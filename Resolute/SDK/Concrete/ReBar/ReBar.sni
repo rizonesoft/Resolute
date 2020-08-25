@@ -1,0 +1,139 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 5
+Script = ReBar.au3
+
+[Modules]
+Build = 1
+Compress = 1
+Sign = 1
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 1
+Tidy = 0
+Sourcecode = 1
+GitHub = 1
+SourcePackage = 1
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://www.rizonesoft.com
+
+[Distribute]
+File=ReBar.exe
+File=ReBar_X64.exe
+File=ReBar.ini
+File=Docs\Changes.txt
+File=Docs\License.txt
+File=Docs\Readme.txt
+File=Themes\Processing\32\Stroke.ani
+File=Themes\Processing\64\Globe.ani
+
+[Sources]
+File=Docs\Changes.txt
+File=Docs\License.txt
+File=Docs\Readme.txt
+File=Templates\Changes.tpl
+File=Templates\License.tpl
+File=Templates\Readme.tpl
+File=Themes\Icons\Error.ico
+File=Themes\Icons\ReBar.ico
+File=Themes\Icons\ReBarH.ico
+File=Themes\Icons\Update.ico
+File=Themes\Icons\About\About.ico
+File=Themes\Icons\About\Facebook.ico
+File=Themes\Icons\About\FacebookH.ico
+File=Themes\Icons\About\GitHub.ico
+File=Themes\Icons\About\GitHubH.ico
+File=Themes\Icons\About\GooglePlus.ico
+File=Themes\Icons\About\GooglePlusH.ico
+File=Themes\Icons\About\PayPal.ico
+File=Themes\Icons\About\PayPalH.ico
+File=Themes\Icons\About\sa.ico
+File=Themes\Icons\About\saH.ico
+File=Themes\Icons\About\Twitter.ico
+File=Themes\Icons\About\TwitterH.ico
+File=Themes\Icons\Dialogs\Check.ico
+File=Themes\Icons\Dialogs\Error.ico
+File=Themes\Icons\Dialogs\Gear.ico
+File=Themes\Icons\Dialogs\Information.ico
+File=Themes\Icons\Dialogs\Love.ico
+File=Themes\Icons\Flags\af.ico
+File=Themes\Icons\Flags\ar.ico
+File=Themes\Icons\Flags\bg.ico
+File=Themes\Icons\Flags\cs.ico
+File=Themes\Icons\Flags\da.ico
+File=Themes\Icons\Flags\de.ico
+File=Themes\Icons\Flags\el.ico
+File=Themes\Icons\Flags\en.ico
+File=Themes\Icons\Flags\es.ico
+File=Themes\Icons\Flags\fr.ico
+File=Themes\Icons\Flags\hi.ico
+File=Themes\Icons\Flags\hr.ico
+File=Themes\Icons\Flags\id.ico
+File=Themes\Icons\Flags\is.ico
+File=Themes\Icons\Flags\it.ico
+File=Themes\Icons\Flags\iw.ico
+File=Themes\Icons\Flags\ja.ico
+File=Themes\Icons\Flags\ko.ico
+File=Themes\Icons\Flags\nl.ico
+File=Themes\Icons\Flags\no.ico
+File=Themes\Icons\Flags\pl.ico
+File=Themes\Icons\Flags\pt.ico
+File=Themes\Icons\Flags\ro.ico
+File=Themes\Icons\Flags\ru.ico
+File=Themes\Icons\Flags\sk.ico
+File=Themes\Icons\Flags\sv.ico
+File=Themes\Icons\Flags\th.ico
+File=Themes\Icons\Flags\tr.ico
+File=Themes\Icons\Flags\vi.ico
+File=Themes\Icons\Flags\zh-CN.ico
+File=Themes\Icons\logging\Complete.ico
+File=Themes\Icons\logging\Cross.ico
+File=Themes\Icons\logging\Exclamation.ico
+File=Themes\Icons\logging\Information.ico
+File=Themes\Icons\logging\Skull.ico
+File=Themes\Icons\logging\Smiley-Glass.ico
+File=Themes\Icons\logging\Snowman.ico
+File=Themes\Processing\32\Globe.ani
+File=Themes\Processing\64\Globe.ani
+File=UDF\Localization.au3
+
+[Links]
+ThankYouURL=https://goo.gl/tGtJ6a
+CompanyURL=https://www.rizonesoft.com
+SupportURL=https://www.rizonesoft.com/forums/
+ContactURL=https://www.rizonesoft.com/contact
+UpdateURL=https://www.rizonesoft.com/downloads/rizonesoft-sdk/
+
+[Environment]
+ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3
+Company=Rizonesoft
+CompanyURL=https://www.rizonesoft.com
+Name=ReBar Framework
+ShortName=ReBar
+Description=AutoIt Application Framework
+Type=N
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Themes\Icons\ReBar.ico
+Version=5.0.2.2151
+VersionMajor=5
+VersionMaintenance=2
+VersionBuild=2151
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=ReBar.exe
+OutFileX64=ReBar_X64.exe
+OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.exe
+OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\2151
+DistributionName=ReBar_2151
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\2151\ReBar_2151
+DistroSourceName=ReBar_2151_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\2151\ReBar_2151_Source

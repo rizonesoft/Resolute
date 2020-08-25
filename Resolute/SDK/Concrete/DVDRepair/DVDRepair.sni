@@ -1,0 +1,89 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 5
+Script = DVDRepair.au3
+
+[Modules]
+Build = 1
+Compress = 1
+Sign = 1
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 1
+Sourcecode = 1
+SourcePackage = 1
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://www.rizonesoft.com
+
+[Distribute]
+File=%RootDir%\DVDRepair.exe
+File=%RootDir%\DVDRepair_X64.exe
+File=%SourceDir%\~DVDRepair.ini
+File=%SourceDir%\Docs\Changes.txt
+File=%SourceDir%\Docs\License.txt
+File=%SourceDir%\Docs\Readme.txt
+File=%RootDir%\Language\DVDRepair\af.ini
+File=%RootDir%\Language\DVDRepair\el.ini
+File=%RootDir%\Language\DVDRepair\en.ini
+File=%RootDir%\Language\DVDRepair\es.ini
+File=%RootDir%\Language\DVDRepair\fr.ini
+File=%RootDir%\Language\DVDRepair\zh-TW.ini
+File=%RootDir%\Processing\32\Stroke.ani
+File=%RootDir%\Processing\64\Stroke.ani
+File=%RootDir%\Processing\64\Globe.ani
+
+[Sources]
+File=Docs\
+File=Language\DVDRepair\
+File=Templates\
+File=Themes\Processing\32\
+File=Themes\Processing\64\
+File=Themes\Icons\
+File=Themes\Icons\About\
+File=Themes\Icons\Dialogs\
+File=Themes\Icons\Flags\
+File=Themes\Icons\logging\
+File=Themes\Icons\Menus\
+File=Themes\Icons\Power\
+File=UDF\
+File=Readme.md
+UDF=UDF\Localization.au3
+
+[Links]
+CompanyURL=https://www.rizonesoft.com
+SupportURL=https://www.rizonesoft.com/support/
+UpdateURL=https://www.rizonesoft.com/downloads/dvd-drive-repair/update/
+
+[Environment]
+ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
+Company=Rizonesoft
+CompanyURL=https://www.rizonesoft.com
+Name=DVD Drive Repair
+ShortName=DVDRepair
+Description=Rizonesoft DVD Drive Repair
+Type=N
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\..\..\Resources\Icons\DVDRepair.ico
+Version=2.2.2.1116
+VersionMajor=2
+VersionMaintenance=2
+VersionBuild=1116
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=DVDRepair.exe
+OutFileX64=DVDRepair_X64.exe
+OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair.exe
+OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1116
+DistributionName=DVDRepair_1116
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1116\DVDRepair_1116
+DistroSourceName=DVDRepair_1116_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1116\DVDRepair_1116_Source
