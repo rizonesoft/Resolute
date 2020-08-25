@@ -1,0 +1,41 @@
+==================================================
+RIZONESOFT REBAR FRAMEWORK CHANGES
+==================================================
+
+--------------------------------------------------
+Version 5.0.2.1986 (2017 06, 2017)
+--------------------------------------------------
+
+- Cleaner optimized code.
+- Main Window is now Resizable.
+- Removed unsupported Win10 AutoIt directive.
+- External resource dlls removed. Icons now embedded in exe.
+- Improved update notification system with option to disable update checks.
+- Added option to manually check for updates to the Help menu.
+- Added update animation.
+- Added customizable splash delay.
+- Added GitHub link to the Help menu to quickly create an issue.
+- Added GitHub link on the About Dialog.
+- Added Downloads, Contact and Donate links to the Help menu.
+- New PayPal.me donation link (PayPal.me/rizonesoft).
+- New none-intrusive Donate prompt after a set time. (120 Hours Default)
+  The Donate prompt will only be shown once.
+- Improved custom Progress Bar. 
+- Improved About Dialog (New Mouse Hover Effects for Image Buttons).
+- Improved Splash Screen (New custom Progress Bar).
+- Added Localization (Translations).
+- Added Afrikaans language file.
+- Alt+F4 now closes the program and not Esc. (Safer!)
+- New Global error count for the logging subsystem.
+- Moved Documents to Documents folder.
+- New Help (chm) file.
+- Now more customizable.
+- Minor cosmetic changes.
+
+--------------------------------------------------
+Version 1.0.0.815
+--------------------------------------------------
+
+No history recorded.
+
+==================================================

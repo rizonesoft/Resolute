@@ -1,0 +1,106 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 5
+Script = Firemin.au3
+
+[Modules]
+Build = 1
+Compress = 1
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 0
+Sourcecode = 1
+GitHub = 1
+SourcePackage = 1
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://www.rizonesoft.com
+
+[Distribute]
+File=Firemin.exe
+File=Firemin_X64.exe
+File=~Firemin.ini
+File=Docs\Changes.txt
+File=Docs\License.txt
+File=Docs\Readme.txt
+File=Language\Firemin\af.ini
+File=Language\Firemin\de.ini
+File=Language\Firemin\el.ini
+File=Language\Firemin\en.ini
+File=Language\Firemin\es.ini
+File=Language\Firemin\fa.ini
+File=Language\Firemin\fr.ini
+File=Language\Firemin\hu.ini
+File=Language\Firemin\it.ini
+File=Language\Firemin\ja.ini
+File=Language\Firemin\ko.ini
+File=Language\Firemin\pl.ini
+File=Language\Firemin\pt.ini
+File=Language\Firemin\pt-BR.ini
+File=Language\Firemin\ru.ini
+File=Language\Firemin\sl.ini
+File=Language\Firemin\tr.ini
+File=Language\Firemin\zh-CN.ini
+File=Language\Firemin\zh-TW.ini
+File=Themes\Processing\32\Stroke.ani
+File=Themes\Processing\64\Globe.ani
+
+[Sources]
+File=Docs\
+File=Language\Firemin\
+File=Templates\
+File=Themes\Processing\16\
+File=Themes\Processing\32\
+File=Themes\Processing\64\
+File=Themes\Sounds\
+File=Themes\Icons\
+File=Themes\Icons\About\
+File=Themes\Icons\Dialogs\
+File=Themes\Icons\Flags\
+File=Themes\Icons\logging\
+File=Themes\Icons\Menus\
+File=Themes\Icons\Power\
+File=UDF\
+UDF=UDF\Localization.au3
+File=.gitignore
+File=Readme.md
+
+[Links]
+CompanyURL=https://www.rizonesoft.com
+SupportURL=https://www.rizonesoft.com/support/
+ContactURL=https://www.rizonesoft.com/contact
+UpdateURL=https://www.rizonesoft.com/downloads/firemin/
+
+[Environment]
+ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+Company=Rizonesoft
+CompanyURL=https://www.rizonesoft.com
+Name=Firemin
+ShortName=Firemin
+Description=Firemin
+Type=N
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Themes\Icons\Firemin.ico
+Version=6.2.3.5065
+VersionMajor=6
+VersionMaintenance=3
+VersionBuild=5065
+UseBeta=P
+UseX64=Y
+CompileBoth=Y
+OutFile=Firemin.exe
+OutFileX64=Firemin_X64.exe
+OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.exe
+OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5065
+DistributionName=Firemin_5065
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5065\Firemin_5065
+DistroSourceName=Firemin_5065_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5065\Firemin_5065_Source
