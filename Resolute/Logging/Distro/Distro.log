@@ -2364,3 +2364,133 @@
 [ 2020/08/04 19:32:55 ] Everything is Ok
 [ 2020/08/04 19:32:55 ] Finished: Zip Package created.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/25 22:42:11 ] DATE:                        2020/08/25 22:42:11
+[ 2020/08/25 22:42:11 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3576
+[ 2020/08/25 22:42:11 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/25 22:42:11 ] COMPILED:                    YES
+[ 2020/08/25 22:42:11 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/25 22:42:11 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/25 22:42:11 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/25 22:42:11 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/25 22:42:11 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/25 22:43:20 ] DATE:                        2020/08/25 22:43:20
+[ 2020/08/25 22:43:20 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3576
+[ 2020/08/25 22:43:20 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/25 22:43:20 ] COMPILED:                    YES
+[ 2020/08/25 22:43:20 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/25 22:43:20 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/25 22:43:20 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/25 22:43:20 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/25 22:43:20 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2020/08/25 22:43:59 ] Building Complete Internet Repair...
+------------------------------------------------------------------------------------------
+[ 2020/08/25 22:44:00 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2020/08/25 22:44:00 ] from:Distro_X64.exe (5.0.2.3576) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2020/08/25 22:44:01 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+[ 2020/08/25 22:44:01 ] "C:\Users\Venom\Documents\GitHub\Resolute\Resolute\SDK\Includes\Link.au3"(1,2) : error: Statement cannot be just an expression. (illegal character)
+[ 2020/08/25 22:44:01 ] O˜
+[ 2020/08/25 22:44:01 ] ~^
+[ 2020/08/25 22:44:01 ] "C:\Users\Venom\Documents\GitHub\Resolute\Resolute\SDK\Includes\Link.au3"(1,2) : error: O(): undefined function.
+[ 2020/08/25 22:44:01 ] O˜
+[ 2020/08/25 22:44:01 ] ~^
+[ 2020/08/25 22:44:01 ] C:\Users\Venom\Documents\GitHub\Resolute\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3 - 2 error(s), 0 warning(s)
+[ 2020/08/25 22:44:01 ] !> AU3Check ended. rc:2
+[ 2020/08/25 22:44:01 ] +> AutoIt3Wrapper Finished.
+[ 2020/08/25 22:44:04 ] Finished: Finished building Complete Internet Repair.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/25 22:47:49 ] DATE:                        2020/08/25 22:47:49
+[ 2020/08/25 22:47:49 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3576
+[ 2020/08/25 22:47:49 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/25 22:47:49 ] COMPILED:                    YES
+[ 2020/08/25 22:47:49 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/25 22:47:49 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/25 22:47:49 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/25 22:47:49 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/25 22:47:49 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/25 23:57:09 ] DATE:                        2020/08/25 23:57:09
+[ 2020/08/25 23:57:09 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3576
+[ 2020/08/25 23:57:09 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/25 23:57:09 ] COMPILED:                    YES
+[ 2020/08/25 23:57:09 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/25 23:57:09 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/25 23:57:09 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/25 23:57:09 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/25 23:57:09 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2020/08/25 23:57:33 ] Generating Documentation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2020/08/25 23:57:33 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates'
+[ 2020/08/25 23:57:33 ] 03 templates files found.
+[ 2020/08/25 23:57:33 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Changes.tpl
+[ 2020/08/25 23:57:33 ] Document created successfuly.
+[ 2020/08/25 23:57:33 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Changes.txt
+[ 2020/08/25 23:57:33 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\License.tpl
+[ 2020/08/25 23:57:33 ] Document created successfuly.
+[ 2020/08/25 23:57:33 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\License.txt
+[ 2020/08/25 23:57:33 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Readme.tpl
+[ 2020/08/25 23:57:33 ] Document created successfuly.
+[ 2020/08/25 23:57:33 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Readme.txt
+[ 2020/08/25 23:57:33 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2020/08/25 23:57:36 ] Distributing Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\ComIntRep.exe Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\ComIntRep_X64.exe Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\ComIntRep.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Docs\Changes.txt Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Docs\License.txt Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Docs\Readme.txt Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\af.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\ar.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\de.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\el.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\en.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\es.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\fr.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\hu.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\it.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\pt-BR.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\ru.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\sl.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\tr.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\zh-CN.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Language\ComIntRep\zh-TW.ini Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Processing\16\Process.ani Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Processing\32\Stroke.ani Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Processing\64\Stroke.ani Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Processing\64\Globe.ani Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Sounds\Complete.wav Distribution Created.
+[ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Sounds\Welcome.wav Distribution Created.
+[ 2020/08/25 23:57:37 ] Finished: Complete Internet Repair Distribution Created.
+------------------------------------------------------------------------------------------
