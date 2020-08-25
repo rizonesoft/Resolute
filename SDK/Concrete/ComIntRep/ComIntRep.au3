@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Complete Internet Repair			;~ Comment field
 #AutoIt3Wrapper_Res_Description=Complete Internet Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=5.2.3.4126
+#AutoIt3Wrapper_Res_Fileversion=5.2.3.4132
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -146,12 +146,13 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 267
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 268
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\InformationH.ico		; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information-D.ico		; 269
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information.ico			; 270
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\RunH.ico				; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run-D.ico				; 271
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run.ico					; 272
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Complete.ico			; 273
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Cross.ico				; 274
+
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-0.ico			; 275
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-1.ico			; 276
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-2.ico			; 277
@@ -626,14 +627,14 @@ Func _StartCoreGui()
 		_GuiCtrlMenuEx_CreateMenuItem("", $mnuFileLog)
 		$miTcpResLog = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[6], $mnuFileLog)
 	EndIf
-	$mnuFileExport = _GuiCtrlMenuEx_CreateMenu($g_aLangMenus[7], $g_hMenuFile, $g_aMenuIcons[3], $g_iMenuIconsStart + 3)
+	$mnuFileExport = _GuiCtrlMenuEx_CreateMenu($g_aLangMenus[7], $g_hMenuFile, $g_aMenuIcons[3], $g_iMenuIconsStart + 9)
 	$g_miExport[0] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[8], $mnuFileExport)
 	$g_miExport[1] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[9], $mnuFileExport)
 	$g_miExport[2] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[10], $mnuFileExport)
 	$g_miExport[3] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[11], $mnuFileExport)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuFile)
 	$miFileReboot = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[12], $g_hMenuFile)
-	$miFileClose = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[13], $g_hMenuFile, $g_aMenuIcons[4], $g_iMenuIconsStart + 4)
+	$miFileClose = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[13], $g_hMenuFile, $g_aMenuIcons[4], $g_iMenuIconsStart + 3)
 
 	GUICtrlSetOnEvent($miFileEventLog, "_StartEventLog")
 	GUICtrlSetOnEvent($miFileOptions, "_ShowPreferencesDlg")
@@ -647,20 +648,20 @@ Func _StartCoreGui()
 	GUICtrlSetOnEvent($miFileReboot, "_Reboot")
 	GUICtrlSetOnEvent($miFileClose, "_ShutdownProgram")
 
-	$miMaintRestore = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[15], $g_hMenuMaintenance, $g_aMenuIcons[5], $g_iMenuIconsStart + 5)
+	$miMaintRestore = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[15], $g_hMenuMaintenance, $g_aMenuIcons[5], $g_iMenuIconsStart + 10)
 	GUICtrlSetOnEvent($miMaintRestore, "_OpenWindowsSystemRestore")
 
 	If @OSVersion <> "WIN_XP" And @OSVersion <> "WIN_2003" Then
 
-		$g_miTrouble[0] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[17], $g_hMenuTrouble, $g_aMenuIcons[6], $g_iMenuIconsStart + 6)
-		$g_miTrouble[1] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[18], $g_hMenuTrouble, $g_aMenuIcons[7], $g_iMenuIconsStart + 7)
-		$g_miTrouble[2] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[19], $g_hMenuTrouble, $g_aMenuIcons[8], $g_iMenuIconsStart + 8)
-		$g_miTrouble[3] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[20], $g_hMenuTrouble, $g_aMenuIcons[9], $g_iMenuIconsStart + 9)
-		$g_miTrouble[4] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[21], $g_hMenuTrouble, $g_aMenuIcons[10], $g_iMenuIconsStart + 10)
-		$g_miTrouble[5] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[22], $g_hMenuTrouble, $g_aMenuIcons[11], $g_iMenuIconsStart + 11)
+		$g_miTrouble[0] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[17], $g_hMenuTrouble, $g_aMenuIcons[6], $g_iMenuIconsStart + 11)
+		$g_miTrouble[1] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[18], $g_hMenuTrouble, $g_aMenuIcons[7], $g_iMenuIconsStart + 12)
+		$g_miTrouble[2] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[19], $g_hMenuTrouble, $g_aMenuIcons[8], $g_iMenuIconsStart + 13)
+		$g_miTrouble[3] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[20], $g_hMenuTrouble, $g_aMenuIcons[9], $g_iMenuIconsStart + 14)
+		$g_miTrouble[4] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[21], $g_hMenuTrouble, $g_aMenuIcons[10], $g_iMenuIconsStart + 15)
+		$g_miTrouble[5] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[22], $g_hMenuTrouble, $g_aMenuIcons[11], $g_iMenuIconsStart + 16)
 		_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuTrouble)
 		$g_miTrouble[6] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[23], $g_hMenuTrouble)
-		$g_miTrouble[7] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[24], $g_hMenuTrouble, $g_aMenuIcons[12], $g_iMenuIconsStart + 12)
+		$g_miTrouble[7] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[24], $g_hMenuTrouble, $g_aMenuIcons[12], $g_iMenuIconsStart + 17)
 		_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuTrouble)
 		$g_miTrouble[8] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[25], $g_hMenuTrouble)
 		$g_miTrouble[9] = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[26], $g_hMenuTrouble)
@@ -683,13 +684,13 @@ Func _StartCoreGui()
 
 	EndIf
 
-	$miTroubleSpeed = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[27], $g_hMenuTrouble, $g_aMenuIcons[13], $g_iMenuIconsStart + 13)
-	$miTroubleRoutPass = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[28], $g_hMenuTrouble, $g_aMenuIcons[14], $g_iMenuIconsStart + 14)
+	$miTroubleSpeed = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[27], $g_hMenuTrouble, $g_aMenuIcons[13], $g_iMenuIconsStart + 18)
+	$miTroubleRoutPass = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[28], $g_hMenuTrouble, $g_aMenuIcons[14], $g_iMenuIconsStart + 19)
 	GUICtrlSetOnEvent($miTroubleSpeed, "_SpeedTest")
 	GUICtrlSetOnEvent($miTroubleRoutPass, "_GetRouterPasswords")
 
-	$miToolsRDP = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[30], $g_hMenuTools, $g_aMenuIcons[15], $g_iMenuIconsStart + 15)
-	$miToolsIEP = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[31], $g_hMenuTools, $g_aMenuIcons[16], $g_iMenuIconsStart + 16)
+	$miToolsRDP = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[30], $g_hMenuTools, $g_aMenuIcons[15], $g_iMenuIconsStart + 20)
+	$miToolsIEP = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[31], $g_hMenuTools, $g_aMenuIcons[16], $g_iMenuIconsStart + 21)
 
 	GUICtrlSetOnEvent($miToolsRDP, "_OpenRDP")
 	GUICtrlSetOnEvent($miToolsIEP, "_OpenIEProperties")
@@ -708,16 +709,16 @@ Func _StartCoreGui()
 
 	EndIf
 
-	$g_hUpdateMenuItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[36], $g_hMenuHelp, $g_aMenuIcons[17], $g_iMenuIconsStart + 17)
+	$g_hUpdateMenuItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[36], $g_hMenuHelp, $g_aMenuIcons[17], $g_iMenuIconsStart + 4)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpHome = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[37], $g_hMenuHelp, $g_aMenuIcons[18], $g_iMenuIconsStart + 18)
+	$miHelpHome = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[37], $g_hMenuHelp, $g_aMenuIcons[18], $g_iMenuIconsStart + 5)
 	; $miHelpDownloads = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[38], $g_hMenuHelp)
-	$miHelpSupport = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[39], $g_hMenuHelp, $g_aMenuIcons[19], $g_iMenuIconsStart + 19)
+	$miHelpSupport = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[39], $g_hMenuHelp, $g_aMenuIcons[19], $g_iMenuIconsStart + 6)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpGitHub = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[40], $g_hMenuHelp, $g_aMenuIcons[20], $g_iMenuIconsStart + 20)
+	$miHelpGitHub = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[40], $g_hMenuHelp, $g_aMenuIcons[20], $g_iMenuIconsStart + 7)
 	$miHelpDonate = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[41], $g_hMenuHelp)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpAbout = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[42], $g_hMenuHelp, $g_aMenuIcons[21], $g_iMenuIconsStart + 21)
+	$miHelpAbout = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[42], $g_hMenuHelp, $g_aMenuIcons[21], $g_iMenuIconsStart + 8)
 
 	GUICtrlSetOnEvent($g_hUpdateMenuItem, "_CheckForUpdates")
 	GUICtrlSetOnEvent($miHelpHome, "_About_HomePage")
