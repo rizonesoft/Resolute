@@ -5,8 +5,8 @@
 ;===============================================================================================================
 ; Tidy Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Run_Tidy=Y                                        ;~ (Y/N) Run Tidy before compilation. Default=N
-#AutoIt3Wrapper_Tidy_Stop_OnError=Y                                ;~ (Y/N) Continue when only Warnings. Default=Y
+#AutoIt3Wrapper_Run_Tidy=Y										;~ (Y/N) Run Tidy before compilation. Default=N
+#AutoIt3Wrapper_Tidy_Stop_OnError=Y								;~ (Y/N) Continue when only Warnings. Default=Y
 
 #EndRegion AutoIt3Wrapper Directives Section
 
@@ -56,7 +56,7 @@ If Not IsDeclared("g_sUrlSupport") Then Global $g_sUrlSupport
 If Not IsDeclared("g_sUrlDownloads") Then Global $g_sUrlDownloads
 If Not IsDeclared("g_sUrlFacebook") Then Global $g_sUrlFacebook
 If Not IsDeclared("g_sUrlTwitter") Then Global $g_sUrlTwitter
-If Not IsDeclared("g_sUrlLinkedIn") Then Global $g_sUrlLinkedIn
+If Not IsDeclared("g_sUrlGooglePlus") Then Global $g_sUrlGooglePlus
 If Not IsDeclared("g_sUrlRSS") Then Global $g_sUrlRSS
 If Not IsDeclared("g_sUrlPayPal") Then Global $g_sUrlPayPal
 If Not IsDeclared("g_sUrlGitHub") Then Global $g_sUrlGitHub
@@ -229,7 +229,7 @@ EndFunc   ;==>_About_ShowDialog
 
 Func _About_Support()
 	ShellExecute(_Link_Split($g_sUrlSupport))
-EndFunc   ;==>_About_Support
+EndFunc   ;==>_About_Contact
 
 
 Func _About_Downloads()
@@ -253,7 +253,7 @@ EndFunc   ;==>_About_GitHubIssues
 
 
 Func _About_GooglePlus()
-	ShellExecute(_Link_Split($g_sUrlLinkedIn))
+	ShellExecute(_Link_Split($g_sUrlGooglePlus))
 EndFunc   ;==>_About_GooglePlus
 
 
@@ -301,26 +301,136 @@ EndFunc   ;==>__About_CloseDialog
 Func __About_OnIconsHover()
 
 	Local $iCursorAbout = GUIGetCursorInfo()
-	If Not @err®YûÂ›Y¬Appe‚0D
-g¦i=¡æ'Œdy4ÿ)g[ÀnuÇŞ`ıpˆ	Œ,5‹„¸<utP…–Ãkä.#ñ"Á×«AÊe¯1µjL¼»b¼Ï ÿ.‰ªb_´TŒî¸ÛkÌgÑ÷µ«õN×³÷¼yšd…ï¯¢ÖüÃæªÉİµe â–åt¢4Ú÷RïÜ<Í˜–‹Ü{®Gv^ n«ï™ZĞİuO½v—gXïUÏÙšEqí&é0ˆÀ‡fÊ»Ûov6K#mè¹ï1—9¾O'¤àú7=Hèá:d†}ªGƒ	D–„ğwi+>şB“ÄŒ¯6>¿7Tl	Ô¦ê©_5T×—/ùDâàÛLdÇù±KZ©ãôôÄ­UÖ“Lƒid¢¦*»ÓYâNò†ênë [°„3|ÕxÄÎA˜#ı½ìFÅ7
-[{ñ¨Ó×9ŸYdh¢Òb(·2)gRTÒ¼‚b©ÿÏÕ ×ƒ
-ŒõgõËö¹mtŠŞõ<ÆGMq@|¤d»r¯ÖIs"µÇâÏJ÷´ô½ˆüÃ´’ÓŠ`ëêPt[€7õÅğ|¢şan‘Çé³¨[¨…¶yM_;6‹$Ü.^Ô®¡²…@ŞÛ~#z‚Ùëjµ©–o%ÔK@G:œ1dZ©ZVÛM ”_¨v¤5ï@êî•ÎòŞ¿Ÿnˆºú„µ‡rÔ4cjg^Ûşï÷’å{iÁúÒ€£1öñwëá·§©Vi	ëºYñinI‡ã Ÿò¼†3¤Û”ÅJRN¡’Ã-ƒMO­‚û÷›bóçÔöÛHé¤ƒZ´ZL8‹æö ,çË(®èIJeè2N(‰ùÅø«7ıÆ!ç,GûMÇÉÈË3™òCRœl½ò‡Ù(ÈÎ@R^}xjï"şš¿4ùW^Ë™?Ó`œ!÷{TŞ³œ”¤ºpv1ÿ}Ù¬Ô{|Ş@³ª¯Â_qş»8x¡³ºu$wdrè(ÙGÔšÄõ;8ñì9Bµ~ßÄrúO$D¥·T¤ŸzĞaÛ»ÄŒœæb*bˆ8Èá9I-Æ?X×;WÁ×J{¡úJ6Í‚TJ
-`ÂØ±õö"|FÕ‡Nz¾9OQ@R;²ì«PÃ@±£~”Ñ'cğpÄ—t–èMÛ5D~ÏÕX˜^R«}¡(¸©8 ˆÿåÛÑ…Ö]mca=M÷Å8.±;¨‡7NÁ¦ÒZÄû.ÃÙ½ÖÃ³ƒÒÓŠïUünÊû Ğ[œgˆ>£ôÍeå¸]šìe¦W_œñb¢æ¶ı>ú[«–]Iœê&ˆøïÁñnâTTtÑm#oËÃÈ"D@ä…¬Yïæ€S¨ò‰‹öû¹N3=±—y4øaFşå¢È—dAz}c1O¬eª3¡SÌ[õkK¡çĞ÷[D„3˜0›iÀ?íå{’; 8àËû¢àÁÑ¦÷¦hCi¥¿æx8ÛìšÑŸ¡…ÌÛy±-^T1`R ûºA8ÍÈI<ËXı¬¸çO7˜ƒÔŠ´ü7Ğ5¨^ œe~ğÄ-±Œe~§í'È‚Azê^ *Cá·%ó‚ë#]Ô
-¤²yâ¨´KsC.v²F¨Ò¸¥£YÃqÙg³G,6k‰PfAä‡rÆ§¤öÀ“iaíşoÇ±kCÜó…DV\Ñíèì1;i£uä&é_¸|k
-	hîw=Ì9ØG2’½…•ôåBCÒ˜6•‘s	¹g.äãIIfÒ<ğ7› Ä¹ M˜2²“<9r¢$ˆÅa°‚ÔèW	`äæo³#*"óÖ:b½/9ïædo 2øw7O/%\’)ˆUD§PıH¥Ìâ/}äÀ(3D1ÏúqºORR^©^W&KÁDé¢ÁÂFìÂ`!‰ôbå Şİ¸‚UÿÙG­š3øâµúÊ5:Ğ/NHM‹†¸}Šm`ïÙp¨Q³…ŸEd¥ÀÚåe}Ì|ÄàÙ¨oÇoêÓ-—zÙ7-%ùìŞb§‰Õé¶™EIñÿéÁà.5w:{,î¡òRš0–ÅR­W_W¡wañô¤ô;ø¥Á	È³ıñIñ¿1¡—óóGn<Ÿ’åŒA²d5[æ›•EO—l;ÕÓ—æè¿ÖÄÎUã«Õ³è²Å/^úâ™H¥³—Xd¤{/G¯@éoN'~Œ*KÖÈÄŸú‹D`r’„Bµş,¨ˆ>ÚvC½?ŞÒ–E¾Ùoßpí%	aŸJ¾a¦z“Ím]r‚Éİ§¬^«ÙB6lïZ—ˆG0ò]½‡8´ùJ¥±{™.~W»ug;¹ç¸“×çÿÊ¬¶»Ñ´Ó?…loSzÛ)f¸`’oæ`"+xÇŸı¸^]œÔ *Wg¸­§d®±)laÅPÚ–ˆ+Ö
-ÉwÜªp7şóÅEpÆî±Êµ•=İPJÂD­’r	y+»=dÁxjÚ
-™Ub2f±DF°AK­{}J”ĞÜ:ÿY´·ŸCCwƒØ±ı×Ä´×+ŞSP©ò;v`şQÁ<-l¨2ºâcoÍ\uß›Øê¢¹-KMÑéo†òÛñÑ»~ 
-p¥¡ìäÁk·ç|6çnBj@ohILäšÚÎëçLE&L#tãógoae¸Ê±¨úCÚôÚ±$Sûså'¨•´qDB8è%'>†Ûfo¬ÈÒ™uhb§ö~GßZaT¨É8¸_/Ô"ée^³ãÍ
- ]ğ˜Ò kVSŒ 9ÂŠâÑ´QÎwUQpğŸßÖŠhåK3 >ñ7’W#ïz[Gõxø´Æ¼¡®cÔ=àŸ°3­åÊ"‡HnÚşí%ŠmUMê9$H¦!G„}rcÌ8ß ]s8£åñFfP6¶@Cn?rF²R«u°$
-’ixß¿µÏ~üóÀŞ=ªFä>‹} ¦£¦Ï>Šğ4(%n„ñ‰¦‡Ì…Åƒê•,Ğy­@À}l7‰'ı”Xœø+Ò‡ÿºğ›r–˜ß&Û_b^T&€K¬Úó7ğ½Tzí•”Âv¿X„IW–,9M }­ô˜ŒæI†$GÀC¤'gŸÉ„UBNRÿêö«tİ\@Üé»’r§
-2„'®HÄ½	^‰‚Ï¿òÅağgªÑªŒÆ™İY¥¦ñ*vd¼òì5|Â ˆ™òI•éá]ìjÜEü	|şG÷İ*¶P<¯ÒUŠŞ‚ï@
-nä˜ïA¼õf12rYÈ1Š‡DÔL©i¡‹[¨Gª9?8´¿°h»³¡Ñ#Bø¼J ëQYfÔÈKÊ½OÅ" é›Õ½|q¼½ Äk†§Ä‘J;, áZi«ór>‹_x3˜Ê0¯ ş+ñØ2÷nX“±ø
-.qğ9ŒKqÏ¡saÁ$<îÂü†ö2İ”È$7x®R\œÆHƒ!€{¢)2}¸`Dô‚Ä-œí‚i5'¯oÍuk%"üúÄ/Ûğ8ÚŒü7É¼wöT£Bnaì|?6‚5ÌŞXT/Ù°¿2ßi( ´<tXHqƒ¼»Ì0¶&Zƒ~dò"çì‘®ø‹0ı"ó‚­…¨»ĞP®xóÍ‡†²å‚úUÉ–sh½øç	Xo*Dqİ×¿Òa‹zØ…/¶äCn )2â=i‚¿ùàÏy®Æ¾YÏ¹ø™(¸T”wH?ş‘V×Oøô“1Kh'‘ígóV¾c©\Ë\ZTFÈ?Z^ûY‘çş#|œÏ÷2'Š£v;YÈ}åá(ŠÒ’8>Õe	Ÿm¤›pñ<†G÷¹â!öÍÆEth`Y7•uÑh'ËÊØ·âŠsğPÍ$=®ÔÛšu¤È6Z¡©mPÇ¯Õ|Ğ;l)‚š1•92„ş;Œ&ÜÑÂnÎ Ë
-øÜ9ÇfèûjÒÁL½?vŸ]d@oÇŞÒ-ëX0¥Dxníy·Ã„¹‚V]tÖvt×DŒ³;L¾İ•ı”–Æˆª®Bö¹İEèS÷9[‰dÒ6Éö~©†¬
-‹Zü¿}
-ê‘A03‰÷7€gçYÕR.Í7fxô…¶^I­C¡ËXùÃK,í7Yô#;B “g-WTÒßOı…zªó#Êï&İ/  É%p'DÏ3œ¨«‡ÌÚ5Â¾”ƒõDT#¶mÀ?]CÃ¯¹?r7êïu›ŸşÏ²N˜n‡YT/ù³ü²Yfô«‡äÓtáğ´Ç·’ :Şãóİ‘ûRÃˆ[·Î¬$]7b³ŞCAø$ÄDéQÕ×t¯º½=)Ÿ5RÌy1…¶C¾=Ñ¸K…~²»i!šÁ2 k²~^Be.'¡ÓzjŒbcÿ}ş)‚5ŞrÈU½è‰éböÿª!
-¦ÀşüÛäj`£ [!İvÛÖd™Úîï"°éóÖ3eî/§dWŒ˜{¦àºî˜œ‡oİ÷ƒÂEpß-ÖÉÿ£²]±ã÷·˜:Àè*™½à\ßièYªg1$¸Ö¡Uù8ïPßÿü¬Û‰@LÈ›|õE¯€Ñt N´¿îÖa¿¨¯/æíÀóN…ÀMÌ’5#k‘¾7\ñMï—Äû?öÀ´Œ‘Ö­+ÚÁBƒñAÿ+Éğİ(	àÿx¢W¦Û2»şíyfÀröQlÛ—o¦Låïï˜G˜¢Î9ĞJu.Sü“™ˆËh•n."Àg×kº‹å	»Ù7ˆ$4u¿f#9­ÄdOÕÍšPœ>¶FÂ}5< l“ÕüaŸàı#
-`64ï¡}©ü•,(Æƒa5†½±µæ—RæU2‡m±éÉZƒ?Ù´w€,U~²™9#ğ~Ñ8Ë‰¬.Y¶;{L²½“kóßZ !ŞÅN03;‘=póuÑf¡l*ÌVõ v=IWyç	ã/]–¼ÏJOGz=ˆláÕw#* İHYa}
-)¹WÒìÃ`9qØXÿ³Ü¬UÑG»EIÅ¯’[Ë+{1œvN÷GTß¦æ*áËö(y%C›Éâ	<ëØÉ˜C±í2( UDFŞ±1”nffØ¸×øW² vÂKƒ¯Î? Qoãûë÷GIÄR¥áq%$<!®ãZ%Ö-Q*6Ğv'|”Ä ¡Æâ² ¢:ä n(·çÅ¥aM,¼¨ç&^­!_£c¶.»wîò—ˆñŞqƒ&Eç‚ìªƒ›+~èœÏµ0UŞª–ÎŠ£))aNjCÏqoø[!Üˆm7 Ğñ‚Wv&Q?w4ƒ—‚›8¨Ás™EGÑd‡wS$ëÀU_À² ‘ÏVó¬HkcoªŠ­?ê—äåHOêëÙ•b::æã¹·™ó:fà.÷ã$DºÁ´=ş§ÿ:ƒ›o6eæÍ° RAìuìYàR$4õC÷:ÀO<£(ˆ¿Î™÷ëGÆüTóúÕt¨~ï)S”¡  àxH¨´@¯MÃ96UâİNÿ|!í»¡9¡+D˜/J‘²Ü"Öµ–‹7µ`‘œí“pÑâ®?,²> îš¢=«j¸Ã¡ÈDO‰¹_Ísª»”Ú]ê”IKÒ÷Ó ÃyVŒR¿œ·ÎÑ–…£ù÷sÚõ4HÉ«ŞÂ¾¨À‰[{Ÿ^jÖÄ5¼=ÇGöX®b_»Wr–şEn‡ñëéNû•¶?ÂØ¢øíˆ›7‚õğAz—WöJnI‹7ğÏ#òÍËuñÑ
-öµÃ è³İ&ƒ=¦¥=ÕáºÅÚ¥¼¨%nT“Ëë(#Ğ“éÑNVµjÏWÀ¹š&óëê¡=‘åÑ›ÖµÊú®Íá‹ÍmŸ»°)Íƒƒ¥’Ò¬CÂ~e£4w“Ú­ßóFL£%¶ıù¼ŸÇ¦ ¬°-Ô¤6I£”UÇFò²=¯ú¼ÆÒqmÕo‘S¢n ç`«·À†=KÉõG#ÆÈöNßÏµÏğ{]WËSEÅ{çPÁb¾ğ\"«ù;˜¿éHY ¦:{M+ÑÛë°:ÉçuãcµmĞ›)n$¸3g×pr¹®MnKí*!ØI>ßuï´ÀUxƒÕÂæê·¨ÎÊ ÇåˆEøt®â]ix~EÅì(m¸®s¸ôpş$¹•€Gÿ¼™‹c |€¬t“MÄiQ…g{KIûr¢e¦'“ª^4t|ê“R5Šíu
-F2©QqîÃTñ-¶šÃ¹m“ÉÉ8š¬|§‡1„ÈÙÏ<ÑãºZUM§~Iˆ×Q
+	If Not @error Then
+
+		If $iCursorAbout[4] = $g_AboutProgIcon And $g_aAboutProgIcons[2] == 1 Then
+			$g_aAboutProgIcons[2] = 0
+			GUICtrlSetImage($g_AboutProgIcon, $g_aAboutProgIcons[1], 201)
+		ElseIf $iCursorAbout[4] <> $g_AboutProgIcon And $g_aAboutProgIcons[2] == 0 Then
+			$g_aAboutProgIcons[2] = 1
+			GUICtrlSetImage($g_AboutProgIcon, $g_aAboutProgIcons[0], 99)
+		EndIf
+
+		For $iA = 0 To $CNT_ABOUTICONS - 1
+			If $iCursorAbout[4] = $g_aAboutIcons[$iA][0] And $g_aAboutIcons[$iA][3] == 1 Then
+				$g_aAboutIcons[$iA][3] = 0
+				GUICtrlSetImage($g_aAboutIcons[$iA][0], $g_aAboutIcons[$iA][2], $g_iAboutIconStart + ($iA * 2) + 1)
+			ElseIf $iCursorAbout[4] <> $g_aAboutIcons[$iA][0] And $g_aAboutIcons[$iA][3] == 0 Then
+				$g_aAboutIcons[$iA][3] = 1
+				GUICtrlSetImage($g_aAboutIcons[$iA][0], $g_aAboutIcons[$iA][1], $g_iAboutIconStart + ($iA * 2))
+			EndIf
+		Next
+
+	EndIf
+
+EndFunc   ;==>__About_OnIconsHover
+
+
+Func __About_SetResources()
+
+	If @Compiled Then
+
+		$g_sDlgAboutIcon = @ScriptFullPath
+		$g_aAboutProgIcons[0] = @ScriptFullPath
+		$g_aAboutProgIcons[1] = @ScriptFullPath
+
+		For $iAi = 0 To $CNT_ABOUTICONS - 1
+			$g_aAboutIcons[$iAi][1] = @ScriptFullPath
+			$g_aAboutIcons[$iAi][2] = @ScriptFullPath
+		Next
+
+	Else
+
+		$g_sDlgAboutIcon = $g_sThemesDir & "\Icons\Dialogs\Information.ico"
+		$g_aAboutProgIcons[0] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & ".ico"
+		$g_aAboutProgIcons[1] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & "H.ico"
+
+		$g_aAboutIcons[0][1] = $g_sThemesDir & "\Icons\About\PayPal.ico"
+		$g_aAboutIcons[0][2] = $g_sThemesDir & "\Icons\About\PayPalH.ico"
+		$g_aAboutIcons[1][1] = $g_sThemesDir & "\Icons\About\sa.ico"
+		$g_aAboutIcons[1][2] = $g_sThemesDir & "\Icons\About\saH.ico"
+		$g_aAboutIcons[2][1] = $g_sThemesDir & "\Icons\About\Facebook.ico"
+		$g_aAboutIcons[2][2] = $g_sThemesDir & "\Icons\About\FacebookH.ico"
+		$g_aAboutIcons[3][1] = $g_sThemesDir & "\Icons\About\Twitter.ico"
+		$g_aAboutIcons[3][2] = $g_sThemesDir & "\Icons\About\TwitterH.ico"
+		$g_aAboutIcons[4][1] = $g_sThemesDir & "\Icons\About\GooglePlus.ico"
+		$g_aAboutIcons[4][2] = $g_sThemesDir & "\Icons\About\GooglePlusH.ico"
+		$g_aAboutIcons[5][1] = $g_sThemesDir & "\Icons\About\GitHub.ico"
+		$g_aAboutIcons[5][2] = $g_sThemesDir & "\Icons\About\GitHubH.ico"
+
+	EndIf
+
+	For $iAh = 0 To $CNT_ABOUTICONS - 1
+		$g_aAboutIcons[$iAh][3] = 1
+	Next
+
+	$g_aAboutProgIcons[2] = 1
+
+EndFunc   ;==>__About_SetResources
+
+
+Func __About_SetDriveSpaceStats()
+
+	Local $sDrive = "", $sDir = "", $sFileName = "", $sExtension = ""
+	_PathSplit(@ScriptDir, $sDrive, $sDir, $sFileName, $sExtension)
+	Local $iSpaceUsed = DriveSpaceTotal($sDrive) - DriveSpaceFree($sDrive)
+	Local $iSpacePerc = Round(($iSpaceUsed / DriveSpaceTotal($sDrive)) * 100)
+	Local $iSpacePercFree = 100 - $iSpacePerc
+
+	If $iSpaceUsed <> $g_aBuffers[0] Then
+		GUICtrlSetData($g_hSpaceLabel, StringUpper(StringFormat($g_aLangAbout[19], _
+				$sDrive, Round(DriveSpaceFree($sDrive) / 1024, 2), Round(DriveSpaceTotal($sDrive) / 1024, 2), $iSpacePercFree)))
+		$g_aBuffers[0] = $iSpaceUsed
+	EndIf
+
+	If $iSpacePerc <> $g_aBuffers[1] Then
+
+		If $iSpacePerc >= 0 And $iSpacePerc < 60 Then
+			_ProgressBar_SetColors($g_hSpaceProg1, $g_hSpaceProg2, "Green")
+		ElseIf $iSpacePerc > 60 And $iSpacePerc < 90 Then
+			_ProgressBar_SetColors($g_hSpaceProg1, $g_hSpaceProg2, "Blue")
+		ElseIf $iSpacePerc > 90 And $iSpacePerc <= 100 Then
+			_ProgressBar_SetColors($g_hSpaceProg1, $g_hSpaceProg2, "Red")
+		EndIf
+
+		_ProgressBar_SetData($g_hAboutGui, $g_hSpaceProg1, $g_hSpaceProg2, 22, 402, 376, $iSpacePerc)
+		$g_aBuffers[1] = $iSpacePerc
+
+	EndIf
+
+EndFunc   ;==>__About_SetDriveSpaceStats
+
+
+Func __About_SetMemoryStats()
+
+	Local $aRAMStats = MemGetStats()
+	Local $iRAMFree = 10, $iRAMPerc = 10, $iRAMPercFree = 10
+
+	If IsArray($aRAMStats) Then
+
+		$iRAMFree = Round($aRAMStats[2] / 1024)
+		$iRAMPerc = $aRAMStats[0]
+		$iRAMPercFree = 100 - $aRAMStats[0]
+
+		If $iRAMFree <> $g_aBuffers[2] Then
+			GUICtrlSetData($g_hRAMLabel, StringUpper(StringFormat($g_aLangAbout[17], _
+					$iRAMFree, Round($aRAMStats[1] / 1024), $iRAMPercFree)))
+			$g_aBuffers[2] = $iRAMFree
+		EndIf
+
+		If $iRAMPerc <> $g_aBuffers[3] Then
+			If $iRAMPerc >= 0 And $iRAMPerc < 60 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Green")
+			ElseIf $iRAMPerc > 60 And $iRAMPerc < 90 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Blue")
+			ElseIf $iRAMPerc > 90 And $iRAMPerc <= 100 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Red")
+			EndIf
+
+			_ProgressBar_SetData($g_hAboutGui, $g_hRAMPRog1, $g_hRAMProg2, 22, 365, 376, $iRAMPerc)
+			$g_aBuffers[3] = $iRAMPerc
+		EndIf
+
+	EndIf
+
+EndFunc   ;==>__About_SetMemoryStats
