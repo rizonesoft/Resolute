@@ -2494,3 +2494,98 @@
 [ 2020/08/25 23:57:36 ] \Concrete\ComIntRep\Distribution\4125\ComIntRep_4125\Sounds\Welcome.wav Distribution Created.
 [ 2020/08/25 23:57:37 ] Finished: Complete Internet Repair Distribution Created.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/26 00:42:06 ] DATE:                        2020/08/26 00:42:06
+[ 2020/08/26 00:42:06 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3576
+[ 2020/08/26 00:42:06 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/26 00:42:06 ] COMPILED:                    YES
+[ 2020/08/26 00:42:06 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/26 00:42:06 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/26 00:42:06 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/26 00:42:06 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/26 00:42:06 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/26 00:45:27 ] DATE:                        2020/08/26 00:45:27
+[ 2020/08/26 00:45:27 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3577
+[ 2020/08/26 00:45:27 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/26 00:45:27 ] COMPILED:                    YES
+[ 2020/08/26 00:45:27 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/26 00:45:27 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/26 00:45:27 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/26 00:45:27 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/26 00:45:27 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2020/08/26 00:46:22 ] Creating installation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\ComIntRep.exe'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\ComIntRep_X64.exe'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\ComIntRep.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Docs\Changes.txt'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Docs\License.txt'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Docs\Readme.txt'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\af.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\ar.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\de.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\el.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\en.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\es.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\fr.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\hu.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\it.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\pt-BR.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\ru.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\sl.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\tr.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\zh-CN.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Language\ComIntRep\zh-TW.ini'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Processing\16\Process.ani'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Processing\32\Stroke.ani'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Processing\64\Stroke.ani'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Processing\64\Globe.ani'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Sounds\Complete.wav'
+[ 2020/08/26 00:46:22 ] Error: Missing Distribution File!
+[ 2020/08/26 00:46:22 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\4131\ComIntRep_4131\Sounds\Welcome.wav'
+[ 2020/08/26 00:46:22 ] Error: Could not create installation!
+[ 2020/08/26 00:46:22 ] ^ The distribution is Incomplete.
+[ 2020/08/26 00:46:22 ] Check the Build configuration file and recreate the Distribution.
+[ 2020/08/26 00:46:22 ] Error: Finished with (28) errors!
+------------------------------------------------------------------------------------------
