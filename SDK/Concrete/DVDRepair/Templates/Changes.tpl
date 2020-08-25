@@ -6,6 +6,36 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed: GUIOnEventMode and TrayOnEventMode options had unnecessary slow downs.
+- Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later (OS bug/design change).
+- Improved Resolute compatibility.
+
+--------------------------------------------------
+Version 2.0.3.1113 (May 28, 2020)
+--------------------------------------------------
+
+- Optimized Functions.
+- Cleaner Code.
+- Resolute Compatibility.
+
+--------------------------------------------------
+Version 2.0.3.1108 (April 10, 2020)
+--------------------------------------------------
+
+- All executables now signed.
+
+--------------------------------------------------
+Version 2.0.3.1105 (April 02, 2020)
+--------------------------------------------------
+
+- Fixed incorrect language flag icons.
+- Removed Google Plus from the About page and replaced it with LinkedIn. 
+- Aligned Uncompiled icons.
+
+--------------------------------------------------
+Version 2.0.3.1100 (September 19, 2018)
+--------------------------------------------------
+
 - Updated to AutoIt version 3.3.14.5 (16 March, 2018)
 - Fixed Welcome Message String Format Bug.
 - Fixed Welcome Message wrong color after update check.

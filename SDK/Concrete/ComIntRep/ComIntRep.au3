@@ -8,7 +8,7 @@
 ; AutoIt3 Settings
 ;===============================================================================================================
 #AutoIt3Wrapper_UseX64=Y										;~ (Y/N) Use AutoIt3_x64 or Aut2Exe_x64. Default=N
-#AutoIt3Wrapper_Version=P                        				;~ (B/P) Use Beta or Production for AutoIt3 and Aut2Eex. Default is P
+#AutoIt3Wrapper_Version=B                        				;~ (B/P) Use Beta or Production for AutoIt3 and Aut2Eex. Default is P
 #AutoIt3Wrapper_Run_Debug_Mode=N								;~ (Y/N) Run Script with console debugging. Default=N
 ;#AutoIt3Wrapper_Autoit3Dir=									;~ Optionally override the AutoIt3 install directory to use.
 ;#AutoIt3Wrapper_Aut2exe=										;~ Optionally override the Aut2exe.exe to use for this script
@@ -16,10 +16,10 @@
 ;===============================================================================================================
 ; Aut2Exe Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Icon=Themes\Icons\ComIntRep.ico					;~ Filename of the Ico file to use for the compiled exe
+#AutoIt3Wrapper_Icon=..\..\Resources\Icons\ComIntRep.ico		;~ Filename of the Ico file to use for the compiled exe
 #AutoIt3Wrapper_OutFile_Type=exe								;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
-#AutoIt3Wrapper_OutFile=ComIntRep.exe							;~ Target exe/a3x filename.
-#AutoIt3Wrapper_OutFile_X64=ComIntRep_X64.exe					;~ Target exe filename for X64 compile.
+#AutoIt3Wrapper_OutFile=..\..\..\Resolute\ComIntRep.exe			;~ Target exe/a3x filename.
+#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\ComIntRep_X64.exe	;~ Target exe filename for X64 compile.
 ;#AutoIt3Wrapper_Compression=4									;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
 ;#AutoIt3Wrapper_UseUpx=Y										;~ (Y/N) Compress output program.  Default=Y
 ;#AutoIt3Wrapper_UPX_Parameters=								;~ Override the default settings for UPX.
@@ -30,13 +30,13 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Complete Internet Repair			;~ Comment field
 #AutoIt3Wrapper_Res_Description=Complete Internet Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=5.2.3.4014
+#AutoIt3Wrapper_Res_Fileversion=5.2.3.4123
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
 #AutoIt3Wrapper_Res_ProductVersion=5             				;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057								;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2018 Rizonesoft			;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=© 2020 Rizonesoft			;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=highestAvailable	;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 ;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81			;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N								;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
@@ -71,124 +71,126 @@
 ; Add files to the resources - can be compressed
 ; #AutoIt3Wrapper_Res_Remove=
 ; Remove resources
-#AutoIt3Wrapper_Res_Icon_Add=..\ComIntRepH.ico				; 201
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRepH.ico					; 201
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Information.ico		; 202
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Complete.ico			; 203
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Cross.ico			 	; 204
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Exclamation.ico		; 205
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Smiley-Glass.ico		; 206
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Skull.ico				; 207
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Snowman.ico			; 208
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico			; 202
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico				; 203
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			 	; 204
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico			; 205
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico			; 206
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico				; 207
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico				; 208
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Update.ico					; 209
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Error.ico						; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico						; 209
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico						; 210
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Check.ico				; 211
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Error.ico				; 212
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Gear.ico				; 213
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Information.ico		; 214
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Love.ico				; 215
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico				; 211
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico				; 212
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico					; 213
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico			; 214
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico					; 215
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\PayPal.ico				; 216
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\PayPalH.ico				; 217
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\sa.ico					; 218
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\saH.ico					; 219
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\Facebook.ico			; 220
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\FacebookH.ico			; 221
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\Twitter.ico				; 222
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\TwitterH.ico			; 223
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GooglePlus.ico			; 224
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GooglePlusH.ico			; 225
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GitHub.ico				; 226
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GitHubH.ico				; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico					; 216
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico						; 218
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 219
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico				; 220
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico				; 221
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico				; 223
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico				; 224
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico				; 225
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 226
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 227
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\en.ico					; 228
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\af.ico					; 229
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ar.ico					; 230
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\bg.ico					; 231
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\cs.ico					; 232
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\da.ico					; 233
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\de.ico					; 234
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\el.ico					; 235
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\es.ico					; 236
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\fa.ico					; 237
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\fr.ico					; 238
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hi.ico					; 239
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hr.ico					; 240
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hu.ico					; 241
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\id.ico					; 242
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\is.ico					; 243
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\it.ico					; 244
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\iw.ico					; 245
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ja.ico					; 246
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ko.ico					; 247
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\nl.ico					; 248
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\no.ico					; 249
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pl.ico					; 250
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pt.ico					; 251
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pt-BR.ico				; 252
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ro.ico					; 253
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ru.ico					; 254
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sl.ico					; 255
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sk.ico					; 256
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sv.ico					; 257
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\th.ico					; 258
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\tr.ico					; 259
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\vi.ico					; 260
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\zh-CN.ico				; 261
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\zh-TW.ico				; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 228
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 229
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico						; 230
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico						; 231
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico						; 232
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico						; 233
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico						; 234
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico						; 235
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico						; 236
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico						; 237
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico						; 238
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico						; 239
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico						; 240
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico						; 241
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico						; 242
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico						; 243
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico						; 244
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico						; 245
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico						; 246
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico						; 247
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico						; 248
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico						; 249
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico						; 250
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico						; 251
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico					; 252
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico						; 253
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico						; 254
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico						; 255
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico						; 256
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico						; 257
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico						; 258
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico						; 259
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico						; 260
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico					; 261
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico					; 262
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-0.ico				; 263
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-1.ico				; 264
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-2.ico				; 265
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-3.ico				; 266
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-4.ico				; 267
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-5.ico				; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 264
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 268
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Information-D.ico	; 269
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Information.ico		; 270
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Run-D.ico			; 271
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Run.ico				; 272
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Complete.ico			; 273
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Cross.ico			; 274
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-0.ico			; 275
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-1.ico			; 276
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-2.ico			; 277
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-3.ico			; 278
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-4.ico			; 279
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-5.ico			; 280
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-6.ico			; 281
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-7.ico			; 282
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-8.ico			; 283
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-9.ico			; 284
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-10.ico		; 285
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-11.ico		; 286
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-12.ico		; 287
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Commands\Repair-13.ico		; 288
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\InformationH.ico		; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information.ico			; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\RunH.ico				; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run.ico					; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Complete.ico			; 273
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Cross.ico				; 274
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-0.ico			; 275
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-1.ico			; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-2.ico			; 277
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-3.ico			; 278
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-4.ico			; 279
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-5.ico			; 280
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-6.ico			; 281
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-7.ico			; 282
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-8.ico			; 283
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-9.ico			; 284
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-10.ico			; 285
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-11.ico			; 286
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-12.ico			; 287
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ComIntRep\Repair-13.ico			; 288
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Eventvwr.ico			; 289
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Gear.ico				; 290
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Logbook.ico				; 291
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\IPProperties.ico		; 292
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Close.ico				; 293
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\RestorePoint.ico		; 294
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\NdWeb.ico				; 295
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\NdNetworkAdapter.ico	; 296
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\InternetDiagnostic.ico	; 297
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\NdInbound.ico			; 298
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\HomeGroupDiag.ico		; 299
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\NdFileShare.ico			; 300
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\WinUpdateDiag.ico		; 301
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\SpeedTest.ico			; 302
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\RouterPass.ico			; 303
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\RemoteDesktop.ico		; 304
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\InternetProperties.ico	; 305
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Update.ico				; 306
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Home.ico				; 307
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Support.ico				; 308
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\GitHub.ico				; 309
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\About.ico				; 310
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Eventvwr.ico				; 289
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 273
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 274
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 275
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\IPProperties.ico			; 292
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\RestorePoint.ico			; 294
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\NdWeb.ico					; 295
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\NdNetworkAdapter.ico		; 296
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\InternetDiagnostic.ico		; 297
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\NdInbound.ico				; 298
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\HomeGroupDiag.ico			; 299
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\NdFileShare.ico			; 300
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\WinUpdateDiag.ico			; 301
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\SpeedTest.ico				; 302
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\RouterPass.ico				; 303
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\RemoteDesktop.ico			; 304
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\InternetProperties.ico		; 305
+
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\SelectAll.ico			; 311
 
 
 ;===============================================================================================================
@@ -293,7 +295,7 @@ EndFunc   ;==>_ReBarStartUp
 #include "..\..\Includes\Update.au3"
 #include "..\..\Includes\Versioning.au3"
 
-#include "UDF\Localization.au3"
+#include "Includes\Localization.au3"
 
 
 ;~ Developer Constants
@@ -307,6 +309,8 @@ Global Const $CNT_COMMICONS		= 20
 Global Const $CNT_REPAIR 		= 14
 Global Const $SPACING_LINE		= 20
 
+Global Const $CNT_NOTICE		= 3
+
 ;~ General Settings
 Global $g_sCompanyName			= "Rizonesoft"
 Global $g_sProgShortName		= "ComIntRep"
@@ -316,27 +320,28 @@ Global $g_iSingleton			= True
 
 ;~ Links
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com/support|www.rizonesoft.com/support"								; https://www.rizonesoft.com/contact
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads|www.rizonesoft.com/downloads"							; https://www.rizonesoft.com/downloads/
+Global $g_sUrlSupport			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
+Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com/downloads/
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
-Global $g_sUrlGooglePlus		= "https://plus.google.com/+Rizonesoftsa|Plus.google.com/+Rizonesoftsa" 						; https://plus.google.com/+Rizonesoftsa/posts
+Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
 Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"										; https://www.rizonesoft.com/feed
 Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"										; https://www.paypal.me/rizonesoft
-Global $g_sUrlGitHub			= "https://github.com/rizonesoft/ComIntRep|GitHub.com/rizonesoft/ComIntRep"						; https://github.com/rizonesoft/ComIntRep
-Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/ComIntRep/issues|GitHub.com/rizonesoft/ComIntRep/issues"		; https://github.com/rizonesoft/ComIntRep/issues
+Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
+Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/complete-internet-repair/|www.rizonesoft.com/downloads/complete-internet-repair/"
 Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/complete-internet-repair/update/|www.rizonesoft.com/downloads/complete-internet-repair/update/"
 Global $g_sUrlWinRepair         = "https://www.rizonesoft.com/downloads/complete-windows-repair/|www.rizonesoft.com/downloads/complete-windows-repair/"
 
 ;~ Path Settings
-Global $g_sWorkingDir		= @ScriptDir ;~ Working Directory
-Global $g_sRootDir			= @ScriptDir ;~ Root Directory
+Global $g_sRootDir			= @ScriptDir
+Global $g_sWorkingDir		= $g_sRootDir ;~ Working Directory
 Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
-Global $g_sThemesDir		= $g_sRootDir & "\Themes" ;~ Themes Directory
-Global $g_sProcessSim		= $g_sThemesDir & "\Processing\16\Process.ani"
+Global $g_sResourcesDir		= _PathFull(@ScriptDir & "\..\..\Resources")
+Global $g_sProcessDir		= $g_sRootDir &	"\Processing"
+Global $g_sProcessSim		= $g_sProcessDir & "\16\Process.ani"
 Global $g_sExportRoot		= $g_sWorkingDir & "\Export\" & $g_sProgShortName
 Global $g_sDocsDir			= $g_sRootDir & "\Documents\" & $g_sProgShortName ;~ Documentation Directory
 Global $g_sDocHelpFile		= $g_sDocsDir & "\" & $g_sProgShortName & ".chm"
@@ -356,11 +361,15 @@ Global $g_sCatroot2Old 		= @WindowsDir & "\System32\CatRoot2.Old"
 Global $g_iBackupData		= 0
 Global $g_iBackupIPData 	= 1
 
+If Not @Compiled Then
+	$g_sProcessDir = _PathFull(@ScriptDir & "\..\..\..\Resolute\Processing")
+EndIf
+
 ;~ Logging Settings
 Global $g_sLoggingRoot		= $g_sWorkingDir & "\Logging\" & $g_sProgShortName
 Global $g_sLoggingPath		= $g_sLoggingRoot & "\" & $g_sProgShortName & ".log"
 Global $g_sLogIpResetPath	= $g_sLoggingRoot & "\IP_Reset.log"
-Global $g_GuiLogBoxHeight	= 120
+Global $g_GuiLogBoxHeight	= 125
 Global $g_iLogIconStart		= -202
 Global $g_iUpdateSubStatus	= True
 
@@ -388,15 +397,16 @@ Global $g_aLognIcons[$CNT_LOGICONS]
 Global $g_aLanguageIcons[$CNT_LANGICONS]
 Global $g_aMenuIcons[$CNT_MENUICONS]
 Global $g_aCommIcons[$CNT_COMMICONS]
+Global $g_sSelectAllIcon
 Global $g_sDlgOptionsIcon
 
 ;~ Splash Page Settings
-Global $g_SplashAnimation
+Global $g_sSplashAniPath
 Global $g_iSplashDelay
 
 ;~ Update Notification Settings
-Global $g_sUpdateAnimation	= $g_sThemesDir & "\Processing\" & $g_iSizeIcon & "\Globe.ani"
-Global $g_sProcessingAnimation  = $g_sThemesDir & "\Processing\" & $g_iSizeIcon & "\Stroke.ani"
+Global $g_sUpdateAnimation	= $g_sProcessDir & "\" & $g_iSizeIcon & "\Globe.ani"
+Global $g_sProcessingAnimation  = $g_sProcessDir & "\" & $g_iSizeIcon & "\Stroke.ani"
 If $DEBUG_UPDATE = True Then
 	Global $g_sRemoteUpdateFile	= "https://www.rizonesoft.com/update/" & $g_sProgShortName & ".ruz"
 Else
@@ -407,7 +417,7 @@ Global $g_iCheckForUpdates	= 4
 ;~ Donate Time
 Global $g_iUptimeMonitor	= 0
 Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 259200 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+Global $g_iDonateTimeSet	= 86400 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= False	;~ Show whether program is running as Administrator
@@ -417,8 +427,8 @@ Global $g_TitleShowBuild	= True	;~ Show program build
 Global $g_TitleShowAutoIt	= False	;~ Show AutoIt version
 
 ;~ Interface Settings
-Global $g_iCoreGuiWidth		= 480
-Global $g_iCoreGuiHeight	= 465
+Global $g_iCoreGuiWidth		= 488
+Global $g_iCoreGuiHeight	= 500
 Global $g_iMsgBoxTimeOut	= 60
 
 Global $g_sAboutCredits		= "Derick Payne (Rizonesoft), Brian J Christy (Beege), " & _
@@ -462,6 +472,7 @@ Global $g_hOLblLanguage
 Global $g_hOLblPrefsUpdated
 Global $g_hOBtnSave
 Global $g_hOBtnCancel
+Global $g_hPicNotice
 
 Global $g_iProcessPriority 		= 3
 Global $g_iSaveRealtime			= 0
@@ -474,6 +485,7 @@ Global $g_aRepairHovering[$CNT_REPAIR][2]
 Global $g_aRepairState[$CNT_REPAIR][3]
 
 Global $g_hBtnGo, $g_IntExplVersion
+Global $g_hChkSelectAll
 Global $g_iCancel, $g_iSoloProcess = True
 Global $g_iRebootRequired
 Global $g_iResetWinsock = True
@@ -481,7 +493,7 @@ Global $g_iClearWinUpdate = True
 Global $g_iResetProxy = True
 Global $g_iResetFirewall = True
 Global $g_iShowCwrMessage = False
-
+Global $g_bRandomNotice = 0
 
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
@@ -528,9 +540,8 @@ Else
 
 		OnAutoItExitRegister("_TerminateProgram")
 
-		$g_SplashAnimation 	= $g_sThemesDir & "\Processing\32\Stroke.ani"
-		$g_iSplashDelay		= 100
-
+		$g_sSplashAniPath		= $g_sProcessDir & "\32\Stroke.ani"
+		$g_iSplashDelay			= 100
 		_Splash_Start($g_aLangMessages[7])
 		_Splash_Update($g_aLangMessages[8], 3)
 		_Localization_Messages2()	;~ Load Custom Message Language Strings
@@ -557,6 +568,19 @@ EndIf
 Func _SetHotKeys()
 
 	HotKeySet("{ESC}", "_MinimizeProgram")
+	HotKeySet("^a", "_SelectAllHot")
+
+EndFunc
+
+
+Func _SelectAllHot()
+
+	If GUICtrlRead($g_hChkSelectAll) = $GUI_CHECKED Then
+		GUICtrlSetState($g_hChkSelectAll, $GUI_UNCHECKED)
+	Else
+		GUICtrlSetState($g_hChkSelectAll, $GUI_CHECKED)
+	EndIf
+	_SelectAll()
 
 EndFunc
 
@@ -570,7 +594,7 @@ Func _StartCoreGui()
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
-	If @DesktopHeight <= 600 Then
+	If @DesktopHeight <= 768 Then
 		$g_hGuiExpanded = False
 	EndIf
 
@@ -687,7 +711,7 @@ Func _StartCoreGui()
 	$g_hUpdateMenuItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[36], $g_hMenuHelp, $g_aMenuIcons[17], $g_iMenuIconsStart + 17)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
 	$miHelpHome = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[37], $g_hMenuHelp, $g_aMenuIcons[18], $g_iMenuIconsStart + 18)
-	$miHelpDownloads = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[38], $g_hMenuHelp)
+	; $miHelpDownloads = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[38], $g_hMenuHelp)
 	$miHelpSupport = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[39], $g_hMenuHelp, $g_aMenuIcons[19], $g_iMenuIconsStart + 19)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
 	$miHelpGitHub = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[40], $g_hMenuHelp, $g_aMenuIcons[20], $g_iMenuIconsStart + 20)
@@ -710,14 +734,14 @@ Func _StartCoreGui()
 			$g_aLangAbout[0], $TIP_INFOICON, $TIP_BALLOON)
 	GUICtrlSetCursor($g_hGuiIcon, 0)
 	GUICtrlSetOnEvent($g_hGuiIcon, "_About_ShowDialog")
-	$g_AniUpdate = GUICtrlCreateIcon($g_sUpdateAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
-	$g_AniProcessing = GUICtrlCreateIcon($g_sProcessingAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
+	$g_AniUpdate = GUICtrlCreateIcon($g_sUpdateAnimation, 0, 10, 5, $g_iSizeIcon, $g_iSizeIcon)
+	$g_AniProcessing = GUICtrlCreateIcon($g_sProcessingAnimation, 0, 10, 5, $g_iSizeIcon, $g_iSizeIcon)
 	GUICtrlSetState($g_AniUpdate, $GUI_HIDE)
 	GUICtrlSetState($g_AniProcessing, $GUI_HIDE)
-	$hHeading = GUICtrlCreateLabel($g_sProgName & " " & _GetProgramVersion(1), $g_iSizeIcon + 22, 15, 300, 25)
+	$hHeading = GUICtrlCreateLabel($g_sProgName & " " & _GetProgramVersion(1), $g_iSizeIcon + 22, 10, 300, 25)
 	GUICtrlSetFont($hHeading, 12)
 
-	$g_hSubHeading = GUICtrlCreateLabel($g_aLangCustom[0], $g_iSizeIcon + 22, 38, 350, 50)
+	$g_hSubHeading = GUICtrlCreateLabel($g_aLangCustom[0], $g_iSizeIcon + 22, 33, 350, 50)
 	GUICtrlSetFont($g_hSubHeading, 10)
 	GUICtrlSetColor($g_hSubHeading, 0x353535)
 
@@ -735,17 +759,20 @@ Func _StartCoreGui()
 
 	$g_IntExplVersion = _GetInternetExplorerVersion()
 
-	GUICtrlCreateGroup("", 10, 85, 460, 305)
+	GUICtrlCreateIcon($g_sSelectAllIcon, 311, 20, 93, 16, 16)
+	$g_hChkSelectAll = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[37], 43, 93, 325, 16)
+
+	GUICtrlCreateGroup("", 10, 110, $g_iCoreGuiWidth - 20, 305)
 	For $iR = 0 To $CNT_REPAIR - 1
 
-		$g_aRepair[$iR][0] = GUICtrlCreateIcon($g_aCommIcons[$iR + 6], $g_iComIconStart + 6 + $iR, 20, 103 + ($iR * $SPACING_LINE), 16, 16)
-		$g_aRepair[$iR][1] = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[$iR + 2], 43, 103 + ($iR * $SPACING_LINE), 325, 16)
-		$g_aRepair[$iR][2] = GUICtrlCreateIcon($g_aCommIcons[0], $g_iComIconStart, 408, 103 + ($iR * $SPACING_LINE), 16, 16)
+		$g_aRepair[$iR][0] = GUICtrlCreateIcon($g_aCommIcons[$iR + 6], $g_iComIconStart + 6 + $iR, 20, 128 + ($iR * $SPACING_LINE), 16, 16)
+		$g_aRepair[$iR][1] = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[$iR + 2], 43, 128 + ($iR * $SPACING_LINE), 325, 16)
+		$g_aRepair[$iR][2] = GUICtrlCreateIcon($g_aCommIcons[0], $g_iComIconStart, 423, 128 + ($iR * $SPACING_LINE), 16, 16)
 		GUICtrlSetCursor($g_aRepair[$iR][2], 0)
-		$g_aRepair[$iR][3] = GUICtrlCreateIcon($g_aCommIcons[2], $g_iComIconStart + 2, 428, 103 + ($iR * $SPACING_LINE), 16, 16)
+		$g_aRepair[$iR][3] = GUICtrlCreateIcon($g_aCommIcons[2], $g_iComIconStart + 2, 443, 128 + ($iR * $SPACING_LINE), 16, 16)
 		GUICtrlSetCursor($g_aRepair[$iR][3], 0)
-		$g_aRepair[$iR][4] = 120 + ($iR * $SPACING_LINE)
-		$g_aRepair[$iR][5] = GUICtrlCreateLabel("", 43, $g_aRepair[$iR][4], 365, 1)
+		$g_aRepair[$iR][4] = 145 + ($iR * $SPACING_LINE)
+		$g_aRepair[$iR][5] = GUICtrlCreateLabel("", 43, $g_aRepair[$iR][4], 380, 1)
 		GUICtrlSetBkColor($g_aRepair[$iR][5], 0xD9D9D9)
 		$g_aRepair[$iR][6] = GUICtrlCreateLabel("", 43, $g_aRepair[$iR][4], 1, 1)
 		GUICtrlSetBkColor($g_aRepair[$iR][6], 0x3399FF)
@@ -759,17 +786,18 @@ Func _StartCoreGui()
 	GUICtrlSetData($g_aRepair[5][1],  Chr(32) & StringFormat($g_aLangCustom[7], $g_IntExplVersion))
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
-	$g_hBtnExtend = GUICtrlCreateCheckbox(6, 10, 410, 30, 28, $BS_PUSHLIKE)
+	$g_hBtnExtend = GUICtrlCreateCheckbox(6, 10, 443, 30, 28, $BS_PUSHLIKE)
 	GUICtrlSetFont($g_hBtnExtend, 10, 400, 0, "Webdings")
 	GUICtrlSetTip($g_hBtnExtend, $g_aLangCustom[16])
-	$g_hBtnGo = GUICtrlCreateButton($g_aLangCustom[18], 280, 395, 190, 43)
+	$g_hBtnGo = GUICtrlCreateButton($g_aLangCustom[18], 280, 428, 190, 43)
 	GUICtrlSetState($g_hBtnGo, $GUI_FOCUS)
 	GUICtrlSetFont($g_hBtnGo, 11, 400, 0, "Verdana")
 
 	GUICtrlSetOnEvent($g_hBtnGo, "_RunSelectedOption")
 	GUICtrlSetOnEvent($g_hBtnExtend, "_GUIExtender")
+	GUICtrlSetOnEvent($g_hChkSelectAll, "_SelectAll")
 
-	$g_hListStatus = GUICtrlCreateListView("", 10, 455, _
+	$g_hListStatus = GUICtrlCreateListView("", 10, 485, _
 			$g_iCoreGuiWidth - 20, $g_GuiLogBoxHeight, BitOR($LVS_REPORT, $LVS_NOCOLUMNHEADER))
 	_GUICtrlListView_SetExtendedListViewStyle($g_hListStatus, BitOR($LVS_EX_FULLROWSELECT, $LVS_EX_DOUBLEBUFFER, _
 			$LVS_EX_SUBITEMIMAGES, $LVS_EX_INFOTIP, $WS_EX_CLIENTEDGE))
@@ -786,7 +814,7 @@ Func _StartCoreGui()
 	_GUIImageList_Add($g_hImgStatus, _GUICtrlListView_CreateSolidBitMap($g_hListStatus, 0xFFFFFF, 16, 16))
 	_GUICtrlListView_SetImageList($g_hListStatus, $g_hImgStatus, 1)
 
-	$g_hEditInfo = GUICtrlCreateEdit("", 10, 450, 460, 120, BitOR($WS_VSCROLL, $ES_READONLY, $ES_AUTOVSCROLL))
+	$g_hEditInfo = GUICtrlCreateEdit("", 10, 485, $g_iCoreGuiWidth - 20, $g_GuiLogBoxHeight, BitOR($WS_VSCROLL, $ES_READONLY, $ES_AUTOVSCROLL))
 	GUICtrlSetBkColor($g_hEditInfo, 0xE8FFCC)
 	GUICtrlSetFont($g_hEditInfo, 9)
 	GUICtrlSetData($g_hEditInfo, StringFormat($g_aLangCustom[20], $g_aLangCustom[18]))
@@ -804,7 +832,7 @@ Func _StartCoreGui()
 	EndIf
 
 	_GUIExtender()
-	SoundPlay(@ScriptDir & "\Themes\Sounds\Welcome.wav")
+	SoundPlay(@ScriptDir & "\Sounds\Welcome.wav")
 
 	If $g_iCheckForUpdates == 4 Then
 		_SoftwareUpdateCheck()
@@ -911,6 +939,28 @@ Func _GUIExpand($iSize)
 
 EndFunc   ;==>_GUIExpand
 
+
+Func _SelectAll()
+
+	If GUICtrlRead($g_hChkSelectAll) = $GUI_CHECKED Then
+
+		For $iS = 0 To $CNT_REPAIR - 1
+			GUICtrlSetState($g_aRepair[$iS][1], $GUI_CHECKED)
+		Next
+		GUICtrlSetData($g_hChkSelectAll, Chr(32) & Chr(32) & "Select None")
+
+	Else
+
+		For $iS = 0 To $CNT_REPAIR - 1
+			GUICtrlSetState($g_aRepair[$iS][1], $GUI_UNCHECKED)
+		Next
+		GUICtrlSetData($g_hChkSelectAll, Chr(32) & Chr(32) & "Select All")
+
+	EndIf
+
+EndFunc
+
+
 #EndRegion "Events"
 
 
@@ -955,100 +1005,103 @@ Func _SetResources()
 		Next
 
 		$g_sDlgOptionsIcon = @ScriptFullPath
+		$g_sSelectAllIcon = @ScriptFullPath
 
 	Else
 
-		$g_aCoreIcons[0] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & ".ico"
-		$g_aCoreIcons[1] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & "H.ico"
+		$g_aCoreIcons[0] = "..\..\..\SDK\Resources\Icons\" & $g_sProgShortName & ".ico"
+		$g_aCoreIcons[1] = "..\..\..\SDK\Resources\Icons\" & $g_sProgShortName & "H.ico"
 
-		$g_aLognIcons[0] = $g_sThemesDir & "\Icons\logging\Information.ico"
-		$g_aLognIcons[1] = $g_sThemesDir & "\Icons\logging\Complete.ico"
-		$g_aLognIcons[2] = $g_sThemesDir & "\Icons\logging\Cross.ico"
-		$g_aLognIcons[3] = $g_sThemesDir & "\Icons\logging\Exclamation.ico"
-		$g_aLognIcons[4] = $g_sThemesDir & "\Icons\logging\Smiley-Glass.ico"
-		$g_aLognIcons[5] = $g_sThemesDir & "\Icons\logging\Skull.ico"
-		$g_aLognIcons[6] = $g_sThemesDir & "\Icons\logging\Snowman.ico"
+		$g_aLognIcons[0] = "..\..\..\SDK\Resources\Icons\logging\Information.ico"
+		$g_aLognIcons[1] = "..\..\..\SDK\Resources\Icons\logging\Complete.ico"
+		$g_aLognIcons[2] = "..\..\..\SDK\Resources\Icons\logging\Cross.ico"
+		$g_aLognIcons[3] = "..\..\..\SDK\Resources\Icons\logging\Exclamation.ico"
+		$g_aLognIcons[4] = "..\..\..\SDK\Resources\Icons\logging\Smiley-Glass.ico"
+		$g_aLognIcons[5] = "..\..\..\SDK\Resources\Icons\logging\Skull.ico"
+		$g_aLognIcons[6] = "..\..\..\SDK\Resources\Icons\logging\Snowman.ico"
 
-		$g_aLanguageIcons[0]  = $g_sThemesDir & "\Icons\Flags\en.ico"
-		$g_aLanguageIcons[1]  = $g_sThemesDir & "\Icons\Flags\af.ico"
-		$g_aLanguageIcons[2]  = $g_sThemesDir & "\Icons\Flags\ar.ico"
-		$g_aLanguageIcons[3]  = $g_sThemesDir & "\Icons\Flags\bg.ico"
-		$g_aLanguageIcons[4]  = $g_sThemesDir & "\Icons\Flags\cs.ico"
-		$g_aLanguageIcons[5]  = $g_sThemesDir & "\Icons\Flags\da.ico"
-		$g_aLanguageIcons[6]  = $g_sThemesDir & "\Icons\Flags\de.ico"
-		$g_aLanguageIcons[7]  = $g_sThemesDir & "\Icons\Flags\el.ico"
-		$g_aLanguageIcons[8]  = $g_sThemesDir & "\Icons\Flags\es.ico"
-		$g_aLanguageIcons[9]  = $g_sThemesDir & "\Icons\Flags\fr.ico"
-		$g_aLanguageIcons[10] = $g_sThemesDir & "\Icons\Flags\hi.ico"
-		$g_aLanguageIcons[11] = $g_sThemesDir & "\Icons\Flags\hr.ico"
-		$g_aLanguageIcons[12] = $g_sThemesDir & "\Icons\Flags\hu.ico"
-		$g_aLanguageIcons[13] = $g_sThemesDir & "\Icons\Flags\id.ico"
-		$g_aLanguageIcons[14] = $g_sThemesDir & "\Icons\Flags\is.ico"
-		$g_aLanguageIcons[15] = $g_sThemesDir & "\Icons\Flags\it.ico"
-		$g_aLanguageIcons[16] = $g_sThemesDir & "\Icons\Flags\iw.ico"
-		$g_aLanguageIcons[17] = $g_sThemesDir & "\Icons\Flags\ja.ico"
-		$g_aLanguageIcons[18] = $g_sThemesDir & "\Icons\Flags\ko.ico"
-		$g_aLanguageIcons[19] = $g_sThemesDir & "\Icons\Flags\nl.ico"
-		$g_aLanguageIcons[20] = $g_sThemesDir & "\Icons\Flags\no.ico"
-		$g_aLanguageIcons[21] = $g_sThemesDir & "\Icons\Flags\pl.ico"
-		$g_aLanguageIcons[22] = $g_sThemesDir & "\Icons\Flags\pt.ico"
-		$g_aLanguageIcons[23] = $g_sThemesDir & "\Icons\Flags\pt-BR.ico"
-		$g_aLanguageIcons[24] = $g_sThemesDir & "\Icons\Flags\ro.ico"
-		$g_aLanguageIcons[25] = $g_sThemesDir & "\Icons\Flags\ru.ico"
-		$g_aLanguageIcons[26] = $g_sThemesDir & "\Icons\Flags\sl.ico"
-		$g_aLanguageIcons[27] = $g_sThemesDir & "\Icons\Flags\sk.ico"
-		$g_aLanguageIcons[28] = $g_sThemesDir & "\Icons\Flags\sv.ico"
-		$g_aLanguageIcons[29] = $g_sThemesDir & "\Icons\Flags\th.ico"
-		$g_aLanguageIcons[30] = $g_sThemesDir & "\Icons\Flags\tr.ico"
-		$g_aLanguageIcons[31] = $g_sThemesDir & "\Icons\Flags\vi.ico"
-		$g_aLanguageIcons[32] = $g_sThemesDir & "\Icons\Flags\zh-CN.ico"
-		$g_aLanguageIcons[32] = $g_sThemesDir & "\Icons\Flags\zh-TW.ico"
+		$g_aLanguageIcons[0]  = "..\..\..\SDK\Resources\Icons\Flags\en.ico"
+		$g_aLanguageIcons[1]  = "..\..\..\SDK\Resources\Icons\Flags\af.ico"
+		$g_aLanguageIcons[2]  = "..\..\..\SDK\Resources\Icons\Flags\ar.ico"
+		$g_aLanguageIcons[3]  = "..\..\..\SDK\Resources\Icons\Flags\bg.ico"
+		$g_aLanguageIcons[4]  = "..\..\..\SDK\Resources\Icons\Flags\cs.ico"
+		$g_aLanguageIcons[5]  = "..\..\..\SDK\Resources\Icons\Flags\da.ico"
+		$g_aLanguageIcons[6]  = "..\..\..\SDK\Resources\Icons\Flags\de.ico"
+		$g_aLanguageIcons[7]  = "..\..\..\SDK\Resources\Icons\Flags\el.ico"
+		$g_aLanguageIcons[8]  = "..\..\..\SDK\Resources\Icons\Flags\es.ico"
+		$g_aLanguageIcons[9]  = "..\..\..\SDK\Resources\Icons\Flags\fr.ico"
+		$g_aLanguageIcons[10] = "..\..\..\SDK\Resources\Icons\Flags\hi.ico"
+		$g_aLanguageIcons[11] = "..\..\..\SDK\Resources\Icons\Flags\hr.ico"
+		$g_aLanguageIcons[12] = "..\..\..\SDK\Resources\Icons\Flags\hu.ico"
+		$g_aLanguageIcons[13] = "..\..\..\SDK\Resources\Icons\Flags\id.ico"
+		$g_aLanguageIcons[14] = "..\..\..\SDK\Resources\Icons\Flags\ir.ico"
+		$g_aLanguageIcons[15] = "..\..\..\SDK\Resources\Icons\Flags\is.ico"
+		$g_aLanguageIcons[16] = "..\..\..\SDK\Resources\Icons\Flags\it.ico"
+		$g_aLanguageIcons[17] = "..\..\..\SDK\Resources\Icons\Flags\iw.ico"
+		$g_aLanguageIcons[18] = "..\..\..\SDK\Resources\Icons\Flags\ja.ico"
+		$g_aLanguageIcons[19] = "..\..\..\SDK\Resources\Icons\Flags\ko.ico"
+		$g_aLanguageIcons[20] = "..\..\..\SDK\Resources\Icons\Flags\nl.ico"
+		$g_aLanguageIcons[21] = "..\..\..\SDK\Resources\Icons\Flags\no.ico"
+		$g_aLanguageIcons[22] = "..\..\..\SDK\Resources\Icons\Flags\pl.ico"
+		$g_aLanguageIcons[23] = "..\..\..\SDK\Resources\Icons\Flags\pt.ico"
+		$g_aLanguageIcons[24] = "..\..\..\SDK\Resources\Icons\Flags\pt-BR.ico"
+		$g_aLanguageIcons[25] = "..\..\..\SDK\Resources\Icons\Flags\ro.ico"
+		$g_aLanguageIcons[26] = "..\..\..\SDK\Resources\Icons\Flags\ru.ico"
+		$g_aLanguageIcons[27] = "..\..\..\SDK\Resources\Icons\Flags\sl.ico"
+		$g_aLanguageIcons[28] = "..\..\..\SDK\Resources\Icons\Flags\sk.ico"
+		$g_aLanguageIcons[29] = "..\..\..\SDK\Resources\Icons\Flags\sv.ico"
+		$g_aLanguageIcons[30] = "..\..\..\SDK\Resources\Icons\Flags\th.ico"
+		$g_aLanguageIcons[31] = "..\..\..\SDK\Resources\Icons\Flags\tr.ico"
+		$g_aLanguageIcons[32] = "..\..\..\SDK\Resources\Icons\Flags\vi.ico"
+		$g_aLanguageIcons[33] = "..\..\..\SDK\Resources\Icons\Flags\zh-CN.ico"
+		$g_aLanguageIcons[34] = "..\..\..\SDK\Resources\Icons\Flags\zh-TW.ico"
 
-		$g_aMenuIcons[0]  = $g_sThemesDir & "\Icons\Menus\Eventvwr.ico"
-		$g_aMenuIcons[1]  = $g_sThemesDir & "\Icons\Menus\Gear.ico"
-		$g_aMenuIcons[2]  = $g_sThemesDir & "\Icons\Menus\Logbook.ico"
-		$g_aMenuIcons[3]  = $g_sThemesDir & "\Icons\Menus\IPProperties.ico"
-		$g_aMenuIcons[4]  = $g_sThemesDir & "\Icons\Menus\Close.ico"
-		$g_aMenuIcons[5]  = $g_sThemesDir & "\Icons\Menus\RestorePoint.ico"
-		$g_aMenuIcons[6]  = $g_sThemesDir & "\Icons\Menus\NdWeb.ico"
-		$g_aMenuIcons[7]  = $g_sThemesDir & "\Icons\Menus\NdNetworkAdapter.ico"
-		$g_aMenuIcons[8]  = $g_sThemesDir & "\Icons\Menus\InternetDiagnostic.ico"
-		$g_aMenuIcons[9]  = $g_sThemesDir & "\Icons\Menus\NdInbound.ico"
-		$g_aMenuIcons[10] = $g_sThemesDir & "\Icons\Menus\HomeGroupDiag.ico"
-		$g_aMenuIcons[11] = $g_sThemesDir & "\Icons\Menus\NdFileShare.ico"
-		$g_aMenuIcons[12] = $g_sThemesDir & "\Icons\Menus\WinUpdateDiag.ico"
-		$g_aMenuIcons[13] = $g_sThemesDir & "\Icons\Menus\SpeedTest.ico"
-		$g_aMenuIcons[14] = $g_sThemesDir & "\Icons\Menus\RouterPass.ico"
-		$g_aMenuIcons[15] = $g_sThemesDir & "\Icons\Menus\RemoteDesktop.ico"
-		$g_aMenuIcons[16] = $g_sThemesDir & "\Icons\Menus\InternetProperties.ico"
-		$g_aMenuIcons[17] = $g_sThemesDir & "\Icons\Menus\Update.ico"
-		$g_aMenuIcons[18] = $g_sThemesDir & "\Icons\Menus\Home.ico"
-		$g_aMenuIcons[19] = $g_sThemesDir & "\Icons\Menus\Support.ico"
-		$g_aMenuIcons[20] = $g_sThemesDir & "\Icons\Menus\GitHub.ico"
-		$g_aMenuIcons[21] = $g_sThemesDir & "\Icons\Menus\About.ico"
+		$g_aMenuIcons[0]  = "..\..\..\SDK\Resources\Icons\Menus\Eventvwr.ico"
+		$g_aMenuIcons[1]  = "..\..\..\SDK\Resources\Icons\Menus\Gear.ico"
+		$g_aMenuIcons[2]  = "..\..\..\SDK\Resources\Icons\Menus\Logbook.ico"
+		$g_aMenuIcons[3]  = "..\..\..\SDK\Resources\Icons\Menus\IPProperties.ico"
+		$g_aMenuIcons[4]  = "..\..\..\SDK\Resources\Icons\Menus\Close.ico"
+		$g_aMenuIcons[5]  = "..\..\..\SDK\Resources\Icons\Menus\RestorePoint.ico"
+		$g_aMenuIcons[6]  = "..\..\..\SDK\Resources\Icons\Menus\NdWeb.ico"
+		$g_aMenuIcons[7]  = "..\..\..\SDK\Resources\Icons\Menus\NdNetworkAdapter.ico"
+		$g_aMenuIcons[8]  = "..\..\..\SDK\Resources\Icons\Menus\InternetDiagnostic.ico"
+		$g_aMenuIcons[9]  = "..\..\..\SDK\Resources\Icons\Menus\NdInbound.ico"
+		$g_aMenuIcons[10] = "..\..\..\SDK\Resources\Icons\Menus\HomeGroupDiag.ico"
+		$g_aMenuIcons[11] = "..\..\..\SDK\Resources\Icons\Menus\NdFileShare.ico"
+		$g_aMenuIcons[12] = "..\..\..\SDK\Resources\Icons\Menus\WinUpdateDiag.ico"
+		$g_aMenuIcons[13] = "..\..\..\SDK\Resources\Icons\Menus\SpeedTest.ico"
+		$g_aMenuIcons[14] = "..\..\..\SDK\Resources\Icons\Menus\RouterPass.ico"
+		$g_aMenuIcons[15] = "..\..\..\SDK\Resources\Icons\Menus\RemoteDesktop.ico"
+		$g_aMenuIcons[16] = "..\..\..\SDK\Resources\Icons\Menus\InternetProperties.ico"
+		$g_aMenuIcons[17] = "..\..\..\SDK\Resources\Icons\Menus\Update.ico"
+		$g_aMenuIcons[18] = "..\..\..\SDK\Resources\Icons\Menus\Home.ico"
+		$g_aMenuIcons[19] = "..\..\..\SDK\Resources\Icons\Menus\Support.ico"
+		$g_aMenuIcons[20] = "..\..\..\SDK\Resources\Icons\Menus\GitHub.ico"
+		$g_aMenuIcons[21] = "..\..\..\SDK\Resources\Icons\Menus\About.ico"
 
-		$g_aCommIcons[0]  = $g_sThemesDir & "\Icons\Commands\Information-D.ico"
-		$g_aCommIcons[1]  = $g_sThemesDir & "\Icons\Commands\Information.ico"
-		$g_aCommIcons[2]  = $g_sThemesDir & "\Icons\Commands\Run-D.ico"
-		$g_aCommIcons[3]  = $g_sThemesDir & "\Icons\Commands\Run.ico"
-		$g_aCommIcons[4]  = $g_sThemesDir & "\Icons\Commands\Complete.ico"
-		$g_aCommIcons[5]  = $g_sThemesDir & "\Icons\Commands\Cross.ico"
-		$g_aCommIcons[6]  = $g_sThemesDir & "\Icons\Commands\Repair-0.ico"
-		$g_aCommIcons[7]  = $g_sThemesDir & "\Icons\Commands\Repair-1.ico"
-		$g_aCommIcons[8]  = $g_sThemesDir & "\Icons\Commands\Repair-2.ico"
-		$g_aCommIcons[9]  = $g_sThemesDir & "\Icons\Commands\Repair-3.ico"
-		$g_aCommIcons[10] = $g_sThemesDir & "\Icons\Commands\Repair-4.ico"
-		$g_aCommIcons[11] = $g_sThemesDir & "\Icons\Commands\Repair-5.ico"
-		$g_aCommIcons[12] = $g_sThemesDir & "\Icons\Commands\Repair-6.ico"
-		$g_aCommIcons[13] = $g_sThemesDir & "\Icons\Commands\Repair-7.ico"
-		$g_aCommIcons[14] = $g_sThemesDir & "\Icons\Commands\Repair-8.ico"
-		$g_aCommIcons[15] = $g_sThemesDir & "\Icons\Commands\Repair-9.ico"
-		$g_aCommIcons[16] = $g_sThemesDir & "\Icons\Commands\Repair-10.ico"
-		$g_aCommIcons[17] = $g_sThemesDir & "\Icons\Commands\Repair-11.ico"
-		$g_aCommIcons[18] = $g_sThemesDir & "\Icons\Commands\Repair-12.ico"
-		$g_aCommIcons[19] = $g_sThemesDir & "\Icons\Commands\Repair-13.ico"
+		$g_aCommIcons[0]  = "..\..\..\SDK\Resources\Icons\Commands\InformationH.ico"
+		$g_aCommIcons[1]  = "..\..\..\SDK\Resources\Icons\Commands\Information.ico"
+		$g_aCommIcons[2]  = "..\..\..\SDK\Resources\Icons\Commands\RunH.ico"
+		$g_aCommIcons[3]  = "..\..\..\SDK\Resources\Icons\Commands\Run.ico"
+		$g_aCommIcons[4]  = "..\..\..\SDK\Resources\Icons\Commands\Complete.ico"
+		$g_aCommIcons[5]  = "..\..\..\SDK\Resources\Icons\Commands\Cross.ico"
+		$g_aCommIcons[6]  = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-0.ico"
+		$g_aCommIcons[7]  = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-1.ico"
+		$g_aCommIcons[8]  = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-2.ico"
+		$g_aCommIcons[9]  = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-3.ico"
+		$g_aCommIcons[10] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-4.ico"
+		$g_aCommIcons[11] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-5.ico"
+		$g_aCommIcons[12] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-6.ico"
+		$g_aCommIcons[13] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-7.ico"
+		$g_aCommIcons[14] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-8.ico"
+		$g_aCommIcons[15] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-9.ico"
+		$g_aCommIcons[16] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-10.ico"
+		$g_aCommIcons[17] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-11.ico"
+		$g_aCommIcons[18] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-12.ico"
+		$g_aCommIcons[19] = "..\..\..\SDK\Resources\Icons\ComIntRep\Repair-13.ico"
 
-		$g_sDlgOptionsIcon = $g_sThemesDir & "\Icons\Dialogs\Gear.ico"
+		$g_sDlgOptionsIcon = "..\..\..\SDK\Resources\Icons\Dialogs\Gear.ico"
+		$g_sSelectAllIcon = "..\..\..\SDK\Resources\Icons\SelectAll.ico"
 
 	EndIf
 
@@ -2519,7 +2572,7 @@ Func _EndProcessing()
 	GUICtrlSetState($g_AniProcessing, $GUI_HIDE)
 
 	; If $g_iCancel = False Then
-		SoundPlay(@ScriptDir & "\Themes\Sounds\Complete.wav")
+		SoundPlay(@ScriptDir & "\Sounds\Complete.wav")
 	; EndIf
 
 
@@ -2813,7 +2866,7 @@ Func _ShowPreferencesDlg()
 	If @Compiled Then
 		$g_hOIconPower = GUICtrlCreateIcon(@ScriptFullPath, $g_iPowerIconsStart, 350, 80, 48, 48)
 	Else
-		$g_hOIconPower = GUICtrlCreateIcon($g_sThemesDir & "\Icons\Power\Power-0.ico", 0, 350, 80, 48, 48)
+		$g_hOIconPower = GUICtrlCreateIcon("..\..\..\SDK\Resources\Icons\Power\Power-0.ico", 0, 350, 80, 48, 48)
 	EndIf
 	$g_hOChkSaveRealtime = GUICtrlCreateCheckbox($g_aLangPreferences[17], 35, 145, 360, 20)
 	GUICtrlSetState($g_hOChkSaveRealtime, $g_iSaveRealtime)
@@ -3180,106 +3233,109 @@ Func __ISO639CodeToIndex($i639 = "en")
 	Switch $i639
 		Case "en"
 			$aLangInfo[0] = "English"
-			$aLangInfo[1] = 0
+			$aLangInfo[1] = 0 ; en.ico
 		Case "af"
 			$aLangInfo[0] = "Afrikaans"
-			$aLangInfo[1] = 1
+			$aLangInfo[1] = 1 ; af.ico
 		Case "ar"
 			$aLangInfo[0] = "Arabic"
-			$aLangInfo[1] = 2
+			$aLangInfo[1] = 2 ; ar.ico
 		Case "bg"
 			$aLangInfo[0] = "Bulgarian"
-			$aLangInfo[1] = 3
+			$aLangInfo[1] = 3 ; bg.ico
 		Case "cs"
 			$aLangInfo[0] = "Czech"
-			$aLangInfo[1] = 4
+			$aLangInfo[1] = 4 ; cs.ico
 		Case "da"
 			$aLangInfo[0] = "Danish"
-			$aLangInfo[1] = 5
+			$aLangInfo[1] = 5 ; da.ico
 		Case "de"
 			$aLangInfo[0] = "German"
-			$aLangInfo[1] = 6
+			$aLangInfo[1] = 6 ; de.ico
 		Case "el"
 			$aLangInfo[0] = "Greek"
-			$aLangInfo[1] = 7
+			$aLangInfo[1] = 7 ; el.ico
 		Case "es"
 			$aLangInfo[0] = "Spanish"
-			$aLangInfo[1] = 8
+			$aLangInfo[1] = 8 ; es.ico
 		Case "fr"
 			$aLangInfo[0] = "French"
-			$aLangInfo[1] = 9
+			$aLangInfo[1] = 9 ; fr.ico
 		Case "hi"
 			$aLangInfo[0] = "Hindi"
-			$aLangInfo[1] = 10
+			$aLangInfo[1] = 10 ; hi.ico
 		Case "hr"
 			$aLangInfo[0] = "Croatian"
-			$aLangInfo[1] = 11
+			$aLangInfo[1] = 11 ; hr.ico
 		Case "hu"
 			$aLangInfo[0] = "Hungarian"
-			$aLangInfo[1] = 12
+			$aLangInfo[1] = 12 ; hu.ico
 		Case "id"
 			$aLangInfo[0] = "Indonesian"
-			$aLangInfo[1] = 13
+			$aLangInfo[1] = 13 ; id.ico
+		Case "ir"
+			$aLangInfo[0] = "Iran"
+			$aLangInfo[1] = 14 ; ir.ico
 		Case "is"
 			$aLangInfo[0] = "Icelandic"
-			$aLangInfo[1] = 14
+			$aLangInfo[1] = 15 ; is.ico
 		Case "it"
 			$aLangInfo[0] = "Italian"
-			$aLangInfo[1] = 15
+			$aLangInfo[1] = 16 ; it.ico
 		Case "iw"
 			$aLangInfo[0] = "Hebrew"
-			$aLangInfo[1] = 16
+			$aLangInfo[1] = 17 ; iw.ico
 		Case "ja"
 			$aLangInfo[0] = "Japanese"
-			$aLangInfo[1] = 17
+			$aLangInfo[1] = 18 ; ja.ico
 		Case "ko"
 			$aLangInfo[0] = "Korean"
-			$aLangInfo[1] = 18
+			$aLangInfo[1] = 19 ; ko.ico
 		Case "nl"
 			$aLangInfo[0] = "Dutch"
-			$aLangInfo[1] = 19
+			$aLangInfo[1] = 20 ; nl.ico
 		Case "no"
 			$aLangInfo[0] = "Norwegian"
-			$aLangInfo[1] = 20
+			$aLangInfo[1] = 21 ; no.ico
 		Case "pl"
 			$aLangInfo[0] = "Polish"
-			$aLangInfo[1] = 21
+			$aLangInfo[1] = 22 ; pl.ico
 		Case "pt"
 			$aLangInfo[0] = "Portuguese"
-			$aLangInfo[1] = 22
+			$aLangInfo[1] = 23 ; pt.ico
 		Case "pt-BR"
 			$aLangInfo[0] = "Portuguese (Brazil)"
-			$aLangInfo[1] = 23
+			$aLangInfo[1] = 24 ; pt-BR.ico
 		Case "ro"
 			$aLangInfo[0] = "Romanian"
-			$aLangInfo[1] = 24
+			$aLangInfo[1] = 25 ; ro.ico
 		Case "ru"
 			$aLangInfo[0] = "Russian"
-			$aLangInfo[1] = 25
+			$aLangInfo[1] = 26 ; ru.ico
 		Case "sl"
 			$aLangInfo[0] = "Slovenian"
-			$aLangInfo[1] = 26
+			$aLangInfo[1] = 27 ; sl.ico
 		Case "sk"
 			$aLangInfo[0] = "Slovak"
-			$aLangInfo[1] = 27
+			$aLangInfo[1] = 28 ; sk.ico
 		Case "sv"
 			$aLangInfo[0] = "Swedish"
-			$aLangInfo[1] = 28
+			$aLangInfo[1] = 29 ; sv.ico
 		Case "th"
 			$aLangInfo[0] = "Thai"
-			$aLangInfo[1] = 29
+			$aLangInfo[1] = 30 ; th.ico
 		Case "tr"
 			$aLangInfo[0] = "Turkish"
-			$aLangInfo[1] = 30
+			$aLangInfo[1] = 31 ; tr.ico
 		Case "vi"
 			$aLangInfo[0] = "Vietnamese"
-			$aLangInfo[1] = 31
+			$aLangInfo[1] = 32 ; vi.ico
 		Case "zh-CN"
 			$aLangInfo[0] = "Simplified Chinese"
-			$aLangInfo[1] = 32
+			$aLangInfo[1] = 33 ; zh-CN.ico
 		Case "zh-TW"
 			$aLangInfo[0] = "Traditional Chinese"
-			$aLangInfo[1] = 33
+			$aLangInfo[1] = 34 ; zh-TW.ico
 	EndSwitch
 
 	Return $aLangInfo

@@ -6,6 +6,47 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed: GUIOnEventMode and TrayOnEventMode options had unnecessary slow downs.
+- Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later (OS bug/design change).
+- Improved Resolute compatibility.
+
+--------------------------------------------------
+Version 5.2.3.4118 (May 27, 2020)
+--------------------------------------------------
+
+- Optimized Functions.
+- Cleaner Code.
+- Resolute Compatibility.
+
+--------------------------------------------------
+Version 5.2.3.4070 (May 06, 2020)
+--------------------------------------------------
+
+- All executables now signed.
+
+--------------------------------------------------
+Version 5.2.3.4063 (April 07, 2020)
+--------------------------------------------------
+
+- Updated Afrikaans translation.
+- Updated Slovenian translation.
+
+--------------------------------------------------
+Version 5.2.3.4060 (April 02, 2020)
+--------------------------------------------------
+
+- New Select All and Select None functions.
+- Fixed incorrect language flag icons.
+- Added German translation.
+- Updated French translation.
+- Updated Spanish translation.
+- Removed Google Plus from the About page and replaced it with LinkedIn. 
+- Aligned Uncompiled icons.
+
+--------------------------------------------------
+Version 5.2.3.4010 (November 24, 2018)
+--------------------------------------------------
+
 - Added Support for Persian Language.
 - Important Security Updates!
 

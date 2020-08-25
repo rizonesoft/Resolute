@@ -8,7 +8,7 @@
 ; AutoIt3 Settings
 ;===============================================================================================================
 #AutoIt3Wrapper_UseX64=Y										;~ (Y/N) Use AutoIt3_x64 or Aut2Exe_x64. Default=N
-#AutoIt3Wrapper_Version=P                        				;~ (B/P) Use Beta or Production for AutoIt3 and Aut2Eex. Default is P
+#AutoIt3Wrapper_Version=B                        				;~ (B/P) Use Beta or Production for AutoIt3 and Aut2Eex. Default is P
 #AutoIt3Wrapper_Run_Debug_Mode=N								;~ (Y/N) Run Script with console debugging. Default=N
 ;#AutoIt3Wrapper_Autoit3Dir=									;~ Optionally override the AutoIt3 install directory to use.
 ;#AutoIt3Wrapper_Aut2exe=										;~ Optionally override the Aut2exe.exe to use for this script
@@ -16,28 +16,28 @@
 ;===============================================================================================================
 ; Aut2Exe Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Icon=Themes\Icons\DVDRepair.ico					;~ Filename of the Ico file to use for the compiled exe
-#AutoIt3Wrapper_OutFile_Type=exe								;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
-#AutoIt3Wrapper_OutFile=DVDRepair.exe							;~ Target exe/a3x filename.
-#AutoIt3Wrapper_OutFile_X64=DVDRepair_X64.exe					;~ Target exe filename for X64 compile.
-;#AutoIt3Wrapper_Compression=4									;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
-;#AutoIt3Wrapper_UseUpx=Y										;~ (Y/N) Compress output program.  Default=Y
-;#AutoIt3Wrapper_UPX_Parameters=								;~ Override the default settings for UPX.
-#AutoIt3Wrapper_Change2CUI=N									;~ (Y/N) Change output program to CUI in stead of GUI. Default=N
-#AutoIt3Wrapper_Compile_both=Y									;~ (Y/N) Compile both X86 and X64 in one run. Default=N
+#AutoIt3Wrapper_Icon=..\..\Resources\Icons\DVDRepair.ico			;~ Filename of the Ico file to use for the compiled exe
+#AutoIt3Wrapper_OutFile_Type=exe									;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
+#AutoIt3Wrapper_OutFile=..\..\..\Resolute\DVDRepair.exe				;~ Target exe/a3x filename.
+#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\DVDRepair_X64.exe		;~ Target exe filename for X64 compile.
+;#AutoIt3Wrapper_Compression=4										;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
+;#AutoIt3Wrapper_UseUpx=Y											;~ (Y/N) Compress output program.  Default=Y
+;#AutoIt3Wrapper_UPX_Parameters=									;~ Override the default settings for UPX.
+#AutoIt3Wrapper_Change2CUI=N										;~ (Y/N) Change output program to CUI in stead of GUI. Default=N
+#AutoIt3Wrapper_Compile_both=Y										;~ (Y/N) Compile both X86 and X64 in one run. Default=N
 ;===============================================================================================================
 ; Target Program Resource info
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=DVD Drive Repair						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft DVD Drive Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=2.0.3.1101
+#AutoIt3Wrapper_Res_Fileversion=2.2.2.1117
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
 #AutoIt3Wrapper_Res_ProductVersion=5             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
 #AutoIt3Wrapper_Res_LegalCopyright=© 2018 Rizonesoft				;~ Copyright field
-#AutoIt3Wrapper_res_requestedExecutionLevel=highestAvailable		;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
+#AutoIt3Wrapper_res_requestedExecutionLevel=requireAdministrator	;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 ;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
 ; If _Res_SaveSource=Y the content of Script_source depends on the _Run_Au3Stripper and #Au3Stripper_parameters directives:
@@ -71,92 +71,93 @@
 ; Add files to the resources - can be compressed
 ; #AutoIt3Wrapper_Res_Remove=
 ; Remove resources
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\DVDRepairH.ico				; 201
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\DVDRepairH.ico				; 201
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Information.ico		; 202
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Complete.ico			; 203
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Cross.ico			 	; 204
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Exclamation.ico		; 205
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Smiley-Glass.ico		; 206
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Skull.ico				; 207
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Snowman.ico			; 208
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico		; 202
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico			; 203
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			 	; 204
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico		; 205
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico		; 206
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico				; 207
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico			; 208
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Update.ico					; 209
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Error.ico						; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico					; 209
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico						; 210
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Check.ico				; 211
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Error.ico				; 212
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Gear.ico				; 213
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Information.ico		; 214
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Love.ico				; 215
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico				; 211
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico				; 212
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico				; 213
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico		; 214
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico				; 215
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\PayPal.ico				; 216
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\PayPalH.ico				; 217
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\sa.ico					; 218
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\saH.ico					; 219
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\Facebook.ico			; 220
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\FacebookH.ico			; 221
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\Twitter.ico				; 222
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\TwitterH.ico			; 223
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GooglePlus.ico			; 224
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GooglePlusH.ico			; 225
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GitHub.ico				; 226
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GitHubH.ico				; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico				; 216
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico					; 218
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 219
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico			; 220
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico			; 221
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico			; 223
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico			; 224
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico			; 225
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico				; 226
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 227
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\en.ico					; 228
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\af.ico					; 229
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ar.ico					; 230
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\bg.ico					; 231
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\cs.ico					; 232
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\da.ico					; 233
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\de.ico					; 234
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\el.ico					; 235
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\es.ico					; 236
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\fr.ico					; 237
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hi.ico					; 238
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hr.ico					; 239
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hu.ico					; 240
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\id.ico					; 241
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\is.ico					; 242
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\it.ico					; 243
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\iw.ico					; 244
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ja.ico					; 245
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ko.ico					; 246
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\nl.ico					; 247
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\no.ico					; 248
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pl.ico					; 249
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pt.ico					; 250
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pt-BR.ico				; 251
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ro.ico					; 252
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ru.ico					; 253
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sl.ico					; 254
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sk.ico					; 255
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sv.ico					; 256
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\th.ico					; 257
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\tr.ico					; 258
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\vi.ico					; 259
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\zh-CN.ico				; 260
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\zh-TW.ico				; 261
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico					; 228
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico					; 229
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico					; 230
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico					; 231
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico					; 232
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico					; 233
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico					; 234
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico					; 235
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico					; 236
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico					; 237
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico					; 238
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico					; 239
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico					; 240
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico					; 241
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico					; 242
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico					; 243
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico					; 244
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico					; 245
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico					; 246
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico					; 247
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico					; 248
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico					; 249
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico					; 250
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico					; 251
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico				; 252
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico					; 253
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico					; 254
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico					; 255
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico					; 256
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico					; 257
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico					; 258
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico					; 259
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico					; 260
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico				; 261
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico				; 262
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-0.ico				; 262
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-1.ico				; 263
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-2.ico				; 264
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-3.ico				; 265
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-4.ico				; 266
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-5.ico				; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 264
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 268
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Gear.ico				; 268
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Logbook.ico				; 269
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Close.ico				; 270
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\DeviceTrouble.ico		; 271
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\RestorePoint.ico		; 272
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\DeviceMan.ico			; 273
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Firmware.ico			; 274
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Update.ico				; 275
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Home.ico				; 276
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Support.ico				; 277
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\GitHub.ico				; 278
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\About.ico				; 279
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico				; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico				; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\DeviceTrouble.ico		; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\RestorePoint.ico		; 273
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\DeviceMan.ico			; 274
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Firmware.ico			; 275
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico				; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico				; 277
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 278
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico				; 279
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico				; 280
 
 ;===============================================================================================================
 ; Tidy Settings
@@ -267,7 +268,7 @@ Global Const $DEBUG_UPDATE		= False
 ;~ Constants
 Global Const $CNT_MENUICONS		= 12
 Global Const $CNT_LOGICONS		= 7
-Global Const $CNT_LANGICONS		= 34
+Global Const $CNT_LANGICONS		= 35
 
 ;~ General Settings
 Global $g_sCompanyName			= "Rizonesoft"
@@ -279,31 +280,36 @@ Global $g_iSingleton			= True
 ;~ Links
 
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com/support|www.rizonesoft.com/support"								; https://www.rizonesoft.com/contact
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads|www.rizonesoft.com/downloads"							; https://www.rizonesoft.com/downloads/
+Global $g_sUrlSupport			= "mailto:support@rizonesoft.com|support@rizonesoft.com"										; https://www.rizonesoft.com/contact
+Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com/downloads/
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
-Global $g_sUrlGooglePlus		= "https://plus.google.com/+Rizonesoftsa|Plus.google.com/+Rizonesoftsa" 						; https://plus.google.com/+Rizonesoftsa/posts
+Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
 Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"										; https://www.rizonesoft.com/feed
 Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"										; https://www.paypal.me/rizonesoft
+Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
+Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlGitHub			= "https://github.com/rizonesoft/DVDRepair|GitHub.com/rizonesoft/DVDRepair"						; https://github.com/rizonesoft/DVDRepair
-Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/DVDRepair/issues|GitHub.com/rizonesoft/DVDRepair/issues"		; https://github.com/rizonesoft/DVDRepair/issues
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/dvd-drive-repair/|www.rizonesoft.com/downloads/dvd-drive-repair/"
 Global $g_sUrlWinRepair         = "https://www.rizonesoft.com/downloads/complete-windows-repair/|www.rizonesoft.com/downloads/complete-windows-repair/"
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/dvd-drive-repair/|www.rizonesoft.com/downloads/dvd-drive-repair/"
+Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/dvd-drive-repair/update|www.rizonesoft.com/downloads/dvd-drive-repair/update"
 
 ;~ Path Settings
-Global $g_sWorkingDir		= @ScriptDir ;~ Working Directory
 Global $g_sRootDir			= @ScriptDir ;~ Root Directory
+Global $g_sWorkingDir		= $g_sRootDir ;~ Working Directory
 Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
-Global $g_sThemesDir		= $g_sRootDir & "\Themes" ;~ Themes Directory
+Global $g_sResourcesDir		= _PathFull(@ScriptDir & "\..\..\Resources")
+Global $g_sProcessDir		= $g_sRootDir &	"\Processing"
 Global $g_sDocsDir			= $g_sRootDir & "\Documents\" & $g_sProgShortName ;~ Documentation Directory
 Global $g_sDocHelpFile		= $g_sDocsDir & "\" & $g_sProgShortName & ".chm"
 Global $g_sDocChanges		= $g_sDocsDir & "\Changes.txt"
 Global $g_sDocLicense		= $g_sDocsDir & "\License.txt"
 Global $g_sDocReadme		= $g_sDocsDir & "\Readme.txt"
+
+If Not @Compiled Then
+	$g_sProcessDir = _PathFull(@ScriptDir & "\..\..\..\Resolute\Processing")
+EndIf
 
 ; Configuration Settings
 Global $g_iSetProtectMachine
@@ -323,8 +329,8 @@ Global $g_iUpdateIconStart				= 209
 Global $g_iDialogIconStart				= 211
 Global $g_iAboutIconStart				= 216
 Global $g_iLangIconStart				= 228
-Global $g_iPowerIconsStart				= 262
-Global $g_iMenuIconsStart				= 268
+Global $g_iPowerIconsStart				= 263
+Global $g_iMenuIconsStart				= 269
 
 Global $g_aCoreIcons[3]
 Global $g_iSizeIcon						= 64
@@ -341,12 +347,12 @@ Global $g_iLogIconStart		= -202
 Global $g_iUpdateSubStatus	= True
 
 ;~ Splash Page Settings
-Global $g_SplashAnimation
+Global $g_sSplashAniPath
 Global $g_iSplashDelay
 
 ;~ Update Notification Settings
-Global $g_sUpdateAnimation	= $g_sThemesDir & "\Processing\" & $g_iSizeIcon & "\Globe.ani"
-Global $g_sProcessingAnimation  = $g_sThemesDir & "\Processing\" & $g_iSizeIcon & "\Stroke.ani"
+Global $g_sUpdateAnimation	= $g_sProcessDir & "\" & $g_iSizeIcon & "\Globe.ani"
+Global $g_sProcessingAnimation  = $g_sProcessDir & "\" & $g_iSizeIcon & "\Stroke.ani"
 If $DEBUG_UPDATE = True Then
 	Global $g_sRemoteUpdateFile	= "https://www.rizonesoft.com/update/" & $g_sProgShortName & ".ruz"
 Else
@@ -466,8 +472,8 @@ Else
 
 	Else
 
-		$g_SplashAnimation 	= $g_sThemesDir & "\Processing\32\Stroke.ani"
-		$g_iSplashDelay		= 100
+		$g_sSplashAniPath		= $g_sProcessDir & "\32\Stroke.ani"
+		$g_iSplashDelay			= 100
 		_Splash_Start($g_aLangMessages[7])
 		_Splash_Update($g_aLangMessages[8], 3)
 		_Localization_Messages2()	;~ Load Custom Message Language Strings
@@ -722,26 +728,27 @@ Func _SetResources()
 		$g_aLanguageIcons[11] = $g_sThemesDir & "\Icons\Flags\hr.ico"
 		$g_aLanguageIcons[12] = $g_sThemesDir & "\Icons\Flags\hu.ico"
 		$g_aLanguageIcons[13] = $g_sThemesDir & "\Icons\Flags\id.ico"
-		$g_aLanguageIcons[14] = $g_sThemesDir & "\Icons\Flags\is.ico"
-		$g_aLanguageIcons[15] = $g_sThemesDir & "\Icons\Flags\it.ico"
-		$g_aLanguageIcons[16] = $g_sThemesDir & "\Icons\Flags\iw.ico"
-		$g_aLanguageIcons[17] = $g_sThemesDir & "\Icons\Flags\ja.ico"
-		$g_aLanguageIcons[18] = $g_sThemesDir & "\Icons\Flags\ko.ico"
-		$g_aLanguageIcons[19] = $g_sThemesDir & "\Icons\Flags\nl.ico"
-		$g_aLanguageIcons[20] = $g_sThemesDir & "\Icons\Flags\no.ico"
-		$g_aLanguageIcons[21] = $g_sThemesDir & "\Icons\Flags\pl.ico"
-		$g_aLanguageIcons[22] = $g_sThemesDir & "\Icons\Flags\pt.ico"
-		$g_aLanguageIcons[23] = $g_sThemesDir & "\Icons\Flags\pt-BR.ico"
-		$g_aLanguageIcons[24] = $g_sThemesDir & "\Icons\Flags\ro.ico"
-		$g_aLanguageIcons[25] = $g_sThemesDir & "\Icons\Flags\ru.ico"
-		$g_aLanguageIcons[26] = $g_sThemesDir & "\Icons\Flags\sl.ico"
-		$g_aLanguageIcons[27] = $g_sThemesDir & "\Icons\Flags\sk.ico"
-		$g_aLanguageIcons[28] = $g_sThemesDir & "\Icons\Flags\sv.ico"
-		$g_aLanguageIcons[29] = $g_sThemesDir & "\Icons\Flags\th.ico"
-		$g_aLanguageIcons[30] = $g_sThemesDir & "\Icons\Flags\tr.ico"
-		$g_aLanguageIcons[31] = $g_sThemesDir & "\Icons\Flags\vi.ico"
-		$g_aLanguageIcons[32] = $g_sThemesDir & "\Icons\Flags\zh-CN.ico"
-		$g_aLanguageIcons[33] = $g_sThemesDir & "\Icons\Flags\zh-TW.ico"
+		$g_aLanguageIcons[14] = $g_sThemesDir & "\Icons\Flags\ir.ico"
+		$g_aLanguageIcons[15] = $g_sThemesDir & "\Icons\Flags\is.ico"
+		$g_aLanguageIcons[16] = $g_sThemesDir & "\Icons\Flags\it.ico"
+		$g_aLanguageIcons[17] = $g_sThemesDir & "\Icons\Flags\iw.ico"
+		$g_aLanguageIcons[18] = $g_sThemesDir & "\Icons\Flags\ja.ico"
+		$g_aLanguageIcons[19] = $g_sThemesDir & "\Icons\Flags\ko.ico"
+		$g_aLanguageIcons[20] = $g_sThemesDir & "\Icons\Flags\nl.ico"
+		$g_aLanguageIcons[21] = $g_sThemesDir & "\Icons\Flags\no.ico"
+		$g_aLanguageIcons[22] = $g_sThemesDir & "\Icons\Flags\pl.ico"
+		$g_aLanguageIcons[23] = $g_sThemesDir & "\Icons\Flags\pt.ico"
+		$g_aLanguageIcons[24] = $g_sThemesDir & "\Icons\Flags\pt-BR.ico"
+		$g_aLanguageIcons[25] = $g_sThemesDir & "\Icons\Flags\ro.ico"
+		$g_aLanguageIcons[26] = $g_sThemesDir & "\Icons\Flags\ru.ico"
+		$g_aLanguageIcons[27] = $g_sThemesDir & "\Icons\Flags\sl.ico"
+		$g_aLanguageIcons[28] = $g_sThemesDir & "\Icons\Flags\sk.ico"
+		$g_aLanguageIcons[29] = $g_sThemesDir & "\Icons\Flags\sv.ico"
+		$g_aLanguageIcons[30] = $g_sThemesDir & "\Icons\Flags\th.ico"
+		$g_aLanguageIcons[31] = $g_sThemesDir & "\Icons\Flags\tr.ico"
+		$g_aLanguageIcons[32] = $g_sThemesDir & "\Icons\Flags\vi.ico"
+		$g_aLanguageIcons[33] = $g_sThemesDir & "\Icons\Flags\zh-CN.ico"
+		$g_aLanguageIcons[34] = $g_sThemesDir & "\Icons\Flags\zh-TW.ico"
 
 		$g_aMenuIcons[0]  = $g_sThemesDir & "\Icons\Menus\Gear.ico"
 		$g_aMenuIcons[1]  = $g_sThemesDir & "\Icons\Menus\Logbook.ico"
@@ -1619,106 +1626,109 @@ Func __ISO639CodeToIndex($i639 = "en")
 	Switch $i639
 		Case "en"
 			$aLangInfo[0] = "English"
-			$aLangInfo[1] = 0
+			$aLangInfo[1] = 0 ; en.ico
 		Case "af"
 			$aLangInfo[0] = "Afrikaans"
-			$aLangInfo[1] = 1
+			$aLangInfo[1] = 1 ; af.ico
 		Case "ar"
 			$aLangInfo[0] = "Arabic"
-			$aLangInfo[1] = 2
+			$aLangInfo[1] = 2 ; ar.ico
 		Case "bg"
 			$aLangInfo[0] = "Bulgarian"
-			$aLangInfo[1] = 3
+			$aLangInfo[1] = 3 ; bg.ico
 		Case "cs"
 			$aLangInfo[0] = "Czech"
-			$aLangInfo[1] = 4
+			$aLangInfo[1] = 4 ; cs.ico
 		Case "da"
 			$aLangInfo[0] = "Danish"
-			$aLangInfo[1] = 5
+			$aLangInfo[1] = 5 ; da.ico
 		Case "de"
 			$aLangInfo[0] = "German"
-			$aLangInfo[1] = 6
+			$aLangInfo[1] = 6 ; de.ico
 		Case "el"
 			$aLangInfo[0] = "Greek"
-			$aLangInfo[1] = 7
+			$aLangInfo[1] = 7 ; el.ico
 		Case "es"
 			$aLangInfo[0] = "Spanish"
-			$aLangInfo[1] = 8
+			$aLangInfo[1] = 8 ; es.ico
 		Case "fr"
 			$aLangInfo[0] = "French"
-			$aLangInfo[1] = 9
+			$aLangInfo[1] = 9 ; fr.ico
 		Case "hi"
 			$aLangInfo[0] = "Hindi"
-			$aLangInfo[1] = 10
+			$aLangInfo[1] = 10 ; hi.ico
 		Case "hr"
 			$aLangInfo[0] = "Croatian"
-			$aLangInfo[1] = 11
+			$aLangInfo[1] = 11 ; hr.ico
 		Case "hu"
 			$aLangInfo[0] = "Hungarian"
-			$aLangInfo[1] = 12
+			$aLangInfo[1] = 12 ; hu.ico
 		Case "id"
 			$aLangInfo[0] = "Indonesian"
-			$aLangInfo[1] = 13
+			$aLangInfo[1] = 13 ; id.ico
+		Case "ir"
+			$aLangInfo[0] = "Iran"
+			$aLangInfo[1] = 14 ; ir.ico
 		Case "is"
 			$aLangInfo[0] = "Icelandic"
-			$aLangInfo[1] = 14
+			$aLangInfo[1] = 15 ; is.ico
 		Case "it"
 			$aLangInfo[0] = "Italian"
-			$aLangInfo[1] = 15
+			$aLangInfo[1] = 16 ; it.ico
 		Case "iw"
 			$aLangInfo[0] = "Hebrew"
-			$aLangInfo[1] = 16
+			$aLangInfo[1] = 17 ; iw.ico
 		Case "ja"
 			$aLangInfo[0] = "Japanese"
-			$aLangInfo[1] = 17
+			$aLangInfo[1] = 18 ; ja.ico
 		Case "ko"
 			$aLangInfo[0] = "Korean"
-			$aLangInfo[1] = 18
+			$aLangInfo[1] = 19 ; ko.ico
 		Case "nl"
 			$aLangInfo[0] = "Dutch"
-			$aLangInfo[1] = 19
+			$aLangInfo[1] = 20 ; nl.ico
 		Case "no"
 			$aLangInfo[0] = "Norwegian"
-			$aLangInfo[1] = 20
+			$aLangInfo[1] = 21 ; no.ico
 		Case "pl"
 			$aLangInfo[0] = "Polish"
-			$aLangInfo[1] = 21
+			$aLangInfo[1] = 22 ; pl.ico
 		Case "pt"
 			$aLangInfo[0] = "Portuguese"
-			$aLangInfo[1] = 22
+			$aLangInfo[1] = 23 ; pt.ico
 		Case "pt-BR"
 			$aLangInfo[0] = "Portuguese (Brazil)"
-			$aLangInfo[1] = 23
+			$aLangInfo[1] = 24 ; pt-BR.ico
 		Case "ro"
 			$aLangInfo[0] = "Romanian"
-			$aLangInfo[1] = 24
+			$aLangInfo[1] = 25 ; ro.ico
 		Case "ru"
 			$aLangInfo[0] = "Russian"
-			$aLangInfo[1] = 25
+			$aLangInfo[1] = 26 ; ru.ico
 		Case "sl"
 			$aLangInfo[0] = "Slovenian"
-			$aLangInfo[1] = 26
+			$aLangInfo[1] = 27 ; sl.ico
 		Case "sk"
 			$aLangInfo[0] = "Slovak"
-			$aLangInfo[1] = 27
+			$aLangInfo[1] = 28 ; sk.ico
 		Case "sv"
 			$aLangInfo[0] = "Swedish"
-			$aLangInfo[1] = 28
+			$aLangInfo[1] = 29 ; sv.ico
 		Case "th"
 			$aLangInfo[0] = "Thai"
-			$aLangInfo[1] = 29
+			$aLangInfo[1] = 30 ; th.ico
 		Case "tr"
 			$aLangInfo[0] = "Turkish"
-			$aLangInfo[1] = 30
+			$aLangInfo[1] = 31 ; tr.ico
 		Case "vi"
 			$aLangInfo[0] = "Vietnamese"
-			$aLangInfo[1] = 31
+			$aLangInfo[1] = 32 ; vi.ico
 		Case "zh-CN"
 			$aLangInfo[0] = "Simplified Chinese"
-			$aLangInfo[1] = 32
+			$aLangInfo[1] = 33 ; zh-CN.ico
 		Case "zh-TW"
 			$aLangInfo[0] = "Traditional Chinese"
-			$aLangInfo[1] = 33
+			$aLangInfo[1] = 34 ; zh-TW.ico
 	EndSwitch
 
 	Return $aLangInfo
