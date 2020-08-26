@@ -5,8 +5,8 @@
 ;===============================================================================================================
 ; Tidy Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Run_Tidy=Y                                        ;~ (Y/N) Run Tidy before compilation. Default=N
-#AutoIt3Wrapper_Tidy_Stop_OnError=Y                                ;~ (Y/N) Continue when only Warnings. Default=Y
+#AutoIt3Wrapper_Run_Tidy=Y										;~ (Y/N) Run Tidy before compilation. Default=N
+#AutoIt3Wrapper_Tidy_Stop_OnError=Y								;~ (Y/N) Continue when only Warnings. Default=Y
 
 #EndRegion AutoIt3Wrapper Directives Section
 
@@ -230,7 +230,7 @@ EndFunc   ;==>_About_ShowDialog
 
 Func _About_Support()
 	ShellExecute(_Link_Split($g_sUrlSupport))
-EndFunc   ;==>_About_Support
+EndFunc   ;==>_About_Contact
 
 
 Func _About_Downloads()
@@ -419,20 +419,20 @@ Func __About_SetMemoryStats()
 			$g_aBuffers[2] = $iRAMFree
 		EndIf
 
-;~ 		If $iRAMPerc <> $g_aBuffers[3] Then
+		;If $iRAMPerc <> $g_aBuffers[3] Then
 
-		If $iRAMPerc >= 0 And $iRAMPerc < 60 Then
-			_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Green")
-		ElseIf $iRAMPerc > 60 And $iRAMPerc < 90 Then
-			_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Blue")
-		ElseIf $iRAMPerc > 90 And $iRAMPerc <= 100 Then
-			_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Red")
-		EndIf
+			If $iRAMPerc >= 0 And $iRAMPerc < 60 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Green")
+			ElseIf $iRAMPerc > 60 And $iRAMPerc < 90 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Blue")
+			ElseIf $iRAMPerc > 90 And $iRAMPerc <= 100 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Red")
+			EndIf
 
-		_ProgressBar_SetData($g_hAboutGui, $g_hRAMPRog1, $g_hRAMProg2, 22, 365, 376, $iRAMPerc)
-		$g_aBuffers[3] = $iRAMPerc
+			_ProgressBar_SetData($g_hAboutGui, $g_hRAMPRog1, $g_hRAMProg2, 22, 365, 376, $iRAMPerc)
+			$g_aBuffers[3] = $iRAMPerc
 
-;~ 		EndIf
+		;EndIf
 
 	EndIf
 

@@ -3,8 +3,8 @@ COMPLETE INTERNET REPAIR
 © RIZONESOFT. All rights reserved
 https://www.rizonesoft.com
 ==================================================
-Version: 5.2.3.4125
-Release Date: 25 2020, 2020
+Version: 6.0.3.5003
+Release Date: 26 2020, 2020
 System Requirements: Windows XP, Vista, 2008, 7, 8, 8.1, 10 
 Disk Space: 0 MB
 ==================================================

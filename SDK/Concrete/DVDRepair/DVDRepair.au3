@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=DVD Drive Repair						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft DVD Drive Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=2.2.2.1117
+#AutoIt3Wrapper_Res_Fileversion=2.2.2.1126
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -280,7 +280,7 @@ Global $g_iSingleton			= True
 ;~ Links
 
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "mailto:support@rizonesoft.com|support@rizonesoft.com"										; https://www.rizonesoft.com/contact
+Global $g_sUrlSupport			= "https://www.rizonesoft.com/#contact|www.rizonesoft.com/#contact"								; https://www.rizonesoft.com/contact
 Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com/downloads/
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft

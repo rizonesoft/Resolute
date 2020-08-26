@@ -6,6 +6,13 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed About page Memory usage par display.
+- Updated support URL on the About page.
+
+--------------------------------------------------
+Version 2.2.2.1116 (August 04, 2020)
+--------------------------------------------------
+
 - Fixed: GUIOnEventMode and TrayOnEventMode options had unnecessary slow downs.
 - Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later (OS bug/design change).
 - Improved Resolute compatibility.

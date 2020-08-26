@@ -3,6 +3,16 @@ RIZONESOFT COMPLETE INTERNET REPAIR CHANGES
 ==================================================
 
 --------------------------------------------------
+Version 6.0.3.5003 (August 26, 2020)
+--------------------------------------------------
+
+- Updated French translation.
+- Fixed Select All button alignment.
+- Fixed Select All translation.
+- Fixed wrong menu icons.
+- New Save Selection on Program exit.
+
+--------------------------------------------------
 Version 5.2.3.4125 (August 25, 2020)
 --------------------------------------------------
 
