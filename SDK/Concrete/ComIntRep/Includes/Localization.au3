@@ -86,6 +86,7 @@ Func _Localization_Custom()
 	$g_aLangCustom[35] = _Localization_Load("Custom", "Label_Sub_Heading_Notice", "Complete Internet Repair functionality now bundled with Complete Windows Repair. Click here to download it now and evolve!!")
 	$g_aLangCustom[36] = _Localization_Load("Custom", "Label_All_Complete", "All selected tasks Complete.")
 	$g_aLangCustom[37] = _Localization_Load("Custom", "Checkbox_Select_All", "Select All")
+	$g_aLangCustom[38] = _Localization_Load("Custom", "Checkbox_Select_None", "Select None")
 
 EndFunc
 

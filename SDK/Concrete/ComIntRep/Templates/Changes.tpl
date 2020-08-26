@@ -6,6 +6,16 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated French translation.
+- Fixed Select All button alignment.
+- Fixed Select All translation.
+- Fixed wrong menu icons.
+- New Save Selection on Program exit.
+
+--------------------------------------------------
+Version 5.2.3.4125 (August 25, 2020)
+--------------------------------------------------
+
 - Fixed: GUIOnEventMode and TrayOnEventMode options had unnecessary slow downs.
 - Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later (OS bug/design change).
 - Improved Resolute compatibility.

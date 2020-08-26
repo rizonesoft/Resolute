@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Complete Internet Repair			;~ Comment field
 #AutoIt3Wrapper_Res_Description=Complete Internet Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=5.2.3.4132
+#AutoIt3Wrapper_Res_Fileversion=6.0.3.5003
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -146,10 +146,10 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 267
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 268
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information-D.ico		; 269
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information.ico			; 270
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run-D.ico				; 271
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run.ico					; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information1.ico		; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information2.ico		; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run1.ico				; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run2.ico				; 272
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Complete.ico			; 273
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Cross.ico				; 274
 
@@ -192,6 +192,7 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\InternetProperties.ico		; 305
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\SelectAll.ico			; 311
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Save.ico				; 312
 
 
 ;===============================================================================================================
@@ -399,6 +400,7 @@ Global $g_aLanguageIcons[$CNT_LANGICONS]
 Global $g_aMenuIcons[$CNT_MENUICONS]
 Global $g_aCommIcons[$CNT_COMMICONS]
 Global $g_sSelectAllIcon
+Global $g_sSaveIcon
 Global $g_sDlgOptionsIcon
 
 ;~ Splash Page Settings
@@ -480,6 +482,7 @@ Global $g_iSaveRealtime			= 0
 Global $g_iReduceMemory 		= 1
 Global $g_iReduceEveryMill 		= 300
 Global $g_iMaxSysMemoryPerc 	= 80
+;~ Global $g_iSaveSelection		= 4
 
 Global $g_aRepair[$CNT_REPAIR][8]
 Global $g_aRepairHovering[$CNT_REPAIR][2]
@@ -487,6 +490,7 @@ Global $g_aRepairState[$CNT_REPAIR][3]
 
 Global $g_hBtnGo, $g_IntExplVersion
 Global $g_hChkSelectAll
+;~ Global $g_hChkSaveSelection
 Global $g_iCancel, $g_iSoloProcess = True
 Global $g_iRebootRequired
 Global $g_iResetWinsock = True
@@ -761,7 +765,10 @@ Func _StartCoreGui()
 	$g_IntExplVersion = _GetInternetExplorerVersion()
 
 	GUICtrlCreateIcon($g_sSelectAllIcon, 311, 20, 93, 16, 16)
-	$g_hChkSelectAll = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[37], 43, 93, 325, 16)
+	$g_hChkSelectAll = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[37], 43, 93, 155, 16)
+;~ 	GUICtrlCreateIcon($g_sSaveIcon, 312, 198, 93, 16, 16)
+;~ 	$g_hChkSaveSelection = GUICtrlCreateCheckbox(Chr(32) & "Save Selection on Exit", 221, 93, 250, 16)
+;~ 	GUICtrlSetOnEvent($g_hChkSaveSelection, "_SetSaveSelection")
 
 	GUICtrlCreateGroup("", 10, 110, $g_iCoreGuiWidth - 20, 305)
 	For $iR = 0 To $CNT_REPAIR - 1
@@ -779,6 +786,7 @@ Func _StartCoreGui()
 		GUICtrlSetBkColor($g_aRepair[$iR][6], 0x3399FF)
 		GUICtrlSetState($g_aRepair[$iR][6], $GUI_HIDE)
 
+		GUICtrlSetOnEvent($g_aRepair[$iR][1], "_TestSelectAll")
 		GUICtrlSetOnEvent($g_aRepair[$iR][2], "_ShowRepairInfo")
 		GUICtrlSetOnEvent($g_aRepair[$iR][3], "_RunSelectedOption")
 
@@ -786,6 +794,12 @@ Func _StartCoreGui()
 
 	GUICtrlSetData($g_aRepair[5][1],  Chr(32) & StringFormat($g_aLangCustom[7], $g_IntExplVersion))
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+;~ 	GUICtrlSetState($g_hChkSaveSelection, $g_iSaveSelection)
+;~ 	If $g_iSaveSelection = 1 Then
+		_LoadSelection()
+;~ 	EndIf
+	_TestSelectAll()
 
 	$g_hBtnExtend = GUICtrlCreateCheckbox(6, 10, 443, 30, 28, $BS_PUSHLIKE)
 	GUICtrlSetFont($g_hBtnExtend, 10, 400, 0, "Webdings")
@@ -944,23 +958,46 @@ EndFunc   ;==>_GUIExpand
 Func _SelectAll()
 
 	If GUICtrlRead($g_hChkSelectAll) = $GUI_CHECKED Then
-
 		For $iS = 0 To $CNT_REPAIR - 1
 			GUICtrlSetState($g_aRepair[$iS][1], $GUI_CHECKED)
 		Next
-		GUICtrlSetData($g_hChkSelectAll, Chr(32) & Chr(32) & "Select None")
-
+		GUICtrlSetData($g_hChkSelectAll, Chr(32) & $g_aLangCustom[38])
 	Else
-
 		For $iS = 0 To $CNT_REPAIR - 1
 			GUICtrlSetState($g_aRepair[$iS][1], $GUI_UNCHECKED)
 		Next
-		GUICtrlSetData($g_hChkSelectAll, Chr(32) & Chr(32) & "Select All")
-
+		GUICtrlSetData($g_hChkSelectAll, Chr(32) & $g_aLangCustom[37])
 	EndIf
 
 EndFunc
 
+
+Func _TestSelectAll()
+
+	Local $x = 0
+
+	For $iSel = 0 To $CNT_REPAIR - 1
+		If GUICtrlRead($g_aRepair[$iSel][1]) = $GUI_CHECKED Then
+			$x += 1
+		Else
+			$x -= 1
+		EndIf
+	Next
+
+	If $x = $CNT_REPAIR Then
+		GUICtrlSetState($g_hChkSelectAll, $GUI_CHECKED)
+		GUICtrlSetData($g_hChkSelectAll, Chr(32) & $g_aLangCustom[38])
+	Else
+		GUICtrlSetState($g_hChkSelectAll, $GUI_UNCHECKED)
+		GUICtrlSetData($g_hChkSelectAll, Chr(32) & $g_aLangCustom[37])
+	EndIF
+
+EndFunc
+
+
+;~ Func _SetSaveSelection()
+;~ 	$g_iSaveSelection = GUICtrlRead($g_hChkSaveSelection)
+;~ EndFunc
 
 #EndRegion "Events"
 
@@ -1007,6 +1044,7 @@ Func _SetResources()
 
 		$g_sDlgOptionsIcon = @ScriptFullPath
 		$g_sSelectAllIcon = @ScriptFullPath
+		$g_sSaveIcon = @ScriptFullPath
 
 	Else
 
@@ -1103,6 +1141,7 @@ Func _SetResources()
 
 		$g_sDlgOptionsIcon = "..\..\..\SDK\Resources\Icons\Dialogs\Gear.ico"
 		$g_sSelectAllIcon = "..\..\..\SDK\Resources\Icons\SelectAll.ico"
+		$g_sSaveIcon = "..\..\..\SDK\Resources\Icons\Save.ico"
 
 	EndIf
 
@@ -1180,15 +1219,46 @@ Func _LoadConfiguration()
 	$g_iUptimeMonitor = Int(IniRead($g_sPathIni, "Donate", "Seconds", 0))
 	$g_iDonateTime = Int(IniRead($g_sPathIni, "Donate", "DonateTime", 0))
 
+;~ 	$g_iSaveSelection = Int(IniRead($g_sPathIni, $g_sProgShortName, "SaveSelection", 1))
+
 	If @Compiled Then
 		ProcessSetPriority(@ScriptName, $g_iProcessPriority)
 	EndIf
+
 EndFunc   ;==>_LoadConfiguration
 
 
 Func _SaveConfiguration()
 
+;~ 	$g_iSaveSelection = GUICtrlRead($g_hChkSaveSelection)
+;~ 	IniWrite($g_sPathIni, $g_sProgShortName, "SaveSelection", $g_iSaveSelection)
+;~ 	If $g_iSaveSelection = 1 Then
+		_SaveSelection()
+;~ 	EndIf
+
 	IniWrite($g_sPathIni, "Donate", "Seconds", $g_iUptimeMonitor)
+	IniWrite($g_sPathIni, "Donate", "Seconds", $g_iUptimeMonitor)
+
+EndFunc
+
+
+Func _LoadSelection()
+
+	For $iSel = 0 To $CNT_REPAIR - 1
+		GUICtrlSetState($g_aRepair[$iSel][1], Int(IniRead($g_sPathIni, "Selection", $iSel, 1)))
+	Next
+
+EndFunc
+
+Func _SaveSelection()
+
+	For $iSel = 0 To $CNT_REPAIR - 1
+		If GUICtrlRead($g_aRepair[$iSel][1]) = $GUI_CHECKED Then
+			IniWrite($g_sPathIni, "Selection", $iSel, $GUI_CHECKED)
+		Else
+			IniWrite($g_sPathIni, "Selection", $iSel, $GUI_UNCHECKED)
+		EndIf
+	Next
 
 EndFunc
 
