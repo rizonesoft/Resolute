@@ -2682,3 +2682,149 @@
 [ 2020/08/26 09:26:38 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Sounds\Welcome.wav Distribution Created.
 [ 2020/08/26 09:26:39 ] Finished: Complete Internet Repair Distribution Created.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/26 21:30:02 ] DATE:                        2020/08/26 21:30:02
+[ 2020/08/26 21:30:02 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3577
+[ 2020/08/26 21:30:02 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/26 21:30:02 ] COMPILED:                    YES
+[ 2020/08/26 21:30:02 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/26 21:30:02 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/26 21:30:02 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/26 21:30:02 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/26 21:30:02 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2020/08/26 21:30:25 ] Generating Documentation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:30:25 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates'
+[ 2020/08/26 21:30:25 ] 03 templates files found.
+[ 2020/08/26 21:30:25 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Changes.tpl
+[ 2020/08/26 21:30:25 ] Document created successfuly.
+[ 2020/08/26 21:30:25 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Changes.txt
+[ 2020/08/26 21:30:25 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\License.tpl
+[ 2020/08/26 21:30:25 ] Document created successfuly.
+[ 2020/08/26 21:30:25 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\License.txt
+[ 2020/08/26 21:30:25 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Readme.tpl
+[ 2020/08/26 21:30:26 ] Document created successfuly.
+[ 2020/08/26 21:30:26 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Readme.txt
+[ 2020/08/26 21:30:26 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:30:34 ] Distributing DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\DVDRepair.exe Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\DVDRepair_X64.exe Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\DVDRepair.ini Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Docs\Changes.txt Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Docs\License.txt Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Docs\Readme.txt Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Language\DVDRepair\af.ini Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Language\DVDRepair\el.ini Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Language\DVDRepair\en.ini Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Language\DVDRepair\es.ini Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Language\DVDRepair\fr.ini Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Language\DVDRepair\zh-TW.ini Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Processing\32\Stroke.ani Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Processing\64\Stroke.ani Distribution Created.
+[ 2020/08/26 21:30:34 ] \Concrete\DVDRepair\Distribution\1125\DVDRepair_1125\Processing\64\Globe.ani Distribution Created.
+[ 2020/08/26 21:30:35 ] Finished: DVD Drive Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:30:41 ] Creating Zip Package for DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:30:41 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2020/08/26 21:30:41 ] Scanning the drive:
+[ 2020/08/26 21:30:41 ] 7 folders, 15 files, 4840993 bytes (4728 KiB)
+[ 2020/08/26 21:30:41 ] Creating archive: DVDRepair_1125.zip
+[ 2020/08/26 21:30:41 ] Items to compress: 22
+[ 2020/08/26 21:30:41 ] Files read from disk: 15
+[ 2020/08/26 21:30:41 ] Archive size: 2536999 bytes (2478 KiB)
+[ 2020/08/26 21:30:42 ] Everything is Ok
+[ 2020/08/26 21:30:42 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:30:44 ] Creating installation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:30:44 ] Finished: Created installation for DVD Drive Repair.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2020/08/26 21:37:49 ] DATE:                        2020/08/26 21:37:49
+[ 2020/08/26 21:37:49 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3577
+[ 2020/08/26 21:37:49 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2020/08/26 21:37:49 ] COMPILED:                    YES
+[ 2020/08/26 21:37:49 ] WINDOWS VERSION:             WIN_10 
+[ 2020/08/26 21:37:49 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2020/08/26 21:37:49 ] MEMORY (RAM):                16302.97 MB
+[ 2020/08/26 21:37:49 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2020/08/26 21:37:49 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2020/08/26 21:37:56 ] Generating Documentation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:37:56 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates'
+[ 2020/08/26 21:37:56 ] 03 templates files found.
+[ 2020/08/26 21:37:56 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Changes.tpl
+[ 2020/08/26 21:37:56 ] Document created successfuly.
+[ 2020/08/26 21:37:56 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Changes.txt
+[ 2020/08/26 21:37:56 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\License.tpl
+[ 2020/08/26 21:37:56 ] Document created successfuly.
+[ 2020/08/26 21:37:56 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\License.txt
+[ 2020/08/26 21:37:56 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Readme.tpl
+[ 2020/08/26 21:37:56 ] Document created successfuly.
+[ 2020/08/26 21:37:56 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Readme.txt
+[ 2020/08/26 21:37:56 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:37:59 ] Distributing Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:37:59 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\ComIntRep.exe Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\ComIntRep_X64.exe Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\ComIntRep.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Docs\Changes.txt Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Docs\License.txt Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Docs\Readme.txt Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\af.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\ar.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\de.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\el.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\en.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\es.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\fr.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\hu.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\it.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\pt-BR.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\ru.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\sl.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\tr.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\zh-CN.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Language\ComIntRep\zh-TW.ini Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Processing\16\Process.ani Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Processing\32\Stroke.ani Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Processing\64\Stroke.ani Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Processing\64\Globe.ani Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Sounds\Complete.wav Distribution Created.
+[ 2020/08/26 21:38:00 ] \Concrete\ComIntRep\Distribution\5003\ComIntRep_5003\Sounds\Welcome.wav Distribution Created.
+[ 2020/08/26 21:38:01 ] Finished: Complete Internet Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:38:04 ] Creating Zip Package for Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:38:04 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2020/08/26 21:38:04 ] Scanning the drive:
+[ 2020/08/26 21:38:04 ] 9 folders, 27 files, 6272612 bytes (6126 KiB)
+[ 2020/08/26 21:38:05 ] Creating archive: ComIntRep_5003.zip
+[ 2020/08/26 21:38:05 ] Items to compress: 36
+[ 2020/08/26 21:38:05 ] Files read from disk: 27
+[ 2020/08/26 21:38:05 ] Archive size: 3183042 bytes (3109 KiB)
+[ 2020/08/26 21:38:05 ] Everything is Ok
+[ 2020/08/26 21:38:05 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:38:07 ] Creating installation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2020/08/26 21:38:41 ] Finished: Created installation for Complete Internet Repair.
+------------------------------------------------------------------------------------------

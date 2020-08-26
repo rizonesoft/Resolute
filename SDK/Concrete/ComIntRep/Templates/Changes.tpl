@@ -7,9 +7,9 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
 - Updated French translation.
-- Fixed Select All button alignment.
-- Fixed Select All translation.
-- Fixed wrong menu icons.
+- Fixed: Select All button alignment.
+- Fixed: Select All translation.
+- Fixed: wrong menu icons.
 - New Save Selection on Program exit.
 
 --------------------------------------------------

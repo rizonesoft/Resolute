@@ -6,7 +6,7 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
-- Fixed About page Memory usage par display.
+- Fixed: About page Memory usage par display.
 - Updated support URL on the About page.
 
 --------------------------------------------------
