@@ -23,7 +23,7 @@ Website = https://www.rizonesoft.com
 [Distribute]
 File=%RootDir%\DVDRepair.exe
 File=%RootDir%\DVDRepair_X64.exe
-File=%SourceDir%\~DVDRepair.ini
+File=%SourceDir%\DVDRepair.in_
 File=%SourceDir%\Docs\Changes.txt
 File=%SourceDir%\Docs\License.txt
 File=%SourceDir%\Docs\Readme.txt

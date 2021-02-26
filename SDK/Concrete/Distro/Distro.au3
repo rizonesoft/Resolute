@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=5.0.2.3578
+#AutoIt3Wrapper_Res_Fileversion=5.0.2.3582
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -146,17 +146,17 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico			; 267
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico			; 268
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\InformationH.ico	; 269
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information.ico		; 270
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\RunH.ico			; 271
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run.ico				; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information1.ico	; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information2.ico	; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run1.ico			; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run2.ico			; 272
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Complete.ico		; 273
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Cross.ico			; 274
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Tick.ico			; 275
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\ShortcutH.ico		; 276
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Shortcut.ico		; 277
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\ArrowsH.ico			; 278
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows.ico			; 279
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Shortcut1.ico		; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Shortcut2.ico		; 277
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows1.ico			; 278
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows2.ico			; 279
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-0.ico			; 280
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-1.ico			; 281
@@ -2395,7 +2395,7 @@ Func _CreateDistribution($sSolutionIniPath, $iRow, $iCol)
 	Local $aFiles = IniReadSection($sSolutionIniPath, "Distribute")
 	If Not @error Then
 		For $xF = 1 To $aFiles[0][0]
-			$sOutputFile = _CleanDestinationPath($sOutputPath & "\" & StringReplace($aFiles[$xF][1], "~", ""))
+			$sOutputFile = _CleanDestinationPath($sOutputPath & "\" & StringReplace($aFiles[$xF][1], "in_", "ini"))
 			If StringInStr($aFiles[$xF][0], "Directory") Then
 				_DistributeDirectory($sOutputFile)
 			ElseIf StringInStr($aFiles[$xF][0], "File") Then
@@ -2537,8 +2537,10 @@ Func _ReturnDistributionState($sSolutionIniPath)
 
 	Local $aFiles = IniReadSection($sSolutionIniPath, "Distribute")
 	If Not @error Then
-		For $x = 1 To $aFiles[0][0]
-			$sFilePath = _CleanDestinationPath($sDistributionPath & "\" & StringReplace($aFiles[$x][1], "~", ""))
+		For $xF = 1 To $aFiles[0][0]
+			$sFilePath = _CleanDestinationPath($sDistributionPath & "\" & StringReplace($aFiles[$xF][1], "in_", "ini"))
+
+
 			If Not FileExists($sFilePath) Then
 				_Logging_EditWrite(_Logging_SetLevel($g_aLangMessages2[52], "ERROR"))
 				_Logging_EditWrite("^ '" & $sFilePath & "'")
@@ -2786,6 +2788,7 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 
 	FileWrite($hFileOpen, "[Run]" & @CRLF)
 	FileWrite($hFileOpen, "Filename: {app}\" & $sOutputFile & "; Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall shellexec skipifsilent unchecked" & @CRLF)
+	FileWrite($hFileOpen, "Filename: " & Chr(34) & "https://www.rizonesoft.com/thank-you/" & Chr(34) & "; Flags: shellexec runasoriginaluser nowait" & @CRLF)
 
 	FileWrite($hFileOpen, "" & @CRLF)
 

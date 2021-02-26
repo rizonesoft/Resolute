@@ -17,10 +17,10 @@
 ;===============================================================================================================
 ; Aut2Exe Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Icon=Themes\Icons\Firemin.ico					;~ Filename of the Ico file to use for the compiled exe
+#AutoIt3Wrapper_Icon=..\..\Resources\Icons\Firemin.ico			;~ Filename of the Ico file to use for the compiled exe
 #AutoIt3Wrapper_OutFile_Type=exe								;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
-#AutoIt3Wrapper_OutFile=Firemin.exe								;~ Target exe/a3x filename.
-#AutoIt3Wrapper_OutFile_X64=Firemin_X64.exe						;~ Target exe filename for X64 compile.
+#AutoIt3Wrapper_OutFile=..\..\..\Resolute\Firemin.exe			;~ Target exe/a3x filename.
+#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\Firemin_X64.exe	;~ Target exe filename for X64 compile.
 ;#AutoIt3Wrapper_Compression=4									;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
 ;#AutoIt3Wrapper_UseUpx=Y										;~ (Y/N) Compress output program.  Default=Y
 ;#AutoIt3Wrapper_UPX_Parameters=								;~ Override the default settings for UPX.
@@ -31,13 +31,13 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=6.2.3.5066
+#AutoIt3Wrapper_Res_Fileversion=6.2.3.5086
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
 #AutoIt3Wrapper_Res_ProductVersion=5             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2018 Rizonesoft				;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=© 2020 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 ;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
@@ -72,89 +72,89 @@
 ; Add files to the resources - can be compressed
 ; #AutoIt3Wrapper_Res_Remove=
 ; Remove resources
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\FireminH.ico					; 201
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\FireminH.ico						; 201
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Information.ico		; 202
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Complete.ico			; 203
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Cross.ico			 	; 204
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Exclamation.ico		; 205
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Smiley-Glass.ico		; 206
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Skull.ico				; 207
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\logging\Snowman.ico			; 208
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico			; 202
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico				; 203
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico				; 204
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico			; 205
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico			; 206
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico				; 207
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico				; 208
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Update.ico					; 209
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Error.ico						; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico						; 209
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico						; 210
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Check.ico				; 211
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Error.ico				; 212
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Gear.ico				; 213
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Information.ico		; 214
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Dialogs\Love.ico				; 215
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico				; 211
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico				; 212
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico					; 213
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico			; 214
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico					; 215
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\PayPal.ico				; 216
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\PayPalH.ico				; 217
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\sa.ico					; 218
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\saH.ico					; 219
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\Facebook.ico			; 220
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\FacebookH.ico			; 221
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\Twitter.ico				; 222
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\TwitterH.ico			; 223
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\LinkedIn.ico			; 224
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\LinkedInH.ico			; 225
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GitHub.ico				; 226
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\About\GitHubH.ico	 			; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico					; 216
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico						; 218
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 219
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico				; 220
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico				; 221
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico				; 223
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico				; 224
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico				; 225
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 226
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 227
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\en.ico					; 228
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\af.ico					; 229
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ar.ico					; 230
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\bg.ico					; 231
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\cs.ico					; 232
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\da.ico					; 233
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\de.ico					; 234
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\el.ico					; 235
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\es.ico					; 236
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\fr.ico					; 237
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hi.ico					; 238
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hr.ico					; 239
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\hu.ico					; 240
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\id.ico					; 241
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ir.ico					; 242
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\is.ico					; 243
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\it.ico					; 244
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\iw.ico					; 245
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ja.ico					; 246
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ko.ico					; 247
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\nl.ico					; 248
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\no.ico					; 249
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pl.ico					; 250
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pt.ico					; 251
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\pt-BR.ico				; 252
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ro.ico					; 253
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\ru.ico					; 254
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sl.ico					; 255
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sk.ico					; 256
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\sv.ico					; 257
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\th.ico					; 258
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\tr.ico					; 259
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\vi.ico					; 260
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\zh-CN.ico				; 261
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Flags\zh-TW.ico				; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 228
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 229
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico						; 230
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico						; 231
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico						; 232
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico						; 233
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico						; 234
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico						; 235
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico						; 236
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico						; 237
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico						; 238
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico						; 239
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico						; 240
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico						; 241
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico						; 242
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico						; 243
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico						; 244
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico						; 245
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico						; 246
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico						; 247
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico						; 248
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico						; 249
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico						; 250
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico						; 251
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico					; 252
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico						; 253
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico						; 254
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico						; 255
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico						; 256
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico						; 257
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico						; 258
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico						; 259
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico						; 260
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico					; 261
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico					; 262
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-0.ico				; 263
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-1.ico				; 264
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-2.ico				; 265
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-3.ico				; 266
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-4.ico				; 267
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Power\Power-5.ico				; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 264
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 268
 
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Gear.ico				; 269
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Logbook.ico				; 270
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Close.ico				; 271
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Update.ico				; 272
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Home.ico				; 273
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\Support.ico				; 274
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\GitHub.ico				; 275
-#AutoIt3Wrapper_Res_Icon_Add=Themes\Icons\Menus\About.ico				; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 273
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 274
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 275
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 276
 
 ;===============================================================================================================
 ; Tidy Settings
@@ -254,7 +254,7 @@ EndFunc   ;==>_ReBarStartUp
 #include "..\..\Includes\Update.au3"
 #include "..\..\Includes\Versioning.au3"
 
-#include "UDF\Localization.au3"
+#include "Includes\Localization.au3"
 
 
 ;~ Developer Constants
@@ -294,7 +294,8 @@ Global $g_sWorkingDir		= @ScriptDir ;~ Working Directory
 Global $g_sRootDir			= @ScriptDir ;~ Root Directory
 Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
-Global $g_sThemesDir		= $g_sRootDir & "\Themes" ;~ Themes Directory
+;~ Global $g_sThemesDir		= $g_sRootDir & "\Themes" ;~ Themes Directory
+Global $g_sProcessDir		= $g_sRootDir &	"\Processing"
 Global $g_sDocsDir			= $g_sRootDir & "\Documents\" & $g_sProgShortName ;~ Documentation Directory
 Global $g_sDocHelpFile		= $g_sDocsDir & "\" & $g_sProgShortName & ".chm"
 Global $g_sDocChanges		= $g_sDocsDir & "\Changes.txt"
@@ -341,7 +342,7 @@ Global $g_aMenuIcons[$CNT_MENUICONS]
 Global $g_sDlgOptionsIcon
 
 ;~ Update Notification Settings
-Global $g_sUpdateAnimation	= $g_sThemesDir & "\Processing\" & $g_iSizeIcon & "\Globe.ani"
+Global $g_sUpdateAnimation	= $g_sProcessDir & "\" & $g_iSizeIcon & "\Globe.ani"
 If $DEBUG_UPDATE = True Then
 	Global $g_sRemoteUpdateFile	= "https://www.rizonesoft.com/update/" & $g_sProgShortName & ".ruz"
 Else

@@ -2920,3 +2920,878 @@
 [ 2020/08/26 04:09:26 ] WINDOWS DIRECTORY:           C:\Windows
 -----------------------------------------------------------------------------------------
 
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/01/28 01:08:47 ] DATE:                        2021/01/28 01:08:47
+[ 2021/01/28 01:08:47 ] PROGRAM:                     Complete Internet Repair 6.0.3.5003
+[ 2021/01/28 01:08:47 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2021/01/28 01:08:47 ] COMPILED:                    YES
+[ 2021/01/28 01:08:47 ] WINDOWS VERSION:             WIN_10 
+[ 2021/01/28 01:08:47 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/01/28 01:08:47 ] MEMORY (RAM):                16302.97 MB
+[ 2021/01/28 01:08:47 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/01/28 01:08:47 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/01/28 01:09:01 ] Resetting all IP configurations.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:01 ] Exporting Windows IP Configuration.
+[ 2021/01/28 01:09:02 ] Error: Could not save IP Configuration.
+[ 2021/01/28 01:09:02 ] Resetting IP version 4 configurations.
+[ 2021/01/28 01:09:02 ] Resetting Compartment Forwarding, OK!
+[ 2021/01/28 01:09:02 ] Resetting Compartment, OK!
+[ 2021/01/28 01:09:02 ] Resetting Control Protocol, OK!
+[ 2021/01/28 01:09:02 ] Resetting Echo Sequence Request, OK!
+[ 2021/01/28 01:09:02 ] Resetting Global, OK!
+[ 2021/01/28 01:09:02 ] Resetting Interface, OK!
+[ 2021/01/28 01:09:02 ] Resetting Anycast Address, OK!
+[ 2021/01/28 01:09:02 ] Resetting Multicast Address, OK!
+[ 2021/01/28 01:09:02 ] Resetting Unicast Address, OK!
+[ 2021/01/28 01:09:02 ] Resetting Neighbor, OK!
+[ 2021/01/28 01:09:03 ] Resetting Path, OK!
+[ 2021/01/28 01:09:03 ] Resetting Potential, OK!
+[ 2021/01/28 01:09:03 ] Resetting Prefix Policy, OK!
+[ 2021/01/28 01:09:03 ] Resetting Proxy Neighbor, OK!
+[ 2021/01/28 01:09:03 ] Resetting Route, OK!
+[ 2021/01/28 01:09:03 ] Resetting Site Prefix, OK!
+[ 2021/01/28 01:09:03 ] Resetting Subinterface, OK!
+[ 2021/01/28 01:09:03 ] Resetting Wakeup Pattern, OK!
+[ 2021/01/28 01:09:03 ] Resetting Resolve Neighbor, OK!
+[ 2021/01/28 01:09:03 ] Resetting, OK!
+[ 2021/01/28 01:09:03 ] Resetting, OK!
+[ 2021/01/28 01:09:03 ] Resetting, OK!
+[ 2021/01/28 01:09:03 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Resetting, failed.
+[ 2021/01/28 01:09:04 ] Access is denied.
+[ 2021/01/28 01:09:04 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Resetting, OK!
+[ 2021/01/28 01:09:04 ] Restart the computer to complete this action.
+[ 2021/01/28 01:09:04 ] Resetting IP version 6 configurations.
+[ 2021/01/28 01:09:04 ] Resetting Compartment Forwarding, OK!
+[ 2021/01/28 01:09:04 ] Resetting Compartment, OK!
+[ 2021/01/28 01:09:05 ] Resetting Control Protocol, OK!
+[ 2021/01/28 01:09:05 ] Resetting Echo Sequence Request, OK!
+[ 2021/01/28 01:09:05 ] Resetting Global, OK!
+[ 2021/01/28 01:09:05 ] Resetting Interface, OK!
+[ 2021/01/28 01:09:05 ] Resetting Anycast Address, OK!
+[ 2021/01/28 01:09:05 ] Resetting Multicast Address, OK!
+[ 2021/01/28 01:09:05 ] Resetting Unicast Address, OK!
+[ 2021/01/28 01:09:05 ] Resetting Neighbor, OK!
+[ 2021/01/28 01:09:05 ] Resetting Path, OK!
+[ 2021/01/28 01:09:05 ] Resetting Potential, OK!
+[ 2021/01/28 01:09:05 ] Resetting Prefix Policy, OK!
+[ 2021/01/28 01:09:05 ] Resetting Proxy Neighbor, OK!
+[ 2021/01/28 01:09:05 ] Resetting Route, OK!
+[ 2021/01/28 01:09:06 ] Resetting Site Prefix, OK!
+[ 2021/01/28 01:09:06 ] Resetting Subinterface, OK!
+[ 2021/01/28 01:09:06 ] Resetting Wakeup Pattern, OK!
+[ 2021/01/28 01:09:06 ] Resetting Resolve Neighbor, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, failed.
+[ 2021/01/28 01:09:06 ] Access is denied.
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:06 ] Resetting, OK!
+[ 2021/01/28 01:09:07 ] Resetting, OK!
+[ 2021/01/28 01:09:07 ] Resetting, OK!
+[ 2021/01/28 01:09:07 ] Restart the computer to complete this action.
+[ 2021/01/28 01:09:07 ] Error: Finished with (03) errors!
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:08 ] Attempting to reset Winsock catalog.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:08 ] Resetting Winsock using Method 1.
+[ 2021/01/28 01:09:08 ] Successfully reset the Winsock Catalog.
+[ 2021/01/28 01:09:08 ] You must restart the computer in order to complete the reset.
+[ 2021/01/28 01:09:09 ] Resetting Winsock using Method 2.
+[ 2021/01/28 01:09:09 ] Successfully reset the Winsock Catalog.
+[ 2021/01/28 01:09:09 ] You must restart the computer in order to complete the reset.
+[ 2021/01/28 01:09:10 ] Finished: Finished resetting Winsock catalog.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:10 ] Releasing and Renewing TCP/IP connections.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:10 ] Releasing TCP/IP connections.
+[ 2021/01/28 01:09:10 ] Windows IP Configuration
+[ 2021/01/28 01:09:10 ] Ethernet adapter Ethernet:
+[ 2021/01/28 01:09:10 ] Connection-specific DNS Suffix  . :
+[ 2021/01/28 01:09:10 ] Link-local IPv6 Address . . . . . : fe80::2dbf:710e:27f7:66b9%3
+[ 2021/01/28 01:09:10 ] Default Gateway . . . . . . . . . :
+[ 2021/01/28 01:09:10 ] Ethernet adapter Ethernet 2:
+[ 2021/01/28 01:09:10 ] Connection-specific DNS Suffix  . :
+[ 2021/01/28 01:09:11 ] Link-local IPv6 Address . . . . . : fe80::d0e6:fdb1:2ec:45d9%8
+[ 2021/01/28 01:09:11 ] Default Gateway . . . . . . . . . :
+[ 2021/01/28 01:09:11 ] Renewing TCP/IP connections.
+[ 2021/01/28 01:09:11 ] Windows IP Configuration
+[ 2021/01/28 01:09:17 ] Ethernet adapter Ethernet:
+[ 2021/01/28 01:09:17 ] Connection-specific DNS Suffix  . :
+[ 2021/01/28 01:09:17 ] Link-local IPv6 Address . . . . . : fe80::2dbf:710e:27f7:66b9%3
+[ 2021/01/28 01:09:18 ] IPv4 Address. . . . . . . . . . . : 192.168.1.127
+[ 2021/01/28 01:09:18 ] Subnet Mask . . . . . . . . . . . : 255.255.255.0
+[ 2021/01/28 01:09:18 ] Default Gateway . . . . . . . . . : 192.168.1.1
+[ 2021/01/28 01:09:18 ] Ethernet adapter Ethernet 2:
+[ 2021/01/28 01:09:18 ] Connection-specific DNS Suffix  . :
+[ 2021/01/28 01:09:18 ] Link-local IPv6 Address . . . . . : fe80::d0e6:fdb1:2ec:45d9%8
+[ 2021/01/28 01:09:18 ] IPv4 Address. . . . . . . . . . . : 192.168.1.152
+[ 2021/01/28 01:09:18 ] Subnet Mask . . . . . . . . . . . : 255.255.255.0
+[ 2021/01/28 01:09:18 ] Default Gateway . . . . . . . . . : 192.168.1.1
+[ 2021/01/28 01:09:18 ] Finished: TCP/IP renewed
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:19 ] Refreshing DNS Resolver Cache.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:19 ] Flushing DNS
+[ 2021/01/28 01:09:20 ] Windows IP Configuration
+[ 2021/01/28 01:09:20 ] Successfully flushed the DNS Resolver Cache.
+[ 2021/01/28 01:09:20 ] Registering DNS
+[ 2021/01/28 01:09:20 ] Windows IP Configuration
+[ 2021/01/28 01:09:23 ] Registration of the DNS resource records for all adapters of this computer has been initiated. Any errors will be reported in the Event Viewer in 15 minutes.
+[ 2021/01/28 01:09:23 ] Finished: DNS Refreshed
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:24 ] Flushing ARP (Address Resolution Protocol) Cache.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:24 ] Ok.
+[ 2021/01/28 01:09:24 ] Finished: ARP Cache Refreshed
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:25 ] Repairing Internet Explorer version 11.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\custsat.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\custsat.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\D3DCompiler_47.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\D3DCompiler_47.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\diagnosticshub.datawarehouse.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\diagnosticshub.datawarehouse.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\DiagnosticsHub_is.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\DiagnosticsHub_is.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\DiagnosticsTap.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\DiagnosticsTap.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\F12.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\F12.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\f12resources.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\f12resources.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\F12Tools.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\F12Tools.dll' Specified module not found.
+[ 2021/01/28 01:09:26 ] Success: RegSvr32.exe > 'C:\Program Files\internet explorer\hmmapi.dll' registration succeeded.
+[ 2021/01/28 01:09:26 ] Success: RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\hmmapi.dll' registration succeeded.
+[ 2021/01/28 01:09:26 ] RegSvr32.exe > 'C:\Program Files\internet explorer\iedvtool.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\iedvtool.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\ieproxy.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\ieproxy.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] Warning: RegSvr32.exe > 'C:\Program Files\internet explorer\IEShims.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:27 ] Warning: RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\IEShims.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\jsdbgui.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\jsdbgui.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\jsdebuggeride.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\jsdebuggeride.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\JSProfilerCore.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\JSProfilerCore.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\jsprofilerui.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\jsprofilerui.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\memoryanalyzer.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\memoryanalyzer.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\msdbg2.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\msdbg2.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files\internet explorer\networkinspection.dll' Specified module not found.
+[ 2021/01/28 01:09:27 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\networkinspection.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files\internet explorer\pdm.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\pdm.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files\internet explorer\pdmproxy100.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\pdmproxy100.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files\internet explorer\perf_nt.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\perf_nt.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files\internet explorer\perfcore.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\perfcore.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] Warning: RegSvr32.exe > 'C:\Program Files\internet explorer\sqmapi.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:28 ] Warning: RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\sqmapi.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files\internet explorer\timeline.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\timeline.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files\internet explorer\Timeline_is.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\Program Files (x86)\internet explorer\Timeline_is.dll' Specified module not found.
+[ 2021/01/28 01:09:28 ] Repairing 'Open in new tab/window not working'.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\WINDOWS\system32\acelpdec.ax' Specified module not found.
+[ 2021/01/28 01:09:28 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\acelpdec.ax' Specified module not found.
+[ 2021/01/28 01:09:29 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\actxprxy.dll' registration succeeded.
+[ 2021/01/28 01:09:29 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\actxprxy.dll' registration succeeded.
+[ 2021/01/28 01:09:30 ] RegSvr32.exe > 'C:\WINDOWS\system32\asctrls.ocx' Specified module not found.
+[ 2021/01/28 01:09:30 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\asctrls.ocx' Specified module not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\browseui.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\browseui.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\browseui.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\browseui.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] RegSvr32.exe > 'C:\WINDOWS\system32\browsewm.dll' Specified module not found.
+[ 2021/01/28 01:09:30 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\browsewm.dll' Specified module not found.
+[ 2021/01/28 01:09:30 ] RegSvr32.exe > 'C:\WINDOWS\system32\cdfview.dll' Specified module not found.
+[ 2021/01/28 01:09:30 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\cdfview.dll' Specified module not found.
+[ 2021/01/28 01:09:30 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\comcat.dll' registration succeeded.
+[ 2021/01/28 01:09:30 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\comcat.dll' registration succeeded.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\comctl32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\comctl32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\comctl32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\comctl32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:30 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\comctl32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:31 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\comctl32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\system32\corpol.dll' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\corpol.dll' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\system32\CRSWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\CRSWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:31 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\CRYPTDLG.DLL' registration succeeded.
+[ 2021/01/28 01:09:31 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\CRYPTDLG.DLL' registration succeeded.
+[ 2021/01/28 01:09:31 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\cryptdlg.dll' registration succeeded.
+[ 2021/01/28 01:09:31 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\cryptdlg.dll' registration succeeded.
+[ 2021/01/28 01:09:31 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\cryptext.dll' registration succeeded.
+[ 2021/01/28 01:09:31 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\cryptext.dll' registration succeeded.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\system32\CSSEQCHK.DLL' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\CSSEQCHK.DLL' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\system32\danim.dll' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\danim.dll' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\system32\datime.dll' Specified module not found.
+[ 2021/01/28 01:09:31 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\datime.dll' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\system32\Daxctle.ocx' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\Daxctle.ocx' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\system32\dhtmled.ocx' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dhtmled.ocx' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\system32\digest.dll' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\digest.dll' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\system32\digest.dll' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\digest.dll' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\system32\directdb.dll' Specified module not found.
+[ 2021/01/28 01:09:32 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\directdb.dll' Specified module not found.
+[ 2021/01/28 01:09:32 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\dispex.dll' registration succeeded.
+[ 2021/01/28 01:09:32 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dispex.dll' registration succeeded.
+[ 2021/01/28 01:09:32 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\DSSENH.DLL' registration succeeded.
+[ 2021/01/28 01:09:32 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\DSSENH.DLL' registration succeeded.
+[ 2021/01/28 01:09:32 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\dxmasf.dll' registration succeeded.
+[ 2021/01/28 01:09:32 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dxmasf.dll' registration succeeded.
+[ 2021/01/28 01:09:32 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\dxtmsft.dll' registration succeeded.
+[ 2021/01/28 01:09:33 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dxtmsft.dll' registration succeeded.
+[ 2021/01/28 01:09:33 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\dxtrans.dll' registration succeeded.
+[ 2021/01/28 01:09:33 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dxtrans.dll' registration succeeded.
+[ 2021/01/28 01:09:33 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\elshyph.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:33 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\elshyph.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:33 ] Repairing 'Add-Ons-Manager menu entry is present but nothing happens'.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\system32\extmgr.dll' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\extmgr.dll' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\system32\FLUPL.OCX' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\FLUPL.OCX' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\system32\FPWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\FPWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\system32\FTPWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\FTPWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\system32\Gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:09:33 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\Gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:09:33 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\hhctrl.ocx' registration succeeded.
+[ 2021/01/28 01:09:34 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\hhctrl.ocx' registration succeeded.
+[ 2021/01/28 01:09:34 ] Repairing Simple HTML Mail API.
+[ 2021/01/28 01:09:34 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\hlink.dll' registration succeeded.
+[ 2021/01/28 01:09:34 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\hlink.dll' registration succeeded.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\system32\hmmapi.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\hmmapi.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\system32\icardie.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\icardie.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\system32\icmfilter.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\icmfilter.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\ieadvpack.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:34 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ieadvpack.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:34 ] Repairing Group policy snap-in.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\system32\ieaksie.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ieaksie.dll' Specified module not found.
+[ 2021/01/28 01:09:34 ] Repairing Smart Screen.
+[ 2021/01/28 01:09:34 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\ieapfltr.dll' registration succeeded.
+[ 2021/01/28 01:09:34 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ieapfltr.dll' registration succeeded.
+[ 2021/01/28 01:09:34 ] Repairing IEAK Branding.
+[ 2021/01/28 01:09:35 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\iedkcs32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:35 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\iedkcs32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:35 ] Repairing Development Tools.
+[ 2021/01/28 01:09:35 ] RegSvr32.exe > 'C:\WINDOWS\system32\iedvtool.dll' Specified module not found.
+[ 2021/01/28 01:09:35 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\iedvtool.dll' Specified module not found.
+[ 2021/01/28 01:09:35 ] RegSvr32.exe > 'C:\WINDOWS\system32\ieetwcollectorres.dll' Specified module not found.
+[ 2021/01/28 01:09:35 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ieetwcollectorres.dll' Specified module not found.
+[ 2021/01/28 01:09:35 ] RegSvr32.exe > 'C:\WINDOWS\system32\ieetwproxystub.dll' Specified module not found.
+[ 2021/01/28 01:09:35 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ieetwproxystub.dll' Specified module not found.
+[ 2021/01/28 01:09:35 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\ieframe.dll' registration succeeded.
+[ 2021/01/28 01:09:35 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ieframe.dll' registration succeeded.
+[ 2021/01/28 01:09:35 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\iepeers.dll' registration succeeded.
+[ 2021/01/28 01:09:35 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\iepeers.dll' registration succeeded.
+[ 2021/01/28 01:09:35 ] Repairing 'IE8 closes immediately on launch'.
+[ 2021/01/28 01:09:36 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\ieproxy.dll' registration succeeded.
+[ 2021/01/28 01:09:36 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ieproxy.dll' registration succeeded.
+[ 2021/01/28 01:09:36 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\iernonce.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:36 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\iernonce.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:36 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\iertutil.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:36 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\iertutil.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:36 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\iesetup.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:37 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\iesetup.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:37 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\iesysprep.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:37 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\iesysprep.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:37 ] RegSvr32.exe > 'C:\WINDOWS\system32\system32\ieui.dll' Specified module not found.
+[ 2021/01/28 01:09:37 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\system32\ieui.dll' Specified module not found.
+[ 2021/01/28 01:09:37 ] RegSvr32.exe > 'C:\WINDOWS\system32\ils.dll' Specified module not found.
+[ 2021/01/28 01:09:37 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ils.dll' Specified module not found.
+[ 2021/01/28 01:09:37 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\imgutil.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:37 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\imgutil.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:37 ] RegSvr32.exe > 'C:\WINDOWS\system32\inetcfg.dll' Specified module not found.
+[ 2021/01/28 01:09:37 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\inetcfg.dll' Specified module not found.
+[ 2021/01/28 01:09:37 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\inetcomm.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\inetcomm.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\inetcpl.cpl' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\inetcpl.cpl' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\inetcpl.cpl' registration succeeded.
+[ 2021/01/28 01:09:38 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\inetcpl.cpl' registration succeeded.
+[ 2021/01/28 01:09:38 ] RegSvr32.exe > 'C:\WINDOWS\system32\initpki.dll' Specified module not found.
+[ 2021/01/28 01:09:38 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\initpki.dll' Specified module not found.
+[ 2021/01/28 01:09:38 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\inseng.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\inseng.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\javascriptcollectionagent.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\javascriptcollectionagent.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:38 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\jscript.dll' registration succeeded.
+[ 2021/01/28 01:09:38 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\jscript.dll' registration succeeded.
+[ 2021/01/28 01:09:38 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\jscript9.dll' registration succeeded.
+[ 2021/01/28 01:09:39 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\jscript9.dll' registration succeeded.
+[ 2021/01/28 01:09:39 ] Error: RegSvr32.exe > 'C:\WINDOWS\system32\jscript9diag.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:39 ] Error: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\jscript9diag.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:39 ] RegSvr32.exe > 'C:\WINDOWS\system32\jsintl.dll' Specified module not found.
+[ 2021/01/28 01:09:39 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\jsintl.dll' Specified module not found.
+[ 2021/01/28 01:09:39 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\jsproxy.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:39 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\jsproxy.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:39 ] RegSvr32.exe > 'C:\WINDOWS\system32\l3codecx.ax' Specified module not found.
+[ 2021/01/28 01:09:39 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\l3codecx.ax' Specified module not found.
+[ 2021/01/28 01:09:39 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\laprxy.dll' registration succeeded.
+[ 2021/01/28 01:09:39 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\laprxy.dll' registration succeeded.
+[ 2021/01/28 01:09:39 ] RegSvr32.exe > 'C:\WINDOWS\system32\licdll.dll' Specified module not found.
+[ 2021/01/28 01:09:39 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\licdll.dll' Specified module not found.
+[ 2021/01/28 01:09:39 ] Repairing License Manager.
+[ 2021/01/28 01:09:39 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\licmgr10.dll' registration succeeded.
+[ 2021/01/28 01:09:39 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\licmgr10.dll' registration succeeded.
+[ 2021/01/28 01:09:39 ] RegSvr32.exe > 'C:\WINDOWS\system32\lmrt.dll' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\lmrt.dll' Specified module not found.
+[ 2021/01/28 01:09:40 ] Error: RegSvr32.exe > 'C:\WINDOWS\system32\migration\wininetplugin.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:40 ] Error: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\migration\wininetplugin.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:40 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mlang.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:40 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mlang.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\system32\mmefxe.ocx' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mmefxe.ocx' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\system32\mobsync.dll' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mobsync.dll' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\system32\mpg4ds32.ax' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mpg4ds32.ax' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\system32\msapsspc.dll' Specified module not found.
+[ 2021/01/28 01:09:40 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msapsspc.dll' Specified module not found.
+[ 2021/01/28 01:09:40 ] Repairing Javascript links don't work (Robin Walker) .NET hub file.
+[ 2021/01/28 01:09:40 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\mscoree.dll' registration succeeded.
+[ 2021/01/28 01:09:40 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mscoree.dll' registration succeeded.
+[ 2021/01/28 01:09:40 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mscorier.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:40 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mscorier.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mscories.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mscories.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\msfeeds.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msfeeds.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\msfeedsbs.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msfeedsbs.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mshtmldac.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshtmldac.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Repairing VS Debugger.
+[ 2021/01/28 01:09:41 ] RegSvr32.exe > 'C:\WINDOWS\system32\msdbg2.dll' Specified module not found.
+[ 2021/01/28 01:09:41 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msdbg2.dll' Specified module not found.
+[ 2021/01/28 01:09:41 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\msdxm.ocx' registration succeeded.
+[ 2021/01/28 01:09:41 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msdxm.ocx' registration succeeded.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mshta.exe' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshta.exe' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:41 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mshtml.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshtml.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mshtml.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshtml.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\mshtmled.dll' registration succeeded.
+[ 2021/01/28 01:09:42 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshtmled.dll' registration succeeded.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mshtmler.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshtmler.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] RegSvr32.exe > 'C:\WINDOWS\system32\mshtmlmedia.dll' Specified module not found.
+[ 2021/01/28 01:09:42 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshtmlmedia.dll' Specified module not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\msident.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msident.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\msieftp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msieftp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\msls31.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:42 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msls31.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\msnsspc.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msnsspc.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\msoe.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msoe.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\msoeacct.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msoeacct.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\msr2c.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msr2c.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\msrating.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:43 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msrating.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\MSTIME.DLL' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\MSTIME.DLL' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\mstinit.exe /setup /s' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mstinit.exe /setup /s' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\msxml.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msxml.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\oeimport.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\oeimport.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\system32\oemiglib.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\oemiglib.dll' Specified module not found.
+[ 2021/01/28 01:09:43 ] Repairing Printing problems, open in new window.
+[ 2021/01/28 01:09:44 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\ole32.dll' registration succeeded.
+[ 2021/01/28 01:09:44 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ole32.dll' registration succeeded.
+[ 2021/01/28 01:09:44 ] Repairing 'Find on this page is blank'.
+[ 2021/01/28 01:09:44 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\oleacc.dll' registration succeeded.
+[ 2021/01/28 01:09:44 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\oleacc.dll' registration succeeded.
+[ 2021/01/28 01:09:44 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\occache.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:44 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\occache.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:44 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\occache.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:44 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\occache.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:44 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\oleaut32.dll' registration succeeded.
+[ 2021/01/28 01:09:44 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\oleaut32.dll' registration succeeded.
+[ 2021/01/28 01:09:44 ] Repairing Process debug manager.
+[ 2021/01/28 01:09:44 ] RegSvr32.exe > 'C:\WINDOWS\system32\plugin.ocx' Specified module not found.
+[ 2021/01/28 01:09:44 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\plugin.ocx' Specified module not found.
+[ 2021/01/28 01:09:44 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\pngfilt.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:44 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\pngfilt.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:44 ] RegSvr32.exe > 'C:\WINDOWS\system32\POSTWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\POSTWPP.DLL' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\system32\proctexe.ocx' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\proctexe.ocx' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\system32\regwizc.dll' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\regwizc.dll' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\system32\rsabase.dll' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\rsabase.dll' Specified module not found.
+[ 2021/01/28 01:09:45 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\RSAENH.DLL' registration succeeded.
+[ 2021/01/28 01:09:45 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\RSAENH.DLL' registration succeeded.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\system32\Sccbase.dll' Specified module not found.
+[ 2021/01/28 01:09:45 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\Sccbase.dll' Specified module not found.
+[ 2021/01/28 01:09:45 ] Error: RegSvr32.exe > 'C:\WINDOWS\system32\scrobj.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:46 ] Error: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\scrobj.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:46 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\scrrun.dll' registration succeeded.
+[ 2021/01/28 01:09:46 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\scrrun.dll' registration succeeded.
+[ 2021/01/28 01:09:46 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\sendmail.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:47 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\sendmail.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\system32\setupwbv.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\setupwbv.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\system32\setupwbv.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\setupwbv.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\system32\shdoc401.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\shdoc401.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\system32\shdoc401.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\shdoc401.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\shdocvw.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:47 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\shdocvw.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:47 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\shdocvw.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:47 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\shdocvw.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\system32\Slbcsp.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\Slbcsp.dll' Specified module not found.
+[ 2021/01/28 01:09:47 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\softpub.dll' registration succeeded.
+[ 2021/01/28 01:09:47 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\softpub.dll' registration succeeded.
+[ 2021/01/28 01:09:47 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\tdc.ocx' registration succeeded.
+[ 2021/01/28 01:09:48 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\tdc.ocx' registration succeeded.
+[ 2021/01/28 01:09:48 ] RegSvr32.exe > 'C:\WINDOWS\system32\thumbvw.dll' Specified module not found.
+[ 2021/01/28 01:09:48 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\thumbvw.dll' Specified module not found.
+[ 2021/01/28 01:09:48 ] RegSvr32.exe > 'C:\WINDOWS\system32\trialoc.dll' Specified module not found.
+[ 2021/01/28 01:09:48 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\trialoc.dll' Specified module not found.
+[ 2021/01/28 01:09:48 ] RegSvr32.exe > 'C:\WINDOWS\system32\triedit.dll' Specified module not found.
+[ 2021/01/28 01:09:48 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\triedit.dll' Specified module not found.
+[ 2021/01/28 01:09:48 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\url.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:48 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\url.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:48 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\urlmon.dll' registration succeeded.
+[ 2021/01/28 01:09:49 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\urlmon.dll' registration succeeded.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\system32\urlmon.dll,NI,HKLM' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\urlmon.dll,NI,HKLM' Specified module not found.
+[ 2021/01/28 01:09:49 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\vbscript.dll' registration succeeded.
+[ 2021/01/28 01:09:49 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\vbscript.dll' registration succeeded.
+[ 2021/01/28 01:09:49 ] Repairing VML Renderer.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\system32\vgx.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\vgx.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\system32\voxmsdec.ax' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\voxmsdec.ax' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\system32\wab32.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wab32.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\system32\wabfind.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wabfind.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\system32\wabimp.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wabimp.dll' Specified module not found.
+[ 2021/01/28 01:09:49 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\webcheck.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:50 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\webcheck.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:50 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\webcheck.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:50 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\webcheck.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:50 ] RegSvr32.exe > 'C:\WINDOWS\system32\WEBPOST.DLL' Specified module not found.
+[ 2021/01/28 01:09:50 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\WEBPOST.DLL' Specified module not found.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wininet.dll' registration succeeded.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wininet.dll' registration succeeded.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wininet.dll' registration succeeded.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wininet.dll' registration succeeded.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wininet.dll' registration succeeded.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wininet.dll' registration succeeded.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\WINTRUST.DLL' registration succeeded.
+[ 2021/01/28 01:09:50 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\WINTRUST.DLL' registration succeeded.
+[ 2021/01/28 01:09:50 ] RegSvr32.exe > 'C:\WINDOWS\system32\WPWIZDLL.DLL' Specified module not found.
+[ 2021/01/28 01:09:50 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\WPWIZDLL.DLL' Specified module not found.
+[ 2021/01/28 01:09:50 ] Error: RegSvr32.exe > 'C:\WINDOWS\system32\wshext.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:51 ] Error: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wshext.dll' Error number: 0x80070005
+[ 2021/01/28 01:09:51 ] Error: RegSvr32.exe > 'C:\WINDOWS\system32\wshom.ocx' Error number: 0x80070005
+[ 2021/01/28 01:09:51 ] Error: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wshom.ocx' Error number: 0x80070005
+[ 2021/01/28 01:09:51 ] RegSvr32.exe > 'C:\WINDOWS\system32\xmsconf.ocx' Specified module not found.
+[ 2021/01/28 01:09:51 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\xmsconf.ocx' Specified module not found.
+[ 2021/01/28 01:09:51 ] Success: RegSvr32.exe > 'C:\Program Files\Common Files\microsoft shared\vgx\vgx.dll' registration succeeded.
+[ 2021/01/28 01:09:51 ] Success: RegSvr32.exe > 'C:\Program Files (x86)\Common Files\microsoft shared\vgx\vgx.dll' registration succeeded.
+[ 2021/01/28 01:09:51 ] RegSvr32.exe > 'C:\Program Files\Common Files\system\directdb.dll' Specified module not found.
+[ 2021/01/28 01:09:51 ] RegSvr32.exe > 'C:\Program Files (x86)\Common Files\system\directdb.dll' Specified module not found.
+[ 2021/01/28 01:09:51 ] Warning: RegSvr32.exe > 'C:\Program Files\Common Files\system\wab32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:51 ] Warning: RegSvr32.exe > 'C:\Program Files (x86)\Common Files\system\wab32.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:09:51 ] Error: Finished with (10) errors!
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:52 ] Clearing File Stores (Update History).
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:53 ] Removing 'C:\ProgramData\Microsoft\Network\Downloader\qmgr*.dat'.
+[ 2021/01/28 01:09:53 ] Error: An error occurred whilst deleting the file.
+[ 2021/01/28 01:09:53 ] ^ 'C:\ProgramData\Microsoft\Network\Downloader\qmgr*.dat'
+[ 2021/01/28 01:09:53 ] Clearing 'C:\WINDOWS\SoftwareDistribution\Download'.
+[ 2021/01/28 01:09:53 ] Setting attributes for '0aa7f541727179be53f4de53dc813ab9'.
+[ 2021/01/28 01:09:53 ] Success: Successfully removed '0aa7f541727179be53f4de53dc813ab9'.
+[ 2021/01/28 01:09:53 ] Setting attributes for '436ccf07dbc78d8e48437c12519b32f7'.
+[ 2021/01/28 01:09:53 ] Success: Successfully removed '436ccf07dbc78d8e48437c12519b32f7'.
+[ 2021/01/28 01:09:53 ] Setting attributes for '6ce08d40f6b55e5380f7af8f8f87afe4'.
+[ 2021/01/28 01:09:54 ] Success: Successfully removed '6ce08d40f6b55e5380f7af8f8f87afe4'.
+[ 2021/01/28 01:09:54 ] Removing 'C:\WINDOWS\SoftwareDistribution\Download\7a12a583532504e117fa22b65424a228f5c5cdfb'.
+[ 2021/01/28 01:09:54 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:09:54 ] Setting attributes for '95e6b850edef48295045eaae2e5ca7b2'.
+[ 2021/01/28 01:09:54 ] Success: Successfully removed '95e6b850edef48295045eaae2e5ca7b2'.
+[ 2021/01/28 01:09:54 ] Removing 'C:\WINDOWS\SoftwareDistribution\Download\d65eae951fe09f39555951970ad03737520c7b12'.
+[ 2021/01/28 01:09:54 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:09:54 ] Setting attributes for 'e2b6710f9e24cf153fcf0c6b0dccb036'.
+[ 2021/01/28 01:09:55 ] Success: Successfully removed 'e2b6710f9e24cf153fcf0c6b0dccb036'.
+[ 2021/01/28 01:09:55 ] Setting attributes for 'e465b79a2d7adf4ad1ab2a631ee8f679'.
+[ 2021/01/28 01:09:55 ] Success: Successfully removed 'e465b79a2d7adf4ad1ab2a631ee8f679'.
+[ 2021/01/28 01:09:55 ] Removing 'C:\WINDOWS\SoftwareDistribution\Download\fd4de6c5d359f348b7c37beb867d36c1552c94da'.
+[ 2021/01/28 01:09:55 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:09:55 ] Setting attributes for 'SharedFileCache'.
+[ 2021/01/28 01:09:55 ] Success: Successfully removed 'SharedFileCache'.
+[ 2021/01/28 01:09:55 ] 'C:\WINDOWS\SoftwareDistribution\Download.Old' does not exist.
+[ 2021/01/28 01:09:55 ] Clearing 'C:\WINDOWS\SoftwareDistribution\DataStore'.
+[ 2021/01/28 01:09:55 ] Removing 'C:\WINDOWS\SoftwareDistribution\DataStore\DataStore.edb'.
+[ 2021/01/28 01:09:55 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:09:55 ] Removing 'C:\WINDOWS\SoftwareDistribution\DataStore\DataStore.jfm'.
+[ 2021/01/28 01:09:55 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:09:55 ] Setting attributes for 'Logs'.
+[ 2021/01/28 01:09:55 ] Success: Successfully removed 'Logs'.
+[ 2021/01/28 01:09:55 ] 'C:\WINDOWS\SoftwareDistribution\DataStore.Old' does not exist.
+[ 2021/01/28 01:09:55 ] Clearing 'C:\WINDOWS\System32\CatRoot2'.
+[ 2021/01/28 01:09:55 ] Removing 'C:\WINDOWS\System32\CatRoot2\dberr.txt'.
+[ 2021/01/28 01:09:55 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:09:55 ] Setting attributes for '{127D0A1D-4EF2-11D1-8608-00C04FC295EE}'.
+[ 2021/01/28 01:09:57 ] Error: '{127D0A1D-4EF2-11D1-8608-00C04FC295EE}' could not be removed.
+[ 2021/01/28 01:09:57 ] Setting attributes for '{F750E6C3-38EE-11D1-85E5-00C04FC295EE}'.
+[ 2021/01/28 01:09:58 ] Error: '{F750E6C3-38EE-11D1-85E5-00C04FC295EE}' could not be removed.
+[ 2021/01/28 01:09:58 ] 'C:\WINDOWS\System32\CatRoot2.Old' does not exist.
+[ 2021/01/28 01:09:59 ] Error: Finished with (03) errors!
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:59 ] Repairing Windows Update / Automatic Updates.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:09:59 ] Stopping the BITS Service.
+[ 2021/01/28 01:10:00 ] The Background Intelligent Transfer Service service is not started.
+[ 2021/01/28 01:10:00 ] More help is available by typing NET HELPMSG 3521.
+[ 2021/01/28 01:10:00 ] Stopping the Automatic Updates Service.
+[ 2021/01/28 01:10:00 ] The Windows Update service is not started.
+[ 2021/01/28 01:10:00 ] More help is available by typing NET HELPMSG 3521.
+[ 2021/01/28 01:10:00 ] Setting BITS Security Descriptor.
+[ 2021/01/28 01:10:00 ] [SC] SetServiceObjectSecurity SUCCESS
+[ 2021/01/28 01:10:00 ] Setting Automatic Updates Service Security Descriptor.
+[ 2021/01/28 01:10:00 ] [SC] SetServiceObjectSecurity SUCCESS
+[ 2021/01/28 01:10:00 ] Configuring the Automatic Updates Service.
+[ 2021/01/28 01:10:00 ] [SC] OpenService FAILED 5:
+[ 2021/01/28 01:10:01 ] Access is denied.
+[ 2021/01/28 01:10:01 ] Configuring BITS.
+[ 2021/01/28 01:10:01 ] [SC] ChangeServiceConfig SUCCESS
+[ 2021/01/28 01:10:01 ] Registering Windows Updates Dlls.
+[ 2021/01/28 01:10:01 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\actxprxy.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\actxprxy.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\atl.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\atl.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\browseui.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:02 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\browseui.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:02 ] RegSvr32.exe > 'C:\WINDOWS\system32\corpol.dll' Specified module not found.
+[ 2021/01/28 01:10:02 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\corpol.dll' Specified module not found.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\cryptdlg.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\cryptdlg.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\dispex.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dispex.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\dssenh.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dssenh.dll' registration succeeded.
+[ 2021/01/28 01:10:02 ] RegSvr32.exe > 'C:\WINDOWS\system32\gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:02 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:02 ] RegSvr32.exe > 'C:\WINDOWS\system32\initpki.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\initpki.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\jscript.dll' registration succeeded.
+[ 2021/01/28 01:10:03 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\jscript.dll' registration succeeded.
+[ 2021/01/28 01:10:03 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\mshtml.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:03 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mshtml.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\system32\msscript.ocx' Specified module not found.
+[ 2021/01/28 01:10:03 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msscript.ocx' registration succeeded.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\system32\msxml.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msxml.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\system32\msxml2.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msxml2.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\msxml3.dll' registration succeeded.
+[ 2021/01/28 01:10:03 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msxml3.dll' registration succeeded.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\system32\msxml4.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msxml4.dll' Specified module not found.
+[ 2021/01/28 01:10:03 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\msxml6.dll' registration succeeded.
+[ 2021/01/28 01:10:03 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\msxml6.dll' registration succeeded.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\system32\muweb.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\muweb.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\system32\ole.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ole.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\ole32.dll' registration succeeded.
+[ 2021/01/28 01:10:04 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\ole32.dll' registration succeeded.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\system32\oleaut.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\oleaut.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\oleaut32.dll' registration succeeded.
+[ 2021/01/28 01:10:04 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\oleaut32.dll' registration succeeded.
+[ 2021/01/28 01:10:04 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\qmgr.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\qmgr.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\system32\qmgrprxy.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\qmgrprxy.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\system32\gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:04 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\rsaenh.dll' registration succeeded.
+[ 2021/01/28 01:10:04 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\rsaenh.dll' registration succeeded.
+[ 2021/01/28 01:10:04 ] RegSvr32.exe > 'C:\WINDOWS\system32\sccbase.dll' Specified module not found.
+[ 2021/01/28 01:10:05 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\sccbase.dll' Specified module not found.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\scrobj.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\scrobj.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\scrrun.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\scrrun.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\shdocvw.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:05 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\shdocvw.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:05 ] RegSvr32.exe > 'C:\WINDOWS\system32\shell.dll' Specified module not found.
+[ 2021/01/28 01:10:05 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\shell.dll' Specified module not found.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\shell32.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\shell32.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] RegSvr32.exe > 'C:\WINDOWS\system32\slbcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:05 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\slbcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\softpub.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\softpub.dll' registration succeeded.
+[ 2021/01/28 01:10:05 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\urlmon.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\urlmon.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\vbscript.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\vbscript.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\winhttp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:06 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\winhttp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:06 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wintrust.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wintrust.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Error: RegSvr32.exe > 'C:\WINDOWS\system32\wshext.dll' Error number: 0x80070005
+[ 2021/01/28 01:10:06 ] Error: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wshext.dll' Error number: 0x80070005
+[ 2021/01/28 01:10:06 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wuapi.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wuapi.dll' registration succeeded.
+[ 2021/01/28 01:10:06 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\wuaueng.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:06 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wuaueng.dll' Specified module not found.
+[ 2021/01/28 01:10:06 ] RegSvr32.exe > 'C:\WINDOWS\system32\wuaueng1.dll' Specified module not found.
+[ 2021/01/28 01:10:06 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wuaueng1.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\system32\wucltui.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wucltui.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\system32\wucltux.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wucltux.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wups.dll' registration succeeded.
+[ 2021/01/28 01:10:07 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wups.dll' registration succeeded.
+[ 2021/01/28 01:10:07 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wups2.dll' registration succeeded.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wups2.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\system32\wuweb.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wuweb.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\system32\wuwebv.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wuwebv.dll' Specified module not found.
+[ 2021/01/28 01:10:07 ] Resetting proxy settings.
+[ 2021/01/28 01:10:07 ] Current WinHTTP proxy settings:
+[ 2021/01/28 01:10:07 ] Direct access (no proxy server).
+[ 2021/01/28 01:10:07 ] Proxy settings reset to defaults.
+[ 2021/01/28 01:10:07 ] Resetting Windows Firewall configuraton.
+[ 2021/01/28 01:10:08 ] Ok.
+[ 2021/01/28 01:10:08 ] Firewall settings reset to defaults.
+[ 2021/01/28 01:10:08 ] Restarting the Automatic Updates Service.
+[ 2021/01/28 01:10:08 ] The Windows Update service is starting
+[ 2021/01/28 01:10:12 ] The Windows Update service was started successfully.
+[ 2021/01/28 01:10:13 ] Restarting the BITS Service.
+[ 2021/01/28 01:10:13 ] The Background Intelligent Transfer Service service is starting
+[ 2021/01/28 01:10:15 ] The Background Intelligent Transfer Service service was started successfully.
+[ 2021/01/28 01:10:15 ] Clean transactional metadata on next Transactional Resource Manager mount.
+[ 2021/01/28 01:10:15 ] Error:
+[ 2021/01/28 01:10:15 ] The filename, directory name, or volume label syntax is incorrect.
+[ 2021/01/28 01:10:15 ] Clearing the BITS queue.
+[ 2021/01/28 01:10:15 ] BITSADMIN version 3.0
+[ 2021/01/28 01:10:15 ] BITS administration utility.
+[ 2021/01/28 01:10:15 ] (C) Copyright Microsoft Corp.
+[ 2021/01/28 01:10:17 ] {F0CBC566-3233-4CFB-87B4-4476039A942C} canceled.
+[ 2021/01/28 01:10:17 ] {D8A65B80-BD6A-4430-A36F-F1D9D693A378} canceled.
+[ 2021/01/28 01:10:17 ] {DBCC5B9A-559C-4B8D-9ECE-E38214D137C8} canceled.
+[ 2021/01/28 01:10:17 ] {B6C99018-A48D-4470-B667-035430AFBB7A} canceled.
+[ 2021/01/28 01:10:17 ] {538671A3-000C-4396-A021-0E386F818583} canceled.
+[ 2021/01/28 01:10:17 ] {4091597F-0DB3-44A1-8B97-4DF9B88BD628} canceled.
+[ 2021/01/28 01:10:17 ] {00E1D2E8-B036-4920-A305-9B61C27BC132} canceled.
+[ 2021/01/28 01:10:17 ] {6A59EA2B-AB46-40EE-9C9D-7125B9645174} canceled.
+[ 2021/01/28 01:10:17 ] {BE2D10CE-3905-4A94-BC44-9DC139B52FB6} canceled.
+[ 2021/01/28 01:10:17 ] {7067A1ED-2359-42E4-9F75-464F8F52718A} canceled.
+[ 2021/01/28 01:10:18 ] {29E6D7CB-3D37-442C-9A91-4B616F096DA1} canceled.
+[ 2021/01/28 01:10:18 ] {F1D1174A-601D-4B55-82C9-4F7CCAFD11C1} canceled.
+[ 2021/01/28 01:10:18 ] {FE9D88D7-DE93-403A-AEA7-DB65ED2DDFDC} canceled.
+[ 2021/01/28 01:10:18 ] {C6966B73-C436-40CF-9028-5ED6FFF4AD27} canceled.
+[ 2021/01/28 01:10:18 ] {C2F00007-FE7C-4D8E-94DA-C3C0069F1E7C} canceled.
+[ 2021/01/28 01:10:18 ] {DCD6F4CE-1D87-4AC5-BDFC-B0C611ED8950} canceled.
+[ 2021/01/28 01:10:18 ] {97831C62-5646-4119-B5C7-F7FA52BF296C} canceled.
+[ 2021/01/28 01:10:18 ] {9E7417C3-F7A5-4997-ABC0-8EF8B6BC617F} canceled.
+[ 2021/01/28 01:10:18 ] {61EAA183-4808-4C56-BEA4-4197E0A9B4CE} canceled.
+[ 2021/01/28 01:10:18 ] 19 out of 19 jobs canceled.
+[ 2021/01/28 01:10:18 ] Error: Finished with (04) errors!
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:19 ] Repairing SSL / HTTPS / Cryptography service.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:20 ] Stopping the Cryptographic Service.
+[ 2021/01/28 01:10:20 ] The following services are dependent on the Cryptographic Services service.
+[ 2021/01/28 01:10:20 ] Stopping the Cryptographic Services service will also stop these services.
+[ 2021/01/28 01:10:20 ] Acronis Cyber Protection Service
+[ 2021/01/28 01:10:20 ] Do you want to continue this operation? (Y/N) [N]:
+[ 2021/01/28 01:10:20 ] No valid response was provided.
+[ 2021/01/28 01:10:20 ] Configuring the cryptographic service.
+[ 2021/01/28 01:10:20 ] [SC] ChangeServiceConfig SUCCESS
+[ 2021/01/28 01:10:20 ] Clearing 'C:\WINDOWS\System32\CatRoot2'.
+[ 2021/01/28 01:10:20 ] Clearing 'C:\WINDOWS\System32\CatRoot2'.
+[ 2021/01/28 01:10:20 ] Setting attributes for '{127D0A1D-4EF2-11D1-8608-00C04FC295EE}'.
+[ 2021/01/28 01:10:22 ] Error: '{127D0A1D-4EF2-11D1-8608-00C04FC295EE}' could not be removed.
+[ 2021/01/28 01:10:22 ] Setting attributes for '{F750E6C3-38EE-11D1-85E5-00C04FC295EE}'.
+[ 2021/01/28 01:10:23 ] Error: '{F750E6C3-38EE-11D1-85E5-00C04FC295EE}' could not be removed.
+[ 2021/01/28 01:10:23 ] 'C:\WINDOWS\System32\CatRoot2.Old' does not exist.
+[ 2021/01/28 01:10:23 ] Clearing 'C:\WINDOWS\System32\CatRoot'.
+[ 2021/01/28 01:10:23 ] Removing 'C:\WINDOWS\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\tmp*.CAT'.
+[ 2021/01/28 01:10:23 ] Error: An error occurred whilst deleting the file.
+[ 2021/01/28 01:10:23 ] ^ 'C:\WINDOWS\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\tmp*.CAT'
+[ 2021/01/28 01:10:23 ] Removing 'C:\WINDOWS\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\tmp*.CAT'.
+[ 2021/01/28 01:10:23 ] Error: An error occurred whilst deleting the file.
+[ 2021/01/28 01:10:23 ] ^ 'C:\WINDOWS\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\tmp*.CAT'
+[ 2021/01/28 01:10:23 ] Removing 'C:\WINDOWS\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\KB*.CAT'.
+[ 2021/01/28 01:10:23 ] Error: An error occurred whilst deleting the file.
+[ 2021/01/28 01:10:23 ] ^ 'C:\WINDOWS\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\KB*.CAT'
+[ 2021/01/28 01:10:23 ] Removing 'C:\WINDOWS\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\KB*.CAT'.
+[ 2021/01/28 01:10:23 ] Error: An error occurred whilst deleting the file.
+[ 2021/01/28 01:10:23 ] ^ 'C:\WINDOWS\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\KB*.CAT'
+[ 2021/01/28 01:10:23 ] Removing 'C:\WINDOWS\inf\oem*.*'.
+[ 2021/01/28 01:10:23 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:10:23 ] 'C:\WINDOWS\System32\CatRoot' Cleared.
+[ 2021/01/28 01:10:23 ] Registering SSL / HTTPS / Cryptography DLLs.
+[ 2021/01/28 01:10:23 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\cryptdlg.dll' registration succeeded.
+[ 2021/01/28 01:10:23 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\cryptdlg.dll' registration succeeded.
+[ 2021/01/28 01:10:23 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\cryptext.dll' registration succeeded.
+[ 2021/01/28 01:10:23 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\cryptext.dll' registration succeeded.
+[ 2021/01/28 01:10:23 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\cryptui.dll' registration succeeded.
+[ 2021/01/28 01:10:23 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\cryptui.dll' registration succeeded.
+[ 2021/01/28 01:10:23 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\dssenh.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\dssenh.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\system32\gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\gpkcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\system32\initpki.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\initpki.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\system32\licdll.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\licdll.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\mssign32.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mssign32.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\mssip32.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\mssip32.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\system32\regwizc.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\regwizc.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\rsaenh.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\rsaenh.dll' registration succeeded.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\system32\scardssp.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\scardssp.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\system32\sccbase.dll' Specified module not found.
+[ 2021/01/28 01:10:24 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\sccbase.dll' Specified module not found.
+[ 2021/01/28 01:10:25 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\scecli.dll' registration succeeded.
+[ 2021/01/28 01:10:25 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\scecli.dll' registration succeeded.
+[ 2021/01/28 01:10:25 ] RegSvr32.exe > 'C:\WINDOWS\system32\slbcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:25 ] RegSvr32.exe > 'C:\WINDOWS\SysWoW64\slbcsp.dll' Specified module not found.
+[ 2021/01/28 01:10:25 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\softpub.dll' registration succeeded.
+[ 2021/01/28 01:10:25 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\softpub.dll' registration succeeded.
+[ 2021/01/28 01:10:25 ] Warning: RegSvr32.exe > 'C:\WINDOWS\system32\winhttp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:25 ] Warning: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\winhttp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2021/01/28 01:10:25 ] Success: RegSvr32.exe > 'C:\WINDOWS\system32\wintrust.dll' registration succeeded.
+[ 2021/01/28 01:10:25 ] Success: RegSvr32.exe > 'C:\WINDOWS\SysWoW64\wintrust.dll' registration succeeded.
+[ 2021/01/28 01:10:25 ] SSL / HTTPS / Cryptography DLLs Registered.
+[ 2021/01/28 01:10:25 ] Restarting the cryptographic service.
+[ 2021/01/28 01:10:25 ] The requested service has already been started.
+[ 2021/01/28 01:10:25 ] More help is available by typing NET HELPMSG 2182.
+[ 2021/01/28 01:10:27 ] Error: Finished with (06) errors!
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:27 ] Resetting proxy settings.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:27 ] Current WinHTTP proxy settings:
+[ 2021/01/28 01:10:27 ] Direct access (no proxy server).
+[ 2021/01/28 01:10:28 ] Finished: Proxy settings reset to defaults.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:28 ] Resetting Windows Firewall configuraton.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:29 ] Ok.
+[ 2021/01/28 01:10:30 ] Finished: Firewall settings reset to defaults.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:30 ] Restoring the default Windows HOSTS file.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:30 ] Removing 'C:\WINDOWS\System32\drivers\etc\hosts'.
+[ 2021/01/28 01:10:30 ] Success: The file was successfully deleted.
+[ 2021/01/28 01:10:30 ] Writing data to the HOSTS file.
+[ 2021/01/28 01:10:30 ] HOSTS file created successfully.
+[ 2021/01/28 01:10:31 ] Finished: HOSTS file restored.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:31 ] Renewing Wins Client Registrations.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:31 ] Successful purge and preload of the NBT Remote Cache Name Table.
+[ 2021/01/28 01:10:32 ] The NetBIOS names registered by this computer have been refreshed.
+[ 2021/01/28 01:10:33 ] Finished: Wins Client Registrations Renewed.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:33 ] Making Network Computers Visible.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:10:33 ] The Function Discovery Resource Publication service is stopping
+[ 2021/01/28 01:10:35 ] The Function Discovery Resource Publication service was stopped successfully.
+[ 2021/01/28 01:10:35 ] Configuring the Function Discovery Resource Publication Service.
+[ 2021/01/28 01:10:35 ] [SC] ChangeServiceConfig SUCCESS
+[ 2021/01/28 01:10:36 ] The Function Discovery Resource Publication service is starting
+[ 2021/01/28 01:10:38 ] The Function Discovery Resource Publication service was started successfully.
+[ 2021/01/28 01:10:39 ] Finished: Network Computers should now be visible in File Explorer.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/01/28 01:39:52 ] DATE:                        2021/01/28 01:39:52
+[ 2021/01/28 01:39:52 ] PROGRAM:                     Complete Internet Repair 6.0.3.5003
+[ 2021/01/28 01:39:52 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2021/01/28 01:39:52 ] COMPILED:                    YES
+[ 2021/01/28 01:39:52 ] WINDOWS VERSION:             WIN_10 
+[ 2021/01/28 01:39:52 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/01/28 01:39:52 ] MEMORY (RAM):                16302.97 MB
+[ 2021/01/28 01:39:52 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/01/28 01:39:52 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/01/28 01:39:58 ] Releasing and Renewing TCP/IP connections.
+------------------------------------------------------------------------------------------
+[ 2021/01/28 01:39:58 ] Releasing TCP/IP connections.
+[ 2021/01/28 01:39:58 ] Windows IP Configuration
+[ 2021/01/28 01:39:58 ] Ethernet adapter Ethernet:
+[ 2021/01/28 01:39:58 ] Connection-specific DNS Suffix  . :
+[ 2021/01/28 01:39:58 ] Link-local IPv6 Address . . . . . : fe80::2dbf:710e:27f7:66b9%3
+[ 2021/01/28 01:39:58 ] Default Gateway . . . . . . . . . :
+[ 2021/01/28 01:39:58 ] Ethernet adapter Ethernet 2:
+[ 2021/01/28 01:39:59 ] Connection-specific DNS Suffix  . :
+[ 2021/01/28 01:39:59 ] Link-local IPv6 Address . . . . . : fe80::d0e6:fdb1:2ec:45d9%15
+[ 2021/01/28 01:39:59 ] Default Gateway . . . . . . . . . :
+[ 2021/01/28 01:39:59 ] Renewing TCP/IP connections.
+[ 2021/01/28 01:39:59 ] Windows IP Configuration
+[ 2021/01/28 01:40:57 ] An error occurred while renewing interface Ethernet : The operation was canceled by the user.

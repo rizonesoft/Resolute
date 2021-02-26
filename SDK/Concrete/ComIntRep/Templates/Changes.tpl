@@ -6,6 +6,15 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated Korean translation.
+- Updated French translation.
+- Updated Greek translation.
+- Initial Resolute integration.
+
+--------------------------------------------------
+Version 6.0.3.5003 (August 26, 2020)
+--------------------------------------------------
+
 - Updated French translation.
 - Fixed: Select All button alignment.
 - Fixed: Select All translation.
