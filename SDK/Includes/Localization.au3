@@ -59,8 +59,8 @@ Func _Localization_About()
 	$g_aLangAbout[1]  = _Localization_Load("About", "Label_Version", "Version")
 	$g_aLangAbout[2]  = _Localization_Load("About", "Label_AutoIt", "Build with AutoIt version")
 	$g_aLangAbout[3]  = _Localization_Load("About", "Label_Copyright", "Copyright")
-	$g_aLangAbout[4]  = _Localization_Load("About", "Tip_Title_Donate", "Donate to our Cause")
-	$g_aLangAbout[5]  = _Localization_Load("About", "Tip_Message_Donate", "When you donate, you help keep our software free\rnand enable us to acquire the tools and services\rnwe use to serve you.")
+	$g_aLangAbout[4]  = _Localization_Load("About", "Tip_Title_Donate", "Donate")
+	$g_aLangAbout[5]  = _Localization_Load("About", "Tip_Message_Donate", "Would you consider a small gift of $10 to help us\rnkeep the lights on and make quality free software? Click here to donate.")
 	$g_aLangAbout[6]  = _Localization_Load("About", "Label_Home", "Homepage")
 	$g_aLangAbout[7]  = _Localization_Load("About", "Label_License", "License")
 	$g_aLangAbout[8]  = _Localization_Load("About", "Label_Support", "Get Support")
@@ -87,6 +87,7 @@ Func _Localization_Donate()
 
 	$g_aLangDonate[0] = _Localization_Load("Donate", "Label_Heading", "%{Program.Name} has been serving you for over %d hours. Now, how about donating to our cause?")
 	$g_aLangDonate[1] = _Localization_Load("Donate", "Label_Message", "Click on the PayPal button below or go to PayPal.me/rizonesoft, enter in the amount, and send us the donation. Because it's PayPal, you know it's easier and more secure than carrying cash. Don’t have a PayPal account? No worries, it's quick and easy to sign up.")
+	$g_aLangDonate[2] = _Localization_Load("Donate", "Label_Donate", "Would you consider a small gift of $10 to help us keep the lights on and make quality free software?")
 
 EndFunc
 

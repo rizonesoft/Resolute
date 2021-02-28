@@ -1,9 +1,17 @@
 ==================================================
-%{:COMPANY:} %{:RELEASE:} CHANGES
+%{COMPANY} %{RELEASE} CHANGES
 ==================================================
 
 --------------------------------------------------
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
+--------------------------------------------------
+
+- Critical Fix: All executables are now signed.
+- Fixed: Generating documentation.
+- Removed: Opening thank you page after installation.
+
+--------------------------------------------------
+Version 6.2.3.5085 (February 25, 2021)
 --------------------------------------------------
 
 - Updated Korean language.

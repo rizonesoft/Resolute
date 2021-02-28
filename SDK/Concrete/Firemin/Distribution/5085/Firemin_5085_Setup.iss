@@ -124,7 +124,6 @@ Filename: {userappdata}\Rizonesoft\Firemin\Firemin.ini; Section: Firemin; Key: P
 
 [Run]
 Filename: {app}\Firemin.exe; Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall shellexec skipifsilent unchecked
-Filename: "https://www.rizonesoft.com/thank-you/"; Flags: shellexec runasoriginaluser nowait
 
 [InstallDelete]
 Type: files;      Name: {userdesktop}\{#app_name}.lnk;   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()

@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=5.0.2.3582
+#AutoIt3Wrapper_Res_Fileversion=5.0.2.3586
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -2344,26 +2344,15 @@ Func _ProcessTemplateFile($sSolutionIniPath, $sDocTemplateIn, $sDocOutput, $iRel
 	EndIf
 
 	Local $sTemplateRead = FileRead($hTemplateOpen)
-	$sTemplateRead = StringReplace($sTemplateRead, "%{RELEASE}", $sReleasName)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{RELEASE}", StringUpper($sReleasName))
 	$sTemplateRead = StringReplace($sTemplateRead, "%{DESCRIPTION}", $sReleasDesc)
-	$sTemplateRead = StringReplace($sTemplateRead, "%{COMPANY}", $sReleasCompany)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{COMPANY}", StringUpper($sReleasCompany))
 	$sTemplateRead = StringReplace($sTemplateRead, "%{COMPANYURL}", $sReleasURL)
 	$sTemplateRead = StringReplace($sTemplateRead, "%{VERSION}", $sReleasVersion)
 	$sTemplateRead = StringReplace($sTemplateRead, "%{DAY}", $sReleasDocDay)
-	$sTemplateRead = StringReplace($sTemplateRead, "%{MONTH}", $sReleasDocMonth)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{MONTH}", StringUpper($sReleasDocMonth))
 	$sTemplateRead = StringReplace($sTemplateRead, "%{YEAR}", $sReleasDocYear)
 	$sTemplateRead = StringReplace($sTemplateRead, "%{INSTSIZE}", $iReleaseInstSize & " MB")
-
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:RELEASE:}", StringUpper($sReleasName))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:DESCRIPTION:}", StringUpper($sReleasDesc))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:COMPANY:}", StringUpper($sReleasCompany))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:COMPANYURL:}", StringUpper($sReleasURL))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:VERSION:}", StringUpper($sReleasVersion))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:DAY:}", StringUpper($sReleasDocDay))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:MONTH:}", StringUpper($sReleasDocYear))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:YEAR:}", StringUpper($sReleasDocYear))
-	$sTemplateRead = StringReplace($sTemplateRead, "%{:INSTSIZE:}", StringUpper($iReleaseInstSize) & " MB")
-
 
 	; Close the handle returned by FileOpen.
 	FileClose($hTemplateOpen)
@@ -2395,7 +2384,7 @@ Func _CreateDistribution($sSolutionIniPath, $iRow, $iCol)
 	Local $aFiles = IniReadSection($sSolutionIniPath, "Distribute")
 	If Not @error Then
 		For $xF = 1 To $aFiles[0][0]
-			$sOutputFile = _CleanDestinationPath($sOutputPath & "\" & StringReplace($aFiles[$xF][1], "in_", "ini"))
+			$sOutputFile = _CleanDestinationPath($sOutputPath & "\" & $aFiles[$xF][1])
 			If StringInStr($aFiles[$xF][0], "Directory") Then
 				_DistributeDirectory($sOutputFile)
 			ElseIf StringInStr($aFiles[$xF][0], "File") Then
@@ -2538,7 +2527,7 @@ Func _ReturnDistributionState($sSolutionIniPath)
 	Local $aFiles = IniReadSection($sSolutionIniPath, "Distribute")
 	If Not @error Then
 		For $xF = 1 To $aFiles[0][0]
-			$sFilePath = _CleanDestinationPath($sDistributionPath & "\" & StringReplace($aFiles[$xF][1], "in_", "ini"))
+			$sFilePath = _CleanDestinationPath($sDistributionPath & "\" & $aFiles[$xF][1])
 
 
 			If Not FileExists($sFilePath) Then
@@ -2788,7 +2777,6 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 
 	FileWrite($hFileOpen, "[Run]" & @CRLF)
 	FileWrite($hFileOpen, "Filename: {app}\" & $sOutputFile & "; Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall shellexec skipifsilent unchecked" & @CRLF)
-	FileWrite($hFileOpen, "Filename: " & Chr(34) & "https://www.rizonesoft.com/thank-you/" & Chr(34) & "; Flags: shellexec runasoriginaluser nowait" & @CRLF)
 
 	FileWrite($hFileOpen, "" & @CRLF)
 

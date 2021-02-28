@@ -3400,3 +3400,599 @@
 [ 2021/02/25 22:14:13 ] Check the Build configuration file and recreate the Distribution.
 [ 2021/02/25 22:14:13 ] Error: Finished with (02) errors!
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/02/28 11:03:46 ] DATE:                        2021/02/28 11:03:46
+[ 2021/02/28 11:03:46 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3581
+[ 2021/02/28 11:03:46 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/02/28 11:03:46 ] COMPILED:                    YES
+[ 2021/02/28 11:03:46 ] WINDOWS VERSION:             WIN_10 
+[ 2021/02/28 11:03:46 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/02/28 11:03:46 ] MEMORY (RAM):                16302.97 MB
+[ 2021/02/28 11:03:46 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/02/28 11:03:46 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/02/28 11:07:09 ] DATE:                        2021/02/28 11:07:09
+[ 2021/02/28 11:07:09 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3581
+[ 2021/02/28 11:07:09 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/02/28 11:07:09 ] COMPILED:                    YES
+[ 2021/02/28 11:07:09 ] WINDOWS VERSION:             WIN_10 
+[ 2021/02/28 11:07:09 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/02/28 11:07:09 ] MEMORY (RAM):                16302.97 MB
+[ 2021/02/28 11:07:09 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/02/28 11:07:09 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/02/28 11:08:35 ] Generating Documentation for USB Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:08:35 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates'
+[ 2021/02/28 11:08:35 ] 03 templates files found.
+[ 2021/02/28 11:08:35 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Changes.tpl
+[ 2021/02/28 11:08:35 ] Document created successfuly.
+[ 2021/02/28 11:08:35 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\Changes.txt
+[ 2021/02/28 11:08:35 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\License.tpl
+[ 2021/02/28 11:08:35 ] Document created successfuly.
+[ 2021/02/28 11:08:35 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\License.txt
+[ 2021/02/28 11:08:35 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Readme.tpl
+[ 2021/02/28 11:08:35 ] Document created successfuly.
+[ 2021/02/28 11:08:35 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\Readme.txt
+[ 2021/02/28 11:08:35 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/02/28 11:33:13 ] DATE:                        2021/02/28 11:33:13
+[ 2021/02/28 11:33:13 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3582
+[ 2021/02/28 11:33:13 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/02/28 11:33:13 ] COMPILED:                    YES
+[ 2021/02/28 11:33:13 ] WINDOWS VERSION:             WIN_10 
+[ 2021/02/28 11:33:13 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/02/28 11:33:13 ] MEMORY (RAM):                16302.97 MB
+[ 2021/02/28 11:33:13 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/02/28 11:33:13 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/02/28 11:33:21 ] Generating Documentation for USB Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:33:21 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates'
+[ 2021/02/28 11:33:21 ] 03 templates files found.
+[ 2021/02/28 11:33:21 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Changes.tpl
+[ 2021/02/28 11:33:21 ] Document created successfuly.
+[ 2021/02/28 11:33:21 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\Changes.txt
+[ 2021/02/28 11:33:21 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\License.tpl
+[ 2021/02/28 11:33:21 ] Document created successfuly.
+[ 2021/02/28 11:33:21 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\License.txt
+[ 2021/02/28 11:33:21 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Readme.tpl
+[ 2021/02/28 11:33:21 ] Document created successfuly.
+[ 2021/02/28 11:33:21 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\Readme.txt
+[ 2021/02/28 11:33:21 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:33:25 ] Signing USB Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:33:25 ] Error: SignTool.exe is required for signing USB Repair!
+[ 2021/02/28 11:33:25 ] Please install the Windows Standalone SDK for Windows 10 or
+[ 2021/02/28 11:33:25 ] the Windows Software Development Kit (SDK) for Windows 8.1.
+[ 2021/02/28 11:33:25 ] Error: Finished with (01) error!
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:33:33 ] Compressing USB Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:33:33 ] Compressing: "C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe"
+[ 2021/02/28 11:33:33 ] Parameters: --best --no-backup --overlay=copy --compress-exports=1 --compress-resources=1 --strip-relocs=1
+[ 2021/02/28 11:33:38 ]                        Ultimate Packer for eXecutables
+[ 2021/02/28 11:33:38 ]                           Copyright (C) 1996 - 2017
+[ 2021/02/28 11:33:38 ] UPX 3.93w       Markus Oberhumer, Laszlo Molnar & John Reiser   Jan 29th 2017
+[ 2021/02/28 11:33:38 ]         File size         Ratio      Format      Name
+[ 2021/02/28 11:33:38 ]    --------------------   ------   -----------   -----------
+[ 2021/02/28 11:33:38 ]    1989632 ->   1180672   59.34%    win32/pe     USBRepair.exe
+[ 2021/02/28 11:33:38 ] Packed 1 file.
+[ 2021/02/28 11:33:38 ] Compressing: "C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe"
+[ 2021/02/28 11:33:38 ] Parameters: --best --no-backup --overlay=copy --compress-exports=1 --compress-resources=1 --strip-relocs=1
+[ 2021/02/28 11:33:43 ]                        Ultimate Packer for eXecutables
+[ 2021/02/28 11:33:43 ]                           Copyright (C) 1996 - 2017
+[ 2021/02/28 11:33:43 ] UPX 3.93w       Markus Oberhumer, Laszlo Molnar & John Reiser   Jan 29th 2017
+[ 2021/02/28 11:33:43 ]         File size         Ratio      Format      Name
+[ 2021/02/28 11:33:43 ]    --------------------   ------   -----------   -----------
+[ 2021/02/28 11:33:43 ]    2108928 ->   1219584   57.83%    win64/pe     USBRepair_X64.exe
+[ 2021/02/28 11:33:43 ] Packed 1 file.
+[ 2021/02/28 11:33:43 ] Finished: Finished compressing executables.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:33:54 ] Building USB Repair...
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:33:55 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/02/28 11:33:55 ] from:Distro_X64.exe (5.0.2.3582) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/02/28 11:33:55 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
+[ 2021/02/28 11:33:56 ] +> AU3Check ended. rc:0
+[ 2021/02/28 11:33:56 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE75C.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2
+[ 2021/02/28 11:33:58 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE75C.tmp.exe. rc:0
+[ 2021/02/28 11:33:58 ] > Performing the Program Resource Update steps:
+[ 2021/02/28 11:33:58 ] ...>Updating Program Version information.
+[ 2021/02/28 11:33:58 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/02/28 11:33:58 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/02/28 11:33:58 ] ...>Updating Program Manifest information.
+[ 2021/02/28 11:33:58 ] ...>Adding 80 Icon(s).
+[ 2021/02/28 11:33:58 ] > Program Resource updating finished successfully.
+[ 2021/02/28 11:33:58 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe
+[ 2021/02/28 11:33:58 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE75C.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2 /x64
+[ 2021/02/28 11:34:00 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE75C.tmp.exe. rc:0
+[ 2021/02/28 11:34:00 ] > Performing the Program Resource Update steps:
+[ 2021/02/28 11:34:00 ] ...>Updating Program Version information.
+[ 2021/02/28 11:34:00 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/02/28 11:34:00 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/02/28 11:34:00 ] ...>Updating Program Manifest information.
+[ 2021/02/28 11:34:00 ] ...>Adding 80 Icon(s).
+[ 2021/02/28 11:34:01 ] > Program Resource updating finished successfully.
+[ 2021/02/28 11:34:01 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe
+[ 2021/02/28 11:34:01 ] -Updated the Source Version to: 1.0.0.1045
+[ 2021/02/28 11:34:02 ] +> AutoIt3Wrapper Finished.
+[ 2021/02/28 11:34:05 ] Finished: Finished building USB Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:34:24 ] Building USB Repair...
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:34:24 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/02/28 11:34:24 ] from:Distro_X64.exe (5.0.2.3582) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/02/28 11:34:25 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
+[ 2021/02/28 11:34:26 ] +> AU3Check ended. rc:0
+[ 2021/02/28 11:34:26 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU5B25.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2
+[ 2021/02/28 11:34:27 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU5B25.tmp.exe. rc:0
+[ 2021/02/28 11:34:27 ] > Performing the Program Resource Update steps:
+[ 2021/02/28 11:34:27 ] ...>Updating Program Version information.
+[ 2021/02/28 11:34:28 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/02/28 11:34:28 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/02/28 11:34:28 ] ...>Updating Program Manifest information.
+[ 2021/02/28 11:34:28 ] ...>Adding 80 Icon(s).
+[ 2021/02/28 11:34:28 ] > Program Resource updating finished successfully.
+[ 2021/02/28 11:34:28 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe
+[ 2021/02/28 11:34:28 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU5B25.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2 /x64
+[ 2021/02/28 11:34:30 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU5B25.tmp.exe. rc:0
+[ 2021/02/28 11:34:30 ] > Performing the Program Resource Update steps:
+[ 2021/02/28 11:34:30 ] ...>Updating Program Version information.
+[ 2021/02/28 11:34:30 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/02/28 11:34:30 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/02/28 11:34:30 ] ...>Updating Program Manifest information.
+[ 2021/02/28 11:34:30 ] ...>Adding 80 Icon(s).
+[ 2021/02/28 11:34:30 ] > Program Resource updating finished successfully.
+[ 2021/02/28 11:34:31 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe
+[ 2021/02/28 11:34:31 ] -Updated the Source Version to: 1.0.0.1046
+[ 2021/02/28 11:34:32 ] +> AutoIt3Wrapper Finished.
+[ 2021/02/28 11:34:35 ] Finished: Finished building USB Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:35:26 ] Generating Documentation for USB Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 11:35:26 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates'
+[ 2021/02/28 11:35:26 ] 03 templates files found.
+[ 2021/02/28 11:35:26 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Changes.tpl
+[ 2021/02/28 11:35:26 ] Document created successfuly.
+[ 2021/02/28 11:35:26 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\Changes.txt
+[ 2021/02/28 11:35:26 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\License.tpl
+[ 2021/02/28 11:35:26 ] Document created successfuly.
+[ 2021/02/28 11:35:26 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\License.txt
+[ 2021/02/28 11:35:26 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Readme.tpl
+[ 2021/02/28 11:35:26 ] Document created successfuly.
+[ 2021/02/28 11:35:26 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Docs\Readme.txt
+[ 2021/02/28 11:35:26 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/02/28 21:43:33 ] DATE:                        2021/02/28 21:43:33
+[ 2021/02/28 21:43:33 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3582
+[ 2021/02/28 21:43:33 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/02/28 21:43:33 ] COMPILED:                    YES
+[ 2021/02/28 21:43:33 ] WINDOWS VERSION:             WIN_10 
+[ 2021/02/28 21:43:33 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/02/28 21:43:33 ] MEMORY (RAM):                16302.97 MB
+[ 2021/02/28 21:43:33 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/02/28 21:43:33 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/02/28 21:43:45 ] Building DVD Drive Repair...
+------------------------------------------------------------------------------------------
+[ 2021/02/28 21:43:45 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/02/28 21:43:45 ] from:Distro_X64.exe (5.0.2.3582) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/02/28 21:43:46 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
+[ 2021/02/28 21:43:46 ] +> AU3Check ended. rc:0
+[ 2021/02/28 21:43:46 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU30EE.tmp.exe" /nopack /icon "..\..\Resources\Icons\DVDRepair.ico" /comp 2
+[ 2021/02/28 21:43:48 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU30EE.tmp.exe. rc:0
+[ 2021/02/28 21:43:48 ] > Performing the Program Resource Update steps:
+[ 2021/02/28 21:43:48 ] ...>Updating Program Version information.
+[ 2021/02/28 21:43:48 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/02/28 21:43:48 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/02/28 21:43:48 ] ...>Updating Program Manifest information.
+[ 2021/02/28 21:43:48 ] ...>Adding 80 Icon(s).
+[ 2021/02/28 21:43:49 ] > Program Resource updating finished successfully.
+[ 2021/02/28 21:43:49 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair.exe
+[ 2021/02/28 21:43:49 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU30EE.tmp.exe" /nopack /icon "..\..\Resources\Icons\DVDRepair.ico" /comp 2 /x64
+[ 2021/02/28 21:43:51 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU30EE.tmp.exe. rc:0
+[ 2021/02/28 21:43:51 ] > Performing the Program Resource Update steps:
+[ 2021/02/28 21:43:51 ] ...>Updating Program Version information.
+[ 2021/02/28 21:43:51 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/02/28 21:43:51 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/02/28 21:43:51 ] ...>Updating Program Manifest information.
+[ 2021/02/28 21:43:51 ] ...>Adding 80 Icon(s).
+[ 2021/02/28 21:43:51 ] > Program Resource updating finished successfully.
+[ 2021/02/28 21:43:51 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair_X64.exe
+[ 2021/02/28 21:43:52 ] -Updated the Source Version to: 2.2.2.1139
+[ 2021/02/28 21:43:53 ] +> AutoIt3Wrapper Finished.
+[ 2021/02/28 21:43:56 ] Finished: Finished building DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 21:44:10 ] Generating Documentation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 21:44:10 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates'
+[ 2021/02/28 21:44:10 ] 03 templates files found.
+[ 2021/02/28 21:44:10 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Changes.tpl
+[ 2021/02/28 21:44:10 ] Document created successfuly.
+[ 2021/02/28 21:44:10 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Changes.txt
+[ 2021/02/28 21:44:10 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\License.tpl
+[ 2021/02/28 21:44:10 ] Document created successfuly.
+[ 2021/02/28 21:44:10 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\License.txt
+[ 2021/02/28 21:44:10 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Readme.tpl
+[ 2021/02/28 21:44:10 ] Document created successfuly.
+[ 2021/02/28 21:44:10 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Readme.txt
+[ 2021/02/28 21:44:10 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 21:47:10 ] Generating Documentation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 21:47:10 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates'
+[ 2021/02/28 21:47:10 ] 03 templates files found.
+[ 2021/02/28 21:47:10 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Changes.tpl
+[ 2021/02/28 21:47:10 ] Document created successfuly.
+[ 2021/02/28 21:47:10 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Changes.txt
+[ 2021/02/28 21:47:11 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\License.tpl
+[ 2021/02/28 21:47:11 ] Document created successfuly.
+[ 2021/02/28 21:47:11 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\License.txt
+[ 2021/02/28 21:47:11 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Readme.tpl
+[ 2021/02/28 21:47:11 ] Document created successfuly.
+[ 2021/02/28 21:47:11 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Readme.txt
+[ 2021/02/28 21:47:11 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 21:47:16 ] Distributing DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\DVDRepair.exe Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\DVDRepair_X64.exe Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\DVDRepair.ini Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Docs\Changes.txt Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Docs\License.txt Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Docs\Readme.txt Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Language\DVDRepair\af.ini Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Language\DVDRepair\el.ini Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Language\DVDRepair\en.ini Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Language\DVDRepair\es.ini Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Language\DVDRepair\fr.ini Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Language\DVDRepair\zh-TW.ini Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Processing\32\Stroke.ani Distribution Created.
+[ 2021/02/28 21:47:16 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Processing\64\Stroke.ani Distribution Created.
+[ 2021/02/28 21:47:17 ] \Concrete\DVDRepair\Distribution\1138\DVDRepair_1138\Processing\64\Globe.ani Distribution Created.
+[ 2021/02/28 21:47:18 ] Finished: DVD Drive Repair Distribution Created.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/02/28 22:27:39 ] DATE:                        2021/02/28 22:27:39
+[ 2021/02/28 22:27:39 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3583
+[ 2021/02/28 22:27:39 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/02/28 22:27:39 ] COMPILED:                    YES
+[ 2021/02/28 22:27:39 ] WINDOWS VERSION:             WIN_10 
+[ 2021/02/28 22:27:39 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/02/28 22:27:39 ] MEMORY (RAM):                16302.97 MB
+[ 2021/02/28 22:27:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/02/28 22:27:39 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/02/28 22:27:49 ] Generating Documentation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:27:49 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates'
+[ 2021/02/28 22:27:49 ] 03 templates files found.
+[ 2021/02/28 22:27:49 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Changes.tpl
+[ 2021/02/28 22:27:49 ] Document created successfuly.
+[ 2021/02/28 22:27:49 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Changes.txt
+[ 2021/02/28 22:27:49 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\License.tpl
+[ 2021/02/28 22:27:49 ] Document created successfuly.
+[ 2021/02/28 22:27:49 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\License.txt
+[ 2021/02/28 22:27:49 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Readme.tpl
+[ 2021/02/28 22:27:49 ] Document created successfuly.
+[ 2021/02/28 22:27:49 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Readme.txt
+[ 2021/02/28 22:27:49 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:27:52 ] Distributing Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\ComIntRep.exe Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\ComIntRep_X64.exe Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\ComIntRep.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Docs\Changes.txt Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Docs\License.txt Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Docs\Readme.txt Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\af.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\ar.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\de.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\el.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\en.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\es.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\fr.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\hu.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\it.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\pt-BR.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\ru.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\sl.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\tr.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\zh-CN.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Language\ComIntRep\zh-TW.ini Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Processing\16\Process.ani Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Processing\32\Stroke.ani Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Processing\64\Stroke.ani Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Processing\64\Globe.ani Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Sounds\Complete.wav Distribution Created.
+[ 2021/02/28 22:27:52 ] \Concrete\ComIntRep\Distribution\5020\ComIntRep_5020\Sounds\Welcome.wav Distribution Created.
+[ 2021/02/28 22:27:53 ] Finished: Complete Internet Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:27:57 ] Creating Zip Package for Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:27:57 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/02/28 22:27:57 ] Scanning the drive:
+[ 2021/02/28 22:27:57 ] 9 folders, 27 files, 6274440 bytes (6128 KiB)
+[ 2021/02/28 22:27:57 ] Creating archive: ComIntRep_5020.zip
+[ 2021/02/28 22:27:58 ] Items to compress: 36
+[ 2021/02/28 22:27:58 ] Files read from disk: 27
+[ 2021/02/28 22:27:58 ] Archive size: 3184035 bytes (3110 KiB)
+[ 2021/02/28 22:27:58 ] Everything is Ok
+[ 2021/02/28 22:27:58 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:01 ] Creating installation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:08 ] Finished: Created installation for Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:13 ] Generating Documentation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:13 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates'
+[ 2021/02/28 22:28:13 ] 03 templates files found.
+[ 2021/02/28 22:28:13 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Changes.tpl
+[ 2021/02/28 22:28:13 ] Document created successfuly.
+[ 2021/02/28 22:28:13 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Changes.txt
+[ 2021/02/28 22:28:13 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\License.tpl
+[ 2021/02/28 22:28:13 ] Document created successfuly.
+[ 2021/02/28 22:28:13 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\License.txt
+[ 2021/02/28 22:28:13 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Readme.tpl
+[ 2021/02/28 22:28:13 ] Document created successfuly.
+[ 2021/02/28 22:28:13 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Docs\Readme.txt
+[ 2021/02/28 22:28:13 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:16 ] Distributing DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\DVDRepair.exe Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\DVDRepair_X64.exe Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\DVDRepair.ini Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Docs\Changes.txt Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Docs\License.txt Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Docs\Readme.txt Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Language\DVDRepair\af.ini Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Language\DVDRepair\el.ini Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Language\DVDRepair\en.ini Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Language\DVDRepair\es.ini Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Language\DVDRepair\fr.ini Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Language\DVDRepair\zh-TW.ini Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Processing\32\Stroke.ani Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Processing\64\Stroke.ani Distribution Created.
+[ 2021/02/28 22:28:16 ] \Concrete\DVDRepair\Distribution\1150\DVDRepair_1150\Processing\64\Globe.ani Distribution Created.
+[ 2021/02/28 22:28:17 ] Finished: DVD Drive Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:19 ] Creating Zip Package for DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:19 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/02/28 22:28:20 ] Scanning the drive:
+[ 2021/02/28 22:28:20 ] 7 folders, 15 files, 4842227 bytes (4729 KiB)
+[ 2021/02/28 22:28:20 ] Creating archive: DVDRepair_1150.zip
+[ 2021/02/28 22:28:20 ] Items to compress: 22
+[ 2021/02/28 22:28:20 ] Files read from disk: 15
+[ 2021/02/28 22:28:20 ] Archive size: 2538179 bytes (2479 KiB)
+[ 2021/02/28 22:28:20 ] Everything is Ok
+[ 2021/02/28 22:28:20 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:23 ] Creating installation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:26 ] Finished: Created installation for DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:33 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:33 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2021/02/28 22:28:33 ] 03 templates files found.
+[ 2021/02/28 22:28:33 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2021/02/28 22:28:33 ] Document created successfuly.
+[ 2021/02/28 22:28:34 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Docs\Changes.txt
+[ 2021/02/28 22:28:34 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2021/02/28 22:28:34 ] Document created successfuly.
+[ 2021/02/28 22:28:34 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Docs\License.txt
+[ 2021/02/28 22:28:34 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2021/02/28 22:28:34 ] Document created successfuly.
+[ 2021/02/28 22:28:34 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Docs\Readme.txt
+[ 2021/02/28 22:28:34 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:40 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:28:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Firemin.exe Distribution Created.
+[ 2021/02/28 22:28:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\FireminiX64.exe Distribution Created.
+[ 2021/02/28 22:28:40 ] Error: The Source File does not exist!
+[ 2021/02/28 22:28:40 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\\Firemin.in_'
+[ 2021/02/28 22:28:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\Changes.txt Distribution Created.
+[ 2021/02/28 22:28:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\License.txt Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\Readme.txt Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\af.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\de.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\el.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\en.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\es.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\fa.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\fr.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\hu.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\it.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ja.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ko.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pl.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pt.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ru.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\sl.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\tr.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Processing\32\Stroke.ani Distribution Created.
+[ 2021/02/28 22:28:41 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Processing\64\Globe.ani Distribution Created.
+[ 2021/02/28 22:28:42 ] Error: Finished with (01) error!
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:37:09 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:37:09 ] Error: Missing Distribution File!
+[ 2021/02/28 22:37:09 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5099\Firemin_5099\FireminiX64.exe'
+[ 2021/02/28 22:37:09 ] Error: Could not create Zip package!
+[ 2021/02/28 22:37:09 ] ^ The distribution is Incomplete.
+[ 2021/02/28 22:37:09 ] Check the Build configuration file and recreate the Distribution.
+[ 2021/02/28 22:37:09 ] Error: Finished with (02) errors!
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:37:41 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:37:41 ] Error: Missing Distribution File!
+[ 2021/02/28 22:37:41 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5099\Firemin_5099\FireminiX64.exe'
+[ 2021/02/28 22:37:41 ] Error: Could not create installation!
+[ 2021/02/28 22:37:41 ] ^ The distribution is Incomplete.
+[ 2021/02/28 22:37:41 ] Check the Build configuration file and recreate the Distribution.
+[ 2021/02/28 22:37:41 ] Error: Finished with (02) errors!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/02/28 22:41:31 ] DATE:                        2021/02/28 22:41:31
+[ 2021/02/28 22:41:31 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3584
+[ 2021/02/28 22:41:31 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/02/28 22:41:31 ] COMPILED:                    YES
+[ 2021/02/28 22:41:31 ] WINDOWS VERSION:             WIN_10 
+[ 2021/02/28 22:41:31 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/02/28 22:41:31 ] MEMORY (RAM):                16302.97 MB
+[ 2021/02/28 22:41:31 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/02/28 22:41:31 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/02/28 22:41:39 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Firemin.exe Distribution Created.
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Firemin_X64.exe Distribution Created.
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Firemin.ini Distribution Created.
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\Changes.txt Distribution Created.
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\License.txt Distribution Created.
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\Readme.txt Distribution Created.
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\af.ini Distribution Created.
+[ 2021/02/28 22:41:39 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\de.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\el.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\en.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\es.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\fa.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\fr.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\hu.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\it.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ja.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ko.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pl.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pt.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ru.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\sl.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\tr.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Processing\32\Stroke.ani Distribution Created.
+[ 2021/02/28 22:41:40 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Processing\64\Globe.ani Distribution Created.
+[ 2021/02/28 22:41:41 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:41:43 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:41:43 ] Error: Missing Distribution File!
+[ 2021/02/28 22:41:43 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5099\Firemin_5099\FireminiX64.exe'
+[ 2021/02/28 22:41:43 ] Error: Could not create Zip package!
+[ 2021/02/28 22:41:43 ] ^ The distribution is Incomplete.
+[ 2021/02/28 22:41:43 ] Check the Build configuration file and recreate the Distribution.
+[ 2021/02/28 22:41:43 ] Error: Finished with (02) errors!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/02/28 22:43:09 ] DATE:                        2021/02/28 22:43:09
+[ 2021/02/28 22:43:09 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3585
+[ 2021/02/28 22:43:09 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/02/28 22:43:09 ] COMPILED:                    YES
+[ 2021/02/28 22:43:09 ] WINDOWS VERSION:             WIN_10 
+[ 2021/02/28 22:43:09 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/02/28 22:43:09 ] MEMORY (RAM):                16302.97 MB
+[ 2021/02/28 22:43:09 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/02/28 22:43:09 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/02/28 22:43:17 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Firemin.exe Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Firemin_X64.exe Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Firemin.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\Changes.txt Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\License.txt Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Docs\Readme.txt Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\af.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\de.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\el.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\en.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\es.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\fa.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\fr.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\hu.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\it.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ja.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ko.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pl.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pt.ini Distribution Created.
+[ 2021/02/28 22:43:17 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2021/02/28 22:43:18 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\ru.ini Distribution Created.
+[ 2021/02/28 22:43:18 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\sl.ini Distribution Created.
+[ 2021/02/28 22:43:18 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\tr.ini Distribution Created.
+[ 2021/02/28 22:43:18 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2021/02/28 22:43:18 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2021/02/28 22:43:18 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Processing\32\Stroke.ani Distribution Created.
+[ 2021/02/28 22:43:18 ] \Concrete\Firemin\Distribution\5099\Firemin_5099\Processing\64\Globe.ani Distribution Created.
+[ 2021/02/28 22:43:19 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:43:21 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:43:22 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/02/28 22:43:22 ] Scanning the drive:
+[ 2021/02/28 22:43:22 ] 7 folders, 27 files, 4593173 bytes (4486 KiB)
+[ 2021/02/28 22:43:22 ] Creating archive: Firemin_5099.zip
+[ 2021/02/28 22:43:22 ] Items to compress: 34
+[ 2021/02/28 22:43:22 ] Files read from disk: 27
+[ 2021/02/28 22:43:22 ] Archive size: 2409028 bytes (2353 KiB)
+[ 2021/02/28 22:43:22 ] Everything is Ok
+[ 2021/02/28 22:43:22 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:43:25 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/02/28 22:43:30 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------

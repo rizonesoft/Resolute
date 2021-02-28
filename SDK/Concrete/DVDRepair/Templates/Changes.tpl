@@ -1,13 +1,15 @@
 ==================================================
-%{:COMPANY:} %{:RELEASE:} CHANGES
+%{COMPANY} %{RELEASE} CHANGES
 ==================================================
 
 --------------------------------------------------
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
-- Fixed: About page Memory usage par display.
-- Updated support URL on the About page.
+- Fixed: About page Memory usage bar display.
+- Fixed: Generating documentation.
+- Updated: support URL on the About page.
+- Removed: Opening thank you page after installation.
 
 --------------------------------------------------
 Version 2.2.2.1116 (August 04, 2020)

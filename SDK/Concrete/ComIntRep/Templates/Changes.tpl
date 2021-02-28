@@ -1,9 +1,17 @@
 ==================================================
-%{:COMPANY:} %{:RELEASE:} CHANGES
+%{COMPANY} %{RELEASE} CHANGES
 ==================================================
 
 --------------------------------------------------
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
+--------------------------------------------------
+
+- Critical Fix: All executables are now signed.
+- Fixed: Generating documentation.
+- Removed: Opening thank you page after installation.
+
+--------------------------------------------------
+Version 6.1.0.5005 (February 24, 2021)
 --------------------------------------------------
 
 - Updated Korean translation.

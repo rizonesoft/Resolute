@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=DVD Drive Repair						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft DVD Drive Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=2.2.2.1127
+#AutoIt3Wrapper_Res_Fileversion=2.3.0.1151
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -286,7 +286,7 @@ Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/riz
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
 Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
 Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"										; https://www.rizonesoft.com/feed
-Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"										; https://www.paypal.me/rizonesoft
+Global $g_sUrlPayPal			= "https://www.paypal.com/donate?hosted_button_id=7UGGCSDUZJPFE&source=url|PayPal.com"
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
@@ -333,6 +333,7 @@ Global $g_iPowerIconsStart				= 263
 Global $g_iMenuIconsStart				= 269
 
 Global $g_aCoreIcons[3]
+Global $g_aDonateIcons[3]
 Global $g_iSizeIcon						= 64
 Global $g_aLognIcons[$CNT_LOGICONS]
 Global $g_aLanguageIcons[$CNT_LANGICONS]
@@ -374,7 +375,7 @@ Global $g_TitleShowAutoIt	= True	;~ Show AutoIt version
 
 ;~ Interface Settings
 Global $g_iCoreGuiWidth		= 550
-Global $g_iCoreGuiHeight	= 500
+Global $g_iCoreGuiHeight	= 550
 Global $g_iMsgBoxTimeOut	= 60
 
 ;~ About Dialog
@@ -419,11 +420,15 @@ Global $g_hOLblPrefsUpdated
 Global $g_hOBtnSave
 Global $g_hOBtnCancel
 
+Global $g_hIconDonate
+Global $g_hLblDonate
+
 Global $g_iProcessPriority 		= 3
 Global $g_iSaveRealtime			= 0
 Global $g_iReduceMemory 		= 1
 Global $g_iReduceEveryMill 		= 300
 Global $g_iMaxSysMemoryPerc 	= 80
+Global $g_iDonateLabelHover		= 1
 
 
 OnAutoItExitRegister("_TerminateProgram")
@@ -480,6 +485,7 @@ Else
 		_Localization_Menus()		;~ Load Menu Language Strings
 		_Localization_Custom()		;~ Load Custom Language Strings
 		_Localization_About()		;~ Load About Language Strings
+		_Localization_Donate()		;~ Load Donate Language Strings
 		_Splash_Update($g_aLangMessages[9], 6)
 		_SetResources()
 		_Splash_Update($g_aLangMessages[10], 9)
@@ -602,7 +608,7 @@ Func _StartCoreGui()
 	GUICtrlSetFont($g_hBtnRepair, 11)
 	GUICtrlSetState($g_hBtnRepair, $GUI_DEFBUTTON)
 
-	$g_hListStatus = GUICtrlCreateListView("", 10, $g_iCoreGuiHeight - $g_GuiLogBoxHeight - 30, _
+	$g_hListStatus = GUICtrlCreateListView("", 10, $g_iCoreGuiHeight - $g_GuiLogBoxHeight - 80, _
 			$g_iCoreGuiWidth - 20, $g_GuiLogBoxHeight, BitOR($LVS_REPORT, $LVS_NOCOLUMNHEADER))
 	_GUICtrlListView_SetExtendedListViewStyle($g_hListStatus, BitOR($LVS_EX_FULLROWSELECT, $LVS_EX_DOUBLEBUFFER, _
 			$LVS_EX_SUBITEMIMAGES, $LVS_EX_INFOTIP, $WS_EX_CLIENTEDGE))
@@ -617,6 +623,15 @@ Func _StartCoreGui()
 	Next
 	_GUIImageList_Add($g_hImgStatus, _GUICtrlListView_CreateSolidBitMap($g_hListStatus, 0xFFFFFF, 16, 16))
 	_GUICtrlListView_SetImageList($g_hListStatus, $g_hImgStatus, 1)
+
+	$g_hIconDonate = GUICtrlCreateIcon($g_aDonateIcons[0], $g_iAboutIconStart, 10, 465, 64, 64)
+	GUICtrlSetCursor($g_hIconDonate, 0)
+	$g_hLblDonate = GUICtrlCreateLabel($g_aLangDonate[2], 85, 485, $g_iCoreGuiWidth - 105, 32)
+	GUICtrlSetCursor($g_hLblDonate, 0)
+	GUICtrlSetColor($g_hLblDonate, 0x000000)
+
+	GUICtrlSetOnEvent($g_hIconDonate, "_About_PayPal")
+	GUICtrlSetOnEvent($g_hLblDonate, "_About_PayPal")
 
 	GUICtrlSetOnEvent($g_hBtnRepair, "_RepairDVDDrives")
 	GUICtrlSetOnEvent($g_hChkResetAutorun, "_SetOptions")
@@ -671,6 +686,22 @@ Func _OnIconsHover()
 			GUICtrlSetImage($g_hGuiIcon, $g_aCoreIcons[0], 99)
 		EndIf
 
+		If $iCursor[4] = $g_hIconDonate And $g_aDonateIcons[2] == 1 Then
+			$g_aDonateIcons[2] = 0
+			GUICtrlSetImage($g_hIconDonate, $g_aDonateIcons[1], $g_iAboutIconStart + 1)
+		ElseIf $iCursor[4] <> $g_hIconDonate And $g_aDonateIcons[2] == 0 Then
+			$g_aDonateIcons[2] = 1
+			GUICtrlSetImage($g_hIconDonate, $g_aDonateIcons[0], $g_iAboutIconStart)
+		EndIf
+
+		If $iCursor[4] = $g_hLblDonate And $g_iDonateLabelHover == 1 Then
+			$g_iDonateLabelHover = 0
+			GUICtrlSetColor($g_hLblDonate, 0x0D559D)
+		ElseIf $iCursor[4] <> $g_hLblDonate And $g_iDonateLabelHover == 0 Then
+			$g_iDonateLabelHover = 1
+			GUICtrlSetColor($g_hLblDonate, 0x000000)
+		EndIf
+
 	EndIf
 
 EndFunc   ;==>_OnIconsHover
@@ -684,8 +715,10 @@ Func _SetResources()
 
 	If @Compiled Then
 
-		$g_aCoreIcons[0] = @ScriptFullPath
-		$g_aCoreIcons[1] = @ScriptFullPath
+		$g_aCoreIcons[0] 	= @ScriptFullPath
+		$g_aCoreIcons[1] 	= @ScriptFullPath
+		$g_aDonateIcons[0] 	= @ScriptFullPath
+		$g_aDonateIcons[1] 	= @ScriptFullPath
 
 		For $iLi = 0 To $CNT_LOGICONS - 1
 			$g_aLognIcons[$iLi] = @ScriptFullPath
@@ -703,8 +736,10 @@ Func _SetResources()
 
 	Else
 
-		$g_aCoreIcons[0] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & ".ico"
-		$g_aCoreIcons[1] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & "H.ico"
+		$g_aCoreIcons[0] 	= $g_sThemesDir & "\Icons\" & $g_sProgShortName & ".ico"
+		$g_aCoreIcons[1] 	= $g_sThemesDir & "\Icons\" & $g_sProgShortName & "H.ico"
+		$g_aDonateIcons[0] 	= $g_sThemesDir & "\Icons\About\PayPal.ico"
+		$g_aDonateIcons[1] 	= $g_sThemesDir & "\Icons\About\PayPalH.ico"
 
 		$g_aLognIcons[0] = $g_sThemesDir & "\Icons\logging\Information.ico"
 		$g_aLognIcons[1] = $g_sThemesDir & "\Icons\logging\Complete.ico"
@@ -767,7 +802,8 @@ Func _SetResources()
 
 	EndIf
 
-	$g_aCoreIcons[2] = 1
+	$g_aCoreIcons[2] 	= 1
+	$g_aDonateIcons[2]	= 1
 
 EndFunc   ;==>_SetResources
 

@@ -127,7 +127,7 @@ Func _About_ShowDialog()
 	GUICtrlCreateLabel($g_aLangAbout[3] & " © " & @YEAR & " " & $g_sCompanyName, $g_iSizeIcon + 22, 75, 230, 15)
 	GUICtrlSetColor(-1, 0x666666)
 	$g_aAboutIcons[0][0] = GUICtrlCreateIcon($g_aAboutIcons[0][1], $g_iAboutIconStart, 346, 0, 64, 64)
-	GUICtrlSetTip($g_aAboutIcons[0][0], $g_aLangAbout[5], $g_aLangAbout[4], $TIP_INFOICON, $TIP_BALLOON)
+	GUICtrlSetTip($g_aAboutIcons[0][0], $g_aLangAbout[5], $g_aLangAbout[4], $TIP_INFOICON)
 	GUICtrlSetCursor($g_aAboutIcons[0][0], 0)
 
 	GUICtrlCreateLabel("", 10, 105, 400, 1)
@@ -150,7 +150,7 @@ Func _About_ShowDialog()
 	GUICtrlSetCursor($abSupport, 0)
 
 	$g_aAboutIcons[1][0] = GUICtrlCreateIcon($g_aAboutIcons[1][1], $g_iAboutIconStart + 2, 353, 165, 48, 48)
-	GUICtrlSetTip($g_aAboutIcons[1][0], $g_aLangAbout[10], $g_aLangAbout[9], $TIP_INFOICON, $TIP_BALLOON)
+	GUICtrlSetTip($g_aAboutIcons[1][0], $g_aLangAbout[10], $g_aLangAbout[9], $TIP_INFOICON)
 	GUICtrlSetCursor($g_aAboutIcons[1][0], 0)
 
 	GUICtrlCreateGroup($g_aLangAbout[11], 10, 205, 400, 125)
