@@ -3795,3 +3795,47 @@
 [ 2021/01/28 01:39:59 ] Renewing TCP/IP connections.
 [ 2021/01/28 01:39:59 ] Windows IP Configuration
 [ 2021/01/28 01:40:57 ] An error occurred while renewing interface Ethernet : The operation was canceled by the user.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/04 19:20:55 ] DATE:                        2021/03/04 19:20:55
+[ 2021/03/04 19:20:55 ] PROGRAM:                     Complete Internet Repair 6.2.0.5020
+[ 2021/03/04 19:20:55 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2021/03/04 19:20:55 ] COMPILED:                    YES
+[ 2021/03/04 19:20:55 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/04 19:20:55 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/04 19:20:55 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/04 19:20:55 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/04 19:20:55 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/04 19:21:18 ] ДАТА:                        2021/03/04 19:21:18
+[ 2021/03/04 19:21:18 ] ПРОГРАММА:                   Complete Internet Repair 6.2.0.5020
+[ 2021/03/04 19:21:18 ] ПУТЬ К ПРОГРАММЕ:            [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2021/03/04 19:21:18 ] СКОМПИЛИРОВАНО:              ДА
+[ 2021/03/04 19:21:18 ] ВЕРСИЯ WINDOWS:              WIN_10 
+[ 2021/03/04 19:21:18 ] ТИП СИСТЕМЫ:                 64-Bit Operating System
+[ 2021/03/04 19:21:18 ] ПАМЯТЬ (ОЗУ):                16302.97 MB
+[ 2021/03/04 19:21:18 ] ПАПКА "PROGRAM FILES":       C:\Program Files
+[ 2021/03/04 19:21:18 ] ПАПКА "WINDOWS":             C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/04 19:21:28 ] Обновление кэша DNS.
+------------------------------------------------------------------------------------------
+[ 2021/03/04 19:21:28 ] Очистка DNS
+[ 2021/03/04 19:21:28 ] Windows IP Configuration
+[ 2021/03/04 19:21:28 ] Successfully flushed the DNS Resolver Cache.
+[ 2021/03/04 19:21:28 ] Регистрация DNS
+[ 2021/03/04 19:21:28 ] Windows IP Configuration
+[ 2021/03/04 19:21:31 ] Registration of the DNS resource records for all adapters of this computer has been initiated. Any errors will be reported in the Event Viewer in 15 minutes.
+[ 2021/03/04 19:21:32 ] Завершено: DNS обновлен
+------------------------------------------------------------------------------------------

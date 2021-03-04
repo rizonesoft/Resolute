@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Resolute								;~ Comment field
 #AutoIt3Wrapper_Res_Description=Resolute      						;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=21.0.0.82
+#AutoIt3Wrapper_Res_Fileversion=21.0.0.83
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -488,20 +488,6 @@ EndFunc
 
 
 Func _StartCoreGui()
-
-
-	Local $pid = Run('sc queryex winmgmt', '', @SW_HIDE, 2)
-
-Global $data
-
-Do
-   $data &= StdOutRead($pid)
-
-Until @error
-
-	Local $ret = StringRegExpReplace($data, "PID?*[^0-9]", "")
-	MsgBox (0, "", $ret)
-
 
 	Local $miFileOptions, $mnuFileLog, $miLogOpenFile, $miLogOpenRoot, $miFileClose
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout

@@ -303,8 +303,8 @@ Global $g_sDocLicense		= $g_sDocsDir & "\License.txt"
 Global $g_sDocReadme		= $g_sDocsDir & "\Readme.txt"
 
 ; Configuration Settings
-Global $g_iBoostMill		 = 500
-Global $g_iCleanLimit		 = 5
+Global $g_iBoostMill		 = 1000
+Global $g_iCleanLimit		 = 20
 Global $g_sBrowserName
 Global $g_sBrowserPath		 = @ProgramFilesDir & "\Mozilla Firefox\firefox.exe"
 Global $g_sExtendedProcs	 = "plugin-container.exe"
