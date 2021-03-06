@@ -6,6 +6,14 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed: translations encoding (Unicode (UTF-16) LE BOM).
+- Updated: Russian translation.
+- Updated: Korean translation.
+
+--------------------------------------------------
+Version 6.2.0.5020 (FEBRUARY 28, 2021)
+--------------------------------------------------
+
 - Critical Fix: All executables are now signed.
 - Fixed: Generating documentation.
 - Removed: Opening thank you page after installation.

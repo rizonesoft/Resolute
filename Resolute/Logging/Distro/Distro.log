@@ -3996,3 +3996,144 @@
 ------------------------------------------------------------------------------------------
 [ 2021/02/28 22:43:30 ] Finished: Created installation for Firemin.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/05 23:38:11 ] DATE:                        2021/03/05 23:38:11
+[ 2021/03/05 23:38:11 ] PROGRAM:                     Rizonesoft SDK 5.0.2.3585
+[ 2021/03/05 23:38:11 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/05 23:38:11 ] COMPILED:                    YES
+[ 2021/03/05 23:38:11 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/05 23:38:11 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/05 23:38:11 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/05 23:38:11 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/05 23:38:11 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/05 23:38:25 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:25 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2021/03/05 23:38:25 ] 03 templates files found.
+[ 2021/03/05 23:38:25 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2021/03/05 23:38:25 ] Document created successfuly.
+[ 2021/03/05 23:38:25 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Docs\Changes.txt
+[ 2021/03/05 23:38:25 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2021/03/05 23:38:25 ] Document created successfuly.
+[ 2021/03/05 23:38:25 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Docs\License.txt
+[ 2021/03/05 23:38:25 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2021/03/05 23:38:25 ] Document created successfuly.
+[ 2021/03/05 23:38:25 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Docs\Readme.txt
+[ 2021/03/05 23:38:25 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:29 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Firemin.exe Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Firemin_X64.exe Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Firemin.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Docs\Changes.txt Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Docs\License.txt Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Docs\Readme.txt Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\af.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\de.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\el.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\en.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\es.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\fa.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\fr.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\hu.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\it.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\ja.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\ko.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\pl.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\pt.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\ru.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\sl.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\tr.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2021/03/05 23:38:29 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2021/03/05 23:38:30 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/05 23:38:30 ] \Concrete\Firemin\Distribution\5105\Firemin_5105\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/05 23:38:31 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:33 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:33 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/03/05 23:38:33 ] Scanning the drive:
+[ 2021/03/05 23:38:34 ] 7 folders, 27 files, 4612786 bytes (4505 KiB)
+[ 2021/03/05 23:38:34 ] Creating archive: Firemin_5105.zip
+[ 2021/03/05 23:38:34 ] Items to compress: 34
+[ 2021/03/05 23:38:34 ] Files read from disk: 27
+[ 2021/03/05 23:38:34 ] Archive size: 2410603 bytes (2355 KiB)
+[ 2021/03/05 23:38:34 ] Everything is Ok
+[ 2021/03/05 23:38:34 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:36 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:47 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:51 ] Generating Documentation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:51 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates'
+[ 2021/03/05 23:38:51 ] 03 templates files found.
+[ 2021/03/05 23:38:51 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Changes.tpl
+[ 2021/03/05 23:38:51 ] Document created successfuly.
+[ 2021/03/05 23:38:51 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Changes.txt
+[ 2021/03/05 23:38:51 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\License.tpl
+[ 2021/03/05 23:38:51 ] Document created successfuly.
+[ 2021/03/05 23:38:51 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\License.txt
+[ 2021/03/05 23:38:51 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Readme.tpl
+[ 2021/03/05 23:38:51 ] Document created successfuly.
+[ 2021/03/05 23:38:51 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Docs\Readme.txt
+[ 2021/03/05 23:38:51 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:54 ] Distributing Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\ComIntRep.exe Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\ComIntRep_X64.exe Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\ComIntRep.in_ Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Docs\Changes.txt Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Docs\License.txt Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Docs\Readme.txt Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\af.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\ar.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\de.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\el.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\en.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\es.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\fr.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\hu.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\it.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\pt-BR.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\ru.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\sl.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\tr.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\zh-CN.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Language\ComIntRep\zh-TW.ini Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Processing\16\Process.ani Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Processing\64\Stroke.ani Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Sounds\Complete.wav Distribution Created.
+[ 2021/03/05 23:38:54 ] \Concrete\ComIntRep\Distribution\5208\ComIntRep_5208\Sounds\Welcome.wav Distribution Created.
+[ 2021/03/05 23:38:55 ] Finished: Complete Internet Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:57 ] Creating Zip Package for Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:38:57 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/03/05 23:38:57 ] Scanning the drive:
+[ 2021/03/05 23:38:58 ] 9 folders, 27 files, 6299759 bytes (6153 KiB)
+[ 2021/03/05 23:38:58 ] Creating archive: ComIntRep_5208.zip
+[ 2021/03/05 23:38:58 ] Items to compress: 36
+[ 2021/03/05 23:38:58 ] Files read from disk: 27
+[ 2021/03/05 23:38:58 ] Archive size: 3185546 bytes (3111 KiB)
+[ 2021/03/05 23:38:58 ] Everything is Ok
+[ 2021/03/05 23:38:58 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:39:00 ] Creating installation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2021/03/05 23:40:04 ] Finished: Created installation for Complete Internet Repair.
+------------------------------------------------------------------------------------------
