@@ -27,7 +27,7 @@ Version %{VERSION} (%{:MONTH:} %{DAY}, %{YEAR})
 - Added Afrikaans language file.
 - Alt+F4 now closes the program and not Esc. (Safer!)
 - New Global error count for the logging subsystem.
-- Moved Documents to Documents folder.
+- Moved Documents to Docs folder.
 - New Help (chm) file.
 - Now more customizable.
 - Minor cosmetic changes.
