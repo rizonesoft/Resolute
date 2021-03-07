@@ -1,5 +1,5 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 5
+Compatibilty = Rizonesoft SDK 8
 Script = DVDRepair.au3
 
 [Modules]
@@ -67,7 +67,7 @@ Name=DVD Drive Repair
 ShortName=DVDRepair
 Description=Rizonesoft DVD Drive Repair
 Type=N
-Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\..\..\Resources\Icons\DVDRepair.ico
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\DVDRepair.ico
 Version=2.3.0.1150
 VersionMajor=2
 VersionMaintenance=0

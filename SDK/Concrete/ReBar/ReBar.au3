@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=ReBar Framework						;~ Comment field
 #AutoIt3Wrapper_Res_Description=ReBar Framework			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=6.4.1.5515
+#AutoIt3Wrapper_Res_Fileversion=6.0.2.5523
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -288,6 +288,7 @@ Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/resolute/|www.rizonesoft.com/downloads/resolute/"
 Global $g_sUrlUpdate			= $g_sUrlProgPage
 
+;~ Path Variables
 Global $g_sRootDir			= @ScriptDir ;~ Root Directory
 Global $g_sWorkingDir		= $g_sRootDir ;~ Working Directory
 Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
@@ -496,10 +497,14 @@ Func _StartCoreGui()
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
-	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, 25)
+	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, 25, $WS_OVERLAPPEDWINDOW)
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(8.5, 400, -1, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
+
+	GUIRegisterMsg($WM_GETMINMAXINFO, "WM_GETMINMAXINFO")
+	GUIRegisterMsg($WM_EXITSIZEMOVE, "WM_EXITSIZEMOVE")
+	GUIRegisterMsg($WM_SYSCOMMAND, "WM_SYSCOMMAND")
 
 	$g_hMenuFile = GUICtrlCreateMenu($g_aLangMenus[0])
 	$g_hMenuHelp = GUICtrlCreateMenu($g_aLangMenus[6])
@@ -565,6 +570,7 @@ Func _StartCoreGui()
 			$LVS_EX_SUBITEMIMAGES, $LVS_EX_INFOTIP, $WS_EX_CLIENTEDGE))
 	_GUICtrlListView_AddColumn($g_hListStatus, "", 680)
 	_WinAPI_SetWindowTheme(GUICtrlGetHandle($g_hListStatus), "Explorer")
+	GUICtrlSetResizing($g_hListStatus, BitOR($GUI_DOCKLEFT, $GUI_DOCKRIGHT, $GUI_DOCKBOTTOM, $GUI_DOCKHEIGHT))
 	GUICtrlSetFont($g_hListStatus, 9, -1, -1, "Courier New")
 	GUICtrlSetColor($g_hListStatus, 0x333333)
 
@@ -577,9 +583,11 @@ Func _StartCoreGui()
 
 	$g_hIconDonate = GUICtrlCreateIcon($g_aDonateIcons[0], $g_iAboutIconStart, 10, 400, 64, 64)
 	GUICtrlSetCursor($g_hIconDonate, 0)
+	GUICtrlSetResizing($g_hIconDonate, BitOR($GUI_DOCKBOTTOM, $GUI_DOCKLEFT, $GUI_DOCKSIZE))
 	$g_hLblDonate = GUICtrlCreateLabel($g_aLangDonate[2], 85, 420, $g_iCoreGuiWidth - 205, 32)
 	GUICtrlSetCursor($g_hLblDonate, 0)
 	GUICtrlSetColor($g_hLblDonate, 0x000000)
+	GUICtrlSetResizing($g_hLblDonate, BitOR($GUI_DOCKBOTTOM, $GUI_DOCKLEFT, $GUI_DOCKSIZE))
 
 	GUICtrlSetOnEvent($g_hIconDonate, "_About_PayPal")
 	GUICtrlSetOnEvent($g_hLblDonate, "_About_PayPal")
@@ -649,6 +657,31 @@ Func _OnIconsHover()
 	EndIf
 
 EndFunc   ;==>_OnIconsHover
+
+
+;~ https://www.autoitscript.com/forum/topic/99603-resize-but-dont-get-smaller-than-original-size/#comment-714621
+Func WM_GETMINMAXINFO($hWnd, $msg, $wParam, $lParam)
+	Local $tagMaxinfo = DllStructCreate("int;int;int;int;int;int;int;int;int;int", $lParam)
+	DllStructSetData($tagMaxinfo, 7, $g_iCoreGuiWidth) ; min X
+	DllStructSetData($tagMaxinfo, 8, $g_iCoreGuiHeight) ; min Y
+	Return 0
+EndFunc   ;==>WM_GETMINMAXINFO
+
+
+Func WM_SYSCOMMAND($hWnd, $msg, $wParam, $lParam)
+	Switch BitAND($wParam, 0xFFF0)
+		Case 0xF010, 0xF000
+			Local $tBool = DllStructCreate("int")
+			DllCall("user32.dll", "int", "SystemParametersInfo", "int", 38, "int", 0, "ptr", DllStructGetPtr($tBool), "int", 0)
+			$g_OldSystemParam = DllStructGetData($tBool, 1)
+			DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", 0, "ptr", 0, "int", 2)
+	EndSwitch
+EndFunc   ;==>WM_SYSCOMMAND
+
+
+Func WM_EXITSIZEMOVE($hWnd, $msg, $wParam, $lParam)
+	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", $g_OldSystemParam, "ptr", 0, "int", 2)
+EndFunc   ;==>WM_EXITSIZEMOVE
 
 #EndRegion "Events"
 

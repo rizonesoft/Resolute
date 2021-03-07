@@ -1,5 +1,5 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 5
+Compatibilty = Rizonesoft SDK 8
 Script = Firemin.au3
 
 [Modules]
@@ -84,7 +84,7 @@ Name=Firemin
 ShortName=Firemin
 Description=Firemin
 Type=N
-Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\..\..\Resources\Icons\Firemin.ico
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\Firemin.ico
 Version=6.3.1.5105
 VersionMajor=6
 VersionMaintenance=1

@@ -30,13 +30,13 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=5.0.2.3586
+#AutoIt3Wrapper_Res_Fileversion=8.0.2.3596
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
-#AutoIt3Wrapper_Res_ProductVersion=5             					;~ Product Version
+#AutoIt3Wrapper_Res_ProductVersion=8             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2020 Rizonesoft				;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=© 2021 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 #AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
@@ -1433,7 +1433,12 @@ Func _PopulateSolutions()
 				Local $sSolShortName = _AutoIt3Script_GetFilename($sAu3ScriptIn)
 				Local $sSolProgDesc = _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_Res_Description")
 				Local $sSolType = _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_Change2CUI")
-				Local $sSolIcon = $sSolutionBase & "\" & _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_Icon")
+				Local $sSolIcon = ""
+				If @Compiled Then
+					$sSolIcon = @ScriptDir & "\Resources\Icons\" & $sSolShortName & ".ico"
+				Else
+					$sSolIcon = _PathFull(_AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_Icon"))
+				EndIf
 				Local $sSolVersion = _AutoIt3Script_GetVersion($sAu3ScriptIn, 0)
 				Local $iSolMajor = _AutoIt3Script_GetVersion($sAu3ScriptIn, 1)
 				Local $iSolMaintenance = _AutoIt3Script_GetVersion($sAu3ScriptIn, 3)
@@ -1532,7 +1537,7 @@ Func _CheckPrerequisites()
 	$g_aAutoIt3 = _CheckPrerequisite("AutoIt3\Uninstall.exe", "AutoIt 3.14 +", "AutoIt3.exe", 0, 0)
 	$g_aAutoIt3Beta = _CheckPrerequisite("AutoIt3\Beta\Uninstall.exe", "AutoIt Beta 3.15 +", "AutoIt3.exe", 1, 0)
 	$g_aScite4AutoIt = _CheckPrerequisite("AutoIt3\SciTE\uninst.exe", "Scite4AutoIt", "SciTE.exe", 2, 0)
-	$g_aInnoSetup = _CheckPrerequisite("Inno Setup 5\unins000.exe", "Inno Setup 5", "ISCC.exe", 3, 0)
+	$g_aInnoSetup = _CheckPrerequisite("Inno Setup 6\unins000.exe", "Inno Setup 5", "ISCC.exe", 3, 0)
 	$g_aSigntool = _CheckSignTool("Microsoft Signtool", 4, 0)
 	$g_a7Zip = _CheckPrerequisite(@ScriptDir & "\Bin\x64\7za.exe", "7-Zip Extra 19.00", "", 0, 1, True)
 	$g_aUPX = _CheckPrerequisite(@ScriptDir & "\Bin\x86\upx.exe", "UPX 3.93", "", 1, 1, True)
@@ -1576,7 +1581,7 @@ EndFunc   ;==>_CheckPrerequisite
 Func _CheckSignTool($sExpectedName, $iPr, $iPc, $sInfoURL = "")
 
 	Local $aSignToolInfo[10]
-	Local $aWinKit[2]
+	Local $aWinKit[5]
 	Local $sWinKitsBase = ""
 
 	If @OSArch == "X64" Then
@@ -1585,8 +1590,11 @@ Func _CheckSignTool($sExpectedName, $iPr, $iPc, $sInfoURL = "")
 		$sWinKitsBase = "%ProgramFiles%"
 	EndIf
 
-	$aWinKit[0] = $sWinKitsBase & "\Windows Kits\10\bin\x86\signtool.exe"
-	$aWinKit[1] = $sWinKitsBase & "\Windows Kits\8.1\bin\x86\signtool.exe"
+	$aWinKit[0] = $sWinKitsBase & "\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"
+	$aWinKit[1] = $sWinKitsBase & "\Windows Kits\10\bin\10.0.18362.0\x86\signtool.exe"
+	$aWinKit[2] = $sWinKitsBase & "\Windows Kits\10\bin\10.0.16299.0\x86\signtool.exe"
+	$aWinKit[3] = $sWinKitsBase & "\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe"
+	$aWinKit[4] = $sWinKitsBase & "\Windows Kits\10\bin\10.0.14393.0\x86\signtool.exe"
 
 	For $iSt = 0 To UBound($aWinKit) - 1
 		If FileExists($aWinKit[$iSt]) Then

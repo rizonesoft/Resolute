@@ -1,5 +1,5 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 5
+Compatibilty = Rizonesoft SDK 8
 Script = ReBar.au3
 
 [Modules]
@@ -11,8 +11,7 @@ Import = 0
 Distribute = 1
 Portable = 1
 Installation = 1
-SignInstall = 1
-Tidy = 0
+SignInstall = 0
 Sourcecode = 1
 GitHub = 1
 SourcePackage = 1
@@ -53,11 +52,11 @@ Name=ReBar Framework
 ShortName=ReBar
 Description=ReBar Framework
 Type=N
-Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\..\..\Resources\Icons\ReBar.ico
-Version=6.3.1.5502
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\ReBar.ico
+Version=6.0.2.5522
 VersionMajor=6
-VersionMaintenance=1
-VersionBuild=5502
+VersionMaintenance=2
+VersionBuild=5522
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -68,8 +67,8 @@ OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5502
-DistributionName=ReBar_5502
-FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5502\ReBar_5502
-DistroSourceName=ReBar_5502_Source
-DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5502\ReBar_5502_Source
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522
+DistributionName=ReBar_5522
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522
+DistroSourceName=ReBar_5522_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522_Source

@@ -1,5 +1,5 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 5
+Compatibilty = Rizonesoft SDK 8
 Script = ComIntRep.au3
 
 [Modules]
@@ -85,7 +85,7 @@ Name=Complete Internet Repair
 ShortName=ComIntRep
 Description=Complete Internet Repair
 Type=N
-Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\..\..\Resources\Icons\ComIntRep.ico
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\ComIntRep.ico
 Version=6.2.1.5208
 VersionMajor=6
 VersionMaintenance=1
