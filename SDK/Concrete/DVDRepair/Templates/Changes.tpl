@@ -6,6 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated: Korean translation.
+
+--------------------------------------------------
+Version 2.3.0.1150 (FEBRUARY 28, 2021)
+--------------------------------------------------
+
 - Fixed: About page Memory usage bar display.
 - Fixed: Generating documentation.
 - Updated: support URL on the About page.

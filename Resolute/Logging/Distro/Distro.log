@@ -5014,3 +5014,825 @@
 [ 2021/03/07 09:36:13 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 18:26:23 ] DATE:                        2021/03/07 18:26:23
+[ 2021/03/07 18:26:23 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3597
+[ 2021/03/07 18:26:23 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 18:26:23 ] COMPILED:                    YES
+[ 2021/03/07 18:26:23 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 18:26:23 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 18:26:23 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 18:26:23 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 18:26:23 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/07 18:26:36 ] Generating Documentation for ReBar Framework
+------------------------------------------------------------------------------------------
+[ 2021/03/07 18:26:36 ] Creating the 'Documents' directory.
+[ 2021/03/07 18:26:36 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates'
+[ 2021/03/07 18:26:36 ] 03 templates files found.
+[ 2021/03/07 18:26:36 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\Changes.tpl
+[ 2021/03/07 18:26:36 ] Document created successfuly.
+[ 2021/03/07 18:26:36 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\Changes.txt
+[ 2021/03/07 18:26:36 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\License.tpl
+[ 2021/03/07 18:26:36 ] Document created successfuly.
+[ 2021/03/07 18:26:36 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\License.txt
+[ 2021/03/07 18:26:36 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\Readme.tpl
+[ 2021/03/07 18:26:36 ] Document created successfuly.
+[ 2021/03/07 18:26:36 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\Readme.txt
+[ 2021/03/07 18:26:36 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 19:12:49 ] DATE:                        2021/03/07 19:12:49
+[ 2021/03/07 19:12:49 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3597
+[ 2021/03/07 19:12:49 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 19:12:49 ] COMPILED:                    YES
+[ 2021/03/07 19:12:49 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 19:12:49 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 19:12:49 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 19:12:49 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 19:12:49 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/07 19:12:54 ] Generating Documentation for ReBar Framework
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:12:54 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates'
+[ 2021/03/07 19:12:54 ] 03 templates files found.
+[ 2021/03/07 19:12:54 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\Changes.tpl
+[ 2021/03/07 19:12:54 ] Document created successfuly.
+[ 2021/03/07 19:12:55 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\Changes.txt
+[ 2021/03/07 19:12:55 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\License.tpl
+[ 2021/03/07 19:12:55 ] Document created successfuly.
+[ 2021/03/07 19:12:55 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\License.txt
+[ 2021/03/07 19:12:55 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\Readme.tpl
+[ 2021/03/07 19:12:55 ] Document created successfuly.
+[ 2021/03/07 19:12:55 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\Readme.txt
+[ 2021/03/07 19:12:55 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:13:12 ] Generating Documentation for ReBar Framework
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:13:12 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates'
+[ 2021/03/07 19:13:12 ] 03 templates files found.
+[ 2021/03/07 19:13:12 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\Changes.tpl
+[ 2021/03/07 19:13:12 ] Document created successfuly.
+[ 2021/03/07 19:13:12 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\Changes.txt
+[ 2021/03/07 19:13:12 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\License.tpl
+[ 2021/03/07 19:13:12 ] Document created successfuly.
+[ 2021/03/07 19:13:12 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\License.txt
+[ 2021/03/07 19:13:12 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Templates\Readme.tpl
+[ 2021/03/07 19:13:12 ] Document created successfuly.
+[ 2021/03/07 19:13:12 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ReBar\Readme.txt
+[ 2021/03/07 19:13:12 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:14:08 ] Distributing ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.exe Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar_X64.exe Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.ini Distribution Created.
+[ 2021/03/07 19:14:08 ] Error: The Source File does not exist!
+[ 2021/03/07 19:14:08 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\\Docs\Changes.txt'
+[ 2021/03/07 19:14:08 ] Error: The Source File does not exist!
+[ 2021/03/07 19:14:08 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\\Docs\License.txt'
+[ 2021/03/07 19:14:08 ] Error: The Source File does not exist!
+[ 2021/03/07 19:14:08 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\\Docs\Readme.txt'
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Language\ReBar\en.ini Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\16\Process.ani Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Stroke.ani Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Complete.wav Distribution Created.
+[ 2021/03/07 19:14:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Welcome.wav Distribution Created.
+[ 2021/03/07 19:14:09 ] Error: Finished with (03) errors!
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:15:07 ] Distributing ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:15:07 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.exe Distribution Created.
+[ 2021/03/07 19:15:07 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar_X64.exe Distribution Created.
+[ 2021/03/07 19:15:07 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.ini Distribution Created.
+[ 2021/03/07 19:15:07 ] Error: The Source File does not exist!
+[ 2021/03/07 19:15:07 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\Changes.txt'
+[ 2021/03/07 19:15:07 ] Error: The Source File does not exist!
+[ 2021/03/07 19:15:07 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\License.txt'
+[ 2021/03/07 19:15:07 ] Error: The Source File does not exist!
+[ 2021/03/07 19:15:07 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\Readme.txt'
+[ 2021/03/07 19:15:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Language\ReBar\en.ini Distribution Created.
+[ 2021/03/07 19:15:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\16\Process.ani Distribution Created.
+[ 2021/03/07 19:15:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/07 19:15:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Stroke.ani Distribution Created.
+[ 2021/03/07 19:15:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/07 19:15:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Complete.wav Distribution Created.
+[ 2021/03/07 19:15:08 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Welcome.wav Distribution Created.
+[ 2021/03/07 19:15:09 ] Error: Finished with (03) errors!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 19:15:45 ] DATE:                        2021/03/07 19:15:45
+[ 2021/03/07 19:15:45 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3597
+[ 2021/03/07 19:15:45 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 19:15:45 ] COMPILED:                    YES
+[ 2021/03/07 19:15:45 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 19:15:45 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 19:15:45 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 19:15:45 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 19:15:45 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/07 19:15:51 ] Distributing ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.exe Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar_X64.exe Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.ini Distribution Created.
+[ 2021/03/07 19:15:51 ] Error: The Source File does not exist!
+[ 2021/03/07 19:15:51 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\Changes.txt'
+[ 2021/03/07 19:15:51 ] Error: The Source File does not exist!
+[ 2021/03/07 19:15:51 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\License.txt'
+[ 2021/03/07 19:15:51 ] Error: The Source File does not exist!
+[ 2021/03/07 19:15:51 ] ^ 'C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\Readme.txt'
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Language\ReBar\en.ini Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\16\Process.ani Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Stroke.ani Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Complete.wav Distribution Created.
+[ 2021/03/07 19:15:51 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Welcome.wav Distribution Created.
+[ 2021/03/07 19:15:52 ] Error: Finished with (03) errors!
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:17:29 ] Distributing ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.exe Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar_X64.exe Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.ini Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\Changes.txt Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\License.txt Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\Readme.txt Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Language\ReBar\en.ini Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\16\Process.ani Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Stroke.ani Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Complete.wav Distribution Created.
+[ 2021/03/07 19:17:29 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Welcome.wav Distribution Created.
+[ 2021/03/07 19:17:30 ] Finished: ReBar Framework Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:18:09 ] Creating Zip Package for ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:18:10 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/03/07 19:18:10 ] Scanning the drive:
+[ 2021/03/07 19:18:10 ] 10 folders, 13 files, 3606110 bytes (3522 KiB)
+[ 2021/03/07 19:18:10 ] Creating archive: ReBar_5522.zip
+[ 2021/03/07 19:18:10 ] Items to compress: 23
+[ 2021/03/07 19:18:10 ] Files read from disk: 13
+[ 2021/03/07 19:18:10 ] Archive size: 2670046 bytes (2608 KiB)
+[ 2021/03/07 19:18:10 ] Everything is Ok
+[ 2021/03/07 19:18:10 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:18:17 ] Creating installation for ReBar Framework
+------------------------------------------------------------------------------------------
+[ 2021/03/07 19:18:19 ] Inno Setup 6 Command-Line Compiler
+[ 2021/03/07 19:18:19 ] Copyright (C) 1997-2020 Jordan Russell. All rights reserved.
+[ 2021/03/07 19:18:20 ] Portions Copyright (C) 2000-2020 Martijn Laan. All rights reserved.
+[ 2021/03/07 19:18:20 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2021/03/07 19:18:20 ] https://www.innosetup.com
+[ 2021/03/07 19:18:20 ] Compiler engine version: Inno Setup 6.1.2
+[ 2021/03/07 19:18:20 ] Preprocessing
+[ 2021/03/07 19:18:20 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 21
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 22
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 23
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 24
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 25
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 26
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 27
+[ 2021/03/07 19:18:20 ] Parsing [Setup] section, line 28
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 29
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 30
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 31
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 32
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 33
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 34
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 35
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 36
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 37
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 38
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 39
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 40
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 41
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 42
+[ 2021/03/07 19:18:21 ] Parsing [Setup] section, line 43
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 44
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 45
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 46
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 47
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 48
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 49
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 50
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 51
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 52
+[ 2021/03/07 19:18:22 ] Parsing [Setup] section, line 53
+[ 2021/03/07 19:18:22 ] Reading file (LicenseFile)
+[ 2021/03/07 19:18:22 ] Error on line 34 in C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522_Setup.iss: Could not read "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\License.txt".
+[ 2021/03/07 19:18:22 ] Error: The system cannot find the file specified.
+[ 2021/03/07 19:18:22 ] Compile aborted.
+[ 2021/03/07 19:18:23 ] Error: Finished with (02) errors!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 20:02:17 ] DATE:                        2021/03/07 20:02:17
+[ 2021/03/07 20:02:17 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3598
+[ 2021/03/07 20:02:17 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 20:02:17 ] COMPILED:                    YES
+[ 2021/03/07 20:02:17 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 20:02:17 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 20:02:17 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 20:02:17 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 20:02:17 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/07 20:02:45 ] Creating installation for ReBar Framework
+------------------------------------------------------------------------------------------
+[ 2021/03/07 20:02:45 ] Inno Setup 6 Command-Line Compiler
+[ 2021/03/07 20:02:45 ] Copyright (C) 1997-2020 Jordan Russell. All rights reserved.
+[ 2021/03/07 20:02:45 ] Portions Copyright (C) 2000-2020 Martijn Laan. All rights reserved.
+[ 2021/03/07 20:02:45 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2021/03/07 20:02:45 ] https://www.innosetup.com
+[ 2021/03/07 20:02:45 ] Compiler engine version: Inno Setup 6.1.2
+[ 2021/03/07 20:02:45 ] Preprocessing
+[ 2021/03/07 20:02:45 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 21
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 22
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 23
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 24
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 25
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 26
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 27
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 28
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 29
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 30
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 31
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 32
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 33
+[ 2021/03/07 20:02:46 ] Parsing [Setup] section, line 34
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 35
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 36
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 37
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 38
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 39
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 40
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 41
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 42
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 43
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 44
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 45
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 46
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 47
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 48
+[ 2021/03/07 20:02:47 ] Parsing [Setup] section, line 49
+[ 2021/03/07 20:02:48 ] Parsing [Setup] section, line 50
+[ 2021/03/07 20:02:48 ] Parsing [Setup] section, line 51
+[ 2021/03/07 20:02:48 ] Parsing [Setup] section, line 52
+[ 2021/03/07 20:02:48 ] Parsing [Setup] section, line 53
+[ 2021/03/07 20:02:48 ] Reading file (LicenseFile)
+[ 2021/03/07 20:02:48 ] Error on line 34 in C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522_Setup.iss: Could not read "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\License.txt".
+[ 2021/03/07 20:02:48 ] Error: The system cannot find the file specified.
+[ 2021/03/07 20:02:48 ] Compile aborted.
+[ 2021/03/07 20:02:48 ] Error: Finished with (02) errors!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 20:07:45 ] DATE:                        2021/03/07 20:07:45
+[ 2021/03/07 20:07:45 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3599
+[ 2021/03/07 20:07:45 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 20:07:45 ] COMPILED:                    YES
+[ 2021/03/07 20:07:45 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 20:07:45 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 20:07:45 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 20:07:45 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 20:07:45 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/07 20:07:50 ] Distributing ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.exe Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar_X64.exe Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.ini Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\Changes.txt Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\License.txt Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\Readme.txt Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Language\ReBar\en.ini Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\16\Process.ani Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Stroke.ani Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Complete.wav Distribution Created.
+[ 2021/03/07 20:07:50 ] \Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Welcome.wav Distribution Created.
+[ 2021/03/07 20:07:51 ] Finished: ReBar Framework Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 20:08:04 ] Creating Zip Package for ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 20:08:04 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/03/07 20:08:04 ] Open archive: ReBar_5522.zip
+[ 2021/03/07 20:08:04 ] --
+[ 2021/03/07 20:08:04 ] Path = ReBar_5522.zip
+[ 2021/03/07 20:08:04 ] Type = zip
+[ 2021/03/07 20:08:04 ] Physical Size = 2670046
+[ 2021/03/07 20:08:04 ] Scanning the drive:
+[ 2021/03/07 20:08:04 ] 10 folders, 13 files, 3606110 bytes (3522 KiB)
+[ 2021/03/07 20:08:04 ] Updating archive: ReBar_5522.zip
+[ 2021/03/07 20:08:04 ] Items to compress: 23
+[ 2021/03/07 20:08:04 ] Files read from disk: 13
+[ 2021/03/07 20:08:05 ] Archive size: 2670046 bytes (2608 KiB)
+[ 2021/03/07 20:08:05 ] Everything is Ok
+[ 2021/03/07 20:08:05 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/03/07 20:08:09 ] Creating installation for ReBar Framework
+------------------------------------------------------------------------------------------
+[ 2021/03/07 20:08:09 ] Inno Setup 6 Command-Line Compiler
+[ 2021/03/07 20:08:09 ] Copyright (C) 1997-2020 Jordan Russell. All rights reserved.
+[ 2021/03/07 20:08:09 ] Portions Copyright (C) 2000-2020 Martijn Laan. All rights reserved.
+[ 2021/03/07 20:08:09 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2021/03/07 20:08:09 ] https://www.innosetup.com
+[ 2021/03/07 20:08:10 ] Compiler engine version: Inno Setup 6.1.2
+[ 2021/03/07 20:08:10 ] Preprocessing
+[ 2021/03/07 20:08:10 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 21
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 22
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 23
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 24
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 25
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 26
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 27
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 28
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 29
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 30
+[ 2021/03/07 20:08:10 ] Parsing [Setup] section, line 31
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 32
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 33
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 34
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 35
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 36
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 37
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 38
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 39
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 40
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 41
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 42
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 43
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 44
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 45
+[ 2021/03/07 20:08:11 ] Parsing [Setup] section, line 46
+[ 2021/03/07 20:08:12 ] Parsing [Setup] section, line 47
+[ 2021/03/07 20:08:12 ] Parsing [Setup] section, line 48
+[ 2021/03/07 20:08:12 ] Parsing [Setup] section, line 49
+[ 2021/03/07 20:08:12 ] Parsing [Setup] section, line 50
+[ 2021/03/07 20:08:12 ] Parsing [Setup] section, line 51
+[ 2021/03/07 20:08:12 ] Parsing [Setup] section, line 52
+[ 2021/03/07 20:08:12 ] Parsing [Setup] section, line 53
+[ 2021/03/07 20:08:12 ] Reading file (LicenseFile)
+[ 2021/03/07 20:08:12 ] Reading file (WizardImageFile)
+[ 2021/03/07 20:08:12 ] Reading file: C:\Program Files (x86)\Inno Setup 6\WizModernImage-IS.bmp
+[ 2021/03/07 20:08:12 ] Reading file (WizardSmallImageFile)
+[ 2021/03/07 20:08:12 ] Reading file: C:\Program Files (x86)\Inno Setup 6\WIZMODERNSMALLIMAGE.BMP
+[ 2021/03/07 20:08:12 ] Preparing Setup program executable
+[ 2021/03/07 20:08:12 ] Updating version info (SETUP.E32)
+[ 2021/03/07 20:08:13 ] Updating manifest (SETUP.E32)
+[ 2021/03/07 20:08:13 ] Determining language code pages
+[ 2021/03/07 20:08:13 ] Parsing [Languages] section, line 56
+[ 2021/03/07 20:08:13 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/03/07 20:08:13 ] Messages in script file
+[ 2021/03/07 20:08:13 ] Reading default messages from Default.isl
+[ 2021/03/07 20:08:13 ] Parsing [Languages] section, line 56
+[ 2021/03/07 20:08:13 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/03/07 20:08:13 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2021/03/07 20:08:13 ] Messages in script file
+[ 2021/03/07 20:08:13 ] Reading [Code] section
+[ 2021/03/07 20:08:13 ] Parsing [Tasks] section, line 74
+[ 2021/03/07 20:08:13 ] Parsing [Tasks] section, line 75
+[ 2021/03/07 20:08:13 ] Parsing [Tasks] section, line 76
+[ 2021/03/07 20:08:13 ] Parsing [Tasks] section, line 77
+[ 2021/03/07 20:08:14 ] Parsing [Tasks] section, line 78
+[ 2021/03/07 20:08:14 ] Parsing [Tasks] section, line 79
+[ 2021/03/07 20:08:14 ] Parsing [Icons] section, line 101
+[ 2021/03/07 20:08:14 ] Parsing [Icons] section, line 102
+[ 2021/03/07 20:08:14 ] Parsing [Icons] section, line 103
+[ 2021/03/07 20:08:14 ] Parsing [Icons] section, line 104
+[ 2021/03/07 20:08:14 ] Parsing [INI] section, line 107
+[ 2021/03/07 20:08:14 ] Parsing [INI] section, line 108
+[ 2021/03/07 20:08:14 ] Parsing [InstallDelete] section, line 114
+[ 2021/03/07 20:08:14 ] Parsing [InstallDelete] section, line 115
+[ 2021/03/07 20:08:14 ] Parsing [InstallDelete] section, line 116
+[ 2021/03/07 20:08:14 ] Parsing [InstallDelete] section, line 117
+[ 2021/03/07 20:08:14 ] Parsing [InstallDelete] section, line 118
+[ 2021/03/07 20:08:14 ] Parsing [UninstallDelete] section, line 121
+[ 2021/03/07 20:08:15 ] Parsing [UninstallDelete] section, line 122
+[ 2021/03/07 20:08:15 ] Parsing [Run] section, line 111
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 82
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 83
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 84
+[ 2021/03/07 20:08:15 ] Reading version info: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.ini
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 85
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 86
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 87
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 88
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 89
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 90
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 91
+[ 2021/03/07 20:08:15 ] Parsing [Files] section, line 92
+[ 2021/03/07 20:08:16 ] Parsing [Files] section, line 93
+[ 2021/03/07 20:08:16 ] Parsing [Files] section, line 94
+[ 2021/03/07 20:08:16 ] Parsing [Files] section, line 95
+[ 2021/03/07 20:08:16 ] Parsing [Files] section, line 96
+[ 2021/03/07 20:08:16 ] Compiling [Code] section
+[ 2021/03/07 20:08:16 ] Creating setup files
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar_X64.exe
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.exe
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\ReBar.ini
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\Changes.txt
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\License.txt
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Docs\ReBar\Readme.txt
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Language\ReBar\en.ini
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\16\Process.ani
+[ 2021/03/07 20:08:16 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\32\Stroke.ani
+[ 2021/03/07 20:08:17 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Stroke.ani
+[ 2021/03/07 20:08:17 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Processing\64\Globe.ani
+[ 2021/03/07 20:08:17 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Complete.wav
+[ 2021/03/07 20:08:17 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522\Sounds\Welcome.wav
+[ 2021/03/07 20:08:17 ] Compressing Setup program executable
+[ 2021/03/07 20:08:17 ] Updating version info (SETUP.EXE)
+[ 2021/03/07 20:08:17 ] Updating manifest (SETUP.EXE)
+[ 2021/03/07 20:08:17 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2021/03/07 20:08:17 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2021/03/07 20:08:17 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2021/03/07 20:08:17 ] Warning: Line 170, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2021/03/07 20:08:17 ] Successful compile (1,281 sec). Resulting Setup program filename is:
+[ 2021/03/07 20:08:17 ] C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\Distribution\5522\ReBar_5522_Setup.exe
+[ 2021/03/07 20:08:18 ] Finished: Created installation for ReBar Framework.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:14:49 ] DATE:                        2021/03/07 23:14:49
+[ 2021/03/07 23:14:49 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3600
+[ 2021/03/07 23:14:49 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:14:49 ] COMPILED:                    YES
+[ 2021/03/07 23:14:49 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:14:49 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:14:49 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:14:49 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:14:49 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:17:43 ] DATE:                        2021/03/07 23:17:43
+[ 2021/03/07 23:17:43 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3601
+[ 2021/03/07 23:17:43 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:17:43 ] COMPILED:                    YES
+[ 2021/03/07 23:17:43 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:17:43 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:17:43 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:17:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:17:43 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:21:40 ] DATE:                        2021/03/07 23:21:40
+[ 2021/03/07 23:21:40 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3603
+[ 2021/03/07 23:21:40 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:21:40 ] COMPILED:                    YES
+[ 2021/03/07 23:21:40 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:21:40 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:21:40 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:21:40 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:21:40 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:33:01 ] DATE:                        2021/03/07 23:33:01
+[ 2021/03/07 23:33:01 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3604
+[ 2021/03/07 23:33:01 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:33:01 ] COMPILED:                    YES
+[ 2021/03/07 23:33:01 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:33:01 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:33:01 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:33:01 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:33:01 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:34:10 ] DATE:                        2021/03/07 23:34:10
+[ 2021/03/07 23:34:10 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3605
+[ 2021/03/07 23:34:10 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:34:10 ] COMPILED:                    YES
+[ 2021/03/07 23:34:10 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:34:10 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:34:10 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:34:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:34:10 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:40:04 ] DATE:                        2021/03/07 23:40:04
+[ 2021/03/07 23:40:04 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3606
+[ 2021/03/07 23:40:04 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:40:04 ] COMPILED:                    YES
+[ 2021/03/07 23:40:04 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:40:04 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:40:04 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:40:04 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:40:04 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:40:37 ] DATE:                        2021/03/07 23:40:37
+[ 2021/03/07 23:40:37 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3607
+[ 2021/03/07 23:40:37 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:40:37 ] COMPILED:                    YES
+[ 2021/03/07 23:40:37 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:40:37 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:40:37 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:40:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:40:37 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:41:11 ] DATE:                        2021/03/07 23:41:11
+[ 2021/03/07 23:41:11 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3608
+[ 2021/03/07 23:41:11 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:41:11 ] COMPILED:                    YES
+[ 2021/03/07 23:41:11 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:41:11 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:41:11 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:41:11 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:41:11 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:41:41 ] DATE:                        2021/03/07 23:41:41
+[ 2021/03/07 23:41:41 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3609
+[ 2021/03/07 23:41:41 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:41:41 ] COMPILED:                    YES
+[ 2021/03/07 23:41:41 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:41:41 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:41:41 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:41:41 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:41:41 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:42:32 ] DATE:                        2021/03/07 23:42:32
+[ 2021/03/07 23:42:32 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3610
+[ 2021/03/07 23:42:32 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:42:32 ] COMPILED:                    YES
+[ 2021/03/07 23:42:32 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:42:32 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:42:32 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:42:32 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:42:32 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:46:19 ] DATE:                        2021/03/07 23:46:19
+[ 2021/03/07 23:46:19 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3610
+[ 2021/03/07 23:46:19 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:46:19 ] COMPILED:                    YES
+[ 2021/03/07 23:46:19 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:46:19 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:46:19 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:46:19 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:46:19 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:50:48 ] DATE:                        2021/03/07 23:50:48
+[ 2021/03/07 23:50:48 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3611
+[ 2021/03/07 23:50:48 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/07 23:50:48 ] COMPILED:                    YES
+[ 2021/03/07 23:50:48 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:50:48 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:50:48 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:50:48 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:50:48 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:55:28 ] DATE:                        2021/03/07 23:55:28
+[ 2021/03/07 23:55:28 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3611
+[ 2021/03/07 23:55:28 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Distro\Distro.au3]
+[ 2021/03/07 23:55:28 ] COMPILED:                    NO
+[ 2021/03/07 23:55:28 ] AUTOIT VERSION:              3.3.14.5
+[ 2021/03/07 23:55:28 ] AUTOIT 64-BIT VERSION:       YES
+[ 2021/03/07 23:55:28 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:55:28 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:55:28 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:55:28 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:55:28 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/07 23:57:46 ] DATE:                        2021/03/07 23:57:46
+[ 2021/03/07 23:57:46 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3611
+[ 2021/03/07 23:57:46 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Distro\Distro.au3]
+[ 2021/03/07 23:57:46 ] COMPILED:                    NO
+[ 2021/03/07 23:57:46 ] AUTOIT VERSION:              3.3.14.5
+[ 2021/03/07 23:57:46 ] AUTOIT 64-BIT VERSION:       YES
+[ 2021/03/07 23:57:46 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/07 23:57:46 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/07 23:57:46 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/07 23:57:46 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/07 23:57:46 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 00:05:08 ] DATE:                        2021/03/08 00:05:08
+[ 2021/03/08 00:05:08 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3612
+[ 2021/03/08 00:05:08 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 00:05:08 ] COMPILED:                    YES
+[ 2021/03/08 00:05:08 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 00:05:08 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 00:05:08 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 00:05:08 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 00:05:08 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 00:07:37 ] DATE:                        2021/03/08 00:07:37
+[ 2021/03/08 00:07:37 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3613
+[ 2021/03/08 00:07:37 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 00:07:37 ] COMPILED:                    YES
+[ 2021/03/08 00:07:37 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 00:07:37 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 00:07:37 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 00:07:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 00:07:37 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 00:11:50 ] DATE:                        2021/03/08 00:11:50
+[ 2021/03/08 00:11:50 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3615
+[ 2021/03/08 00:11:50 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 00:11:50 ] COMPILED:                    YES
+[ 2021/03/08 00:11:50 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 00:11:50 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 00:11:50 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 00:11:50 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 00:11:50 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/08 00:11:56 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:11:56 ] Error: Could not write to 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\ReBar.ru'
+[ 2021/03/08 00:11:56 ] Error: Could not open Setup update file.
+[ 2021/03/08 00:12:17 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:12:17 ] Error: Could not write to 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\ReBar.ru'
+[ 2021/03/08 00:12:17 ] Error: Could not open Setup update file.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 00:13:00 ] DATE:                        2021/03/08 00:13:00
+[ 2021/03/08 00:13:00 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3615
+[ 2021/03/08 00:13:00 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 00:13:00 ] COMPILED:                    YES
+[ 2021/03/08 00:13:00 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 00:13:00 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 00:13:00 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 00:13:00 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 00:13:00 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/08 00:13:04 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:13:04 ] Successfully created 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\ReBar.ru'
+[ 2021/03/08 00:13:04 ] Successfully created 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\ReBar.rus'
+[ 2021/03/08 00:13:05 ] Finished: 
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:13:47 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:13:47 ] Successfully created 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\ReBar.ru'
+[ 2021/03/08 00:13:47 ] Successfully created 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\ReBar.rus'
+[ 2021/03/08 00:13:47 ] Finished: 
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 00:21:06 ] DATE:                        2021/03/08 00:21:06
+[ 2021/03/08 00:21:06 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3616
+[ 2021/03/08 00:21:06 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 00:21:06 ] COMPILED:                    YES
+[ 2021/03/08 00:21:06 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 00:21:06 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 00:21:06 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 00:21:06 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 00:21:06 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+

@@ -6,6 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated: Korean translation.
+
+--------------------------------------------------
+Version 6.2.1.5208 (MARCH 05, 2021)
+--------------------------------------------------
+
 - Fixed: translations encoding (Unicode (UTF-16) LE BOM).
 - Updated: Russian translation.
 - Updated: Korean translation.

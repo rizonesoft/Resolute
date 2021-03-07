@@ -1,9 +1,9 @@
 ==================================================
-RIZONESOFT REBAR FRAMEWORK CHANGES
+%{:COMPANY:} %{:RELEASE:} CHANGES
 ==================================================
 
 --------------------------------------------------
-Version 5.0.2.1986 (2017 06, 2017)
+Version 6.0.2.5522 (MARCH 07, 2021)
 --------------------------------------------------
 
 - Cleaner optimized code.
@@ -27,7 +27,7 @@ Version 5.0.2.1986 (2017 06, 2017)
 - Added Afrikaans language file.
 - Alt+F4 now closes the program and not Esc. (Safer!)
 - New Global error count for the logging subsystem.
-- Moved Documents to Documents folder.
+- Moved Documents to Docs folder.
 - New Help (chm) file.
 - Now more customizable.
 - Minor cosmetic changes.

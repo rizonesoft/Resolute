@@ -12,9 +12,6 @@ Distribute = 1
 Portable = 1
 Installation = 1
 SignInstall = 0
-Sourcecode = 1
-GitHub = 1
-SourcePackage = 1
 UpdateFile = 1
 
 [Signing]
@@ -25,9 +22,9 @@ Website = https://www.rizonesoft.com
 File=%RootDir%\ReBar.exe
 File=%RootDir%\ReBar_X64.exe
 File=%SourceDir%\ReBar.ini
-File=%SourceDir%\Docs\Changes.txt
-File=%SourceDir%\Docs\License.txt
-File=%SourceDir%\Docs\Readme.txt
+File=%RootDir%\Docs\ReBar\Changes.txt
+File=%RootDir%\Docs\ReBar\License.txt
+File=%RootDir%\Docs\ReBar\Readme.txt
 File=%RootDir%\Language\ReBar\en.ini
 File=%RootDir%\Processing\16\Process.ani
 File=%RootDir%\Processing\32\Stroke.ani

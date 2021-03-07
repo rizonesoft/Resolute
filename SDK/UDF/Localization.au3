@@ -61,16 +61,11 @@ Func _Localization_Custom()
 	$g_aLangCustom[8]  = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.07", "Create Portable Package"))
 	$g_aLangCustom[9]  = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.08", "Create Installation"))
 	$g_aLangCustom[10] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.09", "Sign Installation"))
-	$g_aLangCustom[11] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.11", "Distribute Source Code"))
-	$g_aLangCustom[12] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.12", "Create Source Code Package"))
-	$g_aLangCustom[13] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.13", "Source Code to GitHub"))
-
-
-	$g_aLangCustom[14] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.14", "Create Update File"))
-	$g_aLangCustom[15] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Build", "Build"))
-	$g_aLangCustom[16] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Distribution", "Distribution"))
-	$g_aLangCustom[17] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Button.Process", "Process"))
-	$g_aLangCustom[18] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Tab.Logging", "Logging"))
+	$g_aLangCustom[11] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Commands.14", "Create Update File"))
+	$g_aLangCustom[12] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Build", "Build"))
+	$g_aLangCustom[13] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Distribution", "Distribution"))
+	$g_aLangCustom[14] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Button.Process", "Process"))
+	$g_aLangCustom[15] = _Localization_ReplaceVar(IniRead($g_sLanguageFile, "Custom", "Tab.Logging", "Logging"))
 
 
 EndFunc   ;==>_Localization_Custom

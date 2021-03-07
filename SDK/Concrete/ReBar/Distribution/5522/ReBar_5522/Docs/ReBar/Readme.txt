@@ -1,10 +1,10 @@
 ==================================================
-%{:RELEASE:}
+REBAR FRAMEWORK
 © RIZONESOFT. All rights reserved
 https://www.rizonesoft.com
 ==================================================
 Version: 6.0.2.5522
-Release Date: 07 %{:MONTH:}, 2021
+Release Date: 07 MARCH, 2021
 System Requirements: Windows XP, Vista, 2008, 7, 8, 8.1, 10 
 Disk Space: 0 MB
 ==================================================
