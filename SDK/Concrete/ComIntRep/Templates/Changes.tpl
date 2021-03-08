@@ -7,6 +7,8 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
 - Updated: Korean translation.
+- Fixed: Korean translation now included.
+- Fixed: License file variables.
 
 --------------------------------------------------
 Version 6.2.1.5208 (MARCH 05, 2021)

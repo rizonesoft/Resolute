@@ -31,13 +31,13 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=6.3.1.5106
+#AutoIt3Wrapper_Res_Fileversion=6.5.3.5111
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
 #AutoIt3Wrapper_Res_ProductVersion=5             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2020 Rizonesoft				;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=© 2021 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 ;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
@@ -437,7 +437,8 @@ Global $g_iMaxSysMemoryPerc 	= 80
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 	MsgBox($MB_SYSTEMMODAL + $MB_ICONINFORMATION, $g_aLangMessages[3], $g_aLangMessages[4], $g_iMsgBoxTimeOut)
-	Exit
+	Local $currPID = @AutoItPID
+	ProcessClose($currPID)
 EndIf
 
 
@@ -613,7 +614,7 @@ Func _StartCoreGui()
 	GUICtrlSetTip($g_hGuiIcon, $g_aLangAbout[1] & Chr(32) & _GetProgramVersion(0) & @CRLF & _
 			$g_aLangAbout[2] & Chr(32) & @AutoItVersion & @CRLF & _
 			$g_aLangAbout[3] & " © " & @YEAR & " " & $g_sCompanyName, _
-			$g_aLangAbout[0], $TIP_INFOICON, $TIP_BALLOON)
+			$g_aLangAbout[0], $TIP_INFOICON)
 	GUICtrlSetCursor($g_hGuiIcon, 0)
 	GUICtrlSetOnEvent($g_hGuiIcon, "_About_ShowDialog")
 	$g_AniUpdate = GUICtrlCreateIcon($g_sUpdateAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)

@@ -5836,3 +5836,247 @@
 [ 2021/03/08 00:21:06 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 00:31:38 ] DATE:                        2021/03/08 00:31:38
+[ 2021/03/08 00:31:38 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3616
+[ 2021/03/08 00:31:38 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 00:31:38 ] COMPILED:                    YES
+[ 2021/03/08 00:31:38 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 00:31:38 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 00:31:38 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 00:31:38 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 00:31:38 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/08 00:35:25 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:35:25 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 00:35:25 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 00:35:26 ] >Running AU3Check (3.3.14.5) from:C:\Program Files (x86)\AutoIt3 input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 2021/03/08 00:35:27 ] +> AU3Check ended. rc:0
+[ 2021/03/08 00:35:27 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUD70A.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 2021/03/08 00:35:28 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUD70A.tmp.exe. rc:0
+[ 2021/03/08 00:35:28 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:35:28 ] ...>Updating Program Version information.
+[ 2021/03/08 00:35:28 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 00:35:28 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:35:28 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:35:28 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 00:35:29 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:35:29 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin.exe
+[ 2021/03/08 00:35:29 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUD70A.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x64
+[ 2021/03/08 00:35:30 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUD70A.tmp.exe. rc:0
+[ 2021/03/08 00:35:30 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:35:31 ] ...>Updating Program Version information.
+[ 2021/03/08 00:35:31 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 00:35:31 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:35:31 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:35:31 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 00:35:31 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:35:31 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin_X64.exe
+[ 2021/03/08 00:35:32 ] -Updated the Source Version to: 6.3.3.5107
+[ 2021/03/08 00:35:32 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 00:35:33 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 00:43:40 ] DATE:                        2021/03/08 00:43:40
+[ 2021/03/08 00:43:40 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3616
+[ 2021/03/08 00:43:40 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 00:43:40 ] COMPILED:                    YES
+[ 2021/03/08 00:43:40 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 00:43:40 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 00:43:40 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 00:43:40 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 00:43:40 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/08 00:44:11 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:44:11 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 00:44:11 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 00:44:12 ] >Running AU3Check (3.3.14.5) from:C:\Program Files (x86)\AutoIt3 input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 2021/03/08 00:44:13 ] +> AU3Check ended. rc:0
+[ 2021/03/08 00:44:13 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDD9B.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 2021/03/08 00:44:14 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDD9B.tmp.exe. rc:0
+[ 2021/03/08 00:44:14 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:44:14 ] ...>Updating Program Version information.
+[ 2021/03/08 00:44:14 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 00:44:14 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:44:14 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:44:14 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 00:44:15 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:44:15 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin.exe
+[ 2021/03/08 00:44:15 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDD9B.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x64
+[ 2021/03/08 00:44:17 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDD9B.tmp.exe. rc:0
+[ 2021/03/08 00:44:17 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:44:17 ] ...>Updating Program Version information.
+[ 2021/03/08 00:44:17 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 00:44:17 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:44:17 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:44:17 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 00:44:17 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:44:17 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin_X64.exe
+[ 2021/03/08 00:44:18 ] -Updated the Source Version to: 6.3.3.5108
+[ 2021/03/08 00:44:18 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 00:44:19 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:44:22 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:44:22 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 00:44:22 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 00:44:23 ] >Running AU3Check (3.3.14.5) from:C:\Program Files (x86)\AutoIt3 input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 2021/03/08 00:44:24 ] +> AU3Check ended. rc:0
+[ 2021/03/08 00:44:24 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU806.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 2021/03/08 00:44:25 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU806.tmp.exe. rc:0
+[ 2021/03/08 00:44:25 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:44:25 ] ...>Updating Program Version information.
+[ 2021/03/08 00:44:25 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 00:44:25 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:44:25 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:44:25 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 00:44:26 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:44:26 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin.exe
+[ 2021/03/08 00:44:26 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU806.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x64
+[ 2021/03/08 00:44:27 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU806.tmp.exe. rc:0
+[ 2021/03/08 00:44:27 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:44:27 ] ...>Updating Program Version information.
+[ 2021/03/08 00:44:27 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 00:44:28 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:44:28 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:44:28 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 00:44:28 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:44:28 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin_X64.exe
+[ 2021/03/08 00:44:29 ] -Updated the Source Version to: 6.3.3.5109
+[ 2021/03/08 00:44:29 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 00:44:30 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:56:12 ] Building Complete Internet Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:56:12 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 00:56:12 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 00:56:13 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+[ 2021/03/08 00:56:14 ] +> AU3Check ended. rc:0
+[ 2021/03/08 00:56:14 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE036.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2
+[ 2021/03/08 00:56:16 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE036.tmp.exe. rc:0
+[ 2021/03/08 00:56:16 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:56:16 ] ...>Updating Program Version information.
+[ 2021/03/08 00:56:16 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 00:56:16 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:56:16 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:56:16 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 00:56:17 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:56:17 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep.exe
+[ 2021/03/08 00:56:17 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE036.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2 /x64
+[ 2021/03/08 00:56:18 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUE036.tmp.exe. rc:0
+[ 2021/03/08 00:56:18 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:56:18 ] ...>Updating Program Version information.
+[ 2021/03/08 00:56:18 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 00:56:19 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:56:19 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:56:19 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 00:56:19 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:56:19 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe
+[ 2021/03/08 00:56:20 ] -Updated the Source Version to: 6.2.3.5210
+[ 2021/03/08 00:56:20 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 00:56:21 ] Finished: Finished building Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:57:54 ] Building Complete Internet Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 00:57:54 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 00:57:54 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 00:57:55 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+[ 2021/03/08 00:57:55 ] +> AU3Check ended. rc:0
+[ 2021/03/08 00:57:56 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU6B89.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2
+[ 2021/03/08 00:57:57 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU6B89.tmp.exe. rc:0
+[ 2021/03/08 00:57:57 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:57:57 ] ...>Updating Program Version information.
+[ 2021/03/08 00:57:57 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 00:57:57 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:57:57 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:57:57 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 00:57:58 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:57:58 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep.exe
+[ 2021/03/08 00:57:58 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU6B89.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2 /x64
+[ 2021/03/08 00:58:00 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU6B89.tmp.exe. rc:0
+[ 2021/03/08 00:58:00 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 00:58:00 ] ...>Updating Program Version information.
+[ 2021/03/08 00:58:00 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 00:58:00 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 00:58:00 ] ...>Updating Program Manifest information.
+[ 2021/03/08 00:58:00 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 00:58:00 ] > Program Resource updating finished successfully.
+[ 2021/03/08 00:58:00 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe
+[ 2021/03/08 00:58:01 ] -Updated the Source Version to: 6.2.3.5211
+[ 2021/03/08 00:58:01 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 00:58:03 ] Finished: Finished building Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 02:31:06 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 02:31:06 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 02:31:06 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 02:31:07 ] >Running AU3Check (3.3.14.5) from:C:\Program Files (x86)\AutoIt3 input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 2021/03/08 02:31:07 ] +> AU3Check ended. rc:0
+[ 2021/03/08 02:31:07 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBF39.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 2021/03/08 02:31:09 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBF39.tmp.exe. rc:0
+[ 2021/03/08 02:31:09 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 02:31:09 ] ...>Updating Program Version information.
+[ 2021/03/08 02:31:09 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 02:31:09 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 02:31:09 ] ...>Updating Program Manifest information.
+[ 2021/03/08 02:31:09 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 02:31:10 ] > Program Resource updating finished successfully.
+[ 2021/03/08 02:31:10 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin.exe
+[ 2021/03/08 02:31:10 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBF39.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x64
+[ 2021/03/08 02:31:11 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBF39.tmp.exe. rc:0
+[ 2021/03/08 02:31:11 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 02:31:11 ] ...>Updating Program Version information.
+[ 2021/03/08 02:31:11 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 02:31:11 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 02:31:11 ] ...>Updating Program Manifest information.
+[ 2021/03/08 02:31:11 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 02:31:12 ] > Program Resource updating finished successfully.
+[ 2021/03/08 02:31:12 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin_X64.exe
+[ 2021/03/08 02:31:12 ] -Updated the Source Version to: 6.3.3.5111
+[ 2021/03/08 02:31:13 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 02:31:14 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 02:32:25 ] Building ReBar Framework...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 02:32:25 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 02:32:25 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 02:32:26 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3
+[ 2021/03/08 02:32:26 ] +> AU3Check ended. rc:0
+[ 2021/03/08 02:32:26 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUF3A2.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2
+[ 2021/03/08 02:32:28 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUF3A2.tmp.exe. rc:0
+[ 2021/03/08 02:32:28 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 02:32:28 ] ...>Updating Program Version information.
+[ 2021/03/08 02:32:28 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 02:32:28 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 02:32:28 ] ...>Updating Program Manifest information.
+[ 2021/03/08 02:32:28 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 02:32:29 ] > Program Resource updating finished successfully.
+[ 2021/03/08 02:32:29 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar.exe
+[ 2021/03/08 02:32:29 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUF3A2.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2 /x64
+[ 2021/03/08 02:32:30 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUF3A2.tmp.exe. rc:0
+[ 2021/03/08 02:32:30 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 02:32:30 ] ...>Updating Program Version information.
+[ 2021/03/08 02:32:30 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 02:32:30 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 02:32:30 ] ...>Updating Program Manifest information.
+[ 2021/03/08 02:32:30 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 02:32:31 ] > Program Resource updating finished successfully.
+[ 2021/03/08 02:32:31 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe
+[ 2021/03/08 02:32:32 ] -Updated the Source Version to: 8.0.2.5536
+[ 2021/03/08 02:32:32 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 02:32:34 ] Finished: Finished building ReBar Framework.
+------------------------------------------------------------------------------------------

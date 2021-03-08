@@ -6,6 +6,18 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed: Info Tip Display.
+- Fixed: Second instance of the program closes all other instances.
+
+Language Changes:
+- [Donate]: Label_Heading = %{Program.Name} has been serving you for over %d hours. Now, how about a small donation?
+- [Donate]: Label_Message = Click on the PayPal button below, choose an amount, and send us the donation. Your donation will be used to improve our software and keep everything free on Rizonesoft. A $20 donation will keep us going for at least a month.
+- [Donate]: Label_Donate = Would you consider a small gift of $10 to help us improve %{Program.Name} and keep the lights on?
+
+--------------------------------------------------
+Version 6.0.2.5522 (MARCH 07, 2021)
+--------------------------------------------------
+
 - Cleaner optimized code.
 - Main Window is now Resizable.
 - Removed unsupported Win10 AutoIt directive.

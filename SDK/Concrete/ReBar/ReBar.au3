@@ -30,11 +30,11 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=ReBar Framework						;~ Comment field
 #AutoIt3Wrapper_Res_Description=ReBar Framework			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=6.0.2.5523
+#AutoIt3Wrapper_Res_Fileversion=8.0.2.5536
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
-#AutoIt3Wrapper_Res_ProductVersion=6             				;~ Product Version
+#AutoIt3Wrapper_Res_ProductVersion=8             				;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057								;~ Resource Language code . Default 2057=English (United Kingdom)
 #AutoIt3Wrapper_Res_LegalCopyright=© 2021 Rizonesoft			;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=highestAvailable	;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
@@ -351,7 +351,7 @@ Global $g_iCheckForUpdates	= 4
 ;~ Donate Time
 Global $g_iUptimeMonitor	= 0
 Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 10800 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+Global $g_iDonateTimeSet	= 1000 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -417,9 +417,10 @@ OnAutoItExitRegister("_TerminateProgram")
 
 
 _Localization_Messages()   		;~ Load Message Language Strings
-If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
+If _Singleton(@ScriptName, 1) = 0 And $g_iSingleton = True Then
 	MsgBox($MB_SYSTEMMODAL + $MB_ICONINFORMATION, $g_aLangMessages[3], $g_aLangMessages[4], $g_iMsgBoxTimeOut)
-	Exit
+	Local $currPID = @AutoItPID
+	ProcessClose($currPID)
 EndIf
 
 

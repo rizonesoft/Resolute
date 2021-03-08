@@ -466,7 +466,8 @@ Global $g_GuiCreateSln
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 	MsgBox($MB_SYSTEMMODAL + $MB_ICONINFORMATION, $g_aLangMessages[3], $g_aLangMessages[4], $g_iMsgBoxTimeOut)
-	Exit
+	Local $currPID = @AutoItPID
+	ProcessClose($currPID)
 EndIf
 
 

@@ -85,9 +85,9 @@ Func _Localization_Donate()
 		Return
 	EndIf
 
-	$g_aLangDonate[0] = _Localization_Load("Donate", "Label_Heading", "%{Program.Name} has been serving you for over %d hours. Now, how about donating to our cause?")
-	$g_aLangDonate[1] = _Localization_Load("Donate", "Label_Message", "Click on the PayPal button below or go to PayPal.me/rizonesoft, enter in the amount, and send us the donation. Because it's PayPal, you know it's easier and more secure than carrying cash. Don’t have a PayPal account? No worries, it's quick and easy to sign up.")
-	$g_aLangDonate[2] = _Localization_Load("Donate", "Label_Donate", "Would you consider a small gift of $10 to help us keep the lights on and make quality free software?")
+	$g_aLangDonate[0] = _Localization_Load("Donate", "Label_Heading", "%{Program.Name} has been serving you for over %d hours. Now, how about a small donation?")
+	$g_aLangDonate[1] = _Localization_Load("Donate", "Label_Message", "Click on the PayPal button below, choose an amount, and send us the donation. Your donation will be used to improve our software and keep everything free on Rizonesoft. A $20 donation will keep us going for at least a month.")
+	$g_aLangDonate[2] = _Localization_Load("Donate", "Label_Donate", "Would you consider a small gift of $10 to help us improve %{Program.Name} and keep the lights on?")
 
 EndFunc
 

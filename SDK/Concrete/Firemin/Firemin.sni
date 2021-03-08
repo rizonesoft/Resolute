@@ -12,9 +12,6 @@ Distribute = 1
 Portable = 1
 Installation = 1
 SignInstall = 0
-Sourcecode = 1
-GitHub = 1
-SourcePackage = 1
 UpdateFile = 1
 
 [Signing]
@@ -25,9 +22,9 @@ Website = https://www.rizonesoft.com
 File=%RootDir%\Firemin.exe
 File=%RootDir%\Firemin_X64.exe
 File=%SourceDir%\Firemin.ini
-File=%SourceDir%\Docs\Changes.txt
-File=%SourceDir%\Docs\License.txt
-File=%SourceDir%\Docs\Readme.txt
+File=%RootDir%\Docs\Firemin\Changes.txt
+File=%RootDir%\Docs\Firemin\License.txt
+File=%RootDir%\Docs\Firemin\Readme.txt
 File=%RootDir%\Language\Firemin\af.ini
 File=%RootDir%\Language\Firemin\de.ini
 File=%RootDir%\Language\Firemin\el.ini
@@ -51,29 +48,11 @@ File=%RootDir%\Processing\32\Stroke.ani
 File=%RootDir%\Processing\64\Globe.ani
 
 [Sources]
-File=Docs\
-File=Language\Firemin\
-File=Templates\
-File=Themes\Processing\16\
-File=Themes\Processing\32\
-File=Themes\Processing\64\
-File=Themes\Sounds\
-File=Themes\Icons\
-File=Themes\Icons\About\
-File=Themes\Icons\Dialogs\
-File=Themes\Icons\Flags\
-File=Themes\Icons\logging\
-File=Themes\Icons\Menus\
-File=Themes\Icons\Power\
-File=UDF\
-UDF=UDF\Localization.au3
-File=.gitignore
-File=Readme.md
 
 [Links]
 CompanyURL=https://www.rizonesoft.com
-SupportURL=https://www.rizonesoft.com/support/
-ContactURL=https://www.rizonesoft.com/contact
+SupportURL=https://github.com/rizonesoft/Resolute/issues
+ContactURL=https://www.rizonesoft.com/#contact
 UpdateURL=https://www.rizonesoft.com/downloads/firemin/
 
 [Environment]
@@ -85,10 +64,10 @@ ShortName=Firemin
 Description=Firemin
 Type=N
 Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\Firemin.ico
-Version=6.3.1.5105
+Version=6.3.3.5110
 VersionMajor=6
-VersionMaintenance=1
-VersionBuild=5105
+VersionMaintenance=3
+VersionBuild=5110
 UseBeta=P
 UseX64=Y
 CompileBoth=Y
@@ -99,8 +78,8 @@ OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5105
-DistributionName=Firemin_5105
-FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5105\Firemin_5105
-DistroSourceName=Firemin_5105_Source
-DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5105\Firemin_5105_Source
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5110
+DistributionName=Firemin_5110
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5110\Firemin_5110
+DistroSourceName=Firemin_5110_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5110\Firemin_5110_Source
