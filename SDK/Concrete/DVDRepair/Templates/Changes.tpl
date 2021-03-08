@@ -7,6 +7,15 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
 - Updated: Korean translation.
+- Fixed: License file variables.
+- Fixed: Info Tip Display.
+- Fixed: Second instance of the program closes all other instances.
+- Fixed: translations encoding (Unicode (UTF-16) LE BOM).
+
+Language Changes:
+- [Donate]: Label_Heading = %{Program.Name} has been serving you for over %d hours. Now, how about a small donation?
+- [Donate]: Label_Message = Click on the PayPal button below, choose an amount, and send us the donation. Your donation will be used to improve our software and keep everything free on Rizonesoft. A $20 donation will keep us going for at least a month.
+- [Donate]: Label_Donate = Would you consider a small gift of $10 to help us improve %{Program.Name} and keep the lights on?
 
 --------------------------------------------------
 Version 2.3.0.1150 (FEBRUARY 28, 2021)

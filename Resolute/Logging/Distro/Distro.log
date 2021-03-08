@@ -6080,3 +6080,653 @@
 [ 2021/03/08 02:32:32 ] +> AutoIt3Wrapper Finished.
 [ 2021/03/08 02:32:34 ] Finished: Finished building ReBar Framework.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/08 23:10:33 ] DATE:                        2021/03/08 23:10:33
+[ 2021/03/08 23:10:33 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3616
+[ 2021/03/08 23:10:33 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/08 23:10:33 ] COMPILED:                    YES
+[ 2021/03/08 23:10:33 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/08 23:10:33 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/08 23:10:33 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/08 23:10:33 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/08 23:10:33 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/08 23:19:34 ] Building Complete Internet Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:19:35 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 23:19:35 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 23:19:35 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+[ 2021/03/08 23:19:36 ] +> AU3Check ended. rc:0
+[ 2021/03/08 23:19:36 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBA8E.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2
+[ 2021/03/08 23:19:38 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBA8E.tmp.exe. rc:0
+[ 2021/03/08 23:19:38 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:19:38 ] ...>Updating Program Version information.
+[ 2021/03/08 23:19:38 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:19:38 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:19:38 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:19:38 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:19:38 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:19:38 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep.exe
+[ 2021/03/08 23:19:38 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBA8E.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2 /x64
+[ 2021/03/08 23:19:40 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBA8E.tmp.exe. rc:0
+[ 2021/03/08 23:19:40 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:19:40 ] ...>Updating Program Version information.
+[ 2021/03/08 23:19:40 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:19:40 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:19:40 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:19:40 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:19:41 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:19:41 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe
+[ 2021/03/08 23:19:41 ] -Updated the Source Version to: 6.2.3.5214
+[ 2021/03/08 23:19:42 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 23:19:43 ] Finished: Finished building Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:25:58 ] Building Complete Internet Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:25:58 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 23:25:59 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 23:25:59 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+[ 2021/03/08 23:26:00 ] +> AU3Check ended. rc:0
+[ 2021/03/08 23:26:00 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU9621.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2
+[ 2021/03/08 23:26:02 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU9621.tmp.exe. rc:0
+[ 2021/03/08 23:26:02 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:26:02 ] ...>Updating Program Version information.
+[ 2021/03/08 23:26:02 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:26:02 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:26:02 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:26:02 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:26:02 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:26:02 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep.exe
+[ 2021/03/08 23:26:02 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU9621.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2 /x64
+[ 2021/03/08 23:26:04 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU9621.tmp.exe. rc:0
+[ 2021/03/08 23:26:04 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:26:04 ] ...>Updating Program Version information.
+[ 2021/03/08 23:26:04 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:26:04 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:26:04 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:26:04 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:26:05 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:26:05 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe
+[ 2021/03/08 23:26:05 ] -Updated the Source Version to: 6.5.3.5216
+[ 2021/03/08 23:26:06 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 23:26:07 ] Finished: Finished building Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:27:22 ] Building Complete Internet Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:27:22 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 23:27:22 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 23:27:23 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+[ 2021/03/08 23:27:24 ] +> AU3Check ended. rc:0
+[ 2021/03/08 23:27:24 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDE22.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2
+[ 2021/03/08 23:27:26 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDE22.tmp.exe. rc:0
+[ 2021/03/08 23:27:26 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:27:26 ] ...>Updating Program Version information.
+[ 2021/03/08 23:27:26 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:27:26 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:27:26 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:27:26 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:27:26 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:27:26 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep.exe
+[ 2021/03/08 23:27:26 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDE22.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2 /x64
+[ 2021/03/08 23:27:28 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUDE22.tmp.exe. rc:0
+[ 2021/03/08 23:27:28 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:27:28 ] ...>Updating Program Version information.
+[ 2021/03/08 23:27:28 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:27:28 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:27:28 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:27:28 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:27:29 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:27:29 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe
+[ 2021/03/08 23:27:29 ] -Updated the Source Version to: 8.5.3.5218
+[ 2021/03/08 23:27:30 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 23:27:31 ] Finished: Finished building Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:19 ] Building Complete Internet Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:19 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 23:39:19 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 23:39:20 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+[ 2021/03/08 23:39:21 ] +> AU3Check ended. rc:0
+[ 2021/03/08 23:39:21 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUCDFF.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2
+[ 2021/03/08 23:39:22 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUCDFF.tmp.exe. rc:0
+[ 2021/03/08 23:39:22 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:39:22 ] ...>Updating Program Version information.
+[ 2021/03/08 23:39:22 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:39:22 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:39:22 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:39:23 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:39:23 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:39:23 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep.exe
+[ 2021/03/08 23:39:23 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUCDFF.tmp.exe" /nopack /icon "..\..\Resources\Icons\ComIntRep.ico" /comp 2 /x64
+[ 2021/03/08 23:39:25 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUCDFF.tmp.exe. rc:0
+[ 2021/03/08 23:39:25 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:39:25 ] ...>Updating Program Version information.
+[ 2021/03/08 23:39:25 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:39:25 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:39:25 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:39:25 ] ...>Adding 112 Icon(s).
+[ 2021/03/08 23:39:25 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:39:25 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe
+[ 2021/03/08 23:39:26 ] -Updated the Source Version to: 8.1.3.5220
+[ 2021/03/08 23:39:26 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 23:39:28 ] Finished: Finished building Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:31 ] Building ReBar Framework...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:31 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 23:39:31 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 23:39:32 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3
+[ 2021/03/08 23:39:33 ] +> AU3Check ended. rc:0
+[ 2021/03/08 23:39:33 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUFC04.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2
+[ 2021/03/08 23:39:34 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUFC04.tmp.exe. rc:0
+[ 2021/03/08 23:39:34 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:39:34 ] ...>Updating Program Version information.
+[ 2021/03/08 23:39:34 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:39:34 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:39:34 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:39:34 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 23:39:35 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:39:35 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar.exe
+[ 2021/03/08 23:39:35 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUFC04.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2 /x64
+[ 2021/03/08 23:39:36 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUFC04.tmp.exe. rc:0
+[ 2021/03/08 23:39:36 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:39:36 ] ...>Updating Program Version information.
+[ 2021/03/08 23:39:36 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:39:37 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:39:37 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:39:37 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 23:39:37 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:39:37 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe
+[ 2021/03/08 23:39:38 ] -Updated the Source Version to: 8.1.2.5538
+[ 2021/03/08 23:39:38 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 23:39:39 ] Finished: Finished building ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:43 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:43 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 23:39:43 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 23:39:44 ] >Running AU3Check (3.3.14.5) from:C:\Program Files (x86)\AutoIt3 input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 2021/03/08 23:39:44 ] +> AU3Check ended. rc:0
+[ 2021/03/08 23:39:44 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU2A29.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 2021/03/08 23:39:46 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU2A29.tmp.exe. rc:0
+[ 2021/03/08 23:39:46 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:39:46 ] ...>Updating Program Version information.
+[ 2021/03/08 23:39:46 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 23:39:46 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:39:46 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:39:46 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 23:39:47 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:39:47 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin.exe
+[ 2021/03/08 23:39:47 ] >Running:(3.3.14.5):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU2A29.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x64
+[ 2021/03/08 23:39:48 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU2A29.tmp.exe. rc:0
+[ 2021/03/08 23:39:48 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:39:48 ] ...>Updating Program Version information.
+[ 2021/03/08 23:39:48 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2021/03/08 23:39:48 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:39:48 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:39:48 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 23:39:49 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:39:49 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin_X64.exe
+[ 2021/03/08 23:39:49 ] -Updated the Source Version to: 8.1.3.5114
+[ 2021/03/08 23:39:50 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 23:39:51 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:55 ] Building ReBar Framework...
+------------------------------------------------------------------------------------------
+[ 2021/03/08 23:39:55 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/08 23:39:55 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/08 23:39:55 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3
+[ 2021/03/08 23:39:56 ] +> AU3Check ended. rc:0
+[ 2021/03/08 23:39:56 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU58EA.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2
+[ 2021/03/08 23:39:58 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU58EA.tmp.exe. rc:0
+[ 2021/03/08 23:39:58 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:39:58 ] ...>Updating Program Version information.
+[ 2021/03/08 23:39:58 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:39:58 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:39:58 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:39:58 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 23:39:59 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:39:59 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar.exe
+[ 2021/03/08 23:39:59 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU58EA.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2 /x64
+[ 2021/03/08 23:40:00 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU58EA.tmp.exe. rc:0
+[ 2021/03/08 23:40:00 ] > Performing the Program Resource Update steps:
+[ 2021/03/08 23:40:00 ] ...>Updating Program Version information.
+[ 2021/03/08 23:40:00 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/08 23:40:00 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/08 23:40:00 ] ...>Updating Program Manifest information.
+[ 2021/03/08 23:40:00 ] ...>Adding 76 Icon(s).
+[ 2021/03/08 23:40:01 ] > Program Resource updating finished successfully.
+[ 2021/03/08 23:40:01 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe
+[ 2021/03/08 23:40:01 ] -Updated the Source Version to: 8.1.2.5539
+[ 2021/03/08 23:40:02 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/08 23:40:03 ] Finished: Finished building ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:43 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:43 ] Creating the 'Documents' directory.
+[ 2021/03/09 00:06:43 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2021/03/09 00:06:43 ] 03 templates files found.
+[ 2021/03/09 00:06:43 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2021/03/09 00:06:43 ] Document created successfuly.
+[ 2021/03/09 00:06:43 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 2021/03/09 00:06:43 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2021/03/09 00:06:43 ] Document created successfuly.
+[ 2021/03/09 00:06:43 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\Firemin\License.txt
+[ 2021/03/09 00:06:43 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2021/03/09 00:06:43 ] Document created successfuly.
+[ 2021/03/09 00:06:44 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 2021/03/09 00:06:44 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:52 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Firemin.exe Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Firemin_X64.exe Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Firemin.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Docs\Firemin\Changes.txt Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Docs\Firemin\License.txt Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Docs\Firemin\Readme.txt Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\af.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\de.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\el.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\en.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\es.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\fa.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\fr.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\hu.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\it.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\ja.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\ko.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\pl.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\pt.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\ru.ini Distribution Created.
+[ 2021/03/09 00:06:52 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\sl.ini Distribution Created.
+[ 2021/03/09 00:06:53 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\tr.ini Distribution Created.
+[ 2021/03/09 00:06:53 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2021/03/09 00:06:53 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2021/03/09 00:06:53 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/09 00:06:53 ] \Concrete\Firemin\Distribution\5113\Firemin_5113\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/09 00:06:54 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:56 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:56 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/03/09 00:06:56 ] Scanning the drive:
+[ 2021/03/09 00:06:56 ] 8 folders, 27 files, 4616550 bytes (4509 KiB)
+[ 2021/03/09 00:06:57 ] Creating archive: Firemin_5113.zip
+[ 2021/03/09 00:06:57 ] Items to compress: 35
+[ 2021/03/09 00:06:57 ] Files read from disk: 27
+[ 2021/03/09 00:06:57 ] Archive size: 2412664 bytes (2357 KiB)
+[ 2021/03/09 00:06:57 ] Everything is Ok
+[ 2021/03/09 00:06:57 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:59 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:06:59 ] Inno Setup 6 Command-Line Compiler
+[ 2021/03/09 00:06:59 ] Copyright (C) 1997-2020 Jordan Russell. All rights reserved.
+[ 2021/03/09 00:06:59 ] Portions Copyright (C) 2000-2020 Martijn Laan. All rights reserved.
+[ 2021/03/09 00:07:00 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2021/03/09 00:07:00 ] https://www.innosetup.com
+[ 2021/03/09 00:07:00 ] Compiler engine version: Inno Setup 6.1.2
+[ 2021/03/09 00:07:00 ] Preprocessing
+[ 2021/03/09 00:07:00 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 21
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 22
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 23
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 24
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 25
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 26
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 27
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 28
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 29
+[ 2021/03/09 00:07:00 ] Parsing [Setup] section, line 30
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 31
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 32
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 33
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 34
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 35
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 36
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 37
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 38
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 39
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 40
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 41
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 42
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 43
+[ 2021/03/09 00:07:01 ] Parsing [Setup] section, line 44
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 45
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 46
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 47
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 48
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 49
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 50
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 51
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 52
+[ 2021/03/09 00:07:02 ] Parsing [Setup] section, line 53
+[ 2021/03/09 00:07:02 ] Reading file (LicenseFile)
+[ 2021/03/09 00:07:02 ] Reading file (WizardImageFile)
+[ 2021/03/09 00:07:02 ] Reading file: C:\Program Files (x86)\Inno Setup 6\WizModernImage-IS.bmp
+[ 2021/03/09 00:07:02 ] Reading file (WizardSmallImageFile)
+[ 2021/03/09 00:07:02 ] Reading file: C:\Program Files (x86)\Inno Setup 6\WIZMODERNSMALLIMAGE.BMP
+[ 2021/03/09 00:07:03 ] Preparing Setup program executable
+[ 2021/03/09 00:07:03 ] Updating version info (SETUP.E32)
+[ 2021/03/09 00:07:03 ] Updating manifest (SETUP.E32)
+[ 2021/03/09 00:07:03 ] Determining language code pages
+[ 2021/03/09 00:07:03 ] Parsing [Languages] section, line 56
+[ 2021/03/09 00:07:03 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/03/09 00:07:03 ] Messages in script file
+[ 2021/03/09 00:07:03 ] Reading default messages from Default.isl
+[ 2021/03/09 00:07:03 ] Parsing [Languages] section, line 56
+[ 2021/03/09 00:07:03 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/03/09 00:07:03 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2021/03/09 00:07:03 ] Messages in script file
+[ 2021/03/09 00:07:03 ] Reading [Code] section
+[ 2021/03/09 00:07:04 ] Parsing [Tasks] section, line 74
+[ 2021/03/09 00:07:04 ] Parsing [Tasks] section, line 75
+[ 2021/03/09 00:07:04 ] Parsing [Tasks] section, line 76
+[ 2021/03/09 00:07:04 ] Parsing [Tasks] section, line 77
+[ 2021/03/09 00:07:04 ] Parsing [Tasks] section, line 78
+[ 2021/03/09 00:07:04 ] Parsing [Tasks] section, line 79
+[ 2021/03/09 00:07:04 ] Parsing [Icons] section, line 115
+[ 2021/03/09 00:07:04 ] Parsing [Icons] section, line 116
+[ 2021/03/09 00:07:04 ] Parsing [Icons] section, line 117
+[ 2021/03/09 00:07:04 ] Parsing [Icons] section, line 118
+[ 2021/03/09 00:07:04 ] Parsing [INI] section, line 121
+[ 2021/03/09 00:07:04 ] Parsing [INI] section, line 122
+[ 2021/03/09 00:07:04 ] Parsing [InstallDelete] section, line 128
+[ 2021/03/09 00:07:04 ] Parsing [InstallDelete] section, line 129
+[ 2021/03/09 00:07:05 ] Parsing [InstallDelete] section, line 130
+[ 2021/03/09 00:07:05 ] Parsing [InstallDelete] section, line 131
+[ 2021/03/09 00:07:05 ] Parsing [InstallDelete] section, line 132
+[ 2021/03/09 00:07:05 ] Parsing [UninstallDelete] section, line 135
+[ 2021/03/09 00:07:05 ] Parsing [UninstallDelete] section, line 136
+[ 2021/03/09 00:07:05 ] Parsing [Run] section, line 125
+[ 2021/03/09 00:07:05 ] Parsing [Files] section, line 82
+[ 2021/03/09 00:07:05 ] Parsing [Files] section, line 83
+[ 2021/03/09 00:07:05 ] Parsing [Files] section, line 84
+[ 2021/03/09 00:07:05 ] Reading version info: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Firemin.ini
+[ 2021/03/09 00:07:05 ] Parsing [Files] section, line 85
+[ 2021/03/09 00:07:05 ] Parsing [Files] section, line 86
+[ 2021/03/09 00:07:05 ] Parsing [Files] section, line 87
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 88
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 89
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 90
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 91
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 92
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 93
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 94
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 95
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 96
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 97
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 98
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 99
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 100
+[ 2021/03/09 00:07:06 ] Parsing [Files] section, line 101
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 102
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 103
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 104
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 105
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 106
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 107
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 108
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 109
+[ 2021/03/09 00:07:07 ] Parsing [Files] section, line 110
+[ 2021/03/09 00:07:07 ] Compiling [Code] section
+[ 2021/03/09 00:07:07 ] Creating setup files
+[ 2021/03/09 00:07:07 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Firemin_X64.exe
+[ 2021/03/09 00:07:07 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Firemin.exe
+[ 2021/03/09 00:07:07 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Firemin.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Docs\Firemin\Changes.txt
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Docs\Firemin\License.txt
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Docs\Firemin\Readme.txt
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\af.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\de.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\el.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\en.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\es.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\fa.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\fr.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\hu.ini
+[ 2021/03/09 00:07:08 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\it.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\ja.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\ko.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\pl.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\pt.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\pt-BR.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\ru.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\sl.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\tr.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\zh-CN.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Language\Firemin\zh-TW.ini
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Processing\32\Stroke.ani
+[ 2021/03/09 00:07:09 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113\Processing\64\Globe.ani
+[ 2021/03/09 00:07:09 ] Compressing Setup program executable
+[ 2021/03/09 00:07:10 ] Updating version info (SETUP.EXE)
+[ 2021/03/09 00:07:10 ] Updating manifest (SETUP.EXE)
+[ 2021/03/09 00:07:10 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2021/03/09 00:07:10 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2021/03/09 00:07:10 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2021/03/09 00:07:10 ] Warning: Line 184, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2021/03/09 00:07:10 ] Successful compile (1,484 sec). Resulting Setup program filename is:
+[ 2021/03/09 00:07:10 ] C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5113\Firemin_5113_Setup.exe
+[ 2021/03/09 00:07:10 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:34 ] Generating Documentation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:34 ] Creating the 'Documents' directory.
+[ 2021/03/09 00:08:34 ] Template directory found at: 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates'
+[ 2021/03/09 00:08:34 ] 03 templates files found.
+[ 2021/03/09 00:08:34 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Changes.tpl
+[ 2021/03/09 00:08:34 ] Document created successfuly.
+[ 2021/03/09 00:08:34 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ComIntRep\Changes.txt
+[ 2021/03/09 00:08:34 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\License.tpl
+[ 2021/03/09 00:08:34 ] Document created successfuly.
+[ 2021/03/09 00:08:34 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ComIntRep\License.txt
+[ 2021/03/09 00:08:34 ] Processing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Readme.tpl
+[ 2021/03/09 00:08:35 ] Document created successfuly.
+[ 2021/03/09 00:08:35 ] Document File: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Docs\ComIntRep\Readme.txt
+[ 2021/03/09 00:08:35 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:37 ] Distributing Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\ComIntRep.exe Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\ComIntRep_X64.exe Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\ComIntRep.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Docs\ComIntRep\Changes.txt Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Docs\ComIntRep\License.txt Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Docs\ComIntRep\Readme.txt Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\af.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\ar.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\de.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\el.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\en.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\es.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\fr.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\hu.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\it.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\ko.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\pt-BR.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\ru.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\sl.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\tr.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\zh-CN.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\zh-TW.ini Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\16\Process.ani Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\32\Stroke.ani Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\64\Stroke.ani Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\64\Globe.ani Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Sounds\Complete.wav Distribution Created.
+[ 2021/03/09 00:08:37 ] \Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Sounds\Welcome.wav Distribution Created.
+[ 2021/03/09 00:08:38 ] Finished: Complete Internet Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:41 ] Creating Zip Package for Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:41 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/03/09 00:08:41 ] Scanning the drive:
+[ 2021/03/09 00:08:41 ] 10 folders, 28 files, 6336285 bytes (6188 KiB)
+[ 2021/03/09 00:08:41 ] Creating archive: ComIntRep_5219.zip
+[ 2021/03/09 00:08:41 ] Items to compress: 38
+[ 2021/03/09 00:08:41 ] Files read from disk: 28
+[ 2021/03/09 00:08:42 ] Archive size: 3195319 bytes (3121 KiB)
+[ 2021/03/09 00:08:42 ] Everything is Ok
+[ 2021/03/09 00:08:42 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:44 ] Creating installation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:08:44 ] Inno Setup 6 Command-Line Compiler
+[ 2021/03/09 00:08:44 ] Copyright (C) 1997-2020 Jordan Russell. All rights reserved.
+[ 2021/03/09 00:08:44 ] Portions Copyright (C) 2000-2020 Martijn Laan. All rights reserved.
+[ 2021/03/09 00:08:44 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2021/03/09 00:08:44 ] https://www.innosetup.com
+[ 2021/03/09 00:08:44 ] Compiler engine version: Inno Setup 6.1.2
+[ 2021/03/09 00:08:44 ] Preprocessing
+[ 2021/03/09 00:08:45 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 21
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 22
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 23
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 24
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 25
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 26
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 27
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 28
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 29
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 30
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 31
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 32
+[ 2021/03/09 00:08:45 ] Parsing [Setup] section, line 33
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 34
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 35
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 36
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 37
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 38
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 39
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 40
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 41
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 42
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 43
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 44
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 45
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 46
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 47
+[ 2021/03/09 00:08:46 ] Parsing [Setup] section, line 48
+[ 2021/03/09 00:08:47 ] Parsing [Setup] section, line 49
+[ 2021/03/09 00:08:47 ] Parsing [Setup] section, line 50
+[ 2021/03/09 00:08:47 ] Parsing [Setup] section, line 51
+[ 2021/03/09 00:08:47 ] Parsing [Setup] section, line 52
+[ 2021/03/09 00:08:47 ] Parsing [Setup] section, line 53
+[ 2021/03/09 00:08:47 ] Reading file (LicenseFile)
+[ 2021/03/09 00:08:47 ] Reading file (WizardImageFile)
+[ 2021/03/09 00:08:47 ] Reading file: C:\Program Files (x86)\Inno Setup 6\WizModernImage-IS.bmp
+[ 2021/03/09 00:08:47 ] Reading file (WizardSmallImageFile)
+[ 2021/03/09 00:08:47 ] Reading file: C:\Program Files (x86)\Inno Setup 6\WIZMODERNSMALLIMAGE.BMP
+[ 2021/03/09 00:08:47 ] Preparing Setup program executable
+[ 2021/03/09 00:08:47 ] Updating version info (SETUP.E32)
+[ 2021/03/09 00:08:47 ] Updating manifest (SETUP.E32)
+[ 2021/03/09 00:08:48 ] Determining language code pages
+[ 2021/03/09 00:08:48 ] Parsing [Languages] section, line 56
+[ 2021/03/09 00:08:48 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/03/09 00:08:48 ] Messages in script file
+[ 2021/03/09 00:08:48 ] Reading default messages from Default.isl
+[ 2021/03/09 00:08:48 ] Parsing [Languages] section, line 56
+[ 2021/03/09 00:08:48 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/03/09 00:08:48 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2021/03/09 00:08:48 ] Messages in script file
+[ 2021/03/09 00:08:48 ] Reading [Code] section
+[ 2021/03/09 00:08:48 ] Parsing [Tasks] section, line 74
+[ 2021/03/09 00:08:48 ] Parsing [Tasks] section, line 75
+[ 2021/03/09 00:08:48 ] Parsing [Tasks] section, line 76
+[ 2021/03/09 00:08:49 ] Parsing [Tasks] section, line 77
+[ 2021/03/09 00:08:49 ] Parsing [Tasks] section, line 78
+[ 2021/03/09 00:08:49 ] Parsing [Tasks] section, line 79
+[ 2021/03/09 00:08:49 ] Parsing [Icons] section, line 116
+[ 2021/03/09 00:08:49 ] Parsing [Icons] section, line 117
+[ 2021/03/09 00:08:49 ] Parsing [Icons] section, line 118
+[ 2021/03/09 00:08:49 ] Parsing [Icons] section, line 119
+[ 2021/03/09 00:08:49 ] Parsing [INI] section, line 122
+[ 2021/03/09 00:08:49 ] Parsing [INI] section, line 123
+[ 2021/03/09 00:08:49 ] Parsing [InstallDelete] section, line 129
+[ 2021/03/09 00:08:49 ] Parsing [InstallDelete] section, line 130
+[ 2021/03/09 00:08:49 ] Parsing [InstallDelete] section, line 131
+[ 2021/03/09 00:08:49 ] Parsing [InstallDelete] section, line 132
+[ 2021/03/09 00:08:49 ] Parsing [InstallDelete] section, line 133
+[ 2021/03/09 00:08:50 ] Parsing [UninstallDelete] section, line 136
+[ 2021/03/09 00:08:50 ] Parsing [UninstallDelete] section, line 137
+[ 2021/03/09 00:08:50 ] Parsing [Run] section, line 126
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 82
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 83
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 84
+[ 2021/03/09 00:08:50 ] Reading version info: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\ComIntRep.ini
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 85
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 86
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 87
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 88
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 89
+[ 2021/03/09 00:08:50 ] Parsing [Files] section, line 90
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 91
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 92
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 93
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 94
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 95
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 96
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 97
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 98
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 99
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 100
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 101
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 102
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 103
+[ 2021/03/09 00:08:51 ] Parsing [Files] section, line 104
+[ 2021/03/09 00:08:52 ] Parsing [Files] section, line 105
+[ 2021/03/09 00:08:52 ] Parsing [Files] section, line 106
+[ 2021/03/09 00:08:52 ] Parsing [Files] section, line 107
+[ 2021/03/09 00:08:52 ] Parsing [Files] section, line 108
+[ 2021/03/09 00:08:52 ] Parsing [Files] section, line 109
+[ 2021/03/09 00:08:52 ] Parsing [Files] section, line 110
+[ 2021/03/09 00:08:52 ] Parsing [Files] section, line 111
+[ 2021/03/09 00:08:52 ] Compiling [Code] section
+[ 2021/03/09 00:08:52 ] Creating setup files
+[ 2021/03/09 00:08:52 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\ComIntRep_X64.exe
+[ 2021/03/09 00:08:52 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\ComIntRep.exe
+[ 2021/03/09 00:08:52 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\ComIntRep.ini
+[ 2021/03/09 00:08:52 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Docs\ComIntRep\Changes.txt
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Docs\ComIntRep\License.txt
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Docs\ComIntRep\Readme.txt
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\af.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\ar.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\de.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\el.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\en.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\es.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\fr.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\hu.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\it.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\ko.ini
+[ 2021/03/09 00:08:53 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\pt-BR.ini
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\ru.ini
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\sl.ini
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\tr.ini
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\zh-CN.ini
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Language\ComIntRep\zh-TW.ini
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\16\Process.ani
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\32\Stroke.ani
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\64\Stroke.ani
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Processing\64\Globe.ani
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Sounds\Complete.wav
+[ 2021/03/09 00:08:54 ] Compressing: C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219\Sounds\Welcome.wav
+[ 2021/03/09 00:08:54 ] Compressing Setup program executable
+[ 2021/03/09 00:08:55 ] Updating version info (SETUP.EXE)
+[ 2021/03/09 00:08:55 ] Updating manifest (SETUP.EXE)
+[ 2021/03/09 00:08:55 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2021/03/09 00:08:55 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2021/03/09 00:08:55 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2021/03/09 00:08:55 ] Warning: Line 185, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2021/03/09 00:08:55 ] Successful compile (1,766 sec). Resulting Setup program filename is:
+[ 2021/03/09 00:08:55 ] C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219_Setup.exe
+[ 2021/03/09 00:08:55 ] Finished: Created installation for Complete Internet Repair.
+------------------------------------------------------------------------------------------
