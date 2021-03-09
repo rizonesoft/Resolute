@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=DVD Drive Repair						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft DVD Drive Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.0.1151
+#AutoIt3Wrapper_Res_Fileversion=8.1.3.1156
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -259,7 +259,7 @@ EndFunc   ;==>_ReBarStartUp
 #include "..\..\Includes\Update.au3"
 #include "..\..\Includes\Versioning.au3"
 
-#include "UDF\Localization.au3"
+#include "Includes\Localization.au3"
 
 
 ;~ Developer Constants
@@ -364,7 +364,7 @@ Global $g_iCheckForUpdates	= 4
 ;~ Donate Time
 Global $g_iUptimeMonitor	= 0
 Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 259200 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+Global $g_iDonateTimeSet	= 86400 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -437,7 +437,8 @@ OnAutoItExitRegister("_TerminateProgram")
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 	MsgBox($MB_SYSTEMMODAL + $MB_ICONINFORMATION, $g_aLangMessages[3], $g_aLangMessages[4], $g_iMsgBoxTimeOut)
-	Exit
+	Local $currPID = @AutoItPID
+	ProcessClose($currPID)
 EndIf
 
 
@@ -582,7 +583,7 @@ Func _StartCoreGui()
 	GUICtrlSetTip($g_hGuiIcon, $g_aLangAbout[1] & Chr(32) & _GetProgramVersion(0) & @CRLF & _
 			$g_aLangAbout[2] & Chr(32) & @AutoItVersion & @CRLF & _
 			$g_aLangAbout[3] & " © " & @YEAR & " " & $g_sCompanyName, _
-			$g_aLangAbout[0], $TIP_INFOICON, $TIP_BALLOON)
+			$g_aLangAbout[0], $TIP_INFOICON)
 	GUICtrlSetCursor($g_hGuiIcon, 0)
 	GUICtrlSetOnEvent($g_hGuiIcon, "_About_ShowDialog")
 	$g_AniUpdate = GUICtrlCreateIcon($g_sUpdateAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)

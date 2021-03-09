@@ -6730,3 +6730,349 @@
 [ 2021/03/09 00:08:55 ] C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219_Setup.exe
 [ 2021/03/09 00:08:55 ] Finished: Created installation for Complete Internet Repair.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 00:17:53 ] DATE:                        2021/03/09 00:17:53
+[ 2021/03/09 00:17:53 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3616
+[ 2021/03/09 00:17:53 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 00:17:53 ] COMPILED:                    YES
+[ 2021/03/09 00:17:53 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 00:17:53 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 00:17:53 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 00:17:53 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 00:17:53 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/09 00:18:03 ] Building DVD Drive Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:18:03 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/09 00:18:03 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/09 00:18:03 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
+[ 2021/03/09 00:18:04 ] +> AU3Check ended. rc:0
+[ 2021/03/09 00:18:04 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU423B.tmp.exe" /nopack /icon "..\..\Resources\Icons\DVDRepair.ico" /comp 2
+[ 2021/03/09 00:18:06 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU423B.tmp.exe. rc:0
+[ 2021/03/09 00:18:06 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:18:06 ] ...>Updating Program Version information.
+[ 2021/03/09 00:18:06 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:18:06 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:18:06 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:18:06 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:18:07 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:18:07 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair.exe
+[ 2021/03/09 00:18:07 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU423B.tmp.exe" /nopack /icon "..\..\Resources\Icons\DVDRepair.ico" /comp 2 /x64
+[ 2021/03/09 00:18:08 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU423B.tmp.exe. rc:0
+[ 2021/03/09 00:18:08 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:18:08 ] ...>Updating Program Version information.
+[ 2021/03/09 00:18:08 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:18:08 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:18:08 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:18:08 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:18:09 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:18:09 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair_X64.exe
+[ 2021/03/09 00:18:09 ] -Updated the Source Version to: 8.1.3.1155
+[ 2021/03/09 00:18:10 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/09 00:18:11 ] Finished: Finished building DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:19:34 ] Building DVD Drive Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:19:35 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/09 00:19:35 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/09 00:19:35 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
+[ 2021/03/09 00:19:36 ] +> AU3Check ended. rc:0
+[ 2021/03/09 00:19:36 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUA8D0.tmp.exe" /nopack /icon "..\..\Resources\Icons\DVDRepair.ico" /comp 2
+[ 2021/03/09 00:19:38 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUA8D0.tmp.exe. rc:0
+[ 2021/03/09 00:19:38 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:19:38 ] ...>Updating Program Version information.
+[ 2021/03/09 00:19:38 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:19:38 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:19:38 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:19:38 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:19:38 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:19:38 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair.exe
+[ 2021/03/09 00:19:38 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUA8D0.tmp.exe" /nopack /icon "..\..\Resources\Icons\DVDRepair.ico" /comp 2 /x64
+[ 2021/03/09 00:19:40 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUA8D0.tmp.exe. rc:0
+[ 2021/03/09 00:19:40 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:19:40 ] ...>Updating Program Version information.
+[ 2021/03/09 00:19:40 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:19:40 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:19:40 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:19:40 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:19:41 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:19:41 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair_X64.exe
+[ 2021/03/09 00:19:41 ] -Updated the Source Version to: 8.1.3.1156
+[ 2021/03/09 00:19:42 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/09 00:19:43 ] Finished: Finished building DVD Drive Repair.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 00:34:48 ] DATE:                        2021/03/09 00:34:48
+[ 2021/03/09 00:34:48 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3616
+[ 2021/03/09 00:34:48 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 00:34:48 ] COMPILED:                    YES
+[ 2021/03/09 00:34:48 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 00:34:48 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 00:34:48 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 00:34:48 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 00:34:48 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/09 00:34:59 ] Building USB Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:35:00 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/09 00:35:00 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/09 00:35:00 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
+[ 2021/03/09 00:35:01 ] +> AU3Check ended. rc:0
+[ 2021/03/09 00:35:01 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUC6A4.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2
+[ 2021/03/09 00:35:03 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUC6A4.tmp.exe. rc:0
+[ 2021/03/09 00:35:03 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:03 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:03 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:03 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:03 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:03 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:03 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:04 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe
+[ 2021/03/09 00:35:04 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUC6A4.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2 /x64
+[ 2021/03/09 00:35:05 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUC6A4.tmp.exe. rc:0
+[ 2021/03/09 00:35:05 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:05 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:05 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:05 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:05 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:05 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:06 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:06 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe
+[ 2021/03/09 00:35:06 ] -Updated the Source Version to: 8.0.1.1048
+[ 2021/03/09 00:35:07 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/09 00:35:08 ] Finished: Finished building USB Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:35:15 ] Building USB Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:35:15 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/09 00:35:15 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/09 00:35:16 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
+[ 2021/03/09 00:35:16 ] +> AU3Check ended. rc:0
+[ 2021/03/09 00:35:16 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU1F8.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2
+[ 2021/03/09 00:35:18 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU1F8.tmp.exe. rc:0
+[ 2021/03/09 00:35:18 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:18 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:18 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:18 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:18 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:18 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:19 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:19 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe
+[ 2021/03/09 00:35:19 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU1F8.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2 /x64
+[ 2021/03/09 00:35:20 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU1F8.tmp.exe. rc:0
+[ 2021/03/09 00:35:20 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:20 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:20 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:20 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:20 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:20 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:21 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:21 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe
+[ 2021/03/09 00:35:21 ] -Updated the Source Version to: 8.0.1.1049
+[ 2021/03/09 00:35:22 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/09 00:35:24 ] Finished: Finished building USB Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:35:34 ] Building USB Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:35:35 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/09 00:35:35 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/09 00:35:35 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
+[ 2021/03/09 00:35:36 ] +> AU3Check ended. rc:0
+[ 2021/03/09 00:35:36 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU4F5C.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2
+[ 2021/03/09 00:35:38 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU4F5C.tmp.exe. rc:0
+[ 2021/03/09 00:35:38 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:38 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:38 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:38 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:38 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:38 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:38 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:38 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe
+[ 2021/03/09 00:35:38 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU4F5C.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2 /x64
+[ 2021/03/09 00:35:40 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU4F5C.tmp.exe. rc:0
+[ 2021/03/09 00:35:40 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:40 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:40 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:40 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:40 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:40 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:41 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:41 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe
+[ 2021/03/09 00:35:41 ] -Updated the Source Version to: 8.0.1.1050
+[ 2021/03/09 00:35:42 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/09 00:35:43 ] Finished: Finished building USB Repair.
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:35:46 ] Building USB Repair...
+------------------------------------------------------------------------------------------
+[ 2021/03/09 00:35:46 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/09 00:35:46 ] from:Distro_X64.exe (8.0.2.3616) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/09 00:35:46 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
+[ 2021/03/09 00:35:47 ] +> AU3Check ended. rc:0
+[ 2021/03/09 00:35:47 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU7AA2.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2
+[ 2021/03/09 00:35:49 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU7AA2.tmp.exe. rc:0
+[ 2021/03/09 00:35:49 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:49 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:49 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:49 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:49 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:49 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:50 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:50 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe
+[ 2021/03/09 00:35:50 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU7AA2.tmp.exe" /nopack /icon "..\..\Resources\Icons\USBRepair.ico" /comp 2 /x64
+[ 2021/03/09 00:35:51 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AU7AA2.tmp.exe. rc:0
+[ 2021/03/09 00:35:51 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 00:35:51 ] ...>Updating Program Version information.
+[ 2021/03/09 00:35:51 ] ...>Setting Program ExecutionLevel Manifest information to requireAdministrator
+[ 2021/03/09 00:35:51 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 00:35:51 ] ...>Updating Program Manifest information.
+[ 2021/03/09 00:35:51 ] ...>Adding 80 Icon(s).
+[ 2021/03/09 00:35:52 ] > Program Resource updating finished successfully.
+[ 2021/03/09 00:35:52 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe
+[ 2021/03/09 00:35:52 ] -Updated the Source Version to: 8.0.1.1051
+[ 2021/03/09 00:35:53 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/09 00:35:55 ] Finished: Finished building USB Repair.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 01:10:45 ] DATE:                        2021/03/09 01:10:45
+[ 2021/03/09 01:10:45 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3616
+[ 2021/03/09 01:10:45 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 01:10:45 ] COMPILED:                    YES
+[ 2021/03/09 01:10:45 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 01:10:45 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 01:10:45 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 01:10:45 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 01:10:45 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 01:19:07 ] DATE:                        2021/03/09 01:19:07
+[ 2021/03/09 01:19:07 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3617
+[ 2021/03/09 01:19:07 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 01:19:07 ] COMPILED:                    YES
+[ 2021/03/09 01:19:07 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 01:19:07 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 01:19:07 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 01:19:07 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 01:19:07 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 01:19:39 ] DATE:                        2021/03/09 01:19:39
+[ 2021/03/09 01:19:39 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3617
+[ 2021/03/09 01:19:39 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 01:19:39 ] COMPILED:                    YES
+[ 2021/03/09 01:19:39 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 01:19:39 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 01:19:39 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 01:19:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 01:19:39 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 01:20:56 ] DATE:                        2021/03/09 01:20:56
+[ 2021/03/09 01:20:56 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3618
+[ 2021/03/09 01:20:56 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 01:20:56 ] COMPILED:                    YES
+[ 2021/03/09 01:20:56 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 01:20:56 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 01:20:56 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 01:20:56 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 01:20:56 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 01:38:58 ] DATE:                        2021/03/09 01:38:58
+[ 2021/03/09 01:38:58 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3620
+[ 2021/03/09 01:38:58 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 01:38:58 ] COMPILED:                    YES
+[ 2021/03/09 01:38:58 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 01:38:58 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 01:38:58 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 01:38:58 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 01:38:58 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 01:56:40 ] DATE:                        2021/03/09 01:56:40
+[ 2021/03/09 01:56:40 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3622
+[ 2021/03/09 01:56:40 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/09 01:56:40 ] COMPILED:                    YES
+[ 2021/03/09 01:56:40 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 01:56:40 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 01:56:40 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 01:56:40 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 01:56:40 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/09 01:56:52 ] Building ReBar Framework...
+------------------------------------------------------------------------------------------
+[ 2021/03/09 01:56:52 ] +> Starting AutoIt3Wrapper (19.1127.1402.0}
+[ 2021/03/09 01:56:52 ] from:Distro_X64.exe (8.0.2.3622) Keyboard:00000409 OS:WIN_10/ CPU:X64 OS:X64 Environment(Language:0409)
+[ 2021/03/09 01:56:53 ] >Running AU3Check (3.3.15.3) from:C:\Program Files (x86)\AutoIt3\Beta input:C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3
+[ 2021/03/09 01:56:53 ] +> AU3Check ended. rc:0
+[ 2021/03/09 01:56:53 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBAA1.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2
+[ 2021/03/09 01:56:55 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBAA1.tmp.exe. rc:0
+[ 2021/03/09 01:56:55 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 01:56:55 ] ...>Updating Program Version information.
+[ 2021/03/09 01:56:55 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/09 01:56:55 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 01:56:55 ] ...>Updating Program Manifest information.
+[ 2021/03/09 01:56:55 ] ...>Adding 76 Icon(s).
+[ 2021/03/09 01:56:56 ] > Program Resource updating finished successfully.
+[ 2021/03/09 01:56:56 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar.exe
+[ 2021/03/09 01:56:56 ] >Running:(3.3.15.3):C:\Program Files (x86)\AutoIt3\Beta\aut2exe\aut2exe.exe /in "C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ReBar\ReBar.au3" /out "C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBAA1.tmp.exe" /nopack /icon "..\..\Resources\Icons\ReBar.ico" /comp 2 /x64
+[ 2021/03/09 01:56:57 ] +> Aut2exe.exe ended. C:\Users\Venom\AppData\Local\AutoIt v3\Aut2exe\~AUBAA1.tmp.exe. rc:0
+[ 2021/03/09 01:56:57 ] > Performing the Program Resource Update steps:
+[ 2021/03/09 01:56:57 ] ...>Updating Program Version information.
+[ 2021/03/09 01:56:57 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2021/03/09 01:56:57 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2021/03/09 01:56:57 ] ...>Updating Program Manifest information.
+[ 2021/03/09 01:56:57 ] ...>Adding 76 Icon(s).
+[ 2021/03/09 01:56:58 ] > Program Resource updating finished successfully.
+[ 2021/03/09 01:56:58 ] +> Created program: C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe
+[ 2021/03/09 01:56:58 ] -Updated the Source Version to: 8.1.2.5543
+[ 2021/03/09 01:56:59 ] +> AutoIt3Wrapper Finished.
+[ 2021/03/09 01:57:00 ] Finished: Finished building ReBar Framework.
+------------------------------------------------------------------------------------------

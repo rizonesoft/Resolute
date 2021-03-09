@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=ReBar Framework						;~ Comment field
 #AutoIt3Wrapper_Res_Description=ReBar Framework			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.2.5539
+#AutoIt3Wrapper_Res_Fileversion=8.1.2.5543
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -413,7 +413,13 @@ Global $g_iReduceEveryMill 		= 300
 Global $g_iMaxSysMemoryPerc 	= 80
 Global $g_iDonateLabelHover		= 1
 
-OnAutoItExitRegister("_TerminateProgram")
+Const $SC_MOVE = 0xF010
+Const $SC_SIZE = 0xF000
+
+Global $i_DRAGFULLWINDOWS_Current
+Global $i_DRAGFULLWINDOWS_Initial = _SPI_GETDRAGFULLWINDOWS()
+
+OnAutoItExitRegister("_Reset_DRAGFULLWINDOWS")
 
 
 _Localization_Messages()   		;~ Load Message Language Strings
@@ -671,18 +677,28 @@ EndFunc   ;==>WM_GETMINMAXINFO
 
 Func WM_SYSCOMMAND($hWnd, $msg, $wParam, $lParam)
 	Switch BitAND($wParam, 0xFFF0)
-		Case 0xF010, 0xF000
-			Local $tBool = DllStructCreate("int")
-			DllCall("user32.dll", "int", "SystemParametersInfo", "int", 38, "int", 0, "ptr", DllStructGetPtr($tBool), "int", 0)
-			$g_OldSystemParam = DllStructGetData($tBool, 1)
+		Case $SC_MOVE, $SC_SIZE
+			$i_DRAGFULLWINDOWS_Current = _SPI_GETDRAGFULLWINDOWS()
 			DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", 0, "ptr", 0, "int", 2)
 	EndSwitch
 EndFunc   ;==>WM_SYSCOMMAND
 
 
 Func WM_EXITSIZEMOVE($hWnd, $msg, $wParam, $lParam)
-	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", $g_OldSystemParam, "ptr", 0, "int", 2)
+	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", $i_DRAGFULLWINDOWS_Current, "ptr", 0, "int", 2)
 EndFunc   ;==>WM_EXITSIZEMOVE
+
+
+Func _Reset_DRAGFULLWINDOWS()
+	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", $i_DRAGFULLWINDOWS_Initial, "ptr", 0, "int", 2)
+EndFunc   ;==>_Reset_DRAGFULLWINDOWS
+
+
+Func _SPI_GETDRAGFULLWINDOWS()
+	Local $tBool = DllStructCreate("int")
+	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 38, "int", 0, "ptr", DllStructGetPtr($tBool), "int", 0)
+	Return DllStructGetData($tBool, 1)
+EndFunc   ;==>_SPI_GETDRAGFULLWINDOWS
 
 #EndRegion "Events"
 
@@ -945,16 +961,6 @@ Func _ShutdownProgram()
 	EndIf
 
 EndFunc   ;==>_ShutdownProgram
-
-
-Func _TerminateProgram()
-
-	If $g_iSingleton Then
-		Local $iPID = ProcessExists(@ScriptName)
-		If $iPID Then ProcessClose($iPID)
-	EndIf
-
-EndFunc
 
 
 Func _MinimizeProgram()

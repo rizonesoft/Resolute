@@ -30,13 +30,13 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=USB Repair								;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft USB Repair      			;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.1046
+#AutoIt3Wrapper_Res_Fileversion=8.0.1.1051
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
-#AutoIt3Wrapper_Res_ProductVersion=5             					;~ Product Version
+#AutoIt3Wrapper_Res_ProductVersion=8             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=©  2018 Rizonesoft				;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=©  2021 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=requireAdministrator	;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 ;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
@@ -75,33 +75,33 @@
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico		; 202
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico			; 203
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			 	; 204
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			; 204
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico		; 205
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico		; 206
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico				; 207
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico			; 207
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico			; 208
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico					; 209
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico						; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico					; 210
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico				; 211
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico				; 212
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico			; 211
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico			; 212
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico				; 213
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico		; 214
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico				; 215
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico				; 216
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico			; 217
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico					; 218
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 219
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico				; 219
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico			; 220
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico			; 221
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico			; 222
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico			; 223
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico			; 224
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico			; 225
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico				; 226
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 		; 227
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico					; 228
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico					; 229
@@ -139,15 +139,15 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico				; 261
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico				; 262
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 263
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 264
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 265
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 266
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 267
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico			; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico			; 264
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico			; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico			; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico			; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico			; 268
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico				; 269
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico			; 270
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico				; 271
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\DeviceTrouble.ico		; 272
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\RestorePoint.ico		; 273
@@ -155,7 +155,7 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Firmware.ico			; 275
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico				; 276
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico				; 277
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 278
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico			; 278
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico				; 279
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico				; 280
 
@@ -259,7 +259,7 @@ EndFunc   ;==>_ReBarStartUp
 #include "..\..\Includes\Update.au3"
 #include "..\..\Includes\Versioning.au3"
 
-#include "UDF\Localization.au3"
+#include "Includes\Localization.au3"
 
 
 ;~ Developer Constants
@@ -357,7 +357,7 @@ Global $g_iCheckForUpdates	= 4
 ;~ Donate Time
 Global $g_iUptimeMonitor	= 0
 Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 259200 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+Global $g_iDonateTimeSet	= 86400 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -426,7 +426,8 @@ OnAutoItExitRegister("_TerminateProgram")
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 	MsgBox($MB_SYSTEMMODAL + $MB_ICONINFORMATION, $g_aLangMessages[3], $g_aLangMessages[4], $g_iMsgBoxTimeOut)
-	Exit
+	Local $currPID = @AutoItPID
+	ProcessClose($currPID)
 EndIf
 
 
@@ -569,7 +570,7 @@ Func _StartCoreGui()
 	GUICtrlSetTip($g_hGuiIcon, $g_aLangAbout[1] & Chr(32) & _GetProgramVersion(0) & @CRLF & _
 			$g_aLangAbout[2] & Chr(32) & @AutoItVersion & @CRLF & _
 			$g_aLangAbout[3] & " © " & @YEAR & " " & $g_sCompanyName, _
-			$g_aLangAbout[0], $TIP_INFOICON, $TIP_BALLOON)
+			$g_aLangAbout[0], $TIP_INFOICON)
 	GUICtrlSetCursor($g_hGuiIcon, 0)
 	GUICtrlSetOnEvent($g_hGuiIcon, "_About_ShowDialog")
 	$g_AniUpdate = GUICtrlCreateIcon($g_sUpdateAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)

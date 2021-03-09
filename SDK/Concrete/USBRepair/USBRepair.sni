@@ -5,15 +5,13 @@ Script = USBRepair.au3
 [Modules]
 Build = 1
 Compress = 1
-Sign = 1
+Sign = 0
 Documentation = 1
 Import = 0
 Distribute = 1
 Portable = 1
 Installation = 1
-SignInstall = 1
-Sourcecode = 1
-SourcePackage = 1
+SignInstall = 0
 UpdateFile = 1
 
 [Signing]
@@ -23,36 +21,23 @@ Website = https://www.rizonesoft.com
 [Distribute]
 File=%RootDir%\USBRepair.exe
 File=%RootDir%\USBRepair_X64.exe
-File=%SourceDir%\DVDRepair.ini
-File=%SourceDir%\Docs\Changes.txt
-File=%SourceDir%\Docs\License.txt
-File=%SourceDir%\Docs\Readme.txt
+File=%SourceDir%\USBRepair.ini
+File=%RootDir%\Docs\USBRepair\Changes.txt
+File=%RootDir%\Docs\USBRepair\License.txt
+File=%RootDir%\Docs\USBRepair\Readme.txt
 File=%RootDir%\Language\USBRepair\en.ini
+File=%RootDir%\Language\USBRepair\ko.ini
 File=%RootDir%\Processing\32\Stroke.ani
 File=%RootDir%\Processing\64\Stroke.ani
 File=%RootDir%\Processing\64\Globe.ani
 
 [Sources]
-File=Docs\
-File=Language\DVDRepair\
-File=Templates\
-File=Themes\Processing\32\
-File=Themes\Processing\64\
-File=Themes\Icons\
-File=Themes\Icons\About\
-File=Themes\Icons\Dialogs\
-File=Themes\Icons\Flags\
-File=Themes\Icons\logging\
-File=Themes\Icons\Menus\
-File=Themes\Icons\Power\
-File=UDF\
-File=Readme.md
-UDF=UDF\Localization.au3
 
 [Links]
 CompanyURL=https://www.rizonesoft.com
-SupportURL=https://www.rizonesoft.com/support/
-UpdateURL=https://www.rizonesoft.com/downloads/usb-repair/update/
+SupportURL=https://github.com/rizonesoft/Resolute/issues
+ContactURL=https://www.rizonesoft.com/#contact
+UpdateURL=https://www.rizonesoft.com/downloads/usb-repair/
 
 [Environment]
 ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
@@ -63,10 +48,10 @@ ShortName=USBRepair
 Description=Rizonesoft USB Repair
 Type=N
 Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\USBRepair.ico
-Version=1.0.0.1045
-VersionMajor=1
-VersionMaintenance=0
-VersionBuild=1045
+Version=8.0.1.1050
+VersionMajor=8
+VersionMaintenance=1
+VersionBuild=1050
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -77,8 +62,8 @@ OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.e
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1045
-DistributionName=USBRepair_1045
-FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1045\USBRepair_1045
-DistroSourceName=USBRepair_1045_Source
-DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1045\USBRepair_1045_Source
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1050
+DistributionName=USBRepair_1050
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1050\USBRepair_1050
+DistroSourceName=USBRepair_1050_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1050\USBRepair_1050_Source

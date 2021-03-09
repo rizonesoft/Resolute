@@ -9,6 +9,7 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 - Fixed: Info Tip Display.
 - Fixed: Second instance of the program closes all other instances.
 - Added: Korean Translation.
+- Fixed: Show Windows Content while dragging not resetting on Exit.
 
 Language Changes:
 - [Donate]: Label_Heading = %{Program.Name} has been serving you for over %d hours. Now, how about a small donation?

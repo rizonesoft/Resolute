@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.0.2.3617
+#AutoIt3Wrapper_Res_Fileversion=8.0.2.3623
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -462,6 +462,14 @@ Global $g_iMagicNumber		= 25
 Global $g_aEnvironment
 Global $g_GuiCreateSln
 
+Const $SC_MOVE = 0xF010
+Const $SC_SIZE = 0xF000
+
+Global $i_DRAGFULLWINDOWS_Current
+Global $i_DRAGFULLWINDOWS_Initial = _SPI_GETDRAGFULLWINDOWS()
+
+OnAutoItExitRegister("_Reset_DRAGFULLWINDOWS")
+
 
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
@@ -477,9 +485,9 @@ If @OSVersion = "WIN_2000" Or @OSVersion = "WIN_XPe" Or @OSVersion = "WIN_2003" 
 	Switch $iMsgBoxResult
 		Case $IDYES
 			ShellExecute(_Link_Split($g_sUrlSupport))
-			_TerminateProgram()
+			Exit
 		Case -1, $IDNO
-			_TerminateProgram()
+			Exit
 	EndSwitch
 Else
 
@@ -489,7 +497,7 @@ Else
 
 		If FileExists($s64BitExePath) Then
 			ShellExecute($s64BitExePath)
-			_TerminateProgram()
+			Exit
 		Else
 
 			Local $iMsgBoxResult = MsgBox($MB_YESNO + $MB_ICONWARNING + $MB_TOPMOST, $g_aLangMessages[3], StringFormat($g_aLangMessages[6], _
@@ -498,9 +506,9 @@ Else
 			Switch $iMsgBoxResult
 				Case $IDYES
 					ShellExecute(_Link_Split($g_sUrlDownloads))
-					_TerminateProgram()
+					Exit
 				Case -1, $IDNO
-					_TerminateProgram()
+					Exit
 			EndSwitch
 
 		EndIf
@@ -885,18 +893,29 @@ EndFunc   ;==>WM_GETMINMAXINFO
 
 Func WM_SYSCOMMAND($hWnd, $msg, $wParam, $lParam)
 	Switch BitAND($wParam, 0xFFF0)
-		Case 0xF010, 0xF000
-			Local $tBool = DllStructCreate("int")
-			DllCall("user32.dll", "int", "SystemParametersInfo", "int", 38, "int", 0, "ptr", DllStructGetPtr($tBool), "int", 0)
-			$g_OldSystemParam = DllStructGetData($tBool, 1)
+		Case $SC_MOVE, $SC_SIZE
+			$i_DRAGFULLWINDOWS_Current = _SPI_GETDRAGFULLWINDOWS()
 			DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", 0, "ptr", 0, "int", 2)
 	EndSwitch
 EndFunc   ;==>WM_SYSCOMMAND
 
 
 Func WM_EXITSIZEMOVE($hWnd, $msg, $wParam, $lParam)
-	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", $g_OldSystemParam, "ptr", 0, "int", 2)
+	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", $i_DRAGFULLWINDOWS_Current, "ptr", 0, "int", 2)
 EndFunc   ;==>WM_EXITSIZEMOVE
+
+
+Func _Reset_DRAGFULLWINDOWS()
+	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 37, "int", $i_DRAGFULLWINDOWS_Initial, "ptr", 0, "int", 2)
+EndFunc   ;==>_Reset_DRAGFULLWINDOWS
+
+
+Func _SPI_GETDRAGFULLWINDOWS()
+	Local $tBool = DllStructCreate("int")
+	DllCall("user32.dll", "int", "SystemParametersInfo", "int", 38, "int", 0, "ptr", DllStructGetPtr($tBool), "int", 0)
+	Return DllStructGetData($tBool, 1)
+EndFunc   ;==>_SPI_GETDRAGFULLWINDOWS
+
 
 Func WM_NOTIFY($hWnd, $iMsg, $wParam, $lParam)
 	#forceref $hWnd, $iMsg, $wParam
@@ -1159,21 +1178,10 @@ Func _ShutdownProgram()
 	Else
 		;~ If $g_ClearCacheOnExit == 1 Then DirRemove($g_CachePath, 1)
 		WinSetTrans($g_hCoreGui, Default, 255)
-		_TerminateProgram()
+		Exit
 	EndIf
 
 EndFunc   ;==>_ShutdownProgram
-
-
-Func _TerminateProgram()
-
-	If $g_iSingleton Then
-		Local $iPID = ProcessExists(@ScriptName)
-		If $iPID Then ProcessClose($iPID)
-	EndIf
-	Exit
-
-EndFunc
 
 
 Func _MinimizeProgram()
