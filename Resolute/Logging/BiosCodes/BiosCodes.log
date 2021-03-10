@@ -1,0 +1,25 @@
+=========================================================================================
+ RIZONESOFT LOGGING VERSION 2.0
+=========================================================================================
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/09 02:15:08 ] DATE:                        2021/03/09 02:15:08
+[ 2021/03/09 02:15:08 ] PROGRAM:                     Bios Beep Code Viewer 8.1.2.1675
+[ 2021/03/09 02:15:08 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\BiosCodes_X64.exe]
+[ 2021/03/09 02:15:08 ] COMPILED:                    YES
+[ 2021/03/09 02:15:08 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/09 02:15:08 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/09 02:15:08 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/09 02:15:08 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/09 02:15:08 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/09 02:15:10 ] This is a message.
+[ 2021/03/09 02:15:11 ] Error: This is an Error message!
+[ 2021/03/09 02:15:12 ] Warning: This is a Warning!
+[ 2021/03/09 02:15:13 ] Success: This message is successful.
+[ 2021/03/09 02:15:14 ] Finished testing logging system.

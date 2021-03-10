@@ -16,10 +16,10 @@
 ;===============================================================================================================
 ; Aut2Exe Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Icon=..\..\Resources\Icons\ReBar.ico			;~ Filename of the Ico file to use for the compiled exe
+#AutoIt3Wrapper_Icon=..\..\Resources\Icons\BiosCodes.ico		;~ Filename of the Ico file to use for the compiled exe
 #AutoIt3Wrapper_OutFile_Type=exe								;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
-#AutoIt3Wrapper_OutFile=..\..\..\Resolute\ReBar.exe				;~ Target exe/a3x filename.
-#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\ReBar_X64.exe		;~ Target exe filename for X64 compile.
+#AutoIt3Wrapper_OutFile=..\..\..\Resolute\BiosCodes.exe			;~ Target exe/a3x filename.
+#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\BiosCodes_X64.exe	;~ Target exe filename for X64 compile.
 ;#AutoIt3Wrapper_Compression=4									;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
 ;#AutoIt3Wrapper_UseUpx=Y										;~ (Y/N) Compress output program.  Default=Y
 ;#AutoIt3Wrapper_UPX_Parameters=								;~ Override the default settings for UPX.
@@ -28,9 +28,9 @@
 ;===============================================================================================================
 ; Target Program Resource info
 ;===============================================================================================================
-#AutoIt3Wrapper_Res_Comment=ReBar Framework						;~ Comment field
-#AutoIt3Wrapper_Res_Description=ReBar Framework			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.2.5544
+#AutoIt3Wrapper_Res_Comment=Bios Beep Code Viewer				;~ Comment field
+#AutoIt3Wrapper_Res_Description=Bios Beep Code Viewer			;~ Description field
+#AutoIt3Wrapper_Res_Fileversion=8.1.2.1706
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -59,7 +59,7 @@
 ;	%time% = PC timeformat
 ;	eg: #AutoIt3Wrapper_Res_Field=AutoIt Version|%AutoItVer%
 #AutoIt3Wrapper_Res_Field=CompanyName|Rizonesoft
-#AutoIt3Wrapper_Res_Field=ProductName|ReBar Framework
+#AutoIt3Wrapper_Res_Field=ProductName|Bios Beep Code Viewer
 #AutoIt3Wrapper_Res_Field=HomePage|https://www.rizonesoft.com
 #AutoIt3Wrapper_Res_Field=AutoItVersion|%AutoItVer%
 ; Add extra ICO files to the resources
@@ -71,89 +71,84 @@
 ; Add files to the resources - can be compressed
 ; #AutoIt3Wrapper_Res_Remove=
 ; Remove resources
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\ReBarH.ico						; 201
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\BiosCodesH.ico					; 201
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico			; 202
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico				; 203
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			 	; 204
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico			; 205
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico			; 206
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico				; 207
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico				; 208
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico						; 202
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico						; 203
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico						; 209
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico						; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico				; 204
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico				; 205
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico					; 206
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico			; 207
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico					; 208
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico				; 211
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico				; 212
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico					; 213
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico			; 214
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico					; 215
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico					; 209
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico						; 211
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 212
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico				; 213
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico				; 214
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 215
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico				; 216
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico				; 217
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico				; 218
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 219
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 220
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico					; 216
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico						; 218
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 219
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico				; 220
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico				; 221
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 222
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico				; 223
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico				; 224
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico				; 225
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 226
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 221
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico						; 223
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico						; 224
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico						; 225
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico						; 226
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico						; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico						; 228
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico						; 229
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico						; 230
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico						; 231
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico						; 232
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico						; 233
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico						; 234
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico						; 235
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico						; 236
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico						; 237
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico						; 238
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico						; 239
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico						; 240
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico						; 241
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico						; 242
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico						; 243
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico						; 244
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico					; 245
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico						; 246
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico						; 247
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico						; 248
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico						; 249
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico						; 250
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico						; 251
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico						; 252
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico						; 253
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico					; 254
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico					; 255
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 228
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 229
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico						; 230
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico						; 231
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico						; 232
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico						; 233
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico						; 234
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico						; 235
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico						; 236
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico						; 237
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico						; 238
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico						; 239
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico						; 240
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico						; 241
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico						; 242
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico						; 243
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico						; 244
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico						; 245
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico						; 246
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico						; 247
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico						; 248
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico						; 249
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico						; 250
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico						; 251
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico					; 252
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico						; 253
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico						; 254
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico						; 255
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico						; 256
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico						; 257
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico						; 258
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico						; 259
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico						; 260
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico					; 261
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico					; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 256
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 257
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 258
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 259
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 260
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 261
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 263
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 264
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 265
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 266
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 267
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\List\Info.ico					; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\List\No.ico						; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\List\Yes.ico						; 264
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 269
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 270
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 271
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 272
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 273
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 274
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 275
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 271
 
 ;===============================================================================================================
 ; Tidy Settings
@@ -237,6 +232,7 @@ EndFunc   ;==>_ReBarStartUp
 #include <GuiImageList.au3>
 #include <GuiListView.au3>
 #include <Process.au3>
+#include <TabConstants.au3>
 #include <WinAPITheme.au3>
 #include <WinAPIProc.au3>
 #include <WindowsConstants.au3>
@@ -249,7 +245,6 @@ EndFunc   ;==>_ReBarStartUp
 #include "..\..\Includes\GuiMenuEx.au3"
 #include "..\..\Includes\ImageListEx.au3"
 #include "..\..\Includes\Link.au3"
-#include "..\..\Includes\Logging.au3"
 #include "..\..\Includes\Registry.au3"
 #include "..\..\Includes\Splash.au3"
 #include "..\..\Includes\StringEx.au3"
@@ -262,15 +257,17 @@ EndFunc   ;==>_ReBarStartUp
 Global Const $DEBUG_UPDATE		= False
 
 ;~ Constants
-Global Const $CNT_MENUICONS		= 8
-Global Const $CNT_LOGICONS		= 7
-Global Const $CNT_LANGICONS		= 35
+Global Const $CNT_MENUICONS		 = 8
+Global Const $CNT_LANGICONS		 = 35
+Global Const $CNT_BIOSBUTTONS	 = 9
+Global Const $SIZE_BUTTONSTART 	 = 108
+Global Const $SIZE_BUTTONSHEIGHT = 28
 
 ;~ General Settings
 Global $g_sCompanyName			= "Rizonesoft"
-Global $g_sProgShortName		= "ReBar"
+Global $g_sProgShortName		= "BiosCodes"
 Global $g_sProgShortName_X64	= $g_sProgShortName & "_X64"
-Global $g_sProgName				= "ReBar Framework"
+Global $g_sProgName				= "Bios Beep Code Viewer"
 Global $g_iSingleton			= True
 
 ;~ Links
@@ -285,7 +282,7 @@ Global $g_sUrlPayPal			= "https://www.paypal.com/donate?hosted_button_id=7UGGCSD
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/resolute/|www.rizonesoft.com/downloads/resolute/"
+Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/bios-beep-codes-viewer/|www.rizonesoft.com/downloads/bios-beep-codes-viewer/"
 Global $g_sUrlUpdate			= $g_sUrlProgPage
 
 ;~ Path Variables
@@ -312,27 +309,21 @@ Global $g_tSelectedLanguage = $g_sSelectedLanguage
 Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".ini"
 
 ;~ Resources
-Global $g_iUpdateIconStart				= 209
-Global $g_iDialogIconStart				= 211
-Global $g_iAboutIconStart				= 216
-Global $g_iLangIconStart				= 228
-Global $g_iPowerIconsStart				= 263
-Global $g_iMenuIconsStart				= 269
+Global $g_iUpdateIconStart				= 202
+Global $g_iDialogIconStart				= 204
+Global $g_iAboutIconStart				= 209
+Global $g_iLangIconStart				= 221
+Global $g_iPowerIconsStart				= 256
+Global $g_iBiosInfoIconStart			= 262
+Global $g_iMenuIconsStart				= 265
 
 Global $g_aCoreIcons[3]
 Global $g_aDonateIcons[3]
 Global $g_iSizeIcon						= 64
-Global $g_aLognIcons[$CNT_LOGICONS]
 Global $g_aLanguageIcons[$CNT_LANGICONS]
 Global $g_aMenuIcons[$CNT_MENUICONS]
 Global $g_sDlgOptionsIcon
 
-;~ Logging Settings
-Global $g_sLoggingRoot		= $g_sWorkingDir & "\Logging\" & $g_sProgShortName
-Global $g_sLoggingPath		= $g_sLoggingRoot & "\" & $g_sProgShortName & ".log"
-Global $g_GuiLogBoxHeight	= 150
-Global $g_iLogIconStart		= -202
-Global $g_iUpdateSubStatus	= True
 
 ;~ Splash Page Settings
 Global $g_sSplashAniPath
@@ -361,8 +352,8 @@ Global $g_TitleShowBuild	= True	;~ Show program build
 Global $g_TitleShowAutoIt	= True	;~ Show AutoIt version
 
 ;~ Interface Settings
-Global $g_iCoreGuiWidth		= 550
-Global $g_iCoreGuiHeight	= 490
+Global $g_iCoreGuiWidth		= 780
+Global $g_iCoreGuiHeight	= 580
 Global $g_iMsgBoxTimeOut	= 60
 
 ;~ About Dialog
@@ -378,9 +369,13 @@ Global $g_hMenuFile
 Global $g_hMenuHelp, $g_hUpdateMenuItem
 Global $g_hMenuDebug
 
-Global $g_OldSystemParam								;~ Used when resizing the main GUI
 Global $g_hSubHeading
-Global $g_hBtnRepair
+Global $g_aBiosButtons[$CNT_BIOSBUTTONS]
+Global $g_aBiosTabs[$CNT_BIOSBUTTONS]
+Global $g_aBiosGroups[$CNT_BIOSBUTTONS]
+Global $g_aBiosInfoButtons[3]
+Global $g_hListBiosInfo
+Global $g_hImgBiosInfo
 
 If Not IsDeclared("g_iParentState") Then Global $g_iParentState
 If Not IsDeclared("g_iParent") Then Global $g_iParent
@@ -390,11 +385,6 @@ Global $g_hOIconPower
 Global $g_hOComboPower
 Global $g_hOChkSaveRealtime
 Global $g_hOChkReduceMemory
-Global $g_hOChkLogEnabled
-Global $g_hOInLogSize
-Global $g_hOInLogSizeTemp
-Global $g_hOLblLogSize
-Global $g_hOBtnLogClear
 Global $g_hOListLanguage
 Global $g_hOImgLanguage
 Global $g_hOIconLanguage
@@ -420,6 +410,9 @@ Global $i_DRAGFULLWINDOWS_Current
 Global $i_DRAGFULLWINDOWS_Initial = _SPI_GETDRAGFULLWINDOWS()
 
 OnAutoItExitRegister("_Reset_DRAGFULLWINDOWS")
+
+Dim $g_aBaseBoardInfo[1][28], $g_aBIOSInfo[1][30], $g_aBiosCharacteristics
+Global $oMyError = ObjEvent("AutoIt.Error","MyErrFunc")
 
 
 _Localization_Messages()   		;~ Load Message Language Strings
@@ -470,11 +463,12 @@ Else
 		$g_iSplashDelay			= 100
 		_Splash_Start($g_aLangMessages[7])
 		_Splash_Update($g_aLangMessages[8], 3)
-		_Localization_Messages2()	;~ Load Custom Message Language Strings
-		_Localization_Menus()		;~ Load Menu Language Strings
-		_Localization_Custom()		;~ Load Custom Language Strings
-		_Localization_About()		;~ Load About Language Strings
-		_Localization_Donate()		;~ Load Donate Language Strings
+		_Localization_Messages2()			;~ Load Custom Message Language Strings
+		_Localization_Menus()				;~ Load Menu Language Strings
+		_Localization_Custom()				;~ Load Custom Language Strings
+		_Localization_About()				;~ Load About Language Strings
+		_Localization_Donate()				;~ Load Donate Language Strings
+		_Localization_BIOSInformation() 	;~ Load BIOS information Language Strings
 		_Splash_Update($g_aLangMessages[9], 6)
 		_SetResources()
 		_Splash_Update($g_aLangMessages[10], 9)
@@ -482,9 +476,9 @@ Else
 		_Splash_Update($g_aLangMessages[11], 12)
 		_LoadConfiguration()
 		_Splash_Update($g_aLangMessages[12], 15)
-		_Logging_Initialize($g_sProgName)
 		_Splash_Update($g_aLangMessages[13], 18)
 		_SetHotKeys()
+		__GetBiosInformation()
 		_Splash_Update($g_aLangMessages[14], 21)
 		_StartCoreGui()
 
@@ -500,7 +494,7 @@ EndFunc
 
 Func _StartCoreGui()
 
-	Local $miFileOptions, $mnuFileLog, $miLogOpenFile, $miLogOpenRoot, $miFileReboot, $miFileClose
+	Local $miFileOptions, $mnuFileLog, $miFileReboot, $miFileClose
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
@@ -514,32 +508,27 @@ Func _StartCoreGui()
 	GUIRegisterMsg($WM_SYSCOMMAND, "WM_SYSCOMMAND")
 
 	$g_hMenuFile = GUICtrlCreateMenu($g_aLangMenus[0])
-	$g_hMenuHelp = GUICtrlCreateMenu($g_aLangMenus[6])
+	$g_hMenuHelp = GUICtrlCreateMenu($g_aLangMenus[3])
 
 	_GuiCtrlMenuEx_SetMenuIconBkColor(0xF0F0F0)
 	_GuiCtrlMenuEx_SetMenuIconBkGrdColor(0xFFFFFF)
 
 	$miFileOptions = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[1], $g_hMenuFile, $g_aMenuIcons[0], $g_iMenuIconsStart)
-	$mnuFileLog = _GuiCtrlMenuEx_CreateMenu($g_aLangMenus[2], $g_hMenuFile)
-	$miLogOpenFile = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[3], $mnuFileLog, $g_aMenuIcons[1], $g_iMenuIconsStart + 1)
-	$miLogOpenRoot = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[4], $mnuFileLog)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuFile)
-	$miFileClose = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[5], $g_hMenuFile, $g_aMenuIcons[2], $g_iMenuIconsStart + 2)
+	$miFileClose = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[2], $g_hMenuFile, $g_aMenuIcons[1], $g_iMenuIconsStart + 1)
 
-	$g_hUpdateMenuItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[7], $g_hMenuHelp, $g_aMenuIcons[3], $g_iMenuIconsStart + 3)
+	$g_hUpdateMenuItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[4], $g_hMenuHelp, $g_aMenuIcons[2], $g_iMenuIconsStart + 2)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpHome = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[8], $g_hMenuHelp, $g_aMenuIcons[4], $g_iMenuIconsStart + 4)
-	$miHelpDownloads = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[9], $g_hMenuHelp)
-	$miHelpSupport = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[10], $g_hMenuHelp, $g_aMenuIcons[5], $g_iMenuIconsStart + 5)
+	$miHelpHome = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[5], $g_hMenuHelp, $g_aMenuIcons[3], $g_iMenuIconsStart + 3)
+	$miHelpDownloads = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[6], $g_hMenuHelp)
+	$miHelpSupport = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[7], $g_hMenuHelp, $g_aMenuIcons[4], $g_iMenuIconsStart + 4)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpGitHub = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[11], $g_hMenuHelp, $g_aMenuIcons[6], $g_iMenuIconsStart + 6)
-	$miHelpDonate = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[12], $g_hMenuHelp)
+	$miHelpGitHub = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[8], $g_hMenuHelp, $g_aMenuIcons[5], $g_iMenuIconsStart + 5)
+	$miHelpDonate = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[9], $g_hMenuHelp)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpAbout = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[13], $g_hMenuHelp, $g_aMenuIcons[7], $g_iMenuIconsStart + 7)
+	$miHelpAbout = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[10], $g_hMenuHelp, $g_aMenuIcons[6], $g_iMenuIconsStart + 6)
 
 	GUICtrlSetOnEvent($miFileOptions, "_ShowPreferencesDlg")
-	GUICtrlSetOnEvent($miLogOpenFile, "_Logging_OpenFile")
-	GUICtrlSetOnEvent($miLogOpenRoot, "_Logging_OpenDirectory")
 	GUICtrlSetOnEvent($miFileClose, "_ShutdownProgram")
 
 	GUICtrlSetOnEvent($g_hUpdateMenuItem, "_CheckForUpdates")
@@ -568,30 +557,95 @@ Func _StartCoreGui()
 	GUICtrlSetFont($g_hSubHeading, 9)
 	GUICtrlSetColor($g_hSubHeading, 0x353535)
 
-	$g_hListStatus = GUICtrlCreateListView("", 10, $g_iCoreGuiHeight - $g_GuiLogBoxHeight - 90, _
-			$g_iCoreGuiWidth - 20, $g_GuiLogBoxHeight, BitOR($LVS_REPORT, $LVS_NOCOLUMNHEADER))
-	_GUICtrlListView_SetExtendedListViewStyle($g_hListStatus, BitOR($LVS_EX_FULLROWSELECT, $LVS_EX_DOUBLEBUFFER, _
-			$LVS_EX_SUBITEMIMAGES, $LVS_EX_INFOTIP, $WS_EX_CLIENTEDGE))
-	_GUICtrlListView_AddColumn($g_hListStatus, "", 680)
-	_WinAPI_SetWindowTheme(GUICtrlGetHandle($g_hListStatus), "Explorer")
-	GUICtrlSetResizing($g_hListStatus, BitOR($GUI_DOCKLEFT, $GUI_DOCKRIGHT, $GUI_DOCKBOTTOM, $GUI_DOCKHEIGHT))
-	GUICtrlSetFont($g_hListStatus, 9, -1, -1, "Courier New")
-	GUICtrlSetColor($g_hListStatus, 0x333333)
-
-	$g_hImgStatus = _GUIImageList_Create(16, 16, 5, 1, 8, 8)
-	For $iLx = 0 To $CNT_LOGICONS - 1
-		_ImageListEx_AddBlankIcon($g_hImgStatus, $g_hListStatus, $g_aLognIcons[$iLx], $g_iLogIconStart - $iLx)
+	For $iBB = 0 To $CNT_BIOSBUTTONS - 1
+		$g_aBiosButtons[$iBB] = GUICtrlCreateCheckbox(Chr(32) & Chr(32) & $g_aLangCustom[$iBB +2], 10, _
+			$SIZE_BUTTONSTART + ($iBB * ($SIZE_BUTTONSHEIGHT + 3)), 160, $SIZE_BUTTONSHEIGHT, BitOR($BS_PUSHLIKE, $BS_LEFT))
+		GUICtrlSetOnEvent($g_aBiosButtons[$iBB], "_SelectBiosPage")
 	Next
-	_GUIImageList_Add($g_hImgStatus, _GUICtrlListView_CreateSolidBitMap($g_hListStatus, 0xFFFFFF, 16, 16))
-	_GUICtrlListView_SetImageList($g_hListStatus, $g_hImgStatus, 1)
 
-	$g_hIconDonate = GUICtrlCreateIcon($g_aDonateIcons[0], $g_iAboutIconStart, 10, 400, 64, 64)
-	GUICtrlSetCursor($g_hIconDonate, 0)
-	GUICtrlSetResizing($g_hIconDonate, BitOR($GUI_DOCKBOTTOM, $GUI_DOCKLEFT, $GUI_DOCKSIZE))
-	$g_hLblDonate = GUICtrlCreateLabel($g_aLangDonate[2], 85, 420, $g_iCoreGuiWidth - 205, 32)
-	GUICtrlSetCursor($g_hLblDonate, 0)
-	GUICtrlSetColor($g_hLblDonate, 0x000000)
-	GUICtrlSetResizing($g_hLblDonate, BitOR($GUI_DOCKBOTTOM, $GUI_DOCKLEFT, $GUI_DOCKSIZE))
+	GUICtrlCreateTab(200, -50, 600, 800, $TCS_BUTTONS)
+	GUICtrlSetResizing(-1, BitOR($GUI_DOCKLEFT, $GUI_DOCKRIGHT, $GUI_DOCKBOTTOM, $GUI_DOCKTOP))
+
+	$g_aBiosTabs[0] = GUICtrlCreateTabItem($g_aLangCustom[2])
+	$g_aBiosGroups[0] = GUICtrlCreateGroup($g_aLangCustom[2], 180, 80, 580, 465)
+
+	$g_aBiosInfoButtons[0] = GUICtrlCreateCheckbox($g_aLangBIOSInfo[0], 195, 108, 150, 28, $BS_PUSHLIKE)
+	$g_aBiosInfoButtons[1] = GUICtrlCreateCheckbox($g_aLangBIOSInfo[1], 348, 108, 150, 28, $BS_PUSHLIKE)
+	$g_aBiosInfoButtons[2] = GUICtrlCreateCheckbox($g_aLangBIOSInfo[2], 501, 108, 150, 28, $BS_PUSHLIKE)
+	For $iBI = 0 To 2
+		GUICtrlSetOnEvent($g_aBiosInfoButtons[$iBI], "__BiosInfoButtonClick")
+	Next
+
+	$g_hListBiosInfo = GUICtrlCreateListView("", 195, 145, 550, 215)
+	_GUICtrlListView_SetExtendedListViewStyle($g_hListBiosInfo, BitOR($LVS_EX_FULLROWSELECT, _
+			$LVS_EX_SUBITEMIMAGES, $LVS_EX_DOUBLEBUFFER, $WS_EX_CLIENTEDGE, _
+			$LVS_EX_FLATSB, $LVS_EX_INFOTIP))
+	_WinAPI_SetWindowTheme(GUICtrlGetHandle($g_hListBiosInfo), "Explorer")
+	GUICtrlSetResizing($g_hListBiosInfo, BitOR($GUI_DOCKLEFT, $GUI_DOCKRIGHT, $GUI_DOCKTOP, $GUI_DOCKHEIGHT))
+	_GUICtrlListView_AddColumn($g_hListBiosInfo, Chr(32) & $g_aLangBIOSInfo[3] & Chr(32), 200)
+	_GUICtrlListView_AddColumn($g_hListBiosInfo, $g_aLangBIOSInfo[3], 300)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_hImgBiosInfo = _GUIImageList_Create(16, 16, 5, 3)
+	For $iBi = 0 To 2
+		_GUIImageList_AddIcon($g_hImgBiosInfo, @ScriptFullPath, 0 - $g_iBiosInfoIconStart - $iBi)
+	Next
+	_GUICtrlListView_SetImageList($g_hListBiosInfo, $g_hImgBiosInfo, 1)
+	__PopulateBiosInformation(1)
+
+	$g_aBiosTabs[1] = GUICtrlCreateTabItem($g_aLangCustom[3])
+	$g_aBiosGroups[1] = GUICtrlCreateGroup($g_aLangCustom[3], 180, 80, 580, 465)
+	Local $hBtnBeepCodeTest = GUICtrlCreateButton("Beep", 195, 110, 200, 35)
+	; GUICtrlSetOnEvent($hBtnBeepCodeTest, "_BeepCodesSimulator")
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_aBiosTabs[2] = GUICtrlCreateTabItem($g_aLangCustom[4])
+	$g_aBiosGroups[2] = GUICtrlCreateGroup($g_aLangCustom[4], 180, 80, 580, 465)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_aBiosTabs[3] = GUICtrlCreateTabItem($g_aLangCustom[5])
+	$g_aBiosGroups[3] = GUICtrlCreateGroup($g_aLangCustom[5], 180, 80, 580, 465)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_aBiosTabs[4] = GUICtrlCreateTabItem($g_aLangCustom[6])
+	$g_aBiosGroups[4] = GUICtrlCreateGroup($g_aLangCustom[6], 180, 80, 580, 465)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_aBiosTabs[5] = GUICtrlCreateTabItem($g_aLangCustom[7])
+	$g_aBiosGroups[5] = GUICtrlCreateGroup($g_aLangCustom[7], 180, 80, 580, 465)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_aBiosTabs[6] = GUICtrlCreateTabItem($g_aLangCustom[8])
+	$g_aBiosGroups[6] = GUICtrlCreateGroup($g_aLangCustom[8], 180, 80, 580, 465)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_aBiosTabs[7] = GUICtrlCreateTabItem($g_aLangCustom[9])
+	$g_aBiosGroups[7] = GUICtrlCreateGroup($g_aLangCustom[9], 180, 80, 580, 465)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	$g_aBiosTabs[8] = GUICtrlCreateTabItem($g_aLangCustom[10])
+	$g_aBiosGroups[8] = GUICtrlCreateGroup($g_aLangCustom[10], 180, 80, 580, 465)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
+	For $iBC = 0 To $CNT_BIOSBUTTONS - 1
+		GUICtrlSetResizing($g_aBiosGroups[$iBC], BitOR($GUI_DOCKLEFT, $GUI_DOCKRIGHT, $GUI_DOCKBOTTOM, $GUI_DOCKTOP))
+		GUICtrlSetFont($g_aBiosGroups[$iBC], 10, 700, 2)
+	Next
+	GUICtrlCreateTabItem("")
+
+	GUICtrlCreateEdit("", 195, 365, 550, 160, BitOR(0x00200000, 0x0800, 0x0040)) ;$WS_VSCROLL = 0x00200000 : $ES_READONLY = 0x0800 : $ES_AUTOVSCROLL = 0x0040
+	GUICtrlSetBkColor(-1, 0xE5F3FB)
+	GUICtrlSetColor(-1, 0x2C4F73)
+	GUICtrlSetFont(-1, 9)
+	GUICtrlSetResizing(-1, BitOR($GUI_DOCKLEFT, $GUI_DOCKRIGHT, $GUI_DOCKBOTTOM, $GUI_DOCKTOP))
+
+;~ 	$g_hIconDonate = GUICtrlCreateIcon($g_aDonateIcons[0], $g_iAboutIconStart, 10, 400, 64, 64)
+;~ 	GUICtrlSetCursor($g_hIconDonate, 0)
+;~ 	GUICtrlSetResizing($g_hIconDonate, BitOR($GUI_DOCKBOTTOM, $GUI_DOCKLEFT, $GUI_DOCKSIZE))
+;~ 	$g_hLblDonate = GUICtrlCreateLabel($g_aLangDonate[2], 85, 420, $g_iCoreGuiWidth - 205, 32)
+;~ 	GUICtrlSetCursor($g_hLblDonate, 0)
+;~ 	GUICtrlSetColor($g_hLblDonate, 0x000000)
+;~ 	GUICtrlSetResizing($g_hLblDonate, BitOR($GUI_DOCKBOTTOM, $GUI_DOCKLEFT, $GUI_DOCKSIZE))
 
 	GUICtrlSetOnEvent($g_hIconDonate, "_About_PayPal")
 	GUICtrlSetOnEvent($g_hLblDonate, "_About_PayPal")
@@ -608,23 +662,11 @@ Func _StartCoreGui()
 		_SoftwareUpdateCheck()
 	EndIf
 
-	_TestLoggingSystem("This is a message.", 1000)
-	_TestLoggingSystem("Error: This is an Error message!", 1000)
-	_TestLoggingSystem("Warning: This is a Warning!", 1000)
-	_TestLoggingSystem("Success: This message is successful.", 1000)
-	_TestLoggingSystem("Finished testing logging system.", 1000)
-
 	While 1
 		Sleep(30)
 	WEnd
 
 EndFunc
-
-
-Func _TestLoggingSystem($sMessage, $iSleep)
-	_Logging_EditWrite($sMessage)
-	Sleep($iSleep)
-EndFunc   ;==>_TestLoggingSystem
 
 
 #Region "Events"
@@ -661,6 +703,19 @@ Func _OnIconsHover()
 	EndIf
 
 EndFunc   ;==>_OnIconsHover
+
+
+Func _SelectBiosPage()
+
+	For $iBP = 0 To $CNT_BIOSBUTTONS - 1
+		GUICtrlSetState($g_aBiosButtons[$iBP], $GUI_UNCHECKED)
+		If @GUI_CtrlId = $g_aBiosButtons[$iBP] Then
+			GUICtrlSetState($g_aBiosButtons[$iBP], $GUI_CHECKED)
+			GUICtrlSetState($g_aBiosTabs[$iBP], $GUI_SHOW)
+		EndIf
+	Next
+
+EndFunc   ;==>_SelectPage
 
 
 ;~ https://www.autoitscript.com/forum/topic/99603-resize-but-dont-get-smaller-than-original-size/#comment-714621
@@ -711,10 +766,6 @@ Func _SetResources()
 		$g_aDonateIcons[0] 	= @ScriptFullPath
 		$g_aDonateIcons[1] 	= @ScriptFullPath
 
-		For $iLi = 0 To $CNT_LOGICONS - 1
-			$g_aLognIcons[$iLi] = @ScriptFullPath
-		Next
-
 		For $iMi = 0 To $CNT_MENUICONS - 1
 			$g_aMenuIcons[$iMi] = @ScriptFullPath
 		Next
@@ -731,14 +782,6 @@ Func _SetResources()
 		$g_aCoreIcons[1]   = "..\..\..\SDK\Resources\Icons\" & $g_sProgShortName & "H.ico"
 		$g_aDonateIcons[0] = "..\..\..\SDK\Resources\Icons\About\PayPal.ico"
 		$g_aDonateIcons[1] = "..\..\..\SDK\Resources\Icons\About\PayPalH.ico"
-
-		$g_aLognIcons[0] = "..\..\..\SDK\Resources\Icons\logging\Information.ico"
-		$g_aLognIcons[1] = "..\..\..\SDK\Resources\Icons\logging\Complete.ico"
-		$g_aLognIcons[2] = "..\..\..\SDK\Resources\Icons\logging\Cross.ico"
-		$g_aLognIcons[3] = "..\..\..\SDK\Resources\Icons\logging\Exclamation.ico"
-		$g_aLognIcons[4] = "..\..\..\SDK\Resources\Icons\logging\Smiley-Glass.ico"
-		$g_aLognIcons[5] = "..\..\..\SDK\Resources\Icons\logging\Skull.ico"
-		$g_aLognIcons[6] = "..\..\..\SDK\Resources\Icons\logging\Snowman.ico"
 
 		$g_aLanguageIcons[0]  = "..\..\..\SDK\Resources\Icons\Flags\en.ico"
 		$g_aLanguageIcons[1]  = "..\..\..\SDK\Resources\Icons\Flags\af.ico"
@@ -843,6 +886,347 @@ Func _GenerateIniFile($iniPath, $bPortable = 1)
 EndFunc   ;==>_GenerateIniFile
 
 #EndRegion "Working Directories"
+
+
+#Region "Bios Information"
+
+Func __BiosInfoButtonClick()
+
+	For $iBS = 0 To 2
+		GUICtrlSetState($g_aBiosInfoButtons[$iBS], $GUI_UNCHECKED)
+	Next
+
+	Switch @GUI_CtrlId
+		Case $g_aBiosInfoButtons[0]
+			__PopulateBiosInformation(0)
+
+		Case $g_aBiosInfoButtons[1]
+			__PopulateBiosInformation(1)
+
+		Case $g_aBiosInfoButtons[2]
+			__PopulateBiosInformation(2)
+
+	EndSwitch
+
+EndFunc
+
+
+Func __PopulateBiosInformation($iSection)
+
+	If $iSection < 3 Then
+		GUICtrlSetState($g_aBiosInfoButtons[$iSection], $GUI_CHECKED)
+	EndIf
+
+	_GUICtrlListView_BeginUpdate($g_hListBiosInfo)
+	_GUICtrlListView_DeleteAllItems($g_hListBiosInfo)
+
+	Switch $iSection
+		Case 0
+			GUICtrlSetState($g_aBiosInfoButtons[0], $GUI_CHECKED)
+			_GUICtrlListView_SetColumnWidth($g_hListBiosInfo, 0, 200)
+			_GUICtrlListView_SetColumnWidth($g_hListBiosInfo, 1, 300)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Manufacturer", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Product", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Version", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Serial Number", 0)
+
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 0, $g_aBaseBoardInfo[1][9], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 1, $g_aBaseBoardInfo[1][15], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 2, $g_aBaseBoardInfo[1][25], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 3, $g_aBaseBoardInfo[1][20], 1)
+
+		Case 1
+			_GUICtrlListView_SetColumnWidth($g_hListBiosInfo, 0, 250)
+			_GUICtrlListView_SetColumnWidth($g_hListBiosInfo, 1, 300)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "BIOS Vendor", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Serial Number", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "BIOS Version", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "BIOS Date", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "BIOS Release Version", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "DMI Version", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Embedded Controller Version", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Status", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Primary BIOS", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Software Element ID", 0)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Software Element State", 0)
+
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 0,  $g_aBIOSInfo[1][13], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 1,  $g_aBIOSInfo[1][18], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 2,  $g_aBIOSInfo[1][19], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 3,  $g_aBIOSInfo[1][17], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 4,  $g_aBIOSInfo[1][26] & "." & $g_aBIOSInfo[1][27], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 5,  $g_aBIOSInfo[1][20] & "." & $g_aBIOSInfo[1][21], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 6,  $g_aBIOSInfo[1][6] & "." & $g_aBIOSInfo[1][7], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 7,  $g_aBIOSInfo[1][25], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 8,  $g_aBIOSInfo[1][16], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 9,  $g_aBIOSInfo[1][23], 1)
+			_GUICtrlListView_AddSubItem($g_hListBiosInfo, 10, $g_aBIOSInfo[1][24], 1)
+
+		Case 2
+			_GUICtrlListView_SetColumnWidth($g_hListBiosInfo, 0, 350)
+			_GUICtrlListView_SetColumnWidth($g_hListBiosInfo, 1, 150)
+
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports ISA", Int(__DecodeBiosCharacteristic("4")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports MCA", Int(__DecodeBiosCharacteristic("5")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports EISA", Int(__DecodeBiosCharacteristic("6")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports PCI", Int(__DecodeBiosCharacteristic("7")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports PC Card (PCMCIA)", Int(__DecodeBiosCharacteristic("8")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Plug and Play", Int(__DecodeBiosCharacteristic("9")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports APM", Int(__DecodeBiosCharacteristic("10")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Upgradeable (Flash) BIOS", Int(__DecodeBiosCharacteristic("11")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Allows BIOS shadowing", Int(__DecodeBiosCharacteristic("12")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports VL-VESA", Int(__DecodeBiosCharacteristic("13")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "ESCD support is available", Int(__DecodeBiosCharacteristic("14")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports booting from CD-ROM", Int(__DecodeBiosCharacteristic("15")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports selectable boot", Int(__DecodeBiosCharacteristic("16")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "BIOS ROM is socketed", Int(__DecodeBiosCharacteristic("17")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports booting from PC Card (PCMCIA)", Int(__DecodeBiosCharacteristic("18")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports EDD (Enhanced Disk Drive) Specification", Int(__DecodeBiosCharacteristic("19")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 13h - Japanese Floppy for NEC 9800 1.2mb (3.5" & Chr(34) & ", 1k Bytes/Sector, 360 RPM)", Int(__DecodeBiosCharacteristic("20")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 13h - Japanese Floppy for Toshiba 1.2mb (3.5" & Chr(34) & ", 360 RPM)", Int(__DecodeBiosCharacteristic("21")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 13h - 5.25" & Chr(34) & " / 360 KB Floppy Services", Int(__DecodeBiosCharacteristic("22")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 13h - 5.25" & Chr(34) & " / 1.2MB Floppy Services", Int(__DecodeBiosCharacteristic("23")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 13h - 3.5" & Chr(34) & " / 720 KB Floppy Services", Int(__DecodeBiosCharacteristic("24")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 13h - 3.5" & Chr(34) & " / 2.88 MB Floppy Services", Int(__DecodeBiosCharacteristic("25")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 5h, Print Screen Service", Int(__DecodeBiosCharacteristic("26")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 9h, 8042 Keyboard services", Int(__DecodeBiosCharacteristic("27")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 14h, Serial Services", Int(__DecodeBiosCharacteristic("28")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 17h, printer services", Int(__DecodeBiosCharacteristic("29")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Int 10h, CGA/Mono Video Services", Int(__DecodeBiosCharacteristic("30")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "NEC PC-98", Int(__DecodeBiosCharacteristic("31")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports ACPI", Int(__DecodeBiosCharacteristic("32")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports USB Legacy", Int(__DecodeBiosCharacteristic("33")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports AGP", Int(__DecodeBiosCharacteristic("34")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports I2O boot", Int(__DecodeBiosCharacteristic("35")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports LS-120 boot", Int(__DecodeBiosCharacteristic("36")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports ATAPI ZIP Drive boot", Int(__DecodeBiosCharacteristic("37")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports 1394 boot", Int(__DecodeBiosCharacteristic("38")) + 1)
+			_GUICtrlListView_AddItem($g_hListBiosInfo, "Supports Smart Battery", Int(__DecodeBiosCharacteristic("39")) + 1)
+
+
+	EndSwitch
+
+	_GUICtrlListView_EndUpdate($g_hListBiosInfo)
+
+EndFunc
+
+
+Func __GetBiosInformation()
+
+	__WMI_BaseBoard($g_aBaseBoardInfo)
+	If @error Then __ReturnWMIerror(@extended)
+
+	__WMI_Bios($g_aBIOSInfo)
+	If @error Then __ReturnWMIerror(@extended)
+
+EndFunc
+
+
+Func __WMI_BaseBoard(ByRef $g_aBaseBoardInfo)
+	Local $colItems, $objWMIService, $objItem, $i = 1
+
+	$objWMIService = ObjGet("winmgmts:\\" & @ComputerName & "\root\CIMV2")
+	$colItems = $objWMIService.ExecQuery("SELECT * FROM Win32_BaseBoard", "WQL", 0x30)
+
+	If IsObj($colItems) Then
+		For $objItem In $colItems
+			ReDim $g_aBaseBoardInfo[UBound($g_aBaseBoardInfo) + 1][28]
+			$g_aBaseBoardInfo[$i][0]	= $objItem.Caption
+			$g_aBaseBoardInfo[$i][1]	= __JoinExtendedInformation($objItem.ConfigOptions)
+			$g_aBaseBoardInfo[$i][2]	= $objItem.CreationClassName
+			$g_aBaseBoardInfo[$i][3]	= $objItem.Depth
+			$g_aBaseBoardInfo[$i][4]	= $objItem.Description
+			$g_aBaseBoardInfo[$i][5]	= $objItem.Height
+			$g_aBaseBoardInfo[$i][6]	= $objItem.HostingBoard
+			$g_aBaseBoardInfo[$i][7]	= $objItem.HotSwappable
+			$g_aBaseBoardInfo[$i][8]	= __StringToDate($objItem.InstallDate)
+			$g_aBaseBoardInfo[$i][9]	= $objItem.Manufacturer
+			$g_aBaseBoardInfo[$i][10]	= $objItem.Model
+			$g_aBaseBoardInfo[$i][11]	= $objItem.Name
+			$g_aBaseBoardInfo[$i][12]	= $objItem.OtherIdentifyingInfo
+			$g_aBaseBoardInfo[$i][13]	= $objItem.PartNumber
+			$g_aBaseBoardInfo[$i][14]	= $objItem.PoweredOn
+			$g_aBaseBoardInfo[$i][15]	= $objItem.Product
+			$g_aBaseBoardInfo[$i][16]	= $objItem.Removable
+			$g_aBaseBoardInfo[$i][17]	= $objItem.Replaceable
+			$g_aBaseBoardInfo[$i][18]	= $objItem.RequirementsDescription
+			$g_aBaseBoardInfo[$i][19]	= $objItem.RequiresDaughterBoard
+			$g_aBaseBoardInfo[$i][20]	= $objItem.SerialNumber
+			$g_aBaseBoardInfo[$i][21]	= $objItem.SKU
+			$g_aBaseBoardInfo[$i][22]	= $objItem.SlotLayout
+			$g_aBaseBoardInfo[$i][23]	= $objItem.Status
+			$g_aBaseBoardInfo[$i][24]	= $objItem.Tag
+			$g_aBaseBoardInfo[$i][25]	= $objItem.Version
+			$g_aBaseBoardInfo[$i][26]	= $objItem.Weight
+			$g_aBaseBoardInfo[$i][27]	= $objItem.Width
+
+			$i += 1
+		Next
+		$g_aBaseBoardInfo[0][0] = UBound($g_aBaseBoardInfo) - 1
+		If $g_aBaseBoardInfo[0][0] < 1 Then
+			SetError(1, 1, 0)
+		EndIf
+	Else
+		SetError(1, 2, 0)
+	EndIf
+EndFunc ;_ComputerGetMotherboard
+
+
+Func __WMI_Bios(ByRef $g_aBIOSInfo)
+	Local $colItems, $objWMIService, $objItem, $i = 1
+
+	$objWMIService = ObjGet("winmgmts:\\" & @ComputerName & "\root\CIMV2")
+	$colItems = $objWMIService.ExecQuery("SELECT * FROM Win32_BIOS", "WQL", 0x30)
+
+	If IsObj($colItems) Then
+		For $objItem In $colItems
+			ReDim $g_aBIOSInfo[UBound($g_aBIOSInfo) + 1][30]
+
+			$g_aBiosCharacteristics = $objItem.BiosCharacteristics
+			$g_aBIOSInfo[$i][0]  = __JoinExtendedInformation($objItem.BIOSVersion)
+			$g_aBIOSInfo[$i][1]  = $objItem.BuildNumber
+			$g_aBIOSInfo[$i][2]  = $objItem.Caption
+			$g_aBIOSInfo[$i][3]  = $objItem.CodeSet
+			$g_aBIOSInfo[$i][4]  = $objItem.CurrentLanguage
+			$g_aBIOSInfo[$i][5]  = $objItem.Description
+			$g_aBIOSInfo[$i][6]  = $objItem.EmbeddedControllerMajorVersion
+			$g_aBIOSInfo[$i][7]  = $objItem.EmbeddedControllerMinorVersion
+			$g_aBIOSInfo[$i][8]  = $objItem.IdentificationCode
+			$g_aBIOSInfo[$i][9]  = $objItem.InstallableLanguages
+			$g_aBIOSInfo[$i][10] = __StringToDate($objItem.InstallDate)
+			$g_aBIOSInfo[$i][11] = $objItem.LanguageEdition
+			$g_aBIOSInfo[$i][12] = __JoinExtendedInformation($objItem.ListOfLanguages)
+			$g_aBIOSInfo[$i][13] = $objItem.Manufacturer
+			$g_aBIOSInfo[$i][14] = $objItem.Name
+			$g_aBIOSInfo[$i][15] = $objItem.OtherTargetOS
+			$g_aBIOSInfo[$i][16] = $objItem.PrimaryBIOS
+			$g_aBIOSInfo[$i][17] = __StringToDate($objItem.ReleaseDate)
+			$g_aBIOSInfo[$i][18] = $objItem.SerialNumber
+			$g_aBIOSInfo[$i][19] = $objItem.SMBIOSBIOSVersion
+			$g_aBIOSInfo[$i][20] = $objItem.SMBIOSMajorVersion
+			$g_aBIOSInfo[$i][21] = $objItem.SMBIOSMinorVersion
+			$g_aBIOSInfo[$i][22] = $objItem.SMBIOSPresent
+			$g_aBIOSInfo[$i][23] = $objItem.SoftwareElementID
+			$g_aBIOSInfo[$i][24] = __SoftwareElementState($objItem.SoftwareElementState)
+			$g_aBIOSInfo[$i][25] = $objItem.Status
+			$g_aBIOSInfo[$i][26] = $objItem.SystemBiosMajorVersion
+			$g_aBIOSInfo[$i][27] = $objItem.SystemBiosMinorVersion
+			$g_aBIOSInfo[$i][28] = $objItem.TargetOperatingSystem
+			$g_aBIOSInfo[$i][29] = $objItem.Version
+			$i += 1
+		Next
+		$g_aBIOSInfo[0][0] = UBound($g_aBIOSInfo) - 1
+		If $g_aBIOSInfo[0][0] < 1 Then
+			SetError(1, 1, 0)
+		EndIf
+	Else
+		SetError(1, 2, 0)
+	EndIf
+EndFunc
+
+
+Func __DecodeBiosCharacteristic($iCharacteristic)
+
+	_ArraySearch($g_aBiosCharacteristics, $iCharacteristic)
+	If @error Then
+		Return False
+	Else
+		Return True
+	EndIf
+
+EndFunc
+
+
+Func __ConvertBoolToYesNo($b)
+
+	If $b = True Then
+		Return "Yes"
+	ElseIf $b = False Then
+		Return "No"
+	EndIf
+
+EndFunc
+
+
+Func __SoftwareElementState($sItem)
+
+	Local $iItem = 99
+	Local $sReturn = ""
+
+	If IsNumber($sItem) Then
+		$iItem = Int($sItem)
+	EndIf
+
+	Switch $iItem
+		Case 0
+			$sReturn = "Deployable"
+		Case 1
+			$sReturn = "Installable"
+		Case 2
+			$sReturn = "Executable"
+		Case 3
+			$sReturn = "Running"
+		Case Else
+			$sReturn = "Unknown"
+	EndSwitch
+
+	Return $sReturn
+
+EndFunc
+
+
+Func __StringToDate($dtmDate)
+	Return (StringMid($dtmDate, 5, 2) & "/" & _
+			StringMid($dtmDate, 7, 2) & "/" & StringLeft($dtmDate, 4) _
+			& " " & StringMid($dtmDate, 9, 2) & ":" & StringMid($dtmDate, 11, 2) & ":" & StringMid($dtmDate,13, 2))
+EndFunc
+
+
+Func __JoinExtendedInformation($aArray, $sSeparator = " - ")
+
+	Local $n, $sOut = ""
+
+    If IsObj($aArray) Then
+        For $value In $aArray
+            $sOut &= $value & $sSeparator
+        Next
+        Return StringTrimRight($sOut, StringLen($sSeparator))
+    Else
+        For $n = 0 To UBound($aArray) - 1
+            $sOut &= $aArray[$n] & $sSeparator
+        Next
+        Return StringTrimRight($sOut, StringLen($sSeparator))
+    EndIf
+
+EndFunc
+
+
+Func __ReturnWMIError($sWMIError)
+
+	Local $sErrorMessage = "Oops... Something went wrong!"
+	If $sWMIError = 1 Then
+		$sErrorMessage = "Array contains no information!"
+	ElseIf $sWMIError = 2 Then
+		$sErrorMessage = "$colItems isnt an object!"
+	EndIf
+
+	MsgBox($MB_ICONERROR,  "WMI Error!", $sErrorMessage)
+
+EndFunc   ;==>_ReturnWMIerror
+
+
+Func MyErrFunc()
+
+	Local $sErrMessage = ""
+	$sErrMessage &= "Error Number: " & Hex($oMyError.Number, 8) & @CRLF & @CRLF
+	$sErrMessage &= "Description: " & @CRLF & $oMyError.WinDescription & @CRLF
+	MsgBox($MB_ICONERROR, "Oops, something went wrong!", $sErrMessage)
+
+	SetError(1)
+
+Endfunc
+
+#EndRegion
 
 
 #Region "Configuration (Settings)"
@@ -998,23 +1382,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[1]))
 	GUICtrlCreateGroup($g_aLangPreferences[4], 25, 50, 400, 160)
 	GUICtrlSetFont(-1, 10, 700, 2)
-	$g_hOChkLogEnabled = GUICtrlCreateCheckbox($g_aLangPreferences[8], 35, 90, 200, 20)
-	GUICtrlSetState($g_hOChkLogEnabled, $g_iLoggingEnabled)
-	GUICtrlCreateLabel($g_aLangPreferences[9], 35, 120, 180, 20)
-	$g_hOInLogSize = GUICtrlCreateInput(Round($g_iLoggingStorage / 1024, 2), 215, 118, 100, 20)
-	GUICtrlSetStyle($g_hOInLogSize, BitOr($ES_RIGHT, $ES_NUMBER))
-	GUICtrlSetFont(-1, 9, 400, 0, "Verdana")
-	GUICtrlCreateLabel("KB", 325, 120, 50, 20)
-	$g_hOInLogSizeTemp = Int(GUICtrlRead($g_hOInLogSize))
-	$g_hOLblLogSize = GUICtrlCreateLabel(StringFormat($g_aLangPreferences[10], __GetLoggingSize()), 35, 160, 200, 20)
-	GUICtrlSetColor($g_hOLblLogSize, 0x555555)
-	$g_hOBtnLogClear = GUICtrlCreateButton($g_aLangPreferences[11], 255, 155, 150, 30)
-	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
-	GUICtrlSetOnEvent($g_hOChkLogEnabled, "__CheckPreferenceChange")
-	GUICtrlSetOnEvent($g_hOBtnLogClear, "__RemoveLoggingFile")
-		;GUICtrlSetState($g_ReBarChkLogEnabled, $g_ReBarLogEnabled)
-	__CheckLoggingStateChanged()
 	GUICtrlCreateTabItem("") ; end tabitem definition
 
 	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[2]))
@@ -1126,35 +1494,6 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetOnEvent($g_hOBtnCancel, "__CloseOptionsDlg")
 
 	GUISetState(@SW_SHOW, $g_hOptionsGui)
-	AdlibRegister("__CheckLoggingSizeChange", 500)
-
-EndFunc
-
-
-Func __RemoveLoggingFile()
-
-	GUICtrlSetState($g_hOBtnLogClear, $GUI_DISABLE)
-	DirRemove($g_sLoggingRoot, 1)
-
-	If $g_iLoggingEnabled = 1 Then
-		_Logging_Initialize()
-	EndIf
-
-	GUICtrlSetData($g_hOLblLogSize, StringFormat($g_aLangPreferences[10], __GetLoggingSize()))
-	GUICtrlSetData($g_hOLblPrefsUpdated, $g_aLangPreferences[19])
-	GUICtrlSetState($g_hOLblPrefsUpdated, $GUI_SHOW)
-	GUICtrlSetState($g_hOBtnLogClear, $GUI_ENABLE)
-
-EndFunc
-
-
-Func __GetLoggingSize()
-
-	If FileExists($g_sLoggingRoot) Then
-		Return Round(DirGetSize($g_sLoggingRoot) / 1024, 2)
-	Else
-		Return 0
-	EndIf
 
 EndFunc
 
@@ -1222,41 +1561,13 @@ EndFunc
 
 Func __CheckPreferenceChange()
 
-	If __CheckBoxChanged("LoggingEnabled", $g_hOChkLogEnabled) = True Or _
-		__CheckBoxChanged("SaveRealtime", $g_hOChkSaveRealtime) = True Or _
+	If __CheckBoxChanged("SaveRealtime", $g_hOChkSaveRealtime) = True Or _
 		__CheckBoxChanged("ReduceMemory", $g_hOChkReduceMemory) = True Then
 		GUICtrlSetState($g_hOBtnSave, $GUI_ENABLE)
 	Else
 		GUICtrlSetState($g_hOBtnSave, $GUI_DISABLE)
 	EndIf
-
-	__CheckLoggingStateChanged()
 	GUICtrlSetState($g_hOLblPrefsUpdated, $GUI_HIDE)
-
-EndFunc
-
-
-Func __CheckLoggingStateChanged()
-
-	If GUICtrlRead($g_hOChkLogEnabled) = $GUI_CHECKED Then
-		GUICtrlSetState($g_hOInLogSize, $GUI_ENABLE)
-		GUICtrlSetState($g_hOBtnLogClear, $GUI_ENABLE)
-	Else
-		GUICtrlSetState($g_hOInLogSize, $GUI_DISABLE)
-		GUICtrlSetState($g_hOBtnLogClear, $GUI_DISABLE)
-	EndIf
-
-EndFunc
-
-
-Func __CheckLoggingSizeChange()
-
-	Local $iLogTemp = Int(GUICtrlRead($g_hOInLogSize))
-
-	If $g_hOInLogSizeTemp <> $iLogTemp Then
-		GUICtrlSetState($g_hOBtnSave, $GUI_ENABLE)
-		$g_hOInLogSizeTemp = $iLogTemp
-	EndIf
 
 EndFunc
 
@@ -1308,13 +1619,6 @@ Func __SavePreferences()
 		$g_iReduceMemory = 0
 	EndIf
 
-	If GUICtrlRead($g_hOChkLogEnabled) = $GUI_CHECKED Then
-		$g_iLoggingEnabled = 1
-	ElseIf GUICtrlRead($g_hOChkLogEnabled) = $GUI_UNCHECKED Then
-		$g_iLoggingEnabled = 0
-	EndIf
-	$g_iLoggingStorage = Int(GUICtrlRead($g_hOInLogSize)) * 1024
-
 	If $g_iSaveRealtime = 0 And $g_iProcessPriority = 5 Then
 		IniWrite($g_sPathIni, $g_sProgShortName, "ProcessPriority", 4)
 	Else
@@ -1365,7 +1669,6 @@ Func __CloseOptionsDlg()
 		WinSetTrans($g_hCoreGui, Default, 255)
 		GUISetState(@SW_ENABLE, $g_hCoreGui)
 	EndIf
-	AdlibUnRegister("__CheckLoggingSizeChange")
 	GUIDelete($g_hOptionsGui)
 
 EndFunc

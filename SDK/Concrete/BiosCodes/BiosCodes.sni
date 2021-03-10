@@ -1,0 +1,67 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 8
+Script = BiosCodes.au3
+
+[Modules]
+Build = 1
+Compress = 1
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://www.rizonesoft.com
+
+[Distribute]
+File=%RootDir%\BiosCodes.exe
+File=%RootDir%\BiosCodes_X64.exe
+File=%SourceDir%\BiosCodes.ini
+File=%RootDir%\Docs\BiosCodes\Changes.txt
+File=%RootDir%\Docs\BiosCodes\License.txt
+File=%RootDir%\Docs\BiosCodes\Readme.txt
+File=%RootDir%\Language\BiosCodes\en.ini
+File=%RootDir%\Processing\32\Stroke.ani
+File=%RootDir%\Processing\64\Globe.ani
+
+[Sources]
+
+[Links]
+CompanyURL=https://www.rizonesoft.com
+SupportURL=https://github.com/rizonesoft/Resolute/issues
+ContactURL=https://www.rizonesoft.com/#contact
+UpdateURL=https://www.rizonesoft.com/downloads/bios-beep-codes-viewer/
+
+[Environment]
+ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\BiosCodes\BiosCodes.au3
+Company=Rizonesoft
+CompanyURL=https://www.rizonesoft.com
+Name=Bios Beep Code Viewer
+ShortName=BiosCodes
+Description=Bios Beep Code Viewer
+Type=N
+Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\BiosCodes.ico
+Version=8.1.2.1705
+VersionMajor=8
+VersionMaintenance=2
+VersionBuild=1705
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=BiosCodes.exe
+OutFileX64=BiosCodes_X64.exe
+OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\BiosCodes.exe
+OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\BiosCodes_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\BiosCodes\Distribution\1705
+DistributionName=BiosCodes_1705
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\BiosCodes\Distribution\1705\BiosCodes_1705
+DistroSourceName=BiosCodes_1705_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\BiosCodes\Distribution\1705\BiosCodes_1705_Source
