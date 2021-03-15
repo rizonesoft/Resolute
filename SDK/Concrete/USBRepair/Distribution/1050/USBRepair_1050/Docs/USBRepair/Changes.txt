@@ -22,3 +22,5 @@ Version 1.0.0.1045 (FEBRUARY 28, 2021)
 - Initial Release - No recorded history.
 
 ==================================================
+
+USB Repair can fix USB device errors 

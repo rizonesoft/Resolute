@@ -7509,3 +7509,26 @@
 [ 2021/03/09 21:24:30 ] C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1155\DVDRepair_1155_Setup.exe
 [ 2021/03/09 21:24:30 ] Finished: Created installation for DVD Drive Repair.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/13 23:34:41 ] DATE:                        2021/03/13 23:34:41
+[ 2021/03/13 23:34:41 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3622
+[ 2021/03/13 23:34:41 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/03/13 23:34:41 ] COMPILED:                    YES
+[ 2021/03/13 23:34:41 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/13 23:34:41 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/13 23:34:41 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/13 23:34:41 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/13 23:34:41 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/13 23:34:51 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2021/03/13 23:34:51 ] Successfully created 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\USBRepair.ru'
+[ 2021/03/13 23:34:51 ] Successfully created 'C:\Users\Venom\Documents\GitHub\Resolute\SDK\www\update\USBRepair.rus'
+[ 2021/03/13 23:34:51 ] Finished: 
+------------------------------------------------------------------------------------------

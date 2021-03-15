@@ -6,6 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Added: High resolution icon (256x256px). 
+
+--------------------------------------------------
+Version 8.1.3.5113 (MARCH 09, 2021)
+--------------------------------------------------
+
 - Updated: Korean translation.
 - Fixed: License file variables.
 - Fixed: Info Tip Display.
