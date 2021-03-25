@@ -17,28 +17,28 @@
 ;===============================================================================================================
 ; Aut2Exe Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Icon=..\..\Resources\Icons\Firemin.ico			;~ Filename of the Ico file to use for the compiled exe
-#AutoIt3Wrapper_OutFile_Type=exe								;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
-#AutoIt3Wrapper_OutFile=..\..\..\Resolute\Firemin.exe			;~ Target exe/a3x filename.
-#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\Firemin_X64.exe	;~ Target exe filename for X64 compile.
-;#AutoIt3Wrapper_Compression=4									;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
-;#AutoIt3Wrapper_UseUpx=Y										;~ (Y/N) Compress output program.  Default=Y
-;#AutoIt3Wrapper_UPX_Parameters=								;~ Override the default settings for UPX.
-#AutoIt3Wrapper_Change2CUI=N									;~ (Y/N) Change output program to CUI in stead of GUI. Default=N
-#AutoIt3Wrapper_Compile_both=Y									;~ (Y/N) Compile both X86 and X64 in one run. Default=N
+#AutoIt3Wrapper_Icon=..\..\Resources\Icons\FireminPro.ico			;~ Filename of the Ico file to use for the compiled exe
+#AutoIt3Wrapper_OutFile_Type=exe									;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
+#AutoIt3Wrapper_OutFile=..\..\..\Resolute\FireminPro.exe			;~ Target exe/a3x filename.
+#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\FireminPro_X64.exe	;~ Target exe filename for X64 compile.
+;#AutoIt3Wrapper_Compression=4										;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
+;#AutoIt3Wrapper_UseUpx=Y											;~ (Y/N) Compress output program.  Default=Y
+;#AutoIt3Wrapper_UPX_Parameters=									;~ Override the default settings for UPX.
+#AutoIt3Wrapper_Change2CUI=N										;~ (Y/N) Change output program to CUI in stead of GUI. Default=N
+#AutoIt3Wrapper_Compile_both=Y										;~ (Y/N) Compile both X86 and X64 in one run. Default=N
 ;===============================================================================================================
 ; Target Program Resource info
 ;===============================================================================================================
-#AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
-#AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.3.5116
+#AutoIt3Wrapper_Res_Comment=Firemin Server							;~ Comment field
+#AutoIt3Wrapper_Res_Description=Firemin Server			    		;~ Description field
+#AutoIt3Wrapper_Res_Fileversion=8.1.3.5163
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
 #AutoIt3Wrapper_Res_ProductVersion=8             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
 #AutoIt3Wrapper_Res_LegalCopyright=© 2021 Rizonesoft				;~ Copyright field
-#AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
+#AutoIt3Wrapper_res_requestedExecutionLevel=highestAvailable		;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 ;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
 ; If _Res_SaveSource=Y the content of Script_source depends on the _Run_Au3Stripper and #Au3Stripper_parameters directives:
@@ -60,7 +60,7 @@
 ;	%time% = PC timeformat
 ;	eg: #AutoIt3Wrapper_Res_Field=AutoIt Version|%AutoItVer%
 #AutoIt3Wrapper_Res_Field=CompanyName|Rizonesoft
-#AutoIt3Wrapper_Res_Field=ProductName|Firemin
+#AutoIt3Wrapper_Res_Field=ProductName|Firemin Server
 #AutoIt3Wrapper_Res_Field=HomePage|https://www.rizonesoft.com
 #AutoIt3Wrapper_Res_Field=AutoItVersion|%AutoItVer%
 ; Add extra ICO files to the resources
@@ -72,7 +72,7 @@
 ; Add files to the resources - can be compressed
 ; #AutoIt3Wrapper_Res_Remove=
 ; Remove resources
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\FireminH.ico						; 201
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\FireminProH.ico					; 201
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico			; 202
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico				; 203
@@ -267,9 +267,9 @@ Global Const $CNT_LANGICONS		= 35
 
 ;~ General Settings
 Global $g_sCompanyName			= "Rizonesoft"
-Global $g_sProgShortName		= "Firemin"
+Global $g_sProgShortName		= "FireminPro"
 Global $g_sProgShortName_X64	= $g_sProgShortName & "_X64"
-Global $g_sProgName				= "Firemin"
+Global $g_sProgName				= "Firemin Server"
 Global $g_iSingleton			= True
 Global $g_iCoreGuiLoaded		= False
 
@@ -432,6 +432,7 @@ Global $g_iSaveRealtime			= 0
 Global $g_iReduceMemory 		= 1
 Global $g_iReduceEveryMill 		= 300
 Global $g_iMaxSysMemoryPerc 	= 80
+Global $g_iProcessesCount		= 0
 
 
 _Localization_Messages()   		;~ Load Message Language Strings
@@ -642,7 +643,7 @@ Func _StartCoreGui()
 	GUICtrlSetCursor($g_hLblPrflPathExe, 0)
 	GUICtrlCreateLabel($g_aLangCustom[4] & Chr(32), 20, 235, 130, 18, $SS_RIGHT)
 	GUICtrlSetColor(-1, 0x555555)
-	$g_hLblProcessUsage = GUICtrlCreateLabel("0 MB", 150, 235, 100, 18)
+	$g_hLblProcessUsage = GUICtrlCreateLabel("0 MB / 0 MB", 150, 235, 180, 18)
 	GUICtrlCreateLabel($g_aLangCustom[5]& Chr(32), 20, 253, 130, 18, $SS_RIGHT)
 	GUICtrlSetColor(-1, 0x555555)
 	$g_hLblProcessPeak = GUICtrlCreateLabel("0 MB", 150, 253, 100, 18)
@@ -707,13 +708,13 @@ Func _StartCoreGui()
 
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 	AdlibRegister("_OnIconsHover", 65)
-	AdlibRegister("_GetCoreProcessPeak", 5000)
+	; AdlibRegister("_GetCoreProcessPeak", 5000)
 
 	GUICtrlSetState($g_hChkStartWindows, FileExists(@StartupDir & "\Firemin.lnk"))
 	_SetBoostDescription()
 
-	_GetCoreProcessUsage()
-	_GetCoreProcessPeak()
+	; _GetCoreProcessUsage()
+	; _GetCoreProcessPeak()
 
 EndFunc   ;==>_StartCoreGui
 
@@ -733,7 +734,7 @@ Func _CloseCoreGui()
 	_SetTrayItemStates()
 
 	AdlibUnRegister("_OnIconsHover")
-	AdlibUnRegister("_GetCoreProcessPeak")
+	; AdlibUnRegister("_GetCoreProcessPeak")
 
 EndFunc
 
@@ -981,7 +982,10 @@ Func _SetBoost()
 	EndIf
 
 	$g_iBoostMill = Int(GUICtrlRead($g_hComboReduceMill))
+
+	AdlibUnRegister("_ClearProcessesWorkingSet")
 	AdlibRegister("_ClearProcessesWorkingSet", $g_iBoostMill)
+
 	_ClearProcessesWorkingSet()
 	_EnableSaveSettings()
 	_SetControlStates()
@@ -1201,7 +1205,6 @@ Func _FindBrowser()
 			GUICtrlSetState($g_hBtnSave, $GUI_ENABLE)
 		EndIf
         _LoadBrowser($sBrowserOpenDlg)
-		_ResetProcessUsage()
 		_SetTrayItemStates()
     EndIf
 
@@ -1272,46 +1275,54 @@ EndFunc
 
 Func _GetCoreProcessUsage()
 
-	If ProcessExists($g_sCoreProcess) Then
+	Local $hToken, $Data, $aAdjust, $aList = 0
+	Local $aProcessList
 
-		$g_iCoreProcessUsage = _GetProcessUsage($g_sCoreProcess, 0)
-		GUICtrlSetData($g_hLblProcessUsage, $g_iCoreProcessUsage & " MB")
+	; Enable "SeDebugPrivilege" privilege for obtain full access rights to another process
+	$hToken = _WinAPI_OpenProcessToken(BitOR($TOKEN_ADJUST_PRIVILEGES, $TOKEN_QUERY))
+	_WinAPI_AdjustTokenPrivileges($hToken, $SE_DEBUG_NAME, $SE_PRIVILEGE_ENABLED, $aAdjust)
 
-		If $g_iBoostEnabled Then
+	If Not (@error Or @extended) Then
 
-			If $g_iLimitEnabled Then
-				If $g_iCoreProcessUsage > $g_iCleanLimit Then
-					GUICtrlSetColor($g_hLblProcessUsage, 0xFF0000)
-				Else
-					GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
-				EndIf
-			Else
-				GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
-			EndIf
+		$aProcessList = ProcessList($g_sCoreProcess)
+		$g_iProcessesCount = $aProcessList[0][0]
 
-		Else
-
-			If $g_iCoreProcessUsage > 300 Then
-				GUICtrlSetColor($g_hLblProcessUsage, 0xFF0000)
-			Else
-				GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
-			EndIf
-
+		If Not @error Then
+			For $i = 1 To $g_iProcessesCount
+				$g_iCoreProcessUsage += _GetProcessUsage($aProcessList[$i][0], 0)
+				$g_iCoreProcessPeak +=_GetProcessUsage($aProcessList[$i][0], 1)
+			Next
 		EndIf
 
 	EndIf
 
-EndFunc
+	; Enable SeDebugPrivilege privilege by default
+	_WinAPI_AdjustTokenPrivileges($hToken, $aAdjust, 0, $aAdjust)
+	_WinAPI_CloseHandle($hToken)
 
+	$g_iCoreProcessUsage = Round($g_iCoreProcessUsage, 0)
+	$g_iCoreProcessPeak = Round($g_iCoreProcessPeak, 0)
 
-Func _GetCoreProcessPeak()
+	GUICtrlSetData($g_hLblProcessUsage, $g_iCoreProcessUsage & " MB / " & $g_iCoreProcessPeak & " MB")
+	GUICtrlSetData($g_hLblProcessPeak, $g_iProcessesCount)
 
-	If ProcessExists($g_sCoreProcess) Then
-		$g_iCoreProcessPeak =_GetProcessUsage($g_sCoreProcess, 1)
-		GUICtrlSetData($g_hLblProcessPeak, $g_iCoreProcessPeak & " MB")
+	If $g_iBoostEnabled Then
+
+		If $g_iLimitEnabled Then
+			If $g_iCoreProcessUsage > ($g_iCleanLimit * $g_iProcessesCount) Then
+				GUICtrlSetColor($g_hLblProcessUsage, 0xFF0000)
+			Else
+				GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
+			EndIf
+		Else
+			GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
+		EndIf
 	Else
-		_ResetProcessUsage()
+		GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
 	EndIf
+
+	$g_iCoreProcessUsage = 0
+	$g_iCoreProcessPeak	= 0
 
 EndFunc
 
@@ -1319,25 +1330,12 @@ EndFunc
 Func _ClearProcessesWorkingSet()
 
 	If $g_iBoostEnabled Then
-		If $g_iLimitEnabled Then
-			If Round(_GetProcessUsage($g_sCoreProcess, 0)) > $g_iCleanLimit Then
-				__ClearSingleProcess($g_sCoreProcess)
-			EndIf
-		Else
-			__ClearSingleProcess($g_sCoreProcess)
-		EndIf
+		__ClearSingleProcess($g_sCoreProcess)
 	EndIf
 
-	_GetCoreProcessUsage()
 	_ClearExtendedProcs()
+	_GetCoreProcessUsage()
 
-EndFunc
-
-
-Func _ResetProcessUsage()
-	GUICtrlSetData($g_hLblProcessUsage, "0 MB")
-	GUICtrlSetData($g_hLblProcessPeak, "0 MB")
-	GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
 EndFunc
 
 
@@ -1378,12 +1376,36 @@ EndFunc
 
 Func __ClearSingleProcess($sProcess)
 
-	Local $aProcessList = ProcessList($sProcess)
-	If Not @error Then
-		For $i = 1 To $aProcessList[0][0]
-			_WinAPI_EmptyWorkingSet($aProcessList[$i][1])
-		Next
+	Local $hToken, $Data, $aAdjust, $aList = 0
+	Local $aProcessList
+
+	; Enable "SeDebugPrivilege" privilege for obtain full access rights to another process
+	$hToken = _WinAPI_OpenProcessToken(BitOR($TOKEN_ADJUST_PRIVILEGES, $TOKEN_QUERY))
+	_WinAPI_AdjustTokenPrivileges($hToken, $SE_DEBUG_NAME, $SE_PRIVILEGE_ENABLED, $aAdjust)
+
+	If Not (@error Or @extended) Then
+
+		$aProcessList = ProcessList($sProcess)
+
+		If Not @error Then
+
+			For $i = 1 To $aProcessList[0][0]
+				If $g_iLimitEnabled Then
+					If  Round(_GetProcessUsage($aProcessList[$i][1], 0)) > $g_iCleanLimit Then
+						_WinAPI_EmptyWorkingSet($aProcessList[$i][1])
+					EndIf
+				Else
+					_WinAPI_EmptyWorkingSet($aProcessList[$i][0])
+				EndIf
+			Next
+
+		EndIf
+
 	EndIf
+
+	; Enable SeDebugPrivilege privilege by default
+	_WinAPI_AdjustTokenPrivileges($hToken, $aAdjust, 0, $aAdjust)
+	_WinAPI_CloseHandle($hToken)
 
 EndFunc
 
@@ -1546,6 +1568,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetOnEvent($g_hOBtnCancel, "__CloseOptionsDlg")
 
 	GUISetState(@SW_SHOW, $g_hOptionsGui)
+	AdlibUnRegister("__CheckExtendedProcsChange")
 	AdlibRegister("__CheckExtendedProcsChange", 800)
 
 EndFunc

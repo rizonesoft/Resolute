@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.0.2.3623
+#AutoIt3Wrapper_Res_Fileversion=8.0.2.3624
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -2574,6 +2574,7 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	Local $sCompanyURL = IniRead($sSolutionIniPath, "Links", "CompanyURL", "https://www.rizonesoft.com")
 	Local $sSupportURL = IniRead($sSolutionIniPath, "Links", "SupportURL", "https://www.rizonesoft.com")
 	Local $sContactURL = IniRead($sSolutionIniPath, "Links", "ContactURL", "https://www.rizonesoft.com")
+	Local $sUninstallURL = IniRead($sSolutionIniPath, "Links", "UninstallURL", "https://www.rizonesoft.com")
 
 	Local $i64BitInstall = False
 	If StringStripWS($sOutput64Bit, 8) <> "" Then
@@ -2766,8 +2767,9 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, "Type: files;      Name: {app}\" & $sIniFilBaseName & @CRLF)
 	FileWrite($hFileOpen, "Type: dirifempty; Name: {app}" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
-
 	FileWrite($hFileOpen, "[Code]" & @CRLF)
+	FileWrite($hFileOpen, "const" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "UninstSiteURL = '" & $sUninstallURL & "';" & @CRLF)
 	FileWrite($hFileOpen, "function IsUpgrade(): Boolean;" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "var" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "sPrevPath: String;" & @CRLF)
@@ -2819,6 +2821,8 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
 	FileWrite($hFileOpen, "procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);" & @CRLF)
+	FileWrite($hFileOpen, "var" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ErrorCode: Integer;" & @CRLF)
 	FileWrite($hFileOpen, "begin" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "// When uninstalling, ask the user to delete " & $sProgName & "'s settings." & @CRLF)
 	FileWrite($hFileOpen, @TAB & "if CurUninstallStep = usUninstall then begin" & @CRLF)
@@ -2827,6 +2831,8 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, @TAB & @TAB & @TAB & "CleanUpSettings();" & @CRLF)
 	FileWrite($hFileOpen, @TAB & @TAB & "end;" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "end;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "if CurUninstallStep = usDone then" & @CRLF)
+	FileWrite($hFileOpen, @TAB & @TAB & "ShellExec('', UninstSiteURL, '', '', SW_SHOW, ewNoWait, ErrorCode);" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
 	FileWrite($hFileOpen, "procedure InitializeWizard();" & @CRLF)
