@@ -6,9 +6,16 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
-- Added: High resolution icon (256x256px). 
+- Added: High resolution icon (256x256px).
 - Updated: Japanese translation.
+- Updated: Optimized browser Safe Mode detection.
 - Fixed: Incorrect default values.
+- Fixed: Main windows not being able to close.
+- Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later.
+
+Language Changes from Firemin:
+- [Custom]: Label_Notice = %{Program.Name} is designed to run on a desktop computer or laptop.
+			We created Firemin Server for server environments. Read more...
 
 --------------------------------------------------
 Version 8.1.3.5113 (MARCH 09, 2021)

@@ -34,10 +34,11 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Links]
-CompanyURL=https://www.rizonesoft.com
-SupportURL=https://github.com/rizonesoft/Resolute/issues
-ContactURL=https://www.rizonesoft.com/#contact
-UpdateURL=https://www.rizonesoft.com/downloads/usb-repair/
+CompanyURL = https://www.rizonesoft.com
+SupportURL = https://github.com/rizonesoft/Resolute/issues
+ContactURL = https://www.rizonesoft.com/#contact
+UpdateURL = https://www.rizonesoft.com/downloads/update/?id=usbrepair
+UninstallURL = https://www.rizonesoft.com/uninstalled/
 
 [Environment]
 ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
@@ -48,10 +49,10 @@ ShortName=USBRepair
 Description=Rizonesoft USB Repair
 Type=N
 Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\USBRepair.ico
-Version=8.0.1.1056
+Version=8.0.3.1065
 VersionMajor=8
-VersionMaintenance=1
-VersionBuild=1056
+VersionMaintenance=3
+VersionBuild=1065
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -59,11 +60,11 @@ OutFile=USBRepair.exe
 OutFileX64=USBRepair_X64.exe
 OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair.exe
 OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe
-InstallScriptPath=0
-InstallOutputPath=0
+InstallScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1065\USBRepair_1065_Setup.iss
+InstallOutputPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1065\USBRepair_1065_Setup.exe
 InstallSize=0
-DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1056
-DistributionName=USBRepair_1056
-FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1056\USBRepair_1056
-DistroSourceName=USBRepair_1056_Source
-DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1056\USBRepair_1056_Source
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1065
+DistributionName=USBRepair_1065
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1065\USBRepair_1065
+DistroSourceName=USBRepair_1065_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\1065\USBRepair_1065_Source

@@ -6,6 +6,13 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed: Main windows not being able to close.
+- Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later.
+
+--------------------------------------------------
+Version 8.1.3.1155 (MARCH 09, 2021)
+--------------------------------------------------
+
 - Updated: Korean translation.
 - Fixed: License file variables.
 - Fixed: Info Tip Display.

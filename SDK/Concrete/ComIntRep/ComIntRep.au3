@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Complete Internet Repair			;~ Comment field
 #AutoIt3Wrapper_Res_Description=Complete Internet Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.3.5220
+#AutoIt3Wrapper_Res_Fileversion=8.1.3.5223
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -332,7 +332,7 @@ Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/complete-internet-repair/|www.rizonesoft.com/downloads/complete-internet-repair/"
+Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/update/?id=comintrep|www.rizonesoft.com/downloads/update"
 Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/complete-internet-repair/update/|www.rizonesoft.com/downloads/complete-internet-repair/update/"
 Global $g_sUrlWinRepair         = "https://www.rizonesoft.com/downloads/complete-windows-repair/|www.rizonesoft.com/downloads/complete-windows-repair/"
 

@@ -39,10 +39,11 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Links]
-CompanyURL=https://www.rizonesoft.com
-SupportURL=https://github.com/rizonesoft/Resolute/issues
-ContactURL=https://www.rizonesoft.com/#contact
-UpdateURL=https://www.rizonesoft.com/downloads/dvd-drive-repair/
+CompanyURL = https://www.rizonesoft.com
+SupportURL = https://github.com/rizonesoft/Resolute/issues
+ContactURL = https://www.rizonesoft.com/#contact
+UpdateURL = https://www.rizonesoft.com/downloads/update/?id=dvdrepair
+UninstallURL = https://www.rizonesoft.com/uninstalled/
 
 [Environment]
 ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
@@ -53,10 +54,10 @@ ShortName=DVDRepair
 Description=Rizonesoft DVD Drive Repair
 Type=N
 Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\DVDRepair.ico
-Version=8.1.3.1155
+Version=8.1.3.1158
 VersionMajor=8
 VersionMaintenance=3
-VersionBuild=1155
+VersionBuild=1158
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -64,11 +65,11 @@ OutFile=DVDRepair.exe
 OutFileX64=DVDRepair_X64.exe
 OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair.exe
 OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\DVDRepair_X64.exe
-InstallScriptPath=0
-InstallOutputPath=0
+InstallScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1158\DVDRepair_1158_Setup.iss
+InstallOutputPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1158\DVDRepair_1158_Setup.exe
 InstallSize=0
-DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1155
-DistributionName=DVDRepair_1155
-FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1155\DVDRepair_1155
-DistroSourceName=DVDRepair_1155_Source
-DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1155\DVDRepair_1155_Source
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1158
+DistributionName=DVDRepair_1158
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1158\DVDRepair_1158
+DistroSourceName=DVDRepair_1158_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\1158\DVDRepair_1158_Source

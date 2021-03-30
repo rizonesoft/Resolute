@@ -5,6 +5,23 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Added: Reset HIDClass UpperFilters abd LowerFilters.
+- Added: Reset Keyboard UpperFilters abd LowerFilters.
+- Added: Reset Mice and pointing devices UpperFilters abd LowerFilters.
+- Fixed: Main windows not being able to close.
+- Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later.
+
+Language Changes:
+- [Messages2]: Repair_USB_01 = Repairing USB host controllers and hubs.
+- [Messages2]: Repair_USB_02 = Repairing HIDClass.
+- [Messages2]: Repair_USB_03 = Repairing Keyboards.
+- [Messages2]: Repair_USB_04 = Repairing Mice and pointing devices.
+- [Messages2]: Repair_USB_05 = Hope that resolved your USB issues. If not, it could be a physical hardware problem.
+
+--------------------------------------------------
+Version 8.0.1.1050 (MARCH 09, 2021)
+--------------------------------------------------
+
 - Fixed: Info Tip Display.
 - Fixed: Second instance of the program closes all other instances.
 - Added: Korean Translation.

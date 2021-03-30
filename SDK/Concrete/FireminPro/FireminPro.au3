@@ -9,7 +9,7 @@
 ; AutoIt3 Settings
 ;===============================================================================================================
 #AutoIt3Wrapper_UseX64=Y										;~ (Y/N) Use AutoIt3_x64 or Aut2Exe_x64. Default=N
-#AutoIt3Wrapper_Version=P                        				;~ (B/P) Use Beta or Production for AutoIt3 and Aut2Eex. Default is P
+#AutoIt3Wrapper_Version=B                        				;~ (B/P) Use Beta or Production for AutoIt3 and Aut2Eex. Default is P
 #AutoIt3Wrapper_Run_Debug_Mode=N								;~ (Y/N) Run Script with console debugging. Default=N
 ;#AutoIt3Wrapper_Autoit3Dir=									;~ Optionally override the AutoIt3 install directory to use.
 ;#AutoIt3Wrapper_Aut2exe=										;~ Optionally override the Aut2exe.exe to use for this script
@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin Server							;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin Server			    		;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.3.5163
+#AutoIt3Wrapper_Res_Fileversion=8.1.3.5184
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -274,19 +274,20 @@ Global $g_iSingleton			= True
 Global $g_iCoreGuiLoaded		= False
 
 ;~ Links
-Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "mailto:support@rizonesoft.com|support@rizonesoft.com"										; https://www.rizonesoft.com/contact
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com/downloads/
-Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
-Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
-Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
-Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"										; https://www.rizonesoft.com/feed
-Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"										; https://www.paypal.me/rizonesoft
-Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
-Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
-Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/firemin/|www.rizonesoft.com/downloads/firemin/"			; https://www.rizonesoft.com/downloads/firemin/
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/firemin/update|www.rizonesoft.com/downloads/firemin/update"
+Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"																; https://www.rizonesoft.com
+Global $g_sUrlSupport			= "mailto:support@rizonesoft.com|support@rizonesoft.com"														; https://www.rizonesoft.com/contact
+Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"																; https://www.rizonesoft.com/downloads/
+Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"													; https://www.facebook.com/rizonesoft
+Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"														; https://twitter.com/Rizonesoft
+Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 											; https://www.linkedin.com/in/rizonetech
+Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"														; https://www.rizonesoft.com/feed
+Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"														; https://www.paypal.me/rizonesoft
+Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"										; https://github.com/rizonesoft/Resolute
+Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"							; https://github.com/rizonesoft/Resolute/issues
+Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"									; https://en.wikipedia.org/wiki/South_Africa
+Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/firemin-server/|www.rizonesoft.com/downloads/firemin-server"			; https://www.rizonesoft.com/downloads/firemin/
+Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/update/?id=fireminpro|www.rizonesoft.com/downloads/update"
+Global $g_sUrlNotice			= "https://www.rizonesoft.com/notice/?id=fireminpro|www.rizonesoft.com/notice"
 
 
 ;~ Path Settings
@@ -304,7 +305,7 @@ Global $g_sDocReadme		= $g_sDocsDir & "\Readme.txt"
 
 ; Configuration Settings
 Global $g_iBoostMill		 = 1000
-Global $g_iCleanLimit		 = 20
+Global $g_iCleanLimit		 = 5
 Global $g_sBrowserName
 Global $g_sBrowserPath		 = @ProgramFilesDir & "\Mozilla Firefox\firefox.exe"
 Global $g_sExtendedProcs	 = "plugin-container.exe"
@@ -443,7 +444,7 @@ If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 EndIf
 
 
-If @OSVersion = "WIN_2000" Or @OSVersion = "WIN_XPe" Or @OSVersion = "WIN_2003" Then
+If @OSVersion = "WIN_2000" Or @OSVersion = "WIN_XPe" Or @OSVersion = "WIN_XP" Or @OSVersion = "WIN_VISTA" Or @OSVersion = "WIN_2003" Then
 	Local $iMsgBoxResult = MsgBox($MB_YESNO + $MB_ICONERROR + $MB_TOPMOST, $g_aLangMessages[3], StringFormat($g_aLangMessages[5], _
 				_Link_Split($g_sUrlSupport, 2)), $g_iMsgBoxTimeOut)
 	Switch $iMsgBoxResult
@@ -625,7 +626,16 @@ Func _StartCoreGui()
 	$g_hSubHeading = GUICtrlCreateLabel($g_aLangCustom[0], $g_iSizeIcon + 22, 38, _
 		$g_iCoreGuiWidth - $g_iSizeIcon - 42, 50)
 	GUICtrlSetFont($g_hSubHeading, 9)
-	GUICtrlSetColor($g_hSubHeading, 0x353535)
+
+	If @OSVersion = "WIN_10" or @OSVersion = "WIN_81" or @OSVersion = "WIN_8" or @OSVersion = "WIN_7" Then
+		GUICtrlSetData($g_hSubHeading, $g_aLangCustom[26])
+		GUICtrlSetColor($g_hSubHeading, 0xFD6200)
+		GUICtrlSetCursor($g_hSubHeading, 0)
+		GUICtrlSetOnEvent($g_hSubHeading, "_NoticeClick")
+	Else
+		GUICtrlSetData($g_hSubHeading, $g_aLangCustom[0])
+		GUICtrlSetColor($g_hSubHeading, 0x353535)
+	EndIf
 
 	GUICtrlCreateGroup($g_aLangCustom[2], 10, 95, 430, 180)
 	GUICtrlSetFont(-1, 10, 700, 2)
@@ -708,13 +718,10 @@ Func _StartCoreGui()
 
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 	AdlibRegister("_OnIconsHover", 65)
-	; AdlibRegister("_GetCoreProcessPeak", 5000)
 
 	GUICtrlSetState($g_hChkStartWindows, FileExists(@StartupDir & "\Firemin.lnk"))
 	_SetBoostDescription()
-
-	; _GetCoreProcessUsage()
-	; _GetCoreProcessPeak()
+	_GetCoreProcessUsage()
 
 EndFunc   ;==>_StartCoreGui
 
@@ -734,7 +741,6 @@ Func _CloseCoreGui()
 	_SetTrayItemStates()
 
 	AdlibUnRegister("_OnIconsHover")
-	; AdlibUnRegister("_GetCoreProcessPeak")
 
 EndFunc
 
@@ -771,6 +777,10 @@ Func _OnIconsHover()
 	EndIf
 
 EndFunc   ;==>_OnIconsHover
+
+Func _NoticeClick()
+	ShellExecute(_Link_Split($g_sUrlNotice))
+EndFunc
 
 #EndRegion "Events"
 
@@ -985,11 +995,9 @@ Func _SetBoost()
 
 	AdlibUnRegister("_ClearProcessesWorkingSet")
 	AdlibRegister("_ClearProcessesWorkingSet", $g_iBoostMill)
-
-	_ClearProcessesWorkingSet()
+	_SetBoostDescription()
 	_EnableSaveSettings()
 	_SetControlStates()
-	_SetBoostDescription()
 
 EndFunc
 
@@ -1003,7 +1011,7 @@ Func _SetCleanLimit()
 	EndIf
 
 	$g_iCleanLimit = Int(GUICtrlRead($g_hComboCleanLimit))
-	_ClearProcessesWorkingSet()
+	_SetBoostDescription()
 	_EnableSaveSettings()
 	_SetControlStates()
 
@@ -1039,7 +1047,7 @@ Func __iBetween($iLower, $iUpper, $iNumber)
 	If $iNumber >=  $iLower And $iNumber < $iUpper Then
 		Return True
 	Else
-		REturn False
+		Return False
 	EndIf
 
 EndFunc
@@ -1259,16 +1267,8 @@ EndFunc
 Func _ReturnSafeModeCommand()
 
 	Local $sParameters = ""
-	Local $aSafeMode = IniReadSection($g_sPathIni, "Safemode")
-    If Not @error Then
-        For $s = 1 To $aSafeMode[0][0]
-			If $aSafeMode[$s][0] = $g_sCoreProcess Then
-				Return $aSafeMode[$s][1]
-			EndIf
-        Next
-    EndIf
-
-	Return SetError(1, 0, "")
+	Local $sSafeMode = IniRead($g_sPathIni, "Safemode", $g_sCoreProcess, "")
+	Return $sSafeMode
 
 EndFunc
 

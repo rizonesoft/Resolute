@@ -1030,3 +1030,82 @@
 [ 2021/03/23 12:43:28 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/26 19:53:59 ] DATE:                        2021/03/26 19:53:59
+[ 2021/03/26 19:53:59 ] PROGRAM:                     USB Repair 8.0.1.1057
+[ 2021/03/26 19:53:59 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe]
+[ 2021/03/26 19:53:59 ] COMPILED:                    YES
+[ 2021/03/26 19:53:59 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/26 19:53:59 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/26 19:53:59 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/26 19:53:59 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/26 19:53:59 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/26 20:07:18 ] DATE:                        2021/03/26 20:07:18
+[ 2021/03/26 20:07:18 ] PROGRAM:                     USB Repair 8.0.1.1060
+[ 2021/03/26 20:07:18 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe]
+[ 2021/03/26 20:07:18 ] COMPILED:                    YES
+[ 2021/03/26 20:07:18 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/26 20:07:18 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/26 20:07:18 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/26 20:07:18 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/26 20:07:18 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/26 20:31:57 ] DATE:                        2021/03/26 20:31:57
+[ 2021/03/26 20:31:57 ] PROGRAM:                     USB Repair 8.0.1.1062
+[ 2021/03/26 20:31:57 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe]
+[ 2021/03/26 20:31:57 ] COMPILED:                    YES
+[ 2021/03/26 20:31:57 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/26 20:31:57 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/26 20:31:57 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/26 20:31:57 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/26 20:31:57 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/03/26 20:32:00 ] [SC] ChangeServiceConfig SUCCESS
+[ 2021/03/26 20:32:00 ] The requested service has already been started.
+[ 2021/03/26 20:32:00 ] More help is available by typing NET HELPMSG 2182.
+[ 2021/03/26 20:32:00 ] Repairing USB host controllers and hubs.
+[ 2021/03/26 20:32:00 ] Repairing HIDClass.
+[ 2021/03/26 20:32:00 ] Repairing Keyboards.
+[ 2021/03/26 20:32:00 ] Repairing Mice and pointing devices.
+[ 2021/03/26 20:32:00 ] ^ You might need to reboot your computer before the settings will take effect. Would you like to reboot your computer now? Save your stuff, hold your breath and press Yes to reboot your computer. Or press No to ignore me.
+[ 2021/03/26 20:32:00 ] Click on 'File' and then 'Reboot Windows' to Reboot your computer later.
+[ 2021/03/26 20:32:00 ] Finished: Hope that resolved your USB issues. If not, it could be a physical hardware problem.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/03/26 23:19:20 ] DATE:                        2021/03/26 23:19:20
+[ 2021/03/26 23:19:20 ] PROGRAM:                     USB Repair 8.0.3.1065
+[ 2021/03/26 23:19:20 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\USBRepair_X64.exe]
+[ 2021/03/26 23:19:20 ] COMPILED:                    YES
+[ 2021/03/26 23:19:20 ] WINDOWS VERSION:             WIN_10 
+[ 2021/03/26 23:19:20 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/03/26 23:19:20 ] MEMORY (RAM):                16302.97 MB
+[ 2021/03/26 23:19:20 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/03/26 23:19:20 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+

@@ -51,10 +51,11 @@ File=%RootDir%\Sounds\Welcome.wav
 [Sources]
 
 [Links]
-CompanyURL=https://www.rizonesoft.com
-SupportURL=https://github.com/rizonesoft/Resolute/issues
-ContactURL=https://www.rizonesoft.com/#contact
-UpdateURL=https://www.rizonesoft.com/downloads/complete-internet-repair/
+CompanyURL = https://www.rizonesoft.com
+SupportURL = https://github.com/rizonesoft/Resolute/issues
+ContactURL = https://www.rizonesoft.com/#contact
+UpdateURL = https://www.rizonesoft.com/downloads/update/?id=comintrep
+UninstallURL = https://www.rizonesoft.com/uninstalled/
 
 [Environment]
 ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
@@ -65,10 +66,10 @@ ShortName=ComIntRep
 Description=Complete Internet Repair
 Type=N
 Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\ComIntRep.ico
-Version=8.1.3.5219
+Version=8.1.3.5222
 VersionMajor=8
 VersionMaintenance=3
-VersionBuild=5219
+VersionBuild=5222
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -76,11 +77,11 @@ OutFile=ComIntRep.exe
 OutFileX64=ComIntRep_X64.exe
 OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep.exe
 OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ComIntRep_X64.exe
-InstallScriptPath=0
-InstallOutputPath=0
+InstallScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5222\ComIntRep_5222_Setup.iss
+InstallOutputPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5222\ComIntRep_5222_Setup.exe
 InstallSize=0
-DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219
-DistributionName=ComIntRep_5219
-FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219
-DistroSourceName=ComIntRep_5219_Source
-DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5219\ComIntRep_5219_Source
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5222
+DistributionName=ComIntRep_5222
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5222\ComIntRep_5222
+DistroSourceName=ComIntRep_5222_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\5222\ComIntRep_5222_Source

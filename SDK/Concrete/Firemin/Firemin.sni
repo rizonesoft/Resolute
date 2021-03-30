@@ -50,10 +50,11 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Links]
-CompanyURL=https://www.rizonesoft.com
-SupportURL=https://github.com/rizonesoft/Resolute/issues
-ContactURL=https://www.rizonesoft.com/#contact
-UpdateURL=https://www.rizonesoft.com/downloads/firemin/
+CompanyURL = https://www.rizonesoft.com
+SupportURL = https://github.com/rizonesoft/Resolute/issues
+ContactURL = https://www.rizonesoft.com/#contact
+UpdateURL = https://www.rizonesoft.com/downloads/update/?id=firemin
+UninstallURL = https://www.rizonesoft.com/uninstalled/
 
 [Environment]
 ScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
@@ -64,22 +65,22 @@ ShortName=Firemin
 Description=Firemin
 Type=N
 Icon=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Resources\Icons\Firemin.ico
-Version=8.1.3.5115
+Version=8.1.3.5128
 VersionMajor=8
 VersionMaintenance=3
-VersionBuild=5115
-UseBeta=P
+VersionBuild=5128
+UseBeta=B
 UseX64=Y
 CompileBoth=Y
 OutFile=Firemin.exe
 OutFileX64=Firemin_X64.exe
 OutFilePath=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin.exe
 OutFileX64Path=C:\Users\Venom\Documents\GitHub\Resolute\Resolute\Firemin_X64.exe
-InstallScriptPath=0
-InstallOutputPath=0
+InstallScriptPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5128\Firemin_5128_Setup.iss
+InstallOutputPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5128\Firemin_5128_Setup.exe
 InstallSize=0
-DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5115
-DistributionName=Firemin_5115
-FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5115\Firemin_5115
-DistroSourceName=Firemin_5115_Source
-DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5115\Firemin_5115_Source
+DistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5128
+DistributionName=Firemin_5128
+FullDistributionPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5128\Firemin_5128
+DistroSourceName=Firemin_5128_Source
+DistroSourceFullPath=C:\Users\Venom\Documents\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5128\Firemin_5128_Source

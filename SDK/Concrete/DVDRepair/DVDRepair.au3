@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=DVD Drive Repair						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft DVD Drive Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.3.1156
+#AutoIt3Wrapper_Res_Fileversion=8.1.3.1159
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -292,7 +292,7 @@ Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|Git
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/dvd-drive-repair/|www.rizonesoft.com/downloads/dvd-drive-repair/"
 Global $g_sUrlWinRepair         = "https://www.rizonesoft.com/downloads/complete-windows-repair/|www.rizonesoft.com/downloads/complete-windows-repair/"
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/dvd-drive-repair/update|www.rizonesoft.com/downloads/dvd-drive-repair/update"
+Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/update/?id=dvdrepair|www.rizonesoft.com/downloads/update"
 
 ;~ Path Settings
 Global $g_sRootDir			= @ScriptDir ;~ Root Directory
