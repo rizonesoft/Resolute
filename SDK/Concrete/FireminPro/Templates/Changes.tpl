@@ -7,6 +7,8 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
 - Changed: Default startup position now set to the middle of the screen.
+- Updated: Korean translation.
+- Updated: Simplified Chinese translation.
 
 --------------------------------------------------
 Version 8.1.3.5183 (MARCH 26, 2021)
