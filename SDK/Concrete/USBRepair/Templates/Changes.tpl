@@ -5,6 +5,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Changed: Default startup position now set to the middle of the screen.
+
+--------------------------------------------------
+Version 8.0.3.1065 (MARCH 26, 2021)
+--------------------------------------------------
+
 - Added: Reset HIDClass UpperFilters abd LowerFilters.
 - Added: Reset Keyboard UpperFilters abd LowerFilters.
 - Added: Reset Mice and pointing devices UpperFilters abd LowerFilters.
