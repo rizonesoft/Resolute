@@ -6,6 +6,14 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Changed: Default startup position now set to the middle of the screen.
+- Updated: French translation.
+- Updated: Simplified Chinese translation.
+
+--------------------------------------------------
+Version 8.1.3.5222 (MARCH 26, 2021)
+--------------------------------------------------
+
 - Fixed: Main windows not being able to close.
 - Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later.
 

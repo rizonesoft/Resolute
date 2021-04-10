@@ -6,6 +6,14 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Changed: Default startup position now set to the middle of the screen.
+- Updated: Korean translation.
+- Updated: Simplified Chinese translation.
+
+--------------------------------------------------
+Version 8.1.3.5128 (MARCH 26, 2021)
+--------------------------------------------------
+
 - Added: High resolution icon (256x256px).
 - Updated: Japanese translation.
 - Updated: Optimized browser Safe Mode detection.
@@ -13,7 +21,7 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 - Fixed: Main windows not being able to close.
 - Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later.
 
-Language Changes from Firemin:
+Language Changes:
 - [Custom]: Label_Notice = %{Program.Name} is designed to run on a desktop computer or laptop.
 			We created Firemin Server for server environments. Read more...
 

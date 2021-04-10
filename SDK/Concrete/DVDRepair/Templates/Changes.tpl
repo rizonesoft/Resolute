@@ -6,6 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Changed: Default startup position now set to the middle of the screen.
+
+--------------------------------------------------
+Version 8.1.3.1158 (MARCH 26, 2021)
+--------------------------------------------------
+
 - Fixed: Main windows not being able to close.
 - Fixed: Workarounds added to alleviate slow downs on Windows 10 1809 and later.
 
