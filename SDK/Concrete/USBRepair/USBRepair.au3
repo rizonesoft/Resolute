@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=USB Repair								;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft USB Repair      			;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.0.3.1067
+#AutoIt3Wrapper_Res_Fileversion=8.0.3.1070
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -979,15 +979,6 @@ Func _RepairDVDDrives()
 	_Logging_EditWrite($g_aLangMessages2[11])
 	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}", "UpperFilters")
 	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}", "LowerFilters")
-	_Logging_EditWrite($g_aLangMessages2[12])
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{745A17A0-74D3-11D0-B6FE-00A0C90F57DA}", "UpperFilters")
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{745A17A0-74D3-11D0-B6FE-00A0C90F57DA}", "LowerFilters")
-	_Logging_EditWrite($g_aLangMessages2[13])
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E96B-E325-11CE-BFC1-08002BE10318}", "UpperFilters")
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E96B-E325-11CE-BFC1-08002BE10318}", "LowerFilters")
-	_Logging_EditWrite($g_aLangMessages2[14])
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E96F-E325-11CE-BFC1-08002BE10318}", "UpperFilters")
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E96F-E325-11CE-BFC1-08002BE10318}", "LowerFilters")
 
 	GUICtrlSetState($g_hBtnRepair, $GUI_ENABLE)
 	GUICtrlSetState($g_hGuiIcon, $GUI_SHOW)
@@ -995,7 +986,7 @@ Func _RepairDVDDrives()
 
 	_Logging_EditWrite("^ " & $g_aLangMessages2[2])
 	_Logging_EditWrite(StringFormat($g_aLangMessages2[5], StringReplace($g_aLangMenus[0], "&", ""), StringReplace($g_aLangMenus[5], "&", "")))
-	_Logging_FinalMessage($g_aLangMessages2[15])
+	_Logging_FinalMessage($g_aLangMessages2[12])
 
 EndFunc   ;==>_RepairDVDDrives
 

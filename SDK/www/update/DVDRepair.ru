@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=1158
+LatestBuild=1163
 UpdateURL=https://www.rizonesoft.com/downloads/update/?id=dvdrepair

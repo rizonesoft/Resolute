@@ -104,10 +104,7 @@ Func _Localization_Messages2()
 	$g_aLangMessages2[9]  = _Localization_Load("Messages2", "Boot_Restarting", "Your computer is restarting.")
 	$g_aLangMessages2[10] = _Localization_Load("Messages2", "Boot_Canceled", "Reboot Canceled.")
 	$g_aLangMessages2[11] = _Localization_Load("Messages2", "Repair_USB_01", "Repairing USB host controllers and hubs.")
-	$g_aLangMessages2[12] = _Localization_Load("Messages2", "Repair_USB_02", "Repairing HIDClass.")
-	$g_aLangMessages2[13] = _Localization_Load("Messages2", "Repair_USB_03", "Repairing Keyboards.")
-	$g_aLangMessages2[14] = _Localization_Load("Messages2", "Repair_USB_04", "Repairing Mice and pointing devices.")
-	$g_aLangMessages2[15] = _Localization_Load("Messages2", "Repair_USB_05", "Hope that resolved your USB issues. If not, it could be a physical hardware problem.")
+	$g_aLangMessages2[12] = _Localization_Load("Messages2", "Repair_USB_02", "Hope that resolved your USB issues. If not, it could be a physical hardware problem.")
 
 EndFunc
 

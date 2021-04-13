@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=5183
+LatestBuild=5188
 UpdateURL=https://www.rizonesoft.com/downloads/update/?id=fireminpro

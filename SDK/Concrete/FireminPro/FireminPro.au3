@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin Server							;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin Server			    		;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.3.5185
+#AutoIt3Wrapper_Res_Fileversion=8.1.3.5189
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N

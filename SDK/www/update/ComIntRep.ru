@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=5222
+LatestBuild=5228
 UpdateURL=https://www.rizonesoft.com/downloads/update/?id=comintrep
