@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.3.5134
+#AutoIt3Wrapper_Res_Fileversion=8.1.3.5231
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -219,9 +219,9 @@ Opt("SendCapslockMode", 1)			;~ 1=store and restore, 0=don't
 Opt("SendKeyDelay", 5)				;~ 5 milliseconds
 Opt("SendKeyDownDelay", 1)			;~ 1 millisecond
 Opt("TCPTimeout", 100)				;~ 100 milliseconds
-Opt("TrayAutoPause", 1)				;~ 0=no pause, 1=Pause
-Opt("TrayIconDebug", 1)				;~ 0=no info, 1=debug line info
-Opt("TrayIconHide", 1)				;~ 0=show, 1=hide tray icon
+Opt("TrayIconDebug", 0)
+Opt("TrayIconHide", 0)
+Opt("TrayAutoPause", 0)				;~ 0=no pause, 1=Pause
 Opt("TrayMenuMode", 3)				;~ 0=append, 1=no default menu, 2=no automatic check, 4=menuitemID  not return
 Opt("TrayOnEventMode", 1)			;~ 0=disable, 1=enable
 Opt("WinDetectHiddenText", 0)		;~ 0=don't detect, 1=do detect
@@ -235,15 +235,18 @@ Func _ReBarStartUp()
 EndFunc   ;==>_ReBarStartUp
 
 
+#include <Array.au3>
 #include <GuiConstantsEx.au3>
 #include <GuiImageList.au3>
 #include <GuiListView.au3>
+#include <GuiToolBar.au3>
 #include <Process.au3>
 #include <TrayConstants.au3>
 #include <Misc.au3>
 #include <WinAPIProc.au3>
 #include <WinAPITheme.au3>
 #include <WindowsConstants.au3>
+
 
 #include "..\..\Includes\About.au3"
 #include "..\..\Includes\Donate.au3"
@@ -353,7 +356,7 @@ Global $g_iCheckForUpdates	= 4
 ;~ Donate Time
 Global $g_iUptimeMonitor	= 0
 Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 259200 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+Global $g_iDonateTimeSet	= 86400 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -433,6 +436,7 @@ Global $g_iReduceMemory 		= 1
 Global $g_iReduceEveryMill 		= 300
 Global $g_iMaxSysMemoryPerc 	= 80
 
+Global $g_hFireTrayHandle
 
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
@@ -527,6 +531,7 @@ Func _StartCore()
 	TrayItemSetOnEvent($trmnuClose, "_ShutdownProgram")
 
 	TraySetState($TRAY_ICONSTATE_SHOW)
+	TraySetToolTip($g_sProgramTitle)
 	TraySetClick(8)
 
 	If $g_iStartBrowser Then
@@ -552,10 +557,11 @@ Func _StartCore()
 		AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
 	EndIf
 
-	TraySetToolTip($g_sProgramTitle)
 	While 1
 		Sleep(55)
 	WEnd
+
+
 
 EndFunc   ;==>_StartCoreGUI
 

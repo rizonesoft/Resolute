@@ -6,6 +6,14 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated: Korean translation
+- Updated: Traditional Chinese translation
+- Removed: Uninstall Message
+
+--------------------------------------------------
+Version 8.1.3.5228 (APRIL 07, 2021)
+--------------------------------------------------
+
 - Changed: Default startup position now set to the middle of the screen.
 - Updated: French translation.
 - Updated: Simplified Chinese translation.

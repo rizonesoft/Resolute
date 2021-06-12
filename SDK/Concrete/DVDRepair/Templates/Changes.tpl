@@ -6,6 +6,13 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+Updated: Traditional Chinese translation.
+Removed: Uninstall Message.
+
+--------------------------------------------------
+Version 8.1.3.1163 (APRIL 07, 2021)
+--------------------------------------------------
+
 - Changed: Default startup position now set to the middle of the screen.
 - Added: Arabic translation
 
