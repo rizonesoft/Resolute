@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=5230
+LatestBuild=5332
 UpdateURL=https://www.rizonesoft.com/downloads/update/?id=firemin

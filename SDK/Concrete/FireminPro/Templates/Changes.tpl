@@ -6,6 +6,14 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed: All executables are now signed.
+- Updated: Inno Setup to version 6.2.0.
+- Updated: Simplified Chinese translation.
+
+--------------------------------------------------
+Version 8.1.3.5290 (MAY 25, 2021)
+--------------------------------------------------
+
 Updated: Japanese Translation.
 Removed: Uninstall Message.
 

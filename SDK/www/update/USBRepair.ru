@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=1182
+LatestBuild=1285
 UpdateURL=https://www.rizonesoft.com/downloads/update/?id=usbrepair

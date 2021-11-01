@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.0.2.3625
+#AutoIt3Wrapper_Res_Fileversion=8.0.2.3626
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -2641,7 +2641,6 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, "LicenseFile=" & $sPackPathName & "\Docs\" & $sProgShortName & "\License.txt" & @CRLF)
 	FileWrite($hFileOpen, "OutputDir=." & @CRLF)
 	FileWrite($hFileOpen, "OutputBaseFilename=" & StringReplace($sOutputBaseName, ".exe", "") & @CRLF)
-	FileWrite($hFileOpen, "WizardImageFile=compiler:WizModernImage-IS.bmp" & @CRLF)
 	FileWrite($hFileOpen, "Compression=lzma2/max" & @CRLF)
 	FileWrite($hFileOpen, "InternalCompressLevel=max" & @CRLF)
 	FileWrite($hFileOpen, "SolidCompression=yes" & @CRLF)
