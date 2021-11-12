@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.2.3.5333
+#AutoIt3Wrapper_Res_Fileversion=8.2.3.5339
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -202,7 +202,7 @@
 Opt("CaretCoordMode", 1)			;~ 1=absolute, 0=relative, 2=client
 Opt("ExpandEnvStrings", 1)			;~ 0=don't expand, 1=do expand
 Opt("ExpandVarStrings", 1)			;~ 0=don't expand, 1=do expand
-; Opt("GUICloseOnESC", 0)				;~ 1=ESC  closes, 0=ESC won't close
+; Opt("GUICloseOnESC", 0)			;~ 1=ESC  closes, 0=ESC won't close
 Opt("GUICoordMode", 1)				;~ 1=absolute, 0=relative, 2=cell
 Opt("GUIDataSeparatorChar", "|")	;~ "|" is the default
 Opt("GUIOnEventMode", 1)			;~ 0=disabled, 1=OnEvent mode enabled
@@ -353,10 +353,7 @@ Else
 EndIf
 Global $g_iCheckForUpdates	= 4
 
-;~ Donate Time
-Global $g_iUptimeMonitor	= 0
-Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 86400 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+Global $g_iDonate 			= 0
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -538,7 +535,6 @@ Func _StartCore()
 		_RunBrowser()
 	EndIf
 
-	AdlibRegister("_UptimeMonitor", 1000)
 	AdlibRegister("_ReduceMemory", 300)
 	AdlibRegister("_ClearProcessesWorkingSet", $g_iBoostMill)
 
@@ -940,8 +936,9 @@ Func _LoadConfiguration()
 	$g_iReduceMemory = Int(IniRead($g_sPathIni, $g_sProgShortName, "ReduceMemory", 1))
 	$g_iReduceEveryMill = Int(IniRead($g_sPathIni, $g_sProgShortName, "ReduceEveryMill", 300))
 	$g_iMaxSysMemoryPerc = Int(IniRead($g_sPathIni, $g_sProgShortName, "MinSysMemoryPerc", 80))
-	$g_iUptimeMonitor = Int(IniRead($g_sPathIni, "Donate", "Seconds", 0))
-	$g_iDonateTime = Int(IniRead($g_sPathIni, "Donate", "DonateTime", 0))
+
+	$g_iDonate = Int(IniRead($g_sPathIni, "Donate", "Donate", 0))
+
 	$g_sBrowserPath = IniRead($g_sPathIni, $g_sProgShortName, "BrowserPath", @ProgramFilesDir & "\Mozilla Firefox\firefox.exe")
 	$g_iBoostEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "BoostEnabled", 1))
 	$g_iBoostMill = Int(IniRead($g_sPathIni, $g_sProgShortName, "Boost", 500))
@@ -1115,13 +1112,6 @@ Func _CheckForUpdates()
 EndFunc   ;==>_CheckForUpdates
 
 
-Func _UptimeMonitor()
-	If $g_iUptimeMonitor < 2000000000 Then
-		$g_iUptimeMonitor += 1
-	EndIf
-EndFunc
-
-
 Func _ReduceMemory()
 
 	Local $aMemStats = MemGetStats()
@@ -1168,18 +1158,14 @@ EndFunc   ;==>_SetProcessingStates
 
 Func _ShutdownProgram()
 
-	IniWrite($g_sPathIni, "Donate", "Seconds", $g_iUptimeMonitor)
-
 	AdlibUnRegister("_OnIconsHover")
-	AdlibUnRegister("_UptimeMonitor")
 	AdlibUnRegister("_ClearProcessesWorkingSet")
 	If @Compiled Then
 		AdlibUnRegister("_ReduceMemory")
 	EndIf
 
-	If $g_iUptimeMonitor > $g_iDonateTimeSet = True And _
-			$g_iDonateTime == 0 Then
-		IniWrite($g_sPathIni, "Donate", "DonateTime", $g_iUptimeMonitor)
+	If $g_iDonate == 0 Then
+		IniWrite($g_sPathIni, "Donate", "Donate", 1)
 		_Donate_ShowDialog()
 	Else
 		WinSetTrans($g_hCoreGui, Default, 255)

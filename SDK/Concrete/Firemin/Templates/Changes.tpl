@@ -6,6 +6,13 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated AutoIt to version 3.3.15.4
+- Improved Windows 11 compatibility.
+
+--------------------------------------------------
+Version 8.2.3.5332 (JUNE 12, 2021)
+--------------------------------------------------
+
 - Fixed: All executables are now signed.
 - Updated: Inno Setup to version 6.2.0.
 

@@ -16289,3 +16289,236 @@
 [ 2021/08/30 21:28:14 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2021/11/01 22:52:22 ] DATE:                        2021/11/01 22:52:22
+[ 2021/11/01 22:52:22 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3625
+[ 2021/11/01 22:52:22 ] PROGRAM PATH:                [C:\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2021/11/01 22:52:22 ] COMPILED:                    YES
+[ 2021/11/01 22:52:22 ] WINDOWS VERSION:             WIN_10 
+[ 2021/11/01 22:52:22 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2021/11/01 22:52:22 ] MEMORY (RAM):                16302.97 MB
+[ 2021/11/01 22:52:22 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2021/11/01 22:52:22 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2021/11/01 22:52:33 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:52:33 ] Template directory found at: 'C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2021/11/01 22:52:33 ] 03 templates files found.
+[ 2021/11/01 22:52:33 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2021/11/01 22:52:33 ] Document created successfuly.
+[ 2021/11/01 22:52:33 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 2021/11/01 22:52:33 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2021/11/01 22:52:33 ] Document created successfuly.
+[ 2021/11/01 22:52:33 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\License.txt
+[ 2021/11/01 22:52:33 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2021/11/01 22:52:33 ] Document created successfuly.
+[ 2021/11/01 22:52:33 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 2021/11/01 22:52:33 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:52:37 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Firemin.exe Distribution Created.
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Firemin_X64.exe Distribution Created.
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Firemin.ini Distribution Created.
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Docs\Firemin\Changes.txt Distribution Created.
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Docs\Firemin\License.txt Distribution Created.
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Docs\Firemin\Readme.txt Distribution Created.
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\af.ini Distribution Created.
+[ 2021/11/01 22:52:37 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ar.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\de.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\el.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\en.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\es.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\fa.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\fr.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\hu.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\it.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ja.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ko.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\pl.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\pt.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ru.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\sl.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\tr.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Processing\32\Stroke.ani Distribution Created.
+[ 2021/11/01 22:52:38 ] \Concrete\Firemin\Distribution\5338\Firemin_5338\Processing\64\Globe.ani Distribution Created.
+[ 2021/11/01 22:52:39 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:52:42 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:52:42 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2021/11/01 22:52:42 ] Scanning the drive:
+[ 2021/11/01 22:52:42 ] 8 folders, 28 files, 4884607 bytes (4771 KiB)
+[ 2021/11/01 22:52:42 ] Creating archive: Firemin_5338.zip
+[ 2021/11/01 22:52:42 ] Items to compress: 36
+[ 2021/11/01 22:52:42 ] Files read from disk: 28
+[ 2021/11/01 22:52:42 ] Archive size: 2634054 bytes (2573 KiB)
+[ 2021/11/01 22:52:42 ] Everything is Ok
+[ 2021/11/01 22:52:43 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:52:46 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:52:48 ] Inno Setup 6 Command-Line Compiler
+[ 2021/11/01 22:52:48 ] Copyright (C) 1997-2021 Jordan Russell. All rights reserved.
+[ 2021/11/01 22:52:48 ] Portions Copyright (C) 2000-2021 Martijn Laan. All rights reserved.
+[ 2021/11/01 22:52:48 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2021/11/01 22:52:48 ] https://www.innosetup.com
+[ 2021/11/01 22:52:48 ] Compiler engine version: Inno Setup 6.2.0
+[ 2021/11/01 22:52:48 ] Preprocessing
+[ 2021/11/01 22:52:48 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2021/11/01 22:52:48 ] Parsing [Setup] section, line 21
+[ 2021/11/01 22:52:48 ] Parsing [Setup] section, line 22
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 23
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 24
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 25
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 26
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 27
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 28
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 29
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 30
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 31
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 32
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 33
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 34
+[ 2021/11/01 22:52:49 ] Parsing [Setup] section, line 35
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 36
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 37
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 38
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 39
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 40
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 41
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 42
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 43
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 44
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 45
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 46
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 47
+[ 2021/11/01 22:52:50 ] Parsing [Setup] section, line 48
+[ 2021/11/01 22:52:51 ] Parsing [Setup] section, line 49
+[ 2021/11/01 22:52:51 ] Parsing [Setup] section, line 50
+[ 2021/11/01 22:52:51 ] Parsing [Setup] section, line 51
+[ 2021/11/01 22:52:51 ] Parsing [Setup] section, line 52
+[ 2021/11/01 22:52:51 ] Reading file (LicenseFile)
+[ 2021/11/01 22:52:51 ] Reading file (WizardImageFile)
+[ 2021/11/01 22:52:51 ] Reading file (WizardSmallImageFile)
+[ 2021/11/01 22:52:51 ] Preparing Setup program executable
+[ 2021/11/01 22:52:51 ] Updating version info (SETUP.E32)
+[ 2021/11/01 22:52:51 ] Updating manifest (SETUP.E32)
+[ 2021/11/01 22:52:51 ] Determining language code pages
+[ 2021/11/01 22:52:51 ] Parsing [Languages] section, line 55
+[ 2021/11/01 22:52:51 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/11/01 22:52:52 ] Messages in script file
+[ 2021/11/01 22:52:52 ] Reading default messages from Default.isl
+[ 2021/11/01 22:52:52 ] Parsing [Languages] section, line 55
+[ 2021/11/01 22:52:52 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2021/11/01 22:52:52 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2021/11/01 22:52:52 ] Messages in script file
+[ 2021/11/01 22:52:52 ] Reading [Code] section
+[ 2021/11/01 22:52:52 ] Parsing [Tasks] section, line 73
+[ 2021/11/01 22:52:52 ] Parsing [Tasks] section, line 74
+[ 2021/11/01 22:52:52 ] Parsing [Tasks] section, line 75
+[ 2021/11/01 22:52:52 ] Parsing [Tasks] section, line 76
+[ 2021/11/01 22:52:52 ] Parsing [Tasks] section, line 77
+[ 2021/11/01 22:52:52 ] Parsing [Tasks] section, line 78
+[ 2021/11/01 22:52:53 ] Parsing [Icons] section, line 115
+[ 2021/11/01 22:52:53 ] Parsing [Icons] section, line 116
+[ 2021/11/01 22:52:53 ] Parsing [Icons] section, line 117
+[ 2021/11/01 22:52:53 ] Parsing [Icons] section, line 118
+[ 2021/11/01 22:52:53 ] Parsing [INI] section, line 121
+[ 2021/11/01 22:52:53 ] Parsing [INI] section, line 122
+[ 2021/11/01 22:52:53 ] Parsing [InstallDelete] section, line 128
+[ 2021/11/01 22:52:53 ] Parsing [InstallDelete] section, line 129
+[ 2021/11/01 22:52:53 ] Parsing [InstallDelete] section, line 130
+[ 2021/11/01 22:52:53 ] Parsing [InstallDelete] section, line 131
+[ 2021/11/01 22:52:53 ] Parsing [InstallDelete] section, line 132
+[ 2021/11/01 22:52:53 ] Parsing [UninstallDelete] section, line 135
+[ 2021/11/01 22:52:53 ] Parsing [UninstallDelete] section, line 136
+[ 2021/11/01 22:52:54 ] Parsing [Run] section, line 125
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 81
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 82
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 83
+[ 2021/11/01 22:52:54 ] Reading version info: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Firemin.ini
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 84
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 85
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 86
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 87
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 88
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 89
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 90
+[ 2021/11/01 22:52:54 ] Parsing [Files] section, line 91
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 92
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 93
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 94
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 95
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 96
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 97
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 98
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 99
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 100
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 101
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 102
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 103
+[ 2021/11/01 22:52:55 ] Parsing [Files] section, line 104
+[ 2021/11/01 22:52:56 ] Parsing [Files] section, line 105
+[ 2021/11/01 22:52:56 ] Parsing [Files] section, line 106
+[ 2021/11/01 22:52:56 ] Parsing [Files] section, line 107
+[ 2021/11/01 22:52:56 ] Parsing [Files] section, line 108
+[ 2021/11/01 22:52:56 ] Parsing [Files] section, line 109
+[ 2021/11/01 22:52:56 ] Parsing [Files] section, line 110
+[ 2021/11/01 22:52:56 ] Compiling [Code] section
+[ 2021/11/01 22:52:56 ] Creating setup files
+[ 2021/11/01 22:52:56 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Firemin_X64.exe
+[ 2021/11/01 22:52:56 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Firemin.exe
+[ 2021/11/01 22:52:56 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Firemin.ini
+[ 2021/11/01 22:52:56 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Docs\Firemin\Changes.txt
+[ 2021/11/01 22:52:56 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Docs\Firemin\License.txt
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Docs\Firemin\Readme.txt
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\af.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ar.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\de.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\el.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\en.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\es.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\fa.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\fr.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\hu.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\it.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ja.ini
+[ 2021/11/01 22:52:57 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ko.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\pl.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\pt.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\pt-BR.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\ru.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\sl.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\tr.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\zh-CN.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Language\Firemin\zh-TW.ini
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Processing\32\Stroke.ani
+[ 2021/11/01 22:52:58 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338\Processing\64\Globe.ani
+[ 2021/11/01 22:52:58 ] Compressing Setup program executable
+[ 2021/11/01 22:52:58 ] Updating version info (SETUP.EXE)
+[ 2021/11/01 22:52:59 ] Updating manifest (SETUP.EXE)
+[ 2021/11/01 22:52:59 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2021/11/01 22:52:59 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2021/11/01 22:52:59 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2021/11/01 22:52:59 ] Warning: Line 186, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2021/11/01 22:52:59 ] Warning: Line 193, Column 2: [Hint] Variable 'ERRORCODE' never used
+[ 2021/11/01 22:52:59 ] Successful compile (2,312 sec). Resulting Setup program filename is:
+[ 2021/11/01 22:52:59 ] C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5338\Firemin_5338_Setup.exe
+[ 2021/11/01 22:52:59 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:53:03 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2021/11/01 22:53:03 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\Firemin.ru'
+[ 2021/11/01 22:53:03 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\Firemin.rus'
+[ 2021/11/01 22:53:03 ] Finished: 
+------------------------------------------------------------------------------------------

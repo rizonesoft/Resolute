@@ -74,9 +74,11 @@ Func _Donate_ShowDialog()
 		$g_iParent = 0
 	EndIf
 
-	$g_hDonateGui = GUICreate("Donate", 400, 320, -1, -1, BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST)
+	$g_hDonateGui = GUICreate("Donate", 400, 320, -1, -1, _
+			BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_iParent)
 	GUISetFont(8.5, 400, 0, "Verdana", $g_hDonateGui, 5)
-	If $g_iParentState > 0 Then GUISetIcon($g_sDonateIcon, $g_iDialogIconStart + 4, $g_hDonateGui)
+	; If $g_iParentState > 0 Then GUISetIcon($g_sDonateIcon, $g_iDialogIconStart + 4, $g_hDonateGui)
+	GUISetIcon($g_sDonateIcon, $g_iDialogIconStart + 4, $g_hDonateGui)
 
 	GUICtrlCreateLabel("", -10, -10, 420, 100)
 	GUICtrlSetBkColor(-1, 0xFFFFFF)
