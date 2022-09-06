@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin Server							;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin Server			    		;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.2.3.5394
+#AutoIt3Wrapper_Res_Fileversion=9.0.0.5600
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -281,13 +281,13 @@ Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/riz
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"														; https://twitter.com/Rizonesoft
 Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 											; https://www.linkedin.com/in/rizonetech
 Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"														; https://www.rizonesoft.com/feed
-Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"														; https://www.paypal.me/rizonesoft
+Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"								; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"										; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"							; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"									; https://en.wikipedia.org/wiki/South_Africa
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/firemin-server/|www.rizonesoft.com/downloads/firemin-server"			; https://www.rizonesoft.com/downloads/firemin/
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/update/?id=fireminpro|www.rizonesoft.com/downloads/update"
-Global $g_sUrlNotice			= "https://www.rizonesoft.com/notice/?id=fireminpro|www.rizonesoft.com/notice"
+Global $g_sUrlUpdate			= $g_sUrlProgPage
+; Global $g_sUrlNotice			= "https://www.rizonesoft.com/notice/?id=fireminpro|www.rizonesoft.com/notice"
 
 
 ;~ Path Settings
@@ -351,10 +351,8 @@ Else
 EndIf
 Global $g_iCheckForUpdates	= 4
 
-;~ Donate Time
-Global $g_iUptimeMonitor	= 0
-Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 86400 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+;~ Donate
+Global $g_sDonateName = ""
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -631,7 +629,7 @@ Func _StartCoreGui()
 		GUICtrlSetData($g_hSubHeading, $g_aLangCustom[26])
 		GUICtrlSetColor($g_hSubHeading, 0xFD6200)
 		GUICtrlSetCursor($g_hSubHeading, 0)
-		GUICtrlSetOnEvent($g_hSubHeading, "_NoticeClick")
+;~ 		GUICtrlSetOnEvent($g_hSubHeading, "_NoticeClick")
 	Else
 		GUICtrlSetData($g_hSubHeading, $g_aLangCustom[0])
 		GUICtrlSetColor($g_hSubHeading, 0x353535)
@@ -778,9 +776,9 @@ Func _OnIconsHover()
 
 EndFunc   ;==>_OnIconsHover
 
-Func _NoticeClick()
-	ShellExecute(_Link_Split($g_sUrlNotice))
-EndFunc
+;~ Func _NoticeClick()
+;~ 	ShellExecute(_Link_Split($g_sUrlNotice))
+;~ EndFunc
 
 #EndRegion "Events"
 
@@ -932,8 +930,7 @@ Func _LoadConfiguration()
 	$g_iReduceMemory = Int(IniRead($g_sPathIni, $g_sProgShortName, "ReduceMemory", 1))
 	$g_iReduceEveryMill = Int(IniRead($g_sPathIni, $g_sProgShortName, "ReduceEveryMill", 300))
 	$g_iMaxSysMemoryPerc = Int(IniRead($g_sPathIni, $g_sProgShortName, "MinSysMemoryPerc", 80))
-	$g_iUptimeMonitor = Int(IniRead($g_sPathIni, "Donate", "Seconds", 0))
-	$g_iDonateTime = Int(IniRead($g_sPathIni, "Donate", "DonateTime", 0))
+	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "")
 	$g_sBrowserPath = IniRead($g_sPathIni, $g_sProgShortName, "BrowserPath", @ProgramFilesDir & "\Mozilla Firefox\firefox.exe")
 	$g_iBoostEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "BoostEnabled", 1))
 	$g_iBoostMill = Int(IniRead($g_sPathIni, $g_sProgShortName, "Boost", 500))
@@ -1161,8 +1158,6 @@ EndFunc   ;==>_SetProcessingStates
 
 Func _ShutdownProgram()
 
-	IniWrite($g_sPathIni, "Donate", "Seconds", $g_iUptimeMonitor)
-
 	AdlibUnRegister("_OnIconsHover")
 	AdlibUnRegister("_UptimeMonitor")
 	AdlibUnRegister("_ClearProcessesWorkingSet")
@@ -1170,10 +1165,11 @@ Func _ShutdownProgram()
 		AdlibUnRegister("_ReduceMemory")
 	EndIf
 
-	If $g_iUptimeMonitor > $g_iDonateTimeSet = True And _
-			$g_iDonateTime == 0 Then
-		IniWrite($g_sPathIni, "Donate", "DonateTime", $g_iUptimeMonitor)
+	If StringCompare($g_sDonateName, @ComputerName, $STR_NOCASESENSEBASIC) <> 0 Then
+
+		IniWrite($g_sPathIni, "Donate", "DonateName", @ComputerName)
 		_Donate_ShowDialog()
+
 	Else
 		WinSetTrans($g_hCoreGui, Default, 255)
 		TraySetState($TRAY_ICONSTATE_HIDE)

@@ -5,7 +5,7 @@
 ==================================================
 Version: %{VERSION}
 Release Date: %{DAY} %{MONTH}, %{YEAR}
-System Requirements: 7, 8, 8.1, 10 
+System Requirements: 7, 8, 8.1, 10, 11
 Disk Space: %{INSTSIZE}
 ==================================================
 

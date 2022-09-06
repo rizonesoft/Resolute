@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=USB Repair								;~ Comment field
 #AutoIt3Wrapper_Res_Description=Rizonesoft USB Repair      			;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.3.1286
+#AutoIt3Wrapper_Res_Fileversion=9.0.0.1302
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -326,7 +326,7 @@ Global $g_iPowerIconsStart				= 263
 Global $g_iMenuIconsStart				= 269
 
 Global $g_aCoreIcons[3]
-Global $g_aDonateIcons[3]
+Global $g_aDonateIcons[6]
 Global $g_iSizeIcon						= 64
 Global $g_aLognIcons[$CNT_LOGICONS]
 Global $g_aLanguageIcons[$CNT_LANGICONS]
@@ -354,10 +354,8 @@ Else
 EndIf
 Global $g_iCheckForUpdates	= 4
 
-;~ Donate Time
-Global $g_iUptimeMonitor	= 0
-Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 10800 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+;~ Donate
+Global $g_sDonateName = ""
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -842,8 +840,7 @@ Func _LoadConfiguration()
 	$g_iMaxSysMemoryPerc = Int(IniRead($g_sPathIni, $g_sProgShortName, "MinSysMemoryPerc", 80))
 	$g_iLoggingEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "LoggingEnabled", 1))
 	$g_iLoggingStorage = Int(IniRead($g_sPathIni, $g_sProgShortName, "LoggingStorageSize", 5242880))
-	$g_iUptimeMonitor = Int(IniRead($g_sPathIni, "Donate", "Seconds", 0))
-	$g_iDonateTime = Int(IniRead($g_sPathIni, "Donate", "DonateTime", 0))
+	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "")
 
 	If @Compiled Then
 		ProcessSetPriority(@ScriptName, $g_iProcessPriority)
@@ -930,10 +927,11 @@ Func _ShutdownProgram()
 
 	_SaveConfiguration()
 
-	If $g_iUptimeMonitor > $g_iDonateTimeSet = True And _
-			$g_iDonateTime == 0 Then
-		IniWrite($g_sPathIni, "Donate", "DonateTime", $g_iUptimeMonitor)
+	If StringCompare($g_sDonateName, @ComputerName, $STR_NOCASESENSEBASIC) <> 0 Then
+
+		IniWrite($g_sPathIni, "Donate", "DonateName", @ComputerName)
 		_Donate_ShowDialog()
+
 	Else
 		WinSetTrans($g_hCoreGui, Default, 255)
 		Exit

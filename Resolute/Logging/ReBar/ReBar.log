@@ -1001,3 +1001,25 @@
 [ 2021/03/09 01:54:26 ] Error: This is an Error message!
 [ 2021/03/09 01:54:27 ] Warning: This is a Warning!
 [ 2021/03/09 01:54:28 ] Success: This message is successful.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 02:51:36 ] DATE:                        2022/09/04 02:51:36
+[ 2022/09/04 02:51:36 ] PROGRAM:                     ReBar Framework 8.1.2.5545
+[ 2022/09/04 02:51:36 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
+[ 2022/09/04 02:51:36 ] COMPILED:                    YES
+[ 2022/09/04 02:51:36 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 02:51:36 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 02:51:36 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 02:51:36 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 02:51:36 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2022/09/04 02:51:38 ] This is a message.
+[ 2022/09/04 02:51:39 ] Error: This is an Error message!
+[ 2022/09/04 02:51:40 ] Warning: This is a Warning!
+[ 2022/09/04 02:51:41 ] Success: This message is successful.
+[ 2022/09/04 02:51:42 ] Finished testing logging system.

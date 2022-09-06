@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Complete Internet Repair			;~ Comment field
 #AutoIt3Wrapper_Res_Description=Complete Internet Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.2.3.5363
+#AutoIt3Wrapper_Res_Fileversion=9.0.0.5602
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -322,18 +322,18 @@ Global $g_iSingleton			= True
 
 ;~ Links
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
+Global $g_sUrlSupport			= "mailto:growth@rizonetech.com|growth@rizonetech.com"											; growth@rizonetech.com
 Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com/downloads/
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
 Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
 Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"										; https://www.rizonesoft.com/feed
-Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"										; https://www.paypal.me/rizonesoft
+Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"				; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/complete-internet-repair/|www.rizonesoft.com/downloads/complete-internet-repair"
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/update/?id=comintrep|www.rizonesoft.com/downloads/update/"
+Global $g_sUrlUpdate			= $g_sUrlProgPage
 Global $g_sUrlWinRepair         = "https://www.rizonesoft.com/downloads/complete-windows-repair/|www.rizonesoft.com/downloads/complete-windows-repair/"
 
 ;~ Path Settings
@@ -417,10 +417,8 @@ Else
 EndIf
 Global $g_iCheckForUpdates	= 4
 
-;~ Donate Time
-Global $g_iUptimeMonitor	= 0
-Global $g_iDonateTime		= 0
-Global $g_iDonateTimeSet	= 10800 ; 10800 = 3 Hours | 86400 = Day | 259200 = 3 Days (Default) | 432000 = 5 Days
+;~ Donate
+Global $g_sDonateName = ""
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= False	;~ Show whether program is running as Administrator
@@ -842,7 +840,6 @@ Func _StartCoreGui()
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 	GUIRegisterMsg($WM_COMMAND, "MY_WM_COMMAND")
 	AdlibRegister("_OnIconsHover", 65)
-	AdlibRegister("_UptimeMonitor", 1000)
 	If @Compiled Then
 		AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
 	EndIf
@@ -1217,10 +1214,7 @@ Func _LoadConfiguration()
 	$g_iMaxSysMemoryPerc = Int(IniRead($g_sPathIni, $g_sProgShortName, "MinSysMemoryPerc", 80))
 	$g_iLoggingEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "LoggingEnabled", 1))
 	$g_iLoggingStorage = Int(IniRead($g_sPathIni, $g_sProgShortName, "LoggingStorageSize", 5242880))
-	$g_iUptimeMonitor = Int(IniRead($g_sPathIni, "Donate", "Seconds", 0))
-	$g_iDonateTime = Int(IniRead($g_sPathIni, "Donate", "DonateTime", 0))
-
-;~ 	$g_iSaveSelection = Int(IniRead($g_sPathIni, $g_sProgShortName, "SaveSelection", 1))
+	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "")
 
 	If @Compiled Then
 		ProcessSetPriority(@ScriptName, $g_iProcessPriority)
@@ -1231,14 +1225,7 @@ EndFunc   ;==>_LoadConfiguration
 
 Func _SaveConfiguration()
 
-;~ 	$g_iSaveSelection = GUICtrlRead($g_hChkSaveSelection)
-;~ 	IniWrite($g_sPathIni, $g_sProgShortName, "SaveSelection", $g_iSaveSelection)
-;~ 	If $g_iSaveSelection = 1 Then
-		_SaveSelection()
-;~ 	EndIf
-
-	IniWrite($g_sPathIni, "Donate", "Seconds", $g_iUptimeMonitor)
-	IniWrite($g_sPathIni, "Donate", "Seconds", $g_iUptimeMonitor)
+	_SaveSelection()
 
 EndFunc
 
@@ -1274,13 +1261,6 @@ Func _CheckForUpdates()
 	_SetUpdateAnimationState($GUI_HIDE)
 
 EndFunc   ;==>_CheckForUpdates
-
-
-Func _UptimeMonitor()
-	If $g_iUptimeMonitor < 2000000000 Then
-		$g_iUptimeMonitor += 1
-	EndIf
-EndFunc
 
 
 Func _ReduceMemory()
@@ -1331,17 +1311,17 @@ EndFunc   ;==>_SetProcessingStates
 Func _ShutdownProgram()
 
 	AdlibUnRegister("_OnIconsHover")
-	AdlibUnRegister("_UptimeMonitor")
 	If @Compiled Then
 		AdlibUnRegister("_ReduceMemory")
 	EndIf
 
 	_SaveConfiguration()
 
-	If $g_iUptimeMonitor > $g_iDonateTimeSet = True And _
-			$g_iDonateTime == 0 Then
-		IniWrite($g_sPathIni, "Donate", "DonateTime", $g_iUptimeMonitor)
+	If StringCompare($g_sDonateName, @ComputerName, $STR_NOCASESENSEBASIC) <> 0 Then
+
+		IniWrite($g_sPathIni, "Donate", "DonateName", @ComputerName)
 		_Donate_ShowDialog()
+
 	Else
 		WinSetTrans($g_hCoreGui, Default, 255)
 		Exit
@@ -2280,7 +2260,7 @@ Func _RepairWindowsUpdate($iRow)
 	_Registry_Write("HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\Main", "NoUpdateCheck", "REG_DWORD", 0)
 
 	_UpdateSoloProcess($iRow, 90)
-	If Not @OSVersion = "WIN_10" Then
+	If Not @OSVersion = "WIN_10" Or @OSVersion = "WIN_11"  Then
 		_Logging_EditWrite($g_aLangMessages2[71])
 		_RunCommand("wuauclt /detectnow")
 	EndIf
@@ -3434,7 +3414,7 @@ Func __LanguageListEvents($hWnd, $iMsg, $wParam, $lParam)
 					Local $iSelLang = DllStructGetData($tInfo, "Index")
 					$g_tSelectedLanguage = _GUICtrlListView_GetItemText($g_hOListLanguage, $iSelLang, 1)
 					Local $aSelLangInfo = __ISO639CodeToIndex($g_tSelectedLanguage)
-					GUICtrlSetImage($g_hOIconLanguage, $g_aLanguageIcons[$aSelLangInfo[1]], $g_iLangIconStart + $aSelLangInfo[1])
+					GUICtrlSetImage($g_hOIconLanguage, @ScriptFullPath, $g_iLangIconStart + $aSelLangInfo[1])
 					GUICtrlSetData($g_hOLblLanguage, $aSelLangInfo[0])
 
 					If $g_tSelectedLanguage <> $g_sSelectedLanguage Then

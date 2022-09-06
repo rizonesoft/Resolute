@@ -3958,3 +3958,913 @@
 [ 2021/03/10 22:24:30 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/04/07 10:39:32 ] DATE:                        2022/04/07 10:39:32
+[ 2022/04/07 10:39:32 ] PROGRAM:                     Complete Internet Repair 8.2.3.5362
+[ 2022/04/07 10:39:32 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/04/07 10:39:32 ] COMPILED:                    YES
+[ 2022/04/07 10:39:32 ] WINDOWS VERSION:             WIN_10 
+[ 2022/04/07 10:39:32 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/04/07 10:39:32 ] MEMORY (RAM):                32533.46 MB
+[ 2022/04/07 10:39:32 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/04/07 10:39:32 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2022/04/07 10:39:53 ] Resetting all IP configurations.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:39:53 ] Exporting Windows IP Configuration.
+[ 2022/04/07 10:39:53 ] Error: Could not save IP Configuration.
+[ 2022/04/07 10:39:53 ] Resetting IP version 4 configurations.
+[ 2022/04/07 10:39:53 ] Resetting Compartment Forwarding, OK!
+[ 2022/04/07 10:39:53 ] Resetting Compartment, OK!
+[ 2022/04/07 10:39:53 ] Resetting Control Protocol, OK!
+[ 2022/04/07 10:39:53 ] Resetting Echo Sequence Request, OK!
+[ 2022/04/07 10:39:53 ] Resetting Global, OK!
+[ 2022/04/07 10:39:53 ] Resetting Interface, OK!
+[ 2022/04/07 10:39:53 ] Resetting Anycast Address, OK!
+[ 2022/04/07 10:39:53 ] Resetting Multicast Address, OK!
+[ 2022/04/07 10:39:53 ] Resetting Unicast Address, OK!
+[ 2022/04/07 10:39:54 ] Resetting Neighbor, OK!
+[ 2022/04/07 10:39:54 ] Resetting Path, OK!
+[ 2022/04/07 10:39:54 ] Resetting Potential, OK!
+[ 2022/04/07 10:39:54 ] Resetting Prefix Policy, OK!
+[ 2022/04/07 10:39:54 ] Resetting Proxy Neighbor, OK!
+[ 2022/04/07 10:39:54 ] Resetting Route, OK!
+[ 2022/04/07 10:39:54 ] Resetting Site Prefix, OK!
+[ 2022/04/07 10:39:54 ] Resetting Subinterface, OK!
+[ 2022/04/07 10:39:54 ] Resetting Wakeup Pattern, OK!
+[ 2022/04/07 10:39:54 ] Resetting Resolve Neighbor, OK!
+[ 2022/04/07 10:39:54 ] Resetting, OK!
+[ 2022/04/07 10:39:54 ] Resetting, OK!
+[ 2022/04/07 10:39:54 ] Resetting, OK!
+[ 2022/04/07 10:39:54 ] Resetting, OK!
+[ 2022/04/07 10:39:54 ] Resetting, failed.
+[ 2022/04/07 10:39:54 ] Access is denied.
+[ 2022/04/07 10:39:55 ] Resetting, OK!
+[ 2022/04/07 10:39:55 ] Resetting, OK!
+[ 2022/04/07 10:39:55 ] Resetting, OK!
+[ 2022/04/07 10:39:55 ] Resetting, OK!
+[ 2022/04/07 10:39:55 ] Resetting, OK!
+[ 2022/04/07 10:39:55 ] Resetting, OK!
+[ 2022/04/07 10:39:55 ] Resetting, OK!
+[ 2022/04/07 10:39:55 ] Restart the computer to complete this action.
+[ 2022/04/07 10:39:55 ] Resetting IP version 6 configurations.
+[ 2022/04/07 10:39:55 ] Resetting Compartment Forwarding, OK!
+[ 2022/04/07 10:39:55 ] Resetting Compartment, OK!
+[ 2022/04/07 10:39:55 ] Resetting Control Protocol, OK!
+[ 2022/04/07 10:39:55 ] Resetting Echo Sequence Request, OK!
+[ 2022/04/07 10:39:55 ] Resetting Global, OK!
+[ 2022/04/07 10:39:55 ] Resetting Interface, OK!
+[ 2022/04/07 10:39:55 ] Resetting Anycast Address, OK!
+[ 2022/04/07 10:39:56 ] Resetting Multicast Address, OK!
+[ 2022/04/07 10:39:56 ] Resetting Unicast Address, OK!
+[ 2022/04/07 10:39:56 ] Resetting Neighbor, OK!
+[ 2022/04/07 10:39:56 ] Resetting Path, OK!
+[ 2022/04/07 10:39:56 ] Resetting Potential, OK!
+[ 2022/04/07 10:39:56 ] Resetting Prefix Policy, OK!
+[ 2022/04/07 10:39:56 ] Resetting Proxy Neighbor, OK!
+[ 2022/04/07 10:39:56 ] Resetting Route, OK!
+[ 2022/04/07 10:39:56 ] Resetting Site Prefix, OK!
+[ 2022/04/07 10:39:56 ] Resetting Subinterface, OK!
+[ 2022/04/07 10:39:56 ] Resetting Wakeup Pattern, OK!
+[ 2022/04/07 10:39:56 ] Resetting Resolve Neighbor, OK!
+[ 2022/04/07 10:39:56 ] Resetting, OK!
+[ 2022/04/07 10:39:56 ] Resetting, OK!
+[ 2022/04/07 10:39:56 ] Resetting, OK!
+[ 2022/04/07 10:39:56 ] Resetting, OK!
+[ 2022/04/07 10:39:56 ] Resetting, failed.
+[ 2022/04/07 10:39:57 ] Access is denied.
+[ 2022/04/07 10:39:57 ] Resetting, OK!
+[ 2022/04/07 10:39:57 ] Resetting, OK!
+[ 2022/04/07 10:39:57 ] Resetting, OK!
+[ 2022/04/07 10:39:57 ] Resetting, OK!
+[ 2022/04/07 10:39:57 ] Resetting, OK!
+[ 2022/04/07 10:39:57 ] Resetting, OK!
+[ 2022/04/07 10:39:57 ] Resetting, OK!
+[ 2022/04/07 10:39:57 ] Restart the computer to complete this action.
+[ 2022/04/07 10:39:57 ] Error: Finished with (03) errors!
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:39:58 ] Attempting to reset Winsock catalog.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:39:58 ] Resetting Winsock using Method 1.
+[ 2022/04/07 10:39:59 ] Successfully reset the Winsock Catalog.
+[ 2022/04/07 10:39:59 ] You must restart the computer in order to complete the reset.
+[ 2022/04/07 10:39:59 ] Resetting Winsock using Method 2.
+[ 2022/04/07 10:39:59 ] Successfully reset the Winsock Catalog.
+[ 2022/04/07 10:39:59 ] You must restart the computer in order to complete the reset.
+[ 2022/04/07 10:40:00 ] Finished: Finished resetting Winsock catalog.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:00 ] Releasing and Renewing TCP/IP connections.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:00 ] Releasing TCP/IP connections.
+[ 2022/04/07 10:40:00 ] Windows IP Configuration
+[ 2022/04/07 10:40:00 ] The operation failed as no adapter is in the state permissible for
+[ 2022/04/07 10:40:00 ] this operation.
+[ 2022/04/07 10:40:00 ] Renewing TCP/IP connections.
+[ 2022/04/07 10:40:00 ] Windows IP Configuration
+[ 2022/04/07 10:40:00 ] The operation failed as no adapter is in the state permissible for
+[ 2022/04/07 10:40:00 ] this operation.
+[ 2022/04/07 10:40:00 ] Error: Finished with (02) errors!
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:01 ] Refreshing DNS Resolver Cache.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:01 ] Flushing DNS
+[ 2022/04/07 10:40:01 ] Windows IP Configuration
+[ 2022/04/07 10:40:02 ] Successfully flushed the DNS Resolver Cache.
+[ 2022/04/07 10:40:02 ] Registering DNS
+[ 2022/04/07 10:40:02 ] Windows IP Configuration
+[ 2022/04/07 10:40:05 ] Registration of the DNS resource records for all adapters of this computer has been initiated. Any errors will be reported in the Event Viewer in 15 minutes.
+[ 2022/04/07 10:40:05 ] Finished: DNS Refreshed
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:06 ] Flushing ARP (Address Resolution Protocol) Cache.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:06 ] Ok.
+[ 2022/04/07 10:40:06 ] Finished: ARP Cache Refreshed
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:07 ] Repairing SSL / HTTPS / Cryptography service.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:07 ] Stopping the Cryptographic Service.
+[ 2022/04/07 10:40:07 ] The following services are dependent on the Cryptographic Services service.
+[ 2022/04/07 10:40:07 ] Stopping the Cryptographic Services service will also stop these services.
+[ 2022/04/07 10:40:07 ] Acronis Cyber Protection Service
+[ 2022/04/07 10:40:07 ] Acronis Active Protection (TM) Service
+[ 2022/04/07 10:40:07 ] Do you want to continue this operation? (Y/N) [N]:
+[ 2022/04/07 10:40:07 ] No valid response was provided.
+[ 2022/04/07 10:40:07 ] Configuring the cryptographic service.
+[ 2022/04/07 10:40:08 ] [SC] ChangeServiceConfig SUCCESS
+[ 2022/04/07 10:40:08 ] Clearing 'C:\Windows\System32\CatRoot2'.
+[ 2022/04/07 10:40:08 ] Clearing 'C:\Windows\System32\CatRoot2'.
+[ 2022/04/07 10:40:08 ] Removing 'C:\Windows\System32\CatRoot2\dberr.txt'.
+[ 2022/04/07 10:40:08 ] Success: The file was successfully deleted.
+[ 2022/04/07 10:40:08 ] Removing 'C:\Windows\System32\CatRoot2\edb.chk'.
+[ 2022/04/07 10:40:08 ] Success: The file was successfully deleted.
+[ 2022/04/07 10:40:08 ] Removing 'C:\Windows\System32\CatRoot2\edb.log'.
+[ 2022/04/07 10:40:08 ] Error: An error occurred whilst deleting the file.
+[ 2022/04/07 10:40:08 ] ^ 'C:\Windows\System32\CatRoot2\edb.log'
+[ 2022/04/07 10:40:08 ] Removing 'C:\Windows\System32\CatRoot2\edbres00001.jrs'.
+[ 2022/04/07 10:40:08 ] Success: The file was successfully deleted.
+[ 2022/04/07 10:40:08 ] Removing 'C:\Windows\System32\CatRoot2\edbres00002.jrs'.
+[ 2022/04/07 10:40:08 ] Success: The file was successfully deleted.
+[ 2022/04/07 10:40:08 ] Removing 'C:\Windows\System32\CatRoot2\edbtmp.log'.
+[ 2022/04/07 10:40:08 ] Error: An error occurred whilst deleting the file.
+[ 2022/04/07 10:40:08 ] ^ 'C:\Windows\System32\CatRoot2\edbtmp.log'
+[ 2022/04/07 10:40:08 ] Setting attributes for '{127D0A1D-4EF2-11D1-8608-00C04FC295EE}'.
+[ 2022/04/07 10:40:09 ] Error: '{127D0A1D-4EF2-11D1-8608-00C04FC295EE}' could not be removed.
+[ 2022/04/07 10:40:09 ] Setting attributes for '{F750E6C3-38EE-11D1-85E5-00C04FC295EE}'.
+[ 2022/04/07 10:40:10 ] Error: '{F750E6C3-38EE-11D1-85E5-00C04FC295EE}' could not be removed.
+[ 2022/04/07 10:40:10 ] 'C:\Windows\System32\CatRoot2.Old' does not exist.
+[ 2022/04/07 10:40:10 ] Clearing 'C:\Windows\System32\CatRoot'.
+[ 2022/04/07 10:40:10 ] Removing 'C:\Windows\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\tmp*.CAT'.
+[ 2022/04/07 10:40:10 ] Error: An error occurred whilst deleting the file.
+[ 2022/04/07 10:40:10 ] ^ 'C:\Windows\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\tmp*.CAT'
+[ 2022/04/07 10:40:10 ] Removing 'C:\Windows\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\tmp*.CAT'.
+[ 2022/04/07 10:40:10 ] Error: An error occurred whilst deleting the file.
+[ 2022/04/07 10:40:10 ] ^ 'C:\Windows\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\tmp*.CAT'
+[ 2022/04/07 10:40:10 ] Removing 'C:\Windows\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\KB*.CAT'.
+[ 2022/04/07 10:40:10 ] Error: An error occurred whilst deleting the file.
+[ 2022/04/07 10:40:10 ] ^ 'C:\Windows\System32\CatRoot\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\KB*.CAT'
+[ 2022/04/07 10:40:10 ] Removing 'C:\Windows\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\KB*.CAT'.
+[ 2022/04/07 10:40:10 ] Error: An error occurred whilst deleting the file.
+[ 2022/04/07 10:40:10 ] ^ 'C:\Windows\System32\CatRoot\{127D0A1D-4EF2-11D1-8608-00C04FC295EE}\KB*.CAT'
+[ 2022/04/07 10:40:10 ] Removing 'C:\Windows\inf\oem*.*'.
+[ 2022/04/07 10:40:10 ] Success: The file was successfully deleted.
+[ 2022/04/07 10:40:10 ] 'C:\Windows\System32\CatRoot' Cleared.
+[ 2022/04/07 10:40:10 ] Registering SSL / HTTPS / Cryptography DLLs.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\system32\cryptdlg.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\cryptdlg.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\system32\cryptext.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\cryptext.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\system32\cryptui.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\cryptui.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\system32\dssenh.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\dssenh.dll' registration succeeded.
+[ 2022/04/07 10:40:10 ] RegSvr32.exe > 'C:\Windows\system32\gpkcsp.dll' Specified module not found.
+[ 2022/04/07 10:40:10 ] RegSvr32.exe > 'C:\Windows\SysWoW64\gpkcsp.dll' Specified module not found.
+[ 2022/04/07 10:40:10 ] RegSvr32.exe > 'C:\Windows\system32\initpki.dll' Specified module not found.
+[ 2022/04/07 10:40:10 ] RegSvr32.exe > 'C:\Windows\SysWoW64\initpki.dll' Specified module not found.
+[ 2022/04/07 10:40:10 ] RegSvr32.exe > 'C:\Windows\system32\licdll.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\SysWoW64\licdll.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\system32\mssign32.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\mssign32.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\system32\mssip32.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\mssip32.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\system32\regwizc.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\SysWoW64\regwizc.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\system32\rsaenh.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\rsaenh.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\system32\scardssp.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\SysWoW64\scardssp.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\system32\sccbase.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\SysWoW64\sccbase.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\system32\scecli.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\scecli.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\system32\slbcsp.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] RegSvr32.exe > 'C:\Windows\SysWoW64\slbcsp.dll' Specified module not found.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\system32\softpub.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\softpub.dll' registration succeeded.
+[ 2022/04/07 10:40:11 ] Warning: RegSvr32.exe > 'C:\Windows\system32\winhttp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2022/04/07 10:40:11 ] Warning: RegSvr32.exe > 'C:\Windows\SysWoW64\winhttp.dll' Module loaded but entry-point DllRegisterServer was not found.
+[ 2022/04/07 10:40:11 ] Success: RegSvr32.exe > 'C:\Windows\system32\wintrust.dll' registration succeeded.
+[ 2022/04/07 10:40:12 ] Success: RegSvr32.exe > 'C:\Windows\SysWoW64\wintrust.dll' registration succeeded.
+[ 2022/04/07 10:40:12 ] SSL / HTTPS / Cryptography DLLs Registered.
+[ 2022/04/07 10:40:12 ] Restarting the cryptographic service.
+[ 2022/04/07 10:40:12 ] The requested service has already been started.
+[ 2022/04/07 10:40:12 ] More help is available by typing NET HELPMSG 2182.
+[ 2022/04/07 10:40:13 ] Error: Finished with (08) errors!
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:13 ] Resetting proxy settings.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:13 ] Current WinHTTP proxy settings:
+[ 2022/04/07 10:40:13 ] Direct access (no proxy server).
+[ 2022/04/07 10:40:14 ] Finished: Proxy settings reset to defaults.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:14 ] Resetting Windows Firewall configuraton.
+------------------------------------------------------------------------------------------
+[ 2022/04/07 10:40:15 ] Ok.
+[ 2022/04/07 10:40:16 ] Finished: Firewall settings reset to defaults.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 12:49:18 ] DATE:                        2022/09/04 12:49:18
+[ 2022/09/04 12:49:18 ] PROGRAM:                     Complete Internet Repair 8.2.3.5364
+[ 2022/09/04 12:49:18 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 12:49:18 ] COMPILED:                    YES
+[ 2022/09/04 12:49:18 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 12:49:18 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 12:49:18 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 12:49:18 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 12:49:18 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 13:51:09 ] DATE:                        2022/09/04 13:51:09
+[ 2022/09/04 13:51:09 ] PROGRAM:                     Complete Internet Repair 8.2.3.5367
+[ 2022/09/04 13:51:09 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 13:51:09 ] COMPILED:                    YES
+[ 2022/09/04 13:51:09 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 13:51:09 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 13:51:09 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 13:51:09 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 13:51:09 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 13:51:47 ] DATE:                        2022/09/04 13:51:47
+[ 2022/09/04 13:51:47 ] PROGRAM:                     Complete Internet Repair 8.2.3.5367
+[ 2022/09/04 13:51:47 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 13:51:47 ] COMPILED:                    YES
+[ 2022/09/04 13:51:47 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 13:51:47 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 13:51:47 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 13:51:47 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 13:51:47 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:00:09 ] DATE:                        2022/09/04 14:00:09
+[ 2022/09/04 14:00:09 ] PROGRAM:                     Complete Internet Repair 8.2.3.5367
+[ 2022/09/04 14:00:09 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:00:09 ] COMPILED:                    YES
+[ 2022/09/04 14:00:09 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:00:09 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:00:09 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:00:09 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:00:09 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:04:42 ] DATE:                        2022/09/04 14:04:42
+[ 2022/09/04 14:04:42 ] PROGRAM:                     Complete Internet Repair 8.2.3.5370
+[ 2022/09/04 14:04:42 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:04:42 ] COMPILED:                    YES
+[ 2022/09/04 14:04:42 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:04:42 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:04:42 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:04:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:04:42 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:09:44 ] DATE:                        2022/09/04 14:09:44
+[ 2022/09/04 14:09:44 ] PROGRAM:                     Complete Internet Repair 8.2.3.5371
+[ 2022/09/04 14:09:44 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:09:44 ] COMPILED:                    YES
+[ 2022/09/04 14:09:44 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:09:44 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:09:44 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:09:44 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:09:44 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:42:41 ] DATE:                        2022/09/04 14:42:41
+[ 2022/09/04 14:42:41 ] PROGRAM:                     Complete Internet Repair 8.2.3.5373
+[ 2022/09/04 14:42:41 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:42:41 ] COMPILED:                    YES
+[ 2022/09/04 14:42:41 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:42:41 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:42:41 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:42:41 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:42:41 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:42:51 ] DATE:                        2022/09/04 14:42:51
+[ 2022/09/04 14:42:51 ] PROGRAM:                     Complete Internet Repair 8.2.3.5373
+[ 2022/09/04 14:42:51 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:42:51 ] COMPILED:                    YES
+[ 2022/09/04 14:42:51 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:42:51 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:42:51 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:42:51 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:42:51 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:46:49 ] DATE:                        2022/09/04 14:46:49
+[ 2022/09/04 14:46:49 ] PROGRAM:                     Complete Internet Repair 8.2.3.5374
+[ 2022/09/04 14:46:49 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:46:49 ] COMPILED:                    YES
+[ 2022/09/04 14:46:49 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:46:49 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:46:49 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:46:49 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:46:49 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:47:05 ] DATE:                        2022/09/04 14:47:05
+[ 2022/09/04 14:47:05 ] PROGRAM:                     Complete Internet Repair 8.2.3.5374
+[ 2022/09/04 14:47:05 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:47:05 ] COMPILED:                    YES
+[ 2022/09/04 14:47:05 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:47:05 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:47:05 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:47:05 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:47:05 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:47:54 ] DATE:                        2022/09/04 14:47:54
+[ 2022/09/04 14:47:54 ] PROGRAM:                     Complete Internet Repair 8.2.3.5375
+[ 2022/09/04 14:47:54 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:47:54 ] COMPILED:                    YES
+[ 2022/09/04 14:47:54 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:47:54 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:47:54 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:47:54 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:47:54 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:48:11 ] DATE:                        2022/09/04 14:48:11
+[ 2022/09/04 14:48:11 ] PROGRAM:                     Complete Internet Repair 8.2.3.5375
+[ 2022/09/04 14:48:11 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:48:11 ] COMPILED:                    YES
+[ 2022/09/04 14:48:11 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:48:11 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:48:11 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:48:11 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:48:11 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:48:17 ] DATE:                        2022/09/04 14:48:17
+[ 2022/09/04 14:48:17 ] PROGRAM:                     Complete Internet Repair 8.2.3.5375
+[ 2022/09/04 14:48:17 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:48:17 ] COMPILED:                    YES
+[ 2022/09/04 14:48:17 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:48:17 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:48:17 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:48:17 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:48:17 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:48:31 ] DATE:                        2022/09/04 14:48:31
+[ 2022/09/04 14:48:31 ] PROGRAM:                     Complete Internet Repair 8.2.3.5375
+[ 2022/09/04 14:48:31 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:48:31 ] COMPILED:                    YES
+[ 2022/09/04 14:48:31 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:48:31 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:48:31 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:48:31 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:48:31 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:48:37 ] DATE:                        2022/09/04 14:48:37
+[ 2022/09/04 14:48:37 ] PROGRAM:                     Complete Internet Repair 8.2.3.5375
+[ 2022/09/04 14:48:37 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:48:37 ] COMPILED:                    YES
+[ 2022/09/04 14:48:37 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:48:37 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:48:37 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:48:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:48:37 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:51:05 ] DATE:                        2022/09/04 14:51:05
+[ 2022/09/04 14:51:05 ] PROGRAM:                     Complete Internet Repair 8.2.3.5376
+[ 2022/09/04 14:51:05 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:51:05 ] COMPILED:                    YES
+[ 2022/09/04 14:51:05 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:51:05 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:51:05 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:51:05 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:51:05 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:53:52 ] DATE:                        2022/09/04 14:53:52
+[ 2022/09/04 14:53:52 ] PROGRAM:                     Complete Internet Repair 8.2.3.5379
+[ 2022/09/04 14:53:52 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:53:52 ] COMPILED:                    YES
+[ 2022/09/04 14:53:52 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:53:52 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:53:52 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:53:52 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:53:52 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:54:02 ] DATE:                        2022/09/04 14:54:02
+[ 2022/09/04 14:54:02 ] PROGRAM:                     Complete Internet Repair 8.2.3.5379
+[ 2022/09/04 14:54:02 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:54:02 ] COMPILED:                    YES
+[ 2022/09/04 14:54:02 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:54:02 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:54:02 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:54:02 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:54:02 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:56:36 ] DATE:                        2022/09/04 14:56:36
+[ 2022/09/04 14:56:36 ] PROGRAM:                     Complete Internet Repair 8.2.3.5380
+[ 2022/09/04 14:56:36 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:56:36 ] COMPILED:                    YES
+[ 2022/09/04 14:56:36 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:56:36 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:56:36 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:56:36 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:56:36 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:57:42 ] DATE:                        2022/09/04 14:57:42
+[ 2022/09/04 14:57:42 ] PROGRAM:                     Complete Internet Repair 8.2.3.5381
+[ 2022/09/04 14:57:42 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:57:42 ] COMPILED:                    YES
+[ 2022/09/04 14:57:42 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:57:42 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:57:42 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:57:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:57:42 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:57:57 ] DATE:                        2022/09/04 14:57:57
+[ 2022/09/04 14:57:57 ] PROGRAM:                     Complete Internet Repair 8.2.3.5381
+[ 2022/09/04 14:57:57 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:57:57 ] COMPILED:                    YES
+[ 2022/09/04 14:57:57 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:57:57 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:57:57 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:57:57 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:57:57 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:59:04 ] DATE:                        2022/09/04 14:59:04
+[ 2022/09/04 14:59:04 ] PROGRAM:                     Complete Internet Repair 8.2.3.5383
+[ 2022/09/04 14:59:04 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:59:04 ] COMPILED:                    YES
+[ 2022/09/04 14:59:04 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:59:04 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:59:04 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:59:04 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:59:04 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 14:59:14 ] DATE:                        2022/09/04 14:59:14
+[ 2022/09/04 14:59:14 ] PROGRAM:                     Complete Internet Repair 8.2.3.5383
+[ 2022/09/04 14:59:14 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 14:59:14 ] COMPILED:                    YES
+[ 2022/09/04 14:59:14 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 14:59:14 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 14:59:14 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 14:59:14 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 14:59:14 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:00:30 ] DATE:                        2022/09/04 15:00:30
+[ 2022/09/04 15:00:30 ] PROGRAM:                     Complete Internet Repair 8.2.3.5384
+[ 2022/09/04 15:00:30 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:00:30 ] COMPILED:                    YES
+[ 2022/09/04 15:00:30 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:00:30 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:00:30 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:00:30 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:00:30 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:00:45 ] DATE:                        2022/09/04 15:00:45
+[ 2022/09/04 15:00:45 ] PROGRAM:                     Complete Internet Repair 8.2.3.5384
+[ 2022/09/04 15:00:45 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:00:45 ] COMPILED:                    YES
+[ 2022/09/04 15:00:45 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:00:45 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:00:45 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:00:45 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:00:45 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:01:29 ] DATE:                        2022/09/04 15:01:29
+[ 2022/09/04 15:01:29 ] PROGRAM:                     Complete Internet Repair 8.2.3.5385
+[ 2022/09/04 15:01:29 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:01:29 ] COMPILED:                    YES
+[ 2022/09/04 15:01:29 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:01:29 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:01:29 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:01:29 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:01:29 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:01:41 ] DATE:                        2022/09/04 15:01:41
+[ 2022/09/04 15:01:42 ] PROGRAM:                     Complete Internet Repair 8.2.3.5385
+[ 2022/09/04 15:01:42 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:01:42 ] COMPILED:                    YES
+[ 2022/09/04 15:01:42 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:01:42 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:01:42 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:01:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:01:42 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:03:28 ] DATE:                        2022/09/04 15:03:28
+[ 2022/09/04 15:03:28 ] PROGRAM:                     Complete Internet Repair 8.2.3.5386
+[ 2022/09/04 15:03:28 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:03:28 ] COMPILED:                    YES
+[ 2022/09/04 15:03:28 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:03:28 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:03:28 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:03:28 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:03:28 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:03:37 ] DATE:                        2022/09/04 15:03:37
+[ 2022/09/04 15:03:37 ] PROGRAM:                     Complete Internet Repair 8.2.3.5386
+[ 2022/09/04 15:03:37 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:03:37 ] COMPILED:                    YES
+[ 2022/09/04 15:03:37 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:03:37 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:03:37 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:03:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:03:37 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:04:43 ] DATE:                        2022/09/04 15:04:43
+[ 2022/09/04 15:04:43 ] PROGRAM:                     Complete Internet Repair 8.2.3.5387
+[ 2022/09/04 15:04:43 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:04:43 ] COMPILED:                    YES
+[ 2022/09/04 15:04:43 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:04:43 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:04:43 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:04:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:04:43 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:04:55 ] DATE:                        2022/09/04 15:04:55
+[ 2022/09/04 15:04:55 ] PROGRAM:                     Complete Internet Repair 8.2.3.5387
+[ 2022/09/04 15:04:55 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:04:55 ] COMPILED:                    YES
+[ 2022/09/04 15:04:55 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:04:55 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:04:55 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:04:55 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:04:55 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:05:16 ] DATE:                        2022/09/04 15:05:16
+[ 2022/09/04 15:05:16 ] PROGRAM:                     Complete Internet Repair 8.2.3.5387
+[ 2022/09/04 15:05:16 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:05:16 ] COMPILED:                    YES
+[ 2022/09/04 15:05:16 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:05:16 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:05:16 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:05:16 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:05:16 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:06:10 ] DATE:                        2022/09/04 15:06:10
+[ 2022/09/04 15:06:10 ] PROGRAM:                     Complete Internet Repair 8.2.3.5388
+[ 2022/09/04 15:06:10 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:06:10 ] COMPILED:                    YES
+[ 2022/09/04 15:06:10 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:06:10 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:06:10 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:06:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:06:10 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 15:06:23 ] DATE:                        2022/09/04 15:06:23
+[ 2022/09/04 15:06:23 ] PROGRAM:                     Complete Internet Repair 8.2.3.5388
+[ 2022/09/04 15:06:23 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 15:06:23 ] COMPILED:                    YES
+[ 2022/09/04 15:06:23 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 15:06:23 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 15:06:23 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 15:06:23 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 15:06:23 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 16:34:07 ] DATE:                        2022/09/04 16:34:07
+[ 2022/09/04 16:34:07 ] PROGRAM:                     Complete Internet Repair 8.2.3.5389
+[ 2022/09/04 16:34:07 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 16:34:07 ] COMPILED:                    YES
+[ 2022/09/04 16:34:07 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 16:34:07 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 16:34:07 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 16:34:07 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 16:34:07 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 17:30:37 ] DATE:                        2022/09/04 17:30:37
+[ 2022/09/04 17:30:37 ] PROGRAM:                     Complete Internet Repair 8.2.3.5390
+[ 2022/09/04 17:30:37 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 17:30:37 ] COMPILED:                    YES
+[ 2022/09/04 17:30:37 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 17:30:37 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 17:30:37 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 17:30:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 17:30:37 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 18:31:47 ] DATE:                        2022/09/04 18:31:47
+[ 2022/09/04 18:31:47 ] PROGRAM:                     Complete Internet Repair 9.0.0.5396
+[ 2022/09/04 18:31:47 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 18:31:47 ] COMPILED:                    YES
+[ 2022/09/04 18:31:47 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 18:31:47 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 18:31:47 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 18:31:47 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 18:31:47 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 20:25:29 ] DATE:                        2022/09/04 20:25:29
+[ 2022/09/04 20:25:29 ] PROGRAM:                     Complete Internet Repair 9.0.0.5601
+[ 2022/09/04 20:25:29 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 20:25:29 ] COMPILED:                    YES
+[ 2022/09/04 20:25:29 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 20:25:29 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 20:25:29 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 20:25:29 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 20:25:29 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 20:36:54 ] DATE:                        2022/09/04 20:36:54
+[ 2022/09/04 20:36:54 ] PROGRAM:                     Complete Internet Repair 9.0.0.5601
+[ 2022/09/04 20:36:54 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 20:36:54 ] COMPILED:                    YES
+[ 2022/09/04 20:36:54 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 20:36:54 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 20:36:54 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 20:36:54 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 20:36:54 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/09/04 20:39:11 ] DATE:                        2022/09/04 20:39:11
+[ 2022/09/04 20:39:11 ] PROGRAM:                     Complete Internet Repair 9.0.0.5601
+[ 2022/09/04 20:39:11 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe]
+[ 2022/09/04 20:39:11 ] COMPILED:                    YES
+[ 2022/09/04 20:39:11 ] WINDOWS VERSION:             WIN_10 
+[ 2022/09/04 20:39:11 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/09/04 20:39:11 ] MEMORY (RAM):                32605.46 MB
+[ 2022/09/04 20:39:11 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/09/04 20:39:11 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+

@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=ReBar Framework						;~ Comment field
 #AutoIt3Wrapper_Res_Description=ReBar Framework			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.1.2.5545
+#AutoIt3Wrapper_Res_Fileversion=8.1.2.5546
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -200,7 +200,7 @@
 Opt("CaretCoordMode", 1)			;~ 1=absolute, 0=relative, 2=client
 Opt("ExpandEnvStrings", 1)			;~ 0=don't expand, 1=do expand
 Opt("ExpandVarStrings", 1)			;~ 0=don't expand, 1=do expand
-Opt("GUICloseOnESC", 0)				;~ 1=ESC  closes, 0=ESC won't close
+; Opt("GUICloseOnESC", 0)				;~ 1=ESC  closes, 0=ESC won't close
 Opt("GUICoordMode", 1)				;~ 1=absolute, 0=relative, 2=cell
 Opt("GUIDataSeparatorChar", "|")	;~ "|" is the default
 Opt("GUIOnEventMode", 1)			;~ 0=disabled, 1=OnEvent mode enabled
@@ -275,7 +275,7 @@ Global $g_iSingleton			= True
 
 ;~ Links
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com/#contact|www.rizonesoft.com"										; https://www.rizonesoft.com
+Global $g_sUrlSupport			= "mailto:support@rizonesoft.com|support@rizonesoft.com"										; https://www.rizonesoft.com
 Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|www.rizonesoft.com/downloads/"							; https://www.rizonesoft.com/downloads/
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
@@ -289,13 +289,12 @@ Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/resolute/|www.r
 Global $g_sUrlUpdate			= $g_sUrlProgPage
 
 ;~ Path Variables
+Global $g_sWorkingDir		= @ScriptDir ;~ Working Directory
 Global $g_sRootDir			= @ScriptDir ;~ Root Directory
-Global $g_sWorkingDir		= $g_sRootDir ;~ Working Directory
 Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
-Global $g_sResourcesDir		= _PathFull(@ScriptDir & "\..\..\Resources")
 Global $g_sProcessDir		= $g_sRootDir &	"\Processing"
-Global $g_sDocsDir			= $g_sRootDir & "\Docs\" & $g_sProgShortName ;~ Documentation Directory
+Global $g_sDocsDir			= $g_sRootDir & "\Documents\" & $g_sProgShortName ;~ Documentation Directory
 Global $g_sDocHelpFile		= $g_sDocsDir & "\" & $g_sProgShortName & ".chm"
 Global $g_sDocChanges		= $g_sDocsDir & "\Changes.txt"
 Global $g_sDocLicense		= $g_sDocsDir & "\License.txt"
@@ -372,8 +371,6 @@ Global $g_sProgramTitle = _GUIGetTitle($g_sProgName)	;~ Get Program Ttile, inclu
 Global $g_hCoreGui										;~ Main GUI
 Global $g_hGuiIcon										;~ Main Icon
 Global $g_AniUpdate
-Global $g_AniProcessing
-
 Global $g_hMenuFile
 Global $g_hMenuHelp, $g_hUpdateMenuItem
 Global $g_hMenuDebug
@@ -558,9 +555,9 @@ Func _StartCoreGui()
 	GUICtrlSetCursor($g_hGuiIcon, 0)
 	GUICtrlSetOnEvent($g_hGuiIcon, "_About_ShowDialog")
 	$g_AniUpdate = GUICtrlCreateIcon($g_sUpdateAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
-	$g_AniProcessing = GUICtrlCreateIcon($g_sProcessingAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
+	; $g_AniProcessing = GUICtrlCreateIcon($g_sProcessingAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
 	GUICtrlSetState($g_AniUpdate, $GUI_HIDE)
-	GUICtrlSetState($g_AniProcessing, $GUI_HIDE)
+	; GUICtrlSetState($g_AniProcessing, $GUI_HIDE)
 	$hHeading = GUICtrlCreateLabel($g_sProgName & " " & _GetProgramVersion(1), $g_iSizeIcon + 22, 15, 300, 35)
 	GUICtrlSetFont($hHeading, 12)
 

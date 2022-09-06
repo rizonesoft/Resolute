@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=5362
-UpdateURL=https://www.rizonesoft.com/downloads/update/?id=comintrep
+LatestBuild=5601
+UpdateURL=https://www.rizonesoft.com/downloads/complete-internet-repair/

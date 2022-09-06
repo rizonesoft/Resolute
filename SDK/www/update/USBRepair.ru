@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=1285
-UpdateURL=https://www.rizonesoft.com/downloads/update/?id=usbrepair
+LatestBuild=1301
+UpdateURL=https://www.rizonesoft.com/downloads/usb-repair/

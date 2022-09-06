@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=1288
-UpdateURL=https://www.rizonesoft.com/downloads/update/?id=dvdrepair
+LatestBuild=1805
+UpdateURL=https://www.rizonesoft.com/downloads/dvd-drive-repair/
