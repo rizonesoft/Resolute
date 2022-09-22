@@ -8,6 +8,7 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 
 - Updated AutoIt to version 3.3.16.1. - https://www.autoitscript.com/autoit3/docs/history.htm
 - Improved Windows 11 compatibility.
+- Fixed versioning.
 
 --------------------------------------------------
 Version 8.2.3.5338 (NOVEMBER 01, 2021)
