@@ -28,18 +28,18 @@
 ;===============================================================================================================
 ; Target Program Resource info
 ;===============================================================================================================
-#AutoIt3Wrapper_Res_Comment=Complete Internet Repair			;~ Comment field
-#AutoIt3Wrapper_Res_Description=Complete Internet Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=9.0.0.5602
-#AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
-#AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
-#AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
-#AutoIt3Wrapper_Res_ProductVersion=8             				;~ Product Version
-#AutoIt3Wrapper_Res_Language=2057								;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2021 Rizonesoft			;~ Copyright field
-#AutoIt3Wrapper_res_requestedExecutionLevel=highestAvailable	;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
-;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81			;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
-;#AutoIt3Wrapper_Res_SaveSource=N								;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
+#AutoIt3Wrapper_Res_Comment=Complete Internet Repair					;~ Comment field
+#AutoIt3Wrapper_Res_Description=Complete Internet Repair      			;~ Description field
+#AutoIt3Wrapper_Res_Fileversion=9.0.3.6023
+#AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  						;~ (Y/N/P) AutoIncrement FileVersion. Default=N
+#AutoIt3Wrapper_Res_FileVersion_First_Increment=N						;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
+#AutoIt3Wrapper_Res_HiDpi=N                      						;~ (Y/N) Compile for high DPI. Default=N
+#AutoIt3Wrapper_Res_ProductVersion=8             						;~ Product Version
+#AutoIt3Wrapper_Res_Language=2057										;~ Resource Language code . Default 2057=English (United Kingdom)
+#AutoIt3Wrapper_Res_LegalCopyright=© 2022 Rizonesoft					;~ Copyright field
+#AutoIt3Wrapper_res_requestedExecutionLevel=requireAdministrator		;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
+#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81,Win10			;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
+;#AutoIt3Wrapper_Res_SaveSource=N										;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
 ; If _Res_SaveSource=Y the content of Script_source depends on the _Run_Au3Stripper and #Au3Stripper_parameters directives:
 ;    If _Run_Au3Stripper=Y then
 ;        If #Au3Stripper_parameters=/STRIPONLY then Script_source is stripped script & stripped includes
@@ -237,7 +237,6 @@
 
 #EndRegion AutoIt3Wrapper Directives Section
 
-
 Opt("CaretCoordMode", 1)			;~ 1=absolute, 0=relative, 2=client
 Opt("ExpandEnvStrings", 1)			;~ 0=don't expand, 1=do expand
 Opt("ExpandVarStrings", 1)			;~ 0=don't expand, 1=do expand
@@ -322,8 +321,8 @@ Global $g_iSingleton			= True
 
 ;~ Links
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "mailto:growth@rizonetech.com|growth@rizonetech.com"											; growth@rizonetech.com
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com/downloads/
+Global $g_sUrlSupport			= "https://www.rizonesoft.com/#contact|www.rizonesoft.com/#contact"								; https://www.rizonesoft.com/contact
+Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"						; https://www.rizonesoft.com/downloads/
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
 Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
@@ -333,7 +332,7 @@ Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizo
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/complete-internet-repair/|www.rizonesoft.com/downloads/complete-internet-repair"
-Global $g_sUrlUpdate			= $g_sUrlProgPage
+Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/update/?id=comintrep|www.rizonesoft.com/downloads/update"
 Global $g_sUrlWinRepair         = "https://www.rizonesoft.com/downloads/complete-windows-repair/|www.rizonesoft.com/downloads/complete-windows-repair/"
 
 ;~ Path Settings
@@ -418,7 +417,8 @@ EndIf
 Global $g_iCheckForUpdates	= 4
 
 ;~ Donate
-Global $g_sDonateName = ""
+Global $g_sDonateName = "Unknown"
+Global $g_iDonateBuild = 13
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= False	;~ Show whether program is running as Administrator
@@ -432,6 +432,7 @@ Global $g_iCoreGuiWidth		= 488
 Global $g_iCoreGuiHeight	= 500
 Global $g_iMsgBoxTimeOut	= 60
 
+;~ About Dialog
 Global $g_sAboutCredits		= "Derick Payne (Rizonesoft), Brian J Christy (Beege), " & _
 							"G Sandler (MrCreatoR), Holger Kotsch, KaFu, LarsJ, nickston, ProgAndy, Yashied"
 Global $g_sProgramTitle = _GUIGetTitle($g_sProgName)	;~ Get Program Ttile, including version.
@@ -1214,7 +1215,8 @@ Func _LoadConfiguration()
 	$g_iMaxSysMemoryPerc = Int(IniRead($g_sPathIni, $g_sProgShortName, "MinSysMemoryPerc", 80))
 	$g_iLoggingEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "LoggingEnabled", 1))
 	$g_iLoggingStorage = Int(IniRead($g_sPathIni, $g_sProgShortName, "LoggingStorageSize", 5242880))
-	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "")
+	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "Unknown")
+	$g_iDonateBuild = Number(IniRead($g_sPathIni, "Donate", "DonateBuild", 13))
 
 	If @Compiled Then
 		ProcessSetPriority(@ScriptName, $g_iProcessPriority)
@@ -1254,11 +1256,13 @@ EndFunc
 #EndRegion "Configuration (Settings)"
 
 
+#Region "Updates"
 Func _CheckForUpdates()
 
 	_SetUpdateAnimationState($GUI_SHOW)
 	_SoftwareUpdateCheck(True)
 	_SetUpdateAnimationState($GUI_HIDE)
+	GUICtrlSetColor($g_hSubHeading, 0x353535)
 
 EndFunc   ;==>_CheckForUpdates
 
@@ -1298,6 +1302,8 @@ Func _SetUpdateAnimationState($iState)
 
 EndFunc   ;==>_SetUpdateAnimationState
 
+#EndRegion "Updates"
+
 
 Func _SetProcessingStates($iState)
 
@@ -1317,9 +1323,10 @@ Func _ShutdownProgram()
 
 	_SaveConfiguration()
 
-	If StringCompare($g_sDonateName, @ComputerName, $STR_NOCASESENSEBASIC) <> 0 Then
+	If StringCompare($g_sDonateName, @ComputerName, $STR_NOCASESENSEBASIC) <> 0 Or Number(_GetProgramVersion(4)) <> $g_iDonateBuild Then
 
 		IniWrite($g_sPathIni, "Donate", "DonateName", @ComputerName)
+		IniWrite($g_sPathIni, "Donate", "DonateBuild", _GetProgramVersion(4))
 		_Donate_ShowDialog()
 
 	Else

@@ -78,14 +78,16 @@ Func _Donate_ShowDialog()
 			BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_iParent)
 	GUISetFont(8.5, 400, 0, "Verdana", $g_hDonateGui, 5)
 	; If $g_iParentState > 0 Then GUISetIcon($g_sDonateIcon, $g_iDialogIconStart + 4, $g_hDonateGui)
-	GUISetIcon($g_sDonateIcon, $g_iDialogIconStart + 4, $g_hDonateGui)
+	; GUISetIcon($g_sDonateIcon, $g_iDialogIconStart + 4, $g_hDonateGui)
+
+
 
 	GUICtrlCreateLabel("", -10, -10, 420, 100)
 	GUICtrlSetBkColor(-1, 0xFFFFFF)
 	GUICtrlCreateIcon($g_sDonateIcon, $g_iDialogIconStart + 4, 20, 20, 48, 48)
-	GUICtrlCreateLabel(StringFormat($g_aLangDonate[0], Round($g_iUptimeMonitor / 3600)), 80, 20, 280, 60)
-	; GUICtrlCreateLabel($g_sProgName & " has been serving you for over " & Round($g_iUptimeMonitor / 3600) & " hours. " & _
-	; "Now, how about donating to our cause?", 80, 20, 280, 60)
+	GUICtrlCreateLabel($g_aLangDonate[0], 80, 20, 280, 60)
+;~ 	GUICtrlCreateLabel($g_sProgName & " has been serving you for over " & Round($g_iUptimeMonitor / 3600) & " hours. " & _
+;~ 	"Now, how about donating to our cause?", 80, 20, 280, 60)
 	GUICtrlSetFont(-1, 11)
 	GUICtrlSetColor(-1, 0x0565C9)
 	GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
@@ -135,6 +137,7 @@ Func __Donate_CloseDialog()
 	AdlibUnRegister("__Donate_OnIconsHover")
 	If $g_iParentState > 0 Then GUISetState(@SW_ENABLE, $g_hCoreGui)
 	GUIDelete($g_hDonateGui)
+	TraySetState($TRAY_ICONSTATE_HIDE)
 	Exit
 
 EndFunc   ;==>__Donate_CloseDialog

@@ -31,15 +31,15 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=9.0.3.5609
+#AutoIt3Wrapper_Res_Fileversion=9.5.3.8029
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
 #AutoIt3Wrapper_Res_ProductVersion=8             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2021 Rizonesoft				;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=© 2022 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
-;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
+#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81,Win10		;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
 ; If _Res_SaveSource=Y the content of Script_source depends on the _Run_Au3Stripper and #Au3Stripper_parameters directives:
 ;    If _Run_Au3Stripper=Y then
@@ -247,7 +247,6 @@ EndFunc   ;==>_ReBarStartUp
 #include <WinAPITheme.au3>
 #include <WindowsConstants.au3>
 
-
 #include "..\..\Includes\About.au3"
 #include "..\..\Includes\Donate.au3"
 #include "..\..\Includes\GuiMenuEx.au3"
@@ -278,8 +277,8 @@ Global $g_iCoreGuiLoaded		= False
 
 ;~ Links
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "mailto:support@rizonesoft.com|support@rizonesoft.com"										; https://www.rizonesoft.com/contact
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|www.rizonesoft.com/downloads/"												; https://www.rizonesoft.com/downloads/
+Global $g_sUrlSupport			= "https://www.rizonesoft.com/#contact|www.rizonesoft.com/#contact"								; https://www.rizonesoft.com/contact
+Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"						; https://www.rizonesoft.com/downloads/
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
 Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
@@ -289,8 +288,7 @@ Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizo
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/firemin/|www.rizonesoft.com/downloads/firemin/"			; https://www.rizonesoft.com/downloads/firemin/
-Global $g_sUrlUpdate			= $g_sUrlProgPage
-; Global $g_sUrlNotice			= "https://www.rizonesoft.com/notice/?id=firemin|www.rizonesoft.com/notice"
+Global $g_sUrlUpdate			= "UpdateURL=https://www.rizonesoft.com/downloads/update/?id=fireminwww.rizonesoft.com/downloads/update"
 
 ;~ Path Variables
 Global $g_sRootDir			= @ScriptDir
@@ -309,13 +307,14 @@ Global $g_sDocReadme		= $g_sDocsDir & "\Readme.txt"
 
 ; Configuration Settings
 Global $g_iBoostMill		 = 1000
-Global $g_iCleanLimit		 = 20
+Global $g_iCleanLimit		 = 200
 Global $g_sBrowserName
 Global $g_sBrowserPath		 = @ProgramFilesDir & "\Mozilla Firefox\firefox.exe"
 Global $g_sExtendedProcs	 = "plugin-container.exe"
 Global $g_sCoreProcess
 Global $g_iCoreProcessUsage	 = 0
 Global $g_iCoreProcessPeak	 = 0
+Global $g_iExtendedProcUsage     = 0
 Global $g_iBoostEnabled		 = 1
 Global $g_iLimitEnabled		 = 1
 Global $g_iStartBrowser		 = 0
@@ -360,7 +359,8 @@ EndIf
 Global $g_iCheckForUpdates	= 4
 
 ;~ Donate
-Global $g_sDonateName = ""
+Global $g_sDonateName = "Unknown"
+Global $g_iDonateBuild = 13
 
 ;~ Title Settings
 Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administrator
@@ -370,8 +370,8 @@ Global $g_TitleShowBuild	= True	;~ Show program build
 Global $g_TitleShowAutoIt	= True	;~ Show AutoIt version
 
 ;~ Interface Settings
-Global $g_iCoreGuiWidth		= 450
-Global $g_iCoreGuiHeight	= 535
+Global $g_iCoreGuiWidth		= 500
+Global $g_iCoreGuiHeight	= 560
 Global $g_iMsgBoxTimeOut	= 60
 
 ;~ About Dialog
@@ -393,6 +393,7 @@ Global $g_hLblPrflPathCaption
 Global $g_hLblPrflPathExe
 Global $g_hLblProcessUsage
 Global $g_hLblProcessPeak
+Global $g_hLblExtendUsage
 Global $g_hBtnPrflBrowse
 Global $g_hChkReduceEnabled
 Global $g_hComboReduceMill
@@ -439,6 +440,9 @@ Global $g_iSaveRealtime			= 0
 Global $g_iReduceMemory 		= 1
 Global $g_iReduceEveryMill 		= 300
 Global $g_iMaxSysMemoryPerc 	= 80
+Global $g_iProcessesCount		= 0
+Global $g_iExtendedProcessUsage = 0
+Global $g_iExtendedProcessPeak	= 0
 
 Global $g_hFireTrayHandle
 
@@ -448,7 +452,6 @@ If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 	Local $currPID = @AutoItPID
 	ProcessClose($currPID)
 EndIf
-
 
 If @OSVersion = "WIN_2000" Or @OSVersion = "WIN_XPe" Or @OSVersion = "WIN_2003" Then
 	Local $iMsgBoxResult = MsgBox($MB_YESNO + $MB_ICONERROR + $MB_TOPMOST, $g_aLangMessages[3], StringFormat($g_aLangMessages[5], _
@@ -486,13 +489,18 @@ Else
 
 	Else
 
+		_LoadConfiguration()
+
+		;If Not IsAdmin() Then
+			;MsgBox(0, "", "")
+		;EndIf
+
 		OnAutoItExitRegister("_TerminateProgram")
 
 		_Localization_Menus()		;~ Load Menu Language Strings
 		_Localization_Custom()		;~ Load Custom Language Strings
 		_Localization_About()		;~ Load About Language Strings
 		_SetResources()
-		_LoadConfiguration()
 		_SetHotKeys()
 		_StartCore()
 
@@ -542,7 +550,7 @@ Func _StartCore()
 		_RunBrowser()
 	EndIf
 
-	AdlibRegister("_ReduceMemory", 300)
+	; AdlibRegister("_ReduceMemory", 300)
 	AdlibRegister("_ClearProcessesWorkingSet", $g_iBoostMill)
 
 	_SetTrayItemStates()
@@ -557,9 +565,10 @@ Func _StartCore()
     EndIf
 
     If @Compiled Then
-		AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
+		; AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
 	EndIf
 
+	TraySetToolTip($g_sProgramTitle)
 	While 1
 		Sleep(55)
 	WEnd
@@ -634,17 +643,7 @@ Func _StartCoreGui()
 		$g_iCoreGuiWidth - $g_iSizeIcon - 42, 50)
 	GUICtrlSetFont($g_hSubHeading, 9)
 
-	If @OSVersion = "WIN_11" or @OSVersion = "WIN_10" or @OSVersion = "WIN_81" or @OSVersion = "WIN_8" or @OSVersion = "WIN_7" Then
-		GUICtrlSetData($g_hSubHeading, $g_aLangCustom[0])
-		GUICtrlSetColor($g_hSubHeading, 0x353535)
-	Else
-		GUICtrlSetData($g_hSubHeading, $g_aLangCustom[26])
-		GUICtrlSetColor($g_hSubHeading, 0xFD6200)
-		GUICtrlSetCursor($g_hSubHeading, 0)
-;~ 		GUICtrlSetOnEvent($g_hSubHeading, "_NoticeClick")
-	EndIf
-
-	GUICtrlCreateGroup($g_aLangCustom[2], 10, 95, 430, 180)
+	GUICtrlCreateGroup($g_aLangCustom[2], 10, 95, 480, 210)
 	GUICtrlSetFont(-1, 10, 700, 2)
 	$g_IconProfile = GUICtrlCreateIcon($g_aCoreIcons[0], 99, 20, 120, 48, 48)
 	$g_hIconProfile = GUICtrlGetHandle($g_IconProfile)
@@ -660,45 +659,50 @@ Func _StartCoreGui()
 	GUICtrlSetCursor($g_hLblPrflPathExe, 0)
 	GUICtrlCreateLabel($g_aLangCustom[4] & Chr(32), 20, 235, 130, 18, $SS_RIGHT)
 	GUICtrlSetColor(-1, 0x555555)
-	$g_hLblProcessUsage = GUICtrlCreateLabel("0 MB", 150, 235, 100, 18)
+	$g_hLblProcessUsage = GUICtrlCreateLabel("0 MB / 0 MB", 150, 235, 180, 18)
 	GUICtrlCreateLabel($g_aLangCustom[5]& Chr(32), 20, 253, 130, 18, $SS_RIGHT)
 	GUICtrlSetColor(-1, 0x555555)
 	$g_hLblProcessPeak = GUICtrlCreateLabel("0 MB", 150, 253, 100, 18)
-	$g_hBtnPrflBrowse = GUICtrlCreateButton($g_aLangCustom[6], 320, 235, 110, 30)
+
+	GUICtrlCreateLabel("Extended Usage:" & Chr(32), 20, 283, 130, 18, $SS_RIGHT)
+	GUICtrlSetColor(-1, 0x555555)
+	$g_hLblExtendUsage = GUICtrlCreateLabel("0 MB", 150, 283, 200, 18)
+
+	$g_hBtnPrflBrowse = GUICtrlCreateButton($g_aLangCustom[6], 370, 235, 110, 30)
 	GUICtrlSetState($g_hBtnPrflBrowse, $GUI_DEFBUTTON)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
 	GUICtrlSetOnEvent($g_hLblPrflPathExe, "_RunBrowser")
 
-	GUICtrlCreateGroup($g_aLangCustom[7], 10, 285, 430, 160)
+	GUICtrlCreateGroup($g_aLangCustom[7], 10, 315, 480, 160)
 	GUICtrlSetFont(-1, 10, 700, 2)
-	$g_hChkReduceEnabled = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[8], 20, 315, 180, 20)
-	$g_hComboReduceMill = GUICtrlCreateCombo("", 210, 313, 110, 20)
-	GUICtrlSetData($g_hComboReduceMill, "100|250|500|1000|2000|3000|4000|5000|6000|7000|8000|9000|10000|15000|30000|45000|60000|300000|600000|900000|1800000|2700000|3600000|7200000", $g_iBoostMill)
-	GUICtrlCreateLabel($g_aLangCustom[9], 327, 318, 80, 20)
+	$g_hChkReduceEnabled = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[8], 20, 345, 180, 20)
+	$g_hComboReduceMill = GUICtrlCreateCombo("", 210, 343, 110, 20)
+	GUICtrlSetData($g_hComboReduceMill, "500|1000|2000|3000|4000|5000|6000|7000|8000|9000|10000|15000|30000|45000|60000|300000|600000|900000|1800000|2700000|3600000|7200000", $g_iBoostMill)
+	GUICtrlCreateLabel($g_aLangCustom[9], 327, 348, 80, 20)
 
-	$g_hChkCleanLimit = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[10], 20, 338, 270, 20)
-	$g_hComboCleanLimit = GUICtrlCreateCombo("", 290, 339, 55, 20)
-	GUICtrlSetData($g_hComboCleanLimit, "5|10|20|50|100|200|300|400|500|600|700|800|900|1000|1200|1400|1600|1800|2000|2300|2600|2900|3200|3500|3800|4100|4400|4700|5000", $g_iCleanLimit)
-	GUICtrlCreateLabel("MB", 352, 341, 50, 20)
-	$g_hChkBrowserAutoStart = GUICtrlCreateCheckbox(Chr(32) & StringFormat($g_aLangCustom[11], $g_sBrowserName), 20, 361, 320, 20)
-	$g_hChkExtendedProcs = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[12], 20, 384, 220, 20)
-	$g_hBtnExtendedProcs = GUICtrlCreateButton($g_aLangCustom[13], 250, 384, 180, 30)
-	$g_hChkStartWindows = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[14], 20, 415, 320, 20)
+	$g_hChkCleanLimit = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[10], 20, 368, 270, 20)
+	$g_hComboCleanLimit = GUICtrlCreateCombo("", 290, 369, 55, 20)
+	GUICtrlSetData($g_hComboCleanLimit, "50|100|200|300|400|500|600|700|800|900|1000|1200|1400|1600|1800|2000|2300|2600|2900|3200|3500|3800|4100|4400|4700|5000", $g_iCleanLimit)
+	GUICtrlCreateLabel("MB", 352, 371, 50, 20)
+	$g_hChkBrowserAutoStart = GUICtrlCreateCheckbox(Chr(32) & StringFormat($g_aLangCustom[11], $g_sBrowserName), 20, 391, 320, 20)
+	$g_hChkExtendedProcs = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[12], 20, 414, 220, 20)
+	$g_hBtnExtendedProcs = GUICtrlCreateButton($g_aLangCustom[13], 300, 414, 180, 30)
+	$g_hChkStartWindows = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[14], 20, 445, 320, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
-	$g_hLblUpdated = GUICtrlCreateLabel($g_aLangCustom[15], 10, 455, 200, 20)
+	$g_hLblUpdated = GUICtrlCreateLabel($g_aLangCustom[15], 10, 485, 200, 20)
 	GUICtrlSetColor($g_hLblUpdated, 0x008000)
 	GUICtrlSetState($g_hLblUpdated, $GUI_HIDE)
 
-	$g_hBtnCancel = GUICtrlCreateButton($g_aLangCustom[16], 235, 450, 100, 30)
-	$g_hBtnSave = GUICtrlCreateButton($g_aLangCustom[17], 340, 450, 100, 30)
+	$g_hBtnCancel = GUICtrlCreateButton($g_aLangCustom[16], 285, 480, 100, 30)
+	$g_hBtnSave = GUICtrlCreateButton($g_aLangCustom[17], 390, 480, 100, 30)
 	GUICtrlSetState($g_hBtnSave, $GUI_DISABLE)
 	GUICtrlSetOnEvent($g_hBtnSave, "_SaveFireminConfig")
 
-	GUICtrlCreateLabel("", -10, 486, 500, 1)
+	GUICtrlCreateLabel("", -10, 516, 500, 1)
 	GUICtrlSetBkColor(-1, 0xD6D6D6)
-	$g_hLblTimeStatus = GUICtrlCreateLabel("", 10, 493, 450, 25)
+	$g_hLblTimeStatus = GUICtrlCreateLabel("", 10, 523, 450, 25)
 	GUICtrlSetColor($g_hLblTimeStatus, 0x333333)
 
 	GUICtrlSetState($g_hChkReduceEnabled, $g_iBoostEnabled)
@@ -725,13 +729,12 @@ Func _StartCoreGui()
 
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 	AdlibRegister("_OnIconsHover", 65)
-	AdlibRegister("_GetCoreProcessPeak", 5000)
+	; AdlibRegister("_GetCoreProcessPeak", 5000)
 
 	GUICtrlSetState($g_hChkStartWindows, FileExists(@StartupDir & "\Firemin.lnk"))
 	_SetBoostDescription()
-
 	_GetCoreProcessUsage()
-	_GetCoreProcessPeak()
+	; _GetCoreProcessPeak()
 
 EndFunc   ;==>_StartCoreGui
 
@@ -751,7 +754,7 @@ Func _CloseCoreGui()
 	_SetTrayItemStates()
 
 	AdlibUnRegister("_OnIconsHover")
-	AdlibUnRegister("_GetCoreProcessPeak")
+	; AdlibUnRegister("_GetCoreProcessPeak")
 
 EndFunc
 
@@ -943,8 +946,8 @@ Func _LoadConfiguration()
 	$g_iReduceMemory = Int(IniRead($g_sPathIni, $g_sProgShortName, "ReduceMemory", 1))
 	$g_iReduceEveryMill = Int(IniRead($g_sPathIni, $g_sProgShortName, "ReduceEveryMill", 300))
 	$g_iMaxSysMemoryPerc = Int(IniRead($g_sPathIni, $g_sProgShortName, "MinSysMemoryPerc", 80))
-	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "")
-
+	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "Unknown")
+	$g_iDonateBuild = Number(IniRead($g_sPathIni, "Donate", "DonateBuild", 13))
 	$g_sBrowserPath = IniRead($g_sPathIni, $g_sProgShortName, "BrowserPath", @ProgramFilesDir & "\Mozilla Firefox\firefox.exe")
 	$g_iBoostEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "BoostEnabled", 1))
 	$g_iBoostMill = Int(IniRead($g_sPathIni, $g_sProgShortName, "Boost", 500))
@@ -1005,6 +1008,7 @@ Func _SetBoost()
 	$g_iBoostMill = Int(GUICtrlRead($g_hComboReduceMill))
 	AdlibUnRegister("_ClearProcessesWorkingSet")
 	AdlibRegister("_ClearProcessesWorkingSet", $g_iBoostMill)
+
 	_SetBoostDescription()
 	_EnableSaveSettings()
 	_SetControlStates()
@@ -1057,7 +1061,7 @@ Func __iBetween($iLower, $iUpper, $iNumber)
 	If $iNumber >=  $iLower And $iNumber < $iUpper Then
 		Return True
 	Else
-		REturn False
+		Return False
 	EndIf
 
 EndFunc
@@ -1170,9 +1174,10 @@ Func _ShutdownProgram()
 		AdlibUnRegister("_ReduceMemory")
 	EndIf
 
-	If StringCompare($g_sDonateName, @ComputerName, $STR_NOCASESENSEBASIC) <> 0 Then
+	If StringCompare($g_sDonateName, @ComputerName, $STR_NOCASESENSEBASIC) <> 0 Or Number(_GetProgramVersion(4)) <> $g_iDonateBuild Then
 
 		IniWrite($g_sPathIni, "Donate", "DonateName", @ComputerName)
+		IniWrite($g_sPathIni, "Donate", "DonateBuild", _GetProgramVersion(4))
 		_Donate_ShowDialog()
 
 	Else
@@ -1214,7 +1219,7 @@ Func _FindBrowser()
 			GUICtrlSetState($g_hBtnSave, $GUI_ENABLE)
 		EndIf
         _LoadBrowser($sBrowserOpenDlg)
-		_ResetProcessUsage()
+		; _ResetProcessUsage()
 		_SetTrayItemStates()
     EndIf
 
@@ -1277,82 +1282,55 @@ EndFunc
 
 Func _GetCoreProcessUsage()
 
-	If ProcessExists($g_sCoreProcess) Then
-
-		$g_iCoreProcessUsage = _GetProcessUsage($g_sCoreProcess, 0)
-		GUICtrlSetData($g_hLblProcessUsage, $g_iCoreProcessUsage & " MB")
-
-		If $g_iBoostEnabled Then
-
-			If $g_iLimitEnabled Then
-				If $g_iCoreProcessUsage > $g_iCleanLimit Then
-					GUICtrlSetColor($g_hLblProcessUsage, 0xFF0000)
-				Else
-					GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
-				EndIf
-			Else
-				GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
-			EndIf
-
-		Else
-
-			If $g_iCoreProcessUsage > 300 Then
-				GUICtrlSetColor($g_hLblProcessUsage, 0xFF0000)
-			Else
-				GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
-			EndIf
-
-		EndIf
-
-	EndIf
-
-EndFunc
-
-
-Func _GetCoreProcessPeak()
-
-	If ProcessExists($g_sCoreProcess) Then
-		$g_iCoreProcessPeak =_GetProcessUsage($g_sCoreProcess, 1)
-		GUICtrlSetData($g_hLblProcessPeak, $g_iCoreProcessPeak & " MB")
-	Else
-		_ResetProcessUsage()
-	EndIf
-
 EndFunc
 
 
 Func _ClearProcessesWorkingSet()
 
-	If $g_iBoostEnabled Then
-		If $g_iLimitEnabled Then
-			If Round(_GetProcessUsage($g_sCoreProcess, 0)) > $g_iCleanLimit Then
-				__ClearSingleProcess($g_sCoreProcess)
+	Local $aProcessList
+	Local $iCleanLimit = 0
+
+	$aProcessList = ProcessList($g_sCoreProcess)
+	$g_iProcessesCount = $aProcessList[0][0]
+
+	If Not @error Then
+
+		For $i = 1 To $g_iProcessesCount
+			$g_iCoreProcessUsage += _GetProcessUsage($aProcessList[$i][1], 2)
+			$g_iCoreProcessPeak +=_GetProcessUsage($aProcessList[$i][1], 1)
+		Next
+
+		$g_iCoreProcessUsage = Round($g_iCoreProcessUsage / 1024 / 1024, 2)
+		$g_iCoreProcessPeak = Round($g_iCoreProcessPeak / 1024 / 1024, 2)
+
+		If $g_iBoostEnabled Then
+			If $g_iLimitEnabled Then
+				$iCleanLimit = $g_iCleanLimit
+			Else
+				$iCleanLimit = 0
 			EndIf
-		Else
-			__ClearSingleProcess($g_sCoreProcess)
+
+			If $g_iCoreProcessUsage > $iCleanLimit Then
+				For $x = 1 To $g_iProcessesCount
+					_WinAPI_EmptyWorkingSet($aProcessList[$x][1])
+				Next
+			EndIf
 		EndIf
+
 	EndIf
 
-	_GetCoreProcessUsage()
 	_ClearExtendedProcs()
 
 EndFunc
 
 
-Func _ResetProcessUsage()
-	GUICtrlSetData($g_hLblProcessUsage, "0 MB")
-	GUICtrlSetData($g_hLblProcessPeak, "0 MB")
-	GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
-EndFunc
-
-
-Func _GetProcessUsage($sProcess, $iFlag = 0)
+Func _GetProcessUsage($iProcess, $iFlag = 0)
 
 	Local $iProcessUsage = 0
-	Local $aProcessStats = ProcessGetStats($sProcess, 0)
+	Local $aProcessStats = _WinAPI_GetProcessMemoryInfo($iProcess)
 	If Not @error Then
 		If IsArray($aProcessStats) Then
-			$iProcessUsage = Round($aProcessStats[$iFlag] / 1024 / 1024, 2)
+			$iProcessUsage = $aProcessStats[$iFlag]
 		Else
 			Return SetError(2, 0, 0)
 		EndIf
@@ -1369,26 +1347,49 @@ Func _ClearExtendedProcs()
 
 	If $g_iExtProcsEnabled Then
 
+		Local $iExtendedProcess = 0
 		Local $sCleanProc = ""
 		Local $aProcs = StringSplit($g_sExtendedProcs, ",")
 		For $x = 1 To $aProcs[0]
 			$sCleanProc = StringStripCR(StringStripWS($aProcs[$x], 3))
-			__ClearSingleProcess($sCleanProc)
+			$iExtendedProcess = ProcessExists($sCleanProc)
+			_WinAPI_EmptyWorkingSet($iExtendedProcess)
+
+			$g_iExtendedProcessUsage += _GetProcessUsage($iExtendedProcess, 2)
+			$g_iExtendedProcessPeak +=_GetProcessUsage($iExtendedProcess, 1)
+
 		Next
+
+		UpdateStatLabels()
 
 	EndIf
 
 EndFunc
 
 
-Func __ClearSingleProcess($sProcess)
+Func UpdateStatLabels()
 
-	Local $aProcessList = ProcessList($sProcess)
-	If Not @error Then
-		For $i = 1 To $aProcessList[0][0]
-			_WinAPI_EmptyWorkingSet($aProcessList[$i][1])
-		Next
+	GUICtrlSetData($g_hLblProcessUsage, $g_iCoreProcessUsage & " MB / " & $g_iCoreProcessPeak & " MB")
+	GUICtrlSetData($g_hLblProcessPeak, $g_iProcessesCount)
+	GUICtrlSetColor($g_hLblProcessUsage, 0x000000)
+
+	If $g_iBoostEnabled Then
+		If $g_iLimitEnabled Then
+			If $g_iCoreProcessUsage > $g_iCleanLimit Then
+				GUICtrlSetColor($g_hLblProcessUsage, 0xFF0000)
+			EndIf
+		EndIf
 	EndIf
+
+	$g_iExtendedProcessUsage = Round($g_iExtendedProcessUsage / 1024 / 1024, 2)
+	$g_iExtendedProcessPeak = Round($g_iExtendedProcessPeak / 1024 / 1024, 2)
+
+	GUICtrlSetData($g_hLblExtendUsage, $g_iExtendedProcessUsage & " MB / " & $g_iExtendedProcessPeak & " MB")
+
+	$g_iCoreProcessUsage = 0
+	$g_iCoreProcessPeak	= 0
+	$g_iExtendedProcessUsage = 0
+	$g_iExtendedProcessPeak = 0
 
 EndFunc
 
@@ -1551,6 +1552,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetOnEvent($g_hOBtnCancel, "__CloseOptionsDlg")
 
 	GUISetState(@SW_SHOW, $g_hOptionsGui)
+	AdlibUnRegister("__CheckExtendedProcsChange")
 	AdlibRegister("__CheckExtendedProcsChange", 800)
 
 EndFunc

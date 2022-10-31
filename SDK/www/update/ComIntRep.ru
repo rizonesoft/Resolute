@@ -1,3 +1,3 @@
 [Update]
-LatestBuild=5601
+LatestBuild=6022
 UpdateURL=https://www.rizonesoft.com/downloads/complete-internet-repair/

@@ -6,6 +6,26 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed extended processes usage display.
+- Optimized memory statistics display.
+- Cleaned code and optimized functions.
+- Minor bug fixes and enhancements.
+- This version requires a clean install.
+
+--------------------------------------------------
+Version 9.5.3.8008 (OCTOBER 01, 2022)
+--------------------------------------------------
+
+- Updated AutoIt to version 3.3.16.1 (19 Septemeber 2022). - https://www.autoitscript.com/autoit3/docs/history.htm
+- Further Windows 11 compatibility improvements.
+- Reworked optimization function for better accuracy.
+- Implemented Firemin Server functionality. 
+- Minor bug fixes and enhancements.
+
+--------------------------------------------------
+Version 9.0.3.5608 (SEPTEMBER 18, 2022)
+--------------------------------------------------
+
 - Updated AutoIt to version 3.3.16.1. - https://www.autoitscript.com/autoit3/docs/history.htm
 - Improved Windows 11 compatibility.
 - Fixed versioning.

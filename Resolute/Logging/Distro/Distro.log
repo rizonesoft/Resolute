@@ -18272,3 +18272,1310 @@
 [ 2022/09/18 14:55:52 ] C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\5608\Firemin_5608_Setup.exe
 [ 2022/09/18 14:55:52 ] Finished: Created installation for Firemin.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/10/01 23:20:10 ] DATE:                        2022/10/01 23:20:10
+[ 2022/10/01 23:20:10 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3626
+[ 2022/10/01 23:20:10 ] PROGRAM PATH:                [C:\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2022/10/01 23:20:10 ] COMPILED:                    YES
+[ 2022/10/01 23:20:10 ] WINDOWS VERSION:             WIN_10 
+[ 2022/10/01 23:20:10 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/10/01 23:20:10 ] MEMORY (RAM):                32605.47 MB
+[ 2022/10/01 23:20:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/10/01 23:20:10 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2022/10/01 23:20:28 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2022/10/01 23:20:28 ] Template directory found at: 'C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2022/10/01 23:20:28 ] 03 templates files found.
+[ 2022/10/01 23:20:28 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2022/10/01 23:20:28 ] Document created successfuly.
+[ 2022/10/01 23:20:28 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 2022/10/01 23:20:28 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2022/10/01 23:20:28 ] Document created successfuly.
+[ 2022/10/01 23:20:28 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\License.txt
+[ 2022/10/01 23:20:28 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2022/10/01 23:20:28 ] Document created successfuly.
+[ 2022/10/01 23:20:28 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 2022/10/01 23:20:28 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2022/10/01 23:20:31 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Firemin.exe Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Firemin_X64.exe Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Firemin.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Docs\Firemin\Changes.txt Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Docs\Firemin\License.txt Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Docs\Firemin\Readme.txt Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\af.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ar.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\de.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\el.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\en.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\es.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\fa.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\fr.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\hu.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\it.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ja.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ko.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\pl.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\pt.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ru.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\sl.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\tr.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Processing\32\Stroke.ani Distribution Created.
+[ 2022/10/01 23:20:31 ] \Concrete\Firemin\Distribution\8008\Firemin_8008\Processing\64\Globe.ani Distribution Created.
+[ 2022/10/01 23:20:32 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2022/10/01 23:20:35 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/01 23:20:35 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2022/10/01 23:20:35 ] Scanning the drive:
+[ 2022/10/01 23:20:36 ] 8 folders, 28 files, 4889982 bytes (4776 KiB)
+[ 2022/10/01 23:20:36 ] Creating archive: Firemin_8008.zip
+[ 2022/10/01 23:20:36 ] Items to compress: 36
+[ 2022/10/01 23:20:36 ] Files read from disk: 28
+[ 2022/10/01 23:20:36 ] Archive size: 2638209 bytes (2577 KiB)
+[ 2022/10/01 23:20:36 ] Everything is Ok
+[ 2022/10/01 23:20:36 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2022/10/01 23:20:39 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2022/10/01 23:20:39 ] Inno Setup 6 Command-Line Compiler
+[ 2022/10/01 23:20:39 ] Copyright (C) 1997-2022 Jordan Russell. All rights reserved.
+[ 2022/10/01 23:20:40 ] Portions Copyright (C) 2000-2022 Martijn Laan. All rights reserved.
+[ 2022/10/01 23:20:40 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2022/10/01 23:20:40 ] https://www.innosetup.com
+[ 2022/10/01 23:20:40 ] Compiler engine version: Inno Setup 6.2.1
+[ 2022/10/01 23:20:40 ] Preprocessing
+[ 2022/10/01 23:20:40 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 21
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 22
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 23
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 24
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 25
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 26
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 27
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 28
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 29
+[ 2022/10/01 23:20:40 ] Parsing [Setup] section, line 30
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 31
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 32
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 33
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 34
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 35
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 36
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 37
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 38
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 39
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 40
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 41
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 42
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 43
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 44
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 45
+[ 2022/10/01 23:20:41 ] Parsing [Setup] section, line 46
+[ 2022/10/01 23:20:42 ] Parsing [Setup] section, line 47
+[ 2022/10/01 23:20:42 ] Parsing [Setup] section, line 48
+[ 2022/10/01 23:20:42 ] Parsing [Setup] section, line 49
+[ 2022/10/01 23:20:42 ] Parsing [Setup] section, line 50
+[ 2022/10/01 23:20:42 ] Parsing [Setup] section, line 51
+[ 2022/10/01 23:20:42 ] Parsing [Setup] section, line 52
+[ 2022/10/01 23:20:42 ] Reading file (LicenseFile)
+[ 2022/10/01 23:20:42 ] Reading file (WizardImageFile)
+[ 2022/10/01 23:20:42 ] Reading file (WizardSmallImageFile)
+[ 2022/10/01 23:20:42 ] Preparing Setup program executable
+[ 2022/10/01 23:20:42 ] Updating version info (SETUP.E32)
+[ 2022/10/01 23:20:42 ] Updating manifest (SETUP.E32)
+[ 2022/10/01 23:20:42 ] Determining language code pages
+[ 2022/10/01 23:20:42 ] Parsing [Languages] section, line 55
+[ 2022/10/01 23:20:42 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/01 23:20:42 ] Messages in script file
+[ 2022/10/01 23:20:43 ] Reading default messages from Default.isl
+[ 2022/10/01 23:20:43 ] Parsing [Languages] section, line 55
+[ 2022/10/01 23:20:43 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/01 23:20:43 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2022/10/01 23:20:43 ] Messages in script file
+[ 2022/10/01 23:20:43 ] Reading [Code] section
+[ 2022/10/01 23:20:43 ] Parsing [Tasks] section, line 73
+[ 2022/10/01 23:20:43 ] Parsing [Tasks] section, line 74
+[ 2022/10/01 23:20:43 ] Parsing [Tasks] section, line 75
+[ 2022/10/01 23:20:43 ] Parsing [Tasks] section, line 76
+[ 2022/10/01 23:20:43 ] Parsing [Tasks] section, line 77
+[ 2022/10/01 23:20:43 ] Parsing [Tasks] section, line 78
+[ 2022/10/01 23:20:43 ] Parsing [Icons] section, line 115
+[ 2022/10/01 23:20:43 ] Parsing [Icons] section, line 116
+[ 2022/10/01 23:20:43 ] Parsing [Icons] section, line 117
+[ 2022/10/01 23:20:43 ] Parsing [Icons] section, line 118
+[ 2022/10/01 23:20:43 ] Parsing [INI] section, line 121
+[ 2022/10/01 23:20:44 ] Parsing [INI] section, line 122
+[ 2022/10/01 23:20:44 ] Parsing [InstallDelete] section, line 128
+[ 2022/10/01 23:20:44 ] Parsing [InstallDelete] section, line 129
+[ 2022/10/01 23:20:44 ] Parsing [InstallDelete] section, line 130
+[ 2022/10/01 23:20:44 ] Parsing [InstallDelete] section, line 131
+[ 2022/10/01 23:20:44 ] Parsing [InstallDelete] section, line 132
+[ 2022/10/01 23:20:44 ] Parsing [UninstallDelete] section, line 135
+[ 2022/10/01 23:20:44 ] Parsing [UninstallDelete] section, line 136
+[ 2022/10/01 23:20:44 ] Parsing [Run] section, line 125
+[ 2022/10/01 23:20:44 ] Parsing [Files] section, line 81
+[ 2022/10/01 23:20:44 ] Parsing [Files] section, line 82
+[ 2022/10/01 23:20:44 ] Parsing [Files] section, line 83
+[ 2022/10/01 23:20:44 ] Reading version info: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Firemin.ini
+[ 2022/10/01 23:20:44 ] Parsing [Files] section, line 84
+[ 2022/10/01 23:20:44 ] Parsing [Files] section, line 85
+[ 2022/10/01 23:20:44 ] Parsing [Files] section, line 86
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 87
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 88
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 89
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 90
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 91
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 92
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 93
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 94
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 95
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 96
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 97
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 98
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 99
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 100
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 101
+[ 2022/10/01 23:20:45 ] Parsing [Files] section, line 102
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 103
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 104
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 105
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 106
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 107
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 108
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 109
+[ 2022/10/01 23:20:46 ] Parsing [Files] section, line 110
+[ 2022/10/01 23:20:46 ] Compiling [Code] section
+[ 2022/10/01 23:20:46 ] Creating setup files
+[ 2022/10/01 23:20:46 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Firemin_X64.exe
+[ 2022/10/01 23:20:46 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Firemin.exe
+[ 2022/10/01 23:20:46 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Firemin.ini
+[ 2022/10/01 23:20:46 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Docs\Firemin\Changes.txt
+[ 2022/10/01 23:20:46 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Docs\Firemin\License.txt
+[ 2022/10/01 23:20:46 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Docs\Firemin\Readme.txt
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\af.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ar.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\de.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\el.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\en.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\es.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\fa.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\fr.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\hu.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\it.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ja.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ko.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\pl.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\pt.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\pt-BR.ini
+[ 2022/10/01 23:20:47 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\ru.ini
+[ 2022/10/01 23:20:48 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\sl.ini
+[ 2022/10/01 23:20:48 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\tr.ini
+[ 2022/10/01 23:20:48 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\zh-CN.ini
+[ 2022/10/01 23:20:48 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Language\Firemin\zh-TW.ini
+[ 2022/10/01 23:20:48 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Processing\32\Stroke.ani
+[ 2022/10/01 23:20:48 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008\Processing\64\Globe.ani
+[ 2022/10/01 23:20:48 ] Compressing Setup program executable
+[ 2022/10/01 23:20:48 ] Updating version info (SETUP.EXE)
+[ 2022/10/01 23:20:48 ] Updating manifest (SETUP.EXE)
+[ 2022/10/01 23:20:48 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2022/10/01 23:20:48 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2022/10/01 23:20:48 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2022/10/01 23:20:48 ] Warning: Line 186, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2022/10/01 23:20:48 ] Warning: Line 193, Column 2: [Hint] Variable 'ERRORCODE' never used
+[ 2022/10/01 23:20:48 ] Successful compile (1,109 sec). Resulting Setup program filename is:
+[ 2022/10/01 23:20:48 ] C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8008\Firemin_8008_Setup.exe
+[ 2022/10/01 23:20:48 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/10/02 21:49:00 ] DATE:                        2022/10/02 21:49:00
+[ 2022/10/02 21:49:00 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3626
+[ 2022/10/02 21:49:00 ] PROGRAM PATH:                [C:\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2022/10/02 21:49:00 ] COMPILED:                    YES
+[ 2022/10/02 21:49:00 ] WINDOWS VERSION:             WIN_10 
+[ 2022/10/02 21:49:00 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/10/02 21:49:00 ] MEMORY (RAM):                32605.47 MB
+[ 2022/10/02 21:49:00 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/10/02 21:49:00 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2022/10/02 21:49:11 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:11 ] Template directory found at: 'C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2022/10/02 21:49:11 ] 03 templates files found.
+[ 2022/10/02 21:49:11 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2022/10/02 21:49:11 ] Document created successfuly.
+[ 2022/10/02 21:49:11 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 2022/10/02 21:49:11 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2022/10/02 21:49:11 ] Document created successfuly.
+[ 2022/10/02 21:49:11 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\License.txt
+[ 2022/10/02 21:49:11 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2022/10/02 21:49:11 ] Document created successfuly.
+[ 2022/10/02 21:49:11 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 2022/10/02 21:49:11 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:14 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Firemin.exe Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Firemin_X64.exe Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Firemin.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Docs\Firemin\Changes.txt Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Docs\Firemin\License.txt Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Docs\Firemin\Readme.txt Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\af.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ar.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\de.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\el.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\en.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\es.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\fa.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\fr.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\hu.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\it.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ja.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ko.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\pl.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\pt.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ru.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\sl.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\tr.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Processing\32\Stroke.ani Distribution Created.
+[ 2022/10/02 21:49:14 ] \Concrete\Firemin\Distribution\8027\Firemin_8027\Processing\64\Globe.ani Distribution Created.
+[ 2022/10/02 21:49:15 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:19 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:20 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2022/10/02 21:49:20 ] Scanning the drive:
+[ 2022/10/02 21:49:20 ] 8 folders, 28 files, 4891391 bytes (4777 KiB)
+[ 2022/10/02 21:49:20 ] Creating archive: Firemin_8027.zip
+[ 2022/10/02 21:49:20 ] Items to compress: 36
+[ 2022/10/02 21:49:20 ] Files read from disk: 28
+[ 2022/10/02 21:49:20 ] Archive size: 2639151 bytes (2578 KiB)
+[ 2022/10/02 21:49:20 ] Everything is Ok
+[ 2022/10/02 21:49:20 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:24 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:24 ] Inno Setup 6 Command-Line Compiler
+[ 2022/10/02 21:49:24 ] Copyright (C) 1997-2022 Jordan Russell. All rights reserved.
+[ 2022/10/02 21:49:24 ] Portions Copyright (C) 2000-2022 Martijn Laan. All rights reserved.
+[ 2022/10/02 21:49:24 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2022/10/02 21:49:24 ] https://www.innosetup.com
+[ 2022/10/02 21:49:24 ] Compiler engine version: Inno Setup 6.2.1
+[ 2022/10/02 21:49:24 ] Preprocessing
+[ 2022/10/02 21:49:24 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2022/10/02 21:49:24 ] Parsing [Setup] section, line 21
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 22
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 23
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 24
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 25
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 26
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 27
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 28
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 29
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 30
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 31
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 32
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 33
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 34
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 35
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 36
+[ 2022/10/02 21:49:25 ] Parsing [Setup] section, line 37
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 38
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 39
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 40
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 41
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 42
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 43
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 44
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 45
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 46
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 47
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 48
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 49
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 50
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 51
+[ 2022/10/02 21:49:26 ] Parsing [Setup] section, line 52
+[ 2022/10/02 21:49:26 ] Reading file (LicenseFile)
+[ 2022/10/02 21:49:27 ] Reading file (WizardImageFile)
+[ 2022/10/02 21:49:27 ] Reading file (WizardSmallImageFile)
+[ 2022/10/02 21:49:27 ] Preparing Setup program executable
+[ 2022/10/02 21:49:27 ] Updating version info (SETUP.E32)
+[ 2022/10/02 21:49:27 ] Updating manifest (SETUP.E32)
+[ 2022/10/02 21:49:27 ] Determining language code pages
+[ 2022/10/02 21:49:27 ] Parsing [Languages] section, line 55
+[ 2022/10/02 21:49:27 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 21:49:27 ] Messages in script file
+[ 2022/10/02 21:49:27 ] Reading default messages from Default.isl
+[ 2022/10/02 21:49:27 ] Parsing [Languages] section, line 55
+[ 2022/10/02 21:49:27 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 21:49:27 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2022/10/02 21:49:27 ] Messages in script file
+[ 2022/10/02 21:49:27 ] Reading [Code] section
+[ 2022/10/02 21:49:27 ] Parsing [Tasks] section, line 73
+[ 2022/10/02 21:49:28 ] Parsing [Tasks] section, line 74
+[ 2022/10/02 21:49:28 ] Parsing [Tasks] section, line 75
+[ 2022/10/02 21:49:28 ] Parsing [Tasks] section, line 76
+[ 2022/10/02 21:49:28 ] Parsing [Tasks] section, line 77
+[ 2022/10/02 21:49:28 ] Parsing [Tasks] section, line 78
+[ 2022/10/02 21:49:28 ] Parsing [Icons] section, line 115
+[ 2022/10/02 21:49:28 ] Parsing [Icons] section, line 116
+[ 2022/10/02 21:49:28 ] Parsing [Icons] section, line 117
+[ 2022/10/02 21:49:28 ] Parsing [Icons] section, line 118
+[ 2022/10/02 21:49:28 ] Parsing [INI] section, line 121
+[ 2022/10/02 21:49:28 ] Parsing [INI] section, line 122
+[ 2022/10/02 21:49:28 ] Parsing [InstallDelete] section, line 128
+[ 2022/10/02 21:49:28 ] Parsing [InstallDelete] section, line 129
+[ 2022/10/02 21:49:28 ] Parsing [InstallDelete] section, line 130
+[ 2022/10/02 21:49:28 ] Parsing [InstallDelete] section, line 131
+[ 2022/10/02 21:49:28 ] Parsing [InstallDelete] section, line 132
+[ 2022/10/02 21:49:28 ] Parsing [UninstallDelete] section, line 135
+[ 2022/10/02 21:49:29 ] Parsing [UninstallDelete] section, line 136
+[ 2022/10/02 21:49:29 ] Parsing [Run] section, line 125
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 81
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 82
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 83
+[ 2022/10/02 21:49:29 ] Reading version info: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Firemin.ini
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 84
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 85
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 86
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 87
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 88
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 89
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 90
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 91
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 92
+[ 2022/10/02 21:49:29 ] Parsing [Files] section, line 93
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 94
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 95
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 96
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 97
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 98
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 99
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 100
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 101
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 102
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 103
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 104
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 105
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 106
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 107
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 108
+[ 2022/10/02 21:49:30 ] Parsing [Files] section, line 109
+[ 2022/10/02 21:49:31 ] Parsing [Files] section, line 110
+[ 2022/10/02 21:49:31 ] Compiling [Code] section
+[ 2022/10/02 21:49:31 ] Creating setup files
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Firemin_X64.exe
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Firemin.exe
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Firemin.ini
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Docs\Firemin\Changes.txt
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Docs\Firemin\License.txt
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Docs\Firemin\Readme.txt
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\af.ini
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ar.ini
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\de.ini
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\el.ini
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\en.ini
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\es.ini
+[ 2022/10/02 21:49:31 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\fa.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\fr.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\hu.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\it.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ja.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ko.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\pl.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\pt.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\pt-BR.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\ru.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\sl.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\tr.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\zh-CN.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Language\Firemin\zh-TW.ini
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Processing\32\Stroke.ani
+[ 2022/10/02 21:49:32 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027\Processing\64\Globe.ani
+[ 2022/10/02 21:49:32 ] Compressing Setup program executable
+[ 2022/10/02 21:49:32 ] Updating version info (SETUP.EXE)
+[ 2022/10/02 21:49:33 ] Updating manifest (SETUP.EXE)
+[ 2022/10/02 21:49:33 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2022/10/02 21:49:33 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2022/10/02 21:49:33 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2022/10/02 21:49:33 ] Warning: Line 186, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2022/10/02 21:49:33 ] Warning: Line 193, Column 2: [Hint] Variable 'ERRORCODE' never used
+[ 2022/10/02 21:49:33 ] Successful compile (1,968 sec). Resulting Setup program filename is:
+[ 2022/10/02 21:49:33 ] C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8027\Firemin_8027_Setup.exe
+[ 2022/10/02 21:49:33 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:36 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:49:36 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\Firemin.ru'
+[ 2022/10/02 21:49:36 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\Firemin.rus'
+[ 2022/10/02 21:49:36 ] Finished: 
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:56:27 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:56:28 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 2022/10/02 21:56:28 ] from:Distro_X64.exe (8.0.2.3626) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 2022/10/02 21:56:28 ] >Running AU3Check (3.3.16.1) from:C:\Program Files (x86)\AutoIt3 input:C:\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 2022/10/02 21:56:29 ] +> AU3Check ended. rc:0
+[ 2022/10/02 21:56:29 ] >Running:(3.3.16.1):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU1FCA.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 2022/10/02 21:56:32 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU1FCA.tmp.exe. rc:0
+[ 2022/10/02 21:56:32 ] > Performing the Program Resource Update steps:
+[ 2022/10/02 21:56:33 ] ...>Updating Program Version information.
+[ 2022/10/02 21:56:33 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2022/10/02 21:56:33 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2022/10/02 21:56:33 ] ...>Updating Program Manifest information.
+[ 2022/10/02 21:56:33 ] ...>Adding 76 Icon(s).
+[ 2022/10/02 21:56:33 ] > Program Resource updating finished successfully.
+[ 2022/10/02 21:56:34 ] +> Created program: C:\GitHub\Resolute\Resolute\Firemin.exe
+[ 2022/10/02 21:56:34 ] >Running:(3.3.16.1):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "C:\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU1FCA.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x64
+[ 2022/10/02 21:56:35 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU1FCA.tmp.exe. rc:0
+[ 2022/10/02 21:56:35 ] > Performing the Program Resource Update steps:
+[ 2022/10/02 21:56:35 ] ...>Updating Program Version information.
+[ 2022/10/02 21:56:35 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2022/10/02 21:56:35 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2022/10/02 21:56:35 ] ...>Updating Program Manifest information.
+[ 2022/10/02 21:56:35 ] ...>Adding 76 Icon(s).
+[ 2022/10/02 21:56:36 ] > Program Resource updating finished successfully.
+[ 2022/10/02 21:56:36 ] +> Created program: C:\GitHub\Resolute\Resolute\Firemin_X64.exe
+[ 2022/10/02 21:56:36 ] -Updated the Source Version to: 9.5.3.8029
+[ 2022/10/02 21:56:37 ] +> AutoIt3Wrapper Finished.
+[ 2022/10/02 21:56:38 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:20 ] Generating Documentation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:20 ] Template directory found at: 'C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates'
+[ 2022/10/02 21:58:20 ] 03 templates files found.
+[ 2022/10/02 21:58:20 ] Processing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Changes.tpl
+[ 2022/10/02 21:58:20 ] Document created successfuly.
+[ 2022/10/02 21:58:20 ] Document File: C:\GitHub\Resolute\Resolute\Docs\ComIntRep\Changes.txt
+[ 2022/10/02 21:58:20 ] Processing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\License.tpl
+[ 2022/10/02 21:58:20 ] Document created successfuly.
+[ 2022/10/02 21:58:20 ] Document File: C:\GitHub\Resolute\Resolute\Docs\ComIntRep\License.txt
+[ 2022/10/02 21:58:20 ] Processing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Templates\Readme.tpl
+[ 2022/10/02 21:58:20 ] Document created successfuly.
+[ 2022/10/02 21:58:20 ] Document File: C:\GitHub\Resolute\Resolute\Docs\ComIntRep\Readme.txt
+[ 2022/10/02 21:58:20 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:24 ] Distributing Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:24 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\ComIntRep.exe Distribution Created.
+[ 2022/10/02 21:58:24 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\ComIntRep_X64.exe Distribution Created.
+[ 2022/10/02 21:58:24 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\ComIntRep.ini Distribution Created.
+[ 2022/10/02 21:58:24 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Docs\ComIntRep\Changes.txt Distribution Created.
+[ 2022/10/02 21:58:24 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Docs\ComIntRep\License.txt Distribution Created.
+[ 2022/10/02 21:58:24 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Docs\ComIntRep\Readme.txt Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\af.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\ar.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\de.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\el.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\en.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\es.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\fr.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\hu.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\it.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\ko.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\pt-BR.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\ru.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\sl.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\tr.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\zh-CN.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\zh-TW.ini Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\16\Process.ani Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\32\Stroke.ani Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\64\Stroke.ani Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\64\Globe.ani Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Sounds\Complete.wav Distribution Created.
+[ 2022/10/02 21:58:25 ] \Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Sounds\Welcome.wav Distribution Created.
+[ 2022/10/02 21:58:26 ] Finished: Complete Internet Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:28 ] Creating Zip Package for Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:29 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2022/10/02 21:58:29 ] Scanning the drive:
+[ 2022/10/02 21:58:29 ] 10 folders, 28 files, 6372331 bytes (6223 KiB)
+[ 2022/10/02 21:58:29 ] Creating archive: ComIntRep_6022.zip
+[ 2022/10/02 21:58:29 ] Items to compress: 38
+[ 2022/10/02 21:58:29 ] Files read from disk: 28
+[ 2022/10/02 21:58:29 ] Archive size: 3225784 bytes (3151 KiB)
+[ 2022/10/02 21:58:30 ] Everything is Ok
+[ 2022/10/02 21:58:30 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:32 ] Creating installation for Complete Internet Repair
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:32 ] Inno Setup 6 Command-Line Compiler
+[ 2022/10/02 21:58:32 ] Copyright (C) 1997-2022 Jordan Russell. All rights reserved.
+[ 2022/10/02 21:58:33 ] Portions Copyright (C) 2000-2022 Martijn Laan. All rights reserved.
+[ 2022/10/02 21:58:33 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2022/10/02 21:58:33 ] https://www.innosetup.com
+[ 2022/10/02 21:58:33 ] Compiler engine version: Inno Setup 6.2.1
+[ 2022/10/02 21:58:33 ] Preprocessing
+[ 2022/10/02 21:58:33 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 21
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 22
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 23
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 24
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 25
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 26
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 27
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 28
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 29
+[ 2022/10/02 21:58:33 ] Parsing [Setup] section, line 30
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 31
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 32
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 33
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 34
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 35
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 36
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 37
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 38
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 39
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 40
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 41
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 42
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 43
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 44
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 45
+[ 2022/10/02 21:58:34 ] Parsing [Setup] section, line 46
+[ 2022/10/02 21:58:35 ] Parsing [Setup] section, line 47
+[ 2022/10/02 21:58:35 ] Parsing [Setup] section, line 48
+[ 2022/10/02 21:58:35 ] Parsing [Setup] section, line 49
+[ 2022/10/02 21:58:35 ] Parsing [Setup] section, line 50
+[ 2022/10/02 21:58:35 ] Parsing [Setup] section, line 51
+[ 2022/10/02 21:58:35 ] Parsing [Setup] section, line 52
+[ 2022/10/02 21:58:35 ] Reading file (LicenseFile)
+[ 2022/10/02 21:58:35 ] Reading file (WizardImageFile)
+[ 2022/10/02 21:58:35 ] Reading file (WizardSmallImageFile)
+[ 2022/10/02 21:58:35 ] Preparing Setup program executable
+[ 2022/10/02 21:58:35 ] Updating version info (SETUP.E32)
+[ 2022/10/02 21:58:35 ] Updating manifest (SETUP.E32)
+[ 2022/10/02 21:58:35 ] Determining language code pages
+[ 2022/10/02 21:58:35 ] Parsing [Languages] section, line 55
+[ 2022/10/02 21:58:35 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 21:58:35 ] Messages in script file
+[ 2022/10/02 21:58:36 ] Reading default messages from Default.isl
+[ 2022/10/02 21:58:36 ] Parsing [Languages] section, line 55
+[ 2022/10/02 21:58:36 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 21:58:36 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2022/10/02 21:58:36 ] Messages in script file
+[ 2022/10/02 21:58:36 ] Reading [Code] section
+[ 2022/10/02 21:58:36 ] Parsing [Tasks] section, line 73
+[ 2022/10/02 21:58:36 ] Parsing [Tasks] section, line 74
+[ 2022/10/02 21:58:36 ] Parsing [Tasks] section, line 75
+[ 2022/10/02 21:58:36 ] Parsing [Tasks] section, line 76
+[ 2022/10/02 21:58:36 ] Parsing [Tasks] section, line 77
+[ 2022/10/02 21:58:36 ] Parsing [Tasks] section, line 78
+[ 2022/10/02 21:58:36 ] Parsing [Icons] section, line 115
+[ 2022/10/02 21:58:36 ] Parsing [Icons] section, line 116
+[ 2022/10/02 21:58:36 ] Parsing [Icons] section, line 117
+[ 2022/10/02 21:58:36 ] Parsing [Icons] section, line 118
+[ 2022/10/02 21:58:36 ] Parsing [INI] section, line 121
+[ 2022/10/02 21:58:37 ] Parsing [INI] section, line 122
+[ 2022/10/02 21:58:37 ] Parsing [InstallDelete] section, line 128
+[ 2022/10/02 21:58:37 ] Parsing [InstallDelete] section, line 129
+[ 2022/10/02 21:58:37 ] Parsing [InstallDelete] section, line 130
+[ 2022/10/02 21:58:37 ] Parsing [InstallDelete] section, line 131
+[ 2022/10/02 21:58:37 ] Parsing [InstallDelete] section, line 132
+[ 2022/10/02 21:58:37 ] Parsing [UninstallDelete] section, line 135
+[ 2022/10/02 21:58:37 ] Parsing [UninstallDelete] section, line 136
+[ 2022/10/02 21:58:37 ] Parsing [Run] section, line 125
+[ 2022/10/02 21:58:37 ] Parsing [Files] section, line 81
+[ 2022/10/02 21:58:37 ] Parsing [Files] section, line 82
+[ 2022/10/02 21:58:37 ] Parsing [Files] section, line 83
+[ 2022/10/02 21:58:37 ] Reading version info: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\ComIntRep.ini
+[ 2022/10/02 21:58:37 ] Parsing [Files] section, line 84
+[ 2022/10/02 21:58:37 ] Parsing [Files] section, line 85
+[ 2022/10/02 21:58:37 ] Parsing [Files] section, line 86
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 87
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 88
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 89
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 90
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 91
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 92
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 93
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 94
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 95
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 96
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 97
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 98
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 99
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 100
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 101
+[ 2022/10/02 21:58:38 ] Parsing [Files] section, line 102
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 103
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 104
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 105
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 106
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 107
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 108
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 109
+[ 2022/10/02 21:58:39 ] Parsing [Files] section, line 110
+[ 2022/10/02 21:58:39 ] Compiling [Code] section
+[ 2022/10/02 21:58:39 ] Creating setup files
+[ 2022/10/02 21:58:39 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\ComIntRep_X64.exe
+[ 2022/10/02 21:58:39 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\ComIntRep.exe
+[ 2022/10/02 21:58:39 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\ComIntRep.ini
+[ 2022/10/02 21:58:39 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Docs\ComIntRep\Changes.txt
+[ 2022/10/02 21:58:39 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Docs\ComIntRep\License.txt
+[ 2022/10/02 21:58:39 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Docs\ComIntRep\Readme.txt
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\af.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\ar.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\de.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\el.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\en.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\es.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\fr.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\hu.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\it.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\ko.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\pt-BR.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\ru.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\sl.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\tr.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\zh-CN.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Language\ComIntRep\zh-TW.ini
+[ 2022/10/02 21:58:40 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\16\Process.ani
+[ 2022/10/02 21:58:41 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\32\Stroke.ani
+[ 2022/10/02 21:58:41 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\64\Stroke.ani
+[ 2022/10/02 21:58:41 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Processing\64\Globe.ani
+[ 2022/10/02 21:58:41 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Sounds\Complete.wav
+[ 2022/10/02 21:58:41 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022\Sounds\Welcome.wav
+[ 2022/10/02 21:58:41 ] Compressing Setup program executable
+[ 2022/10/02 21:58:41 ] Updating version info (SETUP.EXE)
+[ 2022/10/02 21:58:41 ] Updating manifest (SETUP.EXE)
+[ 2022/10/02 21:58:41 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2022/10/02 21:58:41 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2022/10/02 21:58:41 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2022/10/02 21:58:41 ] Warning: Line 186, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2022/10/02 21:58:41 ] Warning: Line 193, Column 2: [Hint] Variable 'ERRORCODE' never used
+[ 2022/10/02 21:58:41 ] Successful compile (1,656 sec). Resulting Setup program filename is:
+[ 2022/10/02 21:58:41 ] C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6022\ComIntRep_6022_Setup.exe
+[ 2022/10/02 21:58:41 ] Finished: Created installation for Complete Internet Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:44 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:44 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\ComIntRep.ru'
+[ 2022/10/02 21:58:44 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\ComIntRep.rus'
+[ 2022/10/02 21:58:44 ] Finished: 
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:49 ] Generating Documentation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:49 ] Template directory found at: 'C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates'
+[ 2022/10/02 21:58:49 ] 03 templates files found.
+[ 2022/10/02 21:58:49 ] Processing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Changes.tpl
+[ 2022/10/02 21:58:49 ] Document created successfuly.
+[ 2022/10/02 21:58:49 ] Document File: C:\GitHub\Resolute\Resolute\Docs\DVDRepair\Changes.txt
+[ 2022/10/02 21:58:49 ] Processing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\License.tpl
+[ 2022/10/02 21:58:49 ] Document created successfuly.
+[ 2022/10/02 21:58:49 ] Document File: C:\GitHub\Resolute\Resolute\Docs\DVDRepair\License.txt
+[ 2022/10/02 21:58:49 ] Processing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Templates\Readme.tpl
+[ 2022/10/02 21:58:49 ] Document created successfuly.
+[ 2022/10/02 21:58:49 ] Document File: C:\GitHub\Resolute\Resolute\Docs\DVDRepair\Readme.txt
+[ 2022/10/02 21:58:49 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:51 ] Distributing DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\DVDRepair.exe Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\DVDRepair_X64.exe Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\DVDRepair.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Docs\DVDRepair\Changes.txt Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Docs\DVDRepair\License.txt Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Docs\DVDRepair\Readme.txt Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\af.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\ar.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\el.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\en.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\es.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\fr.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\ko.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\zh-TW.ini Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Processing\32\Stroke.ani Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Processing\64\Stroke.ani Distribution Created.
+[ 2022/10/02 21:58:51 ] \Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Processing\64\Globe.ani Distribution Created.
+[ 2022/10/02 21:58:52 ] Finished: DVD Drive Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:55 ] Creating Zip Package for DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:58:56 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2022/10/02 21:58:56 ] Scanning the drive:
+[ 2022/10/02 21:58:56 ] 8 folders, 17 files, 4916626 bytes (4802 KiB)
+[ 2022/10/02 21:58:56 ] Creating archive: DVDRepair_2020.zip
+[ 2022/10/02 21:58:56 ] Items to compress: 25
+[ 2022/10/02 21:58:56 ] Files read from disk: 17
+[ 2022/10/02 21:58:56 ] Archive size: 2580397 bytes (2520 KiB)
+[ 2022/10/02 21:58:56 ] Everything is Ok
+[ 2022/10/02 21:58:56 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:59:02 ] Creating installation for DVD Drive Repair
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:59:02 ] Inno Setup 6 Command-Line Compiler
+[ 2022/10/02 21:59:02 ] Copyright (C) 1997-2022 Jordan Russell. All rights reserved.
+[ 2022/10/02 21:59:02 ] Portions Copyright (C) 2000-2022 Martijn Laan. All rights reserved.
+[ 2022/10/02 21:59:02 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2022/10/02 21:59:02 ] https://www.innosetup.com
+[ 2022/10/02 21:59:02 ] Compiler engine version: Inno Setup 6.2.1
+[ 2022/10/02 21:59:02 ] Preprocessing
+[ 2022/10/02 21:59:02 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2022/10/02 21:59:02 ] Parsing [Setup] section, line 21
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 22
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 23
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 24
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 25
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 26
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 27
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 28
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 29
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 30
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 31
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 32
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 33
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 34
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 35
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 36
+[ 2022/10/02 21:59:03 ] Parsing [Setup] section, line 37
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 38
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 39
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 40
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 41
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 42
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 43
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 44
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 45
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 46
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 47
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 48
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 49
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 50
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 51
+[ 2022/10/02 21:59:04 ] Parsing [Setup] section, line 52
+[ 2022/10/02 21:59:04 ] Reading file (LicenseFile)
+[ 2022/10/02 21:59:04 ] Reading file (WizardImageFile)
+[ 2022/10/02 21:59:05 ] Reading file (WizardSmallImageFile)
+[ 2022/10/02 21:59:05 ] Preparing Setup program executable
+[ 2022/10/02 21:59:05 ] Updating version info (SETUP.E32)
+[ 2022/10/02 21:59:05 ] Updating manifest (SETUP.E32)
+[ 2022/10/02 21:59:05 ] Determining language code pages
+[ 2022/10/02 21:59:05 ] Parsing [Languages] section, line 55
+[ 2022/10/02 21:59:05 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 21:59:05 ] Messages in script file
+[ 2022/10/02 21:59:05 ] Reading default messages from Default.isl
+[ 2022/10/02 21:59:05 ] Parsing [Languages] section, line 55
+[ 2022/10/02 21:59:05 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 21:59:05 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2022/10/02 21:59:05 ] Messages in script file
+[ 2022/10/02 21:59:05 ] Reading [Code] section
+[ 2022/10/02 21:59:05 ] Parsing [Tasks] section, line 73
+[ 2022/10/02 21:59:05 ] Parsing [Tasks] section, line 74
+[ 2022/10/02 21:59:06 ] Parsing [Tasks] section, line 75
+[ 2022/10/02 21:59:06 ] Parsing [Tasks] section, line 76
+[ 2022/10/02 21:59:06 ] Parsing [Tasks] section, line 77
+[ 2022/10/02 21:59:06 ] Parsing [Tasks] section, line 78
+[ 2022/10/02 21:59:06 ] Parsing [Icons] section, line 104
+[ 2022/10/02 21:59:06 ] Parsing [Icons] section, line 105
+[ 2022/10/02 21:59:06 ] Parsing [Icons] section, line 106
+[ 2022/10/02 21:59:06 ] Parsing [Icons] section, line 107
+[ 2022/10/02 21:59:06 ] Parsing [INI] section, line 110
+[ 2022/10/02 21:59:06 ] Parsing [INI] section, line 111
+[ 2022/10/02 21:59:06 ] Parsing [InstallDelete] section, line 117
+[ 2022/10/02 21:59:06 ] Parsing [InstallDelete] section, line 118
+[ 2022/10/02 21:59:06 ] Parsing [InstallDelete] section, line 119
+[ 2022/10/02 21:59:06 ] Parsing [InstallDelete] section, line 120
+[ 2022/10/02 21:59:06 ] Parsing [InstallDelete] section, line 121
+[ 2022/10/02 21:59:06 ] Parsing [UninstallDelete] section, line 124
+[ 2022/10/02 21:59:07 ] Parsing [UninstallDelete] section, line 125
+[ 2022/10/02 21:59:07 ] Parsing [Run] section, line 114
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 81
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 82
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 83
+[ 2022/10/02 21:59:07 ] Reading version info: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\DVDRepair.ini
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 84
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 85
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 86
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 87
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 88
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 89
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 90
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 91
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 92
+[ 2022/10/02 21:59:07 ] Parsing [Files] section, line 93
+[ 2022/10/02 21:59:08 ] Parsing [Files] section, line 94
+[ 2022/10/02 21:59:08 ] Parsing [Files] section, line 95
+[ 2022/10/02 21:59:08 ] Parsing [Files] section, line 96
+[ 2022/10/02 21:59:08 ] Parsing [Files] section, line 97
+[ 2022/10/02 21:59:08 ] Parsing [Files] section, line 98
+[ 2022/10/02 21:59:08 ] Parsing [Files] section, line 99
+[ 2022/10/02 21:59:08 ] Compiling [Code] section
+[ 2022/10/02 21:59:08 ] Creating setup files
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\DVDRepair_X64.exe
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\DVDRepair.exe
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\DVDRepair.ini
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Docs\DVDRepair\Changes.txt
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Docs\DVDRepair\License.txt
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Docs\DVDRepair\Readme.txt
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\af.ini
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\ar.ini
+[ 2022/10/02 21:59:08 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\el.ini
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\en.ini
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\es.ini
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\fr.ini
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\ko.ini
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Language\DVDRepair\zh-TW.ini
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Processing\32\Stroke.ani
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Processing\64\Stroke.ani
+[ 2022/10/02 21:59:09 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020\Processing\64\Globe.ani
+[ 2022/10/02 21:59:09 ] Compressing Setup program executable
+[ 2022/10/02 21:59:09 ] Updating version info (SETUP.EXE)
+[ 2022/10/02 21:59:09 ] Updating manifest (SETUP.EXE)
+[ 2022/10/02 21:59:09 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2022/10/02 21:59:09 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2022/10/02 21:59:09 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2022/10/02 21:59:09 ] Warning: Line 175, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2022/10/02 21:59:09 ] Warning: Line 182, Column 2: [Hint] Variable 'ERRORCODE' never used
+[ 2022/10/02 21:59:10 ] Successful compile (1,438 sec). Resulting Setup program filename is:
+[ 2022/10/02 21:59:10 ] C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020_Setup.exe
+[ 2022/10/02 21:59:10 ] Finished: Created installation for DVD Drive Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:59:12 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 21:59:12 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\DVDRepair.ru'
+[ 2022/10/02 21:59:12 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\DVDRepair.rus'
+[ 2022/10/02 21:59:12 ] Finished: 
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:47 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:47 ] Template directory found at: 'C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2022/10/02 22:01:47 ] 03 templates files found.
+[ 2022/10/02 22:01:47 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2022/10/02 22:01:47 ] Document created successfuly.
+[ 2022/10/02 22:01:47 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 2022/10/02 22:01:47 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2022/10/02 22:01:47 ] Document created successfuly.
+[ 2022/10/02 22:01:47 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\License.txt
+[ 2022/10/02 22:01:47 ] Processing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2022/10/02 22:01:47 ] Document created successfuly.
+[ 2022/10/02 22:01:47 ] Document File: C:\GitHub\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 2022/10/02 22:01:47 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:50 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Firemin.exe Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Firemin_X64.exe Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Firemin.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Docs\Firemin\Changes.txt Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Docs\Firemin\License.txt Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Docs\Firemin\Readme.txt Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\af.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ar.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\de.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\el.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\en.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\es.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\fa.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\fr.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\hu.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\it.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ja.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ko.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\pl.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\pt.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\pt-BR.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ru.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\sl.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\tr.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\zh-CN.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\zh-TW.ini Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Processing\32\Stroke.ani Distribution Created.
+[ 2022/10/02 22:01:50 ] \Concrete\Firemin\Distribution\8028\Firemin_8028\Processing\64\Globe.ani Distribution Created.
+[ 2022/10/02 22:01:51 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:54 ] Creating Zip Package for Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:55 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2022/10/02 22:01:55 ] Scanning the drive:
+[ 2022/10/02 22:01:55 ] 8 folders, 28 files, 4891371 bytes (4777 KiB)
+[ 2022/10/02 22:01:55 ] Creating archive: Firemin_8028.zip
+[ 2022/10/02 22:01:55 ] Items to compress: 36
+[ 2022/10/02 22:01:55 ] Files read from disk: 28
+[ 2022/10/02 22:01:55 ] Archive size: 2639149 bytes (2578 KiB)
+[ 2022/10/02 22:01:55 ] Everything is Ok
+[ 2022/10/02 22:01:55 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:58 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:01:58 ] Inno Setup 6 Command-Line Compiler
+[ 2022/10/02 22:01:58 ] Copyright (C) 1997-2022 Jordan Russell. All rights reserved.
+[ 2022/10/02 22:01:58 ] Portions Copyright (C) 2000-2022 Martijn Laan. All rights reserved.
+[ 2022/10/02 22:01:58 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2022/10/02 22:01:58 ] https://www.innosetup.com
+[ 2022/10/02 22:01:58 ] Compiler engine version: Inno Setup 6.2.1
+[ 2022/10/02 22:01:58 ] Preprocessing
+[ 2022/10/02 22:01:58 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 21
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 22
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 23
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 24
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 25
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 26
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 27
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 28
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 29
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 30
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 31
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 32
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 33
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 34
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 35
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 36
+[ 2022/10/02 22:01:59 ] Parsing [Setup] section, line 37
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 38
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 39
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 40
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 41
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 42
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 43
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 44
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 45
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 46
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 47
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 48
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 49
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 50
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 51
+[ 2022/10/02 22:02:00 ] Parsing [Setup] section, line 52
+[ 2022/10/02 22:02:00 ] Reading file (LicenseFile)
+[ 2022/10/02 22:02:01 ] Reading file (WizardImageFile)
+[ 2022/10/02 22:02:01 ] Reading file (WizardSmallImageFile)
+[ 2022/10/02 22:02:01 ] Preparing Setup program executable
+[ 2022/10/02 22:02:01 ] Updating version info (SETUP.E32)
+[ 2022/10/02 22:02:01 ] Updating manifest (SETUP.E32)
+[ 2022/10/02 22:02:01 ] Determining language code pages
+[ 2022/10/02 22:02:01 ] Parsing [Languages] section, line 55
+[ 2022/10/02 22:02:01 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 22:02:01 ] Messages in script file
+[ 2022/10/02 22:02:01 ] Reading default messages from Default.isl
+[ 2022/10/02 22:02:01 ] Parsing [Languages] section, line 55
+[ 2022/10/02 22:02:01 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 22:02:01 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2022/10/02 22:02:01 ] Messages in script file
+[ 2022/10/02 22:02:01 ] Reading [Code] section
+[ 2022/10/02 22:02:01 ] Parsing [Tasks] section, line 73
+[ 2022/10/02 22:02:02 ] Parsing [Tasks] section, line 74
+[ 2022/10/02 22:02:02 ] Parsing [Tasks] section, line 75
+[ 2022/10/02 22:02:02 ] Parsing [Tasks] section, line 76
+[ 2022/10/02 22:02:02 ] Parsing [Tasks] section, line 77
+[ 2022/10/02 22:02:02 ] Parsing [Tasks] section, line 78
+[ 2022/10/02 22:02:02 ] Parsing [Icons] section, line 115
+[ 2022/10/02 22:02:02 ] Parsing [Icons] section, line 116
+[ 2022/10/02 22:02:02 ] Parsing [Icons] section, line 117
+[ 2022/10/02 22:02:02 ] Parsing [Icons] section, line 118
+[ 2022/10/02 22:02:02 ] Parsing [INI] section, line 121
+[ 2022/10/02 22:02:02 ] Parsing [INI] section, line 122
+[ 2022/10/02 22:02:02 ] Parsing [InstallDelete] section, line 128
+[ 2022/10/02 22:02:02 ] Parsing [InstallDelete] section, line 129
+[ 2022/10/02 22:02:02 ] Parsing [InstallDelete] section, line 130
+[ 2022/10/02 22:02:02 ] Parsing [InstallDelete] section, line 131
+[ 2022/10/02 22:02:02 ] Parsing [InstallDelete] section, line 132
+[ 2022/10/02 22:02:03 ] Parsing [UninstallDelete] section, line 135
+[ 2022/10/02 22:02:03 ] Parsing [UninstallDelete] section, line 136
+[ 2022/10/02 22:02:03 ] Parsing [Run] section, line 125
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 81
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 82
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 83
+[ 2022/10/02 22:02:03 ] Reading version info: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Firemin.ini
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 84
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 85
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 86
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 87
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 88
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 89
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 90
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 91
+[ 2022/10/02 22:02:03 ] Parsing [Files] section, line 92
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 93
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 94
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 95
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 96
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 97
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 98
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 99
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 100
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 101
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 102
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 103
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 104
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 105
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 106
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 107
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 108
+[ 2022/10/02 22:02:04 ] Parsing [Files] section, line 109
+[ 2022/10/02 22:02:05 ] Parsing [Files] section, line 110
+[ 2022/10/02 22:02:05 ] Compiling [Code] section
+[ 2022/10/02 22:02:05 ] Creating setup files
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Firemin_X64.exe
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Firemin.exe
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Firemin.ini
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Docs\Firemin\Changes.txt
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Docs\Firemin\License.txt
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Docs\Firemin\Readme.txt
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\af.ini
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ar.ini
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\de.ini
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\el.ini
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\en.ini
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\es.ini
+[ 2022/10/02 22:02:05 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\fa.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\fr.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\hu.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\it.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ja.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ko.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\pl.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\pt.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\pt-BR.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\ru.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\sl.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\tr.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\zh-CN.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Language\Firemin\zh-TW.ini
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Processing\32\Stroke.ani
+[ 2022/10/02 22:02:06 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028\Processing\64\Globe.ani
+[ 2022/10/02 22:02:06 ] Compressing Setup program executable
+[ 2022/10/02 22:02:07 ] Updating version info (SETUP.EXE)
+[ 2022/10/02 22:02:07 ] Updating manifest (SETUP.EXE)
+[ 2022/10/02 22:02:07 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2022/10/02 22:02:07 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2022/10/02 22:02:07 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2022/10/02 22:02:07 ] Warning: Line 186, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2022/10/02 22:02:07 ] Warning: Line 193, Column 2: [Hint] Variable 'ERRORCODE' never used
+[ 2022/10/02 22:02:07 ] Successful compile (1,422 sec). Resulting Setup program filename is:
+[ 2022/10/02 22:02:07 ] C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8028\Firemin_8028_Setup.exe
+[ 2022/10/02 22:02:07 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:02:11 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:02:11 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\Firemin.ru'
+[ 2022/10/02 22:02:11 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\Firemin.rus'
+[ 2022/10/02 22:02:11 ] Finished: 
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/10/02 22:03:48 ] DATE:                        2022/10/02 22:03:48
+[ 2022/10/02 22:03:48 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3626
+[ 2022/10/02 22:03:48 ] PROGRAM PATH:                [C:\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2022/10/02 22:03:48 ] COMPILED:                    YES
+[ 2022/10/02 22:03:48 ] WINDOWS VERSION:             WIN_10 
+[ 2022/10/02 22:03:48 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/10/02 22:03:48 ] MEMORY (RAM):                32605.47 MB
+[ 2022/10/02 22:03:48 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/10/02 22:03:48 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+
+[ 2022/10/02 22:04:04 ] Generating Documentation for USB Repair
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:04 ] Template directory found at: 'C:\GitHub\Resolute\SDK\Concrete\USBRepair\Templates'
+[ 2022/10/02 22:04:04 ] 03 templates files found.
+[ 2022/10/02 22:04:04 ] Processing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Changes.tpl
+[ 2022/10/02 22:04:04 ] Document created successfuly.
+[ 2022/10/02 22:04:04 ] Document File: C:\GitHub\Resolute\Resolute\Docs\USBRepair\Changes.txt
+[ 2022/10/02 22:04:04 ] Processing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\License.tpl
+[ 2022/10/02 22:04:04 ] Document created successfuly.
+[ 2022/10/02 22:04:04 ] Document File: C:\GitHub\Resolute\Resolute\Docs\USBRepair\License.txt
+[ 2022/10/02 22:04:04 ] Processing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Templates\Readme.tpl
+[ 2022/10/02 22:04:04 ] Document created successfuly.
+[ 2022/10/02 22:04:04 ] Document File: C:\GitHub\Resolute\Resolute\Docs\USBRepair\Readme.txt
+[ 2022/10/02 22:04:04 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:07 ] Distributing USB Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\USBRepair.exe Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\USBRepair_X64.exe Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\USBRepair.ini Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Docs\USBRepair\Changes.txt Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Docs\USBRepair\License.txt Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Docs\USBRepair\Readme.txt Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Language\USBRepair\ar.ini Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Language\USBRepair\en.ini Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Language\USBRepair\ko.ini Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Processing\32\Stroke.ani Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Processing\64\Stroke.ani Distribution Created.
+[ 2022/10/02 22:04:07 ] \Concrete\USBRepair\Distribution\2008\USBRepair_2008\Processing\64\Globe.ani Distribution Created.
+[ 2022/10/02 22:04:08 ] Finished: USB Repair Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:10 ] Creating Zip Package for USB Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:11 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 2022/10/02 22:04:11 ] Scanning the drive:
+[ 2022/10/02 22:04:11 ] 8 folders, 12 files, 4662358 bytes (4554 KiB)
+[ 2022/10/02 22:04:11 ] Creating archive: USBRepair_2008.zip
+[ 2022/10/02 22:04:11 ] Items to compress: 20
+[ 2022/10/02 22:04:11 ] Files read from disk: 12
+[ 2022/10/02 22:04:11 ] Archive size: 2399869 bytes (2344 KiB)
+[ 2022/10/02 22:04:11 ] Everything is Ok
+[ 2022/10/02 22:04:11 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:13 ] Creating installation for USB Repair
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:13 ] Inno Setup 6 Command-Line Compiler
+[ 2022/10/02 22:04:13 ] Copyright (C) 1997-2022 Jordan Russell. All rights reserved.
+[ 2022/10/02 22:04:13 ] Portions Copyright (C) 2000-2022 Martijn Laan. All rights reserved.
+[ 2022/10/02 22:04:13 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2022/10/02 22:04:13 ] https://www.innosetup.com
+[ 2022/10/02 22:04:13 ] Compiler engine version: Inno Setup 6.2.1
+[ 2022/10/02 22:04:13 ] Preprocessing
+[ 2022/10/02 22:04:13 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 21
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 22
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 23
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 24
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 25
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 26
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 27
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 28
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 29
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 30
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 31
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 32
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 33
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 34
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 35
+[ 2022/10/02 22:04:14 ] Parsing [Setup] section, line 36
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 37
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 38
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 39
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 40
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 41
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 42
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 43
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 44
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 45
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 46
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 47
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 48
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 49
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 50
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 51
+[ 2022/10/02 22:04:15 ] Parsing [Setup] section, line 52
+[ 2022/10/02 22:04:15 ] Reading file (LicenseFile)
+[ 2022/10/02 22:04:16 ] Reading file (WizardImageFile)
+[ 2022/10/02 22:04:16 ] Reading file (WizardSmallImageFile)
+[ 2022/10/02 22:04:16 ] Preparing Setup program executable
+[ 2022/10/02 22:04:16 ] Updating version info (SETUP.E32)
+[ 2022/10/02 22:04:16 ] Updating manifest (SETUP.E32)
+[ 2022/10/02 22:04:16 ] Determining language code pages
+[ 2022/10/02 22:04:16 ] Parsing [Languages] section, line 55
+[ 2022/10/02 22:04:16 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 22:04:16 ] Messages in script file
+[ 2022/10/02 22:04:16 ] Reading default messages from Default.isl
+[ 2022/10/02 22:04:16 ] Parsing [Languages] section, line 55
+[ 2022/10/02 22:04:16 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2022/10/02 22:04:16 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2022/10/02 22:04:16 ] Messages in script file
+[ 2022/10/02 22:04:16 ] Reading [Code] section
+[ 2022/10/02 22:04:16 ] Parsing [Tasks] section, line 73
+[ 2022/10/02 22:04:17 ] Parsing [Tasks] section, line 74
+[ 2022/10/02 22:04:17 ] Parsing [Tasks] section, line 75
+[ 2022/10/02 22:04:17 ] Parsing [Tasks] section, line 76
+[ 2022/10/02 22:04:17 ] Parsing [Tasks] section, line 77
+[ 2022/10/02 22:04:17 ] Parsing [Tasks] section, line 78
+[ 2022/10/02 22:04:17 ] Parsing [Icons] section, line 99
+[ 2022/10/02 22:04:17 ] Parsing [Icons] section, line 100
+[ 2022/10/02 22:04:17 ] Parsing [Icons] section, line 101
+[ 2022/10/02 22:04:17 ] Parsing [Icons] section, line 102
+[ 2022/10/02 22:04:17 ] Parsing [INI] section, line 105
+[ 2022/10/02 22:04:17 ] Parsing [INI] section, line 106
+[ 2022/10/02 22:04:17 ] Parsing [InstallDelete] section, line 112
+[ 2022/10/02 22:04:17 ] Parsing [InstallDelete] section, line 113
+[ 2022/10/02 22:04:17 ] Parsing [InstallDelete] section, line 114
+[ 2022/10/02 22:04:17 ] Parsing [InstallDelete] section, line 115
+[ 2022/10/02 22:04:17 ] Parsing [InstallDelete] section, line 116
+[ 2022/10/02 22:04:18 ] Parsing [UninstallDelete] section, line 119
+[ 2022/10/02 22:04:18 ] Parsing [UninstallDelete] section, line 120
+[ 2022/10/02 22:04:18 ] Parsing [Run] section, line 109
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 81
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 82
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 83
+[ 2022/10/02 22:04:18 ] Reading version info: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\USBRepair.ini
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 84
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 85
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 86
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 87
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 88
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 89
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 90
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 91
+[ 2022/10/02 22:04:18 ] Parsing [Files] section, line 92
+[ 2022/10/02 22:04:19 ] Parsing [Files] section, line 93
+[ 2022/10/02 22:04:19 ] Parsing [Files] section, line 94
+[ 2022/10/02 22:04:19 ] Compiling [Code] section
+[ 2022/10/02 22:04:19 ] Creating setup files
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\USBRepair_X64.exe
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\USBRepair.exe
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\USBRepair.ini
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Docs\USBRepair\Changes.txt
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Docs\USBRepair\License.txt
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Docs\USBRepair\Readme.txt
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Language\USBRepair\ar.ini
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Language\USBRepair\en.ini
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Language\USBRepair\ko.ini
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Processing\32\Stroke.ani
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Processing\64\Stroke.ani
+[ 2022/10/02 22:04:19 ] Compressing: C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008\Processing\64\Globe.ani
+[ 2022/10/02 22:04:19 ] Compressing Setup program executable
+[ 2022/10/02 22:04:20 ] Updating version info (SETUP.EXE)
+[ 2022/10/02 22:04:20 ] Updating manifest (SETUP.EXE)
+[ 2022/10/02 22:04:20 ] Warning: Constant "pf" has been renamed. Use "commonpf" instead or consider using its "auto" form.
+[ 2022/10/02 22:04:20 ] Warning: Setting the [Setup] section directive "MinVersion" below 6.1 is not recommended: Windows Vista doesn't support some of Setup's security measures against potential DLL preloading attacks so these have been removed by the compiler making your installer less secure on all versions of Windows.
+[ 2022/10/02 22:04:20 ] Warning: The [Setup] section directive "PrivilegesRequired" is set to "admin" but per-user areas (userappdata,userdesktop,userstartmenu) are used by the script. Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. See the "UsedUserAreasWarning" topic in help file for more information.
+[ 2022/10/02 22:04:20 ] Warning: Line 170, Column 5: [Hint] Support function "IsTaskSelected" has been renamed. Use "WizardIsTaskSelected" instead.
+[ 2022/10/02 22:04:20 ] Warning: Line 177, Column 2: [Hint] Variable 'ERRORCODE' never used
+[ 2022/10/02 22:04:20 ] Successful compile (1,469 sec). Resulting Setup program filename is:
+[ 2022/10/02 22:04:20 ] C:\GitHub\Resolute\SDK\Concrete\USBRepair\Distribution\2008\USBRepair_2008_Setup.exe
+[ 2022/10/02 22:04:20 ] Finished: Created installation for USB Repair.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:23 ] Creating update files.
+------------------------------------------------------------------------------------------
+[ 2022/10/02 22:04:23 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\USBRepair.ru'
+[ 2022/10/02 22:04:23 ] Successfully created 'C:\GitHub\Resolute\SDK\www\update\USBRepair.rus'
+[ 2022/10/02 22:04:23 ] Finished: 
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2022/10/03 07:46:30 ] DATE:                        2022/10/03 07:46:30
+[ 2022/10/03 07:46:30 ] PROGRAM:                     Rizonesoft SDK 8.0.2.3626
+[ 2022/10/03 07:46:30 ] PROGRAM PATH:                [C:\GitHub\Resolute\SDK\Distro_X64.exe]
+[ 2022/10/03 07:46:30 ] COMPILED:                    YES
+[ 2022/10/03 07:46:30 ] WINDOWS VERSION:             WIN_10 
+[ 2022/10/03 07:46:30 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2022/10/03 07:46:30 ] MEMORY (RAM):                32605.47 MB
+[ 2022/10/03 07:46:30 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2022/10/03 07:46:30 ] WINDOWS DIRECTORY:           C:\Windows
+-----------------------------------------------------------------------------------------
+

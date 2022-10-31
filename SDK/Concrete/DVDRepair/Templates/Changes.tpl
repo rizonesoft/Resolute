@@ -6,6 +6,15 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated AutoIt to version 3.3.16.1 (19 Septemeber 2022 version). - https://www.autoitscript.com/autoit3/docs/history.htm
+- Further Windows 11 compatibility improvements.
+- Fixed versioning.
+- Minor bug fixes and enhancements.
+
+--------------------------------------------------
+Version 9.0.0.1805 (SEPTEMBER 04, 2022)
+--------------------------------------------------
+
 - Updated AutoIt to version 3.3.16.1. - https://www.autoitscript.com/autoit3/docs/history.htm
 - Improved Windows 11 compatibility.
 
