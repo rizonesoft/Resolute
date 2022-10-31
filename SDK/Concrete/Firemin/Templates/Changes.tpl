@@ -6,6 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated Slovenian Translation
+
+--------------------------------------------------
+Version 9.5.3.8028 (OCTOBER 02, 2022)
+--------------------------------------------------
+
 - Fixed extended processes usage display.
 - Optimized memory statistics display.
 - Cleaned code and optimized functions.

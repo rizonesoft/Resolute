@@ -6,6 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed an old bug that would reset the firewall even though it is not selected.
+
+--------------------------------------------------
+Version 9.0.3.6022 (OCTOBER 02, 2022)
+--------------------------------------------------
+
 - Updated AutoIt to version 3.3.16.1 (19 Septemeber 2022 version). - https://www.autoitscript.com/autoit3/docs/history.htm
 - Further Windows 11 compatibility improvements.
 - Fixed versioning.

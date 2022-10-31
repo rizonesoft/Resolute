@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Complete Internet Repair					;~ Comment field
 #AutoIt3Wrapper_Res_Description=Complete Internet Repair      			;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=9.0.3.6023
+#AutoIt3Wrapper_Res_Fileversion=9.0.3.6089
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  						;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N						;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      						;~ (Y/N) Compile for high DPI. Default=N
@@ -2210,9 +2210,9 @@ Func _RepairWindowsUpdate($iRow)
 	Next
 
 	_UpdateSoloProcess($iRow, 63)
-	If $g_iResetWinsock Then _RepairWinsock($iRow, True)
-	If $g_iResetProxy Then _ResetProxyServer($iRow, True)
-	If $g_iResetFirewall Then _ResetFirewall($iRow, True)
+	; If $g_iResetWinsock Then _RepairWinsock($iRow, True)
+	; If $g_iResetProxy Then _ResetProxyServer($iRow, True)
+	; If $g_iResetFirewall Then _ResetFirewall($iRow, True)
 
 	_UpdateSoloProcess($iRow, 66)
 	_Logging_EditWrite($g_aLangMessages2[66])
