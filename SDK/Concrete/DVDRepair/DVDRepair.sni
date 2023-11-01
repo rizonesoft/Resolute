@@ -1,10 +1,10 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 8
+Compatibilty = Rizonesoft SDK 11
 Script = DVDRepair.au3
 
 [Modules]
 Build = 1
-Compress = 1
+Compress = 0
 Sign = 0
 Documentation = 1
 Import = 0
@@ -39,38 +39,31 @@ File=%RootDir%\Processing\64\Globe.ani
 
 [Sources]
 
-[Links]
-CompanyURL = https://www.rizonesoft.com
-SupportURL = https://github.com/rizonesoft/Resolute/issues
-ContactURL = https://www.rizonesoft.com/#contact
-UpdateURL = https://www.rizonesoft.com/downloads/dvd-drive-repair/
-UninstallURL = https://www.rizonesoft.com/uninstalled/
-
 [Environment]
-ScriptPath=C:\GitHub\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
+ScriptPath=Z:\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
 Company=Rizonesoft
 CompanyURL=https://www.rizonesoft.com
 Name=DVD Drive Repair
 ShortName=DVDRepair
 Description=Rizonesoft DVD Drive Repair
 Type=N
-Icon=C:\GitHub\Resolute\SDK\Resources\Icons\DVDRepair.ico
-Version=9.0.3.2020
-VersionMajor=9
+Icon=Z:\Resolute\SDK\Resources\Icons\DVDRepair.ico
+Version=11.2.3.2920
+VersionMajor=11
 VersionMaintenance=3
-VersionBuild=2020
+VersionBuild=2920
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
 OutFile=DVDRepair.exe
 OutFileX64=DVDRepair_X64.exe
-OutFilePath=C:\GitHub\Resolute\Resolute\DVDRepair.exe
-OutFileX64Path=C:\GitHub\Resolute\Resolute\DVDRepair_X64.exe
+OutFilePath=Z:\Resolute\Resolute\DVDRepair.exe
+OutFileX64Path=Z:\Resolute\Resolute\DVDRepair_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020
-DistributionName=DVDRepair_2020
-FullDistributionPath=C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020
-DistroSourceName=DVDRepair_2020_Source
-DistroSourceFullPath=C:\GitHub\Resolute\SDK\Concrete\DVDRepair\Distribution\2020\DVDRepair_2020_Source
+DistributionPath=Z:\Resolute\SDK\Concrete\DVDRepair\Distribution\2920
+DistributionName=DVDRepair_2920
+FullDistributionPath=Z:\Resolute\SDK\Concrete\DVDRepair\Distribution\2920\DVDRepair_2920
+DistroSourceName=DVDRepair_2920_Source
+DistroSourceFullPath=Z:\Resolute\SDK\Concrete\DVDRepair\Distribution\2920\DVDRepair_2920_Source

@@ -51,9 +51,10 @@ Func _Splash_Start($sMessage = "Loading Message")
 	EndIf
 
 	$g_hSplashForm = GUICreate("", 250, 150, -1, -1, BitOR($WS_POPUP, $WS_BORDER))
-	GUISetFont(9, -1, -1, "Tahoma", $g_hSplashForm, 5)
+	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUICtrlCreateIcon($g_sSplashAniPath, -1, (250 - 32) / 2, 15, 32, 32)
 	$g_sSplashMessage = GUICtrlCreateLabel($sMessage, 10, 60, 230, 30, $SS_CENTER)
+	GUICtrlSetFont($g_sSplashMessage, 9)
 
 ;~ StatusBar Background
 	GUICtrlCreateLabel("", 9, 99, 232, 12)

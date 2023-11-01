@@ -80,18 +80,19 @@ SetupWindowTitle     =Setup - {#app_name}
 [Tasks]
 
 [Files]
-Source: Resolute.exe;                               DestDir: {app};                                                       Flags: ignoreversion;
-Source: Resolute_X64.exe;                           DestDir: {app};                                                       Flags: ignoreversion; 
-Source: Stock.txt;                                  DestDir: {app};                                                       Flags: ignoreversion;
-Source: Resolute\Language\*;                        DestDir: {app}\Resolute\Language;                                     Flags: ignoreversion recursesubdirs
-Source: Resolute\Processing\*;                      DestDir: {app}\Resolute\Processing;                                   Flags: ignoreversion recursesubdirs
-Source: Resolute\Sounds\*;                          DestDir: {app}\Resolute\Sounds;                                       Flags: ignoreversion recursesubdirs
+; Main executables and text files
+Source: "Resolute.exe";      DestDir: "{app}"; Flags: ignoreversion;
+Source: "Resolute_X64.exe";  DestDir: "{app}"; Flags: ignoreversion;
+Source: "Commands.txt";      DestDir: "{app}"; Flags: ignoreversion;
+Source: "Stock.txt";         DestDir: "{app}"; Flags: ignoreversion;
 
-;Source: Resolute\Bin\x86\cstatus\Config.xm_;        DestDir: {app}\Resolute\Bin\x86\cstatus;  DestName:Config.xml;        Flags: ignoreversion;
-;Source: Resolute\Bin\x86\cstatus\cStatus.exe;       DestDir: {app}\Resolute\Bin\x86\cstatus;                              Flags: ignoreversion;
-;Source: Resolute\Bin\x86\cstatus\known_ports.txt;   DestDir: {app}\Resolute\Bin\x86\cstatus;                              Flags: ignoreversion;
-;Source: Resolute\Bin\x86\cstatus\License.txt;       DestDir: {app}\Resolute\Bin\x86\cstatus;                              Flags: ignoreversion;
+; Resolute directory files
+; Excludes configuration and certain sub-directories for security and customization
+Source: "Resolute\*"; DestDir: "{app}\Resolute"; Flags: ignoreversion recursesubdirs; Excludes: "BiosCodes.ini, ComIntRep.ini, Distro.ini, DVDRepair.ini, Firemin.ini, Ownership.ini, PixRepair.ini, ReBar.ini, Resolute.ini, USBRepair.ini, Rescue\Database\*, Rescue\Quarantine\*, Rescue\ClamAV\*";
 
+; SDK directory files
+; Excludes Distribution directory as it's not needed in the installation
+Source: "SDK\*"; DestDir: "{app}\SDK"; Flags: ignoreversion recursesubdirs; Excludes: "Distribution\*";
 
 [Dirs]
 ;Name: "{app}\Resolute\Bin\x86\cstatus\Configs"

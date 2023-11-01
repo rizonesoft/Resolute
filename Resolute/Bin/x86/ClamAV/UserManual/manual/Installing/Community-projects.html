@@ -1,0 +1,396 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Community Projects - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html" class="active"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="community-projects"><a class="header" href="#community-projects">Community Projects</a></h1>
+<blockquote>
+<p><em>Disclaimer</em>: The software listed in this section is authored by third parties and not by the ClamAV Team. Compatibility may vary.</p>
+</blockquote>
+<h2 id="signatures"><a class="header" href="#signatures">Signatures</a></h2>
+<p>The ClamAV Team provides FreshClam for ClamAV agents to update the official signature databases and provides <a href="https://pypi.org/project/cvdupdate/">CVD-Update</a> for <a href="../../appendix/CvdPrivateMirror.html">Private Mirror</a> administrators to update their server content.</p>
+<p>Both FreshClam and CVD-Update have some limited features to update signatures from third-party sources but community tools exist that are designed for this purpose and provide a more complete experience for users that want the extra coverage.</p>
+<blockquote>
+<p><strong>WARNING</strong>: While there are no known vulnerabilities in using traditional content-based and hash-based ClamAV signatures, bytecode signatures are a <em>different story</em>. Bytecode signatures are effectively cross-platform executable plugins <a href="../Contribute.html#webassembly-runtime">similar to Web Assembly (WASM)</a> but with less sandboxing.</p>
+<p>ClamScan and ClamD will not run unsigned bytecode signatures by default. Cisco-Talos' signing certificate is the <strong>only</strong> certificate trusted by ClamAV to run bytecode signatures.</p>
+<p>Both ClamD and ClamScan have options to run unsigned bytecode signatures but you should <strong>NEVER</strong> enable unsigned bytecode signatures in production when using signatures from third-party sources or a malicious bytecode signature author could gain control of your systems.</p>
+<p>ClamBC is a tool installed with ClamAV for testing bytecode signatures and should also <strong>NEVER</strong> be used to run signatures from an unknown or untrusted source.</p>
+</blockquote>
+<h3 id="fangfrish"><a class="header" href="#fangfrish">Fangfrish</a></h3>
+<p>Fangfrisch (German for &quot;freshly caught&quot;) is a sibling of the Clam Anti-Virus FreshClam utility. It allows downloading virus definition files that are not official ClamAV canon, e.g. from <a href="https://sanesecurity.com/">Sanesecurity</a>, <a href="https://urlhaus.abuse.ch/">URLhaus</a> and others. Fangfrisch was designed with security in mind, to be run by an unprivileged user only.</p>
+<p><a href="https://rseichter.github.io/fangfrisch/">Detailed documentation</a> is available online.</p>
+<p><a href="https://pypi.org/project/fangfrisch/">Get fangfrish</a></p>
+<h2 id="mail-filters"><a class="header" href="#mail-filters">Mail Filters</a></h2>
+<p>ClamAV is popular for filtering mail. The ClamAV Team maintains ClamAV-Milter, which is a filter for the Sendmail mail transfer agent and the ClamAV community have created a wide variety of other tools to use ClamAV with different mail transfer agents.</p>
+<h3 id="generic-mail-transfer-agents"><a class="header" href="#generic-mail-transfer-agents">Generic Mail Transfer Agents</a></h3>
+<h4 id="amavisd-new--clamd-clamscan"><a class="header" href="#amavisd-new--clamd-clamscan">amavisd-new | clamd, clamscan</a></h4>
+<p>amavisd-new is a high-performance interface between mailer (MTA) and content checkers: virus scanners, and/or SpamAssassin. It is written in Perl for maintainability, without paying a significant price for speed. It talks to MTA via (E)SMTP or LMTP, or by using helper programs. Best with Postfix, fine with dual-sendmail setup and Exim v4, works with sendmail/milter, or with any MTA as a SMTP relay. For Courier and qmail MTA integration there is a patch in the distributed package.</p>
+<p>amavisd-new is a rewritten version of Amavis and is maintained by Mark Martinec.</p>
+<p>ClamScan is enabled automatically if <code>clamscan</code> binary is found at amavisd-new startup time. ClamD is activated by uncommenting its entry in the <code>@av_scanners</code> list in the file <code>/etc/amavisd.conf</code>.</p>
+<p><a href="https://www.ijs.si/software/amavisd/">Get amavisd-new</a></p>
+<h3 id="sendmail"><a class="header" href="#sendmail">Sendmail</a></h3>
+<h4 id="mimedefang--clamscan-clamd"><a class="header" href="#mimedefang--clamscan-clamd">MIMEDefang | clamscan, clamd</a></h4>
+<p>MIMEDefang is an efficient mail scanner for Sendmail/milter written in C, Perl.</p>
+<p><a href="https://mimedefang.org/">Get MIMEDefang</a></p>
+<h3 id="postfix"><a class="header" href="#postfix">Postfix</a></h3>
+<h4 id="clamsmtp--clamd"><a class="header" href="#clamsmtp--clamd">ClamSMTP | clamd</a></h4>
+<p>ClamSMTP is an SMTP filter for Postfix and other mail servers that checks for viruses using the ClamAV anti-virus software. It aims to be lightweight, reliable, and simple rather than have a myriad of options. Written in C without major dependencies.</p>
+<p><a href="http://thewalter.net/stef/software/clamsmtp/">Get ClamSMTP</a></p>
+<h4 id="clapf--libclamav"><a class="header" href="#clapf--libclamav">Clapf | libclamav</a></h4>
+<p><a href="https://clapf.org/wiki/start">Clapf</a> is a clamav based virus scanning and anti-spam content filter for Postfix.</p>
+<p><a href="https://bitbucket.org/jsuto/clapf/src/master/">Get clapf</a></p>
+<h3 id="exim"><a class="header" href="#exim">Exim</a></h3>
+<p>Starting with <a href="https://www.exim.org/exim-html-current/doc/html/spec_html/ch-content_scanning_at_acl_time.html">release 4.50</a>, <a href="https://www.exim.org/">Exim</a> natively supports ClamAV.</p>
+<p><a href="https://www.exim.org/mirrors.html">Get exim</a></p>
+<h3 id="others"><a class="header" href="#others">Others</a></h3>
+<h4 id="mail-avenger--clamscan"><a class="header" href="#mail-avenger--clamscan">Mail Avenger | clamscan</a></h4>
+<p><a href="https://www.mailavenger.org/">Mail Avenger</a> is a highly-configurable SMTP server. It allows you to reject spam during mail transactions, before spooling messages in your local mail queue. You can specify site-wide default policies for filtering mail, but individual users can also craft their own policies by creating avenger scripts in their home directories.</p>
+<p><a href="https://www.mailavenger.org/dist/">Get Mail Avenger</a></p>
+<h4 id="mailscanner--clamscan"><a class="header" href="#mailscanner--clamscan">MailScanner | clamscan</a></h4>
+<p><a href="https://www.mailscanner.info/">MailScanner</a> scans all e-mail for viruses, spam and attacks against security vulnerabilities. It is not tied to any particular virus scanner, but can be used with any combination of 14 different virus scanners, allowing sites to choose the best of breed virus scanner.</p>
+<p><a href="https://github.com/MailScanner/v5">Get Mail Scanner</a></p>
+<h4 id="sagator--clamscan-clamd-libclamav"><a class="header" href="#sagator--clamscan-clamd-libclamav">Sagator | clamscan, clamd, libclamav</a></h4>
+<p><a href="http://www.salstar.sk/sagator/">Sagator</a> is an email antivirus/antispam gateway. Its modular architecture can use any combination of antivirus/spamchecker according to configuration.</p>
+<p><a href="http://www.salstar.sk/sagator/download">Get Sagator</a></p>
+<h4 id="courier-mta--libclamav-clamavd"><a class="header" href="#courier-mta--libclamav-clamavd">Courier-MTA | libclamav, clamavd</a></h4>
+<p><a href="http://www.courier-mta.org/">Courier MTA</a> includes four filers.</p>
+<p>courier-pythonfilter by Gordon Messner. Included in a Python filter suite, it uses pyClamAV (libclamav with python)</p>
+<p>Courier::Filter::Module::ClamAVd by Julian Mehnle. A Perl module for use with Courier::Filter, using clamavd.</p>
+<p>ClamCour by Tony Di Monaco. A C++ (with Boost) multithreaded filter using libclamav</p>
+<p>avfilter by Alessandro Vesely. A C forking filter using libclamav.</p>
+<p><a href="https://sourceforge.net/projects/courier/">Get Courier-MTA</a></p>
+<h4 id="haraka--clamd"><a class="header" href="#haraka--clamd">Haraka | clamd</a></h4>
+<p>Haraka is a robust MTA written in node.js, with a modular architecture that lets plugins control nearly every aspect of the SMTP conversation. There is a large selection of included plugins, including a clamav plugin (docs, source) that filters messages <a href="https://github.com/haraka/Haraka/blob/master/docs/plugins/clamd.md">using clamd</a>.</p>
+<p>Haraka is attractive to two audiences:</p>
+<ol>
+<li>
+<p>Anyone managing mail systems with thousands or tens-of-thousands of concurrent incoming SMTP connections (like Craigslist) and wants to do with it fewer racks of servers.</p>
+</li>
+<li>
+<p>Developers who need more control over mail routing, filtering, and processing than can be easily or efficiently handled with traditional (milter-based) MTAs.</p>
+</li>
+</ol>
+<p><a href="https://github.com/haraka/Haraka">Get Haraka</a></p>
+<h3 id="web--ftp-tools"><a class="header" href="#web--ftp-tools">Web &amp; FTP Tools</a></h3>
+<h4 id="clammit--clamd"><a class="header" href="#clammit--clamd">Clammit | clamd</a></h4>
+<p>Clammit is a proxy that will perform virus scans of files uploaded via http requests, including multipart/form-data. If a virus exists, it will reject the request out of hand. If no virus exists, the request is then forwarded to the application and it's response returned in the upstream direction.</p>
+<p>As the name implies, Clammit offloads the virus detection to the ClamAV virus detection server (clamd).</p>
+<p><a href="https://github.com/ifad/clammit">Get Clammit</a></p>
+<h4 id="clara"><a class="header" href="#clara">Clara</a></h4>
+<p>Serverless, real-time, ClamAV+Yara scanning for your S3 Buckets</p>
+<p><a href="https://github.com/abhinavbom/clara">Get Clara</a></p>
+<h4 id="bucket-antivirus-function"><a class="header" href="#bucket-antivirus-function">bucket-antivirus-function</a></h4>
+<p>Scan new objects added to any s3 bucket using AWS Lambda.</p>
+<p><a href="https://github.com/upsidetravel/bucket-antivirus-function">Get bucket-antivirus-function</a></p>
+<h4 id="cdk-serverless-clamscan"><a class="header" href="#cdk-serverless-clamscan">cdk-serverless-clamscan</a></h4>
+<p>An aws-cdk construct that uses ClamAV® to scan objects in Amazon S3 for viruses. The construct provides a flexible interface for a system to act based on the results of a ClamAV virus scan.</p>
+<p><a href="https://github.com/awslabs/cdk-serverless-clamscann">Get cdk-serverless-clamscan</a></p>
+<h4 id="antivirus-for-amazon-s3"><a class="header" href="#antivirus-for-amazon-s3">Antivirus for Amazon S3</a></h4>
+<p>A CloudFormation template to create an EC2 scanner cluster for S3 buckets.</p>
+<p><a href="https://github.com/widdix/aws-s3-virusscan">Get Antivirus for Amazon S3</a></p>
+<h4 id="havp--libclamav"><a class="header" href="#havp--libclamav">HAVP | libclamav</a></h4>
+<p><a href="http://havp.org/">HAVP</a> is a proxy with an antivirus filter. It does not cache or filter content. At the moment the complete traffic is scanned. A reason for that is the chance of malicious code in nearly every filetypes e.g. HTML (JavaScript) or Jpeg.</p>
+<p><a href="https://github.com/HaveSec/HAVP">Get HAVP</a></p>
+<h4 id="mod_clamav--libclamav-clamd"><a class="header" href="#mod_clamav--libclamav-clamd">mod_clamav | libclamav, clamd</a></h4>
+<p>mod_clamav is an Apache virus scanning filter. It was written and is currently maintained by Andreas Müller. The project is very well documented and the installation is quite easy.</p>
+<p><a href="http://software.othello.ch/mod_clamav/">Get mod_clamav</a></p>
+<h4 id="phpmussel--clamav"><a class="header" href="#phpmussel--clamav">phpMussel | clamav</a></h4>
+<p><a href="http://phpmussel.github.io/">phpMussel</a> is a PHP-based script based upon ClamAV signatures designed to detect trojans, viruses, malware and other threats within files uploaded to your system wherever the script is hooked. Written by Maikuolan</p>
+<p><a href="https://github.com/phpMussel/phpMussel">Get phpMussel</a></p>
+<h4 id="spamassassin---clamavplugin--clamd"><a class="header" href="#spamassassin---clamavplugin--clamd">SpamAssassin - ClamAVPlugin | clamd</a></h4>
+<p>A ClamAV plug in fpr SpamAssassin 3.X</p>
+<p><a href="https://cwiki.apache.org/confluence/display/SPAMASSASSIN/ClamAVPlugin">Get ClamAVPlugin</a></p>
+<h4 id="clamav-rest"><a class="header" href="#clamav-rest">clamav-rest</a></h4>
+<p>Simple ClamAV REST proxy. Builds on top of <a href="#clamav-java">clamav-java</a> which is a minimal Java client for ClamAV.</p>
+<p><a href="https://github.com/solita/clamav-rest">Get clamav-rest</a></p>
+<h3 id="filesystem--on-access-scanning"><a class="header" href="#filesystem--on-access-scanning">Filesystem &amp; On-Access Scanning</a></h3>
+<h4 id="clam-sentinel"><a class="header" href="#clam-sentinel">Clam Sentinel</a></h4>
+<p>Clam sentinel is a program that detects file system changes and automatically scans the files added or modified using ClamWin. Require the installation of ClamWin. For Microsoft Windows 98/98SE/Me/2000/XP/Vista, Windows 7 and Windows 8.1.</p>
+<p><a href="https://sourceforge.net/projects/clamsentinel/">Get Clam Sentinel</a></p>
+<h4 id="clamfs--clamd"><a class="header" href="#clamfs--clamd">ClamFS | clamd</a></h4>
+<p>ClamFS is a FUSE-based user-space file system for Linux and BSD with on-access anti-virus file scanning through clamd daemon (a file scanning service developed by ClamAV Project).</p>
+<p>Features:</p>
+<ul>
+<li>Scans files using ClamAV</li>
+<li>User-space file system (no kernel patches, modules, recompilations, etc.)</li>
+<li>Based on libFUSE version 3 (until version 1.1.0 on libFUSE v2)</li>
+<li>Implements all clamd scan modes: fname, fdpass and stream</li>
+<li>Supports remote clamd instances in stream mode over TCP/IP socket</li>
+<li>Caches scan results in a LRU cache with time-based and out-of-memory expiration</li>
+<li>Configuration stored in XML files</li>
+<li>Supports ulockmgr</li>
+<li>Sends mails to administrator when detects virus</li>
+</ul>
+<p><a href="https://github.com/burghardt/clamfs">Get ClamFS</a></p>
+<h4 id="avfs--clamav"><a class="header" href="#avfs--clamav">Avfs | ClamAV</a></h4>
+<p>Avfs, a true on-access anti-virus file system that incrementally scans files and prevents infected data from being committed to disk. Avfs is a stackable file system and therefore can add virus detection to any other file system: Ext3, NFS, etc. Avfs supports forensic modes that can prevent a virus from reaching the disk or automatically create versions of potentially infected files to allow safe recovery. Avfs can also quarantine infected files on disk and isolate them from user processes.</p>
+<p>Avfs uses a matching algorithm that is derived from ClamAV but with changes to optimize scan time for larger signature sets. Though this project does not appear to be maintained or used elsewhere, the research was really good work and may inspire optimizations in ClamAV in the future.</p>
+<p><a href="https://www.fsl.cs.sunysb.edu/docs/avfs-security04/index.html">More about Avfs</a></p>
+<h3 id="mail-user-agents"><a class="header" href="#mail-user-agents">Mail User Agents</a></h3>
+<h4 id="claws-mail"><a class="header" href="#claws-mail">Claws Mail</a></h4>
+<p>Claws Mail is a user-friendly, lightweight, and fast email client. Claws Mail has a ClamD plugin for scanning received messages using ClamAV.</p>
+<p><a href="https://www.claws-mail.org/index.php">Get Claws Mail</a></p>
+<h4 id="kmail--clamscan"><a class="header" href="#kmail--clamscan">Kmail | clamscan</a></h4>
+<p>Mail is a fully-featured email client that fits nicely into the K Desktop Environment, KDE. It supports <a href="https://docs.kde.org/stable5/en/kmail/kmail2/the-anti-virus-wizard.html">attachment scanning with clamscan</a>.</p>
+<p><a href="https://apps.kde.org/kmail2/">Get Kmail</a></p>
+<h4 id="open-webmail-modules--clamscan"><a class="header" href="#open-webmail-modules--clamscan">Open Webmail modules | clamscan</a></h4>
+<p>Open WebMail by default can use ClamAV as the external viruscheck module to scan messages fetched from pop3 servers or all incoming messages. If a message or its attachments is found to have virus, Open WebMail will move the message from INBOX to the VIRUS folder automatically.</p>
+<p><a href="https://openwebmail.org/">Get Open Webmail</a></p>
+<h2 id="clamav-bindings"><a class="header" href="#clamav-bindings">ClamAV Bindings</a></h2>
+<h3 id="rust"><a class="header" href="#rust">Rust</a></h3>
+<h4 id="clamav-rs--libclamav"><a class="header" href="#clamav-rs--libclamav">clamav-rs | libclamav</a></h4>
+<p>A safe Rust binding for libclamav. <code>clamav-rs</code> uses <a href="https://github.com/zaddach/clamav-sys/"><code>clamav-sys</code></a> to wrap the libclamav C API.</p>
+<p><a href="https://github.com/zaddach/clamav-rs/">Get clamav-rs</a></p>
+<h4 id="clamav-sys--libclamav"><a class="header" href="#clamav-sys--libclamav">clamav-sys | libclamav</a></h4>
+<p>clamav-sys is a minimal Rust interface around libclamav. This package is not supposed to be used stand-alone, but only through its safe wrapper, clamav-rs.</p>
+<p><a href="https://github.com/zaddach/clamav-sys/">Get clamav-sys</a></p>
+<h4 id="rust-clamav--libclamav"><a class="header" href="#rust-clamav--libclamav">rust-clamav | libclamav</a></h4>
+<p>Like <code>clamav-rs</code>. rust-clamav is a safe library for interacting with libclamav from Rust. The low-level C API is wrapped in idomatic and safe Rust code.</p>
+<p><a href="https://github.com/icebergdefender/rust-clamav">Get rust-clamav</a></p>
+<h4 id="clamav-tcp--clamd"><a class="header" href="#clamav-tcp--clamd">clamav-tcp | clamd</a></h4>
+<p>A simple to use TCP client for scanning files with ClamAV. This is not exactly a binding. It is a Rust crate for interacting with ClamD. </p>
+<p>Get <a href="https://crates.io/crates/clamav-tcp">clamav-tcp</a></p>
+<h3 id="perl"><a class="header" href="#perl">Perl</a></h3>
+<h4 id="filescanclamav--clamd"><a class="header" href="#filescanclamav--clamd">File::Scan::ClamAV | clamd</a></h4>
+<p>A Perl module for interacting with ClamD. File::Scan::ClamAV will connect to a local Clam Anti-Virus clamd service and send commands.</p>
+<p><a href="https://metacpan.org/pod/release/CFABER/File-Scan-ClamAV-1.8/lib/File/Scan/ClamAV.pm">Get File::Scan::ClamAV</a></p>
+<h3 id="ruby"><a class="header" href="#ruby">Ruby</a></h3>
+<h4 id="clamby--clamscan--freshclam"><a class="header" href="#clamby--clamscan--freshclam">Clamby | clamscan + freshclam</a></h4>
+<p>Ruby binding for scanning file uploads using ClamScan. If you have a file upload on your site and you do not scan the files for viruses then you not only compromise your software, but also the users of the software and their files. This gem's function is to simply scan a given file.</p>
+<p><a href="https://github.com/kobaltz/clamby">Get Clamby</a></p>
+<h4 id="clamavclient--clamd"><a class="header" href="#clamavclient--clamd">ClamAV::Client | clamd</a></h4>
+<p>ClamAV::Client is a client library that can talk to the clam daemon.</p>
+<p><a href="https://github.com/franckverrot/clamav-client">Get ClamAV::Client</a></p>
+<h3 id="php"><a class="header" href="#php">PHP</a></h3>
+<h4 id="php-clamav--clamd"><a class="header" href="#php-clamav--clamd">PHP ClamAV | clamd</a></h4>
+<p>PHP Client to connect to ClamAV daemon over TCP or using a local socket from command line and scan your storage files for viruses.</p>
+<p><a href="https://github.com/appwrite/php-clamav">Get PHP ClamAV</a></p>
+<h4 id="php-clamav-scan--clamd"><a class="header" href="#php-clamav-scan--clamd">PHP ClamAV Scan | clamd</a></h4>
+<p>A simple PHP class for scanning files using a LOCAL ClamAV/clamd install either via a socket file or network socket (windows). Can either be used on its own or dropped into a Codeigniter app as a library. The main reason this was created was because the legacy php-clamav module is not compatible with PHP 7 and all other options I found were either not drop in compatible with CodeIgniter or were designed for use with Composer.</p>
+<p><a href="https://github.com/kissit/php-clamav-scan">Get PHP ClamAV</a></p>
+<h3 id="python"><a class="header" href="#python">Python</a></h3>
+<h4 id="clamd--clamd"><a class="header" href="#clamd--clamd">clamd | clamd</a></h4>
+<p>clamd is a portable Python module to use the ClamAV anti-virus engine on Windows, Linux, MacOSX and other platforms. It requires a running instance of the clamd daemon.</p>
+<p>This is a fork of pyClamd v0.2.0 created by Philippe Lagadec and published on his website: http://www.decalage.info/en/python/pyclamd which in turn is a slightly improved version of pyClamd v0.1.1 created by Alexandre Norman and published on his website: http://xael.org/norman/python/pyclamd/</p>
+<p><a href="https://github.com/graingert/python-clamd">Get clamd</a></p>
+<h4 id="python-clamav--libclamav"><a class="header" href="#python-clamav--libclamav">Python ClamAV | libclamav</a></h4>
+<p>Python wrapper for libclamav using <code>ctypes</code>. Python ClamAV is a part of the ClamWin project.</p>
+<p><a href="https://github.com/clamwin/python-clamav">Get Python ClamAV</a></p>
+<h4 id="pyclamd--clamd"><a class="header" href="#pyclamd--clamd">pyClamd | clamd</a></h4>
+<p>Add virus detection capabilities to your python software in an efficient and easy way.</p>
+<p><a href="http://www.decalage.info/en/python/pyclamd">Get pyClamd</a></p>
+<h3 id="java"><a class="header" href="#java">Java</a></h3>
+<h4 id="clamav-java"><a class="header" href="#clamav-java">clamav-java</a></h4>
+<p>Simple ClamAV Java client. See also <a href="#clamav-rest">ClamAV REST service</a> which builds on top of this.</p>
+<p><a href="https://github.com/solita/clamav-java">Get clamav-java</a></p>
+<h2 id="miscellaneous-tools"><a class="header" href="#miscellaneous-tools">Miscellaneous Tools</a></h2>
+<h3 id="ipcop--clamav"><a class="header" href="#ipcop--clamav">IPCop | ClamAV</a></h3>
+<p>IPCop Linux is a complete Linux Distribution whose sole purpose is to protect the networks it is installed on. ClamAV is included.</p>
+<p><a href="https://www.ipcop.org/">Get IPCop</a></p>
+<h3 id="endian-firewall--clamav"><a class="header" href="#endian-firewall--clamav">Endian Firewall | ClamAV</a></h3>
+<p>Endian Firewall Community (EFW) is a turn-key Linux security distribution that can transform any bare-metal appliance into a full-featured Unified Threat Management solution. Endian is designed to be the easiest security product to install, configure and use!</p>
+<p><a href="https://www.endian.com/community/features/">Get Endian Firewall</a></p>
+<h3 id="clamtk--clamav"><a class="header" href="#clamtk--clamav">ClamTK | ClamAV</a></h3>
+<p>ClamTk is a GUI front-end for ClamAV using gtk2-perl. It is designed to be an easy-to-use, on-demand scanner for Linux systems. ClamTk has been ported to Fedora, Debian, RedHat, openSUSE, ALT Linux, Ubuntu, CentOS, Gentoo, Archlinux, Mandriva, PCLinuxOS, FreeBSD, and others.</p>
+<p><a href="https://github.com/dave-theunsub/clamtk">Get ClamTK</a></p>
+<h3 id="clamav-gui--clamav"><a class="header" href="#clamav-gui--clamav">ClamAV-GUI | ClamAV</a></h3>
+<p>ClamAV-GUI is a GUI front-end for ClamAV using Qt. The ClamAV-GUI sports a dropzone in a corner where files and folders can be dragged and dropped into for scanning. This GUI is brought to you by Joerg Zopes.</p>
+<p><a href="https://store.kde.org/p/1127892/">Get ClamAV-GUI</a></p>
+<h3 id="clamwin--clamav"><a class="header" href="#clamwin--clamav">ClamWin | ClamAV</a></h3>
+<p>ClamWin is a Free Antivirus program for Microsoft Windows 10 / 8 / 7 / Vista / XP / Me / 2000 / 98 and Windows Server 2012, 2008 and 2003.</p>
+<p><a href="https://clamwin.com/">Get ClamWin</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Installing/Installing-from-source-Windows.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Installing/Add-clamav-user.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Installing/Installing-from-source-Windows.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Installing/Add-clamav-user.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

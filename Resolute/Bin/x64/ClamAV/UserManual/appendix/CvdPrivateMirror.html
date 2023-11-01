@@ -1,0 +1,291 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Hosting a Private Database Mirror - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../appendix/CvdPrivateMirror.html" class="active"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="private-local-mirrors"><a class="header" href="#private-local-mirrors">Private Local Mirrors</a></h1>
+<p>There are some situations in which it may be desirable to set up a private mirror for distributing ClamAV databases.</p>
+<p>If you run ClamAV on many clients on your network, each new installation will download a copy of the database files. This is a waste of bandwidth and resources for your network and for our mirrors network.</p>
+<p>Sometimes the servers which perform the scan are not directly connected to Internet and can only download updates from a server in the same network segment.</p>
+<p>For people who face these problems, we recommend using one of the following solutions:</p>
+<ul>
+<li><a href="#use-cvdupdate-to-serve-whole-databases-and-database-patch-files-from-a-private-mirror">Use <code>cvdupdate</code> to serve whole databases and database patch files from a private mirror</a></li>
+<li><a href="#use-freshclam-to-serve-only-whole-database-files-from-a-private-mirror">Use <code>freshclam</code> to serve only whole database files from a private mirror</a></li>
+<li><a href="#use-an-http-proxy">Use an HTTP proxy</a></li>
+</ul>
+<h2 id="use-cvdupdate-to-serve-whole-databases-and-database-patch-files-from-a-private-mirror"><a class="header" href="#use-cvdupdate-to-serve-whole-databases-and-database-patch-files-from-a-private-mirror">Use <code>cvdupdate</code> to serve whole databases and database patch files from a private mirror</a></h2>
+<p>You may use a tool named <code>cvdupdate</code> on a private mirror to maintain the latest CVD databases <em>and</em> CDIFF patch files.</p>
+<p>This solution will allow you to host a mirror that functions in the same way as the official database CDN, serving CVD and CDIFF files. This means that your downstream <code>freshclam</code> clients will be able to update using the CDIFF patch files, which should save some bandwidth between your private mirror and your clients.</p>
+<p>These instructions use a tool named <a href="https://github.com/Cisco-Talos/cvdupdate">cvdupdate</a>. <code>cvdupdate</code> requires:</p>
+<ul>
+<li>Python 3.6 or newer.</li>
+<li>An internet connection with DNS enabled.</li>
+<li>It should work fine on Linux/Unix and on Windows.</li>
+</ul>
+<p><strong>IMPORTANT</strong>: Please do NOT use <code>cvdupdate</code> if you don't need to host a private database mirror. <code>freshclam</code> is far more efficient, even for a small cluster of installs, because it will update with CDIFF patches after the initial database downloads. <code>cvdupdate</code>, on the otherhand, will download both the new daily CDIFF <em>and</em> the daily CVD every day.</p>
+<p>You can easily install <code>cvdupdate</code> using Python 3's Pip package manager:</p>
+<pre><code class="language-bash">pip3 install cvdupdate
+</code></pre>
+<p>(optional) Once installed, you may wish to configure where the databases are stored:</p>
+<pre><code class="language-bash">cvd config set --dbdir &lt;your www path&gt;
+</code></pre>
+<p>Now run this as often as you need, or at least once a day to download/update the databases:</p>
+<pre><code class="language-bash">cvd update
+</code></pre>
+<p>You may wish to <a href="https://github.com/Cisco-Talos/cvdupdate#cron-example">set up a <code>cron</code> job</a> to check for updates.</p>
+<p>If you didn't set a custom database path, the databases will be stored in <code>~/.cvdupdate/database</code></p>
+<blockquote>
+<p><em>Tip</em>: You can use <code>--help</code> with any <code>cvd</code> command to learn more. For ore detailed instructions, or to report issues, please visit: https://github.com/Cisco-Talos/cvdupdate](https://github.com/Cisco-Talos/cvdupdate)</p>
+</blockquote>
+<p>Once you have the database files, host them with your favorite webserver, or use the <code>cvd serve</code> test-webserver (not intended for production).</p>
+<p>Next, you'll need to configure the <code>freshclam</code> clients so they'll update from your private mirror.</p>
+<p>For <code>freshclam.conf</code> on your downstream <code>freshclam</code> clients, set:</p>
+<pre><code class="language-ini"># Replace `mirror.mylan` and `8000` with your domain and port number.
+DatabaseMirror http://mirror.mylan:8000
+</code></pre>
+<p>You may wish to set up a proxy to enable HTTPS. If you do, you can specify <code>https</code> instead of <code>http</code>:</p>
+<pre><code class="language-ini">DatabaseMirror https://mirror.mylan
+</code></pre>
+<p>You could also host the files in a subdirectory. E.g.:</p>
+<pre><code class="language-ini">DatabaseMirror http://mirror.mylan:8000/clamav
+</code></pre>
+<p>When you run <code>freshclam</code> on your client machines, they will still use a DNS query to clamav.net to find out if there should be an update before attempting to update from your private server. If your <code>freshclam</code> clients attempt to update before your private mirror updates, that's okay. The <code>freshclam</code> clients will tolerate being 1 version behind what was advertised on clamav.net.</p>
+<blockquote>
+<p><em>Tip</em>: If the <code>freshclam</code> clients will not have access to the internet to perform that DNS lookup, you may wish to set <code>DNSDatabaseInfo no</code> in your <code>freshclam.conf</code> file. <code>freshclam</code> may complain that the DNS lookup to &quot;no&quot; failed, which is fine. It will fall-back to checking the database version using an HTTP Range-request to your server.</p>
+</blockquote>
+<blockquote>
+<p><em>CAUTION</em>: If your <code>freshclam</code> clients cannot use DNS to check if there is an update, be certain that your private mirror's webserver supports HTTP Range-requests, or else it may serve the ENTIRE database CVD file when a <code>freshclam</code> client means to check if a newer version exists, and not just a small portion containing the database version.</p>
+<p>The Python <code>simple.http</code> server does <em>NOT</em> support HTTP Range requests.</p>
+</blockquote>
+<h2 id="use-freshclam-to-serve-only-whole-database-files-from-a-private-mirror"><a class="header" href="#use-freshclam-to-serve-only-whole-database-files-from-a-private-mirror">Use <code>freshclam</code> to serve only whole database files from a private mirror</a></h2>
+<p>You may use <code>freshclam</code> on a private mirror to maintain the latest CVD or CLD databases.</p>
+<p>The <code>freshclam</code> program running on your private mirror will update using the CDIFF patch files. When you update a CVD database with ClamAV's CDIFF patching process, it produces a CLD &quot;local&quot; database. With this solution for hosting a private mirror, you will serve those CVD or CLD databases to downstream <code>freshclam</code> clients. Unlike when using <code>cvdupdate</code>, this option will not allow you to serve CDIFF patch files.</p>
+<blockquote>
+<p><em>Tip</em>: This method may be best if your public IP address is shared with other clients. At present we rate-limit CVD downloads by IP address. So if your public IP address is used by others, <code>cvdupdate</code> may be rate-limited when it attempts to download <code>daily.cvd</code>. But <code>freshclam</code> should never be rate limited for attempting to download the lateset CDIFF patch file.</p>
+</blockquote>
+<p>This solution is simple to implement. But because you will not be serving CDIFF patch files, it is only effective if your clients are all on the same local network or if bandwidth between your private mirror and your clients is not an issue for you.</p>
+<p>To get started, configure a local webserver on one of your machines (say <code>mirror.mylan</code>). Set up <code>freshclam</code> on that server so it downloads the database files from http://database.clamav.net and stores them in your webserver’s <em>DocumentRoot</em> directory.</p>
+<p>For <code>freshclam.conf</code> on your private mirror, set:</p>
+<pre><code class="language-ini"># The private mirror will update from database.clamav.net.
+DatabaseMirror database.clamav.net
+
+# Customize the DatabaseDirectory so that FreshClam will update the DocumentRoot.
+DatabaseDirectory /your/server/www
+
+# Enable CLD compression to save bandwidth between your mirror and your clients.
+CompressLocalDatabase yes
+</code></pre>
+<p>Set up <code>freshclam</code> to run as a service or in a cron job so that your private mirror always serves the latest databases.</p>
+<p>Next, you'll need to configure the <code>freshclam</code> clients so they'll update from your private mirror.</p>
+<p>For <code>freshclam.conf</code> on your downstream <code>freshclam</code> clients, set:</p>
+<pre><code class="language-ini"># PrivateMirror is used instead of DatabaseMirror so that FreshClam will:
+# 1. Accept CVD or CLD files, not just CVD files.
+# 2. Use an HTTP Range-request to check if there is an update, rather than DNS.
+PrivateMirror http://mirror.mylan:8000
+
+# ScriptedUpdates is not needed because you won't be serving CDIFF files.
+ScriptedUpdates no
+</code></pre>
+<p>When you run <code>freshclam</code> on your client machines, they should check for updates from your private server over HTTP by downloading just the database header<code>*</code>. If there is a new version, the client will download the whole CVD or CLD file from your private server to update.</p>
+<blockquote>
+<p><code>*</code><em>Important</em>: Make sure your HTTP server will accept and handle HTTP Range requests. If yours does not, then each time a client checks for an update it will download the whole database!</p>
+<p>The Python <code>simple.http</code> server does <em>NOT</em> support HTTP Range requests.</p>
+</blockquote>
+<h2 id="use-an-http-proxy"><a class="header" href="#use-an-http-proxy">Use an HTTP proxy</a></h2>
+<p>This solution is really easy to implement and is bandwidth efficient.</p>
+<p>Install a proxy server that supports caching files (e.g. squid) and then tell your <code>freshclam</code> clients to use it. This can be done by setting the <em>HTTPProxyServer</em> parameter in <em>freshclam.conf</em> (see <code>man 5 freshclam.conf</code> for the details).</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../appendix/Terminology.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../appendix/Authenticode.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../appendix/Terminology.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../appendix/Authenticode.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

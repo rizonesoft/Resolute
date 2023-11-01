@@ -1,0 +1,832 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Phishing Signatures - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html" class="active"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="phishing-signatures"><a class="header" href="#phishing-signatures">Phishing Signatures</a></h1>
+<p>ClamAV can detect HTML links that look suspicious when the display text is a URL that is a different domain than than in the actual URL. Unfortunately, it is pretty common for a company to contract out web services and to use HTML link display text to make it look like it is a link to the company website. Because this practice is commonplace, ClamAV only does phishing checks for specific websites that are popularly targeted by phishing campaigns. Signatures to identify domains that should be monitored for phishing attempts are listed in ClamAV <code>PDB</code> database files, such as <code>daily.pdb</code>, a file found in the <code>daily.cvd</code> archive. </p>
+<p>Unfortunately, many websites listed in the <code>PDB</code> phishing database also send emails with links that display a different domain than is in the actual link. To mitigate false positive detections in non-malicious links, ClamAV has allow list signatures in ClamAV <code>WDB</code> database files, such as <code>daily.wdb</code>, another file found in the <code>daily.cvd</code> archive. </p>
+<p>To help you identify what triggered a heuristic phishing alert, <code>clamscan</code> or <code>clamd</code> will print a message indicating the &quot;Display URL&quot; and &quot;Real URL&quot; involved in a heuristic phishing alert. </p>
+<p>For example, suppose that <code>amazon.com</code> were listed in ClamAV's loaded PDB database, you might observe this message before the alert when scanning an email with a link that claims to be for <code>https://www.amazon.com/</code> but is in fact linking to <code>https://someshadywebsite.example.com/</code>:</p>
+<pre><code>LibClamAV info: Suspicious link found!
+LibClamAV info:   Real URL:    https://someshadywebsite.example.com
+LibClamAV info:   Display URL: https://www.amazon.com
+/path/to/suspicious/email.eml: Heuristics.Phishing.Email.SpoofedDomain FOUND
+</code></pre>
+<p>Table of Contents</p>
+<ul>
+<li><a href="#phishing-signatures">Phishing Signatures</a>
+<ul>
+<li><a href="#database-file-format">Database file format</a>
+<ul>
+<li><a href="#pdb-format">PDB format</a></li>
+<li><a href="#gdb-format">GDB format</a></li>
+<li><a href="#wdb-format">WDB format</a></li>
+<li><a href="#hints">Hints</a></li>
+<li><a href="#examples-of-pdb-signatures">Examples of PDB signatures</a></li>
+<li><a href="#examples-of-wdb-signatures">Examples of WDB signatures</a></li>
+<li><a href="#example-for-how-the-url-extractor-works">Example for how the URL extractor works</a></li>
+<li><a href="#how-matching-works">How matching works</a>
+<ul>
+<li><a href="#realurl-displayedurl-concatenation">RealURL, DisplayedURL concatenation</a></li>
+<li><a href="#what-happens-when-a-match-is-found">What happens when a match is found</a></li>
+<li><a href="#extraction-of-realurl-displayedurl-from-html-tags">Extraction of <code>RealURL</code>, <code>DisplayedURL</code> from HTML tags</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</li>
+<li><a href="#simple-patterns">Simple patterns</a></li>
+<li><a href="#regular-expressions">Regular expressions</a></li>
+<li><a href="#flags">Flags</a></li>
+</ul>
+</li>
+<li><a href="#introduction-to-regular-expressions">Introduction to regular expressions</a>
+<ul>
+<li><a href="#special-characters">Special characters</a></li>
+<li><a href="#character-classes">Character classes</a></li>
+<li><a href="#escaping">Escaping</a></li>
+<li><a href="#alternation">Alternation</a></li>
+<li><a href="#optional-matching-and-repetition">Optional matching, and repetition</a></li>
+<li><a href="#groups">Groups</a></li>
+</ul>
+</li>
+<li><a href="#how-to-create-database-files">How to create database files</a>
+<ul>
+<li><a href="#how-to-create-and-maintain-the-allow-list-dailywdb">How to create and maintain the allow list (daily.wdb)</a></li>
+<li><a href="#how-to-create-and-maintain-the-domain-list-dailypdb">How to create and maintain the domain list (daily.pdb)</a></li>
+<li><a href="#dealing-with-false-positives-and-undetected-phishing-mails">Dealing with false positives, and undetected phishing mails</a>
+<ul>
+<li><a href="#false-positives">False positives</a></li>
+<li><a href="#undetected-phish-mails">Undetected phish mails</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="database-file-format"><a class="header" href="#database-file-format">Database file format</a></h2>
+<h3 id="pdb-format"><a class="header" href="#pdb-format">PDB format</a></h3>
+<p>This file contains urls/hosts that should be monitored for phishing attempts.
+It contains lines in the following format:</p>
+<pre><code>R:DisplayedURL[:FuncLevelSpec]
+H:DisplayedHostname[:FuncLevelSpec]
+</code></pre>
+<ul>
+<li>
+<p><code>R</code></p>
+<p>Regular expression, for the concatenated URL. The last 3 characters of the regular expression cannot regex special characters and much be an exact match.</p>
+</li>
+<li>
+<p><code>H</code></p>
+<p>Matches the <code>DisplayedHostname</code> as a simple pattern (literally, no regular expression).</p>
+<ul>
+<li>
+<p>The pattern can match either the full hostname.</p>
+</li>
+<li>
+<p>Or a subdomain of the specified hostname.</p>
+</li>
+<li>
+<p>To avoid false matches in case of subdomain matches, the engine checks that there is a dot(<code>.</code>) or a space(<code> </code>) before the matched portion.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>RealURL</code></p>
+<p>Is the URL the user is sent to, example: <code>href</code> attribute of an html anchor (<code>&lt;a&gt;</code> tag).</p>
+</li>
+<li>
+<p><code>DisplayedURL</code></p>
+<p>Is the URL description displayed to the user, where its <em>claimed</em> they are sent, example: contents of an html anchor (<code>&lt;a&gt;</code> tag).</p>
+</li>
+<li>
+<p><code>DisplayedHostname</code></p>
+<p>Is the hostname portion of the <code>DisplayedURL</code>.</p>
+</li>
+<li>
+<p><code>FuncLevelSpec</code></p>
+<p>An (optional) functionality level, 2 formats are possible:</p>
+<ul>
+<li>
+<p><code>minlevel</code> all engines having functionality level <code>&gt;= minlevel</code> will load this line.</p>
+</li>
+<li>
+<p><code>minlevel-maxlevel</code> engines with functionality level <code>&gt;= minlevel</code>, and <code>&lt; maxlevel</code> will load this line.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="gdb-format"><a class="header" href="#gdb-format">GDB format</a></h3>
+<p>This file contains URL hashes in the following format:</p>
+<pre><code>S:P:HostPrefix[:FuncLevelSpec]
+S:F:Sha256hash[:FuncLevelSpec]
+S1:P:HostPrefix[:FuncLevelSpec]
+S1:F:Sha256hash[:FuncLevelSpec]
+S2:P:HostPrefix[:FuncLevelSpec]
+S2:F:Sha256hash[:FuncLevelSpec]
+S:W:Sha256hash[:FuncLevelSpec]
+</code></pre>
+<ul>
+<li>
+<p><code>S:</code></p>
+<p>These are hashes for Google Safe Browsing - malware sites, and should not be used for other purposes.</p>
+</li>
+<li>
+<p><code>S2:</code></p>
+<p>These are hashes for Google Safe Browsing - phishing sites, and should not be used for other purposes.</p>
+</li>
+<li>
+<p><code>S1:</code></p>
+<p>Hashes for blocking phishing sites. Virus name: <code>Phishing.URL.Blocked</code>.</p>
+</li>
+<li>
+<p><code>S:W:</code></p>
+<p>Locally allowed hashes.</p>
+</li>
+<li>
+<p><code>HostPrefix</code></p>
+<p>4-byte prefix of the sha256 hash of the last 2 or 3 components of the hostname. If prefix doesn’t match, no further lookups are performed.</p>
+</li>
+<li>
+<p><code>Sha256hash</code></p>
+<p>sha256 hash of the canonicalized URL, or a sha256 hash of its prefix/suffix according to the Google Safe Browsing “Performing Lookups” rules. There should be a corresponding <code>:P:HostkeyPrefix</code> entry for the hash to be taken into consideration.</p>
+</li>
+</ul>
+<p>To see which hash/URL matched, look at the <code>clamscan --debug</code> output, and look for the following strings: <code>Looking up hash</code>, <code>prefix matched</code>, and <code>Hash matched</code>. To ignore .gdb entries, create a local.gdb file, and adding a line <code>S:W:&lt;HASH&gt;</code>.</p>
+<h3 id="wdb-format"><a class="header" href="#wdb-format">WDB format</a></h3>
+<p>This file contains url pairs for links that may look suspicious but are safe and should be allowed. It contains lines in the following format:</p>
+<pre><code>X:RealURL:DisplayedURL[:FuncLevelSpec]
+M:RealHostname:DisplayedHostname[:FuncLevelSpec]
+</code></pre>
+<ul>
+<li>
+<p><code>X</code></p>
+<p>Regular expression, for the <em>entire URL</em>, not just the hostname.</p>
+<ul>
+<li>
+<p>The regular expression is by default anchored to start-of-line and end-of-line, as if you have used <code>^RegularExpression$</code></p>
+</li>
+<li>
+<p>A trailing <code>/</code> is automatically added both to the regex, and the input string to avoid false matches.</p>
+</li>
+<li>
+<p>The regular expression matches the <em>concatenation</em> of the <code>RealURL</code>, a colon(<code>:</code>), and the <code>DisplayedURL</code> as a single string. It doesn’t separately match <code>RealURL</code> and <code>DisplayedURL</code>!</p>
+</li>
+<li>
+<p>The last 3 characters of the regular expression cannot regex special characters and much be an exact match.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>M</code></p>
+<p>Matches hostname, or subdomain of it, see notes for H above.</p>
+</li>
+</ul>
+<h3 id="hints"><a class="header" href="#hints">Hints</a></h3>
+<ul>
+<li>
+<p>Empty lines are ignored</p>
+</li>
+<li>
+<p>The colons are mandatory</p>
+</li>
+<li>
+<p>Don’t leave extra spaces on the end of a line!</p>
+</li>
+<li>
+<p>If any of the lines don’t conform to this format, ClamAV will abort with a Malformed Database Error</p>
+</li>
+<li>
+<p>See section <a href="#Extraction-of-RealURL,-DisplayedURL-from-HTML-tags">Extraction-of-RealURL</a> for more details on <code>RealURL</code>/<code>DisplayedURL</code></p>
+</li>
+</ul>
+<h3 id="examples-of-pdb-signatures"><a class="header" href="#examples-of-pdb-signatures">Examples of PDB signatures</a></h3>
+<p>To check for phishing mails that target <code>amazon.com</code>, or subdomains of <code>amazon.com</code>:</p>
+<pre><code>H:amazon.com
+</code></pre>
+<p>To do the same, but for <code>amazon.co.uk</code>:</p>
+<pre><code>H:amazon.co.uk
+</code></pre>
+<p>Alternatively, you could use a regex PDB signature to check both:</p>
+<pre><code>R:.+\.amazon\.(com|co\.uk)([/?].*)?
+</code></pre>
+<p>You can limit the signatures to certain <a href="../../appendix/FunctionalityLevels.html">engine versions</a>. For example...</p>
+<ol>
+<li>
+<p>Restrict so that engine versions 20 through 30 can load it, but not 31+:</p>
+<pre><code>H:amazon.co.uk:20-30
+</code></pre>
+</li>
+<li>
+<p>Restrict so that engine versions <code>&gt;= 20</code> can load it:</p>
+<pre><code>H:amazon.co.uk:20-
+</code></pre>
+</li>
+<li>
+<p>Restrict so that engine versions <code>&lt;= 20</code> can load it:</p>
+<pre><code>H:amazon.co.uk:0-20
+</code></pre>
+</li>
+</ol>
+<p>In a real situation, you’d probably use the second form. A situation like that would be if you are using a feature of the signatures not available in earlier versions, or if earlier versions have bugs with your signature. Its neither case here, the above examples are for illustrative purposes only.</p>
+<h3 id="examples-of-wdb-signatures"><a class="header" href="#examples-of-wdb-signatures">Examples of WDB signatures</a></h3>
+<p>To allow Amazon’s country specific domains and <code>amazon.com</code>, to mix domain names in <code>DisplayedURL</code>, and <code>RealURL</code>:</p>
+<pre><code>X:.+\.amazon\.(at|ca|co\.uk|co\.jp|de|fr)([/?].*)?:.+\.amazon\.com([/?].*)?:17-
+</code></pre>
+<p>Explanation of this signature:</p>
+<ul>
+<li>
+<p><code>X:</code></p>
+<p>this is a regular expression</p>
+</li>
+<li>
+<p><code>:17-</code></p>
+<p>load signature only for engines with <a href="../../appendix/FunctionalityLevels.html">functionality level</a> &gt;= 17</p>
+</li>
+</ul>
+<p>The regular expression is the following (<code>X:</code>, <code>:17-</code> stripped, and a <code>/</code> appended)</p>
+<pre><code>.+\.amazon\.(at|ca|co\.uk|co\.jp|de|fr)([/?].*)?:.+\.amazon\.com([/?].*)?/
+</code></pre>
+<p>Explanation of this regular expression (note that it is a single regular expression, and not 2 regular expressions splitted at the <code>:</code>).</p>
+<ul>
+<li>
+<p><code>.+</code></p>
+<p>any subdomain of</p>
+</li>
+<li>
+<p><code>\.amazon\.</code></p>
+<p>domain we are allowing (<code>RealURL</code> part)</p>
+</li>
+<li>
+<p><code>(at|ca|co\.uk|co\.jp|de|fr)</code></p>
+<p>country-domains: at, ca, co.uk, co.jp, de, fr</p>
+</li>
+<li>
+<p><code>([/?].*)?</code></p>
+<p>recomended way to end the real-url, this protects against embedded URLs (<code>evilurl.example.com/amazon.co.uk/</code>)</p>
+</li>
+<li>
+<p><code>:</code></p>
+<p><code>RealURL</code> and <code>DisplayedURL</code> are concatenated via a <code>:</code>, so match a literal <code>:</code> here</p>
+</li>
+<li>
+<p><code>.+</code></p>
+<p>any subdomain of</p>
+</li>
+<li>
+<p><code>\.amazon\.com</code></p>
+<p>allowed <code>DisplayedURL</code></p>
+</li>
+<li>
+<p><code>([/?].*)?</code></p>
+<p>recommended way to end displayed url part, to protect against embedded URLs</p>
+</li>
+<li>
+<p><code>/</code></p>
+<p>automatically added to further protect against embedded URLs</p>
+</li>
+</ul>
+<p>When you add an entry, make sure you check that both domains are owned by the same entity. This signature allows links claiming to point to amazon.com (<code>DisplayedURL</code>), when in fact they really go to a country-specific domain of amazon (<code>RealURL</code>).</p>
+<h3 id="example-for-how-the-url-extractor-works"><a class="header" href="#example-for-how-the-url-extractor-works">Example for how the URL extractor works</a></h3>
+<p>Consider the following HTML file:</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;a href=&quot;http://1.realurl.example.com/&quot;&gt;
+  1.displayedurl.example.com
+&lt;/a&gt;
+&lt;a href=&quot;http://2.realurl.example.com&quot;&gt;
+  2 d&lt;b&gt;i&lt;p&gt;splayedurl.e&lt;/b&gt;xa&lt;i&gt;mple.com
+&lt;/a&gt;
+&lt;a href=&quot;http://3.realurl.example.com&quot;&gt;
+  3.nested.example.com
+  &lt;a href=&quot;http://4.realurl.example.com&quot;&gt;
+    4.displayedurl.example.com
+  &lt;/a&gt;
+&lt;/a&gt;
+&lt;form action=&quot;http://5.realurl.example.com&quot;&gt;
+  sometext
+  &lt;img src=&quot;http://5.displayedurl.example.com/img0.gif&quot;/&gt;
+  &lt;a href=&quot;http://5.form.nested.displayedurl.example.com&quot;&gt;
+    5.form.nested.link-displayedurl.example.com
+  &lt;/a&gt;
+&lt;/form&gt;
+&lt;a href=&quot;http://6.realurl.example.com&quot;&gt;
+  6.displ
+  &lt;img src=&quot;6.displayedurl.example.com/img1.gif&quot;/&gt;
+  ayedurl.example.com
+&lt;/a&gt;
+&lt;a href=&quot;http://7.realurl.example.com&quot;&gt;
+  &lt;iframe src=&quot;http://7.displayedurl.example.com&quot;&gt;
+&lt;/a&gt;
+</code></pre>
+<p>The phishing engine extract the following
+<code>RealURL</code>/<code>DisplayedURL</code> pairs from it:</p>
+<pre><code>http://1.realurl.example.com/
+1.displayedurl.example.com
+
+http://2.realurl.example.com
+2displayedurl.example.com
+
+http://3.realurl.example.com
+3.nested.example.com
+
+http://4.realurl.example.com
+4.displayedurl.example.com
+
+http://5.realurl.example.com
+http://5.displayedurl.example.com/img0.gif
+
+http://5.realurl.example.com
+http://5.form.nested.displayedurl.example.com
+
+http://5.form.nested.displayedurl.example.com
+5.form.nested.link-displayedurl.example.com
+
+http://6.realurl.example.com
+6.displayedurl.example.com
+
+http://6.realurl.example.com
+6.displayedurl.example.com/img1.gif
+</code></pre>
+<h3 id="how-matching-works"><a class="header" href="#how-matching-works">How matching works</a></h3>
+<h4 id="realurl-displayedurl-concatenation"><a class="header" href="#realurl-displayedurl-concatenation">RealURL, DisplayedURL concatenation</a></h4>
+<p>The phishing detection module processes pairs of RealURL/DisplayedURL. Matching against <code>daily.wdb</code> is done as follows: the RealURL is concatenated with a <code>:</code>, and with the DisplayedURL, then that <em>line</em> is matched against the lines in <code>daily.wdb</code>/<code>daily.pdb</code></p>
+<p>So if you have this line in <code>daily.wdb</code>:</p>
+<pre><code>M:www.google.ro:www.google.com
+</code></pre>
+<p>This href: <code>&lt;a href='http://www.google.ro'&gt;www.google.com&lt;/a&gt;</code> then it will be allowed, but: <code>&lt;a href='http://images.google.com'&gt;www.google.com&lt;/a&gt;</code> will not.</p>
+<h4 id="what-happens-when-a-match-is-found"><a class="header" href="#what-happens-when-a-match-is-found">What happens when a match is found</a></h4>
+<p>In the case of the allow list, a match means that the RealURL/DisplayedURL combination is considered clean, and no further checks are performed on it.</p>
+<p>In the case of the domain list, a match means that the RealURL/DisplayedURL is going to be checked for phishing attempts.</p>
+<p>Furthermore you can restrict what checks are to be performed by specifying the 3-digit hexnumber.</p>
+<h4 id="extraction-of-realurl-displayedurl-from-html-tags"><a class="header" href="#extraction-of-realurl-displayedurl-from-html-tags">Extraction of <code>RealURL</code>, <code>DisplayedURL</code> from HTML tags</a></h4>
+<p>The html parser extracts pairs of <code>RealURL</code>/<code>DisplayedURL</code> based on the following rules.</p>
+<p>After URLs have been extracted, they are normalized, and cut after the hostname. <code>http://test.example.com/path/somecgi?queryparameters</code> becomes <code>http://test.example.com/</code></p>
+<ul>
+<li>
+<p><code>a</code></p>
+<p>(anchor) the <code>href</code> is the <code>RealURL</code>, its <code>contents</code> is the <code>DisplayedURL</code></p>
+<ul>
+<li>
+<p><code>contents</code></p>
+<p>is the tag-stripped contents of the <code>&lt;a&gt;</code> tags, so for example <code>&lt;b&gt;</code> tags are stripped (but not their contents)</p>
+</li>
+</ul>
+<p>nesting another <code>&lt;a&gt;</code> tag withing an <code>&lt;a&gt;</code> tag (besides being invalid html) is treated as a <code>&lt;/a&gt;&lt;a</code>...</p>
+</li>
+<li>
+<p><code>form</code></p>
+<p>the <code>action</code> attribute is the <code>RealURL</code>, and a nested <code>&lt;a&gt;</code> tag is the <code>DisplayedURL.</code></p>
+</li>
+<li>
+<p><code>img/area</code></p>
+<p>if nested within an <code>&lt;a&gt;</code> tag, the RealURL is the <code>href</code> of the a tag, and the <code>src</code>/<code>dynsrc</code>/<code>area</code> is the <code>DisplayedURL</code> of the <code>img</code></p>
+<p>if nested withing a <code>form</code> tag, then the action attribute of the <code>form</code> tag is the <code>RealURL</code>.</p>
+</li>
+<li>
+<p><code>iframe</code></p>
+<p>if nested withing an <code>&lt;a&gt;</code> tag the <code>src</code> attribute is the <code>DisplayedURL</code>, and the <code>href</code> of its parent <code>a</code> tag is the <code>RealURL.</code></p>
+<p>if nested withing a <code>form</code> tag, then the action attribute of the <code>form</code> tag is the <code>RealURL</code>.</p>
+</li>
+</ul>
+<h4 id="example"><a class="header" href="#example">Example</a></h4>
+<p>Consider this html file:</p>
+<pre><code class="language-html">&lt;a href=”evilurl”&gt;www.paypal.com&lt;/a&gt;
+&lt;a href=”evilurl2” title=”www.ebay.com”&gt;click here to sign in&lt;/a&gt;
+&lt;form action=”evilurl_form”&gt;
+Please sign in to &lt;a href=”cgi.ebay.com”&gt;Ebay&lt;/a&gt;using this form
+&lt;input type=’text’ name=’username’&gt;Username&lt;/input&gt;
+....
+&lt;/form&gt;
+&lt;a href=”evilurl”&gt;&lt;img src=”images.paypal.com/secure.jpg”&gt;&lt;/a&gt;
+</code></pre>
+<p>The resulting <code>RealURL</code>/<code>DisplayedURL</code> pairs will be (note that one tag can generate multiple pairs):</p>
+<ul>
+<li>
+<p><code>evilurl</code> / <code>www.paypal.com</code></p>
+</li>
+<li>
+<p><code>evilurl2</code> / <code>click here to sign in</code></p>
+</li>
+<li>
+<p><code>evilurl2</code> / <code>www.ebay.com</code></p>
+</li>
+<li>
+<p><code>evilurl_form</code> / <code>cgi.ebay.com</code></p>
+</li>
+<li>
+<p><code>cgi.ebay.com</code> / <code>Ebay</code></p>
+</li>
+<li>
+<p><code>evilurl</code> / <code>image.paypal.com/secure.jpg</code></p>
+</li>
+</ul>
+<h3 id="simple-patterns"><a class="header" href="#simple-patterns">Simple patterns</a></h3>
+<p>Simple patterns are matched literally, i.e. if you say:</p>
+<pre><code>www.google.com
+</code></pre>
+<p>it is going to match <em>www.google.com</em>, and only that. The <em>. (dot)</em> character has no special meaning (see the section on regexes <a href="#sec:Regular-expressions">[sec:Regular-expressions]</a> for how the <em>.(dot)</em> character behaves there)</p>
+<h3 id="regular-expressions"><a class="header" href="#regular-expressions">Regular expressions</a></h3>
+<p>POSIX regular expressions are supported, and you can consider that internally it is wrapped by <em>^</em>, and <em>$.</em> In other words, this means that the regular expression has to match the entire concatenated (see section <a href="#RealURL,-DisplayedURL-concatenation">RealURL,-DisplayedURL-concatenation</a> for details on concatenation) url.</p>
+<p>It is recomended that you read section <a href="#Introduction-to-regular">Introduction-to-regular</a> to learn how to write regular expressions, and then come back and read this for hints.</p>
+<p>Be advised that clamav contains an internal, very basic regex matcher to reduce the load on the regex matching core. Thus it is recomended that you avoid using regex syntax not supported by it at the very beginning of regexes (at least the first few characters).</p>
+<p>Currently the clamav regex matcher supports:</p>
+<ul>
+<li>
+<p><code>.</code> (dot) character</p>
+</li>
+<li>
+<p><code>\</code> (escaping special characters)</p>
+</li>
+<li>
+<p><code>|</code> (pipe) alternatives</p>
+</li>
+<li>
+<p><code>[]</code> (character classes)</p>
+</li>
+<li>
+<p><code>()</code> (parenthesis for grouping, but no group extraction is performed)</p>
+</li>
+<li>
+<p>other non-special characters</p>
+</li>
+</ul>
+<p>Thus the following are not supported:</p>
+<ul>
+<li>
+<p><code>+</code> repetition</p>
+</li>
+<li>
+<p><code>*</code> repetition</p>
+</li>
+<li>
+<p><code>{}</code> repetition</p>
+</li>
+<li>
+<p>backreferences</p>
+</li>
+<li>
+<p>lookaround</p>
+</li>
+<li>
+<p>other “advanced” features not listed in the supported list ;)</p>
+</li>
+</ul>
+<p>This however shouldn’t discourage you from using the “not directly supported features “, because if the internal engine encounters unsupported syntax, it passes it on to the POSIX regex core (beginning from the first unsupported token, everything before that is still processed by the internal matcher). An example might make this more clear:</p>
+<pre><code class="language-re">*www\(\backslash\).google\(\backslash\).(com|ro|it) (\[a-zA-Z\])+\(\backslash\).google\(\backslash\).(com|ro|it)*
+</code></pre>
+<p>Everything till <code>(\[a-zA-Z\])+</code> is processed internally, that parenthesis (and everything beyond) is processed by the posix core.</p>
+<p>Examples of url pairs that match:</p>
+<ul>
+<li>
+<p><code>www.google.ro</code> <code>images.google.ro</code></p>
+</li>
+<li>
+<p><code>www.google.com</code> <code>images.google.ro</code></p>
+</li>
+</ul>
+<p>Example of url pairs that don’t match:</p>
+<ul>
+<li>
+<p><code>www.google.ro</code> <code>images1.google.ro</code></p>
+</li>
+<li>
+<p><code>images.google.com</code> <code>image.google.com</code></p>
+</li>
+</ul>
+<h3 id="flags"><a class="header" href="#flags">Flags</a></h3>
+<p>Flags are a binary OR of the following numbers:</p>
+<div class="table-wrapper"><table><thead><tr><th>Flag</th><th>Value</th></tr></thead><tbody>
+<tr><td>HOST_SUFFICIENT</td><td>1</td></tr>
+<tr><td>DOMAIN_SUFFICIENT</td><td>2</td></tr>
+<tr><td>DO_REVERSE_LOOKUP</td><td>4</td></tr>
+<tr><td>CHECK_REDIR</td><td>8</td></tr>
+<tr><td>CHECK_SSL</td><td>16</td></tr>
+<tr><td>CHECK_CLOAKING</td><td>32</td></tr>
+<tr><td>CLEANUP_URL</td><td>64</td></tr>
+<tr><td>CHECK_DOMAIN_REVERSE</td><td>128</td></tr>
+<tr><td>CHECK_IMG_URL</td><td>256</td></tr>
+<tr><td>DOMAINLIST_REQUIRED</td><td>512</td></tr>
+</tbody></table>
+</div>
+<p>The names of the constants are self-explanatory.</p>
+<p>These constants are defined in <code>libclamav/phishcheck.h</code>, you can check there for the latest flags.</p>
+<p>There is a default set of flags that are enabled, these are currently:</p>
+<pre><code class="language-c">( CLEANUP_URL | CHECK_SSL | CHECK_CLOAKING | CHECK_IMG_URL )
+</code></pre>
+<p>ssl checking is performed only for a tags currently.</p>
+<p>You must decide for each line in the domain list if you want to filter any flags (that is you don’t want certain checks to be done), and then calculate the binary OR of those constants, and then convert it into a 3-digit hexnumber. For example you devide that domain_sufficient shouldn’t be used for ebay.com, and you don’t want to check images either, so you come up with this flag number: <code>2|256 =&gt; 258(decimal) =&gt; 102(hexadecimal)</code></p>
+<p>So you add this line to <code>daily.wdb</code>:</p>
+<pre><code>R102 www.ebay.com .+
+</code></pre>
+<h2 id="introduction-to-regular-expressions"><a class="header" href="#introduction-to-regular-expressions">Introduction to regular expressions</a></h2>
+<p>Recomended reading:</p>
+<ul>
+<li>
+<p>regex quick start: <a href="http://www.regular-expressions.info/quickstart.html">http://www.regular-expressions.info/quickstart.html</a></p>
+</li>
+<li>
+<p>regex tutorial: <a href="http://www.regular-expressions.info/tutorial.html">http://www.regular-expressions.info/tutorial.html</a></p>
+</li>
+<li>
+<p>regex(7) man-page: <a href="https://linux.die.net/man/7/regex">https://linux.die.net/man/7/regex</a></p>
+</li>
+</ul>
+<h3 id="special-characters"><a class="header" href="#special-characters">Special characters</a></h3>
+<ul>
+<li>
+<p><code>[</code></p>
+<p>the opening square bracket - it marks the beginning of a character class, see section<a href="#Character-classes">Character-classes</a></p>
+</li>
+<li>
+<p><code>\</code></p>
+<p>the backslash - escapes special characters, see section <a href="#Escaping">Escaping</a></p>
+</li>
+<li>
+<p><code>^</code></p>
+<p>the caret - matches the beginning of a line (not needed in clamav regexes, this is implied)</p>
+</li>
+<li>
+<p><code>$</code></p>
+<p>the dollar sign - matches the end of a line (not needed in clamav regexes, this is implied)</p>
+</li>
+<li>
+<p><code>.</code></p>
+<p>the period or dot - matches <em>any</em> character</p>
+</li>
+<li>
+<p><code>|</code></p>
+<p>the vertical bar or pipe symbol - matches either of the token on its left and right side, see <a href="#Alternation">Alternation</a></p>
+</li>
+<li>
+<p><code>?</code></p>
+<p>the question mark - matches optionally the left-side token, see <a href="#optional-matching-and-repetition">Optional-matching, and Repetition</a></p>
+</li>
+<li>
+<p><code>*</code></p>
+<p>the asterisk or star - matches 0 or more occurences of the left-side token, see <a href="#optional-matching-and-repetition">Optional-matching, and Repetition</a></p>
+</li>
+<li>
+<p><code>+</code></p>
+<p>the plus sign - matches 1 or more occurences of the left-side token, see <a href="#optional-matching-and-repetition">Optional-matching, and Repetition</a></p>
+</li>
+<li>
+<p><code>(</code></p>
+<p>the opening round bracket - marks beginning of a group, see section <a href="#Groups">Groups</a></p>
+</li>
+<li>
+<p><code>)</code></p>
+<p>the closing round bracket - marks end of a group, see section<a href="#Groups">Groups</a></p>
+</li>
+</ul>
+<h3 id="character-classes"><a class="header" href="#character-classes">Character classes</a></h3>
+<h3 id="escaping"><a class="header" href="#escaping">Escaping</a></h3>
+<p>Escaping has two purposes:</p>
+<ul>
+<li>
+<p>It allows you to actually match the special characters themselves, for example to match the literal <code>+</code>, you would write <code>\+</code></p>
+</li>
+<li>
+<p>It also allows you to match non-printable characters, such as the tab (<code>\t</code>) and newline (<code>\n</code>)</p>
+</li>
+</ul>
+<p>However since non-printable characters are not valid inside an url, you won’t have a reason to use them.</p>
+<h3 id="alternation"><a class="header" href="#alternation">Alternation</a></h3>
+<h3 id="optional-matching-and-repetition"><a class="header" href="#optional-matching-and-repetition">Optional matching, and repetition</a></h3>
+<h3 id="groups"><a class="header" href="#groups">Groups</a></h3>
+<p>Groups are usually used together with repetition, or alternation. For example: <code>(com|it)+</code> means: match 1 or more repetitions of <code>com</code> or <code>it</code>, that is it matches: <code>com</code>, <code>it</code>, <code>comcom</code>, <code>comcomcom</code>, <code>comit</code>, <code>itit</code>, <code>ititcom</code>,... you get the idea.</p>
+<p>Groups can also be used to extract substring, but this is not supported by the ClamAV, and not needed either in this case.</p>
+<h2 id="how-to-create-database-files"><a class="header" href="#how-to-create-database-files">How to create database files</a></h2>
+<h3 id="how-to-create-and-maintain-the-allow-list-dailywdb"><a class="header" href="#how-to-create-and-maintain-the-allow-list-dailywdb">How to create and maintain the allow list (daily.wdb)</a></h3>
+<p>If the phishing code claims that a certain mail is phishing, but it's not, you have 2 choices:</p>
+<ul>
+<li>
+<p>Examine your rules <code>daily.pdb</code>, and fix them if necessary (see: <a href="#how-to-create-database-files">How to create database files</a>)</p>
+</li>
+<li>
+<p>Add it to the allow list (discussed here)</p>
+</li>
+</ul>
+<p>Lets assume you are having problems because of links like this in a mail:</p>
+<pre><code class="language-html">&lt;a href=''http://69.0.241.57/bCentral/L.asp?L=XXXXXXXX''&gt;`
+  http://www.bcentral.it/`
+&lt;/a&gt;`
+</code></pre>
+<p>After investigating those sites further, you decide they are no threat, and create a line like this in daily.wdb:</p>
+<pre><code>R http://www\(\backslash\).bcentral\(\backslash\).it/.+
+http://69\(\backslash\).0\(\backslash\).241\(\backslash\).57/bCentral/L\(\backslash\).asp?L=.+
+</code></pre>
+<blockquote>
+<p><em>Note</em>: urls like the above can be used to track unique mail recipients, and thus know if somebody actually reads mails (so they can send more spam). However since this site required no authentication information, it is safe from a phishing point of view.</p>
+</blockquote>
+<h3 id="how-to-create-and-maintain-the-domain-list-dailypdb"><a class="header" href="#how-to-create-and-maintain-the-domain-list-dailypdb">How to create and maintain the domain list (daily.pdb)</a></h3>
+<p>When not using <code>--phish-scan-alldomains</code> (production environments for example), you need to decide which urls you are going to check.</p>
+<p>Although at a first glance it might seem a good idea to check everything, it would produce false positives. Particularly newsletters, ads, etc. are likely to use URLs that look like phishing attempts.</p>
+<p>Lets assume that you’ve recently seen many phishing attempts claiming they come from Paypal. Thus you need to add paypal to daily.pdb:</p>
+<pre><code>R .+ .+\(\backslash\).paypal\(\backslash\).com
+</code></pre>
+<p>The above line will block (detect as phishing) mails that contain urls that claim to lead to paypal, but they don’t in fact.</p>
+<p>Be careful not to create regexes that match a too broad range of urls though.</p>
+<h3 id="dealing-with-false-positives-and-undetected-phishing-mails"><a class="header" href="#dealing-with-false-positives-and-undetected-phishing-mails">Dealing with false positives, and undetected phishing mails</a></h3>
+<h4 id="false-positives"><a class="header" href="#false-positives">False positives</a></h4>
+<p>Whenever you see a false positive (mail that is detected as phishing, but its not), ou might need to modify <code>daily.pdb</code> (if one of yours rules in there are too broad), or you need to add the url to <code>daily.wdb</code>. If you think the algorithm is incorrect, please file a bug report.</p>
+<h4 id="undetected-phish-mails"><a class="header" href="#undetected-phish-mails">Undetected phish mails</a></h4>
+<p>If the mail is detected, if yes, then you need to add an appropriate line to <code>daily.pdb</code> (see <a href="#how-to-create-database-files">How to create database files</a>).</p>
+<p>If the mail is not detected, then try using:</p>
+<pre><code class="language-bash">$clamscan/clamscan --debug undetected.eml | less
+</code></pre>
+<p>Then see what urls are being checked, see if any of them is in an allow list, see if all urls are detected, etc.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Signatures/YaraRules.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Signatures/BytecodeSignatures.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Signatures/YaraRules.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Signatures/BytecodeSignatures.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

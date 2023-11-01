@@ -1,0 +1,61 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 11
+Script = Ownership.au3
+
+[Modules]
+Build = 1
+Compress = 0
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://www.rizonesoft.com
+
+[Distribute]
+File=%RootDir%\Ownership.exe
+File=%RootDir%\Ownership_X64.exe
+File=%SourceDir%\Ownership.ini
+File=%RootDir%\Docs\Ownership\Changes.txt
+File=%RootDir%\Docs\Ownership\License.txt
+File=%RootDir%\Docs\Ownership\Readme.txt
+File=%RootDir%\Language\Ownership\en.ini
+File=%RootDir%\Processing\32\Stroke.ani
+File=%RootDir%\Processing\64\Globe.ani
+
+[Sources]
+
+[Environment]
+ScriptPath=Z:\Resolute\SDK\Concrete\Ownership\Ownership.au3
+Company=Rizonesoft
+CompanyURL=https://www.rizonesoft.com
+Name=Take Ownership
+ShortName=Ownership
+Description=Take Ownership
+Type=N
+Icon=Z:\Resolute\SDK\Resources\Icons\Ownership.ico
+Version=11.1.1.869
+VersionMajor=11
+VersionMaintenance=1
+VersionBuild=869
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=Ownership.exe
+OutFileX64=Ownership_X64.exe
+OutFilePath=Z:\Resolute\Resolute\Ownership.exe
+OutFileX64Path=Z:\Resolute\Resolute\Ownership_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=Z:\Resolute\SDK\Concrete\Ownership\Distribution\869
+DistributionName=Ownership_869
+FullDistributionPath=Z:\Resolute\SDK\Concrete\Ownership\Distribution\869\Ownership_869
+DistroSourceName=Ownership_869_Source
+DistroSourceFullPath=Z:\Resolute\SDK\Concrete\Ownership\Distribution\869\Ownership_869_Source

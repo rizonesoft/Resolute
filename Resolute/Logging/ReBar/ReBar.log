@@ -7,15 +7,15 @@
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/06 23:27:33 ] DATE:                        2021/03/06 23:27:33
-[ 2021/03/06 23:27:33 ] PROGRAM:                     ReBar Framework 6.4.1.5503
-[ 2021/03/06 23:27:33 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/06 23:27:33 ] COMPILED:                    YES
-[ 2021/03/06 23:27:33 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/06 23:27:33 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/06 23:27:33 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/06 23:27:33 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/06 23:27:33 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/09/2023 00:33:04 ] DATE:                        10/09/2023 00:33:04
+[ 10/09/2023 00:33:04 ] PROGRAM:                      11.1.3.1875
+[ 10/09/2023 00:33:04 ] PROGRAM PATH:                [Z:\Resolute\Resolute\BiosCodes_X64.exe]
+[ 10/09/2023 00:33:04 ] COMPILED:                    YES
+[ 10/09/2023 00:33:04 ] WINDOWS VERSION:             WIN_10 
+[ 10/09/2023 00:33:04 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/09/2023 00:33:04 ] MEMORY (RAM):                32601.73 MB
+[ 10/09/2023 00:33:04 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/09/2023 00:33:04 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
 
@@ -24,1403 +24,249 @@
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/06 23:28:57 ] DATE:                        2021/03/06 23:28:57
-[ 2021/03/06 23:28:57 ] PROGRAM:                     ReBar Framework 6.4.1.5504
-[ 2021/03/06 23:28:57 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/06 23:28:57 ] COMPILED:                    YES
-[ 2021/03/06 23:28:57 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/06 23:28:57 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/06 23:28:57 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/06 23:28:57 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/06 23:28:57 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/09/2023 00:49:50 ] DATE:                        10/09/2023 00:49:50
+[ 10/09/2023 00:49:50 ] PROGRAM:                     ReBar Framework 11.1.2.5582
+[ 10/09/2023 00:49:50 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/09/2023 00:49:50 ] COMPILED:                    YES
+[ 10/09/2023 00:49:50 ] WINDOWS VERSION:             WIN_10 
+[ 10/09/2023 00:49:50 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/09/2023 00:49:50 ] MEMORY (RAM):                32601.73 MB
+[ 10/09/2023 00:49:50 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/09/2023 00:49:50 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+[ 10/09/2023 00:49:52 ] This is a message.
+[ 10/09/2023 00:49:53 ] Error: This is an Error message!
+[ 10/09/2023 00:49:54 ] Warning: This is a Warning!
+[ 10/09/2023 00:49:55 ] Success: This message is successful.
+[ 10/09/2023 00:49:56 ] Finished testing logging system.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/06 23:33:20 ] DATE:                        2021/03/06 23:33:20
-[ 2021/03/06 23:33:20 ] PROGRAM:                     ReBar Framework 6.4.1.5505
-[ 2021/03/06 23:33:20 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/06 23:33:20 ] COMPILED:                    YES
-[ 2021/03/06 23:33:20 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/06 23:33:20 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/06 23:33:20 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/06 23:33:20 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/06 23:33:20 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/09/2023 00:50:01 ] DATE:                        10/09/2023 00:50:01
+[ 10/09/2023 00:50:01 ] PROGRAM:                     ReBar Framework 11.1.2.5582
+[ 10/09/2023 00:50:01 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/09/2023 00:50:01 ] COMPILED:                    YES
+[ 10/09/2023 00:50:01 ] WINDOWS VERSION:             WIN_10 
+[ 10/09/2023 00:50:01 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/09/2023 00:50:01 ] MEMORY (RAM):                32601.73 MB
+[ 10/09/2023 00:50:01 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/09/2023 00:50:01 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+[ 10/09/2023 00:50:03 ] This is a message.
+[ 10/09/2023 00:50:04 ] Error: This is an Error message!
+[ 10/09/2023 00:50:05 ] Warning: This is a Warning!
+[ 10/09/2023 00:50:07 ] Success: This message is successful.
+[ 10/09/2023 00:50:08 ] Finished testing logging system.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/06 23:46:02 ] DATE:                        2021/03/06 23:46:02
-[ 2021/03/06 23:46:02 ] PROGRAM:                     ReBar Framework 6.4.1.5506
-[ 2021/03/06 23:46:02 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/06 23:46:02 ] COMPILED:                    YES
-[ 2021/03/06 23:46:02 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/06 23:46:02 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/06 23:46:02 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/06 23:46:02 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/06 23:46:02 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/10/2023 07:55:55 ] DATE:                        10/10/2023 07:55:55
+[ 10/10/2023 07:55:55 ] PROGRAM:                     ReBar Framework 11.1.2.5584
+[ 10/10/2023 07:55:56 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/10/2023 07:55:56 ] COMPILED:                    YES
+[ 10/10/2023 07:55:56 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 07:55:56 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 07:55:56 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 07:55:56 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 07:55:56 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+[ 10/10/2023 07:55:56 ] This is a message.
+[ 10/10/2023 07:55:57 ] Error: This is an Error message!
+[ 10/10/2023 07:55:58 ] Warning: This is a Warning!
+[ 10/10/2023 07:55:59 ] Success: This message is successful.
+[ 10/10/2023 07:56:00 ] Finished testing logging system.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/06 23:53:10 ] DATE:                        2021/03/06 23:53:10
-[ 2021/03/06 23:53:10 ] PROGRAM:                     ReBar Framework 6.4.1.5508
-[ 2021/03/06 23:53:10 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/06 23:53:10 ] COMPILED:                    YES
-[ 2021/03/06 23:53:10 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/06 23:53:10 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/06 23:53:10 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/06 23:53:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/06 23:53:10 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/10/2023 07:56:24 ] DATE:                        10/10/2023 07:56:24
+[ 10/10/2023 07:56:24 ] PROGRAM:                     ReBar Framework 11.1.2.5584
+[ 10/10/2023 07:56:24 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/10/2023 07:56:24 ] COMPILED:                    YES
+[ 10/10/2023 07:56:24 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 07:56:24 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 07:56:24 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 07:56:24 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 07:56:24 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+[ 10/10/2023 07:56:24 ] This is a message.
+[ 10/10/2023 07:56:25 ] Error: This is an Error message!
+[ 10/10/2023 07:56:26 ] Warning: This is a Warning!
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/06 23:56:39 ] DATE:                        2021/03/06 23:56:39
-[ 2021/03/06 23:56:39 ] PROGRAM:                     ReBar Framework 6.4.1.5509
-[ 2021/03/06 23:56:39 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/06 23:56:39 ] COMPILED:                    YES
-[ 2021/03/06 23:56:39 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/06 23:56:39 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/06 23:56:39 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/06 23:56:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/06 23:56:39 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/10/2023 07:56:35 ] DATE:                        10/10/2023 07:56:35
+[ 10/10/2023 07:56:35 ] PROGRAM:                     ReBar Framework 11.1.2.5584
+[ 10/10/2023 07:56:35 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/10/2023 07:56:35 ] COMPILED:                    YES
+[ 10/10/2023 07:56:35 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 07:56:35 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 07:56:35 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 07:56:35 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 07:56:35 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+[ 10/10/2023 07:56:36 ] This is a message.
+[ 10/10/2023 07:56:37 ] Error: This is an Error message!
+[ 10/10/2023 07:56:38 ] Warning: This is a Warning!
+[ 10/10/2023 07:56:39 ] Success: This message is successful.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/06 23:57:50 ] DATE:                        2021/03/06 23:57:50
-[ 2021/03/06 23:57:50 ] PROGRAM:                     ReBar Framework 6.4.1.5510
-[ 2021/03/06 23:57:50 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/06 23:57:50 ] COMPILED:                    YES
-[ 2021/03/06 23:57:50 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/06 23:57:50 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/06 23:57:50 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/06 23:57:50 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/06 23:57:50 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/10/2023 07:57:34 ] DATE:                        10/10/2023 07:57:34
+[ 10/10/2023 07:57:34 ] PROGRAM:                     ReBar Framework 11.1.2.5585
+[ 10/10/2023 07:57:34 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/10/2023 07:57:34 ] COMPILED:                    YES
+[ 10/10/2023 07:57:34 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 07:57:34 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 07:57:34 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 07:57:34 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 07:57:34 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+[ 10/10/2023 07:57:34 ] This is a message.
+[ 10/10/2023 07:57:35 ] Error: This is an Error message!
+[ 10/10/2023 07:57:36 ] Warning: This is a Warning!
+[ 10/10/2023 07:57:37 ] Success: This message is successful.
+[ 10/10/2023 07:57:38 ] Finished testing logging system.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/07 00:07:17 ] DATE:                        2021/03/07 00:07:17
-[ 2021/03/07 00:07:17 ] PROGRAM:                     ReBar Framework 6.4.1.5511
-[ 2021/03/07 00:07:17 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 00:07:17 ] COMPILED:                    YES
-[ 2021/03/07 00:07:17 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 00:07:17 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 00:07:17 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 00:07:17 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 00:07:17 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/15/2023 14:56:03 ] DATE:                        10/15/2023 14:56:03
+[ 10/15/2023 14:56:03 ] PROGRAM:                     ReBar Framework 11.1.0.5587
+[ 10/15/2023 14:56:03 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/15/2023 14:56:03 ] COMPILED:                    YES
+[ 10/15/2023 14:56:03 ] WINDOWS VERSION:             WIN_10 
+[ 10/15/2023 14:56:03 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/15/2023 14:56:03 ] MEMORY (RAM):                32601.73 MB
+[ 10/15/2023 14:56:03 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/15/2023 14:56:03 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+[ 10/15/2023 14:56:04 ] This is a message.
+[ 10/15/2023 14:56:05 ] Error: This is an Error message!
+[ 10/15/2023 14:56:07 ] Warning: This is a Warning!
+[ 10/15/2023 14:56:08 ] Success: This message is successful.
+[ 10/15/2023 14:56:09 ] Finished testing logging system.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/07 00:12:19 ] DATE:                        2021/03/07 00:12:19
-[ 2021/03/07 00:12:19 ] PROGRAM:                     ReBar Framework 6.4.1.5512
-[ 2021/03/07 00:12:19 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 00:12:19 ] COMPILED:                    YES
-[ 2021/03/07 00:12:19 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 00:12:19 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 00:12:19 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 00:12:19 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 00:12:19 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/15/2023 14:56:23 ] DATE:                        10/15/2023 14:56:23
+[ 10/15/2023 14:56:23 ] PROGRAM:                     ReBar Framework 11.1.0.5587
+[ 10/15/2023 14:56:23 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/15/2023 14:56:23 ] COMPILED:                    YES
+[ 10/15/2023 14:56:23 ] WINDOWS VERSION:             WIN_10 
+[ 10/15/2023 14:56:23 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/15/2023 14:56:23 ] MEMORY (RAM):                32601.73 MB
+[ 10/15/2023 14:56:23 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/15/2023 14:56:23 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
-[ 2021/03/07 00:12:23 ] This is a message.
-[ 2021/03/07 00:12:24 ] This is an Error message!
-[ 2021/03/07 00:12:25 ] This is a Warning!
-[ 2021/03/07 00:12:26 ] This message is successful.
-[ 2021/03/07 00:12:27 ] This message is done.
+[ 10/15/2023 14:56:23 ] This is a message.
+[ 10/15/2023 14:56:24 ] Error: This is an Error message!
+[ 10/15/2023 14:56:26 ] Warning: This is a Warning!
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/07 00:15:07 ] DATE:                        2021/03/07 00:15:07
-[ 2021/03/07 00:15:07 ] PROGRAM:                     ReBar Framework 6.4.1.5513
-[ 2021/03/07 00:15:07 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 00:15:07 ] COMPILED:                    YES
-[ 2021/03/07 00:15:07 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 00:15:07 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 00:15:07 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 00:15:07 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 00:15:07 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/21/2023 17:02:36 ] DATE:                        10/21/2023 17:02:36
+[ 10/21/2023 17:02:36 ] PROGRAM:                     ReBar Framework 11.1.0.0
+[ 10/21/2023 17:02:36 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Rescue_X64.exe]
+[ 10/21/2023 17:02:36 ] COMPILED:                    YES
+[ 10/21/2023 17:02:36 ] WINDOWS VERSION:             WIN_10 
+[ 10/21/2023 17:02:36 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/21/2023 17:02:36 ] MEMORY (RAM):                32601.73 MB
+[ 10/21/2023 17:02:36 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/21/2023 17:02:36 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
-[ 2021/03/07 00:15:09 ] This is a message.
-[ 2021/03/07 00:15:10 ] Error: This is an Error message!
-[ 2021/03/07 00:15:11 ] Warning: This is a Warning!
-[ 2021/03/07 00:15:12 ] Success: This message is successful.
-[ 2021/03/07 00:15:13 ] Finished testing logging system.
+[ 10/21/2023 17:02:37 ] This is a message.
+[ 10/21/2023 17:02:38 ] Error: This is an Error message!
+[ 10/21/2023 17:02:39 ] Warning: This is a Warning!
+[ 10/21/2023 17:02:40 ] Success: This message is successful.
+[ 10/21/2023 17:02:41 ] Finished testing logging system.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/07 01:08:27 ] DATE:                        2021/03/07 01:08:27
-[ 2021/03/07 01:08:27 ] PROGRAM:                     ReBar Framework 6.3.0.5516
-[ 2021/03/07 01:08:27 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 01:08:27 ] COMPILED:                    YES
-[ 2021/03/07 01:08:27 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 01:08:27 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 01:08:27 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 01:08:27 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 01:08:27 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/21/2023 22:25:48 ] DATE:                        10/21/2023 22:25:48
+[ 10/21/2023 22:25:48 ] PROGRAM:                     ReBar Framework 11.1.0.5588
+[ 10/21/2023 22:25:48 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/21/2023 22:25:48 ] COMPILED:                    YES
+[ 10/21/2023 22:25:48 ] WINDOWS VERSION:             WIN_10 
+[ 10/21/2023 22:25:48 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/21/2023 22:25:48 ] MEMORY (RAM):                32601.73 MB
+[ 10/21/2023 22:25:48 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/21/2023 22:25:48 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
-[ 2021/03/07 01:08:30 ] This is a message.
-[ 2021/03/07 01:08:31 ] Error: This is an Error message!
-[ 2021/03/07 01:08:32 ] Warning: This is a Warning!
-[ 2021/03/07 01:08:33 ] Success: This message is successful.
-[ 2021/03/07 01:08:34 ] Finished testing logging system.
+[ 10/21/2023 22:25:49 ] This is a message.
+[ 10/21/2023 22:25:50 ] Error: This is an Error message!
+[ 10/21/2023 22:25:51 ] Warning: This is a Warning!
+[ 10/21/2023 22:25:52 ] Success: This message is successful.
+[ 10/21/2023 22:25:53 ] Finished testing logging system.
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/07 01:10:35 ] DATE:                        2021/03/07 01:10:35
-[ 2021/03/07 01:10:35 ] PROGRAM:                     ReBar Framework 6.3.0.5517
-[ 2021/03/07 01:10:35 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 01:10:35 ] COMPILED:                    YES
-[ 2021/03/07 01:10:35 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 01:10:35 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 01:10:35 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 01:10:35 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 01:10:35 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/22/2023 00:31:54 ] DATE:                        10/22/2023 00:31:54
+[ 10/22/2023 00:31:54 ] PROGRAM:                     ReBar Framework 11.1.0.5588
+[ 10/22/2023 00:31:54 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/22/2023 00:31:54 ] COMPILED:                    YES
+[ 10/22/2023 00:31:54 ] WINDOWS VERSION:             WIN_10 
+[ 10/22/2023 00:31:54 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/22/2023 00:31:54 ] MEMORY (RAM):                32601.73 MB
+[ 10/22/2023 00:31:54 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/22/2023 00:31:54 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
-[ 2021/03/07 01:10:37 ] This is a message.
-[ 2021/03/07 01:10:38 ] Error: This is an Error message!
-[ 2021/03/07 01:10:39 ] Warning: This is a Warning!
-[ 2021/03/07 01:10:40 ] Success: This message is successful.
-[ 2021/03/07 01:10:42 ] Finished testing logging system.
+[ 10/22/2023 00:31:56 ] This is a message.
+[ 10/22/2023 00:31:57 ] Error: This is an Error message!
+[ 10/22/2023 00:31:58 ] Warning: This is a Warning!
 
 
                                             ./
                                           (o o)
 --------------------------------------oOOo-(-)-oOOo--------------------------------------
 
-[ 2021/03/07 01:13:03 ] DATE:                        2021/03/07 01:13:03
-[ 2021/03/07 01:13:03 ] PROGRAM:                     ReBar Framework 6.3.0.5518
-[ 2021/03/07 01:13:03 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 01:13:03 ] COMPILED:                    YES
-[ 2021/03/07 01:13:03 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 01:13:03 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 01:13:03 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 01:13:03 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 01:13:03 ] WINDOWS DIRECTORY:           C:\WINDOWS
+[ 10/22/2023 01:30:28 ] DATE:                        10/22/2023 01:30:28
+[ 10/22/2023 01:30:28 ] PROGRAM:                     ReBar Framework 11.1.0.5588
+[ 10/22/2023 01:30:28 ] PROGRAM PATH:                [Z:\Resolute\Resolute\ReBar_X64.exe]
+[ 10/22/2023 01:30:28 ] COMPILED:                    YES
+[ 10/22/2023 01:30:28 ] WINDOWS VERSION:             WIN_10 
+[ 10/22/2023 01:30:28 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/22/2023 01:30:28 ] MEMORY (RAM):                32601.73 MB
+[ 10/22/2023 01:30:28 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/22/2023 01:30:28 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
-[ 2021/03/07 01:13:05 ] This is a message.
-[ 2021/03/07 01:13:06 ] Error: This is an Error message!
-[ 2021/03/07 01:13:07 ] Warning: This is a Warning!
-[ 2021/03/07 01:13:08 ] Success: This message is successful.
-[ 2021/03/07 01:13:09 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/07 01:14:57 ] DATE:                        2021/03/07 01:14:57
-[ 2021/03/07 01:14:57 ] PROGRAM:                     ReBar Framework 6.3.0.5519
-[ 2021/03/07 01:14:57 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 01:14:57 ] COMPILED:                    YES
-[ 2021/03/07 01:14:57 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 01:14:57 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 01:14:57 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 01:14:57 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 01:14:57 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/07 01:14:59 ] This is a message.
-[ 2021/03/07 01:15:01 ] Error: This is an Error message!
-[ 2021/03/07 01:15:02 ] Warning: This is a Warning!
-[ 2021/03/07 01:15:03 ] Success: This message is successful.
-[ 2021/03/07 01:15:04 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/07 01:16:57 ] DATE:                        2021/03/07 01:16:57
-[ 2021/03/07 01:16:57 ] PROGRAM:                     ReBar Framework 6.3.0.5520
-[ 2021/03/07 01:16:57 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 01:16:57 ] COMPILED:                    YES
-[ 2021/03/07 01:16:57 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 01:16:57 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 01:16:57 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 01:16:57 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 01:16:57 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/07 01:16:59 ] This is a message.
-[ 2021/03/07 01:17:00 ] Error: This is an Error message!
-[ 2021/03/07 01:17:01 ] Warning: This is a Warning!
-[ 2021/03/07 01:17:02 ] Success: This message is successful.
-[ 2021/03/07 01:17:03 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/07 01:19:37 ] DATE:                        2021/03/07 01:19:37
-[ 2021/03/07 01:19:37 ] PROGRAM:                     ReBar Framework 6.3.0.5521
-[ 2021/03/07 01:19:37 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 01:19:37 ] COMPILED:                    YES
-[ 2021/03/07 01:19:37 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 01:19:37 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 01:19:37 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 01:19:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 01:19:37 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/07 01:19:40 ] This is a message.
-[ 2021/03/07 01:19:41 ] Error: This is an Error message!
-[ 2021/03/07 01:19:42 ] Warning: This is a Warning!
-[ 2021/03/07 01:19:43 ] Success: This message is successful.
-[ 2021/03/07 01:19:44 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/07 01:21:39 ] DATE:                        2021/03/07 01:21:39
-[ 2021/03/07 01:21:39 ] PROGRAM:                     ReBar Framework 6.3.0.5521
-[ 2021/03/07 01:21:39 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 01:21:39 ] COMPILED:                    YES
-[ 2021/03/07 01:21:39 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 01:21:39 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 01:21:39 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 01:21:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 01:21:39 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/07 01:21:42 ] This is a message.
-[ 2021/03/07 01:21:43 ] Error: This is an Error message!
-[ 2021/03/07 01:21:44 ] Warning: This is a Warning!
-[ 2021/03/07 01:21:45 ] Success: This message is successful.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/07 02:22:43 ] DATE:                        2021/03/07 02:22:43
-[ 2021/03/07 02:22:43 ] PROGRAM:                     ReBar Framework 6.0.2.5522
-[ 2021/03/07 02:22:43 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/07 02:22:43 ] COMPILED:                    YES
-[ 2021/03/07 02:22:43 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/07 02:22:43 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/07 02:22:43 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/07 02:22:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/07 02:22:43 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/07 02:22:45 ] This is a message.
-[ 2021/03/07 02:22:46 ] Error: This is an Error message!
-[ 2021/03/07 02:22:47 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:23:00 ] DATE:                        2021/03/08 01:23:00
-[ 2021/03/08 01:23:00 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:23:00 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:23:00 ] COMPILED:                    YES
-[ 2021/03/08 01:23:00 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:23:00 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:23:00 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:23:00 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:23:00 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:23:02 ] This is a message.
-[ 2021/03/08 01:23:03 ] Error: This is an Error message!
-[ 2021/03/08 01:23:04 ] Warning: This is a Warning!
-[ 2021/03/08 01:23:05 ] Success: This message is successful.
-[ 2021/03/08 01:23:06 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:23:15 ] DATE:                        2021/03/08 01:23:15
-[ 2021/03/08 01:23:15 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:23:15 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:23:15 ] COMPILED:                    YES
-[ 2021/03/08 01:23:15 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:23:15 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:23:15 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:23:15 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:23:15 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:23:17 ] This is a message.
-[ 2021/03/08 01:23:18 ] Error: This is an Error message!
-[ 2021/03/08 01:23:19 ] Warning: This is a Warning!
-[ 2021/03/08 01:23:20 ] Success: This message is successful.
-[ 2021/03/08 01:23:21 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:23:43 ] DATE:                        2021/03/08 01:23:43
-[ 2021/03/08 01:23:43 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:23:43 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:23:43 ] COMPILED:                    YES
-[ 2021/03/08 01:23:43 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:23:43 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:23:43 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:23:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:23:43 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:23:45 ] This is a message.
-[ 2021/03/08 01:23:46 ] Error: This is an Error message!
-[ 2021/03/08 01:23:47 ] Warning: This is a Warning!
-[ 2021/03/08 01:23:48 ] Success: This message is successful.
-[ 2021/03/08 01:23:51 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:23:58 ] DATE:                        2021/03/08 01:23:58
-[ 2021/03/08 01:23:58 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:23:58 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:23:58 ] COMPILED:                    YES
-[ 2021/03/08 01:23:58 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:23:58 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:23:58 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:23:58 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:23:58 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:23:59 ] This is a message.
-[ 2021/03/08 01:24:00 ] Error: This is an Error message!
-[ 2021/03/08 01:24:01 ] Warning: This is a Warning!
-[ 2021/03/08 01:24:02 ] Success: This message is successful.
-[ 2021/03/08 01:24:03 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:24:40 ] DATE:                        2021/03/08 01:24:40
-[ 2021/03/08 01:24:40 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:24:40 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:24:40 ] COMPILED:                    YES
-[ 2021/03/08 01:24:40 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:24:40 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:24:40 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:24:40 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:24:40 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:24:42 ] This is a message.
-[ 2021/03/08 01:24:43 ] Error: This is an Error message!
-[ 2021/03/08 01:24:44 ] Warning: This is a Warning!
-[ 2021/03/08 01:24:45 ] Success: This message is successful.
-[ 2021/03/08 01:24:46 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:25:42 ] DATE:                        2021/03/08 01:25:42
-[ 2021/03/08 01:25:42 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:25:42 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:25:42 ] COMPILED:                    YES
-[ 2021/03/08 01:25:42 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:25:42 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:25:42 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:25:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:25:42 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:25:44 ] This is a message.
-[ 2021/03/08 01:25:45 ] Error: This is an Error message!
-[ 2021/03/08 01:25:46 ] Warning: This is a Warning!
-[ 2021/03/08 01:25:47 ] Success: This message is successful.
-[ 2021/03/08 01:25:48 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:27:55 ] DATE:                        2021/03/08 01:27:55
-[ 2021/03/08 01:27:55 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:27:55 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:27:55 ] COMPILED:                    YES
-[ 2021/03/08 01:27:55 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:27:55 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:27:55 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:27:55 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:27:55 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:27:57 ] This is a message.
-[ 2021/03/08 01:27:58 ] Error: This is an Error message!
-[ 2021/03/08 01:27:59 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:28:04 ] DATE:                        2021/03/08 01:28:04
-[ 2021/03/08 01:28:04 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:28:04 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:28:04 ] COMPILED:                    YES
-[ 2021/03/08 01:28:04 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:28:04 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:28:04 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:28:04 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:28:04 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:28:06 ] This is a message.
-[ 2021/03/08 01:28:07 ] Error: This is an Error message!
-[ 2021/03/08 01:28:08 ] Warning: This is a Warning!
-[ 2021/03/08 01:28:09 ] Success: This message is successful.
-[ 2021/03/08 01:28:10 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:37:48 ] DATE:                        2021/03/08 01:37:48
-[ 2021/03/08 01:37:48 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:37:48 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:37:48 ] COMPILED:                    YES
-[ 2021/03/08 01:37:48 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:37:48 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:37:48 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:37:48 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:37:48 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:37:49 ] This is a message.
-[ 2021/03/08 01:37:50 ] Error: This is an Error message!
-[ 2021/03/08 01:37:51 ] Warning: This is a Warning!
-[ 2021/03/08 01:37:53 ] Success: This message is successful.
-[ 2021/03/08 01:37:54 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:38:42 ] DATE:                        2021/03/08 01:38:42
-[ 2021/03/08 01:38:42 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:38:42 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:38:42 ] COMPILED:                    YES
-[ 2021/03/08 01:38:42 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:38:42 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:38:42 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:38:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:38:42 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:38:44 ] This is a message.
-[ 2021/03/08 01:38:45 ] Error: This is an Error message!
-[ 2021/03/08 01:38:46 ] Warning: This is a Warning!
-[ 2021/03/08 01:38:47 ] Success: This message is successful.
-[ 2021/03/08 01:38:48 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:43:41 ] DATE:                        2021/03/08 01:43:41
-[ 2021/03/08 01:43:41 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:43:41 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:43:41 ] COMPILED:                    YES
-[ 2021/03/08 01:43:41 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:43:41 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:43:41 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:43:41 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:43:41 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:43:43 ] This is a message.
-[ 2021/03/08 01:43:44 ] Error: This is an Error message!
-[ 2021/03/08 01:43:45 ] Warning: This is a Warning!
-[ 2021/03/08 01:43:46 ] Success: This message is successful.
-[ 2021/03/08 01:43:47 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:50:39 ] DATE:                        2021/03/08 01:50:39
-[ 2021/03/08 01:50:39 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:50:39 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:50:39 ] COMPILED:                    YES
-[ 2021/03/08 01:50:39 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:50:39 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:50:39 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:50:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:50:39 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:50:41 ] This is a message.
-[ 2021/03/08 01:50:42 ] Error: This is an Error message!
-[ 2021/03/08 01:50:43 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:50:52 ] DATE:                        2021/03/08 01:50:52
-[ 2021/03/08 01:50:52 ] PROGRAM:                     ReBar Framework 6.0.2.5523
-[ 2021/03/08 01:50:52 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:50:52 ] COMPILED:                    YES
-[ 2021/03/08 01:50:52 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:50:52 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:50:52 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:50:52 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:50:52 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:50:54 ] This is a message.
-[ 2021/03/08 01:50:55 ] Error: This is an Error message!
-[ 2021/03/08 01:50:56 ] Warning: This is a Warning!
-[ 2021/03/08 01:50:57 ] Success: This message is successful.
-[ 2021/03/08 01:50:58 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 01:59:40 ] DATE:                        2021/03/08 01:59:40
-[ 2021/03/08 01:59:40 ] PROGRAM:                     ReBar Framework 6.0.2.5524
-[ 2021/03/08 01:59:40 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 01:59:40 ] COMPILED:                    YES
-[ 2021/03/08 01:59:40 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 01:59:40 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 01:59:40 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 01:59:40 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 01:59:40 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 01:59:42 ] This is a message.
-[ 2021/03/08 01:59:43 ] Error: This is an Error message!
-[ 2021/03/08 01:59:44 ] Warning: This is a Warning!
-[ 2021/03/08 01:59:45 ] Success: This message is successful.
-[ 2021/03/08 01:59:46 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:01:06 ] DATE:                        2021/03/08 02:01:06
-[ 2021/03/08 02:01:06 ] PROGRAM:                     ReBar Framework 6.0.2.5525
-[ 2021/03/08 02:01:06 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:01:06 ] COMPILED:                    YES
-[ 2021/03/08 02:01:06 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:01:06 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:01:06 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:01:06 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:01:06 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:01:08 ] This is a message.
-[ 2021/03/08 02:01:09 ] Error: This is an Error message!
-[ 2021/03/08 02:01:10 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:03:10 ] DATE:                        2021/03/08 02:03:10
-[ 2021/03/08 02:03:10 ] PROGRAM:                     ReBar Framework 6.0.2.5525
-[ 2021/03/08 02:03:10 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:03:10 ] COMPILED:                    YES
-[ 2021/03/08 02:03:10 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:03:10 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:03:10 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:03:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:03:10 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:03:11 ] This is a message.
-[ 2021/03/08 02:03:12 ] Error: This is an Error message!
-[ 2021/03/08 02:03:14 ] Warning: This is a Warning!
-[ 2021/03/08 02:03:15 ] Success: This message is successful.
-[ 2021/03/08 02:03:16 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:06:19 ] DATE:                        2021/03/08 02:06:19
-[ 2021/03/08 02:06:19 ] PROGRAM:                     ReBar Framework 6.0.2.5526
-[ 2021/03/08 02:06:19 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:06:19 ] COMPILED:                    YES
-[ 2021/03/08 02:06:19 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:06:19 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:06:19 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:06:19 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:06:19 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:06:21 ] This is a message.
-[ 2021/03/08 02:06:22 ] Error: This is an Error message!
-[ 2021/03/08 02:06:23 ] Warning: This is a Warning!
-[ 2021/03/08 02:06:24 ] Success: This message is successful.
-[ 2021/03/08 02:06:25 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:06:39 ] DATE:                        2021/03/08 02:06:39
-[ 2021/03/08 02:06:39 ] PROGRAM:                     ReBar Framework 6.0.2.5526
-[ 2021/03/08 02:06:39 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:06:39 ] COMPILED:                    YES
-[ 2021/03/08 02:06:39 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:06:39 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:06:39 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:06:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:06:39 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:06:42 ] This is a message.
-[ 2021/03/08 02:06:43 ] Error: This is an Error message!
-[ 2021/03/08 02:06:44 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:07:07 ] DATE:                        2021/03/08 02:07:07
-[ 2021/03/08 02:07:07 ] PROGRAM:                     ReBar Framework 6.0.2.5527
-[ 2021/03/08 02:07:07 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:07:07 ] COMPILED:                    YES
-[ 2021/03/08 02:07:07 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:07:07 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:07:07 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:07:07 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:07:07 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:07:09 ] This is a message.
-[ 2021/03/08 02:07:10 ] Error: This is an Error message!
-[ 2021/03/08 02:07:11 ] Warning: This is a Warning!
-[ 2021/03/08 02:07:12 ] Success: This message is successful.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:08:33 ] DATE:                        2021/03/08 02:08:33
-[ 2021/03/08 02:08:33 ] PROGRAM:                     ReBar Framework 6.0.2.5529
-[ 2021/03/08 02:08:33 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:08:33 ] COMPILED:                    YES
-[ 2021/03/08 02:08:33 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:08:33 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:08:33 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:08:33 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:08:33 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:08:34 ] This is a message.
-[ 2021/03/08 02:08:35 ] Error: This is an Error message!
-[ 2021/03/08 02:08:36 ] Warning: This is a Warning!
-[ 2021/03/08 02:08:37 ] Success: This message is successful.
-[ 2021/03/08 02:08:38 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:10:53 ] DATE:                        2021/03/08 02:10:53
-[ 2021/03/08 02:10:53 ] PROGRAM:                     ReBar Framework 6.0.2.5530
-[ 2021/03/08 02:10:53 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:10:53 ] COMPILED:                    YES
-[ 2021/03/08 02:10:53 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:10:53 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:10:53 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:10:53 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:10:53 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:10:54 ] This is a message.
-[ 2021/03/08 02:10:55 ] Error: This is an Error message!
-[ 2021/03/08 02:10:57 ] Warning: This is a Warning!
-[ 2021/03/08 02:10:58 ] Success: This message is successful.
-[ 2021/03/08 02:10:59 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:17:35 ] DATE:                        2021/03/08 02:17:35
-[ 2021/03/08 02:17:35 ] PROGRAM:                     ReBar Framework 6.0.2.5532
-[ 2021/03/08 02:17:35 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:17:35 ] COMPILED:                    YES
-[ 2021/03/08 02:17:35 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:17:35 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:17:35 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:17:35 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:17:35 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:17:36 ] This is a message.
-[ 2021/03/08 02:17:37 ] Error: This is an Error message!
-[ 2021/03/08 02:17:38 ] Warning: This is a Warning!
-[ 2021/03/08 02:17:39 ] Success: This message is successful.
-[ 2021/03/08 02:17:40 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:17:43 ] DATE:                        2021/03/08 02:17:43
-[ 2021/03/08 02:17:43 ] PROGRAM:                     ReBar Framework 6.0.2.5532
-[ 2021/03/08 02:17:43 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:17:43 ] COMPILED:                    YES
-[ 2021/03/08 02:17:43 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:17:43 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:17:43 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:17:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:17:43 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:17:45 ] This is a message.
-[ 2021/03/08 02:17:46 ] Error: This is an Error message!
-[ 2021/03/08 02:17:47 ] Warning: This is a Warning!
-[ 2021/03/08 02:17:48 ] Success: This message is successful.
-[ 2021/03/08 02:17:49 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/08 02:20:07 ] DATE:                        2021/03/08 02:20:07
-[ 2021/03/08 02:20:07 ] PROGRAM:                     ReBar Framework 6.0.2.5533
-[ 2021/03/08 02:20:07 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/08 02:20:07 ] COMPILED:                    YES
-[ 2021/03/08 02:20:07 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/08 02:20:07 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/08 02:20:07 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/08 02:20:07 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/08 02:20:07 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/08 02:20:09 ] This is a message.
-[ 2021/03/08 02:20:10 ] Error: This is an Error message!
-[ 2021/03/08 02:20:11 ] Warning: This is a Warning!
-[ 2021/03/08 02:20:12 ] Success: This message is successful.
-[ 2021/03/08 02:20:13 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/09 01:29:37 ] DATE:                        2021/03/09 01:29:37
-[ 2021/03/09 01:29:37 ] PROGRAM:                     ReBar Framework 8.1.2.5538
-[ 2021/03/09 01:29:37 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/09 01:29:37 ] COMPILED:                    YES
-[ 2021/03/09 01:29:37 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/09 01:29:37 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/09 01:29:37 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/09 01:29:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/09 01:29:37 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/09 01:29:40 ] This is a message.
-[ 2021/03/09 01:29:41 ] Error: This is an Error message!
-[ 2021/03/09 01:29:42 ] Warning: This is a Warning!
-[ 2021/03/09 01:29:43 ] Success: This message is successful.
-[ 2021/03/09 01:29:44 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/09 01:33:14 ] DATE:                        2021/03/09 01:33:14
-[ 2021/03/09 01:33:14 ] PROGRAM:                     ReBar Framework 8.1.2.5539
-[ 2021/03/09 01:33:14 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/09 01:33:14 ] COMPILED:                    YES
-[ 2021/03/09 01:33:14 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/09 01:33:14 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/09 01:33:14 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/09 01:33:14 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/09 01:33:14 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/09 01:33:16 ] This is a message.
-[ 2021/03/09 01:33:17 ] Error: This is an Error message!
-[ 2021/03/09 01:33:18 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/09 01:33:26 ] DATE:                        2021/03/09 01:33:26
-[ 2021/03/09 01:33:26 ] PROGRAM:                     ReBar Framework 8.1.2.5539
-[ 2021/03/09 01:33:26 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/09 01:33:26 ] COMPILED:                    YES
-[ 2021/03/09 01:33:26 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/09 01:33:26 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/09 01:33:26 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/09 01:33:26 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/09 01:33:26 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/09 01:33:30 ] This is a message.
-[ 2021/03/09 01:33:31 ] Error: This is an Error message!
-[ 2021/03/09 01:33:32 ] Warning: This is a Warning!
-[ 2021/03/09 01:33:33 ] Success: This message is successful.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/09 01:33:37 ] DATE:                        2021/03/09 01:33:37
-[ 2021/03/09 01:33:37 ] PROGRAM:                     ReBar Framework 8.1.2.5539
-[ 2021/03/09 01:33:37 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/09 01:33:37 ] COMPILED:                    YES
-[ 2021/03/09 01:33:37 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/09 01:33:37 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/09 01:33:37 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/09 01:33:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/09 01:33:37 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/09 01:33:39 ] This is a message.
-[ 2021/03/09 01:33:40 ] Error: This is an Error message!
-[ 2021/03/09 01:33:41 ] Warning: This is a Warning!
-[ 2021/03/09 01:33:42 ] Success: This message is successful.
-[ 2021/03/09 01:33:43 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/09 01:34:51 ] DATE:                        2021/03/09 01:34:51
-[ 2021/03/09 01:34:51 ] PROGRAM:                     ReBar Framework 8.1.2.5539
-[ 2021/03/09 01:34:51 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/09 01:34:51 ] COMPILED:                    YES
-[ 2021/03/09 01:34:51 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/09 01:34:51 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/09 01:34:51 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/09 01:34:51 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/09 01:34:51 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/09 01:34:53 ] This is a message.
-[ 2021/03/09 01:34:54 ] Error: This is an Error message!
-[ 2021/03/09 01:34:55 ] Warning: This is a Warning!
-[ 2021/03/09 01:34:56 ] Success: This message is successful.
-[ 2021/03/09 01:34:57 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2021/03/09 01:54:22 ] DATE:                        2021/03/09 01:54:22
-[ 2021/03/09 01:54:22 ] PROGRAM:                     ReBar Framework 8.1.2.5541
-[ 2021/03/09 01:54:22 ] PROGRAM PATH:                [C:\Users\Venom\Documents\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2021/03/09 01:54:22 ] COMPILED:                    YES
-[ 2021/03/09 01:54:22 ] WINDOWS VERSION:             WIN_10 
-[ 2021/03/09 01:54:22 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2021/03/09 01:54:22 ] MEMORY (RAM):                16302.97 MB
-[ 2021/03/09 01:54:22 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2021/03/09 01:54:22 ] WINDOWS DIRECTORY:           C:\WINDOWS
------------------------------------------------------------------------------------------
-
-[ 2021/03/09 01:54:25 ] This is a message.
-[ 2021/03/09 01:54:26 ] Error: This is an Error message!
-[ 2021/03/09 01:54:27 ] Warning: This is a Warning!
-[ 2021/03/09 01:54:28 ] Success: This message is successful.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/04 02:51:36 ] DATE:                        2022/09/04 02:51:36
-[ 2022/09/04 02:51:36 ] PROGRAM:                     ReBar Framework 8.1.2.5545
-[ 2022/09/04 02:51:36 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/04 02:51:36 ] COMPILED:                    YES
-[ 2022/09/04 02:51:36 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/04 02:51:36 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/04 02:51:36 ] MEMORY (RAM):                32605.46 MB
-[ 2022/09/04 02:51:36 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/04 02:51:36 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/04 02:51:38 ] This is a message.
-[ 2022/09/04 02:51:39 ] Error: This is an Error message!
-[ 2022/09/04 02:51:40 ] Warning: This is a Warning!
-[ 2022/09/04 02:51:41 ] Success: This message is successful.
-[ 2022/09/04 02:51:42 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 07:51:59 ] DATE:                        2022/09/27 07:51:59
-[ 2022/09/27 07:51:59 ] PROGRAM:                     ReBar Framework 8.1.2.5545
-[ 2022/09/27 07:51:59 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 07:51:59 ] COMPILED:                    YES
-[ 2022/09/27 07:51:59 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 07:51:59 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 07:51:59 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 07:51:59 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 07:51:59 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 07:52:02 ] This is a message.
-[ 2022/09/27 07:52:03 ] Error: This is an Error message!
-[ 2022/09/27 07:52:04 ] Warning: This is a Warning!
-[ 2022/09/27 07:52:05 ] Success: This message is successful.
-[ 2022/09/27 07:52:06 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 10:34:45 ] DATE:                        2022/09/27 10:34:45
-[ 2022/09/27 10:34:46 ] PROGRAM:                     ReBar Framework 8.1.2.5546
-[ 2022/09/27 10:34:46 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 10:34:46 ] COMPILED:                    YES
-[ 2022/09/27 10:34:46 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 10:34:46 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 10:34:46 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 10:34:46 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 10:34:46 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 10:34:49 ] This is a message.
-[ 2022/09/27 10:34:50 ] Error: This is an Error message!
-[ 2022/09/27 10:34:51 ] Warning: This is a Warning!
-[ 2022/09/27 10:34:52 ] Success: This message is successful.
-[ 2022/09/27 10:34:53 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 10:39:10 ] DATE:                        2022/09/27 10:39:10
-[ 2022/09/27 10:39:10 ] PROGRAM:                     ReBar Framework 8.1.2.5546
-[ 2022/09/27 10:39:10 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 10:39:10 ] COMPILED:                    YES
-[ 2022/09/27 10:39:10 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 10:39:10 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 10:39:10 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 10:39:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 10:39:10 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 10:39:12 ] This is a message.
-[ 2022/09/27 10:39:13 ] Error: This is an Error message!
-[ 2022/09/27 10:39:14 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 10:41:10 ] DATE:                        2022/09/27 10:41:10
-[ 2022/09/27 10:41:10 ] PROGRAM:                     ReBar Framework 8.1.2.5547
-[ 2022/09/27 10:41:10 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 10:41:10 ] COMPILED:                    YES
-[ 2022/09/27 10:41:10 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 10:41:10 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 10:41:10 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 10:41:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 10:41:10 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 10:41:12 ] This is a message.
-[ 2022/09/27 10:41:13 ] Error: This is an Error message!
-[ 2022/09/27 10:41:14 ] Warning: This is a Warning!
-[ 2022/09/27 10:41:15 ] Success: This message is successful.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 10:43:01 ] DATE:                        2022/09/27 10:43:01
-[ 2022/09/27 10:43:01 ] PROGRAM:                     ReBar Framework 8.1.2.5547
-[ 2022/09/27 10:43:01 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 10:43:01 ] COMPILED:                    YES
-[ 2022/09/27 10:43:01 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 10:43:01 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 10:43:01 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 10:43:01 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 10:43:01 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 10:46:43 ] DATE:                        2022/09/27 10:46:43
-[ 2022/09/27 10:46:43 ] PROGRAM:                     ReBar Framework 8.1.2.5548
-[ 2022/09/27 10:46:43 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 10:46:43 ] COMPILED:                    YES
-[ 2022/09/27 10:46:43 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 10:46:43 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 10:46:43 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 10:46:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 10:46:43 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 10:46:51 ] This is a message.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 10:57:17 ] DATE:                        2022/09/27 10:57:17
-[ 2022/09/27 10:57:17 ] PROGRAM:                     ReBar Framework 8.1.2.5550
-[ 2022/09/27 10:57:17 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 10:57:17 ] COMPILED:                    YES
-[ 2022/09/27 10:57:17 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 10:57:17 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 10:57:17 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 10:57:17 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 10:57:17 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 10:57:20 ] This is a message.
-[ 2022/09/27 10:57:21 ] Error: This is an Error message!
-[ 2022/09/27 10:57:22 ] Warning: This is a Warning!
-[ 2022/09/27 10:57:23 ] Success: This message is successful.
-[ 2022/09/27 10:57:24 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 10:57:30 ] DATE:                        2022/09/27 10:57:30
-[ 2022/09/27 10:57:30 ] PROGRAM:                     ReBar Framework 8.1.2.5550
-[ 2022/09/27 10:57:30 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 10:57:30 ] COMPILED:                    YES
-[ 2022/09/27 10:57:30 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 10:57:30 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 10:57:30 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 10:57:30 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 10:57:30 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 10:57:32 ] This is a message.
-[ 2022/09/27 10:57:33 ] Error: This is an Error message!
-[ 2022/09/27 10:57:34 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:03:08 ] DATE:                        2022/09/27 11:03:08
-[ 2022/09/27 11:03:08 ] PROGRAM:                     ReBar Framework 8.1.2.5551
-[ 2022/09/27 11:03:08 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:03:08 ] COMPILED:                    YES
-[ 2022/09/27 11:03:08 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:03:08 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:03:08 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:03:08 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:03:08 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:04:19 ] DATE:                        2022/09/27 11:04:19
-[ 2022/09/27 11:04:19 ] PROGRAM:                     ReBar Framework 8.1.2.5552
-[ 2022/09/27 11:04:19 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:04:19 ] COMPILED:                    YES
-[ 2022/09/27 11:04:19 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:04:19 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:04:19 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:04:19 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:04:19 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:04:21 ] This is a message.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:07:08 ] DATE:                        2022/09/27 11:07:08
-[ 2022/09/27 11:07:08 ] PROGRAM:                     ReBar Framework 8.1.2.5554
-[ 2022/09/27 11:07:08 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:07:08 ] COMPILED:                    YES
-[ 2022/09/27 11:07:08 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:07:08 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:07:08 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:07:08 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:07:08 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:08:27 ] DATE:                        2022/09/27 11:08:27
-[ 2022/09/27 11:08:27 ] PROGRAM:                     ReBar Framework 8.1.2.5555
-[ 2022/09/27 11:08:27 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:08:27 ] COMPILED:                    YES
-[ 2022/09/27 11:08:27 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:08:27 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:08:27 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:08:27 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:08:27 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:08:29 ] This is a message.
-[ 2022/09/27 11:08:30 ] Error: This is an Error message!
-[ 2022/09/27 11:08:31 ] Warning: This is a Warning!
-[ 2022/09/27 11:08:33 ] Success: This message is successful.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:09:54 ] DATE:                        2022/09/27 11:09:54
-[ 2022/09/27 11:09:54 ] PROGRAM:                     ReBar Framework 8.1.2.5556
-[ 2022/09/27 11:09:54 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:09:54 ] COMPILED:                    YES
-[ 2022/09/27 11:09:54 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:09:54 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:09:54 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:09:54 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:09:54 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:09:56 ] This is a message.
-[ 2022/09/27 11:09:57 ] Error: This is an Error message!
-[ 2022/09/27 11:09:58 ] Warning: This is a Warning!
-[ 2022/09/27 11:09:59 ] Success: This message is successful.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:11:39 ] DATE:                        2022/09/27 11:11:39
-[ 2022/09/27 11:11:39 ] PROGRAM:                     ReBar Framework 8.1.2.5557
-[ 2022/09/27 11:11:39 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:11:39 ] COMPILED:                    YES
-[ 2022/09/27 11:11:39 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:11:39 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:11:39 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:11:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:11:39 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:11:41 ] This is a message.
-[ 2022/09/27 11:11:42 ] Error: This is an Error message!
-[ 2022/09/27 11:11:45 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:12:47 ] DATE:                        2022/09/27 11:12:47
-[ 2022/09/27 11:12:47 ] PROGRAM:                     ReBar Framework 8.1.2.5558
-[ 2022/09/27 11:12:47 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:12:47 ] COMPILED:                    YES
-[ 2022/09/27 11:12:47 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:12:47 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:12:47 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:12:47 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:12:47 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:12:48 ] This is a message.
-[ 2022/09/27 11:12:49 ] Error: This is an Error message!
-[ 2022/09/27 11:12:52 ] Warning: This is a Warning!
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:14:37 ] DATE:                        2022/09/27 11:14:37
-[ 2022/09/27 11:14:37 ] PROGRAM:                     ReBar Framework 8.1.2.5559
-[ 2022/09/27 11:14:37 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:14:37 ] COMPILED:                    YES
-[ 2022/09/27 11:14:37 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:14:37 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:14:37 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:14:37 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:14:37 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:15:43 ] DATE:                        2022/09/27 11:15:43
-[ 2022/09/27 11:15:43 ] PROGRAM:                     ReBar Framework 8.1.2.5560
-[ 2022/09/27 11:15:43 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:15:43 ] COMPILED:                    YES
-[ 2022/09/27 11:15:43 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:15:43 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:15:43 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:15:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:15:43 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:15:47 ] This is a message.
-[ 2022/09/27 11:15:48 ] Error: This is an Error message!
-[ 2022/09/27 11:15:50 ] Warning: This is a Warning!
-[ 2022/09/27 11:15:51 ] Success: This message is successful.
-[ 2022/09/27 11:15:53 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:19:21 ] DATE:                        2022/09/27 11:19:21
-[ 2022/09/27 11:19:21 ] PROGRAM:                     ReBar Framework 8.1.2.5561
-[ 2022/09/27 11:19:21 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:19:21 ] COMPILED:                    YES
-[ 2022/09/27 11:19:21 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:19:21 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:19:21 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:19:21 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:19:21 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:19:23 ] This is a message.
-[ 2022/09/27 11:19:24 ] Error: This is an Error message!
-[ 2022/09/27 11:19:25 ] Warning: This is a Warning!
-[ 2022/09/27 11:19:26 ] Success: This message is successful.
-[ 2022/09/27 11:19:27 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/09/27 11:20:24 ] DATE:                        2022/09/27 11:20:24
-[ 2022/09/27 11:20:24 ] PROGRAM:                     ReBar Framework 8.1.2.5561
-[ 2022/09/27 11:20:24 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/09/27 11:20:24 ] COMPILED:                    YES
-[ 2022/09/27 11:20:24 ] WINDOWS VERSION:             WIN_10 
-[ 2022/09/27 11:20:24 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/09/27 11:20:24 ] MEMORY (RAM):                32605.47 MB
-[ 2022/09/27 11:20:24 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/09/27 11:20:24 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/09/27 11:20:26 ] This is a message.
-[ 2022/09/27 11:20:27 ] Error: This is an Error message!
-[ 2022/09/27 11:20:28 ] Warning: This is a Warning!
-[ 2022/09/27 11:20:29 ] Success: This message is successful.
-[ 2022/09/27 11:20:30 ] Finished testing logging system.
-
-
-                                            ./
-                                          (o o)
---------------------------------------oOOo-(-)-oOOo--------------------------------------
-
-[ 2022/10/03 07:48:36 ] DATE:                        2022/10/03 07:48:36
-[ 2022/10/03 07:48:36 ] PROGRAM:                     ReBar Framework 8.1.2.5561
-[ 2022/10/03 07:48:36 ] PROGRAM PATH:                [C:\GitHub\Resolute\Resolute\ReBar_X64.exe]
-[ 2022/10/03 07:48:36 ] COMPILED:                    YES
-[ 2022/10/03 07:48:36 ] WINDOWS VERSION:             WIN_10 
-[ 2022/10/03 07:48:36 ] SYSTEM TYPE:                 64-Bit Operating System
-[ 2022/10/03 07:48:36 ] MEMORY (RAM):                32605.47 MB
-[ 2022/10/03 07:48:36 ] PROGRAM FILES DIRECTORY:     C:\Program Files
-[ 2022/10/03 07:48:36 ] WINDOWS DIRECTORY:           C:\Windows
------------------------------------------------------------------------------------------
-
-[ 2022/10/03 07:48:38 ] This is a message.
-[ 2022/10/03 07:48:39 ] Error: This is an Error message!
-[ 2022/10/03 07:48:40 ] Warning: This is a Warning!
-[ 2022/10/03 07:48:41 ] Success: This message is successful.
-[ 2022/10/03 07:48:42 ] Finished testing logging system.

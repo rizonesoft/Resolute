@@ -1,0 +1,594 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Microsoft Authenticode Signature Verification - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../appendix/Authenticode.html" class="active"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="microsoft-authenticode-signature-verification"><a class="header" href="#microsoft-authenticode-signature-verification">Microsoft Authenticode Signature Verification</a></h1>
+<h2 id="about-microsoft-authenticode"><a class="header" href="#about-microsoft-authenticode">About Microsoft Authenticode</a></h2>
+<p>Authenticode is Microsoft's system for using digital signatures to ensure that programs to be run/installed on Windows systems come from a verified source and has not been modified by anyone else. At a high level, it works by having software developers:</p>
+<ol>
+<li>Obtain a code-signing certificate from a certificate authority trusted by the Windows OS.</li>
+<li>Compute digital signatures for executables and related software installation files using that certificate.</li>
+<li>Include the signatures as part of the software execution/installation process so that Windows can use them in the verification process.</li>
+</ol>
+<p>In addition, Authenticode signatures can be countersigned by a time-stamping service that allows signature verification to succeed even if the code-signing certificate expires or gets revoked.</p>
+<p>For more information, check-out the following resources:</p>
+<ul>
+<li>
+<p><a href="https://blogs.msdn.microsoft.com/ieinternals/2011/03/22/everything-you-need-to-know-about-authenticode-code-signing/">Everything you need to know about Authenticode code-signing</a></p>
+</li>
+<li>
+<p><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/install/authenticode">Authenticode Digital Signatures</a></p>
+</li>
+<li>
+<p><a href="https://docs.microsoft.com/en-us/windows/desktop/seccrypto/time-stamping-authenticode-signatures">Time Stamping Authenticode Signatures</a></p>
+</li>
+<li>
+<p><a href="https://blogs.msdn.microsoft.com/ieinternals/2014/09/04/caveats-for-authenticode-code-signing/">Caveats for Authenticode Code Signing</a></p>
+</li>
+</ul>
+<h2 id="authenticode-and-clamav"><a class="header" href="#authenticode-and-clamav">Authenticode and ClamAV</a></h2>
+<p>ClamAV supports parsing the Authenticode section and performing signature verification on a given executable to determine whether it should be trusted (based on rules loaded in from ClamAV <code>.crb</code> files). An overview of this process, including information on the <code>.crb</code> file format and on how to add new trusted certificate entries, is explained in the <a href="https://blog.clamav.net/2013/02/authenticode-certificate-chain.html">Authenticode Certificate Chain Verification</a> ClamAV blog post.</p>
+<p>There are a few things not covered in the blog post that are worth mentioning:</p>
+<ul>
+<li>
+<p>As of ClamAV 0.102, leaf certificates (the ones actually issued to the entity signing the binary) may be used for certificate verification in addition to certificates that issued the leaf certificate (and certificates higher up in the chain) can be used.</p>
+</li>
+<li>
+<p>As of ClamAV 0.102, <code>.crb</code> rules may also be used to block malicious executables where in previous versions these block list entries just override <code>.crb</code> rules that would otherwise trust a given sample.</p>
+</li>
+<li>
+<p>SigTool offers the <code>--print-certs</code> flag, which can be used to show information about embedded Authenticode signatures without having to first match on a signature (which is currently a requirement for clamscan)</p>
+</li>
+<li>
+<p>External Authenticode signatures contained in <code>.cat</code> files can be loaded in to ClamAV by passing a <code>-d</code> flag and indicating the path to the .cat file from which to load signatures. Note, however, that at least one certificate in the <code>.cat</code> file's certificate chain must be trusted (in other words, it must have a backing <code>.crb</code> trusted certificate rule.)</p>
+</li>
+</ul>
+<h1 id="helpful-info-for-working-with-authenticode-signatures"><a class="header" href="#helpful-info-for-working-with-authenticode-signatures">Helpful Info for Working with Authenticode Signatures</a></h1>
+<p>Below is some useful information collected when improving ClamAV support for Authenticode signatures.</p>
+<h2 id="format-specifications"><a class="header" href="#format-specifications">Format Specifications</a></h2>
+<p>The Windows Authenticode 2008 specification document can be found at the link below. Note, however, that it is not 100% accurate. For instance, the documented steps for computing the Authenticode hash are not correct in the case where you have sections that overlap with the PE header or with one another.</p>
+<ul>
+<li><a href="http://download.microsoft.com/download/9/c/5/9c5b2167-8017-4bae-9fde-d599bac8184a/Authenticode_PE.docx">Windows Authenticode PE Signature Format</a></li>
+</ul>
+<h2 id="verifying-the-signature"><a class="header" href="#verifying-the-signature">Verifying the Signature</a></h2>
+<p>On Linux, osslsigncode can be used to verify a signature:</p>
+<pre><code class="language-bash">    $ osslsigncode verify /path/to/signed/file
+    Current PE checksum   : 00092934
+    Calculated PE checksum: 00092934
+
+    Message digest algorithm  : SHA256
+    Current message digest    : 56924EB391B1B04572B1841ED5D5C10927CE7D6E9553A69F994B9BA855A73933
+    Calculated message digest : 56924EB391B1B04572B1841ED5D5C10927CE7D6E9553A69F994B9BA855A73933
+
+    Signature verification: ok
+
+    Number of signers: 1
+        Signer #0:
+            Subject: /C=US/ST=California/L=Mountain View/O=Google Inc/CN=Google Inc
+            Issuer : /C=US/O=Symantec Corporation/OU=Symantec Trust Network/CN=Symantec Class 3 SHA256 Code Signing CA
+
+    Number of certificates: 2
+        Cert #0:
+            Subject: /C=US/ST=California/L=Mountain View/O=Google Inc/CN=Google Inc
+            Issuer : /C=US/O=Symantec Corporation/OU=Symantec Trust Network/CN=Symantec Class 3 SHA256 Code Signing CA
+        Cert #1:
+            Subject: /C=US/O=Symantec Corporation/OU=Symantec Trust Network/CN=Symantec Class 3 SHA256 Code Signing CA
+            Issuer : /C=US/O=VeriSign, Inc./OU=VeriSign Trust Network/OU=(c) 2006 VeriSign, Inc. - For authorized use only/CN=VeriSign Class 3 Public Primary Certification Authority - G5
+
+    Succeeded
+</code></pre>
+<p>On Windows,</p>
+<p><a href="https://blog.didierstevens.com/programs/authenticode-tools/">AnalyzePESig</a> is a great tool for displaying signature information. In addition,
+<a href="https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe#examples">signtool</a> can be used.</p>
+<p>NOTE that the machine on which these commands is run should have Internet connectivity so that revocation lists can be consulted. Otherwise, Windows may default to assuming that none of the certificates are revoked.</p>
+<p>There is also the <a href="http://code.google.com/p/verify-sigs">verify-sigs</a> python script that performs verification, but this script is no longer maintained.</p>
+<h2 id="extracting-the-signature"><a class="header" href="#extracting-the-signature">Extracting the Signature</a></h2>
+<p>On Linux, the osslsigncode command can be used to extract the contents of the PE security section:</p>
+<p><code>osslsigncode extract-signature -in /path/to/exe -out /path/to/extracted</code></p>
+<blockquote>
+<p><em>Note</em>: This will also extract the 8-byte <a href="https://docs.microsoft.com/en-us/windows/desktop/api/wintrust/ns-wintrust-_win_certificate">WIN_CERTIFICATE</a> structure data.
+To skip this data, use:</p>
+<pre><code class="language-bash">dd if=/path/to/extracted of=/path/to/extracted.p7b bs=1 skip=8`
+</code></pre>
+</blockquote>
+<h2 id="inspecting-the-signature"><a class="header" href="#inspecting-the-signature">Inspecting the Signature</a></h2>
+<p>On Linux, <code>openssl</code> has some useful functions for printing the certificate information and parsing the PKCS7 ASN1:</p>
+<pre><code class="language-bash">    $ openssl pkcs7 -inform der -print_certs -in extracted.p7b -noout -text
+    Certificate:
+        Data:
+            Version: 3 (0x2)
+            Serial Number:
+                2a:9c:21:ac:aa:a6:3a:3c:58:a7:b9:32:2b:ee:94:8d
+        Signature Algorithm: sha256WithRSAEncryption
+            Issuer: C=US, O=Symantec Corporation, OU=Symantec Trust Network, CN=Symantec Class 3 SHA256 Code Signing CA
+            Validity
+                Not Before: Dec 16 00:00:00 2015 GMT
+                Not After : Dec 16 23:59:59 2018 GMT
+            Subject: C=US, ST=California, L=Mountain View, O=Google Inc, CN=Google Inc
+            Subject Public Key Info:
+                Public Key Algorithm: rsaEncryption
+                    Public-Key: (2048 bit)
+                    Modulus:
+                        00:c4:0d:82:c4:41:29:28:e5:fd:0c:3f:a5:c7:0e:
+                        66:bd:a5:c4:8b:b3:8a:ac:84:03:9f:84:2e:38:df:
+                        06:b1:4e:fd:33:60:58:38:36:dd:22:cf:df:f1:50:
+                        1f:47:f1:55:05:c1:81:01:e7:28:3e:ff:5f:89:12:
+                        09:ea:df:aa:17:49:2c:71:ab:48:d1:9d:2e:f4:51:
+                        e0:03:e0:f7:16:6c:7b:0c:22:75:6d:7e:1f:49:c4:
+                        43:28:88:41:dc:6c:ed:13:2a:03:99:eb:62:14:f9:
+                        35:26:6e:12:2c:03:e2:f7:81:b9:1a:05:67:06:7c:
+                        a6:1a:5b:ed:20:15:e5:2d:83:de:8e:36:fa:1e:08:
+                        41:1c:1a:48:9f:b6:f1:c3:2f:02:13:4b:a7:ca:ba:
+                        ef:1c:58:6f:8e:d3:0f:14:a4:0b:2b:5d:ba:f4:5a:
+                        a3:0d:64:34:a5:8a:d7:8f:4d:22:66:4d:a4:ae:e1:
+                        f9:cd:c6:58:e6:c6:11:77:32:df:ba:df:39:48:8a:
+                        d1:27:d7:33:77:a8:c9:e4:5e:ed:fa:12:cf:f3:fd:
+                        fa:ee:ab:80:86:13:34:eb:5a:7e:6f:6c:1b:ee:d8:
+                        4b:b2:cc:77:98:87:ac:ca:f5:bb:64:6f:49:1e:5b:
+                        91:63:50:1f:63:2d:83:27:73:07:9f:2b:16:f4:7b:
+                        71:29
+                    Exponent: 65537 (0x10001)
+            X509v3 extensions:
+                X509v3 Basic Constraints:
+                    CA:FALSE
+                X509v3 Key Usage: critical
+                    Digital Signature
+                X509v3 Extended Key Usage:
+                    Code Signing
+                X509v3 Certificate Policies:
+                    Policy: 2.16.840.1.113733.1.7.23.3
+                    CPS: https://d.symcb.com/cps
+                    User Notice:
+                        Explicit Text: https://d.symcb.com/rpa
+
+                X509v3 Authority Key Identifier:
+                    keyid:96:3B:53:F0:79:33:97:AF:7D:83:EF:2E:2B:CC:CA:B7:86:1E:72:66
+
+                X509v3 CRL Distribution Points:
+
+                    Full Name:
+                    URI:http://sv.symcb.com/sv.crl
+
+                Authority Information Access:
+                    OCSP - URI:http://sv.symcd.com
+                    CA Issuers - URI:http://sv.symcb.com/sv.crt
+
+                Netscape Cert Type:
+                    Object Signing
+                1.3.6.1.4.1.311.2.1.27:
+                    0.......
+        Signature Algorithm: sha256WithRSAEncryption
+            23:e7:93:93:af:db:a8:4d:af:af:54:e8:d8:26:95:80:cd:23:
+            91:70:ed:0b:5b:b1:e9:d8:dd:1e:40:37:78:97:18:ed:9f:e5:
+            84:67:85:06:50:b5:f1:ab:e6:83:5a:17:7b:51:be:7f:18:c6:
+            47:5e:2b:aa:f4:a0:1f:35:3e:05:9f:43:40:f7:9f:d1:f4:e1:
+            a7:02:f3:8e:c9:71:fe:18:37:48:42:d7:e4:36:73:10:92:d4:
+            d8:d9:1c:c4:26:58:18:67:b6:24:22:69:63:02:f7:49:51:6b:
+            75:f6:b4:7d:56:ff:2c:f4:88:f7:67:6f:08:86:f3:8b:0b:30:
+            02:7f:6d:92:d9:4e:bd:99:f7:7b:74:86:0c:cb:b9:ad:2c:bf:
+            44:79:a8:00:82:9c:62:f4:aa:11:df:d2:bf:f0:e1:92:28:11:
+            90:bb:5e:33:88:86:96:4d:dd:0b:af:c3:67:a1:95:2d:44:32:
+            c6:fa:f7:b8:80:c1:4e:38:be:1f:b6:84:f7:f1:21:31:67:49:
+            a8:9f:8a:75:07:df:3b:3a:c3:ea:72:cd:40:7f:a7:da:7c:c9:
+            2e:7c:a9:0c:f1:5d:5c:82:42:62:b9:49:94:8f:70:e6:a5:c0:
+            5f:17:fb:40:36:c1:3a:89:63:03:1c:3f:66:a0:3d:8f:a1:4c:
+            4e:5c:ac:bf
+    ...
+</code></pre>
+<pre><code class="language-bash">    $ openssl asn1parse -inform der -i -in extracted.p7b
+        0:d=0  hl=4 l=6984 cons: SEQUENCE
+        4:d=1  hl=2 l=   9 prim:  OBJECT            :pkcs7-signedData
+    15:d=1  hl=4 l=6969 cons:  cont [ 0 ]
+    19:d=2  hl=4 l=6965 cons:   SEQUENCE
+    23:d=3  hl=2 l=   1 prim:    INTEGER           :01
+    26:d=3  hl=2 l=  15 cons:    SET
+    28:d=4  hl=2 l=  13 cons:     SEQUENCE
+    30:d=5  hl=2 l=   9 prim:      OBJECT            :sha256
+    41:d=5  hl=2 l=   0 prim:      NULL
+    43:d=3  hl=2 l=  92 cons:    SEQUENCE
+    45:d=4  hl=2 l=  10 prim:     OBJECT            :1.3.6.1.4.1.311.2.1.4
+    57:d=4  hl=2 l=  78 cons:     cont [ 0 ]
+    59:d=5  hl=2 l=  76 cons:      SEQUENCE
+    61:d=6  hl=2 l=  23 cons:       SEQUENCE
+    63:d=7  hl=2 l=  10 prim:        OBJECT            :1.3.6.1.4.1.311.2.1.15
+    75:d=7  hl=2 l=   9 cons:        SEQUENCE
+    77:d=8  hl=2 l=   1 prim:         BIT STRING
+    80:d=8  hl=2 l=   4 cons:         cont [ 0 ]
+    82:d=9  hl=2 l=   2 cons:          cont [ 2 ]
+    84:d=10 hl=2 l=   0 prim:           cont [ 0 ]
+    86:d=6  hl=2 l=  49 cons:       SEQUENCE
+    88:d=7  hl=2 l=  13 cons:        SEQUENCE
+    90:d=8  hl=2 l=   9 prim:         OBJECT            :sha256
+    101:d=8  hl=2 l=   0 prim:         NULL
+    103:d=7  hl=2 l=  32 prim:        OCTET STRING      [HEX DUMP]:56924EB391B1B04572B1841ED5D5C10927CE7D6E9553A69F994B9BA855A73933
+    ...
+</code></pre>
+<p>On Windows, the <code>certutil</code> executable has a great ASN parser:</p>
+<pre><code class="language-bash">    C:\&gt;certutil -asn extracted.p7b
+    0000: 30 82 1b 48                               ; SEQUENCE (1b48 Bytes)
+    0004: |  06 09                                  ; OBJECT_ID (9 Bytes)
+    0006: |  |  2a 86 48 86 f7 0d 01 07  02
+        |  |     ; 1.2.840.113549.1.7.2 PKCS 7 Signed
+    000f: |  a0 82 1b 39                            ; OPTIONAL[0] (1b39 Bytes)
+    0013: |     30 82 1b 35                         ; SEQUENCE (1b35 Bytes)
+    0017: |        02 01                            ; INTEGER (1 Bytes)
+    0019: |        |  01
+    001a: |        31 0f                            ; SET (f Bytes)
+    001c: |        |  30 0d                         ; SEQUENCE (d Bytes)
+    001e: |        |     06 09                      ; OBJECT_ID (9 Bytes)
+    0020: |        |     |  60 86 48 01 65 03 04 02  01
+        |        |     |     ; 2.16.840.1.101.3.4.2.1 sha256 (sha256NoSign)
+    0029: |        |     05 00                      ; NULL (0 Bytes)
+    002b: |        30 5c                            ; SEQUENCE (5c Bytes)
+    002d: |        |  06 0a                         ; OBJECT_ID (a Bytes)
+    002f: |        |  |  2b 06 01 04 01 82 37 02  01 04
+        |        |  |     ; 1.3.6.1.4.1.311.2.1.4 SPC_INDIRECT_DATA_OBJID
+    0039: |        |  a0 4e                         ; OPTIONAL[0] (4e Bytes)
+    003b: |        |     30 4c                      ; SEQUENCE (4c Bytes)
+    003d: |        |        30 17                   ; SEQUENCE (17 Bytes)
+    003f: |        |        |  06 0a                ; OBJECT_ID (a Bytes)
+    0041: |        |        |  |  2b 06 01 04 01 82 37 02  01 0f
+        |        |        |  |     ; 1.3.6.1.4.1.311.2.1.15 SPC_PE_IMAGE_DATA_OBJID
+    004b: |        |        |  30 09                ; SEQUENCE (9 Bytes)
+    ...
+</code></pre>
+<p>There is also a website that offers ASN1 parser and allows you to interactively
+hide/view parts of the structure:</p>
+<ul>
+<li><a href="https://lapo.it/asn1js/">ASN1 JavaScript Parser</a></li>
+</ul>
+<h2 id="creating-signed-executables"><a class="header" href="#creating-signed-executables">Creating Signed Executables</a></h2>
+<p>For Linux, Didier Stevens has a great post about how to create signed binaries using self-signed certificates:</p>
+<ul>
+<li><a href="https://blog.didierstevens.com/2018/09/24/quickpost-signing-windows-executables-on-kali/">Signing Windows Executables on Kali</a></li>
+</ul>
+<p>On Windows, a program called <code>signtool</code> ships with the Windows SDK and can be used. See the following for tutorials/examples:</p>
+<ul>
+<li>
+<p><a href="https://www.digicert.com/code-signing/signcode-signtool-command-line.htm">Authenticode Code Signing with Microsoft SignTool</a></p>
+</li>
+<li>
+<p><a href="https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe#examples">Signtool Examples</a></p>
+</li>
+</ul>
+<h2 id="samples-with-interesting-authenticode-signatures"><a class="header" href="#samples-with-interesting-authenticode-signatures">Samples with Interesting Authenticode Signatures</a></h2>
+<p>Below are some PE files with interesting Authenticode signatures. These are probably only interesting to other researchers who are looking at Authenticode in-depth. All samples are available via VirusTotal.</p>
+<ul>
+<li>
+<p>SHA256-based code-signing signature without a countersignature</p>
+<ul>
+<li><code>8886d96e9ed475e4686ffba3d242e97836de8a56b75cc915e21bb324cc89de03</code></li>
+</ul>
+</li>
+<li>
+<p>SHA256-based code-signing sig and SHA1-based timestamping countersig</p>
+<ul>
+<li><code>20367d0e3a5ad12154095d424b8d9818c33e7d6087525e6a3304ef6c22a53665</code></li>
+</ul>
+</li>
+<li>
+<p>SHA384-based cert used in the code-signing chain</p>
+<ul>
+<li><code>2249611fef630d666f667ac9dc7b665d3b9382956e41f10704e40bd900decbb8</code></li>
+</ul>
+</li>
+<li>
+<p>Uses SHA512 to compute the Authenticode hash</p>
+<ul>
+<li><code>eeb5469a214d5aac1dcd7e8415f93eca14edc38f47d1e360d3d97d432695207a</code></li>
+</ul>
+</li>
+<li>
+<p>Signed by an MS root cert that doesn't have a KU or EKU specified</p>
+<ul>
+<li><code>69b61b2c00323cea3686315617d0f452e205dae10c47e02cbe1ea96fea38f582</code></li>
+</ul>
+</li>
+<li>
+<p>Has a v1 x509 cert and uses MD2-based hashing</p>
+<ul>
+<li><code>1cb16f94cebdcad7dd05c8537375a6ff6379fcdb08528fc83889f26efaa84e2a</code></li>
+</ul>
+</li>
+<li>
+<p>Countersignature with version 0 instead of version 1</p>
+<ul>
+<li><code>145fbbf59b1071493686bf41f4eb364627d8be3c9dc8fb927bbe853e593864ec</code></li>
+</ul>
+</li>
+<li>
+<p>Countersignature with contentType == timestampToken instead of pkcs7-data</p>
+<ul>
+<li><code>8a364e0881fd7201cd6f0a0ff747451c9b93182d5699afb28ad8466f7f726660</code></li>
+</ul>
+</li>
+<li>
+<p>Countersignature with AlgoIdentifier sha1WithRSAEncryption instead of SHA1</p>
+<ul>
+<li><code>2aa6b18d509090c60c3e4ecdd8aeb16e5f149807e3404c86892112710eab576d</code></li>
+</ul>
+</li>
+<li>
+<p>Countersignature uses v1 x509 certs</p>
+<ul>
+<li><code>934860a4ac2446240e4c7053ddc27ff4c2463d4ad433cc28c9fcc2ea4690fb86</code></li>
+</ul>
+</li>
+<li>
+<p>Certificate chain has old certificates without a version</p>
+<ul>
+<li><code>374a31b20fbafdcd31d52ae11a0dcad58baba556c8942a3cdfae0bb96ae117a1</code></li>
+</ul>
+</li>
+<li>
+<p>Has extra data after the PKCS7, a violation of <a href="https://docs.microsoft.com/en-us/security-updates/securitybulletins/2013/ms13-098">MS13-098</a></p>
+<ul>
+<li><code>0ee196bb23f0eafe4f61d30bf6c676fd7365cb12ae66a6bde278851e91901ac1</code></li>
+</ul>
+</li>
+<li>
+<p>Authenticode signature covers data not in a section</p>
+<ul>
+<li><code>0123c163ac981e639565caff72ee3af2df7174613ee12003ac89124be461c6e6</code></li>
+</ul>
+</li>
+<li>
+<p>Authenticode signature with a section that overlaps the PE header (UPX-packed)</p>
+<ul>
+<li><code>0059fb3f225c5784789622eeccb97197d591972851b63d59f5bd107ddfdb7a21</code></li>
+</ul>
+</li>
+<li>
+<p>Authenticode signature with overlapping sections</p>
+<ul>
+<li><code>014b66cf2cef39620e9a985d237971b8cf272043e9ac372d5dcef44db754a1d2</code></li>
+</ul>
+</li>
+<li>
+<p>Uses certs with no NULL after AlgorithmIdentifier OID</p>
+<ul>
+<li><code>66b797b3b4f99488f53c2b676610dfe9868984c779536891a8d8f73ee214bc4b</code></li>
+</ul>
+</li>
+<li>
+<p>Uses an ASN1 indefinite length object</p>
+<ul>
+<li><code>8ca912e397a9e1b0cc54c216144ff550da9d43610392208193c0781b1aa5d695</code></li>
+</ul>
+</li>
+<li>
+<p>Unexpected contentType for embedded mode signature (copied from a .cat?)</p>
+<ul>
+<li><code>6ed9b5f6d32f94b3d06456b176c8536be123e1047763cc0a31c6e8fd6a0242b1</code></li>
+</ul>
+</li>
+<li>
+<p>Security directory appears to overlap with the PE header</p>
+<ul>
+<li><code>ff482f69f2183b5fd3c1b45d9006156524b8f8a5f518e33d6e92ea079787e64d</code></li>
+</ul>
+</li>
+<li>
+<p>x509 cert with a public key using exponent 3</p>
+<ul>
+<li><code>012760e582e541c6dd34a2cbd5d053f402eebcb8b60ed4a88fecb5589bd17bb9</code></li>
+</ul>
+</li>
+<li>
+<p>x509 UTCDate is missing the seconds field</p>
+<ul>
+<li><code>05de45fd6a406dc147a4c8040a54eee947cd6eba02f28c0279ffd1a229e17130</code></li>
+</ul>
+</li>
+<li>
+<p>x509 cert with a negative serial number</p>
+<ul>
+<li><code>6218d50eb5c898acd3482daaea8f615b4f1f87ef0d06220cc1d7f700bc35888b</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="additional-references"><a class="header" href="#additional-references">Additional References</a></h2>
+<ul>
+<li>
+<p><a href="https://www.cryptologie.net/article/262/what-are-x509-certificates-rfc-asn1-der/">What are x509 certificates?</a> (Provides an overview of the ASN1 structure of x509 certificates)</p>
+</li>
+<li>
+<p><a href="http://users.umiacs.umd.edu/~tdumitra/signedmalware/index.html">Signed Malware</a> (Research papers on signed malware with interactive tables of malicious code signing certs)</p>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../appendix/CvdPrivateMirror.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../appendix/FileTypes.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../appendix/CvdPrivateMirror.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../appendix/FileTypes.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

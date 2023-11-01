@@ -53,6 +53,10 @@ msgstr ""
 msgid "&Search"
 msgstr ""
 
+#. Resource IDs: (1003)
+msgid "&Whole word"
+msgstr ""
+
 #. Resource IDs: (1013)
 msgid "..."
 msgstr "..."
@@ -61,16 +65,24 @@ msgstr "..."
 msgid "/"
 msgstr "/"
 
+#. Resource IDs: (1045)
+msgid "Visit Stefan Küng's website"
+msgstr ""
+
+#. Resource IDs: (1052)
+msgid "<a>about grepWinNP3...</a>"
+msgstr ""
+
 #. Resource IDs: (1086)
 msgid ">>>"
 msgstr ">>>"
 
-#. Resource IDs: (1052, 135)
+#. Resource IDs: (135)
 msgid "About grepWinNP3"
 msgstr ""
 
 #. Resource IDs: (1021)
-msgid "Add to Presets"
+msgid "Add to Presets..."
 msgstr ""
 
 #. Resource IDs: (155)
@@ -315,20 +327,20 @@ msgstr ""
 msgid "Path"
 msgstr ""
 
-#. Resource IDs: (160)
-msgid "Path does not exist or is not accessible!"
-msgstr ""
-
 #. Resource IDs: (131)
 msgid "Preset name"
 msgstr ""
 
-#. Resource IDs: (1022, 132)
+#. Resource IDs: (1022)
+msgid "Presets..."
+msgstr ""
+
+#. Resource IDs: (132)
 msgid "Presets"
 msgstr ""
 
 #. Resource IDs: (1065)
-msgid "Press F1 for help"
+msgid "Press F1 for help..."
 msgstr ""
 
 #. Resource IDs: (154)
@@ -412,6 +424,11 @@ msgstr ""
 msgid "Searched %ld files, skipped %ld files. Found %ld matches in %ld files."
 msgstr ""
 
+#. Resource IDs: (173)
+#, c-format
+msgid "Searched %ld files, skipped %ld files. Found %ld matches in %ld files. %ld results selected."
+msgstr ""
+
 #. Resource IDs: (140)
 msgid "Select Editor Application..."
 msgstr ""
@@ -421,7 +438,7 @@ msgid "Select path to search"
 msgstr ""
 
 #. Resource IDs: (1071)
-msgid "Settings"
+msgid "Settings..."
 msgstr ""
 
 #. Resource IDs: (133)
@@ -433,7 +450,7 @@ msgid "Size is"
 msgstr ""
 
 #. Resource IDs: (1028)
-msgid "Test regex"
+msgid "Test regex..."
 msgstr ""
 
 #. Resource IDs: (136)
@@ -446,6 +463,11 @@ msgstr ""
 
 #. Resource IDs: (1002)
 msgid "Text search"
+msgstr ""
+
+#. Resource IDs: (160)
+#, c-format
+msgid "The path \"%s\" does not exist or is not accessible!"
 msgstr ""
 
 #. Resource IDs: (65535)
@@ -464,9 +486,14 @@ msgstr ""
 msgid "Treat files as binary"
 msgstr ""
 
-#. Resource IDs: (1045)
-msgid "Visit Stefan Küng's website"
+#. Resource IDs: (172)
+#, c-format
+msgid "You have the option \"%s\" enabled.\r\nWhen replacing, this option can lead to corrupted files.\r\nDo you want to proceed anyway?"
 msgstr ""
+
+#. Resource IDs: (1025)
+msgid "\\"
+msgstr "\\"
 
 #. Resource IDs: (116)
 msgid "a regular expression used for searching. Press F1 for more info."
@@ -574,6 +601,10 @@ msgstr ""
 msgid "search string is empty"
 msgstr ""
 
+#. Resource IDs: (170, 171)
+msgid "Start new grepWinNP3 window"
+msgstr ""
+
 #. Resource IDs: (114)
 msgid "the path(s) which is searched recursively.\nSeparate paths with the '|' symbol.\nExample: c:\\temp|d:\\logs"
 msgstr ""
@@ -581,6 +612,10 @@ msgstr ""
 #. Resource IDs: (113)
 msgid "you can exclude directories, e.g. CVS and images.\nExample: ^(CVS|images)$\nNote, '.svn' folders are 'hidden' on Windows, so they usually are not scanned."
 msgstr ""
+
+#. Resource IDs: (1024)
+msgid "Y"
+msgstr "Y"
 
 #. Resource IDs: (3000)
 msgid "Reset"
@@ -596,5 +631,9 @@ msgstr ""
 
 #. Resource IDs: (3005)
 msgid "This adds a new entry to the context menu named 'Open with Editor'"
+msgstr ""
+
+#. Resource IDs: (3006)
+msgid "Stay On Top"
 msgstr ""
 

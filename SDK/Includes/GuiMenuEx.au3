@@ -135,7 +135,7 @@ Func _GuiCtrlMenuEx_CreateMenuFont(ByRef $hFont, $bBold = FALSE, $bSide = FALSE)
 		If $hFont > 0 Then _WinAPI_DeleteObject($hFont)
 
 		$hFont = _WinAPI_CreateFontIndirect(DllStructGetPtr($stMenuLogFont))
-		If $hFont = 0 Then $hFont = _GuiCtrlMenuEx_CreateMenuFontByName("MS Sans Serif")
+		If $hFont = 0 Then $hFont = _GuiCtrlMenuEx_CreateMenuFontByName("Segoe UI")
 	EndIf
 
 EndFunc

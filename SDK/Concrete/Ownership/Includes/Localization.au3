@@ -48,8 +48,13 @@ Func _Localization_Custom()
 		Return
 	EndIf
 
-	$g_aLangCustom[0]  = _Localization_Load("Custom", "Label_Status_Welcome", "Welcome.")
-	$g_aLangCustom[1]  = _Localization_Load("Custom", "Label_Status_Updates", "Checking for Updates")
+	$g_aLangCustom[0]   = _Localization_Load("Custom", "Label_Status_Welcome", "Welcome.")
+	$g_aLangCustom[1]   = _Localization_Load("Custom", "Label_Status_Updates", "Checking for Updates")
+	$g_aLangCustom[2]   = _Localization_Load("Custom", "Check_Install_Pause", "Install with pause")
+	$g_aLangCustom[3]   = _Localization_Load("Custom", "Button_Install", "Install %s")
+	$g_aLangCustom[4]   = _Localization_Load("Custom", "Button_Uninstall", "Uninstall %s")
+	$g_aLangCustom[5]   = _Localization_Load("Custom", "Label_Install", "To install the %s shell extension, click the (Install %s) button.")
+	$g_aLangCustom[6]   = _Localization_Load("Custom", "Label_Uninstall", "To uninstall the %s shell extension, click the (Uninstall %s) button.")
 
 EndFunc
 
@@ -69,7 +74,7 @@ Func _Localization_Menus()
 	$g_aLangMenus[6]  = _Localization_Load("Menus", "Help", "&Help")
 	$g_aLangMenus[7]  = _Localization_Load("Menus", "Help_Update", "Check for &updates")
 	$g_aLangMenus[8]  = _Localization_Load("Menus", "Help_Home", "%{Company.Name} &Home")
-	$g_aLangMenus[9] = _Localization_Load("Menus", "Help_Downloads", "More &Downloads")
+	$g_aLangMenus[9]  = _Localization_Load("Menus", "Help_Downloads", "More &Downloads")
 	$g_aLangMenus[10] = _Localization_Load("Menus", "Help_Support", "&Get Support")
 	$g_aLangMenus[11] = _Localization_Load("Menus", "Help_Issue", "Create an &issue")
 	$g_aLangMenus[12] = _Localization_Load("Menus", "Help_Donate", "Donate to &our Cause")
@@ -83,6 +88,14 @@ Func _Localization_Messages2()
 	If StringLen($g_aLangMessages2[0]) > 0 Then
 		Return
 	EndIf
+
+	$g_aLangMessages2[0]   = _Localization_Load("Messages2", "Cleaning", "Cleaning old registry entries.")
+	$g_aLangMessages2[1]   = _Localization_Load("Messages2", "With_Pause", "Installing Take Ownership Shell Extension with Pause.")
+	$g_aLangMessages2[2]   = _Localization_Load("Messages2", "Without_Pause", "Installing Take Ownership Shell Extension without Pause.")
+	$g_aLangMessages2[3]   = _Localization_Load("Messages2", "Installing", "Installing Take Ownership Shell Extension.")
+	$g_aLangMessages2[4]   = _Localization_Load("Messages2", "Installed", "Success: Take Ownership Shell Extension Installed.")
+	$g_aLangMessages2[5]   = _Localization_Load("Messages2", "Uninstalling", "Uninstalling Take Ownership Shell Extension.")
+	$g_aLangMessages2[6]   = _Localization_Load("Messages2", "Uninstalled", "Success: Take Ownership Shell Extension Uninstalled.")
 
 EndFunc
 

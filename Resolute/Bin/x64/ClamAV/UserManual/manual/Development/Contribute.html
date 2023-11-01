@@ -1,0 +1,491 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Contribute - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html" class="active"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="project-ideas"><a class="header" href="#project-ideas">Project Ideas</a></h1>
+<p>For ClamAV library &amp; application projects, submit pull-requests to: <a href="https://github.com/Cisco-Talos/clamav">https://github.com/Cisco-Talos/clamav</a></p>
+<p>For ClamAV documentation projects, submit pull-requests to: <a href="https://github.com/Cisco-Talos/clamav-faq/pulls">https://github.com/Cisco-Talos/clamav-faq/pulls</a></p>
+<blockquote>
+<p><em>Tip</em>: If you find that any of the bugs or projects have already been completed, you can help out simply by updating the list in a pull-request to update <a href="https://github.com/Cisco-Talos/clamav-documentation/blob/master/src/manual/Development/Contribute.md">this document</a>.</p>
+</blockquote>
+<ul>
+<li><a href="#project-ideas">Project Ideas</a>
+<ul>
+<li><a href="#bugs">Bugs</a></li>
+<li><a href="#larger-projects">Larger Projects</a>
+<ul>
+<li><a href="#cmake--d-maintainer_modeon">CMake: <code>-D MAINTAINER_MODE=ON</code></a></li>
+<li><a href="#cmake--d-code_coverageon">CMake: <code>-D CODE_COVERAGE=ON</code></a></li>
+<li><a href="#develop-new-detection-capabilities-for-peelfmacho-executables">Develop New Detection Capabilities for PE/ELF/MachO Executables</a></li>
+<li><a href="#develop-memory-scanning-capabilities-for-unix">Develop Memory Scanning Capabilities for Unix</a></li>
+<li><a href="#webassembly-runtime">WebAssembly Runtime</a></li>
+<li><a href="#add-unpacking-support-for-new-packers">Add Unpacking Support for New Packers</a></li>
+<li><a href="#add-support-for-matching-on-net-internals">Add Support for Matching on .NET Internals</a></li>
+<li><a href="#extract-macros-from-oxml-docs">Extract Macros from OXML docs</a></li>
+<li><a href="#dynamically-add-new-file-types-simply-by-adding-file-type-magic-ftm-signatures">Dynamically add new file types simply by adding file type magic (.ftm) signatures</a></li>
+<li><a href="#register-scanners-for-each-file-type-write-bytecode-signature-scanners">Register scanners for each file type, Write bytecode &quot;signature&quot; scanners.</a></li>
+<li><a href="#limit-logical-signature-alerts-based-on-file-type">Limit logical signature alerts based on file type</a></li>
+<li><a href="#libclamav-callback-function-to-request-additional-file">libclamav Callback Function to Request Additional File</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="bugs"><a class="header" href="#bugs">Bugs</a></h2>
+<p>There's only so much our core dev team can schedule into each release. Many bugs probably won't be fixed without your help! Feel free to troll our <a href="https://bugzilla.clamav.net/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=NEEDINFO&amp;bug_status=REOPENED&amp;classification=ClamAV&amp;limit=0&amp;list_id=162199&amp;order=changeddate%20DESC%2Cbug_status%2Cpriority%2Cassigned_to%2Cbug_id&amp;product=ClamAV&amp;query_format=advanced&amp;resolution=---">open Bugzilla tickets</a> and our <a href="https://github.com/Cisco-Talos/clamav-devel/issues">open GitHub Issues</a> if you're looking for project ideas!</p>
+<h2 id="larger-projects"><a class="header" href="#larger-projects">Larger Projects</a></h2>
+<p>The following are a list of project ideas for someone looking to work on a larger project.
+Any projects labeled &quot;Risky&quot; or &quot;Exploratory&quot; are thought to be more likely to fail, or to have significant drawbacks that will result in the new feature being ultimately rejected.</p>
+<p>Please don't take it personally if the ClamAV team decide not to merge your implementation due to perceived complexity, stability, or other such concerns.</p>
+<p>Contributors are expected to implement ample documentation for any new code or feature. Directions on how to test the contribution as well as unit and/or system tests will significantly help with PR review and will improve the likelihood that your contribution will be accepted.</p>
+<p>Unstable or incomplete work is not likely to be accepted. The core development team has a long backlog of tasks and a curated roadmap for the next 6-12 months and will not have time to complete an unfinished project for you.</p>
+<p>Contributors submitting a sizeable new feature will be asked to sign a Contributors License Agreement (CLA) before the contribution can be accepted.</p>
+<h3 id="cmake--d-maintainer_modeon"><a class="header" href="#cmake--d-maintainer_modeon">CMake: <code>-D MAINTAINER_MODE=ON</code></a></h3>
+<p>The purpose of &quot;maintainer&quot; build-mode is to update source generated by tools like Flex, Bison, and GPerf which are not readily accessible on every platform.</p>
+<p>In this case, the project is to add <a href="https://www.gnu.org/software/gperf/manual/gperf.html">GNU <code>gperf</code></a> support to the our CMake build system's Maintainer-Mode (<code>-D MAINTAINER_MODE=ON</code>). To complete this task, you'll need to detect GPerf when using Maintainer-Mode, and it should be required. When the build runs, it should regenerate and overwrite the <code>libclamav/jsparse/generated</code> files in the source directory using <code>gperf</code> with <code>jsparse-keywords.gperf</code>.</p>
+<p>The contributor should add the new option to <code>CMakeOptions.cmake</code> and document the feature in <code>INSTALL.cmake.md</code> as well as in the <code>clamav-faq</code> repo's <code>development.md</code> developer documentation, after the feature has merged.</p>
+<p><strong>Category</strong>: Low-hanging fruit, Development</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>CMake C/C++ build system skills</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>Linux/Unix familiarity. Familiarity with compiling C/C++ projects.</li>
+</ul>
+<p><strong>Project Size</strong>: Small</p>
+<h3 id="cmake--d-code_coverageon"><a class="header" href="#cmake--d-code_coverageon">CMake: <code>-D CODE_COVERAGE=ON</code></a></h3>
+<p>Add a <code>-D CODE_COVERAGE=ON</code> option to the CMake build system which will build ClamAV with code coverage features enabled.</p>
+<p>An ideal solution would support code coverage in when using GCC, Clang, and MSVC.</p>
+<p>See <code>development.md</code> in the <code>clamav-faq</code> repo for additional insight on how <code>gcov</code>, <code>lcov</code>, and <code>genhtml</code> can be used today with the Autotools build system.</p>
+<p>The contributor should add the new option to <code>CMakeOptions.cmake</code> and document the feature in <code>INSTALL.cmake.md</code> as well as in the <code>clamav-faq</code> repo's <code>development.md</code> developer documentation, after the feature has merged.</p>
+<p><strong>Category</strong>: Low-hanging fruit, Development</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>CMake C/C++ build system skills</li>
+<li>Familiarity with C/C++ code coverage</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>Linux/Unix familiarity. Familiarity with compiling C/C++ projects.</li>
+</ul>
+<p><strong>Project Size</strong>: Small</p>
+<h3 id="develop-new-detection-capabilities-for-peelfmacho-executables"><a class="header" href="#develop-new-detection-capabilities-for-peelfmacho-executables">Develop New Detection Capabilities for PE/ELF/MachO Executables</a></h3>
+<p>ClamAV parses the PE/ELF/MachO headers on executables that it scans, but doesn't make all of the data that it extracts available for use by NDB/LDB signatures. Some features that would be great to have include:</p>
+<ul>
+<li>The ability to distinguish between regular executables and DLLs/SOs/DYLIBs (add new keywords?)</li>
+<li>Subsignature modifiers that can limit subsigs to only being evaluated against sections with memory permission flags (Read/Write/Execute). This would allow signatures to be evaluated more efficiently and also would decrease the chance of signature false positives.</li>
+<li>Parsing digital signatures in signed MachO exes and evaluating against the certificate trust / block <code>.crb</code> rules</li>
+<li>Other features that might be helpful?</li>
+</ul>
+<p>As PE, ELF, and MachO parsing features already exist in C, C is the mostly likely language of choice. However any major new self contained code would ideally be written in Rust.</p>
+<p><strong>Category</strong>: Core Development</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>The PE, ELF, and MachO file formats</li>
+<li>How ClamAV parses executable headers, performs signature matching, and the capabilities are provided</li>
+<li>How to write ClamAV signatures to match on executable files</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>Strong C development experience</li>
+<li>Rust development experince (as needed)</li>
+</ul>
+<p><strong>Project Size</strong>: Large</p>
+<h3 id="develop-memory-scanning-capabilities-for-unix"><a class="header" href="#develop-memory-scanning-capabilities-for-unix">Develop Memory Scanning Capabilities for Unix</a></h3>
+<p>Today, ClamAV works by scanning files on disk for malware. It'd be great if ClamAV could also be used to scan process memory on a system its running on in order to detect malware that isn't present on disk.</p>
+<p>The ClamAV team is already looking into integrating such a feature from clamav-win32, a project by Gianluigi Tiesi who has graciously agreed to allow us to include this <a href="https://github.com/clamwin/clamav-win32/blob/0.102/src/helpers/scanmem.c">memory scanning feature</a>  and others in the upstream clamav project.</p>
+<p>This project would be to develop a similar capability for use on Linux and/or macOS and/or BSD Unix scanning clients.</p>
+<p>As this is a relatively large new feature, an ideal solution would be written in Rust.</p>
+<p><strong>Category</strong>: Fun/Peripheral</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>The techniques and OS APIs related to inspecting the memory of running processes</li>
+<li>The security mechanisms in place to limit arbitrary access to process memory</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>Strong Rust development experience.</li>
+<li>Linux/Unix operating systems experience.</li>
+</ul>
+<p><strong>Project Size</strong>: Large</p>
+<h3 id="webassembly-runtime"><a class="header" href="#webassembly-runtime">WebAssembly Runtime</a></h3>
+<p>Background: ClamAV has for a long time had runtime support for running portable plugins we call &quot;bytecode signatures&quot;. ClamAV has a <a href="https://github.com/Cisco-Talos/clamav-bytecode-compiler">custom bytecode compiler</a> to compile these plugins from a C-like language and uses LLVM or a homegrown &quot;bytecode interpreter&quot; to run the plugins. This solution is strikingly similar to a newer portable plugin technology: WebAssembly!</p>
+<p>The goal of project would be to create a proof-of-concept WebAssembly (wasm) runtime in ClamAV so that &quot;wasm signatures&quot; could be written in Rust and executed in a wasm sandbox. As with our current bytecode signature technology, the wasm signatures would run at specific hooks in the ClamAV scanning process. They would need access to the file map (buffer) being scanned, and would be given <a href="https://github.com/Cisco-Talos/clamav/blob/dev/0.103/libclamav/bytecode_api.h">a limited API</a> to call into ClamAV functions.</p>
+<p>For a proof-of-concept, executing a local wasm plugin that has access to the file being scanned (without copying the data) would be fine. A production solution would need to convert the wasm plugin to an ascii-text encoding so it can be distributed much the same way the current bytecode signature <code>.cbc</code> plugins are distributed. As with the bytecode signatures, <code>clamscan</code> and <code>clamd</code> <em>must not</em> load the plugins unless they've been digitally signed or the <code>--bytecode-unsigned</code>/<code>BytecodeUnsigned</code> options are set, which would disable this safety precaution.</p>
+<blockquote>
+<p><em>Important Notes</em>: The ClamAV bytecode compiler project is currently undergoing a major re-write. Once complete, the new bytecode compiler will effectively be a Python script that invokes <code>clang</code> with a collection of custom compiler passes that effectively compile C code into ClamAV-bytecode plugins. This project would have you extend that project to instead use <code>rustc</code> to compile Rust ClamAV-WASM plugins.</p>
+</blockquote>
+<p><strong>Category</strong>: Core Development, Fun</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>Compilers</li>
+<li>LLVM, WebAssembly JIT</li>
+<li>Executable plugin sandboxing</li>
+<li>Rust</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>C/C++ development experience.</li>
+<li>Rust development experience.</li>
+</ul>
+<p><strong>Project Size</strong>: Large</p>
+<h3 id="add-unpacking-support-for-new-packers"><a class="header" href="#add-unpacking-support-for-new-packers">Add Unpacking Support for New Packers</a></h3>
+<p>ClamAV includes support for unpacking executables generated by several software packers so that malware can't use them to easily evade detection. The list of packers currently supported can be found in the <a href="../../Introduction.html">Introduction of the ClamAV Manual</a>. There are many packers out there, though, so there is always a need to write unpacking code for ones that are frequently used by malware authors. Some that are currently needed include:</p>
+<ul>
+<li>UPX for ELF</li>
+<li>MPRESS (although we do have some bytecode signatures for MPRESS - those might be sufficient)</li>
+<li>If anyone is interested in this, we can analyze thousands of samples and identify more candidates for this list</li>
+</ul>
+<p>Improvements to existing executable (PE/ELF/MachO) parsing code would likely be in C, but any new standalone modules would ideally be written in Rust.</p>
+<p><strong>Category</strong>: Fun/Peripheral</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>How packers function, the steps involved in run-time loading and fixing memory maps, and a general approach to unpacking</li>
+<li>You'll gain experience reverse-engineering real-world malware</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>C development experience.</li>
+<li>Rust development experience.</li>
+</ul>
+<p><strong>Project Size</strong>: Large</p>
+<h3 id="add-support-for-matching-on-net-internals"><a class="header" href="#add-support-for-matching-on-net-internals">Add Support for Matching on .NET Internals</a></h3>
+<p>YARA extracts certain properties of .NET executables and makes them available for signatures to use for detection: https://yara.readthedocs.io/en/v3.6.0/modules/dotnet.html</p>
+<p>Can ClamAV do something similar?  For instance, extract the GUIDs and allow matching on those the way we do entries in the PE VersionInfo section?</p>
+<blockquote>
+<p><em>Tip</em>: An ideal solution for this and any new file parsing feature should be written in Rust and called by our existing C code.</p>
+</blockquote>
+<p><strong>Category</strong>: Fun/Peripheral</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>How .NET executables are structured, and how they work internally</li>
+<li>How to write .NET applications (for testing)</li>
+<li>You'll also test your code against real-world malware, and perform reverse-engineering of samples as needed (if they break your code).</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>C development experience.</li>
+<li>Rust development experience.</li>
+<li>Any prior experience in the areas listed above is a plus.</li>
+</ul>
+<p><strong>Project Size</strong>: Large</p>
+<h3 id="extract-macros-from-oxml-docs"><a class="header" href="#extract-macros-from-oxml-docs">Extract Macros from OXML docs</a></h3>
+<p>ClamAV and SigTool currently support parsing OLE Office files to decompress and extract macros for scanning. The newer version OOXML Office files do not have this support, resulting in detection possible for macros in these documents. The ability to both extract and scan macros would enable better coverage. This might mean creating a new target type to prevent creating two signatures one for OLE macros and another for OOXML macros.</p>
+<blockquote>
+<p><em>Tip</em>: An ideal solution for this and any new file parsing feature should be written in Rust and called by our existing C code.</p>
+</blockquote>
+<p><strong>Category</strong>:</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>ClamAV and SigTool internals</li>
+<li>Office document macro compression (RLE compression)</li>
+<li>Macro storage in OOXML files</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>C development experience.</li>
+<li>Rust development experience.</li>
+<li>Any prior experience in the areas listed above is a plus.</li>
+</ul>
+<p><strong>Project Size</strong>: Medium</p>
+<h3 id="dynamically-add-new-file-types-simply-by-adding-file-type-magic-ftm-signatures"><a class="header" href="#dynamically-add-new-file-types-simply-by-adding-file-type-magic-ftm-signatures">Dynamically add new file types simply by adding file type magic (.ftm) signatures</a></h3>
+<p>Known file types are currently baked into each ClamAV versions along with file type magic signatures. See <code>filetypes_int.h</code>, <code>filetypes.h</code>, and <code>filetypes.c</code>. The hardcoded signature definitions for these hardcoded types are generally overridden by <code>daily.ftm</code>, a component of <code>daily.cvd</code> used to tweak file type identification definitions after release.</p>
+<p>This project would be to re-architect how file types are stored in libclamav so new file types can be dynamically added  when <code>daily.ftm</code> (or some other <code>.ftm</code> file) is loaded. Supplemental <code>.ftm</code> files should supplement the existing file type definitions, allowing an <code>extra.ftm</code> file to be tested alongside <code>daily.cvd</code>.</p>
+<p>This new capability when combined with the ability to register bytecode signatures as new file type scanners will dramatically increase the ability to extend ClamAV functionality between major version updates. Even when combined with logical signatures that target specific file types (using the proposed new <code>Type:</code> keyword instead of <code>Target:</code>, see below project idea), will allow creative analysts to write more compact and efficient logical signatures.</p>
+<p><strong>Category</strong>: Fun, Core Development</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>Software architecture experience.</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>C development experience.</li>
+</ul>
+<p><strong>Project Size</strong>: Medium</p>
+<h3 id="register-scanners-for-each-file-type-write-bytecode-signature-scanners"><a class="header" href="#register-scanners-for-each-file-type-write-bytecode-signature-scanners">Register scanners for each file type, Write bytecode &quot;signature&quot; scanners.</a></h3>
+<p>Bytecode signatures are the portable executable plugin format for ClamAV. If ClamAV file types each had one or more<code>*</code> linked list of file type handlers (&quot;scanners&quot;), then a bytecode API could be added to register a bytecode signature as a new scanner for a file type.</p>
+<p>This project should be completed after the project to dynamically add new file types with new file type magic signatures (above). This new scanning architecture would be really powerful way to add features to the product without requiring a major version update. When combined with the project to run WebAssembly signatures written in Rust (project idea above) -- this plugin-based scanner feature would have the potential to become the fastest <em>and</em> <strong>safest</strong> way to add new capabilities to ClamAV.</p>
+<p><em><strong>Example use case</strong></em>:</p>
+<p>One example use case of this feature would be to alert on the malicious use of crypto miner wallet IDs.</p>
+<p>Cryptomining malware has become increasingly prevalent with the rise in cryptocurrency prices, and we have thousands of wallet identifiers known to be associated with malicious cryptomining campaigns. We don't have a robust way of using these IDs for detection, though, because we only want to raise an alert if the ID appears to be used in a malicious way (Ex: hardcoded into a mining application or as part of a coin miner configuration file) and not in legitimate ways (Ex: blog posts about campaigns or wallet block lists used by the mining pools).</p>
+<p>The two use-cases that we want to alert on are miner config files and executables with the embedded wallet identifier. We could have two <code>.ftm</code> rules (one for each case) that indicate a <code>CL_TYPE_MINER</code> or something like that, and then scanning execution for <code>CL_TYPE_MINER</code> can go to the bytecode sig to perform any other checks that may be necessary.</p>
+<p><em><strong><code>*</code>Additional Considerations</strong></em>: ClamAV has several locations in the scanning process for invoking file type scanners:</p>
+<ol>
+<li>After initial file type identification, and before the &quot;raw scan&quot;. In <code>cli_magic_scan()</code>.</li>
+<li>Once for each embedded file types found when using <code>scanraw()</code> to also match on embedded type recognition signatures<code>*</code>. In <code>scanraw()</code>.
+<ul>
+<li><code>*</code>Embedded type recognition signature matching is a feature used to identify self-extracting archives and some harder to identify file formats, like XML-based office document formats, DMG files, master boot records (MBR), etc. It isn't used for some archive and disk image formats that we'll unpack later anyways because they cause excessive type false positives and duplicate file scanning. A common example without this safety measure was duplicate file extraction and scanning of zip file entries found in a tarball.</li>
+</ul>
+</li>
+<li>After scanning all of the found embedded types (above). At the end of <code>scanraw()</code>. These could probably be moved to (4) if it is deemed safe to remove the 1st &quot;safety measure&quot; call to <code>scanraw()</code> in <code>cli_magic_scan()</code> (i.e we'd only call <code>scanraw()</code> once, ever).</li>
+<li>Again, after the call to <code>scanraw()</code> at the bottom of <code>cli_magic_scan()</code>, for types that have bytecode hooks that won't execute unless a logical signature matches, requiring <code>scanraw()</code> to perform matching first.</li>
+</ol>
+<p>Considering that there are 3 or 4 placement options for scanners, it may be required to have 3 (or 4) different lists to add to when registering a new scanner to indicate when to run the scanner in the scanning process. An enum argument for the function would indicate which list to add it to. If inserting the new scanner for a given type from the <em>front</em> of the list, and only invoking the next scanner if the first one returns <code>CL_EPARSE</code> or <code>CL_EFORMAT</code>, then a scanner registration could be used to override an existing/built-in one <em>or</em> supplement it, whichever is desired.</p>
+<p>This project would would require coming up with a common file-type-scanner API for all scanners (including bytecode scanners), and would enable moving all file-type-scanners out of <code>scanners.c</code> and into a new file for each in a <code>scanners</code> subdirectory. A separate <code>parsers</code> subdirectory should be added at this time and each file type parser would be moved there. The distinction between a &quot;scanner&quot; and a &quot;parser&quot; is this. A scanner uses a parser to extract bits to be scanned. A parser may simply be something like an archive extraction library. In some cases, particularly in internally developed code, the distinction may be less clear and so the entire thing may be better placed under the <code>scanners</code> directory as the entry-point will doubtless need to use the common file-type-scanner API.</p>
+<p>This project will also require creating lots of regression tests for file type identification to ensure that the new architecture doesn't accidentally misclassify or fail to scan certain files.</p>
+<p>The majority of the work won't actually change ClamAV's behavior, which may seem frustrating, but the end goal is super cool. Code cleanup and organization along the way will also make a meaningful difference. This project could be split into pieces:</p>
+<ol>
+<li>Establish a common file type scanner function API and reorganize the scanners and parsers as described above.</li>
+<li>Convert the API into a callback function pointer definition and create a registration API. Add a set of scanner callback lists to each file type. The built-in scanners should be initialized either at compile time or at least when libclamav is initialized, depending on the chosen design.</li>
+</ol>
+<p><strong>Category</strong>: Very Fun, Core Development</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>Software architecture experience</li>
+<li>How to write ClamAV signatures (bytecode and LDB sigs)</li>
+<li>You'll test your code against real-world malware, and can do reverse engineering if you'd like to expand the initial coinminer classification logic.</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>Strong C development experience.</li>
+<li>Any prior experience in the areas listed below is a plus.</li>
+</ul>
+<p><strong>Project Size</strong>: Very Large</p>
+<h3 id="limit-logical-signature-alerts-based-on-file-type"><a class="header" href="#limit-logical-signature-alerts-based-on-file-type">Limit logical signature alerts based on file type</a></h3>
+<p>ClamAV signatures have a &quot;Target Type&quot; which is an integer type which can be used in signatures to limit signature matches to specific file types. ClamAV also categorizes signature patterns into two different Aho-Corasick pattern-matching trie's by Target Type. Target Type <code>1</code> (Windows executables (EXE/DLL/SYS/etc.) go in one trie, and <em>everything else</em> goes in the other trie. Unfortunately, not every file type has an associated target type. In addition, while it's conceivable to be able to add new text-based file types dynamically (see the above project idea about file type magic signatures), it is less feasible to dynamically add new numerical target types.</p>
+<p>For some advanced reading, see:</p>
+<ul>
+<li><a href="appendix/FileTypes.html">File Types</a></li>
+<li><a href="manual/Signatures/LogicalSignatures.html">Logical Signatures</a></li>
+</ul>
+<p>This project is to add a new &quot;<code>FileTypes:</code>&quot; keyword to the <code>TargetDescriptionBlock</code> for <a href="../Signatures/LogicalSignatures.html">Logical Signature (<code>.ldb</code>)</a> to limit logical signature alerts to specific file types, much like you currently can do with Target Types (&quot;<code>Target:</code>&quot;), Container File Types (&quot;<code>Container:</code>&quot;), and Container Intermediate Types (&quot;<code>Intermediates:</code>&quot;). While this isn't expected to improve scan times, it should reduce overall signature size as analysts will no longer need to duplicate the file-type-magic signature in order to limit alerting on a signature match by file type.</p>
+<p>To illustrate, this is the file type magic signature for a Microsoft Shortcut File, aka <code>CL_TYPE_LNK</code>:</p>
+<pre><code>0:0:4C0000000114020000000000C000000000000046:Microsoft Windows Shortcut File:CL_TYPE_ANY:CL_TYPE_LNK:100
+</code></pre>
+<p>Though we can classify a file as <code>CL_TYPE_LNK</code> and even unpack the file with custom scanner using that type, there is presently no way to write a signature for <code>CL_TYPE_LNK</code> files without duplicating the <code>0:4C0000000114020000000000C000000000000046</code> bit.</p>
+<p>At present a signature to alert on a &quot;malicious&quot; shortcut containing <code>0xdeadbeef</code> might look like this:</p>
+<pre><code>SignatureName;Target:0;(0&amp;1);0:4C0000000114020000000000C000000000000046;deadbeef
+</code></pre>
+<p>After this change, the signature could instead read:</p>
+<pre><code>SignatureName;Target:0,FileTypes:CL_TYPE_LNK;(0);deadbeef
+</code></pre>
+<p>Extending this, we would really like to build this new option to replace &quot;Container&quot; and &quot;Intermediates&quot;. We would like to also specify parent file types, and use a logical condition supporting alternative file types for each layer.</p>
+<p>Some examples:</p>
+<p><code>Filetypes:(ZIP|RAR)&gt;PDF</code>  to say &quot;a PDF in a ZIP or a RAR&quot;</p>
+<p><code>Filetypes:(ZIP|RAR)&gt;(PDF|HTML)</code>  to say &quot;a PDF or HTML file in a ZIP or a RAR&quot;</p>
+<p><code>Filetypes:EML&gt;ZIP&gt;*</code>  to say &quot;any file in a ZIP in an email&quot;</p>
+<p><strong>Category</strong>: Low-hanging Fruit, Core Development</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>Knowledge of ClamAV's signature databases, and logical signature evaluation.</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>C development experience.</li>
+</ul>
+<p><strong>Project Size</strong>: Medium</p>
+<h3 id="libclamav-callback-function-to-request-additional-file"><a class="header" href="#libclamav-callback-function-to-request-additional-file">libclamav Callback Function to Request Additional File</a></h3>
+<p>Add a callback function to give libclamav file parsers the ability to request additional file data from the scanning application -- I.e. <code>clamscan</code> and <code>clamd</code> (and by extension <code>clamdscan</code> &amp; <code>clamonacc</code>).</p>
+<p>This feature would enable support for split-archive scans, if all components of the split archive are present and available to the scanning application. To make this work for <code>clamdscan</code>+<code>clamd</code>, or <code>clamonacc</code>+<code>clamd</code>, the request would also have to be relayed by <code>clamd</code> over the socket API to the scanning client, and the client would have to respond with additional data, filepath, or file descriptor for <code>clamd</code> to provide via the callback to file parser.</p>
+<blockquote>
+<p><strong>Disclaimer</strong>: It's entirely likely that this idea is bogus and wouldn't work over the <code>clamd</code>+<code>clamdscan</code> socket API. This task would require a fair amount exploratory coding.</p>
+</blockquote>
+<p>When a file is scanned, the scanner (eg <code>cli_scanrar</code>) may call a callback function provided by clamscan or clamd to request scan access to other files by name, with the expectation that it would receive an <code>fmap</code> in response. Specifically, when the first file in a split archive is scanned, the parser could request <code>fmap</code>s for subsequent files to provide to the archive extraction library. Direct scanning of files other than the first file in a split archive will skip, because they are split and are not the first file.</p>
+<p><strong>Category</strong>: Risky/Exploratory, Core Development</p>
+<p><strong>What you will learn from this project</strong>:</p>
+<ul>
+<li>ClamAV and SigTool internals</li>
+<li>Socket programming</li>
+</ul>
+<p><strong>Required skills</strong>:</p>
+<ul>
+<li>C and C++ development experience.</li>
+</ul>
+<p><strong>Project Size</strong>: Large</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Development/libclamav.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../faq/faq.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Development/libclamav.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../faq/faq.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

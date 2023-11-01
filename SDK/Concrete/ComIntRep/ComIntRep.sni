@@ -1,10 +1,10 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 8
+Compatibilty = Rizonesoft SDK 11
 Script = ComIntRep.au3
 
 [Modules]
 Build = 1
-Compress = 1
+Compress = 0
 Sign = 0
 Documentation = 1
 Import = 0
@@ -50,38 +50,31 @@ File=%RootDir%\Sounds\Welcome.wav
 
 [Sources]
 
-[Links]
-CompanyURL = https://www.rizonesoft.com
-SupportURL = https://github.com/rizonesoft/Resolute/issues
-ContactURL = https://www.rizonesoft.com/#contact
-UpdateURL = https://www.rizonesoft.com/downloads/complete-internet-repair/
-UninstallURL = https://www.rizonesoft.com/uninstalled/
-
 [Environment]
-ScriptPath=C:\GitHub\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+ScriptPath=Z:\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
 Company=Rizonesoft
 CompanyURL=https://www.rizonesoft.com
 Name=Complete Internet Repair
 ShortName=ComIntRep
 Description=Complete Internet Repair
 Type=N
-Icon=C:\GitHub\Resolute\SDK\Resources\Icons\ComIntRep.ico
-Version=9.0.3.6088
-VersionMajor=9
+Icon=Z:\Resolute\SDK\Resources\Icons\ComIntRep.ico
+Version=11.1.3.6508
+VersionMajor=11
 VersionMaintenance=3
-VersionBuild=6088
+VersionBuild=6508
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
 OutFile=ComIntRep.exe
 OutFileX64=ComIntRep_X64.exe
-OutFilePath=C:\GitHub\Resolute\Resolute\ComIntRep.exe
-OutFileX64Path=C:\GitHub\Resolute\Resolute\ComIntRep_X64.exe
-InstallScriptPath=C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6088\ComIntRep_6088_Setup.iss
-InstallOutputPath=C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6088\ComIntRep_6088_Setup.exe
+OutFilePath=Z:\Resolute\Resolute\ComIntRep.exe
+OutFileX64Path=Z:\Resolute\Resolute\ComIntRep_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
 InstallSize=0
-DistributionPath=C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6088
-DistributionName=ComIntRep_6088
-FullDistributionPath=C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6088\ComIntRep_6088
-DistroSourceName=ComIntRep_6088_Source
-DistroSourceFullPath=C:\GitHub\Resolute\SDK\Concrete\ComIntRep\Distribution\6088\ComIntRep_6088_Source
+DistributionPath=Z:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508
+DistributionName=ComIntRep_6508
+FullDistributionPath=Z:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508\ComIntRep_6508
+DistroSourceName=ComIntRep_6508_Source
+DistroSourceFullPath=Z:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508\ComIntRep_6508_Source

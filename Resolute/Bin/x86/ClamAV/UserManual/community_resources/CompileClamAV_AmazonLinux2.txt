@@ -1,0 +1,53 @@
+# These are steps to compile ClamAV/ClamD on Amazon Linux 2 (could works also on other distro RHEL based)
+# Needed because on arm platform, EPEL repositories has been deprecated and it's not possible anymore to
+# install ClamAV in that WAY
+
+# TO DO
+# - Install or handle Rust, required for version 0.105
+
+cd
+pip3 install cmake pytest
+yum install systemd-devel bzip2-devel check-devel json-c-devel libcurl-devel libxml2-devel ncurses-devel openssl-devel pcre2-devel zlib-devel -y
+
+cd /usr/local/src/
+version=0.104.2
+wget https://www.clamav.net/downloads/production/clamav-$version.tar.gz
+tar -xzf clamav-$version.tar.gz
+cd clamav-$version/
+mkdir build && cd build
+cmake -DAPP_CONFIG_DIRECTORY=/etc/clamd.d  -DENABLE_CLAMONACC=false -DENABLE_MILTER=false .. &&  cmake --build .  &&  ctest  &&  cmake --build . --target install
+
+rm -f /etc/clamd.d/clamd.conf
+rm -f /etc/clamd.d/freshclam.conf
+cp /etc/clamd.d/clamd.conf.sample /etc/clamd.d/clamd.conf
+cp /etc/clamd.d/freshclam.conf.sample /etc/clamd.d/freshclam.conf
+
+
+sed -i "s/^Example/#Example/g" /etc/clamd.d/clamd.conf
+sed -i "s@^#LocalSocket .*@LocalSocket /run/clamav/clamd.ctl@g" /etc/clamd.d/clamd.conf
+sed -i "s/^#LocalSocketGroup .*/LocalSocketGroup clamav/g" /etc/clamd.d/clamd.conf
+sed -i "s/^#LogFileMaxSize 2M/#LogFileMaxSize 20M/" /etc/clamd.d/clamd.conf
+sed -i "s/^#ScanPE yes/ScanPE no/" /etc/clamd.d/clamd.conf
+sed -i "s/^#DisableCertCheck yes/DisableCertCheck yes/" /etc/clamd.d/clamd.conf
+sed -i "s/^#MaxScanTime .*/MaxScanTime 5000/" /etc/clamd.d/clamd.conf
+
+
+sed -i "s/^Example/#Example/g" /etc/clamd.d/freshclam.conf
+sed -i "s/^#LogSyslog .*/LogSyslog yes/g" /etc/clamd.d/freshclam.conf
+
+
+groupadd -r clamav
+useradd -g clamav -s /bin/false -c "Clam AntiVirus" clamav
+
+
+sed -i "s|^ExecStart=|Restart = always\nExecStart=|g" /usr/lib/systemd/system/clamav-daemon.service
+sed -i "s|^ExecStart=|Restart = always\nExecStart=|g" /usr/lib/systemd/system/clamav-freshclam.service
+
+
+systemctl enable clamav-freshclam
+systemctl enable clamav-daemon
+systemctl start clamav-freshclam
+sleep 30
+chown clamav:clamav /usr/local/share/clamav/
+systemctl start clamav-daemon
+

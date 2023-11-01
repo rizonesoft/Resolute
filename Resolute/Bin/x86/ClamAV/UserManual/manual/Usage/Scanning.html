@@ -1,0 +1,401 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Scanning - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html" class="active"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="scanning"><a class="header" href="#scanning">Scanning</a></h1>
+<p>Table Of Contents</p>
+<ul>
+<li><a href="#scanning">Scanning</a>
+<ul>
+<li><a href="#daemon">Daemon</a>
+<ul>
+<li><a href="#clamd">ClamD</a></li>
+<li><a href="#clamdscan">ClamDScan</a></li>
+<li><a href="#clamdtop">ClamDTop</a></li>
+<li><a href="#on-access-scanning">On-Access Scanning</a>
+<ul>
+<li><a href="#clamonacc-v0102">ClamOnAcc (v0.102+)</a></li>
+</ul>
+</li>
+<li><a href="#clamd-v0101">ClamD (v0.101)</a></li>
+</ul>
+</li>
+<li><a href="#one-time-scanning">One-Time Scanning</a>
+<ul>
+<li><a href="#clamscan">ClamScan</a>
+<ul>
+<li><a href="#some-basic-scans">Some basic scans</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#process-memory-scanning">Process Memory Scanning</a></li>
+<li><a href="#disclaimers">Disclaimers</a></li>
+<li><a href="#windows-specific-issues">Windows-specific Issues</a>
+<ul>
+<li><a href="#globbing">Globbing</a></li>
+<li><a href="#file-paths">File paths</a>
+<ul>
+<li><a href="#socket-and-libclamav-api-input">Socket and libclamav API Input</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><em>Tip</em>: The commands on Windows are generally the same, but you may need to add the <code>.exe</code> extension to run the ClamAV applications.</p>
+</blockquote>
+<h2 id="daemon"><a class="header" href="#daemon">Daemon</a></h2>
+<h3 id="clamd"><a class="header" href="#clamd">ClamD</a></h3>
+<p><code>clamd</code> is a multi-threaded daemon that uses <em>libclamav</em> to scan files for viruses. Scanning behavior can be fully configured to fit most needs by modifying <code>clamd.conf</code>.</p>
+<p>As <code>clamd</code> requires a virus signature database to run, we recommend setting up ClamAV's official signatures before running <code>clamd</code> using <code>freshclam</code>.</p>
+<p>The daemon works by listening for commands on the sockets specified in <code>clamd.conf</code>. Listening is supported over both unix local sockets and TCP sockets.</p>
+<p><strong>IMPORTANT:</strong> <code>clamd</code> does not currently protect or authenticate traffic coming over the TCP socket, meaning it will accept any and all of the following commands listed from <em>any</em> source. Thus, we strongly recommend following best networking practices when setting up your <code>clamd</code> instance. I.e. don't expose your TCP socket to the Internet.</p>
+<p>Here is a quick list of the commands accepted by <code>clamd</code> over the socket.</p>
+<ul>
+<li><code>PING</code></li>
+<li><code>VERSION</code></li>
+<li><code>RELOAD</code></li>
+<li><code>SHUTDOWN</code></li>
+<li><code>SCAN</code> <em>file/directory</em></li>
+<li><code>RAWSCAN</code> <em>file/directory</em></li>
+<li><code>CONTSCAN</code> <em>file/directory</em></li>
+<li><code>MULTISCAN</code> <em>file/directory</em></li>
+<li><code>ALLMATCHSCAN</code> <em>file/directory</em></li>
+<li><code>INSTREAM</code></li>
+<li><code>FILDES</code></li>
+<li><code>STATS</code></li>
+<li><code>IDSESSION, END</code></li>
+</ul>
+<p>As with most ClamAV tools, you can find out more about these by invoking the command:</p>
+<pre><code class="language-bash">man clamd
+</code></pre>
+<p>The daemon also handles the following signals as so:</p>
+<ul>
+<li><code>SIGTERM</code> - perform a clean exit</li>
+<li><code>SIGHUP</code> - reopen the log file</li>
+<li><code>SIGUSR2</code> - reload the database</li>
+</ul>
+<p>It should be noted that <code>clamd</code> should not be started using the shell operator <code>&amp;</code> or other external tools which would start it as a background process. Instead, you should run <code>clamd</code> which will load the database and then daemonize itself (unless you have specified otherwise in <code>clamd.conf</code>). After that, clamd is ready to accept connections and perform file scanning.</p>
+<p>Once you have set up your configuration to your liking, and understand how you will be sending commands to the daemon, running <code>clamd</code> itself is simple. Simply execute the command:</p>
+<pre><code class="language-bash">clamd
+</code></pre>
+<h3 id="clamdscan"><a class="header" href="#clamdscan">ClamDScan</a></h3>
+<p><code>clamdscan</code> is a <code>clamd</code> client, which greatly simplifies the task of scanning files with <code>clamd</code>. It sends commands to the <code>clamd</code> daemon across the socket specified in <code>clamd.conf</code> and generates a scan report after all requested scanning has been completed by the daemon.</p>
+<p>Thus, <strong>to run <code>clamdscan</code>, you must have an instance of <code>clamd</code> already running</strong> as well.</p>
+<p>Please keep in mind, that as a simple scanning client, <code>clamdscan</code> cannot change scanning and engine configurations. These are tied to the <code>clamd</code> instance and the configuration you set up in <code>clamd.conf</code>. Therefore, while <code>clamdscan</code> will accept many of the same commands as its sister tool <code>clamscan</code>, it will simply ignore most of them as (by design) no mechanism exists to make ClamAV engine configuration changes over the <code>clamd</code> socket.</p>
+<p>Again, running <code>clamdscan</code>, once you have a working <code>clamd</code> instance, is simple:</p>
+<pre><code class="language-bash">clamdscan [*options*] [*file/directory/-*]
+</code></pre>
+<h3 id="clamdtop"><a class="header" href="#clamdtop">ClamDTop</a></h3>
+<p><code>clamdtop</code> is a tool to monitor one or multiple instances of <code>clamd</code>. It has a colorized <em>ncurses</em> interface, which shows each job queued, memory usage, and information about the loaded signature database for the connected <code>clamd</code> instance(s). By default it will attempt to connect to the local <code>clamd</code> as defined in <code>clamd.conf</code>. However, you can specify other <code>clamd</code> instances at the command line.</p>
+<p>To learn more, use the commands</p>
+<pre><code class="language-bash">man clamdtop
+</code></pre>
+<p>or</p>
+<pre><code class="language-bash">clamdtop --help
+</code></pre>
+<h3 id="on-access-scanning"><a class="header" href="#on-access-scanning">On-Access Scanning</a></h3>
+<p>The ClamOnAcc application provides On-Access Scanning for Linux systems. On-Access Scanning is a form of real-time protection that uses ClamD to scan files when they're accessed.</p>
+<h4 id="clamonacc-v0102"><a class="header" href="#clamonacc-v0102">ClamOnAcc (v0.102+)</a></h4>
+<p>ClamAV's On-Access Scanning (<code>clamonacc</code>) is a client that runs in its own application alongside, but separately from the <code>clamd</code> instance. The On-Access Scanner is capable of preventing access to/from any malicious files it discovers--based on the verdict it receives from <code>clamd</code>--but by default it is configured to run in notify-only mode, which means it will simply alert the user if a malicious file is detected, then take any additional actions that the user may have specified at the command line, but it will not actively prevent processes from reading or writing to that file.</p>
+<blockquote>
+<p><strong>Disclaimer</strong>: Enabling Prevention mode will seriously impact performance if used on commonly accessed directories.</p>
+</blockquote>
+<blockquote>
+<p><em>Tip</em>: You can run ClamOnAcc multiple times simultaneously, each with a different config. If you want to enable Prevention-mode for one directory, while sticking to notify-only mode for any other monitored directories, that's an option!</p>
+</blockquote>
+<p>On-Access Scanning is primarily set up <a href="Configuration.html#on-access-scanning">through <code>clamd.conf</code></a>. However, you can learn more about all the configuration and command line options available to you by reading the <a href="../OnAccess.html">On-Access Scanning User Guide</a>.</p>
+<p>Once you have set up the On-Access Scanner (and <code>clamd</code>) to your liking, you will first need to run <code>clamd</code> before you can start it. If your <code>clamd</code> instance is local, it is required you run clamd as a user that is excluded (via <code>OnAccessExcludeUname</code> or <code>OnAccessExcludeUID</code>) from On-Access scanning events (e.g.) to prevent <code>clamonacc</code> from triggering events endlessly as it sends scan requests to <code>clamd</code>:</p>
+<pre><code class="language-bash">su - clamav -c &quot;/usr/local/bin/clamd
+</code></pre>
+<p>After the daemon is running, you can start the On-Access Scanner. <code>clamonacc</code> must be run as root in order to utilize its kernel event detection and intervention features:</p>
+<pre><code class="language-bash">sudo clamonacc
+</code></pre>
+<p>It will run a number of startup checks to test for a sane configuration, and ensure it can connect to <code>clamd</code>, and if everything checks out <code>clamonacc</code> will automatically fork to the background and begin monitoring your system for events.</p>
+<h3 id="clamd-v0101"><a class="header" href="#clamd-v0101">ClamD (v0.101)</a></h3>
+<p>In older versions, ClamAV's On-Access Scanner is a thread that runs within a <code>clamd</code> instance. The On-Access Scanner is capable of blocking access to/from any malicious files it discovers--based on the verdict it finds using the engine it shares with <code>clamd</code>--but by default it is configured to run in <code>notify-only</code> mode, which means it will simply alert the user if a malicious file is detected, but it will not actively prevent processes from reading or writing to that file.</p>
+<p>On-Access Scanning is primarily set up <a href="Configuration.html#on-access-scanning">through <code>clamd.conf</code></a>. However, you can learn more about all the configuration and command line options available to you by reading the <a href="../OnAccess.html">On-Access Scanning User Guide</a>.</p>
+<p>Once you have set up the On-Access Scanner to your liking, you will need to run <code>clamd</code> with elevated permissions to start it.</p>
+<pre><code class="language-bash">sudo clamd
+</code></pre>
+<h2 id="one-time-scanning"><a class="header" href="#one-time-scanning">One-Time Scanning</a></h2>
+<h3 id="clamscan"><a class="header" href="#clamscan">ClamScan</a></h3>
+<p><code>clamscan</code> is a command line tool which uses <em>libclamav</em> to scan files and/or directories for viruses. Unlike <code>clamdscan</code>, <code>clamscan</code> does <em>not</em> require a running <code>clamd</code> instance to function. Instead, <code>clamscan</code> will create a new engine and load in the virus database each time it is run. It will then scan the files and/or directories specified at the command line, create a scan report, and exit.</p>
+<p>By default, when loading databases, <code>clamscan</code> will check the location to which <code>freshclam</code> installed the virus database signatures. This behavior, along with a myriad of other scanning and engine controls, can be modified by providing flags and other options at the command line.</p>
+<p>There are too many options to list all of them here. So we'll only cover a few common and more interesting ones:</p>
+<ul>
+<li><code>--log=FILE</code> - save scan report to FILE</li>
+<li><code>--database=FILE/DIR</code> - load virus database from FILE or load all supported db files from DIR</li>
+<li><code>--official-db-only[=yes/no(*)]</code> - only load official signatures</li>
+<li><code>--max-filesize=#n</code> - files larger than this will be skipped and assumed clean</li>
+<li><code>--max-scansize=#n</code> - the maximum amount of data to scan for each container file</li>
+<li><code>--leave-temps[=yes/no(*)]</code>- do not remove temporary files</li>
+<li><code>--file-list=FILE</code> - scan files from FILE</li>
+<li><code>--quiet</code> - only output error messages</li>
+<li><code>--bell</code> - sound bell on virus detection</li>
+<li><code>--cross-fs[=yes(*)/no]</code> - scan files and directories on other filesystems</li>
+<li><code>--move=DIRECTORY</code> - move infected files into DIRECTORY</li>
+<li><code>--copy=DIRECTORY</code> - copy infected files into DIRECTORY</li>
+<li><code>--bytecode-timeout=N</code> - set bytecode timeout (in milliseconds)</li>
+<li><code>--heuristic-alerts[=yes(*)/no]</code> - toggles heuristic alerts</li>
+<li><code>--alert-encrypted[=yes/no(*)]</code> - alert on encrypted archives and documents</li>
+<li><code>--nocerts</code> - disable authenticode certificate chain verification in PE files</li>
+<li><code>--disable-cache</code> - disable caching and cache checks for hash sums of scanned files</li>
+</ul>
+<p>To learn more about the options available when using <code>clamscan</code> please reference:</p>
+<pre><code class="language-bash">man clamscan
+</code></pre>
+<p>and</p>
+<pre><code class="language-bash">clamscan --help
+</code></pre>
+<p>Otherwise, the general usage of clamscan is:</p>
+<pre><code class="language-bash">clamscan [options] [file/directory/-]
+</code></pre>
+<h4 id="some-basic-scans"><a class="header" href="#some-basic-scans">Some basic scans</a></h4>
+<p>Run this to scan the files in the current directory:</p>
+<pre><code class="language-bash">clamscan .
+</code></pre>
+<p>This will scan the current directory. At the end of the scan, it will display a summary. If you notice in the clamscan output, it only scanned something like 60 files, even though there are more files in subdirectories. By default, clamscan will only scan files in the current directory.</p>
+<p>Run this to scan all the files in the current directory:</p>
+<pre><code class="language-bash">clamscan --recursive .
+</code></pre>
+<p>Run this to scan ALL the files on your system, it will take <strong>quite</strong> a while. Keep in mind that you can cancel it at any time by pressing <code>Ctrl-C</code>:</p>
+<p>Linux/Unix:</p>
+<pre><code class="language-bash">clamscan --recursive /
+</code></pre>
+<p>Windows:</p>
+<pre><code class="language-bash">clamscan.exe --recursive C:\
+</code></pre>
+<h2 id="process-memory-scanning"><a class="header" href="#process-memory-scanning">Process Memory Scanning</a></h2>
+<blockquote>
+<p><em>Note</em>: This feature requires Windows and ClamAV version 0.105 or newer. You must also be running ClamAV as Administrator.</p>
+</blockquote>
+<p><code>clamscan</code> and <code>clamdscan</code> are able to scan the virtual memory of currently executing processes. To do so, use the <code>--memory</code> option:</p>
+<pre><code class="language-bash">clamscan --memory
+</code></pre>
+<p>The <code>--kill</code> and <code>--unload</code> options allow for killing/unloading infected loaded modules.</p>
+<h2 id="disclaimers"><a class="header" href="#disclaimers">Disclaimers</a></h2>
+<blockquote>
+<p><strong>Disclaimer</strong>: ClamAV doesn't have a &quot;quick scan&quot; mode. ClamAV is malware detection toolkit, not an endpoint security suite. It's up to you to decide what to scan. A full system scan is going to take a long time with ClamAV or with any anti-virus software.</p>
+</blockquote>
+<blockquote>
+<p><strong>Disclaimer 2</strong>: ClamScan, ClamOnAcc, and ClamDScan each include <code>--remove</code> options for deleting any file which alerts during a scan. This is generally a terrible idea, unless you're monitoring an upload/downloads directory. False positives happen! You do not want to have the wrong file accidentally deleted. Instead, consider using <code>--move</code> or perhaps just <code>--copy</code> and set up script with the ClamD <code>VirusEvent</code> feature to notify you when something has been detected.</p>
+</blockquote>
+<h2 id="windows-specific-issues"><a class="header" href="#windows-specific-issues">Windows-specific Issues</a></h2>
+<h3 id="globbing"><a class="header" href="#globbing">Globbing</a></h3>
+<p>Since the Windows command prompt doesn't take care of wildcard expansion, minimal emulation of unix glob() is performed internally. It supports <code>*</code> and <code>?</code> only.</p>
+<h3 id="file-paths"><a class="header" href="#file-paths">File paths</a></h3>
+<p>Please always use the backslash as the path separator. SMB Network shares and UNC paths are supported.</p>
+<h4 id="socket-and-libclamav-api-input"><a class="header" href="#socket-and-libclamav-api-input">Socket and libclamav API Input</a></h4>
+<p>The Windows version of ClamAV requires all the input to be UTF-8 encoded.</p>
+<p>This affects:</p>
+<ul>
+<li>The API, notably the <code>cl_scanfile()</code> function</li>
+<li>ClamD socket input, e.g. the commands <code>SCAN</code>, <code>CONTSCAN</code>, <code>MUTLISCAN</code>, etc.</li>
+<li>ClamD socket output, i.e replies to the above queries</li>
+</ul>
+<p>For legacy reasons ANSI (i.e. <code>CP_ACP</code>) input will still be accepted and processed as before, but with two important remarks:</p>
+<ol>
+<li>Socket replies to ANSI queries will still be UTF-8 encoded.</li>
+<li>ANSI sequences which are also valid UTF-8 sequences will be handled as UTF-8.</li>
+</ol>
+<p>As a side note, console output (stdin and stderr) will always be OEM encoded, even when redirected to a file.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Usage/SignatureManagement.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/OnAccess.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Usage/SignatureManagement.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/OnAccess.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

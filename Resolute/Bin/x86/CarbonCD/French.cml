@@ -1,0 +1,528 @@
+#   Carbon CD Language file
+#
+#Author:Rico.sos
+#Language:French
+#
+###################################
+#Resource Commune
+#
+Rizonesoft Carbon CD
+OK
+Annuler
+Erreur
+Attention
+Confirmation
+###################################
+#Menu principal du dialogue
+#
+&Fichier
+&Outils
+&CD
+&Fenêtre
+&Aide
+#Rizonesoft Carbon CD ///////////////////
+&Paramètres
+Q&uitter
+#Outil /////////////////////////////
+Afficher &capacité du lecteur
+&Calculateur MSF
+&Effacer le Média CD-RW
+&Effaçage rapide Média CD-RW
+#CD ///////////////////////////////
+Reconnaître &CD
+&Analyse de sous-code
+Clo&ne CD
+&Lire le fichier image
+&Écrire depuis un fichier image
+&Mastérisation
+Lire &Pistes
+#Fenêtre ////////////////////////////
+&Fenêtre TOC
+&Fenêtre Journal
+#Aide //////////////////////////////
+&Aide
+&À propos de Carbon CD
+####################################
+#Menu Fenêtre Toc
+#
+&Fichier
+&Fenêtre
+#Fichier //////////////////////////////
+Sauvegarder TOC au format &Texte
+Sauvegarder TOC au format &HTML
+Sauvegarder TOC au format &CSV
+Sauvegarder TOC en tant que Cue-&Sheet
+#Fenêtre ////////////////////////////
+&Fermer la fenêtre
+####################################
+#Menu de la fenêtre du journal
+#
+&Fichier
+&Fenêtre
+#Fichier //////////////////////////////
+&Sauvegarder le journal
+#Fenêtre ////////////////////////////
+&Fermer la fenêtre
+#Fichier //////////////////////////////
+&Effacer le journal
+####################################
+#Menu du dialogue de mastérisation
+#
+&Fenêtre
+&Créer
+&Piste
+&Fichier && Dossier
+#Fenêtre ////////////////////////////
+&Q&uitter
+#Créer ////////////////////////////
+Créer &Image
+&Écrire sur CD
+#Piste /////////////////////////////
+Insérer Piste de &Données
+Insérer Piste &Audio
+&Retirer piste
+#Fichier & Dossier //////////////////////
+&Créer nouveau dossier
+Ajouter &Fichier
+&Retirer
+Re&nommer
+&Insérer Dossier
+#Piste /////////////////////////////
+Insérer &ISO comme piste de données
+Lancer &Explorer
+####################################
+# Masterisation menu contextuel
+#
+&Ajouter Dossier
+Ajouter &Fichier
+&Retirer
+Re&nommer
+Insérer Piste de &Données
+Insérer Piste &Audio
+&Retirer piste
+####################################
+# À propos de la ressource de dialogue
+#
+À propos de Carbon CD
+Lire CD, Écrire, Dupliquer, Mastérisation
+####################################
+# Ressource de dialogue du calculateur MSF
+#
+Calculator MSF
+Calc
+Fermer
+####################################
+# Créer une ressource de dialogue de progression
+#
+Créer un fichier image
+Journal
+Annuler
+####################################
+# Ressources pour le dialogue sur capacités du lecteur
+#
+Affichage de la capacité du lecteur
+Information
+ID du Lecteur
+ASPI - [ Ha:Tgt:Lun ]
+SPTI - [ lettre du Lecteur ]
+Fournisseur
+Nom du Produit
+Révision du firmware
+Capacité du lecteur
+En écrivant
+CMD par défaut
+Taille du tampon
+CMD par défaut est détectée par l'option 'Détection auto de la commande d'écriture'.
+####################################
+# Effacer la ressource de dialogue
+#
+Effacer Média
+Effacement Media
+Effacement Rapide des Médias
+Achever!
+Défaillance!
+####################################
+# Ressource principale du dialogue
+#
+Rizonesoft Carbon CD
+ Lire CD dans un fichier image
+ Écrire depuis un fichier image sur un CD
+ Clone CD
+ Analyse du sous-canal
+ Actualiser les infos du CD
+ Lire les pistes du CD
+ Mastérisation CD et fichier image
+ Quitter Carbon CD
+####################################
+# Mastérisation Ressource de dialogue
+#
+Mastérisation
+Label volume
+Toujours visible
+Liste des pistes
+Données (ISO 9660)
+Longueur de l'image est trop grande. Forcer la surgravure ?
+Créer Image
+Écrire sur CD
+Fermer
+Aucune
+Type
+Nom du Fichier
+DISQUE DE DONNÉES
+Nom du Fichier
+Type
+Taille
+Date(GMT)
+Nom du Fichier(Source)
+Veuillez choisir un dossier.
+Paramètres
+#20
+Changer de lecteur
+Notifier le nom de fichier tronqué
+Ordre supérieur
+Ordre inférieur
+Lancer Explorer
+Fonctions de protection du disque de données ( Seulement pour  mastérisation ISO)
+Aucune protection
+30sec secteurs RAW spéciaux (faciles à copier)
+60sec secteurs RAW spéciaux
+90sec secteurs RAW spéciaux
+ 5min secteurs RAW spéciaux
+10min secteurs RAW spéciaux
+20min secteurs RAW spéciaux
+30min secteurs RAW spéciaux(difficile à copier)
+####################################
+# Lire ressource de dialogue de progression
+#
+En lecture dpuis CD
+Journal
+Annuler
+####################################
+# Lire ressource de dialogue de paramètre
+#
+Lire depuis CD
+Lecteur pour lire
+Fichier Image(.cue .cdm)
+Parcourir
+Mode test
+Mode session unique (haute compatibilité)
+Mode multi-session (haute performance)
+Vitesse audio
+Vitesse données
+Paramètres étendus
+Analyser sous-code (obtenir une table des matières exacte)
+Ignorer erreurs de lecture
+Ignorer rapidement les erreurs
+Scanner intelligent des secteurs défectueux
+Permuter le canal audio
+Détection auto de la commande de lecture
+Vitesse de lecture
+Analyser Pregap (-150...0 secteur)
+Mode comparaison de données
+Lire le mode Alpha-ROM
+####################################
+# Lire la ressource de dialogue paramètre de piste
+#
+Lire piste
+Nom du Fichier
+####################################
+# Paramètre de la ressource de dialogue
+#
+Paramètres
+Spécifier le gestionnaire ASPI
+Sauvegarde auto des données du journal
+Méthode et vitesse d'analyse sous-code
+Taille du bloc lors du transfert
+Fichier temporaire (clonage)
+Utiliser thème externe
+...
+Processus prioritaire
+Normal
+Inactif
+Haut
+Utiliser SPTI pour l'accès
+Général
+Interface
+I/O
+Analyse
+Jouer son si processus réussi
+Jouer son sur processus ayant échoué
+####################################
+# Ressource de dialogue de progression de l'analyseur de sous-code
+#
+Analyser le sous-code
+Journal
+Annuler
+####################################
+# Ressource de dialogue de progression d'écriture
+#
+Écriture sur CD
+Journal
+Annuler
+####################################
+# Ressource de dialogue de réglage d'écriture
+#
+Écriture sur CD
+Graveur
+Nom du fichier(.cue .cdm)
+...
+Mode Test
+Étalonnage de la puissance optimale
+Protection contre le dépassement de tampon
+Éjecter le tiroir
+Vitesse d'écriture
+Vérifier le lecteur comme compatible CD-R
+Détection auto de la commande d'écriture
+Commandes d'écriture
+Paramètres étendus
+####################################
+# Ressource de la fenêtre TOC
+#
+TOC
+TNO
+Type
+Démarrer Addr
+Piste Len.
+Pre Gap
+Taille
+Copie Digitale
+Accentuation
+Permis
+Interdit
+Aucune
+Totale
+Fichiers texte(*.txt)|*.txt|Tous types de fichiers|*.*||
+Fichiers HTML(*.html,*.htm)|*.html;*.htm|Tous types de fichiers|*.*||
+Fichiers CSV(*.csv)|*.csv|Tous types de fichiers|*.*||
+####################################
+# Ressource de la fenêtre JOURNAL
+#
+JOURNAL
+Fichiers Texte(*.txt)|*.txt|Tous types de fichiers|*.*||
+####################################
+# Messages
+#
+# Messages ASPI
+Impossible de charger le gestionnaire ASPI.
+# Messages du graveur de CD
+Impossible d'ouvrir le fichier Cue-Sheet
+Erreur sur Cue-Sheet:%s
+Mauvais paramètres (commande inacceptable)
+Échec de l'ouverture du tiroir
+#5-----------
+Lecteur est occupé.
+Disque non VIERGE!
+Mauvaise position (PISTE):%s
+Type non compatible:%s
+Mauvaise position(INDEX)EEs
+#10----------
+Numéro INDEX non supporté:%s
+Nom de fichier n'existe pas:%s
+Mauvais format en tant qu'instruction FICHIER:%s
+Type de fichier non compatible:%s
+Fichier image n'existe pas:%s
+#15----------
+Instruction non acceptée:%s
+'INDEX 01' n'existe pas sur la piste%02d
+Abandonner par l'utilisateur
+Abandonner par erreur
+Finie
+#20----------
+Vitesse max
+Nom de fichier (Cue-Sheet) non sélectionné
+Fichiers Cue-Sheet(*.cue *.cdm)|*.cue;*.cdm;*.iso|Images CCD(*.ccd)|*.ccd|Tous types de fichiers(*.*)|*.*||
+Écriture finie.
+Commencez à écrire.
+#25----------
+Utiliser la protection contre les sous-utilisations de tampon.
+Écrire en mode test.
+Compilation de Cue Sheet:%s
+Fichier Image:%s
+Le lecteur sélectionné n'est pas compatible CD-R.
+#30----------
+Veuillez insérer un média VIERGE.
+Aucun média vierge.
+Ne détecte pas les commandes.
+Erreur de lecteur:%s
+Taille du tampon dans le lecteur:%dKBo
+#35----------
+Effectuer un étalonnage de puissance optimal.
+Erreur sur OPC.
+Attente fin de durée.
+Éjecter le tiroir.
+Introduction à l'écrit.
+#40----------
+Erreur lors de l'écriture de l'introduction.
+Erreur lors de l'écriture du pré-intervalle.
+Écriture des données principales.
+Impossible d'ouvrir le fichier image.
+Erreur d'écriture.
+#45----------
+Rédaction de l'introduction.
+Erreur lors de l'écriture de la piste de sortie.
+CD de masterisation.
+Créer une Cue Sheet.
+Erreur lors de la création de Cue-Sheet.
+#50----------
+Compilation de Cue Sheet.
+Écriture Piste01 (ISO/MODE1)
+Écriture Piste%02d (AUDIO)
+Piste de données doit être la première piste.
+Type de fichier non compatible :Piste %d
+#55----------
+Oui
+Non
+Commande détectée : RAW+96
+Commande détectée : RAW+16
+Commande détectée : SAO
+#60----------
+#message du créateur d'image
+Création d'un fichier image réussie.
+Échec de la création du fichier image.
+Création finie.
+Lancer la création.
+Impossible de créer le fichier:%s
+#65----------
+Piste de masterisation 01 (ISO/MODE1)
+Piste de masterisation %02d (AUDIO)
+#message de capacité du lecteur
+OK
+NG
+Aucune
+#70----------
+#effacer le message média
+ã‚¹ãƒ¬ãƒEƒ‰ä½œæEã«å¤±æ•E
+#message principal du dialogue
+Toute session
+session %d
+Copier seulement la première session sur un CD multisession. OK?
+Échec d'analyse du sous-code.
+#75----------
+Veuillez insérer un CD.
+Veuillez choisir la piste dans la fenêtre TOC.
+Veuillez choisir un lecteur.
+Effacez-vous les médias ?
+Effacez-vous d'abord les médias ?
+#80----------
+Réécrire?
+Supprimer les fichiers image ?
+#message de journalisation
+Echec de la sauvegarde des journaux.
+#Message maître
+Nouveau dossier
+Nouveau dossier%d
+#85----------
+Dossier
+Fichier
+Impossible de renommer ce fichier.
+Cartographie directe depuis fichiers
+Fichiers WAV|*.wav|Tous types de fichiers|*.*||
+#90----------
+Fichiers ISO|*.iso|Tous types de fichiers|*.*||
+Fichiers Cue-Sheet(*.cue)|*.cue|Tous types de fichiers(*.*)|*.*||
+Oh! L'image est vide.
+Oh! Allez-vous créer des sous-verres ?
+Mastérisation
+#95----------
+#Message du calculateur MSF
+Veuillez entrer plus grand que 00:02:00 ou égal.
+#Message lecteur
+Lecture depuis :%s
+Nom du fichier (.cue) est vide.
+Ignorer %d erreurs.
+Fin de la lecture du CD.
+#100---------
+Impossible d'ouvrir %s (fichier image).
+Piste %d-%d
+Secteur
+Piste de lecture %d : %s
+Piste de lecture %d : MMC LBA(RAW)
+#105---------
+Stocker dans : %s
+Impossible d'ouvrir %s(Cue-Sheet).
+Créer une Cue Sheet : %s
+Prévenir gap
+Ignorer l'erreur
+#110---------
+Échec de la lecture du CD
+Détecter la commande de lecture
+Commande détectée : %s
+Échec de détection de la commande : impossible de lire la piste audio
+Activez l'option 'Analyse intelligente des secteurs défectueux'.
+#115---------
+Erreur de durée.
+Trouver la fin des erreurs.
+Création d'un secteur fictif.
+#lire message de piste
+WAVE et ISO(*.wav,*.iso)|*.wav;*.iso|Tous types de fichiers|*.*||
+Nom du fichier est vide.
+#120---------
+#sélectionner le message du lecteur
+Veuillez choisir un lecteur.
+#notifier la suppression du journal
+Effacer Journal?
+#message paramétrage
+Recherche avancée (rapide)
+Recherche linéaire
+Rechercher tous les secteurs (lent)
+#125---------
+Gestionnaire ASPI(WNASPI*.DLL)|WNASPI*.dll|Module externe(*.DLL)|*.dll|Tous types de fichiers|*.*||
+Fichiers Texte(*.txt)|*.txt|Tous types de fichiers|*.*||
+#Message de l'analyseur de sous-code
+Analyser à :%s
+Fini d'analyser.
+Session
+#130---------
+Analyse de %d session.
+Échec d'analyse du sous-code.
+Analyse de [Session %d/ Piste%d]
+#message toc
+Impossible d'enregistrer TOC.
+Le saut d'erreur rapide ne fonctionne pas !
+#Ajout après version 2.42
+Session de lecture %d : %s
+#Ajout après version 2.45
+Utiliser moteur de lecture
+Utiliser moteur d'écriture
+Il est possible d'écrire en multisession en utilisant la commande RAW+96
+Ce format n'est pas pris en charge:%s
+#140
+#Ajout après version 2.47
+Rédaction de l'intro de la session %d
+Écriture des données de session %d
+Rédaction de l'introduction à la session %d
+Format d'image : %s
+Nom du produit du lecteur de lecture : %s
+#145
+Vendeur du lecteur de lecture : %s
+Version du firmware du lecteur de lecture : %s
+#Ajout après version 2.48
+Nom du fichier est trop long, donc tronqué.
+Nom initial:%s
+Nom tronqué:%s
+#150
+Analyse de la zone pré-écart.
+Lire secteurs (%d ... 0 secteur) de la zone de pré-espace.
+Échec de l'analyse du pré-écart.
+Lire CD-TEXTE!
+CD-TEXT inexistant.
+#155
+Pistes de données inexistantes.
+Comparer piste %d
+Impossible d'ouvrir fichier image.
+Désaccordé
+Accordé
+#160
+Ce mode ne supporte qu'une seule session.
+Lecture %d-%d
+Recherche inversée
+%02d:%02d.%02d(%6ld) Découvrir les mauvais secteurs.
+%02d:%02d.%02d(%6ld) Découvrez les doubles secteurs.
+#165
+Lecture inversée
+%6ld - %06ld Trouver la queue de la zone à double secteur.
+Recherche du bloc d'erreur.
+%06ld Ignorer le bloc d'erreur.
+%06ld Queue du bloc d'erreur.
+#170
+Lecture des secteurs après le bloc d'erreur.

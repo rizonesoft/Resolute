@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Performance Profiling - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html" class="active"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="performance-profiling"><a class="header" href="#performance-profiling">Performance Profiling</a></h1>
+<h2 id="flame-graph-profiling"><a class="header" href="#flame-graph-profiling">Flame Graph Profiling</a></h2>
+<p><a href="https://github.com/brendangregg/FlameGraph">FlameGraph</a> is a great tool for generating interactive flamegraphs based collected profiling data. The github page has thorough documentation on how to use the tool, but an overview is presented below:</p>
+<p>First, install <code>perf</code>, which on Linux can be done via:</p>
+<pre><code class="language-bash">sudo apt-get install linux-tools-common linux-tools-generic linux-tools-`uname -r`
+</code></pre>
+<blockquote>
+<p><em>Tip</em>: If you're on Windows using WSL2 with Ubuntu 20.04, you may find that the above fails with this error message:</p>
+<pre><code>E: Unable to locate package linux-tools-4.19.104-microsoft-standard
+E: Couldn't find any package by glob 'linux-tools-4.19.104-microsoft-standard'
+E: Couldn't find any package by regex 'linux-tools-4.19.104-microsoft-standard'
+</code></pre>
+<p>You may have luck building and installing <code>perf</code> yourself using Microsoft's WSL2 Linux Kernel sources. At the time of writing, this <em>doesn't</em> work with the <code>master</code> branch because the <code>perf</code> build appears to be broken with newer versions of glibc. Instead, we can use the <code>linux-msft-wsl-5.10.16.3</code> tag:</p>
+<pre><code class="language-bash">sudo apt install flex bison
+git clone https://github.com/microsoft/WSL2-Linux-Kernel --depth 1 --branch linux-msft-wsl-5.10.16.3
+cd WSL2-Linux-Kernel/tools/perf
+make -j8
+sudo cp perf /usr/local/bin
+</code></pre>
+<p>Technique courtesy of: https://gist.github.com/abel0b/b1881e41b9e1c4b16d84e5e083c38a13</p>
+</blockquote>
+<p>Modify the system settings to allow <code>perf</code> record to be run by a standard user:</p>
+<pre><code class="language-bash">sudo su     # Run the following as root
+cat /proc/sys/kernel/perf_event_paranoid
+echo &quot;1&quot; &gt; /proc/sys/kernel/perf_event_paranoid
+exit
+</code></pre>
+<p>Invoke <code>clamscan</code> via <code>perf record</code> as follows, and run <code>perf script</code> to collect the profiling data. Note that in this example, ClamAV was compiled in a <code>build</code> subdirectory and installed to <code>build/install</code>:</p>
+<pre><code class="language-bash">perf record -F 100 -g -- ./install/bin/clamscan -d ./unit_tests/clamav.hdb --allmatch ./test/
+perf script &gt; /tmp/out.perf
+</code></pre>
+<p>The <code>-F</code> parameter indicates how many samples should be collected during program execution. If your scan will take a long time to run, a lower value should be sufficient. Otherwise, consider choosing a higher value (on Ubuntu 18.04, 7250 is the max frequency, but it can be increased via <code>/proc/sys/kernel/perf_event_max_sample_rate</code>.</p>
+<p>Clone out <a href="https://github.com/brendangregg/FlameGraph">the FlameGraph project</a> and run the following commands inside the FlameGraph directory to generate the flame graph:</p>
+<pre><code class="language-bash">git clone https://github.com/brendangregg/FlameGraph.git
+cd FlameGraph
+
+perl stackcollapse-perf.pl /tmp/out.perf &gt; /tmp/out.folded
+perl flamegraph.pl /tmp/out.folded &gt; /tmp/test.svg
+</code></pre>
+<p>The SVG that is generated is interactive, but some viewers don't support this.
+Be sure to open it in a web browser like Chrome to be able to take full advantage of it.</p>
+<p>Here's an example flamegraph generated by scanning ClamAV test files:</p>
+<p align="center">
+  <a href="https://raw.githubusercontent.com/micahsnyder/clamav-documentation/main/src/images/flamegraph.svg">
+    <img align="center" src="https://raw.githubusercontent.com/micahsnyder/clamav-documentation/main/src/images/flamegraph.svg" alt='Example Flamegraph'>
+  </a>
+</p>
+<h2 id="call-graph-profiling---callgrind"><a class="header" href="#call-graph-profiling---callgrind">Call Graph Profiling - Callgrind</a></h2>
+<p>Callgrind is a profiling tool included with <code>valgrind</code>. This can be done by prepending <code>valgrind --tool=callgrind </code> to the <code>clamscan</code> command.</p>
+<p><a href="https://kcachegrind.github.io/html/Home.html">kcachegrind</a> is a follow-on tool that will graphically present the profiling data and allow you to explore it visually, although if you don't already use KDE you'll have to install lots of extra packages to use it.</p>
+<h2 id="system-call-tracing--fault-injection"><a class="header" href="#system-call-tracing--fault-injection">System Call Tracing / Fault Injection</a></h2>
+<p>strace can be used to track the system calls that are performed and provide the number of calls / time spent in each system call. This can be done by prepending <code>strace -c </code> to a <code>clamscan</code> command. Results will look something like this:</p>
+<pre><code class="language-bash">    % time     seconds  usecs/call     calls    errors syscall
+    ------ ----------- ----------- --------- --------- ----------------
+    95.04    0.831430          13     62518           read
+    3.22    0.028172          14      2053           munmap
+    0.69    0.006005           3      2102           mmap
+    0.28    0.002420           7       344           pread64
+    0.16    0.001415           5       305         1 openat
+    0.13    0.001108           3       405           write
+    0.11    0.000932          23        40           mprotect
+    0.07    0.000632           2       310           close
+    0.07    0.000583           9        67        30 access
+    0.05    0.000395           1       444           lseek
+    0.04    0.000344           2       162           fstat
+    0.04    0.000338           1       253           brk
+    0.03    0.000262           1       422           fcntl
+    0.02    0.000218          16        14           futex
+    0.01    0.000119           1       212           getpid
+    0.01    0.000086          14         6           getdents
+    0.00    0.000043           7         6           dup
+    0.00    0.000040           1        31           unlink
+    0.00    0.000038          19         2           rt_sigaction
+    0.00    0.000037          19         2           rt_sigprocmask
+    0.00    0.000029           1        37           stat
+    0.00    0.000022          11         2           prlimit64
+    0.00    0.000021          21         1           sysinfo
+    0.00    0.000020           1        33           clock_gettime
+    0.00    0.000019          19         1           arch_prctl
+    0.00    0.000018          18         1           set_tid_address
+    0.00    0.000018          18         1           set_robust_list
+    0.00    0.000013           0        60           lstat
+    0.00    0.000011           0        65           madvise
+    0.00    0.000002           0        68           geteuid
+    0.00    0.000000           0         1           execve
+    0.00    0.000000           0         1           uname
+    0.00    0.000000           0         1           getcwd
+    ------ ----------- ----------- --------- --------- ----------------
+    100.00    0.874790                 69970        31 total
+</code></pre>
+<p><code>strace</code> can also be used for cool things like system call fault injection. For instance, let's say you are curious whether the <code>read</code> bytecode API call is implemented in such a way that the underlying <code>read</code> system call could handle <code>EINTR</code> being returned (which can happen periodically). To test this, write the following bytecode rule:</p>
+<pre><code class="language-c">    VIRUSNAME_PREFIX(&quot;BC.Heuristic.Test.Read.Passed&quot;)
+    VIRUSNAMES(&quot;&quot;)
+    TARGET(0)
+
+    SIGNATURES_DECL_BEGIN
+    DECLARE_SIGNATURE(zeroes)
+    SIGNATURES_DECL_END
+
+    SIGNATURES_DEF_BEGIN
+    DEFINE_SIGNATURE(zeroes, &quot;0:0000&quot;)
+    SIGNATURES_DEF_END
+
+    bool logical_trigger()
+    {
+        return matches(Signatures.zeroes);
+    }
+
+    #define READ_S(value, size) if (read(value, size) != size) return 0;
+
+    int entrypoint(void)
+    {
+        char buffer[65536];
+        int i;
+
+        for (i = 0; i &lt; 256; i++)
+        {
+            debug(i);
+            debug(&quot;\n&quot;);
+            READ_S(buffer, sizeof(buffer));
+        }
+
+        foundVirus(&quot;&quot;);
+        return 0;
+    }
+</code></pre>
+<p>Compiled the rule, and make a test file to match against it. Then run it under <code>strace</code> to determine what underlying read system call is being used for the bytecode <code>read</code> function:</p>
+<pre><code class="language-bash">clambc-compiler read_test.bc
+dd if=/dev/zero of=/tmp/zeroes bs=65535 count=256
+strace clamscan -d read_test.cbc --bytecode-unsigned /tmp/zeroes
+</code></pre>
+<p>It uses <code>pread64</code> under the hood, so the following command could be used for fault injection:</p>
+<pre><code class="language-bash">strace -e fault=pread64:error=EINTR:when=20+10 clamscan -d read_test.cbc --bytecode-unsigned /tmp/zeroes
+</code></pre>
+<p>This command tells <code>strace</code> to skip the first 20 <code>pread64</code> calls (these appear to be used by the loader, which didn't seem to handle <code>EINTR</code> correctly) but to inject <code>EINTR</code> for every 10th call afterward. We can see the injection in action and that the system call is retried successfully:</p>
+<pre><code class="language-c">    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15007744) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15073280) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15138816) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15204352) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15269888) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15335424) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15400960) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15466496) = 65536
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15532032) = 65536
+    pread64(3, 0x7f6a7ff43000, 65536, 15597568) = -1 EINTR (Interrupted system call) (INJECTED)
+    pread64(3, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;..., 65536, 15597568) = 65536
+</code></pre>
+<p>More documentation on using <code>strace</code> to perform system call fault injection, see <a href="https://archive.fosdem.org/2017/schedule/event/failing_strace/attachments/slides/1630/export/events/attachments/failing_strace/slides/1630/strace_fosdem2017_ta_slides.pdf">this presentation</a> from FOSDEM 2017.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Development/tips-and-tricks.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Development/code-coverage.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Development/tips-and-tricks.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Development/code-coverage.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

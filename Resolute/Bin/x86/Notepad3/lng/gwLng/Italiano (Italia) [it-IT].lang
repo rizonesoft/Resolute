@@ -9,7 +9,7 @@
 #
 # encoding: UTF-8
 # Language: Italian (Italy) resources
-# Translator: (it-IT) Traduzione italiana di RaffaeleBianc0
+# Translator: (it-IT) Traduzione italiana di Matteo-Nigro
 #
 
 #, fuzzy
@@ -43,7 +43,7 @@ msgstr "%path% viene sostituito dal percorso del file, %line% dalla riga a cui s
 
 #. Resource IDs: (119)
 msgid "&About grepWinNP3..."
-msgstr "&Informazioni su grepWinNP3..."
+msgstr "R&iguardo grepWinNP3..."
 
 #. Resource IDs: (1049)
 msgid "&Replace"
@@ -53,6 +53,10 @@ msgstr "&Sostituisci"
 msgid "&Search"
 msgstr "&Cerca"
 
+#. Resource IDs: (1003)
+msgid "&Whole word"
+msgstr "Parola &Intera"
+
 #. Resource IDs: (1013)
 msgid "..."
 msgstr "..."
@@ -61,17 +65,25 @@ msgstr "..."
 msgid "/"
 msgstr "/"
 
+#. Resource IDs: (1045)
+msgid "Visit Stefan Küng's website"
+msgstr "Visita il sito web di Stefan Küng"
+
+#. Resource IDs: (1052)
+msgid "<a>about grepWinNP3...</a>"
+msgstr "<a>riguardo grepWinNP3...</a>"
+
 #. Resource IDs: (1086)
 msgid ">>>"
 msgstr ">>>"
 
-#. Resource IDs: (1052, 135)
+#. Resource IDs: (135)
 msgid "About grepWinNP3"
-msgstr "Informazioni su grepWinNP3"
+msgstr "Riguardo grepWinNP3"
 
 #. Resource IDs: (1021)
-msgid "Add to Presets"
-msgstr "Aggiungi a Predefiniti"
+msgid "Add to Presets..."
+msgstr "Aggiungi a Predefiniti..."
 
 #. Resource IDs: (155)
 msgid "All Files"
@@ -152,7 +164,7 @@ msgstr "Modalità Scura"
 
 #. Resource IDs: (139)
 msgid "Date modified"
-msgstr "Data di ultima modifica"
+msgstr "Data ultima modifica"
 
 #. Resource IDs: (137)
 msgid "Dialog"
@@ -160,7 +172,7 @@ msgstr "Finestra di dialogo"
 
 #. Resource IDs: (1078)
 msgid "Don't warn when replacing without creating backups"
-msgstr "Non avvisare quando si sostituisce senza creare i backup"
+msgstr "Non avvisare quando si sostituisce senza creare backup"
 
 #. Resource IDs: (1051)
 msgid "Dot matches newline"
@@ -301,7 +313,7 @@ msgstr "Solo un'istanza"
 
 #. Resource IDs: (142)
 msgid "Open containing folder"
-msgstr "Apri la cartella padre"
+msgstr "Apri la cartella contenente"
 
 #. Resource IDs: (141)
 msgid "Open with Editor"
@@ -315,21 +327,21 @@ msgstr "Incolla del testo con cui verificare la regex:"
 msgid "Path"
 msgstr "Percorso"
 
-#. Resource IDs: (160)
-msgid "Path does not exist or is not accessible!"
-msgstr "Il percorso non esiste o non è accessibile!"
-
 #. Resource IDs: (131)
 msgid "Preset name"
 msgstr "Nome Predefinito"
 
-#. Resource IDs: (1022, 132)
+#. Resource IDs: (1022)
+msgid "Presets..."
+msgstr "Predefiniti..."
+
+#. Resource IDs: (132)
 msgid "Presets"
 msgstr "Predefiniti"
 
 #. Resource IDs: (1065)
-msgid "Press F1 for help"
-msgstr "Premi F1 per aiuto"
+msgid "Press F1 for help..."
+msgstr "Premi F1 per aiuto..."
 
 #. Resource IDs: (154)
 msgid "Programs"
@@ -341,7 +353,7 @@ msgstr "Ri&nomina Predefinito"
 
 #. Resource IDs: (130)
 msgid "Regex Test"
-msgstr "Test regex"
+msgstr "Regex Test"
 
 #. Resource IDs: (1046)
 msgid "Regex match"
@@ -412,6 +424,11 @@ msgstr "Stringa di ricerca"
 msgid "Searched %ld files, skipped %ld files. Found %ld matches in %ld files."
 msgstr "Cercati %ld file, saltati %ld file. Trovate %ld corrispondenze in %ld file."
 
+#. Resource IDs: (173)
+#, c-format
+msgid "Searched %ld files, skipped %ld files. Found %ld matches in %ld files. %ld results selected."
+msgstr "Cercati %ld file, saltati %ld file. Trovate %ld corrispondenze in %ld file. %ld risultati selezionati."
+
 #. Resource IDs: (140)
 msgid "Select Editor Application..."
 msgstr "Seleziona l'Applicazione Editor..."
@@ -421,8 +438,8 @@ msgid "Select path to search"
 msgstr "Seleziona percorso di ricerca"
 
 #. Resource IDs: (1071)
-msgid "Settings"
-msgstr "Impostazioni"
+msgid "Settings..."
+msgstr "Impostazioni..."
 
 #. Resource IDs: (133)
 msgid "Size"
@@ -433,8 +450,8 @@ msgid "Size is"
 msgstr "Dimens."
 
 #. Resource IDs: (1028)
-msgid "Test regex"
-msgstr "Prova regex"
+msgid "Test regex..."
+msgstr "Prova regex..."
 
 #. Resource IDs: (136)
 msgid "Text"
@@ -447,6 +464,11 @@ msgstr "Modelli di testo"
 #. Resource IDs: (1002)
 msgid "Text search"
 msgstr "Ricerca testo"
+
+#. Resource IDs: (160)
+#, c-format
+msgid "The path \"%s\" does not exist or is not accessible!"
+msgstr "Il percorso \"%s\" non esiste o non è accessibile!"
 
 #. Resource IDs: (65535)
 msgid "The regex search string matches:"
@@ -464,9 +486,14 @@ msgstr "Tratta i file come UTF-8"
 msgid "Treat files as binary"
 msgstr "Tratta i file come binari"
 
-#. Resource IDs: (1045)
-msgid "Visit Stefan Küng's website"
-msgstr "Visita il sito web di Stefan Küng"
+#. Resource IDs: (172)
+#, c-format
+msgid "You have the option \"%s\" enabled.\r\nWhen replacing, this option can lead to corrupted files.\r\nDo you want to proceed anyway?"
+msgstr "L'opzione \"%s\" è attiva.\r\nUsando la sostituzione, questa opzione può causare la corruzione dei file.\r\nVuoi ugualmente procedere?"
+
+#. Resource IDs: (1025)
+msgid "\\"
+msgstr "\\"
 
 #. Resource IDs: (116)
 msgid "a regular expression used for searching. Press F1 for more info."
@@ -574,6 +601,10 @@ msgstr "scansione del file '%s'"
 msgid "search string is empty"
 msgstr "la stringa di ricerca è vuota"
 
+#. Resource IDs: (170, 171)
+msgid "Start new grepWinNP3 window"
+msgstr "Avvia nuova finestra grepWinNP3"
+
 #. Resource IDs: (114)
 msgid "the path(s) which is searched recursively.\nSeparate paths with the '|' symbol.\nExample: c:\\temp|d:\\logs"
 msgstr "il percorso/i che viene cercato in modo ricorsivo.\nSeparare i percorsi con il simbolo '|'.\nEsempio: c:\\temp|d:\\logs"
@@ -581,6 +612,10 @@ msgstr "il percorso/i che viene cercato in modo ricorsivo.\nSeparare i percorsi 
 #. Resource IDs: (113)
 msgid "you can exclude directories, e.g. CVS and images.\nExample: ^(CVS|images)$\nNote, '.svn' folders are 'hidden' on Windows, so they usually are not scanned."
 msgstr "puoi escludere le cartelle, ad es. CVS e immagini.\nEsempio: ^(CVS|immagini)$\nNota, le cartelle '.svn' sono 'nascoste' su Windows, quindi di solito non vengono scansionate."
+
+#. Resource IDs: (1024)
+msgid "Y"
+msgstr "Y"
 
 #. Resource IDs: (3000)
 msgid "Reset"
@@ -597,4 +632,8 @@ msgstr "N° max di task concorrenti"
 #. Resource IDs: (3005)
 msgid "This adds a new entry to the context menu named 'Open with Editor'"
 msgstr "Questo aggiunge una nuova voce al menu contestuale 'Apri con l'Editor'"
+
+#. Resource IDs: (3006)
+msgid "Stay On Top"
+msgstr "Sempre in primo piano"
 

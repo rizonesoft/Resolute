@@ -1,0 +1,540 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Signatures - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures.html" class="active"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="creating-signatures-for-clamav"><a class="header" href="#creating-signatures-for-clamav">Creating signatures for ClamAV</a></h1>
+<p>Table Of Contents</p>
+<ul>
+<li><a href="#creating-signatures-for-clamav">Creating signatures for ClamAV</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#database-formats">Database formats</a>
+<ul>
+<li><a href="#settings-databases">Settings databases</a></li>
+<li><a href="#signature-databases">Signature databases</a>
+<ul>
+<li><a href="#body-based-signatures">Body-based Signatures</a></li>
+<li><a href="#hash-based-signatures">Hash-based Signatures</a></li>
+<li><a href="#alternative-signature-support">Alternative signature support</a></li>
+</ul>
+</li>
+<li><a href="#other-database-files">Other database files</a></li>
+<li><a href="#signature-names">Signature names</a></li>
+</ul>
+</li>
+<li><a href="#signature-writing-tips-and-tricks">Signature Writing Tips and Tricks</a>
+<ul>
+<li><a href="#testing-rules-with-clamscan">Testing rules with <code>clamscan</code></a></li>
+<li><a href="#debug-information-from-libclamav">Debug information from libclamav</a></li>
+<li><a href="#writing-signatures-for-special-files">Writing signatures for special files</a>
+<ul>
+<li><a href="#html">HTML</a></li>
+<li><a href="#text-files">Text files</a></li>
+<li><a href="#compressed-portable-executable-files">Compressed Portable Executable files</a></li>
+</ul>
+</li>
+<li><a href="#using-sigtool">Using <code>sigtool</code></a></li>
+<li><a href="#inspecting-signatures-inside-a-cvd-file">Inspecting signatures inside a CVD file</a></li>
+<li><a href="#external-tools">External tools</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>In order to detect malware and other file-based threats, ClamAV relies on signatures to differentiate clean and malicious/unwanted files. ClamAV signatures are primarily text-based and conform to one of the ClamAV-specific signature formats associated with a given method of detection. These formats are explained in the <a href="#signature-formats">Signature formats</a> section below. In addition, ClamAV 0.99 and above support signatures written in the YARA format. More information on this can be found in the <a href="#using-yara-rules-in-clamav">Using YARA rules in ClamAV</a> section.</p>
+<p>The ClamAV project distributes a collection of signatures in the form of CVD (ClamAV Virus Database) files. The CVD file format provides a digitally-signed container that encapsulates the signatures and ensures that they can't be modified by a malicious third-party. This signature set is actively maintained by <a href="https://www.talosintelligence.com/">Cisco Talos</a> and can be downloaded using the <code>freshclam</code> application that ships with ClamAV. For more details on this, see the <a href="#inspecting-signatures-inside-a-CVD-file">CVD file</a> section.</p>
+<h2 id="database-formats"><a class="header" href="#database-formats">Database formats</a></h2>
+<p>ClamAV CVD and CLD database archives may be unpacked to the current directory using <code>sigtool -u &lt;database name&gt;</code>. For more details on inspecting CVD and CLD files, see <a href="#inspecting-signatures-inside-a-cvd-file">Inspecting signatures inside a CVD file</a>. Once unpacked, you'll observe a large collection of database files with various extensions described below.</p>
+<p>The CVD and CLD database archives may be supplemented with custom database files in the formats described to gain additional detection functionality. This is done simply by adding files of the following formats to the database directory, typically <code>/usr/local/share/clamav</code> or <code>&quot;C:\Program Files\ClamAV\database&quot;</code>. Alternatively, <code>clamd</code> and <code>clamscan</code> can be instructed to load the database from an alternative database file or database directory manually using the <code>clamd</code> <code>DatabaseDirectory</code> config option or the <code>clamscan -d</code> command line option.</p>
+<h3 id="settings-databases"><a class="header" href="#settings-databases">Settings databases</a></h3>
+<p>ClamAV provides a handful of configuration related databases along side the signature definitions.</p>
+<p><code>*.cfg</code>: <a href="Signatures/DynamicConfig.html">Dynamic config settings</a></p>
+<p><code>*.cat</code> <code>*.crb</code>: <a href="Signatures/AuthenticodeRules.html">Trusted and revoked PE certs</a></p>
+<p><code>*.ftm</code>: <a href="Signatures/FileTypeMagic.html">File Type Magic (FTM)</a></p>
+<h3 id="signature-databases"><a class="header" href="#signature-databases">Signature databases</a></h3>
+<blockquote>
+<p><em>Note</em>: Signature databases with an extension ending in <code>u</code> are only loaded when Potentially Unwanted Application (PUA) signatures are enabled (default: off).</p>
+</blockquote>
+<h4 id="body-based-signatures"><a class="header" href="#body-based-signatures">Body-based Signatures</a></h4>
+<p>Body-based signature content is a definition that matches not based on a hash but based on the specific sequences of bytes exhibited by the target file.</p>
+<p>ClamAV body-based signature content has a <a href="Signatures/BodySignatureFormat.html">special format</a> to allow regex-like matching of data that is not entirely known. This format is used extensively in both Extended Signatures and Logical Signatures.</p>
+<p><code>*.ndb</code> <code>*.ndu</code>: <a href="Signatures/ExtendedSignatures.html">Extended signatures</a></p>
+<p><code>*.ldb</code> <code>*.ldu</code>; <code>*.idb</code>: <a href="Signatures/LogicalSignatures.html">Logical Signatures</a></p>
+<p><code>*.cdb</code>: <a href="Signatures/ContainerMetadata.html">Container Metadata Signatures</a></p>
+<p><code>*.cbc</code>: <a href="Signatures/BytecodeSignatures.html">Bytecode Signatures</a></p>
+<p><code>*.pdb</code> <code>*.gdb</code> <code>*.wdb</code>: <a href="Signatures/PhishSigs.html">Phishing URL Signatures</a>)</p>
+<h4 id="hash-based-signatures"><a class="header" href="#hash-based-signatures">Hash-based Signatures</a></h4>
+<p><code>*.hdb</code> <code>*.hsb</code> <code>*.hdu</code> <code>*.hsu</code>: File hash signatures</p>
+<p><code>*.mdb</code> <code>*.msb</code> <code>*.mdu</code> <code>*.msu</code>: PE section hash signatures</p>
+<p><a href="Signatures/HashSignatures.html">Hash-based Signature format</a></p>
+<h4 id="alternative-signature-support"><a class="header" href="#alternative-signature-support">Alternative signature support</a></h4>
+<p><code>*.yar</code> <code>*.yara</code>: <a href="Signatures/YaraRules.html">YARA rules</a></p>
+<h3 id="other-database-files"><a class="header" href="#other-database-files">Other database files</a></h3>
+<p><code>*.fp</code> <code>*.sfp</code> <code>*.ign</code> <code>*.ign2</code>: <a href="Signatures/AllowLists.html">allowed files, ignored signatures</a></p>
+<p><code>*.pwdb</code>: <a href="Signatures/EncryptedArchives.html">Encrypted archive passwords</a></p>
+<p><code>*.info</code>: <a href="Signatures/DatabaseInfo.html">Database information</a>`</p>
+<h3 id="signature-names"><a class="header" href="#signature-names">Signature names</a></h3>
+<p>ClamAV signatures <em>must</em> only use alphanumeric characters, dash (<code>-</code>), dot (<code>.</code>), underscores (<code>_</code>) to delimit words. <em>Never</em> use a space, apostrophe, colon, semi-colon, or quote mark.</p>
+<p>ClamAV signature names found in the official signature databases generally follow this format:</p>
+<pre><code>{platform}.{category}.{name}-{signature id}-{revision}
+</code></pre>
+<p>Older signatures and <a href="../../faq/faq-pua.html">Potentially Unwanted Applications (PUA) signatures</a> may deviate from these guidelines.</p>
+<p>Naming conventions in 3rd party databases vary. You can find Cisco-Talos <a href="Signatures/SignatureNames.html">guidelines for naming signatures for the official database here</a>.</p>
+<h2 id="signature-writing-tips-and-tricks"><a class="header" href="#signature-writing-tips-and-tricks">Signature Writing Tips and Tricks</a></h2>
+<h3 id="testing-rules-with-clamscan"><a class="header" href="#testing-rules-with-clamscan">Testing rules with <code>clamscan</code></a></h3>
+<p>To test a new signature, first create a text file with the extension corresponding to the signature type (Ex: <code>.ldb</code> for logical signatures). Then, add the signature as it's own line within the file. This file can be passed to <code>clamscan</code> via the <code>-d</code> option, which tells ClamAV to load signatures from the file specified. If the signature is not formatted correctly, ClamAV will display an error - run <code>clamscan</code> with <code>--debug --verbose</code> to see additional information about the error message. Some common causes of errors include:</p>
+<ul>
+<li>The signature file has the incorrect extension type for the signatures contained within</li>
+<li>The file has one or more blank lines</li>
+<li>For logical signatures, a semicolon exists at the end of the file</li>
+</ul>
+<p>If the rule is formatted correctly, <code>clamscan</code> will load the signature(s) in and scan any files specified via the command line invocation (or all files in the current directory if none are specified). A successful detection will look like the following:</p>
+<pre><code class="language-bash">clamscan -d test.ldb text.exe
+test.exe: Win.Malware.Agent.UNOFFICIAL FOUND
+
+----------- SCAN SUMMARY -----------
+Known viruses: 1
+Engine version: 0.100.0
+Scanned directories: 0
+Scanned files: 1
+Infected files: 1
+Data scanned: 17.45 MB
+Data read: 17.45 MB (ratio 1.00:1)
+Time: 0.400 sec (0 m 0 s)
+</code></pre>
+<p>If the rule did not match as intended:</p>
+<ul>
+<li>The file may have exceeded one or more of the default scanning limits built-in to ClamAV. Try running <code>clamscan</code> with the following options to see if raising the limits addresses the issue: <code>--max-filesize=2000M --max-scansize=2000M --max-files=2000000 --max-recursion=2000000 --max-embeddedpe=2000M --max-htmlnormalize=2000000 --max-htmlnotags=2000000 --max-scriptnormalize=2000000 --max-ziptypercg=2000000 --max-partitions=2000000 --max-iconspe=2000000 --max-rechwp3=2000000 --pcre-match-limit=2000000 --pcre-recmatch-limit=2000000 --pcre-max-filesize=2000M</code>.</li>
+<li>If matching on HTML or text files, ClamAV might be performing normalization that causes the content of the scanned file to change. See the <a href="#html">HTML</a> and <a href="#text-file">Text file</a> sections for more details.</li>
+<li>libclamav may have been unable to unpack or otherwise process the file. See <a href="#debug-information-from-libclamav">Debug information from libclamav</a> for more details.</li>
+</ul>
+<p>NOTE: If you run <code>clamscan</code> with a <code>-d</code> flag, ClamAV will not load in the signatures downloaded via <code>freshclam</code>. This means that:</p>
+<ul>
+<li>some of ClamAV's unpacking support might be disabled, since some unpackers are implemented as bytecode signatures</li>
+<li>PE certificate trust verification based on Authenticode signatures won't work, since this functionality relies on <code>.crb</code> rules</li>
+</ul>
+<p>If any of this functionality is needed, load in the CVD files manually with additional <code>-d</code> flags.</p>
+<h3 id="debug-information-from-libclamav"><a class="header" href="#debug-information-from-libclamav">Debug information from libclamav</a></h3>
+<p>In order to create efficient signatures for ClamAV it’s important to understand how the engine handles input files. The best way to see how it works is having a look at the debug information from libclamav. You can do it by calling <code>clamscan</code> with the <code>--debug</code> and <code>--leave-temps</code> flags. The first switch makes <code>clamscan</code> display all the interesting information from libclamav and the second one avoids deleting temporary files so they can be analyzed further.</p>
+<p>The now important part of the info is:</p>
+<pre><code class="language-bash">    $ clamscan --debug attachment.exe
+    [...]
+    LibClamAV debug: Recognized MS-EXE/DLL file
+    LibClamAV debug: Matched signature for file type PE
+    LibClamAV debug: File type: Executable
+</code></pre>
+<p>The engine recognized a windows executable.</p>
+<pre><code class="language-bash">    LibClamAV debug: Machine type: 80386
+    LibClamAV debug: NumberOfSections: 3
+    LibClamAV debug: TimeDateStamp: Fri Jan 10 04:57:55 2003
+    LibClamAV debug: SizeOfOptionalHeader: e0
+    LibClamAV debug: File format: PE
+    LibClamAV debug: MajorLinkerVersion: 6
+    LibClamAV debug: MinorLinkerVersion: 0
+    LibClamAV debug: SizeOfCode: 0x9000
+    LibClamAV debug: SizeOfInitializedData: 0x1000
+    LibClamAV debug: SizeOfUninitializedData: 0x1e000
+    LibClamAV debug: AddressOfEntryPoint: 0x27070
+    LibClamAV debug: BaseOfCode: 0x1f000
+    LibClamAV debug: SectionAlignment: 0x1000
+    LibClamAV debug: FileAlignment: 0x200
+    LibClamAV debug: MajorSubsystemVersion: 4
+    LibClamAV debug: MinorSubsystemVersion: 0
+    LibClamAV debug: SizeOfImage: 0x29000
+    LibClamAV debug: SizeOfHeaders: 0x400
+    LibClamAV debug: NumberOfRvaAndSizes: 16
+    LibClamAV debug: Subsystem: Win32 GUI
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: Section 0
+    LibClamAV debug: Section name: UPX0
+    LibClamAV debug: Section data (from headers - in memory)
+    LibClamAV debug: VirtualSize: 0x1e000 0x1e000
+    LibClamAV debug: VirtualAddress: 0x1000 0x1000
+    LibClamAV debug: SizeOfRawData: 0x0 0x0
+    LibClamAV debug: PointerToRawData: 0x400 0x400
+    LibClamAV debug: Section's memory is executable
+    LibClamAV debug: Section's memory is writeable
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: Section 1
+    LibClamAV debug: Section name: UPX1
+    LibClamAV debug: Section data (from headers - in memory)
+    LibClamAV debug: VirtualSize: 0x9000 0x9000
+    LibClamAV debug: VirtualAddress: 0x1f000 0x1f000
+    LibClamAV debug: SizeOfRawData: 0x8200 0x8200
+    LibClamAV debug: PointerToRawData: 0x400 0x400
+    LibClamAV debug: Section's memory is executable
+    LibClamAV debug: Section's memory is writeable
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: Section 2
+    LibClamAV debug: Section name: UPX2
+    LibClamAV debug: Section data (from headers - in memory)
+    LibClamAV debug: VirtualSize: 0x1000 0x1000
+    LibClamAV debug: VirtualAddress: 0x28000 0x28000
+    LibClamAV debug: SizeOfRawData: 0x200 0x1ff
+    LibClamAV debug: PointerToRawData: 0x8600 0x8600
+    LibClamAV debug: Section's memory is writeable
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: EntryPoint offset: 0x8470 (33904)
+</code></pre>
+<p>The section structure displayed above suggests the executable is packed
+with UPX.</p>
+<pre><code class="language-bash">    LibClamAV debug: ------------------------------------
+    LibClamAV debug: EntryPoint offset: 0x8470 (33904)
+    LibClamAV debug: UPX/FSG/MEW: empty section found - assuming
+                    compression
+    LibClamAV debug: UPX: bad magic - scanning for imports
+    LibClamAV debug: UPX: PE structure rebuilt from compressed file
+    LibClamAV debug: UPX: Successfully decompressed with NRV2B
+    LibClamAV debug: UPX/FSG: Decompressed data saved in
+                    /tmp/clamav-90d2d25c9dca42bae6fa9a764a4bcede
+    LibClamAV debug: ***** Scanning decompressed file *****
+    LibClamAV debug: Recognized MS-EXE/DLL file
+    LibClamAV debug: Matched signature for file type PE
+</code></pre>
+<p>Indeed, libclamav recognizes the UPX data and saves the decompressed
+(and rebuilt) executable into
+<code>/tmp/clamav-90d2d25c9dca42bae6fa9a764a4bcede</code>. Then it continues by
+scanning this new file:</p>
+<pre><code class="language-bash">    LibClamAV debug: File type: Executable
+    LibClamAV debug: Machine type: 80386
+    LibClamAV debug: NumberOfSections: 3
+    LibClamAV debug: TimeDateStamp: Thu Jan 27 11:43:15 2011
+    LibClamAV debug: SizeOfOptionalHeader: e0
+    LibClamAV debug: File format: PE
+    LibClamAV debug: MajorLinkerVersion: 6
+    LibClamAV debug: MinorLinkerVersion: 0
+    LibClamAV debug: SizeOfCode: 0xc000
+    LibClamAV debug: SizeOfInitializedData: 0x19000
+    LibClamAV debug: SizeOfUninitializedData: 0x0
+    LibClamAV debug: AddressOfEntryPoint: 0x7b9f
+    LibClamAV debug: BaseOfCode: 0x1000
+    LibClamAV debug: SectionAlignment: 0x1000
+    LibClamAV debug: FileAlignment: 0x1000
+    LibClamAV debug: MajorSubsystemVersion: 4
+    LibClamAV debug: MinorSubsystemVersion: 0
+    LibClamAV debug: SizeOfImage: 0x26000
+    LibClamAV debug: SizeOfHeaders: 0x1000
+    LibClamAV debug: NumberOfRvaAndSizes: 16
+    LibClamAV debug: Subsystem: Win32 GUI
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: Section 0
+    LibClamAV debug: Section name: .text
+    LibClamAV debug: Section data (from headers - in memory)
+    LibClamAV debug: VirtualSize: 0xc000 0xc000
+    LibClamAV debug: VirtualAddress: 0x1000 0x1000
+    LibClamAV debug: SizeOfRawData: 0xc000 0xc000
+    LibClamAV debug: PointerToRawData: 0x1000 0x1000
+    LibClamAV debug: Section contains executable code
+    LibClamAV debug: Section's memory is executable
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: Section 1
+    LibClamAV debug: Section name: .rdata
+    LibClamAV debug: Section data (from headers - in memory)
+    LibClamAV debug: VirtualSize: 0x2000 0x2000
+    LibClamAV debug: VirtualAddress: 0xd000 0xd000
+    LibClamAV debug: SizeOfRawData: 0x2000 0x2000
+    LibClamAV debug: PointerToRawData: 0xd000 0xd000
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: Section 2
+    LibClamAV debug: Section name: .data
+    LibClamAV debug: Section data (from headers - in memory)
+    LibClamAV debug: VirtualSize: 0x17000 0x17000
+    LibClamAV debug: VirtualAddress: 0xf000 0xf000
+    LibClamAV debug: SizeOfRawData: 0x17000 0x17000
+    LibClamAV debug: PointerToRawData: 0xf000 0xf000
+    LibClamAV debug: Section's memory is writeable
+    LibClamAV debug: ------------------------------------
+    LibClamAV debug: EntryPoint offset: 0x7b9f (31647)
+    LibClamAV debug: Bytecode executing hook id 257 (0 hooks)
+    attachment.exe: OK
+    [...]
+</code></pre>
+<p>No additional files get created by libclamav. By writing a signature for the decompressed file you have more chances that the engine will detect the target data when it gets compressed with another packer.</p>
+<p>This method should be applied to all files for which you want to create signatures. By analyzing the debug information you can quickly see how the engine recognizes and preprocesses the data and what additional files get created. Signatures created for bottom-level temporary files are usually more generic and should help detecting the same malware in different forms.</p>
+<h3 id="writing-signatures-for-special-files"><a class="header" href="#writing-signatures-for-special-files">Writing signatures for special files</a></h3>
+<h4 id="html"><a class="header" href="#html">HTML</a></h4>
+<p>ClamAV contains HTML normalization code which makes it easier to write signatures for HTML data that might differ based on white space, capitalization, and other insignificant differences. Running <code>sigtool --html-normalise</code> on a HTML file can be used to see what a file's contents will look like after normalization. This command should generate the following files:</p>
+<ul>
+<li>
+<p>nocomment.html - the file is normalized, lower-case, with all comments and superfluous white space removed</p>
+</li>
+<li>
+<p>notags.html - as above but with all HTML tags removed</p>
+</li>
+<li>
+<p>javascript - any script contents are normalized and the results appended to this file</p>
+</li>
+</ul>
+<p>The code automatically decodes JScript.encode parts and char ref’s (e.g. <code>&amp;#102;</code>). To create a successful signature for the input file type, the rule must match on the contents of one of the created files. Signatures matching on normalized HTML should have a target type of 3. For reference, see <a href="appendix/FileTypes.html">Target Types</a>.</p>
+<h4 id="text-files"><a class="header" href="#text-files">Text files</a></h4>
+<p>Similarly to HTML all ASCII text files get normalized (converted to lower-case, all superfluous white space and control characters removed, etc.) before scanning. Running <code>sigtool --ascii-normalise</code> on a text file will result in a normalized version being written to the file named <code>normalised\_text</code>. Rules matching on normalized ASCII text should have a target type of 7. For reference, see <a href="appendix/FileTypes.html">Target Types</a>.</p>
+<h4 id="compressed-portable-executable-files"><a class="header" href="#compressed-portable-executable-files">Compressed Portable Executable files</a></h4>
+<p>If the file is compressed with UPX, FSG, Petite or another PE packer supported by libclamav, ClamAV will attempt to automatically unpack the executable and evaluate signatures against the unpacked executable. To inspect the executable that results from ClamAV's unpacking process, run <code>clamscan</code> with <code>--debug --leave-temps</code>. Example output for a FSG compressed file:</p>
+<pre><code class="language-bash">    LibClamAV debug: UPX/FSG/MEW: empty section found - assuming compression
+    LibClamAV debug: FSG: found old EP @119e0
+    LibClamAV debug: FSG: Unpacked and rebuilt executable saved in
+    /tmp/clamav-f592b20f9329ac1c91f0e12137bcce6c
+</code></pre>
+<p>In the example above, <code>/tmp/clamav-f592b20f9329ac1c91f0e12137bcce6c</code> is the unpacked executable, and a signature can be written based off of this file.</p>
+<h3 id="using-sigtool"><a class="header" href="#using-sigtool">Using <code>sigtool</code></a></h3>
+<p><code>sigtool</code> pulls in libclamav and provides shortcuts to doing tasks that <code>clamscan</code> does behind the scenes. These can be really useful when writing a signature or trying to get information about a signature that might be causing FPs or performance problems.</p>
+<p>The following <code>sigtool</code> flags can be especially useful for signature writing:</p>
+<ul>
+<li>
+<p><code>--md5</code> / <code>--sha1</code> / <code>--sha256</code>: Generate the MD5/SHA1/SHA256 hash and calculate the file size, outputting both as a properly-formatted <code>.hdb</code>/<code>.hsb</code> signature</p>
+</li>
+<li>
+<p><code>--mdb</code>: Generate section hashes of the specified file. This is useful when generating <code>.mdb</code> signatures.</p>
+</li>
+<li>
+<p><code>--decode</code>: Given a ClamAV signature from STDIN, show a more user-friendly representation of it. An example usage of this flag is <code>cat test.ldb | sigtool --decode</code>.</p>
+</li>
+<li>
+<p><code>--hex-dump</code>: Given a sequence of bytes from STDIN, print the hex equivalent. An example usage of this flag is <code>echo -n &quot;Match on this&quot; | sigtool --hex-dump</code>.</p>
+</li>
+<li>
+<p><code>--html-normalise</code>: Normalize the specified HTML file in the way that <code>clamscan</code> will before looking for rule matches. Writing signatures off of these files makes it easier to write rules for target type HTML (you'll know what white space, capitalization, etc. to expect). See the <a href="#html">HTML</a> section for more details.</p>
+</li>
+<li>
+<p><code>--ascii-normalise</code>: Normalize the specified ASCII text file in the way that <code>clamscan</code> will before looking for rule matches. Writing signatures off of this normalized file data makes it easier to write rules for target type Txt (you'll know what white space, capitalization, etc. to expect). See the <a href="#text-files">Text files</a> sectino for more details.</p>
+</li>
+<li>
+<p><code>--print-certs</code>: Print the Authenticode signatures of any PE files specified.
+This is useful when writing signature-based <code>.crb</code> rule files.</p>
+</li>
+<li>
+<p><code>--vba</code>: Extract VBA/Word6 macro code</p>
+</li>
+<li>
+<p><code>--test-sigs</code>: Given a signature and a sample, determine whether the signature matches and, if so, display the offset into the file where the match occurred. This can be useful for investigating false positive matches in clean files.</p>
+</li>
+</ul>
+<h3 id="inspecting-signatures-inside-a-cvd-file"><a class="header" href="#inspecting-signatures-inside-a-cvd-file">Inspecting signatures inside a CVD file</a></h3>
+<p>CVD (ClamAV Virus Database) is a digitally signed container that includes signature databases in various text formats. The header of the container is a 512 bytes long string with colon separated fields:</p>
+<pre><code class="language-bash">    ClamAV-VDB:build time:version:number of signatures:functionality level required:MD5 checksum:digital signature:builder name:build time (sec)
+</code></pre>
+<p><code>sigtool --info</code> displays detailed information about a given CVD file:</p>
+<pre><code class="language-bash">    zolw@localhost:/usr/local/share/clamav$ sigtool -i main.cvd
+    File: main.cvd
+    Build time: 09 Dec 2007 15:50 +0000
+    Version: 45
+    Signatures: 169676
+    Functionality level: 21
+    Builder: sven
+    MD5: b35429d8d5d60368eea9630062f7c75a
+    Digital signature: dxsusO/HWP3/GAA7VuZpxYwVsE9b+tCk+tPN6OyjVF/U8
+    JVh4vYmW8mZ62ZHYMlM903TMZFg5hZIxcjQB3SX0TapdF1SFNzoWjsyH53eXvMDY
+    eaPVNe2ccXLfEegoda4xU2TezbGfbSEGoU1qolyQYLX674sNA2Ni6l6/CEKYYh
+    Verification OK.
+</code></pre>
+<p>The ClamAV project distributes a number of CVD files, including <code>main.cvd</code> and <code>daily.cvd</code>.</p>
+<p>To view the signature associated with a given detection name, the CVD files can be unpacked and the underlying text files searched for a rule definition using a tool like <code>grep</code>. To do this, use <code>sigtool</code>'s <code>--unpack</code> flag as follows:</p>
+<pre><code class="language-bash">    $ mkdir /tmp/clamav-sigs
+    $ cd /tmp/clamav-sigs/
+    $ sigtool --unpack /var/lib/clamav/main.cvd
+    $ ls
+    COPYING   main.fp   main.hsb   main.mdb  main.ndb
+    main.crb  main.hdb  main.info  main.msb  main.sfp
+</code></pre>
+<h3 id="external-tools"><a class="header" href="#external-tools">External tools</a></h3>
+<p>Below are tools that can be helpful when writing ClamAV signatures:</p>
+<ul>
+<li><a href="https://github.com/Cisco-Talos/CASC">CASC</a> - CASC is a plugin for IDA Pro that allows the user to highlight sections of code and create a signature based on the underlying instructions (with options to ignore bytes associated with registers, addresses, and offsets). It also contains SigAlyzer, a tool to take an existing signature and locate the regions within the binary that match the subsignatures.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../manual/Usage/ReportABug.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../manual/Signatures/DatabaseInfo.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../manual/Usage/ReportABug.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../manual/Signatures/DatabaseInfo.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

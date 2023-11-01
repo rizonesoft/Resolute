@@ -1,0 +1,1007 @@
+=========================================================================================
+ RIZONESOFT LOGGING VERSION 2.0
+=========================================================================================
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:16:32 ] DATE:                        10/08/2023 01:16:32
+[ 10/08/2023 01:16:32 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.101
+[ 10/08/2023 01:16:32 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:16:32 ] COMPILED:                    YES
+[ 10/08/2023 01:16:32 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:16:32 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:16:32 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:16:32 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:16:32 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:16:33 ] This is a message.
+[ 10/08/2023 01:16:34 ] Error: This is an Error message!
+[ 10/08/2023 01:16:35 ] Warning: This is a Warning!
+[ 10/08/2023 01:16:36 ] Success: This message is successful.
+[ 10/08/2023 01:16:37 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:26:35 ] DATE:                        10/08/2023 01:26:35
+[ 10/08/2023 01:26:35 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.103
+[ 10/08/2023 01:26:35 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:26:35 ] COMPILED:                    YES
+[ 10/08/2023 01:26:35 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:26:35 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:26:35 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:26:35 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:26:35 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:26:36 ] This is a message.
+[ 10/08/2023 01:26:37 ] Error: This is an Error message!
+[ 10/08/2023 01:26:38 ] Warning: This is a Warning!
+[ 10/08/2023 01:26:39 ] Success: This message is successful.
+[ 10/08/2023 01:26:40 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:30:36 ] DATE:                        10/08/2023 01:30:36
+[ 10/08/2023 01:30:36 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.104
+[ 10/08/2023 01:30:36 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:30:36 ] COMPILED:                    YES
+[ 10/08/2023 01:30:36 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:30:36 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:30:36 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:30:36 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:30:36 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:30:37 ] This is a message.
+[ 10/08/2023 01:30:38 ] Error: This is an Error message!
+[ 10/08/2023 01:30:39 ] Warning: This is a Warning!
+[ 10/08/2023 01:30:40 ] Success: This message is successful.
+[ 10/08/2023 01:30:41 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:32:46 ] DATE:                        10/08/2023 01:32:46
+[ 10/08/2023 01:32:46 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.105
+[ 10/08/2023 01:32:46 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:32:46 ] COMPILED:                    YES
+[ 10/08/2023 01:32:46 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:32:46 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:32:46 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:32:46 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:32:46 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:32:47 ] This is a message.
+[ 10/08/2023 01:32:48 ] Error: This is an Error message!
+[ 10/08/2023 01:32:49 ] Warning: This is a Warning!
+[ 10/08/2023 01:32:50 ] Success: This message is successful.
+[ 10/08/2023 01:32:51 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:35:12 ] DATE:                        10/08/2023 01:35:12
+[ 10/08/2023 01:35:12 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.106
+[ 10/08/2023 01:35:12 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:35:12 ] COMPILED:                    YES
+[ 10/08/2023 01:35:12 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:35:12 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:35:12 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:35:12 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:35:12 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:35:12 ] This is a message.
+[ 10/08/2023 01:35:13 ] Error: This is an Error message!
+[ 10/08/2023 01:35:14 ] Warning: This is a Warning!
+[ 10/08/2023 01:35:15 ] Success: This message is successful.
+[ 10/08/2023 01:35:16 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:36:07 ] DATE:                        10/08/2023 01:36:07
+[ 10/08/2023 01:36:07 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.107
+[ 10/08/2023 01:36:07 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:36:07 ] COMPILED:                    YES
+[ 10/08/2023 01:36:07 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:36:07 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:36:07 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:36:07 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:36:07 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:36:07 ] This is a message.
+[ 10/08/2023 01:36:08 ] Error: This is an Error message!
+[ 10/08/2023 01:36:10 ] Warning: This is a Warning!
+[ 10/08/2023 01:36:11 ] Success: This message is successful.
+[ 10/08/2023 01:36:12 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:37:12 ] DATE:                        10/08/2023 01:37:12
+[ 10/08/2023 01:37:12 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.108
+[ 10/08/2023 01:37:12 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:37:12 ] COMPILED:                    YES
+[ 10/08/2023 01:37:12 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:37:12 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:37:12 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:37:12 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:37:12 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:37:13 ] This is a message.
+[ 10/08/2023 01:37:14 ] Error: This is an Error message!
+[ 10/08/2023 01:37:15 ] Warning: This is a Warning!
+[ 10/08/2023 01:37:16 ] Success: This message is successful.
+[ 10/08/2023 01:37:17 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:38:57 ] DATE:                        10/08/2023 01:38:57
+[ 10/08/2023 01:38:57 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.109
+[ 10/08/2023 01:38:57 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:38:57 ] COMPILED:                    YES
+[ 10/08/2023 01:38:57 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:38:57 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:38:57 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:38:57 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:38:57 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 01:38:58 ] This is a message.
+[ 10/08/2023 01:38:59 ] Error: This is an Error message!
+[ 10/08/2023 01:39:00 ] Warning: This is a Warning!
+[ 10/08/2023 01:39:01 ] Success: This message is successful.
+[ 10/08/2023 01:39:02 ] Finished testing logging system.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:53:22 ] DATE:                        10/08/2023 01:53:22
+[ 10/08/2023 01:53:22 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.110
+[ 10/08/2023 01:53:22 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:53:22 ] COMPILED:                    YES
+[ 10/08/2023 01:53:22 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:53:22 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:53:22 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:53:22 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:53:22 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:54:46 ] DATE:                        10/08/2023 01:54:46
+[ 10/08/2023 01:54:46 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.111
+[ 10/08/2023 01:54:46 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:54:46 ] COMPILED:                    YES
+[ 10/08/2023 01:54:46 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:54:46 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:54:46 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:54:46 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:54:46 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 01:56:09 ] DATE:                        10/08/2023 01:56:09
+[ 10/08/2023 01:56:09 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.112
+[ 10/08/2023 01:56:09 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 01:56:09 ] COMPILED:                    YES
+[ 10/08/2023 01:56:09 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 01:56:09 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 01:56:09 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 01:56:09 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 01:56:09 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:09:40 ] DATE:                        10/08/2023 02:09:40
+[ 10/08/2023 02:09:40 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.113
+[ 10/08/2023 02:09:40 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:09:40 ] COMPILED:                    YES
+[ 10/08/2023 02:09:40 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:09:40 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:09:40 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:09:40 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:09:40 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:11:18 ] DATE:                        10/08/2023 02:11:18
+[ 10/08/2023 02:11:18 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.114
+[ 10/08/2023 02:11:18 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:11:18 ] COMPILED:                    YES
+[ 10/08/2023 02:11:18 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:11:18 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:11:18 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:11:18 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:11:18 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:11:23 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:11:23 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 02:11:48 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:11:48 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 02:11:54 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:11:54 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 02:11:59 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:11:59 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:13:42 ] DATE:                        10/08/2023 02:13:42
+[ 10/08/2023 02:13:42 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.115
+[ 10/08/2023 02:13:42 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:13:42 ] COMPILED:                    YES
+[ 10/08/2023 02:13:42 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:13:42 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:13:42 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:13:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:13:42 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:15:42 ] DATE:                        10/08/2023 02:15:42
+[ 10/08/2023 02:15:42 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.116
+[ 10/08/2023 02:15:42 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:15:42 ] COMPILED:                    YES
+[ 10/08/2023 02:15:42 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:15:42 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:15:42 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:15:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:15:42 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:16:08 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:16:08 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:18:06 ] DATE:                        10/08/2023 02:18:06
+[ 10/08/2023 02:18:06 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.116
+[ 10/08/2023 02:18:06 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:18:06 ] COMPILED:                    YES
+[ 10/08/2023 02:18:06 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:18:06 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:18:06 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:18:06 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:18:06 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:19:56 ] DATE:                        10/08/2023 02:19:56
+[ 10/08/2023 02:19:56 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.117
+[ 10/08/2023 02:19:56 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:19:56 ] COMPILED:                    YES
+[ 10/08/2023 02:19:56 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:19:56 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:19:56 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:19:56 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:19:56 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:20:11 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:20:12 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:33:36 ] DATE:                        10/08/2023 02:33:36
+[ 10/08/2023 02:33:36 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.118
+[ 10/08/2023 02:33:36 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:33:36 ] COMPILED:                    YES
+[ 10/08/2023 02:33:36 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:33:36 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:33:36 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:33:36 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:33:36 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:33:47 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:33:47 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:35:02 ] DATE:                        10/08/2023 02:35:02
+[ 10/08/2023 02:35:02 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.119
+[ 10/08/2023 02:35:02 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:35:02 ] COMPILED:                    YES
+[ 10/08/2023 02:35:02 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:35:02 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:35:02 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:35:02 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:35:02 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:35:07 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:35:07 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:36:03 ] DATE:                        10/08/2023 02:36:03
+[ 10/08/2023 02:36:03 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.120
+[ 10/08/2023 02:36:03 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:36:03 ] COMPILED:                    YES
+[ 10/08/2023 02:36:03 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:36:03 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:36:03 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:36:03 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:36:03 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:36:08 ] Cleaning old registry entries.
+[ 10/08/2023 02:36:08 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 02:36:08 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 02:36:08 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:36:45 ] DATE:                        10/08/2023 02:36:45
+[ 10/08/2023 02:36:45 ] PROGRAM:                     Take Ownership Shell Extension 11.1.2.120
+[ 10/08/2023 02:36:45 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:36:45 ] COMPILED:                    YES
+[ 10/08/2023 02:36:45 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:36:45 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:36:45 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:36:45 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:36:45 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:36:48 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:36:48 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:39:47 ] DATE:                        10/08/2023 02:39:47
+[ 10/08/2023 02:39:47 ] PROGRAM:                     Take Ownership 11.1.2.121
+[ 10/08/2023 02:39:47 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:39:47 ] COMPILED:                    YES
+[ 10/08/2023 02:39:47 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:39:47 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:39:47 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:39:47 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:39:47 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:43:32 ] DATE:                        10/08/2023 02:43:32
+[ 10/08/2023 02:43:32 ] PROGRAM:                     Take Ownership 11.1.2.122
+[ 10/08/2023 02:43:32 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:43:32 ] COMPILED:                    YES
+[ 10/08/2023 02:43:32 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:43:32 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:43:32 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:43:32 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:43:32 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:45:22 ] DATE:                        10/08/2023 02:45:22
+[ 10/08/2023 02:45:22 ] PROGRAM:                     Take Ownership 11.1.2.123
+[ 10/08/2023 02:45:22 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:45:22 ] COMPILED:                    YES
+[ 10/08/2023 02:45:22 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:45:22 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:45:22 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:45:22 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:45:22 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:45:50 ] Cleaning old registry entries.
+[ 10/08/2023 02:45:50 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 02:45:50 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 02:45:50 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:53:31 ] DATE:                        10/08/2023 02:53:31
+[ 10/08/2023 02:53:31 ] PROGRAM:                     Take Ownership 11.1.2.124
+[ 10/08/2023 02:53:31 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:53:31 ] COMPILED:                    YES
+[ 10/08/2023 02:53:31 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:53:31 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:53:31 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:53:31 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:53:31 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:54:12 ] DATE:                        10/08/2023 02:54:12
+[ 10/08/2023 02:54:12 ] PROGRAM:                     Take Ownership 11.1.2.125
+[ 10/08/2023 02:54:12 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:54:12 ] COMPILED:                    YES
+[ 10/08/2023 02:54:12 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:54:12 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:54:12 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:54:12 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:54:12 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:54:51 ] DATE:                        10/08/2023 02:54:51
+[ 10/08/2023 02:54:51 ] PROGRAM:                     Take Ownership 11.1.2.126
+[ 10/08/2023 02:54:51 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:54:51 ] COMPILED:                    YES
+[ 10/08/2023 02:54:51 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:54:51 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:54:51 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:54:51 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:54:51 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 02:56:44 ] DATE:                        10/08/2023 02:56:44
+[ 10/08/2023 02:56:44 ] PROGRAM:                     Take Ownership 11.1.2.128
+[ 10/08/2023 02:56:44 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 02:56:44 ] COMPILED:                    YES
+[ 10/08/2023 02:56:44 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 02:56:44 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 02:56:44 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 02:56:44 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 02:56:44 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 02:57:21 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:57:21 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 02:57:28 ] Cleaning old registry entries.
+[ 10/08/2023 02:57:28 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 02:57:28 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 02:57:28 ] Success: Take Ownership Shell Extension Installed.
+[ 10/08/2023 02:57:43 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 02:57:43 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 03:01:10 ] DATE:                        10/08/2023 03:01:10
+[ 10/08/2023 03:01:10 ] PROGRAM:                     Take Ownership 11.1.2.129
+[ 10/08/2023 03:01:10 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 03:01:10 ] COMPILED:                    YES
+[ 10/08/2023 03:01:10 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 03:01:10 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 03:01:10 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 03:01:10 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 03:01:10 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 03:01:19 ] Cleaning old registry entries.
+[ 10/08/2023 03:01:19 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 03:01:19 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 03:01:19 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 03:03:05 ] DATE:                        10/08/2023 03:03:05
+[ 10/08/2023 03:03:05 ] PROGRAM:                     Take Ownership 11.1.2.130
+[ 10/08/2023 03:03:05 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 03:03:05 ] COMPILED:                    YES
+[ 10/08/2023 03:03:05 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 03:03:05 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 03:03:05 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 03:03:05 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 03:03:05 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 03:03:13 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 03:03:13 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 03:03:17 ] Cleaning old registry entries.
+[ 10/08/2023 03:03:17 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 03:03:17 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 03:03:17 ] Success: Take Ownership Shell Extension Installed.
+[ 10/08/2023 03:03:18 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 03:03:18 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 03:03:23 ] Cleaning old registry entries.
+[ 10/08/2023 03:03:23 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 03:03:23 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 03:03:23 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 03:07:58 ] DATE:                        10/08/2023 03:07:58
+[ 10/08/2023 03:07:58 ] PROGRAM:                     Take Ownership 11.1.2.131
+[ 10/08/2023 03:07:58 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 03:07:58 ] COMPILED:                    YES
+[ 10/08/2023 03:07:58 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 03:07:58 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 03:07:58 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 03:07:58 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 03:07:58 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 03:08:06 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 03:08:06 ] Success: Take Ownership Shell Extension Uninstalled.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 03:12:06 ] DATE:                        10/08/2023 03:12:06
+[ 10/08/2023 03:12:06 ] PROGRAM:                     Take Ownership 11.1.2.133
+[ 10/08/2023 03:12:06 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 03:12:06 ] COMPILED:                    YES
+[ 10/08/2023 03:12:06 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 03:12:06 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 03:12:06 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 03:12:06 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 03:12:06 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 03:12:11 ] Cleaning old registry entries.
+[ 10/08/2023 03:12:11 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 03:12:11 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 03:12:11 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 03:38:38 ] DATE:                        10/08/2023 03:38:38
+[ 10/08/2023 03:38:38 ] PROGRAM:                     Take Ownership 11.1.2.136
+[ 10/08/2023 03:38:38 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 03:38:38 ] COMPILED:                    YES
+[ 10/08/2023 03:38:38 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 03:38:38 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 03:38:38 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 03:38:38 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 03:38:38 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 03:45:55 ] DATE:                        10/08/2023 03:45:55
+[ 10/08/2023 03:45:55 ] PROGRAM:                     Take Ownership 11.1.2.137
+[ 10/08/2023 03:45:55 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 03:45:55 ] COMPILED:                    YES
+[ 10/08/2023 03:45:55 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 03:45:55 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 03:45:55 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 03:45:55 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 03:45:55 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 03:46:00 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 03:46:00 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 03:46:09 ] Cleaning old registry entries.
+[ 10/08/2023 03:46:09 ] Installing Take Ownership Shell Extension without 'Pause'.
+[ 10/08/2023 03:46:09 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 03:46:09 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 03:56:39 ] DATE:                        10/08/2023 03:56:39
+[ 10/08/2023 03:56:39 ] PROGRAM:                     Take Ownership 11.1.2.848
+[ 10/08/2023 03:56:39 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 03:56:39 ] COMPILED:                    YES
+[ 10/08/2023 03:56:39 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 03:56:39 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 03:56:39 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 03:56:39 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 03:56:39 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/08/2023 03:56:52 ] Uninstalling Take Ownership Shell Extension.
+[ 10/08/2023 03:56:52 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/08/2023 03:56:57 ] Cleaning old registry entries.
+[ 10/08/2023 03:56:57 ] Installing Take Ownership Shell Extension without Pause.
+[ 10/08/2023 03:56:57 ] Installing Take Ownership Shell Extension.
+[ 10/08/2023 03:56:57 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/08/2023 04:14:11 ] DATE:                        10/08/2023 04:14:11
+[ 10/08/2023 04:14:11 ] PROGRAM:                     Take Ownership 11.1.2.853
+[ 10/08/2023 04:14:11 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/08/2023 04:14:11 ] COMPILED:                    YES
+[ 10/08/2023 04:14:11 ] WINDOWS VERSION:             WIN_10 
+[ 10/08/2023 04:14:11 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/08/2023 04:14:11 ] MEMORY (RAM):                32601.73 MB
+[ 10/08/2023 04:14:11 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/08/2023 04:14:11 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:12:43 ] DATE:                        10/10/2023 08:12:43
+[ 10/10/2023 08:12:43 ] PROGRAM:                     Take Ownership 11.1.3.857
+[ 10/10/2023 08:12:43 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:12:43 ] COMPILED:                    YES
+[ 10/10/2023 08:12:43 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:12:43 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:12:43 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:12:43 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:12:43 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/10/2023 08:12:54 ] Uninstalling Take Ownership Shell Extension.
+[ 10/10/2023 08:12:54 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/10/2023 08:12:55 ] Cleaning old registry entries.
+[ 10/10/2023 08:12:55 ] Installing Take Ownership Shell Extension without Pause.
+[ 10/10/2023 08:12:55 ] Installing Take Ownership Shell Extension.
+[ 10/10/2023 08:12:55 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:13:04 ] DATE:                        10/10/2023 08:13:04
+[ 10/10/2023 08:13:04 ] PROGRAM:                     Take Ownership 11.1.3.857
+[ 10/10/2023 08:13:04 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:13:04 ] COMPILED:                    YES
+[ 10/10/2023 08:13:04 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:13:04 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:13:04 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:13:04 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:13:04 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:14:03 ] DATE:                        10/10/2023 08:14:03
+[ 10/10/2023 08:14:03 ] PROGRAM:                     Take Ownership 11.1.3.857
+[ 10/10/2023 08:14:03 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:14:03 ] COMPILED:                    YES
+[ 10/10/2023 08:14:03 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:14:03 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:14:03 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:14:03 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:14:03 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:14:57 ] DATE:                        10/10/2023 08:14:57
+[ 10/10/2023 08:14:57 ] PROGRAM:                     Take Ownership 11.1.3.857
+[ 10/10/2023 08:14:57 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:14:57 ] COMPILED:                    YES
+[ 10/10/2023 08:14:57 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:14:57 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:14:57 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:14:57 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:14:57 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:15:21 ] DATE:                        10/10/2023 08:15:21
+[ 10/10/2023 08:15:21 ] PROGRAM:                     Take Ownership 11.1.3.857
+[ 10/10/2023 08:15:21 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:15:21 ] COMPILED:                    YES
+[ 10/10/2023 08:15:21 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:15:21 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:15:21 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:15:21 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:15:21 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:16:58 ] DATE:                        10/10/2023 08:16:58
+[ 10/10/2023 08:16:58 ] PROGRAM:                     Take Ownership 11.1.3.858
+[ 10/10/2023 08:16:58 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:16:58 ] COMPILED:                    YES
+[ 10/10/2023 08:16:58 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:16:58 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:16:58 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:16:58 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:16:58 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:17:07 ] DATE:                        10/10/2023 08:17:07
+[ 10/10/2023 08:17:07 ] PROGRAM:                     Take Ownership 11.1.3.858
+[ 10/10/2023 08:17:07 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:17:07 ] COMPILED:                    YES
+[ 10/10/2023 08:17:07 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:17:07 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:17:07 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:17:07 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:17:07 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:19:13 ] DATE:                        10/10/2023 08:19:13
+[ 10/10/2023 08:19:13 ] PROGRAM:                     Take Ownership 11.1.3.860
+[ 10/10/2023 08:19:13 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:19:13 ] COMPILED:                    YES
+[ 10/10/2023 08:19:13 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:19:13 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:19:13 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:19:13 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:19:13 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:20:18 ] DATE:                        10/10/2023 08:20:18
+[ 10/10/2023 08:20:18 ] PROGRAM:                     Take Ownership 11.1.3.861
+[ 10/10/2023 08:20:18 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:20:18 ] COMPILED:                    YES
+[ 10/10/2023 08:20:18 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:20:18 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:20:18 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:20:18 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:20:18 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/10/2023 08:21:17 ] DATE:                        10/10/2023 08:21:17
+[ 10/10/2023 08:21:17 ] PROGRAM:                     Take Ownership 11.1.3.861
+[ 10/10/2023 08:21:17 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/10/2023 08:21:17 ] COMPILED:                    YES
+[ 10/10/2023 08:21:17 ] WINDOWS VERSION:             WIN_10 
+[ 10/10/2023 08:21:17 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/10/2023 08:21:17 ] MEMORY (RAM):                32601.73 MB
+[ 10/10/2023 08:21:17 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/10/2023 08:21:17 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 10/10/2023 08:21:35 ] Uninstalling Take Ownership Shell Extension.
+[ 10/10/2023 08:21:35 ] Success: Take Ownership Shell Extension Uninstalled.
+[ 10/10/2023 08:22:37 ] Cleaning old registry entries.
+[ 10/10/2023 08:22:37 ] Installing Take Ownership Shell Extension without Pause.
+[ 10/10/2023 08:22:37 ] Installing Take Ownership Shell Extension.
+[ 10/10/2023 08:22:37 ] Success: Take Ownership Shell Extension Installed.
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/15/2023 14:51:48 ] DATE:                        10/15/2023 14:51:48
+[ 10/15/2023 14:51:48 ] PROGRAM:                     Take Ownership 11.1.1.862
+[ 10/15/2023 14:51:48 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/15/2023 14:51:48 ] COMPILED:                    YES
+[ 10/15/2023 14:51:48 ] WINDOWS VERSION:             WIN_10 
+[ 10/15/2023 14:51:48 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/15/2023 14:51:48 ] MEMORY (RAM):                32601.73 MB
+[ 10/15/2023 14:51:48 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/15/2023 14:51:48 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/15/2023 14:54:24 ] DATE:                        10/15/2023 14:54:24
+[ 10/15/2023 14:54:24 ] PROGRAM:                     Take Ownership 11.1.1.863
+[ 10/15/2023 14:54:24 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/15/2023 14:54:24 ] COMPILED:                    YES
+[ 10/15/2023 14:54:24 ] WINDOWS VERSION:             WIN_10 
+[ 10/15/2023 14:54:24 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/15/2023 14:54:24 ] MEMORY (RAM):                32601.73 MB
+[ 10/15/2023 14:54:24 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/15/2023 14:54:24 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/16/2023 03:21:45 ] DATE:                        10/16/2023 03:21:45
+[ 10/16/2023 03:21:45 ] PROGRAM:                     Take Ownership 11.1.1.867
+[ 10/16/2023 03:21:45 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/16/2023 03:21:45 ] COMPILED:                    YES
+[ 10/16/2023 03:21:45 ] WINDOWS VERSION:             WIN_10 
+[ 10/16/2023 03:21:45 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/16/2023 03:21:45 ] MEMORY (RAM):                32601.73 MB
+[ 10/16/2023 03:21:45 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/16/2023 03:21:45 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/22/2023 01:06:13 ] DATE:                        10/22/2023 01:06:13
+[ 10/22/2023 01:06:13 ] PROGRAM:                     Take Ownership 11.1.1.868
+[ 10/22/2023 01:06:13 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/22/2023 01:06:13 ] COMPILED:                    YES
+[ 10/22/2023 01:06:13 ] WINDOWS VERSION:             WIN_10 
+[ 10/22/2023 01:06:13 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/22/2023 01:06:13 ] MEMORY (RAM):                32601.73 MB
+[ 10/22/2023 01:06:13 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/22/2023 01:06:13 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/30/2023 11:22:15 ] DATE:                        10/30/2023 11:22:15
+[ 10/30/2023 11:22:15 ] PROGRAM:                     Take Ownership 11.1.1.869
+[ 10/30/2023 11:22:15 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/30/2023 11:22:15 ] COMPILED:                    YES
+[ 10/30/2023 11:22:15 ] WINDOWS VERSION:             WIN_10 
+[ 10/30/2023 11:22:15 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/30/2023 11:22:15 ] MEMORY (RAM):                32601.73 MB
+[ 10/30/2023 11:22:15 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/30/2023 11:22:15 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 10/30/2023 12:07:38 ] DATE:                        10/30/2023 12:07:38
+[ 10/30/2023 12:07:38 ] PROGRAM:                     Take Ownership 11.1.1.869
+[ 10/30/2023 12:07:38 ] PROGRAM PATH:                [Z:\Resolute\Resolute\Ownership_X64.exe]
+[ 10/30/2023 12:07:38 ] COMPILED:                    YES
+[ 10/30/2023 12:07:38 ] WINDOWS VERSION:             WIN_10 
+[ 10/30/2023 12:07:38 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 10/30/2023 12:07:38 ] MEMORY (RAM):                32601.73 MB
+[ 10/30/2023 12:07:38 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 10/30/2023 12:07:38 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+

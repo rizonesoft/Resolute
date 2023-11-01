@@ -19,10 +19,10 @@
 ; ===============================================================================================================================
 
 ; #CONSTANTS# ===================================================================================================================
-Global Const $LNG_COUNTABOUT = 20
+Global Const $LNG_COUNTABOUT = 23
 Global Const $LNG_COUNTDONATE = 10
 Global Const $LNG_COUNTFILE = 25
-Global Const $LNG_COUNTLOGGING = 36
+Global Const $LNG_COUNTLOGGING = 99
 Global Const $LNG_COUNTMESSAGES = 50
 Global Const $LNG_COUNTUPDATE = 12
 Global Const $LNG_COUNTVERSIONING = 4
@@ -67,14 +67,15 @@ Func _Localization_About()
 	$g_aLangAbout[9]  = _Localization_Load("About", "Tip_Title_Country", "Made in South Africa")
 	$g_aLangAbout[10] = _Localization_Load("About", "Tip_Message_Country", "%{Program.Name} was born in South Africa.")
 	$g_aLangAbout[11] = _Localization_Load("About", "Label_Contributors", "Contributors")
-	$g_aLangAbout[12] = _Localization_Load("About", "Tip_Facebook", "Like us on Facebook.")
-	$g_aLangAbout[13] = _Localization_Load("About", "Tip_Twitter", "Follow us on Twitter.")
-	$g_aLangAbout[14] = _Localization_Load("About", "Tip_GooglePlus", "Find us on Google.")
-	$g_aLangAbout[15] = _Localization_Load("About", "Tip_GitHub", "%{Program.Name} on GitHub.")
-	$g_aLangAbout[16] = _Localization_Load("About", "Button_Ok", "Ok")
-	$g_aLangAbout[17] = _Localization_Load("About", "Label_RAM", "(RAM) %d MB FREE OF %d MB (%d%)")
-	$g_aLangAbout[18] = _Localization_Load("About", "Tip_RAM", "Random Access Memory")
-	$g_aLangAbout[19] = _Localization_Load("About", "Label_HDD", "(%s) %.2f GB FREE OF %.2f GB (%d%)")
+	$g_aLangAbout[12] = _Localization_Load("About", "Tip_Twitter", "Follow us on Twitter.")
+	$g_aLangAbout[13] = _Localization_Load("About", "Tip_Facebook", "Like us on Facebook.")
+	$g_aLangAbout[14] = _Localization_Load("About", "Tip_Reddit", "Read about us on Reddit.")
+	$g_aLangAbout[15] = _Localization_Load("About", "Tip_LinkedIn", "Connect with us on LinkedIn.")
+	$g_aLangAbout[16] = _Localization_Load("About", "Tip_GitHub", "%{Program.Name} on GitHub.")
+	$g_aLangAbout[17] = _Localization_Load("About", "Tip_WhatsApp", "Chat with us on WhatsApp.")
+	$g_aLangAbout[18] = _Localization_Load("About", "Button_Ok", "Ok")
+	$g_aLangAbout[19] = _Localization_Load("About", "Label_RAM", "(RAM) %d MB FREE OF %d MB (%d%)")
+	$g_aLangAbout[20] = _Localization_Load("About", "Label_HDD", "(%s) %.2f GB FREE OF %.2f GB (%d%)")
 
 EndFunc   ;==>_Localization_About
 
@@ -161,6 +162,7 @@ Func _Localization_Logging()
 	$g_aLangLogging[33] = _Localization_Load("Logging", "Level_Warning", "Warning:")
 	$g_aLangLogging[34] = _Localization_Load("Logging", "Level_Success", "Success:")
 	$g_aLangLogging[35] = _Localization_Load("Logging", "Level_Finished", "Finished:")
+	$g_aLangLogging[36] = _Localization_Load("Logging", "Level_Clean", "Clean:")
 
 EndFunc
 

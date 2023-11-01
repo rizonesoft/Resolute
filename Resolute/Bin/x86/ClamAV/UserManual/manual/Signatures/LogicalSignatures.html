@@ -1,0 +1,600 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Logical Signatures - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html" class="active"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="logical-signatures"><a class="header" href="#logical-signatures">Logical signatures</a></h1>
+<p>Logical signatures allow combining of multiple signatures in extended format using logical operators. They can provide both more detailed and flexible pattern matching. The logical sigs are stored inside <code>*.ldb</code> files in the following format:</p>
+<pre><code>SignatureName;TargetDescriptionBlock;LogicalExpression;Subsig0;
+Subsig1;Subsig2;...
+</code></pre>
+<p>where:</p>
+<ul>
+<li>
+<p><code>TargetDescriptionBlock</code> provides information about the engine and target file with comma separated <code>Arg:Val</code> pairs. For args where <code>Val</code> is a range, the minimum and maximum values should be expressed as <code>min-max</code>.</p>
+</li>
+<li>
+<p><code>LogicalExpression</code> specifies the logical expression describing the relationship between <code>Subsig0...SubsigN</code>. <strong>Basis clause:</strong> 0,1,...,N decimal indexes are SUB-EXPRESSIONS representing <code>Subsig0, Subsig1,...,SubsigN</code> respectively. <strong>Inductive clause:</strong> if <code>A</code> and <code>B</code> are SUB-EXPRESSIONS and <code>X, Y</code> are decimal numbers then <code>(A&amp;B)</code>, <code>(A|B)</code>, <code>A=X</code>, <code>A=X,Y</code>, <code>A&gt;X</code>, <code>A&gt;X,Y</code>, <code>A&lt;X</code> and <code>A&lt;X,Y</code> are SUB-EXPRESSIONS</p>
+</li>
+<li>
+<p><code>SubsigN</code> is n-th subsignature in extended format possibly preceded with an offset. There can be specified up to 64 subsigs.</p>
+</li>
+</ul>
+<p>Keywords used in <code>TargetDescriptionBlock</code>:</p>
+<ul>
+<li>
+<p><code>Engine:X-Y</code>: Required engine functionality level (range; 0.96).</p>
+<blockquote>
+<p><em>Note</em>: If the <code>Engine</code> keyword is used, it <em>must be the first keyword</em> in the <code>TargetDescriptionBlock</code> for backwards compatibility.
+See the <a href="../../appendix/FunctionalityLevels.html">FLEVEL reference</a> for details.</p>
+</blockquote>
+</li>
+<li>
+<p><code>Target:X</code>: A number specifying the type of the target file: <a href="../../appendix/FileTypes.html#Target-Types">Target Types</a>.</p>
+</li>
+<li>
+<p><code>FileSize:X-Y</code>: Required file size (range in bytes; 0.96)</p>
+</li>
+<li>
+<p><code>EntryPoint</code>: Entry point offset (range in bytes; 0.96)</p>
+</li>
+<li>
+<p><code>NumberOfSections</code>: Required number of sections in executable (range; 0.96)</p>
+</li>
+<li>
+<p><code>Container:CL_TYPE_*</code>: File type of the container which stores the scanned file.</p>
+<p>Specifying <code>CL_TYPE_ANY</code> matches on root objects only (i.e. the target file is explicitely <em>not</em> in a container). Chances slim that you would want to use <code>CL_TYPE_ANY</code> in a signature, because placing the malicious file in an archive will then prevent it from alerting.</p>
+<p>Every ClamAV file type has the potential to be a container for additional files, although some are more likely than others. When a file is parsed and data in the file is identified to be scanned as a unique type, that parent file becomes a container the moment the embedded content is scanned. For a list of possible CL_TYPEs, refer to the <a href="../../appendix/FileTypes.html">File Types Reference</a>.</p>
+</li>
+<li>
+<p><code>Intermediates:CL_TYPE_*&gt;CL_TYPE_*</code>: Specify one or more layers of file types containing the scanned file. <em>This is an alternative to using <code>Container</code>.</em></p>
+<p>You may specify up to 16 layers of file types separated by ’<code>&gt;</code>’ in top-down order. Note that the ’<code>&gt;</code>’ separator is not needed if you only specify a single container. The last type should be the immediate container containing the malicious file. Unlike with the <code>Container</code> option, <code>CL_TYPE_ANY</code> can be used as a wildcard file type. (expr; 0.100.0)</p>
+<p>For a list of possible CL_TYPEs, refer to the <a href="../../appendix/FileTypes.html">File Types Reference</a>.</p>
+</li>
+<li>
+<p><code>IconGroup1</code>: Icon group name 1 from .idb signature Required engine functionality (range; 0.96)</p>
+</li>
+<li>
+<p><code>IconGroup2</code>: Icon group name 2 from .idb signature Required engine functionality (range; 0.96)</p>
+</li>
+</ul>
+<p>Modifiers for subexpressions:</p>
+<ul>
+<li>
+<p><code>A=X</code>: If the SUB-EXPRESSION A refers to a single signature then this signature must get matched exactly X times; if it refers to a (logical) block of signatures then this block must generate exactly X matches (with any of its sigs).</p>
+</li>
+<li>
+<p><code>A=0</code> specifies negation (signature or block of signatures cannot be matched)</p>
+</li>
+<li>
+<p><code>A=X,Y</code>: If the SUB-EXPRESSION A refers to a single signature then this signature must be matched exactly X times; if it refers to a (logical) block of signatures then this block must generate X matches and at least Y different signatures must get matched.</p>
+</li>
+<li>
+<p><code>A&gt;X</code>: If the SUB-EXPRESSION A refers to a single signature then this signature must get matched more than X times; if it refers to a (logical) block of signatures then this block must generate more than X matches (with any of its sigs).</p>
+</li>
+<li>
+<p><code>A&gt;X,Y</code>: If the SUB-EXPRESSION A refers to a single signature then this signature must get matched more than X times; if it refers to a (logical) block of signatures then this block must generate more than X matches <em>and</em> at least Y different signatures must be matched.</p>
+</li>
+<li>
+<p><code>A&lt;X</code>: Just like <code>A&gt;Z</code> above with the change of &quot;more&quot; to &quot;less&quot;.</p>
+<p>If the SUB-EXPRESSION A refers to a single signature then this signature must get matched less than X times; if it refers to a (logical) block of signatures then this block must generate less than X matches (with any of its sigs).</p>
+</li>
+<li>
+<p><code>A&lt;X,Y</code>: Similar to <code>A&gt;X,Y</code>. If the SUB-EXPRESSION A refers to a single signature then this signature must get matched less than X times; if it refers to a (logical) block of signatures then this block must generate less than X matches <em>and</em> at least Y different signatures must be matched.</p>
+</li>
+</ul>
+<p>Examples:</p>
+<pre><code>Sig1;Target:0;(0&amp;1&amp;2&amp;3)&amp;(4|1);6b6f74656b;616c61;7a6f6c77;7374656
+6616e;deadbeef
+
+Sig2;Target:0;((0|1|2)&gt;5,2)&amp;(3|1);6b6f74656b;616c61;7a6f6c77;737
+46566616e
+
+Sig3;Target:0;((0|1|2|3)=2)&amp;(4|1);6b6f74656b;616c61;7a6f6c77;737
+46566616e;deadbeef
+
+Sig4;Engine:51-255,Target:1;((0|1)&amp;(2|3))&amp;4;EP+123:33c06834f04100
+f2aef7d14951684cf04100e8110a00;S2+78:22??232c2d252229{-15}6e6573
+(63|64)61706528;S3+50:68efa311c3b9963cb1ee8e586d32aeb9043e;f9c58
+dcf43987e4f519d629b103375;SL+550:6300680065005c0046006900
+</code></pre>
+<h2 id="subsignature-modifiers"><a class="header" href="#subsignature-modifiers">Subsignature Modifiers</a></h2>
+<p>ClamAV (clamav-0.99) supports a number of additional subsignature
+modifiers for logical signatures. This is done by specifying <code>::</code>
+followed by a number of characters representing the desired options.
+Signatures using subsignature modifiers require <code>Engine:81-255</code> for
+backwards-compatibility.</p>
+<ul>
+<li>
+<p>Case-Insensitive [<code>i</code>]</p>
+<p>Specifying the <code>i</code> modifier causes ClamAV to match all alphabetic hex bytes as case-insensitive. All patterns in ClamAV are case-sensitive by default.</p>
+</li>
+<li>
+<p>Wide [<code>w</code>]</p>
+<p>Specifying the <code>w</code> causes ClamAV to match all hex bytes encoded with two bytes per character. Note this simply interweaves each character with NULL characters and does not truly support UTF-16 characters. Wildcards for ’wide’ subsignatures are not treated as wide (i.e. there can be an odd number of intermittent characters). This can be combined with <code>a</code> to search for patterns in both wide and ascii.</p>
+</li>
+<li>
+<p>Fullword [<code>f</code>]</p>
+<p>Match subsignature as a fullword (delimited by non-alphanumeric characters).</p>
+</li>
+<li>
+<p>Ascii [<code>a</code>]</p>
+<p>Match subsignature as ascii characters. This can be combined with <code>w</code> to search for patterns in both ascii and wide.</p>
+</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>Match 'AAAA'(nocase) and 'BBBBBB'(nocase)</li>
+</ul>
+<pre><code>clamav-nocase-A;Engine:81-255,Target:0;0&amp;1;41414141::i;424242424242::i
+</code></pre>
+<ul>
+<li>Match 'AAA' and 'hello'(fullword)</li>
+</ul>
+<pre><code>clamav-fullword-A;Engine:81-255,Target:0;0&amp;1;414141;68656c6c6f::f
+</code></pre>
+<ul>
+<li>Match 'AAA' and 'hello'(fullword nocase)</li>
+</ul>
+<pre><code>clamav-fullword-B;Engine:81-255,Target:0;0&amp;1;414141;68656c6c6f::fi
+</code></pre>
+<ul>
+<li>Match 'AAA' and 'hello'(wide ascii)</li>
+</ul>
+<pre><code>clamav-wide-B2;Engine:81-255,Target:0;0&amp;1;414141;68656c6c6f::wa
+</code></pre>
+<ul>
+<li>Match 'AAA' and 'hello'(nocase wide fullword ascii)</li>
+</ul>
+<pre><code>clamav-wide-C0;Engine:81-255,Target:0;0&amp;1;414141;68656c6c6f::iwfa
+</code></pre>
+<h2 id="special-subsignature-types"><a class="header" href="#special-subsignature-types">Special Subsignature Types</a></h2>
+<h3 id="macro-subsignatures"><a class="header" href="#macro-subsignatures">Macro subsignatures</a></h3>
+<p>Introduced in ClamAV 0.96</p>
+<p>Format: <code>${min-max}MACROID$</code></p>
+<p>Macro subsignatures are used to combine a number of existing extended
+signatures (<code>.ndb</code>) into a on-the-fly generated alternate string logical
+signature (<code>.ldb</code>). Signatures using macro subsignatures require
+<code>Engine:51-255</code> for backwards-compatibility.</p>
+<p>Example:</p>
+<pre><code>test.ldb:
+    TestMacro;Engine:51-255,Target:0;0&amp;1;616161;${6-7}12$
+
+test.ndb:
+    D1:0:$12:626262
+    D2:0:$12:636363
+    D3:0:$30:626264
+</code></pre>
+<p>The example logical signature <code>TestMacro</code> is functionally equivalent
+to:</p>
+<pre><code>TestMacro;Engine:51-255,Target:0;0;616161{3-4}(626262|636363)
+</code></pre>
+<ul>
+<li>
+<p><code>MACROID</code> points to a group of signatures; there can be at most 32 macro groups.</p>
+<ul>
+<li>In the example, <code>MACROID</code> is <code>12</code> and both <code>D1</code> and <code>D2</code> are members of macro group <code>12</code>. <code>D3</code> is a member of separate macro group <code>30</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>{min-max}</code> specifies the offset range at which one of the group signatures should match; the offset range is relative to the starting offset of the preceding subsignature. This means a macro subsignature cannot be the first subsignature.</p>
+<ul>
+<li>In the example, <code>{min-max}</code> is <code>{6-7}</code> and it is relative to the start of a <code>616161</code> match.</li>
+</ul>
+</li>
+<li>
+<p>For more information and examples please see <a href="https://bugzilla.clamav.net/show_bug.cgi?id=164">https://bugzilla.clamav.net/show_bug.cgi?id=164</a>.</p>
+</li>
+</ul>
+<h3 id="byte-compare-subsignatures"><a class="header" href="#byte-compare-subsignatures">Byte Compare Subsignatures</a></h3>
+<p>Introduced in ClamAV 0.101</p>
+<p>Format: <code>subsigid_trigger(offset#byte_options#comparisons)</code></p>
+<p>Byte compare subsignatures can be used to evaluate a numeric value at a given offset from the start of another (matched) subsignature within the same logical signature. These are executed after all other subsignatures within the logical subsignature are fired, with the exception of PCRE subsignatures. They can evaluate offsets only from a single referenced subsignature, and that subsignature must give a valid match for the evaluation to occur.</p>
+<ul>
+<li>
+<p><code>subsigid_trigger</code> is a required field and may refer to any single non-PCRE, non-Byte Compare subsignature within the lsig. The byte compare subsig will evaluate if <code>subsigid_trigger</code> matches. Triggering on multiple subsigs or logic based triggering is not currently supported.</p>
+</li>
+<li>
+<p><code>offset</code> is a required field that consists of an <code>offset_modifier</code> and a numeric <code>offset</code> (hex or decimal offsets are okay).</p>
+<ul>
+<li>
+<p><code>offset_modifier</code> can be either <code>&gt;&gt;</code> or <code>&lt;&lt;</code> where the former denotes a positive offset and the latter denotes a negative offset. The offset is calculated from the start of <code>subsigid_trigger</code>, which allows for byte extraction before the specified match, after the match, and within the match itself.</p>
+</li>
+<li>
+<p><code>offset</code> must be a positive hex or decimal value. This will be the number of bytes from the start of the referenced <code>subsigid_trigger</code> match within the file buffer to begin the comparison.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>byte_options</code> are used to specify the numeric type and endianess of the extracted byte sequence in that order as well as the number of bytes to be read. By default ClamAV will attempt to matchup up to the number of byte specified, unless the <code>e</code> (exact) option is specified or the numeric type is <code>b</code> (binary). This field follows the form <code>[h|d|a|i][l|b][e]num_bytes</code></p>
+<ul>
+<li>
+<p><code>h|d|a|i</code> where <code>h</code> specifies the byte sequence will be in hex, <code>d</code> decimal, <code>a</code> automatic detection of hex or decimal at runtime, and <code>i</code> signifies raw binary data.</p>
+</li>
+<li>
+<p><code>l|b</code> where <code>l</code> specifies the byte sequence will be in little endian order and <code>b</code> big endian. If decimal <code>d</code> is specified, big-endian is implied and using <code>l</code> will result in a malformed database error.</p>
+</li>
+<li>
+<p><code>e</code> specifies that ClamAV will only evaluate the comparison if it can extract the exact number of bytes specified. This option is implicitly declared when using the <code>i</code> flag.</p>
+</li>
+<li>
+<p><code>num_bytes</code> specifies the number of bytes to extract. This can be a hex or decimal value. If <code>i</code> is specified only 1, 2, 4, and 8 are valid options.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>comparisons</code> are a required field which denotes how to evaluate the extracted byte sequence. Each Byte Compare signature can have one or two <code>comparison_sets</code> separated by a comma. Each <code>comparison_set</code> consists of a <code>Comparison_symbol</code> and a <code>Comparison_value</code> and takes the form <code>Comparison_symbolComparison_value</code>. Thus, <code>comparisons</code> takes the form <code>comparison_set[,comparison_set]</code></p>
+<ul>
+<li>
+<p><code>Comparison_symbol</code> denotes the type of comparison to be done. The supported comparison symbols are <code>&lt;</code>, <code>&gt;</code>, <code>=</code>.</p>
+</li>
+<li>
+<p><code>Comparison_value</code> is a required field which must be a numeric hex or decimal value. If all other conditions are met, the byte compare subsig will evalutate the extracted byte sequence against this number based on the provided <code>comparison_symbol</code>.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="pcre-subsignatures"><a class="header" href="#pcre-subsignatures">PCRE subsignatures</a></h3>
+<p>Introduced in ClamAV 0.99</p>
+<p>Format: <code>Trigger/PCRE/[Flags]</code></p>
+<p>PCRE subsignatures are used within a logical signature (<code>.ldb</code>) to specify regex matches that execute once triggered by a conditional based on preceding subsignatures. Signatures using PCRE subsignatures require <code>Engine:81-255</code> for backwards-compatibility.</p>
+<ul>
+<li>
+<p><code>Trigger</code> is a required field that is a valid <code>LogicalExpression</code> and may refer to any subsignatures that precede this subsignature. Triggers cannot be self-referential and cannot refer to subsequent subsignatures.</p>
+</li>
+<li>
+<p><code>PCRE</code> is the expression representing the regex to execute. ClamAV identifies the regex string by searching from the beginning of the subsignature for the start-<code>/</code> and searching from the end for the end-<code>/</code>. You may <code>\</code>-escape any use of <code>/</code> within the regex string, but it is not required. For backward compatibility, <code>;</code> within the expression must be expressed as <code>\x3B</code>. The regex string cannot be empty and <code>(?UTF\*)</code> control sequences are not allowed. If debug messages are enabled (i.e. <code>clamscan --debug</code>), then named capture groups are displayed in a post-execution report.</p>
+</li>
+<li>
+<p><code>Flags</code> are a series of characters which affect the compilation and execution of <code>PCRE</code> within the PCRE compiler and the ClamAV engine. This field is optional.</p>
+<ul>
+<li>
+<p><code>g [CLAMAV_GLOBAL]</code> specifies to search for ALL matches of PCRE (default is to search for first match). NOTE: INCREASES the time needed to run the PCRE.</p>
+</li>
+<li>
+<p><code>r [CLAMAV_ROLLING]</code> specifies to use the given offset as the starting location to search for a match as opposed to the only location; applies to subsigs without maxshifts. By default, in order to facilatate normal ClamAV offset behavior, PCREs are auto-anchored (only attempt match on first offset); using the rolling option disables the auto-anchoring.</p>
+</li>
+<li>
+<p><code>e [CLAMAV_ENCOMPASS]</code> specifies to CONFINE matching between the specified offset and maxshift; applies only when maxshift is specified.</p>
+<blockquote>
+<p><em>Note</em>: DECREASES time needed to run the PCRE.</p>
+</blockquote>
+</li>
+<li>
+<p><code>i [PCRE_CASELESS]</code></p>
+</li>
+<li>
+<p><code>s [PCRE_DOTALL]</code></p>
+</li>
+<li>
+<p><code>m [PCRE_MULTILINE]</code></p>
+</li>
+<li>
+<p><code>x [PCRE_EXTENDED]</code></p>
+</li>
+<li>
+<p><code>A [PCRE_ANCHORED]</code></p>
+</li>
+<li>
+<p><code>E [PCRE_DOLLAR_ENODNLY]</code></p>
+</li>
+<li>
+<p><code>U [PCRE_UNGREEDY]</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Examples:</p>
+<pre><code>Find.All.ClamAV;Engine:81-255,Target:0;1;6265676c6164697427736e6f7462797465636f6465;0/clamav/g
+
+Find.ClamAV.OnlyAt.299;Engine:81-255,Target:0;2;7374756c747a67657473;7063726572656765786c6f6c;299:0&amp;1/clamav/
+
+Find.ClamAV.StartAt.300;Engine:81-255,Target:0;3;616c61696e;62756731393238;636c6f736564;300:0&amp;1&amp;2/clamav/r
+
+Find.All.Encompassed.ClamAV;Engine:81-255,Target:0;3;7768796172656e2774;796f757573696e67;79617261;200,300:0&amp;1&amp;2/clamav/ge
+
+Named.CapGroup.Pcre;Engine:81-255,Target:0;3;636f75727479617264;616c62756d;74657272696572;50:0&amp;1&amp;2/variable=(?&amp;lt;nilshell&amp;gt;.{16})end/gr
+
+Firefox.TreeRange.UseAfterFree;Engine:81-255,Target:0,Engine:81-255;0&amp;1&amp;2;2e766965772e73656c656374696f6e;2e696e76616c696461746553656c656374696f6e;0&amp;1/\x2Eview\x2Eselection.*?\x2Etree\s*\x3D\s*null.*?\x2Einvalidate/smi
+
+Firefox.IDB.UseAfterFree;Engine:81-255,Target:0;0&amp;1;4944424b657952616e6765;0/^\x2e(only|lowerBound|upperBound|bound)\x28.*?\x29.*?\x2e(lower|upper|lowerOpen|upperOpen)/smi
+
+Firefox.boundElements;Engine:81-255,Target:0;0&amp;1&amp;2;6576656e742e6
+26f756e64456c656d656e7473;77696e646f772e636c6f7365;0&amp;1/on(load|click)\s*=\s*\x22?window\.close\s*\x28/si
+</code></pre>
+<h3 id="image-fuzzy-hash-subsignatures"><a class="header" href="#image-fuzzy-hash-subsignatures">Image Fuzzy Hash subsignatures</a></h3>
+<p>Introduced in ClamAV 0.105</p>
+<p>Format: <code>fuzzy_img#&lt;hash&gt;#&lt;dist&gt;</code></p>
+<p>For example if you wanted to match on this image...</p>
+<p><img src="../../images/cisco.png" alt="logo.png" /></p>
+<p>...you would make a signature like this:</p>
+<pre><code>logo.png;Engine:150-255,Target:0;0;fuzzy_img#af2ad01ed42993c7#0
+</code></pre>
+<p>Image fuzzy hash signatures in 0.105 do not support matching with a hamming distance greater than zero. Support for matching with a hamming distance may be added in a future release. The signatures above explicitly set the hamming distance to <code>0</code>. But you could also omit it, like this:</p>
+<pre><code>logo.png;Engine:150-255,Target:0;0;fuzzy_img#af2ad01ed42993c7
+</code></pre>
+<p>You can combine the image fuzzy hash subsignature with other logical signature features, like adding additional subsignatures:</p>
+<pre><code>logo.png-2;Engine:150-255,Target:0;0&amp;1;49484452;fuzzy_img#af2ad01ed42993c7
+</code></pre>
+<p>or container types:</p>
+<pre><code>logo.png;Engine:150-255,Target:0,Container:CL_TYPE_HTML;0;fuzzy_img#af2ad01ed42993c7
+logo.png;Engine:150-255,Target:0,Container:CL_TYPE_MAIL;0;fuzzy_img#af2ad01ed42993c7
+</code></pre>
+<p>ClamAV's image fuzzy hash is very close to, but not 100% identical to, the fuzzy hash generated by the Python <code>imagehash</code> package's <code>phash()</code> function. Note that these are only clean-room approximations of the pHash™️ algorithm. ClamAV's image fuzzy hashes are not expected to match the fuzzy hashes generated using other tools. Some images may match, while others do not.</p>
+<p>You must use ClamAV to generate the fuzzy hash for the most reliable results. A <code>sigtool</code> option does not yet exist to generate a ClamAV image fuzzy hash. So, to generate the image fuzzy hash you can run this command:</p>
+<pre><code class="language-bash">clamscan --gen-json --debug /path/to/file
+</code></pre>
+<p>The hash will appear in the JSON above the &quot;SCAN SUMMARY&quot; under the object named &quot;ImageFuzzyHash&quot;.</p>
+<h2 id="signatures-for-version-information-vi-metadata-in-pe-files"><a class="header" href="#signatures-for-version-information-vi-metadata-in-pe-files">Signatures for Version Information (VI) metadata in PE files</a></h2>
+<p>Starting with ClamAV 0.96 it is possible to easily match certain information built into PE files (executables and dynamic link libraries). Whenever you lookup the properties of a PE executable file in windows, you are presented with a bunch of details about the file itself.</p>
+<p>These info are stored in a special area of the file resources which goes under the name of <code>VS_VERSION_INFORMATION</code> (or versioninfo for short). It is divided into 2 parts. The first part (which is rather uninteresting) is really a bunch of numbers and flags indicating the product and file version. It was originally intended for use with installers which, after parsing it, should be able to determine whether a certain executable or library are to be upgraded/overwritten or are already up to date. Suffice to say, this approach never really worked and is generally never used.</p>
+<p>The second block is much more interesting: it is a simple list of key/value strings, intended for user information and completely ignored by the OS. For example, if you look at ping.exe you can see the company being <em>&quot;Microsoft Corporation&quot;</em>, the description <em>&quot;TCP/IP Ping command&quot;</em>, the internal name <em>&quot;ping.exe&quot;</em> and so on... Depending on the OS version, some keys may be given peculiar visibility in the file properties dialog, however they are internally all the same.</p>
+<p>To match a versioninfo key/value pair, the special file offset anchor <code>VI</code> was introduced. This is similar to the other anchors (like <code>EP</code> and <code>SL</code>) except that, instead of matching the hex pattern against a single offset, it checks it against each and every key/value pair in the file. The <code>VI</code> token doesn’t need nor accept a <code>+/-</code> offset like e.g. <code>EP+1</code>. As for the hex signature itself, it’s just the utf16 dump of the key and value. Only the <code>??</code> and <code>(aa|bb)</code> wildcards are allowed in the signature. Usually, you don’t need to bother figuring it out: each key/value pair together with the corresponding VI-based signature is printed by <code>clamscan</code> when the <code>--debug</code> option is given.</p>
+<p>For example <code>clamscan --debug freecell.exe</code> produces:</p>
+<pre><code>[...]
+Recognized MS-EXE/DLL file
+in cli_peheader
+versioninfo_cb: type: 10, name: 1, lang: 410, rva: 9608
+cli_peheader: parsing version info @ rva 9608 (1/1)
+VersionInfo (d2de): 'CompanyName'='Microsoft Corporation' -
+VI:43006f006d00700061006e0079004e0061006d006500000000004d006900
+630072006f0073006f0066007400200043006f00720070006f0072006100740
+069006f006e000000
+VersionInfo (d32a): 'FileDescription'='Entertainment Pack
+FreeCell Game' - VI:460069006c006500440065007300630072006900700
+0740069006f006e000000000045006e007400650072007400610069006e006d
+0065006e00740020005000610063006b0020004600720065006500430065006
+c006c002000470061006d0065000000
+VersionInfo (d396): 'FileVersion'='5.1.2600.0 (xpclient.010817
+-1148)' - VI:460069006c006500560065007200730069006f006e00000000
+0035002e0031002e0032003600300030002e003000200028007800700063006
+c00690065006e0074002e003000310030003800310037002d00310031003400
+380029000000
+VersionInfo (d3fa): 'InternalName'='freecell' - VI:49006e007400
+650072006e0061006c004e0061006d006500000066007200650065006300650
+06c006c000000
+VersionInfo (d4ba): 'OriginalFilename'='freecell' - VI:4f007200
+6900670069006e0061006c00460069006c0065006e0061006d0065000000660
+0720065006500630065006c006c000000
+VersionInfo (d4f6): 'ProductName'='Sistema operativo Microsoft
+Windows' - VI:500072006f0064007500630074004e0061006d00650000000
+000530069007300740065006d00610020006f00700065007200610074006900
+76006f0020004d006900630072006f0073006f0066007400ae0020005700690
+06e0064006f0077007300ae000000
+VersionInfo (d562): 'ProductVersion'='5.1.2600.0' - VI:50007200
+6f006400750063007400560065007200730069006f006e00000035002e00310
+02e0032003600300030002e0030000000
+[...]
+</code></pre>
+<p>Although VI-based signatures are intended for use in logical signatures you can test them using ordinary <code>.ndb</code> files. For example:</p>
+<pre><code>my_test_vi_sig:1:VI:paste_your_hex_sig_here
+</code></pre>
+<p>Final note. If you want to decode a VI-based signature into a human readable form you can use:</p>
+<pre><code class="language-bash">echo hex_string | xxd -r -p | strings -el
+</code></pre>
+<p>For example:</p>
+<pre><code class="language-bash">echo 460069006c0065004400650073006300720069007000740069006f006e000000000045006e007400650072007400610069006e006d0065006e00740020005000610063006b0020004600720065006500430065006c006c00200047006100
+6d0065000000 | xxd -r -p | strings -el
+FileDescription
+Entertainment Pack FreeCell Game
+</code></pre>
+<h2 id="icon-signatures-for-pe-files"><a class="header" href="#icon-signatures-for-pe-files">Icon Signatures for PE files</a></h2>
+<p>While Icon Signatures are stored in a <code>.idb</code> file, they are a feature of Logical Signatures.</p>
+<p>ClamAV 0.96 includes an approximate/fuzzy icon matcher to help detecting malicious executables disguising themselves as innocent looking image files, office documents and the like.</p>
+<p>Icon matching is only triggered by Logical Signatures (<code>.ldb</code>) using the special attribute tokens <code>IconGroup1</code> or <code>IconGroup2</code>. These identify two (optional) groups of icons defined in a <code>.idb</code> database file. The format of the <code>.idb</code> file is:</p>
+<pre><code>ICONNAME:GROUP1:GROUP2:ICON_HASH
+</code></pre>
+<p>where:</p>
+<ul>
+<li>
+<p><code>ICON_NAME</code> is a unique string identifier for a specific icon,</p>
+</li>
+<li>
+<p><code>GROUP1</code> is a string identifier for the first group of icons (<code>IconGroup1</code>)</p>
+</li>
+<li>
+<p><code>GROUP2</code> is a string identifier for the second group of icons (<code>IconGroup2</code>),</p>
+</li>
+<li>
+<p><code>ICON_HASH</code> is a fuzzy hash of the icon image</p>
+</li>
+</ul>
+<p>The <code>ICON_HASH</code> field can be obtained from the debug output of libclamav. For example:</p>
+<pre><code>LibClamAV debug: ICO SIGNATURE:
+ICON_NAME:GROUP1:GROUP2:18e2e0304ce60a0cc3a09053a30000414100057e000afe0000e 80006e510078b0a08910d11ad04105e0811510f084e01040c080a1d0b0021000a39002a41
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Signatures/BodySignatureFormat.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Signatures/ExtendedSignatures.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Signatures/BodySignatureFormat.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Signatures/ExtendedSignatures.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

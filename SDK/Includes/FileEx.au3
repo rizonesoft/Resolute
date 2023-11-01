@@ -15,6 +15,9 @@
 #include "Logging.au3"
 
 
+Global Const $MOVEFILE_DELAY_UNTIL_REBOOT   = 0x00000004
+
+
 ; #INDEX# =======================================================================================================================
 ; Title .........: FileEx
 ; AutoIt Version : 3.3.15.0
@@ -214,3 +217,63 @@ Func _FileEx_RemoveFileName($sPath)
 	Return ($sDrive & $sDir)
 
 EndFunc   ;==>_FileEx_RemoveFileName
+
+
+Func _FileEx_FileWriteAccessible($sFile)
+    ; Returns
+    ;            1 = Success, file is writeable and deletable
+    ;            0 = Failure
+    ; @error
+    ;            1 = Access Denied because of lacking access rights
+    ;            2 = File is set "Read Only" by attribute
+    ;            3 = File not found
+    ;            4 = Unknown Api Error, check @extended
+
+    Local $iSuccess = 0, $iError_Extended = 0, $iError = 0, $hFile
+    ;$hFile = _WinAPI_CreateFileEx($sFile, $OPEN_EXISTING, $FILE_WRITE_DATA, BitOR($FILE_SHARE_DELETE, $FILE_SHARE_READ, $FILE_SHARE_WRITE), $FILE_FLAG_BACKUP_SEMANTICS)
+    $hFile = _WinAPI_CreateFileEx($sFile, 3, 2, 7, 0x02000000)
+    Switch _WinAPI_GetLastError()
+        Case 0 ; ERROR_SUCCESS
+            $iSuccess = 1
+        Case 5 ; ERROR_ACCESS_DENIED
+            If StringInStr(FileGetAttrib($sFile), "R", 2) Then
+                $iError = 2
+            Else
+                $iError = 1
+            EndIf
+        Case 2 ; ERROR_FILE_NOT_FOUND
+            $iError = 3
+        Case Else ; w000t?
+            $iError = 4
+            $iError_Extended = _WinAPI_GetLastError()
+    EndSwitch
+    _WinAPI_CloseHandle($hFile)
+    Return SetError($iError, $iError_Extended, $iSuccess)
+EndFunc   ;==>_FileEx_FileWriteAccessible
+
+
+; #FUNCTION# ====================================================================================================
+; Name...........: _FileEx_FileDeleteUnlock
+; Description ...:
+; Syntax.........: _FileEx_FileDeleteUnlock($FileSource)
+; Parameters ....: $FileSource - Try to unlock a file & delete it.
+; Return values .: Success  -
+;                  Failure  -
+; Author ........: Venom
+; Modified.......:
+; Remarks .......: None
+; Link ..........:
+; Example .......:
+; ===============================================================================================================
+Func _FileEx_FileDeleteUnlock($FileSource)
+	FileSetAttrib($FileSource, "-RASHNOT")
+	If Not FileDelete($FileSource) Then
+		_FileDeleteOnReboot($FileSource)
+	EndIf
+EndFunc   ;==>_FileEx_FileDeleteUnlock
+
+
+Func _FileDeleteOnReboot($FileSource)
+    Local $Return = DllCall('kernel32.dll', 'int', 'MoveFileExW', 'wstr', $FileSource, 'ptr', 0, 'dword', $MOVEFILE_DELAY_UNTIL_REBOOT)
+    Return $Return[0]
+EndFunc
