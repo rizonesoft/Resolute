@@ -6,6 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated the Spanish Translation
+
+--------------------------------------------------
+Version 11.2.3.2920 (OCTOBER 30, 2023)
+--------------------------------------------------
+
 - Upgraded Rizonesoft SDK to Version 11.
 - Enhanced Social Media Link Integration in the 'About' Dialog.
 - Optimized Memory Usage Indicator Stability in the 'About' Dialog.

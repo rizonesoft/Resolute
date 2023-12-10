@@ -16,30 +16,30 @@
 ;===============================================================================================================
 ; Aut2Exe Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Icon=..\..\Resources\Icons\DVDRepair.ico			;~ Filename of the Ico file to use for the compiled exe
-#AutoIt3Wrapper_OutFile_Type=exe									;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
-#AutoIt3Wrapper_OutFile=..\..\..\Resolute\DVDRepair.exe				;~ Target exe/a3x filename.
-#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\DVDRepair_X64.exe		;~ Target exe filename for X64 compile.
-;#AutoIt3Wrapper_Compression=4										;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
-;#AutoIt3Wrapper_UseUpx=Y											;~ (Y/N) Compress output program.  Default=Y
-;#AutoIt3Wrapper_UPX_Parameters=									;~ Override the default settings for UPX.
-#AutoIt3Wrapper_Change2CUI=N										;~ (Y/N) Change output program to CUI in stead of GUI. Default=N
-#AutoIt3Wrapper_Compile_both=Y										;~ (Y/N) Compile both X86 and X64 in one run. Default=N
+#AutoIt3Wrapper_Icon=..\..\Resources\Icons\MemBoost.ico			;~ Filename of the Ico file to use for the compiled exe
+#AutoIt3Wrapper_OutFile_Type=exe								;~ exe=Standalone executable (Default); a3x=Tokenised AutoIt3 code file
+#AutoIt3Wrapper_OutFile=..\..\..\Resolute\MemBoost.exe			;~ Target exe/a3x filename.
+#AutoIt3Wrapper_OutFile_X64=..\..\..\Resolute\MemBoost_X64.exe	;~ Target exe filename for X64 compile.
+;#AutoIt3Wrapper_Compression=4									;~ Compression parameter 0-4  0=Low 2=normal 4=High. Default=2
+;#AutoIt3Wrapper_UseUpx=Y										;~ (Y/N) Compress output program.  Default=Y
+;#AutoIt3Wrapper_UPX_Parameters=								;~ Override the default settings for UPX.
+#AutoIt3Wrapper_Change2CUI=N									;~ (Y/N) Change output program to CUI in stead of GUI. Default=N
+#AutoIt3Wrapper_Compile_both=Y									;~ (Y/N) Compile both X86 and X64 in one run. Default=N
 ;===============================================================================================================
 ; Target Program Resource info
 ;===============================================================================================================
-#AutoIt3Wrapper_Res_Comment=DVD Drive Repair						;~ Comment field
-#AutoIt3Wrapper_Res_Description=Rizonesoft DVD Drive Repair      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.2.3.2922
-#AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
-#AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
-#AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
-#AutoIt3Wrapper_Res_ProductVersion=11             					;~ Product Version
-#AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2023 Rizonesoft				;~ Copyright field
-#AutoIt3Wrapper_res_requestedExecutionLevel=requireAdministrator	;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
-#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81,Win10		;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
-;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
+#AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
+#AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2306
+#AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
+#AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
+#AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
+#AutoIt3Wrapper_Res_ProductVersion=11             				;~ Product Version
+#AutoIt3Wrapper_Res_Language=2057								;~ Resource Language code . Default 2057=English (United Kingdom)
+#AutoIt3Wrapper_Res_LegalCopyright=© 2023 Rizonesoft			;~ Copyright field
+#AutoIt3Wrapper_res_requestedExecutionLevel=highestAvailable	;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
+;#AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81			;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
+;#AutoIt3Wrapper_Res_SaveSource=N								;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
 ; If _Res_SaveSource=Y the content of Script_source depends on the _Run_Au3Stripper and #Au3Stripper_parameters directives:
 ;    If _Run_Au3Stripper=Y then
 ;        If #Au3Stripper_parameters=/STRIPONLY then Script_source is stripped script & stripped includes
@@ -59,7 +59,7 @@
 ;	%time% = PC timeformat
 ;	eg: #AutoIt3Wrapper_Res_Field=AutoIt Version|%AutoItVer%
 #AutoIt3Wrapper_Res_Field=CompanyName|Rizonesoft
-#AutoIt3Wrapper_Res_Field=ProductName|DVD Drive Repair
+#AutoIt3Wrapper_Res_Field=ProductName|Memory Booster
 #AutoIt3Wrapper_Res_Field=HomePage|https://www.rizonesoft.com
 #AutoIt3Wrapper_Res_Field=AutoItVersion|%AutoItVer%
 ; Add extra ICO files to the resources
@@ -71,24 +71,24 @@
 ; Add files to the resources - can be compressed
 ; #AutoIt3Wrapper_Res_Remove=
 ; Remove resources
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\DVDRepairH.ico				; 201
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoostH.ico					; 201
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico		; 202
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico			; 203
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			; 204
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico		; 205
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico		; 206
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico			; 207
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico			; 208
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico			; 202
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico				; 203
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			 	; 204
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico			; 205
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico			; 206
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico				; 207
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico				; 208
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico					; 209
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico					; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico						; 209
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico						; 210
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico			; 211
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico			; 212
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico				; 213
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico		; 214
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico				; 215
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico				; 211
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico				; 212
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico					; 213
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico			; 214
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico					; 215
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico					; 216
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
@@ -153,15 +153,53 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 273
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 274
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 275
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\DeviceTrouble.ico			; 276
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\RestorePoint.ico			; 277
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\DeviceMan.ico				; 278
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Firmware.ico				; 279
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 280
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 281
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 282
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 283
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 284
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 277
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 278
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 279
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 280
+
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\00.ico					; 281
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\01.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\02.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\03.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\04.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\05.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\06.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\07.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\08.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\09.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\10.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\11.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\12.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\13.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\14.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\15.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\16.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\17.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\18.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\19.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\20.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\21.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\22.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\23.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\24.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\25.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\26.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\27.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\28.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\29.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\30.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\31.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\32.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\33.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\34.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\35.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\36.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\37.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\38.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\39.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\40.ico
 
 ;===============================================================================================================
 ; Tidy Settings
@@ -173,7 +211,7 @@
 ; Au3Stripper Settings
 ;===============================================================================================================
 #AutoIt3Wrapper_Run_Au3Stripper=N								;~ (Y/N) Run Au3Stripper before compilation. default=N
-;#Au3Stripper_Parameters=MergeOnly								;~ Au3Stripper parameters...see SciTE4AutoIt3 Helpfile for options
+;#Au3Stripper_Parameters=/MergeOnly								;~ Au3Stripper parameters...see SciTE4AutoIt3 Helpfile for options
 ;#Au3Stripper_Ignore_Variables=
 ;===============================================================================================================
 ; AU3Check settings
@@ -205,11 +243,10 @@
 
 #EndRegion AutoIt3Wrapper Directives Section
 
-
 Opt("CaretCoordMode", 1)			;~ 1=absolute, 0=relative, 2=client
 Opt("ExpandEnvStrings", 1)			;~ 0=don't expand, 1=do expand
 Opt("ExpandVarStrings", 1)			;~ 0=don't expand, 1=do expand
-Opt("GUICloseOnESC", 0)				;~ 1=ESC  closes, 0=ESC won't close
+; Opt("GUICloseOnESC", 0)				;~ 1=ESC  closes, 0=ESC won't close
 Opt("GUICoordMode", 1)				;~ 1=absolute, 0=relative, 2=cell
 Opt("GUIDataSeparatorChar", "|")	;~ "|" is the default
 Opt("GUIOnEventMode", 1)			;~ 0=disabled, 1=OnEvent mode enabled
@@ -253,36 +290,37 @@ EndFunc   ;==>_ReBarStartUp
 
 #include "..\..\Includes\About.au3"
 #include "..\..\Includes\Donate.au3"
+#include "..\..\Includes\GDIPlusEx.au3"
+#include "..\..\Includes\FileEx.au3"
 #include "..\..\Includes\GuiMenuEx.au3"
 #include "..\..\Includes\ImageListEx.au3"
 #include "..\..\Includes\Link.au3"
 #include "..\..\Includes\Logging.au3"
 #include "..\..\Includes\Registry.au3"
 #include "..\..\Includes\Splash.au3"
+#include "..\..\Includes\SSLG.au3"
 #include "..\..\Includes\StringEx.au3"
 #include "..\..\Includes\Update.au3"
 #include "..\..\Includes\Versioning.au3"
 
 #include "Includes\Localization.au3"
 
-
 ;~ Developer Constants
 Global Const $DEBUG_UPDATE		= False
 
 ;~ Constants
-Global Const $CNT_MENUICONS		= 12
+Global Const $CNT_MENUICONS		= 8
 Global Const $CNT_LOGICONS		= 7
 Global Const $CNT_LANGICONS		= 35
 
 ;~ General Settings
 Global $g_sCompanyName			= "Rizonesoft"
-Global $g_sProgShortName		= "DVDRepair"
+Global $g_sProgShortName		= "MemBoost"
 Global $g_sProgShortName_X64	= $g_sProgShortName & "_X64"
-Global $g_sProgName				= "DVD Drive Repair"
+Global $g_sProgName				= "Memory Booster"
 Global $g_iSingleton			= True
 
 ;~ Links
-
 Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"														; https://www.rizonesoft.com
 Global $g_sUrlSupport			= "https://www.rizonesoft.com/contact-us/|www.rizonesoft.com/contact-us"								; https://www.rizonesoft.com/contact-us
 Global $g_sUrlWhatsApp			= "https://api.whatsapp.com/send?phone=27849630169&text=Hi,&source=&data="
@@ -296,12 +334,12 @@ Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|Git
 Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://www.rizonesoft.com/feed
 Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"						; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"							; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/dvd-drive-repair/|www.rizonesoft.com/downloads/dvd-drive-repair/"
+Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/resolute/|www.rizonesoft.com/downloads/resolute/"
 Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/resolute/update/"
 Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 
 ;~ Path Settings
-Global $g_sRootDir			= @ScriptDir ;~ Root Directory
+Global $g_sRootDir			= @ScriptDir
 Global $g_sWorkingDir		= $g_sRootDir ;~ Working Directory
 Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
@@ -312,12 +350,6 @@ Global $g_sDocHelpFile		= $g_sDocsDir & "\" & $g_sProgShortName & ".chm"
 Global $g_sDocChanges		= $g_sDocsDir & "\Changes.txt"
 Global $g_sDocLicense		= $g_sDocsDir & "\License.txt"
 Global $g_sDocReadme		= $g_sDocsDir & "\Readme.txt"
-; Configuration Settings
-Global $g_iSetProtectMachine
-Global $g_iSetResetMachine
-Global $g_iSetResetAutorun
-Global $g_iSetProtectAutorun
-Global $g_iSetDisableExtras
 
 If Not @Compiled Then
 	$g_sProcessDir = _PathFull(@ScriptDir & "\..\..\..\Resolute\Processing")
@@ -326,7 +358,8 @@ EndIf
 ;~ Logging Settings
 Global $g_sLoggingRoot		= $g_sWorkingDir & "\Logging\" & $g_sProgShortName
 Global $g_sLoggingPath		= $g_sLoggingRoot & "\" & $g_sProgShortName & ".log"
-Global $g_GuiLogBoxHeight	= 150
+Global $g_sLogIpResetPath	= $g_sLoggingRoot & "\IP_Reset.log"
+Global $g_GuiLogBoxHeight	= 125
 Global $g_iLogIconStart		= -202
 Global $g_iUpdateSubStatus	= True
 
@@ -346,9 +379,10 @@ Global $g_iAboutIconStart				= 216
 Global $g_iLangIconStart				= 232
 Global $g_iPowerIconsStart				= 267
 Global $g_iMenuIconsStart				= 273
+Global $g_iMemStatIcoStart				= 281
 
 Global $g_aCoreIcons[3]
-Global $g_aDonateIcons[6]
+; Global $g_aDonateIcons[3]
 Global $g_iSizeIcon						= 64
 Global $g_aLognIcons[$CNT_LOGICONS]
 Global $g_aLanguageIcons[$CNT_LANGICONS]
@@ -370,7 +404,7 @@ EndIf
 Global $g_iCheckForUpdates	= 4
 
 ;~ Donate
-Global $g_sDonateName = "Unkown"
+Global $g_sDonateName = "Unknown"
 Global $g_iDonateBuild = 13
 
 ;~ Title Settings
@@ -378,11 +412,11 @@ Global $g_TitleShowAdmin	= True	;~ Show whether program is running as Administra
 Global $g_TitleShowArch		= True	;~ Show program architecture
 Global $g_TitleShowVersion	= True	;~ Show program version
 Global $g_TitleShowBuild	= True	;~ Show program build
-Global $g_TitleShowAutoIt	= True	;~ Show AutoIt version
+Global $g_TitleShowAutoIt	= False	;~ Show AutoIt version
 
 ;~ Interface Settings
-Global $g_iCoreGuiWidth		= 550
-Global $g_iCoreGuiHeight	= 550
+Global $g_iCoreGuiWidth		= 580
+Global $g_iCoreGuiHeight	= 500
 Global $g_iMsgBoxTimeOut	= 60
 
 ;~ About Dialog
@@ -394,22 +428,36 @@ Global $g_hGuiIcon										;~ Main Icon
 Global $g_AniUpdate
 Global $g_AniProcessing
 Global $g_hMenuFile
-Global $g_hMenuTrouble
-Global $g_hMenuTools
 Global $g_hMenuHelp, $g_hUpdateMenuItem
 Global $g_hMenuDebug
+
 Global $g_OldSystemParam								;~ Used when resizing the main GUI
 Global $g_hSubHeading
-Global $g_hChkResetAutorun
-Global $g_hChkDoNothing
-Global $g_hChkProtectAutorun
-Global $g_hChkProtectMachine
 Global $g_hBtnRepair
 
 If Not IsDeclared("g_iParentState") Then Global $g_iParentState
 If Not IsDeclared("g_iParent") Then Global $g_iParent
 
 Global $g_hOptionsGui
+
+Global $g_hORADOptimMode[3]
+Global $g_hOComboAutSeconds
+Global $g_hOCheckNotify
+Global $g_hOCheckPlayEvents
+Global $g_hOCheckPlayWarnings
+Global $g_hOComboWarnEvery
+Global $g_hOComboWarnIf
+
+Global $g_iOptimizeMethod 	= 0
+Global $g_iAutoCount		= 30
+Global $g_iShowNotify		= 1
+Global $g_iPlaySounds		= 1
+Global $g_iPlayWarnings		= 0
+Global $g_iPlayWarnEvery	= 3
+Global $g_iPlayIfPerc		= 80
+
+;~ Global $Initializing = 1, $SetStartMin, $SetOnTop, $SetForceBehave
+
 Global $g_hOIconPower
 Global $g_hOComboPower
 Global $g_hOChkSaveRealtime
@@ -437,6 +485,36 @@ Global $g_iReduceEveryMill 		= 300
 Global $g_iMaxSysMemoryPerc 	= 80
 Global $g_iDonateLabelHover		= 1
 
+Global $g_hOStartMinimized
+Global $g_hOTopMost
+Global $g_hONotification
+Global $g_hOMethod
+Global $g_hOForceBehave
+Global $g_hOPlaySounds
+Global $g_hOWarnings
+Global $g_hOMemWarnings
+
+Global $g_aMemStats
+Global $g_aMemBuffers[8]
+Global $g_aPageBuffers[2]
+Global $g_aVirtualBuffers[2]
+Global $g_hIconMemStats
+Global $g_hLabelRAMPerc
+Global $g_hLabelRAMTotal
+Global $g_hLabelRAMUsed
+Global $g_hLabelRAMFree
+Global $g_hLabelPagePerc
+Global $g_hLabelPageTotal
+Global $g_hLabelPageUsed
+Global $g_hLabelPageFree
+Global $g_hProgressPage[2]
+Global $g_hLabelCountPerc
+Global $g_hLabelProcs
+Global $g_hLabelCount
+Global $g_hLabelTimer
+Global $g_hProgressProcs[2]
+Global $bGraphColorChanged 		= False ; This will keep track of the graph color state
+Global $Graph1
 
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
@@ -519,19 +597,16 @@ EndFunc
 Func _StartCoreGui()
 
 	Local $miFileOptions, $mnuFileLog, $miLogOpenFile, $miLogOpenRoot, $miFileReboot, $miFileClose
-	Local $miTroubleHard, $miSysRestore, $miDeviceMan, $miFirmwareHQ
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
-	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1)
+	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, $WS_OVERLAPPEDWINDOW)
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
 
 	$g_hMenuFile = GUICtrlCreateMenu($g_aLangMenus[0])
-	$g_hMenuTrouble = GUICtrlCreateMenu($g_aLangMenus[7])
-	$g_hMenuTools = GUICtrlCreateMenu($g_aLangMenus[9])
-	$g_hMenuHelp = GUICtrlCreateMenu($g_aLangMenus[13])
+	$g_hMenuHelp = GUICtrlCreateMenu($g_aLangMenus[6])
 
 	_GuiCtrlMenuEx_SetMenuIconBkColor(0xF0F0F0)
 	_GuiCtrlMenuEx_SetMenuIconBkGrdColor(0xFFFFFF)
@@ -541,41 +616,23 @@ Func _StartCoreGui()
 	$miLogOpenFile = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[3], $mnuFileLog, $g_aMenuIcons[1], $g_iMenuIconsStart + 1)
 	$miLogOpenRoot = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[4], $mnuFileLog)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuFile)
-	$miFileReboot = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[5], $g_hMenuFile)
-	$miFileClose = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[6], $g_hMenuFile, $g_aMenuIcons[2], $g_iMenuIconsStart + 2)
+	$miFileClose = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[5], $g_hMenuFile, $g_aMenuIcons[2], $g_iMenuIconsStart + 2)
 
-	$miTroubleHard = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[8], $g_hMenuTrouble, $g_aMenuIcons[3], $g_iMenuIconsStart + 3)
-	If _GetTroubleshootingInstalled("DeviceDiagnostic") Then
-		GUICtrlSetOnEvent($miTroubleHard, "_TroubleshootHardwareProblems")
-	Else
-		GUICtrlSetState($miTroubleHard, $GUI_DISABLE)
-	EndIf
-
-	$miSysRestore = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[10], $g_hMenuTools, $g_aMenuIcons[4], $g_iMenuIconsStart + 4)
-	$miDeviceMan = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[11], $g_hMenuTools, $g_aMenuIcons[5], $g_iMenuIconsStart + 5)
-	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuTools)
-	$miFirmwareHQ = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[12], $g_hMenuTools, $g_aMenuIcons[6], $g_iMenuIconsStart + 6)
-
-	$g_hUpdateMenuItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[14], $g_hMenuHelp, $g_aMenuIcons[7], $g_iMenuIconsStart + 7)
+	$g_hUpdateMenuItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[7], $g_hMenuHelp, $g_aMenuIcons[3], $g_iMenuIconsStart + 3)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpHome = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[15], $g_hMenuHelp, $g_aMenuIcons[8], $g_iMenuIconsStart + 8)
-	$miHelpDownloads = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[16], $g_hMenuHelp)
-	$miHelpSupport = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[17], $g_hMenuHelp, $g_aMenuIcons[9], $g_iMenuIconsStart + 9)
+	$miHelpHome = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[8], $g_hMenuHelp, $g_aMenuIcons[4], $g_iMenuIconsStart + 4)
+	$miHelpDownloads = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[9], $g_hMenuHelp)
+	$miHelpSupport = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[10], $g_hMenuHelp, $g_aMenuIcons[5], $g_iMenuIconsStart + 5)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpGitHub = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[18], $g_hMenuHelp, $g_aMenuIcons[10], $g_iMenuIconsStart + 10)
-	$miHelpDonate = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[19], $g_hMenuHelp)
+	$miHelpGitHub = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[11], $g_hMenuHelp, $g_aMenuIcons[6], $g_iMenuIconsStart + 6)
+	$miHelpDonate = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[12], $g_hMenuHelp)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuHelp)
-	$miHelpAbout = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[20], $g_hMenuHelp, $g_aMenuIcons[11], $g_iMenuIconsStart + 11)
+	$miHelpAbout = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[13], $g_hMenuHelp, $g_aMenuIcons[7], $g_iMenuIconsStart + 7)
 
 	GUICtrlSetOnEvent($miFileOptions, "_ShowPreferencesDlg")
 	GUICtrlSetOnEvent($miLogOpenFile, "_Logging_OpenFile")
 	GUICtrlSetOnEvent($miLogOpenRoot, "_Logging_OpenDirectory")
-	GUICtrlSetOnEvent($miFileReboot, "_Reboot")
 	GUICtrlSetOnEvent($miFileClose, "_ShutdownProgram")
-
-	GUICtrlSetOnEvent($miSysRestore, "_OpenWindowsSystemRestore")
-	GUICtrlSetOnEvent($miDeviceMan, "_OpenDeviceManager")
-	GUICtrlSetOnEvent($miFirmwareHQ, "_OpenFirmwareHQ")
 
 	GUICtrlSetOnEvent($g_hUpdateMenuItem, "_CheckForUpdates")
 	GUICtrlSetOnEvent($miHelpHome, "_About_HomePage")
@@ -593,70 +650,175 @@ Func _StartCoreGui()
 	GUICtrlSetCursor($g_hGuiIcon, 0)
 	GUICtrlSetOnEvent($g_hGuiIcon, "_About_ShowDialog")
 	$g_AniUpdate = GUICtrlCreateIcon($g_sUpdateAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
-	$g_AniProcessing = GUICtrlCreateIcon($g_sProcessingAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
+	; $g_AniProcessing = GUICtrlCreateIcon($g_sProcessingAnimation, 0, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
 	GUICtrlSetState($g_AniUpdate, $GUI_HIDE)
-	GUICtrlSetState($g_AniProcessing, $GUI_HIDE)
-	$hHeading = GUICtrlCreateLabel($g_sProgName & " " & _GetProgramVersion(1), $g_iSizeIcon + 22, 15, 300, 35)
+	; GUICtrlSetState($g_AniProcessing, $GUI_HIDE)
+	$hHeading = GUICtrlCreateLabel($g_sProgName & " " & _GetProgramVersion(1), $g_iSizeIcon + 22, 15, 300)
 	GUICtrlSetFont($hHeading, 12)
-
-	$g_hSubHeading = GUICtrlCreateLabel(StringFormat($g_aLangCustom[0], $g_aLangCustom[11]), $g_iSizeIcon + 22, 38, 430, 70)
-	GUICtrlSetFont($g_hSubHeading, 9)
+	$g_hSubHeading = GUICtrlCreateLabel(StringFormat($g_aLangCustom[0], $g_aLangCustom[3]), $g_iSizeIcon + 22, 38, 430, 50)
+	GUICtrlSetFont($g_hSubHeading, 10)
 	GUICtrlSetColor($g_hSubHeading, 0x353535)
-	GUICtrlCreateLabel($g_aLangCustom[2], $g_iSizeIcon + 22, 120, 430, 40)
-	GUICtrlSetFont(-1, 10)
-	GUICtrlSetColor(-1, 0xB30B00)
-	$g_hChkResetAutorun = GUICtrlCreateCheckbox($g_aLangCustom[3], 20, 180, 230, 15, $BS_AUTORADIOBUTTON)
-	$g_hChkDoNothing = GUICtrlCreateCheckbox($g_aLangCustom[4], 280, 180, 200, 15)
-	GUICtrlSetTip($g_hChkDoNothing, $g_aLangCustom[5], $g_aLangCustom[6], $TIP_INFOICON)
-	$g_hChkProtectAutorun = GUICtrlCreateCheckbox($g_aLangCustom[7], 20, 205, 230, 15, $BS_AUTORADIOBUTTON)
-	GUICtrlSetTip($g_hChkProtectAutorun, StringFormat($g_aLangCustom[8], $g_aLangCustom[3]), $g_aLangCustom[9], $TIP_WARNINGICON)
-	$g_hChkProtectMachine = GUICtrlCreateCheckbox($g_aLangCustom[10], 280, 205, 200, 15)
-	$g_hBtnRepair = GUICtrlCreateButton($g_aLangCustom[11], ($g_iCoreGuiWidth - 300) / 2, 250, 300, 50)
-	GUICtrlSetFont($g_hBtnRepair, 11)
-	GUICtrlSetState($g_hBtnRepair, $GUI_DEFBUTTON)
 
-	$g_hListStatus = GUICtrlCreateListView("", 10, $g_iCoreGuiHeight - $g_GuiLogBoxHeight - 80, _
-			$g_iCoreGuiWidth - 20, $g_GuiLogBoxHeight, BitOR($LVS_REPORT, $LVS_NOCOLUMNHEADER))
-	_GUICtrlListView_SetExtendedListViewStyle($g_hListStatus, BitOR($LVS_EX_FULLROWSELECT, $LVS_EX_DOUBLEBUFFER, _
-			$LVS_EX_SUBITEMIMAGES, $LVS_EX_INFOTIP, $WS_EX_CLIENTEDGE))
-	_GUICtrlListView_AddColumn($g_hListStatus, "", 680)
-	_WinAPI_SetWindowTheme(GUICtrlGetHandle($g_hListStatus), "Explorer")
-	GUICtrlSetFont($g_hListStatus, 9, -1, -1, "Courier New")
-	GUICtrlSetColor($g_hListStatus, 0x333333)
+	$Graph1 = _SSLG_CreateGraph(133, 125, 420, 104, 0, 100, 500, 0x000F1318)
+	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
+	_SSLG_SetSmoothingMode($Graph1, 2)
 
-	$g_hImgStatus = _GUIImageList_Create(16, 16, 5, 1, 8, 8)
-	For $iLx = 0 To $CNT_LOGICONS - 1
-		_ImageListEx_AddBlankIcon($g_hImgStatus, $g_hListStatus, $g_aLognIcons[$iLx], $g_iLogIconStart - $iLx)
-	Next
-	_GUIImageList_Add($g_hImgStatus, _GUICtrlListView_CreateSolidBitMap($g_hListStatus, 0xFFFFFF, 16, 16))
-	_GUICtrlListView_SetImageList($g_hListStatus, $g_hImgStatus, 1)
+	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 245, $SS_ETCHEDFRAME)
+	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 241)
+	GUICtrlSetBkColor(-1, 0x151C23)
 
-	$g_hIconDonate = GUICtrlCreateIcon($g_aDonateIcons[0], $g_iAboutIconStart, 10, 465, 64, 64)
-	GUICtrlSetCursor($g_hIconDonate, 0)
-	$g_hLblDonate = GUICtrlCreateLabel($g_aLangDonate[2], 85, 485, $g_iCoreGuiWidth - 150, 32)
-	GUICtrlSetCursor($g_hLblDonate, 0)
-	GUICtrlSetColor($g_hLblDonate, 0x000000)
+	GUICtrlCreateGraphic(20, 125, 104, 108, -1)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hIconMemStats = GUICtrlCreateIcon(@ScriptFullPath, $g_iMemStatIcoStart, 38, 140, 64, 64)
+	$g_hLabelRAMPerc = GUICtrlCreateLabel("100%", 20, 210, 104, -1, $SS_CENTER)
+	GUICtrlSetBkColor($g_hLabelRAMPerc, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelRAMPerc, 0x13FF92)
 
-	GUICtrlSetOnEvent($g_hIconDonate, "_About_PayPal")
-	GUICtrlSetOnEvent($g_hLblDonate, "_About_PayPal")
+	GUICtrlCreateGraphic(127, 125, 432, 108)
+	GUICtrlSetBkColor(-1, 0x0F1318)
 
-	GUICtrlSetOnEvent($g_hBtnRepair, "_RepairDVDDrives")
-	GUICtrlSetOnEvent($g_hChkResetAutorun, "_SetOptions")
-	GUICtrlSetOnEvent($g_hChkDoNothing, "_SetOptions")
-	GUICtrlSetOnEvent($g_hChkProtectAutorun, "_SetOptions")
-	GUICtrlSetOnEvent($g_hChkProtectMachine, "_SetOptions")
+	GUICtrlCreateGraphic(20, 102, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("MEMORY", 20, 105, 104, 16, $SS_CENTER)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCtrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(127, 102, 84, 20, -1)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelRAMTotal = GUICtrlCreateLabel("00.0 GB", 131, 105, 78, 16, $WS_EX_COMPOSITED)
+	GUICtrlSetBkColor($g_hLabelRAMTotal, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelRAMTotal, 0x13FF92)
 
-	GUICtrlSetState($g_hChkResetAutorun, $g_iSetResetAutorun)
-	GUICtrlSetState($g_hChkDoNothing, $g_iSetDisableExtras)
-	GUICtrlSetState($g_hChkProtectAutorun, $g_iSetProtectAutorun)
-	GUICtrlSetState($g_hChkProtectMachine, $g_iSetProtectMachine)
+	GUICtrlCreateGraphic(214, 102, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("USED", 218, 105, 78, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(301, 102, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelRAMUsed = GUICtrlCreateLabel("00.0 GB", 305, 105, 78, 16)
+	GUICtrlSetBkColor($g_hLabelRAMUsed, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelRAMUsed, 0x13FF92)
 
-	_SetOptions()
+	GUICtrlCreateGraphic(388, 102, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("FREE", 392, 105, 78, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(475, 102, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelRAMFree = GUICtrlCreateLabel("00.0 GB", 480, 105, 78, 16)
+	GUICtrlSetBkColor($g_hLabelRAMFree, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelRAMFree, 0x13FF92)
+
+
+	GUICtrlCreateGraphic(20, 236, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("PAGEFILE", 20, 239, 104, 16, $SS_CENTER)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(127, 236, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelPageTotal = GUICtrlCreateLabel("00.0 GB", 131, 239, 80, 16)
+	GUICtrlSetBkColor($g_hLabelPageTotal, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelPageTotal, 0x00ACFF)
+
+	GUICtrlCreateGraphic(214, 236, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("USED", 218, 239, 80, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(301, 236, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelPageUsed = GUICtrlCreateLabel("00.0 GB", 305, 239, 80, 16)
+	GUICtrlSetBkColor($g_hLabelPageUsed, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelPageUsed, 0x00ACFF)
+
+	GUICtrlCreateGraphic(388, 236, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("FREE", 392, 239, 78, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(475, 236, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelPageFree = GUICtrlCreateLabel("00.0 GB", 480, 239, 78, 16)
+	GUICtrlSetBkColor($g_hLabelPageFree, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelPageFree, 0x00ACFF)
+
+
+	GUICtrlCreateGraphic(20, 259, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelPagePerc = GUICtrlCreateLabel("100%", 20, 262, 104, -1, $SS_CENTER)
+	GUICtrlSetBkColor($g_hLabelPagePerc, $GUI_BKCOLOR_TRANSPARENT)
+	GuiCTrlSetColor($g_hLabelPagePerc, 0x00ACFF)
+
+	GUICtrlCreateGraphic(127, 259, 432, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hProgressPage[0] = GUICtrlCreateGraphic(129, 261, 428, 16)
+	GUICtrlSetBkColor($g_hProgressPage[0], 0x00ACFF)
+	$g_hProgressPage[1] = GUICtrlCreateGraphic(130, 262, 426, 14)
+	GUICtrlSetBkColor($g_hProgressPage[1], 0x005174)
+
+
+	GUICtrlCreateGraphic(20, 282, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("PROCS", 20, 285, 104, 16, $SS_CENTER)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(127, 282, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelProcs = GUICtrlCreateLabel("350", 131, 285, 80, 16)
+	GUICtrlSetBkColor($g_hLabelProcs, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelProcs, 0xFF8000)
+
+	GUICtrlCreateGraphic(214, 282, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("COUNT", 218, 285, 80, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(301, 282, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelCount = GUICtrlCreateLabel("00.0 GB", 305, 285, 80, 16)
+	GUICtrlSetBkColor($g_hLabelCount, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelCount, 0xFF8000)
+
+	GUICtrlCreateGraphic(388, 282, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("TIMER", 392, 285, 78, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	GUICtrlCreateGraphic(475, 282, 84, 43)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelTimer = GUICtrlCreateLabel("30", 480, 285, 78, 36, $SS_CENTER)
+	GUICtrlSetFont($g_hLabelTimer, 18)
+	GUICtrlSetBkColor($g_hLabelTimer, 0x0F1318)
+	GuiCTrlSetColor($g_hLabelTimer, 0xFF8000)
+
+
+	GUICtrlCreateGraphic(20, 305, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hLabelCountPerc = GUICtrlCreateLabel("100%", 20, 308, 104, -1, $SS_CENTER)
+	GUICtrlSetBkColor($g_hLabelCountPerc, $GUI_BKCOLOR_TRANSPARENT)
+	GuiCTrlSetColor($g_hLabelCountPerc, 0xFF8000)
+
+	GUICtrlCreateGraphic(127, 305, 345, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hProgressProcs[0] = GUICtrlCreateGraphic(129, 307, 341, 16)
+	GUICtrlSetBkColor($g_hProgressProcs[0], 0xFF8000)
+	$g_hProgressProcs[1] = GUICtrlCreateGraphic(130, 308, 339, 14)
+	GUICtrlSetBkColor($g_hProgressProcs[1], 0x803A0A)
+
+
+
+
+
+	_UpdateMemoryStatsFirst()
+	_UpdateMemoryStats()
+	AdlibRegister("_UpdateMemoryStats", 1000)
 
 	_Splash_Update("", 100)
 	GUISetState(@SW_SHOW, $g_hCoreGui)
+
 	AdlibRegister("_OnIconsHover", 65)
-	AdlibRegister("_UptimeMonitor", 1000)
 	If @Compiled Then
 		AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
 	EndIf
@@ -669,13 +831,84 @@ Func _StartCoreGui()
 		Sleep(30)
 	WEnd
 
-EndFunc   ;==>_StartCoreGui
+EndFunc
+
+Func _UpdateMemoryStatsFirst()
+
+	$g_aMemStats = MemGetStats()
+
+	Local $iTotalRAM = Round($g_aMemStats[$MEM_TOTALPHYSRAM] / 1048576, 1)
+	Local $iTotalPage = Round($g_aMemStats[$MEM_TOTALPAGEFILE] / 1048576, 1)
+
+	GUICtrlSetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iTotalRAM))
+	GUICtrlSetData($g_hLabelPageTotal, StringFormat("%.1f GB", $iTotalPage))
+
+EndFunc
 
 
-Func _TestLoggingSystem($sMessage, $iSleep)
-	_Logging_EditWrite($sMessage)
-	Sleep($iSleep)
-EndFunc   ;==>_TestLoggingSystem
+
+Func _UpdateMemoryStats()
+
+	$g_aMemStats = MemGetStats()
+
+    Local $iRAMFree = Round($g_aMemStats[$MEM_AVAILPHYSRAM] / 1048576, 1)
+    Local $iRAMUsed = Round(($g_aMemStats[$MEM_TOTALPHYSRAM] - $g_aMemStats[$MEM_AVAILPHYSRAM]) / 1048576, 1)
+	Local $iPageFree = Round($g_aMemStats[$MEM_AVAILPAGEFILE] / 1048576, 1)
+	Local $iPageUsed = Round(($g_aMemStats[$MEM_TOTALPAGEFILE] - $g_aMemStats[$MEM_AVAILPAGEFILE]) / 1048576, 1)
+	Local $iPagePerc = Round(($g_aMemStats[$MEM_TOTALPAGEFILE] - $g_aMemStats[$MEM_AVAILPAGEFILE]) / $g_aMemStats[$MEM_TOTALPAGEFILE] * 100)
+
+    ; Check if the RAM usage has changed and needs a GUI update
+    If $g_aMemStats[$MEM_LOAD] <> $g_aMemBuffers[$MEM_LOAD] Then
+
+        Local $iIconIndex = 0
+        If $g_aMemStats[$MEM_LOAD] > 0 Then
+            $iIconIndex = Floor($g_aMemStats[$MEM_LOAD] / 2.5)
+        EndIf
+
+        GUICtrlSetImage($g_hIconMemStats, @ScriptFullPath, $g_iMemStatIcoStart + $iIconIndex)
+        GUICtrlSetData($g_hLabelRAMPerc, StringFormat("%d%", $g_aMemStats[$MEM_LOAD]))
+
+        ; If RAM usage is above 90% and the graph color hasn't been changed yet, change it
+        If $g_aMemStats[$MEM_LOAD] > 90 And Not $bGraphColorChanged Then
+            _SSLG_SetLine($Graph1, 0x00ED1C24, 1, 0x0077070B)
+            $bGraphColorChanged = True
+        ElseIf $g_aMemStats[$MEM_LOAD] <= 90 And $bGraphColorChanged Then
+            ; If RAM usage has dropped below 90% and the graph color was changed, reset it
+            _SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
+            $bGraphColorChanged = False
+        EndIf
+
+		$g_aMemBuffers[$MEM_LOAD] = $g_aMemStats[$MEM_LOAD]
+
+    EndIf
+
+    ; Update RAM usage and free space display
+    If $g_aMemBuffers[$MEM_AVAILPHYSRAM] <> $iRAMFree Then
+        GUICtrlSetData($g_hLabelRAMUsed, StringFormat("%.1f GB", $iRAMUsed))
+        GUICtrlSetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree))
+        $g_aMemBuffers[$MEM_AVAILPHYSRAM] = $iRAMFree
+    EndIf
+
+	If $g_aPageBuffers[0] <> $iPagePerc Then
+		GUICtrlSetData($g_hLabelPagePerc, StringFormat("%d%", $iPagePerc))
+		_ProgressBar_SetData($g_hCoreGui, $g_hProgressPage[0], $g_hProgressPage[1], 129, 261, 428, $iPagePerc)
+		$g_aPageBuffers[0] = $iPagePerc
+	EndIf
+
+	If $g_aMemBuffers[$MEM_AVAILPAGEFILE] <> $iPageFree Then
+		GUICtrlSetData($g_hLabelPageUsed, StringFormat("%.1f GB", $iPageUsed))
+        GUICtrlSetData($g_hLabelPageFree, StringFormat("%.1f GB", $iPageFree))
+		$g_aMemBuffers[$MEM_AVAILPAGEFILE] = $iPageFree
+	EndIf
+
+    _SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
+    _SSLG_UpdateGraph($Graph1, False, True)
+
+EndFunc   ;==>_UpdateMemoryStats
+
+
+
+
 
 
 #Region "Events"
@@ -743,67 +976,63 @@ Func _SetResources()
 
 	Else
 
-		$g_aCoreIcons[0] 	= $g_sThemesDir & "\Icons\" & $g_sProgShortName & ".ico"
-		$g_aCoreIcons[1] 	= $g_sThemesDir & "\Icons\" & $g_sProgShortName & "H.ico"
-		$g_aDonateIcons[0] 	= $g_sThemesDir & "\Icons\About\PayPal.ico"
-		$g_aDonateIcons[1] 	= $g_sThemesDir & "\Icons\About\PayPalH.ico"
+		$g_aCoreIcons[0]   = "..\..\..\SDK\Resources\Icons\" & $g_sProgShortName & ".ico"
+		$g_aCoreIcons[1]   = "..\..\..\SDK\Resources\Icons\" & $g_sProgShortName & "H.ico"
+		$g_aDonateIcons[0] = "..\..\..\SDK\Resources\Icons\About\PayPal.ico"
+		$g_aDonateIcons[1] = "..\..\..\SDK\Resources\Icons\About\PayPalH.ico"
 
-		$g_aLognIcons[0] = $g_sThemesDir & "\Icons\logging\Information.ico"
-		$g_aLognIcons[1] = $g_sThemesDir & "\Icons\logging\Complete.ico"
-		$g_aLognIcons[2] = $g_sThemesDir & "\Icons\logging\Cross.ico"
-		$g_aLognIcons[3] = $g_sThemesDir & "\Icons\logging\Exclamation.ico"
-		$g_aLognIcons[4] = $g_sThemesDir & "\Icons\logging\Smiley-Glass.ico"
-		$g_aLognIcons[5] = $g_sThemesDir & "\Icons\logging\Skull.ico"
-		$g_aLognIcons[6] = $g_sThemesDir & "\Icons\logging\Snowman.ico"
+		$g_aLognIcons[0] = "..\..\..\SDK\Resources\Icons\logging\Information.ico"
+		$g_aLognIcons[1] = "..\..\..\SDK\Resources\Icons\logging\Complete.ico"
+		$g_aLognIcons[2] = "..\..\..\SDK\Resources\Icons\logging\Cross.ico"
+		$g_aLognIcons[3] = "..\..\..\SDK\Resources\Icons\logging\Exclamation.ico"
+		$g_aLognIcons[4] = "..\..\..\SDK\Resources\Icons\logging\Smiley-Glass.ico"
+		$g_aLognIcons[5] = "..\..\..\SDK\Resources\Icons\logging\Skull.ico"
+		$g_aLognIcons[6] = "..\..\..\SDK\Resources\Icons\logging\Snowman.ico"
 
-		$g_aLanguageIcons[0]  = $g_sThemesDir & "\Icons\Flags\en.ico"
-		$g_aLanguageIcons[1]  = $g_sThemesDir & "\Icons\Flags\af.ico"
-		$g_aLanguageIcons[2]  = $g_sThemesDir & "\Icons\Flags\ar.ico"
-		$g_aLanguageIcons[3]  = $g_sThemesDir & "\Icons\Flags\bg.ico"
-		$g_aLanguageIcons[4]  = $g_sThemesDir & "\Icons\Flags\cs.ico"
-		$g_aLanguageIcons[5]  = $g_sThemesDir & "\Icons\Flags\da.ico"
-		$g_aLanguageIcons[6]  = $g_sThemesDir & "\Icons\Flags\de.ico"
-		$g_aLanguageIcons[7]  = $g_sThemesDir & "\Icons\Flags\el.ico"
-		$g_aLanguageIcons[8]  = $g_sThemesDir & "\Icons\Flags\es.ico"
-		$g_aLanguageIcons[9]  = $g_sThemesDir & "\Icons\Flags\fr.ico"
-		$g_aLanguageIcons[10] = $g_sThemesDir & "\Icons\Flags\hi.ico"
-		$g_aLanguageIcons[11] = $g_sThemesDir & "\Icons\Flags\hr.ico"
-		$g_aLanguageIcons[12] = $g_sThemesDir & "\Icons\Flags\hu.ico"
-		$g_aLanguageIcons[13] = $g_sThemesDir & "\Icons\Flags\id.ico"
-		$g_aLanguageIcons[14] = $g_sThemesDir & "\Icons\Flags\ir.ico"
-		$g_aLanguageIcons[15] = $g_sThemesDir & "\Icons\Flags\is.ico"
-		$g_aLanguageIcons[16] = $g_sThemesDir & "\Icons\Flags\it.ico"
-		$g_aLanguageIcons[17] = $g_sThemesDir & "\Icons\Flags\iw.ico"
-		$g_aLanguageIcons[18] = $g_sThemesDir & "\Icons\Flags\ja.ico"
-		$g_aLanguageIcons[19] = $g_sThemesDir & "\Icons\Flags\ko.ico"
-		$g_aLanguageIcons[20] = $g_sThemesDir & "\Icons\Flags\nl.ico"
-		$g_aLanguageIcons[21] = $g_sThemesDir & "\Icons\Flags\no.ico"
-		$g_aLanguageIcons[22] = $g_sThemesDir & "\Icons\Flags\pl.ico"
-		$g_aLanguageIcons[23] = $g_sThemesDir & "\Icons\Flags\pt.ico"
-		$g_aLanguageIcons[24] = $g_sThemesDir & "\Icons\Flags\pt-BR.ico"
-		$g_aLanguageIcons[25] = $g_sThemesDir & "\Icons\Flags\ro.ico"
-		$g_aLanguageIcons[26] = $g_sThemesDir & "\Icons\Flags\ru.ico"
-		$g_aLanguageIcons[27] = $g_sThemesDir & "\Icons\Flags\sl.ico"
-		$g_aLanguageIcons[28] = $g_sThemesDir & "\Icons\Flags\sk.ico"
-		$g_aLanguageIcons[29] = $g_sThemesDir & "\Icons\Flags\sv.ico"
-		$g_aLanguageIcons[30] = $g_sThemesDir & "\Icons\Flags\th.ico"
-		$g_aLanguageIcons[31] = $g_sThemesDir & "\Icons\Flags\tr.ico"
-		$g_aLanguageIcons[32] = $g_sThemesDir & "\Icons\Flags\vi.ico"
-		$g_aLanguageIcons[33] = $g_sThemesDir & "\Icons\Flags\zh-CN.ico"
-		$g_aLanguageIcons[34] = $g_sThemesDir & "\Icons\Flags\zh-TW.ico"
+		$g_aLanguageIcons[0]  = "..\..\..\SDK\Resources\Icons\Flags\en.ico"
+		$g_aLanguageIcons[1]  = "..\..\..\SDK\Resources\Icons\Flags\af.ico"
+		$g_aLanguageIcons[2]  = "..\..\..\SDK\Resources\Icons\Flags\ar.ico"
+		$g_aLanguageIcons[3]  = "..\..\..\SDK\Resources\Icons\Flags\bg.ico"
+		$g_aLanguageIcons[4]  = "..\..\..\SDK\Resources\Icons\Flags\cs.ico"
+		$g_aLanguageIcons[5]  = "..\..\..\SDK\Resources\Icons\Flags\da.ico"
+		$g_aLanguageIcons[6]  = "..\..\..\SDK\Resources\Icons\Flags\de.ico"
+		$g_aLanguageIcons[7]  = "..\..\..\SDK\Resources\Icons\Flags\el.ico"
+		$g_aLanguageIcons[8]  = "..\..\..\SDK\Resources\Icons\Flags\es.ico"
+		$g_aLanguageIcons[9]  = "..\..\..\SDK\Resources\Icons\Flags\fr.ico"
+		$g_aLanguageIcons[10] = "..\..\..\SDK\Resources\Icons\Flags\hi.ico"
+		$g_aLanguageIcons[11] = "..\..\..\SDK\Resources\Icons\Flags\hr.ico"
+		$g_aLanguageIcons[12] = "..\..\..\SDK\Resources\Icons\Flags\hu.ico"
+		$g_aLanguageIcons[13] = "..\..\..\SDK\Resources\Icons\Flags\id.ico"
+		$g_aLanguageIcons[14] = "..\..\..\SDK\Resources\Icons\Flags\ir.ico"
+		$g_aLanguageIcons[15] = "..\..\..\SDK\Resources\Icons\Flags\is.ico"
+		$g_aLanguageIcons[16] = "..\..\..\SDK\Resources\Icons\Flags\it.ico"
+		$g_aLanguageIcons[17] = "..\..\..\SDK\Resources\Icons\Flags\iw.ico"
+		$g_aLanguageIcons[18] = "..\..\..\SDK\Resources\Icons\Flags\ja.ico"
+		$g_aLanguageIcons[19] = "..\..\..\SDK\Resources\Icons\Flags\ko.ico"
+		$g_aLanguageIcons[20] = "..\..\..\SDK\Resources\Icons\Flags\nl.ico"
+		$g_aLanguageIcons[21] = "..\..\..\SDK\Resources\Icons\Flags\no.ico"
+		$g_aLanguageIcons[22] = "..\..\..\SDK\Resources\Icons\Flags\pl.ico"
+		$g_aLanguageIcons[23] = "..\..\..\SDK\Resources\Icons\Flags\pt.ico"
+		$g_aLanguageIcons[24] = "..\..\..\SDK\Resources\Icons\Flags\pt-BR.ico"
+		$g_aLanguageIcons[25] = "..\..\..\SDK\Resources\Icons\Flags\ro.ico"
+		$g_aLanguageIcons[26] = "..\..\..\SDK\Resources\Icons\Flags\ru.ico"
+		$g_aLanguageIcons[27] = "..\..\..\SDK\Resources\Icons\Flags\sl.ico"
+		$g_aLanguageIcons[28] = "..\..\..\SDK\Resources\Icons\Flags\sk.ico"
+		$g_aLanguageIcons[29] = "..\..\..\SDK\Resources\Icons\Flags\sv.ico"
+		$g_aLanguageIcons[30] = "..\..\..\SDK\Resources\Icons\Flags\th.ico"
+		$g_aLanguageIcons[31] = "..\..\..\SDK\Resources\Icons\Flags\tr.ico"
+		$g_aLanguageIcons[32] = "..\..\..\SDK\Resources\Icons\Flags\vi.ico"
+		$g_aLanguageIcons[33] = "..\..\..\SDK\Resources\Icons\Flags\zh-CN.ico"
+		$g_aLanguageIcons[34] = "..\..\..\SDK\Resources\Icons\Flags\zh-TW.ico"
 
-		$g_aMenuIcons[0]  = $g_sThemesDir & "\Icons\Menus\Gear.ico"
-		$g_aMenuIcons[1]  = $g_sThemesDir & "\Icons\Menus\Logbook.ico"
-		$g_aMenuIcons[2]  = $g_sThemesDir & "\Icons\Menus\Close.ico"
-		$g_aMenuIcons[3]  = $g_sThemesDir & "\Icons\Menus\DeviceTrouble.ico"
-		$g_aMenuIcons[4]  = $g_sThemesDir & "\Icons\Menus\RestorePoint.ico"
-		$g_aMenuIcons[5]  = $g_sThemesDir & "\Icons\Menus\DeviceMan.ico"
-		$g_aMenuIcons[6]  = $g_sThemesDir & "\Icons\Menus\Firmware.ico"
-		$g_aMenuIcons[7]  = $g_sThemesDir & "\Icons\Menus\Update.ico"
-		$g_aMenuIcons[8]  = $g_sThemesDir & "\Icons\Menus\Home.ico"
-		$g_aMenuIcons[9]  = $g_sThemesDir & "\Icons\Menus\Support.ico"
-		$g_aMenuIcons[10] = $g_sThemesDir & "\Icons\Menus\GitHub.ico"
-		$g_aMenuIcons[11] = $g_sThemesDir & "\Icons\Menus\About.ico"
+		$g_aMenuIcons[0]  = "..\..\..\SDK\Resources\Icons\Menus\Gear.ico"
+		$g_aMenuIcons[1]  = "..\..\..\SDK\Resources\Icons\Menus\Logbook.ico"
+		$g_aMenuIcons[2]  = "..\..\..\SDK\Resources\Icons\Menus\Close.ico"
+		$g_aMenuIcons[3]  = "..\..\..\SDK\Resources\Icons\Menus\Update.ico"
+		$g_aMenuIcons[4]  = "..\..\..\SDK\Resources\Icons\Menus\Home.ico"
+		$g_aMenuIcons[5]  = "..\..\..\SDK\Resources\Icons\Menus\Support.ico"
+		$g_aMenuIcons[6]  = "..\..\..\SDK\Resources\Icons\Menus\GitHub.ico"
+		$g_aMenuIcons[7]  = "..\..\..\SDK\Resources\Icons\Menus\About.ico"
 
 		$g_sDlgOptionsIcon = $g_sThemesDir & "\Icons\Dialogs\Gear.ico"
 
@@ -869,11 +1098,6 @@ EndFunc   ;==>_GenerateIniFile
 
 Func _LoadConfiguration()
 
-	$g_iSetResetMachine = Int(IniRead($g_sPathIni, $g_sProgShortName, "ResetAutorunMachine", 1))
-	$g_iSetProtectMachine = Int(IniRead($g_sPathIni, $g_sProgShortName, "ProtectAutorunMachine", 1))
-	$g_iSetResetAutorun = Int(IniRead($g_sPathIni, $g_sProgShortName, "ResetAutorun", 1))
-	$g_iSetProtectAutorun = Int(IniRead($g_sPathIni, $g_sProgShortName, "ProtectAutorun", 0))
-	$g_iSetDisableExtras = Int(IniRead($g_sPathIni, $g_sProgShortName, "DisableExtras", 0))
 	$g_iCheckForUpdates = Int(IniRead($g_sPathIni, $g_sProgShortName, "CheckForUpdates", 4))
 	$g_iProcessPriority = Int(IniRead($g_sPathIni, $g_sProgShortName, "ProcessPriority", 3))
 	$g_iSaveRealtime = Int(IniRead($g_sPathIni, $g_sProgShortName, "SaveRealtime", 0))
@@ -893,17 +1117,14 @@ EndFunc   ;==>_LoadConfiguration
 
 Func _SaveConfiguration()
 
-	IniWrite($g_sPathIni, $g_sProgShortName, "ResetAutorunMachine", $g_iSetResetMachine)
-	IniWrite($g_sPathIni, $g_sProgShortName, "ProtectAutorunMachine", $g_iSetProtectMachine)
-	IniWrite($g_sPathIni, $g_sProgShortName, "ResetAutorun", $g_iSetResetAutorun)
-	IniWrite($g_sPathIni, $g_sProgShortName, "ProtectAutorun", $g_iSetProtectAutorun)
-	IniWrite($g_sPathIni, $g_sProgShortName, "DisableExtras", $g_iSetDisableExtras)
+	; _SaveSelection()
 
 EndFunc
 
 #EndRegion "Configuration (Settings)"
 
 
+#Region "Updates"
 Func _CheckForUpdates()
 
 	_SetUpdateAnimationState($GUI_SHOW)
@@ -912,24 +1133,6 @@ Func _CheckForUpdates()
 	GUICtrlSetColor($g_hSubHeading, 0x353535)
 
 EndFunc   ;==>_CheckForUpdates
-
-
-Func _UptimeMonitor()
-	If $g_iUptimeMonitor < 2000000000 Then
-		$g_iUptimeMonitor += 1
-	EndIf
-EndFunc
-
-
-Func _ReduceMemory()
-
-	Local $aMemStats = MemGetStats()
-
-	If $aMemStats[0] > $g_iMaxSysMemoryPerc And $g_iReduceMemory = 1 Then
-		_WinAPI_EmptyWorkingSet()
-	EndIf
-
-EndFunc
 
 
 Func _SetUpdateAnimationState($iState)
@@ -956,6 +1159,8 @@ Func _SetUpdateAnimationState($iState)
 
 EndFunc   ;==>_SetUpdateAnimationState
 
+#EndRegion "Updates"
+
 
 Func _SetProcessingStates($iState)
 
@@ -966,10 +1171,22 @@ Func _SetProcessingStates($iState)
 EndFunc   ;==>_SetProcessingStates
 
 
+Func _ReduceMemory()
+
+	Local $aMemStats = MemGetStats()
+
+	If $aMemStats[0] > $g_iMaxSysMemoryPerc And $g_iReduceMemory = 1 Then
+		_WinAPI_EmptyWorkingSet()
+	EndIf
+
+EndFunc
+
+
 Func _ShutdownProgram()
 
 	AdlibUnRegister("_OnIconsHover")
-	AdlibUnRegister("_UptimeMonitor")
+	AdlibUnRegister("_UpdateMemoryStats")
+
 	If @Compiled Then
 		AdlibUnRegister("_ReduceMemory")
 	EndIf
@@ -1010,258 +1227,6 @@ Func _MinimizeProgram()
 
 EndFunc
 
-#Region "Processing"
-
-
-Func _RepairDVDDrives()
-
-	Local $iBootMessage = 0
-
-	GUICtrlSetState($g_hGuiIcon, $GUI_HIDE)
-	GUICtrlSetState($g_AniProcessing, $GUI_SHOW)
-	GUICtrlSetState($g_hBtnRepair, $GUI_DISABLE)
-	GUICtrlSetState($g_hChkResetAutorun, $GUI_DISABLE)
-	GUICtrlSetState($g_hChkProtectAutorun, $GUI_DISABLE)
-	GUICtrlSetState($g_hChkDoNothing, $GUI_DISABLE)
-
-	_Logging_Start($g_aLangMessages2[11])
-	_RunCommand("sc config ShellHWDetection start= auto obj= LocalSystem")
-	_RunCommand("net start ShellHWDetection")
-
-	_Logging_EditWrite($g_aLangMessages2[12])
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}", "UpperFilters")
-	_Registry_Delete("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}", "LowerFilters")
-
-	If $g_iSetDisableExtras = 0 Then
-
-		If $g_iSetResetAutorun = 1 Then
-
-			_Logging_EditWrite($g_aLangMessages2[13])
-			_Registry_Write("HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\CDRom", "AutoRun", "REG_DWORD", 1)
-
-			_Registry_Delete("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "DontSetAutoplayCheckbox")
-			_Registry_Delete("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoAutorun")
-			_Registry_Delete("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoDriveTypeAutoRun")
-			_Registry_Delete("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "DontSetAutoplayCheckbox")
-			_Registry_Delete("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoAutorun")
-			_Registry_Delete("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoDriveTypeAutoRun")
-
-			If @OSVersion = "WIN_XP" Then
-				_Registry_Delete("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\IniFileMapping\Autorun.inf", "")
-			EndIf
-
-		ElseIf $g_iSetProtectAutorun = 1 Then
-
-			_Registry_Write("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoAutorun", "REG_DWORD", 1)
-			If @OSVersion = "WIN_XP" Then
-				_Registry_Write("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\IniFileMapping\Autorun.inf", "", "REG_SZ", "@SYS:DoesNotExist")
-			Else
-
-				_Registry_Write("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "DontSetAutoplayCheckbox", "REG_DWORD", 1)
-				_Registry_Write("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoDriveTypeAutoRun", "REG_DWORD", 255)
-
-				If $g_iSetProtectMachine = 1 Then
-					_Registry_Write("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoAutorun", "REG_DWORD", 1)
-					_Registry_Write("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "DontSetAutoplayCheckbox", "REG_DWORD", 1)
-					_Registry_Write("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer", "NoDriveTypeAutoRun", "REG_DWORD", 255)
-				EndIf
-
-			EndIf
-
-		EndIf
-
-	EndIf
-
-	_Logging_EditWrite($g_aLangMessages2[14])
-	_Registry_Write("HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\atapi\Controller0", "EnumDevice1", "REG_DWORD", 1)
-
-	GUICtrlSetState($g_hBtnRepair, $GUI_ENABLE)
-	GUICtrlSetState($g_hChkResetAutorun, $GUI_ENABLE)
-	GUICtrlSetState($g_hChkProtectAutorun, $GUI_ENABLE)
-	GUICtrlSetState($g_hChkDoNothing, $GUI_ENABLE)
-	GUICtrlSetState($g_hGuiIcon, $GUI_SHOW)
-	GUICtrlSetState($g_AniProcessing, $GUI_HIDE)
-
-	_Logging_EditWrite("^ " & $g_aLangMessages2[2])
-	_Logging_EditWrite(StringFormat($g_aLangMessages2[5], StringReplace($g_aLangMenus[0], "&", ""), StringReplace($g_aLangMenus[5], "&", "")))
-	_SetOptions()
-	_Logging_FinalMessage($g_aLangMessages2[15])
-
-EndFunc   ;==>_RepairDVDDrives
-
-
-Func _RunCommand($sCommand)
-
-	Local $iCMD = Run(@ComSpec & " /c " & $sCommand, @SystemDir, @SW_HIDE, $STDERR_MERGED)
-	Local $sOutput, $sSuccess = ""
-
-	While 1
-		$sOutput = StdoutRead($iCMD)
-		If @error Then
-			ExitLoop
-		EndIf
-
-		Local $aOutput = StringSplit($sOutput, @CRLF)
-		For $x = 1 To $aOutput[0]
-			If __HasOutput($aOutput[$x]) Then
-				_Logging_EditWrite(StringStripWS(__FormatRunOutput($aOutput[$x]), $STR_STRIPLEADING + $STR_STRIPTRAILING))
-					Sleep(50)
-			EndIf
-		Next
-
-
-	WEnd
-
-EndFunc   ;==>_RunCommand
-
-
-Func __HasOutput($sOutput)
-
-	$sOutput = StringStripWS($sOutput, $STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES)
-
-	Switch $sOutput
-		Case "", ".", ".."
-			Return False
-		Case Else
-			Return True
-	EndSwitch
-
-EndFunc   ;==>__HasOutput
-
-
-Func __FormatRunOutput($sOutput)
-
-	Local $sReturn = $sOutput
-	Local $sBadStrings = "Resetting , failed.|Resetting , OK!|Sucessfully"
-	Local $sGoodStrings = "Resetting, failed.|Resetting, OK!|Successfully"
-	Local $aBadStrings = StringSplit($sBadStrings, "|")
-	Local $aGoodStrings = StringSplit($sGoodStrings, "|")
-
-
-	If $aBadStrings[0] = $aGoodStrings[0] Then
-		For $x = 1 To $aBadStrings[0]
-			$sReturn = StringReplace($sReturn, $aBadStrings[$x], $aGoodStrings[$x])
-		Next
-	EndIf
-
-	Return $sReturn
-
-EndFunc   ;==>__FormatRunOutput
-
-
-Func _BootMessage()
-
-	_Logging_EditWrite($g_aLangMessages2[0])
-
-	If $g_ShowInterface Then
-
-		If Not IsDeclared("iMsgResult") Then Local $iMsgResult
-		$iMsgResult = MsgBox($MB_YESNO + $MB_ICONEXCLAMATION, $g_aLangMessages2[1], $g_aLangMessages2[2])
-		Select
-			Case $iMsgResult = $IDYES
-				_Reboot()
-			Case $iMsgResult = $IDNO
-				_Logging_EditWrite($g_aLangMessages2[3])
-				_Logging_EditWrite($g_aLangMessages2[4])
-				_Logging_EditWrite(StringFormat($g_aLangMessages2[5], StringReplace($g_aLangMenus[0], "&", ""), _
-					StringReplace($g_aLangMenus[5], "&", "")))
-
-		EndSelect
-
-	EndIf
-
-EndFunc   ;==>_BootMessage
-
-
-Func _Reboot()
-
-	_Logging_Start($g_aLangMessages2[9])
-
-	If Not IsDeclared("iMsgResult") Then Local $iMsgResult
-	$iMsgResult = MsgBox($MB_OKCANCEL + $MB_ICONEXCLAMATION, $g_aLangMessages2[7], StringFormat($g_aLangMessages2[8], $g_iMsgBoxTimeOut), $g_iMsgBoxTimeOut)
-
-	If $iMsgResult = $IDOK Then
-		_Logging_EditWrite($g_aLangMessages2[9])
-		_Logging_End()
-		Shutdown(18)
-	Else
-		_Logging_EditWrite($g_aLangMessages2[10])
-		_Logging_End()
-	EndIf
-
-EndFunc   ;==>_Reboot
-
-
-#EndRegion "Processing"
-
-
-#Region "Menus Events"
-
-Func _TroubleshootHardwareProblems()
-	Run("msdt.exe /id DeviceDiagnostic")
-EndFunc
-
-
-Func _OpenWindowsSystemRestore()
-	Run("systempropertiesprotection")
-EndFunc   ;==>_OpenWindowsSystemRestore
-
-
-Func _OpenDeviceManager()
-	ShellExecute("devmgmt.msc")
-EndFunc   ;==>_OpenSystemProtection
-
-
-Func _OpenFirmwareHQ()
-	ShellExecute("http://www.firmwarehq.com/")
-EndFunc   ;==>_OpenFirmwareHQ
-
-
-Func _GetTroubleshootingInstalled($sID)
-	If FileExists(@WindowsDir & "\diagnostics\index\" & $sID & ".xml") Then
-		Return True
-	Else
-		Return False
-	EndIf
-EndFunc
-
-#EndRegion "Menu Events"
-
-
-Func _SetOptions()
-
-	If GUICtrlRead($g_hChkDoNothing) = $GUI_CHECKED Then
-
-		GUICtrlSetState($g_hChkResetAutorun, $GUI_DISABLE)
-		GUICtrlSetState($g_hChkProtectAutorun, $GUI_DISABLE)
-		GUICtrlSetState($g_hChkProtectMachine, $GUI_DISABLE)
-		$g_iSetDisableExtras = 1
-	Else
-
-		GUICtrlSetState($g_hChkResetAutorun, $GUI_ENABLE)
-		GUICtrlSetState($g_hChkProtectAutorun, $GUI_ENABLE)
-		$g_iSetDisableExtras = 0
-
-		If GUICtrlRead($g_hChkResetAutorun) = $GUI_CHECKED Then
-			$g_iSetResetAutorun = 1
-			$g_iSetProtectAutorun = 0
-			GUICtrlSetState($g_hChkProtectMachine, $GUI_DISABLE)
-		ElseIf GUICtrlRead($g_hChkProtectAutorun) = $GUI_CHECKED Then
-			$g_iSetProtectAutorun = 1
-			$g_iSetResetAutorun = 0
-			GUICtrlSetState($g_hChkProtectMachine, $GUI_ENABLE)
-		EndIf
-
-		If GUICtrlRead($g_hChkProtectMachine) = $GUI_CHECKED Then
-			$g_iSetProtectMachine = 1
-		Else
-			$g_iSetProtectMachine = 0
-		EndIf
-
-	EndIf
-
-EndFunc   ;==>_SetOptions
-
 
 Func _ShowPreferencesDlg()
 
@@ -1287,19 +1252,45 @@ Func _ShowPreferencesDlg()
 
 	GUICtrlCreateTab(10, 10, 430, 430)
 
-	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[1]))
-	GUICtrlCreateGroup($g_aLangPreferences[4], 25, 50, 400, 160)
+	GUICtrlCreateTabItem($g_aLangPreferences[24])
+	GUICtrlCreateGroup("Memory optimization modes", 25, 50, 400, 130)
 	GUICtrlSetFont(-1, 10, Default, 2)
-	$g_hOChkLogEnabled = GUICtrlCreateCheckbox($g_aLangPreferences[8], 35, 90, 200, 20)
+	$g_hORADOptimMode[0] = GUICtrlCreateRadio(" Intelligent memory optimization", 35, 90, 300, 15)
+	$g_hORADOptimMode[1] = GUICtrlCreateRadio(" Automatically optimize memory every", 35, 110, 240, 15)
+	$g_hOComboAutSeconds = GUICtrlCreateCombo("", 285, 107, 55, 20)
+	GUICtrlSetData($g_hOComboAutSeconds, "3|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100|105|110|115|120", $g_iAutoCount)
+	GUICtrlCreateLabel(" sec", 350, 110, 50, 15)
+	$g_hORADOptimMode[2] = GUICtrlCreateRadio(" Don't automatically optimize memory", 35, 130, 300, 15)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)  ;~ Close group
+
+	GUICtrlCreateGroup("Notifications", 25, 200, 400, 130)
+	GUICtrlSetFont(-1, 10, Default, 2)
+	$g_hOCheckNotify = GUICtrlCreateCheckbox(" Show program notifications", 35, 240, 300, 15)
+	$g_hOCheckPlayEvents = GUICtrlCreateCheckbox(" Play sounds on program events. ", 35, 260, 300, 15)
+	$g_hOCheckPlayWarnings = GUICtrlCreateCheckbox(" Play Warning every ", 35, 280, 130, 20)
+	$g_hOComboWarnEvery = GUICtrlCreateCombo("", 175, 282, 50, 20)
+	GUICtrlSetData($g_hOComboWarnEvery, "1|3|6|9|12|15|20|30|40|50|60|120", $g_iPlayWarnEvery)
+	GUICtrlCreateLabel("min if load exceed", 235, 285, 120, 20)
+	$g_hOComboWarnIf = GUICtrlCreateCombo("", 350, 282, 50, 20)
+	GUICtrlSetData($g_hOComboWarnIf, "30|40|50|60|70|80|90", $g_iPlayIfPerc)
+
+	GUICtrlCreateGroup("", -99, -99, 1, 1)  ;~ Close group
+	GUICtrlCreateTabItem("") ; end tabitem definition
+
+	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[1]))
+	GUICtrlCreateGroup($g_aLangPreferences[4], 25, 250, 400, 160)
+	GUICtrlSetFont(-1, 10, Default, 2)
+	$g_hOChkLogEnabled = GUICtrlCreateCheckbox($g_aLangPreferences[8], 35, 290, 200, 20)
 	GUICtrlSetState($g_hOChkLogEnabled, $g_iLoggingEnabled)
-	GUICtrlCreateLabel($g_aLangPreferences[9], 35, 120, 180, 20)
-	$g_hOInLogSize = GUICtrlCreateInput(Round($g_iLoggingStorage / 1024, 2), 215, 118, 100, 20)
+	GUICtrlCreateLabel($g_aLangPreferences[9], 35, 320, 180, 20)
+	$g_hOInLogSize = GUICtrlCreateInput(Round($g_iLoggingStorage / 1024, 2), 215, 318, 100, 20)
 	GUICtrlSetStyle($g_hOInLogSize, BitOr($ES_RIGHT, $ES_NUMBER))
-	GUICtrlCreateLabel("KB", 325, 120, 50, 20)
+	GUICtrlSetFont(-1, 9, 400, 0, "Segoe UI")
+	GUICtrlCreateLabel("KB", 325, 320, 50, 20)
 	$g_hOInLogSizeTemp = Int(GUICtrlRead($g_hOInLogSize))
-	$g_hOLblLogSize = GUICtrlCreateLabel(StringFormat($g_aLangPreferences[10], __GetLoggingSize()), 35, 160, 200, 20)
+	$g_hOLblLogSize = GUICtrlCreateLabel(StringFormat($g_aLangPreferences[10], __GetLoggingSize()), 35, 360, 200, 20)
 	GUICtrlSetColor($g_hOLblLogSize, 0x555555)
-	$g_hOBtnLogClear = GUICtrlCreateButton($g_aLangPreferences[11], 255, 155, 150, 30)
+	$g_hOBtnLogClear = GUICtrlCreateButton($g_aLangPreferences[11], 255, 355, 150, 30)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
 	GUICtrlSetOnEvent($g_hOChkLogEnabled, "__CheckPreferenceChange")
@@ -1315,10 +1306,11 @@ Func _ShowPreferencesDlg()
 	GUICTrlSetColor(-1, 0x555555)
 	$g_hOComboPower = GUICtrlCreateCombo("", 35, 105, 200, 30)
 	GUICtrlSetData($g_hOComboPower, "Low|Below Normal|Normal|Above Normal|High|Realtime", "Normal")
+	GUICtrlSetFont($g_hOComboPower, 9, 400)
 	If @Compiled Then
 		$g_hOIconPower = GUICtrlCreateIcon(@ScriptFullPath, $g_iPowerIconsStart, 350, 80, 48, 48)
 	Else
-		$g_hOIconPower = GUICtrlCreateIcon($g_sThemesDir & "\Icons\Power\Power-0.ico", 0, 350, 80, 48, 48)
+		$g_hOIconPower = GUICtrlCreateIcon("..\..\..\SDK\Resources\Icons\Power\Power-0.ico", 0, 350, 80, 48, 48)
 	EndIf
 	$g_hOChkSaveRealtime = GUICtrlCreateCheckbox($g_aLangPreferences[13], 35, 145, 360, 20)
 	GUICtrlSetState($g_hOChkSaveRealtime, $g_iSaveRealtime)
