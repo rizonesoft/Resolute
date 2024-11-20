@@ -1,0 +1,330 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>ClamAV File Types and Target Types - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../appendix/FileTypes.html" class="active"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="clamav-file-types"><a class="header" href="#clamav-file-types">ClamAV File Types</a></h1>
+<p>ClamAV has two file typing systems for filtering signature matches: Target Types and File Types.</p>
+<h2 id="target-types"><a class="header" href="#target-types">Target Types</a></h2>
+<p>A Target Type is an integer that indicates which kind of file the signature will match against. Target Type notation was first created for the purposes writing efficient signatures. A signature with a target type of <code>0</code> will be run against every file type, and thus is not ideal. However, the Target Type notation is limited and it may be unavoidable.</p>
+<p>Although the newer CL_TYPE string name notation has replaced the Target Type for some signature formats, many signature formats require a target type number.</p>
+<p>This is the current list of available Target Types:</p>
+<div class="table-wrapper"><table><thead><tr><th>Target Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>0</td><td>any file</td></tr>
+<tr><td>1</td><td>Portable Executable, both 32- and 64-bit</td></tr>
+<tr><td>2</td><td>OLE2 containers, including specific macros. Primarily used by MS Office and MSI installation files</td></tr>
+<tr><td>3</td><td>HTML (normalized)</td></tr>
+<tr><td>4</td><td>Mail file</td></tr>
+<tr><td>5</td><td>Graphics</td></tr>
+<tr><td>6</td><td>ELF</td></tr>
+<tr><td>7</td><td>ASCII text file (normalized)</td></tr>
+<tr><td>8</td><td>Unused</td></tr>
+<tr><td>9</td><td>Mach-O files</td></tr>
+<tr><td>10</td><td>PDF files</td></tr>
+<tr><td>11</td><td>Flash files</td></tr>
+<tr><td>12</td><td>Java class files</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p><em>Important</em>: HTML, ASCII, Javascript are all normalized:</p>
+<ul>
+<li>ASCII - All lowercase.</li>
+<li>HTML - Whitespace transformed to spaces, tags/tag attributes normalized, all lowercase.</li>
+<li>Javascript - All strings are normalized (hex encoding is decoded), numbers are parsed and normalized, local variables/function names are normalized to <code>n001</code> format, argument to <code>eval()</code> is parsed as JS again, unescape() is handled, some simple JS packers are handled, output is whitespace normalized.</li>
+</ul>
+</blockquote>
+<h2 id="file-types"><a class="header" href="#file-types">File Types</a></h2>
+<p>ClamAV maintains it's own file typing format and assigns these types using either:</p>
+<ul>
+<li>
+<p>Evaluation of a unique sequence of bytes at the start of a file (<a href="../manual/Signatures/FileTypeMagic.html">File Type Magic</a>).</p>
+</li>
+<li>
+<p>File type indicators when parsing container files.</p>
+<ul>
+<li>For example:
+<code>CL_TYPE_SCRIPT</code> may be assigned to data contained in a PDF when the PDF indicates that a stream of bytes is &quot;Javascript&quot;</li>
+</ul>
+</li>
+<li>
+<p>File type determination based on the names or characteristics contained within the file.</p>
+<ul>
+<li>For example:
+<code>CL_TYPE_OOXML_WORD</code> may be assigned to a Zip file containing files with specific names.</li>
+</ul>
+</li>
+</ul>
+<p>ClamAV File Types are prefixed with <code>CL_TYPE_</code>. The following is an exhaustive list of all current file types.</p>
+<div class="table-wrapper"><table><thead><tr><th>CL_TYPE</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>CL_TYPE_7Z</code></td><td>7-Zip Archive</td></tr>
+<tr><td><code>CL_TYPE_7ZSFX</code></td><td>Self-Extracting 7-Zip Archive</td></tr>
+<tr><td><code>CL_TYPE_APM</code></td><td>Disk Image - Apple Partition Map</td></tr>
+<tr><td><code>CL_TYPE_ARJ</code></td><td>ARJ Archive</td></tr>
+<tr><td><code>CL_TYPE_ARJSFX</code></td><td>Self-Extracting ARJ Archive</td></tr>
+<tr><td><code>CL_TYPE_AUTOIT</code></td><td>AutoIt Automation Executable</td></tr>
+<tr><td><code>CL_TYPE_BINARY_DATA</code></td><td>binary data</td></tr>
+<tr><td><code>CL_TYPE_BINHEX</code></td><td>BinHex Macintosh 7-bit ASCII email attachment encoding</td></tr>
+<tr><td><code>CL_TYPE_BZ</code></td><td>BZip Compressed File</td></tr>
+<tr><td><code>CL_TYPE_CABSFX</code></td><td>Self-Extracting Microsoft CAB Archive</td></tr>
+<tr><td><code>CL_TYPE_CPIO_CRC</code></td><td>CPIO Archive (CRC)</td></tr>
+<tr><td><code>CL_TYPE_CPIO_NEWC</code></td><td>CPIO Archive (NEWC)</td></tr>
+<tr><td><code>CL_TYPE_CPIO_ODC</code></td><td>CPIO Archive (ODC)</td></tr>
+<tr><td><code>CL_TYPE_CPIO_OLD</code></td><td>CPIO Archive (OLD, Little Endian or Big Endian)</td></tr>
+<tr><td><code>CL_TYPE_CRYPTFF</code></td><td>Files encrypted by CryptFF malware</td></tr>
+<tr><td><code>CL_TYPE_DMG</code></td><td>Apple DMG Archive</td></tr>
+<tr><td><code>CL_TYPE_EGG</code></td><td>ESTSoft EGG Archive, new in 0.102</td></tr>
+<tr><td><code>CL_TYPE_ELF</code></td><td>ELF Executable (Linux/Unix program or library)</td></tr>
+<tr><td><code>CL_TYPE_GIF</code></td><td>GIF Graphics File, new in 0.103</td></tr>
+<tr><td><code>CL_TYPE_GPT</code></td><td>Disk Image - GUID Partition Table</td></tr>
+<tr><td><code>CL_TYPE_GRAPHICS</code></td><td>Other graphics files; BMP, JPEG2000</td></tr>
+<tr><td><code>CL_TYPE_GZ</code></td><td>GZip Compressed File</td></tr>
+<tr><td><code>CL_TYPE_HTML_UTF16</code></td><td>Wide-Character / UTF16 encoded HTML</td></tr>
+<tr><td><code>CL_TYPE_HTML</code></td><td>HTML data</td></tr>
+<tr><td><code>CL_TYPE_HWP3</code></td><td>Hangul Word Processor (3.X)</td></tr>
+<tr><td><code>CL_TYPE_HWPOLE2</code></td><td>Hangul Word Processor embedded OLE2</td></tr>
+<tr><td><code>CL_TYPE_INTERNAL</code></td><td>Internal properties</td></tr>
+<tr><td><code>CL_TYPE_ISHIELD_MSI</code></td><td>Windows Install Shield MSI installer</td></tr>
+<tr><td><code>CL_TYPE_ISO9660</code></td><td>ISO 9660 file system for optical disc media</td></tr>
+<tr><td><code>CL_TYPE_JAVA</code></td><td>Java Class File</td></tr>
+<tr><td><code>CL_TYPE_JPEG</code></td><td>JPEG Graphics File, new in 0.103.1</td></tr>
+<tr><td><code>CL_TYPE_LNK</code></td><td>Microsoft Windows Shortcut File</td></tr>
+<tr><td><code>CL_TYPE_MACHO_UNIBIN</code></td><td>Universal Binary/Java Bytecode</td></tr>
+<tr><td><code>CL_TYPE_MACHO</code></td><td>Apple/NeXTSTEP Mach-O Executable file format</td></tr>
+<tr><td><code>CL_TYPE_MAIL</code></td><td>Email file</td></tr>
+<tr><td><code>CL_TYPE_MBR</code></td><td>Disk Image - Master Boot Record</td></tr>
+<tr><td><code>CL_TYPE_MHTML</code></td><td>MHTML Saved Web Page</td></tr>
+<tr><td><code>CL_TYPE_MSCAB</code></td><td>Microsoft CAB Archive</td></tr>
+<tr><td><code>CL_TYPE_MSCHM</code></td><td>Microsoft CHM help archive</td></tr>
+<tr><td><code>CL_TYPE_MSEXE</code></td><td>Microsoft EXE / DLL Executable file</td></tr>
+<tr><td><code>CL_TYPE_MSOLE2</code></td><td>Microsoft OLE2 Container file</td></tr>
+<tr><td><code>CL_TYPE_MSSZDD</code></td><td>Microsoft Compressed EXE</td></tr>
+<tr><td><code>CL_TYPE_NULSFT</code></td><td>NullSoft Scripted Installer program</td></tr>
+<tr><td><code>CL_TYPE_OLD_TAR</code></td><td>TAR archive (old)</td></tr>
+<tr><td><code>CL_TYPE_OOXML_HWP</code></td><td>Hangul Office Open Word Processor (5.X)</td></tr>
+<tr><td><code>CL_TYPE_OOXML_PPT</code></td><td>Microsoft Office Open XML PowerPoint</td></tr>
+<tr><td><code>CL_TYPE_OOXML_WORD</code></td><td>Microsoft Office Open Word 2007+</td></tr>
+<tr><td><code>CL_TYPE_OOXML_XL</code></td><td>Microsoft Office Open Excel 2007+</td></tr>
+<tr><td><code>CL_TYPE_PART_HFSPLUS</code></td><td>Apple HFS+ partition</td></tr>
+<tr><td><code>CL_TYPE_PDF</code></td><td>Adobe PDF document</td></tr>
+<tr><td><code>CL_TYPE_PNG</code></td><td>PNG Graphics File, new in 0.103</td></tr>
+<tr><td><code>CL_TYPE_POSIX_TAR</code></td><td>TAR archive</td></tr>
+<tr><td><code>CL_TYPE_PS</code></td><td>Postscript</td></tr>
+<tr><td><code>CL_TYPE_RAR</code></td><td>RAR Archive</td></tr>
+<tr><td><code>CL_TYPE_RARSFX</code></td><td>Self-Extracting RAR Archive</td></tr>
+<tr><td><code>CL_TYPE_RIFF</code></td><td>Resource Interchange File Format container formatted file</td></tr>
+<tr><td><code>CL_TYPE_RTF</code></td><td>Rich Text Format document</td></tr>
+<tr><td><code>CL_TYPE_SCRENC</code></td><td>Files encrypted by ScrEnc malware</td></tr>
+<tr><td><code>CL_TYPE_SCRIPT</code></td><td>Generic type for scripts (Javascript, Python, etc)</td></tr>
+<tr><td><code>CL_TYPE_SIS</code></td><td>Symbian OS Software Installation Script Archive</td></tr>
+<tr><td><code>CL_TYPE_SWF</code></td><td>Adobe Flash File (LZMA, Zlib, or uncompressed)</td></tr>
+<tr><td><code>CL_TYPE_TEXT_ASCII</code></td><td>ASCII text</td></tr>
+<tr><td><code>CL_TYPE_TEXT_UTF16BE</code></td><td>UTF-16BE text</td></tr>
+<tr><td><code>CL_TYPE_TEXT_UTF16LE</code></td><td>UTF-16LE text</td></tr>
+<tr><td><code>CL_TYPE_TEXT_UTF8</code></td><td>UTF-8 text</td></tr>
+<tr><td><code>CL_TYPE_TIFF</code></td><td>TIFF Graphics File (Little or Big Endian), new in 0.103.1</td></tr>
+<tr><td><code>CL_TYPE_TNEF</code></td><td>Microsoft Outlook &amp; Exchange email attachment format</td></tr>
+<tr><td><code>CL_TYPE_UUENCODED</code></td><td>UUEncoded (Unix-to-Unix) binary file (Unix email attachment)</td></tr>
+<tr><td><code>CL_TYPE_XAR</code></td><td>XAR Archive</td></tr>
+<tr><td><code>CL_TYPE_XDP</code></td><td>Adobe XDP - Embedded PDF</td></tr>
+<tr><td><code>CL_TYPE_XML_HWP</code></td><td>Hangul Word Processor XML (HWPML) Document</td></tr>
+<tr><td><code>CL_TYPE_XML_WORD</code></td><td>Microsoft Word 2003 XML Document</td></tr>
+<tr><td><code>CL_TYPE_XML_XL</code></td><td>Microsoft Excel 2003 XML Document</td></tr>
+<tr><td><code>CL_TYPE_XZ</code></td><td>XZ Archive</td></tr>
+<tr><td><code>CL_TYPE_ZIP</code></td><td>Zip Archive</td></tr>
+<tr><td><code>CL_TYPE_ZIPSFX</code></td><td>Self-Extracting Zip Archive</td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../appendix/Authenticode.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../appendix/FunctionalityLevels.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../appendix/Authenticode.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../appendix/FunctionalityLevels.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

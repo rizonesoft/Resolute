@@ -1,0 +1,411 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Configuration - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html" class="active"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>Table Of Contents</p>
+<ul>
+<li><a href="#configuration">Configuration</a>
+<ul>
+<li><a href="#first-time-set-up">First Time Set-Up</a>
+<ul>
+<li><a href="#unix">Unix</a></li>
+<li><a href="#windows">Windows</a>
+<ul>
+<li><a href="#additional-notes-about-the-config-files-and-database-directories">Additional notes about the config files and database directories</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#freshclamconf">freshclam.conf</a>
+<ul>
+<li><a href="#other-freshclamconf-settings">Other freshclam.conf settings</a></li>
+</ul>
+</li>
+<li><a href="#clamdconf">clamd.conf</a>
+<ul>
+<li><a href="#other-clamdconf-settings">Other clamd.conf settings</a></li>
+<li><a href="#on-access-scanning">On-Access Scanning</a></li>
+</ul>
+</li>
+<li><a href="#clamav-milterconf">clamav-milter.conf</a>
+<ul>
+<li><a href="#users-and-on-user-privileges">Users and on user privileges</a></li>
+</ul>
+</li>
+<li><a href="#configure-selinux-for-clamav">Configure SELinux for ClamAV</a></li>
+<li><a href="#clamconf">ClamConf</a></li>
+<li><a href="#next-steps">Next Steps</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="first-time-set-up"><a class="header" href="#first-time-set-up">First Time Set-Up</a></h2>
+<p>Depending on your install method and your operating system, some configuration options may have been pre-configured. For example a clamav install on Ubuntu with <code>apt install</code> will place configs in <code>/etc/clamav</code>.</p>
+<p>However, it is likely that you will need to create new config files or modify the existing ones with custom settings that make the most sense for your use case. A from-source install will require you to create a <code>freshclam.conf</code> before you can use FreshClam, a <code>clamd.conf</code> before you can use ClamD, and a <code>clamav-milter.conf</code> before you can use ClamAV-Milter.</p>
+<p>A default install from source will place the example configs in <code>/usr/local/etc/</code> on Unix/Linux systems and in the install directory under <code>conf_examples</code> on Windows. These examples demonstrate each of the options and may help you decide how to configure ClamAV to suit your needs. But again the location of these examples may vary depending on how you installed ClamAV. To continue with the Ubuntu example, you may find the FreshClam config from an <code>apt install</code> in <code>/usr/share/doc/clamav-freshclam/examples/</code>. So if you're unsure where the example configs are on your system, you may wish to use <a href="#clamconf">ClamConf</a> to generate them.</p>
+<p>Here are some quick steps to get you started.</p>
+<h3 id="unix"><a class="header" href="#unix">Unix</a></h3>
+<p>Run these to generate example configs, if needed:</p>
+<pre><code class="language-bash">clamconf -g freshclam.conf &gt; freshclam.conf
+clamconf -g clamd.conf &gt; clamd.conf
+clamconf -g clamav-milter.conf &gt; clamav-milter.conf
+</code></pre>
+<p>Or if you have the examples already, copy them to drop the <code>.example</code> extension:</p>
+<pre><code class="language-bash">cp freshclam.conf.example freshclam.conf
+cp clamd.conf.example clamd.conf
+cp clamav-milter.conf.example clamav-milter.conf
+</code></pre>
+<p>Next up, edit the configs you need. There are tips below for each of <a href="#freshclamconf">freshclam.conf</a>, <a href="#clamdconf">clamd.conf</a>, and <a href="#clamav-milter">clamav-milter</a>.</p>
+<h3 id="windows"><a class="header" href="#windows">Windows</a></h3>
+<p>In a PowerShell terminal in the install directory, perform the following tasks:</p>
+<p>Run:</p>
+<pre><code class="language-ps1">copy .\conf_examples\freshclam.conf.sample .\freshclam.conf
+copy .\conf_examples\clamd.conf.sample .\clamd.conf
+</code></pre>
+<p>Run:</p>
+<pre><code class="language-ps1">write.exe .\freshclam.conf
+</code></pre>
+<p>WordPad will pop up. Delete the line that says &quot;Example&quot;. You may also wish to set additional options to enable features or alter default behavior, such as the receive-timeout. Save the file and close WordPad.</p>
+<p>Run:</p>
+<pre><code class="language-ps1">write.exe .\clamd.conf
+</code></pre>
+<p>WordPad will pop up. Delete the line that says &quot;Example&quot;. You may also wish to set additional options to enable features or alter default behavior, such as enabling logging. Save the file and close WordPad.</p>
+<h4 id="additional-notes-about-the-config-files-and-database-directories"><a class="header" href="#additional-notes-about-the-config-files-and-database-directories">Additional notes about the config files and database directories</a></h4>
+<p>The install directory is but one of a few locations ClamAV may search for configs and for signature databases.</p>
+<p>Config files path search order:</p>
+<ol>
+<li>The content of the registry key:
+&quot;HKEY_LOCAL_MACHINE/Software/ClamAV/ConfDir&quot;</li>
+<li>The directory where libclamav.dll is located:
+&quot;C:\Program Files\ClamAV&quot;</li>
+<li>&quot;C:\ClamAV&quot;</li>
+</ol>
+<p>Database files path search order:</p>
+<ol>
+<li>The content of the registry key:
+&quot;HKEY_LOCAL_MACHINE/Software/ClamAV/DataDir&quot;</li>
+<li>The directory &quot;database&quot; inside the directory where libclamav.dll is located:
+&quot;C:\Program Files\ClamAV\database&quot;</li>
+<li>&quot;C:\ClamAV\db&quot;</li>
+</ol>
+<h2 id="freshclamconf"><a class="header" href="#freshclamconf">freshclam.conf</a></h2>
+<p><code>freshclam</code> is the automatic database update tool for Clam AntiVirus. It can be configured to work in two modes:</p>
+<ul>
+<li>interactive - on demand from command line</li>
+<li>daemon - silently in the background</li>
+</ul>
+<p><code>freshclam</code> is an advanced tool: it supports scripted updates (instead of transferring the whole CVD file at each update it only transfers the differences between the latest and the current database via a special script), database version checks through DNS, proxy servers (with authentication), digital signatures and various error scenarios.</p>
+<p><strong>Quick test: run freshclam (as superuser) with no parameters and check the output.</strong></p>
+<pre><code class="language-bash">freshclam
+</code></pre>
+<blockquote>
+<p><em>Tip</em>: Depending on how you installed Freshclam and depending on which version of ClamAV you're running, you may encounter errors the first time you run Freshclam. See <a href="../../faq/faq-freshclam.html">the Freshclam section of our FAQ</a> for help!</p>
+</blockquote>
+<p>If everything is OK you may create the log file in /var/log (ensure the directory is owned either by <em>clamav</em> or whichever user <code>freshclam</code> will be running as):</p>
+<pre><code class="language-bash">touch /var/log/freshclam.log
+chmod 600 /var/log/freshclam.log
+chown clamav /var/log/freshclam.log
+</code></pre>
+<p>Now you <em>should</em> edit the configuration file <code>freshclam.conf</code> and point the <em>UpdateLogFile</em> directive to the log file. Finally, to run <code>freshclam</code> in the daemon mode, execute:</p>
+<pre><code class="language-bash">freshclam -d
+</code></pre>
+<p>The other way is to use the <em>cron</em> daemon. You have to add the following line to the <em>crontab</em> of <strong>root</strong> or <strong>clamav</strong> user:</p>
+<pre><code>N * * * *   /usr/local/bin/freshclam --quiet
+</code></pre>
+<p>to check for a new database every hour. <strong>N should be a number between 3 and 57 of your choice. Please don’t choose any multiple of 10, because there are already too many clients using those time slots.</strong> Proxy settings are only configurable via the configuration file and <code>freshclam</code> will require strict permission settings for the config file when <code>HTTPProxyPassword</code> is turned on.</p>
+<pre><code class="language-ini">HTTPProxyServer myproxyserver.com
+HTTPProxyPort 1234
+HTTPProxyUsername myusername
+HTTPProxyPassword mypass
+</code></pre>
+<h3 id="other-freshclamconf-settings"><a class="header" href="#other-freshclamconf-settings">Other freshclam.conf settings</a></h3>
+<p>If your <code>freshclam.conf</code> was derived from the <code>freshclam.conf.sample</code>, you should find many other options that are simply commented out. If not, seek out the <code>freshclam.conf.sample</code> file, or on Linux/Unix systems run <code>man freshclam.conf</code>.</p>
+<p>Take the time to look through the options. You can enable the sample options by deleting the <code>#</code> comment characters.</p>
+<p>Some popular options to enable include:</p>
+<ul>
+<li><code>LogTime</code></li>
+<li><code>LogRotate</code></li>
+<li><code>NotifyClamd</code></li>
+<li><code>DatabaseOwner</code></li>
+</ul>
+<h2 id="clamdconf"><a class="header" href="#clamdconf">clamd.conf</a></h2>
+<p>Currently, ClamAV requires users to edit their <code>clamd.conf.example</code> file before they can run the daemon. At a bare minimum, users will need to comment out the line that reads &quot;Example&quot;, else <code>clamd</code> will consider the configuration invalid, ala:</p>
+<pre><code class="language-ini"># Comment or remove the line below.
+#Example
+</code></pre>
+<p>You will also need to rename <code>clamd.conf.example</code> to <code>clamd.conf</code> via:</p>
+<pre><code class="language-bash">mv ./clamd.conf.example ./clamd.conf
+</code></pre>
+<p>If you are setting up a simple, local <a href="Scanning.html#clamd"><code>clamd</code> instance</a> then some other configuration options of interests to you will be as follows:</p>
+<pre><code class="language-ini"># Path to a local socket file the daemon will listen on.
+# Default: disabled (must be specified by a user)
+LocalSocket /tmp/clamd.socket
+
+...
+
+# Sets the permissions on the unix socket to the specified mode.
+# Default: disabled (socket is world accessible)
+LocalSocketMode 660
+</code></pre>
+<p>Beyond that, <code>clamd.conf</code> is well commented and configuration should be straightforward.</p>
+<p>If needed, you can find out even more about the formatting and options available in <code>clamd.conf</code> with the command:</p>
+<pre><code class="language-bash">man clamd.conf
+</code></pre>
+<h3 id="other-clamdconf-settings"><a class="header" href="#other-clamdconf-settings">Other clamd.conf settings</a></h3>
+<p>If your <code>clamd.conf</code> was derived from the <code>clamd.conf.sample</code>, you should find many other options that are simply commented out. If not, seek out the <code>clamd.conf.sample</code> file, or on Linux/Unix systems run <code>man clamd.conf</code>.</p>
+<p>Take the time to look through the options. You can enable the sample options by deleting the <code>#</code> comment characters.</p>
+<p>Some popular options to enable include:</p>
+<ul>
+<li><code>LogTime</code></li>
+<li><code>LogClean</code></li>
+<li><code>LogRotate</code></li>
+<li><code>User</code></li>
+<li><code>ScanOnAccess</code>
+<ul>
+<li><code>OnAccessIncludePath</code></li>
+<li><code>OnAccessExcludePath</code></li>
+<li><code>OnAccessPrevention</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="on-access-scanning"><a class="header" href="#on-access-scanning">On-Access Scanning</a></h3>
+<p>You can configure On-Access Scanning through <code>clamd.conf</code>. Configuration for On-Access Scanning starts in the second half of <code>clamd.conf.sample</code> starting with &quot;On-access Scan Settings&quot;. All options are grouped acording to use and roughly ordered by importance in those groupings. Please carefully read the explanation of each option to see if it might be of use to you.</p>
+<p>Also read the <a href="../OnAccess.html">on-access</a> section of the Usage manual for further details on using On-Access Scanning.</p>
+<h2 id="clamav-milterconf"><a class="header" href="#clamav-milterconf">clamav-milter.conf</a></h2>
+<p>ClamAV includes a mail filtering tool called <code>clamav-milter</code>. This tool interfaces directly with <code>clamd</code>, and thus requires a working <a href="Scanning.html#clamd"><code>clamd</code> instance</a> to run. However, <code>clamav-milter</code>'s configuration and log files are separate from that of <code>clamd</code>.</p>
+<p>Ensuring ClamAV compiles with <code>clamav-milter</code> must be done at configure time with the command:</p>
+<pre><code class="language-bash">./configure [options] --enable-milter
+</code></pre>
+<p>This requires having the milter library installed on your system. If <em>libmilter</em> is not installed, <code>./configure</code> will exit with this error message:</p>
+<pre><code class="language-bash">checking for mi_stop in -lmilter... no
+configure: error: Cannot find libmilter
+</code></pre>
+<p>While not necessarily <em>complicated</em>, setting up the <code>clamav-milter</code> is an involved process. Thus, we recommend consulting your MTA’s manual on how to best connect ClamAV with the <code>clamav-milter</code>.</p>
+<h3 id="users-and-on-user-privileges"><a class="header" href="#users-and-on-user-privileges">Users and on user privileges</a></h3>
+<p>If you are running <code>freshclam</code> and <code>clamd</code> as root or with <code>sudo</code>, and you did not explicitly configure with <code>--disable-clamav</code>, you will want to ensure that the <code>DatabaseOwner</code> user specified in <code>freshclam.conf</code> owns the database directory so it can download signature updates.</p>
+<p>The user that <code>clamd</code>, <code>clamdscan</code>, and <code>clamscan</code> run as may be the same user, but if it isn't -- it merely needs <em>read</em> access to the database directory.</p>
+<p>If you choose to use the default <code>clamav</code> user to run <code>freshclam</code> and <code>clamd</code>, you'll need to create the clamav group and the clamav user account the first time you install ClamAV.</p>
+<pre><code class="language-bash">groupadd clamav
+useradd -g clamav -s /bin/false -c &quot;Clam Antivirus&quot; clamav
+</code></pre>
+<p>Finally, you will want to set user ownership of the database directory. For example:</p>
+<pre><code class="language-bash">sudo chown -R clamav:clamav /usr/local/share/clamav
+</code></pre>
+<h2 id="configure-selinux-for-clamav"><a class="header" href="#configure-selinux-for-clamav">Configure SELinux for ClamAV</a></h2>
+<p>Certain distributions (notably RedHat variants) when operating with SELinux enabled use the non-standard <code>antivirus_can_scan_system</code> SELinux option instead of <code>clamd_can_scan_system</code>.</p>
+<p>At this time, libclamav only sets the <code>clamd_can_scan_system</code> option, so you may need to manually enable <code>antivirus_can_scan_system</code>. If you don't perform this step, <code>freshclam</code> will log something like this when it tests the newly downloaded signature databases:</p>
+<pre><code class="language-bash">During database load : LibClamAV Warning: RWX mapping denied: Can't allocate RWX Memory: Permission denied
+</code></pre>
+<p>To allow ClamAV to operate under SELinux, run the following:</p>
+<pre><code class="language-bash">setsebool -P antivirus_can_scan_system 1
+</code></pre>
+<h2 id="clamconf"><a class="header" href="#clamconf">ClamConf</a></h2>
+<p><code>clamconf</code> is a tool ClamAV provides for checking your entire system configuration, as it relates to your ClamAV installation. When run, it displays values used when configuring ClamAV at compilation time, important OS details, the contents (and validity) of both <code>clamd.conf</code> and <code>freshclam.conf</code>, along with other important engine, database, platform, and build information.</p>
+<p>It can also generate example configuration files for <a href="#clamdconf"><code>clamd.conf</code></a> and <a href="#freshclamconf"><code>freshclam.conf</code></a>.</p>
+<p>To use <code>clamconf</code>, and see all the information it provides, simply run the following command:</p>
+<pre><code class="language-bash">clamconf
+</code></pre>
+<p>For more detailed information on <code>clamconf</code>, run:</p>
+<pre><code class="language-bash">clamconf --help
+</code></pre>
+<p>or on Unix systems:</p>
+<pre><code class="language-bash">man clamconf
+</code></pre>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<p>Now that you have the config file basics, it's time to <a href="SignatureManagement.html">learn about signature databases and how to keep yours up-to-date</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Usage.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Usage/SignatureManagement.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Usage.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Usage/SignatureManagement.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

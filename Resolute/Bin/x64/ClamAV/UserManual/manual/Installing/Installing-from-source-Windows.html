@@ -1,0 +1,393 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Windows from source - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html" class="active"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="installing-clamav-on-windows-from-source"><a class="header" href="#installing-clamav-on-windows-from-source">Installing ClamAV on Windows from Source</a></h1>
+<p>The following are instructions to build ClamAV <em>version 0.104 and newer</em> using CMake.</p>
+<blockquote>
+<p><em>Tip</em>: If you wish to build ClamAV from source in ClamAV <em>version 0.103 and older</em>, you'll have to use the Visual Studio solution, please see the <a href="https://github.com/Cisco-Talos/clamav/blob/rel/0.103/win32/README.md">Win32 ClamAV Build Instructions</a> located in our source release materials on <a href="https://www.clamav.net/downloads">ClamAV.net</a> and on <a href="https://github.com/Cisco-Talos/clamav">GitHub</a>.</p>
+</blockquote>
+<ul>
+<li><a href="#installing-clamav-on-windows-from-source">Installing ClamAV on Windows from Source</a>
+<ul>
+<li><a href="#install-prerequisites">Install prerequisites</a>
+<ul>
+<li><a href="#building-the-library-dependencies">Building the library dependencies</a></li>
+<li><a href="#install-rust-toolchain">Install Rust toolchain</a></li>
+</ul>
+</li>
+<li><a href="#download-the-source-code">Download the source code</a></li>
+<li><a href="#build-clamav">Build ClamAV</a>
+<ul>
+<li><a href="#building-with-mussels">Building with Mussels</a>
+<ul>
+<li><a href="#building-the-library-dependencies-with-mussels">Building the library dependencies with Mussels</a></li>
+<li><a href="#building-clamav">Building ClamAV</a></li>
+</ul>
+</li>
+<li><a href="#building-with-vcpkg">Building with vcpkg</a></li>
+<li><a href="#build-the-installer">Build the Installer</a></li>
+</ul>
+</li>
+<li><a href="#what-now">What now?</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><em>Note</em>: Some of the dependencies are optional if you elect to not build all of the command line applications, or elect to only build the libclamav library. Specifically:</p>
+<ul>
+<li>libcurl:  <em>required for libfreshclam, freshclam, clamsubmit</em></li>
+<li>ncurses:  <em>required for clamdtop</em></li>
+</ul>
+<p>For more information about customized builds and which dependencies can be skipped, please see the <code>INSTALL.md</code> document accompanying the source code.</p>
+</blockquote>
+<h2 id="install-prerequisites"><a class="header" href="#install-prerequisites">Install prerequisites</a></h2>
+<p><strong>The following commands for building on Windows are written for Powershell</strong>.</p>
+<p>At a minimum you will need:</p>
+<ul>
+<li>Visual Studio 2015 or newer</li>
+<li>CMake</li>
+<li><a href="#install-rust-toolchain">The Rust programming language toolchain</a> (for ClamAV version 0.105+)</li>
+</ul>
+<p>If you want to build the installer, you'll also need WiX Toolset.</p>
+<p>If you're using Chocolatey, you can install CMake and WiX simply like this:</p>
+<pre><code class="language-ps1">choco install cmake wixtoolset
+</code></pre>
+<p>If you're using Mussels to build the library dependencies (see below), then you may also need to install Netwide Assembler (NASM) and ActivePerl. These are also simple to install using Chocolatey:</p>
+<pre><code class="language-ps1">choco install nasm activeperl
+</code></pre>
+<p>Then open a new terminal so that CMake and WiX will be in your <code>$PATH</code>.</p>
+<h3 id="building-the-library-dependencies"><a class="header" href="#building-the-library-dependencies">Building the library dependencies</a></h3>
+<p>There are two options for building and supplying the library dependencies. These are Mussels and vcpkg.</p>
+<p>Mussels is an open source project developed in-house by the ClamAV team. It offers great flexibility for defining your own collections (cookbooks) of build instructions (recipes) instead of solely relying on a centralized repository of ports. And unlike vcpkg, Mussels does not implement CMake build tooling for projects that don't support CMake, but instead leverages whatever build system is provided by the project. This means that Mussels builds may require installing additional tools, like NMake and ActivePerl rather than simply requiring CMake. The advantage is that you'll be building those projects the same way that those developers intended, and that Mussels recipes are generally very light weight. Mussels has some sharp edges because it's a newer and much smaller project than vcpkg.</p>
+<p>Vcpkg is an open source project developed by Microsoft and is heavily oriented towards CMake projects. Vcpkg offers a very large collection of &quot;ports&quot; for almost any project you may need to build. It is very easy to get started with vcpkg.</p>
+<p>Mussels is the preferred tool to supply the library dependencies at least until such time as the vcpkg Debug-build libclamav unit test heap-corruption crash is resolved <a href="#windows-build-with-vcpkg">(see below)</a>.</p>
+<p><em><strong>Details for how to use Mussels and vcpkg will be provided with the build instructions (below), as the instructions differ <em>significantly</em> depending on which you choose.</strong></em></p>
+<blockquote>
+<p><em>Tip</em>: Installing the Python 3 <code>pytest</code> package is also recommended in case the unit tests fail so that the test output is easy to read. <em>You're welcome to skip it.</em> However, if you have Python 2's <code>pytest</code> installed but not Python 3's <code>pytest</code>, the tests may fail to run.</p>
+<p>You can install pytest by running:</p>
+<pre><code class="language-ps1">python3 -m pip install --user pytest
+</code></pre>
+</blockquote>
+<h3 id="install-rust-toolchain"><a class="header" href="#install-rust-toolchain">Install Rust toolchain</a></h3>
+<p>Starting with ClamAV version 0.105, the Rust toolchain is required to compile ClamAV. You can install the appropriate toolchain for your development environment by following the instructions on the <a href="https://rustup.rs">rustup</a> website. This ensures that you have the most up-to-date compiler available at the time of installation; keep your toolchain updated for new features and bug/security fixes by periodically executing: <code>rustup update</code>.</p>
+<p>Building ClamAV requires, at a minimum, Rust compiler version 1.56, as it relies on features introduced in the <a href="https://doc.rust-lang.org/edition-guide/rust-2021/index.html">Rust 2021 Edition</a>.</p>
+<h2 id="download-the-source-code"><a class="header" href="#download-the-source-code">Download the source code</a></h2>
+<p>Download the source from <a href="https://www.clamav.net/downloads">the clamav.net downloads page</a>.</p>
+<p>Extract the archive. You should be able to right click on it and extract it to a folder, then in that folder, do the same for the <code>clamav-[ver].tar</code> file.</p>
+<p>The rest of the instructions will assume you've opened Powershell in the clamav source directory.</p>
+<h2 id="build-clamav"><a class="header" href="#build-clamav">Build ClamAV</a></h2>
+<p>First, make a &quot;build&quot; subdirectory. This will enable you to easily delete your build files if something goes wrong and you need to re-configure and try again.</p>
+<pre><code class="language-ps1">mkdir build &amp;&amp; cd build
+</code></pre>
+<h3 id="building-with-mussels"><a class="header" href="#building-with-mussels">Building with Mussels</a></h3>
+<h4 id="building-the-library-dependencies-with-mussels"><a class="header" href="#building-the-library-dependencies-with-mussels">Building the library dependencies with Mussels</a></h4>
+<p>Much like <code>vcpkg</code>, <a href="https://github.com/Cisco-Talos/Mussels">Mussels</a> can be used to automatically build the ClamAV library dependencies. Unlike <code>vcpkg</code>, Mussels does not provide a mechanism for CMake to automatically detect the
+library paths.</p>
+<p>To build the library dependencies with Mussels, use Python's <code>pip</code> package manager to install Mussels:</p>
+<pre><code class="language-ps1">python3 -m pip install mussels
+</code></pre>
+<blockquote>
+<p><em>Important</em>: Always run <code>mussels</code> or <code>msl</code> in a small sub-directory. Mussels will recursively search your current directory for YAML recipe files. In a large directory, such as your home directory, this may take a long time.</p>
+</blockquote>
+<p>Update the Mussels cookbooks to get the latest build recipes and set the
+<code>clamav</code> cookbook to be trusted:</p>
+<pre><code class="language-ps1">msl update
+msl cookbook trust clamav
+</code></pre>
+<p>Use <code>msl list</code> if you wish to see the recipes provided by the <code>clamav</code> cookbook.</p>
+<p>To build with Mussels, you may need to install a few extra tools required to build some of the libraries. These include NASM and ActivePerl. See <a href="#install-prerequisites">install prerequisites</a>, above.</p>
+<p>Build the <code>clamav_deps</code> recipe to compile ClamAV's library dependencies. By default, Mussels will install them to <code>~\.mussels\install\&lt;target&gt;</code></p>
+<pre><code class="language-ps1">msl build clamav_deps
+</code></pre>
+<p>If this worked, you should be ready to build ClamAV.</p>
+<blockquote>
+<p><em>Tip</em>: You can also build for 32-bit systems, using <code>msl build clamav_deps -t x86</code>.</p>
+</blockquote>
+<h4 id="building-clamav"><a class="header" href="#building-clamav">Building ClamAV</a></h4>
+<p>To configure the project, run the following, substiting &quot;Visual Studio 16 2019&quot; with your Visual Studio version:</p>
+<pre><code class="language-ps1">cmake ..  -G &quot;Visual Studio 16 2019&quot; -A x64 `
+  -D JSONC_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include\json-c&quot;         `
+  -D JSONC_LIBRARY=&quot;$home\.mussels\install\x64\lib\json-c.lib&quot;             `
+  -D ENABLE_JSON_SHARED=OFF                                              `
+  -D BZIP2_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;                `
+  -D BZIP2_LIBRARY_RELEASE=&quot;$home\.mussels\install\x64\lib\libbz2.lib&quot;     `
+  -D CURL_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;                 `
+  -D CURL_LIBRARY=&quot;$home\.mussels\install\x64\lib\libcurl_imp.lib&quot;         `
+  -D OPENSSL_ROOT_DIR=&quot;$home\.mussels\install\x64&quot;                         `
+  -D OPENSSL_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;              `
+  -D OPENSSL_CRYPTO_LIBRARY=&quot;$home\.mussels\install\x64\lib\libcrypto.lib&quot; `
+  -D OPENSSL_SSL_LIBRARY=&quot;$home\.mussels\install\x64\lib\libssl.lib&quot;       `
+  -D ZLIB_LIBRARY=&quot;$home\.mussels\install\x64\lib\libssl.lib&quot;              `
+  -D LIBXML2_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;              `
+  -D LIBXML2_LIBRARY=&quot;$home\.mussels\install\x64\lib\libxml2.lib&quot;          `
+  -D PCRE2_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;                `
+  -D PCRE2_LIBRARY=&quot;$home\.mussels\install\x64\lib\pcre2-8.lib&quot;            `
+  -D CURSES_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;               `
+  -D CURSES_LIBRARY=&quot;$home\.mussels\install\x64\lib\pdcurses.lib&quot;          `
+  -D PThreadW32_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;           `
+  -D PThreadW32_LIBRARY=&quot;$home\.mussels\install\x64\lib\pthreadVC2.lib&quot;    `
+  -D ZLIB_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;                 `
+  -D ZLIB_LIBRARY=&quot;$home\.mussels\install\x64\lib\zlibstatic.lib&quot;          `
+  -D LIBCHECK_INCLUDE_DIR=&quot;$home\.mussels\install\x64\include&quot;             `
+  -D LIBCHECK_LIBRARY=&quot;$home\.mussels\install\x64\lib\checkDynamic.lib&quot;    `
+  -D CMAKE_INSTALL_PREFIX=&quot;install&quot;
+</code></pre>
+<blockquote>
+<p><em>Tip</em>: You have to drop the <code>-A x64</code> arguments if you're building for 32-bits (or specify <code>-A win32</code>) and substitute <code>x64</code> with <code>x86</code> in the library paths.</p>
+</blockquote>
+<p>Now, go ahead and build the project:</p>
+<pre><code class="language-ps1">cmake --build . --config RelWithDebInfo
+</code></pre>
+<blockquote>
+<p><em>Tip</em>: If you're having include-path issues when building, try building with
+detailed verbosity so you can verify that the paths are correct:</p>
+</blockquote>
+<pre><code class="language-ps1">cmake --build . --config RelWithDebInfo -- /verbosity:detailed
+</code></pre>
+<p>You can run the test suite with <code>ctest</code>:</p>
+<pre><code class="language-ps1">ctest -C RelWithDebInfo
+</code></pre>
+<p>And you can install to the <code>install</code> (set above) like this:</p>
+<pre><code class="language-ps1">cmake --build . --config RelWithDebInfo --target install
+</code></pre>
+<blockquote>
+<p><em>Tip</em>: For a full list of configuration options, see the &quot;Custom CMake Config Options&quot; section of the <code>INSTALL.md</code> file included with the source code.</p>
+</blockquote>
+<h3 id="building-with-vcpkg"><a class="header" href="#building-with-vcpkg">Building with vcpkg</a></h3>
+<p><code>vcpkg</code> can be used to build the ClamAV library dependencies automatically.</p>
+<p><code>vcpkg</code> integrates really well with CMake, enabling CMake to find your compiled libraries automatically, so you don't have to specify the include &amp; library paths manually as you do when using Mussels.</p>
+<blockquote>
+<p><em>DISCLAIMER</em>: There is a known issue with the unit tests when building with vcpkg in <code>Debug</code> mode. When you run the libclamav unit tests (<code>check_clamav</code>), the program will crash and a popup will claim there was heap corruption. If &gt; you use Task Manager to kill the <code>check_clamav.exe</code> process, the rest of the tests pass just fine. This issue does not occur when using Mussels to supply the library dependencies. Commenting out the following lines in <code>readdb.c</code> resolves the heap corruption crash when running <code>check_clamav</code>, but of course introduces a memory leak:</p>
+<pre><code class="language-c">    if (engine-&gt;stats_data)
+        free(engine-&gt;stats_data);
+</code></pre>
+<p>If anyone has time to figure out the real cause of the vcpkg <code>Debug</code>-build crash in <code>check_clamav</code>, it would be greatly appreciated.</p>
+</blockquote>
+<p>You'll need to install <a href="https://github.com/microsoft/vcpkg">vcpkg</a>. See the <code>vcpkg</code> README for installation instructions.</p>
+<p>Once installed, set the variable <code>$VCPKG_PATH</code> to the location where you installed <code>vcpkg</code>:</p>
+<pre><code class="language-ps1">$VCPKG_PATH=&quot;...&quot; # Path to your vcpkg installation
+</code></pre>
+<p>By default, CMake and <code>vcpkg</code> build for 32-bit. If you want to build for 64-bit, set the <code>VCPKG_DEFAULT_TRIPLET</code> environment variable:</p>
+<pre><code class="language-ps1">$env:VCPKG_DEFAULT_TRIPLET=&quot;x64-windows&quot;
+</code></pre>
+<p>Next, use <code>vcpkg</code> to build the required library dependencies:</p>
+<pre><code class="language-ps1">&amp; &quot;$VCPKG_PATH\vcpkg&quot; install 'curl[openssl]' 'json-c' 'libxml2' 'pcre2' 'pthreads' 'zlib' 'pdcurses' 'bzip2' 'check'
+</code></pre>
+<p>Now configure the ClamAV build using the <code>CMAKE_TOOLCHAIN_FILE</code> variable which will enable CMake to automatically find the libraries we built with <code>vcpkg</code>.</p>
+<pre><code class="language-ps1">cmake .. -A x64 `
+  -D CMAKE_TOOLCHAIN_FILE=&quot;$VCPKG_PATH\scripts\buildsystems\vcpkg.cmake&quot; `
+  -D CMAKE_INSTALL_PREFIX=&quot;install&quot;
+</code></pre>
+<p>Now, go ahead and build the project:</p>
+<pre><code class="language-ps1">cmake --build . --config RelWithDebInfo
+</code></pre>
+<p>You can run the test suite with <code>ctest</code>:</p>
+<pre><code class="language-ps1">ctest -C RelWithDebInfo
+</code></pre>
+<p>And you can install to the <code>install</code> directory (set above) like this:</p>
+<pre><code class="language-ps1">cmake --build . --config RelWithDebInfo --target install
+</code></pre>
+<h3 id="build-the-installer"><a class="header" href="#build-the-installer">Build the Installer</a></h3>
+<p>To build the installer, you must have WIX Toolset installed. If you're using Chocolatey, you can install it simply with <code>choco install wixtoolset</code> and then open a new terminal so that WIX will be in your PATH.</p>
+<pre><code class="language-ps1">cpack -C RelWithDebInfo
+</code></pre>
+<h2 id="what-now"><a class="header" href="#what-now">What now?</a></h2>
+<p>Now that ClamAV is installed, you will want to customize your configuration and perhaps set up some scanning automation and alerting mechanisms.</p>
+<p><a href="../Usage/Configuration.html">Continue on to &quot;Configuration&quot;...</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Installing/Installing-from-source-Unix-old.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Installing/Community-projects.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Installing/Installing-from-source-Unix-old.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Installing/Community-projects.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

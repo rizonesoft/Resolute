@@ -31,7 +31,7 @@
 ; ===============================================================================================================================
 
 ; #CONSTANTS# ===================================================================================================================
-Global Const $CNT_ABOUTICONS = 6
+Global Const $CNT_ABOUTICONS = 9
 ; ===============================================================================================================================
 
 ; #VARIABLES# ===================================================================================================================
@@ -54,9 +54,11 @@ If Not IsDeclared("g_iAboutIconStart") Then Global $g_iAboutIconStart
 If Not IsDeclared("g_sUrlCompHomePage") Then Global $g_sUrlCompHomePage
 If Not IsDeclared("g_sUrlSupport") Then Global $g_sUrlSupport
 If Not IsDeclared("g_sUrlDownloads") Then Global $g_sUrlDownloads
-If Not IsDeclared("g_sUrlFacebook") Then Global $g_sUrlFacebook
 If Not IsDeclared("g_sUrlTwitter") Then Global $g_sUrlTwitter
-If Not IsDeclared("g_sUrlGooglePlus") Then Global $g_sUrlGooglePlus
+If Not IsDeclared("g_sUrlFacebook") Then Global $g_sUrlFacebook
+If Not IsDeclared("g_sUrlReddit") Then Global $g_sUrlReddit
+If Not IsDeclared("g_sUrlLinkedIn") Then Global $g_sUrlLinkedIn
+If Not IsDeclared("g_sUrlWhatsApp") Then Global $g_sUrlWhatsApp
 If Not IsDeclared("g_sUrlRSS") Then Global $g_sUrlRSS
 If Not IsDeclared("g_sUrlPayPal") Then Global $g_sUrlPayPal
 If Not IsDeclared("g_sUrlGitHub") Then Global $g_sUrlGitHub
@@ -112,7 +114,7 @@ Func _About_ShowDialog()
 	TrayItemSetState($g_hTrItemAbout, $GUI_DISABLE)
 	$g_hAboutGui = GUICreate($g_aLangAbout[0], 420, 500, -1, -1, _
 			BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_iParent)
-	GUISetFont(8.5, 400, 0, "Verdana", $g_hAboutGui, 5)
+	GUISetFont(8.5, Default, Default, "Verdana", $g_hAboutGui, 5)
 	If $g_iParentState > 0 Then GUISetIcon($g_sDlgAboutIcon, $g_iDialogIconStart + 3, $g_hAboutGui)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "__About_CloseDialog", $g_hAboutGui)
 
@@ -121,9 +123,11 @@ Func _About_ShowDialog()
 	GUICtrlSetOnEvent($g_AboutProgIcon, "_About_ProgramPage")
 
 	$abTitle = GUICtrlCreateLabel($g_sProgName, $g_iSizeIcon + 22, 16, 220, 18)
-	GUICtrlSetFont($abTitle, 11, 700)
+	GUICtrlSetFont($abTitle, 10, 700)
 	GUICtrlCreateLabel($g_aLangAbout[1] & Chr(32) & _GetProgramVersion(0), $g_iSizeIcon + 22, 40, 230, 15)
+	GUICtrlSetColor(-1, 0x333333)
 	GUICtrlCreateLabel($g_aLangAbout[2] & Chr(32) & @AutoItVersion, $g_iSizeIcon + 22, 55, 230, 15)
+	GUICtrlSetColor(-1, 0x333333)
 	GUICtrlCreateLabel($g_aLangAbout[3] & " © " & @YEAR & " " & $g_sCompanyName, $g_iSizeIcon + 22, 75, 230, 15)
 	GUICtrlSetColor(-1, 0x666666)
 	$g_aAboutIcons[0][0] = GUICtrlCreateIcon($g_aAboutIcons[0][1], $g_iAboutIconStart, 346, 0, 64, 64)
@@ -154,31 +158,27 @@ Func _About_ShowDialog()
 	GUICtrlSetCursor($g_aAboutIcons[1][0], 0)
 
 	GUICtrlCreateGroup($g_aLangAbout[11], 10, 205, 400, 125)
-	GUICtrlSetFont(-1, 10, 700, 2)
+	GUICtrlSetFont(-1, 10, 500, 2)
 	GUICtrlCreateEdit($g_sAboutCredits, 20, 230, 380, 85, BitOR($WS_VSCROLL, $ES_READONLY), $WS_EX_CLIENTEDGE)
 	GUICtrlSetColor(-1, 0x333333)
 	GUICtrlSetFont(-1, 8.5, -1, 2)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
 	$g_hRAMLabel = GUICtrlCreateLabel("", 20, 346, 380, 15)
-	GUICtrlSetFont($g_hRAMLabel, 8, 700)
+	GUICtrlSetFont($g_hRAMLabel, 8, 700, Default, "Verdana")
 	GUICtrlSetColor($g_hRAMLabel, 0x333333)
-	GUICtrlSetTip($g_hRAMLabel, $g_aLangAbout[18])
+	GUICtrlSetTip($g_hRAMLabel, $g_aLangAbout[19])
 
 	GUICtrlCreateLabel("", 20, 363, 380, 15)
 	GUICtrlSetBkColor(-1, 0x555555)
-	GUICtrlSetTip(-1, $g_aLangAbout[18])
 	GUICtrlCreateLabel("", 21, 364, 378, 13)
 	GUICtrlSetBkColor(-1, 0xD3D3D3)
-	GUICtrlSetTip(-1, $g_aLangAbout[18])
 
 	$g_hRAMPRog1 = GUICtrlCreateLabel("", 22, 365, 50, 11)
-	GUICtrlSetTip($g_hRAMPRog1, $g_aLangAbout[18])
 	$g_hRAMProg2 = GUICtrlCreateLabel("", 23, 366, 48, 9)
-	GUICtrlSetTip($g_hRAMProg2, $g_aLangAbout[18])
 
 	$g_hSpaceLabel = GUICtrlCreateLabel("", 20, 383, 380, 15)
-	GUICtrlSetFont($g_hSpaceLabel, 8, 700)
+	GUICtrlSetFont($g_hSpaceLabel, 8, 700, Default, "Verdana")
 	GUICtrlSetColor($g_hSpaceLabel, 0x333333)
 
 ;~ ProgressBar Background
@@ -187,34 +187,44 @@ Func _About_ShowDialog()
 	GUICtrlCreateLabel("", 21, 401, 378, 13)
 	GUICtrlSetBkColor(-1, 0xD3D3D3)
 ;~ ProgressBar
+
 	$g_hSpaceProg1 = GUICtrlCreateLabel("", 22, 402, 50, 11)
 	$g_hSpaceProg2 = GUICtrlCreateLabel("", 23, 403, 48, 9)
 
-	$abBtnOK = GUICtrlCreateButton($g_aLangAbout[16], 260, 450, 150, 38, $BS_DEFPUSHBUTTON)
+	$abBtnOK = GUICtrlCreateButton($g_aLangAbout[18], 260, 450, 150, 38, $BS_DEFPUSHBUTTON)
 	GUICtrlSetFont($abBtnOK, 9)
 
 	$g_aAboutIcons[2][0] = GUICtrlCreateIcon($g_aAboutIcons[2][1], $g_iAboutIconStart + 4, 20, 455, 32, 32)
 	GUICtrlSetTip($g_aAboutIcons[2][0], $g_aLangAbout[12])
 	GUICtrlSetCursor($g_aAboutIcons[2][0], 0)
-	$g_aAboutIcons[3][0] = GUICtrlCreateIcon($g_aAboutIcons[3][1], $g_iAboutIconStart + 6, 55, 455, 32, 32)
+	$g_aAboutIcons[3][0] = GUICtrlCreateIcon($g_aAboutIcons[3][1], $g_iAboutIconStart + 6, 60, 455, 32, 32)
 	GUICtrlSetTip($g_aAboutIcons[3][0], $g_aLangAbout[13])
 	GUICtrlSetCursor($g_aAboutIcons[3][0], 0)
-	$g_aAboutIcons[4][0] = GUICtrlCreateIcon($g_aAboutIcons[4][1], $g_iAboutIconStart + 8, 90, 455, 32, 32)
+	$g_aAboutIcons[4][0] = GUICtrlCreateIcon($g_aAboutIcons[4][1], $g_iAboutIconStart + 8, 100, 455, 32, 32)
 	GUICtrlSetTip($g_aAboutIcons[4][0], $g_aLangAbout[14])
 	GUICtrlSetCursor($g_aAboutIcons[4][0], 0)
-	$g_aAboutIcons[5][0] = GUICtrlCreateIcon($g_aAboutIcons[5][1], $g_iAboutIconStart + 10, 125, 455, 32, 32)
+	$g_aAboutIcons[5][0] = GUICtrlCreateIcon($g_aAboutIcons[5][1], $g_iAboutIconStart + 10, 140, 455, 32, 32)
 	GUICtrlSetTip($g_aAboutIcons[5][0], $g_aLangAbout[15])
 	GUICtrlSetCursor($g_aAboutIcons[5][0], 0)
+	$g_aAboutIcons[6][0] = GUICtrlCreateIcon($g_aAboutIcons[6][1], $g_iAboutIconStart + 12, 180, 455, 32, 32)
+	GUICtrlSetTip($g_aAboutIcons[6][0], $g_aLangAbout[16])
+	GUICtrlSetCursor($g_aAboutIcons[6][0], 0)
+	$g_aAboutIcons[7][0] = GUICtrlCreateIcon($g_aAboutIcons[7][1], $g_iAboutIconStart + 14, 220, 455, 32, 32)
+	GUICtrlSetTip($g_aAboutIcons[7][0], $g_aLangAbout[17])
+	GUICtrlSetCursor($g_aAboutIcons[7][0], 0)
+	GUICtrlSetState($g_aAboutIcons[7][0], $GUI_HIDE)
 
 	GUICtrlSetOnEvent($abBtnOK, "__About_CloseDialog")
 	GUICtrlSetOnEvent($abHome, "_About_HomePage")
 	GUICtrlSetOnEvent($abSupport, "_About_Support")
 	GUICtrlSetOnEvent($g_aAboutIcons[0][0], "_About_PayPal")
 	GUICtrlSetOnEvent($g_aAboutIcons[1][0], "_About_SouthAfrica")
-	GUICtrlSetOnEvent($g_aAboutIcons[2][0], "_About_Facebook")
-	GUICtrlSetOnEvent($g_aAboutIcons[3][0], "_About_Twitter")
-	GUICtrlSetOnEvent($g_aAboutIcons[4][0], "_About_GooglePlus")
-	GUICtrlSetOnEvent($g_aAboutIcons[5][0], "_About_GitHub")
+	GUICtrlSetOnEvent($g_aAboutIcons[2][0], "_About_Twitter")
+	GUICtrlSetOnEvent($g_aAboutIcons[3][0], "_About_Facebook")
+	GUICtrlSetOnEvent($g_aAboutIcons[4][0], "_About_Reddit")
+	GUICtrlSetOnEvent($g_aAboutIcons[5][0], "_About_LinkedIn")
+	GUICtrlSetOnEvent($g_aAboutIcons[6][0], "_About_GitHub")
+	GUICtrlSetOnEvent($g_aAboutIcons[7][0], "_About_WhatsApp")
 
 
 	GUISetState(@SW_SHOW, $g_hAboutGui)
@@ -222,40 +232,15 @@ Func _About_ShowDialog()
 	__About_SetDriveSpaceStats()
 
 	AdlibRegister("__About_OnIconsHover", 50)
-	AdlibRegister("__About_SetMemoryStats", 3000)
+	AdlibRegister("__About_SetMemoryStats", 5000)
 	AdlibRegister("__About_SetDriveSpaceStats", 3000)
 
 EndFunc   ;==>_About_ShowDialog
 
 
-Func _About_Support()
-	ShellExecute(_Link_Split($g_sUrlSupport))
-EndFunc   ;==>_About_Support
-
-
 Func _About_Downloads()
 	ShellExecute(_Link_Split($g_sUrlDownloads))
 EndFunc   ;==>_About_Downloads
-
-
-Func _About_Facebook()
-	ShellExecute(_Link_Split($g_sUrlFacebook))
-EndFunc   ;==>_About_Facebook
-
-
-Func _About_GitHub()
-	ShellExecute(_Link_Split($g_sUrlGitHub))
-EndFunc   ;==>_About_GitHub
-
-
-Func _About_GitHubIssues()
-	ShellExecute(_Link_Split($g_sUrlGitHubIssues))
-EndFunc   ;==>_About_GitHubIssues
-
-
-Func _About_GooglePlus()
-	ShellExecute(_Link_Split($g_sUrlGooglePlus))
-EndFunc   ;==>_About_GooglePlus
 
 
 Func _About_HomePage()
@@ -281,6 +266,41 @@ EndFunc   ;==>_About_SouthAfrica
 Func _About_Twitter()
 	ShellExecute(_Link_Split($g_sUrlTwitter))
 EndFunc   ;==>_About_Twitter
+
+
+Func _About_Facebook()
+	ShellExecute(_Link_Split($g_sUrlFacebook))
+EndFunc   ;==>_About_Facebook
+
+
+Func _About_Reddit()
+	ShellExecute(_Link_Split($g_sUrlReddit))
+EndFunc   ;==>_About_Reddit
+
+
+Func _About_LinkedIn()
+	ShellExecute(_Link_Split($g_sUrlLinkedIn))
+EndFunc   ;==>_About_LinkedIn
+
+
+Func _About_WhatsApp()
+	ShellExecute(_Link_Split($g_sUrlWhatsApp))
+EndFunc   ;==>_About_WhatsApp
+
+
+Func _About_Support()
+	ShellExecute(_Link_Split($g_sUrlSupport))
+EndFunc   ;==>_About_Support
+
+
+Func _About_GitHub()
+	ShellExecute(_Link_Split($g_sUrlGitHub))
+EndFunc   ;==>_About_GitHub
+
+
+Func _About_GitHubIssues()
+	ShellExecute(_Link_Split($g_sUrlGitHubIssues))
+EndFunc   ;==>_About_GitHubIssues
 
 
 Func __About_CloseDialog()
@@ -379,7 +399,7 @@ Func __About_SetDriveSpaceStats()
 	Local $iSpacePercFree = 100 - $iSpacePerc
 
 	If $iSpaceUsed <> $g_aBuffers[0] Then
-		GUICtrlSetData($g_hSpaceLabel, StringUpper(StringFormat($g_aLangAbout[19], _
+		GUICtrlSetData($g_hSpaceLabel, StringUpper(StringFormat($g_aLangAbout[20], _
 				$sDrive, Round(DriveSpaceFree($sDrive) / 1024, 2), Round(DriveSpaceTotal($sDrive) / 1024, 2), $iSpacePercFree)))
 		$g_aBuffers[0] = $iSpaceUsed
 	EndIf
@@ -405,34 +425,33 @@ EndFunc   ;==>__About_SetDriveSpaceStats
 Func __About_SetMemoryStats()
 
 	Local $aRAMStats = MemGetStats()
-	Local $iRAMFree = 10, $iRAMPerc = 10, $iRAMPercFree = 10
+	Local $iRAMUsed = 10, $iRAMFree = 10, $iRAMPerc = 10, $iRAMPercFree = 10
 
 	If IsArray($aRAMStats) Then
 
 		$iRAMFree = Round($aRAMStats[2] / 1024)
+		$iRAMUsed = Round($aRAMStats[1] / 1024)
 		$iRAMPerc = $aRAMStats[0]
 		$iRAMPercFree = 100 - $aRAMStats[0]
 
 		If $iRAMFree <> $g_aBuffers[2] Then
-			GUICtrlSetData($g_hRAMLabel, StringUpper(StringFormat($g_aLangAbout[17], _
-					$iRAMFree, Round($aRAMStats[1] / 1024), $iRAMPercFree)))
+			GUICtrlSetData($g_hRAMLabel, StringUpper(StringFormat($g_aLangAbout[19], $iRAMFree, $iRAMUsed, $iRAMPercFree)))
 			$g_aBuffers[2] = $iRAMFree
+
+			If $iRAMPerc >= 0 And $iRAMPerc < 60 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Green")
+			ElseIf $iRAMPerc > 60 And $iRAMPerc < 90 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Blue")
+			ElseIf $iRAMPerc > 90 And $iRAMPerc <= 100 Then
+				_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Red")
+			EndIf
+
 		EndIf
 
-;~ 		If $iRAMPerc <> $g_aBuffers[3] Then
-
-		If $iRAMPerc >= 0 And $iRAMPerc < 60 Then
-			_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Green")
-		ElseIf $iRAMPerc > 60 And $iRAMPerc < 90 Then
-			_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Blue")
-		ElseIf $iRAMPerc > 90 And $iRAMPerc <= 100 Then
-			_ProgressBar_SetColors($g_hRAMPRog1, $g_hRAMProg2, "Red")
+		If $iRAMPerc <> $g_aBuffers[3] Then
+			_ProgressBar_SetData($g_hAboutGui, $g_hRAMPRog1, $g_hRAMProg2, 22, 365, 376, $iRAMPerc)
+			$g_aBuffers[3] = $iRAMPerc
 		EndIf
-
-		_ProgressBar_SetData($g_hAboutGui, $g_hRAMPRog1, $g_hRAMProg2, 22, 365, 376, $iRAMPerc)
-		$g_aBuffers[3] = $iRAMPerc
-
-;~ 		EndIf
 
 	EndIf
 

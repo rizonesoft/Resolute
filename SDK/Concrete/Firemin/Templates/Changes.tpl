@@ -6,6 +6,55 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Upgraded Rizonesoft SDK to Version 11.
+- Enhanced Social Media Link Integration in the 'About' Dialog.
+- Optimized Memory Usage Indicator Stability in the 'About' Dialog.
+- Rectified Icon Display in the 'Donate' Dialog.
+- Codebase Optimization and Refactoring.
+
+--------------------------------------------------
+Version 9.8.3.8388 (SEPTEMBER 27, 2023)
+--------------------------------------------------
+
+- Update notification optimization.
+- Minor bug fixes and enhancements.
+
+--------------------------------------------------
+Version 9.8.3.8365 (SEPTEMBER 16, 2023)
+--------------------------------------------------
+
+- Installer enahancements.
+- Update notification enhancements.
+- Minor bug fixes and enancements.
+
+--------------------------------------------------
+Version 9.8.3.8153 (AUGUST 26, 2023)
+--------------------------------------------------
+
+- Updated Japanese Translation.
+- Updated links.
+- Completed all translations.
+
+--------------------------------------------------
+Version 9.8.3.8112 (JULY 30, 2023)
+--------------------------------------------------
+
+- Extended Processes now optimizes all occurrences.
+- Tweaked and optimized the memory management functions.
+- Process Usage and Peak are now being displayed correctly.
+- Fixed English language file.
+
+--------------------------------------------------
+Version 9.6.3.8086 (MAY 20, 2023)
+--------------------------------------------------
+
+- Updated Afrikaans translation.
+- Updated Windows 11 compatibility.
+
+--------------------------------------------------
+Version 9.5.3.8055 (OCTOBER 31, 2022)
+--------------------------------------------------
+
 - Updated Slovenian Translation
 
 --------------------------------------------------

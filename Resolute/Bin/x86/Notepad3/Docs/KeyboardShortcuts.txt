@@ -2,14 +2,14 @@
 =                                                                              =
 =            Notepad3 - light-weight Scintilla-based text editor for Windows   =
 =                                                                              =
-=                                                   (c) Rizonesoft 2008-2020   =
+=                                                   (c) Rizonesoft 2008-2023   =
 =                                                 https://www.rizonesoft.com   =
 =                                                                              =
 ================================================================================
 
 
-*** Keyboard Shortcuts ***               date: 2020/08/26
----------------------------------------------------------
+*** Keyboard Shortcuts for Notepad3 ***              date: 2023-01-31
+---------------------------------------------------------------------
 
 
   FILE
@@ -30,11 +30,16 @@
                               Minimize or Exit Notepad3 (optionally, if no state).
     Shift+Esc                 Save file and Exit Notepad3.
 
+      Path to Clipboard
+      -----------------
+        Ctrl+F9               Copy Filename Only to Clipboard.
+        Ctrl+Shift+F9         Copy Full Path to Clipboard.
+
       Launch
       ------
         Ctrl+Shift+F          Search in Files.
-        Alt+N                 Open Document in New Window.
-        Alt+Shift+N           Open New Empty Window.
+        Alt+N                 Open New Empty Window.
+        Alt+Shift+N           Duplicate Current Document in New Window (If Not "Only One Instance").
         Ctrl+L                Launch Document.
         Alt+L                 Open With...
         Ctrl+R                Run Command...
@@ -111,8 +116,7 @@
 
       Selection
       ---------
-        Ctrl+,                Jump to Selection Start.
-        Ctrl+.                Jump to Selection End.
+        Ctrl+Shift+Q          Stream Comment.
         Ctrl+D                Duplicate Selection or Line.
         Alt+B                 Pad with Blanks.
         Alt+Z                 Strip First Character.
@@ -122,9 +126,18 @@
         Alt+M                 Modify Lines...
         Alt+J                 Align Lines...
         Alt+O                 Sort Lines...
+        Ctrl+,                Jump to Selection Start.
+        Ctrl+.                Jump to Selection End.
         Tab                   Indent Selected Block.
         Shift+Tab             Unindent Selected Block.
         Ctrl+Tab              Insert Tabulator.
+
+          Line Comment
+          ------------
+            Ctrl+Q                Toggle.
+            Ctrl+Alt+Q            Add.
+            Ctrl+Alt+Shift+Q      Remove.
+            Alt+Shift+Q           Block Edit.
 
           Enclose Selection
           ------------------
@@ -161,8 +174,6 @@
         Ctrl+F5               Time/Date (Short Form).
         Ctrl+Shift+F5         Time/Date (Long Form).
         Shift+F5              Update Timestamps.
-        Ctrl+Q                Block Comment (Toggle).
-        Ctrl+Shift+Q          Stream Comment.
 
       Miscellaneous
       -------------
@@ -178,8 +189,8 @@
         Ctrl+Space            Select Word or Lines.
         Ctrl+Shift+Space      Multi-Select All Matches.
         Alt+Shift+Arrows      Rectangular Selection.
-        Ctrl+F9               Copy Filename Only to Clipboard.
-        Ctrl+Shift+F9         Copy Full Path to Clipboard.
+        Alt+Left Mouse        Rectangular Selection.
+        Ctrl+Left Mouse       On hovering color indicator → Open color selection.
 
       Bookmarks
       ---------
@@ -233,6 +244,8 @@
         Ctrl+Alt+V            Focused View.
         Ctrl+PgUp/PgDn        Goto Previous/Next.
         Ctrl+Shift+PgUp/PgDn  Select to Previous/Next.
+        Alt+PageUp            Paragraph navigation Up.
+        Alt+PageDown          Paragraph navigation Down.
 
       Zoom
       ----
@@ -289,9 +302,72 @@
 
 ================================================================================
 
+*** Keyboard Shortcuts for Minipath ***             date: 2023-01-20
+---------------------------------------------------------------------
+
+
+  Enter           Open selected file in an existing target window.
+  Shift+Enter     Open selected file in a new window.
+  Alt+Enter       Properties of selected object.
+  Backspace       Move to upper directory.
+  Ctrl+Backspace  Move to root directory.
+  Alt+Left        Go to previous directory.
+  Alt+Right       Go to next directory.
+  Tab             Move to next control.
+  Shift+Tab       Move to previous control.
+  Esc             Exit or minimize metapath (optional).
+  Ctrl+D          Change to another directory.
+  Ctrl+E          Toggle "Activate target window" option.
+  Ctrl+F          Launch target application without any file.
+  Ctrl+G          Goto...
+  Ctrl+H          Save settings.
+  Ctrl+K          Create link.
+  Ctrl+L          Launch selected file.
+  Ctrl+M          Specify file filter.
+  Ctrl+N          Create new file.
+  Ctrl+Q          Open file with specified quickviewer.
+  Ctrl+P          Snap to target window.
+  Ctrl+Shift+P    Move window to default position.
+  Ctrl+R          Open run dialog box.
+  Ctrl+S          Save file to new location.
+  Ctrl+T          Toggle "Keep on top" option.
+  Ctrl+U          Toggle transparency mode.
+  Ctrl+1          Sort files by name.
+  Ctrl+2          Sort files by size.
+  Ctrl+3          Sort files by type.
+  Ctrl+4          Sort files by date.
+  Ctrl+5          Sort files in reverse order.
+  Ctrl+*          Set file filter to *.*
+  Alt+D           Create new directory.
+  Alt+G           Goto link target.
+  Alt+L           Open selected file with another application.
+  Alt+N           Open new window.
+  Alt+S           Toggle statusbar.
+  Alt+T           Toggle toolbar.
+  Del             Delete selected object.
+  Shift+Del       Delete selected object (no recycling).
+  Ctrl+Shift+Del  Delete file without confirmation.
+  Alt+Up          Goto next file.
+  Alt+Down        Goto previous file.
+  F1              Display version info.
+  F2              Rename seletced object.
+  F5              Update view of directory.
+  F6              Copy/move selected object to another location.
+  F7              Save settings now.
+  Ctrl+F7         Jump to ini-file.
+  F9              Edit "Favorites" folder.
+  F11             Jump to "Favorites" folder.
+  F12             View program settings.
+  Ctrl+F12        Setup metapath target application.
+
+
+
+================================================================================
+
 *** Regular Expression Matching Syntax (Multi Lines) ***
     (Advanced features: see .\Oniguruma_RE.txt)
----------------------------------------------------------
+---------------------------------------------------------------------
+
 
   .        This matches any character.
 
@@ -358,7 +434,8 @@
 ================================================================================
 
 *** Command Line Help ***
----------------------------------------------------------
+---------------------------------------------------------------------
+
 
   Usage:
     Notepad3  [/?] […[Encoding]] […[Line ending mode]] [/e] [/g] [/m] [/l]

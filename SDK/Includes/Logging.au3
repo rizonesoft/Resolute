@@ -5,8 +5,8 @@
 ;===============================================================================================================
 ; Tidy Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Run_Tidy=Y										;~ (Y/N) Run Tidy before compilation. Default=N
-#AutoIt3Wrapper_Tidy_Stop_OnError=Y								;~ (Y/N) Continue when only Warnings. Default=Y
+#AutoIt3Wrapper_Run_Tidy=Y                                        ;~ (Y/N) Run Tidy before compilation. Default=N
+#AutoIt3Wrapper_Tidy_Stop_OnError=Y                                ;~ (Y/N) Continue when only Warnings. Default=Y
 
 #EndRegion AutoIt3Wrapper Directives Section
 
@@ -73,68 +73,96 @@ If Not IsDeclared("g_iUpdateSubStatus") Then Global $g_iUpdateSubStatus = True
 ; ===============================================================================================================================
 
 
-Func _Logging_EditWrite($sMessage = "", $bTimePrex = True)
+Func _Logging_EditWrite($sMessage = "", $bTimePrex = True, $bToLogFile = True, $sSubItem = "", $iCustomImageIndex = -1)
 
-	Local $sTimeStamp = ""
+    ; Skip empty or whitespace-only strings
+    If StringStripWS($sMessage, 8) = "" Then Return
 
-	GUICtrlSetState($g_hListStatus, $GUI_SHOW)
-	GUICtrlSetState($g_hEditInfo, $GUI_HIDE)
-	GUICtrlSetState($g_hTabLogging, $GUI_SHOW)
+    Local $sTimeStamp = ""
+    Local $aLines = StringSplit($sMessage, @CRLF, 1) ; Split the message into lines
 
-	If $bTimePrex Then
-		$sTimeStamp = "[" & @HOUR & ":" & @MIN & ":" & @SEC & ":" & @MSEC & "] "
-	EndIf
+    GUICtrlSetState($g_hListStatus, $GUI_SHOW)
+    GUICtrlSetState($g_hEditInfo, $GUI_HIDE)
+    GUICtrlSetState($g_hTabLogging, $GUI_SHOW)
 
-	If $g_ShowInterface Then
+    If $bTimePrex Then
+        $sTimeStamp = __Logging_GenerateTimePrefix(3, True) ; Call the modified __Logging_GenerateTimePrefix function
+    EndIf
 
-		; 0 = Information
-		; 1 = Complete
-		; 2 = Error
-		; 3 = Warning
+    If $g_ShowInterface Then
+        For $i = 1 To $aLines[0] ; Loop through each line
+            Local $sLine = $aLines[$i]
 
-		Local $iImage = 0
-		Local $iErrorLen = StringLen($g_aLangLogging[32])
-		Local $iWarningLen = StringLen($g_aLangLogging[33])
-		Local $iSuccessLen = StringLen($g_aLangLogging[34])
-		Local $iFinalLen = StringLen($g_aLangLogging[0])
+            ; Skip empty or whitespace-only lines
+            If StringStripWS($sLine, 8) = "" Then ContinueLoop
 
-		If StringLeft($sMessage, $iErrorLen) = $g_aLangLogging[32] Or _
-				StringLeft($sMessage, 6) = "Error:" Or _
-				__Logging_ValidateError($sMessage) Then
-			$iImage = 2
-			$g_iLoggingErrors += 1
-		ElseIf StringLeft($sMessage, $iSuccessLen) = $g_aLangLogging[34] Or _
-				StringLeft($sMessage, 8) = "Success:" Or _
-				__Logging_ValidateSuccess($sMessage) Then
-			$iImage = 1
-		ElseIf StringLeft($sMessage, $iFinalLen) = $g_aLangLogging[0] Or _
-				StringLeft($sMessage, 8) = "Finished" Then
-			Switch @MON
-				Case 10
-					$iImage = 5
-				Case 12
-					$iImage = 6
-				Case Else
-					$iImage = 4
-			EndSwitch
-		ElseIf StringLeft($sMessage, $iWarningLen) = $g_aLangLogging[33] Or _
-				StringLeft($sMessage, 8) = "Warning:" Or _
-				StringLeft($sMessage, 1) = "^" Or _
-				__Logging_ValidateWarning($sMessage) Then
-			$iImage = 3
-		ElseIf StringStripWS($sMessage, 8) = "" Then
-			$iImage = 7
-		EndIf
+            Local $iImage = ($iCustomImageIndex = -1) ? _DetermineLogImage($sLine) : $iCustomImageIndex
+            Local $iIndex = _GUICtrlListView_AddItem($g_hListStatus, Chr(32) & $sLine, $iImage) ; Add each line as a separate item
 
-		_GUICtrlListView_AddItem($g_hListStatus, Chr(32) & $sMessage, $iImage)
-		_GUICtrlListView_SetItemFocused($g_hListStatus, _GUICtrlListView_GetItemCount($g_hListStatus) - 1)
-		_GUICtrlListView_EnsureVisible($g_hListStatus, _GUICtrlListView_GetItemCount($g_hListStatus) - 1)
+            ; Add subitem if provided
+            If $sSubItem <> "" Then
+                _GUICtrlListView_AddSubItem($g_hListStatus, $iIndex, $sSubItem, 1)
+            EndIf
 
-	EndIf
+            _GUICtrlListView_SetItemFocused($g_hListStatus, _GUICtrlListView_GetItemCount($g_hListStatus) - 1)
+            _GUICtrlListView_EnsureVisible($g_hListStatus, _GUICtrlListView_GetItemCount($g_hListStatus) - 1)
+        Next
+    EndIf
 
-	_Logging_Write($sMessage, $bTimePrex)
+    If $bToLogFile Then
+        For $i = 1 To $aLines[0]
+            Local $sLine = $aLines[$i]
+
+            ; Skip empty or whitespace-only lines
+            If StringStripWS($sLine, 8) = "" Then ContinueLoop
+            If $sSubItem <> "" Then
+                _Logging_Write($sLine & " - " & $sSubItem, $bTimePrex)
+            Else
+                _Logging_Write($sLine, $bTimePrex)
+            EndIf
+        Next
+    EndIf
 
 EndFunc   ;==>_Logging_EditWrite
+
+
+; Function to determine the image index based on the line content
+Func _DetermineLogImage($sLine)
+	Local $iImage = 0
+	Local $iErrorLen = StringLen($g_aLangLogging[32])
+	Local $iWarningLen = StringLen($g_aLangLogging[33])
+	Local $iSuccessLen = StringLen($g_aLangLogging[34])
+	Local $iFinalLen = StringLen($g_aLangLogging[0])
+
+	If StringLeft($sLine, $iSuccessLen) = $g_aLangLogging[34] Or _
+			StringLeft($sLine, 8) = "Success:" Or _
+			__Logging_ValidateSuccess($sLine) Then
+		$iImage = 1
+	ElseIf StringLeft($sLine, $iWarningLen) = $g_aLangLogging[33] Or _
+			StringLeft($sLine, 8) = "Warning:" Or _
+			StringLeft($sLine, 1) = "^" Or _
+			__Logging_ValidateWarning($sLine) Then
+		$iImage = 3
+	ElseIf StringLeft($sLine, $iErrorLen) = $g_aLangLogging[32] Or _
+			StringLeft($sLine, 6) = "Error:" Or _
+			__Logging_ValidateError($sLine) Then
+		$iImage = 2
+		$g_iLoggingErrors += 1
+	ElseIf __Logging_ValidateCritical($sLine) Then
+		$iImage = 5
+	ElseIf StringLeft($sLine, $iFinalLen) = $g_aLangLogging[0] Or StringLeft($sLine, 8) = "Finished" Then
+		Switch @MON
+			Case 12
+				$iImage = 6
+			Case Else
+				$iImage = 4
+		EndSwitch
+	ElseIf StringStripWS($sLine, 8) = "" Then
+		$iImage = 7
+	EndIf
+
+	Return $iImage
+EndFunc   ;==>_DetermineLogImage
 
 
 Func _Logging_End($WriteToInterface = True, $sFinalMsg = $g_aLangLogging[0] & "!")
@@ -157,7 +185,7 @@ Func _Logging_FinalMessage($sMessage = $g_aLangMessages[24])
 
 	If $g_iLoggingErrors > 0 Then
 		$sFinalMessage = StringFormat($g_aLangMessages[21], $g_iLoggingErrors, _
-						_StringEx_ReturnPlural($g_iLoggingErrors, $g_aLangMessages[22], $g_aLangMessages[23]))
+				_StringEx_ReturnPlural($g_iLoggingErrors, $g_aLangMessages[22], $g_aLangMessages[23]))
 		_Logging_End(Default, _Logging_SetLevel($sFinalMessage, "ERROR"))
 		GUICtrlSetColor($g_hSubHeading, 0xC80B0B)
 	Else
@@ -170,7 +198,7 @@ Func _Logging_FinalMessage($sMessage = $g_aLangMessages[24])
 		GUICtrlSetData($g_hSubHeading, $sFinalMessage)
 	EndIf
 
-EndFunc
+EndFunc   ;==>_Logging_FinalMessage
 
 
 ; #FUNCTION# ====================================================================================================================
@@ -459,7 +487,7 @@ EndFunc   ;==>__Logging_StringFromBoolean
 
 Func __Logging_ValidateError($sMessage)
 
-	Local $sErrorStrings = "error |failed|1 error|" & _
+	Local $sErrorStrings = "error |failed|1 error|Error:|" & _
 			$g_aLangLogging[7] & " |" & $g_aLangLogging[8] & "|1 " & $g_aLangLogging[7]
 
 	Local $aErrorStrings = StringSplit($sErrorStrings, "|")
@@ -489,9 +517,9 @@ EndFunc   ;==>__Logging_ValidateRegistry
 
 Func __Logging_ValidateSuccess($sMessage)
 
-	Local $sSuccessStrings = "success|Response Received|Successfully|OK!|Registration succeeded|Initiated|" & _
-			$g_aLangLogging[1] & "|" & $g_aLangLogging[2] & "|" & $g_aLangLogging[3] & "|" & _
-			$g_aLangLogging[4] & "!|" & $g_aLangLogging[5] & "|" & $g_aLangLogging[6]
+	Local $sSuccessStrings = 	"success|Response Received|Successfully|OK!|: OK|Registration succeeded|Initiated|" & _
+								$g_aLangLogging[1] & "|" & $g_aLangLogging[2] & "|" & $g_aLangLogging[3] & "|" & _
+								$g_aLangLogging[4] & "!|" & $g_aLangLogging[5] & "|" & $g_aLangLogging[6]
 	Local $aSuccessStrings = StringSplit($sSuccessStrings, "|")
 
 	For $s = 1 To $aSuccessStrings[0]
@@ -505,7 +533,7 @@ EndFunc   ;==>__Logging_ValidateSuccess
 
 Func __Logging_ValidateWarning($sMessage)
 
-	Local $sWarningStrings = "Access is denied|No operation can be performed|" & _
+	Local $sWarningStrings = "Access is denied|No operation can be performed|rate limited|blocked|: Empty file|MaxFileSize FOUND|" & _
 			$g_aLangLogging[9] & "|" & $g_aLangLogging[10]
 
 	Local $aWarningStrings = StringSplit($sWarningStrings, "|")
@@ -517,3 +545,16 @@ Func __Logging_ValidateWarning($sMessage)
 	Next
 
 EndFunc   ;==>__Logging_ValidateWarning
+
+Func __Logging_ValidateCritical($sMessage)
+
+	Local $sCriticalStrings = "Critical:|FOUND"
+	Local $aCriticalStrings = StringSplit($sCriticalStrings, "|")
+
+	For $s = 1 To $aCriticalStrings[0]
+		If StringInStr($sMessage, $aCriticalStrings[$s], $STR_CASESENSE) Then
+			Return True
+		EndIf
+	Next
+
+EndFunc   ;==>__Logging_ValidateCritical

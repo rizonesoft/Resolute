@@ -1,0 +1,13 @@
+==================================================
+RIZONESOFT RESOLUTE CHANGES
+==================================================
+
+--------------------------------------------------
+Version 0.0.0.0
+--------------------------------------------------
+
+- Improved the Resolute tool execution process and implemented comprehensive logging mechanisms.
+- Resolved issues pertaining to the functionality of the System Repair buttons.
+- Introduced Hardware, System, and Extension menus.
+
+==================================================

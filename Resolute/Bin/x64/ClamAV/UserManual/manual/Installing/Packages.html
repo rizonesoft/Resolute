@@ -1,0 +1,416 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Packages - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html" class="active"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="clamav-packages"><a class="header" href="#clamav-packages">ClamAV Packages</a></h1>
+<p>Many Linux and Unix distributions offer one or more ClamAV packages to make it easy for you to install ClamAV.</p>
+<p>These packages are usually well maintained but if you find an issue with one, please consider helping the volunteers that maintain the packages.</p>
+<blockquote>
+<p><em>Disclaimer</em>: ClamAV packages may vary somewhat from the upstream version.
+Some examples:</p>
+<ul>
+<li>
+<p>The database and application config paths may vary:</p>
+<ul>
+<li>
+<p>A default from-source install will go in <code>/usr/local</code>, with:</p>
+<ul>
+<li>applications in <code>/usr/local/bin</code></li>
+<li>daemons in <code>/usr/local/sbin</code></li>
+<li>libraries in <code>/usr/local/lib</code></li>
+<li>headers in <code>/usr/local/include</code></li>
+<li>configs in <code>/usr/local/etc/</code></li>
+<li>databases in <code>/usr/local/share/clamav/</code></li>
+</ul>
+</li>
+<li>
+<p>A Linux package install will probably go in <code>/usr</code>, with:</p>
+<ul>
+<li>applications in <code>/usr/bin</code></li>
+<li>daemons in <code>/usr/sbin</code></li>
+<li>libraries in <code>/usr/lib</code></li>
+<li>headers in <code>/usr/include</code></li>
+<li>configs in <code>/etc/clamav</code></li>
+<li>databases in <code>/var/lib/clamav</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As of 0.103.x, a from-source install requires the user create a config for FreshClam, ClamD, and ClamAV-Milter in order to use each application. A package install, however, is likely to come pre-configured. Users may wish to modify the configs as needed.</p>
+</li>
+<li>
+<p>Package installs sometimes carry extra patches for issues affecting their distribution, for issues the ClamAV developers haven't had time to fix or are unaware of, and for security issues when distributing older versions that are no longer maintained by the ClamAV developers.</p>
+</li>
+<li>
+<p>Some distributions parcel up ClamAV components into separate packages. You don't necessarily need all of the packages. If this applies to your package system, you may need to review the applications described in the <a href="../Usage/Scanning.html">scanning instructions</a> to understand which features you will need.</p>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><em>Acknowledgments</em>: Thank you to all of the volunteers who maintain these packages! We appreciate your help!</p>
+</blockquote>
+<h2 id="the-packages"><a class="header" href="#the-packages">The Packages</a></h2>
+<h3 id="debian"><a class="header" href="#debian">Debian</a></h3>
+<p>Debian splits up ClamAV into a selection of different packages.</p>
+<p>Realistically, you probably only need to <code>apt install clamav</code> and probably <code>apt install clamav-daemon</code>. If you require support for scanning compressed RAR files you first need to enable the &quot;non-free&quot; archive.<code>*</code></p>
+<p>The full list of packages includes:</p>
+<ul>
+<li><code>clamav</code> - command-line interface</li>
+<li><code>clamav-base</code> - base package</li>
+<li><code>clamav-daemon</code> - scanner daemon</li>
+<li><code>clamav-docs</code> - documentation</li>
+<li><code>clamav-freshclam</code> - virus database update utility</li>
+<li><code>clamav-milter</code> - sendmail integration</li>
+<li><code>clamav-testfiles</code> - test files</li>
+<li><code>libclamav-dev</code> - development files</li>
+<li><code>libclamav9</code> - library</li>
+<li><code>libclamunrar9</code> - unrar support</li>
+</ul>
+<blockquote>
+<p><code>*</code> <em>RAR Support</em>: ClamAV's RAR support comes from UnRAR, which is open-source but not entirely free in so far as its license restricts users from reverse engineering it to create RAR archives. For this reason, it is bundled separately in the &quot;non-free&quot; archive. Enable it by adding &quot;non-free&quot; to <code>/etc/apt/sources.list</code>. Eg:</p>
+<p><code>deb http://http.us.debian.org/debian stable main contrib non-free</code></p>
+<p>Then you can install the RAR-plugin using: <code>apt install libclamunrar9</code></p>
+</blockquote>
+<p>There are a variety of other ClamAV related projects as well.  Run <code>apt search clamav</code> to see a larger list.</p>
+<p>To test the installation, you can try to scan the test files in the <code>clamav-testfiles</code> package.</p>
+<blockquote>
+<p><em>Note</em>: Debian packages are maintained by <a href="https://salsa.debian.org/clamav-team">Debian's ClamAV Team</a>.</p>
+<p>The package maintainers can be reached at <a href="pkg-clamav-devel@lists.alioth.debian.org">clamav-devel at lists.alith.debian.org</a>. More info at <a href="https://tracker.debian.org/pkg/clamav">tracker.debian.org/pkg/clamav</a>.</p>
+<p>Patches: https://salsa.debian.org/clamav-team/clamav/tree/unstable/debian/patches</p>
+</blockquote>
+<h3 id="ubuntu"><a class="header" href="#ubuntu">Ubuntu</a></h3>
+<p>Ubuntu's ClamAV packages are derived from the Debian packages (above). See the Debian instructions for installation details.</p>
+<blockquote>
+<p><em>RAR Support</em>: As with Debian, RAR support is not included in the base package. Users that desire RAR support will have to install <code>libclamunar9</code> separately. Unlike with Debian, there is no need to enable &quot;non-free&quot; packages for this to work.</p>
+</blockquote>
+<blockquote>
+<p><em>Note</em>: Ubuntu packages are curated by <a href="https://wiki.ubuntu.com/UbuntuDevelopers">Ubuntu Developers</a>.
+Package source: https://packages.ubuntu.com/source/clamav</p>
+</blockquote>
+<h3 id="opensuse"><a class="header" href="#opensuse">openSUSE</a></h3>
+<p>openSUSE provides two packages:</p>
+<ul>
+<li><code>clamav</code> - The clamav package</li>
+<li><code>clamav-devel</code> - The clamav package plus headers for software development.</li>
+</ul>
+<h4 id="rpm-download"><a class="header" href="#rpm-download">RPM download</a></h4>
+<p>Find these packages at under http://download.opensuse.org/repositories/security
+Eg.:</p>
+<ul>
+<li>http://download.opensuse.org/repositories/security/openSUSE_Leap_15.3/x86_64/clamav-0.103.1-lp153.234.4.x86_64.rpm.mirrorlist</li>
+<li>http://download.opensuse.org/repositories/security/openSUSE_Leap_15.3/x86_64/clamav-devel-0.103.1-lp153.234.4.x86_64.rpm.mirrorlist</li>
+</ul>
+<p>Use the update variant for openSUSE, add it to your installation as another repository using YaST or zypper and give it a higher priority (lower number) than the repository that delivers the official updates.</p>
+<blockquote>
+<p><em>Tip</em>: RPMs of new ClamAV versions for existing SUSE products are provided through the respective online update channels. As these packages have to go through QA, it usually takes some time for a new ClamAV source release to appear as an official RPM. For those who want the newest version, packages are available from <a href="https://build.opensuse.org/package/show/security/clamav">the security project in the openSUSE Build Service</a>.</p>
+</blockquote>
+<h4 id="zypper"><a class="header" href="#zypper">Zypper</a></h4>
+<p>Install ClamAV with <code>zypper</code>:</p>
+<pre><code class="language-bash">  zypper install -y clamav
+</code></pre>
+<blockquote>
+<p><em>Note</em>: openSUSE packages are maintained by Reinhard Max.</p>
+</blockquote>
+<h3 id="epel-fedora-rhel-and-centos"><a class="header" href="#epel-fedora-rhel-and-centos">EPEL: Fedora, RHEL, and CentOS</a></h3>
+<p>EPEL creates ClamAV packages for Fedora (as well as EPEL-enabled CentOS and RHEL). For more information on EPEL, <a href="https://fedoraproject.org/wiki/EPEL">visit their wiki</a>.</p>
+<p>To enable EPEL for CentOS:</p>
+<pre><code class="language-bash">dnf install -y epel-release
+</code></pre>
+<p>EPEL offers a selection of packages to install ClamAV:</p>
+<ul>
+<li><code>clamd</code> - The Clam AntiVirus Daemon</li>
+<li><code>clamav</code> - End-user tools for the Clam Antivirus scanner</li>
+<li><code>clamav-data</code> - Virus signature data for the Clam Antivirus scanner</li>
+<li><code>clamav-devel</code> - Header files and libraries for the Clam Antivirus scanner</li>
+<li><code>clamav-lib</code> - Dynamic libraries for the Clam Antivirus scanner</li>
+<li><code>clamav-milter</code> - Milter module for the Clam Antivirus scanner</li>
+<li><code>clamav-update</code> - Auto-updater for the Clam Antivirus scanner data-files</li>
+</ul>
+<p>Most users will only need to run:</p>
+<pre><code class="language-bash">dnf install -y clamav clamd clamav-update
+</code></pre>
+<blockquote>
+<p><strong><em>Tips</em></strong></p>
+<p><em>CentOS</em>: On Community Enterprise Operating System (CentOS) the ClamAV package requires the Extra Packages for Enterprise Linux (EPEL) repository.</p>
+<p><em>RHEL</em>: On RedHat Enterprise Linux (RHEL) the EPEL release package has to be installed either manually or through RHN.</p>
+<p><em>Fedora</em>: Fedora packages can be found at https://src.fedoraproject.org/rpms/clamav</p>
+<p>Fedora's packaging is more customized than most. Please review the RPM notes when troubleshooting your Fedora package configuration.</p>
+</blockquote>
+<h3 id="gentoo"><a class="header" href="#gentoo">Gentoo</a></h3>
+<p>ClamAV is available in portage under <code>/usr/portage/app-antivirus/clamav</code></p>
+<p>To install, run:</p>
+<pre><code class="language-bash">emerge clamav
+</code></pre>
+<p>For more details, see the package entry on <a href="https://packages.gentoo.org/packages/app-antivirus/clamav">Portage</a>.</p>
+<h3 id="freebsd-openbsd-netbsd"><a class="header" href="#freebsd-openbsd-netbsd">FreeBSD, OpenBSD, NetBSD</a></h3>
+<p>Although all these systems offer the possibility to use ports or pkgsrc, you can install the pre-built package:</p>
+<h4 id="freebsd"><a class="header" href="#freebsd">FreeBSD</a></h4>
+<p>FreeBSD offers two ClamAV ports (packages):</p>
+<ul>
+<li><code>clamav</code></li>
+<li><code>clamav-lts</code></li>
+</ul>
+<p>To install, run:</p>
+<pre><code class="language-bash">pkg install clamav
+</code></pre>
+<p>and</p>
+<pre><code class="language-bash">pkg install clamav-lts
+</code></pre>
+<p>respectively.</p>
+<blockquote>
+<p><em>Note</em>: For more details, see:</p>
+<ul>
+<li>https://www.freshports.org/security/clamav</li>
+<li>https://www.freshports.org/security/clamav-lts</li>
+</ul>
+</blockquote>
+<h4 id="openbsd"><a class="header" href="#openbsd">OpenBSD</a></h4>
+<p>To install, run:</p>
+<pre><code class="language-bash">  pkg_add clamav
+</code></pre>
+<h4 id="netbsd"><a class="header" href="#netbsd">NetBSD</a></h4>
+<p>To install, run:</p>
+<pre><code class="language-bash">  pkgin install clamav
+</code></pre>
+<h3 id="solaris"><a class="header" href="#solaris">Solaris</a></h3>
+<p>OpenCSW is a community software project for Solaris 8+ on both Sparc and x86. It packages more than 2000 popular open source titles and they can all easily be installed with dependency handling via <em>pkgutil</em> which is modeled after Debian's <em>apt-get</em>.</p>
+<pre><code class="language-bash">pkgutil -i clamav
+</code></pre>
+<blockquote>
+<p><em>Note</em>: The package can be found on <a href="https://www.opencsw.org/packages/clamav/">OpenCSW</a> though it is unfortuantely quite out-of-date.</p>
+</blockquote>
+<blockquote>
+<p><em>Disclaimer</em>: ClamAV is also no longer supported on Solaris because Solaris is proprietary, less commonly used, and difficult to work with. Future versions of ClamAV will depend on components written in the Rust programming language, which also does not support building directly on Solaris. It is likely that ClamAV will no longer work on Solaris in the future.</p>
+</blockquote>
+<h3 id="slackware"><a class="header" href="#slackware">Slackware</a></h3>
+<p>You can download ClamAV builds for Slackware from https://slackbuilds.org/repository/14.2/system/clamav/</p>
+<p>Download the package, and as root, install it like so (substituting the appropriate filename):</p>
+<pre><code class="language-bash">  installpkg clamav.tar.gz
+</code></pre>
+<h3 id="macos"><a class="header" href="#macos">macOS</a></h3>
+<p>ClamAV can be easily installed on macOS using one of these popular package managers:</p>
+<ul>
+<li><a href="https://brew.sh">Homebrew</a>: <a href="https://formulae.brew.sh/formula/clamav">ClamAV formula</a></li>
+<li><a href="https://www.macports.org/install.php">MacPorts</a>: <a href="https://ports.macports.org/port/clamav/summary">ClamAV port</a></li>
+</ul>
+<h4 id="homebrew"><a class="header" href="#homebrew">Homebrew</a></h4>
+<p>Install <a href="https://brew.sh">Homebrew</a> if you don't already have it. Then run:</p>
+<pre><code class="language-bash">  brew install clamav
+</code></pre>
+<p>Homebrew installs versioned packages to <code>/usr/local/Cellar/&lt;pacakge&gt;/&lt;version&gt;</code> with symlinks in <code>/usr/local/opt/&lt;pacakge&gt;</code> to the current version. Symlinks for ClamAV's executables will be placed in <code>/usr/local/bin</code> to add them to your PATH. ClamAV's config files will be placed in <code>/usr/local/etc/clamav</code>.</p>
+<p>As with most other installation methods, you may need to do the following at a minimum before you can run <code>freshclam</code>, <code>clamscan</code>, or use <code>clamdscan</code> with <code>clamd</code>:</p>
+<ol>
+<li>Create <code>/usr/local/etc/clamav/freshclam.conf</code> from <code>/usr/local/etc/clamav/freshclam.conf.sample</code>.</li>
+<li>Remove or comment-out the <code>Example</code> line from <code>freshclam.conf</code></li>
+<li>Run <code>freshclam</code> to download the latest malware definitions.</li>
+</ol>
+<p>If you wish to run <code>clamd</code> you'll also need to create <code>/usr/local/etc/clamav/clamd.conf</code> from <code>/usr/local/etc/clamav/clamd.conf.sample</code>, and configure <code>clamd.conf</code> with Local/Unix socket settings (preferred), or TCP socket settings.</p>
+<h4 id="macports"><a class="header" href="#macports">MacPorts</a></h4>
+<p>Install <a href="https://www.macports.org/install.php">MacPorts</a> if you don't already have it. Then run:</p>
+<pre><code class="language-bash">  sudo port install clamav
+</code></pre>
+<p>MacPorts installs versioned packages to <code>/opt/local/</code>. ClamAV's config files will be placed in <code>/opt/local/etc</code>.</p>
+<p>As with most other installation methods, you may need to do the following at a minimum before you can run <code>freshclam</code>, <code>clamscan</code>, or use <code>clamdscan</code> with <code>clamd</code>:</p>
+<ol>
+<li>Create <code>/opt/local/etc/freshclam.conf</code> from <code>/opt/local/etc/freshclam.conf.sample</code>.</li>
+<li>Remove or comment-out the <code>Example</code> line from <code>freshclam.conf</code></li>
+<li>Run <code>freshclam</code> to download the latest malware definitions.</li>
+</ol>
+<p>If you wish to run <code>clamd</code> you'll also need to create <code>/opt/local/etc/clamd.conf</code> from <code>/opt/local/etc/clamd.conf.sample</code>, and configure <code>clamd.conf</code> with Local/Unix socket settings (preferred), or TCP socket settings.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Installing.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Installing/Docker.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Installing.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Installing/Docker.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

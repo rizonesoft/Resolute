@@ -6,6 +6,58 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Updated the Spanish Translation
+
+--------------------------------------------------
+Version 11.2.3.2920 (OCTOBER 30, 2023)
+--------------------------------------------------
+
+- Upgraded Rizonesoft SDK to Version 11.
+- Enhanced Social Media Link Integration in the 'About' Dialog.
+- Optimized Memory Usage Indicator Stability in the 'About' Dialog.
+- Rectified Icon Display in the 'Donate' Dialog.
+- Codebase Optimization and Refactoring.
+
+--------------------------------------------------
+Version 9.2.3.2899 (SEPTEMBER 27, 2023)
+--------------------------------------------------
+
+- Update notification optimization.
+- Minor bug fixes and enhancements.
+
+--------------------------------------------------
+Version 9.2.3.2886 (SEPTEMBER 16, 2023)
+--------------------------------------------------
+
+- Installer enahancements.
+- Update notification enhancements.
+- Minor bug fixes and enancements.
+
+--------------------------------------------------
+Version 9.2.3.2085 (AUGUST 26, 2023)
+--------------------------------------------------
+
+- Updated links.
+- Completed all translations.
+
+--------------------------------------------------
+Version 9.2.3.2053 (JUNE 20, 2023)
+--------------------------------------------------
+
+- Added Slovenian Translation
+- Added Turkish Translation
+
+--------------------------------------------------
+Version 9.1.3.2031 (MAY 20, 2023)
+--------------------------------------------------
+
+- Updated Afrikaans translation.
+- Updated Windows 11 compatibility.
+
+--------------------------------------------------
+Version 9.0.3.2020 (OCTOBER 02, 2022)
+--------------------------------------------------
+
 - Updated AutoIt to version 3.3.16.1 (19 Septemeber 2022 version). - https://www.autoitscript.com/autoit3/docs/history.htm
 - Further Windows 11 compatibility improvements.
 - Fixed versioning.

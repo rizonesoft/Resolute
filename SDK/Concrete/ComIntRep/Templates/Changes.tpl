@@ -6,6 +6,38 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Upgraded Rizonesoft SDK to Version 11.
+- Enhanced Social Media Link Integration in the 'About' Dialog.
+- Optimized Memory Usage Indicator Stability in the 'About' Dialog.
+- Rectified Icon Display in the 'Donate' Dialog.
+- Codebase Optimization and Refactoring.
+
+--------------------------------------------------
+Version 9.1.3.6322 (SEPTEMBER 16, 2023)
+--------------------------------------------------
+
+- Installer enahancements.
+- Update notification enhancements.
+- Minor bug fixes and enancements.
+
+--------------------------------------------------
+Version 9.1.3.6120 (AUGUST 26, 2023)
+--------------------------------------------------
+
+- Updated links.
+- Completed all translations.
+
+--------------------------------------------------
+Version 9.1.3.6099 (MAY 20, 2023)
+--------------------------------------------------
+
+- Updated Afrikaans translation.
+- Updated Windows 11 compatibility.
+
+--------------------------------------------------
+Version 9.0.3.6088 (OCTOBER 31, 2022)
+--------------------------------------------------
+
 - Fixed an old bug that would reset the firewall even though it is not selected.
 
 --------------------------------------------------

@@ -6,6 +6,6 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
-No history recorded.
+- Upgraded to Resolute Framework 11
 
 ==================================================

@@ -5,8 +5,8 @@
 ;===============================================================================================================
 ; Tidy Settings
 ;===============================================================================================================
-#AutoIt3Wrapper_Run_Tidy=Y										 ;~ (Y/N) Run Tidy before compilation. Default=N
-#AutoIt3Wrapper_Tidy_Stop_OnError=Y								 ;~ (Y/N) Continue when only Warnings. Default=Y
+#AutoIt3Wrapper_Run_Tidy=Y                                         ;~ (Y/N) Run Tidy before compilation. Default=N
+#AutoIt3Wrapper_Tidy_Stop_OnError=Y                                 ;~ (Y/N) Continue when only Warnings. Default=Y
 
 #EndRegion AutoIt3Wrapper Directives Dection
 
@@ -117,7 +117,7 @@ Func _SoftwareUpdateCheck($iMenuSource = False)
 
 			$g_hUpdateGUI = GUICreate($g_aLangUpdate[0], $iUpdateWidth, $iUpdateHeight, $aUpdatePos[0], $aUpdatePos[1], _
 					BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_iParent)
-			GUISetFont(9, 400, -1, "Verdana", $g_hUpdateGUI, $CLEARTYPE_QUALITY)
+			GUISetFont(Default, Default, Default, "Verdana", $g_hUpdateGUI, $CLEARTYPE_QUALITY)
 			If $g_iParentState > 0 Then GUISetIcon($g_aDlgUpdateIcons[0], $g_iDialogIconStart, $g_hUpdateGUI)
 			GUISetOnEvent($GUI_EVENT_CLOSE, "__CloseUpdateDialog", $g_hUpdateGUI)
 
@@ -138,6 +138,7 @@ Func _SoftwareUpdateCheck($iMenuSource = False)
 			$g_chkUpdateNoShow = GUICtrlCreateCheckbox(Chr(32) & $g_aLangUpdate[9], 15, 140, 255, -1)
 			GUICtrlSetState($g_chkUpdateNoShow, $g_iCheckForUpdates)
 			$btnUpdate = GUICtrlCreateButton($g_aLangUpdate[10], ($iUpdateWidth - 250) / 2, 185, 250, 35)
+			GUICtrlSetFont($btnUpdate, 10)
 
 			GUICtrlSetOnEvent($icoUpdate, "__OpenUpdateURL")
 			GUICtrlSetOnEvent($lblBuild2, "__OpenUpdateURL")
@@ -171,7 +172,7 @@ Func _SoftwareUpdateCheck($iMenuSource = False)
 			If $g_iParentState > 0 Then GUISetState(@SW_DISABLE, $g_hCoreGui)
 			$g_hUpdateGUI = GUICreate($sUpdateDlgTitle, $iUpdateWidth, $iUpdateHeight, $aUpdatePos[0], $aUpdatePos[1], _
 					BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_hCoreGui)
-			GUISetFont(9, 400, -1, "Verdana", $g_hUpdateGUI, $CLEARTYPE_QUALITY)
+			GUISetFont(Default, Default, Default, "Verdana", $g_hUpdateGUI, $CLEARTYPE_QUALITY)
 			If $g_iParentState > 0 Then GUISetIcon($sUpdateDlgIcon, $iUpdateDlgIcon, $g_hUpdateGUI)
 			GUISetOnEvent($GUI_EVENT_CLOSE, "__CloseUpdateDialog", $g_hUpdateGUI)
 
@@ -187,6 +188,7 @@ Func _SoftwareUpdateCheck($iMenuSource = False)
 			$g_chkUpdateNoShow = GUICtrlCreateCheckbox(Chr(32) & $g_aLangUpdate[9], 15, 140, $iUpdateWidth - 30, -1)
 			GUICtrlSetState($g_chkUpdateNoShow, $g_iCheckForUpdates)
 			$btnOk = GUICtrlCreateButton($g_aLangUpdate[11], ($iUpdateWidth - 250) / 2, 185, 250, 35)
+			GUICtrlSetFont($btnOk, 9)
 
 			GUICtrlSetOnEvent($icoUpdate, "__OpenHomePage")
 			GUICtrlSetOnEvent($btnOk, "__CloseUpdateDialog")

@@ -30,13 +30,13 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=8.0.2.3627
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.3681
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
-#AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
-#AutoIt3Wrapper_Res_ProductVersion=8             					;~ Product Version
+#AutoIt3Wrapper_Res_HiDpi=N                     					;~ (Y/N) Compile for high DPI. Default=N
+#AutoIt3Wrapper_Res_ProductVersion=11             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2021 Rizonesoft				;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=© 2022 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 #AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81				;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
@@ -90,94 +90,98 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico		; 214
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico				; 215
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico				; 216
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico			; 217
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico					; 218
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico				; 219
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico			; 220
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico			; 221
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico			; 222
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico			; 223
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico			; 224
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico			; 225
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico				; 226
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico			; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico					; 216
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico						; 218
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 219
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 220
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico				; 221
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico				; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico				; 223
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Reddit.ico					; 224
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\RedditH.ico				; 225
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico				; 226
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico				; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 228
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 229
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\WhatsApp.ico				; 230
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\WhatsAppH.ico	 			; 231
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico					; 228
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico					; 229
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico					; 230
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico					; 231
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico					; 232
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico					; 233
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico					; 234
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico					; 235
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico					; 236
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico					; 237
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico					; 238
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico					; 239
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico					; 240
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico					; 241
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico					; 242
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico					; 243
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico					; 244
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico					; 245
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico					; 246
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico					; 247
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico					; 248
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico					; 249
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico					; 250
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico					; 251
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico				; 252
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico					; 253
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico					; 254
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico					; 255
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico					; 256
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico					; 257
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico					; 258
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico					; 259
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico					; 260
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico				; 261
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico				; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 232
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 233
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico						; 234
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico						; 235
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico						; 236
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico						; 237
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico						; 238
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico						; 239
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico						; 240
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico						; 241
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico						; 242
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico						; 243
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico						; 244
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico						; 245
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico						; 246
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico						; 247
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico						; 248
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico						; 249
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico						; 250
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico						; 251
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico						; 252
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico						; 253
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico						; 254
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico						; 255
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico					; 256
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico						; 257
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico						; 258
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico						; 259
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico						; 260
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico						; 261
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico						; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico						; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico						; 264
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico					; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico					; 266
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico			; 263
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico			; 264
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico			; 265
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico			; 266
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico			; 267
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico			; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 272
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information1.ico	; 269
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information2.ico	; 270
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run1.ico			; 271
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run2.ico			; 272
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Complete.ico		; 273
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Cross.ico			; 274
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Tick.ico			; 275
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Shortcut1.ico		; 276
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Shortcut2.ico		; 277
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows1.ico			; 278
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows2.ico			; 279
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information1.ico		; 273
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Information2.ico		; 274
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run1.ico				; 275
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Run2.ico				; 276
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Complete.ico			; 277
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Cross.ico				; 278
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Tick.ico				; 279
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Shortcut1.ico			; 280
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Shortcut2.ico			; 281
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows1.ico				; 282
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows2.ico				; 283
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-0.ico			; 280
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-1.ico			; 281
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-2.ico			; 282
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-3.ico			; 283
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-0.ico		; 284
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-1.ico		; 285
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-2.ico		; 286
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-3.ico		; 287
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-4.ico		; 288
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-5.ico		; 289
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-0.ico				; 284
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-1.ico				; 285
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-2.ico				; 286
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Build-3.ico				; 287
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-0.ico			; 288
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-1.ico			; 289
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-2.ico			; 290
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-3.ico			; 291
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-4.ico			; 292
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Distro\Distribute-5.ico			; 293
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico				; 290
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico			; 291
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico				; 292
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico				; 293
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico				; 294
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico			; 295
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico				; 296
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico				; 397
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Solution.ico			; 398
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 294
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 295
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 296
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 297
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 298
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 299
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 300
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 301
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Solution.ico				; 302
 
 
 ;===============================================================================================================
@@ -305,19 +309,23 @@ Global $g_sProgShortName		= "Distro"
 Global $g_sProgShortName_X64	= $g_sProgShortName & "_X64"
 Global $g_sProgName				= "Rizonesoft SDK"
 Global $g_iSingleton			= True
-Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com|www.rizonesoft.com"												; https://www.rizonesoft.com/downloads/
-Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
-Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"										; https://twitter.com/Rizonesoft
-Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 							; https://www.linkedin.com/in/rizonetech
-Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"										; https://www.rizonesoft.com/feed
-Global $g_sUrlPayPal			= "https://www.paypal.me/rizonesoft|PayPal.me/rizonesoft"										; https://www.paypal.me/rizonesoft
-Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"						; https://github.com/rizonesoft/Resolute
-Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"			; https://github.com/rizonesoft/Resolute/issues
-Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"					; https://en.wikipedia.org/wiki/South_Africa
+
+Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"														; https://www.rizonesoft.com
+Global $g_sUrlSupport			= "https://www.rizonesoft.com/contact-us/|www.rizonesoft.com/contact-us"								; https://www.rizonesoft.com/contact-us
+Global $g_sUrlWhatsApp			= "https://api.whatsapp.com/send?phone=27849630169&text=Hi,&source=&data="
+Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"								; https://www.rizonesoft.com/downloads/
+Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"												; https://twitter.com/Rizonesoft
+Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"											; https://www.facebook.com/rizonesoft
+Global $g_sUrlReddit			= "https://www.reddit.com/user/rizonesoft|Reddit.com/user/rizonesoft"									; https://www.reddit.com/user/rizonesoft
+Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 									; https://www.linkedin.com/in/rizonetech
+Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"								; https://github.com/rizonesoft/Resolute
+Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"					; https://github.com/rizonesoft/Resolute/issues
+Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://www.rizonesoft.com/feed
+Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"						; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
+Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"							; https://en.wikipedia.org/wiki/South_Africa
 Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/resolute/|www.rizonesoft.com/downloads/resolute/"
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/resolute/update/|www.rizonesoft.com/downloads/resolute/update/"
+Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/resolute/update/"
+Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 
 ;~ Path Settings
 Global $g_sRootDir
@@ -368,10 +376,10 @@ Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".ini"
 Global $g_iUpdateIconStart				= 209
 Global $g_iDialogIconStart				= 211
 Global $g_iAboutIconStart				= 216
-Global $g_iLangIconStart				= 228
-Global $g_iPowerIconsStart				= 263
-Global $g_iComIconStart					= 269
-Global $g_iMenuIconsStart				= 290
+Global $g_iLangIconStart				= 232
+Global $g_iPowerIconsStart				= 267
+Global $g_iComIconStart					= 273
+Global $g_iMenuIconsStart				= 294
 
 Global $g_aCoreIcons[3]
 Global $g_iSizeIcon						= 48
@@ -390,9 +398,9 @@ Global $g_iSplashDelay
 Global $g_sUpdateAnimation	= $g_sProcessDir & "\" & $g_iSizeIcon & "\Globe.ani"
 Global $g_sProcessingAnimation  = $g_sProcessDir & "\" & $g_iSizeIcon & "\Stroke.ani"
 If $DEBUG_UPDATE = True Then
-	Global $g_sRemoteUpdateFile	= "https://www.rizonesoft.com/update/" & $g_sProgShortName & ".ruz"
+	Global $g_sRemoteUpdateFile	= $g_sUrlUpdateServer & $g_sProgShortName & ".ruz"
 Else
-	Global $g_sRemoteUpdateFile	= "https://www.rizonesoft.com/update/" & $g_sProgShortName & ".ru"
+	Global $g_sRemoteUpdateFile	= $g_sUrlUpdateServer & $g_sProgShortName & ".ru"
 EndIf
 Global $g_iCheckForUpdates	= 4
 
@@ -558,7 +566,7 @@ Func _StartCoreGui()
 
 	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, $WS_OVERLAPPEDWINDOW)
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
-	GUISetFont(8.5, 400, -1, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
+	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
 
 	GUIRegisterMsg($WM_GETMINMAXINFO, "WM_GETMINMAXINFO")
@@ -575,7 +583,7 @@ Func _StartCoreGui()
 
 	$g_hCreateSlnMItem = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[1], $g_hMenuFile, $g_aMenuIcons[7], $g_iMenuIconsStart + 8)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuFile)
-	$miFileOptions = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[2], $g_hMenuFile, $g_aMenuIcons[8], $g_iMenuIconsStart)
+	;~ $miFileOptions = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[2], $g_hMenuFile, $g_aMenuIcons[8], $g_iMenuIconsStart)
 	$g_hMenuFileLog = _GuiCtrlMenuEx_CreateMenu($g_aLangMenus[3], $g_hMenuFile)
 	$miLogOpenFile = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[4], $g_hMenuFileLog, $g_aMenuIcons[5], $g_iMenuIconsStart + 1)
 	$miLogOpenRoot = _GuiCtrlMenuEx_CreateMenuItem($g_aLangMenus[5], $g_hMenuFileLog)
@@ -597,7 +605,6 @@ Func _StartCoreGui()
 	GUICtrlSetOnEvent($miLogOpenFile, "_Logging_OpenFile")
 	GUICtrlSetOnEvent($miLogOpenRoot, "_Logging_OpenDirectory")
 	GUICtrlSetOnEvent($miFileClose, "_ShutdownProgram")
-
 	GUICtrlSetOnEvent($g_hUpdateMenuItem, "_CheckForUpdates")
 	GUICtrlSetOnEvent($miHelpHome, "_About_HomePage")
 	GUICtrlSetOnEvent($miHelpDownloads, "_About_Downloads")
@@ -641,7 +648,7 @@ Func _StartCoreGui()
 
 	GUICtrlCreateGroup($g_aLangCustom[12], 470, 10, 300, 120)
 	GUICtrlSetResizing(-1, BitOR($GUI_DOCKRIGHT, $GUI_DOCKTOP, $GUI_DOCKSIZE))
-	GUICtrlSetFont(-1, 10, 700, 2)
+	GUICtrlSetFont(-1, 10, Default, 2)
 
 	For $iBr = 0 To $CNT_BUILD - 1
 
@@ -674,7 +681,7 @@ Func _StartCoreGui()
 
 	GUICtrlCreateGroup($g_aLangCustom[13], 470, 140, 300, 240)
 	GUICtrlSetResizing(-1, BitOR($GUI_DOCKRIGHT, $GUI_DOCKTOP, $GUI_DOCKBOTTOM, $GUI_DOCKWIDTH))
-	GUICtrlSetFont(-1, 10, 700, 2)
+	GUICtrlSetFont(-1, 10, Default, 2)
 
 	For $iDr = 0 To $CNT_DISTRIBUTE - 1
 
@@ -2381,6 +2388,7 @@ Func _CreateDistribution($sSolutionIniPath, $iRow, $iCol)
 	Local $sOutputPath = $g_aEnvironment[25][1]
 	Local $sReleasName = $g_aEnvironment[4][1]
 	Local $iFilePerc = 0, $sOutputFile = ""
+	Local $sSetupResourcePath = @ScriptDir & "\Resources\Setup\"
 
 	_Logging_Start(StringFormat($g_aLangMessages2[45], $sReleasName))
 	_StartSoloProcess($iRow, $iCol)
@@ -2398,6 +2406,9 @@ Func _CreateDistribution($sSolutionIniPath, $iRow, $iCol)
 			_UpdateSoloProcess($iRow, $iCol, $iFilePerc)
 		Next
 	EndIf
+
+	_DistributeFile($sSetupResourcePath & "OfficePromoScreenBig.bmp", $sOutputPath & "\OfficePromoScreenBig.bmp")
+	_DistributeFile($sSetupResourcePath & "OfficePromoScreen.bmp", $sOutputPath & "\OfficePromoScreen.bmp")
 
 	_Logging_FinalMessage(StringFormat($g_aLangMessages2[51], $sReleasName))
 	_UpdateSoloProcess($iRow, $iCol, 100)
@@ -2481,7 +2492,7 @@ Func _CreateZipPackage($sSolutionIniPath, $iRow, $iCol)
 	Else
 
 		If FileExists($g_a7Zip[9]) Then
-			$sZipCommand = Chr(34) & $g_a7Zip[9] & Chr(34) & " a -tzip " & $sZipFileName  & " " & $sZipDirName
+			$sZipCommand = Chr(34) & $g_a7Zip[9] & Chr(34) & " a -tzip " & $sZipFileName  & " " & $sZipDirName & " -xr!*.bmp"
 			_ProcessEx_RunCommand($sZipCommand, $s7ZipWorkingDir)
 		EndIf
 
@@ -2569,12 +2580,6 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	Local $sScriptFullPath = $sDistoPath & "\" & $sScriptBaseName
 	Local $sIniBaseDir = IniRead($sSolutionIniPath, "Features", "IniBaseDir", "")
 	Local $sIniFilBaseName = _FileEx_CleanDirectoryName($sIniBaseDir & "\" & $sProgShortName & ".ini")
-	;~ Local $sVersionURL = "https://www.rizonesoft.com/update/" & $sProgShortName & ".rus"
-	Local $sUpdateURL = IniRead($sSolutionIniPath, "Links", "UpdateURL", "https://www.rizonesoft.com")
-	Local $sCompanyURL = IniRead($sSolutionIniPath, "Links", "CompanyURL", "https://www.rizonesoft.com")
-	Local $sSupportURL = IniRead($sSolutionIniPath, "Links", "SupportURL", "https://www.rizonesoft.com")
-	Local $sContactURL = IniRead($sSolutionIniPath, "Links", "ContactURL", "https://www.rizonesoft.com")
-	Local $sUninstallURL = IniRead($sSolutionIniPath, "Links", "UninstallURL", "https://www.rizonesoft.com")
 
 	Local $i64BitInstall = False
 	If StringStripWS($sOutput64Bit, 8) <> "" Then
@@ -2630,10 +2635,10 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, "AppVersion={#app_version}" & @CRLF)
 	FileWrite($hFileOpen, "AppVerName={#app_name} {#app_version}" & @CRLF)
 	FileWrite($hFileOpen, "AppPublisher=" & $sCompanyName & @CRLF)
-	FileWrite($hFileOpen, "AppPublisherURL=" & $sCompanyURL & @CRLF)
-	FileWrite($hFileOpen, "AppSupportURL=" & $sSupportURL & @CRLF)
-	FileWrite($hFileOpen, "AppUpdatesURL=" & $sUpdateURL & @CRLF)
-	FileWrite($hFileOpen, "AppContact=" & $sContactURL & @CRLF)
+	FileWrite($hFileOpen, "AppPublisherURL=" & _Link_Split($g_sUrlCompHomePage) & @CRLF)
+	FileWrite($hFileOpen, "AppSupportURL=" & _Link_Split($g_sUrlSupport) & @CRLF)
+	FileWrite($hFileOpen, "AppUpdatesURL=" & $g_sUrlUpdate & @CRLF)
+	FileWrite($hFileOpen, "AppContact=" & _Link_Split($g_sUrlSupport)& @CRLF)
 	FileWrite($hFileOpen, "AppCopyright={#app_copyright}" & @CRLF)
 	FileWrite($hFileOpen, "UninstallDisplayIcon={app}\" & $sOutputFile & @CRLF)
 	FileWrite($hFileOpen, "UninstallDisplayName={#app_name} {#app_version}" & @CRLF)
@@ -2725,7 +2730,8 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 			EndIf
 		Next
 	EndIf
-
+	FileWrite($hFileOpen, "Source: {#distrodir}\OfficePromoScreen.bmp; DestDir: {tmp}; Flags: dontcopy" & @CRLF)
+	FileWrite($hFileOpen, "Source: {#distrodir}\OfficePromoScreenBig.bmp; DestDir: {tmp}; Flags: dontcopy" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
 	FileWrite($hFileOpen, "[Dirs]" & @CRLF)
 
@@ -2766,9 +2772,28 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, "Type: files;      Name: {app}\" & $sIniFilBaseName & @CRLF)
 	FileWrite($hFileOpen, "Type: dirifempty; Name: {app}" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
+
 	FileWrite($hFileOpen, "[Code]" & @CRLF)
+	FileWrite($hFileOpen, "var" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoPage: TWizardPage;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage: TBitmapImage;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton: TButton;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel: TLabel;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ErrCode: integer;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SplashForm: TSetupForm;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton: TNewButton;" & @CRLF)
+
 	FileWrite($hFileOpen, "const" & @CRLF)
-	FileWrite($hFileOpen, @TAB & "UninstSiteURL = '" & $sUninstallURL & "';" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "HWND_TOPMOST = -1;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SWP_NOSIZE = $1;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SWP_NOMOVE = $2;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SWP_NOZORDER = $4;" & @CRLF)
+	; FileWrite($hFileOpen, @TAB & "UninstSiteURL = '" & $sUninstallURL & "';" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoURL = 'https://www.rizonesoft.com/downloads/rizonesoft-office/update/';" & @CRLF)
+
+	FileWrite($hFileOpen, "function SetWindowPos(hWnd: HWND; hWndInsertAfter: HWND; X, Y, cx, cy: Integer; uFlags: UINT): BOOL;" & @CRLF)
+	FileWrite($hFileOpen, "external 'SetWindowPos@user32.dll stdcall';" & @CRLF)
+
 	FileWrite($hFileOpen, "function IsUpgrade(): Boolean;" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "var" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "sPrevPath: String;" & @CRLF)
@@ -2790,6 +2815,7 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, @TAB & "end;" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
+
 	FileWrite($hFileOpen, "function ShouldSkipPage(PageID: Integer): Boolean;" & @CRLF)
 	FileWrite($hFileOpen, "begin" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "// Hide the license page if IsUpgrade()" & @CRLF)
@@ -2797,20 +2823,25 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, @TAB & "Result := True;" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
+
 	FileWrite($hFileOpen, "procedure CleanUpSettings();" & @CRLF)
 	FileWrite($hFileOpen, "begin" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "DeleteFile(ExpandConstant('{userappdata}\" & $sCompanyName & "\" & $sProgShortName & "\" & $sIniFilBaseName & "'));" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "RemoveDir(ExpandConstant('{userappdata}\" & $sCompanyName & "\" & $sProgShortName & "'));" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
+
 	FileWrite($hFileOpen, "procedure CurPageChanged(CurPageID: Integer);" & @CRLF)
 	FileWrite($hFileOpen, "begin" & @CRLF)
-	FileWrite($hFileOpen, @TAB & "if CurPageID = wpSelectTasks then" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "if CurPageID = PromoPage.ID then" & @CRLF)
+	FileWrite($hFileOpen, @TAB & @TAB & "WizardForm.NextButton.Caption := 'Continue'" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "else if CurPageID = wpSelectTasks then" & @CRLF)
 	FileWrite($hFileOpen, @TAB & @TAB & "WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall)" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "else if CurPageID = wpFinished then" & @CRLF)
 	FileWrite($hFileOpen, @TAB & @TAB & "WizardForm.NextButton.Caption := SetupMessage(msgButtonFinish);" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
+
 	FileWrite($hFileOpen, "procedure CurStepChanged(CurStep: TSetupStep);" & @CRLF)
 	FileWrite($hFileOpen, "begin" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "if CurStep = ssInstall then begin" & @CRLF)
@@ -2819,6 +2850,7 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, @TAB & "end;" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
+
 	FileWrite($hFileOpen, "procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);" & @CRLF)
 	FileWrite($hFileOpen, "var" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "ErrorCode: Integer;" & @CRLF)
@@ -2832,13 +2864,88 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, @TAB & "end;" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileWrite($hFileOpen, "" & @CRLF)
+
+	FileWrite($hFileOpen, "procedure DownloadButtonClick(Sender: TObject);" & @CRLF)
+	FileWrite($hFileOpen, "begin" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ShellExec('open', PromoURL, '', '', SW_SHOW, ewNoWait, ErrCode);" & @CRLF)
+	FileWrite($hFileOpen, "end;" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+
 	FileWrite($hFileOpen, "procedure InitializeWizard();" & @CRLF)
 	FileWrite($hFileOpen, "begin" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "WizardForm.SelectTasksLabel.Hide;" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "WizardForm.TasksList.Top    := 0;" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "WizardForm.TasksList.Height := PageFromID(wpSelectTasks).SurfaceHeight;" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ExtractTemporaryFile('OfficePromoScreen.bmp');" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoPage := CreateCustomPage(wpWelcome, '" & $sProgName & "', 'Thank you for choosing " & $sProgName & ".');" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage := TBitmapImage.Create(PromoPage);" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage.Parent := PromoPage.Surface;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage.Bitmap.LoadFromFile(ExpandConstant('{tmp}\OfficePromoScreen.bmp'));" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage.Left := 0;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage.Top := 0;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage.Width := PromoImage.Bitmap.Width;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoImage.Height := PromoImage.Bitmap.Height;" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton := TButton.Create(PromoPage);" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton.Parent := PromoPage.Surface;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton.Width := 100;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton.Height := 30;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton.Left := PromoImage.Width - DownloadButton.Width - 10;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton.Top := PromoImage.Height - DownloadButton.Height - 10;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton.Caption := 'Read more';" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "DownloadButton.OnClick := @DownloadButtonClick;" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel := TLabel.Create(PromoPage);" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel.Parent := PromoPage.Surface;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel.Left := 0;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel.Top := PromoImage.Height + 5;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel.Width := PromoPage.SurfaceWidth;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel.Caption := 'Free from adware, malware, and unwanted software.';" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel.Font.Size := 10;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoLabel.Alignment := taCenter;" & @CRLF)
 	FileWrite($hFileOpen, "end;" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
 
+	FileWrite($hFileOpen, "procedure CreateSplashForm();" & @CRLF)
+	FileWrite($hFileOpen, "var" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ImageControl: TBitmapImage;" & @CRLF)
+	FileWrite($hFileOpen, "begin" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SplashForm := CreateCustomForm();" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SplashForm.BorderStyle := bsDialog;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SplashForm.ClientWidth := 600;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SplashForm.ClientHeight := 550;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SplashForm.Caption := 'Rizonesoft Office 2023 Promo';" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ExtractTemporaryFile('OfficePromoScreenBig.bmp');" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ImageControl := TBitmapImage.Create(SplashForm);" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ImageControl.Parent := SplashForm;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ImageControl.Bitmap.LoadFromFile(ExpandConstant('{tmp}\OfficePromoScreenBig.bmp'));" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "ImageControl.SetBounds(0, 0, 600, 500);" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton := TNewButton.Create(SplashForm);" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton.Parent := SplashForm;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton.Width := 150;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton.Height := 30;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton.Left := SplashForm.ClientWidth - OpenWebpageButton.Width - 10;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton.Top := ImageControl.Top + ImageControl.Height + 10;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton.Caption := 'Go to Rizonesoft';" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "OpenWebpageButton.OnClick := @DownloadButtonClick;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SplashForm.Show();" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "SetWindowPos(SplashForm.Handle, HWND_TOPMOST, 13, 13, 0, 0, SWP_NOSIZE or SWP_NOZORDER);" & @CRLF)
+	FileWrite($hFileOpen, "end;" & @CRLF)
+	FileWrite($hFileOpen, "" & @CRLF)
+
+	FileWrite($hFileOpen, "function NextButtonClick(CurPageID: Integer): Boolean;" & @CRLF)
+	FileWrite($hFileOpen, "begin" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "Result := True;" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "if CurPageID = wpSelectTasks then" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "begin" & @CRLF)
+	FileWrite($hFileOpen, @TAB & @TAB & "CreateSplashForm();" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "end;" & @CRLF)
+	FileWrite($hFileOpen, "end;" & @CRLF)
 	FileClose($hFileOpen)
 
 	IniWrite($sSolutionIniPath, "Environment", "InstallScriptPath", $sScriptFullPath)
@@ -2898,7 +3005,6 @@ Func _CreateUpdateFiles($sSolutionIniPath, $iRow, $iCol)
 	Local $sProgShortName = $g_aEnvironment[5][1]
 	Local $sProgVersion = $g_aEnvironment[9][1]
 	Local $sProgBuild = $g_aEnvironment[12][1]
-	Local $sUpdateURL = IniRead($sSolutionIniPath, "Links", "UpdateURL", "https://rizone.tech/2Eoo9O1")
 	Local $sUpdateFile = $g_sUpdateRoot & "\" & $sProgShortName & ".ru"
 	Local $sUpdateSetupFile = $g_sUpdateRoot & "\" & $sProgShortName & ".rus"
 	Local $iIniError = 1, $iFileWriteError = 1
@@ -2908,7 +3014,7 @@ Func _CreateUpdateFiles($sSolutionIniPath, $iRow, $iCol)
 
 	$iIniError = IniWrite($sUpdateFile, "Update", "LatestBuild", $sProgBuild)
 	_UpdateSoloProcess($iRow, $iCol, 30)
-	$iIniError = IniWrite($sUpdateFile, "Update", "UpdateURL", $sUpdateURL)
+	$iIniError = IniWrite($sUpdateFile, "Update", "UpdateURL", $g_sUrlUpdate)
 	_UpdateSoloProcess($iRow, $iCol, 60)
 
 	If $iIniError = 0 Then
@@ -3084,7 +3190,7 @@ Func _CreateNewSolutionDlg()
 
 	GUICtrlCreateTabItem(" Program ")
 	GUICtrlCreateGroup("Solution", 20, 50, 455, 210)
-	GUICtrlSetFont(-1, 10, 700, 2)
+	GUICtrlSetFont(-1, 10, Default, 2)
 	GUICtrlCreateLabel("Solution Name", 30, 80, 220, 18)
 	; $NSD_NAME = GUICtrlCreateInput($snSolutionName, 30, 98, 410, 20)
 	GUICtrlCreateLabel("Program Name", 30, 123, 220, 18)
@@ -3100,12 +3206,12 @@ Func _CreateNewSolutionDlg()
 	GUICtrlCreateInput("", 250, 227, 130, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 	GUICtrlCreateGroup("Icon", 20, 270, 94, 140)
-	GUICtrlSetFont(-1, 10, 700, 2)
+	GUICtrlSetFont(-1, 10, Default, 2)
 	GUICtrlCreateIcon(@ScriptFullPath, 99, 35, 295, 64, 64)
 	GUICtrlCreateButton("Browse", 30, 365, 74, 30)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 	GUICtrlCreateGroup("Compile Options", 130, 270, 345, 60)
-	GUICtrlSetFont(-1, 10, 700, 2)
+	GUICtrlSetFont(-1, 10, Default, 2)
 	GUICtrlCreateCheckbox(" Compile X86 Version", 140, 295, 160, 20)
 	GUICtrlCreateCheckbox(" Compile X64 Version", 300, 295, 160, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group

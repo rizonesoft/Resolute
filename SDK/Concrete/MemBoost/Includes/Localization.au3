@@ -48,8 +48,8 @@ Func _Localization_Custom()
 		Return
 	EndIf
 
-	$g_aLangCustom[0]  = _Localization_Load("Custom", "Label_Status_Welcome", "Welcome.")
-	$g_aLangCustom[1]  = _Localization_Load("Custom", "Label_Status_Updates", "Checking for Updates")
+	$g_aLangCustom[0]   = _Localization_Load("Custom", "Label_Status_Welcome", "Welcome.")
+	$g_aLangCustom[1]   = _Localization_Load("Custom", "Label_Status_Updates", "Checking for Updates")
 
 EndFunc
 
@@ -69,7 +69,7 @@ Func _Localization_Menus()
 	$g_aLangMenus[6]  = _Localization_Load("Menus", "Help", "&Help")
 	$g_aLangMenus[7]  = _Localization_Load("Menus", "Help_Update", "Check for &updates")
 	$g_aLangMenus[8]  = _Localization_Load("Menus", "Help_Home", "%{Company.Name} &Home")
-	$g_aLangMenus[9] = _Localization_Load("Menus", "Help_Downloads", "More &Downloads")
+	$g_aLangMenus[9]  = _Localization_Load("Menus", "Help_Downloads", "More &Downloads")
 	$g_aLangMenus[10] = _Localization_Load("Menus", "Help_Support", "&Get Support")
 	$g_aLangMenus[11] = _Localization_Load("Menus", "Help_Issue", "Create an &issue")
 	$g_aLangMenus[12] = _Localization_Load("Menus", "Help_Donate", "Donate to &our Cause")
@@ -118,5 +118,7 @@ Func _Localization_Preferences()
 	$g_aLangPreferences[21] = _Localization_Load("Preferences", "MsgBox_Language_Message", "The selected language has changed. Complete Internet Repair should be restarted for the chosen language to take effect.")
 	$g_aLangPreferences[22] = _Localization_Load("Preferences", "MsgBox_Closing_Title", "Closing %{Program.Name}")
 	$g_aLangPreferences[23] = _Localization_Load("Preferences", "MsgBox_Closing_Message", "Would you like to close %{Program.Name} now?")
+
+	$g_aLangPreferences[24] = _Localization_Load("Preferences", "Tab_Optimization", "Optimization")
 
 EndFunc

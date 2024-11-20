@@ -1,0 +1,16 @@
+[Version]
+Signature="$Windows NT$"
+Provider=Rizonesoft
+
+[DefaultInstall]
+AddReg=UnhookReg
+
+[UnhookReg]
+HKLM, Software\CLASSES\batfile\shell\open\command,,0x00000000,"""%1"" %*"
+HKLM, Software\CLASSES\comfile\shell\open\command,,0x00000000,"""%1"" %*"
+HKLM, Software\CLASSES\exefile\shell\open\command,,0x00000000,"""%1"" %*"
+HKLM, Software\CLASSES\piffile\shell\open\command,,0x00000000,"""%1"" %*"
+HKLM, Software\CLASSES\regfile\shell\open\command,,0x00000000,"regedit.exe ""%1"""
+HKLM, Software\CLASSES\scrfile\shell\open\command,,0x00000000,"""%1"" %*"
+HKCU, Software\Microsoft\Windows\CurrentVersion\Policies\System,DisableRegistryTools,0x00010001,0
+HKCU, Software\Microsoft\Windows\CurrentVersion\Policies\System,DisableCMD,0x00010001,0

@@ -1,10 +1,10 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 8
+Compatibilty = Rizonesoft SDK 11
 Script = BiosCodes.au3
 
 [Modules]
 Build = 1
-Compress = 1
+Compress = 0
 Sign = 0
 Documentation = 1
 Import = 0
@@ -31,37 +31,31 @@ File=%RootDir%\Processing\64\Globe.ani
 
 [Sources]
 
-[Links]
-CompanyURL=https://www.rizonesoft.com
-SupportURL=https://github.com/rizonesoft/Resolute/issues
-ContactURL=https://www.rizonesoft.com/#contact
-UpdateURL=https://www.rizonesoft.com/downloads/bios-beep-codes-viewer/
-
 [Environment]
-ScriptPath=C:\GitHub\Resolute\SDK\Concrete\BiosCodes\BiosCodes.au3
+ScriptPath=Z:\Resolute\SDK\Concrete\BiosCodes\BiosCodes.au3
 Company=Rizonesoft
 CompanyURL=https://www.rizonesoft.com
-Name=Bios Beep Code Viewer
+Name=Beep Codes Viewer
 ShortName=BiosCodes
-Description=Bios Beep Code Viewer
+Description=Beep Codes Viewer
 Type=N
-Icon=C:\GitHub\Resolute\SDK\Resources\Icons\BiosCodes.ico
-Version=8.1.2.1707
-VersionMajor=8
-VersionMaintenance=2
-VersionBuild=1707
+Icon=Z:\Resolute\SDK\Resources\Icons\BiosCodes.ico
+Version=11.1.1.1959
+VersionMajor=11
+VersionMaintenance=1
+VersionBuild=1959
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
 OutFile=BiosCodes.exe
 OutFileX64=BiosCodes_X64.exe
-OutFilePath=C:\GitHub\Resolute\Resolute\BiosCodes.exe
-OutFileX64Path=C:\GitHub\Resolute\Resolute\BiosCodes_X64.exe
+OutFilePath=Z:\Resolute\Resolute\BiosCodes.exe
+OutFileX64Path=Z:\Resolute\Resolute\BiosCodes_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=C:\GitHub\Resolute\SDK\Concrete\BiosCodes\Distribution\1707
-DistributionName=BiosCodes_1707
-FullDistributionPath=C:\GitHub\Resolute\SDK\Concrete\BiosCodes\Distribution\1707\BiosCodes_1707
-DistroSourceName=BiosCodes_1707_Source
-DistroSourceFullPath=C:\GitHub\Resolute\SDK\Concrete\BiosCodes\Distribution\1707\BiosCodes_1707_Source
+DistributionPath=Z:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959
+DistributionName=BiosCodes_1959
+FullDistributionPath=Z:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959\BiosCodes_1959
+DistroSourceName=BiosCodes_1959_Source
+DistroSourceFullPath=Z:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959\BiosCodes_1959_Source

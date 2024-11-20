@@ -53,6 +53,10 @@ msgstr "Ersätt"
 msgid "&Search"
 msgstr "Sök"
 
+#. Resource IDs: (1003)
+msgid "&Hela ord"
+msgstr ""
+
 #. Resource IDs: (1013)
 msgid "..."
 msgstr "..."
@@ -61,17 +65,25 @@ msgstr "..."
 msgid "/"
 msgstr "/"
 
+#. Resource IDs: (1045)
+msgid "Visit Stefan Küng's website"
+msgstr "Besök Stefan Küngs hemsida"
+
+#. Resource IDs: (1052)
+msgid "<a>about grepWinNP3...</a>"
+msgstr "<a>om grepWinNP3...</a>"
+
 #. Resource IDs: (1086)
 msgid ">>>"
 msgstr ">>>"
 
-#. Resource IDs: (1052, 135)
+#. Resource IDs: (135)
 msgid "About grepWinNP3"
 msgstr "Om grepWinNP3"
 
 #. Resource IDs: (1021)
-msgid "Add to Presets"
-msgstr "Lägg till favoriter"
+msgid "Add to Presets..."
+msgstr "Lägg till favoriter..."
 
 #. Resource IDs: (155)
 msgid "All Files"
@@ -315,21 +327,21 @@ msgstr "Klistra in text att testa regex med:"
 msgid "Path"
 msgstr "Sökväg"
 
-#. Resource IDs: (160)
-msgid "Path does not exist or is not accessible!"
-msgstr "Sökvägen existerar inte, eller kan inte nås!"
-
 #. Resource IDs: (131)
 msgid "Preset name"
 msgstr "Förvalt namn"
 
-#. Resource IDs: (1022, 132)
+#. Resource IDs: (1022)
+msgid "Presets..."
+msgstr "Förval..."
+
+#. Resource IDs: (132)
 msgid "Presets"
 msgstr "Förval"
 
 #. Resource IDs: (1065)
-msgid "Press F1 for help"
-msgstr "Tryck in F1 för hjälp"
+msgid "Press F1 for help..."
+msgstr "Tryck in F1 för hjälp..."
 
 #. Resource IDs: (154)
 msgid "Programs"
@@ -412,6 +424,11 @@ msgstr "Sök sträng"
 msgid "Searched %ld files, skipped %ld files. Found %ld matches in %ld files."
 msgstr "Sök %ld filer, hoppade över %ld filer. Hittade %ld träffar i %ld filer."
 
+#. Resource IDs: (173)
+#, c-format
+msgid "Searched %ld files, skipped %ld files. Found %ld matches in %ld files. %ld results selected."
+msgstr "Sökt #ld filer, skippade %ld filer. Hittade %ld träffar i %ld filer. %ld resultat valda."
+
 #. Resource IDs: (140)
 msgid "Select Editor Application..."
 msgstr "Välj editor..."
@@ -421,8 +438,8 @@ msgid "Select path to search"
 msgstr "Välj mapp att söka i"
 
 #. Resource IDs: (1071)
-msgid "Settings"
-msgstr "Inställningar"
+msgid "Settings..."
+msgstr "Inställningar..."
 
 #. Resource IDs: (133)
 msgid "Size"
@@ -433,8 +450,8 @@ msgid "Size is"
 msgstr "Storlek är"
 
 #. Resource IDs: (1028)
-msgid "Test regex"
-msgstr "Testa regex"
+msgid "Test regex..."
+msgstr "Testa regex..."
 
 #. Resource IDs: (136)
 msgid "Text"
@@ -447,6 +464,11 @@ msgstr "Textträffar"
 #. Resource IDs: (1002)
 msgid "Text search"
 msgstr "Textsökning"
+
+#. Resource IDs: (160)
+#, c-format
+msgid "The path \"%s\" does not exist or is not accessible!"
+msgstr "Sökvägen \"%s\" existerar inte eller är ej tillgänglig!"
 
 #. Resource IDs: (65535)
 msgid "The regex search string matches:"
@@ -464,9 +486,14 @@ msgstr "Behandlar filer som UTF-8"
 msgid "Treat files as binary"
 msgstr "Behandlar filer som binära"
 
-#. Resource IDs: (1045)
-msgid "Visit Stefan Küng's website"
-msgstr "Besök Stefan Küngs hemsida"
+#. Resource IDs: (172)
+#, c-format
+msgid "You have the option \"%s\" enabled.\r\nWhen replacing, this option can lead to corrupted files.\r\nDo you want to proceed anyway?"
+msgstr "Inställningen \"%s\ är aktiverad.\r\nVid ersättning kan denna inställning leda till korrupta filer.\r\nVill du fortsätta ändå?"
+
+#. Resource IDs: (1025)
+msgid "\\"
+msgstr "\\"
 
 #. Resource IDs: (116)
 msgid "a regular expression used for searching. Press F1 for more info."
@@ -574,6 +601,10 @@ msgstr "söker i filen '%s'"
 msgid "search string is empty"
 msgstr "söksträngen är tom"
 
+#. Resource IDs: (170, 171)
+msgid "Start new grepWinNP3 window"
+msgstr "Öppna nytt grepWinNP3-fönster"
+
 #. Resource IDs: (114)
 msgid "the path(s) which is searched recursively.\nSeparate paths with the '|' symbol.\nExample: c:\\temp|d:\\logs"
 msgstr "sökväg(arna) söks rekursivt.\nSeparera sökvägar med '|' symbolen.\nExempelvis: c:\\temp|d:\\logs"
@@ -581,6 +612,10 @@ msgstr "sökväg(arna) söks rekursivt.\nSeparera sökvägar med '|' symbolen.\n
 #. Resource IDs: (113)
 msgid "you can exclude directories, e.g. CVS and images.\nExample: ^(CVS|images)$\nNote, '.svn' folders are 'hidden' on Windows, so they usually are not scanned."
 msgstr "du kan exkludera mappar, exempelvis CVS och bilder.\nExempelvis: ^(CVS|bilder)$\nMärk, '.svn'-mappar are är dolda i Windows, så de är vanligtvis inte sökta i."
+
+#. Resource IDs: (1024)
+msgid "Y"
+msgstr "Y"
 
 #. Resource IDs: (3000)
 msgid "Reset"
@@ -597,4 +632,8 @@ msgstr "Maximalt # samtidiga instanser"
 #. Resource IDs: (3005)
 msgid "This adds a new entry to the context menu named 'Open with Editor'"
 msgstr "Lägger till ny post i snabbmenyn med rubriken 'Öppna med editor'"
+
+#. Resource IDs: (3006)
+msgid "Stay On Top"
+msgstr "Alltid överst"
 

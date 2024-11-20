@@ -48,8 +48,28 @@ Func _Localization_Custom()
 		Return
 	EndIf
 
-	$g_aLangCustom[0]  = _Localization_Load("Custom", "Label_Status_Welcome", "Welcome.")
-	$g_aLangCustom[1]  = _Localization_Load("Custom", "Label_Status_Updates", "Checking for Updates")
+	$g_aLangCustom[0]   = _Localization_Load("Custom", "Label_Status_Welcome", "Repair stuck pixels with this tool. It won't repair dead pixels (Black Ones).")
+	$g_aLangCustom[1]   = _Localization_Load("Custom", "Label_Status_Updates", "Checking for Updates")
+	$g_aLangCustom[2]   = _Localization_Load("Custom", "Label_Warning", "Caution: If epilepsy runs in your family, the vibrant colors here might be more dizzying than dazzling!")
+	$g_aLangCustom[3]   = _Localization_Load("Custom", "Group_1", "1) Dead pixel locator")
+	$g_aLangCustom[4]   = _Localization_Load("Custom", "Group_2", "2) Examples")
+	$g_aLangCustom[5]   = _Localization_Load("Custom", "Group_3", "3) Speed (%s ms)")
+	$g_aLangCustom[6]   = _Localization_Load("Custom", "Button_Color_1", "White")
+	$g_aLangCustom[7]   = _Localization_Load("Custom", "Button_Color_2", "Black")
+	$g_aLangCustom[8]   = _Localization_Load("Custom", "Button_Color_3", "Red")
+	$g_aLangCustom[9]   = _Localization_Load("Custom", "Button_Color_4", "Green")
+	$g_aLangCustom[10]  = _Localization_Load("Custom", "Button_Color_5", "Blue")
+	$g_aLangCustom[11]  = _Localization_Load("Custom", "Button_Color_6", "Yellow")
+	$g_aLangCustom[12]  = _Localization_Load("Custom", "Button_Color_7", "Magenta")
+	$g_aLangCustom[13]  = _Localization_Load("Custom", "Button_Color_8", "Cyan")
+	$g_aLangCustom[14]  = _Localization_Load("Custom", "Label_Step_1", "Click any color button on the left to display a color over the entire screen.")
+	$g_aLangCustom[15]  = _Localization_Load("Custom", "Label_Step_2", "After a color is displayed, you can use the arrow keys on your keyboard to switch between colors.")
+	$g_aLangCustom[16]  = _Localization_Load("Custom", "Label_Step_3", "Press the 'Esc' key to exit the color display and return to this window.")
+	$g_aLangCustom[17]  = _Localization_Load("Custom", "Button_Go", "Go!")
+	$g_aLangCustom[18]  = _Localization_Load("Custom", "Label_F11", "Hit 'F11' to go full glam with Fullscreen mode. Tap 'F11' again to tone it down.")
+	$g_aLangCustom[19]  = _Localization_Load("Custom", "Slider_Faster", "Faster")
+	$g_aLangCustom[20]  = _Localization_Load("Custom", "Slider_Slower", "Slower")
+	$g_aLangCustom[21]  = _Localization_Load("Custom", "Label_YouTube", "For other devices, go to bit.ly/pixrepair to play the Pixel Repair video.")
 
 EndFunc
 

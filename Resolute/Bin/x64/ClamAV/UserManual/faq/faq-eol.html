@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>ClamAV EOL Policy - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Docker.html"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../faq/faq-eol.html" class="active"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="end-of-life-eol-policy"><a class="header" href="#end-of-life-eol-policy">End of Life (EOL) Policy</a></h1>
+<p>This document describes the End of Life (EOL) policy for Long Term Support (LTS) feature releases and for regular (non-LTS) feature releases.</p>
+<p>Skip to our <a href="#version-support-matrix">Version Support Matrix</a> to quickly check if your version is still supported.</p>
+<blockquote>
+<p><em>Disclaimer</em>: If this policy has to change due to a compatibility problem that prohibits the use of new detection technology, or impacts the stability of ClamAV infrastructure, we will announce the end of life for those versions four months before they become unsupported.</p>
+</blockquote>
+<h2 id="long-term-support-lts-feature-releases"><a class="header" href="#long-term-support-lts-feature-releases">Long Term Support (LTS) Feature Releases</a></h2>
+<p>ClamAV <em><strong>1.0</strong></em> is the latest Long Term Support (LTS) feature release.</p>
+<p>ClamAV <em><strong>0.103</strong></em> is the previous Long Term Support (LTS) feature release.</p>
+<p>LTS feature releases will be supported for <em>at least</em> <strong>three (3)</strong> years from the initial publication date of that LTS feature version. In other words, support for the LTS release &quot;X.Y&quot; starts when version &quot;X.Y.0&quot; is published and ends three years after.</p>
+<p>Each LTS feature release will be supported with critical patch versions for the duration of the three year support period.</p>
+<p>Each LTS feature release will be supported with access to download signatures for the duration of the three year support period plus one additional year. The additional year is to allow package distributions to extend support by backporting security fixes after official support for patch versions has ended.</p>
+<p>A new LTS feature release will be identified <em>approximately</em> every <strong>two (2)</strong> years.</p>
+<p><em>Users must stay up-to-date with the latest patch versions for continued support.</em></p>
+<h2 id="regular-non-lts-feature-releases"><a class="header" href="#regular-non-lts-feature-releases">Regular (non-LTS) Feature Releases</a></h2>
+<p>Non-LTS feature releases will be supported with critical patch versions for <em>at least</em> <strong>four (4) months</strong> from the initial publication date of the <em><strong>next</strong></em> feature release or until the <em>next</em>-<em><strong>next</strong></em> feature release is published.</p>
+<p>Non-LTS feature releases will be allowed access to download signatures until at least four (4) months after the <em>next</em>-<em><strong>next</strong></em> feature release is published.</p>
+<h2 id="definitions"><a class="header" href="#definitions">Definitions</a></h2>
+<ul>
+<li>
+<p><em>&quot;feature release&quot;</em> -- A version starting with MAJOR.MINOR.0 to include all PATCH versions.</p>
+<p>For example: 0.103.0 and 0.103.1 are both &quot;patch versions&quot; within the same &quot;feature release&quot;.</p>
+</li>
+<li>
+<p><em>&quot;patch version&quot;</em> -- A specific MAJOR.MINOR.PATCH version.</p>
+<p>For example: 0.103.1 is a &quot;patch version&quot; in the 0.103 &quot;feature release&quot;.</p>
+</li>
+<li>
+<p><em>&quot;end of life&quot; (EOL)</em> -- The date after which the ClamAV Team will no longer support a feature version in any way.</p>
+<p>After this point, all patch versions of that release may be blocked from downloading official signature content.</p>
+</li>
+<li>
+<p><em>&quot;long term support (LTS) release&quot;</em> -- A feature release that will get critical patch versions for an extended period.</p>
+<p>The latest patch version will continue to get access to download signature databases for the duration of the support period. See <a href="#long-term-support-lts-feature-releases">above</a> for policy details.</p>
+</li>
+<li>
+<p><em>&quot;regular (non-LTS) release&quot;</em> -- A feature release that will only be supported until a little after the next feature release.</p>
+<p>The latest patch version will continue to get access to download signature databases a little longer than that, but users are encouraged to upgrade and may be vulnerable if a security patch is only published for the next feature release and they fail to upgrade. See <a href="#regular-non-lts-feature-releases">above</a> for policy details.</p>
+</li>
+<li>
+<p><em>&quot;support&quot;</em> -- The ClamAV project defines &quot;support&quot; in several ways:</p>
+<ol>
+<li>
+<p><em>Critical patch support</em>:</p>
+<p>The ClamAV Team provides critical patch versions for supported feature releases(<a href="#additional-detail-about-critical-patch-support">**</a>).</p>
+<p>The Application Binary Interface (ABI) shall not change between patch versions within a given feature release. That is, the SONAMEs for the ClamAV libraries will remain the same and changes in a patch version will not break compatibility with older library versions.</p>
+<p>Users are responsible for updating to the latest patch version for continued support.</p>
+</li>
+<li>
+<p><em>Signature Database (CVD) Access</em>:</p>
+<p>Supported releases are allowed free access to download the latest signature databases.</p>
+<p>Users must keep up-to-date with the latest patch version to maintain access to the official signature database content.</p>
+<p>We reserve the right to block older/problematic patch versions 4 months after the release of a newer patch version.</p>
+</li>
+<li>
+<p><em>New-Signature Load/Functional Testing</em>:</p>
+<p>The ClamAV Team will load-test new sigantures for functional correctness on <strong>all versions</strong> that are allowed access to download the official signature databases.</p>
+</li>
+<li>
+<p><em>New-Signature False Positive Testing</em>:</p>
+<p>The ClamAV Team will perform false positive testing for new signature content, but only using the latest patch version of the latest feature release. False positive testing requires scanning large data sets. It is more time consuming than functional testing.</p>
+</li>
+</ol>
+<p>Cisco does not offer paid technical support or paid extended long term support for ClamAV.</p>
+</li>
+</ul>
+<h2 id="version-support-matrix"><a class="header" href="#version-support-matrix">Version Support Matrix</a></h2>
+<blockquote>
+<p><em>Note</em>: This markdown table is generated from a spreadsheet using <a href="https://thisdavej.com/copy-table-in-excel-and-paste-as-a-markdown-table/">this tool</a>.</p>
+</blockquote>
+<div class="table-wrapper"><table><thead><tr><th>Feature release</th><th>First Published</th><th>Latest patch version</th><th>Expected End of Life (EOL)</th><th>Signature load testing until</th><th>Signature FP testing until</th><th>DB downloads allowed until</th><th>Patch versions continue until</th></tr></thead><tbody>
+<tr><td>1.2</td><td>TBD</td><td>n/a</td><td>1.4 + 4 months</td><td>1.4 + 4 months</td><td>1.3 published</td><td>1.4 + 4 months</td><td>1.3 + 4 months, or 1.4</td></tr>
+<tr><td>1.1</td><td>May-1 2023</td><td>1.1.0</td><td>1.3 + 4 months</td><td>1.3 + 4 months</td><td>1.2 published</td><td>1.3 + 4 months</td><td>1.2 + 4 months, or 1.3</td></tr>
+<tr><td><strong>1.0 LTS</strong></td><td><strong>Nov-28 2022</strong></td><td><strong>1.0.1</strong></td><td><strong>Nov-28 2025</strong></td><td><strong>Nov-28 2025</strong></td><td>1.1 published</td><td><strong>Nov-28 2026</strong></td><td><strong>Nov-28 2025</strong></td></tr>
+<tr><td>0.105</td><td>May-4 2022</td><td>0.105.2</td><td>1.1 + 4 months</td><td>1.1 + 4 months</td><td>1.0 published</td><td>1.1 + 4 months</td><td>1.0 + 4 months, or 1.1</td></tr>
+<tr><td>0.104</td><td>Sep-3 2021</td><td>0.104.4</td><td>1.0 + 4 months</td><td>1.0 + 4 months</td><td>0.105 published</td><td>1.0 + 4 months</td><td>0.105 + 4 months, or 1.0</td></tr>
+<tr><td><strong>0.103 LTS</strong></td><td><strong>Sep-14 2020</strong></td><td><strong>0.103.8</strong></td><td><strong>Sep-14 2024</strong></td><td><strong>Sep-14 2024</strong></td><td>0.104 published</td><td><strong>Sep-14 2025</strong></td><td><strong>Sep-14 2024</strong></td></tr>
+<tr><td>0.102</td><td>Oct-2 2019</td><td>0.102.4</td><td>Jan-3 2022 (0.104 + 4 mo.)</td><td>Jan-3 2022</td><td></td><td>Jan-3 2022</td><td></td></tr>
+<tr><td>0.101</td><td>Dec-3 2018</td><td>0.101.5</td><td>Jan-3 2022</td><td>Jan-3 2022</td><td></td><td>Jan-3 2022</td><td></td></tr>
+<tr><td>0.100</td><td>Apr-9 2018</td><td>0.100.3</td><td>Oct-29 2021</td><td>Oct-29 2021</td><td></td><td>Oct-29 2021</td><td></td></tr>
+<tr><td>0.99</td><td>Dec-1 2015</td><td>0.99.4</td><td>Mar-1 2021</td><td></td><td></td><td></td><td></td></tr>
+</tbody></table>
+</div>
+<p>Currently, every version from ClamAV 0.102 and down, including all patch versions, are unsupported, and <strong>are actively blocked from downloading new updates</strong>.</p>
+<h2 id="additional-detail-about-critical-patch-support"><a class="header" href="#additional-detail-about-critical-patch-support">Additional Detail About Critical Patch Support</a></h2>
+<p>Like all bugs, security patches are first prepared for our upcoming feature release. Only security patches and other critical fixes or critical improvements are backported to previous feature releases.</p>
+<p>The ClamAV Team is small and can't afford to publish patch versions for every release. To keep up momentum crafting new features and other improvements, our policy is to backport no further than 1 or 2 of the latest feature releases plus the Long Term Support (LTS) feature releases.</p>
+<h3 id="critical-patches-after-a-breaking-change"><a class="header" href="#critical-patches-after-a-breaking-change">Critical Patches After a Breaking Change</a></h3>
+<p>On rare occasion we have made breaking changes to the way that users or other software interact with ClamAV or libclamav. The 0.101.0 release was one such example where we made a breaking change to the libclamav programming API. When this happens, we will provide extra time for users to upgrade to a newer feature release before we discontinue support for the older feature release.</p>
+<p>The amount of extra time before we discontinue support will vary depending on the severity of the breaking change and the level of difficulty to upgrade.</p>
+<h3 id="examples"><a class="header" href="#examples">Examples</a></h3>
+<h4 id="security-patches-less-than-four-4-months-after-a-feature-release"><a class="header" href="#security-patches-less-than-four-4-months-after-a-feature-release">Security Patches Less than four (4) Months After a Feature Release</a></h4>
+<p>If the non-disclosure / release date for a security patch falls within four (4) months since the previous feature release was published, we will craft a security patch version for the future feature release, the current feature release, the previous feature release, and any LTS feature releases.</p>
+<blockquote>
+<p><em>Example</em>: Let's say ClamAV 0.105.0 was just released and development begins on 0.106. But shortly after the release or as we're preparing for the release, it is discovered that 0.105.0 contains one or more security issues.</p>
+<p>We understand with such a recent release, not everyone has had time to verify that they can indeed upgrade without some other supporting changes to their system or product.</p>
+<p>In this situation, we would prepare a security patch version for:</p>
+<ul>
+<li>the 0.105 feature release (eg. 0.105.1),</li>
+<li>for the 0.104 feature release (eg. 0.104.3),</li>
+<li>and for the 0.103 LTS feature release.</li>
+</ul>
+<p>Once the critical patch versions have been published, the same or equivalent fixes will be merged into the <code>main</code> branch for inclusion into the next feature release (0.106.0).</p>
+</blockquote>
+<h4 id="security-patches-more-than-four-4-months-after-a-feature-release-has-been-available"><a class="header" href="#security-patches-more-than-four-4-months-after-a-feature-release-has-been-available">Security Patches More than four (4) Months After a Feature Release Has Been Available</a></h4>
+<p>If the non-disclosure / release date for a security patch falls after four (4) months since the previous feature release was published, we will only craft a security patch version for the future feature release, the current feature release, and any LTS feature releases.</p>
+<blockquote>
+<p><em>Example</em>: If 0.105.0 was released in January and a security issue was found in March, but the non-disclosure agreement allowed for the bug to be patched after the standard 90 days, then a security patch release will likely be prepared for release in early June.</p>
+<p>This would exceed our 4-month policy, so we would publish the fix:</p>
+<ul>
+<li>in 0.105 (eg. 0.105.1),</li>
+<li>and in 0.103 LTS, ...</li>
+</ul>
+<p>... but would not publish a patch version for the 0.104 feature release.</p>
+</blockquote>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../faq/faq-uninstall.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../community_resources/CommunityResources.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../faq/faq-uninstall.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../community_resources/CommunityResources.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

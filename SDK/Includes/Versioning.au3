@@ -103,42 +103,61 @@ EndFunc   ;==>_GetProgramVersionFromFile
 
 
 Func _GUIGetTitle($sGUIName)
+    Local $sReturn, $sAdminInstance = "", $sProgramVersion = "", $sProgramMinorString = "", $sProgramBuild = ""
+    Local $sAutoItArch = "", $sAutoItVers = ""
 
-	Local $sReturn = ""
-	Local $sAdminInstance = ""
-	Local $sProgamVersion = ""
-	Local $sProgramBuild = ""
-	Local $sAutoItArch = ""
-	Local $sAutoItVers = ""
+    _Localization_Versioning()
 
-	_Localization_Versioning()
-	If IsAdmin() And $g_TitleShowAdmin = True Then $sAdminInstance = $g_aLangVersioning[0] & " ~ "
-	If $g_TitleShowArch = True Then $sAutoItArch = " : " & _AutoIt3Script_GetArchitecture() & "-" & $g_aLangVersioning[3]
+    If IsAdmin() And $g_TitleShowAdmin Then
+        $sAdminInstance = $g_aLangVersioning[0] & " ~ "
+    EndIf
 
-	If @Compiled Then
+    If $g_TitleShowArch Then
+        $sAutoItArch = " : " & _AutoIt3Script_GetArchitecture() & "-" & $g_aLangVersioning[3]
+    EndIf
 
-		Local $sReturn = FileGetVersion(@ScriptFullPath)
+    If @Compiled Then
+        $sReturn = FileGetVersion(@ScriptFullPath)
 
-		Local $sPltReturn = StringSplit($sReturn, ".")
-		If IsArray($sPltReturn) Then
+        If @error Or Not StringRegExp($sReturn, "^\d+\.\d+\.\d+\.\d+$") Then
+            Return ""
+        EndIf
 
-			If $g_TitleShowVersion = True Then $sProgamVersion = Chr(32) & $sPltReturn[1]
-			If $g_TitleShowBuild = True Then $sProgramBuild = " : " & $g_aLangVersioning[1] & Chr(32) & $sPltReturn[$sPltReturn[0]]
-			$sReturn = $sAdminInstance & $sGUIName & $sProgamVersion & $sProgramBuild & $sAutoItArch
+        Local $aVersionParts = StringSplit($sReturn, ".")
 
-		EndIf
+        If @error Then
+            Return ""
+        EndIf
 
-	Else
+        If $g_TitleShowVersion Then $sProgramVersion = " " & $aVersionParts[1]
+        If $g_TitleShowBuild Then $sProgramBuild = " : " & $g_aLangVersioning[1] & " " & $aVersionParts[$aVersionParts[0]]
 
-		If $g_TitleShowVersion = True Then $sProgamVersion = Chr(32) & _AutoIt3Script_GetVersion(@ScriptFullPath, 1)
-		If $g_TitleShowBuild = True Then $sProgramBuild = " : " & $g_aLangVersioning[1] & Chr(32) & _AutoIt3Script_GetVersion(@ScriptFullPath, 4)
-		If $g_TitleShowAutoIt = True Then $sAutoItVers = " : " & $g_aLangVersioning[2]
-		$sReturn = $sAdminInstance & $sGUIName & $sProgamVersion & $sProgramBuild & $sAutoItVers & $sAutoItArch
+        Switch $aVersionParts[3]
+            Case 0
+                $sProgramMinorString = "Alpha "
+            Case 1
+                $sProgramMinorString = "Beta "
+            Case 2
+                $sProgramMinorString = "RC "
+        EndSwitch
 
-	EndIf
+        $sReturn = $sAdminInstance & $sGUIName & $sProgramVersion & $sProgramBuild
 
-	Return $sReturn
+        If $aVersionParts[3] >= 0 And $aVersionParts[3] <= 2 Then
+            $sReturn &= " - (" & $sProgramMinorString & $aVersionParts[2] & ")"
+        EndIf
 
+        $sReturn &= $sAutoItArch
+
+    Else
+        If $g_TitleShowVersion Then $sProgramVersion = " " & _AutoIt3Script_GetVersion(@ScriptFullPath, 1)
+        If $g_TitleShowBuild Then $sProgramBuild = " : " & $g_aLangVersioning[1] & " " & _AutoIt3Script_GetVersion(@ScriptFullPath, 4)
+        If $g_TitleShowAutoIt Then $sAutoItVers = " : " & $g_aLangVersioning[2]
+
+        $sReturn = $sAdminInstance & $sGUIName & $sProgramVersion & $sProgramBuild & $sAutoItVers & $sAutoItArch
+    EndIf
+
+    Return $sReturn
 EndFunc   ;==>_GUIGetTitle
 
 

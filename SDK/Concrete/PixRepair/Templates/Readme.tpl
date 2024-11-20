@@ -5,7 +5,7 @@
 ==================================================
 Version: %{VERSION}
 Release Date: %{DAY} %{MONTH}, %{YEAR}
-System Requirements: Windows XP, Vista, 2008, 7, 8, 8.1, 10 
+System Requirements: Windows 7, 8, 8.1, 10 
 Disk Space: %{INSTSIZE}
 ==================================================
 

@@ -1,10 +1,10 @@
 [Rizonesoft SDK]
-Compatibilty = Rizonesoft SDK 8
+Compatibilty = Rizonesoft SDK 11
 Script = Firemin.au3
 
 [Modules]
 Build = 1
-Compress = 1
+Compress = 0
 Sign = 0
 Documentation = 1
 Import = 0
@@ -50,38 +50,31 @@ File=%RootDir%\Processing\64\Globe.ani
 
 [Sources]
 
-[Links]
-CompanyURL = https://www.rizonesoft.com
-SupportURL = https://github.com/rizonesoft/Resolute/issues
-ContactURL = https://www.rizonesoft.com/#contact
-UpdateURL = https://www.rizonesoft.com/downloads/firemin/
-UninstallURL = https://www.rizonesoft.com/uninstalled/
-
 [Environment]
-ScriptPath=C:\GitHub\Resolute\SDK\Concrete\Firemin\Firemin.au3
+ScriptPath=Z:\Resolute\SDK\Concrete\Firemin\Firemin.au3
 Company=Rizonesoft
 CompanyURL=https://www.rizonesoft.com
 Name=Firemin
 ShortName=Firemin
 Description=Firemin
 Type=N
-Icon=C:\GitHub\Resolute\SDK\Resources\Icons\Firemin.ico
-Version=9.5.3.8055
-VersionMajor=9
+Icon=Z:\Resolute\SDK\Resources\Icons\Firemin.ico
+Version=11.8.3.8398
+VersionMajor=11
 VersionMaintenance=3
-VersionBuild=8055
+VersionBuild=8398
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
 OutFile=Firemin.exe
 OutFileX64=Firemin_X64.exe
-OutFilePath=C:\GitHub\Resolute\Resolute\Firemin.exe
-OutFileX64Path=C:\GitHub\Resolute\Resolute\Firemin_X64.exe
-InstallScriptPath=C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8055\Firemin_8055_Setup.iss
-InstallOutputPath=C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8055\Firemin_8055_Setup.exe
+OutFilePath=Z:\Resolute\Resolute\Firemin.exe
+OutFileX64Path=Z:\Resolute\Resolute\Firemin_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
 InstallSize=0
-DistributionPath=C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8055
-DistributionName=Firemin_8055
-FullDistributionPath=C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8055\Firemin_8055
-DistroSourceName=Firemin_8055_Source
-DistroSourceFullPath=C:\GitHub\Resolute\SDK\Concrete\Firemin\Distribution\8055\Firemin_8055_Source
+DistributionPath=Z:\Resolute\SDK\Concrete\Firemin\Distribution\8398
+DistributionName=Firemin_8398
+FullDistributionPath=Z:\Resolute\SDK\Concrete\Firemin\Distribution\8398\Firemin_8398
+DistroSourceName=Firemin_8398_Source
+DistroSourceFullPath=Z:\Resolute\SDK\Concrete\Firemin\Distribution\8398\Firemin_8398_Source

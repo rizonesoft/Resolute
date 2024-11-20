@@ -1,0 +1,528 @@
+#   Carbon CD Language file
+#
+#Author:Rizonesoft
+#Language:English
+#
+###################################
+#Common Resource
+#
+Rizonesoft Carbon CD
+OK
+Cancel
+Error
+Warning
+Confirmation
+###################################
+#Main Dialog Menu
+#
+&File
+&Tools
+&CD
+&Window
+&Help
+#Rizonesoft Carbon CD ///////////////////
+&Settings
+E&xit
+#Tool /////////////////////////////
+Show Drive &Capability
+&MSF Calculator
+&Erase CD-RW Media
+&Fast Erase CD-RW Media
+#CD ///////////////////////////////
+Recognize &CD
+&Subcode Analysis
+Clo&ne CD
+&Read to Image File
+&Write from Image File
+&Mastering
+Read &Tracks
+#Window ////////////////////////////
+&TOC Window
+&Log Window
+#Help //////////////////////////////
+&Help
+&About Carbon CD
+####################################
+#Toc Window Menu
+#
+&File
+&Window
+#File //////////////////////////////
+Save TOC as &Text format
+Save TOC as &HTML format
+Save TOC as &CSV format
+Save TOC as Cue-&Sheet
+#Window ////////////////////////////
+&Close window
+####################################
+#Log Window Menu
+#
+&File
+&Window
+#File //////////////////////////////
+&Save Log
+#Window ////////////////////////////
+&Close window
+#File //////////////////////////////
+&Clear Log
+####################################
+#Mastering Dialog Menu
+#
+&Window
+&Create
+&Track
+&File && Folder
+#Window ////////////////////////////
+&E&xit
+#Create ////////////////////////////
+Create &Image
+&Write to CD
+#Track /////////////////////////////
+Insert &Data Track
+Insert &Audio Track
+&Remove Track
+#File & Folder //////////////////////
+&Create new Folder
+Add &File
+&Remove
+Re&name
+&Insert Folder
+#Track /////////////////////////////
+Insert &ISO as data track
+Launch &Explorer
+####################################
+# Mastering Popup Menu
+#
+&Add Folder
+Add &File
+&Remove
+Re&name
+Insert &Data Track
+Insert &Audio Track
+&Remove track
+####################################
+# About dialog resource
+#
+About Carbon CD
+CD Read, Write, Duplicate, Mastering
+####################################
+# MSF Calculator dialog resource
+#
+MSF Calculator
+Calc
+Close
+####################################
+# Create progress dialog resource
+#
+Creating Image File
+Log
+Cancel
+####################################
+# Drive capability dialog resource
+#
+Showing Drive Capability
+Information
+Drive ID
+ASPI - [ Ha:Tgt:Lun ]
+SPTI - [ Drive letter ]
+Vendor
+Product Name
+Firmware Revision
+Drive Capability
+Writing
+Default CMD
+Buffer size
+Default CMD is detected by 'Auto Detect Writing Command' option.
+####################################
+# Erase dialog resource
+#
+Erase Media
+Erasing Media
+Erasing Media at Fast
+Complete!
+Failure!
+####################################
+# Main dialog resource
+#
+Rizonesoft Carbon CD
+ Read CD to Image File
+ Write from image File to CD
+ Clone CD
+ Analyze Sub Channel
+ Refresh CD information
+ Read Tracks from CD
+ Mastering CD and image file
+ Exit Carbon CD
+####################################
+# Mastering dialog resource
+#
+Mastering
+Volume Label
+Always on Top
+Track List
+Data (ISO 9660)
+Image length is too large. Force overburn?
+Create Image
+Write to CD
+Close
+No
+Type
+File Name
+DATA_DISC
+File Name
+Type
+Size
+Date(GMT)
+File Name(Source)
+Please select a folder.
+Settings
+#20
+Change Drive
+Notify truncated file name
+Up order
+Down order
+Launch explorer
+Protection features for data disc (Only for ISO mastering)
+No protection
+30sec special RAW sectors(easy to copy)
+60sec special RAW sectors
+90sec special RAW sectors
+ 5min special RAW sectors
+10min special RAW sectors
+20min special RAW sectors
+30min special RAW sectors(hard to copy)
+####################################
+# Read progress dialog resource
+#
+Reading from CD
+Log
+Cancel
+####################################
+# Read setting dialog resource
+#
+Read from CD
+Drive to Read
+Image File(.cue .cdm)
+Browse
+Test Mode
+Single-Session mode (high compatibility)
+Multi-Session mode (high performance)
+Audio Speed
+Data Speed
+Extended Settings
+Analyze Sub Code (Get Accurate TOC)
+Ignore Read Errors
+Fast Error Skip
+Intelligent Bad Sector Scanner
+Swap Audio Channel
+Auto Detect Read Command
+Reading Speed
+Analyze Pregap (-150...0 sector)
+Data compare mode
+Read Alpha-ROM mode
+####################################
+# Read track setting dialog resource
+#
+Read Track
+File Name
+####################################
+# Setting dialog resource
+#
+Settings
+Specify ASPI Manager
+Auto Save Log Data
+Sub Code Analysis Method and Speed
+Block Size at Transfer
+Temporary File (Cloning)
+Use external skin
+...
+Process priority
+Normal
+Idle
+High
+Use SPTI for access
+General
+Interface
+I/O
+Analysis
+Play sound on succeed process
+Play sound on failed process
+####################################
+# Subcode analyzer progress dialog resource
+#
+Analyzing Sub Code
+Log
+Cancel
+####################################
+# Writing progress dialog resource
+#
+Writing to CD
+Log
+Cancel
+####################################
+# Write setting dialog resource
+#
+Write to CD
+Drive to Write
+File Name(.cue .cdm)
+...
+Test Mode
+Perform Optimum Power Calibration
+Buffer-Underrun Protection
+Eject Tray
+Writing Speed
+Check Drive as CD-R compatible
+Auto Detect Writing Command
+Writing Commands
+Extended Settings
+####################################
+# TOC Window resource
+#
+TOC
+TNO
+Type
+Start Addr
+Track Len.
+Pre Gap
+Size
+Digital Copy
+Emphasis
+Permitted
+Prohibited
+None
+Total
+Text Files(*.txt)|*.txt|All Type Files|*.*||
+HTML Files(*.html,*.htm)|*.html;*.htm|All Type Files|*.*||
+CSV Files(*.csv)|*.csv|All Type Files|*.*||
+####################################
+# LOG Window resource
+#
+LOG
+Text Files(*.txt)|*.txt|All Type Files|*.*||
+####################################
+# Messages
+#
+# ASPI Messages
+Can't load ASPI manager.
+# CD Writer Messages
+Can't open Cue-Sheet file
+Error on Cue-Sheet:%s
+Bad parameters(Not acceptable command)
+Failured to open tray
+#5-----------
+Drive is busy.
+Disc is not BLANK!
+Bad position(TRACK):%s
+Unsupported type:%s
+Bad position(INDEX)：%s
+#10----------
+Unsupported INDEX number:%s
+Not exist file name:%s
+Bad format as FILE statement:%s
+Unsupported file type:%s
+Not exist image file:%s
+#15----------
+Unsupported statement:%s
+Not exist 'INDEX 01' at track%02d
+Abort by user
+Abort by Error
+Finished
+#20----------
+Max Speed
+Not selected File Name (Cue-Sheet)
+Cue-Sheet Files(*.cue *.cdm)|*.cue;*.cdm;*.iso|CCD Images(*.ccd)|*.ccd|All Type Files(*.*)|*.*||
+Finished Writing.
+Start Writing.
+#25----------
+Use Buffer-Underrun Protection.
+Write on Test Mode.
+Compiling Cue-Sheet:%s
+Image File:%s
+Selected drive is not CD-R compatible drive.
+#30----------
+Please insert BLANK media.
+No blank media.
+Can't detect commands.
+Drive Error:%s
+Size of Buffer in Drive:%dKB
+#35----------
+Performing Optimum Power Calibration.
+Error on OPC.
+Waiting finish of duration.
+Eject tray.
+Writing Lead-In.
+#40----------
+Error on Writing Lead-In.
+Error on Writing Pre-Gap.
+Writing main data.
+Failure to open of image file.
+Error on Writing.
+#45----------
+Writing Lead-Out.
+Error on Writing Lead-Out.
+Mastering CD.
+Creating Cue-Sheet.
+Error on Creating Cue-Sheet.
+#50----------
+Compiling Cue-Sheet.
+Writing Track01 (ISO/MODE1)
+Writing Track%02d (AUDIO)
+Data Track must be first track.
+Unsupported file type :Track %d
+#55----------
+Yes
+No
+Detected command : RAW+96
+Detected command : RAW+16
+Detected command : SAO
+#60----------
+#image creator message
+Successed in creating image file.
+Failured in creating image file.
+Finished creation.
+Start creation.
+Can't create file:%s
+#65----------
+Mastering track 01 (ISO/MODE1)
+Mastering track %02d (AUDIO)
+#drive capability message
+OK
+NG
+None
+#70----------
+#erase media message
+スレッド作成に失敗
+#main dialog message
+All session
+session %d
+Copy only first session at multisession CD. OK?
+Failured in analyzing sub code.
+#75----------
+Please insert CD media.
+Please select track in TOC window.
+Please select a drive.
+Do you erase media?
+Do you erase media at first?
+#80----------
+Writing again?
+Delete image files?
+#log message
+Failured in saving logs.
+#Masterer message
+New Folder
+New Folder%d
+#85----------
+Folder
+File
+Can't rename that file.
+Direct mapped from files
+WAV Files|*.wav|All Type Files|*.*||
+#90----------
+ISO Files|*.iso|All Type Files|*.*||
+Cue-Sheet Files(*.cue)|*.cue|All Type Files(*.*)|*.*||
+Oh! Image is empty.
+Oh! Will you create coaster?
+Mastering
+#95----------
+#MSF calculator message
+Please input bigger than 00:02:00 or equal.
+#Reader message
+Reading From :%s
+File Name(.cue) is empty.
+Ignore %d errors.
+Finished reading from CD.
+#100---------
+Can't open %s(Image file).
+Track %d-%d
+Sector
+Reading Track %d : %s
+Reading Track %d : MMC LBA(RAW)
+#105---------
+Store to : %s
+Can't open %s(Cue-Sheet).
+Create Cue-Sheet : %s
+Prevent gap
+Ignore error
+#110---------
+Failured in reading from CD
+Detecting read command
+Detected command : %s
+Failured in detecting command : Can't read audio track
+Turn on 'Intelligence bad sector scanner.'
+#115---------
+Durating error.
+Find the end of errors.
+Creating dummy sector.
+#read track message
+WAVE and ISO(*.wav,*.iso)|*.wav;*.iso|All Type Files|*.*||
+File Name is empty.
+#120---------
+#select drive message
+Please select a drive.
+#notify clearing log
+Clear log?
+#setting message
+Power Search (Fast)
+Linear Search
+Search All Sectors (Slow)
+#125---------
+ASPI Manager(WNASPI*.DLL)|WNASPI*.dll|External Module(*.DLL)|*.dll|All Type Files|*.*||
+Text Files(*.txt)|*.txt|All Type Files|*.*||
+#Subcode analyzer message
+Analyzing at :%s
+Finished analyzing.
+Session
+#130---------
+Analyzing %d session.
+Failured in analyzing sub code.
+Analyzing [Session %d/ Track%d]
+#toc message
+Can't save TOC.
+Fast error skipping is not working!
+#Added after version 2.42
+Reading session %d : %s
+#Added after version 2.45
+Use read engine
+Use write engine
+Multisession can be wrote when using RAW+96 command
+It isn't supported format:%s
+#140
+#Added after version 2.47
+Writing Lead-In of session %d
+Writing data of session %d
+Writing Lead-Out of session %d
+Image format : %s
+Product name of read drive name : %s
+#145
+Vendor of read drive : %s
+Firmware version of read drive : %s
+#Added after version 2.48
+Filename is too long so truncated.
+Original Name:%s
+Truncated Name:%s
+#150
+Analyzing Pregap area.
+Read sectors(%d ... 0 sector) of pregap area.
+Failed in analyzing pregap.
+Read CD-TEXT!
+Not existing CD-TEXT.
+#155
+Data tracks are not existing.
+Compare track %d
+Can't open the image file.
+Disaccorded
+Accorded
+#160
+This mode supports only single session.
+Reading %d-%d
+Reverse searching
+%02d:%02d.%02d(%6ld) Discover bad sectors.
+%02d:%02d.%02d(%6ld) Discover double sectors.
+#165
+Reverse reading
+%6ld - %06ld Find tail of the double sector area.
+Searching the error block.
+%06ld Skipping the error block.
+%06ld Tail of the error block.
+#170
+Reading sectors after the error block.

@@ -117,6 +117,28 @@ Func _ProgressBar_SetColors($hControl1, $hControl2, $sColor = "")
 EndFunc   ;==>_ProgressBar_SetColors
 
 
+Func _ProgressBar_ThemeModern_SetColors($hControl, $sColor = "")
+
+	Local $iColor
+
+	Switch $sColor
+		Case "Green"
+			$iColor = 0x7CCC7C
+		Case "Blue"
+			$iColor = 0x68CEFA
+		Case "Orange"
+			$iColor	= 0xFABA00
+		Case "Red"
+			$iColor = 0xFB9595
+		Case Else
+			$iColor = 0x969696
+	EndSwitch
+
+	GUICtrlSetBkColor($hControl, $iColor)
+
+EndFunc   ;==>_ProgressBar_SetColors
+
+
 Func __ProgressBar_Unhide($hControl)
 	If BitAND(GUICtrlGetState($hControl), $GUI_HIDE) = $GUI_HIDE Then
 		GUICtrlSetState($hControl, $GUI_SHOW)

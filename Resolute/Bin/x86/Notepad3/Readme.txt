@@ -2,7 +2,7 @@
 =                                                                              =
 =            Notepad3 - light-weight Scintilla-based text editor for Windows   =
 =                                                                              =
-=                                                   (c) Rizonesoft 2008-2020   =
+=                                                   (c) Rizonesoft 2008-2023   =
 =                                                 https://www.rizonesoft.com   =
 =                                                                              =
 ================================================================================
@@ -33,7 +33,7 @@ Changes compared to Flo's official Notepad2 (made in Notepad2-mod):
 Changes compared to the Notepad2-mod fork:
 ------------------------------------------
 - Additional syntax highlighting support for Awk, D, golang, MATLAB
-- State of the art Regular Expression search engine (Onigmu)
+- State of the art Regular Expression search engine (Oniguruma)
 - New toolbar icons based on Yusuke Kamiyaman's Fugue Icons 
   (Purchased by Rizonesoft)
 - Hyperlink Hotspot highlighting 
@@ -63,7 +63,7 @@ Windows 7, 8, 8.1 and 10 both 32-bit and 64-bit
 --------------------------------------------------------------------------------
 Development:
 ------------
-- Florian 'Flo' Balmer (Notepad2)       http://www.flos-freeware.ch
+- Florian 'Flo' Balmer (Notepad2)       https://www.flos-freeware.ch
 - RaiKoHoff                             https://github.com/RaiKoHoff
 
 --------------------------------------------------------------------------------
@@ -94,30 +94,36 @@ Lewis Van Winkle (TinyExpr)     https://github.com/codeplea/tinyexpr
 --------------------------------------------------------------------------------
 Acknowledgments:
 ----------------
+alex-ilin               https://github.com/alex-ilin
 alexantr                https://github.com/alexantr
-AlexIljin               https://github.com/AlexIljin
-craigo-                 https://github.com/craigo-/
+ashish12phnx            https://github.com/ashish12phnx
+bravo-hero              https://github.com/bravo-hero
+craigo-                 https://github.com/craigo-
 Crane70                 https://github.com/Crane70
 engelhro                https://github.com/engelhro
+geogeo-gr               https://github.com/geogeo-gr
 Hexaae                  https://github.com/Hexaae
 hpwamr                  https://github.com/hpwamr
-it4u                    https://github.com/it4u
-jmacasd                 https://github.com/jmacasd
+igorruckert             https://github.com/igorruckert
 jupester                https://github.com/jupester
+kayazeren               https://github.com/kayazeren
 kofifus                 https://github.com/kofifus
-kRaLL-Turko             https://github.com/kRaLL-Turko
 Lacn0755                https://github.com/Lacn0755
 leeoniya                https://github.com/leeoniya
 lhmouse                 https://github.com/lhmouse
+Lidgeu                  https://github.com/Lidgeu
 ltGuillaume             https://github.com/ltGuillaume
 maboroshin              https://github.com/maboroshin
 MadDogVachon            https://github.com/MadDogVachon
+Matteo-Nigro            https://github.com/Matteo-Nigro
+MelchiorGaspar          https://github.com/MelchiorGaspar
 Mitezuss                https://github.com/Mitezuss
-ohgree                  https://github.com/ohgree
-RaffaeleBianc0          https://github.com/RaffaeleBianc0
+RaiKoHoff               https://github.com/RaiKoHoff
 rizonesoft              https://github.com/rizonesoft
 Rudolfin                https://github.com/Rudolfin
+Stephan-P               https://github.com/Stephan-P
 ThreeLightsBeyond       https://github.com/ThreeLightsBeyond
+VenusGirl               https://github.com/VenusGirl
 xsak                    https://github.com/xsak
 zufuliu                 https://github.com/zufuliu
 
@@ -137,12 +143,12 @@ uthash                          https://troydhanson.github.io/uthash/license.htm
 uchardet                        https://www.freedesktop.org/wiki/Software/uchardet/#license
 TinyExpr                        https://github.com/codeplea/tinyexpr/blob/master/LICENSE
 Notepad3 icon by Vexels.com     https://www.vexels.com
-  -  designed by                mailto:smanashova@gmail.com
+  -  designed by                smanashova@gmail.com
 
 --------------------------------------------------------------------------------
 Notepad3 Licence:
 -----------------
-Notepad3 and MiniPath Copyright © 2008-2020 Rizonesoft, All rights reserved.
+Notepad3 and MiniPath Copyright © 2008-2023 Rizonesoft, All rights reserved.
 https://www.rizonesoft.com
 
 Redistribution and use in source and binary forms, with or without modification,

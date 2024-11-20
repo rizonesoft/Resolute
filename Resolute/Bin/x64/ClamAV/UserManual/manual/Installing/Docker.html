@@ -1,0 +1,506 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js clamav">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Docker - ClamAV Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="An open source malware detection toolkit and antivirus engine.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "clamav" : "clamav";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('clamav')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../Introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../../manual/Installing.html"><strong aria-hidden="true">2.</strong> Installing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Installing/Packages.html"><strong aria-hidden="true">2.1.</strong> Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Docker.html" class="active"><strong aria-hidden="true">2.2.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix.html"><strong aria-hidden="true">2.3.</strong> Unix from source (v0.104+)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Unix-old.html"><strong aria-hidden="true">2.4.</strong> Unix from source (v0.103-)</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Installing-from-source-Windows.html"><strong aria-hidden="true">2.5.</strong> Windows from source</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Community-projects.html"><strong aria-hidden="true">2.6.</strong> Community Projects</a></li><li class="chapter-item expanded "><a href="../../manual/Installing/Add-clamav-user.html"><strong aria-hidden="true">2.7.</strong> Add a service user account</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Usage/Configuration.html"><strong aria-hidden="true">3.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/SignatureManagement.html"><strong aria-hidden="true">3.2.</strong> Updating Signature Databases</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/Scanning.html"><strong aria-hidden="true">3.3.</strong> Scanning</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/OnAccess.html"><strong aria-hidden="true">3.3.1.</strong> On-Access Scanning</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Usage/Services.html"><strong aria-hidden="true">3.4.</strong> Running ClamAV Services</a></li><li class="chapter-item expanded "><a href="../../manual/Usage/ReportABug.html"><strong aria-hidden="true">3.5.</strong> Report a Bug</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures.html"><strong aria-hidden="true">4.</strong> Signatures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/DatabaseInfo.html"><strong aria-hidden="true">4.1.</strong> CVD Info File</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/DynamicConfig.html"><strong aria-hidden="true">4.2.</strong> Dynamic Configuration Settings</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AuthenticodeRules.html"><strong aria-hidden="true">4.3.</strong> Trusted and Revoked EXE Certificates</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/FileTypeMagic.html"><strong aria-hidden="true">4.4.</strong> File Type Recognition</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/AllowLists.html"><strong aria-hidden="true">4.5.</strong> Allow Lists</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/HashSignatures.html"><strong aria-hidden="true">4.6.</strong> Hash-based Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BodySignatureFormat.html"><strong aria-hidden="true">4.7.</strong> Content-based Signature Format</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Signatures/LogicalSignatures.html"><strong aria-hidden="true">4.7.1.</strong> Logical Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ExtendedSignatures.html"><strong aria-hidden="true">4.7.2.</strong> Extended Signatures</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Signatures/YaraRules.html"><strong aria-hidden="true">4.8.</strong> YARA Rules</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/PhishSigs.html"><strong aria-hidden="true">4.9.</strong> Phishing Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/BytecodeSignatures.html"><strong aria-hidden="true">4.10.</strong> Bytecode Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/ContainerMetadata.html"><strong aria-hidden="true">4.11.</strong> Container Metadata Signatures</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/EncryptedArchives.html"><strong aria-hidden="true">4.12.</strong> Archive Passwords (experimental)</a></li><li class="chapter-item expanded "><a href="../../manual/Signatures/SignatureNames.html"><strong aria-hidden="true">4.13.</strong> Signature Names</a></li></ol></li><li class="chapter-item expanded "><a href="../../manual/Development.html"><strong aria-hidden="true">5.</strong> For Developers</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../manual/Development/github-pr-basics.html"><strong aria-hidden="true">5.1.</strong> Pull Request Basics</a></li><li class="chapter-item expanded "><a href="../../manual/Development/clamav-git-work-flow.html"><strong aria-hidden="true">5.2.</strong> ClamAV Git Work Flow</a></li><li class="chapter-item expanded "><a href="../../manual/Development/personal-forks.html"><strong aria-hidden="true">5.3.</strong> Working with Your Fork</a></li><li class="chapter-item expanded "><a href="../../manual/Development/testing-pull-requests.html"><strong aria-hidden="true">5.4.</strong> Reviewing Pull Requests</a></li><li class="chapter-item expanded "><a href="../../manual/Development/development-builds.html"><strong aria-hidden="true">5.5.</strong> Building for Development</a></li><li class="chapter-item expanded "><a href="../../manual/Development/build-installer-packages.html"><strong aria-hidden="true">5.6.</strong> Building the Installer Packages</a></li><li class="chapter-item expanded "><a href="../../manual/Development/tips-and-tricks.html"><strong aria-hidden="true">5.7.</strong> Dev Tips & Tricks</a></li><li class="chapter-item expanded "><a href="../../manual/Development/performance-profiling.html"><strong aria-hidden="true">5.8.</strong> Performance Profiling</a></li><li class="chapter-item expanded "><a href="../../manual/Development/code-coverage.html"><strong aria-hidden="true">5.9.</strong> Computing Code Coverage</a></li><li class="chapter-item expanded "><a href="../../manual/Development/fuzzing-sanitizers.html"><strong aria-hidden="true">5.10.</strong> Fuzzing Sanitizers</a></li><li class="chapter-item expanded "><a href="../../manual/Development/libclamav.html"><strong aria-hidden="true">5.11.</strong> libclamav</a></li><li class="chapter-item expanded "><a href="../../manual/Development/Contribute.html"><strong aria-hidden="true">5.12.</strong> Contribute</a></li></ol></li><li class="chapter-item expanded "><a href="../../faq/faq.html"><strong aria-hidden="true">6.</strong> Frequently Asked Questions</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../faq/faq-whichversion.html"><strong aria-hidden="true">6.1.</strong> Selecting the Right Version of ClamAV for You</a></li><li class="chapter-item expanded "><a href="../../faq/faq-freshclam.html"><strong aria-hidden="true">6.2.</strong> FreshClam (Signature Updater)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-cvd.html"><strong aria-hidden="true">6.3.</strong> Signature Database (CVD)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-misc.html"><strong aria-hidden="true">6.4.</strong> Misc</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ml.html"><strong aria-hidden="true">6.5.</strong> Mailing Lists</a></li><li class="chapter-item expanded "><a href="../../faq/faq-safebrowsing.html"><strong aria-hidden="true">6.6.</strong> Safe Browsing</a></li><li class="chapter-item expanded "><a href="../../faq/faq-troubleshoot.html"><strong aria-hidden="true">6.7.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="../../faq/faq-scan-alerts.html"><strong aria-hidden="true">6.8.</strong> Interpreting Scan Alerts</a></li><li class="chapter-item expanded "><a href="../../faq/faq-upgrade.html"><strong aria-hidden="true">6.9.</strong> Upgrading</a></li><li class="chapter-item expanded "><a href="../../faq/faq-rust.html"><strong aria-hidden="true">6.10.</strong> Rust</a></li><li class="chapter-item expanded "><a href="../../faq/faq-win32.html"><strong aria-hidden="true">6.11.</strong> Win32</a></li><li class="chapter-item expanded "><a href="../../faq/faq-pua.html"><strong aria-hidden="true">6.12.</strong> PUA (Potentially Unwanted Application)</a></li><li class="chapter-item expanded "><a href="../../faq/faq-ignore.html"><strong aria-hidden="true">6.13.</strong> Ignore</a></li><li class="chapter-item expanded "><a href="../../faq/faq-uninstall.html"><strong aria-hidden="true">6.14.</strong> Uninstall</a></li><li class="chapter-item expanded "><a href="../../faq/faq-eol.html"><strong aria-hidden="true">6.15.</strong> ClamAV EOL Policy</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="../../community_resources/CommunityResources.html"><strong aria-hidden="true">7.</strong> Community Resources</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../../appendix/Appendix.html"><strong aria-hidden="true">8.</strong> Appendix</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../appendix/Terminology.html"><strong aria-hidden="true">8.1.</strong> Terminology</a></li><li class="chapter-item expanded "><a href="../../appendix/CvdPrivateMirror.html"><strong aria-hidden="true">8.2.</strong> Hosting a Private Database Mirror</a></li><li class="chapter-item expanded "><a href="../../appendix/Authenticode.html"><strong aria-hidden="true">8.3.</strong> Microsoft Authenticode Signature Verification</a></li><li class="chapter-item expanded "><a href="../../appendix/FileTypes.html"><strong aria-hidden="true">8.4.</strong> ClamAV File Types and Target Types</a></li><li class="chapter-item expanded "><a href="../../appendix/FunctionalityLevels.html"><strong aria-hidden="true">8.5.</strong> ClamAV Versions and Functionality Levels</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="clamav">Dark</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="clamav_light">Light</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ClamAV Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="clamav-in-docker"><a class="header" href="#clamav-in-docker">ClamAV in Docker</a></h1>
+<p>ClamAV can be run within a Docker container. This provides isolation from other processes by running it in a containerized environment. If new or unfamiliar with Docker, containers or cgroups see <a href="https://www.docker.com">docker.com</a>.</p>
+<h2 id="memory-ram-requirements"><a class="header" href="#memory-ram-requirements">Memory (RAM) Requirements</a></h2>
+<p>Whether you're using the official ClamAV docker images or third party images that run ClamAV, you will need to ensure that you have enough RAM.</p>
+<p>Recommended RAM for ClamAV (As of 2020/09/20):</p>
+<ul>
+<li>Minimum: 3 GiB</li>
+<li>Preferred: 4 GiB</li>
+</ul>
+<h3 id="why-is-this-much-ram-required"><a class="header" href="#why-is-this-much-ram-required">Why is this much RAM required?</a></h3>
+<p>ClamAV uses upwards of 1.2 GiB of RAM simply to load the signature definitions into matching structures in the construct we call an &quot;engine&quot;. This does not take into account any RAM required to process the files during the scanning process.</p>
+<p>ClamAV uses upwards of 2.4 GiB of RAM for a short period each day when loading new signature definitions. When the <code>clamd</code> processs reloads the databases after an update, the default behavior is for ClamAV to build a new engine based on the updated signatures first. Once loaded and once all scans that use the old engine have completed, the old engine is unloaded. This process is called &quot;concurrent reloading&quot; and enables scans to continue during the reload. As a consequence, <code>clamd</code> will use twice the amount of RAM for a brief period. During the reload.</p>
+<p>The <code>freshclam</code> process may also consume a sizeable chunk of memory when load-testing newly downloaded databases. It won't use quite as much as a <code>clamd</code> database reload, but it may still be enough to cause issues on some systems.</p>
+<p>If your container does not have enough RAM you can expect that the OS (or Docker) may kill your <code>clamd</code> process. Within Docker, this may cause your container to become unresponsive. If you're observing issues with ClamAV failing or becoming unresponsive once a day, it is likely that your system does not have enough RAM to run ClamAV.</p>
+<h3 id="what-can-i-do-to-minimize-ram-usage"><a class="header" href="#what-can-i-do-to-minimize-ram-usage">What can I do to minimize RAM usage?</a></h3>
+<h4 id="clamd-reload-memory-usage"><a class="header" href="#clamd-reload-memory-usage"><code>clamd</code> reload memory usage</a></h4>
+<p>You can minimize <code>clamd</code> RAM usage by setting <code>ConcurrentDatabaseReload no</code> in <code>clamd.conf</code>.</p>
+<p>The downside is that <code>clamd</code> will block any new scans until reload is complete.</p>
+<h4 id="freshclam-memory-usage"><a class="header" href="#freshclam-memory-usage"><code>freshclam</code> memory usage</a></h4>
+<p>You can disable <code>freshclam</code> database load testing to minimize RAM usage by setting <code>TestDatabases no</code> in <code>freshclam.conf</code>.</p>
+<p>The downside here is a risk that a download may fail in an unexpected way and that <code>freshclam</code> will unknowingly keep the broken database, causing <code>clamd</code> to fail to load/reload the broken file.</p>
+<h2 id="the-official-images-on-docker-hub"><a class="header" href="#the-official-images-on-docker-hub">The official images on Docker Hub</a></h2>
+<p>ClamAV image tags <a href="https://hub.docker.com/r/clamav/clamav">on Docker Hub</a> follow these naming conventions.</p>
+<p>All images come in two forms:</p>
+<ul>
+<li>
+<p><code>clamav/clamav:&lt;version&gt;</code>: A release preloaded with signature databases.</p>
+<p>Using this container will save the ClamAV project some bandwidth. Use this if you will keep the image around so that you don't download the entire database set every time you start a new container. Updating with FreshClam from existing databases set does not use much data.</p>
+</li>
+<li>
+<p><code>clamav/clamav:&lt;version&gt;_base</code>: A release with no signature databases.</p>
+<p>Use this container <strong>only</strong> if you mount a volume in your container under <code>/var/lib/clamav</code> to persist your signature database databases. This method is the best option because it will reduce data costs for ClamAV and for the Docker registry, but it does require advanced familiarity with Linux and Docker.</p>
+<blockquote>
+<p><em>Caution</em>: Using this image without mounting an existing database directory will cause FreshClam to download the entire database set each time you start a new container.</p>
+</blockquote>
+</li>
+</ul>
+<p>There are a selection of tags to help you get the versions you need:</p>
+<ul>
+<li>
+<p><code>clamav/clamav:&lt;MAJOR.MINOR.PATCH&gt;_base</code> and <code>clamav/clamav:&lt;MAJOR.MINOR.PATCH&gt;</code>: This is a tag for a specific image for a given patch version. The &quot;base&quot; version of this image will never change, and the non-base version will only ever be updated to have newer signature databases.</p>
+<p>If we need to publish a new image to resolve CVE's in the underlying dependencies, then another image will be created with a build-number suffix.</p>
+<p>For example: <code>0.104.2-2_base</code> is a new image to resolve security issues found in busybox in the <code>0.104.2_base</code> image.</p>
+</li>
+<li>
+<p><code>clamav/clamav:&lt;MAJOR.MINOR&gt;_base</code> and <code>clamav/clamav:&lt;MAJOR.MINOR&gt;</code>: This is a tag for the latest patch version of ClamAV 0.104. When the image for a new patch version is created, this tag will be updated so that it always points to the latest image for ClamAV 0.104.</p>
+</li>
+<li>
+<p><code>clamav/clamav:stable_base</code> and <code>clamav/clamav:stable</code>: These tags point to the latest stable patch version image. We use the word &quot;stable&quot; to make it clear that these do not track the latest commit in Github. As of 2022-02-15, that makes these equivalent to <code>0.104</code> and <code>0.104_base</code>. When 0.105 is released, these will be updated to track <code>0.105</code> and <code>0.105_base</code>.</p>
+</li>
+<li>
+<p><code>clamav/clamav:latest_base</code> and <code>clamav/clamav:latest</code>: These are the same as <code>clamav/clamav:stable_base</code> and <code>clamav/clamav:stable</code>. They exist because many users expect all images to have a &quot;latest&quot;.</p>
+</li>
+<li>
+<p><code>clamav/clamav:unstable_base</code> and <code>clamav/clamav:unstable</code>: These tags point to the latest commit in the <code>main</code> branch on github.com/Cisco-Talos/clamav. Provided something doesn't go wrong, these are updated every evening that something changes in the ClamAV Git repository.</p>
+</li>
+</ul>
+<h3 id="image-selection-recommendations"><a class="header" href="#image-selection-recommendations">Image Selection Recommendations</a></h3>
+<p>Instead of choosing the specific image for a patch release, choose the tag for a feature release, such as <code>clamav/clamav:0.104</code> or <code>clamav/clamav:0.104_base</code>.</p>
+<p>Only select a &quot;latest&quot; or &quot;stable&quot; tags if you're comfortable with the the risk involved with updating to a new feature release right away without evaluating it first.</p>
+<p>Choose the <code>_base</code> tag and set up a volume to persist your signature databases. This will save us and you bandwidth. You may choose to set up a container that has the Freshclam daemon enabled, and have multiple others that do not. The ClamD daemon in the all images will occasionally check to see if there are newer signatures in the mounted volume and will reload the databases as needed.</p>
+<p>ClamAV uses quite a bit of RAM to load the signature databases into memory. 2GB may be insufficient. Configure your containers to have 4GB of RAM.</p>
+<h3 id="end-of-life"><a class="header" href="#end-of-life">End of Life</a></h3>
+<p>The ClamAV Docker images are subject to ClamAV's <a href="../../faq/faq-eol.html">End-of-Life (EOL) policy</a>. After EOL for a given feature release, those images will no longer be updated and may be unable to download signature updates.</p>
+<h2 id="building-the-clamav-image"><a class="header" href="#building-the-clamav-image">Building the ClamAV image</a></h2>
+<p>While it is recommended to pull the image from our <a href="https://hub.docker.com/u/clamav/clamav">Docker Hub registry</a>, some may want to build the image locally instead.</p>
+<p>To do this, you will need to get the  <code>Dockerfile</code> and the supporting <code>scripts/</code> directory from the <a href="https://github.com/Cisco-Talos/clamav-docker/tree/main/clamav">clamav-docker Git repository</a>. Be sure to select the correct one for this ClamAV release.</p>
+<blockquote>
+<p><em>Tip</em>: For unreleased ClamAV versions, such as when building from the <code>main</code> git branch, you should select the files from the <code>clamav-dockere/clamav/unstable/&lt;distro&gt;</code> directory.</p>
+</blockquote>
+<p>Place the <code>Dockerfile</code> and <code>scripts/</code> directory in the ClamAV source directory.
+Then you can build the image. For example, run:</p>
+<pre><code class="language-bash">docker build --tag &quot;clamav:TICKET-123&quot; .
+</code></pre>
+<p>in the current directory. This will build the ClamAV image and tag it with the name &quot;clamav:TICKET-123&quot;. Any name can generally be used and it is this name that needs to be referred to later when running the image.</p>
+<h2 id="running-clamd"><a class="header" href="#running-clamd">Running ClamD</a></h2>
+<p>To run <code>clamd</code> in a Docker container, first, an image either has to be built or pulled from a Docker registry.</p>
+<h3 id="running-clamd-using-the-official-clamav-images-from-docker-hub"><a class="header" href="#running-clamd-using-the-official-clamav-images-from-docker-hub">Running ClamD using the official ClamAV images from Docker Hub</a></h3>
+<p>To pull the ClamAV &quot;unstable&quot; image from Docker Hub, run:</p>
+<pre><code class="language-bash">docker pull clamav/clamav:unstable
+</code></pre>
+<blockquote>
+<p><em>Tip</em>: Substitute <code>unstable</code> with a different version as needed.</p>
+</blockquote>
+<p>To pull <em>and run</em> the official ClamAV images from the Docker Hub registry, try the following command:</p>
+<pre><code class="language-bash">docker run \
+    --interactive \
+    --tty \
+    --rm \
+    --name &quot;clam_container_01&quot; \
+    clamav/clamav:unstable
+</code></pre>
+<p>The above creates an interactive container with the current TTY connected to it. This is optional but useful when getting started as it allows one to directly see the output and, in the case of <code>clamd</code>, send <code>ctrl-c</code> to close the container. The <code>--rm</code> parameter ensures the container is cleaned up again after it exits and the <code>--name</code> parameter names the container, so it can be referenced through other (Docker) commands, as several containers of the same image can be started without conflicts.</p>
+<blockquote>
+<p><em>Note</em>: Pulling is not always required. <code>docker run</code> will pull the image if it cannot be found locally. <code>docker run --pull always</code> will always pull beforehand to ensure the most up-to-date container is being used. Do not use <code>--pull always</code> with the larger ClamAV images.</p>
+</blockquote>
+<blockquote>
+<p><em>Tip</em>: It's common to see <code>-it</code> instead of <code>--interactive --tty</code>.</p>
+</blockquote>
+<blockquote>
+<p><em>Tip</em>: It's common to also publish (forward) the ClamAV TCP port to the local host to use the <a href="#tcp">TCP socket</a> using <code>--publish 3310:3310</code> in the <code>docker run</code> command</p>
+</blockquote>
+<h3 id="running-clamd-using-a-locally-built-image"><a class="header" href="#running-clamd-using-a-locally-built-image">Running ClamD using a Locally Built Image</a></h3>
+<p>You can run a container using an image built locally (<a href="#building-the-clamav-image">see &quot;Building the ClamAV Image&quot;</a>). Just run:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --name &quot;clam_container_01&quot; \
+    clamav:TICKET-123
+</code></pre>
+<h3 id="persisting-the-virus-database-volume"><a class="header" href="#persisting-the-virus-database-volume">Persisting the virus database (volume)</a></h3>
+<p>The virus database in <code>/var/lib/clamav</code> is by default unique to each container and thus is normally not shared. For simple setups this is fine, where only one instance of <code>clamd</code> is expected to run in a dockerized environment. However some use cases may want to efficiently share the database or at least persist it across short-lived ClamAV containers.</p>
+<p>To do so, you have two options:</p>
+<ol>
+<li>
+<p>Create a <a href="https://docs.docker.com/storage/volumes/">Docker volume</a> using the
+<code>docker volume</code> command.
+Volumes are completely managed by Docker and are the best choice for creating a persistent database volume.</p>
+<p>For example, create a &quot;clam_db&quot; volume:</p>
+<pre><code class="language-bash">docker volume create clam_db
+</code></pre>
+<p>Then start one or more containers using this volume. The first container to use a new database volume will download the full database set. Subsequent containers will use the existing databases and may update them as needed:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --name &quot;clam_container_01&quot; \
+    --mount source=clam_db,target=/var/lib/clamav \
+    clamav/clamav:unstable_base
+</code></pre>
+</li>
+<li>
+<p>Create a <a href="https://docs.docker.com/storage/bind-mounts/">Bind Mount</a> that maps a file system directory to a path within the container. Bind Mounts depend on the directory structure, permissions, and operating system of the Docker host machine.</p>
+<p>Run the container with these arguments to mount the a directory from your host environment as a volume in the container.</p>
+<pre><code class="language-bash">    --mount type=bind,source=/path/to/databases,target=/var/lib/clamav
+</code></pre>
+<p>When doing this, it's best to use the <code>&lt;version&gt;_base</code> image tags so as to save on bandwith. E.g.:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --name &quot;clam_container_01&quot; \
+    --mount type=bind,source=/path/to/databases,target=/var/lib/clamav \
+    clamav/clamav:unstable_base
+</code></pre>
+<blockquote>
+<p><em>Disclaimer</em>: When using a Bind Mount, the container's entrypoint script will change ownership of this directory to its &quot;clamav&quot; user. This enables FreshClam and ClamD with the required permissions to read and write to the directory, though these changes will also affect those files on the host.</p>
+</blockquote>
+</li>
+</ol>
+<p>If you're thinking about running multiple containers that share a single database volume, <a href="#multiple-containers-sharing-the-same-mounted-databases">here are some notes on how this might work</a>.</p>
+<h2 id="running-clamdscan"><a class="header" href="#running-clamdscan">Running Clam(D)Scan</a></h2>
+<p>Scanning files using <code>clamscan</code> or <code>clamdscan</code> is possible in various ways with Docker. This section briefly describes them, but the other sections of this document are best read before hand to better understand some of the concepts.</p>
+<p>One important aspect is however to realize that Docker by default does not have access to any of the hosts files. And so to scan these within Docker, they need to be mounted with a <a href="https://docs.docker.com/storage/bind-mounts/">bind mount</a> to be made accessible.</p>
+<p>For example, running the container with these arguments ...</p>
+<pre><code class="language-bash">    --mount type=bind,source=/path/to/scan,target=/scandir
+    --mount type=bind,source=/path/to/scan,target=/scandir
+</code></pre>
+<p>... would make the hosts file/directory <code>/path/to/scan</code> available in the container as <code>/scandir</code> and thus invoking <code>clamscan</code> would thus be done on <code>/scandir</code>.</p>
+<p>Note that while technically possible to run either scanners via <code>docker exec</code> this is not described as it is unlikely the container has access to the files to be scanned.</p>
+<h3 id="clamscan"><a class="header" href="#clamscan">ClamScan</a></h3>
+<p>Using <code>clamscan</code> outside of the Docker container is how normally <code>clamscan</code> is invoked. To make use of the available shared dockerized resources however, it is possible to expose the virus database and share that for example. E.g. it could be possible to run a Docker container with only the <code>freshclam</code> daemon running, and share the virus database directory <code>/var/lib/clamav</code>. This could be useful for file servers for example, where only <code>clamscan</code> is installed on the host, and <code>freshclam</code> is managed in a Docker container.</p>
+<blockquote>
+<p><em>Note</em>: Running the <code>freshclam</code> daemon separated from <code>clamd</code> is less recommended, unless the <code>clamd</code> socket is shared with <code>freshclam</code> as <code>freshclam</code> would not be able to inform <code>clamd</code> of database updates.</p>
+</blockquote>
+<h3 id="dockerized-clamscan"><a class="header" href="#dockerized-clamscan">Dockerized ClamScan</a></h3>
+<p>To run <code>clamscan</code> in a Docker container, the Docker container can be invoked as:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --mount type=bind,source=/path/to/scan,target=/scandir \
+    clamav/clamav:unstable \
+    clamscan /scandir
+</code></pre>
+<p>However, this will use whatever signatures are found in the image, which may be slightly out of date. If using <code>clamscan</code> in this way, it would be best to use a <a href="#running-with-a-mounted-database-directory-volume">database volume</a> that is up-to-date so that you scan with the latest signatures. E.g.:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --mount type=bind,source=/path/to/scan,target=/scandir \
+    --mount type=bind,source=/path/to/databases,target=/var/lib/clamav \
+    clamav/clamav:unstable_base \
+    clamscan /scandir
+</code></pre>
+<h3 id="clamdscan"><a class="header" href="#clamdscan">ClamDScan</a></h3>
+<p>As with <code>clamscan</code>, <code>clamdscan</code> can also be run when installed on the host, by connecting to the dockerized <code>clamd</code>. This can be done by either pointing <code>clamdscan</code> to the exposed TCP/UDP port or unix socket.</p>
+<h3 id="dockerized-clamdscan"><a class="header" href="#dockerized-clamdscan">Dockerized ClamDScan</a></h3>
+<p>Running both <code>clamd</code> and <code>clamdscan</code> is also easily possible, as all that is needed is the shared socket between the two containers. The only cavaet here is to:</p>
+<ol>
+<li>mount the files to be scanned in the container that will run <code>clamd</code>, or</li>
+<li>mount the files to be scanned in the container that will <code>clamdscan</code> run if using <code>clamdscan --stream</code>. The <code>--stream</code> option will be slower, but enables submitting files from a different machine on a network.</li>
+</ol>
+<p>For example:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --mount type=bind,source=/path/to/scan,target=/scandir \
+    --mount type=bind,source=/var/lib/docker/data/clamav/sockets/,target=/run/clamav/ \
+    clamav/clamav:unstable
+</code></pre>
+<pre><code class="language-bash">docker run -it --rm \
+    --mount type=bind,source=/path/to/scan,target=/scandir \
+    --mount type=bind,source=/var/lib/docker/data/clamav/sockets/,target=/run/clamav/ \
+    clamav/clamav:unstable_base \
+    clamdscan /scandir
+</code></pre>
+<h2 id="controlling-the-container"><a class="header" href="#controlling-the-container">Controlling the container</a></h2>
+<p>The ClamAV container actually runs both <code>freshclam</code> and <code>clamd</code> daemons by default. Optionally available to the container is ClamAV's milter daemon. To control the behavior of the services started within the container, the following flags can be passed to the <code>docker run</code> command with the <code>--env</code> (<code>-e</code>) parameter.</p>
+<ul>
+<li>CLAMAV_NO_CLAMD [true|<strong>false</strong>] Do not start <code>clamd</code>.
+(default: <code>clamd</code> daemon is started)</li>
+<li>CLAMAV_NO_FRESHCLAMD [true|<strong>false</strong>] Do not start the <code>freshclam</code> daemon.
+(default: <code>freshclam</code> daemon is started)</li>
+<li>CLAMAV_NO_MILTERD [<strong>true</strong>|false] Do not start the <code>clamav-milter</code> daemon.
+(default: <code>clamav-milter</code> daemon is <strong>not</strong> started)</li>
+<li>CLAMD_STARTUP_TIMEOUT [integer] Seconds to wait for <code>clamd</code> to start.
+(default: 1800)</li>
+<li>FRESHCLAM_CHECKS [integer] <code>freshclam</code> daily update frequency.
+(default: once per day)</li>
+</ul>
+<p>So to additionally also enable <code>clamav-milter</code>, the following flag can be added:</p>
+<pre><code class="language-bash">    --env 'CLAMAV_NO_MILTERD=false'
+</code></pre>
+<p>Further more, all of the configuration files that live in <code>/etc/clamav</code> can be overridden by doing a volume-mount to the specific file. The following argument can be added for this purpose. The example uses the entire configuration directory, but this can be supplied multiple times if individual files deem to be replaced.</p>
+<pre><code class="language-bash">    --mount type=bind,source=/full/path/to/clamav/,target=/etc/clamav
+</code></pre>
+<blockquote>
+<p><em>Note</em>: Even when disabling the <code>freshclam</code> daemon, <code>freshclam</code> will always run at least once during container startup if there is no virus database. While not recommended, the virus database location itself <code>/var/lib/clamav/</code> could be a persistent Docker volume. This however is slightly more advanced and out of scope of this document.</p>
+</blockquote>
+<h2 id="connecting-to-the-container"><a class="header" href="#connecting-to-the-container">Connecting to the container</a></h2>
+<h3 id="executing-commands-within-a-running-container"><a class="header" href="#executing-commands-within-a-running-container">Executing commands within a running container</a></h3>
+<p>To connect to a running ClamAV container, <code>docker exec</code> can be used to run a command on an already running container. To do so, the name needs to be either obtained from <code>docker ps</code> or supplied during container start via the <code>--name</code> parameter. The most interesting command in this case can be <code>clamdtop</code>.</p>
+<pre><code class="language-bash">docker exec --interactive --tty &quot;clamav_container_01&quot; clamdtop
+</code></pre>
+<p>Alternatively, a shell can be started to inspect and run commands within the
+container as well.</p>
+<pre><code class="language-bash">docker exec --interactive --tty &quot;clamav_container_01&quot; /bin/sh
+</code></pre>
+<h3 id="unix-sockets"><a class="header" href="#unix-sockets">Unix sockets</a></h3>
+<p>The default socket for <code>clamd</code> is located inside the container as <code>/tmp/clamd.sock</code> and can be connected to when exposed via a Docker volume mount. To ensure, that <code>clamd</code> within the container can freely create and remove the socket, the path for the socket is to be volume-mounted, to expose it for others on the same host to use. The following volume can be used for this purpose. Do ensure that the directory on the host actually exists and clamav inside the container has permission to access it. Caution is required when managing permissions, as incorrect permission could open clamd for anyone on the host system.</p>
+<pre><code class="language-bash">    --mount type=bind,source=/var/lib/docker/data/clamav/sockets/,target=/tmp/
+</code></pre>
+<blockquote>
+<p><em>Note</em>: If you override the <code>LocalSocket</code> option with a custom <code>clamd.conf</code> config file, then you may find the <code>clamd.sock</code> file in a different location.</p>
+</blockquote>
+<p>With the socket exposed to the host, any other service can now talk to <code>clamd</code> as well. If for example <code>clamdtop</code> where installed on the local host, calling</p>
+<pre><code class="language-bash">clamdtop &quot;/var/lib/docker/data/clamav/sockets/clamd.sock&quot;
+</code></pre>
+<p>should work just fine. Likewise, running <code>clamdtop</code> in a different container, but sharing the socket will equally work. While <code>clamdtop</code> works well as an example here, it is of course important to realize, this can also be used to connect a mail server to <code>clamd</code>.</p>
+<h3 id="tcp"><a class="header" href="#tcp">TCP</a></h3>
+<p>ClamAV in the official Docker images is configured to listen for TCP connections on these ports:</p>
+<ul>
+<li><code>clamd</code>: 3310</li>
+<li><code>clamav-milter</code>: 7357</li>
+</ul>
+<p>While <code>clamd</code> and <code>clamav-milter</code> will listen on the above TCP ports, Docker does not expose these by default to the host. Only within containers can these ports be accessed. To expose, or &quot;publish&quot;, these ports to the host, and thus potentially over the (inter)network, the <code>--publish</code> (or <code>--publish-all</code>) flag to <code>docker run</code> can be used. While more advanced/secure mappings can be done as per documentation, the basic way is to <code>--publish [&lt;host_port&gt;:]&lt;container_port&gt;</code> to make the port available to the host.</p>
+<pre><code class="language-bash">    --publish 13310:3310 \
+    --publish 7357
+</code></pre>
+<p>The above would thus publish:</p>
+<ul>
+<li><code>clamd</code> port <code>3310</code> as <code>13310</code> on the host</li>
+<li><code>milter</code> port <code>7357</code> as a <em>random</em> to the host. The <em>random</em> port can be inspected via <code>docker ps</code>.</li>
+</ul>
+<p>But if you're just running one ClamAV container, you probably will just want to use the default port numbers, which are the same port numbers suggested in the <code>clamd.conf.sample</code> file provided with ClamAV:</p>
+<pre><code class="language-bash">    --publish 3310:3310 \
+    --publish 7357:7357
+</code></pre>
+<blockquote>
+<p><strong>Warning</strong>: Extreme caution is to be taken when using <code>clamd</code> over TCP as there are no protections on that level. All traffic is un-encrypted. Extra care is to be taken when using TCP communications.</p>
+</blockquote>
+<h2 id="container-clamd-health-check"><a class="header" href="#container-clamd-health-check">Container ClamD health-check</a></h2>
+<p>Docker has the ability to run simple <code>ping</code> checks on services running inside containers. If <code>clamd</code> is running inside the container, Docker will on occasion send a <code>ping</code> to <code>clamd</code> on the default port and wait for the pong from <code>clamd</code>. If <code>clamd</code> fails to respond, Docker will treat this as an error. The healthcheck results can be viewed with <code>docker inspect</code>.</p>
+<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
+<p>The performance impact of running <code>clamd</code> in Docker is negligible. Docker is in essence just a wrapper around Linux's cgroups and cgroups can be thought of as <code>chroot</code> or FreeBSD's <code>jail</code>. All code is executed on the host without any translation. Docker does however do some isolation (through cgroups) to isolate the various systems somewhat.</p>
+<p>Of course, nothing in life is free, and so there is some overhead. Disk-space being the most prominent one. The Docker container might have some duplication of files for example between the host and the container. Further more, also RAM memory may be duplicated for each instance, as there is no RAM-deduplication. Both of which can be solved on the host however. A filesystem that supports disk-deduplication and a memory manager that does RAM-deduplication.</p>
+<p>The base container image in itself is already quite small 80 / 225 MB (compressed/uncompressed) at the time of this writing, this cost is still very tiny, where the advantages are very much worth the cost in general.</p>
+<p>The container including the virus database is about 300 / 456 MB (compressed/uncompressed) at the time of this writing.</p>
+<h2 id="bandwidth"><a class="header" href="#bandwidth">Bandwidth</a></h2>
+<p>Please, be kind when using 'free' bandwidth, both for the virus databases but also the Docker registry. Try not to download the entire database set or the larger ClamAV database images on a regular basis.</p>
+<h2 id="advanced-container-configurations"><a class="header" href="#advanced-container-configurations">Advanced container configurations</a></h2>
+<h3 id="multiple-containers-sharing-the-same-mounted-databases"><a class="header" href="#multiple-containers-sharing-the-same-mounted-databases">Multiple containers sharing the same mounted databases</a></h3>
+<p>You can run multiple containers that share the same database volume, but be aware that the FreshClam daemons on each would compete to update the databases. Most likely, one would update the databases and trigger its ClamD to load the new databases, while the others would be oblivious to the new databases and would continue with the old signatures until the next ClamD self-check.</p>
+<p>This is fine, honestly. It won't take that long before the new signatures are detected by ClamD's self-check and the databases are reloaded automatically.</p>
+<p>To reload the databases on all ClamD containers immediately after an update, you could <a href="#controlling-the-container">disable the FreshClam daemon</a> when you start the containers. Later, use <code>docker exec</code> to perform an update and again as needed to have ClamD load updated databases.</p>
+<blockquote>
+<p><em>Note</em>: This really isn't necessary but you could do this if you wish.</p>
+</blockquote>
+<p>Exactly how you orchestrate this will depend on your environment. You might do something along these lines:</p>
+<ol>
+<li>
+<p>Create a &quot;clam_db&quot; volume, if you don't already have one:</p>
+<pre><code class="language-bash">docker volume create clam_db
+</code></pre>
+</li>
+<li>
+<p>Start your containers:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --name &quot;clam_container_01&quot; \
+    --mount source=clam_db,target=/var/lib/clamav \
+    --env 'CLAMAV_NO_FRESHCLAMD=true' \
+    clamav/clamav:0.104_base
+</code></pre>
+<p>Wait for the first one to download the databases (if it's a new database volume). Then start more:</p>
+<pre><code class="language-bash">docker run -it --rm \
+    --name &quot;clam_container_02&quot; \
+    --mount source=clam_db,target=/var/lib/clamav \
+    --env 'CLAMAV_NO_FRESHCLAMD=true' \
+    clamav/clamav:0.104_base
+</code></pre>
+</li>
+<li>
+<p>Check for updates, as needed:</p>
+<pre><code class="language-bash">docker exec -it clam_container_01 freshclam --on-update-execute=EXIT_1 || \
+if [ $? == 1 ]; then \
+    docker exec -it clam_container_01 clamdscan --reload; \
+    docker exec -it clam_container_02 clamdscan --reload; \
+fi
+</code></pre>
+</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../manual/Installing/Packages.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../manual/Installing/Installing-from-source-Unix.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../manual/Installing/Packages.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../manual/Installing/Installing-from-source-Unix.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+        <script type="text/javascript">
+            window.playground_line_numbers = true;
+        </script>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+        <script src="../../ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mode-rust.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-dawn.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../theme-tomorrow_night.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>
