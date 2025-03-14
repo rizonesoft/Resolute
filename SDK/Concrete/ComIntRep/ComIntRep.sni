@@ -51,14 +51,14 @@ File=%RootDir%\Sounds\Welcome.wav
 [Sources]
 
 [Environment]
-ScriptPath=Z:\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
+ScriptPath=R:\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
 Company=Rizonesoft
 CompanyURL=https://www.rizonesoft.com
 Name=Complete Internet Repair
 ShortName=ComIntRep
 Description=Complete Internet Repair
 Type=N
-Icon=Z:\Resolute\SDK\Resources\Icons\ComIntRep.ico
+Icon=R:\Resolute\SDK\Resources\Icons\ComIntRep.ico
 Version=11.1.3.6508
 VersionMajor=11
 VersionMaintenance=3
@@ -68,13 +68,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=ComIntRep.exe
 OutFileX64=ComIntRep_X64.exe
-OutFilePath=Z:\Resolute\Resolute\ComIntRep.exe
-OutFileX64Path=Z:\Resolute\Resolute\ComIntRep_X64.exe
+OutFilePath=R:\Resolute\Resolute\ComIntRep.exe
+OutFileX64Path=R:\Resolute\Resolute\ComIntRep_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=Z:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508
+DistributionPath=R:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508
 DistributionName=ComIntRep_6508
-FullDistributionPath=Z:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508\ComIntRep_6508
+FullDistributionPath=R:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508\ComIntRep_6508
 DistroSourceName=ComIntRep_6508_Source
-DistroSourceFullPath=Z:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508\ComIntRep_6508_Source
+DistroSourceFullPath=R:\Resolute\SDK\Concrete\ComIntRep\Distribution\6508\ComIntRep_6508_Source

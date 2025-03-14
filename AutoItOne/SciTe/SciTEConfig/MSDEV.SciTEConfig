@@ -1,0 +1,31 @@
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# START: DO NOT CHANGE ANYTHING AFTER THIS LINE     #-#-#-#-#
+# Jon's Standard MSDEV Color scheme
+#------------------------------------------------------------
+font.base=font:Verdana,size:10,$(font.override)
+font.monospace=font:Courier New,size:10
+
+style.au3.32=style.*.32=$(font.base),back:#F0F4F9    #Background
+caret.line.back=#FFFED8                                #CaretLineBackground
+style.au3.34=fore:#0000FF,back:#F0F4F9                # Brace highlight
+style.au3.35=fore:#009933,back:#F0F4F9                # Brace incomplete highlight
+style.au3.0=fore:#000000,back:#F0F4F9                #White space
+style.au3.1=fore:#009933,back:#F0F4F9                #Comment line
+style.au3.2=fore:#669900,italics,back:#F0F4F9        #Comment block
+style.au3.3=fore:#004040,back:#F0F4F9                #Number
+style.au3.4=fore:#000080,italics,back:#F0F4F9        #Function
+style.au3.5=fore:#0000FF,back:#F0F4F9                #Keyword
+style.au3.6=fore:#800000,back:#F0F4F9                #Macro
+style.au3.7=fore:#008080,back:#F0F4F9                #String
+style.au3.8=fore:#000000,back:#F0F4F9                #Operator
+style.au3.9=fore:#5A5A5A,back:#F0F4F9                #Variable
+style.au3.10=fore:#B05C00,back:#F0F4F9                #Sent keys
+style.au3.11=fore:#0000FF,italics,back:#F0F4F9        #Pre-Processor
+style.au3.12=fore:#ABB1FA,italics,back:#F0F4F9        #Special
+style.au3.13=fore:#C00000,back:#F0F4F9                #Abbrev-Expand
+style.au3.14=fore:#000080,bold,back:#F0F4F9            #Com Objects
+style.au3.15=fore:#0080FF,italics,back:#F0F4F9        #Standard UDF's
+style.au3.16=fore:#0080FF,italics,back:#F0F4F9#User UDF's
+
+# END => DO NOT CHANGE ANYTHING BEFORE THIS LINE  #-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#

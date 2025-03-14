@@ -1,0 +1,189 @@
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# START: DO NOT CHANGE ANYTHING AFTER THIS LINE     #-#-#-#-#
+# mLipok's Font&Color scheme for low contrast LCD Display
+#------------------------------------------------------------
+font.quality=4
+font.base=font:Verdana,size:10,$(font.override)
+font.monospace=font:Courier New,size:11
+
+selection.fore=#E6E4FA
+selection.alpha=256
+selection.back=#9488C8
+
+indicators.alpha=255
+
+#InLine Errors setting style.error.* : .0 = DEFAULT .1=WARRNING .2=ERROR .3=FATALERROR
+error.inline=1
+style.error.0=fore:#FFFFFF,back:#D00064,bold,xfont:Consolas,size:12
+style.error.1=fore:#FF0000,back:#FFFF00,bold,xfont:Consolas,size:12
+style.error.2=fore:#FFFFFF,back:#FF0000,bold,xfont:Consolas,size:12
+style.error.3=fore:#FFFFFF,back:#FF6400,bold,xfont:Consolas,size:12
+calltips.set.above=0
+calltips.color.highlight=#FF0000
+
+#~ highlight.current.word=1
+#~ highlight.current.word.by.style=0
+#~ highlight.current.word.autoselectword=0
+#~ highlight.current.word.wholeword=0
+#~ highlight.current.word.matchcase=0
+#~ highlight.current.word.minlength=3
+highlight.current.word.colour=#DE9EAA
+#~ highlight.current.word.indicator=style:box,color:#000000,under,outlinealpha:256,fillalpha:256
+visible.policy.strict=1
+visible.policy.lines=8
+
+#CaretLine
+caret.width=3
+#~ caret.line.back=#66CC80
+caret.line.back=#FDF268
+caret.line.back.alpha=256
+
+#White space
+style.au3.0=fore:#000000,bold,back:#F0F4F9
+#Comment line
+style.au3.1=fore:#008000,italics,bold,back:#F0F4F9
+#Comment block
+style.au3.2=fore:#008000,italics,bold,back:#F0F4F9
+#Number
+style.au3.3=fore:#0000FF,bold,back:#F0F4F9
+#Function
+style.au3.4=fore:#000090,bold,back:#F0F4F9
+#Keyword
+style.au3.5=fore:#0000FF,bold,back:#F0F4F9
+#Macro
+style.au3.6=fore:#808000,bold,back:#F0F4F9
+#String
+style.au3.7=fore:#FF0000,bold,back:#F0F4F9
+#Operator
+style.au3.8=fore:#FF8000,bold,back:#F0F4F9
+#Variable
+style.au3.9=fore:#5A5A5A,bold,back:#F0F4F9
+#Sent keys
+style.au3.10=fore:#808080,bold,back:#F0F4F9
+#Pre-Processor
+style.au3.11=fore:#808000,bold,back:#F0F4F9
+#Special
+style.au3.12=fore:#DC143C,bold,back:#F0F4F9
+#Abbrev-Expand
+style.au3.13=fore:#FF0000,bold,underlined,back:#F0F4F9
+#Com Objects
+style.au3.14=fore:#993399,bold,back:#F0F4F9
+#Standard UDF's
+style.au3.15=fore:#0080FF,bold,back:#F0F4F9
+#User UDF's
+style.au3.16=fore:#0080FF,italics,underlined,back:#F0F4F9
+#Background
+style.au3.32=style.*.32=$(font.base),back:#F0F4F9
+#Line Numbers
+style.au3.33=fore:#000000,bold,back:#A0E0F0
+#Brace highlight
+style.au3.34=fore:#0000FF,bold,back:#F0F4F9
+#Brace incomplete highlight
+style.au3.35=fore:#008000,italics,bold,back:#F0F4F9
+#Indentation guides
+style.au3.37=fore:#00AAFF,back:FFFFFF
+#Calltips
+style.au3.38=fore:#050505,back:#85E9FE
+
+# Lua styles
+#Default
+style.lua.32=fore:#000000,bold,back:#F0F4F9
+# White space: Visible only in View Whitespace mode (or if it has a back colour)
+style.lua.0=fore:#F07070,bold
+# Block comment (Lua 5.0)
+style.lua.1=$(colour.code.comment.box),$(font.code.comment.box),back:#D0F0F0,eolfilled
+# Line comment
+style.lua.2=$(colour.code.comment.line),$(font.code.comment.line)
+# Doc comment -- Not used in Lua (yet?)
+style.lua.3=$(colour.notused),bold,$(font.notused)
+# Number
+style.lua.4=fore:#E000F4,bold,italics
+# Keyword
+style.lua.5=fore:#0000FF,bold
+# (Double quoted) String
+style.lua.6=fore:#F07070,bold
+# Character (Single quoted string)
+style.lua.7=fore:#F07070,bold
+# Literal string
+style.lua.8=fore:#F07070,bold
+# Preprocessor (obsolete in Lua 4.0 and up)
+style.lua.9=$(colour.preproc),bold
+# Operators
+style.lua.10=$(colour.operator),bold
+# Identifier (everything else...)
+style.lua.11=fore:#808080,bold
+# End of line where string is not closed
+style.lua.12=back:#E0C0E0,bold,eolfilled
+# Other keywords (bozo test colors, but toned down ;)
+style.lua.13=$(style.lua.5),bold,back:#F5FFF5
+style.lua.14=$(style.lua.5),bold,back:#F5F5FF
+style.lua.15=$(style.lua.5),bold,back:#FFF5F5
+style.lua.16=$(style.lua.5),bold,back:#FFF5FF
+style.lua.17=$(style.lua.5),bold,back:#FFFFF5
+style.lua.18=$(style.lua.5),bold,back:#FFA0A0
+style.lua.19=$(style.lua.5),bold,back:#FFF5F5
+# Labels
+style.lua.20=fore:#7F7F00,bold
+# Braces are only matched in operator style
+braces.lua.style=10,bold
+
+
+# Properties styles
+file.patterns.props=*.properties;*.session;*.ini;*.inf;*.reg;*.url;*.cfg;*.cnf;*.aut;*.SciTEConfig
+# Properties style: Default
+style.props.0=fore:#000000,bold
+# Properties style: Comment
+style.props.1=fore:#009000,bold,$(font.comment)
+# Properties style: Section
+style.props.2=$(colour.string),bold,back:#EFF0F0,eolfilled
+# Properties style: Assignment operator
+style.props.3=fore:#FF0000,bold
+# Properties style: Default value (@)
+style.props.4=$(colour.preproc)
+# Properties style: Key
+style.props.5=fore:#0060E0,bold
+# Properties style: Line Numbers
+style.props.33=fore:#000000,bold,back:#A0E0F0
+# Properties style: Matched Operators
+style.props.32=fore:#000000,bold
+style.props.34=fore:#0000FF,bold
+style.props.35=fore:#FF0000,bold
+
+# Default
+style.json.0=fore:FFFFFF,bold
+# Number
+style.json.1=fore:#007F7F,bold
+# String
+style.json.2=fore:#7F0000,bold
+# Unclosed string
+style.json.3=fore:#FFFFFF,back:#FF0000,eolfilled
+# Property name
+style.json.4=fore:#880AE8,bold
+# Escape sequence
+style.json.5=fore:#0B982E
+# Line comment
+style.json.6=fore:#05BBAE,bold,italics
+# Block comment
+style.json.7=$(style.json.6),bold
+# Operator
+style.json.8=fore:#18644A,bold
+# URL/IRI
+style.json.9=fore:#0000FF,bold
+# JSON-LD compact IRI
+style.json.10=fore:#D137C1,bold
+# JSON keyword
+style.json.11=fore:#0BCEA7,bold
+# JSON-LD keyword
+style.json.12=fore:#EC2806,bold
+# Parsing error
+style.json.13=fore:#FFFFFF,bold,back:#FF0000
+
+#Background
+style.*.32=style.*.32=$(font.base),back:#F0F4F9
+#Line Numbers
+style.*.33=fore:#000000,bold,back:#A0E0F0
+#Indentation guides
+style.*.37=fore:#00AAFF,back:FFFFFF
+
+# END => DO NOT CHANGE ANYTHING BEFORE THIS LINE  #-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#

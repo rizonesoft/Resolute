@@ -1,0 +1,68 @@
+
+  Translate
+
+-----------------------------
+
+Website: http://softwarespot.wordpress.com/
+Language: Multi-language
+
+
+  Description
+-----------------------------
+Translating an application to your language is easy to do and will help the application reach a wider audience thanks to your invaluable input. To translate the language file find a language string e.g. 'ABOUT=About the application' and then translate the string after the equals sign (=). Therefore in this example you would translate 'About the Application' (minus the quotes.)
+
+During the translation process you will come across 'special commands' (see below) that shouldn't be translated, this is because the data that is replaced with these are static and can't be translated e.g. size of a file or a URL string.
+
+
+  Recognition
+-----------------------------
+If you wish to receive recognition for your hard work then please complete the following section at the end of the language file.
+
+[Author]
+AUTHOR=Your Name
+VERSION=Version number of the language file, this is the latest version of the application. 
+UPDATED=Date of when the language file was updated in the format DD/MM/YYYY. [e.g. 01/01/20XX]
+
+
+  Country flag
+-----------------------------
+In certain applications a country flag will be displayed next to the language, therefore the following section should be completed with an ISO_3166-1 country code, for example United Kingdom is gb, United States is us & France is fr. If you are unware of your country code please have a look at wikipedia [http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2] to determine the correct country code.
+
+The flags used are provided by famfamfam [http://www.famfamfam.com/lab/icons/flags/]
+
+[Country]
+CODE=gb
+
+
+  Encoding
+-----------------------------
+When saving a new language file ensure the encoding is set to unicode, if you're editing the original English translation then this doesn't apply.
+
+
+  How to submit
+-----------------------------
+Upload the completed language file to a file sharing site e.g. PasteBin.com, Dropbox.com or localhostr.com and then send the link using the contact page on the website.
+
+
+  General commands
+-----------------------------
+The following commands are present in all applications created by softwarespot.
+
+%COPYRIGHT% - The copyright notice for the application. [e.g. softwarepot (C) 20XX]
+%LICENSE% - The license of the application. [e.g. GPLv3]
+%PROGRAMNAME% - Name of the application. [e.g. Translator]
+%VERSION% - The version number of the application. [e.g. 1.0.0.0]
+%WEBSITE% - Website of the application. [e.g. http://softwarespot.wordpress.com/translator]
+
+%LANGUAGE% - Language of the current file being used in the application. [e.g. English]
+%LANGUAGEAUTHOR% - The author of the language file. [e.g. Your Name]
+%LANGUAGEUPDATED% - Date of when the language file was updated in the UK format DD/MM/YYYY. [e.g. 01/01/20XX]
+%LANGUAGEVERSION% - Version number of the language file, this is the latest version of the application. 
+
+
+  Program commands
+-----------------------------
+The following commands are specific to this application only.
+
+%CREATIONDATE% - Date of when the file was created.
+%TOTALNUMBER% - Total number of Functions in the .au3 file.

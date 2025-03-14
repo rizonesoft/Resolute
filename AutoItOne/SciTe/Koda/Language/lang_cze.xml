@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<language>
+	<name>Czech</name>
+	<nativename>Èesky</nativename>
+	<version>1.7.2.8</version>
+	<author>Zedna</author>
+	<icon>
+		<bin>000001000100120C000001001800F80200001600000028000000120000001800</bin>
+		<bin>00000100180000000000D0020000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>00000000000000000000000000000000000000000000000000A3312650126903</bin>
+		<bin>00C60303CE0D0DCF1D1DDB2F2FE84242F44F4FF95050F44646E53536D03030C5</bin>
+		<bin>2A2ABA2323AE1B1BA30000000000000000B84838AA2B187514351903A50505D0</bin>
+		<bin>1010D42121DE3535EC4646F65050F94E4EF14242E03434CE2E2EC32828B72121</bin>
+		<bin>AB0000000000000000C76050AF4030A5251293160C4008730707CE1414DB2626</bin>
+		<bin>E23A3AEF4A4AF85151F84C4CED3E3FDB3333CA2D2DC02626B500000000000000</bin>
+		<bin>00D57264C25848AA38279F1F0D9D15017010362A0EA31818DE2B2BE63E3EF24D</bin>
+		<bin>4DF95151F64949E93A3AD53132C82C2CBD0000000000000000D27366D16C5EBB</bin>
+		<bin>5041A6311F9B1B09A0140095100552116D2928D93A3BEA4D4DF45959F95A5AF4</bin>
+		<bin>4F4FE43F3FD03939C50000000000000000A2473BD8786ACC6657B64838A12918</bin>
+		<bin>960D059E200CBF8779CFCFD8D9D9E4E6E7F2F2F2FCF4F4FEECECF6DBDBE5C9C9</bin>
+		<bin>D20000000000000000852D21B05446D87568C65B50AE3930AD584BC5B4B0CCCD</bin>
+		<bin>CDD1D1D1DBDBDBE8E8E8F5F5F5FEFEFEFDFDFDF2F2F2DFE0E000000000000000</bin>
+		<bin>006A160A8E362AC25F59D98074DDB5AFD8D7D7CECECECCCCCCCDCDCDD4D4D4DE</bin>
+		<bin>DEDEEBEBEBF8F8F8FFFFFFFBFBFBEEEEEE00000000000000005D0800711A11A4</bin>
+		<bin>6B62F3E9E7FAFAFAE7E7E7D4D4D4CDCDCDCCCCCCCECECED6D6D6E1E1E1EEEEEE</bin>
+		<bin>FAFAFAFFFFFFF9F9F9000000000000000062170E7457539D9D9DC7C7C6FFFFFF</bin>
+		<bin>F6F6F6E1E1E1D2D2D2CCCCCCCCCCCCD0D0D0D8D8D8E4E4E4F2F2F2FCFCFCFEFE</bin>
+		<bin>FE00000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000</bin>
+	</icon>
+	<messages>
+		<strAssociated>Asociováno</strAssociated>
+		<strNotAssociated>Neasociováno</strNotAssociated>
+		<strObjInit>Inicializace...</strObjInit>
+		<strObjCreatedOk>Objekt úspìšnì vytvoøen</strObjCreatedOk>
+		<strObjCreatedErr>Chyba pøi vytváøení objektu!</strObjCreatedErr>
+		<msgCloseModified>%s byl zmìnìn. Uložit formuláø pøed odstranìním?</msgCloseModified>
+		<msgAlreadyOpened>Soubor\n\n&quot;%s&quot;\n\nje již otevøen v editoru.</msgAlreadyOpened>
+		<msgFileExists>Soubor &quot;%s&quot; již existuje. Pøepsat?</msgFileExists>
+		<msgNoActiveForm>V editoru není aktivní žádný formuláø, operaci nelze provést.</msgNoActiveForm>
+		<msgUnrecoverable>Koda nemùže otevøít tento formuláø, syntaktický analyzátor hlásí chybu:\n\n  %s</msgUnrecoverable>
+		<msgNoKodaUpdates>Máte aktuální verzi.</msgNoKodaUpdates>
+		<msgNewKodaUpdate>Existuje nová verze Koda %s%s.\n\n%s\n\nChcete otevøít stránku pro stažení?</msgNewKodaUpdate>
+		<msgNoFormsInScript>Ve skriptu nenalezen žádný formuláø vytvoøený v Koda.</msgNoFormsInScript>
+		<msgNoFormIdent>Ve skriptu nelze najít aktuální formuláøovou sekci. Pravdìpodobnì byl odstranìn její identifikátor. Skript nebyl aktualizován!</msgNoFormIdent>
+		<msgFormHaveNoScript>Tento formuláø nemá asociovaný skript.</msgFormHaveNoScript>
+		<msgNotImplemented>Dosud neimplementováno...</msgNotImplemented>
+		<msgWarningTitle>Upozornìní</msgWarningTitle>
+		<msgInfoTitle>Informace</msgInfoTitle>
+		<msgConfirmTitle>Potvrzení</msgConfirmTitle>
+		<msgErrorTitle>Chyba</msgErrorTitle>
+		<strErrOpFailed>Operace nebyla úspìšná!</strErrOpFailed>
+		<msgErrorUpdate>Nelze zjistit informace o nové verzi.</msgErrorUpdate>
+		<msgNewNamePrompt>Zadejte nové jméno:</msgNewNamePrompt>
+		<strFilterAU3>Autoit Skript Soubor</strFilterAU3>
+		<strFilterKXF>Koda XML formuláø</strFilterKXF>
+		<strDefault>Implicitní</strDefault>
+		<strFilterKXP>Koda projekt</strFilterKXP>
+		<strFilterALL>Vše</strFilterALL>
+		<strFilterBMP>Bitmapy</strFilterBMP>
+		<strFilterJPG>JPEG soubory</strFilterJPG>
+		<strFilterGIF>GIF soubory</strFilterGIF>
+		<strFilterICO>Ikony</strFilterICO>
+		<strFilterEXE>Spustitelné a knihovny</strFilterEXE>
+		<msgFileExistsNoConfirm>Soubor již existuje. Prosím zadejte jiné jméno.</msgFileExistsNoConfirm>
+		<msgProjectNew>Prosím zadejte cestu a nové jméno projektu</msgProjectNew>
+		<msgProjectOpen>Prosím zadejte projekt</msgProjectOpen>
+		<msgProjectNewScript>Otevøete existující skript nebo zadejte jméno nového skriptu:</msgProjectNewScript>
+		<msgProjectNewForm>Otevøete existující formuláø nebo zadejte jméno nového formuláøe:</msgProjectNewForm>
+		<msgSaveFormBefore>Váš aktuální formuláø není uložen. Pro použití funkce Aktualizace byste mìli uložit formuláø pøed uložením skriptu. Chcete uložit formuláø?</msgSaveFormBefore>
+		<msgProjectAskClose>Vytvoøení nového projektu uzavøe aktuálnì otevøený projekt a všechny jeho formuláøe. Pokraèovat?</msgProjectAskClose>
+		<msgProjectFileMissing>Soubor který chcete otevøít chybí.</msgProjectFileMissing>
+		<msgNoDatafile>Soubor styles.xml chybí. Prosím obnovte ho z Koda archivu. Bez nìj nebudete moci editovat styly ovládacích prvkù.</msgNoDatafile>
+		<strColorDesigner>Designer</strColorDesigner>
+		<strColorHandle>Ukazatel</strColorHandle>
+		<strColorHandleBorder>Okraj Ukazatele</strColorHandleBorder>
+		<strColorInactiveHandle>Neaktivní Ukazatel</strColorInactiveHandle>
+		<strColorInactiveHandleBorder>Okraj neaktivního Ukazatele</strColorInactiveHandleBorder>
+		<strColorMultiselHandle>Ukazatel Vícenásobného Výbìru</strColorMultiselHandle>
+		<strColorMultiselHandleBorder>Okraj Ukazatele Vícenásobného Výbìru</strColorMultiselHandleBorder>
+		<strColorLockedHandle>Ukazatel Zamknutého Prvku</strColorLockedHandle>
+		<strColorGrid>Møížka</strColorGrid>
+		<strColorObjInsp>Objekt Inspektor</strColorObjInsp>
+		<strColorOIBackground>Pozadí</strColorOIBackground>
+		<strColorOILabels>Popisy</strColorOILabels>
+		<strColorOIValues>Hodnoty</strColorOIValues>
+		<strColorOICompRef>Reference Komponenty</strColorOICompRef>
+		<strColorOICompRefChild>Reference Komponenty Potomka</strColorOICompRefChild>
+		<strColorOICustom>Skupina položek %d</strColorOICustom>
+		<strColorOutputWindow>Výstupní Okno</strColorOutputWindow>
+		<strColorErrorMessage>Chybová Zpráva</strColorErrorMessage>
+		<strColorWarningMessage>Upozoròovací Zpráva</strColorWarningMessage>
+		<strColorInfoMessage>Informaèní Zpráva</strColorInfoMessage>
+		<strColorDebugMessage>Ladicí Zpráva</strColorDebugMessage>
+		<strColorOutWinBackground>Pozadí</strColorOutWinBackground>
+		<msgWrongIconFormat>Soubor který chcete otevøít není ikona.</msgWrongIconFormat>
+		<msgWrongIconLibFormat>Soubor knihovny který chcete otevøít má chybný formát nebo neobsahuje žádné ikony.</msgWrongIconLibFormat>
+		<strFilterLIB>Knihovny ikon</strFilterLIB>
+		<msgIconLibIs16bit>Soubor knihovny který jste otevøeli je 16-bitová knihovna. Pøesto s ní Koda mùže pracovat, ikony nebudou viditelné ve Vista a výše. Musíte ji uložit jako 32-bitovou knihovnu. Toto lze provést pomocí tlaèítka Uložit.</msgIconLibIs16bit>
+		<msgNoPortable>Koda nemùže zapsat konfiguraci v její složce, pravdìpodobnì zde nemáte práva zápisu. Stále mùžete pokraèovat v pøenosném módu, ale bez možnosti uložit konfiguraèní nastavení, nebo mùžete vytvoøit konfiguraèní soubor v profilu aktuálního uživatele.\n\nVytvoøit konfiguraci v profilu aktuálního uživatele?</msgNoPortable>
+		<msgOutdatedStyles>Váš soubor &quot;styles.xml&quot; má špatnou verzi, což mùže zpùsobit chyby. Je doporuèeno stáhnout poslední distribuci Koda.</msgOutdatedStyles>
+		<strMixed>Smíšený</strMixed>
+		<strDownloading>Stahování...</strDownloading>
+	</messages>
+	<form name="DesignerMain">
+		<caption>oda FormDesigner</caption>
+		<mnuFile property="Caption">&amp;Soubor</mnuFile>
+		<grpRecent property="Caption">&amp;Poslední soubory</grpRecent>
+		<grpImport property="Caption">&amp;Import</grpImport>
+		<mnuEdit property="Caption">&amp;Editace</mnuEdit>
+		<grpControl property="Caption">Ovládací prvek</grpControl>
+		<grpAlign property="Caption">Zarovnání</grpAlign>
+		<mnuView property="Caption">&amp;Zobrazit</mnuView>
+		<mnuOptions property="Caption">&amp;Možnosti</mnuOptions>
+		<mnuTools property="Caption">&amp;Nástroje</mnuTools>
+		<mnuFormList property="Caption">&amp;Formuláøe</mnuFormList>
+		<mnuHelp property="Caption">Ná&amp;povìda</mnuHelp>
+		<tabStandard property="Caption">Standard</tabStandard>
+		<btnTMenu property="Hint">Hlavní menu</btnTMenu>
+		<btnTLabel property="Hint">Text (Label)</btnTLabel>
+		<btnTInput property="Hint">Vstupní pole (Input)</btnTInput>
+		<btnTEdit property="Hint">Editaèní pole (Edit)</btnTEdit>
+		<btnTButton property="Hint">Tlaèítko (Button)</btnTButton>
+		<btnTCheckBox property="Hint">Zaškrtávací tlaèítko (CheckBox)</btnTCheckBox>
+		<btnTRadio property="Hint">Pøepínací tlaèítko (RadioButton)</btnTRadio>
+		<btnTList property="Hint">ListBox</btnTList>
+		<btnTCombo property="Hint">ComboBox</btnTCombo>
+		<btnTContextMenu property="Hint">Kontextové Menu</btnTContextMenu>
+		<btnTGroup property="Hint">GroupBox</btnTGroup>
+		<tabAdditional property="Caption">Pøíslušenství</tabAdditional>
+		<btnSelect2 property="Caption">Výbìr</btnSelect2>
+		<btnTPic property="Hint">Obrázek</btnTPic>
+		<btnTIcon property="Hint">Ikona</btnTIcon>
+		<btnTGraphic property="Hint">Grafika</btnTGraphic>
+		<btnTUpdown property="Hint">Updown</btnTUpdown>
+		<btnTAvi property="Hint">Avi</btnTAvi>
+		<btnTTrayMenu property="Hint">Tray Menu</btnTTrayMenu>
+		<btnTDummy property="Hint">Dummy Prvek</btnTDummy>
+		<btnTControlGroup property="Hint">Skupina prvkù (Group)</btnTControlGroup>
+		<tabWin32 property="Caption">Win32</tabWin32>
+		<btnSelect3 property="Caption">Výbìr</btnSelect3>
+		<btnTSlider property="Hint">Slider</btnTSlider>
+		<btnTProgress property="Hint">Progress</btnTProgress>
+		<btnTDate property="Hint">Zadání data (Date Picker)</btnTDate>
+		<btnTMonthCal property="Hint">Kalendáø (Month Calendar)</btnTMonthCal>
+		<btnTTreeView property="Hint">TreeView</btnTTreeView>
+		<btnTListView property="Hint">ListView</btnTListView>
+		<btnTTab property="Hint">Panel Záložek</btnTTab>
+		<btnTObj property="Hint">COM Objekt</btnTObj>
+		<tabCustom property="Caption">Uživatelské</tabCustom>
+		<btnTStatusBar property="Hint">Stavový øádek (Status Bar)</btnTStatusBar>
+		<btnTIPAddress property="Hint">Vstupní pole pro IP adresu (IP Address InputBox)</btnTIPAddress>
+		<btnTToolbar property="Hint">Panel nástrojù (Toolbar)</btnTToolbar>
+		<btnTImageList property="Hint">Seznam obrázkù (ImageList)</btnTImageList>
+		<actProjectNew property="Caption">Nový Projekt...</actProjectNew>
+		<actAlignToGrid property="Caption">Zarovnat k &amp;møížce</actAlignToGrid>
+		<actAlignLeft property="Caption">Vlevo</actAlignLeft>
+		<actAlignCenterHorizontal property="Caption">Na støed Vodorovnì</actAlignCenterHorizontal>
+		<actAlignRight property="Caption">Vpravo</actAlignRight>
+		<actAlignTop property="Caption">Nahoru</actAlignTop>
+		<actAlignCenterVertical property="Caption">Na støed Svisle</actAlignCenterVertical>
+		<actAlignBottom property="Caption">Dolù</actAlignBottom>
+		<actAlignSpaceEquallyHorizontal property="Caption">Stejné mezery Vodorovnì</actAlignSpaceEquallyHorizontal>
+		<actAlignSpaceEquallyVertical property="Caption">Stejné mezery Svisle</actAlignSpaceEquallyVertical>
+		<actAlignSameWidth property="Caption">Stejná šíøka</actAlignSameWidth>
+		<actAlignSameHeight property="Caption">Stejná výška</actAlignSameHeight>
+		<actAlignSameWidthHeight property="Caption">Stejná velikost</actAlignSameWidthHeight>
+		<actNew property="Caption">&amp;Nový...</actNew>
+		<actNew property="Hint">Nový formuláø z galerie</actNew>
+		<actAlignWCenterHorizontal property="Caption">Vystøedit Vodorovnì v Oknì</actAlignWCenterHorizontal>
+		<actNewForm property="Caption">Nový &amp;Formuláø</actNewForm>
+		<actNewForm property="Hint">Nový prázdný formuláø</actNewForm>
+		<actAlignWCenterVertical property="Caption">Vystøedit Svisle v Oknì</actAlignWCenterVertical>
+		<actOpen property="Caption">&amp;Otevøít</actOpen>
+		<actOpen property="Hint">Otevøít formuláø</actOpen>
+		<actCloseForm property="Caption">&amp;Zavøít Formuláø</actCloseForm>
+		<actCloseForm property="Hint">Zavøít formuláø</actCloseForm>
+		<actSave property="Caption">&amp;Uložit</actSave>
+		<actSave property="Hint">Uložit formuláø</actSave>
+		<actSaveAll property="Caption">Uložit &amp;vše</actSaveAll>
+		<actSaveAll property="Hint">Uložit všechny formuláøe</actSaveAll>
+		<actSaveAs property="Caption">Uložit &amp;jako...</actSaveAs>
+		<actSaveAs property="Hint">Uložit formuláø jako...</actSaveAs>
+		<actExit property="Caption">&amp;Konec</actExit>
+		<actExit property="Hint">Ukonèit program</actExit>
+		<actCut property="Caption">V&amp;ystøihnout</actCut>
+		<actCopy property="Caption">&amp;Kopírovat</actCopy>
+		<actPaste property="Caption">&amp;Vložit</actPaste>
+		<actDelete property="Caption">&amp;Smazat</actDelete>
+		<actSelectAll property="Caption">Vybr&amp;at Vše</actSelectAll>
+		<actTabOrder property="Caption">Tab &amp;Poøadí</actTabOrder>
+		<actBringToFront property="Caption">Dát do popøedí</actBringToFront>
+		<actSendToBack property="Caption">Dát na pozadí</actSendToBack>
+		<actLock property="Caption">Zamknout</actLock>
+		<actUnlock property="Caption">Odemknout</actUnlock>
+		<actNoInsertIn property="Caption">Žádné vkládání</actNoInsertIn>
+		<actNoCopy property="Caption">Žádné kopírování</actNoCopy>
+		<actOptions property="Caption">&amp;Možnosti...</actOptions>
+		<actGenerate property="Caption">&amp;Generovat Kód...</actGenerate>
+		<actGenerate property="Hint">Generovat kód</actGenerate>
+		<actConfigureGenerate property="Caption">&amp;Konfigurovat &amp;&amp; Generovat...</actConfigureGenerate>
+		<actConfigureGenerate property="Hint">Generovat kód s pokroèilým nastavením</actConfigureGenerate>
+		<actSaveUpdate property="Caption">&amp;Aktualizovat skript</actSaveUpdate>
+		<actSaveUpdate property="Hint">Aktualizovat formuláø v asociovaném skriptu</actSaveUpdate>
+		<actRun property="Caption">&amp;Spustit Formuláø</actRun>
+		<actRun property="Hint">Spustit náhled formuláøe</actRun>
+		<actHelpContent property="Caption">&amp;Obsah</actHelpContent>
+		<actCheckUpdate property="Caption">Kontrola Poslední &amp;Verze</actCheckUpdate>
+		<actAbout property="Caption">O &amp;Aplikaci...</actAbout>
+		<actSavePosition property="Caption">Zapamatovat si pozici</actSavePosition>
+		<actNewPage property="Caption">&amp;Nová Záložka</actNewPage>
+		<actNewToolButton property="Caption">&amp;Nové Tlaèítko</actNewToolButton>
+		<actImportAu3 property="Caption">Importovat Autoit GUI</actImportAu3>
+		<actImportExt property="Caption">Externí Import...</actImportExt>
+		<actViewObjectTree property="Caption">Strom Objektù</actViewObjectTree>
+		<actViewObjectInspector property="Caption">Objekt Inspektor</actViewObjectInspector>
+		<actViewFormList property="Caption">Seznam Formuláøù</actViewFormList>
+		<actPopup_grpAlign property="Caption">Menu Zarovnání</actPopup_grpAlign>
+		<actPopup_grpControl property="Caption">Menu Ovládacího prvku</actPopup_grpControl>
+		<actPopup_grpImport property="Caption">Import menu</actPopup_grpImport>
+		<actViewProjectManager property="Caption">Projekt Manažer</actViewProjectManager>
+		<actProjectOpen property="Caption">Otevøít Projekt...</actProjectOpen>
+		<actProjectClose property="Caption">Zavøít Projekt</actProjectClose>
+		<actProjectUpdate property="Caption">&amp;Aktualizovat &amp;&amp; Uložit Projekt</actProjectUpdate>
+		<actProjectRun property="Caption">Spustit Projekt</actProjectRun>
+		<actUndo property="Caption">&amp;Zpìt</actUndo>
+		<actToolbarCustomize property="Caption">Vlastní...</actToolbarCustomize>
+		<actSeparator property="Caption">---Oddìlovaè---</actSeparator>
+		<actMoveTabBackward property="Caption">Pøesunout záložku dozadu</actMoveTabBackward>
+		<actMoveTabForward property="Caption">Pøesunout záložku dopøedu</actMoveTabForward>
+	</form>
+	<form name="frmFormList">
+		<caption>Seznam Formuláøù</caption>
+		<tipNotSaved property="Caption">Formuláø neuložen</tipNotSaved>
+		<tipForm property="Caption"> Formuláø</tipForm>
+		<tipScript property="Caption">Skript</tipScript>
+		<FormList property="Columns">
+			<item idx="0">Formuláø</item>
+			<item idx="1">Cesta</item>
+		</FormList>
+		<btnFormAdd property="Hint">Nový Formuláø</btnFormAdd>
+		<btnFormDel property="Hint">Odstranit Formuláø</btnFormDel>
+	</form>
+	<form name="PInsp">
+		<caption>Objekt Inspektor</caption>
+		<ModeTabSet property="Tabs">
+			<line idx="0">Vlastnosti</line>
+			<line idx="1">Styly</line>
+			<line idx="2">Ex. Styly</line>
+		</ModeTabSet>
+		<btnResetStyle property="Caption">Výchozí</btnResetStyle>
+		<btnResetExStyle property="Caption">Výchozí</btnResetExStyle>
+	</form>
+	<form name="ConfigDlg">
+		<caption>Možnosti</caption>
+		<OptTreeView property="Items">
+			<item idx="0">Hlavní</item>
+			<item idx="1">Generátor kódu</item>
+			<item idx="2">Formátování</item>
+			<item idx="3">Šablony</item>
+			<item idx="4">Designer</item>
+			<item idx="5">Barvy</item>
+			<item idx="6">Jazyk</item>
+			<item idx="7">Panely nástrojù</item>
+		</OptTreeView>
+		<lblUndoLevels property="Caption">Poèet úrovní pro pøíkaz Zpìt (0 - žádná)</lblUndoLevels>
+		<lblMRUCount property="Caption">Poèet posledních souborù (1-20)</lblMRUCount>
+		<grpGeneralAssociate property="Caption">Asociace</grpGeneralAssociate>
+		<btnAssociate property="Caption">Nastavit</btnAssociate>
+		<btnUnassociate property="Caption">Zrušit</btnUnassociate>
+		<grpGeneralAuPath property="Caption">Metoda náhledu pro spuštìní</grpGeneralAuPath>
+		<cbGeneralAuPath property="Items">
+			<line idx="0">Asociováno</line>
+			<line idx="1">Ruènì</line>
+		</cbGeneralAuPath>
+		<grpGeneralStartup property="Caption">Pøi startu</grpGeneralStartup>
+		<cbGeneralStartup property="Items">
+			<line idx="0">Vytvoøit nový formuláø</line>
+			<line idx="1">Otevøít poslední formuláø</line>
+			<line idx="2">Otevøít jiný formuláø</line>
+		</cbGeneralStartup>
+		<cbGeneralBackup property="Caption">Vytváøet Zálohu</cbGeneralBackup>
+		<cbUpdateSave property="Caption">tl. Aktualizovat také uloží formuláø</cbUpdateSave>
+		<grpDesignerOptions property="Caption">Implicitní Nastavení Generátoru</grpDesignerOptions>
+		<cbCodegenPopulate property="Caption">Generovat události pro všechny ovládací prvky</cbCodegenPopulate>
+		<cbCodegenPopulate property="Hint">Bude generovat promìnné nebo funkce pro všechny ovládací prvky, bez ohledu na to zda mají nastavenu vlastnost &quot;událost&quot; nebo ne</cbCodegenPopulate>
+		<cbCodegenExpandVars property="Caption">Pøeložit %prom% promìnné</cbCodegenExpandVars>
+		<cbCodegenExpandVars property="Hint">Pokud položka text obsahuje promìnnou jako %PROM% - bude generováno jako promìnná, ne øetìzec</cbCodegenExpandVars>
+		<cbCodegenOnEvent property="Caption">Generovat OnEvent kód</cbCodegenOnEvent>
+		<cbCodegenOnEvent property="Hint">Bude generovat kód stylu událostí místo stylu cyklu zpráv</cbCodegenOnEvent>
+		<grpFormatDefaults property="Caption">Implicitní nastavení formátování</grpFormatDefaults>
+		<grpFormatVariables property="Caption">Promìnné</grpFormatVariables>
+		<lblScope property="Caption">Rozsah</lblScope>
+		<cbScope property="Items">
+			<line idx="0">Nenastaveno</line>
+			<line idx="1">Globální</line>
+			<line idx="2">Lokální</line>
+		</cbScope>
+		<grpIndent property="Caption">Odsazení kódu</grpIndent>
+		<lblInitial property="Caption">Poè. odsazení</lblInitial>
+		<lblIndentBy property="Caption">Odsazení o</lblIndentBy>
+		<lblCount property="Caption">Poèet</lblCount>
+		<cbSymbol property="Items">
+			<line idx="0">Tab</line>
+			<line idx="1">Mezera</line>
+		</cbSymbol>
+		<grpFormatOther property="Caption">Rùzné</grpFormatOther>
+		<lblSepChar property="Caption">Znak oddìlovaèe dat</lblSepChar>
+		<rbLoop property="Caption">Cyklus</rbLoop>
+		<rbEvents property="Caption">Události</rbEvents>
+		<TemplatesList property="Columns">
+			<item idx="0">Jméno šablony</item>
+			<item idx="1">Implicitní</item>
+		</TemplatesList>
+		<grpDesignerGrid property="Caption">Møížka</grpDesignerGrid>
+		<cbDesignerDispalyGrid property="Caption">Zobrazit Møížku</cbDesignerDispalyGrid>
+		<cbDesignerSnapToGrid property="Caption">Pøichytávat k Møížce</cbDesignerSnapToGrid>
+		<grpDesignerGridSize property="Caption">Velikost Møížky</grpDesignerGridSize>
+		<lblDesignerGridX property="Caption">Møížka &amp;X</lblDesignerGridX>
+		<lblDesignerGridY property="Caption">Møížka &amp;Y</lblDesignerGridY>
+		<grpDesignerOther property="Caption">Další možnosti</grpDesignerOther>
+		<cbDesignerReflect property="Caption">Promítat zmìny stylu formuláøe bìhem návrhu</cbDesignerReflect>
+		<cbDesignerSafe property="Caption">Nepromítat nebezpeèné styly (transparentnost apod.)</cbDesignerSafe>
+		<grpWindows property="Caption">Okna</grpWindows>
+		<lblDesignerPosSaving property="Caption">Ukládání velikosti a pozice</lblDesignerPosSaving>
+		<cbDesignerWinSnap property="Caption">Pøichytávat okna</cbDesignerWinSnap>
+		<cbDesignerSavePos property="Items">
+			<line idx="0">Neukládat</line>
+			<line idx="1">Automaticky</line>
+			<line idx="2">Ruènì</line>
+		</cbDesignerSavePos>
+		<cbDesignerKeepLayout property="Caption">Zachovat standardní rozložení</cbDesignerKeepLayout>
+		<cbDesignerKeepLayout property="Hint">Zachovat standardní rozložení oken bìhem posunu hlavního formuláøe</cbDesignerKeepLayout>
+		<lblActiveLang property="Caption">Aktivní jazyk: </lblActiveLang>
+		<LangList property="Columns">
+			<item idx="0">Jazyk</item>
+			<item idx="1">Pùvodní jméno</item>
+			<item idx="2">Autor</item>
+			<item idx="3">Verze</item>
+		</LangList>
+		<btnCreateTemplate property="Caption">Vytvoøit šablonu</btnCreateTemplate>
+		<AllCommandsList property="Columns">
+			<item idx="0">Všechny pøíkazy</item>
+		</AllCommandsList>
+		<btnCancel property="Caption">Storno</btnCancel>
+		<btnOK property="Caption">OK</btnOK>
+		<btnApply property="Caption">Použít</btnApply>
+		<mnuNew property="Caption">Nový</mnuNew>
+		<mnuEdit property="Caption">Upravit</mnuEdit>
+		<mnuDelete property="Caption">Smazat</mnuDelete>
+		<mnuDuplicate property="Caption">Duplikovat</mnuDuplicate>
+		<mnuSetDef property="Caption">Zmìnit implicitní</mnuSetDef>
+		<grpObjectTree property="Caption">Strom Objektù</grpObjectTree>
+		<cbObjTreeAlwaysExpand property="Caption">Vždy plnì rozbalený</cbObjTreeAlwaysExpand>
+		<cbObjTreeCaptionAsDescr property="Caption">Implicitnì použít Titulek místo Jména</cbObjTreeCaptionAsDescr>
+		<btnDownloadHelpfile property="Caption">Stáhnout nápovìdu</btnDownloadHelpfile>
+	</form>
+	<form name="frmDesignerCode">
+		<caption>Kód</caption>
+		<mnuCopyToClipboard property="Caption">&amp;Kopírovat do schránky</mnuCopyToClipboard>
+		<mnuSaveToFile property="Caption">&amp;Uložit do souboru</mnuSaveToFile>
+		<mnuInsertIntoScite property="Caption">&amp;Vložit do Scite</mnuInsertIntoScite>
+		<mnuCopySelection property="Caption">Kopírovat výbìr</mnuCopySelection>
+		<mnuSelectAll property="Caption">Vybrat Vše</mnuSelectAll>
+	</form>
+	<form name="frmAdvGenerate">
+		<caption>Pokroèilé Generování</caption>
+		<btnSaveGenerate property="Caption">Uložit &amp;&amp; Generovat</btnSaveGenerate>
+		<btnCancel property="Caption">Storno</btnCancel>
+		<grpTemplate property="Caption">Šablona</grpTemplate>
+		<btnManage property="Caption">Nastavení</btnManage>
+		<tpOptions property="Caption">Nastavení</tpOptions>
+		<grpDesignerOptions property="Caption">Nastavení Generátoru</grpDesignerOptions>
+		<cbCodegenPopulate property="Caption">Generovat události pro všechny ovládací prvky</cbCodegenPopulate>
+		<cbCodegenExpandVars property="Caption">Pøeložit %prom% promìnné</cbCodegenExpandVars>
+		<cbCodegenOnEvent property="Caption">Generovat OnEvent kód</cbCodegenOnEvent>
+		<cbCodegenVarsForSet property="Caption">Promìnné místo '-1' kde je to možné</cbCodegenVarsForSet>
+		<tpFormat property="Caption">Formátování</tpFormat>
+		<grpIndent property="Caption">Odsazení kódu</grpIndent>
+		<lblInitial property="Caption">Poèáteèní</lblInitial>
+		<lblIndentBy property="Caption">Odsazení o</lblIndentBy>
+		<lblCount property="Caption">Poèet</lblCount>
+		<cbSymbol property="Items">
+			<line idx="0">Tab</line>
+			<line idx="1">Mezera</line>
+		</cbSymbol>
+		<grpVariables property="Caption">Promìnné</grpVariables>
+		<lblScope property="Caption">Rozsah</lblScope>
+		<cbScope property="Items">
+			<line idx="0">Nenastaveno</line>
+			<line idx="1">Globální</line>
+			<line idx="2">Lokální</line>
+		</cbScope>
+		<btnSave property="Caption">Uložit</btnSave>
+	</form>
+	<form name="frmAboutBox">
+		<caption>O Aplikaci</caption>
+		<lblHomePage property="Caption">Domovská stránka</lblHomePage>
+		<lblVersion property="Caption">Verze</lblVersion>
+		<btnOK property="Caption">OK</btnOK>
+	</form>
+	<form name="frmTemplateEditor">
+		<caption>Editor Šablony kódu</caption>
+		<lblName property="Caption">Jméno šablony</lblName>
+		<lblText property="Caption">Text šablony</lblText>
+		<btnOK property="Caption">OK</btnOK>
+		<editName property="Text">Pøíklad Cyklus</editName>
+	</form>
+	<form name="frmObjectTree">
+		<caption>Strom Objektù</caption>
+	</form>
+	<form name="frmChooseScript">
+		<caption>Zvolte Skript</caption>
+		<lblChooseHint property="Caption">Na otevíraný formuláø &quot;%s&quot; se odkazuje z více skriptù. Prosím zvolte jeden se kterým chcete pracovat.</lblChooseHint>
+		<ScriptsList property="Columns">
+			<item idx="0">Jméno Skriptu</item>
+			<item idx="1">Poslední Modifikace</item>
+		</ScriptsList>
+		<btnOK property="Caption">OK</btnOK>
+		<btnCancel property="Caption">Storno</btnCancel>
+	</form>
+	<form name="frmProjMan">
+		<caption>Projekt Manažer</caption>
+		<mnuRenameFile property="Caption">Pøejmenovat soubor</mnuRenameFile>
+		<mnuRenameFile property="Hint">Pøejmenje aktuálnì vybraný soubor</mnuRenameFile>
+		<mnuScriptAdd property="Caption">Pøidat skript</mnuScriptAdd>
+		<mnuScriptAdd property="Hint">Pøidá skript do projektu</mnuScriptAdd>
+		<mnuFormAdd property="Caption">Pøidat formuláø</mnuFormAdd>
+		<mnuFormAdd property="Hint">Pøidá formuláø k aktuálnímu skriptu</mnuFormAdd>
+		<mnuFormsExisting property="Caption">Pøidat existující</mnuFormsExisting>
+		<mnuFormsExisting property="Hint">Pøidá existující formuláø (z projektu nebo otevøený v designeru) k aktuálnímu skriptu</mnuFormsExisting>
+		<mnuScriptSetMain property="Caption">Nastavit implicitní</mnuScriptSetMain>
+		<mnuScriptSetMain property="Hint">Nastaví aktuální skript jako implicitní, tento skript bude spuštìn pøíkazem &quot;Spustit projekt&quot;</mnuScriptSetMain>
+		<mnuScriptRemove property="Caption">Odebrat skript</mnuScriptRemove>
+		<mnuScriptRemove property="Hint">Odebere aktuální skript z projektu (žádné soubory nebudou smazány)</mnuScriptRemove>
+		<mnuFormOpen property="Caption">Otevøít formuláø</mnuFormOpen>
+		<mnuFormOpen property="Hint">Otevøe formuláø v designeru</mnuFormOpen>
+		<mnuFormRemove property="Caption">Odebrat formuláø</mnuFormRemove>
+		<mnuFormRemove property="Hint">Odebere aktuální formuláø z aktuálního skriptu (žádné soubory nebudou smazány)</mnuFormRemove>
+		<mnuNotesEdit property="Caption">Editovat poznámky</mnuNotesEdit>
+		<mnuNotesEdit property="Hint">Otevøe okno pro editaci poznámek projektu</mnuNotesEdit>
+	</form>
+	<form name="frmNotesEditor">
+		<caption>Editor Poznámek</caption>
+		<btnOK property="Caption">OK</btnOK>
+	</form>
+	<form name="frmImport">
+		<caption>Moduly Externího Importu</caption>
+		<ConvertersList property="Columns">
+			<item idx="0">Jméno</item>
+			<item idx="1">Popis</item>
+		</ConvertersList>
+		<btnCancel property="Caption">Storno</btnCancel>
+		<btnOK property="Caption">OK</btnOK>
+	</form>
+	<form name="frmImportDlg">
+		<caption>AU3 Import</caption>
+		<btnCancel property="Caption">Storno</btnCancel>
+		<btnProcess property="Caption">Provést</btnProcess>
+		<btnLoad property="Caption">Naèíst</btnLoad>
+		<btnClear property="Caption">Smazat</btnClear>
+		<mnuCut property="Caption">Vystøihnout</mnuCut>
+		<mnuCopy property="Caption">Kopírovat</mnuCopy>
+		<mnuPaste property="Caption">Vložit</mnuPaste>
+		<mnuSelectAll property="Caption">Vybrat Vše</mnuSelectAll>
+		<mnuClear property="Caption">Smazat</mnuClear>
+	</form>
+	<form name="frmOutput">
+		<caption>Výstupní Okno</caption>
+		<btnOk property="Caption">Zavøít</btnOk>
+	</form>
+	<form name="frmPictureEditor">
+		<caption>Editor Obrázkù</caption>
+		<btnImgOk property="Caption">OK</btnImgOk>
+		<btnImgCancel property="Caption">Storno</btnImgCancel>
+		<btnImgHelp property="Caption">Nápovìda</btnImgHelp>
+		<grpImgPicGroupBox property="Caption">Vybraný obrázek</grpImgPicGroupBox>
+		<btnImgLoad property="Caption">&amp;Naèíst...</btnImgLoad>
+		<btnImgClear property="Caption">&amp;Vymazat</btnImgClear>
+		<cbFitImage property="Caption">Pøizpùsobit obrázek</cbFitImage>
+		<grpImages property="Caption">Obrázky v souboru</grpImages>
+		<lblViewListAs property="Caption">Zobrazit seznam jako:</lblViewListAs>
+		<lblPath property="Caption">Vlastní cesta k obrázku</lblPath>
+		<btnTest property="Caption">Test</btnTest>
+	</form>
+	<form name="frmAXObjectEditor">
+		<caption>Prohlížeè ActiveX objektù</caption>
+		<lblLoadStatus property="Caption">Stav: </lblLoadStatus>
+		<lblPath property="Caption">Cesta:</lblPath>
+		<CompList property="Columns">
+			<item idx="0">Jméno komponenty</item>
+		</CompList>
+		<btnOK property="Caption">OK</btnOK>
+		<btnCancel property="Caption">Storno</btnCancel>
+		<btnHelp property="Caption">Nápovìda</btnHelp>
+	</form>
+	<form name="frmGalleryBrowser">
+		<caption>Šablony Formuláøù</caption>
+		<lblTGDescr property="Caption">Popis:</lblTGDescr>
+		<btnTGOK property="Caption">OK</btnTGOK>
+		<btnTGCancel property="Caption">Storno</btnTGCancel>
+		<btnTGHelp property="Caption">&amp;Nápovìda</btnTGHelp>
+		<tabGroups property="Tabs">
+			<line idx="0">Standard</line>
+		</tabGroups>
+		<lvItems property="Columns">
+			<item idx="0">Jméno</item>
+			<item idx="1">Popis</item>
+		</lvItems>
+		<mnuTGLargeIcons property="Caption">Zobrazit &amp;Velké Ikony</mnuTGLargeIcons>
+		<mnuTGSmallIcons property="Caption">Zobrazit &amp;Malé Ikony</mnuTGSmallIcons>
+		<mnuTGList property="Caption">Zobrazit S&amp;eznam</mnuTGList>
+		<mnuTGDetails property="Caption">Zobrazit &amp;Detaily</mnuTGDetails>
+	</form>
+	<form name="frmTreeViewEditor">
+		<caption>Editor Položek Treeview</caption>
+		<grpTVItems property="Caption">Položky</grpTVItems>
+		<btnTVNew property="Caption">No&amp;vá Položka</btnTVNew>
+		<btnTVNewSub property="Caption">N&amp;ová Podpoložka</btnTVNewSub>
+		<btnTVDelete property="Caption">&amp;Smazat</btnTVDelete>
+		<grpTVProperties property="Caption">Vlastnosti Položky</grpTVProperties>
+		<lblTVText property="Caption">&amp;Text:</lblTVText>
+		<btnTVCancel property="Caption">Storno</btnTVCancel>
+		<btnTVApply property="Caption">&amp;Použít</btnTVApply>
+		<btnTVOk property="Caption">OK</btnTVOk>
+		<btnTVHelp property="Caption">&amp;Nápovìda</btnTVHelp>
+		<lblSelectedIdx property="Caption">Index oznaèeného:</lblSelectedIdx>
+		<lblImageIdx property="Caption">Index obrázku:</lblImageIdx>
+	</form>
+	<form name="frmListViewEditor">
+		<caption>Editor položek ListView</caption>
+		<grpLVItems property="Caption">Položky</grpLVItems>
+		<btnLVNew property="Caption">No&amp;vá Položka</btnLVNew>
+		<btnLVDelete property="Caption">&amp;Smazat</btnLVDelete>
+		<btnLVNewSub property="Caption">N&amp;ová Podpoložka</btnLVNewSub>
+		<grpLVProperties property="Caption">Vlastnosti Položky</grpLVProperties>
+		<lblLVCaption property="Caption">&amp;Text:</lblLVCaption>
+		<btnLVOk property="Caption">OK</btnLVOk>
+		<btnLVCancel property="Caption">Storno</btnLVCancel>
+		<btnLVApply property="Caption">&amp;Použít</btnLVApply>
+		<btnLVHelp property="Caption">&amp;Nápovìda</btnLVHelp>
+		<lblImageIndex property="Caption">Index obrázku:</lblImageIndex>
+		<cbAuto property="Caption">Autoindex</cbAuto>
+	</form>
+	<form name="frmCollectionEditor">
+		<caption>Sloupce</caption>
+		<btnAdd property="Hint">Pøidat Položku</btnAdd>
+		<btnDelete property="Hint">Smazat Položku</btnDelete>
+		<btnUp property="Hint">Posun Nahoru</btnUp>
+		<btnDown property="Hint">Posun Dolù</btnDown>
+		<strProperty property="Caption">Položka</strProperty>
+	</form>
+	<form name="frmEventEditor">
+		<caption>Editor Událostí</caption>
+		<grpNotify property="Caption">Oznámení ovládacího prvku</grpNotify>
+		<lblNotifyState property="Caption">Aktuální oznámení: %s</lblNotifyState>
+		<grpEvent property="Caption">Událost ovládacího prvku</grpEvent>
+		<lblEventState property="Caption">Aktuální událost: %s</lblEventState>
+		<rbEditFunc property="Caption">Hlásit</rbEditFunc>
+		<rbNone property="Caption">Nic</rbNone>
+		<btnDefault property="Caption">Implicitní</btnDefault>
+		<btnOK property="Caption">OK</btnOK>
+		<btnCancel property="Caption">Storno</btnCancel>
+	</form>
+	<form name="frmTabOrder">
+		<caption>Editor Tab Poøadí</caption>
+		<btnOK property="Caption">OK</btnOK>
+		<btnCancel property="Caption">Storno</btnCancel>
+	</form>
+	<form name="frmImageListEditor">
+		<caption>Editor Seznamu obrázkù (ImageList)</caption>
+		<btnImgOk property="Caption">OK</btnImgOk>
+		<btnImgCancel property="Caption">Storno</btnImgCancel>
+		<btnHelp property="Caption">Nápovìda</btnHelp>
+		<grpImages property="Caption">Obrázky v seznamu</grpImages>
+		<btnSingleAdd property="Caption">&amp;Pøidat jeden...</btnSingleAdd>
+		<btnMultiAdd property="Caption">Pøidat &amp;knihovnu...</btnMultiAdd>
+		<btnImgRemove property="Caption">&amp;Odstranit</btnImgRemove>
+		<btnClear property="Caption">&amp;Vymazat Seznam</btnClear>
+		<btnSave property="Caption">&amp;Uložit</btnSave>
+	</form>
+	<form name="frmMenuBuilder">
+		<caption>Menu Designer</caption>
+		<InsertItem property="Caption">&amp;Pøidat</InsertItem>
+		<DeleteItem property="Caption">&amp;Smazat</DeleteItem>
+		<CreateSubmenu property="Caption">&amp;Vytvoøit Podmenu</CreateSubmenu>
+	</form>
+	<form name="frmGraphicEditor">
+		<caption>Editor Grafiky</caption>
+		<mnuArrow property="Hint">Výbìr</mnuArrow>
+		<btnLine property="Hint">Èára</btnLine>
+		<btnBezier property="Hint">Bezier</btnBezier>
+		<btnRectangle property="Hint">Obdélník</btnRectangle>
+		<btnEllipse property="Hint">Elipsa</btnEllipse>
+		<btnPie property="Hint">Výseè</btnPie>
+		<btnDot property="Hint">Teèka</btnDot>
+		<btnPixel property="Hint">Pixel</btnPixel>
+		<mnuEdit property="Caption">Editace</mnuEdit>
+		<mnuCut property="Caption">Vystøihnout</mnuCut>
+		<mnuCopy property="Caption">Kopírovat</mnuCopy>
+		<mnuPaste property="Caption">Vložit</mnuPaste>
+		<mnuClone property="Caption">Klonovat</mnuClone>
+		<mnuDelete property="Caption">Smazat</mnuDelete>
+		<mnuBringToFront property="Caption">Dát do popøedí</mnuBringToFront>
+		<mnuSendToBack property="Caption">Dát na pozadí</mnuSendToBack>
+		<mnuPointInsert property="Caption">Vložit pøerušení</mnuPointInsert>
+		<mnuPointDelete property="Caption">Odstranit pøerušení</mnuPointDelete>
+		<mnuOptions property="Caption">Možnosti</mnuOptions>
+		<mnuCreateNext property="Caption">Vytvoøit následující tvar se souèasným formátováním</mnuCreateNext>
+		<btnCancel property="Caption">Storno</btnCancel>
+		<btnOK property="Caption">OK</btnOK>
+		<mnuShowGrid property="Caption">Zobrazit møížku</mnuShowGrid>
+		<strPoint property="Caption">Ukazatel</strPoint>
+		<strObjects property="Caption">Objektù</strObjects>
+		<strTransparent property="Caption">Transparentní</strTransparent>
+		<strAutomatic property="Caption">Automatická</strAutomatic>
+		<strOtherColors property="Caption">Další barvy...</strOtherColors>
+		<strCustom property="Caption">Uživatelská</strCustom>
+	</form>
+</language>

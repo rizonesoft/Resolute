@@ -1,0 +1,54 @@
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# START: DO NOT CHANGE ANYTHING AFTER THIS LINE     #-#-#-#-#
+# Monokai Color scheme
+#------------------------------------------------------------
+font.base=font:Arial,size:10,$(font.override)
+font.monospace=font:Consolas,size:10
+
+selection.fore=#CF6A4C                                #Color Settings
+selection.back=#272822
+selection.alpha=25
+style.au3.32=$(font.base),back:#272822    #Background
+
+caret.line.back=#FFFF00                                #CaretLineBackground
+caret.line.back.alpha=5
+
+style.au3.34=fore:#0000FF,back:#272822                # Brace highlight
+style.au3.35=fore:#009933,back:#272822                # Brace incomplete highlight
+
+style.au3.0=fore:#F8F8F2                            # White space
+style.au3.1=fore:#755E71                            # Comment line
+style.au3.2=fore:#755E71                            # Comment block
+style.au3.3=fore:#AE81FF                            # Number
+style.au3.4=fore:#DAD085                            # Function
+style.au3.5=fore:#66D9EF                            # Keyword
+style.au3.6=fore:#8996A8                            # Macro
+style.au3.7=fore:#E6DB74                            # String
+style.au3.8=fore:#F92672                            # Operator
+style.au3.9=fore:#F8F8F2                            # Variable
+style.au3.10=fore:#8996A8                            # Send keys in string
+style.au3.11=fore:#8996A8                            # Pre-Processor
+style.au3.12=fore:#DADADA                            # Special
+style.au3.13=fore:#DADADA                            #Abbrev-Expand
+style.au3.14=fore:#FD971F                            # COM Objects
+style.au3.15=fore:#FD831F                            #Standard UDF's
+style.au3.16=fore:#FD831F                            #User UDF's
+
+
+# ConsoleWrite output background color
+style.errorlist.32=$(font.base),back:#FFFFFF
+# Actual ConsoleWrite output
+style.errorlist.0=fore:#000000
+# ConsoleWrite output highlighted
+style.errorlist.3=fore:#808000
+# starting with >
+style.errorlist.4=fore:#0000FF
+# starting with !
+style.errorlist.10=fore:#FF0000,bold
+# starting with +
+style.errorlist.11=fore:#008000,bold
+# starting with -
+style.errorlist.12=fore:#FFC90E,bold
+
+# END => DO NOT CHANGE ANYTHING BEFORE THIS LINE  #-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#

@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<language>
+	<name>Bulgarian</name>
+	<nativename>Български</nativename>
+	<version>1.7.0.5</version>
+	<author>lokster</author>
+	<icon>
+		<bin>000001000100120C000001001800F80200001600000028000000120000001800</bin>
+		<bin>00000100180000000000A0020000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>000000000000000000000000000000000000000000000000001F23D3090DCB00</bin>
+		<bin>04CB0307CC0D11D41D21DF2F33ED4246F94F52FE5053F84649E93539D43033C9</bin>
+		<bin>2A2CBD2326B11B1DA60000000000000000383AE1181BD20508CC0002CC0507D0</bin>
+		<bin>1013D82123E43537F24649FC5052FE4E50F64244E53436D22E30C7282ABC2122</bin>
+		<bin>B000000000000000005059E82F38D2121CC4030DC0000BC00711C5141ECF2630</bin>
+		<bin>DC3A43EA4A53F3515AF34C55E83E47D6333BC62D35BB262EB000000000000000</bin>
+		<bin>0064B086489A6D27804F0D6E3901672F0168300A6F38187C452B8B563E9B684D</bin>
+		<bin>A67551A778499C6F3A8A5E3180552C774D000000000000000065B47D5EB27740</bin>
+		<bin>9A5B20823C097328006F210371230D792D1D873C2F974E42A6604FAE6B50AB6B</bin>
+		<bin>469E60368C4F30844900000000000000003B84516AB88257AB70389153187A36</bin>
+		<bin>056E25006B21056F2510793021884135985346A66450AC6C4EA66942985C3487</bin>
+		<bin>4E0000000000000000296C3F4F966670BC8A59AA753990571D7C3D0F74310C73</bin>
+		<bin>2F13783520844131925245A36455AF735BB27856A97248996300000000000000</bin>
+		<bin>00848785AAAEABE0E5E1F4F8F5E2E8E4CED3CFC3C9C4C0C7C2C1C8C3C8CEC9D2</bin>
+		<bin>D8D4DFE6E1EDF3EEF4FAF6F1F7F3E4EAE600000000000000007F7F7F949494BB</bin>
+		<bin>BBBBF7F7F7FAFAFAE7E7E7D4D4D4CDCDCDCCCCCCCECECED6D6D6E1E1E1EEEEEE</bin>
+		<bin>FAFAFAFFFFFFF9F9F900000000000000007F7F7F7F7F7F9D9D9DC7C7C6FFFFFF</bin>
+		<bin>F6F6F6E1E1E1D2D2D2CCCCCCCCCCCCD0D0D0D8D8D8E4E4E4F2F2F2FCFCFCFEFE</bin>
+		<bin>FE00000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000000000000000000000000000000000000000</bin>
+		<bin>0000000000000000000000000000</bin>
+	</icon>
+	<messages>
+		<msgCloseModified>%s е променен. Да бъде ли запазен преди затваряне?</msgCloseModified>
+		<msgAlreadyOpened>Файлът\n\n&quot;%s&quot;\n\nвече е отворен в редактора.</msgAlreadyOpened>
+		<msgFileExists>Файлът &quot;%s&quot; Вече съществува. Да бъде ли презаписан?</msgFileExists>
+		<msgNoActiveForm>Няма активна форма в редактора. Операцията не може да бъде изпълнена.</msgNoActiveForm>
+		<msgUnrecoverable>Koda не може да отвори тази форма, интерпретатора върна грешка:\n\n  %s</msgUnrecoverable>
+		<msgNoKodaUpdates>Имате най новата версия.</msgNoKodaUpdates>
+		<msgNewKodaUpdate>Намерена е нова версия на Koda (%s%s).\n\n%s\n\nИскате ли да бъде отворена страницата за сваляне?</msgNewKodaUpdate>
+		<msgErrorUpdate>Не може да бъде получена информация за версията.</msgErrorUpdate>
+		<msgNoFormsInScript>Не бяха намерени форми генерирани с Koda в този скрипт.</msgNoFormsInScript>
+		<msgNoFormIdent>Секцията за формата не може да бъде намерена в скрипта. Вероятно инцидентно сте изтрили нейният идентификатор. Скриптът не бе обновен!</msgNoFormIdent>
+		<msgFormHaveNoScript>Тази форма няма асоцииран скрипт.</msgFormHaveNoScript>
+		<msgNotImplemented>Тази функция все още не е завършена...</msgNotImplemented>
+		<msgWarningTitle>Внимание</msgWarningTitle>
+		<msgInfoTitle>Информация</msgInfoTitle>
+		<msgConfirmTitle>Потвърдете</msgConfirmTitle>
+		<msgErrorTitle>Грешка</msgErrorTitle>
+		<strErrOpFailed>Операцията се провали!</strErrOpFailed>
+		<strAssociated>Асоцииран</strAssociated>
+		<strNotAssociated>Не асоцииран</strNotAssociated>
+		<strObjInit>Инициализиране...</strObjInit>
+		<strObjCreatedOk>Обектът е създаден успешно</strObjCreatedOk>
+		<strObjCreatedErr>Грешка при създаването на обекта!</strObjCreatedErr>
+		<msgFileExistsNoConfirm>Файлът съществува. Моля изберете друго име.</msgFileExistsNoConfirm>
+		<msgNewNamePrompt>Въведете ново име:</msgNewNamePrompt>
+		<msgProjectNew>Изберете път и напишете името на новия проект</msgProjectNew>
+		<msgProjectOpen>Моля изберете проект</msgProjectOpen>
+		<msgProjectNewScript>Отворете съществуващ проект или напишете името на нов:</msgProjectNewScript>
+		<msgProjectNewForm>Отворете съществуваща форма или напишете името на нова</msgProjectNewForm>
+		<msgSaveFormBefore>Текущата форма не е запазена. За да използвате функцията Обновяване, формата трябва първо да е запазена. Искате ли да я запазите?</msgSaveFormBefore>
+		<msgProjectAskClose>Създаването на нов проект ще затвори текущият отворен проект и всичките му форми. Искате ли да продължите?</msgProjectAskClose>
+		<msgProjectFileMissing>Файлът който се опитвате да отворите липсва.</msgProjectFileMissing>
+		<msgNoDatafile>Файлът styles.xml липсва. Моля възстановете го от инсталационния архив на Koda. Без него няма да можете да редактирате стиловете на компонентите.</msgNoDatafile>
+		<strDefault>По подразбиране</strDefault>
+		<strFilterAU3>Autoit Скрипт</strFilterAU3>
+		<strFilterKXF>Koda XML форма</strFilterKXF>
+		<strFilterKXP>Koda проект</strFilterKXP>
+		<strFilterALL>Всички</strFilterALL>
+		<strFilterBMP>Bitmap-и</strFilterBMP>
+		<strFilterJPG>JPEG файлове</strFilterJPG>
+		<strFilterGIF>GIF файлове</strFilterGIF>
+		<strFilterICO>Икони</strFilterICO>
+		<strFilterEXE>Изпълними файлове и библиотеки</strFilterEXE>
+		<strColorDesigner>Дизайнер</strColorDesigner>
+		<strColorHandle>Дръжка</strColorHandle>
+		<strColorHandleBorder>Рамка на дръжката</strColorHandleBorder>
+		<strColorInactiveHandle>Неактивна дръжка</strColorInactiveHandle>
+		<strColorInactiveHandleBorder>Рамка на неактивната дръжка</strColorInactiveHandleBorder>
+		<strColorMultiselHandle>Дръжка на множествената селекция</strColorMultiselHandle>
+		<strColorMultiselHandleBorder>Цвят на дръжката на множествената селекция</strColorMultiselHandleBorder>
+		<strColorLockedHandle>Дръжка на заключените контроли</strColorLockedHandle>
+		<strColorGrid>Мрежа</strColorGrid>
+		<strColorObjInsp>Обектен инспектор</strColorObjInsp>
+		<strColorOIBackground>Фон</strColorOIBackground>
+		<strColorOILabels>Етикети</strColorOILabels>
+		<strColorOIValues>Стойности</strColorOIValues>
+		<strColorOICompRef>Връзка към компонент</strColorOICompRef>
+		<strColorOICompRefChild>Връзка към дъщерен компонент</strColorOICompRefChild>
+		<strColorOICustom>Група от свойства %d</strColorOICustom>
+		<strColorOutputWindow>Изходен прозорец</strColorOutputWindow>
+		<strColorErrorMessage>Съобщение за грешка</strColorErrorMessage>
+		<strColorWarningMessage>Предупреждение</strColorWarningMessage>
+		<strColorInfoMessage>Информационно съобщение</strColorInfoMessage>
+		<strColorDebugMessage>Debug съобщение</strColorDebugMessage>
+		<strColorOutWinBackground>Фон</strColorOutWinBackground>
+	</messages>
+	<form name="DesignerMain">
+		<caption>oda FormDesigner</caption>
+		<tabStandard property="Caption">Стандартни</tabStandard>
+		<btnTMenu property="Hint">Главно меню</btnTMenu>
+		<btnTLabel property="Hint">Label</btnTLabel>
+		<btnTInput property="Hint">Input</btnTInput>
+		<btnTEdit property="Hint">Input</btnTEdit>
+		<btnTButton property="Hint">Button</btnTButton>
+		<btnTCheckBox property="Hint">CheckBox</btnTCheckBox>
+		<btnTRadio property="Hint">RadioButton</btnTRadio>
+		<btnTList property="Hint">ListBox</btnTList>
+		<btnTCombo property="Hint">ComboBox</btnTCombo>
+		<btnTContextMenu property="Hint">Context Menu</btnTContextMenu>
+		<btnTGroup property="Hint">GroupBox</btnTGroup>
+		<tabAdditional property="Caption">Допълнителни</tabAdditional>
+		<btnTPic property="Hint">Picture</btnTPic>
+		<btnTIcon property="Hint">Icon</btnTIcon>
+		<btnTGraphic property="Hint">Graphic</btnTGraphic>
+		<btnTUpdown property="Hint">Updown</btnTUpdown>
+		<btnTAvi property="Hint">Avi</btnTAvi>
+		<btnTTrayMenu property="Hint">Tray Menu</btnTTrayMenu>
+		<btnTDummy property="Hint">Dummy Control</btnTDummy>
+		<tabWin32 property="Caption">Win32</tabWin32>
+		<btnTSlider property="Hint">Slider</btnTSlider>
+		<btnTProgress property="Hint">Progress</btnTProgress>
+		<btnTDate property="Hint">Date Picker</btnTDate>
+		<btnTMonthCal property="Hint">Month Calendar</btnTMonthCal>
+		<btnTTreeView property="Hint">TreeView</btnTTreeView>
+		<btnTListView property="Hint">ListView</btnTListView>
+		<btnTTab property="Hint">Tabbed Panel</btnTTab>
+		<btnTObj property="Hint">COM Object</btnTObj>
+		<mnuFile property="Caption">Файл</mnuFile>
+		<grpRecent property="Caption">&amp;Последни файлове</grpRecent>
+		<grpImport property="Caption">&amp;Внасяне</grpImport>
+		<mnuEdit property="Caption">Редактиране</mnuEdit>
+		<grpControl property="Caption">Контрол</grpControl>
+		<grpAlign property="Caption">Кодравняване</grpAlign>
+		<mnuView property="Caption">Изглед</mnuView>
+		<mnuOptions property="Caption">Опции</mnuOptions>
+		<mnuTools property="Caption">Инструменти</mnuTools>
+		<mnuFormList property="Caption">Списък с формите</mnuFormList>
+		<mnuHelp property="Caption">Помощ</mnuHelp>
+		<actProjectNew property="Caption">Нов проект...</actProjectNew>
+		<actAlignToGrid property="Caption">Подравняване към мрежата</actAlignToGrid>
+		<actAlignLeft property="Caption">Ляво</actAlignLeft>
+		<actAlignCenterHorizontal property="Caption">Х. Център</actAlignCenterHorizontal>
+		<actAlignRight property="Caption">Дясно</actAlignRight>
+		<actAlignTop property="Caption">Горе</actAlignTop>
+		<actAlignCenterVertical property="Caption">В. Център</actAlignCenterVertical>
+		<actAlignBottom property="Caption">Долу</actAlignBottom>
+		<actAlignSpaceEquallyHorizontal property="Caption">Равно разстояние по хоризонтала</actAlignSpaceEquallyHorizontal>
+		<actAlignSpaceEquallyVertical property="Caption">Равно разстояние по вертикала</actAlignSpaceEquallyVertical>
+		<actAlignSameWidth property="Caption">Равна ширина</actAlignSameWidth>
+		<actAlignSameHeight property="Caption">Равна височина</actAlignSameHeight>
+		<actAlignSameWidthHeight property="Caption">Равна ширина и височина</actAlignSameWidthHeight>
+		<actNew property="Caption">&amp;Нов...</actNew>
+		<actNew property="Hint">Нова форма от шаблон</actNew>
+		<actAlignWCenterHorizontal property="Caption">Хоризонтално центриране в прозореца</actAlignWCenterHorizontal>
+		<actNewForm property="Caption">Нова форма</actNewForm>
+		<actNewForm property="Hint">Създаване на нова празна форма</actNewForm>
+		<actAlignWCenterVertical property="Caption">Вертикално центриране в прозореца</actAlignWCenterVertical>
+		<actOpen property="Caption">Отваряне</actOpen>
+		<actOpen property="Hint">Отваряне на форма</actOpen>
+		<actCloseForm property="Caption">Затваряне</actCloseForm>
+		<actCloseForm property="Hint">Затваряне на формата</actCloseForm>
+		<actSave property="Caption">Запис</actSave>
+		<actSave property="Hint">Запазване на промените във формата</actSave>
+		<actSaveAll property="Caption">Запис на всички</actSaveAll>
+		<actSaveAll property="Hint">Запазване на промените във всички форми</actSaveAll>
+		<actSaveAs property="Caption">Запис като...</actSaveAs>
+		<actSaveAs property="Hint">Запазване на формата като...</actSaveAs>
+		<actExit property="Caption">Изход</actExit>
+		<actExit property="Hint">Изход от програмата</actExit>
+		<actCut property="Caption">Вземане</actCut>
+		<actCopy property="Caption">Копиране</actCopy>
+		<actPaste property="Caption">Поставяне</actPaste>
+		<actDelete property="Caption">Изтриване</actDelete>
+		<actSelectAll property="Caption">Избор на всичко</actSelectAll>
+		<actTabOrder property="Caption">Подреждане</actTabOrder>
+		<actBringToFront property="Caption">Изкарване напред</actBringToFront>
+		<actSendToBack property="Caption">Изпращане назад</actSendToBack>
+		<actLock property="Caption">Заключване</actLock>
+		<actUnlock property="Caption">Отключване</actUnlock>
+		<actNoInsertIn property="Caption">Без вмъкване</actNoInsertIn>
+		<actNoCopy property="Caption">Без копиране</actNoCopy>
+		<actOptions property="Caption">Опции...</actOptions>
+		<actGenerate property="Caption">Генериране на код за формата...</actGenerate>
+		<actGenerate property="Hint">Генериране на код</actGenerate>
+		<actConfigureGenerate property="Caption">Опции за генерирането...</actConfigureGenerate>
+		<actConfigureGenerate property="Hint">Генериране на код с допълнителни опции</actConfigureGenerate>
+		<actSaveUpdate property="Caption">Обновяване на скрипта</actSaveUpdate>
+		<actSaveUpdate property="Hint">Обновяване на формата в асоциирания с нея скрипт</actSaveUpdate>
+		<actRun property="Caption">Изпълняване на формата</actRun>
+		<actRun property="Hint">Показване на предварителен преглед на формата</actRun>
+		<actHelpContent property="Caption">Съдържание</actHelpContent>
+		<actCheckUpdate property="Caption">Проверка за последна версия</actCheckUpdate>
+		<actAbout property="Caption">Относно...</actAbout>
+		<actSavePosition property="Caption">Запаметяване на позицията</actSavePosition>
+		<actNewPage property="Caption">Нова страница</actNewPage>
+		<actImportAu3 property="Caption">Импорт на Autoit GUI</actImportAu3>
+		<actImportExt property="Caption">External Import...</actImportExt>
+		<actViewObjectTree property="Caption">Дърво на Обекти</actViewObjectTree>
+		<actViewObjectInspector property="Caption">Инспектор на обекти</actViewObjectInspector>
+		<actViewFormList property="Caption">Списък с Форми</actViewFormList>
+		<actPopup_grpAlign property="Caption">Подравняване на група</actPopup_grpAlign>
+		<actPopup_grpControl property="Caption">Действия с контроли</actPopup_grpControl>
+		<actPopup_grpImport property="Caption">Меню импорт</actPopup_grpImport>
+		<actViewProjectManager property="Caption">Мениджър на проекти</actViewProjectManager>
+		<actProjectOpen property="Caption">Отваряне на проектt...</actProjectOpen>
+		<actProjectClose property="Caption">Затваряне на проекта</actProjectClose>
+		<actProjectUpdate property="Caption">Обновяване и запис на проекта</actProjectUpdate>
+		<actProjectRun property="Caption">Изпълняване на проекта</actProjectRun>
+		<actUndo property="Caption">Отмяна</actUndo>
+		<actToolbarCustomize property="Caption">Персонализиране...</actToolbarCustomize>
+		<actSeparator property="Caption">---Разделител---</actSeparator>
+	</form>
+	<form name="frmFormList">
+		<caption>Списък с формите</caption>
+		<tipNotSaved property="Caption">Формата не е записана</tipNotSaved>
+		<tipForm property="Caption"> Форма</tipForm>
+		<tipScript property="Caption">Скрипт</tipScript>
+		<FormList property="Columns">
+			<item idx="0">Форма</item>
+			<item idx="1">Път</item>
+		</FormList>
+		<btnFormAdd property="Hint">Нова форма</btnFormAdd>
+		<btnFormDel property="Hint">Затвори формата</btnFormDel>
+	</form>
+	<form name="PInsp">
+		<caption>Инспектор на обекта</caption>
+		<ModeTabSet property="Tabs">
+			<line idx="0">Свойства</line>
+			<line idx="1">Стилове</line>
+			<line idx="2">Ex-Стилове</line>
+		</ModeTabSet>
+		<btnResetStyle property="Caption">Изчисти</btnResetStyle>
+		<btnResetExStyle property="Caption">Изчисти</btnResetExStyle>
+	</form>
+	<form name="ConfigDlg">
+		<caption>Опции</caption>
+		<OptTreeView property="Items">
+			<item idx="0">Общи</item>
+			<item idx="1">Генератор на код</item>
+			<item idx="2">Форматиране</item>
+			<item idx="3">Шаблони</item>
+			<item idx="4">Дизайнер</item>
+			<item idx="5">Colors</item>
+			<item idx="6">Език</item>
+			<item idx="7">Toolbars</item>
+		</OptTreeView>
+		<lblUndoLevels property="Caption">Нива на отмяна (0 - няма)</lblUndoLevels>
+		<lblMRUCount property="Caption">Брой последно отваряни файлове (1-20)</lblMRUCount>
+		<grpGeneralAssociate property="Caption">Асоцииране</grpGeneralAssociate>
+		<btnAssociate property="Caption">Сложи</btnAssociate>
+		<btnUnassociate property="Caption">Махни</btnUnassociate>
+		<grpGeneralAuPath property="Caption">Метод за стартиране на формата</grpGeneralAuPath>
+		<cbGeneralAuPath property="Items">
+			<line idx="0">Асоцииран</line>
+			<line idx="1">Ръчен...</line>
+		</cbGeneralAuPath>
+		<grpGeneralStartup property="Caption">При стартиране на Koda</grpGeneralStartup>
+		<cbGeneralStartup property="Items">
+			<line idx="0">Създай нова форма</line>
+			<line idx="1">Отвори последната форма</line>
+			<line idx="2">Отвори форма...</line>
+		</cbGeneralStartup>
+		<cbGeneralBackup property="Caption">Създай резервно копие</cbGeneralBackup>
+		<cbUpdateSave property="Caption">Бутонът за обновяване запазва и формата</cbUpdateSave>
+		<grpDesignerOptions property="Caption">Начални опции</grpDesignerOptions>
+		<cbCodegenPopulate property="Caption">Генериране на събития за всички контроли</cbCodegenPopulate>
+		<cbCodegenPopulate property="Hint">Това ще генерира променливи или функции за всички контроли, независимо дали имат някакво събитие или не.</cbCodegenPopulate>
+		<cbCodegenExpandVars property="Caption">Разширени %var% променливи</cbCodegenExpandVars>
+		<cbCodegenExpandVars property="Hint">Ако текстово свойство съдържа променлива като %VAR% - ще бъде генерирано като променлива а не като стринг</cbCodegenExpandVars>
+		<cbCodegenOnEvent property="Caption">Генериране на OnEvent код</cbCodegenOnEvent>
+		<cbCodegenOnEvent property="Hint">Ще генерира event-style код вместо loop-style</cbCodegenOnEvent>
+		<grpFormatDefaults property="Caption">Опции за форматиране по подразбиране</grpFormatDefaults>
+		<grpFormatVariables property="Caption">Променливи</grpFormatVariables>
+		<lblScope property="Caption">Обхват</lblScope>
+		<cbScope property="Items">
+			<line idx="0">Не е зададен</line>
+			<line idx="1">Глобален</line>
+			<line idx="2">Локален</line>
+		</cbScope>
+		<grpIndent property="Caption">Отместване</grpIndent>
+		<lblInitial property="Caption">Начално</lblInitial>
+		<lblIndentBy property="Caption">Отместване с</lblIndentBy>
+		<lblCount property="Caption">Брой</lblCount>
+		<cbSymbol property="Items">
+			<line idx="0">Таб</line>
+			<line idx="1">Интервал</line>
+		</cbSymbol>
+		<grpFormatOther property="Caption">Други</grpFormatOther>
+		<lblSepChar property="Caption">Знак за разделяне на датата</lblSepChar>
+		<rbLoop property="Caption">Loop</rbLoop>
+		<rbEvents property="Caption">Събития</rbEvents>
+		<TemplatesList property="Columns">
+			<item idx="0">Име на шаблона</item>
+			<item idx="1">Основен</item>
+		</TemplatesList>
+		<grpDesignerGrid property="Caption">Настройки на мрежата</grpDesignerGrid>
+		<cbDesignerDispalyGrid property="Caption">Показвай мрежа</cbDesignerDispalyGrid>
+		<cbDesignerSnapToGrid property="Caption">Подравнявай към мрежата</cbDesignerSnapToGrid>
+		<grpDesignerGridSize property="Caption">Размер на мрежата</grpDesignerGridSize>
+		<lblDesignerGridX property="Caption">X</lblDesignerGridX>
+		<lblDesignerGridY property="Caption">Y</lblDesignerGridY>
+		<grpDesignerOther property="Caption">Други опции</grpDesignerOther>
+		<cbDesignerReflect property="Caption">Показвай по време на дизайн промените в стила</cbDesignerReflect>
+		<cbDesignerSafe property="Caption">Не показвай не-безопасни стилове (прозрачност и т.н.)</cbDesignerSafe>
+		<grpWindows property="Caption">Прозорци</grpWindows>
+		<lblDesignerPosSaving property="Caption">Запазване на размер и позиция</lblDesignerPosSaving>
+		<cbDesignerWinSnap property="Caption">Прилепване</cbDesignerWinSnap>
+		<cbDesignerSavePos property="Items">
+			<line idx="0">Не запазвай</line>
+			<line idx="1">Автоматично</line>
+			<line idx="2">Ръчно</line>
+		</cbDesignerSavePos>
+		<cbDesignerKeepLayout property="Caption">Стандартната подредба</cbDesignerKeepLayout>
+		<cbDesignerKeepLayout property="Hint">Запазване на стандартната подредба по време на местене на главния прозорец</cbDesignerKeepLayout>
+		<lblActiveLang property="Caption">Активен език: </lblActiveLang>
+		<LangList property="Columns">
+			<item idx="0">Език</item>
+			<item idx="1">Име</item>
+			<item idx="2">Автор</item>
+			<item idx="3">Версия</item>
+		</LangList>
+		<btnCreateTemplate property="Caption">Създаване на шаблон</btnCreateTemplate>
+		<AllCommandsList property="Columns">
+			<item idx="0">Всички команди</item>
+		</AllCommandsList>
+		<btnCancel property="Caption">Отказ</btnCancel>
+		<btnOK property="Caption">ОК</btnOK>
+		<btnApply property="Caption">Прилагане</btnApply>
+		<mnuNew property="Caption">Нов</mnuNew>
+		<mnuEdit property="Caption">Редактиране</mnuEdit>
+		<mnuDelete property="Caption">Изтриване</mnuDelete>
+		<mnuDuplicate property="Caption">Копиране</mnuDuplicate>
+		<mnuSetDef property="Caption">Основен</mnuSetDef>
+	</form>
+	<form name="frmDesignerCode">
+		<caption>Код</caption>
+		<mnuCopyToClipboard property="Caption">Копиране в системния буфер</mnuCopyToClipboard>
+		<mnuSaveToFile property="Caption">Запис във файл</mnuSaveToFile>
+		<mnuInsertIntoScite property="Caption">Вмъкване в Scite</mnuInsertIntoScite>
+		<mnuCopySelection property="Caption">Копиране на избраните</mnuCopySelection>
+		<mnuSelectAll property="Caption">Избор на всички</mnuSelectAll>
+	</form>
+	<form name="frmAdvGenerate">
+		<caption>Разширено генериране</caption>
+		<btnSaveGenerate property="Caption">Запис и генериране</btnSaveGenerate>
+		<btnCancel property="Caption">Отказ</btnCancel>
+		<grpTemplate property="Caption">Шаблон</grpTemplate>
+		<btnManage property="Caption">Организиране</btnManage>
+		<tpOptions property="Caption">Опции</tpOptions>
+		<grpDesignerOptions property="Caption">Настройки на генератора</grpDesignerOptions>
+		<cbCodegenPopulate property="Caption">Генериране на събития за всички контроли</cbCodegenPopulate>
+		<cbCodegenExpandVars property="Caption">Разширяване %var% променливите</cbCodegenExpandVars>
+		<cbCodegenOnEvent property="Caption">Генериране на OnEvent код</cbCodegenOnEvent>
+		<cbCodegenVarsForSet property="Caption">Променливи вместо '-1' когато е възможно</cbCodegenVarsForSet>
+		<tpFormat property="Caption">Форматиране</tpFormat>
+		<grpIndent property="Caption">Отместване</grpIndent>
+		<lblInitial property="Caption">Начално</lblInitial>
+		<lblIndentBy property="Caption">Символ за отместването</lblIndentBy>
+		<lblCount property="Caption">Брой</lblCount>
+		<cbSymbol property="Items">
+			<line idx="0">Табулация</line>
+			<line idx="1">Интервал</line>
+		</cbSymbol>
+		<grpVariables property="Caption">Променливи</grpVariables>
+		<lblScope property="Caption">Обхват</lblScope>
+		<cbScope property="Items">
+			<line idx="0">не е зададен</line>
+			<line idx="1">глобални</line>
+			<line idx="2">локални</line>
+		</cbScope>
+		<btnSave property="Caption">Запис</btnSave>
+	</form>
+	<form name="frmAboutBox">
+		<caption>Информация</caption>
+		<lblHomePage property="Caption">Домашна страница</lblHomePage>
+		<lblVersion property="Caption">Версия</lblVersion>
+		<btnOK property="Caption">ОК</btnOK>
+	</form>
+	<form name="frmTemplateEditor">
+		<caption>Редактор на шаблони за код</caption>
+		<lblName property="Caption">Име на шаблона</lblName>
+		<lblText property="Caption">Съдържание на шаблона</lblText>
+		<btnOK property="Caption">ОК</btnOK>
+	</form>
+	<form name="frmObjectTree">
+		<caption>Дърво на обектите</caption>
+	</form>
+	<form name="frmChooseScript">
+		<caption>Избор на скрипт</caption>
+		<lblChooseHint property="Caption">Формата &quot;%s&quot; която се опитвате да отворите, се използва в повече от един скрипт. Моля изберете този с който искате да работите.</lblChooseHint>
+		<ScriptsList property="Columns">
+			<item idx="0">Име на скрипта</item>
+			<item idx="1">Последна промяна</item>
+		</ScriptsList>
+		<btnOK property="Caption">ОК</btnOK>
+		<btnCancel property="Caption">Отказ</btnCancel>
+	</form>
+	<form name="frmProjMan">
+		<caption>Мениджър на проекти</caption>
+		<mnuRenameFile property="Caption">Преименуване</mnuRenameFile>
+		<mnuRenameFile property="Hint">Преименуване на избрания файл</mnuRenameFile>
+		<mnuScriptAdd property="Caption">Добавяне на скрипт</mnuScriptAdd>
+		<mnuScriptAdd property="Hint">Добавяне на скрипт към проекта</mnuScriptAdd>
+		<mnuFormAdd property="Caption">Добавяне на форма</mnuFormAdd>
+		<mnuFormAdd property="Hint">Добавяне на форма към проекта</mnuFormAdd>
+		<mnuFormsExisting property="Caption">Добавяне на съществуваща форма</mnuFormsExisting>
+		<mnuFormsExisting property="Hint">Добавяне на съществуваще (от проекта или отворена в дизайнера) форма към скрипта</mnuFormsExisting>
+		<mnuScriptSetMain property="Caption">Задаване като главна</mnuScriptSetMain>
+		<mnuScriptSetMain property="Hint">Тази форма ще се покаже когато проектът буде изпълнен</mnuScriptSetMain>
+		<mnuScriptRemove property="Caption">Премахване на скрипт</mnuScriptRemove>
+		<mnuScriptRemove property="Hint">Премахване на скрипта от проекта (файлът НЯМА да бъде изтрит)</mnuScriptRemove>
+		<mnuFormOpen property="Caption">Отваряне от</mnuFormOpen>
+		<mnuFormOpen property="Hint">Отваряне на форма</mnuFormOpen>
+		<mnuFormRemove property="Caption">Премахване на форма</mnuFormRemove>
+		<mnuFormRemove property="Hint">Премахване на формата от проекта (файлът НЯМА да бъде изтрит)</mnuFormRemove>
+		<mnuNotesEdit property="Caption">Бележки</mnuNotesEdit>
+		<mnuNotesEdit property="Hint">Редактиране на бележките към проекта</mnuNotesEdit>
+	</form>
+	<form name="frmNotesEditor">
+		<caption>Редактиране на бележки</caption>
+		<btnOK property="Caption">OK</btnOK>
+	</form>
+	<form name="frmImport">
+		<caption>Модули за внясяне</caption>
+		<ConvertersList property="Columns">
+			<item idx="0">Име</item>
+			<item idx="1">Описание</item>
+		</ConvertersList>
+		<btnCancel property="Caption">Отказ</btnCancel>
+		<btnOK property="Caption">ОК</btnOK>
+	</form>
+	<form name="frmImportDlg">
+		<caption>Внасяне от AU3</caption>
+		<btnCancel property="Caption">Отказ</btnCancel>
+		<btnProcess property="Caption">Процес</btnProcess>
+		<btnLoad property="Caption">Зареждане</btnLoad>
+		<btnClear property="Caption">Изчистване</btnClear>
+		<mnuCut property="Caption">Вземане</mnuCut>
+		<mnuCopy property="Caption">Копиране</mnuCopy>
+		<mnuPaste property="Caption">Поставяне</mnuPaste>
+		<mnuSelectAll property="Caption">Избор на всичко</mnuSelectAll>
+		<mnuClear property="Caption">Изчистване</mnuClear>
+	</form>
+	<form name="frmOutput">
+		<caption>Изходен прозорец</caption>
+		<btnOk property="Caption">Затваряне</btnOk>
+	</form>
+	<form name="frmPictureEditor">
+		<caption>Редактор на изображения</caption>
+		<lblPath property="Caption">Път към изображението</lblPath>
+		<btnImgOk property="Caption">ОК</btnImgOk>
+		<btnImgCancel property="Caption">Отказ</btnImgCancel>
+		<btnImgHelp property="Caption">Помощ</btnImgHelp>
+		<grpImgPicGroupBox property="Caption">Избрано изображение</grpImgPicGroupBox>
+		<btnImgLoad property="Caption">Зареждане...</btnImgLoad>
+		<btnImgSave property="Caption">Запазване...</btnImgSave>
+		<btnImgClear property="Caption">Изчистване</btnImgClear>
+		<grpImages property="Caption">Изображения във файла</grpImages>
+		<cbSmallIcons property="Caption">Малки иконки</cbSmallIcons>
+	</form>
+	<form name="frmAXObjectEditor">
+		<caption>Браузър на ActiveX обекти</caption>
+		<lblLoadStatus property="Caption">Статус: </lblLoadStatus>
+		<lblPath property="Caption">Път:</lblPath>
+		<CompList property="Columns">
+			<item idx="0">Име на компонента</item>
+		</CompList>
+		<btnOK property="Caption">ОК</btnOK>
+		<btnCancel property="Caption">Отказ</btnCancel>
+	</form>
+	<form name="frmGalleryBrowser">
+		<caption>Шаблони за Форма</caption>
+		<lblTGDescr property="Caption">Описание:</lblTGDescr>
+		<btnTGOK property="Caption">ОК</btnTGOK>
+		<btnTGCancel property="Caption">Отказ</btnTGCancel>
+		<btnTGHelp property="Caption">Помощ</btnTGHelp>
+		<tabGroups property="Tabs">
+			<line idx="0">Стандартно</line>
+		</tabGroups>
+		<lvItems property="Columns">
+			<item idx="0">Име</item>
+			<item idx="1">Описание</item>
+		</lvItems>
+		<mnuTGLargeIcons property="Caption">Големи иконки</mnuTGLargeIcons>
+		<mnuTGSmallIcons property="Caption">Малки иконки</mnuTGSmallIcons>
+		<mnuTGList property="Caption">Списък</mnuTGList>
+		<mnuTGDetails property="Caption">Детайли</mnuTGDetails>
+	</form>
+	<form name="frmTreeViewEditor">
+		<caption>Редактор на Treeview елементи</caption>
+		<grpTVItems property="Caption">Елементи</grpTVItems>
+		<btnTVNew property="Caption">Нов елемент</btnTVNew>
+		<btnTVNewSub property="Caption">Нов под-елемент</btnTVNewSub>
+		<btnTVDelete property="Caption">Изтриване</btnTVDelete>
+		<grpTVProperties property="Caption">Свойства на елемента</grpTVProperties>
+		<lblTVText property="Caption">Текст:</lblTVText>
+		<btnTVCancel property="Caption">Отказ</btnTVCancel>
+		<btnTVApply property="Caption">Прилагане</btnTVApply>
+		<btnTVOk property="Caption">ОК</btnTVOk>
+		<btnTVHelp property="Caption">Помощ</btnTVHelp>
+	</form>
+	<form name="frmListViewEditor">
+		<caption>Редактор на ListView елементи</caption>
+		<grpLVItems property="Caption">Елементи</grpLVItems>
+		<btnLVNew property="Caption">Нов елемент</btnLVNew>
+		<btnLVDelete property="Caption">Изтриване</btnLVDelete>
+		<btnLVNewSub property="Caption">Нов под-елемент</btnLVNewSub>
+		<grpLVProperties property="Caption">Свойства на елемента</grpLVProperties>
+		<lblLVCaption property="Caption">Текст:</lblLVCaption>
+		<btnLVOk property="Caption">ОК</btnLVOk>
+		<btnLVCancel property="Caption">Отказ</btnLVCancel>
+		<btnLVApply property="Caption">Прилагане</btnLVApply>
+		<btnLVHelp property="Caption">Помпщ</btnLVHelp>
+	</form>
+	<form name="frmCollectionEditor">
+		<caption>Колони</caption>
+		<btnAdd property="Hint">Добавяне</btnAdd>
+		<btnDelete property="Hint">Изтриване</btnDelete>
+		<btnUp property="Hint">Премести Нагоре</btnUp>
+		<btnDown property="Hint">Премести Надолу</btnDown>
+	</form>
+	<form name="frmEventEditor">
+		<caption>Редактор на събития</caption>
+		<grpNotify property="Caption">Уведомяване на контрола</grpNotify>
+		<lblNotifyState property="Caption">Текущо уведомяване: %s</lblNotifyState>
+		<grpEvent property="Caption">Контролно събитие</grpEvent>
+		<lblEventState property="Caption">Текущо събитие: %s</lblEventState>
+		<rbEditFunc property="Caption">уведомяване</rbEditFunc>
+		<rbNone property="Caption">Няма</rbNone>
+		<btnDefault property="Caption">По подразбиране</btnDefault>
+		<btnOK property="Caption">ОК</btnOK>
+		<btnCancel property="Caption">Отказ</btnCancel>
+	</form>
+	<form name="frmTabOrder">
+		<caption>Редактиране на подреждането</caption>
+		<btnOK property="Caption">ОК</btnOK>
+		<btnCancel property="Caption">Отказ</btnCancel>
+	</form>
+	<form name="frmMenuBuilder">
+		<caption>Дизайнер на менюта</caption>
+		<InsertItem property="Caption">Вмъкване</InsertItem>
+		<DeleteItem property="Caption">Изтриване</DeleteItem>
+		<CreateSubmenu property="Caption">Създаване на подменю</CreateSubmenu>
+	</form>
+</language>

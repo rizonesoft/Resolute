@@ -1,0 +1,104 @@
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# START: DO NOT CHANGE ANYTHING AFTER THIS LINE     #-#-#-#-#
+# Dark SciTE4AutoIt3 Color scheme
+#------------------------------------------------------------
+font.base=font:Verdana,size:10,$(font.override)
+font.monospace=font:Courier New,size:10
+
+# 32 is the default style and its features will be inherited by all other styles unless overridden.
+style.*.32=fore:#D0D0D0,back:#202020,$(font.base)
+# Background color
+style.au3.32=$(font.base),back:#202020
+
+caret.line.back=#333333
+caret.line.back.alpha=256
+caret.fore=#FFFFFF
+selection.fore=#C2FFAE
+selection.alpha=50
+selection.back=#f9f9f9
+
+style.error.0=fore:#FF0000,back:#F0F0F0
+style.error.1=fore:#FF0000,back:#FFFF00
+style.error.2=fore:#FFFFFF,back:#FF0000
+
+highlight.current.word.colour=#C2FFAE
+# NEEDED to fix global highlight in #forceref
+highlight.current.word.by.style=0
+# NEEDED to fix global highlight for simple variable as $a
+highlight.current.word.minlength=2
+
+# Calltips colors
+style.au3.38=fore:#DADADA,back:#202020
+calltips.color.highlight=#e7db74
+
+# 33 is used to display line numbers in the margin.
+style.*.33=fore:#DADADA,back:#202020,$(font.base)
+# checkerboard pixel patter color 1 around fold trees
+fold.margin.colour=#202020
+# checkerboard pixel patter color 2 around fold trees
+fold.margin.highlight.colour=#333333
+# Color of symbol fill
+fold.back=#333333
+
+# indentation line
+style.au3.37=fore:#202020
+
+# Brace highlight
+style.au3.34=fore:#00F0F0
+# Brace incomplete highlight
+style.au3.35=fore:#00FF80,italics
+
+# White space
+style.au3.0=fore:#80C0FF
+# Comment line
+style.au3.1=fore:#60A060,italics
+# Comment block
+style.au3.2=fore:#60A060,italics
+# Number
+style.au3.3=fore:#C0FFFF
+# Function
+style.au3.4=fore:#8080FF
+# Keyword
+style.au3.5=fore:#C080C0
+# Macro
+style.au3.6=fore:#A0A000
+# String
+style.au3.7=fore:#F0E090
+# Operator
+style.au3.8=fore:#FF8000
+# Variable
+style.au3.9=fore:#D0D0D0
+# Send keys in string
+style.au3.10=fore:#A0A0A0
+# Pre-Processor
+style.au3.11=fore:#8996A8
+# Special
+style.au3.12=fore:#FFAAB7
+# Abbrev-Expand
+style.au3.13=fore:#FF80C0
+# COM Objects
+style.au3.14=fore:#993399
+# Standard UDF's
+style.au3.15=fore:#0080FF
+# User UDF's as defined by au3.keywords.user.udfs= in au3.UserUdfs.properties
+style.au3.16=fore:#0080FF
+
+# ConsoleWrite output background color
+style.errorlist.32=$(font.base),back:#333333
+# Actual consoleWrite output
+style.errorlist.0=fore:#F9F9F9
+# ConsoleWrite output highlighted
+style.errorlist.3=fore:#FF0000
+# starting with >
+style.errorlist.4=fore:#32FFFF
+# starting with !
+style.errorlist.10=fore:#FF0000,bold
+# starting with +
+style.errorlist.11=fore:#EA9515,bold
+# starting with - or <
+style.errorlist.12=fore:#E6DB74,bold
+# starting with ---
+style.errorlist.13=fore:#E87400
+
+# END => DO NOT CHANGE ANYTHING BEFORE THIS LINE  #-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#

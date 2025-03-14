@@ -32,14 +32,14 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Environment]
-ScriptPath=Z:\Resolute\SDK\Concrete\BiosCodes\BiosCodes.au3
+ScriptPath=R:\Resolute\SDK\Concrete\BiosCodes\BiosCodes.au3
 Company=Rizonesoft
 CompanyURL=https://www.rizonesoft.com
 Name=Beep Codes Viewer
 ShortName=BiosCodes
 Description=Beep Codes Viewer
 Type=N
-Icon=Z:\Resolute\SDK\Resources\Icons\BiosCodes.ico
+Icon=R:\Resolute\SDK\Resources\Icons\BiosCodes.ico
 Version=11.1.1.1959
 VersionMajor=11
 VersionMaintenance=1
@@ -49,13 +49,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=BiosCodes.exe
 OutFileX64=BiosCodes_X64.exe
-OutFilePath=Z:\Resolute\Resolute\BiosCodes.exe
-OutFileX64Path=Z:\Resolute\Resolute\BiosCodes_X64.exe
+OutFilePath=R:\Resolute\Resolute\BiosCodes.exe
+OutFileX64Path=R:\Resolute\Resolute\BiosCodes_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=Z:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959
+DistributionPath=R:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959
 DistributionName=BiosCodes_1959
-FullDistributionPath=Z:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959\BiosCodes_1959
+FullDistributionPath=R:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959\BiosCodes_1959
 DistroSourceName=BiosCodes_1959_Source
-DistroSourceFullPath=Z:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959\BiosCodes_1959_Source
+DistroSourceFullPath=R:\Resolute\SDK\Concrete\BiosCodes\Distribution\1959\BiosCodes_1959_Source

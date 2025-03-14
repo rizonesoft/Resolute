@@ -1,0 +1,22 @@
+<object type="TForm" name="Form1">
+  <properties>
+    <property name="Left" vt="Int16">302</property>
+    <property name="Top" vt="Int16">218</property>
+    <property name="Width" vt="Int16">420</property>
+    <property name="Height" vt="Int16">331</property>
+    <property name="Caption" vt="String">Form1</property>
+    <property name="Color" vt="Ident">clBtnFace</property>
+    <property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
+    <property name="Font.Color" vt="Ident">clWindowText</property>
+    <property name="Font.Height" vt="Int8">-11</property>
+    <property name="Font.Name" vt="String">MS Sans Serif</property>
+    <property name="Font.Style" vt="Set"></property>
+    <property name="OldCreateOrder" vt="False">False</property>
+    <property name="Visible" vt="True">True</property>
+    <property name="PixelsPerInch" vt="Int8">96</property>
+    <property name="TextHeight" vt="Int8">13</property>
+    <property name="Description" vt="String">A standard Windows Form.</property>
+  </properties>
+  <components>
+  </components>
+</object>
