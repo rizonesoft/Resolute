@@ -1,6 +1,6 @@
 ==================================================
 %{RELEASE}
-© %{COMPANY}. All rights reserved
+%{COMPANY}. All rights reserved
 %{COMPANYURL}
 ==================================================
 Version: %{VERSION}
@@ -12,7 +12,7 @@ Disk Space: %{INSTSIZE}
 Description
 --------------------------------------------------
 
-One of the biggest "improvements" that Mozilla claims is improved memory usage, in particular, the vanquishing of memory leaks. If you thought it was too good to be true you were right. Firefox still uses a lot of memory – way too much memory for a web browser.
+One of the biggest "improvements" that Mozilla claims is improved memory usage, in particular, the vanquishing of memory leaks. If you thought it was too good to be true you were right. Firefox still uses a lot of memory ï¿½ way too much memory for a web browser.
 
 We like keeping our apps running for a few days (that's just the way we roll) and because of this Firefox was using over ~800MB of memory after about 3 days. It's quite normal for Firefox to be sucking up ~100MB of memory right off the bat (in a memory leak you'll see the memory usage keep increasing the longer the browser is open/in-use).
 
