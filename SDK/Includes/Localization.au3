@@ -9,6 +9,7 @@
 
 #EndRegion AutoIt3Wrapper Directives Section
 
+#include "Versioning.au3"
 
 ; #INDEX# =======================================================================================================================
 ; Title .........: Localization
@@ -22,10 +23,8 @@
 Global Const $LNG_COUNTABOUT = 23
 Global Const $LNG_COUNTDONATE = 10
 Global Const $LNG_COUNTFILE = 25
-Global Const $LNG_COUNTLOGGING = 99
 Global Const $LNG_COUNTMESSAGES = 50
 Global Const $LNG_COUNTUPDATE = 12
-Global Const $LNG_COUNTVERSIONING = 4
 ; ===============================================================================================================================
 
 ; #VARIABLES# ===================================================================================================================
@@ -37,10 +36,8 @@ If Not IsDeclared("g_sProgName") Then Global $g_sProgName
 If Not IsDeclared("g_aLangAbout") Then Global $g_aLangAbout[$LNG_COUNTABOUT]
 If Not IsDeclared("g_aLangDonate") Then Global $g_aLangDonate[$LNG_COUNTDONATE]
 If Not IsDeclared("g_aLangFile") Then Global $g_aLangFile[$LNG_COUNTFILE]
-If Not IsDeclared("g_aLangLogging") Then Global $g_aLangLogging[$LNG_COUNTLOGGING]
 If Not IsDeclared("g_aLangMessages") Then Global $g_aLangMessages[$LNG_COUNTMESSAGES]
 If Not IsDeclared("g_aLangUpdate") Then Global $g_aLangUpdate[$LNG_COUNTUPDATE]
-If Not IsDeclared("g_aLangVersioning") Then Global $g_aLangVersioning[$LNG_COUNTVERSIONING]
 If Not IsDeclared("g_aLocalizationCache") Then Global $g_aLocalizationCache[50][3]
 If Not IsDeclared("g_iLocalizationCacheSize") Then Global $g_iLocalizationCacheSize = 0
 ; ===============================================================================================================================
@@ -234,20 +231,6 @@ Func _Localization_Update()
 	$g_aLangUpdate[11] = _Localization_Load("Update", "Button_Close", "Close")
 
 EndFunc   ;==>_Localization_Update
-
-
-Func _Localization_Versioning()
-
-	If StringLen($g_aLangVersioning[0]) > 0 Then
-		Return
-	EndIf
-
-	$g_aLangVersioning[0] = _Localization_Load("Versioning", "Administrator", "Administrator")
-	$g_aLangVersioning[1] = _Localization_Load("Versioning", "Build", "Build")
-	$g_aLangVersioning[2] = _Localization_Load("Versioning", "AutoIt_Version", "using AutoIt version %{AutoIt.Version}")
-	$g_aLangVersioning[3] = _Localization_Load("Versioning", "Bit", "Bit")
-
-EndFunc   ;==>_Localization_Versioning
 
 
 Func _Localization_Load($sSection, $sKey, $sDefault)

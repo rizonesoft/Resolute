@@ -9,20 +9,16 @@
 
 #EndRegion AutoIt3Wrapper Directives Section
 
-
 #include "AutoIt3Script.au3"
-#include "Localization.au3"
 
-
-; #INDEX# =======================================================================================================================
-; Title .........: Versioning
-; AutoIt Version : 3.3.15.0
-; Description ...: Versioning Functions
-; Author(s) .....: Derick Payne (Rizonesoft)
+; #CONSTANTS# ===================================================================================================================
+Global Const $LNG_COUNTLOGGING = 99
+Global Const $LNG_COUNTVERSIONING = 4
 ; ===============================================================================================================================
 
 ; #VARIABLES# ===================================================================================================================
 Global $g_aLangLogging[$LNG_COUNTLOGGING]
+Global $g_aLangVersioning[$LNG_COUNTVERSIONING]
 
 If Not IsDeclared("g_TitleShowAdmin") Then Global $g_TitleShowAdmin = False ;~ Show whether program is running as Administrator
 If Not IsDeclared("g_TitleShowArch") Then Global $g_TitleShowArch = False ;~ Show program architecture
@@ -31,8 +27,21 @@ If Not IsDeclared("g_TitleShowBuild") Then Global $g_TitleShowBuild = True ;~ Sh
 If Not IsDeclared("g_TitleShowAutoIt") Then Global $g_TitleShowAutoIt = False ;~ Show AutoIt version
 ; ===============================================================================================================================
 
+; Initialize versioning strings
+Func _Localization_Versioning()
+    If StringLen($g_aLangVersioning[0]) > 0 Then Return
+    
+    $g_aLangVersioning[0] = "Administrator"  ; Default English strings
+    $g_aLangVersioning[1] = "Build"
+    $g_aLangVersioning[2] = "using AutoIt version %{AutoIt.Version}"
+    $g_aLangVersioning[3] = "Bit"
+EndFunc
 
-; #CONSTANTS# ===================================================================================================================
+; #INDEX# =======================================================================================================================
+; Title .........: Versioning
+; AutoIt Version : 3.3.15.0
+; Description ...: Versioning Functions
+; Author(s) .....: Derick Payne (Rizonesoft)
 ; ===============================================================================================================================
 
 ; #CURRENT# =====================================================================================================================
