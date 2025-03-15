@@ -6,12 +6,12 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
-- Enhanced: Memory management system to check total memory usage across all processes
-- Fixed: Memory threshold comparison now properly considers combined process memory
+- Fixed: Memory usage display showing incorrect 0 MB values
+- Fixed: Memory threshold now checks total usage across all processes
+- Enhanced: Memory usage updates now occur every 1000ms for better performance
 - Improved: Memory clearing logic to handle multiple processes more efficiently
 - Added: Smarter memory threshold checks for better resource management
 - Enhanced: Memory statistics display with color-coded status indicators
-- Added: Visual warning indicators for approaching memory limits
 - Optimized: GUI update frequency for better performance
 
 --------------------------------------------------

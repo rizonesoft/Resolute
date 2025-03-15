@@ -1282,6 +1282,7 @@ EndFunc
 Func _ClearProcessesWorkingSet()
     ; Static variable declarations must be at the start
     Static $hLastCheck = 0  ; Cache last check time
+    Static $hLastUsageUpdate = 0  ; Cache last usage update time
     
     Local $aProcessList
 
@@ -1292,45 +1293,50 @@ Func _ClearProcessesWorkingSet()
     ; Return if memory reduction is not enabled
     If Not $g_iBoostEnabled Then Return
 
-    ; Get memory threshold if limit is enabled
-    Local $iMemThreshold = 0
-    If $g_iLimitEnabled = 1 Then
-        ; Convert MB to bytes - multiply by 1024 * 1024
-        $iMemThreshold = Number($g_iCleanLimit) * 1024 * 1024
-    EndIf
+    ; Only update usage values every 1000ms
+    If TimerDiff($hLastUsageUpdate) >= 1000 Then
+        $hLastUsageUpdate = TimerInit()
+        
+        ; Get all processes at once
+        $aProcessList = ProcessList($g_sCoreProcess)
+        $g_iProcessesCount = $aProcessList[0][0]
 
-    ; Get all processes at once
-    $aProcessList = ProcessList($g_sCoreProcess)
-    $g_iProcessesCount = $aProcessList[0][0]
+        If Not @error And $g_iProcessesCount > 0 Then
+            Local $iTotalMemoryUsage = 0
+            Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
 
-    If Not @error And $g_iProcessesCount > 0 Then
-        Local $iTotalMemoryUsage = 0
-        Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
+            ; First pass - collect total memory usage
+            For $i = 1 To $g_iProcessesCount
+                Local $iPID = $aProcessList[$i][1]
+                Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
+                Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
+                
+                $iTotalMemoryUsage += $iUsage
+                $g_iCoreProcessUsage += $iUsage
+                $g_iCoreProcessPeak += $iPeak
 
-        ; First pass - collect total memory usage
-        For $i = 1 To $g_iProcessesCount
-            Local $iPID = $aProcessList[$i][1]
-            Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
-            Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
-            
-            $iTotalMemoryUsage += $iUsage
-            $g_iCoreProcessUsage += $iUsage
-            $g_iCoreProcessPeak += $iPeak
+                ; Store process info for potential clearing
+                _ArrayAdd($aProcessesToClear, $iPID)
+                $aProcessesToClear[0] += 1
+            Next
 
-            ; Store process info for potential clearing
-            _ArrayAdd($aProcessesToClear, $iPID)
-            $aProcessesToClear[0] += 1
-        Next
+            ; Get memory threshold if limit is enabled
+            Local $iMemThreshold = 0
+            If $g_iLimitEnabled = 1 Then
+                ; Convert MB to bytes - multiply by 1024 * 1024
+                $iMemThreshold = Number($g_iCleanLimit) * 1024 * 1024
+            EndIf
 
-        ; Only clear processes if:
-        ; 1. Limit is not enabled ($g_iLimitEnabled = 0) OR
-        ; 2. Total memory usage exceeds the threshold when limit is enabled
-        If $g_iLimitEnabled = 0 Or ($g_iLimitEnabled = 1 And $iTotalMemoryUsage > $iMemThreshold) Then
-            ; Clear all processes since total memory exceeds threshold
-            If $aProcessesToClear[0] > 0 Then
-                For $i = 1 To $aProcessesToClear[0]
-                    _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
-                Next
+            ; Only clear processes if:
+            ; 1. Limit is not enabled ($g_iLimitEnabled = 0) OR
+            ; 2. Total memory usage exceeds the threshold when limit is enabled
+            If $g_iLimitEnabled = 0 Or ($g_iLimitEnabled = 1 And $iTotalMemoryUsage > $iMemThreshold) Then
+                ; Clear all processes since total memory exceeds threshold
+                If $aProcessesToClear[0] > 0 Then
+                    For $i = 1 To $aProcessesToClear[0]
+                        _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
+                    Next
+                EndIf
             EndIf
         EndIf
     EndIf
@@ -1340,6 +1346,8 @@ EndFunc
 
 Func _ClearProcessWorkingSet($sProcessName)
     Static $hLastCheck = 0  ; Cache last check time
+    Static $hLastUsageUpdate = 0  ; Cache last usage update time
+    
     Local $aProcessList
     Local $iProcessCount
     
@@ -1349,36 +1357,41 @@ Func _ClearProcessWorkingSet($sProcessName)
     
     If Not $g_iBoostEnabled Then Return
     
-    $aProcessList = ProcessList($sProcessName)
-    $iProcessCount = $aProcessList[0][0]
-    
-    If Not @error And $iProcessCount > 0 Then
-        ; Pre-calculate memory threshold
-        Local $iMemThreshold = $g_iCleanLimit * 1024 * 1024
-        Local $iTotalMemoryUsage = 0
-        Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
+    ; Only update usage values every 1000ms
+    If TimerDiff($hLastUsageUpdate) >= 1000 Then
+        $hLastUsageUpdate = TimerInit()
         
-        ; First pass - collect total memory usage
-        For $i = 1 To $iProcessCount
-            Local $iPID = $aProcessList[$i][1]
-            Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
-            Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
-            
-            $iTotalMemoryUsage += $iUsage
-            $g_iExtendedProcessUsage += $iUsage
-            $g_iExtendedProcessPeak += $iPeak
-            
-            ; Store process info for potential clearing
-            _ArrayAdd($aProcessesToClear, $iPID)
-            $aProcessesToClear[0] += 1
-        Next
+        $aProcessList = ProcessList($sProcessName)
+        $iProcessCount = $aProcessList[0][0]
         
-        ; Only clear if total memory exceeds threshold
-        If $g_iLimitEnabled = 0 Or ($g_iLimitEnabled = 1 And $iTotalMemoryUsage > $iMemThreshold) Then
-            If $aProcessesToClear[0] > 0 Then
-                For $i = 1 To $aProcessesToClear[0]
-                    _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
-                Next
+        If Not @error And $iProcessCount > 0 Then
+            ; Pre-calculate memory threshold
+            Local $iMemThreshold = $g_iCleanLimit * 1024 * 1024
+            Local $iTotalMemoryUsage = 0
+            Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
+            
+            ; First pass - collect total memory usage
+            For $i = 1 To $iProcessCount
+                Local $iPID = $aProcessList[$i][1]
+                Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
+                Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
+                
+                $iTotalMemoryUsage += $iUsage
+                $g_iExtendedProcessUsage += $iUsage
+                $g_iExtendedProcessPeak += $iPeak
+                
+                ; Store process info for potential clearing
+                _ArrayAdd($aProcessesToClear, $iPID)
+                $aProcessesToClear[0] += 1
+            Next
+            
+            ; Only clear if total memory exceeds threshold
+            If $g_iLimitEnabled = 0 Or ($g_iLimitEnabled = 1 And $iTotalMemoryUsage > $iMemThreshold) Then
+                If $aProcessesToClear[0] > 0 Then
+                    For $i = 1 To $aProcessesToClear[0]
+                        _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
+                    Next
+                EndIf
             EndIf
         EndIf
     EndIf
@@ -1428,34 +1441,45 @@ Func _UpdateStatLabels()
     If TimerDiff($iLastUpdate) < 500 Then Return
     $iLastUpdate = TimerInit()
     
-    ; Convert bytes to MB with proper rounding
-    $g_iCoreProcessUsage = Round($g_iCoreProcessUsage / 1024 / 1024, 2)
-    $g_iCoreProcessPeak = Round($g_iCoreProcessPeak / 1024 / 1024, 2)
-    $g_iExtendedProcessUsage = Round($g_iExtendedProcessUsage / 1024 / 1024, 2)
-    $g_iExtendedProcessPeak = Round($g_iExtendedProcessPeak / 1024 / 1024, 2)
-    
-    ; Update core process stats
-    GUICtrlSetData($g_hLblProcessUsage, $g_iCoreProcessUsage & " MB / " & $g_iCoreProcessPeak & " MB")
-    GUICtrlSetData($g_hLblProcessPeak, $g_iProcessesCount & " processes")
-    
-    ; Set colors based on memory thresholds
-    Local $iColor = 0x008000  ; Default green
-    If $g_iBoostEnabled And $g_iLimitEnabled And $g_iCoreProcessUsage > $g_iCleanLimit Then
-        $iColor = 0xFF0000  ; Red if over limit
-    ElseIf $g_iCoreProcessUsage > ($g_iCleanLimit * 0.8) Then
-        $iColor = 0xFF8C00  ; Orange if approaching limit
-    EndIf
-    GUICtrlSetColor($g_hLblProcessUsage, $iColor)
-    
-    ; Update extended process stats
-    GUICtrlSetData($g_hLblExtendUsage, $g_iExtendedProcessUsage & " MB / " & $g_iExtendedProcessPeak & " MB")
-    GUICtrlSetColor($g_hLblExtendUsage, $g_iExtendedProcessUsage > $g_iCleanLimit ? 0xFF0000 : 0x008000)
+    ; Store current values before resetting
+    Local $iCurrentCoreUsage = $g_iCoreProcessUsage
+    Local $iCurrentCorePeak = $g_iCoreProcessPeak
+    Local $iCurrentExtendedUsage = $g_iExtendedProcessUsage
+    Local $iCurrentExtendedPeak = $g_iExtendedProcessPeak
     
     ; Reset counters for next update cycle
     $g_iCoreProcessUsage = 0
     $g_iCoreProcessPeak = 0
     $g_iExtendedProcessUsage = 0
     $g_iExtendedProcessPeak = 0
+    
+    ; Convert bytes to MB with proper rounding
+    $iCurrentCoreUsage = Round($iCurrentCoreUsage / 1024 / 1024, 2)
+    $iCurrentCorePeak = Round($iCurrentCorePeak / 1024 / 1024, 2)
+    $iCurrentExtendedUsage = Round($iCurrentExtendedUsage / 1024 / 1024, 2)
+    $iCurrentExtendedPeak = Round($iCurrentExtendedPeak / 1024 / 1024, 2)
+    
+    ; Only update display if we have valid values
+    If $iCurrentCoreUsage > 0 Then
+        ; Update core process stats
+        GUICtrlSetData($g_hLblProcessUsage, $iCurrentCoreUsage & " MB / " & $iCurrentCorePeak & " MB")
+        GUICtrlSetData($g_hLblProcessPeak, $g_iProcessesCount & " processes")
+        
+        ; Set colors based on memory thresholds
+        Local $iColor = 0x008000  ; Default green
+        If $g_iBoostEnabled And $g_iLimitEnabled And $iCurrentCoreUsage > $g_iCleanLimit Then
+            $iColor = 0xFF0000  ; Red if over limit
+        ElseIf $iCurrentCoreUsage > ($g_iCleanLimit * 0.8) Then
+            $iColor = 0xFF8C00  ; Orange if approaching limit
+        EndIf
+        GUICtrlSetColor($g_hLblProcessUsage, $iColor)
+    EndIf
+    
+    ; Only update extended process stats if we have valid values
+    If $iCurrentExtendedUsage > 0 Then
+        GUICtrlSetData($g_hLblExtendUsage, $iCurrentExtendedUsage & " MB / " & $iCurrentExtendedPeak & " MB")
+        GUICtrlSetColor($g_hLblExtendUsage, $iCurrentExtendedUsage > $g_iCleanLimit ? 0xFF0000 : 0x008000)
+    EndIf
 EndFunc
 
 
