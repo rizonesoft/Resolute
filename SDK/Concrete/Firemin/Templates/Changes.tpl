@@ -6,10 +6,8 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
---------------------------------------------------
-Version 11.8.3.8527 (DECEMBER 15, 2024)
---------------------------------------------------
-
+- Fixed: Undefined function error in localization system
+- Added: Missing include for Windows version detection
 - Optimized: Memory management functions with improved caching
 - Enhanced: Process working set clearing with batch processing
 - Added: Rate limiting to prevent excessive CPU usage
@@ -17,6 +15,11 @@ Version 11.8.3.8527 (DECEMBER 15, 2024)
 - Enhanced: Error handling in memory management functions
 - Optimized: Array handling for better performance
 - Added: Early exit conditions to improve response time
+- Enhanced: Memory statistics display with color-coded status
+- Added: Visual warning indicators for memory usage thresholds
+- Improved: Process count display formatting
+- Optimized: GUI update frequency for better performance
+- Added: Intermediate warning state for approaching memory limits
 
 --------------------------------------------------
 Version 11.8.3.8520 (DECEMBER 5, 2024)

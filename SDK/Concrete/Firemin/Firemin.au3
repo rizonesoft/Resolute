@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.8.3.8527
+#AutoIt3Wrapper_Res_Fileversion=11.8.3.8528
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -1410,37 +1410,40 @@ EndFunc
 
 
 Func _UpdateStatLabels()
-
-	$g_iCoreProcessUsage = Round($g_iCoreProcessUsage / 1024 / 1024, 2)
-	$g_iCoreProcessPeak = Round($g_iCoreProcessPeak / 1024 / 1024, 2)
-
-	GUICtrlSetData($g_hLblProcessUsage, $g_iCoreProcessUsage & " MB / " & $g_iCoreProcessPeak & " MB")
-	GUICtrlSetData($g_hLblProcessPeak, $g_iProcessesCount)
-	GUICtrlSetColor($g_hLblProcessUsage, 0x008000)
-
-
-	If $g_iBoostEnabled Then
-		If $g_iLimitEnabled Then
-			If $g_iCoreProcessUsage > $g_iCleanLimit Then
-				GUICtrlSetColor($g_hLblProcessUsage, 0xFF0000)
-			EndIf
-		EndIf
-	EndIf
-
-	$g_iExtendedProcessUsage = Round($g_iExtendedProcessUsage / 1024 / 1024, 2)
-	$g_iExtendedProcessPeak = Round($g_iExtendedProcessPeak / 1024 / 1024, 2)
-	GUICtrlSetData($g_hLblExtendUsage, $g_iExtendedProcessUsage & " MB / " & $g_iExtendedProcessPeak & " MB")
-	GUICtrlSetColor($g_hLblExtendUsage, 0x008000)
-
-	If $g_iExtendedProcessUsage > $g_iCleanLimit Then
-		GUICtrlSetColor($g_hLblExtendUsage, 0xFF0000)
-	EndIf
-
-	$g_iCoreProcessUsage = 0
-	$g_iCoreProcessPeak	= 0
-	$g_iExtendedProcessUsage = 0
-	$g_iExtendedProcessPeak = 0
-
+    Static $iLastUpdate = 0  ; Cache last update time
+    
+    ; Only update every 500ms to prevent excessive GUI updates while still being responsive
+    If TimerDiff($iLastUpdate) < 500 Then Return
+    $iLastUpdate = TimerInit()
+    
+    ; Convert bytes to MB with proper rounding
+    $g_iCoreProcessUsage = Round($g_iCoreProcessUsage / 1024 / 1024, 2)
+    $g_iCoreProcessPeak = Round($g_iCoreProcessPeak / 1024 / 1024, 2)
+    $g_iExtendedProcessUsage = Round($g_iExtendedProcessUsage / 1024 / 1024, 2)
+    $g_iExtendedProcessPeak = Round($g_iExtendedProcessPeak / 1024 / 1024, 2)
+    
+    ; Update core process stats
+    GUICtrlSetData($g_hLblProcessUsage, $g_iCoreProcessUsage & " MB / " & $g_iCoreProcessPeak & " MB")
+    GUICtrlSetData($g_hLblProcessPeak, $g_iProcessesCount & " processes")
+    
+    ; Set colors based on memory thresholds
+    Local $iColor = 0x008000  ; Default green
+    If $g_iBoostEnabled And $g_iLimitEnabled And $g_iCoreProcessUsage > $g_iCleanLimit Then
+        $iColor = 0xFF0000  ; Red if over limit
+    ElseIf $g_iCoreProcessUsage > ($g_iCleanLimit * 0.8) Then
+        $iColor = 0xFF8C00  ; Orange if approaching limit
+    EndIf
+    GUICtrlSetColor($g_hLblProcessUsage, $iColor)
+    
+    ; Update extended process stats
+    GUICtrlSetData($g_hLblExtendUsage, $g_iExtendedProcessUsage & " MB / " & $g_iExtendedProcessPeak & " MB")
+    GUICtrlSetColor($g_hLblExtendUsage, $g_iExtendedProcessUsage > $g_iCleanLimit ? 0xFF0000 : 0x008000)
+    
+    ; Reset counters for next update cycle
+    $g_iCoreProcessUsage = 0
+    $g_iCoreProcessPeak = 0
+    $g_iExtendedProcessUsage = 0
+    $g_iExtendedProcessPeak = 0
 EndFunc
 
 
@@ -1981,3 +1984,4 @@ Func __LanguageListEvents($hWnd, $iMsg, $wParam, $lParam)
 	EndSwitch
 	Return $GUI_RUNDEFMSG
 EndFunc   ;==>WM_NOTIFY
+
