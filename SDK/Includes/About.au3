@@ -54,12 +54,7 @@ If Not IsDeclared("g_iAboutIconStart") Then Global $g_iAboutIconStart
 If Not IsDeclared("g_sUrlCompHomePage") Then Global $g_sUrlCompHomePage
 If Not IsDeclared("g_sUrlSupport") Then Global $g_sUrlSupport
 If Not IsDeclared("g_sUrlDownloads") Then Global $g_sUrlDownloads
-If Not IsDeclared("g_sUrlTwitter") Then Global $g_sUrlTwitter
 If Not IsDeclared("g_sUrlFacebook") Then Global $g_sUrlFacebook
-If Not IsDeclared("g_sUrlReddit") Then Global $g_sUrlReddit
-If Not IsDeclared("g_sUrlLinkedIn") Then Global $g_sUrlLinkedIn
-If Not IsDeclared("g_sUrlWhatsApp") Then Global $g_sUrlWhatsApp
-If Not IsDeclared("g_sUrlRSS") Then Global $g_sUrlRSS
 If Not IsDeclared("g_sUrlPayPal") Then Global $g_sUrlPayPal
 If Not IsDeclared("g_sUrlGitHub") Then Global $g_sUrlGitHub
 If Not IsDeclared("g_sUrlGitHubIssues") Then Global $g_sUrlGitHubIssues
@@ -167,7 +162,7 @@ Func _About_ShowDialog()
 	$g_hRAMLabel = GUICtrlCreateLabel("", 20, 346, 380, 15)
 	GUICtrlSetFont($g_hRAMLabel, 8, 700, Default, "Verdana")
 	GUICtrlSetColor($g_hRAMLabel, 0x333333)
-	GUICtrlSetTip($g_hRAMLabel, $g_aLangAbout[19])
+	GUICtrlSetTip($g_hRAMLabel, $g_aLangAbout[15])
 
 	GUICtrlCreateLabel("", 20, 363, 380, 15)
 	GUICtrlSetBkColor(-1, 0x555555)
@@ -191,7 +186,7 @@ Func _About_ShowDialog()
 	$g_hSpaceProg1 = GUICtrlCreateLabel("", 22, 402, 50, 11)
 	$g_hSpaceProg2 = GUICtrlCreateLabel("", 23, 403, 48, 9)
 
-	$abBtnOK = GUICtrlCreateButton($g_aLangAbout[18], 260, 450, 150, 38, $BS_DEFPUSHBUTTON)
+	$abBtnOK = GUICtrlCreateButton($g_aLangAbout[14], 260, 450, 150, 38, $BS_DEFPUSHBUTTON)
 	GUICtrlSetFont($abBtnOK, 9)
 
 	$g_aAboutIcons[2][0] = GUICtrlCreateIcon($g_aAboutIcons[2][1], $g_iAboutIconStart + 4, 20, 455, 32, 32)
@@ -200,32 +195,14 @@ Func _About_ShowDialog()
 	$g_aAboutIcons[3][0] = GUICtrlCreateIcon($g_aAboutIcons[3][1], $g_iAboutIconStart + 6, 60, 455, 32, 32)
 	GUICtrlSetTip($g_aAboutIcons[3][0], $g_aLangAbout[13])
 	GUICtrlSetCursor($g_aAboutIcons[3][0], 0)
-	$g_aAboutIcons[4][0] = GUICtrlCreateIcon($g_aAboutIcons[4][1], $g_iAboutIconStart + 8, 100, 455, 32, 32)
-	GUICtrlSetTip($g_aAboutIcons[4][0], $g_aLangAbout[14])
-	GUICtrlSetCursor($g_aAboutIcons[4][0], 0)
-	$g_aAboutIcons[5][0] = GUICtrlCreateIcon($g_aAboutIcons[5][1], $g_iAboutIconStart + 10, 140, 455, 32, 32)
-	GUICtrlSetTip($g_aAboutIcons[5][0], $g_aLangAbout[15])
-	GUICtrlSetCursor($g_aAboutIcons[5][0], 0)
-	$g_aAboutIcons[6][0] = GUICtrlCreateIcon($g_aAboutIcons[6][1], $g_iAboutIconStart + 12, 180, 455, 32, 32)
-	GUICtrlSetTip($g_aAboutIcons[6][0], $g_aLangAbout[16])
-	GUICtrlSetCursor($g_aAboutIcons[6][0], 0)
-	$g_aAboutIcons[7][0] = GUICtrlCreateIcon($g_aAboutIcons[7][1], $g_iAboutIconStart + 14, 220, 455, 32, 32)
-	GUICtrlSetTip($g_aAboutIcons[7][0], $g_aLangAbout[17])
-	GUICtrlSetCursor($g_aAboutIcons[7][0], 0)
-	GUICtrlSetState($g_aAboutIcons[7][0], $GUI_HIDE)
 
 	GUICtrlSetOnEvent($abBtnOK, "__About_CloseDialog")
 	GUICtrlSetOnEvent($abHome, "_About_HomePage")
 	GUICtrlSetOnEvent($abSupport, "_About_Support")
 	GUICtrlSetOnEvent($g_aAboutIcons[0][0], "_About_PayPal")
 	GUICtrlSetOnEvent($g_aAboutIcons[1][0], "_About_SouthAfrica")
-	GUICtrlSetOnEvent($g_aAboutIcons[2][0], "_About_Twitter")
-	GUICtrlSetOnEvent($g_aAboutIcons[3][0], "_About_Facebook")
-	GUICtrlSetOnEvent($g_aAboutIcons[4][0], "_About_Reddit")
-	GUICtrlSetOnEvent($g_aAboutIcons[5][0], "_About_LinkedIn")
-	GUICtrlSetOnEvent($g_aAboutIcons[6][0], "_About_GitHub")
-	GUICtrlSetOnEvent($g_aAboutIcons[7][0], "_About_WhatsApp")
-
+	GUICtrlSetOnEvent($g_aAboutIcons[2][0], "_About_Facebook")
+	GUICtrlSetOnEvent($g_aAboutIcons[3][0], "_About_GitHub")
 
 	GUISetState(@SW_SHOW, $g_hAboutGui)
 	__About_SetMemoryStats()
@@ -263,29 +240,9 @@ Func _About_SouthAfrica()
 EndFunc   ;==>_About_SouthAfrica
 
 
-Func _About_Twitter()
-	ShellExecute(_Link_Split($g_sUrlTwitter))
-EndFunc   ;==>_About_Twitter
-
-
 Func _About_Facebook()
 	ShellExecute(_Link_Split($g_sUrlFacebook))
 EndFunc   ;==>_About_Facebook
-
-
-Func _About_Reddit()
-	ShellExecute(_Link_Split($g_sUrlReddit))
-EndFunc   ;==>_About_Reddit
-
-
-Func _About_LinkedIn()
-	ShellExecute(_Link_Split($g_sUrlLinkedIn))
-EndFunc   ;==>_About_LinkedIn
-
-
-Func _About_WhatsApp()
-	ShellExecute(_Link_Split($g_sUrlWhatsApp))
-EndFunc   ;==>_About_WhatsApp
 
 
 Func _About_Support()
@@ -372,12 +329,8 @@ Func __About_SetResources()
 		$g_aAboutIcons[1][2] = $g_sThemesDir & "\Icons\About\saH.ico"
 		$g_aAboutIcons[2][1] = $g_sThemesDir & "\Icons\About\Facebook.ico"
 		$g_aAboutIcons[2][2] = $g_sThemesDir & "\Icons\About\FacebookH.ico"
-		$g_aAboutIcons[3][1] = $g_sThemesDir & "\Icons\About\Twitter.ico"
-		$g_aAboutIcons[3][2] = $g_sThemesDir & "\Icons\About\TwitterH.ico"
-		$g_aAboutIcons[4][1] = $g_sThemesDir & "\Icons\About\GooglePlus.ico"
-		$g_aAboutIcons[4][2] = $g_sThemesDir & "\Icons\About\GooglePlusH.ico"
-		$g_aAboutIcons[5][1] = $g_sThemesDir & "\Icons\About\GitHub.ico"
-		$g_aAboutIcons[5][2] = $g_sThemesDir & "\Icons\About\GitHubH.ico"
+		$g_aAboutIcons[3][1] = $g_sThemesDir & "\Icons\About\GitHub.ico"
+		$g_aAboutIcons[3][2] = $g_sThemesDir & "\Icons\About\GitHubH.ico"
 
 	EndIf
 
@@ -399,7 +352,7 @@ Func __About_SetDriveSpaceStats()
 	Local $iSpacePercFree = 100 - $iSpacePerc
 
 	If $iSpaceUsed <> $g_aBuffers[0] Then
-		GUICtrlSetData($g_hSpaceLabel, StringUpper(StringFormat($g_aLangAbout[20], _
+		GUICtrlSetData($g_hSpaceLabel, StringUpper(StringFormat($g_aLangAbout[16], _
 				$sDrive, Round(DriveSpaceFree($sDrive) / 1024, 2), Round(DriveSpaceTotal($sDrive) / 1024, 2), $iSpacePercFree)))
 		$g_aBuffers[0] = $iSpaceUsed
 	EndIf

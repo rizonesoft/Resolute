@@ -6,6 +6,47 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+--------------------------------------------------
+Version 11.8.3.8527 (DECEMBER 15, 2024)
+--------------------------------------------------
+
+- Optimized: Memory management functions with improved caching
+- Enhanced: Process working set clearing with batch processing
+- Added: Rate limiting to prevent excessive CPU usage
+- Improved: Memory threshold calculations and efficiency
+- Enhanced: Error handling in memory management functions
+- Optimized: Array handling for better performance
+- Added: Early exit conditions to improve response time
+
+--------------------------------------------------
+Version 11.8.3.8520 (DECEMBER 5, 2024)
+--------------------------------------------------
+
+- Improved: Made minor code enhancements for better performance and stability.
+- Resolved issues affecting all language versions.
+- Added more browser safe mode and incognito commands.
+
+--------------------------------------------------
+Version 11.8.3.8516 (NOVEMBER 30, 2024)
+--------------------------------------------------
+
+- Fixed: An issue where settings were not being saved correctly.
+- Fixed: The 'Decline' option was missing on the installation promo screen.
+- Enhanced: Streamlined the About pages by removing unnecessary content.
+- Improved: Made minor code enhancements for better performance and stability.
+
+--------------------------------------------------
+Version 11.8.3.8509 (NOVEMBER 20, 2024)
+--------------------------------------------------
+
+- Optimized language loading system with caching mechanism
+- Improved string replacement efficiency in localization
+- Code refactoring and performance improvements
+
+--------------------------------------------------
+Version 11.8.3.8398 (OCTOBER 30, 2023)
+--------------------------------------------------
+
 - Upgraded Rizonesoft SDK to Version 11.
 - Enhanced Social Media Link Integration in the 'About' Dialog.
 - Optimized Memory Usage Indicator Stability in the 'About' Dialog.

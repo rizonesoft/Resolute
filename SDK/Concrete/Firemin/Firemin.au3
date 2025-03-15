@@ -31,13 +31,13 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.8.3.8399
+#AutoIt3Wrapper_Res_Fileversion=11.8.3.8527
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
 #AutoIt3Wrapper_Res_ProductVersion=11             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
-#AutoIt3Wrapper_Res_LegalCopyright=© 2023 Rizonesoft				;~ Copyright field
+#AutoIt3Wrapper_Res_LegalCopyright=© 2025 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
 #AutoIt3Wrapper_res_Compatibility=Vista,Win7,Win8,Win81,Win10		;~ Vista/Windows7/win7/win8/win81 allowed separated by a comma     (Default=Win81)
 ;#AutoIt3Wrapper_Res_SaveSource=N									;~ (Y/N) Save a copy of the Script_source in the EXE resources. Default=N
@@ -95,18 +95,10 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico				; 217
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico						; 218
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico					; 219
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Twitter.ico				; 220
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\TwitterH.ico				; 221
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico				; 222
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico				; 223
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Reddit.ico					; 224
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\RedditH.ico				; 225
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedIn.ico				; 226
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\LinkedInH.ico				; 227
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 228
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 229
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\WhatsApp.ico				; 230
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\WhatsAppH.ico	 			; 231
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico				; 220
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico				; 221
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 223
 
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 232
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 233
@@ -280,21 +272,16 @@ Global $g_iSingleton			= True
 Global $g_iCoreGuiLoaded		= False
 
 ;~ Links
-Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"														; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com/contact-us/|www.rizonesoft.com/contact-us"								; https://www.rizonesoft.com/contact-us
-Global $g_sUrlWhatsApp			= "https://api.whatsapp.com/send?phone=27849630169&text=Hi,&source=&data="
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"								; https://www.rizonesoft.com/downloads/
-Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"												; https://twitter.com/Rizonesoft
-Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"											; https://www.facebook.com/rizonesoft
-Global $g_sUrlReddit			= "https://www.reddit.com/user/rizonesoft|Reddit.com/user/rizonesoft"									; https://www.reddit.com/user/rizonesoft
-Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 									; https://www.linkedin.com/in/rizonetech
+Global $g_sUrlCompHomePage		= "https://rizonesoft.com|rizonesoft.com"														; https://rizonesoft.com
+Global $g_sUrlSupport			= "https://rizonesoft.com/contact-us/|rizonesoft.com/contact-us/"								; https://rizonesoft.com/contact-us
+Global $g_sUrlDownloads			= "https://rizonesoft.com/downloads/|rizonesoft.com/downloads/"									; https://rizonesoft.com/downloads/
+Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"									; https://www.facebook.com/rizonesoft
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"								; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"					; https://github.com/rizonesoft/Resolute/issues
-Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://www.rizonesoft.com/feed
 Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"						; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"							; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/firemin/|www.rizonesoft.com/downloads/firemin/"
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/resolute/update/"
+Global $g_sUrlProgPage			= "https://rizonesoft.com/downloads/firemin/|rizonesoft.com/downloads/firemin/"
+Global $g_sUrlUpdate			= "https://rizonesoft.com/downloads/firemin/"
 Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 
 ;~ Path Variables
@@ -345,9 +332,9 @@ Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".ini"
 Global $g_iUpdateIconStart				= 209
 Global $g_iDialogIconStart				= 211
 Global $g_iAboutIconStart				= 216
-Global $g_iLangIconStart				= 232
-Global $g_iPowerIconsStart				= 267
-Global $g_iMenuIconsStart				= 273
+Global $g_iLangIconStart				= 224
+Global $g_iPowerIconsStart				= 259
+Global $g_iMenuIconsStart				= 265
 
 Global $g_aCoreIcons[3]
 Global $g_iSizeIcon						= 64
@@ -1293,51 +1280,96 @@ EndFunc
 
 
 Func _ClearProcessesWorkingSet()
-
-	Local $aProcessList
-
-	If Not $g_iLimitEnabled Then
-		$g_iCleanLimit = 0
-	EndIf
-
-	$aProcessList = ProcessList($g_sCoreProcess)
-	$g_iProcessesCount = $aProcessList[0][0]
-
-	If Not @error Then
-		For $x = 1 To $g_iProcessesCount
-
-			$g_iCoreProcessUsage += _GetProcessUsage($aProcessList[$x][1], 2)
-			$g_iCoreProcessPeak +=_GetProcessUsage($aProcessList[$x][1], 1)
-			If $g_iCoreProcessUsage > $g_iCleanLimit * 1024 * 1024 Then
-				_WinAPI_EmptyWorkingSet($aProcessList[$x][1])
-			EndIf
-		Next
-	EndIf
-	_ClearExtendedProcs()
-
+    Static $hLastCheck = 0  ; Cache last check time
+    Local $aProcessList
+    
+    ; Only check every 100ms to prevent excessive CPU usage
+    If TimerDiff($hLastCheck) < 100 Then Return
+    $hLastCheck = TimerInit()
+    
+    If Not $g_iLimitEnabled Then
+        $g_iCleanLimit = 0
+    EndIf
+    
+    ; Get all processes at once
+    $aProcessList = ProcessList($g_sCoreProcess)
+    $g_iProcessesCount = $aProcessList[0][0]
+    
+    If Not @error And $g_iProcessesCount > 0 Then
+        ; Pre-calculate memory threshold
+        Local $iMemThreshold = $g_iCleanLimit * 1024 * 1024
+        Local $iCurrentProcessUsage = 0
+        Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
+        
+        ; First pass - collect memory usage and identify processes to clear
+        For $i = 1 To $g_iProcessesCount
+            Local $iPID = $aProcessList[$i][1]
+            Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
+            Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
+            
+            $g_iCoreProcessUsage += $iUsage
+            $g_iCoreProcessPeak += $iPeak
+            
+            ; If process exceeds limit, add to clearing list
+            If $iUsage > $iMemThreshold Then
+                _ArrayAdd($aProcessesToClear, $iPID)
+                $aProcessesToClear[0] += 1
+            EndIf
+        Next
+        
+        ; Second pass - clear working sets in batch
+        If $aProcessesToClear[0] > 0 Then
+            For $i = 1 To $aProcessesToClear[0]
+                _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
+            Next
+        EndIf
+    EndIf
+    
+    _ClearExtendedProcs()
 EndFunc
 
-
 Func _ClearProcessWorkingSet($sProcessName)
-
-	Local $aProcessList
-	Local $iProcessCount
-
-	$aProcessList = ProcessList($sProcessName)
-	$iProcessCount = $aProcessList[0][0]
-
-	If Not @error Then
-		If $g_iBoostEnabled Then
-			For $x = 1 To $iProcessCount
-				$g_iExtendedProcessUsage += _GetProcessUsage($aProcessList[$x][1], 2)
-				$g_iExtendedProcessPeak +=_GetProcessUsage($aProcessList[$x][1], 1)
-				If $g_iExtendedProcessUsage > $g_iCleanLimit * 1024 * 1024 Then
-					_WinAPI_EmptyWorkingSet($aProcessList[$x][1])
-				EndIf
-			Next
-		EndIf
-	EndIf
-
+    Static $hLastCheck = 0  ; Cache last check time
+    Local $aProcessList
+    Local $iProcessCount
+    
+    ; Only check every 100ms to prevent excessive CPU usage
+    If TimerDiff($hLastCheck) < 100 Then Return
+    $hLastCheck = TimerInit()
+    
+    If Not $g_iBoostEnabled Then Return
+    
+    $aProcessList = ProcessList($sProcessName)
+    $iProcessCount = $aProcessList[0][0]
+    
+    If Not @error And $iProcessCount > 0 Then
+        ; Pre-calculate memory threshold
+        Local $iMemThreshold = $g_iCleanLimit * 1024 * 1024
+        Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
+        
+        ; First pass - collect memory usage and identify processes to clear
+        For $i = 1 To $iProcessCount
+            Local $iPID = $aProcessList[$i][1]
+            Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
+            Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
+            
+            $g_iExtendedProcessUsage += $iUsage
+            $g_iExtendedProcessPeak += $iPeak
+            
+            ; If process exceeds limit, add to clearing list
+            If $iUsage > $iMemThreshold Then
+                _ArrayAdd($aProcessesToClear, $iPID)
+                $aProcessesToClear[0] += 1
+            EndIf
+        Next
+        
+        ; Second pass - clear working sets in batch
+        If $aProcessesToClear[0] > 0 Then
+            For $i = 1 To $aProcessesToClear[0]
+                _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
+            Next
+        EndIf
+    EndIf
 EndFunc
 
 
