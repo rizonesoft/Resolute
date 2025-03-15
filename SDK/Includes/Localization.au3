@@ -41,6 +41,8 @@ If Not IsDeclared("g_aLangLogging") Then Global $g_aLangLogging[$LNG_COUNTLOGGIN
 If Not IsDeclared("g_aLangMessages") Then Global $g_aLangMessages[$LNG_COUNTMESSAGES]
 If Not IsDeclared("g_aLangUpdate") Then Global $g_aLangUpdate[$LNG_COUNTUPDATE]
 If Not IsDeclared("g_aLangVersioning") Then Global $g_aLangVersioning[$LNG_COUNTVERSIONING]
+If Not IsDeclared("g_aLocalizationCache") Then Global $g_aLocalizationCache[50][3]
+If Not IsDeclared("g_iLocalizationCacheSize") Then Global $g_iLocalizationCacheSize = 0
 ; ===============================================================================================================================
 
 
@@ -253,30 +255,56 @@ EndFunc   ;==>_Localization_Versioning
 
 
 Func _Localization_Load($sSection, $sKey, $sDefault)
-
 	Local $sCheckSpace = ""
 	If StringCompare(StringLeft($sKey, 8), "Checkbox") = 0 Then
 		$sCheckSpace = Chr(32)
 	EndIf
 
-	Return $sCheckSpace & _Localization_ReplaceVar(IniRead($g_sLanguageFile, $sSection, $sKey, $sDefault))
+	; Generate cache key
+	Local $sCacheKey = $sSection & "|" & $sKey
 
+	; Check cache first
+	For $i = 0 To $g_iLocalizationCacheSize - 1
+		If $g_aLocalizationCache[$i][0] = $sCacheKey Then
+			Return $sCheckSpace & $g_aLocalizationCache[$i][2]
+		EndIf
+	Next
+
+	; Not in cache, load from file
+	Local $sText = IniRead($g_sLanguageFile, $sSection, $sKey, $sDefault)
+	Local $sReplaced = _Localization_ReplaceVar($sText)
+
+	; Add to cache
+	_Localization_AddToCache($sCacheKey, $sText, $sReplaced)
+
+	Return $sCheckSpace & $sReplaced
 EndFunc
 
+Func _Localization_AddToCache($sCacheKey, $sOriginal, $sReplaced)
+	; Grow cache array if needed
+	If $g_iLocalizationCacheSize >= UBound($g_aLocalizationCache) Then
+		ReDim $g_aLocalizationCache[$g_iLocalizationCacheSize + 50][3]
+	EndIf
+
+	; Add to cache
+	$g_aLocalizationCache[$g_iLocalizationCacheSize][0] = $sCacheKey
+	$g_aLocalizationCache[$g_iLocalizationCacheSize][1] = $sOriginal
+	$g_aLocalizationCache[$g_iLocalizationCacheSize][2] = $sReplaced
+	$g_iLocalizationCacheSize += 1
+EndFunc
 
 Func _Localization_ReplaceVar($sText)
-
 	$sText = String($sText)
-	Local $aReturn[8]
 
-	$aReturn[0] = StringReplace($sText, "%{Company.Name}", $g_sCompanyName)
-	$aReturn[1] = StringReplace($aReturn[0], "%{Program.Name.Short}", $g_sProgShortName)
-	$aReturn[2] = StringReplace($aReturn[1], "%{Program.Name.Short.X64}", $g_sProgShortName_X64)
-	$aReturn[3] = StringReplace($aReturn[2], "%{Program.Name}", $g_sProgName)
-	$aReturn[4] = StringReplace($aReturn[3], "%{AutoIt.Version}", @AutoItVersion)
-	$aReturn[5] = StringReplace($aReturn[4], "%{Windows.Version}", _GetWindowsVersion(1))
-	$aReturn[6] = StringReplace($aReturn[5], "\rn", @CRLF)
-	$aReturn[7] = StringReplace($aReturn[6], "\t", @TAB)
+	; Do all replacements in one pass
+	$sText = StringReplace($sText, "%{Company.Name}", $g_sCompanyName)
+	$sText = StringReplace($sText, "%{Program.Name.Short}", $g_sProgShortName)
+	$sText = StringReplace($sText, "%{Program.Name.Short.X64}", $g_sProgShortName_X64)
+	$sText = StringReplace($sText, "%{Program.Name}", $g_sProgName)
+	$sText = StringReplace($sText, "%{AutoIt.Version}", @AutoItVersion)
+	$sText = StringReplace($sText, "%{Windows.Version}", _GetWindowsVersion(1))
+	$sText = StringReplace($sText, "\rn", @CRLF)
+	$sText = StringReplace($sText, "\t", @TAB)
 
-	Return $aReturn[7]
+	Return $sText
 EndFunc   ;==>_Localization_ReplaceVar
