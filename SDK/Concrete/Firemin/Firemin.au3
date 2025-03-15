@@ -315,6 +315,12 @@ Global $g_iStartBrowser		 = 0
 Global $g_iExtProcsEnabled	 = 1
 Global $g_iShowNotifications = 0
 
+; System memory limit settings
+Global $g_iSystemMemoryLimit = 20    ; Default to 20% free memory required
+Global $g_iSystemMemoryEnabled = 0   ; Disabled by default
+Global $g_hChkSystemMemory          ; Checkbox control
+Global $g_hCmbSystemMemory          ; Combobox control
+
 If Not @Compiled Then
 	$g_sProcessDir = _PathFull(@ScriptDir & "\..\..\..\Resolute\Processing")
 EndIf
@@ -365,7 +371,7 @@ Global $g_TitleShowAutoIt	= True	;~ Show AutoIt version
 
 ;~ Interface Settings
 Global $g_iCoreGuiWidth		= 500
-Global $g_iCoreGuiHeight	= 560
+Global $g_iCoreGuiHeight	= 580
 Global $g_iMsgBoxTimeOut	= 60
 
 ;~ About Dialog
@@ -543,7 +549,7 @@ Func _StartCore()
 
     ; Register the memory clearing function with the specified interval
     AdlibRegister("_ClearProcessesWorkingSet", $g_iBoostMill)
-    
+
     ; Register the stats update function to run every 500ms
     AdlibRegister("_GetCoreProcessUsage", 500)
 
@@ -661,39 +667,47 @@ Func _StartCoreGui()
 
 	GUICtrlSetOnEvent($g_hLblPrflPathExe, "_RunBrowser")
 
-	GUICtrlCreateGroup($g_aLangCustom[7], 10, 315, 480, 160)
+	GUICtrlCreateGroup($g_aLangCustom[7], 10, 315, 480, 180)
 	GUICtrlSetFont(-1, 10, Default, 2)
-	$g_hChkReduceEnabled = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[8], 20, 345, 180, 20)
-	$g_hComboReduceMill = GUICtrlCreateCombo("", 210, 343, 110, 20)
-	GUICtrlSetData($g_hComboReduceMill, "500|1000|2000|3000|4000|5000|6000|7000|8000|9000|10000|15000|30000|45000|60000|300000|600000|900000|1800000|2700000|3600000|7200000", $g_iBoostMill)
-	GUICtrlCreateLabel($g_aLangCustom[9], 327, 348, 80, 20)
+	$g_hChkReduceEnabled = GUICtrlCreateCheckbox($g_aLangCustom[8], 20, 345, 165, 20)
+	$g_hComboReduceMill = GUICtrlCreateCombo("", 190, 343, 90, 20)
+	GUICtrlSetData($g_hComboReduceMill, "500|1000|2000|3000|4000|5000|6000|7000|8000|9000|10000", $g_iBoostMill)
+	GUICtrlCreateLabel($g_aLangCustom[9] & " {1000 ms}", 286, 348, 150, 20)
 
-	$g_hChkCleanLimit = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[10], 20, 368, 270, 20)
-	$g_hComboCleanLimit = GUICtrlCreateCombo("", 290, 369, 55, 20)
-	GUICtrlSetData($g_hComboCleanLimit, "50|100|200|300|400|500|600|700|800|900|1000|1200|1400|1600|1800|2000|2300|2600|2900|3200|3500|3800|4100|4400|4700|5000", $g_iCleanLimit)
-	GUICtrlCreateLabel("MB", 352, 371, 50, 20)
-	$g_hChkBrowserAutoStart = GUICtrlCreateCheckbox(Chr(32) & StringFormat($g_aLangCustom[11], $g_sBrowserName), 20, 391, 320, 20)
-	$g_hChkExtendedProcs = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[12], 20, 414, 220, 20)
-	$g_hBtnExtendedProcs = GUICtrlCreateButton($g_aLangCustom[13], 300, 414, 180, 30)
-	$g_hChkStartWindows = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[14], 20, 445, 320, 20)
+	$g_hChkCleanLimit = GUICtrlCreateCheckbox($g_aLangCustom[10], 20, 368, 240, 20)
+	$g_hComboCleanLimit = GUICtrlCreateCombo("", 270, 369, 55, 20)
+	GUICtrlSetData($g_hComboCleanLimit, "50|100|200|300|400|500|600|700|800|900|1000|1200|1400|1600|1800|2000|2300|2600|2900|3200", $g_iCleanLimit)
+	GUICtrlCreateLabel("MB {200 MB}", 330, 371, 120, 20)
+
+	; Add system memory limit controls
+	$g_hChkSystemMemory = GUICtrlCreateCheckbox(Chr(32) & "Only reduce if system free memory is less than :", 20, 391, 300, 20)
+	$g_hCmbSystemMemory = GUICtrlCreateCombo("", 330, 391, 55, 20)
+	GUICtrlSetData($g_hCmbSystemMemory, "5|10|15|20|25|30|35|40|45|50|60|70|80|90", "20")
+	GUICtrlCreateLabel("% {20%}", 390, 393, 90, 20)
+
+	$g_hChkBrowserAutoStart = GUICtrlCreateCheckbox(StringFormat($g_aLangCustom[11], $g_sBrowserName), 20, 414, 320, 20)
+	$g_hChkExtendedProcs = GUICtrlCreateCheckbox($g_aLangCustom[12], 20, 437, 220, 20)
+	$g_hBtnExtendedProcs = GUICtrlCreateButton($g_aLangCustom[13], 300, 437, 180, 30)
+	$g_hChkStartWindows = GUICtrlCreateCheckbox($g_aLangCustom[14], 20, 468, 320, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
-	$g_hLblUpdated = GUICtrlCreateLabel($g_aLangCustom[15], 10, 485, 200, 20)
+	$g_hLblUpdated = GUICtrlCreateLabel($g_aLangCustom[15], 10, 505, 200, 20)
 	GUICtrlSetColor($g_hLblUpdated, 0x008000)
 	GUICtrlSetState($g_hLblUpdated, $GUI_HIDE)
 
-	$g_hBtnCancel = GUICtrlCreateButton($g_aLangCustom[16], 285, 480, 100, 30)
-	$g_hBtnSave = GUICtrlCreateButton($g_aLangCustom[17], 390, 480, 100, 30)
+	$g_hBtnCancel = GUICtrlCreateButton($g_aLangCustom[16], 285, 500, 100, 30)
+	$g_hBtnSave = GUICtrlCreateButton($g_aLangCustom[17], 390, 500, 100, 30)
 	GUICtrlSetState($g_hBtnSave, $GUI_DISABLE)
 	GUICtrlSetOnEvent($g_hBtnSave, "_SaveFireminConfig")
 
-	GUICtrlCreateLabel("", -10, 516, 500, 1)
+	GUICtrlCreateLabel("", -10, 536, 500, 1)
 	GUICtrlSetBkColor(-1, 0xD6D6D6)
-	$g_hLblTimeStatus = GUICtrlCreateLabel("", 10, 523, 450, 25)
+	$g_hLblTimeStatus = GUICtrlCreateLabel("", 10, 543, 450, 25)
 	GUICtrlSetColor($g_hLblTimeStatus, 0x333333)
 
 	GUICtrlSetState($g_hChkReduceEnabled, $g_iBoostEnabled)
 	GUICtrlSetState($g_hChkCleanLimit, $g_iLimitEnabled)
+	GUICtrlSetState($g_hChkSystemMemory, $g_iSystemMemoryEnabled)
 	GUICtrlSetState($g_hChkBrowserAutoStart, $g_iStartBrowser)
 	GUICtrlSetState($g_hChkExtendedProcs, $g_iExtProcsEnabled)
 	GUICtrlSetState($g_hChkStartWindows, FileExists(@StartupDir & "\Firemin.lnk"))
@@ -703,6 +717,8 @@ Func _StartCoreGui()
 	GUICtrlSetOnEvent($g_hComboReduceMill, "_SetBoost")
 	GUICtrlSetOnEvent($g_hChkCleanLimit, "_SetCleanLimit")
 	GUICtrlSetOnEvent($g_hComboCleanLimit, "_SetCleanLimit")
+	GUICtrlSetOnEvent($g_hChkSystemMemory, "_SetSystemMemoryLimit")
+	GUICtrlSetOnEvent($g_hCmbSystemMemory, "_SetSystemMemoryLimit")
 	GUICtrlSetOnEvent($g_hChkExtendedProcs, "_SetExtendedProcsEnabled")
 	GUICtrlSetOnEvent($g_hChkBrowserAutoStart, "_EnableSaveSettings")
 	GUICtrlSetOnEvent($g_hChkStartWindows, "_EnableSaveSettings")
@@ -1271,25 +1287,25 @@ Func _GetCoreProcessUsage()
     ; Reset core process counters before collecting new values
     $g_iCoreProcessUsage = 0
     $g_iCoreProcessPeak = 0
-    
+
     ; Get all processes at once
     Local $aProcessList = ProcessList($g_sCoreProcess)
     $g_iProcessesCount = $aProcessList[0][0]
-    
+
     If Not @error And $g_iProcessesCount > 0 Then
         ; Collect memory usage for all processes
         For $i = 1 To $g_iProcessesCount
             Local $iPID = $aProcessList[$i][1]
             Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
             Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
-            
+
             If Not @error Then
                 $g_iCoreProcessUsage += $iUsage
                 $g_iCoreProcessPeak += $iPeak
             EndIf
         Next
     EndIf
-    
+
     ; Update the GUI with new values
     _UpdateStatLabels()
 EndFunc
@@ -1299,7 +1315,7 @@ Func _ClearProcessesWorkingSet()
     ; Static variable declarations must be at the start
     Static $hLastCheck = 0  ; Cache last check time
     Static $hLastUsageUpdate = 0  ; Cache last usage update time
-    
+
     Local $aProcessList
 
     ; Only check every 100ms to prevent excessive CPU usage
@@ -1312,7 +1328,7 @@ Func _ClearProcessesWorkingSet()
     ; Only update usage values every 1000ms
     If TimerDiff($hLastUsageUpdate) >= 1000 Then
         $hLastUsageUpdate = TimerInit()
-        
+
         ; Get all processes at once
         $aProcessList = ProcessList($g_sCoreProcess)
         $g_iProcessesCount = $aProcessList[0][0]
@@ -1326,7 +1342,7 @@ Func _ClearProcessesWorkingSet()
                 Local $iPID = $aProcessList[$i][1]
                 Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
                 Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
-                
+
                 $iTotalMemoryUsage += $iUsage
                 $g_iCoreProcessUsage += $iUsage
                 $g_iCoreProcessPeak += $iPeak
@@ -1363,35 +1379,35 @@ EndFunc
 Func _ClearProcessWorkingSet($sProcessName)
     Static $hLastCheck = 0  ; Cache last check time
     Static $hLastUsageUpdate = 0  ; Cache last usage update time
-    
+
     Local $aProcessList
     Local $iProcessCount
-    
+
     ; Only check every 100ms to prevent excessive CPU usage
     If TimerDiff($hLastCheck) < 100 Then Return
     $hLastCheck = TimerInit()
-    
+
     If Not $g_iBoostEnabled Then Return
-    
+
     ; Only update usage values every 1000ms
     If TimerDiff($hLastUsageUpdate) >= 1000 Then
         $hLastUsageUpdate = TimerInit()
-        
+
         $aProcessList = ProcessList($sProcessName)
         $iProcessCount = $aProcessList[0][0]
-        
+
         If Not @error And $iProcessCount > 0 Then
             Local $iTotalMemoryUsage = 0
             Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
-            
+
             ; First pass - collect total memory usage
             For $i = 1 To $iProcessCount
                 Local $iPID = $aProcessList[$i][1]
                 Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
                 Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
-                
+
                 $iTotalMemoryUsage += $iUsage
-                
+
                 ; Update the appropriate counters based on process type
                 If $sProcessName = $g_sCoreProcess Then
                     $g_iCoreProcessUsage += $iUsage
@@ -1400,19 +1416,19 @@ Func _ClearProcessWorkingSet($sProcessName)
                     $g_iExtendedProcessUsage += $iUsage
                     $g_iExtendedProcessPeak += $iPeak
                 EndIf
-                
+
                 ; Store process info for potential clearing
                 _ArrayAdd($aProcessesToClear, $iPID)
                 $aProcessesToClear[0] += 1
             Next
-            
+
             ; Get memory threshold if limit is enabled
             Local $iMemThreshold = 0
             If $g_iLimitEnabled = 1 Then
                 ; Convert MB to bytes - multiply by 1024 * 1024
                 $iMemThreshold = Number($g_iCleanLimit) * 1024 * 1024
             EndIf
-            
+
             ; Only clear processes if:
             ; 1. Limit is not enabled ($g_iLimitEnabled = 0) OR
             ; 2. Total memory usage exceeds the threshold when limit is enabled
@@ -1451,35 +1467,35 @@ EndFunc
 Func _ClearExtendedProcs()
     Static $hLastCheck = 0  ; Cache last check time
     Static $hLastUsageUpdate = 0  ; Cache last usage update time
-    
+
     ; Only check every 100ms to prevent excessive CPU usage
     If TimerDiff($hLastCheck) < 100 Then Return
     $hLastCheck = TimerInit()
-    
-    If Not $g_iBoostEnabled Or Not $g_iExtProcsEnabled Then 
+
+    If Not $g_iBoostEnabled Or Not $g_iExtProcsEnabled Then
         Return
     EndIf
-    
+
     ; Only update usage values every 1000ms
     If TimerDiff($hLastUsageUpdate) >= 1000 Then
         $hLastUsageUpdate = TimerInit()
-        
+
         ; Reset extended process counters before collecting new values
         $g_iExtendedProcessUsage = 0
         $g_iExtendedProcessPeak = 0
-        
+
         ; Get memory threshold if limit is enabled
         Local $iMemThreshold = 0
         If $g_iLimitEnabled = 1 Then
             ; Convert MB to bytes - multiply by 1024 * 1024
             $iMemThreshold = Number($g_iCleanLimit) * 1024 * 1024
         EndIf
-        
+
         ; Split and clean the extended processes list
         Local $aProcs = StringSplit(StringStripWS($g_sExtendedProcs, 8), ",", $STR_NOCOUNT)
         Local $iTotalMemoryUsage = 0
         Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
-        
+
         ; First pass - collect total memory usage from all extended processes
         For $x = 0 To UBound($aProcs) - 1
             ; Clean up process name and ensure it ends with .exe
@@ -1487,7 +1503,7 @@ Func _ClearExtendedProcs()
             If Not StringInStr($sCleanProc, ".exe", 1) Then
                 $sCleanProc &= ".exe"
             EndIf
-            
+
             If $sCleanProc <> "" Then
                 ; Get all instances of this process
                 Local $aProcessList = ProcessList($sCleanProc)
@@ -1497,14 +1513,14 @@ Func _ClearExtendedProcs()
                         Local $iPID = $aProcessList[$i][1]
                         Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
                         Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
-                        
+
                         If Not @error Then
                             $iTotalMemoryUsage += $iUsage
                             $g_iExtendedProcessUsage += $iUsage
                             If $iPeak > $g_iExtendedProcessPeak Then
                                 $g_iExtendedProcessPeak = $iPeak
                             EndIf
-                            
+
                             ; Store process info for potential clearing
                             _ArrayAdd($aProcessesToClear, $iPID)
                             $aProcessesToClear[0] += 1
@@ -1513,7 +1529,7 @@ Func _ClearExtendedProcs()
                 EndIf
             EndIf
         Next
-        
+
         ; Only clear processes if:
         ; 1. Limit is not enabled ($g_iLimitEnabled = 0) OR
         ; 2. Total memory usage exceeds the threshold when limit is enabled
@@ -1530,21 +1546,21 @@ EndFunc
 
 Func _UpdateStatLabels()
     Static $iLastUpdate = 0  ; Cache last update time
-    
+
     ; Only update every 500ms to prevent excessive GUI updates while still being responsive
     If TimerDiff($iLastUpdate) < 500 Then Return
     $iLastUpdate = TimerInit()
-    
+
     ; Convert bytes to MB with proper rounding
     Local $iCurrentCoreUsage = Round($g_iCoreProcessUsage / 1024 / 1024, 2)
     Local $iCurrentCorePeak = Round($g_iCoreProcessPeak / 1024 / 1024, 2)
     Local $iCurrentExtendedUsage = Round($g_iExtendedProcessUsage / 1024 / 1024, 2)
     Local $iCurrentExtendedPeak = Round($g_iExtendedProcessPeak / 1024 / 1024, 2)
-    
+
     ; Always update core process stats
     GUICtrlSetData($g_hLblProcessUsage, $iCurrentCoreUsage & " MB / " & $iCurrentCorePeak & " MB")
     GUICtrlSetData($g_hLblProcessPeak, $g_iProcessesCount & " processes")
-    
+
     ; Set colors based on memory thresholds
     Local $iColor = 0x008000  ; Default green
     If $g_iBoostEnabled And $g_iLimitEnabled And $iCurrentCoreUsage > $g_iCleanLimit Then
@@ -1553,7 +1569,7 @@ Func _UpdateStatLabels()
         $iColor = 0xFF8C00  ; Orange if approaching limit
     EndIf
     GUICtrlSetColor($g_hLblProcessUsage, $iColor)
-    
+
     ; Always update extended process stats
     GUICtrlSetData($g_hLblExtendUsage, $iCurrentExtendedUsage & " MB / " & $iCurrentExtendedPeak & " MB")
     GUICtrlSetColor($g_hLblExtendUsage, $iCurrentExtendedUsage > $g_iCleanLimit ? 0xFF0000 : 0x008000)
@@ -2098,4 +2114,11 @@ Func __LanguageListEvents($hWnd, $iMsg, $wParam, $lParam)
 	EndSwitch
 	Return $GUI_RUNDEFMSG
 EndFunc   ;==>WM_NOTIFY
+
+
+Func _SetSystemMemoryLimit()
+    $g_iSystemMemoryEnabled = (GUICtrlRead($g_hChkSystemMemory) = $GUI_CHECKED)
+    $g_iSystemMemoryLimit = Number(GUICtrlRead($g_hCmbSystemMemory))
+    _EnableSaveSettings()
+EndFunc
 
