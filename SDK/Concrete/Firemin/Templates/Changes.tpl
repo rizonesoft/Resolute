@@ -6,20 +6,13 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
-- Fixed: Undefined function error in localization system
-- Added: Missing include for Windows version detection
-- Optimized: Memory management functions with improved caching
-- Enhanced: Process working set clearing with batch processing
-- Added: Rate limiting to prevent excessive CPU usage
-- Improved: Memory threshold calculations and efficiency
-- Enhanced: Error handling in memory management functions
-- Optimized: Array handling for better performance
-- Added: Early exit conditions to improve response time
-- Enhanced: Memory statistics display with color-coded status
-- Added: Visual warning indicators for memory usage thresholds
-- Improved: Process count display formatting
+- Enhanced: Memory management system to check total memory usage across all processes
+- Fixed: Memory threshold comparison now properly considers combined process memory
+- Improved: Memory clearing logic to handle multiple processes more efficiently
+- Added: Smarter memory threshold checks for better resource management
+- Enhanced: Memory statistics display with color-coded status indicators
+- Added: Visual warning indicators for approaching memory limits
 - Optimized: GUI update frequency for better performance
-- Added: Intermediate warning state for approaching memory limits
 
 --------------------------------------------------
 Version 11.8.3.8520 (DECEMBER 5, 2024)

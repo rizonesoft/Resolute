@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.8.3.8528
+#AutoIt3Wrapper_Res_Fileversion=12.1.0.8532
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -1280,51 +1280,61 @@ EndFunc
 
 
 Func _ClearProcessesWorkingSet()
+    ; Static variable declarations must be at the start
     Static $hLastCheck = 0  ; Cache last check time
-    Local $aProcessList
     
+    Local $aProcessList
+
     ; Only check every 100ms to prevent excessive CPU usage
     If TimerDiff($hLastCheck) < 100 Then Return
     $hLastCheck = TimerInit()
-    
-    If Not $g_iLimitEnabled Then
-        $g_iCleanLimit = 0
+
+    ; Return if memory reduction is not enabled
+    If Not $g_iBoostEnabled Then Return
+
+    ; Get memory threshold if limit is enabled
+    Local $iMemThreshold = 0
+    If $g_iLimitEnabled = 1 Then
+        ; Convert MB to bytes - multiply by 1024 * 1024
+        $iMemThreshold = Number($g_iCleanLimit) * 1024 * 1024
     EndIf
-    
+
     ; Get all processes at once
     $aProcessList = ProcessList($g_sCoreProcess)
     $g_iProcessesCount = $aProcessList[0][0]
-    
+
     If Not @error And $g_iProcessesCount > 0 Then
-        ; Pre-calculate memory threshold
-        Local $iMemThreshold = $g_iCleanLimit * 1024 * 1024
-        Local $iCurrentProcessUsage = 0
+        Local $iTotalMemoryUsage = 0
         Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
-        
-        ; First pass - collect memory usage and identify processes to clear
+
+        ; First pass - collect total memory usage
         For $i = 1 To $g_iProcessesCount
             Local $iPID = $aProcessList[$i][1]
             Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
             Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
             
+            $iTotalMemoryUsage += $iUsage
             $g_iCoreProcessUsage += $iUsage
             $g_iCoreProcessPeak += $iPeak
-            
-            ; If process exceeds limit, add to clearing list
-            If $iUsage > $iMemThreshold Then
-                _ArrayAdd($aProcessesToClear, $iPID)
-                $aProcessesToClear[0] += 1
-            EndIf
+
+            ; Store process info for potential clearing
+            _ArrayAdd($aProcessesToClear, $iPID)
+            $aProcessesToClear[0] += 1
         Next
-        
-        ; Second pass - clear working sets in batch
-        If $aProcessesToClear[0] > 0 Then
-            For $i = 1 To $aProcessesToClear[0]
-                _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
-            Next
+
+        ; Only clear processes if:
+        ; 1. Limit is not enabled ($g_iLimitEnabled = 0) OR
+        ; 2. Total memory usage exceeds the threshold when limit is enabled
+        If $g_iLimitEnabled = 0 Or ($g_iLimitEnabled = 1 And $iTotalMemoryUsage > $iMemThreshold) Then
+            ; Clear all processes since total memory exceeds threshold
+            If $aProcessesToClear[0] > 0 Then
+                For $i = 1 To $aProcessesToClear[0]
+                    _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
+                Next
+            EndIf
         EndIf
     EndIf
-    
+
     _ClearExtendedProcs()
 EndFunc
 
@@ -1345,29 +1355,31 @@ Func _ClearProcessWorkingSet($sProcessName)
     If Not @error And $iProcessCount > 0 Then
         ; Pre-calculate memory threshold
         Local $iMemThreshold = $g_iCleanLimit * 1024 * 1024
+        Local $iTotalMemoryUsage = 0
         Local $aProcessesToClear[1] = [0]  ; Dynamic array to store PIDs that need clearing
         
-        ; First pass - collect memory usage and identify processes to clear
+        ; First pass - collect total memory usage
         For $i = 1 To $iProcessCount
             Local $iPID = $aProcessList[$i][1]
             Local $iUsage = _GetProcessUsage($iPID, 2)  ; Current working set
             Local $iPeak = _GetProcessUsage($iPID, 1)   ; Peak working set
             
+            $iTotalMemoryUsage += $iUsage
             $g_iExtendedProcessUsage += $iUsage
             $g_iExtendedProcessPeak += $iPeak
             
-            ; If process exceeds limit, add to clearing list
-            If $iUsage > $iMemThreshold Then
-                _ArrayAdd($aProcessesToClear, $iPID)
-                $aProcessesToClear[0] += 1
-            EndIf
+            ; Store process info for potential clearing
+            _ArrayAdd($aProcessesToClear, $iPID)
+            $aProcessesToClear[0] += 1
         Next
         
-        ; Second pass - clear working sets in batch
-        If $aProcessesToClear[0] > 0 Then
-            For $i = 1 To $aProcessesToClear[0]
-                _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
-            Next
+        ; Only clear if total memory exceeds threshold
+        If $g_iLimitEnabled = 0 Or ($g_iLimitEnabled = 1 And $iTotalMemoryUsage > $iMemThreshold) Then
+            If $aProcessesToClear[0] > 0 Then
+                For $i = 1 To $aProcessesToClear[0]
+                    _WinAPI_EmptyWorkingSet($aProcessesToClear[$i])
+                Next
+            EndIf
         EndIf
     EndIf
 EndFunc
