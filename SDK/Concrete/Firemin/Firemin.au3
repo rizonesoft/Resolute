@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=12.1.0.8532
+#AutoIt3Wrapper_Res_Fileversion=12.2.1.8532
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -100,57 +100,62 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico					; 222
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 			; 223
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 232
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 233
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico						; 234
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico						; 235
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico						; 236
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico						; 237
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico						; 238
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico						; 239
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico						; 240
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico						; 241
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico						; 242
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico						; 243
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico						; 244
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico						; 245
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico						; 246
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico						; 247
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico						; 248
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico						; 249
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico						; 250
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico						; 251
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico						; 252
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico						; 253
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico						; 254
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico						; 255
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico					; 256
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico						; 257
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico						; 258
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico						; 259
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico						; 260
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico						; 261
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico						; 262
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico						; 263
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico						; 264
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico					; 265
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico					; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico						; 224
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico						; 225
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico						; 226
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico						; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico						; 228
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico						; 229
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico						; 230
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico						; 231
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico						; 232
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico						; 233
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico						; 234
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico						; 235
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico						; 236
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico						; 237
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico						; 238
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico						; 239
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico						; 240
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico						; 241
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico						; 242
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico						; 243
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico						; 244
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico						; 245
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico						; 246
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico						; 247
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico					; 248
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico						; 249
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico						; 250
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico						; 251
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico						; 252
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico						; 253
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico						; 254
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico						; 255
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico						; 256
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico					; 257
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico					; 258
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 267
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 268
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 269
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 270
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 271
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico				; 259
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico				; 260
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico				; 261
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico				; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico				; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico				; 264
 
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 273
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 274
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 275
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 276
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 277
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 278
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 279
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 280
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico					; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico				; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico					; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico					; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico					; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico				; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico					; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico					; 272
+
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows2.ico				; 273
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Commands\Arrows3.ico				; 274
+
+
 
 ;===============================================================================================================
 ; Tidy Settings
@@ -343,6 +348,8 @@ Global $g_iPowerIconsStart				= 259
 Global $g_iMenuIconsStart				= 265
 
 Global $g_aCoreIcons[3]
+Global $g_aCommIcons[3]  ; Command icons array
+Global $g_iComIconStart = 273  ; Starting index for command icons
 Global $g_iSizeIcon						= 64
 Global $g_aLognIcons[$CNT_LOGICONS]
 Global $g_aLanguageIcons[$CNT_LANGICONS]
@@ -407,6 +414,8 @@ Global $g_hLblUpdated
 Global $g_hLblTimeStatus
 Global $g_hBtnSave
 Global $g_hBtnCancel
+Global $g_hBtnReset  ; Reset options button
+Global $g_hBtnResetHovering = 1
 
 ;~ Tray menu items
 Global $g_hTrItemAbout
@@ -667,9 +676,16 @@ Func _StartCoreGui()
 
 	GUICtrlSetOnEvent($g_hLblPrflPathExe, "_RunBrowser")
 
-	GUICtrlCreateGroup($g_aLangCustom[7], 10, 315, 480, 180)
+	GUICtrlCreateGroup($g_aLangCustom[7], 10, 315, 480, 160)
 	GUICtrlSetFont(-1, 10, Default, 2)
-	$g_hChkReduceEnabled = GUICtrlCreateCheckbox($g_aLangCustom[8], 20, 345, 165, 20)
+
+	$g_hBtnReset = GUICtrlCreateIcon($g_aCommIcons[0], $g_iComIconStart, 460, 320, 16, 16)
+	GUICtrlSetResizing($g_hBtnReset, BitOR($GUI_DOCKRIGHT, $GUI_DOCKTOP, $GUI_DOCKSIZE))
+	GUICtrlSetCursor($g_hBtnReset, 0)
+	GUICtrlSetTip($g_hBtnReset, "Reset options to default values", "Options", $TIP_INFOICON, $TIP_BALLOON)
+	GUICtrlSetOnEvent($g_hBtnReset, "_ResetOptions")
+
+	$g_hChkReduceEnabled = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[8], 20, 345, 180, 20)
 	$g_hComboReduceMill = GUICtrlCreateCombo("", 190, 343, 90, 20)
 	GUICtrlSetData($g_hComboReduceMill, "500|1000|2000|3000|4000|5000|6000|7000|8000|9000|10000", $g_iBoostMill)
 	GUICtrlCreateLabel($g_aLangCustom[9] & " {1000 ms}", 286, 348, 150, 20)
@@ -723,6 +739,9 @@ Func _StartCoreGui()
 	GUICtrlSetOnEvent($g_hChkBrowserAutoStart, "_EnableSaveSettings")
 	GUICtrlSetOnEvent($g_hChkStartWindows, "_EnableSaveSettings")
 	GUICtrlSetOnEvent($g_hBtnExtendedProcs, "_ShowPreferencesDlg")
+	GUICtrlSetOnEvent($g_hChkBrowserAutoStart, "_EnableSaveSettings")
+	GUICtrlSetOnEvent($g_hChkStartWindows, "_EnableSaveSettings")
+	GUICtrlSetOnEvent($g_hBtnReset, "_ResetOptions")
 
 	GUICtrlSetOnEvent($g_hBtnCancel, "_CloseCoreGui")
 	GUICtrlSetOnEvent($g_hBtnSave, "_SaveFireminConfig")
@@ -750,7 +769,7 @@ Func _CloseCoreGui()
 	GUIDelete($g_hCoreGui)
 
 	If $g_iShowNotifications == 1 Then
-		TrayTip($g_aLangCustom[24], StringFormat($g_aLangCustom[25], $g_sBrowserName), 20,  $TIP_ICONASTERISK)
+		TrayTip($g_aLangCustom[24], StringFormat($g_aLangCustom[25], $g_sBrowserName), 0)  ; Use Information icon
 	EndIf
 
 	_LoadConfiguration()
@@ -789,6 +808,12 @@ Func _OnIconsHover()
 		ElseIf $iCursor[4] <> $g_hGuiIcon And $g_aCoreIcons[2] == 0 Then
 			$g_aCoreIcons[2] = 1
 			GUICtrlSetImage($g_hGuiIcon, $g_aCoreIcons[0], 99)
+		ElseIf $iCursor[4] = $g_hBtnReset And $g_hBtnResetHovering = 1 Then
+			$g_hBtnResetHovering = 0
+			GUICtrlSetImage($g_hBtnReset, $g_aCommIcons[1], $g_iComIconStart + 1)
+		ElseIf $iCursor[4] <> $g_hBtnReset And $g_hBtnResetHovering = 0 Then
+			$g_hBtnResetHovering = 1
+			GUICtrlSetImage($g_hBtnReset, $g_aCommIcons[0], $g_iComIconStart)
 		EndIf
 
 	EndIf
@@ -811,6 +836,10 @@ Func _SetResources()
 		$g_aCoreIcons[0] = @ScriptFullPath
 		$g_aCoreIcons[1] = @ScriptFullPath
 
+		For $iCi = 0 To UBound($g_aCommIcons) - 1
+			$g_aCommIcons[$iCi] = @ScriptFullPath
+		Next
+
 		For $iLi = 0 To $CNT_LOGICONS - 1
 			$g_aLognIcons[$iLi] = @ScriptFullPath
 		Next
@@ -827,8 +856,11 @@ Func _SetResources()
 
 	Else
 
-		$g_aCoreIcons[0] = $g_sThemesDir & "..\..\..\SDK\Resources\Icons\" & $g_sProgShortName & ".ico"
+		$g_aCoreIcons[0] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & ".ico"
 		$g_aCoreIcons[1] = $g_sThemesDir & "\Icons\" & $g_sProgShortName & "H.ico"
+
+		$g_aCommIcons[0] = $g_sThemesDir & "\Icons\Commands\Arrows2.ico"
+		$g_aCommIcons[1] = $g_sThemesDir & "\Icons\Commands\Arrows3.ico"
 
 		$g_aLognIcons[0] = $g_sThemesDir & "..\..\..\SDK\Resources\Icons\logging\Information.ico"
 		$g_aLognIcons[1] = $g_sThemesDir & "..\..\..\SDK\Resources\Icons\logging\Complete.ico"
@@ -961,6 +993,10 @@ Func _LoadConfiguration()
 	$g_iShowNotifications = Int(IniRead($g_sPathIni, $g_sProgShortName, "ShowNotifications", 1))
 	$g_sExtendedProcs = IniRead($g_sPathIni, $g_sProgShortName, "ExtendedProcs", "plugin-container.exe")
 
+	; Load system memory limit settings
+	$g_iSystemMemoryEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "SystemMemoryEnabled", 0))
+	$g_iSystemMemoryLimit = Int(IniRead($g_sPathIni, $g_sProgShortName, "SystemMemoryLimit", 20))
+
 	_LoadBrowser($g_sBrowserPath)
 
 	If @Compiled Then
@@ -985,6 +1021,10 @@ Func _SaveFireminConfig()
 	IniWrite($g_sPathIni, $g_sProgShortName, "ReduceLimit", $g_iCleanLimit)
 	IniWrite($g_sPathIni, $g_sProgShortName, "StartBrowser", $g_iStartBrowser)
 	IniWrite($g_sPathIni, $g_sProgShortName, "EnableExtendedProcs", $g_iExtProcsEnabled)
+
+	; Save system memory limit settings
+	IniWrite($g_sPathIni, $g_sProgShortName, "SystemMemoryEnabled", $g_iSystemMemoryEnabled)
+	IniWrite($g_sPathIni, $g_sProgShortName, "SystemMemoryLimit", $g_iSystemMemoryLimit)
 
 	If GUICtrlRead($g_hChkStartWindows) = $GUI_CHECKED Then
 		FileDelete(@StartupDir & "\Firemin.lnk")
@@ -1322,8 +1362,8 @@ Func _ClearProcessesWorkingSet()
     If TimerDiff($hLastCheck) < 100 Then Return
     $hLastCheck = TimerInit()
 
-    ; Return if memory reduction is not enabled
-    If Not $g_iBoostEnabled Then Return
+    ; Check if we should reduce memory based on all conditions
+    If Not _ShouldReduceMemory() Then Return
 
     ; Only update usage values every 1000ms
     If TimerDiff($hLastUsageUpdate) >= 1000 Then
@@ -1387,7 +1427,8 @@ Func _ClearProcessWorkingSet($sProcessName)
     If TimerDiff($hLastCheck) < 100 Then Return
     $hLastCheck = TimerInit()
 
-    If Not $g_iBoostEnabled Then Return
+    ; Check if we should reduce memory based on all conditions
+    If Not _ShouldReduceMemory() Then Return
 
     ; Only update usage values every 1000ms
     If TimerDiff($hLastUsageUpdate) >= 1000 Then
@@ -2120,5 +2161,60 @@ Func _SetSystemMemoryLimit()
     $g_iSystemMemoryEnabled = (GUICtrlRead($g_hChkSystemMemory) = $GUI_CHECKED)
     $g_iSystemMemoryLimit = Number(GUICtrlRead($g_hCmbSystemMemory))
     _EnableSaveSettings()
+EndFunc
+
+; Memory management functions
+Func _GetSystemFreeMemoryPercent()
+    Local $aMemStats = MemGetStats()
+    Return Round(($aMemStats[$MEM_AVAILPHYSRAM] / $aMemStats[$MEM_TOTALPHYSRAM]) * 100)
+EndFunc
+
+Func _ShouldReduceMemory()
+    Static $hLastLog = 0  ; Cache last log time
+
+    If Not $g_iBoostEnabled Then
+        Return False
+    EndIf
+
+    ; Check system memory threshold if enabled
+    If $g_iSystemMemoryEnabled Then
+        Local $iFreePercent = _GetSystemFreeMemoryPercent()
+
+        ; Only log every 10 seconds to avoid spam
+        If TimerDiff($hLastLog) >= 10000 Then
+            $hLastLog = TimerInit()
+            ConsoleWrite("System memory check - Free: " & $iFreePercent & "%, Threshold: " & $g_iSystemMemoryLimit & "%" & @CRLF)
+        EndIf
+
+        If $iFreePercent > $g_iSystemMemoryLimit Then
+            Return False  ; Don't reduce if free memory is above threshold
+        EndIf
+    EndIf
+
+    Return True
+EndFunc
+
+Func _ResetOptions()
+    ; Reset memory reduction settings
+    $g_iBoostEnabled = 1
+    $g_iBoostMill = 1000
+    $g_iLimitEnabled = 1
+    $g_iCleanLimit = 200
+    $g_iSystemMemoryEnabled = 0
+    $g_iSystemMemoryLimit = 20
+    $g_iStartBrowser = 0
+
+    ; Update GUI controls
+    GUICtrlSetState($g_hChkReduceEnabled, $g_iBoostEnabled)
+    GUICtrlSetData($g_hComboReduceMill, "500|1000|2000|3000|4000|5000|6000|7000|8000|9000|10000", $g_iBoostMill)
+    GUICtrlSetState($g_hChkCleanLimit, $g_iLimitEnabled)
+    GUICtrlSetData($g_hComboCleanLimit, "50|100|200|300|400|500|600|700|800|900|1000", $g_iCleanLimit)
+    GUICtrlSetState($g_hChkSystemMemory, $g_iSystemMemoryEnabled)
+    GUICtrlSetData($g_hCmbSystemMemory, "5|10|15|20|25|30|35|40|45|50|60|70|80|90", $g_iSystemMemoryLimit)
+    GUICtrlSetState($g_hChkBrowserAutoStart, $g_iStartBrowser)
+
+    ; Enable save button
+    GUICtrlSetState($g_hBtnSave, $GUI_ENABLE)
+    GUICtrlSetState($g_hLblUpdated, $GUI_HIDE)
 EndFunc
 

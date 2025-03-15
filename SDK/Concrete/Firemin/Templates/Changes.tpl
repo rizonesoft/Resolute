@@ -6,6 +6,14 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Fixed: About dialog window parenting when main window is minimized
+- Enhanced: Memory usage display in About dialog now updates correctly
+- Improved: About dialog window handling and transparency
+- Fixed: Memory statistics display in About dialog when main window is in tray
+- Enhanced: About dialog window state management
+- Optimized: Memory and disk space monitoring in About dialog
+- Added: Color-coded progress bars for memory and disk space usage
+- Enhanced: Resource usage thresholds with warning and critical states
 - Added: Option to only reduce memory when system free memory is below a specified percentage (5-90%)
 - Added: System-wide memory monitoring with configurable threshold (default 20%)
 - Enhanced: Memory reduction now considers both process-specific limits and system-wide memory state

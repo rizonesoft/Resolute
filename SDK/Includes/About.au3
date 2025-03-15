@@ -16,6 +16,8 @@
 #include <GUIConstantsEx.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
+#include <WinAPI.au3>
+#include <Constants.au3>
 
 #include "Link.au3"
 #include "Localization.au3"
@@ -37,6 +39,7 @@ Global Const $UPDATE_INTERVAL_DISK = 5000      ; Disk stats update interval in m
 Global Const $UPDATE_INTERVAL_HOVER = 50       ; Icon hover check interval in ms
 Global Const $THRESHOLD_WARNING = 60           ; Warning threshold percentage
 Global Const $THRESHOLD_CRITICAL = 90          ; Critical threshold percentage
+Global Const $SW_MINIMIZE = 0x00000008
 ; ===============================================================================================================================
 
 ; #VARIABLES# ===================================================================================================================
@@ -104,8 +107,11 @@ Func _About_ShowDialog()
 	_Localization_About()
 
 	$g_iParentState = WinGetState($g_hCoreGui)
-
-	If $g_iParentState > 0 Then
+	
+	; Don't try to parent or modify transparency if main window is minimized
+	If BitAND($g_iParentState, 16) Then  ; @SW_MINIMIZE = 16
+		$g_iParent = 0
+	ElseIf $g_iParentState > 0 Then
 		WinSetTrans($g_hCoreGui, Default, 200)
 		GUISetState(@SW_DISABLE, $g_hCoreGui)
 		$g_iParent = $g_hCoreGui
@@ -117,7 +123,9 @@ Func _About_ShowDialog()
 	$g_hAboutGui = GUICreate($g_aLangAbout[0], 420, 500, -1, -1, _
 			BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_iParent)
 	GUISetFont(8.5, Default, Default, "Verdana", $g_hAboutGui, 5)
-	If $g_iParentState > 0 Then GUISetIcon($g_sDlgAboutIcon, $g_iDialogIconStart + 3, $g_hAboutGui)
+	If $g_iParentState > 0 And Not BitAND($g_iParentState, 16) Then 
+		GUISetIcon($g_sDlgAboutIcon, $g_iDialogIconStart + 3, $g_hAboutGui)
+	EndIf
 	GUISetOnEvent($GUI_EVENT_CLOSE, "__About_CloseDialog", $g_hAboutGui)
 
 	$g_AboutProgIcon = GUICtrlCreateIcon($g_aAboutProgIcons[0], 99, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
