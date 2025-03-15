@@ -679,7 +679,7 @@ Func _StartCoreGui()
 	GUICtrlCreateGroup($g_aLangCustom[7], 10, 315, 480, 160)
 	GUICtrlSetFont(-1, 10, Default, 2)
 
-	$g_hBtnReset = GUICtrlCreateIcon($g_aCommIcons[0], $g_iComIconStart, 460, 320, 16, 16)
+	$g_hBtnReset = GUICtrlCreateIcon($g_aCommIcons[0], $g_iComIconStart, 460, 335, 16, 16)
 	GUICtrlSetResizing($g_hBtnReset, BitOR($GUI_DOCKRIGHT, $GUI_DOCKTOP, $GUI_DOCKSIZE))
 	GUICtrlSetCursor($g_hBtnReset, 0)
 	GUICtrlSetTip($g_hBtnReset, "Reset options to default values", "Options", $TIP_INFOICON, $TIP_BALLOON)

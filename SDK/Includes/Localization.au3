@@ -25,6 +25,8 @@ Global Const $LNG_COUNTDONATE = 10
 Global Const $LNG_COUNTFILE = 25
 Global Const $LNG_COUNTMESSAGES = 50
 Global Const $LNG_COUNTUPDATE = 12
+Global Const $LNG_CACHE_SIZE = 100  ; Increased cache size for better performance
+Global Const $LNG_LINE_BREAK = "\r\n"  ; Standardized line break
 ; ===============================================================================================================================
 
 ; #VARIABLES# ===================================================================================================================
@@ -38,7 +40,7 @@ If Not IsDeclared("g_aLangDonate") Then Global $g_aLangDonate[$LNG_COUNTDONATE]
 If Not IsDeclared("g_aLangFile") Then Global $g_aLangFile[$LNG_COUNTFILE]
 If Not IsDeclared("g_aLangMessages") Then Global $g_aLangMessages[$LNG_COUNTMESSAGES]
 If Not IsDeclared("g_aLangUpdate") Then Global $g_aLangUpdate[$LNG_COUNTUPDATE]
-If Not IsDeclared("g_aLocalizationCache") Then Global $g_aLocalizationCache[50][3]
+If Not IsDeclared("g_aLocalizationCache") Then Global $g_aLocalizationCache[$LNG_CACHE_SIZE][3]
 If Not IsDeclared("g_iLocalizationCacheSize") Then Global $g_iLocalizationCacheSize = 0
 ; ===============================================================================================================================
 
@@ -249,27 +251,21 @@ Func _Localization_Load($sSection, $sKey, $sDefault)
 		EndIf
 	Next
 
-	; Not in cache, load from file
-	Local $sText = IniRead($g_sLanguageFile, $sSection, $sKey, $sDefault)
-	Local $sReplaced = _Localization_ReplaceVar($sText)
-
-	; Add to cache
-	_Localization_AddToCache($sCacheKey, $sText, $sReplaced)
-
-	Return $sCheckSpace & $sReplaced
-EndFunc
-
-Func _Localization_AddToCache($sCacheKey, $sOriginal, $sReplaced)
-	; Grow cache array if needed
-	If $g_iLocalizationCacheSize >= UBound($g_aLocalizationCache) Then
-		ReDim $g_aLocalizationCache[$g_iLocalizationCacheSize + 50][3]
+	; Load from file if not in cache
+	Local $sValue = IniRead($g_sLanguageFile, $sSection, $sKey, $sDefault)
+	
+	; Process the string
+	$sValue = _Localization_ReplaceVar($sValue)
+	
+	; Add to cache if there's space
+	If $g_iLocalizationCacheSize < $LNG_CACHE_SIZE Then
+		$g_aLocalizationCache[$g_iLocalizationCacheSize][0] = $sCacheKey
+		$g_aLocalizationCache[$g_iLocalizationCacheSize][1] = $sSection & "|" & $sKey
+		$g_aLocalizationCache[$g_iLocalizationCacheSize][2] = $sValue
+		$g_iLocalizationCacheSize += 1
 	EndIf
 
-	; Add to cache
-	$g_aLocalizationCache[$g_iLocalizationCacheSize][0] = $sCacheKey
-	$g_aLocalizationCache[$g_iLocalizationCacheSize][1] = $sOriginal
-	$g_aLocalizationCache[$g_iLocalizationCacheSize][2] = $sReplaced
-	$g_iLocalizationCacheSize += 1
+	Return $sCheckSpace & $sValue
 EndFunc
 
 Func _Localization_ReplaceVar($sText)
@@ -282,8 +278,14 @@ Func _Localization_ReplaceVar($sText)
 	$sText = StringReplace($sText, "%{Program.Name}", $g_sProgName)
 	$sText = StringReplace($sText, "%{AutoIt.Version}", @AutoItVersion)
 	$sText = StringReplace($sText, "%{Windows.Version}", _GetWindowsVersion(1))
-	$sText = StringReplace($sText, "\rn", @CRLF)
-	$sText = StringReplace($sText, "\t", @TAB)
+	
+	; Handle escape sequences
+	$sText = StringReplace($sText, "\r\n", @CRLF)  ; Standard Windows line break
+	$sText = StringReplace($sText, "\n", @LF)      ; Unix line break
+	$sText = StringReplace($sText, "\r", @CR)      ; Mac line break
+	$sText = StringReplace($sText, "\t", @TAB)     ; Tab character
+	$sText = StringReplace($sText, "\\", "\")      ; Escaped backslash
+	$sText = StringReplace($sText, "\rn", @CRLF)   ; Legacy support for old format
 
 	Return $sText
 EndFunc   ;==>_Localization_ReplaceVar
