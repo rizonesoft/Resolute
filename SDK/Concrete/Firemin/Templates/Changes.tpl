@@ -6,6 +6,9 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+- Added: Option to only reduce memory when system free memory is below a specified percentage (5-90%)
+- Added: System-wide memory monitoring with configurable threshold (default 20%)
+- Enhanced: Memory reduction now considers both process-specific limits and system-wide memory state
 - Fixed: Memory usage display showing incorrect 0 MB values
 - Fixed: Memory threshold now checks total usage across all processes
 - Fixed: Extended processes memory tracking and display
