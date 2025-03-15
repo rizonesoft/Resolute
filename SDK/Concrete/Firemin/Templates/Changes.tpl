@@ -8,6 +8,7 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 
 - Fixed: Memory usage display showing incorrect 0 MB values
 - Fixed: Memory threshold now checks total usage across all processes
+- Fixed: Extended processes memory tracking and display
 - Enhanced: Memory usage updates now occur every 1000ms for better performance
 - Improved: Memory clearing logic to handle multiple processes more efficiently
 - Added: Smarter memory threshold checks for better resource management
