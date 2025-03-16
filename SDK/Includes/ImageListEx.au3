@@ -30,7 +30,7 @@
 
 Func _ImageListEx_AddBlankIcon($hWnd, $hWndListView, $sFilePath, $iIndex = 0, $bLarge = False)
 
-	_GUIImageList_AddIcon($hWnd, $sFilePath, $iIndex, $bLarge)
+	_GUIImageList_AddIcon($hWnd, $sFilePath, $iIndex, $bLarge) 
 	If @error Then
 		_GUIImageList_Add($hWnd, _GUICtrlListView_CreateSolidBitMap($hWndListView, 0xFFEFEF, 16, 16))
 	EndIf
