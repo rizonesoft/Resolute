@@ -3792,3 +3792,80 @@
 [ 3/15/2025 17:46:27 ] WINDOWS DIRECTORY:           C:\WINDOWS
 -----------------------------------------------------------------------------------------
 
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 3/16/2025 01:08:27 ] DATE:                        3/16/2025 01:08:27
+[ 3/16/2025 01:08:27 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 3/16/2025 01:08:27 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 3/16/2025 01:08:27 ] COMPILED:                    YES
+[ 3/16/2025 01:08:27 ] WINDOWS VERSION:             WIN_10 
+[ 3/16/2025 01:08:27 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 3/16/2025 01:08:27 ] MEMORY (RAM):                32601.73 MB
+[ 3/16/2025 01:08:27 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 3/16/2025 01:08:27 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 3/16/2025 01:08:53 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 3/16/2025 01:08:53 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 3/16/2025 01:08:53 ] from:Distro_X64.exe (11.1.1.3680) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 3/16/2025 01:08:54 ] >Running AU3Check (3.3.16.1) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 3/16/2025 01:08:54 ] +> AU3Check ended. rc:0
+[ 3/16/2025 01:08:54 ] >Running:(3.3.16.1):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe_x64.exe /in "R:\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU4419.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x86
+[ 3/16/2025 01:08:56 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU4419.tmp.exe. rc:0
+[ 3/16/2025 01:08:56 ] > Performing the Program Resource Update steps:
+[ 3/16/2025 01:08:56 ] ...>Updating Program Version information.
+[ 3/16/2025 01:08:56 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 3/16/2025 01:08:56 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 3/16/2025 01:08:56 ] ...>Updating Program Manifest information.
+[ 3/16/2025 01:08:56 ] ...>Adding 74 Icon(s).
+[ 3/16/2025 01:08:56 ] > Program Resource updating finished successfully.
+[ 3/16/2025 01:08:56 ] +> Created program: R:\Resolute\Resolute\Firemin.exe
+[ 3/16/2025 01:08:56 ] >Running:(3.3.16.1):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe_x64.exe /in "R:\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU4419.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 3/16/2025 01:08:57 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU4419.tmp.exe. rc:0
+[ 3/16/2025 01:08:57 ] > Performing the Program Resource Update steps:
+[ 3/16/2025 01:08:57 ] ...>Updating Program Version information.
+[ 3/16/2025 01:08:57 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 3/16/2025 01:08:57 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 3/16/2025 01:08:57 ] ...>Updating Program Manifest information.
+[ 3/16/2025 01:08:57 ] ...>Adding 74 Icon(s).
+[ 3/16/2025 01:08:58 ] > Program Resource updating finished successfully.
+[ 3/16/2025 01:08:58 ] +> Created program: R:\Resolute\Resolute\Firemin_X64.exe
+[ 3/16/2025 01:08:58 ] -Updated the Source Version to: 12.2.1.2534
+[ 3/16/2025 01:08:59 ] +> AutoIt3Wrapper Finished.
+[ 3/16/2025 01:09:00 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 01:15:44 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 3/16/2025 01:15:44 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 3/16/2025 01:15:44 ] from:Distro_X64.exe (11.1.1.3680) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 3/16/2025 01:15:45 ] >Running AU3Check (3.3.16.1) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 3/16/2025 01:15:45 ] +> AU3Check ended. rc:0
+[ 3/16/2025 01:15:45 ] >Running:(3.3.16.1):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe_x64.exe /in "R:\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU8868.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x86
+[ 3/16/2025 01:15:46 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU8868.tmp.exe. rc:0
+[ 3/16/2025 01:15:46 ] > Performing the Program Resource Update steps:
+[ 3/16/2025 01:15:46 ] ...>Updating Program Version information.
+[ 3/16/2025 01:15:46 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 3/16/2025 01:15:46 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 3/16/2025 01:15:46 ] ...>Updating Program Manifest information.
+[ 3/16/2025 01:15:46 ] ...>Adding 74 Icon(s).
+[ 3/16/2025 01:15:47 ] > Program Resource updating finished successfully.
+[ 3/16/2025 01:15:47 ] +> Created program: R:\Resolute\Resolute\Firemin.exe
+[ 3/16/2025 01:15:47 ] >Running:(3.3.16.1):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe_x64.exe /in "R:\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU8868.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 3/16/2025 01:15:48 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU8868.tmp.exe. rc:0
+[ 3/16/2025 01:15:48 ] > Performing the Program Resource Update steps:
+[ 3/16/2025 01:15:48 ] ...>Updating Program Version information.
+[ 3/16/2025 01:15:48 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 3/16/2025 01:15:48 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 3/16/2025 01:15:48 ] ...>Updating Program Manifest information.
+[ 3/16/2025 01:15:48 ] ...>Adding 74 Icon(s).
+[ 3/16/2025 01:15:49 ] > Program Resource updating finished successfully.
+[ 3/16/2025 01:15:49 ] +> Created program: R:\Resolute\Resolute\Firemin_X64.exe
+[ 3/16/2025 01:15:49 ] -Updated the Source Version to: 12.2.1.2536
+[ 3/16/2025 01:15:49 ] +> AutoIt3Wrapper Finished.
+[ 3/16/2025 01:15:50 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------

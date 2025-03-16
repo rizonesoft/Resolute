@@ -31,11 +31,11 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=12.2.1.8532
+#AutoIt3Wrapper_Res_Fileversion=12.2.1.9539
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
-#AutoIt3Wrapper_Res_ProductVersion=11             					;~ Product Version
+#AutoIt3Wrapper_Res_ProductVersion=12             					;~ Product Version
 #AutoIt3Wrapper_Res_Language=2057									;~ Resource Language code . Default 2057=English (United Kingdom)
 #AutoIt3Wrapper_Res_LegalCopyright=© 2025 Rizonesoft				;~ Copyright field
 #AutoIt3Wrapper_res_requestedExecutionLevel=asInvoker				;~ asInvoker, highestAvailable, requireAdministrator or None (remove the trsutInfo section).  Default is the setting from Aut2Exe (asInvoker)
@@ -337,7 +337,7 @@ _SetWorkingDirectories()
 Global $g_sLanguageDir		= $g_sRootDir & "\Language\" & $g_sProgShortName
 Global $g_sSelectedLanguage = IniRead($g_sPathIni, $g_sProgShortName, "Language", "en")
 Global $g_tSelectedLanguage = $g_sSelectedLanguage
-Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".ini"
+Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".lng"
 
 ;~ Resources
 Global $g_iUpdateIconStart				= 209
@@ -1729,12 +1729,12 @@ Func _ShowPreferencesDlg()
 	_GUICtrlListView_AddSubItem($g_hOListLanguage, 0, "en", 1)
 	_GUICtrlListView_SetItemParam($g_hOListLanguage, 0, 3300)
 
-	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.ini")
+	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.lng")
 	While 1
 		Local $sLangFileName = FileFindNextFile($hLangSearch)
 		;~ If there is no more file matching the search.
 		If @error Then ExitLoop
-		If $sLangFileName = "en.ini" Then ContinueLoop
+		If $sLangFileName = "en.lng" Then ContinueLoop
 
 		Local $sLangIniPath = $g_sLanguageDir & "\" & $sLangFileName
 		ConsoleWrite($sLangIniPath)

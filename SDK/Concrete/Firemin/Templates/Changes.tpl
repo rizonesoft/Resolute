@@ -7,8 +7,17 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
 Language and Localization:
-- Added: Seven new language files with complete translations:
+- Changed: Language file extensions from .ini to .lng for better compatibility
+- Added: Fifteen additional language files with complete translations:
+  * Bulgarian (bg)
+  * Czech (cs)
+  * Danish (da)
   * Dutch (nl)
+  * Hindi (hi)
+  * Croatian (hr)
+  * Indonesian (id)
+  * Icelandic (is)
+  * Hebrew (iw)
   * Norwegian (no)
   * Romanian (ro)
   * Slovak (sk)
