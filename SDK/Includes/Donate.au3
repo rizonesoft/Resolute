@@ -31,12 +31,11 @@
 ; ===============================================================================================================================
 
 ; #VARIABLES# ===================================================================================================================
-Global $g_hDonateGui
+Global Enum $DONATE_ICON_NORMAL = 0, $DONATE_ICON_HOVER, $DONATE_ICON_MAX
+Global $g_hDonateGui, $g_hDonateButton
 Global $g_sDonateIcon = @ScriptFullPath
-Global $g_aDonateIcons[6] = [@ScriptFullPath, @ScriptFullPath, @ScriptFullPath, @ScriptFullPath, 1, 1]
-Global $g_hDonateAnonLabel
-Global $g_iDonateTabIndex = 0
-Global $g_hDonateButton
+Global $g_aDonateIcons[$DONATE_ICON_MAX] = [@ScriptFullPath, @ScriptFullPath]
+Global $g_bDonateIconHovered = False
 
 
 If Not IsDeclared("g_hCoreGui") Then Global $g_hCoreGui
@@ -118,13 +117,14 @@ Func __Donate_OnIconsHover()
 
 	Local $iCursorAbout = GUIGetCursorInfo()
 	If Not @error Then
-
-		If $iCursorAbout[4] = $g_hDonateButton And $g_aDonateIcons[4] == 1 Then
-			$g_aDonateIcons[4] = 0
-			GUICtrlSetImage($g_hDonateButton, $g_aDonateIcons[1], $g_iAboutIconStart + 1)
-		ElseIf $iCursorAbout[4] <> $g_hDonateButton And $g_aDonateIcons[4] == 0 Then
-			$g_aDonateIcons[4] = 1
-			GUICtrlSetImage($g_hDonateButton, $g_aDonateIcons[0], $g_iAboutIconStart)
+		Local $bIsHovered = ($iCursorAbout[4] = $g_hDonateButton)
+		
+		If $bIsHovered And Not $g_bDonateIconHovered Then
+			$g_bDonateIconHovered = True
+			GUICtrlSetImage($g_hDonateButton, $g_aDonateIcons[$DONATE_ICON_HOVER], $g_iAboutIconStart + 1)
+		ElseIf Not $bIsHovered And $g_bDonateIconHovered Then
+			$g_bDonateIconHovered = False
+			GUICtrlSetImage($g_hDonateButton, $g_aDonateIcons[$DONATE_ICON_NORMAL], $g_iAboutIconStart)
 		EndIf
 
 	EndIf

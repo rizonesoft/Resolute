@@ -3869,3 +3869,317 @@
 [ 3/16/2025 01:15:49 ] +> AutoIt3Wrapper Finished.
 [ 3/16/2025 01:15:50 ] Finished: Finished building Firemin.
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 3/16/2025 11:36:05 ] DATE:                        3/16/2025 11:36:05
+[ 3/16/2025 11:36:05 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 3/16/2025 11:36:05 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 3/16/2025 11:36:05 ] COMPILED:                    YES
+[ 3/16/2025 11:36:05 ] WINDOWS VERSION:             WIN_10 
+[ 3/16/2025 11:36:05 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 3/16/2025 11:36:05 ] MEMORY (RAM):                32601.73 MB
+[ 3/16/2025 11:36:05 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 3/16/2025 11:36:05 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 3/16/2025 11:36:12 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Firemin.exe Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Firemin_X64.exe Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Firemin.ini Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Docs\Firemin\Changes.txt Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Docs\Firemin\License.txt Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Docs\Firemin\Readme.txt Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\af.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ar.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\bg.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\cs.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\da.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\de.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\el.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\en.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\es.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\fa.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\fr.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\hi.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\hr.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\hu.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\id.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\is.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\it.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\iw.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ja.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ko.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\nl.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\no.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\pl.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\pt-BR.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\pt.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ro.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ru.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\sk.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\sl.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\sv.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\th.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\tr.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\vi.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\zh-CN.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\zh-TW.lng Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Processing\32\Stroke.ani Distribution Created.
+[ 3/16/2025 11:36:12 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Processing\64\Globe.ani Distribution Created.
+[ 3/16/2025 11:36:13 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\OfficePromoScreenBig.bmp Distribution Created.
+[ 3/16/2025 11:36:13 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\OfficePromoScreen.bmp Distribution Created.
+[ 3/16/2025 11:36:13 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 11:39:11 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 3/16/2025 11:39:11 ] Template directory found at: 'R:\Resolute\SDK\Concrete\Firemin\Templates'
+[ 3/16/2025 11:39:11 ] 03 templates files found.
+[ 3/16/2025 11:39:11 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 3/16/2025 11:39:11 ] Document created successfuly.
+[ 3/16/2025 11:39:11 ] Document File: R:\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 3/16/2025 11:39:11 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 3/16/2025 11:39:11 ] Document created successfuly.
+[ 3/16/2025 11:39:11 ] Document File: R:\Resolute\Resolute\Docs\Firemin\License.txt
+[ 3/16/2025 11:39:11 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 3/16/2025 11:39:11 ] Document created successfuly.
+[ 3/16/2025 11:39:11 ] Document File: R:\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 3/16/2025 11:39:11 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 11:39:18 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Firemin.exe Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Firemin_X64.exe Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Firemin.ini Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Docs\Firemin\Changes.txt Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Docs\Firemin\License.txt Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Docs\Firemin\Readme.txt Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\af.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ar.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\bg.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\cs.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\da.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\de.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\el.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\en.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\es.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\fa.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\fr.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\hi.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\hr.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\hu.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\id.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\is.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\it.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\iw.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ja.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ko.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\nl.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\no.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\pl.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\pt-BR.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\pt.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ro.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\ru.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\sk.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\sl.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\sv.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\th.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\tr.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\vi.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\zh-CN.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Language\Firemin\zh-TW.lng Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Processing\32\Stroke.ani Distribution Created.
+[ 3/16/2025 11:39:18 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\Processing\64\Globe.ani Distribution Created.
+[ 3/16/2025 11:39:19 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\OfficePromoScreenBig.bmp Distribution Created.
+[ 3/16/2025 11:39:19 ] \Concrete\Firemin\Distribution\9543\Firemin_9543\OfficePromoScreen.bmp Distribution Created.
+[ 3/16/2025 11:39:19 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 3/16/2025 16:10:17 ] DATE:                        3/16/2025 16:10:17
+[ 3/16/2025 16:10:17 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 3/16/2025 16:10:17 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 3/16/2025 16:10:17 ] COMPILED:                    YES
+[ 3/16/2025 16:10:17 ] WINDOWS VERSION:             WIN_10 
+[ 3/16/2025 16:10:17 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 3/16/2025 16:10:17 ] MEMORY (RAM):                32601.73 MB
+[ 3/16/2025 16:10:17 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 3/16/2025 16:10:17 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 3/16/2025 16:10:36 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 3/16/2025 16:10:36 ] Template directory found at: 'R:\Resolute\SDK\Concrete\Firemin\Templates'
+[ 3/16/2025 16:10:36 ] 03 templates files found.
+[ 3/16/2025 16:10:36 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 3/16/2025 16:10:36 ] Document created successfuly.
+[ 3/16/2025 16:10:36 ] Document File: R:\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 3/16/2025 16:10:36 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 3/16/2025 16:10:36 ] Document created successfuly.
+[ 3/16/2025 16:10:36 ] Document File: R:\Resolute\Resolute\Docs\Firemin\License.txt
+[ 3/16/2025 16:10:36 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 3/16/2025 16:10:36 ] Document created successfuly.
+[ 3/16/2025 16:10:36 ] Document File: R:\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 3/16/2025 16:10:36 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 16:10:53 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Firemin.exe Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Firemin_X64.exe Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Firemin.ini Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Docs\Firemin\Changes.txt Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Docs\Firemin\License.txt Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Docs\Firemin\Readme.txt Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\af.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\ar.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\bg.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\cs.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\da.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\de.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\el.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\en.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\es.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\fa.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\fr.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\hi.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\hr.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\hu.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\id.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\is.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\it.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\iw.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\ja.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\ko.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\nl.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\no.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\pl.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\pt-BR.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\pt.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\ro.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\ru.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\sk.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\sl.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\sv.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\th.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\tr.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\vi.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\zh-CN.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Language\Firemin\zh-TW.lng Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Processing\32\Stroke.ani Distribution Created.
+[ 3/16/2025 16:10:53 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\Processing\64\Globe.ani Distribution Created.
+[ 3/16/2025 16:10:54 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\OfficePromoScreenBig.bmp Distribution Created.
+[ 3/16/2025 16:10:54 ] \Concrete\Firemin\Distribution\9545\Firemin_9545\OfficePromoScreen.bmp Distribution Created.
+[ 3/16/2025 16:10:54 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 16:11:02 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 3/16/2025 16:11:03 ] Inno Setup 6 Command-Line Compiler
+[ 3/16/2025 16:11:03 ] Copyright (C) 1997-2025 Jordan Russell. All rights reserved.
+[ 3/16/2025 16:11:03 ] Portions Copyright (C) 2000-2025 Martijn Laan. All rights reserved.
+[ 3/16/2025 16:11:03 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 3/16/2025 16:11:03 ] https://www.innosetup.com
+[ 3/16/2025 16:11:03 ] Compiler engine version: Inno Setup 6.4.2
+[ 3/16/2025 16:11:03 ] Preprocessing
+[ 3/16/2025 16:11:03 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 3/16/2025 16:11:03 ] Parsing [Setup] section, line 21
+[ 3/16/2025 16:11:03 ] Parsing [Setup] section, line 22
+[ 3/16/2025 16:11:03 ] Parsing [Setup] section, line 23
+[ 3/16/2025 16:11:03 ] Parsing [Setup] section, line 24
+[ 3/16/2025 16:11:03 ] Parsing [Setup] section, line 25
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 26
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 27
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 28
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 29
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 30
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 31
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 32
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 33
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 34
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 35
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 36
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 37
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 38
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 39
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 40
+[ 3/16/2025 16:11:04 ] Parsing [Setup] section, line 41
+[ 3/16/2025 16:11:05 ] Parsing [Setup] section, line 42
+[ 3/16/2025 16:11:05 ] Parsing [Setup] section, line 43
+[ 3/16/2025 16:11:05 ] Parsing [Setup] section, line 44
+[ 3/16/2025 16:11:05 ] Parsing [Setup] section, line 45
+[ 3/16/2025 16:11:05 ] Parsing [Setup] section, line 46
+[ 3/16/2025 16:11:05 ] Parsing [Setup] section, line 47
+[ 3/16/2025 16:11:05 ] Parsing [Setup] section, line 48
+[ 3/16/2025 16:11:05 ] Error on line 48 in R:\Resolute\SDK\Concrete\Firemin\Distribution\9545\Firemin_9545_Setup.iss: Minimum version specified by MinVersion must be at least 6.1 otherwise Setup will never run. (Windows Vista/Server 2008 are no longer supported.)
+[ 3/16/2025 16:11:05 ] Compile aborted.
+[ 3/16/2025 16:11:05 ] Error: Finished with (01) error!
+------------------------------------------------------------------------------------------
+[ 3/16/2025 17:51:28 ] Distributing ReBar Framework.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\ReBar.exe Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\ReBar_X64.exe Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\ReBar.ini Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Docs\ReBar\Changes.txt Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Docs\ReBar\License.txt Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Docs\ReBar\Readme.txt Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Language\ReBar\en.ini Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Processing\16\Process.ani Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Processing\32\Stroke.ani Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Processing\64\Stroke.ani Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Processing\64\Globe.ani Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Sounds\Complete.wav Distribution Created.
+[ 3/16/2025 17:51:28 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\Sounds\Welcome.wav Distribution Created.
+[ 3/16/2025 17:51:29 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\OfficePromoScreenBig.bmp Distribution Created.
+[ 3/16/2025 17:51:29 ] \Concrete\ReBar\Distribution\5588\ReBar_5588\OfficePromoScreen.bmp Distribution Created.
+[ 3/16/2025 17:51:29 ] Finished: ReBar Framework Distribution Created.
+------------------------------------------------------------------------------------------
+[ 3/16/2025 17:51:33 ] Creating installation for ReBar Framework
+------------------------------------------------------------------------------------------
+[ 3/16/2025 17:51:33 ] Inno Setup 6 Command-Line Compiler
+[ 3/16/2025 17:51:34 ] Copyright (C) 1997-2025 Jordan Russell. All rights reserved.
+[ 3/16/2025 17:51:34 ] Portions Copyright (C) 2000-2025 Martijn Laan. All rights reserved.
+[ 3/16/2025 17:51:34 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 3/16/2025 17:51:34 ] https://www.innosetup.com
+[ 3/16/2025 17:51:34 ] Compiler engine version: Inno Setup 6.4.2
+[ 3/16/2025 17:51:34 ] Preprocessing
+[ 3/16/2025 17:51:34 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 21
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 22
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 23
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 24
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 25
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 26
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 27
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 28
+[ 3/16/2025 17:51:34 ] Parsing [Setup] section, line 29
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 30
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 31
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 32
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 33
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 34
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 35
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 36
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 37
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 38
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 39
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 40
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 41
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 42
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 43
+[ 3/16/2025 17:51:35 ] Parsing [Setup] section, line 44
+[ 3/16/2025 17:51:36 ] Parsing [Setup] section, line 45
+[ 3/16/2025 17:51:36 ] Parsing [Setup] section, line 46
+[ 3/16/2025 17:51:36 ] Parsing [Setup] section, line 47
+[ 3/16/2025 17:51:36 ] Parsing [Setup] section, line 48
+[ 3/16/2025 17:51:36 ] Error on line 48 in R:\Resolute\SDK\Concrete\ReBar\Distribution\5588\ReBar_5588_Setup.iss: Minimum version specified by MinVersion must be at least 6.1 otherwise Setup will never run. (Windows Vista/Server 2008 are no longer supported.)
+[ 3/16/2025 17:51:36 ] Compile aborted.
+[ 3/16/2025 17:51:36 ] Error: Finished with (01) error!
+------------------------------------------------------------------------------------------
