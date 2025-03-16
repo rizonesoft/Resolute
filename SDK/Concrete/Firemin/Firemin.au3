@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=12.2.1.9539
+#AutoIt3Wrapper_Res_Fileversion=12.2.1.9547
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -685,7 +685,7 @@ Func _StartCoreGui()
 	GUICtrlSetTip($g_hBtnReset, "Reset options to default values", "Options", $TIP_INFOICON, $TIP_BALLOON)
 	GUICtrlSetOnEvent($g_hBtnReset, "_ResetOptions")
 
-	$g_hChkReduceEnabled = GUICtrlCreateCheckbox(Chr(32) & $g_aLangCustom[8], 20, 345, 180, 20)
+	$g_hChkReduceEnabled = GUICtrlCreateCheckbox($g_aLangCustom[8], 20, 345, 169, 20)
 	$g_hComboReduceMill = GUICtrlCreateCombo("", 190, 343, 90, 20)
 	GUICtrlSetData($g_hComboReduceMill, "500|1000|2000|3000|4000|5000|6000|7000|8000|9000|10000", $g_iBoostMill)
 	GUICtrlCreateLabel($g_aLangCustom[9] & " {1000 ms}", 286, 348, 150, 20)
@@ -1123,28 +1123,19 @@ EndFunc
 
 
 Func _SetControlStates()
-
-	If GUICtrlRead($g_hChkReduceEnabled) = $GUI_CHECKED Then
-
-		GUICtrlSetState($g_hComboReduceMill, $GUI_ENABLE)
-		GUICtrlSetState($g_hChkCleanLimit, $GUI_ENABLE)
-		GUICtrlSetState($g_hChkExtendedProcs, $GUI_ENABLE)
-
-		If GUICtrlRead($g_hChkCleanLimit) = $GUI_CHECKED Then
-			GUICtrlSetState($g_hComboCleanLimit, $GUI_ENABLE)
-		Else
-			GUICtrlSetState($g_hComboCleanLimit, $GUI_DISABLE)
-		EndIf
-
-	Else
-
-		GUICtrlSetState($g_hComboReduceMill, $GUI_DISABLE)
-		GUICtrlSetState($g_hChkCleanLimit, $GUI_DISABLE)
-		GUICtrlSetState($g_hChkExtendedProcs, $GUI_DISABLE)
-		GUICtrlSetState($g_hComboCleanLimit, $GUI_DISABLE)
-
-	EndIf
-
+    Local $bReduceEnabled = (GUICtrlRead($g_hChkReduceEnabled) = $GUI_CHECKED)
+    Local $bCleanLimitEnabled = (GUICtrlRead($g_hChkCleanLimit) = $GUI_CHECKED)
+    Local $bSystemMemoryEnabled = (GUICtrlRead($g_hChkSystemMemory) = $GUI_CHECKED)
+    
+    ; Set states for all controls based on main reduce enabled state
+    GUICtrlSetState($g_hComboReduceMill, $bReduceEnabled ? $GUI_ENABLE : $GUI_DISABLE)
+    GUICtrlSetState($g_hChkCleanLimit, $bReduceEnabled ? $GUI_ENABLE : $GUI_DISABLE)
+    GUICtrlSetState($g_hChkExtendedProcs, $bReduceEnabled ? $GUI_ENABLE : $GUI_DISABLE)
+    GUICtrlSetState($g_hChkSystemMemory, $bReduceEnabled ? $GUI_ENABLE : $GUI_DISABLE)
+    
+    ; Set states for dependent controls
+    GUICtrlSetState($g_hComboCleanLimit, ($bReduceEnabled And $bCleanLimitEnabled) ? $GUI_ENABLE : $GUI_DISABLE)
+    GUICtrlSetState($g_hCmbSystemMemory, ($bReduceEnabled And $bSystemMemoryEnabled) ? $GUI_ENABLE : $GUI_DISABLE)
 EndFunc
 
 
@@ -1588,8 +1579,8 @@ EndFunc
 Func _UpdateStatLabels()
     Static $iLastUpdate = 0  ; Cache last update time
 
-    ; Only update every 500ms to prevent excessive GUI updates while still being responsive
-    If TimerDiff($iLastUpdate) < 500 Then Return
+    ; Only update every 1000ms to prevent excessive GUI updates while still being responsive
+    If TimerDiff($iLastUpdate) < 1000 Then Return
     $iLastUpdate = TimerInit()
 
     ; Convert bytes to MB with proper rounding
@@ -2158,8 +2149,20 @@ EndFunc   ;==>WM_NOTIFY
 
 
 Func _SetSystemMemoryLimit()
-    $g_iSystemMemoryEnabled = (GUICtrlRead($g_hChkSystemMemory) = $GUI_CHECKED)
+    If GUICtrlRead($g_hChkSystemMemory) = $GUI_CHECKED Then
+        $g_iSystemMemoryEnabled = 1
+    Else
+        $g_iSystemMemoryEnabled = 0
+    EndIf
     $g_iSystemMemoryLimit = Number(GUICtrlRead($g_hCmbSystemMemory))
+    
+    ; Enable/disable the combo box based on checkbox state
+    If $g_iSystemMemoryEnabled Then
+        GUICtrlSetState($g_hCmbSystemMemory, $GUI_ENABLE)
+    Else
+        GUICtrlSetState($g_hCmbSystemMemory, $GUI_DISABLE)
+    EndIf
+    
     _EnableSaveSettings()
 EndFunc
 
