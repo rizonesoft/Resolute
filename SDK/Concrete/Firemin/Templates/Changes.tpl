@@ -44,6 +44,7 @@ Language and Localization:
 - Optimized: Memory usage in localization system
 
 User Interface Improvements:
+- Added: Import/Export functionality for Extended Processes list
 - Added: Color-coded progress bars for memory and disk space usage
 - Enhanced: About dialog window handling, transparency, and state management
 - Enhanced: Memory statistics display with color-coded status indicators

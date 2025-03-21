@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=12.2.1.9547
+#AutoIt3Wrapper_Res_Fileversion=12.2.1.9553
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -441,6 +441,8 @@ Global $g_hOImgLanguage
 Global $g_hOIconLanguage
 Global $g_hOLblLanguage
 Global $g_hOLblPrefsUpdated
+Global $g_hOBtnExportExtProcs
+Global $g_hOBtnImportExtProcs
 Global $g_hOBtnSave
 Global $g_hOBtnCancel
 
@@ -991,7 +993,19 @@ Func _LoadConfiguration()
 	$g_iStartBrowser = Int(IniRead($g_sPathIni, $g_sProgShortName, "StartBrowser", 0))
 	$g_iExtProcsEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "EnableExtendedProcs", 1))
 	$g_iShowNotifications = Int(IniRead($g_sPathIni, $g_sProgShortName, "ShowNotifications", 1))
+	
+	; Load and clean extended processes list
 	$g_sExtendedProcs = IniRead($g_sPathIni, $g_sProgShortName, "ExtendedProcs", "plugin-container.exe")
+	$g_sExtendedProcs = StringStripWS($g_sExtendedProcs, 3)
+	While StringLeft($g_sExtendedProcs, 1) = ","
+		$g_sExtendedProcs = StringStripWS(StringTrimLeft($g_sExtendedProcs, 1), 3)
+	WEnd
+	
+	; If the extended processes list was cleaned, update it in the INI file
+	Local $sOriginalExtProcs = IniRead($g_sPathIni, $g_sProgShortName, "ExtendedProcs", "plugin-container.exe")
+	If $g_sExtendedProcs <> $sOriginalExtProcs Then
+		IniWrite($g_sPathIni, $g_sProgShortName, "ExtendedProcs", $g_sExtendedProcs)
+	EndIf
 
 	; Load system memory limit settings
 	$g_iSystemMemoryEnabled = Int(IniRead($g_sPathIni, $g_sProgShortName, "SystemMemoryEnabled", 0))
@@ -1608,6 +1622,130 @@ Func _UpdateStatLabels()
 EndFunc
 #EndRegion Extended Processes
 
+#Region Export Extended Processes
+; Export Extended Processes list to a text file
+Func _ExportExtendedProcesses()
+    ; Get the current list from the edit control
+    Local $sExtendedProcesses = GUICtrlRead($g_hOEditExtProcs)
+    
+    ; Ask user for save location
+    Local $sFilePath = FileSaveDialog($g_aLangPreferences[23], @DesktopDir, "Text Files (*.txt)|All Files (*.*)", 16, "ExtendedProcesses.txt", $g_hOptionsGui)
+    If @error Then
+        Return False ; User cancelled
+    EndIf
+    
+    ; Add .txt extension if not present
+    If StringRight($sFilePath, 4) <> ".txt" Then
+        $sFilePath &= ".txt"
+    EndIf
+    
+    ; Create header for the file
+    Local $sFileContent = $g_sProgName & " - Extended Processes List" & @CRLF & @CRLF
+    $sFileContent &= "The following processes will be optimized by " & $g_sProgName & ":" & @CRLF & @CRLF
+    
+    ; Format process list for better readability
+    Local $aProcesses = StringSplit(StringStripWS($sExtendedProcesses, 8), ",", $STR_NOCOUNT)
+    For $i = 0 To UBound($aProcesses) - 1
+        Local $sProcess = StringStripWS($aProcesses[$i], 3)
+        If $sProcess <> "" Then
+            If Not StringInStr($sProcess, ".exe", 1) Then
+                $sProcess &= ".exe"
+            EndIf
+            $sFileContent &= "- " & $sProcess & @CRLF
+        EndIf
+    Next
+    
+    ; Add export timestamp
+    $sFileContent &= @CRLF & "Exported on: " & @YEAR & "-" & @MON & "-" & @MDAY & " " & @HOUR & ":" & @MIN & ":" & @SEC
+
+    ; Write to file
+    Local $hFile = FileOpen($sFilePath, $FO_OVERWRITE)
+    If $hFile = -1 Then
+        MsgBox($MB_ICONERROR, $g_aLangPreferences[24], $g_aLangPreferences[25], 0, $g_hOptionsGui)
+        Return False
+    EndIf
+    
+    FileWrite($hFile, $sFileContent)
+    FileClose($hFile)
+    
+    ; Show success message
+    MsgBox($MB_ICONINFORMATION, $g_aLangPreferences[26], $g_aLangPreferences[27] & @CRLF & $sFilePath, 0, $g_hOptionsGui)
+    Return True
+EndFunc
+#EndRegion Export Extended Processes
+
+#Region Import Extended Processes
+; Import Extended Processes list from a text file
+Func _ImportExtendedProcesses()
+    ; Ask user for file to import
+    Local $sFilePath = FileOpenDialog($g_aLangPreferences[29], @DesktopDir, "Text Files (*.txt)|All Files (*.*)", 1, "", $g_hOptionsGui)
+    If @error Then
+        Return False ; User cancelled
+    EndIf
+    
+    ; Read file content
+    Local $sFileContent = FileRead($sFilePath)
+    If @error Then
+        MsgBox($MB_ICONERROR, $g_aLangPreferences[30], $g_aLangPreferences[31], 0, $g_hOptionsGui)
+        Return False
+    EndIf
+    
+    ; Parse the processes from the file
+    Local $aProcesses = []
+    Local $aLines = StringSplit($sFileContent, @CRLF, $STR_ENTIRESPLIT)
+    
+    For $i = 1 To $aLines[0]
+        Local $sLine = StringStripWS($aLines[$i], 3)
+        ; Look for lines that begin with a dash (list item)
+        If StringLeft($sLine, 1) = "-" Then
+            Local $sProcess = StringStripWS(StringTrimLeft($sLine, 1), 3)
+            If $sProcess <> "" Then
+                _ArrayAdd($aProcesses, $sProcess)
+            EndIf
+        ; Also look for raw process names (without dash)
+        ElseIf StringInStr($sLine, ".exe", 1) Then
+            Local $sProcess = StringStripWS($sLine, 3)
+            _ArrayAdd($aProcesses, $sProcess)
+        EndIf
+    Next
+    
+    ; Check if array has valid entries
+    If UBound($aProcesses) > 0 Then
+        ; Combine processes into comma-separated string
+        Local $sProcessList = ""
+        
+        For $i = 0 To UBound($aProcesses) - 1
+            ; Only add comma for entries after the first one
+            If $i > 0 Then 
+                $sProcessList &= ", "
+            EndIf
+            $sProcessList &= $aProcesses[$i]
+        Next
+        
+        ; Ensure there are no leading commas or whitespace
+        $sProcessList = StringStripWS($sProcessList, 3)
+        While StringLeft($sProcessList, 1) = "," 
+            $sProcessList = StringStripWS(StringTrimLeft($sProcessList, 1), 3)
+        WEnd
+        
+        ; Debug: Show the generated process list
+        ConsoleWrite("Process list: " & $sProcessList & @CRLF)
+        
+        ; Update the GUI control with the imported processes
+        GUICtrlSetData($g_hOEditExtProcs, $sProcessList)
+        $g_hOEditExtProcsTemp = $sProcessList
+        
+        ; Show success message
+        MsgBox($MB_ICONINFORMATION, $g_aLangPreferences[32], $g_aLangPreferences[33], 0, $g_hOptionsGui)
+        Return True
+    Else
+        ; No processes found
+        MsgBox($MB_ICONWARNING, $g_aLangPreferences[34], $g_aLangPreferences[35], 0, $g_hOptionsGui)
+        Return False
+    EndIf
+EndFunc
+#EndRegion Import Extended Processes
+
 
 Func _ShowPreferencesDlg()
 
@@ -1646,13 +1784,31 @@ Func _ShowPreferencesDlg()
 	GUICtrlCreateLabel($g_aLangPreferences[10], 45, 180, 365, 80)
 	GUICtrlSetColor(-1, 0x555555)
 	GUICtrlSetFont(-1, 9)
-	$g_hOEditExtProcs = GUICtrlCreateEdit("", 45, 250, 365, 150, $WS_VSCROLL + $ES_AUTOVSCROLL)
-	GUICtrlSetData($g_hOEditExtProcs, IniRead($g_sPathIni, $g_sProgShortName, "ExtendedProcs", "plugin-container.exe"))
+	$g_hOEditExtProcs = GUICtrlCreateEdit("", 45, 250, 365, 125, $WS_VSCROLL + $ES_AUTOVSCROLL)
+	
+	; Load extended processes list, ensuring there's no leading comma
+	Local $sExtendedProcs = IniRead($g_sPathIni, $g_sProgShortName, "ExtendedProcs", "plugin-container.exe")
+	$sExtendedProcs = StringStripWS($sExtendedProcs, 3)
+	While StringLeft($sExtendedProcs, 1) = ","
+		$sExtendedProcs = StringStripWS(StringTrimLeft($sExtendedProcs, 1), 3)
+	WEnd
+	
+	GUICtrlSetData($g_hOEditExtProcs, $sExtendedProcs)
 	GUICtrlSetState($g_hOEditExtProcs, $GUI_NOFOCUS)
 	GUICtrlSetFont($g_hOEditExtProcs, 9)
 	Local $iSelLen = StringLen(GUICtrlRead($g_hOEditExtProcs))
 	_GUICtrlEdit_SetSel($g_hOEditExtProcs, $iSelLen, $iSelLen)
 	$g_hOEditExtProcsTemp = GUICtrlRead($g_hOEditExtProcs)
+	
+	; Add Import/Export buttons for Extended Processes
+	$g_hOBtnImportExtProcs = GUICtrlCreateButton($g_aLangPreferences[28], 180, 385, 110, 25)
+	GUICtrlSetFont($g_hOBtnImportExtProcs, 9)
+	GUICtrlSetOnEvent($g_hOBtnImportExtProcs, "_ImportExtendedProcesses")
+	
+	$g_hOBtnExportExtProcs = GUICtrlCreateButton($g_aLangPreferences[22], 300, 385, 110, 25)
+	GUICtrlSetFont($g_hOBtnExportExtProcs, 9)
+	GUICtrlSetOnEvent($g_hOBtnExportExtProcs, "_ExportExtendedProcesses")
+	
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 	GUICtrlCreateTabItem("") ; end tabitem definition
 
@@ -1891,7 +2047,17 @@ Func __SavePreferences()
 	IniWrite($g_sPathIni, $g_sProgShortName, "ShowNotifications", $g_iShowNotifications)
 
 	If StringCompare($sEPTemp, $sEPSavedTemp) <> 0 Then
-		IniWrite($g_sPathIni, $g_sProgShortName, "ExtendedProcs", GUICtrlRead($g_hOEditExtProcs))
+		; Clean up any leading commas before saving
+		Local $sCleanProcessList = StringStripWS($sEPTemp, 3)
+		While StringLeft($sCleanProcessList, 1) = ","
+			$sCleanProcessList = StringStripWS(StringTrimLeft($sCleanProcessList, 1), 3)
+		WEnd
+		
+		IniWrite($g_sPathIni, $g_sProgShortName, "ExtendedProcs", $sCleanProcessList)
+		
+		; Update the GUI control to ensure it's clean
+		GUICtrlSetData($g_hOEditExtProcs, $sCleanProcessList)
+		$g_hOEditExtProcsTemp = $sCleanProcessList
 	EndIf
 
 	If $g_tSelectedLanguage <> $g_sSelectedLanguage Then
