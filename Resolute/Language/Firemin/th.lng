@@ -131,6 +131,20 @@ MsgBox_Language_Title = เปลี่ยนภาษาแล้ว
 MsgBox_Language_Message = ภาษาที่เลือกถูกเปลี่ยนแล้ว\r\n%{Program.Name} ต้องรีสตาร์ทเพื่อให้ภาษาที่เลือกมีผล
 MsgBox_Closing_Title = กำลังปิด %{Program.Name}
 MsgBox_Closing_Message = คุณต้องการปิด %{Program.Name} ตอนนี้หรือไม่?
+Button_Export = ส่งออก
+Dialog_Export_Title = ส่งออกกระบวนการที่ขยาย
+Dialog_Export_Error_Title = ข้อผิดพลาดในการส่งออก
+Dialog_Export_Error_Message = ไม่สามารถสร้างไฟล์ส่งออกได้
+Dialog_Export_Success_Title = ส่งออกสำเร็จ
+Dialog_Export_Success_Message = รายการกระบวนการที่ขยายถูกส่งออกไปยัง:
+Button_Import = นำเข้า
+Dialog_Import_Title = นำเข้ากระบวนการที่ขยาย
+Dialog_Import_Error_Title = ข้อผิดพลาดในการนำเข้า
+Dialog_Import_Error_Message = ไม่สามารถอ่านไฟล์นำเข้าได้
+Dialog_Import_Success_Title = นำเข้าสำเร็จ
+Dialog_Import_Success_Message = รายการกระบวนการที่ขยายได้รับการนำเข้าเรียบร้อยแล้ว
+Dialog_Import_Empty_Title = ไม่พบกระบวนการ
+Dialog_Import_Empty_Message = ไม่พบกระบวนการที่ถูกต้องในไฟล์ที่เลือก
 
 [Update]
 Window_Title_Available = มีการอัปเดตพร้อมใช้งาน

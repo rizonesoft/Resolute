@@ -131,6 +131,20 @@ MsgBox_Language_Title = Sprog ændret
 MsgBox_Language_Message = Det valgte sprog er blevet ændret.\r\n%{Program.Name} skal genstartes for at det valgte sprog træder i kraft.
 MsgBox_Closing_Title = Lukker %{Program.Name}
 MsgBox_Closing_Message = Vil du lukke %{Program.Name} nu?
+Button_Export = Eksporter
+Dialog_Export_Title = Eksporter udvidede processer
+Dialog_Export_Error_Title = Eksport fejl
+Dialog_Export_Error_Message = Kunne ikke oprette eksportfilen.
+Dialog_Export_Success_Title = Eksport gennemført
+Dialog_Export_Success_Message = Liste over udvidede processer eksporteret til:
+Button_Import = Importer
+Dialog_Import_Title = Importer udvidede processer
+Dialog_Import_Error_Title = Import fejl
+Dialog_Import_Error_Message = Kunne ikke læse importfilen.
+Dialog_Import_Success_Title = Import gennemført
+Dialog_Import_Success_Message = Listen over udvidede processer er blevet importeret.
+Dialog_Import_Empty_Title = Ingen processer fundet
+Dialog_Import_Empty_Message = Ingen gyldige processer blev fundet i den valgte fil.
 
 [Update]
 Window_Title_Available = Opdatering tilgængelig

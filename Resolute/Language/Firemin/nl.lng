@@ -130,7 +130,21 @@ Label_Updated = Voorkeuren bijgewerkt
 MsgBox_Language_Title = Taal gewijzigd
 MsgBox_Language_Message = De geselecteerde taal is gewijzigd.\r\n%{Program.Name} moet opnieuw worden gestart om de gekozen taal van kracht te laten worden.
 MsgBox_Closing_Title = %{Program.Name} sluiten
-MsgBox_Closing_Message = Wil je %{Program.Name} nu sluiten?
+MsgBox_Closing_Message = Wilt u %{Program.Name} nu sluiten?
+Button_Export = Exporteren
+Dialog_Export_Title = Uitgebreide processen exporteren
+Dialog_Export_Error_Title = Exportfout
+Dialog_Export_Error_Message = Kan exportbestand niet maken.
+Dialog_Export_Success_Title = Export succesvol
+Dialog_Export_Success_Message = Lijst met uitgebreide processen geëxporteerd naar:
+Button_Import = Importeren
+Dialog_Import_Title = Uitgebreide processen importeren
+Dialog_Import_Error_Title = Importfout
+Dialog_Import_Error_Message = Kan importbestand niet lezen.
+Dialog_Import_Success_Title = Import succesvol
+Dialog_Import_Success_Message = Lijst met uitgebreide processen is succesvol geïmporteerd.
+Dialog_Import_Empty_Title = Geen processen gevonden
+Dialog_Import_Empty_Message = Er zijn geen geldige processen gevonden in het geselecteerde bestand.
 
 [Update]
 Window_Title_Available = Update beschikbaar

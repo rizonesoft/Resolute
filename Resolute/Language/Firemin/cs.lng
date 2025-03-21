@@ -131,6 +131,20 @@ MsgBox_Language_Title = Jazyk změněn
 MsgBox_Language_Message = Vybraný jazyk byl změněn.\r\n%{Program.Name} by měl být restartován, aby se projevil zvolený jazyk.
 MsgBox_Closing_Title = Zavírání %{Program.Name}
 MsgBox_Closing_Message = Chcete nyní zavřít %{Program.Name}?
+Button_Export = Export
+Dialog_Export_Title = Export rozšířených procesů
+Dialog_Export_Error_Title = Chyba exportu
+Dialog_Export_Error_Message = Nepodařilo se vytvořit exportní soubor.
+Dialog_Export_Success_Title = Export byl úspěšný
+Dialog_Export_Success_Message = Seznam rozšířených procesů byl exportován do:
+Button_Import = Import
+Dialog_Import_Title = Import rozšířených procesů
+Dialog_Import_Error_Title = Chyba importu
+Dialog_Import_Error_Message = Nepodařilo se načíst importní soubor.
+Dialog_Import_Success_Title = Import byl úspěšný
+Dialog_Import_Success_Message = Seznam rozšířených procesů byl úspěšně importován.
+Dialog_Import_Empty_Title = Nebyly nalezeny žádné procesy
+Dialog_Import_Empty_Message = Ve vybraném souboru nebyly nalezeny žádné platné procesy.
 
 [Update]
 Window_Title_Available = K dispozici je aktualizace

@@ -129,8 +129,22 @@ Button_Cancel = ביטול
 Label_Updated = העדפות עודכנו
 MsgBox_Language_Title = השפה שונתה
 MsgBox_Language_Message = השפה הנבחרת שונתה.\r\nיש להפעיל מחדש את %{Program.Name} כדי שהשפה הנבחרת תיכנס לתוקף.
-MsgBox_Closing_Title = סוגר את %{Program.Name}
-MsgBox_Closing_Message = האם ברצונך לסגור את %{Program.Name} עכשיו?
+MsgBox_Closing_Title = סגירת %{Program.Name}
+MsgBox_Closing_Message = האם ברצונך לסגור את %{Program.Name} כעת?
+Button_Export = ייצוא
+Dialog_Export_Title = ייצוא תהליכים מורחבים
+Dialog_Export_Error_Title = שגיאת ייצוא
+Dialog_Export_Error_Message = נכשל ביצירת קובץ הייצוא.
+Dialog_Export_Success_Title = הייצוא הצליח
+Dialog_Export_Success_Message = רשימת התהליכים המורחבים יוצאה אל:
+Button_Import = ייבוא
+Dialog_Import_Title = ייבוא תהליכים מורחבים
+Dialog_Import_Error_Title = שגיאת ייבוא
+Dialog_Import_Error_Message = נכשל בקריאת קובץ הייבוא.
+Dialog_Import_Success_Title = הייבוא הצליח
+Dialog_Import_Success_Message = רשימת התהליכים המורחבים יובאה בהצלחה.
+Dialog_Import_Empty_Title = לא נמצאו תהליכים
+Dialog_Import_Empty_Message = לא נמצאו תהליכים חוקיים בקובץ שנבחר.
 
 [Update]
 Window_Title_Available = עדכון זמין

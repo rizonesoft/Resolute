@@ -129,8 +129,22 @@ Button_Cancel = Anulează
 Label_Updated = Preferințe actualizate
 MsgBox_Language_Title = Limbă schimbată
 MsgBox_Language_Message = Limba selectată a fost schimbată.\r\n%{Program.Name} trebuie repornit pentru ca limba selectată să aibă efect.
-MsgBox_Closing_Title = Închidere %{Program.Name}
-MsgBox_Closing_Message = Vrei să închizi %{Program.Name} acum?
+MsgBox_Closing_Title = Se închide %{Program.Name}
+MsgBox_Closing_Message = Doriți să închideți %{Program.Name} acum?
+Button_Export = Export
+Dialog_Export_Title = Export Procese Extinse
+Dialog_Export_Error_Title = Eroare de Export
+Dialog_Export_Error_Message = Nu s-a putut crea fișierul de export.
+Dialog_Export_Success_Title = Export Reușit
+Dialog_Export_Success_Message = Lista de Procese Extinse a fost exportată în:
+Button_Import = Import
+Dialog_Import_Title = Import Procese Extinse
+Dialog_Import_Error_Title = Eroare de Import
+Dialog_Import_Error_Message = Nu s-a putut citi fișierul de import.
+Dialog_Import_Success_Title = Import Reușit
+Dialog_Import_Success_Message = Lista de Procese Extinse a fost importată cu succes.
+Dialog_Import_Empty_Title = Nu s-au găsit procese
+Dialog_Import_Empty_Message = Nu s-au găsit procese valide în fișierul selectat.
 
 [Update]
 Window_Title_Available = Actualizare disponibilă

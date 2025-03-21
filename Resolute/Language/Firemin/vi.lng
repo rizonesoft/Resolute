@@ -131,6 +131,20 @@ MsgBox_Language_Title = Đã thay đổi ngôn ngữ
 MsgBox_Language_Message = Ngôn ngữ đã chọn đã được thay đổi.\r\n%{Program.Name} phải được khởi động lại để ngôn ngữ đã chọn có hiệu lực.
 MsgBox_Closing_Title = Đang đóng %{Program.Name}
 MsgBox_Closing_Message = Bạn có muốn đóng %{Program.Name} ngay bây giờ không?
+Button_Export = Xuất
+Dialog_Export_Title = Xuất Quy Trình Mở Rộng
+Dialog_Export_Error_Title = Lỗi Xuất
+Dialog_Export_Error_Message = Không thể tạo tệp xuất.
+Dialog_Export_Success_Title = Xuất Thành Công
+Dialog_Export_Success_Message = Danh sách Quy Trình Mở Rộng đã được xuất đến:
+Button_Import = Nhập
+Dialog_Import_Title = Nhập Quy Trình Mở Rộng
+Dialog_Import_Error_Title = Lỗi Nhập
+Dialog_Import_Error_Message = Không thể đọc tệp nhập.
+Dialog_Import_Success_Title = Nhập Thành Công
+Dialog_Import_Success_Message = Danh sách Quy Trình Mở Rộng đã được nhập thành công.
+Dialog_Import_Empty_Title = Không Tìm Thấy Quy Trình
+Dialog_Import_Empty_Message = Không tìm thấy quy trình hợp lệ trong tệp đã chọn.
 
 [Update]
 Window_Title_Available = Có bản cập nhật

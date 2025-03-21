@@ -131,6 +131,20 @@ MsgBox_Language_Title = Bahasa Diubah
 MsgBox_Language_Message = Bahasa yang dipilih telah diubah.\r\n%{Program.Name} harus dimulai ulang agar bahasa yang dipilih berlaku.
 MsgBox_Closing_Title = Menutup %{Program.Name}
 MsgBox_Closing_Message = Apakah Anda ingin menutup %{Program.Name} sekarang?
+Button_Export = Ekspor
+Dialog_Export_Title = Ekspor Proses Diperluas
+Dialog_Export_Error_Title = Kesalahan Ekspor
+Dialog_Export_Error_Message = Gagal membuat file ekspor.
+Dialog_Export_Success_Title = Ekspor Berhasil
+Dialog_Export_Success_Message = Daftar Proses Diperluas diekspor ke:
+Button_Import = Impor
+Dialog_Import_Title = Impor Proses Diperluas
+Dialog_Import_Error_Title = Kesalahan Impor
+Dialog_Import_Error_Message = Gagal membaca file impor.
+Dialog_Import_Success_Title = Impor Berhasil
+Dialog_Import_Success_Message = Daftar Proses Diperluas telah berhasil diimpor.
+Dialog_Import_Empty_Title = Tidak Ada Proses Ditemukan
+Dialog_Import_Empty_Message = Tidak ada proses valid yang ditemukan dalam file yang dipilih.
 
 [Update]
 Window_Title_Available = Pembaruan tersedia

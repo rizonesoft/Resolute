@@ -130,7 +130,21 @@ Label_Updated = Postavke ažurirane
 MsgBox_Language_Title = Jezik promijenjen
 MsgBox_Language_Message = Odabrani jezik je promijenjen.\r\n%{Program.Name} treba biti ponovno pokrenut kako bi odabrani jezik stupio na snagu.
 MsgBox_Closing_Title = Zatvaranje %{Program.Name}
-MsgBox_Closing_Message = Želite li sada zatvoriti %{Program.Name}?
+MsgBox_Closing_Message = Želite li zatvoriti %{Program.Name} sada?
+Button_Export = Izvoz
+Dialog_Export_Title = Izvoz proširenih procesa
+Dialog_Export_Error_Title = Greška izvoza
+Dialog_Export_Error_Message = Nije uspjelo stvaranje datoteke izvoza.
+Dialog_Export_Success_Title = Izvoz uspješan
+Dialog_Export_Success_Message = Lista proširenih procesa izvezena je u:
+Button_Import = Uvoz
+Dialog_Import_Title = Uvoz proširenih procesa
+Dialog_Import_Error_Title = Greška uvoza
+Dialog_Import_Error_Message = Nije uspjelo čitanje datoteke uvoza.
+Dialog_Import_Success_Title = Uvoz uspješan
+Dialog_Import_Success_Message = Lista proširenih procesa uspješno je uvezena.
+Dialog_Import_Empty_Title = Nisu pronađeni procesi
+Dialog_Import_Empty_Message = Nisu pronađeni valjani procesi u odabranoj datoteci.
 
 [Update]
 Window_Title_Available = Dostupno ažuriranje

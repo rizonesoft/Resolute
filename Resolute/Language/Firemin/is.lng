@@ -131,6 +131,20 @@ MsgBox_Language_Title = Tungumáli breytt
 MsgBox_Language_Message = Valda tungumálinu hefur verið breytt.\r\n%{Program.Name} þarf að endurræsa til að valið tungumál taki gildi.
 MsgBox_Closing_Title = Loka %{Program.Name}
 MsgBox_Closing_Message = Viltu loka %{Program.Name} núna?
+Button_Export = Flytja út
+Dialog_Export_Title = Flytja út viðbótarferla
+Dialog_Export_Error_Title = Villa við útflutning
+Dialog_Export_Error_Message = Ekki tókst að búa til útflutningsskrá.
+Dialog_Export_Success_Title = Útflutningur tókst
+Dialog_Export_Success_Message = Listi yfir viðbótarferla var fluttur út til:
+Button_Import = Flytja inn
+Dialog_Import_Title = Flytja inn viðbótarferla
+Dialog_Import_Error_Title = Villa við innflutning
+Dialog_Import_Error_Message = Ekki tókst að lesa innflutningsskrá.
+Dialog_Import_Success_Title = Innflutningur tókst
+Dialog_Import_Success_Message = Listi yfir viðbótarferla hefur verið fluttur inn.
+Dialog_Import_Empty_Title = Engir ferlar fundust
+Dialog_Import_Empty_Message = Engir gildir ferlar fundust í valinni skrá.
 
 [Update]
 Window_Title_Available = Uppfærsla í boði
