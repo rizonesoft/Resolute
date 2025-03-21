@@ -19,6 +19,7 @@ Memory Management and Performance:
 
 Language and Localization:
 - Changed: Language file extensions from .ini to .lng for better compatibility
+- Fixed: Line break issue in language selection text preventing proper display in the UI window
 - Added: Fifteen additional language files with complete translations:
   * Bulgarian (bg)
   * Czech (cs)
