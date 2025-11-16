@@ -243,20 +243,20 @@ EndFunc   ;==>_ReBarStartUp
 #include <WindowsConstants.au3>
 #include <Misc.au3>
 
-#include "Includes\About.au3"
-#include "Includes\Donate.au3"
-#include "Includes\GDIPlusEx.au3"
-#include "Includes\FileEx.au3"
-#include "Includes\GuiMenuEx.au3"
-#include "Includes\ImageListEx.au3"
-#include "Includes\Link.au3"
-#include "Includes\Registry.au3"
-#include "Includes\Splash.au3"
-#include "Includes\StringEx.au3"
-#include "Includes\Update.au3"
-#include "Includes\Versioning.au3"
+#include "..\..\Includes\About.au3"
+#include "..\..\Includes\Donate.au3"
+#include "..\..\Includes\GDIPlusEx.au3"
+#include "..\..\Includes\FileEx.au3"
+#include "..\..\Includes\GuiMenuEx.au3"
+#include "..\..\Includes\ImageListEx.au3"
+#include "..\..\Includes\Link.au3"
+#include "..\..\Includes\Registry.au3"
+#include "..\..\Includes\Splash.au3"
+#include "..\..\Includes\StringEx.au3"
+#include "..\..\Includes\Update.au3"
+#include "..\..\Includes\Versioning.au3"
 
-;~ #include "Includes\Localization.au3"
+#include "Includes\Localization.au3"
 
 ;~ Developer Constants
 Global Const $DEBUG_UPDATE		= False
