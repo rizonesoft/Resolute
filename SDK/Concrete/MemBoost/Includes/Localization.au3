@@ -48,8 +48,11 @@ Func _Localization_Custom()
 		Return
 	EndIf
 
-	$g_aLangCustom[0]   = _Localization_Load("Custom", "Label_Status_Welcome", "Welcome.")
+	$g_aLangCustom[0]   = _Localization_Load("Custom", "Label_Status_Welcome", "Welcome to Memory Booster!")
 	$g_aLangCustom[1]   = _Localization_Load("Custom", "Label_Status_Updates", "Checking for Updates")
+	$g_aLangCustom[2]   = _Localization_Load("Custom", "Label_Status_Optimizing", "Optimizing memory... Please wait.")
+	$g_aLangCustom[3]   = _Localization_Load("Custom", "Label_Status_Complete", "Optimization complete! %d processes optimized.")
+	$g_aLangCustom[4]   = _Localization_Load("Custom", "Button_Optimize", "OPTIMIZE MEMORY")
 
 EndFunc
 

@@ -9,18 +9,36 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 Platform and Toolchain:
 - Updated: AutoIt to version 3.3.18.0 – https://www.autoitscript.com/autoit3/docs/history.htm
 
-SDK Language System Improvements:
-- Enhanced: Language system with improved string handling, caching, and RTL support
-- Fixed: Unicode encoding and handling issues in language files
-- Fixed: Line break handling in language files (\rn replaced with \r\n)
-- Added: Automatic language file formatting and consistency checks
-- Optimized: Memory usage in localization system
+SDK Framework:
+- Migrated: To use Resolute SDK 11 shared includes structure
+- Enhanced: Integration with SDK shared subsystems (About, Donate, Logging, Update, etc.)
+- Added: ProgressBar.au3 include for visual feedback
+
+UI/UX:
+- Added: Full memory optimization button with modern dark theme styling
+- Added: Real-time optimization progress visualization
+- Added: Optimization count tracking and display
+- Enhanced: Status messages with localized strings
+- Improved: Visual feedback during memory optimization process
+
+Core Features:
+- Implemented: Complete memory optimization engine
+- Added: Process working set clearing for all system processes
+- Added: Real-time progress tracking during optimization
+- Added: Visual progress bar with percentage display
+- Enhanced: Memory statistics display integration
+- Optimized: Performance with minimal CPU impact during optimization
+
+Language System:
+- Added: Localization support for optimization UI strings
+- Enhanced: Custom localization with status messages
+- Fixed: Language file encoding and consistency
 
 Memory Management and Performance:
-- Fixed: Info Tip Display.
-- Fixed: Second instance of the program closes all other instances.
-- Added: Korean Translation.
-- Fixed: Show Windows Content while dragging not resetting on Exit.
+- Fixed: Info Tip Display
+- Fixed: Second instance of the program closes all other instances
+- Added: Korean Translation
+- Fixed: Show Windows Content while dragging not resetting on Exit
 
 Language Changes:
 - [Donate]: Label_Heading = %{Program.Name} has been serving you for over %d hours. Now, how about a small donation?

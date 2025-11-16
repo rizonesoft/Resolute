@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2306
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2307
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -296,6 +296,7 @@ EndFunc   ;==>_ReBarStartUp
 #include "..\..\Includes\ImageListEx.au3"
 #include "..\..\Includes\Link.au3"
 #include "..\..\Includes\Logging.au3"
+#include "..\..\Includes\ProgressBar.au3"
 #include "..\..\Includes\Registry.au3"
 #include "..\..\Includes\Splash.au3"
 #include "..\..\Includes\SSLG.au3"
@@ -434,6 +435,12 @@ Global $g_hMenuDebug
 Global $g_OldSystemParam								;~ Used when resizing the main GUI
 Global $g_hSubHeading
 Global $g_hBtnRepair
+Global $g_hBtnOptimize						;~ Optimize Memory button
+Global $g_hProgressOptimize[2]					;~ Optimization progress bar
+Global $g_iOptimizing = 0						;~ Optimization in progress flag
+Global $g_iAutoOptimize = 0					;~ Auto optimization enabled flag
+Global $g_iOptimizeTimer = 30					;~ Auto optimize timer (seconds)
+Global $g_iOptimizeCount = 0					;~ Total optimization count
 
 If Not IsDeclared("g_iParentState") Then Global $g_iParentState
 If Not IsDeclared("g_iParent") Then Global $g_iParent
@@ -807,8 +814,22 @@ Func _StartCoreGui()
 	$g_hProgressProcs[1] = GUICtrlCreateGraphic(130, 308, 339, 14)
 	GUICtrlSetBkColor($g_hProgressProcs[1], 0x803A0A)
 
+	; Optimize Memory Button
+	$g_hBtnOptimize = GUICtrlCreateButton($g_aLangCustom[4], 20, 345, 540, 45)
+	GUICtrlSetFont($g_hBtnOptimize, 12, 600)
+	GUICtrlSetBkColor($g_hBtnOptimize, 0x13FF92)
+	GUICtrlSetColor($g_hBtnOptimize, 0x000000)
+	GUICtrlSetOnEvent($g_hBtnOptimize, "_OptimizeMemory")
 
-
+	; Optimization Progress Bar
+	GUICtrlCreateGraphic(20, 400, 540, 25)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hProgressOptimize[0] = GUICtrlCreateGraphic(22, 402, 536, 21)
+	GUICtrlSetBkColor($g_hProgressOptimize[0], 0x13FF92)
+	$g_hProgressOptimize[1] = GUICtrlCreateGraphic(23, 403, 534, 19)
+	GUICtrlSetBkColor($g_hProgressOptimize[1], 0x085820)
+	GUICtrlSetState($g_hProgressOptimize[0], $GUI_HIDE)
+	GUICtrlSetState($g_hProgressOptimize[1], $GUI_HIDE)
 
 
 	_UpdateMemoryStatsFirst()
@@ -1169,6 +1190,63 @@ Func _SetProcessingStates($iState)
 	GUICtrlSetState($g_hMenuDebug, $iState)
 
 EndFunc   ;==>_SetProcessingStates
+
+
+Func _OptimizeMemory()
+
+	If $g_iOptimizing = 1 Then Return ; Already optimizing
+
+	$g_iOptimizing = 1
+	$g_iOptimizeCount += 1
+
+	; Disable button and menu during optimization
+	GUICtrlSetState($g_hBtnOptimize, $GUI_DISABLE)
+	_SetProcessingStates($GUI_DISABLE)
+
+	; Show progress bar
+	GUICtrlSetState($g_hProgressOptimize[0], $GUI_SHOW)
+	GUICtrlSetState($g_hProgressOptimize[1], $GUI_SHOW)
+
+	; Get process list
+	Local $aProcsList = ProcessList()
+	Local $iTotalProcs = $aProcsList[0][0]
+
+	; Update status
+	GUICtrlSetData($g_hLabelCount, String($g_iOptimizeCount))
+	GUICtrlSetData($g_hSubHeading, $g_aLangCustom[2])
+
+	; Loop through all processes and clear working set
+	For $i = 1 To $iTotalProcs
+		_WinAPI_EmptyWorkingSet($aProcsList[$i][1])
+
+		; Update progress bar
+		Local $iProgress = ($i / $iTotalProcs) * 100
+		_ProgressBar_SetData($g_hCoreGui, $g_hProgressOptimize[0], $g_hProgressOptimize[1], 22, 402, 536, $iProgress)
+		GUICtrlSetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress))
+		_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, $iProgress)
+
+		Sleep(1) ; Small delay to prevent CPU spike
+	Next
+
+	; Update memory stats immediately after optimization
+	_UpdateMemoryStats()
+
+	; Reset progress bar
+	GUICtrlSetState($g_hProgressOptimize[0], $GUI_HIDE)
+	GUICtrlSetState($g_hProgressOptimize[1], $GUI_HIDE)
+	_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, 0)
+	GUICtrlSetData($g_hLabelCountPerc, "0%")
+
+	; Update status
+	GUICtrlSetData($g_hSubHeading, StringFormat($g_aLangCustom[3], $iTotalProcs))
+
+	; Re-enable button and menu
+	GUICtrlSetState($g_hBtnOptimize, $GUI_ENABLE)
+	_SetProcessingStates($GUI_ENABLE)
+
+	$g_iOptimizing = 0
+
+EndFunc   ;==>_OptimizeMemory
 
 
 Func _ReduceMemory()
