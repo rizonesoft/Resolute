@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2331
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2333
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -1472,26 +1472,25 @@ Func _UpdateTrayIcon()
 	$g_aMemStats = MemGetStats()
 	Local $iMemLoad = $g_aMemStats[$MEM_LOAD]
 	
-	; Calculate icon index based on memory usage (0-11 for 0-100%)
-	; Old formula: Floor($iMemLoad / 10) but capped at 11
-	; 0-9% = 0, 10-19% = 1, 20-29% = 2, ..., 100-109% = 10, but capped at 11
-	Local $iIconIndex = Floor($iMemLoad / 10)
-	If $iIconIndex > 11 Then $iIconIndex = 11
+	; Calculate icon index - old version formula: $OneDig = Floor($iMemLoad / 10)
+	; Then resource was: (-1 * ($OneDig + 6))
+	; Which means: 0% = -6, 10% = -7, 20% = -8, etc.
+	; Our resources start at -303, so we need: -303 = icon for 0-9%
+	Local $iOneDig = Floor($iMemLoad / 10)
+	If $iOneDig > 11 Then $iOneDig = 11
 	
-	; Always use embedded resource when compiled, file path when not
 	If @Compiled Then
-		; Use embedded tray icon resource (resources start at -303)
-		; Negative index: -303 for icon 0, -304 for icon 1, etc.
-		Local $iResourceID = -303 - $iIconIndex
-		TraySetIcon(@ScriptFullPath, $iResourceID)
+		; Old formula: TraySetIcon(@ScriptFullPath, (-1 * ($OneDig + 6)))
+		; New resources at -303 to -314, so adjust: -303 corresponds to old -6
+		; Mapping: old -6 = new -303, old -7 = new -304, etc.
+		; Formula: -303 - $iOneDig (where $iOneDig is 0-11)
+		TraySetIcon(@ScriptFullPath, (-303 - $iOneDig))
 	Else
-		; Development mode: use external icon files
-		If FileExists($g_aTrayIcons[$iIconIndex]) Then
-			TraySetIcon($g_aTrayIcons[$iIconIndex])
-		EndIf
+		; Development: use file
+		TraySetIcon($g_aTrayIcons[$iOneDig])
 	EndIf
 	
-	; Tooltip format matching old version exactly
+	; Old tooltip: $APPSET_TITLE & " " & $APPSET_VERSION & @CRLF & "---..." & @CRLF & "Memory Usage: " & $MemInfo[0] & "%"
 	TraySetToolTip($g_sProgramTitle & @CRLF & _
 					"----------------------------------------" & @CRLF & _
 					"Memory Usage: " & $iMemLoad & "%")
