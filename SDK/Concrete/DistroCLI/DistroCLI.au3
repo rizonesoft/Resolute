@@ -9,7 +9,9 @@
 #AutoIt3Wrapper_Compile_both=Y
 #AutoIt3Wrapper_Res_Comment=DistroCLI - Command Line Build Tool
 #AutoIt3Wrapper_Res_Description=DistroCLI Command Line Interface
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.0
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.2
+#AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y
+#AutoIt3Wrapper_Res_FileVersion_First_Increment=N
 #AutoIt3Wrapper_Res_ProductVersion=1
 #AutoIt3Wrapper_Res_Language=2057
 #AutoIt3Wrapper_Res_LegalCopyright=© 2025 Rizonesoft
@@ -40,7 +42,7 @@
 #include <File.au3>
 #include <FileConstants.au3>
 
-Global Const $VERSION = "1.0.0"
+Global Const $VERSION = "1.0.0.2"
 Global $g_bVerbose = False
 Global $g_sRootDir = @ScriptDir & "\..\..\.."
 Global $g_sDistroRoot = @ScriptDir & "\..\.."

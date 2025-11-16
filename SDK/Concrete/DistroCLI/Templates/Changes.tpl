@@ -6,6 +6,9 @@ DISTROCLI CHANGES
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+Build System:
+- Added: Auto-increment for build number on each compilation
+
 Bug Fixes:
 - Fixed: Icon configuration - created DistroCLI.ico for proper icon display
 
