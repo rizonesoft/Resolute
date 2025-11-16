@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2328
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2329
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -1317,9 +1317,9 @@ Func _OptimizeMemory()
 			EndIf
 		EndIf
 
-		; Update progress on process counter bar (only when percentage changes)
+		; Update progress on process counter bar (only every 5% to reduce flicker)
 		Local $iProgress = Floor(($i / $iTotalProcs) * 100)
-		If $iProgress <> $iLastProgress Then
+		If $iProgress <> $iLastProgress And Mod($iProgress, 5) = 0 Then
 			GUICtrlSetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress))
 			_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, $iProgress)
 			$iLastProgress = $iProgress
