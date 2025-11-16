@@ -150,7 +150,7 @@ Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_short
 Source: {#distrodir}\{#app_shortname}_X64.exe; DestDir: {app}; DestName: {#app_shortname}_X64.exe; Flags: ignoreversion; Check: GetInstallationType()
 Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_shortname}.exe; Flags: ignoreversion; Check: GetInstallationType()
 %{FILES_SECTION}
-Source: ..\..\..\Resources\Setup\PayPal.bmp; Flags: dontcopy
+Source: ..\..\..\..\Resources\Setup\PayPal.bmp; Flags: dontcopy
 
 [Dirs]
 
