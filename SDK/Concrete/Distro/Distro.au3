@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.3681
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.3684
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                     					;~ (Y/N) Compile for high DPI. Default=N
@@ -60,7 +60,7 @@
 ;	eg: #AutoIt3Wrapper_Res_Field=AutoIt Version|%AutoItVer%
 #AutoIt3Wrapper_Res_Field=CompanyName|Rizonesoft
 #AutoIt3Wrapper_Res_Field=ProductName|Distro Building Environment
-#AutoIt3Wrapper_Res_Field=HomePage|https://www.rizonesoft.com
+#AutoIt3Wrapper_Res_Field=HomePage|https://rizonesoft.com
 #AutoIt3Wrapper_Res_Field=AutoItVersion|%AutoItVer%
 ; Add extra ICO files to the resources
 ; Use full path of the ico files to be added
@@ -310,21 +310,21 @@ Global $g_sProgShortName_X64	= $g_sProgShortName & "_X64"
 Global $g_sProgName				= "Rizonesoft SDK"
 Global $g_iSingleton			= True
 
-Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"														; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com/contact-us/|www.rizonesoft.com/contact-us"								; https://www.rizonesoft.com/contact-us
+Global $g_sUrlCompHomePage		= "https://rizonesoft.com|www.rizonesoft.com"														; https://rizonesoft.com
+Global $g_sUrlSupport			= "https://rizonesoft.com/contact-us/|www.rizonesoft.com/contact-us"								; https://rizonesoft.com/contact-us
 Global $g_sUrlWhatsApp			= "https://api.whatsapp.com/send?phone=27849630169&text=Hi,&source=&data="
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"								; https://www.rizonesoft.com/downloads/
+Global $g_sUrlDownloads			= "https://rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"								; https://rizonesoft.com/downloads/
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"												; https://twitter.com/Rizonesoft
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"											; https://www.facebook.com/rizonesoft
 Global $g_sUrlReddit			= "https://www.reddit.com/user/rizonesoft|Reddit.com/user/rizonesoft"									; https://www.reddit.com/user/rizonesoft
 Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 									; https://www.linkedin.com/in/rizonetech
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"								; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"					; https://github.com/rizonesoft/Resolute/issues
-Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://www.rizonesoft.com/feed
+Global $g_sUrlRSS				= "https://rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://rizonesoft.com/feed
 Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"						; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"							; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/resolute/|www.rizonesoft.com/downloads/resolute/"
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/resolute/update/"
+Global $g_sUrlProgPage			= "https://rizonesoft.com/downloads/resolute/|www.rizonesoft.com/downloads/resolute/"
+Global $g_sUrlUpdate			= "https://rizonesoft.com/downloads/resolute/update/"
 Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 
 ;~ Path Settings
@@ -2335,7 +2335,7 @@ EndFunc   ;==>_GenerateDocumentation
 Func _ProcessTemplateFile($sSolutionIniPath, $sDocTemplateIn, $sDocOutput, $iReleaseInstSize)
 
 	Local $sReleasCompany = $g_aEnvironment[2][1]
-	Local $sReleasURL = IniRead($sSolutionIniPath, "Links", "CompanyURL", "https://www.rizonesoft.com")
+	Local $sReleasURL = IniRead($sSolutionIniPath, "Links", "CompanyURL", "https://rizonesoft.com")
 	Local $sReleasName = $g_aEnvironment[4][1]
 	Local $sReleasDesc = $g_aEnvironment[6][1]
 	Local $sReleasVersion = $g_aEnvironment[9][1]
@@ -2537,6 +2537,7 @@ Func _CreateInstall($sSolutionIniPath, $iRow, $iCol)
 	Local $sInnoWorkingDir = $g_aInnoSetup[8]
 	Local $cInnoSetup = _FileEx_PathSplit($g_aInnoSetup[9], 5)
 
+
 	_Logging_Start(StringFormat($g_aLangMessages2[58], $sReleasName))
 	_StartSoloProcess($iRow, $iCol)
 
@@ -2546,19 +2547,142 @@ Func _CreateInstall($sSolutionIniPath, $iRow, $iCol)
 		_Logging_EditWrite($g_aLangMessages2[55])
 	Else
 
-		_GenerateInstallationScript($sSolutionIniPath)
-
-		Local $sInstallScriptPath = IniRead($sSolutionIniPath, "Environment", "InstallScriptPath", "")
-		If FileExists($sInstallScriptPath) Then
-			_ProcessEx_RunCommand($cInnoSetup & Chr(32) & Chr(34) & $sInstallScriptPath & Chr(34), $sInnoWorkingDir)
+		If _GenerateInstallationScriptFromTemplate($sSolutionIniPath) Then
+			Local $sInstallScriptPath = IniRead($sSolutionIniPath, "Environment", "InstallScriptPath", "")
+			If FileExists($sInstallScriptPath) Then
+				_ProcessEx_RunCommand($cInnoSetup & Chr(32) & Chr(34) & $sInstallScriptPath & Chr(34), $sInnoWorkingDir)
+			EndIf
+		Else
+			_Logging_EditWrite(_Logging_SetLevel($g_aLangMessages2[61], "ERROR"))
 		EndIf
-
 	EndIf
 
 	_Logging_FinalMessage(StringFormat($g_aLangMessages2[60], $sReleasName))
 	_UpdateSoloProcess($iRow, $iCol, 100)
 
 EndFunc   ;==>_CreateInstall
+
+
+Func _GenerateInstallationScriptFromTemplate($sSolutionIniPath)
+
+	Local $sCompanyName = $g_aEnvironment[2][1]
+	Local $sProgName = $g_aEnvironment[4][1]
+	Local $sProgShortName = $g_aEnvironment[5][1]
+	Local $sProgBuild = $g_aEnvironment[12][1]
+	Local $sDistoPath = $g_aEnvironment[23][1]
+	Local $sPackPathName = $g_aEnvironment[24][1]
+	Local $sProgBaseName = $sProgShortName & "_" & $sProgBuild
+	Local $sOutputBaseName = $sProgBaseName & "_Setup.exe"
+	Local $sScriptBaseName = $sProgBaseName & "_Setup.iss"
+	Local $sOutputFullPath = $sDistoPath & "\" & $sOutputBaseName
+	Local $sScriptFullPath = $sDistoPath & "\" & $sScriptBaseName
+
+	Local $sScriptPath = $g_aEnvironment[1][1]
+	Local $sProgRoot = _FileEx_PathSplit($sScriptPath, 2)
+	Local $sTemplatePath = $sProgRoot & "\Templates\Setup.iss.tpl"
+
+	If Not FileExists($sTemplatePath) Then
+		_Logging_EditWrite(_Logging_SetLevel("Installer template not found.", "ERROR"))
+		_Logging_EditWrite(StringFormat("^ '%s'", $sTemplatePath))
+		IniWrite($sSolutionIniPath, "Environment", "InstallScriptPath", "")
+		IniWrite($sSolutionIniPath, "Environment", "InstallOutputPath", "")
+		Return False
+	EndIf
+
+	Local $hTemplateOpen = FileOpen($sTemplatePath, $FO_READ)
+	If $hTemplateOpen = -1 Then
+		_Logging_EditWrite(_Logging_SetLevel($g_aLangMessages2[61], "ERROR"))
+		_Logging_EditWrite(StringFormat("^ '%s'", $sTemplatePath))
+		IniWrite($sSolutionIniPath, "Environment", "InstallScriptPath", "")
+		IniWrite($sSolutionIniPath, "Environment", "InstallOutputPath", "")
+		Return False
+	EndIf
+
+	Local $sTemplateRead = FileRead($hTemplateOpen)
+	FileClose($hTemplateOpen)
+
+	; Generate dynamic [Files] section from [Distribute] entries in .sni
+	Local $sFilesSection = _GenerateFilesSection($sSolutionIniPath)
+
+	$sTemplateRead = StringReplace($sTemplateRead, "%{COMPANY}", $sCompanyName)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{APP_NAME}", $sProgName)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{APP_SHORTNAME}", $sProgShortName)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{DISTRO_NAME}", $sPackPathName)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{FILES_SECTION}", $sFilesSection)
+
+	FileDelete($sScriptFullPath)
+	Local $hScriptOpen = FileOpen($sScriptFullPath, $FO_OVERWRITE)
+	If $hScriptOpen = -1 Then
+		_Logging_EditWrite(_Logging_SetLevel($g_aLangMessages2[61], "ERROR"))
+		_Logging_EditWrite(StringFormat("^ '%s'", $sScriptFullPath))
+		IniWrite($sSolutionIniPath, "Environment", "InstallScriptPath", "")
+		IniWrite($sSolutionIniPath, "Environment", "InstallOutputPath", "")
+		Return False
+	EndIf
+
+	If FileWrite($hScriptOpen, $sTemplateRead) = 0 Then
+		_Logging_EditWrite(_Logging_SetLevel($g_aLangMessages2[61], "ERROR"))
+		_Logging_EditWrite(StringFormat("^ '%s'", $sScriptFullPath))
+		FileClose($hScriptOpen)
+		IniWrite($sSolutionIniPath, "Environment", "InstallScriptPath", "")
+		IniWrite($sSolutionIniPath, "Environment", "InstallOutputPath", "")
+		Return False
+	EndIf
+
+	FileClose($hScriptOpen)
+
+	IniWrite($sSolutionIniPath, "Environment", "InstallScriptPath", $sScriptFullPath)
+	IniWrite($sSolutionIniPath, "Environment", "InstallOutputPath", $sOutputFullPath)
+
+	Return True
+
+EndFunc   ;==>_GenerateInstallationScriptFromTemplate
+
+
+Func _GenerateFilesSection($sSolutionIniPath)
+
+	Local $aDistFiles = IniReadSection($sSolutionIniPath, "Distribute")
+	If @error Then Return ""
+
+	Local $sFilesSection = ""
+	Local $sFile, $sRelPath, $sDestDir, $sFileName, $sSourcePath
+
+	For $i = 1 To $aDistFiles[0][0]
+		$sFile = $aDistFiles[$i][1]
+		
+		; Skip %RootDir% and %SourceDir% prefix parsing - just extract relative path
+		If StringInStr($sFile, "%RootDir%\") Then
+			$sRelPath = StringTrimLeft($sFile, StringLen("%RootDir%\"))
+		ElseIf StringInStr($sFile, "%SourceDir%\") Then
+			$sRelPath = StringTrimLeft($sFile, StringLen("%SourceDir%\"))
+		Else
+			ContinueLoop
+		EndIf
+
+		; Skip executables - handled separately in template
+		If StringRegExp($sRelPath, "(?i)^[^\\]+\.(exe)$") Then ContinueLoop
+
+		; Determine destination directory from path structure
+		Local $aPathParts = StringSplit($sRelPath, "\\")
+		If $aPathParts[0] > 1 Then
+			; File has subdirectory structure (e.g., Docs\Changes.txt, Language\en.lng)
+			$sDestDir = "{app}"
+			For $j = 1 To $aPathParts[0] - 1
+				$sDestDir &= "\\" & $aPathParts[$j]
+			Next
+		Else
+			; File in root directory
+			$sDestDir = "{app}"
+		EndIf
+
+		$sSourcePath = "{#distrodir}\\" & $sRelPath
+
+		$sFilesSection &= "Source: " & $sSourcePath & "; DestDir: " & $sDestDir & "; Flags: ignoreversion" & @CRLF
+	Next
+
+	Return $sFilesSection
+
+EndFunc   ;==>_GenerateFilesSection
 
 
 Func _GenerateInstallationScript($sSolutionIniPath)
@@ -2789,7 +2913,7 @@ Func _GenerateInstallationScript($sSolutionIniPath)
 	FileWrite($hFileOpen, @TAB & "SWP_NOMOVE = $2;" & @CRLF)
 	FileWrite($hFileOpen, @TAB & "SWP_NOZORDER = $4;" & @CRLF)
 	; FileWrite($hFileOpen, @TAB & "UninstSiteURL = '" & $sUninstallURL & "';" & @CRLF)
-	FileWrite($hFileOpen, @TAB & "PromoURL = 'https://www.rizonesoft.com/downloads/rizonesoft-office/update/';" & @CRLF)
+	FileWrite($hFileOpen, @TAB & "PromoURL = 'https://rizonesoft.com/downloads/rizonesoft-office/update/';" & @CRLF)
 
 	FileWrite($hFileOpen, "function SetWindowPos(hWnd: HWND; hWndInsertAfter: HWND; X, Y, cx, cy: Integer; uFlags: UINT): BOOL;" & @CRLF)
 	FileWrite($hFileOpen, "external 'SetWindowPos@user32.dll stdcall';" & @CRLF)

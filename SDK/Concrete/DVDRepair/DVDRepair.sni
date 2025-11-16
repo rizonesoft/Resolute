@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\DVDRepair.exe
@@ -42,7 +42,7 @@ File=%RootDir%\Processing\64\Globe.ani
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=DVD Drive Repair
 ShortName=DVDRepair
 Description=Rizonesoft DVD Drive Repair

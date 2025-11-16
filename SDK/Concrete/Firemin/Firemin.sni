@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\Firemin.exe
@@ -68,16 +68,16 @@ File=%RootDir%\Processing\64\Globe.ani
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\Firemin\Firemin.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=Firemin
 ShortName=Firemin
 Description=Firemin
 Type=N
 Icon=R:\Resolute\SDK\Resources\Icons\Firemin.ico
-Version=12.2.1.9545
+Version=12.2.1.9558
 VersionMajor=12
 VersionMaintenance=1
-VersionBuild=9545
+VersionBuild=9558
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -85,11 +85,11 @@ OutFile=Firemin.exe
 OutFileX64=Firemin_X64.exe
 OutFilePath=R:\Resolute\Resolute\Firemin.exe
 OutFileX64Path=R:\Resolute\Resolute\Firemin_X64.exe
-InstallScriptPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9545\Firemin_9545_Setup.iss
-InstallOutputPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9545\Firemin_9545_Setup.exe
+InstallScriptPath=0
+InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9545
-DistributionName=Firemin_9545
-FullDistributionPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9545\Firemin_9545
-DistroSourceName=Firemin_9545_Source
-DistroSourceFullPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9545\Firemin_9545_Source
+DistributionPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9558
+DistributionName=Firemin_9558
+FullDistributionPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558
+DistroSourceName=Firemin_9558_Source
+DistroSourceFullPath=R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Source

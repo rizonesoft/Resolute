@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\MemBoost.exe
@@ -38,7 +38,7 @@ File=%RootDir%\Sounds\Welcome.wav
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\MemBoost\MemBoost.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=Memory Booster
 ShortName=MemBoost
 Description=Memory Booster

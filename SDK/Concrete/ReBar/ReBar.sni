@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\ReBar.exe
@@ -38,7 +38,7 @@ File=%RootDir%\Sounds\Welcome.wav
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\ReBar\ReBar.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=ReBar Framework
 ShortName=ReBar
 Description=ReBar Framework
@@ -55,8 +55,8 @@ OutFile=ReBar.exe
 OutFileX64=ReBar_X64.exe
 OutFilePath=R:\Resolute\Resolute\ReBar.exe
 OutFileX64Path=R:\Resolute\Resolute\ReBar_X64.exe
-InstallScriptPath=R:\Resolute\SDK\Concrete\ReBar\Distribution\5588\ReBar_5588_Setup.iss
-InstallOutputPath=R:\Resolute\SDK\Concrete\ReBar\Distribution\5588\ReBar_5588_Setup.exe
+InstallScriptPath=0
+InstallOutputPath=0
 InstallSize=0
 DistributionPath=R:\Resolute\SDK\Concrete\ReBar\Distribution\5588
 DistributionName=ReBar_5588

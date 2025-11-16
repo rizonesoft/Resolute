@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\BiosCodes.exe
@@ -34,7 +34,7 @@ File=%RootDir%\Processing\64\Globe.ani
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\BiosCodes\BiosCodes.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=Beep Codes Viewer
 ShortName=BiosCodes
 Description=Beep Codes Viewer

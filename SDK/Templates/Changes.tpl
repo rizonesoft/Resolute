@@ -5,6 +5,12 @@
 --------------------------------------------------
 Version %{VERSION} (%{:MONTH:} %{DAY}, %{YEAR})
 --------------------------------------------------
+Platform and Toolchain:
+- Updated: AutoIt to version 3.3.18.0 – https://www.autoitscript.com/autoit3/docs/history.htm
+
+--------------------------------------------------
+Version 2.0.0.1533 (Oktober 20, 2016)
+--------------------------------------------------
 
 - Cleaner optimized code.
 - Main Window is now Resizable.
@@ -47,11 +53,5 @@ Version %{VERSION} (%{:MONTH:} %{DAY}, %{YEAR})
 - Now uses Microsoft SignTool for code signing.
 - Added Import External Dependencies option.
 - Added Create Update File option.
-
---------------------------------------------------
-Version 2.0.0.1533 (Oktober 20, 2016)
---------------------------------------------------
-
-No recorded history
 
 ==================================================

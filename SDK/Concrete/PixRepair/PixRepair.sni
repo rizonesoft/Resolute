@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\PixRepair.exe
@@ -34,16 +34,16 @@ File=%RootDir%\Processing\64\Globe.ani
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=Pixel Repair
 ShortName=PixRepair
 Description=Pixel Repair
 Type=N
 Icon=R:\Resolute\SDK\Resources\Icons\PixRepair.ico
-Version=11.1.1.1008
+Version=11.1.1.1011
 VersionMajor=11
 VersionMaintenance=1
-VersionBuild=1008
+VersionBuild=1011
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -54,8 +54,8 @@ OutFileX64Path=R:\Resolute\Resolute\PixRepair_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1008
-DistributionName=PixRepair_1008
-FullDistributionPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1008\PixRepair_1008
-DistroSourceName=PixRepair_1008_Source
-DistroSourceFullPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1008\PixRepair_1008_Source
+DistributionPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1011
+DistributionName=PixRepair_1011
+FullDistributionPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1011\PixRepair_1011
+DistroSourceName=PixRepair_1011_Source
+DistroSourceFullPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1011\PixRepair_1011_Source

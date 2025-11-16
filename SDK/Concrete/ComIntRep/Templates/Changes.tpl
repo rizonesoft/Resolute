@@ -6,6 +6,20 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+Platform and Toolchain:
+- Updated: AutoIt to version 3.3.18.0 â€“ https://www.autoitscript.com/autoit3/docs/history.htm
+
+SDK Language System Improvements:
+- Enhanced: Language system with improved string handling, caching, and RTL support
+- Fixed: Unicode encoding and handling issues in language files
+- Fixed: Line break handling in language files (\rn replaced with \r\n)
+- Added: Automatic language file formatting and consistency checks
+- Optimized: Memory usage in localization system
+
+--------------------------------------------------
+Version 11.1.3.6508 (OCTOBER 30, 2023)
+--------------------------------------------------
+
 - Upgraded Rizonesoft SDK to Version 11.
 - Enhanced Social Media Link Integration in the 'About' Dialog.
 - Optimized Memory Usage Indicator Stability in the 'About' Dialog.
@@ -581,9 +595,9 @@ Version 2.0.0.1490 (September 17, 2013)
 Version 2.0.0.1468 (September 10, 2013)
 --------------------------------------------------
 
-- New “Show TCP/IP configuration” command
-- New “Open Remote Desktop” command
-- New “Open Internet Explorer Properties” command
+- New Â“Show TCP/IP configurationÂ” command
+- New Â“Open Remote DesktopÂ” command
+- New Â“Open Internet Explorer PropertiesÂ” command
 - New SpeedTest.net link
 - New Icons and Donate button
 - Sorted out the wuauclt bug

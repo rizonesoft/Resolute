@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\Rescue.exe
@@ -38,16 +38,16 @@ Folder=%RootDir%\Bin\x86\ClamAV
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\Rescue\Rescue.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=Rescue Antivirus
 ShortName=Rescue
 Description=Rescue Antivirus
 Type=N
 Icon=R:\Resolute\SDK\Resources\Icons\Rescue.ico
-Version=11.1.1.339
+Version=11.1.1.340
 VersionMajor=11
 VersionMaintenance=1
-VersionBuild=339
+VersionBuild=340
 UseBeta=B
 UseX64=Y
 CompileBoth=Y
@@ -58,8 +58,8 @@ OutFileX64Path=R:\Resolute\Resolute\Rescue_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\339
-DistributionName=Rescue_339
-FullDistributionPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\339\Rescue_339
-DistroSourceName=Rescue_339_Source
-DistroSourceFullPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\339\Rescue_339_Source
+DistributionPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\340
+DistributionName=Rescue_340
+FullDistributionPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\340\Rescue_340
+DistroSourceName=Rescue_340_Source
+DistroSourceFullPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\340\Rescue_340_Source

@@ -60,7 +60,7 @@
 ;	eg: #AutoIt3Wrapper_Res_Field=AutoIt Version|%AutoItVer%
 #AutoIt3Wrapper_Res_Field=CompanyName|Rizonesoft
 #AutoIt3Wrapper_Res_Field=ProductName|USB Repair
-#AutoIt3Wrapper_Res_Field=HomePage|https://www.rizonesoft.com
+#AutoIt3Wrapper_Res_Field=HomePage|https://rizonesoft.com
 #AutoIt3Wrapper_Res_Field=AutoItVersion|%AutoItVer%
 ; Add extra ICO files to the resources
 ; Use full path of the ico files to be added
@@ -283,21 +283,21 @@ Global $g_iSingleton			= True
 
 ;~ Links
 
-Global $g_sUrlCompHomePage		= "https://www.rizonesoft.com|www.rizonesoft.com"														; https://www.rizonesoft.com
-Global $g_sUrlSupport			= "https://www.rizonesoft.com/contact-us/|www.rizonesoft.com/contact-us"								; https://www.rizonesoft.com/contact-us
+Global $g_sUrlCompHomePage		= "https://rizonesoft.com|www.rizonesoft.com"														; https://rizonesoft.com
+Global $g_sUrlSupport			= "https://rizonesoft.com/contact-us/|www.rizonesoft.com/contact-us"								; https://rizonesoft.com/contact-us
 Global $g_sUrlWhatsApp			= "https://api.whatsapp.com/send?phone=27849630169&text=Hi,&source=&data="
-Global $g_sUrlDownloads			= "https://www.rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"								; https://www.rizonesoft.com/downloads/
+Global $g_sUrlDownloads			= "https://rizonesoft.com/downloads/|/www.rizonesoft.com/downloads/"								; https://rizonesoft.com/downloads/
 Global $g_sUrlTwitter			= "https://twitter.com/rizonesoft|Twitter.com/Rizonesoft"												; https://twitter.com/Rizonesoft
 Global $g_sUrlFacebook			= "https://www.facebook.com/rizonesoft|Facebook.com/rizonesoft"											; https://www.facebook.com/rizonesoft
 Global $g_sUrlReddit			= "https://www.reddit.com/user/rizonesoft|Reddit.com/user/rizonesoft"									; https://www.reddit.com/user/rizonesoft
 Global $g_sUrlLinkedIn	 		= "https://www.linkedin.com/in/rizonetech|LinkedIn.com/in/rizonetech" 									; https://www.linkedin.com/in/rizonetech
 Global $g_sUrlGitHub			= "https://github.com/rizonesoft/Resolute|GitHub.com/rizonesoft/Resolute"								; https://github.com/rizonesoft/Resolute
 Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|GitHub.com/rizonesoft/Resolute/issues"					; https://github.com/rizonesoft/Resolute/issues
-Global $g_sUrlRSS				= "https://www.rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://www.rizonesoft.com/feed
+Global $g_sUrlRSS				= "https://rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://rizonesoft.com/feed
 Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"						; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"							; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://www.rizonesoft.com/downloads/usb-repair/|www.rizonesoft.com/downloads/usb-repair/"
-Global $g_sUrlUpdate			= "https://www.rizonesoft.com/downloads/resolute/update/"
+Global $g_sUrlProgPage			= "https://rizonesoft.com/downloads/usb-repair/|www.rizonesoft.com/downloads/usb-repair/"
+Global $g_sUrlUpdate			= "https://rizonesoft.com/downloads/resolute/update/"
 Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 
 ;~ Path Settings

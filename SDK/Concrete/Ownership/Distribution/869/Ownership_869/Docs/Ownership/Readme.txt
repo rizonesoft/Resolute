@@ -4,7 +4,7 @@ TAKE OWNERSHIP
 https://www.rizonesoft.com
 ==================================================
 Version: 11.1.1.869
-Release Date: 30 OCTOBER, 2023
+Release Date: 08 APRIL, 2025
 System Requirements: Windows XP, Vista, 2008, 7, 8, 8.1, 10 
 Disk Space: 0 MB
 ==================================================

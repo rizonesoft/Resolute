@@ -62,11 +62,3 @@ You further have the right to lodge a complaint with a supervisory authority pur
 International Data Transfers: Your personal data may be transferred to servers located outside of your country. We ensure that appropriate safeguards are in place to protect your data, in compliance with the GDPR and the POPI Act.
 
 Data Breach Notification: In the unlikely event of a data breach, we will notify affected users and the appropriate authorities in accordance with GDPR and POPI Act requirements.
-
-Additional Data Processing in this Installer: This is an offer-enabled installer that incorporates additional software by Opera Norway AS, which is an independent data controller. Their separate privacy policy is available at https://legal.opera.com/privacy/.
-
-Consent and User Choices: By proceeding with the installation, you will be presented with an option to install additional software provided by Opera Norway AS. The installation of this additional software is optional and requires your explicit consent.
-
-During the installation process, some information like your system configuration may be collected by Opera from your computer, representing personal data according to the GDPR and POPI Act.
-
-If you object to this data processing, you may choose not to install the additional software by unchecking the respective option during installation. Alternatively, you may wish to choose an installer from https://rizonetech.com that is not offer-enabled.

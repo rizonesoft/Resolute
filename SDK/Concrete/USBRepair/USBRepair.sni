@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\USBRepair.exe
@@ -37,7 +37,7 @@ File=%RootDir%\Processing\64\Globe.ani
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=USB Repair
 ShortName=USBRepair
 Description=Rizonesoft USB Repair

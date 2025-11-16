@@ -34,7 +34,11 @@
 Global Enum $DONATE_ICON_NORMAL = 0, $DONATE_ICON_HOVER, $DONATE_ICON_MAX
 Global $g_hDonateGui, $g_hDonateButton
 Global $g_sDonateIcon = @ScriptFullPath
-Global $g_aDonateIcons[$DONATE_ICON_MAX] = [@ScriptFullPath, @ScriptFullPath]
+; NOTE:
+; - $DONATE_ICON_MAX is the highest *icon* index (currently 1), not the array length.
+; - Several programs use $g_aDonateIcons[2] as a simple hover/normal state flag.
+;   To keep that usage valid, we allocate one extra element beyond $DONATE_ICON_MAX.
+Global $g_aDonateIcons[$DONATE_ICON_MAX + 1] = [@ScriptFullPath, @ScriptFullPath]
 Global $g_bDonateIconHovered = False
 
 

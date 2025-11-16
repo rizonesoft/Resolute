@@ -1,5 +1,15 @@
-;* Firemin - Installer script
+;* Firemin - Installer script (Template)
 ;* Copyright (C) 2025 Rizonesoft
+;*
+;* This template is processed by Distro.au3 (_GenerateInstallationScriptFromTemplate)
+;* The following placeholders are substituted:
+;*   Rizonesoft        -> Environment["Company"]       (e.g., "Rizonesoft")
+;*   Firemin       -> Environment["Name"]          (e.g., "Firemin")
+;*   Firemin  -> Environment["ShortName"]     (e.g., "Firemin")
+;*   Firemin_9558    -> Environment["DistributionName"] (e.g., "Firemin_9558")
+;*
+;* The generated script will be written to Distribution\<Build>\ and will reference
+;* the distribution folder Firemin_9558 as a sibling directory.
 
 ; Requirements: Inno Setup 6.3.x or newer
 ; Inno Setup: https://jrsoftware.org/isdl.php
@@ -11,9 +21,7 @@
 	#error Update your Inno Setup version (6.4.2 or newer)
 #endif
 
-#define distrodir       "..\..\..\Resolute"
-#define promodir        "..\..\..\promo"
-#define outdir          "..\..\..\Distribution"
+#define distrodir       "Firemin_9558"
 #define app_publisher   "Rizonesoft"
 #define app_name        "Firemin"
 #define app_shortname   "Firemin"
@@ -79,9 +87,9 @@ AppContact=https://rizonesoft.com/contact-us
 AppCopyright={#app_copyright}
 UninstallDisplayIcon={app}\{#app_shortname}.exe
 UninstallDisplayName={#app_name} {#app_version}
-DefaultDirName={pf}\Rizonesoft\{#app_name}
+DefaultDirName={autopf}\{#app_publisher}\{#app_name}
 LicenseFile={#distrodir}\Docs\{#app_shortname}\License.txt
-OutputDir={#outdir}\Packages
+OutputDir=.
 OutputBaseFilename={#app_shortname}_{#app_build}_Setup
 Compression=lzma2/max
 InternalCompressLevel=max
@@ -97,8 +105,10 @@ SignedUninstaller=no
 SignedUninstallerDir=.\Resources\Uninstaller
 AllowCancelDuringInstall=no
 MinVersion=6.1sp1
-ArchitecturesAllowed=x86 x64
-ArchitecturesInstallIn64BitMode=x64
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
+ArchitecturesAllowed=x86compatible x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=force
 SetupMutex={#app_shortname}_{#app_build}_setup_mutex,Global\{#app_shortname}_{#app_build}_setup_mutex
 
@@ -119,13 +129,6 @@ en.tsk_Other                 =Other tasks:
 en.tsk_ResetSettings         =Reset {#app_name}'s settings
 en.tsk_StartMenuIcon         =Create a Start Menu shortcut
 en.tsk_LaunchWelcomePage     =Read Important Release Information!
-
-; Opera Promotion
-en.msg_Opera                  = Browse Smarter and Upgrade your Web Experience with Opera!
-en.msg_BrowserForTech         = Unlock Aria, the AI that redefines web exploration.
-en.msg_Accept                 = Accept
-en.msg_Decline                = Decline
-
 ; Normal and Portable Install
 en.msg_InstallationType      = Installation Type
 en.msg_SelectInstallType     = Please select the type of installation:
@@ -140,12 +143,54 @@ Name: "desktopicon\user"; Description: "{cm:tsk_CurrentUser}"; GroupDescription:
 Name: "desktopicon\common"; Description: "{cm:tsk_AllUsers}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked exclusive; Check: not GetInstallationType
 
 [Files]
-Source: {#distrodir}\{#app_shortname}_X64.exe; DestDir: {app}; DestName: Firemin.exe; Flags: ignoreversion; Check: Is64BitInstallMode()
-Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; Flags: ignoreversion; Check: not Is64BitInstallMode()
+; Normal installation: Install only the appropriate architecture
+Source: {#distrodir}\{#app_shortname}_X64.exe; DestDir: {app}; DestName: {#app_shortname}.exe; Flags: ignoreversion; Check: not GetInstallationType() and Is64BitInstallMode()
+Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_shortname}.exe; Flags: ignoreversion; Check: not GetInstallationType() and not Is64BitInstallMode()
+; Portable installation: Include both x64 and x86 versions with distinct names
+Source: {#distrodir}\{#app_shortname}_X64.exe; DestDir: {app}; DestName: {#app_shortname}_X64.exe; Flags: ignoreversion; Check: GetInstallationType()
+Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_shortname}.exe; Flags: ignoreversion; Check: GetInstallationType()
+Source: {#distrodir}\\Firemin.ini; DestDir: {app}; Flags: ignoreversion
+Source: {#distrodir}\\Docs\Firemin\Changes.txt; DestDir: {app}\\Docs\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Docs\Firemin\License.txt; DestDir: {app}\\Docs\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Docs\Firemin\Readme.txt; DestDir: {app}\\Docs\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\af.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\ar.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\bg.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\cs.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\da.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\de.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\el.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\en.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\es.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\fa.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\fr.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\hi.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\hr.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\hu.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\id.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\is.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\it.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\iw.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\ja.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\ko.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\nl.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\no.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\pl.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\pt-BR.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\pt.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\ro.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\ru.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\sk.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\sl.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\sv.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\th.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\tr.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\vi.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\zh-CN.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Language\Firemin\zh-TW.lng; DestDir: {app}\\Language\\Firemin; Flags: ignoreversion
+Source: {#distrodir}\\Processing\32\Stroke.ani; DestDir: {app}\\Processing\\32; Flags: ignoreversion
+Source: {#distrodir}\\Processing\64\Globe.ani; DestDir: {app}\\Processing\\64; Flags: ignoreversion
 
-; Opera Promotion
-Source: {#promodir}\en_PromoScreen.bmp; DestDir: {tmp}; Flags: dontcopy
-Source: {#promodir}\en_PromoScreen_HiDPI.bmp; DestDir: {tmp}; Flags: dontcopy
 
 [Dirs]
 
@@ -209,12 +254,12 @@ Filename: "{app}\{#app_inifile}"; Section: "Donate"; Key: "DonateName"; String: 
 Filename: "{app}\{#app_inifile}"; Section: "Donate"; Key: "DonateBuild"; String: "{#ini_DonateBuild}"; Check: GetInstallationType() and (not IsUpgrade() or ResetSettingsRequested())
 
 [Run]
-Filename: {app}\Firemin.exe; Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall shellexec skipifsilent unchecked
+Filename: {app}\{#app_shortname}.exe; Description: {cm:LaunchProgram,{#app_name}}; WorkingDir: {app}; Flags: nowait postinstall shellexec skipifsilent unchecked
 
 [InstallDelete]
-Type: files;      Name: {userdesktop}\{#app_name}.lnk;   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()
-Type: files;      Name: {commondesktop}\{#app_name}.lnk; Check: not IsTaskSelected('desktopicon\common') and IsUpgrade()
-Type: files;      Name: {userstartmenu}\{#app_name}.lnk; Check: not IsTaskSelected('startup_icon')       and IsUpgrade()
+Type: files;      Name: {userdesktop}\{#app_name}.lnk;   Check: not WizardIsTaskSelected('desktopicon\user')   and IsUpgrade()
+Type: files;      Name: {commondesktop}\{#app_name}.lnk; Check: not WizardIsTaskSelected('desktopicon\common') and IsUpgrade()
+Type: files;      Name: {userstartmenu}\{#app_name}.lnk; Check: not WizardIsTaskSelected('startup_icon')       and IsUpgrade()
 Type: files;      Name: {app}\{#app_shortname}.ini
 
 [UninstallDelete]
@@ -222,42 +267,14 @@ Type: files;      Name: {app}\{#app_shortname}.ini
 Type: dirifempty; Name: {app}
 
 [Code]
-type
-    // Declare HDC as an Integer
-    HDC = Integer;
 var
-    PromoPage: TWizardPage;
     InstallTypePage: TWizardPage;
     NormalInstallRadio: TRadioButton;
     PortableInstallRadio: TRadioButton;
-    PromoImage: TBitmapImage;
-    AcceptRadioButton: TRadioButton;
-    DeclineRadioButton: TRadioButton;
-    OperaExecuted: Boolean;
-    PromoImagePath: String;
-    ScreenDC: HDC;
-    DPI: Integer;
-    ScaleFactor: Double;
-    OriginalWidth, OriginalHeight: Integer;
-    HighDPIThreshold: Integer;
-    ErrCode: integer;
-    IsPortableInstall: Boolean;
     BuildNumber: String;
-    ResetSettingsOnUpgrade: Boolean;
     ResetSettings: Boolean;
 
-const
-    HWND_TOPMOST = -1;
-    SWP_NOSIZE = $1;
-    SWP_NOMOVE = $2;
-    SWP_NOZORDER = $4;
-    DownloadURL = 'https://net.geo.opera.com/opera/stable/windows?utm_source=RIZONE&utm_medium=pb&utm_campaign=NOTEPAD';
-    // Constants for GetDeviceCaps function
-    LOGPIXELSX = 88; // Horizontal DPI
-    LOGPIXELSY = 90; // Vertical DPI (if needed)
-
 // Forward declarations removed
-
 function GetInstallationType(): Boolean;
 begin
     if PortableInstallRadio <> nil then
@@ -271,76 +288,12 @@ begin
     Result := not GetInstallationType;
 end;
 
-function SetWindowPos(hWnd: HWND; hWndInsertAfter: HWND; X, Y, cx, cy: Integer; uFlags: UINT): BOOL;
-    external 'SetWindowPos@user32.dll stdcall';
-
-function GetDC(hWnd: Integer): HDC;
-    external 'GetDC@user32.dll stdcall';
-
-function ReleaseDC(hWnd: Integer; hDC: HDC): Integer;
-    external 'ReleaseDC@user32.dll stdcall';
-
-function GetDeviceCaps(hdc: HDC; nIndex: Integer): Integer;
-    external 'GetDeviceCaps@gdi32.dll stdcall';
-
-function OperaKeyExistsCIS(): Boolean;
-var
-  SubkeyNames: TArrayOfString;
-  I, J: Integer;
-  RegistryPaths: array[0..3] of String;
-begin
-  Result := False;
-
-  RegistryPaths[0] := 'Software\Microsoft\Windows\CurrentVersion\Uninstall';
-  RegistryPaths[1] := 'Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall';
-  RegistryPaths[2] := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall';
-  RegistryPaths[3] := 'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall';
-
-  for I := 0 to High(RegistryPaths) do
-  begin
-    if RegGetSubkeyNames(HKLM, RegistryPaths[I], SubkeyNames) or
-       RegGetSubkeyNames(HKCU, RegistryPaths[I], SubkeyNames) then
-    begin
-      for J := 0 to GetArrayLength(SubkeyNames) - 1 do
-      begin
-        if Pos('Opera', SubkeyNames[J]) = 1 then
-        begin
-          Result := True;
-          Exit;
-        end;
-      end;
-    end;
-  end;
-end;
-
 Var
   Upgrade: Boolean;
 
 function IsUpgrade(): Boolean;
 begin
     Result := Upgrade;
-end;
-
-function OperaKeyExists(): Boolean;
-begin
-  Result := False;
-
-  // Check if Opera keys exist in the registry
-  if RegKeyExists(HKCU, 'Software\Opera Software') or
-     RegKeyExists(HKLM, 'SOFTWARE\Opera Software') or
-     RegKeyExists(HKLM, 'SOFTWARE\Wow6432Node\Opera Software') then
-  begin
-    Result := True;
-  end;
-end;
-
-function OperaDetected(): Boolean;
-begin
-    Result := False;
-    if OperaKeyExistsCIS() or OperaKeyExists() then
-    begin
-        Result := True;
-    end;
 end;
 
 // Check if Firemin's settings exist.
@@ -366,10 +319,6 @@ begin
             WizardForm.LicenseAcceptedRadio.Checked := Result;
         end;
 
-    // Skip the promo page if Opera is detected
-    if (PromoPage <> nil) and (PageID = PromoPage.ID) and OperaKeyExists() then
-        Result := True;
-
     // Skip the tasks page for portable installations
     if (PageID = wpSelectTasks) and GetInstallationType() then
         Result := True;
@@ -379,12 +328,6 @@ procedure CleanUpSettings();
 begin
 	DeleteFile(ExpandConstant('{userappdata}\{#app_publisher}\{#app_shortname}\{#app_inifile}'));
 	RemoveDir(ExpandConstant('{userappdata}\{#app_publisher}\{#app_shortname}'));
-end;
-
-procedure UpdateNextButtonState();
-begin
-  // Enable Next button only if either Accept or Decline is selected
-  WizardForm.NextButton.Enabled := AcceptRadioButton.Checked or DeclineRadioButton.Checked;
 end;
 
 // Ask user if they want to reset settings during upgrade
@@ -405,50 +348,8 @@ begin
   end;
 end;
 
-procedure PromoOptionClick(Sender: TObject);
-var
-  ResultCode: Integer;
-begin
-  UpdateNextButtonState();
-
-  if DeclineRadioButton.Checked then
-  begin
-    ResultCode := MsgBox(
-      'Are you sure you would like to miss out on an enhanced browsing and AI experience? ' +
-      'Opera offers integrated AI features and a host of other powerful tools. ' +
-      'Don''t miss this opportunity to transform how you browse!' + #13#10#13#10 +
-      'Would you still like to decline?',
-      mbConfirmation, MB_YESNO
-    );
-
-    if ResultCode = IDNO then
-    begin
-      AcceptRadioButton.Checked := True;
-      DeclineRadioButton.Checked := False;
-      UpdateNextButtonState();
-    end;
-  end;
-end;
-
 procedure CurPageChanged(CurPageID: Integer);
 begin
-  // Only handle Opera logic if not silent
-  if not WizardSilent then
-  begin
-    if (PromoPage <> nil) and (CurPageID = PromoPage.ID) then
-      UpdateNextButtonState();
-
-    if CurPageID = wpReady then
-    begin
-      // Download Opera if accepted
-      if (PromoPage <> nil) and (AcceptRadioButton.Checked) and (not OperaDetected()) then
-      begin
-        idpAddFile(DownloadURL, ExpandConstant('{tmp}\\OperaSetup.exe'));
-        idpDownloadAfter(wpReady);
-      end;
-    end;
-  end;
-
   if CurPageID = wpFinished then
     WizardForm.NextButton.Caption := SetupMessage(msgButtonFinish);
 end;
@@ -474,15 +375,15 @@ begin
   end;
   
   // Check common installation locations
-  if FileExists(ExpandConstant('{pf}\Mozilla Firefox\firefox.exe')) then
+  if FileExists(ExpandConstant('{commonpf}\Mozilla Firefox\firefox.exe')) then
   begin
-    Result := ExpandConstant('{pf}\Mozilla Firefox\firefox.exe');
+    Result := ExpandConstant('{commonpf}\Mozilla Firefox\firefox.exe');
     Exit;
   end;
   
-  if FileExists(ExpandConstant('{pf32}\Mozilla Firefox\firefox.exe')) then
+  if FileExists(ExpandConstant('{commonpf32}\Mozilla Firefox\firefox.exe')) then
   begin
-    Result := ExpandConstant('{pf32}\Mozilla Firefox\firefox.exe');
+    Result := ExpandConstant('{commonpf32}\Mozilla Firefox\firefox.exe');
     Exit;
   end;
   
@@ -611,7 +512,7 @@ begin
     
     With WizardForm do
     begin
-        Upgrade := FileExists(AddBackslash(WizardDirValue) + '{#app_name}.exe');
+        Upgrade := FileExists(AddBackslash(WizardDirValue) + '{#app_shortname}.exe');
         SelectTasksLabel.Hide;
         With TasksList do
         begin
@@ -622,69 +523,6 @@ begin
 
     if WizardSilent then
         Exit;
-
-    // Set the threshold DPI value (e.g., 144 for 150% scaling)
-    HighDPIThreshold := 144;
-    // Get the screen's device context
-    ScreenDC := GetDC(0);
-    // Retrieve the DPI (use LOGPIXELSX for horizontal DPI)
-    DPI := GetDeviceCaps(ScreenDC, LOGPIXELSX);
-    // Release the device context
-    ReleaseDC(0, ScreenDC);
-    // Calculate the scaling factor (assuming 96 DPI is standard)
-    ScaleFactor := DPI / 96.0;
-
-    if DPI >= HighDPIThreshold then
-        begin
-            // High-DPI screen
-            PromoImagePath := ExpandConstant('{tmp}\en_PromoScreen_HiDPI.bmp');
-            OriginalWidth := 802;  // Width of the high-DPI image
-            OriginalHeight := 400; // Height of the high-DPI image
-        end
-    else
-        begin
-            // Normal DPI screen
-            PromoImagePath := ExpandConstant('{tmp}\en_PromoScreen.bmp');
-            OriginalWidth := 450;  // Width of the normal image
-            OriginalHeight := 236; // Height of the normal image
-    end;
-
-    // Extract and load the appropriate promo image
-    ExtractTemporaryFile(ExtractFileName(PromoImagePath));
-    PromoPage := CreateCustomPage(wpWelcome, CustomMessage('msg_Opera'), CustomMessage('msg_BrowserForTech'));
-
-    PromoImage := TBitmapImage.Create(PromoPage);
-    PromoImage.Parent := PromoPage.Surface;
-    PromoImage.Bitmap.LoadFromFile(PromoImagePath);
-    PromoImage.Left := 0;
-    PromoImage.Top := 0;
-    PromoImage.Width := OriginalWidth;
-    PromoImage.Height := OriginalHeight;
-
-    // Create the "Accept" radio button
-    AcceptRadioButton := TRadioButton.Create(PromoPage);
-    AcceptRadioButton.Parent := PromoPage.Surface;
-    AcceptRadioButton.Caption := CustomMessage('msg_Accept');
-    AcceptRadioButton.Left := 0;
-    AcceptRadioButton.Top := PromoImage.Height;
-    AcceptRadioButton.Height := 30;
-    AcceptRadioButton.OnClick := @PromoOptionClick;
-
-    // Create the "Decline" radio button
-    DeclineRadioButton := TRadioButton.Create(PromoPage);
-    DeclineRadioButton.Parent := PromoPage.Surface;
-    DeclineRadioButton.Caption := CustomMessage('msg_Decline');
-    DeclineRadioButton.Left := AcceptRadioButton.Width + 10;
-    DeclineRadioButton.Top := PromoImage.Height;
-    DeclineRadioButton.Height := 30;
-    DeclineRadioButton.OnClick := @PromoOptionClick;
-
-    // Initially disable the Next button on the promo page
-    // The Next button will be re-enabled once a radio button is selected
-    if Assigned(WizardForm) then
-    begin
-        WizardForm.NextButton.Enabled := False;
-    end;
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;

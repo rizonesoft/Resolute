@@ -4183,3 +4183,1245 @@
 [ 3/16/2025 17:51:36 ] Compile aborted.
 [ 3/16/2025 17:51:36 ] Error: Finished with (01) error!
 ------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 4/07/2025 23:39:38 ] DATE:                        4/07/2025 23:39:38
+[ 4/07/2025 23:39:38 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 4/07/2025 23:39:38 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 4/07/2025 23:39:38 ] COMPILED:                    YES
+[ 4/07/2025 23:39:38 ] WINDOWS VERSION:             WIN_10 
+[ 4/07/2025 23:39:38 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 4/07/2025 23:39:38 ] MEMORY (RAM):                32601.73 MB
+[ 4/07/2025 23:39:38 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 4/07/2025 23:39:38 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 4/07/2025 23:39:51 ] Generating Documentation for Take Ownership
+------------------------------------------------------------------------------------------
+[ 4/07/2025 23:39:51 ] Template directory found at: 'R:\Resolute\SDK\Concrete\Ownership\Templates'
+[ 4/07/2025 23:39:51 ] 03 templates files found.
+[ 4/07/2025 23:39:51 ] Processing: R:\Resolute\SDK\Concrete\Ownership\Templates\Changes.tpl
+[ 4/07/2025 23:39:51 ] Document created successfuly.
+[ 4/07/2025 23:39:51 ] Document File: R:\Resolute\Resolute\Docs\Ownership\Changes.txt
+[ 4/07/2025 23:39:51 ] Processing: R:\Resolute\SDK\Concrete\Ownership\Templates\License.tpl
+[ 4/07/2025 23:39:51 ] Document created successfuly.
+[ 4/07/2025 23:39:51 ] Document File: R:\Resolute\Resolute\Docs\Ownership\License.txt
+[ 4/07/2025 23:39:51 ] Processing: R:\Resolute\SDK\Concrete\Ownership\Templates\Readme.tpl
+[ 4/07/2025 23:39:51 ] Document created successfuly.
+[ 4/07/2025 23:39:51 ] Document File: R:\Resolute\Resolute\Docs\Ownership\Readme.txt
+[ 4/07/2025 23:39:51 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 4/07/2025 23:39:58 ] Distributing Take Ownership.
+------------------------------------------------------------------------------------------
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Ownership.exe Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Ownership_X64.exe Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Ownership.ini Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Docs\Ownership\Changes.txt Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Docs\Ownership\License.txt Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Docs\Ownership\Readme.txt Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Language\Ownership\en.ini Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Processing\32\Stroke.ani Distribution Created.
+[ 4/07/2025 23:39:58 ] \Concrete\Ownership\Distribution\869\Ownership_869\Processing\64\Globe.ani Distribution Created.
+[ 4/07/2025 23:39:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\OfficePromoScreenBig.bmp Distribution Created.
+[ 4/07/2025 23:39:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\OfficePromoScreen.bmp Distribution Created.
+[ 4/07/2025 23:39:59 ] Finished: Take Ownership Distribution Created.
+------------------------------------------------------------------------------------------
+[ 4/08/2025 00:54:56 ] Generating Documentation for Take Ownership
+------------------------------------------------------------------------------------------
+[ 4/08/2025 00:54:56 ] Template directory found at: 'R:\Resolute\SDK\Concrete\Ownership\Templates'
+[ 4/08/2025 00:54:56 ] 03 templates files found.
+[ 4/08/2025 00:54:56 ] Processing: R:\Resolute\SDK\Concrete\Ownership\Templates\Changes.tpl
+[ 4/08/2025 00:54:56 ] Document created successfuly.
+[ 4/08/2025 00:54:56 ] Document File: R:\Resolute\Resolute\Docs\Ownership\Changes.txt
+[ 4/08/2025 00:54:57 ] Processing: R:\Resolute\SDK\Concrete\Ownership\Templates\License.tpl
+[ 4/08/2025 00:54:57 ] Document created successfuly.
+[ 4/08/2025 00:54:57 ] Document File: R:\Resolute\Resolute\Docs\Ownership\License.txt
+[ 4/08/2025 00:54:57 ] Processing: R:\Resolute\SDK\Concrete\Ownership\Templates\Readme.tpl
+[ 4/08/2025 00:54:57 ] Document created successfuly.
+[ 4/08/2025 00:54:57 ] Document File: R:\Resolute\Resolute\Docs\Ownership\Readme.txt
+[ 4/08/2025 00:54:57 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 4/08/2025 00:54:59 ] Distributing Take Ownership.
+------------------------------------------------------------------------------------------
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Ownership.exe Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Ownership_X64.exe Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Ownership.ini Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Docs\Ownership\Changes.txt Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Docs\Ownership\License.txt Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Docs\Ownership\Readme.txt Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Language\Ownership\en.ini Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Processing\32\Stroke.ani Distribution Created.
+[ 4/08/2025 00:54:59 ] \Concrete\Ownership\Distribution\869\Ownership_869\Processing\64\Globe.ani Distribution Created.
+[ 4/08/2025 00:55:00 ] \Concrete\Ownership\Distribution\869\Ownership_869\OfficePromoScreenBig.bmp Distribution Created.
+[ 4/08/2025 00:55:00 ] \Concrete\Ownership\Distribution\869\Ownership_869\OfficePromoScreen.bmp Distribution Created.
+[ 4/08/2025 00:55:00 ] Finished: Take Ownership Distribution Created.
+------------------------------------------------------------------------------------------
+[ 4/08/2025 00:55:05 ] Creating Zip Package for Take Ownership.
+------------------------------------------------------------------------------------------
+[ 4/08/2025 00:55:05 ] 7-Zip (a) [64] 16.04 : Copyright (c) 1999-2016 Igor Pavlov : 2016-10-04
+[ 4/08/2025 00:55:05 ] Open archive: Ownership_869.zip
+[ 4/08/2025 00:55:05 ] --
+[ 4/08/2025 00:55:05 ] Path = Ownership_869.zip
+[ 4/08/2025 00:55:05 ] Type = zip
+[ 4/08/2025 00:55:05 ] Physical Size = 2426869
+[ 4/08/2025 00:55:05 ] Scanning the drive:
+[ 4/08/2025 00:55:06 ] 8 folders, 9 files, 4558547 bytes (4452 KiB)
+[ 4/08/2025 00:55:06 ] Updating archive: Ownership_869.zip
+[ 4/08/2025 00:55:06 ] Items to compress: 17
+[ 4/08/2025 00:55:06 ] Files read from disk: 9
+[ 4/08/2025 00:55:06 ] Archive size: 2426865 bytes (2370 KiB)
+[ 4/08/2025 00:55:06 ] Everything is Ok
+[ 4/08/2025 00:55:06 ] Finished: Zip Package created.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/14 20:35:25 ] DATE:                        2025/11/14 20:35:25
+[ 2025/11/14 20:35:25 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 2025/11/14 20:35:25 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/14 20:35:25 ] COMPILED:                    YES
+[ 2025/11/14 20:35:25 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/14 20:35:25 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/14 20:35:25 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/14 20:35:25 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/14 20:35:25 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 01:45:58 ] DATE:                        2025/11/15 01:45:58
+[ 2025/11/15 01:45:58 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 2025/11/15 01:45:58 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 01:45:58 ] COMPILED:                    YES
+[ 2025/11/15 01:45:58 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 01:45:58 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 01:45:58 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 01:45:58 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 01:45:58 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 01:49:31 ] DATE:                        2025/11/15 01:49:31
+[ 2025/11/15 01:49:31 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 2025/11/15 01:49:31 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 01:49:31 ] COMPILED:                    YES
+[ 2025/11/15 01:49:31 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 01:49:31 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 01:49:31 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 01:49:31 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 01:49:31 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/15 01:50:27 ] Building Rescue Antivirus...
+------------------------------------------------------------------------------------------
+[ 2025/11/15 01:50:28 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 2025/11/15 01:50:28 ] from:Distro_X64.exe (11.1.1.3680) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 2025/11/15 01:50:29 ] >Running AU3Check (3.3.18.0) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\Rescue\Rescue.au3
+[ 2025/11/15 01:50:30 ] +> AU3Check ended. rc:0
+[ 2025/11/15 01:50:30 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\Rescue\Rescue.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUB133.tmp.exe" /nopack /icon "..\..\Resources\Icons\Rescue.ico" /comp 2
+[ 2025/11/15 01:50:31 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUB133.tmp.exe. rc:0
+[ 2025/11/15 01:50:31 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:50:31 ] ...>Updating Program Version information.
+[ 2025/11/15 01:50:31 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2025/11/15 01:50:31 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:50:31 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:50:31 ] ...>Adding 108 Icon(s).
+[ 2025/11/15 01:50:32 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:50:32 ] +> Created program: R:\Resolute\Resolute\Rescue.exe
+[ 2025/11/15 01:50:32 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\Rescue\Rescue.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUB133.tmp.exe" /nopack /icon "..\..\Resources\Icons\Rescue.ico" /comp 2 /x64
+[ 2025/11/15 01:50:33 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUB133.tmp.exe. rc:0
+[ 2025/11/15 01:50:33 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:50:33 ] ...>Updating Program Version information.
+[ 2025/11/15 01:50:33 ] ...>Setting Program ExecutionLevel Manifest information to highestAvailable
+[ 2025/11/15 01:50:33 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:50:33 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:50:33 ] ...>Adding 108 Icon(s).
+[ 2025/11/15 01:50:34 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:50:34 ] +> Created program: R:\Resolute\Resolute\Rescue_X64.exe
+[ 2025/11/15 01:50:34 ] -Updated the Source Version to: 11.1.1.341
+[ 2025/11/15 01:50:34 ] +> AutoIt3Wrapper Finished.
+[ 2025/11/15 01:50:36 ] Finished: Finished building Rescue Antivirus.
+------------------------------------------------------------------------------------------
+[ 2025/11/15 01:51:13 ] Building Pixel Repair...
+------------------------------------------------------------------------------------------
+[ 2025/11/15 01:51:14 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 2025/11/15 01:51:14 ] from:Distro_X64.exe (11.1.1.3680) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 2025/11/15 01:51:14 ] >Running AU3Check (3.3.18.0) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3
+[ 2025/11/15 01:51:15 ] +> AU3Check ended. rc:0
+[ 2025/11/15 01:51:15 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU6198.tmp.exe" /nopack /icon "..\..\Resources\Icons\PixRepair.ico" /comp 2
+[ 2025/11/15 01:51:16 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU6198.tmp.exe. rc:0
+[ 2025/11/15 01:51:16 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:51:16 ] ...>Updating Program Version information.
+[ 2025/11/15 01:51:16 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 01:51:16 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:51:16 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:51:16 ] ...>Adding 82 Icon(s).
+[ 2025/11/15 01:51:17 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:51:17 ] +> Created program: R:\Resolute\Resolute\PixRepair.exe
+[ 2025/11/15 01:51:17 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU6198.tmp.exe" /nopack /icon "..\..\Resources\Icons\PixRepair.ico" /comp 2 /x64
+[ 2025/11/15 01:51:18 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU6198.tmp.exe. rc:0
+[ 2025/11/15 01:51:18 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:51:18 ] ...>Updating Program Version information.
+[ 2025/11/15 01:51:18 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 01:51:18 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:51:18 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:51:18 ] ...>Adding 82 Icon(s).
+[ 2025/11/15 01:51:19 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:51:19 ] +> Created program: R:\Resolute\Resolute\PixRepair_X64.exe
+[ 2025/11/15 01:51:19 ] -Updated the Source Version to: 11.1.1.1010
+[ 2025/11/15 01:51:20 ] +> AutoIt3Wrapper Finished.
+[ 2025/11/15 01:51:21 ] Finished: Finished building Pixel Repair.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 01:56:27 ] DATE:                        2025/11/15 01:56:27
+[ 2025/11/15 01:56:27 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 2025/11/15 01:56:27 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 01:56:27 ] COMPILED:                    YES
+[ 2025/11/15 01:56:27 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 01:56:27 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 01:56:27 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 01:56:27 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 01:56:27 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/15 01:56:32 ] Building Pixel Repair...
+------------------------------------------------------------------------------------------
+[ 2025/11/15 01:56:32 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 2025/11/15 01:56:32 ] from:Distro_X64.exe (11.1.1.3680) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 2025/11/15 01:56:33 ] >Running AU3Check (3.3.18.0) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3
+[ 2025/11/15 01:56:34 ] +> AU3Check ended. rc:0
+[ 2025/11/15 01:56:34 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU3ED5.tmp.exe" /nopack /icon "..\..\Resources\Icons\PixRepair.ico" /comp 2
+[ 2025/11/15 01:56:35 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU3ED5.tmp.exe. rc:0
+[ 2025/11/15 01:56:35 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:56:35 ] ...>Updating Program Version information.
+[ 2025/11/15 01:56:35 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 01:56:35 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:56:35 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:56:35 ] ...>Adding 82 Icon(s).
+[ 2025/11/15 01:56:35 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:56:35 ] +> Created program: R:\Resolute\Resolute\PixRepair.exe
+[ 2025/11/15 01:56:36 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU3ED5.tmp.exe" /nopack /icon "..\..\Resources\Icons\PixRepair.ico" /comp 2 /x64
+[ 2025/11/15 01:56:37 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU3ED5.tmp.exe. rc:0
+[ 2025/11/15 01:56:37 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:56:37 ] ...>Updating Program Version information.
+[ 2025/11/15 01:56:37 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 01:56:37 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:56:37 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:56:37 ] ...>Adding 82 Icon(s).
+[ 2025/11/15 01:56:37 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:56:37 ] +> Created program: R:\Resolute\Resolute\PixRepair_X64.exe
+[ 2025/11/15 01:56:38 ] -Updated the Source Version to: 11.1.1.1011
+[ 2025/11/15 01:56:38 ] +> AutoIt3Wrapper Finished.
+[ 2025/11/15 01:56:40 ] Finished: Finished building Pixel Repair.
+------------------------------------------------------------------------------------------
+[ 2025/11/15 01:59:02 ] Building Pixel Repair...
+------------------------------------------------------------------------------------------
+[ 2025/11/15 01:59:02 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 2025/11/15 01:59:02 ] from:Distro_X64.exe (11.1.1.3680) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 2025/11/15 01:59:03 ] >Running AU3Check (3.3.18.0) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3
+[ 2025/11/15 01:59:03 ] +> AU3Check ended. rc:0
+[ 2025/11/15 01:59:03 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU879C.tmp.exe" /nopack /icon "..\..\Resources\Icons\PixRepair.ico" /comp 2
+[ 2025/11/15 01:59:05 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU879C.tmp.exe. rc:0
+[ 2025/11/15 01:59:05 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:59:05 ] ...>Updating Program Version information.
+[ 2025/11/15 01:59:05 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 01:59:05 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:59:05 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:59:05 ] ...>Adding 82 Icon(s).
+[ 2025/11/15 01:59:05 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:59:05 ] +> Created program: R:\Resolute\Resolute\PixRepair.exe
+[ 2025/11/15 01:59:05 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU879C.tmp.exe" /nopack /icon "..\..\Resources\Icons\PixRepair.ico" /comp 2 /x64
+[ 2025/11/15 01:59:06 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU879C.tmp.exe. rc:0
+[ 2025/11/15 01:59:07 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 01:59:07 ] ...>Updating Program Version information.
+[ 2025/11/15 01:59:07 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 01:59:07 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 01:59:07 ] ...>Updating Program Manifest information.
+[ 2025/11/15 01:59:07 ] ...>Adding 82 Icon(s).
+[ 2025/11/15 01:59:07 ] > Program Resource updating finished successfully.
+[ 2025/11/15 01:59:07 ] +> Created program: R:\Resolute\Resolute\PixRepair_X64.exe
+[ 2025/11/15 01:59:08 ] -Updated the Source Version to: 11.1.1.1012
+[ 2025/11/15 01:59:08 ] +> AutoIt3Wrapper Finished.
+[ 2025/11/15 01:59:09 ] Finished: Finished building Pixel Repair.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 13:19:20 ] DATE:                        2025/11/15 13:19:20
+[ 2025/11/15 13:19:20 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 2025/11/15 13:19:20 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 13:19:20 ] COMPILED:                    YES
+[ 2025/11/15 13:19:20 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 13:19:20 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 13:19:20 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 13:19:20 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 13:19:20 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/15 13:19:36 ] Building Firemin...
+------------------------------------------------------------------------------------------
+[ 2025/11/15 13:19:37 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 2025/11/15 13:19:37 ] from:Distro_X64.exe (11.1.1.3680) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 2025/11/15 13:19:38 ] >Running AU3Check (3.3.18.0) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\Firemin\Firemin.au3
+[ 2025/11/15 13:19:39 ] +> AU3Check ended. rc:0
+[ 2025/11/15 13:19:39 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUA3A9.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2
+[ 2025/11/15 13:19:40 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUA3A9.tmp.exe. rc:0
+[ 2025/11/15 13:19:40 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 13:19:40 ] ...>Updating Program Version information.
+[ 2025/11/15 13:19:40 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 13:19:40 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 13:19:40 ] ...>Updating Program Manifest information.
+[ 2025/11/15 13:19:40 ] ...>Adding 74 Icon(s).
+[ 2025/11/15 13:19:41 ] > Program Resource updating finished successfully.
+[ 2025/11/15 13:19:41 ] +> Created program: R:\Resolute\Resolute\Firemin.exe
+[ 2025/11/15 13:19:41 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\Firemin\Firemin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUA3A9.tmp.exe" /nopack /icon "..\..\Resources\Icons\Firemin.ico" /comp 2 /x64
+[ 2025/11/15 13:19:42 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AUA3A9.tmp.exe. rc:0
+[ 2025/11/15 13:19:42 ] > Performing the Program Resource Update steps:
+[ 2025/11/15 13:19:42 ] ...>Updating Program Version information.
+[ 2025/11/15 13:19:42 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/15 13:19:42 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/15 13:19:42 ] ...>Updating Program Manifest information.
+[ 2025/11/15 13:19:42 ] ...>Adding 74 Icon(s).
+[ 2025/11/15 13:19:43 ] > Program Resource updating finished successfully.
+[ 2025/11/15 13:19:43 ] +> Created program: R:\Resolute\Resolute\Firemin_X64.exe
+[ 2025/11/15 13:19:43 ] -Updated the Source Version to: 12.2.1.9559
+[ 2025/11/15 13:19:44 ] +> AutoIt3Wrapper Finished.
+[ 2025/11/15 13:19:45 ] Finished: Finished building Firemin.
+------------------------------------------------------------------------------------------
+[ 2025/11/15 13:19:47 ] Generating Documentation for Firemin
+------------------------------------------------------------------------------------------
+[ 2025/11/15 13:19:47 ] Template directory found at: 'R:\Resolute\SDK\Concrete\Firemin\Templates'
+[ 2025/11/15 13:19:47 ] 03 templates files found.
+[ 2025/11/15 13:19:47 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\Changes.tpl
+[ 2025/11/15 13:19:47 ] Document created successfuly.
+[ 2025/11/15 13:19:47 ] Document File: R:\Resolute\Resolute\Docs\Firemin\Changes.txt
+[ 2025/11/15 13:19:47 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\License.tpl
+[ 2025/11/15 13:19:47 ] Document created successfuly.
+[ 2025/11/15 13:19:47 ] Document File: R:\Resolute\Resolute\Docs\Firemin\License.txt
+[ 2025/11/15 13:19:47 ] Processing: R:\Resolute\SDK\Concrete\Firemin\Templates\Readme.tpl
+[ 2025/11/15 13:19:47 ] Document created successfuly.
+[ 2025/11/15 13:19:47 ] Document File: R:\Resolute\Resolute\Docs\Firemin\Readme.txt
+[ 2025/11/15 13:19:47 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------
+[ 2025/11/15 13:19:50 ] Distributing Firemin.
+------------------------------------------------------------------------------------------
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Firemin.exe Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Firemin_X64.exe Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Firemin.ini Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Docs\Firemin\Changes.txt Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Docs\Firemin\License.txt Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Docs\Firemin\Readme.txt Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\af.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\ar.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\bg.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\cs.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\da.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\de.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\el.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\en.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\es.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\fa.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\fr.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\hi.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\hr.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\hu.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\id.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\is.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\it.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\iw.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\ja.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\ko.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\nl.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\no.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\pl.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\pt-BR.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\pt.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\ro.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\ru.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\sk.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\sl.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\sv.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\th.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\tr.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\vi.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\zh-CN.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Language\Firemin\zh-TW.lng Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Processing\32\Stroke.ani Distribution Created.
+[ 2025/11/15 13:19:50 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\Processing\64\Globe.ani Distribution Created.
+[ 2025/11/15 13:19:51 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\OfficePromoScreenBig.bmp Distribution Created.
+[ 2025/11/15 13:19:51 ] \Concrete\Firemin\Distribution\9558\Firemin_9558\OfficePromoScreen.bmp Distribution Created.
+[ 2025/11/15 13:19:51 ] Finished: Firemin Distribution Created.
+------------------------------------------------------------------------------------------
+[ 2025/11/15 13:19:57 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2025/11/15 13:19:57 ] Inno Setup 6 Command-Line Compiler
+[ 2025/11/15 13:19:57 ] Copyright (C) 1997-2025 Jordan Russell. All rights reserved.
+[ 2025/11/15 13:19:57 ] Portions Copyright (C) 2000-2025 Martijn Laan. All rights reserved.
+[ 2025/11/15 13:19:57 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2025/11/15 13:19:57 ] https://www.innosetup.com
+[ 2025/11/15 13:19:57 ] Compiler engine version: Inno Setup 6.5.4
+[ 2025/11/15 13:19:58 ] Non-commercial use only
+[ 2025/11/15 13:19:58 ] Preprocessing
+[ 2025/11/15 13:19:58 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 21
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 22
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 23
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 24
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 25
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 26
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 27
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 28
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 29
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 30
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 31
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 32
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 33
+[ 2025/11/15 13:19:58 ] Parsing [Setup] section, line 34
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 35
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 36
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 37
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 38
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 39
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 40
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 41
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 42
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 43
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 44
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 45
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 46
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 47
+[ 2025/11/15 13:19:59 ] Parsing [Setup] section, line 48
+[ 2025/11/15 13:19:59 ] Error on line 48 in R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Setup.iss: Minimum version specified by MinVersion must be at least 6.1 otherwise Setup will never run. (Windows Vista/Server 2008 are no longer supported.)
+[ 2025/11/15 13:20:00 ] Compile aborted.
+[ 2025/11/15 13:20:00 ] Error: Finished with (01) error!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 19:38:42 ] DATE:                        2025/11/15 19:38:42
+[ 2025/11/15 19:38:42 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3680
+[ 2025/11/15 19:38:42 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 19:38:42 ] COMPILED:                    YES
+[ 2025/11/15 19:38:42 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 19:38:42 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 19:38:42 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 19:38:42 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 19:38:42 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/15 19:38:50 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2025/11/15 19:38:51 ] Inno Setup 6 Command-Line Compiler
+[ 2025/11/15 19:38:51 ] Copyright (C) 1997-2025 Jordan Russell. All rights reserved.
+[ 2025/11/15 19:38:51 ] Portions Copyright (C) 2000-2025 Martijn Laan. All rights reserved.
+[ 2025/11/15 19:38:51 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2025/11/15 19:38:51 ] https://www.innosetup.com
+[ 2025/11/15 19:38:51 ] Compiler engine version: Inno Setup 6.6.0
+[ 2025/11/15 19:38:51 ] Non-commercial use only
+[ 2025/11/15 19:38:51 ] Preprocessing
+[ 2025/11/15 19:38:51 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2025/11/15 19:38:51 ] Parsing [Setup] section, line 21
+[ 2025/11/15 19:38:51 ] Parsing [Setup] section, line 22
+[ 2025/11/15 19:38:51 ] Parsing [Setup] section, line 23
+[ 2025/11/15 19:38:51 ] Parsing [Setup] section, line 24
+[ 2025/11/15 19:38:51 ] Parsing [Setup] section, line 25
+[ 2025/11/15 19:38:51 ] Parsing [Setup] section, line 26
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 27
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 28
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 29
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 30
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 31
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 32
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 33
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 34
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 35
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 36
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 37
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 38
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 39
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 40
+[ 2025/11/15 19:38:52 ] Parsing [Setup] section, line 41
+[ 2025/11/15 19:38:53 ] Parsing [Setup] section, line 42
+[ 2025/11/15 19:38:53 ] Parsing [Setup] section, line 43
+[ 2025/11/15 19:38:53 ] Parsing [Setup] section, line 44
+[ 2025/11/15 19:38:53 ] Parsing [Setup] section, line 45
+[ 2025/11/15 19:38:53 ] Parsing [Setup] section, line 46
+[ 2025/11/15 19:38:53 ] Parsing [Setup] section, line 47
+[ 2025/11/15 19:38:53 ] Parsing [Setup] section, line 48
+[ 2025/11/15 19:38:53 ] Error on line 48 in R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Setup.iss: Minimum version specified by MinVersion must be at least 6.1 otherwise Setup will never run. (Windows Vista/Server 2008 are no longer supported.)
+[ 2025/11/15 19:38:53 ] Compile aborted.
+[ 2025/11/15 19:38:53 ] Error: Finished with (01) error!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 19:39:48 ] DATE:                        2025/11/15 19:39:48
+[ 2025/11/15 19:39:48 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3681
+[ 2025/11/15 19:39:48 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 19:39:48 ] COMPILED:                    YES
+[ 2025/11/15 19:39:48 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 19:39:48 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 19:39:48 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 19:39:48 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 19:39:48 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/15 19:39:56 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2025/11/15 19:39:56 ] Inno Setup 6 Command-Line Compiler
+[ 2025/11/15 19:39:56 ] Copyright (C) 1997-2025 Jordan Russell. All rights reserved.
+[ 2025/11/15 19:39:56 ] Portions Copyright (C) 2000-2025 Martijn Laan. All rights reserved.
+[ 2025/11/15 19:39:56 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2025/11/15 19:39:56 ] https://www.innosetup.com
+[ 2025/11/15 19:39:56 ] Compiler engine version: Inno Setup 6.6.0
+[ 2025/11/15 19:39:56 ] Non-commercial use only
+[ 2025/11/15 19:39:56 ] Preprocessing
+[ 2025/11/15 19:39:56 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2025/11/15 19:39:56 ] Line 18: Including file: C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 19:39:56 ] Reading file: C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 19:39:57 ] Line 33 of idp.iss: Warning: Function "ParseVersion" has been renamed. Use "GetVersionComponents" instead.
+[ 2025/11/15 19:39:57 ] Line 36 of idp.iss: Warning: Function "GetFileVersion" has been renamed. Use "GetVersionNumbersString" instead.
+[ 2025/11/15 19:39:57 ] Line 662 of idp.iss: Including file: C:\Program Files (x86)\Inno Download Plugin\unicode\idplang\default.iss
+[ 2025/11/15 19:39:57 ] Reading file: C:\Program Files (x86)\Inno Download Plugin\unicode\idplang\default.iss
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 78
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 79
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 80
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 81
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 82
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 83
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 84
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 85
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 86
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 87
+[ 2025/11/15 19:39:57 ] Parsing [Setup] section, line 88
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 89
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 90
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 91
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 92
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 93
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 94
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 95
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 96
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 97
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 98
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 99
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 100
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 101
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 102
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 103
+[ 2025/11/15 19:39:58 ] Parsing [Setup] section, line 104
+[ 2025/11/15 19:39:59 ] Parsing [Setup] section, line 105
+[ 2025/11/15 19:39:59 ] Parsing [Setup] section, line 106
+[ 2025/11/15 19:39:59 ] Parsing [Setup] section, line 107
+[ 2025/11/15 19:39:59 ] Parsing [Setup] section, line 108
+[ 2025/11/15 19:39:59 ] Parsing [Setup] section, line 109
+[ 2025/11/15 19:39:59 ] Parsing [Setup] section, line 110
+[ 2025/11/15 19:39:59 ] Parsing [Setup] section, line 111
+[ 2025/11/15 19:39:59 ] Creating signed uninstaller directory: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Resources\Uninstaller
+[ 2025/11/15 19:39:59 ] Reading file (LicenseFile)
+[ 2025/11/15 19:39:59 ] Reading file (WizardImageFile)
+[ 2025/11/15 19:39:59 ] Reading file (WizardSmallImageFile)
+[ 2025/11/15 19:39:59 ] Preparing Setup program executable
+[ 2025/11/15 19:39:59 ] Verification successful
+[ 2025/11/15 19:39:59 ] Updating icons (Setup.e32)
+[ 2025/11/15 19:39:59 ] Updating version info (Setup.e32)
+[ 2025/11/15 19:39:59 ] Determining language code pages
+[ 2025/11/15 19:40:00 ] Parsing [Languages] section, line 114
+[ 2025/11/15 19:40:00 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2025/11/15 19:40:00 ] Messages in script file
+[ 2025/11/15 19:40:00 ] Reading default messages from Default.isl
+[ 2025/11/15 19:40:00 ] Parsing [Languages] section, line 114
+[ 2025/11/15 19:40:00 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2025/11/15 19:40:00 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2025/11/15 19:40:00 ] Messages in script file
+[ 2025/11/15 19:40:00 ] Reading [Code] section
+[ 2025/11/15 19:40:00 ] Parsing [Tasks] section, line 137
+[ 2025/11/15 19:40:00 ] Parsing [Tasks] section, line 138
+[ 2025/11/15 19:40:00 ] Parsing [Tasks] section, line 139
+[ 2025/11/15 19:40:00 ] Parsing [Tasks] section, line 140
+[ 2025/11/15 19:40:00 ] Parsing [Tasks] section, line 141
+[ 2025/11/15 19:40:00 ] Parsing [Icons] section, line 150
+[ 2025/11/15 19:40:00 ] Parsing [Icons] section, line 151
+[ 2025/11/15 19:40:00 ] Parsing [Icons] section, line 152
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 157
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 158
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 159
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 160
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 161
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 162
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 163
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 164
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 165
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 166
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 167
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 168
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 169
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 170
+[ 2025/11/15 19:40:01 ] Parsing [INI] section, line 171
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 172
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 173
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 174
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 175
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 176
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 177
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 178
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 179
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 180
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 183
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 184
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 185
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 186
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 187
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 188
+[ 2025/11/15 19:40:02 ] Parsing [INI] section, line 189
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 190
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 191
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 192
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 193
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 194
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 195
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 196
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 197
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 198
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 199
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 200
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 201
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 202
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 203
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 204
+[ 2025/11/15 19:40:03 ] Parsing [INI] section, line 205
+[ 2025/11/15 19:40:04 ] Parsing [INI] section, line 206
+[ 2025/11/15 19:40:04 ] Parsing [InstallDelete] section, line 212
+[ 2025/11/15 19:40:04 ] Parsing [InstallDelete] section, line 213
+[ 2025/11/15 19:40:04 ] Parsing [InstallDelete] section, line 214
+[ 2025/11/15 19:40:04 ] Parsing [InstallDelete] section, line 215
+[ 2025/11/15 19:40:04 ] Parsing [UninstallDelete] section, line 218
+[ 2025/11/15 19:40:04 ] Parsing [UninstallDelete] section, line 219
+[ 2025/11/15 19:40:04 ] Parsing [Run] section, line 209
+[ 2025/11/15 19:40:04 ] Parsing [Files] section, line 39 of C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 19:40:04 ] Reading version info: C:\Program Files (x86)\Inno Download Plugin\\unicode\idp.dll
+[ 2025/11/15 19:40:04 ] Parsing [Files] section, line 144
+[ 2025/11/15 19:40:04 ] Parsing [Files] section, line 145
+[ 2025/11/15 19:40:04 ] Compiling [Code] section
+[ 2025/11/15 19:40:04 ] Error on line 304 in R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Setup.iss: Column 1:
+[ 2025/11/15 19:40:04 ] Identifier expected.
+[ 2025/11/15 19:40:04 ] Compile aborted.
+[ 2025/11/15 19:40:05 ] Error: Finished with (01) error!
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 19:55:14 ] DATE:                        2025/11/15 19:55:14
+[ 2025/11/15 19:55:14 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3682
+[ 2025/11/15 19:55:14 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 19:55:14 ] COMPILED:                    YES
+[ 2025/11/15 19:55:14 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 19:55:14 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 19:55:14 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 19:55:14 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 19:55:14 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/15 19:55:19 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2025/11/15 19:55:19 ] Inno Setup 6 Command-Line Compiler
+[ 2025/11/15 19:55:19 ] Copyright (C) 1997-2025 Jordan Russell. All rights reserved.
+[ 2025/11/15 19:55:19 ] Portions Copyright (C) 2000-2025 Martijn Laan. All rights reserved.
+[ 2025/11/15 19:55:19 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2025/11/15 19:55:19 ] https://www.innosetup.com
+[ 2025/11/15 19:55:19 ] Compiler engine version: Inno Setup 6.6.0
+[ 2025/11/15 19:55:20 ] Non-commercial use only
+[ 2025/11/15 19:55:20 ] Preprocessing
+[ 2025/11/15 19:55:20 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2025/11/15 19:55:20 ] Line 18: Including file: C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 19:55:20 ] Reading file: C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 19:55:20 ] Line 33 of idp.iss: Warning: Function "ParseVersion" has been renamed. Use "GetVersionComponents" instead.
+[ 2025/11/15 19:55:20 ] Line 36 of idp.iss: Warning: Function "GetFileVersion" has been renamed. Use "GetVersionNumbersString" instead.
+[ 2025/11/15 19:55:20 ] Line 662 of idp.iss: Including file: C:\Program Files (x86)\Inno Download Plugin\unicode\idplang\default.iss
+[ 2025/11/15 19:55:20 ] Reading file: C:\Program Files (x86)\Inno Download Plugin\unicode\idplang\default.iss
+[ 2025/11/15 19:55:20 ] Parsing [Setup] section, line 78
+[ 2025/11/15 19:55:20 ] Parsing [Setup] section, line 79
+[ 2025/11/15 19:55:20 ] Parsing [Setup] section, line 80
+[ 2025/11/15 19:55:20 ] Parsing [Setup] section, line 81
+[ 2025/11/15 19:55:20 ] Parsing [Setup] section, line 82
+[ 2025/11/15 19:55:20 ] Parsing [Setup] section, line 83
+[ 2025/11/15 19:55:20 ] Parsing [Setup] section, line 84
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 85
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 86
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 87
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 88
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 89
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 90
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 91
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 92
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 93
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 94
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 95
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 96
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 97
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 98
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 99
+[ 2025/11/15 19:55:21 ] Parsing [Setup] section, line 100
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 101
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 102
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 103
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 104
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 105
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 106
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 107
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 108
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 109
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 110
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 111
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 112
+[ 2025/11/15 19:55:22 ] Parsing [Setup] section, line 113
+[ 2025/11/15 19:55:22 ] Reading file (LicenseFile)
+[ 2025/11/15 19:55:22 ] Reading file (WizardImageFile)
+[ 2025/11/15 19:55:23 ] Reading file (WizardSmallImageFile)
+[ 2025/11/15 19:55:23 ] Preparing Setup program executable
+[ 2025/11/15 19:55:23 ] Verification successful
+[ 2025/11/15 19:55:23 ] Updating icons (Setup.e32)
+[ 2025/11/15 19:55:23 ] Updating version info (Setup.e32)
+[ 2025/11/15 19:55:23 ] Determining language code pages
+[ 2025/11/15 19:55:23 ] Parsing [Languages] section, line 116
+[ 2025/11/15 19:55:23 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2025/11/15 19:55:23 ] Messages in script file
+[ 2025/11/15 19:55:23 ] Reading default messages from Default.isl
+[ 2025/11/15 19:55:23 ] Parsing [Languages] section, line 116
+[ 2025/11/15 19:55:23 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2025/11/15 19:55:23 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2025/11/15 19:55:23 ] Messages in script file
+[ 2025/11/15 19:55:23 ] Reading [Code] section
+[ 2025/11/15 19:55:24 ] Parsing [Tasks] section, line 139
+[ 2025/11/15 19:55:24 ] Parsing [Tasks] section, line 140
+[ 2025/11/15 19:55:24 ] Parsing [Tasks] section, line 141
+[ 2025/11/15 19:55:24 ] Parsing [Tasks] section, line 142
+[ 2025/11/15 19:55:24 ] Parsing [Tasks] section, line 143
+[ 2025/11/15 19:55:24 ] Parsing [Icons] section, line 194
+[ 2025/11/15 19:55:24 ] Parsing [Icons] section, line 195
+[ 2025/11/15 19:55:24 ] Parsing [Icons] section, line 196
+[ 2025/11/15 19:55:24 ] Parsing [INI] section, line 201
+[ 2025/11/15 19:55:24 ] Parsing [INI] section, line 202
+[ 2025/11/15 19:55:24 ] Parsing [INI] section, line 203
+[ 2025/11/15 19:55:24 ] Parsing [INI] section, line 204
+[ 2025/11/15 19:55:24 ] Parsing [INI] section, line 205
+[ 2025/11/15 19:55:24 ] Parsing [INI] section, line 206
+[ 2025/11/15 19:55:24 ] Parsing [INI] section, line 207
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 208
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 209
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 210
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 211
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 212
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 213
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 214
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 215
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 216
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 217
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 218
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 219
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 220
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 221
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 222
+[ 2025/11/15 19:55:25 ] Parsing [INI] section, line 223
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 224
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 227
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 228
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 229
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 230
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 231
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 232
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 233
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 234
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 235
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 236
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 237
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 238
+[ 2025/11/15 19:55:26 ] Parsing [INI] section, line 239
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 240
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 241
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 242
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 243
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 244
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 245
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 246
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 247
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 248
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 249
+[ 2025/11/15 19:55:27 ] Parsing [INI] section, line 250
+[ 2025/11/15 19:55:27 ] Parsing [InstallDelete] section, line 256
+[ 2025/11/15 19:55:27 ] Parsing [InstallDelete] section, line 257
+[ 2025/11/15 19:55:27 ] Parsing [InstallDelete] section, line 258
+[ 2025/11/15 19:55:27 ] Parsing [InstallDelete] section, line 259
+[ 2025/11/15 19:55:28 ] Parsing [UninstallDelete] section, line 262
+[ 2025/11/15 19:55:28 ] Parsing [UninstallDelete] section, line 263
+[ 2025/11/15 19:55:28 ] Parsing [Run] section, line 253
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 39 of C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 19:55:28 ] Reading version info: C:\Program Files (x86)\Inno Download Plugin\\unicode\idp.dll
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 146
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 147
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 148
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 149
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 150
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 151
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 152
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 153
+[ 2025/11/15 19:55:28 ] Parsing [Files] section, line 154
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 155
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 156
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 157
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 158
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 159
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 160
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 161
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 162
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 163
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 164
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 165
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 166
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 167
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 168
+[ 2025/11/15 19:55:29 ] Parsing [Files] section, line 169
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 170
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 171
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 172
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 173
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 174
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 175
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 176
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 177
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 178
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 179
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 180
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 181
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 182
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 183
+[ 2025/11/15 19:55:30 ] Parsing [Files] section, line 184
+[ 2025/11/15 19:55:31 ] Parsing [Files] section, line 185
+[ 2025/11/15 19:55:31 ] Parsing [Files] section, line 186
+[ 2025/11/15 19:55:31 ] Parsing [Files] section, line 187
+[ 2025/11/15 19:55:31 ] Parsing [Files] section, line 188
+[ 2025/11/15 19:55:31 ] Compiling [Code] section
+[ 2025/11/15 19:55:31 ] Deleting Firemin_9558_Setup.exe from output directory
+[ 2025/11/15 19:55:31 ] Creating setup files
+[ 2025/11/15 19:55:31 ] Verification successful
+[ 2025/11/15 19:55:31 ] Updating icons (Setup.exe)
+[ 2025/11/15 19:55:31 ] Compressing: C:\Program Files (x86)\Inno Download Plugin\\unicode\idp.dll   (1.5.1.0)
+[ 2025/11/15 19:55:31 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\Firemin_X64.exe
+[ 2025/11/15 19:55:31 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\Firemin.exe
+[ 2025/11/15 19:55:31 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Firemin.ini
+[ 2025/11/15 19:55:31 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Docs\Firemin\Changes.txt
+[ 2025/11/15 19:55:31 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Docs\Firemin\License.txt
+[ 2025/11/15 19:55:31 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Docs\Firemin\Readme.txt
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\af.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ar.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\bg.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\cs.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\da.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\de.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\el.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\en.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\es.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\fa.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\fr.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\hi.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\hr.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\hu.lng
+[ 2025/11/15 19:55:32 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\id.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\is.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\it.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\iw.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ja.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ko.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\nl.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\no.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\pl.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\pt-BR.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\pt.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ro.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ru.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\sk.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\sl.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\sv.lng
+[ 2025/11/15 19:55:33 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\th.lng
+[ 2025/11/15 19:55:34 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\tr.lng
+[ 2025/11/15 19:55:34 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\vi.lng
+[ 2025/11/15 19:55:34 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\zh-CN.lng
+[ 2025/11/15 19:55:34 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\zh-TW.lng
+[ 2025/11/15 19:55:34 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Processing\32\Stroke.ani
+[ 2025/11/15 19:55:34 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Processing\64\Globe.ani
+[ 2025/11/15 19:55:34 ] Compressing Setup program executable
+[ 2025/11/15 19:55:34 ] Updating version info (Setup.exe)
+[ 2025/11/15 19:55:34 ] Updating manifest (Setup.exe)
+[ 2025/11/15 19:55:34 ] Successful compile (1,000 sec). Resulting Setup program filename is:
+[ 2025/11/15 19:55:34 ] R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Setup.exe
+[ 2025/11/15 19:55:34 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/15 22:24:22 ] DATE:                        2025/11/15 22:24:22
+[ 2025/11/15 22:24:22 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3683
+[ 2025/11/15 22:24:22 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/15 22:24:22 ] COMPILED:                    YES
+[ 2025/11/15 22:24:22 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/15 22:24:22 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/15 22:24:22 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/15 22:24:22 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/15 22:24:22 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/15 22:24:33 ] Creating installation for Firemin
+------------------------------------------------------------------------------------------
+[ 2025/11/15 22:24:33 ] Inno Setup 6 Command-Line Compiler
+[ 2025/11/15 22:24:33 ] Copyright (C) 1997-2025 Jordan Russell. All rights reserved.
+[ 2025/11/15 22:24:33 ] Portions Copyright (C) 2000-2025 Martijn Laan. All rights reserved.
+[ 2025/11/15 22:24:33 ] Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+[ 2025/11/15 22:24:33 ] https://www.innosetup.com
+[ 2025/11/15 22:24:33 ] Compiler engine version: Inno Setup 6.6.0
+[ 2025/11/15 22:24:34 ] Non-commercial use only
+[ 2025/11/15 22:24:34 ] Preprocessing
+[ 2025/11/15 22:24:34 ] Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+[ 2025/11/15 22:24:34 ] Line 18: Including file: C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 22:24:34 ] Reading file: C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 22:24:34 ] Line 33 of idp.iss: Warning: Function "ParseVersion" has been renamed. Use "GetVersionComponents" instead.
+[ 2025/11/15 22:24:34 ] Line 36 of idp.iss: Warning: Function "GetFileVersion" has been renamed. Use "GetVersionNumbersString" instead.
+[ 2025/11/15 22:24:34 ] Line 662 of idp.iss: Including file: C:\Program Files (x86)\Inno Download Plugin\unicode\idplang\default.iss
+[ 2025/11/15 22:24:34 ] Reading file: C:\Program Files (x86)\Inno Download Plugin\unicode\idplang\default.iss
+[ 2025/11/15 22:24:34 ] Parsing [Setup] section, line 78
+[ 2025/11/15 22:24:34 ] Parsing [Setup] section, line 79
+[ 2025/11/15 22:24:34 ] Parsing [Setup] section, line 80
+[ 2025/11/15 22:24:34 ] Parsing [Setup] section, line 81
+[ 2025/11/15 22:24:34 ] Parsing [Setup] section, line 82
+[ 2025/11/15 22:24:34 ] Parsing [Setup] section, line 83
+[ 2025/11/15 22:24:34 ] Parsing [Setup] section, line 84
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 85
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 86
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 87
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 88
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 89
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 90
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 91
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 92
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 93
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 94
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 95
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 96
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 97
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 98
+[ 2025/11/15 22:24:35 ] Parsing [Setup] section, line 99
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 100
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 101
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 102
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 103
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 104
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 105
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 106
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 107
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 108
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 109
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 110
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 111
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 112
+[ 2025/11/15 22:24:36 ] Parsing [Setup] section, line 113
+[ 2025/11/15 22:24:37 ] Reading file (LicenseFile)
+[ 2025/11/15 22:24:37 ] Reading file (WizardImageFile)
+[ 2025/11/15 22:24:37 ] Reading file (WizardSmallImageFile)
+[ 2025/11/15 22:24:37 ] Preparing Setup program executable
+[ 2025/11/15 22:24:37 ] Verification successful
+[ 2025/11/15 22:24:37 ] Updating icons (Setup.e32)
+[ 2025/11/15 22:24:37 ] Updating version info (Setup.e32)
+[ 2025/11/15 22:24:37 ] Determining language code pages
+[ 2025/11/15 22:24:37 ] Parsing [Languages] section, line 116
+[ 2025/11/15 22:24:37 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2025/11/15 22:24:37 ] Messages in script file
+[ 2025/11/15 22:24:37 ] Reading default messages from Default.isl
+[ 2025/11/15 22:24:37 ] Parsing [Languages] section, line 116
+[ 2025/11/15 22:24:37 ] Reading file: C:\Program Files (x86)\Inno Setup 6\Default.isl
+[ 2025/11/15 22:24:37 ] Parsing [LangOptions], [Messages], and [CustomMessages] sections
+[ 2025/11/15 22:24:37 ] Messages in script file
+[ 2025/11/15 22:24:38 ] Reading [Code] section
+[ 2025/11/15 22:24:38 ] Parsing [Tasks] section, line 139
+[ 2025/11/15 22:24:38 ] Parsing [Tasks] section, line 140
+[ 2025/11/15 22:24:38 ] Parsing [Tasks] section, line 141
+[ 2025/11/15 22:24:38 ] Parsing [Tasks] section, line 142
+[ 2025/11/15 22:24:38 ] Parsing [Tasks] section, line 143
+[ 2025/11/15 22:24:38 ] Parsing [Icons] section, line 198
+[ 2025/11/15 22:24:38 ] Parsing [Icons] section, line 199
+[ 2025/11/15 22:24:38 ] Parsing [Icons] section, line 200
+[ 2025/11/15 22:24:38 ] Parsing [INI] section, line 205
+[ 2025/11/15 22:24:38 ] Parsing [INI] section, line 206
+[ 2025/11/15 22:24:38 ] Parsing [INI] section, line 207
+[ 2025/11/15 22:24:38 ] Parsing [INI] section, line 208
+[ 2025/11/15 22:24:38 ] Parsing [INI] section, line 209
+[ 2025/11/15 22:24:38 ] Parsing [INI] section, line 210
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 211
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 212
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 213
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 214
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 215
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 216
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 217
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 218
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 219
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 220
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 221
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 222
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 223
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 224
+[ 2025/11/15 22:24:39 ] Parsing [INI] section, line 225
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 226
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 227
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 228
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 231
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 232
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 233
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 234
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 235
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 236
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 237
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 238
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 239
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 240
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 241
+[ 2025/11/15 22:24:40 ] Parsing [INI] section, line 242
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 243
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 244
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 245
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 246
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 247
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 248
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 249
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 250
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 251
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 252
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 253
+[ 2025/11/15 22:24:41 ] Parsing [INI] section, line 254
+[ 2025/11/15 22:24:41 ] Parsing [InstallDelete] section, line 260
+[ 2025/11/15 22:24:41 ] Parsing [InstallDelete] section, line 261
+[ 2025/11/15 22:24:42 ] Parsing [InstallDelete] section, line 262
+[ 2025/11/15 22:24:42 ] Parsing [InstallDelete] section, line 263
+[ 2025/11/15 22:24:42 ] Parsing [UninstallDelete] section, line 266
+[ 2025/11/15 22:24:42 ] Parsing [UninstallDelete] section, line 267
+[ 2025/11/15 22:24:42 ] Parsing [Run] section, line 257
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 39 of C:\Program Files (x86)\Inno Download Plugin\idp.iss
+[ 2025/11/15 22:24:42 ] Reading version info: C:\Program Files (x86)\Inno Download Plugin\\unicode\idp.dll
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 147
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 148
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 150
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 151
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 152
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 153
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 154
+[ 2025/11/15 22:24:42 ] Parsing [Files] section, line 155
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 156
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 157
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 158
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 159
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 160
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 161
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 162
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 163
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 164
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 165
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 166
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 167
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 168
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 169
+[ 2025/11/15 22:24:43 ] Parsing [Files] section, line 170
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 171
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 172
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 173
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 174
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 175
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 176
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 177
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 178
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 179
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 180
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 181
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 182
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 183
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 184
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 185
+[ 2025/11/15 22:24:44 ] Parsing [Files] section, line 186
+[ 2025/11/15 22:24:45 ] Parsing [Files] section, line 187
+[ 2025/11/15 22:24:45 ] Parsing [Files] section, line 188
+[ 2025/11/15 22:24:45 ] Parsing [Files] section, line 189
+[ 2025/11/15 22:24:45 ] Parsing [Files] section, line 190
+[ 2025/11/15 22:24:45 ] Parsing [Files] section, line 191
+[ 2025/11/15 22:24:45 ] Parsing [Files] section, line 192
+[ 2025/11/15 22:24:45 ] Compiling [Code] section
+[ 2025/11/15 22:24:45 ] Deleting Firemin_9558_Setup.exe from output directory
+[ 2025/11/15 22:24:45 ] Creating setup files
+[ 2025/11/15 22:24:45 ] Verification successful
+[ 2025/11/15 22:24:45 ] Updating icons (Setup.exe)
+[ 2025/11/15 22:24:45 ] Compressing: C:\Program Files (x86)\Inno Download Plugin\\unicode\idp.dll   (1.5.1.0)
+[ 2025/11/15 22:24:45 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\Firemin_X64.exe
+[ 2025/11/15 22:24:45 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\Firemin.exe
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Firemin.ini
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Docs\Firemin\Changes.txt
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Docs\Firemin\License.txt
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Docs\Firemin\Readme.txt
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\af.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ar.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\bg.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\cs.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\da.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\de.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\el.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\en.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\es.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\fa.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\fr.lng
+[ 2025/11/15 22:24:46 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\hi.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\hr.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\hu.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\id.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\is.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\it.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\iw.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ja.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ko.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\nl.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\no.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\pl.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\pt-BR.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\pt.lng
+[ 2025/11/15 22:24:47 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ro.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\ru.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\sk.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\sl.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\sv.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\th.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\tr.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\vi.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\zh-CN.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Language\Firemin\zh-TW.lng
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Processing\32\Stroke.ani
+[ 2025/11/15 22:24:48 ] Compressing: R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558\\Processing\64\Globe.ani
+[ 2025/11/15 22:24:48 ] Compressing Setup program executable
+[ 2025/11/15 22:24:48 ] Updating version info (Setup.exe)
+[ 2025/11/15 22:24:48 ] Updating manifest (Setup.exe)
+[ 2025/11/15 22:24:48 ] Successful compile (1,406 sec). Resulting Setup program filename is:
+[ 2025/11/15 22:24:49 ] R:\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Setup.exe
+[ 2025/11/15 22:24:49 ] Finished: Created installation for Firemin.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/16 16:52:33 ] DATE:                        2025/11/16 16:52:33
+[ 2025/11/16 16:52:33 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3683
+[ 2025/11/16 16:52:33 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/16 16:52:33 ] COMPILED:                    YES
+[ 2025/11/16 16:52:33 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/16 16:52:33 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/16 16:52:33 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/16 16:52:33 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/16 16:52:33 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/16 16:52:47 ] Building Chromin...
+------------------------------------------------------------------------------------------
+[ 2025/11/16 16:52:49 ] +> Starting AutoIt3Wrapper (21.316.1639.1)
+[ 2025/11/16 16:52:49 ] from:Distro_X64.exe (11.1.1.3683) Keyboard:00000409 OS:WIN_11/2009 CPU:X64 OS:X64 Environment(Language:0409)
+[ 2025/11/16 16:52:49 ] >Running AU3Check (3.3.18.0) from:C:\Program Files (x86)\AutoIt3 input:R:\Resolute\SDK\Concrete\Chromin\Chromin.au3
+[ 2025/11/16 16:52:50 ] +> AU3Check ended. rc:0
+[ 2025/11/16 16:52:50 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\Chromin\Chromin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU327D.tmp.exe" /nopack /icon "..\..\Resources\Icons\Chromin.ico" /comp 2
+[ 2025/11/16 16:52:52 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU327D.tmp.exe. rc:0
+[ 2025/11/16 16:52:52 ] > Performing the Program Resource Update steps:
+[ 2025/11/16 16:52:52 ] ...>Updating Program Version information.
+[ 2025/11/16 16:52:52 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/16 16:52:52 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/16 16:52:52 ] ...>Updating Program Manifest information.
+[ 2025/11/16 16:52:52 ] ...>Adding 74 Icon(s).
+[ 2025/11/16 16:52:52 ] > Program Resource updating finished successfully.
+[ 2025/11/16 16:52:52 ] +> Created program: R:\Resolute\Resolute\Chromin.exe
+[ 2025/11/16 16:52:52 ] >Running:(3.3.18.0):C:\Program Files (x86)\AutoIt3\aut2exe\aut2exe.exe /in "R:\Resolute\SDK\Concrete\Chromin\Chromin.au3" /out "C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU327D.tmp.exe" /nopack /icon "..\..\Resources\Icons\Chromin.ico" /comp 2 /x64
+[ 2025/11/16 16:52:53 ] +> Aut2exe.exe ended. C:\Users\DerickPayne\AppData\Local\AutoIt v3\Aut2exe\~AU327D.tmp.exe. rc:0
+[ 2025/11/16 16:52:53 ] > Performing the Program Resource Update steps:
+[ 2025/11/16 16:52:53 ] ...>Updating Program Version information.
+[ 2025/11/16 16:52:53 ] ...>Setting Program ExecutionLevel Manifest information to asInvoker
+[ 2025/11/16 16:52:53 ] ...>Setting Program Compatibility Manifest information to Windows10
+[ 2025/11/16 16:52:53 ] ...>Updating Program Manifest information.
+[ 2025/11/16 16:52:53 ] ...>Adding 74 Icon(s).
+[ 2025/11/16 16:52:54 ] > Program Resource updating finished successfully.
+[ 2025/11/16 16:52:54 ] +> Created program: R:\Resolute\Resolute\Chromin_X64.exe
+[ 2025/11/16 16:52:54 ] -Updated the Source Version to: 11.8.3.8536
+[ 2025/11/16 16:52:55 ] +> AutoIt3Wrapper Finished.
+[ 2025/11/16 16:52:56 ] Finished: Finished building Chromin.
+------------------------------------------------------------------------------------------
+
+
+                                            ./
+                                          (o o)
+--------------------------------------oOOo-(-)-oOOo--------------------------------------
+
+[ 2025/11/16 18:40:55 ] DATE:                        2025/11/16 18:40:55
+[ 2025/11/16 18:40:55 ] PROGRAM:                     Rizonesoft SDK 11.1.1.3683
+[ 2025/11/16 18:40:55 ] PROGRAM PATH:                [R:\Resolute\SDK\Distro_X64.exe]
+[ 2025/11/16 18:40:55 ] COMPILED:                    YES
+[ 2025/11/16 18:40:55 ] WINDOWS VERSION:             WIN_10 
+[ 2025/11/16 18:40:55 ] SYSTEM TYPE:                 64-Bit Operating System
+[ 2025/11/16 18:40:55 ] MEMORY (RAM):                32601.73 MB
+[ 2025/11/16 18:40:55 ] PROGRAM FILES DIRECTORY:     C:\Program Files
+[ 2025/11/16 18:40:55 ] WINDOWS DIRECTORY:           C:\WINDOWS
+-----------------------------------------------------------------------------------------
+
+[ 2025/11/16 18:41:04 ] Generating Documentation for Chromin
+------------------------------------------------------------------------------------------
+[ 2025/11/16 18:41:04 ] Creating the 'Documents' directory.
+[ 2025/11/16 18:41:04 ] Template directory found at: 'R:\Resolute\SDK\Concrete\Chromin\Templates'
+[ 2025/11/16 18:41:04 ] 04 templates files found.
+[ 2025/11/16 18:41:04 ] Processing: R:\Resolute\SDK\Concrete\Chromin\Templates\Changes.tpl
+[ 2025/11/16 18:41:04 ] Document created successfuly.
+[ 2025/11/16 18:41:04 ] Document File: R:\Resolute\Resolute\Docs\Chromin\Changes.txt
+[ 2025/11/16 18:41:04 ] Processing: R:\Resolute\SDK\Concrete\Chromin\Templates\License.tpl
+[ 2025/11/16 18:41:04 ] Document created successfuly.
+[ 2025/11/16 18:41:04 ] Document File: R:\Resolute\Resolute\Docs\Chromin\License.txt
+[ 2025/11/16 18:41:04 ] Processing: R:\Resolute\SDK\Concrete\Chromin\Templates\Readme.tpl
+[ 2025/11/16 18:41:04 ] Document created successfuly.
+[ 2025/11/16 18:41:04 ] Document File: R:\Resolute\Resolute\Docs\Chromin\Readme.txt
+[ 2025/11/16 18:41:04 ] Processing: R:\Resolute\SDK\Concrete\Chromin\Templates\Setup.iss.tpl
+[ 2025/11/16 18:41:04 ] Document created successfuly.
+[ 2025/11/16 18:41:04 ] Document File: R:\Resolute\Resolute\Docs\Chromin\Setup.iss.txt
+[ 2025/11/16 18:41:04 ] Finished: All document templates processed.
+------------------------------------------------------------------------------------------

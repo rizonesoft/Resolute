@@ -1,6 +1,6 @@
 ==================================================
 %{:RELEASE:}
-© %{:COMPANY:}. All rights reserved
+%{:COMPANY:}. All rights reserved
 %{:COMPANYURL:}
 ==================================================
 Version: %{VERSION}

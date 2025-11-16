@@ -16,7 +16,7 @@ UpdateFile = 1
 
 [Signing]
 CertificateSet = Signing\Signing.ini
-Website = https://www.rizonesoft.com
+Website = https://rizonesoft.com
 
 [Distribute]
 File=%RootDir%\ComIntRep.exe
@@ -53,7 +53,7 @@ File=%RootDir%\Sounds\Welcome.wav
 [Environment]
 ScriptPath=R:\Resolute\SDK\Concrete\ComIntRep\ComIntRep.au3
 Company=Rizonesoft
-CompanyURL=https://www.rizonesoft.com
+CompanyURL=https://rizonesoft.com
 Name=Complete Internet Repair
 ShortName=ComIntRep
 Description=Complete Internet Repair

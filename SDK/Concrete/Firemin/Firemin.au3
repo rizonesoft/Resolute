@@ -31,7 +31,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Firemin									;~ Comment field
 #AutoIt3Wrapper_Res_Description=Firemin						      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=12.2.1.9553
+#AutoIt3Wrapper_Res_Fileversion=12.2.1.9559
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      					;~ (Y/N) Compile for high DPI. Default=N
@@ -61,7 +61,7 @@
 ;	eg: #AutoIt3Wrapper_Res_Field=AutoIt Version|%AutoItVer%
 #AutoIt3Wrapper_Res_Field=CompanyName|Rizonesoft
 #AutoIt3Wrapper_Res_Field=ProductName|Firemin
-#AutoIt3Wrapper_Res_Field=HomePage|https://www.rizonesoft.com
+#AutoIt3Wrapper_Res_Field=HomePage|https://rizonesoft.com
 #AutoIt3Wrapper_Res_Field=AutoItVersion|%AutoItVer%
 ; Add extra ICO files to the resources
 ; Use full path of the ico files to be added

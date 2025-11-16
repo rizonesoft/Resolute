@@ -6,6 +6,9 @@
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+Platform and Toolchain:
+- Updated: AutoIt to version 3.3.18.0 – https://www.autoitscript.com/autoit3/docs/history.htm
+
 Memory Management and Performance:
 - Fixed: SystemMemoryEnabled setting now correctly uses numeric values (0/1) in config file
 - Added: System-wide memory monitoring with configurable threshold (default 20%)
