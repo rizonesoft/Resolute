@@ -483,16 +483,20 @@ begin
   // PayPal donation button
   PayPalButton := TBitmapImage.Create(DonatePage);
   PayPalButton.Parent := DonatePage.Surface;
-  PayPalButton.Left := (DonatePage.SurfaceWidth - ScaleX(200)) div 2; // Center the button
-  PayPalButton.Top := DonateLabel4.Top + DonateLabel4.Height + ScaleY(16);
-  PayPalButton.Width := ScaleX(200);
-  PayPalButton.Height := ScaleY(60);
   PayPalButton.Cursor := crHand;
   PayPalButton.OnClick := @PayPalButtonClick;
   
   // Extract and load the PayPal button image
   ExtractTemporaryFile('PayPal.bmp');
   PayPalButton.Bitmap.LoadFromFile(ExpandConstant('{tmp}\PayPal.bmp'));
+  
+  // Use AutoSize for best quality across all DPI settings
+  PayPalButton.AutoSize := True;
+  PayPalButton.Stretch := False;
+  
+  // Center the button after AutoSize sets its dimensions
+  PayPalButton.Top := DonateLabel4.Top + DonateLabel4.Height + ScaleY(16);
+  PayPalButton.Left := (DonatePage.SurfaceWidth - PayPalButton.Width) div 2;
 end;
 
 procedure CreateInstallTypePage();
