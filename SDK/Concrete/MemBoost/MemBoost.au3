@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2329
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2330
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -1473,22 +1473,22 @@ Func _UpdateTrayIcon()
 	Local $iMemLoad = $g_aMemStats[$MEM_LOAD]
 	
 	; Calculate icon index based on memory usage (0-11 for 0-100%)
-	; 0-8% = 0, 9-17% = 1, 18-26% = 2, ..., 99-100% = 11
-	Local $iIconIndex = Floor($iMemLoad / 9)
+	; Old formula: Floor($iMemLoad / 10) but capped at 11
+	; 0-9% = 0, 10-19% = 1, 20-29% = 2, ..., 100-109% = 10, but capped at 11
+	Local $iIconIndex = Floor($iMemLoad / 10)
 	If $iIconIndex > 11 Then $iIconIndex = 11
-	If $iIconIndex < 0 Then $iIconIndex = 0
 	
 	If @Compiled Then
 		; Use embedded tray icon resource (303-314 for icons 0-11)
+		; Formula matches old version: -303 is icon 0, -304 is icon 1, etc.
 		TraySetIcon(@ScriptFullPath, -303 - $iIconIndex)
 	Else
 		; Use external icon file for development
-		TraySetIcon($g_aTrayIcons[$iIconIndex], 0)
+		TraySetIcon($g_aTrayIcons[$iIconIndex])
 	EndIf
 	
-	; Tooltip format matching old version: Title + Version, separator, Memory Usage
-	Local $sVersion = _GetProgramVersion(1) & "." & _GetProgramVersion(2) & "." & _GetProgramVersion(3) & "." & _GetProgramVersion(4)
-	TraySetToolTip($g_sProgName & " " & $sVersion & @CRLF & _
+	; Tooltip format matching old version exactly
+	TraySetToolTip($g_sProgramTitle & @CRLF & _
 					"----------------------------------------" & @CRLF & _
 					"Memory Usage: " & $iMemLoad & "%")
 
