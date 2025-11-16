@@ -708,6 +708,9 @@ Func _StartCoreGui()
 	$Graph1 = _SSLG_CreateGraph(133, 125, 420, 104, 0, 100, 500, 0x000F1318)
 	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
 	_SSLG_SetSmoothingMode($Graph1, 2)
+	; Add initial sample to trigger graph display with WS_EX_COMPOSITED
+	_SSLG_AddSample($Graph1, 0)
+	_SSLG_UpdateGraph($Graph1, False, False)
 
 	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 245, $SS_ETCHEDFRAME)
 	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 241)
