@@ -973,7 +973,7 @@ Func _UpdateMemoryStats()
 	EndIf
 
 	_SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
-    _SSLG_UpdateGraph($Graph1, False, False)
+    _SSLG_UpdateGraph($Graph1, False, True)
 
 EndFunc   ;==>_UpdateMemoryStats
 
