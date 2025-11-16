@@ -1,0 +1,56 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 11
+Script = DistroCLI.au3
+
+[Modules]
+Build = 1
+Compress = 0
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://rizonesoft.com
+
+[Distribute]
+File=%RootDir%\SDK\DistroCLI.exe
+File=%RootDir%\SDK\DistroCLI_X64.exe
+File=%RootDir%\Docs\DistroCLI\Changes.txt
+File=%RootDir%\Docs\DistroCLI\Readme.txt
+File=%RootDir%\Docs\DistroCLI\License.txt
+
+[Sources]
+
+[Environment]
+ScriptPath=R:\Resolute\SDK\Concrete\DistroCLI\DistroCLI.au3
+Company=Rizonesoft
+CompanyURL=https://rizonesoft.com
+Name=DistroCLI
+ShortName=DistroCLI
+Description=DistroCLI Command Line Interface
+Type=N
+Icon=R:\Resolute\SDK\Resources\Icons\Distro.ico
+Version=1.0.0.0
+VersionMajor=1
+VersionMaintenance=0
+VersionBuild=0
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=DistroCLI.exe
+OutFileX64=DistroCLI_X64.exe
+OutFilePath=R:\Resolute\SDK\DistroCLI.exe
+OutFileX64Path=R:\Resolute\SDK\DistroCLI_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=R:\Resolute\SDK\Concrete\DistroCLI\Distribution\1
+DistributionName=DistroCLI_1
+FullDistributionPath=R:\Resolute\SDK\Concrete\DistroCLI\Distribution\1\DistroCLI_1
+DistroSourceName=DistroCLI_1_Source
+DistroSourceFullPath=R:\Resolute\SDK\Concrete\DistroCLI\Distribution\1\DistroCLI_1_Source

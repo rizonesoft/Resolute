@@ -1,0 +1,57 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 11
+Script = Resolute.au3
+
+[Modules]
+Build = 1
+Compress = 0
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://rizonesoft.com
+
+[Distribute]
+File=%RootDir%\Resolute.exe
+File=%RootDir%\Resolute_X64.exe
+File=%RootDir%\Docs\Resolute\Changes.txt
+File=%RootDir%\Docs\Resolute\Readme.txt
+File=%RootDir%\Docs\Resolute\License.txt
+File=%RootDir%\Language\Resolute\en.ini
+
+[Sources]
+
+[Environment]
+ScriptPath=R:\Resolute\SDK\Concrete\Resolute\Resolute.au3
+Company=Rizonesoft
+CompanyURL=https://rizonesoft.com
+Name=Resolute
+ShortName=Resolute
+Description=Resolute Power Tools
+Type=N
+Icon=R:\Resolute\SDK\Resources\Icons\Resolute.ico
+Version=23.2.0.854
+VersionMajor=23
+VersionMaintenance=0
+VersionBuild=854
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=Resolute.exe
+OutFileX64=Resolute_X64.exe
+OutFilePath=R:\Resolute\Resolute\Resolute.exe
+OutFileX64Path=R:\Resolute\Resolute\Resolute_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=R:\Resolute\SDK\Concrete\Resolute\Distribution\854
+DistributionName=Resolute_854
+FullDistributionPath=R:\Resolute\SDK\Concrete\Resolute\Distribution\854\Resolute_854
+DistroSourceName=Resolute_854_Source
+DistroSourceFullPath=R:\Resolute\SDK\Concrete\Resolute\Distribution\854\Resolute_854_Source
