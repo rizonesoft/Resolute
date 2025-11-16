@@ -24,7 +24,7 @@ UI/UX:
 - Fixed: Main window now non-resizable (removed WS_SIZEBOX)
 - Fixed: Tray icon now properly displays memory usage levels with embedded resources (303-314)
 - Fixed: Tray tooltip format matches original three-line format with version and separator
-- Optimized: Flickering minimized through multiple techniques (update throttling, buffering, frequency reduction)
+- Optimized: Flickering minimized through proven techniques (update throttling, change detection, frequency reduction)
 - Improved: Visual feedback during memory optimization process
 - Optimized: Memory stats update frequency (2 seconds) to reduce flickering
 - Optimized: Progress bar updates only when integer percentage changes (anti-flicker)
