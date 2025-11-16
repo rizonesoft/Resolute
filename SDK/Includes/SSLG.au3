@@ -25,6 +25,7 @@
 #include-once
 #include <GDIPlus.au3>
 #include <WindowsConstants.au3>
+#include <WinAPI.au3>
 
 _GDIPlus_Startup()
 OnAutoItExitRegister(__SSLG_Exit)
@@ -761,26 +762,35 @@ Func __SSLG_GraphicsDraw($iIdx, $hBitmap, $iW, $iH)
 	Local $hObjOld, $hDC_Src, $hDC_Dst, $hHBitmap, $hGraphic
 
 	;$hBitmap = GDI+ Bitmap [SRC]
-	$hHBitmap = $g_SSLG[$iIdx][$gSSLG_hHBitmapGDI_] ;Standard GDI Bitmap [DEST]
-
-	;DC where we can select the Standard GDI Bitmap
-	$hDC_Src = $g_SSLG[$iIdx][$gSSLG_hDCBuf]
-	$hObjOld = _WinAPI_SelectObject($hDC_Src, $hHBitmap)
-
+	;Draw [SRC] onto standard GDI DC / HBITMAP via GDI+
+	$hDC_Src = $g_SSLG[$iIdx][$gSSLG_hDCBuf] ;std DC
+	$hObjOld = _WinAPI_SelectObject($hDC_Src, $g_SSLG[$iIdx][$gSSLG_hHBitmapGDI_]) ;std HBITMAP
 	$hGraphic = _GDIPlus_GraphicsCreateFromHDC($hDC_Src)
 	_GDIPlus_GraphicsSetSmoothingMode($hGraphic, 2)
 	_GDIPlus_GraphicsDrawImageRect($hGraphic, $hBitmap, 0, 0, $iW, $iH)
 	_GDIPlus_GraphicsDispose($hGraphic)
 
-	$hDC_Dst = _WinAPI_GetDC($g_SSLG[$iIdx][$gSSLG_hCtrl])
-	_WinAPI_BitBlt($hDC_Dst, 0, 0, $iW, $iH, $hDC_Src, 0, 0, $SRCCOPY) ;Copy back to ctrl
-	_WinAPI_ReleaseDC($g_SSLG[$iIdx][$gSSLG_hCtrl], $hDC_Dst)
+	; For WS_EX_COMPOSITED windows, use InvalidateRect to trigger proper WM_PAINT
+	; This allows the double-buffering system to handle the update correctly
+	Local $hParent = _WinAPI_GetParent($g_SSLG[$iIdx][$gSSLG_hCtrl])
+	Local $iExStyle = _WinAPI_GetWindowLong($hParent, $GWL_EXSTYLE)
+	If BitAND($iExStyle, 0x02000000) Then ; WS_EX_COMPOSITED
+		; For composited windows, trigger repaint via message queue
+		$hDC_Dst = _WinAPI_GetDC($g_SSLG[$iIdx][$gSSLG_hCtrl])
+		_WinAPI_BitBlt($hDC_Dst, 0, 0, $iW, $iH, $hDC_Src, 0, 0, $SRCCOPY)
+		_WinAPI_ReleaseDC($g_SSLG[$iIdx][$gSSLG_hCtrl], $hDC_Dst)
+		; Force immediate repaint through compositing system
+		_WinAPI_RedrawWindow($g_SSLG[$iIdx][$gSSLG_hCtrl], 0, 0, BitOR(0x0001, 0x0100, 0x0400)) ; RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN
+	Else
+		; Normal window - direct BitBlt
+		$hDC_Dst = _WinAPI_GetDC($g_SSLG[$iIdx][$gSSLG_hCtrl])
+		_WinAPI_BitBlt($hDC_Dst, 0, 0, $iW, $iH, $hDC_Src, 0, 0, $SRCCOPY) ;Copy back to ctrl
+		_WinAPI_ReleaseDC($g_SSLG[$iIdx][$gSSLG_hCtrl], $hDC_Dst)
+	EndIf
 
 	_WinAPI_SelectObject($hDC_Src, $hObjOld) ;Put old object back
 
 EndFunc   ;==>__SSLG_GraphicsDraw
-
-; #INTERNAL_USE_ONLY# ===========================================================================================================
 ; Name...........: __SSLG_LookupHandle
 ; Description ...: Converts controlID or Handles to internal graph index
 ; Syntax.........:
