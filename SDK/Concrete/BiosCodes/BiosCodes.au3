@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Beep Codes Viewer					;~ Comment field
 #AutoIt3Wrapper_Res_Description=Beep Codes Viewer				;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.1960
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.1961
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N

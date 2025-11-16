@@ -11,7 +11,6 @@ Build System:
 
 Bug Fixes:
 - Fixed: Icon configuration - created DistroCLI.ico for proper icon display
-- Fixed: AutoIt3Wrapper path detection for Program Files (x86)
 
 Platform and Toolchain:
 - Updated: AutoIt to version 3.3.18.0

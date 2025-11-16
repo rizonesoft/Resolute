@@ -9,7 +9,7 @@
 #AutoIt3Wrapper_Compile_both=Y
 #AutoIt3Wrapper_Res_Comment=DistroCLI - Command Line Build Tool
 #AutoIt3Wrapper_Res_Description=DistroCLI Command Line Interface
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.2
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.3
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N
 #AutoIt3Wrapper_Res_ProductVersion=1
@@ -42,7 +42,7 @@
 #include <File.au3>
 #include <FileConstants.au3>
 
-Global Const $VERSION = "1.0.0.2"
+Global Const $VERSION = "1.0.0.3"
 Global $g_bVerbose = False
 Global $g_sRootDir = @ScriptDir & "\..\..\.."
 Global $g_sDistroRoot = @ScriptDir & "\..\.."
@@ -277,10 +277,15 @@ EndFunc
 Func _BuildProgram($sSniFile, $aEnv)
 	; Build using AutoIt3Wrapper
 	Local $sScriptPath = $aEnv[0][1]
-	Local $sAutoIt3Wrapper = @ProgramFilesDir & "\AutoIt3\SciTE\AutoIt3Wrapper\AutoIt3Wrapper.au3"
+	
+	; Check both Program Files locations
+	Local $sAutoIt3Wrapper = @ProgramFilesDir & " (x86)\AutoIt3\SciTE\AutoIt3Wrapper\AutoIt3Wrapper.au3"
+	If Not FileExists($sAutoIt3Wrapper) Then
+		$sAutoIt3Wrapper = @ProgramFilesDir & "\AutoIt3\SciTE\AutoIt3Wrapper\AutoIt3Wrapper.au3"
+	EndIf
 	
 	If Not FileExists($sAutoIt3Wrapper) Then
-		ConsoleWriteError("Error: AutoIt3Wrapper not found at: " & $sAutoIt3Wrapper & @CRLF)
+		ConsoleWriteError("Error: AutoIt3Wrapper not found in Program Files or Program Files (x86)" & @CRLF)
 		Return 1
 	EndIf
 	
