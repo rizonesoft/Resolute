@@ -12,6 +12,7 @@ Platform and Toolchain:
 SDK Framework:
 - Migrated: To use shared SDK includes structure
 - Removed: Duplicate include files (now uses SDK/Includes/)
+- Fixed: Localization.au3 duplicate function declarations
 - Enhanced: Code organization and maintainability
 
 --------------------------------------------------
