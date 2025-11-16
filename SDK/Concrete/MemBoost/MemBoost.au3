@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2310
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2311
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -632,9 +632,10 @@ Func _StartCoreGui()
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
-	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, $WS_OVERLAPPEDWINDOW)
+	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX))
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
+	GUISetBkColor(0x1A1D23, $g_hCoreGui) ; Set background color to prevent flickering
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
 
 	$g_hMenuFile = GUICtrlCreateMenu($g_aLangMenus[0])
@@ -848,6 +849,13 @@ Func _StartCoreGui()
 	
 	Global $g_hBtnClose = GUICtrlCreateButton("Close", 440, 345, 120, 30)
 	GUICtrlSetOnEvent($g_hBtnClose, "_MinimizeToTray")
+	
+	; Force behave checkbox
+	Global $g_hCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 20, 385, 540, 20)
+	GUICtrlSetState($g_hCheckForceBehave, $g_iForceBehave)
+	GUICtrlSetBkColor($g_hCheckForceBehave, $GUI_BKCOLOR_TRANSPARENT)
+	GUICtrlSetColor($g_hCheckForceBehave, 0xFFFFFF)
+	GUICtrlSetOnEvent($g_hCheckForceBehave, "_ToggleForceBehave")
 
 
 	_UpdateMemoryStatsFirst()
@@ -1159,8 +1167,8 @@ Func _LoadConfiguration()
 	$g_iDonateBuild = Number(IniRead($g_sPathIni, "Donate", "DonateBuild", 13))
 
 	; New optimization and behavior settings
-	$g_iAutoOptimize = Int(IniRead($g_sPathIni, $g_sProgShortName, "AutoOptimize", 0))
-	$g_iAutoOptimizeSeconds = Int(IniRead($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", 30))
+	$g_iAutoOptimize = Int(IniRead($g_sPathIni, $g_sProgShortName, "AutoOptimize", 2))
+	$g_iAutoOptimizeSeconds = Int(IniRead($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", 60))
 	$g_iForceBehave = Int(IniRead($g_sPathIni, $g_sProgShortName, "ForceBehave", 0))
 	$g_iStartWithWindows = Int(IniRead($g_sPathIni, $g_sProgShortName, "StartWithWindows", 0))
 	$g_iAlwaysOnTop = Int(IniRead($g_sPathIni, $g_sProgShortName, "AlwaysOnTop", 0))
@@ -1477,6 +1485,20 @@ Func _ToggleShowHide()
 	EndIf
 
 EndFunc   ;==>_ToggleShowHide
+
+
+Func _ToggleForceBehave()
+
+	If GUICtrlRead($g_hCheckForceBehave) = $GUI_CHECKED Then
+		$g_iForceBehave = 1
+	Else
+		$g_iForceBehave = 0
+	EndIf
+	
+	; Save immediately
+	IniWrite($g_sPathIni, $g_sProgShortName, "ForceBehave", $g_iForceBehave)
+
+EndFunc   ;==>_ToggleForceBehave
 
 
 Func _ShowPreferencesDlg()
@@ -1797,14 +1819,8 @@ EndFunc
 
 Func __CheckPreferenceChange()
 
-	If __CheckBoxChanged("LoggingEnabled", $g_hOChkLogEnabled) = True Or _
-		__CheckBoxChanged("SaveRealtime", $g_hOChkSaveRealtime) = True Or _
-		__CheckBoxChanged("ReduceMemory", $g_hOChkReduceMemory) = True Then
-		GUICtrlSetState($g_hOBtnSave, $GUI_ENABLE)
-	Else
-		GUICtrlSetState($g_hOBtnSave, $GUI_DISABLE)
-	EndIf
-
+	; Always enable Save button when any preference control is changed
+	GUICtrlSetState($g_hOBtnSave, $GUI_ENABLE)
 	__CheckLoggingStateChanged()
 	GUICtrlSetState($g_hOLblPrefsUpdated, $GUI_HIDE)
 

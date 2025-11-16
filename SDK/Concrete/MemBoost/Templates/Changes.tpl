@@ -17,10 +17,12 @@ SDK Framework:
 UI/UX:
 - Redesigned: Button layout with Optimize, Preferences, and Close buttons (standard Windows buttons)
 - Added: Close button that minimizes to system tray
+- Added: Force behave checkbox on main interface for quick access
 - Added: Countdown timer display showing automatic optimization status (OFF/AUTO/seconds)
 - Added: Complete system tray icon integration with dynamic memory indicators
 - Added: Tray menu with Show/Hide, Optimize, and Exit options
-- Fixed: Flickering issue during memory statistics updates
+- Fixed: Main window now non-resizable (removed WS_SIZEBOX)
+- Fixed: Flickering completely eliminated with GUISetBkColor background
 - Improved: Visual feedback during memory optimization process
 - Optimized: Memory stats update frequency (2 seconds) to reduce flickering
 - Changed: Removed custom colored buttons, using standard Windows button style
@@ -54,7 +56,8 @@ Preferences and Configuration:
 - Added: Complete Optimization tab in Preferences dialog
 - Added: Memory optimization mode selection (Intelligent/Timer/Manual)
 - Added: Configurable automatic optimization interval (5-120 seconds)
-- Added: "Force malicious processes to behave" checkbox
+- Changed: Default is now Timer mode with 60 second intervals (not Manual)
+- Added: "Force malicious processes to behave" checkbox (main GUI and preferences)
 - Added: "Start Memory Booster when Windows starts" checkbox
 - Added: "Show Memory Booster always on top" checkbox
 - Added: "Show program notifications" checkbox
@@ -62,9 +65,11 @@ Preferences and Configuration:
 - Added: "Play warning sounds" with configurable intervals (1-120 seconds)
 - Added: Configurable warning memory load threshold (50-95%)
 - Fixed: Preferences warning line layout now properly fits on two lines
-- Fixed: Save button now enables correctly when any setting is changed
+- Fixed: Save button now ALWAYS enables when ANY setting is changed
+- Fixed: INI default values now properly set to Timer mode (2) and 60 seconds
 - Fixed: All combo boxes trigger preference change detection
 - Implemented: Real-time "Always on Top" toggle
+- Implemented: Force behave checkbox on main interface saves immediately
 - Enhanced: All settings persist and load correctly with proper defaults
 
 Language System:
