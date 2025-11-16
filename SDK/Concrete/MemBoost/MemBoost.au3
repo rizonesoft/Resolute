@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2312
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2313
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -200,6 +200,20 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\38.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\39.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\40.ico
+
+; Tray icons for dynamic memory display (303-314)
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\0.ico					; 303
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\1.ico					; 304
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\2.ico					; 305
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\3.ico					; 306
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\4.ico					; 307
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\5.ico					; 308
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\6.ico					; 309
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\7.ico					; 310
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\8.ico					; 311
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\9.ico					; 312
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\10.ico					; 313
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\11.ico					; 314
 
 ;===============================================================================================================
 ; Tidy Settings
@@ -632,7 +646,7 @@ Func _StartCoreGui()
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
-	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX))
+	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX), $WS_EX_COMPOSITED)
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
@@ -1460,20 +1474,24 @@ Func _UpdateTrayIcon()
 	Local $iMemLoad = $g_aMemStats[$MEM_LOAD]
 	
 	; Calculate icon index based on memory usage (0-11 for 0-100%)
+	; 0-8% = 0, 9-17% = 1, 18-26% = 2, ..., 99-100% = 11
 	Local $iIconIndex = Floor($iMemLoad / 9)
 	If $iIconIndex > 11 Then $iIconIndex = 11
 	If $iIconIndex < 0 Then $iIconIndex = 0
 	
 	If @Compiled Then
-		; Use embedded tray icon resource (-159 to -170 for icons 0-11)
-		TraySetIcon(@ScriptFullPath, -159 - $iIconIndex)
+		; Use embedded tray icon resource (303-314 for icons 0-11)
+		TraySetIcon(@ScriptFullPath, -303 - $iIconIndex)
 	Else
 		; Use external icon file for development
 		TraySetIcon($g_aTrayIcons[$iIconIndex], 0)
 	EndIf
 	
-	; Tooltip format: Program Name - Memory: XX%
-	TraySetToolTip($g_sProgName & " - Memory: " & $iMemLoad & "%")
+	; Tooltip format matching old version: Title + Version, separator, Memory Usage
+	Local $sVersion = _GetProgramVersion(1) & "." & _GetProgramVersion(2) & "." & _GetProgramVersion(3) & "." & _GetProgramVersion(4)
+	TraySetToolTip($g_sProgName & " " & $sVersion & @CRLF & _
+					"----------------------------------------" & @CRLF & _
+					"Memory Usage: " & $iMemLoad & "%")
 
 EndFunc   ;==>_UpdateTrayIcon
 
