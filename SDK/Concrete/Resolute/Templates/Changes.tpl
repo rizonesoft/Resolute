@@ -6,10 +6,10 @@ RIZONESOFT RESOLUTE CHANGES
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
-Build System Tools:
-- Added: DistroCLI - Command-line build automation tool for AI assistants
+Build System:
 - Enhanced: Distro with improved solution management and build pipeline
 - Improved: Template-based documentation generation system
+- Documented: Distro build environment in Resolute documentation
 
 Browser Variants:
 - Added: Chromin - Chrome browser memory optimizer
@@ -44,7 +44,6 @@ URL Standardization:
 
 Documentation:
 - Updated: Changes.tpl templates for all programs with SDK improvements
-- Added: Windsurf workflows and documentation for Resolute framework
 - Maintained: Version placeholders for unreleased changes
 
 Programs Updated:

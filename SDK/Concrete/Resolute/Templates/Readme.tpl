@@ -45,15 +45,56 @@ Included Tools:
 Usage:
 Simply launch Resolute.exe and select the utility you need from the main interface. Each tool can be accessed directly from the categorized menu system.
 
-Build System:
-Resolute also serves as the host for the SDK build environment:
-- Distro - GUI build tool for compiling programs
-- DistroCLI - Command-line build automation
-- Comprehensive template system for documentation
-- Multi-program build and distribution management
+Build System - Distro:
+Resolute includes the Distro Building Environment, a comprehensive GUI tool
+for building and distributing all Resolute programs.
+
+Distro Features:
+- Compile executables for x86 and x64 architectures
+- Generate documentation from templates with placeholder replacement
+- Create distribution packages with all required files
+- Build Inno Setup installers for easy deployment
+- Create update files for auto-update system
+- Code signing support for trusted executables
+- UPX compression for smaller file sizes
+- Multi-program solution management
+- Build progress monitoring and logging
+
+Build Modules:
+- Build: Compile programs using AutoIt3Wrapper
+- Documentation: Process templates (Changes, Readme, License) into final docs
+- Distribution: Copy files to distribution folders per .sni configuration
+- Installation: Generate and compile Inno Setup installers
+- Update Files: Create version metadata for auto-update system
+- Compression: UPX compression for executables
+- Signing: Code signing with digital certificates
+
+Template System:
+Distro uses templates with placeholders for automated documentation:
+- %{VERSION} - Version number from build configuration
+- %{COMPANY} - Company name (Rizonesoft)
+- %{COMPANYURL} - Company website
+- %{DAY}, %{MONTH}, %{YEAR} - Current date components
+- %{INSTSIZE} - Installation size
+- %{RELEASE} - Full release name
+
+Solution INI Files:
+Each program has a .sni file defining build configuration:
+- Build settings and module selection
+- Environment metadata (version, paths, etc.)
+- Distribution file lists
+- Signing configuration
+- Located in SDK/Concrete/<Program>/<Program>.sni
+
+Distro Location:
+- Executable: R:\Resolute\SDK\Distro.exe
+- Source: R:\Resolute\SDK\Concrete\Distro\Distro.au3
+- Note: Distro builds other programs, not itself
 
 For Developers:
-The Resolute SDK provides a complete framework for building, documenting, and distributing Windows utilities. See the SDK documentation in .windsurf/docs/ for details.
+The Resolute SDK provides a complete framework for building, documenting,
+and distributing Windows utilities. All programs follow the same structure
+with Templates/, .sni files, and standardized build processes.
 
 ==================================================
 %{COMPANYURL}
