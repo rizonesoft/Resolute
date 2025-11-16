@@ -19,12 +19,15 @@ UI/UX:
 - Added: Close button that minimizes to system tray
 - Added: Force behave checkbox on main interface for quick access
 - Added: Countdown timer display showing automatic optimization status (OFF/AUTO/seconds)
-- Added: Complete system tray icon integration with dynamic memory indicators
+- Added: Complete system tray icon integration with dynamic memory indicators (12 tray icons: 0.ico - 11.ico)
 - Added: Tray menu with Show/Hide, Optimize, and Exit options
 - Fixed: Main window now non-resizable (removed WS_SIZEBOX)
-- Fixed: Flickering completely eliminated with GUISetBkColor background
+- Fixed: Tray icon now properly displays memory usage levels with embedded resources (303-314)
+- Fixed: Tray tooltip format matches original three-line format with version and separator
+- Optimized: Flickering minimized through multiple techniques (update throttling, buffering, frequency reduction)
 - Improved: Visual feedback during memory optimization process
 - Optimized: Memory stats update frequency (2 seconds) to reduce flickering
+- Optimized: Progress bar updates only when integer percentage changes (anti-flicker)
 - Changed: Removed custom colored buttons, using standard Windows button style
 
 Core Features - Memory Optimization:
@@ -40,12 +43,14 @@ Core Features - Memory Optimization:
 - Optimized: Performance with minimal CPU impact during optimization
 
 System Tray Integration:
-- Added: Complete system tray icon with dynamic memory usage indicators (12 icon states)
-- Added: Tray icon updates every 5 seconds reflecting current memory usage
-- Added: Tray tooltip showing program name and current memory percentage
+- Added: Complete system tray icon with dynamic memory usage indicators (12 icon states: 0-11)
+- Added: Tray icon resources properly embedded (303-314) with correct calculation (Floor(MemLoad / 9))
+- Fixed: Tray icon updates every 5 seconds reflecting current memory usage (0-8%, 9-17%, ..., 99-100%)
+- Fixed: Tray tooltip format matches original: "Program Name Version\n---\nMemory Usage: XX%"
 - Added: Tray menu with Show/Hide toggle, Optimize Now, and Exit options
 - Added: Minimize to tray functionality via Close button
 - Added: Double-click tray icon to show/hide main window
+- Enhanced: Dynamic tooltip with live version info and proper multiline formatting
 
 Core Features - Force Behave:
 - Added: "Force malicious processes to behave" functionality
