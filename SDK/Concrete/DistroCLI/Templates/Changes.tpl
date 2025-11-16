@@ -6,6 +6,9 @@ DISTROCLI CHANGES
 Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
+Bug Fixes:
+- Fixed: Icon configuration - now correctly uses Distro.ico
+
 Platform and Toolchain:
 - Updated: AutoIt to version 3.3.18.0
 

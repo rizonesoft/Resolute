@@ -1,7 +1,7 @@
 #Region AutoIt3Wrapper Directives
 #AutoIt3Wrapper_UseX64=Y
 #AutoIt3Wrapper_Version=P
-#AutoIt3Wrapper_Icon=..\..\Resources\Icons\Distro.ico
+#AutoIt3Wrapper_Icon=..\Resources\Icons\Distro.ico
 #AutoIt3Wrapper_OutFile_Type=exe
 #AutoIt3Wrapper_OutFile=..\..\..\SDK\DistroCLI.exe
 #AutoIt3Wrapper_OutFile_X64=..\..\..\SDK\DistroCLI_X64.exe
