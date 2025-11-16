@@ -7,7 +7,7 @@ Version %{VERSION} (%{MONTH} %{DAY}, %{YEAR})
 --------------------------------------------------
 
 Bug Fixes:
-- Fixed: Icon configuration - now correctly uses Distro.ico
+- Fixed: Icon configuration - created DistroCLI.ico for proper icon display
 
 Platform and Toolchain:
 - Updated: AutoIt to version 3.3.18.0
