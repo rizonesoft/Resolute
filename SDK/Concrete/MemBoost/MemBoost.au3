@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2309
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2310
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -437,14 +437,22 @@ Global $g_hSubHeading
 Global $g_hBtnRepair
 Global $g_hBtnOptimize						;~ Optimize Memory button
 Global $g_hBtnPreferences						;~ Preferences button
+Global $g_hBtnClose							;~ Close (minimize to tray) button
 Global $g_iOptimizing = 0						;~ Optimization in progress flag
 Global $g_iOptimizeCount = 0					;~ Total optimization count
 
 ; Automatic optimization settings
-Global $g_iAutoOptimize = 0					;~ Auto optimization mode (0=off, 1=intelligent, 2=every X seconds)
-Global $g_iAutoOptimizeSeconds = 30			;~ Auto optimize interval (seconds)
-Global $g_iTimerCountdown = 0					;~ Current countdown value
+Global $g_iAutoOptimize = 2					;~ Auto optimization mode (0=off, 1=intelligent, 2=every X seconds) - default to timer
+Global $g_iAutoOptimizeSeconds = 60			;~ Auto optimize interval (seconds) - default to 60
+Global $g_iTimerCountdown = 60					;~ Current countdown value
 Global $g_hTimerAdlib = 0						;~ Timer adlib registration flag
+
+; Tray icon
+Global $g_hTrayIcon								;~ Tray icon handle
+Global $g_hTrayShowHide						;~ Show/Hide menu item
+Global $g_hTrayOptimize						;~ Optimize menu item
+Global $g_hTrayExit							;~ Exit menu item
+Global $g_aTrayIcons[12]						;~ Tray icon array (0-11 for memory levels)
 
 ; Behavior settings
 Global $g_iForceBehave = 0						;~ Force processes to behave (reduce priority)
@@ -831,18 +839,15 @@ Func _StartCoreGui()
 	$g_hProgressProcs[1] = GUICtrlCreateGraphic(130, 308, 339, 14)
 	GUICtrlSetBkColor($g_hProgressProcs[1], 0x803A0A)
 
-	; Optimize Memory and Preferences Buttons (side by side)
-	$g_hBtnOptimize = GUICtrlCreateButton("Optimize Memory", 20, 345, 350, 35)
-	GUICtrlSetFont($g_hBtnOptimize, 10, 600)
-	GUICtrlSetBkColor($g_hBtnOptimize, 0x13FF92)
-	GUICtrlSetColor($g_hBtnOptimize, 0x000000)
+	; Buttons (Optimize, Preferences, Close)
+	$g_hBtnOptimize = GUICtrlCreateButton("Optimize Memory", 20, 345, 260, 30)
 	GUICtrlSetOnEvent($g_hBtnOptimize, "_OptimizeMemory")
 
-	$g_hBtnPreferences = GUICtrlCreateButton("Preferences", 380, 345, 180, 35)
-	GUICtrlSetFont($g_hBtnPreferences, 10, 600)
-	GUICtrlSetBkColor($g_hBtnPreferences, 0x555555)
-	GUICtrlSetColor($g_hBtnPreferences, 0xFFFFFF)
+	$g_hBtnPreferences = GUICtrlCreateButton("Preferences", 290, 345, 140, 30)
 	GUICtrlSetOnEvent($g_hBtnPreferences, "_ShowPreferencesDlg")
+	
+	Global $g_hBtnClose = GUICtrlCreateButton("Close", 440, 345, 120, 30)
+	GUICtrlSetOnEvent($g_hBtnClose, "_MinimizeToTray")
 
 
 	_UpdateMemoryStatsFirst()
@@ -850,10 +855,15 @@ Func _StartCoreGui()
 	AdlibRegister("_UpdateMemoryStats", 2000) ; Update every 2 seconds to reduce flickering
 
 	_Splash_Update("", 100)
+	
+	; Setup tray icon
+	_SetupTrayIcon()
+	
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 
 	AdlibRegister("_OnIconsHover", 65)
 	AdlibRegister("_UpdateTimer", 1000) ; Timer countdown every second
+	AdlibRegister("_UpdateTrayIcon", 5000) ; Update tray icon every 5 seconds
 	
 	If @Compiled Then
 		AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
@@ -1393,10 +1403,80 @@ Func _MinimizeProgram()
 	Local $iState = WinGetState($g_hCoreGui)
 
 	If BitAND($iState, 4) Then
-		WinSetState($g_hCoreGui, "", @SW_MINIMIZE)
+		_MinimizeToTray()
 	EndIf
 
-EndFunc
+EndFunc   ;==>_MinimizeProgram
+
+
+Func _SetupTrayIcon()
+
+	; Set tray mode
+	Opt("TrayMenuMode", 3) ; No default items
+	Opt("TrayOnEventMode", 1)
+	
+	; Load tray icons
+	For $i = 0 To 11
+		If @Compiled Then
+			$g_aTrayIcons[$i] = @ScriptFullPath
+		Else
+			$g_aTrayIcons[$i] = "..\..\..\SDK\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
+		EndIf
+	Next
+	
+	; Set initial tray icon
+	TraySetIcon($g_aTrayIcons[0], 0)
+	TraySetToolTip($g_sProgramTitle)
+	
+	; Create tray menu
+	$g_hTrayShowHide = TrayCreateItem("Show/Hide Memory Booster")
+	TrayItemSetOnEvent($g_hTrayShowHide, "_ToggleShowHide")
+	TrayCreateItem("")
+	$g_hTrayOptimize = TrayCreateItem("Optimize Memory Now")
+	TrayItemSetOnEvent($g_hTrayOptimize, "_OptimizeMemory")
+	TrayCreateItem("")
+	$g_hTrayExit = TrayCreateItem("Exit")
+	TrayItemSetOnEvent($g_hTrayExit, "_ShutdownProgram")
+	
+	TraySetState(1) ; Show tray icon
+
+EndFunc   ;==>_SetupTrayIcon
+
+
+Func _UpdateTrayIcon()
+
+	$g_aMemStats = MemGetStats()
+	Local $iIconIndex = Floor($g_aMemStats[$MEM_LOAD] / 10)
+	If $iIconIndex > 11 Then $iIconIndex = 11
+	
+	If @Compiled Then
+		TraySetIcon($g_aTrayIcons[$iIconIndex], -159 + $iIconIndex) ; Icon resource index
+	Else
+		TraySetIcon($g_aTrayIcons[$iIconIndex], 0)
+	EndIf
+	
+	TraySetToolTip($g_sProgramTitle & @CRLF & "Memory Usage: " & $g_aMemStats[$MEM_LOAD] & "%")
+
+EndFunc   ;==>_UpdateTrayIcon
+
+
+Func _MinimizeToTray()
+
+	GUISetState(@SW_HIDE, $g_hCoreGui)
+
+EndFunc   ;==>_MinimizeToTray
+
+
+Func _ToggleShowHide()
+
+	If BitAND(WinGetState($g_hCoreGui), 2) Then ; If visible
+		GUISetState(@SW_HIDE, $g_hCoreGui)
+	Else
+		GUISetState(@SW_SHOW, $g_hCoreGui)
+		WinActivate($g_hCoreGui)
+	EndIf
+
+EndFunc   ;==>_ToggleShowHide
 
 
 Func _ShowPreferencesDlg()
@@ -1463,26 +1543,30 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetState($g_hOCheckNotify, $g_iShowNotifications)
 	$g_hOCheckPlayEvents = GUICtrlCreateCheckbox(" Play sounds on program events", 35, 320, 360, 20)
 	GUICtrlSetState($g_hOCheckPlayEvents, $g_iPlaySounds)
-	$g_hOCheckPlayWarnings = GUICtrlCreateCheckbox(" Play warning every", 35, 345, 150, 20)
+	$g_hOCheckPlayWarnings = GUICtrlCreateCheckbox(" Play warning every", 35, 345, 140, 20)
 	GUICtrlSetState($g_hOCheckPlayWarnings, $g_iPlayWarnings)
-	$g_hOComboWarnEvery = GUICtrlCreateCombo("", 190, 344, 50, 20)
+	$g_hOComboWarnEvery = GUICtrlCreateCombo("", 180, 344, 50, 20)
 	GUICtrlSetData($g_hOComboWarnEvery, "1|3|5|10|15|30|60|120", String($g_iWarnEvery))
-	GUICtrlCreateLabel(" sec if memory load exceeds", 245, 347, 150, 20)
-	$g_hOComboWarnIf = GUICtrlCreateCombo("", 385, 369, 50, 20)
+	GUICtrlCreateLabel(" seconds", 235, 347, 60, 20)
+	GUICtrlCreateLabel("       if memory load exceeds", 35, 372, 180, 20)
+	$g_hOComboWarnIf = GUICtrlCreateCombo("", 220, 370, 50, 20)
 	GUICtrlSetData($g_hOComboWarnIf, "50|60|70|80|90|95", String($g_iWarnIfLoad))
-	GUICtrlCreateLabel("%", 400, 372, 20, 20)
+	GUICtrlCreateLabel("%", 275, 372, 20, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 	
 	; Set event handlers
 	GUICtrlSetOnEvent($g_hORADOptimMode[0], "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hORADOptimMode[1], "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hORADOptimMode[2], "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOComboAutSeconds, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckForceBehave, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckStartWindows, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckOnTop, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckNotify, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckPlayEvents, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckPlayWarnings, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOComboWarnEvery, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOComboWarnIf, "__CheckPreferenceChange")
 	
 	GUICtrlCreateTabItem("") ; end tabitem definition
 

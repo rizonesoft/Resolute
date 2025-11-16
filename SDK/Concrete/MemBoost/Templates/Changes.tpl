@@ -15,23 +15,35 @@ SDK Framework:
 - Added: ProgressBar.au3 include for visual feedback
 
 UI/UX:
-- Redesigned: Button layout with Optimize Memory and Preferences side by side
-- Added: Countdown timer display showing automatic optimization status
-- Enhanced: Modern button styling (green for Optimize, gray for Preferences)
+- Redesigned: Button layout with Optimize, Preferences, and Close buttons (standard Windows buttons)
+- Added: Close button that minimizes to system tray
+- Added: Countdown timer display showing automatic optimization status (OFF/AUTO/seconds)
+- Added: Complete system tray icon integration with dynamic memory indicators
+- Added: Tray menu with Show/Hide, Optimize, and Exit options
 - Fixed: Flickering issue during memory statistics updates
 - Improved: Visual feedback during memory optimization process
 - Optimized: Memory stats update frequency (2 seconds) to reduce flickering
+- Changed: Removed custom colored buttons, using standard Windows button style
 
 Core Features - Memory Optimization:
 - Implemented: Complete memory optimization engine
 - Added: Three optimization modes (Intelligent, Timer-based, Manual)
 - Added: Intelligent mode automatically optimizes when memory exceeds 90%
 - Added: Timer-based mode with configurable intervals (5-120 seconds)
+- Changed: Default mode is now automatic optimization every 60 seconds
 - Added: Countdown timer display with real-time updates
 - Added: Process working set clearing for all system processes
 - Added: Real-time progress tracking during optimization
 - Added: Automatic timer reset after optimization completion
 - Optimized: Performance with minimal CPU impact during optimization
+
+System Tray Integration:
+- Added: Complete system tray icon with dynamic memory usage indicators (12 icon states)
+- Added: Tray icon updates every 5 seconds reflecting current memory usage
+- Added: Tray tooltip showing program name and current memory percentage
+- Added: Tray menu with Show/Hide toggle, Optimize Now, and Exit options
+- Added: Minimize to tray functionality via Close button
+- Added: Double-click tray icon to show/hide main window
 
 Core Features - Force Behave:
 - Added: "Force malicious processes to behave" functionality
@@ -41,16 +53,19 @@ Core Features - Force Behave:
 Preferences and Configuration:
 - Added: Complete Optimization tab in Preferences dialog
 - Added: Memory optimization mode selection (Intelligent/Timer/Manual)
-- Added: Configurable automatic optimization interval
+- Added: Configurable automatic optimization interval (5-120 seconds)
 - Added: "Force malicious processes to behave" checkbox
 - Added: "Start Memory Booster when Windows starts" checkbox
 - Added: "Show Memory Booster always on top" checkbox
 - Added: "Show program notifications" checkbox
 - Added: "Play sounds on program events" checkbox
-- Added: "Play warning sounds" with configurable intervals
-- Added: Configurable warning memory load threshold
+- Added: "Play warning sounds" with configurable intervals (1-120 seconds)
+- Added: Configurable warning memory load threshold (50-95%)
+- Fixed: Preferences warning line layout now properly fits on two lines
+- Fixed: Save button now enables correctly when any setting is changed
+- Fixed: All combo boxes trigger preference change detection
 - Implemented: Real-time "Always on Top" toggle
-- Enhanced: All settings persist and load correctly
+- Enhanced: All settings persist and load correctly with proper defaults
 
 Language System:
 - Added: Localization support for optimization UI strings
