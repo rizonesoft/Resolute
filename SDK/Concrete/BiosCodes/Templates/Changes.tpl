@@ -31,6 +31,7 @@ SDK Language System Improvements:
 Version 11.3.1.1983 (NOVEMBER 20, 2024)
 --------------------------------------------------
 
+- Optimized: Language loading system with caching mechanism
 - Improved: String replacement efficiency in localization
 - Code refactoring and performance improvements
 - Added: German translation
