@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2321
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2323
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -562,10 +562,6 @@ Global $g_hProgressProcs[2]
 Global $bGraphColorChanged 		= False ; This will keep track of the graph color state
 Global $Graph1
 
-; Custom graph for WS_EX_COMPOSITED compatibility
-Global $g_hGraphBackground
-Global $g_aGraphData[500] ; Store last 500 data points
-Global $g_iGraphDataCount = 0
 
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
@@ -651,7 +647,7 @@ Func _StartCoreGui()
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
-	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX), $WS_EX_COMPOSITED)
+	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX))
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
@@ -710,15 +706,9 @@ Func _StartCoreGui()
 	GUICtrlSetFont($g_hSubHeading, 10)
 	GUICtrlSetColor($g_hSubHeading, 0x353535)
 
-	; Custom graph implementation for WS_EX_COMPOSITED compatibility
-	$g_hGraphBackground = GUICtrlCreateGraphic(133, 125, 420, 104)
-	GUICtrlSetBkColor($g_hGraphBackground, 0x0F1318)
-	GUICtrlSetState($g_hGraphBackground, $GUI_DISABLE) ; Make it non-interactive
-	
-	; Initialize graph data
-	For $i = 0 To 499
-		$g_aGraphData[$i] = 0
-	Next
+	$Graph1 = _SSLG_CreateGraph(133, 125, 420, 104, 0, 100, 500, 0x000F1318)
+	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
+	_SSLG_SetSmoothingMode($Graph1, 2)
 
 	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 245, $SS_ETCHEDFRAME)
 	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 241)
@@ -953,15 +943,7 @@ Func _UpdateMemoryStats()
         GUICtrlSetImage($g_hIconMemStats, @ScriptFullPath, $g_iMemStatIcoStart + $iIconIndex)
         GUICtrlSetData($g_hLabelRAMPerc, StringFormat("%d%", $g_aMemStats[$MEM_LOAD]))
 
-        ; If RAM usage is above 90% and the graph color hasn't been changed yet, change it
-        If $g_aMemStats[$MEM_LOAD] > 90 And Not $bGraphColorChanged Then
-            _SSLG_SetLine($Graph1, 0x00ED1C24, 1, 0x0077070B)
-            $bGraphColorChanged = True
-        ElseIf $g_aMemStats[$MEM_LOAD] <= 90 And $bGraphColorChanged Then
-            ; If RAM usage has dropped below 90% and the graph color was changed, reset it
-            _SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
-            $bGraphColorChanged = False
-        EndIf
+        ; Graph color change removed to reduce updates and flickering
 
 		$g_aMemBuffers[$MEM_LOAD] = $g_aMemStats[$MEM_LOAD]
 
@@ -990,48 +972,10 @@ Func _UpdateMemoryStats()
 		$g_aMemBuffers[$MEM_AVAILPAGEFILE] = $iPageFree
 	EndIf
 
-    _CustomGraph_AddSample($g_aMemStats[$MEM_LOAD])
+	_SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
+    _SSLG_UpdateGraph($Graph1, False, False)
 
 EndFunc   ;==>_UpdateMemoryStats
-
-
-Func _CustomGraph_AddSample($iValue)
-	; Shift all data left
-	For $i = 0 To 498
-		$g_aGraphData[$i] = $g_aGraphData[$i + 1]
-	Next
-	$g_aGraphData[499] = $iValue
-	$g_iGraphDataCount += 1
-	
-	; Redraw graph every update
-	_CustomGraph_Draw()
-EndFunc
-
-Func _CustomGraph_Draw()
-	; Clear previous drawing
-	GUICtrlDelete($g_hGraphBackground)
-	$g_hGraphBackground = GUICtrlCreateGraphic(133, 125, 420, 104)
-	GUICtrlSetBkColor($g_hGraphBackground, 0x0F1318)
-	GUICtrlSetState($g_hGraphBackground, $GUI_DISABLE)
-	
-	; Draw graph line
-	Local $iWidth = 420
-	Local $iHeight = 104
-	Local $iStep = $iWidth / 500
-	
-	; Draw lines connecting data points (0-498, connecting to next point)
-	For $i = 0 To 498
-		Local $x1 = Int($i * $iStep)
-		Local $x2 = Int(($i + 1) * $iStep)
-		Local $y1 = $iHeight - Int(($g_aGraphData[$i] / 100) * $iHeight)
-		Local $y2 = $iHeight - Int(($g_aGraphData[$i + 1] / 100) * $iHeight)
-		
-		; Draw line segment
-		GUICtrlSetGraphic($g_hGraphBackground, $GUI_GR_MOVE, $x1, $y1)
-		GUICtrlSetGraphic($g_hGraphBackground, $GUI_GR_LINE, $x2, $y2)
-		GUICtrlSetGraphic($g_hGraphBackground, $GUI_GR_COLOR, 0x13FF92)
-	Next
-EndFunc
 
 
 
