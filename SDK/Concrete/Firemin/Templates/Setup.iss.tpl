@@ -312,6 +312,21 @@ end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
+  // When leaving the install type page, set the appropriate default directory
+  if (CurPageID = wpSelectDir) and (InstallTypePage <> nil) then
+  begin
+    if GetInstallationType() then
+    begin
+      // Portable installation: Default to root of system drive (e.g., C:\Firemin)
+      WizardForm.DirEdit.Text := ExpandConstant('{sd}\{#app_name}');
+    end
+    else
+    begin
+      // Normal installation: Default to Program Files
+      WizardForm.DirEdit.Text := ExpandConstant('{autopf}\{#app_publisher}\{#app_name}');
+    end;
+  end;
+  
   if CurPageID = wpFinished then
     WizardForm.NextButton.Caption := SetupMessage(msgButtonFinish);
 end;
