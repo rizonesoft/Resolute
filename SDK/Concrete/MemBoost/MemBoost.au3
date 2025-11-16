@@ -1439,17 +1439,17 @@ Func _SetupTrayIcon()
 	Opt("TrayMenuMode", 3) ; No default items
 	Opt("TrayOnEventMode", 1)
 	
-	; Load tray icons
+	; Load tray icons (for development mode only)
 	For $i = 0 To 11
-		If @Compiled Then
-			$g_aTrayIcons[$i] = @ScriptFullPath
-		Else
-			$g_aTrayIcons[$i] = "..\..\..\SDK\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
-		EndIf
+		$g_aTrayIcons[$i] = "..\..\..\SDK\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
 	Next
 	
-	; Set initial tray icon
-	TraySetIcon($g_aTrayIcons[0], 0)
+	; Set initial tray icon (0% = icon 0 = resource -303)
+	If @Compiled Then
+		TraySetIcon(@ScriptFullPath, -303)
+	Else
+		TraySetIcon($g_aTrayIcons[0])
+	EndIf
 	TraySetToolTip($g_sProgramTitle)
 	
 	; Create tray menu
