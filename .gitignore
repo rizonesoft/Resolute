@@ -1,0 +1,38 @@
+# Build artifacts and distribution folders
+SDK/Concrete/*/Distribution/
+
+# Compiled executables in main Resolute folder
+Resolute/*.exe
+
+# Log files
+*.log
+Resolute/Logging/
+
+# Temporary and cache files
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+
+# AutoIt compiled files
+*.a3x
+
+# Installer executables
+*_Setup.exe
+*_Setup.iss
+
+# Zip packages
+SDK/Concrete/*/*.zip
+SDK/Concrete/*/Distribution/*/*.zip
+
+# Windows thumbnail cache
+ehthumbs.db
+Desktop.ini
