@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2333
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2334
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -1472,25 +1472,26 @@ Func _UpdateTrayIcon()
 	$g_aMemStats = MemGetStats()
 	Local $iMemLoad = $g_aMemStats[$MEM_LOAD]
 	
-	; Calculate icon index - old version formula: $OneDig = Floor($iMemLoad / 10)
-	; Then resource was: (-1 * ($OneDig + 6))
-	; Which means: 0% = -6, 10% = -7, 20% = -8, etc.
-	; Our resources start at -303, so we need: -303 = icon for 0-9%
-	Local $iOneDig = Floor($iMemLoad / 10)
+	; OLD VERSION EXACT FORMULA: Local $OneDig = StringLeft($MemInfo[0], 1)
+	; Gets first digit: 0-9% = "0", 10-19% = "1", 20-29% = "2", ..., 100% = "1"
+	; Then: TraySetIcon(@ScriptFullPath, (-1 * ($OneDig + 6)))
+	; So: 0-9% → -6, 10-19% → -7, 20-29% → -8, ..., 90-99% → -15, 100% → -7 (wraps)
+	; New resources: -303 to -314 (12 icons for 0-100%)
+	; Mapping: 0-9%=-303, 10-19%=-304, 20-29%=-305, ..., 100%=-313
+	Local $iOneDig = Int(StringLeft(String($iMemLoad), 1))
+	
+	; Cap at 10 for 100% (shows icon 10), but we have 12 icons (0-11)
+	If $iMemLoad = 100 Then $iOneDig = 10
 	If $iOneDig > 11 Then $iOneDig = 11
 	
 	If @Compiled Then
-		; Old formula: TraySetIcon(@ScriptFullPath, (-1 * ($OneDig + 6)))
-		; New resources at -303 to -314, so adjust: -303 corresponds to old -6
-		; Mapping: old -6 = new -303, old -7 = new -304, etc.
-		; Formula: -303 - $iOneDig (where $iOneDig is 0-11)
-		TraySetIcon(@ScriptFullPath, (-303 - $iOneDig))
+		; Convert from old resource numbering to new: old -6 = new -303
+		TraySetIcon(@ScriptFullPath, -303 - $iOneDig)
 	Else
-		; Development: use file
 		TraySetIcon($g_aTrayIcons[$iOneDig])
 	EndIf
 	
-	; Old tooltip: $APPSET_TITLE & " " & $APPSET_VERSION & @CRLF & "---..." & @CRLF & "Memory Usage: " & $MemInfo[0] & "%"
+	; Tooltip exactly as old version
 	TraySetToolTip($g_sProgramTitle & @CRLF & _
 					"----------------------------------------" & @CRLF & _
 					"Memory Usage: " & $iMemLoad & "%")
