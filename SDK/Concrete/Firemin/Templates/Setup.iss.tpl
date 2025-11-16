@@ -426,59 +426,45 @@ var
   DonateLabel1: TNewStaticText;
   DonateLabel2: TNewStaticText;
   DonateLabel3: TNewStaticText;
-  DonateLabel4: TNewStaticText;
 begin
-  DonatePage := CreateCustomPage(wpInfoAfter, 'Support Free Software', 'Help Keep {#app_name} Free and Ad-Free');
+  DonatePage := CreateCustomPage(wpInfoAfter, 'Support Free Software', 'Help Keep Rizonesoft Tools Free Forever');
 
-  // Compelling donation message
+  // Main message
   DonateLabel1 := TNewStaticText.Create(DonatePage);
   DonateLabel1.Parent := DonatePage.Surface;
   DonateLabel1.Caption := 
-    'Did {#app_name} help optimize your browser?' + #13#10 + 
-    'Free up memory and make browsing faster?';
+    'This software is completely FREE with no ads, no tracking, and no premium versions.' + #13#10 +
+    'If you find it useful, please consider supporting our work.';
   DonateLabel1.Left := 0;
-  DonateLabel1.Top := 0;
+  DonateLabel1.Top := ScaleY(8);
   DonateLabel1.Width := DonatePage.SurfaceWidth;
   DonateLabel1.Height := ScaleY(32);
-  DonateLabel1.Font.Size := 10;
-  DonateLabel1.Font.Style := [fsBold];
-  DonateLabel1.Font.Color := clNavy;
+  DonateLabel1.Font.Size := 9;
 
+  // Support impact paragraph
   DonateLabel2 := TNewStaticText.Create(DonatePage);
   DonateLabel2.Parent := DonatePage.Surface;
   DonateLabel2.Caption := 
-    '{#app_name} is completely FREE, with no ads, no tracking, and no premium versions.' + #13#10 +
-    'It''s built by passionate developers who believe great software should be accessible' + #13#10 +
-    'to everyone.';
+    'Your support helps us keep all Rizonesoft tools free forever, add new features ' +
+    'and improvements, provide timely updates and support, and develop more amazing ' +
+    'free tools for everyone.';
   DonateLabel2.Left := 0;
-  DonateLabel2.Top := DonateLabel1.Top + DonateLabel1.Height + ScaleY(16);
+  DonateLabel2.Top := DonateLabel1.Top + DonateLabel1.Height + ScaleY(12);
   DonateLabel2.Width := DonatePage.SurfaceWidth;
   DonateLabel2.Height := ScaleY(48);
+  DonateLabel2.Font.Size := 9;
 
+  // Call to action
   DonateLabel3 := TNewStaticText.Create(DonatePage);
   DonateLabel3.Parent := DonatePage.Surface;
   DonateLabel3.Caption := 
-    'Your support helps us:' + #13#10 +
-    '  • Keep all Rizonesoft tools free forever' + #13#10 +
-    '  • Add new features and improvements' + #13#10 +
-    '  • Provide timely updates and support' + #13#10 +
-    '  • Develop more amazing free tools';
+    'Even a small donation makes a difference. Click below to support development:';
   DonateLabel3.Left := 0;
-  DonateLabel3.Top := DonateLabel2.Top + DonateLabel2.Height + ScaleY(16);
+  DonateLabel3.Top := DonateLabel2.Top + DonateLabel2.Height + ScaleY(12);
   DonateLabel3.Width := DonatePage.SurfaceWidth;
-  DonateLabel3.Height := ScaleY(80);
-
-  DonateLabel4 := TNewStaticText.Create(DonatePage);
-  DonateLabel4.Parent := DonatePage.Surface;
-  DonateLabel4.Caption := 
-    'Even a small donation makes a huge difference!' + #13#10 +
-    'Click the button below to support development:';
-  DonateLabel4.Left := 0;
-  DonateLabel4.Top := DonateLabel3.Top + DonateLabel3.Height + ScaleY(16);
-  DonateLabel4.Width := DonatePage.SurfaceWidth;
-  DonateLabel4.Height := ScaleY(32);
-  DonateLabel4.Font.Size := 9;
-  DonateLabel4.Font.Style := [fsBold];
+  DonateLabel3.Height := ScaleY(20);
+  DonateLabel3.Font.Size := 9;
+  DonateLabel3.Font.Style := [fsBold];
 
   // PayPal donation button
   PayPalButton := TBitmapImage.Create(DonatePage);
@@ -495,7 +481,7 @@ begin
   PayPalButton.Stretch := False;
   
   // Center the button after AutoSize sets its dimensions
-  PayPalButton.Top := DonateLabel4.Top + DonateLabel4.Height + ScaleY(16);
+  PayPalButton.Top := DonateLabel3.Top + DonateLabel3.Height + ScaleY(16);
   PayPalButton.Left := (DonatePage.SurfaceWidth - PayPalButton.Width) div 2;
 end;
 
