@@ -562,6 +562,11 @@ Global $g_hProgressProcs[2]
 Global $bGraphColorChanged 		= False ; This will keep track of the graph color state
 Global $Graph1
 
+; Custom graph for WS_EX_COMPOSITED compatibility
+Global $g_hGraphBackground
+Global $g_aGraphData[500] ; Store last 500 data points
+Global $g_iGraphDataCount = 0
+
 _Localization_Messages()   		;~ Load Message Language Strings
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 	MsgBox($MB_SYSTEMMODAL + $MB_ICONINFORMATION, $g_aLangMessages[3], $g_aLangMessages[4], $g_iMsgBoxTimeOut)
@@ -705,12 +710,15 @@ Func _StartCoreGui()
 	GUICtrlSetFont($g_hSubHeading, 10)
 	GUICtrlSetColor($g_hSubHeading, 0x353535)
 
-	$Graph1 = _SSLG_CreateGraph(133, 125, 420, 104, 0, 100, 500, 0x000F1318)
-	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
-	_SSLG_SetSmoothingMode($Graph1, 2)
-	; Initial update to display graph with WS_EX_COMPOSITED
-	_SSLG_AddSample($Graph1, 0)
-	_SSLG_UpdateGraph($Graph1, False, False)
+	; Custom graph implementation for WS_EX_COMPOSITED compatibility
+	$g_hGraphBackground = GUICtrlCreateGraphic(133, 125, 420, 104)
+	GUICtrlSetBkColor($g_hGraphBackground, 0x0F1318)
+	GUICtrlSetState($g_hGraphBackground, $GUI_DISABLE) ; Make it non-interactive
+	
+	; Initialize graph data
+	For $i = 0 To 499
+		$g_aGraphData[$i] = 0
+	Next
 
 	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 245, $SS_ETCHEDFRAME)
 	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 241)
@@ -982,12 +990,49 @@ Func _UpdateMemoryStats()
 		$g_aMemBuffers[$MEM_AVAILPAGEFILE] = $iPageFree
 	EndIf
 
-    _SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
-    _SSLG_UpdateGraph($Graph1, False, False) ; Changed last param to False to reduce flickering
+    _CustomGraph_AddSample($g_aMemStats[$MEM_LOAD])
+    _CustomGraph_UpdateGraph(False, False) ; Changed last param to False to reduce flickering
 
 EndFunc   ;==>_UpdateMemoryStats
 
 
+Func _CustomGraph_AddSample($iValue)
+	; Shift all data left
+	For $i = 0 To 498
+		$g_aGraphData[$i] = $g_aGraphData[$i + 1]
+	Next
+	$g_aGraphData[499] = $iValue
+	$g_iGraphDataCount += 1
+	
+	; Redraw graph every update
+	_CustomGraph_Draw()
+EndFunc
+
+Func _CustomGraph_Draw()
+	; Clear previous drawing
+	GUICtrlDelete($g_hGraphBackground)
+	$g_hGraphBackground = GUICtrlCreateGraphic(133, 125, 420, 104)
+	GUICtrlSetBkColor($g_hGraphBackground, 0x0F1318)
+	GUICtrlSetState($g_hGraphBackground, $GUI_DISABLE)
+	
+	; Draw graph line
+	Local $iWidth = 420
+	Local $iHeight = 104
+	Local $iStep = $iWidth / 500
+	
+	; Draw lines connecting data points
+	For $i = 1 To 499
+		Local $x1 = Int($i * $iStep)
+		Local $x2 = Int(($i + 1) * $iStep)
+		Local $y1 = $iHeight - Int(($g_aGraphData[$i] / 100) * $iHeight)
+		Local $y2 = $iHeight - Int(($g_aGraphData[$i + 1] / 100) * $iHeight)
+		
+		; Draw line segment
+		GUICtrlSetGraphic($g_hGraphBackground, $GUI_GR_MOVE, $x1, $y1)
+		GUICtrlSetGraphic($g_hGraphBackground, $GUI_GR_LINE, $x2, $y2)
+		GUICtrlSetGraphic($g_hGraphBackground, $GUI_GR_COLOR, 0x13FF92)
+	Next
+EndFunc
 
 
 
