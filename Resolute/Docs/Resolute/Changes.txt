@@ -3,8 +3,13 @@ RIZONESOFT RESOLUTE CHANGES
 ==================================================
 
 --------------------------------------------------
-Version 11.0.0.0 (NOVEMBER 16, 2025)
+Version 23.2.0.856 (NOVEMBER 16, 2025)
 --------------------------------------------------
+
+Build System:
+- Enhanced: Distro with improved solution management and build pipeline
+- Improved: Template-based documentation generation system
+- Documented: Distro build environment in Resolute documentation
 
 Browser Variants:
 - Added: Chromin - Chrome browser memory optimizer
@@ -39,11 +44,9 @@ URL Standardization:
 
 Documentation:
 - Updated: Changes.tpl templates for all programs with SDK improvements
-- Added: Windsurf workflows and documentation for Resolute framework
 - Maintained: Version placeholders for unreleased changes
 
 Programs Updated:
 - BiosCodes, ComIntRep, DVDRepair, Firemin, MemBoost, Ownership
 - PixRepair, ReBar, Rescue, USBRepair, Chromin, Edgemin, Watermin
-
 ==================================================
