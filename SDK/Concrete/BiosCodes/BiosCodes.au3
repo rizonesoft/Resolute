@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Beep Codes Viewer					;~ Comment field
 #AutoIt3Wrapper_Res_Description=Beep Codes Viewer				;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.3.1.1993
+#AutoIt3Wrapper_Res_Fileversion=11.3.1.1994
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=Y				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -71,89 +71,89 @@
 ; Add files to the resources - can be compressed
 ; #AutoIt3Wrapper_Res_Remove=
 ; Remove resources
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\BiosCodesH.ico						; 201
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\BiosCodesH.ico						; 201
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\logging\Information.ico			; 202
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\logging\Complete.ico				; 203
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\logging\Cross.ico			 		; 204
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\logging\Exclamation.ico			; 205
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\logging\Smiley-Glass.ico			; 206
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\logging\Skull.ico					; 207
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\logging\Snowman.ico				; 208
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Information.ico			; 202
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Complete.ico				; 203
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Cross.ico			 		; 204
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Exclamation.ico			; 205
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Smiley-Glass.ico			; 206
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Skull.ico					; 207
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\logging\Snowman.ico				; 208
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Update.ico							; 209
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Error.ico							; 210
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Update.ico							; 209
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Error.ico							; 210
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Dialogs\Check.ico					; 211
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Dialogs\Error.ico					; 212
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Dialogs\Gear.ico					; 213
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Dialogs\Information.ico			; 214
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Dialogs\Love.ico					; 215
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Check.ico					; 211
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Error.ico					; 212
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Gear.ico					; 213
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Information.ico			; 214
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Dialogs\Love.ico					; 215
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\PayPal.ico						; 216
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\PayPalH.ico						; 217
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\sa.ico							; 218
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\saH.ico							; 219
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\Facebook.ico						; 220
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\FacebookH.ico					; 221
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\GitHub.ico						; 222
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\About\GitHubH.ico	 					; 223
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPal.ico						; 216
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\PayPalH.ico						; 217
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\sa.ico							; 218
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\saH.ico							; 219
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\Facebook.ico						; 220
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\FacebookH.ico					; 221
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHub.ico						; 222
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\About\GitHubH.ico	 					; 223
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\en.ico							; 224
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\af.ico							; 225
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\ar.ico							; 226
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\bg.ico							; 227
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\cs.ico							; 228
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\da.ico							; 229
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\de.ico							; 230
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\el.ico							; 231
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\es.ico							; 232
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\fr.ico							; 233
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\hi.ico							; 234
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\hr.ico							; 235
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\hu.ico							; 236
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\id.ico							; 237
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\ir.ico							; 238
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\is.ico							; 239
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\it.ico							; 240
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\iw.ico							; 241
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\ja.ico							; 242
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\ko.ico							; 243
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\nl.ico							; 244
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\no.ico							; 245
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\pl.ico							; 246
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\pt.ico							; 247
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\pt-BR.ico						; 248
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\ro.ico							; 249
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\ru.ico							; 250
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\sl.ico							; 251
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\sk.ico							; 252
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\sv.ico							; 253
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\th.ico							; 254
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\tr.ico							; 255
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\vi.ico							; 256
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\zh-CN.ico						; 257
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Flags\zh-TW.ico						; 258
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\en.ico							; 224
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\af.ico							; 225
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ar.ico							; 226
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\bg.ico							; 227
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\cs.ico							; 228
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\da.ico							; 229
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\de.ico							; 230
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\el.ico							; 231
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\es.ico							; 232
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\fr.ico							; 233
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hi.ico							; 234
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hr.ico							; 235
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\hu.ico							; 236
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\id.ico							; 237
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ir.ico							; 238
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\is.ico							; 239
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\it.ico							; 240
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\iw.ico							; 241
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ja.ico							; 242
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ko.ico							; 243
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\nl.ico							; 244
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\no.ico							; 245
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pl.ico							; 246
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt.ico							; 247
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\pt-BR.ico						; 248
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ro.ico							; 249
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\ru.ico							; 250
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sl.ico							; 251
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sk.ico							; 252
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\sv.ico							; 253
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\th.ico							; 254
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\tr.ico							; 255
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\vi.ico							; 256
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-CN.ico						; 257
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Flags\zh-TW.ico						; 258
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Power\Power-0.ico						; 259
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Power\Power-1.ico						; 260
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Power\Power-2.ico						; 261
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Power\Power-3.ico						; 262
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Power\Power-4.ico						; 263
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Power\Power-5.ico						; 264
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-0.ico						; 259
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-1.ico						; 260
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-2.ico						; 261
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-3.ico						; 262
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-4.ico						; 263
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Power\Power-5.ico						; 264
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\Gear.ico							; 265
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\Logbook.ico						; 266
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\Close.ico						; 267
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\Update.ico						; 268
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\Home.ico							; 269
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\Support.ico						; 270
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\GitHub.ico						; 271
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\Menus\About.ico						; 272
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Gear.ico							; 265
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Logbook.ico						; 266
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Close.ico						; 267
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Update.ico						; 268
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Home.ico							; 269
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Support.ico						; 270
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\GitHub.ico						; 271
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\About.ico						; 272
 
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\List\Info.ico						; 273
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\List\No.ico						; 274
-#AutoIt3Wrapper_Res_Icon_Add=Resources\Icons\List\Yes.ico						; 275
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\List\Info.ico						; 273
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\List\No.ico						; 274
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\List\Yes.ico						; 275
 
 ;===============================================================================================================
 ; Tidy Settings

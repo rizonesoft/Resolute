@@ -13,7 +13,11 @@ SDK Framework:
 - Migrated: To use shared SDK includes structure
 - Removed: Duplicate include files (now uses SDK/Includes/)
 - Fixed: Localization.au3 duplicate function declarations
+- Fixed: Icon resource paths to use SDK structure
 - Enhanced: Code organization and maintainability
+
+Localization:
+- Added: German translation (de.ini)
 
 --------------------------------------------------
 Version 11.3.1.1983 (NOVEMBER 20, 2024)
