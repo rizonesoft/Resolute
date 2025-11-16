@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2313
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2315
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -812,7 +812,7 @@ Func _StartCoreGui()
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 	GUICtrlCreateGraphic(127, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelProcs = GUICtrlCreateLabel("350", 131, 285, 80, 16)
+	$g_hLabelProcs = GUICtrlCreateLabel("0", 131, 285, 80, 16)
 	GUICtrlSetBkColor($g_hLabelProcs, 0x0F1318)
 	GuiCTrlSetColor($g_hLabelProcs, 0xFF8000)
 
@@ -823,7 +823,7 @@ Func _StartCoreGui()
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 	GUICtrlCreateGraphic(301, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelCount = GUICtrlCreateLabel("00.0 GB", 305, 285, 80, 16)
+	$g_hLabelCount = GUICtrlCreateLabel("0", 305, 285, 80, 16)
 	GUICtrlSetBkColor($g_hLabelCount, 0x0F1318)
 	GuiCTrlSetColor($g_hLabelCount, 0xFF8000)
 
@@ -909,6 +909,10 @@ Func _UpdateMemoryStatsFirst()
 
 	GUICtrlSetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iTotalRAM))
 	GUICtrlSetData($g_hLabelPageTotal, StringFormat("%.1f GB", $iTotalPage))
+	
+	; Update process count
+	Local $aProcessList = ProcessList()
+	GUICtrlSetData($g_hLabelProcs, String($aProcessList[0][0]))
 
 EndFunc
 
@@ -958,6 +962,10 @@ Func _UpdateMemoryStats()
         GUICtrlSetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree))
         $g_aMemBuffers[$MEM_AVAILPHYSRAM] = $iRAMFree
     EndIf
+	
+	; Update process count
+	Local $aProcessList = ProcessList()
+	GUICtrlSetData($g_hLabelProcs, String($aProcessList[0][0]))
 
 	If $g_aPageBuffers[0] <> $iPagePerc Then
 		GUICtrlSetData($g_hLabelPagePerc, StringFormat("%d%", $iPagePerc))
@@ -972,7 +980,7 @@ Func _UpdateMemoryStats()
 	EndIf
 
     _SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
-    _SSLG_UpdateGraph($Graph1, False, True)
+    _SSLG_UpdateGraph($Graph1, False, False) ; Changed last param to False to reduce flickering
 
 EndFunc   ;==>_UpdateMemoryStats
 
