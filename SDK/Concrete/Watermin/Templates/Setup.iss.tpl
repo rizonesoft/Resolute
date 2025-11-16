@@ -150,6 +150,7 @@ Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_short
 Source: {#distrodir}\{#app_shortname}_X64.exe; DestDir: {app}; DestName: {#app_shortname}_X64.exe; Flags: ignoreversion; Check: GetInstallationType()
 Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_shortname}.exe; Flags: ignoreversion; Check: GetInstallationType()
 %{FILES_SECTION}
+Source: ..\..\..\..\Resources\Setup\PayPal.bmp; Flags: dontcopy
 
 [Dirs]
 
@@ -228,8 +229,10 @@ Type: dirifempty; Name: {app}
 [Code]
 var
     InstallTypePage: TWizardPage;
+    DonatePage: TWizardPage;
     NormalInstallRadio: TRadioButton;
     PortableInstallRadio: TRadioButton;
+    PayPalButton: TBitmapImage;
     BuildNumber: String;
     ResetSettings: Boolean;
 
@@ -309,6 +312,21 @@ end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
+  // When leaving the install type page, set the appropriate default directory
+  if (CurPageID = wpSelectDir) and (InstallTypePage <> nil) then
+  begin
+    if GetInstallationType() then
+    begin
+      // Portable installation: Default to root of system drive (e.g., C:\Watermin)
+      WizardForm.DirEdit.Text := ExpandConstant('{sd}\{#app_name}');
+    end
+    else
+    begin
+      // Normal installation: Default to Program Files
+      WizardForm.DirEdit.Text := ExpandConstant('{autopf}\{#app_publisher}\{#app_name}');
+    end;
+  end;
+  
   if CurPageID = wpFinished then
     WizardForm.NextButton.Caption := SetupMessage(msgButtonFinish);
 end;
@@ -411,6 +429,81 @@ begin
   end;
 end;
 
+procedure PayPalButtonClick(Sender: TObject);
+var
+  ErrorCode: Integer;
+begin
+  ShellExec('', 'https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE', '', '', SW_SHOW, ewNoWait, ErrorCode);
+end;
+
+procedure CreateDonatePage();
+var
+  DonateLabel1: TNewStaticText;
+  DonateLabel2: TNewStaticText;
+  DonateLabel3: TNewStaticText;
+begin
+  DonatePage := CreateCustomPage(wpInfoAfter, 'Support Free Software', 'Help Keep Rizonesoft Tools Free Forever');
+
+  // Main message
+  DonateLabel1 := TNewStaticText.Create(DonatePage);
+  DonateLabel1.Parent := DonatePage.Surface;
+  DonateLabel1.Caption := 
+    'This software is completely FREE with no ads, no tracking, and no premium versions.' + #13#10 +
+    'If you find it useful, please consider supporting our work.';
+  DonateLabel1.Left := 0;
+  DonateLabel1.Top := ScaleY(8);
+  DonateLabel1.Width := DonatePage.SurfaceWidth;
+  DonateLabel1.Height := ScaleY(32);
+  DonateLabel1.Font.Size := 9;
+  DonateLabel1.WordWrap := True;
+  DonateLabel1.AutoSize := True;
+
+  // Support impact paragraph
+  DonateLabel2 := TNewStaticText.Create(DonatePage);
+  DonateLabel2.Parent := DonatePage.Surface;
+  DonateLabel2.Caption := 
+    'Your support helps us keep all Rizonesoft tools free forever, add new features ' +
+    'and improvements, provide timely updates and support, and develop more amazing ' +
+    'free tools for everyone.';
+  DonateLabel2.Left := 0;
+  DonateLabel2.Top := DonateLabel1.Top + DonateLabel1.Height + ScaleY(12);
+  DonateLabel2.Width := DonatePage.SurfaceWidth;
+  DonateLabel2.Font.Size := 9;
+  DonateLabel2.WordWrap := True;
+  DonateLabel2.AutoSize := True;
+
+  // Call to action
+  DonateLabel3 := TNewStaticText.Create(DonatePage);
+  DonateLabel3.Parent := DonatePage.Surface;
+  DonateLabel3.Caption := 
+    'Even a small donation makes a difference. Click below to support development:';
+  DonateLabel3.Left := 0;
+  DonateLabel3.Top := DonateLabel2.Top + DonateLabel2.Height + ScaleY(12);
+  DonateLabel3.Width := DonatePage.SurfaceWidth;
+  DonateLabel3.Font.Size := 9;
+  DonateLabel3.Font.Style := [fsBold];
+  DonateLabel3.WordWrap := True;
+  DonateLabel3.AutoSize := True;
+
+  // PayPal donation button
+  PayPalButton := TBitmapImage.Create(DonatePage);
+  PayPalButton.Parent := DonatePage.Surface;
+  PayPalButton.Cursor := crHand;
+  PayPalButton.OnClick := @PayPalButtonClick;
+  
+  // Extract and load the PayPal button image
+  ExtractTemporaryFile('PayPal.bmp');
+  PayPalButton.Bitmap.LoadFromFile(ExpandConstant('{tmp}\PayPal.bmp'));
+  
+  // Use AutoSize for best quality across all DPI settings
+  PayPalButton.AutoSize := True;
+  PayPalButton.Stretch := False;
+  
+  // Center the button after AutoSize sets its dimensions
+  PayPalButton.Top := DonateLabel3.Top + DonateLabel3.Height + ScaleY(16);
+  PayPalButton.Left := (DonatePage.SurfaceWidth - PayPalButton.Width) div 2;
+end;
+
 procedure CreateInstallTypePage();
 begin
     InstallTypePage := CreateCustomPage(wpWelcome, CustomMessage('msg_InstallationType'), CustomMessage('msg_SelectInstallType'));
@@ -468,6 +561,9 @@ begin
     
     // Create installation type page
     CreateInstallTypePage();
+    
+    // Create donation page
+    CreateDonatePage();
     
     With WizardForm do
     begin
