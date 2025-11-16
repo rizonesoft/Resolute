@@ -428,7 +428,7 @@ var
   DonateLabel3: TNewStaticText;
   DonateLabel4: TNewStaticText;
 begin
-  DonatePage := CreateCustomPage(wpFinished, 'Support Free Software', 'Help Keep {#app_name} Free and Ad-Free');
+  DonatePage := CreateCustomPage(wpInfoAfter, 'Support Free Software', 'Help Keep {#app_name} Free and Ad-Free');
 
   // Compelling donation message
   DonateLabel1 := TNewStaticText.Create(DonatePage);
