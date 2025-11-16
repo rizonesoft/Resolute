@@ -440,6 +440,8 @@ begin
   DonateLabel1.Width := DonatePage.SurfaceWidth;
   DonateLabel1.Height := ScaleY(32);
   DonateLabel1.Font.Size := 9;
+  DonateLabel1.WordWrap := True;
+  DonateLabel1.AutoSize := True;
 
   // Support impact paragraph
   DonateLabel2 := TNewStaticText.Create(DonatePage);
@@ -451,8 +453,9 @@ begin
   DonateLabel2.Left := 0;
   DonateLabel2.Top := DonateLabel1.Top + DonateLabel1.Height + ScaleY(12);
   DonateLabel2.Width := DonatePage.SurfaceWidth;
-  DonateLabel2.Height := ScaleY(48);
   DonateLabel2.Font.Size := 9;
+  DonateLabel2.WordWrap := True;
+  DonateLabel2.AutoSize := True;
 
   // Call to action
   DonateLabel3 := TNewStaticText.Create(DonatePage);
@@ -462,9 +465,10 @@ begin
   DonateLabel3.Left := 0;
   DonateLabel3.Top := DonateLabel2.Top + DonateLabel2.Height + ScaleY(12);
   DonateLabel3.Width := DonatePage.SurfaceWidth;
-  DonateLabel3.Height := ScaleY(20);
   DonateLabel3.Font.Size := 9;
   DonateLabel3.Font.Style := [fsBold];
+  DonateLabel3.WordWrap := True;
+  DonateLabel3.AutoSize := True;
 
   // PayPal donation button
   PayPalButton := TBitmapImage.Create(DonatePage);
