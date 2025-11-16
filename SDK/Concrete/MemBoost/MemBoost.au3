@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2319
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2320
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -646,7 +646,7 @@ Func _StartCoreGui()
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout
 	Local $hHeading
 
-	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX))
+	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX), $WS_EX_COMPOSITED)
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
@@ -708,6 +708,9 @@ Func _StartCoreGui()
 	$Graph1 = _SSLG_CreateGraph(133, 125, 420, 104, 0, 100, 500, 0x000F1318)
 	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
 	_SSLG_SetSmoothingMode($Graph1, 2)
+	; Initial update to display graph with WS_EX_COMPOSITED
+	_SSLG_AddSample($Graph1, 0)
+	_SSLG_UpdateGraph($Graph1, False, False)
 
 	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 245, $SS_ETCHEDFRAME)
 	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 241)
