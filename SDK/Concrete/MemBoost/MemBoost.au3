@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2311
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2312
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -635,7 +635,6 @@ Func _StartCoreGui()
 	$g_hCoreGui = GUICreate($g_sProgramTitle, $g_iCoreGuiWidth, $g_iCoreGuiHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUP, $WS_SYSMENU, $WS_MINIMIZEBOX))
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
-	GUISetBkColor(0x1A1D23, $g_hCoreGui) ; Set background color to prevent flickering
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
 
 	$g_hMenuFile = GUICtrlCreateMenu($g_aLangMenus[0])
@@ -1293,6 +1292,7 @@ Func _OptimizeMemory()
 	GUICtrlSetData($g_hSubHeading, $g_aLangCustom[2])
 
 	; Loop through all processes and clear working set
+	Local $iLastProgress = -1
 	For $i = 1 To $iTotalProcs
 		_WinAPI_EmptyWorkingSet($aProcsList[$i][1])
 
@@ -1304,10 +1304,13 @@ Func _OptimizeMemory()
 			EndIf
 		EndIf
 
-		; Update progress on process counter bar
-		Local $iProgress = ($i / $iTotalProcs) * 100
-		GUICtrlSetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress))
-		_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, $iProgress)
+		; Update progress on process counter bar (only when percentage changes)
+		Local $iProgress = Floor(($i / $iTotalProcs) * 100)
+		If $iProgress <> $iLastProgress Then
+			GUICtrlSetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress))
+			_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, $iProgress)
+			$iLastProgress = $iProgress
+		EndIf
 
 		Sleep(1) ; Small delay to prevent CPU spike
 	Next
@@ -1454,16 +1457,23 @@ EndFunc   ;==>_SetupTrayIcon
 Func _UpdateTrayIcon()
 
 	$g_aMemStats = MemGetStats()
-	Local $iIconIndex = Floor($g_aMemStats[$MEM_LOAD] / 10)
+	Local $iMemLoad = $g_aMemStats[$MEM_LOAD]
+	
+	; Calculate icon index based on memory usage (0-11 for 0-100%)
+	Local $iIconIndex = Floor($iMemLoad / 9)
 	If $iIconIndex > 11 Then $iIconIndex = 11
+	If $iIconIndex < 0 Then $iIconIndex = 0
 	
 	If @Compiled Then
-		TraySetIcon($g_aTrayIcons[$iIconIndex], -159 + $iIconIndex) ; Icon resource index
+		; Use embedded tray icon resource (-159 to -170 for icons 0-11)
+		TraySetIcon(@ScriptFullPath, -159 - $iIconIndex)
 	Else
+		; Use external icon file for development
 		TraySetIcon($g_aTrayIcons[$iIconIndex], 0)
 	EndIf
 	
-	TraySetToolTip($g_sProgramTitle & @CRLF & "Memory Usage: " & $g_aMemStats[$MEM_LOAD] & "%")
+	; Tooltip format: Program Name - Memory: XX%
+	TraySetToolTip($g_sProgName & " - Memory: " & $iMemLoad & "%")
 
 EndFunc   ;==>_UpdateTrayIcon
 
