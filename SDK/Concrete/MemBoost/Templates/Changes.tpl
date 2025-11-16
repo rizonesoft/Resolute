@@ -15,19 +15,42 @@ SDK Framework:
 - Added: ProgressBar.au3 include for visual feedback
 
 UI/UX:
-- Added: Full memory optimization button with modern dark theme styling
-- Added: Real-time optimization progress visualization
-- Added: Optimization count tracking and display
-- Enhanced: Status messages with localized strings
+- Redesigned: Button layout with Optimize Memory and Preferences side by side
+- Added: Countdown timer display showing automatic optimization status
+- Enhanced: Modern button styling (green for Optimize, gray for Preferences)
+- Fixed: Flickering issue during memory statistics updates
 - Improved: Visual feedback during memory optimization process
+- Optimized: Memory stats update frequency (2 seconds) to reduce flickering
 
-Core Features:
+Core Features - Memory Optimization:
 - Implemented: Complete memory optimization engine
+- Added: Three optimization modes (Intelligent, Timer-based, Manual)
+- Added: Intelligent mode automatically optimizes when memory exceeds 90%
+- Added: Timer-based mode with configurable intervals (5-120 seconds)
+- Added: Countdown timer display with real-time updates
 - Added: Process working set clearing for all system processes
 - Added: Real-time progress tracking during optimization
-- Added: Visual progress bar with percentage display
-- Enhanced: Memory statistics display integration
+- Added: Automatic timer reset after optimization completion
 - Optimized: Performance with minimal CPU impact during optimization
+
+Core Features - Force Behave:
+- Added: "Force malicious processes to behave" functionality
+- Implemented: Automatic priority reduction for high-priority processes
+- Added: Process priority checking and normalization during optimization
+
+Preferences and Configuration:
+- Added: Complete Optimization tab in Preferences dialog
+- Added: Memory optimization mode selection (Intelligent/Timer/Manual)
+- Added: Configurable automatic optimization interval
+- Added: "Force malicious processes to behave" checkbox
+- Added: "Start Memory Booster when Windows starts" checkbox
+- Added: "Show Memory Booster always on top" checkbox
+- Added: "Show program notifications" checkbox
+- Added: "Play sounds on program events" checkbox
+- Added: "Play warning sounds" with configurable intervals
+- Added: Configurable warning memory load threshold
+- Implemented: Real-time "Always on Top" toggle
+- Enhanced: All settings persist and load correctly
 
 Language System:
 - Added: Localization support for optimization UI strings

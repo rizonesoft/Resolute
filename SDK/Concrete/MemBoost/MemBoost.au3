@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2307
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2309
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -436,24 +436,41 @@ Global $g_OldSystemParam								;~ Used when resizing the main GUI
 Global $g_hSubHeading
 Global $g_hBtnRepair
 Global $g_hBtnOptimize						;~ Optimize Memory button
-Global $g_hProgressOptimize[2]					;~ Optimization progress bar
+Global $g_hBtnPreferences						;~ Preferences button
 Global $g_iOptimizing = 0						;~ Optimization in progress flag
-Global $g_iAutoOptimize = 0					;~ Auto optimization enabled flag
-Global $g_iOptimizeTimer = 30					;~ Auto optimize timer (seconds)
 Global $g_iOptimizeCount = 0					;~ Total optimization count
+
+; Automatic optimization settings
+Global $g_iAutoOptimize = 0					;~ Auto optimization mode (0=off, 1=intelligent, 2=every X seconds)
+Global $g_iAutoOptimizeSeconds = 30			;~ Auto optimize interval (seconds)
+Global $g_iTimerCountdown = 0					;~ Current countdown value
+Global $g_hTimerAdlib = 0						;~ Timer adlib registration flag
+
+; Behavior settings
+Global $g_iForceBehave = 0						;~ Force processes to behave (reduce priority)
+Global $g_iStartWithWindows = 0				;~ Start with Windows
+Global $g_iAlwaysOnTop = 0						;~ Always on top
+Global $g_iShowNotifications = 1				;~ Show notifications
+Global $g_iPlaySounds = 0						;~ Play event sounds
+Global $g_iPlayWarnings = 0					;~ Play warning sounds
+Global $g_iWarnEvery = 60						;~ Warning interval (seconds)
+Global $g_iWarnIfLoad = 80						;~ Warning memory load threshold (%)
 
 If Not IsDeclared("g_iParentState") Then Global $g_iParentState
 If Not IsDeclared("g_iParent") Then Global $g_iParent
 
 Global $g_hOptionsGui
 
-Global $g_hORADOptimMode[3]
-Global $g_hOComboAutSeconds
-Global $g_hOCheckNotify
-Global $g_hOCheckPlayEvents
-Global $g_hOCheckPlayWarnings
-Global $g_hOComboWarnEvery
-Global $g_hOComboWarnIf
+Global $g_hORADOptimMode[3]					;~ Optimization mode radio buttons
+Global $g_hOComboAutSeconds					;~ Auto optimize seconds combo
+Global $g_hOCheckForceBehave					;~ Force behave checkbox
+Global $g_hOCheckStartWindows					;~ Start with Windows checkbox
+Global $g_hOCheckOnTop						;~ Always on top checkbox
+Global $g_hOCheckNotify						;~ Show notifications checkbox
+Global $g_hOCheckPlayEvents					;~ Play event sounds checkbox
+Global $g_hOCheckPlayWarnings					;~ Play warning sounds checkbox
+Global $g_hOComboWarnEvery					;~ Warning frequency combo
+Global $g_hOComboWarnIf						;~ Warning threshold combo
 
 Global $g_iOptimizeMethod 	= 0
 Global $g_iAutoCount		= 30
@@ -814,32 +831,30 @@ Func _StartCoreGui()
 	$g_hProgressProcs[1] = GUICtrlCreateGraphic(130, 308, 339, 14)
 	GUICtrlSetBkColor($g_hProgressProcs[1], 0x803A0A)
 
-	; Optimize Memory Button
-	$g_hBtnOptimize = GUICtrlCreateButton($g_aLangCustom[4], 20, 345, 540, 45)
-	GUICtrlSetFont($g_hBtnOptimize, 12, 600)
+	; Optimize Memory and Preferences Buttons (side by side)
+	$g_hBtnOptimize = GUICtrlCreateButton("Optimize Memory", 20, 345, 350, 35)
+	GUICtrlSetFont($g_hBtnOptimize, 10, 600)
 	GUICtrlSetBkColor($g_hBtnOptimize, 0x13FF92)
 	GUICtrlSetColor($g_hBtnOptimize, 0x000000)
 	GUICtrlSetOnEvent($g_hBtnOptimize, "_OptimizeMemory")
 
-	; Optimization Progress Bar
-	GUICtrlCreateGraphic(20, 400, 540, 25)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressOptimize[0] = GUICtrlCreateGraphic(22, 402, 536, 21)
-	GUICtrlSetBkColor($g_hProgressOptimize[0], 0x13FF92)
-	$g_hProgressOptimize[1] = GUICtrlCreateGraphic(23, 403, 534, 19)
-	GUICtrlSetBkColor($g_hProgressOptimize[1], 0x085820)
-	GUICtrlSetState($g_hProgressOptimize[0], $GUI_HIDE)
-	GUICtrlSetState($g_hProgressOptimize[1], $GUI_HIDE)
+	$g_hBtnPreferences = GUICtrlCreateButton("Preferences", 380, 345, 180, 35)
+	GUICtrlSetFont($g_hBtnPreferences, 10, 600)
+	GUICtrlSetBkColor($g_hBtnPreferences, 0x555555)
+	GUICtrlSetColor($g_hBtnPreferences, 0xFFFFFF)
+	GUICtrlSetOnEvent($g_hBtnPreferences, "_ShowPreferencesDlg")
 
 
 	_UpdateMemoryStatsFirst()
 	_UpdateMemoryStats()
-	AdlibRegister("_UpdateMemoryStats", 1000)
+	AdlibRegister("_UpdateMemoryStats", 2000) ; Update every 2 seconds to reduce flickering
 
 	_Splash_Update("", 100)
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 
 	AdlibRegister("_OnIconsHover", 65)
+	AdlibRegister("_UpdateTimer", 1000) ; Timer countdown every second
+	
 	If @Compiled Then
 		AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
 	EndIf
@@ -869,6 +884,9 @@ EndFunc
 
 
 Func _UpdateMemoryStats()
+
+	; Skip update if currently optimizing to reduce flickering
+	If $g_iOptimizing = 1 Then Return
 
 	$g_aMemStats = MemGetStats()
 
@@ -1130,6 +1148,28 @@ Func _LoadConfiguration()
 	$g_sDonateName = IniRead($g_sPathIni, "Donate", "DonateName", "Unknown")
 	$g_iDonateBuild = Number(IniRead($g_sPathIni, "Donate", "DonateBuild", 13))
 
+	; New optimization and behavior settings
+	$g_iAutoOptimize = Int(IniRead($g_sPathIni, $g_sProgShortName, "AutoOptimize", 0))
+	$g_iAutoOptimizeSeconds = Int(IniRead($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", 30))
+	$g_iForceBehave = Int(IniRead($g_sPathIni, $g_sProgShortName, "ForceBehave", 0))
+	$g_iStartWithWindows = Int(IniRead($g_sPathIni, $g_sProgShortName, "StartWithWindows", 0))
+	$g_iAlwaysOnTop = Int(IniRead($g_sPathIni, $g_sProgShortName, "AlwaysOnTop", 0))
+	$g_iShowNotifications = Int(IniRead($g_sPathIni, $g_sProgShortName, "ShowNotifications", 1))
+	$g_iPlaySounds = Int(IniRead($g_sPathIni, $g_sProgShortName, "PlaySounds", 0))
+	$g_iPlayWarnings = Int(IniRead($g_sPathIni, $g_sProgShortName, "PlayWarnings", 0))
+	$g_iWarnEvery = Int(IniRead($g_sPathIni, $g_sProgShortName, "WarnEvery", 60))
+	$g_iWarnIfLoad = Int(IniRead($g_sPathIni, $g_sProgShortName, "WarnIfLoad", 80))
+
+	; Initialize timer countdown
+	If $g_iAutoOptimize = 2 Then
+		$g_iTimerCountdown = $g_iAutoOptimizeSeconds
+	EndIf
+
+	; Apply always on top setting
+	If $g_iAlwaysOnTop = 1 Then
+		WinSetOnTop($g_hCoreGui, "", 1)
+	EndIf
+
 	If @Compiled Then
 		ProcessSetPriority(@ScriptName, $g_iProcessPriority)
 	EndIf
@@ -1138,7 +1178,24 @@ EndFunc   ;==>_LoadConfiguration
 
 Func _SaveConfiguration()
 
-	; _SaveSelection()
+	IniWrite($g_sPathIni, $g_sProgShortName, "CheckForUpdates", $g_iCheckForUpdates)
+	IniWrite($g_sPathIni, $g_sProgShortName, "ProcessPriority", $g_iProcessPriority)
+	IniWrite($g_sPathIni, $g_sProgShortName, "SaveRealtime", $g_iSaveRealtime)
+	IniWrite($g_sPathIni, $g_sProgShortName, "ReduceMemory", $g_iReduceMemory)
+	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingEnabled", $g_iLoggingEnabled)
+	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingStorageSize", $g_iLoggingStorage)
+	
+	; Save new settings
+	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimize", $g_iAutoOptimize)
+	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", $g_iAutoOptimizeSeconds)
+	IniWrite($g_sPathIni, $g_sProgShortName, "ForceBehave", $g_iForceBehave)
+	IniWrite($g_sPathIni, $g_sProgShortName, "StartWithWindows", $g_iStartWithWindows)
+	IniWrite($g_sPathIni, $g_sProgShortName, "AlwaysOnTop", $g_iAlwaysOnTop)
+	IniWrite($g_sPathIni, $g_sProgShortName, "ShowNotifications", $g_iShowNotifications)
+	IniWrite($g_sPathIni, $g_sProgShortName, "PlaySounds", $g_iPlaySounds)
+	IniWrite($g_sPathIni, $g_sProgShortName, "PlayWarnings", $g_iPlayWarnings)
+	IniWrite($g_sPathIni, $g_sProgShortName, "WarnEvery", $g_iWarnEvery)
+	IniWrite($g_sPathIni, $g_sProgShortName, "WarnIfLoad", $g_iWarnIfLoad)
 
 EndFunc
 
@@ -1199,13 +1256,15 @@ Func _OptimizeMemory()
 	$g_iOptimizing = 1
 	$g_iOptimizeCount += 1
 
-	; Disable button and menu during optimization
-	GUICtrlSetState($g_hBtnOptimize, $GUI_DISABLE)
-	_SetProcessingStates($GUI_DISABLE)
+	; Reset timer countdown if auto-optimize is enabled
+	If $g_iAutoOptimize = 2 Then
+		$g_iTimerCountdown = $g_iAutoOptimizeSeconds
+	EndIf
 
-	; Show progress bar
-	GUICtrlSetState($g_hProgressOptimize[0], $GUI_SHOW)
-	GUICtrlSetState($g_hProgressOptimize[1], $GUI_SHOW)
+	; Disable buttons and menu during optimization
+	GUICtrlSetState($g_hBtnOptimize, $GUI_DISABLE)
+	GUICtrlSetState($g_hBtnPreferences, $GUI_DISABLE)
+	_SetProcessingStates($GUI_DISABLE)
 
 	; Get process list
 	Local $aProcsList = ProcessList()
@@ -1219,9 +1278,16 @@ Func _OptimizeMemory()
 	For $i = 1 To $iTotalProcs
 		_WinAPI_EmptyWorkingSet($aProcsList[$i][1])
 
-		; Update progress bar
+		; Force behave: reduce priority of high-priority processes
+		If $g_iForceBehave = 1 Then
+			Local $iPriority = _ProcessGetPriority($aProcsList[$i][1])
+			If $iPriority > 2 Then ; If priority is above Normal
+				ProcessSetPriority($aProcsList[$i][0], 2) ; Set to Normal
+			EndIf
+		EndIf
+
+		; Update progress on process counter bar
 		Local $iProgress = ($i / $iTotalProcs) * 100
-		_ProgressBar_SetData($g_hCoreGui, $g_hProgressOptimize[0], $g_hProgressOptimize[1], 22, 402, 536, $iProgress)
 		GUICtrlSetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress))
 		_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, $iProgress)
 
@@ -1232,21 +1298,47 @@ Func _OptimizeMemory()
 	_UpdateMemoryStats()
 
 	; Reset progress bar
-	GUICtrlSetState($g_hProgressOptimize[0], $GUI_HIDE)
-	GUICtrlSetState($g_hProgressOptimize[1], $GUI_HIDE)
 	_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, 0)
 	GUICtrlSetData($g_hLabelCountPerc, "0%")
 
 	; Update status
 	GUICtrlSetData($g_hSubHeading, StringFormat($g_aLangCustom[3], $iTotalProcs))
 
-	; Re-enable button and menu
+	; Re-enable buttons and menu
 	GUICtrlSetState($g_hBtnOptimize, $GUI_ENABLE)
+	GUICtrlSetState($g_hBtnPreferences, $GUI_ENABLE)
 	_SetProcessingStates($GUI_ENABLE)
 
 	$g_iOptimizing = 0
 
 EndFunc   ;==>_OptimizeMemory
+
+
+Func _UpdateTimer()
+
+	; Handle automatic optimization modes
+	If $g_iAutoOptimize = 1 Then ; Intelligent mode
+		Local $aMemStats = MemGetStats()
+		If $aMemStats[$MEM_LOAD] > 90 Then ; Memory over 90%
+			_OptimizeMemory()
+		EndIf
+		GUICtrlSetData($g_hLabelTimer, "AUTO")
+		
+	ElseIf $g_iAutoOptimize = 2 Then ; Timer mode
+		$g_iTimerCountdown -= 1
+		
+		If $g_iTimerCountdown <= 0 Then
+			$g_iTimerCountdown = $g_iAutoOptimizeSeconds
+			_OptimizeMemory()
+		Else
+			GUICtrlSetData($g_hLabelTimer, String($g_iTimerCountdown))
+		EndIf
+		
+	Else ; Manual mode
+		GUICtrlSetData($g_hLabelTimer, "OFF")
+	EndIf
+
+EndFunc   ;==>_UpdateTimer
 
 
 Func _ReduceMemory()
@@ -1264,6 +1356,7 @@ Func _ShutdownProgram()
 
 	AdlibUnRegister("_OnIconsHover")
 	AdlibUnRegister("_UpdateMemoryStats")
+	AdlibUnRegister("_UpdateTimer")
 
 	If @Compiled Then
 		AdlibUnRegister("_ReduceMemory")
@@ -1331,28 +1424,66 @@ Func _ShowPreferencesDlg()
 	GUICtrlCreateTab(10, 10, 430, 430)
 
 	GUICtrlCreateTabItem($g_aLangPreferences[24])
-	GUICtrlCreateGroup("Memory optimization modes", 25, 50, 400, 130)
+	
+	; Optimization Modes Group
+	GUICtrlCreateGroup("Memory Optimization Modes", 25, 50, 400, 110)
 	GUICtrlSetFont(-1, 10, Default, 2)
-	$g_hORADOptimMode[0] = GUICtrlCreateRadio(" Intelligent memory optimization", 35, 90, 300, 15)
-	$g_hORADOptimMode[1] = GUICtrlCreateRadio(" Automatically optimize memory every", 35, 110, 240, 15)
-	$g_hOComboAutSeconds = GUICtrlCreateCombo("", 285, 107, 55, 20)
-	GUICtrlSetData($g_hOComboAutSeconds, "3|5|10|15|20|25|30|35|40|45|50|55|60|65|70|75|80|85|90|95|100|105|110|115|120", $g_iAutoCount)
-	GUICtrlCreateLabel(" sec", 350, 110, 50, 15)
-	$g_hORADOptimMode[2] = GUICtrlCreateRadio(" Don't automatically optimize memory", 35, 130, 300, 15)
-	GUICtrlCreateGroup("", -99, -99, 1, 1)  ;~ Close group
+	$g_hORADOptimMode[0] = GUICtrlCreateRadio(" Intelligent memory optimization", 35, 75, 360, 20)
+	$g_hORADOptimMode[1] = GUICtrlCreateRadio(" Automatically optimize memory every", 35, 100, 240, 20)
+	$g_hOComboAutSeconds = GUICtrlCreateCombo("", 285, 98, 55, 20)
+	GUICtrlSetData($g_hOComboAutSeconds, "5|10|15|20|25|30|35|40|45|50|55|60|90|120", String($g_iAutoOptimizeSeconds))
+	GUICtrlCreateLabel(" seconds", 345, 100, 60, 20)
+	$g_hORADOptimMode[2] = GUICtrlCreateRadio(" Don't automatically optimize memory", 35, 125, 360, 20)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+	
+	; Set current optimization mode
+	If $g_iAutoOptimize = 1 Then
+		GUICtrlSetState($g_hORADOptimMode[0], $GUI_CHECKED)
+	ElseIf $g_iAutoOptimize = 2 Then
+		GUICtrlSetState($g_hORADOptimMode[1], $GUI_CHECKED)
+	Else
+		GUICtrlSetState($g_hORADOptimMode[2], $GUI_CHECKED)
+	EndIf
 
-	GUICtrlCreateGroup("Notifications", 25, 200, 400, 130)
+	; Behavior Group
+	GUICtrlCreateGroup("Behavior", 25, 170, 400, 90)
 	GUICtrlSetFont(-1, 10, Default, 2)
-	$g_hOCheckNotify = GUICtrlCreateCheckbox(" Show program notifications", 35, 240, 300, 15)
-	$g_hOCheckPlayEvents = GUICtrlCreateCheckbox(" Play sounds on program events. ", 35, 260, 300, 15)
-	$g_hOCheckPlayWarnings = GUICtrlCreateCheckbox(" Play Warning every ", 35, 280, 130, 20)
-	$g_hOComboWarnEvery = GUICtrlCreateCombo("", 175, 282, 50, 20)
-	GUICtrlSetData($g_hOComboWarnEvery, "1|3|6|9|12|15|20|30|40|50|60|120", $g_iPlayWarnEvery)
-	GUICtrlCreateLabel("min if load exceed", 235, 285, 120, 20)
-	$g_hOComboWarnIf = GUICtrlCreateCombo("", 350, 282, 50, 20)
-	GUICtrlSetData($g_hOComboWarnIf, "30|40|50|60|70|80|90", $g_iPlayIfPerc)
+	$g_hOCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 35, 195, 360, 20)
+	GUICtrlSetState($g_hOCheckForceBehave, $g_iForceBehave)
+	$g_hOCheckStartWindows = GUICtrlCreateCheckbox(" Start Memory Booster when Windows starts", 35, 220, 360, 20)
+	GUICtrlSetState($g_hOCheckStartWindows, $g_iStartWithWindows)
+	$g_hOCheckOnTop = GUICtrlCreateCheckbox(" Show Memory Booster always on top", 35, 245, 360, 20)
+	GUICtrlSetState($g_hOCheckOnTop, $g_iAlwaysOnTop)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-	GUICtrlCreateGroup("", -99, -99, 1, 1)  ;~ Close group
+	; Notifications Group
+	GUICtrlCreateGroup("Notifications and Sounds", 25, 270, 400, 140)
+	GUICtrlSetFont(-1, 10, Default, 2)
+	$g_hOCheckNotify = GUICtrlCreateCheckbox(" Show program notifications", 35, 295, 360, 20)
+	GUICtrlSetState($g_hOCheckNotify, $g_iShowNotifications)
+	$g_hOCheckPlayEvents = GUICtrlCreateCheckbox(" Play sounds on program events", 35, 320, 360, 20)
+	GUICtrlSetState($g_hOCheckPlayEvents, $g_iPlaySounds)
+	$g_hOCheckPlayWarnings = GUICtrlCreateCheckbox(" Play warning every", 35, 345, 150, 20)
+	GUICtrlSetState($g_hOCheckPlayWarnings, $g_iPlayWarnings)
+	$g_hOComboWarnEvery = GUICtrlCreateCombo("", 190, 344, 50, 20)
+	GUICtrlSetData($g_hOComboWarnEvery, "1|3|5|10|15|30|60|120", String($g_iWarnEvery))
+	GUICtrlCreateLabel(" sec if memory load exceeds", 245, 347, 150, 20)
+	$g_hOComboWarnIf = GUICtrlCreateCombo("", 385, 369, 50, 20)
+	GUICtrlSetData($g_hOComboWarnIf, "50|60|70|80|90|95", String($g_iWarnIfLoad))
+	GUICtrlCreateLabel("%", 400, 372, 20, 20)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+	
+	; Set event handlers
+	GUICtrlSetOnEvent($g_hORADOptimMode[0], "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hORADOptimMode[1], "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hORADOptimMode[2], "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOCheckForceBehave, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOCheckStartWindows, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOCheckOnTop, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOCheckNotify, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOCheckPlayEvents, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOCheckPlayWarnings, "__CheckPreferenceChange")
+	
 	GUICtrlCreateTabItem("") ; end tabitem definition
 
 	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[1]))
@@ -1668,6 +1799,36 @@ Func __SavePreferences()
 		$g_iReduceMemory = 0
 	EndIf
 
+	; Read optimization mode
+	If GUICtrlRead($g_hORADOptimMode[0]) = $GUI_CHECKED Then
+		$g_iAutoOptimize = 1
+	ElseIf GUICtrlRead($g_hORADOptimMode[1]) = $GUI_CHECKED Then
+		$g_iAutoOptimize = 2
+		$g_iAutoOptimizeSeconds = Int(GUICtrlRead($g_hOComboAutSeconds))
+		$g_iTimerCountdown = $g_iAutoOptimizeSeconds
+	Else
+		$g_iAutoOptimize = 0
+	EndIf
+
+	; Read behavior checkboxes
+	$g_iForceBehave = (GUICtrlRead($g_hOCheckForceBehave) = $GUI_CHECKED) ? 1 : 0
+	$g_iStartWithWindows = (GUICtrlRead($g_hOCheckStartWindows) = $GUI_CHECKED) ? 1 : 0
+	
+	Local $iPrevOnTop = $g_iAlwaysOnTop
+	$g_iAlwaysOnTop = (GUICtrlRead($g_hOCheckOnTop) = $GUI_CHECKED) ? 1 : 0
+	
+	; Apply always on top setting immediately
+	If $iPrevOnTop <> $g_iAlwaysOnTop Then
+		WinSetOnTop($g_hCoreGui, "", $g_iAlwaysOnTop)
+	EndIf
+
+	; Read notification and sound settings
+	$g_iShowNotifications = (GUICtrlRead($g_hOCheckNotify) = $GUI_CHECKED) ? 1 : 0
+	$g_iPlaySounds = (GUICtrlRead($g_hOCheckPlayEvents) = $GUI_CHECKED) ? 1 : 0
+	$g_iPlayWarnings = (GUICtrlRead($g_hOCheckPlayWarnings) = $GUI_CHECKED) ? 1 : 0
+	$g_iWarnEvery = Int(GUICtrlRead($g_hOComboWarnEvery))
+	$g_iWarnIfLoad = Int(GUICtrlRead($g_hOComboWarnIf))
+
 	If GUICtrlRead($g_hOChkLogEnabled) = $GUI_CHECKED Then
 		$g_iLoggingEnabled = 1
 	ElseIf GUICtrlRead($g_hOChkLogEnabled) = $GUI_UNCHECKED Then
@@ -1685,6 +1846,18 @@ Func __SavePreferences()
 	IniWrite($g_sPathIni, $g_sProgShortName, "ReduceMemory", $g_iReduceMemory)
 	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingEnabled", $g_iLoggingEnabled)
 	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingStorageSize", $g_iLoggingStorage)
+	
+	; Save new optimization and behavior settings
+	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimize", $g_iAutoOptimize)
+	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", $g_iAutoOptimizeSeconds)
+	IniWrite($g_sPathIni, $g_sProgShortName, "ForceBehave", $g_iForceBehave)
+	IniWrite($g_sPathIni, $g_sProgShortName, "StartWithWindows", $g_iStartWithWindows)
+	IniWrite($g_sPathIni, $g_sProgShortName, "AlwaysOnTop", $g_iAlwaysOnTop)
+	IniWrite($g_sPathIni, $g_sProgShortName, "ShowNotifications", $g_iShowNotifications)
+	IniWrite($g_sPathIni, $g_sProgShortName, "PlaySounds", $g_iPlaySounds)
+	IniWrite($g_sPathIni, $g_sProgShortName, "PlayWarnings", $g_iPlayWarnings)
+	IniWrite($g_sPathIni, $g_sProgShortName, "WarnEvery", $g_iWarnEvery)
+	IniWrite($g_sPathIni, $g_sProgShortName, "WarnIfLoad", $g_iWarnIfLoad)
 
 	If $iLangChanged = True Then
 		$iMsgBoxResult = MsgBox($MB_OKCANCEL + $MB_ICONINFORMATION, $g_aLangPreferences[22], $g_aLangPreferences[23], 0, $g_hOptionsGui)
