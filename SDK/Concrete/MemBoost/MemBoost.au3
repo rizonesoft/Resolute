@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2330
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2331
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -1317,9 +1317,9 @@ Func _OptimizeMemory()
 			EndIf
 		EndIf
 
-		; Update progress on process counter bar (only every 5% to reduce flicker)
+		; Update progress on process counter bar (every percentage)
 		Local $iProgress = Floor(($i / $iTotalProcs) * 100)
-		If $iProgress <> $iLastProgress And Mod($iProgress, 5) = 0 Then
+		If $iProgress <> $iLastProgress Then
 			GUICtrlSetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress))
 			_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, $iProgress)
 			$iLastProgress = $iProgress
@@ -1478,13 +1478,17 @@ Func _UpdateTrayIcon()
 	Local $iIconIndex = Floor($iMemLoad / 10)
 	If $iIconIndex > 11 Then $iIconIndex = 11
 	
+	; Always use embedded resource when compiled, file path when not
 	If @Compiled Then
-		; Use embedded tray icon resource (303-314 for icons 0-11)
-		; Formula matches old version: -303 is icon 0, -304 is icon 1, etc.
-		TraySetIcon(@ScriptFullPath, -303 - $iIconIndex)
+		; Use embedded tray icon resource (resources start at -303)
+		; Negative index: -303 for icon 0, -304 for icon 1, etc.
+		Local $iResourceID = -303 - $iIconIndex
+		TraySetIcon(@ScriptFullPath, $iResourceID)
 	Else
-		; Use external icon file for development
-		TraySetIcon($g_aTrayIcons[$iIconIndex])
+		; Development mode: use external icon files
+		If FileExists($g_aTrayIcons[$iIconIndex]) Then
+			TraySetIcon($g_aTrayIcons[$iIconIndex])
+		EndIf
 	EndIf
 	
 	; Tooltip format matching old version exactly
