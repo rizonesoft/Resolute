@@ -991,7 +991,6 @@ Func _UpdateMemoryStats()
 	EndIf
 
     _CustomGraph_AddSample($g_aMemStats[$MEM_LOAD])
-    _CustomGraph_UpdateGraph(False, False) ; Changed last param to False to reduce flickering
 
 EndFunc   ;==>_UpdateMemoryStats
 
