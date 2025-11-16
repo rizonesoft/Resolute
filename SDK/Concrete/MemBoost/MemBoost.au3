@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2320
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2321
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -1019,8 +1019,8 @@ Func _CustomGraph_Draw()
 	Local $iHeight = 104
 	Local $iStep = $iWidth / 500
 	
-	; Draw lines connecting data points
-	For $i = 1 To 499
+	; Draw lines connecting data points (0-498, connecting to next point)
+	For $i = 0 To 498
 		Local $x1 = Int($i * $iStep)
 		Local $x2 = Int(($i + 1) * $iStep)
 		Local $y1 = $iHeight - Int(($g_aGraphData[$i] / 100) * $iHeight)
