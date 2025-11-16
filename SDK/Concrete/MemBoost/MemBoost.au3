@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2326
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2328
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -925,9 +925,6 @@ Func _UpdateMemoryStats()
 	If $g_iOptimizing = 1 Then Return
 
 	$g_aMemStats = MemGetStats()
-	
-	; Lock GUI to prevent flickering during control updates (but NOT graph)
-	GUISetState(@SW_LOCK, $g_hCoreGui)
 
     Local $iRAMFree = Round($g_aMemStats[$MEM_AVAILPHYSRAM] / 1048576, 1)
     Local $iRAMUsed = Round(($g_aMemStats[$MEM_TOTALPHYSRAM] - $g_aMemStats[$MEM_AVAILPHYSRAM]) / 1048576, 1)
@@ -975,10 +972,6 @@ Func _UpdateMemoryStats()
 		$g_aMemBuffers[$MEM_AVAILPAGEFILE] = $iPageFree
 	EndIf
 
-	; Unlock GUI after control updates (before graph update)
-	GUISetState(@SW_UNLOCK, $g_hCoreGui)
-	
-	; Graph update outside lock - SSLG handles its own rendering
 	_SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
     _SSLG_UpdateGraph($Graph1, False, True)
 
