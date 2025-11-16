@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2323
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2325
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -924,6 +924,9 @@ Func _UpdateMemoryStats()
 	; Skip update if currently optimizing to reduce flickering
 	If $g_iOptimizing = 1 Then Return
 
+	; Lock GUI to prevent flickering during updates
+	GUISetState(@SW_LOCK, $g_hCoreGui)
+
 	$g_aMemStats = MemGetStats()
 
     Local $iRAMFree = Round($g_aMemStats[$MEM_AVAILPHYSRAM] / 1048576, 1)
@@ -974,6 +977,9 @@ Func _UpdateMemoryStats()
 
 	_SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
     _SSLG_UpdateGraph($Graph1, False, True)
+
+	; Unlock GUI after all updates complete
+	GUISetState(@SW_UNLOCK, $g_hCoreGui)
 
 EndFunc   ;==>_UpdateMemoryStats
 
