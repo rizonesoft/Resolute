@@ -14,12 +14,6 @@ Template System:
 - Enhanced: Template processing with placeholder support
 - Improved: Documentation generation workflow
 
-==================================================
-
---------------------------------------------------
-Version 11.1.1.3684
---------------------------------------------------
-
 Build System Enhancements:
 - Enhanced: Dynamic [Files] section generation from .sni files
 - Added: Portable installer support with distinct x86/x64 executable names

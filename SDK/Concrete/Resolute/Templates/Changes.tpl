@@ -11,12 +11,6 @@ Build System Tools:
 - Enhanced: Distro with improved solution management and build pipeline
 - Improved: Template-based documentation generation system
 
-==================================================
-
---------------------------------------------------
-Version 11.0.0.0 (NOVEMBER 16, 2025)
---------------------------------------------------
-
 Browser Variants:
 - Added: Chromin - Chrome browser memory optimizer
 - Added: Edgemin - Microsoft Edge browser memory optimizer
@@ -56,13 +50,4 @@ Documentation:
 Programs Updated:
 - BiosCodes, ComIntRep, DVDRepair, Firemin, MemBoost, Ownership
 - PixRepair, ReBar, Rescue, USBRepair, Chromin, Edgemin, Watermin
-
---------------------------------------------------
-Version 0.0.0.0
---------------------------------------------------
-
-- Improved the Resolute tool execution process and implemented comprehensive logging mechanisms.
-- Resolved issues pertaining to the functionality of the System Repair buttons.
-- Introduced Hardware, System, and Extension menus.
-
 ==================================================
