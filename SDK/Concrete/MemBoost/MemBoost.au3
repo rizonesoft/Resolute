@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2362
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2363
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -433,7 +433,7 @@ Global $g_TitleShowAutoIt	= False	;~ Show AutoIt version
 
 ;~ Interface Settings
 Global $g_iCoreGuiWidth		= 580
-Global $g_iCoreGuiHeight	= 593  ; Increased by 43px for CPU bar
+Global $g_iCoreGuiHeight	= 593  ; Increased by 43px for 2-row CPU section
 Global $g_iMsgBoxTimeOut	= 60
 
 ;~ About Dialog
@@ -730,7 +730,7 @@ Func _StartCoreGui()
 	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
 	_SSLG_SetSmoothingMode($Graph1, 2)
 
-	; CPU usage progress bar (single row with percentage spanning 2 rows like timer)
+	; CPU usage section (single row progress bar, 2-row percentage like timer)
 	GUICtrlCreateGraphic(20, 236, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("CPU", 20, 239, 104, 16, $SS_CENTER)
@@ -741,21 +741,21 @@ Func _StartCoreGui()
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	$g_hProgressCPU = GUICtrlCreateGraphic(129, 238, 341, 16)
 	GUICtrlSetBkColor($g_hProgressCPU, 0x0F1318)
-	
-	; CPU percentage spanning 2 rows (like timer below)
+
+	; CPU percentage spanning 2 rows (like timer)
 	Local $hPanelCPUPerc = GUICtrlCreateGraphic(475, 236, 84, 43)
 	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
 	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 12, 78, 20, 10, Default, 0, 1, 0xFF8000) ; Orange percentage
 	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
 
-	; Second row of CPU section (empty space to complete 2-row layout)
+	; Second row of CPU section (empty graphics)
 	GUICtrlCreateGraphic(20, 259, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateGraphic(127, 259, 345, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 
-	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 295, $SS_ETCHEDFRAME)
-	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 291)
+	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 338, $SS_ETCHEDFRAME) ; Increased from 295 to 338 (+43px)
+	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 334)
 	GUICtrlSetBkColor(-1, 0x151C23)
 
 	$g_hPanelRAMBox = GUICtrlCreateGraphic(20, 125, 104, 108, -1)
@@ -964,7 +964,7 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 
 	; Setup tray icon
 	_SetupTrayIcon()
-	
+
 	; Show GUI first so FFLabels can properly initialize their graphics contexts
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 
@@ -1116,38 +1116,38 @@ EndFunc   ;==>_UpdateMemoryStats
 Func _GetCPUUsage()
 	; Simple CPU usage calculation using processor time
 	Static $lastIdleTime = 0, $lastKernelTime = 0, $lastUserTime = 0
-	
+
 	Local $aInfo = DllCall("kernel32.dll", "bool", "GetSystemTimes", "int64*", 0, "int64*", 0, "int64*", 0)
 	If @error Or Not $aInfo[0] Then Return 0
-	
+
 	Local $idleTime = $aInfo[1]
 	Local $kernelTime = $aInfo[2]
 	Local $userTime = $aInfo[3]
-	
+
 	If $lastIdleTime = 0 Then
 		$lastIdleTime = $idleTime
 		$lastKernelTime = $kernelTime
 		$lastUserTime = $userTime
 		Return 0
 	EndIf
-	
+
 	Local $idle = $idleTime - $lastIdleTime
 	Local $kernel = $kernelTime - $lastKernelTime
 	Local $user = $userTime - $lastUserTime
 	Local $system = $kernel + $user
-	
+
 	$lastIdleTime = $idleTime
 	$lastKernelTime = $kernelTime
 	$lastUserTime = $userTime
-	
+
 	Local $iCPU = 0
 	If $system > 0 Then
 		$iCPU = Round((($system - $idle) / $system) * 100)
 	EndIf
-	
+
 	If $iCPU < 0 Then $iCPU = 0
 	If $iCPU > 100 Then $iCPU = 100
-	
+
 	Return $iCPU
 EndFunc   ;==>_GetCPUUsage
 
@@ -1490,7 +1490,7 @@ Func _OptimizeMemory()
 	For $i = 1 To $iTotalProcs
 		; Skip our own process to prevent clearing our GDI resources
 		If $aProcsList[$i][1] = @AutoItPID Then ContinueLoop
-		
+
 		; Skip excluded processes
 		Local $bExcluded = False
 		For $j = 0 To UBound($g_aExcludeProcesses) - 1
@@ -1531,7 +1531,7 @@ Func _OptimizeMemory()
 
 	; Update status with actual processed count
 	GUICtrlSetData($g_hSubHeading, StringFormat($g_aLangCustom[3], $iProcessedCount))
-	
+
 	; Show completion notification
 	If $g_iShowNotifications = 1 Then
 		TrayTip("Optimization Complete", StringFormat("Optimized %d processes", $iProcessedCount), 3, $TIP_ICONASTERISK)
@@ -1544,7 +1544,7 @@ Func _OptimizeMemory()
 
 	; Update memory stats to show post-optimization results
 	$g_iOptimizing = 0
-	
+
 	; Double-update pattern: ensures buffers and graphics survive WM_PAINT
 	_UpdateMemoryStats()
 	_WinAPI_UpdateWindow($g_hCoreGui)
@@ -1561,11 +1561,11 @@ Func _UpdateTimer()
 	; Handle automatic optimization modes
 	If $g_iAutoOptimize = 1 Then ; Intelligent mode
 		Local $aMemStats = MemGetStats()
-		
+
 		; Track memory history for trend detection
 		$g_aMemoryHistory[$g_iMemoryHistoryIndex] = $aMemStats[$MEM_LOAD]
 		$g_iMemoryHistoryIndex = Mod($g_iMemoryHistoryIndex + 1, 10)
-		
+
 		; Only optimize if memory is high AND increasing (smart detection)
 		If $aMemStats[$MEM_LOAD] > 90 And _IsMemoryIncreasing() Then
 			_OptimizeMemory()
@@ -1592,7 +1592,7 @@ EndFunc   ;==>_UpdateTimer
 Func _IsMemoryIncreasing()
 	; Check if memory usage is trending upward over last 10 readings
 	; Returns True if memory increased in majority of recent samples
-	
+
 	Local $iIncreaseCount = 0
 	For $i = 1 To 9
 		Local $iPrev = Mod(($g_iMemoryHistoryIndex + $i - 1 + 10), 10)
@@ -1601,7 +1601,7 @@ Func _IsMemoryIncreasing()
 			$iIncreaseCount += 1
 		EndIf
 	Next
-	
+
 	; Return True if memory increased in at least 6 of last 9 intervals
 	Return ($iIncreaseCount >= 6)
 EndFunc   ;==>_IsMemoryIncreasing
