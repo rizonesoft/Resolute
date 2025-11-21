@@ -739,7 +739,8 @@ Func _StartCoreGui()
 
 	GUICtrlCreateGraphic(64, 236, 450, 40)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressCPU = _GDIPlusProgressBar_Create(64, 236, 450, 40)
+	$g_hProgressCPU = GUICtrlCreateGraphic(66, 238, 446, 36)
+	GUICtrlSetBkColor($g_hProgressCPU, 0x0F1318)
 	
 	Local $hPanelCPUPerc = GUICtrlCreateGraphic(517, 236, 42, 40)
 	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
