@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2361
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2362
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -730,22 +730,29 @@ Func _StartCoreGui()
 	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
 	_SSLG_SetSmoothingMode($Graph1, 2)
 
-	; CPU usage progress bar below graph
-	GUICtrlCreateGraphic(20, 236, 41, 40)
+	; CPU usage progress bar (single row with percentage spanning 2 rows like timer)
+	GUICtrlCreateGraphic(20, 236, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("CPU", 20, 248, 41, 16, $SS_CENTER)
+	GUICtrlCreateLabel("CPU", 20, 239, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GuiCtrlSetColor(-1, 0xFF8000) ; Orange color for CPU
+	GuiCtrlSetColor(-1, 0xFFFFFF) ; White label like other section headers
 
-	GUICtrlCreateGraphic(64, 236, 450, 40)
+	GUICtrlCreateGraphic(127, 236, 345, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressCPU = GUICtrlCreateGraphic(66, 238, 446, 36)
+	$g_hProgressCPU = GUICtrlCreateGraphic(129, 238, 341, 16)
 	GUICtrlSetBkColor($g_hProgressCPU, 0x0F1318)
 	
-	Local $hPanelCPUPerc = GUICtrlCreateGraphic(517, 236, 42, 40)
+	; CPU percentage spanning 2 rows (like timer below)
+	Local $hPanelCPUPerc = GUICtrlCreateGraphic(475, 236, 84, 43)
 	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
-	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 0, 12, 42, 16, 9, Default, 0, 1, 0xFF8000) ; Orange percentage
+	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 12, 78, 20, 10, Default, 0, 1, 0xFF8000) ; Orange percentage
 	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
+
+	; Second row of CPU section (empty space to complete 2-row layout)
+	GUICtrlCreateGraphic(20, 259, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateGraphic(127, 259, 345, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
 
 	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 295, $SS_ETCHEDFRAME)
 	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 291)
