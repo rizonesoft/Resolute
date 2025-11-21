@@ -770,26 +770,10 @@ Func __SSLG_GraphicsDraw($iIdx, $hBitmap, $iW, $iH)
 	_GDIPlus_GraphicsDrawImageRect($hGraphic, $hBitmap, 0, 0, $iW, $iH)
 	_GDIPlus_GraphicsDispose($hGraphic)
 
-	; Check if parent window uses WS_EX_COMPOSITED
-	Local $hParent = _WinAPI_GetParent($g_SSLG[$iIdx][$gSSLG_hCtrl])
-	Local $iExStyle = _WinAPI_GetWindowLong($hParent, $GWL_EXSTYLE)
-	
-	If BitAND($iExStyle, 0x02000000) Then ; WS_EX_COMPOSITED
-		; For WS_EX_COMPOSITED: Use GdiFlush + UpdateWindow approach
-		; This forces all GDI operations to complete before compositing
-		$hDC_Dst = _WinAPI_GetDC($g_SSLG[$iIdx][$gSSLG_hCtrl])
-		_WinAPI_BitBlt($hDC_Dst, 0, 0, $iW, $iH, $hDC_Src, 0, 0, $SRCCOPY)
-		DllCall("gdi32.dll", "bool", "GdiFlush") ; Force GDI to complete all drawing
-		_WinAPI_ReleaseDC($g_SSLG[$iIdx][$gSSLG_hCtrl], $hDC_Dst)
-		; Update both child and parent through composition
-		DllCall("user32.dll", "bool", "UpdateWindow", "hwnd", $g_SSLG[$iIdx][$gSSLG_hCtrl])
-		DllCall("user32.dll", "bool", "UpdateWindow", "hwnd", $hParent)
-	Else
-		; Normal window - direct BitBlt
-		$hDC_Dst = _WinAPI_GetDC($g_SSLG[$iIdx][$gSSLG_hCtrl])
-		_WinAPI_BitBlt($hDC_Dst, 0, 0, $iW, $iH, $hDC_Src, 0, 0, $SRCCOPY)
-		_WinAPI_ReleaseDC($g_SSLG[$iIdx][$gSSLG_hCtrl], $hDC_Dst)
-	EndIf
+	; Always BitBlt directly to the SSLG control; SSLG already uses its own double buffers.
+	$hDC_Dst = _WinAPI_GetDC($g_SSLG[$iIdx][$gSSLG_hCtrl])
+	_WinAPI_BitBlt($hDC_Dst, 0, 0, $iW, $iH, $hDC_Src, 0, 0, $SRCCOPY)
+	_WinAPI_ReleaseDC($g_SSLG[$iIdx][$gSSLG_hCtrl], $hDC_Dst)
 
 	_WinAPI_SelectObject($hDC_Src, $hObjOld) ;Put old object back
 

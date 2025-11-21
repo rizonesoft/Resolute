@@ -21,14 +21,22 @@ UI/UX:
 - Added: Countdown timer display showing automatic optimization status (OFF/AUTO/seconds)
 - Added: Complete system tray icon integration with dynamic memory indicators (12 tray icons: 0.ico - 11.ico)
 - Added: Tray menu with Show/Hide, Optimize, and Exit options
+- Added: Paged Pool and Non-Paged Pool kernel memory displays (replaced Pagefile section)
+- Added: Cached memory composition display showing TOTAL/IN USE/CACHED breakdown
+- Added: Committed memory display with TOTAL/USED/FREE and percentage progress bar
+- Enhanced: Memory displays migrated to flicker-free FFLabels and GDI+ progress bars
+- Optimized: All memory stats (RAM load, composition, committed, kernel pools) now derived from a single WinAPI_GetPerformanceInfo snapshot
+- Enhanced: Color-coded memory sections (RAM/Procs: green, Pools: orange, Cached: yellow, Committed: cyan)
 - Fixed: Main window now non-resizable (removed WS_SIZEBOX)
 - Fixed: Tray icon now properly displays memory usage levels with embedded resources (303-314)
 - Fixed: Tray tooltip format matches original three-line format with version and separator
-- Optimized: Flickering minimized through proven techniques (update throttling, change detection, frequency reduction)
+- Fixed: Committed memory values now correctly match Task Manager (using correct WinAPI indices)
+- Optimized: Flickering minimized through proven techniques (update throttling, change detection, frequency reduction, WS_EX_COMPOSITED double-buffered main window)
 - Improved: Visual feedback during memory optimization process
 - Optimized: Memory stats update frequency (2 seconds) to reduce flickering
 - Optimized: Progress bar updates only when integer percentage changes (anti-flicker)
 - Changed: Removed custom colored buttons, using standard Windows button style
+- Changed: Removed cached percentage/progress bar (memory composition doesn't need progress indicator)
 
 Core Features - Memory Optimization:
 - Implemented: Complete memory optimization engine
@@ -44,9 +52,10 @@ Core Features - Memory Optimization:
 
 System Tray Integration:
 - Added: Complete system tray icon with dynamic memory usage indicators (12 icon states: 0-11)
-- Added: Tray icon resources properly embedded (303-314) with correct calculation (Floor(MemLoad / 9))
-- Fixed: Tray icon updates every 5 seconds reflecting current memory usage (0-8%, 9-17%, ..., 99-100%)
-- Fixed: Tray tooltip format matches original: "Program Name Version\n---\nMemory Usage: XX%"
+- Added: Tray icon resources properly embedded (350-361, separate from main UI icons) with correct calculation based on first digit of memory load (0-9%, 10-19%, ..., 90-100%)
+- Fixed: Tray icon updates every 5 seconds reflecting current memory usage bands
+- Enhanced: Tray tooltip format matches original three-line layout with version, separator, and memory usage percentage
+- Enhanced: Tray tooltip now also shows RAM and pagefile usage plus process count for quick diagnostics
 - Added: Tray menu with Show/Hide toggle, Optimize Now, and Exit options
 - Added: Minimize to tray functionality via Close button
 - Added: Double-click tray icon to show/hide main window

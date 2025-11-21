@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2335
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2336
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -201,19 +201,19 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\39.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\40.ico
 
-; Tray icons for dynamic memory display (303-314)
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\0.ico					; 303
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\1.ico					; 304
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\2.ico					; 305
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\3.ico					; 306
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\4.ico					; 307
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\5.ico					; 308
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\6.ico					; 309
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\7.ico					; 310
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\8.ico					; 311
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\9.ico					; 312
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\10.ico					; 313
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\11.ico					; 314
+; Tray icons for dynamic memory display (explicit resource IDs 350-361, outside main icon range 201-321)
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\0.ico,350					; 350
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\1.ico,351					; 351
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\2.ico,352					; 352
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\3.ico,353					; 353
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\4.ico,354					; 354
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\5.ico,355					; 355
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\6.ico,356					; 356
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\7.ico,357					; 357
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\8.ico,358					; 358
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\9.ico,359					; 359
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\10.ico,360					; 360
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\MemBoost\Tray\11.ico,361					; 361
 
 ;===============================================================================================================
 ; Tidy Settings
@@ -279,7 +279,7 @@ Opt("SendKeyDownDelay", 1)			;~ 1 millisecond
 Opt("TCPTimeout", 100)				;~ 100 milliseconds
 Opt("TrayAutoPause", 1)				;~ 0=no pause, 1=Pause
 Opt("TrayIconDebug", 1)				;~ 0=no info, 1=debug line info
-Opt("TrayIconHide", 1)				;~ 0=show, 1=hide tray icon
+Opt("TrayIconHide", 0)				;~ 0=show, 1=hide tray icon
 Opt("TrayMenuMode", 1)				;~ 0=append, 1=no default menu, 2=no automatic check, 4=menuitemID  not return
 Opt("TrayOnEventMode", 1)			;~ 0=disable, 1=enable
 Opt("WinDetectHiddenText", 0)		;~ 0=don't detect, 1=do detect
@@ -299,6 +299,7 @@ EndFunc   ;==>_ReBarStartUp
 #include <Process.au3>
 #include <WinAPITheme.au3>
 #include <WinAPIProc.au3>
+#include <WinAPISys.au3>
 #include <WindowsConstants.au3>
 #include <Misc.au3>
 
@@ -309,14 +310,15 @@ EndFunc   ;==>_ReBarStartUp
 #include "..\..\Includes\GuiMenuEx.au3"
 #include "..\..\Includes\ImageListEx.au3"
 #include "..\..\Includes\Link.au3"
-#include "..\..\Includes\Logging.au3"
-#include "..\..\Includes\ProgressBar.au3"
+#include "..\\..\\Includes\\Logging.au3"
+#include "..\\..\\Includes\\GDIPlusProgressBar.au3"
 #include "..\..\Includes\Registry.au3"
 #include "..\..\Includes\Splash.au3"
 #include "..\..\Includes\SSLG.au3"
 #include "..\..\Includes\StringEx.au3"
 #include "..\..\Includes\Update.au3"
 #include "..\..\Includes\Versioning.au3"
+#include "..\..\Includes\FFLabels.au3"
 
 #include "Includes\Localization.au3"
 
@@ -431,7 +433,7 @@ Global $g_TitleShowAutoIt	= False	;~ Show AutoIt version
 
 ;~ Interface Settings
 Global $g_iCoreGuiWidth		= 580
-Global $g_iCoreGuiHeight	= 500
+Global $g_iCoreGuiHeight	= 550
 Global $g_iMsgBoxTimeOut	= 60
 
 ;~ About Dialog
@@ -545,15 +547,23 @@ Global $g_aMemBuffers[8]
 Global $g_aPageBuffers[2]
 Global $g_aVirtualBuffers[2]
 Global $g_hIconMemStats
+Global $g_hPanelRAMBox
+Global $g_hPanelPagePerc
+Global $g_hPanelCountPerc
 Global $g_hLabelRAMPerc
 Global $g_hLabelRAMTotal
 Global $g_hLabelRAMUsed
 Global $g_hLabelRAMFree
-Global $g_hLabelPagePerc
-Global $g_hLabelPageTotal
-Global $g_hLabelPageUsed
-Global $g_hLabelPageFree
-Global $g_hProgressPage[2]
+Global $g_hLabelPagedPool
+Global $g_hLabelNonPagedPool
+Global $g_hLabelCachedTotal
+Global $g_hLabelCachedUsed
+Global $g_hLabelCachedFree
+Global $g_hLabelCommittedTotal
+Global $g_hLabelCommittedUsed
+Global $g_hLabelCommittedFree
+Global $g_hLabelCommittedPerc
+Global $g_hProgressCommitted
 Global $g_hLabelCountPerc
 Global $g_hLabelProcs
 Global $g_hLabelCount
@@ -706,187 +716,237 @@ Func _StartCoreGui()
 	GUICtrlSetFont($g_hSubHeading, 10)
 	GUICtrlSetColor($g_hSubHeading, 0x353535)
 
+	; Memory usage graph (narrowed to make room for CPU graph)
 	$Graph1 = _SSLG_CreateGraph(133, 125, 420, 104, 0, 100, 500, 0x000F1318)
 	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
 	_SSLG_SetSmoothingMode($Graph1, 2)
 
-	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 245, $SS_ETCHEDFRAME)
-	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 241)
+	; CPU usage graph (to the right of memory graph, slightly shorter to make room for CPU bar)
+
+
+	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 295, $SS_ETCHEDFRAME)
+	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 291)
 	GUICtrlSetBkColor(-1, 0x151C23)
 
-	GUICtrlCreateGraphic(20, 125, 104, 108, -1)
-	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hPanelRAMBox = GUICtrlCreateGraphic(20, 125, 104, 108, -1)
+	GUICtrlSetBkColor($g_hPanelRAMBox, 0x0F1318)
 	$g_hIconMemStats = GUICtrlCreateIcon(@ScriptFullPath, $g_iMemStatIcoStart, 38, 140, 64, 64)
-	$g_hLabelRAMPerc = GUICtrlCreateLabel("100%", 20, 210, 104, -1, $SS_CENTER)
-	GUICtrlSetBkColor($g_hLabelRAMPerc, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelRAMPerc, 0x13FF92)
+	$g_hLabelRAMPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($g_hPanelRAMBox), "100%", 0, 83, 104, 16, 9, Default, 0, 1, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, "100%", 0x0F1318)
 
 	GUICtrlCreateGraphic(127, 125, 432, 108)
 	GUICtrlSetBkColor(-1, 0x0F1318)
+
+	; CPU usage bar under CPU graph
+
 
 	GUICtrlCreateGraphic(20, 102, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("MEMORY", 20, 105, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCtrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(127, 102, 84, 20, -1)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelRAMTotal = GUICtrlCreateLabel("00.0 GB", 131, 105, 78, 16, $WS_EX_COMPOSITED)
-	GUICtrlSetBkColor($g_hLabelRAMTotal, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelRAMTotal, 0x13FF92)
+	Local $hPanelRAMTotal = GUICtrlCreateGraphic(127, 102, 84, 20, -1)
+	GUICtrlSetBkColor($hPanelRAMTotal, 0x0F1318)
+	$g_hLabelRAMTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMTotal), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, "00.0 GB", 0x0F1318)
 
 	GUICtrlCreateGraphic(214, 102, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("USED", 218, 105, 78, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(301, 102, 84, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelRAMUsed = GUICtrlCreateLabel("00.0 GB", 305, 105, 78, 16)
-	GUICtrlSetBkColor($g_hLabelRAMUsed, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelRAMUsed, 0x13FF92)
+	Local $hPanelRAMUsed = GUICtrlCreateGraphic(301, 102, 84, 20)
+	GUICtrlSetBkColor($hPanelRAMUsed, 0x0F1318)
+	$g_hLabelRAMUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMUsed), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
 
 	GUICtrlCreateGraphic(388, 102, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("FREE", 392, 105, 78, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(475, 102, 84, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelRAMFree = GUICtrlCreateLabel("00.0 GB", 480, 105, 78, 16)
-	GUICtrlSetBkColor($g_hLabelRAMFree, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelRAMFree, 0x13FF92)
+	Local $hPanelRAMFree = GUICtrlCreateGraphic(475, 102, 84, 20)
+	GUICtrlSetBkColor($hPanelRAMFree, 0x0F1318)
+	$g_hLabelRAMFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 
 
+	; Paged Pool and Non-Paged Pool (one row with 4 mini panels)
 	GUICtrlCreateGraphic(20, 236, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("PAGEFILE", 20, 239, 104, 16, $SS_CENTER)
+	GUICtrlCreateLabel("PAGED POOL", 20, 239, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(127, 236, 84, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelPageTotal = GUICtrlCreateLabel("00.0 GB", 131, 239, 80, 16)
-	GUICtrlSetBkColor($g_hLabelPageTotal, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelPageTotal, 0x00ACFF)
-
-	GUICtrlCreateGraphic(214, 236, 84, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("USED", 218, 239, 80, 16)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	GuiCTrlSetColor(-1, 0xCCCCCC)
+	
+	Local $hPanelPagedPool = GUICtrlCreateGraphic(127, 236, 171, 20)
+	GUICtrlSetBkColor($hPanelPagedPool, 0x0F1318)
+	$g_hLabelPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelPagedPool), "0.0 GB", 4, 3, 167, 16, 9, Default, 0, 0, 0xFF8000)
+	_GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", 0x0F1318)
+	
 	GUICtrlCreateGraphic(301, 236, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelPageUsed = GUICtrlCreateLabel("00.0 GB", 305, 239, 80, 16)
-	GUICtrlSetBkColor($g_hLabelPageUsed, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelPageUsed, 0x00ACFF)
-
-	GUICtrlCreateGraphic(388, 236, 84, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("FREE", 392, 239, 78, 16)
+	GUICtrlCreateLabel("NON-PAGED", 305, 239, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(475, 236, 84, 20)
+	
+	Local $hPanelNonPagedPool = GUICtrlCreateGraphic(388, 236, 171, 20)
+	GUICtrlSetBkColor($hPanelNonPagedPool, 0x0F1318)
+	$g_hLabelNonPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelNonPagedPool), "0.0 GB", 4, 3, 167, 16, 9, Default, 0, 0, 0xFF8000)
+	_GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", 0x0F1318)
+
+	; Cached memory composition (one row: [CACHED][TOTAL][IN USE][CACHED])
+	Local $hPanelCachedHeader = GUICtrlCreateGraphic(20, 259, 104, 20)
+	GUICtrlSetBkColor($hPanelCachedHeader, 0x0F1318)
+	GUICtrlCreateLabel("CACHED", 20, 262, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelPageFree = GUICtrlCreateLabel("00.0 GB", 480, 239, 78, 16)
-	GUICtrlSetBkColor($g_hLabelPageFree, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelPageFree, 0x00ACFF)
-
-
-	GUICtrlCreateGraphic(20, 259, 104, 20)
+	GUICtrlSetColor(-1, 0xFFFFFF)
+	
+	Local $hPanelCachedTotal = GUICtrlCreateGraphic(127, 259, 84, 20)
+	GUICtrlSetBkColor($hPanelCachedTotal, 0x0F1318)
+	$g_hLabelCachedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
+	_GUICtrlFFLabel_SetData($g_hLabelCachedTotal, "00.0 GB", 0x0F1318)
+	
+	GUICtrlCreateGraphic(214, 259, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelPagePerc = GUICtrlCreateLabel("100%", 20, 262, 104, -1, $SS_CENTER)
-	GUICtrlSetBkColor($g_hLabelPagePerc, $GUI_BKCOLOR_TRANSPARENT)
-	GuiCTrlSetColor($g_hLabelPagePerc, 0x00ACFF)
-
-	GUICtrlCreateGraphic(127, 259, 432, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressPage[0] = GUICtrlCreateGraphic(129, 261, 428, 16)
-	GUICtrlSetBkColor($g_hProgressPage[0], 0x00ACFF)
-	$g_hProgressPage[1] = GUICtrlCreateGraphic(130, 262, 426, 14)
-	GUICtrlSetBkColor($g_hProgressPage[1], 0x005174)
-
-
-	GUICtrlCreateGraphic(20, 282, 104, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("PROCS", 20, 285, 104, 16, $SS_CENTER)
+	GUICtrlCreateLabel("IN USE", 218, 262, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(127, 282, 84, 20)
+	
+	Local $hPanelCachedUsed = GUICtrlCreateGraphic(301, 259, 84, 20)
+	GUICtrlSetBkColor($hPanelCachedUsed, 0x0F1318)
+	$g_hLabelCachedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
+	_GUICtrlFFLabel_SetData($g_hLabelCachedUsed, "00.0 GB", 0x0F1318)
+	
+	GUICtrlCreateGraphic(388, 259, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelProcs = GUICtrlCreateLabel("0", 131, 285, 80, 16)
-	GUICtrlSetBkColor($g_hLabelProcs, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelProcs, 0xFF8000)
+	GUICtrlCreateLabel("CACHED", 392, 262, 78, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	
+	Local $hPanelCachedFree = GUICtrlCreateGraphic(475, 259, 84, 20)
+	GUICtrlSetBkColor($hPanelCachedFree, 0x0F1318)
+	$g_hLabelCachedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0xFFFF00)
+	_GUICtrlFFLabel_SetData($g_hLabelCachedFree, "00.0 GB", 0x0F1318)
 
+	; Committed memory mini-panel (first row: [COMMITTED][TOTAL][USED][FREE] with values, second row: percent + bar)
+	Local $hPanelCommittedHeader = GUICtrlCreateGraphic(20, 282, 104, 20)
+	GUICtrlSetBkColor($hPanelCommittedHeader, 0x0F1318)
+	GUICtrlCreateLabel("COMMITTED", 20, 285, 104, 16, $SS_CENTER)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlSetColor(-1, 0xFFFFFF)
+	
+	Local $hPanelCommittedTotal = GUICtrlCreateGraphic(127, 282, 84, 20)
+	GUICtrlSetBkColor($hPanelCommittedTotal, 0x0F1318)
+	$g_hLabelCommittedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, "00.0 GB", 0x0F1318)
+	
 	GUICtrlCreateGraphic(214, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("COUNT", 218, 285, 80, 16)
+	GUICtrlCreateLabel("USED", 218, 285, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(301, 282, 84, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelCount = GUICtrlCreateLabel("0", 305, 285, 80, 16)
-	GUICtrlSetBkColor($g_hLabelCount, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelCount, 0xFF8000)
-
+	
+	Local $hPanelCommittedUsed = GUICtrlCreateGraphic(301, 282, 84, 20)
+	GUICtrlSetBkColor($hPanelCommittedUsed, 0x0F1318)
+	$g_hLabelCommittedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, "00.0 GB", 0x0F1318)
+	
 	GUICtrlCreateGraphic(388, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("TIMER", 392, 285, 78, 16)
+	GUICtrlCreateLabel("FREE", 392, 285, 78, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	GUICtrlCreateGraphic(475, 282, 84, 43)
+	
+	Local $hPanelCommittedFree = GUICtrlCreateGraphic(475, 282, 84, 20)
+	GUICtrlSetBkColor($hPanelCommittedFree, 0x0F1318)
+	$g_hLabelCommittedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x00ACFF)
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedFree, "00.0 GB", 0x0F1318)
+	
+	Local $hPanelCommittedPerc = GUICtrlCreateGraphic(20, 305, 104, 20)
+	GUICtrlSetBkColor($hPanelCommittedPerc, 0x0F1318)
+	$g_hLabelCommittedPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedPerc), "0%", 0, 2, 104, 16, 9, Default, 0, 1, 0x00ACFF)
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", 0x0F1318)
+	
+	GUICtrlCreateGraphic(127, 305, 432, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelTimer = GUICtrlCreateLabel("30", 480, 285, 78, 36, $SS_CENTER)
-	GUICtrlSetFont($g_hLabelTimer, 18)
-	GUICtrlSetBkColor($g_hLabelTimer, 0x0F1318)
-	GuiCTrlSetColor($g_hLabelTimer, 0xFF8000)
+	$g_hProgressCommitted = GUICtrlCreateGraphic(129, 307, 428, 16)
+	GUICtrlSetBkColor($g_hProgressCommitted, 0x0F1318)
 
-
-	GUICtrlCreateGraphic(20, 305, 104, 20)
+	; Processes / count / timer block
+	GUICtrlCreateGraphic(20, 328, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hLabelCountPerc = GUICtrlCreateLabel("100%", 20, 308, 104, -1, $SS_CENTER)
-	GUICtrlSetBkColor($g_hLabelCountPerc, $GUI_BKCOLOR_TRANSPARENT)
-	GuiCTrlSetColor($g_hLabelCountPerc, 0xFF8000)
-
-	GUICtrlCreateGraphic(127, 305, 345, 20)
+	GUICtrlCreateLabel("PROCS", 20, 331, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressProcs[0] = GUICtrlCreateGraphic(129, 307, 341, 16)
-	GUICtrlSetBkColor($g_hProgressProcs[0], 0xFF8000)
-	$g_hProgressProcs[1] = GUICtrlCreateGraphic(130, 308, 339, 14)
-	GUICtrlSetBkColor($g_hProgressProcs[1], 0x803A0A)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	Local $hPanelProcs = GUICtrlCreateGraphic(127, 328, 84, 20)
+	GUICtrlSetBkColor($hPanelProcs, 0x0F1318)
+	$g_hLabelProcs = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelProcs), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
+
+	GUICtrlCreateGraphic(214, 328, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("COUNT", 218, 331, 80, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	Local $hPanelCount = GUICtrlCreateGraphic(301, 328, 84, 20)
+	GUICtrlSetBkColor($hPanelCount, 0x0F1318)
+	$g_hLabelCount = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCount), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelCount, "0", 0x0F1318)
+
+	GUICtrlCreateGraphic(388, 328, 84, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("TIMER", 392, 331, 78, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
+	Local $hPanelTimer = GUICtrlCreateGraphic(475, 328, 84, 43)
+	GUICtrlSetBkColor($hPanelTimer, 0x0F1318)
+	$g_hLabelTimer = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelTimer), "30", 3, 4, 78, 36, 18, Default, 0, 1, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelTimer, "30", 0x0F1318)
+
+	$g_hPanelCountPerc = GUICtrlCreateGraphic(20, 351, 104, 20)
+	GUICtrlSetBkColor($g_hPanelCountPerc, 0x0F1318)
+	$g_hLabelCountPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($g_hPanelCountPerc), "100%", 0, 2, 104, 16, 9, Default, 0, 1, 0x13FF92)
+	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "100%", 0x0F1318)
+
+	GUICtrlCreateGraphic(127, 351, 345, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hProgressProcs[0] = GUICtrlCreateGraphic(129, 353, 341, 16)
+	GUICtrlSetBkColor($g_hProgressProcs[0], 0x0F1318)
 
 	; Buttons (Optimize, Preferences, Close)
-	$g_hBtnOptimize = GUICtrlCreateButton("Optimize Memory", 20, 345, 260, 30)
+	$g_hBtnOptimize = GUICtrlCreateButton("Optimize Memory", 20, 395, 260, 30)
 	GUICtrlSetOnEvent($g_hBtnOptimize, "_OptimizeMemory")
 
-	$g_hBtnPreferences = GUICtrlCreateButton("Preferences", 290, 345, 140, 30)
+	$g_hBtnPreferences = GUICtrlCreateButton("Preferences", 290, 395, 140, 30)
 	GUICtrlSetOnEvent($g_hBtnPreferences, "_ShowPreferencesDlg")
-	
-	Global $g_hBtnClose = GUICtrlCreateButton("Close", 440, 345, 120, 30)
+
+	Global $g_hBtnClose = GUICtrlCreateButton("Close", 440, 395, 120, 30)
 	GUICtrlSetOnEvent($g_hBtnClose, "_MinimizeToTray")
-	
+
 	; Force behave checkbox
-	Global $g_hCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 20, 385, 540, 20)
+	Global $g_hCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 20, 435, 540, 20)
 	GUICtrlSetState($g_hCheckForceBehave, $g_iForceBehave)
 	GUICtrlSetBkColor($g_hCheckForceBehave, $GUI_BKCOLOR_TRANSPARENT)
 	GUICtrlSetColor($g_hCheckForceBehave, 0xFFFFFF)
 	GUICtrlSetOnEvent($g_hCheckForceBehave, "_ToggleForceBehave")
 
-
-	_UpdateMemoryStatsFirst()
-	_UpdateMemoryStats()
 	AdlibRegister("_UpdateMemoryStats", 2000) ; Update every 2 seconds to reduce flickering
 
 	_Splash_Update("", 100)
-	
+
 	; Setup tray icon
 	_SetupTrayIcon()
-	
+
 	GUISetState(@SW_SHOW, $g_hCoreGui)
+
+	_UpdateMemoryStatsFirst()
+	_UpdateMemoryStats()
+	_UpdateTimer()
 
 	AdlibRegister("_OnIconsHover", 65)
 	AdlibRegister("_UpdateTimer", 1000) ; Timer countdown every second
 	AdlibRegister("_UpdateTrayIcon", 5000) ; Update tray icon every 5 seconds
-	
+
 	If @Compiled Then
 		AdlibRegister("_ReduceMemory", $g_iReduceEveryMill)
 	EndIf
@@ -903,19 +963,20 @@ EndFunc
 
 Func _UpdateMemoryStatsFirst()
 
-	$g_aMemStats = MemGetStats()
-
-	Local $iTotalRAM = Round($g_aMemStats[$MEM_TOTALPHYSRAM] / 1048576, 1)
-	Local $iTotalPage = Round($g_aMemStats[$MEM_TOTALPAGEFILE] / 1048576, 1)
-
-	GUICtrlSetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iTotalRAM))
-	GUICtrlSetData($g_hLabelPageTotal, StringFormat("%.1f GB", $iTotalPage))
+	Local $aPerfInfo = _WinAPI_GetPerformanceInfo()
+	If IsArray($aPerfInfo) Then
+		; Total physical memory (bytes -> MB -> GB)
+		Local $iMemTotalMB = Floor($aPerfInfo[3] / 1024 / 1024)
+		Local $iMemTotalGB = Round($iMemTotalMB / 1024, 1)
+		_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
+	EndIf
 	
 	; Update process count
 	Local $aProcessList = ProcessList()
-	GUICtrlSetData($g_hLabelProcs, String($aProcessList[0][0]))
+	_GUICtrlFFLabel_SetData($g_hLabelProcs, String($aProcessList[0][0]), 0x0F1318)
 
 EndFunc
+
 
 
 
@@ -924,56 +985,99 @@ Func _UpdateMemoryStats()
 	; Skip update if currently optimizing to reduce flickering
 	If $g_iOptimizing = 1 Then Return
 
-	$g_aMemStats = MemGetStats()
+	; Query system performance info once and derive all memory stats from it
+	Local $aPerfInfo = _WinAPI_GetPerformanceInfo()
+	If Not IsArray($aPerfInfo) Then Return
 
-    Local $iRAMFree = Round($g_aMemStats[$MEM_AVAILPHYSRAM] / 1048576, 1)
-    Local $iRAMUsed = Round(($g_aMemStats[$MEM_TOTALPHYSRAM] - $g_aMemStats[$MEM_AVAILPHYSRAM]) / 1048576, 1)
-	Local $iPageFree = Round($g_aMemStats[$MEM_AVAILPAGEFILE] / 1048576, 1)
-	Local $iPageUsed = Round(($g_aMemStats[$MEM_TOTALPAGEFILE] - $g_aMemStats[$MEM_AVAILPAGEFILE]) / 1048576, 1)
-	Local $iPagePerc = Round(($g_aMemStats[$MEM_TOTALPAGEFILE] - $g_aMemStats[$MEM_AVAILPAGEFILE]) / $g_aMemStats[$MEM_TOTALPAGEFILE] * 100)
+	; Physical memory (bytes -> MB/GB)
+	Local $iMemTotalMB = Floor($aPerfInfo[3] / 1024 / 1024)
+	Local $iMemAvailMB = Floor($aPerfInfo[4] / 1024 / 1024)
+	Local $iMemTotalGB = Round($iMemTotalMB / 1024, 1)
+	Local $iMemAvailGB = Round($iMemAvailMB / 1024, 1)
+	Local $iMemUsedMB = $iMemTotalMB - $iMemAvailMB
+	If $iMemUsedMB < 0 Then $iMemUsedMB = 0
+	Local $iMemUsedGB = Round($iMemUsedMB / 1024, 1)
 
-    ; Check if the RAM usage has changed and needs a GUI update
-    If $g_aMemStats[$MEM_LOAD] <> $g_aMemBuffers[$MEM_LOAD] Then
+	; RAM load (%) derived from PerfInfo (Task Manager style)
+	Local $iMemLoad = 0
+	If $iMemTotalMB > 0 Then $iMemLoad = Round(($iMemUsedMB / $iMemTotalMB) * 100)
 
-        Local $iIconIndex = 0
-        If $g_aMemStats[$MEM_LOAD] > 0 Then
-            $iIconIndex = Floor($g_aMemStats[$MEM_LOAD] / 2.5)
-        EndIf
+	; Update total RAM label
+	_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
 
-        GUICtrlSetImage($g_hIconMemStats, @ScriptFullPath, $g_iMemStatIcoStart + $iIconIndex)
-        GUICtrlSetData($g_hLabelRAMPerc, StringFormat("%d%", $g_aMemStats[$MEM_LOAD]))
+	; Check if the RAM usage has changed and needs a GUI update
+	If $iMemLoad <> $g_aMemBuffers[$MEM_LOAD] Then
+		Local $iIconIndex = 0
+		If $iMemLoad > 0 Then
+			$iIconIndex = Floor($iMemLoad / 2.5)
+		EndIf
 
-        ; Graph color change removed to reduce updates and flickering
+		GUICtrlSetImage($g_hIconMemStats, @ScriptFullPath, $g_iMemStatIcoStart + $iIconIndex)
+		_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, StringFormat("%d%", $iMemLoad), 0x0F1318)
 
-		$g_aMemBuffers[$MEM_LOAD] = $g_aMemStats[$MEM_LOAD]
+		; Graph color change removed to reduce updates and flickering
 
-    EndIf
+		$g_aMemBuffers[$MEM_LOAD] = $iMemLoad
+	EndIf
 
-    ; Update RAM usage and free space display
-    If $g_aMemBuffers[$MEM_AVAILPHYSRAM] <> $iRAMFree Then
-        GUICtrlSetData($g_hLabelRAMUsed, StringFormat("%.1f GB", $iRAMUsed))
-        GUICtrlSetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree))
-        $g_aMemBuffers[$MEM_AVAILPHYSRAM] = $iRAMFree
-    EndIf
-	
+	; Update RAM usage and free space display when available RAM changes
+	Local $iRAMFree = $iMemAvailGB
+	Local $iRAMUsed = $iMemUsedGB
+	If $g_aMemBuffers[$MEM_AVAILPHYSRAM] <> $iRAMFree Then
+		_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, StringFormat("%.1f GB", $iRAMUsed), 0x0F1318)
+		_GUICtrlFFLabel_SetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree), 0x0F1318)
+		$g_aMemBuffers[$MEM_AVAILPHYSRAM] = $iRAMFree
+	EndIf
+
 	; Update process count
 	Local $aProcessList = ProcessList()
-	GUICtrlSetData($g_hLabelProcs, String($aProcessList[0][0]))
+	_GUICtrlFFLabel_SetData($g_hLabelProcs, String($aProcessList[0][0]), 0x0F1318)
 
-	If $g_aPageBuffers[0] <> $iPagePerc Then
-		GUICtrlSetData($g_hLabelPagePerc, StringFormat("%d%", $iPagePerc))
-		_ProgressBar_SetData($g_hCoreGui, $g_hProgressPage[0], $g_hProgressPage[1], 129, 261, 428, $iPagePerc)
-		$g_aPageBuffers[0] = $iPagePerc
-	EndIf
+	; Cached and committed memory panels and kernel pools
+	Local $iCachedMB = Floor($aPerfInfo[5] / 1024 / 1024)
+	Local $iCachedGB = Round($iCachedMB / 1024, 1)
+	; Cached % no longer shown
 
-	If $g_aMemBuffers[$MEM_AVAILPAGEFILE] <> $iPageFree Then
-		GUICtrlSetData($g_hLabelPageUsed, StringFormat("%.1f GB", $iPageUsed))
-        GUICtrlSetData($g_hLabelPageFree, StringFormat("%.1f GB", $iPageFree))
-		$g_aMemBuffers[$MEM_AVAILPAGEFILE] = $iPageFree
-	EndIf
+	Local $iCachedInUseGB = Round($iMemTotalGB - $iMemAvailGB - $iCachedGB, 1)
+	If $iCachedInUseGB < 0 Then $iCachedInUseGB = 0
 
-	_SSLG_AddSample($Graph1, $g_aMemStats[$MEM_LOAD])
-    _SSLG_UpdateGraph($Graph1, False, True)
+	Local $iCommitTotalMB = Floor($aPerfInfo[0] / 1024 / 1024)
+	Local $iCommitLimitMB = Floor($aPerfInfo[1] / 1024 / 1024)
+	Local $iCommitPerc = 0
+	If $iCommitLimitMB > 0 Then $iCommitPerc = Round(($iCommitTotalMB / $iCommitLimitMB) * 100)
+
+	Local $iCommitTotalGB = Round($iCommitTotalMB / 1024, 1)
+	Local $iCommitLimitGB = Round($iCommitLimitMB / 1024, 1)
+	Local $iCommitFreeGB = Round($iCommitLimitGB - $iCommitTotalGB, 1)
+	If $iCommitFreeGB < 0 Then $iCommitFreeGB = 0
+
+	; Update Paged and Non-Paged Pool
+	Local $iPagedPoolMB = Floor($aPerfInfo[7] / 1024 / 1024)
+	Local $iNonPagedPoolMB = Floor($aPerfInfo[8] / 1024 / 1024)
+	Local $iPagedPoolGB = Round($iPagedPoolMB / 1024, 1)
+	Local $iNonPagedPoolGB = Round($iNonPagedPoolMB / 1024, 1)
+	
+	_GUICtrlFFLabel_SetData($g_hLabelPagedPool, StringFormat("%.1f GB", $iPagedPoolGB), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, StringFormat("%.1f GB", $iNonPagedPoolGB), 0x0F1318)
+	
+	; Cached section: TOTAL = physical RAM, IN USE = active memory, CACHED = system cache
+	_GUICtrlFFLabel_SetData($g_hLabelCachedTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCachedUsed, StringFormat("%.1f GB", $iCachedInUseGB), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCachedFree, StringFormat("%.1f GB", $iCachedGB), 0x0F1318)
+	
+	; Committed: TOTAL = commit limit, USED = commit total, FREE = limit - total
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, StringFormat("%.1f GB", $iCommitLimitGB), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, StringFormat("%.1f GB", $iCommitTotalGB), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedFree, StringFormat("%.1f GB", $iCommitFreeGB), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, StringFormat("%d%%", $iCommitPerc), 0x0F1318)
+	_GDIPlusProgressBar_Draw($g_hProgressCommitted, $iCommitPerc, 0x0F1318, 0x00ACFF, 0x005174)
+
+	; Update memory usage graph based on the PerfInfo-derived RAM load
+	_SSLG_AddSample($Graph1, $iMemLoad)
+	_SSLG_UpdateGraph($Graph1, False, True)
+
+	; Update CPU usage graph and bar
+
 
 EndFunc   ;==>_UpdateMemoryStats
 
@@ -1301,7 +1405,7 @@ Func _OptimizeMemory()
 	Local $iTotalProcs = $aProcsList[0][0]
 
 	; Update status
-	GUICtrlSetData($g_hLabelCount, String($g_iOptimizeCount))
+	_GUICtrlFFLabel_SetData($g_hLabelCount, String($g_iOptimizeCount), 0x0F1318)
 	GUICtrlSetData($g_hSubHeading, $g_aLangCustom[2])
 
 	; Loop through all processes and clear working set
@@ -1320,8 +1424,8 @@ Func _OptimizeMemory()
 		; Update progress on process counter bar (every percentage)
 		Local $iProgress = Floor(($i / $iTotalProcs) * 100)
 		If $iProgress <> $iLastProgress Then
-			GUICtrlSetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress))
-			_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, $iProgress)
+			_GUICtrlFFLabel_SetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress), 0x0F1318)
+			_GDIPlusProgressBar_Draw($g_hProgressProcs[0], $iProgress, 0x0F1318, 0x13FF92, 0x085820)
 			$iLastProgress = $iProgress
 		EndIf
 
@@ -1332,8 +1436,8 @@ Func _OptimizeMemory()
 	_UpdateMemoryStats()
 
 	; Reset progress bar
-	_ProgressBar_SetData($g_hCoreGui, $g_hProgressProcs[0], $g_hProgressProcs[1], 129, 307, 341, 0)
-	GUICtrlSetData($g_hLabelCountPerc, "0%")
+	_GDIPlusProgressBar_Draw($g_hProgressProcs[0], 0, 0x0F1318, 0x13FF92, 0x085820)
+	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "0%", 0x0F1318)
 
 	; Update status
 	GUICtrlSetData($g_hSubHeading, StringFormat($g_aLangCustom[3], $iTotalProcs))
@@ -1356,7 +1460,7 @@ Func _UpdateTimer()
 		If $aMemStats[$MEM_LOAD] > 90 Then ; Memory over 90%
 			_OptimizeMemory()
 		EndIf
-		GUICtrlSetData($g_hLabelTimer, "AUTO")
+		_GUICtrlFFLabel_SetData($g_hLabelTimer, "AUTO", 0x0F1318)
 		
 	ElseIf $g_iAutoOptimize = 2 Then ; Timer mode
 		$g_iTimerCountdown -= 1
@@ -1365,14 +1469,16 @@ Func _UpdateTimer()
 			$g_iTimerCountdown = $g_iAutoOptimizeSeconds
 			_OptimizeMemory()
 		Else
-			GUICtrlSetData($g_hLabelTimer, String($g_iTimerCountdown))
+			_GUICtrlFFLabel_SetData($g_hLabelTimer, String($g_iTimerCountdown), 0x0F1318)
 		EndIf
 		
 	Else ; Manual mode
-		GUICtrlSetData($g_hLabelTimer, "OFF")
+		_GUICtrlFFLabel_SetData($g_hLabelTimer, "OFF", 0x0F1318)
 	EndIf
 
 EndFunc   ;==>_UpdateTimer
+
+
 
 
 Func _ReduceMemory()
@@ -1441,12 +1547,12 @@ Func _SetupTrayIcon()
 	
 	; Load tray icons (for development mode only)
 	For $i = 0 To 11
-		$g_aTrayIcons[$i] = "..\..\..\SDK\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
+		$g_aTrayIcons[$i] = "..\..\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
 	Next
 	
-	; Set initial tray icon (0% = icon 0 = resource -303)
+	; Set initial tray icon (0% = icon 0 = resource 350)
 	If @Compiled Then
-		TraySetIcon(@ScriptFullPath, -303)
+		TraySetIcon(@ScriptFullPath, 350)
 	Else
 		TraySetIcon($g_aTrayIcons[0])
 	EndIf
@@ -1476,8 +1582,8 @@ Func _UpdateTrayIcon()
 	; Gets first digit: 0-9% = "0", 10-19% = "1", 20-29% = "2", ..., 100% = "1"
 	; Then: TraySetIcon(@ScriptFullPath, (-1 * ($OneDig + 6)))
 	; So: 0-9% → -6, 10-19% → -7, 20-29% → -8, ..., 90-99% → -15, 100% → -7 (wraps)
-	; New resources: -303 to -314 (12 icons for 0-100%)
-	; Mapping: 0-9%=-303, 10-19%=-304, 20-29%=-305, ..., 100%=-313
+	; New resources: 350 to 361 (12 icons for 0-100%), separate from main GUI icons (201-321)
+	; Mapping: 0-9%=350, 10-19%=351, 20-29%=352, ..., 100%=360
 	Local $iOneDig = Int(StringLeft(String($iMemLoad), 1))
 	
 	; Cap at 10 for 100% (shows icon 10), but we have 12 icons (0-11)
@@ -1485,16 +1591,26 @@ Func _UpdateTrayIcon()
 	If $iOneDig > 11 Then $iOneDig = 11
 	
 	If @Compiled Then
-		; Convert from old resource numbering to new: old -6 = new -303
-		TraySetIcon(@ScriptFullPath, -303 - $iOneDig)
+		; Use explicit resource IDs 350-361 for tray icons
+		TraySetIcon(@ScriptFullPath, 350 + $iOneDig)
 	Else
 		TraySetIcon($g_aTrayIcons[$iOneDig])
 	EndIf
 	
-	; Tooltip exactly as old version
+	; Tooltip: program title, separator, memory usage, plus key stats
+	Local $iTotalRAMGB = Round($g_aMemStats[$MEM_TOTALPHYSRAM] / 1048576, 1)
+	Local $iUsedRAMGB = Round(($g_aMemStats[$MEM_TOTALPHYSRAM] - $g_aMemStats[$MEM_AVAILPHYSRAM]) / 1048576, 1)
+	Local $iTotalPageGB = Round($g_aMemStats[$MEM_TOTALPAGEFILE] / 1048576, 1)
+	Local $iUsedPageGB = Round(($g_aMemStats[$MEM_TOTALPAGEFILE] - $g_aMemStats[$MEM_AVAILPAGEFILE]) / 1048576, 1)
+	Local $aProcs = ProcessList()
+	Local $iProcCount = $aProcs[0][0]
+
 	TraySetToolTip($g_sProgramTitle & @CRLF & _
 					"----------------------------------------" & @CRLF & _
-					"Memory Usage: " & $iMemLoad & "%")
+					"Memory Usage: " & $iMemLoad & "%" & @CRLF & _
+					"RAM: " & StringFormat("%.1f/%.1f GB used", $iUsedRAMGB, $iTotalRAMGB) & @CRLF & _
+					"Pagefile: " & StringFormat("%.1f/%.1f GB used", $iUsedPageGB, $iTotalPageGB) & @CRLF & _
+					"Processes: " & $iProcCount)
 
 EndFunc   ;==>_UpdateTrayIcon
 
