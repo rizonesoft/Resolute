@@ -38,8 +38,8 @@
 ;                  $bVertical   - [Optional] True to draw vertical bar from bottom up, False for horizontal (default)
 ; Return values..: Success - True
 ;                  Failure - Sets @error and returns False
-; Remarks........: This function uses GDIPlus for drawing. It starts and shuts down GDIPlus internally on each call
-;                  to remain self-contained and avoid interfering with other GDIPlus users.
+; Remarks........: This function uses GDIPlus for drawing. GDI+ must already be initialized by the caller
+;                  (e.g., by FFLabels). Does not start/stop GDI+ to avoid destroying shared GDI+ resources.
 ; ===============================================================================================================
 Func _GDIPlusProgressBar_Draw($hCtrl, $iPerc, $iBackColor, $iOuterColor, $iInnerColor, $bVertical = False)
 
@@ -57,18 +57,18 @@ Func _GDIPlusProgressBar_Draw($hCtrl, $iPerc, $iBackColor, $iOuterColor, $iInner
 	Local $iHeight = DllStructGetData($tRect, "Bottom") - DllStructGetData($tRect, "Top")
 	If $iWidth <= 0 Or $iHeight <= 0 Then Return SetError(3, 0, False)
 
+	; GDI+ uses reference counting - safe to call startup multiple times
+	; FFLabels will handle the final shutdown on exit
 	_GDIPlus_Startup()
 
 	Local $hDC = _WinAPI_GetDC($hWndCtrl)
 	If Not $hDC Then
-		_GDIPlus_Shutdown()
 		Return SetError(4, 0, False)
 	EndIf
 
 	Local $hGraphics = _GDIPlus_GraphicsCreateFromHDC($hDC)
 	If @error Or Not $hGraphics Then
 		_WinAPI_ReleaseDC($hWndCtrl, $hDC)
-		_GDIPlus_Shutdown()
 		Return SetError(5, 0, False)
 	EndIf
 
@@ -113,13 +113,12 @@ Func _GDIPlusProgressBar_Draw($hCtrl, $iPerc, $iBackColor, $iOuterColor, $iInner
 		EndIf
 	EndIf
 
-	; Cleanup
+	; Cleanup (but don't shutdown GDI+ - FFLabels manages it globally)
 	_GDIPlus_BrushDispose($hBrushBg)
 	_GDIPlus_BrushDispose($hBrushOuter)
 	_GDIPlus_BrushDispose($hBrushInner)
 	_GDIPlus_GraphicsDispose($hGraphics)
 	_WinAPI_ReleaseDC($hWndCtrl, $hDC)
-	_GDIPlus_Shutdown()
 
 	Return True
 

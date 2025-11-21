@@ -25,7 +25,7 @@ File=%SourceDir%\PixRepair.ini
 File=%RootDir%\Docs\PixRepair\Changes.txt
 File=%RootDir%\Docs\PixRepair\License.txt
 File=%RootDir%\Docs\PixRepair\Readme.txt
-File=%RootDir%\Language\PixRepair\en.ini
+File=%RootDir%\Language\PixRepair\en.lng
 File=%RootDir%\Processing\32\Stroke.ani
 File=%RootDir%\Processing\64\Globe.ani
 

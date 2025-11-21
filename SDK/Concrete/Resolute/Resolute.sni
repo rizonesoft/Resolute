@@ -23,7 +23,7 @@ File=%RootDir%\Resolute_X64.exe
 File=%RootDir%\Docs\Resolute\Changes.txt
 File=%RootDir%\Docs\Resolute\Readme.txt
 File=%RootDir%\Docs\Resolute\License.txt
-File=%RootDir%\Language\Resolute\en.ini
+File=%RootDir%\Language\Resolute\en.lng
 
 [Sources]
 

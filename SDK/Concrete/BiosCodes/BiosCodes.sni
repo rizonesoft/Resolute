@@ -25,7 +25,7 @@ File=%SourceDir%\BiosCodes.ini
 File=%RootDir%\Docs\BiosCodes\Changes.txt
 File=%RootDir%\Docs\BiosCodes\License.txt
 File=%RootDir%\Docs\BiosCodes\Readme.txt
-File=%RootDir%\Language\BiosCodes\en.ini
+File=%RootDir%\Language\BiosCodes\en.lng
 File=%RootDir%\Processing\32\Stroke.ani
 File=%RootDir%\Processing\64\Globe.ani
 

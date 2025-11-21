@@ -25,7 +25,7 @@ File=%SourceDir%\Ownership.ini
 File=%RootDir%\Docs\Ownership\Changes.txt
 File=%RootDir%\Docs\Ownership\License.txt
 File=%RootDir%\Docs\Ownership\Readme.txt
-File=%RootDir%\Language\Ownership\en.ini
+File=%RootDir%\Language\Ownership\en.lng
 File=%RootDir%\Processing\32\Stroke.ani
 File=%RootDir%\Processing\64\Globe.ani
 

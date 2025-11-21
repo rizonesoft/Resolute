@@ -315,7 +315,7 @@ _SetWorkingDirectories()
 Global $g_sLanguageDir		= @ScriptDir & "\Language"
 Global $g_sSelectedLanguage = IniRead($g_sPathIni, $g_sProgShortName, "Language", "en")
 Global $g_tSelectedLanguage = $g_sSelectedLanguage
-Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".ini"
+Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".lng"
 
 If Not @Compiled Then
 	$g_sProcessDir 		= "..\Processing"
@@ -2059,12 +2059,12 @@ Func _ShowPreferencesDlg()
 	_GUICtrlListView_AddSubItem($g_hOListLanguage, 0, "en", 1)
 	_GUICtrlListView_SetItemParam($g_hOListLanguage, 0, 3300)
 
-	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.ini")
+	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.lng")
 	While 1
 		Local $sLangFileName = FileFindNextFile($hLangSearch)
 		;~ If there is no more file matching the search.
 		If @error Then ExitLoop
-		If $sLangFileName = "en.ini" Then ContinueLoop
+		If $sLangFileName = "en.lng" Then ContinueLoop
 
 		Local $sLangIniPath = $g_sLanguageDir & "\" & $sLangFileName
 		ConsoleWrite($sLangIniPath)

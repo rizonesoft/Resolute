@@ -337,7 +337,7 @@ Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 Global $g_sRootDir			= @ScriptDir
 Global $g_sBinDir			= $g_sRootDir & "\Bin"
 Global $g_sWorkingDir		= $g_sRootDir ;~ Working Directory
-Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
+Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".lng" ;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
 Global $g_sResourcesDir		= _PathFull(@ScriptDir & "\..\..\Resources")
 Global $g_sProcessDir		= $g_sRootDir &	"\Processing"
@@ -365,7 +365,7 @@ _SetWorkingDirectories()
 Global $g_sLanguageDir		= $g_sRootDir & "\Language\" & $g_sProgShortName
 Global $g_sSelectedLanguage = IniRead($g_sPathIni, $g_sProgShortName, "Language", "en")
 Global $g_tSelectedLanguage = $g_sSelectedLanguage
-Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".ini"
+Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".lng"
 
 ;~ Resources
 Global $g_iUpdateIconStart				= 209
@@ -1320,7 +1320,7 @@ EndFunc   ;==>_SetResources
 
 Func _ResetWorkingDirectories()
 
-	$g_sPathIni = $g_sWorkingDir & "\" & $g_sProgShortName & ".ini"
+	$g_sPathIni = $g_sWorkingDir & "\" & $g_sProgShortName & ".lng"
 	$g_sLoggingRoot = $g_sWorkingDir & "\Logging\" & $g_sProgShortName
 	$g_sLoggingPath = $g_sLoggingRoot & "\" & $g_sProgShortName & ".log"
 
@@ -1607,12 +1607,12 @@ Func _ShowPreferencesDlg()
 	_GUICtrlListView_AddSubItem($g_hOListLanguage, 0, "en", 1)
 	_GUICtrlListView_SetItemParam($g_hOListLanguage, 0, 3300)
 
-	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.ini")
+	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.lng")
 	While 1
 		Local $sLangFileName = FileFindNextFile($hLangSearch)
 		;~ If there is no more file matching the search.
 		If @error Then ExitLoop
-		If $sLangFileName = "en.ini" Then ContinueLoop
+		If $sLangFileName = "en.lng" Then ContinueLoop
 
 		Local $sLangIniPath = $g_sLanguageDir & "\" & $sLangFileName
 		ConsoleWrite($sLangIniPath)

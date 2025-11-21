@@ -131,6 +131,7 @@ Func _GUICtrlFFLabel_Create($hWnd, $sText, $iLeft, $iTop, $iWidth, $iHeight, $iF
 		GUIRegisterMsg($WM_SIZE, '__GUICtrlFFLabel_WM_SIZE')
 		GUIRegisterMsg(0x0232, '__GUICtrlFFLabel_WM_EXITSIZEMOVE')
 		GUIRegisterMsg(0x0231, '__GUICtrlFFLabel_WM_ENTERSIZEMOVE')
+		GUIRegisterMsg($WM_PAINT, '__GUICtrlFFLabel_WM_PAINT')
 	EndIf
 
 	__GUICtrlFFLabel_Graphics_N_DC($g_aGDILbs[0][0], $hWnd)
@@ -209,7 +210,12 @@ Func _GUICtrlFFLabel_SetData($iIndex, $sText, $iBackGround = Default)
 	$g_aGDILbs[$iIndex][$g_FF_sRestore] = $sText
 	If $g_aGDILbs[$iIndex][$g_FF_bIsMinimized] Then Return
 
-	If $iBackGround = Default Then $iBackGround = $g_aGDILbs[$iIndex][$g_FF_iDef_BG_Color]
+	If $iBackGround = Default Then 
+		$iBackGround = $g_aGDILbs[$iIndex][$g_FF_iDef_BG_Color]
+	Else
+		; Store explicit background so it persists for refreshes
+		$g_aGDILbs[$iIndex][$g_FF_iDef_BG_Color] = $iBackGround
+	EndIf
 	__GUICtrlFFLabel_VerifyARGB($iBackGround)
 	_GDIPlus_GraphicsClear($g_aGDILbs[$iIndex][$g_FF_hBuffer], $iBackGround)
 	_GDIPlus_GraphicsDrawStringEx($g_aGDILbs[$iIndex][$g_FF_hBuffer], $sText, $g_aGDILbs[$iIndex][$g_FF_hFont], $g_aGDILbs[$iIndex][$g_FF_Layout], $g_aGDILbs[$iIndex][$g_FF_hStringformat], $g_aGDILbs[$iIndex][$g_FF_hBrush])
@@ -432,11 +438,13 @@ Func __GUICtrlFFLabel_WM_SIZE($hWndGUI, $MsgID, $wParam)
 	#forceref $hWndGUI, $MsgID
 	Switch $wParam
 		Case 0;restore
+			; Clear minimized flag first
 			For $i = 1 To $g_aGDILbs[0][0]
 				If $g_aGDILbs[$i][$g_FF_hGUI] = $hWndGUI Then
-					If $g_aGDILbs[$i][$g_FF_bIsMinimized] Then $g_aGDILbs[$i][$g_FF_bIsMinimized] = False
+					$g_aGDILbs[$i][$g_FF_bIsMinimized] = False
 				EndIf
 			Next
+			; Use delayed refresh so DCs are fully ready
 			AdlibRegister('__GUICtrlFFLabel_DelayedRefresh', 100)
 		Case 1;minimize
 			For $i = 1 To $g_aGDILbs[0][0]
@@ -457,4 +465,20 @@ Func __GUICtrlFFLabel_DelayedRefresh()
 	_GUICtrlFFLabel_Refresh()
 	AdlibUnRegister('__GUICtrlFFLabel_DelayedRefresh')
 EndFunc   ;==>__GUICtrlFFLabel_DelayedRefresh
+
+Func __GUICtrlFFLabel_WM_PAINT($hWndGUI, $MsgID, $wParam, $lParam)
+	#forceref $MsgID, $wParam, $lParam
+	
+	; Microsoft best practice: WM_PAINT should write to window DC precisely once
+	; This is a single BitBlt operation - NO text redrawing, just restore existing buffer
+	For $i = 1 To $g_aGDILbs[0][0]
+		If Not $g_aGDILbs[$i][$g_FF_bRemoved] And $g_aGDILbs[$i][$g_FF_hGUI] = $hWndGUI And Not $g_aGDILbs[$i][$g_FF_bIsMinimized] Then
+			; Only reblit the buffer - don't call SetData which would redraw text
+			__GUICtrlFFLabel_WriteBuffer($i)
+		EndIf
+	Next
+	
+	Return $GUI_RUNDEFMSG
+EndFunc   ;==>__GUICtrlFFLabel_WM_PAINT
+
 #endregion internal functions

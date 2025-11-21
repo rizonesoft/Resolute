@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2336
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2352
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -387,7 +387,7 @@ _SetWorkingDirectories()
 Global $g_sLanguageDir		= $g_sRootDir & "\Language\" & $g_sProgShortName
 Global $g_sSelectedLanguage = IniRead($g_sPathIni, $g_sProgShortName, "Language", "en")
 Global $g_tSelectedLanguage = $g_sSelectedLanguage
-Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".ini"
+Global $g_sLanguageFile		= $g_sLanguageDir & "\" & $g_sSelectedLanguage & ".lng"
 
 ;~ Resources
 Global $g_iUpdateIconStart				= 209
@@ -543,7 +543,7 @@ Global $g_hOWarnings
 Global $g_hOMemWarnings
 
 Global $g_aMemStats
-Global $g_aMemBuffers[8]
+Global $g_aMemBuffers[8] = [-1, -1, -1, -1, -1, -1, -1, -1]  ; Initialize to -1 to force first update
 Global $g_aPageBuffers[2]
 Global $g_aVirtualBuffers[2]
 Global $g_hIconMemStats
@@ -748,7 +748,7 @@ Func _StartCoreGui()
 	Local $hPanelRAMTotal = GUICtrlCreateGraphic(127, 102, 84, 20, -1)
 	GUICtrlSetBkColor($hPanelRAMTotal, 0x0F1318)
 	$g_hLabelRAMTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMTotal), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, "00.0 GB", 0x0F1318)
 
 	GUICtrlCreateGraphic(214, 102, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -758,7 +758,7 @@ Func _StartCoreGui()
 	Local $hPanelRAMUsed = GUICtrlCreateGraphic(301, 102, 84, 20)
 	GUICtrlSetBkColor($hPanelRAMUsed, 0x0F1318)
 	$g_hLabelRAMUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMUsed), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
 
 	GUICtrlCreateGraphic(388, 102, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -768,7 +768,7 @@ Func _StartCoreGui()
 	Local $hPanelRAMFree = GUICtrlCreateGraphic(475, 102, 84, 20)
 	GUICtrlSetBkColor($hPanelRAMFree, 0x0F1318)
 	$g_hLabelRAMFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 
 
 	; Paged Pool and Non-Paged Pool (one row with 4 mini panels)
@@ -777,22 +777,22 @@ Func _StartCoreGui()
 	GUICtrlCreateLabel("PAGED POOL", 20, 239, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	
+
 	Local $hPanelPagedPool = GUICtrlCreateGraphic(127, 236, 171, 20)
 	GUICtrlSetBkColor($hPanelPagedPool, 0x0F1318)
 	$g_hLabelPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelPagedPool), "0.0 GB", 4, 3, 167, 16, 9, Default, 0, 0, 0xFF8000)
-	_GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", 0x0F1318)
-	
+_GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", 0x0F1318)
+
 	GUICtrlCreateGraphic(301, 236, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("NON-PAGED", 305, 239, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	
+
 	Local $hPanelNonPagedPool = GUICtrlCreateGraphic(388, 236, 171, 20)
 	GUICtrlSetBkColor($hPanelNonPagedPool, 0x0F1318)
 	$g_hLabelNonPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelNonPagedPool), "0.0 GB", 4, 3, 167, 16, 9, Default, 0, 0, 0xFF8000)
-	_GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", 0x0F1318)
 
 	; Cached memory composition (one row: [CACHED][TOTAL][IN USE][CACHED])
 	Local $hPanelCachedHeader = GUICtrlCreateGraphic(20, 259, 104, 20)
@@ -800,33 +800,33 @@ Func _StartCoreGui()
 	GUICtrlCreateLabel("CACHED", 20, 262, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlSetColor(-1, 0xFFFFFF)
-	
+
 	Local $hPanelCachedTotal = GUICtrlCreateGraphic(127, 259, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedTotal, 0x0F1318)
 	$g_hLabelCachedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
-	_GUICtrlFFLabel_SetData($g_hLabelCachedTotal, "00.0 GB", 0x0F1318)
-	
+_GUICtrlFFLabel_SetData($g_hLabelCachedTotal, "00.0 GB", 0x0F1318)
+
 	GUICtrlCreateGraphic(214, 259, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("IN USE", 218, 262, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	
+
 	Local $hPanelCachedUsed = GUICtrlCreateGraphic(301, 259, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedUsed, 0x0F1318)
 	$g_hLabelCachedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
-	_GUICtrlFFLabel_SetData($g_hLabelCachedUsed, "00.0 GB", 0x0F1318)
-	
+_GUICtrlFFLabel_SetData($g_hLabelCachedUsed, "00.0 GB", 0x0F1318)
+
 	GUICtrlCreateGraphic(388, 259, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("CACHED", 392, 262, 78, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	
+
 	Local $hPanelCachedFree = GUICtrlCreateGraphic(475, 259, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedFree, 0x0F1318)
 	$g_hLabelCachedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0xFFFF00)
-	_GUICtrlFFLabel_SetData($g_hLabelCachedFree, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCachedFree, "00.0 GB", 0x0F1318)
 
 	; Committed memory mini-panel (first row: [COMMITTED][TOTAL][USED][FREE] with values, second row: percent + bar)
 	Local $hPanelCommittedHeader = GUICtrlCreateGraphic(20, 282, 104, 20)
@@ -834,39 +834,39 @@ Func _StartCoreGui()
 	GUICtrlCreateLabel("COMMITTED", 20, 285, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlSetColor(-1, 0xFFFFFF)
-	
+
 	Local $hPanelCommittedTotal = GUICtrlCreateGraphic(127, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedTotal, 0x0F1318)
 	$g_hLabelCommittedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
-	_GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, "00.0 GB", 0x0F1318)
-	
+_GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, "00.0 GB", 0x0F1318)
+
 	GUICtrlCreateGraphic(214, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("USED", 218, 285, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	
+
 	Local $hPanelCommittedUsed = GUICtrlCreateGraphic(301, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedUsed, 0x0F1318)
 	$g_hLabelCommittedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
-	_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, "00.0 GB", 0x0F1318)
-	
+_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, "00.0 GB", 0x0F1318)
+
 	GUICtrlCreateGraphic(388, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("FREE", 392, 285, 78, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	
+
 	Local $hPanelCommittedFree = GUICtrlCreateGraphic(475, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedFree, 0x0F1318)
 	$g_hLabelCommittedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x00ACFF)
-	_GUICtrlFFLabel_SetData($g_hLabelCommittedFree, "00.0 GB", 0x0F1318)
-	
+_GUICtrlFFLabel_SetData($g_hLabelCommittedFree, "00.0 GB", 0x0F1318)
+
 	Local $hPanelCommittedPerc = GUICtrlCreateGraphic(20, 305, 104, 20)
 	GUICtrlSetBkColor($hPanelCommittedPerc, 0x0F1318)
 	$g_hLabelCommittedPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedPerc), "0%", 0, 2, 104, 16, 9, Default, 0, 1, 0x00ACFF)
-	_GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", 0x0F1318)
-	
+_GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", 0x0F1318)
+
 	GUICtrlCreateGraphic(127, 305, 432, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	$g_hProgressCommitted = GUICtrlCreateGraphic(129, 307, 428, 16)
@@ -881,7 +881,7 @@ Func _StartCoreGui()
 	Local $hPanelProcs = GUICtrlCreateGraphic(127, 328, 84, 20)
 	GUICtrlSetBkColor($hPanelProcs, 0x0F1318)
 	$g_hLabelProcs = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelProcs), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 
 	GUICtrlCreateGraphic(214, 328, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -930,18 +930,19 @@ Func _StartCoreGui()
 	GUICtrlSetColor($g_hCheckForceBehave, 0xFFFFFF)
 	GUICtrlSetOnEvent($g_hCheckForceBehave, "_ToggleForceBehave")
 
-	AdlibRegister("_UpdateMemoryStats", 2000) ; Update every 2 seconds to reduce flickering
-
 	_Splash_Update("", 100)
 
 	; Setup tray icon
 	_SetupTrayIcon()
-
+	AdlibRegister("_UpdateMemoryStats", 1000)
+	; Show GUI first so FFLabels can properly initialize their graphics contexts
 	GUISetState(@SW_SHOW, $g_hCoreGui)
 
-	_UpdateMemoryStatsFirst()
+	; Immediate initialization with double-update to survive WM_PAINT
 	_UpdateMemoryStats()
 	_UpdateTimer()
+	_GUICtrlFFLabel_SetData($g_hLabelCount, String($g_iOptimizeCount), 0x0F1318)
+	_GUICtrlFFLabel_Refresh()
 
 	AdlibRegister("_OnIconsHover", 65)
 	AdlibRegister("_UpdateTimer", 1000) ; Timer countdown every second
@@ -970,7 +971,7 @@ Func _UpdateMemoryStatsFirst()
 		Local $iMemTotalGB = Round($iMemTotalMB / 1024, 1)
 		_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
 	EndIf
-	
+
 	; Update process count
 	Local $aProcessList = ProcessList()
 	_GUICtrlFFLabel_SetData($g_hLabelProcs, String($aProcessList[0][0]), 0x0F1318)
@@ -981,9 +982,6 @@ EndFunc
 
 
 Func _UpdateMemoryStats()
-
-	; Skip update if currently optimizing to reduce flickering
-	If $g_iOptimizing = 1 Then Return
 
 	; Query system performance info once and derive all memory stats from it
 	Local $aPerfInfo = _WinAPI_GetPerformanceInfo()
@@ -1005,29 +1003,27 @@ Func _UpdateMemoryStats()
 	; Update total RAM label
 	_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
 
-	; Check if the RAM usage has changed and needs a GUI update
-	If $iMemLoad <> $g_aMemBuffers[$MEM_LOAD] Then
-		Local $iIconIndex = 0
-		If $iMemLoad > 0 Then
-			$iIconIndex = Floor($iMemLoad / 2.5)
-		EndIf
-
-		GUICtrlSetImage($g_hIconMemStats, @ScriptFullPath, $g_iMemStatIcoStart + $iIconIndex)
-		_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, StringFormat("%d%", $iMemLoad), 0x0F1318)
-
-		; Graph color change removed to reduce updates and flickering
-
-		$g_aMemBuffers[$MEM_LOAD] = $iMemLoad
+	Local $iIconIndex = 0
+	If $iMemLoad > 0 Then
+		$iIconIndex = Floor($iMemLoad / 2.5)
 	EndIf
+
+	; Only update icon if it changed to prevent flickering
+	If $iMemLoad <> $g_aMemBuffers[$MEM_LOAD] Then
+		GUICtrlSetImage($g_hIconMemStats, @ScriptFullPath, $g_iMemStatIcoStart + $iIconIndex)
+	EndIf
+
+	_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, StringFormat("%d%", $iMemLoad), 0x0F1318)
+
+	$g_aMemBuffers[$MEM_LOAD] = $iMemLoad
 
 	; Update RAM usage and free space display when available RAM changes
 	Local $iRAMFree = $iMemAvailGB
 	Local $iRAMUsed = $iMemUsedGB
-	If $g_aMemBuffers[$MEM_AVAILPHYSRAM] <> $iRAMFree Then
-		_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, StringFormat("%.1f GB", $iRAMUsed), 0x0F1318)
-		_GUICtrlFFLabel_SetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree), 0x0F1318)
-		$g_aMemBuffers[$MEM_AVAILPHYSRAM] = $iRAMFree
-	EndIf
+
+	_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, StringFormat("%.1f GB", $iRAMUsed), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree), 0x0F1318)
+	$g_aMemBuffers[$MEM_AVAILPHYSRAM] = $iRAMFree
 
 	; Update process count
 	Local $aProcessList = ProcessList()
@@ -1056,15 +1052,15 @@ Func _UpdateMemoryStats()
 	Local $iNonPagedPoolMB = Floor($aPerfInfo[8] / 1024 / 1024)
 	Local $iPagedPoolGB = Round($iPagedPoolMB / 1024, 1)
 	Local $iNonPagedPoolGB = Round($iNonPagedPoolMB / 1024, 1)
-	
+
 	_GUICtrlFFLabel_SetData($g_hLabelPagedPool, StringFormat("%.1f GB", $iPagedPoolGB), 0x0F1318)
 	_GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, StringFormat("%.1f GB", $iNonPagedPoolGB), 0x0F1318)
-	
+
 	; Cached section: TOTAL = physical RAM, IN USE = active memory, CACHED = system cache
 	_GUICtrlFFLabel_SetData($g_hLabelCachedTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
 	_GUICtrlFFLabel_SetData($g_hLabelCachedUsed, StringFormat("%.1f GB", $iCachedInUseGB), 0x0F1318)
 	_GUICtrlFFLabel_SetData($g_hLabelCachedFree, StringFormat("%.1f GB", $iCachedGB), 0x0F1318)
-	
+
 	; Committed: TOTAL = commit limit, USED = commit total, FREE = limit - total
 	_GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, StringFormat("%.1f GB", $iCommitLimitGB), 0x0F1318)
 	_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, StringFormat("%.1f GB", $iCommitTotalGB), 0x0F1318)
@@ -1080,8 +1076,6 @@ Func _UpdateMemoryStats()
 
 
 EndFunc   ;==>_UpdateMemoryStats
-
-
 
 
 #Region "Events"
@@ -1318,7 +1312,7 @@ Func _SaveConfiguration()
 	IniWrite($g_sPathIni, $g_sProgShortName, "ReduceMemory", $g_iReduceMemory)
 	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingEnabled", $g_iLoggingEnabled)
 	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingStorageSize", $g_iLoggingStorage)
-	
+
 	; Save new settings
 	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimize", $g_iAutoOptimize)
 	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", $g_iAutoOptimizeSeconds)
@@ -1408,9 +1402,20 @@ Func _OptimizeMemory()
 	_GUICtrlFFLabel_SetData($g_hLabelCount, String($g_iOptimizeCount), 0x0F1318)
 	GUICtrlSetData($g_hSubHeading, $g_aLangCustom[2])
 
+	; Double-update: ensures buffers fresh before and after WM_PAINT
+	_UpdateMemoryStats()
+	_WinAPI_UpdateWindow($g_hCoreGui)
+	_UpdateMemoryStats()
+
+	; Force full refresh of ALL labels to ensure count and timer stay visible
+	_GUICtrlFFLabel_Refresh()
+
 	; Loop through all processes and clear working set
 	Local $iLastProgress = -1
 	For $i = 1 To $iTotalProcs
+		; Skip our own process to prevent clearing our GDI resources
+		If $aProcsList[$i][1] = @AutoItPID Then ContinueLoop
+
 		_WinAPI_EmptyWorkingSet($aProcsList[$i][1])
 
 		; Force behave: reduce priority of high-priority processes
@@ -1432,9 +1437,6 @@ Func _OptimizeMemory()
 		Sleep(1) ; Small delay to prevent CPU spike
 	Next
 
-	; Update memory stats immediately after optimization
-	_UpdateMemoryStats()
-
 	; Reset progress bar
 	_GDIPlusProgressBar_Draw($g_hProgressProcs[0], 0, 0x0F1318, 0x13FF92, 0x085820)
 	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "0%", 0x0F1318)
@@ -1447,7 +1449,14 @@ Func _OptimizeMemory()
 	GUICtrlSetState($g_hBtnPreferences, $GUI_ENABLE)
 	_SetProcessingStates($GUI_ENABLE)
 
+	; Update memory stats to show post-optimization results
 	$g_iOptimizing = 0
+	_UpdateMemoryStats()
+	_WinAPI_UpdateWindow($g_hCoreGui)
+	_UpdateMemoryStats()
+
+	; Force full refresh of ALL labels to ensure count and timer stay visible
+	_GUICtrlFFLabel_Refresh()
 
 EndFunc   ;==>_OptimizeMemory
 
@@ -1461,17 +1470,17 @@ Func _UpdateTimer()
 			_OptimizeMemory()
 		EndIf
 		_GUICtrlFFLabel_SetData($g_hLabelTimer, "AUTO", 0x0F1318)
-		
+
 	ElseIf $g_iAutoOptimize = 2 Then ; Timer mode
 		$g_iTimerCountdown -= 1
-		
+
 		If $g_iTimerCountdown <= 0 Then
 			$g_iTimerCountdown = $g_iAutoOptimizeSeconds
 			_OptimizeMemory()
 		Else
 			_GUICtrlFFLabel_SetData($g_hLabelTimer, String($g_iTimerCountdown), 0x0F1318)
 		EndIf
-		
+
 	Else ; Manual mode
 		_GUICtrlFFLabel_SetData($g_hLabelTimer, "OFF", 0x0F1318)
 	EndIf
@@ -1544,12 +1553,12 @@ Func _SetupTrayIcon()
 	; Set tray mode
 	Opt("TrayMenuMode", 3) ; No default items
 	Opt("TrayOnEventMode", 1)
-	
+
 	; Load tray icons (for development mode only)
 	For $i = 0 To 11
 		$g_aTrayIcons[$i] = "..\..\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
 	Next
-	
+
 	; Set initial tray icon (0% = icon 0 = resource 350)
 	If @Compiled Then
 		TraySetIcon(@ScriptFullPath, 350)
@@ -1557,7 +1566,7 @@ Func _SetupTrayIcon()
 		TraySetIcon($g_aTrayIcons[0])
 	EndIf
 	TraySetToolTip($g_sProgramTitle)
-	
+
 	; Create tray menu
 	$g_hTrayShowHide = TrayCreateItem("Show/Hide Memory Booster")
 	TrayItemSetOnEvent($g_hTrayShowHide, "_ToggleShowHide")
@@ -1567,7 +1576,7 @@ Func _SetupTrayIcon()
 	TrayCreateItem("")
 	$g_hTrayExit = TrayCreateItem("Exit")
 	TrayItemSetOnEvent($g_hTrayExit, "_ShutdownProgram")
-	
+
 	TraySetState(1) ; Show tray icon
 
 EndFunc   ;==>_SetupTrayIcon
@@ -1577,7 +1586,7 @@ Func _UpdateTrayIcon()
 
 	$g_aMemStats = MemGetStats()
 	Local $iMemLoad = $g_aMemStats[$MEM_LOAD]
-	
+
 	; OLD VERSION EXACT FORMULA: Local $OneDig = StringLeft($MemInfo[0], 1)
 	; Gets first digit: 0-9% = "0", 10-19% = "1", 20-29% = "2", ..., 100% = "1"
 	; Then: TraySetIcon(@ScriptFullPath, (-1 * ($OneDig + 6)))
@@ -1585,18 +1594,18 @@ Func _UpdateTrayIcon()
 	; New resources: 350 to 361 (12 icons for 0-100%), separate from main GUI icons (201-321)
 	; Mapping: 0-9%=350, 10-19%=351, 20-29%=352, ..., 100%=360
 	Local $iOneDig = Int(StringLeft(String($iMemLoad), 1))
-	
+
 	; Cap at 10 for 100% (shows icon 10), but we have 12 icons (0-11)
 	If $iMemLoad = 100 Then $iOneDig = 10
 	If $iOneDig > 11 Then $iOneDig = 11
-	
+
 	If @Compiled Then
 		; Use explicit resource IDs 350-361 for tray icons
 		TraySetIcon(@ScriptFullPath, 350 + $iOneDig)
 	Else
 		TraySetIcon($g_aTrayIcons[$iOneDig])
 	EndIf
-	
+
 	; Tooltip: program title, separator, memory usage, plus key stats
 	Local $iTotalRAMGB = Round($g_aMemStats[$MEM_TOTALPHYSRAM] / 1048576, 1)
 	Local $iUsedRAMGB = Round(($g_aMemStats[$MEM_TOTALPHYSRAM] - $g_aMemStats[$MEM_AVAILPHYSRAM]) / 1048576, 1)
@@ -1641,7 +1650,7 @@ Func _ToggleForceBehave()
 	Else
 		$g_iForceBehave = 0
 	EndIf
-	
+
 	; Save immediately
 	IniWrite($g_sPathIni, $g_sProgShortName, "ForceBehave", $g_iForceBehave)
 
@@ -1673,7 +1682,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlCreateTab(10, 10, 430, 430)
 
 	GUICtrlCreateTabItem($g_aLangPreferences[24])
-	
+
 	; Optimization Modes Group
 	GUICtrlCreateGroup("Memory Optimization Modes", 25, 50, 400, 110)
 	GUICtrlSetFont(-1, 10, Default, 2)
@@ -1684,7 +1693,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlCreateLabel(" seconds", 345, 100, 60, 20)
 	$g_hORADOptimMode[2] = GUICtrlCreateRadio(" Don't automatically optimize memory", 35, 125, 360, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	
+
 	; Set current optimization mode
 	If $g_iAutoOptimize = 1 Then
 		GUICtrlSetState($g_hORADOptimMode[0], $GUI_CHECKED)
@@ -1722,7 +1731,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetData($g_hOComboWarnIf, "50|60|70|80|90|95", String($g_iWarnIfLoad))
 	GUICtrlCreateLabel("%", 275, 372, 20, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	
+
 	; Set event handlers
 	GUICtrlSetOnEvent($g_hORADOptimMode[0], "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hORADOptimMode[1], "__CheckPreferenceChange")
@@ -1736,7 +1745,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetOnEvent($g_hOCheckPlayWarnings, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOComboWarnEvery, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOComboWarnIf, "__CheckPreferenceChange")
-	
+
 	GUICtrlCreateTabItem("") ; end tabitem definition
 
 	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[1]))
@@ -1824,12 +1833,12 @@ Func _ShowPreferencesDlg()
 	_GUICtrlListView_AddSubItem($g_hOListLanguage, 0, "en", 1)
 	_GUICtrlListView_SetItemParam($g_hOListLanguage, 0, 3300)
 
-	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.ini")
+	Local $hLangSearch = FileFindFirstFile($g_sLanguageDir & "\*.lng")
 	While 1
 		Local $sLangFileName = FileFindNextFile($hLangSearch)
 		;~ If there is no more file matching the search.
 		If @error Then ExitLoop
-		If $sLangFileName = "en.ini" Then ContinueLoop
+		If $sLangFileName = "en.lng" Then ContinueLoop
 
 		Local $sLangIniPath = $g_sLanguageDir & "\" & $sLangFileName
 		ConsoleWrite($sLangIniPath)
@@ -2060,10 +2069,10 @@ Func __SavePreferences()
 	; Read behavior checkboxes
 	$g_iForceBehave = (GUICtrlRead($g_hOCheckForceBehave) = $GUI_CHECKED) ? 1 : 0
 	$g_iStartWithWindows = (GUICtrlRead($g_hOCheckStartWindows) = $GUI_CHECKED) ? 1 : 0
-	
+
 	Local $iPrevOnTop = $g_iAlwaysOnTop
 	$g_iAlwaysOnTop = (GUICtrlRead($g_hOCheckOnTop) = $GUI_CHECKED) ? 1 : 0
-	
+
 	; Apply always on top setting immediately
 	If $iPrevOnTop <> $g_iAlwaysOnTop Then
 		WinSetOnTop($g_hCoreGui, "", $g_iAlwaysOnTop)
@@ -2093,7 +2102,7 @@ Func __SavePreferences()
 	IniWrite($g_sPathIni, $g_sProgShortName, "ReduceMemory", $g_iReduceMemory)
 	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingEnabled", $g_iLoggingEnabled)
 	IniWrite($g_sPathIni, $g_sProgShortName, "LoggingStorageSize", $g_iLoggingStorage)
-	
+
 	; Save new optimization and behavior settings
 	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimize", $g_iAutoOptimize)
 	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", $g_iAutoOptimizeSeconds)
