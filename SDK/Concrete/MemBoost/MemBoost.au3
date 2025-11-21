@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2367
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2368
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -748,6 +748,12 @@ Func _StartCoreGui()
 	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 4, 78, 36, 18, Default, 0, 1, 0xFF8000) ; Orange percentage
 	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
 
+	; Second row backgrounds for CPU (visual spacing, shorter to avoid CPU perc)
+	GUICtrlCreateGraphic(20, 259, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateGraphic(127, 259, 345, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+
 	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 338, $SS_ETCHEDFRAME) ; Increased from 295 to 338 (+43px)
 	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 334)
 	GUICtrlSetBkColor(-1, 0x151C23)
@@ -792,160 +798,160 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
 _GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 
 
-	; Paged Pool - starts where CPU row 2 would be (23px gap from CPU row 1)
-	GUICtrlCreateGraphic(20, 259, 104, 20)
+	; Paged Pool and Non-Paged Pool (shortened to accommodate CPU perc overlap)
+	GUICtrlCreateGraphic(20, 282, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("PAGED POOL", 20, 262, 104, 16, $SS_CENTER)
+	GUICtrlCreateLabel("PAGED POOL", 20, 285, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelPagedPool = GUICtrlCreateGraphic(127, 259, 171, 20)
+	Local $hPanelPagedPool = GUICtrlCreateGraphic(127, 282, 130, 20)
 	GUICtrlSetBkColor($hPanelPagedPool, 0x0F1318)
-	$g_hLabelPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelPagedPool), "0.0 GB", 4, 3, 167, 16, 9, Default, 0, 0, 0xFFFF00) ; Yellow
+	$g_hLabelPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelPagedPool), "0.0 GB", 4, 3, 126, 16, 9, Default, 0, 0, 0xFFFF00) ; Yellow
 _GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", 0x0F1318)
 
-	GUICtrlCreateGraphic(301, 259, 84, 20)
+	GUICtrlCreateGraphic(260, 282, 80, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("NON-PAGED", 305, 262, 80, 16)
+	GUICtrlCreateLabel("NON-PAGED", 264, 285, 76, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelNonPagedPool = GUICtrlCreateGraphic(388, 259, 171, 20)
+	Local $hPanelNonPagedPool = GUICtrlCreateGraphic(343, 282, 129, 20)
 	GUICtrlSetBkColor($hPanelNonPagedPool, 0x0F1318)
-	$g_hLabelNonPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelNonPagedPool), "0.0 GB", 4, 3, 167, 16, 9, Default, 0, 0, 0xFFFF00) ; Yellow
+	$g_hLabelNonPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelNonPagedPool), "0.0 GB", 4, 3, 125, 16, 9, Default, 0, 0, 0xFFFF00) ; Yellow
 _GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", 0x0F1318)
 
 	; Cached memory composition (23px gap)
-	Local $hPanelCachedHeader = GUICtrlCreateGraphic(20, 282, 104, 20)
+	Local $hPanelCachedHeader = GUICtrlCreateGraphic(20, 305, 104, 20)
 	GUICtrlSetBkColor($hPanelCachedHeader, 0x0F1318)
-	GUICtrlCreateLabel("CACHED", 20, 285, 104, 16, $SS_CENTER)
+	GUICtrlCreateLabel("CACHED", 20, 308, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlSetColor(-1, 0xFFFFFF)
 
-	Local $hPanelCachedTotal = GUICtrlCreateGraphic(127, 282, 84, 20)
+	Local $hPanelCachedTotal = GUICtrlCreateGraphic(127, 305, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedTotal, 0x0F1318)
 	$g_hLabelCachedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
 _GUICtrlFFLabel_SetData($g_hLabelCachedTotal, "00.0 GB", 0x0F1318)
 
-	GUICtrlCreateGraphic(214, 282, 84, 20)
+	GUICtrlCreateGraphic(214, 305, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("IN USE", 218, 285, 80, 16)
+	GUICtrlCreateLabel("IN USE", 218, 308, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelCachedUsed = GUICtrlCreateGraphic(301, 282, 84, 20)
+	Local $hPanelCachedUsed = GUICtrlCreateGraphic(301, 305, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedUsed, 0x0F1318)
 	$g_hLabelCachedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
 _GUICtrlFFLabel_SetData($g_hLabelCachedUsed, "00.0 GB", 0x0F1318)
 
-	GUICtrlCreateGraphic(388, 282, 84, 20)
+	GUICtrlCreateGraphic(388, 305, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("CACHED", 392, 285, 80, 16)
+	GUICtrlCreateLabel("CACHED", 392, 308, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelCachedFree = GUICtrlCreateGraphic(475, 282, 84, 20)
+	Local $hPanelCachedFree = GUICtrlCreateGraphic(475, 305, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedFree, 0x0F1318)
 	$g_hLabelCachedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedFree), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
 _GUICtrlFFLabel_SetData($g_hLabelCachedFree, "00.0 GB", 0x0F1318)
 
 	; Committed memory mini-panel (23px gap)
-	Local $hPanelCommittedHeader = GUICtrlCreateGraphic(20, 305, 104, 20)
+	Local $hPanelCommittedHeader = GUICtrlCreateGraphic(20, 328, 104, 20)
 	GUICtrlSetBkColor($hPanelCommittedHeader, 0x0F1318)
-	GUICtrlCreateLabel("COMMITTED", 20, 308, 104, 16, $SS_CENTER)
+	GUICtrlCreateLabel("COMMITTED", 20, 331, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlSetColor(-1, 0xFFFFFF)
 
-	Local $hPanelCommittedTotal = GUICtrlCreateGraphic(127, 305, 84, 20)
+	Local $hPanelCommittedTotal = GUICtrlCreateGraphic(127, 328, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedTotal, 0x0F1318)
 	$g_hLabelCommittedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
 _GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, "00.0 GB", 0x0F1318)
 
-	GUICtrlCreateGraphic(214, 305, 84, 20)
+	GUICtrlCreateGraphic(214, 328, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("USED", 218, 308, 80, 16)
+	GUICtrlCreateLabel("USED", 218, 331, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelCommittedUsed = GUICtrlCreateGraphic(301, 305, 84, 20)
+	Local $hPanelCommittedUsed = GUICtrlCreateGraphic(301, 328, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedUsed, 0x0F1318)
 	$g_hLabelCommittedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
 _GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, "00.0 GB", 0x0F1318)
 
-	GUICtrlCreateGraphic(388, 305, 84, 20)
+	GUICtrlCreateGraphic(388, 328, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("FREE", 392, 308, 78, 16)
+	GUICtrlCreateLabel("FREE", 392, 331, 78, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelCommittedFree = GUICtrlCreateGraphic(475, 305, 84, 20)
+	Local $hPanelCommittedFree = GUICtrlCreateGraphic(475, 328, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedFree, 0x0F1318)
 	$g_hLabelCommittedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x00ACFF)
 _GUICtrlFFLabel_SetData($g_hLabelCommittedFree, "00.0 GB", 0x0F1318)
 
-	Local $hPanelCommittedPerc = GUICtrlCreateGraphic(20, 328, 104, 20)
+	Local $hPanelCommittedPerc = GUICtrlCreateGraphic(20, 351, 104, 20)
 	GUICtrlSetBkColor($hPanelCommittedPerc, 0x0F1318)
 	$g_hLabelCommittedPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedPerc), "0%", 0, 2, 104, 16, 9, Default, 0, 1, 0x00ACFF)
 _GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", 0x0F1318)
 
-	GUICtrlCreateGraphic(127, 328, 345, 20)
+	GUICtrlCreateGraphic(127, 351, 348, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressCommitted = GUICtrlCreateGraphic(129, 330, 341, 16)
+	$g_hProgressCommitted = GUICtrlCreateGraphic(129, 353, 344, 16)
 	GUICtrlSetBkColor($g_hProgressCommitted, 0x0F1318)
 
 	; Processes / count / timer block (23px gap)
-	GUICtrlCreateGraphic(20, 351, 104, 20)
+	GUICtrlCreateGraphic(20, 374, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("PROCS", 20, 374, 104, 16, $SS_CENTER)
+	GUICtrlCreateLabel("PROCS", 20, 377, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	Local $hPanelProcs = GUICtrlCreateGraphic(127, 371, 84, 20)
+	Local $hPanelProcs = GUICtrlCreateGraphic(127, 374, 84, 20)
 	GUICtrlSetBkColor($hPanelProcs, 0x0F1318)
 	$g_hLabelProcs = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelProcs), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
 _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 
-	GUICtrlCreateGraphic(214, 371, 84, 20)
+	GUICtrlCreateGraphic(214, 374, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("COUNT", 218, 374, 80, 16)
+	GUICtrlCreateLabel("COUNT", 218, 377, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	Local $hPanelCount = GUICtrlCreateGraphic(301, 371, 84, 20)
+	Local $hPanelCount = GUICtrlCreateGraphic(301, 374, 84, 20)
 	GUICtrlSetBkColor($hPanelCount, 0x0F1318)
 	$g_hLabelCount = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCount), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
 	_GUICtrlFFLabel_SetData($g_hLabelCount, "0", 0x0F1318)
 
-	GUICtrlCreateGraphic(388, 371, 84, 20)
+	GUICtrlCreateGraphic(388, 374, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("TIMER", 392, 374, 78, 16)
+	GUICtrlCreateLabel("TIMER", 392, 377, 78, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
-	Local $hPanelTimer = GUICtrlCreateGraphic(475, 371, 84, 43)
+	Local $hPanelTimer = GUICtrlCreateGraphic(475, 374, 84, 43)
 	GUICtrlSetBkColor($hPanelTimer, 0x0F1318)
 	$g_hLabelTimer = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelTimer), "30", 3, 4, 78, 36, 18, Default, 0, 1, 0x13FF92)
 	_GUICtrlFFLabel_SetData($g_hLabelTimer, "30", 0x0F1318)
 
-	$g_hPanelCountPerc = GUICtrlCreateGraphic(20, 394, 104, 20)
+	$g_hPanelCountPerc = GUICtrlCreateGraphic(20, 397, 104, 20)
 	GUICtrlSetBkColor($g_hPanelCountPerc, 0x0F1318)
 	$g_hLabelCountPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($g_hPanelCountPerc), "100%", 0, 2, 104, 16, 9, Default, 0, 1, 0x13FF92)
 	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "100%", 0x0F1318)
 
-	GUICtrlCreateGraphic(127, 394, 345, 20)
+	GUICtrlCreateGraphic(127, 397, 345, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressProcs[0] = GUICtrlCreateGraphic(129, 396, 341, 16)
+	$g_hProgressProcs[0] = GUICtrlCreateGraphic(129, 399, 341, 16)
 	GUICtrlSetBkColor($g_hProgressProcs[0], 0x0F1318)
 
 	; Buttons (Optimize, Preferences, Close) - moved down 43px
-	$g_hBtnOptimize = GUICtrlCreateButton("Optimize Memory", 20, 438, 260, 30)
+	$g_hBtnOptimize = GUICtrlCreateButton("Optimize Memory", 20, 461, 260, 30)
 	GUICtrlSetOnEvent($g_hBtnOptimize, "_OptimizeMemory")
 
-	$g_hBtnPreferences = GUICtrlCreateButton("Preferences", 290, 438, 140, 30)
+	$g_hBtnPreferences = GUICtrlCreateButton("Preferences", 290, 461, 140, 30)
 	GUICtrlSetOnEvent($g_hBtnPreferences, "_ShowPreferencesDlg")
 
-	Global $g_hBtnClose = GUICtrlCreateButton("Close", 440, 438, 120, 30)
+	Global $g_hBtnClose = GUICtrlCreateButton("Close", 440, 461, 120, 30)
 	GUICtrlSetOnEvent($g_hBtnClose, "_MinimizeToTray")
 
 	; Force behave checkbox - moved down 43px
-	Global $g_hCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 20, 478, 540, 20)
+	Global $g_hCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 20, 501, 540, 20)
 	GUICtrlSetState($g_hCheckForceBehave, $g_iForceBehave)
 	GUICtrlSetBkColor($g_hCheckForceBehave, $GUI_BKCOLOR_TRANSPARENT)
 	GUICtrlSetColor($g_hCheckForceBehave, 0xFFFFFF)
