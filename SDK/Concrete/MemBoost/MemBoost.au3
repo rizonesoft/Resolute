@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2363
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2364
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -742,10 +742,10 @@ Func _StartCoreGui()
 	$g_hProgressCPU = GUICtrlCreateGraphic(129, 238, 341, 16)
 	GUICtrlSetBkColor($g_hProgressCPU, 0x0F1318)
 
-	; CPU percentage spanning 2 rows (like timer)
+	; CPU percentage spanning 2 rows (exactly like timer design)
 	Local $hPanelCPUPerc = GUICtrlCreateGraphic(475, 236, 84, 43)
 	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
-	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 12, 78, 20, 10, Default, 0, 1, 0xFF8000) ; Orange percentage
+	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 4, 78, 36, 18, Default, 0, 1, 0xFF8000) ; Orange percentage
 	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
 
 	; Second row of CPU section (empty graphics)
