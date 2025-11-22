@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2372
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2373
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -896,9 +896,9 @@ _GUICtrlFFLabel_SetData($g_hLabelCommittedFree, "00.0 GB", 0x0F1318)
 	$g_hLabelCommittedPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedPerc), "0%", 0, 2, 104, 16, 9, Default, 0, 1, 0x00ACFF)
 _GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", 0x0F1318)
 
-	GUICtrlCreateGraphic(127, 351, 348, 20)
+	GUICtrlCreateGraphic(127, 351, 345, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressCommitted = GUICtrlCreateGraphic(129, 353, 344, 16)
+	$g_hProgressCommitted = GUICtrlCreateGraphic(129, 353, 341, 16)
 	GUICtrlSetBkColor($g_hProgressCommitted, 0x0F1318)
 
 	; Processes / count / timer block (23px gap)
