@@ -730,26 +730,6 @@ Func _StartCoreGui()
 	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
 	_SSLG_SetSmoothingMode($Graph1, 2)
 
-	; === CPU ROW (Grid Row with 2-row span for percentage) ===
-	; Col 1: CPU Label
-	GUICtrlCreateGraphic(20, 236, 104, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("CPU", 20, 239, 104, 16, $SS_CENTER)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	GuiCtrlSetColor(-1, 0xFFFFFF)
-
-	; Col 2-5: CPU Progress Bar (spans 4 columns)
-	GUICtrlCreateGraphic(127, 236, 345, 20)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	$g_hProgressCPU = GUICtrlCreateGraphic(129, 238, 341, 16)
-	GUICtrlSetBkColor($g_hProgressCPU, 0x0F1318)
-
-	; Col 6: CPU Percentage (rowspan=2, spans rows 236-279)
-	Local $hPanelCPUPerc = GUICtrlCreateGraphic(475, 236, 84, 43)
-	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
-	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 4, 78, 36, 18, Default, 0, 1, 0xFF8000)
-	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
-
 	GUICtrlCreateGraphic(-10, 90, $g_iCoreGuiWidth + 20, 338, $SS_ETCHEDFRAME) ; Increased from 295 to 338 (+43px)
 	GUICtrlCreateGraphic(-12, 92, $g_iCoreGuiWidth + 24, 334)
 	GUICtrlSetBkColor(-1, 0x151C23)
@@ -793,6 +773,26 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
 	$g_hLabelRAMFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
 _GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 
+
+	; === CPU ROW (Grid Row with 2-row span for percentage) ===
+	; Col 1: CPU Label
+	GUICtrlCreateGraphic(20, 236, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GUICtrlCreateLabel("CPU", 20, 239, 104, 16, $SS_CENTER)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCtrlSetColor(-1, 0xFFFFFF)
+
+	; Col 2-5: CPU Progress Bar (spans 4 columns)
+	GUICtrlCreateGraphic(127, 236, 345, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	$g_hProgressCPU = GUICtrlCreateGraphic(129, 238, 341, 16)
+	GUICtrlSetBkColor($g_hProgressCPU, 0x0F1318)
+
+	; Col 6: CPU Percentage (rowspan=2, spans rows 236-279)
+	$hPanelCPUPerc = GUICtrlCreateGraphic(475, 236, 84, 43)
+	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
+	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 4, 78, 36, 18, Default, 0, 1, 0xFF8000)
+	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
 
 	; === PAGED POOL ROW (Grid Row - matches 6-column structure) ===
 	; Col 1: Paged Pool Label
