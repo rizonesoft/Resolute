@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2369
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2372
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -730,25 +730,27 @@ Func _StartCoreGui()
 	_SSLG_SetLine($Graph1, 0x0013FF92, 1, 0x00085820)
 	_SSLG_SetSmoothingMode($Graph1, 2)
 
-	; CPU usage section - Row 1
-	Local $hPanelCPULabel = GUICtrlCreateGraphic(20, 236, 104, 20)
-	GUICtrlSetBkColor($hPanelCPULabel, 0x0F1318)
+	; === CPU ROW (Grid Row with 2-row span for percentage) ===
+	; Col 1: CPU Label
+	GUICtrlCreateGraphic(20, 236, 104, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("CPU", 20, 239, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GuiCtrlSetColor(-1, 0xFFFFFF) ; White label like other section headers
+	GuiCtrlSetColor(-1, 0xFFFFFF)
 
-	Local $hPanelCPUProgress = GUICtrlCreateGraphic(127, 236, 345, 20)
-	GUICtrlSetBkColor($hPanelCPUProgress, 0x0F1318)
+	; Col 2-5: CPU Progress Bar (spans 4 columns)
+	GUICtrlCreateGraphic(127, 236, 345, 20)
+	GUICtrlSetBkColor(-1, 0x0F1318)
 	$g_hProgressCPU = GUICtrlCreateGraphic(129, 238, 341, 16)
 	GUICtrlSetBkColor($g_hProgressCPU, 0x0F1318)
 
-	; CPU percentage spanning 2 rows (exactly like timer design)
+	; Col 6: CPU Percentage (rowspan=2, spans rows 236-279)
 	Local $hPanelCPUPerc = GUICtrlCreateGraphic(475, 236, 84, 43)
 	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
-	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 4, 78, 36, 18, Default, 0, 1, 0xFF8000) ; Orange percentage
+	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 4, 78, 36, 18, Default, 0, 1, 0xFF8000)
 	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
 
-	; Second row backgrounds for CPU (visual spacing, shorter to avoid CPU perc)
+	; === CPU ROW 2 (Background panels only, Col 6 continues from above) ===
 	GUICtrlCreateGraphic(20, 259, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateGraphic(127, 259, 345, 20)
@@ -798,7 +800,7 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
 _GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 
 
-	; Paged Pool and Non-Paged Pool (shortened to accommodate CPU perc overlap)
+	; === PAGED POOL ROW (Grid Row - standard height) ===
 	GUICtrlCreateGraphic(20, 282, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("PAGED POOL", 20, 285, 104, 16, $SS_CENTER)
