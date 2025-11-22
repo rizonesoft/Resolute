@@ -800,28 +800,34 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
 _GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 
 
-	; === PAGED POOL ROW (Grid Row - standard height) ===
+	; === PAGED POOL ROW (Grid Row - matches 6-column structure) ===
+	; Col 1: Paged Pool Label
 	GUICtrlCreateGraphic(20, 282, 104, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("PAGED POOL", 20, 285, 104, 16, $SS_CENTER)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelPagedPool = GUICtrlCreateGraphic(127, 282, 130, 20)
+	; Col 2: Paged Pool Value
+	Local $hPanelPagedPool = GUICtrlCreateGraphic(127, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelPagedPool, 0x0F1318)
-	$g_hLabelPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelPagedPool), "0.0 GB", 4, 3, 126, 16, 9, Default, 0, 0, 0xFFFF00) ; Yellow
+	$g_hLabelPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelPagedPool), "0.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
 _GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", 0x0F1318)
 
-	GUICtrlCreateGraphic(260, 282, 80, 20)
+	; Col 3: Non-Paged Label
+	GUICtrlCreateGraphic(214, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
-	GUICtrlCreateLabel("NON-PAGED", 264, 285, 76, 16)
+	GUICtrlCreateLabel("NON-PAGED", 218, 285, 80, 16)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 
-	Local $hPanelNonPagedPool = GUICtrlCreateGraphic(343, 282, 129, 20)
+	; Col 4: Non-Paged Value
+	Local $hPanelNonPagedPool = GUICtrlCreateGraphic(301, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelNonPagedPool, 0x0F1318)
-	$g_hLabelNonPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelNonPagedPool), "0.0 GB", 4, 3, 125, 16, 9, Default, 0, 0, 0xFFFF00) ; Yellow
+	$g_hLabelNonPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelNonPagedPool), "0.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
 _GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", 0x0F1318)
+
+	; Col 5-6: Covered by CPU Percentage rowspan from above (no elements here)
 
 	; Cached memory composition (23px gap)
 	Local $hPanelCachedHeader = GUICtrlCreateGraphic(20, 305, 104, 20)
