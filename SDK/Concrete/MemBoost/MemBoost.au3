@@ -555,6 +555,7 @@ Global $g_aPageBuffers[2]
 Global $g_aVirtualBuffers[2]
 Global $g_hIconMemStats
 Global $g_hPanelRAMBox
+Global $hPanelCPUPerc
 Global $g_hPanelPagePerc
 Global $g_hPanelCountPerc
 Global $g_hLabelRAMPerc
