@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2374
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2414
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -277,10 +277,10 @@ Opt("SendCapslockMode", 1)			;~ 1=store and restore, 0=don't
 Opt("SendKeyDelay", 5)				;~ 5 milliseconds
 Opt("SendKeyDownDelay", 1)			;~ 1 millisecond
 Opt("TCPTimeout", 100)				;~ 100 milliseconds
-Opt("TrayAutoPause", 1)				;~ 0=no pause, 1=Pause
-Opt("TrayIconDebug", 1)				;~ 0=no info, 1=debug line info
+Opt("TrayIconDebug", 0)				;~ 0=no info, 1=debug line info (Match Firemin)
 Opt("TrayIconHide", 0)				;~ 0=show, 1=hide tray icon
-Opt("TrayMenuMode", 1)				;~ 0=append, 1=no default menu, 2=no automatic check, 4=menuitemID  not return
+Opt("TrayAutoPause", 0)				;~ 0=no pause, 1=Pause (Match Firemin)
+Opt("TrayMenuMode", 3)				;~ 0=append, 1=no default menu, 2=no automatic check, 4=menuitemID  not return (Match Firemin)
 Opt("TrayOnEventMode", 1)			;~ 0=disable, 1=enable
 Opt("WinDetectHiddenText", 0)		;~ 0=don't detect, 1=do detect
 Opt("WinSearchChildren", 1)			;~ 0=no, 1=search children also
@@ -297,6 +297,7 @@ EndFunc   ;==>_ReBarStartUp
 #include <GuiImageList.au3>
 #include <GuiListView.au3>
 #include <Process.au3>
+#include <TrayConstants.au3>
 #include <WinAPITheme.au3>
 #include <WinAPIProc.au3>
 #include <WinAPISys.au3>
@@ -361,6 +362,7 @@ Global $g_sWorkingDir		= $g_sRootDir ;~ Working Directory
 Global $g_sPathIni			= $g_sWorkingDir & "\" & $g_sProgShortName & ".ini" ;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
 Global $g_sResourcesDir		= _PathFull(@ScriptDir & "\..\..\Resources")
+Global $g_sSoundsDir		= @Compiled ? ($g_sRootDir & "\Sounds") : _PathFull(@ScriptDir & "\..\..\..\Resolute\Sounds")
 Global $g_sProcessDir		= $g_sRootDir &	"\Processing"
 Global $g_sDocsDir			= $g_sRootDir & "\Documents\" & $g_sProgShortName ;~ Documentation Directory
 Global $g_sDocHelpFile		= $g_sDocsDir & "\" & $g_sProgShortName & ".chm"
@@ -486,6 +488,9 @@ Global $g_iPlaySounds = 0						;~ Play event sounds
 Global $g_iPlayWarnings = 0					;~ Play warning sounds
 Global $g_iWarnEvery = 60						;~ Warning interval (seconds)
 Global $g_iWarnIfLoad = 80						;~ Warning memory load threshold (%)
+Global $g_iWarnCounter = 0						;~ Counter for warning interval
+Global $g_iStartMinimized = 0					;~ Start minimized to tray
+Global $g_bManualOptimization = True			;~ Track if optimization was manual vs automatic (default to manual)
 
 If Not IsDeclared("g_iParentState") Then Global $g_iParentState
 If Not IsDeclared("g_iParent") Then Global $g_iParent
@@ -581,9 +586,17 @@ Global $g_hLabelTimer
 Global $g_hProgressProcs[2]
 Global $bGraphColorChanged 		= False ; This will keep track of the graph color state
 Global $Graph1
+Global $g_iPeakCPU = 0
+Global $g_iPeakCommitted = 0
 
 
 _Localization_Messages()   		;~ Load Message Language Strings
+
+; Check for command line parameter /smin (start minimized)
+If $CmdLine[0] > 0 And StringLower($CmdLine[1]) = "/smin" Then
+	$g_iStartMinimized = 1
+EndIf
+
 If _Singleton($g_sProgramTitle, 1) = 0 And $g_iSingleton = True Then
 	MsgBox($MB_SYSTEMMODAL + $MB_ICONINFORMATION, $g_aLangMessages[3], $g_aLangMessages[4], $g_iMsgBoxTimeOut)
 	Local $currPID = @AutoItPID
@@ -671,6 +684,7 @@ Func _StartCoreGui()
 	If Not @Compiled Then GUISetIcon($g_aCoreIcons[0])
 	GUISetFont(Default, Default, Default, "Verdana", $g_hCoreGui, $CLEARTYPE_QUALITY)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "_ShutdownProgram", $g_hCoreGui)
+	GUISetOnEvent($GUI_EVENT_RESTORE, "_OnWindowRestore", $g_hCoreGui)
 
 	$g_hMenuFile = GUICtrlCreateMenu($g_aLangMenus[0])
 	$g_hMenuHelp = GUICtrlCreateMenu($g_aLangMenus[6])
@@ -699,7 +713,7 @@ Func _StartCoreGui()
 	GUICtrlSetOnEvent($miFileOptions, "_ShowPreferencesDlg")
 	GUICtrlSetOnEvent($miLogOpenFile, "_Logging_OpenFile")
 	GUICtrlSetOnEvent($miLogOpenRoot, "_Logging_OpenDirectory")
-	GUICtrlSetOnEvent($miFileClose, "_ShutdownProgram")
+	GUICtrlSetOnEvent($miFileClose, "_ExitProgram")
 
 	GUICtrlSetOnEvent($g_hUpdateMenuItem, "_CheckForUpdates")
 	GUICtrlSetOnEvent($miHelpHome, "_About_HomePage")
@@ -951,7 +965,7 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 	GUICtrlSetOnEvent($g_hBtnPreferences, "_ShowPreferencesDlg")
 
 	Global $g_hBtnClose = GUICtrlCreateButton("Close", 440, 461, 120, 30)
-	GUICtrlSetOnEvent($g_hBtnClose, "_MinimizeToTray")
+	GUICtrlSetOnEvent($g_hBtnClose, "_ExitProgram")
 
 	; Force behave checkbox - moved down 43px
 	Global $g_hCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 20, 501, 540, 20)
@@ -965,8 +979,15 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 	; Setup tray icon
 	_SetupTrayIcon()
 
-	; Show GUI first so FFLabels can properly initialize their graphics contexts
-	GUISetState(@SW_SHOW, $g_hCoreGui)
+	; Show or hide GUI based on start minimized setting
+	If $g_iStartMinimized = 1 Then
+		GUISetState(@SW_SHOW, $g_hCoreGui) ; Show briefly so FFLabels initialize
+		GUISetState(@SW_HIDE, $g_hCoreGui) ; Then hide immediately
+		TrayItemSetText($g_hTrayShowHide, "Show Memory Booster")
+	Else
+		GUISetState(@SW_SHOW, $g_hCoreGui)
+		TrayItemSetText($g_hTrayShowHide, "Hide Memory Booster")
+	EndIf
 
 	; Immediate initialization with double-update to survive WM_PAINT
 	_UpdateMemoryStats()
@@ -978,6 +999,7 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 	AdlibRegister("_UpdateMemoryStats", 1000)
 	AdlibRegister("_OnIconsHover", 65)
 	AdlibRegister("_UpdateTimer", 1000) ; Timer countdown every second
+	_UpdateTrayIcon() ; Set detailed tooltip immediately
 	AdlibRegister("_UpdateTrayIcon", 5000) ; Update tray icon every 5 seconds
 
 	If @Compiled Then
@@ -988,8 +1010,11 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 		_SoftwareUpdateCheck()
 	EndIf
 
+	; Set tooltip again before main loop (like Firemin does at line 578)
+	TraySetToolTip($g_sProgName & " " & _GetProgramVersion(0))
+	
 	While 1
-		Sleep(30)
+		Sleep(22)
 	WEnd
 
 EndFunc
@@ -1098,7 +1123,10 @@ Func _UpdateMemoryStats()
 	_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, StringFormat("%.1f GB", $iCommitTotalGB), 0x0F1318)
 	_GUICtrlFFLabel_SetData($g_hLabelCommittedFree, StringFormat("%.1f GB", $iCommitFreeGB), 0x0F1318)
 	_GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, StringFormat("%d%%", $iCommitPerc), 0x0F1318)
-	_GDIPlusProgressBar_Draw($g_hProgressCommitted, $iCommitPerc, 0x0F1318, 0x00ACFF, 0x005174)
+
+	; Track peak and draw both bars (peak underneath, current on top)
+	If $iCommitPerc > $g_iPeakCommitted Then $g_iPeakCommitted = $iCommitPerc
+	_GDIPlusProgressBar_DrawWithPeak($g_hProgressCommitted, $iCommitPerc, $g_iPeakCommitted, 0x0F1318, 0x00ACFF, 0x005174, 0x3000ACFF)
 
 	; Update memory usage graph based on the PerfInfo-derived RAM load
 	_SSLG_AddSample($Graph1, $iMemLoad)
@@ -1107,8 +1135,23 @@ Func _UpdateMemoryStats()
 	; Update CPU usage progress bar (orange color)
 	Local $iCPUUsage = _GetCPUUsage()
 	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, StringFormat("%d%%", $iCPUUsage), 0x0F1318)
-	_GDIPlusProgressBar_Draw($g_hProgressCPU, $iCPUUsage, 0x0F1318, 0xFF8000, 0x803000)  ; Orange bar with darker background
 
+	; Track peak and draw both bars (peak underneath, current on top)
+	If $iCPUUsage > $g_iPeakCPU Then $g_iPeakCPU = $iCPUUsage
+	_GDIPlusProgressBar_DrawWithPeak($g_hProgressCPU, $iCPUUsage, $g_iPeakCPU, 0x0F1318, 0xFF8000, 0x803000, 0x30FF8000)
+
+	; Check for memory warnings (if enabled)
+	If $g_iPlayWarnings = 1 Then
+		$g_iWarnCounter += 1
+		If $g_iWarnCounter >= $g_iWarnEvery Then
+			; Check if memory load exceeds threshold
+			If $iMemLoad >= $g_iWarnIfLoad Then
+				SoundPlay("") ; Stop any current sound
+				SoundPlay($g_sSoundsDir & "\Warning-Memory.mp3", 0)
+			EndIf
+			$g_iWarnCounter = 0 ; Reset counter
+		EndIf
+	EndIf
 
 EndFunc   ;==>_UpdateMemoryStats
 
@@ -1355,6 +1398,7 @@ Func _LoadConfiguration()
 	$g_iAutoOptimizeSeconds = Int(IniRead($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", 60))
 	$g_iForceBehave = Int(IniRead($g_sPathIni, $g_sProgShortName, "ForceBehave", 0))
 	$g_iStartWithWindows = Int(IniRead($g_sPathIni, $g_sProgShortName, "StartWithWindows", 0))
+	$g_iStartMinimized = Int(IniRead($g_sPathIni, $g_sProgShortName, "StartMinimized", 0))
 	$g_iAlwaysOnTop = Int(IniRead($g_sPathIni, $g_sProgShortName, "AlwaysOnTop", 0))
 	$g_iShowNotifications = Int(IniRead($g_sPathIni, $g_sProgShortName, "ShowNotifications", 1))
 	$g_iPlaySounds = Int(IniRead($g_sPathIni, $g_sProgShortName, "PlaySounds", 0))
@@ -1392,6 +1436,7 @@ Func _SaveConfiguration()
 	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", $g_iAutoOptimizeSeconds)
 	IniWrite($g_sPathIni, $g_sProgShortName, "ForceBehave", $g_iForceBehave)
 	IniWrite($g_sPathIni, $g_sProgShortName, "StartWithWindows", $g_iStartWithWindows)
+	IniWrite($g_sPathIni, $g_sProgShortName, "StartMinimized", $g_iStartMinimized)
 	IniWrite($g_sPathIni, $g_sProgShortName, "AlwaysOnTop", $g_iAlwaysOnTop)
 	IniWrite($g_sPathIni, $g_sProgShortName, "ShowNotifications", $g_iShowNotifications)
 	IniWrite($g_sPathIni, $g_sProgShortName, "PlaySounds", $g_iPlaySounds)
@@ -1458,6 +1503,15 @@ Func _OptimizeMemory()
 	$g_iOptimizing = 1
 	$g_iOptimizeCount += 1
 
+	; Default to manual optimization UNLESS explicitly set to False by _UpdateTimer
+	; Timer sets it to False BEFORE calling this function for automatic optimization
+	If $g_bManualOptimization <> False Then 
+		$g_bManualOptimization = True
+		ConsoleWrite("DEBUG: Manual optimization (button/tray click)" & @CRLF)
+	Else
+		ConsoleWrite("DEBUG: Automatic optimization (timer set flag to False)" & @CRLF)
+	EndIf
+
 	; Reset timer countdown if auto-optimize is enabled
 	If $g_iAutoOptimize = 2 Then
 		$g_iTimerCountdown = $g_iAutoOptimizeSeconds
@@ -1513,11 +1567,18 @@ Func _OptimizeMemory()
 			EndIf
 		EndIf
 
-		; Update progress on process counter bar (every 5% for better performance)
+		; Update progress on process counter bar (every 1% for smooth display)
 		Local $iProgress = Floor(($i / $iTotalProcs) * 100)
-		If Mod($iProgress, 5) = 0 And $iProgress <> $iLastProgress Then
+		If $iProgress <> $iLastProgress Then
 			_GUICtrlFFLabel_SetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress), 0x0F1318)
-			_GDIPlusProgressBar_Draw($g_hProgressProcs[0], $iProgress, 0x0F1318, 0x13FF92, 0x085820)
+			
+			; If in timer mode, show countdown as peak (background) and optimization as current (foreground)
+			If $g_iAutoOptimize = 2 Then
+				Local $iCountdownPerc = Floor(($g_iTimerCountdown / $g_iAutoOptimizeSeconds) * 100)
+				_GDIPlusProgressBar_DrawWithPeak($g_hProgressProcs[0], $iProgress, $iCountdownPerc, 0x0F1318, 0x13FF92, 0x085820, 0x3013FF92)
+			Else
+				_GDIPlusProgressBar_Draw($g_hProgressProcs[0], $iProgress, 0x0F1318, 0x13FF92, 0x085820)
+			EndIf
 			$iLastProgress = $iProgress
 		EndIf
 
@@ -1532,9 +1593,26 @@ Func _OptimizeMemory()
 	; Update status with actual processed count
 	GUICtrlSetData($g_hSubHeading, StringFormat($g_aLangCustom[3], $iProcessedCount))
 
-	; Show completion notification
-	If $g_iShowNotifications = 1 Then
-		TrayTip("Optimization Complete", StringFormat("Optimized %d processes", $iProcessedCount), 3, $TIP_ICONASTERISK)
+	; Show notification and play sound ONLY for manual optimization
+	If $g_bManualOptimization Then
+		; Show completion notification
+		If $g_iShowNotifications = 1 Then
+			TrayTip("Optimization Complete", StringFormat("Optimized %d processes", $iProcessedCount), 3, $TIP_ICONASTERISK)
+		EndIf
+		
+		; Play completion sound
+		If $g_iPlaySounds = 1 Then
+			Local $sSoundFile = $g_sSoundsDir & "\Optimization-Complete.mp3"
+			ConsoleWrite("DEBUG: Play sounds enabled. Path: " & $sSoundFile & @CRLF)
+			ConsoleWrite("DEBUG: File exists: " & FileExists($sSoundFile) & @CRLF)
+			ConsoleWrite("DEBUG: $g_sSoundsDir = " & $g_sSoundsDir & @CRLF)
+			SoundPlay("") ; Stop any current sound
+			SoundPlay($sSoundFile, 0)
+		Else
+			ConsoleWrite("DEBUG: Play sounds is disabled ($g_iPlaySounds = " & $g_iPlaySounds & ")" & @CRLF)
+		EndIf
+	Else
+		ConsoleWrite("DEBUG: Optimization was automatic, skipping notification/sound" & @CRLF)
 	EndIf
 
 	; Re-enable buttons and menu
@@ -1553,6 +1631,9 @@ Func _OptimizeMemory()
 	; Force full refresh of ALL labels to ensure count and timer stay visible
 	_GUICtrlFFLabel_Refresh()
 
+	; Reset manual optimization flag to default (True) for next optimization
+	$g_bManualOptimization = True
+
 EndFunc   ;==>_OptimizeMemory
 
 
@@ -1568,22 +1649,47 @@ Func _UpdateTimer()
 
 		; Only optimize if memory is high AND increasing (smart detection)
 		If $aMemStats[$MEM_LOAD] > 90 And _IsMemoryIncreasing() Then
+			$g_bManualOptimization = False ; Mark as automatic optimization
 			_OptimizeMemory()
 		EndIf
 		_GUICtrlFFLabel_SetData($g_hLabelTimer, "AUTO", 0x0F1318)
 
+		; Clear progress bar in AUTO mode (only if not currently optimizing)
+		If $g_iOptimizing = 0 Then
+			_GDIPlusProgressBar_Draw($g_hProgressProcs[0], 0, 0x0F1318, 0x13FF92, 0x085820)
+			_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "0%", 0x0F1318)
+		EndIf
+
 	ElseIf $g_iAutoOptimize = 2 Then ; Timer mode
-		$g_iTimerCountdown -= 1
+		; Pause countdown during optimization
+		If $g_iOptimizing = 0 Then
+			$g_iTimerCountdown -= 1
+		EndIf
 
 		If $g_iTimerCountdown <= 0 Then
 			$g_iTimerCountdown = $g_iAutoOptimizeSeconds
+			$g_bManualOptimization = False ; Mark as automatic optimization
 			_OptimizeMemory()
 		Else
 			_GUICtrlFFLabel_SetData($g_hLabelTimer, String($g_iTimerCountdown), 0x0F1318)
+
+			; Update progress bar to show countdown (shown as peak during optimization)
+			; During optimization, countdown pauses and shows as background peak
+			If $g_iOptimizing = 0 Then
+				Local $iProgressPerc = Floor(($g_iTimerCountdown / $g_iAutoOptimizeSeconds) * 100)
+				_GDIPlusProgressBar_Draw($g_hProgressProcs[0], $iProgressPerc, 0x0F1318, 0x13FF92, 0x085820)
+				_GUICtrlFFLabel_SetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgressPerc), 0x0F1318)
+			EndIf
 		EndIf
 
 	Else ; Manual mode
 		_GUICtrlFFLabel_SetData($g_hLabelTimer, "OFF", 0x0F1318)
+
+		; Clear progress bar when not in timer mode (only if not currently optimizing)
+		If $g_iOptimizing = 0 Then
+			_GDIPlusProgressBar_Draw($g_hProgressProcs[0], 0, 0x0F1318, 0x13FF92, 0x085820)
+			_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "0%", 0x0F1318)
+		EndIf
 	EndIf
 
 EndFunc   ;==>_UpdateTimer
@@ -1619,6 +1725,13 @@ EndFunc
 
 
 Func _ShutdownProgram()
+	; Window close button (X) minimizes to tray instead of exiting
+	_MinimizeToTray()
+EndFunc   ;==>_ShutdownProgram
+
+
+Func _ExitProgram()
+	; Actually close the application (called from tray Exit button)
 
 	; Unregister all periodic tasks
 	AdlibUnRegister("_OnIconsHover")
@@ -1646,7 +1759,7 @@ Func _ShutdownProgram()
 		Exit
 	EndIf
 
-EndFunc   ;==>_ShutdownProgram
+EndFunc   ;==>_ExitProgram
 
 
 Func _TerminateProgram()
@@ -1672,24 +1785,10 @@ EndFunc   ;==>_MinimizeProgram
 
 Func _SetupTrayIcon()
 
-	; Set tray mode
-	Opt("TrayMenuMode", 3) ; No default items
-	Opt("TrayOnEventMode", 1)
+	; Set tray double-click event to show/hide window
+	TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "_ToggleShowHide")
 
-	; Load tray icons (for development mode only)
-	For $i = 0 To 11
-		$g_aTrayIcons[$i] = "..\..\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
-	Next
-
-	; Set initial tray icon (0% = icon 0 = resource 350)
-	If @Compiled Then
-		TraySetIcon(@ScriptFullPath, 350)
-	Else
-		TraySetIcon($g_aTrayIcons[0])
-	EndIf
-	TraySetToolTip($g_sProgramTitle)
-
-	; Create tray menu
+	; Create tray menu FIRST (before showing icon)
 	$g_hTrayShowHide = TrayCreateItem("Show/Hide Memory Booster")
 	TrayItemSetOnEvent($g_hTrayShowHide, "_ToggleShowHide")
 	TrayCreateItem("")
@@ -1697,9 +1796,17 @@ Func _SetupTrayIcon()
 	TrayItemSetOnEvent($g_hTrayOptimize, "_OptimizeMemory")
 	TrayCreateItem("")
 	$g_hTrayExit = TrayCreateItem("Exit")
-	TrayItemSetOnEvent($g_hTrayExit, "_ShutdownProgram")
+	TrayItemSetOnEvent($g_hTrayExit, "_ExitProgram")
 
-	TraySetState(1) ; Show tray icon
+	; Load tray icons (for development mode only)
+	For $i = 0 To 11
+		$g_aTrayIcons[$i] = "..\..\Resources\Icons\MemBoost\Tray\" & $i & ".ico"
+	Next
+
+	; Match Firemin's exact sequence
+	TraySetState($TRAY_ICONSTATE_SHOW)
+	TraySetToolTip($g_sProgName & " " & _GetProgramVersion(0))  ; Use same format as _UpdateTrayIcon
+	TraySetClick(8)
 
 EndFunc   ;==>_SetupTrayIcon
 
@@ -1736,12 +1843,15 @@ Func _UpdateTrayIcon()
 	Local $aProcs = ProcessList()
 	Local $iProcCount = $aProcs[0][0]
 
-	TraySetToolTip($g_sProgramTitle & @CRLF & _
+	; Format: "Memory Booster 11.1.1.2406" (program name + version only)
+	Local $sTooltip = $g_sProgName & " " & _GetProgramVersion(0) & @CRLF & _
 					"----------------------------------------" & @CRLF & _
 					"Memory Usage: " & $iMemLoad & "%" & @CRLF & _
 					"RAM: " & StringFormat("%.1f/%.1f GB used", $iUsedRAMGB, $iTotalRAMGB) & @CRLF & _
 					"Pagefile: " & StringFormat("%.1f/%.1f GB used", $iUsedPageGB, $iTotalPageGB) & @CRLF & _
-					"Processes: " & $iProcCount)
+					"Processes: " & $iProcCount
+	
+	TraySetToolTip($sTooltip)
 
 EndFunc   ;==>_UpdateTrayIcon
 
@@ -1750,19 +1860,36 @@ Func _MinimizeToTray()
 
 	GUISetState(@SW_HIDE, $g_hCoreGui)
 
+	; Update tray menu text to "Show"
+	TrayItemSetText($g_hTrayShowHide, "Show Memory Booster")
+
+	; Show notification if enabled
+	TrayTip("Clear Tray Tip", "", 0)
+	If $g_iShowNotifications = 1 Then
+		TrayTip("Memory Booster is still running.", "Memory Booster will continue to run so that we can keep on monitoring your system, " & _
+				"automatically optimize your memory and fix memory leaks.", 20, 1)
+	EndIf
+
 EndFunc   ;==>_MinimizeToTray
 
 
 Func _ToggleShowHide()
 
 	If BitAND(WinGetState($g_hCoreGui), 2) Then ; If visible
-		GUISetState(@SW_HIDE, $g_hCoreGui)
+		_MinimizeToTray()
 	Else
 		GUISetState(@SW_SHOW, $g_hCoreGui)
 		WinActivate($g_hCoreGui)
+		TrayItemSetText($g_hTrayShowHide, "Hide Memory Booster")
 	EndIf
 
 EndFunc   ;==>_ToggleShowHide
+
+
+Func _OnWindowRestore()
+	; Update memory stats when window is restored from minimize
+	_UpdateMemoryStats()
+EndFunc   ;==>_OnWindowRestore
 
 
 Func _ToggleForceBehave()
@@ -1826,13 +1953,15 @@ Func _ShowPreferencesDlg()
 	EndIf
 
 	; Behavior Group
-	GUICtrlCreateGroup("Behavior", 25, 170, 400, 90)
+	GUICtrlCreateGroup("Behavior", 25, 170, 400, 110)
 	GUICtrlSetFont(-1, 10, Default, 2)
 	$g_hOCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 35, 195, 360, 20)
 	GUICtrlSetState($g_hOCheckForceBehave, $g_iForceBehave)
 	$g_hOCheckStartWindows = GUICtrlCreateCheckbox(" Start Memory Booster when Windows starts", 35, 220, 360, 20)
 	GUICtrlSetState($g_hOCheckStartWindows, $g_iStartWithWindows)
-	$g_hOCheckOnTop = GUICtrlCreateCheckbox(" Show Memory Booster always on top", 35, 245, 360, 20)
+	$g_hOStartMinimized = GUICtrlCreateCheckbox("     Start minimized to system tray", 35, 242, 360, 20)
+	GUICtrlSetState($g_hOStartMinimized, $g_iStartMinimized)
+	$g_hOCheckOnTop = GUICtrlCreateCheckbox(" Show Memory Booster always on top", 35, 265, 360, 20)
 	GUICtrlSetState($g_hOCheckOnTop, $g_iAlwaysOnTop)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
@@ -1861,6 +1990,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetOnEvent($g_hOComboAutSeconds, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckForceBehave, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckStartWindows, "__CheckPreferenceChange")
+	GUICtrlSetOnEvent($g_hOStartMinimized, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckOnTop, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckNotify, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckPlayEvents, "__CheckPreferenceChange")
@@ -2191,6 +2321,7 @@ Func __SavePreferences()
 	; Read behavior checkboxes
 	$g_iForceBehave = (GUICtrlRead($g_hOCheckForceBehave) = $GUI_CHECKED) ? 1 : 0
 	$g_iStartWithWindows = (GUICtrlRead($g_hOCheckStartWindows) = $GUI_CHECKED) ? 1 : 0
+	$g_iStartMinimized = (GUICtrlRead($g_hOStartMinimized) = $GUI_CHECKED) ? 1 : 0
 
 	Local $iPrevOnTop = $g_iAlwaysOnTop
 	$g_iAlwaysOnTop = (GUICtrlRead($g_hOCheckOnTop) = $GUI_CHECKED) ? 1 : 0
@@ -2230,6 +2361,7 @@ Func __SavePreferences()
 	IniWrite($g_sPathIni, $g_sProgShortName, "AutoOptimizeSeconds", $g_iAutoOptimizeSeconds)
 	IniWrite($g_sPathIni, $g_sProgShortName, "ForceBehave", $g_iForceBehave)
 	IniWrite($g_sPathIni, $g_sProgShortName, "StartWithWindows", $g_iStartWithWindows)
+	IniWrite($g_sPathIni, $g_sProgShortName, "StartMinimized", $g_iStartMinimized)
 	IniWrite($g_sPathIni, $g_sProgShortName, "AlwaysOnTop", $g_iAlwaysOnTop)
 	IniWrite($g_sPathIni, $g_sProgShortName, "ShowNotifications", $g_iShowNotifications)
 	IniWrite($g_sPathIni, $g_sProgShortName, "PlaySounds", $g_iPlaySounds)
@@ -2237,11 +2369,23 @@ Func __SavePreferences()
 	IniWrite($g_sPathIni, $g_sProgShortName, "WarnEvery", $g_iWarnEvery)
 	IniWrite($g_sPathIni, $g_sProgShortName, "WarnIfLoad", $g_iWarnIfLoad)
 
+	; Handle startup shortcut creation/deletion
+	Local $sShortcutPath = @StartupDir & "\" & $g_sProgramTitle & ".lnk"
+	If $g_iStartWithWindows = 1 Then
+		; Create shortcut with /smin parameter if start minimized is enabled
+		Local $sParameters = ($g_iStartMinimized = 1) ? "/smin" : ""
+		FileDelete($sShortcutPath) ; Delete old shortcut first
+		FileCreateShortcut(@ScriptFullPath, $sShortcutPath, @WorkingDir, $sParameters)
+	Else
+		; Remove startup shortcut
+		FileDelete($sShortcutPath)
+	EndIf
+
 	If $iLangChanged = True Then
 		$iMsgBoxResult = MsgBox($MB_OKCANCEL + $MB_ICONINFORMATION, $g_aLangPreferences[22], $g_aLangPreferences[23], 0, $g_hOptionsGui)
 		Switch $iMsgBoxResult
 			Case 1
-				_ShutdownProgram()
+				_ExitProgram()
 			Case 2
 				$iLangChanged = False
 		EndSwitch
