@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2414
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2417
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -1532,7 +1532,6 @@ Func _OptimizeMemory()
 
 	; Double-update: ensures buffers fresh before and after WM_PAINT
 	_UpdateMemoryStats()
-	_WinAPI_UpdateWindow($g_hCoreGui)
 	_UpdateMemoryStats()
 
 	; Force full refresh of ALL labels to ensure count and timer stay visible
@@ -1625,7 +1624,6 @@ Func _OptimizeMemory()
 
 	; Double-update pattern: ensures buffers and graphics survive WM_PAINT
 	_UpdateMemoryStats()
-	_WinAPI_UpdateWindow($g_hCoreGui)
 	_UpdateMemoryStats()
 
 	; Force full refresh of ALL labels to ensure count and timer stay visible
