@@ -67,10 +67,25 @@ Func _GDIPlusProgressBar_Draw($hCtrl, $iPerc, $iBackColor, $iOuterColor, $iInner
 		Return SetError(4, 0, False)
 	EndIf
 
-	Local $hGraphics = _GDIPlus_GraphicsCreateFromHDC($hDC)
-	If @error Or Not $hGraphics Then
+	Local $hGraphicsWindow = _GDIPlus_GraphicsCreateFromHDC($hDC)
+	If @error Or Not $hGraphicsWindow Then
 		_WinAPI_ReleaseDC($hWndCtrl, $hDC)
 		Return SetError(5, 0, False)
+	EndIf
+
+	Local $hBitmap = _GDIPlus_BitmapCreateFromGraphics($iWidth, $iHeight, $hGraphicsWindow)
+	If @error Or Not $hBitmap Then
+		_GDIPlus_GraphicsDispose($hGraphicsWindow)
+		_WinAPI_ReleaseDC($hWndCtrl, $hDC)
+		Return SetError(6, 0, False)
+	EndIf
+
+	Local $hGraphics = _GDIPlus_ImageGetGraphicsContext($hBitmap)
+	If @error Or Not $hGraphics Then
+		_GDIPlus_BitmapDispose($hBitmap)
+		_GDIPlus_GraphicsDispose($hGraphicsWindow)
+		_WinAPI_ReleaseDC($hWndCtrl, $hDC)
+		Return SetError(7, 0, False)
 	EndIf
 
 	; Ensure colors are ARGB
@@ -118,7 +133,11 @@ Func _GDIPlusProgressBar_Draw($hCtrl, $iPerc, $iBackColor, $iOuterColor, $iInner
 	_GDIPlus_BrushDispose($hBrushBg)
 	_GDIPlus_BrushDispose($hBrushOuter)
 	_GDIPlus_BrushDispose($hBrushInner)
+	_GDIPlus_GraphicsDrawImageRect($hGraphicsWindow, $hBitmap, 0, 0, $iWidth, $iHeight)
+
 	_GDIPlus_GraphicsDispose($hGraphics)
+	_GDIPlus_BitmapDispose($hBitmap)
+	_GDIPlus_GraphicsDispose($hGraphicsWindow)
 	_WinAPI_ReleaseDC($hWndCtrl, $hDC)
 
 	Return True
@@ -168,10 +187,25 @@ Func _GDIPlusProgressBar_DrawWithPeak($hCtrl, $iPerc, $iPeakPerc, $iBackColor, $
 		Return SetError(4, 0, False)
 	EndIf
 
-	Local $hGraphics = _GDIPlus_GraphicsCreateFromHDC($hDC)
-	If @error Or Not $hGraphics Then
+	Local $hGraphicsWindow = _GDIPlus_GraphicsCreateFromHDC($hDC)
+	If @error Or Not $hGraphicsWindow Then
 		_WinAPI_ReleaseDC($hWndCtrl, $hDC)
 		Return SetError(5, 0, False)
+	EndIf
+
+	Local $hBitmap = _GDIPlus_BitmapCreateFromGraphics($iWidth, $iHeight, $hGraphicsWindow)
+	If @error Or Not $hBitmap Then
+		_GDIPlus_GraphicsDispose($hGraphicsWindow)
+		_WinAPI_ReleaseDC($hWndCtrl, $hDC)
+		Return SetError(6, 0, False)
+	EndIf
+
+	Local $hGraphics = _GDIPlus_ImageGetGraphicsContext($hBitmap)
+	If @error Or Not $hGraphics Then
+		_GDIPlus_BitmapDispose($hBitmap)
+		_GDIPlus_GraphicsDispose($hGraphicsWindow)
+		_WinAPI_ReleaseDC($hWndCtrl, $hDC)
+		Return SetError(7, 0, False)
 	EndIf
 
 	; Ensure colors are ARGB
@@ -280,7 +314,11 @@ Func _GDIPlusProgressBar_DrawWithPeak($hCtrl, $iPerc, $iPeakPerc, $iBackColor, $
 	_GDIPlus_BrushDispose($hBrushOuter)
 	_GDIPlus_BrushDispose($hBrushInner)
 	_GDIPlus_BrushDispose($hBrushPeak)
+	_GDIPlus_GraphicsDrawImageRect($hGraphicsWindow, $hBitmap, 0, 0, $iWidth, $iHeight)
+
 	_GDIPlus_GraphicsDispose($hGraphics)
+	_GDIPlus_BitmapDispose($hBitmap)
+	_GDIPlus_GraphicsDispose($hGraphicsWindow)
 	_WinAPI_ReleaseDC($hWndCtrl, $hDC)
 
 	Return True
