@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2420
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2423
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -491,6 +491,9 @@ Global $g_iWarnIfLoad = 80						;~ Warning memory load threshold (%)
 Global $g_iWarnCounter = 0						;~ Counter for warning interval
 Global $g_iStartMinimized = 0					;~ Start minimized to tray
 Global $g_bManualOptimization = True			;~ Track if optimization was manual vs automatic (default to manual)
+Global $g_sLabelCountText = "0"
+Global $g_sLabelCountPercText = "0%"
+Global $g_sLabelTimerText = "OFF"
 
 If Not IsDeclared("g_iParentState") Then Global $g_iParentState
 If Not IsDeclared("g_iParent") Then Global $g_iParent
@@ -1534,9 +1537,9 @@ Func _OptimizeMemory()
 	_UpdateMemoryStats()
 	_WinAPI_UpdateWindow($g_hCoreGui)
 	_UpdateMemoryStats()
-
-	; Force full refresh of ALL labels to ensure count and timer stay visible
-	_GUICtrlFFLabel_Refresh()
+	_GUICtrlFFLabel_SetData($g_hLabelCount, $g_sLabelCountText, 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, $g_sLabelCountPercText, 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelTimer, $g_sLabelTimerText, 0x0F1318)
 
 	; Loop through all processes and clear working set
 	Local $iLastProgress = -1
@@ -1627,9 +1630,9 @@ Func _OptimizeMemory()
 	_UpdateMemoryStats()
 	_WinAPI_UpdateWindow($g_hCoreGui)
 	_UpdateMemoryStats()
-
-	; Force full refresh of ALL labels to ensure count and timer stay visible
-	_GUICtrlFFLabel_Refresh()
+	_GUICtrlFFLabel_SetData($g_hLabelCount, $g_sLabelCountText, 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, $g_sLabelCountPercText, 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelTimer, $g_sLabelTimerText, 0x0F1318)
 
 	; Reset manual optimization flag to default (True) for next optimization
 	$g_bManualOptimization = True
