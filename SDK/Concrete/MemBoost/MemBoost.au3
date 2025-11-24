@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Memory Booster						;~ Comment field
 #AutoIt3Wrapper_Res_Description=Memory Booster			     	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.2423
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.2430
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N
@@ -491,6 +491,8 @@ Global $g_iWarnIfLoad = 80						;~ Warning memory load threshold (%)
 Global $g_iWarnCounter = 0						;~ Counter for warning interval
 Global $g_iStartMinimized = 0					;~ Start minimized to tray
 Global $g_bManualOptimization = True			;~ Track if optimization was manual vs automatic (default to manual)
+Global Const $g_iPanelBgColorGui = 0x0F1318
+Global Const $g_iPanelBgColorARGB = 0xFF0F1318
 Global $g_sLabelCountText = "0"
 Global $g_sLabelCountPercText = "0%"
 Global $g_sLabelTimerText = "30"
@@ -592,19 +594,19 @@ Global $Graph1
 Global $g_iPeakCPU = 0
 Global $g_iPeakCommitted = 0
 
-Func _SetLabelCount($sText, $iColor = 0x0F1318)
+Func _SetLabelCount($sText, $iBackground = $g_iPanelBgColorARGB)
 	$g_sLabelCountText = $sText
-	If $g_hLabelCount Then _GUICtrlFFLabel_SetData($g_hLabelCount, $sText, $iColor)
+	If $g_hLabelCount Then _GUICtrlFFLabel_SetData($g_hLabelCount, $sText, $iBackground)
 EndFunc
 
-Func _SetLabelCountPerc($sText, $iColor = 0x0F1318)
+Func _SetLabelCountPerc($sText, $iBackground = $g_iPanelBgColorARGB)
 	$g_sLabelCountPercText = $sText
-	If $g_hLabelCountPerc Then _GUICtrlFFLabel_SetData($g_hLabelCountPerc, $sText, $iColor)
+	If $g_hLabelCountPerc Then _GUICtrlFFLabel_SetData($g_hLabelCountPerc, $sText, $iBackground)
 EndFunc
 
-Func _SetLabelTimer($sText, $iColor = 0x0F1318)
+Func _SetLabelTimer($sText, $iBackground = $g_iPanelBgColorARGB)
 	$g_sLabelTimerText = $sText
-	If $g_hLabelTimer Then _GUICtrlFFLabel_SetData($g_hLabelTimer, $sText, $iColor)
+	If $g_hLabelTimer Then _GUICtrlFFLabel_SetData($g_hLabelTimer, $sText, $iBackground)
 EndFunc
 
 _Localization_Messages()   		;~ Load Message Language Strings
@@ -770,7 +772,7 @@ Func _StartCoreGui()
 	GUICtrlSetBkColor($g_hPanelRAMBox, 0x0F1318)
 	$g_hIconMemStats = GUICtrlCreateIcon(@ScriptFullPath, $g_iMemStatIcoStart, 38, 140, 64, 64)
 	$g_hLabelRAMPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($g_hPanelRAMBox), "100%", 0, 83, 104, 16, 9, Default, 0, 1, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, "100%", 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, "100%", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(127, 125, 432, 108)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -783,7 +785,7 @@ Func _StartCoreGui()
 	Local $hPanelRAMTotal = GUICtrlCreateGraphic(127, 102, 84, 20, -1)
 	GUICtrlSetBkColor($hPanelRAMTotal, 0x0F1318)
 	$g_hLabelRAMTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMTotal), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
-_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, "00.0 GB", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(214, 102, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -793,7 +795,7 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMTotal, "00.0 GB", 0x0F1318)
 	Local $hPanelRAMUsed = GUICtrlCreateGraphic(301, 102, 84, 20)
 	GUICtrlSetBkColor($hPanelRAMUsed, 0x0F1318)
 	$g_hLabelRAMUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMUsed), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
-_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(388, 102, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -803,7 +805,7 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMUsed, "00.0 GB", 0x0F1318)
 	Local $hPanelRAMFree = GUICtrlCreateGraphic(475, 102, 84, 20)
 	GUICtrlSetBkColor($hPanelRAMFree, 0x0F1318)
 	$g_hLabelRAMFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelRAMFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x13FF92)
-_GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", $g_iPanelBgColorARGB)
 
 
 	; === CPU ROW (Grid Row with 2-row span for percentage) ===
@@ -824,7 +826,7 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 	$hPanelCPUPerc = GUICtrlCreateGraphic(475, 236, 84, 43)
 	GUICtrlSetBkColor($hPanelCPUPerc, 0x0F1318)
 	$g_hLabelCPUPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCPUPerc), "0%", 3, 4, 78, 36, 18, Default, 0, 1, 0xFF8000)
-	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelCPUPerc, "0%", $g_iPanelBgColorARGB)
 
 	; === PAGED POOL ROW (Grid Row - matches 6-column structure) ===
 	; Col 1: Paged Pool Label
@@ -838,7 +840,7 @@ _GUICtrlFFLabel_SetData($g_hLabelRAMFree, "00.0 GB", 0x0F1318)
 	Local $hPanelPagedPool = GUICtrlCreateGraphic(127, 259, 84, 20)
 	GUICtrlSetBkColor($hPanelPagedPool, 0x0F1318)
 	$g_hLabelPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelPagedPool), "0.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
-_GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", $g_iPanelBgColorARGB)
 
 	; Col 3: Non-Paged Label
 	GUICtrlCreateGraphic(214, 259, 84, 20)
@@ -851,7 +853,7 @@ _GUICtrlFFLabel_SetData($g_hLabelPagedPool, "0.0 GB", 0x0F1318)
 	Local $hPanelNonPagedPool = GUICtrlCreateGraphic(301, 259, 84, 20)
 	GUICtrlSetBkColor($hPanelNonPagedPool, 0x0F1318)
 	$g_hLabelNonPagedPool = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelNonPagedPool), "0.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
-_GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", $g_iPanelBgColorARGB)
 
 	; Col 5-6: Covered by CPU Percentage rowspan from above (no elements here)
 
@@ -865,7 +867,7 @@ _GUICtrlFFLabel_SetData($g_hLabelNonPagedPool, "0.0 GB", 0x0F1318)
 	Local $hPanelCachedTotal = GUICtrlCreateGraphic(127, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedTotal, 0x0F1318)
 	$g_hLabelCachedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
-_GUICtrlFFLabel_SetData($g_hLabelCachedTotal, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCachedTotal, "00.0 GB", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(214, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -876,7 +878,7 @@ _GUICtrlFFLabel_SetData($g_hLabelCachedTotal, "00.0 GB", 0x0F1318)
 	Local $hPanelCachedUsed = GUICtrlCreateGraphic(301, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedUsed, 0x0F1318)
 	$g_hLabelCachedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
-_GUICtrlFFLabel_SetData($g_hLabelCachedUsed, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCachedUsed, "00.0 GB", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(388, 282, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -887,7 +889,7 @@ _GUICtrlFFLabel_SetData($g_hLabelCachedUsed, "00.0 GB", 0x0F1318)
 	Local $hPanelCachedFree = GUICtrlCreateGraphic(475, 282, 84, 20)
 	GUICtrlSetBkColor($hPanelCachedFree, 0x0F1318)
 	$g_hLabelCachedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCachedFree), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0xFFFF00)
-_GUICtrlFFLabel_SetData($g_hLabelCachedFree, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCachedFree, "00.0 GB", $g_iPanelBgColorARGB)
 
 	; Committed memory mini-panel (23px gap from Cached)
 	Local $hPanelCommittedHeader = GUICtrlCreateGraphic(20, 305, 104, 20)
@@ -899,7 +901,7 @@ _GUICtrlFFLabel_SetData($g_hLabelCachedFree, "00.0 GB", 0x0F1318)
 	Local $hPanelCommittedTotal = GUICtrlCreateGraphic(127, 305, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedTotal, 0x0F1318)
 	$g_hLabelCommittedTotal = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedTotal), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
-_GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, "00.0 GB", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(214, 305, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -910,7 +912,7 @@ _GUICtrlFFLabel_SetData($g_hLabelCommittedTotal, "00.0 GB", 0x0F1318)
 	Local $hPanelCommittedUsed = GUICtrlCreateGraphic(301, 305, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedUsed, 0x0F1318)
 	$g_hLabelCommittedUsed = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedUsed), "00.0 GB", 4, 3, 80, 16, 9, Default, 0, 0, 0x00ACFF)
-_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, "00.0 GB", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(388, 305, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -921,12 +923,12 @@ _GUICtrlFFLabel_SetData($g_hLabelCommittedUsed, "00.0 GB", 0x0F1318)
 	Local $hPanelCommittedFree = GUICtrlCreateGraphic(475, 305, 84, 20)
 	GUICtrlSetBkColor($hPanelCommittedFree, 0x0F1318)
 	$g_hLabelCommittedFree = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedFree), "00.0 GB", 4, 3, 78, 16, 9, Default, 0, 0, 0x00ACFF)
-_GUICtrlFFLabel_SetData($g_hLabelCommittedFree, "00.0 GB", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCommittedFree, "00.0 GB", $g_iPanelBgColorARGB)
 
 	Local $hPanelCommittedPerc = GUICtrlCreateGraphic(20, 328, 104, 20)
 	GUICtrlSetBkColor($hPanelCommittedPerc, 0x0F1318)
 	$g_hLabelCommittedPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCommittedPerc), "0%", 0, 2, 104, 16, 9, Default, 0, 1, 0x00ACFF)
-_GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", 0x0F1318)
+_GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(127, 328, 432, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -940,15 +942,17 @@ _GUICtrlFFLabel_SetData($g_hLabelCommittedPerc, "0%", 0x0F1318)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 	Local $hPanelProcs = GUICtrlCreateGraphic(127, 351, 84, 20)
-	GUICtrlSetBkColor($hPanelProcs, 0x0F1318)
+	GUICtrlSetBkColor($hPanelProcs, $g_iPanelBgColorGui)
 	$g_hLabelProcs = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelProcs), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
-_GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelProcs, "0", $g_iPanelBgColorARGB)
 
 	GUICtrlCreateGraphic(214, 351, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("COUNT", 218, 354, 80, 16)
+	GUICtrlSetBkColor(-1, 0x0F1318)
+	GuiCTrlSetColor(-1, 0xCCCCCC)
 	Local $hPanelCount = GUICtrlCreateGraphic(301, 351, 84, 20)
-	GUICtrlSetBkColor($hPanelCount, 0x0F1318)
+	GUICtrlSetBkColor($hPanelCount, $g_iPanelBgColorGui)
 	$g_hLabelCount = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCount), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
 	_SetLabelCount("0")
 
@@ -958,12 +962,12 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 	Local $hPanelTimer = GUICtrlCreateGraphic(475, 351, 84, 43)
-	GUICtrlSetBkColor($hPanelTimer, 0x0F1318)
+	GUICtrlSetBkColor($hPanelTimer, $g_iPanelBgColorGui)
 	$g_hLabelTimer = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelTimer), $g_sLabelTimerText, 3, 4, 78, 36, 18, Default, 0, 1, 0x13FF92)
 	_SetLabelTimer($g_sLabelTimerText)
 
 	$g_hPanelCountPerc = GUICtrlCreateGraphic(20, 374, 104, 20)
-	GUICtrlSetBkColor($g_hPanelCountPerc, 0x0F1318)
+	GUICtrlSetBkColor($g_hPanelCountPerc, $g_iPanelBgColorGui)
 	$g_hLabelCountPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($g_hPanelCountPerc), "0%", 0, 2, 104, 16, 9, Default, 0, 1, 0x13FF92)
 	_SetLabelCountPerc("0%")
 
@@ -1041,12 +1045,12 @@ Func _UpdateMemoryStatsFirst()
 		; Total physical memory (bytes -> MB -> GB)
 		Local $iMemTotalMB = Floor($aPerfInfo[3] / 1024 / 1024)
 		Local $iMemTotalGB = Round($iMemTotalMB / 1024, 1)
-		_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
+		_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), $g_iPanelBgColorARGB)
 	EndIf
 
 	; Update process count
 	Local $aProcessList = ProcessList()
-	_GUICtrlFFLabel_SetData($g_hLabelProcs, String($aProcessList[0][0]), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelProcs, String($aProcessList[0][0]), $g_iPanelBgColorARGB)
 
 EndFunc
 
@@ -1073,7 +1077,7 @@ Func _UpdateMemoryStats()
 	If $iMemTotalMB > 0 Then $iMemLoad = Round(($iMemUsedMB / $iMemTotalMB) * 100)
 
 	; Update total RAM label
-	_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMTotal, StringFormat("%.1f GB", $iMemTotalGB), $g_iPanelBgColorARGB)
 
 	Local $iIconIndex = 0
 	If $iMemLoad > 0 Then
@@ -1085,7 +1089,7 @@ Func _UpdateMemoryStats()
 		GUICtrlSetImage($g_hIconMemStats, @ScriptFullPath, $g_iMemStatIcoStart + $iIconIndex)
 	EndIf
 
-	_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, StringFormat("%d%", $iMemLoad), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMPerc, StringFormat("%d%", $iMemLoad), $g_iPanelBgColorARGB)
 
 	$g_aMemBuffers[$MEM_LOAD] = $iMemLoad
 
@@ -1093,13 +1097,13 @@ Func _UpdateMemoryStats()
 	Local $iRAMFree = $iMemAvailGB
 	Local $iRAMUsed = $iMemUsedGB
 
-	_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, StringFormat("%.1f GB", $iRAMUsed), 0x0F1318)
-	_GUICtrlFFLabel_SetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMUsed, StringFormat("%.1f GB", $iRAMUsed), $g_iPanelBgColorARGB)
+	_GUICtrlFFLabel_SetData($g_hLabelRAMFree, StringFormat("%.1f GB", $iRAMFree), $g_iPanelBgColorARGB)
 	$g_aMemBuffers[$MEM_AVAILPHYSRAM] = $iRAMFree
 
 	; Update process count
 	Local $aProcessList = ProcessList()
-	_GUICtrlFFLabel_SetData($g_hLabelProcs, String($aProcessList[0][0]), 0x0F1318)
+	_GUICtrlFFLabel_SetData($g_hLabelProcs, String($aProcessList[0][0]), $g_iPanelBgColorARGB)
 
 	; Cached and committed memory panels and kernel pools
 	Local $iCachedMB = Floor($aPerfInfo[5] / 1024 / 1024)
@@ -1642,9 +1646,9 @@ Func _OptimizeMemory()
 	_UpdateMemoryStats()
 	_WinAPI_UpdateWindow($g_hCoreGui)
 	_UpdateMemoryStats()
-	_GUICtrlFFLabel_SetData($g_hLabelCount, $g_sLabelCountText, 0x0F1318)
-	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, $g_sLabelCountPercText, 0x0F1318)
-	_GUICtrlFFLabel_SetData($g_hLabelTimer, $g_sLabelTimerText, 0x0F1318)
+	_SetLabelCount($g_sLabelCountText)
+	_SetLabelCountPerc($g_sLabelCountPercText)
+	_SetLabelTimer($g_sLabelTimerText)
 
 	; Reset manual optimization flag to default (True) for next optimization
 	$g_bManualOptimization = True
@@ -1927,6 +1931,15 @@ Func _ShowPreferencesDlg()
 	_LoadConfiguration()
 	$g_sSelectedLanguage = IniRead($g_sPathIni, $g_sProgShortName, "Language", "en")
 	Local $iLangCount = 1
+	Local Const $iDialogWidth = 520
+	Local Const $iDialogHeight = 500
+	Local Const $iTabWidth = $iDialogWidth - 20
+	Local Const $iTabHeight = 430
+	Local Const $iGroupWidth = $iDialogWidth - 50
+	Local Const $iLanguageListWidth = $iGroupWidth - 35
+	Local Const $iLanguageLabelWidth = $iGroupWidth - 35
+	Local Const $iButtonSaveX = $iDialogWidth - 260
+	Local Const $iButtonCancelX = $iButtonSaveX + 110
 
 	$g_iParentState = WinGetState($g_hCoreGui)
 	If $g_iParentState > 0 Then
@@ -1937,18 +1950,18 @@ Func _ShowPreferencesDlg()
 		$g_iParent = 0
 	EndIf
 
-	$g_hOptionsGui = GUICreate($g_aLangPreferences[0], 450, 500, -1, -1, BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_iParent)
+	$g_hOptionsGui = GUICreate($g_aLangPreferences[0], $iDialogWidth, $iDialogHeight, -1, -1, BitOR($WS_CAPTION, $WS_POPUPWINDOW), $WS_EX_TOPMOST, $g_iParent)
 	GUISetFont(Default, Default, Default, "Verdana", $g_hOptionsGui, 5)
 	If $g_iParentState > 0 Then GUISetIcon($g_sDlgOptionsIcon, $g_iDialogIconStart + 2, $g_hAboutGui)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "__CloseOptionsDlg", $g_hOptionsGui)
 	GUIRegisterMsg($WM_NOTIFY, "__LanguageListEvents")
 
-	GUICtrlCreateTab(10, 10, 430, 430)
+	GUICtrlCreateTab(10, 10, $iTabWidth, $iTabHeight)
 
 	GUICtrlCreateTabItem($g_aLangPreferences[24])
 
 	; Optimization Modes Group
-	GUICtrlCreateGroup("Memory Optimization Modes", 25, 50, 400, 110)
+	GUICtrlCreateGroup("Memory Optimization Modes", 25, 50, $iGroupWidth, 110)
 	GUICtrlSetFont(-1, 10, Default, 2)
 	$g_hORADOptimMode[0] = GUICtrlCreateRadio(" Intelligent memory optimization", 35, 75, 360, 20)
 	$g_hORADOptimMode[1] = GUICtrlCreateRadio(" Automatically optimize memory every", 35, 100, 240, 20)
@@ -1968,7 +1981,7 @@ Func _ShowPreferencesDlg()
 	EndIf
 
 	; Behavior Group
-	GUICtrlCreateGroup("Behavior", 25, 170, 400, 110)
+	GUICtrlCreateGroup("Behavior", 25, 170, $iGroupWidth, 110)
 	GUICtrlSetFont(-1, 10, Default, 2)
 	$g_hOCheckForceBehave = GUICtrlCreateCheckbox(" Force malicious processes to behave", 35, 195, 360, 20)
 	GUICtrlSetState($g_hOCheckForceBehave, $g_iForceBehave)
@@ -1980,24 +1993,6 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetState($g_hOCheckOnTop, $g_iAlwaysOnTop)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
-	; Notifications Group
-	GUICtrlCreateGroup("Notifications and Sounds", 25, 270, 400, 140)
-	GUICtrlSetFont(-1, 10, Default, 2)
-	$g_hOCheckNotify = GUICtrlCreateCheckbox(" Show program notifications", 35, 295, 360, 20)
-	GUICtrlSetState($g_hOCheckNotify, $g_iShowNotifications)
-	$g_hOCheckPlayEvents = GUICtrlCreateCheckbox(" Play sounds on program events", 35, 320, 360, 20)
-	GUICtrlSetState($g_hOCheckPlayEvents, $g_iPlaySounds)
-	$g_hOCheckPlayWarnings = GUICtrlCreateCheckbox(" Play warning every", 35, 345, 140, 20)
-	GUICtrlSetState($g_hOCheckPlayWarnings, $g_iPlayWarnings)
-	$g_hOComboWarnEvery = GUICtrlCreateCombo("", 180, 344, 50, 20)
-	GUICtrlSetData($g_hOComboWarnEvery, "1|3|5|10|15|30|60|120", String($g_iWarnEvery))
-	GUICtrlCreateLabel(" seconds", 235, 347, 60, 20)
-	GUICtrlCreateLabel("       if memory load exceeds", 35, 372, 180, 20)
-	$g_hOComboWarnIf = GUICtrlCreateCombo("", 220, 370, 50, 20)
-	GUICtrlSetData($g_hOComboWarnIf, "50|60|70|80|90|95", String($g_iWarnIfLoad))
-	GUICtrlCreateLabel("%", 275, 372, 20, 20)
-	GUICtrlCreateGroup("", -99, -99, 1, 1)
-
 	; Set event handlers
 	GUICtrlSetOnEvent($g_hORADOptimMode[0], "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hORADOptimMode[1], "__CheckPreferenceChange")
@@ -2007,30 +2002,49 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetOnEvent($g_hOCheckStartWindows, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOStartMinimized, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckOnTop, "__CheckPreferenceChange")
+
+	GUICtrlCreateTabItem("") ; end tabitem definition
+
+	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[1]))
+
+	; Notifications Group moved to General tab
+	GUICtrlCreateGroup("Notifications and Sounds", 25, 50, $iGroupWidth, 140)
+	GUICtrlSetFont(-1, 10, Default, 2)
+	$g_hOCheckNotify = GUICtrlCreateCheckbox(" Show program notifications", 35, 75, 360, 20)
+	GUICtrlSetState($g_hOCheckNotify, $g_iShowNotifications)
+	$g_hOCheckPlayEvents = GUICtrlCreateCheckbox(" Play sounds on program events", 35, 100, 360, 20)
+	GUICtrlSetState($g_hOCheckPlayEvents, $g_iPlaySounds)
+	$g_hOCheckPlayWarnings = GUICtrlCreateCheckbox(" Play warning every", 35, 125, 140, 20)
+	GUICtrlSetState($g_hOCheckPlayWarnings, $g_iPlayWarnings)
+	$g_hOComboWarnEvery = GUICtrlCreateCombo("", 180, 123, 50, 20)
+	GUICtrlSetData($g_hOComboWarnEvery, "1|3|5|10|15|30|60|120", String($g_iWarnEvery))
+	GUICtrlCreateLabel(" seconds", 235, 126, 60, 20)
+	GUICtrlCreateLabel("       if memory load exceeds", 35, 151, 180, 20)
+	$g_hOComboWarnIf = GUICtrlCreateCombo("", 220, 149, 50, 20)
+	GUICtrlSetData($g_hOComboWarnIf, "50|60|70|80|90|95", String($g_iWarnIfLoad))
+	GUICtrlCreateLabel("%", 275, 151, 20, 20)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+	GUICtrlCreateGroup($g_aLangPreferences[4], 25, 200, $iGroupWidth, 160)
+	GUICtrlSetFont(-1, 10, Default, 2)
+	$g_hOChkLogEnabled = GUICtrlCreateCheckbox($g_aLangPreferences[8], 35, 240, 200, 20)
+	GUICtrlSetState($g_hOChkLogEnabled, $g_iLoggingEnabled)
+	GUICtrlCreateLabel($g_aLangPreferences[9], 35, 270, 180, 20)
+	$g_hOInLogSize = GUICtrlCreateInput(Round($g_iLoggingStorage / 1024, 2), 215, 268, 100, 20)
+	GUICtrlSetStyle($g_hOInLogSize, BitOr($ES_RIGHT, $ES_NUMBER))
+	GUICtrlSetFont(-1, 9, 400, 0, "Segoe UI")
+	GUICtrlCreateLabel("KB", 325, 270, 50, 20)
+	$g_hOInLogSizeTemp = Int(GUICtrlRead($g_hOInLogSize))
+	$g_hOLblLogSize = GUICtrlCreateLabel(StringFormat($g_aLangPreferences[10], __GetLoggingSize()), 35, 310, 200, 20)
+	GUICtrlSetColor($g_hOLblLogSize, 0x555555)
+	$g_hOBtnLogClear = GUICtrlCreateButton($g_aLangPreferences[11], 255, 305, 150, 30)
+	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+
 	GUICtrlSetOnEvent($g_hOCheckNotify, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckPlayEvents, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOCheckPlayWarnings, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOComboWarnEvery, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOComboWarnIf, "__CheckPreferenceChange")
-
-	GUICtrlCreateTabItem("") ; end tabitem definition
-
-	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[1]))
-	GUICtrlCreateGroup($g_aLangPreferences[4], 25, 250, 400, 160)
-	GUICtrlSetFont(-1, 10, Default, 2)
-	$g_hOChkLogEnabled = GUICtrlCreateCheckbox($g_aLangPreferences[8], 35, 290, 200, 20)
-	GUICtrlSetState($g_hOChkLogEnabled, $g_iLoggingEnabled)
-	GUICtrlCreateLabel($g_aLangPreferences[9], 35, 320, 180, 20)
-	$g_hOInLogSize = GUICtrlCreateInput(Round($g_iLoggingStorage / 1024, 2), 215, 318, 100, 20)
-	GUICtrlSetStyle($g_hOInLogSize, BitOr($ES_RIGHT, $ES_NUMBER))
-	GUICtrlSetFont(-1, 9, 400, 0, "Segoe UI")
-	GUICtrlCreateLabel("KB", 325, 320, 50, 20)
-	$g_hOInLogSizeTemp = Int(GUICtrlRead($g_hOInLogSize))
-	$g_hOLblLogSize = GUICtrlCreateLabel(StringFormat($g_aLangPreferences[10], __GetLoggingSize()), 35, 360, 200, 20)
-	GUICtrlSetColor($g_hOLblLogSize, 0x555555)
-	$g_hOBtnLogClear = GUICtrlCreateButton($g_aLangPreferences[11], 255, 355, 150, 30)
-	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
-
 	GUICtrlSetOnEvent($g_hOChkLogEnabled, "__CheckPreferenceChange")
 	GUICtrlSetOnEvent($g_hOBtnLogClear, "__RemoveLoggingFile")
 		;GUICtrlSetState($g_ReBarChkLogEnabled, $g_ReBarLogEnabled)
@@ -2038,7 +2052,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlCreateTabItem("") ; end tabitem definition
 
 	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[2]))
-	GUICtrlCreateGroup($g_aLangPreferences[5], 25, 50, 400, 130)
+	GUICtrlCreateGroup($g_aLangPreferences[5], 25, 50, $iGroupWidth, 130)
 	GUICtrlSetFont(-1, 10, Default, 2)
 	GUICtrlCreateLabel($g_aLangPreferences[12], 35, 80, 300, 20)
 	GUICTrlSetColor(-1, 0x555555)
@@ -2058,7 +2072,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlSetOnEvent($g_hOComboPower, "_SetProcessPriority")
 	GUICtrlSetOnEvent($g_hOChkSaveRealtime, "__CheckPreferenceChange")
 
-	GUICtrlCreateGroup($g_aLangPreferences[6], 25, 200, 400, 70)
+	GUICtrlCreateGroup($g_aLangPreferences[6], 25, 200, $iGroupWidth, 70)
 	GUICtrlSetFont(-1, 10, Default, 2)
 	$g_hOChkReduceMemory = GUICtrlCreateCheckbox($g_aLangPreferences[14], 35, 235, 360, 20)
 	GUICtrlSetState($g_hOChkReduceMemory, $g_iReduceMemory)
@@ -2074,7 +2088,7 @@ Func _ShowPreferencesDlg()
 	GUICtrlCreateTabItem("") ; end tabitem definition
 
 	GUICtrlCreateTabItem(StringFormat(" %s ", $g_aLangPreferences[3]))
-	GUICtrlCreateGroup($g_aLangPreferences[7], 25, 50, 400, 350)
+	GUICtrlCreateGroup($g_aLangPreferences[7], 25, 50, $iGroupWidth, 350)
 	GUICtrlSetFont(-1, 10, Default, 2)
 
 	Local $aSelLangInfo = __ISO639CodeToIndex($g_sSelectedLanguage)
@@ -2082,7 +2096,7 @@ Func _ShowPreferencesDlg()
 	$g_hOLblLanguage = GUICtrlCreateLabel($aSelLangInfo[0], 80, 98, 300)
 	GUICtrlSetFont($g_hOLblLanguage, 11)
 
-	$g_hOListLanguage = GUICtrlCreateListView("", 40, 135, 365, 200)
+	$g_hOListLanguage = GUICtrlCreateListView("", 40, 135, $iLanguageListWidth, 200)
 	_GUICtrlListView_SetExtendedListViewStyle($g_hOListLanguage, BitOR($LVS_EX_BORDERSELECT, _
 			$LVS_EX_FLATSB, $LVS_EX_FULLROWSELECT, $LVS_EX_GRIDLINES, $LVS_EX_SUBITEMIMAGES, $LVS_EX_DOUBLEBUFFER, _
 			$WS_EX_CLIENTEDGE, $LVS_EX_FLATSB, $LVS_EX_INFOTIP))
@@ -2126,7 +2140,7 @@ Func _ShowPreferencesDlg()
 	Local $iSelLangItem = __FindLanguageItem(3300 + $aSelLangInfo[1])
 	_GUICtrlListView_SetItemSelected($g_hOListLanguage, $iSelLangItem, True, True)
 	_GUICtrlListView_EnsureVisible($g_hOListLanguage, $iSelLangItem)
-	GUICtrlCreateLabel(StringFormat($g_aLangPreferences[15], $g_aLangPreferences[16]), 40, 350, 365, 35)
+	GUICtrlCreateLabel(StringFormat($g_aLangPreferences[15], $g_aLangPreferences[16]), 40, 350, $iLanguageLabelWidth, 35)
 	GUICtrlSetColor(-1, 0x555555)
 	GUICtrlSetFont(-1, 9)
 	GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
@@ -2135,13 +2149,13 @@ Func _ShowPreferencesDlg()
 	$g_hOLblPrefsUpdated = GUICtrlCreateLabel($g_aLangPreferences[12], 25, 455, 200, 20)
 	GUICtrlSetColor($g_hOLblPrefsUpdated, 0x008000)
 	GUICtrlSetState($g_hOLblPrefsUpdated, $GUI_HIDE)
-	$g_hOBtnSave = GUICtrlCreateButton($g_aLangPreferences[16], 210, 450, 100, 30)
+	$g_hOBtnSave = GUICtrlCreateButton($g_aLangPreferences[16], $iButtonSaveX, 450, 100, 30)
 	GUICtrlSetFont($g_hOBtnSave, 10)
 	GUICtrlSetState($g_hOBtnSave, $GUI_FOCUS)
 	GUICtrlSetState($g_hOBtnSave, $GUI_DISABLE)
 	GUICtrlSetOnEvent($g_hOBtnSave, "__SavePreferences")
 
-	$g_hOBtnCancel = GUICtrlCreateButton($g_aLangPreferences[17], 320, 450, 100, 30)
+	$g_hOBtnCancel = GUICtrlCreateButton($g_aLangPreferences[17], $iButtonCancelX, 450, 100, 30)
 	GUICtrlSetFont($g_hOBtnCancel, 10)
 	GUICtrlSetOnEvent($g_hOBtnCancel, "__CloseOptionsDlg")
 
