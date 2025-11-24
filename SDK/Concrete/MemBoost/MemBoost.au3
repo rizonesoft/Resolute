@@ -493,7 +493,7 @@ Global $g_iStartMinimized = 0					;~ Start minimized to tray
 Global $g_bManualOptimization = True			;~ Track if optimization was manual vs automatic (default to manual)
 Global $g_sLabelCountText = "0"
 Global $g_sLabelCountPercText = "0%"
-Global $g_sLabelTimerText = "OFF"
+Global $g_sLabelTimerText = "30"
 
 If Not IsDeclared("g_iParentState") Then Global $g_iParentState
 If Not IsDeclared("g_iParent") Then Global $g_iParent
@@ -592,6 +592,20 @@ Global $Graph1
 Global $g_iPeakCPU = 0
 Global $g_iPeakCommitted = 0
 
+Func _SetLabelCount($sText, $iColor = 0x0F1318)
+	$g_sLabelCountText = $sText
+	If $g_hLabelCount Then _GUICtrlFFLabel_SetData($g_hLabelCount, $sText, $iColor)
+EndFunc
+
+Func _SetLabelCountPerc($sText, $iColor = 0x0F1318)
+	$g_sLabelCountPercText = $sText
+	If $g_hLabelCountPerc Then _GUICtrlFFLabel_SetData($g_hLabelCountPerc, $sText, $iColor)
+EndFunc
+
+Func _SetLabelTimer($sText, $iColor = 0x0F1318)
+	$g_sLabelTimerText = $sText
+	If $g_hLabelTimer Then _GUICtrlFFLabel_SetData($g_hLabelTimer, $sText, $iColor)
+EndFunc
 
 _Localization_Messages()   		;~ Load Message Language Strings
 
@@ -933,12 +947,10 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 	GUICtrlCreateGraphic(214, 351, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
 	GUICtrlCreateLabel("COUNT", 218, 354, 80, 16)
-	GUICtrlSetBkColor(-1, 0x0F1318)
-	GuiCTrlSetColor(-1, 0xCCCCCC)
 	Local $hPanelCount = GUICtrlCreateGraphic(301, 351, 84, 20)
 	GUICtrlSetBkColor($hPanelCount, 0x0F1318)
 	$g_hLabelCount = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelCount), "0", 4, 2, 80, 16, 9, Default, 0, 0, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelCount, "0", 0x0F1318)
+	_SetLabelCount("0")
 
 	GUICtrlCreateGraphic(388, 351, 84, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -947,13 +959,13 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 	GuiCTrlSetColor(-1, 0xCCCCCC)
 	Local $hPanelTimer = GUICtrlCreateGraphic(475, 351, 84, 43)
 	GUICtrlSetBkColor($hPanelTimer, 0x0F1318)
-	$g_hLabelTimer = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelTimer), "30", 3, 4, 78, 36, 18, Default, 0, 1, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelTimer, "30", 0x0F1318)
+	$g_hLabelTimer = _GUICtrlFFLabel_Create(GUICtrlGetHandle($hPanelTimer), $g_sLabelTimerText, 3, 4, 78, 36, 18, Default, 0, 1, 0x13FF92)
+	_SetLabelTimer($g_sLabelTimerText)
 
 	$g_hPanelCountPerc = GUICtrlCreateGraphic(20, 374, 104, 20)
 	GUICtrlSetBkColor($g_hPanelCountPerc, 0x0F1318)
-	$g_hLabelCountPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($g_hPanelCountPerc), "100%", 0, 2, 104, 16, 9, Default, 0, 1, 0x13FF92)
-	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "100%", 0x0F1318)
+	$g_hLabelCountPerc = _GUICtrlFFLabel_Create(GUICtrlGetHandle($g_hPanelCountPerc), "0%", 0, 2, 104, 16, 9, Default, 0, 1, 0x13FF92)
+	_SetLabelCountPerc("0%")
 
 	GUICtrlCreateGraphic(127, 374, 345, 20)
 	GUICtrlSetBkColor(-1, 0x0F1318)
@@ -995,7 +1007,7 @@ _GUICtrlFFLabel_SetData($g_hLabelProcs, "0", 0x0F1318)
 	; Immediate initialization with double-update to survive WM_PAINT
 	_UpdateMemoryStats()
 	_UpdateTimer()
-	_GUICtrlFFLabel_SetData($g_hLabelCount, String($g_iOptimizeCount), 0x0F1318)
+	_SetLabelCount(String($g_iOptimizeCount))
 	_GUICtrlFFLabel_Refresh()
 
 	; Start all periodic updates AFTER window initialization complete
@@ -1530,16 +1542,16 @@ Func _OptimizeMemory()
 	Local $iTotalProcs = $aProcsList[0][0]
 
 	; Update status
-	_GUICtrlFFLabel_SetData($g_hLabelCount, String($g_iOptimizeCount), 0x0F1318)
+	_SetLabelCount(String($g_iOptimizeCount))
 	GUICtrlSetData($g_hSubHeading, $g_aLangCustom[2])
 
 	; Double-update: ensures buffers fresh before and after WM_PAINT
 	_UpdateMemoryStats()
 	_WinAPI_UpdateWindow($g_hCoreGui)
 	_UpdateMemoryStats()
-	_GUICtrlFFLabel_SetData($g_hLabelCount, $g_sLabelCountText, 0x0F1318)
-	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, $g_sLabelCountPercText, 0x0F1318)
-	_GUICtrlFFLabel_SetData($g_hLabelTimer, $g_sLabelTimerText, 0x0F1318)
+	_SetLabelCount($g_sLabelCountText)
+	_SetLabelCountPerc($g_sLabelCountPercText)
+	_SetLabelTimer($g_sLabelTimerText)
 
 	; Loop through all processes and clear working set
 	Local $iLastProgress = -1
@@ -1573,7 +1585,7 @@ Func _OptimizeMemory()
 		; Update progress on process counter bar (every 1% for smooth display)
 		Local $iProgress = Floor(($i / $iTotalProcs) * 100)
 		If $iProgress <> $iLastProgress Then
-			_GUICtrlFFLabel_SetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgress), 0x0F1318)
+			_SetLabelCountPerc(StringFormat("%d%%", $iProgress))
 			
 			; If in timer mode, show countdown as peak (background) and optimization as current (foreground)
 			If $g_iAutoOptimize = 2 Then
@@ -1591,7 +1603,7 @@ Func _OptimizeMemory()
 
 	; Reset progress bar
 	_GDIPlusProgressBar_Draw($g_hProgressProcs[0], 0, 0x0F1318, 0x13FF92, 0x085820)
-	_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "0%", 0x0F1318)
+	_SetLabelCountPerc("0%")
 
 	; Update status with actual processed count
 	GUICtrlSetData($g_hSubHeading, StringFormat($g_aLangCustom[3], $iProcessedCount))
@@ -1655,12 +1667,12 @@ Func _UpdateTimer()
 			$g_bManualOptimization = False ; Mark as automatic optimization
 			_OptimizeMemory()
 		EndIf
-		_GUICtrlFFLabel_SetData($g_hLabelTimer, "AUTO", 0x0F1318)
+		_SetLabelTimer("AUTO")
 
 		; Clear progress bar in AUTO mode (only if not currently optimizing)
 		If $g_iOptimizing = 0 Then
 			_GDIPlusProgressBar_Draw($g_hProgressProcs[0], 0, 0x0F1318, 0x13FF92, 0x085820)
-			_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "0%", 0x0F1318)
+			_SetLabelCountPerc("0%")
 		EndIf
 
 	ElseIf $g_iAutoOptimize = 2 Then ; Timer mode
@@ -1674,24 +1686,24 @@ Func _UpdateTimer()
 			$g_bManualOptimization = False ; Mark as automatic optimization
 			_OptimizeMemory()
 		Else
-			_GUICtrlFFLabel_SetData($g_hLabelTimer, String($g_iTimerCountdown), 0x0F1318)
+			_SetLabelTimer(String($g_iTimerCountdown))
 
 			; Update progress bar to show countdown (shown as peak during optimization)
 			; During optimization, countdown pauses and shows as background peak
 			If $g_iOptimizing = 0 Then
 				Local $iProgressPerc = Floor(($g_iTimerCountdown / $g_iAutoOptimizeSeconds) * 100)
 				_GDIPlusProgressBar_Draw($g_hProgressProcs[0], $iProgressPerc, 0x0F1318, 0x13FF92, 0x085820)
-				_GUICtrlFFLabel_SetData($g_hLabelCountPerc, StringFormat("%d%%", $iProgressPerc), 0x0F1318)
+				_SetLabelCountPerc(StringFormat("%d%%", $iProgressPerc))
 			EndIf
 		EndIf
 
 	Else ; Manual mode
-		_GUICtrlFFLabel_SetData($g_hLabelTimer, "OFF", 0x0F1318)
+		_SetLabelTimer("OFF")
 
 		; Clear progress bar when not in timer mode (only if not currently optimizing)
 		If $g_iOptimizing = 0 Then
 			_GDIPlusProgressBar_Draw($g_hProgressProcs[0], 0, 0x0F1318, 0x13FF92, 0x085820)
-			_GUICtrlFFLabel_SetData($g_hLabelCountPerc, "0%", 0x0F1318)
+			_SetLabelCountPerc("0%")
 		EndIf
 	EndIf
 
