@@ -1,0 +1,5 @@
+@ECHO OFF
+COLOR 7
+TITLE Doors Command Prompt 0.0.5.55
+CLS
+VER

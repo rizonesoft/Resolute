@@ -1,0 +1,4 @@
+Remove Policies Set By Infections:
+
+This will remove the policies that most infections set. Such as disabling the task manager, Windows Defender, Microsoft Security Essentials, hiding the desktop, hijacking any exe that is run and many more. 
+

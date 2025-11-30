@@ -1,0 +1,18 @@
+[Version]
+Signature="$Chicago$"
+Provider=me
+
+[DefaultInstall]
+DelReg=regsec
+AddReg=regsec1
+
+[regsec]
+HKCU, Software\Classes\.exe
+HKCU, Software\Classes\secfile
+HKCR, secfile
+HKCR, .exe\shell\open\command
+
+[regsec1]
+HKCR, exefile\shell\open\command,,,"""%1"" %*"
+HKCR, .exe,,,"exefile"
+HKCR, .exe,"Content Type",,"application/x-msdownload"

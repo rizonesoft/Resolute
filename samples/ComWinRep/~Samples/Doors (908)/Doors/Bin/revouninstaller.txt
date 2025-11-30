@@ -1,0 +1,10 @@
+Revo Uninstaller 1.94
+--------------------------------------------------
+Revo Uninstaller helps you to uninstall software and remove unwanted programs installed on your computer easily! Even if you have problems uninstalling and cannot uninstall them from "Windows Add or Remove Programs" control panel applet.
+
+
+Download: 	http://www.revouninstaller.com/revo_uninstaller_free_download.html
+
+Installation:
+--------------------------------------------------	
+Extract downloaded version to the "[Doors Dir]\Doors\Bin\Variable\revouninstaller" directory

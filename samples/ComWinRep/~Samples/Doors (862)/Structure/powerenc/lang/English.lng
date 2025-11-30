@@ -1,0 +1,375 @@
+;Create your own language-files and send them
+;to bentech@freenet.de.
+
+;Unicode is not supported!
+
+;Language : English
+;Version  : PowerEnc 3.32
+;Creator  : Benedikt Maettig
+;Mail     : bentech@freenet.de
+
+[Globals]
+CapOK=OK
+CapCancel=Cancel
+CapClose=Close
+
+[Mainform]
+destfolder=Choose destination folder...
+encsetbtn=Encoder...
+encsettop=Settings...
+gensetbtn=Settings...
+startbtn=Start
+stopbtn=Stop
+pausebtn1=Pause
+pausebtn2=Resume
+menu1=Start
+menu2=Stop
+menu3=File mode...
+menu4=Add files...
+menu5=Remove files
+menu6=Disc mode...
+menu7=Select all
+menu8=Deselect all
+menu9=Eject
+menu10=Show/Hide editor
+menu11=Get infos from freedb...
+menu12=Encoder settings...
+menu13=General settings...
+menu14=About...
+menu15=Close
+donate=Donate
+hidewin=Hide
+lbloverwrite=Sourcefiles could be overwritten!
+freedbbtn=Get infos from freedb...
+filecap=File mode
+disccap=Disc mode
+addfilebtn=Add files...
+remfilebtn=Remove files
+savefile=Save files in...
+svfile0=...destination folder
+svfile1=...subfolder (in destination folder)
+svfile2=...subfolder (in sourcefolder)
+svfile3=...sourcefolder
+namesub=Name of the subfolder...
+lstcap11=Filename
+lstcap12=Format
+lstcap13=Status
+selbtn=Select all
+deselbtn=Deselect all
+ejectbtn=Eject
+choosedrive=Choose source drive...
+lstcap21=Track
+lstcap22=Format
+lstcap23=Status
+lbldiscinfo=Disc informations...
+lblartist=Artist
+lbltitle=Title
+lblvarart=Various artists>>>>>>>>>>>
+lblalbum=Album
+lblyear=Year
+lblgenre=Genre
+lblcover=Cover
+lblComment=Comment
+lblWeb=Web
+lblEncBy=Encoded by
+grpfileTag=Taginfos (select file for editing)
+grpfileTag2=Additional infos
+grpfileTag3=Fileinfos
+grpfileDisc=Discinfos (select file for editing)
+grpfileDisc2=Additional infos
+selEncoder=Selected output format:
+lblbitrate=Bitrate:
+lblduration=Duration:
+lblfrequency=Frequency:
+lblchannels=Channels:
+infocap=Disc informations...
+lbltrack=#Track
+
+[Selector]
+selCoverCap=Select the source... 
+selCoverOpt1=Cover from local disc...
+selCoverOpt2=Search online for covers...
+
+[Progress]
+lblprogrCap=Progress:
+lblelapsedCap=Time elapsed
+lblleftCap=Time left:
+lblspeedCap=Speed...
+lblcpuCap=CPU load...
+
+[Settings]
+settingsCaption=General setting...
+btnSettingsApply=Apply
+grpAmazonSettings=Amazon settings
+lblChooseAmazonServer=Choose your prefered Amazon server
+grpDecoder=Decoder plugins
+btnDecoderAdd=Add decoder
+btnDecoderEdit=Edit decoder
+btnDecoderDel=Del decoder
+colDecoderExt=Ext
+colDecoderPlugin=Plugin
+colDecoderDescription=Description
+grpDiscModeFilename=Filenames && Directories
+lblDiscModeFormatFileName=Format of filename
+lblDiscModeFormatFolder=Format of subfolder
+lblDiscModeDescription=It is possible to create more than one subfolder.
+chkDiscModeCreateSub=Enable creating of subfolders
+grpDiscModeTagging=Tagging
+chkDiscModeWriteTag=Write tag into ripped files
+lblDiscModeTimeOfTagWrite=Time of writing tags (internal tagger only)
+cmbDiscModeWrite1=Write tags while ripping
+cmbDiscModeWrite2=Write tags after ripping has finished
+grpFileModeFilename=Filenames
+chkFileModeChangeFileNames=Change filenames (if informations are valid)
+lblFileModeFormatFileName=Format of filename
+grpFileModeTagging=Tagging
+chkFileModeWriteTag=Transfer tag informations to the destination files
+lblFileModeTimeOfTagWrite=Time of writing tags (internal tagger only)
+cmbFileModeWrite1=Write tags while encoding
+cmbFileModeWrite2=Write tags after encoding has finished
+grpFreeDB=FreeDB settings
+lblFreeDBServer=Choose your prefered FreeDB server
+grpLanguage=Language
+lblLanguage=Choose your language
+btnEditLanguage=Edit language
+lblLanguageInfo=Create your own languagefile and send it by mail to bentech@freenet.de
+grpMainFolder=Main folder
+lblMainFolder=Choose the main directory
+cmbMainFolder1=PowerEnc program folder
+cmbMainFolder2=Windows user home folder
+lblMainFolderInfo=You should choose your user folder when you are not the admin of this computer. This is only available on Windows NT systems.
+grpProxyServer=Proxy server
+chkUseProxy=Use a proxy server for internet connections
+lblProxyServer=Server
+lblProxyPort=Port
+lblProxyUser=User
+lblProxyPassword=Password
+grpTagger=Flexible tagging
+colTagger1=Filetype
+colTagger2=Tagmode
+btnTaggerEditMode=Edit mode
+grpOtherTaggers=Other tags
+lblOtherTaggersInfo=The internal tagger can tag OggVorbis and Flac files with information tags.
+chkEnableOggTagging=Enable VorbisComment && Flac tagging
+grpExtTaggers=Taggers
+colExtTaggers1=Ext
+colExtTaggers2=Description
+btnAddExtTagger=Add tagger
+btnEditExtTagger=Edit tagger
+btnDelExtTagger=Del tagger
+grpExtTaggerInfo=Informations
+lblExtTaggerDescription=Description:
+lblExtTaggerExtension=Extension:
+lblExtTaggerParameters=Parameters:
+lblExtTaggerFileName=Filename:
+grp_userInterface=User interface
+lblChooseEncoderSelector=Choose your prefered encoder selector
+cmbChooseEncoderSelector1=PopUp menu (standard)
+cmbChooseEncoderSelector2=Extended selector
+chkShowProgressBars=Show progressbars in the filelist while encoding
+chkShowSmallProgressView=Show small progressview while encoding
+
+[ExtTaggerEditor]
+extTaggerCaption=External tagger editor...
+extTaggerName=Name:
+extTaggerExt=Extension:
+extTaggerCmd=Commandline:
+extTaggerParam=Parameters
+extTaggerSelParam=Select the parameter you want to edit...
+extTaggerEditParam=Edit selected parameter...
+extTaggerPath=Path to the tagger:
+extTaggerSave=Save
+
+[Proxy]
+proxyCaption=Proxy settings
+proxyChk=Use a proxy server
+proxylblServer=Server
+proxylblUser=Username
+proxylblPass=Password
+proxylblPort=Port
+
+[FileExists]
+existsCap=File already exists...
+existsQues=This file already exists! What do you want to do now?
+existsFile=New filename...
+existsAll=for all following tracks
+existsOpt1=Skip this file [Jump to next track]
+existsOpt2=Overwrite file [Delete existing file]
+existsOpt3=Change filename [...]
+
+[EncSettings]
+dlgencCaption=Encoder settings
+lblchooseEnc=Choose an encoder...
+
+[EncProfile]
+lblselProfile=Selected profile...
+btnprofilenew=New
+btnprofilesave=Save profile
+btnprofileCancel=Cancel
+btnprofiledelete=Delete profile
+boxprofileMain=Settings
+tabPro01=Encoder
+tabPro02=Path
+lblprofileParam=Params...
+lblprofileExt=File-Extension...
+lblprofileBitrate=Choose your bitrate...
+lblprofilePath=Path to encoder...
+lblprofileText=Create your own profile and send it to: bentech@freenet.de
+
+[EncFrog]
+lblfrogPath=Path to Frog...
+boxfrogMain=Frog settings
+lblfrogParam=Frog params:
+tabfrog01=Main settings
+grpfrogMode=Encoding mode
+lblfrogMode=Select one mode...
+chkfrogMax=Disable mode and use "Maximum compression" (very slow)
+
+[EncFlac]
+lblflacPath=Path to flac...
+boxflacMain=Flac settings
+lblflacParam=Flac params:
+tabflac01=Flac presets
+chkflacpreset=Use Flac presets (all other settings will be ignored)
+lblflacchoose=Choose preset...
+tabflac02=Encoding settings
+lblflacBlockSize=Blocksize
+lblflacMaxLPC=Maximum LPC order
+chkflacTry=Try mid-side coding for each frame
+chkflacAdaptive=Adaptive mid-side coding for all frames
+chkflacModel=Do exhaustive model search (slow)
+chkflacLPSearch=Do exhaustive search of LP coefficient quantization (slow)
+lblflacLP=LP coefficient precision (default 0)
+lblflacPartition=Set residual partition order (default 0)
+
+[EncFaac]
+lblaacPath=Path to Faac...
+boxaacMain=Faac settings
+tabaac01=Main
+rbtnaacQuality=Quality
+rbtnaacBitrate=Bitrate
+lblaacQuality=Choose quality...
+lblaacBitrate=Choose bitrate...
+chkaacMp4=Use mp4 container
+lblaacParam=Faac params:
+
+[EncMp]
+lblmpPath=Path to Musepack...
+boxmpMain=Musepack settings
+tabmp01=Main
+boxmpPreset=Choose a preset...
+lblmpParam=Musepack params:
+
+[EncOgg]
+lbloggPath=Path to Ogg...
+boxoggMain=Ogg Vorbis settings
+tabogg01=Quality settings
+tabogg02=Special
+rbtnoggQuality=Quality
+rbtnoggBitrate=Bitrate
+lbloggQuality=Choose quality...
+lbloggBitrate=Choose bitrate...
+lbloggParam=Ogg params:
+chboggMinBitrate=Minimum bitrate...
+chboggMaxBitrate=Maximum bitrate...
+chboggResample=Resample to...
+chboggDownmix=Downmix Stereo to Mono
+lbloggMin=Useful for encoding for a fixed-size channel.
+lbloggMax=Useful for streaming applications.
+
+[EncLame]
+lbllamePath=Path to lame...
+boxlameMain=Lame settings
+tablame01=Lame presets
+tablame02=Quality settings
+tablame03=Frequency
+chblamePreset=Use new Lame presets (all other settings will be ignored)
+lbllameChoose=Choose preset...
+chblameFast=Activate "Fast encoding"
+lbllameText=For using the new Lame presets you need Lame version 3.97 or newer!
+lbllameParam=Lame params:
+rbtnlameCBR=Constant bitrate (CBR)
+rbtnlameVBR=Variable bitrate (VBR)
+rbtnlameABR=Average bitrate (ABR)
+lbllameMinBitrate1=Choose bitrate...
+lbllameMinBitrate2=Choose minimum bitrate...
+lbllameMinBitrate3=Choose average bitrate...
+lbllameMaxBitrate=Choose maximum bitrate...
+lbllameQuality=Quality...
+spnlameQuality=0=Highest...9=Lowest
+lbllameMode=Channel mode...
+lbllameOptimization=Optimization...
+grplameFlags=Flags...
+grplameOptions=Options
+chblameOriginal=Mark as copy
+chblameCopyright=Copyright
+chblameCRC=Include CRC-Checksum
+chklameKeep=Keep frequency from sourcefile
+optlame0=q0
+optlame1=q1
+optlame2=q2 (Recommended)
+optlame3=q3
+optlame4=q4
+optlame5=q5
+optlame6=q6
+optlame7=q7
+optlame8=q8
+optlame9=q9
+optlamedescr1=q0 = Highest quality, lowest speed
+optlamedescr2=q9 = Highest speed, poor quality
+lbllamepriority=Set the encoder priority...
+chklameresample=Resample to...
+tablame04=Extra
+
+[EncNero]
+lblneroPath=Path to NeroAac...
+grpneroSettings=NeroAac settings
+tabnerobasic=Basic settings
+tabneroadvanced=Advanced
+grpneroProfile=AAC profile
+chkneroAuto=Automatic
+lblneroMode=Choose encoding mode...
+grpneroVBR=Target quality - VBR
+grpneroCBR=Target bitrate (streaming) - CBR
+grpneroABR=Target bitrate - ABR
+lblneroABRBitrate=Choose bitrate...
+lblneroBitrate=Choose bitrate...
+lblneroQuality=Choose encoding quality...
+lblneroDescr1=lowest quality
+lblneroDescr2=highest quality
+lblneroParams=NeroAac params:
+
+[Format]
+FormatArtist=Artist
+FormatTitle=Title
+FormatAlbum=Album
+FormatYear=Year
+FormatGenre=Genre
+FormatTrackNum=TrackNum
+FormatFileName=Filename
+
+[FreeDB]
+freeDBCaption=Get informations from FreeDB...
+freeDBbtnOther=<< other album
+freeDBlblFound=Found audio-cds...
+freeDBlstres1=Genre
+freeDBlstres2=Artist
+freeDBlstres3=Album
+freeDBlsttrack1=Artist
+freeDBlsttrack2=Title
+freeDBlsttrack3=Album
+freeDBlsttrack4=Year
+freeDBNotFound=The album could not be found on FreeDB!
+
+[OnlineCover]
+coverCaption=Search album cover...
+coverlblsearch=Search for:
+coverlblartist=Artist:
+coverlblalbum=Album:
+coverlblsource=Source:
+coverbtnsearch=Search now...
+coverlblsize=Size
+coverlblinfos=More infos...
+coverlstalbum=Album
+coverbtnnew=New search...
+coverbtnmore=Search more...

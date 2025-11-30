@@ -1,0 +1,153 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1">
+	<title>MP3val 0.1.8: Documentation</title>
+</head>
+<body>
+	<p><h2>MP3val 0.1.8: Documentation</h2>
+	<p>
+		<ol>
+			<li><a href="#intro">Introduction</a>
+			<li><a href="#why">Why to use it?</a>
+			<li><a href="#how">How to use it?</a>
+			<li><a href="#messages">Interpreting the output</a>
+			<li><a href="#copy">Licensing and copyright</a>
+		</ol>
+
+	<p><a name="#intro"><h3>1. Introduction.</h3>
+	<p>MP3val is a small, high-speed tool for MPEG audio files validation and (optionally) fixing problems. It was primarily designed for verification of MPEG 1 Layer III (MP3) files, but supports also other MPEG versions and layers. It can be useful for finding corrupted files (e.g. incompletely downloaded).
+	<p>MP3val supports:
+		<ul>
+			<li>MPEG-1, 2, 2.5; Layers I, II, III
+			<li>ID3v1 tags (must be at the very end of the file)
+			<li>ID3v2 tags (must be at the very beginning of the file)
+			<li>APEv2 tags
+		</ul>
+	<p>This program can be compiled both for Windows and major Unix systems.
+	<p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+	<p>The latest version of MP3val (including sources) can be downloaded from the <a href="http://mp3val.sourceforge.net">official home page</a>.
+
+	<p><a name="#why"><h3>2. Why to use it?</h3>
+	<p>MPEG is a streamable format, that is, it is optimized for quick and easy recovery from errors. MP3 decoders are very tolerant to inconsistencies in the input file. Most players even don't report to user about stream errors. So, as a rule, user doesn't know whether his files are valid or broken. But using broken files can eventually lead to problems during playback on certain software/hardware.
+	<p>MP3val can assure you that your files are consistent in the terms of MPEG frames, that is,  it ensures that the file can be easily split into the frames and doesn't contain garbage. It checks also some other issues, such as track length stored in the VBR header. Checking by MP3val isn't a full test for compliance with existing formal and informal standards. MP3val neither decodes audio data nor checks for data validity in the frame.
+	<p>MP3val can also fix most of the problems. Be careful: although MP3val can repair even files with MPEG stream errors, it is recommended that you find a "good" copy of this file, because a "click" sound usually can't be removed, the repaired file will only look like good.
+
+	<p><a name="how"><h3>3. How to use it?</h3>
+	<p>MP3val is a console program. Command-line syntax:
+		<pre>
+	mp3val <i>&lt;files to validate&gt;</i> <i>&lt;options&gt;</i>
+		</pre>
+	<p><i>&lt;files to validate&gt;</i> - MPEG audio file(s) name(s). Can contain wildcards.
+	<p><i>Options</i>:
+	<p>
+		<table width=100% border>
+			<tr>
+				<td><b>Option</b>
+				<td><b>Description</b>
+			<tr>
+				<td>-l<i>&lt;log file&gt;</i>
+				<td>Log file name. If this argument is missing, all the information will be written to stdout.
+			<tr>
+				<td>-f
+				<td>Try to fix errors.
+			<tr>
+				<td>-si
+				<td>Suppress INFO messages.
+			<tr>
+				<td>-nb
+				<td>Delete .bak files that were created during file rebuilding. Use this option together with -f.
+			<tr>
+				<td>-t
+				<td>Keep file timestamps. Use this option together with -f.
+			<tr>
+				<td>-p
+				<td>Pipe mode (receive input file names from stdin). Intended for interaction with frontends. <i>&lt;files to validate&gt;</i> is ignored in this case.
+			<tr>
+				<td>-v
+				<td>Print version and exit
+		</table>
+	<p>Example:
+		<pre>
+	mp3val my_song.mp3 -lout.log -f
+		</pre>
+	<p>MP3val will give information about the file with the name specified. Any errors or inconsistencies will result in a "WARNING" message. This doesn't necessarily mean that the file is corrupted. See the next section for details. If the file doesn't look like a MPEG audio file, an <i>"ERROR: invalid file format"</i> message will be generated.
+
+	<p><a name="messages"><h3>4. Interpreting the output.</h3>
+	<p>
+		<table width=100% border>
+			<tr>
+				<td><b>WARNING message</b>
+				<td><b>Fixable?</b>
+				<td><b>Comments</b>
+			<tr>
+				<td><i>Too few MPEG frames (it's unlikely that this is a MPEG audio file)</i>
+				<td align=center>-
+				<td>Probably this is not a MPEG audio file, but MP3val has detected a couple of MPEG frames in it. Most likely this is a false positive.
+			<tr>
+				<td><i>Garbage at the beginning of the file</i>
+				<td align=center>+
+				<td>There are some unknown data at the beginning of the file (before the first MPEG frame). It can be an unsupported tag with metadata, but in most cases it is only garbage. "Fixing" means here a removal of these data.
+			<tr>
+				<td><i>Garbage at the end of the file</i>
+				<td align=center>+
+				<td>Like previous.
+			<tr>
+				<td><i>MPEG stream error, resynchronized successfully</i>
+				<td align=center>+
+				<td>Normally, each MPEG frame must be followed by a next MPEG frame (or a metadata block), otherwise this message is generated. MPEG stream errors can be caused by garbage in the middle of the file (e.g. the file was split into several parts, the tags were appended, and then these parts were improperly merged) or by a data loss during transfer or storage. Note that "fixing" this error will remove garbage, but in most cases "fixed" file will not sound better, that's why it is strongly recommended to find a "good" copy of the file.
+			<tr>
+				<td><i>This is a RIFF file, not MPEG stream</i>
+				<td align=center>+
+				<td>A common way for storing a MPEG audio file is simply to write MPEG frames one-by-one. MP1/MP2/MP3 files are organized so. MPEG audio data can also be encapsulated in the RIFF container (better known as WAV file). The RIFF container shouldn't be used unless the file has "WAV" extension.
+			<tr>
+				<td><i>It seems that file is truncated or there is garbage at the end of the file</i>
+				<td align=center>+
+				<td>This message is generated when the length of the last frame (according to its header) is greater than the amount of data from its beginning to the end of the file. As a rule, it means that the file was truncated, however, there can be garbage at its end. "Fixing" means here a removal of the last frame.
+			<tr>
+				<td><i>Wrong number of MPEG frames specified in Xing header</i>
+				<td align=center>+
+				<td>MPEG audio files don't have any special header, each frame has its own header instead. However, it can cause problems when "seeking" in variable bitrate files, because a decoder can't determine the exact place in the file corresponding to the selected time. That's why a "VBR header" is sometimes included in the first MPEG frame. This message is generated if this header contains false information about the total number of MPEG frames.
+			<tr>
+				<td><i>Wrong number of MPEG data bytes specified in Xing header</i>
+				<td align=center>+
+				<td>This message is generated when the Xing header contains false information about the total size of MPEG data in the file. See the previous message.
+			<tr>
+				<td><i>Wrong number of MPEG frames specified in VBRI header</i>
+				<td align=center>+
+				<td>Like with Xing header. VBRI is the other way to store VBR information in the first MPEG frame, but it seems to be used much more rarely.
+			<tr>
+				<td><i>Wrong number of MPEG data bytes specified in VBRI header</i>
+				<td align=center>+
+				<td>Like with Xing header. VBRI is the other way to store VBR information in the first MPEG frame, but it seems to be used much more rarely.
+			<tr>
+				<td><i>VBR detected, but no VBR header is present. Seeking may not work properly</i>
+				<td align=center>-
+				<td>Files encoded with VBR should have a VBR header (either Xing or VBRI), otherwise seeking can be broken. This will be fixable in the future versions.
+			<tr>
+				<td><i>Wrong CRC in ... frames</i>
+				<td align=center>+
+				<td>Some frames in the file are protected by CRC, but the checksum is wrong. It means that either the file was encoded or processed by broken software, or it was broken during storage or transmission. MP3val reports a number of frames with incorrect CRC, which can be used as a hint (if this number equals or is about the total number of frames, then it's likely due to a bad encoder). Note that only a minority of files is protected by CRC.
+			<tr>
+				<td><i>Non-layer-III frame encountered</i>
+				<td align=center>-
+				<td>MP3val was primarily designed for MP3 files. That's why it warns about MPEG frames with layers other than III. If it is an MP2 or MP1 file, this warning should be ignored. If you want to fix this issue, you should reencode the file.
+			<tr>
+				<td><i>Different MPEG versions or layers in one file</i>
+				<td align=center>-
+				<td>Mixing different MPEG versions and/or layers in one file is not very good. As in the previous case, this issue can be fixed only by reencoding.
+			<tr>
+				<td><i>Several APEv2 tags in one file</i>
+				<td align=center>+
+				<td>Normally there would be only one APEv2 tag in the file.
+			<tr>
+				<td><i>No supported tags in the file</i>
+				<td align=center>-
+				<td>This is only a warning. It's a good practice to store metadata in tags.
+		</table>
+
+	<p><a name="#copy"><h3>5. Licensing and copyright</h3>
+	<p>Copyright (c) 2005-2009 by Alexey Kuznetsov (ring0) and Eugen Tikhonov (jetsys).
+	<p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+	<p>Contacts: mp3val at ring0 dot pp dot ru
+</body>
+</html>

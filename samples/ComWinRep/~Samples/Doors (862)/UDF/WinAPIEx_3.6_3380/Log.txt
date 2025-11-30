@@ -1,0 +1,49 @@
+WinAPIEx UDF v3.6
+=================
+
+ADDED
+=====
+_WinAPI_CallWindowProcW
+_WinAPI_ColorAdjustLuma
+_WinAPI_CreateBuffer
+_WinAPI_DefWindowProcW
+_WinAPI_EnumUILanguages
+_WinAPI_FileExists
+_WinAPI_FindClose
+_WinAPI_FindFirstFile
+_WinAPI_FindNextFile
+_WinAPI_GetFileSize
+_WinAPI_GetMemorySize
+_WinAPI_GetPriorityClass
+_WinAPI_GetSystemDefaultUILanguage
+_WinAPI_GetUserDefaultUILanguage
+_WinAPI_IsMemory
+_WinAPI_PathAppend
+_WinAPI_PathBuildRoot
+_WinAPI_RemoveDirectory
+_WinAPI_SetPriorityClass
+
+DELETED
+=======
+
+_WinAPI_IsString (use _WinAPI_IsMemory)
+
+FIXED
+=====
+Added System Parameter Info ($SPI_*) constants.
+Added $tagSHELLHOOKINFO structure.
+Added optional parameter in _WinAPI_CreateString() function, see its description.
+The first parameter in _WinAPI_ShellEmptyRecycleBin() and _WinAPI_ShellQueryRecycleBin() functions are now optional.
+The third and fourth parameters in _WinAPI_CreateFileEx() function are now optional.
+The third parameter in _WinAPI_LZNTDecompress() function now is no longer optional, see its description.
+The following functions now sets @error flag instead of crash script if an error allocating memory occurred.
+
+_WinAPI_FindTextDlg
+_WinAPI_LZNTDecompress
+_WinAPI_ReplaceTextDlg
+
+Fixed bug in _WinAPI_CascadeWindows() and _WinAPI_TileWindows() functions causing an error return if the first parameter is zero. (Thanks KaFu)
+Fixed bug in _WinAPI_DisplayStruct() function due to which the parent window remains disabled (if any).
+Fixed bug in _WinAPI_GetDriveGeometryEx() function due to which the function requested administrator rights in Windows Vista+. (Thanks KaFu)
+Fixed bug in _WinAPI_ShellOpenFolderAndSelectItems() function that could cause crash the script when using COM objects.
+Fixed bug in description of some functions.

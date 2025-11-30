@@ -1,0 +1,12 @@
+Roadkil's Unstoppable Copier 5.2
+--------------------------------------------------
+Recovers files from disks with physical damage. Allows you to copy files from disks with problems such as bad sectors, scratches or that just give errors when reading data. The program will attempt to recover every readable piece of a file and put the pieces together. Using this method most types of files can be made useable even if some parts of the file were not recoverable in the end.
+
+The program can be used as a daily backup system using its batch mode functions. A list of transfers can be saved to a file and then run from the command line to perform the same batch of transfers on a regular basis without having to use the GUI interface. The program supports command line parameters which allow the application to be run from schedulers or scripts so it can be fully integrated into daily server tasks.
+
+
+Download: 	http://www.roadkil.net/program.php/P29/Unstoppable%20Copier
+
+Installation:
+--------------------------------------------------	
+Extract downloaded version to the "[Doors Dir]\Doors\Bin\Variable\revouninstaller" directory

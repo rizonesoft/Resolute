@@ -1,0 +1,7 @@
+Repair Windows Firewall:
+
+This will repair the Windows Firewall and get it working normally again. The firewall is built into the system rather deep. And when the firewall becomes corrupt it can still block out side connections from coming in. Even when turned off. Also when corrupt you are unable to add any exceptions to the firewall.
+
+Notes:
+- By default this repair will enable the Windows Firewall Service (called "SharedAccess" in XP or "Mpssvc" in Vista and newer).
+- If the user wants to disable this Service then that can be done with the repair "Set Windows Services to Default Startup".

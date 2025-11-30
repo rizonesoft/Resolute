@@ -1,0 +1,1 @@
+Before you try any of the solutions, we suggest you scan your system files using a little hidden Windows utility called System File Checker (SFC). To scan your system files you can run the "sfc /scannow" command from the Windows command prompt or click the Scannow button below. Let SFC do its thing and reboot your computer if asked.  

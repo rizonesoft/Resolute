@@ -1,0 +1,18 @@
+Reset File Permissions:
+
+The repair will grant administrators, system, users and everyone full rights to every file on the selected drives.
+
+This will only ADD the permissions, it will not remove current permissions or the owner of a file.
+
+When certain files lose their proper permissions, then lots of problems can happen, such as not being able to install windows updates, program errors, services failing and so on.
+
+WARNING: This repair can take a very significant amount of time to complete, depending on the speed of your CPU & the number of files on the drive.
+
+******
+For Windows 7, 8, 8.1 & 10
+******
+The program will set the default permissions instead of the full admin privileges that are done on XP.
+
+This way proper permissions are put back and your machine stays secure.
+
+******

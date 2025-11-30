@@ -1,0 +1,6 @@
+Repair Internet Explorer:
+
+This will repair Internet Explorer.
+
+When IE is corrupt and stops working you will notice you get just a white page and nothing more when using it. Also other errors and problems. This repair tool will get IE working normally again. This doesn't replace ANY IE settings. It only repairs IE files.
+

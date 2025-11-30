@@ -1,0 +1,40 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\.COM]
+@="comfile"
+
+[HKEY_CLASSES_ROOT\.COM\PersistentHandler]
+@="{098f2470-bae0-11cd-b579-08002b30bfeb}"
+
+[HKEY_CLASSES_ROOT\comfile]
+@="MS-DOS Application"
+"EditFlags"=hex:30,00,00,00
+"FriendlyTypeName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,\
+  00,6f,00,6f,00,74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,\
+  32,00,5c,00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,\
+  00,2c,00,2d,00,38,00,34,00,36,00,34,00,00,00
+
+[HKEY_CLASSES_ROOT\comfile\DefaultIcon]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,32,00,00,00
+
+[HKEY_CLASSES_ROOT\comfile\shell]
+
+[HKEY_CLASSES_ROOT\comfile\shell\open]
+"EditFlags"=dword:00000000
+
+[HKEY_CLASSES_ROOT\comfile\shell\open\command]
+@="\"%1\" %*"
+
+[HKEY_CLASSES_ROOT\comfile\shellex]
+
+[HKEY_CLASSES_ROOT\comfile\shellex\DropHandler]
+@="{86C86720-42A0-1069-A2E8-08002B30309D}"
+
+[HKEY_CLASSES_ROOT\comfile\shellex\PropertySheetHandlers]
+
+[HKEY_CLASSES_ROOT\comfile\shellex\PropertySheetHandlers\PifProps]
+@="{86F19A00-42A0-1069-A2E9-08002B30309D}"
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.COM]

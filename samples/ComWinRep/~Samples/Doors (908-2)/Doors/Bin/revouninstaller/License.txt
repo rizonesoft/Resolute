@@ -1,0 +1,34 @@
+LICENSE AGREEMENT AND COPYRIGHT
+========================
+
+IMPORTANT - READ CAREFULLY:
+This license agreement is a legal agreement between you (either personal or corporate) and VS Revo Group, the vendor of the software product “Revo Uninstaller”".
+
+"the Vendor" means the developer of the  "Revo Uninstaller" software product, VS Revo Group.
+
+YOU AGREE TO BE BOUND BY THE TERMS OF THIS LICENSE AGREEMENT AND THE LIMITATIONS OF YOUR LICENSE BY INSTALLING, COPYING, DISTRIBUTING OR OTHERWISE USING REVO UNINSTALLER. IF YOU DO NOT AGREE, DO NOT INSTALL, DISTRIBUTE OR USE REVO UNINSATALLER IN ANY WAYS.
+
+Revo Uninstaller is FREEWARE. You can freely use this software and distribute copies of the ORIGINAL DISTRIBUTION FILE as long as NO ALTERATIONS are made to the file and its contents, no charge is raised and that this license agreement is not violated in any ways. Any other way of distributing this software is prohibited.
+
+This is not public domain software. The software is owned by the author and protected by copyright law. The Software is licensed, not sold, to You for Your use only under the terms of this Agreement, and VS Revo Group reserves all rights not expressly granted to You. 
+
+You are NOT allowed to:
+
+1. Modify, reverse engineer, decompile, disassemble or otherwise attempt to reconstruct or discover the source code, or any parts of it from the binaries of Revo Uninstaller.
+
+2. Remove any product identification, copyright, proprietary notices or labels from Revo Uninstaller.
+
+3. Distribute Revo Uninstaller in any other form than in the official distribution packages without a written permission from the Vendor.
+
+4. Use, run, copy, distribute or store Revo Uninstaller in your computer if this license agreement is violated in any ways.
+
+
+THE APPLICATION AND ANY RELATED DOCUMENTATION IS PROVIDED "AS IS" WITHOUT ANY WARRANTIES. AND THAT THE VENDOR DOES NOT WARRANT THAT REVO UNINSTALLER WILL RUN UNINTERRUPTED OR ERROR FREE NOR THAT REVO UNINSTALLER WILL OPERATE WITH HARDWARE AND/OR SOFTWARE NOT PROVIDED BY THE VENDOR, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE REMAINS WITH YOU
+
+The Agreement becomes effective when You agree to the terms and conditions of this Agreement by opening, installing, using, accessing or manipulating the Software (the " Effective Date "), and this Agreement  will terminate immediately upon notice to You if You materially breach any term or condition of this Agreement. You agree upon termination to promptly destroy the Software and all copies thereof.
+
+
+NOTE: REVO UNINSTALLER MAY CONNECT BY USER’S REQUEST THROUGH THE INTERNET TO WWW.REVOUNINSTALLER.COM TO CHECK FOR UPDATES. DURING THIS PROCESS IT WILL DOWNLOAD A SMALL FILE THAT CONTAINS THE NUMBER OF THE LATEST VERSION AVAILABLE ON THE INTERNET TO CHECK IF THE VERSION AVAILABLE ON THE INTERNET IS NEWER THAN THE VERSION INSTALLED ON THE USER'S COMPUTER. REVO UNINSTALLER WILL NOT SEND ANY DATA FROM THE USER'S COMPUTER. YOU CAN DISABLE THIS FEATURE FROM THE SETTINGS SCREEN.
+
+Copyright VS Revo Group. All rights reserved.
+http://www.vsrevogroup.com

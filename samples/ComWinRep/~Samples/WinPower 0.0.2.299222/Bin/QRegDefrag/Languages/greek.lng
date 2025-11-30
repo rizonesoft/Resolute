@@ -1,0 +1,167 @@
+﻿
+[Ελληνική]
+;Translated by Vasilis Kosmidis
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Ακύρωση
+LSAVEASBUTTON=Αποθήκευση ως...
+LANALYZEBUTTON=Ανάλυση
+LDEFRAGBUTTON=Ανασυγκ/ση
+LCLOSEBUTTON=Κλείσιμο
+LRESTARTBUTTON=Επανεκκίνηση
+LLATERBUTTON=Αργότερα
+LREPORTBUTTON=Δημιουργία αναφοράς...
+LSTOPBUTTON=Παύση
+LBROWSEBUTTON=Περιήγηση...
+LERROR=Σφάλμα
+LENABLED=Ενεργοποιημένο
+LDISABLED=Απενεργοποιημένο
+LNOTSUPPORTED=Δεν υποστηρίζεται
+LREGREPLACE=Σφάλμα - Το RegReplaceKey είναι απενεργοποιημένο. Επανεκκινήστε τα Windows και δοκιμάστε ξανά.
+LRESTOREPOINTNOT=Δεν υποστηρίζεται η Επαναφορά Συστήματος.
+LCREATINGRESTORE=Δημιουργία Σημείου Επαναφοράς...
+
+;MAIN WINDOW
+LNEVERUSED=Δε χρησιμοποιήθηκε
+LMENUOPTIONS=Επιλογές
+LMENUHELP=Βοήθεια
+LMENUABOUT=Περί
+LOVERVIEW=Ανασκόπηση
+LLASTDEFRAG=Tελευταία ανασυγκρότηση:
+LSIZERECOVERED=Μέγεθος ανάκτησης:
+LPERCENT=Ποσοστό:
+LWOULDLIKE=Τι θα θέλατε να κάνετε;
+LDEFRAGTITLE=Ανασυγκρότηση μητρώου
+LREGINFOTITLE=Ανάκτηση πληροφοριών μητρώου
+LUPDATEOK=Χρησιμοποιείτε την τελευταία έκδοση.
+LUPDATEDISABLED=Ο αυτόματος έλεγχος ενημερώσεων είναι απενεργοποιημένος.
+LUPDATENEW=Νέα έκδοση είναι διαθέσιμη.
+LUPDATEWAIT=Έλεγχος για νέες εκδόσεις. Παρακαλώ περιμένετε.
+LMOREINFO=Περισσότερες πληροφορίες...
+LUPDATES=Ενημερώσεις
+
+;ABOUT WINDOW
+LABOUTTITLE=Περί
+LVERSION=Έκδοση
+LICON=Τα εικονίδια δημιουργήθηκαν από την
+
+;OPTIONS WINDOW
+LOPTIONS=Επιλογές
+LOPTIONSDESCRIPTION=Διαμόρφωση ρυθμίσεων προγράμματος.
+LSETTINGS=Γενικές ρυθμίσεις
+LLANGUAGE=Γλώσσα
+LCHKCHECKUPDATE=Αυτόματος έλεγχος ενημερώσεων
+LCHECKNOW=Έλεγχος για ενημερώσεις τώρα...
+LCHKDEFRAGMYCOMPUTER="Ανασυγκρότηση μητρώου..." στο μενού περιεχομένων του Υπολογιστή μου
+LCHKREGINFOMYCOMPUTER="Ανάκτηση πληροφοριών μητρώου..." στο μενού περιεχομένων του Υπολογιστή μου
+LBACKUPS=Αντίγραφα ασφαλείας
+LAUTOREGFILES=Αυτόματο αντίγραφο ασφαλείας των αρχείων μητρώου πριν την ανασυγκρότηση
+LAUTORESTOREPOINT=Αυτόματο σημείο επαναφοράς πριν την ανασυγκρότηση
+LBACKUPFOLDER=Φάκελος αντιγράφων ασφαλείας:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Πληροφορίες
+LREGINFODESCRIPTION=Πληροφορίες για το μητρώο των Windows.
+LSO=Λειτουργικό σύστημα:
+LUSER=Συνδεδεμένος χρήστης:
+LREGSIZE=Μέγεθος μητρώου:
+LCOLUMNPATH=Διαδρομή
+LCOLUMNSIZE=Μέγεθος
+LREGISTRYFILES=Αρχεία μητρώου
+LNUMBERFILES=Αριθμός αρχείων:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Διαγνωστικά
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Όνομα σμήνους:
+LLOGICALPATH=Λογική διαδρομή:
+LMAPPATH=Διαδρομή χάρτη:
+LTEMPPATH=Προσωρινή διαδρομή:
+LHIVESIZE=Μέγεθος σμήνους:
+LKEY=Κλειδί:
+LVALIDFILE=Το αρχείο υπάρχει.
+LNOTVALIDFILE=Το αρχείο δεν υπάρχει.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Βελτιστοποίηση και συμπύκνωση του μητρώου των Windows.
+LTITLEPROBLEM=Πρόβλημα και Λύση
+LMAINTEXT=Τα δεδομένα του μητρώου γράφονται και μετακινούνται συνεχώς κατά τη φυσιολογική λειτουργία των Windows. Με τον καιρό, αυτά τα δεδομένα κατακερματίζονται. Αυτό το εργαλείο βελτιστοποιεί το μητρώο σας, απομακρύνοντας τα κενά και τον άχρηστο χώρο του.
+LBENEFITS=Το Quicksys RegDefrag βελτιώνει την απόδοση ολόκληρου του συστήματος και ενισχύει την πρόσβαση στο μητρώο.
+LTITLESTEPS=Βήματα
+LSTEP1=1. Ανάλυση του μητρώου σας.
+LSTEP2=2. Ανασκόπηση των αποτελεσμάτων της ανάλυσης.
+LSTEP3=3. Ανασυγκρότηση του μητρώου. Θα χρειαστεί επανεκκίνηση.
+LTITLEANALYZE=Επιλέξτε "Ανάλυση" για να ξεκινήσετε τη διαδικασία.
+LAUTOBACKUP=Αυτόματο αντίγραφο ασφαλείας:
+LAUTORESTORE=Αυτόματο Σημείο Επαναφοράς:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Ανάλυση μητρώου. Παρακαλώ περιμένετε.
+LPROGRESS=Πρόοδος:
+LREADING=Έλεγχος:
+LSTOPPROCESS=Παύση διαδικασίας...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Ανάλυση αποτελεσμάτων
+LCOMPARATION=Σύγκριση
+LCONCLUSION=Συμπέρασμα
+LREGISTRYFRAGMENTATION=Κατακερματισμός μητρώου
+LCURRENTSIZE=Τρέχων μέγεθος μητρώου:
+LNEWSIZE=Νέο μέγεθος μητρώου:
+LSIZEDIFFERENCE=Διαφορά μεγέθους:
+LLEGFRAG=Κατακερματισμένα
+LLEGALLOC=Κατανεμημένος χώρος
+LBACKREGFILES=Αντιγράφο ασφαλείας μητρώου:
+LBACKRESTORE=Δημιουργία σημείου επαναφοράς:
+LCONCLUSION=Συμπέρασμα
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Η ανασυγκρότηση ολοκληρώθηκε!
+LFINISHED=Τελείωσε επιτυχώς.
+LRESTARTREQUIRED=Πρέπει να επανεκκινήσετε τον υπολογιστή σας για να ενεργοποιηθούν οι αλλαγές.
+LRESTARTMSGBOX=Θέλετε να επανεκκινήσετε τώρα;
+LHTMLREPORT=Μπορείτε να δημιουργήσετε μια αναφορά HTML με πληροφορίες για την ανασυγκρότηση.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Είναι απαραίτητο να επανεκκινήσετε τον υπολογιστή για να ξεκινήσετε μια νέα ανάλυση ανασυγκρότησης.
+LDEFRAGMSGBOX1=Κλείστε όλα τα προγράμματα.
+LDEFRAGMSGBOX2=Η ανάλυση μπορεί να διαρκέσει αρκετά λεπτά.
+LDEFRAGMSGBOX3=Κατά τη διάρκεια της ο υπολογιστής σας μπορεί να μην αποκρίνεται.
+LDEFRAGMSGBOX4=Για να συνεχίσετε επιλέξτε "Ναι".
+LFEWFRAGMENTS=Μικρός κατακερματισμός. Δεν είναι απαραίτητη η ανασυγκρότηση.
+LNOFRAGMENTS=Δε βρέθηκε κατακερματισμός. Αδύνατη η ανασυγκρότηση.
+LTOOFRAGMENTS=Μεγάλος κατακερματισμός. Επιλέξτε "Ανασυγκρότηση" για  βελτιστοποίηση του μητρώου.
+
+;REPORT 
+LNAMEREPORT=Αναφορά
+LH1=Αναφορά ανασυγκρότησης
+LCREATEDBY=Δημιουργήθηκε από το
+LDATE=Ημέρα:
+LTIME=Ώρα:
+LSUMMARY=Σύνοψη ανασυγκρότησης
+LREGPROCESSED=Επεξεργασμένα αρχεία μητρώου:
+LREGANASTART=Η ανάλυση μητρώου ξεκίνησε:
+LREGANAFINISHED=Η ανάλυση μητρώου ολοκληρώθηκε:
+LREGTOTALFINISHED=Συνολικός χρόνος ανάλυσης μητρώου:
+LREGSIZEBEFORE=Μέγεθος μητρώου πριν:
+LREGSIZEAFTER=Μέγεθος μητρώου μετά:
+LREGSIZEDIFFERENCE=Διαφορά μεγέθους μητρώου:
+LREGFILESSUMMARY=Σύνοψη αρχείων μητρώου
+LCOLUMNREGFILE=Αρχείο μητρώου
+LCOLUMNREGBEFORE=Μέγεθος πριν
+LCOLUMNAFTER=Μέγεθος μετά
+LCOLUMNDIFFERENCE=Διαφορά μεγέθους
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Ανασυγκρότηση μητρώου
+LDEFRAGNOW=Ανασυγκρότηση:
+
+;HTML REPORT
+LHTMLCREATED=Η αναφορά HTML δημιουργήθηκε επιτυχώς. 
+LOPENNOW=Άνοιγμα τώρα;
+LNOTHTMLCREATED=Σφάλμα! Η αναφορά HTML ΔΕ δημιουργήθηκε επιτυχώς.
+LFILE=Αρχείο
+LFREESPACE=Δεν υπάρχει αρκετός ελεύθερος χώρος για την ανασυγκρότηση. Ελέγξτε και δοκιμάστε ξανά.
+LERROREGREAD=Σφάλμα! Αδύνατη η ανάγνωση των πληροφοριών μητρώου.

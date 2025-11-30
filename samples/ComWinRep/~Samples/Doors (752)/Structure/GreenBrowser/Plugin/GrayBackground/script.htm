@@ -1,0 +1,40 @@
+<script language="JavaScript">
+function cancelError() {return true;} onerror=cancelError;
+
+var BACKGROUND = "#C0C0C0";//modify any color you like
+
+function doType(doc, tag)
+{
+	var objs = doc.getElementsByTagName(tag);
+	var l=objs.length;
+	for (var i=0;i<l;i++)
+		objs[i].style.background = BACKGROUND;
+}
+
+function doDoc(doc)
+{
+	doc.body.style.background = BACKGROUND;
+	doType(doc, "td");//only do td is enough
+	doType(doc, "div");
+}
+
+function doDocument(doc)
+{
+	try
+	{
+		doDoc(doc);
+		var frs=doc.frames;
+		if (frs != null && frs.length>0)
+		{
+		    for (var i=0; i < frs.length; i++)
+		    {
+		    	doDocument(frs[i].document);
+		    }
+		}
+	}catch(e){}	
+}
+
+//do from document
+doDocument(document);
+
+</script>

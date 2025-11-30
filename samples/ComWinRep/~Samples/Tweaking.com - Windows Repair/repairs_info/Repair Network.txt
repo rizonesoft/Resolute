@@ -1,0 +1,18 @@
+Repair Network:
+
+This will clear the stored DNS cache in Windows. When the DNS becomes corrupt you will not be able to get to some sites. Flushing and rebuilding the DNS will fix that problem.
+Also resets Winsock entries & resets TCP/IP stack.
+
+This repair will also restore the Winsock and Winsock2 registry keys.
+
+These extra commands are run on Windows vista and newer.
+
+netsh winsock reset all
+netsh int 6to4 reset all
+netsh int ipv4 reset all
+netsh int ipv6 reset all
+netsh int httpstunnel reset all
+netsh int isatap reset all
+netsh int portproxy reset all
+netsh int tcp reset all
+netsh int teredo reset all

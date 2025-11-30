@@ -1,0 +1,55 @@
+Set Windows Services To Default Startup:
+================================
+This will set the Windows Services to their default startup state. This repair is loosely based on info found at http://www.blackviper.com.
+
+Notes:
+- This will set the Services startup using the "sc config" command.
+- Windows Repair puts the start up states back to what it assumes is needed for a well functioning Windows. That's why by default this repair enables the following Services:
+1) Windows Firewall Service, called "SharedAccess" (XP) or "Mpssvc" (Vista & newer).
+2) Windows Defender Service called "WinDefend" (Vista & newer).
+3) Windows Search Service called WSearch (Vista & newer)
+But experienced computer users have their own different favourite Service settings. If the user doesn't like the default Service state(s), (as assumed by this repair) then the user can customize the start up states using this repair. Information needed for customization is provided below.
+
+Most Services are set to one of three states:
+- "Auto" (Service will be run upon start up).
+- "Disabled" (Service won't run upon start up).
+- "Demand" (Service will be started & run when needed).
+
+The default start-up-states of the Services for several Operating Systems can be found in the following files in the "files" subfolder:
+Windows XP:          services_start_xp.txt
+Windows Vista:      services_start_vista.txt
+Windows 7:            services_start_7.txt
+Windows 8:            services_start_8.txt
+Windows 8.1:         services_start_8.1.txt
+Windows 10:          services_start_10.txt
+
+
+Below an example of how the user can change the start up state of a Service using this repair.
+------------------------------------------------------------------------------------------------------------------------------
+If the user already has a 3rd party Firewall running (e.g. AVAST, ESET ) then the Windows Firewall can be disabled. The default state for the Firewall Service is "Auto". To disable the Windows Firewall take the following steps:
+- Open the appropriate "services_start........ " file with a text editor.
+- For Windows XP change this line:
+
+        sc config SharedAccess start= auto
+
+to this:
+
+        sc config SharedAccess start= disabled
+
+  (mind the spaces !!)
+- For Windows Vista or newer, change this line:
+
+       sc config Mpssvc start= auto
+
+to this:
+
+       sc config Mpssvc start= disabled
+
+  (mind the spaces !!).
+- Save the text file.
+- After this, everytime this repair is run, the start up state of the Windows Firewall Service will be set appropriately (in this case "disabled").
+
+Notes:
+- Windows Repair calculates upon start up the checksum of all the files needed. Changes to a "services_start ......... " file will result in a checksum error. Windows Repair then reports the expected checksum and the checksum it found. In that case the user can replace the old checksum with the new checksum in the "files_list.txt" file.
+- Changes in a "services_start ......." file will be taken into account only after a new restart of Windows Repair.
+- Changes for the start up states for the Services will become effective after a system reboot.

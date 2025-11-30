@@ -1,0 +1,6 @@
+Name:				Auslogics Disk Defrag Portable
+Version:			3.3.0.2
+Link:				http://www.auslogics.com/en/software/disk-defrag/#portable
+License:			Freeware (Home use only) - Permission granted to Rizonesoft for distribution with Doors
+Compatibility:		Windows 7/2008/Vista/2003/XP (32-bit & 64-bit)
+Ripping:			No (Need permission form the author - Home use only)

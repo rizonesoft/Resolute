@@ -1,0 +1,23 @@
+==================================================
+OWNERSHIP CHANGES
+==================================================
+
+--------------------------------------------------
+Version 0.1.2.120 (August 31st, 2014)
+--------------------------------------------------
+
+- Now Open Source (GNU General Public License version 3)
+
+--------------------------------------------------
+Version 0.1.1.119 (June 1st, 2014)
+--------------------------------------------------
+
+I redesigned Take Ownership from scratch and essentially it a brand new utility. Below is a list of the differences between Take Ownership and the new Rizonesoft Ownership.
+
+- The interface was redesigned.
+- New and prettier main icon. Well, at least we think so.
+- Implemented old Registry entry cleanup and Runas fix for exe files.
+- Windows 8 and Windows 8.1 supported.
+- Proper 64Bit support in the form of a 64Bit version.
+
+==================================================

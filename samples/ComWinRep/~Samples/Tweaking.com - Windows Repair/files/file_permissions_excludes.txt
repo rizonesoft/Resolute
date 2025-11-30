@@ -1,0 +1,12 @@
+#Exlude list for file permissions.
+#The program uses ManageACL and the -fltr option to filter keywords.
+
+-fltr "\$Recycle.Bin"
+-fltr "\System Volume Information"
+-fltr "\RECYCLER"
+-fltr "\documents and settings"
+-fltr "\Users"
+-fltr "\pagefile.sys"
+-fltr "\hiberfil.sys"
+-fltr "\swapfile.sys"
+-fltr "\WindowsApps"

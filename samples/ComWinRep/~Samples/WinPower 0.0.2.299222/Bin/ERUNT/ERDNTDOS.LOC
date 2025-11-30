@@ -1,0 +1,177 @@
+;
+; This is the localization file for ERDNTDOS v1.1 .
+;
+; IMPORTANT: This file is not compatible with
+; ERDNTDOS v1.0 !
+;
+; Only change lines beginning with #
+;
+; Other #'s or ##'s in a line are replaced at
+; runtime with certain text strings (file names
+; etc.), so include them in your translation!
+;
+; To make sure OEM characters are saved correctly,
+; please use a DOS based text editor (such as
+; EDIT.COM) to edit this file.
+;
+
+: 1
+; 1 line only
+# ERD for Windows NT
+
+: 2
+; multiple lines possible
+# Emergency Recovery Disk NT -
+# Registry Restore for Windows NT/2000/XP
+
+: 3
+; 1 line only
+# Written by
+
+: 4
+; 1 line only
+# Welcome!
+
+: 5
+; multiple lines possible
+# With this program you can restore a registry
+# backup of your Windows NT/2000/XP system.
+
+: 6
+; multiple lines possible
+# Syntax:
+#
+# ERDNT
+#
+# - or -
+#
+# ERDNT silent [sysreg] [otherusers] [/nobackup] [/noprogresswindow]
+
+: 7
+; 1 line only
+# Press any key...
+
+: 8
+; 2 lines here
+# Yes
+# No
+
+: 9
+; 2 lines here
+# OK
+# Cancel
+
+: 10
+; 1 line only
+# Error!
+
+: 11
+; multiple lines possible
+# Could not open file:
+# #
+
+: 12
+; multiple lines possible
+# The file #
+# does not contain any restoration entries!
+
+: 13
+; 1 line only
+# Restoring a registry backup created #
+
+: 14
+; multiple lines possible
+# Please select the restoration options:
+
+: 15
+; 3 lines here
+# System registry
+# User registries
+# Continue
+
+: 16
+; 1 line only
+# Use  and  to move, ENTER to select, ESC to cancel
+
+: 17
+; multiple lines possible
+# At least one restoration option must be selected.
+
+: 18
+; multiple lines possible
+# No restoration entries found
+# for the selected options!
+
+: 19
+; 1 line only
+# Note:
+
+: 20
+; multiple lines possible
+# No restoration entries found
+# for the system registry.
+#
+# User registry restoration
+# will continue.
+
+: 21
+; multiple lines possible
+# No restoration entries found
+# for the user registries.
+#
+# System registry restoration
+# will continue.
+
+: 22
+; 1 line only
+# Question
+
+: 23
+; multiple lines possible
+# Do you want backups of the current
+# registry files to be created
+# during restoration?
+
+: 24
+; 1 line only
+# Restoring registry
+
+: 25
+; 1 line only
+# Current file:
+
+: 26
+; 1 line only
+# # of ## files restored
+
+: 27
+; 1 line only
+# Warning!
+
+: 28
+; multiple lines possible
+# Current registry file not found:
+# #
+#
+# Restore this file?
+
+: 29
+; multiple lines possible
+# Unable to create a backup of the
+# current registry file
+# # !
+#
+# Continue restoration of this file?
+
+: 30
+; multiple lines possible
+# Error restoring
+# #
+# to
+# ## !
+#
+# Continue with the next file?
+
+: 31
+; multiple lines possible
+# Restoration of the registry is complete!

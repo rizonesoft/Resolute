@@ -1,0 +1,375 @@
+;Erstelle eine eigene Sprachdatei und sende
+;sie an bentech@freenet.de.
+
+;Unicode wird nicht unterstützt!
+
+;Language : German (Deutsch)
+;Version  : PowerEnc 3.32
+;Creator  : Benedikt Maettig
+;Mail     : bentech@freenet.de
+
+[Globals]
+CapOK=OK
+CapCancel=Abbrechen
+CapClose=Schließen
+
+[Mainform]
+destfolder=Wählen Sie hier den Ausgabeordner...
+encsetbtn=Encoder...
+encsettop=Einstellungen...
+gensetbtn=Einstellungen...
+startbtn=Start
+stopbtn=Stopp
+pausebtn1=Pause
+pausebtn2=Fortsetzen
+menu1=Start
+menu2=Stopp
+menu3=Dateimodus...
+menu4=Dateien hinzufügen...
+menu5=Dateien entfernen
+menu6=Discmodus...
+menu7=Alle auswählen
+menu8=Auswahl aufheben
+menu9=Auswerfen
+menu10=Editor ein-/ausblenden
+menu11=Infos von FreeDB abfragen...
+menu12=Encoder Einstellungen...
+menu13=Generelle Einstellungen...
+menu14=Über...
+menu15=Schließen
+donate=Spenden
+hidewin=Verstecken
+lbloverwrite=Quelldateien könnten überschrieben werden!
+freedbbtn=CD Infos abfragen...
+filecap=Dateimodus
+disccap=Discmodus
+addfilebtn=Dateien hinzufügen...
+remfilebtn=Dateien entfernen
+savefile=Dateien hier speichern...
+svfile0=Ausgabeordner
+svfile1=Unterordner (im Ausgabeordner)
+svfile2=Unterordner (im Quellordner)
+svfile3=Quellordner
+namesub=Name des Unterordners...
+lstcap11=Dateiname
+lstcap12=Format
+lstcap13=Status
+selbtn=Alles auswählen
+deselbtn=Auswahl aufheben
+ejectbtn=Eject
+choosedrive=Wählen Sie hier das Quelllaufwerk...
+lstcap21=Track
+lstcap22=Format
+lstcap23=Status
+lbldiscinfo=CD Informationen...
+lblartist=Interpret
+lbltitle=Titel
+lblvarart=unterschiedliche Interpreten
+lblalbum=Album
+lblyear=Jahr
+lblgenre=Genre
+lblcover=Cover
+lblComment=Kommentar
+lblWeb=Web
+lblEncBy=Umgewandelt von
+grpfileTag=Tag-Informationen (Datei zum Editieren auswählen)
+grpfileTag2=Zusätzliche Informationen
+grpfileTag3=Dateiinfos
+grpfileDisc=Disc-Informationen (Track zum Editieren auswählen)
+grpfileDisc2=Zusätzliche Informationen
+selEncoder=Gewählter Encoder:
+lblbitrate=Bitrate:
+lblduration=Länge:
+lblfrequency=Frequenz:
+lblchannels=Kanäle:
+infocap=CD Informationen...
+lbltrack=#Track
+
+[Selector]
+selCoverCap=Quelle wählen...
+selCoverOpt1=Cover von lokalem Laufwerk laden...
+selCoverOpt2=Cover online suchen...
+
+[Progress]
+lblprogrCap=Fortschritt:
+lblelapsedCap=Abgelaufene Zeit:
+lblleftCap=Geschätzte Restzeit:
+lblspeedCap=Geschwindigkeit...
+lblcpuCap=CPU Auslastung...
+
+[Settings]
+settingsCaption=Programmeinstellungen...
+btnSettingsApply=Übernehmen
+grpAmazonSettings=Amazon Einstellungen
+lblChooseAmazonServer=Bevorzugten Amazon Server auswählen
+grpDecoder=Decoder Plugins
+btnDecoderAdd=Hinzufügen
+btnDecoderEdit=Editieren
+btnDecoderDel=Entfernen
+colDecoderExt=Ext
+colDecoderPlugin=Plugin
+colDecoderDescription=Beschreibung
+grpDiscModeFilename=Dateinamen && Ordner
+lblDiscModeFormatFileName=Format des Dateinamens
+lblDiscModeFormatFolder=Format des Unterordners
+lblDiscModeDescription=Es kann auch mehr als einen Unterordner erstellt werden.
+chkDiscModeCreateSub=Unterordner erstellen
+grpDiscModeTagging=Tagging
+chkDiscModeWriteTag=Tag in gerippte Dateien schreiben
+lblDiscModeTimeOfTagWrite=Zeitpunkt des Schreibens der Tags (nur interne Tagger)
+cmbDiscModeWrite1=Tags während des Rippens schreiben
+cmbDiscModeWrite2=Tags nach dem Rippen schreiben
+grpFileModeFilename=Dateinamen
+chkFileModeChangeFileNames=Dateinamen ändern (falls Informationen vorhanden)
+lblFileModeFormatFileName=Format des Dateinamens
+grpFileModeTagging=Tagging
+chkFileModeWriteTag=Tag in die Ausgabedateien schreiben
+lblFileModeTimeOfTagWrite=Zeitpunkt des Schreibens der Tags (nur interne Tagger)
+cmbFileModeWrite1=Tags während der Umwandlung schreiben
+cmbFileModeWrite2=Tags nach der Umwandlung schreiben
+grpFreeDB=FreeDB Einstellungen
+lblFreeDBServer=Bevorzugten FreeDB Server auswählen
+grpLanguage=Sprache
+lblLanguage=Sprache wählen
+btnEditLanguage=Sprache bearbeiten
+lblLanguageInfo=Erstellen Sie Ihre eigene Sprachdatei und senden diese an bentech@freenet.de
+grpMainFolder=Speicherverzeichnis
+lblMainFolder=Speicherverzeichnis wählen
+cmbMainFolder1=PowerEnc Programmordner
+cmbMainFolder2=Windows Benutzerordner
+lblMainFolderInfo=Der Windows Benutzerordner sollte gewählt werden, wenn die Benutzer keine Adminrechte haben. Nur verfügbar auf NT Systemen.
+grpProxyServer=Proxy Server
+chkUseProxy=Proxy Server für Internetverbindungen nutzen
+lblProxyServer=Server
+lblProxyPort=Port
+lblProxyUser=Benutzername
+lblProxyPassword=Passwort
+grpTagger=Flexibles Tagging
+colTagger1=Dateityp
+colTagger2=Tagmodus
+btnTaggerEditMode=Modus ändern
+grpOtherTaggers=Andere Tags
+lblOtherTaggersInfo=Der interne Tagger kann OggVorbis und Flac Dateien mit einem VorbisComment-Tag versehen.
+chkEnableOggTagging=VorbisComment-Tags schreiben
+grpExtTaggers=Tagger
+colExtTaggers1=Ext
+colExtTaggers2=Beschreibung
+btnAddExtTagger=Hinzhufügen
+btnEditExtTagger=Editieren
+btnDelExtTagger=Entfernen
+grpExtTaggerInfo=Informationen
+lblExtTaggerDescription=Beschreibung:
+lblExtTaggerExtension=Endung:
+lblExtTaggerParameters=Parameter:
+lblExtTaggerFileName=Dateiname:
+grp_userInterface=Benutzeroberfläche
+lblChooseEncoderSelector=Bevorzugte Encoder-Auswahl wählen
+cmbChooseEncoderSelector1=PopUp Menü (Standard)
+cmbChooseEncoderSelector2=Erweitete Encoder-Auswahl
+chkShowProgressBars=Fortschrittsbalken in der Liste anzeigen
+chkShowSmallProgressView=Kleine Fortschrittsanzeige aktivieren
+
+[ExtTaggerEditor]
+extTaggerCaption=Externen Tagger editieren...
+extTaggerName=Name:
+extTaggerExt=Dateiendung:
+extTaggerCmd=Kommandozeile:
+extTaggerParam=Parameter
+extTaggerSelParam=Den zu editierenden Parameter auswählen...
+extTaggerEditParam=Ausgewählten Parameter editieren...
+extTaggerPath=Pfad zum Tagger:
+extTaggerSave=Speichern
+
+[Proxy]
+proxyCaption=Proxy Einstellungen
+proxyChk=Einen Proxy-Server nutzen
+proxylblServer=Server
+proxylblUser=Benutzername
+proxylblPass=Passwort
+proxylblPort=Port
+
+[FileExists]
+existsCap=Datei existiert bereits...
+existsQues=Diese Datei existsiert bereits! Was wollen Sie machen?
+existsFile=Neuer Dateiname...
+existsAll=für alle folgenden Tracks
+existsOpt1=Datei überspringen [Springt zum nächsten Track]
+existsOpt2=Datei überschreiben [Löscht die existierende Datei]
+existsOpt3=Dateiname ändern [...]
+
+[EncSettings]
+dlgencCaption=Encodereinstellungen
+lblchooseEnc=Wählen Sie einen Encoder...
+
+[EncProfile]
+lblselProfile=Ausgewähltes Profil...
+btnprofilenew=Neu
+btnprofilesave=Profil speichern
+btnprofileCancel=Abbrechen
+btnprofiledelete=Profil löschen
+boxprofileMain=Einstellungen
+tabPro01=Encoder
+tabPro02=Pfad
+lblprofileParam=Parameter...
+lblprofileExt=Dateiendung...
+lblprofileBitrate=Wählen Sie Ihre Bitrate...
+lblprofilePath=Pfad zum Encoder...
+lblprofileText=Erstellen Sie Ihr eigenes Profil und senden es an: bentech@freenet.de
+
+[EncFrog]
+lblfrogPath=Pfad zu Frog...
+boxfrogMain=Frog Einstellungen
+lblfrogParam=Frog Parameter:
+tabfrog01=Grundeinstellungen
+grpfrogMode=Encoder Modus
+lblfrogMode=Einen Modus auswählen...
+chkfrogMax=Modus deaktivieren und "Maximum compression" verwenden (sehr langsam)
+
+[EncFlac]
+lblflacPath=Pfad zu flac...
+boxflacMain=Flac Einstellungen
+lblflacParam=Flac Parameter:
+tabflac01=Flac Presets
+chkflacpreset=Flac Presets nutzen (alle anderen Einstellungen werden ignoriert)
+lblflacchoose=Preset auswählen...
+tabflac02=Erweiterte Einstellungen
+lblflacBlockSize=Blockgröße
+lblflacMaxLPC=Maximale LPC Reihenfolge
+chkflacTry=Versuche eine mid-side Kodierung für jeden Frame
+chkflacAdaptive=Adaptive mid-side Kodierung für alle Frames
+chkflacModel=Vollständige Modelsuche durchführen (langsam)
+chkflacLPSearch=Vollständige Suche nach LP-Koeffizienten durchführen (langsam)
+lblflacLP=LP Genauigkeit (Standard 0)
+lblflacPartition=Partitions Reihenfolge (Standard 0)
+
+[EncFaac]
+lblaacPath=Pfad zu Faac...
+boxaacMain=Faac Einstellungen
+tabaac01=Grundeinstellungen
+rbtnaacQuality=Qualität
+rbtnaacBitrate=Bitrate
+lblaacQuality=Qualität wählen...
+lblaacBitrate=Bitrate wählen...
+chkaacMp4=Mp4 Container nutzen
+lblaacParam=Faac Parameter:
+
+[EncMp]
+lblmpPath=Pfad zu Musepack...
+boxmpMain=Musepack Einstellungen
+tabmp01=Grundeinstellungen
+boxmpPreset=Preset wählen...
+lblmpParam=Musepack Parameter:
+
+[EncOgg]
+lbloggPath=Pfad zu Ogg...
+boxoggMain=Ogg Vorbis Einstellungen
+tabogg01=Qualitätseinstellungen
+tabogg02=Spezielles
+rbtnoggQuality=Qualität
+rbtnoggBitrate=Bitrate
+lbloggQuality=Qualität wählen...
+lbloggBitrate=Bitrate wählen...
+lbloggParam=Ogg Parameter:
+chboggMinBitrate=Minimale Bitrate...
+chboggMaxBitrate=Maximale Bitrate...
+chboggResample=Resample nach...
+chboggDownmix=Downmix Stereo zu Mono
+lbloggMin=Useful for encoding for a fixed-size channel.
+lbloggMax=Eignet sich für Streaminganwendungen.
+
+[EncLame]
+lbllamePath=Pfad zu Lame...
+boxlameMain=Lame Einstellungen
+tablame01=Lame Presets
+tablame02=Qualitätseinstellungen
+tablame03=Frequenz
+tablame04=Extra
+chblamePreset=Lame Presets nutzen (alle anderen Einstellungen werden ignoriert)
+lbllameChoose=Preset wählen...
+chblameFast="Fast Encoding" aktivieren
+lbllameText=Um die neuen Lame Presets nutzen zu können wird ein Encoder der Version 3.97 oder neuer benötigt!
+lbllameParam=Lame Parameter:
+rbtnlameCBR=Konstante Bitrate (CBR)
+rbtnlameVBR=Variable Bitrate (VBR)
+rbtnlameABR=Mittlere Bitrate (ABR)
+lbllameMinBitrate1=Bitrate wählen...
+lbllameMinBitrate2=Minimale Bitrate wählen...
+lbllameMinBitrate3=Mittlere Bitrate wählen...
+lbllameMaxBitrate=Maximale Bitrate wählen...
+lbllameQuality=Qualität...
+spnlameQuality=0=Höchste...9=Niedrigste
+lbllameMode=Kanalmodus...
+lbllameOptimization=Optimierung...
+grplameFlags=Flags
+grplameOptions=Optionen
+chblameOriginal=Als Kopie kennzeichnen
+chblameCopyright=Copyright
+chblameCRC=CRC-Checksumme hinzufügen
+chklameKeep=Frequenz (der Quelldatei) beibehalten
+optlame0=q0
+optlame1=q1
+optlame2=q2 (Empfohlen)
+optlame3=q3
+optlame4=q4
+optlame5=q5
+optlame6=q6
+optlame7=q7
+optlame8=q8
+optlame9=q9
+optlamedescr1=q0 = Höchste Qualität, sehr langsam
+optlamedescr2=q9 = Sehr schnell, schlechte Qualität
+lbllamepriority=Encoderpriorität einstellen...
+chklameresample=Resampling nach...
+
+[EncNero]
+lblneroPath=Pfad zu NeroAac...
+grpneroSettings=NeroAac Einstellungen
+tabnerobasic=Grundeinstellungen
+tabneroadvanced=Erweitert
+grpneroProfile=AAC Profil
+chkneroAuto=Automatisch
+lblneroMode=Encodermodus wählen...
+grpneroVBR=Qualität - VBR
+grpneroCBR=Konstante bitrate (streaming) - CBR
+grpneroABR=Mittlere bitrate - ABR
+lblneroABRBitrate=Bitrate wählen...
+lblneroBitrate=Bitrate wählen...
+lblneroQuality=Qualität wählen...
+lblneroDescr1=höchste Qualität
+lblneroDescr2=niedrigste Qualität
+lblneroParams=NeroAac Parameter:
+
+[Format]
+FormatArtist=Interpret
+FormatTitle=Titel
+FormatAlbum=Album
+FormatYear=Jahr
+FormatGenre=Genre
+FormatTrackNum=Tracknummer
+FormatFileName=Dateiname
+
+[FreeDB]
+freeDBCaption=Information von FreeDB abfragen...
+freeDBbtnOther=<< anderes Album
+freeDBlblFound=Gefundene CDs...
+freeDBlstres1=Genre
+freeDBlstres2=Interpret
+freeDBlstres3=Album
+freeDBlsttrack1=Interpret
+freeDBlsttrack2=Titel
+freeDBlsttrack3=Album
+freeDBlsttrack4=Jahr
+freeDBNotFound=Das Album konnte nicht bei FreeDB gefunden werden!
+
+[OnlineCover]
+coverCaption=Albencover suchen...
+coverlblsearch=Suche nach:
+coverlblartist=Interpret:
+coverlblalbum=Album:
+coverlblsource=Quelle:
+coverbtnsearch=Jetzt suchen...
+coverlblsize=Größe
+coverlblinfos=Mehr infos...
+coverlstalbum=Album
+coverbtnnew=Neue Suche...
+coverbtnmore=Mehr suchen...

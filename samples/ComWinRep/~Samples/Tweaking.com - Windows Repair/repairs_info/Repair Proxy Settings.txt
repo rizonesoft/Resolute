@@ -1,0 +1,4 @@
+Repair Proxy Settings:
+
+Many infections will set your proxy settings to keep you from getting to websites. This repair will turn the proxy off in the system.
+

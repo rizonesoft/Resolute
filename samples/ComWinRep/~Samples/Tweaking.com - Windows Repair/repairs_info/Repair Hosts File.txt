@@ -1,0 +1,6 @@
+Repair Hosts File:
+
+This will restore the windows hosts file back to default. Some viruses and infections will add sites to the hosts file to keep you from going to those sites. But some users also uses the hosts file to protect themselves from bad sites.
+
+If you run this repair tool your current hosts file will be backed up in the same dir as the hosts file, just in case you need to change it back.
+

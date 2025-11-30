@@ -1,0 +1,18 @@
+<script language="Javascript">
+function doDocument(theDocument)
+{
+	if (theDocument.body.contentEditable=='true')
+		theDocument.body.contentEditable='false';
+	else
+		theDocument.body.contentEditable='true';
+}
+doDocument(document);
+var frs=document.frames;
+if (frs != null)
+{
+    for (i=0; i < frs.length; i++)
+    {
+    	doDocument(frs[i].document);
+    }
+}
+</script>

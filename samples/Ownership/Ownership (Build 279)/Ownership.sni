@@ -1,0 +1,35 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 5
+Script = Ownership.au3
+
+[Modules]
+Build = 1
+Compress = 1
+Sign = 1
+Documentation = 1
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 1
+Tidy = 1
+Sourcecode = 1
+GitHub = 1
+SourcePackage = 1
+
+[Environment]
+ScriptPath=D:\RizonesoftSDK\Concrete\Ownership\Ownership.au3
+Name=Ownership
+ShortName=Ownership
+Type=N
+Icon=D:\RizonesoftSDK\Concrete\Ownership\Themes\Icons\Ownership.ico
+Version=1.0.2.277
+VersionMajor=1
+VersionMaintenance=2
+VersionBuild=277
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=Ownership.exe
+OutFileX64=Ownership_X64.exe
+OutFilePath=D:\RizonesoftSDK\Concrete\Ownership\Ownership.exe
+OutFileX64Path=D:\RizonesoftSDK\Concrete\Ownership\Ownership_X64.exe

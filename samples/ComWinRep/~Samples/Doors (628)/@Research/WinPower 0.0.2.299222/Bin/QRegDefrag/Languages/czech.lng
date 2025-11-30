@@ -1,0 +1,167 @@
+﻿
+[Čeština]
+;Translate by Geralt
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Storno
+LSAVEASBUTTON=Uložit jako...
+LANALYZEBUTTON=Analyzovat
+LDEFRAGBUTTON=Defragmentovat
+LCLOSEBUTTON=Zavřít
+LRESTARTBUTTON=Restartovat
+LLATERBUTTON=Později
+LREPORTBUTTON=Vytvořit zprávu...
+LSTOPBUTTON=Zastavit
+LBROWSEBUTTON=Procházet...
+LERROR=Chyba
+LENABLED=Zapnuto
+LDISABLED=Vypnuto
+LNOTSUPPORTED=Nepodporováno
+LREGREPLACE=Chyba - RegReplaceKey je vypnut. Restartujte Windows a zkuste to znovu.
+LRESTOREPOINTNOT=Bod obnovy není podporován.
+LCREATINGRESTORE=Vytvářím bod obnovy...
+
+;MAIN WINDOW
+LNEVERUSED=Neprovedeno
+LMENUOPTIONS=Možnosti
+LMENUHELP=Nápověda
+LMENUABOUT=O programu
+LOVERVIEW=Přehled
+LLASTDEFRAG=Defragmentace provedena:
+LSIZERECOVERED=Velikost obnovy:
+LPERCENT=Procent:
+LWOULDLIKE=Co si přejete provést?
+LDEFRAGTITLE=Defragmentovat registry
+LREGINFOTITLE=Získat informace o registru
+LUPDATEOK=Používáte aktuální verzi programu.
+LUPDATEDISABLED=Automatické ověření aktualizací programu je vypnuto.
+LUPDATENEW=K dispozici je nová verze programu.
+LUPDATEWAIT=Ověřuji dostupnost novějších verzí. Prosím čekejte.
+LMOREINFO=více informací...
+LUPDATES=Aktualizace
+
+;ABOUT WINDOW
+LABOUTTITLE=O programu
+LVERSION=Verze
+LICON=Ikonky vytvořil
+
+;OPTIONS WINDOW
+LOPTIONS=Možnosti
+LOPTIONSDESCRIPTION=Nastavení možností programu.
+LSETTINGS=Obecná nastavení
+LLANGUAGE=Jazyk
+LCHKCHECKUPDATE=Automaticky ověřit aktualizace
+LCHECKNOW=Ověřit aktualizace nyní...
+LCHKDEFRAGMYCOMPUTER=Přidat položku "Defragmentovat registry..." do kontextového menu
+LCHKREGINFOMYCOMPUTER=Přidat položku "Získat informace o registru..." do kontextového menu
+LBACKUPS=Zálohy
+LAUTOREGFILES=Automaticky zálohovat soubory registru před defragmentací
+LAUTORESTOREPOINT=Automaticky vytvořit bod obnovy před defragmentací
+LBACKUPFOLDER=Složka záloh:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Informace
+LREGINFODESCRIPTION=Informace o registru Windows.
+LSO=Operační systém:
+LUSER=Přihlášený uživatel:
+LREGSIZE=Velikost registru:
+LCOLUMNPATH=Cesta
+LCOLUMNSIZE=Velikost
+LREGISTRYFILES=Soubory registru
+LNUMBERFILES=Počet souborů:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnostika
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Hive Name:
+LLOGICALPATH=Logická cesta:
+LMAPPATH=Mapovaná cesta:
+LTEMPPATH=Dočasná cesta:
+LHIVESIZE=Hive Size:
+LKEY=Klíč:
+LVALIDFILE=Soubor existuje.
+LNOTVALIDFILE=Soubor neexistuje.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Optimalizovat a uspořádat Windows registry.
+LTITLEPROBLEM=Problémy a řešení
+LMAINTEXT=Data registru  jsou neustále zapisována a mazána během operací prováděných Windows. Postupem času se data fragmentují. Pomocí tohoto nástroje můžete optimalizovat Vaše registry tím, že odstraníte mezery mezi daty tzn., defragmentujete soubory a snížíte nevyužité místo v souborech registru Windows.
+LBENEFITS=Quicksys RegDefrag zvýší výkon systému a sníží přístupovou dobu do registru.
+LTITLESTEPS=Postup
+LSTEP1=1. Analyzujte registry.
+LSTEP2=2. Prohlédněte si výsledky analýzy.
+LSTEP3=3. Defragmentujte registry. Poté je nutné provést restart.
+LTITLEANALYZE=Klikněte na "Analyzovat" pro spuštění procesu.
+LAUTOBACKUP=Automatická záloha:
+LAUTORESTORE=Automatický bod obnovy:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analyzuji registry. Prosím čekejte.
+LPROGRESS=Průběh:
+LREADING=Ověřuji:
+LSTOPPROCESS=Zastavuji proces...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Výsledky analýzy
+LCOMPARATION=Porovnání
+LCONCLUSION=Výsledek
+LREGISTRYFRAGMENTATION=Fragmentace registru
+LCURRENTSIZE=Aktuální velikost registru:
+LNEWSIZE=Nová velikost registru:
+LSIZEDIFFERENCE=Rozdíl velikostí:
+LLEGFRAG=fragmentováno
+LLEGALLOC=přidělené místo
+LBACKREGFILES=Tvorba zálohy souborů registru:
+LBACKRESTORE=Tvorba bodu obnovy:
+LCONCLUSION=Výsledek
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defragmentace byla dokončena!
+LFINISHED=Defragmentace byla úspěšně dokončena.
+LRESTARTREQUIRED=Pro aplikaci změn je nutné restartovat počítač.
+LRESTARTMSGBOX=Přejete si jej restartovat nyní?
+LHTMLREPORT=Můžete si vytvořit HTML zprávu obsahující informaci o defragmentaci.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Před spuštěním nové analýzy defragmentace je nutné restartovat počítač.
+LDEFRAGMSGBOX1=Zavřete prosím všechny programy.
+LDEFRAGMSGBOX2=Analýza může trvat i několik minut.
+LDEFRAGMSGBOX3=Během procesu analýzy nemusí Váš počítač reagovat na Vaše příkazy.
+LDEFRAGMSGBOX4=Pro spuštění klikněte na "Ano".
+LFEWFRAGMENTS=Nalezeno malé množství fragmentovaných soubor. Registry není nutné defragmentovat.
+LNOFRAGMENTS=Nenalezeny žádné fragmentované soubory. Registry není možné defragmentovat.
+LTOOFRAGMENTS=Nalezeno velké množství fragmentovaných souborů. Klepněte na "Defragmentovat" pro optimalizaci registru.
+
+;REPORT 
+LNAMEREPORT=Zpráva
+LH1=Zpráva o defragmentaci
+LCREATEDBY=Vytvořil
+LDATE=Datum:
+LTIME=Čas:
+LSUMMARY=Přehled defragmentace
+LREGPROCESSED=Počet zpracovaných souborů registru:
+LREGANASTART=Analýza registru spuštěna:
+LREGANAFINISHED=Analýyza registru dokončena:
+LREGTOTALFINISHED=Celkový čas analýzy:
+LREGSIZEBEFORE=Velikost registru před:
+LREGSIZEAFTER=Velikost registru po:
+LREGSIZEDIFFERENCE=Rozdíl velikosti registrů:
+LREGFILESSUMMARY=Přehled souborů registru
+LCOLUMNREGFILE=Soubor registru
+LCOLUMNREGBEFORE=Velikost před
+LCOLUMNAFTER=Velikost po
+LCOLUMNDIFFERENCE=Rozdíl velikostí
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Defragmentuji registry
+LDEFRAGNOW=Defragmentuji:
+
+;NEW PHRASES! Please, translate!
+LHTMLCREATED=HTML zpráva byla úspěšně vytvořena.
+LOPENNOW=Přejete si ji nyní otevřít?
+LNOTHTMLCREATED=Chyba! Tvorba HTML zprávy nebyla úspěšně dokončena.
+LFILE=Soubor
+LFREESPACE=Pro defragmentaci není dostatek místa. Ověřit a zkusit znovu.
+LERROREGREAD=Chyba! Nelze číst informace z registru.

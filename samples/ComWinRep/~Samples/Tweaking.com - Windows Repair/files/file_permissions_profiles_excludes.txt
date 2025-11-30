@@ -1,0 +1,10 @@
+#Exlude list for file permissions.
+#This is for the profiles folder in Windows only.
+#The main file permission repairs targets all folders but the profiles and then a profiles repair is ran as it requires different permissions.
+#The program uses ManageACL and the -fltr option to filter keywords.
+
+# Examples
+#-fltr "Test1"
+#-fltr "\Test2"
+
+

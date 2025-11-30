@@ -1,0 +1,76 @@
+--------------------------------------
+ClamAV update process started at Mon Oct 16 18:32:33 2023
+WARNING: Your ClamAV installation is OUTDATED!
+WARNING: Local version: 0.95.3 Recommended version: 0.103.10
+DON'T PANIC! Read http://www.clamav.net/support/faq
+WARNING: getfile: Unknown response from remote server (IP: 104.16.218.84)
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getfile: Unknown response from remote server (IP: 104.16.218.84)
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getfile: Unknown response from remote server (IP: 104.16.218.84)
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: Incremental update failed, trying to download main.cvd
+Trying host database.clamav.net (104.16.219.84)...
+WARNING: getfile: Unknown response from remote server (IP: 104.16.219.84)
+WARNING: Can't download main.cvd from database.clamav.net
+Trying again in 5 secs...
+ClamAV update process started at Mon Oct 16 18:32:39 2023
+WARNING: Your ClamAV installation is OUTDATED!
+WARNING: Local version: 0.95.3 Recommended version: 0.103.10
+DON'T PANIC! Read http://www.clamav.net/support/faq
+Trying host database.clamav.net (104.16.219.84)...
+WARNING: getfile: Unknown response from remote server (IP: 104.16.219.84)
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+Trying host database.clamav.net (104.16.219.84)...
+WARNING: getfile: Unknown response from remote server (IP: 104.16.219.84)
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: Incremental update failed, trying to download main.cvd
+WARNING: Can't download main.cvd from database.clamav.net
+Trying again in 5 secs...
+ClamAV update process started at Mon Oct 16 18:32:45 2023
+WARNING: Your ClamAV installation is OUTDATED!
+WARNING: Local version: 0.95.3 Recommended version: 0.103.10
+DON'T PANIC! Read http://www.clamav.net/support/faq
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+ERROR: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: Incremental update failed, trying to download main.cvd
+ERROR: Can't download main.cvd from database.clamav.net
+Giving up on database.clamav.net...
+Update failed. Your network may be down or none of the mirrors listed in c:\users\derick~1\appdata\local\temp\tmp94jryk is working. Check http://www.clamav.net/support/mirror-problem for possible reasons.
+--------------------------------------
+ClamAV update process started at Fri Oct 20 01:51:33 2023
+WARNING: Your ClamAV installation is OUTDATED!
+WARNING: Local version: 0.95.3 Recommended version: 0.103.10
+DON'T PANIC! Read http://www.clamav.net/support/faq
+WARNING: getfile: Unknown response from remote server (IP: 104.16.219.84)
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+Trying host database.clamav.net (104.16.218.84)...
+WARNING: getfile: Unknown response from remote server (IP: 104.16.218.84)
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: Incremental update failed, trying to download main.cvd
+WARNING: Can't download main.cvd from database.clamav.net
+Trying again in 5 secs...
+ClamAV update process started at Fri Oct 20 01:51:39 2023
+WARNING: Your ClamAV installation is OUTDATED!
+WARNING: Local version: 0.95.3 Recommended version: 0.103.10
+DON'T PANIC! Read http://www.clamav.net/support/faq
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: Incremental update failed, trying to download main.cvd
+WARNING: Can't download main.cvd from database.clamav.net
+Trying again in 5 secs...
+ClamAV update process started at Fri Oct 20 01:51:44 2023
+WARNING: Your ClamAV installation is OUTDATED!
+WARNING: Local version: 0.95.3 Recommended version: 0.103.10
+DON'T PANIC! Read http://www.clamav.net/support/faq
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: getpatch: Can't download main-52.cdiff from database.clamav.net
+ERROR: getpatch: Can't download main-52.cdiff from database.clamav.net
+WARNING: Incremental update failed, trying to download main.cvd
+ERROR: Can't download main.cvd from database.clamav.net
+Giving up on database.clamav.net...
+Update failed. Your network may be down or none of the mirrors listed in c:\users\derick~1\appdata\local\temp\tmpm-sm5y is working. Check http://www.clamav.net/support/mirror-problem for possible reasons.

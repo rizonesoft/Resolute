@@ -1,0 +1,8 @@
+Repair WMI:
+
+This will repair WMI on the system. WMI is used by many Windows services and 3rd party programs. When WMI becomes corrupt these services and programs will fail.
+
+Windows Firewall and also the Windows Action Center are just a few examples of Windows services & programs that use WMI.
+
+This repair can take a bit of time to complete, depending on the speed of your CPU.
+

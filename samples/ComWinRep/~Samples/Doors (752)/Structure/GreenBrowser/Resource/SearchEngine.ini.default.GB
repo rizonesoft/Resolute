@@ -1,0 +1,62 @@
+[SearchEngine]
+N0====== 综合 =====
+S0=http://www.baidu.com/s?tn=5igb_dg&wd=%s | http://www.youdao.com/search?ue=gbk&keyfrom=browser.gb_0001&vendor=browser.gb_0001&q=%s
+C1=1
+N1=百度
+S1=http://www.baidu.com/s?tn=5igb_dg&wd=%s
+N2=有道
+S2=http://www.youdao.com/search?ue=gbk&keyfrom=browser.gb_0001&vendor=browser.gb_0001&q=%s
+I2=.\resource\youdao.ico
+N3=Google
+S3=http://www.google.com.hk/search?client=pub-1549238212314499&prog=aff&channel=8696049412&q=%u
+N4====== 新闻 =====
+S4=http://news.google.com.hk/news?client=pub-1549238212314499&prog=aff&channel=8696049412&ie=utf-8&oe=UTF-8&hl=zh-CN&q=%u | http://news.baidu.com/ns?word=%s&cl=0&tn=news
+N5=Google(资讯)
+S5=http://news.google.com.hk/news?client=pub-1549238212314499&prog=aff&channel=8696049412&ie=utf-8&oe=UTF-8&hl=zh-CN&q=%u
+N6=百度(新闻)
+S6=http://news.baidu.com/ns?word=%s&cl=0&tn=news
+N7====== 图片 =====
+S7=http://images.google.com.hk/images?client=pub-1549238212314499&prog=aff&channel=8696049412&ie=utf-8&oe=UTF-8&hl=zh-CN&q=%u | http://image.baidu.com/i?tn=baiduimage&ct=201326592&lm=-1&cl=2&word=%s
+N8=Google(图片)
+S8=http://images.google.com.hk/images?client=pub-1549238212314499&prog=aff&channel=8696049412&ie=utf-8&oe=UTF-8&hl=zh-CN&q=%u
+N9=百度(图片)
+S9=http://image.baidu.com/i?tn=baiduimage&ct=201326592&lm=-1&cl=2&word=%s
+N10====== 软件 =====
+S10=http://search.onlinedown.net/search_list.php?searchname=%u|http://www.xdowns.com/tag.asp?act=topic&keyword=%s
+N11=华军软件园
+S11=http://search.onlinedown.net/search_list.php?searchname=%u
+N12=绿色软件站
+S12=http://www.xdowns.com/tag.asp?act=topic&keyword=%s
+N13====== 影音 =====
+S13=http://www.gougou.com/search?id=1008860&search=%s|http://mp3.baidu.com/m?word=%s&tn=5igb_dg
+N14=狗狗(影音)
+S14=http://www.gougou.com/search?id=1008860&search=%s
+N15=百度(MP3)
+S15=http://mp3.baidu.com/m?word=%s
+N16=狗狗(BT)
+S16=http://www.gougou.com/search?id=1008860&ty=1&search=%s
+N17=VeryCD(电驴)
+S17=http://www.verycd.com/search/folders/%u
+N18====== 翻译 =====
+S18=http://www.iciba.com/search?s=%s&lang=gb2312&t=word|http://www.baidu.com/baidu?ie=gb2312&cl=3&ct=1048576&tn=5igb_dg&word=%s
+N19=有道词典
+S19=http://dict.youdao.com/search?ue=gbk&keyfrom=GB_03&q=%s
+N20=金山词霸
+S20=http://dict.iciba.com/%u/
+N21====== 购物 =====
+S21=http://www.amazon.cn/gp/search?ie=UTF8&tag=5igb-23&index=aps&linkCode=ur2&camp=536&creative=3200&keywords=%u|http://union.dangdang.com/transfer.php?from=P-137849&ad_type=10&sys_id=1&backurl=http://search.dangdang.com/search.php?key=%s
+N22=卓越网购物搜索
+S22=http://www.amazon.cn/gp/search?ie=UTF8&tag=5igb-23&index=aps&linkCode=ur2&camp=536&creative=3200&keywords=%u
+N23=当当网购物搜索
+S23=http://union.dangdang.com/transfer.php?from=P-137849&ad_type=10&sys_id=1&backurl=http://search.dangdang.com/search.php?key=%s
+N24=淘宝网
+S24=http://search8.taobao.com/browse/search_auction.htm?cat=&pid=mm_14573828_2305331_8936331&commend=all&search_type=auction&user_action=initiative&f=D9_5_1&at_topsearch=1&sort=&spercent=0&gt;&viewIndex=7&style=grid&q=%s
+I24=.\resource\taobao.ico
+N25====== 生活 =====
+S25=%s
+N26=谷歌地图
+S26=http://ditu.google.cn/maps?client=pub-1549238212314499&prog=aff&channel=8696049412&ie=utf-8&oe=UTF-8&hl=zh-CN&q=%u
+N27=百度知道
+S27=http://zhidao.baidu.com/q?ct=17&pn=0&pt=5igb_ik&tn=ikaslist&rn=10&word=%s
+N28=百度贴吧
+S28=http://tieba.baidu.com/f?kw=%s

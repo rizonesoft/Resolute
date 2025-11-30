@@ -1,0 +1,10 @@
+Repair CD/DVD Missing/Not Working:
+
+This repair may help with CD or DVD drives that are not working as they should.
+
+"The CD drive or the DVD drive does not work as expected on a computer that you upgraded to Windows Vista"
+http://support.microsoft.com/kb/929461
+
+"Your CD drive or DVD drive is missing or is not recognized by Windows or other programs"
+http://support.microsoft.com/kb/982116 
+

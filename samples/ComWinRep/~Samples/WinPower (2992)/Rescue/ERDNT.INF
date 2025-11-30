@@ -1,0 +1,40 @@
+[Creation]
+"2012/11/18 06:13:06 PM"
+
+[SystemRoot]
+"C:\Windows"
+
+[Restore]
+"MACHINE SYSTEM"
+"SYSTEM"
+"C:\Windows\System32\config\SYSTEM"
+
+[Restore]
+"MACHINE SOFTWARE"
+"SOFTWARE"
+"C:\Windows\System32\config\SOFTWARE"
+
+[Restore]
+"USERS .DEFAULT"
+"DEFAULT"
+"C:\Windows\System32\config\DEFAULT"
+
+[Restore]
+"MACHINE SECURITY"
+"SECURITY"
+"C:\Windows\System32\config\SECURITY"
+
+[Restore]
+"MACHINE SAM"
+"SAM"
+"C:\Windows\System32\config\SAM"
+
+[Restore]
+"USERS S-1-5-21-2407918343-1998237217-3651314289-1000"
+"Users\00000001\NTUSER.DAT"
+"C:\Users\Venom\NTUSER.DAT"
+
+[Restore]
+"USERS S-1-5-21-2407918343-1998237217-3651314289-1000_Classes"
+"Users\00000002\UsrClass.dat"
+"C:\Users\Venom\AppData\Local\MICROS~1\Windows\UsrClass.dat"

@@ -1,0 +1,416 @@
+**********************************************************************************
+*   #####           #     ##           ####    ##                                *
+*   #                      #           #   #    #                                *
+*   #      #   #   ##      #           #   #    #     ###   #   #   ###   # ##   *
+*   ####   #   #    #      #           ####     #        #  #   #  #   #  ##  #  *
+*   #       # #     #      #           #        #     ####  #  ##  #####  #      *
+*   #       # #     #      #           #        #    #   #   ## #  #      #      *
+*   #####    #     ###    ###          #       ###    ####      #   ###   #      *
+*                                                           #   #                *
+*                                                            ###   V. 1.31       *
+**********************************************************************************
+*                                 [ What is it? ]                                *
+*                                                                                *
+*    Evil Player is a fast, powerful and flexible media player for windows.      *
+*    Some of Evil Player's key features include Shoutcast, Icecast & Icecast2    *
+*    support, low memory footprint and native support for several popular        *
+*    formats (MP3, MP2, MP1, OGG, AIFF and MOD).                                 *
+*                                                                                *
+**********************************************************************************
+*                                  [ Features ]                                  *
+*                                                                                *
+*       - Completely free                                                        *
+*       - Simple to use                                                          *
+*       - Audio formats supported: WAV, OGG, MP1, MP2, MP3, AIFF,                *
+*         MOD (IT, XM, S3M, MTM, UMX) and MO3                                    *
+*       - Supports BASS plug-ins                                                 *
+*       - Low memory footprint                                                   *
+*       - Radio streaming (Shoutcast/Icecast/Icecast2)                           *
+*       - Shoutcast recording                                                    *
+*                                                                                *
+**********************************************************************************
+*                                 [ Change Log ]                                 *
+*                                                                                *
+*       Version 1.31 (12/07/2009)                                                *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.4.3.1                                    *
+*       - Updated tags.dll to version 0.0.0.15                                   *
+*       - Added queue songs from search window (Insert key)                      *
+*       - Added Lithuanian translation                                           *
+*       - Fixed not jumping to the playing song                                  *
+*                                                                                *
+*                                                                                *
+*       Version 1.30 (23/06/2009)                                                *
+*       ------------------------                                                 *
+*       - Fixed crash when playing a song                                        *
+*       - Updated Swedish, Hebrew, German & Italian translation                  *
+*                                                                                *
+*                                                                                *
+*       Version 1.29 (21/06/2009)                                                *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.4.3.0                                    *
+*       - Fixed last.fm submission error                                         *
+*       - Fixed not remembering all the previous added files                     *
+*       - Fixed a string that wasen't translatable                               *
+*                                                                                *
+*                                                                                *
+*       Version 1.28 (21/04/2009)                                                *
+*       ------------------------                                                 *
+*       - Fixed Last.fm now playing                                              *
+*       - Fixed List index out of bounds (0) error                               *
+*       - Fixed crash when adding a file                                         *
+*                                                                                *
+*                                                                                *
+*       Version 1.27 (07/10/2008)                                                *
+*       ------------------------                                                 *
+*       - Added queue song to the right click menu                               *
+*       - Updated Chinese (Simplified) & Polish translation                      *
+*       - Fixed not playing queued song (if any) when pressing next              *
+*                                                                                *
+*                                                                                *
+*       Version 1.26 (07/09/2008)                                                *
+*       ------------------------                                                 *
+*       - Added queue function within the playlist by using the Insert key       *
+*                                                                                *
+*                                                                                *
+*       Version 1.25 (25/08/2008)                                                *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.4.1.1                                    *
+*       - Updated language files                                                 *
+*                                                                                *
+*                                                                                *
+*       Version 1.24 (15/06/2008)                                                *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.4.0.1                                    *
+*       - Fixed MSN listening to with radio streams                              *
+*       - Fixed MSN song tags did not update at song switch                      *
+*                                                                                *
+*                                                                                *
+*       Version 1.23 (5/4/2008)                                                  *
+*       ------------------------                                                 *
+*       - Added Arabic, Catalan & Belorussian translation                        *
+*       - Added ID3 support to tray hint & MSN Listening to service              *
+*       - Updated Bass.dll to version 2.4.0.0                                    *
+*       - Fixed Crash when closing the application                               *
+*       - Fixed doubble stream when proxy is enabled                             *
+*       - Updated Bulgarian, Eesti, Finnish, French, German,  Italian,           *
+*         Japanese & Romanian translation                                        *
+*                                                                                *
+*                                                                                *
+*       Version 1.22 (7/11/2007)                                                 *
+*       ------------------------                                                 *
+*       - Fixed the access violation error when hitting search                   *
+*         hotkey more then once                                                  *
+*       - Updated Hebrew, Swedish, Czech, Eest, French, Portuguese (Brasil),     *
+*         Romanian & Russian                                                     *
+*       - Added Last.fm support                                                  *
+*                                                                                *
+*                                                                                *
+*       Version 1.21 (8/22/2007)                                                 *
+*       ------------------------                                                 *
+*       - Updated Dutch, Euskara, Finnish, French, German, Italian, Japanese,    *
+*         Korean, Slovak, Portuguese (Brasil),                                   *
+*         Spanish (Latin America) & Turkish translation                          *
+*       - Updated Bass.dll to version 2.3.0.3                                    *
+*       - Updated tags.dll to version 0.0.0.13                                   *
+*       - Fixed "Search" can now be translated                                   *
+*       - Fixed not remembering activated plugins                                *
+*       - Added hotkey for Search                                                *
+*       - Added Search & tags windows now remembers last postion                 *
+*                                                                                *
+*                                                                                *
+*       Version 1.20 (4/22/2007)                                                 *
+*       ------------------------                                                 *
+*       - Updated Euskara, Italian, Russian & Swedish translation                *
+*       - Fixed access violation when reading tags                               *
+*       - Added search function                                                  *
+*                                                                                *
+*                                                                                *
+*       Version 1.19 (4/9/2007)                                                  *
+*       ------------------------                                                 *
+*       - Updated Hungarian (Magyar), Czech, Italian & Finnish translation       *
+*       - Updated Bass.dll to version 2.3.0.2                                    *
+*       - Added tag window (Read only)                                           *
+*                                                                                *
+*                                                                                *
+*       Version 1.18 (1/14/2007)                                                 *
+*       ------------------------                                                 *
+*       - Updated Euskara, Russian, Portuguese (Brasil), French,                 *
+*         Spanish (Latin America), German, Japanese, Korean, Italian,            *
+*         Thai, Chinese (Traditional) & Eesti translation                        *
+*       - Updated the about page                                                 *
+*       - Added 128x128 icon                                                     *
+*       - Fixed application icon was not displayed correct under Windows 2000    *
+*       - Fixed the can't save temp.tmp error                                    *
+*                                                                                *
+*                                                                                *
+*       Version 1.17 (11/19/2006)                                                *
+*       ------------------------                                                 *
+*       - Updated German, Swedish, Nessaye, Korean, Chinese (Traditional),       *
+*         Portuguese, French, Dutch & Euskara translation                        *
+*       - Added Portuguese (Brasil) translation                                  *
+*       - Added balloon notification (optional)                                  *
+*       - Added No Repeat mode                                                   *
+*       - Added volume bar. Hold SHIFT down, seekbar needs to be enabled         *
+*       - Fixed now it's possible to translate "Remeber Playlist"                *
+*                                                                                *
+*                                                                                *
+*       Version 1.16 (11/3/2006)                                                 *
+*       ------------------------                                                 *
+*       - Updated Russian, Japanese, Polish &                                    *
+*         Spanish (Latin America) translation                                    *
+*       - Added a option to remember/forget playlist                             *
+*       - Fixed Languages, Themes & plugins wasn't loaded into                   *
+*         the context menu when the files where NTFS compressed                  *
+*       - Fixed DOS name bug                                                     *
+*       - Fixed some minor bugs                                                  *
+*                                                                                *
+*                                                                                *
+*       Version 1.15 (9/30/2006)                                                 *
+*       ------------------------                                                 *
+*       - Added Thai translation                                                 *
+*       - Updated Chinese (Simplified), Euskara, French, German, Greek,          *
+*         Italian & Japanese translation                                         *
+*       - Updated installer to modern user interface                             *
+*       - Fixed Copying playing song title to clipboard din't work               *
+*         with internet streams                                                  *
+*       - Fixed Stopping after playing the first WMA file (using Basswma.dll)    *
+*       - Added Show/Hide player with single tray click                          *
+*       - Renamed "Spanish.lng" to "Spanish (Spain).lng" and                     *
+*         "Latin America.lng" to "Spanish (Latin America).lng"                   *
+*       - Hungarian.lng and Magyar.lng replaced with Hungarian (Magyar).lng      *
+*                                                                                *
+*                                                                                *
+*       Version 1.14 (9/8/2006)                                                  *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.3.0.1                                    *
+*       - Updated Japanese, Korean & Swedish translation                         *
+*       - Added Latin American & Eesti translation                               *
+*       - Added Passive/Active mode FTP option                                   *
+*       - Added proxy support                                                    *
+*       - Added double clicking on an associated file will be added to           *
+*         already running instance                                               *
+*       - Added clear button under history                                       *
+*       - Added ESC key function under Miscellaneous                             *
+*                                                                                *
+*                                                                                *
+*       Version 1.13 (7/31/2006)                                                 *
+*       ------------------------                                                 *
+*       - Added Nessaye & Palúnthurn translation                                 *
+*       - Fixed file association bug                                             *
+*                                                                                *
+*                                                                                *
+*       Version 1.12 (6/15/2006)                                                 *
+*       ------------------------                                                 *
+*       - Updated Chinese (Simplified), Finnish, German,                         *
+*         Italian, Korean & Polish translation                                   *
+*       - Added Bulgarian (Cyrillic) translation                                 *
+*       - Added possibility to change the color of seekbar & VU-Meter            *
+*       - Added copy song text to clipboard via tray menu                        *
+*       - Added move file to recycle bin with Shift + Del                        *
+*       - Disabled multiple instances                                            *
+*                                                                                *
+*                                                                                *
+*       Version 1.11 (5/17/2006)                                                 *
+*       ------------------------                                                 *
+*       - Updated installer                                                      *
+*       - Updated Chinese (Traditional), Danish, Hebrew, Euskara,                *
+*         French & Swedish translation                                           *
+*       - Added possibility to only enable some hotkeys (settings.ini)           *
+*       - Added Select All under File Association                                *
+*       - Added a Donate button in the tray menu                                 *
+*       - Fixed "Theme" can now be translated                                    *
+*       - Fixed Sometime it didn't remember last playlist                        *
+*       - Fixed Music Folder bug                                                 *
+*       - Fixed some minor bugs                                                  *
+*                                                                                *
+*                                                                                *
+*       Version 1.10 (3/30/2006)                                                 *
+*       ------------------------                                                 *
+*       - Updated French translation                                             *
+*       - Added Hebrew translation                                               *
+*       - Added theme manager                                                    *
+*       - Added possibility to change text size                                  *
+*       - Added possibility to change font type                                  *
+*       - Added Shortcuts to settings.ini                                        *
+*                                                                                *
+*                                                                                *
+*       Version 1.09 (3/1/2006)                                                  *
+*       ------------------------                                                 *
+*       - Updated Swedish & Chinese (Traditional) translation                    *
+*       - Updated EULA                                                           *
+*       - Added Greek & Serbian (Cyrillic) translation                           *
+*       - Added scroll to start or end of the playlist with HOME & END key       *
+*       - Added forward, backward 5 seconds with the left & right key            *
+*       - Added pause/resume with space key                                      *
+*       - Added Play with enter key                                              *
+*       - Fixed a bug in shuffle                                                 *
+*       - Fixed a "List index out of bounds (-1)" bug                            *
+*       - Fixed restart instead of resume when using hotkeys                     *
+*       - Fixed MSN What I'm listening to bug                                    *
+*       - Fixed crash at end of song with empty playlist                         *
+*       - changed the default hotkey: CTRL -> ALT to prevent Cut & Past Hijack   *
+*                                                                                *
+*                                                                                *
+*       Version 1.08 (2/19/2006)                                                 *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.2.0.4                                    *
+*       - Updated Chinese (Simplified), Czech, Finnish, German, Japanese,        *
+*         Korean, Russian & Portuguese translation                               *
+*       - Added Euskara translation                                              *
+*       - Added file association                                                 *
+*       - Added auto play                                                        *
+*       - Improved shuffle (No repeat)                                           *
+*                                                                                *
+*                                                                                *
+*       Version 1.07 (2/3/2006)                                                  *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.2.0.3                                    *
+*       - Updated Chinese (Traditional & Simplified), Danish, German,            *
+*         Korean & Finnish translation                                           *
+*       - Addded Romanian translation                                            *
+*       - Added music folder option                                              *
+*       - Fixed some memory leaks                                                *
+*                                                                                *
+*                                                                                *
+*       Version 1.06 (12/6/2005)                                                 *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.2.0.1                                    *
+*       - Added Magyar translation                                               *
+*       - Added a playlist history menu                                          *
+*       - Fixed the & character bug                                              *
+*       - Play & Pause is now merged together                                    *
+*       - Added repeat function                                                  *
+*       - Added Volume control to Global Hotkeys                                 *
+*                                                                                *
+*                                                                                *
+*       Version 1.05 (10/7/2005)                                                 *
+*       ------------------------                                                 *
+*       - Updated Bass.dll to version 2.2.0.0                                    *
+*       - Updated Chinese (Traditional) & Japanese translation                   *
+*       - Added Korean, Finnish & Danish translation                             *
+*       - Added AIFF support                                                     *
+*       - Added volume control                                                   *
+*       - Added file seeking for MOD, XM, IT, S3M, MTM, UMX & MO3 files          *
+*       - Added file seeking for big file (3 hour +)                             *
+*       - Added BASS plug-in support                                             *
+*       - Added color support (look for "theme" in settings.ini)                 *
+*       - Added Slim Mode to the titlebar context menu                           *
+*       - Fixed multiple audio device bug                                        *
+*       - Fixed a bug in the save playlist procedure                             *
+*       - Fixed crash at end of file when shuffle was enabled & only one file    *
+*         was added to playlist                                                  *
+*       - Improved the language support                                          *
+*       - Improved Hot Keys it's now possible to use ALT, SHIFT or WIN           *
+*         instead of CTRL                                                        *
+*       - Removed WMA, FLAC & AAC support (available via plug-ins)               *
+*                                                                                *
+*                                                                                *
+*       Version 1.04 (7/1/2005)                                                  *
+*       ------------------------                                                 *
+*       - Updated Bass_aac.dll to version 2.1.0.4                                *
+*       - Updated Bass_flac.dll to version 2.1.0.3                               *
+*       - Added Close to tray                                                    *
+*       - Added tray hint                                                        *
+*       - Fixed crash when trying to play non-supported files                    *
+*       - Multimedia keys should now work via hot keys (see forum how to)        *
+*       - MSN playing now gets cleared when clicking stop                        *
+*       - Added Japanese & Chinese (Simplified & Traditional) translations       *
+*       - Updated Portuguese translation                                         *
+*                                                                                *
+*                                                                                *
+*       Version 1.03 (6/3/2005)                                                  *
+*       ------------------------                                                 *
+*       - Updated Bass_aac.dll to version 2.1.0.3                                *
+*       - Updated Bass_wma.dll to version 2.1.0.2                                *
+*       - Added MSN Now Playing support                                          *
+*       - Made some small changes under Options                                  *
+*                                                                                *
+*                                                                                *
+*       Version 1.02 (5/26/2005)                                                 *
+*       ------------------------                                                 *
+*       - Added Seekbar                                                          *
+*       - Added Polish & Spanish translations                                    *
+*       - Downgraded bass_acc.dll to version 2.1.0.1                             *
+*                                                                                *
+*                                                                                *
+*       Version 1.01 (5/17/2005)                                                 *
+*       ------------------------                                                 *
+*       - Added Global Hotkeys (Ctrl + Shortcut key)                             *
+*       - Added German, Slovak, Turkish, Portuguese,                             *
+*         Serbian & czech translations                                           *
+*       - Fixed the "List index out of bounds (-1)" bug                          *
+*       - Fixed the shuffle problem: It didn't play a random                     *
+*         song when clicking next                                                *
+*       - Improved context/main menu                                             *
+*       - Updated Bass.dll to version 2.1.0.5                                    *
+*       - Updated Bass_aac.dll to version 2.1.0.2                                *
+*                                                                                *
+*                                                                                *
+*       Version 1.00 (4/14/2005)                                                 *
+*       ------------------------                                                 *
+*       - Added VU-meter                                                         *
+*       - Added AAC, MOD (IT, XM, S3M, MTM, UMX) and MO3 support                 *
+*       - Added Shoutcast/icecast support                                        *
+*       - Added Shoutcast Recording                                              *
+*       - Fixed the show tray icon when it's Unchecked bug                       *
+*       - Drag'n Drog file(s)/Directory                                          *
+*       - Add a Directory to playlist                                            *
+*       - Load M3U & PLS playlist                                                *
+*       - Save M3U & PLS playlist                                                *
+*       - Move a items position in the playlist                                  *
+*       - Added shortcuts                                                        *
+*       - Make Evil Player transparent                                           *
+*       - Hide/Show Evil Player in Taskbar                                       *
+*       - A new Slim Mode function is added                                      *
+*       - Added Dutch, French, Hungarian, Italian, Swedish,                      *
+*         "Scottish" and Elmer Fudd translations                                 *
+*       - Fixed some minor bugs                                                  *
+*       - Complety new Icon                                                      *
+*                                                                                *
+*                                                                                *
+*       Version 0.97 (10/9/2004)                                                 *
+*       ------------------------                                                 *
+*       - Added OGG, WMA, Flac support                                           *
+*       - Added a stop function                                                  *
+*       - Remember application size                                              *
+*       - Remember application position                                          *
+*       - Improved the playlist engine                                           *
+*       - Improved th play engine                                                *
+*       - The playing song will now be bold                                      *
+*       - Fixed the remove bug                                                   *
+*       - Fixed the last played bug                                              *
+*       - Fixed the always on top bug                                            *
+*       - Fixed the save playlist while a song is playing bug                    *
+*       - Removed ID3 support                                                    *
+*                                                                                *
+*                                                                                *
+*       Version 0.90 (9/4/2004)                                                  *
+*       ------------------------                                                 *
+*       - First release                                                          *
+*                                                                                *
+*                                                                                *
+**********************************************************************************
+*                                   [ Credits ]                                  *
+*                                                                                *
+*       - Evil_Player.exe                                                        *
+*         © 2004-2007, Hakeem                                                    *
+*                                                                                *
+*       - Bass.dll                                                               *
+*         © 1999-2007, Ian Luck                                                  *
+*                                                                                *
+*       - Icons/logo                                                             *
+*         by Tomás J. Luis                                                       *
+*                                                                                *
+*       - Web-hosting                                                            *
+*         Gigahost.dk                                                            *
+*                                                                                *
+*       - Translators                                                            *
+*         alanmp3, lyliakar, Sean, BreYers, phaelox, gm88, HomiSite, Tiago,      *
+*         Emperror, KeCHi, ZoNi, brzj, bocian, ZerOMegA, Samoa, barlog,          *
+*         kebabi, EcLipSe, Kenned, nyelviskola, Adrian George Sav,               *
+*         3ARRANO, Adept & www.ok-nyelviskola.hu                                 *
+*                                                                                *
+**********************************************************************************
+*                       Copyrigth© 2004-2007, Hakeem                             *
+**********************************************************************************

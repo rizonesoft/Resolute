@@ -1,0 +1,57 @@
+Reset Registry Permissions:
+
+When certain registry keys lose their proper permissions, then lots of problems can happen. Such as not being able to register certain files, windows updates failing, programs giving an error because they can't access a certain reg key and so on.
+
+This repair can take a significant amount of time to complete, depending on the speed of your CPU & the number of reg keys.
+
+*********
+The first part of this repair will patch up missing installation dates.
+
+If the registry key "InstallDate" is missing in the uninstall section of the registry, then Windows will show the "Modified" date instead, when the user opens "Add/Remove Programs" or "Programs and Features".
+
+Every time this repair is run, in addition to changing the permissions, the "Modified" date will be updated/changed as well.
+
+The end result is that when opening "Add/Remove Programs" or "Programs and Features", Windows could display the date when this repair has been run and not the latest installation date of the program.
+
+To prevent the wrong installation date being displayed, this repair will take the "Modified" date and use that to create a new "InstallDate" registry key.
+
+The repair loops through these 3 locations:
+- "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+
+- "HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+
+- "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+
+******
+******
+For Windows 7, 8, 8.1 & 10
+******
+The program will set the default permissions instead of the full admin privileges that are done on XP.
+
+This way proper permissions are put back and your machine stays secure.
+
+******
+For XP and Vista:
+******
+The second part of this repair will reset the permissions on every key in the registry.
+
+The permissions are as follows
+
+HKEY_CURRENT_USER 
+Administrators = Full
+System = Full
+Guest = Read
+Current User = Full
+TrustedInstaller = Full
+
+HKEY_LOCAL_MACHINE
+Administrators = Full
+System = Full
+Users = Full
+TrustedInstaller = Full
+
+HKEY_CLASSES_ROOT
+Administrators = Full
+System = Full
+Users = Read
+TrustedInstaller = Full

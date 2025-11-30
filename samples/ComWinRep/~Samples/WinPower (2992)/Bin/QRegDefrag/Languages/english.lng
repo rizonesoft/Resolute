@@ -1,0 +1,167 @@
+﻿
+[English]
+;Translated by Quicksys
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Cancel
+LSAVEASBUTTON=Save As...
+LANALYZEBUTTON=Analyze
+LDEFRAGBUTTON=Defrag
+LCLOSEBUTTON=Close
+LRESTARTBUTTON=Restart
+LLATERBUTTON=Later
+LREPORTBUTTON=Generate Report...
+LSTOPBUTTON=Stop
+LBROWSEBUTTON=Browse...
+LERROR=Error
+LENABLED=Enabled
+LDISABLED=Disabled
+LNOTSUPPORTED=Not Supported
+LREGREPLACE=Error - RegReplaceKey is disabled. Restart Windows and try again.
+LRESTOREPOINTNOT=Restore Point not supported.
+LCREATINGRESTORE=Creating Restore Point...
+
+;MAIN WINDOW
+LNEVERUSED=Never used
+LMENUOPTIONS=Options
+LMENUHELP=Help
+LMENUABOUT=About
+LOVERVIEW=Overview
+LLASTDEFRAG=Last Defrag Performed:
+LSIZERECOVERED=Size Recovered:
+LPERCENT=Percent:
+LWOULDLIKE=What would you like to do?
+LDEFRAGTITLE=Defrag Registry
+LREGINFOTITLE=Get Registry Information
+LUPDATEOK=You are using the latest version.
+LUPDATEDISABLED=Auto check update is disabled.
+LUPDATENEW=New version is avaliable.
+LUPDATEWAIT=Checking for new versions. Please wait.
+LMOREINFO=more info...
+LUPDATES=Updates
+
+;ABOUT WINDOW
+LABOUTTITLE=About
+LVERSION=Version
+LICON=Icons developed by
+
+;OPTIONS WINDOW
+LOPTIONS=Options
+LOPTIONSDESCRIPTION=Configure program settings.
+LSETTINGS=General Settings
+LLANGUAGE=Language
+LCHKCHECKUPDATE=Automatically check for updates
+LCHECKNOW=Check for new updates now...
+LCHKDEFRAGMYCOMPUTER=Add "Defrag Registry..." option to My Computer context menu
+LCHKREGINFOMYCOMPUTER=Add "Get Registry Information" option to My Computer context menu
+LBACKUPS=Backups
+LAUTOREGFILES=Automatically backup registry files before defragmentation
+LAUTORESTOREPOINT=Automatically create restore point before defragmentation
+LBACKUPFOLDER=Backups Folder:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Information
+LREGINFODESCRIPTION=Information about Windows registry.
+LSO=Operating System:
+LUSER=User Logged:
+LREGSIZE=Registry Size:
+LCOLUMNPATH=Path
+LCOLUMNSIZE=Size
+LREGISTRYFILES=Registry Files
+LNUMBERFILES=Number of Files:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnostics
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Hive Name:
+LLOGICALPATH=Logical Path:
+LMAPPATH=Map Path:
+LTEMPPATH=Temp Path:
+LHIVESIZE=Hive Size:
+LKEY=Key:
+LVALIDFILE=File exists.
+LNOTVALIDFILE=File not exists.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Optimize and Compact Windows Registry.
+LTITLEPROBLEM=Problem and Solution
+LMAINTEXT=Registry data is constantly being written to and removed during a normal Windows operation. Over time this data becomes fragmented. This tool optimizes your registry by removing gaps, fragments and wasted space in Windows registry files.
+LBENEFITS=Quicksys RegDefrag improves the whole system performance and boosts access to registry.
+LTITLESTEPS=Steps
+LSTEP1=1. Analyze your registry.
+LSTEP2=2. Review analyze results.
+LSTEP3=3. Defrag the registry. Restart is required.
+LTITLEANALYZE=Click "Analyze" to start the process.
+LAUTOBACKUP=Automatic Backup:
+LAUTORESTORE=Automatic Restore Point:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analyzing registry. Please wait.
+LPROGRESS=Progress:
+LREADING=Checking:
+LSTOPPROCESS=Stopping process...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Analyze Results
+LCOMPARATION=Comparison
+LCONCLUSION=Conclusion
+LREGISTRYFRAGMENTATION=Registry Fragmentation
+LCURRENTSIZE=Current Registry Size:
+LNEWSIZE=New Registry Size:
+LSIZEDIFFERENCE=Size Difference:
+LLEGFRAG=fragmented
+LLEGALLOC=allocated space
+LBACKREGFILES=Create backup of registry files:
+LBACKRESTORE=Create restore point:
+LCONCLUSION=Conclusion
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defrag Completed!
+LFINISHED=Finished successfully.
+LRESTARTREQUIRED=You must restart your computer for the changes to take effect.
+LRESTARTMSGBOX=Would you like to restart now?
+LHTMLREPORT=You can generate a HTML report with defragmentation information.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=It is necessary to restart the computer to start a new defrag analysis.
+LDEFRAGMSGBOX1=Close all programs.
+LDEFRAGMSGBOX2=Analysis may take several minutes.
+LDEFRAGMSGBOX3=During this process, your computer may become unresponsive.
+LDEFRAGMSGBOX4=To proceed, click "Yes".
+LFEWFRAGMENTS=Few fragments found. It is not necessary to defrag the registry.
+LNOFRAGMENTS=No fragments found. It is not possible to defrag the registry.
+LTOOFRAGMENTS=Too many fragments found. Click "Defrag" to optimize the registry.
+
+;REPORT 
+LNAMEREPORT=Report
+LH1=Defragmentation Report
+LCREATEDBY=Created by
+LDATE=Date:
+LTIME=Time:
+LSUMMARY=Defragmentation Summary
+LREGPROCESSED=Registry files processed:
+LREGANASTART=Registry analysis started:
+LREGANAFINISHED=Registry analysis finished:
+LREGTOTALFINISHED=Registry analysis total time:
+LREGSIZEBEFORE=Registry size before:
+LREGSIZEAFTER=Registry size after:
+LREGSIZEDIFFERENCE=Registry size difference:
+LREGFILESSUMMARY=Registry Files Summary
+LCOLUMNREGFILE=Registry File
+LCOLUMNREGBEFORE=Size Before
+LCOLUMNAFTER=Size After
+LCOLUMNDIFFERENCE=Size Difference
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Defragmenting Registry
+LDEFRAGNOW=Defragmenting:
+
+;NEW PHRASES! Please, translate!
+;LHTMLCREATED=HTML report created successfully. 
+;LOPENNOW=Open Now?
+;LNOTHTMLCREATED=Error! HTML report was NOT created successfully.
+;LFILE=File
+;LFREESPACE=Not enough free space to defrag. Check and try again.
+;LERROREGREAD=Error! Not possible to read registry information.

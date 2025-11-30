@@ -1,0 +1,69 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 5
+Script = WinRepair.au3
+
+[Modules]
+Build = 1
+Compress = 1
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 0
+Sourcecode = 0
+SourcePackage = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://www.rizonesoft.com
+
+[Distribute]
+File=WinRepair.exe
+File=WinRepair_X64.exe
+File=Docs\Changes.txt
+File=Docs\License.txt
+File=Docs\Readme.txt
+File=Doors\Themes\Processing\16\Process.ani
+File=Doors\Themes\Processing\32\Stroke.ani
+File=Doors\Themes\Processing\64\Globe.ani
+
+[Sources]
+
+[Links]
+CompanyURL=https://www.rizonesoft.com
+DownloadsURL=https://goo.gl/BWhZ4G
+SupportURL=https://www.rizonesoft.com/forums/
+ContactURL=https://www.rizonesoft.com/contact
+UpdateURL=https://www.rizonesoft.com/downloads/rizonesoft-sdk/
+
+[Environment]
+ScriptPath=D:\SDK\Concrete\WinRepair\WinRepair.au3
+Company=Rizonesoft
+CompanyURL=https://www.rizonesoft.com
+Name=Complete Windows Repair
+ShortName=WinRepair
+Description=Complete Windows Repair
+Type=N
+Icon=D:\SDK\Concrete\WinRepair\Doors\Themes\Icons\WinRepair.ico
+Version=1.0.0.338
+VersionMajor=1
+VersionMaintenance=0
+VersionBuild=338
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=WinRepair.exe
+OutFileX64=WinRepair_X64.exe
+OutFilePath=D:\SDK\Concrete\WinRepair\WinRepair.exe
+OutFileX64Path=D:\SDK\Concrete\WinRepair\WinRepair_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=D:\SDK\Concrete\WinRepair\Distribution\338
+DistributionName=WinRepair_338
+FullDistributionPath=D:\SDK\Concrete\WinRepair\Distribution\338\WinRepair_338
+DistroSourceName=WinRepair_338_Source
+DistroSourceFullPath=D:\SDK\Concrete\WinRepair\Distribution\338\WinRepair_338_Source

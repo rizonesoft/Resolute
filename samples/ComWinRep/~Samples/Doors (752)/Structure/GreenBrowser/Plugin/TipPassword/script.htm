@@ -1,0 +1,25 @@
+<script language="Javascript">
+
+function cancelError() {return true;} onerror=cancelError;
+
+function ShowPassword(obj)
+{
+	/*var newObj = document.createElement("INPUT");
+	newObj.type = "text";
+	newObj.value = obj.value;
+	newObj.id = obj.id;
+	newObj.name = obj.name;
+	newObj.className =  obj.className;
+	newObj.style.width = obj.style.width;
+	obj.replaceNode(newObj);*/
+	obj.title = obj.value;
+}
+
+var objs=document.all;
+var l=objs.length;
+for (i=0;i<l;i++)
+{
+	if (objs[i].type=="password")
+	  	ShowPassword(objs[i]);
+}
+</script>

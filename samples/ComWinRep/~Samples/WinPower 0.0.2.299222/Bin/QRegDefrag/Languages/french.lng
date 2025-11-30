@@ -1,0 +1,167 @@
+﻿
+[Français]
+;Translated by Dodich
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Annuler
+LSAVEASBUTTON=Enregistrer sous...
+LANALYZEBUTTON=Analyser
+LDEFRAGBUTTON=Defragmenter
+LCLOSEBUTTON=Fermer
+LRESTARTBUTTON=Redémarrer
+LLATERBUTTON=Plus tard
+LREPORTBUTTON=Générer un rapport...
+LSTOPBUTTON=Arrêter
+LBROWSEBUTTON=Parcourir...
+LERROR=Erreur
+LENABLED=Activé
+LDISABLED=Désactivé
+LNOTSUPPORTED=Non Supporté
+LREGREPLACE=Erreur - RegReplaceKey est désactivé. Redémarrez Windows et essayez à nouveau.
+LRESTOREPOINTNOT=Point de restauration non supporté.
+LCREATINGRESTORE=Création d'un point de restauration...
+
+;MAIN WINDOW
+LNEVERUSED=Jamais utilisé
+LMENUOPTIONS=Options
+LMENUHELP=Aide
+LMENUABOUT=À propos
+LOVERVIEW=Présentation
+LLASTDEFRAG=Dernière défragmentation :
+LSIZERECOVERED=Espace récupéré :
+LPERCENT=Pourcentage :
+LWOULDLIKE=Que voulez-vous faire ?
+LDEFRAGTITLE=Défragmenter le registre
+LREGINFOTITLE=Obtenir des informations sur le registre
+LUPDATEOK=Vous utilisez la dernière version.
+LUPDATEDISABLED=La vérification de mise à jour automatique est désactivée.
+LUPDATENEW=Une nouvelle version est disponible.
+LUPDATEWAIT=Vérification de nouvelles versions. Veuillez patienter.
+LMOREINFO=Plus d'info...
+LUPDATES=Mise à jour
+
+;ABOUT WINDOW
+LABOUTTITLE=A propos de
+LVERSION=Version
+LICON=Icônes développées par
+
+;OPTIONS WINDOW
+LOPTIONS=Options
+LOPTIONSDESCRIPTION=Configurer les paramètres du programme.
+LSETTINGS=Paramètres généraux
+LLANGUAGE=Langue
+LCHKCHECKUPDATE=Vérifier automatiquement les mises à jour
+LCHECKNOW=Vérifier les mises à jour maintenant...
+LCHKDEFRAGMYCOMPUTER=Ajouter "Défragmenter le registre..." au menu contextuel
+LCHKREGINFOMYCOMPUTER=Ajouter "Lire les informations du registre" au menu contextuel
+LBACKUPS=Sauvegardes
+LAUTOREGFILES=Sauvegarder automatiquement la base de registre avant la défragmentation
+LAUTORESTOREPOINT=Créer automatiquement un point de restauration avant la défragmentation
+LBACKUPFOLDER=Dossier des sauvegardes :
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Informations
+LREGINFODESCRIPTION=Information sur le registre Windows.
+LSO=Système d'exploitation :
+LUSER=Utilisateur connecté :
+LREGSIZE=Taille du registre :
+LCOLUMNPATH=Emplacement
+LCOLUMNSIZE=Taille
+LREGISTRYFILES=Fichiers du registre
+LNUMBERFILES=Nombre de fichiers :
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnostique
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Nom Hive:
+LLOGICALPATH=Chemin logique :
+LMAPPATH=Chemin de Map :
+LTEMPPATH=Chemin temporaire :
+LHIVESIZE=Taille Hive :
+LKEY=Clé :
+LVALIDFILE=Le fichier existe.
+LNOTVALIDFILE=Le fichier n'existe pas.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Optimiser et compacter la base de registre Windows.
+LTITLEPROBLEM=Problème et solution
+LMAINTEXT=Les données de la base de registre sont constamment écrites et supprimer lors du fonctionnement normal de Windows. Au fil du temps, ces données se fragmentent. Cet outil optimise votre base de registre par l'élimination des erreurs, des fragments et des espaces gaspillés  dans les fichiers de la base de registre Windows.
+LBENEFITS=Quicksys RegDefrag améliore les performances du système et accélère l'accès au registre.
+LTITLESTEPS=Etapes
+LSTEP1=1. Analyse du registre.
+LSTEP2=2. Analyse des résultats de l'examen.
+LSTEP3=3. Defragmentation du registre. Redémarrage nécessaire.
+LTITLEANALYZE=Cliquez sur "Analyser" pour démarrer.
+LAUTOBACKUP=Sauvegarde automatique :
+LAUTORESTORE=Point de restauration automatique :
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analyse du registre. Veuillez Patienter.
+LPROGRESS=Progression :
+LREADING=Vérification :
+LSTOPPROCESS=Arrêt du processus...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Analyser les résultats
+LCOMPARATION=Comparaison :
+LCONCLUSION=Conclusion :
+LREGISTRYFRAGMENTATION=Fragmentation du registre :
+LCURRENTSIZE=Taille actuelle :
+LNEWSIZE=Nouvelle taille :
+LSIZEDIFFERENCE=Différence :
+LLEGFRAG=Fragmentée
+LLEGALLOC=Espace alloué
+LBACKREGFILES=Sauvegarder le registre :
+LBACKRESTORE=Créer un point de restauration :
+LCONCLUSION=Conclusion :
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defragmentation terminée !
+LFINISHED=Terminée avec succès.
+LRESTARTREQUIRED=Vous devez redémarrer votre ordinateur pour que les modifications prennent effet.
+LRESTARTMSGBOX=Voulez-vous redémarrer maintenant ?
+LHTMLREPORT=Vous pouvez générer des rapports HTML incluant les informations sur la défragmentation.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Il est nécessaire de redémarrer l'ordinateur pour faire une nouvelle analyse de défragmentation.
+LDEFRAGMSGBOX1=Fermer tous les programmes.
+LDEFRAGMSGBOX2=L'analyse peut prendre plusieurs minutes.
+LDEFRAGMSGBOX3=Au cours de ce processus, votre ordinateur pourrait ne plus répondre.
+LDEFRAGMSGBOX4=Pour procéder, cliquez sur "Oui".
+LFEWFRAGMENTS=Peu de fragments trouvés. Il n'est pas nécessaire de défragmenter le registre.
+LNOFRAGMENTS=Pas de fragments trouvés. Il n'est pas possible de défragmenter le registre.
+LTOOFRAGMENTS=Trop de fragments trouvés. Cliquez sur "Défragmenter" afin d'optimiser le registre.
+
+;REPORT 
+LNAMEREPORT=Rapport
+LH1=Rapport de défragmentation
+LCREATEDBY=Créé par
+LDATE=Date :
+LTIME=Heure :
+LSUMMARY=Résumé de la défragmentation
+LREGPROCESSED=Fichiers modifiés du registre :
+LREGANASTART=Analyse du registre commencé :
+LREGANAFINISHED=Analyse du registre terminé :
+LREGTOTALFINISHED=Temps total d'analyse du registre :
+LREGSIZEBEFORE=Taille du registre avant :
+LREGSIZEAFTER=Taille du registre après :
+LREGSIZEDIFFERENCE=Différence de taille du registre :
+LREGFILESSUMMARY=Résumé des fichiers du registre
+LCOLUMNREGFILE=Fichier du registre
+LCOLUMNREGBEFORE=Taille avant
+LCOLUMNAFTER=Taille après
+LCOLUMNDIFFERENCE=Différence de taille
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Défragmentation du registre
+LDEFRAGNOW=Défragmentation :
+
+;NEW PHRASES! Please, translate!
+;LHTMLCREATED=Rapport HTML créé avec succès. 
+;LOPENNOW=Ouvrir maintenant ?
+;LNOTHTMLCREATED=Erreur ! Rapport HTML non créé.
+;LFILE=Fichier
+;LFREESPACE=Pas assez d'espace libre pour défragmenter. Vérifiez et essayez à nouveau.
+;LERROREGREAD=Erreur ! Impossible de lire les informations du registre.

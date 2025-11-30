@@ -1,0 +1,159 @@
+﻿
+[Deutsch]
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Abbruch
+LSAVEASBUTTON=Speichern als...
+LANALYZEBUTTON=Analysieren
+LDEFRAGBUTTON=Defragmentieren
+LCLOSEBUTTON=Schließen
+LRESTARTBUTTON=Neustart
+LLATERBUTTON=Später
+LREPORTBUTTON=Report erstellen...
+LSTOPBUTTON=Anhalten
+LBROWSEBUTTON=Durchsuchen...
+LERROR=Fehler
+LENABLED=eingeschaltet
+LDISABLED=ausgeschaltet
+LNOTSUPPORTED=Nicht unterstützt
+LREGREPLACE=Error - RegReplaceKey ist deaktiviert. Bitte Windows neu starten und nochmals versuchen.
+LRESTOREPOINTNOT=Wiederherstellungspunkt nicht unterstützt.
+LCREATINGRESTORE=Wiederherstellungspunkt wird erstellt...
+LNEVERUSED=Niemals benutzt
+
+;MAIN WINDOW
+LNEVERUSED=Niemals benutzt
+LMENUOPTIONS=Optionen
+LMENUHELP=Hilfe
+LMENUABOUT=Über
+LOVERVIEW=Überblick
+LLASTDEFRAG=Letzte Defragmentierung:
+LSIZERECOVERED=Reduzierte Größe:
+LPERCENT=Prozent:
+LWOULDLIKE=Was möchten Sie tun?
+LDEFRAGTITLE=Registry defragmentieren
+LREGINFOTITLE=Registry-Information
+LUPDATEOK=Aktuellste Version installiert.
+LUPDATEDISABLED=Automatische Updateprüfung ausgeschaltet.
+LUPDATENEW=Neue Version verfügbar.
+LUPDATEWAIT=Prüfe auf neue Version. Bitte warten.
+LMOREINFO=Mehr Info...
+LUPDATES=Updates
+
+;ABOUT WINDOW
+LABOUTTITLE=Über
+LVERSION=Version
+LICON=Icons entwickelt von
+
+;OPTIONS WINDOW
+LOPTIONS=Optionen
+LOPTIONSDESCRIPTION=Programmeinstellungen.
+LSETTINGS=Allgemeine Einstellungen
+LLANGUAGE=Sprache
+LCHKCHECKUPDATE=Automatisch nach neuen Versionen suchen.
+LCHECKNOW=Prüfe auf neue Version...
+LCHKDEFRAGMYCOMPUTER=Kontextmenü Arbeitsplatz um "Registry defragmentieren..." erweitern 
+LCHKREGINFOMYCOMPUTER=Kontextmenü Arbeitsplatz um "Registry-Informationen anzeigen" erweitern
+LBACKUPS=Backups
+LAUTOREGFILES=Automatisches Backup der Registry vor Defragmentierung
+LAUTORESTOREPOINT=Automatischer Wiederherstellungspunkt vor Defragmentierung
+LBACKUPFOLDER=Ordner für Backups:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Informationen
+LREGINFODESCRIPTION=Information über die Registry-Dateien von Windows.
+LSO=Betriebssystem:
+LUSER=Angemeldeter Benutzer:
+LREGSIZE=Registry-Größe:
+LCOLUMNPATH=Pfad
+LCOLUMNSIZE=Größe
+LREGISTRYFILES=Registry-Dateien
+LNUMBERFILES=Anzahl Dateien:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnostik
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Hive-Name:
+LLOGICALPATH=Logischer Pfad:
+LMAPPATH=Abgebildeter Pfad:
+LTEMPPATH=Temporärer Pfad:
+LHIVESIZE=Hive-Größe:
+LKEY=Schlüssel:
+LVALIDFILE=Datei existiert.
+LNOTVALIDFILE=Datei existiert nicht.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Registry-Dateien optimieren und komprimieren.
+LTITLEPROBLEM=Problem und Lösungen
+LMAINTEXT=Die Registry-Dateien werden während des normalen Betriebs permanent beschrieben und geändert und können daher fragmentieren. RegDefrag optimiert die Registry-Daten, indem Fragmente und verschwendeter Platz wieder frei gegeben werden.
+LBENEFITS=Quicksys RegDefrag steigert die System-Performance und erhöht die Zugriffsgeschwindigkeit auf die Registry-Daten.
+LTITLESTEPS=Schritte
+LSTEP1=1. Registry analysieren.
+LSTEP2=2. Ergebnisse betrachten und bewerten.
+LSTEP3=3. Registry defragmentieren. Neustart ist obligatorisch.
+LTITLEANALYZE="Analysieren" klicken, um fortzufahren.
+LAUTOBACKUP=Automatisches Backup:
+LAUTORESTORE=Automatischer Wiederherstellungspunkt:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Registry wird analysiert. Bitte warten.
+LPROGRESS=Fortschritt:
+LREADING=Prüfe... 
+LSTOPPROCESS=Anhalten...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Ergebnis der Analyse
+LCOMPARATION=Vergleich
+LCONCLUSION=Zusammenfassung
+LREGISTRYFRAGMENTATION=Fragmentierung der Registry
+LCURRENTSIZE=Derzeitige Registry-Größe:
+LNEWSIZE=Neue Registry-Größe:
+LSIZEDIFFERENCE=Unterschied:
+LLEGFRAG=fragmentiert
+LLEGALLOC=vorgesehener Platz
+LBACKREGFILES=Registry-Backup erstellen:
+LBACKRESTORE=Wiederherstellungspunkt erstellen:
+LCONCLUSION=Zusammenfassung
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defragmentierung beendet!
+LFINISHED=Erfolgreich abgeschlossen.
+LRESTARTREQUIRED=System muß neu gestartet werden, damit die Änderungen wirksam werden.
+LRESTARTMSGBOX=Soll das System jetzt neu gestartet werden?
+LHTMLREPORT=HTML-Report kann erstellt werden mit den Informationen über die Defragmentierung.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Das Sytem muß erst neu gestarter werden, bevor eine weitere Analyse durchgeführt werden kann.
+LDEFRAGMSGBOX1=Bitte alle Programme schließen.
+LDEFRAGMSGBOX2=Analyse kann einige Minuten in Anspruch nehmen.
+LDEFRAGMSGBOX3=Währenddessen kann das System ausgelastet sein.
+LDEFRAGMSGBOX4=Um fortzufahren, bitte mit "Ja" bestätigen.
+LFEWFRAGMENTS=Nur wenige Fragmente gefunden. Registry muß nicht defragmentiert werden.
+LNOFRAGMENTS=Keine Fragmente gefunden. Registry kann nicht defragmentiert werden.
+LTOOFRAGMENTS=Zu viele Fragmente gefunden. Registry mit "Defragmentieren" optimieren und komprimieren.
+
+;REPORT 
+LNAMEREPORT=Report
+LH1=Defragmentierungsreport
+LCREATEDBY=Erstellt von
+LDATE=Datum:
+LTIME=Zeit:
+LSUMMARY=Zusammenfassung
+LREGPROCESSED=Registry-Dateien verarbeitet:
+LREGANASTART=Analyse gestartet:
+LREGANAFINISHED=Analyse beendet:
+LREGTOTALFINISHED=Analysedauer:
+LREGSIZEBEFORE=Registry-Größe vorher:
+LREGSIZEAFTER=Registry-Größe nachher:
+LREGSIZEDIFFERENCE=Unterschied:
+LREGFILESSUMMARY=Zusammenfassung
+LCOLUMNREGFILE=Registry-Datei
+LCOLUMNREGBEFORE=Größe vorher
+LCOLUMNAFTER=Größer nachher
+LCOLUMNDIFFERENCE=Unterschied
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Registry wird defragmentiert
+LDEFRAGNOW=Defragmentierung von 

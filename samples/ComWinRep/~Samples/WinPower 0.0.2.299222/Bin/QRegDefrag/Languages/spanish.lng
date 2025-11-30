@@ -1,0 +1,158 @@
+﻿
+[Español] 
+;Translated by Ricardo A. Rivas
+
+;COMMON VALUES 
+LOKBUTTON=Aceptar 
+LCANCELBUTTON=Cancelar 
+LSAVEASBUTTON=Guardar como...
+LANALYZEBUTTON=Analizar
+LDEFRAGBUTTON=Desfragmentar
+LCLOSEBUTTON=Cerrar
+LRESTARTBUTTON=Ahora
+LLATERBUTTON=Después
+LREPORTBUTTON=Generar informe
+LSTOPBUTTON=Detener
+LBROWSEBUTTON=Buscar
+LERROR=Error
+LENABLED=Habilitado
+LDISABLED=Inhabilitado
+LNOTSUPPORTED=Inviable
+LREGREPLACE=Error - RegReplaceKey está inhabilitado. Sírvase reiniciar Windows para intentarlo de nuevo.
+LRESTOREPOINTNOT=Punto de restauración inviable.
+LCREATINGRESTORE=Creando punto de restauración...
+
+;MAIN WINDOW 
+LNEVERUSED=Ninguna 
+LMENUOPTIONS=Opciones 
+LMENUHELP=Ayuda 
+LMENUABOUT=Acerca de... 
+LOVERVIEW=Informe 
+LLASTDEFRAG=Última desfragmentación: 
+LSIZERECOVERED=Tamaño recuperado: 
+LPERCENT=Porcentaje: 
+LWOULDLIKE=¿Qué desea hacer? 
+LDEFRAGTITLE=Desfragmentar Registro 
+LREGINFOTITLE=Información del Registro 
+LUPDATEOK=Versión actual 
+LUPDATEDISABLED=Actualización automática inhabilitada 
+LUPDATENEW=Nueva versión disponible 
+LUPDATEWAIT=Buscando nuevas versiones... Sírvase esperar. 
+LMOREINFO=Mayor información 
+LUPDATES=Actualizaciones 
+
+;ABOUT WINDOW 
+LABOUTTITLE=Acerca de 
+LVERSION=Versión 
+LICON=Iconos creados por 
+
+;OPTIONS WINDOW 
+LOPTIONS=Opciones 
+LOPTIONSDESCRIPTION=Personalizar programa 
+LSETTINGS=Generales 
+LLANGUAGE=Idioma 
+LCHKCHECKUPDATE=Buscar actualizaciones automáticamente 
+LCHECKNOW=Buscar actualizaciones 
+LCHKDEFRAGMYCOMPUTER=Añadir "Desfragmentar Registro" a menú contextual de Mi PC 
+LCHKREGINFOMYCOMPUTER=Añadir "Información de Registro" a menú contextual de Mi PC 
+LBACKUPS=Respaldo 
+LAUTOREGFILES=Respaldar automáticamente archivos de registro antes de desfragmentar 
+LAUTORESTOREPOINT=Crear automáticamente punto de restauración antes de desfragmentar 
+LBACKUPFOLDER=Directorio de respaldo: 
+
+;REGISTRY INFORMATIONS WINDOW 
+LINFORMATIONS=Información 
+LREGINFODESCRIPTION=Información del Registro de Windows 
+LSO=Sistema operativo: 
+LUSER=Usuario: 
+LREGSIZE=Tamaño del registro:
+LCOLUMNPATH=Ruta 
+LCOLUMNSIZE=Tamaño 
+LREGISTRYFILES=Ficheros de registro
+LNUMBERFILES=Cifra de ficheros:
+
+;DIAGNOSTICS WINDOW 
+LDIAGTITLE=Diagnóstico 
+
+;DIAGNOSTIC WINDOW - ADDITIONAL 
+LHIVENAME=Nombre de rama: 
+LLOGICALPATH=Ruta lógica: 
+LMAPPATH=Ruta de mapa: 
+LTEMPPATH=Ruta temporal: 
+LHIVESIZE=Tamaño de rama: 
+LKEY=Clave: 
+LVALIDFILE=Fichero existente 
+LNOTVALIDFILE=Ficheiro inexistente 
+
+;DEFRAG WINDOW - Primera pantalla 
+LDEFRAGDESCRIPTION=Optimizar y compactar Registro de Windows 
+LTITLEPROBLEM=Problema y solución 
+LMAINTEXT=El registro sufre constantes modificaciones durante el funcionamiento de Windows. Con el tiempo, la información se fragmenta cada vez más. Este programa optimiza el registro al eliminar fragmentos y espacio desperdiciado en los archivos del registro de Windows. 
+LBENEFITS=Quicksys RegDefrag mejora el funcionamiento del sistema y acelera el acceso al registro. 
+LTITLESTEPS=Pasos 
+LSTEP1=1. Analizar el registro.
+LSTEP2=2. Verificar resultados del análisis. 
+LSTEP3=3. Desfragmentar el registro. Se requiere reiniciar el sistema. 
+LTITLEANALYZE=Pulsar "Analizar" para iniciar proceso. 
+LAUTOBACKUP=Respaldo automático: 
+LAUTORESTORE=Punto de restauración automático: 
+
+;DEFRAG WINDOW - Segunda pantalla 
+LSTATUSANALYZING=Analizando registro... Sírvase esperar. 
+LPROGRESS=Progreso: 
+LREADING=Verificando: 
+LSTOPPROCESS=Deteniendo proceso...
+
+;DEFRAG WINDOW - Tercera pantalla 
+LRESULTS=Análisis de resultados 
+LCOMPARATION=Comparación 
+LCONCLUSION=Conclusión 
+LREGISTRYFRAGMENTATION=Fragmentación del registro: 
+LCURRENTSIZE=Tamaño del registro: 
+LNEWSIZE=Nuevo tamaño del registro: 
+LSIZEDIFFERENCE=Diferencia de tamaño: 
+LLEGFRAG=fragmentado 
+LLEGALLOC=no fragmentado 
+LBACKREGFILES=Crear respaldo de archivos registro 
+LBACKRESTORE=Crear punto de restauración 
+LCONCLUSION=Conclusión 
+
+;DEFRAG WINDOW - Cuarta pantalla 
+LDEFRAGCOMPLETED=¡Desfragmentación finalizada! 
+LFINISHED=Finalizada satisfactoriamente. 
+LRESTARTREQUIRED=Se debe reiniciar la computadora para procesar cambios. 
+LRESTARTMSGBOX=¿Desea reiniciar la computadora? 
+LHTMLREPORT=Es posible generar reporte HTML con información acerca de la desfragmentación. 
+
+;DEFRAG WINDOW - Otros 
+LREDEFRAGRESTART=Es necesario reiniciar la computadora para efectuar un nuevo análisis. 
+LDEFRAGMSGBOX1=Es necesario cerrar todos los programas. 
+LDEFRAGMSGBOX2=El análisis podría tardar varios minutos. 
+LDEFRAGMSGBOX3=Tal vez la computadora se "cuelgue". LDEFRAGMSGBOX4=Para continuar, pulse "Sí" o "Yes". 
+LFEWFRAGMENTS=Hay pocos fragmentos. No es necesario desfragmentar el registro. 
+LNOFRAGMENTS=No hay fragmentos. No es posible desfragmentar el registro. 
+LTOOFRAGMENTS=Hay demasiados fragmentos. Pulse "Desfragmentar" para optimizar el registro. 
+
+;REPORT 
+LNAMEREPORT=Informe 
+LH1=Informe de desfragmentación 
+LCREATEDBY=Creado por 
+LDATE=Fecha: 
+LTIME=Hora: 
+LSUMMARY=Resumen de desfragmentación: 
+LREGPROCESSED=Ficheros de registro procesados: 
+LREGANASTART=Análisis del registro iniciado: 
+LREGANAFINISHED=Análisis del registro finalizado: 
+LREGTOTALFINISHED=Duración de análisis del registro: 
+LREGSIZEBEFORE=Tamaño previo del registro: 
+LREGSIZEAFTER=Tamaño posterior del registro: 
+LREGSIZEDIFFERENCE=Diferencia de tamaño del registro: 
+LREGFILESSUMMARY=Resumen de ficheros de registro 
+LCOLUMNREGFILE=Fichero de registro 
+LCOLUMNREGBEFORE=Tamaño previo 
+LCOLUMNAFTER=Tamaño posterior 
+LCOLUMNDIFFERENCE=Diferencia de tamaño 
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Desfragmentando registro 
+LDEFRAGNOW=Desfragmentando...

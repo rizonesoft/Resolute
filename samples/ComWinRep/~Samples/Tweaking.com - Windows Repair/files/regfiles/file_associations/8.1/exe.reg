@@ -1,0 +1,56 @@
+Windows Registry Editor Version 5.00
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.EXE\UserChoice]
+[-HKEY_CURRENT_USER\Software\Classes\.exe]
+[-HKEY_CURRENT_USER\Software\Classes\secfile]
+[-HKEY_CLASSES_ROOT\secfile]
+[-HKEY_CLASSES_ROOT\.exe\shell\open\command]
+
+[HKEY_CLASSES_ROOT\.exe]
+@="exefile"
+"Content Type"="application/x-msdownload"
+
+[HKEY_CLASSES_ROOT\.exe\PersistentHandler]
+@="{098f2470-bae0-11cd-b579-08002b30bfeb}"
+
+[HKEY_CLASSES_ROOT\exefile]
+@="Application"
+"EditFlags"=hex:38,07,00,00
+"TileInfo"="prop:FileDescription;Company;FileVersion"
+"InfoTip"="prop:FileDescription;Company;FileVersion;Create;Size"
+
+[HKEY_CLASSES_ROOT\exefile\DefaultIcon]
+@="%1"
+
+[HKEY_CLASSES_ROOT\exefile\shell]
+
+[HKEY_CLASSES_ROOT\exefile\shell\open]
+"EditFlags"=hex:00,00,00,00
+
+[HKEY_CLASSES_ROOT\exefile\shell\open\command]
+@="\"%1\" %*"
+
+[HKEY_CLASSES_ROOT\exefile\shell\runas]
+
+[HKEY_CLASSES_ROOT\exefile\shell\runas\command]
+@="\"%1\" %*"
+
+[HKEY_CLASSES_ROOT\exefile\shellex]
+
+[HKEY_CLASSES_ROOT\exefile\shellex\DropHandler]
+@="{86C86720-42A0-1069-A2E8-08002B30309D}"
+
+[HKEY_CLASSES_ROOT\exefile\shellex\PropertySheetHandlers]
+
+[HKEY_CLASSES_ROOT\exefile\shellex\PropertySheetHandlers\PEAnalyser]
+@="{09A63660-16F9-11d0-B1DF-004F56001CA7}"
+
+[HKEY_CLASSES_ROOT\exefile\shellex\PropertySheetHandlers\PifProps]
+@="{86F19A00-42A0-1069-A2E9-08002B30309D}"
+
+[HKEY_CLASSES_ROOT\exefile\shellex\PropertySheetHandlers\ShimLayer Property Page]
+@="{513D916F-2A8E-4F51-AEAB-0CBC76FB1AF8}"
+
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.EXE\OpenWithProgids]
+"exefile"=hex(0):

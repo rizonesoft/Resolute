@@ -1,0 +1,201 @@
+;
+; This is the localization file for ERDNTWIN v1.1 .
+;
+; IMPORTANT: This file is not compatible with
+; ERDNTWIN v1.0 !
+;
+; Only change lines beginning with #
+;
+; Other #'s or ##'s in a line are replaced at
+; runtime with certain text strings (file names
+; etc.), so include them in your translation!
+;
+; To make sure OEM characters are saved correctly,
+; please use a Windows based text editor (such as
+; Notepad) to edit this file.
+;
+
+: 1
+; 1 line only
+# ERD for Windows NT
+
+: 2
+; multiple lines possible
+# Emergency Recovery Disk NT -
+# Registry Restore for Windows NT/2000/XP
+
+: 3
+; 1 line only
+# Written by
+
+: 4
+; 1 line only
+# Welcome!
+
+: 5
+; multiple lines possible
+# With this program you can restore a registry
+# backup of your Windows NT/2000/XP system.
+
+: 6
+; multiple lines possible
+# Syntax:
+#
+# ERDNT
+#
+# - or -
+#
+# ERDNT silent [sysreg] [curuser] [otherusers]
+# [/mode:nt|filecopy] [/nobackup] [/noprogresswindow] [/reboot]
+
+: 7
+; 1 line only
+# Error!
+
+: 8
+; multiple lines possible
+# Could not open file:
+# #
+
+: 9
+; multiple lines possible
+# The file #
+# does not contain any restoration entries!
+
+: 10
+; 1 line only
+# Warning!
+
+: 11
+; multiple lines possible
+# System variable %SystemRoot% is empty!
+#
+# Continue anyway?
+
+: 12
+; 2 lines here
+# Restoring a registry backup created
+# #
+
+: 13
+; 1 line only
+# Restoration options
+
+: 14
+; 1 line only
+# &System registry
+
+: 15
+; 1 line only
+# Current user &registry
+
+: 16
+; 2 lines here
+# Other saved &user registries
+# &User registries
+
+: 17
+; 1 line only
+# Restoration mode
+
+: 18
+; 1 line only
+# &Auto
+
+: 19
+; 2 lines here
+# &NT
+# &File copy
+
+: 20
+; 1 line only
+# &Backup current registry files
+
+: 21
+; 2 lines here
+# &OK
+# &Cancel
+
+: 22
+; multiple lines possible
+# Disable "Auto" mode only if you are experiencing problems
+# restoring the registry. Selecting the wrong restoration
+# mode may lead to unexpected results.
+#
+# Continue?
+
+: 23
+; multiple lines possible
+# At least one restoration option must be selected.
+
+: 24
+; multiple lines possible
+# No restoration entries found
+# for the selected options!
+
+: 25
+; multiple lines possible
+# No restoration entries found
+# for the system registry.
+
+: 26
+; multiple lines possible
+# No restoration entries found
+# for the current user.
+
+: 27
+; multiple lines possible
+# No restoration entries found
+# for other users.
+
+: 28
+; multiple lines possible
+# Restoration of the remaining
+# registries will continue.
+
+: 29
+; 1 line only
+# Restoring registry
+
+: 30
+; 1 line only
+# Current file:
+
+: 31
+; 1 line only
+# # of ## files restored
+
+: 32
+; multiple lines possible
+# Current registry file not found:
+# #
+#
+# Restore this file?
+
+: 33
+; multiple lines possible
+# Unable to create a backup of the
+# current registry file
+# # !
+#
+# Continue restoration of this file?
+
+: 34
+; multiple lines possible
+# Error restoring
+# #
+# to
+# ## !
+#
+# Continue with the next file?
+
+: 35
+; multiple lines possible
+# Restoration of the registry is complete!
+
+: 36
+; multiple lines possible
+# The computer must be rebooted to activate
+# the new registry.
+#
+# Reboot the computer now?

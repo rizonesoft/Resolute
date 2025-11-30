@@ -1,0 +1,6 @@
+[General]
+action=backup
+application=Thunderbird
+profile=Default
+output=D:\<application> <version> - <year>-<month>-<day>.pcv
+password=

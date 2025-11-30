@@ -1,0 +1,78 @@
+ModernMenu possible commands:
+----------------------------
+*** Common parameters ***
+bUseAdvMenu - switch on/off GUI advanced menu
+bUseAdvTrayMenu - switch on/off Tray advanced menu
+bUseRGBColors - use RGB colors instead of BGR colors (default BGR)
+
+
+----------------------------
+
+*** GUI menu color commands ***
+
+_SetMenuBkColor(Color)
+_SetMenuIconBkColor(Color)
+_SetMenuIconBkGrdColor(Color)
+_SetMenuSelectBkColor(Color)
+_SetMenuSelectRectColor(Color)
+_SetMenuSelectTextColor(Color)
+_SetMenuTextColor(Color)
+
+
+*** GUI menu item commands ***
+
+_GUICtrlCreateODMenuItem(Text, ParentMenuID [, IconFile [, IconID [, Radio]]])
+_GUICtrlCreateODMenu(Text, ParentMenuID [, IconFile [, IconID]])
+_GUICtrlODMenuItemSetText(MenuID, Text)
+_GUICtrlODMenuItemSetIcon(MenuID [, IconFile], IconID]])
+_GUICtrlODMenuItemSetSelIcon(MenuID [, IconFile ], IconID]])
+_GUICtrlODMenuItemDelete(MenuID)
+
+
+----------------------------
+
+*** Tray menu color/flash commands ***
+
+_SetTrayBkColor(Color)
+_SetTrayIconBkColor(Color)
+_SetTrayIconBkGrdColor(Color)
+_SetTraySelectBkColor(Color)
+_SetTraySelectRectColor(Color)
+_SetTraySelectTextColor(Color)
+_SetTrayTextColor(Color)
+_SetFlashTimeOut([ToggleTimeout])
+
+
+*** Tray menu item commands ***
+_TrayCreateContextMenu([TrayIconID])
+_TrayCreateItem(Text [, TrayParentMenuID [, MenuEntryPos [, Radio]]])
+_TrayCreateMenu(Text [, TrayParentMenuID [, MenuEntryPos]])
+_TrayItemSetIcon(TrayMenuID [, IconFile [, IconID]])
+_TrayItemSetSelIcon(TrayMenuID [, IconFile [, IconID]])
+_TrayItemSetText([TrayMenuID [, Text]])
+_TrayDeleteItem(TrayMenu/itemID)
+
+
+*** Tray icon commands ***
+
+_TrayIconCreate([ToolTip [, IconFile [, IconID [, Callback [, Msg [, hIcon]]]]]])
+_TrayIconSetState([TrayIconID [, State]])
+_TrayIconSetClick(TrayIconID, Clicks)
+_TrayIconSetIcon([TrayIconID [, IconFile [, IconID]]])
+_TrayIconSetToolTip([TrayIconID [, ToolTip]])
+_TrayIconDelete(TrayIconID)
+_TrayTip(TrayIconID, Title, Text [, TimeOut [, InfoFlags]])
+_TrayGetMenuHandle(TrayIconID)
+
+
+----------------------------
+
+*** Side Menu commands ***
+
+_CreateSideMenu(MenuID) ; returns a SideMenuID/index
+_DeleteSideMenu(SideMenuID) ; delete a menu sidebar
+_SetSideMenuText(SideMenuID, Text) ; set a text for the sidebar
+_SetSideMenuColor(SideMenuID, Color) ; set text color
+_SetSideMenuBkColor(SideMenuID, Color) ; set text background color
+_SetSideMenuBkGradColor(SideMenuID, Color) ; set text background gradient color
+_SetSideMenuImage(SideMenuID, Bitmapfile [, Resourcename/number [, Expand/Compress Bitmap]])

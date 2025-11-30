@@ -1,0 +1,64 @@
+<presets>
+ <facility name="lame">
+  <preset name="High Quality: HiFi, home or quiet listening">
+   <comment>
+      This preset (~190 kbps) will produce transparent encoding (transparent = most people cannot distinguish the mp3 from the original in an ABX blind test).
+      The preset is equivalent to the old "--preset fast standard" preset.
+      Command line used: "-V2 --vbr-new"
+   </comment>
+   <value name="lameQualityOrBitrate">1</value>
+   <value name="lameQuality">2</value>
+   <value name="lameVBRMode">1</value>
+   <value name="lameHideSettings">1</value>
+  </preset>
+
+  <preset name="High Quality: Continuous album encoding (nogap encoding)">
+   <comment>
+      Album preset that additionally uses the "nogap" feature of LAME.
+      This preset is the same as the "High Quality" one, except that it enables LAME nogap encoding. With this feature turned on, you can encode continuous mix CD's to mp3 safely. When playing back the created mp3's (e.g. with Winamp + gapless output plugin), there will be no hearable clicks, pops or gaps.
+      Command line used: "-V2 --vbr-new --nogap"
+   </comment>
+   <value name="lameQualityOrBitrate">1</value>
+   <value name="lameQuality">2</value>
+   <value name="lameVBRMode">1</value>
+   <value name="lameHideSettings">1</value>
+   <value name="lameNoGap">1</value>
+  </preset>
+
+  <preset name="Archiving: Best Quality">
+   <comment>
+      This is the strongest setting for MP3, with the lowest risk of artifacts. With the exception of a few situations, quality is rarely better than the highest VBR profiles.
+      Command line used: "-b 320 --cbr"
+   </comment>
+   <value name="lameQualityOrBitrate">0</value>
+   <value name="lameBitrate">320</value>
+   <value name="lameCBR">1</value>
+   <value name="lameHideSettings">1</value>
+  </preset>
+
+  <preset name="Portable: background noise and low bitrate requirement, small sizes">
+   <comment>
+      This preset will produce files suitable listening to on a portable (~115 kbps).
+      Command line used: "-V6 --vbr-new"
+   </comment>
+   <value name="lameQualityOrBitrate">1</value>
+   <value name="lameQuality">6</value>
+   <value name="lameVBRMode">1</value>
+   <value name="lameHideSettings">1</value>
+  </preset>
+
+  <preset name="VirtualDub: audio track compression, CBR at 128 kbps">
+   <comment>
+      This preset will produce "wave mp3" files suitable VirtualDub audio mp3 compression, CBR 128 kbps (VBR and ABR are unsuitable here, since the audio track has to be in sync with the video track).
+      This preset can be used to compress audio streams to mp3, for use e.g. in VirtualDub. A RIFF WAVE Header is prepended to the mp3 data, and the file extension will be ".wav".
+      It uses constant bitrate encoding at 128 kbps.
+      Command line used: "-b 128 --cbr"
+   </comment>
+   <value name="lameQualityOrBitrate">0</value>
+   <value name="lameBitrate">128</value>
+   <value name="lameCBR">1</value>
+   <value name="lameHideSettings">1</value>
+   <value name="lameWriteWaveHeader">1</value>
+  </preset>
+ </facility>
+</presets>

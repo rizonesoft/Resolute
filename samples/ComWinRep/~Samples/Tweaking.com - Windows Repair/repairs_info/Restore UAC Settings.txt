@@ -1,0 +1,3 @@
+Restore UAC (User Account Control) Settings
+
+This will restore the default registry settings for the UAC in Windows.

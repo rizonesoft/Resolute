@@ -1,0 +1,168 @@
+﻿
+[Italiano]
+;Tradotto da Giacomo Margarito
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Annulla
+LSAVEASBUTTON=Salva Come...
+LANALYZEBUTTON=Analizza
+LDEFRAGBUTTON=Deframmenta
+LCLOSEBUTTON=Chiudi
+LRESTARTBUTTON=Riavvia
+LLATERBUTTON=Dopo
+LREPORTBUTTON=Genera Rapporto...
+LSTOPBUTTON=Stop
+LBROWSEBUTTON=Sfoglia...
+LERROR=Errore
+LENABLED=Abilitato
+LDISABLED=Disabilitato
+LNOTSUPPORTED=Non Supportato
+LREGREPLACE=Error - RegReplaceKey è disabilitato. Riavviare Windows e riprovare.
+LRESTOREPOINTNOT=Punto di Ripristino non supportato.
+LCREATINGRESTORE=Creazione Punto di Ripristino...
+LNEVERUSED=Non Usato
+
+;MAIN WINDOW
+LNEVERUSED=Non Usato
+LMENUOPTIONS=Opzioni
+LMENUHELP=Aiuto
+LMENUABOUT=Informazioni
+LOVERVIEW=Anteprima
+LLASTDEFRAG=Ultima deframmentazione:
+LSIZERECOVERED=Spazio Recuperato:
+LPERCENT=Percentuale:
+LWOULDLIKE=Cosa volete fare?
+LDEFRAGTITLE=Deframmenta Registro
+LREGINFOTITLE=Mostra Informazioni sul Registro
+LUPDATEOK=State utilizzando l'ultima versione.
+LUPDATEDISABLED=Controllo automatico aggiornamenti disabilitato.
+LUPDATENEW=È disponibile una nuova versione.
+LUPDATEWAIT=Controllo nuova versione in corso. Attendere.
+LMOREINFO=Maggiori informazioni...
+LUPDATES=Aggiornamenti
+
+;ABOUT WINDOW
+LABOUTTITLE=Informazioni
+LVERSION=Versione
+LICON=Icone prodotte da
+
+;OPTIONS WINDOW
+LOPTIONS=Opzioni
+LOPTIONSDESCRIPTION=Impostazioni del programma.
+LSETTINGS=Impostazioni Generali
+LLANGUAGE=Lingua
+LCHKCHECKUPDATE=Controlla Automaticamente Aggiornamenti
+LCHECKNOW=Controlla aggiornamenti ora...
+LCHKDEFRAGMYCOMPUTER=Aggiungi "Deframmenta Registro..." nel menu contestuale
+LCHKREGINFOMYCOMPUTER=Aggiungi "Mostra Informazioni sul Registro" nel menu contestuale
+LBACKUPS=Backup
+LAUTOREGFILES=Crea backup automatico dei file di registro prima della deframmentazione
+LAUTORESTOREPOINT=Crea punto di ripristino automatico prima della deframmentazione
+LBACKUPFOLDER=Cartella dei Backup:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Informazioni
+LREGINFODESCRIPTION=Informazioni sul registro di Windows.
+LSO=Sistema Operativo:
+LUSER=Utente Attivo:
+LREGSIZE=Dimensione Registro:
+LCOLUMNPATH=Percorso
+LCOLUMNSIZE=Dimensione
+LREGISTRYFILES=File Registro
+LNUMBERFILES=Numero di File:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnostica
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Nome dell'alveare:
+LLOGICALPATH=Percorso Logico:
+LMAPPATH=Mappa Percorso:
+LTEMPPATH=Percorso Temp:
+LHIVESIZE=Dimensione dell'alveare:
+LKEY=Chiave:
+LVALIDFILE=File esistente.
+LNOTVALIDFILE=File non esistente.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Ottimizza e Compatta il Registro di Windows.
+LTITLEPROBLEM=Problemi e Soluzioni
+LMAINTEXT=I dati del Registro di Sistema vengono sempre scritti e rimossi durante le normali operazioni. Nel corso del tempo questi dati si deframmentano. Questo programma ottimizza il Registro eliminando i frammenti e lo spreco di spazio nei file di registro di Windows. 
+LBENEFITS=Quicksys RegDefrag aumenta le prestazioni del sistema e acccelera l'accesso al registro.
+LTITLESTEPS=Passi
+LSTEP1=1. Analisi del registro.
+LSTEP2=2. Ricontrollo dei risultati dell'analisi.
+LSTEP3=3. Deframmenta il registro. Riavvio necessario.
+LTITLEANALYZE=Cliccate "Analizza" per avviare il processo.
+LAUTOBACKUP=Backup Automatico:
+LAUTORESTORE=Punto di Ripristino Automatico:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analisi del registro in corso. Attendere.
+LPROGRESS=Avanzamento:
+LREADING=Controllo:
+LSTOPPROCESS=Arresto del processo in corso...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Risultati Analisi
+LCOMPARATION=Confronto
+LCONCLUSION=Conclusioni
+LREGISTRYFRAGMENTATION=Frammentazione Registro
+LCURRENTSIZE=Dimensione attuale del Registro:
+LNEWSIZE=Nuova Dimensione Registro:
+LSIZEDIFFERENCE=Differenze:
+LLEGFRAG=frammentato
+LLEGALLOC=spazio occupato
+LBACKREGFILES=Crea backup dei file di registro:
+LBACKRESTORE=Crea punto di ripristino:
+LCONCLUSION=Conclusioni
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defrag Completato!
+LFINISHED=Terminato con successo.
+LRESTARTREQUIRED=È necessario riavviare il computer per applicare i cambiamenti.
+LRESTARTMSGBOX=Volete riavviare adesso?
+LHTMLREPORT=Potete generare un rapporto in HTML con incluse le informazioni sulla deframmentazione
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=È necessario riavviare il computer prima di avviare una nuova analisi.
+LDEFRAGMSGBOX1=Chiudi tutti i programmi.
+LDEFRAGMSGBOX2=L'analisi può durare diversi minuti.
+LDEFRAGMSGBOX3=Durante questo processo, il computer potrebbe non rispondere.
+LDEFRAGMSGBOX4=Per iniziare, cliccare "Sì".
+LFEWFRAGMENTS=Trovati alcuni frammenti. Non è necessario deframmentare il registro.
+LNOFRAGMENTS=Nessun frammento trovato. Non è possibile deframmentare il registro.
+LTOOFRAGMENTS=Troppi frammenti trovati. Cliccate "Deframmenta" per ottimizzare il registro.
+
+;REPORT
+LNAMEREPORT=Rapporto
+LH1=Rapporto Deframmentazione
+LCREATEDBY=Creato da
+LDATE=Data:
+LTIME=Ora:
+LSUMMARY=Sommario Deframmentazione
+LREGPROCESSED=File registro elaborati:
+LREGANASTART=Analisi registro avviata:
+LREGANAFINISHED=Analisi registro terminata:
+LREGTOTALFINISHED=Tempo totale analisi registro:
+LREGSIZEBEFORE=Dimensione registro prima:
+LREGSIZEAFTER=Dimensione registro dopo:
+LREGSIZEDIFFERENCE=Differenza dimensione registro:
+LREGFILESSUMMARY=Sommario File Registro
+LCOLUMNREGFILE=File Registro
+LCOLUMNREGBEFORE=Dimensione Prima
+LCOLUMNAFTER=Dimensione Dopo
+LCOLUMNDIFFERENCE=Differenza Dimensione
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Deframmentazione Registro
+LDEFRAGNOW=Deframmentazione:
+
+;NEW PHRASES! Please, translate!
+;LHTMLCREATED=Rapporto in HTML creato con successo. 
+;LOPENNOW=Aprire Ora?
+;LNOTHTMLCREATED=Errore! Il rapporto in HTML NON è stato creato con successo.
+;LFILE=File
+;LFREESPACE=Spazio insufficiente per la deframmentazione. Controllate e riprovate.
+;LERROREGREAD=Errore! Non è possibile leggere le informazioni sul registro.

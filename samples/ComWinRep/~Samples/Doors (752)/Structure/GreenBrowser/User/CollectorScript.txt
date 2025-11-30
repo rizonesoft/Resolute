@@ -1,0 +1,13 @@
+##########################################################################
+## How to run collector selected script text
+## 1. Select script text in collector from <script> to </script>. 
+## 2. Click "Run Selected Script Text" button in collector.
+## 3. If you want to run script in all page, press "Ctrl" key when click.
+##########################################################################
+
+==========================================================================
+== Unlock Mouse Left Right Click
+==========================================================================
+<script language="JavaScript">
+function enableCtxt(){ if (event != null) event.cancelBubble=false; return true;}document.onmousedown=enableCtxt;document.oncontextmenu=enableCtxt;document.onmouseup=enableCtxt;document.onselectstart=enableCtxt;var frs=document.frames;if (frs != null){    for (i=0; i < frs.length; i++)    {        frs[i].document.onmousedown=enableCtxt;        frs[i].document.oncontextmenu=enableCtxt;        frs[i].document.onmouseup=enableCtxt;        frs[i].document.onselectstart=enableCtxt;    }}
+</script>

@@ -1,0 +1,10 @@
+Reset Service Permissions:
+
+This repair will reset the permissions on all services on the current system.
+
+The permissions are as follows
+
+ 
+Administrators = Full
+System = Full
+TrustedInstaller = Full

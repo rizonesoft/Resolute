@@ -1,0 +1,166 @@
+﻿[Ukrainian]
+;Translated by Oleg Kravchenko (oleg@kaa.org.ua)
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Відміна
+LSAVEASBUTTON=Зберегти як...
+LANALYZEBUTTON=Аналіз
+LDEFRAGBUTTON=Дефрагментація
+LCLOSEBUTTON=Закрити
+LRESTARTBUTTON=Перезапуск
+LLATERBUTTON=Пізніше
+LREPORTBUTTON=Створити звіт...
+LSTOPBUTTON=Стоп
+LBROWSEBUTTON=Огляд...
+LERROR=Помилка
+LENABLED=Вкл.
+LDISABLED=Вимк.
+LNOTSUPPORTED=Не підтримується
+LREGREPLACE=Помилка: RegReplaceKey заборонений. Перезавантажте Windows та спробуйте ще.
+LRESTOREPOINTNOT=Точка відновлення не підтримується.
+LCREATINGRESTORE=Створення точки відновлення...
+
+;MAIN WINDOW
+LNEVERUSED=Ні
+LMENUOPTIONS=Налаштування
+LMENUHELP=Довідка
+LMENUABOUT=Автора!
+LOVERVIEW=Загальна інформація
+LLASTDEFRAG=Остання дефрагментація:
+LSIZERECOVERED=Вивільнено:
+LPERCENT=Процент:
+LWOULDLIKE=Оберіть дію
+LDEFRAGTITLE=Дефрагментація реєстру
+LREGINFOTITLE=Інформація про реєстр
+LUPDATEOK=У вас остання версія програми.
+LUPDATEDISABLED=Перевірка оновлень вимкнена.
+LUPDATENEW=Доступна нова версія.
+LUPDATEWAIT=Перевірка наявності нової версії. Зачекайте.
+LMOREINFO=Ще...
+LUPDATES=Оновлення
+
+;ABOUT WINDOW
+LABOUTTITLE=Про програму
+LVERSION=Версія
+LICON=Створення значків:
+
+;OPTIONS WINDOW
+LOPTIONS=Налаштування
+LOPTIONSDESCRIPTION=Налаштування параметрів програми.
+LSETTINGS=Загальні налаштування
+LLANGUAGE=Мова
+LCHKCHECKUPDATE=Автоматично перевіряти наявність оновлень
+LCHECKNOW=Знайти оновлення зараз...
+LCHKDEFRAGMYCOMPUTER=Пункт "дефрагментації реєстру..." в контекстному меню Мого комп'ютера
+LCHKREGINFOMYCOMPUTER=Пункт "Інформація про реєстр" у контекстному меню Мого комп'ютера
+LBACKUPS=Резервні копії
+LAUTOREGFILES=Створювати резервні копії файлів реєстру перед дефрагментацією
+LAUTORESTOREPOINT=Створювати точку відновлення перед дефрагментацією
+LBACKUPFOLDER=Папка для резервних копій:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Інформація
+LREGINFODESCRIPTION=Відомості про реєстр Windows.
+LSO=Операційна система:
+LUSER=Користувач:
+LREGSIZE=Розмір реєстру:
+LCOLUMNPATH=Шлях
+LCOLUMNSIZE=Розмір
+LREGISTRYFILES=Файли реєстру
+LNUMBERFILES=Кількість файлів:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Діагностування
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Ім'я вузла:
+LLOGICALPATH=Логічний шлях:
+LMAPPATH=Шлях карти:
+LTEMPPATH=Тимчасовий шлях:
+LHIVESIZE=Розмір вузлу:
+LKEY=Ключ:
+LVALIDFILE=Файл існує.
+LNOTVALIDFILE=Файл не існує.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Оптимізація та стиснення реєстру Windows.
+LTITLEPROBLEM=Проблема та рішення
+LMAINTEXT=При роботі Windows постійно відбувається запис та видалення даних реєстру. Згодом ці дані стають фрагментовані. Дана програма оптимізує реєстр, видаляючи порожні ділянки, фрагменти та марно зайняті місця.
+LBENEFITS=Quicksys RegDefrag покращує загальну продуктивність системи і підвищує швидкість доступу до реєстру.
+LTITLESTEPS=Етапи
+LSTEP1=1. Аналіз реєстру.
+LSTEP2=2. Перегляд результатів аналізу.
+LSTEP3=3. Дефрагментація реєстру. Потрібне перезавантаження ПК.
+LTITLEANALYZE=Натисніть "Аналіз", щоб почати операцію.
+LAUTOBACKUP=Авторезервування:
+LAUTORESTORE=Створення точки відновлення:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Аналіз реєстру. Зачекайте.
+LPROGRESS=Хід виконування:
+LREADING=Перевірка:
+LSTOPPROCESS=Зупинка процесу...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Аналіз результатів
+LCOMPARATION=Порівняння
+LCONCLUSION=Висновок
+LREGISTRYFRAGMENTATION=Фрагментація реєстру
+LCURRENTSIZE=Поточний розмір реєстру:
+LNEWSIZE=Новий розмір реєстру :
+LSIZEDIFFERENCE=Різниця в розмірах:
+LLEGFRAG=фрагментоване
+LLEGALLOC=розподілено
+LBACKREGFILES=Створення копій файлів реєстру:
+LBACKRESTORE=Створення точки відновлення:
+LCONCLUSION=Висновок
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Дефрагментація виконана.
+LFINISHED=Процес успішно завершено.
+LRESTARTREQUIRED=Щоб зміни вступили в силу, необхідно перезавантажити комп'ютер.
+LRESTARTMSGBOX=Перезавантажити ПК зараз?
+LHTMLREPORT=Зараз можна створити HTML-звіт з інформацією про дефрагментацію.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Щоб почати новий аналіз, необхідно перезавантажити комп'ютер.
+LDEFRAGMSGBOX1=Закрийте всі запущені додатки.
+LDEFRAGMSGBOX2=Аналіз може тривати кілька хвилин.
+LDEFRAGMSGBOX3=Під час цього процесу комп'ютер може перестати реагувати на дії користувача.
+LDEFRAGMSGBOX4=Натисніть "Yes", щоб почати операцію.
+LFEWFRAGMENTS=Знайдено незначна кількість фрагментів. Необхідності в дефрагментації реєстру немає. 
+LNOFRAGMENTS=Фрагментів не виявлено. Дефрагментація реєстру неможлива. 
+LTOOFRAGMENTS=Знайдено дуже багато фрагментів. Натисніть кнопку "дефрагментація", щоб оптимізувати реєстр.
+
+;REPORT 
+LNAMEREPORT=Звіт
+LH1=Звіт про дефрагментацію
+LCREATEDBY=Створений
+LDATE=Дата:
+LTIME=Час:
+LSUMMARY=Разом про дефрагментацію
+LREGPROCESSED=Опрацьовано файлів реєстру:
+LREGANASTART=Аналіз реєстру розпочатий:
+LREGANAFINISHED=Аналіз реєстру виконаний:
+LREGTOTALFINISHED=Загальний час аналізу:
+LREGSIZEBEFORE=Розмір реєстру до:
+LREGSIZEAFTER=Розмір реєстру після:
+LREGSIZEDIFFERENCE=Різниця в розмірах:
+LREGFILESSUMMARY=Разом про файли реєстру
+LCOLUMNREGFILE=Файл реєстру
+LCOLUMNREGBEFORE=Розмір до
+LCOLUMNAFTER=Розмір після
+LCOLUMNDIFFERENCE=Різниця в розмірах
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Дефрагментація реєстру
+LDEFRAGNOW=Дефрагментація:
+
+;NEW PHRASES! Please, translate!
+LHTMLCREATED=HTML-звіт успішно створений.
+LOPENNOW=Відкрити зараз?
+LNOTHTMLCREATED=Помилка! HTML-звіт НЕ створений.
+LFILE=Файл
+LFREESPACE=Недостатньо вільного місця для дефрагментації. Перевірте та повторіть спробу.
+LERROREGREAD=Помилка! Неможливо прочитати інформацію реєстру.

@@ -1,0 +1,138 @@
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\msjet40.dll /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\msjtes40.dll /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\msjetoledb40.dll /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\mswstr10.dll /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\msjint40.dll /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\msjter40.dll /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\MSJINT35.DLL /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\MSJET35.DLL /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\MSJT4JLT.DLL /s
+%SystemRoot%\system32\regsvr32.exe %SystemRoot%\system32\MSJTER35.DLL /s
+
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\Microsoft Shared\DAO\DAO350.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\Microsoft Shared\DAO\dao360.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\ado\msader15.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\ado\msado15.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\ado\msadomd.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\ado\msador15.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\ado\msadox.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\ado\msadrh15.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\ado\msjro.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadce.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadcer.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadcf.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadcfr.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadco.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadcor.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadcs.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msadds.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msaddsr.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msdaprst.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msdarem.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msdaremr.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\msadc\msdfmap.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdadc.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdaenum.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdaer.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSDAERR.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSDAIPP.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdaora.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdaorar.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdaosp.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSDAPML.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdaps.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdasc.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdasql.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdasqlr.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSDATL2.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdatl3.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdatt.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msdaurl.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSDMENG.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSDMINE.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSJTOR35.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSMDCB80.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSMDGD80.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSMDUN80.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSOLAP80.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\MSOLUI80.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msxactps.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\oledb32.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\oledb32r.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\OLEDB32X.DLL" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\sqloledb.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\sqlxmlx.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msolap90.dll" /s
+%SystemRoot%\system32\regsvr32.exe "%CommonProgramFiles%\System\Ole DB\msolui90.dll" /s
+
+IF NOT EXIST %systemroot%\SysWoW64\regsvr32.exe goto :end
+
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\msjet40.dll /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\msjtes40.dll /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\msjetoledb40.dll /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\mswstr10.dll /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\msjint40.dll /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\msjter40.dll /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\MSJINT35.DLL /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\MSJET35.DLL /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\MSJT4JLT.DLL /s
+%systemroot%\SysWoW64\regsvr32.exe %systemroot%\SysWoW64\MSJTER35.DLL /s
+
+
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\Microsoft Shared\DAO\DAO350.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\Microsoft Shared\DAO\dao360.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\ado\msader15.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\ado\msado15.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\ado\msadomd.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\ado\msador15.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\ado\msadox.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\ado\msadrh15.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\ado\msjro.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadce.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadcer.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadcf.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadcfr.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadco.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadcor.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadcs.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msadds.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msaddsr.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msdaprst.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msdarem.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msdaremr.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\msadc\msdfmap.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdadc.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdaenum.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdaer.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSDAERR.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSDAIPP.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdaora.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdaorar.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdaosp.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSDAPML.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdaps.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdasc.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdasql.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdasqlr.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSDATL2.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdatl3.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdatt.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msdaurl.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSDMENG.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSDMINE.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSJTOR35.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSMDCB80.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSMDGD80.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSMDUN80.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSOLAP80.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\MSOLUI80.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msxactps.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\oledb32.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\oledb32r.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\OLEDB32X.DLL" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\sqloledb.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\sqlxmlx.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msolap90.dll" /s
+%systemroot%\SysWoW64\regsvr32.exe "%CommonProgramFiles(x86)%\System\Ole DB\msolui90.dll" /s
+
+:end

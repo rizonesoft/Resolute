@@ -1,0 +1,49 @@
+[SearchEngine]
+C0=1
+N0=google.com
+S0=http://www.google.com/search?hl=en&q=%u
+I0=.\resource\google.ico
+N1=google.cn
+S1=http://www.google.com.hk/search?client=pub-1549238212314499&prog=aff&channel=8696049412&q=%u
+N2=baidu
+S2=http://www.baidu.com/s?tn=5igb_dg&wd=%s
+I2=.\resource\baidu.ico
+N3=yahoo
+S3=http://search.yahoo.com/search?ei=UTF-8&p=%u
+N4=bing
+S4=http://www.bing.com/search?q=%u
+N5=--
+S5=
+N6=image (google)
+S6=http://images.google.com/images?hl=en&q=%u
+I6=.\resource\image.ico
+N7=image (yahoo.com)
+S7=http://images.search.yahoo.com/search/images?ei=UTF-8&p=%u
+N8=--
+S8=
+N9=news (google)
+S9=http://news.google.com/news?hl=en&q=%u
+N10=news (cnn.com)
+S10=http://search.cnn.com/search.jsp?query=%u&type=web&sortBy=date&intl=false
+N11=--
+S11=
+N12=soft (brothersoft.com)
+S12=http://search.brothersoft.com/index.php?act=search.index&keyword=%s&referral=GreenBrowser
+N13=soft (download.com)
+S13=http://www.download.com/3120-20_4.html?qt=%s
+N14=--
+S14=
+N15=shopping (amazon.com)
+S15=http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=%u
+N16=shopping (ebay.com)
+S16=http://shop.ebay.com/?_nkw=%u
+N17=--
+S17=
+N18=mp3 (mp3.com)
+S18=http://www.mp3.com/search.php?action=Search&stype=song&query=%s
+N19=maps (google.com)
+S19=http://maps.google.com/maps?hl=en&q=%u
+N20=weather (weather.com)
+S20=http://www.weather.com/search/enhanced?where=%s
+N21=dictionary (reference.com)
+S21=http://dictionary.reference.com/browse/%s

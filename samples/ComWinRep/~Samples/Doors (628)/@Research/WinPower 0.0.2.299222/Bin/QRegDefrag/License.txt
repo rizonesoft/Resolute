@@ -1,0 +1,24 @@
+Copyright © 2006-2009 BMSoftware Informática Ltda.
+
+Licence Agreement for Quicksys RegDefrag
+
+By using or distributing this software (or any work based on the software) you shall be deemed to have accepted the terms and conditions set out below.
+
+BMSoftware Informática Ltda ("Quicksys") is making this software freely available on the basis that it is accepted as found and that the user checks its fitness for purpose prior to use.
+
+This software is provided 'as-is', without any express or implied warranties whatsoever. In no event will the authors, partners or contributors be held liable for any damages, claims or other liabilities direct or indirect, arising from the use of this software.
+
+Quicksys will from time to time make software updates available. However, Quicksys accepts no obligation to provide any support to free licence holders.
+
+Quicksys grants you a limited non-exclusive licence to use this software for any purpose, including commercial applications and redistribute it freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software.
+2. You must not alter the software, user licence or installer in any way.
+3. This notice may not be removed or altered from any distribution.
+4. You may not resell or charge for the software.
+5. You may not reverse engineer, decompile, disassemble, derive the source code of or modify [or create derivative work from] the program.
+6. You must not use Quicksys RegDefrag to engage in or allow others to engage in any illegal activity.
+7. You may not claim any sponsorship by, endorsement by, or affiliation with our company.
+8. You acknowledge that Quicksys owns the copyright and all associated intellectual property rights relating to the software.
+
+This software licence is governed by and construed in accordance with the laws of Brazil and you agree to submit to the exclusive jurisdiction of the Brazil courts.

@@ -1,0 +1,6 @@
+Repair Icons:
+
+If you notice your icons on your system are just a white file the use this repair. When the Windows icon database becomes corrupt you will notice the icons not showing correctly.
+
+This will delete the icon database on the system, making windows rebuild it and fixing the corrupt icons.
+

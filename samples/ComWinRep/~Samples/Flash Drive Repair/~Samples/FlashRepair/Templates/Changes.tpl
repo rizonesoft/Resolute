@@ -1,0 +1,92 @@
+==================================================
+[:COMPANY:] [:PRODUCT:] CHANGES
+==================================================
+
+--------------------------------------------------
+Version [:VERSION:] ([:MONTH:] [:DAY:], [:YEAR:])
+--------------------------------------------------
+
+- Critical Update Notification Fix.
+
+--------------------------------------------------
+Version 1.0.2.823 (November 27, 2016)
+--------------------------------------------------
+
+- Disable Extras, now called Just Repair. Makes more sense.
+- Cleaner interface. Moved About and Close into the menus.
+- New options for managing Logging and Cache.
+- Moved System Restore and Firmware update to Tools menu.
+- Removed Reboot Message Box.
+- Minor bug fixes.
+- Minor cosmetic changes.
+
+--------------------------------------------------
+Version 1.0.2.686 (November 06, 2016)
+--------------------------------------------------
+
+- Updated the ReBar Framework.
+- New Option to disable Autorun reset and Protection.
+- Now saves options on exit.
+- Cut about 1MB from the total size.
+- Minor bug fixes.
+- Minor cosmetic changes.
+
+--------------------------------------------------
+Version 1.0.2.638 (October 22, 2016)
+--------------------------------------------------
+
+- Updated Fugue.dll
+- Fixed program freezing on Exit.
+- Optimized the Update Notification System.
+- Small bug fixes and Enhancements.
+- New Registry based Method for configuring Services.
+
+--------------------------------------------------
+Version 1.0.2.616 (October 09, 2016)
+--------------------------------------------------
+
+- Fixed a critical error that stopped the 32-bit version from running.
+- Updated DoorsShell.dll.
+- Updated the Update Notification System.
+
+--------------------------------------------------
+Version 1.0.2.553 (September 25, 2016)
+--------------------------------------------------
+
+- Added support for Windows 10.
+- Rewrote code from scratch.
+- New logging system.
+- New update notification system.
+
+--------------------------------------------------
+Version 0.4.3.430 (August 31, 2014)
+--------------------------------------------------
+
+- Now Open Source (GNU General Public License version 3)
+
+--------------------------------------------------
+Version 0.4.2.423 (May 22, 2014)
+--------------------------------------------------
+
+- Name changed from CD-DVD Icon repair to DVD Drive Repair
+- New interface design with new Icons
+- Updated links and about information
+- Fixed some minor bugs
+- Added a 64Bit version (Better support for 64Bit Windows)
+- Added support for Windows 8 and Windows 8.1
+- Updated Documentation
+
+--------------------------------------------------
+Version 0.2.8.280 (September 18, 2013)
+--------------------------------------------------
+
+- Cleaned the code a little
+- Some minor bug fixes
+
+--------------------------------------------------
+Version 0.2.6.263 (September 18, 2013)
+--------------------------------------------------
+
+No recorded history
+
+==================================================

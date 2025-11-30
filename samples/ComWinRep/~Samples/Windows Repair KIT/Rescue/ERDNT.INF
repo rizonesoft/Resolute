@@ -1,0 +1,40 @@
+[Creation]
+"8/12/2009 7:47:45 AM"
+
+[SystemRoot]
+"C:\WINDOWS"
+
+[Restore]
+"MACHINE SECURITY"
+"SECURITY"
+"C:\WINDOWS\system32\config\SECURITY"
+
+[Restore]
+"MACHINE SOFTWARE"
+"software"
+"C:\WINDOWS\system32\config\software"
+
+[Restore]
+"MACHINE SYSTEM"
+"system"
+"C:\WINDOWS\system32\config\system"
+
+[Restore]
+"USERS .DEFAULT"
+"default"
+"C:\WINDOWS\system32\config\default"
+
+[Restore]
+"MACHINE SAM"
+"SAM"
+"C:\WINDOWS\system32\config\SAM"
+
+[Restore]
+"USERS S-1-5-21-861567501-854245398-725345543-500"
+"Users\00000001\NTUSER.DAT"
+"C:\DOCUME~1\ADMINI~1\NTUSER.DAT"
+
+[Restore]
+"USERS S-1-5-21-861567501-854245398-725345543-500_Classes"
+"Users\00000002\UsrClass.dat"
+"C:\DOCUME~1\ADMINI~1\LOCALS~1\APPLIC~1\MICROS~1\Windows\UsrClass.dat"

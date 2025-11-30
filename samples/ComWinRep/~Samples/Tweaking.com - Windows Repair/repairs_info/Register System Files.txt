@@ -1,0 +1,8 @@
+Register System Files:
+
+This will register a list of Dll & Ocx files in the System32 & SysWOW64 directories in Windows.
+
+By registering the system files this can repair a lot of errors in windows. Many Windows fixes include registering certain files in the system directories.
+
+You can edit the list to add or remove files for registering. The list location is \files\system_files_reg_list.txt
+

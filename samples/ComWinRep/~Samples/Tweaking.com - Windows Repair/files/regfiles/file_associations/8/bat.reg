@@ -1,0 +1,79 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\.BAT]
+@="batfile"
+
+[HKEY_CLASSES_ROOT\.BAT\PersistentHandler]
+@="{5e941d80-bf96-11cd-b579-08002b30bfeb}"
+
+[HKEY_CLASSES_ROOT\batfile]
+@="Windows Batch File"
+"EditFlags"=hex:30,04,00,00
+"FriendlyTypeName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,\
+  00,6f,00,6f,00,74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,\
+  32,00,5c,00,61,00,63,00,70,00,70,00,61,00,67,00,65,00,2e,00,64,00,6c,00,6c,\
+  00,2c,00,2d,00,36,00,30,00,30,00,32,00,00,00
+
+[HKEY_CLASSES_ROOT\batfile\DefaultIcon]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,00,6d,00,\
+  61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,00,36,\
+  00,38,00,00,00
+
+[HKEY_CLASSES_ROOT\batfile\shell\edit\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,4e,00,4f,00,\
+  54,00,45,00,50,00,41,00,44,00,2e,00,45,00,58,00,45,00,20,00,25,00,31,00,00,\
+  00
+
+[HKEY_CLASSES_ROOT\batfile\shell\open]
+"EditFlags"=hex:00,00,00,00
+
+[HKEY_CLASSES_ROOT\batfile\shell\open\command]
+@="\"%1\" %*"
+
+[HKEY_CLASSES_ROOT\batfile\shell\print\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,4e,00,4f,00,\
+  54,00,45,00,50,00,41,00,44,00,2e,00,45,00,58,00,45,00,20,00,2f,00,70,00,20,\
+  00,25,00,31,00,00,00
+
+[HKEY_CLASSES_ROOT\batfile\shell\runas]
+"HasLUAShield"=""
+
+[HKEY_CLASSES_ROOT\batfile\shell\runas\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,63,00,6d,00,\
+  64,00,2e,00,65,00,78,00,65,00,20,00,2f,00,43,00,20,00,22,00,25,00,31,00,22,\
+  00,20,00,25,00,2a,00,00,00
+
+[HKEY_CLASSES_ROOT\batfile\shell\runasuser]
+@="@shell32.dll,-50944"
+"Extended"=""
+"SuppressionPolicyEx"="{F211AA05-D4DF-4370-A2A0-9F19C09756A7}"
+
+[HKEY_CLASSES_ROOT\batfile\shell\runasuser\command]
+"DelegateExecute"="{ea72d00e-4960-42fa-ba92-7792a7944c1d}"
+
+[HKEY_CLASSES_ROOT\batfile\ShellEx\ContextMenuHandlers]
+@="Compatibility"
+
+[HKEY_CLASSES_ROOT\batfile\ShellEx\ContextMenuHandlers\Compatibility]
+@="{1d27f844-3a1f-4410-85ac-14651078412d}"
+
+[HKEY_CLASSES_ROOT\batfile\ShellEx\DropHandler]
+@="{86C86720-42A0-1069-A2E8-08002B30309D}"
+
+[HKEY_CLASSES_ROOT\batfile\ShellEx\PropertySheetHandlers\PifProps]
+@="{86F19A00-42A0-1069-A2E9-08002B30309D}"
+
+[HKEY_CLASSES_ROOT\batfile\ShellEx\PropertySheetHandlers\ShimLayer Property Page]
+@="{513D916F-2A8E-4F51-AEAB-0CBC76FB1AF8}"
+
+[HKEY_CLASSES_ROOT\batfile\ShellEx\{8895b1c6-b41f-4c1c-a562-0d564250836f}]
+@="{1531d583-8375-4d3f-b5fb-d23bbd169f22}"
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.BAT\UserChoice]
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.BAT\OpenWithProgids]
+"batfile"=hex(0):

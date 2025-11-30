@@ -1,0 +1,167 @@
+﻿
+[Hrvatski]
+;Translated by Osmanagić Hasan 
+
+;COMMON VALUES
+LOKBUTTON=U redu
+LCANCELBUTTON=Odustajem
+LSAVEASBUTTON=Pohrani kao...
+LANALYZEBUTTON=Analiza
+LDEFRAGBUTTON=Defrag
+LCLOSEBUTTON=Zatvori
+LRESTARTBUTTON=Restart
+LLATERBUTTON=Kasnije
+LREPORTBUTTON=Stvori izvještaj...
+LSTOPBUTTON=Prekini
+LBROWSEBUTTON=Odredi...
+LERROR=Greška
+LENABLED=Omogući
+LDISABLED=Onemogući
+LNOTSUPPORTED=Nije podržano
+LREGREPLACE=Greška - RegReplaceKey je onemogućen. Pokušajte nakon ponovnog pokretanja Windows-a.
+LRESTOREPOINTNOT=Točka povratka nije podržana.
+LCREATINGRESTORE=Stvaranje točke povratka...
+
+;MAIN WINDOW
+LNEVERUSED=Never used
+LMENUOPTIONS=Mogućnosti
+LMENUHELP=Pomoć
+LMENUABOUT=O programu
+LOVERVIEW=Pregled
+LLASTDEFRAG=Zadnja upotreba:
+LSIZERECOVERED=Smanjeno za:
+LPERCENT=Postotak:
+LWOULDLIKE=Što želite?
+LDEFRAGTITLE=Defragmentiranje registra
+LREGINFOTITLE=Informacije o registru
+LUPDATEOK=Vi koristite zadnju inačicu programa.
+LUPDATEDISABLED=Automatska provjera dogradnje je onemogućena.
+LUPDATENEW=Nova inačica programa je dostupna.
+LUPDATEWAIT=Provjeravam postoji li nova inačica. Molim strpljenja.
+LMOREINFO=Više info...
+LUPDATES=Dogradnje
+
+;ABOUT WINDOW
+LABOUTTITLE=O programu
+LVERSION=Inačica
+LICON=Ikone je napravio
+
+;OPTIONS WINDOW
+LOPTIONS=Mogućnosti
+LOPTIONSDESCRIPTION=Podešavanje programa.
+LSETTINGS=Opće postavke
+LLANGUAGE=Jezik
+LCHKCHECKUPDATE=Automatski provjeri ima li dogradnja
+LCHECKNOW=Provjeri ima li dogradnja odmah...
+LCHKDEFRAGMYCOMPUTER=Dodaj "Defragmentiraj registar..." naredbu u padajući izbornik
+LCHKREGINFOMYCOMPUTER=Dodaj "Informacije o registru" naredbu u padajući izbornik
+LBACKUPS=Sigurnosne kopije
+LAUTOREGFILES=Automatski ućini sigurnosne kopiju registra prije defragmentacije
+LAUTORESTOREPOINT=Automatski stvori točku povratka prije defragmentacije
+LBACKUPFOLDER=Mapa sigurnosnih kopija:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Podaci
+LREGINFODESCRIPTION=Podaci o registru
+LSO=Operativni sustav:
+LUSER=Korisnik:
+LREGSIZE=Veličina registra:
+LCOLUMNPATH=Staza
+LCOLUMNSIZE=Veličina
+LREGISTRYFILES=Datoteke registra
+LNUMBERFILES=Broj datoteka:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnosticiranje
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Hive Naziv:
+LLOGICALPATH=Logička staza:
+LMAPPATH=Map staza:
+LTEMPPATH=Privremena staza:
+LHIVESIZE=Hive veličina:
+LKEY=Kjuč:
+LVALIDFILE=Datoteka postoji.
+LNOTVALIDFILE=Datoteka ne postoji.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Optimiziranje i kompaktiranje Windows registra.
+LTITLEPROBLEM=Problem i rješenje
+LMAINTEXT=Za vrijeme rada, Windows o.s. stalno koristi registar unoseći ili uklanjajući podatke. Tokom vremena dolazi do fragmentacije. Ovaj alat optimizira registar uklanjajući prazan prostor i spaja fragmente.
+LBENEFITS=Quicksys RegDefrag povećava učinkovitost sustava ubrzavajući pristup i njegovo podizanje.
+LTITLESTEPS=Koraci
+LSTEP1=1. Analiza vašeg regista.
+LSTEP2=2. Pregled rezultata analize.
+LSTEP3=3. Defragmentacija regista. Nužno je ponovno pokretanje računala.
+LTITLEANALYZE=Kliknite "Analiza" i pokrenite proces.
+LAUTOBACKUP=Automatska sigurnosna kopija:
+LAUTORESTORE=Automatska stvaranje točke povratka:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analiziranje registra. Strpljenje molim.
+LPROGRESS=Napredak:
+LREADING=Provjera:
+LSTOPPROCESS=Prekid procesa...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Analiza rezulta
+LCOMPARATION=Usporedba
+LCONCLUSION=Zaključak
+LREGISTRYFRAGMENTATION=Fragmentacija registra
+LCURRENTSIZE=Sadašnja veličina registra:
+LNEWSIZE=Nova veličina registra:
+LSIZEDIFFERENCE=Razlika:
+LLEGFRAG=fragmenata
+LLEGALLOC=praznina
+LBACKREGFILES=Stvaranje sig. kopije registra:
+LBACKRESTORE=Stvaranje točke povrata:
+LCONCLUSION=Zaključak
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defragmentiranje je gotovo!
+LFINISHED=Uspješan završetak.
+LRESTARTREQUIRED=Promjene će nastupiti nakon ponovnog pokretanja računala.
+LRESTARTMSGBOX=Želite li ponovno pokretanja računala sada?
+LHTMLREPORT=U generiranom HTML izvještaju možete pregledati podatke o defragmentiranju.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Za novu analizu nužno je ponovno pokretanje računala.
+LDEFRAGMSGBOX1=Zatvorite sve programe.
+LDEFRAGMSGBOX2=Analza može potrajati nekoliko minutea.
+LDEFRAGMSGBOX3=Tokom ovog procesa, vaše računalo može izgledati zamrznuto.
+LDEFRAGMSGBOX4=Za nastavak kliknite "Yes".
+LFEWFRAGMENTS=Nađeno je samo nekoliko fragmenata. Defragmentacija nije nužna.
+LNOFRAGMENTS=Nema fragmenata. Defragmentacija se ne provodi.
+LTOOFRAGMENTS=Previše fragmenata. Kliknite "Defrag" za optimiziranje registra.
+
+;REPORT 
+LNAMEREPORT=Izvještaj
+LH1=Izvještaj o defragmentataciji
+LCREATEDBY=Stvorio
+LDATE=Datum:
+LTIME=Vrijeme:
+LSUMMARY=Detalji o defragmentaciji 
+LREGPROCESSED=Procesirano registar datoteka:
+LREGANASTART=Analiza registra je pokrenuta:
+LREGANAFINISHED=Analiza registra je završena:
+LREGTOTALFINISHED=Analiza registra je trajala:
+LREGSIZEBEFORE=Veličina registra prije:
+LREGSIZEAFTER=Veličina registra poslije:
+LREGSIZEDIFFERENCE=Razlika veličine registra:
+LREGFILESSUMMARY=Pregled datoteka registra
+LCOLUMNREGFILE=Datoteka registra
+LCOLUMNREGBEFORE=Veličina prije:
+LCOLUMNAFTER=Veličina poslije:
+LCOLUMNDIFFERENCE=Razlika veličine:
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Defragmentiranje registra
+LDEFRAGNOW=Defragmentiranje:
+
+;NEW PHRASES! Please, translate!
+;LHTMLCREATED=HTML report created successfully. 
+;LOPENNOW=Open Now?
+;LNOTHTMLCREATED=Error! HTML report was NOT created successfully.
+;LFILE=File
+;LFREESPACE=Not enough free space to defrag. Check and try again.
+;LERROREGREAD=Error! Not possible to read registry information.

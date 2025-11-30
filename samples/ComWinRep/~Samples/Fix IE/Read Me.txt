@@ -1,0 +1,12 @@
+Fix IE Utility v 1.0
+
+This freeware portable utility re-registers around 89 concerned dll & ocx files required for the smooth operation of Internet Explorer. 
+
+Before running the utility, make sure that all your Internet Explorer windows are closed.
+
+All product names, logos, and trademarks, eg Windows, Internet Explorer, are acknowledged as the registered intellectual property of their respective owners viz Microsoft.
+
+The utility is being offered as a freeware on a as-is basis without any warranties. Always best to create a System Restore point first before making any changes to your system.
+
+This utility has been developed by Raghu Boddu for www.TheWindowsClub.com .
+
