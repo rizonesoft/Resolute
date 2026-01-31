@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Resolute Power Tools				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Resolute Power Tools		    ;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=23.2.0.857
+#AutoIt3Wrapper_Res_Fileversion=23.2.0.858
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  				;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N				;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                      				;~ (Y/N) Compile for high DPI. Default=N

@@ -1,8 +1,8 @@
 # Build artifacts and distribution folders
 SDK/Concrete/*/Distribution/
 
-# Compiled executables in main Resolute folder
-Resolute/*.exe
+# Compiled executables
+*.exe
 
 # Log files
 *.log
@@ -24,10 +24,6 @@ Thumbs.db
 
 # AutoIt compiled files
 *.a3x
-
-# Installer executables
-*_Setup.exe
-*_Setup.iss
 
 # Zip packages
 SDK/Concrete/*/*.zip
