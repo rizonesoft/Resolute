@@ -31,14 +31,14 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Environment]
-ScriptPath=R:\Origo\Resolute\SDK\Concrete\Firemin\Firemin.au3
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Firemin.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=Firemin
 ShortName=Firemin
 Description=Firemin
 Type=N
-Icon=R:\Origo\Resolute\SDK\Resources\Icons\Firemin.ico
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\Firemin.ico
 Version=12.2.1.9558
 VersionMajor=12
 VersionMaintenance=1
@@ -48,13 +48,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=Firemin.exe
 OutFileX64=Firemin_X64.exe
-OutFilePath=R:\Origo\Resolute\Resolute\Firemin.exe
-OutFileX64Path=R:\Origo\Resolute\Resolute\Firemin_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\Firemin.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\Firemin_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Origo\Resolute\SDK\Concrete\Firemin\Distribution\9558
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Distribution\9558
 DistributionName=Firemin_9558
-FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558
 DistroSourceName=Firemin_9558_Source
-DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Source

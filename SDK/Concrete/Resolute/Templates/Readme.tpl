@@ -35,7 +35,6 @@ Included Tools:
 - Ownership - File ownership management
 - PixRepair - Pixel repair utility
 - ReBar - Registry backup and restore
-- Rescue - System rescue tools
 - USBRepair - USB drive repair utility
 - Firemin - Firefox memory optimizer
 - Chromin - Chrome memory optimizer

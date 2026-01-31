@@ -48,5 +48,5 @@ Documentation:
 
 Programs Updated:
 - BiosCodes, ComIntRep, DVDRepair, Firemin, MemBoost, Ownership
-- PixRepair, ReBar, Rescue, USBRepair, Chromin, Edgemin, Watermin
+- PixRepair, ReBar, USBRepair, Chromin, Edgemin, Watermin
 ==================================================

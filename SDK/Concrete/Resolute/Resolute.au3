@@ -182,7 +182,7 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Narrator.ico				; 302
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Contrast.ico				; 303
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Command.ico				; 304
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Notepad3.ico				; 305
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Blank.ico					; 305
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\Calculator.ico				; 306
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\System.ico					; 307
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Menus\SystemProperties.ico		; 308
@@ -259,10 +259,10 @@
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\USBRepairH.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Ownership.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\OwnershipH.ico
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Rescue.ico
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\RescueH.ico
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Notepad3.ico
-#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Notepad3H.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Blank.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\BlankH.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Blank.ico
+#AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\BlankH.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\CarbonCD.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\CarbonCDH.ico
 #AutoIt3Wrapper_Res_Icon_Add=..\..\Resources\Icons\Tools\Blank.ico
@@ -432,9 +432,6 @@ Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 
 ;~ Path Settings
 Global $g_sRootDir			= @ScriptDir & "\Resolute"
-Global $g_sBinDir			= $g_sRootDir & "\Bin"
-Global $g_sBin86Dir			= $g_sBinDir & "\x86"
-Global $g_sBin64Dir			= $g_sBinDir & "\x64"
 Global $g_sPathIni			= $g_sRootDir & "\" & $g_sProgShortName & ".lng" 					;~ Full Path to the Configuaration file
 Global $g_sAppDataRoot		= @AppDataDir & "\" & $g_sCompanyName & "\" & $g_sProgShortName
 Global $g_sResourcesDir		= _PathFull(@ScriptDir & "\..\..\Resources")
@@ -607,8 +604,8 @@ Global $g_aSystemTooltips[$CNT_SYSTEMTOOLS] = [	"System (About)", "Task Manager"
 												"Disk Cleanup", "Optimize Drives", "Resource Monitor", "Task Manager", "Control Panel", "Command Prompt", "Registry Editor"]
 Global $g_aSysIconContext[$CNT_SYSTEMTOOLS]
 Global $g_aPowerTooltips[$CNT_POWERTOOLS] 	= [	"Complete Internet Repair", "Firemin", "BIOS Beep Codes Viewer", _
-												"Frozen Pixel Repair", "DVD Repair", "USB Repair", "Install Take Ownership Shell Extension", "Rescue Antivirus", _
-												"Notepad3", "Carbon CD", "Coming Soon!", "Coming Soon!", "Coming Soon!", "Coming Soon!", "Coming Soon!", _
+												"Frozen Pixel Repair", "DVD Repair", "USB Repair", "Install Take Ownership Shell Extension", "Coming Soon!", _
+												"Coming Soon!", "Carbon CD", "Coming Soon!", "Coming Soon!", "Coming Soon!", "Coming Soon!", "Coming Soon!", _
 												"Coming Soon!", "Coming Soon!", "Calculator"]
 Global $g_IsCursorOverTool = False
 Global $g_hUsageProg[6]
@@ -716,7 +713,7 @@ Func _StartCoreGui()
 	Local $miHelpHome, $miHelpDownloads, $miHelpSupport, $miHelpGitHub, $miHelpDonate, $miHelpAbout, $hHeading
 	Local $miNetScan, $micStatus
 	Local $menuAccAccess, $miAccAccOptions, $miAccMagnifier, $miAccOnScreenKey, $miAccNarrator, $miAccHighContrast
-	Local $miAccCommand, $miAccTerminal, $miAccNotepad3, $miAccCalculator
+	Local $miAccCommand, $miAccCalculator
 	Local $menuAccessibility, $miAdmControlPanelG, $miAdmEventViewer
 	Local $miMntBackupRestore
 	Local $miRepComIntRep, $miRepDVDRepair, $miRepUSBRepair
@@ -862,20 +859,14 @@ Func _StartCoreGui()
 	$miAccNarrator = _GuiCtrlMenuEx_CreateMenuItem("Start &Narrator", $menuAccAccess, $g_aMenuIcons[29], $g_iMenuIconsStart + 29)
 	$miAccHighContrast = _GuiCtrlMenuEx_CreateMenuItem("High &Contrast Settings", $menuAccAccess, $g_aMenuIcons[30], $g_iMenuIconsStart + 30)
 	$miAccCalculator = _GuiCtrlMenuEx_CreateMenuItem("&Calculator", $g_hMenuAccessories, $g_aMenuIcons[33], $g_iMenuIconsStart + 33)
-	$miAccNotepad3 = _GuiCtrlMenuEx_CreateMenuItem("&Notepad3" & @TAB & _GetBinToolVersionNumber("Notepad3", "Notepad3.exe"), $g_hMenuAccessories, $g_aMenuIcons[32], $g_iMenuIconsStart + 32)
 	_GuiCtrlMenuEx_CreateMenuItem("", $g_hMenuAccessories)
 	$miAccCommand = _GuiCtrlMenuEx_CreateMenuItem("Command &Prompt", $g_hMenuAccessories, $g_aMenuIcons[31], $g_iMenuIconsStart + 31)
-	If $g_IsWin10_2004_OrAbove Then
-		$miAccTerminal = _GuiCtrlMenuEx_CreateMenuItem("Windows &Terminal" & @TAB & _GetBinToolVersionNumber("Terminal", "wt.exe"), $g_hMenuAccessories, $g_aMenuIcons[31], $g_iMenuIconsStart + 31)
-		GUICtrlSetOnEvent($miAccTerminal, "_OpenWindowsTerminal")
-	EndIf
 
 	GUICtrlSetOnEvent($miAccAccOptions, "_OpenAccessibilityOptions")
 	GUICtrlSetOnEvent($miAccMagnifier, "_StartMagnifier")
 	GUICtrlSetOnEvent($miAccOnScreenKey, "_StartOnScreenKeyboard")
 	GUICtrlSetOnEvent($miAccNarrator, "_StartNarrator")
 	GUICtrlSetOnEvent($miAccHighContrast, "_OpenHighContrastSettings")
-	GUICtrlSetOnEvent($miAccNotepad3, "_OpenNotepad3")
 	GUICtrlSetOnEvent($miAccCommand, "_OpenCommandPrompt")
 
 	$miAdmControlPanelG = _GuiCtrlMenuEx_CreateMenuItem("Control Panel (all tasks)", $g_hMenuAdmin, $g_aMenuIcons[16], $g_iMenuIconsStart + 16)
@@ -1147,7 +1138,7 @@ Func _StartLaunchPadTools()
 		Case  $g_hSystemIcon[8][0]
 			 _OpenControlPanelG()
 		Case  $g_hSystemIcon[9][0]
-			_OpenWindowsTerminal()
+			_OpenCommandPrompt()
 		Case $g_hSystemIcon[10][0]
 			_CMD_Regedit()
 		Case $g_hPowerIcon[0][0]
@@ -1164,9 +1155,9 @@ Func _StartLaunchPadTools()
 		Case $g_hPowerIcon[6][0]
 			_RTOOL_Ownership()
 		Case $g_hPowerIcon[7][0]
-			_RTOOL_Rescue()
+			; Discontinued
 		Case $g_hPowerIcon[8][0]
-			_OpenNotepad3()
+			; Discontinued
 		Case $g_hPowerIcon[9][0]
 	EndSwitch
 EndFunc
@@ -1240,9 +1231,7 @@ EndFunc
 
 
 
-Func _RTOOL_Rescue()
-	_ExecuteResoluteTool("Rescue", "Rescue Antivirus")
-EndFunc
+
 
 #EndRegion
 
@@ -1351,15 +1340,7 @@ Func _OpenCommandPrompt()
 	_ShellExecuteEx("cmd.exe", "Command Prompt", "/k title Resolute Console && prompt $T $B $P$G && color B", $g_sCommandDir)
 EndFunc
 
-Func _OpenWindowsTerminal()
-	_ExecuteBinTool("Terminal", "wt.exe", "Windows Terminal", $g_sCommandDir)
-EndFunc
-
 #EndRegion "Command Prompt"
-
-Func _OpenNotepad3()
-	_ExecuteBinTool("Notepad3", "Notepad3.exe", "Rizonesoft Notepad3", $g_sRootDir)
-EndFunc
 
 #EndRegion "Menu Commands - Accessories"
 

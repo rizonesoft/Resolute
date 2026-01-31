@@ -36,14 +36,14 @@ File=%RootDir%\Sounds\Welcome.wav
 [Sources]
 
 [Environment]
-ScriptPath=R:\Origo\Resolute\SDK\Concrete\MemBoost\MemBoost.au3
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\MemBoost\MemBoost.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=Memory Booster
 ShortName=MemBoost
 Description=Memory Booster
 Type=N
-Icon=R:\Origo\Resolute\SDK\Resources\Icons\MemBoost.ico
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\MemBoost.ico
 Version=11.1.1.2429
 VersionMajor=11
 VersionMaintenance=1
@@ -53,13 +53,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=MemBoost.exe
 OutFileX64=MemBoost_X64.exe
-OutFilePath=R:\Origo\Resolute\Resolute\MemBoost.exe
-OutFileX64Path=R:\Origo\Resolute\Resolute\MemBoost_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\MemBoost.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\MemBoost_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Origo\Resolute\SDK\Concrete\MemBoost\Distribution\2429
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\MemBoost\Distribution\2429
 DistributionName=MemBoost_2429
-FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\MemBoost\Distribution\2429\MemBoost_2429
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\MemBoost\Distribution\2429\MemBoost_2429
 DistroSourceName=MemBoost_2429_Source
-DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\MemBoost\Distribution\2429\MemBoost_2429_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\MemBoost\Distribution\2429\MemBoost_2429_Source

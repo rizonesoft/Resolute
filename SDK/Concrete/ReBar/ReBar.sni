@@ -36,14 +36,14 @@ File=%RootDir%\Sounds\Welcome.wav
 [Sources]
 
 [Environment]
-ScriptPath=R:\Origo\Resolute\SDK\Concrete\ReBar\ReBar.au3
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\ReBar\ReBar.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=ReBar Framework
 ShortName=ReBar
 Description=ReBar Framework
 Type=N
-Icon=R:\Origo\Resolute\SDK\Resources\Icons\ReBar.ico
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\ReBar.ico
 Version=11.1.0.5588
 VersionMajor=11
 VersionMaintenance=0
@@ -53,13 +53,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=ReBar.exe
 OutFileX64=ReBar_X64.exe
-OutFilePath=R:\Origo\Resolute\Resolute\ReBar.exe
-OutFileX64Path=R:\Origo\Resolute\Resolute\ReBar_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\ReBar.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\ReBar_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Origo\Resolute\SDK\Concrete\ReBar\Distribution\5588
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\ReBar\Distribution\5588
 DistributionName=ReBar_5588
-FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\ReBar\Distribution\5588\ReBar_5588
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\ReBar\Distribution\5588\ReBar_5588
 DistroSourceName=ReBar_5588_Source
-DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\ReBar\Distribution\5588\ReBar_5588_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\ReBar\Distribution\5588\ReBar_5588_Source

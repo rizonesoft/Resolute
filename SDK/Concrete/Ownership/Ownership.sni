@@ -32,14 +32,14 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Environment]
-ScriptPath=R:\Origo\Resolute\SDK\Concrete\Ownership\Ownership.au3
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\Ownership\Ownership.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=Take Ownership
 ShortName=Ownership
 Description=Take Ownership
 Type=N
-Icon=R:\Origo\Resolute\SDK\Resources\Icons\Ownership.ico
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\Ownership.ico
 Version=11.1.1.869
 VersionMajor=11
 VersionMaintenance=1
@@ -49,13 +49,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=Ownership.exe
 OutFileX64=Ownership_X64.exe
-OutFilePath=R:\Origo\Resolute\Resolute\Ownership.exe
-OutFileX64Path=R:\Origo\Resolute\Resolute\Ownership_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\Ownership.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\Ownership_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Origo\Resolute\SDK\Concrete\Ownership\Distribution\869
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\Ownership\Distribution\869
 DistributionName=Ownership_869
-FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\Ownership\Distribution\869\Ownership_869
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\Ownership\Distribution\869\Ownership_869
 DistroSourceName=Ownership_869_Source
-DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\Ownership\Distribution\869\Ownership_869_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\Ownership\Distribution\869\Ownership_869_Source

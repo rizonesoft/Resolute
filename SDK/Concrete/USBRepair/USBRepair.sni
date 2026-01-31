@@ -35,14 +35,14 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Environment]
-ScriptPath=R:\Origo\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\USBRepair\USBRepair.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=USB Repair
 ShortName=USBRepair
 Description=Rizonesoft USB Repair
 Type=N
-Icon=R:\Origo\Resolute\SDK\Resources\Icons\USBRepair.ico
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\USBRepair.ico
 Version=11.2.3.2380
 VersionMajor=11
 VersionMaintenance=3
@@ -52,13 +52,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=USBRepair.exe
 OutFileX64=USBRepair_X64.exe
-OutFilePath=R:\Origo\Resolute\Resolute\USBRepair.exe
-OutFileX64Path=R:\Origo\Resolute\Resolute\USBRepair_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\USBRepair.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\USBRepair_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Origo\Resolute\SDK\Concrete\USBRepair\Distribution\2380
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\USBRepair\Distribution\2380
 DistributionName=USBRepair_2380
-FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\USBRepair\Distribution\2380\USBRepair_2380
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\USBRepair\Distribution\2380\USBRepair_2380
 DistroSourceName=USBRepair_2380_Source
-DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\USBRepair\Distribution\2380\USBRepair_2380_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\USBRepair\Distribution\2380\USBRepair_2380_Source
