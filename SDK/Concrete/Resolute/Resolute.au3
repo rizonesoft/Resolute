@@ -1564,51 +1564,6 @@ Func _RunDISM()
 	ShellExecute("DISM", "/online /cleanup-image /restorehealth", "", "", @SW_SHOW)
 EndFunc
 
-Func _ExecuteBinTool($sToolDir, $sExecutable, $sToolName, $sWorkingDir = "")
-
-	Local $s64ExePath	= $g_sBin64Dir & "\" & $sToolDir & "\" & $sExecutable
-	Local $s86ExePath	= $g_sBin86Dir & "\" & $sToolDir & "\" & $sExecutable
-
-	If @OSArch = "X64" Then
-		If FileExists($s64ExePath) Then
-			_ShellExecuteTool($s64ExePath, $sToolName, $sWorkingDir)
-			Return
-		Else
-			_ShellExecuteTool($s86ExePath, $sToolName, $sWorkingDir)
-			Return
-		EndIf
-	Else
-		_ShellExecuteTool($s86ExePath, $sToolName, $sWorkingDir)
-	EndIf
-EndFunc
-
-Func _GetBinToolVersionNumber($sToolDir, $sExecutable, $sStringName = $FV_PRODUCTVERSION)
-
-;~  $FV_COMMENTS ("Comments")
-;~  $FV_COMPANYNAME ("CompanyName")
-;~  $FV_FILEDESCRIPTION ("FileDescription")
-;~  $FV_FILEVERSION ("FileVersion")
-;~  $FV_INTERNALNAME ("InternalName")
-;~  $FV_LEGALCOPYRIGHT ("LegalCopyright")
-;~  $FV_LEGALTRADEMARKS ("LegalTrademarks")
-;~  $FV_ORIGINALFILENAME ("OriginalFilename")
-;~  $FV_PRODUCTNAME ("ProductName")
-;~  $FV_PRODUCTVERSION ("ProductVersion")
-;~  $FV_PRIVATEBUILD ("PrivateBuild")
-;~  $FV_SPECIALBUILD ("SpecialBuild")
-
-	Local $s64ExePath	= $g_sBin64Dir & "\" & $sToolDir & "\" & $sExecutable
-	Local $s86ExePath	= $g_sBin86Dir & "\" & $sToolDir & "\" & $sExecutable
-	If @OSArch = "X64" Then
-		If FileExists($s64ExePath) Then
-			Return FileGetVersion($s64ExePath)
-		Else
-			Return FileGetVersion($s86ExePath)
-		EndIf
-	Else
-		Return FileGetVersion($s86ExePath)
-	EndIf
-EndFunc
 
 
 Func _ExecuteResoluteTool($sExeName, $sProgramName = "Resolute Tool", $sPath = $g_sResolutePath)
