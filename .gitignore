@@ -1,5 +1,6 @@
 # Build artifacts and distribution folders
 SDK/Concrete/*/Distribution/
+Samples/
 
 # Compiled executables
 *.exe
