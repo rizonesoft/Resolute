@@ -14,8 +14,6 @@
 ; Requirements: Inno Setup 6.3.x or newer
 ; Inno Setup: https://jrsoftware.org/isdl.php
 
-#pragma include __INCLUDE__ + ";" + ReadReg(HKLM, "Software\Mitrich Software\Inno Download Plugin", "InstallDir")
-#include <idp.iss>
 ; Preprocessor related stuff
 #if VER < EncodeVer(6,4,2)
 	#error Update your Inno Setup version (6.4.2 or newer)
@@ -150,7 +148,8 @@ Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_short
 Source: {#distrodir}\{#app_shortname}_X64.exe; DestDir: {app}; DestName: {#app_shortname}_X64.exe; Flags: ignoreversion; Check: GetInstallationType()
 Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_shortname}.exe; Flags: ignoreversion; Check: GetInstallationType()
 %{FILES_SECTION}
-Source: ..\..\..\..\Resources\Setup\PayPal.bmp; Flags: dontcopy
+%{LANGUAGE_FILES_SECTION}
+Source: ..\..\..\..\Resources\Setup\Donate.bmp; Flags: dontcopy
 
 [Dirs]
 
@@ -223,7 +222,6 @@ Type: files;      Name: {userstartmenu}\{#app_name}.lnk; Check: not WizardIsTask
 Type: files;      Name: {app}\{#app_shortname}.ini
 
 [UninstallDelete]
-Type: files;      Name: {app}\{#app_shortname}.ini
 Type: dirifempty; Name: {app}
 
 [Code]
@@ -233,6 +231,7 @@ var
     NormalInstallRadio: TRadioButton;
     PortableInstallRadio: TRadioButton;
     PayPalButton: TBitmapImage;
+    CreateDesktopIconCheck: TNewCheckBox;
     BuildNumber: String;
     ResetSettings: Boolean;
 
@@ -243,6 +242,41 @@ begin
         Result := PortableInstallRadio.Checked
     else
         Result := False;
+end;
+
+procedure UpdatePortableDesktopIconOption();
+begin
+  if CreateDesktopIconCheck = nil then
+    Exit;
+
+  if GetInstallationType() and not WizardSilent then
+  begin
+    CreateDesktopIconCheck.Visible := True;
+    CreateDesktopIconCheck.Checked := True;
+  end
+  else
+  begin
+    CreateDesktopIconCheck.Visible := False;
+  end;
+end;
+
+procedure CreatePortableDesktopIcon();
+var
+  IconPath: String;
+begin
+  IconPath := ExpandConstant('{userdesktop}\{#app_name}.lnk');
+  if FileExists(IconPath) then
+    DeleteFile(IconPath);
+
+  CreateShellLink(
+    IconPath,
+    '',
+    ExpandConstant('{app}\{#app_shortname}.exe'),
+    '',
+    ExpandConstant('{app}'),
+    0,
+    ExpandConstant('{app}\{#app_shortname}.exe')
+  );
 end;
 
 function ShouldCreateUninstaller: Boolean;
@@ -298,7 +332,7 @@ var
   ResultCode: Integer;
 begin
   Result := False;
-  if IsUpgrade() then
+  if IsUpgrade() and not GetInstallationType() then
   begin
     ResultCode := MsgBox(
       'Would you like to reset {#app_name} settings to default values?' + #13#10#13#10 +
@@ -318,7 +352,7 @@ begin
     if GetInstallationType() then
     begin
       // Portable installation: Default to root of system drive (e.g., C:\Chromin)
-      WizardForm.DirEdit.Text := ExpandConstant('{sd}\{#app_name}');
+      WizardForm.DirEdit.Text := ExpandConstant('{sd}\{#app_shortname}');
     end
     else
     begin
@@ -327,8 +361,14 @@ begin
     end;
   end;
   
+  if CurPageID = wpSelectDir then
+    UpdatePortableDesktopIconOption();
+
   if CurPageID = wpFinished then
+  begin
+    UpdatePortableDesktopIconOption();
     WizardForm.NextButton.Caption := SetupMessage(msgButtonFinish);
+  end;
 end;
 
 // Add a function to detect Chrome installation path
@@ -491,9 +531,9 @@ begin
   PayPalButton.Cursor := crHand;
   PayPalButton.OnClick := @PayPalButtonClick;
   
-  // Extract and load the PayPal button image
-  ExtractTemporaryFile('PayPal.bmp');
-  PayPalButton.Bitmap.LoadFromFile(ExpandConstant('{tmp}\PayPal.bmp'));
+  // Extract and load the Donate button image
+  ExtractTemporaryFile('Donate.bmp');
+  PayPalButton.Bitmap.LoadFromFile(ExpandConstant('{tmp}\Donate.bmp'));
   
   // Use AutoSize for best quality across all DPI settings
   PayPalButton.AutoSize := True;
@@ -547,6 +587,9 @@ begin
     begin
       DeleteFile(ExpandConstant('{app}\unins000.dat'));
       DeleteFile(ExpandConstant('{app}\unins000.exe'));
+
+      if (CreateDesktopIconCheck <> nil) and CreateDesktopIconCheck.Checked then
+        CreatePortableDesktopIcon();
     end;
   end;
 end;
@@ -564,6 +607,16 @@ begin
     
     // Create donation page
     CreateDonatePage();
+
+    // Create portable desktop icon option (finished page)
+    CreateDesktopIconCheck := TNewCheckBox.Create(WizardForm);
+    CreateDesktopIconCheck.Parent := WizardForm.FinishedPage.Surface;
+    CreateDesktopIconCheck.Caption := SetupMessage(msgCreateDesktopIcon);
+    CreateDesktopIconCheck.Checked := True;
+    CreateDesktopIconCheck.Left := WizardForm.RunList.Left;
+    CreateDesktopIconCheck.Top := WizardForm.RunList.Top + WizardForm.RunList.Height + ScaleY(8);
+    CreateDesktopIconCheck.Width := WizardForm.RunList.Width;
+    CreateDesktopIconCheck.Visible := False;
     
     With WizardForm do
     begin
@@ -578,6 +631,8 @@ begin
 
     if WizardSilent then
         Exit;
+
+    UpdatePortableDesktopIconOption();
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;

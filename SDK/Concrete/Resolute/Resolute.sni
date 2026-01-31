@@ -28,14 +28,14 @@ File=%RootDir%\Language\Resolute\en.lng
 [Sources]
 
 [Environment]
-ScriptPath=R:\Resolute\SDK\Concrete\Resolute\Resolute.au3
+ScriptPath=R:\Origo\Resolute\SDK\Concrete\Resolute\Resolute.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=Resolute Power Tools
 ShortName=Resolute
 Description=Resolute Power Tools
 Type=N
-Icon=R:\Resolute\SDK\Resources\Icons\Resolute.ico
+Icon=R:\Origo\Resolute\SDK\Resources\Icons\Resolute.ico
 Version=23.2.0.856
 VersionMajor=23
 VersionMaintenance=0
@@ -45,13 +45,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=..\..\..\Resolute.exe
 OutFileX64=..\..\..\Resolute_X64.exe
-OutFilePath=R:\Resolute\Resolute.exe
-OutFileX64Path=R:\Resolute\Resolute_X64.exe
+OutFilePath=R:\Origo\Resolute\Resolute.exe
+OutFileX64Path=R:\Origo\Resolute\Resolute_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Resolute\SDK\Concrete\Resolute\Distribution\856
+DistributionPath=R:\Origo\Resolute\SDK\Concrete\Resolute\Distribution\856
 DistributionName=Resolute_856
-FullDistributionPath=R:\Resolute\SDK\Concrete\Resolute\Distribution\856\Resolute_856
+FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\Resolute\Distribution\856\Resolute_856
 DistroSourceName=Resolute_856_Source
-DistroSourceFullPath=R:\Resolute\SDK\Concrete\Resolute\Distribution\856\Resolute_856_Source
+DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\Resolute\Distribution\856\Resolute_856_Source

@@ -30,7 +30,7 @@
 ;===============================================================================================================
 #AutoIt3Wrapper_Res_Comment=Distro Building Environment				;~ Comment field
 #AutoIt3Wrapper_Res_Description=Distro Building Environment	      	;~ Description field
-#AutoIt3Wrapper_Res_Fileversion=11.1.1.3684
+#AutoIt3Wrapper_Res_Fileversion=11.1.1.3687
 #AutoIt3Wrapper_Res_FileVersion_AutoIncrement=Y  					;~ (Y/N/P) AutoIncrement FileVersion. Default=N
 #AutoIt3Wrapper_Res_FileVersion_First_Increment=N					;~ (Y/N) AutoIncrement Y=Before; N=After compile. Default=N
 #AutoIt3Wrapper_Res_HiDpi=N                     					;~ (Y/N) Compile for high DPI. Default=N
@@ -389,6 +389,7 @@ Global $g_aMenuIcons[$CNT_MENUICONS]
 Global $g_aCommIcons[$CNT_COMMICONS]
 Global $g_sSelectAllIcon
 Global $g_sDlgOptionsIcon
+Global $g_aDetectedLanguages[0][5]
 
 ;~ Splash Page Settings
 Global $g_sSplashAniPath
@@ -616,7 +617,7 @@ Func _StartCoreGui()
 	$g_hGuiIcon = GUICtrlCreateIcon($g_aCoreIcons[0], 99, 10, 10, $g_iSizeIcon, $g_iSizeIcon)
 	GUICtrlSetTip($g_hGuiIcon, $g_aLangAbout[1] & Chr(32) & _GetProgramVersion(0) & @CRLF & _
 			$g_aLangAbout[2] & Chr(32) & @AutoItVersion & @CRLF & _
-			$g_aLangAbout[3] & " © " & @YEAR & " " & $g_sCompanyName, _
+			$g_aLangAbout[3] & " " & @YEAR & " " & $g_sCompanyName, _
 			$g_aLangAbout[0], $TIP_INFOICON, $TIP_BALLOON)
 	GUICtrlSetCursor($g_hGuiIcon, 0)
 	GUICtrlSetOnEvent($g_hGuiIcon, "_About_ShowDialog")
@@ -1483,7 +1484,7 @@ Func _PopulateSolutions()
 
 				EndIf
 
-				; Local $sSolCompany = StringRegExpReplace($sSolCompTemp, "([©|\(c\)|Copyright][\s][0-9]{4}[\s])", "")
+				; Local $sSolCompany = StringRegExpReplace($sSolCompTemp, "([&copy;|\(c\)|Copyright][\s][0-9]{4}[\s])", "")
 
 				IniWrite($sSolIniPath, "Environment", "ScriptPath", $sAu3ScriptIn)
 				IniWrite($sSolIniPath, "Environment", "Company", $sSolCompany)
@@ -2407,8 +2408,7 @@ Func _CreateDistribution($sSolutionIniPath, $iRow, $iCol)
 		Next
 	EndIf
 
-	_DistributeFile($sSetupResourcePath & "OfficePromoScreenBig.bmp", $sOutputPath & "\OfficePromoScreenBig.bmp")
-	_DistributeFile($sSetupResourcePath & "OfficePromoScreen.bmp", $sOutputPath & "\OfficePromoScreen.bmp")
+	_DistributeLanguageFiles($sSolutionIniPath, $sOutputPath)
 
 	_Logging_FinalMessage(StringFormat($g_aLangMessages2[51], $sReleasName))
 	_UpdateSoloProcess($iRow, $iCol, 100)
@@ -2450,6 +2450,95 @@ Func _DistributeFile($sFilePath, $sDestPath)
 	Return 1
 
 EndFunc   ;==>_DistributeFile
+
+
+Func _DistributeLanguageFiles($sSolutionIniPath, $sDistributionRoot)
+
+	Local $sShortName = $g_aEnvironment[5][1]
+	Local $sLanguageSource = $g_sRootDir & "\Language\" & $sShortName
+
+	Local $aLanguages = _CollectLanguageFiles($sLanguageSource, $sShortName)
+	If @error Then
+		ReDim $g_aDetectedLanguages[0][5]
+		Return
+	EndIf
+
+	$g_aDetectedLanguages = $aLanguages
+
+	If UBound($g_aDetectedLanguages, $UBOUND_ROWS) = 0 Then Return
+
+	_Logging_EditWrite(StringFormat("Distributing %02i language file(s) from '%s'", _
+			UBound($g_aDetectedLanguages, $UBOUND_ROWS), $sLanguageSource))
+
+	For $iLang = 0 To UBound($g_aDetectedLanguages, $UBOUND_ROWS) - 1
+		Local $sLangSourceFile = $g_aDetectedLanguages[$iLang][3]
+		Local $sRelPath = $g_aDetectedLanguages[$iLang][4]
+		Local $sDestPath = _CleanDestinationPath($sDistributionRoot & "\" & $sRelPath)
+		_DistributeFile($sLangSourceFile, $sDestPath)
+	Next
+
+EndFunc   ;==>_DistributeLanguageFiles
+
+
+Func _CollectLanguageFiles($sLanguageDir, $sShortName)
+
+	Local $aLanguages[0][5]
+	If Not FileExists($sLanguageDir) Then
+		Return SetError(1, 0, $aLanguages)
+	EndIf
+
+	Local $hSearch = FileFindFirstFile($sLanguageDir & "\*.lng")
+	If $hSearch = -1 Then
+		Return SetError(1, 0, $aLanguages)
+	EndIf
+
+	While 1
+		Local $sLangFile = FileFindNextFile($hSearch)
+		If @error Then ExitLoop
+
+		Local $sFullPath = $sLanguageDir & "\" & $sLangFile
+		Local $sLangCode = IniRead($sFullPath, "Language", "Code", StringTrimRight($sLangFile, 4))
+		Local $sLangName = IniRead($sFullPath, "Language", "Name", $sLangCode)
+		Local $sRelPath = "Language\" & $sShortName & "\" & $sLangFile
+
+		Local $iNext = UBound($aLanguages, $UBOUND_ROWS)
+		ReDim $aLanguages[$iNext + 1][5]
+		$aLanguages[$iNext][0] = $sLangCode
+		$aLanguages[$iNext][1] = $sLangName
+		$aLanguages[$iNext][2] = $sLangFile
+		$aLanguages[$iNext][3] = $sFullPath
+		$aLanguages[$iNext][4] = $sRelPath
+	WEnd
+
+	FileClose($hSearch)
+
+	Return SetError(0, 0, $aLanguages)
+
+EndFunc   ;==>_CollectLanguageFiles
+
+
+Func _EnsureLanguageCache($sShortName)
+
+	If IsArray($g_aDetectedLanguages) And UBound($g_aDetectedLanguages, $UBOUND_ROWS) > 0 Then
+		Return $g_aDetectedLanguages
+	EndIf
+
+	Local $sLanguageSource = $g_sRootDir & "\Language\" & $sShortName
+	$g_aDetectedLanguages = _CollectLanguageFiles($sLanguageSource, $sShortName)
+	If @error Then
+		ReDim $g_aDetectedLanguages[0][5]
+	EndIf
+
+	Return $g_aDetectedLanguages
+
+EndFunc   ;==>_EnsureLanguageCache
+
+
+Func _GetDetectedLanguages()
+
+	Return $g_aDetectedLanguages
+
+EndFunc   ;==>_GetDetectedLanguages
 
 
 Func _ReplacePathVariables($sInputPath, $sPath)
@@ -2603,12 +2692,14 @@ Func _GenerateInstallationScriptFromTemplate($sSolutionIniPath)
 
 	; Generate dynamic [Files] section from [Distribute] entries in .sni
 	Local $sFilesSection = _GenerateFilesSection($sSolutionIniPath)
+	Local $sLanguageFilesSection = _GenerateLanguageFilesSection($sProgShortName)
 
 	$sTemplateRead = StringReplace($sTemplateRead, "%{COMPANY}", $sCompanyName)
 	$sTemplateRead = StringReplace($sTemplateRead, "%{APP_NAME}", $sProgName)
 	$sTemplateRead = StringReplace($sTemplateRead, "%{APP_SHORTNAME}", $sProgShortName)
 	$sTemplateRead = StringReplace($sTemplateRead, "%{DISTRO_NAME}", $sPackPathName)
 	$sTemplateRead = StringReplace($sTemplateRead, "%{FILES_SECTION}", $sFilesSection)
+	$sTemplateRead = StringReplace($sTemplateRead, "%{LANGUAGE_FILES_SECTION}", $sLanguageFilesSection)
 
 	FileDelete($sScriptFullPath)
 	Local $hScriptOpen = FileOpen($sScriptFullPath, $FO_OVERWRITE)
@@ -2683,6 +2774,24 @@ Func _GenerateFilesSection($sSolutionIniPath)
 	Return $sFilesSection
 
 EndFunc   ;==>_GenerateFilesSection
+
+
+Func _GenerateLanguageFilesSection($sShortName)
+
+	Local $sLanguageFilesSection = ""
+	Local $aLanguages = _EnsureLanguageCache($sShortName)
+
+	If Not IsArray($aLanguages) Or UBound($aLanguages, $UBOUND_ROWS) = 0 Then Return $sLanguageFilesSection
+
+	For $i = 0 To UBound($aLanguages, $UBOUND_ROWS) - 1
+		Local $sLangFile = $aLanguages[$i][2]
+		$sLanguageFilesSection &= StringFormat("Source: {#distrodir}\\Language\\%s\\%s; DestDir: {app}\\Language\\%s; Flags: ignoreversion" & @CRLF, _
+			$sShortName, $sLangFile, $sShortName)
+	Next
+
+	Return $sLanguageFilesSection
+
+EndFunc   ;==>_GenerateLanguageFilesSection
 
 
 Func _GenerateInstallationScript($sSolutionIniPath)

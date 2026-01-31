@@ -3,8 +3,8 @@ BEEP CODES VIEWER
 © RIZONESOFT. All rights reserved
 https://www.rizonesoft.com
 ==================================================
-Version: 11.1.1.1959
-Release Date: 30 OCTOBER, 2023
+Version: 11.3.1.1994
+Release Date: 30 NOVEMBER, 2025
 System Requirements: 7, 8, 8.1, 10, 11
 Disk Space: 0 MB
 ==================================================

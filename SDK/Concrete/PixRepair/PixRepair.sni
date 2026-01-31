@@ -32,14 +32,14 @@ File=%RootDir%\Processing\64\Globe.ani
 [Sources]
 
 [Environment]
-ScriptPath=R:\Resolute\SDK\Concrete\PixRepair\PixRepair.au3
+ScriptPath=R:\Origo\Resolute\SDK\Concrete\PixRepair\PixRepair.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=Pixel Repair
 ShortName=PixRepair
 Description=Pixel Repair
 Type=N
-Icon=R:\Resolute\SDK\Resources\Icons\PixRepair.ico
+Icon=R:\Origo\Resolute\SDK\Resources\Icons\PixRepair.ico
 Version=11.1.1.1011
 VersionMajor=11
 VersionMaintenance=1
@@ -49,13 +49,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=PixRepair.exe
 OutFileX64=PixRepair_X64.exe
-OutFilePath=R:\Resolute\Resolute\PixRepair.exe
-OutFileX64Path=R:\Resolute\Resolute\PixRepair_X64.exe
+OutFilePath=R:\Origo\Resolute\Resolute\PixRepair.exe
+OutFileX64Path=R:\Origo\Resolute\Resolute\PixRepair_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1011
+DistributionPath=R:\Origo\Resolute\SDK\Concrete\PixRepair\Distribution\1011
 DistributionName=PixRepair_1011
-FullDistributionPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1011\PixRepair_1011
+FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\PixRepair\Distribution\1011\PixRepair_1011
 DistroSourceName=PixRepair_1011_Source
-DistroSourceFullPath=R:\Resolute\SDK\Concrete\PixRepair\Distribution\1011\PixRepair_1011_Source
+DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\PixRepair\Distribution\1011\PixRepair_1011_Source

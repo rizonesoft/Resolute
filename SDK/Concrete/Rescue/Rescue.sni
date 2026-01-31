@@ -36,14 +36,14 @@ Folder=%RootDir%\Bin\x86\ClamAV
 [Sources]
 
 [Environment]
-ScriptPath=R:\Resolute\SDK\Concrete\Rescue\Rescue.au3
+ScriptPath=R:\Origo\Resolute\SDK\Concrete\Rescue\Rescue.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=Rescue Antivirus
 ShortName=Rescue
 Description=Rescue Antivirus
 Type=N
-Icon=R:\Resolute\SDK\Resources\Icons\Rescue.ico
+Icon=R:\Origo\Resolute\SDK\Resources\Icons\Rescue.ico
 Version=11.1.1.340
 VersionMajor=11
 VersionMaintenance=1
@@ -53,13 +53,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=Rescue.exe
 OutFileX64=Rescue_X64.exe
-OutFilePath=R:\Resolute\Resolute\Rescue.exe
-OutFileX64Path=R:\Resolute\Resolute\Rescue_X64.exe
+OutFilePath=R:\Origo\Resolute\Resolute\Rescue.exe
+OutFileX64Path=R:\Origo\Resolute\Resolute\Rescue_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\340
+DistributionPath=R:\Origo\Resolute\SDK\Concrete\Rescue\Distribution\340
 DistributionName=Rescue_340
-FullDistributionPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\340\Rescue_340
+FullDistributionPath=R:\Origo\Resolute\SDK\Concrete\Rescue\Distribution\340\Rescue_340
 DistroSourceName=Rescue_340_Source
-DistroSourceFullPath=R:\Resolute\SDK\Concrete\Rescue\Distribution\340\Rescue_340_Source
+DistroSourceFullPath=R:\Origo\Resolute\SDK\Concrete\Rescue\Distribution\340\Rescue_340_Source

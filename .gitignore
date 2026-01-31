@@ -36,3 +36,9 @@ SDK/Concrete/*/Distribution/*/*.zip
 # Windows thumbnail cache
 ehthumbs.db
 Desktop.ini
+
+# Removed from repo
+rescue-db/
+.windsurf/
+TODO.md
+implementation_plan.md

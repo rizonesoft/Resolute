@@ -150,6 +150,7 @@ Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_short
 Source: {#distrodir}\{#app_shortname}_X64.exe; DestDir: {app}; DestName: {#app_shortname}_X64.exe; Flags: ignoreversion; Check: GetInstallationType()
 Source: {#distrodir}\{#app_shortname}.exe; DestDir: {app}; DestName: {#app_shortname}.exe; Flags: ignoreversion; Check: GetInstallationType()
 %{FILES_SECTION}
+%{LANGUAGE_FILES_SECTION}
 Source: ..\..\..\..\Resources\Setup\PayPal.bmp; Flags: dontcopy
 
 [Dirs]
@@ -298,7 +299,7 @@ var
   ResultCode: Integer;
 begin
   Result := False;
-  if IsUpgrade() then
+  if IsUpgrade() and not GetInstallationType() then
   begin
     ResultCode := MsgBox(
       'Would you like to reset {#app_name} settings to default values?' + #13#10#13#10 +
@@ -318,7 +319,7 @@ begin
     if GetInstallationType() then
     begin
       // Portable installation: Default to root of system drive (e.g., C:\Watermin)
-      WizardForm.DirEdit.Text := ExpandConstant('{sd}\{#app_name}');
+      WizardForm.DirEdit.Text := ExpandConstant('{sd}\{#app_shortname}');
     end
     else
     begin

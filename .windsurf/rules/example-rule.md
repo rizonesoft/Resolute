@@ -1,4 +1,0 @@
----
-trigger: always_on
----
-
