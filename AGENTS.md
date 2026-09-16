@@ -2,37 +2,54 @@
 
 Agent instructions for this repository. Claude Code loads this file through the `CLAUDE.md` import stub.
 
-## What is here
+## What this project is
 
-`Resolute` is Rizonesoft's suite of Windows system utilities: a launcher plus thirteen tools, written in AutoIt3, sharing one SDK. Roughly 43,000 lines across `SDK/`.
+`Resolute` is Rizonesoft's suite of Windows system utilities: a launcher plus thirteen tools.
+
+It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoIt suite still ships and still works; the C++ suite is what replaces it, one framework first and then the tools.
 
 | Path | Purpose |
 | ---- | ------- |
-| `SDK/Concrete/<Tool>/` | Each tool's `.au3` source, its `.sni` build descriptor, and its own includes |
-| `SDK/Includes/` | The shared library every tool consumes: logging, localization, settings, update, chrome |
-| `SDK/Distro.exe` | The SDK builder that turns a `.sni` into signed, distributable executables |
-| `Resolute/` | The runtime layout: built tools, per-tool `Docs/`, `Language/`, `Sounds/`, `Logging/` |
-| `todo/` | Canonical execution contracts; read `todo/README.md` before authoring or implementing |
+| `src/` | The C++ suite. The work. |
+| `resolute_au3/` | The frozen AutoIt suite. **The executable specification**, not a maintenance target |
+| `resolute_au3/todo/` | The archived AutoIt plan, superseded 2026-09-16, kept for its per-tool analysis |
+| `todo/` | The live execution plan; read `todo/README.md` before authoring or implementing |
 | `todo/implementation-plan.md` | Ordered execution plan synchronized through `scripts/todo-graph.py` |
 | `scripts/` | Neutral tooling: the TODO graph, validator, adjacency inspector |
-| `docs/` | Captures, reviews, phase runs, reports, user guide |
+| `docs/` | Captures, reviews, phase runs, reports, the brainstorm record |
 | `build/` | Ignored derived output, never an authoritative record |
 
-Everything here is Windows-only: the tools, the toolchain, and the tests. The TODO tooling (`scripts/`, plan checks) is stdlib Python 3 and runs anywhere.
+Everything here is Windows-only. The TODO tooling (`scripts/`, plan checks) is stdlib Python 3 and runs anywhere.
 
-## The tools
+## The decisions this project runs on
 
-`Resolute` (launcher) · `BiosCodes` · `ComIntRep` · `DVDRepair` · `Ownership` · `PixRepair` · `ReBar` · `USBRepair` (system tools) · `Firemin` · `Chromin` · `Edgemin` · `Watermin` (browser optimizers) · `MemBoost` (system memory) · `Distro` (the builder itself).
+Recorded in `docs/brainstorm/2026-09-16-completion-brainstorm.md`. Read it before proposing anything that contradicts one.
 
-Seven of them change a user's system in ways that are hard to undo. Those behaviors are **frozen**: see the frozen set in `todo/README.md`.
+- **C++23 on MSVC 2022**, built with CMake and vcpkg.
+- **wxWidgets, statically linked.** One self-contained executable per tool. Chosen over WinUI 3, Qt 6, and raw Win32; the rationale is in the brainstorm record and the deciding constraint was standalone distribution.
+- **Catch2 v3** for tests.
+- **1:1 on behavior, not on pixels.** The C++ tool must have the same effect on a system as its AutoIt counterpart, proven by running both against the same fixture. The UI is rebuilt rather than reproduced, because the AutoIt windows are not DPI-aware and have no dark mode.
+- **Framework first, then the tools.** One vertical slice through `Ownership` proves the framework end to end before the remaining tools port.
+- **Every tool is distributed independently.** Its own download, update file, language packs, documentation, and About page. A tool may never depend at runtime on another tool, on the launcher, or on a suite-wide file. "Shared" always means shared at author time or build time.
+
+## The two shared layers
+
+This is the architecture. A defect is anything that reimplements either layer privately.
+
+| Layer | Consumed by | Owns |
+| ----- | ----------- | ----- |
+| Framework | every tool | startup, working directories, settings, configuration load and save, preferences dialog, language list, update check, logging, process priority, About, shutdown, DPI, dark mode |
+| Repair contract | the repair tools only | diagnose pass, result list with per-item status, transcript export, restore record, undo, one log line per action |
+
+The AutoIt suite failed this test: `ReBar` was a framework people copied rather than included, so fourteen tools carry fourteen copies of it, roughly 21,000 of the AutoIt tree's 43,000 lines. Seven tools ended up writing settings to `.lng` and seven to `.ini` because the path was typed out fourteen times. Do not recreate that.
 
 ## The TODO system
 
 `todo/` is the live execution plan; **format spec: `todo/README.md`.** Markdown is canonical and `build/` holds derived, gitignored projections.
 
-Nine flat-numbered domains `00`-`08`: `00-workspace` (toolchain, gates, test backbone), `01-sdk-core` (shared includes and their contracts), `02-launcher` (the Resolute hub), `03-system-tools` (the seven system tools, frozen), `04-browser-tools` (the four optimizers), `05-memboost` (frozen trim path), `06-distro-release` (build, sign, package, ship), `07-quality` (the bar, the ratchet, conformance), `08-docs-localization` (docs, language packs, user guide). Numbers are stable addresses: a new domain appends after `08`.
+Ten flat-numbered domains `00`-`09`. Numbers are stable addresses: a new domain appends after `09`.
 
-Files are `todo/NN-domain/TODO-NN-short-name.md`. The **Implementation Order table is the dependency graph**: every `## N.` section has exactly one row and vice versa, and a row flips to `[x]` only when a `Verified:` stamp covers it. Cross-references use `§N` / `TNN §N` / `DNN TNN §N` and must be bidirectional.
+Files are `todo/NN-domain/TODO-NN-short-name.md`. The **Implementation Order table is the dependency graph**: every `## N.` section has exactly one row and vice versa, and a row flips to `[x]` only when a `Verified:` stamp covers it. Cross-references use section marks in the forms `SN`, `TNN SN`, and `DNN TNN SN` as spelled out in `todo/README.md`, and must be bidirectional.
 
 ## Choose the work contract
 
@@ -42,47 +59,60 @@ The lifecycle is: capture, author, validate the plan and source claims, record `
 
 ## What counts as proof
 
-There is no `dotnet test` here. A Test checkpoint cites one or more of four proofs, spelled out in `todo/README.md`:
+A Test checkpoint cites one or more of five proofs, spelled out in `todo/README.md`:
 
-1. **Au3Check clean** on every script the section touched. Every code section owes this one.
-2. **Compiles both architectures** through the tool's `.sni`.
-3. **Driven run with evidence**: a log line, an `.ini` readback, or a capture under `docs/captures/`.
-4. **Harness test** in `tests/`, once `D00 T02 §1` ships it. Until then, a checkpoint citing a harness test is unfalsifiable and is not allowed.
+1. **Builds clean** at the project warning level, both architectures, warnings as errors.
+2. **Static analysis clean**: `clang-tidy` reports nothing new on the touched translation units.
+3. **Unit test** under Catch2 in `tests/`.
+4. **Driven run with evidence**: a log line, an `.ini` readback, or a capture under `docs/captures/`.
+5. **Parity proof**: the C++ tool and its `resolute_au3/` counterpart run against the same fixture and produce the same effect, compared field by field. Every ported tool owes this one.
+
+A checkpoint citing a gate that does not exist yet is unfalsifiable and is not allowed.
 
 ## Working rules
 
-- **Output discipline:** bound every command (`Au3Check` on the touched scripts, `tail`/`head` on logs, field extraction on `.ini` readbacks). Keep full logs in ignored scratch.
+- **Output discipline:** bound every command (build output filtered to the touched targets, `tail` or `head` on logs, field extraction on `.ini` readbacks). Keep full logs in ignored scratch.
 - **Act, then report:** complete authorized work and report evidence. Explicit operator stop instructions take effect immediately.
 - **Writes are serial:** one session owns the working tree. Check `git status` before building over unfamiliar work.
 - **User systems first:** atomic writes, readback, skip-and-report, confirmed destructive paths, and a reverse for every system change or an honest statement that there is none. Checkpoints prove the failure path too.
-- **One suite, one SDK:** shared behavior is consumed from `SDK/Includes/`, never reimplemented in a tool. A second progress bar, About dialog, settings writer, or log format is a defect.
-- **Elevation is checked at the action**, not only by `#RequireAdmin` at startup.
+- **One suite, one framework:** shared behavior is consumed from the framework or the repair contract, never reimplemented in a tool. A second progress bar, About dialog, settings writer, or log format is a defect.
+- **Elevation is checked at the action**, not only at startup.
+- **`resolute_au3/` is read-only** except under the maintenance domain. It is the specification. Changing it changes what the port is measured against.
 - **No em dashes** in authored prose. One line per paragraph and list item in Markdown.
-- **Source of truth:** tool behavior via the `.au3` source and a driven run, the house style via the captures under `docs/captures/`, plan state via `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
+- **Source of truth:** target behavior via the `resolute_au3/` source and a driven run of the shipped tool, the house style via the captures under `docs/captures/`, plan state via `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
+
+## Frozen behavior
+
+Six tools change a user's system in ways that are hard to undo: `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, `BiosCodes`.
+
+What they compute and write is **frozen**. The C++ port reproduces the effect exactly and proves it with a parity check. Restructuring is allowed, changing the effect is not, because the effect lands on somebody's registry, ACLs, or drive.
+
+`ReBar` is not in this set. It is the framework, it changes nothing on a user's system, and it is internal tooling rather than a product. The archived AutoIt plan says otherwise and is wrong.
 
 ## Unknowns and questions
 
-Answer from source first (the script, a driven run, Microsoft's documentation for a Win32 call). When an unanswered question would change implementation, take a justified default, record that it is a default with its cost of changing, and carry on. Do not stall a section waiting for an answer; do not silently reinterpret a section into something buildable.
+Answer from source first: the `resolute_au3/` script, a driven run of the shipped tool, Microsoft's documentation for a Win32 call, or the wxWidgets documentation. When an unanswered question would change implementation, take a justified default, record that it is a default with its cost of changing, and carry on. Do not stall a section waiting for an answer; do not silently reinterpret a section into something buildable.
 
 ## Validation
 
 ```bash
 python scripts/todo-graph.py self-test      # 393 cases, must stay green
-python scripts/todo-graph.py validate       # FATAL blocks; new WARN* blocks until fixed or accepted
+python scripts/todo-graph.py validate       # FATAL blocks; new WARN blocks until fixed or accepted
 python scripts/todo-graph.py query ready    # dependency-safe work right now
 python scripts/todo-graph.py query blocked  # sections waiting on something
 python scripts/todo-graph.py query stats    # tree health
 python scripts/todo-graph.py plan --sync    # re-derive the plan projection after TODO edits
 python scripts/todo-graph.py plan --check   # fail if the projection went stale
-python scripts/todo-graph.py resolve 'D00 T01 §1'   # ref -> file, section, deps, status
 ```
 
-Build and check commands arrive with `D00 T01`: `scripts/autoit-env.ps1`, `scripts/au3check-all.ps1`, `scripts/build.ps1`, and `scripts/check-all.ps1` as the one command a push owes. The test harness arrives with `D00 T02 §1`. Until they land, `todo-graph.py` is the only thing to run, and `Au3Check.exe` can be invoked directly.
+`python scripts/todo-graph.py resolve` takes a reference and reports its file, section, dependencies, and status.
 
-Run checks owed by the task. Report only commands actually run, and distinguish static evidence, driven-run output, and review proof.
+Build and check commands arrive with `D00 T01`. Until they land, `todo-graph.py` is the only thing to run.
+
+Run checks owed by the task. Report only commands actually run, and distinguish static evidence, driven-run output, parity output, and review proof.
 
 Use trunk-based `master` for routine work and concise imperative commits. Respect exact candidate identity and one-section scope. Never bypass hooks with `--no-verify`, amend a recorded candidate, or force-push.
 
 ## Credentials
 
-Credentials never enter tracked files, arguments, logs, or handoff prose. The signing certificate and its password are supplied to the build from outside the repository; `SDK/Signing/` holds configuration, never a secret.
+Credentials never enter tracked files, arguments, logs, or handoff prose. The signing certificate and its password are supplied to the build from outside the repository, and signing already happens through an existing external procedure that `06-distro-release` documents rather than replaces.

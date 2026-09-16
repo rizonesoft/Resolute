@@ -200,7 +200,7 @@ CHROME_BLOCK_RE = re.compile(r"^\*\*Chrome:\*\*")
 NEEDS_BLOCK_RE = re.compile(r"^\*\*Needs:\*\*\s*(?P<value>.+?)\s*$")
 NEEDS_ALLOWED: dict[str, str] = {
     "Windows host (build/test)": "windows-host",
-    "AutoIt3 toolchain (compile)": "autoit-toolchain",
+    "C++ toolchain (compile)": "cpp-toolchain",
     "Optical drive (drive test)": "optical-drive",
     "USB device (drive test)": "usb-device",
     "Signing certificate (release)": "signing-cert",

@@ -4,125 +4,119 @@ id: build-and-release
 domain: 06-distro-release
 status: draft
 title: "TODO-01 -- Build and Release"
-depends_on: []
+depends_on: [tool-ports]
 track: R1
 ---
 
 # TODO-01 -- Build and Release
 
-> **Goal:** A release of Resolute Power Tools is produced by a repeatable procedure from a clean checkout: every tool built to both architectures, signed, packaged into the installer and the portable edition, versioned consistently, and checked against a list before it ships. Today the procedure lives in one developer's habits and one machine's directory layout.
+> **Goal:** A release is produced by a procedure rather than by habit: one command builds the whole set, every tool is signed, every tool ships as an installer and a portable edition, every tool gets its update file, and the four retiring products tell their users where they went.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** Builds run through `SDK/Distro.exe` against a `.sni` descriptor per tool. There are 13 `.sni` files under `SDK/Concrete/*/`; `SDK/Concrete/Distro/` has `Distro.au3` but no descriptor of its own. Every one of the 13 hardcodes `ScriptPath=R:\Workspace\Resolute\...` plus absolute `Icon`, `OutFilePath`, `OutFileX64Path`, and `DistributionPath` values, none of which match this checkout at `R:\conclave\projects\Resolute`. `Resolute.sni` sets `Sign=0` and points `CertificateSet` at `Signing\Signing.ini`; `SDK/Signing/` exists in the tree. `Resolute_setup.iss` is an Inno Setup script at the repository root, last touched 2025-03-15. Tool versions have drifted apart: `Resolute` 23.2.0.857, `Firemin` 12.2.1.9558, `Chromin`/`Edgemin`/`Watermin` 11.8.3.8534, `BiosCodes` 11.3.1.1994, down to `Ownership` 11.1.1.869. `Distribution/` output directories are gitignored. There is no release checklist and no changelog procedure in the repository.
+> **Current state (verified 2026-09-16):** Nothing exists in C++. In the AutoIt tree, thirteen `.sni` descriptors drive `SDK/Distro.exe`, and every one of them hardcodes `R:\Workspace\Resolute\...`, a path that no longer exists, so that tree does not build from a clean checkout. All thirteen carry `Sign = 0`, `Compress = 0`, and `SignInstall = 0`. Signing happens through an existing procedure outside this repository, which this file documents rather than replaces. The update mechanism resolves `<UpdateServer>/<ShortName>.ru`, or `.ruz` on a beta build, but nothing in the tree generates those files. Copyright years in the AutoIt sources span 2022 to 2025 because they are typed by hand into fourteen scripts.
 
 ## Inputs
 
-- [`SDK/Concrete/Resolute/Resolute.sni`](../../SDK/Concrete/Resolute/Resolute.sni) -- the descriptor shape all 13 repeat, including its `[Modules]`, `[Signing]`, and `[Distribute]` sections
-- [`Resolute_setup.iss`](../../Resolute_setup.iss) -- the Inno Setup installer script §4 owns
-- [`Resolute/Docs/Resolute/Changes.txt`](../../Resolute/Docs/Resolute/Changes.txt) -- the changelog §5 makes part of the procedure
-- -> XREF: [`00-workspace/TODO-01 §3`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the one-command build this file's release procedure calls, and the `.sni` path repair it depends on
-- -> XREF: [`07-quality/TODO-01 §3`](../07-quality/TODO-01-quality-bar.md) -- the suite smoke run the release checklist requires before shipping
-- -> XREF: [`08-docs-localization/TODO-01 §1`](../08-docs-localization/TODO-01-docs-and-localization.md) -- the per-tool documentation a release ships
+- [`resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.sni`](../../resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.sni) -- the shape of a release descriptor, and the record of what a distributed tool ships with
+- -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the ports this release ships
+- -> XREF: [`08-docs-localization/TODO-01 §1`](../08-docs-localization/TODO-01-docs-and-localization.md) -- the documentation set every release includes
 
 ## Outcome
 
-- Every tool, including `Distro` itself, has a build descriptor that resolves from the repository root.
-- One command produces a complete, signed release set from a clean checkout.
-- The installer and the portable edition are built from the same outputs and both are install-tested.
-- Version numbers across the suite follow a stated rule, and a release cannot ship with a version that contradicts its changelog.
+- One command produces the whole release set, for both architectures.
+- Every shipped executable is signed through the documented procedure.
+- Every tool ships as an installer and as a portable edition, install-tested on a clean machine.
+- Every tool has an update file, generated rather than hand-written.
+- The four retiring products announce their successors.
+- The version rule is written down, including the build auto-increment convention.
 
-**Adjacency:** list=not-applicable (a build procedure holds no records a user browses; the release artifacts are files on disk); document=applicable @ D06 T01 §5; settings=applicable @ D06 T01 §1; reporting=applicable @ D06 T01 §2; notifications=not-applicable (nothing here notifies a user; a release announcement is outside this repository); permissions=applicable @ D06 T01 §4; audit=applicable @ D06 T01 §5; exchange=applicable @ D06 T01 §3; reverse=applicable @ D06 T01 §4
+**Adjacency:** list=not-applicable (the release process holds no records a user browses); document=applicable @ D06 T01 §5; settings=not-applicable (the release reads the build configuration and owns none of its own); reporting=applicable @ D06 T01 §2; notifications=applicable @ D06 T01 §4; permissions=not-applicable (release runs on a developer machine with no role model); audit=applicable @ D06 T01 §5; exchange=applicable @ D06 T01 §4; reverse=applicable @ D06 T01 §3
 
-**Adjacency rationale:** Settings is §1 because the `.sni` files are the build's settings surface and they are the file class most often hand-edited in this repository, which is exactly how they came to carry one developer's drive letter. Permissions and reverse both land on §4: an installer needs elevation, and the reverse of an install is an uninstall that leaves nothing behind, which is the part nobody tests until a user complains. Exchange is §3 because signing consumes a certificate produced elsewhere and the release set is what leaves this repository. Document and audit pair on §5: the changelog is both the document a user reads and the record of what a given version contained.
+**Adjacency rationale:** Reverse anchors on §3 because an installer that cannot cleanly uninstall is the one irreversible thing a release can ship, and it is only provable on a machine that has never had the suite. Exchange and notifications pair on §4 because the update file is both a published interface and the only channel to a user who already installed something, which is exactly what the retiring products need.
 
 ## Implementation Order
 
-| Order | Section | Deliverable                                  | Depends On | Status |
-| :---: | :-----: | -------------------------------------------- | ---------- | :----: |
-|   1   |   §1    | Complete and portable build descriptors      | D00 T01 §4 |  [ ]   |
-|   2   |   §2    | One command builds the whole release set     | §1, D00 T01 §5 |  [ ]   |
-|   3   |   §3    | Signing the release set                      | §2         |  [ ]   |
-|   4   |   §4    | Installer and portable edition, install-tested | §2       |  [ ]   |
-|   5   |   §5    | Version rule, changelog, and release checklist | §3, §4   |  [ ]   |
+| Order | Section | Deliverable                                   | Depends On   | Status |
+| :---: | :-----: | --------------------------------------------- | ------------ | :----: |
+|   1   |   §1    | Release descriptors, portable by construction | D04 T01 §1   |  [ ]   |
+|   2   |   §2    | One command builds the release set            | §1           |  [ ]   |
+|   3   |   §3    | Installer and portable edition, install-tested | §2          |  [ ]   |
+|   4   |   §4    | Update files and consolidation announcements  | §2           |  [ ]   |
+|   5   |   §5    | Version rule, changelog, and release checklist | §2          |  [ ]   |
 
 ---
 
-## 1. Complete and Portable Build Descriptors
+## 1. Release Descriptors, Portable by Construction
 
-`D00 T01 §4` removes the hardcoded drive letter from the 13 existing descriptors. This section finishes the job: the missing descriptor, the sections that are inconsistent between tools, and the rule that keeps a new tool from being added without one.
+Thirteen descriptors pointing at a directory that no longer exists is the clearest possible argument for making a path impossible to hardcode.
 
-- [ ] Add `SDK/Concrete/Distro/Distro.sni` so the builder itself is built by the same procedure as everything else. Done when: `pwsh scripts/build.ps1 Distro` produces both architectures. Cheaper substitute: leaving the builder as the one tool built by hand, which is how its build breaks unnoticed.
-- [ ] Compare the `[Modules]`, `[Signing]`, and `[Distribute]` sections across all 14 descriptors and record every difference with whether it is deliberate. Done when: the comparison table is in the commit body and each difference is marked deliberate or a defect.
-- [ ] Normalize the defects found, leaving the deliberate differences alone and annotated. Done when: a second run of the comparison shows only the annotated differences.
-- [ ] Confirm every file each `[Distribute]` section names actually exists, including the `Docs` and `Language` paths. Done when: a checker reports zero missing files, or the missing ones are filed with an owner. Source: `Resolute.sni`'s `[Distribute]` names `Docs\Resolute\Changes.txt`, `Readme.txt`, `License.txt`, and `Language\Resolute\en.lng`.
-- [ ] Add the rule and its check: a tool directory under `SDK/Concrete/` without a `.sni` fails the gate. Done when: a scratch directory with no descriptor makes `scripts/check-all.ps1` exit 1 naming it.
-- [ ] Commit: `"distro: give every tool a complete, repository-relative build descriptor"`
+**Needs:** C++ toolchain (compile)
 
-**Test checkpoint:** `pwsh scripts/build.ps1 Distro` produces both architectures. The distribute-file checker reports zero missing files across all 14 descriptors. A scratch tool directory with no `.sni` makes `scripts/check-all.ps1` exit 1 naming it. All three outputs are quoted in the commit body.
+- [ ] Declare each tool's release content: executables, documentation set, language packs, and any runtime assets. Done when: every shipped tool has a declaration and it is derived from the build rather than maintained separately.
+- [ ] Make an absolute path impossible. Done when: a declaration containing one fails the release build with a named message, and this section names the enforcement.
+- [ ] Generate the copyright year at build time rather than storing it. Done when: no source file contains a hardcoded year and the built executables all report the same one.
+- [ ] Carry the per-tool independence: each declaration produces a self-contained set that needs no other tool. Done when: each set is checked for references outside its own folder.
+- [ ] Commit: `"release: declarative, path-portable release descriptors"`
 
-## 2. One Command Builds the Whole Release Set
+**Test checkpoint:** Every shipped tool has a release declaration derived from the build. A declaration with an absolute path fails with a named message. No source contains a hardcoded copyright year and all built executables report the same one. Each release set is self-contained, proven by check.
 
-Fourteen tools times two architectures is 28 executables, plus documentation and language files. Done by hand, a release ships with one tool a build behind and nobody notices for a month.
+## 2. One Command Builds the Release Set
 
-**Needs:** AutoIt3 toolchain (compile)
+**Needs:** C++ toolchain (compile)
 
-- [ ] Add `scripts/release.ps1` building every tool to both architectures from a clean checkout and collecting the outputs into a staging directory. Done when: one invocation produces all 28 executables plus the files each `[Distribute]` section names. Cheaper substitute: a script that builds and leaves the outputs where they land, so the release set is assembled by hand afterwards.
-- [ ] Fail the release build on the first tool that does not build, and report which, rather than producing a partial set that looks complete. Done when: a deliberately broken tool stops the run and names itself.
-- [ ] Produce a manifest: every artifact with its version, size, architecture, and hash. Done when: the manifest covers all 28 executables and is written into the staging directory.
-- [ ] Make the build reproducible enough to compare: two runs from the same commit produce manifests differing only in fields that legitimately vary, and the section names which those are. Done when: two runs are compared and the differing fields are listed and explained.
-- [ ] Require the gates before staging: `scripts/check-all.ps1` must pass, and the release script refuses to stage when it does not. Done when: a deliberately introduced Au3Check warning makes the release script refuse with the gate named.
-- [ ] Commit: `"distro: build the whole release set with one command"`
+- [ ] `scripts/release.ps1` builds every shipped tool for both architectures in release configuration. Done when: one invocation produces the whole set and names each artifact.
+- [ ] Refuse to produce a release when the gates are not green. Done when: a deliberate warning makes the release command refuse with a named message, and the refusal names which gate failed.
+- [ ] Report the set legibly: one line per tool with its version, architectures, and artifact sizes. Done when: a full run's report is quoted.
+- [ ] Make the run reproducible. Done when: two runs from the same commit produce identical artifacts, or this section records exactly which bytes differ and why.
+- [ ] Commit: `"release: one command builds the whole release set"`
 
-**Test checkpoint:** `pwsh scripts/release.ps1` from a clean checkout produces 28 executables and a manifest naming each with version, architecture, size, and hash, quoted in part. A deliberately broken tool stops the run and names itself. A new Au3Check warning makes the script refuse before staging, naming the gate. All three outputs are quoted in the commit body.
+**Test checkpoint:** One invocation produces the whole set for both architectures with a per-tool report, quoted. A deliberate warning makes it refuse and name the failing gate. Two runs from one commit are compared and any difference is explained.
 
-## 3. Signing the Release Set
-
-`Resolute.sni` carries `Sign=0` and a `CertificateSet` pointing at `Signing\Signing.ini`. Unsigned executables that perform system repairs will be blocked, quarantined, or simply distrusted, so signing is not a finishing touch here.
-
-**Needs:** Signing certificate (release)
-
-- [ ] Record what signing needs: which certificate, where it comes from, how it is supplied to the build, and what must never be committed. Done when: the requirements are written here and no credential or certificate path appears in a tracked file.
-- [ ] Wire signing into `scripts/release.ps1` behind a switch, so an unsigned developer build and a signed release build are the same procedure with one difference. Done when: both modes run and the manifest records which was used.
-- [ ] Verify every artifact after signing rather than trusting the signing call: check each executable's signature and report per artifact. Done when: all 28 are verified and one deliberately unsigned artifact is reported as such.
-- [ ] Refuse to produce a release-marked set when any artifact is unsigned. Done when: the refusal names the artifacts and exits non-zero.
-- [ ] Record the failure path: what happens when the certificate is unavailable or expired, and what the operator does. Done when: the procedure is written and the unavailable-certificate case is exercised.
-- [ ] Commit: `"distro: sign the release set and verify every artifact"`
-
-**Test checkpoint:** With the certificate available, `pwsh scripts/release.ps1 -Sign` produces 28 signed artifacts, each verified, with the verification output quoted. With the certificate absent, the script refuses and names what is missing. A deliberately unsigned artifact is reported and blocks the release-marked set. This row does not stamp until it has run with a real certificate.
-
-## 4. Installer and Portable Edition, Install-Tested
-
-`Resolute_setup.iss` builds the installer and `PortableEdition=1` selects the portable behavior at runtime. Neither has a test, so the first person to find out that an install is broken is a user.
+## 3. Installer and Portable Edition, Install-Tested
 
 **Needs:** Windows host (build/test)
 
-- [ ] Build the installer from the staged release set rather than from whatever is lying in the working tree. Done when: `Resolute_setup.iss` consumes the staging directory and the installer's file list matches the manifest.
-- [ ] Produce the portable edition from the same staged set, with `PortableEdition=1` and its settings beside the executable. Done when: the portable set runs from a directory with no installation and writes its settings there.
-- [ ] Install-test on a clean target: install, launch the launcher, launch one tool from it, and confirm settings and logs land where the edition says they should. Done when: all four steps pass and the paths are recorded.
-- [ ] Uninstall-test as the reverse: uninstall, and confirm what remains is only what the user would expect to keep, with anything left behind named deliberately. Done when: the remaining file and registry list is recorded and each entry is deliberate.
-- [ ] Prove the elevation path: the installer requests elevation, and declining it leaves the system unchanged. Done when: a declined install leaves no files and no registry entries.
-- [ ] Record the upgrade case: installing over an existing version preserves the user's settings. Done when: a settings value set before the upgrade is read back after it.
-- [ ] Commit: `"distro: build and install-test the installer and the portable edition"`
+- [ ] Produce an installer and a portable edition per tool. Done when: both exist for every shipped tool and the portable edition writes nothing outside its own folder, traced.
+- [ ] Sign every executable and every installer through the existing external procedure. Done when: the procedure is documented here, every artifact verifies, and no credential appears in any tracked file.
+- [ ] Install-test on a machine that has never had the suite. Done when: install, run, and uninstall are each proven on a clean virtual machine with a snapshot, and the machine and snapshot are named.
+- [ ] Prove the uninstall is a real reverse. Done when: after uninstall the machine has no leftover files, registry keys, or services, compared against the pre-install snapshot.
+- [ ] Upgrade-test over a previously installed version. Done when: an upgrade preserves user settings and the check is quoted.
+- [ ] Commit: `"release: installer and portable edition, install-tested"`
 
-**Test checkpoint:** On a clean target, the installer installs from the staged set, the launcher starts, one tool launches from it, and settings and logs land at the recorded paths. Uninstalling leaves only the named, deliberate residue. A declined elevation leaves nothing behind. An upgrade preserves a settings value set beforehand. All five results are quoted in the commit body.
+**Test checkpoint:** Both editions exist per tool; the portable edition writes nothing outside its folder, traced. Every artifact verifies as signed. Install, run, uninstall, and upgrade are each proven on a named clean virtual machine. The post-uninstall comparison against the pre-install snapshot is quoted.
+
+## 4. Update Files and Consolidation Announcements
+
+The channel to every user who already installed something. Four products are retiring into two, and this is the only way those users find out.
+
+**Needs:** C++ toolchain (compile)
+
+- [ ] Generate `<ShortName>.ru` and `.ruz` per tool from the release build. Done when: every shipped tool has both, generated rather than hand-written, and the values match the built artifacts.
+- [ ] Generate the announcement files for the four retiring products: `Chromin`, `Edgemin`, `Watermin`, and `DVDRepair`. Done when: each carries a build above any shipped build, a `UpdateURL` pointing at its successor, and a `Successor` naming it.
+- [ ] Verify the announcement end to end against a real installed build. Done when: an installed AutoIt `Chromin` polls the generated file and shows the consolidation message, captured.
+- [ ] Keep the files backward compatible. Done when: a shipped AutoIt build parses a generated file carrying the new `Successor` key without error, proven by driving one.
+- [ ] Record the retirement policy: how long the announcement files stay published. Done when: the policy is dated with its cost of changing.
+- [ ] Commit: `"release: generated update files and consolidation announcements"`
+
+**Test checkpoint:** Every shipped tool has generated `.ru` and `.ruz` matching its artifacts. An installed AutoIt `Chromin` polls the generated file and shows the consolidation message, captured. A shipped AutoIt build parses a file carrying `Successor` without error. The retirement policy is dated.
 
 ## 5. Version Rule, Changelog, and Release Checklist
 
-Tool versions in this suite span 11.1.1.869 to 23.2.0.857, and the `.sni` version and the script's own version directive differ by one build during development by convention that is written down nowhere. A release that ships a version contradicting its changelog is the kind of error that is discovered by a user asking which version fixed their bug.
+**Needs:** C++ toolchain (compile)
 
-- [ ] Write the version rule: what each field means, when each is bumped, why the tools do not share a number, and the expected one-build drift between a `.sni` `Version=` and the script's `#AutoIt3Wrapper_Res_Fileversion`. Done when: the rule is in `docs/release/versioning.md` and explains the current spread rather than declaring it wrong.
-- [ ] Reconcile the two version sources at release time: the release build refuses when a tool's `.sni` version and its compiled resource version disagree by more than the rule allows. Done when: a deliberate mismatch makes the release build refuse and name the tool.
-- [ ] Make the changelog part of the procedure: `Resolute/Docs/<Tool>/Changes.txt` gains an entry for the version being released, and the release build refuses when the version being built has no entry. Done when: a tool with no changelog entry for its version blocks the release and names itself.
-- [ ] Write the release checklist as a runnable document: gates green, release set built, signed, installed, uninstalled, smoke run passed, changelogs current, manifest archived. Done when: `docs/release/checklist.md` exists and every item names the command or artifact that satisfies it.
-- [ ] Archive the manifest with the release so a shipped artifact can be traced back to its commit. Done when: the manifest records the commit hash and is stored with the release set.
-- [ ] Commit: `"distro: state the version rule and make the release checklist runnable"`
+- [ ] Write the version rule, including that the descriptor build number sits one behind the source because of auto-increment. Done when: the rule explains the current spread rather than declaring it wrong, and says what a C++ port does to a tool's version.
+- [ ] Decide and record what version a ported tool ships at. Done when: the decision is dated with its cost, and covers both the ports and the new tools.
+- [ ] Generate the changelog from commits rather than maintaining it by hand. Done when: a release produces a per-tool changelog and each entry traces to a commit.
+- [ ] Write the release checklist as a procedure somebody else could run. Done when: a second person follows it end to end and their result is recorded.
+- [ ] Commit: `"release: version rule, changelog, and checklist"`
 
-**Test checkpoint:** A deliberate version mismatch between a `.sni` and its script's resource version makes the release build refuse and name the tool. A tool whose `Changes.txt` lacks an entry for the version being built blocks the release. `docs/release/checklist.md` exists with a command or artifact named for every item, and the archived manifest carries the commit hash. All outputs are quoted in the commit body.
+**Test checkpoint:** The version rule explains the current spread and the auto-increment convention. A release produces a per-tool changelog whose entries trace to commits. A second person runs the checklist end to end and the result is recorded.
 
 ## Verification
 
-- [ ] `pwsh scripts/release.ps1` from a clean checkout produces the full staged set and its manifest
-- [ ] Every artifact in the release set is signed and verified
-- [ ] The installer and the portable edition are both install-tested, including the uninstall and the declined-elevation paths
-- [ ] `docs/release/checklist.md` and `docs/release/versioning.md` exist and every checklist item names its command or artifact
+- [ ] `pwsh scripts/release.ps1` produces the whole set for both architectures
+- [ ] The release refuses to build when any gate is not green
+- [ ] Every artifact verifies as signed and no credential appears in any tracked file
+- [ ] Install, uninstall, and upgrade are proven on a clean machine
+- [ ] The consolidation announcement is verified against a real installed build
 - [ ] `python scripts/todo-graph.py validate` clean

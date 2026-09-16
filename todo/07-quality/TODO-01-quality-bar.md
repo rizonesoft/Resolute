@@ -3,111 +3,96 @@ schema_version: 1
 id: quality-bar
 domain: 07-quality
 status: draft
-title: "TODO-01 -- Quality Bar"
+title: "TODO-01 -- The Quality Bar"
 depends_on: []
 track: Q1
 ---
 
-# TODO-01 -- Quality Bar
+# TODO-01 -- The Quality Bar
 
-> **Goal:** The suite has a written, checkable definition of what "done" means for a tool, a warning count that only goes down, a smoke run that answers whether all fourteen tools still work, and a conformance check that catches a tool drifting away from the house style. This file does not build features. It is what makes a claim about a feature believable.
+> **Goal:** "Done" is a checklist a machine can run, not an opinion. The conformance profile says what a tool must be, the conformance check proves it per tool, and the ratchet makes sure the numbers only move one way.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** There is no written quality bar, no test suite, no smoke run, and no conformance check in this repository. The measured baseline is: 0 Au3Check errors, 847 unique Au3Check warnings at `-w 1..7` across the 14 concrete scripts (610 `already declared/assigned`, 178 unused locals, 54 `'Local' specifier in global scope`, 4 deprecated `Dim`, 1 global-in-function); 7 of 14 tools writing settings to a `.lng`; 5 of 14 with no logging; 41 of 54 launcher menu items hardcoded in English; 3 tools with no language directory; 3 with no documentation directory; and 4 tools that are the same 2,389-line file. Every one of those numbers is a starting point this file drives toward zero, and every one of them is owned by a section somewhere else in the tree.
+> **Current state (verified 2026-09-16):** Nothing here exists. This domain runs **early**, not late: the profile is what every tool is built against and what every intake is measured against, so it is a dependency of the framework's acceptance rather than a review of finished work. The AutoIt suite is the evidence for why: with no written bar, seven tools stored settings in a language-pack file, six wrote no log, four had no documentation directory, and five had no language pack, and none of that was visible as a defect because nothing said it should be otherwise.
 
 ## Inputs
 
-- [`scripts/au3check-baseline.txt`](../../scripts) -- the ratchet file §2 drives down, created by `D00 T01 §2`
-- [`docs/captures/house-style/`](../../docs) -- the captures §4 checks each tool against, created by `D00 T02 §3`
-- -> XREF: [`00-workspace/TODO-01 §2`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the Au3Check gate and the baseline this file ratchets
-- -> XREF: [`00-workspace/TODO-02 §5`](../00-workspace/TODO-02-test-backbone.md) -- the smoke run this file turns into a standing check
-- -> XREF: [`03-system-tools/TODO-01 §1`](../03-system-tools/TODO-01-system-tool-repairs.md) -- the tools measured against the bar §1 writes
-- -> XREF: [`06-distro-release/TODO-01 §2`](../06-distro-release/TODO-01-build-and-release.md) -- the release build that refuses to stage when these checks fail
+- [`docs/brainstorm/2026-09-16-completion-brainstorm.md`](../../docs/brainstorm/2026-09-16-completion-brainstorm.md) -- the measured conformance matrix the profile is derived from
+- -> XREF: [`00-workspace/TODO-01 §3`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the tidy baseline this domain ratchets
+- -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework the profile mostly describes consuming correctly
 
 ## Outcome
 
-- `docs/quality/bar.md` states what a tool must be able to prove before it is called done, and every item on it names the check that proves it.
-- The Au3Check baseline only ever shrinks, enforced rather than encouraged.
-- A single command answers whether all fourteen tools still start, render, and exit cleanly.
-- A tool that drifts from the house style is caught by a check rather than by a reviewer's memory.
+- A written profile that says what a finished tool is, in terms a check can evaluate.
+- A check that runs the profile against every tool and fails by name.
+- A ratchet on warnings and static-analysis findings that only goes down.
+- A standing smoke run over the whole suite.
 
-**Adjacency:** list=applicable @ D07 T01 §3; document=applicable @ D07 T01 §1; settings=not-applicable (the quality checks have no tunable a user changes; their thresholds are decisions recorded in the bar itself); reporting=applicable @ D07 T01 §3; notifications=not-applicable (a local check notifies nobody; CI notification waits for a runner); permissions=applicable @ D07 T01 §1; audit=applicable @ D07 T01 §2; exchange=not-applicable (nothing here reads or writes a third-party format); reverse=not-applicable (a check changes nothing, so there is nothing to undo)
+**Adjacency:** list=applicable @ D07 T01 §3; document=applicable @ D07 T01 §1; settings=not-applicable (the quality tooling owns no user-facing settings); reporting=applicable @ D07 T01 §3; notifications=not-applicable (a local check notifies nobody); permissions=not-applicable (no role model in a developer gate); audit=applicable @ D07 T01 §2; exchange=not-applicable (nothing imports or exports here); reverse=not-applicable (a check changes nothing that needs undoing)
 
-**Adjacency rationale:** Audit is §2 and it is the point of the ratchet: the baseline file is the committed record of what this repository has accepted and when, so its diff is the audit trail for every quality decision made here. Permissions lands on §1 rather than on a check, because "what does this tool do without elevation" is an item on the bar every tool must answer, and a bar that omits it would let seven tools pass while failing on a user's machine. Settings and reverse are the two honest not-applicables: a threshold in the bar is a decision recorded in prose, not a value a user tunes, and a read-only check has no undo.
+**Adjacency rationale:** Document anchors on §1 because the profile is the one artifact in this domain a person reads rather than runs, and a bar nobody can read is a bar nobody meets. Audit anchors on §2 because the ratchet is the project's memory of its own quality: the baseline file is the record that makes a regression visible rather than arguable.
 
 ## Implementation Order
 
-| Order | Section | Deliverable                                | Depends On | Status |
-| :---: | :-----: | ------------------------------------------ | ---------- | :----: |
-|   1   |   §1    | The bar: what done means for a tool        | --         |  [ ]   |
-|   2   |   §2    | Warning ratchet that only goes down        | §1, D00 T01 §2 |  [ ]   |
-|   3   |   §3    | Standing smoke run and its report          | §1, D00 T02 §5 |  [ ]   |
-|   4   |   §4    | House-style conformance check              | §1, D00 T02 §3 |  [ ]   |
+| Order | Section | Deliverable                            | Depends On   | Status |
+| :---: | :-----: | -------------------------------------- | ------------ | :----: |
+|   1   |   §1    | The conformance profile                | --           |  [ ]   |
+|   2   |   §2    | Warning and analysis ratchet           | D00 T01 §3   |  [ ]   |
+|   3   |   §3    | Conformance check and its report       | §1           |  [ ]   |
+|   4   |   §4    | Standing smoke run over the suite      | §3           |  [ ]   |
 
 ---
 
-## 1. The Bar: What Done Means for a Tool
+## 1. The Conformance Profile
 
-Fourteen tools, fourteen different ideas of finished. Without a written bar, "is this tool done" is answered by whoever is asked, and the answer moves. This section writes it down, and it writes it as checks rather than as aspirations, because a bar nothing measures is a mission statement.
+The document every other domain is measured against. It runs first because a bar written after the work is a description, not a standard.
 
-- [ ] Write `docs/quality/bar.md` with one row per requirement and, for each, the command or artifact that proves it. Done when: every row names a check, and no row says "should" without naming what refuses it. Cheaper substitute: a list of principles with no check named, which cannot fail and therefore cannot pass.
-- [ ] Include the requirements this tree has already established: Au3Check clean against the baseline, builds both architectures, settings through the shared contract in an `.ini`, every action logged, every user-visible string from the language layer, a documentation directory, a language pack, elevation refused by name, and every destructive action reversible or honestly declared irreversible. Done when: all nine appear with their proving check.
-- [ ] Add the surface requirements: every control working or deferred to a named section, and the rendered surface compared against a capture. Done when: both appear and name `review-todo-section` as their enforcer.
-- [ ] Score all 14 tools against the bar as of today and commit the result as `docs/quality/scorecard.md`. Done when: every tool has a row, every cell is pass, fail, or not-applicable with a reason, and the fails match the measured current state rather than an estimate.
-- [ ] File each fail that has no owner through `add-todo`, so the scorecard's red cells each point at a section. Done when: every fail cell names a section reference that resolves.
-- [ ] State what the bar does not cover and why, so its silence is not read as approval. Done when: the exclusions are listed with reasons.
-- [ ] Commit: `"quality: write the bar and score every tool against it"`
+- [ ] Write the profile covering: consumes the framework, no private settings or log or localization code, settings in an `.ini` through the shared writer, one log line per action, every surface string from a pack, a documentation set, an update short name and file, an About page, DPI correct at four scalings, both appearances, and standalone in an empty folder. Done when: every clause is stated so that a check could evaluate it.
+- [ ] Add the clauses that apply only to a repair tool: consumes the repair contract, records prior state, verifies by read-back, and has a reverse or says it does not. Done when: the profile distinguishes the two tool kinds.
+- [ ] Require standalone-ness explicitly. Done when: the profile states that a built tool alone in an empty directory must start, localize, show About, and check for updates.
+- [ ] Make each clause cite its owner section. Done when: every clause names the section that implements it, so a failure has an address.
+- [ ] Derive the profile from the measured AutoIt gaps rather than from taste. Done when: each of the seven measured defect classes maps to a clause that would have caught it.
+- [ ] Commit: `"quality: the conformance profile"`
 
-**Test checkpoint:** `docs/quality/bar.md` exists with a named check on every row, and `docs/quality/scorecard.md` scores all 14 tools. Every fail cell names a reference that `python scripts/todo-graph.py resolve` accepts without exiting 1 or 2, proven by running it over the extracted references. The resolve output is quoted in the commit body.
+**Test checkpoint:** The profile states every clause in evaluable terms, distinguishes tool kinds, requires standalone-ness, and cites an owner per clause. Each of the seven measured AutoIt defect classes maps to a clause that would have caught it, and the mapping is quoted.
 
-## 2. Warning Ratchet That Only Goes Down
+## 2. Warning and Analysis Ratchet
 
-`D00 T01 §2` freezes the current 847 warnings so the gate can be switched on without failing on day one. That is a starting position, not a resting place. This section makes the number a one-way count and drives it down where it is cheapest to do so.
+**Needs:** C++ toolchain (compile)
 
-- [ ] Enforce the direction: the gate fails when the baseline grows, and `-UpdateBaseline` refuses to add entries unless an override flag is passed and the reason is recorded in the commit. Done when: adding a warning and running `-UpdateBaseline` without the override fails and names the new entries.
-- [ ] Record the current count in `docs/quality/scorecard.md` as the starting figure with its date, so progress is measurable rather than remembered. Done when: the figure and date are recorded and match a fresh sweep.
-- [ ] Clear the 54 `'Local' specifier in global scope` warnings across the concrete tools, the class with the most mechanical fix. Done when: the class is zero repo-wide and the baseline shrank by 54. Cheaper substitute: suppressing the warning level.
-- [ ] Clear the 4 deprecated `Dim` declarations repo-wide. Done when: `grep -rn "^\s*Dim " SDK/` returns nothing and the class is zero.
-- [ ] Triage the 610 `already declared/assigned` warnings into deliberate guards and real duplicates, and record the split. Done when: the split is recorded per file, and the deliberate ones carry a reason in the baseline.
-- [ ] File the remaining classes as their own work with owners rather than fixing them here. Done when: each remaining class has a section reference that resolves.
-- [ ] Commit: `"quality: make the warning baseline one-way and clear the mechanical classes"`
+- [ ] Record the per-target baseline for compiler warnings and static-analysis findings. Done when: the baseline file exists and the combined gate compares against it.
+- [ ] Make the ratchet one-way. Done when: a count above the baseline fails, a count equal passes, and a count below rewrites the baseline down in the same commit.
+- [ ] Report which target regressed, not just that something did. Done when: a deliberate regression names the target and the finding.
+- [ ] Prevent a silent baseline raise. Done when: raising a baseline requires an explicit recorded reason and the check names it.
+- [ ] Commit: `"quality: a ratchet that only goes down"`
 
-**Test checkpoint:** `pwsh scripts/au3check-all.ps1` exits 0 and reports zero warnings of the `'Local' specifier in global scope` and deprecated `Dim` classes repo-wide. The baseline diff shows removals only. Adding a warning and running `-UpdateBaseline` without the override flag exits non-zero naming the new entries. All three outputs are quoted in the commit body.
+**Test checkpoint:** A count above the baseline fails and names the target and finding. A count equal passes. A count below rewrites the baseline down. A raise without a recorded reason is refused. All four quoted.
 
-## 3. Standing Smoke Run and Its Report
+## 3. Conformance Check and Its Report
 
-`D00 T02 §5` builds the smoke run. This section turns it into something that happens rather than something that exists, and makes its output the thing a person reads when asking whether the suite is healthy.
+- [ ] Implement the check so it evaluates the profile against every shipped tool. Done when: it produces one row per tool per clause.
+- [ ] Fail by name. Done when: a tool missing a documentation set is named with the clause it failed and the section that owns it.
+- [ ] Include the standalone clause by actually running the tool in an empty directory. Done when: a tool that reaches outside its folder fails the check, proven by a deliberate regression.
+- [ ] Make the report readable as a matrix. Done when: the full report renders as tools by clauses and is quoted here.
+- [ ] Wire it into the combined gate. Done when: a conformance failure fails `scripts/check-all.ps1`.
+- [ ] Commit: `"quality: the conformance check"`
 
-**Needs:** Windows host (build/test)
+**Test checkpoint:** The check produces a tool-by-clause matrix, quoted. A tool missing a documentation set is named with its clause and owner section. A tool that writes outside its folder fails the standalone clause. A conformance failure fails the combined gate.
 
-- [ ] Make the smoke run part of `scripts/check-all.ps1` behind a switch, since it needs built executables and a desktop session. Done when: `-Smoke` runs it and the default run says clearly that it was skipped and why.
-- [ ] Publish the report at a stable path, `docs/reports/smoke-latest.md`, alongside the dated ones, so there is one place to look. Done when: a run updates both and the stable file names the run's date and commit.
-- [ ] Make the report readable as a status, not a log: one line per tool with started, window found, closed cleanly, and the capture path, and a summary line at the top. Done when: a reader can answer "is the suite healthy" from the first line.
-- [ ] Record per-tool history so a tool that fails intermittently is visible as intermittent rather than as a one-off. Done when: three runs produce a history table showing all three outcomes per tool.
-- [ ] Make the release build require a passing smoke run, so a red suite cannot ship. Done when: a failing smoke run makes `scripts/release.ps1` refuse and name the failing tool.
-- [ ] Commit: `"quality: run the suite smoke check and publish its report"`
+## 4. Standing Smoke Run Over the Suite
 
-**Test checkpoint:** `pwsh scripts/check-all.ps1 -Smoke` runs all 14 tools and updates `docs/reports/smoke-latest.md`, whose first line answers the health question and whose body names every tool. Three consecutive runs produce a history table with three outcomes per tool. A deliberately broken tool makes `scripts/release.ps1` refuse and name it. All three outputs are quoted in the commit body.
+- [ ] Drive every shipped tool through start, main surface, About, preferences, and exit. Done when: every tool is covered and a crash in any one is reported without stopping the run.
+- [ ] Capture each tool's main surface on every run. Done when: the capture set is produced and compared against the previous run.
+- [ ] Report the run as one artifact. Done when: a full run produces a single report naming every tool and its result, quoted.
+- [ ] Make a smoke failure actionable. Done when: a failure names the tool, the step, and the captured state at failure.
+- [ ] Commit: `"quality: a standing smoke run over the whole suite"`
 
-## 4. House-Style Conformance Check
-
-Fourteen tools share one SDK, and the way that stops being true is one tool at a time: a private progress bar here, a second About dialog there, each one reasonable on its own. A reviewer cannot hold fourteen surfaces in memory. A check can.
-
-**Fidelity:** this section builds no surface of its own. It compares other tools' surfaces against `docs/captures/house-style/`.
-
-- [ ] Add `scripts/style-conformance.ps1` reporting, per tool, which shared includes it consumes and which shared behavior it implements privately instead. Done when: it reports a per-tool table and flags any tool defining a function whose name matches a shared include's entry point. Cheaper substitute: checking only the `#include` lines, which passes a tool that includes the file and then ignores it.
-- [ ] Flag the specific drifts this suite is prone to: a private progress bar, a private About dialog, a private settings writer, a private log format, a private message dialog. Done when: all five checks run and a scratch tool with a private progress bar is flagged.
-- [ ] Compare each tool's rendered main window against the house-style capture as part of the smoke run, and report differences rather than failing on them, because a legitimate difference exists and a check that cries wolf gets muted. Done when: the smoke report carries a per-tool difference note and the approved-deviation list is honored.
-- [ ] Keep the approved-deviation list in `docs/captures/house-style/README.md` as the single place a deviation is recorded, and make the check read it. Done when: adding an entry to the list silences exactly that difference and nothing else.
-- [ ] Add the conformance result to the scorecard so drift is visible beside the other measures. Done when: the scorecard gains a column and all 14 tools have a value in it.
-- [ ] Commit: `"quality: check every tool against the house style"`
-
-**Test checkpoint:** `pwsh scripts/style-conformance.ps1` reports all 14 tools with their consumed includes and flags a scratch tool carrying a private progress bar. Adding that difference to the approved-deviation list silences it and nothing else. The scorecard's conformance column is populated for all 14 tools. All three outputs are quoted in the commit body.
+**Test checkpoint:** A full smoke run covers every shipped tool through five steps each and produces one report, quoted. A deliberately broken tool is reported without stopping the run, naming tool, step, and captured state.
 
 ## Verification
 
-- [ ] `docs/quality/bar.md` names a check for every requirement, and every fail on `docs/quality/scorecard.md` names a section that resolves
-- [ ] `pwsh scripts/au3check-all.ps1` exits 0 and the baseline has shrunk against its recorded starting figure
-- [ ] `pwsh scripts/check-all.ps1 -Smoke` runs all 14 tools and publishes `docs/reports/smoke-latest.md`
-- [ ] `pwsh scripts/style-conformance.ps1` reports all 14 tools with no unapproved drift
+- [ ] The conformance profile states every clause in evaluable terms with an owner per clause
+- [ ] `pwsh scripts/check-all.ps1` includes the conformance check and the ratchet
+- [ ] Every shipped tool passes every clause of the profile, or has a recorded exception
+- [ ] A smoke run covers every shipped tool and produces one report
 - [ ] `python scripts/todo-graph.py validate` clean

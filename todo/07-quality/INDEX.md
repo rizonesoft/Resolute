@@ -1,14 +1,14 @@
 # 07 Quality
 
-> **Phase 3**
+> **Phase 0**
 
-The written bar, the warning ratchet, the standing smoke run, and the house-style conformance check. This domain builds nothing a user sees and makes every other claim believable.
+The bar, written before the work rather than after it. The conformance profile defines what a finished tool is; the check proves it per tool; the ratchet keeps the numbers moving one way.
 
 ## TODOs
 
 | TODO | Title | Status |
 | ---- | ----- | :----: |
-| [TODO-01](./TODO-01-quality-bar.md) | Quality Bar | draft |
+| [TODO-01](./TODO-01-quality-bar.md) | The Quality Bar | draft |
 
 ## Completed
 
@@ -17,16 +17,15 @@ The written bar, the warning ratchet, the standing smoke run, and the house-styl
 
 ## In scope
 
-- What done means for a tool, as checks rather than aspirations
-- The one-way Au3Check baseline
-- The standing smoke run and its report
-- House-style conformance across fourteen tools
+- The conformance profile, including the standalone requirement
+- A warning and static-analysis ratchet that only goes down
+- The conformance check and its tool-by-clause report
+- A standing smoke run over the whole suite
 
 ## Out of scope
 
-- The test harness and smoke machinery (00), which this domain turns into standing checks
-- Fixing any individual tool, which belongs to that tool's domain
-- Release gating mechanics (06)
+- The gates' plumbing (00); this domain sets standards, not machinery
+- Fixing any individual tool's conformance failures (04, 05)
 
 ---
 

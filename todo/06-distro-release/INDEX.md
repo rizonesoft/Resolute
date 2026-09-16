@@ -1,8 +1,8 @@
 # 06 Distro and Release
 
-> **Phase 3**
+> **Phase 4**
 
-Building, signing, packaging, and shipping the suite from a clean checkout by a procedure rather than by habit.
+Build, sign, package, and ship. Includes the update files every independently distributed tool needs and the announcements the four retiring products owe their users.
 
 ## TODOs
 
@@ -17,16 +17,16 @@ Building, signing, packaging, and shipping the suite from a clean checkout by a 
 
 ## In scope
 
-- Build descriptors that resolve from the repository root
-- One command for the whole release set, with a manifest
-- Signing, the installer, the portable edition, and install testing
-- The version rule, the changelog procedure, and the release checklist
+- Release descriptors that cannot carry an absolute path
+- One command that builds the whole release set
+- Installer and portable edition, install-tested on a clean machine
+- Generated update files, and the consolidation announcements
+- The version rule, the changelog, and the release checklist
 
 ## Out of scope
 
-- The one-command per-tool build (00), which this domain calls
-- The quality checks (07) the release refuses to ship without
-- Tool behavior of any kind
+- The tools themselves (03, 04, 05)
+- The quality gates the release refuses to ship without (07)
 
 ---
 

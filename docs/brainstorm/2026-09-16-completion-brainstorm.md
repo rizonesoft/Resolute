@@ -438,3 +438,37 @@ The ignore patterns were anchored to the old root and had to be unanchored; the 
 
 `resolute_au3/samples/Resources/` (180 files) has never been tracked and still is not. Decide whether it should be.
 
+
+## Decisions taken, round 6
+
+18. **The toolchain is repository-scoped, built on `clang-cl`.** LLVM, CMake, Ninja, and vcpkg are downloaded into a gitignored `.toolchain/` against recorded hashes. A bare Windows machine with no Visual Studio bootstraps and builds.
+19. **The build is IDE-agnostic.** CMake presets are the source of truth; no `.sln` or `.vcxproj` is committed. Visual Studio, VS Code, and a bare terminal drive the same presets.
+20. **The minimum supported Windows is 10 1809.** This was already implied by choosing dark mode and per-monitor DPI v2, and is now recorded rather than discovered.
+21. **The Windows SDK pins to the latest stable**, with the runtime floor set separately through `WINVER`, `_WIN32_WINNT`, and the manifest. A build check prevents an above-floor API shipping silently.
+22. **Bootstrap detects before it downloads**, and detects the *pinned* version specifically. A machine carrying a different SDK version does not silently satisfy the check, because that would make two machines disagree while both report success.
+
+### The sharp edge in decision 18
+
+`clang-cl` is not a complete toolchain on Windows. It needs the Windows SDK headers and import libraries and a C++ standard library, and neither ships in the LLVM archive.
+
+The LLVM archive is freely redistributable. The Windows SDK is not, so it is downloaded at bootstrap from Microsoft's own package feed rather than committed. `D00 T01 §1` owns proving that acquisition works, and is written so the plan finds out there rather than in `D01`.
+
+### What this is worth
+
+The AutoIt tree does not build from a clean checkout today, because thirteen build descriptors hardcode a path that no longer exists. Making the toolchain repository-scoped is the direct answer to that failure mode: there is no machine-specific state left to go stale.
+
+---
+
+# Where this left the tree, 2026-09-16
+
+The plan is seeded and green.
+
+- **10 domains, 11 TODO files, 54 sections, 334 checklist items.**
+- `validate`: 0 fatal, 0 warning, 43 adjacency advisories.
+- `plan --check`: current, 0 of 54 complete.
+- `self-test`: 393 cases, 0 failed.
+- **4 sections ready now:** `D00 T01 §1` (toolchain bootstrap), `D07 T01 §1` (the conformance profile), `D09 T01 §1` and `§2` (make the AutoIt suite buildable again, and clear its housekeeping defects).
+
+The phases are: gates and the bar; the two shared layers; the launcher and the ports; intake and new capability; ship it in every language.
+
+`07-quality` deliberately carries no file-level dependency, so the conformance profile can be written immediately. It is what every tool is built against, so it runs first rather than reviewing finished work.

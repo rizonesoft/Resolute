@@ -1,0 +1,231 @@
+---
+schema_version: 1
+id: framework-core
+domain: 01-framework
+status: draft
+title: "TODO-01 -- Framework Core"
+depends_on: [cpp-toolchain-and-gates, cpp-test-backbone]
+track: F1
+---
+
+# TODO-01 -- Framework Core
+
+> **Goal:** One framework that every tool consumes, owning everything a Resolute tool does before it does anything specific: startup, settings, logging, localization, update, elevation, preferences, About, DPI, and theme. Written once, so a correction lands once.
+
+> [!IMPORTANT]
+> **Current state (verified 2026-09-16):** None of this exists in C++. In the AutoIt tree it exists fourteen times. `ReBar.au3` is 1,556 lines of pure framework and every tool carries a near-copy of it: all fourteen privately define `_SetWorkingDirectories`, `_GenerateIniFile`, `_LoadConfiguration`, and `_SaveConfiguration`; thirteen privately define `_ShowPreferencesDlg` and `_SetProcessPriority`; thirteen carry a private `Includes/Localization.au3` of 122 to 491 lines. Roughly 21,000 of that tree's 43,000 lines are those copies. The measurable consequence is that seven tools write settings into a `.lng` file and seven into `.ini`, because the path was typed out fourteen separate times. Every script also carries `#AutoIt3Wrapper_Res_HiDpi=N`, so the whole suite renders bitmap-scaled on a high-resolution display.
+
+## Inputs
+
+- [`resolute_au3/SDK/Concrete/ReBar/ReBar.au3`](../../resolute_au3/SDK/Concrete/ReBar/ReBar.au3) -- the framework being ported, and the closest thing to a specification this file has
+- [`resolute_au3/SDK/Includes/`](../../resolute_au3/SDK/Includes) -- the shared includes `ReBar` consumes: `About.au3`, `Update.au3`, `Logging.au3`, `Localization.au3`, `Versioning.au3`
+- -> XREF: [`00-workspace/TODO-01 §4`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the build this framework is the first real consumer of
+- -> XREF: [`00-workspace/TODO-02 §1`](../00-workspace/TODO-02-test-backbone.md) -- the harness these assertions run under
+- -> XREF: [`02-repair-contract/TODO-01 §1`](../02-repair-contract/TODO-01-repair-contract.md) -- the second layer, which sits on this one
+- -> XREF: [`03-launcher/TODO-01 §1`](../03-launcher/TODO-01-launcher.md) -- the launcher, this framework's first product consumer
+- -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the ports, every one of which consumes this
+- -> XREF: [`07-quality/TODO-01 §1`](../07-quality/TODO-01-quality-bar.md) -- the conformance profile, which is largely "consumes this framework correctly"
+- -> XREF: [`08-docs-localization/TODO-01 §2`](../08-docs-localization/TODO-01-docs-and-localization.md) -- the language packs the localization layer loads
+
+## Outcome
+
+- A tool is the framework plus its own logic, and its own logic is the only thing in its source file.
+- Settings live in one place, written by one writer, and survive a restart.
+- Every tool logs, in one format, to one place.
+- Every surface string resolves from a pack, and a missing key is reported rather than rendered blank.
+- The update check works, and can announce a consolidation in the user's language.
+- A privileged action is refused by name when the privilege is absent.
+- Every window is DPI-correct and follows the system theme.
+- A tool placed alone in an empty folder still does all of the above.
+
+**Adjacency:** list=not-applicable (the framework holds no records a user browses; the tools built on it do); document=applicable @ D01 T01 §7; settings=applicable @ D01 T01 §2; reporting=applicable @ D01 T01 §3; notifications=applicable @ D01 T01 §5; permissions=applicable @ D01 T01 §6; audit=applicable @ D01 T01 §3; exchange=applicable @ D01 T01 §4; reverse=not-applicable (the framework changes nothing on a user's system; the repair contract owns undo)
+
+**Adjacency rationale:** Settings anchors on §2 because the settings writer is the single defect this framework exists to stop recurring, and it is the surface every other section reads through. Exchange anchors on §4 because a language pack is a file a translator edits by hand and hands back, which makes it untrusted input with an encoding and a missing-key story rather than a lookup table. Audit and reporting pair on §3 because the log is both, and the AutoIt suite demonstrated what happens when six tools skip it.
+
+## Implementation Order
+
+| Order | Section | Deliverable                                     | Depends On             | Status |
+| :---: | :-----: | ----------------------------------------------- | ---------------------- | :----: |
+|   1   |   §1    | Application shell and lifecycle                 | D00 T01 §4, D00 T02 §1 |  [ ]   |
+|   2   |   §2    | Settings: one writer, one path                  | §1                     |  [ ]   |
+|   3   |   §3    | Logging and the log surface                     | §1                     |  [ ]   |
+|   4   |   §4    | Localization and the pack loader                | §2                     |  [ ]   |
+|   5   |   §5    | Update check and consolidation announcement     | §2, §4                 |  [ ]   |
+|   6   |   §6    | Elevation and its refusal path                  | §3, §4                 |  [ ]   |
+|   7   |   §7    | Standard window, About, and preferences         | §4                     |  [ ]   |
+|   8   |   §8    | DPI awareness and system theme                  | §7                     |  [ ]   |
+|   9   |   §9    | Standalone proof in an empty folder             | §2, §4, §5, §7         |  [ ]   |
+
+---
+
+## 1. Application Shell and Lifecycle
+
+Everything else in this file hangs off the shell. It decides what a tool is structurally, and getting the seam wrong here is what produced fourteen copies last time.
+
+**Fidelity:** no surface of its own. The shell constructs windows; the surfaces live in §7.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Define the tool descriptor: display name, short name, version, product URL, update short name, and icon. Done when: the type carries values only and no behavior, and a tool supplies one to start.
+- [ ] Implement startup: resolve working directories, load configuration, initialize logging, resolve the language, construct the main window, in a documented order. Done when: the order is written in the header and a tool with a minimal descriptor starts.
+- [ ] Implement shutdown: persist configuration, flush the log, release resources. Done when: a forced close still writes the configuration, proven by a readback.
+- [ ] Draw the seam explicitly: the framework owns lifecycle and shared surface, the tool owns its own logic and its own window contents. Done when: the seam is documented and nothing tool-specific exists on the framework side.
+- [ ] Add assertions for the lifecycle order and the shutdown persist. Done when: both run under Catch2.
+- [ ] Commit: `"framework: application shell and lifecycle"`
+
+**Test checkpoint:** A minimal tool built on the shell starts and exits cleanly for both architectures. The documented startup order matches the asserted order. A forced close persists configuration, proven by readback. All three quoted.
+
+## 2. Settings: One Writer, One Path
+
+This section exists because the AutoIt suite typed its settings path fourteen times and got it wrong seven times. One writer, one resolver, and no tool ever computes a settings path again.
+
+**Fidelity:** no surface of its own; the preferences dialog in §7 is the surface.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Implement the settings path resolver from the tool descriptor, producing exactly one path per tool. Done when: no tool can compute its own path, because the framework exposes no way to. Cheaper substitute: a helper that returns a directory and lets each tool append its own filename, which is precisely the AutoIt failure.
+- [ ] Implement typed read and write with defaults, backed by an `.ini` matching the format the AutoIt tools use. Done when: a file written by the AutoIt tool reads back identically through the new reader, proven on a committed fixture.
+- [ ] Write atomically and read back before reporting success. Done when: a write to a read-only location reports failure rather than claiming success, and the original file is intact afterwards.
+- [ ] Carry the portable and installed distinction the AutoIt tools support, resolving to the correct location for each. Done when: both modes resolve and this section records how a tool learns which it is in.
+- [ ] Migrate an existing `<Tool>.lng` settings file to `<Tool>.ini` on first start, with a log line. Done when: a fixture `.lng` taken from the AutoIt tree migrates and the line is written.
+- [ ] Add assertions for round trip, defaults, atomic-write failure, and migration. Done when: four assertions run.
+- [ ] Commit: `"framework: one settings writer and one settings path"`
+
+**Test checkpoint:** `ctest` runs four settings assertions green. An `.ini` written by the shipped AutoIt tool reads back identically. A write to a read-only target reports failure with the original intact. A fixture `.lng` migrates with its log line. All quoted.
+
+## 3. Logging and the Log Surface
+
+Six of fourteen AutoIt tools write no log at all, including every browser optimizer, which terminates and restarts a user's browser silently. In the framework this is one implementation no tool can opt out of by forgetting.
+
+**Fidelity:** the shared log viewer, against `docs/captures/house-style/`.
+**Job:** a user or a support reader can find out what a tool did to their machine and when. Consumer: the log files, read back by the viewer.
+**Treatment:** one line per action, written through a single call no tool can bypass, including actions the user did not trigger explicitly. Cheaper substitute that fails the checkpoint: logging only user-initiated actions, which leaves every scheduled or automatic operation invisible.
+**Chrome:** consume the framework's standard window and list surface. Do not build a second log format.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Implement the log writer with the AutoIt log format preserved, so existing readers and support habits still work. Done when: a line written by the new writer matches the shape of one from the AutoIt tool, compared on a fixture.
+- [ ] Implement the action log call every destructive or notable operation uses. Done when: it is the only way to write a log line and takes the action and its target as arguments.
+- [ ] Honor the enable switch and the size cap, with rotation. Done when: disabling stops the writes and a small cap triggers rotation, both observed.
+- [ ] Guarantee a log line cannot be lost for an action already performed. Done when: an action followed by forced termination still leaves its line, proven by a driven run.
+- [ ] Add assertions for format, rotation, and the disable switch. Done when: three assertions run.
+- [ ] Commit: `"framework: one log format, one log writer"`
+
+**Test checkpoint:** Three logging assertions run green. A line from the new writer matches the AutoIt shape on a fixture. Disabling produces no writes; a small cap rotates. An action followed by forced termination still leaves its line. All quoted.
+
+## 4. Localization and the Pack Loader
+
+`Firemin` has 35 language packs and three browser tools built from the same source have none. In the framework a tool cannot have fewer languages than the framework does, because it does not own the loader.
+
+**Fidelity:** no surface of its own; every surface in §7 renders through it.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Implement the pack loader reading the existing `.lng` format, so the 35 packs in `resolute_au3/Resolute/Language/Firemin/` load unchanged. Done when: all 35 load and their key counts are reported.
+- [ ] Resolve a key through tool pack, then common pack, then the built-in English fallback. Done when: the order is asserted and a key present only in the common pack resolves.
+- [ ] Report missing keys rather than rendering blank. Done when: driving a tool with a deliberately incomplete pack lists every key the surface asked for and did not get.
+- [ ] Treat a pack as untrusted input: wrong encoding, truncated file, or duplicate key produces a named message and a log line, not a crash. Done when: three malformed fixture packs are handled and each produces its message.
+- [ ] Support the language list in preferences, resolving display names without hardcoding them per tool. Done when: the list renders for every pack present.
+- [ ] Add assertions for resolution order, missing-key reporting, and the three malformed cases. Done when: five assertions run.
+- [ ] Commit: `"framework: localization and the pack loader"`
+
+**Test checkpoint:** All 35 Firemin packs load with key counts reported. Resolution order is asserted. An incomplete pack produces a missing-key list. Three malformed packs each produce a named message and a log line. All quoted.
+
+## 5. Update Check and Consolidation Announcement
+
+The update mechanism already works and its file format is already deployed to users. What it cannot do is tell somebody their product has been consolidated into another one, which four retiring products need it to do.
+
+**Fidelity:** the update notice, against `docs/captures/house-style/`.
+**Job:** a user learns a newer version exists, or that their product has been consolidated into another one, in their own language. Consumer: the update file on the server, and the notice on screen.
+**Treatment:** the server supplies a successor name only, and the language pack supplies the sentence around it. Cheaper substitute that fails the checkpoint: a free-text message from the server, which reaches every user in one language regardless of their own.
+**Chrome:** consume the framework's message layer and localization loader. Do not build a second notice dialog.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Implement the check against `<UpdateServer>/<ShortName>.ru`, with `.ruz` on a beta build, matching the AutoIt behavior. Done when: both resolve correctly for a descriptor and the AutoIt URLs are reproduced exactly.
+- [ ] Parse the update file's `[Update]` section with `LatestBuild` and `UpdateURL`, ignoring unknown keys. Done when: a file carrying extra keys parses without error, which is what keeps already-shipped builds compatible.
+- [ ] Add the optional `Successor` key carrying a display name only, rendered through a language-pack template. Done when: a fixture update file naming a successor produces the announcement in the pack's language. Cheaper substitute that fails the checkpoint: a free-text message from the server, which arrives in one language regardless of the user's.
+- [ ] Handle the offline and malformed cases without blocking startup. Done when: an unreachable server and a truncated file each produce one log line and no dialog, both observed.
+- [ ] Honor the check frequency setting, including never. Done when: each setting is driven and the observed behavior matches.
+- [ ] Add assertions for URL derivation, unknown-key tolerance, the successor template, and the offline path. Done when: four assertions run.
+- [ ] Commit: `"framework: update check and the consolidation announcement"`
+
+**Test checkpoint:** Four update assertions run green. A fixture naming a successor renders the announcement from the language pack, quoted in two languages. A file with unknown keys parses. An unreachable server produces one log line and no dialog. All quoted.
+
+## 6. Elevation and Its Refusal Path
+
+Every AutoIt tool requests elevation at startup and then assumes it holds for the session. None re-checks at the action. This section puts the check where the damage would happen.
+
+**Fidelity:** the refusal notice, reusing the shared message dialog in `docs/captures/house-style/`. No new dialog.
+**Job:** a user without the privilege a tool needs is told which action needs what, before anything is changed. Consumer: the log, and the action path that does not run.
+**Treatment:** the check sits immediately before the privileged call, not at startup. Cheaper substitute that fails the checkpoint: checking once at startup and treating the answer as true for the session, which is what all fourteen AutoIt tools do.
+**Chrome:** consume the framework's message layer and logging. Do not build a second refusal dialog.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Implement the elevation check as a guard taking the action name and returning whether it may proceed. Done when: it is the only elevation primitive the framework exposes.
+- [ ] Refuse by name: the message states which action needs what privilege, before anything is attempted. Done when: an unelevated session produces the named refusal and nothing is changed.
+- [ ] Log every refusal exactly once. Done when: a refused action writes one line naming the tool and the action, asserted.
+- [ ] Support the case where a tool can still do something useful unelevated. Done when: the framework exposes the distinction and this section records that each tool declares its own answer.
+- [ ] Add assertions for the guard, the refusal message, and the single log line. Done when: three assertions run unelevated.
+- [ ] Commit: `"framework: gate privileged actions at the call site"`
+
+**Test checkpoint:** Three elevation assertions run green in an unelevated session, each proving the action was refused by name, nothing changed, and exactly one log line was written. The refusal message is quoted.
+
+## 7. Standard Window, About, and Preferences
+
+Three surfaces every tool has, built once. The AutoIt suite has fourteen About dialogs that are nearly the same and drift a little, which is the visible form of the duplication problem.
+
+**Fidelity:** the standard tool window, the About dialog, and the preferences dialog, against `docs/captures/house-style/`. Layout and terminology match the captures; DPI and theme are the approved deviations.
+**Job:** a user recognizes any tool in the suite as part of one product, and changes a shared setting in the place they already know. Consumer: the rendered surfaces, and the settings writer behind preferences.
+**Treatment:** one implementation of each surface, parameterized by the tool descriptor. Cheaper substitute that fails the checkpoint: a base surface each tool is free to override, which is how fourteen About dialogs drifted apart.
+**Chrome:** consume the framework's own settings writer and localization loader. A tool may add a preferences page; it may not fork the dialog.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Build the standard window frame: title band, content area, status strip, and menu, taking its content from the tool. Done when: a tool supplies only content and gets the full frame.
+- [ ] Build the About dialog from the tool descriptor, with no per-tool copy. Done when: two different tools render correct About dialogs with no tool-side code.
+- [ ] Build the preferences dialog covering the framework's own settings: language, logging, update frequency, process priority. Done when: every control persists through the §2 writer and survives a restart.
+- [ ] Let a tool add its own preferences without forking the dialog. Done when: a tool contributes a page and the framework's pages are unchanged.
+- [ ] Account for the surface: every control on all three surfaces is working or deferred to a named section. Done when: the account is written and each deferral resolves.
+- [ ] Compare each rendered surface against its house-style capture and list every difference. Done when: three comparisons are recorded and each difference is either approved or fixed.
+- [ ] Commit: `"framework: standard window, about, and preferences"`
+
+**Test checkpoint:** Two different tools render correct About dialogs with no tool-side code. Every preferences control persists and survives a restart, proven by readback. The three rendered surfaces are compared against their captures with differences listed. Captures committed under `docs/captures/runs/`.
+
+## 8. DPI Awareness and System Theme
+
+The two things the AutoIt suite could never retrofit, done once in the framework where they are affordable. On a high-resolution display the current suite renders soft against a sharp desktop, and it is invisible at 100 percent scaling.
+
+**Fidelity:** the surfaces from §7, re-measured at 125, 150, and 200 percent scaling. These are the approved deviations from the house-style captures.
+**Job:** a user on a high-resolution display or in dark mode sees a tool that looks like the rest of their desktop. Consumer: the rendered surfaces at each scaling and in each appearance.
+**Treatment:** layout expressed in scalable terms so a DPI change re-lays out rather than re-scales a bitmap. Cheaper substitute that fails the checkpoint: declaring DPI awareness while keeping absolute pixel coordinates, which produces clipped controls instead of blurry ones.
+**Chrome:** consume the framework's own surfaces from §7. No tool implements its own DPI or theme handling.
+**Needs:** Windows host (build/test)
+
+- [ ] Declare per-monitor DPI awareness in the manifest and make the framework surfaces lay out correctly at 100, 125, 150, and 200 percent. Done when: all four are captured and no control is clipped or overlapping at any of them.
+- [ ] Handle a DPI change at runtime, which happens when a window moves between monitors. Done when: dragging between two monitors at different scaling re-lays out correctly, captured.
+- [ ] Follow the system light and dark setting on the framework surfaces. Done when: both appearances are captured and text contrast is legible in each.
+- [ ] Record honestly what wxWidgets does not theme natively on Windows, and what the framework does about each. Done when: the list exists with a decision per entry rather than a silent gap.
+- [ ] Expose the appearance as a setting with light, dark, and follow-system. Done when: all three are driven and persist.
+- [ ] Commit: `"framework: per-monitor dpi and system theme"`
+
+**Test checkpoint:** Framework surfaces captured at 100, 125, 150, and 200 percent with nothing clipped. A drag between differently scaled monitors re-lays out correctly. Light and dark both captured. The unthemed-control list carries a decision per entry. All captures committed under `docs/captures/runs/`.
+
+## 9. Standalone Proof in an Empty Folder
+
+Every tool is distributed on its own. This section proves the framework did not quietly introduce a dependency on a suite install, which is the failure that would otherwise surface only after shipping.
+
+**Fidelity:** no surface of its own; this section re-drives the surfaces from §7 in a different environment.
+**Needs:** Windows host (build/test)
+
+- [ ] Define the standalone layout: exactly what files a single tool ships with and where it finds each. Done when: the layout is documented and reconciled against the `Doors/` convention used by Complete Windows Repair. Cheaper substitute: assuming the suite layout and discovering the gap at release.
+- [ ] Place one built tool alone in an empty directory with only its own files and start it. Done when: it starts, localizes, shows About, opens preferences, and checks for updates, all captured.
+- [ ] Prove it writes its settings and its log in that directory and nowhere else. Done when: a file-system trace shows no write outside the tool's own folder, quoted.
+- [ ] Prove no shared root is required. Done when: the tool runs on a machine with no `Resolute/` directory anywhere.
+- [ ] Add the standalone check to the harness so a later change cannot silently break it. Done when: the assertion runs and fails if a framework surface reaches outside the tool folder.
+- [ ] Commit: `"framework: prove a tool runs standalone in an empty folder"`
+
+**Test checkpoint:** A built tool alone in an empty directory starts, localizes, shows About, opens preferences, and checks for updates, all captured. A file-system trace shows no write outside its own folder. The machine has no `Resolute/` directory during the run. The harness assertion fails when a surface reaches outside. All quoted.
+
+## Verification
+
+- [ ] `pwsh scripts/check-all.ps1` exits 0 with the framework suites reporting
+- [ ] All 35 Firemin language packs load through the framework loader
+- [ ] Framework surfaces captured at four DPI scalings and in both appearances
+- [ ] A tool runs standalone in an empty folder, writing nothing outside it
+- [ ] No tool-side code computes a settings path, a log path, or a language path
+- [ ] `python scripts/todo-graph.py validate` clean

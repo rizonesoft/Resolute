@@ -1,0 +1,155 @@
+---
+schema_version: 1
+id: intake-and-new-tools
+domain: 05-new-tools
+status: draft
+title: "TODO-01 -- Intake and New Tools"
+depends_on: [framework-core, repair-contract, tool-ports]
+track: P3
+---
+
+# TODO-01 -- Intake and New Tools
+
+> **Goal:** Six programs from `samples/` become real products, and four new utilities join the suite. Every one of them arrives already conformant, through a repeatable intake contract, so no new tool ever joins a cleanup backlog.
+
+> [!IMPORTANT]
+> **Current state (verified 2026-09-16):** Nothing here has started. The intake candidates live under `resolute_au3/samples/`: Complete Windows Repair (`ComWinRep/WinRepair.au3`, 2,028 lines, version 1.0.0.339, with its own build descriptor and documentation set), QuickErase (`QuickErase/QuickErace.au3`, 723 lines, and the filename is misspelled in the sample), WinClean (`WinClean/EvBeGone.au3`, 582 lines, plus `UDF/Services.au3`, `UDF/Resources.au3`, `UDF/SecureDelete.au3`), UUIDGen (209 lines), and Indicators (349 lines). SaveDesk is **not** a port: `samples/SaveDesk/` holds only a `[Research]/` directory of third-party material with no Rizonesoft source. The four new utilities have no source at all.
+
+## Inputs
+
+- [`resolute_au3/samples/ComWinRep/WinRepair.au3`](../../resolute_au3/samples) -- Complete Windows Repair, the flagship intake
+- [`resolute_au3/samples/WinClean/UDF/Services.au3`](../../resolute_au3/samples) -- service control primitives; nothing in the framework does this yet and two new tools need it
+- -> XREF: [`02-repair-contract/TODO-01 §1`](../02-repair-contract/TODO-01-repair-contract.md) -- the contract every repairing intake consumes from its first commit
+- -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the porting pattern this file reuses
+
+## Outcome
+
+- An intake contract exists, and a tool that has been through it is conformant by construction.
+- Complete Windows Repair ships as a first-class product.
+- QuickErase, WinClean, UUIDGen, and Indicators ship.
+- SaveDesk is built as new development against a researched concept.
+- Startup Manager, Service Manager, Context Menu Editor, and Hosts File Editor ship.
+- Service control lives in the framework, not in one tool.
+
+**Adjacency:** list=applicable @ D05 T01 §5; document=applicable @ D05 T01 §2; settings=applicable @ D05 T01 §1; reporting=applicable @ D05 T01 §5; notifications=applicable @ D05 T01 §3; permissions=applicable @ D05 T01 §3; audit=applicable @ D05 T01 §3; exchange=applicable @ D05 T01 §4; reverse=applicable @ D05 T01 §5
+
+**Adjacency rationale:** Reverse and list pair on §5 because the new utilities are mostly enable-and-disable surfaces over system state, and the whole reason they are safe to ship is that every change is listed and every change is undoable. Permissions, notifications, and audit converge on §3 because QuickErase and WinClean are the destructive intakes, and a secure delete that proceeds without privilege, without confirmation, or without a trail is the worst tool in the suite.
+
+## Implementation Order
+
+| Order | Section | Deliverable                                  | Depends On             | Status |
+| :---: | :-----: | -------------------------------------------- | ---------------------- | :----: |
+|   1   |   §1    | The intake contract, proven on UUIDGen       | D04 T01 §1             |  [ ]   |
+|   2   |   §2    | Complete Windows Repair                      | §1, D02 T01 §1         |  [ ]   |
+|   3   |   §3    | QuickErase and WinClean                      | §1, D02 T01 §4         |  [ ]   |
+|   4   |   §4    | Indicators and SaveDesk                      | §1                     |  [ ]   |
+|   5   |   §5    | The four new utilities                       | §1, D02 T01 §4         |  [ ]   |
+
+---
+
+## 1. The Intake Contract, Proven on UUIDGen
+
+The whole point of doing the framework first is that a new tool should be cheap and correct from its first commit. This section writes that procedure down and proves it on the smallest possible candidate.
+
+**Fidelity:** the UUIDGen main window; new build against the framework's standard window, no AutoIt baseline required beyond its sample.
+**Job:** a maintainer can bring a sample program into the suite and have it be conformant on its first commit. Consumer: the intake contract document, and UUIDGen as its proof.
+**Treatment:** the contract is proven by running it, not by writing it. Cheaper substitute that fails the checkpoint: publishing the contract and declaring it proven because it reads well.
+**Chrome:** consume the framework. UUIDGen changes nothing on a system and does not consume the repair contract.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Write the intake contract as a document: what a candidate must have before it starts, what the framework supplies, what the tool must supply, and what it owes before it can ship. Done when: the document exists and names the conformance profile as its acceptance test.
+- [ ] Require the tool descriptor, a documentation set, an update short name, and an English language pack as intake minimums. Done when: a candidate missing any of them fails the contract by name.
+- [ ] Prove it on UUIDGen, at 209 lines the cheapest candidate in the set. Done when: UUIDGen ships conformant and the elapsed effort is recorded here as the intake baseline.
+- [ ] Record what the contract missed. Done when: anything UUIDGen needed that the contract did not anticipate is added to the contract in the same commit.
+- [ ] Commit: `"intake: the intake contract, proven on uuidgen"`
+
+**Test checkpoint:** UUIDGen builds for both architectures, runs standalone in an empty folder, passes the conformance check, and renders localized. A candidate missing a documentation set fails the contract by name. The intake effort baseline is recorded.
+
+## 2. Complete Windows Repair
+
+The flagship intake, and the largest. It arrives with its own documentation set and a `Doors/` runtime layout that is arguably better than the shipped suite's, which makes it the right place to settle the standalone layout question.
+
+**Fidelity:** the Complete Windows Repair main window, against its shipped 1.0.0.339 build and `docs/captures/house-style/`.
+**Job:** a user can repair a broken Windows installation, see what was attempted, and undo it. Consumer: the system state, read back by verify.
+**Treatment:** every repair declared as a repair-contract item, so diagnose, verify, and undo come for free. Cheaper substitute that fails the checkpoint: porting the tool's own repair loop, which is how the suite grew seven of them.
+**Chrome:** consume the framework and the repair contract.
+**Needs:** Windows host (build/test)
+
+- [ ] Enumerate what the sample repairs and record the list here with its source locations. Done when: the list is complete and each entry names the function that performs it.
+- [ ] Reconcile the `Doors/` layout against the framework's standalone layout. Done when: one layout is chosen, recorded with its cost, and `D01 T01 §9` is named as the owner of the decision.
+- [ ] Import the repairs from `WinPower.au3` that belong here: `_RepairFontRegistrations`, `_ResetTcpipAll`, `_RebuildWMI`. Done when: all three are declared items and `_ResetTcpipAll` reuses the ComIntRep implementation rather than becoming a second one.
+- [ ] Restore the Windows Update reset scripts from git history at `8d7469a^` and evaluate them as repair items. Done when: each is either a declared item or explicitly rejected with a reason.
+- [ ] Prove every repair has a reverse, or states on the surface that it does not and what to do instead. Done when: each item carries one of those two.
+- [ ] Account for the surface. Done when: the account covers the whole window and each deferral resolves.
+- [ ] Commit: `"comwinrep: complete windows repair on the repair contract"`
+
+**Test checkpoint:** Every repair is a declared contract item, with the enumeration quoted. A fixture run followed by undo restores the pre-run state. `_ResetTcpipAll` resolves to one implementation shared with ComIntRep, proven by reference. The rendered surface is captured and compared.
+
+## 3. QuickErase and WinClean
+
+The two destructive intakes. A secure delete is the one tool in this suite with no undo by definition, which raises the bar on confirmation and on saying so plainly.
+
+**Fidelity:** each tool's main window against the framework's standard window; the confirmation reuses the framework's message dialog.
+**Job:** a user can securely erase files, or clean a system, and cannot do either by accident. Consumer: the filesystem, read back after the action.
+**Treatment:** confirmation naming exactly what will be destroyed, and an explicit statement that this action has no reverse. Cheaper substitute that fails the checkpoint: a generic "are you sure" over an unnamed set.
+**Chrome:** consume the framework and the repair contract. WinClean's service operations consume the promoted service primitives.
+**Needs:** Windows host (build/test)
+
+- [ ] Promote `samples/WinClean/UDF/Services.au3` into the framework as service-control primitives. Done when: the framework exposes start, stop, pause, resume, and start-mode operations, and no tool implements them privately.
+- [ ] Port QuickErase, correcting the misspelled source filename on intake. Done when: it builds, and the file is named for the product.
+- [ ] Confirm every destructive action by naming what will be destroyed: count, total size, and the paths. Done when: the confirmation names all three and declining performs nothing, asserted.
+- [ ] State on the surface that a secure erase has no reverse, before the user commits. Done when: the statement appears where the user sees it, captured.
+- [ ] Prove the erase against a fixture tree rather than a real user path. Done when: the assertion runs entirely inside the fixture root and a path outside it is refused.
+- [ ] Port WinClean, with each cleanup declared as a repair-contract item so it inherits diagnose and undo where an undo exists. Done when: each item declares its reversibility honestly.
+- [ ] Decide and record whether QuickErase and WinClean stay separate products given their overlapping secure-delete capability. Done when: the decision is dated with its cost of changing.
+- [ ] Commit: `"quickerase, winclean: the destructive intakes"`
+
+**Test checkpoint:** Service primitives live in the framework and no tool implements them privately, proven by search. A destructive confirmation names count, size, and paths; declining performs nothing. The no-reverse statement is captured on the surface. The erase assertion runs inside the fixture root and refuses a path outside it.
+
+## 4. Indicators and SaveDesk
+
+One small port and one genuinely new build. SaveDesk is the only candidate in this plan with no Rizonesoft source behind it, and saying so keeps it from being estimated like a port.
+
+**Fidelity:** each tool's main window against the framework's standard window. SaveDesk is a new build with no baseline.
+**Job:** a user can see their indicator state at a glance, and can put their desktop icons back where they were after a resolution change. Consumer: the rendered surfaces, and the saved layout read back on restore.
+**Treatment:** SaveDesk's restore proven as a real reverse against recorded positions. Cheaper substitute that fails the checkpoint: restoring icons to a grid, which is a tidy-up rather than a restore.
+**Chrome:** consume the framework. SaveDesk consumes the repair contract for its restore record.
+**Needs:** Windows host (build/test)
+
+- [ ] Port Indicators through the intake contract. Done when: it ships conformant.
+- [ ] Record that SaveDesk is new development, not a port, with what the `[Research]/` material does and does not provide. Done when: the statement is here and the estimate reflects it.
+- [ ] Build SaveDesk: save and restore desktop icon layout, per resolution. Done when: a layout is saved, the resolution is changed, the layout is restored, and the icons return to their recorded positions.
+- [ ] Make saved layouts findable and identifiable. Done when: a user with several can pick one without opening it, captured.
+- [ ] Prove the restore is genuinely a reverse. Done when: save, disturb, restore returns every icon to its recorded position, asserted.
+- [ ] Commit: `"indicators, savedesk: a port and a new build"`
+
+**Test checkpoint:** Indicators passes the conformance check and runs standalone. SaveDesk saves a layout, survives a resolution change, and restores every icon to its recorded position, asserted and captured. The layout list is identifiable without opening entries.
+
+## 5. The Four New Utilities
+
+New capability, built on a framework and a contract that already exist, which is what makes them affordable. Each is an enable-and-disable surface over system state, so each owes a list and an undo.
+
+**Fidelity:** each tool's main window and result list against the framework's standard window and `docs/captures/house-style/`.
+**Job:** a user can see what their system is doing and change it, reversibly. Consumer: the system state, read back by verify.
+**Treatment:** every change declared as a repair-contract item so the undo is the contract's, not a per-tool invention. Cheaper substitute that fails the checkpoint: four tools that each write their own enable-and-disable logic.
+**Chrome:** consume the framework, the repair contract, and the service primitives from §3.
+**Needs:** Windows host (build/test)
+
+- [ ] Build Startup Manager: list what runs at boot, with enable, disable, and undo. Done when: an entry is disabled, the machine is restarted, the entry did not run, and the undo restores it.
+- [ ] Build Service Manager on the promoted service primitives. Done when: start, stop, and start-mode changes each verify by reading the service state back, and each is undoable.
+- [ ] Build Context Menu Editor. Done when: an entry is removed, Explorer no longer offers it, and the undo restores it exactly.
+- [ ] Build Hosts File Editor. Done when: an entry is added, name resolution reflects it, the file is written atomically, and the prior file is recoverable.
+- [ ] Give every one of the four a per-item result list and a transcript through the repair contract. Done when: all four render results and export transcripts with no per-tool code.
+- [ ] Account for all four surfaces. Done when: four accounts are written and each deferral resolves.
+- [ ] Commit: `"new tools: startup, services, context menu, and hosts"`
+
+**Test checkpoint:** Each of the four performs its change, verifies it by reading system state back, and restores it through the contract's undo, all four asserted. All four render results and export transcripts with no per-tool code. Four surfaces captured under `docs/captures/runs/`.
+
+## Verification
+
+- [ ] `pwsh scripts/check-all.ps1` exits 0 with every new tool's suite reporting
+- [ ] Every tool in this file passes the conformance check
+- [ ] Every tool in this file runs standalone in an empty folder
+- [ ] Service control exists once, in the framework
+- [ ] Every destructive action confirms by naming what it will destroy
+- [ ] `python scripts/todo-graph.py validate` clean

@@ -1,126 +1,146 @@
 ---
 schema_version: 1
-id: toolchain-and-gates
+id: cpp-toolchain-and-gates
 domain: 00-workspace
 status: draft
-title: "TODO-01 -- Toolchain and Gates"
+title: "TODO-01 -- C++ Toolchain and Gates"
 depends_on: []
 track: W1
 ---
 
-# TODO-01 -- Toolchain and Gates
+# TODO-01 -- C++ Toolchain and Gates
 
-> **Goal:** A fresh clone of this repository can locate the AutoIt3 toolchain, check every tracked script, and build any tool to both architectures with one command, on a machine that has never seen this project. Nothing downstream is trustworthy until that is true, because today every gate in this repo is a thing somebody remembers to do by hand.
+> **Goal:** A clean checkout builds any tool with one command, on a machine whose toolchain versions are pinned rather than remembered. Every gate the project owes runs from one entry point, so a change is either provably clean or provably not.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** There is no build script, no check script, and no CI in this repository. AutoIt3 is installed at `C:\Program Files (x86)\AutoIt3` with `Au3Check.exe` and `Aut2Exe\Aut2exe.exe`, but nothing in the repo names that path. All 13 `.sni` build descriptors under `SDK/Concrete/*/` hardcode `ScriptPath=R:\Workspace\Resolute\...`, a root that does not exist on this machine (the repo is at `R:\conclave\projects\Resolute`), so `SDK/Distro.exe` cannot build any tool from a clean checkout without hand-editing 13 files. `Au3Check.exe -q -d -w 1..7` over the 14 concrete scripts reports **0 errors and 847 unique warnings** (610 `already declared/assigned`, 178 `declared, but not used in func`, 54 `'Local' specifier in global scope`, 4 deprecated `Dim`, 1 `declared global in function only`). `SDK/Concrete/Distro/` holds `Distro.au3` but no `.sni` of its own.
+> **Current state (verified 2026-09-16):** Nothing in this domain exists. `src/` has not been created. There is no `CMakeLists.txt`, no vcpkg manifest, no compiler pin, and no gate script anywhere in the repository. The AutoIt suite under `resolute_au3/` builds through `SDK/Distro.exe` from `.sni` descriptors whose paths point at `R:\Workspace\Resolute`, a directory that no longer exists, so that tree does not build from a clean checkout either. Every later section in this plan cites a build, a static-analysis run, a unit test, or a parity run, and none of those can happen until this file ships.
 
 ## Inputs
 
-- [`SDK/Concrete/Resolute/Resolute.sni`](../../SDK/Concrete/Resolute/Resolute.sni) -- the build descriptor shape every tool repeats; §1 reads it, §3 drives it, §4 repairs its hardcoded root
-- [`SDK/Distro.exe`](../../SDK/Distro.exe) -- the SDK builder that consumes a `.sni`; §3 wraps it
-- [`Resolute_setup.iss`](../../Resolute_setup.iss) -- the Inno Setup script; not built here, owned by `D06 T01 §4`
-- -> XREF: [`00-workspace/TODO-02 §1`](./TODO-02-test-backbone.md) -- the harness that §2's gate script will also run once it exists
-- -> XREF: [`06-distro-release/TODO-01 §1`](../06-distro-release/TODO-01-build-and-release.md) -- the release build consumes the one-command build §3 writes
-- -> XREF: [`07-quality/TODO-01 §2`](../07-quality/TODO-01-quality-bar.md) -- the warning ratchet §2 seeds is driven to zero there
+- [`resolute_au3/SDK/Concrete/ReBar/ReBar.au3`](../../resolute_au3/SDK/Concrete/ReBar/ReBar.au3) -- the framework being ported; its `#AutoIt3Wrapper_OutFile` directives are already repository-relative and are the model for output paths
+- [`docs/brainstorm/2026-09-16-completion-brainstorm.md`](../../docs/brainstorm/2026-09-16-completion-brainstorm.md) -- the toolkit decision and its rationale
+- -> XREF: [`00-workspace/TODO-02 §1`](./TODO-02-test-backbone.md) -- the Catch2 harness this file's build must produce
+- -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the first real consumer of the build
+- -> XREF: [`07-quality/TODO-01 §2`](../07-quality/TODO-01-quality-bar.md) -- the warning ratchet that builds on §3
 
 ## Outcome
 
-- `pwsh scripts/autoit-env.ps1` prints the resolved `Au3Check.exe`, `Aut2Exe.exe`, and AutoIt3 version, and exits non-zero with a named remedy when the toolchain is absent.
-- `pwsh scripts/au3check-all.ps1` checks every tracked `.au3` and fails on any error, or on any warning not in the committed baseline.
-- `pwsh scripts/build.ps1 <Tool>` produces the x86 and x64 executables for any tool from a clean checkout, with no file hand-edited first.
-- Every `.sni` resolves its paths from the repository root rather than one developer's drive layout.
-- `pwsh scripts/check-all.ps1` runs the whole gate set, so a contributor has one command to answer "is this repo green".
+- A pinned toolchain that reports its own versions and fails by name when one is missing.
+- One command builds any tool, or every tool, for both architectures, from a clean checkout.
+- Warnings are errors, and the level is the same for every target.
+- `clang-tidy` runs over the tree and its findings are counted, so the ratchet has a number to start from.
+- One command runs every gate, and it is the command a push owes.
 
-**Adjacency:** list=not-applicable (gate scripts hold no records a user browses); document=not-applicable (a gate prints to a console, it files nothing); settings=applicable @ D00 T01 §1; reporting=applicable @ D00 T01 §2; notifications=not-applicable (a local gate notifies nobody; CI notification is out of scope until a runner exists); permissions=not-applicable (the gates run unelevated by design, and §3 proves it); audit=not-applicable (git history is the audit trail for a script); exchange=not-applicable (nothing here reads or writes a third-party file format); reverse=applicable @ D00 T01 §3
+**Adjacency:** list=not-applicable (a build system holds no records a user browses); document=not-applicable (nothing here produces a document a user carries); settings=applicable @ D00 T01 §2; reporting=applicable @ D00 T01 §5; notifications=not-applicable (a local gate notifies nobody); permissions=not-applicable (single-user desktop toolchain, no roles); audit=not-applicable (git history is the audit for a build script); exchange=not-applicable (nothing imports or exports here); reverse=not-applicable (a build produces artifacts under `build/`, and deleting that directory is the whole reverse)
 
-**Adjacency rationale:** The two applicable-with-owner entries are the ones a reader would otherwise assume are missing. Settings: the toolchain location is the one tunable value in this file, and §1 owns it as `scripts/toolchain.json` with `autoit-env.ps1` as the named consumer, so nobody hardcodes an install path a second time. Reporting: the Au3Check baseline in §2 is a report over the repo's own data, and the ratchet only works if the report is committed and diffable. Reverse: a build writes executables into the working tree, so §3 owns `-Clean` as the reverse of a build; without it the only way back is `git clean`, which also destroys untracked work. Permissions is declared not-applicable rather than skipped because every tool in this suite carries `#RequireAdmin`, which makes "do the gates need elevation" a real question: they do not, and §3 proves it by building without it.
+**Adjacency rationale:** Settings anchors on §2 because the vcpkg manifest and the CMake preset set are this domain's configuration surface, and they are the thing a second developer has to reproduce exactly. Reporting anchors on §5 because the combined gate is what a human reads to decide whether a change is shippable, and a gate that reports nothing legible is a gate people stop running.
 
 ## Implementation Order
 
-| Order | Section | Deliverable                                     | Depends On | Status |
-| :---: | :-----: | ----------------------------------------------- | ---------- | :----: |
-|   1   |   §1    | AutoIt3 toolchain pin and locator               | --         |  [ ]   |
-|   2   |   §2    | Au3Check gate and warning baseline              | §1         |  [ ]   |
-|   3   |   §3    | One-command build for any tool                  | §1         |  [ ]   |
-|   4   |   §4    | Repository-relative `.sni` paths                | §3         |  [ ]   |
-|   5   |   §5    | One command that runs every gate                | §2, §4     |  [ ]   |
+| Order | Section | Deliverable                                  | Depends On | Status |
+| :---: | :-----: | -------------------------------------------- | ---------- | :----: |
+|   1   |   §1    | Portable toolchain bootstrap                 | --         |  [ ]   |
+|   2   |   §2    | CMake skeleton and vcpkg manifest            | §1         |  [ ]   |
+|   3   |   §3    | Warnings as errors at one level              | §2         |  [ ]   |
+|   4   |   §4    | One command builds any tool                  | §2         |  [ ]   |
+|   5   |   §5    | One command runs every gate                  | §3, §4     |  [ ]   |
 
 ---
 
-## 1. AutoIt3 Toolchain Pin
+## 1. Portable Toolchain Bootstrap
 
-Every later gate shells out to `Au3Check.exe` or `Aut2Exe.exe`, and today nothing in the repository knows where either lives. The failure this section prevents is the one where each script grows its own copy of an install path, and the repo stops building the day somebody installs AutoIt3 somewhere else. One locator, one pinned version, one remedy message.
+The toolchain is repository-scoped: a bare Windows machine with no Visual Studio installed runs one script and can build. That is the decision, and this section is where it is either true or quietly false. Nothing is vendored into git; everything is downloaded to a gitignored directory against a recorded hash.
 
-**Needs:** AutoIt3 toolchain (compile)
+The sharp edge is that `clang-cl` is not a complete toolchain on Windows. It needs the Windows SDK headers and import libraries and a C++ standard library, and neither ships in the LLVM archive. The LLVM archive is freely redistributable; the Windows SDK is not, so it is **downloaded at bootstrap from Microsoft's own package feed** rather than committed. If that acquisition proves unworkable, this section is where the plan finds out, not `D01`.
 
-- [ ] Add `scripts/toolchain.json` recording the expected AutoIt3 version and the search order for its install directory (the `AutoIt3` registry key under `HKLM\SOFTWARE\WOW6432Node\AutoIt v3\AutoIt`, then `%ProgramFiles(x86)%\AutoIt3`, then an `AUTOIT3_HOME` override). Done when: the file exists, is valid JSON, and names no path that is specific to one machine. Source: `Au3Check.exe` and `Aut2Exe\` observed at `C:\Program Files (x86)\AutoIt3` on the build host, 2026-09-16.
-- [ ] Add `scripts/autoit-env.ps1` that reads `toolchain.json`, resolves `Au3Check.exe` and `Aut2Exe.exe` in that search order, and writes both paths plus the reported AutoIt3 version to stdout. Done when: it prints three lines and exits 0 on this host. Cheaper substitute: a script that returns the first path it guesses without confirming the executable exists.
-- [ ] Make the failure path explicit: when either executable is missing, exit 1 with one line naming what was looked for, where, and the remedy ("install AutoIt3, or set AUTOIT3_HOME"). Done when: pointing `AUTOIT3_HOME` at an empty directory produces exit 1 and that line, not a PowerShell stack trace.
-- [ ] Have `autoit-env.ps1` emit its results as a dot-sourceable object (`$Au3Check`, `$Aut2Exe`, `$AutoItVersion`) so §2 and §3 consume it rather than re-resolving. Done when: `. ./scripts/autoit-env.ps1` leaves those three variables set in the caller's scope.
-- [ ] Record the version actually found against the version pinned in `toolchain.json`, and warn (do not fail) on a mismatch. Done when: a pinned version of `0.0.0.0` produces a warning line naming both versions and still exits 0.
-- [ ] Commit: `"workspace: pin the AutoIt3 toolchain and resolve it from one place"`
+**Needs:** Windows host (build/test)
 
-**Test checkpoint:** `pwsh scripts/autoit-env.ps1` exits 0 and prints the `Au3Check.exe` path, the `Aut2Exe.exe` path, and the AutoIt3 version on this host. With `AUTOIT3_HOME` pointed at an empty temporary directory it exits 1 and prints the remedy line. Both runs are quoted in the commit body.
+- [ ] Record the pins in `toolchain.json` at the repository root: LLVM release, Windows SDK version, CRT version, CMake, Ninja, and the vcpkg baseline commit, each with a download URL and a SHA-256. Done when: every value is an exact version and every entry carries a hash. Cheaper substitute: naming versions without hashes, which makes the bootstrap reproducible only until a URL is re-cut.
+- [ ] `scripts/bootstrap.ps1` **detects before it downloads**, in a fixed order: `.toolchain/` first, then the machine's installed components. Done when: a second run downloads nothing and finishes in seconds, and the detection order is documented so a repository-scoped component always wins over a machine-installed one of the same version.
+- [ ] Detect the **pinned version specifically**, not merely presence. Done when: a machine carrying a different Windows SDK version than the pin does not silently satisfy the check. Cheaper substitute that defeats the point of pinning: accepting any installed SDK, which makes two machines disagree while both report success.
+- [ ] Decide and record what happens when only a non-pinned version is present: download the pin alongside it, or report and stop for the operator to choose. Done when: the behavior is a dated default with its cost of changing, and the message names both the found version and the wanted one.
+- [ ] Locate a machine-installed Windows SDK properly rather than by guessing a path. Done when: the lookup reads `HKLM\SOFTWARE\Microsoft\Windows Kits\Installed Roots` and the resolved root and version are printed.
+- [ ] Download each missing component into `.toolchain/`, verify its hash, and refuse to proceed on a mismatch. Done when: a deliberately corrupted hash aborts the bootstrap with a named message and leaves `.toolchain/` unchanged.
+- [ ] Acquire the Windows SDK and CRT headers and libraries into `.toolchain/` without a Visual Studio install, and record which mechanism was used and under which licence terms. Done when: a machine with no Visual Studio compiles and links a program calling `CreateFileW`, and the mechanism and licence are named here.
+- [ ] Decide and record the C++ standard library: MSVC STL from the acquired CRT, or LLVM's libc++. Done when: the decision is dated, carries its cost of changing, and names which one wxWidgets and Catch2 are built against.
+- [ ] Pin the **latest stable** Windows SDK, and set the runtime floor separately to Windows 10 1809 through `WINVER`, `_WIN32_WINNT`, and the application manifest. Done when: `toolchain.json` names the exact current SDK version, the floor macros are set in one place in CMake, and this section states why the two are independent knobs. Cheaper substitute: pinning the SDK to the floor version, which trades away every newer header to solve a problem the floor macros already solve.
+- [ ] Add a floor check so an above-floor API cannot ship silently. Done when: a deliberate call to an API newer than the floor fails the build or is flagged by `clang-tidy`, and the diagnostic is quoted. Record which mechanism was used.
+- [ ] Record why the floor is Windows 10 1809 rather than the Vista-through-Win10 range the AutoIt manifests declare. Done when: this section names dark mode and per-monitor DPI v2 as the two features that set it, with the cost of lowering it.
+- [ ] Add `.toolchain/` to `.gitignore`. Done when: a full bootstrap leaves `git status` clean.
+- [ ] `scripts/cpp-env.ps1` reports every resolved component and its version, and fails by name. Done when: it prints all six on a bootstrapped machine, and deleting one component makes it exit 1 naming that component and the bootstrap command that restores it.
+- [ ] Prove the bare-machine claim. Done when: bootstrap and build succeed on a Windows machine with no Visual Studio installed, and this section records where that was proven and on what Windows build.
+- [ ] Commit: `"workspace: repository-scoped clang-cl toolchain bootstrap"`
 
-## 2. Au3Check Gate and Warning Baseline
+**Test checkpoint:** `pwsh scripts/bootstrap.ps1` populates `.toolchain/` from the pins and leaves `git status` clean. A second run downloads nothing and finishes in seconds, quoted. On a machine carrying a non-pinned Windows SDK, the run reports both the found and the wanted version rather than accepting it. A corrupted hash aborts with a named message. `pwsh scripts/cpp-env.ps1` prints six resolved versions; deleting one component makes it exit 1 naming that component. Bootstrap and build both succeed on a machine with no Visual Studio, and that machine's Windows build is quoted.
 
-`Au3Check` is the cheapest gate this repository has and it is not wired to anything. The measured state is 0 errors and 847 unique warnings, which is too many to fix in this section and exactly the reason a ratchet exists: the baseline is committed, new warnings fail the gate, and `D07 T01 §2` drives the number down. A gate that fails on day one gets disabled on day two, so this one starts at the number the repo is actually at.
+## 2. CMake Skeleton and vcpkg Manifest
 
-- [ ] Add `scripts/au3check-all.ps1` that dot-sources `autoit-env.ps1` and runs `Au3Check.exe -q -d -w 1 -w 2 -w 3 -w 4 -w 5 -w 6 -w 7` over every tracked `.au3` under `SDK/Concrete/` and `SDK/Includes/`. Done when: it visits all 14 concrete scripts and reports a per-file count. Cheaper substitute: checking only the file the author happens to be editing.
-- [ ] Any `error:` fails the run immediately, with the file, line, and message echoed. Done when: introducing a deliberate syntax error in a scratch copy makes the script exit 1 and name that file.
-- [ ] Normalize each warning to a stable key (`<file-relative-path>|<message-with-variable-name>`), dropping the absolute path prefix and the source-echo lines, so the baseline is diffable and machine-independent. Done when: running the script from two different checkout locations produces byte-identical keys.
-- [ ] Write the current set to `scripts/au3check-baseline.txt`, sorted, one key per line, and commit it. Done when: the file holds the measured unique warning keys and `git diff` is empty on a second run.
-- [ ] Fail the gate on any warning whose key is not in the baseline, and print the new ones only. Done when: adding an unused `Local` to a scratch copy of a tracked script makes the script exit 1 and print exactly that one warning.
-- [ ] Support `-UpdateBaseline` to rewrite the file deliberately, and say in the script header that shrinking the baseline is the point and growing it is a decision. Done when: the switch rewrites the file and the header says so.
-- [ ] Commit: `"workspace: gate every tracked script on Au3Check with a committed baseline"`
+The dependency set is small and the temptation to vendor it by hand is real. A manifest is what makes "it builds on my machine" reproducible, and wxWidgets static is a large enough dependency that building it twice by accident is a genuine cost.
 
-**Test checkpoint:** `pwsh scripts/au3check-all.ps1` exits 0 against the committed baseline and reports 0 errors. A scratch copy of `SDK/Concrete/BiosCodes/BiosCodes.au3` with one added unused `Local` makes it exit 1 and print that single new warning key and nothing else. Both outputs are quoted in the commit body.
+**Needs:** C++ toolchain (compile)
 
-## 3. One-Command Build for Any Tool
+- [ ] Create `src/` with a top-level `CMakeLists.txt` targeting C++23, and a `CMakePresets.json` carrying an x86 and an x64 configuration that resolve their compiler, generator, and vcpkg root from `.toolchain/` rather than from `PATH`. Done when: `cmake --preset x64-debug` configures on a clean checkout, and configuring with a different compiler earlier on `PATH` still selects the bootstrapped one.
+- [ ] Generate no Visual Studio solution and commit none. Done when: the repository contains no `.sln` or `.vcxproj`, and the presets drive VS, VS Code, and a bare terminal identically.
+- [ ] Add `vcpkg.json` declaring `wxwidgets` and `catch2`, with the baseline pinned to the commit recorded in §1, and a custom triplet naming `clang-cl` as the compiler. Done when: a clean checkout with no vcpkg cache resolves and builds both dependencies unattended under `clang-cl`.
+- [ ] Pin wxWidgets to static linkage explicitly, so the triplet cannot silently produce a DLL build. Done when: the configured triplet is asserted in CMake and configuration fails with a named message if it is not static.
+- [ ] Put all build output under `build/`, which is already gitignored, with nothing written inside `src/`. Done when: a full configure and build leaves `git status` clean.
+- [ ] Prove the skeleton compiles and links something real: a placeholder executable that links wxWidgets and opens no window. Done when: it builds for both architectures and runs to exit 0.
+- [ ] Record the resulting binary size for the placeholder, as the baseline the per-tool size budget is measured against. Done when: both architecture sizes are in this section, dated.
+- [ ] Commit: `"workspace: cmake skeleton and vcpkg manifest with static wxWidgets"`
 
-Building a tool today means opening the SDK builder and pointing it at a `.sni` whose paths are wrong. This section makes the build a command, which is what lets every later section cite "compiles both architectures" as proof rather than as an intention.
+**Test checkpoint:** `cmake --preset x64-debug && cmake --build --preset x64-debug` succeeds on a clean checkout with no vcpkg cache. The placeholder links statically, proven by `dumpbin /dependents` showing no `wx` DLL. `git status` is clean afterwards. The two baseline binary sizes are quoted.
 
-**Needs:** AutoIt3 toolchain (compile)
+## 3. Warnings as Errors at One Level
 
-- [ ] Add `scripts/build.ps1` taking a tool name (`Resolute`, `Firemin`, and so on), resolving `SDK/Concrete/<Tool>/<Tool>.sni`, and invoking `SDK/Distro.exe` against it. Done when: `pwsh scripts/build.ps1 Resolute` produces `Resolute.exe` and `Resolute_X64.exe` at the repository root. Cheaper substitute: a script that compiles only the x86 target and reports success.
-- [ ] Fall back to `Aut2Exe.exe` directly when `Distro.exe` is unavailable, driving both architectures from the `.au3` and its `#AutoIt3Wrapper_` directives. Done when: the fallback path is exercised with `-NoDistro` and produces both executables. Source: `#AutoIt3Wrapper_Res_*` directives at the head of every concrete script.
-- [ ] Validate the tool name against the directories under `SDK/Concrete/` and exit 1 listing the valid names on a miss. Done when: `pwsh scripts/build.ps1 Nonsense` exits 1 and prints the 14 available names.
-- [ ] Add `-All` to build every tool in sequence, reporting one line per tool and a final pass/fail tally. Done when: the tally counts 14 attempts and names any that failed.
-- [ ] Add `-Clean` as the reverse of a build: remove the executables and `Distribution/` output this script produced, and nothing else. Done when: `-Clean` after a build leaves `git status` exactly as it was before the build, and a dry-run switch lists what it would remove first.
-- [ ] Prove the build needs no elevation: run it from a non-elevated shell and record that it succeeds. Done when: the checkpoint output is captured from an unelevated session. Note that `#RequireAdmin` in the scripts affects the built executable at runtime, not the compile.
-- [ ] Commit: `"workspace: build any tool to both architectures with one command"`
+A warning level that varies per target is a warning level nobody trusts. The AutoIt tree carried 45 to 68 warnings per tool for years because the gate was optional; this is the section that stops that from recurring.
 
-**Test checkpoint:** From an unelevated shell on a clean checkout, `pwsh scripts/build.ps1 Resolute` exits 0 and both `Resolute.exe` and `Resolute_X64.exe` appear with a current timestamp; `pwsh scripts/build.ps1 Nonsense` exits 1 and lists the valid tool names; `-Clean` restores `git status` to its pre-build state. All three are quoted in the commit body.
+**Needs:** C++ toolchain (compile)
 
-## 4. Repository-Relative `.sni` Paths
+- [ ] Set the project warning level once, in one place, applied to every target the project owns. Done when: a new target added with no extra configuration inherits it, proven by adding a throwaway target with a deliberate warning and watching it fail.
+- [ ] Enable warnings as errors for project targets and **disable** them for vcpkg dependencies. Done when: a warning in `src/` fails the build and a warning inside wxWidgets does not.
+- [ ] Add `clang-tidy` configuration and wire it to the compile database. Done when: `clang-tidy` runs over the placeholder target and reports a count.
+- [ ] Record the starting finding count as the ratchet baseline. Done when: the number is in `todo/.tidy-baseline` and named here. Cheaper substitute: leaving the baseline implicit and comparing against zero, which makes the first real run unfixably red.
+- [ ] Prove the gate can fail. Done when: a deliberate unused-variable in `src/` fails the build with the expected diagnostic, and reverting it passes.
+- [ ] Commit: `"workspace: warnings as errors at one level, with a tidy baseline"`
 
-All 13 `.sni` files carry absolute paths under `R:\Workspace\Resolute`, which is not where this repository lives. Anyone cloning it gets a build system pointing at a directory that does not exist, and the current workaround is that one machine happens to match. This section removes the developer's drive layout from the build descriptors.
+**Test checkpoint:** A deliberate warning in `src/` fails the build; the same warning inside a vcpkg dependency does not. `clang-tidy` reports a count that matches `todo/.tidy-baseline`. The failing and passing outputs are both quoted.
 
-- [ ] Inventory every absolute path key across `SDK/Concrete/*/*.sni` (`ScriptPath`, `Icon`, `OutFilePath`, `OutFileX64Path`, `DistributionPath`, `FullDistributionPath`, `DistroSourceFullPath`) and record the list in the commit body. Done when: the inventory names all 13 files and every key that carries an absolute path. Source: `grep -h "R:\\\\Workspace" SDK/Concrete/*/*.sni`, 2026-09-16.
-- [ ] Decide and record the substitution: a `%RootDir%`-style token already used by the `[Distribute]` section of these files, resolved by the build wrapper. Done when: the decision and its cost of changing are written into this section as a dated note, and the token chosen is one `Distro.exe` already understands or the wrapper expands before invoking it.
-- [ ] Rewrite the 13 `.sni` files to the repository-relative form, one commit, no other change. Done when: no `.sni` under `SDK/Concrete/` contains `R:\Workspace`, and `git diff` shows only path lines.
-- [ ] Teach `scripts/build.ps1` to expand the token against the repository root before handing the descriptor to the builder. Done when: a build from a checkout at a different absolute path succeeds without editing a `.sni`.
-- [ ] Prove it from a second location: copy the checkout to a temporary directory and build one tool there. Done when: the build succeeds at the copied path and the output executables land inside the copy, not in the original. Cheaper substitute: rebuilding in place and concluding the paths are fine.
-- [ ] Commit: `"workspace: resolve .sni build paths from the repository root"`
+## 4. One Command Builds Any Tool
 
-**Test checkpoint:** `grep -rn "R:\\\\Workspace" SDK/Concrete/` returns nothing. A copy of the checkout at a different absolute path builds `Firemin` successfully with `scripts/build.ps1`, and the resulting executable is inside the copy. Both are quoted in the commit body.
+The AutoIt suite reached fourteen tools with no way to build them all, which is how thirteen `.sni` descriptors came to point at a directory that no longer exists. One command, exercised from the start, is what keeps that from happening again.
 
-## 5. One Command That Runs Every Gate
+**Needs:** C++ toolchain (compile)
 
-A contributor should not have to know which four scripts to run in which order. This section is the front door: one command, every gate, one verdict. It is also what a future CI job will call, so the gate set lives in the repository rather than in a workflow file.
+- [ ] `scripts/build.ps1 <Tool>` builds one tool for both architectures. Done when: it builds the placeholder from §2 and exits non-zero with a named message for an unknown tool name.
+- [ ] `scripts/build.ps1 -All` builds every tool the project defines. Done when: it builds everything currently defined and its output names each target and its result.
+- [ ] Support a release configuration alongside debug. Done when: both configurations build and the script says which it produced.
+- [ ] Make the output location predictable and repository-relative. Done when: built executables land in one documented place under `build/` and no absolute path appears in any build file. Cheaper substitute: the absolute-path habit that broke every `.sni` in the AutoIt tree.
+- [ ] Prove a clean-checkout build. Done when: a fresh clone into a different directory builds without editing a single file, and this section records the directory it was proven in.
+- [ ] Commit: `"workspace: one command builds any tool or all of them"`
 
-- [ ] Add `scripts/check-all.ps1` running, in order: `autoit-env.ps1`, `au3check-all.ps1`, `python scripts/todo-graph.py self-test`, `python scripts/todo-graph.py validate`, and `python scripts/todo-graph.py plan --check`. Done when: each step prints a labeled pass or fail line and the script exits non-zero if any failed. Cheaper substitute: stopping at the first failure so the author only ever sees one problem per run.
-- [ ] Run every gate even after one fails, and summarize at the end. Done when: with two gates deliberately broken, both appear in the summary.
-- [ ] Add `-Quick` to skip the Au3Check sweep for a fast plan-only check, and say in the header that `-Quick` is not the gate a push owes. Done when: `-Quick` completes without invoking `Au3Check.exe`.
-- [ ] Document the command in `AGENTS.md` under Validation as the one a contributor runs before pushing. Done when: the file names `scripts/check-all.ps1` and the docs and the script agree on what it runs.
-- [ ] Commit: `"workspace: one command runs every gate this repo owes"`
+**Test checkpoint:** `pwsh scripts/build.ps1 -All` exits 0 and names every target built. A fresh clone into a different absolute path builds with no file edited, and that path is quoted. An unknown tool name exits non-zero with the named message.
 
-**Test checkpoint:** `pwsh scripts/check-all.ps1` exits 0 on a green tree and prints one labeled line per gate. With a deliberate new Au3Check warning present, it exits 1, the Au3Check line reads fail, and the TODO-graph lines still ran and read pass. Both outputs are quoted in the commit body.
+## 5. One Command Runs Every Gate
+
+Five gates that must each be remembered are five gates that get skipped under time pressure. This is the command a push owes, and it exists so that "did you run the checks" has a single answer.
+
+**Needs:** C++ toolchain (compile)
+
+- [ ] `scripts/check-all.ps1` runs the build for both architectures, `clang-tidy` against the baseline, the Catch2 suite, and `python scripts/todo-graph.py validate`. Done when: all four run in one invocation and the script exits non-zero if any fails.
+- [ ] Report legibly: one line per gate with its result and duration, and the failure detail only for gates that failed. Done when: a run with one deliberate failure shows three passes and one failure with its detail, and the passing detail is not dumped.
+- [ ] Make the tidy gate compare against the baseline rather than zero. Done when: a finding count equal to the baseline passes and one above it fails, both observed.
+- [ ] Tolerate the harness not existing yet. Done when: with `D00 T02 §1` unshipped, the test gate reports "not present" and does not fail the run, and this behavior is removed by that section.
+- [ ] Commit: `"workspace: one command runs every gate"`
+
+**Test checkpoint:** `pwsh scripts/check-all.ps1` exits 0 on a clean tree and prints one line per gate. Introducing one deliberate warning makes it exit non-zero and show only that gate's detail. A tidy count one above the baseline fails. All three runs are quoted in the commit body.
 
 ## Verification
 
-- [ ] `pwsh scripts/check-all.ps1` exits 0 with every gate reporting pass
-- [ ] `pwsh scripts/build.ps1 -All` builds all 14 tools to both architectures from a clean checkout
-- [ ] No `.sni` under `SDK/Concrete/` contains an absolute path outside the repository
+- [ ] `pwsh scripts/bootstrap.ps1` populates `.toolchain/` from the pins and leaves `git status` clean
+- [ ] `pwsh scripts/cpp-env.ps1` exits 0 and prints every resolved component version
+- [ ] `pwsh scripts/build.ps1 -All` builds every defined target for both architectures
+- [ ] `pwsh scripts/check-all.ps1` exits 0 on a clean tree
+- [ ] A fresh clone into a different absolute path builds with no file edited
+- [ ] Bootstrap and build succeed on a machine with no Visual Studio installed
+- [ ] No absolute path appears in any build file, and no `.sln` or `.vcxproj` is committed
 - [ ] `python scripts/todo-graph.py validate` clean

@@ -2,7 +2,7 @@
 
 > **Phase 4**
 
-What a user reads: per-tool documentation, language packs, and the guide to the surfaces they actually meet.
+A complete documentation set per tool, and one shared string pool composed into each tool's pack at build time so a standalone tool still carries everything it needs.
 
 ## TODOs
 
@@ -17,15 +17,14 @@ What a user reads: per-tool documentation, language packs, and the guide to the 
 
 ## In scope
 
-- Per-tool Readme, Changes, and License coverage and currency
-- The language coverage matrix and the partial-pack path
-- The user guide, illustrated from the committed captures
+- A generated documentation set for every tool, and the user guide
+- The shared string pool and build-time pack composition
+- The coverage matrix and pack naming hygiene
 
 ## Out of scope
 
-- The localization contract itself (01)
-- The three browser-tool language packs (04), created there and reported here
-- The release procedure that requires a current changelog (06)
+- The pack loader itself (01)
+- Shipping the composed packs (06)
 
 ---
 

@@ -61,14 +61,14 @@ superseded_by: other-todo-id         # optional -- set with status: superseded
 
 ## Inputs
 
-- [`src/framework/Logging.h`](…) -- exists; §2 extends it
-- [`resolute_au3/SDK/Concrete/Resolute/Resolute.au3`](…) -- the specification this section ports
+- [`SDK/Includes/Logging.au3`](…) -- exists; §2 extends it
+- [`SDK/Concrete/Resolute/Resolute.sni`](…) -- the build descriptor this section drives
 - -> XREF: [`02-launcher/TODO-01 §4`](…) -- consumes the gate this section builds
 
 ## Outcome
 
 - Bullet list. Each bullet is an observable end state, not an activity.
-- "Every target builds with warnings as errors on both architectures" -- good.
+- "Every tracked `.au3` passes Au3Check at `-w 1..7` with zero output" -- good.
 - "Improve code quality" -- bad.
 
 **Adjacency:** list=not-applicable (a gate script has no records to browse); document=not-applicable (no printed output in this file); settings=applicable @ D00 T01 §4; reporting=applicable @ D00 T01 §5; notifications=not-applicable (a local gate notifies nobody); permissions=not-applicable (single-user desktop toolchain, no roles); audit=not-applicable (git history is the audit for a script); exchange=not-applicable (nothing imports or exports here); reverse=applicable @ D00 T01 §6
@@ -77,30 +77,30 @@ superseded_by: other-todo-id         # optional -- set with status: superseded
 
 | Order | Section | Deliverable                              | Depends On   | Status |
 | :---: | :-----: | ---------------------------------------- | ------------ | :----: |
-|   1   |   §1    | Toolchain pin: MSVC, CMake, vcpkg        | --           |  [x]   |
-|   2   |   §2    | Warnings-as-errors gate over every target| §1           |  [ ]   |
-|   3   |   §3    | One-command build for any tool           | §1           |  [ ]   |
+|   1   |   §1    | AutoIt3 toolchain pin and locator        | --           |  [x]   |
+|   2   |   §2    | Au3Check gate over every tracked script  | §1           |  [ ]   |
+|   3   |   §3    | One-command build through Distro         | §1           |  [ ]   |
 
 ---
 
-## 1. Toolchain Pin
+## 1. AutoIt3 Toolchain Pin
 
 One paragraph of context: why this section exists and what it must not break.
 
-- [ ] `scripts/cpp-env.ps1` resolves the MSVC toolset, CMake, and the vcpkg root from pinned versions. Done when: the script prints all three versions and exits 1 with a named remedy when any is missing. Cheaper substitute: hardcoding one developer's install path.
+- [ ] `scripts/autoit-env.ps1` resolves `Au3Check.exe` and `Aut2Exe.exe` from a pinned install path. Done when: the script prints both paths and the AutoIt3 version, and exits 1 with a named remedy when either is missing. Cheaper substitute: hardcoding one developer's install path.
 - [ ] Another concrete item. Max 30 per section. See Work items below.
-- [ ] Commit: `"workspace: pin the C++ toolchain and locate it from one place"`
+- [ ] Commit: `"workspace: pin the AutoIt3 toolchain and locate it from one place"`
 
-**Test checkpoint:** `pwsh scripts/cpp-env.ps1` exits 0 and prints the MSVC, CMake, and vcpkg versions on a configured machine; renaming the pinned toolset directory makes it exit 1 with the remedy line.
+**Test checkpoint:** `pwsh scripts/autoit-env.ps1` exits 0 and prints both tool paths on a machine with AutoIt3 installed; renaming the pinned directory makes it exit 1 with the remedy line.
 
-> **Verified:** 2026-09-16 | §1 | cpp-env 0 · MSVC 19.44 · CMake 3.30 · negative probe exit 1
+> **Verified:** 2026-09-16 | §1 | autoit-env 0 · Au3Check 3.3.16.1 · negative probe exit 1
 
 ## 2. …
 
 ## Verification
 
-- [ ] `pwsh scripts/check-all.ps1` -- zero findings across every target
-- [ ] Both architectures build without warning
+- [ ] `pwsh scripts/au3check-all.ps1` -- zero findings across every tracked `.au3`
+- [ ] Both architectures compile through the file's `.sni` without error
 - [ ] `python scripts/todo-graph.py validate` clean
 ```
 
@@ -128,27 +128,18 @@ Never a bare number, and never a cross-TODO reference without a section. `D03 T0
 
 ## Proof: what a Test checkpoint may cite
 
-Resolute is C++23 on Windows, built with CMake and vcpkg, linked against a static wxWidgets. A checkpoint cites one or more of these five, and **it must be able to fail**:
+Resolute is AutoIt3 on Windows. There is no `dotnet test` here, so the format names what counts as evidence. A checkpoint cites one or more of these four, and **it must be able to fail**:
 
 | Proof | What it is | What it cannot prove |
 | ----- | ---------- | -------------------- |
-| **Builds clean** | The touched targets build at the project warning level with warnings as errors, for both architectures. The baseline gate every code section owes. | That the code does the right thing. It is a compile gate, nothing more. |
-| **Static analysis clean** | `clang-tidy` reports nothing new on the translation units the section touched, measured against the ratchet baseline. | Runtime behavior. Clean analysis over wrong logic is still wrong logic. |
-| **Unit test** | A Catch2 test in `tests/` asserting a named behavior. Cite the test name. | Anything on the rendered surface. A unit test over a UI section is a supplement, not a substitute. |
-| **Driven run with evidence** | Launch the built executable, drive the surface, and record the observable result: a log line, an `.ini` value read back, or a screenshot committed under `docs/captures/`. | Repeatability. A driven run is evidence of one run, so the section says what was driven and what it produced. |
-| **Parity proof** | The C++ tool and its `resolute_au3/` counterpart run against the same fixture, and their effects are compared field by field. **Every ported tool owes this one.** | Anything about a surface that has no AutoIt counterpart. New work cites the other four and says so. |
+| **Au3Check clean** | `Au3Check.exe -q -d -w 1..7 <script>` exits 0 with no output on every script the section touched. The baseline gate every code section owes. | That the code does the right thing. It is a syntax and declaration gate, nothing more. |
+| **Compiles both architectures** | The file's `.sni` builds through `SDK/Distro.exe` (or `Aut2Exe`) producing the x86 and x64 executables with no error. | Runtime behavior. A script can compile and still do nothing. |
+| **Driven run with evidence** | Launch the built executable, drive the surface, and record the observable result: a log line under `Resolute/Logging/`, an `.ini` value read back, or a screenshot committed under `docs/captures/`. | Repeatability. A driven run is evidence of one run, so the section says what was driven and what it produced. |
+| **Harness test** | A test in the AutoIt harness (`tests/`, owned by `D00 T02 §1`) asserting a named behavior, run by `tests/run-tests.au3`. Cite the test name. | Anything on the rendered surface. A harness test over a UI section is a supplement, not a substitute. |
 
-Until `D00 T01` ships the build and `D00 T02` ships the harness, a section says which gates do not exist yet. A checkpoint that cites a gate which does not exist is unfalsifiable, which is the one thing a checkpoint may never be.
+Until `D00 T02 §1` ships the harness, a section cites the first three and says so. A checkpoint that cites a harness test which does not exist is unfalsifiable, which is the one thing a checkpoint may never be.
 
-**Every code section owes a clean build.** A section that changes a `.cpp` and cites only a screenshot has skipped the cheapest gate it had.
-
-### Parity is the load-bearing proof of this project
-
-The rewrite is 1:1 on behavior. `resolute_au3/` is not legacy to be cleaned up: it is the specification, and a port is finished when it demonstrably does the same thing.
-
-A parity proof names the fixture, runs both builds against it, and compares the resulting state rather than the exit codes. "Both returned success" is not parity. For a frozen tool the comparison is the freeze check, and the two are satisfied by the same run.
-
-Parity does **not** extend to the rendered surface. The C++ windows are DPI-aware and theme-aware; the AutoIt windows are neither. Comparing them pixel to pixel would freeze the defects the rewrite exists to fix.
+**Every code section owes Au3Check clean.** A section that changes a `.au3` and cites only a screenshot has skipped the cheapest gate it had.
 
 ## Stamps
 
@@ -161,7 +152,7 @@ One paragraph of context, then the checklist.
 
 **Test checkpoint:** …
 
-> **Verified:** 2026-09-16 | §3 | build clean both arches · clang-tidy 0 new · driven run trimmed 412 MB, log line quoted
+> **Verified:** 2026-09-16 | §3 | Au3Check 0 findings · both arches compiled · driven run trimmed 412 MB, log line quoted
 > **Deferred:** per-process exclusion list -> XREF: D05 T01 §6 -- needs the settings store first
 > **Review:** round 1, fingerprint `a3f91c2e5b04` -- `adversarial` approve · `consistency` approve · `integration` needs-attention (1). Raw findings: docs/reviews/05-memboost/D05-T01-s3.md
 > **CRUD:** applicable | driven run: set the interval in Settings, readback from `MemBoost.ini`, restart, value survived
@@ -253,10 +244,10 @@ Every section that builds or changes a user-facing surface carries three blocks 
 ```
 **Job:** <the user> can <the verb this surface exists for>. Consumer: <what reads the write, or "none: this surface is the consumer">.
 **Treatment:** <the asked treatment, named so a substitute can fail>. Cheaper substitute that fails the checkpoint: <the wrong thing>.
-**Chrome:** consume <named shared headers from the framework or the repair contract>. Do not invent a second <pattern>.
+**Chrome:** consume <named shared includes and styles from `SDK/Includes/`>. Do not invent a second <pattern>.
 ```
 
-`Chrome:` is load-bearing in this repo. Fourteen tools share one framework, and the failure mode this suite has already lived through is a tool growing its own progress bar, its own About dialog, or its own settings writer instead of consuming the shared layer. The AutoIt suite ended up carrying fourteen copies of its framework exactly that way. A second implementation of a shared control is a defect, not a shortcut.
+`Chrome:` is load-bearing in this repo. Fourteen tools share one SDK, and the failure mode the suite is prone to is a tool growing its own progress bar, its own About dialog, or its own settings writer instead of consuming `SDK/Includes/`. A second implementation of a shared control is a defect, not a shortcut.
 
 A section whose Fidelity line says the work has no surface of its own ("no surface of its own", "not a surface", "the library is not a surface") skips these three.
 
@@ -266,7 +257,7 @@ A section that cannot run without a live host or device the plan cannot otherwis
 **Needs:** Windows host (build/test)
 ```
 
-The value comes from a closed list (`todo-graph.py` `NEEDS_ALLOWED`; `validate` refuses any other): `Windows host (build/test)`, `C++ toolchain (compile)`, `Optical drive (drive test)`, `USB device (drive test)`, `Signing certificate (release)`. `resolve` prints it as `needs`, so a future runner can skip the row while the device is not attached and take the next unblocked row instead.
+The value comes from a closed list (`todo-graph.py` `NEEDS_ALLOWED`; `validate` refuses any other): `Windows host (build/test)`, `AutoIt3 toolchain (compile)`, `Optical drive (drive test)`, `USB device (drive test)`, `Signing certificate (release)`. `resolve` prints it as `needs`, so a future runner can skip the row while the device is not attached and take the next unblocked row instead.
 
 A section whose open work is worked OUTSIDE this tree carries a `Moved:` marker under its heading:
 
@@ -301,7 +292,7 @@ So a TODO file's `## Outcome` carries an **Adjacency** line naming which of thes
 - **Reporting** (`reporting`) -- summaries and exports over the domain's own data.
 - **Lifecycle notifications** (`notifications`) -- registered with recipient rules, not an address list. In a desktop tool this is the tray balloon, the sound, and the completion dialog.
 - **Permissions, exercised on refusal** (`permissions`) -- for this suite, elevation. A tool that needs admin proves what it does when it does not have it. A hidden button is not a refusal.
-- **Audit and history** (`audit`) -- who changed what, with the reason where one is required. The framework's logging layer is the suite's audit trail; a destructive action that writes no log line is unaudited.
+- **Audit and history** (`audit`) -- who changed what, with the reason where one is required. `SDK/Includes/Logging.au3` is the suite's audit trail; a destructive action that writes no log line is unaudited.
 - **Import or export** (`exchange`) -- wherever the tool reads or writes a file somebody else authored: an `.ini`, a `.lng`, a registry backup.
 - **The reverse of every create** (`reverse`) -- cancel, reopen, delete, undo. An irreversible system change nobody can roll back is a support call, and in this suite it is the most expensive defect class there is.
 
@@ -320,7 +311,7 @@ A section that only names an outcome ("clean up Firemin") leaves a cold agent to
 Each checklist item except `Commit:` is a **micro-step**. Required on new work:
 
 1. **One action.** One file, function, include, command, or control. If you need "and then" to describe it, it is two items, or one item with numbered sub-steps.
-2. **A named path** in backticks (`src/framework/Logging.h`, `MemBoost::TrimWorkingSet()`, `clang-tidy`). A verb with no object ("improve logging") is not an item.
+2. **A named path** in backticks (`SDK/Includes/Logging.au3`, `_MemBoost_TrimWorkingSet()`, `Au3Check.exe -w 1..7`). A verb with no object ("improve logging") is not an item.
 3. **Done when.** The observable end state in the same bullet. Example: "Done when: the restore path refuses a backup whose header does not match, and logs the refusal."
 4. **The cheaper substitute** on any UI or write item, so the Test checkpoint can fail on it.
 5. **A source cite** when behavior is copied: a file and line, an existing tool that already does it, a Microsoft docs URL for a Win32 call.
@@ -353,7 +344,7 @@ The scripts are stdlib-only by design: no install step stands between a fresh cl
 `resolve` is the front door for the two section skills, and it takes whatever you already had in front of you: a `DNN TNN §N` reference, a `<path> §N` pair, or a row pasted straight out of `implementation-plan.md`, backticks, pipes and all. Its exit code carries the verdict: `3` means the section is already `[x]` (audit stance, not implementation), `4` means a dependency is unmet, `5` means the section moved out of the tree. So
 
 ```
-process todo section: | [ ] | `D00 T01 §2` | Warnings-as-errors gate over every target | 6 |
+process todo section: | [ ] | `D00 T01 §2` | Au3Check gate over every tracked script | 6 |
 ```
 
 is a complete instruction: nobody has to translate domain `00` and TODO `01` into a filename, which is the step that gets done wrong at 3am.
@@ -415,3 +406,14 @@ Treat a warning as a decision to make rather than noise to clear. The tree start
 
 When something needs doing, start at `add-todo`: it decides whether the work belongs in an existing section, needs a new one, warrants a whole new file (delegating to `create-todo`), or is already covered. Reaching for `create-todo` directly tends to produce a second TODO over an existing one.
 
+---
+
+## SUPERSEDED, 2026-09-16
+
+This tree planned the AutoIt suite. Resolute is being rewritten in C++ and this plan is archived rather than continued.
+
+It is kept because the per-tool analysis in it is input to the ports: what each tool does, where its settings live, which surfaces it owns, and what was measured about it on 2026-09-16.
+
+The live plan is `todo/` at the repository root. The decisions that moved the project here are in `docs/brainstorm/2026-09-16-completion-brainstorm.md`.
+
+Nothing in this tree should be built. `D03 T01 §2` in particular describes registry backup behavior that `ReBar` has never had.

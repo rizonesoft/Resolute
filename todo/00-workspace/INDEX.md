@@ -8,7 +8,7 @@ Toolchain, gates, build, and the test backbone every later domain leans on. Noth
 
 | TODO | Title | Status |
 | ---- | ----- | :----: |
-| [TODO-01](./TODO-01-toolchain-and-gates.md) | Toolchain and Gates | draft |
+| [TODO-01](./TODO-01-toolchain-and-gates.md) | C++ Toolchain and Gates | draft |
 | [TODO-02](./TODO-02-test-backbone.md) | Test Backbone | draft |
 
 ## Completed
@@ -18,17 +18,17 @@ Toolchain, gates, build, and the test backbone every later domain leans on. Noth
 
 ## In scope
 
-- AutoIt3 toolchain location and version pin
-- Au3Check gate and its warning baseline
-- One-command build for any tool, and repository-relative build descriptors
-- The AutoIt test harness, fixtures, captures, and the driven-run driver
+- Repository-scoped clang-cl toolchain, bootstrapped rather than installed
+- CMake and vcpkg skeleton with statically linked wxWidgets
+- Warnings as errors, clang-tidy, and one command that runs every gate
+- Catch2 harness, disposable fixtures, house-style captures, and the parity driver
 
 ## Out of scope
 
-- The tools themselves (02, 03, 04, 05)
-- The shared includes they consume (01)
-- Release packaging and signing (06), which consumes the build this domain writes
-- The quality bar's content (07); this domain builds the machinery it runs on
+- The framework and the repair contract (01, 02)
+- The tools themselves (03, 04, 05)
+- Release packaging (06), which consumes the build this domain writes
+- The quality bar's content (07); this domain builds machinery, not standards
 
 ---
 
