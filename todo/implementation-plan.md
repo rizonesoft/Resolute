@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 106 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 114 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -173,45 +173,53 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 
 Seven programs from `samples/` become products and eleven new utilities join, all through one intake contract, on a framework that already exists. This phase is where the rewrite starts paying for itself, and it is where the suite stops being a port and starts being a better product than the one it replaces. Two of its tools matter beyond themselves: RegStudio is a registry editor that can undo what it did, and the Restore Point Manager gives every other tool in the suite a second undo layer.
 
-|  ✔  | Section      | Deliverable                                     | Items |
-| :-: | ------------ | ----------------------------------------------- | :---: |
-| [ ] | `D05 T01 §1` | The intake contract, proven on UUIDGen          |   5   |
-| [ ] | `D05 T01 §2` | Complete Windows Repair                         |   7   |
-| [ ] | `D05 T01 §3` | QuickErase and WinClean                         |   8   |
-| [ ] | `D05 T01 §4` | Indicators and SaveDesk                         |   6   |
-| [ ] | `D05 T01 §5` | The four new utilities                          |   7   |
-| [ ] | `D05 T02 §1` | RegStudio on the shared framework               |   7   |
-| [ ] | `D05 T02 §2` | The registry engine                             |   7   |
-| [ ] | `D05 T02 §3` | Browse, display, and virtualize                 |   6   |
-| [ ] | `D05 T02 §4` | Editing, with a reverse                         |   8   |
-| [ ] | `D05 T02 §5` | Search across hives                             |   5   |
-| [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange            |   7   |
-| [ ] | `D05 T03 §1` | Restore Point Manager                           |   8   |
-| [ ] | `D05 T03 §2` | Driver Manager: backup and rollback             |   8   |
-| [ ] | `D05 T03 §3` | Disk Health                                     |   7   |
-| [ ] | `D05 T03 §4` | Crash Decoder                                   |   6   |
-| [ ] | `D05 T03 §5` | File Unlocker                                   |   7   |
-| [ ] | `D05 T03 §6` | System Report                                   |   7   |
-| [ ] | `D05 T03 §7` | Battery Health, Boot Options, File Associations |   7   |
-| [ ] | `D05 T03 §8` | Policy Inspector and Attribute Repair           |   9   |
-| [ ] | `D05 T04 §1` | System Change Journal                           |   8   |
-| [ ] | `D05 T04 §2` | Repair History                                  |   8   |
-| [ ] | `D05 T04 §3` | Sleep and Wake Diagnostics                      |   7   |
-| [ ] | `D05 T04 §4` | Boot Time Analyzer                              |   6   |
-| [ ] | `D05 T04 §5` | Why Is This Denied                              |   6   |
-| [ ] | `D05 T04 §6` | Pending Reboot Inspector                        |   5   |
-| [ ] | `D05 T04 §7` | Activation and Network Share Diagnostics        |   6   |
-| [ ] | `D05 T05 §1` | The recovery engine, read-only by design        |   8   |
-| [ ] | `D05 T05 §2` | Undelete                                        |   6   |
-| [ ] | `D05 T05 §3` | Erase verification                              |   7   |
-| [ ] | `D05 T05 §4` | Rescue imaging                                  |   9   |
-| [ ] | `D05 T06 §1` | Shadow Copy Browser                             |   7   |
-| [ ] | `D05 T06 §2` | Windows Disk Space                              |   7   |
-| [ ] | `D05 T06 §3` | Wi-Fi Diagnostics                               |   8   |
-| [ ] | `D05 T06 §4` | Profile Manager                                 |   7   |
-| [ ] | `D05 T06 §5` | Icon Cache and Default Apps Repair              |   6   |
-| [ ] | `D05 T06 §6` | Resource History and USB Device History         |   7   |
-| [ ] | `D05 T06 §7` | Credential, Display, and Connection Viewers     |   8   |
+|  ✔  | Section      | Deliverable                                       | Items |
+| :-: | ------------ | ------------------------------------------------- | :---: |
+| [ ] | `D05 T01 §1` | The intake contract, proven on UUIDGen            |   5   |
+| [ ] | `D05 T01 §2` | Complete Windows Repair                           |   7   |
+| [ ] | `D05 T01 §3` | QuickErase and WinClean                           |   8   |
+| [ ] | `D05 T01 §4` | Indicators and SaveDesk                           |   6   |
+| [ ] | `D05 T01 §5` | The four new utilities                            |   7   |
+| [ ] | `D05 T02 §1` | RegStudio on the shared framework                 |   7   |
+| [ ] | `D05 T02 §2` | The registry engine                               |   7   |
+| [ ] | `D05 T02 §3` | Browse, display, and virtualize                   |   6   |
+| [ ] | `D05 T02 §4` | Editing, with a reverse                           |   8   |
+| [ ] | `D05 T02 §5` | Search across hives                               |   5   |
+| [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange              |   7   |
+| [ ] | `D05 T03 §1` | Restore Point Manager                             |   8   |
+| [ ] | `D05 T03 §2` | Driver Manager: backup and rollback               |   8   |
+| [ ] | `D05 T03 §3` | Disk Health                                       |   7   |
+| [ ] | `D05 T03 §4` | Crash Decoder                                     |   6   |
+| [ ] | `D05 T03 §5` | File Unlocker                                     |   7   |
+| [ ] | `D05 T03 §6` | System Report                                     |   7   |
+| [ ] | `D05 T03 §7` | Battery Health, Boot Options, File Associations   |   7   |
+| [ ] | `D05 T03 §8` | Policy Inspector and Attribute Repair             |   9   |
+| [ ] | `D05 T04 §1` | System Change Journal                             |   8   |
+| [ ] | `D05 T04 §2` | Repair History                                    |   8   |
+| [ ] | `D05 T04 §3` | Sleep and Wake Diagnostics                        |   7   |
+| [ ] | `D05 T04 §4` | Boot Time Analyzer                                |   6   |
+| [ ] | `D05 T04 §5` | Why Is This Denied                                |   6   |
+| [ ] | `D05 T04 §6` | Pending Reboot Inspector                          |   5   |
+| [ ] | `D05 T04 §7` | Activation and Network Share Diagnostics          |   6   |
+| [ ] | `D05 T05 §1` | The recovery engine, read-only by design          |   8   |
+| [ ] | `D05 T05 §2` | Undelete                                          |   6   |
+| [ ] | `D05 T05 §3` | Erase verification                                |   7   |
+| [ ] | `D05 T05 §4` | Rescue imaging                                    |   9   |
+| [ ] | `D05 T06 §1` | Shadow Copy Browser                               |   7   |
+| [ ] | `D05 T06 §2` | Windows Disk Space                                |   7   |
+| [ ] | `D05 T06 §3` | Wi-Fi Diagnostics                                 |   8   |
+| [ ] | `D05 T06 §4` | Profile Manager                                   |   7   |
+| [ ] | `D05 T06 §5` | Icon Cache and Default Apps Repair                |   6   |
+| [ ] | `D05 T06 §6` | Resource History and USB Device History           |   7   |
+| [ ] | `D05 T06 §7` | Credential, Display, and Connection Viewers       |   8   |
+| [ ] | `D05 T07 §1` | Update Blocker and Update History                 |   7   |
+| [ ] | `D05 T07 §2` | Shell Extension Bisector and Explorer Performance |   7   |
+| [ ] | `D05 T07 §3` | Defender Manager and Security Status              |   7   |
+| [ ] | `D05 T07 §4` | BitLocker, Certificates, and Recovery             |   7   |
+| [ ] | `D05 T07 §5` | Privacy and Telemetry Settings                    |   6   |
+| [ ] | `D05 T07 §6` | Environment, Features, Power, and Locale          |   6   |
+| [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
+| [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  10   |
 
 
 ### Phase 4 -- Ship it, in every language

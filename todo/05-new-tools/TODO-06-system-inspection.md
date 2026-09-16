@@ -26,6 +26,7 @@ track: P3
 - -> XREF: [`02-repair-contract/TODO-01 §4`](../02-repair-contract/TODO-01-repair-contract.md) -- the restore record every destructive tool here consumes
 - -> XREF: [`05-new-tools/TODO-03 §1`](./TODO-03-system-utilities.md) -- the Restore Point Manager, which reads the same shadow copy store as `§1`
 - -> XREF: [`03-launcher/TODO-01 §6`](../03-launcher/TODO-01-launcher.md) -- the symptom routing that makes fifty tools findable
+- -> XREF: [`05-new-tools/TODO-07 §4`](./TODO-07-system-control.md) -- the configuration tools, which inherit §3's rule for revealing a secret
 
 ## Outcome
 

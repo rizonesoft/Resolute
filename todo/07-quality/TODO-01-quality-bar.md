@@ -74,6 +74,9 @@ The document every other domain is measured against. It runs first because a bar
 
 - [ ] Implement the check so it evaluates the profile against every shipped tool. Done when: it produces one row per tool per clause.
 - [ ] Fail by name. Done when: a tool missing a documentation set is named with the clause it failed and the section that owns it.
+- [ ] Enforce a **per-tool size budget**, because the suite's size claim is a product promise and an unchecked promise decays. Done when: each tool's executable is measured at release, compared against a recorded budget, and a tool exceeding it fails the check by name. The baseline is the 1.36 MB the shipped `ExoSuite.exe` measured on 2026-09-16 with the full UI framework linked statically.
+- [ ] Report the whole-suite total alongside it. Done when: the release report states the per-tool sizes and their sum, so the claim can be stated from measurement rather than estimate.
+- [ ] Record what the budget buys. Done when: this section states that a competing suite of roughly twenty tools commonly exceeds 200 MB, so the comparison the claim rests on is written down rather than assumed.
 - [ ] Check the **source layout** declared in `AGENTS.md` still holds. Done when: no file under `src/framework/` or `src/repair/` was added by a tool, no tool carries a file that belongs to a shared layer, and a deliberate violation fails the check by name. Cheaper substitute: trusting review, which is how a shared layer acquires a tool-specific special case.
 - [ ] Include the standalone clause by actually running the tool in an empty directory. Done when: a tool that reaches outside its folder fails the check, proven by a deliberate regression.
 - [ ] Make the report readable as a matrix. Done when: the full report renders as tools by clauses and is quoted here.

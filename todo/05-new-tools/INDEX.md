@@ -14,6 +14,7 @@ Six programs from samples/ become products, and four new utilities join the suit
 | [TODO-04](./TODO-04-diagnostics.md) | Diagnostics and Forensics | draft |
 | [TODO-05](./TODO-05-recovery-and-imaging.md) | Recovery and Imaging | draft |
 | [TODO-06](./TODO-06-system-inspection.md) | Inspection and Recovery Tools | draft |
+| [TODO-07](./TODO-07-system-control.md) | System Control and Configuration | draft |
 
 ## Completed
 
@@ -32,6 +33,7 @@ Six programs from samples/ become products, and four new utilities join the suit
 - Diagnostics that compose the other tools: change journal, repair history, sleep and wake, boot time, denial explainer, pending reboot, activation, shares
 - Undelete and rescue imaging, ported from GPL v3 C# sources, plus the erase verification that proves QuickErase's claim
 - Eleven inspection tools that surface what Windows records and will not show
+- Thirty configuration tools, three of them answering needs found by research rather than intuition
 - RegStudio: a registry editor whose every change is undoable
 
 ## Out of scope

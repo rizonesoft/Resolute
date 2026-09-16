@@ -27,6 +27,7 @@ track: F2
 - -> XREF: [`05-new-tools/TODO-03 §1`](../05-new-tools/TODO-03-system-utilities.md) -- the Restore Point Manager, which adds a second undo layer beneath this contract
 - -> XREF: [`05-new-tools/TODO-04 §2`](../05-new-tools/TODO-04-diagnostics.md) -- the Repair History, which reads this contract's restore records across every tool
 - -> XREF: [`05-new-tools/TODO-06 §4`](../05-new-tools/TODO-06-system-inspection.md) -- the Profile Manager, the least reversible consumer of this contract
+- -> XREF: [`05-new-tools/TODO-07 §7`](../05-new-tools/TODO-07-system-control.md) -- the network tools, whose changes can break the connection they are made over
 
 ## Outcome
 

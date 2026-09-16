@@ -22,6 +22,7 @@ track: P1
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework this launcher is the first product consumer of
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the tools this launcher discovers and starts
 - -> XREF: [`05-new-tools/TODO-06 §1`](../05-new-tools/TODO-06-system-inspection.md) -- the inspection tools, which take the suite past the point where a list is browsable
+- -> XREF: [`05-new-tools/TODO-07 §1`](../05-new-tools/TODO-07-system-control.md) -- the configuration tools, routed by the same symptom search
 
 ## Outcome
 

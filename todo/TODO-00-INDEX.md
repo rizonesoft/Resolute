@@ -101,6 +101,33 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | Credential Viewer | 05-new-tools | TODO written, new |
 | Display Info | 05-new-tools | TODO written, new |
 | Connection Viewer | 05-new-tools | TODO written, new, composed |
+| Update Blocker | 05-new-tools | TODO written, new |
+| Update History Viewer | 05-new-tools | TODO written, new |
+| Shell Extension Bisector | 05-new-tools | TODO written, new |
+| Explorer Performance | 05-new-tools | TODO written, new |
+| Defender Manager | 05-new-tools | TODO written, new |
+| Security Status | 05-new-tools | TODO written, new |
+| BitLocker Status | 05-new-tools | TODO written, new |
+| Certificate Manager | 05-new-tools | TODO written, new |
+| Recovery Manager | 05-new-tools | TODO written, new |
+| Privacy Settings | 05-new-tools | TODO written, new |
+| Environment Editor | 05-new-tools | TODO written, new |
+| Windows Features | 05-new-tools | TODO written, new |
+| Power Plans | 05-new-tools | TODO written, new |
+| Locale Fixer | 05-new-tools | TODO written, new |
+| Firewall Rules | 05-new-tools | TODO written, new |
+| Adapter Manager | 05-new-tools | TODO written, new |
+| DNS Selector | 05-new-tools | TODO written, new |
+| Proxy Inspector | 05-new-tools | TODO written, new |
+| Link Manager | 05-new-tools | TODO written, new |
+| Permissions Copier | 05-new-tools | TODO written, new |
+| Hash Verifier | 05-new-tools | TODO written, new |
+| Long Path Enabler | 05-new-tools | TODO written, new |
+| Boot Manager | 05-new-tools | TODO written, new |
+| Page File Manager | 05-new-tools | TODO written, new |
+| Audio Devices | 05-new-tools | TODO written, new |
+| Colour Profiles | 05-new-tools | TODO written, new |
+| Software Inventory | 05-new-tools | TODO written, new |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | **discontinued** as a tool; it becomes the C++ framework |
