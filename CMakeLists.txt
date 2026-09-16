@@ -43,5 +43,6 @@ add_subdirectory(shared/lucide)
 add_subdirectory(src)
 
 # Extensions
-add_subdirectory(extensions/Console)
+# Console retired by D00 T03 §1: off-mission for a repair suite, and the only
+# consumer of the deps/libvterm submodule. Source preserved in history at ac97ed7.
 # add_subdirectory(extensions/RegStudio)

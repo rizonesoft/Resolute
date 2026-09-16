@@ -1,4 +1,0 @@
-[submodule "deps/libvterm"]
-	path = deps/libvterm
-	url = https://github.com/neovim/libvterm.git
-	branch = nvim
