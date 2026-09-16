@@ -13,6 +13,8 @@ It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoI
 | `src/` | The launcher shell |
 | `shared/` | The framework and the UI library. Every tool consumes these |
 | `extensions/` | The tools, each building as a standalone executable |
+| `exokit/` | The portable toolchain bootstrap: llvm-mingw, CMake, Ninja. Downloads into itself and is gitignored except for its scripts. Renamed `reskit/` by `D00 T03 §3` |
+| `resources/` | Application icons and embedded resources |
 | `resolute_au3/` | The frozen AutoIt suite. **The executable specification**, not a maintenance target |
 | `resolute_au3/todo/` | The archived AutoIt plan, superseded 2026-09-16, kept for its per-tool analysis |
 | `DESIGN.md` | **The design contract.** Every user-facing surface is held to it |

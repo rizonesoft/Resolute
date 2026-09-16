@@ -15,10 +15,10 @@ track: W1
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files. **Corrected 2026-09-17 after independent review:** an earlier draft called it the tree's *only* external dependency, which was wrong. `shared/lucide/CMakeLists.txt:9` also fetches `sammycage/lunasvg` v3.5.0 through `FetchContent` at configure time. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1,423,872 bytes, 1.36 MiB. **Corrected 2026-09-17:** it is **not** fully static. Rebuilding the merged tree produces a 1,380,352-byte executable plus `System/ExoUI.dll` and `System/Lucide.dll`, 3.9 MB in total. `D00 T01 §2` owns the correction. There is **no vcpkg**. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
 >
-> <!-- claim: exists samples/ExoSuite/shared/exo-ui/include/exo/theme.h -->
-> <!-- claim: exists samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1 -->
-> <!-- claim: lines samples/ExoSuite/src/main.cpp = 573 -->
-> <!-- claim: count "llvm-mingw" samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1 = 4 -->
+> <!-- claim: exists shared/exo-ui/include/exo/theme.h -->
+> <!-- claim: exists exokit/Bootstrap-ExoKit.ps1 -->
+> <!-- claim: lines src/main.cpp = 573 -->
+> <!-- claim: count "llvm-mingw" exokit/Bootstrap-ExoKit.ps1 = 4 -->
 >
 > **Corrected 2026-09-16** during `§1` validation, three claims in the paragraph above were wrong:
 >
@@ -49,7 +49,7 @@ track: W1
 
 | Order | Section | Deliverable                          | Depends On | Status |
 | :---: | :-----: | ------------------------------------ | ---------- | :----: |
-|   1   |   §1    | Subtree merge with history preserved | --         |  [ ]   |
+|   1   |   §1    | Subtree merge with history preserved | --         |  [x]   |
 |   2   |   §2    | Rename the product to Resolute       | §1         |  [ ]   |
 |   3   |   §3    | Rename the library and the toolchain | §2         |  [ ]   |
 |   4   |   §4    | Correct the stale documentation      | §3         |  [ ]   |
@@ -129,7 +129,9 @@ track: W1
 
 - [x] Take `RegStudio` in from its remote, by `git subtree` rather than a root merge, because its layout is root-level and would collide. Its full 10-commit history is reachable and `c9b8a0b` is an ancestor of `HEAD`. The ExoSuite copy was removed first at `862cfb5`, byte-identical in `src/` and `CMakeLists.txt`, verified before removal. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the standalone repository and the copy inside ExoSuite's `extensions/`, and only the standalone one carries history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
 - [x] Confirm `samples/` stays out of the repository. `git ls-files samples` is empty and no embedded-repository warning appears. Done when: `/samples/` is gitignored, `git ls-files samples` is empty, and `git status` reports no embedded-repository warning. The local checkouts may stay on disk; they are working copies, not repository content.
-- [x] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. **A full release build leaves `git status` clean**, verified after building 52/52 targets.
+- [x] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. **A full release build leaves `git status` clean**, verified after building 52/52 targets. **Verified again 2026-09-17 by review, this time against a real bootstrap:** running `exokit/Bootstrap-ExoKit.ps1` downloaded the toolchain into `exokit/` and `git status` stayed clean, so the ignore rules hold for the directories rather than only for the build output. The rules are written for both `exokit/` and the `reskit/` name `§3` renames it to, so the rename cannot silently un-ignore 850 MB.
+<!-- claim: count "exokit/llvm-mingw" .gitignore = 1 -->
+<!-- claim: count "reskit/llvm-mingw" .gitignore = 1 -->
 - [x] Record what was merged, from which source, and at which commit:
 
   | Source | Mechanism | Commit | Landed |
@@ -138,9 +140,26 @@ track: W1
   | `github.com/rizonesoft/RegStudio` | `git subtree add` | `c9b8a0bc51809b2d0805f874919b41f99347ce85` | `extensions/RegStudio` |
 
   ExoSuite was taken from the local checkout because the remote lacked 52 entries; `fffd8b4` is the commit that captured them and is identical in both once pushed.
-- [ ] Commit: `"intake: merge the exosuite codebase with its history"`
+- [x] Commit: `"intake: merge the exosuite codebase with its history"` -- landed as `ac97ed7`, with the four follow-on commits named in the items above.
 
-**Test checkpoint:** The precondition above is resolved and the chosen option is recorded with its date. `git log -- shared/` shows pre-merge commits including `efdce6177` and `09b1f92ab`. `extensions/Console/`, `TODO-ux.md`, and the ten `shared/exo-ui` files named above are all present after the merge, each confirmed by path, because their absence is the failure this section nearly shipped. `git ls-files samples` is empty and no embedded-repository warning appears. A full bootstrap and build leaves `git status` clean. Each merge's source remote and commit are quoted.
+**Test checkpoint:** The precondition above is resolved and the chosen option is recorded with its date. `git log -- shared/` shows pre-merge commits including `efdce6177` and `09b1f92ab`. `extensions/Console/` and `TODO-ux.md` are present at the merge commit, and so are the ten `shared/exo-ui` files, **checked at these exact paths** because their absence is the failure this section nearly shipped:
+
+  ```
+  include/exo/animation.h            src/animation.cpp
+  include/exo/typography.h           src/typography.cpp
+  include/exo/controls/contentview.h src/controls/contentview.cpp
+  include/exo/controls/listview.h    src/controls/listview.cpp
+  include/exo/controls/popupmenu.h   src/controls/popupmenu.cpp
+  ```
+
+  **Corrected 2026-09-17 by review:** the checkpoint previously named the five components without their paths, and re-verifying it produced three false MISSING results, because `contentview`, `listview`, and `popupmenu` live under `controls/` rather than beside the others. A checkpoint that cannot be executed the same way twice is not evidence; the paths are now written down. Console is checked at `ac97ed7`, not at `HEAD`, because `e1f26a1` deliberately retired it. `git ls-files samples` is empty and no embedded-repository warning appears. A full bootstrap and build leaves `git status` clean. Each merge's source remote and commit are quoted.
+
+> **Verified:** 2026-09-17 | §1 | `git log -- shared/` reaches `efdce61` and `09b1f92` · `c9b8a0b` is an ancestor of `HEAD` · all ten `shared/exo-ui` files plus `extensions/Console` and `TODO-ux.md` present at `ac97ed7`, each checked at its exact path · `git ls-files samples` empty, no embedded-repository warning · real bootstrap exit 0 installing CMake 4.2.3, Ninja 1.13.1, clang 21.1.8 · `build/release` deleted and reconfigured, `grep -c samples CMakeCache.txt` = 0 · 52/52 targets · `ExoSuite.exe` 1,380,352 bytes plus two DLLs, 3.9 MB · `git status` clean after 850 MB of toolchain
+> **Review:** round 1, candidate `ac97ed7` `862cfb5` `1b99463` `e1f26a1` `ffa97c3` `8ba1f20` -- `adversarial` approve · `consistency` approve after fixes (2) · `integration` approve after fix and filing (1) · `source-defect` approve · `design` not-applicable · `record` approve after fixes (1). Raw findings: docs/reviews/00-workspace/D00-T03-s1.md
+> **Independent:** `codex review --commit ffa97c3` (gpt-6-astra, high) returned 2 P2 findings, both verified against source, both correct, both fixed in `8ba1f20`: the static-linking diagnosis named the SHARED targets when the application links `ExoUI_static` and the real dependency is the runtime `LoadLibraryW` in icons.cpp; and "no external dependencies at all" was false because lucide fetches lunasvg v3.5.0. Neither was argued. The skill's own invocation was corrected: `--commit` refuses a prompt.
+> **CRUD:** not applicable (this section moves history between repositories and creates no user-facing data path)
+> **Duration:** 25
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## 2. Rename the Product to Resolute
 

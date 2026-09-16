@@ -59,6 +59,8 @@ Catch2 is a dependency, not a design. What this section decides is the shape of 
 - [ ] Write the conventions into `tests/README.md`: naming, tagging by tool, and the rule that a test asserting a system effect reads the effect back rather than trusting a return value. Done when: the file exists and the first tests follow it.
 - [ ] Prove a failure is legible. Done when: a deliberately failing assertion prints the tool tag, the expected value, and the actual value, and the output is quoted here.
 - [ ] Wire the suite into `scripts/check-all.ps1`, replacing the not-present branch that section left. Done when: the branch is gone and a failing test fails the combined gate.
+- [ ] Remove the root scratch file `test_font.cpp`, or move it under `tests/` as a real test if it still proves something. **Filed 2026-09-17 by the review of `D00 T03 §1`:** the intake left it tracked at the repository root, where it is built by nothing and named in no layout. Its `.exe` and `.obj` were gitignored during the intake, but the source itself travelled. Done when: `git ls-files test_font.cpp` is empty, or the file lives under `tests/` and `ctest` runs it. Cheaper substitute that fails the checkpoint: gitignoring it while leaving it tracked, which changes nothing because git keeps tracking what it already tracks.
+<!-- claim: exists test_font.cpp -->
 - [ ] Commit: `"workspace: catch2 harness and assertion conventions"`
 
 **Test checkpoint:** `ctest --preset x64-debug` runs and exits 0. A deliberately failing assertion exits non-zero and prints tool tag, expected, and actual; both outputs are quoted. `pwsh scripts/check-all.ps1` fails when a test fails.
