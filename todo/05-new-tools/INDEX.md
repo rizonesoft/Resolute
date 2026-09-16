@@ -29,6 +29,7 @@ Six programs from samples/ become products, and four new utilities join the suit
 
 - Existing tools being ported (04)
 - WinPower, which is not taken in; the launcher replaces it (03)
+- Console, dropped as a product by `D00 T03 §1`
 
 ---
 

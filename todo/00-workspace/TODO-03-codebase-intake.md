@@ -55,13 +55,14 @@ track: W1
 
   | Collision | Resolution |
   | --- | --- |
-  | `todo/extensions/TODO-Console.md` | route through `add-todo`, then remove the directory |
+  | `todo/extensions/TODO-Console.md` | Console is not shipped; mark superseded and remove the directory |
   | `docs/extensions.md` | move into the repository's `docs/` |
   | `README.md` | the repository's wins; the incoming content is rewritten by §4 |
   | `.gitignore`, `.gitattributes` | merge the incoming rules into the repository's |
   | `build/` | ignored on both sides, no content to reconcile |
 
-- [ ] Decide what happens to the `deps/libvterm` submodule. Done when: the decision is dated with its cost of changing. A submodule contradicts the bare-machine bootstrap property, because a clone without `--recursive` cannot build; vendoring the source removes that. Cheaper substitute that fails the checkpoint: leaving the submodule and discovering it on the first clean clone.
+- [ ] Retire the `Console` extension and the `deps/libvterm` submodule with it. Done when: neither is built by any preset, `.gitmodules` is empty or removed, and a fresh clone **without** `--recursive` builds everything. Decided 2026-09-16: Console is not a shipped product, and it was `libvterm`'s only consumer, so the tree ends with **no external dependencies at all**. Reversing this means restoring both, which git history makes cheap.
+- [ ] Preserve the retired source rather than deleting it. Done when: `Console` and its 1,762 lines are reachable in history, and this section names the commit, so the decision is reversible on evidence rather than on memory.
 - [ ] Record the resulting root layout so later sections can rely on it. Done when: the layout below is true and `AGENTS.md` agrees with it.
 
   ```

@@ -684,3 +684,36 @@ todo/ docs/ scripts/
 ```
 
 This corrects `AGENTS.md`, which described `src/` as "the C++ suite". After the intake `src/` is only the launcher shell: the framework lives in `shared/` and the tools in `extensions/`.
+
+## Decisions taken, round 12
+
+The operator delegated these. Each is recorded with its reasoning so it can be overturned on evidence rather than re-argued from scratch.
+
+34. **Every tool lives at `extensions/<Tool>/`** and builds as its own standalone executable linking the shared library statically. `src/` is the launcher shell and nothing else. This is the model ExoSuite already uses, and "standalone or integrated" is precisely the independent-distribution constraint, so the port inherits a proven arrangement rather than inventing one.
+35. **`Console` is dropped as a shipped product.** Its 1,762 lines stay reachable in history.
+36. **The `deps/libvterm` submodule goes with it**, leaving the tree with **no external dependencies at all** beyond the bootstrapped toolchain and Catch2.
+
+### Why Console is dropped
+
+It is the operator's own working code, so the reasoning is stated rather than assumed.
+
+- **It is off-mission.** Resolute is system repair. A terminal emulator is a developer tool, and no comparable suite ships one: not Sysinternals, not NirSoft.
+- **Windows Terminal exists, is excellent, and ships with Windows 11.** Competing with a free first-party terminal is a poor use of the only scarce resource here.
+- **The conformance cost is real.** As a shipped product it would owe the full profile: a documentation set, an update file, an About page, up to 35 language packs, `DESIGN.md` conformance, and the accessibility floor. A terminal grid with a UI Automation provider is genuinely hard, and it would be hard for a tool nobody asked this suite for.
+- **It carries the tree's only external dependency.** `libvterm` was a submodule, which quietly breaks the bare-machine property: a clone without `--recursive` cannot build. Dropping Console removes the submodule, the dependency, and that failure mode together.
+
+**What the real need actually is.** Several repair tools shell out to `netsh`, `sfc`, `dism`, and `chkdsk`, and a user wants to see what those printed. That is a read-only command output surface, not a terminal emulator: no PTY, no escape sequence parsing, no `libvterm`. The repair contract's per-item result and transcript in `D02 T01 §3` and `§5` already cover it.
+
+**Reversing this is cheap.** `D00 T03 §1` requires the retired source to be reachable in history with the commit named, so restoring Console is a `git checkout` rather than a rewrite.
+
+### What the shape now is
+
+```
+src/          the launcher shell, and nothing else
+shared/       resolute-ui, lucide
+extensions/   every tool, each a standalone executable
+deps/         empty after Console retires
+reskit/       the bootstrapped toolchain
+```
+
+A fresh clone **without** `--recursive` builds everything. `D00 T01 §2` asserts exactly that.

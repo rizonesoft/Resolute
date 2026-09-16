@@ -48,6 +48,8 @@ Everything in this plan is organized around them. A defect is anything that reim
 
 ## Coverage: every tool, and who owns it
 
+Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalone executable.
+
 | Tool | Domain | State |
 | ---- | ------ | ----- |
 | Resolute (launcher) | 03-launcher | TODO written |
@@ -69,7 +71,7 @@ Everything in this plan is organized around them. A defect is anything that reim
 | Context Menu Editor | 05-new-tools | TODO written, new |
 | Hosts File Editor | 05-new-tools | TODO written, new |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
-| Console | 05-new-tools | arrives with the intake, **needs a keep-or-drop decision** |
+| Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | internal tooling, not a product |
 | Distro | 06-distro-release | internal tooling, not a product |
 | WinPower | 03-launcher | not taken in; the launcher replaces it |

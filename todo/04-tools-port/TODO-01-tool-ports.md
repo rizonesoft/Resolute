@@ -32,7 +32,7 @@ track: P2
 - Every shipped tool has a C++ implementation that passes a parity check against its AutoIt counterpart.
 - The six frozen tools produce byte-identical effects, proven per tool.
 - Four browser tools become one; two drive tools become one.
-- Every port consumes the framework and, where it repairs, the repair contract.
+- Every port lives at `extensions/<Tool>/`, builds as its own standalone executable, and consumes the framework and, where it repairs, the repair contract.
 - No ported tool carries a private settings writer, log writer, or localization loader.
 
 **Adjacency:** list=applicable @ D04 T01 §4; document=applicable @ D04 T01 §5; settings=applicable @ D04 T01 §1; reporting=applicable @ D04 T01 §2; notifications=applicable @ D04 T01 §3; permissions=applicable @ D04 T01 §2; audit=applicable @ D04 T01 §2; exchange=applicable @ D04 T01 §3; reverse=applicable @ D04 T01 §2
@@ -62,7 +62,7 @@ track: P2
 **Needs:** Windows host (build/test)
 
 - [ ] Capture the shipped AutoIt `Ownership` first: a driven run against the fixture tree with its effects and window recorded. Done when: the baseline is committed.
-- [ ] Port the tool as framework plus repair contract plus its own items, and nothing else. Done when: the source contains no settings, log, localization, or loop code.
+- [ ] Port the tool to `extensions/Ownership/` as framework plus repair contract plus its own items, and nothing else. Done when: it builds as its own standalone executable and the source contains no settings, log, localization, or loop code.
 - [ ] Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference. Done when: the parity report is quoted and shows zero differing fields.
 - [ ] Prove the reverse: a takeover followed by undo restores every path's owner and ACL, compared entry by entry. Done when: the assertion compares owner and ACL before and after.
 - [ ] Prove the refusal: a path the process cannot touch is refused by name, leaving every other path in the batch accounted for. Done when: a deny-ACE fixture produces the refusal and the batch counts reconcile.
@@ -85,7 +85,7 @@ track: P2
 **Needs:** Windows host (build/test)
 
 - [ ] Capture each shipped AutoIt tool first, with its effects on its fixture and its window. Done when: five baselines are committed.
-- [ ] Port each as framework plus contract plus items. Done when: none of the five contains settings, log, localization, or loop code.
+- [ ] Port each to `extensions/<Tool>/` as framework plus contract plus items. Done when: each builds as its own standalone executable and none of the five contains settings, log, localization, or loop code.
 - [ ] Prove parity per tool. Done when: five parity reports each show zero differing fields, all quoted.
 - [ ] Prove the reverse per tool, or state plainly which actions have none and what the user should do instead, on the surface. Done when: each of the five carries one of those two and the checkpoint proves which.
 - [ ] Prove the elevation refusal per tool. Done when: five unelevated assertions each show the action refused by name, nothing changed, one log line.

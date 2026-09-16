@@ -81,6 +81,8 @@ A checkpoint citing a gate that does not exist yet is unfalsifiable and is not a
 - **One suite, one framework:** shared behavior is consumed from the framework or the repair contract, never reimplemented in a tool. A second progress bar, About dialog, settings writer, or log format is a defect.
 - **Elevation is checked at the action**, not only at startup.
 - **`resolute_au3/` is read-only** except under the maintenance domain. It is the specification. Changing it changes what the port is measured against.
+- **Every tool lives at `extensions/<Tool>/`** and builds as its own standalone executable linking the shared library statically. `src/` is the launcher shell and nothing else.
+- **The tree has no external dependencies** beyond the bootstrapped toolchain and the test framework. Adding one is a decision with a recorded reason, not a convenience.
 - **Every surface answers to [`DESIGN.md`](./DESIGN.md).** A tool never draws a control the shared library provides, and never hardcodes a colour, a size, or a spacing value. Application icons are the one deliberate exception.
 - **No em dashes** in authored prose. One line per paragraph and list item in Markdown.
 - **Source of truth:** target behavior via the `resolute_au3/` source and a driven run of the shipped tool, the design rules via `DESIGN.md` with the captures under `docs/captures/` as its visual reference, plan state via `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
