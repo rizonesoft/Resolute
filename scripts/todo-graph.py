@@ -985,16 +985,27 @@ def cmd_query(args) -> int:
     what = args.what
 
     if what == "calibration":
-        rows = _calibration_rows(todos)
+        try:
+            rows = _calibration_rows(todos)
+        except GitUnavailable as exc:
+            # Loudly, and with nothing reported. A git failure used to become a
+            # zero, which entered the outlier maths and would have entered the
+            # correlation as an observation of a section that cost nothing.
+            print(f"calibration: cannot measure -- {exc}")
+            print("  No rows are reported. An unanswerable question is not an answer of zero.")
+            return 1
         total_sections = sum(len(t.sections) for t in todos)
         print(f"calibration: {len(rows)} stamped section(s) of {total_sections}\n")
         if not rows:
             print("  Nothing has been stamped yet, so there is nothing to calibrate.")
             return 0
-        print(f"  {'section':14} {'items':>5} {'commits':>7} {'minutes':>7}")
+        print(f"  {'section':14} {'items':>5} {'commits':>7} {'minutes':>7}  rework")
         for r in rows:
             mins = "--" if r["minutes"] is None else str(r["minutes"])
-            print(f"  {r['ref']:14} {r['items']:>5} {r['commits']:>7} {mins:>7}")
+            rw = {True: "yes", False: "no", None: "?"}[r["rework"]]
+            print(f"  {r['ref']:14} {r['items']:>5} {r['commits']:>7} {mins:>7}  {rw}")
+        print("  rework: a commit owned by the section between its ship and its stamp,")
+        print("  which is review finding something. A raw commit count cannot see it.")
 
         # Outliers: a section whose commit count is far from what its item count
         # would suggest. Named, never explained away: the reason is usually
@@ -1004,13 +1015,13 @@ def cmd_query(args) -> int:
             mean = sum(x for _, x in ratios) / len(ratios)
             far = [(r, x) for r, x in ratios if abs(x - mean) > 0.5 * max(mean, 0.01)]
             if far:
-                print("\n  commits per item, mean {:.2f}. Furthest from it:".format(mean))
+                print("\ncommits per item, mean {:.2f}. Furthest from it:".format(mean))
                 for r, x in sorted(far, key=lambda p: -abs(p[1] - mean)):
                     print(f"    {r['ref']:14} {x:.2f}")
                 print("  An outlier is a question, not a conclusion. A section may have")
                 print("  cost what it did for reasons the plan never recorded.")
 
-        print(f"\n  sample {len(rows)}, threshold {CALIBRATION_MIN_SAMPLE}")
+        print(f"\nsample {len(rows)}, threshold {CALIBRATION_MIN_SAMPLE}")
         if not _calibration_reports_correlation(len(rows)):
             print("  NO CORRELATION IS REPORTED. The sample is below the threshold, and a")
             print("  correlation over this many points is noise with a number attached.")
@@ -1025,6 +1036,7 @@ def cmd_query(args) -> int:
             print("  A correlation is still not a cause: item count and cost may both")
             print("  follow from something the plan does not record.")
         return 0
+
 
     if what == "stats":
         secs = [s for t in todos for s in t.sections.values()]
@@ -1641,16 +1653,60 @@ def _calibration_reports_correlation(sample: int) -> bool:
     return sample >= CALIBRATION_MIN_SAMPLE
 
 
-def _commits_naming(ref: str) -> int:
-    """How many commits name this section. Derived, never typed."""
+class GitUnavailable(Exception):
+    """Git could not answer. NOT the same as an answer of zero."""
+
+
+def _owned_commits(ref: str) -> list[str]:
+    """Subjects of the commits this section OWNS, oldest first.
+
+    Ownership is the repository's commit convention: the subject line ends with
+    the section reference in parentheses, `... (D00 T03 §2)`.
+
+    It was `git log --grep=<ref>` until 2026-09-17, which matched the reference
+    anywhere in the message, including the body. The commit that introduced this
+    very report tabulated all six stamped sections in its body and so counted as
+    a commit of every one of them: each row rose by one and the outlier
+    disappeared. A measurement that its own documentation changes is not a
+    measurement. Found by the independent review of 6fb88f3.
+    """
     try:
         out = subprocess.run(
-            ["git", "log", "--oneline", "--all", f"--grep={ref}"],
-            cwd=REPO, capture_output=True, text=True, timeout=20,
+            ["git", "log", "--format=%s", "--all"],
+            cwd=REPO, capture_output=True, text=True, timeout=30,
+            # Git emits UTF-8. Without this, Python decodes with the locale
+            # codec, which on Windows is cp1252, and every section marker comes
+            # back as `Â§` instead of `§`: every subject fails to match and the
+            # report shows a confident zero for every section. The first repr of
+            # the output looked correct because the terminal re-encoded it.
+            encoding="utf-8", errors="replace",
         )
-    except (OSError, subprocess.SubprocessError):
-        return 0
-    return len([l for l in out.stdout.splitlines() if l.strip()])
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise GitUnavailable(f"git log could not run: {exc}") from exc
+    if out.returncode != 0:
+        # A non-zero exit was previously ignored, so a broken repository or a
+        # detached worktree produced a confident zero and fed it to the report
+        # as an observation of a costless section.
+        raise GitUnavailable(f"git log exited {out.returncode}: {out.stderr.strip()[:120]}")
+    marker = f"({ref})"
+    subjects = [l for l in out.stdout.splitlines() if l.rstrip().endswith(marker)]
+    subjects.reverse()   # oldest first
+    return subjects
+
+
+def _needed_rework(subjects: list[str]) -> bool | None:
+    """Did this section need a commit after its ship, before the stamp?
+
+    The convention is one ship commit, then a `review:` stamp. Anything owned by
+    the section between them is rework the independent review or self-review
+    caused, which is exactly what the checklist asks to be recorded and what a
+    raw commit count cannot distinguish from ordinary implementation.
+    """
+    stamp = next((i for i, s in enumerate(subjects) if s.startswith("review:")), None)
+    if stamp is None:
+        return None       # not stamped through the usual path; say so, do not guess
+    return stamp > 1
+
 
 
 def _calibration_rows(todos: list[Todo]) -> list[dict]:
@@ -1662,13 +1718,15 @@ def _calibration_rows(todos: list[Todo]) -> list[dict]:
             if sec.status != "x" or sec.moved:
                 continue
             ref = f"D{dom} T{t.number} \u00a7{num}"
+            subjects = _owned_commits(ref)
             rows.append({
                 "ref": ref,
                 "items": sec.items_total,
-                "commits": _commits_naming(ref),
+                "commits": len(subjects),
                 # Already parsed from the stamp by the loader; re-parsing the
                 # body here would be a second reader of one fact.
                 "minutes": sec.duration_minutes,
+                "rework": _needed_rework(subjects),
             })
     return rows
 
@@ -3642,6 +3700,16 @@ track: Z1
         check("pearson on a perfect inverse", round(_pearson([1, 2, 3], [6, 4, 2]), 6), -1.0)
         check("pearson needs two points", _pearson([1], [2]), None)
         check("pearson refuses a flat series", _pearson([1, 1, 1], [1, 2, 3]), None)
+        # Ownership, not mention. `git log --grep` matched the reference
+        # anywhere in a message, so the commit introducing this report counted
+        # as a commit of all six sections it tabulated.
+        check("rework: ship then stamp is no rework",
+              _needed_rework(["intake: x (D00 T01 §1)", "review: stamp (D00 T01 §1)"]), False)
+        check("rework: ship, fix, stamp is rework",
+              _needed_rework(["intake: x (D00 T01 §1)", "intake: fix (D00 T01 §1)",
+                              "review: stamp (D00 T01 §1)"]), True)
+        check("rework: unstamped says unknown rather than guessing",
+              _needed_rework(["intake: x (D00 T01 §1)"]), None)
         check("items sync writes the new count", _new.rstrip().endswith("11  |"), True)
         check("items sync leaves the ref untouched", "`D90 T01 §1`" in _new, True)
         check("items sync keeps the cell width", len(_new), len(_row))
