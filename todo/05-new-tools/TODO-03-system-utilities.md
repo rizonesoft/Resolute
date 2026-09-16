@@ -29,6 +29,7 @@ track: P3
 - A user can find out whether their disk is dying, and why their machine crashed.
 - A file that will not delete can be unlocked, and a user can say what is holding it.
 - A support conversation starts with one attached file rather than twenty questions.
+- A user can find out why a Windows setting is locked, and recover files that malware hid.
 
 **Adjacency:** list=applicable @ D05 T03 §1; document=applicable @ D05 T03 §6; settings=applicable @ D05 T03 §7; reporting=applicable @ D05 T03 §4; notifications=applicable @ D05 T03 §3; permissions=applicable @ D05 T03 §5; audit=applicable @ D05 T03 §2; exchange=applicable @ D05 T03 §6; reverse=applicable @ D05 T03 §1
 
@@ -45,6 +46,7 @@ track: P3
 |   5   |   §5    | File Unlocker                              | D05 T01 §1         |  [ ]   |
 |   6   |   §6    | System Report                              | D05 T01 §1         |  [ ]   |
 |   7   |   §7    | Battery Health, Boot Options, File Associations | §1            |  [ ]   |
+|   8   |   §8    | Policy Inspector and Attribute Repair      | D05 T01 §1         |  [ ]   |
 
 ---
 
@@ -197,6 +199,30 @@ Three small tools grouped because each is a single surface over a single system 
 **Freeze check:** What Boot Options writes to the boot configuration is frozen from the moment it ships, because a mistake there costs the user their machine. Evidence is a fixture boot-configuration change and undo reproducing the original entry exactly.
 
 **Test checkpoint:** Battery Health renders four values on a laptop and reports no battery on a desktop. Each boot option is a declared contract item with undo, and each states its restart requirement and recovery path on the surface. A deliberately broken association is repaired and verified by read-back, and undo restores the previous handler exactly.
+
+## 8. Policy Inspector and Attribute Repair
+
+Two tools that exist because nothing else does. Neither is a big build; both answer a question a user currently cannot get answered anywhere.
+
+**Fidelity:** each tool's main window and result list, against `DESIGN.md`.
+**Job:** a user can find out why a Windows setting is locked, and recover files that malware hid from them. Consumer: the policy registry areas, and the file system attributes read back after the change.
+**Treatment:** the Policy Inspector explains **why** rather than just listing policy values, because the value is not the thing a user is confused about. Cheaper substitute that fails the checkpoint: dumping the policy registry keys, which is what a user could already do with RegStudio.
+**Chrome:** consume the framework and the repair contract.
+**Needs:** Windows host (build/test)
+
+- [ ] Enumerate applied policy from the machine and user policy areas, with the setting each one controls. Done when: a fixture policy value renders with the Windows setting it affects, named in plain words rather than as a registry path.
+- [ ] Identify orphaned policy: entries left behind by software that is no longer installed. Done when: a fixture orphan is flagged as orphaned and the reasoning is shown, and a legitimately applied policy is not.
+- [ ] Explain "managed by your organization" on a machine with no organization. Done when: the surface states which policy produced the message and what removing it would restore. Cheaper substitute that fails the checkpoint: reporting that a policy exists without saying what it did to the user.
+- [ ] Remove an orphaned policy as a repair-contract item, so it is undoable. Done when: removal is a declared item with prior state captured, and undo restores the entry exactly.
+- [ ] Refuse to touch policy on a genuinely domain-joined machine without an explicit override. Done when: a domain-joined fixture produces the refusal naming the domain, because removing real policy from a managed machine is somebody else's decision.
+- [ ] Build Attribute Repair: find files and folders carrying hidden or system attributes in user-chosen locations, and restore them. Done when: a fixture tree with `+h +s` set renders and the attributes are cleared, verified by read-back. `USBRepair` was checked on 2026-09-16 and does not do this, so it is not a duplicate.
+- [ ] Make the attribute change undoable and scoped. Done when: it is a repair-contract item, and the tool refuses to run against a system directory where those attributes are legitimate.
+- [ ] Account for both surfaces. Done when: two accounts are written and each deferral resolves.
+- [ ] Commit: `"policy inspector and attribute repair"`
+
+**Freeze check:** What Attribute Repair clears is frozen once shipped: hidden and system attributes only, never file content, never ACLs. Evidence is a fixture tree compared before and after for everything except the two attributes.
+
+**Test checkpoint:** A fixture policy value renders with the setting it controls in plain words. An orphan is flagged with its reasoning and a legitimate policy is not. The surface names which policy produced "managed by your organization". Removal is a contract item and undo restores it exactly. A domain-joined fixture is refused by name. A `+h +s` fixture tree is cleared and verified, and a system directory is refused.
 
 ## Verification
 

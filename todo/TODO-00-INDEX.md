@@ -77,6 +77,8 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | Battery Health | 05-new-tools | TODO written, new |
 | Boot Options | 05-new-tools | TODO written, new |
 | File Association Repair | 05-new-tools | TODO written, new |
+| Policy Inspector | 05-new-tools | TODO written, new |
+| Attribute Repair | 05-new-tools | TODO written, new |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | internal tooling, not a product |
