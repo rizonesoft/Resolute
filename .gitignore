@@ -39,3 +39,7 @@ rescue-db/
 .windsurf/
 TODO.md
 implementation_plan.md
+
+# TODO graph derived cache (always reproducible from todo/*.md)
+build/
+__pycache__/

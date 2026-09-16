@@ -1,0 +1,3998 @@
+#!/usr/bin/env python3
+"""todo-graph -- build, validate, query, and render the Resolute TODO graph.
+
+Markdown under todo/ is canonical. This script parses it into a derived cache
+(build/todo-cache.json), checks the graph's integrity, and answers questions the
+markdown cannot answer by grep -- what is ready, what is blocked, and on what.
+
+    python scripts/todo-graph.py build
+    python scripts/todo-graph.py validate
+    python scripts/todo-graph.py self-test
+    python scripts/todo-graph.py query ready|blocked|stats|deferred|frozen|findings|surfaces
+    python scripts/todo-graph.py render > docs-graph.md
+    python scripts/todo-graph.py plan [--check]
+    python scripts/todo-graph.py classify 'D00 T01 §11' 'D02 T01 §13'
+    python scripts/todo-graph.py progress --json
+
+Stdlib only -- this runs before platform/ has a composer.json, let alone vendor/.
+Format spec: todo/README.md
+
+A campaign may edit this file when the inflight section already names it
+(Build order or dirty list). That is planned section work, not a mid-run
+self-improvement. The intelligence hook allows that path (INT-0012); the
+four verify commands in `.grok/skills/run-phase/SKILL.md` still run before
+staging.
+"""
+
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+import re
+import shutil
+import tempfile
+import sys
+from dataclasses import dataclass, field, asdict
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
+
+# This tree is written in UTF-8 and prints section markers (U+00A7) and status
+# glyphs. A Windows console defaults to cp1252, where those raise
+# UnicodeEncodeError mid-command and take a query down with them. Reconfigure
+# our own streams rather than asking every caller to set PYTHONIOENCODING: the
+# point of a stdlib-only script is that a fresh clone just runs.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):  # already wrapped, or not a real stream
+        pass
+
+REPO = Path(__file__).resolve().parent.parent
+TODO_DIR = REPO / "todo"
+CACHE = REPO / "build" / "todo-cache.json"
+
+ID_RE = re.compile(r"^[a-z][a-z0-9-]{0,58}[a-z0-9]$")
+STATUSES = {"draft", "active", "blocked", "done", "superseded"}
+TODO_FILE_RE = re.compile(r"^TODO-(\d{2})-[a-z0-9-]+\.md$")
+
+# "| 3 | §2 | Deliverable text | §1, T02 §4 | [x] |"
+ROW_RE = re.compile(
+    r"^\|\s*(?P<order>\d+)\s*\|\s*§(?P<sec>\d+)\s*\|"
+    r"\s*(?P<deliverable>.+?)\s*\|\s*(?P<deps>.*?)\s*\|\s*\[(?P<status>[ x/])\]\s*\|\s*$"
+)
+BODY_RE = re.compile(r"^##\s+(?P<num>\d+)\.\s+(?P<title>.+?)\s*$")
+# §1 | T02 §3 | D02 T01 §4
+XREF_RE = re.compile(r"(?:D(?P<dom>\d{2})\s+)?(?:T(?P<todo>\d{2})\s+)?§(?P<sec>\d+)")
+BARE_TODO_RE = re.compile(r"(?<![\w§])(?:D\d{2}\s+)?T\d{2}(?!\s*§)(?![\w-])")
+STAMP_RE = re.compile(
+    r"^>\s*\*\*(?P<kind>Verified|Deferred|Resolved|Review|Duration|CRUD|Verification|Implementer|Moved):\*\*\s*(?P<body>.+?)\s*$"
+)
+# `> **Implementer:** Fable 5.1 (claude-fable-5-1)` or `not recorded (<why>)`.
+# D00 T08 §1: the runner writes it from its own transcript, never by hand.
+IMPLEMENTER_RE = re.compile(
+    r"^(?:(?P<name>[A-Za-z][A-Za-z0-9 .-]{0,120}?)\s*\((?P<model>[a-z][a-z0-9.-]{0,120})\)|not recorded\b.*)$"
+)
+REVIEW_FAMILIES = ("codex", "grok", "claude", "kimi", "opencode", "qwen", "muse", "gemini")
+# A per-kind verdict. Corrected 2026-08-30: a required job id between kind and
+# verdict matched no real stamp, so the Progress page showed no chips. The gap
+# may cross no `|`, `·` or BACKTICK -- else a match on the fingerprint eats the
+# first kind. -> XREF: D00 T06 §47.
+# The provenance suffix (D00 T08 §1) follows the verdict and its optional
+# finding count: `(codex gpt-5.6-sol ×10)`, `(claude opus ×4)`, `(grok ×7)`
+# when the ledger has no model for the family or the model is the family's
+# own name (the Grok wrapper records `grok`), `(model not recorded)` when the
+# ledger has no leg for the kind. Written by
+# `scripts/stamp-provenance.py` from `build/codex-review/dispatches.jsonl`.
+REVIEW_ENTRY_RE = re.compile(
+    r"`(?P<kind>[a-z][a-z0-9-]+)`"
+    r"(?:\s+(?:`[^`]+`|(?:review|opus|aux|task)-[\w-]+))?"
+    r"[^|·\n`]{0,60}?"
+    r"\b(?P<verdict>approve|needs-attention|advisory|skipped(?:-limit|\s*\(limit\))?)"
+    r"(?:\s*\(\d+[^)]*\))?"
+    r"(?:\s*\((?:(?P<family>codex|grok|claude|kimi|opencode|qwen|muse|gemini)"
+    r"(?:\s+(?P<model>[A-Za-z0-9][\w.:/-]*))?(?:\s*×(?P<runs>\d+))?"
+    r"|(?P<unrecorded>model not recorded))\))?",
+    re.IGNORECASE,
+)
+REVIEW_JOBISH_RE = re.compile(r"^(?:review|opus|aux|task)-", re.IGNORECASE)
+REVIEW_HEX_RE = re.compile(r"^[0-9a-f]{4,40}$", re.IGNORECASE)
+REVIEW_KIND_LABELS = {
+    "adversarial": "Adversarial",
+    "consistency": "Consistency",
+    "optimisation": "Optimisation",
+    "optimization": "Optimisation",
+    "source-defect": "Source",
+    "record": "Record",
+    "design": "Design",
+    "fidelity": "Fidelity",
+    "integration": "Integration",
+    # The stage 3 and 4 advisory passes (writers-and-reviewers §7): gray badges.
+    "muse-final": "Muse final",
+    "adversarial-final": "Qwen final",
+}
+DURATION_BODY_RE = re.compile(r"^(?P<minutes>\d+)\s*m?$")
+VERIFIED_DATE_RE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2})\b")
+# A deferral names its owner with "-> XREF: <ref>" and, optionally, the exact
+# checklist item that owner carries. Both are what make closure checkable.
+DEFER_REF_RE = re.compile(r"->\s*XREF:\s*(?P<ref>(?:D\d{2}\s+)?(?:T\d{2}\s+)?§\d+)")
+# A FINDING is a checklist item that records something NOTICED, with the date it
+# was noticed and usually who or what noticed it. The convention emerged before it
+# was named: by 2026-08-14 roughly forty items across ten files opened with one of
+# these verbs and an ISO date, because "a finding is filed, not mentioned" makes
+# provenance the whole point of the entry.
+#
+# Detecting the convention rather than demanding a new marker is deliberate. A new
+# marker would need forty edits and would silently miss every finding filed before
+# it existed, which is the failure mode this query is meant to close.
+FINDING_RE = re.compile(
+    r"\*{0,2}(?P<verb>Found|Filed|Handed over|Recorded|Discovered|Corrected|Re-pointed)"
+    r"\s+(?P<date>\d{4}-\d{2}-\d{2})",
+    re.I,
+)
+
+DEFER_ITEM_RE = re.compile(r"\(item:\s*[\"“](?P<item>[^\"”]+)[\"”]")
+SEC_RANGE_RE = re.compile(r"§(\d+)(?:\s*-\s*§?(\d+))?")
+
+# The WHOLE body of a `Verified:` stamp, as one anchored grammar (D00 T01 §39).
+#
+# **Corrected 2026-08-29 by round 1, corroborated by both Codex lenses (High).**
+# The first version checked three things separately -- a date PREFIX, then
+# `body.split("|")[1]` -- and validating the parts is not validating the line.
+# Measured on the committed parser: `2026-08-29 junk-before-pipe | §1 | e`,
+# `2026-08-29 | §1` (no closing delimiter) and `2026-08-29 | §1, §3-§2 | e`
+# all still verified §1 with no refusal recorded, because a prefix match says
+# nothing about what follows it, `parts[1]` is whatever happens to sit between
+# the first two pipes, and one valid element made the aggregate non-empty.
+#
+# So the shape is asserted end to end instead: the date field is EXACTLY the
+# date, both delimiters are required, and the evidence field must carry a
+# non-space character. All 193 stamps in the live tree already satisfy this.
+# `re.ASCII` on both, and it is load-bearing: round 2 measured
+# `٢٠٢٦-٠٨-٢٩ | §١ | evidence` verifying §1 with `stamped_on='٢٠٢٦-٠٨-٢٩'`,
+# because Python's `\d` is Unicode-aware and `int()` converts Arabic-Indic
+# digits happily. The contract says YYYY-MM-DD; a grammar that accepts another
+# script's digits is not that grammar, and the date it stores is unusable to
+# every consumer that compares stamps as strings.
+STAMP_BODY_RE = re.compile(
+    r"^(?P<date>\d{4}-\d{2}-\d{2})[ \t]*\|[ \t]*(?P<cover>[^|]*?)[ \t]*\|(?P<evidence>.*)$",
+    re.ASCII,
+)
+
+# The largest number of sections one stamp may cover. A range stamp exists so a
+# handful of sections shipped together share one stamp, and this is far past any
+# real use. Round 2 measured `§1-§3000000` materialising three million integers
+# in `covered` before anything looked at them, so the bound is checked BEFORE
+# the range is built rather than after.
+#
+# **65, not 64, and the number is taken from the sibling gate rather than
+# chosen.** `scripts/section_commit_gate.py` clamps a stamp range with
+# `min(end, start + 64)` and then builds an INCLUSIVE range, so it admits
+# `start` through `start + 64` -- sixty-five sections. Round 5 measured it:
+# a `§1-§1000` stamp expands there to 65 entries ending at §65. At 64 here, the
+# gate would recognise a `§1-§65` stamp that `validate` refuses, which is the
+# operator-facing deadlock the parity probe below exists to prevent. The probe
+# now compares the gate's effective COUNT (`literal + 1`), not its literal,
+# because comparing the literal is what made it pass while the two disagreed.
+MAX_STAMP_COVERAGE = 65
+
+# One element of the coverage field, anchored. The field is split on commas and
+# EVERY element must match this and be ordered, so a reversed range is refused
+# rather than silently contributing nothing. `SEC_RANGE_RE` stays what it is --
+# a forgiving finditer over free text, which is what lets a stamp's evidence
+# prose mention `§4` without claiming it -- and is no longer used on the field
+# the graph TRUSTS.
+COVER_ITEM_RE = re.compile(r"^§(?P<lo>\d+)(?:[ \t]*-[ \t]*§?(?P<hi>\d+))?$", re.ASCII)
+
+# Surface contract (D00 T03 §15). A real block starts the line. A checklist
+# item that mentions `**Fidelity:**` is not a Fidelity block (D00 T01 §22).
+FIDELITY_BLOCK_RE = re.compile(r"^\*\*Fidelity:\*\*\s*(.*)$")
+JOB_BLOCK_RE = re.compile(r"^\*\*Job:\*\*")
+TREATMENT_BLOCK_RE = re.compile(r"^\*\*Treatment:\*\*")
+CHROME_BLOCK_RE = re.compile(r"^\*\*Chrome:\*\*")
+# `**Needs:** <host>` marks a section that cannot run without a live host the
+# plan cannot otherwise see (D00 T07 §28). The Azure VMs deallocate daily
+# 00:15-04:14 SAST, so `plan-gate.py next` reads this to skip a marked row
+# inside the window and take it first when the host wakes. The list is
+# CLOSED: `validate` refuses any other value, so a typo cannot silently
+# unmark a section. A second host is one more entry here and one probe in
+# plan-gate.py.
+NEEDS_BLOCK_RE = re.compile(r"^\*\*Needs:\*\*\s*(?P<value>.+?)\s*$")
+NEEDS_ALLOWED: dict[str, str] = {
+    "Windows host (build/test)": "windows-host",
+    "AutoIt3 toolchain (compile)": "autoit-toolchain",
+    "Optical drive (drive test)": "optical-drive",
+    "USB device (drive test)": "usb-device",
+    "Signing certificate (release)": "signing-cert",
+}
+FIDELITY_EXEMPT_RE = re.compile(
+    r"no surface of its own|not a surface|no page of its own|not a page|the library is not a surface",
+    re.I,
+)
+
+
+# ---------------------------------------------------------------- frontmatter
+
+
+def parse_frontmatter(text: str) -> tuple[dict, list[str]]:
+    """Minimal YAML for our flat schema: scalars, bools, ints, and flow lists.
+
+    Deliberately not a YAML library -- the schema is five required scalar fields
+    and three optional ones. A dependency here would have to be installed before
+    anyone could validate a TODO, which defeats the point.
+    """
+    errors: list[str] = []
+    if not text.startswith("---"):
+        return {}, ["missing frontmatter (file must open with ---)"]
+    end = text.find("\n---", 3)
+    if end == -1:
+        return {}, ["frontmatter opened with --- but never closed"]
+    block = text[3:end].strip("\n")
+    data: dict = {}
+    for lineno, raw in enumerate(block.splitlines(), start=2):
+        line = raw.rstrip()
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if ":" not in line:
+            errors.append(f"frontmatter line {lineno}: no key (got {line!r})")
+            continue
+        key, _, val = line.partition(":")
+        key, val = key.strip(), val.strip()
+        if val.startswith("[") and val.endswith("]"):
+            inner = val[1:-1].strip()
+            data[key] = (
+                [v.strip().strip("\"'") for v in inner.split(",") if v.strip()]
+                if inner else []
+            )
+        elif val in ("true", "false"):
+            data[key] = val == "true"
+        elif val.isdigit():
+            data[key] = int(val)
+        else:
+            data[key] = val.strip("\"'")
+    return data, errors
+
+
+# --------------------------------------------------------------------- model
+
+
+@dataclass
+class Section:
+    num: int
+    title: str = ""
+    order: int | None = None
+    deliverable: str = ""
+    depends_on: list[str] = field(default_factory=list)  # raw XREF strings
+    status: str = " "
+    has_body: bool = False
+    has_row: bool = False
+    items_total: int = 0
+    items_done: int = 0
+    items: list[tuple[bool, str]] = field(default_factory=list)  # (done, text)
+    has_test_checkpoint: bool = False
+    test_checkpoint_text: str = ""
+    has_freeze_check: bool = False
+    has_commit_item: bool = False
+    commit_done: bool = False
+    has_fidelity_block: bool = False
+    fidelity_exempt: bool = False
+    has_job: bool = False
+    has_treatment: bool = False
+    has_chrome: bool = False
+    needs_raw: str = ""          # the `**Needs:**` value as written
+    needs: list[str] = field(default_factory=list)  # closed-list keys, e.g. windows-host
+    line: int = 0
+    duration_minutes: int | None = None
+    stamped_on: str | None = None
+    review_body: str = ""
+    crud_body: str = ""
+    verification_body: str = ""
+    implementer_body: str = ""
+    # `> **Moved:**` body under the heading: the section's open work is worked
+    # OUTSIDE the tree, in the file the body names (writers-and-reviewers §2).
+    # The row and the cross-references stay; ready, plan and progress skip it.
+    moved: str = ""
+
+
+@dataclass
+class Deferral:
+    """One `Deferred:`/`Resolved:` stamp line, parsed so closure can be checked.
+
+    Stored as a raw string until 2026-08-10, which is why deferrals went stale
+    unnoticed: nothing could resolve the owner or see that it had shipped.
+    """
+
+    line: int = 0
+    resolved: bool = False
+    body: str = ""
+    ref: str = ""      # raw XREF target, e.g. "D09 T01 §1"
+    item: str = ""     # the exact checklist item the owner carries
+
+
+@dataclass
+class Todo:
+    path: str
+    domain: str
+    number: str
+    id: str = ""
+    title: str = ""
+    status: str = ""
+    frozen: bool = False
+    track: str = ""
+    depends_on: list[str] = field(default_factory=list)
+    superseded_by: str = ""
+    sections: dict[int, Section] = field(default_factory=dict)
+    verified_sections: set[int] = field(default_factory=set)
+    deferred: list["Deferral"] = field(default_factory=list)
+    xrefs: list[str] = field(default_factory=list)  # raw "-> XREF:" target text
+    fm_errors: list[str] = field(default_factory=list)
+    bare_refs: list[str] = field(default_factory=list)
+    # (line number, the raw body) of every `Verified:` line the parser refused.
+    # Carried rather than flagged here because the loader has no reporter; rule
+    # 15 in cmd_validate turns each into the `malformed-stamp` FATAL.
+    #
+    # It rides `asdict()` into `build/todo-cache.json`, so every todo there now
+    # carries `malformed_stamps: []` on a clean tree while `schema_version`
+    # stays 1 (round 2, Low, derived). That is deliberate: the cache is derived
+    # and gitignored, its one consumer (`scripts/groom-audit.py`) reads named
+    # keys and is unaffected -- `groom-audit.py self-test` 17 cases 0 failed
+    # against the new shape -- and `schema_version` gates the SHAPE a reader
+    # must understand, which an additive field does not change. The two
+    # committed projections under `platform/resources/` do not carry it.
+    malformed_stamps: list[tuple[int, str]] = field(default_factory=list)
+
+
+def parse_todo(path: Path) -> Todo:
+    try:
+        rel = path.relative_to(REPO).as_posix()
+    except ValueError:
+        rel = path.as_posix()
+    m = TODO_FILE_RE.match(path.name)
+    todo = Todo(path=rel, domain=path.parent.name, number=m.group(1) if m else "??")
+    text = path.read_text(encoding="utf-8")
+    fm, todo.fm_errors = parse_frontmatter(text)
+    todo.id = str(fm.get("id", ""))
+    todo.title = str(fm.get("title", ""))
+    todo.status = str(fm.get("status", ""))
+    todo.frozen = bool(fm.get("frozen", False))
+    todo.track = str(fm.get("track", ""))
+    todo.superseded_by = str(fm.get("superseded_by", ""))
+    dep = fm.get("depends_on", [])
+    # Drop falsy entries at the source: a blank `depends_on:` scalar parses
+    # to [""], which validate skips but the shared dependency gate would
+    # report as an unknown-unmet edge with an empty label, silently blocking
+    # every resolver (§37 round-1 finding, both lenses).
+    todo.depends_on = [
+        str(d).strip() for d in (dep if isinstance(dep, list) else [dep]) if str(d).strip()
+    ]
+
+    current: Section | None = None
+    # The sections the most recent Verified line covers; the field lines under
+    # it (Review, CRUD, Implementer, Duration) are written to each of them.
+    stamp_targets: list[Section] = []
+    stamp_orphaned = False  # the last stamp was malformed: its fields belong to no section
+    in_order_table = False
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        stamp = STAMP_RE.match(line)
+        if stamp:
+            body = stamp.group("body")
+            kind = stamp.group("kind")
+            if kind == "Verified":
+                # PARSE OR REFUSE (D00 T01 §39, dev ticket #7). Before this,
+                # ANY `> **Verified:** ...` line verified the current section:
+                # `> **Verified:** nonsense` inside an `[x]` section suppressed
+                # rule 7's missing-stamp FATAL and, since §38, moved two
+                # warning kinds into the acked register. A malformed stamp on a
+                # shipped row is worse than a missing one, because it READS as
+                # evidence, so it is refused and reported rather than trusted.
+                #
+                # Three things are checked, and the second and third are the
+                # ones a date-only repair would miss: the body opens with a
+                # REAL calendar date (`2026-99-99` is date-SHAPED and not a
+                # date), the coverage field exists and matches
+                # `COVER_FIELD_RE` end to end, and it yields at least one
+                # section. The old `if not covered` fallback to the current
+                # section is deliberately gone: it is what let a garbage
+                # coverage field still verify the section it sat in.
+                covered: list[int] = []
+                refusal = ""
+                day = ""
+                shaped = STAMP_BODY_RE.match(body.strip())
+                if not shaped:
+                    refusal = "is not '<YYYY-MM-DD> | <sections> | <evidence>'"
+                elif not shaped.group("evidence").strip():
+                    refusal = "has an empty evidence field"
+                else:
+                    day = shaped.group("date")
+                    try:
+                        date(*(int(part) for part in day.split("-")))
+                    except ValueError:
+                        refusal = f"opens with {day!r}, which is not a real calendar date"
+                if not refusal:
+                    cover_field = shaped.group("cover")
+                    for element in cover_field.split(","):
+                        item = COVER_ITEM_RE.match(element.strip())
+                        if item is None:
+                            refusal = (
+                                f"has {element.strip()!r} in its coverage field, which is not "
+                                f"a section reference or range"
+                            )
+                            break
+                        lo = int(item.group("lo"))
+                        hi = int(item.group("hi")) if item.group("hi") else lo
+                        if lo < 1 or hi < lo:
+                            refusal = (
+                                f"has {element.strip()!r} in its coverage field, which covers "
+                                f"no section"
+                            )
+                            break
+                        # AGGREGATE, not per element (round 3, Medium). The
+                        # first version checked each element before extending,
+                        # so `§1-§64, §65-§128` passed twice and covered 128 --
+                        # repeating valid ranges restored exactly the unbounded
+                        # allocation the cap exists to stop. The bound is on
+                        # what the stamp CLAIMS, so it is counted across the
+                        # whole field and still checked before the range is
+                        # built.
+                        if len(covered) + (hi - lo + 1) > MAX_STAMP_COVERAGE:
+                            refusal = (
+                                f"covers more than {MAX_STAMP_COVERAGE} sections by "
+                                f"{element.strip()!r}"
+                            )
+                            break
+                        covered.extend(range(lo, hi + 1))
+                if refusal:
+                    todo.malformed_stamps.append((lineno, f"{body} -- {refusal}"))
+                    stamp_targets, stamp_orphaned = [], True  # its fields reach no section (INT-0110)
+                else:
+                    todo.verified_sections.update(covered)
+                    # The field lines under this stamp belong to EVERY section
+                    # it covers, not only the heading it sits under: a range
+                    # stamp's Review and Implementer used to reach one section
+                    # and leave the rest reading "not recorded" (D00 T08 §1,
+                    # Codex on the last wave).
+                    stamp_targets = [todo.sections[num] for num in covered if num in todo.sections]
+                    stamp_orphaned = False
+                    for target in stamp_targets:
+                        target.stamped_on = day
+            elif kind == "Duration" and current is not None:
+                parsed = DURATION_BODY_RE.fullmatch(body.strip())
+                if parsed:
+                    for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                        target.duration_minutes = int(parsed.group("minutes"))
+            elif kind == "Review" and current is not None:
+                for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                    target.review_body = body
+            elif kind == "CRUD" and current is not None:
+                for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                    target.crud_body = body
+            elif kind == "Verification" and current is not None:
+                for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                    target.verification_body = body
+            elif kind == "Implementer" and current is not None:
+                for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                    target.implementer_body = body
+            elif kind == "Moved" and current is not None:
+                current.moved = body
+            elif kind in ("Deferred", "Resolved"):
+                ref = DEFER_REF_RE.search(body)
+                item = DEFER_ITEM_RE.search(body)
+                todo.deferred.append(
+                    Deferral(
+                        line=lineno,
+                        resolved=(kind == "Resolved"),
+                        body=body,
+                        ref=ref.group("ref").strip() if ref else "",
+                        item=item.group("item").strip() if item else "",
+                    )
+                )
+            # A deferral's "-> XREF:" is a real cross-reference: it is this file
+            # pointing at the section that owes the work. Collect it so reciprocity
+            # sees it, otherwise the owner acknowledging the hand-off reads as
+            # one-sided.
+            todo.xrefs.extend(m.group(0) for m in XREF_RE.finditer(body))
+            continue
+
+        if line.startswith("## Implementation Order"):
+            in_order_table = True
+            continue
+        if in_order_table and line.startswith("## "):
+            in_order_table = False
+        if in_order_table:
+            row = ROW_RE.match(line)
+            if row:
+                num = int(row.group("sec"))
+                sec = todo.sections.setdefault(num, Section(num=num))
+                sec.has_row = True
+                sec.order = int(row.group("order"))
+                sec.deliverable = row.group("deliverable").strip()
+                sec.status = row.group("status")
+                deps = row.group("deps").strip()
+                if deps and deps not in ("--", "—", "-"):
+                    sec.depends_on = [d.strip() for d in deps.split(",") if d.strip()]
+            continue
+
+        body = BODY_RE.match(line)
+        if body:
+            num = int(body.group("num"))
+            sec = todo.sections.setdefault(num, Section(num=num))
+            sec.title = body.group("title")
+            sec.has_body = True
+            sec.line = lineno
+            current = sec
+            stamp_targets = []
+            stamp_orphaned = False
+            continue
+        if line.startswith("## "):
+            current = None
+            stamp_targets = []
+
+        if current is not None:
+            st = line.strip()
+            if st.startswith("- [") and len(st) > 4 and st[4] == "]":
+                current.items_total += 1
+                done = st[3] == "x"
+                if done:
+                    current.items_done += 1
+                current.items.append((done, st[5:].strip()))
+                low = st.lower()
+                if "commit:" in low:
+                    current.has_commit_item = True
+                    if done:
+                        current.commit_done = True
+            if "**Test checkpoint:**" in line:
+                current.has_test_checkpoint = True
+                current.test_checkpoint_text = st
+            if "**Freeze check:**" in line:
+                current.has_freeze_check = True
+            fid = FIDELITY_BLOCK_RE.match(st)
+            if fid:
+                current.has_fidelity_block = True
+                if FIDELITY_EXEMPT_RE.search(fid.group(1) or "") or FIDELITY_EXEMPT_RE.search(st):
+                    current.fidelity_exempt = True
+            if JOB_BLOCK_RE.match(st):
+                current.has_job = True
+            if TREATMENT_BLOCK_RE.match(st):
+                current.has_treatment = True
+            if CHROME_BLOCK_RE.match(st):
+                current.has_chrome = True
+            needs = NEEDS_BLOCK_RE.match(st)
+            if needs:
+                current.needs_raw = needs.group("value").strip()
+                key = NEEDS_ALLOWED.get(current.needs_raw)
+                current.needs = [key] if key else []
+
+        if "-> XREF:" in line:
+            todo.xrefs.append(line.split("-> XREF:", 1)[1].strip())
+        for bare in BARE_TODO_RE.findall(line):
+            if "XREF" in line or "Depends" in line or "|" in line:
+                todo.bare_refs.append(f"line {lineno}: {bare}")
+
+    return todo
+
+
+def load_todos() -> list[Todo]:
+    if not TODO_DIR.exists():
+        return []
+    return [
+        parse_todo(p)
+        for p in sorted(TODO_DIR.glob("*/TODO-*.md"))
+        if TODO_FILE_RE.match(p.name)
+    ]
+
+
+# --------------------------------------------------------------------- build
+
+
+def to_cache(todos: list[Todo]) -> dict:
+    out = {"schema_version": 1, "todos": []}
+    for t in todos:
+        d = asdict(t)
+        d["verified_sections"] = sorted(t.verified_sections)
+        d["sections"] = [asdict(s) for s in sorted(t.sections.values(), key=lambda s: s.num)]
+        out["todos"].append(d)
+    return out
+
+
+def cmd_build(_args) -> int:
+    todos = load_todos()
+    CACHE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE.write_text(json.dumps(to_cache(todos), indent=2) + "\n", encoding="utf-8")
+    secs = sum(len(t.sections) for t in todos)
+    print(f"built {CACHE.relative_to(REPO)}: {len(todos)} todos, {secs} sections")
+    return 0
+
+
+# ------------------------------------------------------------------ validate
+
+
+def resolve_ref(ref: str, origin: Todo, by_key: dict[tuple[str, str], Todo]) -> tuple[str, int] | None:
+    """Resolve '§3' / 'T02 §1' / 'D02 T01 §4' to (todo_id, section_num)."""
+    m = XREF_RE.search(ref)
+    if not m:
+        return None
+    sec = int(m.group("sec"))
+    dom = m.group("dom")
+    tno = m.group("todo")
+    if dom is None and tno is None:
+        return (origin.id, sec)
+    domain = origin.domain
+    if dom is not None:
+        matches = [d for d in {t.domain for t in by_key.values()} if d.startswith(dom + "-")]
+        if not matches:
+            return None
+        domain = matches[0]
+    target = by_key.get((domain, tno or origin.number))
+    return (target.id, sec) if target else None
+
+
+# D00 T01 §21 (2026-08-28): THE severity map -- the one place a warning
+# class's push-time consequence is decided, mirrored row-for-row in
+# todo/README.md's severity table (the self-test compares the two, so the
+# mirror cannot drift silently). Two-layer contract: "fatal" exits 1 always
+# and is never ackable; "warn" rides the §38 ratchet -- a NEW occurrence
+# fails validate as WARN* until fixed or deliberately accepted into the
+# baseline, and stamped pre-convention occurrences live in the ack ledger.
+# Classification rule: push-time actionability. A class lands "fatal" when
+# the fix is mechanical and the defect is a structural-integrity break; it
+# stays "warn" when the fix is a judgement call (sizing, prose, recording
+# early resolution) that a red build cannot resolve.
+# An automated filer stamps what it filed FROM, so a second run of the same
+# scanner cannot open a second row for one real-world thing. Prose ("search
+# before filing") is what every filer already had, and it is a judgement call
+# made by whoever is tired at the time. This is mechanical.
+#
+#   -> SOURCE: build-1042
+#   -> SOURCE: inbox-AAMkAGI2...
+#
+# Free-form after the prefix, one per line, lowercase-normalised. Human filings
+# do not need one; two humans filing the same thing twice is a judgement
+# problem and this cannot solve it. What it CAN guarantee is that a scanner
+# that runs twice a day never files the same production exception twice.
+SOURCE_RE = re.compile(r"->\s*SOURCE:\s*(?P<key>[A-Za-z0-9][A-Za-z0-9._:@+-]*)")
+
+# A TODO file caps at 55 sections; past that the work goes in a NEW file
+# (operator 2026-09-01). Files only ever grow, because a section number is a
+# permanent address -- `DNN TNN §N` cross-references encode it, so renumbering
+# to tidy up is not available and a large file can never be made small again.
+# The cost is paid by every reader and every grep from then on.
+#
+# 55 rather than a round number: the largest file was at 53 when this was set,
+# so the cap is real headroom rather than an instruction to go and split
+# something tonight. Splitting BY SUBJECT into a new file is free; a renumber
+# is impossible.
+MAX_SECTIONS_PER_FILE = 55
+
+SEVERITY_MAP: dict[str, str] = {
+    # a file past the section cap: the next piece of work opens a new TODO
+    # file, because section numbers are permanent and a file cannot shrink.
+    "over-section-cap": "fatal",
+    # two sections claiming the same provenance key is a duplicate filing --
+    # the one thing an automated filer can and must prove it did not do.
+    "duplicate-source-key": "fatal",
+    # superseded frontmatter must name its successor: mechanical, structural.
+    "superseded-no-successor": "fatal",
+    # an OPEN section whose --filter checkpoint claims another suite stays
+    # green is a checkpoint known not to detect its promised regression --
+    # naming the test files is a two-minute fix (D00 T06 §26).
+    "filter-overclaim-open": "fatal",
+    # the stamped fix-forward branch stays ratcheted: the stamp must not be
+    # reopened, so the fix is forward-only (§38's deliberate design).
+    "filter-overclaim-stamped": "warn",
+    # one section = one commit is the format's core contract.
+    "no-commit-item": "fatal",
+    # unticked, unstruck work inside a shipped [x] section is an integrity
+    # break in the shipped claim itself.
+    "orphaned-items-shipped": "fatal",
+    # Fidelity missing Job/Treatment/Chrome on an OPEN section is already
+    # fatal at the emitter; the stamped branches are §38 fix-forward.
+    "fidelity-missing-lines-open": "fatal",
+    "fidelity-missing-lines-stamped": "warn",
+    # an empty section is structurally unimplementable.
+    "no-checklist-items": "fatal",
+    # 31 items is a sizing judgement a red build cannot resolve.
+    "over-30-items": "warn",
+    # a frozen TODO without its check (or the reverse) is a safety-marker
+    # mismatch with a mechanical fix in either direction.
+    "frozen-no-freeze-check": "fatal",
+    "freeze-check-not-frozen": "fatal",
+    # prose legitimately mentions a TODO file without a section.
+    "bare-todo-ref": "warn",
+    # the README calls a one-sided XREF BROKEN; the validator now agrees
+    # (§21's headline case -- the wording was right, the severity wrong).
+    "one-sided-xref": "fatal",
+    # a deferral with no owner is an abandonment (process-todo-section §8).
+    "deferral-no-owner": "fatal",
+    # recording a resolution before the owner ticks is legitimate evidence
+    # of work done early; blocking it would forbid honest records.
+    "resolved-owner-unshipped": "warn",
+    # a TODO absent from its domain INDEX.md is a two-line mechanical fix.
+    "missing-from-index": "fatal",
+    # a `Verified:` line the parser refused. FATAL rather than WARN because a
+    # malformed stamp on a shipped row READS as evidence: it is worse than a
+    # missing one, and the fix is to write the line correctly (D00 T01 §39).
+    "malformed-stamp": "fatal",
+    # a `**Needs:**` value outside NEEDS_ALLOWED: the list is closed so a
+    # misspelt host cannot silently unmark a section (D00 T07 §28).
+    "needs-unknown": "fatal",
+    # a `> **Moved:**` marker naming no file, or a file that does not exist:
+    # the section is excluded from ready/plan/progress on the strength of
+    # that pointer, so a dead pointer would hide work (writers-and-reviewers §2).
+    "moved-target-missing": "fatal",
+    "pending-control-contract": "fatal",
+}
+
+
+# The file a `Moved:` body points at: the first `path/to/file.md` token.
+MOVED_PATH_RE = re.compile(r"(?P<path>(?:[\w.-]+/)+[\w.-]+\.md)")
+
+
+def moved_target(body: str) -> str:
+    m = MOVED_PATH_RE.search(body)
+    return m.group("path") if m else ""
+
+
+def _moved_by_ref(todos: list["Todo"]) -> dict[str, str]:
+    """'D00 T07 §25' -> the Moved: body, for every section carrying the marker."""
+    out: dict[str, str] = {}
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, s in t.sections.items():
+            if s.moved:
+                out[f"D{dom} T{t.number} §{num}"] = s.moved
+    return out
+
+
+def cmd_validate(_args) -> int:
+    spec = importlib.util.spec_from_file_location("todo_validate", REPO / "scripts/todo-validate.py")
+    if spec is None or spec.loader is None:
+        raise RuntimeError("TODO validator unavailable")
+    validator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validator)
+    return validator.validate(sys.modules[__name__], _args)
+
+
+def adjacency_module():
+    spec = importlib.util.spec_from_file_location("todo_adjacency", Path(__file__).with_name("todo-adjacency.py"))
+    if spec is None or spec.loader is None:
+        raise RuntimeError("TODO adjacency inspector unavailable")
+    inspector = importlib.util.module_from_spec(spec)
+    # Historical inspection must leave the caller's checkout unchanged,
+    # including a fresh clone where __pycache__ is not ignored.
+    previous_bytecode = sys.dont_write_bytecode
+    try:
+        sys.dont_write_bytecode = True
+        spec.loader.exec_module(inspector)
+    finally:
+        sys.dont_write_bytecode = previous_bytecode
+    return inspector
+
+
+WARNING_BASELINE = REPO / "todo" / ".warning-baseline"
+
+
+def warning_key(text: str) -> str:
+    """A warning identified by file, section and class -- never by line number.
+
+    Line numbers move whenever anything above them is edited, and a baseline
+    keyed on them would go stale on every unrelated commit. File plus section
+    plus the first few words of the class is stable and still specific enough
+    that a genuinely new warning of an owned class is visible.
+    """
+    head, _, rest = text.partition(": ")
+    path = head.split(":")[0]
+    section = ""
+    m = re.match(r"\s*§(\d+)", rest)
+    if m:
+        section = f"§{m.group(1)}"
+    cls = " ".join(rest.split()[:8])
+    return f"{path}|{section}|{cls}"
+
+
+def load_warning_baseline() -> set[str] | None:
+    if not WARNING_BASELINE.exists():
+        return None
+    return {
+        line.strip()
+        for line in WARNING_BASELINE.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    }
+
+
+def cmd_warnings(args: argparse.Namespace) -> int:
+    """Show the warning baseline, or re-accept the current set as the new one."""
+    todos = load_todos()
+    import io, contextlib as _c
+
+    buf = io.StringIO()
+    with _c.redirect_stdout(buf):
+        cmd_validate(args)
+    # Adjacency's semantic advisories deliberately never enter this ratchet.
+    current = sorted(
+        {warning_key(l[6:].strip()) for l in buf.getvalue().splitlines() if l.startswith(("WARN  ", "WARN* "))}
+    )
+    if getattr(args, "acked", False):
+        # The debt register (D00 T01 §38): the pre-convention occurrences on
+        # stamped sections, acknowledged out of the live WARN channel but
+        # never dropped -- a shipped-work audit starts here.
+        acked = getattr(cmd_validate, "last_acked", [])
+        print(f"{len(acked)} acknowledged warning(s) -- stamped pre-convention")
+        for a in acked:
+            print(f"  ACK  {a}")
+        return 0
+    if not args.accept:
+        base = load_warning_baseline() or set()
+        print(f"baseline {len(base)} · current {len(current)}")
+        for k in current:
+            print(("  NEW  " if k not in base else "       ") + k)
+        return 0
+    WARNING_BASELINE.write_text(
+        "# Warnings accepted as of the date below. A warning NOT in this file is\n"
+        "# NEW and fails `validate`. The set may shrink and never grow without a\n"
+        "# deliberate --accept. -> XREF: INT-0034.\n"
+        f"# accepted {len(current)} warning(s)\n"
+        + ("\n".join(current) + "\n" if current else ""),
+        encoding="utf-8",
+    )
+    try:
+        shown = WARNING_BASELINE.relative_to(REPO)
+    except ValueError:
+        # The self-test rebinds WARNING_BASELINE outside the repo; showing
+        # the absolute path there beats crashing the accept it is testing.
+        shown = WARNING_BASELINE
+    print(f"accepted {len(current)} warning(s) into {shown}")
+    return 0
+
+
+def _cycles(edges: dict[str, set[str]], label: str) -> list[str]:
+    out, state, stack = [], {}, []
+
+    def walk(n: str) -> None:
+        if state.get(n) == 2:
+            return
+        if state.get(n) == 1:
+            cyc = stack[stack.index(n):] + [n]
+            out.append(f"{label} dependency cycle: {' -> '.join(cyc)}")
+            return
+        state[n] = 1
+        stack.append(n)
+        for m in sorted(edges.get(n, ())):
+            if m in edges:
+                walk(m)
+        stack.pop()
+        state[n] = 2
+
+    for n in sorted(edges):
+        walk(n)
+    return out
+
+
+# --------------------------------------------------------------------- query
+
+
+def _section_state(todos: list[Todo]):
+    by_id = {t.id: t for t in todos if t.id}
+    by_key = {(t.domain, t.number): t for t in todos}
+    done: set[str] = set()
+    for t in todos:
+        for num, s in t.sections.items():
+            if s.status == "x":
+                done.add(f"{t.id} §{num}")
+    return by_id, by_key, done
+
+
+def unmet_dependencies(
+    target: Todo, sec_num: int, todos: list[Todo], by_key, by_id: dict | None = None
+) -> list[dict]:
+    """ONE dependency gate for every resolver (D00 T01 §37).
+
+    Before this existed, `query` walked section-row edges AND frontmatter
+    whole-TODO edges while `resolve`/`classify`/the operator snapshot walked
+    only the row edges, so the same open section was "blocked" in one
+    canonical command and "ready" in the runner gate (measured: D07 T02 §6).
+    Every caller now asks this function and formats its records; none may
+    re-implement readiness semantics.
+
+    Returns one record per unmet edge for §sec_num of `target`:
+      section edge  {"kind": "section", "todo_id", "query_label": "<id> §N",
+                     "dnn": "DNN TNN §N"}
+      whole-TODO    {"kind": "todo", "todo_id", "query_label":
+                     "<id> (whole TODO)", "dnn": "... first open §N, K open",
+                     "first_open": N|None, "open_count": K}
+      unknown       {"kind": "unknown", "query_label", "dnn"} -- an edge that
+                     does not resolve is UNMET, never silently ready;
+                     `validate` separately reports it FATAL.
+
+    A whole-TODO dependency is complete only when every numbered section in
+    that TODO is [x]. An EMPTY prerequisite TODO is unmet: nothing shipped is
+    not everything shipped, and `all()` over an empty set must not open the
+    gate accidentally. A section carrying `> **Moved:**` counts as done for
+    this gate: its row can never flip here, so holding the file edge on it
+    would stall whole-TODO dependents forever.
+    """
+    if sec_num not in target.sections:
+        # Callers gate on membership first (resolve/classify exit 1, query
+        # iterates real sections); an absent section has no edges to report.
+        return []
+    s = target.sections[sec_num]
+    if by_id is None:
+        by_id = {t.id: t for t in todos if t.id}
+    unmet: list[dict] = []
+    for raw in s.depends_on:
+        r = resolve_ref(raw, target, by_key)
+        src = by_id.get(r[0]) if r else None
+        if src is None or r[1] not in src.sections:
+            # Label with the normalized form when the ref at least resolved,
+            # byte-matching what query printed before the gate was unified;
+            # `validate` rule 5b reports all three unknown shapes FATAL.
+            label = f"{r[0]} §{r[1]}" if r else raw
+            unmet.append({"kind": "unknown", "query_label": label, "dnn": label})
+            continue
+        if src.sections[r[1]].moved:
+            # Worked outside the tree (writers-and-reviewers §2): its row can
+            # never flip here, so a dependent that waited on it would wait
+            # forever. The edge is kept for the record and counts as met.
+            continue
+        if src.sections[r[1]].status != "x":
+            sdom = src.domain.split("-")[0]
+            unmet.append(
+                {
+                    "kind": "section",
+                    "todo_id": src.id,
+                    "query_label": f"{src.id} §{r[1]}",
+                    "dnn": f"D{sdom} T{src.number} §{r[1]}",
+                }
+            )
+    for dep in target.depends_on:
+        dt = by_id.get(dep)
+        if dt is None:
+            unmet.append(
+                {
+                    "kind": "unknown",
+                    "query_label": f"{dep} (whole TODO)",
+                    "dnn": f"{dep} (whole TODO)",
+                }
+            )
+            continue
+        open_secs = sorted(
+            n for n, x in dt.sections.items() if x.status != "x" and not x.moved
+        )
+        if open_secs or not dt.sections:
+            ddom = dt.domain.split("-")[0]
+            first = f"§{open_secs[0]}" if open_secs else "no sections"
+            unmet.append(
+                {
+                    "kind": "todo",
+                    "todo_id": dep,
+                    "query_label": f"{dep} (whole TODO)",
+                    "dnn": (
+                        f"{dep} (whole TODO; D{ddom} T{dt.number}, "
+                        f"first open {first}, {len(open_secs)} open)"
+                    ),
+                    "first_open": open_secs[0] if open_secs else None,
+                    "open_count": len(open_secs),
+                }
+            )
+    return unmet
+
+
+def cmd_query(args) -> int:
+    if args.what == "adjacency":
+        return adjacency_module().cli(sys.modules[__name__], args)
+    todos = load_todos()
+    by_id, by_key, done = _section_state(todos)
+    what = args.what
+
+    if what == "stats":
+        secs = [s for t in todos for s in t.sections.values()]
+        by_status: dict[str, int] = {}
+        for t in todos:
+            by_status[t.status or "?"] = by_status.get(t.status or "?", 0) + 1
+        print(f"domains          {len(list(TODO_DIR.glob('*/INDEX.md')))}")
+        print(f"todo files       {len(todos)}")
+        print(f"sections         {len(secs)}")
+        print(f"  done [x]       {sum(1 for s in secs if s.status == 'x')}")
+        print(f"  in progress [/]{sum(1 for s in secs if s.status == '/'):>2}")
+        print(f"  open [ ]       {sum(1 for s in secs if s.status == ' ' and not s.moved)}")
+        moved_n = sum(1 for s in secs if s.moved)
+        if moved_n:
+            print(f"  moved          {moved_n}  (worked outside the tree; `> **Moved:**` names where)")
+        print(f"checklist items  {sum(s.items_done for s in secs)}/{sum(s.items_total for s in secs)}")
+        print(f"frozen todos     {sum(1 for t in todos if t.frozen)}")
+        print("todo status      " + ", ".join(f"{k}={v}" for k, v in sorted(by_status.items())))
+
+        # The section cap REPORTS here and GATES in validate, deliberately
+        # split. A warning would have to fail validate to be seen (a new WARN
+        # outside the baseline returns 1), and the largest file was already at
+        # 53 when the cap was set -- so the only honest early warning is one
+        # that does not gate. A file arriving at 55 with no notice is the
+        # surprise this line exists to prevent.
+        near = sorted(
+            ((len(t.sections), t.path) for t in todos
+             if len(t.sections) >= MAX_SECTIONS_PER_FILE - 5),
+            reverse=True,
+        )
+        if near:
+            print(f"section cap      {MAX_SECTIONS_PER_FILE} per file; nearest:")
+            for count, path in near:
+                left = MAX_SECTIONS_PER_FILE - count
+                room = f"{left} left" if left > 0 else "OVER CAP"
+                print(f"  {count:>3}  {room:<9}  {path}")
+        return 0
+
+    if what == "deferred":
+        open_, closed = [], []
+        for t in todos:
+            for d in t.deferred:
+                (closed if d.resolved else open_).append((t, d))
+        print("OPEN -- owed to another section")
+        if not open_:
+            print("    (none)")
+        for t, d in open_:
+            owner = d.ref or "NO OWNER"
+            print(f"    {t.path}:{d.line}  -> {owner}")
+            print(f"        {d.body[:150]}")
+        print("\nRESOLVED -- closed, kept for the record")
+        if not closed:
+            print("    (none)")
+        for t, d in closed:
+            print(f"    {t.path}:{d.line}  -> {d.ref}")
+            print(f"        {d.body[:150]}")
+        print(f"\n{len(open_)} open, {len(closed)} resolved")
+        print("Staleness is enforced by `validate`, not reported here: a deferral")
+        print("whose owner has shipped is a FATAL, so it cannot sit in this list.")
+        return 0
+
+    if what == "findings":
+        # Every finding, newest first, so "what have we noticed and not yet done"
+        # is one command instead of ten greps. A finding filed as a plain checklist
+        # item inside an unrelated section has no other tripwire: the deferral
+        # lifecycle only catches the subset that names an owner.
+        rows = []
+        for t in todos:
+            for num, sec in t.sections.items():
+                for done, text in sec.items:
+                    if text.lstrip().startswith("~~"):
+                        continue  # struck: a decision recorded against, not a finding still open
+                    m = FINDING_RE.search(text)
+                    if m:
+                        rows.append((m.group("date"), done, t.path, num, m.group("verb"), text))
+        rows.sort(key=lambda r: (r[0], r[2], r[3]), reverse=True)
+
+        open_rows = [r for r in rows if not r[1]]
+        done_rows = [r for r in rows if r[1]]
+
+        print("OPEN -- noticed, filed, not yet done")
+        if not open_rows:
+            print("    (none)")
+        for date, _, path, num, verb, text in open_rows:
+            body = re.sub(r"\s+", " ", text).strip()
+            print(f"    {date}  {path}  §{num}  ({verb.lower()})")
+            print(f"        {body[:160]}")
+
+        if args.all:
+            print("\nCLOSED -- filed and since done, kept for the record")
+            if not done_rows:
+                print("    (none)")
+            for date, _, path, num, verb, text in done_rows:
+                body = re.sub(r"\s+", " ", text).strip()
+                print(f"    {date}  {path}  §{num}  ({verb.lower()})")
+                print(f"        {body[:160]}")
+
+        print(f"\n{len(open_rows)} open, {len(done_rows)} closed, {len(rows)} total")
+        if not args.all:
+            print("Closed findings are hidden; pass --all to include them.")
+        print("Findings that name an owner are ALSO tracked as deferrals, where a")
+        print("stale one is a FATAL. A plain item here has no such tripwire, which")
+        print("is exactly why this list exists.")
+        return 0
+
+    if what == "frozen":
+        for t in todos:
+            if not t.frozen:
+                continue
+            checked = sum(1 for s in t.sections.values() if s.has_freeze_check)
+            print(f"{t.path}  ({checked}/{len(t.sections)} sections carry a Freeze check)")
+        return 0
+
+    if what == "surfaces":
+        present: list[tuple[Todo, int, Section]] = []
+        missing: list[tuple[Todo, int, Section, list[str]]] = []
+        for t in todos:
+            for num, s in sorted(t.sections.items()):
+                if s.status == "x":
+                    continue
+                if not s.has_fidelity_block or s.fidelity_exempt:
+                    continue
+                lack = [
+                    n
+                    for n, ok in (
+                        ("Job", s.has_job),
+                        ("Treatment", s.has_treatment),
+                        ("Chrome", s.has_chrome),
+                    )
+                    if not ok
+                ]
+                if lack:
+                    missing.append((t, num, s, lack))
+                else:
+                    present.append((t, num, s))
+        print("OPEN UI -- Job, Treatment, Chrome present")
+        if not present:
+            print("    (none)")
+        for t, num, s in present:
+            print(f"    {t.path} §{num}  {s.deliverable}")
+        print("\nOPEN UI -- Fidelity page, contract incomplete")
+        if not missing:
+            print("    (none)")
+        for t, num, s, lack in missing:
+            print(f"    {t.path} §{num}  missing {', '.join(lack)}")
+        print(f"\n{len(present)} present, {len(missing)} missing")
+        return 0
+
+    rows = []
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if s.status == "x" or s.moved:
+                continue
+            # The one dependency gate (D00 T01 §37); no local edge-walking.
+            missing = [
+                u["query_label"]
+                for u in unmet_dependencies(t, num, todos, by_key, by_id=by_id)
+            ]
+            rows.append((t, num, s, missing))
+
+    if what == "ready":
+        ready = [r for r in rows if not r[3]]
+        for t, num, s, _ in sorted(ready, key=lambda r: (r[0].domain, r[0].number, r[2].order or 0)):
+            flag = " 🔒" if t.frozen else ""
+            print(f"{t.domain}/{Path(t.path).name} §{num}{flag}  {s.deliverable}")
+        print(f"\n{len(ready)} section(s) ready")
+    else:  # blocked
+        blocked = [r for r in rows if r[3]]
+        for t, num, s, missing in sorted(blocked, key=lambda r: (r[0].domain, r[0].number, r[1])):
+            print(f"{t.domain}/{Path(t.path).name} §{num}  {s.deliverable}")
+            print(f"    waiting on: {', '.join(missing)}")
+        print(f"\n{len(blocked)} section(s) blocked")
+    return 0
+
+
+# -------------------------------------------------------------------- render
+
+
+def cmd_render(_args) -> int:
+    todos = load_todos()
+    by_key = {(t.domain, t.number): t for t in todos}
+    print("# TODO dependency graph\n")
+    print("```mermaid")
+    print("flowchart LR")
+    for domain in sorted({t.domain for t in todos}):
+        print(f'  subgraph {domain.replace("-", "_")}["{domain}"]')
+        for t in [x for x in todos if x.domain == domain]:
+            for num, s in sorted(t.sections.items()):
+                mark = {"x": "✓", "/": "~"}.get(s.status, "")
+                label = s.deliverable[:44].replace('"', "'")
+                print(f'    {_nid(t, num)}["{mark}§{num} {label}"]')
+        print("  end")
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            for raw in s.depends_on:
+                r = resolve_ref(raw, t, by_key)
+                if not r:
+                    continue
+                src = next((x for x in todos if x.id == r[0]), None)
+                if src and r[1] in src.sections:
+                    print(f"  {_nid(src, r[1])} --> {_nid(t, num)}")
+        for dep in t.depends_on:
+            src = next((x for x in todos if x.id == dep), None)
+            if src and src.sections and t.sections:
+                print(f"  {_nid(src, max(src.sections))} -.-> {_nid(t, min(t.sections))}")
+    print("```")
+    return 0
+
+
+def _nid(t: Todo, sec: int) -> str:
+    return re.sub(r"[^A-Za-z0-9]", "_", f"{t.domain}_{t.number}_{sec}")
+
+
+# --------------------------------------------------------------- resolve
+
+
+def resolve_exit_code(raw: str, todos: list[Todo]) -> int:
+    """Same exit codes as `cmd_resolve`, without printing. Used by `classify` and the operator snapshot so a phase of 76 open rows does not spawn 76 graph loads."""
+    by_prefix = {(t.domain.split("-")[0], t.number): t for t in todos}
+    by_key = {(t.domain, t.number): t for t in todos}
+    raw = raw.strip()
+    if not raw:
+        return 2
+    m = re.search(r"D(?P<dom>\d{2})\s+T(?P<todo>\d{2})\s+§(?P<sec>\d+)", raw)
+    if m:
+        target = by_prefix.get((m.group("dom"), m.group("todo")))
+        sec = int(m.group("sec"))
+        if target is None:
+            return 1
+    else:
+        m2 = re.search(r"§(?P<sec>\d+)", raw)
+        if not m2:
+            return 2
+        sec = int(m2.group("sec"))
+        frag = raw[: m2.start()].strip().strip("`|").strip()
+        hits = [t for t in todos if frag and frag in t.path]
+        if len(hits) != 1:
+            return 1
+        target = hits[0]
+    if sec not in target.sections:
+        return 1
+    s = target.sections[sec]
+    if s.status == "x":
+        return 3
+    if s.moved:
+        return 5
+    # The one dependency gate (D00 T01 §37): row edges AND frontmatter
+    # whole-TODO edges, identical to `query blocked`. Before this, only the
+    # row edges were walked here, so a section could be blocked in `query`
+    # and exit 0 from `resolve`/`classify`/the operator snapshot.
+    return 4 if unmet_dependencies(target, sec, todos, by_key) else 0
+
+
+def needs_for_ref(raw: str, todos: list[Todo]) -> list[str]:
+    """The closed-list `needs` keys of one section; [] for no marker or an unknown ref; `["unknown:<value>"]` for a marker outside the closed list.
+
+    Same reference forms as `resolve`. `plan-gate.py next` asks this for every
+    ready row in one graph load, so a phase of 70 rows costs one subprocess,
+    and it holds a row carrying the unknown sentinel as repairable work.
+    """
+    by_prefix = {(t.domain.split("-")[0], t.number): t for t in todos}
+    m = re.search(r"D(?P<dom>\d{2})\s+T(?P<todo>\d{2})\s+§(?P<sec>\d+)", raw.strip())
+    if m:
+        target = by_prefix.get((m.group("dom"), m.group("todo")))
+        sec = int(m.group("sec"))
+    else:
+        m2 = re.search(r"§(?P<sec>\d+)", raw)
+        if not m2:
+            return []
+        sec = int(m2.group("sec"))
+        frag = raw[: m2.start()].strip().strip("`|").strip()
+        hits = [t for t in todos if frag and frag in t.path]
+        target = hits[0] if len(hits) == 1 else None
+    if target is None or sec not in target.sections:
+        return []
+    section = target.sections[sec]
+    if section.needs_raw and not section.needs:
+        # Never read as host-free: `validate` refuses the value, and `plan-gate.py
+        # next` refuses to run the row (round-1 Grok consistency + record).
+        return [f"unknown:{section.needs_raw}"]
+    return list(section.needs)
+
+
+def cmd_needs(args: argparse.Namespace) -> int:
+    """The `**Needs:**` keys of many refs in one graph load. JSON {ref: [keys]}."""
+    refs = [r.strip() for r in args.refs if str(r).strip()]
+    todos = load_todos()
+    print(json.dumps({ref: needs_for_ref(ref, todos) for ref in refs}, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_classify(args: argparse.Namespace) -> int:
+    """Resolve many refs against one graph load. JSON object of ref -> exit code."""
+    refs = [r.strip() for r in args.refs if str(r).strip()]
+    todos = load_todos()
+    payload = {ref: resolve_exit_code(ref, todos) for ref in refs}
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_resolve(args: argparse.Namespace) -> int:
+    """Turn any reference to a section into the file and number that name it.
+
+    The point is that a person should be able to paste whatever they are
+    already looking at -- a row out of the implementation plan, a line from
+    `query ready`, a bare `D05 T02 §3` -- and get the file path back, instead
+    of translating a domain number into a filename by hand every time.
+
+        todo-graph.py resolve 'D00 T01 §11'
+        todo-graph.py resolve '| [ ] | `D00 T01 §11` | Test gates ... | 12 |'
+        todo-graph.py resolve '00-workspace/TODO-01-repo-and-delivery-pipeline.md §11'
+
+    Output is the skill's input: path, section, status, and whether the
+    dependencies are actually met -- which is the question the caller would
+    otherwise have to ask separately and usually forgets to.
+    """
+    raw = " ".join(args.ref).strip()
+    if not raw:
+        print("nothing to resolve", file=sys.stderr)
+        return 2
+
+    todos = load_todos()
+
+    # Two dicts, deliberately, because two different callers key differently
+    # and collapsing them cost this command its entire cross-domain gate.
+    #
+    # `by_prefix` is what the argument regex below needs: a caller types
+    # "D01 T01 §7" and holds the two-digit prefix. `by_key` is what
+    # resolve_ref() needs -- it widens "01" to "01-foundation" itself and then
+    # looks the pair up, which is also how cmd_validate builds its dict.
+    #
+    # Until 2026-08-13 this command built ONLY the prefix-keyed dict and
+    # handed it to resolve_ref, so every cross-TODO lookup missed and returned
+    # None, and the `if not r: continue` below swallowed it. Same-file deps
+    # ("§6") never touched the dict at all, so UNMET listed those and nothing
+    # else -- a dependency gate that silently ignored exactly the edges that
+    # cross a domain boundary, which are the ones a reader cannot hold in their
+    # head. `resolve` exits 4 on unmet deps and process-todo-section reads
+    # that exit code, so a section could be claimed with its cross-domain
+    # dependencies unshipped.
+    by_prefix = {(t.domain.split("-")[0], t.number): t for t in todos}
+    by_key = {(t.domain, t.number): t for t in todos}
+
+    # A pasted plan row carries the reference in backticks; a bare reference
+    # does not. Both reduce to the same regex, applied to the whole string.
+    m = re.search(r"D(?P<dom>\d{2})\s+T(?P<todo>\d{2})\s+§(?P<sec>\d+)", raw)
+    if m:
+        target = by_prefix.get((m.group("dom"), m.group("todo")))
+        sec = int(m.group("sec"))
+        if target is None:
+            print(f"no TODO for domain {m.group('dom')} number {m.group('todo')}", file=sys.stderr)
+            return 1
+    else:
+        # "<path or fragment> §N" -- match the path fragment against known files.
+        m2 = re.search(r"§(?P<sec>\d+)", raw)
+        if not m2:
+            print(f"no section reference found in: {raw[:80]}", file=sys.stderr)
+            return 2
+        sec = int(m2.group("sec"))
+        frag = raw[: m2.start()].strip().strip("`|").strip()
+        hits = [t for t in todos if frag and frag in t.path]
+        if len(hits) != 1:
+            print(
+                f"{'no' if not hits else len(hits)} TODO file(s) match {frag!r} -- "
+                "give a DNN TNN §N reference or a unique path fragment",
+                file=sys.stderr,
+            )
+            return 1
+        target = hits[0]
+
+    if sec not in target.sections:
+        print(f"{target.path} has no §{sec}", file=sys.stderr)
+        return 1
+
+    s = target.sections[sec]
+    dom = target.domain.split("-")[0]
+
+    # Dependency state, resolved rather than restated. A caller who is about to
+    # implement wants to know this now, not after reading the file. The one
+    # dependency gate (D00 T01 §37): identical records to query/classify.
+    unmet = [u["dnn"] for u in unmet_dependencies(target, sec, todos, by_key)]
+
+    print(f"path       {target.path}")
+    print(f"section    §{sec} -- {s.title}")
+    print(f"ref        D{dom} T{target.number} §{sec}")
+    print(f"status     [{s.status}]  ({s.items_done}/{s.items_total} items)")
+    print(f"frozen     {'yes -- section needs a Freeze check' if target.frozen else 'no'}")
+    print(f"deps       {', '.join(s.depends_on) if s.depends_on else '--'}")
+    if s.moved:
+        print(f"moved      {s.moved}")
+    if s.needs_raw:
+        keys = ', '.join(s.needs) if s.needs else 'UNKNOWN -- not in the closed list'
+        print(f"needs      {keys} ({s.needs_raw}); confirm the host or device is available before writing Started:")
+    if unmet:
+        print(f"UNMET      {', '.join(unmet)}")
+    print()
+    print(f"skill arg  {target.path.split('todo/', 1)[-1]} §{sec}")
+
+    if s.moved:
+        print(
+            f"\nNOTE: §{sec} is worked outside the tree: {moved_target(s.moved) or s.moved}. "
+            "Not a process-todo-section target; its row never flips here.",
+            file=sys.stderr,
+        )
+        return 5
+    if s.status == "x":
+        print(
+            f"\nNOTE: §{sec} is already [x]. Re-checking shipped work is "
+            "review-todo-section in AUDIT stance, not process-todo-section.",
+            file=sys.stderr,
+        )
+        return 3
+    if unmet:
+        print(
+            f"\nNOTE: {len(unmet)} unmet dependency -- process-todo-section stops at "
+            "its dependency gate unless these are shipped first.",
+            file=sys.stderr,
+        )
+        return 4
+    return 0
+
+
+# ------------------------------------------------------------------ plan
+
+
+PLAN = REPO / "todo" / "implementation-plan.md"
+
+# "| [ ] | `D05 T02 §3` | WaybillService and BuyoutMarginService | 8 |"
+PLAN_ROW_RE = re.compile(
+    r"^\|\s*\[(?P<box>[ x/])\]\s*\|\s*`(?P<ref>D\d{2}\s+T\d{2}\s+§\d+)`\s*\|"
+)
+# The one line a moved section leaves in the plan (writers-and-reviewers §2):
+# `> **Moved:** `D00 T07 §25` -- <the section's own Moved: body>`. Written
+# by --sync where the row was, kept in place on later syncs, dropped when
+# the marker goes. Not a row: totals, progress and plan-gate never see it.
+PLAN_MOVED_RE = re.compile(r"^>\s*\*\*Moved:\*\*\s*`(?P<ref>D\d{2}\s+T\d{2}\s+§\d+)`")
+
+
+def _rel(path: Path) -> str:
+    """Repo-relative for messages; the absolute path when outside the repo (self-test fixtures)."""
+    try:
+        return path.relative_to(REPO).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def _moved_line(ref: str, body: str) -> str:
+    return f"> **Moved:** `{ref}` -- {body}"
+
+
+PLAN_PROGRESS_RE = re.compile(
+    r"^(?P<prefix>>\s+\*\*Progress:\*\*\s+).*$", re.M
+)
+# One dash is enough: `:-:` is the shortest legal centred separator and is what
+# most of this repo's tables are written with. Requiring two silently skipped
+# every centred table, which is most of the phase tables.
+SEP_CELL_RE = re.compile(r"^:?-+:?$")
+
+
+def _width(s: str) -> int:
+    """Display width, counting wide glyphs as two columns.
+
+    The prerequisite tables carry 🔴 🟠 ✅ ❌ and the phase tables carry ✔, and
+    a naive len() pads those columns one short each -- which looks exactly like
+    a misalignment bug in the aligner rather than a property of the font.
+    """
+    import unicodedata
+
+    return sum(2 if unicodedata.east_asian_width(c) in ("W", "F") else 1 for c in s)
+
+
+def _split_row(line: str) -> list[str] | None:
+    """Split a markdown table row into cells, respecting `inline code`.
+
+    A pipe inside a code span is content, not a delimiter. Nothing in the plan
+    relies on that today, but a deliverable named `a|b` would otherwise be
+    silently torn into two columns and the row would stop matching its header.
+    """
+    s = line.strip()
+    if not (s.startswith("|") and s.endswith("|")) or len(s) < 2:
+        return None
+    cells, buf, tick = [], [], False
+    i = 1
+    body = s[1:-1]
+    while i - 1 < len(body):
+        c = body[i - 1]
+        if c == "`":
+            tick = not tick
+            buf.append(c)
+        elif c == "\\" and i < len(body):
+            buf.append(c)
+            buf.append(body[i])
+            i += 1
+        elif c == "|" and not tick:
+            cells.append("".join(buf).strip())
+            buf = []
+        else:
+            buf.append(c)
+        i += 1
+    cells.append("".join(buf).strip())
+    return cells
+
+
+def _align_tables(text: str) -> str:
+    """Pad every markdown table's columns to a common width.
+
+    Purely cosmetic, and deliberately not something `--check` fails on: a build
+    that goes red over whitespace teaches people to stop reading it. `--sync`
+    fixes it, which is enough.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        if not lines[i].strip().startswith("|"):
+            out.append(lines[i])
+            i += 1
+            continue
+
+        block, j = [], i
+        while j < len(lines) and lines[j].strip().startswith("|"):
+            block.append(lines[j])
+            j += 1
+
+        rows = [_split_row(b) for b in block]
+        # A table needs a header, a separator, and consistent arity. Anything
+        # else is left exactly as it was rather than guessed at.
+        sep_at = next(
+            (
+                k
+                for k, r in enumerate(rows)
+                if r and r and all(SEP_CELL_RE.match(c) for c in r)
+            ),
+            None,
+        )
+        if sep_at is None or any(r is None for r in rows):
+            out.extend(block)
+            i = j
+            continue
+        ncol = len(rows[sep_at])
+        if any(len(r) != ncol for r in rows):
+            out.extend(block)
+            i = j
+            continue
+
+        align = []
+        for c in rows[sep_at]:
+            align.append("center" if c.startswith(":") and c.endswith(":")
+                         else "right" if c.endswith(":") else "left")
+        widths = [
+            max(_width(r[k]) for n, r in enumerate(rows) if n != sep_at) for k in range(ncol)
+        ]
+        widths = [max(w, 3) for w in widths]
+
+        for n, r in enumerate(rows):
+            if n == sep_at:
+                cells = []
+                for k in range(ncol):
+                    w = widths[k]
+                    if align[k] == "center":
+                        cells.append(":" + "-" * (w - 2) + ":")
+                    elif align[k] == "right":
+                        cells.append("-" * (w - 1) + ":")
+                    else:
+                        cells.append("-" * w)
+                out.append("| " + " | ".join(cells) + " |")
+                continue
+            cells = []
+            for k in range(ncol):
+                pad = widths[k] - _width(r[k])
+                if align[k] == "center":
+                    left = pad // 2
+                    cells.append(" " * left + r[k] + " " * (pad - left))
+                elif align[k] == "right":
+                    cells.append(" " * pad + r[k])
+                else:
+                    cells.append(r[k] + " " * pad)
+            out.append("| " + " | ".join(cells) + " |")
+        i = j
+    return "\n".join(out)
+
+
+def _plan_state(todos: list[Todo]) -> dict[str, str]:
+    """Map 'D05 T02 §3' -> the section's real status character."""
+    state: dict[str, str] = {}
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, s in t.sections.items():
+            if s.moved:
+                continue  # no row in the plan; a Moved line stands in its place
+            state[f"D{dom} T{t.number} §{num}"] = s.status
+    return state
+
+
+def _in_progress_by_ref(todos: list[Todo]) -> dict[str, bool]:
+    """Shipped-but-unstamped: Commit item ticked, no Verified stamp. D00 T06 §31."""
+    flags: dict[str, bool] = {}
+    for t in todos:
+        dom = t.domain.split("-", 1)[0]
+        for num, s in t.sections.items():
+            flags[f"D{dom} T{t.number} §{num}"] = s.status != "x" and (
+                s.status == "/"
+                or (s.commit_done and num not in t.verified_sections)
+            )
+    return flags
+
+
+def _duration_by_ref(todos: list[Todo]) -> dict[str, int | None]:
+    """Map 'D05 T02 §3' -> stamp Duration minutes, or None when the field is absent."""
+    minutes: dict[str, int | None] = {}
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, s in t.sections.items():
+            minutes[f"D{dom} T{t.number} §{num}"] = s.duration_minutes
+    return minutes
+
+
+def _stamped_on_by_ref(todos: list[Todo]) -> dict[str, str | None]:
+    """Map 'D05 T02 §3' -> Verified: calendar day, or None when the stamp has no date."""
+    days: dict[str, str | None] = {}
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, s in t.sections.items():
+            days[f"D{dom} T{t.number} §{num}"] = s.stamped_on
+    return days
+
+
+PHASE_HEADING_RE = re.compile(
+    r"^### Phase (?P<id>\d+)\s+(?:\u2014|\u2013|--|-)\s+(?P<title>.+?)\s*$"
+)
+# Resolute day-1 port: no progress surface consumes these yet, so both
+# stay derived and gitignored under build/ beside the cache. When a progress
+# surface lands, repoint to its committed path and let --check pin it in CI.
+PROGRESS_JSON = REPO / "build" / "todo-progress.json"
+OPERATOR_JSON = REPO / "build" / "todo-operator.json"
+REVIEW_KIND_RE = re.compile(
+    r"`(adversarial|consistency|optimisation|source-defect|record|design|fidelity)`"
+)
+REQUIRED_REVIEW_KINDS = ("adversarial", "consistency", "optimisation", "record")
+# Wave-1 debt named in CLAUDE.md. Verified 2026-08-13/14 without the panel.
+REVIEW_DEBT = frozenset(
+    {
+        "D00 T03 §2",
+        "D00 T03 §10",
+        "D01 T03 §1",
+        "D01 T01 §16",
+        "D01 T01 §17",
+        "D03 T01 §3",
+        "D03 T01 §4",
+        "D01 T04 §1",
+    }
+)
+
+
+def build_progress(todos: list[Todo]) -> dict:
+    """The payload the progress dashboard renders. Same graph as plan --sync.
+
+    Counts and checkbox state come from Implementation Order rows, not from
+    campaign.json and not from a second list in PHP. Duration is present only
+    when a stamp recorded integer minutes.
+    """
+    state = _plan_state(todos)
+    duration = _duration_by_ref(todos)
+    stamped = _stamped_on_by_ref(todos)
+    in_flight = _in_progress_by_ref(todos)
+    chips = _stamp_chips_by_ref(todos)
+    phases: list[dict] = []
+
+    if PLAN.exists():
+        lines = PLAN.read_text(encoding="utf-8").splitlines()
+        i = 0
+        while i < len(lines):
+            heading = PHASE_HEADING_RE.match(lines[i])
+            if not heading:
+                i += 1
+                continue
+            phase_id = int(heading.group("id"))
+            title = heading.group("title").strip()
+            sections: list[dict] = []
+            i += 1
+            while i < len(lines) and not lines[i].startswith("### Phase "):
+                row = PLAN_ROW_RE.match(lines[i])
+                if row:
+                    ref = re.sub(r"\s+", " ", row.group("ref"))
+                    cells = _split_row(lines[i]) or []
+                    deliverable = cells[2].strip() if len(cells) > 2 else ""
+                    done = state.get(ref, row.group("box")) == "x"
+                    chip = chips.get(ref) or {}
+                    section_row = {
+                        "ref": ref,
+                        "deliverable": deliverable,
+                        "done": done,
+                        "in_progress": (not done) and bool(in_flight.get(ref)),
+                        "duration_minutes": duration.get(ref),
+                        "stamped_on": stamped.get(ref),
+                        "verified": bool(chip.get("verified")),
+                        "reviews": list(chip.get("reviews") or []),
+                    }
+                    live = chip.get("live_checks")
+                    if live:
+                        section_row["live_checks"] = live
+                    if section_row["verified"]:
+                        # None on a stamp without the field: the page says
+                        # "not recorded" rather than inventing a name (D00 T08 §1).
+                        section_row["implementer"] = chip.get("implementer")
+                    sections.append(section_row)
+                i += 1
+            total = len(sections)
+            done_n = sum(1 for s in sections if s["done"])
+            phases.append(
+                {
+                    "id": phase_id,
+                    "heading": f"Phase {phase_id}",
+                    "title": title,
+                    "done": done_n,
+                    "total": total,
+                    "complete": total > 0 and done_n == total,
+                    "sections": sections,
+                }
+            )
+
+    # D00 T06 §29: in-progress is 0 < done < total (same membership as
+    # 0 < percent < 100 after PHP's clamp). Empty headings are never current:
+    # they are never complete, so the old first-incomplete scan opened them.
+    # `percent` is not emitted on phase records; PHP derives it from counts.
+    current_phase_id = _select_current_phase_id(phases)
+    for phase in phases:
+        phase["current"] = phase["id"] == current_phase_id
+        phase["expanded"] = phase["current"]
+
+    plan_done = sum(phase["done"] for phase in phases)
+    plan_total = sum(phase["total"] for phase in phases)
+    secs = [s for t in todos for s in t.sections.values()]
+    in_progress_n = sum(1 for flag in in_flight.values() if flag)
+    done_n = sum(1 for s in secs if s.status == "x")
+    # A moved section (writers-and-reviewers §2) is neither open nor done
+    # here: `query stats` counts it on its own line, and so does this.
+    moved_n = sum(1 for s in secs if s.moved)
+
+    return {
+        "stats": {
+            "sections": len(secs),
+            "done": done_n,
+            "in_progress": in_progress_n,
+            "open": len(secs) - done_n - in_progress_n - moved_n,
+            "moved": moved_n,
+        },
+        "plan": {
+            "done": plan_done,
+            "total": plan_total,
+            "open": plan_total - plan_done,
+            "percent": round(plan_done / plan_total * 100) if plan_total else 0,
+        },
+        "current_phase_id": current_phase_id,
+        "phases": phases,
+    }
+
+
+def _phase_in_progress(phase: dict) -> bool:
+    """Work started and work left. Empty headings are neither."""
+    total = int(phase.get("total") or 0)
+    done = int(phase.get("done") or 0)
+    return total > 0 and 0 < done < total
+
+
+def _select_current_phase_id(phases: list[dict]) -> int | None:
+    """First in-progress phase, else first non-empty incomplete, else none.
+
+    Numbered order in the JSON is unchanged. Display order (complete last) is
+    a PHP render concern, not this projection. D00 T06 §29.
+    """
+    for phase in phases:
+        if _phase_in_progress(phase):
+            return int(phase["id"])
+    for phase in phases:
+        total = int(phase.get("total") or 0)
+        if total > 0 and not phase.get("complete"):
+            return int(phase["id"])
+    return None
+
+
+def progress_text(todos: list[Todo]) -> str:
+    """Deterministic payload. `generated_at` is stamped only on write. D00 T06 §31."""
+    return json.dumps(build_progress(todos), indent=2, sort_keys=True) + "\n"
+
+
+def _generated_at() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def generated_progress_text(todos: list[Todo], generated_at: str | None = None) -> str:
+    payload = build_progress(todos)
+    payload["generated_at"] = generated_at or _generated_at()
+    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
+
+
+GENERATED_AT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+
+
+def _valid_generated_at(value: object) -> bool:
+    """Calendar-valid UTC instant, not merely regex-shaped. D00 T06 §31."""
+    if not isinstance(value, str) or GENERATED_AT_RE.fullmatch(value) is None:
+        return False
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return False
+    if parsed.strftime("%Y-%m-%dT%H:%M:%SZ") != value:
+        return False
+    now = datetime.now(timezone.utc)
+    if parsed > now + timedelta(days=1):
+        return False
+    if parsed < now - timedelta(days=365 * 20):
+        return False
+    return True
+
+
+def progress_generated_at_ok(written: str) -> bool:
+    try:
+        data = json.loads(written)
+    except json.JSONDecodeError:
+        return False
+    return isinstance(data, dict) and _valid_generated_at(data.get("generated_at"))
+
+
+def progress_text_for_check(written: str) -> str:
+    """Drop a valid generated_at so plan --check does not race the clock.
+
+    Invalid or missing values are left in place so the compare fails rather than
+    treating a corrupt snapshot as current.
+    """
+    data = json.loads(written)
+    if isinstance(data, dict) and _valid_generated_at(data.get("generated_at")):
+        data.pop("generated_at", None)
+    return json.dumps(data, indent=2, sort_keys=True) + "\n"
+
+
+def write_progress_json(todos: list[Todo]) -> None:
+    PROGRESS_JSON.parent.mkdir(parents=True, exist_ok=True)
+    PROGRESS_JSON.write_text(generated_progress_text(todos), encoding="utf-8")
+
+
+def _latest_closeout() -> str | None:
+    files = [
+        path
+        for path in list((REPO / "docs" / "campaign-runs").glob("*.md"))
+        + list((REPO / "docs" / "phase-runs").glob("*.md"))
+        if path.name.lower() != "readme.md"
+    ]
+    if not files:
+        return None
+    latest = max(files, key=lambda p: p.name)
+    return latest.relative_to(REPO).as_posix()
+
+
+def _open_plan_phases(text: str) -> list[tuple[int, str, list[str]]]:
+    """Open `[ ]` rows grouped by `### Phase N` heading. Same split plan-gate uses."""
+    heading_re = re.compile(r"^### (Phase\s+(\d+)\b.*)$")
+    phases: list[tuple[int, str, list[str]]] = []
+    current_id: int | None = None
+    current_heading = ""
+    current_refs: list[str] = []
+    for line in text.splitlines():
+        heading = heading_re.match(line)
+        if heading:
+            if current_id is not None and current_refs:
+                phases.append((current_id, current_heading, current_refs))
+            current_id = int(heading.group(2))
+            current_heading = heading.group(1).strip()
+            current_refs = []
+            continue
+        row = PLAN_ROW_RE.match(line)
+        if row and row.group("box") == " " and current_id is not None:
+            current_refs.append(re.sub(r"\s+", " ", row.group("ref")))
+    if current_id is not None and current_refs:
+        phases.append((current_id, current_heading, current_refs))
+    return phases
+
+
+def _campaign_snapshot(todos: list[Todo]) -> dict:
+    """Live next-phase fields for operator JSON. Computed from the already-loaded graph.
+
+    Used to shell out to `plan-gate.py next`, which then shelled out to
+    `todo-graph.py resolve` once per open Phase 0 row (76 after the 2026-08-20
+    remap). That nested spawn is what made `plan --check` take 12s locally and
+    exceed plan-gate's 15s timeout on GitHub Actions.
+    """
+    payload = {
+        "phase": None,
+        "phase_n": None,
+        "open_count": 0,
+        "first_open": None,
+        "first_ready": None,
+        "closeout": _latest_closeout(),
+    }
+    if not PLAN.is_file():
+        return payload
+    first_blocked: dict | None = None
+    for phase_n, heading, refs in _open_plan_phases(PLAN.read_text(encoding="utf-8")):
+        codes = {ref: resolve_exit_code(ref, todos) for ref in refs}
+        ready = [ref for ref in refs if codes[ref] == 0]
+        broken = [ref for ref in refs if codes[ref] not in (0, 3, 4)]
+        if ready or broken:
+            payload["phase"] = heading
+            payload["phase_n"] = phase_n
+            payload["open_count"] = len(refs)
+            payload["first_open"] = refs[0]
+            payload["first_ready"] = ready[0] if ready else None
+            return payload
+        if first_blocked is None:
+            first_blocked = {
+                "phase": heading,
+                "phase_n": phase_n,
+                "open_count": len(refs),
+                "first_open": refs[0],
+            }
+    if first_blocked is not None:
+        payload.update(first_blocked)
+    return payload
+
+
+def _review_kinds(body: str) -> list[str]:
+    kinds: list[str] = []
+    for kind in REVIEW_KIND_RE.findall(body):
+        if kind not in kinds:
+            kinds.append(kind)
+    return kinds
+
+
+def _review_kind_label(kind: str) -> str | None:
+    if kind == "plan":
+        return None
+    if kind in REVIEW_KIND_LABELS:
+        return REVIEW_KIND_LABELS[kind]
+    return kind.replace("-", " ").title()
+
+
+def _review_entries(body: str) -> list[dict]:
+    """Kinds that ran on the stamp, not fingerprints, jobs, or prose."""
+    seen: set[str] = set()
+    out: list[dict] = []
+    for match in REVIEW_ENTRY_RE.finditer(body or ""):
+        kind = match.group("kind").lower()
+        if REVIEW_JOBISH_RE.match(kind) or REVIEW_HEX_RE.match(kind):
+            continue
+        label = "Gemini final" if kind == "adversarial-final" and (match.group("family") or "").lower() == "gemini" else _review_kind_label(kind)
+        if not label or kind in seen:
+            continue
+        seen.add(kind)
+        verdict = re.sub(r"\s+", " ", match.group("verdict").lower())
+        if verdict in ("approve", "needs-attention"):
+            status = "passed"
+        elif verdict == "advisory":
+            # A stage 3 or 4 pass (§7): `advisory (family model ×1)` ran,
+            # `advisory (skipped)` did not; neither is a verdict on the section.
+            status = "skipped" if (match.group("family") or "").lower() == "" else "advisory"
+        elif "skip" in verdict:
+            status = "skipped"
+        else:
+            continue
+        family = (match.group("family") or "").lower() or None
+        model = match.group("model") or None
+        runs = int(match.group("runs")) if match.group("runs") else None
+        out.append({
+            "kind": kind, "status": status, "label": label,
+            # `family` None and `model` None together mean "model not recorded":
+            # the stamp predates the ledger or nothing was dispatched for the kind.
+            "family": family, "model": model, "runs": runs,
+        })
+    return out
+
+
+def _implementer(body: str) -> dict | None:
+    """`{"name": "Fable 5.1", "model": "claude-fable-5-1"}`, or None when not recorded."""
+    m = IMPLEMENTER_RE.fullmatch((body or "").strip())
+    if not m or not m.group("model"):
+        return None
+    return {"name": m.group("name").strip(), "model": m.group("model")}
+
+
+def _stamp_chips_by_ref(todos: list[Todo]) -> dict[str, dict]:
+    chips: dict[str, dict] = {}
+    provenance = None
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, sec in t.sections.items():
+            ref = f"D{dom} T{t.number} §{num}"
+            verified = num in t.verified_sections
+            reviews = _review_entries(sec.review_body) if verified else []
+            live = []
+            canonical_ref = t.path+'#'+str(num)
+            outcomes = f"docs/reviews/{t.domain}/D{dom}-T{t.number}-s{num}-review-outcomes.json"
+            if verified and (sec.verification_body or (REPO / outcomes).is_file()):
+                if provenance is None:
+                    spec = importlib.util.spec_from_file_location('progress_provenance', Path(__file__).parent / 'progress-provenance.py')
+                    provenance = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(provenance)
+                execution = provenance.load_outcomes(REPO, outcomes, canonical_ref, sec.review_body, reviews)
+                for review in reviews:
+                    if review['kind'] in execution:
+                        review['execution'] = execution[review['kind']]
+                live = provenance.live_checks(REPO, canonical_ref, sec.verification_body.strip('` '))
+            chips[ref] = {
+                "verified": verified,
+                "reviews": reviews,
+                "live_checks": live,
+                "implementer": _implementer(sec.implementer_body) if verified else None,
+            }
+    return chips
+
+
+def _review_doc(ref: str) -> str | None:
+    match = re.fullmatch(r"D(\d{2}) T(\d{2}) §(\d+)", ref)
+    if not match:
+        return None
+    # Sharded by domain since 2026-08-23. A flat directory was heading for one
+    # file per section -- about 435 -- which is navigable by grep and by
+    # nothing else. The domain directory is derived from the ref rather than
+    # stored, so it cannot drift from where the file actually is.
+    domain = _domain_dir(match.group(1))
+    if domain is None:
+        return None
+    rel = f"docs/reviews/{domain}/D{match.group(1)}-T{match.group(2)}-s{match.group(3)}.md"
+    return rel if (REPO / rel).is_file() else None
+
+
+def _domain_dir(number: str) -> str | None:
+    """'00' -> '00-workspace'. Read from the tree, never hardcoded."""
+    for child in sorted((REPO / "todo").iterdir()):
+        if child.is_dir() and child.name.startswith(f"{number}-"):
+            return child.name
+    return None
+
+
+def build_operator(todos: list[Todo]) -> dict:
+    """Operator Campaign / Findings / Reviews payload. D00 T06 §6."""
+    findings: list[dict] = []
+    reviews: list[dict] = []
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, sec in t.sections.items():
+            ref = f"D{dom} T{t.number} §{num}"
+            for done, text in sec.items:
+                match = FINDING_RE.search(text)
+                if not match:
+                    continue
+                status = "done" if done else ("filed" if "XREF" in text else "open")
+                findings.append(
+                    {
+                        "date": match.group("date"),
+                        "ref": ref,
+                        "path": t.path,
+                        "section": num,
+                        "verb": match.group("verb"),
+                        "text": re.sub(r"\s+", " ", text).strip(),
+                        "status": status,
+                    }
+                )
+            if num not in t.verified_sections:
+                continue
+            kinds = _review_kinds(sec.review_body)
+            missing = [k for k in REQUIRED_REVIEW_KINDS if k not in kinds]
+            reviews.append(
+                {
+                    "ref": ref,
+                    "title": sec.title or sec.deliverable,
+                    "kinds": kinds,
+                    "skipped_limit": "skipped (limit)" in sec.review_body
+                    or "skipped-limit" in sec.review_body,
+                    "missing_required": missing,
+                    "debt": bool(missing) or ref in REVIEW_DEBT,
+                    "doc": _review_doc(ref),
+                }
+            )
+    findings.sort(key=lambda row: (row["date"], row["path"], row["section"]), reverse=True)
+    reviews.sort(key=lambda row: row["ref"])
+    return {
+        "campaign": _campaign_snapshot(todos),
+        "findings": findings,
+        "reviews": reviews,
+    }
+
+
+def operator_text(todos: list[Todo]) -> str:
+    return json.dumps(build_operator(todos), indent=2, sort_keys=True) + "\n"
+
+
+def write_operator_json(todos: list[Todo]) -> None:
+    OPERATOR_JSON.parent.mkdir(parents=True, exist_ok=True)
+    OPERATOR_JSON.write_text(operator_text(todos), encoding="utf-8")
+
+
+def cmd_progress(args: argparse.Namespace) -> int:
+    todos = load_todos()
+    stamp = _generated_at()
+    text = generated_progress_text(todos, stamp)
+    sys.stdout.write(text)
+    if args.write:
+        PROGRESS_JSON.parent.mkdir(parents=True, exist_ok=True)
+        PROGRESS_JSON.write_text(text, encoding="utf-8")
+        print(f"wrote {_rel(PROGRESS_JSON)}", file=sys.stderr)
+    return 0
+
+
+def cmd_plan(args: argparse.Namespace) -> int:
+    """Sync (or check) implementation-plan.md's boxes against the graph.
+
+    The boxes are DERIVED, never hand-maintained. Two places recording the
+    same completion state is precisely the drift this repository keeps paying
+    for -- a stale `Depends On` edge hid half the project behind a client
+    nothing used, and the handover pack diverged from production in both
+    directions while reading as authoritative.
+
+    So the plan's checkboxes are a projection of the Implementation Order
+    tables, which `review-todo-section` is the only thing allowed to flip.
+    `--check` is what CI runs; it fails when the projection has gone stale.
+    """
+    if not PLAN.exists():
+        print(f"{_rel(PLAN)} does not exist.", file=sys.stderr)
+        return 2
+
+    todos = load_todos()
+    state = _plan_state(todos)
+
+    lines = PLAN.read_text(encoding="utf-8").splitlines()
+    out: list[str] = []
+    stale: list[str] = []
+    unknown: list[str] = []
+    seen: list[str] = []
+
+    moved = _moved_by_ref(todos)
+    moved_rows: list[str] = []      # moved sections that still hold a row
+    stale_notes: list[str] = []     # Moved lines whose section is not moved (or is noted twice)
+    noted: set[str] = set()
+    pending_notes: list[str] = []   # written where the table that held the row ends
+
+    def flush_notes(next_line: str | None) -> None:
+        if not pending_notes:
+            return
+        if out and out[-1].strip():
+            out.append("")
+        out.extend(pending_notes)
+        pending_notes.clear()
+        if next_line is not None and next_line.strip():
+            out.append("")
+
+    for line in lines:
+        note = PLAN_MOVED_RE.match(line)
+        if note:
+            nref = re.sub(r"\s+", " ", note.group("ref"))
+            if nref in moved and nref not in noted:
+                noted.add(nref)
+                out.append(_moved_line(nref, moved[nref]))  # regenerated: the pointer is the section's
+            else:
+                stale_notes.append(nref)
+            continue
+        m = PLAN_ROW_RE.match(line)
+        if not m:
+            if pending_notes and not line.startswith("|"):
+                flush_notes(line)
+            out.append(line)
+            continue
+        ref = re.sub(r"\s+", " ", m.group("ref"))
+        if ref in moved:
+            # Not a row any more: it leaves one line saying where it went, at
+            # the end of the table it sat in, and never counts (§2 rule).
+            moved_rows.append(ref)
+            if ref not in noted:
+                noted.add(ref)
+                pending_notes.append(_moved_line(ref, moved[ref]))
+            continue
+        seen.append(ref)
+        if ref not in state:
+            unknown.append(ref)
+            out.append(line)
+            continue
+        want = state[ref]
+        if want != m.group("box"):
+            stale.append(f"{ref}: plan says [{m.group('box')}], graph says [{want}]")
+        # Replace the box CHARACTER in place rather than rebuilding the row.
+        # Rebuilding would collapse the column padding on every sync, so the
+        # file would be aligned exactly until the next time anything shipped --
+        # which is the one moment nobody is looking at its whitespace.
+        out.append(line[: m.start("box")] + want + line[m.end("box") :])
+
+    # A section listed TWICE is the failure this projection exists to prevent,
+    # and it is not caught by any check above: both rows sync happily to the
+    # same status, the totals just quietly overcount, and the phase that should
+    # have lost the row keeps it. Found 2026-08-12 when `D01 T02 §3` was added
+    # to Phase 0 while still sitting in Phase 4 -- `--check` passed.
+    flush_notes(None)
+    dupes = sorted({r for r in seen if seen.count(r) > 1})
+
+    done = sum(1 for r in seen if state.get(r) == "x")
+    total = len(seen)
+    pct = round(done / total * 100) if total else 0
+    summary = (
+        f"**{done} of {total} sections complete ({pct}%).** "
+        f"Derived from the Implementation Order tables by "
+        f"`python scripts/todo-graph.py plan --sync` -- never edited by hand."
+    )
+    text = "\n".join(out) + "\n"
+    text, n = PLAN_PROGRESS_RE.subn(lambda mo: mo.group("prefix") + summary, text, count=1)
+    if n == 0:
+        print(
+            "warning: no '> **Progress:**' line in the plan, so the summary was "
+            "not updated. Add one under the title.",
+            file=sys.stderr,
+        )
+
+    # A row for a section that does not exist is a worse defect than a stale
+    # box: it means the plan is sequencing something the graph has never heard
+    # of, and no amount of syncing will make it true.
+    for ref in unknown:
+        print(f"::error::{_rel(PLAN)} references {ref}, which is not in the graph")
+
+    # EVERY section has a ROW. Not "is mentioned somewhere", and not "is
+    # mentioned unless it already shipped".
+    #
+    # Hardened 2026-08-23 on operator instruction, after the drift it allowed
+    # was measured: 435 sections, 417 rows, and `--check` green. Both escape
+    # hatches were load-bearing in the wrong direction.
+    #
+    #   `state[r] != "x"` excused a SHIPPED section from having a row. That
+    #   sounds harmless -- the work is done -- but the plan's totals are
+    #   computed from its rows, so each excused section silently shrank the
+    #   denominator AND the numerator. The plan reported 125/417 = 30% while
+    #   the graph held 143/435 = 33%, and `platform/resources/rebuild-progress.json`
+    #   feeds that number to the progress dashboard reads.
+    #
+    #   Matching any backtick-quoted ref anywhere in the file excused a
+    #   section from having a row because a SENTENCE named it. The plan's own
+    #   prose said so out loud -- "The stamped T05 rows stay named in prose" --
+    #   which is a design decision that quietly stopped the projection from
+    #   being a projection.
+    #
+    # Neither hatch is replaced with a softer one. A section that genuinely
+    # does not belong in a phase does not exist: `plan --sync` derives from the
+    # Implementation Order tables, and a section IS a unit of work in a domain.
+    missing = [r for r in state if r not in seen]
+
+    if args.check:
+        for s in stale:
+            print(f"::error::{_rel(PLAN)} is stale -- {s}")
+        for r in moved_rows:
+            print(
+                f"::error::{_rel(PLAN)} lists {r} as a row, but its section is "
+                "moved out of the tree. `plan --sync` replaces the row with a Moved line."
+            )
+        for r in stale_notes:
+            print(
+                f"::error::{_rel(PLAN)} carries a Moved line for {r}, which is "
+                "not moved (or is noted twice). `plan --sync` drops it."
+            )
+        for r in dupes:
+            print(
+                f"::error::{_rel(PLAN)} lists {r} in more than one phase. "
+                "One row per section, or the totals overcount and a phase keeps work it handed away."
+            )
+        if missing:
+            print(
+                f"::error::{len(missing)} section(s) have no row in the plan, so "
+                f"the plan's totals do not describe the project: "
+                + ", ".join(sorted(missing)[:8])
+                + ("..." if len(missing) > 8 else "")
+            )
+        expected_json = progress_text(todos)
+        written_progress = PROGRESS_JSON.read_text(encoding="utf-8") if PROGRESS_JSON.exists() else ""
+        json_stale = (
+            not PROGRESS_JSON.exists()
+            or not progress_generated_at_ok(written_progress)
+            or progress_text_for_check(written_progress) != expected_json
+        )
+        if json_stale:
+            print(
+                f"::error::{_rel(PROGRESS_JSON)} is stale -- "
+                "run `python scripts/todo-graph.py plan --sync`"
+            )
+        expected_operator = operator_text(todos)
+        operator_stale = (
+            not OPERATOR_JSON.exists()
+            or OPERATOR_JSON.read_text(encoding="utf-8") != expected_operator
+        )
+        if operator_stale:
+            print(
+                f"::error::{_rel(OPERATOR_JSON)} is stale -- "
+                "run `python scripts/todo-graph.py plan --sync`"
+            )
+        if stale or unknown or missing or dupes or json_stale or operator_stale or moved_rows or stale_notes:
+            print(
+                f"\n{len(stale)} stale box(es), {len(unknown)} unknown ref(s), "
+                f"{len(missing)} unsequenced section(s), {len(dupes)} duplicated section(s)"
+                f"{f', {len(moved_rows)} moved row(s)' if moved_rows else ''}"
+                f"{f', {len(stale_notes)} stale Moved line(s)' if stale_notes else ''}"
+                f"{', progress JSON stale' if json_stale else ''}"
+                f"{', operator JSON stale' if operator_stale else ''}. "
+                "Run `python scripts/todo-graph.py plan --sync`.",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"implementation plan is current -- {done}/{total} sections complete ({pct}%)")
+        return 0
+
+    text = _align_tables(text)
+    PLAN.write_text(text, encoding="utf-8")
+    write_progress_json(todos)
+    write_operator_json(todos)
+    for r in dupes:
+        print(f"  WARNING: {r} appears in more than one phase")
+    print(f"synced {total} row(s) -- {done} complete ({pct}%), {len(stale)} box(es) changed")
+    for r in moved_rows:
+        print(f"  moved: {r} -- row replaced by a Moved line")
+    for r in stale_notes:
+        print(f"  dropped a stale Moved line for {r}")
+    for s in stale:
+        print(f"  {s}")
+    if missing:
+        print(f"  NOTE: {len(missing)} open section(s) appear in no phase -- run with --check for the list")
+    return 0
+
+
+# ---------------------------------------------------------------------- main
+
+
+# ------------------------------------------------------------------ self-test
+
+
+SELF_TEST_TODO_A = """---
+schema_version: 1
+id: self-test-alpha
+domain: 90-selftest
+status: active
+title: "TODO-01 -- Self-test alpha"
+track: Z1
+---
+
+# TODO-01 -- Self-test alpha
+
+> **Goal:** Fixture. Never shipped, never read by a human.
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Shipped thing | - |  [x]   |
+|   2   |   §2    | Open thing, deps met | §1 |  [ ]   |
+|   3   |   §3    | Open thing, dep unmet | §2 |  [ ]   |
+|   4   |   §4    | Open thing, cross-file dep unmet | T02 §1 |  [ ]   |
+
+---
+
+## 1. Shipped thing
+
+- [x] Did the thing
+- [x] Commit: `"selftest: the thing"`
+
+**Test checkpoint:** `true` proves nothing and is meant to.
+
+> **Verified:** 2026-01-01 | §1 | fixture mentioned §4
+> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` review-mt1-aaaa approve · `consistency` review-mt1-bbbb needs-attention · `design` aux-design-x skipped (limit) · `integration` opus-integration-y approve
+> **CRUD:** applicable | test.sales cloud-crud.sh 24/24
+> **Duration:** 7
+
+## 2. Open thing, deps met
+
+**Needs:** Windows host (build/test)
+
+- [ ] Do the next thing
+- [ ] And another
+- [x] Commit: `"selftest: the next thing"`
+
+**Test checkpoint:** `true`
+
+> **Deferred:** something for later -> XREF: D90 T02 §1 (item: "A deferred thing")
+
+## 3. Open thing, dep unmet
+
+- [ ] Blocked on §2
+- [ ] Commit: `"selftest: blocked"`
+
+**Test checkpoint:** `true`
+
+## 4. Open thing, cross-file dep unmet
+
+- [ ] Blocked on another file
+- [ ] Commit: `"selftest: cross-file"`
+
+**Test checkpoint:** `true`
+"""
+
+SELF_TEST_TODO_B = """---
+schema_version: 1
+id: self-test-beta
+domain: 90-selftest
+status: active
+title: "TODO-02 -- Self-test beta"
+track: Z1
+frozen: true
+---
+
+# TODO-02 -- Self-test beta
+
+> **Goal:** Fixture.
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | A deferred thing | - |  [ ]   |
+
+---
+
+## 1. A deferred thing
+
+- [ ] A deferred thing
+- [ ] Commit: `"selftest: deferred"`
+
+**Test checkpoint:** `true`
+**Freeze check:** fixture
+"""
+
+SELF_TEST_PLAN = """# Implementation plan
+
+### Phase 0 -- Fixture phase
+
+| ✔ | Section | Deliverable | Days |
+| :-: | :-----: | ----------- | :--: |
+| [ ] | `D90 T01 §1` | Shipped thing | 1 |
+| [ ] | `D90 T01 §2` | Open thing, deps met | 2 |
+
+### Phase 1 -- Empty fixture phase
+
+### Phase 2 -- Second fixture phase
+
+| ✔ | Section | Deliverable | Days |
+| :-: | :-----: | ----------- | :--: |
+| [ ] | `D90 T01 §3` | Open thing, dep unmet | 1 |
+| [ ] | `D90 T02 §1` | A deferred thing | 1 |
+"""
+
+
+SELF_TEST_TODO_MOVED = """---
+schema_version: 1
+id: self-test-moved
+domain: 93-moved
+status: active
+title: "TODO-05 -- moved section"
+track: Z1
+---
+
+# TODO-05 -- moved section
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Moved thing | - |  [ ]   |
+|   2   |   §2    | Depends on the moved thing | §1 |  [ ]   |
+
+## 1. Moved thing
+
+> **Moved:** 2026-09-05 to docs/plans/fixture-plan.md (operator instruction); worked there by its named writer without a review chain.
+
+- [x] Shipped before the move
+- [ ] ~~Found 2026-01-01 by a fixture: open work, struck~~ Moved 2026-09-05 to docs/plans/fixture-plan.md.
+- [ ] Commit: `"selftest: moved"`
+
+**Test checkpoint:** run tests/MovedTest.php.
+
+## 2. Depends on the moved thing
+
+- [ ] Do it
+- [ ] Commit: `"selftest: dependent"`
+
+**Test checkpoint:** run tests/DependentTest.php.
+"""
+
+SELF_TEST_PLAN_MOVED = """# Implementation plan
+
+> **Progress:** placeholder
+
+### Phase 0 -- Moved fixture phase
+
+| ✔ | Section | Deliverable | Days |
+| :-: | :-----: | ----------- | :--: |
+| [ ] | `D93 T05 §1` | Moved thing | 1 |
+| [ ] | `D93 T05 §2` | Depends on the moved thing | 1 |
+
+Prose after the table.
+
+### Phase 1 -- The ratchet fixture's own row
+
+| ✔ | Section | Deliverable | Days |
+| :-: | :-----: | ----------- | :--: |
+| [ ] | `D91 T09 §1` | Placeholder | 1 |
+"""
+
+
+def cmd_self_test(_args) -> int:
+    """Prove the graph's own contract against synthetic fixtures, in under a second.
+
+    This exists so a run may edit this file as planned section work: the ban in
+    `process-phase` is verify-then-adopt, and this is the verify. Before this
+    existed the only coverage was `PlanGateTest` inside the Pest suite, which
+    runs eight minutes into pre-push -- exactly the wrong place for a check
+    whose whole value is being fast enough to run after every edit.
+
+    Fixtures, never the live tree: a self-test that reads `todo/` passes or
+    fails for reasons that have nothing to do with this file, and `validate`
+    already owns that job.
+    """
+    import tempfile
+
+    cases: list[tuple[str, object, object]] = []
+
+    def check(name: str, got, want) -> None:
+        cases.append((name, got, want))
+
+    global TODO_DIR, PLAN  # noqa: PLW0603 -- rebinding is the point
+    saved_todo_dir, saved_plan = TODO_DIR, PLAN
+    tmp = tempfile.TemporaryDirectory(prefix="todo-graph-selftest-")
+    try:
+        root = Path(tmp.name)
+        (root / "todo" / "90-selftest").mkdir(parents=True)
+        a = root / "todo" / "90-selftest" / "TODO-01-self-test-alpha.md"
+        b = root / "todo" / "90-selftest" / "TODO-02-self-test-beta.md"
+        a.write_text(SELF_TEST_TODO_A, encoding="utf-8")
+        b.write_text(SELF_TEST_TODO_B, encoding="utf-8")
+        plan = root / "todo" / "implementation-plan.md"
+        plan.write_text(SELF_TEST_PLAN, encoding="utf-8")
+        TODO_DIR = root / "todo"
+        PLAN = plan
+
+        todos = load_todos()
+        check("load_todos finds both fixtures", len(todos), 2)
+        ta = next((t for t in todos if t.number == "01"), None)
+        tb = next((t for t in todos if t.number == "02"), None)
+        check("alpha parsed", ta is not None, True)
+        check("beta parsed", tb is not None, True)
+        if ta is None or tb is None:
+            raise RuntimeError("fixtures did not parse; the rest cannot run")
+
+        # --- parsing -------------------------------------------------------
+        check("alpha has four sections", len(ta.sections), 4)
+        check("alpha frontmatter id", ta.id, "self-test-alpha")
+        check("beta is frozen", tb.frozen, True)
+        check("alpha is not frozen", ta.frozen, False)
+        check("§1 row is shipped", ta.sections[1].status, "x")
+        check("§2 row is open", ta.sections[2].status, " ")
+        check("§2 counts three items", ta.sections[2].items_total, 3)
+        check("§1 counts its done items", ta.sections[1].items_done, 2)
+        check("§2 has a Test checkpoint", ta.sections[2].has_test_checkpoint, True)
+        # --- the Needs marker (D00 T07 §28) ---------------------------------
+        check("§2 Needs parses to the closed-list key", ta.sections[2].needs, ["windows-host"])
+        check("§2 Needs keeps the raw value", ta.sections[2].needs_raw, "Windows host (build/test)")
+        check("§3 has no Needs", ta.sections[3].needs, [])
+        check("needs_for_ref: marked", needs_for_ref("D90 T01 §2", todos), ["windows-host"])
+        check("needs_for_ref: unmarked", needs_for_ref("D90 T01 §3", todos), [])
+        check("needs_for_ref: unknown ref is []", needs_for_ref("D91 T01 §1", todos), [])
+        check(
+            "needs_for_ref: pasted plan row",
+            needs_for_ref("| [ ] | `D90 T01 §2` | Open thing | 2 |", todos),
+            ["windows-host"],
+        )
+        check("§2 has a Commit item", ta.sections[2].has_commit_item, True)
+        check("beta §1 has a Freeze check", tb.sections[1].has_freeze_check, True)
+        check("every body section has a row", all(s.has_row for s in ta.sections.values()), True)
+        check("every row has a body", all(s.has_body for s in ta.sections.values()), True)
+        check("§1 duration parsed", ta.sections[1].duration_minutes, 7)
+        check("§1 is in verified_sections", 1 in ta.verified_sections, True)
+        check("alpha carries one deferral", len(ta.deferred), 1)
+        check("the deferral names its owner", ta.deferred[0].ref, "D90 T02 §1")
+        check("the deferral is open", ta.deferred[0].resolved, False)
+
+        # --- resolve_exit_code: the contract process-phase routes on --------
+        check("exit 0 -- open, deps met", resolve_exit_code("D90 T01 §2", todos), 0)
+        check("exit 3 -- already shipped", resolve_exit_code("D90 T01 §1", todos), 3)
+        check("exit 4 -- dep in the same file", resolve_exit_code("D90 T01 §3", todos), 4)
+        check("exit 4 -- dep in another file", resolve_exit_code("D90 T01 §4", todos), 4)
+        check("exit 1 -- no such section", resolve_exit_code("D90 T01 §99", todos), 1)
+        check("exit 1 -- no such todo", resolve_exit_code("D91 T01 §1", todos), 1)
+        check("exit 2 -- no section reference", resolve_exit_code("just some prose", todos), 2)
+        check("exit 2 -- empty input", resolve_exit_code("   ", todos), 2)
+
+        # --- the three reference forms all resolve to the same section ------
+        check(
+            "reference form: path + §N",
+            resolve_exit_code("90-selftest/TODO-01-self-test-alpha.md §2", todos),
+            0,
+        )
+        check(
+            "reference form: a pasted plan row",
+            resolve_exit_code("| [ ] | `D90 T01 §2` | Open thing, deps met | 2 |", todos),
+            0,
+        )
+        check(
+            "reference form: prose around a ref",
+            resolve_exit_code("please do D90 T01 §2 next", todos),
+            0,
+        )
+
+        # --- plan projection ------------------------------------------------
+        state = _plan_state(todos)
+        check("plan state knows the shipped row", state.get("D90 T01 §1"), "x")
+        check("plan state knows an open row", state.get("D90 T01 §2"), " ")
+        check("plan state covers the second file", state.get("D90 T02 §1"), " ")
+        check("plan state has one key per section", len(state), 5)
+
+        phases = _open_plan_phases(plan.read_text(encoding="utf-8"))
+        check("open phases skip the empty one", [p[0] for p in phases], [0, 2])
+        check("phase 0 lists both its rows", len(phases[0][2]), 2)
+        check("phase rows keep their refs", phases[0][2][0], "D90 T01 §1")
+
+        # --- progress arithmetic --------------------------------------------
+        prog = build_progress(todos)
+        by_id = {p["id"]: p for p in prog["phases"]}
+        check("progress emits every heading", sorted(by_id), [0, 1, 2])
+        check("phase 0 counts its rows", by_id[0]["total"], 2)
+        check("phase 0 counts the shipped one", by_id[0]["done"], 1)
+        check("an empty phase totals zero", by_id[1]["total"], 0)
+        check("an empty phase is not complete", by_id[1].get("complete"), False)
+        check("phase 2 has nothing done", by_id[2]["done"], 0)
+        check("progress carries the stamp duration", by_id[0]["sections"][0].get("duration_minutes"), 7)
+        check("progress carries the Verified calendar day", by_id[0]["sections"][0].get("stamped_on"), "2026-01-01")
+        check("evidence §N does not verify that section", 4 not in ta.verified_sections, True)
+        check("coverage field still verifies §1", 1 in ta.verified_sections, True)
+        shipped = by_id[0]["sections"][0]
+        check("progress verified chip on a stamped row", shipped.get("verified"), True)
+        check(
+            "progress review kinds follow the job-plus-verdict grammar",
+            [r["kind"] for r in shipped.get("reviews") or []],
+            ["adversarial", "consistency", "design", "integration"],
+        )
+        check("needs-attention is Passed", (shipped.get("reviews") or [{}])[1].get("status"), "passed")
+        check("skipped-limit is Skipped", (shipped.get("reviews") or [{}, {}, {}])[2].get("status"), "skipped")
+        check("fingerprint is not a review kind", "abc123def456" not in [r["kind"] for r in shipped.get("reviews") or []], True)
+        check("progress does not upgrade CRUD prose to live proof", shipped.get("live_checks", []), [])
+        # D00 T08 §1: provenance on the lens clause, three states.
+        prov = _review_entries(
+            "fp `abc123abc123` | `adversarial` approve (codex gpt-5.6-sol ×10) · "
+            "`consistency` needs-attention (2) (grok ×7) · `design` approve (model not recorded) · "
+            "`integration` needs-attention (claude opus ×4)"
+        )
+        check("provenance: family and model", (prov[0]["family"], prov[0]["model"], prov[0]["runs"]), ("codex", "gpt-5.6-sol", 10))
+        check("provenance: count then family, no model", (prov[1]["family"], prov[1]["model"], prov[1]["runs"]), ("grok", None, 7))
+        check("provenance: model not recorded", (prov[2]["family"], prov[2]["model"], prov[2]["status"]), (None, None, "passed"))
+        check("provenance: claude opus", (prov[3]["family"], prov[3]["model"]), ("claude", "opus"))
+        final = _review_entries("`adversarial` approve (codex gpt-6-astra ×1) · `adversarial-final` advisory (qwen qwen3.8-max ×1) · `muse-final` advisory (skipped)")
+        check("advisory pass: family, model, status", (final[1]["kind"], final[1]["family"], final[1]["model"], final[1]["status"], final[1]["label"]), ("adversarial-final", "qwen", "qwen3.8-max", "advisory", "Qwen final"))
+        check("advisory skipped: status skipped, no family", (final[2]["kind"], final[2]["family"], final[2]["status"]), ("muse-final", None, "skipped"))
+        bare = _review_entries("`adversarial` approve · `record` needs-attention (1)")
+        check("a stamp without provenance still yields its kinds", [(r["kind"], r["family"]) for r in bare], [("adversarial", None), ("record", None)])
+        # D00 T08 §4: Git abbreviations are a range, not just 12-character fingerprints.
+        for length in range(4, 41):
+            for token in ("a" + "9" * (length - 1), "F" + "0" * (length - 1)):
+                check(f"commit token excluded {token}", _review_entries(f"`{token}` approve"), [])
+            check(f"digit-leading commit remains inert {length}", _review_entries(f"`{'1' * length}` approve"), [])
+        for token in ("abc", "a" * 41):
+            check(f"non-commit boundary retains prior classification {len(token)}", [r["kind"] for r in _review_entries(f"`{token}` approve")], [token])
+        legacy_kinds = (
+            "correctness", "data-safety", "integration", "fix-review", "adversarial",
+            "consistency", "optimisation", "record", "opus", "source-defect", "design",
+            "muse-final", "adversarial-final", "fidelity", "escalation", "security",
+        )
+        for kind in legacy_kinds:
+            entry = _review_entries(f"`{kind}` approve (claude opus ×2)")
+            check(f"actual historical vocabulary preserved {kind}", [(r["kind"], r["family"], r["model"], r["runs"], r["status"]) for r in entry], [(kind, "claude", "opus", 2, "passed")])
+        for clause in (None, "", "unrecorded", "`record` refused", "`plan` approve", "`opus-design-20260907` approve"):
+            check(f"missing invalid or non-lens clause stays empty {clause}", _review_entries(clause), [])
+        check("implementer parses name and model", _implementer("Fable 5.1 (claude-fable-5-1)"), {"name": "Fable 5.1", "model": "claude-fable-5-1"})
+        check("implementer not recorded is None", _implementer("not recorded (stamped before D00 T08 §1)"), None)
+        check("implementer refuses prose", _implementer("Derick typed this"), None)
+        check("stamped row carries implementer key", "implementer" in shipped, True)
+        # A range stamp's field lines reach every section it covers (Codex, last wave).
+        ranged_dir = Path(tempfile.mkdtemp(prefix="todo-range-"))
+        try:
+            (ranged_dir / "todo" / "00-workspace").mkdir(parents=True)
+            (ranged_dir / "todo" / "00-workspace" / "TODO-09-range.md").write_text(
+                "---\nschema_version: 1\nid: range\ndomain: 00-workspace\nstatus: draft\ntitle: Range\n---\n\n# Range\n\n"
+                "## Implementation Order\n\n| Order | Section | Deliverable | Depends On | Status |\n| :---: | :-----: | --- | --- | :----: |\n"
+                "| 1 | §1 | One | -- | [x] |\n| 2 | §2 | Two | §1 | [x] |\n\n"
+                "## 1. One\n\n- [x] a\n\n## 2. Two\n\n- [x] b\n\n"
+                "> **Verified:** 2026-09-03 | §1 - §2 | ok\n> **Review:** fp `abc123abc123` | `adversarial` approve (codex ×1)\n> **Implementer:** Opus 5 (claude-opus-5)\n",
+                encoding="utf-8",
+            )
+            ranged = parse_todo(ranged_dir / "todo" / "00-workspace" / "TODO-09-range.md")
+            check("range stamp: Review reaches §1", "adversarial" in ranged.sections[1].review_body, True)
+            check("range stamp: Review reaches §2", "adversarial" in ranged.sections[2].review_body, True)
+            check("range stamp: Implementer reaches §1", _implementer(ranged.sections[1].implementer_body), {"name": "Opus 5", "model": "claude-opus-5"})
+            (ranged_dir / "todo" / "00-workspace" / "TODO-09-range.md").write_text(
+                (ranged_dir / "todo" / "00-workspace" / "TODO-09-range.md").read_text(encoding="utf-8")
+                + "\n> **Verified:** 2026-09-03 | §9 - §1 | backwards\n> **Review:** `design` approve (claude opus ×1)\n",
+                encoding="utf-8",
+            )
+            after = parse_todo(ranged_dir / "todo" / "00-workspace" / "TODO-09-range.md")
+            check("a malformed stamp's fields reach no section", "design" in after.sections[2].review_body, False)
+        finally:
+            shutil.rmtree(ranged_dir, ignore_errors=True)
+        open_row = by_id[0]["sections"][1]
+        check("unstamped row is not verified", open_row.get("verified"), False)
+        check("unstamped row has no review chips", open_row.get("reviews"), [])
+        check("unstamped row omits live_checks", "live_checks" in open_row, False)
+        check(
+            "progress leaves stamped_on null where no Verified date exists",
+            by_id[0]["sections"][1].get("stamped_on"),
+            None,
+        )
+
+        range_todo = root / "todo" / "90-selftest" / "TODO-03-range.md"
+        range_todo.write_text(
+            """---
+schema_version: 1
+id: self-test-range
+domain: 90-selftest
+status: active
+title: "TODO-03 -- range stamp"
+track: Z1
+---
+
+# TODO-03 -- range stamp
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | One | - |  [x]   |
+|   2   |   §2    | Two | §1 |  [x]   |
+|   3   |   §3    | Three | §2 |  [x]   |
+
+## 1. One
+
+> **Verified:** 2026-08-20 | §1-§3 | range fixture
+
+## 2. Two
+
+## 3. Three
+""",
+            encoding="utf-8",
+        )
+        # --- §38: pre-convention warnings ACK on stamped sections only ------
+        ack_todo = root / "todo" / "90-selftest" / "TODO-04-acked.md"
+        ack_todo.write_text(
+            """---
+schema_version: 1
+id: self-test-acked
+domain: 90-selftest
+status: active
+title: "TODO-04 -- acked warnings"
+track: Z1
+---
+
+# TODO-04 -- acked warnings
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Stamped, both defects | - |  [x]   |
+|   2   |   §2    | Open, both defects | §1 |  [ ]   |
+|   3   |   §3    | Ticked but unverified | §1 |  [x]   |
+|   4   |   §4    | Open but stamped | §1 |  [ ]   |
+|   5   |   §5    | Stamped after the cutoff | §1 |  [x]   |
+|   6   |   §6    | Needs a host nobody listed | §1 |  [ ]   |
+
+## 1. Stamped, both defects
+
+- [x] Did it
+- [x] Commit: `"selftest: acked"`
+
+**Fidelity:** some page -- fixture.
+
+**Test checkpoint:** `pest --filter=Thing`; everything else must still pass.
+
+> **Verified:** 2026-01-01 | §1 | fixture
+
+## 2. Open, both defects
+
+- [ ] Do it
+- [ ] Commit: `"selftest: open"`
+
+**Fidelity:** some page -- fixture.
+
+**Test checkpoint:** `pest --filter=Thing`; everything else must still pass.
+
+## 3. Ticked but unverified
+
+- [x] Did it
+- [x] Commit: `"selftest: unverified"`
+
+**Fidelity:** some page -- fixture.
+
+**Test checkpoint:** `pest --filter=Thing`; everything else must still pass.
+
+## 4. Open but stamped
+
+- [ ] Do it
+- [ ] Commit: `"selftest: open-stamped"`
+
+**Fidelity:** some page -- fixture.
+
+**Test checkpoint:** `pest --filter=Thing`; everything else must still pass.
+
+> **Verified:** 2026-01-01 | §4 | fixture
+
+## 5. Stamped after the cutoff
+
+- [x] Did it
+- [x] Commit: `"selftest: post-cutoff"`
+
+**Fidelity:** some page -- fixture.
+
+**Test checkpoint:** `pest --filter=Thing`; everything else must still pass.
+
+> **Verified:** 2027-01-01 | §5 | fixture
+
+## 6. Needs a host nobody listed
+
+**Needs:** Mars (live host)
+
+- [ ] Do it
+- [ ] Commit: `"selftest: needs"`
+
+**Test checkpoint:** `true`
+""",
+            encoding="utf-8",
+        )
+        import io as _io
+        import contextlib as _ctx
+
+        vbuf = _io.StringIO()
+        with _ctx.redirect_stdout(vbuf), _ctx.redirect_stderr(_io.StringIO()):
+            cmd_validate(None)
+        vout = vbuf.getvalue()
+        vacked = getattr(cmd_validate, "last_acked", [])
+        check(
+            "stamped Fidelity gap is acked, not warned",
+            any("TODO-04-acked.md" in a and "**Fidelity:**" in a for a in vacked),
+            True,
+        )
+        check(
+            "stamped --filter overclaim is acked, not warned",
+            any("TODO-04-acked.md" in a and "`--filter`" in a for a in vacked),
+            True,
+        )
+        check(
+            "no WARN line names the stamped section",
+            any(
+                line.startswith("WARN") and "TODO-04-acked.md" in line and "§1" in line
+                for line in vout.splitlines()
+            ),
+            False,
+        )
+        check(
+            "needs_for_ref: an unknown VALUE is the unknown sentinel, never host-free",
+            needs_for_ref("D90 T04 §6", load_todos()),
+            ["unknown:Mars (live host)"],
+        )
+        check(
+            "an unknown Needs value is FATAL (needs-unknown)",
+            any(
+                line.startswith("FATAL") and "TODO-04-acked.md" in line
+                and "§6 has **Needs:** 'Mars (live host)'" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        check(
+            "open Fidelity gap stays FATAL",
+            any(
+                line.startswith("FATAL") and "TODO-04-acked.md" in line and "§2 has **Fidelity:**" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        # D00 T01 §21 (2026-08-28): an OPEN unfalsifiable --filter checkpoint
+        # is FATAL now -- a checkpoint known not to detect its promised
+        # regression is push-time actionable (name the test files). The
+        # stamped branches keep their §38 ack/fix-forward treatment above.
+        check(
+            "open --filter overclaim is FATAL (§21)",
+            any(
+                line.startswith("FATAL") and "TODO-04-acked.md" in line and "§2 has a `--filter`" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        # The conjunction, not either predicate alone (round-1 consistency
+        # finding): [x] with no Verified stamp is NOT acked, and an open row
+        # with a Verified stamp is NOT acked.
+        check(
+            "ticked-but-unverified §3 is not acked",
+            any("TODO-04-acked.md" in a and "§3" in a for a in vacked),
+            False,
+        )
+        check(
+            "ticked-but-unverified §3 stays in the live channel",
+            any(
+                line.startswith(("WARN", "FATAL")) and "TODO-04-acked.md" in line and "§3" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        check(
+            "open-but-stamped §4 is not acked",
+            any("TODO-04-acked.md" in a and "§4" in a for a in vacked),
+            False,
+        )
+        check(
+            "open-but-stamped §4 Fidelity gap stays FATAL",
+            any(
+                line.startswith("FATAL") and "TODO-04-acked.md" in line and "§4 has **Fidelity:**" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        # The ack is DATE-BOUND: a stamp dated after the cutoff must not ack,
+        # or new work could ship the defect under a "pre-convention" label
+        # (terminal integration finding).
+        check(
+            "post-cutoff stamp §5 is not acked",
+            any("TODO-04-acked.md" in a and "§5" in a for a in vacked),
+            False,
+        )
+        check(
+            "post-cutoff stamp §5 stays in the live channel",
+            any(
+                line.startswith(("WARN", "FATAL")) and "TODO-04-acked.md" in line and "§5" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        # ...and wears the fix-forward message, never the legacy do-not-reopen
+        # text, which for a post-convention stamp is an instruction to ship
+        # the gap (final integration finding).
+        check(
+            "severity: filter-overclaim-stamped stays WARN on post-cutoff §5",
+            any(
+                line.startswith("WARN")
+                and "§5" in line
+                and "TODO-04-acked.md" in line
+                and "fix the checkpoint forward" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        check(
+            "post-cutoff stamp §5 carries the fix-forward instruction",
+            any(
+                "§5" in line and "TODO-04-acked.md" in line and "fix it forward" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        # Class-isolated (review 2026-08-28): the Fidelity occurrence on the
+        # post-cutoff stamp is a ratcheted WARN, never FATAL -- the probe
+        # above accepts either prefix and would survive a reclassification.
+        check(
+            "severity: fidelity-missing-lines-stamped stays WARN on post-cutoff §5",
+            any(
+                line.startswith("WARN")
+                and "§5" in line
+                and "TODO-04-acked.md" in line
+                and "fix it forward" in line
+                for line in vout.splitlines()
+            ),
+            True,
+        )
+        check(
+            "severity: fidelity-missing-lines-stamped never FATAL",
+            any(
+                line.startswith("FATAL") and "TODO-04-acked.md" in line and "fix it forward" in line
+                for line in vout.splitlines()
+            ),
+            False,
+        )
+        ack_todo.unlink()
+
+        # --- §37: one dependency gate -- whole-TODO edges block every -------
+        # resolver. A source TODO with one shipped and one open section, and
+        # consumers exercising file-level, unknown, empty, mixed, and
+        # all-shipped edges.
+        dep_src = root / "todo" / "90-selftest" / "TODO-05-dep-source.md"
+        dep_empty = root / "todo" / "90-selftest" / "TODO-06-dep-empty.md"
+        dep_users = root / "todo" / "90-selftest" / "TODO-07-dep-users.md"
+
+        def dep_source_text(second_status: str) -> str:
+            return f"""---
+schema_version: 1
+id: self-test-dep-source
+domain: 90-selftest
+status: active
+title: "TODO-05 -- dep source"
+track: Z1
+---
+
+# TODO-05 -- dep source
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Shipped half | - |  [x]   |
+|   2   |   §2    | Open half | §1 |  [{second_status}]   |
+
+## 1. Shipped half
+
+## 2. Open half
+"""
+
+        dep_src.write_text(dep_source_text(" "), encoding="utf-8")
+        dep_empty.write_text(
+            """---
+schema_version: 1
+id: self-test-dep-empty
+domain: 90-selftest
+status: active
+title: "TODO-06 -- dep empty"
+track: Z1
+---
+
+# TODO-06 -- dep empty
+""",
+            encoding="utf-8",
+        )
+        dep_users.write_text(
+            """---
+schema_version: 1
+id: self-test-dep-users
+domain: 90-selftest
+status: active
+title: "TODO-07 -- dep users"
+track: Z1
+depends_on: ["self-test-dep-source"]
+---
+
+# TODO-07 -- dep users
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Blocked by the whole source TODO | - |  [ ]   |
+|   2   |   §2    | Mixed: row edge plus the file edge | T05 §2 |  [ ]   |
+
+## 1. Blocked by the whole source TODO
+
+## 2. Mixed: row edge plus the file edge
+""",
+            encoding="utf-8",
+        )
+        dtodos = load_todos()
+        dkey = {(t.domain, t.number): t for t in dtodos}
+        d7 = next(t for t in dtodos if t.id == "self-test-dep-users")
+        u1 = unmet_dependencies(d7, 1, dtodos, dkey)
+        check(
+            "whole-TODO edge blocks: exit 4 from the shared gate",
+            resolve_exit_code("D90 T07 §1", dtodos),
+            4,
+        )
+        check(
+            "whole-TODO record names the first open section and count",
+            [(u.get("kind"), u.get("first_open"), u.get("open_count")) for u in u1],
+            [("todo", 2, 1)],
+        )
+        u2 = unmet_dependencies(d7, 2, dtodos, dkey)
+        check(
+            "mixed: row edge and file edge both reported",
+            sorted(u.get("kind") for u in u2),
+            ["section", "todo"],
+        )
+        # Repaired: the source's final open section flips [x]; the consumer
+        # becomes ready WITHOUT editing the consumer.
+        dep_src.write_text(dep_source_text("x"), encoding="utf-8")
+        rtodos = load_todos()
+        check(
+            "all-shipped source unblocks the consumer",
+            resolve_exit_code("D90 T07 §1", rtodos),
+            0,
+        )
+        check(
+            "mixed section becomes ready with the same flip",
+            resolve_exit_code("D90 T07 §2", rtodos),
+            0,
+        )
+        # Moved: the source's only open section leaves the tree (row stays
+        # [ ], work struck); the consumer becomes ready WITHOUT editing the
+        # consumer, or whole-TODO dependents would wait on moved work forever.
+        dep_src.write_text(
+            dep_source_text(" ").replace(
+                "## 2. Open half\n",
+                "## 2. Open half\n\n"
+                "> **Moved:** 2026-01-02 to docs/testing.md (fixture).\n",
+            ),
+            encoding="utf-8",
+        )
+        mtodos = load_todos()
+        check(
+            "a moved open section does not block the whole-TODO consumer",
+            resolve_exit_code("D90 T07 §1", mtodos),
+            0,
+        )
+        check(
+            "mixed section ready when its row edge moved out",
+            resolve_exit_code("D90 T07 §2", mtodos),
+            0,
+        )
+        # Empty and unknown sources are UNMET, never accidentally satisfied.
+        dep_users.write_text(
+            dep_users.read_text(encoding="utf-8").replace(
+                'depends_on: ["self-test-dep-source"]',
+                'depends_on: ["self-test-dep-empty"]',
+            ),
+            encoding="utf-8",
+        )
+        check(
+            "an EMPTY prerequisite TODO is unmet",
+            resolve_exit_code("D90 T07 §1", load_todos()),
+            4,
+        )
+        dep_users.write_text(
+            dep_users.read_text(encoding="utf-8").replace(
+                'depends_on: ["self-test-dep-empty"]',
+                'depends_on: ["self-test-dep-ghost"]',
+            ),
+            encoding="utf-8",
+        )
+        check(
+            "an UNKNOWN prerequisite id is unmet, not silently ready",
+            resolve_exit_code("D90 T07 §1", load_todos()),
+            4,
+        )
+        # A blank `depends_on:` scalar is NO dependency, not an unnamed one:
+        # it must neither block nor produce an empty-labeled record
+        # (round-1 finding, both lenses).
+        dep_users.write_text(
+            dep_users.read_text(encoding="utf-8").replace(
+                'depends_on: ["self-test-dep-ghost"]',
+                "depends_on:",
+            ),
+            encoding="utf-8",
+        )
+        btodos = load_todos()
+        check(
+            "a blank depends_on scalar does not block",
+            resolve_exit_code("D90 T07 §1", btodos),
+            0,
+        )
+        check(
+            "a blank depends_on scalar parses to no edges",
+            next(t for t in btodos if t.id == "self-test-dep-users").depends_on,
+            [],
+        )
+        # A row edge to a real TODO's NONEXISTENT section is unmet (exit 4)
+        # and validate rule 5b reports it FATAL -- the unknown shape most
+        # likely to survive in a hand-edited tree (round-2 integration).
+        dep_users.write_text(
+            dep_users.read_text(encoding="utf-8").replace(
+                "| Blocked by the whole source TODO | - |",
+                "| Blocked by the whole source TODO | T05 §9 |",
+            ),
+            encoding="utf-8",
+        )
+        gtodos = load_todos()
+        check(
+            "row edge to a nonexistent section is unmet",
+            resolve_exit_code("D90 T07 §1", gtodos),
+            4,
+        )
+        gbuf = _io.StringIO()
+        with _ctx.redirect_stdout(gbuf), _ctx.redirect_stderr(_io.StringIO()):
+            cmd_validate(None)
+        check(
+            "validate reports that edge FATAL",
+            any(
+                line.startswith("FATAL") and "T05 §9" in line and "does not exist" in line
+                for line in gbuf.getvalue().splitlines()
+            ),
+            True,
+        )
+        dep_src.unlink()
+        dep_empty.unlink()
+        dep_users.unlink()
+
+        ranged = parse_todo(range_todo)
+        # verified_sections and stamped_on both fan out from the SAME covered
+        # list, so a range-stamped section is stamped for the ack predicate
+        # too (round-2 integration question, answered here as a proof).
+        check("range stamp verifies the whole range", {1, 2, 3} <= ranged.verified_sections, True)
+        check("range stamp dates §1", ranged.sections[1].stamped_on, "2026-08-20")
+        check("range stamp dates §2", ranged.sections[2].stamped_on, "2026-08-20")
+        check("range stamp dates §3", ranged.sections[3].stamped_on, "2026-08-20")
+
+        # --- §39: the stamp parser refuses the line it cannot parse ---------
+        # Eighteen cases, fourteen RED and four GREEN, and the ones past the
+        # first two are the reason this block exists. A date-only repair passes
+        # "nonsense is refused" and "a good stamp is accepted" while
+        # `2026-08-29 | nonsense |` still verifies the section it sits in,
+        # which is the cheaper substitute §39's Treatment forbids; and
+        # validating the PARTS passes all of those while junk after the date, a
+        # missing delimiter, an empty evidence field and a reversed range in a
+        # list still verify. Round 2 added the two the ANCHORED grammar still
+        # let through: another script's digits, and an unbounded range.
+        # Every RED case asserts BOTH that the refusal was recorded AND that
+        # the section stayed out of verified_sections: a FATAL that still
+        # verifies the section would be a gate that reports and permits.
+        def malformed_case(name: str, stamp_body: str) -> None:
+            f = root / "todo" / "90-selftest" / f"TODO-05-malformed-{name}.md"
+            f.write_text(
+                "---\n"
+                "schema_version: 1\n"
+                f"id: self-test-malformed-{name}\n"
+                "domain: 90-selftest\n"
+                "status: active\n"
+                f'title: "TODO-05 -- malformed {name}"\n'
+                "track: Z1\n"
+                "---\n\n"
+                f"# TODO-05 -- malformed {name}\n\n"
+                "## Implementation Order\n\n"
+                "| Order | Section | Deliverable | Depends On | Status |\n"
+                "| :---: | :-----: | ----------- | ---------- | :----: |\n"
+                "|   1   |   §1    | One | - |  [x]   |\n\n"
+                "## 1. One\n\n"
+                "- [x] Commit: `\"selftest: one\"`\n\n"
+                f"> **Verified:** {stamp_body}\n",
+                encoding="utf-8",
+            )
+            parsed = parse_todo(f)
+            check(f"malformed stamp refused: {name}", len(parsed.malformed_stamps), 1)
+            # COUNT, not the set. Red-proving the coverage cap against the
+            # uncapped parser printed a three-million-element set into the
+            # failure message and 24 MB into the session that ran it: a check
+            # whose failure output is unbounded is a check nobody can run under
+            # the very condition it exists for.
+            check(f"malformed stamp verifies nothing: {name}", len(parsed.verified_sections), 0)
+            check(f"malformed stamp leaves stamped_on null: {name}", parsed.sections[1].stamped_on, None)
+            f.unlink()
+
+        malformed_case("nonsense", "nonsense")
+        malformed_case("no-coverage-field", "2026-08-29")
+        malformed_case("garbage-coverage", "2026-08-29 | nonsense | evidence")
+        malformed_case("impossible-date", "2026-99-99 | §1 | evidence")
+        malformed_case("malformed-range", "2026-08-29 | §3-§ | evidence")
+        # Round 1, both Codex lenses (High): validating the PARTS is not
+        # validating the LINE. Each of these five verified §1 under the
+        # first version of the fix.
+        malformed_case("junk-after-date", "2026-08-29 prose-before-coverage | §1 | evidence")
+        malformed_case("no-closing-delimiter", "2026-08-29 | §1")
+        malformed_case("empty-evidence", "2026-08-29 | §1 |")
+        malformed_case("reversed-range-in-a-list", "2026-08-29 | §1, §3-§2 | evidence")
+        malformed_case("section-zero", "2026-08-29 | §0 | evidence")
+        # Round 2 (both Medium, measured): `\d` is Unicode-aware, so
+        # `٢٠٢٦-٠٨-٢٩ | §١ |` verified §1 and stored a stamped_on no consumer
+        # can compare; and an ordered but enormous range materialised three
+        # million integers before anything looked at them.
+        malformed_case("unicode-digits", "٢٠٢٦-٠٨-٢٩ | §١ | evidence")
+        malformed_case("range-beyond-the-coverage-cap", "2026-08-29 | §1-§3000000 | evidence")
+        # Round 3 (Medium): the cap was per ELEMENT, so two valid ranges
+        # summed past it. `§1-§64` alone stays legal, immediately below.
+        malformed_case("ranges-summing-past-the-cap", "2026-08-29 | §1-§64, §65-§128 | evidence")
+        # The boundary itself, both sides, because round 5 found the cap and the
+        # sibling gate's clamp differed by exactly one.
+        malformed_case("one-past-the-cap", "2026-08-29 | §1-§66 | evidence")
+
+        good = root / "todo" / "90-selftest" / "TODO-05-well-formed.md"
+        good.write_text(
+            """---
+schema_version: 1
+id: self-test-well-formed
+domain: 90-selftest
+status: active
+title: "TODO-05 -- well formed"
+track: Z1
+---
+
+# TODO-05 -- well formed
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | One | - |  [x]   |
+
+## 1. One
+
+- [x] Commit: `"selftest: one"`
+
+> **Verified:** 2026-08-29 | §1 | evidence
+""",
+            encoding="utf-8",
+        )
+        ok_todo = parse_todo(good)
+        check("well-formed stamp is not refused", ok_todo.malformed_stamps, [])
+        check("well-formed stamp verifies its section", ok_todo.verified_sections, {1})
+        check("well-formed stamp dates its section", ok_todo.sections[1].stamped_on, "2026-08-29")
+        good.write_text(
+            good.read_text(encoding="utf-8").replace(
+                "> **Verified:** 2026-08-29 | §1 | evidence",
+                "> **Verified:** 2026-08-29 | §1, §3 | evidence carrying | a pipe",
+            ),
+            encoding="utf-8",
+        )
+        multi = parse_todo(good)
+        check("a comma list of sections is accepted", multi.malformed_stamps, [])
+        check("a comma list verifies every element", multi.verified_sections, {1, 3})
+        check("a pipe inside the evidence field is legal", multi.sections[1].stamped_on, "2026-08-29")
+        good.unlink()
+        check("range stamp is not refused", ranged.malformed_stamps, [])
+        # The coverage cap is a second copy of a number the sibling gate also
+        # carries, and the integration leg was right that nothing pinned them:
+        # if the gate's clamp were raised, it would let a wide-range stamp be
+        # WRITTEN while `validate` -- in the same pre-commit invocation --
+        # refused the identical bytes, leaving the operator with two tools that
+        # disagree about a stamp neither will let them fix. Reading the sibling
+        # is the same shape as the README parity check above, which is why this
+        # is a probe rather than a shared import: both are standalone stdlib
+        # scripts by design.
+        # Resolute day-1 port: the sibling stamp gate is not ported
+        # yet (see Deferred in the repo README), so the parity probe below
+        # only runs when the gate exists. When it lands, this skip goes away
+        # and the clamp comparison runs unconditionally again.
+        gate_path = REPO / "scripts" / "section_commit_gate.py"
+        if not gate_path.exists():
+            print("todo-graph self-test: SKIP sibling stamp-gate clamp probe (no section_commit_gate.py)")
+        else:
+            gate_src = gate_path.read_text(encoding="utf-8")
+            # The sibling clamps `hi = min(hi, lo + N)` before building an inclusive
+            # range (D00 T08 §1 closing wave; it was `min(end, start + N)` before).
+            gate_clamp = re.search(r"min\((?:end|hi),\s*(?:start|lo)\s*\+\s*(\d+)\)", gate_src)
+            # `+ 1`: the sibling clamps to `start + N` and then builds an INCLUSIVE
+            # range, so it admits N+1 sections. Round 5 caught the first version of
+            # this probe comparing the LITERAL and passing while the two tools
+            # disagreed by exactly one -- a parity probe that reads the wrong half
+            # of the expression is the same defect as no probe, and more expensive
+            # because it is believed.
+            check(
+                "the effective stamp-range clamp in section_commit_gate.py matches MAX_STAMP_COVERAGE",
+                int(gate_clamp.group(1)) + 1 if gate_clamp else None,
+                MAX_STAMP_COVERAGE,
+            )
+        at_cap = root / "todo" / "90-selftest" / "TODO-05-at-cap.md"
+        at_cap.write_text(
+            (root / "todo" / "90-selftest" / "TODO-03-range.md").read_text(encoding="utf-8")
+            .replace("id: self-test-range", "id: self-test-at-cap")
+            .replace("2026-08-20 | §1-§3 | range fixture", "2026-08-20 | §1-§65 | at the cap"),
+            encoding="utf-8",
+        )
+        capped = parse_todo(at_cap)
+        check("a range exactly at the coverage cap is accepted", capped.malformed_stamps, [])
+        check(
+            "a range at the cap covers every section in it",
+            len(capped.verified_sections),
+            MAX_STAMP_COVERAGE,
+        )
+        at_cap.unlink()
+
+        # The FATAL is emitted, not merely recorded on the object: rule 15 is
+        # what tells the reader WHICH line is wrong, where rule 7 would only
+        # say a visibly-stamped section has no stamp.
+        bad = root / "todo" / "90-selftest" / "TODO-05-fatal.md"
+        bad.write_text(
+            (root / "todo" / "90-selftest" / "TODO-03-range.md").read_text(encoding="utf-8")
+            .replace("id: self-test-range", "id: self-test-fatal")
+            .replace("2026-08-20 | §1-§3 | range fixture", "nonsense"),
+            encoding="utf-8",
+        )
+        import io as _mio
+        import contextlib as _mctx
+
+        mbuf = _mio.StringIO()
+        with _mctx.redirect_stdout(mbuf), _mctx.redirect_stderr(_mio.StringIO()):
+            cmd_validate(None)
+        malformed_out = mbuf.getvalue()
+        check(
+            "malformed-stamp is a FATAL class",
+            SEVERITY_MAP.get("malformed-stamp"),
+            "fatal",
+        )
+        check(
+            "validate names the offending line",
+            "refused '> **Verified:** nonsense" in malformed_out,
+            True,
+        )
+        # Round 2 (Low) narrowed the SUBSTRING to rule 7's own sentence; the
+        # Opus integration leg pointed out it had not narrowed the SCOPE.
+        # `cmd_validate` walks the whole fixture tree, so asking whether the
+        # sentence appears ANYWHERE in the buffer stays green while rule 7
+        # stops firing for this fixture, which is the exact failure the round-2
+        # comment claimed to close. Assert on the LINE: one output line naming
+        # this fixture AND carrying rule 7's sentence.
+        check(
+            "the malformed stamp also leaves the [x] row missing its stamp",
+            any(
+                "TODO-05-fatal.md" in ln and "stamp covers it" in ln
+                for ln in malformed_out.splitlines()
+            ),
+            True,
+        )
+        bad.unlink()
+        check(
+            "progress leaves duration null where no stamp recorded one",
+            by_id[0]["sections"][1].get("duration_minutes"),
+            None,
+        )
+        check(
+            "a row's done state comes from the SECTION, not the plan box",
+            by_id[0]["sections"][0]["done"],
+            True,
+        )
+        check("verified shipped row is not in_progress", by_id[0]["sections"][0].get("in_progress"), False)
+        check("shipped-unstamped row is in_progress", by_id[0]["sections"][1].get("in_progress"), True)
+        check("open uncommitted row is not in_progress", by_id[0]["sections"][2].get("in_progress") if len(by_id[0]["sections"]) > 2 else by_id[2]["sections"][0].get("in_progress"), False)
+        check("progress_text omits generated_at", "generated_at" in json.loads(progress_text(todos)), False)
+        stamped = json.loads(generated_progress_text(todos, "2026-08-25T00:00:00Z"))
+        check("generated payload carries generated_at", stamped.get("generated_at"), "2026-08-25T00:00:00Z")
+        check(
+            "plan --check ignores generated_at",
+            progress_text_for_check(json.dumps(stamped, indent=2, sort_keys=True) + "\n"),
+            progress_text(todos),
+        )
+        check("stats.in_progress matches shipped-unstamped rows", prog["stats"]["in_progress"], 1)
+        check("valid generated_at is accepted", _valid_generated_at("2026-08-25T00:00:00Z"), True)
+        check("regex-shaped invalid day is rejected", _valid_generated_at("2026-02-30T00:00:00Z"), False)
+        check("missing generated_at fails the check", progress_generated_at_ok(progress_text(todos)), False)
+        bogus = dict(stamped)
+        bogus["generated_at"] = "not-a-date"
+        check(
+            "invalid generated_at is not stripped",
+            "generated_at" in json.loads(progress_text_for_check(json.dumps(bogus))),
+            True,
+        )
+        check(
+            "phase records omit percent; PHP derives it",
+            all("percent" not in phase for phase in prog["phases"]),
+            True,
+        )
+        check("live 1-of-2 fixture is current, not the empty heading", prog["current_phase_id"], 0)
+        check("empty heading is not current", by_id[1]["current"], False)
+        check("empty heading is not expanded", by_id[1]["expanded"], False)
+        check(
+            "empty is never current even when it is first incomplete",
+            _select_current_phase_id(
+                [
+                    {"id": 0, "done": 0, "total": 0, "complete": False},
+                    {"id": 1, "done": 1, "total": 2, "complete": False},
+                ]
+            ),
+            1,
+        )
+        check(
+            "later partial outranks an earlier 0 percent phase",
+            _select_current_phase_id(
+                [
+                    {"id": 0, "done": 0, "total": 4, "complete": False},
+                    {"id": 1, "done": 2, "total": 4, "complete": False},
+                ]
+            ),
+            1,
+        )
+        check(
+            "all-complete has no current",
+            _select_current_phase_id([{"id": 0, "done": 2, "total": 2, "complete": True}]),
+            None,
+        )
+
+        # --- table alignment rewrites the plan file, so it must round-trip ---
+        aligned = _align_tables(plan.read_text(encoding="utf-8"))
+        check("alignment preserves the line count", len(aligned.splitlines()), len(SELF_TEST_PLAN.splitlines()))
+        check(
+            "alignment preserves every plan row",
+            len([l for l in aligned.splitlines() if PLAN_ROW_RE.match(l)]),
+            4,
+        )
+        check("alignment is idempotent", _align_tables(aligned), aligned)
+        check(
+            "alignment leaves non-table text alone",
+            [l for l in aligned.splitlines() if not l.strip().startswith("|")],
+            [l for l in SELF_TEST_PLAN.splitlines() if not l.strip().startswith("|")],
+        )
+
+        # --- the row regexes, which decide what is a section at all ----------
+        check("ROW_RE accepts an open row", bool(ROW_RE.match("|   2   |   §2    | Thing | - |  [ ]   |")), True)
+        check("ROW_RE accepts a shipped row", bool(ROW_RE.match("|   2   |   §2    | Thing | - |  [x]   |")), True)
+        check("ROW_RE accepts an in-flight row", bool(ROW_RE.match("|   2   |   §2    | Thing | - |  [/]   |")), True)
+        check("ROW_RE rejects a missing box", bool(ROW_RE.match("|   2   |   §2    | Thing | - |     |")), False)
+        check("ROW_RE rejects the header", bool(ROW_RE.match("| Order | Section | Deliverable | Depends On | Status |")), False)
+        check("PLAN_ROW_RE needs the backticked ref", bool(PLAN_ROW_RE.match("| [ ] | D90 T01 §1 | x | 1 |")), False)
+        check("PLAN_ROW_RE accepts a real row", bool(PLAN_ROW_RE.match("| [ ] | `D90 T01 §1` | x | 1 |")), True)
+        check(
+            "PHASE_HEADING_RE accepts an em dash",
+            bool(PHASE_HEADING_RE.match("### Phase 3 — Something")),
+            True,
+        )
+        check(
+            "PHASE_HEADING_RE accepts a double hyphen",
+            bool(PHASE_HEADING_RE.match("### Phase 3 -- Something")),
+            True,
+        )
+
+        # --- D00 T01 §21: the severity map, one fixture per class ------------
+        # Two isolated domains so the deliberately-missing-INDEX case cannot
+        # contaminate the classes that need a clean home. Co-emission note:
+        # the empty §3 emits BOTH no-checklist-items and no-commit-item; the
+        # probe covers the set.
+        (root / "todo" / "91-severity").mkdir(parents=True)
+        (root / "todo" / "91-severity" / "INDEX.md").write_text(
+            "# 91-severity\n\n- [TODO-05](TODO-05-severity.md)\n- [TODO-06](TODO-06-super.md)\n",
+            encoding="utf-8",
+        )
+        (root / "todo" / "91-severity" / "TODO-05-severity.md").write_text(
+            """---
+schema_version: 1
+id: self-test-severity
+domain: 91-severity
+status: active
+title: "TODO-05 -- severity fixtures"
+track: Z1
+---
+
+# TODO-05 -- severity fixtures
+
+See todo/91-severity/TODO-06-super.md for the superseded case.
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | No commit item | - |  [ ]   |
+|   2   |   §2    | Orphaned in shipped | - |  [x]   |
+|   3   |   §3    | Empty | - |  [ ]   |
+|   4   |   §4    | Oversized | - |  [ ]   |
+|   5   |   §5    | Deferral and resolution | - |  [ ]   |
+
+## 1. No commit item
+
+- [ ] Do the thing
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 2. Orphaned in shipped
+
+- [x] Did it
+- [ ] Never finished this one
+- [x] Commit: `"selftest: orphaned"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §2 | fixture
+
+## 3. Empty
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 4. Oversized
+
+"""
+            + "\n".join(f"- [ ] Item {i}" for i in range(1, 31))
+            + """
+- [ ] Commit: `"selftest: oversized"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 5. Deferral and resolution
+
+- [ ] Do it
+- [ ] Commit: `"selftest: deferral"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Deferred:** an ownerless deferral with no owner reference at all
+> **Resolved:** 2026-01-02 | early closure -> XREF: §1 (item: "Do the thing") | closed by `abc1234`
+
+Depends on T06 without a section: the bare-todo-ref shape.
+""",
+            encoding="utf-8",
+        )
+        (root / "todo" / "91-severity" / "TODO-06-super.md").write_text(
+            """---
+schema_version: 1
+id: self-test-super
+domain: 91-severity
+status: superseded
+title: "TODO-06 -- superseded without successor"
+track: Z1
+---
+
+# TODO-06 -- superseded without successor
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Placeholder | - |  [ ]   |
+
+## 1. Placeholder
+
+- [ ] Thing (frozen marker below makes the check-not-frozen case)
+- [ ] Commit: `"selftest: super"`
+
+**Freeze check:** fixture golden outputs.
+
+**Test checkpoint:** run tests/AlphaTest.php.
+""",
+            encoding="utf-8",
+        )
+        # An unindexed file in the ORIGINAL domain (which has no INDEX.md at
+        # all -- absent INDEX means every file there flags, which the earlier
+        # fixtures would drown in). Instead: a third domain with an INDEX
+        # that omits its one file.
+        (root / "todo" / "92-unindexed").mkdir(parents=True)
+        (root / "todo" / "92-unindexed" / "INDEX.md").write_text(
+            "# 92-unindexed\n\n(nothing listed)\n", encoding="utf-8"
+        )
+        (root / "todo" / "92-unindexed" / "TODO-07-orphan.md").write_text(
+            """---
+schema_version: 1
+id: self-test-unindexed
+domain: 92-unindexed
+status: active
+title: "TODO-07 -- not in INDEX"
+track: Z1
+---
+
+# TODO-07 -- not in INDEX
+
+Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Placeholder | - |  [ ]   |
+
+## 1. Placeholder
+
+- [ ] Thing
+- [ ] Commit: `"selftest: unindexed"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+""",
+            encoding="utf-8",
+        )
+
+        sev_buf = _io.StringIO()
+        with _ctx.redirect_stdout(sev_buf), _ctx.redirect_stderr(sev_buf):
+            sev_rc = cmd_validate(None)
+        sev_out = sev_buf.getvalue()
+
+        def sev_line(prefix: str, needle: str) -> bool:
+            return any(
+                line.startswith(prefix) and needle in line for line in sev_out.splitlines()
+            )
+
+        check("severity: superseded-no-successor is FATAL", sev_line("FATAL", "superseded_by is unset"), True)
+        check("severity: no-commit-item is FATAL", sev_line("FATAL", "§1 has no '- [ ] Commit:'"), True)
+        check("severity: orphaned-in-shipped is FATAL", sev_line("FATAL", "orphaned work in a shipped section"), True)
+        check("severity: no-checklist-items is FATAL (co-emits no-commit)", sev_line("FATAL", "§3 has no checklist items"), True)
+        check("severity: over-30 stays WARN", sev_line("WARN", "31 checklist items"), True)
+        check("severity: over-30 never FATAL", sev_line("FATAL", "31 checklist items"), False)
+        check("severity: check-not-frozen is FATAL", sev_line("FATAL", "has a Freeze check but frontmatter"), True)
+        check("severity: one-sided XREF is FATAL", sev_line("FATAL", "is one-sided"), True)
+        check("severity: deferral-no-owner is FATAL", sev_line("FATAL", "deferral names no owner"), True)
+        check("severity: resolved-early stays WARN", sev_line("WARN", "has not shipped it yet"), True)
+        check("severity: missing-from-INDEX is FATAL", sev_line("FATAL", "not listed in todo/92-unindexed/INDEX.md"), True)
+        check("severity: bare-todo-ref stays WARN", sev_line("WARN", "bare TODO reference without a section -- line"), True)
+        check("severity: bare-todo-ref never FATAL", sev_line("FATAL", "bare TODO reference without a section"), False)
+        check("severity: validate exits 1 on the fixture set", sev_rc, 1)
+        # The ratchet layer: a WARN absent from the baseline is marked NEW.
+        check("severity: a new WARN carries the ratchet marker", "WARN*" in sev_out, True)
+
+        # frozen-no-freeze-check needs frozen: true with NO check anywhere --
+        # its own file, since TODO-06 carries the inverse case.
+        (root / "todo" / "91-severity" / "TODO-08-frozen.md").write_text(
+            """---
+schema_version: 1
+id: self-test-frozen
+domain: 91-severity
+status: active
+title: "TODO-08 -- frozen without check"
+frozen: true
+track: Z1
+---
+
+# TODO-08 -- frozen without check
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Placeholder | - |  [ ]   |
+
+## 1. Placeholder
+
+- [ ] Thing
+- [ ] Commit: `"selftest: frozen"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+""",
+            encoding="utf-8",
+        )
+        (root / "todo" / "91-severity" / "INDEX.md").write_text(
+            "# 91-severity\n\n- [TODO-05](TODO-05-severity.md)\n- [TODO-06](TODO-06-super.md)\n- [TODO-08](TODO-08-frozen.md)\n",
+            encoding="utf-8",
+        )
+        sev_buf2 = _io.StringIO()
+        with _ctx.redirect_stdout(sev_buf2), _ctx.redirect_stderr(sev_buf2):
+            cmd_validate(None)
+        check(
+            "severity: frozen-no-freeze-check is FATAL",
+            any(
+                line.startswith("FATAL") and "frozen: true but no section carries" in line
+                for line in sev_buf2.getvalue().splitlines()
+            ),
+            True,
+        )
+
+        # --- the ratchet's two directions on a WARN-only fixture tree --------
+        # Remove the FATAL-carrying fixtures so only warn classes remain
+        # (over-30 is the clean single-warn shape; resolved-early and
+        # bare-todo-ref stay in TODO-05 beside their fatal siblings),
+        # then prove: NEW warn = exit 1 with the WARN* marker; the SAME warn
+        # baselined = exit 0. WARNING_BASELINE is rebound like TODO_DIR --
+        # the live baseline must never absorb fixture keys.
+        for f in ("TODO-05-severity.md", "TODO-06-super.md", "TODO-08-frozen.md"):
+            (root / "todo" / "91-severity" / f).unlink()
+        (root / "todo" / "91-severity" / "INDEX.md").write_text(
+            "# 91-severity\n\n- [TODO-09](TODO-09-warn-only.md)\n", encoding="utf-8"
+        )
+        (root / "todo" / "92-unindexed" / "TODO-07-orphan.md").unlink()
+        (root / "todo" / "91-severity" / "TODO-09-warn-only.md").write_text(
+            """---
+schema_version: 1
+id: self-test-warn-only
+domain: 91-severity
+status: active
+title: "TODO-09 -- a single ratcheted warning"
+track: Z1
+---
+
+# TODO-09 -- a single ratcheted warning
+
+An oversized section: the clean single-WARN shape (over-30-items).
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Placeholder | - |  [ ]   |
+
+## 1. Placeholder
+
+"""
+            + "\n".join(f"- [ ] Item {i}" for i in range(1, 32))
+            + """
+- [ ] Commit: `"selftest: warn only"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+""",
+            encoding="utf-8",
+        )
+        # The earlier phases' fixtures carry FATALs (open Fidelity gaps, a
+        # deliberately missing 90-selftest INDEX); a ratchet exit-code proof
+        # needs a genuinely warn-only tree, so clear them.
+        import shutil as _sh
+
+        _sh.rmtree(root / "todo" / "90-selftest")
+        global WARNING_BASELINE  # noqa: PLW0603 -- rebinding is the point
+        saved_baseline = WARNING_BASELINE
+        WARNING_BASELINE = root / "warning-baseline"
+        # An EMPTY baseline file, mirroring the live zero-entry one: absent
+        # file = ratchet unarmed, which is not the live contract.
+        WARNING_BASELINE.write_text("# empty fixture baseline\n", encoding="utf-8")
+        try:
+            new_buf = _io.StringIO()
+            with _ctx.redirect_stdout(new_buf), _ctx.redirect_stderr(new_buf):
+                new_rc = cmd_validate(None)
+            check("ratchet: a NEW warn-only tree exits 1", new_rc, 1)
+            check("ratchet: the new warning is marked WARN*", "WARN*" in new_buf.getvalue(), True)
+
+            class _AcceptArgs:
+                accept = True
+                acked = False
+
+            with _ctx.redirect_stdout(_io.StringIO()), _ctx.redirect_stderr(_io.StringIO()):
+                cmd_warnings(_AcceptArgs())
+            base_buf = _io.StringIO()
+            with _ctx.redirect_stdout(base_buf), _ctx.redirect_stderr(base_buf):
+                base_rc = cmd_validate(None)
+            check("ratchet: the SAME warning baselined exits 0", base_rc, 0)
+            check("ratchet: baselined output carries plain WARN, not WARN*", "WARN*" in base_buf.getvalue(), False)
+        finally:
+            WARNING_BASELINE = saved_baseline
+
+        # --- the Moved marker (writers-and-reviewers §2) ---------------------
+        # A section worked outside the tree keeps its row and its edges and is
+        # excluded from ready, from plan/--sync, and from the progress totals;
+        # validate is clean with the marker and FATAL when it names no file.
+        global PROGRESS_JSON, OPERATOR_JSON  # noqa: PLW0603 -- the sync writes them
+        saved_json = (PROGRESS_JSON, OPERATOR_JSON)
+        (root / "docs" / "plans").mkdir(parents=True, exist_ok=True)
+        moved_file = root / "docs" / "plans" / "fixture-plan.md"
+        moved_file.write_text("# fixture plan\n", encoding="utf-8")
+        (root / "todo" / "93-moved").mkdir(parents=True, exist_ok=True)
+        (root / "todo" / "93-moved" / "INDEX.md").write_text(
+            "# 93-moved\n\n- [TODO-05](TODO-05-moved.md)\n", encoding="utf-8"
+        )
+        (root / "todo" / "93-moved" / "TODO-05-moved.md").write_text(
+            SELF_TEST_TODO_MOVED, encoding="utf-8"
+        )
+        plan_m = root / "todo" / "plan-moved.md"
+        plan_m.write_text(SELF_TEST_PLAN_MOVED, encoding="utf-8")
+        try:
+            PLAN = plan_m
+            PROGRESS_JSON = root / "build" / "progress.json"
+            OPERATOR_JSON = root / "build" / "operator.json"
+            todos_m = load_todos()
+            tm = next((t for t in todos_m if t.number == "05"), None)
+            check("moved fixture parsed", tm is not None, True)
+            if tm is None:
+                raise RuntimeError("moved fixture did not parse")
+            check("Moved: marker parsed onto its section", tm.sections[1].moved.startswith("2026-09-05 to docs/plans/fixture-plan.md"), True)
+            check("moved_target reads the path out of the body", moved_target(tm.sections[1].moved), "docs/plans/fixture-plan.md")
+            check("moved_target: no path is empty", moved_target("2026-09-05 somewhere else"), "")
+            check("the neighbour carries no marker", tm.sections[2].moved, "")
+            check("the moved section keeps its row", tm.sections[1].has_row, True)
+            check("exit 5 -- moved", resolve_exit_code("D93 T05 §1", todos_m), 5)
+            check("a dependency on a moved section is met", resolve_exit_code("D93 T05 §2", todos_m), 0)
+            check("plan state omits the moved section", "D93 T05 §1" in _plan_state(todos_m), False)
+            check("plan state keeps the neighbour", _plan_state(todos_m).get("D93 T05 §2"), " ")
+            check("_moved_by_ref names it", _moved_by_ref(todos_m).get("D93 T05 §1", "").startswith("2026-09-05"), True)
+            qbuf = _io.StringIO()
+            with _ctx.redirect_stdout(qbuf), _ctx.redirect_stderr(_io.StringIO()):
+                cmd_query(argparse.Namespace(what="ready", all=False))
+            qout = qbuf.getvalue()
+            check("query ready excludes the moved section", "§1  Moved thing" in qout, False)
+            check("query ready lists its dependent as ready", "§2  Depends on the moved thing" in qout, True)
+            qbuf = _io.StringIO()
+            with _ctx.redirect_stdout(qbuf), _ctx.redirect_stderr(_io.StringIO()):
+                cmd_query(argparse.Namespace(what="blocked", all=False))
+            check("query blocked excludes the moved section", "Moved thing" in qbuf.getvalue(), False)
+            sbuf = _io.StringIO()
+            with _ctx.redirect_stdout(sbuf), _ctx.redirect_stderr(_io.StringIO()):
+                cmd_query(argparse.Namespace(what="stats", all=False))
+            check("query stats counts the moved section on its own line", "  moved          1" in sbuf.getvalue(), True)
+            fbuf = _io.StringIO()
+            with _ctx.redirect_stdout(fbuf), _ctx.redirect_stderr(_io.StringIO()):
+                cmd_query(argparse.Namespace(what="findings", all=True))
+            check("query findings skips a struck item even when it carries a finding verb", "by a fixture" in fbuf.getvalue(), False)
+            # plan: --check refuses the row, --sync replaces it with one Moved line, idempotently.
+            with _ctx.redirect_stdout(_io.StringIO()), _ctx.redirect_stderr(_io.StringIO()):
+                rc_before = cmd_plan(argparse.Namespace(check=True))
+                rc_sync = cmd_plan(argparse.Namespace(check=False))
+            check("plan --check refuses a row for a moved section", rc_before, 1)
+            check("plan --sync succeeds with a moved row", rc_sync, 0)
+            synced = plan_m.read_text(encoding="utf-8")
+            moved_lines = [l for l in synced.splitlines() if PLAN_MOVED_RE.match(l)]
+            check("sync removed the moved row", "`D93 T05 §1`" in "\n".join(l for l in synced.splitlines() if PLAN_ROW_RE.match(l)), False)
+            check("sync kept the neighbour row", "| [ ] | `D93 T05 §2` |" in synced, True)
+            check("sync wrote exactly one Moved line", len(moved_lines), 1)
+            check("the Moved line names the section and the file", moved_lines[0].startswith("> **Moved:** `D93 T05 §1` -- 2026-09-05 to docs/plans/fixture-plan.md") if moved_lines else False, True)
+            synced_lines = synced.splitlines()
+            at = next((i for i, l in enumerate(synced_lines) if PLAN_MOVED_RE.match(l)), -1)
+            check(
+                "the Moved line sits after the table, blank-line separated",
+                at > 1 and synced_lines[at - 1] == "" and synced_lines[at - 2].startswith("|") and synced_lines[at + 1] == "",
+                True,
+            )
+            check("sync's progress summary counts one row", "**0 of 2 sections complete (0%).**" in synced, True)
+            with _ctx.redirect_stdout(_io.StringIO()), _ctx.redirect_stderr(_io.StringIO()):
+                rc_after = cmd_plan(argparse.Namespace(check=True))
+                cmd_plan(argparse.Namespace(check=False))
+            check("plan --check is clean after the sync", rc_after, 0)
+            check("a second sync changes nothing", plan_m.read_text(encoding="utf-8"), synced)
+            prog = build_progress(todos_m)
+            check("progress: the phase counts only the neighbour", (prog["phases"][0]["total"], prog["phases"][0]["done"]), (1, 0))
+            check("progress: the moved section is not a phase row", any(r["ref"] == "D93 T05 §1" for ph in prog["phases"] for r in ph["sections"]), False)
+            check("progress: stats count the moved section on its own key, not as open", (prog["stats"]["moved"], prog["stats"]["open"] + prog["stats"]["in_progress"] + prog["stats"]["done"] + prog["stats"]["moved"] == prog["stats"]["sections"]), (1, True))
+            # a stale Moved line (its section no longer moved) is dropped by --sync
+            plan_m.write_text(synced.replace("`D93 T05 §1`", "`D93 T05 §2`"), encoding="utf-8")
+            with _ctx.redirect_stdout(_io.StringIO()), _ctx.redirect_stderr(_io.StringIO()):
+                rc_stale = cmd_plan(argparse.Namespace(check=True))
+                cmd_plan(argparse.Namespace(check=False))
+            check("plan --check refuses a Moved line for an unmoved section", rc_stale, 1)
+            check("plan --sync drops the stale Moved line", "> **Moved:** `D93 T05 §2`" in plan_m.read_text(encoding="utf-8"), False)
+            # validate: clean with the marker, FATAL when the file it names is gone
+            vbuf = _io.StringIO()
+            with _ctx.redirect_stdout(vbuf), _ctx.redirect_stderr(_io.StringIO()):
+                cmd_validate(None)
+            check("validate: a Moved marker naming an existing file is not flagged", "moved-target-missing" in vbuf.getvalue() or "carries a Moved: marker" in vbuf.getvalue(), False)
+            moved_file.unlink()
+            vbuf = _io.StringIO()
+            with _ctx.redirect_stdout(vbuf), _ctx.redirect_stderr(_io.StringIO()):
+                cmd_validate(None)
+            check(
+                "validate: a Moved marker naming a missing file is FATAL",
+                any(l.startswith("FATAL") and "TODO-05-moved.md" in l and "carries a Moved: marker" in l for l in vbuf.getvalue().splitlines()),
+                True,
+            )
+        finally:
+            PLAN = plan
+            PROGRESS_JSON, OPERATOR_JSON = saved_json
+            _sh.rmtree(root / "todo" / "93-moved")
+            plan_m.unlink()
+
+        # --- README parity: the table IS the map, mechanically ---------------
+        readme = (REPO / "todo" / "README.md").read_text(encoding="utf-8")
+        table_rows = re.findall(
+            r"^\|\s*`([a-z0-9-]+)`\s*\|\s*(FATAL|WARN)\s*\|", readme, re.M
+        )
+        # Row-for-row (review 2026-08-28): an ORDERED comparison, so a
+        # duplicate or reordered README row cannot hide behind a dict.
+        check(
+            "README severity table matches SEVERITY_MAP row-for-row, in order",
+            [(cls, sev.lower()) for cls, sev in table_rows],
+            [(cls, sev) for cls, sev in SEVERITY_MAP.items()],
+        )
+        check(
+            "README severity table has no duplicate class rows",
+            len({cls for cls, _ in table_rows}),
+            len(table_rows),
+        )
+        check(
+            "README's deliberately-left-open note is retired",
+            "deliberately left open" in readme,
+            False,
+        )
+
+    finally:
+        TODO_DIR, PLAN = saved_todo_dir, saved_plan
+        tmp.cleanup()
+
+    failed = [(n, got, want) for n, got, want in cases if got != want]
+    for name, got, want in failed:
+        print(f"todo-graph self-test: FAIL {name}: got {got!r}, want {want!r}", file=sys.stderr)
+    print(f"todo-graph self-test: {len(cases)} cases, {len(failed)} failed")
+    return 1 if failed else 0
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(prog="todo-graph", description=__doc__.split("\n")[0])
+    sub = p.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("build", help="parse todo/ into build/todo-cache.json").set_defaults(fn=cmd_build)
+    sub.add_parser("validate", help="structural and graph integrity checks").set_defaults(fn=cmd_validate)
+    wa = sub.add_parser("warnings", help="show or re-accept the warning baseline")
+    # Mutually exclusive: --accept writes the baseline (the one durable side
+    # effect here) and --acked only reads; passing both must be an argparse
+    # error, not a silent no-op of the write (round-2 integration finding).
+    wa_mode = wa.add_mutually_exclusive_group()
+    wa_mode.add_argument("--accept", action="store_true", help="accept the current set as the baseline")
+    wa_mode.add_argument(
+        "--acked",
+        action="store_true",
+        help="list acknowledged warnings (stamped pre-convention debt register, D00 T01 §38)",
+    )
+    wa.set_defaults(fn=cmd_warnings)
+    sub.add_parser(
+        "self-test",
+        help="prove this script's own contract against fixtures (fast; run it after editing this file)",
+    ).set_defaults(fn=cmd_self_test)
+    q = sub.add_parser("query", help="ask the graph a question")
+    q.add_argument(
+        "what",
+        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency"],
+    )
+    q.add_argument("--all", action="store_true", help="findings: include ones already done")
+    q.add_argument("--file", help="adjacency: exact repository-relative TODO path")
+    q.add_argument("--at", help="adjacency: inspect an isolated historical commit")
+    q.add_argument("--json", action="store_true", help="adjacency: machine-readable report")
+    q.add_argument("--require-owned", action="store_true", help="adjacency: refuse incomplete file ownership at closeout")
+    q.add_argument("--require-conformance", action="store_true", help="adjacency: require non-vacuous tree-wide kind coverage")
+    q.set_defaults(fn=cmd_query)
+    sub.add_parser("render", help="mermaid dependency graph on stdout").set_defaults(fn=cmd_render)
+    rs = sub.add_parser("resolve", help="turn any section reference into its file and number")
+    rs.add_argument("ref", nargs="+", help="'D00 T01 §11', a pasted plan row, or '<path> §N'")
+    rs.set_defaults(fn=cmd_resolve)
+    cl = sub.add_parser(
+        "classify",
+        help="resolve many refs in one graph load; JSON {ref: exit_code}",
+    )
+    cl.add_argument("refs", nargs="*", help="D00 T01 §11 and friends")
+    cl.set_defaults(fn=cmd_classify)
+    nd = sub.add_parser(
+        "needs",
+        help="the **Needs:** host keys of many refs in one graph load; JSON {ref: [keys]}",
+    )
+    nd.add_argument("refs", nargs="*", help="D02 T01 §3 and friends")
+    nd.set_defaults(fn=cmd_needs)
+    pl = sub.add_parser("plan", help="sync implementation-plan.md's checkboxes from the graph")
+    mode = pl.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--check",
+        action="store_true",
+        help="report staleness and exit 1 instead of rewriting the file (what CI runs)",
+    )
+    # Accepted and ignored: syncing is the default, but the plan's own
+    # instructions say `--sync`, and a documented command that errors is worse
+    # than a redundant flag.
+    mode.add_argument("--sync", action="store_true", help="rewrite the boxes (the default)")
+    pl.set_defaults(fn=cmd_plan)
+    pr = sub.add_parser("progress", help="emit rebuild-progress JSON for the progress dashboard")
+    pr.add_argument("--json", action="store_true", help="JSON on stdout (the only format)")
+    pr.add_argument(
+        "--write",
+        action="store_true",
+        help="also write platform/resources/rebuild-progress.json",
+    )
+    pr.set_defaults(fn=cmd_progress)
+    args = p.parse_args()
+    if args.cmd == "query" and args.what != "adjacency" and any(getattr(args, key, None) for key in ("file", "at", "json", "require_owned", "require_conformance")):
+        p.error("--file/--at/--json/--require-owned/--require-conformance apply only to query adjacency")
+    return args.fn(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
