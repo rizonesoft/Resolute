@@ -67,10 +67,17 @@ CATEGORIES = {
 DISPOSITIONS = {"fixed", "filed", "refuted", "advisory", "routed", "cleared"}
 
 
-class Finding:
-    __slots__ = ("ref", "path", "line", "number", "summary", "category", "disposition")
+# `FILED to \`D07 T01 §2\`` -- the section a finding was handed to. D00 T04 §4
+# reads these as coupling the dependency graph does not carry.
+FILED_TO_RE = re.compile(r"\bFILED\s+to\s+`?(D\d{2}\s+T\d{2}\s+§\d+)`?", re.IGNORECASE)
 
-    def __init__(self, ref, path, line, number, summary, category, disposition):
+
+class Finding:
+    __slots__ = ("ref", "path", "line", "number", "summary", "category", "disposition",
+                 "filed_to")
+
+    def __init__(self, ref, path, line, number, summary, category, disposition,
+                 filed_to=None):
         self.ref = ref
         self.path = path
         self.line = line
@@ -78,6 +85,7 @@ class Finding:
         self.summary = summary
         self.category = category
         self.disposition = disposition
+        self.filed_to = filed_to
 
 
 def _ref_for(name: str) -> str | None:
@@ -124,7 +132,9 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
         if disp is None:
             bad.append((path, lineno, f"unreadable disposition {disposition!r}; expected one of {sorted(DISPOSITIONS)}"))
             continue
-        findings.append(Finding(ref, path, lineno, number, summary, cat, disp))
+        target = FILED_TO_RE.search(disposition)
+        findings.append(Finding(ref, path, lineno, number, summary, cat, disp,
+                                target.group(1) if target else None))
     return findings, bad
 
 

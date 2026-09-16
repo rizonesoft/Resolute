@@ -5,6 +5,18 @@ description: Harden the todo tree for a weaker executor -- sequence check, drift
 
 # Groom Plan
 
+## Evidence before reordering
+
+```bash
+python scripts/todo-graph.py query sequence
+```
+
+It prints the longest dependency chain, which is where delay costs most, and every coupling the review findings recorded: a section that filed a finding to another section ran into work that section owns, which the dependency graph does not carry.
+
+Read what it says about direction before acting on it. **A filing is not proof the order is wrong.** Most filings are work discovered early rather than work needed first, and nothing in the data separates those. `D00 T04 §4` records the case in this plan where acting on the signal would have inverted a correct order.
+
+The command proposes and cannot act: it opens no file for writing. Reordering happens here, by hand, with the addresses and cross-references kept consistent as below.
+
 Hardening the tree so a weaker executor can run it. Grooming adds prerequisites and fills gaps; it never moves a row out of its phase, never ticks a box, and never starts a campaign.
 
 ## Workflow

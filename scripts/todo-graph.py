@@ -985,6 +985,44 @@ def cmd_query(args) -> int:
     by_id, by_key, done = _section_state(todos)
     what = args.what
 
+    if what == "sequence":
+        edges, titles = _section_edges(todos)
+        chain = _longest_chain(edges)
+        # `done` from _section_state is keyed by TODO id, not by the canonical
+        # DNN TNN §N reference this report uses, so it cannot be looked up here.
+        shipped = {
+            f"D{t.domain.split('-')[0]} T{t.number} §{num}"
+            for t in todos for num, sec in t.sections.items() if sec.status == "x"
+        }
+        print(f"sequence: longest dependency chain is {len(chain)} section(s) deep\n")
+        for i, ref in enumerate(reversed(chain)):
+            mark = "x" if ref in shipped else " "
+            print(f"  {i + 1:>2}. [{mark}] {ref:14} {titles.get(ref, '')[:52]}")
+        print("\n  Every section above waits on the one before it. Delay here costs")
+        print("  more than delay anywhere else, because nothing on this chain can")
+        print("  start early.")
+
+        couplings = _filing_couplings()
+        print(f"\n  coupling candidates from review findings: {len(couplings)}")
+        if not couplings:
+            print("    None. No review has filed a finding to another section, so there")
+            print("    is no evidence here either way.")
+        else:
+            for src, dst, summary in couplings:
+                in_deps = dst in edges.get(src, [])
+                note = "already a dependency" if in_deps else "NOT a dependency"
+                print(f"    {src} -> {dst}  ({note})")
+                print(f"      {summary[:66]}")
+            print("\n    A filing means one section ran into work another one owns. That")
+            print("    is coupling the dependency graph does not carry. It is NOT proof")
+            print("    the order is wrong: most filings are work found early, not work")
+            print("    needed first.")
+
+        print("\n  This command proposes and cannot act. It opens no file for writing.")
+        print("  Take a change through the `groom-plan` skill, which is where section")
+        print("  addresses, cross-references and the plan projection are kept consistent.")
+        return 0
+
     if what == "calibration":
         try:
             rows = _calibration_rows(todos)
@@ -1743,6 +1781,89 @@ def _calibration_rows(todos: list[Todo]) -> list[dict]:
                 "rework": _needed_rework(subjects),
             })
     return rows
+
+
+def _section_edges(todos: list[Todo]) -> tuple[dict[str, list[str]], dict[str, str]]:
+    """ref -> the refs it depends on, plus ref -> its title.
+
+    A dependency is written `§N` inside its own file and `DNN TNN §N` across
+    files; both normalise to the canonical form here so the chain can be walked.
+    """
+    edges: dict[str, list[str]] = {}
+    titles: dict[str, str] = {}
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        own = f"D{dom} T{t.number}"
+        for num, sec in t.sections.items():
+            ref = f"{own} \u00a7{num}"
+            titles[ref] = sec.title or sec.deliverable or ""
+            deps = []
+            for raw in sec.depends_on:
+                d = re.sub(r"\s+", " ", raw.strip())
+                if d.startswith("\u00a7"):
+                    d = f"{own} {d}"
+                deps.append(d)
+            edges[ref] = deps
+    return edges, titles
+
+
+def _longest_chain(edges: dict[str, list[str]]) -> list[str]:
+    """The longest dependency chain in the graph, deepest-first order.
+
+    Memoised depth-first. A cycle would otherwise recurse forever, so a node
+    already on the current path is treated as terminating that branch: the graph
+    should be acyclic and `validate` enforces it, but a tool that hangs on bad
+    input is worse than one that reports a short chain.
+    """
+    best: dict[str, list[str]] = {}
+
+    def walk(node: str, on_path: frozenset) -> list[str]:
+        if node in best:
+            return best[node]
+        if node in on_path or node not in edges:
+            return [node]
+        longest: list[str] = []
+        for dep in edges[node]:
+            cand = walk(dep, on_path | {node})
+            if len(cand) > len(longest):
+                longest = cand
+        result = [node] + longest
+        best[node] = result
+        return result
+
+    overall: list[str] = []
+    for node in edges:
+        chain = walk(node, frozenset())
+        if len(chain) > len(overall):
+            overall = chain
+    return overall
+
+
+def _filing_couplings() -> list[tuple[str, str, str]]:
+    """(from_ref, to_ref, summary) for every review finding filed to another section.
+
+    This is the evidence D00 T04 §4 uses. A filing records that one section ran
+    into work another one owns, which is a coupling the dependency graph does not
+    carry. Derived from the ledger D00 T04 §2 generates, never from a new record.
+    """
+    mod = REPO / "scripts" / "todo-findings.py"
+    if not mod.is_file():
+        return []
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("todo_findings", mod)
+    if spec is None or spec.loader is None:
+        return []
+    tf = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(tf)
+        findings, _bad = tf.collect()
+    except Exception:
+        return []
+    out = []
+    for f in findings:
+        if getattr(f, "filed_to", None):
+            out.append((f.ref, f.filed_to, f.summary))
+    return out
 
 
 def _plan_state(todos: list[Todo]) -> dict[str, str]:
@@ -3724,6 +3845,20 @@ track: Z1
                               "review: stamp (D00 T01 §1)"]), True)
         check("rework: unstamped says unknown rather than guessing",
               _needed_rework(["intake: x (D00 T01 §1)"]), None)
+
+        # --- sequence (D00 T04 §4) -------------------------------------------
+        _chain = _longest_chain({"a": ["b"], "b": ["c"], "c": [], "z": []})
+        check("longest chain walks the whole dependency run", _chain, ["a", "b", "c"])
+        check("longest chain ignores a shorter branch",
+              _longest_chain({"a": ["b"], "b": [], "x": ["y"], "y": ["z"], "z": []}),
+              ["x", "y", "z"])
+        # A cycle should be impossible (validate forbids it) but a tool that
+        # hangs on bad input is worse than one that reports a short chain.
+        _cyc = _longest_chain({"a": ["b"], "b": ["a"]})
+        check("longest chain terminates on a cycle", len(_cyc) <= 3, True)
+        # Normalisation of a bare `§N` into a full reference is proven by the
+        # driven run in this section's checkpoint, against the real tree. The
+        # self-test loads fixture TODOs, where those references do not exist.
         check("items sync writes the new count", _new.rstrip().endswith("11  |"), True)
         check("items sync leaves the ref untouched", "`D90 T01 §1`" in _new, True)
         check("items sync keeps the cell width", len(_new), len(_row))
@@ -4207,7 +4342,7 @@ def main() -> int:
     q = sub.add_parser("query", help="ask the graph a question")
     q.add_argument(
         "what",
-        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency", "calibration"],
+        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency", "calibration", "sequence"],
     )
     q.add_argument("--all", action="store_true", help="findings: include ones already done")
     q.add_argument("--file", help="adjacency: exact repository-relative TODO path")

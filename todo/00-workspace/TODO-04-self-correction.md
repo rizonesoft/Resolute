@@ -29,6 +29,9 @@ track: W1
 <!-- claim: count "def _ignored" scripts/todo-claims.py = 1 -->
 <!-- claim: count "def _calibration_rows" scripts/todo-graph.py = 1 -->
 <!-- claim: count "CALIBRATION_MIN_SAMPLE = 30" scripts/todo-graph.py = 1 -->
+<!-- claim: count "def _longest_chain" scripts/todo-graph.py = 1 -->
+<!-- claim: count "def _filing_couplings" scripts/todo-graph.py = 1 -->
+<!-- claim: count "FILED_TO_RE" scripts/todo-findings.py = 2 -->
 
 ## Inputs
 
@@ -203,15 +206,41 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 
 ## 4. Re-Sequencing on Evidence
 
+> **Started:** 2026-09-16T23:43:46Z
+
 `query ready` answers what is dependency-safe. It does not answer what is **wise**, and the plan's order otherwise reflects the order things were written in.
 
-- [ ] Report the critical path: the longest dependency chain to a shippable product. Done when: it prints, and the sections on it are identified as the ones whose delay costs most.
-- [ ] Surface a dependency that evidence contradicts. Done when: a section repeatedly blocked, or one whose review findings show it needed something not in its dependencies, is reported as a candidate for re-sequencing.
-- [ ] Keep re-sequencing a decision, never automatic. Done when: the tool proposes and a human disposes, and this section records why: a dependency exists for a reason the graph cannot see, and an automatic reorder would discard that reason silently.
-- [ ] Route a proposed change through `groom-plan`. Done when: re-sequencing happens through the existing skill rather than a second mechanism.
-- [ ] Commit: `"self-correction: propose a better order, and let a human take it"`
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Two corrections and one confirmation.**
+>
+> **"A section repeatedly blocked" is not derivable, because nothing records blocking over time.** `query blocked` is a snapshot: it reports 108 sections blocked right now and has no memory of what was blocked yesterday. No file in `scripts/` tracks a block count or a blocked-since date, checked by search. An item asking for a section "repeatedly blocked" therefore asks for a measurement this repository cannot make, and building it would mean inventing a history store that nothing else needs.
+>
+> **The other half of that item is derivable, and `§2` is what makes it so.** A finding filed from one section to another is recorded evidence that the first section ran into work the second one owns. Four exist today:
+>
+> | Filed from | To | About |
+> | --- | --- | --- |
+> | `D00 T03 §1` | `D00 T01 §2` | the build resolving its toolchain through a gitignored tree |
+> | `D00 T03 §1` | `D00 T02 §1` | a scratch file tracked at the repository root |
+> | `D00 T03 §4` | `D00 T04 §1` | the claims checker dropping an unparseable claim |
+> | `D00 T03 §4` | `D06 T01 §8` | there being no `LICENSE` file |
+>
+> That is a real coupling signal the dependency graph does not carry, and it is exactly what this section asked for in its second clause. The first clause is dropped with its reason recorded rather than faked.
+>
+> **Confirmed: `groom-plan` exists** at `.claude/skills/groom-plan/SKILL.md`, so item 4 routes through a skill that is really there.
 
-**Test checkpoint:** The critical path prints and its sections are named. A fixture section blocked repeatedly is reported as a re-sequencing candidate. The tool proposes and does not act, proven by there being no write path. A proposed change routes through `groom-plan`.
+- [x] Report the critical path: the longest dependency chain to a shippable product. Done when: it prints, and the sections on it are identified as the ones whose delay costs most.
+- [x] Surface a dependency that evidence contradicts. **Corrected 2026-09-17:** the first half, "a section repeatedly blocked", is struck. Nothing in this repository records blocking over time; `query blocked` is a snapshot with no memory, and no block count or blocked-since date is stored anywhere, checked by search. Building it would mean adding a history store nothing else needs, to answer a question the second half already answers better. Done when: a section that filed a review finding to another section is reported as a coupling the dependency graph does not carry, with the direction and the finding named, derived from the ledger `§2` generates rather than from a new record.
+- [x] Keep re-sequencing a decision, never automatic. Done when: the tool proposes and a human disposes, and this section records why. Proven by there being **no write path**: the `sequence` branch contains no `open(`, no `.write(`, no `write_text`, no `mkdir`, no `rename`, shown by search over the branch.
+
+  **Recorded 2026-09-17, with the concrete case this plan already contains.** A dependency exists for reasons the graph cannot see, and the four couplings the tool reports are the proof. Every one of them points **backwards**: `D00 T03 §1`, the very first section, filed work to `D00 T01 §2`, `D00 T02 §1` and, through `§4`, to `D00 T04 §1` and `D06 T01 §8`. A tool acting on that signal would conclude the intake sections should come *after* the toolchain and test sections they filed to.
+
+  That would be exactly wrong. The intake had to run first, because there was no C++ tree to build a toolchain around until it landed. The filings are work **discovered** early, not work **needed** first, and nothing in the data distinguishes those two. A human reading the finding knows the difference in a sentence; a tool reading the graph cannot recover it at all.
+
+- [x] Say which direction a coupling points, since the tool cannot judge it. **Added 2026-09-17:** the report states for each filing whether the target is already a dependency, and says in its own output that a filing is not proof the order is wrong. Done when: the output carries that sentence and a section with no filings produces no candidates rather than an empty ceremony.
+- [x] Route a proposed change through `groom-plan`. Done when: the report names that skill as where a change goes, and `groom-plan` names this command as where the evidence comes from, so the loop is closed from both ends rather than one.
+- [x] Commit: `"self-correction: propose a better order, and let a human take it"`
+
+**Test checkpoint:** `python scripts/todo-graph.py query sequence` prints the longest dependency chain to a shippable product, naming every section on it, and the chain is verified by walking it by hand against `resolve` for at least its first three links. It reports every cross-section filing as a coupling candidate, naming direction and finding, and the count matches an independent `grep` of the findings files. **The tool proposes and cannot act**, proven by there being no write path: the command opens no file for writing, shown by search, and the output names `groom-plan` as where a change goes. A section with no filings produces no candidates, so the report is not merely always-on noise. `self-test` covers the chain computation including a cycle, and stays green.
 
 ## Verification
 

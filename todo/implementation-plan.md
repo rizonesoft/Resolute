@@ -102,7 +102,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §1` | Staleness Detection for Every Claim-Free Block |   9   |
 | [x] | `D00 T04 §2` | The Review-Finding Ledger                      |   8   |
 | [x] | `D00 T04 §3` | Section Calibration                            |   6   |
-| [ ] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   5   |
+| [ ] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   6   |
 | [ ] | `D00 T01 §1` | Portable toolchain bootstrap                   |  15   |
 | [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest              |  11   |
 | [ ] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
