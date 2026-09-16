@@ -128,13 +128,22 @@ The difference between an application that looks like it belongs on Windows 11 a
 
 Every custom-drawn control in this suite reports nothing to a screen reader today, and every control in this suite is custom-drawn. That is the largest single accessibility gap the project has, and it is invisible to anyone not using assistive technology.
 
+> [!IMPORTANT]
+> **This section is also the prerequisite for the entire driven-test strategy.** Measured 2026-09-16 against the shipped binary and recorded in [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md): the UI Automation tree for a running window contains **four unnamed panes and nothing inside them**, because Direct2D draws pixels rather than automation elements.
+>
+> Until providers exist, a driver can launch the app, read its title, screenshot it, and click at a coordinate, and nothing more. It cannot find a control, read a label, count list rows, or assert a state. Every "driven run with evidence" checkpoint in this plan degrades to a screenshot and a log line, and `D00 T02 §4`, the surface accounts, and `D07 T01 §4` all degrade with it.
+>
+> One implementation, two payoffs. This is not a Phase 1 polish item that can slip.
+
 **Fidelity:** no new visual surface. This section changes what the surfaces expose, not how they look, except for the focus ring.
 **Job:** a user who cannot use a mouse, cannot see the screen, or cannot tolerate motion can use every tool completely. Consumer: the UI Automation tree, the keyboard, and the system accessibility settings.
 **Treatment:** a UI Automation provider per control. Cheaper substitute that fails the checkpoint: exposing only the window and treating its contents as one opaque element, which is the same as exposing nothing.
 **Chrome:** implement in the shared library, per control. A tool never adds its own accessibility handling.
 **Needs:** Windows host (build/test)
 
-- [ ] Implement a UI Automation provider for every control in the shared library. Done when: a screen reader announces every control's name, role, value, and state, verified by driving Narrator over each and quoting what it said.
+- [ ] Implement a UI Automation provider for every control in the shared library, handling `WM_GETOBJECT` and exposing `IRawElementProviderSimple`. Done when: a screen reader announces every control's name, role, value, and state, verified by driving Narrator over each and quoting what it said.
+- [ ] Give every interactive control a **stable automation id**, set where the control is created rather than derived from its position or its text. Done when: the ids survive a layout change and a language change, proven by driving the tree in two languages.
+- [ ] Prove the tree is traversable by a driver, not only by a screen reader. Done when: the spike's tree walk is re-run and the descendant count rises from **4** to cover every control on the surface, with the before and after quoted.
 - [ ] Raise notification events for status changes. Done when: a completed repair is announced, driven and quoted.
 - [ ] Make every feature reachable by keyboard, with a logical tab order. Done when: every surface is driven mouse-free end to end and the path is recorded.
 - [ ] Render the focus ring per the contract: 2px accent with 1px offset, always visible. Done when: it renders on every focusable control in both appearances, captured.
@@ -143,7 +152,7 @@ Every custom-drawn control in this suite reports nothing to a screen reader toda
 - [ ] Add UI scaling independent of system DPI, on the standard zoom shortcuts. Done when: zoom in, out, and reset are driven and the layout stays correct.
 - [ ] Commit: `"design: meet the accessibility floor"`
 
-**Test checkpoint:** Narrator announces name, role, value, and state for every shared control, quoted per control. A completed repair raises an announcement, quoted. Every surface is driven mouse-free and the path recorded. The focus ring is captured in both appearances. With reduced motion set, no animation occurs and state still changes. Every hit target is measured against the floor.
+**Test checkpoint:** Narrator announces name, role, value, and state for every shared control, quoted per control. The UI Automation tree walk from `docs/captures/ui-automation-spike.md` is re-run and the descendant count rises from 4 to cover the surface, with before and after quoted, and a control is found by automation id in two languages. A completed repair raises an announcement, quoted. Every surface is driven mouse-free and the path recorded. The focus ring is captured in both appearances. With reduced motion set, no animation occurs and state still changes. Every hit target is measured against the floor.
 
 ## 6. Performance Floor
 

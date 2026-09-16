@@ -23,6 +23,8 @@ track: W1
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- every port cites the parity driver this file builds
 - -> XREF: [`00-workspace/TODO-03 §3`](./TODO-03-codebase-intake.md) -- the intake that renames the library §5 covers
 - -> XREF: [`01-framework/TODO-02 §1`](../01-framework/TODO-02-design-system.md) -- the design system whose surfaces the capture store compares
+- -> XREF: [`01-framework/TODO-02 §5`](../01-framework/TODO-02-design-system.md) -- the UI Automation providers that make control-level driving possible at all
+- [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md) -- what the driver can reach today, measured
 
 ## Outcome
 
@@ -98,6 +100,7 @@ The fifth proof type of this project rests entirely on this section. Without it,
 
 - [ ] Define the parity record: a declarative file listing the system state a run touched, keyed by target, with values and types. Done when: the format is documented and one hand-written example parses.
 - [ ] Drive a built executable far enough to run its main action against a fixture, and emit a parity record. Done when: the driver runs the first ported tool and writes a record.
+- [ ] Record what the driver can and cannot reach **today**, and what unblocks the rest. Done when: this section cites [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md), states that launch, title, screenshot, coordinate click, and close work now while control-level driving needs `D01 T02 §5`, and states which parity records can therefore be produced before that section ships. Cheaper substitute that fails the checkpoint: coordinate clicking presented as control-level driving, which encodes the layout into every test and still passes when the click lands on the wrong control.
 - [ ] Run the AutoIt counterpart from `resolute_au3/` against the same fixture and emit the same record format. Done when: both implementations produce records for `Ownership` on the same fixture tree.
 - [ ] Compare two records field by field and report the differences, not a boolean. Done when: two deliberately different records produce a named per-field diff, and two identical ones report parity. Cheaper substitute that fails the checkpoint: comparing exit codes, which is how two tools that did completely different things both report success.
 - [ ] State plainly what parity does not cover. Done when: this section records that the rendered surface is excluded, with the reason, so no later section claims a pixel comparison as parity.
