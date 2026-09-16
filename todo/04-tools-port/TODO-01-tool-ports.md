@@ -61,6 +61,17 @@ track: P2
 **Chrome:** consume the framework and the repair contract. Do not keep a private copy of either.
 **Needs:** Windows host (build/test)
 
+
+**Build order.** This slice decides whether the framework and the contract are right. Capture the baseline **before** writing any C++, because the shipped tool is the only source of truth for what it does.
+
+1. **Capture the AutoIt baseline first.** Run `resolute_au3/Resolute/Ownership.exe` against `tests/fixtures/filetree/` and record its effects and window. Done when: the baseline is committed under `docs/captures/` and the parity record exists for the AutoIt side.
+2. **Enumerate what the tool does** from `resolute_au3/SDK/Concrete/Ownership/Ownership.au3`, ignoring the roughly 1,556 framework lines and reading only its real logic. Done when: every action it performs is listed with its source line.
+3. **Declare those actions as repair-contract items**, with no loop of their own. Done when: the tool compiles and `D02 T01 §1`'s loop runs them.
+4. **Run the parity driver** and fix differences until it reports zero. Done when: the parity report shows no differing fields, quoted.
+5. **Prove the reverse**, which the AutoIt tool never had, so it has no baseline. Done when: takeover then undo restores every owner and ACL, asserted.
+6. **Prove the refusal** with a deny-ACE fixture. Done when: the path is refused by name and the batch counts still reconcile.
+7. **Record what the slice proved** before porting anything else. Done when: this section states which framework and contract assumptions are now evidence, so `§2` starts from fact.
+
 - [ ] Capture the shipped AutoIt `Ownership` first: a driven run against the fixture tree with its effects and window recorded. Done when: the baseline is committed.
 - [ ] Port the tool to `extensions/Ownership/` as framework plus repair contract plus its own items, and nothing else. Done when: it builds as its own standalone executable and the source contains no settings, log, localization, or loop code.
 - [ ] Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference. Done when: the parity report is quoted and shows zero differing fields.

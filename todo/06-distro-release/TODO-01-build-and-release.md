@@ -13,7 +13,7 @@ track: R1
 > **Goal:** A release is produced by a procedure rather than by habit: one command builds the whole set, every tool is signed, every tool ships as an installer and a portable edition, every tool gets its update file, and the four retiring products tell their users where they went.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** Nothing exists in C++. In the AutoIt tree, thirteen `.sni` descriptors drive `SDK/Distro.exe`, and every one of them hardcodes `R:\Workspace\Resolute\...`, a path that no longer exists, so that tree does not build from a clean checkout. All thirteen carry `Sign = 0`, `Compress = 0`, and `SignInstall = 0`. Signing happens through an existing procedure outside this repository, which this file documents rather than replaces. The update mechanism resolves `<UpdateServer>/<ShortName>.ru`, or `.ruz` on a beta build, but nothing in the tree generates those files. Copyright years in the AutoIt sources span 2022 to 2025 because they are typed by hand into fourteen scripts. The tree also carries **two licences with no recorded decision**: the AutoIt tools ship GPL v3, while `RegStudio` is MIT. `shared/lucide` ships **no licence file at all**, and ExoSuite has no root `LICENSE`.
+> **Current state (verified 2026-09-16):** Nothing exists in C++. In the AutoIt tree, thirteen `.sni` descriptors drive `SDK/Distro.exe`, and every one of them hardcodes `R:\Workspace\Resolute\...`, a path that no longer exists, so that tree does not build from a clean checkout. All thirteen carry `Sign = 0`, `Compress = 0`, and `SignInstall = 0`. Signing happens through an existing procedure outside this repository, which this file documents rather than replaces. The update mechanism resolves `<UpdateServer>/<ShortName>.ru`, or `.ruz` on a beta build, but nothing in the tree generates those files. Installers are built with **Inno Setup**, which is being kept: `resolute_au3/Resolute_setup.iss` is the existing suite script, and the per-tool `Setup.iss.txt` files under `Resolute/Docs/` are the per-tool equivalents. Copyright years in the AutoIt sources span 2022 to 2025 because they are typed by hand into fourteen scripts. The tree also carries **two licences with no recorded decision**: the AutoIt tools ship GPL v3, while `RegStudio` is MIT. `shared/lucide` ships **no licence file at all**, and ExoSuite has no root `LICENSE`.
 
 ## Inputs
 
@@ -26,14 +26,16 @@ track: R1
 
 - One command produces the whole release set, for both architectures.
 - Every shipped executable is signed through the documented procedure.
-- Every tool ships as an installer and as a portable edition, install-tested on a clean machine.
+- Every tool ships as an Inno Setup installer and as a portable edition, install-tested on a clean machine, and the suite ships as one installer with per-tool selection.
+- Both install silently for unattended deployment.
+- A user upgrading from the AutoIt suite keeps their settings and ends up with one copy, not two.
 - Every tool has an update file, generated rather than hand-written.
 - The four retiring products announce their successors.
 - The version rule is written down, including the build auto-increment convention.
 - A repair can be promoted to its own named product for the cost of a descriptor, with no second codebase.
 - Every shipped tool carries its licence and its third-party attributions, generated rather than maintained.
 
-**Adjacency:** list=not-applicable (the release process holds no records a user browses); document=applicable @ D06 T01 §5; settings=not-applicable (the release reads the build configuration and owns none of its own); reporting=applicable @ D06 T01 §2; notifications=applicable @ D06 T01 §4; permissions=not-applicable (release runs on a developer machine with no role model); audit=applicable @ D06 T01 §5; exchange=applicable @ D06 T01 §4; reverse=applicable @ D06 T01 §3
+**Adjacency:** list=not-applicable (the release process holds no records a user browses); document=applicable @ D06 T01 §6; settings=not-applicable (the release reads the build configuration and owns none of its own); reporting=applicable @ D06 T01 §2; notifications=applicable @ D06 T01 §5; permissions=not-applicable (release runs on a developer machine with no role model); audit=applicable @ D06 T01 §6; exchange=applicable @ D06 T01 §5; reverse=applicable @ D06 T01 §3
 
 **Adjacency rationale:** Reverse anchors on §3 because an installer that cannot cleanly uninstall is the one irreversible thing a release can ship, and it is only provable on a machine that has never had the suite. Exchange and notifications pair on §4 because the update file is both a published interface and the only channel to a user who already installed something, which is exactly what the retiring products need.
 
@@ -43,11 +45,12 @@ track: R1
 | :---: | :-----: | --------------------------------------------- | ------------ | :----: |
 |   1   |   §1    | Release descriptors, portable by construction | D04 T01 §1   |  [ ]   |
 |   2   |   §2    | One command builds the release set            | §1           |  [ ]   |
-|   3   |   §3    | Installer and portable edition, install-tested | §2          |  [ ]   |
-|   4   |   §4    | Update files and consolidation announcements  | §2           |  [ ]   |
-|   5   |   §5    | Version rule, changelog, and release checklist | §2          |  [ ]   |
-|   6   |   §6    | Focused builds from one codebase              | §1, §4      |  [ ]   |
-|   7   |   §7    | Licensing and attribution                     | --          |  [ ]   |
+|   3   |   §3    | Installers: per tool and whole suite          | §2           |  [ ]   |
+|   4   |   §4    | Migration from the AutoIt suite               | §3, D01 T01 §2 |  [ ]   |
+|   5   |   §5    | Update files and consolidation announcements  | §2           |  [ ]   |
+|   6   |   §6    | Version rule, changelog, and release checklist | §2          |  [ ]   |
+|   7   |   §7    | Focused builds from one codebase              | §1, §5      |  [ ]   |
+|   8   |   §8    | Licensing and attribution                     | --          |  [ ]   |
 
 ---
 
@@ -77,20 +80,53 @@ Thirteen descriptors pointing at a directory that no longer exists is the cleare
 
 **Test checkpoint:** One invocation produces the whole set for both architectures with a per-tool report, quoted. A deliberate warning makes it refuse and name the failing gate. Two runs from one commit are compared and any difference is explained.
 
-## 3. Installer and Portable Edition, Install-Tested
+## 3. Installers: Per Tool and Whole Suite
 
+**Inno Setup is kept.** `resolute_au3/Resolute_setup.iss` is the existing suite script and the per-tool `Setup.iss.txt` files are the per-tool equivalents, so this section adapts working scripts rather than choosing an installer.
+
+Two shapes are needed, because the suite is distributed both ways: a user who wants one tool should not download thirty-nine, and a user who wants the suite should not run thirty-nine installers.
+
+**Fidelity:** the installer's own pages, which are Inno Setup's. No custom installer UI.
+**Job:** a user can install one tool or the whole suite, silently or interactively, and remove either cleanly. Consumer: the installed machine, compared against its pre-install state.
+**Treatment:** both installer shapes generated from one declarative source, so a new tool appears in both without either script being hand-edited. Cheaper substitute that fails the checkpoint: thirty-nine hand-maintained `.iss` files, which drift the moment a tool is added.
+**Chrome:** consume the release descriptors from §1. The installer scripts are generated, not authored per tool.
 **Needs:** Windows host (build/test)
 
-- [ ] Produce an installer and a portable edition per tool. Done when: both exist for every shipped tool and the portable edition writes nothing outside its own folder, traced.
+- [ ] Generate a per-tool Inno Setup script from that tool's release descriptor. Done when: a tool's `.iss` is produced by the release command with no hand editing, and adding a tool produces its installer with no script change.
+- [ ] Generate the suite installer, with per-tool selection. Done when: a user can choose which tools to install, the default is a sensible set rather than all thirty-nine, and this section records what the default is and why.
+- [ ] Produce a portable edition per tool that writes nothing outside its own folder. Done when: a file-system trace of a portable run shows no write outside it, quoted.
+- [ ] Support **silent and unattended install**, because administrators deploy this across machines. Done when: `/SILENT` and `/VERYSILENT` both complete with no interaction, honour a target directory and a tool selection, and return a documented exit code.
 - [ ] Sign every executable and every installer through the existing external procedure. Done when: the procedure is documented here, every artifact verifies, and no credential appears in any tracked file.
 - [ ] Install-test on a machine that has never had the suite. Done when: install, run, and uninstall are each proven on a clean virtual machine with a snapshot, and the machine and snapshot are named.
-- [ ] Prove the uninstall is a real reverse. Done when: after uninstall the machine has no leftover files, registry keys, or services, compared against the pre-install snapshot.
-- [ ] Upgrade-test over a previously installed version. Done when: an upgrade preserves user settings and the check is quoted.
-- [ ] Commit: `"release: installer and portable edition, install-tested"`
+- [ ] Prove the uninstall is a real reverse. Done when: after uninstall the machine has no leftover files, registry keys, services, or scheduled tasks, compared against the pre-install snapshot.
+- [ ] Prove the two shapes coexist. Done when: installing a tool individually and then installing the suite does not duplicate it, and removing the suite does not orphan the individually installed copy.
+- [ ] Commit: `"release: generated inno setup installers, per tool and whole suite"`
 
-**Test checkpoint:** Both editions exist per tool; the portable edition writes nothing outside its folder, traced. Every artifact verifies as signed. Install, run, uninstall, and upgrade are each proven on a named clean virtual machine. The post-uninstall comparison against the pre-install snapshot is quoted.
+**Test checkpoint:** A per-tool `.iss` and the suite `.iss` are both generated by the release command with no hand editing, and adding a fixture tool produces its installer with no script change. `/SILENT` and `/VERYSILENT` complete unattended and return documented exit codes. A portable run writes nothing outside its folder, traced. Every artifact verifies as signed. Install, run, and uninstall are proven on a named clean virtual machine, with the post-uninstall comparison quoted. The individual-then-suite case is driven and neither duplicates nor orphans.
 
-## 4. Update Files and Consolidation Announcements
+## 4. Migration From the AutoIt Suite
+
+Every existing user has AutoIt tools installed. The day a C++ tool ships, that machine has two of something, and nothing in the plan said what happens.
+
+This is the section that decides whether an upgrade feels like an upgrade or like a second product appearing beside the first.
+
+**Fidelity:** the migration notice, reusing the framework's message dialog and the installer's own pages.
+**Job:** a user upgrading from the AutoIt version keeps their settings and does not end up with two copies. Consumer: the migrated settings, read back, and the machine after the old version is removed.
+**Treatment:** settings migrated and the old version removed by the installer, with the user told what happened. Cheaper substitute that fails the checkpoint: installing beside the old version and leaving the user to work out which is which, which is how a suite acquires a reputation for clutter.
+**Chrome:** consume the framework's settings writer and its `.lng` migration from `D01 T01 §2`.
+**Needs:** Windows host (build/test)
+
+- [ ] Detect an installed AutoIt version of the same tool. Done when: the installer finds it on a fixture machine and reports the version found.
+- [ ] Migrate its settings, including the `.lng` case for the seven tools that stored them wrongly. Done when: a fixture machine with AutoIt settings upgrades and every value survives, proven by readback.
+- [ ] Remove the old version as part of the upgrade, or state plainly why not. Done when: the behaviour is one of those two, and a fixture upgrade leaves exactly one copy installed.
+- [ ] Handle the consolidations, where the old tool has no direct successor. Done when: upgrading a machine with `Chromin` installed results in `Firemin`, the user is told why, and `Chromin` is removed; the same for `DVDRepair` into Drive Repair.
+- [ ] Preserve anything the user would miss. Done when: this section lists what carries over beyond settings, such as logs and restore records, and what deliberately does not.
+- [ ] Prove the path end to end on a machine that really has the old version. Done when: the AutoIt suite is installed on a clean virtual machine, upgraded, and the result is recorded with the snapshot named.
+- [ ] Commit: `"release: migrate installs from the autoit suite"`
+
+**Test checkpoint:** A fixture machine with an installed AutoIt tool is detected and its version reported. Settings migrate with every value surviving, proven by readback, including the `.lng` case. A fixture upgrade leaves exactly one copy installed. A machine with `Chromin` ends up with `Firemin`, told why, with `Chromin` removed. The full path is proven on a named clean virtual machine carrying the real AutoIt suite.
+
+## 5. Update Files and Consolidation Announcements
 
 The channel to every user who already installed something. Four products are retiring into two, and this is the only way those users find out.
 
@@ -105,7 +141,7 @@ The channel to every user who already installed something. Four products are ret
 
 **Test checkpoint:** Every shipped tool has generated `.ru` and `.ruz` matching its artifacts. An installed AutoIt `Chromin` polls the generated file and shows the consolidation message, captured. A shipped AutoIt build parses a file carrying `Successor` without error. The retirement policy is dated.
 
-## 5. Version Rule, Changelog, and Release Checklist
+## 6. Version Rule, Changelog, and Release Checklist
 
 **Needs:** C++ toolchain (compile)
 
@@ -117,7 +153,7 @@ The channel to every user who already installed something. Four products are ret
 
 **Test checkpoint:** The version rule explains the current spread and the auto-increment convention. A release produces a per-tool changelog whose entries trace to commits. A second person runs the checklist end to end and the result is recorded.
 
-## 6. Focused Builds From One Codebase
+## 7. Focused Builds From One Codebase
 
 A landing page for "fix windows search" earns traffic that a page for a general repair tool does not. This section makes it possible to ship that page a focused product without a second codebase, so the suite gains marketing surface without regaining the duplication this rewrite exists to remove.
 
@@ -135,7 +171,7 @@ It exists before it is needed deliberately: built once, promoting any repair to 
 
 **Test checkpoint:** Two descriptors over one source produce two differently-named executables. A focused build exposes only its declared item, proven by driving it. Its update file and documentation set are generated by the release command. Its About names the suite and the parent tool, captured. A focused build and its parent differ only in descriptor values and exposed items, with any other difference explained.
 
-## 7. Licensing and Attribution
+## 8. Licensing and Attribution
 
 The tree currently carries two licences with no recorded decision, and ships third-party code with no licence file at all. Both are distribution defects today, and both get harder to fix with every tool added.
 
@@ -160,6 +196,7 @@ The tree currently carries two licences with no recorded decision, and ships thi
 - [ ] `pwsh scripts/release.ps1` produces the whole set for both architectures
 - [ ] The release refuses to build when any gate is not green
 - [ ] Every artifact verifies as signed and no credential appears in any tracked file
-- [ ] Install, uninstall, and upgrade are proven on a clean machine
+- [ ] Install, uninstall, and upgrade are proven on a clean machine, silently and interactively
+- [ ] A machine carrying the real AutoIt suite upgrades cleanly, with settings preserved and one copy left
 - [ ] The consolidation announcement is verified against a real installed build
 - [ ] `python scripts/todo-graph.py validate` clean

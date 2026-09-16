@@ -59,6 +59,16 @@ What it lacks is hash verification, detect-before-download, a locator that fails
 
 **Needs:** Windows host (build/test)
 
+
+**Build order.** The existing `reskit/Bootstrap-ExoKit.ps1` already works; this hardens it. Change one thing at a time and re-run the bootstrap after each.
+
+1. **Write `toolchain.json` first**, recording exactly what the existing script pulls today: llvm-mingw `20251216`, CMake `4.2.3`, Ninja `1.13.1`, each with its URL. Done when: the file's versions match the script's variables exactly, compared line by line.
+2. **Add the SHA-256 for each**, taken from a real download. Done when: every entry has a hash and re-running the bootstrap verifies all three.
+3. **Add detect-before-download**, checking the toolchain directory first. Done when: a second bootstrap run downloads nothing and finishes in seconds, timed and quoted.
+4. **Add the fail-by-name locator** as `scripts/cpp-env.ps1`. Done when: deleting one component makes it exit 1 naming that component and the command that restores it.
+5. **Set the Windows floor** in CMake only, not in the bootstrap. Done when: `WINVER` and `_WIN32_WINNT` are set once and every target inherits them.
+6. **Prove the bare-machine claim last**, because it is the only stage needing a second machine. Done when: bootstrap and build both succeed where no Visual Studio and no Windows SDK are installed.
+
 - [ ] Record the pins in `toolchain.json` at the repository root: the llvm-mingw release, CMake, and Ninja, each with a download URL and a SHA-256. Done when: every value is an exact version and every entry carries a hash, and the versions match what the ExoKit bootstrap pulls today. Cheaper substitute: naming versions without hashes, which makes the bootstrap reproducible only until a URL is re-cut.
 - [ ] `scripts/bootstrap.ps1` **detects before it downloads**, in a fixed order: `.toolchain/` first, then the machine's installed components. Done when: a second run downloads nothing and finishes in seconds, and the detection order is documented so a repository-scoped component always wins over a machine-installed one of the same version.
 - [ ] Detect the **pinned version specifically**, not merely presence. Done when: a directory carrying a different llvm-mingw release than the pin does not silently satisfy the check. Cheaper substitute that defeats the point of pinning: accepting any toolchain that is present, which makes two machines disagree while both report success.

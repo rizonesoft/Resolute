@@ -39,6 +39,9 @@ track: F1
 - A privileged action is refused by name when the privilege is absent.
 - Every window is DPI-correct and follows the system theme.
 - A tool placed alone in an empty folder still does all of the above.
+- A tool that crashes says so, leaves a report, and leaves its repair undoable.
+- Two copies of a tool cannot change the same thing at the same time.
+- Every tool can be run unattended from a script and branched on by its exit code.
 
 **Adjacency:** list=not-applicable (the framework holds no records a user browses; the tools built on it do); document=applicable @ D01 T01 §7; settings=applicable @ D01 T01 §2; reporting=applicable @ D01 T01 §3; notifications=applicable @ D01 T01 §5; permissions=applicable @ D01 T01 §6; audit=applicable @ D01 T01 §3; exchange=applicable @ D01 T01 §4; reverse=not-applicable (the framework changes nothing on a user's system; the repair contract owns undo)
 
@@ -57,6 +60,8 @@ track: F1
 |   7   |   §7    | Adopt the UI library and its surfaces           | §4, D00 T03 §3         |  [ ]   |
 |   8   |   §8    | Extend the UI library for the tools             | §7                     |  [ ]   |
 |   9   |   §9    | Standalone proof in an empty folder             | §2, §4, §5, §7         |  [ ]   |
+|  10   |   §10   | Crash handling and single instance              | §1, §3                 |  [ ]   |
+|  11   |   §11   | Command line and exit codes                     | §1, §3, §6             |  [ ]   |
 
 ---
 
@@ -229,11 +234,55 @@ Every tool is distributed on its own. This section proves the framework did not 
 
 **Test checkpoint:** A built tool alone in an empty directory starts, localizes, shows About, opens preferences, and checks for updates, all captured. A file-system trace shows no write outside its own folder. The machine has no `Resolute/` directory during the run. The harness assertion fails when a surface reaches outside. All quoted.
 
+## 10. Crash Handling and Single Instance
+
+Two lifecycle guarantees the plan assumed and never assigned. Both matter more here than in ordinary software, because these tools are running on a machine that is **already broken** and several of them are mid-way through changing a registry or an ACL when something goes wrong.
+
+**Fidelity:** the crash notice, reusing the framework's message dialog. No new dialog.
+**Job:** a tool that fails does so visibly and recoverably, and a user cannot accidentally run two copies of a tool that is changing their system. Consumer: the crash report on disk, and the second instance that does not start.
+**Treatment:** the restore record flushed before the process dies, so an interrupted repair is still undoable. Cheaper substitute that fails the checkpoint: a crash handler that writes a report and exits, leaving a half-applied repair with no record of what was already done.
+**Chrome:** consume the framework's logging, message layer, and the repair contract's restore record.
+**Needs:** Windows host (build/test)
+
+- [ ] Install an unhandled-exception and structured-exception handler in the framework startup, so every tool gets one. Done when: a deliberately faulted fixture tool produces a report rather than the Windows crash dialog, and no tool installs its own handler, proven by search.
+- [ ] Write a crash report naming the tool, its version, the action in progress, and the fault. Done when: a faulted run writes one to the log directory and its path is shown to the user.
+- [ ] **Flush the repair contract's restore record before the process dies.** Done when: a tool faulted mid-repair still leaves a record covering what it had already changed, and `Repair History` can undo it, proven by driving `D05 T04 §2` against the wreckage.
+- [ ] Say something useful to the user rather than nothing. Done when: the notice names the tool, states whether the machine was changed, and points at the report, captured.
+- [ ] Enforce a single instance per tool, keyed by tool and by installation. Done when: launching a second copy focuses the first rather than starting, proven by driving it twice.
+- [ ] Decide and record the portable exception. Done when: this section states whether a portable copy on a USB stick may run alongside an installed copy, dated, with the cost of changing it. Cheaper substitute that fails the checkpoint: a global mutex that silently blocks a technician's portable copy because the machine has the suite installed.
+- [ ] Prove the guard holds where it matters. Done when: two copies of a repair tool cannot run a repair simultaneously against the same target, asserted.
+- [ ] Commit: `"framework: crash handling and single instance"`
+
+**Test checkpoint:** A deliberately faulted fixture tool produces a report, not the Windows crash dialog, and no tool installs its own handler, proven by search. A tool faulted mid-repair leaves a usable restore record, proven by undoing it from `Repair History`. The notice names the tool and whether the machine changed, captured. A second launch focuses the first. Two copies cannot repair the same target simultaneously, asserted.
+
+## 11. Command Line and Exit Codes
+
+Every tool in this suite is something an IT administrator would want to run across fifty machines from a script, and today the plan gives them no way to. A repair tool that can only be driven by a human is half a product for that audience.
+
+**Fidelity:** no surface of its own; the command line is the surface, and `--help` is its documentation.
+**Job:** an administrator can run any tool unattended, capture what it did, and branch on whether it worked. Consumer: the exit code, the log, and the transcript.
+**Treatment:** one argument grammar across every tool, defined in the framework, so learning one tool teaches all of them. Cheaper substitute that fails the checkpoint: per-tool argument parsing, which is the settings-path defect in a new place.
+**Chrome:** consume the framework's logging and the repair contract's transcript. No tool parses its own arguments.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Define the shared grammar in the framework: the verbs every tool understands, and the options every tool accepts. Done when: the grammar is documented, and a tool adds its own verbs without touching the parser.
+- [ ] Support unattended operation. Done when: a tool runs its main action with no window and no prompt, writes its transcript to a given path, and returns, proven by driving a fixture repair from a script.
+- [ ] **Define the exit codes once**, so a script can branch. Done when: success, nothing-to-do, partial, refused-for-privilege, and failed are distinct documented values, and a fixture run of each returns the expected one.
+- [ ] Never perform a destructive action unattended without an explicit flag. Done when: an unattended destructive run without the flag refuses and returns the refusal code, and the flag's name states what it authorises.
+- [ ] Implement `--help` and `--version` for every tool, generated from the tool descriptor and the registered verbs. Done when: both work on two different tools with no tool-side code.
+- [ ] Honour the elevation contract on the command line. Done when: an unattended run without the required privilege refuses by name, returns the refusal code, and changes nothing.
+- [ ] Record what the command line deliberately cannot do. Done when: anything reachable only through the window is listed, so an administrator is not left guessing.
+- [ ] Commit: `"framework: one command-line grammar and one set of exit codes"`
+
+**Test checkpoint:** A fixture repair runs unattended from a script with no window, writes its transcript, and returns. Each of the five exit codes is produced by a fixture run and matches its documented value. An unattended destructive run without the authorising flag refuses with the refusal code. `--help` and `--version` work on two tools with no tool-side code. An unelevated unattended run refuses by name and changes nothing.
+
 ## Verification
 
 - [ ] `pwsh scripts/check-all.ps1` exits 0 with the framework suites reporting
 - [ ] All 35 Firemin language packs load through the framework loader
 - [ ] Framework surfaces captured at four DPI scalings and in both appearances
 - [ ] A tool runs standalone in an empty folder, writing nothing outside it
-- [ ] No tool-side code computes a settings path, a log path, or a language path
+- [ ] No tool-side code computes a settings path, a log path, a language path, or parses its own arguments
+- [ ] A tool faulted mid-repair still leaves a restore record that `Repair History` can undo
+- [ ] Every tool runs unattended and returns a documented exit code
 - [ ] `python scripts/todo-graph.py validate` clean

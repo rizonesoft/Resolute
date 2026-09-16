@@ -102,6 +102,17 @@ The two destructive intakes. A secure delete is the one tool in this suite with 
 **Chrome:** consume the framework and the repair contract. WinClean's service operations consume the promoted service primitives.
 **Needs:** Windows host (build/test)
 
+
+**Build order.** Media detection comes before any erase path, because which method is correct depends on it.
+
+1. **Promote `samples/WinClean/UDF/Services.au3` into the framework** as service primitives. Done when: the framework exposes start, stop, pause, resume, and start-mode, and no tool implements them privately.
+2. **Build media detection first.** Magnetic, SATA solid state, NVMe, or unknown. Done when: each is correctly identified on a driven run and unknown is reported rather than assumed.
+3. **Port the eight overwrite patterns unchanged** from `resolute_au3/samples/QuickErase/QuickErace.au3`, for magnetic media only. Done when: the patterns are compared against the original and match byte for byte.
+4. **Add the firmware erase path** for solid state: ATA Secure Erase and NVMe Sanitize. Done when: each is exercised and the surface states which method was used.
+5. **Add the multi-pass refusal on solid state**, with its explanation and override. Done when: the refusal fires, the override is logged, and the reasoning is on the surface.
+6. **Add confirmation and the no-reverse statement** before wiring any action to a button. Done when: the confirmation names count, size, and paths, and declining performs nothing.
+7. **Port WinClean's cleanups** as repair-contract items, each declaring its reversibility honestly. Done when: each is a declared item and none writes outside the contract's loop.
+
 - [ ] Promote `samples/WinClean/UDF/Services.au3` into the framework as service-control primitives. Done when: the framework exposes start, stop, pause, resume, and start-mode operations, and no tool implements them privately.
 - [ ] Port QuickErase, correcting the misspelled source filename on intake. Done when: it builds, and the file is named for the product.
 - [ ] Detect the media type of the target: magnetic, SATA solid state, or NVMe. Done when: each is correctly identified on a driven run and an indeterminate result is reported as unknown rather than assumed.

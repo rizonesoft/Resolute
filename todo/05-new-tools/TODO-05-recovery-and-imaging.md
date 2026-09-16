@@ -42,7 +42,7 @@ track: P3
 - The FAT32 specification and the published NTFS on-disk documentation, which are what `§1` is actually written from
 - -> XREF: [`05-new-tools/TODO-01 §3`](./TODO-01-intake-and-new-tools.md) -- `QuickErase`, whose claim §3 verifies
 - -> XREF: [`05-new-tools/TODO-03 §3`](./TODO-03-system-utilities.md) -- Disk Health, which §4 composes with
-- -> XREF: [`06-distro-release/TODO-01 §7`](../06-distro-release/TODO-01-build-and-release.md) -- the licensing and attribution rules these ports must satisfy
+- -> XREF: [`06-distro-release/TODO-01 §8`](../06-distro-release/TODO-01-build-and-release.md) -- the licensing and attribution rules these ports must satisfy
 
 ## Outcome
 
@@ -75,13 +75,24 @@ It also makes the engine structurally incapable of writing to the volume it read
 **Fidelity:** no surface of its own; §2 and §3 render what this produces.
 **Needs:** C++ toolchain (compile)
 
+
+**Build order.** Stage 1 is a legal precondition, not a preference. Do not begin stage 3 until stage 1 is recorded.
+
+1. **Record the clean-room statement before writing code.** Name who implements the engine and confirm they have not opened `samples/Undelete/`. Done when: the statement is in this section, dated, and the named person has not read the original.
+2. **Gather the specifications.** The FAT32 specification and the published NTFS on-disk documentation. Done when: each is cited here by title, so the implementation has a stated source that is not somebody's code.
+3. **Build the volume reader first, read-only.** Done when: it opens a volume and refuses to expose any write path, proven by search for write calls.
+4. **Implement FAT before NTFS**, because FAT is simpler and proves the fixture machinery. Done when: a FAT fixture image enumerates its deleted entries headlessly.
+5. **Implement NTFS.** Done when: an NTFS fixture image enumerates entries whose MFT in-use flag is clear.
+6. **Add recoverability classification last**, because it depends on both parsers. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable on fixtures.
+7. **Prove nothing from the original is present.** Done when: `git grep` finds no file, identifier, or comment traceable to `samples/Undelete/`.
+
 - [ ] Name the specifications this engine is written from, and the formats it supports. Done when: each supported format cites the published documentation it was implemented against, and a fixture image of each enumerates its deleted entries.
 - [ ] **Record the clean-room discipline and who held it.** Done when: this section states that the implementer did not read the Kickass Undelete source, names who wrote the engine, and confirms no file from it is referenced by, included in, or copied into the build. The gitignored `samples/` tree makes this easy to hold and easy to demonstrate. Cheaper substitute that fails the checkpoint: consulting the original "just for the tricky parts", which is precisely where a derivative-work claim would land.
 - [ ] Make the engine **physically unable to write to the source volume.** Done when: it opens the volume read-only, exposes no write path, and a search proves no write call exists. Cheaper substitute that fails the checkpoint: a write path guarded by a flag, which is one mistake away from destroying the data the user is trying to recover.
 - [ ] Recover to a destination on a different volume, and refuse a destination on the source. Done when: a same-volume destination is refused by name, because writing recovered data onto the volume being recovered from overwrites what has not been recovered yet.
 - [ ] Report recoverability honestly per entry. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable, and a partially overwritten fixture is not reported as recoverable.
 - [ ] Guard raw volume access behind the framework's elevation check, at the call. Done when: an unelevated scan is refused by name and nothing is opened.
-- [ ] Confirm the result is unencumbered. Done when: the engine carries no third-party copyright notice, `D06 T01 §7` records it as owned code, and the licence it ships under is the suite's choice rather than an inherited obligation.
+- [ ] Confirm the result is unencumbered. Done when: the engine carries no third-party copyright notice, `D06 T01 §8` records it as owned code, and the licence it ships under is the suite's choice rather than an inherited obligation.
 - [ ] Add engine assertions against committed fixture images, with no physical disk. Done when: each supported format asserts headlessly.
 - [ ] Commit: `"recovery engine: port the file system parser, read-only"`
 
@@ -141,6 +152,17 @@ Tools that write images to healthy drives are numerous and good. Reading an imag
 **Chrome:** consume the framework and the shared progress surface. Compose with Disk Health rather than re-reading SMART.
 **Needs:** Windows host (build/test)
 
+
+**Build order.** Every stage before 4 is about not destroying the drive you are trying to save. Build the strategy before the speed.
+
+1. **Build the read-only source reader**, against `CreateFile` on `\\.\PhysicalDriveN`. Done when: it reads a fixture drive and no write path to the source exists, proven by search.
+2. **Build the region map**, which records what has and has not been read. Done when: a partial run writes a map that a later run can resume from.
+3. **Implement the fast first pass**, copying every readable region with **no** retries. Done when: a fixture with unreadable regions completes the first pass before any retry is attempted, observable in the log.
+4. **Implement the bounded retry pass** over the gaps. Done when: the budget is configurable, visible on the surface, and exhausting it continues the run rather than stalling.
+5. **Measure total re-reads** against a stated ceiling. Done when: a fixture run's re-read count is quoted and under the ceiling.
+6. **Add resumability.** Done when: an interrupted run restarts from its map and does not re-read completed regions.
+7. **Add the write-back path last**, because it is the only destructive one. Done when: the confirmation names letter, label, and size, and the destination can never be the source.
+
 - [ ] Image a source drive to a file, reading read-only and never writing to the source. Done when: no write path to the source exists, proven by search, and the source is byte-identical after a run.
 - [ ] Record the read strategy as a design decision with its reasoning. Done when: this section states the phase order, the retry bounds, and why unbounded retrying is refused, so a later change cannot quietly weaken it.
 - [ ] Implement the read strategy explicitly, in phases: a fast first pass that copies every readable region without retrying, then a second pass over the gaps, then bounded retries on what remains. Done when: the phases are documented, and a fixture with unreadable regions shows the first pass completing before any retry is attempted.
@@ -154,7 +176,7 @@ Tools that write images to healthy drives are numerous and good. Reading an imag
 - [ ] Support writing an image back to a drive, with a confirmation naming the destination by letter, label, and size. Done when: the confirmation names all three, declining performs nothing, and the destination is never the source.
 - [ ] State plainly that writing an image destroys everything on the destination. Done when: that statement is on the surface before the user commits.
 - [ ] Implement raw drive access from the Win32 API rather than porting it. Done when: the access layer is written against `CreateFile` on `\\.\PhysicalDriveN` and the documented IOCTLs, and no file from `samples/SDImage/` appears in the build, proven by search. At roughly fifty lines this is faster than porting regardless of who owns the original.
-- [ ] Resolve SD Imager's provenance, or record that it remains unresolved. Done when: either the rights are established and recorded in `D06 T01 §7`, or this section states that the question was left open and made moot by implementing from Win32.
+- [ ] Resolve SD Imager's provenance, or record that it remains unresolved. Done when: either the rights are established and recorded in `D06 T01 §8`, or this section states that the question was left open and made moot by implementing from Win32.
 - [ ] Commit: `"rescue imaging: image a failing drive, bad sectors and all"`
 
 **Freeze check:** What is written to a destination drive is frozen once shipped, because a mistake destroys a user's data. Evidence is a fixture image written to a fixture target producing a byte-identical result across changes.

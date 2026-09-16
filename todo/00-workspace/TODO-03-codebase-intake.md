@@ -49,6 +49,17 @@ track: W1
 
 `exo-ui` is about to become the foundation of fourteen tools. How it got to be the shape it is will matter, and it is recoverable now and never again once the embedded repositories are discarded.
 
+
+**Build order.** Do these in order; a wrong order costs history that cannot be recovered afterwards.
+
+1. **Back out a safety branch first.** `git branch pre-intake` on `master`. Done when: `git branch --list pre-intake` prints it, so every later stage is revertable with one command.
+2. **Add the remotes, do not use the local checkouts.** `git remote add exosuite https://github.com/rizonesoft/ExoSuite.git` and the same for `regstudio`. Done when: `git fetch exosuite` and `git fetch regstudio` both succeed.
+3. **Merge ExoSuite first**, because RegStudio's authoritative copy is decided against what it brings. `git subtree add --prefix=. exosuite master` is wrong here: use a staging prefix, then move, because a root-prefix subtree collides. Done when: the tree lands and `git log -- shared/` shows `efdce6177`.
+4. **Resolve the six collisions** from the table below, one commit each. Done when: `git status` is clean and no file from the incoming tree has overwritten a repository file unexamined.
+5. **Merge RegStudio**, then delete the duplicate under `extensions/`. Done when: exactly one RegStudio tree exists and `git log` over it shows `c9b8a0b`.
+6. **Retire Console and the `libvterm` submodule** per the item below. Done when: `.gitmodules` is empty or gone and `git clone` without `--recursive` builds.
+7. **Confirm `samples/` never enters the index.** Done when: `git ls-files samples` is empty.
+
 - [ ] Take `ExoSuite` in through `git subtree`, **from its remote rather than a local path**, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`, and the merge is reproducible on a machine with no local checkout.
 - [ ] Resolve the six measured root collisions, each deliberately rather than by whichever side git picks. Done when: each is handled as below and none is left as a merge artifact.
 

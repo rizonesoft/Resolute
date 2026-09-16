@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 95 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 98 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -47,7 +47,7 @@ The finished suite is **fourteen Rizonesoft products that behave like one produc
 | It is usable without a mouse or eyes | `D01 T02 §5` (the accessibility floor)                                       |
 | Each tool ships alone                | `D01 T01 §9` · `D07 T01 §1` · `D06 T01 §3`                                   |
 | One suite, not fourteen products     | `D01 T01 §1` · `D02 T01 §1` · `D07 T01 §3`                                   |
-| Retiring products tell their users   | `D06 T01 §4`                                                                 |
+| Retiring products tell their users   | `D06 T01 §5`                                                                 |
 | What defines done is written down    | `D07 T01 §1`                                                                 |
 
 ---
@@ -122,30 +122,32 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 
 The framework every tool consumes, the repair contract the destructive half consumes, and the design system that makes `DESIGN.md` true. This is where roughly 21,000 lines of AutoIt duplication stop being reproduced. Nothing after this phase is affordable without it.
 
-|  ✔  | Section      | Deliverable                                  | Items |
-| :-: | ------------ | -------------------------------------------- | :---: |
-| [ ] | `D01 T01 §1` | Application shell and lifecycle              |   6   |
-| [ ] | `D01 T01 §2` | Settings: one writer, one path               |   7   |
-| [ ] | `D01 T01 §3` | Logging and the log surface                  |   6   |
-| [ ] | `D01 T01 §4` | Localization and the pack loader             |   7   |
-| [ ] | `D01 T01 §5` | Update check and consolidation announcement  |   7   |
-| [ ] | `D01 T01 §6` | Elevation and its refusal path               |   6   |
-| [ ] | `D01 T01 §7` | Standard window, About, and preferences      |   7   |
-| [ ] | `D01 T01 §8` | DPI awareness and system theme               |   6   |
-| [ ] | `D01 T01 §9` | Standalone proof in an empty folder          |   6   |
-| [ ] | `D02 T01 §1` | The repair item and the run loop             |   6   |
-| [ ] | `D02 T01 §2` | Diagnose before repair                       |   6   |
-| [ ] | `D02 T01 §3` | Per-item result and the surface              |   6   |
-| [ ] | `D02 T01 §4` | Restore record and undo                      |   7   |
-| [ ] | `D02 T01 §5` | Transcript the user can carry                |   5   |
-| [ ] | `D02 T01 §6` | One log line per action and per refusal      |   5   |
-| [ ] | `D01 T02 §1` | Tokens made unbypassable                     |   6   |
-| [ ] | `D01 T02 §2` | Spacing grid, density, and responsive layout |   7   |
-| [ ] | `D01 T02 §3` | Content area: virtualization and scrolling   |   6   |
-| [ ] | `D01 T02 §4` | Window chrome and shell integration          |   7   |
-| [ ] | `D01 T02 §5` | The accessibility floor                      |   8   |
-| [ ] | `D01 T02 §6` | Performance floor                            |   8   |
-| [ ] | `D01 T02 §7` | Text presentation and machine values         |   5   |
+|  ✔  | Section       | Deliverable                                  | Items |
+| :-: | ------------- | -------------------------------------------- | :---: |
+| [ ] | `D01 T01 §1`  | Application shell and lifecycle              |   6   |
+| [ ] | `D01 T01 §2`  | Settings: one writer, one path               |   7   |
+| [ ] | `D01 T01 §3`  | Logging and the log surface                  |   6   |
+| [ ] | `D01 T01 §4`  | Localization and the pack loader             |   7   |
+| [ ] | `D01 T01 §5`  | Update check and consolidation announcement  |   7   |
+| [ ] | `D01 T01 §6`  | Elevation and its refusal path               |   6   |
+| [ ] | `D01 T01 §7`  | Standard window, About, and preferences      |   7   |
+| [ ] | `D01 T01 §8`  | DPI awareness and system theme               |   6   |
+| [ ] | `D01 T01 §9`  | Standalone proof in an empty folder          |   6   |
+| [ ] | `D01 T01 §10` | Crash Handling and Single Instance           |   8   |
+| [ ] | `D01 T01 §11` | Command Line and Exit Codes                  |   8   |
+| [ ] | `D02 T01 §1`  | The repair item and the run loop             |   6   |
+| [ ] | `D02 T01 §2`  | Diagnose before repair                       |   6   |
+| [ ] | `D02 T01 §3`  | Per-item result and the surface              |   6   |
+| [ ] | `D02 T01 §4`  | Restore record and undo                      |   7   |
+| [ ] | `D02 T01 §5`  | Transcript the user can carry                |   5   |
+| [ ] | `D02 T01 §6`  | One log line per action and per refusal      |   5   |
+| [ ] | `D01 T02 §1`  | Tokens made unbypassable                     |   6   |
+| [ ] | `D01 T02 §2`  | Spacing grid, density, and responsive layout |   7   |
+| [ ] | `D01 T02 §3`  | Content area: virtualization and scrolling   |   6   |
+| [ ] | `D01 T02 §4`  | Window chrome and shell integration          |   7   |
+| [ ] | `D01 T02 §5`  | The accessibility floor                      |   8   |
+| [ ] | `D01 T02 §6`  | Performance floor                            |   8   |
+| [ ] | `D01 T02 §7`  | Text presentation and machine values         |   5   |
 
 
 ### Phase 2 -- The launcher and the ports
@@ -210,13 +212,14 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 
 |  ✔  | Section      | Deliverable                                    | Items |
 | :-: | ------------ | ---------------------------------------------- | :---: |
-| [ ] | `D06 T01 §1` | Release descriptors, portable by construction  |   5   |
-| [ ] | `D06 T01 §2` | One command builds the release set             |   5   |
-| [ ] | `D06 T01 §3` | Installer and portable edition, install-tested |   6   |
-| [ ] | `D06 T01 §4` | Update files and consolidation announcements   |   6   |
-| [ ] | `D06 T01 §5` | Version rule, changelog, and release checklist |   5   |
-| [ ] | `D06 T01 §6` | Focused builds from one codebase               |   7   |
-| [ ] | `D06 T01 §7` | Licensing and attribution                      |   8   |
+| [ ] | `D06 T01 §1` | Release Descriptors, Portable by Construction  |   5   |
+| [ ] | `D06 T01 §2` | One Command Builds the Release Set             |   5   |
+| [ ] | `D06 T01 §3` | Installers: Per Tool and Whole Suite           |   9   |
+| [ ] | `D06 T01 §4` | Migration From the AutoIt Suite                |   7   |
+| [ ] | `D06 T01 §5` | Update Files and Consolidation Announcements   |   6   |
+| [ ] | `D06 T01 §6` | Version Rule, Changelog, and Release Checklist |   5   |
+| [ ] | `D06 T01 §7` | Focused Builds From One Codebase               |   7   |
+| [ ] | `D06 T01 §8` | Licensing and Attribution                      |  11   |
 | [ ] | `D08 T01 §1` | Documentation set for every tool               |   6   |
 | [ ] | `D08 T01 §2` | Shared string pool and build-time composition  |   6   |
 | [ ] | `D08 T01 §3` | Coverage matrix and pack hygiene               |   6   |
@@ -229,7 +232,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 
 - **It does not redesign the tools.** The port is 1:1 on behavior. New capability enters through `add-todo` like anything else, and Phase 3 is where it lands.
 - **It does not set up CI.** There is no runner for this repository today. `D00 T01 §5` puts the whole gate set behind one command so wiring a runner later is a small job.
-- **It does not unify tool versions.** `D06 T01 §5` writes the rule that explains the spread rather than declaring it wrong.
+- **It does not unify tool versions.** `D06 T01 §6` writes the rule that explains the spread rather than declaring it wrong.
 - **It does not maintain the AutoIt suite beyond keeping it shippable.** `D09 T01 §3` writes that scope down so the rewrite does not quietly become two projects.
 - **It does not vendor a compiler into git.** The bootstrap downloads a pinned llvm-mingw toolchain into an ignored directory instead.
 - **It does not keep the ExoSuite name.** `D00 T03` renames the product, the UI library, and the toolchain to Resolute, because there is one product here rather than two.
