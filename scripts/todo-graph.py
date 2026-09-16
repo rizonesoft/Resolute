@@ -1002,10 +1002,13 @@ def cmd_query(args) -> int:
         print("  more than delay anywhere else, because nothing on this chain can")
         print("  start early.")
 
-        couplings = _filing_couplings()
+        couplings, coupling_problems = _filing_couplings()
         print(f"\n  coupling candidates from review findings: {len(couplings)}")
         if not couplings:
-            print("    None. No review has filed a finding to another section, so there")
+            if coupling_problems:
+                print("    None READABLE. That is not the same as none existing:")
+            else:
+                print("    None. No review has filed a finding to another section, so there")
             print("    is no evidence here either way.")
         else:
             for src, dst, summary in couplings:
@@ -1017,6 +1020,13 @@ def cmd_query(args) -> int:
             print("    is coupling the dependency graph does not carry. It is NOT proof")
             print("    the order is wrong: most filings are work found early, not work")
             print("    needed first.")
+
+        if coupling_problems:
+            print("\n  the filing evidence is INCOMPLETE:")
+            for problem in coupling_problems:
+                print(f"    {problem}")
+            print("    Findings that could not be read are not counted above, so the")
+            print("    coupling list is a floor rather than the whole picture.")
 
         print("\n  This command proposes and cannot act. It opens no file for writing.")
         print("  Take a change through the `groom-plan` skill, which is where section")
@@ -1786,25 +1796,56 @@ def _calibration_rows(todos: list[Todo]) -> list[dict]:
 def _section_edges(todos: list[Todo]) -> tuple[dict[str, list[str]], dict[str, str]]:
     """ref -> the refs it depends on, plus ref -> its title.
 
-    A dependency is written `§N` inside its own file and `DNN TNN §N` across
-    files; both normalise to the canonical form here so the chain can be walked.
+    Two kinds of edge, and the first version carried only one:
+
+    * **Section edges**, the `Depends On` column. A reference may be written
+      `§N`, `TNN §N` or `DNN TNN §N`, all three of which `AGENTS.md`
+      documents, so they are resolved through `resolve_ref` rather than by
+      pattern-matching the two forms somebody happened to think of.
+    * **Whole-TODO edges**, the frontmatter `depends_on`. Fifteen are declared
+      today, and ignoring them made the reported chain 17 sections deep when it
+      is 30, with a different endpoint: the report named the wrong path as the
+      one where delay costs most, which is its entire purpose. A whole-TODO edge
+      means every section of the dependency must ship, which is how
+      `unmet_dependencies` already reads it.
+
+    Found by the independent review of 390b560.
     """
+    by_id = {t.id: t for t in todos if t.id}
+    by_key = {(t.domain, t.number): t for t in todos}
+
+    def canon(todo: Todo, num: int) -> str:
+        return f"D{todo.domain.split('-')[0]} T{todo.number} §{num}"
+
     edges: dict[str, list[str]] = {}
     titles: dict[str, str] = {}
     for t in todos:
-        dom = t.domain.split("-")[0]
-        own = f"D{dom} T{t.number}"
+        # Every section of every whole-TODO prerequisite, computed once per file.
+        file_deps: list[str] = []
+        for dep_id in t.depends_on:
+            dep = by_id.get(dep_id)
+            if dep is None:
+                continue
+            file_deps.extend(canon(dep, n) for n in dep.sections)
+
         for num, sec in t.sections.items():
-            ref = f"{own} \u00a7{num}"
+            ref = canon(t, num)
             titles[ref] = sec.title or sec.deliverable or ""
-            deps = []
+            deps: list[str] = []
             for raw in sec.depends_on:
-                d = re.sub(r"\s+", " ", raw.strip())
-                if d.startswith("\u00a7"):
-                    d = f"{own} {d}"
-                deps.append(d)
+                hit = resolve_ref(raw, t, by_key)
+                if hit is None:
+                    continue          # unresolvable: validate reports it, not this
+                dep_todo = by_id.get(hit[0])
+                if dep_todo is None:
+                    continue
+                deps.append(canon(dep_todo, hit[1]))
+            for fd in file_deps:
+                if fd != ref and fd not in deps:
+                    deps.append(fd)
             edges[ref] = deps
     return edges, titles
+
 
 
 def _longest_chain(edges: dict[str, list[str]]) -> list[str]:
@@ -1839,31 +1880,44 @@ def _longest_chain(edges: dict[str, list[str]]) -> list[str]:
     return overall
 
 
-def _filing_couplings() -> list[tuple[str, str, str]]:
-    """(from_ref, to_ref, summary) for every review finding filed to another section.
+def _filing_couplings() -> tuple[list[tuple[str, str, str]], list[str]]:
+    """Couplings from the findings ledger, and any reason the evidence is incomplete.
 
-    This is the evidence D00 T04 §4 uses. A filing records that one section ran
-    into work another one owns, which is a coupling the dependency graph does not
-    carry. Derived from the ledger D00 T04 §2 generates, never from a new record.
+    Returns (couplings, problems). The first version returned only the couplings
+    and swallowed everything else: an unreadable heading, an import failure, a
+    missing script all produced an empty list, and the report then stated that no
+    review had filed a finding. "No evidence" and "the evidence could not be
+    read" are opposite claims and it made them identical.
+
+    That is the third time in this TODO file that a failure was quietly turned
+    into a benign result, after the claims checker dropping a split claim and the
+    coverage floor passing with no claims. Found by the independent review of
+    390b560.
     """
     mod = REPO / "scripts" / "todo-findings.py"
     if not mod.is_file():
-        return []
+        return [], [f"{mod.name} is missing, so no filing evidence could be read"]
     import importlib.util
     spec = importlib.util.spec_from_file_location("todo_findings", mod)
     if spec is None or spec.loader is None:
-        return []
+        return [], [f"{mod.name} could not be loaded, so no filing evidence could be read"]
     tf = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(tf)
-        findings, _bad = tf.collect()
-    except Exception:
-        return []
-    out = []
-    for f in findings:
-        if getattr(f, "filed_to", None):
-            out.append((f.ref, f.filed_to, f.summary))
-    return out
+        findings, bad = tf.collect()
+    except Exception as exc:
+        return [], [f"reading {mod.name} failed: {exc}"]
+    problems = [
+        f"{path}:{line} could not be read as a finding -- {why}"
+        for path, line, why in bad
+    ]
+    out = [
+        (f.ref, f.filed_to, f.summary)
+        for f in findings
+        if getattr(f, "filed_to", None)
+    ]
+    return out, problems
+
 
 
 def _plan_state(todos: list[Todo]) -> dict[str, str]:
@@ -3856,6 +3910,18 @@ track: Z1
         # hangs on bad input is worse than one that reports a short chain.
         _cyc = _longest_chain({"a": ["b"], "b": ["a"]})
         check("longest chain terminates on a cycle", len(_cyc) <= 3, True)
+        # _filing_couplings returned a bare list and swallowed every failure, so
+        # "no evidence" and "the evidence could not be read" were the same
+        # answer. The shape is the guard: a caller that unpacks two values
+        # cannot silently go back to ignoring the second.
+        _cp = _filing_couplings()
+        check("filing couplings returns evidence AND problems", len(_cp), 2)
+        check("filing couplings: evidence is a list", isinstance(_cp[0], list), True)
+        check("filing couplings: problems is a list", isinstance(_cp[1], list), True)
+        # The whole-TODO edges and the TNN §N shorthand are proven by driven runs
+        # in this section's checkpoint: the chain moves from 17 to 30 with file
+        # edges included, and stays 30 when a dependency is rewritten as
+        # shorthand. The self-test loads fixture TODOs, which declare neither.
         # Normalisation of a bare `§N` into a full reference is proven by the
         # driven run in this section's checkpoint, against the real tree. The
         # self-test loads fixture TODOs, where those references do not exist.
