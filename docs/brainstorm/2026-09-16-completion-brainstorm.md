@@ -490,7 +490,7 @@ The phases are: gates and the bar; the two shared layers; the launcher and the p
 | `extensions/` | `RegStudio` and `Console`, each a standalone `WIN32` executable linking exo-ui statically |
 | `src/main.cpp` | 573 lines. The application is a shell composing `exo::Toolbar`, `Sidebar`, `StatusBar`, `ContentView`, `ListView` |
 | `Bin/Release/ExoSuite.exe` | **1.39 MB**, fully static via `-static -static-libgcc -static-libstdc++` |
-| Dependencies | **No vcpkg.** `deps/libvterm` is vendored for the Console extension |
+| Dependencies | **No vcpkg.** `deps/libvterm` is a **git submodule** on `neovim/libvterm`, populated with 81 files |
 | Tests | **None.** `test_font.cpp` is a scratch file |
 | Standard | C++23, CMake presets, Ninja, LTO on release |
 
@@ -652,3 +652,35 @@ It arrives with the intake whether or not it is wanted, and it has no owner in t
 - `validate`: 0 fatal, 0 warning, 50 adjacency advisories. `plan --check`: current at 0 of 72.
 
 Phase 3 now carries seven intakes plus four new utilities, with RegStudio the largest.
+
+## Correction and layout, round 11
+
+**Correction:** `deps/libvterm` was recorded earlier as vendored. It is a **git submodule** pointing at `neovim/libvterm`, populated with 81 files. It is the tree's only external dependency, and a submodule contradicts the bare-machine bootstrap property, because a clone without `--recursive` cannot build. `D00 T03 §1` now owns the decision and names leaving it as the substitute that fails.
+
+**The merge lands at the repository root**, and the six collisions are all trivial:
+
+| Collision | What it actually is | Resolution |
+| --- | --- | --- |
+| `todo/` | one file, `todo/extensions/TODO-Console.md` | route, then remove |
+| `docs/` | one file, `docs/extensions.md` | move into the repository's `docs/` |
+| `README.md` | the stale Rust and Slint one | the repository's wins; §4 rewrites the content |
+| `.gitignore`, `.gitattributes` | build and `Bin/` rules | merge into the repository's |
+| `build/` | ignored on both sides | nothing to reconcile |
+
+`.github/` carries issue templates only, no CI workflows, so nothing is inherited there.
+
+**Resulting root layout**, now recorded in `D00 T03 §1` and agreed by `AGENTS.md`:
+
+```
+CMakeLists.txt  CMakePresets.json
+src/          the launcher shell
+shared/       resolute-ui, lucide
+extensions/   the tools, each a standalone executable
+deps/         third-party source
+reskit/       the bootstrapped toolchain
+resources/    application icons
+resolute_au3/ the frozen specification
+todo/ docs/ scripts/
+```
+
+This corrects `AGENTS.md`, which described `src/` as "the C++ suite". After the intake `src/` is only the launcher shell: the framework lives in `shared/` and the tools in `extensions/`.

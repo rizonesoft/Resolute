@@ -13,7 +13,7 @@ track: W1
 > **Goal:** The working C++23 codebase at `samples/ExoSuite` becomes the Resolute C++ tree: history preserved, product renamed, library and toolchain renamed, and the stale documentation corrected. After this file, `src/` is real and the rest of the plan builds on something that already compiles.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** `samples/ExoSuite` and `samples/RegStudio` are **embedded git repositories** with their own commit history, currently untracked by the outer repository. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1.39 MB fully static. There is **no vcpkg**; `deps/libvterm` is vendored. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
+> **Current state (verified 2026-09-16):** `samples/ExoSuite` and `samples/RegStudio` are **embedded git repositories** with their own commit history, currently untracked by the outer repository. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1.39 MB fully static. There is **no vcpkg**; `deps/libvterm` is vendored. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
 
 ## Inputs
 
@@ -51,6 +51,31 @@ track: W1
 `exo-ui` is about to become the foundation of fourteen tools. How it got to be the shape it is will matter, and it is recoverable now and never again once the embedded repositories are discarded.
 
 - [ ] Take `samples/ExoSuite` in through `git subtree`, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`.
+- [ ] Resolve the six measured root collisions, each deliberately rather than by whichever side git picks. Done when: each is handled as below and none is left as a merge artifact.
+
+  | Collision | Resolution |
+  | --- | --- |
+  | `todo/extensions/TODO-Console.md` | route through `add-todo`, then remove the directory |
+  | `docs/extensions.md` | move into the repository's `docs/` |
+  | `README.md` | the repository's wins; the incoming content is rewritten by §4 |
+  | `.gitignore`, `.gitattributes` | merge the incoming rules into the repository's |
+  | `build/` | ignored on both sides, no content to reconcile |
+
+- [ ] Decide what happens to the `deps/libvterm` submodule. Done when: the decision is dated with its cost of changing. A submodule contradicts the bare-machine bootstrap property, because a clone without `--recursive` cannot build; vendoring the source removes that. Cheaper substitute that fails the checkpoint: leaving the submodule and discovering it on the first clean clone.
+- [ ] Record the resulting root layout so later sections can rely on it. Done when: the layout below is true and `AGENTS.md` agrees with it.
+
+  ```
+  CMakeLists.txt  CMakePresets.json
+  src/          the launcher shell
+  shared/       resolute-ui, lucide
+  extensions/   the tools, each a standalone executable
+  deps/         third-party source
+  reskit/       the bootstrapped toolchain
+  resources/    application icons
+  resolute_au3/ the frozen specification
+  todo/ docs/ scripts/
+  ```
+
 - [ ] Take `samples/RegStudio` in with its history. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the two copies, and only the root copy carries git history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
 - [ ] Remove the embedded repositories from `samples/` once their content is merged. Done when: no `.git` directory remains under `samples/` and `git status` reports no embedded-repository warning.
 - [ ] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. Done when: a full bootstrap and build leaves `git status` clean.

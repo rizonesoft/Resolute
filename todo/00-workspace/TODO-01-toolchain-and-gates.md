@@ -13,7 +13,7 @@ track: W1
 > **Goal:** A clean checkout builds any tool with one command, on a machine whose toolchain versions are pinned rather than remembered. Every gate the project owes runs from one entry point, so a change is either provably clean or provably not.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** A working toolchain bootstrap and CMake structure arrive with `D00 T03`, from the ExoSuite codebase: llvm-mingw 20251216 ucrt-x86_64, CMake 4.2.3, Ninja 1.13.1, C++23, presets driving Ninja with LTO on release, and full static linking producing a 1.39 MB executable. There is **no vcpkg**; `deps/libvterm` is vendored. What does not exist anywhere is hash verification on the bootstrap, a locator that fails by name, a warning level applied across targets, `clang-tidy`, a one-command build, or a combined gate. The AutoIt suite under `resolute_au3/` separately does not build from a clean checkout, because thirteen `.sni` descriptors point at `R:\Workspace\Resolute`, a directory that no longer exists; `D09 T01 §1` owns that.
+> **Current state (verified 2026-09-16):** A working toolchain bootstrap and CMake structure arrive with `D00 T03`, from the ExoSuite codebase: llvm-mingw 20251216 ucrt-x86_64, CMake 4.2.3, Ninja 1.13.1, C++23, presets driving Ninja with LTO on release, and full static linking producing a 1.39 MB executable. There is **no vcpkg**; `deps/libvterm` is a git submodule, which `D00 T03 §1` decides the fate of. What does not exist anywhere is hash verification on the bootstrap, a locator that fails by name, a warning level applied across targets, `clang-tidy`, a one-command build, or a combined gate. The AutoIt suite under `resolute_au3/` separately does not build from a clean checkout, because thirteen `.sni` descriptors point at `R:\Workspace\Resolute`, a directory that no longer exists; `D09 T01 §1` owns that.
 
 ## Inputs
 
@@ -85,7 +85,7 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
 
 - [ ] Make the presets resolve their compiler and generator from the bootstrapped toolchain rather than from `PATH`. Done when: configuring with a different `clang` earlier on `PATH` still selects the bootstrapped one, proven by the configure output.
 - [ ] Generate no Visual Studio solution and commit none. Done when: the repository contains no `.sln` or `.vcxproj`, and the presets drive VS, VS Code, and a bare terminal identically.
-- [ ] Settle how dependencies arrive. Done when: the decision is dated, records that there is no vcpkg and that `deps/libvterm` is vendored, and names how Catch2 arrives.
+- [ ] Settle how dependencies arrive. Done when: the decision is dated, records that there is no vcpkg, states what `D00 T03 §1` decided about the `libvterm` submodule, and names how Catch2 arrives.
 - [ ] Keep static linking explicit and enforced. Done when: `-static -static-libgcc -static-libstdc++` is set once for every target, and a build producing a runtime DLL dependency fails, proven by checking the built executable's imports.
 - [ ] Put all build output under `build/`, which is already gitignored, with nothing written inside `src/`. Done when: a full configure and build leaves `git status` clean.
 - [ ] Prove the structure builds the real application, not a placeholder. Done when: `Resolute.exe` builds from a clean checkout after bootstrap.

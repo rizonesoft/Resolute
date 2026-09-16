@@ -10,7 +10,9 @@ It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoI
 
 | Path | Purpose |
 | ---- | ------- |
-| `src/` | The C++ suite. The work. |
+| `src/` | The launcher shell |
+| `shared/` | The framework and the UI library. Every tool consumes these |
+| `extensions/` | The tools, each building as a standalone executable |
 | `resolute_au3/` | The frozen AutoIt suite. **The executable specification**, not a maintenance target |
 | `resolute_au3/todo/` | The archived AutoIt plan, superseded 2026-09-16, kept for its per-tool analysis |
 | `DESIGN.md` | **The design contract.** Every user-facing surface is held to it |
