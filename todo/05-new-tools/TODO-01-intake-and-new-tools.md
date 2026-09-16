@@ -10,7 +10,7 @@ track: P3
 
 # TODO-01 -- Intake and New Tools
 
-> **Goal:** Six programs from `samples/` become real products, and four new utilities join the suite. Every one of them arrives already conformant, through a repeatable intake contract, so no new tool ever joins a cleanup backlog.
+> **Goal:** Six programs from `samples/` become real products, and the new utilities join the suite. Every one of them arrives already conformant, through a repeatable intake contract, so no new tool ever joins a cleanup backlog. Complete Windows Repair becomes the suite's general repair library: any Windows repair without a clearly topical home lands there as an item rather than as a product.
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** Nothing here has started. The intake candidates live under `resolute_au3/samples/`: Complete Windows Repair (`ComWinRep/WinRepair.au3`, 2,028 lines, version 1.0.0.339, with its own build descriptor and documentation set), QuickErase (`QuickErase/QuickErace.au3`, 723 lines, and the filename is misspelled in the sample), WinClean (`WinClean/EvBeGone.au3`, 582 lines, plus `UDF/Services.au3`, `UDF/Resources.au3`, `UDF/SecureDelete.au3`), UUIDGen (209 lines), and Indicators (349 lines). SaveDesk is **not** a port: `samples/SaveDesk/` holds only a `[Research]/` directory of third-party material with no Rizonesoft source. The four new utilities have no source at all.
@@ -82,6 +82,9 @@ The flagship intake, and the largest. It arrives with its own documentation set 
 - [ ] Reconcile the `Doors/` layout against the framework's standalone layout. Done when: one layout is chosen, recorded with its cost, and `D01 T01 §9` is named as the owner of the decision.
 - [ ] Import the repairs from `WinPower.au3` that belong here: `_RepairFontRegistrations`, `_ResetTcpipAll`, `_RebuildWMI`. Done when: all three are declared items and `_ResetTcpipAll` reuses the ComIntRep implementation rather than becoming a second one.
 - [ ] Restore the Windows Update reset scripts from git history at `8d7469a^` and evaluate them as repair items. Done when: each is either a declared item or explicitly rejected with a reason.
+- [ ] Add the six routed repairs as declared items: Windows Search and indexing, audio, Store and UWP app re-registration, print spooler, font registration, and WinSxS component cleanup. Done when: all six are contract items with a diagnose, a verify, and an honest reversibility answer. Source for font registration: `_RepairFontRegistrations` in `resolute_au3/samples/WinPower 0.0.3.325922/WinPower.au3:229`.
+- [ ] Give WinSxS cleanup the treatment its irreversibility demands. Done when: it states on the surface that superseded components cannot be restored afterwards, and the confirmation names what will be removed.
+- [ ] Record that this tool is the suite's **general repair library**. Done when: this section states that any Windows repair without a clearly topical home becomes a CWR item, and names the two exceptions already assigned: network repairs to `ComIntRep` and drive repairs to Drive Repair.
 - [ ] Prove every repair has a reverse, or states on the surface that it does not and what to do instead. Done when: each item carries one of those two.
 - [ ] Account for the surface. Done when: the account covers the whole window and each deferral resolves.
 - [ ] Commit: `"comwinrep: complete windows repair on the repair contract"`

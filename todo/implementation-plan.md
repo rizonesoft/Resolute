@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 87 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 88 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -211,6 +211,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §3` | Installer and portable edition, install-tested |   6   |
 | [ ] | `D06 T01 §4` | Update files and consolidation announcements   |   6   |
 | [ ] | `D06 T01 §5` | Version rule, changelog, and release checklist |   5   |
+| [ ] | `D06 T01 §6` | Focused builds from one codebase               |   7   |
 | [ ] | `D08 T01 §1` | Documentation set for every tool               |   6   |
 | [ ] | `D08 T01 §2` | Shared string pool and build-time composition  |   6   |
 | [ ] | `D08 T01 §3` | Coverage matrix and pack hygiene               |   6   |

@@ -30,6 +30,7 @@ track: F2
 ## Outcome
 
 - A repair tool declares what it can repair and the contract runs it, rather than each tool writing its own loop.
+- Every repair run, in every tool, checks first for the machine-level faults that masquerade as something else.
 - Nothing is changed without the prior state being recorded first.
 - Every change is verified by reading it back, never by trusting a return code.
 - Every run can be undone, or says plainly and on the surface that it cannot and what to do instead.
@@ -83,10 +84,13 @@ Presenting a user with a checklist and letting them guess is the current behavio
 - [ ] Make diagnose read-only, provably. Done when: a diagnose pass over the fixture leaves it byte-identical, asserted.
 - [ ] Let a user override the diagnosis and run an item anyway, with a stated consequence. Done when: the override is available, and choosing it is recorded in the result and the log.
 - [ ] Handle a diagnose that cannot determine an answer as its own outcome, distinct from applies and does-not-apply. Done when: three states are representable and the surface shows which.
-- [ ] Add assertions for the applicable subset, the read-only guarantee, and the unknown state. Done when: three assertions run.
+- [ ] Add a **shared pre-flight** that runs once before any repair run, in every tool, checking the machine-level faults that masquerade as something else. Done when: system clock skew and expired or corrupt root certificates are both checked, and a fixture for each produces a named warning before the run begins.
+- [ ] Explain a pre-flight finding in terms of the symptom the user actually has. Done when: a skewed clock says that it breaks secure connections machine-wide and may be the real cause of the problem they came to fix, rather than reporting a time difference. Cheaper substitute that fails the checkpoint: a warning that states the clock is wrong without connecting it to why they are here.
+- [ ] Let the user proceed anyway, and record that they did. Done when: continuing past a pre-flight warning is possible, logged, and carried into the transcript.
+- [ ] Add assertions for the applicable subset, the read-only guarantee, the unknown state, and both pre-flight checks. Done when: five assertions run.
 - [ ] Commit: `"repair: diagnose before offering a repair"`
 
-**Test checkpoint:** A fixture where two of four items apply offers exactly two. A diagnose pass leaves the fixture byte-identical, asserted. The unknown state renders distinctly. An override is recorded in both result and log. All quoted.
+**Test checkpoint:** A fixture where two of four items apply offers exactly two. A diagnose pass leaves the fixture byte-identical, asserted. The unknown state renders distinctly. An override is recorded in both result and log. A skewed-clock fixture and an expired-root-certificate fixture each produce a named pre-flight warning connecting the fault to the user's symptom, and proceeding past one is logged. All quoted.
 
 ## 3. Per-Item Result and the Surface
 

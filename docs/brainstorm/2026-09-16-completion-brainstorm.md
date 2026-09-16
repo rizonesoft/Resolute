@@ -817,3 +817,38 @@ Two safety rules are recorded where they will be read rather than in prose here:
 - The suite is **34 shipped products** plus two internal tools.
 
 Still unrouted and recorded earlier: six repairs that belong in Complete Windows Repair as items rather than products, and the clock-skew and root-certificate checks for `ComIntRep`'s diagnose pass.
+
+## Decisions taken, round 15
+
+43. **The six Windows repairs ship as Complete Windows Repair items**, with a landing page per repair, and a repair is promoted to its own focused build only when measured traffic justifies it.
+44. **A focused-build mechanism is added to the release domain**, `D06 T01 §6`, built before it is needed so that promoting a repair later costs a descriptor rather than a project.
+45. **Clock skew and root certificate checks become a shared pre-flight in the repair contract**, `D02 T01 §2`, running once before any repair run in any tool.
+46. **Complete Windows Repair is the suite's general repair library.** Any Windows repair without a clearly topical home becomes a CWR item. The two standing exceptions are network repairs, which go to `ComIntRep`, and drive repairs, which go to Drive Repair.
+
+### The traffic question, and how it resolved
+
+The operator's instinct was six separate utilities, to earn search traffic on long-tail repair queries. That instinct is correct about the traffic and wrong about the mechanism.
+
+**Traffic comes from pages, not from binaries.** Somebody searching for a specific fix needs a page about exactly that fix. Whether the download it offers is a focused executable or the general tool with that item pre-selected is invisible to a search engine and nearly invisible to the user. Pages are cheap; products are not, and each one costs a documentation set, up to 35 language packs, an update file, an About page, design conformance, the accessibility floor, a release slot, and a support surface.
+
+**The parallel that settled it:** earlier the same day, `Chromin`, `Edgemin`, and `Watermin` were merged into `Firemin`, giving up three download pages, because four copies of one 2,389-line script was the single worst defect in the suite. Six repair tools as six codebases would recreate exactly that.
+
+**What survives from the instinct** is the focused build: one codebase, several descriptors, each producing a named product with its own icon, update file, and exposed item set. That keeps the marketing surface without the duplication, and `D06 T01 §6` requires a focused build's About to name the suite and the parent tool, so the arrangement is honest rather than shovelware.
+
+The staged rule is: **items now, landing pages now, focused builds on measured traffic.** Guessing wrong costs nothing in either direction.
+
+### Why the pre-flight matters more than it looks
+
+A wrong system clock and an expired root certificate both break secure connections machine-wide, and both present as a network fault that no amount of network repair will fix.
+
+Putting the check only in `ComIntRep` would miss the user who opened a different tool entirely, because they did not think the problem was network-related. As a shared pre-flight it runs before **every** repair run in **every** tool.
+
+`D02 T01 §2` requires the warning to be phrased in terms of the symptom the user actually has, not the fault: a skewed clock says it breaks secure connections and may be the real cause of what they came to fix. A warning that reports a time difference without connecting it to why they are here is named as the substitute that fails the checkpoint.
+
+---
+
+# Plan state
+
+- **10 domains, 16 TODO files, 88 sections.**
+- `validate`: 0 fatal, 0 warning, 54 adjacency advisories. `plan --check`: current at 0 of 88.
+- Nothing from the brainstorm is now unrouted.
