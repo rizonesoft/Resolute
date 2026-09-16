@@ -66,10 +66,17 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | UUIDGen | 05-new-tools | TODO written, intake pilot |
 | Indicators | 05-new-tools | TODO written, intake |
 | SaveDesk | 05-new-tools | TODO written, new development |
-| Startup Manager | 05-new-tools | TODO written, new |
-| Service Manager | 05-new-tools | TODO written, new |
-| Context Menu Editor | 05-new-tools | TODO written, new |
+| Autoruns Manager (startup, services, tasks, context menus) | 05-new-tools | TODO written, new, consolidation |
 | Hosts File Editor | 05-new-tools | TODO written, new |
+| Restore Point Manager | 05-new-tools | TODO written, new |
+| Driver Manager | 05-new-tools | TODO written, new |
+| Disk Health | 05-new-tools | TODO written, new |
+| Crash Decoder | 05-new-tools | TODO written, new |
+| File Unlocker | 05-new-tools | TODO written, new |
+| System Report | 05-new-tools | TODO written, new |
+| Battery Health | 05-new-tools | TODO written, new |
+| Boot Options | 05-new-tools | TODO written, new |
+| File Association Repair | 05-new-tools | TODO written, new |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | internal tooling, not a product |

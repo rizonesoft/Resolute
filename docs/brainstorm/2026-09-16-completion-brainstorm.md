@@ -717,3 +717,60 @@ reskit/       the bootstrapped toolchain
 ```
 
 A fresh clone **without** `--recursive` builds everything. `D00 T01 §2` asserts exactly that.
+
+## Decisions taken, round 13
+
+37. **The four manager tools collapse into one autoruns-style tool** with four tabs: startup entries, services, scheduled tasks, and context menu entries. Scheduled tasks were not previously covered by anything and are where bloat and malware hide. The Hosts editor stays separate, because it edits one file rather than enumerating system state.
+38. **Nine new utilities are added**, in `D05 T03`: Restore Point Manager, Driver Manager, Disk Health, Crash Decoder, File Unlocker, System Report, Battery Health, Boot Options, and File Association Repair.
+39. **Suite width is not treated as a constraint.** The operator decided this explicitly after it was raised twice. The framework and the repair contract are what make each tool cheap, and that is the bet the plan is built on.
+
+### Why the manager consolidation is a better product, not just fewer products
+
+Startup entries, services, scheduled tasks, and shell context menu entries are the same tool four times: enumerate what the system runs, show what is enabled, toggle it, undo it.
+
+The question a user actually has is "what runs on my machine", and four separate downloads answer it worse than one does. Sysinternals Autoruns established that model. `D05 T01 §5` requires **one entry model across all four sources with no per-source branch in the surface**, and one search that narrows every tab and names each hit's source.
+
+### Restore Point Manager is infrastructure, not a tool
+
+`D05 T03 §1` adds restore-point creation to the **repair contract's run loop**, so every repair in the suite can offer one first. That is a second undo layer beneath the per-item restore record, and it is the only thing that helps when a repair breaks something the record cannot describe: a driver that will not load, a service that will not start.
+
+It also fixes the two things people dislike about Windows' own restore interface: points listed by date alone with no indication of what they cover, and a greyed-out button when System Protection is off with no explanation of why or how to change it.
+
+### A product decision recorded so it is not relaxed quietly
+
+**The Driver Manager backs up and rolls back. It never updates.**
+
+Driver updaters sit next door to scareware, and shipping one would attach that reputation to the entire suite. `D05 T03 §2` carries this as an `IMPORTANT` block, and the file's Verification requires the absence of an update path to be **proven by search** rather than asserted.
+
+### The structural insight: items are cheap, tools are expensive
+
+The repair contract makes adding a repair nearly free: declare diagnose, repair, verify, and a reversibility answer, and it inherits the result list, transcript, restore record, undo, and logging. Adding a **tool** costs a documentation set, up to 35 language packs, an update file, conformance, and accessibility.
+
+Complete Windows Repair **is** a collection of repair items, which makes it the right home for these, at roughly a tenth of the cost of a product each:
+
+- Windows Search and indexing repair
+- Audio repair, which is a top-three support call
+- Store and UWP app repair
+- Print spooler repair
+- Font registration repair, for which `WinPower` already has the code
+- WinSxS component store cleanup
+
+Two more belong in `ComIntRep`'s diagnose pass rather than anywhere else, because both break HTTPS machine-wide and present identically to a network fault that no amount of network repair fixes:
+
+- **System clock skew**
+- **Expired or corrupt root certificates**
+
+None of these are routed yet. They are recorded here so they are not rediscovered as new ideas later.
+
+### Still unrouted, worth a decision
+
+- **Group Policy leftovers.** "Some settings are managed by your organization" on a personal machine is residue from uninstalled software, `gpedit` is absent on Home editions, and nothing addresses it. A real gap with no competition.
+- **Hidden and system attribute repair.** USB malware setting `+h +s` on a user's files is the classic USB infection symptom. Check whether `USBRepair` already does this before adding it.
+
+---
+
+# Plan state after the new utilities
+
+- **10 domains, 15 TODO files, 79 sections.**
+- `validate`: 0 fatal, 0 warning, 53 adjacency advisories. `plan --check`: current at 0 of 79.
+- The suite is **26 shipped products** plus two internal tools.

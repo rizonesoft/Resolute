@@ -22,6 +22,7 @@ track: P3
 - -> XREF: [`02-repair-contract/TODO-01 §1`](../02-repair-contract/TODO-01-repair-contract.md) -- the contract every repairing intake consumes from its first commit
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the porting pattern this file reuses
 - -> XREF: [`05-new-tools/TODO-02 §1`](./TODO-02-regstudio.md) -- RegStudio, the largest intake, measured against the contract §1 writes
+- -> XREF: [`05-new-tools/TODO-03 §1`](./TODO-03-system-utilities.md) -- the nine new utilities, measured against the same contract
 
 ## Outcome
 
@@ -29,7 +30,7 @@ track: P3
 - Complete Windows Repair ships as a first-class product.
 - QuickErase, WinClean, UUIDGen, and Indicators ship.
 - SaveDesk is built as new development against a researched concept.
-- Startup Manager, Service Manager, Context Menu Editor, and Hosts File Editor ship.
+- Startup entries, services, scheduled tasks, and context menu entries ship as one tool; the Hosts editor ships beside it.
 - Service control lives in the framework, not in one tool.
 
 **Adjacency:** list=applicable @ D05 T01 §5; document=applicable @ D05 T01 §2; settings=applicable @ D05 T01 §1; reporting=applicable @ D05 T01 §5; notifications=applicable @ D05 T01 §3; permissions=applicable @ D05 T01 §3; audit=applicable @ D05 T01 §3; exchange=applicable @ D05 T01 §4; reverse=applicable @ D05 T01 §5
@@ -44,7 +45,7 @@ track: P3
 |   2   |   §2    | Complete Windows Repair                      | §1, D02 T01 §1         |  [ ]   |
 |   3   |   §3    | QuickErase and WinClean                      | §1, D02 T01 §4         |  [ ]   |
 |   4   |   §4    | Indicators and SaveDesk                      | §1                     |  [ ]   |
-|   5   |   §5    | The four new utilities                       | §1, D02 T01 §4         |  [ ]   |
+|   5   |   §5    | The autoruns manager and the hosts editor    | §1, D02 T01 §4         |  [ ]   |
 
 ---
 
@@ -126,25 +127,30 @@ One small port and one genuinely new build. SaveDesk is the only candidate in th
 
 **Test checkpoint:** Indicators passes the conformance check and runs standalone. SaveDesk saves a layout, survives a resolution change, and restores every icon to its recorded position, asserted and captured. The layout list is identifiable without opening entries.
 
-## 5. The Four New Utilities
+## 5. The Autoruns Manager and the Hosts Editor
 
-New capability, built on a framework and a contract that already exist, which is what makes them affordable. Each is an enable-and-disable surface over system state, so each owes a list and an undo.
+Startup entries, services, scheduled tasks, and shell context menu entries are the same tool four times: enumerate what the system runs, show what is enabled, toggle it, undo it. They ship as **one tool with four tabs**, because the question a user actually has is "what runs on my machine", and answering it across four separate downloads is worse rather than better.
 
-**Fidelity:** each tool's main window and result list against the framework's standard window and `docs/captures/house-style/`.
-**Job:** a user can see what their system is doing and change it, reversibly. Consumer: the system state, read back by verify.
-**Treatment:** every change declared as a repair-contract item so the undo is the contract's, not a per-tool invention. Cheaper substitute that fails the checkpoint: four tools that each write their own enable-and-disable logic.
+The Hosts editor stays separate: it edits one file rather than enumerating system state, and grouping it here would be filing by convenience.
+
+**Fidelity:** the manager's tabbed surface and the hosts editor, against `DESIGN.md` and `docs/captures/house-style/`.
+**Job:** a user can see everything their system runs without being asked, and stop any of it reversibly. Consumer: the system state, read back by verify.
+**Treatment:** one enumeration model over four sources, and every change declared as a repair-contract item. Cheaper substitute that fails the checkpoint: four tools that each write their own enable-and-disable logic, which is the duplication this whole rewrite exists to remove.
 **Chrome:** consume the framework, the repair contract, and the service primitives from §3.
 **Needs:** Windows host (build/test)
 
-- [ ] Build Startup Manager: list what runs at boot, with enable, disable, and undo. Done when: an entry is disabled, the machine is restarted, the entry did not run, and the undo restores it.
-- [ ] Build Service Manager on the promoted service primitives. Done when: start, stop, and start-mode changes each verify by reading the service state back, and each is undoable.
-- [ ] Build Context Menu Editor. Done when: an entry is removed, Explorer no longer offers it, and the undo restores it exactly.
-- [ ] Build Hosts File Editor. Done when: an entry is added, name resolution reflects it, the file is written atomically, and the prior file is recoverable.
-- [ ] Give every one of the four a per-item result list and a transcript through the repair contract. Done when: all four render results and export transcripts with no per-tool code.
-- [ ] Account for all four surfaces. Done when: four accounts are written and each deferral resolves.
-- [ ] Commit: `"new tools: startup, services, context menu, and hosts"`
+- [ ] Define one entry model covering all four sources: a name, a source, a command, an enabled state, and a publisher where one exists. Done when: all four sources populate the same model and the surface has no per-source branch.
+- [ ] Build the startup tab. Done when: an entry is disabled, the machine is restarted, the entry did not run, and undo restores it.
+- [ ] Build the services tab on the promoted service primitives. Done when: start, stop, and start-mode changes each verify by reading the service state back, and each is undoable.
+- [ ] Build the scheduled tasks tab, which nothing in the suite covers today and where bloat and malware hide. Done when: a task is disabled and re-enabled, verified by reading the task state back.
+- [ ] Build the context menu tab. Done when: an entry is removed, Explorer no longer offers it, and undo restores it exactly.
+- [ ] Make every change a repair-contract item so the undo is the contract's. Done when: no tab writes outside the contract's loop, proven by search.
+- [ ] Let a user find an entry across all four sources at once. Done when: one search narrows every tab and the result says which source each hit came from.
+- [ ] Build the Hosts File Editor separately. Done when: an entry is added, name resolution reflects it, the file is written atomically, and the prior file is recoverable through the contract.
+- [ ] Account for both surfaces. Done when: two accounts are written and each deferral resolves.
+- [ ] Commit: `"autoruns manager and hosts editor"`
 
-**Test checkpoint:** Each of the four performs its change, verifies it by reading system state back, and restores it through the contract's undo, all four asserted. All four render results and export transcripts with no per-tool code. Four surfaces captured under `docs/captures/runs/`.
+**Test checkpoint:** All four sources populate one entry model with no per-source branch in the surface, proven by search. Each tab performs a change, verifies by reading system state back, and restores through the contract's undo, all four asserted. One search narrows every tab and names each hit's source. The hosts editor writes atomically and its prior file is recoverable. Both surfaces captured under `docs/captures/runs/`.
 
 ## Verification
 
