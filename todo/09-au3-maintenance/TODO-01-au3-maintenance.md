@@ -48,7 +48,8 @@ A shipping product that cannot be built from its own repository cannot be fixed.
 
 **Needs:** Windows host (build/test)
 
-- [ ] Replace the hardcoded `R:\Workspace\Resolute\...` paths in all thirteen `.sni` descriptors with repository-relative equivalents. Done when: no descriptor contains an absolute path, checked rather than eyeballed. Note that `ReBar`'s `#AutoIt3Wrapper_OutFile` directives are already relative and are the model.
+- [ ] Replace the hardcoded `R:\Workspace\Resolute\...` paths in all thirteen `.sni` descriptors with repository-relative equivalents. Done when: no descriptor contains an absolute path, checked rather than eyeballed.
+- [ ] Note the scope, measured 2026-09-16: **the `#AutoIt3Wrapper_` directives are already repository-relative and correct.** `Resolute.au3` emits to `..\..\..\Resolute.exe`, which resolves to `resolute_au3/Resolute.exe` after the move, and the tool scripts emit to `..\..\..\Resolute\<Tool>.exe`, which resolves into `resolute_au3/Resolute/`. Only the `.sni` descriptors carry absolute paths. Done when: this section confirms the directives were checked and left alone, so the fix is scoped to the descriptors rather than to every script.
 - [ ] Prove a clean-checkout build. Done when: a fresh clone into a different absolute path builds at least one tool to both architectures with no file edited, and the path is recorded.
 - [ ] Record which tools build and which do not. Done when: all thirteen are attempted and the result per tool is recorded here.
 - [ ] Commit: `"au3: make the autoit suite build from a clean checkout"`
