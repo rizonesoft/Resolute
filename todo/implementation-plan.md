@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **1 of 120 sections complete (1%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **2 of 120 sections complete (2%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -96,7 +96,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 |  ✔  | Section      | Deliverable                                    | Items |
 | :-: | ------------ | ---------------------------------------------- | :---: |
 | [x] | `D00 T03 §1` | Subtree merge with history preserved           |  11   |
-| [ ] | `D00 T03 §2` | Rename the product to Resolute                 |   5   |
+| [x] | `D00 T03 §2` | Rename the product to Resolute                 |   5   |
 | [ ] | `D00 T03 §3` | Rename the library and the toolchain           |   5   |
 | [ ] | `D00 T03 §4` | Correct the stale documentation                |   5   |
 | [ ] | `D00 T04 §1` | Staleness Detection for Every Claim-Free Block |   6   |

@@ -260,8 +260,8 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         FilterByCategory(L"All");
         app->listView.Create(hwnd, hInst, IDC_LISTVIEW);
 
-        // Load embedded fallback icon (application.ico)
-        #define IDI_APPFALLBACK 102
+        // Load embedded fallback icon (application.ico). The identifier comes
+        // from resource.h, which the .rc also includes, so one value defines it.
         app->listView.SetFallbackIcon(
             LoadIconW(hInst, MAKEINTRESOURCEW(IDI_APPFALLBACK)));
 

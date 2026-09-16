@@ -50,7 +50,7 @@ track: W1
 | Order | Section | Deliverable                          | Depends On | Status |
 | :---: | :-----: | ------------------------------------ | ---------- | :----: |
 |   1   |   §1    | Subtree merge with history preserved | --         |  [x]   |
-|   2   |   §2    | Rename the product to Resolute       | §1         |  [ ]   |
+|   2   |   §2    | Rename the product to Resolute       | §1         |  [x]   |
 |   3   |   §3    | Rename the library and the toolchain | §2         |  [ ]   |
 |   4   |   §4    | Correct the stale documentation      | §3         |  [ ]   |
 
@@ -230,6 +230,13 @@ ExoSuite is not a second product. It is the Resolute launcher, and leaving the o
 - [x] Commit: `"intake: rename the application to resolute"`
 
 **Test checkpoint:** The build produces `Resolute.exe` and no `ExoSuite.exe`. No window title, resource string, or build script says ExoSuite. The built binary's version resource is read back and reports ProductName `Resolute`, CompanyName `Rizonesoft`, FileDescription `Resolute Power Tools`, and a copyright year equal to the year the build ran, proven by reading the binary rather than the `.rc`. `.vscode/settings.json` names no path outside this repository. `git grep -il exosuite` returns **only** the six survivors tabulated above, and the list is quoted in full so an extra entry is visible rather than absorbed into a count.
+
+> **Verified:** 2026-09-17 | §2 | build produces `Resolute.exe` and no `ExoSuite.exe`, both presets, 52/52 each · version resource read back **from the binary**: ProductName `Resolute`, CompanyName `Rizonesoft`, FileDescription `Resolute Power Tools`, `Copyright (c) 2026 Rizonesoft`, year equal to the build year · the year is generated, proven both ways: `src/Resolute.rc.in` contains no `20xx` literal and the generated `build/release/src/Resolute.rc` contains 2026 · `git grep -in exosuite` returns 0 hits across `src/ exokit/ shared/ extensions/ CMakeLists.txt CMakePresets.json .github/ .vscode/` · `.vscode/settings.json` names no path outside the repository
+> **Review:** round 1, candidate `7d3ac0d` plus the follow-up fix -- `adversarial` approve · `consistency` approve after fix (1) · `integration` approve · `source-defect` approve · `design` not-applicable · `record` approve. Raw findings: docs/reviews/00-workspace/D00-T03-s2.md
+> **Independent:** `codex review --commit 7d3ac0d` (gpt-6-astra, high) found **no actionable regressions**, and independently ran both self-test suites and the claims checker. It did not find F1, the duplicate `IDI_APPFALLBACK`, which is invisible to a diff reader because the redefinition is legal and the file it duplicates is one the diff also touches. Found by self-review instead, and fixed.
+> **CRUD:** not applicable (this section renames build artifacts and writes no user-facing data)
+> **Duration:** 9
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## 3. Rename the Library and the Toolchain
 
