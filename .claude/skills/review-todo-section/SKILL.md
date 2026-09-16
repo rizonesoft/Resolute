@@ -55,11 +55,11 @@ Look specifically for the failure modes this codebase is prone to:
 - A file or `.ini` write that is not atomic, or a settings value the UI shows that nothing reads back.
 - A destructive system action (registry write, ownership takeover, COM re-registration, drive repair) with no rollback and no log line.
 - An elevation check the UI performs but the action path does not re-check, or a path that assumes it is already admin.
-- A `Global` or `Local` declaration missing, a variable reused across functions, or an `AutoItSetOption` changed and never restored.
-- A shared behavior copied into a tool instead of consumed from `SDK/Includes/`, especially across the four browser tools.
+- A raw owning pointer where the layer uses RAII, a handle or resource released on one path but not another, or a global left mutated after the call returns.
+- A shared behavior copied into a tool instead of consumed from `src/framework/` or `src/repair/`, or a file added to a shared layer by a tool, which the source layout in `AGENTS.md` forbids.
 - A hardcoded English string on a surface that has a `.lng` entry, or a `.lng` key nothing reads.
 - A frozen behavior that moved.
-- A checkpoint that passes by being unfalsifiable (Au3Check on a file the section did not change, a screenshot of the wrong window).
+- A checkpoint that passes by being unfalsifiable (a build of a target the section did not touch, a screenshot of the wrong window, a parity run against a fixture the change cannot affect).
 - A surface compared against memory instead of the capture under `docs/captures/`.
 
 Cheap defects caught here cost nothing; the same defect caught by a lens costs a whole round.
@@ -71,8 +71,8 @@ Run each lens as a separate pass over the candidate, recording findings in the f
 | Lens | Asks |
 | ---- | ---- |
 | `adversarial` | How would this fail in hostile hands? Malformed input, races, injection, revoked consent mid-flow. |
-| `consistency` | Does this agree with the rest of the suite: naming, `SDK/Includes/` patterns, the house style, the ini writer, the logging call? |
-| `integration` | Do the callers and consumers still hold: every tool that includes the changed file, the launcher that starts it, the `.sni` that builds it, the `.lng` that names it? |
+| `consistency` | Does this agree with the rest of the suite: naming, the source layout in `AGENTS.md`, `DESIGN.md`, the settings writer, the logging call? |
+| `integration` | Do the callers and consumers still hold: every tool that includes the changed header, the launcher that starts it, the release descriptor that ships it, the language pack that names it? |
 | `source-defect` | When owed (a Win32 contract, a registry layout, or another tool's behavior is at stake): is the source read correctly, and is the deviation declared? |
 | `design` | On a surface: judge the RENDERED surface against the baseline or contract, never source alone. Screenshots or driven captures, not impressions. |
 | `record` | Is the record honest: does the stamp's evidence match what ran, do deferrals name owners, is the row flip earned? |

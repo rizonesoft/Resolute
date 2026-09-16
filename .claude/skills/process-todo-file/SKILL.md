@@ -32,17 +32,17 @@ The `## Verification` section is not decoration. Run every item in it and record
 For a code TODO that means the **full** sweep, not the filtered runs individual sections used:
 
 ```bash
-pwsh scripts/au3check-all.ps1          # every tracked .au3, zero findings
-tests/run-tests.au3                    # the whole harness, once it exists (D00 T02 §1)
+pwsh scripts/check-all.ps1             # build both architectures, clang-tidy, tests, validate
+ctest --preset x64-debug               # the whole suite, once it exists (D00 T02 §1)
 ```
 
-plus the file's other Verification items (both architectures compiled through the `.sni`, captures refreshed, a clean-machine install check where the file owes one), each executed, none trimmed.
+plus the file's other Verification items (both architectures built, captures refreshed, parity reports quoted where the file owes one, a clean-machine install check where the file owes one), each executed, none trimmed.
 
 ### 3. Loose-end sweep
 
 Read the whole file with fresh eyes and check:
 
-- **Stubs and TODOs in the code.** Grep the touched `.au3` paths for `TODO`, `FIXME`, `; ~`, and any commented-out block left during the work. Each is either finished now, or gets an owning section and an XREF.
+- **Stubs and TODOs in the code.** Grep the touched source paths for `TODO`, `FIXME`, `HACK`, `XXX`, and any commented-out block left during the work. Each is either finished now, or gets an owning section and an XREF.
 - **Partial items.** Any checklist item ticked when only part shipped. Split it.
 - **Orphaned deferrals.** Every `Deferred:` line in every stamp must name a live owner. Confirm the target section still exists and is still open. A deferral pointing at a section that shipped without addressing it is a hole.
 - **One-sided XREFs.** The validator warns on these; resolve rather than ignore.

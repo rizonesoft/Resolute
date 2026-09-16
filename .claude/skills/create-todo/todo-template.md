@@ -60,7 +60,7 @@ CHANGEME: one paragraph of context.
 
 ## Verification
 
-- [ ] `pwsh scripts/au3check-all.ps1` -- zero findings across every tracked `.au3`
-- [ ] Both architectures compile through this file's `.sni` without error
+- [ ] `pwsh scripts/check-all.ps1` -- exits 0: both architectures build, clang-tidy clean against the baseline, tests pass
+- [ ] `ctest --preset x64-debug` exits 0 with this file's suites reporting
 - [ ] CHANGEME: file-level checks this file owes as a whole
 - [ ] `python3 scripts/todo-graph.py validate` clean
