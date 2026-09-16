@@ -957,3 +957,25 @@ The fourth was found while checking: `CompInfo.au3` by Jarvis Stubblefield, `FFL
 **That ends the moment an outside contribution arrives.** A patch from a stranger under GPL v3 is that person's copyright, and the file it touches can no longer be relicensed without their permission. Given monetisation was raised as a goal in round 15, the freedom to relicense is worth preserving deliberately.
 
 A contributor licence agreement preserves it, is trivial to adopt before the first external pull request, and is effectively impossible to retrofit once there are contributors to chase. `D06 T01 §7` now carries the decision with a `before the repository takes its first external contribution` trigger.
+
+## Decisions taken, round 19
+
+51. **The recovery engine is implemented from published file system specifications, not ported.** Nobody who writes it reads `samples/Undelete/Source/`.
+52. **The drive access layer is implemented from the Win32 API, not ported**, which also makes SD Imager's unresolved provenance moot.
+53. **SD Imager's provenance stays open.** The metadata says OS IT Consult and the repository history is Rizonesoft's; until settled it is treated as third-party, and implementing from Win32 means that costs nothing.
+
+### The reasoning, recorded because it will be questioned later
+
+The operator's position was that porting away from AutoIt meant licences should not be an obstacle. That is **right for everything Rizonesoft owns**, which is ExoSuite, the UI library, RegStudio, and all fourteen AutoIt tools, and it is **wrong for one thing**: translating code into another language does not shed its licence. A translation is a derivative work, in the same way translating a novel does not create a new copyright.
+
+The route to the same outcome is not a workaround, it is the ordinary one. **Copyright protects expression, not facts or functionality.** A file system's on-disk layout is a documented fact: a deleted MFT record is one whose in-use flag is clear, a deleted FAT directory entry begins with `0xE5`. A parser written from the FAT32 specification and the published NTFS documentation owes nothing to anyone else's implementation of one.
+
+**The discipline is the whole of it: the implementer does not open the original.** The samples establish that the feature is achievable and show what a good surface offers. `D05 T05 §1` requires the clean-room statement to name who wrote the engine and what they worked from, and requires a search proving no file from `samples/Undelete/` is referenced by or included in the build. Consulting the original "just for the tricky parts" is named as the substitute that fails, because that is precisely where a derivative-work claim would land.
+
+Raw disk access made the second case easy: `CreateFile` on `\.\PhysicalDriveN` plus the documented IOCTLs is roughly fifty lines, written from scratch faster than ported, whoever owns SD Imager.
+
+### The result
+
+The suite now **owns everything it ships** except Lucide, which is ISC and needs only its notice carried, and the four unlicensed AutoIt community UDFs, which are avoided rather than resolved.
+
+Nothing in the plan is permanently GPL v3 any more. The licence on every line becomes what decision 47 says it should be, by choice rather than by inheritance.

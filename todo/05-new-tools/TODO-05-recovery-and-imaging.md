@@ -11,7 +11,7 @@ track: P3
 
 # TODO-05 -- Recovery and Imaging
 
-> **Goal:** Two GPL v3 C# programs become C++ tools, and both are positioned where nothing else stands. The recovery engine also proves that `QuickErase` did what it claimed, and the imaging tool rescues a failing drive rather than competing with the tools that write to healthy ones.
+> **Goal:** A file recovery engine and a rescue imager, both **implemented from published specifications rather than ported**, so the suite owns what it ships and licenses it freely. The recovery engine also proves that `QuickErase` did what it claimed, and the imager rescues a failing drive rather than competing with the tools that write to healthy ones.
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** Both are **third-party GPL v3 C# projects**, not Rizonesoft code.
@@ -21,14 +21,23 @@ track: P3
 > `samples/SDImage/` is **SD Imager**, `AssemblyCompany("OS IT Consult")`, `AssemblyCopyright("Copyright © OS IT Consult, 2013")`, a C# WinForms prototype licensed GPL v3. The repository's git history is Rizonesoft's, but the code is not.
 >
 > Neither can consume the shared framework as it stands, because both are C# and the framework is C++23.
+>
+> **SD Imager's provenance is unresolved.** The metadata says OS IT Consult and the repository history is Rizonesoft's. Until that is settled it is treated as third-party, which costs nothing here because raw disk access is roughly fifty lines of Win32 and is written from scratch faster than it is ported.
 
 > [!CAUTION]
-> **A port is a derivative work.** Rewriting in C++ does not reset the licence. Both ports ship GPL v3, credit their original authors by name, carry the GPL v3 text, and state that they are modified versions. This is a licence condition, not a courtesy, and `§1` and `§4` each carry it as a checklist item with a checkpoint.
+> **Neither tool is ported. Both are implemented from specification.**
+>
+> A port is a derivative work: translating C# into C++ does not reset a licence, any more than translating a novel creates a new copyright. Copyright protects **expression**, not facts or functionality, and a file system's on-disk layout is a documented fact. A parser written from the FAT32 specification and the NTFS documentation owes nothing to anyone's implementation of one.
+>
+> **The discipline that makes this true: whoever writes the C++ does not read the C#.** The samples establish that the feature is achievable and what a good surface looks like. They are not a source to work from, and `§1` and `§4` each carry that as a checklist item with a checkpoint.
+>
+> This is not a workaround. It is the ordinary way a clean implementation is made, and it is what leaves the result free to license.
 
 ## Inputs
 
-- [`samples/Undelete/Source/FileSystems/`](../../samples/Undelete/Source) -- the file system parsing library, the valuable half of Kickass Undelete
-- [`samples/SDImage/SDImage/DriveTools.cs`](../../samples/SDImage/SDImage) -- raw drive access, the valuable part of SD Imager
+- [`samples/Undelete/Source/`](../../samples/Undelete/Source) -- Kickass Undelete. **Reference only, and not for the implementer**: evidence the feature is achievable and a guide to what the surface should offer
+- [`samples/SDImage/SDImage/`](../../samples/SDImage/SDImage) -- SD Imager, on the same terms
+- The FAT32 specification and the published NTFS on-disk documentation, which are what `§1` is actually written from
 - -> XREF: [`05-new-tools/TODO-01 §3`](./TODO-01-intake-and-new-tools.md) -- `QuickErase`, whose claim §3 verifies
 - -> XREF: [`05-new-tools/TODO-03 §3`](./TODO-03-system-utilities.md) -- Disk Health, which §4 composes with
 - -> XREF: [`06-distro-release/TODO-01 §7`](../06-distro-release/TODO-01-build-and-release.md) -- the licensing and attribution rules these ports must satisfy
@@ -37,8 +46,8 @@ track: P3
 
 - A user can recover a deleted file, and a user who securely erased a drive can prove nothing remains.
 - A failing drive can be imaged before it stops responding, at the moment Disk Health says it is dying.
-- Both ports credit their original authors and ship under the licence their source requires.
-- Neither port carries a private file system parser or drive access layer that another tool duplicates.
+- Both tools are owned outright, implemented from documented formats, and licensed at the suite's discretion.
+- Neither carries a private file system parser or drive access layer that another tool duplicates.
 
 **Adjacency:** list=applicable @ D05 T05 §2; document=applicable @ D05 T05 §3; settings=not-applicable (these tools own no settings beyond the framework's); reporting=applicable @ D05 T05 §3; notifications=applicable @ D05 T05 §4; permissions=applicable @ D05 T05 §1; audit=applicable @ D05 T05 §3; exchange=applicable @ D05 T05 §4; reverse=not-applicable (recovery and imaging both write to a destination the user chose; neither modifies the source, which §1 makes structural)
 
@@ -57,27 +66,30 @@ track: P3
 
 ## 1. The Recovery Engine, Read-Only By Design
 
-The valuable half of Kickass Undelete is its file system parsing, not its interface. This section ports that, and makes it structurally incapable of writing to the volume it reads.
+A file system's on-disk layout is documented and its structures are facts. A deleted MFT record is one whose in-use flag is clear; a deleted FAT directory entry begins with `0xE5`. None of that belongs to anyone, and this section implements it from the specifications rather than from somebody's C#.
+
+It also makes the engine structurally incapable of writing to the volume it reads.
 
 **Fidelity:** no surface of its own; §2 and §3 render what this produces.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Port the file system parsing for the formats the source supports, and record which those are. Done when: the supported set is listed here with its source file, and a fixture image of each format enumerates its deleted entries.
+- [ ] Name the specifications this engine is written from, and the formats it supports. Done when: each supported format cites the published documentation it was implemented against, and a fixture image of each enumerates its deleted entries.
+- [ ] **Record the clean-room discipline and who held it.** Done when: this section states that the implementer did not read `samples/Undelete/Source/`, names who wrote the engine, and confirms no file from that tree is referenced by, included in, or copied into the build. Cheaper substitute that fails the checkpoint: consulting the original "just for the tricky parts", which is precisely where a derivative-work claim would land.
 - [ ] Make the engine **physically unable to write to the source volume.** Done when: it opens the volume read-only, exposes no write path, and a search proves no write call exists. Cheaper substitute that fails the checkpoint: a write path guarded by a flag, which is one mistake away from destroying the data the user is trying to recover.
 - [ ] Recover to a destination on a different volume, and refuse a destination on the source. Done when: a same-volume destination is refused by name, because writing recovered data onto the volume being recovered from overwrites what has not been recovered yet.
 - [ ] Report recoverability honestly per entry. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable, and a partially overwritten fixture is not reported as recoverable.
 - [ ] Guard raw volume access behind the framework's elevation check, at the call. Done when: an unelevated scan is refused by name and nothing is opened.
-- [ ] **Carry the attribution.** Done when: the source files name Kickass Undelete and Kevin Leach as the origin, the GPL v3 text ships with the tool, and the About states it is a modified version. Required by the licence, not optional.
+- [ ] Confirm the result is unencumbered. Done when: the engine carries no third-party copyright notice, `D06 T01 §7` records it as owned code, and the licence it ships under is the suite's choice rather than an inherited obligation.
 - [ ] Add engine assertions against committed fixture images, with no physical disk. Done when: each supported format asserts headlessly.
 - [ ] Commit: `"recovery engine: port the file system parser, read-only"`
 
 **Freeze check:** What the engine reports as recoverable is frozen once shipped, because a user deletes data on the strength of it. Evidence is a fixture image per format producing an identical entry list across changes. Fixture source: `tests/fixtures/volumes/`.
 
-**Test checkpoint:** Each supported format enumerates its deleted entries from a committed fixture image, headlessly. No write call exists in the engine, proven by search. A same-volume destination is refused by name. A partially overwritten fixture is not reported as recoverable. An unelevated scan is refused. The attribution appears in source, in the shipped licence text, and in the About.
+**Test checkpoint:** Each supported format cites the specification it was implemented from and enumerates its deleted entries from a committed fixture image, headlessly. The clean-room statement names the implementer, and no file from `samples/Undelete/` appears in the build, proven by search. No write call exists in the engine, proven by search. A same-volume destination is refused by name. A partially overwritten fixture is not reported as recoverable. An unelevated scan is refused.
 
 ## 2. Undelete
 
-The straightforward half. It competes with well-established free tools, so it earns its place by being the one already installed when the user needs it, and by being honest about what it cannot do.
+The straightforward half, once §1 exists. It competes with well-established free tools, so it earns its place by being the one already installed when the user needs it, and by being honest about what it cannot do.
 
 **Fidelity:** the scan result list, against `DESIGN.md` and `docs/captures/house-style/`.
 **Job:** a user who deleted something can get it back, or find out plainly that they cannot. Consumer: the recovered files at the destination, verified after writing.
@@ -139,19 +151,20 @@ Tools that write images to healthy drives are numerous and good. Reading an imag
 - [ ] Verify the image after writing. Done when: readable regions are compared against the source and any mismatch is reported.
 - [ ] Support writing an image back to a drive, with a confirmation naming the destination by letter, label, and size. Done when: the confirmation names all three, declining performs nothing, and the destination is never the source.
 - [ ] State plainly that writing an image destroys everything on the destination. Done when: that statement is on the surface before the user commits.
-- [ ] **Carry the attribution.** Done when: the source files name SD Imager and OS IT Consult as the origin, the GPL v3 text ships, and the About states it is a modified version.
+- [ ] Implement raw drive access from the Win32 API rather than porting it. Done when: the access layer is written against `CreateFile` on `\\.\PhysicalDriveN` and the documented IOCTLs, and no file from `samples/SDImage/` appears in the build, proven by search. At roughly fifty lines this is faster than porting regardless of who owns the original.
+- [ ] Resolve SD Imager's provenance, or record that it remains unresolved. Done when: either the rights are established and recorded in `D06 T01 §7`, or this section states that the question was left open and made moot by implementing from Win32.
 - [ ] Commit: `"rescue imaging: image a failing drive, bad sectors and all"`
 
 **Freeze check:** What is written to a destination drive is frozen once shipped, because a mistake destroys a user's data. Evidence is a fixture image written to a fixture target producing a byte-identical result across changes.
 
-**Test checkpoint:** No write path to the source exists, proven by search, and the source is byte-identical after a run. On a fixture with unreadable regions the fast first pass completes before any retry is attempted, the retry budget is exhausted without stalling the run, and total re-reads are measured against the stated ceiling, all quoted. An interrupted run resumes from its map. The unreadable map names each region by offset and length. The Disk Health hand-off carries the drive identity. A write confirmation names letter, label, and size, and declining does nothing. The attribution appears in source, licence text, and About.
+**Test checkpoint:** No write path to the source exists, proven by search, and the source is byte-identical after a run. No file from `samples/SDImage/` appears in the build, proven by search. On a fixture with unreadable regions the fast first pass completes before any retry is attempted, the retry budget is exhausted without stalling the run, and total re-reads are measured against the stated ceiling, all quoted. An interrupted run resumes from its map. The unreadable map names each region by offset and length. The Disk Health hand-off carries the drive identity. A write confirmation names letter, label, and size, and declining does nothing.
 
 ## Verification
 
 - [ ] `pwsh scripts/check-all.ps1` exits 0 with the recovery and imaging suites reporting
 - [ ] The recovery engine and the imaging path contain no write call to their source, both proven by search
-- [ ] Both ports credit their original authors in source, in shipped licence text, and in the About
-- [ ] Both ports ship GPL v3, as their source requires
+- [ ] Neither tool includes or references any file from `samples/Undelete/` or `samples/SDImage/`, proven by search
+- [ ] The clean-room statement names who implemented the recovery engine and what they worked from
 - [ ] The erase verification surface contains no unqualified "securely erased" claim
 - [ ] Every freeze check in this file ran and passed
 - [ ] `python scripts/todo-graph.py validate` clean
