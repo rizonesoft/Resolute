@@ -1,0 +1,151 @@
+---
+schema_version: 1
+id: recovery-and-imaging
+domain: 05-new-tools
+status: draft
+title: "TODO-05 -- Recovery and Imaging"
+depends_on: [system-utilities]
+frozen: true
+track: P3
+---
+
+# TODO-05 -- Recovery and Imaging
+
+> **Goal:** Two GPL v3 C# programs become C++ tools, and both are positioned where nothing else stands. The recovery engine also proves that `QuickErase` did what it claimed, and the imaging tool rescues a failing drive rather than competing with the tools that write to healthy ones.
+
+> [!IMPORTANT]
+> **Current state (verified 2026-09-16):** Both are **third-party GPL v3 C# projects**, not Rizonesoft code.
+>
+> `samples/Undelete/Source/` is **Kickass Undelete 1.5.5** by Kevin Leach, dated 2018-12-10: 105 C# files across `FileSystems`, `GuiComponents`, `KickassUndelete`, and a test project, licensed GPL v3.
+>
+> `samples/SDImage/` is **SD Imager**, `AssemblyCompany("OS IT Consult")`, `AssemblyCopyright("Copyright © OS IT Consult, 2013")`, a C# WinForms prototype licensed GPL v3. The repository's git history is Rizonesoft's, but the code is not.
+>
+> Neither can consume the shared framework as it stands, because both are C# and the framework is C++23.
+
+> [!CAUTION]
+> **A port is a derivative work.** Rewriting in C++ does not reset the licence. Both ports ship GPL v3, credit their original authors by name, carry the GPL v3 text, and state that they are modified versions. This is a licence condition, not a courtesy, and `§1` and `§4` each carry it as a checklist item with a checkpoint.
+
+## Inputs
+
+- [`samples/Undelete/Source/FileSystems/`](../../samples/Undelete/Source) -- the file system parsing library, the valuable half of Kickass Undelete
+- [`samples/SDImage/SDImage/DriveTools.cs`](../../samples/SDImage/SDImage) -- raw drive access, the valuable part of SD Imager
+- -> XREF: [`05-new-tools/TODO-01 §3`](./TODO-01-intake-and-new-tools.md) -- `QuickErase`, whose claim §3 verifies
+- -> XREF: [`05-new-tools/TODO-03 §3`](./TODO-03-system-utilities.md) -- Disk Health, which §4 composes with
+- -> XREF: [`06-distro-release/TODO-01 §7`](../06-distro-release/TODO-01-build-and-release.md) -- the licensing and attribution rules these ports must satisfy
+
+## Outcome
+
+- A user can recover a deleted file, and a user who securely erased a drive can prove nothing remains.
+- A failing drive can be imaged before it stops responding, at the moment Disk Health says it is dying.
+- Both ports credit their original authors and ship under the licence their source requires.
+- Neither port carries a private file system parser or drive access layer that another tool duplicates.
+
+**Adjacency:** list=applicable @ D05 T05 §2; document=applicable @ D05 T05 §3; settings=not-applicable (these tools own no settings beyond the framework's); reporting=applicable @ D05 T05 §3; notifications=applicable @ D05 T05 §4; permissions=applicable @ D05 T05 §1; audit=applicable @ D05 T05 §3; exchange=applicable @ D05 T05 §4; reverse=not-applicable (recovery and imaging both write to a destination the user chose; neither modifies the source, which §1 makes structural)
+
+**Adjacency rationale:** Permissions anchors on §1 because raw volume access is the most privileged thing in the entire suite, and an engine that can read a raw disk is one mistake away from being an engine that writes to one. Document, reporting, and audit converge on §3 because an erase-verification result is a claim a user may rely on or show to somebody else, which makes how it is worded and what it refuses to claim the whole substance of the section.
+
+## Implementation Order
+
+| Order | Section | Deliverable                                | Depends On     | Status |
+| :---: | :-----: | ------------------------------------------ | -------------- | :----: |
+|   1   |   §1    | The recovery engine, read-only by design   | D05 T01 §1     |  [ ]   |
+|   2   |   §2    | Undelete                                   | §1             |  [ ]   |
+|   3   |   §3    | Erase verification                         | §1, D05 T01 §3 |  [ ]   |
+|   4   |   §4    | Rescue imaging                             | D05 T03 §3     |  [ ]   |
+
+---
+
+## 1. The Recovery Engine, Read-Only By Design
+
+The valuable half of Kickass Undelete is its file system parsing, not its interface. This section ports that, and makes it structurally incapable of writing to the volume it reads.
+
+**Fidelity:** no surface of its own; §2 and §3 render what this produces.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Port the file system parsing for the formats the source supports, and record which those are. Done when: the supported set is listed here with its source file, and a fixture image of each format enumerates its deleted entries.
+- [ ] Make the engine **physically unable to write to the source volume.** Done when: it opens the volume read-only, exposes no write path, and a search proves no write call exists. Cheaper substitute that fails the checkpoint: a write path guarded by a flag, which is one mistake away from destroying the data the user is trying to recover.
+- [ ] Recover to a destination on a different volume, and refuse a destination on the source. Done when: a same-volume destination is refused by name, because writing recovered data onto the volume being recovered from overwrites what has not been recovered yet.
+- [ ] Report recoverability honestly per entry. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable, and a partially overwritten fixture is not reported as recoverable.
+- [ ] Guard raw volume access behind the framework's elevation check, at the call. Done when: an unelevated scan is refused by name and nothing is opened.
+- [ ] **Carry the attribution.** Done when: the source files name Kickass Undelete and Kevin Leach as the origin, the GPL v3 text ships with the tool, and the About states it is a modified version. Required by the licence, not optional.
+- [ ] Add engine assertions against committed fixture images, with no physical disk. Done when: each supported format asserts headlessly.
+- [ ] Commit: `"recovery engine: port the file system parser, read-only"`
+
+**Freeze check:** What the engine reports as recoverable is frozen once shipped, because a user deletes data on the strength of it. Evidence is a fixture image per format producing an identical entry list across changes. Fixture source: `tests/fixtures/volumes/`.
+
+**Test checkpoint:** Each supported format enumerates its deleted entries from a committed fixture image, headlessly. No write call exists in the engine, proven by search. A same-volume destination is refused by name. A partially overwritten fixture is not reported as recoverable. An unelevated scan is refused. The attribution appears in source, in the shipped licence text, and in the About.
+
+## 2. Undelete
+
+The straightforward half. It competes with well-established free tools, so it earns its place by being the one already installed when the user needs it, and by being honest about what it cannot do.
+
+**Fidelity:** the scan result list, against `DESIGN.md` and `docs/captures/house-style/`.
+**Job:** a user who deleted something can get it back, or find out plainly that they cannot. Consumer: the recovered files at the destination, verified after writing.
+**Treatment:** recoverability stated per file before the user commits, including the partially-overwritten case. Cheaper substitute that fails the checkpoint: listing every entry as recoverable and letting the user discover the truth after the scan finishes.
+**Chrome:** consume the framework and the shared virtualized list. The engine is §1's; this tool adds no parsing.
+**Needs:** Windows host (build/test)
+
+- [ ] Scan a volume and render results through the shared virtualized list. Done when: a fixture image with many entries scrolls smoothly and the scan leaves the window responsive.
+- [ ] Filter by name, type, size, and recoverability. Done when: each filter narrows and clearing restores.
+- [ ] Recover selected files and verify each after writing. Done when: recovered content is compared against the fixture original byte for byte, and a failed write is reported per file rather than as a batch result.
+- [ ] Tell the user the one thing that actually matters, before they scan. Done when: the surface states that continuing to use the drive reduces what can be recovered, where they will read it rather than in documentation.
+- [ ] Account for the surface. Done when: every control is working or deferred to a named section.
+- [ ] Commit: `"undelete: recover deleted files, honestly"`
+
+**Test checkpoint:** A fixture image with many entries scrolls smoothly with the window responsive. Each filter narrows and restores. Recovered content matches the fixture original byte for byte, and a failed write is reported per file. The continued-use warning appears on the surface, captured.
+
+## 3. Erase Verification
+
+The reason this port is worth making. `QuickErase` claims a file is unrecoverable; this proves it. No comparable suite ships a secure-erase tool that can verify its own claim, and running the recovery engine over an erased target is the only honest way to make one.
+
+**Fidelity:** the verification result, against `DESIGN.md`. Presented as a report rather than a file list, because the useful outcome is a finding, not a set of entries.
+**Job:** a user who erased something can confirm it is gone, or learn that it is not. Consumer: the verification report, which the user may rely on or show to somebody else.
+**Treatment:** the finding stated with its limits, because a verification that overstates is worse than none. Cheaper substitute that fails the checkpoint: reporting "securely erased" from the absence of recoverable entries, which the engine cannot actually establish.
+**Chrome:** consume the framework and the §1 engine. Add no second scanner.
+**Needs:** Windows host (build/test)
+
+- [ ] Scan a target after a `QuickErase` run and report what, if anything, the engine can still find. Done when: an erased fixture reports nothing recoverable and a deliberately non-erased control reports its entries.
+- [ ] Offer verification directly from `QuickErase` after an erase. Done when: the hand-off works and the result names the erase run it verifies.
+- [ ] **State the limits of the claim plainly.** Done when: the report says what was checked, by what method, and what this cannot establish, naming at least the remapped-sector case and the SSD wear-levelling case, where data can survive in blocks no file system read will ever reach.
+- [ ] Never report a bare "securely erased". Done when: every result is phrased as what was and was not found by a stated method, proven by there being no such string in the surface.
+- [ ] Export the verification as a transcript. Done when: it is written atomically, read back, and carries the same limits the surface states.
+- [ ] Log every verification. Done when: each writes one line naming the target and the outcome.
+- [ ] Commit: `"erase verification: prove what quickerase claimed"`
+
+**Freeze check:** What this reports and refuses to report is frozen once shipped, because a user may make a disclosure decision on it. Evidence is an erased fixture and a control fixture producing identical findings and identical limit statements across changes.
+
+**Test checkpoint:** An erased fixture reports nothing recoverable; a non-erased control reports its entries. The hand-off from `QuickErase` names the run it verifies. The report names the remapped-sector and SSD wear-levelling limits. No "securely erased" phrasing exists in the surface, proven by search. The transcript carries the same limits.
+
+## 4. Rescue Imaging
+
+Tools that write images to healthy drives are numerous and good. Reading an image **off** a drive that is failing is a different job, far less served on Windows, and it is the one that matters at the moment Disk Health says the disk is dying.
+
+**Fidelity:** the imaging surface and its progress, against `DESIGN.md`.
+**Job:** a user with a failing drive can get an image of it before it stops responding. Consumer: the image file, verified after writing.
+**Treatment:** bad sectors tolerated and recorded rather than aborting the run, because a drive that is failing will produce them and stopping at the first one loses everything after it. Cheaper substitute that fails the checkpoint: a straight block copy that aborts on the first read error, which is what makes general-purpose imaging tools useless on a dying disk.
+**Chrome:** consume the framework and the shared progress surface. Compose with Disk Health rather than re-reading SMART.
+**Needs:** Windows host (build/test)
+
+- [ ] Image a source drive to a file, reading read-only and never writing to the source. Done when: no write path to the source exists, proven by search, and the source is byte-identical after a run.
+- [ ] Tolerate read errors: retry with a stated policy, record every unreadable region, and continue. Done when: a fixture with deliberately unreadable regions produces a complete image with those regions recorded and zero-filled, and the run completes.
+- [ ] Produce a map of what could not be read. Done when: the map ships beside the image and names each unreadable region by offset and length.
+- [ ] Offer imaging from Disk Health when a drive reports failing. Done when: the hand-off works and carries the drive identity across.
+- [ ] Verify the image after writing. Done when: readable regions are compared against the source and any mismatch is reported.
+- [ ] Support writing an image back to a drive, with a confirmation naming the destination by letter, label, and size. Done when: the confirmation names all three, declining performs nothing, and the destination is never the source.
+- [ ] State plainly that writing an image destroys everything on the destination. Done when: that statement is on the surface before the user commits.
+- [ ] **Carry the attribution.** Done when: the source files name SD Imager and OS IT Consult as the origin, the GPL v3 text ships, and the About states it is a modified version.
+- [ ] Commit: `"rescue imaging: image a failing drive, bad sectors and all"`
+
+**Freeze check:** What is written to a destination drive is frozen once shipped, because a mistake destroys a user's data. Evidence is a fixture image written to a fixture target producing a byte-identical result across changes.
+
+**Test checkpoint:** No write path to the source exists, proven by search, and the source is byte-identical after a run. A fixture with unreadable regions produces a complete image with those regions recorded, and the run completes. The unreadable map names each region by offset and length. The Disk Health hand-off carries the drive identity. A write confirmation names letter, label, and size, and declining does nothing. The attribution appears in source, licence text, and About.
+
+## Verification
+
+- [ ] `pwsh scripts/check-all.ps1` exits 0 with the recovery and imaging suites reporting
+- [ ] The recovery engine and the imaging path contain no write call to their source, both proven by search
+- [ ] Both ports credit their original authors in source, in shipped licence text, and in the About
+- [ ] Both ports ship GPL v3, as their source requires
+- [ ] The erase verification surface contains no unqualified "securely erased" claim
+- [ ] Every freeze check in this file ran and passed
+- [ ] `python scripts/todo-graph.py validate` clean

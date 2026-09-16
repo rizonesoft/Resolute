@@ -87,6 +87,9 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | Pending Reboot Inspector | 05-new-tools | TODO written, new |
 | Activation Diagnostics | 05-new-tools | TODO written, new |
 | Network Share Diagnostics | 05-new-tools | TODO written, new |
+| Undelete | 05-new-tools | TODO written, GPL v3 port, frozen |
+| Erase Verification | 05-new-tools | TODO written, new, composed |
+| Rescue Imaging | 05-new-tools | TODO written, GPL v3 port, frozen |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | internal tooling, not a product |

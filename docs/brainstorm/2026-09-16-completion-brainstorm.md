@@ -852,3 +852,52 @@ Putting the check only in `ComIntRep` would miss the user who opened a different
 - **10 domains, 16 TODO files, 88 sections.**
 - `validate`: 0 fatal, 0 warning, 54 adjacency advisories. `plan --check`: current at 0 of 88.
 - Nothing from the brainstorm is now unrouted.
+
+## Decisions taken, round 16
+
+47. **The framework is MIT, the tools are GPL v3.** Direction matters: MIT code may be included in GPL work, the reverse is not true. A permissive framework can serve tools under either licence; a GPL framework could not.
+48. **`SDImage` and `Undelete` are ported to C++ and positioned for the angle nobody occupies**, rather than shipped as direct competitors.
+
+## What these two actually are
+
+Neither is Rizonesoft code, and both are GPL v3.
+
+| | Reality |
+| --- | --- |
+| `samples/Undelete/Source/` | **Kickass Undelete 1.5.5** by Kevin Leach, 2018-12-10. 105 C# files across `FileSystems`, `GuiComponents`, `KickassUndelete`, and a test project. GPL v3 |
+| `samples/SDImage/` | **SD Imager**, `AssemblyCompany("OS IT Consult")`, `Copyright © OS IT Consult, 2013`. C# WinForms prototype. GPL v3. The git history is Rizonesoft's; the code is not |
+
+**A port is a derivative work.** Rewriting in C++ does not reset the licence. Both ports ship GPL v3, credit their original authors by name, carry the GPL v3 text, and state that they are modified versions. `D05 T05 §1` and `§4` each carry that as a checklist item with a checkpoint, because an obligation recorded only in prose is one that gets dropped.
+
+## The licensing situation this exposed
+
+Checking the tree to answer the question found three things that are distribution defects **today**, not future ones:
+
+1. **The suite is already GPL v3.** `ComIntRep`, `Firemin`, `USBRepair`, and `Ownership` all ship under it. So porting GPL v3 code was never the problem it first appeared to be.
+2. **`RegStudio` is MIT** while everything else is GPL v3, with no recorded decision anywhere.
+3. **`shared/lucide` ships no licence file at all**, and ExoSuite has no root `LICENSE`. Lucide is ISC and requires its copyright notice be retained.
+
+`D06 T01 §7` now owns all of it: the policy and its reasoning, resolving the `RegStudio` inconsistency, the missing licence files, the attribution obligations the two ports carry, and a check that lists every tool with its licence and attributions rather than assuming.
+
+## The positioning, and why it matters
+
+File recovery and USB imaging are two of the most crowded categories in Windows utilities. Rufus owns imaging and is excellent and free; Recuva, PhotoRec, and TestDisk own recovery, and Kickass Undelete itself is already free. As direct ports these would be the two tools in the plan least likely to earn anything, which contradicts the operator's own criterion from round 14.
+
+Both have an uncrowded position, and both come from being part of a suite:
+
+- **Erase verification.** `QuickErase` claims a file is unrecoverable; the recovery engine turned around **proves it**. No comparable suite ships a secure-erase tool that can verify its own claim. `D05 T05 §3` requires the report to state what it cannot establish, naming remapped sectors and SSD wear levelling, and forbids an unqualified "securely erased" anywhere on the surface, proven by search. A verification that overstates is worse than none, because a user may make a disclosure decision on it.
+- **Rescue imaging.** Tools that write images to healthy drives are numerous and good. Reading an image **off** a failing drive is a different job, far less served on Windows, and `D05 T05 §4` requires read errors to be retried, recorded, and survived rather than aborting the run, which is exactly what makes general-purpose imagers useless on a dying disk. It hands off from Disk Health at the moment the drive reports failing.
+
+## The safety rule these two share
+
+Both engines are **structurally incapable of writing to their source.** Not guarded by a flag: no write path exists, and `D05 T05` requires that to be proven by search for both.
+
+Raw volume access is the most privileged thing in the entire suite, and an engine that can read a raw disk is one mistake away from being an engine that destroys the data the user is trying to save.
+
+---
+
+# Plan state
+
+- **10 domains, 17 TODO files, 93 sections.**
+- `validate`: 0 fatal, 0 warning, 59 adjacency advisories. `plan --check`: current at 0 of 93.
+- The suite is **37 shipped products** plus two internal tools.
