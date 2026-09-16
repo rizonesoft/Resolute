@@ -232,6 +232,51 @@ Intake adds **six**: Complete Windows Repair, QuickErase, WinClean, SaveDesk, UU
 
 `ComIntRep` is the reference implementation of the second layer. `ReBar` is the reference implementation of the first.
 
+## Decisions taken, round 4
+
+12. **A retired product keeps its own update file and announces the consolidation.** `Chromin.ru`, `Edgemin.ru`, `Watermin.ru`, and `DVDRepair.ru` stay live. Each serves a final update notification that says the product has been consolidated and points at its successor. Installed copies keep working and get told where to go, rather than going silent.
+
+### What decision 12 needs from the update mechanism
+
+The `.ru` file is an INI read by `SDK/Includes/Update.au3:93,98`, with `[Update]` carrying `LatestBuild` and `UpdateURL`.
+The redirect half is already expressible today: raise `LatestBuild` above any shipped build and set `UpdateURL` to the successor's page.
+What does not exist is the wording. The dialog text comes from the tool's own language pack, not from the server, so nothing in the current format can say "consolidated".
+
+**Design, for the framework extraction to implement:** add an optional `Successor` key to `[Update]` carrying only the successor's display name, and a matching template string in the language packs along the lines of `%s is now part of %s`.
+The server supplies the name; the pack supplies the sentence.
+This keeps translation in the packs where it belongs, so the announcement arrives in the user's language rather than in English from a server.
+A free-text `Message` key from the server was considered and rejected for exactly that reason.
+
+Unknown keys are ignored by the current `IniRead` calls, so the change is backward compatible with every shipped build.
+
+**The capability generalizes.** Once the update file can carry a templated announcement, every tool has a server-side channel for "this build has a known issue" or "this version is end of support", without shipping a new binary. Worth designing for deliberately rather than discovering later.
+
+## Two more consistency findings, 2026-09-16
+
+### High DPI is off on all fourteen tools
+
+Every script carries `#AutoIt3Wrapper_Res_HiDpi=N`.
+On the high-resolution displays most laptops now ship with, Windows bitmap-scales these windows, so the whole suite renders soft while the rest of the desktop is sharp. It is the most visible quality gap in the product and it is invisible on a development machine at 100 percent scaling.
+
+**This is not a one-line flip.** AutoIt GUIs built on absolute pixel coordinates re-lay-out incorrectly when the process becomes DPI-aware. Turning it on means auditing coordinate math per window. The honest sequencing is: the framework extraction makes the shared surfaces DPI-correct once, and each tool's own window is then a much smaller audit.
+
+### Copyright years span 2022 to 2025
+
+`Distro` 2022; `ComIntRep`, `DVDRepair`, `MemBoost`, `Ownership`, `PixRepair`, `ReBar`, `Resolute`, `USBRepair` 2023; `BiosCodes` 2024; `Chromin`, `Edgemin`, `Firemin`, `Watermin` 2025.
+A copyright year that is typed by hand into fourteen scripts will always be wrong in some of them. It should be generated at build time by `Distro`, not maintained.
+
+`Res_Language=2057` (English, United Kingdom) is at least consistent across all fourteen.
+
+## Open question: what is a tool's on-disk layout when distributed standalone?
+
+Raised by the `samples/ComWinRep/` intake, and it matters because of the standing standalone constraint.
+
+Complete Windows Repair uses a `Doors/` runtime directory holding `Cache/`, `Language/`, `Logging/`, `Themes/`, and its `.ini`: one tool, one folder, everything it needs beside the executable.
+
+The shipped suite instead puts `Language/<Tool>/`, `Logging/`, and `Docs/<Tool>/` at a shared `Resolute/` root, which is natural for a suite install and awkward for a tool distributed on its own.
+
+The two models need reconciling before the conformance profile is written, because the profile has to assert where a standalone tool finds its own files. Unresolved.
+
 ## WinPower import
 
 `samples/WinPower 0.0.3.325922/` restored from `8d7469a^`. 349 lines plus two small modules.
