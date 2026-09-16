@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 98 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 106 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -161,6 +161,7 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D03 T01 §3` | Launch, failure reporting, and elevation     |   5   |
 | [ ] | `D03 T01 §4` | Windows system locations                     |   5   |
 | [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
+| [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T01 §2` | The five remaining frozen tools              |   7   |
 | [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   8   |
@@ -204,6 +205,13 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T05 §2` | Undelete                                        |   6   |
 | [ ] | `D05 T05 §3` | Erase verification                              |   7   |
 | [ ] | `D05 T05 §4` | Rescue imaging                                  |   9   |
+| [ ] | `D05 T06 §1` | Shadow Copy Browser                             |   7   |
+| [ ] | `D05 T06 §2` | Windows Disk Space                              |   7   |
+| [ ] | `D05 T06 §3` | Wi-Fi Diagnostics                               |   8   |
+| [ ] | `D05 T06 §4` | Profile Manager                                 |   7   |
+| [ ] | `D05 T06 §5` | Icon Cache and Default Apps Repair              |   6   |
+| [ ] | `D05 T06 §6` | Resource History and USB Device History         |   7   |
+| [ ] | `D05 T06 §7` | Credential, Display, and Connection Viewers     |   8   |
 
 
 ### Phase 4 -- Ship it, in every language

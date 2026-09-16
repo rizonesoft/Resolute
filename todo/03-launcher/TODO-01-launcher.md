@@ -21,6 +21,7 @@ track: P1
 - [`resolute_au3/samples/WinPower 0.0.3.325922/`](../../resolute_au3/samples) -- the shell-location features being imported; `Resolute` is WinPower's replacement
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework this launcher is the first product consumer of
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the tools this launcher discovers and starts
+- -> XREF: [`05-new-tools/TODO-06 §1`](../05-new-tools/TODO-06-system-inspection.md) -- the inspection tools, which take the suite past the point where a list is browsable
 
 ## Outcome
 
@@ -29,6 +30,7 @@ track: P1
 - Every menu item and every surface string is localized.
 - A user can reach the Windows system locations a repair session needs without hunting.
 - A launch that fails says why.
+- A user who can describe their problem reaches the right tool without knowing its name.
 
 **Adjacency:** list=applicable @ D03 T01 §2; document=not-applicable (the launcher produces no document a user carries; the tools do); settings=applicable @ D03 T01 §1; reporting=applicable @ D03 T01 §3; notifications=applicable @ D03 T01 §3; permissions=applicable @ D03 T01 §3; audit=applicable @ D03 T01 §3; exchange=not-applicable (nothing is imported or exported here); reverse=not-applicable (launching a tool changes nothing that needs undoing)
 
@@ -43,6 +45,7 @@ track: P1
 |   3   |   §3    | Launch, failure reporting, and elevation  | §2           |  [ ]   |
 |   4   |   §4    | Windows system locations                  | §2           |  [ ]   |
 |   5   |   §5    | Suite log viewer                          | §1           |  [ ]   |
+|   6   |   §6    | Symptom routing                           | §2, D01 T01 §4 |  [ ]   |
 
 ---
 
@@ -136,6 +139,29 @@ Fourteen tools write logs. One place to read them is the difference between a su
 - [ ] Commit: `"launcher: one viewer for every tool's log"`
 
 **Test checkpoint:** Logs from three tools render in one view. Each filter narrows and restores. Missing, empty, and malformed logs each produce a stated result. An export matches the rendered view, quoted.
+
+## 6. Symptom Routing
+
+Fifty tools is past the point where anyone browses a list. The question a user actually arrives with is never "which tool?", it is **"my machine does X"**, and an alphabetical grid answers the wrong question.
+
+This is what makes fifty tools feel like one product rather than a directory, and it is cheap because tool discovery already exists.
+
+**Fidelity:** the search and results surface, against `DESIGN.md` and `docs/captures/house-style/`.
+**Job:** a user who can describe their problem in their own words reaches the right tool without knowing its name. Consumer: the launched tool, and the search result that led there.
+**Treatment:** symptoms declared by each tool alongside its descriptor, so a new tool arrives searchable. Cheaper substitute that fails the checkpoint: a keyword table maintained in the launcher, which goes stale the day a tool is added and nobody remembers it exists.
+**Chrome:** consume the framework and the shared list surface, and the tool discovery from `§2`.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Extend the tool descriptor so each tool declares the symptoms it addresses, in `src/framework/ToolDescriptor.h`. Done when: a tool declares its symptoms beside its name and version, and adding a tool makes it searchable with no launcher change.
+- [ ] Match on plain words rather than exact terms. Done when: "no sound", "sound not working", and "audio broken" all reach the same tool, driven and quoted.
+- [ ] Localize the symptoms, because a user searches in their own language. Done when: symptom strings resolve from the language pack and a search in a second language reaches the same tool.
+- [ ] Rank results so the most likely tool is first. Done when: a symptom matching three tools orders them and this section records what the ordering is based on.
+- [ ] Say something useful when nothing matches. Done when: an unmatched search offers the diagnostic tools that narrow a problem rather than rendering an empty list.
+- [ ] Route a symptom to a repair **item** where no whole tool owns it. Done when: "printer not working" reaches the Complete Windows Repair item rather than failing, since most repairs are items rather than products.
+- [ ] Account for the surface. Done when: every control is working or deferred to a named section.
+- [ ] Commit: `"launcher: route a symptom to the tool that fixes it"`
+
+**Test checkpoint:** Three phrasings of one symptom reach the same tool, all driven and quoted. A newly added fixture tool is searchable with no launcher change. A search in a second language reaches the same tool. A symptom matching three tools is ordered by the recorded rule. An unmatched search offers the diagnostics. "Printer not working" reaches a Complete Windows Repair item.
 
 ## Verification
 

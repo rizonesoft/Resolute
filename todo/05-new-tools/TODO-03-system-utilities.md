@@ -23,6 +23,7 @@ track: P3
 - -> XREF: [`05-new-tools/TODO-01 §1`](./TODO-01-intake-and-new-tools.md) -- the intake contract these tools are measured against
 - -> XREF: [`05-new-tools/TODO-04 §1`](./TODO-04-diagnostics.md) -- the diagnostics, which compose the enumerators and records this file's tools own
 - -> XREF: [`05-new-tools/TODO-05 §4`](./TODO-05-recovery-and-imaging.md) -- rescue imaging, which §3 hands off to when a drive reports failing
+- -> XREF: [`05-new-tools/TODO-06 §1`](./TODO-06-system-inspection.md) -- the Shadow Copy Browser, which reads the same store as §1
 
 ## Outcome
 

@@ -90,6 +90,17 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | Undelete | 05-new-tools | TODO written, GPL v3 port, frozen |
 | Erase Verification | 05-new-tools | TODO written, new, composed |
 | Rescue Imaging | 05-new-tools | TODO written, GPL v3 port, frozen |
+| Shadow Copy Browser | 05-new-tools | TODO written, new |
+| Windows Disk Space | 05-new-tools | TODO written, new |
+| Wi-Fi Diagnostics | 05-new-tools | TODO written, new |
+| Profile Manager | 05-new-tools | TODO written, new, frozen |
+| Icon Cache Repair | 05-new-tools | TODO written, new |
+| Default Apps Repair | 05-new-tools | TODO written, new |
+| Resource History | 05-new-tools | TODO written, new |
+| USB Device History | 05-new-tools | TODO written, new |
+| Credential Viewer | 05-new-tools | TODO written, new |
+| Display Info | 05-new-tools | TODO written, new |
+| Connection Viewer | 05-new-tools | TODO written, new, composed |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | **discontinued** as a tool; it becomes the C++ framework |
