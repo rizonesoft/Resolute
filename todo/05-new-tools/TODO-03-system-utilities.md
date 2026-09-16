@@ -18,7 +18,7 @@ track: P3
 
 ## Inputs
 
-- [`resolute_au3/SDK/Includes/CompInfo.au3`](../../resolute_au3/SDK/Includes/CompInfo.au3) -- the existing machine-information helper, prior art for §6
+- [`resolute_au3/SDK/Includes/CompInfo.au3`](../../resolute_au3/SDK/Includes/CompInfo.au3) -- the existing machine-information helper. Third-party, by Jarvis Stubblefield, with no stated licence: read it for **what** to collect, never port it
 - -> XREF: [`02-repair-contract/TODO-01 §4`](../02-repair-contract/TODO-01-repair-contract.md) -- the restore record and undo every tool here consumes
 - -> XREF: [`05-new-tools/TODO-01 §1`](./TODO-01-intake-and-new-tools.md) -- the intake contract these tools are measured against
 - -> XREF: [`05-new-tools/TODO-04 §1`](./TODO-04-diagnostics.md) -- the diagnostics, which compose the enumerators and records this file's tools own
@@ -167,7 +167,7 @@ The support workflow made real: instead of twenty questions in a forum thread, t
 **Fidelity:** the report preview and the export, against `DESIGN.md`.
 **Job:** a user can hand somebody everything they need to help, in one file, without being asked for it piece by piece. Consumer: the exported report, read by a stranger.
 **Treatment:** the report assembled from the machine and from the suite's own logs, with the user shown exactly what it contains before it leaves. Cheaper substitute that fails the checkpoint: a report generated and saved without a preview, which is how a tool ends up leaking something the user did not intend to share.
-**Chrome:** consume the framework. `resolute_au3/SDK/Includes/CompInfo.au3` is prior art for what to collect.
+**Chrome:** consume the framework. `resolute_au3/SDK/Includes/CompInfo.au3` shows **what to collect**, not how: it is a third-party community UDF with no stated licence, so the collection is reimplemented from Win32 and WMI rather than ported.
 **Needs:** Windows host (build/test)
 
 - [ ] Collect the machine facts: Windows build, hardware, drives, and installed Resolute tools with their versions. Done when: a generated report carries all four and each is verified against an independent source.

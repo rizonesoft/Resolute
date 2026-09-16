@@ -928,3 +928,32 @@ It also makes the verification claim in `D05 T05 §3` precise rather than hedged
 `D05 T05 §4` now requires the phase order, a visible and bounded retry budget, a measured ceiling on total re-reads, and resumability, because re-reading a dying drive from zero is the most expensive thing the tool could do. Unbounded retrying is named as the substitute that fails, and the section records the reasoning so a later change cannot quietly weaken it.
 
 Both of these are the same shape: the tool's value is not the feature, it is knowing the one thing about the hardware that makes the feature honest.
+
+## Correction, round 18: what is actually constrained
+
+Operator note: ExoSuite and RegStudio are Rizonesoft products, so their licence can be changed at will.
+
+That is correct, and it extends further than the note claims. **The AutoIt suite is Rizonesoft copyright too** (`Copyright (C) 2023 RIZONESOFT` on every `License.txt` checked). So ExoSuite, the UI library, RegStudio, and all fourteen AutoIt tools are owned code, and their licence is a **choice rather than a constraint**.
+
+`D06 T01 §7` previously framed `RegStudio` sitting at MIT as an inconsistency to repair. That framing was wrong and is now corrected: it is a decision to make.
+
+### The four things that genuinely bind
+
+| Constraint | Effect |
+| --- | --- |
+| **Kickass Undelete port** | Permanently GPL v3. Kevin Leach's copyright, never relicensable |
+| **SD Imager port** | Permanently GPL v3. OS IT Consult's copyright, never relicensable |
+| **Lucide** | ISC. Permissive, but the copyright notice must ship, which it does not today |
+| **Four AutoIt community UDFs** | Unclear, and best avoided rather than resolved |
+
+The fourth was found while checking: `CompInfo.au3` by Jarvis Stubblefield, `FFLabels.au3` and `GUICtrlFFLabel.au3` by Brian J Christy and G. Sandler, and `SSLG.au3` from an AutoIt forum post. Forum UDFs are typically published with **no explicit licence at all**, which legally means all rights reserved even where community practice assumes permission.
+
+**The C++ rewrite sheds this naturally**, provided those four are reimplemented rather than ported. `CompInfo` is WMI and registry queries; the two label controls are AutoIt GUI primitives that cannot survive the move to Direct2D regardless. `D06 T01 §7` now requires each to be confirmed reimplemented, and `D05 T03 §6` was corrected so it reads `CompInfo.au3` for **what** to collect and never as a source to port.
+
+### The thing worth acting on before it becomes impossible
+
+**Copyleft on owned code costs the holder nothing.** A sole copyright holder may dual-license, relicense, or ship a closed commercial build at any time. GPL v3 binds everyone else, not Rizonesoft.
+
+**That ends the moment an outside contribution arrives.** A patch from a stranger under GPL v3 is that person's copyright, and the file it touches can no longer be relicensed without their permission. Given monetisation was raised as a goal in round 15, the freedom to relicense is worth preserving deliberately.
+
+A contributor licence agreement preserves it, is trivial to adopt before the first external pull request, and is effectively impossible to retrofit once there are contributors to chase. `D06 T01 §7` now carries the decision with a `before the repository takes its first external contribution` trigger.
