@@ -47,6 +47,7 @@ track: W1
 |   3   |   §3    | Warnings as errors at one level              | §2         |  [ ]   |
 |   4   |   §4    | One command builds any tool                  | §2         |  [ ]   |
 |   5   |   §5    | One command runs every gate                  | §3, §4     |  [ ]   |
+|   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [ ]   |
 
 ---
 
@@ -155,6 +156,50 @@ Five gates that must each be remembered are five gates that get skipped under ti
 - [ ] Commit: `"workspace: one command runs every gate"`
 
 **Test checkpoint:** `pwsh scripts/check-all.ps1` exits 0 on a clean tree and prints one line per gate. Introducing one deliberate warning makes it exit non-zero and show only that gate's detail. A tidy count one above the baseline fails. All three runs are quoted in the commit body.
+
+## 6. Keep the Toolchain Current
+
+`§1` pins the toolchain so two machines agree. A pin with no expiry is how a project quietly ships a two-year-old compiler: the bootstrap keeps working, so nothing ever says the pin is old.
+
+> [!IMPORTANT]
+> **Measured 2026-09-17 against the upstream release APIs.** The pins are further behind than the working bootstrap suggests, because a bootstrap that succeeds tells you nothing about currency.
+>
+> | Component | Pinned | Latest | Published | Gap |
+> | --- | --- | --- | --- | --- |
+> | llvm-mingw | `20251216` | `20260908` | 2026-09-08 | about 9 months |
+> | CMake | `4.2.3` | `4.4.3` | 2026-08-25 | two minor releases |
+> | Ninja | `1.13.1` | `1.13.2` | 2025-11-20 | one patch |
+>
+> The pinned llvm-mingw carries clang 21.1.8, measured from a real bootstrap on 2026-09-17.
+
+<!-- claim: count "20251216" exokit/Bootstrap-ExoKit.ps1 = 1 -->
+<!-- claim: count "4\.2\.3" exokit/Bootstrap-ExoKit.ps1 = 1 -->
+<!-- claim: count "1\.13\.1" exokit/Bootstrap-ExoKit.ps1 = 1 -->
+
+**The tension this section resolves.** Pinning and "latest" pull against each other and both are right: a pin buys reproducibility, currency buys compiler fixes and newer C++23 support. The resolution is that **a pin is a dated decision, not a permanent one**, and that falling behind must be *visible* rather than discovered by accident nine months later.
+
+**Needs:** Windows host (build/test)
+
+**Build order.** Bump one component at a time and run the full gate between each. Bumping all three at once means a new diagnostic cannot be attributed to the thing that caused it.
+
+1. **Ninja first**, because it is a patch release and the least likely to change behaviour. Done when: the gate passes on `1.13.2`.
+2. **CMake second.** Two minor releases can change policy defaults, which is a configure-time failure and therefore loud. Done when: the gate passes on `4.4.3` with no new policy warnings, or each one is resolved and recorded.
+3. **llvm-mingw last**, because it carries the compiler and is the only one that can produce new warnings across the whole tree. Done when: the gate passes and the new clang version is recorded.
+
+- [ ] Record the clang version each llvm-mingw release carries, not just the release date. Done when: this section names the clang version for the outgoing pin (21.1.8, measured 2026-09-17) and for the incoming one, because "llvm-mingw 20260908" says nothing about what changed for the code.
+- [ ] Bump Ninja to `1.13.2` alone, then run the full gate. Done when: `scripts/check-all.ps1` passes and the pin, URL, and SHA-256 in `toolchain.json` are updated together.
+- [ ] Bump CMake to `4.4.3` alone, then run the full gate. Done when: configure produces no new policy warnings, or each new one is resolved and named here with what it changed.
+- [ ] Bump llvm-mingw to `20260908` alone, then run the full gate. Done when: the build passes at the project warning level with warnings as errors.
+- [ ] **Treat new compiler diagnostics as findings, not as noise to silence.** Done when: every new warning the bump surfaces is either fixed or suppressed with a named reason at the narrowest scope, and a blanket suppression is recorded as a decision with its cost. Cheaper substitute that fails the checkpoint: lowering the warning level or adding a global `-Wno-` to make the bump quiet, which discards exactly the value the newer compiler provides.
+- [ ] Re-measure the binary size after the bump, against the recorded baseline. Done when: the new size is quoted against the 1.39 MB figure `§2` records, because a compiler change moves it and the per-tool size budget is measured against it.
+- [ ] Add `scripts/toolchain-latest.ps1`, which reports each pin against the upstream latest release and exits non-zero when any is behind. Done when: running it today reports all three as current, and artificially lowering one pin makes it exit non-zero naming that component, the pinned version, and the latest.
+- [ ] **Keep the check advisory, never automatic.** Done when: the script reports and does not edit `toolchain.json`, and this section records why: an unattended bump of a compiler can break a build nobody is watching, and the reproducibility a pin buys is worth more than being current by a few days.
+- [ ] Decide the re-evaluation cadence and record it as a dated default. Done when: the cadence is written with its cost of changing, and it names who runs the check. Cheaper substitute: leaving it to whoever notices, which is what produced the nine-month gap this section opens with.
+- [ ] Wire the check into the combined gate as a **warning, not a failure**. Done when: a pin that has fallen behind prints a named advisory line in `scripts/check-all.ps1` output and does not fail the build.
+- [ ] Record what this section cannot promise. Done when: it states that being current is not the same as being correct, because a newer compiler can regress, and that the pin exists so a regression can be backed out by editing one file.
+- [ ] Commit: `"workspace: bring the toolchain pins current and report when they fall behind"`
+
+**Test checkpoint:** `toolchain.json` names llvm-mingw `20260908`, CMake `4.4.3`, and Ninja `1.13.2`, each with a URL and a SHA-256, and a clean bootstrap from those pins populates the toolchain directory and leaves `git status` clean. `scripts/check-all.ps1` passes at each of the three bumps, run separately. Every new compiler diagnostic is named here with its disposition. The binary size is quoted against the 1.39 MB baseline. `pwsh scripts/toolchain-latest.ps1` exits 0 with all three current; lowering one pin makes it exit non-zero naming the component, the pinned version, and the latest. The check writes nothing, proven by there being no write path to `toolchain.json`.
 
 ## Verification
 
