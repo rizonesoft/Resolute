@@ -1,0 +1,153 @@
+;~ =============================================================================
+;~ Rizonesoft Language File
+;~ =============================================================================
+;~ Date.........: 15 March 2025
+;~ Author.......: Derick Payne (Rizonesoft)
+;~ Link.........: https://rizonesoft.com
+;~ =============================================================================
+
+[Main]
+Product = Firemin
+Version = 12
+
+[Language]
+;~ Please ad the translated language name next to the English name. For example; Ελληνικά - Greek
+Name = Svenska - Swedish
+Code = sv
+Encoding = Unicode (UTF-16) LE BOM
+
+[Translations]
+;~ Please do not translate this section.
+About = About
+Custom = Custom
+Donate = Donate
+Menus = Menus
+Messages = Messages
+Messages2 = Messages2
+Preferences = Preferences
+Update = Update
+Versioning = Versioning
+
+[About]
+Window_Title = Om %{Program.Name}
+Label_Version = Version
+Label_AutoIt = Byggd med AutoIt version
+Label_Copyright = Upphovsrätt
+Tip_Title_Donate = Donera till vår sak
+Tip_Message_Donate = När du donerar hjälper du till att hålla vår programvara gratis\r\noch gör det möjligt för oss att skaffa verktygen och tjänsterna\r\nvi använder för att betjäna dig.
+Label_Home = Hemsida
+Label_License = Licens
+Label_Support = Få support
+Tip_Title_Country = Gjord i Sydafrika
+Tip_Message_Country = %{Program.Name} föddes i Sydafrika.
+Label_Contributors = Bidragsgivare
+Button_Ok = Ok
+Label_RAM = (RAM) %d MB LEDIGT AV %d MB (%d%%)
+Label_HDD = (%s) %.2f GB LEDIGT AV %.2f GB (%d%%)
+Tip_Facebook = Gilla oss på Facebook.
+Tip_GitHub = %{Program.Name} på GitHub.
+
+[Custom]
+Label_Status_Welcome = Börja med att ladda webbläsaren (välj filnamn).\r\n%{Program.Name} kommer automatiskt att upptäcka processen från den körbara filen du väljer.
+Label_Status_Updates = Kontrollerar uppdateringar
+Group_Load_Browser = Ladda webbläsare
+Label_Executable = Körbar sökväg (%s):
+Label_Process_Usage = Användning | Topp:
+Label_Process_Count = Processantal:
+Button_Browse = &Bläddra
+Group_Options = Alternativ
+Checkbox_Reduce_Mem = Minska minne var:
+Label_Milliseconds = millisekunder
+Checkbox_Reduce_Limit = Minska minne endast om användning överstiger:
+Checkbox_Start_With = Starta %s när %{Program.Name} startar
+Checkbox_Enable_Extended_Processes = Aktivera utökade processer
+Button_Extended_Processes = &Utökade processer
+Checkbox_Start_Windows = Starta %{Program.Name} när Windows startar
+Label_Settings_Updated = Inställningar uppdaterade.
+Button_Cancel = Avbryt
+Button_Save = Spara
+Time_Unit_01 = millisekunder
+Time_Unit_02 = sekunder
+Time_Unit_03 = minuter
+Time_Unit_04 = timmar
+Label_Boost_Description = Minska var %s %s om användning överstiger %s MB.
+Title_Select_Browser = Välj webbläsare
+Tip_Minimized_Title = %{Program.Name} körs fortfarande!
+Tip_Minimized_Message = %{Program.Name} kommer fortsätta köras för att optimera minnesanvändningen för %s.\r\nKlicka på systemfältsikonen för att ändra olika optimeringsalternativ.
+Label_Notice = %{Program.Name} är designad för att köras på en stationär dator eller bärbar dator.\r\nVi har skapat Firemin Server för servermiljöer. Läs mer...
+
+[Donate]
+Label_Heading = Vad sägs om en liten donation för att hålla vår programvara gratis för alltid?
+Label_Message = Klicka på PayPal-knappen nedan, välj ett belopp och skicka oss din donation.\r\nDin donation kommer att användas för att förbättra vår programvara och hålla allt gratis på Rizonesoft.\r\nEn donation på $20 håller oss igång i minst en månad.
+Label_Donate = Skulle du överväga en liten gåva på $10 för att hjälpa oss förbättra %{Program.Name} och hålla ljusen tända?
+
+[Menus]
+File = &Arkiv
+File_Preferences = &Inställningar
+File_Close = &Stäng\tShift+Alt+F4
+Help = &Hjälp
+Help_Update = Kontrollera &uppdateringar
+Help_Home = %{Company.Name} &Hem
+Help_Downloads = Fler &Nedladdningar
+Help_Support = &Få support
+Help_Issue = Skapa ett &problem
+Help_Donate = Donera till &vår sak
+Help_About = Om %{Program.Name}
+Tray_About = Om %{Program.Name} %s
+Tray_Open = Öppna %{Program.Name}
+Tray_Extended_Processes = Utökade processer
+Tray_Run = Kör %s
+Tray_Run_Safemode = Kör %s i säkert läge
+
+[Messages]
+Info_Title = Vänligen notera
+Warning_Title = Varning!
+Error_Title = Hoppsan! Något gick fel!
+Error_Oops = Hoppsan!
+Singleton = En annan instans av %{Program.Name} körs redan.\r\nTips: Klicka på %{Program.Name}-ikonen i systemfältet.
+Compatible = %{Program.Name} är inte kompatibel med din Windows-version.\r\nOm du tror att detta är ett fel, tveka inte att lämna ett meddelande på '%s' med alla detaljer.
+Compatible_Bit = Tyvärr är %{Program.Name} 32 Bit inte kompatibel med din Windows-version.\r\nVänligen ladda ner %{Program.Name} 64 Bit från '%s'
+
+[Preferences]
+Window_Title = Inställningar
+Tab_General = Allmänt
+Tab_Performance = Prestanda
+Tab_Language = Språk
+Group_Notifications = Aviseringar
+Group_Extended_Processes = Utökade processer
+Group_Priority = Prioritet
+Group_Memory = Minne
+Group_Language = Språk
+Checkbox_Notifications = Visa systemfältsaviseringar
+Label_Extended_Processes = Ange namnen på eventuella ytterligare processer du vill att %{Program.Name} ska optimera här.\r\nListan måste vara kommaseparerad (Process01.exe, Process02.exe, etc)
+Label_SetPriority = Ställ in processprioritet:
+Checkbox_SaveRealtime = Spara prioritet över hög (rekommenderas inte).
+Checkbox_ReduceMemory = Minska minne på system med lågt minne.
+Label_Language_Message = Välj ditt föredragna språk och tryck på %s-knappen för att fortsätta.\r\n(Kräver omstart)
+Button_Save = Spara
+Button_Cancel = Avbryt
+Label_Updated = Inställningar uppdaterade
+MsgBox_Language_Title = Språk ändrat
+MsgBox_Language_Message = Det valda språket har ändrats.\r\n%{Program.Name} måste startas om för att det valda språket ska träda i kraft.
+MsgBox_Closing_Title = Stänger %{Program.Name}
+MsgBox_Closing_Message = Vill du stänga %{Program.Name} nu?
+
+[Update]
+Window_Title_Available = Uppdatering tillgänglig
+Window_Title_Congratulations = Grattis!
+Window_Title_Error = Något gick fel!
+Label_Message_Update = En ny version av '%{Program.Name}' är tillgänglig.
+Label_Message_Latest = Du använder den senaste versionen av '%{Program.Name}'.
+Label_Message_Error = Information om den senaste versionen av '%{Program.Name}' kunde inte hämtas.
+Label_Message_Internet = Kontrollera din internetanslutning och försök igen.
+Label_Build_Current = Nuvarande version:
+Label_Build_Update = Uppdateringsversion:
+CheckBox_NoUpdate = Kontrollera inte uppdateringar vid start.
+Button_Update = Läs mer
+Button_Close = Stäng
+
+[Versioning]
+Administrator = Administratör
+Build = Version
+AutoIt_Version = använder AutoIt version %{AutoIt.Version}
+Bit = Bit 

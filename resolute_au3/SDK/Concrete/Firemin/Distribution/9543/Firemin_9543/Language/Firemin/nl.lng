@@ -1,0 +1,153 @@
+;~ =============================================================================
+;~ Rizonesoft Language File
+;~ =============================================================================
+;~ Date.........: 15 March 2025
+;~ Author.......: Derick Payne (Rizonesoft)
+;~ Link.........: https://rizonesoft.com
+;~ =============================================================================
+
+[Main]
+Product = Firemin
+Version = 12
+
+[Language]
+;~ Please ad the translated language name next to the English name. For example; Ελληνικά - Greek
+Name = Nederlands - Dutch
+Code = nl
+Encoding = Unicode (UTF-16) LE BOM
+
+[Translations]
+;~ Please do not translate this section.
+About = About
+Custom = Custom
+Donate = Donate
+Menus = Menus
+Messages = Messages
+Messages2 = Messages2
+Preferences = Preferences
+Update = Update
+Versioning = Versioning
+
+[About]
+Window_Title = Over %{Program.Name}
+Label_Version = Versie
+Label_AutoIt = Gebouwd met AutoIt versie
+Label_Copyright = Copyright
+Tip_Title_Donate = Doneer voor onze zaak
+Tip_Message_Donate = Als je doneert, help je onze software gratis te houden\r\nen stel je ons in staat om de tools en diensten te verkrijgen\r\ndie we gebruiken om jou van dienst te zijn.
+Label_Home = Startpagina
+Label_License = Licentie
+Label_Support = Krijg ondersteuning
+Tip_Title_Country = Gemaakt in Zuid-Afrika
+Tip_Message_Country = %{Program.Name} is geboren in Zuid-Afrika.
+Label_Contributors = Bijdragers
+Button_Ok = Ok
+Label_RAM = (RAM) %d MB VRIJ VAN %d MB (%d%%)
+Label_HDD = (%s) %.2f GB VRIJ VAN %.2f GB (%d%%)
+Tip_Facebook = Like ons op Facebook.
+Tip_GitHub = %{Program.Name} op GitHub.
+
+[Custom]
+Label_Status_Welcome = Begin met het laden van de browser (selecteer bestandsnaam).\r\n%{Program.Name} zal automatisch het proces detecteren van het uitvoerbare bestand dat je kiest.
+Label_Status_Updates = Updates controleren
+Group_Load_Browser = Browser laden
+Label_Executable = Uitvoerbaar pad (%s):
+Label_Process_Usage = Gebruik | Piek:
+Label_Process_Count = Proces aantal:
+Button_Browse = &Bladeren
+Group_Options = Opties
+Checkbox_Reduce_Mem = Geheugen verminderen elke:
+Label_Milliseconds = milliseconden
+Checkbox_Reduce_Limit = Alleen geheugen verminderen als gebruik boven:
+Checkbox_Start_With = Start %s wanneer %{Program.Name} start
+Checkbox_Enable_Extended_Processes = Uitgebreide processen inschakelen
+Button_Extended_Processes = &Uitgebreide processen
+Checkbox_Start_Windows = Start %{Program.Name} wanneer Windows start
+Label_Settings_Updated = Instellingen succesvol bijgewerkt.
+Button_Cancel = Annuleren
+Button_Save = Opslaan
+Time_Unit_01 = milliseconden
+Time_Unit_02 = seconden
+Time_Unit_03 = minuten
+Time_Unit_04 = uren
+Label_Boost_Description = Verminderen elke %s %s als gebruik boven %s MB.
+Title_Select_Browser = Browser selecteren
+Tip_Minimized_Title = %{Program.Name} draait nog steeds!
+Tip_Minimized_Message = %{Program.Name} blijft draaien om het geheugengebruik van %s te optimaliseren.\r\nKlik op het systeemvakpictogram om verschillende optimalisatie-opties te wijzigen.
+Label_Notice = %{Program.Name} is ontworpen om op een desktop computer of laptop te draaien.\r\nWe hebben Firemin Server gemaakt voor serveromgevingen. Lees meer...
+
+[Donate]
+Label_Heading = Wat dacht je van een kleine donatie om onze software voor altijd gratis te houden?
+Label_Message = Klik op de PayPal-knop hieronder, kies een bedrag en stuur ons je donatie.\r\nJe donatie zal worden gebruikt om onze software te verbeteren en alles gratis te houden op Rizonesoft.\r\nEen donatie van $20 houdt ons minstens een maand draaiende.
+Label_Donate = Zou je een klein geschenk van $10 willen overwegen om ons te helpen %{Program.Name} te verbeteren en de lichten aan te houden?
+
+[Menus]
+File = &Bestand
+File_Preferences = &Voorkeuren
+File_Close = &Sluiten\tShift+Alt+F4
+Help = &Help
+Help_Update = &Updates controleren
+Help_Home = %{Company.Name} &Home
+Help_Downloads = Meer &Downloads
+Help_Support = &Krijg ondersteuning
+Help_Issue = Maak een &probleem aan
+Help_Donate = Doneer voor &onze zaak
+Help_About = Over %{Program.Name}
+Tray_About = Over %{Program.Name} %s
+Tray_Open = Open %{Program.Name}
+Tray_Extended_Processes = Uitgebreide processen
+Tray_Run = Start %s
+Tray_Run_Safemode = Start %s in veilige modus
+
+[Messages]
+Info_Title = Let op
+Warning_Title = Waarschuwing!
+Error_Title = Oeps! Er ging iets mis!
+Error_Oops = Oeps!
+Singleton = Een andere instantie van %{Program.Name} draait al.\r\nTip: Klik op het %{Program.Name} pictogram in het systeemvak.
+Compatible = %{Program.Name} is niet compatibel met jouw Windows-versie.\r\nAls je denkt dat dit een fout is, aarzel dan niet om een bericht achter te laten op '%s' met alle details.
+Compatible_Bit = Helaas is %{Program.Name} 32 Bit niet compatibel met jouw Windows-versie.\r\nDownload alsjeblieft %{Program.Name} 64 Bit van '%s'
+
+[Preferences]
+Window_Title = Voorkeuren
+Tab_General = Algemeen
+Tab_Performance = Prestaties
+Tab_Language = Taal
+Group_Notifications = Meldingen
+Group_Extended_Processes = Uitgebreide processen
+Group_Priority = Prioriteit
+Group_Memory = Geheugen
+Group_Language = Taal
+Checkbox_Notifications = Toon systeemvakmeldingen
+Label_Extended_Processes = Voer hier de namen in van eventuele extra processen die je wilt dat %{Program.Name} optimaliseert.\r\nDe lijst moet door komma's gescheiden zijn (Process01.exe, Process02.exe, etc)
+Label_SetPriority = Stel processprioriteit in:
+Checkbox_SaveRealtime = Sla prioriteit boven hoog op (niet aanbevolen).
+Checkbox_ReduceMemory = Verminder geheugen op systemen met weinig geheugen.
+Label_Language_Message = Selecteer je voorkeurstaal en druk op de %s knop om door te gaan.\r\n(Herstart vereist)
+Button_Save = Opslaan
+Button_Cancel = Annuleren
+Label_Updated = Voorkeuren bijgewerkt
+MsgBox_Language_Title = Taal gewijzigd
+MsgBox_Language_Message = De geselecteerde taal is gewijzigd.\r\n%{Program.Name} moet opnieuw worden gestart om de gekozen taal van kracht te laten worden.
+MsgBox_Closing_Title = %{Program.Name} sluiten
+MsgBox_Closing_Message = Wil je %{Program.Name} nu sluiten?
+
+[Update]
+Window_Title_Available = Update beschikbaar
+Window_Title_Congratulations = Gefeliciteerd!
+Window_Title_Error = Er ging iets mis!
+Label_Message_Update = Een nieuwe versie van '%{Program.Name}' is beschikbaar.
+Label_Message_Latest = Je gebruikt de nieuwste versie van '%{Program.Name}'.
+Label_Message_Error = Informatie over de nieuwste versie van '%{Program.Name}' kon niet worden opgehaald.
+Label_Message_Internet = Controleer je internetverbinding en probeer het opnieuw.
+Label_Build_Current = Huidige build:
+Label_Build_Update = Update build:
+CheckBox_NoUpdate = Controleer niet op updates bij opstarten.
+Button_Update = Lees meer
+Button_Close = Sluiten
+
+[Versioning]
+Administrator = Beheerder
+Build = Build
+AutoIt_Version = gebruikt AutoIt versie %{AutoIt.Version}
+Bit = Bit 
