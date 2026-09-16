@@ -203,15 +203,14 @@ Push the SHIP push. The commit must exist on the remote before the next step, be
 **An outside reviewer reads the commit before this session stamps its own work.** The session that built a section is the worst judge of whether it is right, and this step exists to break that.
 
 ```bash
-codex review --commit <SHIP_SHA> "Review this commit against its TODO section <ref>. \
-Read the section's contract in todo/, including its Test checkpoint, its Freeze check if it has one, \
-and the source layout in AGENTS.md. Report: behaviour that does not match the contract; a checkpoint \
-that cannot fail; a shared-layer rule broken, meaning a tool that reimplements the framework or the \
-repair contract, or writes outside the layout; a destructive path with no reverse or no confirmation; \
-and anything the commit message claims that the diff does not support. Be specific and cite lines."
+codex review --commit <SHIP_SHA>
 ```
 
 Codex is configured here with `gpt-6-astra` at high reasoning effort, so no model flag is needed. It reviews read-only and changes nothing.
+
+**`--commit` takes no review instructions.** Verified 2026-09-17 while processing `D00 T03 §1`: the usage line prints `codex review --commit <SHA> [PROMPT]`, but supplying either a prompt string or `-` for stdin fails with `the argument '--commit <SHA>' cannot be used with '[PROMPT]'`. An earlier version of this skill documented a long prompt here, and it could never have run. Do not reintroduce one.
+
+What replaces it: Codex reads `AGENTS.md` from the repository root on its own, so the contract it needs is already in front of it. That file carries the source layout table, the five proof types, and the shared-layer rules, which is exactly what the deleted prompt was asking the reviewer to consult. **When a section needs review guidance the reviewer would not otherwise have, put it in the section's own `Test checkpoint` rather than in the command**, because the reviewer reads the section.
 
 Then act on what it returns:
 
