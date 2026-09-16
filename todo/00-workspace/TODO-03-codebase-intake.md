@@ -52,7 +52,7 @@ track: W1
 |   1   |   §1    | Subtree merge with history preserved | --         |  [x]   |
 |   2   |   §2    | Rename the product to Resolute       | §1         |  [x]   |
 |   3   |   §3    | Rename the library and the toolchain | §2         |  [x]   |
-|   4   |   §4    | Correct the stale documentation      | §3         |  [ ]   |
+|   4   |   §4    | Correct the stale documentation      | §3         |  [x]   |
 
 ---
 
@@ -191,6 +191,8 @@ ExoSuite is not a second product. It is the Resolute launcher, and leaving the o
 
 <!-- claim: absent shared/exo-ui -->
 <!-- claim: absent todo/extensions -->
+<!-- claim: count "\n- \[ \]" TODO.md = 348 -->
+<!-- claim: count "\n- \[ \]" TODO-ux.md = 101 -->
 <!-- claim: count "RESEXT" docs/extensions.md = 16 -->
 <!-- claim: count "RESEXT" src/main.cpp = 6 -->
 <!-- claim: absent resources/ExoSuite.ico -->
@@ -342,6 +344,13 @@ Anyone approaching this code cold is told nothing at all, and the one document t
 - [x] Commit: `"intake: correct the documentation to the stack that exists"`
 
 **Test checkpoint:** The README names C++23, Direct2D and DirectWrite, llvm-mingw, CMake with Ninja, and carries build commands that a reader can run from a clean clone to reach `Resolute.exe`; the commands are executed and quoted rather than assumed. It states the shipped set as it is today, DLLs included, and names `D00 T01 §2` as the owner of making it static. The absence of tests, vcpkg, `src/framework/`, and `src/repair/` is stated, each verified absent. `docs/extensions.md` names `RESEXT` and `ResoluteUI.dll` and no retired extension. `git grep -i exoext` returns **exactly one** hit outside the brainstorm, the reviews, and this file: the rename note in `docs/extensions.md` itself, which names the old resource deliberately so an extension author can tell why an executable embedding it is not listed. A document that changes a discovery contract silently is the failure this guards against. `TODO.md` is marked superseded with its date and successor, and anything still wanted from its 348 open items is named with an owning section. `TODO-ux.md` says `D01 T02 §1` owns it. `todo/extensions/` does not exist. `.vscode/settings.json` configures no Slint toolchain.
+
+> **Verified:** 2026-09-17 | §4 | the README's build commands run **verbatim** from a deleted `build/` and `Bin/`: `pwsh scripts/bootstrap.ps1` 3 SKIP, `. .\reskit\Init-ResKit.ps1` 3 tools, `cmake --preset release`, `cmake --build --preset release` 52/52, reaching `Bin/Release/Resolute.exe` · README names C++23, Direct2D, DirectWrite, llvm-mingw, Ninja, and the section that owns the static-linking gap · the absences it states are each verified on disk: `tests`, vcpkg, `src/framework/`, `src/repair/`, `LICENSE` · `docs/extensions.md` names `RESEXT` 16 times against `src/main.cpp`'s 6, and no retired extension · `TODO.md` superseded with its one uncovered idea routed · `todo/extensions/` gone · 0 Slint references in tracked config
+> **Review:** round 1, candidate `74caddc` plus the follow-up fix -- `adversarial` approve · `consistency` approve · `integration` approve · `source-defect` approve · `design` not-applicable · `record` approve after fix (1). Raw findings: docs/reviews/00-workspace/D00-T03-s4.md
+> **Independent:** `codex review --commit 74caddc` (gpt-6-astra, high) found **no actionable regressions** and confirmed validation, claims, both self-tests, and plan freshness passed. It did not find F1 or F2, both invisible to a diff reader: a header stating its own file's line count reads as correct prose, and is wrong only *because* the line was added.
+> **CRUD:** not applicable (this section writes documentation and no user-facing data path)
+> **Duration:** 7
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## Verification
 

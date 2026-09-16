@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > **Superseded 2026-09-17 by `todo/`, and kept for the record rather than deleted.**
 >
-> This is the ExoSuite development roadmap: 728 lines, 35 items done and **348 open**, describing a Control Panel replacement built from CPL applets. Resolute is a suite of system utilities, and its plan is `todo/`, which carries 120 sections across ten domains. The two describe different products, so this is not a plan that fell behind; it is a plan for something else.
+> This is the ExoSuite development roadmap: **348 open items** and 35 done, describing a Control Panel replacement built from CPL applets. No line count is given, because a figure describing the file it sits in is changed by being written: the first draft of this header said 728 and made itself wrong. Resolute is a suite of system utilities, and its plan is `todo/`, which carries 120 sections across ten domains. The two describe different products, so this is not a plan that fell behind; it is a plan for something else.
 >
 > **Nothing here is a live work item.** Do not tick, route, or implement from this file. `todo/implementation-plan.md` is the live plan.
 >
