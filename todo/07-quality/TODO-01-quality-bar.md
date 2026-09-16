@@ -74,6 +74,7 @@ The document every other domain is measured against. It runs first because a bar
 
 - [ ] Implement the check so it evaluates the profile against every shipped tool. Done when: it produces one row per tool per clause.
 - [ ] Fail by name. Done when: a tool missing a documentation set is named with the clause it failed and the section that owns it.
+- [ ] Check that **no repair has two homes**. Done when: every repair-contract item declared anywhere in the suite is checked for a duplicate subject in another tool, and a deliberate duplicate fails the check by name. This is the settings-path defect in a new place: one repair in two tools diverges the first time either is touched.
 - [ ] Enforce a **per-tool size budget**, because the suite's size claim is a product promise and an unchecked promise decays. Done when: each tool's executable is measured at release, compared against a recorded budget, and a tool exceeding it fails the check by name. The baseline is the 1.36 MB the shipped `ExoSuite.exe` measured on 2026-09-16 with the full UI framework linked statically.
 - [ ] Report the whole-suite total alongside it. Done when: the release report states the per-tool sizes and their sum, so the claim can be stated from measurement rather than estimate.
 - [ ] Record what the budget buys. Done when: this section states that a competing suite of roughly twenty tools commonly exceeds 200 MB, so the comparison the claim rests on is written down rather than assumed.

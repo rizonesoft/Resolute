@@ -214,6 +214,7 @@ Nine smaller tools, grouped because each is one surface over one thing, and sepa
 - [ ] `extensions/BootManager/`: boot entries, order, and timeout, as contract items. Done when: a change verifies by read-back and undo restores the entry exactly.
 - [ ] `extensions/PageFileManager/`: page file location and size per volume. Done when: a change verifies by read-back and states that it needs a restart.
 - [ ] `extensions/AudioDevices/`: default device per role, per-application routing, and devices Windows has hidden. Done when: a hidden device is surfaced and setting a default verifies by read-back.
+- [ ] Own the **audio repair** that would otherwise sit in Complete Windows Repair, because this is its topical tool. Done when: no-sound is diagnosed across its real causes, namely the audio service, a disabled or absent endpoint, a muted or wrongly routed default, and a driver fault, and each repair is a contract item verified by read-back.
 - [ ] `extensions/ColorProfiles/`: profiles per display, with association and reset. Done when: association and reset both verify by read-back.
 - [ ] `extensions/SoftwareInventory/`: installed software with version, publisher, size, and install date, exportable into the System Report. Done when: the list matches what the system reports and the export feeds `D05 T03 §6`.
 - [ ] Commit: `"link, permissions, hash, boot, page file, audio, colour, and inventory tools"`

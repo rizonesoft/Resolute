@@ -979,3 +979,29 @@ Raw disk access made the second case easy: `CreateFile` on `\\.\PhysicalDriveN` 
 The suite now **owns everything it ships** except Lucide, which is ISC and needs only its notice carried, and the four unlicensed AutoIt community UDFs, which are avoided rather than resolved.
 
 Nothing in the plan is permanently GPL v3 any more. The licence on every line becomes what decision 47 says it should be, by choice rather than by inheritance.
+
+## Correction, round 20: one repair, one home
+
+Adding the Printer Manager, Search Manager, and Audio Devices created topical homes for repairs that had already been routed to Complete Windows Repair, leaving the same subject in two places. That is the settings-path defect arriving by a new route, and the operator caught it.
+
+**The rule already existed.** Decision 46 says CWR is the general repair library and holds any Windows repair **without a clearly topical home**. Adding those tools created homes, so four of the six routed repairs no longer belong in CWR:
+
+| Repair | Was | Now owned by |
+| --- | --- | --- |
+| Windows Search and indexing | CWR | `D05 T07 §9`, Search Manager |
+| Print spooler | CWR | `D05 T07 §9`, Printer Manager |
+| Audio | CWR | `D05 T07 §8`, Audio Devices |
+| WinSxS component cleanup | CWR | `D05 T06 §2`, Windows Disk Space, which already measured and cleaned the component store |
+
+WinSxS was a straight duplicate rather than a near-miss: `D05 T06 §2` already required the component store to be cleaned through the documented path.
+
+**Two remain in CWR** because no topical tool exists for either: Store and UWP app re-registration, and font registration. A Font Manager was considered during the tool rounds and not built, which is why font registration stays.
+
+### What was added so it does not recur
+
+- `D05 T01 §2` now names the four that moved and forbids adding them back "for discoverability", which is the plausible-sounding way one repair ends up in two places.
+- It records the routing rule operationally: a repair goes to the tool whose subject it is, and lands in CWR only when no such tool exists. CWR is the fallback, not the default.
+- It states that adding a topical tool **moves** its repair rather than duplicating it.
+- `D07 T01 §3` gains a check: every repair-contract item declared anywhere is checked for a duplicate subject in another tool, and a deliberate duplicate fails by name.
+
+The check matters more than the correction. The suite now has 80 tools and a repair library, so this collision will happen again every time a tool is added, and catching it by eye worked exactly once.
