@@ -142,6 +142,19 @@ REPEAT_QUESTION = (
 )
 
 
+def _print_bad(bad: list[tuple[Path, int, str]]) -> None:
+    if not bad:
+        return
+    print("  headings this could not read, reported rather than skipped:")
+    for path, lineno, why in bad:
+        try:
+            rel = path.relative_to(ROOT).as_posix()
+        except ValueError:
+            rel = path.as_posix()   # a self-test fixture outside the repository
+        print(f"    {rel}:{lineno}  {why}")
+    print()
+
+
 def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
     by_cat = Counter(f.category for f in findings)
     by_disp = Counter(f.disposition for f in findings)
@@ -167,12 +180,10 @@ def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
             print(f"    {cat}: " + REPEAT_QUESTION.format(n=n))
 
     if bad:
-        print("\n  headings this could not read, reported rather than skipped:")
-        for path, lineno, why in bad:
-            rel = path.relative_to(ROOT).as_posix()
-            print(f"    {rel}:{lineno}  {why}")
+        print()
+        _print_bad(bad)
 
-    print(f"\ntodo-findings: {len(findings)} parsed, {len(bad)} unreadable")
+    print(f"todo-findings: {len(findings)} parsed, {len(bad)} unreadable")
     return 1 if bad else 0
 
 
@@ -266,10 +277,27 @@ def _self_test() -> int:
         print("  FAIL  ledger rendering is not deterministic")
         failed += 1
 
+    # The independent review of 43a299a: --write must not publish a ledger it
+    # knows is incomplete, and every mode must name the heading it could not read.
+    import contextlib
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        _print_bad([(f, 7, "unknown category")])
+    if "D00-T99-s1.md:7" not in buf.getvalue():
+        print("  FAIL  _print_bad did not name the file and line")
+        failed += 1
+    buf2 = io.StringIO()
+    with contextlib.redirect_stdout(buf2):
+        _print_bad([])
+    if buf2.getvalue():
+        print("  FAIL  _print_bad printed something with nothing to report")
+        failed += 1
+
+
     for x in (f, other):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 8 cases, {failed} failed")
+    print(f"todo-findings self-test: 10 cases, {failed} failed")
     return 1 if failed else 0
 
 
@@ -291,6 +319,12 @@ def main(argv: list[str] | None = None) -> int:
     findings, bad = collect()
 
     if args.write or args.check:
+        # Unreadable headings are named in EVERY mode. The first version printed
+        # them only in the default report, so --write published a ledger with the
+        # unparsed findings missing and said nothing, and --check then printed
+        # "ledger current" while exiting 1: a failure with no reason attached.
+        # Found by the independent review of 43a299a.
+        _print_bad(bad)
         want = render_ledger(findings)
         have = LEDGER.read_text(encoding="utf-8") if LEDGER.is_file() else ""
         if args.check:
@@ -298,13 +332,25 @@ def main(argv: list[str] | None = None) -> int:
                 print("todo-findings: docs/reviews/findings.md is stale -- "
                       "run `python scripts/todo-findings.py --write`")
                 return 1
+            if bad:
+                print(f"todo-findings: ledger matches, but {len(bad)} heading(s) "
+                      "above are missing from it")
+                return 1
             print(f"todo-findings: ledger current, {len(findings)} finding(s)")
-            return 1 if bad else 0
+            return 0
+        if bad:
+            # Refuse to publish a ledger known to be incomplete. Overwriting it
+            # with whatever happened to parse makes the omission permanent and
+            # invisible, which is the opposite of what this file is for.
+            print(f"todo-findings: refusing to write a ledger missing {len(bad)} "
+                  "finding(s). Fix the heading(s) above first.")
+            return 1
         LEDGER.parent.mkdir(parents=True, exist_ok=True)
-        LEDGER.write_text(want, encoding="utf-8", newline="\n")
+        LEDGER.write_text(want, encoding="utf-8", newline=chr(10))
         print(f"todo-findings: wrote {LEDGER.relative_to(ROOT).as_posix()}, "
               f"{len(findings)} finding(s)")
-        return 1 if bad else 0
+        return 0
+
 
     return report(findings, bad)
 

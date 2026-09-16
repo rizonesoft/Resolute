@@ -91,12 +91,30 @@ def _ignored(target: str) -> bool:
     worthless to any other clone. Found by the review of D00 T03 §1, made a check
     by D00 T04 §2 after `consistency` repeated six times.
     """
-    probe = target.split("*")[0].rstrip("/")
-    if not probe:
+    # Both the literal prefix AND every path the glob resolves to. Checking only
+    # the prefix let a wildcard walk straight past this: `extensions/*/build/x`
+    # has the unignored prefix `extensions/`, while the file it resolves to sits
+    # under the ignored `extensions/*/build/`. The literal form was rejected and
+    # the wildcard form allowed, which preserved exactly the machine-dependent
+    # claim this check exists to stop. Found by the independent review of
+    # 43a299a. `-q` is NOT used: it accepts only one pathname and exits 128 on
+    # more, which a returncode test reads as "not ignored" and which silently
+    # broke the literal case when this fix was first written. Without `-q`,
+    # check-ignore prints each ignored path and exits 0 when any are ignored.
+    probes = []
+    prefix = target.split("*")[0].rstrip("/")
+    if prefix:
+        probes.append(prefix)
+    for hit in _resolve(target):
+        try:
+            probes.append(hit.relative_to(ROOT).as_posix())
+        except ValueError:
+            pass   # a self-test fixture outside the repository
+    if not probes:
         return False
     try:
         out = subprocess.run(
-            ["git", "check-ignore", "-q", "--", probe],
+            ["git", "check-ignore", "--", *probes],
             cwd=ROOT, capture_output=True, timeout=10,
         )
     except (OSError, subprocess.SubprocessError):
