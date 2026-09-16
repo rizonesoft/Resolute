@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import functools
 import re
 import subprocess
 import shutil
@@ -1657,18 +1658,15 @@ class GitUnavailable(Exception):
     """Git could not answer. NOT the same as an answer of zero."""
 
 
-def _owned_commits(ref: str) -> list[str]:
-    """Subjects of the commits this section OWNS, oldest first.
+@functools.lru_cache(maxsize=1)
+def _all_commit_subjects() -> tuple[str, ...]:
+    """Every commit subject in the repository, oldest last, fetched once.
 
-    Ownership is the repository's commit convention: the subject line ends with
-    the section reference in parentheses, `... (D00 T03 §2)`.
-
-    It was `git log --grep=<ref>` until 2026-09-17, which matched the reference
-    anywhere in the message, including the body. The commit that introduced this
-    very report tabulated all six stamped sections in its body and so counted as
-    a commit of every one of them: each row rose by one and the outlier
-    disappeared. A measurement that its own documentation changes is not a
-    measurement. Found by the independent review of 6fb88f3.
+    Cached because `_owned_commits` is called once per stamped section, and the
+    first version re-ran the whole log each time: 380 subjects re-fetched six
+    times today and a hundred and twenty times when the plan is finished, with
+    the history growing underneath it. Same shape as the performance finding in
+    `D00 T04 §1`, caught the same way, by measuring rather than reading.
     """
     try:
         out = subprocess.run(
@@ -1688,8 +1686,24 @@ def _owned_commits(ref: str) -> list[str]:
         # detached worktree produced a confident zero and fed it to the report
         # as an observation of a costless section.
         raise GitUnavailable(f"git log exited {out.returncode}: {out.stderr.strip()[:120]}")
+    return tuple(out.stdout.splitlines())
+
+
+def _owned_commits(ref: str) -> list[str]:
+    """Subjects of the commits this section OWNS, oldest first.
+
+    Ownership is the repository's commit convention: the subject line ends with
+    the section reference in parentheses, `... (D00 T03 §2)`.
+
+    It was `git log --grep=<ref>` until 2026-09-17, which matched the reference
+    anywhere in the message, including the body. The commit that introduced this
+    very report tabulated all six stamped sections in its body and so counted as
+    a commit of every one of them: each row rose by one and the outlier
+    disappeared. A measurement that its own documentation changes is not a
+    measurement. Found by the independent review of 6fb88f3.
+    """
     marker = f"({ref})"
-    subjects = [l for l in out.stdout.splitlines() if l.rstrip().endswith(marker)]
+    subjects = [l for l in _all_commit_subjects() if l.rstrip().endswith(marker)]
     subjects.reverse()   # oldest first
     return subjects
 

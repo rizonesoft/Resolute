@@ -4,7 +4,7 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**19 findings across 6 sections.**
+**21 findings across 7 sections.**
 
 ## By category
 
@@ -12,10 +12,10 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | --- | ---: | --- |
 | `consistency` | 6 | disagrees with the rest of the suite, its naming, or its layout |
 | `record` | 6 | the plan or the evidence misdescribes what happened |
-| `correctness` | 4 | the code does the wrong thing |
+| `correctness` | 5 | the code does the wrong thing |
+| `performance` | 2 | correct, and too slow or too costly to be used |
 | `integration` | 1 | a consumer, caller, or downstream artifact no longer holds |
 | `reproducibility` | 1 | the same input does not produce the same output |
-| `performance` | 1 | correct, and too slow or too costly to be used |
 
 ## Every finding
 
@@ -40,3 +40,5 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §2` | F1-F2 | `correctness` | fixed | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | `correctness` | fixed | the heading pattern matched ordinary headings |
 | `D00 T04 §2` | F4 | `record` | fixed | the ledger goes stale on every review that does not regenerate it |
+| `D00 T04 §3` | F1-F3 | `correctness` | fixed | raised by the independent review, all three correct |
+| `D00 T04 §3` | F4 | `performance` | fixed | the whole git log was re-fetched once per section |

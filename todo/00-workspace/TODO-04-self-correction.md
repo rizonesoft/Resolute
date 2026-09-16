@@ -54,7 +54,7 @@ track: W1
 | :---: | :-----: | ------------------------------------------ | ---------- | :----: |
 |   1   |   §1    | Staleness detection for every claim-free block | --     |  [x]   |
 |   2   |   §2    | The review-finding ledger                  | --         |  [x]   |
-|   3   |   §3    | Section calibration                        | §2         |  [ ]   |
+|   3   |   §3    | Section calibration                        | §2         |  [x]   |
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [ ]   |
 
 ---
@@ -193,6 +193,13 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 - [x] Commit: `"self-correction: measure what a section actually cost"`
 
 **Test checkpoint:** `python scripts/todo-graph.py query calibration` prints one row per stamped section with its item count, commit count, and `Duration:`, every figure derived rather than typed: proven by changing a section's item count and watching the row move. The report states the sample size against the threshold and **prints no correlation while the sample is below it**, proven by reading the output. Outliers are named with the reason they are outliers where it is known. `todo/README.md` carries a dated note that the data is insufficient, naming the threshold. `self-test` covers the derivation and the below-threshold refusal, and stays green.
+
+> **Verified:** 2026-09-17 | §3 | `query calibration` prints one row per stamped section with items, commits, `Duration:` minutes, and **rework**, every figure derived: proven by adding one checklist item to `D00 T04 §2` and watching its row move 8 to 9, then back · it **refuses to state a correlation**, printing sample 6 against threshold 30 and the full reason, which is the section's actual deliverable · the outlier is named at 0.82 commits per item against a mean of 0.54, with its cause recorded as an operator block mid-flight that no item count could have predicted · a git failure raises and reports nothing, driven by pointing `REPO` at a non-repository, because an unanswerable question is not an answer of zero · `todo/README.md` keeps its sizing guidance **unchanged** with a dated note naming the threshold · five limits written
+> **Review:** round 2, candidate `6fb88f3` `e6a9eda` `951e70a` plus the follow-up fix -- `adversarial` approve after fixes (3) · `consistency` approve · `integration` approve · `source-defect` approve · `design` not-applicable · `record` approve after fix (1). Raw findings: docs/reviews/00-workspace/D00-T04-s3.md
+> **Independent:** `codex review --commit 6fb88f3` (gpt-6-astra, high) returned **three P2 findings, all correct**. The sharpest: commits were counted by mention, so the commit introducing this report tabulated all six stamped sections in its body and counted as a commit of each, raising every row and erasing the outlier. A measurement its own documentation changes is not one. It also caught a ticked item the implementation did not satisfy. It noted the 406 self-tests passed and covered none of the three, which is the more useful observation.
+> **CRUD:** not applicable (this reads the plan and git history and writes nothing)
+> **Duration:** 8
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## 4. Re-Sequencing on Evidence
 
