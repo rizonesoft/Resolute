@@ -65,6 +65,7 @@ CITED_PATH_RE = re.compile(r"`([A-Za-z0-9_][A-Za-z0-9_./\-]*[A-Za-z0-9_/])`")
 # above the real number fails on day one and gets deleted rather than met.
 # 3 of 20 `Current state` blocks carried a claim when this was written.
 COVERAGE_FLOOR = 3
+DEFAULT_ROOT = "todo"
 
 
 class Stale(Exception):
@@ -208,10 +209,13 @@ def current_state_blocks(paths: list[Path]) -> list[dict]:
                     break
             region = lines[i:end]
             text = "\n".join(region)
-            cited = []
-            for c in CITED_PATH_RE.findall(text):
-                if ("/" in c or "." in c) and (ROOT / c).exists():
-                    cited.append(c)
+            # Keep anything shaped like a path, present or not. A cited file
+            # that has been DELETED or renamed since the block was written is
+            # the strongest evidence the block is stale, and filtering on
+            # existence discarded exactly that case. Git answers for paths it
+            # has ever tracked and stays silent for prose that merely looks
+            # like a path, so the filter is git's rather than the filesystem's.
+            cited = [c for c in CITED_PATH_RE.findall(text) if "/" in c or "." in c]
             try:
                 shown = path.relative_to(ROOT).as_posix()
             except ValueError:
@@ -226,8 +230,15 @@ def current_state_blocks(paths: list[Path]) -> list[dict]:
     return blocks
 
 
-def run_coverage(paths: list[Path], quiet: bool = False) -> tuple[int, int, list[str]]:
-    """Report claim coverage and date-suspect blocks. Returns (covered, total, problems)."""
+def run_coverage(
+    paths: list[Path], quiet: bool = False, apply_floor: bool = True
+) -> tuple[int, int, list[str]]:
+    """Report claim coverage and date-suspect blocks. Returns (covered, total, problems).
+
+    `apply_floor` is False when scanning a subtree through `--root`. The floor is a
+    repository-wide figure, and enforcing it against part of the tree fails on a
+    perfectly healthy subtree, which is how an exit code stops meaning anything.
+    """
     blocks = current_state_blocks(paths)
     total = len(blocks)
     covered = sum(1 for b in blocks if b["claims"] > 0)
@@ -261,7 +272,7 @@ def run_coverage(paths: list[Path], quiet: bool = False) -> tuple[int, int, list
             if len(moved) > 4:
                 print(f"      ... and {len(moved) - 4} more")
 
-    if covered < COVERAGE_FLOOR:
+    if apply_floor and covered < COVERAGE_FLOOR:
         problems.append(
             f"coverage fell to {covered}, below the recorded floor of {COVERAGE_FLOOR}. "
             "The floor ratchets: raise it deliberately, never lower it to pass."
@@ -275,7 +286,9 @@ def main(argv: list[str] | None = None) -> int:
         description="Re-verify the measured claims a TODO makes about this repository.",
     )
     ap.add_argument(
-        "--root", default="todo", help="directory to scan for claims (default: todo)"
+        "--root", default=DEFAULT_ROOT,
+        help="directory to scan for claims (default: todo). A subtree is scanned "
+             "without the coverage floor, which is a whole-plan figure.",
     )
     ap.add_argument(
         "--quiet", action="store_true", help="print only failures and the summary"
@@ -293,13 +306,18 @@ def main(argv: list[str] | None = None) -> int:
         return _self_test()
 
     files = sorted((ROOT / args.root).rglob("*.md"))
+    # The floor describes the whole plan. A --root subtree is scanned without it.
+    scoped_floor = args.root.strip("/") == DEFAULT_ROOT
 
     if args.coverage:
-        covered, total, problems = run_coverage(files, quiet=args.quiet)
+        covered, total, problems = run_coverage(
+            files, quiet=args.quiet, apply_floor=scoped_floor
+        )
         for p in problems:
             print(f"\nFLOOR     {p}")
         if args.quiet:
-            print(f"todo-claims coverage: {covered}/{total}, floor {COVERAGE_FLOOR}")
+            note = "" if scoped_floor else "  (floor not applied: --root selects a subtree)"
+            print(f"todo-claims coverage: {covered}/{total}, floor {COVERAGE_FLOOR}{note}")
         return 1 if problems else 0
 
     claims = collect(files)
@@ -308,13 +326,24 @@ def main(argv: list[str] | None = None) -> int:
         print(f"todo-claims: no claims found under {args.root}/")
         print("  A TODO that measures something should record it as a claim, so the")
         print("  measurement is re-checked rather than trusted. See AGENTS.md.")
-        return 0
+        # The floor is still owed. Returning here unconditionally meant that
+        # deleting every claim in the tree made the gate pass, which is the one
+        # failure a coverage floor exists to prevent.
+        _, _, problems = run_coverage(files, quiet=True, apply_floor=scoped_floor)
+        for problem in problems:
+            print(f"FLOOR     {problem}")
+        return 1 if problems else 0
 
     stale, malformed = [], []
+    held = 0   # counted, not derived: `malformed` also holds unterminated
+               # comments that were never in `claims`, so subtracting its
+               # length from the claim total reports a number that is wrong
+               # in both directions at once.
     for path, lineno, claim in claims:
         rel = path.relative_to(ROOT).as_posix()
         try:
             ok = evaluate(claim)
+            held += 1
             if not args.quiet:
                 print(f"  ok    {rel}:{lineno}  {ok}")
         except Stale as exc:
@@ -331,15 +360,16 @@ def main(argv: list[str] | None = None) -> int:
     for rel, lineno, msg in stale:
         print(f"STALE     {rel}:{lineno}  {msg}")
 
-    covered, total, problems = run_coverage(files, quiet=True)
-    for p in problems:
-        print(f"FLOOR     {p}")
+    covered, total, problems = run_coverage(files, quiet=True, apply_floor=scoped_floor)
+    for problem in problems:
+        print(f"FLOOR     {problem}")
 
+    floor_note = "" if scoped_floor else "  (floor not applied: --root selects a subtree)"
     print(
         f"\ntodo-claims: {len(claims)} claim(s) -- "
-        f"{len(claims) - len(stale)} hold, "
+        f"{held} hold, "
         f"{len(stale)} stale, {len(malformed)} malformed; "
-        f"coverage {covered}/{total}, floor {COVERAGE_FLOOR}"
+        f"coverage {covered}/{total}, floor {COVERAGE_FLOOR}{floor_note}"
     )
     if malformed:
         return 2
@@ -453,11 +483,35 @@ def _self_test() -> int:
         print(f"  FAIL  coverage: claim attribution wrong: {[b['claims'] for b in blocks]}")
         failed += 1
 
-    for f in (fixture, split, whole, cov, prose):
+    # --- the four findings the independent review of f875758 raised ---------
+    # F3: the floor is a whole-plan figure; a --root subtree must not trip it.
+    _, _, probs = run_coverage([cov], quiet=True, apply_floor=False)
+    if probs:
+        print("  FAIL  floor was applied to a subtree scan")
+        failed += 1
+    _, _, probs = run_coverage([cov], quiet=True, apply_floor=True)
+    if not probs:
+        print("  FAIL  floor was not applied when it should have been")
+        failed += 1
+
+    # F2: a cited path that no longer exists must survive into the git check,
+    # because a deleted source is the strongest evidence a block went stale.
+    gone = tmp / "gone.md"
+    gone.write_text(
+        "# T\n\n> **Current state (verified 2020-01-01):** cites `shared/exo-ui` "
+        "and `src/main.cpp`.\n",
+        encoding="utf-8",
+    )
+    cited = current_state_blocks([gone])[0]["cited"]
+    if "shared/exo-ui" not in cited:
+        print("  FAIL  a deleted cited path was filtered out before the git check")
+        failed += 1
+
+    for f in (fixture, split, whole, cov, prose, gone):
         f.unlink()
     tmp.rmdir()
 
-    total = len(cases) + 3 + 5
+    total = len(cases) + 3 + 8
     print(f"todo-claims self-test: {total} cases, {failed} failed")
     return 1 if failed else 0
 
