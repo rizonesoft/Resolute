@@ -1,13 +1,13 @@
 # Build artifacts and distribution folders
-SDK/Concrete/*/Distribution/
-Samples/
+# Paths are unanchored so they keep matching wherever the AutoIt tree sits.
+**/SDK/Concrete/*/Distribution/
 
 # Compiled executables
 *.exe
 
 # Log files
 *.log
-Resolute/Logging/
+**/Resolute/Logging/
 
 # Temporary and cache files
 *.tmp
@@ -27,8 +27,8 @@ Thumbs.db
 *.a3x
 
 # Zip packages
-SDK/Concrete/*/*.zip
-SDK/Concrete/*/Distribution/*/*.zip
+**/SDK/Concrete/*/*.zip
+**/SDK/Concrete/*/Distribution/*/*.zip
 
 # Windows thumbnail cache
 ehthumbs.db
