@@ -972,7 +972,7 @@ The route to the same outcome is not a workaround, it is the ordinary one. **Cop
 
 **The discipline is the whole of it: the implementer does not open the original.** The samples establish that the feature is achievable and show what a good surface offers. `D05 T05 §1` requires the clean-room statement to name who wrote the engine and what they worked from, and requires a search proving no file from `samples/Undelete/` is referenced by or included in the build. Consulting the original "just for the tricky parts" is named as the substitute that fails, because that is precisely where a derivative-work claim would land.
 
-Raw disk access made the second case easy: `CreateFile` on `\.\PhysicalDriveN` plus the documented IOCTLs is roughly fifty lines, written from scratch faster than ported, whoever owns SD Imager.
+Raw disk access made the second case easy: `CreateFile` on `\\.\PhysicalDriveN` plus the documented IOCTLs is roughly fifty lines, written from scratch faster than ported, whoever owns SD Imager.
 
 ### The result
 
