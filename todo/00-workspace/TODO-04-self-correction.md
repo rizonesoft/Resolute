@@ -47,7 +47,7 @@ track: W1
 
 | Order | Section | Deliverable                                | Depends On | Status |
 | :---: | :-----: | ------------------------------------------ | ---------- | :----: |
-|   1   |   §1    | Staleness detection for every claim-free block | --     |  [ ]   |
+|   1   |   §1    | Staleness detection for every claim-free block | --     |  [x]   |
 |   2   |   §2    | The review-finding ledger                  | --         |  [ ]   |
 |   3   |   §3    | Section calibration                        | §2         |  [ ]   |
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [ ]   |
@@ -80,6 +80,13 @@ A claim protects a figure somebody thought to record. Nothing protects the rest,
 - [x] Commit: `"self-correction: report a current-state block whose sources moved"`
 
 **Test checkpoint:** `python scripts/todo-claims.py --coverage` names every `Current state` block carrying no claim and prints the covered and total counts, and the starting figure is recorded in this section. A block whose cited files changed after its stated verification date is reported as **suspect**, and a current one is not, both driven against real files rather than described. The output says a block *may* be stale, never that it is. Coverage cannot fall below its recorded floor, proven by lowering it artificially and watching the check fail. `plan --sync` rewrites the Items column and `plan --check` fails on a hand-edited count, both driven. `todo-claims.py` exits non-zero on a stale claim and on a fallen floor. `--self-test` stays green and its case count rises, because every behaviour added here is a case.
+
+> **Verified:** 2026-09-17 | §1 | `--coverage` names every claim-free `Current state` block and prints **4/20, floor 3**; the floor is the measured starting figure, not an aspiration · date staleness flags 13 cited files across **7** blocks as **suspect**, wording that says *may* be stale and never asserts · the live tree proves it: `D00 T03`'s block is flagged on `exokit/` and `shared/exo-ui`, paths `§3` renamed out of existence · the plan's Items column is derived, synced in place with alignment preserved, and **28 of 121 rows were wrong** while `plan --check` passed; hand-editing a count now exits 1 naming the row · a claim split across lines is reported malformed instead of vanishing · patterns compile with `re.MULTILINE` · `todo-claims --self-test` 13 to 24 cases, `todo-graph self-test` 393 to 400, both green
+> **Review:** round 2, candidate `f875758` `6cb2e1b` plus the follow-up fix -- `adversarial` approve after fixes (4) · `consistency` approve · `integration` approve · `source-defect` approve · `design` not-applicable · `record` approve. Raw findings: docs/reviews/00-workspace/D00-T04-s1.md
+> **Independent:** `codex review --commit f875758` (gpt-6-astra, high) returned **four findings, all correct**, and is why this review has two rounds. It did not treat green self-tests as sufficient: it wrote probes that constructed the failing cases, which found a coverage-gate bypass when no claims remain, a whole-plan floor applied to a subtree, deleted sources filtered out before the git check, and a malformed claim counted as holding. All four fixed in `6cb2e1b`. It did not find F5, a performance regression invisible to any probe that only asks whether the output is correct.
+> **CRUD:** not applicable (this tooling reads the plan and writes only the plan's own derived column)
+> **Duration:** 11
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## 2. The Review-Finding Ledger
 

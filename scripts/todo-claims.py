@@ -231,7 +231,8 @@ def current_state_blocks(paths: list[Path]) -> list[dict]:
 
 
 def run_coverage(
-    paths: list[Path], quiet: bool = False, apply_floor: bool = True
+    paths: list[Path], quiet: bool = False, apply_floor: bool = True,
+    check_dates: bool = True,
 ) -> tuple[int, int, list[str]]:
     """Report claim coverage and date-suspect blocks. Returns (covered, total, problems).
 
@@ -252,8 +253,12 @@ def run_coverage(
             for b in uncovered:
                 print(f"    {b['path']}:{b['line']}  verified {b['verified']}")
 
+    # The date check shells out to git once per cited path, 74 times on the
+    # 2026-09-17 tree, and that is the whole cost of this function. The floor
+    # needs only claim counts, which are free, so the default run skips it and
+    # `--coverage` pays for it deliberately.
     suspect = []
-    for b in blocks:
+    for b in (blocks if check_dates else []):
         moved = []
         for rel in b["cited"]:
             when = _git_last_change(rel)
@@ -329,7 +334,9 @@ def main(argv: list[str] | None = None) -> int:
         # The floor is still owed. Returning here unconditionally meant that
         # deleting every claim in the tree made the gate pass, which is the one
         # failure a coverage floor exists to prevent.
-        _, _, problems = run_coverage(files, quiet=True, apply_floor=scoped_floor)
+        _, _, problems = run_coverage(
+            files, quiet=True, apply_floor=scoped_floor, check_dates=False
+        )
         for problem in problems:
             print(f"FLOOR     {problem}")
         return 1 if problems else 0
@@ -360,7 +367,9 @@ def main(argv: list[str] | None = None) -> int:
     for rel, lineno, msg in stale:
         print(f"STALE     {rel}:{lineno}  {msg}")
 
-    covered, total, problems = run_coverage(files, quiet=True, apply_floor=scoped_floor)
+    covered, total, problems = run_coverage(
+        files, quiet=True, apply_floor=scoped_floor, check_dates=False
+    )
     for problem in problems:
         print(f"FLOOR     {problem}")
 
