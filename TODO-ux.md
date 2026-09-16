@@ -1,5 +1,12 @@
 # ExoSuite — UX Enhancement Roadmap
 
+> [!IMPORTANT]
+> **This is the UX standard the suite is held to.** It is not superseded and it is not this file's job to close.
+>
+> Measured 2026-09-17: **341 lines, 66 items done and 101 open.** `D01 T02 §1` opens this file and that TODO's Verification block requires every open item to be shipped there, routed elsewhere, or marked superseded, so the 101 are owned.
+>
+> `D00 T03 §4` deliberately ticked nothing here. Two sections reconciling one file is how it gets done twice or not at all. The permanent design contract derived from this file is [`DESIGN.md`](./DESIGN.md).
+
 > Modern, premium, native Windows UI — every pixel intentional.
 
 ---

@@ -1,5 +1,20 @@
 # ExoSuite Development Roadmap
 
+> [!IMPORTANT]
+> **Superseded 2026-09-17 by `todo/`, and kept for the record rather than deleted.**
+>
+> This is the ExoSuite development roadmap: 728 lines, 35 items done and **348 open**, describing a Control Panel replacement built from CPL applets. Resolute is a suite of system utilities, and its plan is `todo/`, which carries 120 sections across ten domains. The two describe different products, so this is not a plan that fell behind; it is a plan for something else.
+>
+> **Nothing here is a live work item.** Do not tick, route, or implement from this file. `todo/implementation-plan.md` is the live plan.
+>
+> **What was checked before superseding it.** `D00 T03 §4` compared this file's phases against the Resolute plan rather than assuming coverage. One idea was genuinely uncovered:
+>
+> | Idea | Where it lives here | Status |
+> | --- | --- | --- |
+> | **Hosting Control Panel applets**: loading `.cpl` DLLs in-process and calling `CPlApplet` | Phases 2, 3 and 11, 51 mentions | **Routed.** `git grep -i "\.cpl"` over `todo/` returned nothing, so it was filed as a decision on `D03 T01 §4`. The launcher already plans to *open* Control Panel items by CLSID, which is a different thing from hosting them |
+>
+> Everything else here is either covered by `todo/` or belongs to the ExoSuite product direction that Resolute does not follow.
+
 This document outlines the complete development roadmap from initial structure to production-ready release.
 
 **Tech Stack**: C++23, Native Win32 API, CMake + Ninja (LLVM-MinGW) — No .NET Framework Required

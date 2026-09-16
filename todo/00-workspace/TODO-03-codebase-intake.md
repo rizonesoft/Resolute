@@ -190,6 +190,9 @@ ExoSuite is not a second product. It is the Resolute launcher, and leaving the o
 > **`src/ExoSuite.rc` has no `VS_VERSION_INFO` block at all.** Measured 2026-09-17: the file is five lines and declares two icons and nothing else. So company and copyright are *absent*, not wrong, and this section adds the block rather than editing one.
 
 <!-- claim: absent shared/exo-ui -->
+<!-- claim: absent todo/extensions -->
+<!-- claim: count "RESEXT" docs/extensions.md = 16 -->
+<!-- claim: count "RESEXT" src/main.cpp = 6 -->
 <!-- claim: absent resources/ExoSuite.ico -->
 <!-- claim: exists resources/icons/Resolute.ico -->
 <!-- claim: exists resources/icons/application.ico -->
@@ -309,17 +312,36 @@ The count grows with every tool that includes a header. This is the cheapest thi
 
 ## 4. Correct the Stale Documentation
 
-The README describes a Rust and Slint stack that was deleted in `efdce6177`. Anyone approaching this code cold is told the wrong language, the wrong UI framework, and the wrong build system.
+> **Started:** 2026-09-16T22:52:46Z
 
-- [ ] Rewrite the README to describe what is there: C++23, Direct2D and DirectWrite, a repository-scoped llvm-mingw toolchain, CMake presets with Ninja, and static linking. Done when: no sentence describes Rust, Slint, or Cargo.
-- [ ] Record the architecture: the UI library, the application shell, and the extension model where a tool builds as a standalone executable. Done when: a reader can tell which layer owns what.
-- [ ] State what the codebase does **not** have, so no later section assumes it. Done when: the absence of tests, of vcpkg, and of the non-UI framework layers is written down.
-- [ ] Reconcile `TODO.md` and `TODO-ux.md` against this plan. Done when: work still wanted is routed through `add-todo` and the rest is marked superseded, with `TODO-ux.md` recorded as the UX standard the suite is held to.
-- [ ] Remove `todo/extensions/TODO-Console.md` and its directory. **Filed 2026-09-17 by `§3`'s validation:** `§1`'s collision table prescribed "mark superseded and remove the directory", `§1` is stamped, and the file is still there. It arrived through `fffd8b4` after the precondition was resolved by committing the untracked files, which is the path `§1` predicted but nobody then applied the prescribed resolution. Console itself was retired at `e1f26a1`, so its TODO now describes an extension the tree does not build. Done when: `todo/extensions/` does not exist and the Console decision is recorded where a reader will find it.
-- [ ] Clear the remaining Slint traces in editor configuration, not only in prose. **Filed 2026-09-17 by `§2`, which touched the file but did not own this:** `.vscode/settings.json` still maps `*.slint` to the `slint` language, though `efdce6177` deleted that stack. Done when: the association is gone and no tracked file outside the historical record configures a Slint toolchain.
-- [ ] Commit: `"intake: correct the documentation to the stack that exists"`
+Anyone approaching this code cold is told nothing at all, and the one document that does explain the architecture teaches a resource name that no longer exists.
 
-**Test checkpoint:** The README describes C++23, Direct2D, llvm-mingw, CMake, and static linking, with no mention of Rust, Slint, or Cargo. The absence of tests, vcpkg, and the non-UI framework layers is stated. Every item in `TODO.md` and `TODO-ux.md` is either routed or marked superseded.
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Three corrections.**
+>
+> **This section's opening premise was false.** It said the README describes a Rust and Slint stack deleted in `efdce6177`. Measured today: `README.md` is **two lines**, `# Resolute` and a blank, and `grep -icE "rust|slint|cargo"` returns **0**. The ExoSuite README that did describe that stack lost the merge conflict at `ac97ed7`, where `§1` recorded "README.md: the repository's won". So the wrong-stack problem was solved by `§1` as a side effect, and what remains is an empty file.
+>
+> That matters for more than accuracy: the checkpoint said "no sentence describes Rust, Slint, or Cargo", which a two-line file passes **trivially and unfalsifiably**. The checkpoint is rewritten below to assert what the README must contain rather than what it must not.
+>
+> **`docs/extensions.md` is stale from `§3`, not only from `§2`.** It teaches `FindResourceW(hMod, "EXOEXT", RT_RCDATA)`, and `§3` renamed that resource to `RESEXT` after confirming it had zero producers. A document that teaches a discovery contract by its old name is worse than no document, because an extension author would follow it and produce an executable the launcher silently ignores. It also names `ExoUI.dll` and `Console.exe`, and Console was retired at `e1f26a1`.
+>
+> **Item 4 was mis-sized and double-owned.** It asks to reconcile `TODO.md` and `TODO-ux.md`. Measured: **348 open items** in `TODO.md` and **101** in `TODO-ux.md`. `TODO-ux.md` is already owned: `D01 T02 §1` opens the file and that TODO's Verification block requires every open item in it to be shipped, routed, or superseded. Two sections owning one reconciliation is how it gets done twice or not at all. **This section owns `TODO.md` and records that `D01 T02 §1` owns `TODO-ux.md`.**
+
+- [x] Write the README, which is two lines today. **Corrected 2026-09-17:** the item said "rewrite ... Done when: no sentence describes Rust, Slint, or Cargo", and that is already true of a file containing only a title, so it could not fail. Done when: the README names the language standard, the UI stack, the toolchain, the build system, and how to build from a clean clone in commands a reader can run, **and** a reader who follows it reaches a built `Resolute.exe` without consulting anything else. Cheaper substitute that fails the checkpoint: a feature list, which reads well and does not get anybody to a build.
+
+- [x] State the linking position accurately rather than aspirationally. **Added 2026-09-17:** `AGENTS.md` and the plan both describe static linking as the goal, and the release preset still ships `System/ResoluteUI.dll` and `System/Lucide.dll` beside the executable, measured today. Done when: the README says what is true now and names `D00 T01 §2` as the owner of making it static. Cheaper substitute: writing "statically linked" because the plan says so, which makes the README wrong on the day it is written.
+- [x] Record the architecture: the UI library, the application shell, and the extension model where a tool builds as a standalone executable. Done when: a reader can tell which layer owns what.
+
+- [x] Correct `docs/extensions.md`, which `§3` invalidated. **Added 2026-09-17:** it documents the discovery contract as `EXOEXT`, and `§3` renamed it to `RESEXT`. It also names `ExoUI.dll`, now `ResoluteUI.dll`, and `Console.exe`, retired at `e1f26a1`. Done when: the document names `RESEXT`, the current library file, no retired extension, and an extension author following it produces an executable the launcher actually discovers. Cheaper substitute that fails the checkpoint: renaming the strings without re-reading the walkthrough, which leaves a diagram describing a scan that no longer happens.
+- [x] State what the codebase does **not** have, so no later section assumes it. Done when: the absence of tests, of vcpkg, and of the non-UI framework layers is written down.
+- [x] Reconcile `TODO.md` against this plan. **Narrowed 2026-09-17:** the item covered `TODO-ux.md` too, which `D01 T02 §1` already owns through its own Verification block. Two owners for one reconciliation is how it happens twice or not at all. Done when: `TODO.md`'s 348 open items are accounted for as a whole, anything still wanted is named and routed with an owning section, and the file is marked superseded with the date and what superseded it. Cheaper substitute that fails the checkpoint: deleting it, which discards the ideas without anybody deciding they were not wanted.
+
+- [x] Record `TODO-ux.md` as the UX standard and name its owner, without reconciling it here. Done when: the file says at its head that it is the UX standard the suite is held to and that `D01 T02 §1` routes its open items, and this section does not tick anything on its behalf.
+- [x] Remove `todo/extensions/TODO-Console.md` and its directory. **Filed 2026-09-17 by `§3`'s validation:** `§1`'s collision table prescribed "mark superseded and remove the directory", `§1` is stamped, and the file is still there. It arrived through `fffd8b4` after the precondition was resolved by committing the untracked files, which is the path `§1` predicted but nobody then applied the prescribed resolution. Console itself was retired at `e1f26a1`, so its TODO now describes an extension the tree does not build. Done when: `todo/extensions/` does not exist and the Console decision is recorded where a reader will find it.
+- [x] Clear the remaining Slint traces in editor configuration, not only in prose. **Filed 2026-09-17 by `§2`, which touched the file but did not own this:** `.vscode/settings.json` still maps `*.slint` to the `slint` language, though `efdce6177` deleted that stack. Done when: the association is gone and no tracked file outside the historical record configures a Slint toolchain.
+- [x] Commit: `"intake: correct the documentation to the stack that exists"`
+
+**Test checkpoint:** The README names C++23, Direct2D and DirectWrite, llvm-mingw, CMake with Ninja, and carries build commands that a reader can run from a clean clone to reach `Resolute.exe`; the commands are executed and quoted rather than assumed. It states the shipped set as it is today, DLLs included, and names `D00 T01 §2` as the owner of making it static. The absence of tests, vcpkg, `src/framework/`, and `src/repair/` is stated, each verified absent. `docs/extensions.md` names `RESEXT` and `ResoluteUI.dll` and no retired extension. `git grep -i exoext` returns **exactly one** hit outside the brainstorm, the reviews, and this file: the rename note in `docs/extensions.md` itself, which names the old resource deliberately so an extension author can tell why an executable embedding it is not listed. A document that changes a discovery contract silently is the failure this guards against. `TODO.md` is marked superseded with its date and successor, and anything still wanted from its 348 open items is named with an owning section. `TODO-ux.md` says `D01 T02 §1` owns it. `todo/extensions/` does not exist. `.vscode/settings.json` configures no Slint toolchain.
 
 ## Verification
 
