@@ -14,6 +14,11 @@ track: F1
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** None of this exists in C++. In the AutoIt tree it exists fourteen times. `ReBar.au3` is 1,556 lines of pure framework and every tool carries a near-copy of it: all fourteen privately define `_SetWorkingDirectories`, `_GenerateIniFile`, `_LoadConfiguration`, and `_SaveConfiguration`; thirteen privately define `_ShowPreferencesDlg` and `_SetProcessPriority`; thirteen carry a private `Includes/Localization.au3` of 122 to 491 lines. Roughly 21,000 of that tree's 43,000 lines are those copies. The measurable consequence is that seven tools write settings into a `.lng` file and seven into `.ini`, because the path was typed out fourteen separate times. Every script also carries `#AutoIt3Wrapper_Res_HiDpi=N`, so the whole suite renders bitmap-scaled on a high-resolution display.
+>
+> <!-- claim: exists resolute_au3/SDK/Concrete/ReBar/ReBar.au3 -->
+> <!-- claim: lines resolute_au3/SDK/Concrete/ReBar/ReBar.au3 = 1556 -->
+> <!-- claim: count "ReBar Framework" resolute_au3/SDK/Concrete/ReBar/ReBar.au3 = 4 -->
+> <!-- claim: count "Res_HiDpi=N" resolute_au3/SDK/Concrete/*/*.au3 = 14 -->
 
 ## Inputs
 

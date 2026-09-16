@@ -11,6 +11,7 @@ Toolchain, gates, build, and the test backbone every later domain leans on. Noth
 | [TODO-01](./TODO-01-toolchain-and-gates.md) | C++ Toolchain and Gates | draft |
 | [TODO-02](./TODO-02-test-backbone.md) | Test Backbone | draft |
 | [TODO-03](./TODO-03-codebase-intake.md) | ExoSuite Codebase Intake | draft |
+| [TODO-04](./TODO-04-self-correction.md) | Self-Correction and Feedback | draft |
 
 ## Completed
 
@@ -24,6 +25,7 @@ Toolchain, gates, build, and the test backbone every later domain leans on. Noth
 - CMake structure, dependency policy, and static linking
 - Warnings as errors, clang-tidy, and one command that runs every gate
 - Catch2 harness, disposable fixtures, house-style captures, and the parity driver
+- The checks that keep the plan honest about itself: claims, staleness, a findings ledger, calibration
 
 ## Out of scope
 

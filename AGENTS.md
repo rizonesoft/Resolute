@@ -143,6 +143,25 @@ What they compute and write is **frozen**. The C++ port reproduces the effect ex
 
 `ReBar` is not in this set. It is the framework, it changes nothing on a user's system, and it is internal tooling rather than a product. The archived AutoIt plan says otherwise and is wrong.
 
+## A measurement recorded is a measurement re-checked
+
+`validate` proves the tree is internally consistent. It cannot tell whether a `Current state` block is still **true**, because a stale figure and a correct one look identical as prose. Every factual drift found on 2026-09-16 was caught by a human reading the tree, which does not scale and did not catch everything.
+
+So **a TODO that measures something records it as a claim**, and `scripts/todo-claims.py` re-measures it:
+
+```
+<!-- claim: exists resolute_au3/SDK/Concrete/ReBar/ReBar.au3 -->
+<!-- claim: absent resolute_au3/SDK/Concrete/Rescue/Rescue.au3 -->
+<!-- claim: lines resolute_au3/SDK/Concrete/ReBar/ReBar.au3 = 1556 -->
+<!-- claim: count "Res_HiDpi=N" resolute_au3/SDK/Concrete/*/*.au3 = 14 -->
+```
+
+Claims are HTML comments, so they are invisible in rendered Markdown and inert to every other parser.
+
+**When a claim goes stale the TODO is wrong, not the repository.** The figure changed because the code changed, which is the moment the surrounding prose needs re-reading. Fix the claim and the sentence it supports in the same commit, and if the change invalidates the section's reasoning, say so rather than quietly updating a number.
+
+Write a claim for anything a later reader would otherwise have to trust: a line count, a file's presence or absence, a count of occurrences that an argument rests on. Do not claim what does not matter.
+
 ## Unknowns and questions
 
 Answer from source first: the `resolute_au3/` script, a driven run of the shipped tool, Microsoft's documentation for a Win32 call, or the wxWidgets documentation. When an unanswered question would change implementation, take a justified default, record that it is a default with its cost of changing, and carry on. Do not stall a section waiting for an answer; do not silently reinterpret a section into something buildable.
@@ -150,6 +169,8 @@ Answer from source first: the `resolute_au3/` script, a driven run of the shippe
 ## Validation
 
 ```bash
+python scripts/todo-claims.py              # re-measure what the TODOs claim about the repo
+python scripts/todo-claims.py --self-test  # 13 cases, must stay green
 python scripts/todo-graph.py self-test      # 393 cases, must stay green
 python scripts/todo-graph.py validate       # FATAL blocks; new WARN blocks until fixed or accepted
 python scripts/todo-graph.py query ready    # dependency-safe work right now

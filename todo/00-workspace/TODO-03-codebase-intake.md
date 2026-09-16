@@ -14,6 +14,11 @@ track: W1
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1.39 MB fully static. There is **no vcpkg**; `deps/libvterm` is vendored. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
+>
+> <!-- claim: exists samples/ExoSuite/shared/exo-ui/include/exo/theme.h -->
+> <!-- claim: exists samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1 -->
+> <!-- claim: lines samples/ExoSuite/src/main.cpp = 573 -->
+> <!-- claim: count "llvm-mingw" samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1 = 4 -->
 
 ## Inputs
 

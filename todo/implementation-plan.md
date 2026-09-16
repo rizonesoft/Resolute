@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 115 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 119 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -93,29 +93,33 @@ Signing already happens outside this repository. `D06 T01 §3` documents and ver
 
 Nothing in this plan can be proven until this phase is done. It opens by taking the ExoSuite codebase in and renaming it, because that is what makes `src/` real. It also carries the conformance profile, which runs early rather than late because it is what every tool is built against, and the maintenance that keeps the shipping AutoIt suite alive meanwhile.
 
-|  ✔  | Section      | Deliverable                                | Items |
-| :-: | ------------ | ------------------------------------------ | :---: |
-| [ ] | `D00 T03 §1` | Subtree merge with history preserved       |   6   |
-| [ ] | `D00 T03 §2` | Rename the product to Resolute             |   5   |
-| [ ] | `D00 T03 §3` | Rename the library and the toolchain       |   5   |
-| [ ] | `D00 T03 §4` | Correct the stale documentation            |   5   |
-| [ ] | `D00 T01 §1` | Portable toolchain bootstrap               |  15   |
-| [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest          |   8   |
-| [ ] | `D00 T01 §3` | Warnings as errors at one level            |   6   |
-| [ ] | `D00 T01 §4` | One command builds any tool                |   6   |
-| [ ] | `D00 T01 §5` | One command runs every gate                |   5   |
-| [ ] | `D00 T02 §1` | Catch2 harness and assertion conventions   |   5   |
-| [ ] | `D00 T02 §2` | Fixture store and disposable targets       |   6   |
-| [ ] | `D00 T02 §3` | House-style capture store                  |   5   |
-| [ ] | `D00 T02 §4` | Parity driver for a built tool             |   6   |
-| [ ] | `D07 T01 §1` | The conformance profile                    |   6   |
-| [ ] | `D07 T01 §2` | Warning and analysis ratchet               |   5   |
-| [ ] | `D07 T01 §3` | Conformance check and its report           |   6   |
-| [ ] | `D07 T01 §4` | Standing smoke run over the suite          |   5   |
-| [ ] | `D09 T01 §1` | Make the AutoIt suite buildable again      |   4   |
-| [ ] | `D09 T01 §2` | Clear the housekeeping defects             |   5   |
-| [ ] | `D09 T01 §3` | Maintenance scope and retirement procedure |   5   |
-| [ ] | `D00 T02 §5` | Cover the inherited UI library             |   7   |
+|  ✔  | Section      | Deliverable                                    | Items |
+| :-: | ------------ | ---------------------------------------------- | :---: |
+| [ ] | `D00 T03 §1` | Subtree merge with history preserved           |   6   |
+| [ ] | `D00 T03 §2` | Rename the product to Resolute                 |   5   |
+| [ ] | `D00 T03 §3` | Rename the library and the toolchain           |   5   |
+| [ ] | `D00 T03 §4` | Correct the stale documentation                |   5   |
+| [ ] | `D00 T04 §1` | Staleness Detection for Every Claim-Free Block |   6   |
+| [ ] | `D00 T04 §2` | The Review-Finding Ledger                      |   6   |
+| [ ] | `D00 T04 §3` | Section Calibration                            |   6   |
+| [ ] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   5   |
+| [ ] | `D00 T01 §1` | Portable toolchain bootstrap                   |  15   |
+| [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest              |   8   |
+| [ ] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
+| [ ] | `D00 T01 §4` | One command builds any tool                    |   6   |
+| [ ] | `D00 T01 §5` | One command runs every gate                    |   5   |
+| [ ] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   5   |
+| [ ] | `D00 T02 §2` | Fixture store and disposable targets           |   6   |
+| [ ] | `D00 T02 §3` | House-style capture store                      |   5   |
+| [ ] | `D00 T02 §4` | Parity driver for a built tool                 |   6   |
+| [ ] | `D07 T01 §1` | The conformance profile                        |   6   |
+| [ ] | `D07 T01 §2` | Warning and analysis ratchet                   |   5   |
+| [ ] | `D07 T01 §3` | Conformance check and its report               |   6   |
+| [ ] | `D07 T01 §4` | Standing smoke run over the suite              |   5   |
+| [ ] | `D09 T01 §1` | Make the AutoIt suite buildable again          |   4   |
+| [ ] | `D09 T01 §2` | Clear the housekeeping defects                 |   5   |
+| [ ] | `D09 T01 §3` | Maintenance scope and retirement procedure     |   5   |
+| [ ] | `D00 T02 §5` | Cover the inherited UI library                 |   7   |
 
 
 ### Phase 1 -- The two shared layers

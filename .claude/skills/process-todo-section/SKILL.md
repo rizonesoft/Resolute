@@ -178,7 +178,10 @@ Then run **every gate the section owes**, not only the checkpoint:
 pwsh scripts/check-all.ps1          # build both architectures, clang-tidy, tests, validate
 ctest --preset x64-debug            # the whole suite, not only the new tests
 python scripts/todo-graph.py validate
+python scripts/todo-claims.py       # the TODOs' measured claims still hold
 ```
+
+**If a claim went stale, the section changed something a TODO had measured.** That is not a nuisance to silence: fix the claim *and* re-read the sentence it supports, in this commit, because the prose around a changed figure is usually wrong too.
 
 While iterating, narrow with `ctest --tests-regex`. Before committing, run the full sweep once: a section that passes its own filter and breaks another suite has not passed.
 

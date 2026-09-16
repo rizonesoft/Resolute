@@ -14,6 +14,10 @@ track: M1
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** The AutoIt suite is at `resolute_au3/` and ships today. `Distro` and the AutoIt `SDK/` go with it: `Distro` is the `.sni` builder that CMake, Ninja, and the release scripts replace, and `SDK/` becomes frozen specification rather than maintained code. Neither is ported and neither has a C++ successor. It does **not** build from a clean checkout: all thirteen `.sni` descriptors hardcode `R:\Workspace\Resolute\...`, a directory that no longer exists. `SDK/Concrete/Rescue/` holds only a `Distribution/338/` build output with no source, left behind when that tool was removed. `SDK/Concrete/BiosCodes/Includes/Localization.au3.backup` is a stray file. `ReBar` declares a product page at `downloads/resolute/` although it is internal tooling. Framework-first sequencing means this suite ships for a long time yet, so it needs an owner rather than a freeze.
+>
+> <!-- claim: count "R:.Workspace.Resolute" resolute_au3/SDK/Concrete/*/*.sni = 91 -->
+> <!-- claim: absent resolute_au3/SDK/Concrete/Rescue/Rescue.au3 -->
+> <!-- claim: exists resolute_au3/SDK/Concrete/BiosCodes/Includes/Localization.au3.backup -->
 
 ## Inputs
 

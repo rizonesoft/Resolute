@@ -21,6 +21,7 @@ track: Q1
 - -> XREF: [`00-workspace/TODO-01 §3`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the tidy baseline this domain ratchets
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework the profile mostly describes consuming correctly
 - -> XREF: [`01-framework/TODO-02 §1`](../01-framework/TODO-02-design-system.md) -- the design contract the conformance check enforces
+- -> XREF: [`00-workspace/TODO-04 §2`](../00-workspace/TODO-04-self-correction.md) -- the findings ledger, which is the ratchet idea applied to review rather than to code
 
 ## Outcome
 

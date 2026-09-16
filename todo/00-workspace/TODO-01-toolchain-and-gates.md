@@ -24,6 +24,7 @@ track: W1
 - -> XREF: [`00-workspace/TODO-03 §3`](./TODO-03-codebase-intake.md) -- the intake that moves the toolchain bootstrap to the repository root before this file hardens it
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the first real consumer of the build
 - -> XREF: [`07-quality/TODO-01 §2`](../07-quality/TODO-01-quality-bar.md) -- the warning ratchet that builds on §3
+- -> XREF: [`00-workspace/TODO-04 §1`](./TODO-04-self-correction.md) -- the claim and staleness checks that join §5's combined gate
 
 ## Outcome
 
