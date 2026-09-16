@@ -61,6 +61,16 @@ The contract's whole value is that a tool declares items and the loop does the r
 **Fidelity:** no surface of its own. The loop orchestrates; §3 owns the surface.
 **Needs:** C++ toolchain (compile)
 
+
+**Build order.** The loop is the contract. Build it so a tool physically cannot repair outside it, then add the guards.
+
+1. **Define `src/repair/RepairItem.h` first**, values only. Done when: an item declares a name, a localization key, diagnose, repair, verify, and a reversibility answer, and carries no logic.
+2. **Make reversibility non-optional** in the type. Done when: an item lacking a reversibility answer fails to compile, or fails a startup assertion, and the mechanism is named here.
+3. **Build `src/repair/RepairRun.h/.cpp`** with the diagnose-all, repair-applicable, verify-each sequence. Done when: a fixture tool with four items produces four outcomes and contains no loop of its own.
+4. **Close the bypass.** Done when: nothing in `src/repair/` lets a tool invoke an item outside the run, proven by search, and this section names the enforcement.
+5. **Add the elevation guard at the item**, not at startup. Done when: an unelevated run refuses per item and the fixture is unchanged.
+6. **Assert the mixed case last**, where some items apply and some do not. Done when: three assertions run under Catch2.
+
 - [ ] Define the repair item: a name, a localization key, a diagnose function, a repair function, a verify function, and a declared reversibility. Done when: an item carrying no reversibility answer fails to compile or fails a startup assertion.
 - [ ] Implement the run loop: diagnose all, repair the applicable, verify each, and record every outcome. Done when: a fixture tool declaring four items produces four outcomes with no tool-side loop.
 - [ ] Make the loop the only path. Done when: nothing in the contract lets a tool repair an item outside the loop, and this section names how that is enforced.
@@ -120,6 +130,17 @@ The part users actually need and the part nobody builds. A repair with no revers
 **Treatment:** the prior state captured per item before the change, so undo restores what was actually there rather than a guess at a default. Cheaper substitute that fails the checkpoint: restoring to a convention such as the current user or a documented default value.
 **Chrome:** consume the framework's settings writer for record location and its logging for the trail.
 **Needs:** Windows host (build/test)
+
+
+**Build order.** This is the most dangerous section in the contract. Build the record before anything can write, so no repair ever runs without one.
+
+1. **Define the record format in `src/repair/RestoreRecord.h`**, on disk and versioned. Done when: a hand-written example parses and an unversioned one is refused.
+2. **Write the record before the first write path exists.** Done when: capture is wired into the run from `S1` and a fixture run produces a record naming every target with its prior value and type.
+3. **Add validation on the way back in**, before undo is built. Done when: truncated, corrupt, and foreign records are each refused and the fixture is byte-identical afterwards.
+4. **Build undo** over validated records only. Done when: a fixture run followed by undo restores every value and type, asserted.
+5. **Decide all-or-nothing**, and implement whichever was chosen. Done when: the behaviour is one of the two and the checkpoint proves which.
+6. **Add the record list surface** with findable identity. Done when: several records render with what each covers and when, captured.
+7. **Handle the irreversible item last.** Done when: an item declared irreversible cannot claim a reverse, and the surface says so before the user commits.
 
 - [ ] Capture prior state per item before any change, into a restore record beside the log. Done when: a fixture run writes a record naming every target and its prior value and type.
 - [ ] Implement undo for a whole run, restoring from the record. Done when: a fixture run followed by undo leaves the fixture identical to its pre-run state, compared value by value and type by type.

@@ -92,6 +92,18 @@ Two shapes are needed, because the suite is distributed both ways: a user who wa
 **Chrome:** consume the release descriptors from §1. The installer scripts are generated, not authored per tool.
 **Needs:** Windows host (build/test)
 
+
+**Build order.** Adapt the working script before generating anything, so the generator has a known-good target to reproduce.
+
+1. **Read `resolute_au3/Resolute_setup.iss` and record what it does.** Done when: its pages, tasks, and registry writes are listed, so nothing working is lost by accident.
+2. **Hand-write one per-tool `.iss` for a single tool** and install-test it. Done when: it installs, runs, and uninstalls on a clean virtual machine.
+3. **Turn that script into a template** driven by the release descriptor from `S1`. Done when: the same tool's installer is produced by the release command and is byte-comparable to the hand-written one, or the differences are explained.
+4. **Generate for every tool.** Done when: adding a fixture tool produces its installer with no script edited.
+5. **Build the suite installer** with per-tool selection on top of the same descriptors. Done when: a selection installs exactly those tools.
+6. **Add silent and unattended support.** Done when: `/SILENT` and `/VERYSILENT` complete with no interaction and honour a target directory and a selection.
+7. **Prove uninstall is a real reverse**, against a pre-install snapshot. Done when: no files, registry keys, services, or scheduled tasks remain.
+8. **Prove the two shapes coexist last.** Done when: individual-then-suite neither duplicates nor orphans.
+
 - [ ] Generate a per-tool Inno Setup script from that tool's release descriptor. Done when: a tool's `.iss` is produced by the release command with no hand editing, and adding a tool produces its installer with no script change.
 - [ ] Generate the suite installer, with per-tool selection. Done when: a user can choose which tools to install, the default is a sensible set rather than all thirty-nine, and this section records what the default is and why.
 - [ ] Produce a portable edition per tool that writes nothing outside its own folder. Done when: a file-system trace of a portable run shows no write outside it, quoted.

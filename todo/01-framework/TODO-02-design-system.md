@@ -143,6 +143,17 @@ Every custom-drawn control in this suite reports nothing to a screen reader toda
 **Chrome:** implement in the shared library, per control. A tool never adds its own accessibility handling.
 **Needs:** Windows host (build/test)
 
+
+**Build order.** One control end to end before all of them, because the provider pattern is what gets repeated thirty times and a wrong pattern is expensive to unpick.
+
+1. **Pick one control and implement its provider fully**, handling `WM_GETOBJECT` and returning `IRawElementProviderSimple`. Done when: Narrator announces that control's name, role, value, and state, quoted.
+2. **Re-run the tree walk from `docs/captures/ui-automation-spike.md`.** Done when: the descendant count has risen above 4 and the new element is named in the output.
+3. **Extract the pattern** into something the other controls reuse. Done when: a second control gains a provider with no duplicated plumbing, proven by search.
+4. **Add stable automation ids** where controls are created, never derived from text or position. Done when: an id survives a language change, proven by walking the tree in two languages.
+5. **Apply to every remaining control.** Done when: every control in `shared/resolute-ui/` reports name, role, value, and state.
+6. **Add notification events** for status changes. Done when: a completed fixture repair is announced, quoted.
+7. **Then the rest of the floor**: focus ring, keyboard reachability, reduced motion, hit targets. Done when: each is driven and captured.
+
 - [ ] Implement a UI Automation provider for every control in the shared library, handling `WM_GETOBJECT` and exposing `IRawElementProviderSimple`. Done when: a screen reader announces every control's name, role, value, and state, verified by driving Narrator over each and quoting what it said.
 - [ ] Give every interactive control a **stable automation id**, set where the control is created rather than derived from its position or its text. Done when: the ids survive a layout change and a language change, proven by driving the tree in two languages.
 - [ ] Prove the tree is traversable by a driver, not only by a screen reader. Done when: the spike's tree walk is re-run and the descendant count rises from **4** to cover every control on the surface, with the before and after quoted.

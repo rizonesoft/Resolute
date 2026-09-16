@@ -74,6 +74,7 @@ The document every other domain is measured against. It runs first because a bar
 
 - [ ] Implement the check so it evaluates the profile against every shipped tool. Done when: it produces one row per tool per clause.
 - [ ] Fail by name. Done when: a tool missing a documentation set is named with the clause it failed and the section that owns it.
+- [ ] Check the **source layout** declared in `AGENTS.md` still holds. Done when: no file under `src/framework/` or `src/repair/` was added by a tool, no tool carries a file that belongs to a shared layer, and a deliberate violation fails the check by name. Cheaper substitute: trusting review, which is how a shared layer acquires a tool-specific special case.
 - [ ] Include the standalone clause by actually running the tool in an empty directory. Done when: a tool that reaches outside its folder fails the check, proven by a deliberate regression.
 - [ ] Make the report readable as a matrix. Done when: the full report renders as tools by clauses and is quoted here.
 - [ ] Wire it into the combined gate. Done when: a conformance failure fails `scripts/check-all.ps1`.

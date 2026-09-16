@@ -57,7 +57,17 @@ Zero real references. Every tool here is something an administrator would want t
 
 **Fixed.** New `D01 T01 §11`: one argument grammar defined in the framework so no tool parses its own, five distinct documented exit codes, `--help` and `--version` generated from the tool descriptor, and a requirement that no destructive action runs unattended without an explicit authorising flag.
 
-### 7. Build order blocks were unused
+### 7. The plan never declared where code goes
+
+**Found on a second pass**, after the first draft of this audit wrongly treated `Build order` as sufficient.
+
+Measured: **159 of 195 code-change items do not name a target file.** "Implement the settings path resolver" tells a weak executor what to build and not where to put it, so it invents a layout, and it invents a different one each time. That is the same failure that produced fourteen settings paths in the AutoIt suite, arriving by a new route.
+
+The defect was systemic rather than concentrated: 71 sections affected, 45 of them with only one or two items, so there was no hotspot to patch.
+
+**Fixed at the cause rather than the symptom.** `AGENTS.md` now declares the **source layout**: every framework and repair-contract file, with the section that owns it. One table resolves all 159 items, because an item that changes code and names no file targets the file its section owns. `D01 T01 §1` owns creating the layout before any framework code is written, and `D07 T01 §3` checks it still holds, so a tool cannot quietly add a file to a shared layer.
+
+### 8. Build order blocks were unused
 
 The format spec defines **Build order** as the mechanism for directing a cold agent through a section, and not one section used it.
 
@@ -71,8 +81,15 @@ The format spec defines **Build order** as the mechanism for directing a cold ag
 | `D05 T05 §1` | Stage 1 is a **legal** precondition: record the clean-room statement before writing code |
 | `D05 T05 §4` | Every stage before 4 is about not destroying the drive being rescued |
 | `D05 T01 §3` | Media detection must precede any erase path, because which method is correct depends on it |
+| `D02 T01 §1` | The run loop is the contract; build it so a tool cannot bypass it, then add guards |
+| `D02 T01 §4` | The most dangerous section in the contract; the record must exist before anything can write |
+| `D05 T02 §2` | Read before write, types before either; an engine that silently drops a value type is worse than one that refuses to open |
+| `D01 T02 §5` | One control end to end before thirty, because the provider pattern is what gets repeated |
+| `D06 T01 §3` | Adapt the working `.iss` before generating, so the generator has a known-good target |
 
-### 8. Renumbering broke references, then fixed them
+**Eleven sections now carry one.** The remainder rely on the declared source layout, which is the cheaper fix where a section's only ambiguity was which file to touch.
+
+### 9. Renumbering broke references, then fixed them
 
 Inserting the migration section pushed four `D06 T01` sections up by one, leaving stale inline references in four files.
 
@@ -90,7 +107,9 @@ Recorded so they are not rediscovered as new ideas.
 ## Where the plan stands after the audit
 
 - **10 domains, 17 TODO files, 98 sections**, up from 93.
+- **The source layout is declared once** in `AGENTS.md`, resolving 159 items that named no target file.
+- **Eleven sections carry a Build order block**, up from none.
 - **39 shipped products**, unchanged.
 - `validate` 0 fatal 0 warning; `plan --check` current; `self-test` 393 green.
 
-Every one of the seven faults above was a gap between what the plan said and what shipping the suite actually requires. None of them would have been caught by the validator, because all of them are absences rather than errors.
+Every one of the eight faults above was a gap between what the plan said and what shipping the suite actually requires. None of them would have been caught by the validator, because all of them are absences rather than errors.

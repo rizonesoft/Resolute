@@ -80,6 +80,17 @@ The part that does not exist yet. Six registry calls in a UI file is a demo; thi
 **Fidelity:** no surface of its own; §3 renders what this produces.
 **Needs:** C++ toolchain (compile)
 
+
+**Build order.** Read before write, and types before either. A registry engine that drops a value type silently is worse than one that refuses to open.
+
+1. **Build RAII handle wrappers first**, under the tool's `core/`. Done when: a repeated-open assertion shows no handle leak.
+2. **Implement enumeration**, keys then values, read-only. Done when: a fixture tree enumerates completely with no write path present, proven by search.
+3. **Implement every value type before any write**, including `REG_MULTI_SZ`, `REG_EXPAND_SZ`, `REG_QWORD`, `REG_BINARY`, and unknown types preserved. Done when: a fixture carrying every type round-trips byte-identically.
+4. **Add the 32-bit and 64-bit view distinction.** Done when: a `WOW6432Node` value is distinguishable from its 64-bit counterpart and the engine reports which view it read.
+5. **Add the denied outcome**, distinct from empty. Done when: an unreadable key reports denied and the two are distinguishable in the return.
+6. **Add writes last**, each behind the elevation guard at the call. Done when: an unelevated write is refused by name and nothing changes.
+7. **Assert headlessly.** Done when: enumeration, every type, both views, and the denied case all run with no window created.
+
 - [ ] Implement key enumeration, value enumeration, and read across every hive, with RAII handles. Done when: a fixture key tree is enumerated completely and no handle leaks under a repeated-open assertion.
 - [ ] Support every value type Windows defines, including the ones editors commonly skip: `REG_MULTI_SZ`, `REG_EXPAND_SZ`, `REG_QWORD`, `REG_BINARY`, and unknown types preserved rather than dropped. Done when: a fixture carrying every type round-trips byte-identically.
 - [ ] Handle the 32-bit and 64-bit registry views explicitly. Done when: a value written to the `WOW6432Node` view is distinguishable from its 64-bit counterpart, and the surface can say which it is showing.

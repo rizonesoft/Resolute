@@ -72,7 +72,8 @@ Everything else in this file hangs off the shell. It decides what a tool is stru
 **Fidelity:** no surface of its own. The shell constructs windows; the surfaces live in §7.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Define the tool descriptor: display name, short name, version, product URL, update short name, and icon. Done when: the type carries values only and no behavior, and a tool supplies one to start.
+- [ ] Create the source layout exactly as `AGENTS.md` declares it, before writing any framework code. Done when: every directory in that table exists and every later section can name its target file without inventing one. Cheaper substitute that fails the checkpoint: letting each section choose its own file, which is how fourteen tools came to hold fourteen settings paths.
+- [ ] Define the tool descriptor in `src/framework/ToolDescriptor.h`: display name, short name, version, product URL, update short name, and icon. Done when: the type carries values only and no behavior, and a tool supplies one to start.
 - [ ] Implement startup: resolve working directories, load configuration, initialize logging, resolve the language, construct the main window, in a documented order. Done when: the order is written in the header and a tool with a minimal descriptor starts.
 - [ ] Implement shutdown: persist configuration, flush the log, release resources. Done when: a forced close still writes the configuration, proven by a readback.
 - [ ] Draw the seam explicitly: the framework owns lifecycle and shared surface, the tool owns its own logic and its own window contents. Done when: the seam is documented and nothing tool-specific exists on the framework side.

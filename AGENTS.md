@@ -46,6 +46,41 @@ This is the architecture. A defect is anything that reimplements either layer pr
 
 The AutoIt suite failed this test: `ReBar` was a framework people copied rather than included, so fourteen tools carry fourteen copies of it, roughly 21,000 of the AutoIt tree's 43,000 lines. Seven tools ended up writing settings to `.lng` and seven to `.ini` because the path was typed out fourteen times. Do not recreate that.
 
+## The source layout
+
+**Declared here so no section has to invent it.** A checklist item that changes code and does not name a file targets the file its section owns below. Where a section adds a file, it goes in the directory its layer owns.
+
+```
+src/
+  framework/            consumed by EVERY tool
+    App.h/.cpp                lifecycle and startup order      D01 T01 S1
+    ToolDescriptor.h          the per-tool values, no behaviour D01 T01 S1
+    Settings.h/.cpp           one writer, one path             D01 T01 S2
+    Logging.h/.cpp            one format, one writer           D01 T01 S3
+    Localization.h/.cpp       pack loader and key resolution   D01 T01 S4
+    Update.h/.cpp             check, and the Successor notice  D01 T01 S5
+    Elevation.h/.cpp          the guard and its refusal        D01 T01 S6
+    Crash.h/.cpp              handler and report               D01 T01 S10
+    SingleInstance.h/.cpp     the per-tool guard               D01 T01 S10
+    CommandLine.h/.cpp        grammar and exit codes           D01 T01 S11
+    ui/
+      AboutDialog.h/.cpp      built from the descriptor        D01 T01 S7
+      Preferences.h/.cpp      the host, and tool pages         D01 T01 S7
+  repair/               consumed by the REPAIR tools only
+    RepairItem.h              the declared item shape          D02 T01 S1
+    RepairRun.h/.cpp          the shared loop, and pre-flight  D02 T01 S1, S2
+    ResultList.h/.cpp         per-item outcome and counts      D02 T01 S3
+    RestoreRecord.h/.cpp      prior state, and undo            D02 T01 S4
+    Transcript.h/.cpp         the carryable result             D02 T01 S5
+shared/
+  resolute-ui/          the Direct2D UI library, from the intake
+  lucide/               icon set
+extensions/<Tool>/      one directory per tool, one standalone executable
+tests/                  Catch2 suites, fixtures, and the parity driver
+```
+
+**The rule this encodes:** a tool never adds a file under `src/framework/` or `src/repair/`. If a tool needs something shared, it goes in the shared layer with a section that says so, which is what stops the fourteen-copies failure from recurring.
+
 ## The TODO system
 
 `todo/` is the live execution plan; **format spec: `todo/README.md`.** Markdown is canonical and `build/` holds derived, gitignored projections.
