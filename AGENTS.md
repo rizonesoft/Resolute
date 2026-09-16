@@ -182,6 +182,7 @@ python scripts/todo-graph.py validate       # FATAL blocks; new WARN blocks unti
 python scripts/todo-graph.py query ready    # dependency-safe work right now
 python scripts/todo-graph.py query blocked  # sections waiting on something
 python scripts/todo-graph.py query stats    # tree health
+python scripts/todo-graph.py query calibration  # what sections cost against what they estimated
 python scripts/todo-graph.py plan --sync    # re-derive the plan projection after TODO edits
 python scripts/todo-graph.py plan --check   # fail if the projection went stale
 ```
