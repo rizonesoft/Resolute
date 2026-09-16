@@ -607,3 +607,48 @@ That is invisible to anyone not using assistive technology, which is exactly why
 - `self-test`: 393 cases, 0 failed.
 
 Phase 1 now carries the design system alongside the framework and the repair contract. The acceptance bar gained a row: the suite is usable without a mouse or eyes, owned by `D01 T02 §5`.
+
+## Decisions taken, round 10
+
+32. **RegStudio joins the suite as a product**, with its own TODO file rather than a section, because a registry editor is a large tool and its own backlog carries 323 open items.
+33. **RegStudio is a repair-contract tool, not a viewer.** Every registry write goes through the restore record and undo. That is the whole reason to build it: the registry editor everybody already has cannot put anything back.
+
+## What RegStudio actually is, measured 2026-09-16
+
+It exists twice, and `src/` and `CMakeLists.txt` are **byte-identical** between the two copies. `samples/RegStudio/` carries the git history, latest commit `c9b8a0b`; `samples/ExoSuite/extensions/RegStudio/` is the copy that arrives with the intake. The root copy is authoritative.
+
+**It is an early prototype, not a near-complete tool.** Its own `TODO.md` reports **95 items done and 323 open**, roughly 23 percent.
+
+| Aspect | Reality |
+| --- | --- |
+| Size | 1,086 lines, **all in one `src/main.cpp`** |
+| Structure | `src/core/` and `src/ui/` exist but contain only `.gitkeep` |
+| Works | Window with resizable panes, menu bar, dark title bar via `DwmSetWindowAttribute`, a TreeView and ListView created |
+| Registry access | **6 API calls**, enough to demonstrate, not enough to be an editor |
+| Missing | The registry engine, value editing, search, backup and restore, privilege handling |
+| UI layer | Native Win32 `comctl32`, **not** the shared UI library |
+
+That last row matters: conforming RegStudio to `DESIGN.md` means **replacing its control layer**, not restyling it. `D05 T02 §1` says so explicitly and names restyling as the cheaper substitute that fails the checkpoint.
+
+### Why it is worth building anyway
+
+Every registry editor can change a value. The one that ships with Windows cannot put it back.
+
+`D05 T02 §4` makes undo the tool's defining feature, and it is specific about what that requires: prior state captured to a restore record on disk **before** any write, so undo survives the tool closing. An in-memory undo stack is named as the cheaper substitute that fails, because it is gone at exactly the moment a user discovers they need it.
+
+The file also carries a protected-path set requiring a second explicit confirmation, and treats an imported `.reg` file as untrusted input that is previewed as a change set before anything is written. Shelling out to `reg.exe import` is named as the substitute that fails, because it applies an unknown change set with no preview and no undo.
+
+## Open: the Console extension
+
+`samples/ExoSuite/extensions/Console/` is **1,762 lines** across seven files: a real terminal emulator with PTY sessions and a terminal view, backed by the vendored `deps/libvterm`.
+
+It arrives with the intake whether or not it is wanted, and it has no owner in the plan. It is listed in the coverage table as **needing a keep-or-drop decision**. Shipping a terminal emulator is a different product proposition from shipping system repair tools, and that is a call rather than an oversight.
+
+---
+
+# Plan state after RegStudio
+
+- **10 domains, 14 TODO files, 72 sections.**
+- `validate`: 0 fatal, 0 warning, 50 adjacency advisories. `plan --check`: current at 0 of 72.
+
+Phase 3 now carries seven intakes plus four new utilities, with RegStudio the largest.

@@ -22,6 +22,7 @@ track: W1
 - [`samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1`](../../samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1) -- the working toolchain bootstrap
 - -> XREF: [`00-workspace/TODO-01 §1`](./TODO-01-toolchain-and-gates.md) -- the toolchain hardening that follows this intake
 - -> XREF: [`01-framework/TODO-01 §7`](../01-framework/TODO-01-framework-core.md) -- the framework that adopts this UI layer
+- -> XREF: [`05-new-tools/TODO-02 §1`](../05-new-tools/TODO-02-regstudio.md) -- RegStudio, which arrives as an extension and whose duplicate copy §1 reconciles
 
 ## Outcome
 
@@ -50,7 +51,7 @@ track: W1
 `exo-ui` is about to become the foundation of fourteen tools. How it got to be the shape it is will matter, and it is recoverable now and never again once the embedded repositories are discarded.
 
 - [ ] Take `samples/ExoSuite` in through `git subtree`, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`.
-- [ ] Take `samples/RegStudio` in the same way if its history differs from the copy already inside `extensions/`. Done when: the two copies are compared and this section records which was authoritative and why.
+- [ ] Take `samples/RegStudio` in with its history. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the two copies, and only the root copy carries git history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
 - [ ] Remove the embedded repositories from `samples/` once their content is merged. Done when: no `.git` directory remains under `samples/` and `git status` reports no embedded-repository warning.
 - [ ] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. Done when: a full bootstrap and build leaves `git status` clean.
 - [ ] Record what was merged and from which commit. Done when: the source commit of each subtree is named here.

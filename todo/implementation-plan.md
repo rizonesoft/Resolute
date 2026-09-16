@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 66 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 72 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -168,7 +168,7 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 
 ### Phase 3 -- Intake and new capability
 
-Six programs from samples/ become products and four new utilities join, all through one intake contract, on a framework that already exists. This phase is where the rewrite starts paying for itself.
+Seven programs from `samples/` become products and four new utilities join, all through one intake contract, on a framework that already exists. This phase is where the rewrite starts paying for itself. RegStudio is the largest of them and the one with the clearest reason to exist: a registry editor that can undo what it did.
 
 |  ✔  | Section      | Deliverable                            | Items |
 | :-: | ------------ | -------------------------------------- | :---: |
@@ -177,6 +177,12 @@ Six programs from samples/ become products and four new utilities join, all thro
 | [ ] | `D05 T01 §3` | QuickErase and WinClean                |   8   |
 | [ ] | `D05 T01 §4` | Indicators and SaveDesk                |   6   |
 | [ ] | `D05 T01 §5` | The four new utilities                 |   7   |
+| [ ] | `D05 T02 §1` | RegStudio on the shared framework      |   7   |
+| [ ] | `D05 T02 §2` | The registry engine                    |   7   |
+| [ ] | `D05 T02 §3` | Browse, display, and virtualize        |   6   |
+| [ ] | `D05 T02 §4` | Editing, with a reverse                |   8   |
+| [ ] | `D05 T02 §5` | Search across hives                    |   5   |
+| [ ] | `D05 T02 §6` | Backup, restore, and `.reg` exchange   |   7   |
 
 
 ### Phase 4 -- Ship it, in every language

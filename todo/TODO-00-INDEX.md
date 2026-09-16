@@ -68,6 +68,8 @@ Everything in this plan is organized around them. A defect is anything that reim
 | Service Manager | 05-new-tools | TODO written, new |
 | Context Menu Editor | 05-new-tools | TODO written, new |
 | Hosts File Editor | 05-new-tools | TODO written, new |
+| RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
+| Console | 05-new-tools | arrives with the intake, **needs a keep-or-drop decision** |
 | ReBar | 01-framework | internal tooling, not a product |
 | Distro | 06-distro-release | internal tooling, not a product |
 | WinPower | 03-launcher | not taken in; the launcher replaces it |

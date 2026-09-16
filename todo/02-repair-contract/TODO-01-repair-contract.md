@@ -23,6 +23,7 @@ track: F2
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework this layer sits on
 - -> XREF: [`04-tools-port/TODO-01 §2`](../04-tools-port/TODO-01-tool-ports.md) -- the six frozen tools that consume this contract
 - -> XREF: [`05-new-tools/TODO-01 §1`](../05-new-tools/TODO-01-intake-and-new-tools.md) -- the new tools, which consume it from their first commit
+- -> XREF: [`05-new-tools/TODO-02 §4`](../05-new-tools/TODO-02-regstudio.md) -- RegStudio's editing path, which is the contract's most exposed consumer
 
 ## Outcome
 

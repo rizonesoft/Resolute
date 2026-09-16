@@ -9,6 +9,7 @@ Six programs from samples/ become products, and four new utilities join the suit
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-intake-and-new-tools.md) | Intake and New Tools | draft |
+| [TODO-02](./TODO-02-regstudio.md) | RegStudio | draft |
 
 ## Completed
 
@@ -22,6 +23,7 @@ Six programs from samples/ become products, and four new utilities join the suit
 - QuickErase and WinClean, the destructive intakes
 - Indicators, and SaveDesk as new development
 - Startup Manager, Service Manager, Context Menu Editor, Hosts File Editor
+- RegStudio: a registry editor whose every change is undoable
 
 ## Out of scope
 

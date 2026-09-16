@@ -21,6 +21,7 @@ track: P3
 - [`resolute_au3/samples/WinClean/UDF/Services.au3`](../../resolute_au3/samples) -- service control primitives; nothing in the framework does this yet and two new tools need it
 - -> XREF: [`02-repair-contract/TODO-01 §1`](../02-repair-contract/TODO-01-repair-contract.md) -- the contract every repairing intake consumes from its first commit
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the porting pattern this file reuses
+- -> XREF: [`05-new-tools/TODO-02 §1`](./TODO-02-regstudio.md) -- RegStudio, the largest intake, measured against the contract §1 writes
 
 ## Outcome
 
