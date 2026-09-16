@@ -13,7 +13,20 @@ track: D1
 > **Goal:** Every tool ships a complete documentation set and speaks every language the suite speaks. The shared strings are translated once and composed into each tool's pack at build time, so a standalone tool still carries everything it needs.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** Measured across the AutoIt tree. Language packs per tool: `Firemin` 35, `ComIntRep` 16, `DVDRepair` 10, `USBRepair` 8, `BiosCodes` 3, `PixRepair` 2, `ReBar` 2, and `MemBoost`, `Ownership`, and `Resolute` 1 each; `Chromin`, `Edgemin`, `Watermin`, and `Distro` have none. Four tools have no documentation directory at all: `Edgemin`, `Watermin`, `MemBoost`, `Distro`. Naming is inconsistent: `DVDRepair` ships `zh-tw` where every other tool ships `zh-TW`, and `USBRepair` ships `sv.ini` among `.lng` files. A translator who translated this suite translated a quarter of it, because the same strings exist in fourteen separate packs.
+> **Current state (verified 2026-09-16):** Measured across the AutoIt tree.
+>
+> **Language packs per tool:** `Firemin` 35, `ComIntRep` 16, `DVDRepair` 10, `USBRepair` 8, `BiosCodes` 3, `PixRepair` 2, `ReBar` 2, and `MemBoost`, `Ownership`, and `Resolute` 1 each; `Chromin`, `Edgemin`, `Watermin`, and `Distro` have none. Naming is inconsistent: `DVDRepair` ships `zh-tw` where every other tool ships `zh-TW`, and `USBRepair` ships `sv.ini` among `.lng` files. A translator who translated this suite translated a quarter of it, because the same strings exist in fourteen separate packs.
+>
+> **Documentation is worse than "missing".** Four tools have no documentation directory at all: `Edgemin`, `Watermin`, `MemBoost`, `Distro`. What the other ten ship has these measured defects:
+>
+> - **Metadata is hardcoded and stale.** `ComIntRep/Readme.txt` states `Version: 11.1.3.6508` where the source is at `.6509`, `Release Date: 30 OCTOBER, 2023`, `System Requirements: 7, 8, 8.1, 10` which names no Windows 11 and contradicts the C++ floor of Windows 10 1809, and `Disk Space: 0 MB`, which is a placeholder nobody filled.
+> - **`Changes.txt` ranges from 10 lines to 632.** `Ownership` and `PixRepair` carry a single entry; `ComIntRep` carries 632 lines and `Firemin` 489. There is no shared idea of what a changelog entry is.
+> - **`License.txt` comes in two shapes and neither is the licence.** Seven tools ship a 7-line GPL v3 **notice**; `Firemin`, `Chromin`, and `Resolute` ship a 63 to 64-line structured agreement. Neither contains the GPL v3 text itself, although every one of them says "You should have received a copy of the GNU General Public License along with this program."
+> - **Two different copyright holders appear.** The older files say `Copyright (C) 2023 RIZONESOFT`; the newer say `Copyright © 2025 Rizonetech (Pty) Ltd.` and add that Rizonesoft is a trading name of it.
+>
+> **The repository `README.md` is 2 lines**: a title and a blank.
+>
+> `resolute_au3/SDK/Concrete/ReBar/Templates/` holds `Changes.tpl`, `License.tpl`, and `Readme.tpl`, which is what a documentation set was meant to be generated from. `Ownership/Changes.txt` records "Upgraded to Resolute Framework 11", confirming that `ReBar` is the framework by its internal name.
 
 ## Inputs
 
@@ -25,7 +38,9 @@ track: D1
 ## Outcome
 
 - Shared strings are translated once and composed into every tool's shipped pack.
-- Every shipped tool has a documentation set.
+- Every shipped tool has a documentation set whose metadata is generated, not typed.
+- Every shipped tool's documentation is written rather than inherited, and says what the tool actually does today.
+- The repository explains itself to somebody arriving cold.
 - Pack naming is consistent and a malformed pack is caught before release.
 - The coverage matrix makes a gap visible if it reopens.
 
@@ -40,21 +55,27 @@ track: D1
 |   1   |   §1    | Documentation set for every tool           | --           |  [ ]   |
 |   2   |   §2    | Shared string pool and build-time composition | D01 T01 §4 |  [ ]   |
 |   3   |   §3    | Coverage matrix and pack hygiene           | §2           |  [ ]   |
+|   4   |   §4    | Rewrite the shipped documentation          | §1           |  [ ]   |
+|   5   |   §5    | Repository and developer documentation     | --           |  [ ]   |
 
 ---
 
-## 1. Documentation Set for Every Tool
+## 1. The Documentation Contract
 
-Four tools ship with no documentation at all. The templates for what a set should be already exist in the `ReBar` framework directory, which makes this mostly a matter of doing it rather than designing it.
+A documentation set is currently whatever each tool happened to acquire. This section defines what one **is**, and generates every part of it that should never be typed by a human.
 
-- [ ] Define the documentation set from the existing templates: changes, licence, and readme per tool. Done when: the set is defined and generated from the templates rather than copied by hand.
-- [ ] Give every shipped tool a complete set. Done when: no tool is missing one, proven by the conformance check rather than by inspection.
-- [ ] Generate what can be generated: version, copyright year, and the changelog. Done when: none of the three is typed by hand in any tool's set.
-- [ ] Keep documentation current with the surface. Done when: the rule is stated that a section changing a user-facing surface updates that tool's readme in the same commit.
-- [ ] Write the user guide for the surfaces users actually meet. Done when: every shipped tool's main surface has a page and each page names the tool version it describes.
-- [ ] Commit: `"docs: a complete documentation set for every tool"`
+The templates already exist at `resolute_au3/SDK/Concrete/ReBar/Templates/`, so this is mostly a matter of deciding what belongs in each file and wiring the generation, rather than designing from nothing.
 
-**Test checkpoint:** Every shipped tool has a complete documentation set, proven by the conformance check. Version, copyright year, and changelog are generated, with none typed by hand. The user guide covers every shipped tool's main surface, each naming its version.
+- [ ] Define the set: `Readme.txt`, `Changes.txt`, and `License.txt` per tool, and state what each is for. Done when: each file has a stated purpose and a stated audience, and the difference between the readme and the user guide is written down so they do not drift into being the same document twice.
+- [ ] **Generate every piece of metadata.** Done when: version, release date, system requirements, and disk space are all produced from the build, and no tool's documentation contains a typed version or date. Cheaper substitute that fails the checkpoint: typing them and fixing them at release, which is how `ComIntRep` came to ship a version one build behind its own source and a requirements line that predates Windows 11.
+- [ ] Settle the copyright line and use one. Done when: a single form is chosen between `RIZONESOFT` and `Rizonetech (Pty) Ltd.`, recorded with which is the legal entity, and generated into every tool.
+- [ ] **Ship the actual licence, not a notice about it.** Done when: every tool's documentation set includes the full GPL v3 text, because the notice every tool already carries says the user should have received a copy and today none of them conveys one. See `D06 T01 §7`.
+- [ ] Define what a changelog entry is, so `Changes.txt` stops ranging from 10 lines to 632. Done when: the entry shape is documented, and the rule for what is worth recording is stated.
+- [ ] Give every shipped tool a complete set, including the four that have none. Done when: no tool is missing one, proven by the conformance check rather than by inspection.
+- [ ] Write the user guide for the surfaces users actually meet. Done when: every shipped tool's main surface has a page, and each page names the tool version it describes.
+- [ ] Commit: `"docs: the documentation contract, with metadata generated"`
+
+**Test checkpoint:** Every shipped tool has a complete set, proven by the conformance check. No documentation file contains a typed version, date, requirement list, or disk figure, proven by search. The full GPL v3 text ships with every tool. One copyright form appears across the suite. The user guide covers every shipped tool's main surface, each naming its version.
 
 ## 2. Shared String Pool and Build-Time Composition
 
@@ -80,9 +101,42 @@ The change that turns an impossible translation job into a tractable one. Most s
 
 **Test checkpoint:** Every pack follows one naming rule, checked. A malformed pack fails the release, proven with three malformed fixtures. The coverage matrix renders every tool by every language. Every shipped tool is driven with every pack and missing keys are reported.
 
+## 4. Rewrite the Shipped Documentation
+
+Generation fixes the metadata. It does not fix the prose, and the prose is what a user actually reads.
+
+The existing readmes are not empty, which is the trap: `ComIntRep`'s is 52 lines of real writing. But it was written for a suite of fourteen tools that behaved differently from the one being shipped, it describes a portable tool that writes nothing to the registry in a suite that now keeps restore records, and its requirements line stops at Windows 10.
+
+**Fidelity:** no surface of its own; this section produces text, and the captures are unaffected.
+
+- [ ] Rewrite each ported tool's readme against what the C++ tool actually does. Done when: every claim in it is checked against the shipped behaviour, and anything no longer true is corrected rather than carried forward.
+- [ ] Say what changed in the rewrite. Done when: each tool records which claims were corrected, so the rewrite is reviewable rather than a wholesale replacement nobody can check.
+- [ ] Reconcile the readme with the new capabilities. Done when: undo, restore records, logging, and the accessibility floor are described where they apply, because a user who does not know a repair is reversible will not use it.
+- [ ] Normalize the changelogs without inventing history. Done when: existing entries are reformatted to the §1 shape, gaps are marked as gaps rather than filled, and `Ownership` and `PixRepair` are not given a fictional past to match `ComIntRep`'s 632 lines.
+- [ ] Write documentation for every tool that has none, which is four today and rises with every new tool. Done when: each has a set that meets the contract on its first shipped build.
+- [ ] Keep the tone the suite is written for. Done when: the guidance in `DESIGN.md` section 11 is applied, because a user reading this has a broken machine and is not in a mood for marketing copy.
+- [ ] Commit: `"docs: rewrite the shipped documentation against what the tools now do"`
+
+**Test checkpoint:** Every ported tool's readme is checked claim by claim against shipped behaviour, with the corrections listed. Reversibility and logging are described wherever they apply. Changelog gaps are marked rather than filled. Every tool has a set meeting the contract, proven by the conformance check.
+
+## 5. Repository and Developer Documentation
+
+The repository `README.md` is two lines. Somebody arriving at this project cold, including a future maintainer, has `AGENTS.md`, `DESIGN.md`, and a 93-section plan, and nothing that tells them what any of it is.
+
+- [ ] Write the repository `README.md`: what Resolute is, what the two trees are, how to bootstrap and build, and where the plan lives. Done when: a reader who has never seen the project can bootstrap the toolchain and build from it alone.
+- [ ] Explain the shape, because it is unusual and will otherwise be misread. Done when: the readme states that `resolute_au3/` is a frozen specification rather than a maintenance target, and that `src/`, `shared/`, and `extensions/` are the work.
+- [ ] Write the bootstrap document the build actually needs, following `intelligent-notepad/docs/bootstrap.md` in form: from zero to a green build with no improvisation. Done when: a second person follows it on a machine with no toolchain and records the result.
+- [ ] Point at the contracts rather than restating them. Done when: the readme links `AGENTS.md`, `DESIGN.md`, and `todo/README.md`, and duplicates none of their content.
+- [ ] Commit: `"docs: a repository readme and a bootstrap document"`
+
+**Test checkpoint:** A reader with no prior exposure bootstraps the toolchain and builds from the readme alone, and the run is recorded. The readme states the role of both trees. It links the three contracts and restates none of them.
+
 ## Verification
 
-- [ ] Every shipped tool has a complete documentation set
+- [ ] Every shipped tool has a complete documentation set, with no typed version, date, requirement, or disk figure
+- [ ] The full GPL v3 text ships with every tool, and one copyright form is used across the suite
+- [ ] Every ported tool's readme has been checked claim by claim against shipped behaviour
+- [ ] A reader with no prior exposure can bootstrap and build from `README.md` alone
 - [ ] Every shipped pack is self-contained, with nothing resolved at runtime from a shared location
 - [ ] Every pack follows one naming rule and a malformed pack fails the release
 - [ ] The coverage matrix is committed and current
