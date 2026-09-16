@@ -5,9 +5,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-project(ExoSuite
+project(Resolute
     VERSION 0.1.0
-    DESCRIPTION "ExoSuite — Native Windows Control Panel & System Utilities"
+    DESCRIPTION "Resolute Power Tools — Native Windows system utilities"
     LANGUAGES CXX
 )
 

@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-    Build ExoSuite main application.
+    Build Resolute main application.
 
 .DESCRIPTION
-    Builds ExoSuite to Bin/Release/ExoSuite.exe with progress display.
+    Builds Resolute to Bin/Release/Resolute.exe with progress display.
 
 .EXAMPLE
-    .\exokit\Build-ExoSuite.ps1 -Release
+    .\exokit\Build-Resolute.ps1 -Release
 #>
 
 param(
@@ -30,7 +30,7 @@ if (-not (Test-Path (Join-Path $RepoRoot "CMakeLists.txt"))) {
 $BuildType = if ($Release) { "Release" } else { "Debug" }
 $BuildDir = Join-Path $RepoRoot "build\$($BuildType.ToLower())"
 
-Write-Host "[1/3] Configuring ExoSuite ($BuildType)..." -ForegroundColor Cyan
+Write-Host "[1/3] Configuring Resolute ($BuildType)..." -ForegroundColor Cyan
 
 if (-not (Test-Path $BuildDir)) {
     New-Item -ItemType Directory -Force -Path $BuildDir | Out-Null
@@ -46,7 +46,7 @@ if ($cmakeExit -ne 0) {
     exit 1
 }
 
-Write-Host "[2/3] Compiling ExoSuite..." -ForegroundColor Cyan
+Write-Host "[2/3] Compiling Resolute..." -ForegroundColor Cyan
 $ninjaResult = & ninja 2>&1
 $ninjaExit = $LASTEXITCODE
 $ninjaResult | Out-Host
@@ -57,4 +57,4 @@ if ($ninjaExit -ne 0) {
     exit 1
 }
 
-Write-Host "[3/3] Done! Output: Bin\$BuildType\ExoSuite.exe" -ForegroundColor Green
+Write-Host "[3/3] Done! Output: Bin\$BuildType\Resolute.exe" -ForegroundColor Green

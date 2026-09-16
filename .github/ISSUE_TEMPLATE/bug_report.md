@@ -25,7 +25,7 @@ If applicable, add screenshots.
 
 ## Environment
 - **OS**: Windows 10/11 (build number)
-- **ExoSuite Version**: 
+- **Resolute Version**: 
 - **Running as Admin**: Yes/No
 
 ## Additional Context

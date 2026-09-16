@@ -163,15 +163,73 @@ track: W1
 
 ## 2. Rename the Product to Resolute
 
+> **Started:** 2026-09-16T22:31:00Z
+
 ExoSuite is not a second product. It is the Resolute launcher, and leaving the old name in the tree makes every later reader wonder whether there are two things.
 
-- [ ] Rename the application and its artifacts: `ExoSuite.exe` to `Resolute.exe`, `src/ExoSuite.rc` to match, and the window class, title, and resource strings with it. Done when: the built executable is `Resolute.exe` and no window or resource string says ExoSuite.
-- [ ] Update the build scripts that name the product. Done when: `Build-ExoSuite.ps1` is renamed and every script referencing the old product name is updated.
-- [ ] Check the 32 files carrying the product name and resolve each. Done when: the only remaining occurrences are historical references in the brainstorm record and in commit messages, which are deliberately left alone.
-- [ ] Give the application the Rizonesoft identity: the Resolute application icon, company, and copyright, generated rather than typed. Done when: the built executable reports them and the copyright year is generated.
-- [ ] Commit: `"intake: rename the application to resolute"`
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Four corrections, recorded here rather than absorbed silently.**
+>
+> **The count moved.** This section said 32 files. Measured today with `git grep -il exosuite` over tracked files: **29**. The figure was taken on 2026-09-16, before `ac97ed7` retired Console and before the review added its findings file.
+>
+> **The identity values are not a choice to invent.** The shipping AutoIt product declares them, and `AGENTS.md` makes `resolute_au3/` the source of truth for target behaviour:
+>
+> | Field | Value | Source |
+> | --- | --- | --- |
+> | ProductName | `Resolute` | `#AutoIt3Wrapper_Res_Field=ProductName|Resolute` |
+> | FileDescription | `Resolute Power Tools` | `#AutoIt3Wrapper_Res_Description` |
+> | CompanyName | `Rizonesoft` | `#AutoIt3Wrapper_Res_Field=CompanyName|Rizonesoft` |
+> | Copyright | `Copyright (c) <year> Rizonesoft` | the launcher builds it from `@YEAR` at runtime |
+>
+> The AutoIt launcher generates its year rather than typing it, which is what this section's "generated rather than typed" means. **Dated default 2026-09-17:** the C++ build generates the year at *configure* time through CMake, not at runtime, so a binary states the year it was built. Cost of changing: one `configure_file` line.
+>
+> **The application icon is the existing ExoSuite artwork, renamed.** **Operator decision 2026-09-17, overriding this session's default.** Validation had proposed copying `resolute_au3/SDK/Resources/Icons/Resolute.ico`, the shipping AutoIt launcher's icon, on the reasoning that the C++ launcher should inherit the identity of the product it replaces. The operator chose instead to keep the ExoSuite artwork and make it Resolute's. That is the better call for a reason the default missed: the AutoIt icon belongs to the tool being retired, while the ExoSuite artwork was drawn for this codebase and its Direct2D surface. `resources/ExoSuite.ico` is renamed to `resources/icons/Resolute.ico` with `git mv`, so the artwork keeps its history. The AutoIt icon stays where it is and is not copied. Cost of changing: one file swap, since nothing but the `.rc` names it.
+>
+> **Icons live in `resources/icons/`.** **Operator decision 2026-09-17.** They were loose in `resources/`, which is fine for four files and wrong for what is coming: `DESIGN.md` makes the application icon the one deliberate exception to the shared-library rule, so **every tool owns one**, and eighty tools' icons loose beside the build resources is a directory nobody can read. The convention is one flat directory keyed by product name, `resources/icons/<Product>.ico`, with `application.ico` as the generic fallback. Flat rather than per-tool subdirectories, because a tool has one icon and a directory per tool would be four-fifths empty. The `.rc` reaches it through a single CMake variable, `RESOLUTE_RESOURCE_DIR`, so moving the directory again costs one line.
+>
+> **`src/ExoSuite.rc` has no `VS_VERSION_INFO` block at all.** Measured 2026-09-17: the file is five lines and declares two icons and nothing else. So company and copyright are *absent*, not wrong, and this section adds the block rather than editing one.
 
-**Test checkpoint:** The build produces `Resolute.exe`. No window title, resource string, or build script says ExoSuite. The executable reports the Rizonesoft company and a generated copyright year. A search for the old product name returns only historical references, quoted.
+<!-- claim: absent resources/ExoSuite.ico -->
+<!-- claim: exists resources/icons/Resolute.ico -->
+<!-- claim: exists resources/icons/application.ico -->
+
+- [x] Rename the application and its artifacts: `ExoSuite.exe` to `Resolute.exe`, `src/ExoSuite.rc` to match, and the window class, title, and resource strings with it. Done when: the built executable is `Resolute.exe` and no window or resource string says ExoSuite.
+- [x] Update the build scripts that name the product. Done when: `Build-ExoSuite.ps1` is renamed and every script referencing the old product name is updated.
+- [x] Check the files carrying the product name and resolve each. **Corrected 2026-09-17:** the count read 32 and is **29** today, and the Done-when as written was unbuildable. It named only the brainstorm record and commit messages as legitimate survivors, which would require rewriting the intake record itself. Done when: every occurrence outside the survivor set below is resolved, and the survivor set is exactly:
+
+  | Kept | Occurrences | Why it must not be rewritten |
+  | --- | ---: | --- |
+  | `.gitattributes` | 1 | states that ExoSuite carried Git LFS rules at intake, a fact about the merge |
+  | `.gitignore` | 2 | two comments on where the C++ ignore rules came from |
+  | `docs/brainstorm/2026-09-16-completion-brainstorm.md` | 17 | the decision record, written when the name was current |
+  | `docs/captures/ui-automation-spike.md` | 3 | a dated spike record |
+  | `docs/reviews/00-workspace/D00-T03-s1.md` | 9 | the `§1` review, same reason |
+  | `todo/00-workspace/INDEX.md` | 2 | the intake TODO's own title, which is accurate: the work intakes the ExoSuite codebase |
+  | `todo/00-workspace/TODO-01-toolchain-and-gates.md` | 4 | names where the bootstrap came from, plus this section's own repointing notes |
+  | `todo/00-workspace/TODO-03-codebase-intake.md` | self | **this file.** It documents merging a repository *named* ExoSuite; renaming those references would make the record false. The count is deliberately not given: a file that tabulates its own occurrences changes that count by tabulating them, so any figure here is stale the moment it is written |
+  | `todo/01-framework/TODO-02-design-system.md` | 1 | this section's repointing note |
+  | `todo/05-new-tools/TODO-02-regstudio.md` | 1 | quotes the pre-intake duplicate state for the record |
+  | `todo/06-distro-release/TODO-01-build-and-release.md` | 2 | a copyright-ownership fact about the codebase |
+  | `todo/implementation-plan.md` | 3 | describes the intake and states that the name is **not** kept |
+  | commit messages | n/a | history is not editable and must not be |
+
+  And three that belong to `§4`, left untouched here rather than renamed:
+
+  | Routed | Occurrences | Owner |
+  | --- | ---: | --- |
+  | `TODO-ux.md` | 1 | `D00 T03 §4` reconciles it; `D01 T02 §1` opens the file that routes its 101 open items |
+  | `TODO.md` | 19 | `D00 T03 §4` reconciles it |
+  | `docs/extensions.md` | 7 | `D00 T03 §4` records the architecture and the extension model |
+
+  Cheaper substitute that fails the checkpoint: a tree-wide search-and-replace, which satisfies the letter by falsifying the intake record and the commit history's own subject lines.
+
+- [x] Route the documentation carrying the old name to the section that owns it rather than rewriting it here. **Added 2026-09-17:** `TODO.md` (19), `TODO-ux.md` (1), and `docs/extensions.md` (7) all carry the product name, and all three are `D00 T03 §4`'s to reconcile, not this section's to rename. Done when: this section leaves all three untouched and `§4` names them.
+
+- [x] Fix the stale absolute path this rename exposes. **Found 2026-09-17 while counting:** `.vscode/settings.json` sets `cmake.sourceDirectory` to `R:/GitHub/ExoSuite/extensions/regstudio`, a path that does not exist on this machine, verified. It is broken independently of the rename. Done when: the setting points at a path inside this repository or is removed, and the reason is recorded.
+- [x] Give the application the Rizonesoft identity: the Resolute application icon, company, and copyright, generated rather than typed. The values and the icon path are fixed in the block above, taken from the shipping product rather than invented. Done when: the built executable reports ProductName `Resolute`, CompanyName `Rizonesoft`, and FileDescription `Resolute Power Tools`, read back **from the built binary** rather than from the source that produced it, and the copyright year is generated at configure time rather than typed. Cheaper substitute that fails the checkpoint: typing the current year into the `.rc`, which is correct today and silently wrong every January.
+- [x] Commit: `"intake: rename the application to resolute"`
+
+**Test checkpoint:** The build produces `Resolute.exe` and no `ExoSuite.exe`. No window title, resource string, or build script says ExoSuite. The built binary's version resource is read back and reports ProductName `Resolute`, CompanyName `Rizonesoft`, FileDescription `Resolute Power Tools`, and a copyright year equal to the year the build ran, proven by reading the binary rather than the `.rc`. `.vscode/settings.json` names no path outside this repository. `git grep -il exosuite` returns **only** the six survivors tabulated above, and the list is quoted in full so an extra entry is visible rather than absorbed into a count.
 
 ## 3. Rename the Library and the Toolchain
 
@@ -193,6 +251,7 @@ The README describes a Rust and Slint stack that was deleted in `efdce6177`. Any
 - [ ] Record the architecture: the UI library, the application shell, and the extension model where a tool builds as a standalone executable. Done when: a reader can tell which layer owns what.
 - [ ] State what the codebase does **not** have, so no later section assumes it. Done when: the absence of tests, of vcpkg, and of the non-UI framework layers is written down.
 - [ ] Reconcile `TODO.md` and `TODO-ux.md` against this plan. Done when: work still wanted is routed through `add-todo` and the rest is marked superseded, with `TODO-ux.md` recorded as the UX standard the suite is held to.
+- [ ] Clear the remaining Slint traces in editor configuration, not only in prose. **Filed 2026-09-17 by `§2`, which touched the file but did not own this:** `.vscode/settings.json` still maps `*.slint` to the `slint` language, though `efdce6177` deleted that stack. Done when: the association is gone and no tracked file outside the historical record configures a Slint toolchain.
 - [ ] Commit: `"intake: correct the documentation to the stack that exists"`
 
 **Test checkpoint:** The README describes C++23, Direct2D, llvm-mingw, CMake, and static linking, with no mention of Rust, Slint, or Cargo. The absence of tests, vcpkg, and the non-UI framework layers is stated. Every item in `TODO.md` and `TODO-ux.md` is either routed or marked superseded.

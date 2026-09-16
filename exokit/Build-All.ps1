@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Build all ExoSuite components (shell + extensions).
+    Build all Resolute components (shell + extensions).
 
 .DESCRIPTION
-    Builds ExoSuite shell and all extensions with progress display.
+    Builds Resolute shell and all extensions with progress display.
     Output goes to Bin/Release/ for shell and Bin/Release/System/ for extensions.
 
 .EXAMPLE
@@ -47,7 +47,7 @@ $CurrentStep = 1
 
 # Build shell (if exists)
 if ($HasShell) {
-    Write-Host "[$CurrentStep/$TotalSteps] Compiling ExoSuite shell ($BuildType)..." -ForegroundColor Cyan
+    Write-Host "[$CurrentStep/$TotalSteps] Compiling Resolute shell ($BuildType)..." -ForegroundColor Cyan
     
     $BuildDir = Join-Path $ShellDir "build"
     if (-not (Test-Path $BuildDir)) {
@@ -65,7 +65,7 @@ if ($HasShell) {
     }
     
     if ($Release) {
-        $ShellExe = Get-ChildItem -Path $BuildDir -Filter "ExoSuite.exe" | Select-Object -First 1
+        $ShellExe = Get-ChildItem -Path $BuildDir -Filter "Resolute.exe" | Select-Object -First 1
         if ($ShellExe) {
             Copy-Item $ShellExe.FullName -Destination $OutputDir -Force
         }
@@ -107,7 +107,7 @@ foreach ($Ext in $Extensions) {
 Write-Host "[$CurrentStep/$TotalSteps] Done! Output: Bin\Release\" -ForegroundColor Green
 Write-Host ""
 if ($HasShell) {
-    Write-Host "  Shell:      Bin\Release\ExoSuite.exe" -ForegroundColor DarkGray
+    Write-Host "  Shell:      Bin\Release\Resolute.exe" -ForegroundColor DarkGray
 }
 if ($Extensions.Count -gt 0) {
     Write-Host "  Extensions: Bin\Release\System\" -ForegroundColor DarkGray

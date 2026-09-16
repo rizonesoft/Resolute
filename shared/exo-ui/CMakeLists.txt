@@ -23,7 +23,7 @@ set(EXOUI_SOURCES
 
 set(EXOUI_LIBS comctl32 dwmapi d2d1 dwrite ole32 msimg32)
 
-# ── Static lib (for ExoSuite.exe — no DLL dependency) ────────
+# ── Static lib (for Resolute.exe — no DLL dependency) ────────
 add_library(ExoUI_static STATIC ${EXOUI_SOURCES})
 target_include_directories(ExoUI_static PUBLIC include)
 target_compile_definitions(ExoUI_static PUBLIC EXOUI_STATIC)

@@ -91,7 +91,7 @@ static void ScanExtensions() {
     g_filteredItems.clear();
 
 
-    // Get System/ folder path (relative to ExoSuite.exe)
+    // Get System/ folder path (relative to Resolute.exe)
     wchar_t exePath[MAX_PATH];
     GetModuleFileNameW(nullptr, exePath, MAX_PATH);
     std::wstring dir(exePath);
@@ -115,7 +115,7 @@ static void ScanExtensions() {
         HRSRC hRes = FindResourceW(hMod, L"EXOEXT", RT_RCDATA);
         if (!hRes) {
             FreeLibrary(hMod);
-            continue;  // Not an ExoSuite extension
+            continue;  // Not a Resolute extension
         }
 
         HGLOBAL hData = LoadResource(hMod, hRes);
@@ -483,13 +483,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
 
     // Initialize ExoUI (D2D, DirectWrite, Lucide icons)
     if (!exo::RenderContext::Init()) {
-        MessageBoxW(nullptr, L"Failed to initialize D2D/DirectWrite.", L"ExoSuite", MB_ICONERROR);
+        MessageBoxW(nullptr, L"Failed to initialize D2D/DirectWrite.", L"Resolute", MB_ICONERROR);
         return 1;
     }
     exo::LucideIcons::Load();
     exo::Theme::Init();
 
-    constexpr auto CLASS_NAME = L"ExoSuiteMain";
+    constexpr auto CLASS_NAME = L"ResoluteMain";
 
     WNDCLASSEXW wc{};
     wc.cbSize        = sizeof(wc);
@@ -498,26 +498,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
     wc.hInstance     = hInstance;
     wc.hCursor       = LoadCursorW(nullptr, IDC_ARROW);
     wc.hbrBackground = CreateSolidBrush(RGB(30, 30, 30));  // Dark initial fill — prevents white flash
-    wc.hIcon         = LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_EXOSUITE));
-    wc.hIconSm       = LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_EXOSUITE));
+    wc.hIcon         = LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_RESOLUTE));
+    wc.hIconSm       = LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_RESOLUTE));
     wc.lpszClassName = CLASS_NAME;
 
     if (!RegisterClassExW(&wc)) {
-        MessageBoxW(nullptr, L"Failed to register window class.", L"ExoSuite", MB_ICONERROR);
+        MessageBoxW(nullptr, L"Failed to register window class.", L"Resolute", MB_ICONERROR);
         return 1;
     }
 
     AppState app{};
 
     HWND hwnd = CreateWindowExW(
-        0, CLASS_NAME, L"ExoSuite",
+        0, CLASS_NAME, L"Resolute",
         WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
         CW_USEDEFAULT, CW_USEDEFAULT, 1100, 720,
         nullptr, nullptr, hInstance, &app
     );
 
     if (!hwnd) {
-        MessageBoxW(nullptr, L"Failed to create main window.", L"ExoSuite", MB_ICONERROR);
+        MessageBoxW(nullptr, L"Failed to create main window.", L"Resolute", MB_ICONERROR);
         return 1;
     }
 

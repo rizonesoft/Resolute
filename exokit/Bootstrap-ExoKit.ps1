@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-    Bootstrap ExoKit toolchain for ExoSuite.
+    Bootstrap ExoKit toolchain for Resolute.
 
 .DESCRIPTION
     Downloads and installs the required C++ build tools into the exokit/ folder.
-    Run this once before building ExoSuite.
+    Run this once before building Resolute.
 
 .EXAMPLE
     .\exokit\Bootstrap-ExoKit.ps1

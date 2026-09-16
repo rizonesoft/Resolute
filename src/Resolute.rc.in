@@ -1,0 +1,44 @@
+// Resolute application resources.
+//
+// This file is configured by CMake into the build directory. The copyright year
+// is substituted at configure time rather than typed, so a binary states the year
+// it was built. Edit Resolute.rc.in, never the generated Resolute.rc.
+
+#include <windows.h>
+#include "resource.h"
+
+IDI_RESOLUTE    ICON "@RESOLUTE_RESOURCE_DIR@/Resolute.ico"
+IDI_APPFALLBACK ICON "@RESOLUTE_RESOURCE_DIR@/application.ico"
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION     @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+    PRODUCTVERSION  @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+    FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+    FILEFLAGS       VS_FF_DEBUG
+#else
+    FILEFLAGS       0x0L
+#endif
+    FILEOS          VOS_NT_WINDOWS32
+    FILETYPE        VFT_APP
+    FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "Rizonesoft"
+            VALUE "FileDescription",  "Resolute Power Tools"
+            VALUE "FileVersion",      "@PROJECT_VERSION@.0"
+            VALUE "InternalName",     "Resolute"
+            VALUE "LegalCopyright",   "Copyright \xA9 @RESOLUTE_COPYRIGHT_YEAR@ Rizonesoft"
+            VALUE "OriginalFilename", "Resolute.exe"
+            VALUE "ProductName",      "Resolute"
+            VALUE "ProductVersion",   "@PROJECT_VERSION@.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

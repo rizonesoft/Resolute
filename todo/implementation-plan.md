@@ -56,7 +56,7 @@ The finished suite is **fourteen Rizonesoft products that behave like one produc
 
 Nothing in this plan has been built, but the C++ tree is **not** starting from zero.
 
-`samples/ExoSuite` is a working native C++23 application that `D00 T03` takes in: a 6,865-line Direct2D and DirectWrite UI framework, a 573-line application shell, a working repository-scoped llvm-mingw toolchain, an extension model where each tool builds as a standalone executable, and a 1.39 MB fully static binary. It has no tests, no vcpkg, and none of the non-UI framework layers. It becomes the Resolute launcher, and its UI library becomes the framework's UI half.
+The ExoSuite codebase, taken in by `D00 T03 §1` and renamed to Resolute by `§2`, is a working native C++23 application: a 6,865-line Direct2D and DirectWrite UI framework, a 573-line application shell, a working repository-scoped llvm-mingw toolchain, an extension model where each tool builds as a standalone executable, and a 1.39 MB fully static binary. It has no tests, no vcpkg, and none of the non-UI framework layers. It becomes the Resolute launcher, and its UI library becomes the framework's UI half.
 
 The suite being replaced is mature and shipping: fourteen tools, roughly 43,000 lines of AutoIt3, a working builder, and an installer. Two measurements shape this plan. Roughly **21,000 of those 43,000 lines are fourteen copies of one framework**, which is why the real porting job is one framework plus fourteen small bodies of logic rather than a 43,000-line rewrite. And the per-tool logic, with that framework subtracted, is: `Ownership` 77 lines, `USBRepair` 147, `DVDRepair` 274, `PixRepair` 341, `BiosCodes` 960, `ComIntRep` 1,903.
 

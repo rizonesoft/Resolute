@@ -13,12 +13,12 @@ track: F1
 > **Goal:** Every rule in `DESIGN.md` is true of every surface, and provably so. Tokens cannot be bypassed, the layout adapts, the accessibility floor is met rather than aspired to, and the suite stays fast enough that a system utility does not undermine its own claim to be fixing your machine.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** `samples/ExoSuite/TODO-ux.md` is the source for this file: 341 lines, **66 items done and 101 open**. What exists is the motion system (shared clock, named easings, sidebar and toolbar animation), the colour system (system accent from DWM, semantic tokens, four elevation levels, scrim, high-contrast detection, 300ms crossfade, Mica backdrop), and the type ramp with DirectWrite rendering modes. What does **not** exist is the entire accessibility section (8 open items, including UI Automation for custom-drawn controls, which is all of them), the spacing grid, responsive layout, content virtualization, custom window chrome, the performance work, and text truncation. `DESIGN.md` at the repository root is the contract this file makes true.
+> **Current state (verified 2026-09-16):** `TODO-ux.md` at the repository root is the source for this file. **Repointed 2026-09-17 by `D00 T03 §2`:** it read `samples/ExoSuite/TODO-ux.md`, and the intake landed that file at the root before the operator deleted the checkout: 341 lines, **66 items done and 101 open**. What exists is the motion system (shared clock, named easings, sidebar and toolbar animation), the colour system (system accent from DWM, semantic tokens, four elevation levels, scrim, high-contrast detection, 300ms crossfade, Mica backdrop), and the type ramp with DirectWrite rendering modes. What does **not** exist is the entire accessibility section (8 open items, including UI Automation for custom-drawn controls, which is all of them), the spacing grid, responsive layout, content virtualization, custom window chrome, the performance work, and text truncation. `DESIGN.md` at the repository root is the contract this file makes true.
 
 ## Inputs
 
 - [`DESIGN.md`](../../DESIGN.md) -- the contract; every section here makes one part of it true
-- [`samples/ExoSuite/TODO-ux.md`](../../samples/ExoSuite/TODO-ux.md) -- the 101 open items this file routes, and the record of what the 66 done items already cover
+- [`TODO-ux.md`](../../TODO-ux.md) -- the 101 open items this file routes, and the record of what the 66 done items already cover
 - -> XREF: [`01-framework/TODO-01 §8`](./TODO-01-framework-core.md) -- the controls added for the repair tools, which are held to this file
 - -> XREF: [`00-workspace/TODO-02 §3`](../00-workspace/TODO-02-test-backbone.md) -- the capture store these surfaces are compared against
 - -> XREF: [`07-quality/TODO-01 §3`](../07-quality/TODO-01-quality-bar.md) -- the conformance check that enforces this contract per tool
@@ -210,5 +210,5 @@ Small rules, and the ones a user notices when they are wrong: a path they cannot
 - [ ] Every framework surface is captured at four DPI scalings, both appearances, and three densities
 - [ ] Narrator announces every shared control, and every surface is reachable mouse-free
 - [ ] Reduced motion stops all motion and high contrast wins over the palette
-- [ ] Every open item in `samples/ExoSuite/TODO-ux.md` is shipped here, routed elsewhere, or marked superseded
+- [ ] Every open item in `TODO-ux.md` is shipped here, routed elsewhere, or marked superseded
 - [ ] `python scripts/todo-graph.py validate` clean

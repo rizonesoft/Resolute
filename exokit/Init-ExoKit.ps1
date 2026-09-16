@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Initialize ExoKit portable toolchain for ExoSuite builds.
+    Initialize ExoKit portable toolchain for Resolute builds.
 
 .DESCRIPTION
     Sets PATH to use ExoKit tools (LLVM-MinGW, CMake, Ninja) instead of

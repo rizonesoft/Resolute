@@ -17,8 +17,8 @@ track: W1
 
 ## Inputs
 
-- [`samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1`](../../samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1) -- the working bootstrap this file hardens
-- [`samples/ExoSuite/CMakePresets.json`](../../samples/ExoSuite/CMakePresets.json) -- the preset structure this file adopts
+- [`exokit/Bootstrap-ExoKit.ps1`](../../exokit/Bootstrap-ExoKit.ps1) -- the working bootstrap this file hardens. **Repointed 2026-09-17 by `D00 T03 §2`:** it read `samples/ExoSuite/...`, which the intake made redundant and the operator then deleted, so the link would have died
+- [`CMakePresets.json`](../../CMakePresets.json) -- the preset structure this file adopts. **Repointed 2026-09-17 by `D00 T03 §2`**, same reason
 - [`docs/brainstorm/2026-09-16-completion-brainstorm.md`](../../docs/brainstorm/2026-09-16-completion-brainstorm.md) -- the toolchain decision and its rationale
 - -> XREF: [`00-workspace/TODO-02 §1`](./TODO-02-test-backbone.md) -- the Catch2 harness this file's build must produce
 - -> XREF: [`00-workspace/TODO-03 §3`](./TODO-03-codebase-intake.md) -- the intake that moves the toolchain bootstrap to the repository root before this file hardens it
@@ -105,7 +105,7 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
 - [ ] **Replace the runtime icon loader, which is what actually breaks standalone.** Corrected 2026-09-17 after independent review: an earlier draft of this item blamed the `SHARED` library targets, which was wrong. `src/CMakeLists.txt:10` links `ExoUI_static`, so ExoUI is already static. The real dependency is explicit: `LucideIcons::Load()` at `shared/exo-ui/src/icons.cpp:15` calls `LoadLibraryW(L"System\Lucide.dll")` and resolves entry points with `GetProcAddress`. Done when: icons render with **no DLL present beside the executable**, proven by deleting `System/` and running. Cheaper substitute that fails the checkpoint: checking the executable's import table, which cannot see a runtime `LoadLibrary` and would pass a tool that still needs a DLL.
 <!-- claim: count "LoadLibraryW" shared/exo-ui/src/icons.cpp = 2 -->
 <!-- claim: count "ExoUI_static" src/CMakeLists.txt = 1 -->
-- [ ] Record what the release preset ships today, so the change has a before. Measured 2026-09-17: `Bin/Release/ExoSuite.exe` at 1,380,352 bytes plus `System/ExoUI.dll` and `System/Lucide.dll`, 3.9 MB in total. `shared/exo-ui/CMakeLists.txt:33` and `shared/lucide/CMakeLists.txt:58` still build `SHARED` targets even though the application does not link ExoUI's. Done when: the unused shared target is either removed or its purpose recorded.
+- [ ] Record what the release preset ships today, so the change has a before. Measured 2026-09-17: `Bin/Release/Resolute.exe` at **1,381,376** bytes plus `System/ExoUI.dll` and `System/Lucide.dll`, 4,074,176 bytes in total. **Corrected 2026-09-17 by `D00 T03 §2`:** this read `ExoSuite.exe` at 1,380,352 bytes. The rename added 1,024 bytes, which is the version-resource block that executable had never carried. `shared/exo-ui/CMakeLists.txt:33` and `shared/lucide/CMakeLists.txt:58` still build `SHARED` targets even though the application does not link ExoUI's. Done when: the unused shared target is either removed or its purpose recorded.
 - [ ] Put all build output under `build/`, which is already gitignored, with nothing written inside `src/`. Done when: a full configure and build leaves `git status` clean.
 - [ ] Prove the structure builds the real application, not a placeholder. Done when: `Resolute.exe` builds from a clean checkout after bootstrap, cloned **without** `--recursive`.
 - [ ] Record the binary size as the baseline the per-tool size budget is measured against. Done when: the size is in this section, dated, against the 1.39 MB the pre-intake build produced.
