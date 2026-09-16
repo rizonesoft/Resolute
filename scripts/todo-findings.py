@@ -42,7 +42,11 @@ LEDGER = REVIEWS / "findings.md"
 
 # D00-T03-s1.md -> ("D00 T03 §1")
 FILE_RE = re.compile(r"^D(?P<dom>\d{2})-T(?P<todo>\d{2})-s(?P<sec>\d+)\.md$")
-HEADING_RE = re.compile(r"^###\s+(?P<body>F[\d\-, ]*\S.*)$")
+# `F<digits>` then a ` -- ` separator. The first version accepted any `###`
+# heading starting with F, so `### Findings`, `### Frozen check` and
+# `### Fixes applied` were all read as malformed findings. A check that fires on
+# ordinary headings gets switched off, which is worse than not having it.
+HEADING_RE = re.compile(r"^###\s+(?P<body>F\d+(?:\s*-\s*F?\d+)?\s+--\s+\S.*)$")
 
 # The closed category set. Anything outside it is reported rather than bucketed,
 # so a new category arrives by decision instead of by invention at the point of
@@ -277,6 +281,21 @@ def _self_test() -> int:
         print("  FAIL  ledger rendering is not deterministic")
         failed += 1
 
+    # Ordinary headings that begin with F must be ignored, not reported as
+    # malformed findings. A check that fires on `### Findings` gets switched off.
+    noise = tmp / "D00-T98-s1.md"
+    NL = chr(10)
+    noise.write_text(NL.join([
+        "## Findings", "", "### Findings", "", "### Frozen check", "",
+        "### Fixes applied", "", "### F1 -- real -- record -- FIXED", "",
+    ]), encoding="utf-8")
+    nf, nb = parse_file(noise)
+    if len(nf) != 1 or nb:
+        print(f"  FAIL  heading noise: parsed {len(nf)}, bad {len(nb)}, want 1 and 0")
+        failed += 1
+    noise.unlink()
+
+
     # The independent review of 43a299a: --write must not publish a ledger it
     # knows is incomplete, and every mode must name the heading it could not read.
     import contextlib
@@ -297,7 +316,7 @@ def _self_test() -> int:
     for x in (f, other):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 10 cases, {failed} failed")
+    print(f"todo-findings self-test: 11 cases, {failed} failed")
     return 1 if failed else 0
 
 

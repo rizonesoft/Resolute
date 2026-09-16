@@ -97,6 +97,16 @@ Append the stamp block at the end of the section: `Verified:` (date, coverage, q
 
 Re-verification replaces the stamp in place. Never accumulate duplicates, and never edit a stamp to fit new code: the fix goes forward in a new commit and the stamp is rewritten by review.
 
+**Then regenerate the ledger**, because the findings file you just wrote is part of it:
+
+```bash
+python scripts/todo-findings.py --write   # docs/reviews/findings.md, derived
+```
+
+`D00 T04 §2` owns that file. It is generated from every per-section findings file, so a review that writes one and does not regenerate leaves the ledger stale by construction. `--write` refuses to publish while any finding heading is unreadable, and names the heading, so a refusal is a defect in the findings file you just wrote: fix the heading rather than skipping the step.
+
+Finding headings take the form `### F<n> -- summary -- category -- disposition`, and the category comes from the closed set in `scripts/todo-findings.py`. A category outside it is a decision to add one, not a word to invent while writing.
+
 ### 8. Audit stance
 
 On an already-`[x]` section: run steps 1-6 against the section's own candidate. Confirm the stamp's evidence still holds (re-run the checkpoint), or find the regression. The only permitted row change is `[x]` to `[ ]`, with the reason written into the section as a blocking note. A re-confirmed row keeps its stamp; say so in one line.

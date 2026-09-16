@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **5 of 120 sections complete (4%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **6 of 120 sections complete (5%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -100,7 +100,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T03 §3` | Rename the library and the toolchain           |   5   |
 | [x] | `D00 T03 §4` | Correct the stale documentation                |  10   |
 | [x] | `D00 T04 §1` | Staleness Detection for Every Claim-Free Block |   9   |
-| [ ] | `D00 T04 §2` | The Review-Finding Ledger                      |   8   |
+| [x] | `D00 T04 §2` | The Review-Finding Ledger                      |   8   |
 | [ ] | `D00 T04 §3` | Section Calibration                            |   6   |
 | [ ] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   5   |
 | [ ] | `D00 T01 §1` | Portable toolchain bootstrap                   |  15   |
