@@ -98,12 +98,18 @@ The two destructive intakes. A secure delete is the one tool in this suite with 
 
 **Fidelity:** each tool's main window against the framework's standard window; the confirmation reuses the framework's message dialog.
 **Job:** a user can securely erase files, or clean a system, and cannot do either by accident. Consumer: the filesystem, read back after the action.
-**Treatment:** confirmation naming exactly what will be destroyed, and an explicit statement that this action has no reverse. Cheaper substitute that fails the checkpoint: a generic "are you sure" over an unnamed set.
+**Treatment:** the erase method chosen by **drive type**, and confirmation naming exactly what will be destroyed with an explicit statement that this action has no reverse. Cheaper substitute that fails the checkpoint: overwriting regardless of media, which is what most free shredders do and which does not reliably erase anything on an SSD.
 **Chrome:** consume the framework and the repair contract. WinClean's service operations consume the promoted service primitives.
 **Needs:** Windows host (build/test)
 
 - [ ] Promote `samples/WinClean/UDF/Services.au3` into the framework as service-control primitives. Done when: the framework exposes start, stop, pause, resume, and start-mode operations, and no tool implements them privately.
 - [ ] Port QuickErase, correcting the misspelled source filename on intake. Done when: it builds, and the file is named for the product.
+- [ ] Detect the media type of the target: magnetic, SATA solid state, or NVMe. Done when: each is correctly identified on a driven run and an indeterminate result is reported as unknown rather than assumed.
+- [ ] **Choose the erase method by media type.** On magnetic media, overwrite. On solid state, use the drive's own firmware erase, ATA Secure Erase or NVMe Format and Sanitize, because wear levelling means an overwrite lands in a different physical block and leaves the original where no read can reach it. Done when: each path is exercised and the surface states which method was used and why.
+- [ ] Refuse to run a multi-pass overwrite on solid state without an explicit override. Done when: the refusal explains that additional passes add wear without adding erasure, and the override is recorded in the log and the transcript. Cheaper substitute that fails the checkpoint: running the requested passes silently, which costs the drive real life and achieves nothing.
+- [ ] Record what the shipped AutoIt passes actually are, and keep them. Done when: `DoD-5220-22-M`, its `-E` and `-ECE` variants, Schneier, German, Canadian, Russian, and `AR380` are all preserved for magnetic media, with their patterns unchanged from `QuickErace.au3`.
+- [ ] State what single-file erasure cannot guarantee on any media. Done when: the surface names copies the file system may hold elsewhere, such as shadow copies, journals, and previously allocated blocks, before the user commits.
+- [ ] Handle the case where firmware erase is unavailable or refused by the drive. Done when: it is reported as a named outcome rather than silently falling back to overwriting.
 - [ ] Confirm every destructive action by naming what will be destroyed: count, total size, and the paths. Done when: the confirmation names all three and declining performs nothing, asserted.
 - [ ] State on the surface that a secure erase has no reverse, before the user commits. Done when: the statement appears where the user sees it, captured.
 - [ ] Prove the erase against a fixture tree rather than a real user path. Done when: the assertion runs entirely inside the fixture root and a path outside it is refused.
@@ -111,7 +117,7 @@ The two destructive intakes. A secure delete is the one tool in this suite with 
 - [ ] Decide and record whether QuickErase and WinClean stay separate products given their overlapping secure-delete capability. Done when: the decision is dated with its cost of changing.
 - [ ] Commit: `"quickerase, winclean: the destructive intakes"`
 
-**Test checkpoint:** Service primitives live in the framework and no tool implements them privately, proven by search. A destructive confirmation names count, size, and paths; declining performs nothing. The no-reverse statement is captured on the surface. The erase assertion runs inside the fixture root and refuses a path outside it.
+**Test checkpoint:** Service primitives live in the framework and no tool implements them privately, proven by search. A destructive confirmation names count, size, and paths; declining performs nothing. The no-reverse statement is captured on the surface. The erase assertion runs inside the fixture root and refuses a path outside it. Each media type is detected on a driven run and the surface states the method used; a multi-pass request on solid state is refused with its explanation, and the override is logged. The eight preserved overwrite patterns are compared against `QuickErace.au3` and match.
 
 ## 4. Indicators and SaveDesk
 

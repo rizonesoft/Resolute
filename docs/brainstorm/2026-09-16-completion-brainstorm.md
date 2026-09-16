@@ -901,3 +901,30 @@ Raw volume access is the most privileged thing in the entire suite, and an engin
 - **10 domains, 17 TODO files, 93 sections.**
 - `validate`: 0 fatal, 0 warning, 59 adjacency advisories. `plan --check`: current at 0 of 93.
 - The suite is **37 shipped products** plus two internal tools.
+
+## Decisions taken, round 17
+
+49. **QuickErase chooses its erase method by media type.** Overwrite on magnetic media, ATA Secure Erase or NVMe Sanitize on solid state, with the surface stating which was used and why. A multi-pass overwrite on solid state is refused without an explicit override.
+50. **The rescue-imaging read strategy is an explicit section requirement**, not an implementation detail left to whoever builds it.
+
+### The QuickErase problem, measured
+
+`resolute_au3/samples/QuickErase/QuickErace.au3` implements the classic multi-pass standards: `DoD-5220-22-M` with its `-E` and `-ECE` variants, Schneier, German, Canadian, Russian, and `AR380`.
+
+**Multi-pass overwrite works on magnetic media and does not reliably work on solid state.** On an HDD, overwriting a sector physically replaces the data, and one pass is genuinely sufficient on modern densities; Gutmann himself said his 35-pass method was obsolete for post-1990s drives. On an SSD, wear levelling means writing logical block X places the data in a **different physical block** and marks the old one stale. The original survives where no read can reach it, and additional passes add wear without adding erasure.
+
+So the shipped claim is true on HDDs and unreliable on the majority of modern machines, and running 35 passes on an SSD costs the drive real life while achieving nothing.
+
+**This was treated as an upgrade rather than a retreat.** A shredder that detects the media and uses the drive's own firmware erase where overwriting cannot work is meaningfully better than most free tools, which run DoD passes on SSDs and report success. The eight existing overwrite patterns are preserved unchanged for magnetic media.
+
+It also makes the verification claim in `D05 T05 §3` precise rather than hedged: the report now carries the erase method through, so an overwritten magnetic target, a firmware-erased solid state target, and an **overwritten** solid state target produce three different honest findings, the last of which says plainly that a file system scan cannot establish erasure there.
+
+### Why the imaging read strategy is the product
+
+`ddrescue` is the gold standard and its value is decades of refinement in retry and skip algorithms, not in block copying.
+
+**Naive retrying accelerates a failing drive's death.** Hammering a marginal sector can push the drive over the edge and lose everything not yet read, which is the opposite of what a rescue tool is for. The correct approach reads every good region **fast and first**, then returns for the damaged areas under a bounded budget.
+
+`D05 T05 §4` now requires the phase order, a visible and bounded retry budget, a measured ceiling on total re-reads, and resumability, because re-reading a dying drive from zero is the most expensive thing the tool could do. Unbounded retrying is named as the substitute that fails, and the section records the reasoning so a later change cannot quietly weaken it.
+
+Both of these are the same shape: the tool's value is not the feature, it is knowing the one thing about the hardware that makes the feature honest.

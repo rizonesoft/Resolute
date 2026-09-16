@@ -107,6 +107,7 @@ The reason this port is worth making. `QuickErase` claims a file is unrecoverabl
 - [ ] Scan a target after a `QuickErase` run and report what, if anything, the engine can still find. Done when: an erased fixture reports nothing recoverable and a deliberately non-erased control reports its entries.
 - [ ] Offer verification directly from `QuickErase` after an erase. Done when: the hand-off works and the result names the erase run it verifies.
 - [ ] **State the limits of the claim plainly.** Done when: the report says what was checked, by what method, and what this cannot establish, naming at least the remapped-sector case and the SSD wear-levelling case, where data can survive in blocks no file system read will ever reach.
+- [ ] Carry the erase method through from `QuickErase`, because the honest claim differs by method. Done when: a report on an overwritten magnetic target and one on a firmware-erased solid state target state different findings, and a report on an **overwritten** solid state target says plainly that a file system scan cannot establish erasure there.
 - [ ] Never report a bare "securely erased". Done when: every result is phrased as what was and was not found by a stated method, proven by there being no such string in the surface.
 - [ ] Export the verification as a transcript. Done when: it is written atomically, read back, and carries the same limits the surface states.
 - [ ] Log every verification. Done when: each writes one line naming the target and the outcome.
@@ -114,7 +115,7 @@ The reason this port is worth making. `QuickErase` claims a file is unrecoverabl
 
 **Freeze check:** What this reports and refuses to report is frozen once shipped, because a user may make a disclosure decision on it. Evidence is an erased fixture and a control fixture producing identical findings and identical limit statements across changes.
 
-**Test checkpoint:** An erased fixture reports nothing recoverable; a non-erased control reports its entries. The hand-off from `QuickErase` names the run it verifies. The report names the remapped-sector and SSD wear-levelling limits. No "securely erased" phrasing exists in the surface, proven by search. The transcript carries the same limits.
+**Test checkpoint:** An erased fixture reports nothing recoverable; a non-erased control reports its entries. The hand-off from `QuickErase` names the run and the method it verifies. The report names the remapped-sector and SSD wear-levelling limits, and an overwritten solid state target is reported as not establishable by scan. No "securely erased" phrasing exists in the surface, proven by search. The transcript carries the same limits.
 
 ## 4. Rescue Imaging
 
@@ -122,12 +123,17 @@ Tools that write images to healthy drives are numerous and good. Reading an imag
 
 **Fidelity:** the imaging surface and its progress, against `DESIGN.md`.
 **Job:** a user with a failing drive can get an image of it before it stops responding. Consumer: the image file, verified after writing.
-**Treatment:** bad sectors tolerated and recorded rather than aborting the run, because a drive that is failing will produce them and stopping at the first one loses everything after it. Cheaper substitute that fails the checkpoint: a straight block copy that aborts on the first read error, which is what makes general-purpose imaging tools useless on a dying disk.
+**Treatment:** **the read strategy is the product.** Good regions are read fast and first, damaged regions are returned to afterwards under a bounded retry budget, because naive retrying accelerates a failing drive's death and can lose everything not yet read. Cheaper substitute that fails the checkpoint: a straight block copy that aborts on the first read error, or one that retries a bad sector indefinitely, which are the two ways a rescue tool destroys what it exists to save.
 **Chrome:** consume the framework and the shared progress surface. Compose with Disk Health rather than re-reading SMART.
 **Needs:** Windows host (build/test)
 
 - [ ] Image a source drive to a file, reading read-only and never writing to the source. Done when: no write path to the source exists, proven by search, and the source is byte-identical after a run.
-- [ ] Tolerate read errors: retry with a stated policy, record every unreadable region, and continue. Done when: a fixture with deliberately unreadable regions produces a complete image with those regions recorded and zero-filled, and the run completes.
+- [ ] Record the read strategy as a design decision with its reasoning. Done when: this section states the phase order, the retry bounds, and why unbounded retrying is refused, so a later change cannot quietly weaken it.
+- [ ] Implement the read strategy explicitly, in phases: a fast first pass that copies every readable region without retrying, then a second pass over the gaps, then bounded retries on what remains. Done when: the phases are documented, and a fixture with unreadable regions shows the first pass completing before any retry is attempted.
+- [ ] Bound the retry budget per region and overall, and make it visible. Done when: the budget is stated on the surface, a fixture exhausts it, and the run continues rather than stalling. Cheaper substitute that fails the checkpoint: unlimited retries, which is how a marginal drive is pushed over the edge while the user watches a progress bar that is not moving.
+- [ ] Minimise stress on a failing drive. Done when: the section records what was done to avoid it, and a fixture run is measured for total re-reads against a stated ceiling.
+- [ ] Make the run resumable. Done when: an interrupted run restarts from its map rather than from the beginning, because re-reading a dying drive from zero is the most expensive thing the tool could do.
+- [ ] Record every unreadable region and continue. Done when: a fixture with deliberately unreadable regions produces a complete image with those regions recorded and zero-filled, and the run completes.
 - [ ] Produce a map of what could not be read. Done when: the map ships beside the image and names each unreadable region by offset and length.
 - [ ] Offer imaging from Disk Health when a drive reports failing. Done when: the hand-off works and carries the drive identity across.
 - [ ] Verify the image after writing. Done when: readable regions are compared against the source and any mismatch is reported.
@@ -138,7 +144,7 @@ Tools that write images to healthy drives are numerous and good. Reading an imag
 
 **Freeze check:** What is written to a destination drive is frozen once shipped, because a mistake destroys a user's data. Evidence is a fixture image written to a fixture target producing a byte-identical result across changes.
 
-**Test checkpoint:** No write path to the source exists, proven by search, and the source is byte-identical after a run. A fixture with unreadable regions produces a complete image with those regions recorded, and the run completes. The unreadable map names each region by offset and length. The Disk Health hand-off carries the drive identity. A write confirmation names letter, label, and size, and declining does nothing. The attribution appears in source, licence text, and About.
+**Test checkpoint:** No write path to the source exists, proven by search, and the source is byte-identical after a run. On a fixture with unreadable regions the fast first pass completes before any retry is attempted, the retry budget is exhausted without stalling the run, and total re-reads are measured against the stated ceiling, all quoted. An interrupted run resumes from its map. The unreadable map names each region by offset and length. The Disk Health hand-off carries the drive identity. A write confirmation names letter, label, and size, and declining does nothing. The attribution appears in source, licence text, and About.
 
 ## Verification
 
