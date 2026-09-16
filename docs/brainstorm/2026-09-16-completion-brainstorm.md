@@ -774,3 +774,46 @@ None of these are routed yet. They are recorded here so they are not rediscovere
 - **10 domains, 15 TODO files, 79 sections.**
 - `validate`: 0 fatal, 0 warning, 53 adjacency advisories. `plan --check`: current at 0 of 79.
 - The suite is **26 shipped products** plus two internal tools.
+
+## Decisions taken, round 14
+
+40. **Eight diagnostic tools are added**, in `D05 T04`: System Change Journal, Repair History, Sleep and Wake Diagnostics, Boot Time Analyzer, Why Is This Denied, Pending Reboot Inspector, Activation Diagnostics, and Network Share Diagnostics.
+41. **Group Policy leftovers and hidden-attribute repair are routed** to `D05 T03 §8` as the Policy Inspector and Attribute Repair. `USBRepair` was checked on 2026-09-16 and does **not** handle file attributes, so the second is not a duplicate. That check also found `_RepairDVDDrives` inside `USBRepair`, which further supports the Drive Repair merge.
+42. **Update Impact Correlation is deferred**, not rejected. It needs the System Change Journal to be worth anything, and it becomes cheap once that exists.
+
+## The selection criterion, and why it produced these
+
+The operator's brief was **unique tools that cannot be found anywhere**, avoiding crowded categories.
+
+That rules out disk space analyzers, duplicate finders, uninstallers, registry cleaners, driver updaters, and anything framed as a PC optimizer. Some are crowded, some are reputationally toxic, and building into either is building to a draw.
+
+What it rules **in** is a specific shape: **tools a standalone utility cannot build.**
+
+This is a suite with a shared repair contract, suite-wide restore records, and enumerators for startup entries, services, tasks, context menus, drivers, and policy. Four of the eight new tools are only possible because those parts exist:
+
+| Tool | What it composes | Why nobody else has it |
+| --- | --- | --- |
+| **System Change Journal** | every enumerator in the suite | Answers "my machine was fine last week", which nothing on Windows answers. Regshot is registry-only and ancient |
+| **Repair History** | the restore records of every tool | Emergent from the repair contract. Literally not buildable without a suite-wide undo record |
+| **Why Is This Denied** | ownership, file locks, policy | Seven mechanisms produce "access denied" and no tool checks all seven |
+| **Update Impact Correlation** (deferred) | crash dumps plus the change journal | Needs two other tools to exist first |
+
+The other four fill gaps that are unserved rather than composed: `powercfg` has never had a face despite answering three of the most infuriating questions a user has; boot attribution exists only as developer-grade tracing; pending-restart flags are scattered and sometimes stale; and activation and share failures are opaque error codes with no explanation anywhere.
+
+## The rule that keeps this from becoming duplication
+
+`D05 T04` **composes and never re-enumerates.** Its Current state block names the sections that own each enumerator, `§1` names duplication as the cheaper substitute that fails its checkpoint, and the file's Verification requires the absence of a duplicate enumerator to be **proven by search**.
+
+Three of these tools also have **no write path at all** by design: `§5` and both tools in `§7`. That is asserted by search rather than by intention, because a diagnostic that quietly acquires a repair button is how a safe tool becomes a dangerous one.
+
+Two safety rules are recorded where they will be read rather than in prose here: activation diagnostics **never read or display a product key**, because that turns a diagnostic into a credential leak; and the Policy Inspector **refuses to touch policy on a genuinely domain-joined machine** without an explicit override, because removing real policy from a managed machine is somebody else's decision.
+
+---
+
+# Plan state after the diagnostics
+
+- **10 domains, 16 TODO files, 87 sections.**
+- `validate`: 0 fatal, 0 warning, 55 adjacency advisories. `plan --check`: current at 0 of 87.
+- The suite is **34 shipped products** plus two internal tools.
+
+Still unrouted and recorded earlier: six repairs that belong in Complete Windows Repair as items rather than products, and the clock-skew and root-certificate checks for `ComIntRep`'s diagnose pass.

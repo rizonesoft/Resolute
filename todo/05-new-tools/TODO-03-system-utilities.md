@@ -21,6 +21,7 @@ track: P3
 - [`resolute_au3/SDK/Includes/CompInfo.au3`](../../resolute_au3/SDK/Includes/CompInfo.au3) -- the existing machine-information helper, prior art for §6
 - -> XREF: [`02-repair-contract/TODO-01 §4`](../02-repair-contract/TODO-01-repair-contract.md) -- the restore record and undo every tool here consumes
 - -> XREF: [`05-new-tools/TODO-01 §1`](./TODO-01-intake-and-new-tools.md) -- the intake contract these tools are measured against
+- -> XREF: [`05-new-tools/TODO-04 §1`](./TODO-04-diagnostics.md) -- the diagnostics, which compose the enumerators and records this file's tools own
 
 ## Outcome
 

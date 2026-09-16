@@ -79,6 +79,14 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | File Association Repair | 05-new-tools | TODO written, new |
 | Policy Inspector | 05-new-tools | TODO written, new |
 | Attribute Repair | 05-new-tools | TODO written, new |
+| System Change Journal | 05-new-tools | TODO written, new, composed |
+| Repair History | 05-new-tools | TODO written, new, composed |
+| Sleep and Wake Diagnostics | 05-new-tools | TODO written, new |
+| Boot Time Analyzer | 05-new-tools | TODO written, new |
+| Why Is This Denied | 05-new-tools | TODO written, new, composed |
+| Pending Reboot Inspector | 05-new-tools | TODO written, new |
+| Activation Diagnostics | 05-new-tools | TODO written, new |
+| Network Share Diagnostics | 05-new-tools | TODO written, new |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | internal tooling, not a product |

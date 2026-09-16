@@ -23,6 +23,7 @@ track: P3
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the porting pattern this file reuses
 - -> XREF: [`05-new-tools/TODO-02 §1`](./TODO-02-regstudio.md) -- RegStudio, the largest intake, measured against the contract §1 writes
 - -> XREF: [`05-new-tools/TODO-03 §1`](./TODO-03-system-utilities.md) -- the nine new utilities, measured against the same contract
+- -> XREF: [`05-new-tools/TODO-04 §1`](./TODO-04-diagnostics.md) -- the diagnostics, which compose §5's enumerators rather than writing their own
 
 ## Outcome
 

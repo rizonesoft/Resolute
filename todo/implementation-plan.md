@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 80 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 87 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -191,6 +191,13 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T03 §6` | System Report                                   |   7   |
 | [ ] | `D05 T03 §7` | Battery Health, Boot Options, File Associations |   7   |
 | [ ] | `D05 T03 §8` | Policy Inspector and Attribute Repair           |   9   |
+| [ ] | `D05 T04 §1` | System Change Journal                           |   8   |
+| [ ] | `D05 T04 §2` | Repair History                                  |   8   |
+| [ ] | `D05 T04 §3` | Sleep and Wake Diagnostics                      |   7   |
+| [ ] | `D05 T04 §4` | Boot Time Analyzer                              |   6   |
+| [ ] | `D05 T04 §5` | Why Is This Denied                              |   6   |
+| [ ] | `D05 T04 §6` | Pending Reboot Inspector                        |   5   |
+| [ ] | `D05 T04 §7` | Activation and Network Share Diagnostics        |   6   |
 
 
 ### Phase 4 -- Ship it, in every language
