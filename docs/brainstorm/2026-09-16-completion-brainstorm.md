@@ -361,3 +361,80 @@ Ranked by demand against risk.
 6. **Disk Space Analyzer** -- high demand, much larger build than the rest of this list.
 
 **Not recommended:** a registry cleaner. The whole category has a poor reputation and it would sit badly beside tools whose pitch is that they can undo everything.
+---
+
+# PIVOT: rewrite in C++
+
+Taken 2026-09-16, after the findings above. Everything recorded before this point was written against the AutoIt suite. The product decisions survive the pivot; the AutoIt-specific mechanics do not.
+
+## Decisions taken, round 5
+
+13. **Resolute is rewritten in C++.** Target C++23 on MSVC 2022, built with CMake and vcpkg.
+14. **UI toolkit is wxWidgets, statically linked.** Chosen over WinUI 3, Qt 6, and raw Win32.
+15. **The clone is 1:1 on behavior, not on pixels.** Identical effects on the system, verified by diffing against the AutoIt build on the same fixture. The UI is rebuilt to the conformance profile with DPI and dark mode corrected.
+16. **Migration is framework first, then all tools.** The framework is built and hardened before the tools port.
+17. **One repository, two trees.** `resolute_au3/` holds the frozen AutoIt suite as the executable specification; the C++ tree sits beside it; one `todo/` covers both.
+
+## Why wxWidgets and not WinUI 3
+
+Measured UI inventory across the whole suite: 281 labels, 180 groups, 135 icons, 97 tab items, 92 checkboxes, 79 buttons, 28 combos, 22 listviews, 17 inputs. There is no custom rendering and no animation anywhere. This is a Win32 dialog application, and WinUI 3 exists to solve problems this suite does not have.
+
+Against that, WinUI 3 costs four things that matter here:
+
+1. **It breaks the standalone constraint.** Framework-dependent deployment needs the Windows App SDK runtime installed; self-contained ships roughly 40 to 60 MB per tool. Current executables are 1 to 2 MB and independently distributed. `UUIDGen` is 209 lines of AutoIt.
+2. **Elevation.** Every tool here needs administrator rights. Unpackaged WinUI 3 can elevate but has a poor history of it; packaged MSIX effectively cannot.
+3. **MSIX container semantics fight system repair**, which is the entire product.
+4. **C++/WinRT is the second-class path.** Microsoft's WinUI 3 investment is C#-first.
+
+wxWidgets wins on the decisive point: the wxWindows Licence carries an explicit static-linking exception, so a single self-contained executable ships with no source obligation. Native Win32 controls underneath, per-monitor DPI in 3.2+, Windows dark mode in 3.3, 5 to 12 MB per tool, trivial elevation.
+
+Qt 6 has the better tooling, and Qt Linguist would suit 35 language packs well, but LGPLv3 forces either dynamic linking (roughly 30 MB of DLLs beside every independently distributed tool) or a commercial licence.
+
+Raw Win32 remains the purist option and is viable precisely because the framework is written once. It was not chosen because dark mode and DPI would both be hand-built.
+
+## What the framework discovery does to the estimate
+
+The port is **not** 43,000 lines of AutoIt.
+
+Roughly 21,000 of those lines are fourteen copies of `ReBar`. The unique logic is about 22,000 lines, and the framework inside it is 1,556 lines written once. Per tool, the real logic is: `Ownership` ~77, `USBRepair` ~147, `DVDRepair` ~274, `PixRepair` ~341, `BiosCodes` ~960, `ComIntRep` ~1,903.
+
+So the work is one framework plus fourteen small bodies of logic. Estimate: 5,000 to 8,000 lines of C++ for the framework, 40,000 to 60,000 for the suite.
+
+## Risk carried by decision 16
+
+Framework-first means no migrated tool reaches users until late, and two codebases run in parallel meanwhile. The named mitigation is a **vertical slice**: the framework is proven end to end through one real tool before the remaining thirteen are ported. `Ownership`, at roughly 77 lines of real logic, is the cheapest candidate; `UUIDGen` is cheaper still but is not an existing product.
+
+The AutoIt suite stays shippable throughout. It needs a maintenance owner in the plan, not a freeze.
+
+## What survives the pivot
+
+Product decisions, unchanged:
+
+- The conformance profile, and that it must assert standalone-ness.
+- The two-layer architecture: framework for every tool, repair contract for the repair tools.
+- Both consolidations: four browser tools into one, `USBRepair` plus `DVDRepair` into Drive Repair.
+- `ReBar` internal, `Distro` internal, fourteen shipped products.
+- The intake list, and that `SaveDesk` is new development rather than a port.
+- The consolidation announcement design: `Successor` key plus a language-pack template.
+- Build-time language composition, per-tool update files, the `Doors/` layout question.
+- Every feature and utility recommendation.
+- High DPI and dark mode, which stop being retrofits and become requirements of the new framework.
+
+What dies: `Au3Check` gates, `.sni` portability, the `.lng` settings repair, `Au3Stripper`, and the browser-tool source consolidation as a source problem. Those evaporate rather than needing doing.
+
+## Repository layout after the move
+
+Commits `2c125ff` and `71caa37`.
+
+```
+resolute_au3/      the frozen AutoIt suite: SDK/, Resolute/, samples/
+src/               the C++ tree (not yet created)
+todo/              one execution plan covering both
+scripts/           todo-graph.py and friends, language-agnostic, kept
+docs/              captures, brainstorm, reviews
+```
+
+The ignore patterns were anchored to the old root and had to be unanchored; the move otherwise swept 368 build artifacts into the repository. The `Samples/` ignore rule was dropped because it never matched: the directory is lowercase and the pattern was not, so `samples/` has always been tracked. It stays tracked, as the intake source.
+
+`resolute_au3/samples/Resources/` (180 files) has never been tracked and still is not. Decide whether it should be.
+
