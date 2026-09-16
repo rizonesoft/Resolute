@@ -13,13 +13,12 @@ track: W1
 > **Goal:** The working C++23 codebase at `samples/ExoSuite` becomes the Resolute C++ tree: history preserved, product renamed, library and toolchain renamed, and the stale documentation corrected. After this file, `src/` is real and the rest of the plan builds on something that already compiles.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** `samples/ExoSuite` and `samples/RegStudio` are **embedded git repositories** with their own commit history, currently untracked by the outer repository. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1.39 MB fully static. There is **no vcpkg**; `deps/libvterm` is vendored. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
+> **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1.39 MB fully static. There is **no vcpkg**; `deps/libvterm` is vendored. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
 
 ## Inputs
 
-- [`samples/ExoSuite/`](../../samples/ExoSuite) -- the codebase being taken in
-- [`samples/ExoSuite/shared/exo-ui/`](../../samples/ExoSuite/shared/exo-ui) -- the UI framework that replaces the wxWidgets decision
-- [`samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1`](../../samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1) -- the working toolchain bootstrap
+- `github.com/rizonesoft/ExoSuite` -- the codebase being taken in, including `shared/exo-ui` and the `exokit/` toolchain bootstrap. Checked out locally under `samples/`, which is gitignored
+- `github.com/rizonesoft/RegStudio` -- merged alongside it
 - -> XREF: [`00-workspace/TODO-01 §1`](./TODO-01-toolchain-and-gates.md) -- the toolchain hardening that follows this intake
 - -> XREF: [`01-framework/TODO-01 §7`](../01-framework/TODO-01-framework-core.md) -- the framework that adopts this UI layer
 - -> XREF: [`05-new-tools/TODO-02 §1`](../05-new-tools/TODO-02-regstudio.md) -- RegStudio, which arrives as an extension and whose duplicate copy §1 reconciles
@@ -50,7 +49,7 @@ track: W1
 
 `exo-ui` is about to become the foundation of fourteen tools. How it got to be the shape it is will matter, and it is recoverable now and never again once the embedded repositories are discarded.
 
-- [ ] Take `samples/ExoSuite` in through `git subtree`, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`.
+- [ ] Take `ExoSuite` in through `git subtree`, **from its remote rather than a local path**, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`, and the merge is reproducible on a machine with no local checkout.
 - [ ] Resolve the six measured root collisions, each deliberately rather than by whichever side git picks. Done when: each is handled as below and none is left as a merge artifact.
 
   | Collision | Resolution |
@@ -77,13 +76,13 @@ track: W1
   todo/ docs/ scripts/
   ```
 
-- [ ] Take `samples/RegStudio` in with its history. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the two copies, and only the root copy carries git history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
-- [ ] Remove the embedded repositories from `samples/` once their content is merged. Done when: no `.git` directory remains under `samples/` and `git status` reports no embedded-repository warning.
+- [ ] Take `RegStudio` in from its remote the same way. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the standalone repository and the copy inside ExoSuite's `extensions/`, and only the standalone one carries history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
+- [ ] Confirm `samples/` stays out of the repository. Done when: `/samples/` is gitignored, `git ls-files samples` is empty, and `git status` reports no embedded-repository warning. The local checkouts may stay on disk; they are working copies, not repository content.
 - [ ] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. Done when: a full bootstrap and build leaves `git status` clean.
-- [ ] Record what was merged and from which commit. Done when: the source commit of each subtree is named here.
+- [ ] Record what was merged, from which remote, and at which commit. Done when: each subtree names its remote URL and source commit, so the merge can be repeated or audited later.
 - [ ] Commit: `"intake: merge the exosuite codebase with its history"`
 
-**Test checkpoint:** `git log -- shared/` shows pre-merge commits including `efdce6177`. No `.git` directory remains under `samples/` and no embedded-repository warning appears. A full bootstrap and build leaves `git status` clean. The source commits are quoted.
+**Test checkpoint:** `git log -- shared/` shows pre-merge commits including `efdce6177`, and the merge is reproduced on a machine with no local `samples/` checkout. `git ls-files samples` is empty and no embedded-repository warning appears. A full bootstrap and build leaves `git status` clean. Each subtree's remote and source commit are quoted.
 
 ## 2. Rename the Product to Resolute
 

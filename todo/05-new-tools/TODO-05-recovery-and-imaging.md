@@ -22,7 +22,9 @@ track: P3
 >
 > Neither can consume the shared framework as it stands, because both are C# and the framework is C++23.
 >
-> **SD Imager's provenance is unresolved.** The metadata says OS IT Consult and the repository history is Rizonesoft's. Until that is settled it is treated as third-party, which costs nothing here because raw disk access is roughly fifty lines of Win32 and is written from scratch faster than it is ported.
+> **SD Imager's provenance is unresolved.** The assembly metadata says OS IT Consult while the repository sits at `github.com/rizonesoft/SDImage`, which is suggestive but not conclusive. Until it is settled the code is treated as third-party, which costs nothing here because raw disk access is roughly fifty lines of Win32 and is written from scratch faster than it is ported.
+>
+> Neither sample is in this repository: `/samples/` is gitignored. For the clean-room requirement that is a feature rather than an inconvenience, because the source the implementer must not read is not in the tree to be read.
 
 > [!CAUTION]
 > **Neither tool is ported. Both are implemented from specification.**
@@ -35,8 +37,8 @@ track: P3
 
 ## Inputs
 
-- [`samples/Undelete/Source/`](../../samples/Undelete/Source) -- Kickass Undelete. **Reference only, and not for the implementer**: evidence the feature is achievable and a guide to what the surface should offer
-- [`samples/SDImage/SDImage/`](../../samples/SDImage/SDImage) -- SD Imager, on the same terms
+- Kickass Undelete, publicly available. **Reference only, and not for the implementer**: evidence the feature is achievable and a guide to what a surface should offer. **Deliberately not in this repository**, because `/samples/` is gitignored, which is what keeps GPL v3 source out of a tree whose engine must owe it nothing
+- `github.com/rizonesoft/SDImage`, on the same terms
 - The FAT32 specification and the published NTFS on-disk documentation, which are what `§1` is actually written from
 - -> XREF: [`05-new-tools/TODO-01 §3`](./TODO-01-intake-and-new-tools.md) -- `QuickErase`, whose claim §3 verifies
 - -> XREF: [`05-new-tools/TODO-03 §3`](./TODO-03-system-utilities.md) -- Disk Health, which §4 composes with
@@ -74,7 +76,7 @@ It also makes the engine structurally incapable of writing to the volume it read
 **Needs:** C++ toolchain (compile)
 
 - [ ] Name the specifications this engine is written from, and the formats it supports. Done when: each supported format cites the published documentation it was implemented against, and a fixture image of each enumerates its deleted entries.
-- [ ] **Record the clean-room discipline and who held it.** Done when: this section states that the implementer did not read `samples/Undelete/Source/`, names who wrote the engine, and confirms no file from that tree is referenced by, included in, or copied into the build. Cheaper substitute that fails the checkpoint: consulting the original "just for the tricky parts", which is precisely where a derivative-work claim would land.
+- [ ] **Record the clean-room discipline and who held it.** Done when: this section states that the implementer did not read the Kickass Undelete source, names who wrote the engine, and confirms no file from it is referenced by, included in, or copied into the build. The gitignored `samples/` tree makes this easy to hold and easy to demonstrate. Cheaper substitute that fails the checkpoint: consulting the original "just for the tricky parts", which is precisely where a derivative-work claim would land.
 - [ ] Make the engine **physically unable to write to the source volume.** Done when: it opens the volume read-only, exposes no write path, and a search proves no write call exists. Cheaper substitute that fails the checkpoint: a write path guarded by a flag, which is one mistake away from destroying the data the user is trying to recover.
 - [ ] Recover to a destination on a different volume, and refuse a destination on the source. Done when: a same-volume destination is refused by name, because writing recovered data onto the volume being recovered from overwrites what has not been recovered yet.
 - [ ] Report recoverability honestly per entry. Done when: fully recoverable, partially overwritten, and unrecoverable are distinguishable, and a partially overwritten fixture is not reported as recoverable.
