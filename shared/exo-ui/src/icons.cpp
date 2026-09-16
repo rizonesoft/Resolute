@@ -8,6 +8,7 @@ LucideIcons::FnGetName   LucideIcons::s_getName   = nullptr;
 LucideIcons::FnRender    LucideIcons::s_render    = nullptr;
 LucideIcons::FnFree      LucideIcons::s_free      = nullptr;
 LucideIcons::FnCreateBmp LucideIcons::s_createBmp = nullptr;
+LucideIcons::FnGetSvg    LucideIcons::s_getSvg    = nullptr;
 
 bool LucideIcons::Load() {
     if (s_dll) return true;
@@ -20,6 +21,7 @@ bool LucideIcons::Load() {
     s_render    = reinterpret_cast<FnRender>(GetProcAddress(s_dll, "LucideRenderIcon"));
     s_free      = reinterpret_cast<FnFree>(GetProcAddress(s_dll, "LucideFree"));
     s_createBmp = reinterpret_cast<FnCreateBmp>(GetProcAddress(s_dll, "LucideCreateHBitmap"));
+    s_getSvg    = reinterpret_cast<FnGetSvg>(GetProcAddress(s_dll, "LucideGetSvgData"));
 
     return s_getCount && s_getName && s_render && s_free && s_createBmp;
 }
@@ -35,6 +37,10 @@ void LucideIcons::Free(void* ptr) { if (s_free) s_free(ptr); }
 
 HBITMAP LucideIcons::CreateBitmap(const char* name, int size, uint32_t color) {
     return s_createBmp ? static_cast<HBITMAP>(s_createBmp(name, size, color)) : nullptr;
+}
+
+const char* LucideIcons::GetSvgData(const char* name) {
+    return s_getSvg ? s_getSvg(name) : nullptr;
 }
 
 } // namespace exo

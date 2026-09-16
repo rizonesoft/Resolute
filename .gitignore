@@ -25,3 +25,7 @@ build/
 # OS
 Thumbs.db
 .DS_Store
+
+# scratch build output
+test_font.exe
+test_font.obj

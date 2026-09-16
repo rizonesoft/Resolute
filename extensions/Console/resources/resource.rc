@@ -1,0 +1,15 @@
+/**
+ * Console Extension Resource Script
+ */
+
+#include <windows.h>
+
+// Application Icon
+1 ICON "Console.ico"
+
+// Application Manifest (DPI awareness + visual styles)
+1 24  "app.manifest"
+
+// EXOEXT metadata — self-describing extension resource
+// The ExoSuite shell reads this to discover extension metadata
+EXOEXT RCDATA "exoext.json"

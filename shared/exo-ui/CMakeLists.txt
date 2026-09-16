@@ -10,13 +10,18 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(EXOUI_SOURCES
     src/theme.cpp
     src/render.cpp
+    src/typography.cpp
     src/icons.cpp
+    src/animation.cpp
     src/controls/sidebar.cpp
     src/controls/toolbar.cpp
+    src/controls/popupmenu.cpp
     src/controls/statusbar.cpp
+    src/controls/contentview.cpp
+    src/controls/listview.cpp
 )
 
-set(EXOUI_LIBS comctl32 dwmapi d2d1 dwrite ole32)
+set(EXOUI_LIBS comctl32 dwmapi d2d1 dwrite ole32 msimg32)
 
 # ── Static lib (for ExoSuite.exe — no DLL dependency) ────────
 add_library(ExoUI_static STATIC ${EXOUI_SOURCES})

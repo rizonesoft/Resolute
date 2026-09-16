@@ -89,6 +89,14 @@ LUCIDE_API void LucideFree(void* ptr) {
     free(ptr);
 }
 
+LUCIDE_API const char* LucideGetSvgData(const char* name) {
+    if (!name) return nullptr;
+    auto& idx = GetNameIndex();
+    auto it = idx.find(name);
+    if (it == idx.end()) return nullptr;
+    return kIcons[it->second].svg;
+}
+
 LUCIDE_API void* LucideCreateHBitmap(const char* name, int size, uint32_t color) {
     if (!name || size <= 0) return nullptr;
 

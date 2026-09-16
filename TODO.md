@@ -8,14 +8,14 @@ This document outlines the complete development roadmap from initial structure t
 
 ## Why C++ / Win32?
 
-| Feature | Benefit |
-|---------|--------|
-| **Zero Dependencies** | No runtime needed — runs on any Windows 10/11 machine |
-| **Maximum Performance** | Direct hardware access, no GC, no JIT |
-| **Tiny Binaries** | Single .exe per extension, < 1 MB typical |
-| **Full Win32 Access** | Complete access to all Windows APIs |
-| **SVG Icons** | Modern icon system via Direct2D or nanosvg |
-| **ExoKit Toolchain** | Portable build (LLVM-MinGW, CMake, Ninja) |
+| Feature                 | Benefit                                               |
+| ----------------------- | ----------------------------------------------------- |
+| **Zero Dependencies**   | No runtime needed — runs on any Windows 10/11 machine |
+| **Maximum Performance** | Direct hardware access, no GC, no JIT                 |
+| **Tiny Binaries**       | Single .exe per extension, < 1 MB typical             |
+| **Full Win32 Access**   | Complete access to all Windows APIs                   |
+| **SVG Icons**           | Modern icon system via Direct2D or nanosvg            |
+| **ExoKit Toolchain**    | Portable build (LLVM-MinGW, CMake, Ninja)             |
 
 ---
 
@@ -24,12 +24,14 @@ This document outlines the complete development roadmap from initial structure t
 > **This is the first thing to implement** — Get a working window on screen before anything else.
 
 ### 0.0.1: Development Environment
+
 - [x] Set up ExoKit portable toolchain (LLVM-MinGW, CMake, Ninja)
 - [x] Verify LLVM-MinGW: `clang++ --version` (21.1.8 ✓)
 - [x] Verify CMake: `cmake --version` (4.2.3 ✓)
 - [x] Verify Ninja: `ninja --version` (1.13.1 ✓)
 
 ### 0.0.2: C++ Project Setup
+
 - [x] Create root `CMakeLists.txt` for monorepo workspace
 - [x] Create project directory structure:
   ```
@@ -47,11 +49,13 @@ This document outlines the complete development roadmap from initial structure t
 - [x] Add CMakePresets.json for Debug/Release configurations
 
 ### 0.0.3: Test Compile & Run
+
 - [x] Build: `.\exokit\Build-ExoSuite.ps1 -Release`
 - [x] Run: `Bin\Release\ExoSuite.exe`
 - [x] Verify window appears (WS_OVERLAPPEDWINDOW)
 
 ### 0.0.4: Basic UI Shell Layout
+
 - [x] Add NavigationView/sidebar (owner-draw or custom control)
 - [x] Add content area (ListView placeholder)
 - [x] Add toolbar with SVG icon buttons
@@ -63,15 +67,17 @@ This document outlines the complete development roadmap from initial structure t
 ## Phase 0: Project Foundation & Setup
 
 ### 0.1: Repository Setup
+
 - [x] Create directory structure (extensions, shared, exokit, installers)
 - [x] Create GitHub repository
 - [x] Create .gitignore for C++ projects
 - [x] Create README.md with project overview
 - [x] Initialize Git repository and push
-- [ ] Set up issue templates
-- [ ] Create initial commit with shell skeleton
+- [x] Set up issue templates
+- [x] Create initial commit with shell skeleton
 
 ### 0.2: Build System Configuration
+
 - [x] Create ExoKit bootstrap (LLVM-MinGW, CMake, Ninja)
 - [x] Create ExoKit init script (PATH setup)
 - [x] Create Build-All.ps1 (shell + extensions)
@@ -93,6 +99,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Verify extension compilation output to system folder
 
 ### 0.3: Project Structure & Scaffolding
+
 - [ ] Create Core namespace structure (CplInterop, CplLoader, CplItem)
 - [ ] Create UI namespace structure (MainWindow)
 - [ ] Create Resources folder structure
@@ -136,6 +143,7 @@ This document outlines the complete development roadmap from initial structure t
 ## Phase 1: Core Architecture
 
 ### 1.0: Platform & Architecture Requirements
+
 - [ ] **Windows 10/11 Only**: Implement OS version checking
   - [ ] Check minimum Windows version (Windows 10 build 10240 or later)
   - [ ] Display friendly error message if running on unsupported OS
@@ -147,6 +155,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Document platform requirements in README and installer
 
 ### 1.1: Error Handling System
+
 - [ ] Create ErrorInfo class/struct
 - [ ] Implement error logging system
 - [ ] Create LogError function with debug output
@@ -155,6 +164,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Implement graceful error recovery
 
 ### 1.2: Configuration Management
+
 - [ ] Create Settings class
 - [ ] Implement settings file (JSON)
 - [ ] Create LoadSettings function
@@ -171,6 +181,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Support settings migration between versions
 
 ### 1.3: Versioning System
+
 - [ ] Create VersionInfo class
 - [ ] Implement semantic versioning (MAJOR.MINOR.PATCH)
 - [ ] Add version display in About dialog
@@ -178,6 +189,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Integrate version into build process
 
 ### 1.4: Exception Handling System
+
 - [ ] Create global unhandled exception handler
 - [ ] Implement ExceptionDialog with Win32 dialog
 - [ ] Add exception details viewer (expandable sections)
@@ -191,6 +203,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Add "Send Error Report" option with privacy notice
 
 ### 1.5: Performance Monitoring & Optimization
+
 - [ ] Create PerformanceMonitor class
 - [ ] Implement startup time tracking
 - [ ] Monitor memory usage
@@ -208,6 +221,7 @@ This document outlines the complete development roadmap from initial structure t
 ## Phase 2: CPL Interop Implementation
 
 ### 2.1: Complete Win32 API Definitions
+
 - [ ] Define CPL message constants
 - [ ] Define CPlApplet function pointer
 - [ ] Define CPLINFO struct
@@ -217,6 +231,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Test definitions with sample .cpl
 
 ### 2.2: CPL Marshaling Implementation
+
 - [ ] Implement CPL_INQUIRE handling
 - [ ] Implement CPL_NEWINQUIRE handling
 - [ ] Handle both ANSI and Unicode paths
@@ -224,6 +239,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Add error handling for failures
 
 ### 2.3: Icon Resource Extraction
+
 - [ ] Implement LoadIconFromResource function
 - [ ] Extract icon from hModule using idIcon
 - [ ] Handle multiple icon sizes (16, 24, 32, 48, 64, 128, 256)
@@ -231,6 +247,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Test icon extraction with sample .cpl files
 
 ### 2.4: String Resource Extraction
+
 - [ ] Implement LoadStringFromResource function
 - [ ] Extract name string using idName
 - [ ] Extract description string using idInfo
@@ -238,6 +255,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Add fallback to file name if resource missing
 
 ### 2.5: Administrator Privilege Detection
+
 - [ ] Implement function to detect if current process has admin privileges
 - [ ] Implement function to detect if a CPL requires admin privileges
 - [ ] Check CPL manifest or metadata for admin requirement
@@ -250,6 +268,7 @@ This document outlines the complete development roadmap from initial structure t
 ## Phase 3: CPL Loader Implementation
 
 ### 3.1: Dynamic Library Loading
+
 - [ ] Implement LoadCplFile method
 - [ ] Use LoadLibraryEx for dynamic loading
 - [ ] Find CPlApplet export with GetProcAddress
@@ -259,6 +278,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Handle locked/unloadable .cpl files
 
 ### 3.2: Applet Enumeration
+
 - [ ] Iterate through applets in each .cpl
 - [ ] Implement CPL_INQUIRE for each applet
 - [ ] Extract applet name and description
@@ -267,6 +287,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Test with multiple .cpl files
 
 ### 3.3: System Folder Management
+
 - [ ] Create system folder if missing
 - [ ] Scan for .cpl files
 - [ ] Add file watching for new .cpl additions (ReadDirectoryChangesW)
@@ -281,6 +302,7 @@ This document outlines the complete development roadmap from initial structure t
   - [ ] Handle privilege detection failures gracefully
 
 ### 3.4: Category Management System
+
 - [ ] Create Category enum/class (System, Network, Security, Display, Programs, etc.)
 - [ ] Implement category assignment for CplItem
 - [ ] Create category metadata storage (JSON/XML)
@@ -295,6 +317,7 @@ This document outlines the complete development roadmap from initial structure t
 ## Phase 4: User Interface Components (Win32)
 
 ### 4.1: Main Window Layout
+
 - [ ] Create MainWindow (WS_OVERLAPPEDWINDOW)
 - [ ] Set window properties (title, size, icon)
 - [ ] Add MenuBar (File, View, Help, Tools)
@@ -314,6 +337,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Add customizable window chrome (dark title bar via DwmSetWindowAttribute)
 
 ### 4.2: ListView/GridView Setup
+
 - [ ] Configure GridView for Large Icon view
 - [ ] Set up ImageSource for icons (HICON-based)
 - [ ] Add columns for Details view (Name, Category, Description)
@@ -330,6 +354,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Implement keyboard navigation
 
 ### 4.3: View Mode Implementation
+
 - [ ] Implement Large Icons view
 - [ ] Implement Small Icons view
 - [ ] Implement List view
@@ -339,6 +364,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Update toolbar toggle states
 
 ### 4.4: Icon Display
+
 - [ ] Create icon loading (HICON/HBITMAP)
 - [ ] Populate icons from CplItem
 - [ ] Assign icons to view items
@@ -353,6 +379,7 @@ This document outlines the complete development roadmap from initial structure t
   - [ ] Test shield overlay rendering in all view modes
 
 ### 4.5: Menu System
+
 - [ ] Implement File menu (Refresh, Exit)
 - [ ] Implement View menu (Large Icons, Small Icons, List, Details)
 - [ ] Implement Tools menu (Settings)
@@ -386,6 +413,7 @@ This document outlines the complete development roadmap from initial structure t
   - [ ] Test both admin and non-admin scenarios
 
 ### 4.6: About Dialog
+
 - [ ] Create AboutDialog (Win32 DialogBox)
 - [ ] Add application icon/branding
 - [ ] Display version information from VersionInfo
@@ -397,6 +425,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Make responsive to dialog sizing
 
 ### 4.7: Update Check System
+
 - [ ] Create UpdateChecker class
 - [ ] Implement XML-based version manifest download
 - [ ] Parse version information from XML file
@@ -409,6 +438,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Cache update check results
 
 ### 4.8: SVG Icon Toolbar
+
 - [ ] Design SVG icon storage system (embedded resources or files)
 - [ ] Implement SVG rendering engine (nanosvg or Direct2D SVG)
 - [ ] Create toolbar with SVG icon buttons
@@ -418,6 +448,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Integrate icon library with toolbar
 
 ### 4.9: CommandBar / Toolbar Implementation
+
 - [ ] Add view mode toggle buttons
 - [ ] Add refresh button
 - [ ] Implement button state management
@@ -428,6 +459,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Update icons on theme change
 
 ### 4.10: Context Menu
+
 - [ ] Add "Open" option
 - [ ] Add view mode options
 - [ ] Add separator
@@ -438,6 +470,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Add "Properties" option (show applet details)
 
 ### 4.11: Search & Filter System
+
 - [ ] Create search bar in toolbar area
 - [ ] Implement real-time search filtering
 - [ ] Support fuzzy search
@@ -454,6 +487,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Show search result count
 
 ### 4.12: Favorites & Quick Access
+
 - [ ] Create Favorites system
 - [ ] Add "Favorites" category to sidebar
 - [ ] Implement add/remove from favorites
@@ -466,6 +500,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Export/import favorites
 
 ### 4.13: Recent Items & History
+
 - [ ] Track recently opened applets
 - [ ] Display "Recently Used" category
 - [ ] Show usage frequency
@@ -475,6 +510,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Show last used timestamp
 
 ### 4.14: Command Palette / Quick Actions
+
 - [ ] Implement command palette (Ctrl+K or Ctrl+Shift+P)
 - [ ] Quick access to all applets via typing
 - [ ] Support keyboard shortcuts for common actions
@@ -484,6 +520,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Customizable keyboard shortcuts
 
 ### 4.15: Themes & Customization
+
 - [ ] Implement light theme (default)
 - [ ] Implement dark theme (DWM dark mode APIs)
 - [ ] Implement system mode (follows Windows theme preference)
@@ -493,6 +530,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Implement smooth theme transitions
 
 ### 4.16: Animations & Transitions
+
 - [ ] Implement smooth fade-in/fade-out
 - [ ] Add slide transitions between views
 - [ ] Smooth icon loading animations
@@ -503,6 +541,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Respect user preference for reduced motion (SPI_GETCLIENTAREAANIMATION)
 
 ### 4.17: Accessibility Features
+
 - [ ] Implement keyboard navigation throughout UI
 - [ ] Add screen reader support (MSAA / UI Automation)
 - [ ] Support high contrast mode
@@ -521,6 +560,7 @@ This document outlines the complete development roadmap from initial structure t
 > **Extension Architecture**: Each extension lives in `extensions/` within the monorepo. Extensions can run standalone or integrated into ExoSuite via shared libraries.
 
 ### 5.0: Extension Infrastructure Setup
+
 - [ ] Create `shared/ExoSuite.Core/` (shared static library)
 - [ ] Create `shared/ExoSuite.UI/` (shared UI components, SVG icons)
 - [ ] Create `extensions/_template/` extension template
@@ -528,7 +568,8 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Create extension installer/manager UI
 - [ ] Document extension development workflow
 
-### 5.1: RegStudio (Registry Editor) — `extensions/regstudio/`
+### 5.1: RegStudio (Registry Editor) — `extensions/RegStudio/`
+
 - [x] Create CMakeLists.txt (C++23, Ninja, LLVM-MinGW)
 - [x] Create main.cpp entry point stub
 - [x] Application manifest (DPI-aware, admin rights)
@@ -542,6 +583,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] SVG toolbar with RegStudio-specific actions
 
 ### 5.2: System Properties Utility — `extensions/sysprops/`
+
 - [ ] Create project structure
 - [ ] Design System Properties dialog layout
 - [ ] Create main window with tabs:
@@ -554,6 +596,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Handle UAC elevation for privileged operations
 
 ### 5.3: System Information — `extensions/sysinfo/`
+
 - [ ] Display Windows edition and version
 - [ ] Display processor information
 - [ ] Display installed memory (RAM)
@@ -574,6 +617,7 @@ This document outlines the complete development roadmap from initial structure t
 ## Phase 11: Applet Execution (Core Functionality)
 
 ### 11.0: Administrator Privilege Management
+
 - [ ] **Check Admin Requirements Before Execution**:
   - [ ] Verify if selected CPL requires admin privileges
   - [ ] Check if current process has admin privileges
@@ -601,6 +645,7 @@ This document outlines the complete development roadmap from initial structure t
   - [ ] Provide keyboard shortcut to restart as admin
 
 ### 11.1: Double-Click Handling
+
 - [ ] Implement item double-click event
 - [ ] Get selected CplItem
 - [ ] Check admin requirements before execution
@@ -610,6 +655,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Show error message if execution fails
 
 ### 11.2: Execution Methods
+
 - [ ] Implement rundll32.exe method (Control_RunDLL) for external .cpl
 - [ ] Pass correct .cpl path and index
 - [ ] Implement direct execution for internal applets
@@ -620,6 +666,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Add alternative execution methods if needed
 
 ### 11.3: Error Handling for Execution
+
 - [ ] Catch execution failures
 - [ ] Display user-friendly error messages
 - [ ] Log execution errors
@@ -631,6 +678,7 @@ This document outlines the complete development roadmap from initial structure t
 ## Phase 12-18: Polish, Distribution & Release
 
 ### 12: Testing & QA
+
 - [ ] Unit testing framework setup
 - [ ] Integration tests for CPL loading
 - [ ] UI automation tests
@@ -638,6 +686,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] Memory leak detection (AddressSanitizer)
 
 ### 13: Distribution
+
 - [ ] Inno Setup installer script
 - [ ] Portable mode support (settings in app directory)
 - [ ] Update checker (XML version manifest)
@@ -645,6 +694,7 @@ This document outlines the complete development roadmap from initial structure t
 - [ ] GitHub Release automation
 
 ### 14: Final Polish
+
 - [ ] Code signing (optional)
 - [ ] Documentation
 - [ ] README with screenshots
@@ -660,7 +710,7 @@ Bin/
 └── Release/
     ├── ExoSuite.exe          ← Main application (from src/)
     └── System/
-        ├── RegStudio.exe     ← Registry Editor (from extensions/regstudio/)
+        ├── RegStudio.exe     ← Registry Editor (from extensions/RegStudio/)
         ├── SysProps.exe      ← System Properties (from extensions/sysprops/)
         └── SysInfo.exe       ← System Info (from extensions/sysinfo/)
 ```

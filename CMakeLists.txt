@@ -32,10 +32,16 @@ add_compile_definitions(
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Bin/Debug")
 
+# ── Static C++ Runtime ───────────────────────────────────────
+# Bake libc++, libunwind, pthreads into every binary so no
+# LLVM-MinGW runtime DLLs need to ship alongside the app.
+add_link_options(-static)
+
 # ── Subdirectories ───────────────────────────────────────────
 add_subdirectory(shared/exo-ui)
 add_subdirectory(shared/lucide)
 add_subdirectory(src)
 
-# Extensions (uncomment as they gain CMakeLists.txt)
-# add_subdirectory(extensions/regstudio)
+# Extensions
+add_subdirectory(extensions/Console)
+# add_subdirectory(extensions/RegStudio)

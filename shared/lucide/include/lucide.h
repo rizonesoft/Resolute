@@ -32,6 +32,12 @@ LUCIDE_API uint8_t* LucideRenderIcon(const char* name, int size, uint32_t color)
 /// Free memory returned by LucideRenderIcon.
 LUCIDE_API void LucideFree(void* ptr);
 
+/// Get raw SVG XML data for an icon (with currentColor intact).
+/// @param name   Icon name
+/// @return       Pointer to null-terminated SVG string, or nullptr if not found.
+///               The pointer is valid for the lifetime of the DLL. Do NOT free.
+LUCIDE_API const char* LucideGetSvgData(const char* name);
+
 /// Render an icon and create a Win32 HBITMAP (premultiplied alpha, top-down DIB).
 /// @param name   Icon name
 /// @param size   Bitmap width and height in pixels
