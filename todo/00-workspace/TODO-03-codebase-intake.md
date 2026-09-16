@@ -13,7 +13,7 @@ track: W1
 > **Goal:** The working C++23 codebase at `samples/ExoSuite` becomes the Resolute C++ tree: history preserved, product renamed, library and toolchain renamed, and the stale documentation corrected. After this file, `src/` is real and the rest of the plan builds on something that already compiles.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1,423,872 bytes, 1.36 MiB, fully static. There is **no vcpkg**. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
+> **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1,423,872 bytes, 1.36 MiB. **Corrected 2026-09-17:** it is **not** fully static. Rebuilding the merged tree produces a 1,380,352-byte executable plus `System/ExoUI.dll` and `System/Lucide.dll`, 3.9 MB in total. `D00 T01 §2` owns the correction. There is **no vcpkg**. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
 >
 > <!-- claim: exists samples/ExoSuite/shared/exo-ui/include/exo/theme.h -->
 > <!-- claim: exists samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1 -->
@@ -91,7 +91,7 @@ track: W1
 6. **Retire Console and the `libvterm` submodule** per the item below. Done when: `.gitmodules` is empty or gone and `git clone` without `--recursive` builds.
 7. **Confirm `samples/` never enters the index.** Done when: `git ls-files samples` is empty.
 
-- [ ] **Resolve the precondition above before merging anything.** Done when: one option is taken and recorded here, with its date.
+- [x] **Resolve the precondition above before merging anything.** **Resolved 2026-09-17: option A, adapted.** The 52 real entries were committed in `samples/ExoSuite` as `fffd8b4`, excluding `test_font.exe` and `test_font.obj` which were gitignored as build output. The merge then took the **local** repository rather than the remote, so nothing was published to `github.com/rizonesoft/ExoSuite` on the operator's behalf; that push remains theirs to make. Done when: one option is taken and recorded here, with its date.
 
   | Option | What it costs |
   | --- | --- |
@@ -99,8 +99,8 @@ track: W1
   | **B. Merge from the local repository path** instead of the remote | Keeps the uncommitted work only if it is committed locally first; untracked files still do not travel through a merge |
   | **C. Merge from the remote, then copy the missing work over** | Lands it without its history, which contradicts this file's Goal and its `audit` adjacency |
 
-- [ ] Take `ExoSuite` in with `git merge --allow-unrelated-histories`, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`, and the merge is reproducible from a clean clone.
-- [ ] Resolve the six measured root collisions, each deliberately rather than by whichever side git picks. Done when: each is handled as below and none is left as a merge artifact.
+- [x] Take `ExoSuite` in with `git merge --allow-unrelated-histories`, landing its tree at the repository root alongside `resolute_au3/`. Merged at `ac97ed7` from `samples/ExoSuite` at `fffd8b4`. `git log -- shared/` reaches `efdce61` and `09b1f92`; the repository went from 12 commits to 348. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`, and the merge is reproducible from a clean clone.
+- [x] Resolve the measured root collisions, each deliberately rather than by whichever side git picks. **Three conflicted, as the corrected Build order predicted.** `.gitattributes`: kept LF normalisation and refused the incoming Git LFS rules, with the reason recorded in the file. `.gitignore`: merged the incoming C++ and toolchain rules, added the `reskit/` forms so both sides of the `§3` rename are covered, and dropped the stale `TODO.md` entry because ExoSuite brings a real one that `§4` reconciles. `README.md`: the repository's won. Done when: each is handled as below and none is left as a merge artifact.
 
   | Collision | Resolution |
   | --- | --- |
@@ -110,26 +110,34 @@ track: W1
   | `.gitignore`, `.gitattributes` | merge the incoming rules into the repository's |
   | `build/` | ignored on both sides, no content to reconcile |
 
-- [ ] Retire the `Console` extension and the `deps/libvterm` submodule with it. Done when: neither is built by any preset, `.gitmodules` is empty or removed, and a fresh clone **without** `--recursive` builds everything. Decided 2026-09-16: Console is not a shipped product, and it was `libvterm`'s only consumer, so the tree ends with **no external dependencies at all**. Reversing this means restoring both, which git history makes cheap.
-- [ ] Preserve the retired source rather than deleting it. Done when: `Console` and its 1,762 lines are reachable in history, and this section names the commit, so the decision is reversible on evidence rather than on memory.
-- [ ] Record the resulting root layout so later sections can rely on it. Done when: the layout below is true and `AGENTS.md` agrees with it.
+- [x] Retire the `Console` extension and the `deps/libvterm` submodule with it. Done at `e1f26a1`: `.gitmodules` removed, `deps/` gone, and `CMakeLists.txt` records why at the line where `add_subdirectory(extensions/Console)` stood. Done when: neither is built by any preset, `.gitmodules` is empty or removed, and a fresh clone **without** `--recursive` builds everything. Decided 2026-09-16: Console is not a shipped product, and it was `libvterm`'s only consumer, so the tree ends with **no external dependencies at all**. Reversing this means restoring both, which git history makes cheap.
+- [x] Preserve the retired source rather than deleting it. **Reachable at `ac97ed7:extensions/Console`**, measured at 1,762 lines, matching the figure this section recorded before the merge. Done when: `Console` and its 1,762 lines are reachable in history, and this section names the commit, so the decision is reversible on evidence rather than on memory.
+- [x] Record the resulting root layout so later sections can rely on it. **Corrected 2026-09-17: `deps/` is gone**, because retiring Console removed the only external dependency. `installers/` did not arrive, having been empty. `.github/` and `.vscode/` did. Done when: the layout below is true and `AGENTS.md` agrees with it.
 
   ```
   CMakeLists.txt  CMakePresets.json
   src/          the launcher shell
-  shared/       resolute-ui, lucide
-  extensions/   the tools, each a standalone executable
-  deps/         third-party source
-  reskit/       the bootstrapped toolchain
+  shared/       exo-ui and lucide, renamed by §3
+  extensions/   the tools, each its own executable
+  exokit/       the toolchain bootstrap, renamed reskit/ by §3
   resources/    application icons
   resolute_au3/ the frozen specification
   todo/ docs/ scripts/
   ```
 
-- [ ] Take `RegStudio` in from its remote the same way. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the standalone repository and the copy inside ExoSuite's `extensions/`, and only the standalone one carries history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
-- [ ] Confirm `samples/` stays out of the repository. Done when: `/samples/` is gitignored, `git ls-files samples` is empty, and `git status` reports no embedded-repository warning. The local checkouts may stay on disk; they are working copies, not repository content.
-- [ ] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. Done when: a full bootstrap and build leaves `git status` clean.
-- [ ] Record what was merged, from which remote, and at which commit. Done when: each subtree names its remote URL and source commit, so the merge can be repeated or audited later.
+  No `deps/`: the tree has **no external dependencies**, so a clone without `--recursive` builds.
+
+- [x] Take `RegStudio` in from its remote, by `git subtree` rather than a root merge, because its layout is root-level and would collide. Its full 10-commit history is reachable and `c9b8a0b` is an ancestor of `HEAD`. The ExoSuite copy was removed first at `862cfb5`, byte-identical in `src/` and `CMakeLists.txt`, verified before removal. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the standalone repository and the copy inside ExoSuite's `extensions/`, and only the standalone one carries history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
+- [x] Confirm `samples/` stays out of the repository. `git ls-files samples` is empty and no embedded-repository warning appears. Done when: `/samples/` is gitignored, `git ls-files samples` is empty, and `git status` reports no embedded-repository warning. The local checkouts may stay on disk; they are working copies, not repository content.
+- [x] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. **A full release build leaves `git status` clean**, verified after building 52/52 targets.
+- [x] Record what was merged, from which source, and at which commit:
+
+  | Source | Mechanism | Commit | Landed |
+  | --- | --- | --- | --- |
+  | `samples/ExoSuite` (local, in sync with `github.com/rizonesoft/ExoSuite`) | `git merge --allow-unrelated-histories` | `fffd8b4` | root |
+  | `github.com/rizonesoft/RegStudio` | `git subtree add` | `c9b8a0bc51809b2d0805f874919b41f99347ce85` | `extensions/RegStudio` |
+
+  ExoSuite was taken from the local checkout because the remote lacked 52 entries; `fffd8b4` is the commit that captured them and is identical in both once pushed.
 - [ ] Commit: `"intake: merge the exosuite codebase with its history"`
 
 **Test checkpoint:** The precondition above is resolved and the chosen option is recorded with its date. `git log -- shared/` shows pre-merge commits including `efdce6177` and `09b1f92ab`. `extensions/Console/`, `TODO-ux.md`, and the ten `shared/exo-ui` files named above are all present after the merge, each confirmed by path, because their absence is the failure this section nearly shipped. `git ls-files samples` is empty and no embedded-repository warning appears. A full bootstrap and build leaves `git status` clean. Each merge's source remote and commit are quoted.
