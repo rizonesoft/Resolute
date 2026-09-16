@@ -291,6 +291,12 @@ Size a section by what holds together, not by a number. Two forces pull in oppos
 
 Split where the work genuinely divides: a different tool, a different include, a dependency boundary, the shared library separate from the tool that consumes it. Split at **authoring** time, not during implementation: splitting mid-flight costs a wasted context.
 
+> **This guidance is unconfirmed, and deliberately unchanged. Checked 2026-09-17 by `D00 T04 §3`.**
+>
+> Nothing above is derived from measurement. `python scripts/todo-graph.py query calibration` compares each stamped section's item count against what it actually cost, and at the time of writing the sample was **6 stamped sections of 120**, far below the 30 that section records as the threshold for quoting a correlation.
+>
+> So the question was asked and the answer is "not yet". The guidance stays as written rather than being tuned to six observations, which would dress a guess in the authority of measurement. Run `query calibration` for the current count; when it stops refusing to report a correlation, this block is the thing to revisit.
+
 ### Feature adjacency: the surfaces a domain owes beyond its record
 
 Section sizing above decides how work is split. This decides whether the work is *all there*, and it is answered **before the Implementation Order table is final**, not at review.

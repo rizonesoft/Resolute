@@ -27,6 +27,8 @@ track: W1
 <!-- claim: exists scripts/todo-findings.py -->
 <!-- claim: count "def render_ledger" scripts/todo-findings.py = 1 -->
 <!-- claim: count "def _ignored" scripts/todo-claims.py = 1 -->
+<!-- claim: count "def _calibration_rows" scripts/todo-graph.py = 1 -->
+<!-- claim: count "CALIBRATION_MIN_SAMPLE = 30" scripts/todo-graph.py = 1 -->
 
 ## Inputs
 
@@ -147,16 +149,46 @@ A defect class found five times across five sections should have become a check 
 
 ## 3. Section Calibration
 
+> **Started:** 2026-09-16T23:33:19Z
+
 The plan estimates effort as an item count. Nothing has ever checked whether that number predicts anything, and after a hundred sections it either does or it does not.
 
-- [ ] Record per section what it actually cost: commits, elapsed sessions, and whether it needed a follow-up commit after review. Done when: the record exists for each stamped section and is derived from git rather than typed.
-- [ ] Compare against the item count. Done when: a report shows estimated items against actual cost, and the correlation is stated rather than assumed.
-- [ ] Identify the sections that were badly wrong in either direction. Done when: outliers are named, because a section that took five times its estimate usually means the section was really several.
-- [ ] Feed it back into sizing. Done when: the item-count guidance in `todo/README.md` is either confirmed by the data or revised, and the revision cites the data.
-- [ ] Record what calibration cannot tell you. Done when: it states that a slow section may have been slow for reasons outside the plan, so an outlier is a question rather than a conclusion.
-- [ ] Commit: `"self-correction: measure what a section actually cost"`
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Three corrections, and one of them decides what this section can honestly deliver.**
+>
+> **There are six stamped sections, not a hundred.** Measured today: `query stats` reports 6 done of 120. The whole dataset is:
+>
+> | Section | Items | Commits |
+> | --- | ---: | ---: |
+> | `D00 T03 §1` | 11 | 9 |
+> | `D00 T03 §2` | 7 | 2 |
+> | `D00 T03 §3` | 5 | 3 |
+> | `D00 T03 §4` | 10 | 5 |
+> | `D00 T04 §1` | 9 | 5 |
+> | `D00 T04 §2` | 8 | 4 |
+>
+> **So the measurement can be built and the conclusion cannot be drawn.** A correlation over six points is noise with a number attached, and quoting one would be the most dangerous thing this section could produce: a figure that looks like evidence, gets cited, and was never evidence. This section therefore ships the instrument, prints the data, and **refuses to state a correlation**, saying so in the output rather than in a footnote.
+>
+> **Dated default 2026-09-17: thirty stamped sections before a correlation is quoted.** That is a judgement, not a derivation. Below about thirty paired observations a single outlier moves a correlation coefficient more than the underlying relationship does, and this plan already contains one obvious outlier: `D00 T03 §1` took nine commits because it was blocked mid-flight on an operator decision, which has nothing to do with its item count. Cost of changing: one constant, and the tool prints the threshold alongside the count so the gap is visible.
+>
+> **"Elapsed sessions" is not derivable from git.** The item asked for it. Git knows commits and their timestamps; it does not know what a session was. What **is** recorded and derivable is `Duration:`, the minutes from `Started:` to the stamp, which `review-todo-section` already writes. The item is corrected to name it.
 
-**Test checkpoint:** Actual cost is derived from git for every stamped section, not typed. The estimate-versus-actual report prints and states a correlation. Outliers are named. The sizing guidance is confirmed or revised against the data.
+- [x] Record per section what it actually cost: commits, `Duration:` minutes, and whether it needed a follow-up commit after review. **Corrected 2026-09-17:** the item said "elapsed sessions", which git cannot answer, because git records commits and timestamps and has no notion of a session. `Duration:` is the recorded equivalent and `review-todo-section` already writes it. Done when: `python scripts/todo-graph.py query calibration` prints the record for every stamped section, every figure derived from git or from the stamp rather than typed anywhere.
+- [x] Compare against the item count. Done when: the report shows estimated items against actual cost for every stamped section, **and states whether the sample is large enough to support a correlation at all**. Cheaper substitute that fails the checkpoint: printing a correlation coefficient over six sections, which is noise with a number attached and is worse than printing nothing, because a figure that looks like evidence gets cited as evidence.
+- [x] Identify the sections that were badly wrong in either direction. Done when: outliers are named, because a section that took five times its estimate usually means the section was really several.
+- [x] Feed it back into sizing. **Corrected 2026-09-17:** the item required the `todo/README.md` guidance to be "confirmed by the data or revised", and at six sections neither is honest. Done when: the guidance is left **unchanged** with a dated note recording that the data is not yet sufficient, naming the threshold and where the current count is read from, so a later reader knows the question was asked rather than skipped. Cheaper substitute that fails the checkpoint: revising the guidance to match six sections, which dresses a guess in the authority of measurement.
+- [x] Record what calibration cannot tell you. Done when: it states that a slow section may have been slow for reasons outside the plan, so an outlier is a question rather than a conclusion.
+
+  **Written 2026-09-17.** Five limits, each a way to read this report wrongly:
+
+  1. **An outlier is a question, not a conclusion.** `D00 T03 §1` cost 9 commits against 11 items, the furthest from the mean of any section. The reason is recorded and has nothing to do with sizing: it was blocked mid-flight on an operator decision about an unpushed upstream commit. Nothing in the item count could have predicted that, and nothing in the report can see it.
+  2. **Commits are a proxy, not a cost.** A section that commits often is not necessarily expensive; it may simply have been worked in smaller steps. The independent review adds a commit to any section it finds something in, so `commits` partly measures how thoroughly a section was reviewed.
+  3. **`Duration:` is wall-clock from `Started:` to the stamp**, so it counts interruptions, waiting on a build, and an operator answering a question. It is not time spent.
+  4. **A correlation would not be a cause.** Item count and cost may both follow from something the plan never records, most obviously how well understood the work was when the section was authored. The report says this even above the threshold.
+  5. **Only stamped sections appear.** A section abandoned, re-scoped, or still open contributes nothing, and those are exactly the sections whose estimates were most likely wrong. The sample is biased toward work that went well enough to finish.
+- [x] Commit: `"self-correction: measure what a section actually cost"`
+
+**Test checkpoint:** `python scripts/todo-graph.py query calibration` prints one row per stamped section with its item count, commit count, and `Duration:`, every figure derived rather than typed: proven by changing a section's item count and watching the row move. The report states the sample size against the threshold and **prints no correlation while the sample is below it**, proven by reading the output. Outliers are named with the reason they are outliers where it is known. `todo/README.md` carries a dated note that the data is insufficient, naming the threshold. `self-test` covers the derivation and the below-threshold refusal, and stays green.
 
 ## 4. Re-Sequencing on Evidence
 

@@ -30,6 +30,7 @@ import argparse
 import importlib.util
 import json
 import re
+import subprocess
 import shutil
 import tempfile
 import sys
@@ -983,6 +984,48 @@ def cmd_query(args) -> int:
     by_id, by_key, done = _section_state(todos)
     what = args.what
 
+    if what == "calibration":
+        rows = _calibration_rows(todos)
+        total_sections = sum(len(t.sections) for t in todos)
+        print(f"calibration: {len(rows)} stamped section(s) of {total_sections}\n")
+        if not rows:
+            print("  Nothing has been stamped yet, so there is nothing to calibrate.")
+            return 0
+        print(f"  {'section':14} {'items':>5} {'commits':>7} {'minutes':>7}")
+        for r in rows:
+            mins = "--" if r["minutes"] is None else str(r["minutes"])
+            print(f"  {r['ref']:14} {r['items']:>5} {r['commits']:>7} {mins:>7}")
+
+        # Outliers: a section whose commit count is far from what its item count
+        # would suggest. Named, never explained away: the reason is usually
+        # outside the plan, which is exactly why an outlier is a question.
+        ratios = [(r, r["commits"] / r["items"]) for r in rows if r["items"]]
+        if ratios:
+            mean = sum(x for _, x in ratios) / len(ratios)
+            far = [(r, x) for r, x in ratios if abs(x - mean) > 0.5 * max(mean, 0.01)]
+            if far:
+                print("\n  commits per item, mean {:.2f}. Furthest from it:".format(mean))
+                for r, x in sorted(far, key=lambda p: -abs(p[1] - mean)):
+                    print(f"    {r['ref']:14} {x:.2f}")
+                print("  An outlier is a question, not a conclusion. A section may have")
+                print("  cost what it did for reasons the plan never recorded.")
+
+        print(f"\n  sample {len(rows)}, threshold {CALIBRATION_MIN_SAMPLE}")
+        if not _calibration_reports_correlation(len(rows)):
+            print("  NO CORRELATION IS REPORTED. The sample is below the threshold, and a")
+            print("  correlation over this many points is noise with a number attached.")
+            print("  Quoting one would produce a figure that looks like evidence, gets")
+            print("  cited, and never was. See D00 T04 §3 for why the threshold is 30.")
+        else:
+            r = _pearson([x["items"] for x in rows], [x["commits"] for x in rows])
+            if r is None:
+                print("  items against commits: not computable on this sample.")
+            else:
+                print(f"  items against commits: r = {r:.2f} over {len(rows)} sections.")
+            print("  A correlation is still not a cause: item count and cost may both")
+            print("  follow from something the plan does not record.")
+        return 0
+
     if what == "stats":
         secs = [s for t in todos for s in t.sections.values()]
         by_status: dict[str, int] = {}
@@ -1567,6 +1610,67 @@ def _align_tables(text: str) -> str:
             out.append("| " + " | ".join(cells) + " |")
         i = j
     return "\n".join(out)
+
+
+# Calibration (D00 T04 §3). A correlation below this many paired observations is
+# noise with a number attached, and the most dangerous thing this can produce is
+# a figure that looks like evidence. Thirty is a judgement, not a derivation:
+# below roughly that, one outlier moves a coefficient more than the underlying
+# relationship does, and this plan already has one, `D00 T03 §1`, which cost nine
+# commits because it was blocked on an operator decision mid-flight.
+CALIBRATION_MIN_SAMPLE = 30
+
+
+
+def _pearson(xs: list[float], ys: list[float]) -> float | None:
+    """Correlation, or None when it cannot be computed. Pure, so it is testable."""
+    n = len(xs)
+    if n < 2 or n != len(ys):
+        return None
+    mx, my = sum(xs) / n, sum(ys) / n
+    cov = sum((a - mx) * (b - my) for a, b in zip(xs, ys))
+    vx = sum((a - mx) ** 2 for a in xs) ** 0.5
+    vy = sum((b - my) ** 2 for b in ys) ** 0.5
+    if not vx or not vy:
+        return None
+    return cov / (vx * vy)
+
+
+def _calibration_reports_correlation(sample: int) -> bool:
+    """Whether the sample is large enough to quote a correlation at all."""
+    return sample >= CALIBRATION_MIN_SAMPLE
+
+
+def _commits_naming(ref: str) -> int:
+    """How many commits name this section. Derived, never typed."""
+    try:
+        out = subprocess.run(
+            ["git", "log", "--oneline", "--all", f"--grep={ref}"],
+            cwd=REPO, capture_output=True, text=True, timeout=20,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return 0
+    return len([l for l in out.stdout.splitlines() if l.strip()])
+
+
+def _calibration_rows(todos: list[Todo]) -> list[dict]:
+    """One row per STAMPED section: its estimate, and what it actually cost."""
+    rows = []
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, sec in sorted(t.sections.items()):
+            if sec.status != "x" or sec.moved:
+                continue
+            ref = f"D{dom} T{t.number} \u00a7{num}"
+            rows.append({
+                "ref": ref,
+                "items": sec.items_total,
+                "commits": _commits_naming(ref),
+                # Already parsed from the stamp by the loader; re-parsing the
+                # body here would be a second reader of one fact.
+                "minutes": sec.duration_minutes,
+            })
+    return rows
 
 
 def _plan_state(todos: list[Todo]) -> dict[str, str]:
@@ -3525,6 +3629,19 @@ track: Z1
         _row = "| [ ] | `D90 T01 §1` | Deliverable                        |   6   |"
         _new, _had = _sync_items_cell(_row, 11)
         check("items sync reads the old count", _had, 6)
+
+        # --- calibration (D00 T04 §3) ----------------------------------------
+        # The refusal below threshold is the point of the feature, not a
+        # limitation of it: a correlation over six sections is noise with a
+        # number attached, and a figure that looks like evidence gets cited.
+        check("calibration refuses a correlation below the threshold",
+              _calibration_reports_correlation(CALIBRATION_MIN_SAMPLE - 1), False)
+        check("calibration reports one at the threshold",
+              _calibration_reports_correlation(CALIBRATION_MIN_SAMPLE), True)
+        check("pearson on a perfect line", round(_pearson([1, 2, 3], [2, 4, 6]), 6), 1.0)
+        check("pearson on a perfect inverse", round(_pearson([1, 2, 3], [6, 4, 2]), 6), -1.0)
+        check("pearson needs two points", _pearson([1], [2]), None)
+        check("pearson refuses a flat series", _pearson([1, 1, 1], [1, 2, 3]), None)
         check("items sync writes the new count", _new.rstrip().endswith("11  |"), True)
         check("items sync leaves the ref untouched", "`D90 T01 §1`" in _new, True)
         check("items sync keeps the cell width", len(_new), len(_row))
@@ -4008,7 +4125,7 @@ def main() -> int:
     q = sub.add_parser("query", help="ask the graph a question")
     q.add_argument(
         "what",
-        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency"],
+        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency", "calibration"],
     )
     q.add_argument("--all", action="store_true", help="findings: include ones already done")
     q.add_argument("--file", help="adjacency: exact repository-relative TODO path")
