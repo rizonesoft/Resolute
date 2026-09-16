@@ -15,9 +15,9 @@ track: D1
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** Measured across the AutoIt tree.
 >
-> **Language packs per tool:** `Firemin` 35, `ComIntRep` 16, `DVDRepair` 10, `USBRepair` 8, `BiosCodes` 3, `PixRepair` 2, `ReBar` 2, and `MemBoost`, `Ownership`, and `Resolute` 1 each; `Chromin`, `Edgemin`, `Watermin`, and `Distro` have none. Naming is inconsistent: `DVDRepair` ships `zh-tw` where every other tool ships `zh-TW`, and `USBRepair` ships `sv.ini` among `.lng` files. A translator who translated this suite translated a quarter of it, because the same strings exist in fourteen separate packs.
+> **Language packs per tool:** `Firemin` 35, `ComIntRep` 16, `DVDRepair` 10, `USBRepair` 8, `BiosCodes` 3, `PixRepair` 2, `ReBar` 2, and `MemBoost`, `Ownership`, and `Resolute` 1 each; `Chromin`, `Edgemin`, and `Watermin` have none, and `Distro` has none and needs none, being discontinued. Naming is inconsistent: `DVDRepair` ships `zh-tw` where every other tool ships `zh-TW`, and `USBRepair` ships `sv.ini` among `.lng` files. A translator who translated this suite translated a quarter of it, because the same strings exist in fourteen separate packs.
 >
-> **Documentation is worse than "missing".** Four tools have no documentation directory at all: `Edgemin`, `Watermin`, `MemBoost`, `Distro`. What the other ten ship has these measured defects:
+> **Documentation is worse than "missing".** Three shipped tools have no documentation directory at all: `Edgemin`, `Watermin`, and `MemBoost`. `Distro` has none either and is excluded here, being discontinued rather than ported. What the other ten ship has these measured defects:
 >
 > - **Metadata is hardcoded and stale.** `ComIntRep/Readme.txt` states `Version: 11.1.3.6508` where the source is at `.6509`, `Release Date: 30 OCTOBER, 2023`, `System Requirements: 7, 8, 8.1, 10` which names no Windows 11 and contradicts the C++ floor of Windows 10 1809, and `Disk Space: 0 MB`, which is a placeholder nobody filled.
 > - **`Changes.txt` ranges from 10 lines to 632.** `Ownership` and `PixRepair` carry a single entry; `ComIntRep` carries 632 lines and `Firemin` 489. There is no shared idea of what a changelog entry is.

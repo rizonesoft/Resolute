@@ -13,7 +13,7 @@ track: M1
 > **Goal:** The AutoIt suite keeps working and keeps shipping for as long as the C++ rewrite takes, without becoming a second development effort. It is the specification and it is the product users currently have, and both of those need it to stay intact.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** The AutoIt suite is at `resolute_au3/` and ships today. It does **not** build from a clean checkout: all thirteen `.sni` descriptors hardcode `R:\Workspace\Resolute\...`, a directory that no longer exists. `SDK/Concrete/Rescue/` holds only a `Distribution/338/` build output with no source, left behind when that tool was removed. `SDK/Concrete/BiosCodes/Includes/Localization.au3.backup` is a stray file. `ReBar` declares a product page at `downloads/resolute/` although it is internal tooling. Framework-first sequencing means this suite ships for a long time yet, so it needs an owner rather than a freeze.
+> **Current state (verified 2026-09-16):** The AutoIt suite is at `resolute_au3/` and ships today. `Distro` and the AutoIt `SDK/` go with it: `Distro` is the `.sni` builder that CMake, Ninja, and the release scripts replace, and `SDK/` becomes frozen specification rather than maintained code. Neither is ported and neither has a C++ successor. It does **not** build from a clean checkout: all thirteen `.sni` descriptors hardcode `R:\Workspace\Resolute\...`, a directory that no longer exists. `SDK/Concrete/Rescue/` holds only a `Distribution/338/` build output with no source, left behind when that tool was removed. `SDK/Concrete/BiosCodes/Includes/Localization.au3.backup` is a stray file. `ReBar` declares a product page at `downloads/resolute/` although it is internal tooling. Framework-first sequencing means this suite ships for a long time yet, so it needs an owner rather than a freeze.
 
 ## Inputs
 
@@ -75,6 +75,8 @@ Without a written scope, every request to fix something in the AutoIt tree is ar
 - [ ] Write the scope: what will be fixed here, what will not, and why. Done when: it states that only defects affecting users of the shipping suite are in scope, and that the conformance campaign is not.
 - [ ] State explicitly that `resolute_au3/` is otherwise read-only, because it is the specification the ports are measured against. Done when: the statement is here and `AGENTS.md` agrees with it.
 - [ ] Write the retirement procedure: what happens to an AutoIt tool the day its C++ port ships. Done when: the procedure covers the update file, the download page, and the source, and names `D06 T01 §4` as the owner of the announcement.
+- [ ] Cover the tools that retire with **no successor**, which is a different case. Done when: `Distro` and `ReBar` are both named. `Distro` is the AutoIt `.sni` builder and is replaced by CMake, Ninja, and the release scripts rather than ported, so it ends when the last AutoIt tool does. `ReBar` does not retire so much as become the C++ framework. Neither gets a consolidation announcement, because neither had users to announce to.
+- [ ] Record what `Distro` contributed before it goes. Done when: this section notes that its `.sni` module model, meaning the Portable, Installation, and UpdateFile flags, is what `D06 T01 §1` reproduces as declarative release descriptors, so the concepts survive even though the tool does not.
 - [ ] Decide and record how a defect found in the AutoIt tree that also affects the port is handled. Done when: the answer is dated, and says which tree gets fixed first.
 - [ ] Commit: `"au3: maintenance scope and the retirement procedure"`
 

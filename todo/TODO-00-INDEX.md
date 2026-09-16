@@ -92,8 +92,8 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | Rescue Imaging | 05-new-tools | TODO written, GPL v3 port, frozen |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
-| ReBar | 01-framework | internal tooling, not a product |
-| Distro | 06-distro-release | internal tooling, not a product |
+| ReBar | 01-framework | **discontinued** as a tool; it becomes the C++ framework |
+| Distro | 09-au3-maintenance | **discontinued** with the AutoIt suite; the C++ build replaces it |
 | WinPower | 03-launcher | not taken in; the launcher replaces it |
 
 ---
