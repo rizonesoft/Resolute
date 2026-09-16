@@ -575,3 +575,35 @@ The toolchain stays fully repository-scoped and is **more** portable than the su
 - **4 sections ready:** `D00 T03 §1` (subtree merge), `D07 T01 §1` (conformance profile), `D09 T01 §1` and `§2` (AutoIt maintenance).
 
 `D00 T03` is the new front door: take the codebase in, rename it, correct its documentation. `D00 T01 §1` changed from building a bootstrap to hardening one. `D01 T01 §7` changed from building the standard surfaces to adopting the UI library and binding it to the settings and localization layers; `§8` changed from DPI and theme work, which Direct2D makes unnecessary, to extending the library with the result list, progress surface, and dialogs the repair tools need.
+
+## Decisions taken, round 9
+
+29. **`DESIGN.md` at the repository root is the permanent design contract.** Named for breadth: it governs colour tokens, the type ramp, the spacing grid, motion, iconography, window chrome, accessibility, performance, and content tone, which is more than "UX" suggests. It sits beside `AGENTS.md` as a peer contract and is updated by editing it, in a commit that also restakes the affected captures.
+30. **The contract binds through the existing Fidelity mechanism.** `todo/README.md` now points every `Fidelity:` block at `DESIGN.md`, with the captures under `docs/captures/house-style/` as its visual reference. **Where a capture and the contract disagree, the contract wins** and the capture is restaked. `D07 T01 §1` adopts it by reference rather than restating it, so there is one record rather than two that drift.
+31. **`AGENTS.md` carries the three overriding rules**: a tool never draws a control the shared library provides, never hardcodes a colour, size, or spacing value, and application icons are the one deliberate exception.
+
+## Gaps filled
+
+Three gaps were named at the end of the previous round. All three are now routed.
+
+**The test gap.** `D00 T02 §5` covers the inherited UI library: theme token resolution, the DPI layer's metrics at four scalings, each named easing at its endpoints, icon resolution, and the controls' non-visual logic. The library renders the launcher correctly today, which is evidence it works rather than evidence it keeps working, and fourteen tools are about to depend on it.
+
+**The UX roadmap.** `samples/ExoSuite/TODO-ux.md` holds 66 done and **101 open** items. `D01 T02` routes all of them across seven sections: tokens made unbypassable, the spacing grid with density and responsive layout, content virtualization, window chrome, the accessibility floor, the performance floor, and text presentation. Its Verification block requires every open item in that file to be shipped, routed, or marked superseded, so nothing is lost silently.
+
+**The stale README.** `D00 T03 §4` owns it, and also reconciles `TODO.md` and `TODO-ux.md` against this plan.
+
+### The largest gap the measurement exposed
+
+Every control in the suite is custom-drawn, and **not one of them reports anything to a screen reader.** The entire accessibility section of `TODO-ux.md` is open: 8 items, including UI Automation providers, Narrator announcements, reduced motion, and hit-target sizes.
+
+That is invisible to anyone not using assistive technology, which is exactly why it survived. `DESIGN.md` section 9 states it as a floor rather than an aspiration, and `D01 T02 §5` makes it true with a checkpoint that drives Narrator over every control and quotes what it said.
+
+---
+
+# Plan state after the design contract
+
+- **10 domains, 13 TODO files, 66 sections.**
+- `validate`: 0 fatal, 0 warning, 48 adjacency advisories. `plan --check`: current at 0 of 66.
+- `self-test`: 393 cases, 0 failed.
+
+Phase 1 now carries the design system alongside the framework and the repair contract. The acceptance bar gained a row: the suite is usable without a mouse or eyes, owned by `D01 T02 §5`.

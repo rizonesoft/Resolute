@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 58 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 66 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -32,22 +32,23 @@ process todo section: | [ ] | `D00 T03 §1` | Subtree merge with history preserv
 
 The finished suite is **fourteen Rizonesoft products that behave like one product**, each built by one command from a clean checkout on a machine with no Visual Studio, each checked by the same gates, each proven to do exactly what its AutoIt predecessor did, each storing settings through one writer, logging every action, speaking the user's language on every surface, refusing by name when it lacks a privilege, undoing every system change it makes or saying plainly that it cannot, rendering correctly at every DPI and in both appearances, and running standalone in an empty folder.
 
-| Aim                                 | Owned by                                                                 |
-| ----------------------------------- | ------------------------------------------------------------------------ |
-| A bare Windows machine can build it | `D00 T01 §1` (bootstrap) · `D00 T01 §4` (build)                          |
-| One command checks everything       | `D00 T01 §5` (all gates) · `D07 T01 §2` (ratchet)                        |
-| Proof is possible at all            | `D00 T02 §1` (harness) · `D00 T02 §2` (fixtures) · `D00 T02 §4` (parity) |
-| The port is genuinely 1:1           | `D00 T02 §4` (driver) · `D04 T01 §1`-`§5` (every port)                   |
-| One settings writer, one path       | `D01 T01 §2`                                                             |
-| Every tool leaves a trace           | `D01 T01 §3` · `D02 T01 §6`                                              |
-| Every surface speaks the language   | `D01 T01 §4` · `D08 T01 §2`                                              |
-| Elevation refused by name           | `D01 T01 §6` · `D02 T01 §1`                                              |
-| Every change has a reverse          | `D02 T01 §4` · `D04 T01 §2` · `D05 T01 §5`                               |
-| It looks like a 2026 application    | `D00 T03 §1` (the UI library) · `D01 T01 §7`-`§8` (adopt and extend it)  |
-| Each tool ships alone               | `D01 T01 §9` · `D07 T01 §1` · `D06 T01 §3`                               |
-| One suite, not fourteen products    | `D01 T01 §1` · `D02 T01 §1` · `D07 T01 §3`                               |
-| Retiring products tell their users  | `D06 T01 §4`                                                             |
-| What defines done is written down   | `D07 T01 §1`                                                             |
+| Aim                                  | Owned by                                                                     |
+| ------------------------------------ | ---------------------------------------------------------------------------- |
+| A bare Windows machine can build it  | `D00 T01 §1` (bootstrap) · `D00 T01 §4` (build)                              |
+| One command checks everything        | `D00 T01 §5` (all gates) · `D07 T01 §2` (ratchet)                            |
+| Proof is possible at all             | `D00 T02 §1` (harness) · `D00 T02 §2` (fixtures) · `D00 T02 §4` (parity)     |
+| The port is genuinely 1:1            | `D00 T02 §4` (driver) · `D04 T01 §1`-`§5` (every port)                       |
+| One settings writer, one path        | `D01 T01 §2`                                                                 |
+| Every tool leaves a trace            | `D01 T01 §3` · `D02 T01 §6`                                                  |
+| Every surface speaks the language    | `D01 T01 §4` · `D08 T01 §2`                                                  |
+| Elevation refused by name            | `D01 T01 §6` · `D02 T01 §1`                                                  |
+| Every change has a reverse           | `D02 T01 §4` · `D04 T01 §2` · `D05 T01 §5`                                   |
+| It looks like a 2026 application     | [`DESIGN.md`](../DESIGN.md) · `D01 T01 §7`-`§8` · `D01 T02` (the whole file) |
+| It is usable without a mouse or eyes | `D01 T02 §5` (the accessibility floor)                                       |
+| Each tool ships alone                | `D01 T01 §9` · `D07 T01 §1` · `D06 T01 §3`                                   |
+| One suite, not fourteen products     | `D01 T01 §1` · `D02 T01 §1` · `D07 T01 §3`                                   |
+| Retiring products tell their users   | `D06 T01 §4`                                                                 |
+| What defines done is written down    | `D07 T01 §1`                                                                 |
 
 ---
 
@@ -114,29 +115,37 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D09 T01 §1` | Make the AutoIt suite buildable again      |   4   |
 | [ ] | `D09 T01 §2` | Clear the housekeeping defects             |   5   |
 | [ ] | `D09 T01 §3` | Maintenance scope and retirement procedure |   5   |
+| [ ] | `D00 T02 §5` | Cover the inherited UI library             |   7   |
 
 
 ### Phase 1 -- The two shared layers
 
-The framework every tool consumes, and the repair contract the destructive half consumes. This is where roughly 21,000 lines of AutoIt duplication stop being reproduced. Nothing after this phase is affordable without it.
+The framework every tool consumes, the repair contract the destructive half consumes, and the design system that makes `DESIGN.md` true. This is where roughly 21,000 lines of AutoIt duplication stop being reproduced. Nothing after this phase is affordable without it.
 
-|  ✔  | Section      | Deliverable                                 | Items |
-| :-: | ------------ | ------------------------------------------- | :---: |
-| [ ] | `D01 T01 §1` | Application shell and lifecycle             |   6   |
-| [ ] | `D01 T01 §2` | Settings: one writer, one path              |   7   |
-| [ ] | `D01 T01 §3` | Logging and the log surface                 |   6   |
-| [ ] | `D01 T01 §4` | Localization and the pack loader            |   7   |
-| [ ] | `D01 T01 §5` | Update check and consolidation announcement |   7   |
-| [ ] | `D01 T01 §6` | Elevation and its refusal path              |   6   |
-| [ ] | `D01 T01 §7` | Standard window, About, and preferences     |   7   |
-| [ ] | `D01 T01 §8` | DPI awareness and system theme              |   6   |
-| [ ] | `D01 T01 §9` | Standalone proof in an empty folder         |   6   |
-| [ ] | `D02 T01 §1` | The repair item and the run loop            |   6   |
-| [ ] | `D02 T01 §2` | Diagnose before repair                      |   6   |
-| [ ] | `D02 T01 §3` | Per-item result and the surface             |   6   |
-| [ ] | `D02 T01 §4` | Restore record and undo                     |   7   |
-| [ ] | `D02 T01 §5` | Transcript the user can carry               |   5   |
-| [ ] | `D02 T01 §6` | One log line per action and per refusal     |   5   |
+|  ✔  | Section      | Deliverable                                  | Items |
+| :-: | ------------ | -------------------------------------------- | :---: |
+| [ ] | `D01 T01 §1` | Application shell and lifecycle              |   6   |
+| [ ] | `D01 T01 §2` | Settings: one writer, one path               |   7   |
+| [ ] | `D01 T01 §3` | Logging and the log surface                  |   6   |
+| [ ] | `D01 T01 §4` | Localization and the pack loader             |   7   |
+| [ ] | `D01 T01 §5` | Update check and consolidation announcement  |   7   |
+| [ ] | `D01 T01 §6` | Elevation and its refusal path               |   6   |
+| [ ] | `D01 T01 §7` | Standard window, About, and preferences      |   7   |
+| [ ] | `D01 T01 §8` | DPI awareness and system theme               |   6   |
+| [ ] | `D01 T01 §9` | Standalone proof in an empty folder          |   6   |
+| [ ] | `D02 T01 §1` | The repair item and the run loop             |   6   |
+| [ ] | `D02 T01 §2` | Diagnose before repair                       |   6   |
+| [ ] | `D02 T01 §3` | Per-item result and the surface              |   6   |
+| [ ] | `D02 T01 §4` | Restore record and undo                      |   7   |
+| [ ] | `D02 T01 §5` | Transcript the user can carry                |   5   |
+| [ ] | `D02 T01 §6` | One log line per action and per refusal      |   5   |
+| [ ] | `D01 T02 §1` | Tokens made unbypassable                     |   6   |
+| [ ] | `D01 T02 §2` | Spacing grid, density, and responsive layout |   7   |
+| [ ] | `D01 T02 §3` | Content area: virtualization and scrolling   |   6   |
+| [ ] | `D01 T02 §4` | Window chrome and shell integration          |   7   |
+| [ ] | `D01 T02 §5` | The accessibility floor                      |   8   |
+| [ ] | `D01 T02 §6` | Performance floor                            |   8   |
+| [ ] | `D01 T02 §7` | Text presentation and machine values         |   5   |
 
 
 ### Phase 2 -- The launcher and the ports

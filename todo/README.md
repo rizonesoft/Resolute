@@ -229,7 +229,9 @@ The frozen set as of this file: registry write and restore paths (`ReBar`), owne
 
 The freeze check has a visual twin. Resolute is not a clone of somebody else's product, so fidelity here means the **house style**: every tool in the suite looks and behaves like the rest of the suite, because they share one SDK.
 
-**Every section that builds or changes a user-facing surface carries a `Fidelity:` block** naming the house-style source it must match and the captured artifact(s) under `docs/captures/`:
+**Every section that builds or changes a user-facing surface carries a `Fidelity:` block** naming the house-style source it must match and the captured artifact(s) under `docs/captures/`.
+
+The binding rules live in [`DESIGN.md`](../DESIGN.md) at the repository root; the captures are its visual reference. Where a capture and the contract disagree, **the contract wins** and the capture is restaked. A `Fidelity:` block never restates a rule from the contract, it points at it:
 
 ```
 **Fidelity:** Resolute standard tool window (title band, GDI+ progress bar, status strip, About dialog) -- docs/captures/house-style/. Control order, spacing, font, and terminology match the capture; deviations only from the approved list.

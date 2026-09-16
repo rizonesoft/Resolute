@@ -13,6 +13,7 @@ It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoI
 | `src/` | The C++ suite. The work. |
 | `resolute_au3/` | The frozen AutoIt suite. **The executable specification**, not a maintenance target |
 | `resolute_au3/todo/` | The archived AutoIt plan, superseded 2026-09-16, kept for its per-tool analysis |
+| `DESIGN.md` | **The design contract.** Every user-facing surface is held to it |
 | `todo/` | The live execution plan; read `todo/README.md` before authoring or implementing |
 | `todo/implementation-plan.md` | Ordered execution plan synchronized through `scripts/todo-graph.py` |
 | `scripts/` | Neutral tooling: the TODO graph, validator, adjacency inspector |
@@ -78,8 +79,9 @@ A checkpoint citing a gate that does not exist yet is unfalsifiable and is not a
 - **One suite, one framework:** shared behavior is consumed from the framework or the repair contract, never reimplemented in a tool. A second progress bar, About dialog, settings writer, or log format is a defect.
 - **Elevation is checked at the action**, not only at startup.
 - **`resolute_au3/` is read-only** except under the maintenance domain. It is the specification. Changing it changes what the port is measured against.
+- **Every surface answers to [`DESIGN.md`](./DESIGN.md).** A tool never draws a control the shared library provides, and never hardcodes a colour, a size, or a spacing value. Application icons are the one deliberate exception.
 - **No em dashes** in authored prose. One line per paragraph and list item in Markdown.
-- **Source of truth:** target behavior via the `resolute_au3/` source and a driven run of the shipped tool, the house style via the captures under `docs/captures/`, plan state via `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
+- **Source of truth:** target behavior via the `resolute_au3/` source and a driven run of the shipped tool, the design rules via `DESIGN.md` with the captures under `docs/captures/` as its visual reference, plan state via `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
 
 ## Frozen behavior
 

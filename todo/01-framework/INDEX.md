@@ -9,6 +9,7 @@ The shared framework every tool consumes. Startup, settings, logging, localizati
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-framework-core.md) | Framework Core | draft |
+| [TODO-02](./TODO-02-design-system.md) | Design System | draft |
 
 ## Completed
 
@@ -22,6 +23,7 @@ The shared framework every tool consumes. Startup, settings, logging, localizati
 - One log format, the localization loader, and the update check
 - The standard window, About, preferences, DPI, and system theme
 - Proof that a tool runs standalone in an empty folder
+- The design system that makes `DESIGN.md` true and checkable
 
 ## Out of scope
 

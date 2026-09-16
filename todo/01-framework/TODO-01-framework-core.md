@@ -22,6 +22,7 @@ track: F1
 - -> XREF: [`00-workspace/TODO-01 §4`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the build this framework is the first real consumer of
 - -> XREF: [`00-workspace/TODO-02 §1`](../00-workspace/TODO-02-test-backbone.md) -- the harness these assertions run under
 - -> XREF: [`00-workspace/TODO-03 §3`](../00-workspace/TODO-03-codebase-intake.md) -- the UI library this framework adopts, renamed by that section
+- -> XREF: [`01-framework/TODO-02 §1`](./TODO-02-design-system.md) -- the design contract every surface here is held to
 - -> XREF: [`02-repair-contract/TODO-01 §1`](../02-repair-contract/TODO-01-repair-contract.md) -- the second layer, which sits on this one
 - -> XREF: [`03-launcher/TODO-01 §1`](../03-launcher/TODO-01-launcher.md) -- the launcher, this framework's first product consumer
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the ports, every one of which consumes this
@@ -199,7 +200,7 @@ This section is where those are added **to the library**, not to a tool. Getting
 **Fidelity:** the new controls against the existing library's visual language and `TODO-ux.md`, captured at four scalings and in both appearances.
 **Job:** a repair tool can show what it did, how far along it is, and what it is about to destroy, using controls the whole suite shares. Consumer: the rendered surfaces, and the repair contract that drives them.
 **Treatment:** every new surface added to the shared library. Cheaper substitute that fails the checkpoint: adding a result list to the first tool that needs one, which is how fourteen private progress bars happen.
-**Chrome:** extend `shared/resolute-ui`. No tool defines its own control.
+**Chrome:** extend `shared/resolute-ui`. No tool defines its own control. Every new control is held to [`DESIGN.md`](../../DESIGN.md).
 **Needs:** Windows host (build/test)
 
 - [ ] Add the result list control: one row per item with an outcome, a reason, and reconciling counts. Done when: a fixture set of mixed outcomes renders and the counts add up, captured.

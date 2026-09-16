@@ -20,6 +20,7 @@ track: Q1
 - [`docs/brainstorm/2026-09-16-completion-brainstorm.md`](../../docs/brainstorm/2026-09-16-completion-brainstorm.md) -- the measured conformance matrix the profile is derived from
 - -> XREF: [`00-workspace/TODO-01 §3`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the tidy baseline this domain ratchets
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the framework the profile mostly describes consuming correctly
+- -> XREF: [`01-framework/TODO-02 §1`](../01-framework/TODO-02-design-system.md) -- the design contract the conformance check enforces
 
 ## Outcome
 
@@ -48,6 +49,7 @@ track: Q1
 The document every other domain is measured against. It runs first because a bar written after the work is a description, not a standard.
 
 - [ ] Write the profile covering: consumes the framework, no private settings or log or localization code, settings in an `.ini` through the shared writer, one log line per action, every surface string from a pack, a documentation set, an update short name and file, an About page, DPI correct at four scalings, both appearances, and standalone in an empty folder. Done when: every clause is stated so that a check could evaluate it.
+- [ ] Adopt [`DESIGN.md`](../../DESIGN.md) by reference rather than restating it. Done when: the profile names the contract as the source for every visual and interaction clause, and the check evaluates against it. Cheaper substitute: copying the design rules into the profile, which creates a second record that drifts.
 - [ ] Add the clauses that apply only to a repair tool: consumes the repair contract, records prior state, verifies by read-back, and has a reverse or says it does not. Done when: the profile distinguishes the two tool kinds.
 - [ ] Require standalone-ness explicitly. Done when: the profile states that a built tool alone in an empty directory must start, localize, show About, and check for updates.
 - [ ] Make each clause cite its owner section. Done when: every clause names the section that implements it, so a failure has an address.
