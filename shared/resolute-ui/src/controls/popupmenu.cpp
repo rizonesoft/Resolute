@@ -245,7 +245,7 @@ WORD PopupMenu::Show(HWND parent, POINT screenPt,
         wc.hInstance      = GetModuleHandleW(nullptr);
         wc.hCursor       = LoadCursorW(nullptr, IDC_ARROW);
         wc.hbrBackground = CreateSolidBrush(RGB(30, 30, 30));
-        wc.lpszClassName = L"ExoPopupMenu";
+        wc.lpszClassName = L"ResolutePopupMenu";
         RegisterClassExW(&wc);
         s_classRegistered = true;
     }
@@ -270,7 +270,7 @@ WORD PopupMenu::Show(HWND parent, POINT screenPt,
 
     HWND popup = CreateWindowExW(
         WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-        L"ExoPopupMenu", nullptr, WS_POPUP,
+        L"ResolutePopupMenu", nullptr, WS_POPUP,
         screenPt.x, screenPt.y, sz.cx, sz.cy,
         parent, nullptr, GetModuleHandleW(nullptr), &data);
     if (!popup) return 0;

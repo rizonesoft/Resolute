@@ -45,7 +45,7 @@ struct ListColumn {
 struct ListItem {
     std::vector<std::wstring> cells;
     HICON icon = nullptr;     // Win32 icon (shell, app, file type)
-    std::wstring category;    // EXOEXT category for sidebar filtering
+    std::wstring category;    // RESEXT category for sidebar filtering
 };
 
 // ── Item Provider Callback ──────────────────────────────────

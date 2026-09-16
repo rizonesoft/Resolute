@@ -31,11 +31,11 @@ void StatusBar::Create(HWND parent, HINSTANCE hInst, int id) {
     wc.lpfnWndProc   = StatusProc;
     wc.hInstance     = hInst;
     wc.hCursor       = LoadCursorW(nullptr, IDC_ARROW);
-    wc.lpszClassName = L"ExoStatusBar";
+    wc.lpszClassName = L"ResoluteStatusBar";
     RegisterClassExW(&wc);
 
     m_hwnd = CreateWindowExW(
-        0, L"ExoStatusBar", nullptr,
+        0, L"ResoluteStatusBar", nullptr,
         WS_CHILD | WS_VISIBLE,
         0, 0, 800, BASE_HEIGHT,
         parent, reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),

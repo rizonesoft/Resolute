@@ -25,9 +25,9 @@ enum CtrlId : int {
 };
 
 // ── Extension Discovery ─────────────────────────────────────
-// Scans System/*.exe for embedded EXOEXT RCDATA resources.
+// Scans System/*.exe for embedded RESEXT RCDATA resources.
 // Each extension is a self-describing executable — no external
-// config files, no registry. Drop an .exe with EXOEXT, done.
+// config files, no registry. Drop an .exe with RESEXT, done.
 #include <shellapi.h>
 #include <string>
 #pragma comment(lib, "shell32.lib")
@@ -111,8 +111,8 @@ static void ScanExtensions() {
             LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
         if (!hMod) continue;
 
-        // Look for EXOEXT RCDATA resource
-        HRSRC hRes = FindResourceW(hMod, L"EXOEXT", RT_RCDATA);
+        // Look for RESEXT RCDATA resource
+        HRSRC hRes = FindResourceW(hMod, L"RESEXT", RT_RCDATA);
         if (!hRes) {
             FreeLibrary(hMod);
             continue;  // Not a Resolute extension
@@ -123,7 +123,7 @@ static void ScanExtensions() {
         const char* json = static_cast<const char*>(LockResource(hData));
 
         if (json && resSize > 0) {
-            // Parse EXOEXT metadata
+            // Parse RESEXT metadata
             std::wstring name   = JsonStr(json, resSize, "name");
             std::wstring desc   = JsonStr(json, resSize, "description");
             std::wstring ver    = JsonStr(json, resSize, "version");
@@ -138,7 +138,7 @@ static void ScanExtensions() {
             item.icon = hIcon;
             item.category = cat;
             item.cells = {
-                name.empty() ? std::wstring(fd.cFileName) : name,  // Name (from EXOEXT)
+                name.empty() ? std::wstring(fd.cFileName) : name,  // Name (from RESEXT)
                 desc.empty() ? cat : desc,     // Description
                 ver.empty() ? L"—" : ver,      // Version
                 FormatSize(fd.nFileSizeHigh, fd.nFileSizeLow),  // Size
@@ -395,7 +395,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     }
 
     // ── Tab Cycling ─────────────────────────────────────────
-    case WM_EXOTAB: {
+    case WM_RESUI_TAB: {
         int fromId = static_cast<int>(wp);
         bool backward = (lp != 0);
 
@@ -557,7 +557,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
             HWND focused = GetFocus();
             bool backward = (msg.wParam == VK_TAB &&
                              (GetKeyState(VK_SHIFT) & 0x8000));
-            SendMessageW(hwnd, WM_EXOTAB,
+            SendMessageW(hwnd, WM_RESUI_TAB,
                 static_cast<WPARAM>(GetDlgCtrlID(focused)),
                 backward ? 1 : 0);
             continue;

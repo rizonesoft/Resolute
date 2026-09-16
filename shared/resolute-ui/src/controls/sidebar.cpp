@@ -82,11 +82,11 @@ void Sidebar::Create(HWND parent, HINSTANCE hInst, int id) {
     wc.lpfnWndProc   = SidebarProc;
     wc.hInstance     = hInst;
     wc.hCursor       = LoadCursorW(nullptr, IDC_HAND);
-    wc.lpszClassName = L"ExoSidebar";
+    wc.lpszClassName = L"ResoluteSidebar";
     RegisterClassExW(&wc);
 
     m_hwnd = CreateWindowExW(
-        0, L"ExoSidebar", nullptr,
+        0, L"ResoluteSidebar", nullptr,
         WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_TABSTOP,
         0, 0, BASE_WIDTH, 400,
         parent, reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),
@@ -1074,7 +1074,7 @@ LRESULT CALLBACK Sidebar::SidebarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
             [[fallthrough]];
         case VK_TAB: {
             LPARAM shift = (wp == VK_TAB && (GetKeyState(VK_SHIFT) & 0x8000)) ? 1 : 0;
-            SendMessageW(self->m_parent, WM_EXOTAB,
+            SendMessageW(self->m_parent, WM_RESUI_TAB,
                 reinterpret_cast<WPARAM>(hwnd), shift);
             return 0;
         }

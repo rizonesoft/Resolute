@@ -51,7 +51,7 @@ track: W1
 | :---: | :-----: | ------------------------------------ | ---------- | :----: |
 |   1   |   §1    | Subtree merge with history preserved | --         |  [x]   |
 |   2   |   §2    | Rename the product to Resolute       | §1         |  [x]   |
-|   3   |   §3    | Rename the library and the toolchain | §2         |  [ ]   |
+|   3   |   §3    | Rename the library and the toolchain | §2         |  [x]   |
 |   4   |   §4    | Correct the stale documentation      | §3         |  [ ]   |
 
 ---
@@ -299,6 +299,13 @@ The count grows with every tool that includes a header. This is the cheapest thi
 - [x] Commit: `"intake: rename the ui library and the toolchain"`
 
 **Test checkpoint:** The tree builds after the rename, both presets, and `git grep -iE "exo::|EXOUI_API|exo/|exo-ui|ExoUI|exokit|ExoKit"` returns **no hits** under `src/`, `shared/`, `extensions/`, `scripts/`, `reskit/`, `CMakeLists.txt`, and `CMakePresets.json`. `pwsh scripts/bootstrap.ps1` bootstraps the toolchain from the repository root and a second run downloads nothing. `shared/exo-ui/` and `exokit/` no longer exist as paths. The rebuilt artifacts are compared against the three fingerprints recorded above and every difference is explained by a named cause. `todo-claims.py` passes, which it cannot do unless the claims naming `shared/exo-ui/` and `exokit/` were updated with the rename.
+
+> **Verified:** 2026-09-17 | §3 | `git grep -inE "[A-Za-z_]*exo[A-Za-z_]*"` over `src shared extensions scripts reskit CMakeLists.txt CMakePresets.json` returns **none** · `shared/exo-ui` and `exokit` no longer exist · both presets build 52/52 · exported symbols: 213 `_ZN3rui`, 0 `_ZN3exo`, 1429 total, so the instrument demonstrably reads something · **driven run**: window created titled `Resolute` with child classes `ResoluteListView`, `ResoluteSidebar`, `ResoluteStatusBar`, `ResoluteToolbar` live · `pwsh scripts/bootstrap.ps1` runs from the repository root, 3 SKIP, 0.6s · all three artifacts identical in size to the pre-rename fingerprints recorded before the rename began
+> **Review:** round 1, candidate `68c7ea9` plus the follow-up fix -- `adversarial` approve · `consistency` approve after fix (1) · `integration` approve · `source-defect` approve · `design` advisory · `record` approve. Raw findings: docs/reviews/00-workspace/D00-T03-s3.md
+> **Independent:** `codex review --commit 68c7ea9` (gpt-6-astra, high) found **no actionable regressions** and confirmed the rename applies consistently across CMake targets, export macros, includes, and toolchain paths. It did not find F1 and said plainly it did not rebuild or run the application. Both misses share a shape: the surviving identifiers sit on lines that are internally consistent, so only a search for the old prefix in any spelling finds them.
+> **CRUD:** not applicable (this section renames identifiers and paths and writes no user-facing data)
+> **Duration:** 10
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## 4. Correct the Stale Documentation
 

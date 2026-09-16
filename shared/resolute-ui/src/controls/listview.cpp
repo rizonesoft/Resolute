@@ -86,10 +86,10 @@ void ListView::Create(HWND parent, HINSTANCE hInst, int id) {
     wc.lpfnWndProc = ListViewProc;
     wc.hInstance = hInst;
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    wc.lpszClassName = L"ExoListView";
+    wc.lpszClassName = L"ResoluteListView";
     RegisterClassExW(&wc);
 
-    m_hwnd = CreateWindowExW(0, L"ExoListView", nullptr,
+    m_hwnd = CreateWindowExW(0, L"ResoluteListView", nullptr,
         WS_CHILD | WS_VISIBLE | WS_TABSTOP,
         0, 0, 400, 400, parent,
         reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),

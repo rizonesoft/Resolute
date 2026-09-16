@@ -47,11 +47,11 @@ void Toolbar::Create(HWND parent, HINSTANCE hInst, int id) {
     wc.lpfnWndProc   = ToolbarProc;
     wc.hInstance     = hInst;
     wc.hCursor       = LoadCursorW(nullptr, IDC_HAND);
-    wc.lpszClassName = L"ExoToolbar";
+    wc.lpszClassName = L"ResoluteToolbar";
     RegisterClassExW(&wc);
 
     m_hwnd = CreateWindowExW(
-        0, L"ExoToolbar", nullptr,
+        0, L"ResoluteToolbar", nullptr,
         WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_TABSTOP,
         0, 0, 800, BASE_HEIGHT,
         parent, reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),
@@ -826,7 +826,7 @@ LRESULT CALLBACK Toolbar::ToolbarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         case VK_ESCAPE:
         case VK_TAB: {
             LPARAM shift = (wp == VK_TAB && (GetKeyState(VK_SHIFT) & 0x8000)) ? 1 : 0;
-            SendMessageW(self->m_parent, WM_EXOTAB,
+            SendMessageW(self->m_parent, WM_RESUI_TAB,
                 reinterpret_cast<WPARAM>(hwnd), shift);
             return 0;
         }

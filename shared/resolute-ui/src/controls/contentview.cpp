@@ -18,12 +18,12 @@ void ContentView::Create(HWND parent, HINSTANCE hInst, int id) {
     wc.lpfnWndProc   = ContentProc;
     wc.hInstance      = hInst;
     wc.hCursor        = LoadCursorW(nullptr, IDC_ARROW);
-    wc.lpszClassName  = L"ExoContentView";
+    wc.lpszClassName  = L"ResoluteContentView";
     RegisterClassExW(&wc);
 
     m_hwnd = CreateWindowExW(
         WS_EX_TRANSPARENT,  // click-through when nothing visible
-        L"ExoContentView", nullptr,
+        L"ResoluteContentView", nullptr,
         WS_CHILD | WS_VISIBLE,
         0, 0, 400, 400,
         parent, reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),
