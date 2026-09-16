@@ -62,6 +62,7 @@ A claim protects a figure somebody thought to record. Nothing protects the rest,
 - [ ] Detect a block whose cited files have changed since its stated verification date. Done when: a deliberately aged block is reported and a current one is not, both driven.
 - [ ] Distinguish suspect from wrong. Done when: the output says a block **may** be stale because its sources moved, rather than asserting it is, because the check cannot read prose.
 - [ ] Make coverage ratchet rather than threshold. Done when: coverage may not fall below its recorded value, and raising the floor is a recorded decision. Cheaper substitute that fails the checkpoint: requiring full coverage immediately, which produces a hundred claims written to satisfy a check rather than to record a measurement.
+- [ ] Sync the plan's **Items** column, which `plan --sync` does not touch today. Found 2026-09-16 while processing `D00 T03 §1`: the row read 6 items against an actual 11, and `plan --check` passed, because parity is enforced on boxes and status but not on counts. Done when: the count is derived rather than typed, and a stale count fails `plan --check` like any other parity failure.
 - [ ] Wire into `scripts/check-all.ps1`. Done when: a stale claim or a fallen coverage floor fails the combined gate.
 - [ ] Commit: `"self-correction: report a current-state block whose sources moved"`
 

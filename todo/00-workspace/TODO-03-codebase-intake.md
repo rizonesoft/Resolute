@@ -13,12 +13,18 @@ track: W1
 > **Goal:** The working C++23 codebase at `samples/ExoSuite` becomes the Resolute C++ tree: history preserved, product renamed, library and toolchain renamed, and the stale documentation corrected. After this file, `src/` is real and the rest of the plan builds on something that already compiles.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1.39 MB fully static. There is **no vcpkg**; `deps/libvterm` is vendored. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
+> **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files, and is the tree's only external dependency. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1,423,872 bytes, 1.36 MiB, fully static. There is **no vcpkg**. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
 >
 > <!-- claim: exists samples/ExoSuite/shared/exo-ui/include/exo/theme.h -->
 > <!-- claim: exists samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1 -->
 > <!-- claim: lines samples/ExoSuite/src/main.cpp = 573 -->
 > <!-- claim: count "llvm-mingw" samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1 = 4 -->
+>
+> **Corrected 2026-09-16** during `§1` validation, three claims in the paragraph above were wrong:
+>
+> - It said `deps/libvterm` **is vendored** in one sentence and **is a git submodule** in another. It is a submodule, and it is staged but **not committed** in the local checkout, so it is in neither the remote nor this repository.
+> - It said the executable is **1.39 MB**. It is 1,423,872 bytes, which is 1.36 MiB.
+> - The `shared/exo-ui` figure of 6,865 lines was measured on the **local working tree**, which carries ten source files the remote does not have. The remote's copy is materially smaller and older.
 
 ## Inputs
 
@@ -52,20 +58,48 @@ track: W1
 
 ## 1. Subtree Merge With History Preserved
 
+> **Started:** 2026-09-16T21:47:21Z
+
 `exo-ui` is about to become the foundation of fourteen tools. How it got to be the shape it is will matter, and it is recoverable now and never again once the embedded repositories are discarded.
+
+> [!CAUTION]
+> **Blocked 2026-09-16: the remote is materially behind the local checkout, and merging from it would destroy work.**
+>
+> This section instructed "add the remotes, do not use the local checkouts". Validation found that instruction is unsafe as written. `samples/ExoSuite` carries **54 uncommitted entries** against `origin/main`:
+>
+> | Not in the remote at all | Why it matters |
+> | --- | --- |
+> | `extensions/Console/` | The entire Console extension, 1,762 lines. `§1` claims to preserve it in history, and the history does not have it |
+> | `TODO-ux.md` | 66 done and 101 open UX items. `DESIGN.md` is derived from it and `D01 T02 §1` opens the file that routes all 101 of them |
+> | Ten `shared/exo-ui` files | `animation`, `contentview`, `listview`, `popupmenu`, `typography`, headers and sources |
+> | `docs/`, `todo/`, `installers/`, `resources/application.ico` | Including two of the six collisions this section plans to resolve |
+>
+> Twenty further tracked files are **modified** locally, including `src/main.cpp`, `src/ExoSuite.rc`, and most of `exo-ui`: `sidebar`, `statusbar`, `toolbar`, `export`, `icons`, `render`, `theme`, and `lucide`. `.gitmodules`, `deps/libvterm`, and the `extensions/regstudio` to `extensions/RegStudio` rename are **staged and uncommitted**.
+>
+> A merge from `exosuite/main` today produces an older, smaller codebase missing Console, missing the UX standard the design contract is built on, and missing a third of the UI library.
+>
+> **This is an operator decision, not an implementation choice.** The options are recorded in the item below. Nothing in this section may run until one is taken, because the failure is silent: the merge succeeds and the loss is only visible later.
 
 
 **Build order.** Do these in order; a wrong order costs history that cannot be recovered afterwards.
 
 1. **Back out a safety branch first.** `git branch pre-intake` on `master`. Done when: `git branch --list pre-intake` prints it, so every later stage is revertable with one command.
-2. **Add the remotes, do not use the local checkouts.** `git remote add exosuite https://github.com/rizonesoft/ExoSuite.git` and the same for `regstudio`. Done when: `git fetch exosuite` and `git fetch regstudio` both succeed.
-3. **Merge ExoSuite first**, because RegStudio's authoritative copy is decided against what it brings. `git subtree add --prefix=. exosuite master` is wrong here: use a staging prefix, then move, because a root-prefix subtree collides. Done when: the tree lands and `git log -- shared/` shows `efdce6177`.
-4. **Resolve the six collisions** from the table below, one commit each. Done when: `git status` is clean and no file from the incoming tree has overwritten a repository file unexamined.
+2. **Add the remotes.** `git remote add exosuite https://github.com/rizonesoft/ExoSuite.git` and the same for `regstudio`. Done when: `git fetch exosuite` and `git fetch regstudio` both succeed. **Corrected 2026-09-16:** the original wording, "do not use the local checkouts", is unsafe while the precondition above is open, because the remote does not carry what the local checkout has.
+3. **Merge ExoSuite first**, because RegStudio's authoritative copy is decided against what it brings. **Corrected 2026-09-16:** the branch is `main`, not `master`, and the mechanism is `git merge --allow-unrelated-histories exosuite/main`, **not** `git subtree`. Proven by experiment on a throwaway branch: a plain merge lands the tree at the root directly, needs no staging prefix and no move, and `git log -- shared/` shows `efdce61` and `09b1f92` afterwards. `git subtree` was specified to avoid a root-prefix collision that does not occur, and it would additionally establish an ongoing subtree relationship this one-time intake does not want. Done when: the tree lands and `git log -- shared/` shows `efdce6177`.
+4. **Resolve the conflicts** from the table below. **Corrected 2026-09-16:** a merge conflicts on **three** files, not six: `.gitattributes`, `.gitignore`, and `README.md`. The other three entries are not git conflicts. `docs/extensions.md` and `todo/extensions/TODO-Console.md` are untracked in the source and so arrive only if the precondition above is resolved by committing them; `build/` is ignored on both sides. Done when: `git status` is clean and no file from the incoming tree has overwritten a repository file unexamined.
 5. **Merge RegStudio**, then delete the duplicate under `extensions/`. Done when: exactly one RegStudio tree exists and `git log` over it shows `c9b8a0b`.
 6. **Retire Console and the `libvterm` submodule** per the item below. Done when: `.gitmodules` is empty or gone and `git clone` without `--recursive` builds.
 7. **Confirm `samples/` never enters the index.** Done when: `git ls-files samples` is empty.
 
-- [ ] Take `ExoSuite` in through `git subtree`, **from its remote rather than a local path**, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`, and the merge is reproducible on a machine with no local checkout.
+- [ ] **Resolve the precondition above before merging anything.** Done when: one option is taken and recorded here, with its date.
+
+  | Option | What it costs |
+  | --- | --- |
+  | **A. Commit and push the local ExoSuite work first**, then merge from the remote as planned | The operator's call on their own repository. Preferred: the preserved history is then complete, which is the entire point of this section |
+  | **B. Merge from the local repository path** instead of the remote | Keeps the uncommitted work only if it is committed locally first; untracked files still do not travel through a merge |
+  | **C. Merge from the remote, then copy the missing work over** | Lands it without its history, which contradicts this file's Goal and its `audit` adjacency |
+
+- [ ] Take `ExoSuite` in with `git merge --allow-unrelated-histories`, landing its tree at the repository root alongside `resolute_au3/`. Done when: `git log -- shared/` shows commits predating the merge, including `efdce6177` and `09b1f92ab`, and the merge is reproducible from a clean clone.
 - [ ] Resolve the six measured root collisions, each deliberately rather than by whichever side git picks. Done when: each is handled as below and none is left as a merge artifact.
 
   | Collision | Resolution |
@@ -98,7 +132,7 @@ track: W1
 - [ ] Record what was merged, from which remote, and at which commit. Done when: each subtree names its remote URL and source commit, so the merge can be repeated or audited later.
 - [ ] Commit: `"intake: merge the exosuite codebase with its history"`
 
-**Test checkpoint:** `git log -- shared/` shows pre-merge commits including `efdce6177`, and the merge is reproduced on a machine with no local `samples/` checkout. `git ls-files samples` is empty and no embedded-repository warning appears. A full bootstrap and build leaves `git status` clean. Each subtree's remote and source commit are quoted.
+**Test checkpoint:** The precondition above is resolved and the chosen option is recorded with its date. `git log -- shared/` shows pre-merge commits including `efdce6177` and `09b1f92ab`. `extensions/Console/`, `TODO-ux.md`, and the ten `shared/exo-ui` files named above are all present after the merge, each confirmed by path, because their absence is the failure this section nearly shipped. `git ls-files samples` is empty and no embedded-repository warning appears. A full bootstrap and build leaves `git status` clean. Each merge's source remote and commit are quoted.
 
 ## 2. Rename the Product to Resolute
 

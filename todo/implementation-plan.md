@@ -95,7 +95,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 
 |  ✔  | Section      | Deliverable                                    | Items |
 | :-: | ------------ | ---------------------------------------------- | :---: |
-| [ ] | `D00 T03 §1` | Subtree merge with history preserved           |   6   |
+| [ ] | `D00 T03 §1` | Subtree merge with history preserved           |  11   |
 | [ ] | `D00 T03 §2` | Rename the product to Resolute                 |   5   |
 | [ ] | `D00 T03 §3` | Rename the library and the toolchain           |   5   |
 | [ ] | `D00 T03 §4` | Correct the stale documentation                |   5   |
