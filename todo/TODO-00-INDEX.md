@@ -128,6 +128,9 @@ Every shipped tool lives at `extensions/<Tool>/` and builds as its own standalon
 | Audio Devices | 05-new-tools | TODO written, new |
 | Colour Profiles | 05-new-tools | TODO written, new |
 | Software Inventory | 05-new-tools | TODO written, new |
+| Printer Manager | 05-new-tools | TODO written, new |
+| Search Manager | 05-new-tools | TODO written, new |
+| Scheduled Task Manager | 05-new-tools | TODO written, new, frozen |
 | RegStudio | 05-new-tools | TODO written, intake, frozen once shipped |
 | Console | -- | **dropped**, see `D00 T03 §1`; source preserved in history |
 | ReBar | 01-framework | **discontinued** as a tool; it becomes the C++ framework |

@@ -32,6 +32,7 @@ track: P3
 - A user can stop a specific Windows update from installing, and have it stay stopped.
 - A machine whose Explorer crashes can find the culprit without disabling extensions by hand.
 - The configuration surfaces Windows hides behind policy editors and command lines have interfaces.
+- Printing, search, and scheduled tasks have interfaces that explain a failure rather than restarting a service and hoping.
 - Every change made by a tool in this file is recorded and reversible.
 
 **Adjacency:** list=applicable @ D05 T07 §1; document=applicable @ D05 T07 §8; settings=applicable @ D05 T07 §6; reporting=applicable @ D05 T07 §2; notifications=applicable @ D05 T07 §1; permissions=applicable @ D05 T07 §3; audit=applicable @ D05 T07 §3; exchange=applicable @ D05 T07 §7; reverse=applicable @ D05 T07 §6
@@ -50,6 +51,7 @@ track: P3
 |   6   |   §6    | Environment, Features, Power, and Locale          | D02 T01 §4     |  [ ]   |
 |   7   |   §7    | Network Configuration Tools                       | D02 T01 §4     |  [ ]   |
 |   8   |   §8    | Files, Boot, Audio, and Inventory                 | D02 T01 §4     |  [ ]   |
+|   9   |   §9    | Printing, Search, and Scheduled Tasks             | D02 T01 §4, D05 T01 §5 |  [ ]   |
 
 ---
 
@@ -220,6 +222,31 @@ Nine smaller tools, grouped because each is one surface over one thing, and sepa
 
 **Test checkpoint:** Each link type is created and identified and a broken link is reported. The permissions preview lists every change before applying and is undoable. Matching and mismatching hashes are both reported clearly. Long path is set, verified, and the opt-in requirement stated. Boot, page file, audio, and colour changes each verify by read-back. The inventory matches the system and feeds the System Report.
 
+## 9. Printing, Search, and Scheduled Tasks
+
+Three surfaces where Windows ships an interface so poor that the usual advice is to avoid it. Printing is split across three separate places, Task Scheduler is legendarily unusable, and search failure is a top-ranked complaint with no interface that explains it.
+
+**Fidelity:** each tool's surface, against `DESIGN.md` and `docs/captures/house-style/`.
+**Job:** a user whose printer will not print, whose search finds nothing, or who needs to see and edit a scheduled task can do so without three Control Panel pages or a management console. Consumer: the print subsystem, the index, and the task store, each read back after any change.
+**Treatment:** each tool diagnoses before it offers to change anything, because all three of these fail for several unrelated reasons and a blind fix is as likely to make things worse. Cheaper substitute that fails the checkpoint: a restart-the-service button labelled as a repair, which is the whole of most published printing advice.
+**Chrome:** consume the framework and the repair contract. Take scheduled-task enumeration from `D05 T01 §5` rather than writing a second one.
+**Needs:** Windows host (build/test)
+
+- [ ] Build `extensions/PrinterManager/`: printers, queues, drivers, and ports in one place, with the stuck-job case handled. Done when: a stuck queue is cleared, verified by reading the queue back, and the spooler restart it needs is part of the operation rather than a separate instruction.
+- [ ] Diagnose why a printer will not print across its real causes: spooler state, driver, port, offline status, and a queue blocked by one failed job. Done when: a fixture failure in each category is attributed correctly and names the failing step.
+- [ ] Remove a printer and its driver together. Done when: removal takes the queue, the printer, and the driver package, and a driver still in use by another printer is refused by name.
+- [ ] Build `extensions/SearchManager/`: index status, size, what is indexed, and what is excluded. Done when: each renders and a machine mid-rebuild reports progress rather than appearing broken.
+- [ ] Answer the question users actually ask, which is why a specific file is not found. Done when: a file outside the indexed locations, one excluded by type, and one in a location the indexer cannot read are each diagnosed distinctly.
+- [ ] Rebuild the index as a repair-contract item, stating what it costs. Done when: the confirmation says search will be incomplete until the rebuild finishes and gives an estimate, because a silent multi-hour rebuild is how a repair looks like a break.
+- [ ] Build `extensions/TaskManager/` over scheduled tasks: view, create, edit, enable, and disable, with the triggers and conditions Task Scheduler buries. Done when: a task is created, its trigger fires, and editing it verifies by reading the task back.
+- [ ] Make every task change a contract item. Done when: undo restores the task definition exactly, asserted against a fixture task.
+- [ ] Flag tasks that look wrong. Done when: a task running from a temporary directory, or one whose executable no longer exists, is flagged with its reasoning.
+- [ ] Commit: `"printer, search, and scheduled task managers"`
+
+**Freeze check:** What `TaskManager` writes to a task definition is frozen once shipped, because a malformed definition can stop a task a machine depends on. Evidence is a fixture task round-tripped through edit and undo, compared field by field. Fixture source: `tests/fixtures/tasks/`.
+
+**Test checkpoint:** A stuck print queue is cleared and verified by read-back. A fixture printing failure in each category is attributed correctly. Driver removal refuses a driver still in use, by name. Index status renders and a rebuild reports progress. Three distinct not-found causes are diagnosed distinctly. A created task's trigger fires and editing verifies by read-back. Undo restores a task definition exactly, asserted. A task running from a temporary directory is flagged.
+
 ## Verification
 
 - [ ] `pwsh scripts/check-all.ps1` exits 0 with every suite in this file reporting
@@ -227,5 +254,5 @@ Nine smaller tools, grouped because each is one surface over one thing, and sepa
 - [ ] Every tool that changes the system does so through the repair contract, with a working undo
 - [ ] No tool here exports a secret in bulk, proven by search
 - [ ] Every change that weakens security, or that could break the connection it is made over, is stated before it is applied
-- [ ] Every freeze check in this file ran and passed, covering recovery drive creation, network changes, and boot entries
+- [ ] Every freeze check in this file ran and passed, covering recovery drive creation, network changes, boot entries, and task definitions
 - [ ] `python scripts/todo-graph.py validate` clean
