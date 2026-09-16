@@ -24,6 +24,9 @@ track: W1
 <!-- claim: count "def collect_unterminated" scripts/todo-claims.py = 1 -->
 <!-- claim: count "def _sync_items_cell" scripts/todo-graph.py = 1 -->
 <!-- claim: count "def _plan_items" scripts/todo-graph.py = 1 -->
+<!-- claim: exists scripts/todo-findings.py -->
+<!-- claim: count "def render_ledger" scripts/todo-findings.py = 1 -->
+<!-- claim: count "def _ignored" scripts/todo-claims.py = 1 -->
 
 ## Inputs
 
@@ -90,16 +93,50 @@ A claim protects a figure somebody thought to record. Nothing protects the rest,
 
 ## 2. The Review-Finding Ledger
 
-Both reviewers, the independent `codex review` and `review-todo-section`, produce findings that vanish once the section is stamped. A defect class found five times across five sections should have become a check after the second.
+> **Started:** 2026-09-16T23:17:19Z
 
-- [ ] Record every review finding in `docs/reviews/findings.md` with its section, its category, and what was done about it: fixed, refuted, or filed. Done when: a section's findings are recorded as part of its stamp rather than in prose that scrolls away.
-- [ ] Use a small closed category set, and record it. Done when: the categories exist, and anything that does not fit gets a new one by decision rather than by invention at the point of writing.
-- [ ] **Make a repeat a trigger.** Done when: the second finding in one category raises the question of what check would have caught it, and the answer is recorded even when the answer is that no cheap check exists.
-- [ ] Report the pattern. Done when: `scripts/todo-claims.py --findings` or an equivalent prints counts per category, so the shape is visible without reading every stamp.
-- [ ] Record what the ledger cannot do. Done when: it states that a category count is a signal rather than a verdict, because an early category is often just the first section touching that area.
-- [ ] Commit: `"self-correction: a ledger of what review keeps finding"`
+A defect class found five times across five sections should have become a check after the second.
 
-**Test checkpoint:** A fixture set of findings is recorded with section, category, and disposition. A second finding in one category triggers the recorded question and the answer is present. The per-category report prints counts. The ledger's stated limits are written.
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Three corrections.**
+>
+> **The premise is half stale.** This section said findings "vanish once the section is stamped". They did when it was written; they do not now. `review-todo-section` writes a findings file per section, and five exist under `docs/reviews/00-workspace/` carrying **16 finding headings**. What is missing is not the record, it is the **aggregation**: nothing reads across those files, so a category repeating is still invisible.
+>
+> **`docs/reviews/findings.md` as a hand-maintained file would be the defect this project keeps hitting.** A second place to write a finding is a second source of truth, and it drifts exactly like a figure duplicated in prose. **Decided 2026-09-17: the ledger is derived, never typed.** The per-section findings files stay authoritative and a tool reads across them. Cost of changing: the tool parses one heading format, so a different format means rewriting the parser rather than the data.
+>
+> **The heading format is emergent and not yet a convention.** Measured across the five files: 16 headings, of which **3 carry no category** (`F2 -- the build is not reproducible -- FILED to D07 T01`, `F1-F4 -- raised by the independent review ...`, `F3 -- ... -- routed, not a defect`). A derived ledger has to report a heading it cannot parse rather than skip it, or the same silence that hid the split claims in `§1` returns here.
+>
+> **The tool is a new script, not a flag on an existing one.** `todo-claims.py` re-measures claims and `todo-graph.py` owns the plan graph; a findings ledger is neither. `scripts/todo-findings.py`, which this section's item allows as "an equivalent".
+
+- [x] **Derive** the ledger from the per-section findings files rather than maintaining a second copy. **Corrected 2026-09-17:** the item named `docs/reviews/findings.md` as a place to *record* findings, which would make two homes for one fact. Done when: `scripts/todo-findings.py` reads every `docs/reviews/**/D*-T*-s*.md`, extracts each finding's section, number, summary, category, and disposition, and writes `docs/reviews/findings.md` as **generated output carrying a do-not-edit header**. Cheaper substitute that fails the checkpoint: a hand-written ledger, which is correct on the day it is written and wrong by the next stamp.
+- [x] Use a small closed category set, and record it. Done when: the categories exist in one place the tool reads, and a heading using an unknown category is **reported**, not silently bucketed. Anything that does not fit gets a new category by decision rather than by invention at the point of writing.
+
+- [x] Report a heading the parser cannot read. **Added 2026-09-17:** measured today, 3 of 16 existing headings carry no category. A ledger that skips what it cannot parse repeats the defect `§1` just fixed in the claims checker, where a split claim vanished and the total still said everything held. Done when: a malformed heading is listed with its file and line and the tool exits non-zero, proven against one of the three real cases.
+- [x] **Make a repeat a trigger.** Done when: the second finding in one category raises the question of what check would have caught it, and the answer is recorded even when the answer is that no cheap check exists.
+
+  **Answered 2026-09-17 against the real ledger.** Three categories are already past two:
+
+  **`consistency`, 6 findings.** The shared shape is *a fact declared in one place and never reconciled with the other place that depends on it*: four claims citing a gitignored tree, `AGENTS.md` not listing directories the merge landed, a resource id defined twice, identifiers surviving a rename because the search pattern was narrower than the rule.
+
+  One cheap check exists and is **built here**: a claim may not cite a path this repository ignores. That is the `§1` F1 case exactly, it costs one `git check-ignore` call per claim, and it would have failed on the day those four claims were written instead of surviving until a reviewer read them. The rest of the category has no single cheap check, and saying so is the honest half of this answer: "two things that should agree do not" is the definition of a defect, not a pattern a tool can recognise. What replaces a check is narrower rules, and `§3` adopted one when its rename pattern missed three identifier families: search for the old name in **any** spelling rather than the spellings somebody enumerated.
+
+  **`record`, 5 findings.** The shape is *a figure or reference in prose that nothing re-measures*. This one already has its check and it is `§1`: claims re-measure figures, and `--coverage` names the blocks carrying none. Two of the five findings are specifically a figure describing the file it sits in, which no re-measurement can fix because writing the figure changes it. The rule that replaces a check is recorded in both places it bit: **do not state a count of a file inside that file**, and `todo/00-workspace/TODO-03-codebase-intake.md` and `TODO.md` both now say why no such count appears.
+
+  **`correctness`, 2 findings.** Both are the same inversion: *a check that reports success for its own absence*. The claims checker dropped an unparseable claim and still printed "all hold"; the coverage floor passed when every claim was deleted. The check is a discipline rather than a script, and it is now in this file: **a new check ships with a self-test that constructs its failing case**, not merely one that confirms the passing case. `codex` found the second instance precisely by writing probes that built the failure, which is the same technique.
+
+- [x] Build the one check the `consistency` repeat produced: a claim may not cite a gitignored path. **Added 2026-09-17** by the answer above. Done when: `todo-claims.py` reports a claim whose target is ignored by this repository, proven against a deliberately added claim citing a gitignored path, and the live tree passes. Cheaper substitute that fails the checkpoint: checking only that the path exists, which is what let four claims cite `samples/` for a day, because they did exist on the one machine that mattered.
+- [x] Report the pattern. Done when: `scripts/todo-findings.py` prints counts per category and per disposition, so the shape is visible without reading every stamp. The tool is a new script rather than a flag on `todo-claims.py`, which re-measures claims and has nothing to do with review findings.
+- [x] Record what the ledger cannot do. Done when: it states that a category count is a signal rather than a verdict, because an early category is often just the first section touching that area.
+
+  **Written 2026-09-17.** Four limits, each one a way to read this ledger wrongly:
+
+  1. **A count is a signal, not a verdict.** Every finding so far comes from five sections in one domain, all of them intake and tooling work. `consistency` leading is partly a fact about those sections and partly a fact about this project; the ledger cannot tell you which.
+  2. **It counts what reviews found, not what exists.** A defect class nobody looks for scores zero, and scores zero most convincingly when no reviewer knows to look. The `record` category exists only because these reviews were told to check the record.
+  3. **Category is assigned by the reviewer who wrote the heading**, which is the session that did the work. That is the same conflict the independent review exists to break, and the ledger does not break it.
+  4. **It cannot see a finding nobody wrote down.** Findings caught and fixed mid-implementation, before review, never reach a findings file. The ledger measures the review process, not the work.
+- [x] Commit: `"self-correction: a ledger of what review keeps finding"`
+
+**Test checkpoint:** `python scripts/todo-findings.py` reads the real findings files and prints counts per category and per disposition, and the totals match the number of finding headings actually present, counted independently with `grep -c '^### F'`. `--write` regenerates `docs/reviews/findings.md` with a do-not-edit header, and running it twice produces no diff, proving the output is derived rather than accumulated. A heading with an unknown or missing category is listed with its file and line and the tool exits non-zero, proven against a real case rather than a fixture. A category reaching two occurrences prints the recorded question, and the answer for every such category is present in this section. `--self-test` covers parsing, the repeat trigger, and the unknown-category path, and stays green. The ledger's stated limits are written here.
 
 ## 3. Section Calibration
 

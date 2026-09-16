@@ -81,6 +81,29 @@ def _resolve(pattern: str) -> list[Path]:
     return [Path(p) for p in sorted(glob.glob(str(ROOT / pattern), recursive=True))]
 
 
+def _ignored(target: str) -> bool:
+    """Is this path ignored by the repository?
+
+    A claim citing an ignored path holds only on a machine that happens to have
+    that tree on disk, and fails for everyone else. Four claims cited
+    `samples/ExoSuite/...` for a day for exactly this reason: they existed on the
+    one machine that mattered, so `exists` was satisfied while the claim was
+    worthless to any other clone. Found by the review of D00 T03 §1, made a check
+    by D00 T04 §2 after `consistency` repeated six times.
+    """
+    probe = target.split("*")[0].rstrip("/")
+    if not probe:
+        return False
+    try:
+        out = subprocess.run(
+            ["git", "check-ignore", "-q", "--", probe],
+            cwd=ROOT, capture_output=True, timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return out.returncode == 0
+
+
 def _check_path(verb: str, target: str) -> str:
     hits = _resolve(target)
     if verb == "exists":
@@ -129,6 +152,18 @@ def _check_count(pattern: str, target: str, expected: int) -> str:
 
 def evaluate(claim: str) -> str:
     """Return a human-readable confirmation, or raise Stale / Malformed."""
+    target = None
+    if m := PATH_RE.match(claim):
+        target = m.group(2)
+    elif m2 := LINES_RE.match(claim):
+        target = m2.group(1)
+    elif m3 := COUNT_RE.match(claim):
+        target = m3.group(2)
+    if target and _ignored(target):
+        raise Malformed(
+            f"{target} is gitignored, so this claim holds only on a machine that "
+            "has that path on disk. Cite something the repository tracks."
+        )
     if m := PATH_RE.match(claim):
         return _check_path(m.group(1), m.group(2))
     if m := LINES_RE.match(claim):
@@ -446,6 +481,31 @@ def _self_test() -> int:
 
     ROOT = saved_root
 
+    # The gitignored-path check, added by D00 T04 §2 after `consistency`
+    # repeated six times. ROOT is restored above, so this runs against the real
+    # repository, which is the only place git can answer.
+    try:
+        evaluate("exists build/release")
+    except Malformed as exc:
+        if "gitignored" not in str(exc):
+            print(f"  FAIL  gitignored claim raised the wrong error: {exc}")
+            failed += 1
+    except Stale:
+        print("  FAIL  a claim citing a gitignored path was allowed through")
+        failed += 1
+    else:
+        print("  FAIL  a claim citing a gitignored path was allowed through")
+        failed += 1
+
+    # A tracked path must NOT trip it, or the check is useless noise.
+    try:
+        evaluate("exists AGENTS.md")
+    except Malformed as exc:
+        print(f"  FAIL  a tracked path was rejected as gitignored: {exc}")
+        failed += 1
+    except Stale:
+        pass
+
     # An unterminated claim is reported, not skipped. This is the defect that
     # made two real claims vanish while the summary said everything held.
     split = tmp / "split.md"
@@ -520,7 +580,7 @@ def _self_test() -> int:
         f.unlink()
     tmp.rmdir()
 
-    total = len(cases) + 3 + 8
+    total = len(cases) + 3 + 10
     print(f"todo-claims self-test: {total} cases, {failed} failed")
     return 1 if failed else 0
 

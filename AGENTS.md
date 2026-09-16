@@ -173,6 +173,9 @@ Answer from source first: the `resolute_au3/` script, a driven run of the shippe
 
 ```bash
 python scripts/todo-claims.py              # re-measure what the TODOs claim about the repo
+python scripts/todo-claims.py --coverage   # name every Current state block nothing re-measures
+python scripts/todo-findings.py            # what review keeps finding, across every section
+python scripts/todo-findings.py --check    # fail if docs/reviews/findings.md is stale
 python scripts/todo-claims.py --self-test  # must stay green; the count is the suite's, not this file's
 python scripts/todo-graph.py self-test      # must stay green; the count is the suite's, not this file's
 python scripts/todo-graph.py validate       # FATAL blocks; new WARN blocks until fixed or accepted
