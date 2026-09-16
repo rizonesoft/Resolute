@@ -4,15 +4,15 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**21 findings across 7 sections.**
+**25 findings across 8 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
+| `correctness` | 8 | the code does the wrong thing |
+| `record` | 7 | the plan or the evidence misdescribes what happened |
 | `consistency` | 6 | disagrees with the rest of the suite, its naming, or its layout |
-| `record` | 6 | the plan or the evidence misdescribes what happened |
-| `correctness` | 5 | the code does the wrong thing |
 | `performance` | 2 | correct, and too slow or too costly to be used |
 | `integration` | 1 | a consumer, caller, or downstream artifact no longer holds |
 | `reproducibility` | 1 | the same input does not produce the same output |
@@ -42,3 +42,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §2` | F4 | `record` | fixed | the ledger goes stale on every review that does not regenerate it |
 | `D00 T04 §3` | F1-F3 | `correctness` | fixed | raised by the independent review, all three correct |
 | `D00 T04 §3` | F4 | `performance` | fixed | the whole git log was re-fetched once per section |
+| `D00 T04 §4` | F1 | `correctness` | fixed | the chain was wrong, in the way that matters most |
+| `D00 T04 §4` | F2 | `correctness` | fixed | a documented reference form matched nothing |
+| `D00 T04 §4` | F3 | `correctness` | fixed | unreadable evidence was reported as absent evidence |
+| `D00 T04 §4` | F4 | `record` | fixed | the headline number counted work that cannot be delayed |

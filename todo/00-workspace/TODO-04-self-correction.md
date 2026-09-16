@@ -58,7 +58,7 @@ track: W1
 |   1   |   §1    | Staleness detection for every claim-free block | --     |  [x]   |
 |   2   |   §2    | The review-finding ledger                  | --         |  [x]   |
 |   3   |   §3    | Section calibration                        | §2         |  [x]   |
-|   4   |   §4    | Re-sequencing on evidence                  | §3         |  [ ]   |
+|   4   |   §4    | Re-sequencing on evidence                  | §3         |  [x]   |
 
 ---
 
@@ -247,6 +247,13 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 - [x] Commit: `"self-correction: propose a better order, and let a human take it"`
 
 **Test checkpoint:** `python scripts/todo-graph.py query sequence` prints the longest dependency chain to a shippable product, naming every section on it, and the chain is verified by walking it by hand against `resolve` for at least its first three links. It reports every cross-section filing as a coupling candidate, naming direction and finding, and the count matches an independent `grep` of the findings files. **The tool proposes and cannot act**, proven by there being no write path: the command opens no file for writing, shown by search, and the output names `groom-plan` as where a change goes. A section with no filings produces no candidates, so the report is not merely always-on noise. `self-test` covers the chain computation including a cycle, and stays green.
+
+> **Verified:** 2026-09-17 | §4 | `query sequence` prints the longest dependency chain, **30 sections deep, 27 still open**, verified by hand against `resolve` for its first links · it reports 4 couplings from review findings, matching an independent `grep` of the findings files, each labelled as already a dependency or not · **it proposes and cannot act**, proven structurally: the branch contains no `open(`, no `.write(`, no `write_text`, no `mkdir`, no `rename`, shown by search · a `TNN §N` dependency keeps the chain at 30, driven · breaking one finding's category drops couplings to 3 **and** names the file, line and reason rather than reporting absence · `groom-plan` names this command and this command names `groom-plan`
+> **Review:** round 2, candidate `390b560` `b541b9a` plus the follow-up fix -- `adversarial` approve after fixes (3) · `consistency` approve · `integration` approve · `source-defect` approve · `design` not-applicable · `record` approve after fix (1). Raw findings: docs/reviews/00-workspace/D00-T04-s4.md
+> **Independent:** `codex review --commit 390b560` (gpt-6-astra, high) returned **three P2 findings, all correct**, and one made this feature's central output wrong: the chain ignored fifteen declared whole-TODO dependencies, reading 17 deep against an actual 30 and ending elsewhere. It predicted both the corrected depth and the changed endpoint before the fix and both matched. It noted again that the passing self-tests covered none of its findings.
+> **CRUD:** not applicable (this reads the plan and the findings ledger and writes nothing)
+> **Duration:** 8
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## Verification
 

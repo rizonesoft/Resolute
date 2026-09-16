@@ -994,13 +994,16 @@ def cmd_query(args) -> int:
             f"D{t.domain.split('-')[0]} T{t.number} §{num}"
             for t in todos for num, sec in t.sections.items() if sec.status == "x"
         }
-        print(f"sequence: longest dependency chain is {len(chain)} section(s) deep\n")
+        remaining = [r for r in chain if r not in shipped]
+        print(f"sequence: longest dependency chain is {len(chain)} section(s) deep, "
+              f"{len(remaining)} still open\n")
         for i, ref in enumerate(reversed(chain)):
             mark = "x" if ref in shipped else " "
             print(f"  {i + 1:>2}. [{mark}] {ref:14} {titles.get(ref, '')[:52]}")
-        print("\n  Every section above waits on the one before it. Delay here costs")
-        print("  more than delay anywhere else, because nothing on this chain can")
-        print("  start early.")
+        print("\n  Every section above waits on the one before it. Delay on an OPEN")
+        print("  one costs more than delay anywhere else, because nothing later on")
+        print("  the chain can start early. The shipped ones are shown for shape:")
+        print("  they set the structure and can no longer be delayed.")
 
         couplings, coupling_problems = _filing_couplings()
         print(f"\n  coupling candidates from review findings: {len(couplings)}")
