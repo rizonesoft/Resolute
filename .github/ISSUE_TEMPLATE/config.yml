@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/rizonesoft/ExoSuite/wiki
+    about: Check the wiki for documentation and guides
+  - name: Website
+    url: https://rizonesoft.com
+    about: Visit our website for more information

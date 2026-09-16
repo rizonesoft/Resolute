@@ -1,0 +1,8 @@
+{
+  "name": "Console",
+  "description": "Multi-tab terminal emulator with ConPTY backend",
+  "version": "0.1.0",
+  "category": "System",
+  "icon": "terminal",
+  "author": "Rizonesoft"
+}

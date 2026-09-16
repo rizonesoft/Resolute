@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# ExoSuite carried Git LFS rules for *.exe, *.dll, and Bin/** at intake.
+# They are deliberately not merged: its own comment recorded them as unused,
+# all three paths are gitignored here, and LFS filters on never-committed
+# files would require git-lfs on every clone for no benefit.

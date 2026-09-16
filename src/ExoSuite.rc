@@ -1,0 +1,5 @@
+// ExoSuite application icon
+#define IDI_EXOSUITE    101
+#define IDI_APPFALLBACK 102
+IDI_EXOSUITE    ICON "../resources/ExoSuite.ico"
+IDI_APPFALLBACK ICON "../resources/application.ico"

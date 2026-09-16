@@ -1,0 +1,16 @@
+/**
+ * RegStudio Resource Script
+ */
+
+#include <windows.h>
+
+// Application Icon
+1 ICON "icon.ico"
+
+// Value Type Icons
+2 ICON "string.ico"
+3 ICON "num.ico"
+4 ICON "bin.ico"
+
+// Application Manifest (enables visual styles + admin rights)
+1 24 "app.manifest"

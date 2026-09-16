@@ -1,0 +1,47 @@
+cmake_minimum_required(VERSION 3.25)
+
+# Default build type (must be set before project() for CMake 4.x Ninja rules)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
+project(ExoSuite
+    VERSION 0.1.0
+    DESCRIPTION "ExoSuite — Native Windows Control Panel & System Utilities"
+    LANGUAGES CXX
+)
+
+# ── Standards ────────────────────────────────────────────────
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
+# ── Platform Requirements ────────────────────────────────────
+# Windows 10+ only (build 10240 = version 1507)
+add_compile_definitions(
+    WINVER=0x0A00
+    _WIN32_WINNT=0x0A00
+    UNICODE
+    _UNICODE
+    NOMINMAX
+    WIN32_LEAN_AND_MEAN
+)
+
+# ── Output Configuration ────────────────────────────────────
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Bin/Debug")
+
+# ── Static C++ Runtime ───────────────────────────────────────
+# Bake libc++, libunwind, pthreads into every binary so no
+# LLVM-MinGW runtime DLLs need to ship alongside the app.
+add_link_options(-static)
+
+# ── Subdirectories ───────────────────────────────────────────
+add_subdirectory(shared/exo-ui)
+add_subdirectory(shared/lucide)
+add_subdirectory(src)
+
+# Extensions
+add_subdirectory(extensions/Console)
+# add_subdirectory(extensions/RegStudio)

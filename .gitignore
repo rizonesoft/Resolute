@@ -22,6 +22,8 @@ Thumbs.db
 *.suo
 *.user
 *.sln.docstates
+.idea/
+*.ntvs_analysis.dat
 
 # AutoIt compiled files
 *.a3x
@@ -37,8 +39,23 @@ Desktop.ini
 # Removed from repo
 rescue-db/
 .windsurf/
-TODO.md
 implementation_plan.md
+
+# C++ build outputs, merged from ExoSuite at intake
+/out/
+/Bin/
+extensions/*/build/
+extensions/*/bin/
+test_font.obj
+
+# The bootstrapped toolchain, never committed.
+# Renamed exokit -> reskit by D00 T03 §3; both are ignored across the rename.
+/exokit/llvm-mingw/
+/exokit/cmake/
+/exokit/ninja/
+/reskit/llvm-mingw/
+/reskit/cmake/
+/reskit/ninja/
 
 # TODO graph derived cache (always reproducible from todo/*.md)
 build/
@@ -46,8 +63,8 @@ __pycache__/
 
 # Local working copies of the intake sources. Not part of this repository.
 # ExoSuite, RegStudio, and SDImage are separate repositories under
-# github.com/rizonesoft and are brought in by subtree merge, not by being
-# committed here. Undelete is third-party reference material and is
-# deliberately kept out of the tree; see D05 T05.
+# github.com/rizonesoft, merged in with their history rather than committed
+# here. Undelete is third-party reference material and is deliberately kept
+# out of the tree; see D05 T05.
 # Anchored with a leading slash so resolute_au3/samples/ is unaffected.
 /samples/
