@@ -15,10 +15,10 @@ track: W1
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** `ExoSuite`, `RegStudio`, and `SDImage` are **separate repositories** under `github.com/rizonesoft`, checked out locally under `samples/` and **deliberately not tracked** by this repository: `/samples/` is gitignored. The subtree merge pulls from the remotes, so nothing depends on a local working copy. `deps/libvterm` is a **git submodule** pointing at `neovim/libvterm`, currently populated with 81 files. **Corrected 2026-09-17 after independent review:** an earlier draft called it the tree's *only* external dependency, which was wrong. `shared/lucide/CMakeLists.txt:9` also fetches `sammycage/lunasvg` v3.5.0 through `FetchContent` at configure time. ExoSuite is a working native C++23 application: `shared/exo-ui` is 6,865 lines of Direct2D and DirectWrite UI framework, `src/main.cpp` is a 573-line shell, `extensions/` holds `RegStudio` and `Console`, and `exokit/` is a working toolchain bootstrap pulling llvm-mingw 20251216, CMake 4.2.3, and Ninja 1.13.1. `Bin/Release/ExoSuite.exe` is 1,423,872 bytes, 1.36 MiB. **Corrected 2026-09-17:** it is **not** fully static. Rebuilding the merged tree produces a 1,380,352-byte executable plus `System/ExoUI.dll` and `System/Lucide.dll`, 3.9 MB in total. `D00 T01 §2` owns the correction. There is **no vcpkg**. There are **no tests**; `test_font.cpp` is a scratch file. The `README.md` still describes a Rust and Slint stack that commit `efdce6177` removed. The product name appears in 32 files; `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files.
 >
-> <!-- claim: exists shared/exo-ui/include/exo/theme.h -->
-> <!-- claim: exists exokit/Bootstrap-ExoKit.ps1 -->
+> <!-- claim: exists shared/resolute-ui/include/resolute/theme.h -->
+> <!-- claim: exists scripts/bootstrap.ps1 -->
 > <!-- claim: lines src/main.cpp = 573 -->
-> <!-- claim: count "llvm-mingw" exokit/Bootstrap-ExoKit.ps1 = 4 -->
+> <!-- claim: count "llvm-mingw" scripts/bootstrap.ps1 = 4 -->
 >
 > **Corrected 2026-09-16** during `§1` validation, three claims in the paragraph above were wrong:
 >
@@ -130,7 +130,7 @@ track: W1
 - [x] Take `RegStudio` in from its remote, by `git subtree` rather than a root merge, because its layout is root-level and would collide. Its full 10-commit history is reachable and `c9b8a0b` is an ancestor of `HEAD`. The ExoSuite copy was removed first at `862cfb5`, byte-identical in `src/` and `CMakeLists.txt`, verified before removal. Measured 2026-09-16: `src/` and `CMakeLists.txt` are byte-identical between the standalone repository and the copy inside ExoSuite's `extensions/`, and only the standalone one carries history, latest `c9b8a0b`. Done when: one RegStudio tree remains, its history is present, and this section records the commit taken.
 - [x] Confirm `samples/` stays out of the repository. `git ls-files samples` is empty and no embedded-repository warning appears. Done when: `/samples/` is gitignored, `git ls-files samples` is empty, and `git status` reports no embedded-repository warning. The local checkouts may stay on disk; they are working copies, not repository content.
 - [x] Reconcile the two `.gitignore` files so the merged tree ignores `build/`, `Bin/`, and the bootstrapped toolchain directory. **A full release build leaves `git status` clean**, verified after building 52/52 targets. **Verified again 2026-09-17 by review, this time against a real bootstrap:** running `exokit/Bootstrap-ExoKit.ps1` downloaded the toolchain into `exokit/` and `git status` stayed clean, so the ignore rules hold for the directories rather than only for the build output. The rules are written for both `exokit/` and the `reskit/` name `§3` renames it to, so the rename cannot silently un-ignore 850 MB.
-<!-- claim: count "exokit/llvm-mingw" .gitignore = 1 -->
+<!-- claim: absent exokit -->
 <!-- claim: count "reskit/llvm-mingw" .gitignore = 1 -->
 - [x] Record what was merged, from which source, and at which commit:
 
@@ -189,6 +189,7 @@ ExoSuite is not a second product. It is the Resolute launcher, and leaving the o
 >
 > **`src/ExoSuite.rc` has no `VS_VERSION_INFO` block at all.** Measured 2026-09-17: the file is five lines and declares two icons and nothing else. So company and copyright are *absent*, not wrong, and this section adds the block rather than editing one.
 
+<!-- claim: absent shared/exo-ui -->
 <!-- claim: absent resources/ExoSuite.ico -->
 <!-- claim: exists resources/icons/Resolute.ico -->
 <!-- claim: exists resources/icons/application.ico -->
@@ -240,15 +241,64 @@ ExoSuite is not a second product. It is the Resolute launcher, and leaving the o
 
 ## 3. Rename the Library and the Toolchain
 
-108 occurrences across 25 files today, and it grows with every tool that includes a header. This is the cheapest this change will ever be.
+> **Started:** 2026-09-16T22:42:10Z
 
-- [ ] Rename `shared/exo-ui` to `shared/resolute-ui`, the `exo::` namespace to `rui::`, the `EXOUI_API` macro to `RESUI_API`, and the `exo/` include prefix to `resolute/`. Done when: the tree builds and no identifier or path carries the old name. Recorded as a dated default: these exact names are a choice, and changing them later costs more the longer it waits.
-- [ ] Rename `exokit/` to `reskit/` and its scripts with it. Done when: the bootstrap runs from the new path and no script references the old one.
-- [ ] Move the toolchain bootstrap so it runs from the repository root. Done when: `pwsh scripts/bootstrap.ps1` bootstraps the toolchain, and `D00 T01 §1` hardens what this section moves.
-- [ ] Verify the rename changed names only. Done when: the built executable is byte-comparable to the pre-rename build except for embedded strings, or the differences are explained.
-- [ ] Commit: `"intake: rename the ui library and the toolchain"`
+The count grows with every tool that includes a header. This is the cheapest this change will ever be.
 
-**Test checkpoint:** The tree builds after the rename and no identifier, path, or script carries `exo` or `ExoKit`. The bootstrap runs from the repository root. The rebuilt executable is compared against the pre-rename build and every difference is explained.
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Four corrections.**
+>
+> **The count moved, and by more than drift.** This section said 108 occurrences across 25 files, measured 2026-09-16 against the pre-merge tree. Measured today across `exo::`, `EXOUI_API`, `exo/`, `exo-ui`, and `ExoUI`: **214 occurrences across 39 files**. The 39 includes prose; the code is **28 files** under `src/` and `shared/`. `extensions/` carries **none**, so RegStudio does not consume the UI library yet and the blast radius is smaller than the raw count suggests.
+>
+> **One match is a false positive and is excluded.** `resolute_au3/samples/ComWinRep/~Samples/Windows Repair KIT/Rescue/system` is a **binary Windows registry hive** that happens to contain the byte sequence. `AGENTS.md` makes `resolute_au3/` read-only outside the maintenance domain, so it is not touched.
+>
+> **`D00 T01 §1` names the toolchain directory three different ways**, and it depends on this section, so this section's choice settles it. Measured 2026-09-17: its Build order says `reskit/`, two of its items say `.toolchain/`, and its Inputs say `exokit/`. `.gitignore` already anticipates `reskit/`. **`reskit/` wins** and `D00 T01 §1` is corrected to match, because a section cannot harden a directory it cannot name consistently.
+>
+> **The split between `reskit/` and `scripts/` was left to the implementer, so it is decided here.** Items 2 and 3 together are ambiguous: item 2 renames `exokit/` "and its scripts with it", while item 3 moves the bootstrap to `scripts/bootstrap.ps1`. **Dated default 2026-09-17**, consistent with `AGENTS.md` describing `reskit/` as "gitignored except for its scripts":
+>
+> | Path | Holds | Tracked |
+> | --- | --- | --- |
+> | `scripts/bootstrap.ps1` | the one entry point that downloads the toolchain. `D00 T01 §1` hardens **this** file | yes |
+> | `reskit/llvm-mingw`, `reskit/cmake`, `reskit/ninja` | the downloaded toolchain | no, gitignored |
+> | `reskit/Init-ExoKit.ps1`, `reskit/Build-*.ps1` | the environment and build helpers | yes |
+>
+> There is **one** copy of the download logic, in `scripts/bootstrap.ps1`. The old `Bootstrap-ExoKit.ps1` is moved rather than copied, so no second copy can drift. Cost of changing: the paths are computed from `$PSScriptRoot`, so moving either directory is a one-line edit.
+
+- [x] Rename `shared/exo-ui` to `shared/resolute-ui`, the `exo::` namespace to `rui::`, the `EXOUI_API` macro to `RESUI_API`, and the `exo/` include prefix to `resolute/`. **Added 2026-09-17:** the CMake targets `ExoUI` and `ExoUI_static` are renamed to `ResoluteUI` and `ResoluteUI_static` too, because the Done-when says *no identifier* carries the old name and a target name is an identifier. Done when: the tree builds and no identifier or path carries the old name. Recorded as a dated default: these exact names are a choice, and changing them later costs more the longer it waits.
+- [x] Rename `exokit/` to `reskit/` and its scripts with it. Done when: the bootstrap runs from the new path and no script references the old one.
+- [x] Move the toolchain bootstrap so it runs from the repository root. Done when: `pwsh scripts/bootstrap.ps1` bootstraps the toolchain, and `D00 T01 §1` hardens what this section moves.
+- [x] Verify the rename changed names only. **Made falsifiable 2026-09-17:** "byte-comparable" cannot be asserted after the fact without a recorded before, so the pre-rename fingerprints are written down here first, measured immediately before the rename began:
+
+  | Artifact | Bytes | SHA-256, first 16 |
+  | --- | ---: | --- |
+  | `Bin/Release/Resolute.exe` | 1,381,376 | `94B62BC22E2295AF` |
+  | `Bin/Release/System/ExoUI.dll` | 898,048 | `EB2E7EFAAC96C6C0` |
+  | `Bin/Release/System/Lucide.dll` | 1,717,760 | `F589E28B75293D74` |
+
+  Done when: the post-rename sizes are compared against these three and every difference is explained by a named cause. Cheaper substitute that fails the checkpoint: observing that the build still succeeds, which proves the code compiles and says nothing about whether the rename changed behaviour.
+
+  **Result 2026-09-17. All three artifacts are identical in size, to the byte:**
+
+  | Artifact | Before | After | Delta |
+  | --- | ---: | ---: | ---: |
+  | `Resolute.exe` | 1,381,376 | 1,381,376 | 0 |
+  | `ExoUI.dll` to `ResoluteUI.dll` | 898,048 | 898,048 | 0 |
+  | `Lucide.dll` | 1,717,760 | 1,717,760 | 0 |
+
+  **The hashes differ, and the named cause is not the rename: this build is not reproducible.** `Lucide.dll` is the control. Its sources were never touched by this section, `git status shared/lucide/` is empty, and its hash changed anyway. Two consecutive clean builds of identical sources were then compared directly: `8B25CFEE72714F28` and `08C187347BF55A19`, same size both times. A build that cannot reproduce its own output twice in a row cannot be used to attribute a hash difference to a source change, so **byte-comparison is the wrong instrument here** and the section's original wording asked for something this toolchain cannot supply.
+
+  **What proves the rename instead, and can fail:** the exported symbol table, read with `llvm-nm --extern-only --defined-only` on `ResoluteUI.dll`.
+
+  ```
+  213  _ZN3rui        the new namespace
+    0  _ZN3exo        the old one
+  1429               total exported symbols, so the instrument is reading something
+  ```
+
+  The third line is the falsifiability check: a count of zero for the old namespace means nothing unless the same command demonstrably finds symbols, which it does. `strings` over both shipped binaries also returns 0 for `_ZN3exo`, `exo-ui`, and `EXOUI`.
+- [x] Commit: `"intake: rename the ui library and the toolchain"`
+
+**Test checkpoint:** The tree builds after the rename, both presets, and `git grep -iE "exo::|EXOUI_API|exo/|exo-ui|ExoUI|exokit|ExoKit"` returns **no hits** under `src/`, `shared/`, `extensions/`, `scripts/`, `reskit/`, `CMakeLists.txt`, and `CMakePresets.json`. `pwsh scripts/bootstrap.ps1` bootstraps the toolchain from the repository root and a second run downloads nothing. `shared/exo-ui/` and `exokit/` no longer exist as paths. The rebuilt artifacts are compared against the three fingerprints recorded above and every difference is explained by a named cause. `todo-claims.py` passes, which it cannot do unless the claims naming `shared/exo-ui/` and `exokit/` were updated with the rename.
 
 ## 4. Correct the Stale Documentation
 
@@ -258,6 +308,7 @@ The README describes a Rust and Slint stack that was deleted in `efdce6177`. Any
 - [ ] Record the architecture: the UI library, the application shell, and the extension model where a tool builds as a standalone executable. Done when: a reader can tell which layer owns what.
 - [ ] State what the codebase does **not** have, so no later section assumes it. Done when: the absence of tests, of vcpkg, and of the non-UI framework layers is written down.
 - [ ] Reconcile `TODO.md` and `TODO-ux.md` against this plan. Done when: work still wanted is routed through `add-todo` and the rest is marked superseded, with `TODO-ux.md` recorded as the UX standard the suite is held to.
+- [ ] Remove `todo/extensions/TODO-Console.md` and its directory. **Filed 2026-09-17 by `§3`'s validation:** `§1`'s collision table prescribed "mark superseded and remove the directory", `§1` is stamped, and the file is still there. It arrived through `fffd8b4` after the precondition was resolved by committing the untracked files, which is the path `§1` predicted but nobody then applied the prescribed resolution. Console itself was retired at `e1f26a1`, so its TODO now describes an extension the tree does not build. Done when: `todo/extensions/` does not exist and the Console decision is recorded where a reader will find it.
 - [ ] Clear the remaining Slint traces in editor configuration, not only in prose. **Filed 2026-09-17 by `§2`, which touched the file but did not own this:** `.vscode/settings.json` still maps `*.slint` to the `slint` language, though `efdce6177` deleted that stack. Done when: the association is gone and no tracked file outside the historical record configures a Slint toolchain.
 - [ ] Commit: `"intake: correct the documentation to the stack that exists"`
 

@@ -13,7 +13,8 @@ It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoI
 | `src/` | The launcher shell |
 | `shared/` | The framework and the UI library. Every tool consumes these |
 | `extensions/` | The tools, each building as a standalone executable |
-| `exokit/` | The portable toolchain bootstrap: llvm-mingw, CMake, Ninja. Downloads into itself and is gitignored except for its scripts. Renamed `reskit/` by `D00 T03 §3` |
+| `reskit/` | The portable toolchain: llvm-mingw, CMake, Ninja, downloaded into it and gitignored, plus the tracked environment and build helpers. Renamed from `exokit/` by `D00 T03 §3` |
+| `scripts/bootstrap.ps1` | The one entry point that downloads the toolchain into `reskit/`. `D00 T01 §1` hardens it |
 | `resources/` | Application icons and embedded resources |
 | `resolute_au3/` | The frozen AutoIt suite. **The executable specification**, not a maintenance target |
 | `resolute_au3/todo/` | The archived AutoIt plan, superseded 2026-09-16, kept for its per-tool analysis |
@@ -75,7 +76,7 @@ src/
     RestoreRecord.h/.cpp      prior state, and undo            D02 T01 S4
     Transcript.h/.cpp         the carryable result             D02 T01 S5
 shared/
-  resolute-ui/          the Direct2D UI library, from the intake
+  resolute-ui/          the Direct2D UI library, from the intake. Namespace `rui::`, include prefix `resolute/`, export macro `RESUI_API`
   lucide/               icon set
 extensions/<Tool>/      one directory per tool, one standalone executable
 tests/                  Catch2 suites, fixtures, and the parity driver

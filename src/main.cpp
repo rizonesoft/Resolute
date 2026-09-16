@@ -4,17 +4,17 @@
 #include <algorithm>
 #include "resource.h"
 
-// ExoUI shared library
-#include <exo/dpi.h>
-#include <exo/theme.h>
-#include <exo/render.h>
-#include <exo/icons.h>
-#include <exo/animation.h>
-#include <exo/controls/toolbar.h>
-#include <exo/controls/sidebar.h>
-#include <exo/controls/statusbar.h>
-#include <exo/controls/contentview.h>
-#include <exo/controls/listview.h>
+// ResoluteUI shared library
+#include <resolute/dpi.h>
+#include <resolute/theme.h>
+#include <resolute/render.h>
+#include <resolute/icons.h>
+#include <resolute/animation.h>
+#include <resolute/controls/toolbar.h>
+#include <resolute/controls/sidebar.h>
+#include <resolute/controls/statusbar.h>
+#include <resolute/controls/contentview.h>
+#include <resolute/controls/listview.h>
 
 enum CtrlId : int {
     IDC_TOOLBAR     = 100,
@@ -32,8 +32,8 @@ enum CtrlId : int {
 #include <string>
 #pragma comment(lib, "shell32.lib")
 
-static std::vector<exo::ListItem> g_allItems;       // all scanned extensions
-static std::vector<exo::ListItem*> g_filteredItems;  // current visible subset
+static std::vector<rui::ListItem> g_allItems;       // all scanned extensions
+static std::vector<rui::ListItem*> g_filteredItems;  // current visible subset
 
 // Rebuild filtered view based on sidebar category
 static void FilterByCategory(const wchar_t* category) {
@@ -134,7 +134,7 @@ static void ScanExtensions() {
             ExtractIconExW(fullPath.c_str(), 0, &hIcon, nullptr, 1);
 
             // Build list item
-            exo::ListItem item;
+            rui::ListItem item;
             item.icon = hIcon;
             item.category = cat;
             item.cells = {
@@ -153,11 +153,11 @@ static void ScanExtensions() {
 }
 
 struct AppState {
-    exo::Toolbar     toolbar;
-    exo::Sidebar     sidebar;
-    exo::StatusBar   statusbar;
-    exo::ContentView contentView;
-    exo::ListView    listView;
+    rui::Toolbar     toolbar;
+    rui::Sidebar     sidebar;
+    rui::StatusBar   statusbar;
+    rui::ContentView contentView;
+    rui::ListView    listView;
     HBRUSH         bgBrush   = nullptr;
     int            dpi       = 96;
 
@@ -167,7 +167,7 @@ struct AppState {
 
     void UpdateBrushes() {
         DestroyBrushes();
-        bgBrush = CreateSolidBrush(exo::Theme::Colors().background);
+        bgBrush = CreateSolidBrush(rui::Theme::Colors().background);
     }
 };
 
@@ -202,7 +202,7 @@ static void LayoutChildren(HWND hwnd, AppState& app) {
 
 // ── Theme Application ───────────────────────────────────────
 static void ApplyTheme(HWND hwnd, AppState& app) {
-    exo::Theme::ApplyToWindow(hwnd);
+    rui::Theme::ApplyToWindow(hwnd);
     app.UpdateBrushes();
     app.listView.Repaint();
 
@@ -224,9 +224,9 @@ static void OnThemeFrame() {
     // g_app->contentView.Repaint();
     g_app->listView.Repaint();
 
-    if (!exo::Theme::IsTransitioning()) {
+    if (!rui::Theme::IsTransitioning()) {
         g_app->UpdateBrushes();
-        exo::Theme::ApplyToWindow(g_mainHwnd);
+        rui::Theme::ApplyToWindow(g_mainHwnd);
         InvalidateRect(g_mainHwnd, nullptr, FALSE);
     }
 }
@@ -246,7 +246,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
     case WM_CREATE: {
         auto hInst = reinterpret_cast<CREATESTRUCTW*>(lp)->hInstance;
-        app->dpi = exo::Dpi::Get(hwnd);
+        app->dpi = rui::Dpi::Get(hwnd);
 
         app->toolbar.Create(hwnd, hInst, IDC_TOOLBAR);
         app->sidebar.Create(hwnd, hInst, IDC_SIDEBAR);
@@ -271,7 +271,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         app->listView.AddColumn(L"Size", 80, true, DWRITE_TEXT_ALIGNMENT_TRAILING);
         app->listView.AddColumn(L"Modified", 120);
         app->listView.SetItemCount(static_cast<int>(g_filteredItems.size()));
-        app->listView.SetItemProvider([](int idx) -> const exo::ListItem& {
+        app->listView.SetItemProvider([](int idx) -> const rui::ListItem& {
             return *g_filteredItems[idx];
         });
         app->listView.SetSortColumn(0, true);
@@ -279,10 +279,10 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
         // Dynamic badge counts from scanned extensions
         app->sidebar.SetBadge(0, static_cast<int>(g_allItems.size()));  // All
-        for (int c = 1; c < exo::kCategoryCount; c++) {
+        for (int c = 1; c < rui::kCategoryCount; c++) {
             int count = 0;
             for (auto& item : g_allItems)
-                if (_wcsicmp(item.category.c_str(), exo::kCategories[c].label) == 0)
+                if (_wcsicmp(item.category.c_str(), rui::kCategories[c].label) == 0)
                     count++;
             app->sidebar.SetBadge(c, count);
         }
@@ -299,10 +299,10 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         // Store globals for theme transition callback
         g_mainHwnd = hwnd;
         g_app = app;
-        exo::Theme::SetRepaintCallback(OnThemeFrame);
+        rui::Theme::SetRepaintCallback(OnThemeFrame);
 
         // Apply Mica Alt backdrop (Win11 22H2+, graceful fallback)
-        exo::Theme::ApplyBackdrop(hwnd);
+        rui::Theme::ApplyBackdrop(hwnd);
         return 0;
     }
 
@@ -316,7 +316,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         // Sidebar category selection
         if (id == IDC_SIDEBAR) {
             int catIdx = HIWORD(wp);
-            const wchar_t* catName = exo::kCategories[catIdx].label;
+            const wchar_t* catName = rui::kCategories[catIdx].label;
 
             // Filter extensions by selected category
             FilterByCategory(catName);
@@ -331,57 +331,57 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         }
 
         switch (id) {
-        case exo::IDC_TB_THEME:
-            exo::Theme::AnimateToggle(300.0f);
+        case rui::IDC_TB_THEME:
+            rui::Theme::AnimateToggle(300.0f);
             break;
 
-        case exo::IDC_TB_VIEW_LARGE:
-            app->listView.SetViewMode(exo::ViewMode::LargeIcons);
+        case rui::IDC_TB_VIEW_LARGE:
+            app->listView.SetViewMode(rui::ViewMode::LargeIcons);
             app->statusbar.SetRightText(L"Large Icons");
             break;
 
-        case exo::IDC_TB_VIEW_SMALL:
-            app->listView.SetViewMode(exo::ViewMode::SmallIcons);
+        case rui::IDC_TB_VIEW_SMALL:
+            app->listView.SetViewMode(rui::ViewMode::SmallIcons);
             app->statusbar.SetRightText(L"Small Icons");
             break;
 
-        case exo::IDC_TB_VIEW_LIST:
-            app->listView.SetViewMode(exo::ViewMode::List);
+        case rui::IDC_TB_VIEW_LIST:
+            app->listView.SetViewMode(rui::ViewMode::List);
             app->statusbar.SetRightText(L"List");
             break;
 
-        case exo::IDC_TB_VIEW_DETAILS:
-            app->listView.SetViewMode(exo::ViewMode::Details);
+        case rui::IDC_TB_VIEW_DETAILS:
+            app->listView.SetViewMode(rui::ViewMode::Details);
             app->statusbar.SetRightText(L"Details");
             break;
 
-        case exo::IDC_TB_REFRESH:
+        case rui::IDC_TB_REFRESH:
             app->statusbar.SetText(L"Refreshing...");
             app->statusbar.SetProgress(0.01f);  // start visible
-            app->statusbar.AddNotifyIcon(1, exo::NotifyIconKind::Spinner);
+            app->statusbar.AddNotifyIcon(1, rui::NotifyIconKind::Spinner);
             // Animate progress 0→1 over 2 seconds
-            exo::AnimationManager::Instance().Animate(
-                0.0f, 1.0f, 2000.0f, exo::ease::InOutCubic,
-                [app](float v, const exo::Animation&) {
+            rui::AnimationManager::Instance().Animate(
+                0.0f, 1.0f, 2000.0f, rui::ease::InOutCubic,
+                [app](float v, const rui::Animation&) {
                     app->statusbar.SetProgress(v);
                 },
                 [app, hwnd]() {
                     app->statusbar.HideProgress();
                     app->statusbar.RemoveNotifyIcon(1);
-                    app->statusbar.AddNotifyIcon(2, exo::NotifyIconKind::Success);
+                    app->statusbar.AddNotifyIcon(2, rui::NotifyIconKind::Success);
                     app->statusbar.SetText(L"Ready");
                 }
             );
             break;
 
-        case exo::IDC_TB_SETTINGS:
+        case rui::IDC_TB_SETTINGS:
             break;
 
-        case exo::IDC_LISTVIEW_SORT: {
+        case rui::IDC_LISTVIEW_SORT: {
             int col = app->listView.SortColumn();
-            bool asc = app->listView.SortDirection() == exo::SortDir::Ascending;
+            bool asc = app->listView.SortDirection() == rui::SortDir::Ascending;
             std::sort(g_filteredItems.begin(), g_filteredItems.end(),
-                [col, asc](const exo::ListItem* a, const exo::ListItem* b) {
+                [col, asc](const rui::ListItem* a, const rui::ListItem* b) {
                     if (col < 0 || col >= static_cast<int>(a->cells.size()) ||
                         col >= static_cast<int>(b->cells.size())) return false;
                     int cmp = _wcsicmp(a->cells[col].c_str(), b->cells[col].c_str());
@@ -441,7 +441,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
     case WM_SETTINGCHANGE:
         if (lp && wcscmp(reinterpret_cast<LPCWSTR>(lp), L"ImmersiveColorSet") == 0) {
-            exo::Theme::SetDark(exo::Theme::IsDarkMode());
+            rui::Theme::SetDark(rui::Theme::IsDarkMode());
             ApplyTheme(hwnd, *app);
         }
         return 0;
@@ -452,7 +452,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
-        HBRUSH br = CreateSolidBrush(exo::Theme::Colors().background);
+        HBRUSH br = CreateSolidBrush(rui::Theme::Colors().background);
         FillRect(hdc, &ps.rcPaint, br);
         DeleteObject(br);
         EndPaint(hwnd, &ps);
@@ -481,13 +481,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
     icc.dwICC  = ICC_STANDARD_CLASSES | ICC_LISTVIEW_CLASSES | ICC_BAR_CLASSES;
     InitCommonControlsEx(&icc);
 
-    // Initialize ExoUI (D2D, DirectWrite, Lucide icons)
-    if (!exo::RenderContext::Init()) {
+    // Initialize ResoluteUI (D2D, DirectWrite, Lucide icons)
+    if (!rui::RenderContext::Init()) {
         MessageBoxW(nullptr, L"Failed to initialize D2D/DirectWrite.", L"Resolute", MB_ICONERROR);
         return 1;
     }
-    exo::LucideIcons::Load();
-    exo::Theme::Init();
+    rui::LucideIcons::Load();
+    rui::Theme::Init();
 
     constexpr auto CLASS_NAME = L"ResoluteMain";
 
@@ -528,21 +528,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
     SetFocus(app.sidebar.Handle());
 
     // Start the animation engine
-    exo::AnimationManager::Instance().Start(hwnd);
+    rui::AnimationManager::Instance().Start(hwnd);
 
     // Show empty state after animation engine is running
     app.contentView.ShowEmpty(L"No items",
         L"Select a category to browse or add items",
-        exo::kCategories[0].iconName);
+        rui::kCategories[0].iconName);
 
     // Build accelerator table
     ACCEL accels[] = {
-        { FALT | FVIRTKEY, 'L', exo::IDC_TB_VIEW_LARGE },
-        { FALT | FVIRTKEY, 'S', exo::IDC_TB_VIEW_SMALL },
-        { FALT | FVIRTKEY, 'I', exo::IDC_TB_VIEW_LIST },
-        { FALT | FVIRTKEY, 'D', exo::IDC_TB_VIEW_DETAILS },
-        { FALT | FVIRTKEY, 'R', exo::IDC_TB_REFRESH },
-        { FALT | FVIRTKEY, 'T', exo::IDC_TB_THEME },
+        { FALT | FVIRTKEY, 'L', rui::IDC_TB_VIEW_LARGE },
+        { FALT | FVIRTKEY, 'S', rui::IDC_TB_VIEW_SMALL },
+        { FALT | FVIRTKEY, 'I', rui::IDC_TB_VIEW_LIST },
+        { FALT | FVIRTKEY, 'D', rui::IDC_TB_VIEW_DETAILS },
+        { FALT | FVIRTKEY, 'R', rui::IDC_TB_REFRESH },
+        { FALT | FVIRTKEY, 'T', rui::IDC_TB_THEME },
     };
     HACCEL hAccel = CreateAcceleratorTableW(accels, _countof(accels));
 

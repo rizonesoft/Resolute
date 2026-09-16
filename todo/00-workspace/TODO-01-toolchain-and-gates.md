@@ -17,7 +17,7 @@ track: W1
 
 ## Inputs
 
-- [`exokit/Bootstrap-ExoKit.ps1`](../../exokit/Bootstrap-ExoKit.ps1) -- the working bootstrap this file hardens. **Repointed 2026-09-17 by `D00 T03 §2`:** it read `samples/ExoSuite/...`, which the intake made redundant and the operator then deleted, so the link would have died
+- [`scripts/bootstrap.ps1`](../../scripts/bootstrap.ps1) -- the working bootstrap this file hardens. **Moved there by `D00 T03 §3`**. **Repointed 2026-09-17 by `D00 T03 §2`:** it read `samples/ExoSuite/...`, which the intake made redundant and the operator then deleted, so the link would have died
 - [`CMakePresets.json`](../../CMakePresets.json) -- the preset structure this file adopts. **Repointed 2026-09-17 by `D00 T03 §2`**, same reason
 - [`docs/brainstorm/2026-09-16-completion-brainstorm.md`](../../docs/brainstorm/2026-09-16-completion-brainstorm.md) -- the toolchain decision and its rationale
 - -> XREF: [`00-workspace/TODO-02 §1`](./TODO-02-test-backbone.md) -- the Catch2 harness this file's build must produce
@@ -62,7 +62,7 @@ What it lacks is hash verification, detect-before-download, a locator that fails
 **Needs:** Windows host (build/test)
 
 
-**Build order.** The existing `reskit/Bootstrap-ExoKit.ps1` already works; this hardens it. Change one thing at a time and re-run the bootstrap after each.
+**Build order.** The existing `scripts/bootstrap.ps1` already works; this hardens it. Change one thing at a time and re-run the bootstrap after each.
 
 1. **Write `toolchain.json` first**, recording exactly what the existing script pulls today: llvm-mingw `20251216`, CMake `4.2.3`, Ninja `1.13.1`, each with its URL. Done when: the file's versions match the script's variables exactly, compared line by line.
 2. **Add the SHA-256 for each**, taken from a real download. Done when: every entry has a hash and re-running the bootstrap verifies all three.
@@ -72,10 +72,10 @@ What it lacks is hash verification, detect-before-download, a locator that fails
 6. **Prove the bare-machine claim last**, because it is the only stage needing a second machine. Done when: bootstrap and build both succeed where no Visual Studio and no Windows SDK are installed.
 
 - [ ] Record the pins in `toolchain.json` at the repository root: the llvm-mingw release, CMake, and Ninja, each with a download URL and a SHA-256. Done when: every value is an exact version and every entry carries a hash, and the versions match what the ExoKit bootstrap pulls today. Cheaper substitute: naming versions without hashes, which makes the bootstrap reproducible only until a URL is re-cut.
-- [ ] `scripts/bootstrap.ps1` **detects before it downloads**, in a fixed order: `.toolchain/` first, then the machine's installed components. Done when: a second run downloads nothing and finishes in seconds, and the detection order is documented so a repository-scoped component always wins over a machine-installed one of the same version.
+- [ ] `scripts/bootstrap.ps1` **detects before it downloads**, in a fixed order: `reskit/` first, then the machine's installed components. **Corrected 2026-09-17 by `D00 T03 §3`:** this said `.toolchain/`, while the Build order below said `reskit/` and the Inputs said `exokit/`. Three names for one directory in one section. `reskit/` is what `§3` creates and what `.gitignore` already covers. Done when: a second run downloads nothing and finishes in seconds, and the detection order is documented so a repository-scoped component always wins over a machine-installed one of the same version.
 - [ ] Detect the **pinned version specifically**, not merely presence. Done when: a directory carrying a different llvm-mingw release than the pin does not silently satisfy the check. Cheaper substitute that defeats the point of pinning: accepting any toolchain that is present, which makes two machines disagree while both report success.
 - [ ] Decide and record what happens when only a non-pinned version is present: replace it with the pin, or report and stop for the operator to choose. Done when: the behavior is a dated default with its cost of changing, and the message names both the found version and the wanted one.
-- [ ] Download each missing component into `.toolchain/`, verify its hash, and refuse to proceed on a mismatch. Done when: a deliberately corrupted hash aborts the bootstrap with a named message and leaves `.toolchain/` unchanged.
+- [ ] Download each missing component into `reskit/`, verify its hash, and refuse to proceed on a mismatch. **Corrected 2026-09-17 by `D00 T03 §3`**, same reason. Done when: a deliberately corrupted hash aborts the bootstrap with a named message and leaves `reskit/` unchanged.
 - [ ] Confirm the self-contained claim rather than assuming it. Done when: a machine with no Visual Studio and no Windows SDK compiles and links a program calling `CreateFileW` and a Direct2D entry point, using only the bootstrapped toolchain.
 - [ ] Record the MinGW-w64 tradeoff plainly. Done when: this section states that the toolchain targets the MinGW-w64 environment rather than the MSVC ABI, so MSVC-built static libraries cannot be linked and debugging is LLDB, with the cost of changing that decision.
 - [ ] Record what the extra llvm-mingw targets are worth. Done when: the `aarch64`, `arm64ec`, `armv7`, and `i686` targets are named and this section states whether ARM64 Windows is in scope, as a dated default.
@@ -102,10 +102,10 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
 <!-- claim: count "lunasvg" shared/lucide/CMakeLists.txt = 6 -->
 <!-- claim: absent .gitmodules -->
 - [ ] Keep static linking explicit and enforced. Done when: `-static -static-libgcc -static-libstdc++` is set once for every target, and a build producing a runtime DLL dependency fails, proven by checking the built executable's imports.
-- [ ] **Replace the runtime icon loader, which is what actually breaks standalone.** Corrected 2026-09-17 after independent review: an earlier draft of this item blamed the `SHARED` library targets, which was wrong. `src/CMakeLists.txt:10` links `ExoUI_static`, so ExoUI is already static. The real dependency is explicit: `LucideIcons::Load()` at `shared/exo-ui/src/icons.cpp:15` calls `LoadLibraryW(L"System\Lucide.dll")` and resolves entry points with `GetProcAddress`. Done when: icons render with **no DLL present beside the executable**, proven by deleting `System/` and running. Cheaper substitute that fails the checkpoint: checking the executable's import table, which cannot see a runtime `LoadLibrary` and would pass a tool that still needs a DLL.
-<!-- claim: count "LoadLibraryW" shared/exo-ui/src/icons.cpp = 2 -->
-<!-- claim: count "ExoUI_static" src/CMakeLists.txt = 1 -->
-- [ ] Record what the release preset ships today, so the change has a before. Measured 2026-09-17: `Bin/Release/Resolute.exe` at **1,381,376** bytes plus `System/ExoUI.dll` and `System/Lucide.dll`, 4,074,176 bytes in total. **Corrected 2026-09-17 by `D00 T03 §2`:** this read `ExoSuite.exe` at 1,380,352 bytes. The rename added 1,024 bytes, which is the version-resource block that executable had never carried. `shared/exo-ui/CMakeLists.txt:33` and `shared/lucide/CMakeLists.txt:58` still build `SHARED` targets even though the application does not link ExoUI's. Done when: the unused shared target is either removed or its purpose recorded.
+- [ ] **Replace the runtime icon loader, which is what actually breaks standalone.** Corrected 2026-09-17 after independent review: an earlier draft of this item blamed the `SHARED` library targets, which was wrong. `src/CMakeLists.txt` links `ResoluteUI_static`, so the UI library is already static. The real dependency is explicit: `LucideIcons::Load()` at `shared/resolute-ui/src/icons.cpp:15` calls `LoadLibraryW(L"System\Lucide.dll")` and resolves entry points with `GetProcAddress`. Done when: icons render with **no DLL present beside the executable**, proven by deleting `System/` and running. Cheaper substitute that fails the checkpoint: checking the executable's import table, which cannot see a runtime `LoadLibrary` and would pass a tool that still needs a DLL.
+<!-- claim: count "LoadLibraryW" shared/resolute-ui/src/icons.cpp = 2 -->
+<!-- claim: count "ResoluteUI_static" src/CMakeLists.txt = 1 -->
+- [ ] Record what the release preset ships today, so the change has a before. Measured 2026-09-17: `Bin/Release/Resolute.exe` at **1,381,376** bytes plus `System/ExoUI.dll` and `System/Lucide.dll`, 4,074,176 bytes in total. **Corrected 2026-09-17 by `D00 T03 §2`:** this read `ExoSuite.exe` at 1,380,352 bytes. The rename added 1,024 bytes, which is the version-resource block that executable had never carried. `shared/resolute-ui/CMakeLists.txt:33` and `shared/lucide/CMakeLists.txt:58` still build `SHARED` targets even though the application does not link ExoUI's. Done when: the unused shared target is either removed or its purpose recorded.
 - [ ] Put all build output under `build/`, which is already gitignored, with nothing written inside `src/`. Done when: a full configure and build leaves `git status` clean.
 - [ ] Prove the structure builds the real application, not a placeholder. Done when: `Resolute.exe` builds from a clean checkout after bootstrap, cloned **without** `--recursive`.
 - [ ] Record the binary size as the baseline the per-tool size budget is measured against. Done when: the size is in this section, dated, against the 1.39 MB the pre-intake build produced.
@@ -172,9 +172,9 @@ Five gates that must each be remembered are five gates that get skipped under ti
 >
 > The pinned llvm-mingw carries clang 21.1.8, measured from a real bootstrap on 2026-09-17.
 
-<!-- claim: count "20251216" exokit/Bootstrap-ExoKit.ps1 = 1 -->
-<!-- claim: count "4\.2\.3" exokit/Bootstrap-ExoKit.ps1 = 1 -->
-<!-- claim: count "1\.13\.1" exokit/Bootstrap-ExoKit.ps1 = 1 -->
+<!-- claim: count "20251216" scripts/bootstrap.ps1 = 1 -->
+<!-- claim: count "4\.2\.3" scripts/bootstrap.ps1 = 1 -->
+<!-- claim: count "1\.13\.1" scripts/bootstrap.ps1 = 1 -->
 
 **The tension this section resolves.** Pinning and "latest" pull against each other and both are right: a pin buys reproducibility, currency buys compiler fixes and newer C++23 support. The resolution is that **a pin is a dated decision, not a permanent one**, and that falling behind must be *visible* rather than discovered by accident nine months later.
 

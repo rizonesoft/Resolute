@@ -49,10 +49,8 @@ extensions/*/bin/
 test_font.obj
 
 # The bootstrapped toolchain, never committed.
-# Renamed exokit -> reskit by D00 T03 §3; both are ignored across the rename.
-/exokit/llvm-mingw/
-/exokit/cmake/
-/exokit/ninja/
+# Renamed exokit -> reskit by D00 T03 §3, which completed; the exokit rules are
+# gone with the directory rather than kept as dead weight.
 /reskit/llvm-mingw/
 /reskit/cmake/
 /reskit/ninja/

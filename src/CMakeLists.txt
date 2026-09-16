@@ -21,7 +21,7 @@ target_compile_options(Resolute PRIVATE -municode)
 target_link_options(Resolute PRIVATE -municode -mwindows)
 
 target_link_libraries(Resolute PRIVATE
-    ExoUI_static
+    ResoluteUI_static
     comctl32
     dwmapi
     uxtheme

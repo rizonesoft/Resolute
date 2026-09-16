@@ -38,7 +38,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Bin/Debug")
 add_link_options(-static)
 
 # ── Subdirectories ───────────────────────────────────────────
-add_subdirectory(shared/exo-ui)
+add_subdirectory(shared/resolute-ui)
 add_subdirectory(shared/lucide)
 add_subdirectory(src)
 
