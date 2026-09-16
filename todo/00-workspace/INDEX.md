@@ -10,6 +10,7 @@ Toolchain, gates, build, and the test backbone every later domain leans on. Noth
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-toolchain-and-gates.md) | C++ Toolchain and Gates | draft |
 | [TODO-02](./TODO-02-test-backbone.md) | Test Backbone | draft |
+| [TODO-03](./TODO-03-codebase-intake.md) | ExoSuite Codebase Intake | draft |
 
 ## Completed
 
@@ -18,8 +19,9 @@ Toolchain, gates, build, and the test backbone every later domain leans on. Noth
 
 ## In scope
 
-- Repository-scoped clang-cl toolchain, bootstrapped rather than installed
-- CMake and vcpkg skeleton with statically linked wxWidgets
+- Taking the ExoSuite codebase in with its history, and renaming it to Resolute
+- Repository-scoped llvm-mingw toolchain, bootstrapped rather than installed
+- CMake structure, dependency policy, and static linking
 - Warnings as errors, clang-tidy, and one command that runs every gate
 - Catch2 harness, disposable fixtures, house-style captures, and the parity driver
 

@@ -21,6 +21,7 @@ track: F1
 - [`resolute_au3/SDK/Includes/`](../../resolute_au3/SDK/Includes) -- the shared includes `ReBar` consumes: `About.au3`, `Update.au3`, `Logging.au3`, `Localization.au3`, `Versioning.au3`
 - -> XREF: [`00-workspace/TODO-01 §4`](../00-workspace/TODO-01-toolchain-and-gates.md) -- the build this framework is the first real consumer of
 - -> XREF: [`00-workspace/TODO-02 §1`](../00-workspace/TODO-02-test-backbone.md) -- the harness these assertions run under
+- -> XREF: [`00-workspace/TODO-03 §3`](../00-workspace/TODO-03-codebase-intake.md) -- the UI library this framework adopts, renamed by that section
 - -> XREF: [`02-repair-contract/TODO-01 §1`](../02-repair-contract/TODO-01-repair-contract.md) -- the second layer, which sits on this one
 - -> XREF: [`03-launcher/TODO-01 §1`](../03-launcher/TODO-01-launcher.md) -- the launcher, this framework's first product consumer
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the ports, every one of which consumes this
@@ -52,8 +53,8 @@ track: F1
 |   4   |   §4    | Localization and the pack loader                | §2                     |  [ ]   |
 |   5   |   §5    | Update check and consolidation announcement     | §2, §4                 |  [ ]   |
 |   6   |   §6    | Elevation and its refusal path                  | §3, §4                 |  [ ]   |
-|   7   |   §7    | Standard window, About, and preferences         | §4                     |  [ ]   |
-|   8   |   §8    | DPI awareness and system theme                  | §7                     |  [ ]   |
+|   7   |   §7    | Adopt the UI library and its surfaces           | §4, D00 T03 §3         |  [ ]   |
+|   8   |   §8    | Extend the UI library for the tools             | §7                     |  [ ]   |
 |   9   |   §9    | Standalone proof in an empty folder             | §2, §4, §5, §7         |  [ ]   |
 
 ---
@@ -166,9 +167,11 @@ Every AutoIt tool requests elevation at startup and then assumes it holds for th
 
 **Test checkpoint:** Three elevation assertions run green in an unelevated session, each proving the action was refused by name, nothing changed, and exactly one log line was written. The refusal message is quoted.
 
-## 7. Standard Window, About, and Preferences
+## 7. Adopt the UI Library and Its Surfaces
 
-Three surfaces every tool has, built once. The AutoIt suite has fourteen About dialogs that are nearly the same and drift a little, which is the visible form of the duplication problem.
+Most of this section already exists. `shared/resolute-ui` is 6,865 lines of Direct2D and DirectWrite carrying theme, typography, DPI, animation, icons, and six controls, and it renders the launcher today at 1.39 MB fully static. What it does **not** have is an About dialog, a preferences host, or any binding to the settings and localization layers built in §2 and §4.
+
+This section connects the two, and it is adoption rather than construction. DPI and dark mode are not built here: Direct2D is vector-crisp by construction and the theme system already carries a semantic palette with four elevation levels, animated crossfade, DWM accent reading, and high-contrast detection.
 
 **Fidelity:** the standard tool window, the About dialog, and the preferences dialog, against `docs/captures/house-style/`. Layout and terminology match the captures; DPI and theme are the approved deviations.
 **Job:** a user recognizes any tool in the suite as part of one product, and changes a shared setting in the place they already know. Consumer: the rendered surfaces, and the settings writer behind preferences.
@@ -176,34 +179,38 @@ Three surfaces every tool has, built once. The AutoIt suite has fourteen About d
 **Chrome:** consume the framework's own settings writer and localization loader. A tool may add a preferences page; it may not fork the dialog.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Build the standard window frame: title band, content area, status strip, and menu, taking its content from the tool. Done when: a tool supplies only content and gets the full frame.
-- [ ] Build the About dialog from the tool descriptor, with no per-tool copy. Done when: two different tools render correct About dialogs with no tool-side code.
-- [ ] Build the preferences dialog covering the framework's own settings: language, logging, update frequency, process priority. Done when: every control persists through the §2 writer and survives a restart.
-- [ ] Let a tool add its own preferences without forking the dialog. Done when: a tool contributes a page and the framework's pages are unchanged.
+- [ ] Bind the UI library's text rendering to the localization loader from §4, so every string on every control resolves from a pack. Done when: driving with an incomplete pack lists the missing keys and nothing renders as bare English.
+- [ ] Bind the theme mode to the settings writer from §2, so light, dark, and follow-system persist. Done when: each is driven and survives a restart, proven by readback.
+- [ ] Build the About dialog on the library's controls, from the tool descriptor, with no per-tool copy. Done when: two different tools render correct About dialogs with no tool-side code.
+- [ ] Build the preferences host covering language, logging, update frequency, and process priority. Done when: every control persists through the §2 writer and survives a restart.
+- [ ] Let a tool add its own preferences page without forking the host. Done when: a tool contributes a page and the framework's pages are unchanged.
 - [ ] Account for the surface: every control on all three surfaces is working or deferred to a named section. Done when: the account is written and each deferral resolves.
 - [ ] Compare each rendered surface against its house-style capture and list every difference. Done when: three comparisons are recorded and each difference is either approved or fixed.
 - [ ] Commit: `"framework: standard window, about, and preferences"`
 
 **Test checkpoint:** Two different tools render correct About dialogs with no tool-side code. Every preferences control persists and survives a restart, proven by readback. The three rendered surfaces are compared against their captures with differences listed. Captures committed under `docs/captures/runs/`.
 
-## 8. DPI Awareness and System Theme
+## 8. Extend the UI Library for the Tools
 
-The two things the AutoIt suite could never retrofit, done once in the framework where they are affordable. On a high-resolution display the current suite renders soft against a sharp desktop, and it is invisible at 100 percent scaling.
+The library has six controls, built for a launcher that browses and launches things. The repair tools need surfaces it does not have: a per-item result list that reconciles, a progress surface, and the standard message and confirmation dialogs every destructive action goes through.
 
-**Fidelity:** the surfaces from §7, re-measured at 125, 150, and 200 percent scaling. These are the approved deviations from the house-style captures.
-**Job:** a user on a high-resolution display or in dark mode sees a tool that looks like the rest of their desktop. Consumer: the rendered surfaces at each scaling and in each appearance.
-**Treatment:** layout expressed in scalable terms so a DPI change re-lays out rather than re-scales a bitmap. Cheaper substitute that fails the checkpoint: declaring DPI awareness while keeping absolute pixel coordinates, which produces clipped controls instead of blurry ones.
-**Chrome:** consume the framework's own surfaces from §7. No tool implements its own DPI or theme handling.
+This section is where those are added **to the library**, not to a tool. Getting that wrong is how the AutoIt suite grew fourteen private progress bars.
+
+**Fidelity:** the new controls against the existing library's visual language and `TODO-ux.md`, captured at four scalings and in both appearances.
+**Job:** a repair tool can show what it did, how far along it is, and what it is about to destroy, using controls the whole suite shares. Consumer: the rendered surfaces, and the repair contract that drives them.
+**Treatment:** every new surface added to the shared library. Cheaper substitute that fails the checkpoint: adding a result list to the first tool that needs one, which is how fourteen private progress bars happen.
+**Chrome:** extend `shared/resolute-ui`. No tool defines its own control.
 **Needs:** Windows host (build/test)
 
-- [ ] Declare per-monitor DPI awareness in the manifest and make the framework surfaces lay out correctly at 100, 125, 150, and 200 percent. Done when: all four are captured and no control is clipped or overlapping at any of them.
-- [ ] Handle a DPI change at runtime, which happens when a window moves between monitors. Done when: dragging between two monitors at different scaling re-lays out correctly, captured.
-- [ ] Follow the system light and dark setting on the framework surfaces. Done when: both appearances are captured and text contrast is legible in each.
-- [ ] Record honestly what wxWidgets does not theme natively on Windows, and what the framework does about each. Done when: the list exists with a decision per entry rather than a silent gap.
-- [ ] Expose the appearance as a setting with light, dark, and follow-system. Done when: all three are driven and persist.
-- [ ] Commit: `"framework: per-monitor dpi and system theme"`
+- [ ] Add the result list control: one row per item with an outcome, a reason, and reconciling counts. Done when: a fixture set of mixed outcomes renders and the counts add up, captured.
+- [ ] Add the progress surface, covering both determinate and indeterminate work. Done when: both render and a long operation remains responsive, captured.
+- [ ] Add the message and confirmation dialogs, including the destructive confirmation that names what will be changed. Done when: every dialog the plan calls for exists in the library and no tool defines its own.
+- [ ] Verify the new controls at 100, 125, 150, and 200 percent, and in both appearances. Done when: all four scalings and both appearances are captured with nothing clipped.
+- [ ] Extend the Lucide icon set as the new controls require, keeping application icons out of it. Done when: every glyph a control needs resolves, and application icons remain per-tool Rizonesoft assets.
+- [ ] Hold the new controls to the existing UX standard. Done when: `TODO-ux.md` is named as the standard and each new control's animation and focus behavior is checked against it.
+- [ ] Commit: `"framework: extend the ui library for the repair tools"`
 
-**Test checkpoint:** Framework surfaces captured at 100, 125, 150, and 200 percent with nothing clipped. A drag between differently scaled monitors re-lays out correctly. Light and dark both captured. The unthemed-control list carries a decision per entry. All captures committed under `docs/captures/runs/`.
+**Test checkpoint:** The result list renders a mixed fixture set with reconciling counts. Both progress modes render and stay responsive. Every dialog the plan calls for exists in the library, proven by search showing no tool-side dialog. All new controls captured at four scalings and in both appearances. Captures committed under `docs/captures/runs/`.
 
 ## 9. Standalone Proof in an Empty Folder
 

@@ -472,3 +472,106 @@ The plan is seeded and green.
 The phases are: gates and the bar; the two shared layers; the launcher and the ports; intake and new capability; ship it in every language.
 
 `07-quality` deliberately carries no file-level dependency, so the conformance profile can be written immediately. It is what every tool is built against, so it runs first rather than reviewing finished work.
+
+---
+
+# ExoSuite changes the plan, 2026-09-16
+
+`samples/ExoSuite` was inspected at the operator's request. It is not a sketch: it is a working native C++23 application with a shared UI framework, a repository-scoped toolchain, and an extension model. It supersedes two decisions taken earlier today.
+
+## What was measured
+
+| Piece | Reality |
+| --- | --- |
+| `shared/exo-ui` | 6,865 lines of C++23: theme, typography, DPI, animation, icons, render, and six controls |
+| Rendering | Direct2D and DirectWrite, with native `ID2D1SvgDocument` SVG icon rendering |
+| Icons | Lucide, ISC licensed, 29 bundled |
+| `exokit/` | A working bootstrap: llvm-mingw 20251216 ucrt-x86_64, CMake 4.2.3, Ninja 1.13.1 |
+| `extensions/` | `RegStudio` and `Console`, each a standalone `WIN32` executable linking exo-ui statically |
+| `src/main.cpp` | 573 lines. The application is a shell composing `exo::Toolbar`, `Sidebar`, `StatusBar`, `ContentView`, `ListView` |
+| `Bin/Release/ExoSuite.exe` | **1.39 MB**, fully static via `-static -static-libgcc -static-libstdc++` |
+| Dependencies | **No vcpkg.** `deps/libvterm` is vendored for the Console extension |
+| Tests | **None.** `test_font.cpp` is a scratch file |
+| Standard | C++23, CMake presets, Ninja, LTO on release |
+
+The README still describes Rust and Slint and is stale: commit `efdce6177` removed that prototype and restored the native C++23 architecture.
+
+**573 lines of application on 6,865 lines of shared framework is the framework-plus-thin-tool split this session spent the day designing.** It already exists and it already ships.
+
+## Decisions taken, round 7
+
+23. **ExoSuite becomes the Resolute launcher.** One product, not two. Its Control Panel browsing and extension discovery is what the launcher does, the WinPower system-locations import folds into it naturally, and `RegStudio` and `Console` become Resolute tools.
+24. **ExoUI replaces wxWidgets as the UI layer.** Decision 14 is superseded.
+25. **ExoKit replaces the clang-cl bootstrap as the toolchain.** Decision 18 is superseded.
+26. **Lucide for UI glyphs, Rizonesoft icons for applications.** Each tool keeps the application icon users recognize.
+
+## Why ExoUI over wxWidgets
+
+- **1.39 MB static**, against 5 to 12 MB for wxWidgets and 40 to 60 MB for a self-contained WinUI 3. It is the same size class as the AutoIt executables it replaces.
+- **Direct2D is vector-crisp at every DPI by construction.** High DPI stops being a retrofit and becomes a property. `#AutoIt3Wrapper_Res_HiDpi=N` across fourteen scripts was the second most visible defect in the suite, and this removes the whole category.
+- **Dark mode is already built to a higher standard** than wxWidgets offers: a full semantic palette with four surface elevation levels, animated crossfade, DWM system accent reading, and high-contrast detection.
+- SVG icons render natively, so iconography is sharp at every scaling without a bitmap set per size.
+- It is the operator's own code, so there is no third-party UI dependency to track.
+
+## Why ExoKit over clang-cl plus an acquired Windows SDK
+
+The risk flagged in decision 18 was that `clang-cl` needs Windows SDK headers and import libraries that cannot be vendored, so the bootstrap depended on acquiring them from Microsoft's feed.
+
+**llvm-mingw removes that risk entirely.** It is a self-contained UCRT-targeting archive carrying its own headers and import libraries. No Windows SDK, no `xwin`, no licence question, and it already works.
+
+It also ships `aarch64`, `arm64ec`, `armv7`, `i686`, and `x86_64` targets, so ARM64 Windows becomes nearly free.
+
+**The honest tradeoff:** llvm-mingw targets the MinGW-w64 environment rather than the MSVC ABI. MSVC-built static libraries cannot be linked, and debugging is LLDB rather than the Visual Studio debugger. Everything here is built from source, so the cost is small, but it is a real constraint on ever consuming a binary-only third-party library.
+
+## What ExoUI does not cover
+
+Checked directly: the only matches for settings, logging, localization, or update in the exo-ui headers were `UpdateDpi`. **ExoUI is UI only.**
+
+The split is therefore clean, and it is good news for the framework domain:
+
+| Layer | Status |
+| --- | --- |
+| Theme, typography, DPI, animation, icons, render, six controls | **Exists.** `D01 T01 §7` and `§8` become adoption rather than construction |
+| Settings, logging, localization, update, elevation, tool descriptor, standalone layout | **Still owed.** `D01 T01 §1` to `§6` and `§9` stand |
+
+The two hardest sections in the framework domain were the ones already written.
+
+## What this leaves open
+
+- **`exo-ui` has no test coverage**, and neither does ExoSuite. `D00 T02` is unchanged in scope and is now the largest remaining gap in Phase 0.
+- **`samples/ExoSuite` and `samples/RegStudio` are embedded git repositories** with their own history. Bringing them in needs a decision: preserve history through a subtree merge, or vendor the working tree and lose it.
+- **`exo-ui` has six controls.** The repair tools need a result list, a progress surface, a preferences page host, and standard dialogs. Whether those are extensions to exo-ui or a Resolute layer above it is undecided.
+- **No vcpkg** means Catch2 needs vendoring or `FetchContent`.
+- **ExoSuite's README is stale** and describes a Rust and Slint stack that was removed.
+
+## Decisions taken, round 8
+
+27. **Everything renames to Resolute now.** The product, the UI library, and the toolchain. Measured scope: the product name is in 32 files, and `exo::`, `EXOUI_API`, and `exo/` appear 108 times across 25 files. It is the cheapest this will ever be, and it stops fourteen tools from including headers named for a retired product.
+28. **The codebase comes in through a subtree merge**, preserving history. `exo-ui` is about to become the foundation of fourteen tools, and how it reached its current shape is recoverable now and never again once the embedded repositories are discarded.
+
+### The names chosen
+
+Recorded as a dated default, changeable at the cost of redoing a mechanical rename:
+
+| Was | Becomes |
+| --- | --- |
+| `ExoSuite.exe` | `Resolute.exe` |
+| `shared/exo-ui` | `shared/resolute-ui` |
+| namespace `exo::` | namespace `rui::` |
+| `EXOUI_API` | `RESUI_API` |
+| include prefix `exo/` | `resolute/` |
+| `exokit/` | `reskit/`, bootstrapped from the repository root |
+
+### Build portability, confirmed
+
+The toolchain stays fully repository-scoped and is **more** portable than the superseded clang-cl plan. The bootstrap downloads llvm-mingw, CMake, and Ninja into an ignored directory. No Visual Studio, no Windows SDK, no installer, nothing registered on the machine. `D00 T01 §1` hardens it with recorded hashes, detect-before-download, a fail-by-name locator, and a proof on a machine that has neither Visual Studio nor a Windows SDK.
+
+---
+
+# Plan state after the ExoSuite intake
+
+- **10 domains, 12 TODO files, 58 sections.**
+- `validate`: 0 fatal, 0 warning, 46 adjacency advisories. `plan --check`: current at 0 of 58.
+- **4 sections ready:** `D00 T03 §1` (subtree merge), `D07 T01 §1` (conformance profile), `D09 T01 §1` and `§2` (AutoIt maintenance).
+
+`D00 T03` is the new front door: take the codebase in, rename it, correct its documentation. `D00 T01 §1` changed from building a bootstrap to hardening one. `D01 T01 §7` changed from building the standard surfaces to adopting the UI library and binding it to the settings and localization layers; `§8` changed from DPI and theme work, which Direct2D makes unnecessary, to extending the library with the result list, progress surface, and dialogs the repair tools need.

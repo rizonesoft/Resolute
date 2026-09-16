@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **0 of 54 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **0 of 58 sections complete (0%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -13,7 +13,7 @@ Seeded 2026-09-16 for the C++ rewrite. The decisions behind it are in [`../docs/
 **Copy a row and paste it.** The skills resolve a reference from whatever shape it arrives in, so this is a complete instruction:
 
 ```
-process todo section: | [ ] | `D00 T01 §1` | Portable toolchain bootstrap | 12 |
+process todo section: | [ ] | `D00 T03 §1` | Subtree merge with history preserved | 6 |
 ```
 
 > [!IMPORTANT]
@@ -43,7 +43,7 @@ The finished suite is **fourteen Rizonesoft products that behave like one produc
 | Every surface speaks the language   | `D01 T01 §4` · `D08 T01 §2`                                              |
 | Elevation refused by name           | `D01 T01 §6` · `D02 T01 §1`                                              |
 | Every change has a reverse          | `D02 T01 §4` · `D04 T01 §2` · `D05 T01 §5`                               |
-| It looks like a 2026 application    | `D01 T01 §8` (DPI and theme)                                             |
+| It looks like a 2026 application    | `D00 T03 §1` (the UI library) · `D01 T01 §7`-`§8` (adopt and extend it)  |
 | Each tool ships alone               | `D01 T01 §9` · `D07 T01 §1` · `D06 T01 §3`                               |
 | One suite, not fourteen products    | `D01 T01 §1` · `D02 T01 §1` · `D07 T01 §3`                               |
 | Retiring products tell their users  | `D06 T01 §4`                                                             |
@@ -53,7 +53,9 @@ The finished suite is **fourteen Rizonesoft products that behave like one produc
 
 ## Where the project stands
 
-Nothing in this plan has been built. `src/` does not exist yet.
+Nothing in this plan has been built, but the C++ tree is **not** starting from zero.
+
+`samples/ExoSuite` is a working native C++23 application that `D00 T03` takes in: a 6,865-line Direct2D and DirectWrite UI framework, a 573-line application shell, a working repository-scoped llvm-mingw toolchain, an extension model where each tool builds as a standalone executable, and a 1.39 MB fully static binary. It has no tests, no vcpkg, and none of the non-UI framework layers. It becomes the Resolute launcher, and its UI library becomes the framework's UI half.
 
 The suite being replaced is mature and shipping: fourteen tools, roughly 43,000 lines of AutoIt3, a working builder, and an installer. Two measurements shape this plan. Roughly **21,000 of those 43,000 lines are fourteen copies of one framework**, which is why the real porting job is one framework plus fourteen small bodies of logic rather than a 43,000-line rewrite. And the per-tool logic, with that framework subtracted, is: `Ownership` 77 lines, `USBRepair` 147, `DVDRepair` 274, `PixRepair` 341, `BiosCodes` 960, `ComIntRep` 1,903.
 
@@ -67,7 +69,7 @@ Every open section is in scope and must appear in exactly one phase. A dependenc
 
 ### 1. A Windows host
 
-Everything here is Windows-only. `D00 T01 §1` makes the toolchain repository-scoped so that host needs no Visual Studio, but it still needs to be Windows.
+Everything here is Windows-only. The toolchain is repository-scoped and bootstrapped, so the host needs no Visual Studio and no Windows SDK, but it still needs to be Windows.
 
 ### 2. The signing procedure
 
@@ -88,10 +90,14 @@ Signing already happens outside this repository. `D06 T01 §3` documents and ver
 
 ### Phase 0 -- Gates, proof, and the bar
 
-Nothing in this plan can be proven until this phase is done. It also carries the conformance profile, which runs early rather than late because it is what every tool is built against, and the maintenance that keeps the shipping AutoIt suite alive meanwhile.
+Nothing in this plan can be proven until this phase is done. It opens by taking the ExoSuite codebase in and renaming it, because that is what makes `src/` real. It also carries the conformance profile, which runs early rather than late because it is what every tool is built against, and the maintenance that keeps the shipping AutoIt suite alive meanwhile.
 
 |  ✔  | Section      | Deliverable                                | Items |
 | :-: | ------------ | ------------------------------------------ | :---: |
+| [ ] | `D00 T03 §1` | Subtree merge with history preserved       |   6   |
+| [ ] | `D00 T03 §2` | Rename the product to Resolute             |   5   |
+| [ ] | `D00 T03 §3` | Rename the library and the toolchain       |   5   |
+| [ ] | `D00 T03 §4` | Correct the stale documentation            |   5   |
 | [ ] | `D00 T01 §1` | Portable toolchain bootstrap               |  15   |
 | [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest          |   8   |
 | [ ] | `D00 T01 §3` | Warnings as errors at one level            |   6   |
@@ -187,5 +193,6 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 - **It does not set up CI.** There is no runner for this repository today. `D00 T01 §5` puts the whole gate set behind one command so wiring a runner later is a small job.
 - **It does not unify tool versions.** `D06 T01 §5` writes the rule that explains the spread rather than declaring it wrong.
 - **It does not maintain the AutoIt suite beyond keeping it shippable.** `D09 T01 §3` writes that scope down so the rewrite does not quietly become two projects.
-- **It does not vendor a compiler into git.** `D00 T01 §1` downloads a pinned toolchain into an ignored directory instead.
+- **It does not vendor a compiler into git.** The bootstrap downloads a pinned llvm-mingw toolchain into an ignored directory instead.
+- **It does not keep the ExoSuite name.** `D00 T03` renames the product, the UI library, and the toolchain to Resolute, because there is one product here rather than two.
 

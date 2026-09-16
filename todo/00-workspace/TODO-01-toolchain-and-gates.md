@@ -13,13 +13,15 @@ track: W1
 > **Goal:** A clean checkout builds any tool with one command, on a machine whose toolchain versions are pinned rather than remembered. Every gate the project owes runs from one entry point, so a change is either provably clean or provably not.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** Nothing in this domain exists. `src/` has not been created. There is no `CMakeLists.txt`, no vcpkg manifest, no compiler pin, and no gate script anywhere in the repository. The AutoIt suite under `resolute_au3/` builds through `SDK/Distro.exe` from `.sni` descriptors whose paths point at `R:\Workspace\Resolute`, a directory that no longer exists, so that tree does not build from a clean checkout either. Every later section in this plan cites a build, a static-analysis run, a unit test, or a parity run, and none of those can happen until this file ships.
+> **Current state (verified 2026-09-16):** A working toolchain bootstrap and CMake structure arrive with `D00 T03`, from the ExoSuite codebase: llvm-mingw 20251216 ucrt-x86_64, CMake 4.2.3, Ninja 1.13.1, C++23, presets driving Ninja with LTO on release, and full static linking producing a 1.39 MB executable. There is **no vcpkg**; `deps/libvterm` is vendored. What does not exist anywhere is hash verification on the bootstrap, a locator that fails by name, a warning level applied across targets, `clang-tidy`, a one-command build, or a combined gate. The AutoIt suite under `resolute_au3/` separately does not build from a clean checkout, because thirteen `.sni` descriptors point at `R:\Workspace\Resolute`, a directory that no longer exists; `D09 T01 §1` owns that.
 
 ## Inputs
 
-- [`resolute_au3/SDK/Concrete/ReBar/ReBar.au3`](../../resolute_au3/SDK/Concrete/ReBar/ReBar.au3) -- the framework being ported; its `#AutoIt3Wrapper_OutFile` directives are already repository-relative and are the model for output paths
-- [`docs/brainstorm/2026-09-16-completion-brainstorm.md`](../../docs/brainstorm/2026-09-16-completion-brainstorm.md) -- the toolkit decision and its rationale
+- [`samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1`](../../samples/ExoSuite/exokit/Bootstrap-ExoKit.ps1) -- the working bootstrap this file hardens
+- [`samples/ExoSuite/CMakePresets.json`](../../samples/ExoSuite/CMakePresets.json) -- the preset structure this file adopts
+- [`docs/brainstorm/2026-09-16-completion-brainstorm.md`](../../docs/brainstorm/2026-09-16-completion-brainstorm.md) -- the toolchain decision and its rationale
 - -> XREF: [`00-workspace/TODO-02 §1`](./TODO-02-test-backbone.md) -- the Catch2 harness this file's build must produce
+- -> XREF: [`00-workspace/TODO-03 §3`](./TODO-03-codebase-intake.md) -- the intake that moves the toolchain bootstrap to the repository root before this file hardens it
 - -> XREF: [`01-framework/TODO-01 §1`](../01-framework/TODO-01-framework-core.md) -- the first real consumer of the build
 - -> XREF: [`07-quality/TODO-01 §2`](../07-quality/TODO-01-quality-bar.md) -- the warning ratchet that builds on §3
 
@@ -33,62 +35,64 @@ track: W1
 
 **Adjacency:** list=not-applicable (a build system holds no records a user browses); document=not-applicable (nothing here produces a document a user carries); settings=applicable @ D00 T01 §2; reporting=applicable @ D00 T01 §5; notifications=not-applicable (a local gate notifies nobody); permissions=not-applicable (single-user desktop toolchain, no roles); audit=not-applicable (git history is the audit for a build script); exchange=not-applicable (nothing imports or exports here); reverse=not-applicable (a build produces artifacts under `build/`, and deleting that directory is the whole reverse)
 
-**Adjacency rationale:** Settings anchors on §2 because the vcpkg manifest and the CMake preset set are this domain's configuration surface, and they are the thing a second developer has to reproduce exactly. Reporting anchors on §5 because the combined gate is what a human reads to decide whether a change is shippable, and a gate that reports nothing legible is a gate people stop running.
+**Adjacency rationale:** Settings anchors on §2 because the CMake preset set and the dependency policy are this domain's configuration surface, and they are the thing a second developer has to reproduce exactly. Reporting anchors on §5 because the combined gate is what a human reads to decide whether a change is shippable, and a gate that reports nothing legible is a gate people stop running.
 
 ## Implementation Order
 
 | Order | Section | Deliverable                                  | Depends On | Status |
 | :---: | :-----: | -------------------------------------------- | ---------- | :----: |
-|   1   |   §1    | Portable toolchain bootstrap                 | --         |  [ ]   |
-|   2   |   §2    | CMake skeleton and vcpkg manifest            | §1         |  [ ]   |
+|   1   |   §1    | Harden the toolchain bootstrap               | D00 T03 §3 |  [ ]   |
+|   2   |   §2    | CMake structure and dependencies             | §1         |  [ ]   |
 |   3   |   §3    | Warnings as errors at one level              | §2         |  [ ]   |
 |   4   |   §4    | One command builds any tool                  | §2         |  [ ]   |
 |   5   |   §5    | One command runs every gate                  | §3, §4     |  [ ]   |
 
 ---
 
-## 1. Portable Toolchain Bootstrap
+## 1. Harden the Toolchain Bootstrap
 
-The toolchain is repository-scoped: a bare Windows machine with no Visual Studio installed runs one script and can build. That is the decision, and this section is where it is either true or quietly false. Nothing is vendored into git; everything is downloaded to a gitignored directory against a recorded hash.
+The toolchain is repository-scoped: a bare Windows machine with no Visual Studio installed runs one script and can build. **That already works.** `D00 T03 §3` moves ExoKit's bootstrap to the repository root; this section hardens it to the standard the rest of the plan needs.
 
-The sharp edge is that `clang-cl` is not a complete toolchain on Windows. It needs the Windows SDK headers and import libraries and a C++ standard library, and neither ships in the LLVM archive. The LLVM archive is freely redistributable; the Windows SDK is not, so it is **downloaded at bootstrap from Microsoft's own package feed** rather than committed. If that acquisition proves unworkable, this section is where the plan finds out, not `D01`.
+What it pulls today is llvm-mingw 20251216 ucrt-x86_64, CMake 4.2.3, and Ninja 1.13.1. llvm-mingw matters because it is a **self-contained UCRT-targeting archive carrying its own headers and import libraries**, so there is no Windows SDK to acquire and no licence question to answer. That was the single largest risk in this domain and the existing bootstrap removes it.
+
+What it lacks is hash verification, detect-before-download, a locator that fails by name, and any proof that it works on a machine other than the one it was written on.
 
 **Needs:** Windows host (build/test)
 
-- [ ] Record the pins in `toolchain.json` at the repository root: LLVM release, Windows SDK version, CRT version, CMake, Ninja, and the vcpkg baseline commit, each with a download URL and a SHA-256. Done when: every value is an exact version and every entry carries a hash. Cheaper substitute: naming versions without hashes, which makes the bootstrap reproducible only until a URL is re-cut.
+- [ ] Record the pins in `toolchain.json` at the repository root: the llvm-mingw release, CMake, and Ninja, each with a download URL and a SHA-256. Done when: every value is an exact version and every entry carries a hash, and the versions match what the ExoKit bootstrap pulls today. Cheaper substitute: naming versions without hashes, which makes the bootstrap reproducible only until a URL is re-cut.
 - [ ] `scripts/bootstrap.ps1` **detects before it downloads**, in a fixed order: `.toolchain/` first, then the machine's installed components. Done when: a second run downloads nothing and finishes in seconds, and the detection order is documented so a repository-scoped component always wins over a machine-installed one of the same version.
-- [ ] Detect the **pinned version specifically**, not merely presence. Done when: a machine carrying a different Windows SDK version than the pin does not silently satisfy the check. Cheaper substitute that defeats the point of pinning: accepting any installed SDK, which makes two machines disagree while both report success.
-- [ ] Decide and record what happens when only a non-pinned version is present: download the pin alongside it, or report and stop for the operator to choose. Done when: the behavior is a dated default with its cost of changing, and the message names both the found version and the wanted one.
-- [ ] Locate a machine-installed Windows SDK properly rather than by guessing a path. Done when: the lookup reads `HKLM\SOFTWARE\Microsoft\Windows Kits\Installed Roots` and the resolved root and version are printed.
+- [ ] Detect the **pinned version specifically**, not merely presence. Done when: a directory carrying a different llvm-mingw release than the pin does not silently satisfy the check. Cheaper substitute that defeats the point of pinning: accepting any toolchain that is present, which makes two machines disagree while both report success.
+- [ ] Decide and record what happens when only a non-pinned version is present: replace it with the pin, or report and stop for the operator to choose. Done when: the behavior is a dated default with its cost of changing, and the message names both the found version and the wanted one.
 - [ ] Download each missing component into `.toolchain/`, verify its hash, and refuse to proceed on a mismatch. Done when: a deliberately corrupted hash aborts the bootstrap with a named message and leaves `.toolchain/` unchanged.
-- [ ] Acquire the Windows SDK and CRT headers and libraries into `.toolchain/` without a Visual Studio install, and record which mechanism was used and under which licence terms. Done when: a machine with no Visual Studio compiles and links a program calling `CreateFileW`, and the mechanism and licence are named here.
-- [ ] Decide and record the C++ standard library: MSVC STL from the acquired CRT, or LLVM's libc++. Done when: the decision is dated, carries its cost of changing, and names which one wxWidgets and Catch2 are built against.
-- [ ] Pin the **latest stable** Windows SDK, and set the runtime floor separately to Windows 10 1809 through `WINVER`, `_WIN32_WINNT`, and the application manifest. Done when: `toolchain.json` names the exact current SDK version, the floor macros are set in one place in CMake, and this section states why the two are independent knobs. Cheaper substitute: pinning the SDK to the floor version, which trades away every newer header to solve a problem the floor macros already solve.
+- [ ] Confirm the self-contained claim rather than assuming it. Done when: a machine with no Visual Studio and no Windows SDK compiles and links a program calling `CreateFileW` and a Direct2D entry point, using only the bootstrapped toolchain.
+- [ ] Record the MinGW-w64 tradeoff plainly. Done when: this section states that the toolchain targets the MinGW-w64 environment rather than the MSVC ABI, so MSVC-built static libraries cannot be linked and debugging is LLDB, with the cost of changing that decision.
+- [ ] Record what the extra llvm-mingw targets are worth. Done when: the `aarch64`, `arm64ec`, `armv7`, and `i686` targets are named and this section states whether ARM64 Windows is in scope, as a dated default.
+- [ ] Set the runtime floor to Windows 10 1809 through `WINVER`, `_WIN32_WINNT`, and the application manifest, in one place in CMake. Done when: the floor macros are set once and inherited by every target. The Windows SDK pin is not needed here: llvm-mingw supplies its own headers, which is why decision 21's separate-pin problem does not arise under this toolchain.
 - [ ] Add a floor check so an above-floor API cannot ship silently. Done when: a deliberate call to an API newer than the floor fails the build or is flagged by `clang-tidy`, and the diagnostic is quoted. Record which mechanism was used.
-- [ ] Record why the floor is Windows 10 1809 rather than the Vista-through-Win10 range the AutoIt manifests declare. Done when: this section names dark mode and per-monitor DPI v2 as the two features that set it, with the cost of lowering it.
-- [ ] Add `.toolchain/` to `.gitignore`. Done when: a full bootstrap leaves `git status` clean.
+- [ ] Record why the floor is Windows 10 1809 rather than the Vista-through-Win10 range the AutoIt manifests declare. Done when: this section names dark mode, per-monitor DPI v2, and Direct2D SVG rendering as the features that set it, with the cost of lowering it.
+- [ ] Ensure the bootstrapped toolchain directory is gitignored. Done when: a full bootstrap leaves `git status` clean.
 - [ ] `scripts/cpp-env.ps1` reports every resolved component and its version, and fails by name. Done when: it prints all six on a bootstrapped machine, and deleting one component makes it exit 1 naming that component and the bootstrap command that restores it.
 - [ ] Prove the bare-machine claim. Done when: bootstrap and build succeed on a Windows machine with no Visual Studio installed, and this section records where that was proven and on what Windows build.
 - [ ] Commit: `"workspace: repository-scoped clang-cl toolchain bootstrap"`
 
-**Test checkpoint:** `pwsh scripts/bootstrap.ps1` populates `.toolchain/` from the pins and leaves `git status` clean. A second run downloads nothing and finishes in seconds, quoted. On a machine carrying a non-pinned Windows SDK, the run reports both the found and the wanted version rather than accepting it. A corrupted hash aborts with a named message. `pwsh scripts/cpp-env.ps1` prints six resolved versions; deleting one component makes it exit 1 naming that component. Bootstrap and build both succeed on a machine with no Visual Studio, and that machine's Windows build is quoted.
+**Test checkpoint:** `pwsh scripts/bootstrap.ps1` populates the toolchain directory from the pins and leaves `git status` clean. A second run downloads nothing and finishes in seconds, quoted. A non-pinned llvm-mingw release is reported rather than accepted, naming found and wanted. A corrupted hash aborts with a named message. `pwsh scripts/cpp-env.ps1` prints three resolved versions; deleting one component makes it exit 1 naming it. Bootstrap and build both succeed on a machine with no Visual Studio and no Windows SDK, compiling a Direct2D entry point, and that machine's Windows build is quoted.
 
-## 2. CMake Skeleton and vcpkg Manifest
+## 2. CMake Structure and Dependencies
 
-The dependency set is small and the temptation to vendor it by hand is real. A manifest is what makes "it builds on my machine" reproducible, and wxWidgets static is a large enough dependency that building it twice by accident is a genuine cost.
+The intake brings a working CMake structure: C++23, presets driving Ninja, LTO on release, and full static linking. This section makes it the repository's structure rather than one application's, and settles how dependencies arrive now that there is no vcpkg and no wxWidgets.
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] Create `src/` with a top-level `CMakeLists.txt` targeting C++23, and a `CMakePresets.json` carrying an x86 and an x64 configuration that resolve their compiler, generator, and vcpkg root from `.toolchain/` rather than from `PATH`. Done when: `cmake --preset x64-debug` configures on a clean checkout, and configuring with a different compiler earlier on `PATH` still selects the bootstrapped one.
+- [ ] Make the presets resolve their compiler and generator from the bootstrapped toolchain rather than from `PATH`. Done when: configuring with a different `clang` earlier on `PATH` still selects the bootstrapped one, proven by the configure output.
 - [ ] Generate no Visual Studio solution and commit none. Done when: the repository contains no `.sln` or `.vcxproj`, and the presets drive VS, VS Code, and a bare terminal identically.
-- [ ] Add `vcpkg.json` declaring `wxwidgets` and `catch2`, with the baseline pinned to the commit recorded in §1, and a custom triplet naming `clang-cl` as the compiler. Done when: a clean checkout with no vcpkg cache resolves and builds both dependencies unattended under `clang-cl`.
-- [ ] Pin wxWidgets to static linkage explicitly, so the triplet cannot silently produce a DLL build. Done when: the configured triplet is asserted in CMake and configuration fails with a named message if it is not static.
+- [ ] Settle how dependencies arrive. Done when: the decision is dated, records that there is no vcpkg and that `deps/libvterm` is vendored, and names how Catch2 arrives.
+- [ ] Keep static linking explicit and enforced. Done when: `-static -static-libgcc -static-libstdc++` is set once for every target, and a build producing a runtime DLL dependency fails, proven by checking the built executable's imports.
 - [ ] Put all build output under `build/`, which is already gitignored, with nothing written inside `src/`. Done when: a full configure and build leaves `git status` clean.
-- [ ] Prove the skeleton compiles and links something real: a placeholder executable that links wxWidgets and opens no window. Done when: it builds for both architectures and runs to exit 0.
-- [ ] Record the resulting binary size for the placeholder, as the baseline the per-tool size budget is measured against. Done when: both architecture sizes are in this section, dated.
-- [ ] Commit: `"workspace: cmake skeleton and vcpkg manifest with static wxWidgets"`
+- [ ] Prove the structure builds the real application, not a placeholder. Done when: `Resolute.exe` builds from a clean checkout after bootstrap.
+- [ ] Record the binary size as the baseline the per-tool size budget is measured against. Done when: the size is in this section, dated, against the 1.39 MB the pre-intake build produced.
+- [ ] Commit: `"workspace: repository cmake structure and dependency policy"`
 
-**Test checkpoint:** `cmake --preset x64-debug && cmake --build --preset x64-debug` succeeds on a clean checkout with no vcpkg cache. The placeholder links statically, proven by `dumpbin /dependents` showing no `wx` DLL. `git status` is clean afterwards. The two baseline binary sizes are quoted.
+**Test checkpoint:** `cmake --preset release && cmake --build --preset release` succeeds on a clean checkout after bootstrap and produces `Resolute.exe`. The executable's imports are listed and carry no compiler runtime DLL. `git status` is clean afterwards. The binary size is quoted against the 1.39 MB baseline.
 
 ## 3. Warnings as Errors at One Level
 
@@ -136,11 +140,11 @@ Five gates that must each be remembered are five gates that get skipped under ti
 
 ## Verification
 
-- [ ] `pwsh scripts/bootstrap.ps1` populates `.toolchain/` from the pins and leaves `git status` clean
+- [ ] `pwsh scripts/bootstrap.ps1` populates the toolchain from the pins and leaves `git status` clean
 - [ ] `pwsh scripts/cpp-env.ps1` exits 0 and prints every resolved component version
 - [ ] `pwsh scripts/build.ps1 -All` builds every defined target for both architectures
 - [ ] `pwsh scripts/check-all.ps1` exits 0 on a clean tree
 - [ ] A fresh clone into a different absolute path builds with no file edited
-- [ ] Bootstrap and build succeed on a machine with no Visual Studio installed
+- [ ] Bootstrap and build succeed on a machine with no Visual Studio and no Windows SDK installed
 - [ ] No absolute path appears in any build file, and no `.sln` or `.vcxproj` is committed
 - [ ] `python scripts/todo-graph.py validate` clean
