@@ -199,7 +199,9 @@ Four configuration surfaces Windows ships with interfaces that are worse than no
 
 ## 8. Files, Boot, Audio, and Inventory
 
-Nine smaller tools, grouped because each is one surface over one thing, and separating them into nine sections would be ceremony.
+Nine tools. **Most are one surface over one thing and are built from the items below; three are not, and are specified first.**
+
+`BootManager` can make a machine unbootable, `PermissionsCopier` rewrites ACLs across a tree, and `AudioDevices` absorbs the audio repair from Complete Windows Repair. None of the three is a one-line job, and each gets its own TODO file before any of it is built, per the rule in `AGENTS.md`.
 
 **Fidelity:** each tool's surface, against `DESIGN.md`.
 **Job:** the remaining everyday gaps have an interface. Consumer: each underlying configuration, read back after any change.
@@ -208,22 +210,24 @@ Nine smaller tools, grouped because each is one surface over one thing, and sepa
 **Needs:** Windows host (build/test)
 
 - [ ] `extensions/LinkManager/`: create and inspect junctions, symlinks, and hard links, which Windows offers only through `mklink`. Done when: each type is created and identified, and a broken link is reported as broken.
-- [ ] `extensions/PermissionsCopier/`: copy an ACL from one path to another, with a preview. Done when: the preview lists every change before applying and the apply is undoable.
+- [ ] **Specify** `PermissionsCopier` in its own TODO file before building it, covering the preview, inheritance, the recursive case, and what happens when a path cannot be read. Done when: the file exists, validates, and its sections appear in the plan.
 - [ ] `extensions/HashVerifier/`: compute and compare file hashes against an expected value. Done when: a matching and a mismatching file are each reported clearly.
 - [ ] `extensions/LongPathEnabler/`: report and set the long-path setting, including the manifest requirement most guides omit. Done when: the setting is changed, verified by read-back, and the surface states that applications must opt in too.
-- [ ] `extensions/BootManager/`: boot entries, order, and timeout, as contract items. Done when: a change verifies by read-back and undo restores the entry exactly.
+- [ ] **Specify** `BootManager` in its own TODO file before building it, covering entries, order, timeout, the recovery path when a machine will not boot, and the freeze check below. Done when: the file exists, validates, and its sections appear in the plan.
 - [ ] `extensions/PageFileManager/`: page file location and size per volume. Done when: a change verifies by read-back and states that it needs a restart.
 - [ ] `extensions/AudioDevices/`: default device per role, per-application routing, and devices Windows has hidden. Done when: a hidden device is surfaced and setting a default verifies by read-back.
-- [ ] Own the **audio repair** that would otherwise sit in Complete Windows Repair, because this is its topical tool. Done when: no-sound is diagnosed across its real causes, namely the audio service, a disabled or absent endpoint, a muted or wrongly routed default, and a driver fault, and each repair is a contract item verified by read-back.
+- [ ] **Specify** `AudioDevices` in its own TODO file before building it, covering device enumeration, per-role defaults, per-application routing, hidden devices, and the audio repair it owns from Complete Windows Repair across the service, endpoint, routing, and driver causes. Done when: the file exists, validates, and its sections appear in the plan.
 - [ ] `extensions/ColorProfiles/`: profiles per display, with association and reset. Done when: association and reset both verify by read-back.
 - [ ] `extensions/SoftwareInventory/`: installed software with version, publisher, size, and install date, exportable into the System Report. Done when: the list matches what the system reports and the export feeds `D05 T03 §6`.
 - [ ] Commit: `"link, permissions, hash, boot, page file, audio, colour, and inventory tools"`
 
 **Freeze check:** What `BootManager` writes to the boot configuration is frozen once shipped, because a mistake there costs the user their machine. Evidence is a fixture boot entry changed and undone, reproducing the original exactly, entry for entry. Fixture source: `tests/fixtures/boot/`.
 
-**Test checkpoint:** Each link type is created and identified and a broken link is reported. The permissions preview lists every change before applying and is undoable. Matching and mismatching hashes are both reported clearly. Long path is set, verified, and the opt-in requirement stated. Boot, page file, audio, and colour changes each verify by read-back. The inventory matches the system and feeds the System Report.
+**Test checkpoint:** `BootManager`, `PermissionsCopier`, and `AudioDevices` each have an authored TODO file that validates and appears in the plan. For the tools built here: each link type is created and identified and a broken link is reported. The permissions preview lists every change before applying and is undoable. Matching and mismatching hashes are both reported clearly. Long path is set, verified, and the opt-in requirement stated. Boot, page file, audio, and colour changes each verify by read-back. The inventory matches the system and feeds the System Report.
 
 ## 9. Printing, Search, and Scheduled Tasks
+
+**All three are specified before they are built.** Each replaces a Windows interface that is split across several places or is actively avoided, and none is a one-section job. This section authors their TODO files; those files are what gets built.
 
 Three surfaces where Windows ships an interface so poor that the usual advice is to avoid it. Printing is split across three separate places, Task Scheduler is legendarily unusable, and search failure is a top-ranked complaint with no interface that explains it.
 
@@ -233,20 +237,16 @@ Three surfaces where Windows ships an interface so poor that the usual advice is
 **Chrome:** consume the framework and the repair contract. Take scheduled-task enumeration from `D05 T01 §5` rather than writing a second one.
 **Needs:** Windows host (build/test)
 
-- [ ] Build `extensions/PrinterManager/`: printers, queues, drivers, and ports in one place, with the stuck-job case handled. Done when: a stuck queue is cleared, verified by reading the queue back, and the spooler restart it needs is part of the operation rather than a separate instruction.
-- [ ] Diagnose why a printer will not print across its real causes: spooler state, driver, port, offline status, and a queue blocked by one failed job. Done when: a fixture failure in each category is attributed correctly and names the failing step.
-- [ ] Remove a printer and its driver together. Done when: removal takes the queue, the printer, and the driver package, and a driver still in use by another printer is refused by name.
-- [ ] Build `extensions/SearchManager/`: index status, size, what is indexed, and what is excluded. Done when: each renders and a machine mid-rebuild reports progress rather than appearing broken.
-- [ ] Answer the question users actually ask, which is why a specific file is not found. Done when: a file outside the indexed locations, one excluded by type, and one in a location the indexer cannot read are each diagnosed distinctly.
-- [ ] Rebuild the index as a repair-contract item, stating what it costs. Done when: the confirmation says search will be incomplete until the rebuild finishes and gives an estimate, because a silent multi-hour rebuild is how a repair looks like a break.
-- [ ] Build `extensions/TaskManager/` over scheduled tasks: view, create, edit, enable, and disable, with the triggers and conditions Task Scheduler buries. Done when: a task is created, its trigger fires, and editing it verifies by reading the task back.
-- [ ] Make every task change a contract item. Done when: undo restores the task definition exactly, asserted against a fixture task.
-- [ ] Flag tasks that look wrong. Done when: a task running from a temporary directory, or one whose executable no longer exists, is flagged with its reasoning.
+- [ ] **Specify** `PrinterManager` in its own TODO file. Required scope: printers, queues, drivers, and ports in one place; the stuck-queue case including the spooler restart it needs; diagnosis across spooler state, driver, port, offline status, and a queue blocked by one failed job; and removing a printer with its driver while refusing a driver still in use. Done when: the file exists, validates, and its sections appear in the plan.
+- [ ] **Specify** `SearchManager` in its own TODO file. Required scope: index status, size, indexed locations, and exclusions; the not-found diagnosis distinguishing a file outside indexed locations, one excluded by type, and one the indexer cannot read; and a rebuild that states search will be incomplete until it finishes and gives an estimate. Done when: the file exists, validates, and its sections appear in the plan.
+- [ ] **Specify** `TaskManager` in its own TODO file. Required scope: view, create, edit, enable, and disable over scheduled tasks; the triggers and conditions Task Scheduler buries; every change as a repair-contract item with undo restoring the definition exactly; and flagging a task running from a temporary directory or pointing at a missing executable. Done when: the file exists, validates, and its sections appear in the plan.
+- [ ] Take the task enumeration from `D05 T01 §5` rather than writing a second one, and record that in each spec. Done when: all three specs name what they consume rather than what they will reimplement.
+- [ ] Carry the freeze check below into the `TaskManager` spec. Done when: that file owns it, because a freeze check belongs with the section that does the writing.
 - [ ] Commit: `"printer, search, and scheduled task managers"`
 
-**Freeze check:** What `TaskManager` writes to a task definition is frozen once shipped, because a malformed definition can stop a task a machine depends on. Evidence is a fixture task round-tripped through edit and undo, compared field by field. Fixture source: `tests/fixtures/tasks/`.
+**Freeze check:** What `TaskManager` writes to a task definition is frozen once shipped, because a malformed definition can stop a task a machine depends on. Evidence is a fixture task round-tripped through edit and undo, compared field by field. **This check transfers to the `TaskManager` spec**, which is where the writing happens. Fixture source: `tests/fixtures/tasks/`.
 
-**Test checkpoint:** A stuck print queue is cleared and verified by read-back. A fixture printing failure in each category is attributed correctly. Driver removal refuses a driver still in use, by name. Index status renders and a rebuild reports progress. Three distinct not-found causes are diagnosed distinctly. A created task's trigger fires and editing verifies by read-back. Undo restores a task definition exactly, asserted. A task running from a temporary directory is flagged.
+**Test checkpoint:** Three TODO files exist, validate, and appear in the plan, one per tool. Each names its required scope above and each names what it consumes rather than reimplements. The `TaskManager` spec carries the freeze check. `python scripts/todo-graph.py validate` is clean and `plan --check` is current after all three are synced.
 
 ## Verification
 

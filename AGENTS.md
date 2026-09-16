@@ -81,6 +81,19 @@ tests/                  Catch2 suites, fixtures, and the parity driver
 
 **The rule this encodes:** a tool never adds a file under `src/framework/` or `src/repair/`. If a tool needs something shared, it goes in the shared layer with a section that says so, which is what stops the fourteen-copies failure from recurring.
 
+## Specify a tool before building it
+
+A tool is **never** built from a single checklist item. Anything larger than a one-surface utility gets its own TODO file first, enumerating its features as micro-steps, and that file is what gets built.
+
+So a tool appears in the plan twice, and that is deliberate:
+
+1. **A specification step** in the domain that owns it: *author `TODO-NN-<Tool>.md` covering this tool's features*. One item, and its `Done when:` is that the file exists and validates.
+2. **The file's own sections**, which appear in the plan once it is authored and synced.
+
+**This is why the plan's total grows, and the growth is correct rather than alarming.** A tool's detailed specification is written when somebody is looking at that tool, against the real Windows surface it has to work with, rather than guessed at months ahead. A lower completion percentage after adding real scope is more truthful than a false one.
+
+The exception is a genuinely single-surface tool, such as a hash verifier or a long-path toggle, where one section is the honest size of the work. If in doubt, specify first: a tool spec that turns out to be short costs an hour, and a tool built from one line costs a rewrite.
+
 ## The TODO system
 
 `todo/` is the live execution plan; **format spec: `todo/README.md`.** Markdown is canonical and `build/` holds derived, gitignored projections.

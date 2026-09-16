@@ -62,6 +62,8 @@ The whole point of doing the framework first is that a new tool should be cheap 
 **Needs:** C++ toolchain (compile)
 
 - [ ] Write the intake contract as a document: what a candidate must have before it starts, what the framework supplies, what the tool must supply, and what it owes before it can ship. Done when: the document exists and names the conformance profile as its acceptance test.
+- [ ] **Require a per-tool TODO file before any tool larger than a single surface is built.** Done when: the contract states that a tool is specified in `TODO-NN-<Tool>.md` enumerating its features as micro-steps, that the file is authored through `create-todo` into the domain that owns the tool, and that building from a single checklist item is not permitted. Cheaper substitute that fails the checkpoint: building from a one-line description, which freezes a guess at the tool instead of the tool.
+- [ ] State when a tool is small enough to skip that. Done when: the rule is written, naming a genuinely single-surface utility as the exception and stating that the default is to specify first, because a short spec costs an hour and a tool built from one line costs a rewrite.
 - [ ] Require the tool descriptor, a documentation set, an update short name, and an English language pack as intake minimums. Done when: a candidate missing any of them fails the contract by name.
 - [ ] Prove it on UUIDGen, at 209 lines the cheapest candidate in the set. Done when: UUIDGen ships conformant and the elapsed effort is recorded here as the intake baseline.
 - [ ] Record what the contract missed. Done when: anything UUIDGen needed that the contract did not anticipate is added to the contract in the same commit.
