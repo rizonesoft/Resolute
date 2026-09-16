@@ -129,11 +129,13 @@ The difference between an application that looks like it belongs on Windows 11 a
 Every custom-drawn control in this suite reports nothing to a screen reader today, and every control in this suite is custom-drawn. That is the largest single accessibility gap the project has, and it is invisible to anyone not using assistive technology.
 
 > [!IMPORTANT]
-> **This section is also the prerequisite for the entire driven-test strategy.** Measured 2026-09-16 against the shipped binary and recorded in [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md): the UI Automation tree for a running window contains **four unnamed panes and nothing inside them**, because Direct2D draws pixels rather than automation elements.
+> **This section carries a second payoff: it is what makes control-level test driving possible.** Measured 2026-09-16 against the shipped binary and recorded in [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md): the UI Automation tree for a running window contains **four unnamed panes and nothing inside them**, because Direct2D draws pixels rather than automation elements.
 >
-> Until providers exist, a driver can launch the app, read its title, screenshot it, and click at a coordinate, and nothing more. It cannot find a control, read a label, count list rows, or assert a state. Every "driven run with evidence" checkpoint in this plan degrades to a screenshot and a log line, and `D00 T02 §4`, the surface accounts, and `D07 T01 §4` all degrade with it.
+> Until providers exist, a driver can launch the app, read its title, screenshot it, and click at a coordinate, and nothing more. It cannot find a control, read a label, count list rows, or assert a state.
 >
-> One implementation, two payoffs. This is not a Phase 1 polish item that can slip.
+> This does **not** block the test strategy. Compile gates, unit tests, fixtures, the parity driver, the freeze checks, and launch-and-close smoke all work without it, and together they are the bulk of early fault catching. What is missing without it is **UI wiring**: whether the right data reached the right control, which a unit test cannot see and a screenshot cannot judge.
+>
+> The section earns its place on accessibility grounds alone. Control-level driving is the bonus.
 
 **Fidelity:** no new visual surface. This section changes what the surfaces expose, not how they look, except for the focus ring.
 **Job:** a user who cannot use a mouse, cannot see the screen, or cannot tolerate motion can use every tool completely. Consumer: the UI Automation tree, the keyboard, and the system accessibility settings.

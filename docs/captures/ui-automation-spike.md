@@ -65,13 +65,27 @@ A driver can currently launch the app, read its title, screenshot it, click at a
 
 Coordinate clicking is available but is not a test: it encodes the layout into the test, so every layout change breaks every test, and a click that lands on the wrong control still passes.
 
-## The finding
+## The finding, stated precisely
 
-**UI Automation providers are the prerequisite for the entire driven-test strategy, not only for accessibility.**
+**UI Automation providers are what make control-level driving possible.** They are not a prerequisite for the test strategy as a whole, and an earlier draft of this spike overstated that.
 
-`D01 T02 §5` currently frames them as the accessibility floor, which is true and is reason enough on its own. This spike establishes that the same work is also what makes every "driven run with evidence" checkpoint in the plan mean anything at the control level.
+What the plan already catches **without** any of this work:
 
-One implementation, two payoffs. It also means `D01 T02 §5` is not a Phase 1 polish item that can slip: the parity driver in `D00 T02 §4`, the surface accounts every UI section owes, and the standing smoke run in `D07 T01 §4` all degrade to screenshots and log lines without it.
+| Layer | Catches | Owner |
+| --- | --- | --- |
+| Warnings as errors, `clang-tidy` ratchet | Whole classes of fault, on every change | `D00 T01 §3` |
+| Catch2 unit tests | Settings round trip, log format, localization resolution, update parsing, elevation guard, the repair loop, diagnose logic, the registry engine, recovery parsing | `D00 T02 §1` |
+| Disposable fixtures | Destructive code exercised safely, teardown asserted | `D00 T02 §2` |
+| **Parity driver** | System **effects** compared field by field against the AutoIt build | `D00 T02 §4` |
+| 15 freeze checks | Destructive behaviour pinned against change | throughout |
+| Launch, attach, close | Startup crashes, missing runtime, hangs | **works today** |
+| Screenshot captures | Visual regression against the house style | `D00 T02 §3` |
+
+That is the bulk of early regression, bug, and fault catching, and none of it needs an automation tree. The parity driver is the strongest regression catcher in the plan for the eight ported tools, and it compares system state rather than pixels.
+
+**What UIA adds is narrower and specific: UI wiring.** Whether the right data reached the right control, whether a list shows the expected rows, whether a state is what it should be. Those are real bugs that unit tests and screenshots both miss, a screenshot because it proves something rendered rather than that it rendered the truth.
+
+So the honest sequencing is: `D01 T02 §5` earns its Phase 1 place on accessibility grounds alone, and control-level driving is the second payoff rather than a blocked dependency. Nothing in Phase 0 waits on it.
 
 ## Driver choice
 
