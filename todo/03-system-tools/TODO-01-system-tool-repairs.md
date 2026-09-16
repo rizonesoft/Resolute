@@ -16,6 +16,19 @@ track: T1
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** Six of these seven tools write their settings to `<Tool>.lng` instead of `.ini`: `ComIntRep.au3:348,1164`, `DVDRepair.au3:306,824`, `Ownership.au3:301,888`, `PixRepair.au3:305,1155`, `ReBar.au3`, `USBRepair.au3`. `BiosCodes` writes correctly to `.ini` (`BiosCodes.au3:294,1774`) but includes no `Logging.au3`, so it leaves no trace at all. The other six do include `Logging.au3`. All seven carry `#RequireAdmin` and none of them calls `IsAdmin()` before a privileged action. There are no tests and no fixtures for any of them. Au3Check at `-w 1..7` reports 0 errors and, per tool: ComIntRep 68, PixRepair 61, ReBar 60, Ownership 60, BiosCodes 63, USBRepair 51, DVDRepair 51 unique warnings.
 
+> [!CAUTION]
+> **This file is superseded in part and must not be built against until it is re-authored.** Recorded 2026-09-16 during the completion brainstorm; see `docs/brainstorm/2026-09-16-completion-brainstorm.md`.
+>
+> **`§2` describes behavior that does not exist.** `ReBar` is not a registry backup tool. `SDK/Concrete/ReBar/ReBar.au3:32` declares `#AutoIt3Wrapper_Res_Description=ReBar Framework`, it ships `Templates/*.tpl`, and it contains no backup or restore logic. `§2` specifies a golden backup fixture, a round-trip assertion, and a corrupt-backup refusal for a capability the tool has never had.
+>
+> **The frozen set in this file is wrong.** It names seven tools; `ReBar` changes nothing on a user's system and does not belong in it. The real frozen set here is six: `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, `BiosCodes`.
+>
+> **`ReBar` is internal tooling, not a product,** and is being promoted to a shared SDK include that every tool consumes. That extraction gets its own file and subsumes much of this file's `§1`.
+>
+> **`USBRepair` and `DVDRepair` are merging** into one Drive Repair tool, which changes `§5`.
+>
+> **The adjacency block below is stale**: `reverse` and `exchange` anchor on `§2` and need re-anchoring once this file is re-authored.
+
 ## Inputs
 
 - [`SDK/Concrete/ReBar/ReBar.au3`](../../SDK/Concrete/ReBar/ReBar.au3) -- registry backup and restore; the frozen behavior §2 pins
