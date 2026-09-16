@@ -96,30 +96,30 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 |  ✔  | Section      | Deliverable                                    | Items |
 | :-: | ------------ | ---------------------------------------------- | :---: |
 | [x] | `D00 T03 §1` | Subtree merge with history preserved           |  11   |
-| [x] | `D00 T03 §2` | Rename the product to Resolute                 |   5   |
+| [x] | `D00 T03 §2` | Rename the product to Resolute                 |   7   |
 | [x] | `D00 T03 §3` | Rename the library and the toolchain           |   5   |
-| [x] | `D00 T03 §4` | Correct the stale documentation                |   5   |
-| [ ] | `D00 T04 §1` | Staleness Detection for Every Claim-Free Block |   6   |
+| [x] | `D00 T03 §4` | Correct the stale documentation                |  10   |
+| [ ] | `D00 T04 §1` | Staleness Detection for Every Claim-Free Block |   9   |
 | [ ] | `D00 T04 §2` | The Review-Finding Ledger                      |   6   |
 | [ ] | `D00 T04 §3` | Section Calibration                            |   6   |
 | [ ] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   5   |
 | [ ] | `D00 T01 §1` | Portable toolchain bootstrap                   |  15   |
-| [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest              |   8   |
+| [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest              |  11   |
 | [ ] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
 | [ ] | `D00 T01 §4` | One command builds any tool                    |   6   |
-| [ ] | `D00 T01 §5` | One command runs every gate                    |   5   |
+| [ ] | `D00 T01 §5` | One command runs every gate                    |   6   |
 | [ ] | `D00 T01 §6` | Keep the toolchain current                     |  12   |
-| [ ] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   5   |
+| [ ] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   6   |
 | [ ] | `D00 T02 §2` | Fixture store and disposable targets           |   6   |
 | [ ] | `D00 T02 §3` | House-style capture store                      |   5   |
-| [ ] | `D00 T02 §4` | Parity driver for a built tool                 |   6   |
-| [ ] | `D07 T01 §1` | The conformance profile                        |   6   |
+| [ ] | `D00 T02 §4` | Parity driver for a built tool                 |   7   |
+| [ ] | `D07 T01 §1` | The conformance profile                        |   7   |
 | [ ] | `D07 T01 §2` | Warning and analysis ratchet                   |   5   |
-| [ ] | `D07 T01 §3` | Conformance check and its report               |   6   |
+| [ ] | `D07 T01 §3` | Conformance check and its report               |  12   |
 | [ ] | `D07 T01 §4` | Standing smoke run over the suite              |   5   |
-| [ ] | `D09 T01 §1` | Make the AutoIt suite buildable again          |   4   |
+| [ ] | `D09 T01 §1` | Make the AutoIt suite buildable again          |   5   |
 | [ ] | `D09 T01 §2` | Clear the housekeeping defects                 |   5   |
-| [ ] | `D09 T01 §3` | Maintenance scope and retirement procedure     |   5   |
+| [ ] | `D09 T01 §3` | Maintenance scope and retirement procedure     |   7   |
 | [ ] | `D00 T02 §5` | Cover the inherited UI library                 |   7   |
 
 
@@ -129,19 +129,19 @@ The framework every tool consumes, the repair contract the destructive half cons
 
 |  ✔  | Section       | Deliverable                                  | Items |
 | :-: | ------------- | -------------------------------------------- | :---: |
-| [ ] | `D01 T01 §1`  | Application shell and lifecycle              |   6   |
+| [ ] | `D01 T01 §1`  | Application shell and lifecycle              |   7   |
 | [ ] | `D01 T01 §2`  | Settings: one writer, one path               |   7   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                  |   6   |
 | [ ] | `D01 T01 §4`  | Localization and the pack loader             |   7   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement  |   7   |
 | [ ] | `D01 T01 §6`  | Elevation and its refusal path               |   6   |
-| [ ] | `D01 T01 §7`  | Standard window, About, and preferences      |   7   |
-| [ ] | `D01 T01 §8`  | DPI awareness and system theme               |   6   |
+| [ ] | `D01 T01 §7`  | Standard window, About, and preferences      |   8   |
+| [ ] | `D01 T01 §8`  | DPI awareness and system theme               |   7   |
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder          |   6   |
 | [ ] | `D01 T01 §10` | Crash Handling and Single Instance           |   8   |
 | [ ] | `D01 T01 §11` | Command Line and Exit Codes                  |   8   |
 | [ ] | `D02 T01 §1`  | The repair item and the run loop             |   6   |
-| [ ] | `D02 T01 §2`  | Diagnose before repair                       |   6   |
+| [ ] | `D02 T01 §2`  | Diagnose before repair                       |   9   |
 | [ ] | `D02 T01 §3`  | Per-item result and the surface              |   6   |
 | [ ] | `D02 T01 §4`  | Restore record and undo                      |   7   |
 | [ ] | `D02 T01 §5`  | Transcript the user can carry                |   5   |
@@ -150,7 +150,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T02 §2`  | Spacing grid, density, and responsive layout |   7   |
 | [ ] | `D01 T02 §3`  | Content area: virtualization and scrolling   |   6   |
 | [ ] | `D01 T02 §4`  | Window chrome and shell integration          |   7   |
-| [ ] | `D01 T02 §5`  | The accessibility floor                      |   8   |
+| [ ] | `D01 T02 §5`  | The accessibility floor                      |  10   |
 | [ ] | `D01 T02 §6`  | Performance floor                            |   8   |
 | [ ] | `D01 T02 §7`  | Text presentation and machine values         |   5   |
 
@@ -164,7 +164,7 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D03 T01 §1` | Launcher on the framework                    |   6   |
 | [ ] | `D03 T01 §2` | Tool discovery and the tool list             |   5   |
 | [ ] | `D03 T01 §3` | Launch, failure reporting, and elevation     |   5   |
-| [ ] | `D03 T01 §4` | Windows system locations                     |   5   |
+| [ ] | `D03 T01 §4` | Windows system locations                     |   6   |
 | [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
 | [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
@@ -180,11 +180,11 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 
 |  ✔  | Section      | Deliverable                                       | Items |
 | :-: | ------------ | ------------------------------------------------- | :---: |
-| [ ] | `D05 T01 §1` | The intake contract, proven on UUIDGen            |   5   |
-| [ ] | `D05 T01 §2` | Complete Windows Repair                           |   7   |
-| [ ] | `D05 T01 §3` | QuickErase and WinClean                           |   8   |
+| [ ] | `D05 T01 §1` | The intake contract, proven on UUIDGen            |   7   |
+| [ ] | `D05 T01 §2` | Complete Windows Repair                           |  11   |
+| [ ] | `D05 T01 §3` | QuickErase and WinClean                           |  14   |
 | [ ] | `D05 T01 §4` | Indicators and SaveDesk                           |   6   |
-| [ ] | `D05 T01 §5` | The four new utilities                            |   7   |
+| [ ] | `D05 T01 §5` | The four new utilities                            |  10   |
 | [ ] | `D05 T02 §1` | RegStudio on the shared framework                 |   7   |
 | [ ] | `D05 T02 §2` | The registry engine                               |   7   |
 | [ ] | `D05 T02 §3` | Browse, display, and virtualize                   |   6   |
@@ -206,10 +206,10 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T04 §5` | Why Is This Denied                                |   6   |
 | [ ] | `D05 T04 §6` | Pending Reboot Inspector                          |   5   |
 | [ ] | `D05 T04 §7` | Activation and Network Share Diagnostics          |   6   |
-| [ ] | `D05 T05 §1` | The recovery engine, read-only by design          |   8   |
+| [ ] | `D05 T05 §1` | The recovery engine, read-only by design          |   9   |
 | [ ] | `D05 T05 §2` | Undelete                                          |   6   |
-| [ ] | `D05 T05 §3` | Erase verification                                |   7   |
-| [ ] | `D05 T05 §4` | Rescue imaging                                    |   9   |
+| [ ] | `D05 T05 §3` | Erase verification                                |   8   |
+| [ ] | `D05 T05 §4` | Rescue imaging                                    |  15   |
 | [ ] | `D05 T06 §1` | Shadow Copy Browser                               |   7   |
 | [ ] | `D05 T06 §2` | Windows Disk Space                                |   7   |
 | [ ] | `D05 T06 §3` | Wi-Fi Diagnostics                                 |   8   |
@@ -224,8 +224,8 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T07 §5` | Privacy and Telemetry Settings                    |   6   |
 | [ ] | `D05 T07 §6` | Environment, Features, Power, and Locale          |   6   |
 | [ ] | `D05 T07 §7` | Network Configuration Tools                       |   7   |
-| [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  10   |
-| [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |  10   |
+| [ ] | `D05 T07 §8` | Files, Boot, Audio, and Inventory                 |  11   |
+| [ ] | `D05 T07 §9` | Printing, Search, and Scheduled Tasks             |   6   |
 
 
 ### Phase 4 -- Ship it, in every language
@@ -241,8 +241,8 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §5` | Update Files and Consolidation Announcements   |   6   |
 | [ ] | `D06 T01 §6` | Version Rule, Changelog, and Release Checklist |   5   |
 | [ ] | `D06 T01 §7` | Focused Builds From One Codebase               |   7   |
-| [ ] | `D06 T01 §8` | Licensing and Attribution                      |  11   |
-| [ ] | `D08 T01 §1` | Documentation set for every tool               |   6   |
+| [ ] | `D06 T01 §8` | Licensing and Attribution                      |  12   |
+| [ ] | `D08 T01 §1` | Documentation set for every tool               |   8   |
 | [ ] | `D08 T01 §2` | Shared string pool and build-time composition  |   6   |
 | [ ] | `D08 T01 §3` | Coverage matrix and pack hygiene               |   6   |
 | [ ] | `D08 T01 §4` | Rewrite the shipped documentation              |   7   |

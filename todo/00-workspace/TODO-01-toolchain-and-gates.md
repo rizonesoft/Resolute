@@ -149,6 +149,7 @@ Five gates that must each be remembered are five gates that get skipped under ti
 
 **Needs:** C++ toolchain (compile)
 
+- [ ] Surface the self-correction checks in the combined gate. **Registered 2026-09-17 by `D00 T04 §1`, which owns the checks but not this script:** `scripts/todo-claims.py` exits non-zero on a **stale claim** and on a **fallen coverage floor**, and both must fail the combined gate rather than print and be ignored. Done when: both conditions are exercised against a deliberately broken fixture and both fail `check-all.ps1` by name.
 - [ ] `scripts/check-all.ps1` runs the build for both architectures, `clang-tidy` against the baseline, the Catch2 suite, and `python scripts/todo-graph.py validate`. Done when: all four run in one invocation and the script exits non-zero if any fails.
 - [ ] Report legibly: one line per gate with its result and duration, and the failure detail only for gates that failed. Done when: a run with one deliberate failure shows three passes and one failure with its detail, and the passing detail is not dumped.
 - [ ] Make the tidy gate compare against the baseline rather than zero. Done when: a finding count equal to the baseline passes and one above it fails, both observed.

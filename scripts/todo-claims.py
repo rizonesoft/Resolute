@@ -16,7 +16,18 @@ other parser that reads these files:
     <!-- claim: lines resolute_au3/SDK/Concrete/ReBar/ReBar.au3 = 1556 -->
     <!-- claim: count "\\.lng" resolute_au3/SDK/Concrete/*/*.au3 = 14 -->
 
-Exit codes: 0 all claims hold, 1 at least one is stale, 2 a claim is malformed.
+A claim must be written on ONE line. The pattern may contain `\\n` as two characters,
+which means a newline, but a real line break inside a claim splits it in half and is
+reported rather than skipped: see `--coverage` and the unterminated-claim check.
+
+Patterns are matched with `re.MULTILINE`, so `^` and `$` mean line start and line end.
+
+A claim protects a figure somebody thought to record. `--coverage` protects the rest,
+by naming every `Current state` block that carries no claim at all and by reporting a
+block whose cited files have moved since the date it states.
+
+Exit codes: 0 all claims hold, 1 at least one is stale or coverage fell, 2 a claim is
+malformed.
 """
 
 from __future__ import annotations
@@ -25,15 +36,35 @@ import argparse
 import glob
 import io
 import re
+import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CLAIM_RE = re.compile(r"<!--\s*claim:\s*(.+?)\s*-->")
+# An opened claim that never closes on the same line. Split across two lines it
+# matches nothing at all, so the claim silently disappears and the total still
+# reads "all hold": a check reporting success for its own absence. Found
+# 2026-09-17 by D00 T03 §4, which wrote two such claims by accident.
+CLAIM_OPEN_RE = re.compile(r"<!--\s*claim:")
+INLINE_CODE_RE = re.compile(r"`[^`]*`")
 # count "<pattern>" <glob> = N   -- pattern is quoted because it may contain spaces
 COUNT_RE = re.compile(r'^count\s+"(.+)"\s+(\S+)\s*=\s*(\d+)$')
 LINES_RE = re.compile(r"^lines\s+(\S+)\s*=\s*(\d+)$")
 PATH_RE = re.compile(r"^(exists|absent)\s+(\S+)$")
+
+CURRENT_STATE_RE = re.compile(r"\*\*Current state\s*\(verified\s+(\d{4}-\d{2}-\d{2})\)")
+HEADING_RE = re.compile(r"^#{1,6}\s")
+# A path cited in prose: backticked, containing a slash or a dot, no spaces.
+CITED_PATH_RE = re.compile(r"`([A-Za-z0-9_][A-Za-z0-9_./\-]*[A-Za-z0-9_/])`")
+
+# The coverage ratchet. Raising this is a recorded decision: it changes with a
+# commit, and the check refuses to let it fall. It is deliberately set to what
+# was MEASURED on 2026-09-17 by D00 T04 §1, not to what would be nice: a floor
+# above the real number fails on day one and gets deleted rather than met.
+# 3 of 20 `Current state` blocks carried a claim when this was written.
+COVERAGE_FLOOR = 3
 
 
 class Stale(Exception):
@@ -74,7 +105,11 @@ def _check_lines(target: str, expected: int) -> str:
 
 def _check_count(pattern: str, target: str, expected: int) -> str:
     try:
-        rx = re.compile(pattern)
+        # MULTILINE so `^` and `$` mean line start and line end. Without it `^`
+        # matches only at the start of the file and a line-anchored claim
+        # silently counts 0, which reads as a stale figure rather than as a
+        # pattern that cannot work. Found 2026-09-17 by D00 T03 §4.
+        rx = re.compile(pattern, re.MULTILINE)
     except re.error as exc:
         raise Malformed(f"bad regex {pattern!r}: {exc}") from exc
     hits = _resolve(target)
@@ -113,6 +148,127 @@ def collect(paths: list[Path]) -> list[tuple[Path, int, str]]:
     return found
 
 
+def collect_unterminated(paths: list[Path]) -> list[tuple[Path, int, str]]:
+    """Claim comments opened on a line that does not close them.
+
+    A claim written across two lines matches CLAIM_RE nowhere, so without this it
+    is not stale, not malformed, and not counted: it is simply gone, while the
+    summary still reports every remaining claim holding.
+    """
+    found = []
+    for path in paths:
+        for lineno, line in enumerate(
+            io.open(path, encoding="utf-8", errors="replace").read().splitlines(), 1
+        ):
+            # Strip inline code spans first. Prose *about* claims quotes the
+            # opening token in backticks, and counting that as an unterminated
+            # claim makes the check fire on its own documentation. A real claim
+            # is never written inside backticks, so nothing genuine is hidden.
+            scan = INLINE_CODE_RE.sub("", line)
+            opens = len(CLAIM_OPEN_RE.findall(scan))
+            closes = len(CLAIM_RE.findall(scan))
+            if opens > closes:
+                found.append((path, lineno, scan.strip()[:70]))
+    return found
+
+
+# ---------------------------------------------------------------- coverage
+
+
+def _git_last_change(rel: str) -> str | None:
+    """Committer date of the last commit touching `rel`, as YYYY-MM-DD, or None."""
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%cs", "--", rel],
+            cwd=ROOT, capture_output=True, text=True, timeout=20,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    val = out.stdout.strip()
+    return val or None
+
+
+def current_state_blocks(paths: list[Path]) -> list[dict]:
+    """Every `Current state (verified DATE)` block, with its claims and cited paths.
+
+    A block runs from its own line to the next Markdown heading, which is where the
+    prose it introduces ends.
+    """
+    blocks = []
+    for path in paths:
+        lines = io.open(path, encoding="utf-8", errors="replace").read().splitlines()
+        for i, line in enumerate(lines):
+            m = CURRENT_STATE_RE.search(line)
+            if not m:
+                continue
+            end = len(lines)
+            for j in range(i + 1, len(lines)):
+                if HEADING_RE.match(lines[j]):
+                    end = j
+                    break
+            region = lines[i:end]
+            text = "\n".join(region)
+            cited = []
+            for c in CITED_PATH_RE.findall(text):
+                if ("/" in c or "." in c) and (ROOT / c).exists():
+                    cited.append(c)
+            try:
+                shown = path.relative_to(ROOT).as_posix()
+            except ValueError:
+                shown = path.as_posix()   # a self-test fixture outside the repo
+            blocks.append({
+                "path": shown,
+                "line": i + 1,
+                "verified": m.group(1),
+                "claims": len(CLAIM_RE.findall(text)),
+                "cited": sorted(set(cited)),
+            })
+    return blocks
+
+
+def run_coverage(paths: list[Path], quiet: bool = False) -> tuple[int, int, list[str]]:
+    """Report claim coverage and date-suspect blocks. Returns (covered, total, problems)."""
+    blocks = current_state_blocks(paths)
+    total = len(blocks)
+    covered = sum(1 for b in blocks if b["claims"] > 0)
+    problems: list[str] = []
+
+    uncovered = [b for b in blocks if b["claims"] == 0]
+    if not quiet:
+        print(f"todo-claims coverage: {covered}/{total} `Current state` block(s) carry a claim")
+        if uncovered:
+            print("\n  no claim, so nothing re-measures them:")
+            for b in uncovered:
+                print(f"    {b['path']}:{b['line']}  verified {b['verified']}")
+
+    suspect = []
+    for b in blocks:
+        moved = []
+        for rel in b["cited"]:
+            when = _git_last_change(rel)
+            if when and when > b["verified"]:
+                moved.append((rel, when))
+        if moved:
+            suspect.append((b, moved))
+
+    if suspect and not quiet:
+        print("\n  may be stale: cited files changed after the stated date.")
+        print("  This cannot read prose, so it reports suspicion, never a verdict.")
+        for b, moved in suspect:
+            print(f"    {b['path']}:{b['line']}  verified {b['verified']}")
+            for rel, when in moved[:4]:
+                print(f"      {rel} last changed {when}")
+            if len(moved) > 4:
+                print(f"      ... and {len(moved) - 4} more")
+
+    if covered < COVERAGE_FLOOR:
+        problems.append(
+            f"coverage fell to {covered}, below the recorded floor of {COVERAGE_FLOOR}. "
+            "The floor ratchets: raise it deliberately, never lower it to pass."
+        )
+    return covered, total, problems
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         prog="todo-claims",
@@ -125,6 +281,10 @@ def main(argv: list[str] | None = None) -> int:
         "--quiet", action="store_true", help="print only failures and the summary"
     )
     ap.add_argument(
+        "--coverage", action="store_true",
+        help="report which `Current state` blocks carry no claim, and which look stale",
+    )
+    ap.add_argument(
         "--self-test", action="store_true", help="prove this script against known facts"
     )
     args = ap.parse_args(argv)
@@ -133,8 +293,18 @@ def main(argv: list[str] | None = None) -> int:
         return _self_test()
 
     files = sorted((ROOT / args.root).rglob("*.md"))
+
+    if args.coverage:
+        covered, total, problems = run_coverage(files, quiet=args.quiet)
+        for p in problems:
+            print(f"\nFLOOR     {p}")
+        if args.quiet:
+            print(f"todo-claims coverage: {covered}/{total}, floor {COVERAGE_FLOOR}")
+        return 1 if problems else 0
+
     claims = collect(files)
-    if not claims:
+    unterminated = collect_unterminated(files)
+    if not claims and not unterminated:
         print(f"todo-claims: no claims found under {args.root}/")
         print("  A TODO that measures something should record it as a claim, so the")
         print("  measurement is re-checked rather than trusted. See AGENTS.md.")
@@ -152,19 +322,28 @@ def main(argv: list[str] | None = None) -> int:
         except Malformed as exc:
             malformed.append((rel, lineno, str(exc)))
 
+    for path, lineno, snippet in unterminated:
+        rel = path.relative_to(ROOT).as_posix()
+        malformed.append((rel, lineno, f"claim opened and not closed on this line: {snippet}"))
+
     for rel, lineno, msg in malformed:
         print(f"MALFORMED {rel}:{lineno}  {msg}")
     for rel, lineno, msg in stale:
         print(f"STALE     {rel}:{lineno}  {msg}")
 
+    covered, total, problems = run_coverage(files, quiet=True)
+    for p in problems:
+        print(f"FLOOR     {p}")
+
     print(
         f"\ntodo-claims: {len(claims)} claim(s) -- "
-        f"{len(claims) - len(stale) - len(malformed)} hold, "
-        f"{len(stale)} stale, {len(malformed)} malformed"
+        f"{len(claims) - len(stale)} hold, "
+        f"{len(stale)} stale, {len(malformed)} malformed; "
+        f"coverage {covered}/{total}, floor {COVERAGE_FLOOR}"
     )
     if malformed:
         return 2
-    return 1 if stale else 0
+    return 1 if (stale or problems) else 0
 
 
 def _self_test() -> int:
@@ -195,6 +374,11 @@ def _self_test() -> int:
         (f'count "alpha" {rel} = 2', True),
         (f'count "alpha" {rel} = 5', False),
         (f'count "gamma" {rel} = 0', True),
+        # MULTILINE: `^` means line start, so two of the three lines start with a.
+        (f'count "^alpha" {rel} = 2', True),
+        (f'count "^beta" {rel} = 1', True),
+        # Without MULTILINE this would be 0 and the claim would read as stale.
+        (f'count "^alpha" {rel} = 0', False),
     ]
     failed = 0
     for claim, should_hold in cases:
@@ -222,10 +406,58 @@ def _self_test() -> int:
         failed += 1
 
     ROOT = saved_root
-    fixture.unlink()
+
+    # An unterminated claim is reported, not skipped. This is the defect that
+    # made two real claims vanish while the summary said everything held.
+    split = tmp / "split.md"
+    split.write_text(
+        '<!-- claim: count "\n- x" TODO.md = 1 -->\n<!-- claim: exists a.txt -->\n',
+        encoding="utf-8",
+    )
+    found = collect_unterminated([split])
+    if len(found) != 1:
+        print(f"  FAIL  unterminated claim: expected 1 report, got {len(found)}")
+        failed += 1
+
+    # Prose about claims quotes the opening token in backticks. Counting that
+    # would make the check fire on its own documentation, which it did on first
+    # run: the filed item describing this defect tripped it.
+    prose = tmp / "prose.md"
+    prose.write_text(
+        "A claim opened with `<!-- claim:` and not closed is reported.\n",
+        encoding="utf-8",
+    )
+    if collect_unterminated([prose]):
+        print("  FAIL  prose quoting the claim token was reported as unterminated")
+        failed += 1
+
+    whole = tmp / "whole.md"
+    whole.write_text("<!-- claim: exists a.txt -->\n", encoding="utf-8")
+    if collect_unterminated([whole]):
+        print("  FAIL  a well-formed claim was reported as unterminated")
+        failed += 1
+
+    # Coverage: a block with a claim is covered, one without is named.
+    cov = tmp / "cov.md"
+    cov.write_text(
+        "# T\n\n> **Current state (verified 2020-01-01):** prose.\n"
+        "<!-- claim: absent nowhere.txt -->\n\n"
+        "## S\n\n> **Current state (verified 2020-01-02):** prose with no claim.\n",
+        encoding="utf-8",
+    )
+    blocks = current_state_blocks([cov])
+    if len(blocks) != 2:
+        print(f"  FAIL  coverage: expected 2 blocks, got {len(blocks)}")
+        failed += 1
+    elif blocks[0]["claims"] != 1 or blocks[1]["claims"] != 0:
+        print(f"  FAIL  coverage: claim attribution wrong: {[b['claims'] for b in blocks]}")
+        failed += 1
+
+    for f in (fixture, split, whole, cov, prose):
+        f.unlink()
     tmp.rmdir()
 
-    total = len(cases) + 3
+    total = len(cases) + 3 + 5
     print(f"todo-claims self-test: {total} cases, {failed} failed")
     return 1 if failed else 0
 

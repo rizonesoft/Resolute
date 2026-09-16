@@ -173,8 +173,8 @@ Answer from source first: the `resolute_au3/` script, a driven run of the shippe
 
 ```bash
 python scripts/todo-claims.py              # re-measure what the TODOs claim about the repo
-python scripts/todo-claims.py --self-test  # 13 cases, must stay green
-python scripts/todo-graph.py self-test      # 393 cases, must stay green
+python scripts/todo-claims.py --self-test  # must stay green; the count is the suite's, not this file's
+python scripts/todo-graph.py self-test      # must stay green; the count is the suite's, not this file's
 python scripts/todo-graph.py validate       # FATAL blocks; new WARN blocks until fixed or accepted
 python scripts/todo-graph.py query ready    # dependency-safe work right now
 python scripts/todo-graph.py query blocked  # sections waiting on something

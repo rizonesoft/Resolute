@@ -1418,6 +1418,11 @@ PLAN_ROW_RE = re.compile(
 # by --sync where the row was, kept in place on later syncs, dropped when
 # the marker goes. Not a row: totals, progress and plan-gate never see it.
 PLAN_MOVED_RE = re.compile(r"^>\s*\*\*Moved:\*\*\s*`(?P<ref>D\d{2}\s+T\d{2}\s+§\d+)`")
+# The Items cell: the trailing numeric column of a plan row. Synced like the box
+# character, in place, so the table's alignment survives. Until 2026-09-17 nothing
+# wrote this column and nothing checked it, so 28 of 121 rows disagreed with their
+# section while `plan --check` reported the plan current (D00 T04 §1).
+PLAN_ITEMS_RE = re.compile(r"\|(?P<cell>\s*(?P<items>\d+)\s*)\|\s*$")
 
 
 def _rel(path: Path) -> str:
@@ -1576,6 +1581,41 @@ def _plan_state(todos: list[Todo]) -> dict[str, str]:
     return state
 
 
+def _plan_items(todos: list[Todo]) -> dict[str, int]:
+    """Map 'D05 T02 §3' -> the section's real checklist item count.
+
+    The plan's Items column is what an operator reads to size the next piece of
+    work, so a count typed once and never re-derived is worse than no column.
+    """
+    counts: dict[str, int] = {}
+    for t in todos:
+        dom = t.domain.split("-")[0]
+        for num, s in t.sections.items():
+            if s.moved:
+                continue
+            counts[f"D{dom} T{t.number} §{num}"] = s.items_total
+    return counts
+
+
+def _sync_items_cell(line: str, want: int) -> tuple[str, int | None]:
+    """Rewrite the Items cell to `want`, keeping the cell's width.
+
+    Returns (line, previous) where previous is None when the row has no Items
+    cell to sync, so a differently shaped table is left alone rather than mangled.
+    """
+    m = PLAN_ITEMS_RE.search(line)
+    if not m:
+        return line, None
+    had = int(m.group("items"))
+    if had == want:
+        return line, had
+    width = len(m.group("cell"))
+    cell = f"{want}".center(width)
+    if len(cell) > width:          # the number outgrew the column; keep one pad
+        cell = f" {want} "
+    return line[: m.start("cell")] + cell + line[m.end("cell") :], had
+
+
 def _in_progress_by_ref(todos: list[Todo]) -> dict[str, bool]:
     """Shipped-but-unstamped: Commit item ticked, no Verified stamp. D00 T06 §31."""
     flags: dict[str, bool] = {}
@@ -1644,6 +1684,7 @@ def build_progress(todos: list[Todo]) -> dict:
     when a stamp recorded integer minutes.
     """
     state = _plan_state(todos)
+    items_by_ref = _plan_items(todos)
     duration = _duration_by_ref(todos)
     stamped = _stamped_on_by_ref(todos)
     in_flight = _in_progress_by_ref(todos)
@@ -2105,6 +2146,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
 
     todos = load_todos()
     state = _plan_state(todos)
+    items_by_ref = _plan_items(todos)
 
     lines = PLAN.read_text(encoding="utf-8").splitlines()
     out: list[str] = []
@@ -2161,6 +2203,13 @@ def cmd_plan(args: argparse.Namespace) -> int:
         want = state[ref]
         if want != m.group("box"):
             stale.append(f"{ref}: plan says [{m.group('box')}], graph says [{want}]")
+        want_items = items_by_ref.get(ref)
+        if want_items is not None:
+            line, had_items = _sync_items_cell(line, want_items)
+            if had_items is not None and had_items != want_items:
+                stale.append(
+                    f"{ref}: plan says {had_items} item(s), graph says {want_items}"
+                )
         # Replace the box CHARACTER in place rather than rebuilding the row.
         # Rebuilding would collapse the column padding on every sync, so the
         # file would be aligned exactly until the next time anything shipped --
@@ -2272,7 +2321,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
             )
         if stale or unknown or missing or dupes or json_stale or operator_stale or moved_rows or stale_notes:
             print(
-                f"\n{len(stale)} stale box(es), {len(unknown)} unknown ref(s), "
+                f"\n{len(stale)} stale row(s), {len(unknown)} unknown ref(s), "
                 f"{len(missing)} unsequenced section(s), {len(dupes)} duplicated section(s)"
                 f"{f', {len(moved_rows)} moved row(s)' if moved_rows else ''}"
                 f"{f', {len(stale_notes)} stale Moved line(s)' if stale_notes else ''}"
@@ -3469,6 +3518,22 @@ track: Z1
         check("ROW_RE rejects the header", bool(ROW_RE.match("| Order | Section | Deliverable | Depends On | Status |")), False)
         check("PLAN_ROW_RE needs the backticked ref", bool(PLAN_ROW_RE.match("| [ ] | D90 T01 §1 | x | 1 |")), False)
         check("PLAN_ROW_RE accepts a real row", bool(PLAN_ROW_RE.match("| [ ] | `D90 T01 §1` | x | 1 |")), True)
+
+        # --- Items column (D00 T04 §1) ---------------------------------------
+        # Until 2026-09-17 nothing wrote or checked this column, so 28 of 121
+        # rows disagreed with their section while `plan --check` passed.
+        _row = "| [ ] | `D90 T01 §1` | Deliverable                        |   6   |"
+        _new, _had = _sync_items_cell(_row, 11)
+        check("items sync reads the old count", _had, 6)
+        check("items sync writes the new count", _new.rstrip().endswith("11  |"), True)
+        check("items sync leaves the ref untouched", "`D90 T01 §1`" in _new, True)
+        check("items sync keeps the cell width", len(_new), len(_row))
+        check("items sync leaves an already-correct row alone",
+              _sync_items_cell(_row, 6), (_row, 6))
+        check("items sync widens a number that outgrows the cell",
+              _sync_items_cell("| [ ] | `D90 T01 §1` | d |1|", 100)[0].endswith("| 100 |"), True)
+        check("items sync ignores a row with no items cell",
+              _sync_items_cell("| [ ] | `D90 T01 §1` | no trailing number |", 4)[1], None)
         check(
             "PHASE_HEADING_RE accepts an em dash",
             bool(PHASE_HEADING_RE.match("### Phase 3 — Something")),
