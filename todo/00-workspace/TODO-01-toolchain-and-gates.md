@@ -527,16 +527,95 @@ The AutoIt suite reached fourteen tools with no way to build them all, which is 
 
 ## 5. One Command Runs Every Gate
 
+> **Started:** 2026-09-17T10:37:12Z
+
 Five gates that must each be remembered are five gates that get skipped under time pressure. This is the command a push owes, and it exists so that "did you run the checks" has a single answer.
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] Surface the self-correction checks in the combined gate. **Registered 2026-09-17 by `D00 T04 §1`, which owns the checks but not this script:** `scripts/todo-claims.py` exits non-zero on a **stale claim** and on a **fallen coverage floor**, and both must fail the combined gate rather than print and be ignored. Done when: both conditions are exercised against a deliberately broken fixture and both fail `check-all.ps1` by name.
-- [ ] `scripts/check-all.ps1` runs the build for both architectures, `clang-tidy` against the baseline, the Catch2 suite, and `python scripts/todo-graph.py validate`. Done when: all four run in one invocation and the script exits non-zero if any fails.
-- [ ] Report legibly: one line per gate with its result and duration, and the failure detail only for gates that failed. Done when: a run with one deliberate failure shows three passes and one failure with its detail, and the passing detail is not dumped.
-- [ ] Make the tidy gate compare against the baseline rather than zero. Done when: a finding count equal to the baseline passes and one above it fails, both observed.
-- [ ] Tolerate the harness not existing yet. Done when: with `D00 T02 §1` unshipped, the test gate reports "not present" and does not fail the run, and this behavior is removed by that section.
-- [ ] Commit: `"workspace: one command runs every gate"`
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Four corrections, and one of them is a claim this file broke in its own previous section.**
+>
+> **"Both architectures" contradicts `§1`, for the second time in this file.** `§1` recorded the dated default that **x86-64 is the only architecture built**, with `i686` "noted and not wanted". `§4` corrected the same inherited phrase two sections ago and this one still carries it. Corrected to the two **configurations** the suite actually builds, Debug and Release, which is what "both" was reaching for on a toolchain that has one target.
+>
+> **A claim in `D00 T04 §5` goes false the moment this section ships, and it is misfiled.** an `absent scripts/check-all.ps1` claim sits in the body of `D00 T04 §5`, which is about the adjacency advisory and says nothing about this script. The sentence it actually supports is in `D00 T04 §1`: "that script **does not exist**: `D00 T01 §5` builds it". Both sections are stamped. The claim moves to the sentence it supports and flips to `exists`, which is claim maintenance rather than a rewrite: no checklist item, tick, or `Done when:` changes, and `§1`'s reasoning is untouched and was correct, since what it required is exactly what this section is doing.
+>
+> **And writing that sentence filed a claim.** The paragraph above originally quoted the claim's literal HTML-comment syntax to explain it, and `todo-claims.py` parsed the quotation as a real claim, taking the tree from 61 to 62 with an `absent` assertion this very section was about to falsify. The claim grammar has no escape, so **documenting a claim files one**. Written around here by describing the claim instead of reproducing it. Worth knowing before somebody writes a guide to the claim syntax inside a TODO.
+>
+> **Two self-correction checks exist and are not named.** The item list names `todo-claims.py` and `todo-graph.py validate`. It does not name `plan --check` or `todo-findings.py --check`, both of which exist now and both of which go stale **silently**. This is not hypothetical: the independent review of `§4` surfaced a stale `build/todo-progress.json` that my own gate sweep had missed, because I ran `plan --check` before ticking items rather than after. A combined gate that omits a check which fails quietly is not "a single answer". Added, and recorded as going beyond what `D00 T04 §1` registered, with that as the reason.
+>
+> **The boundary with the ratchet, stated so this section does not build it.** This section makes the tidy gate compare a count against `todo/.tidy-baseline`, currently **59**, and fail when it is higher. `D07 T01 §2` owns the **ratchet**: rewriting the baseline down in the same commit, naming which target regressed, and refusing a silent raise. Compare here, ratchet there.
+
+- [x] Surface the self-correction checks in the combined gate. **Registered 2026-09-17 by `D00 T04 §1`, which owns the checks but not this script:** `scripts/todo-claims.py` exits non-zero on a **stale claim** and on a **fallen coverage floor**, and both must fail the combined gate rather than print and be ignored. Done when: both conditions are exercised against a deliberately broken fixture and both fail `check-all.ps1` by name.
+
+  **Extended 2026-09-17, beyond what `D00 T04 §1` registered, with the reason.** `plan --check` and `todo-findings.py --check` are also self-correction checks, they both exist, and they both go stale **silently**. The independent review of `§4` caught a stale `build/todo-progress.json` that my own sweep had missed. A combined gate that omits a check which fails quietly does not give "did you run the checks" a single answer, which is this section's stated purpose. Done when: both also run and both fail the gate by name.
+
+  **All four conditions driven 2026-09-17, each against its own deliberately broken fixture.**
+
+  ```
+  stale claim     claim pointed at scripts/no-such-file.ps1
+                  STALE todo/00-workspace/TODO-04-self-correction.md:87
+                  claims FAILED, check-all exit 1
+  coverage floor  claims disabled in two covered Current state blocks
+                  FLOOR coverage fell to 2, below the recorded floor of 3
+                  claims FAILED, check-all exit 1
+  ```
+
+  `plan --check` needed no fixture: it **failed on the first real run**, catching a stale `build/todo-operator.json` that nothing else in the sweep would have. That is the evidence for extending this item, arriving before the item was finished.
+
+  **One probe caught the claim system catching me.** Raising `COVERAGE_FLOOR` in the source to force the floor condition tripped a *different* claim, `'COVERAGE_FLOOR = 3' in scripts/todo-claims.py matches 1 times`. The floor value is itself claimed, so lowering it to pass is not available. The fixture was rebuilt to remove claims rather than move the floor.
+- [x] `scripts/check-all.ps1` runs the build in **both configurations**, `clang-tidy` against the baseline, the Catch2 suite, and `python scripts/todo-graph.py validate`. **Corrected 2026-09-17:** this read "for both architectures", which contradicts `§1`'s recorded default that x86-64 is the only architecture built; `§4` corrected the same phrase and this one was missed. Debug and Release are what "both" means on a single-target toolchain. Done when: all four run in one invocation and the script exits non-zero if any fails. **Done 2026-09-17**, ten gates in one invocation:
+
+  ```
+  build Debug        ok              4.8s
+  build Release      ok              7.0s
+  tidy               ok            147.6s  59 finding(s), baseline 59
+  tests              not present     0.0s  tests/ does not exist; D00 T02 §1 lands the harness
+  graph validate     ok              0.5s
+  graph self-test    ok              0.6s
+  plan --check       ok              0.3s
+  claims             ok              3.4s
+  claims self-test   ok              0.9s
+  findings ledger    ok              0.1s
+  check-all: 10 gate(s) ok, 1 not present        exit 0
+  ```
+- [x] Report legibly: one line per gate with its result and duration, and the failure detail only for gates that failed. **Corrected 2026-09-17:** "three passes and one failure" was written when the build was one gate. A single deliberate warning now fails **two**, `build Debug` and `build Release`, because the same source is compiled twice, and that is the gate being right rather than wrong. Done when: a run with one deliberate warning fails only the build gates, every other gate passes, and detail is printed for the failures alone.
+
+  Driven with an unused variable in `shared/resolute-ui/src/theme.cpp`:
+
+  ```
+  build Debug        FAILED          6.7s
+  build Release      FAILED          6.1s
+  tidy               ok            158.8s  59 finding(s), baseline 59
+  graph validate     ok              0.6s
+  ... and five more, all ok
+  --- build Debug: last 25 lines of gate-build-debug.log ---
+  ```
+
+  The eight passing gates printed one line each and no detail. **The probe was deliberately moved to `theme.cpp` first:** putting it in `src/main.cpp` also failed the claims gate, because `main.cpp` carries a `lines` claim and appending to it changed the count. That is two gates doing their jobs, and it made the report harder to read as a demonstration of one.
+- [x] Make the tidy gate compare against the baseline rather than zero. **Both observed 2026-09-17.**
+
+  ```
+  equal   tidy ok       59 finding(s), baseline 59
+  above   tidy FAILED   clang-tidy found 59 finding(s), above the baseline of 58
+  ```
+
+  The second was driven by lowering the baseline rather than by manufacturing a finding, because it is the **comparator** under test and varying the cheaper side keeps the probe honest and reversible.
+
+  **The counter is reimplemented in PowerShell here and it agrees with the Python one**, both reporting 59 on the same tree. That is worth stating: `§3` recorded a baseline of 52 instead of 59 because its check-name character class was lowercase-only, and a second independent implementation landing on the same number is the check that mistake never got.
+- [x] Tolerate the harness not existing yet. Verified 2026-09-17: `tests/` does not exist, the gate reports `not present` with the reason and the section that removes it, and the run still exits 0.
+
+  ```
+  tests   not present   0.0s   tests/ does not exist; D00 T02 §1 lands the harness
+                               and removes this tolerance
+  ```
+
+  Reported in yellow and counted separately in the summary, `10 gate(s) ok, 1 not present`, rather than folded into the ok count. A gate that never ran must not read as a gate that passed, which is the whole reason this tolerance is allowed to exist at all.
+  -> XREF: D00 T02 §1 -- lands the harness and removes this tolerance
+- [x] Commit: `"workspace: one command runs every gate"`
+
+<!-- claim: exists scripts/check-all.ps1 -->
+<!-- claim: count "COVERAGE_FLOOR" scripts/check-all.ps1 = 0 -->
 
 **Test checkpoint:** `pwsh scripts/check-all.ps1` exits 0 on a clean tree and prints one line per gate. Introducing one deliberate warning makes it exit non-zero and show only that gate's detail. A tidy count one above the baseline fails. All three runs are quoted in the commit body.
 

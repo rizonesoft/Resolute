@@ -55,10 +55,11 @@ Catch2 is a dependency, not a design. What this section decides is the shape of 
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] Add a `tests/` target built by the same preset set, linking Catch2 through whatever mechanism `D00 T01 §2` settled. Done when: `ctest --preset x64-debug` discovers and runs at least one test.
+- [ ] Add a `tests/` target built by the same preset set, linking Catch2 through whatever mechanism `D00 T01 §2` settled. **Corrected 2026-09-17 by `D00 T01 §5`, which read this while wiring the test gate:** there is no `x64-debug` preset. `CMakePresets.json` declares `debug` and `release`, and **no `testPresets` block at all**, so `ctest --preset` cannot work until this section adds one. Done when: a `testPresets` entry exists and `ctest --preset debug` discovers and runs at least one test.
 - [ ] Write the conventions into `tests/README.md`: naming, tagging by tool, and the rule that a test asserting a system effect reads the effect back rather than trusting a return value. Done when: the file exists and the first tests follow it.
 - [ ] Prove a failure is legible. Done when: a deliberately failing assertion prints the tool tag, the expected value, and the actual value, and the output is quoted here.
-- [ ] Wire the suite into `scripts/check-all.ps1`, replacing the not-present branch that section left. Done when: the branch is gone and a failing test fails the combined gate.
+- [ ] Wire the suite into `scripts/check-all.ps1`, replacing the not-present branch that section left. **The branch now exists and has a known shape, recorded 2026-09-17 when `D00 T01 §5` shipped it:** the gate tests `Test-Path tests/`, and while that is false it reports `not present` in yellow, counts separately in the summary as `10 gate(s) ok, 1 not present`, and does not fail the run. Done when: the branch is gone and a failing test fails the combined gate.
+  -> XREF: D00 T01 §5 -- the combined gate, and the tolerance this item removes
 - [ ] Remove the root scratch file `test_font.cpp`, or move it under `tests/` as a real test if it still proves something. **Filed 2026-09-17 by the review of `D00 T03 §1`:** the intake left it tracked at the repository root, where it is built by nothing and named in no layout. Its `.exe` and `.obj` were gitignored during the intake, but the source itself travelled. Done when: `git ls-files test_font.cpp` is empty, or the file lives under `tests/` and `ctest` runs it. Cheaper substitute that fails the checkpoint: gitignoring it while leaving it tracked, which changes nothing because git keeps tracking what it already tracks.
 <!-- claim: exists test_font.cpp -->
 - [ ] Commit: `"workspace: catch2 harness and assertion conventions"`

@@ -83,6 +83,10 @@ A claim protects a figure somebody thought to record. Nothing protects the rest,
 
   Done when: the count is derived rather than typed, `plan --sync` rewrites it, and a stale count fails `plan --check` like any other parity failure, proven by editing one row's count by hand and watching the check fail. Cheaper substitute that fails the checkpoint: correcting the 28 rows by hand, which fixes today's numbers and leaves the next 28 to accumulate silently.
 - [x] Register these checks for the combined gate, and prove them standalone today. **Corrected 2026-09-17:** the item said "wire into `scripts/check-all.ps1`", and that script **does not exist**: `D00 T01 §5` builds it. `AGENTS.md` rules that a checkpoint citing a gate that does not exist yet is unfalsifiable and not allowed, so this item cannot be satisfied as written and must not be ticked on a promise. Done when: `todo-claims.py` exits non-zero on a stale claim and on a fallen coverage floor, proven by running it directly on a deliberately broken fixture, **and** `D00 T01 §5` carries an item naming these two exit conditions as things its combined gate must surface. The wiring itself belongs to that section, which owns the script.
+
+  <!-- claim: exists scripts/check-all.ps1 -->
+
+  **Updated 2026-09-17 by `D00 T01 §5`, which built it.** The claim above read `absent scripts/check-all.ps1` and was filed into `§5` of this file, which is about the adjacency advisory and says nothing about this script; it belongs here, on the sentence it supports. The script now exists and surfaces both conditions this item registered. Nothing else in this item changes: its tick, its `Done when:` and its reasoning stand, and that reasoning was right, because what it required of `D00 T01 §5` is exactly what that section did.
 - [x] **Report a claim the parser could not see, rather than skipping it.** Filed 2026-09-17 by `D00 T03 §4`, which hit it: `CLAIM_RE` matches within a single line, so a claim whose pattern contains a real newline is split across two lines and matched by nothing. It is not reported malformed; the claim count simply drops. The failure is silent and inverted: a claim that should have failed loudly instead vanishes, and the total still reads "all hold". Done when: a claim comment opened with `<!-- claim:` and not closed on the same line is reported, proven by a fixture containing one. Cheaper substitute that fails the checkpoint: trusting the total, which is exactly what concealed it.
 - [x] **Anchor line-oriented patterns without `^`.** Filed 2026-09-17, same section: `_check_count` compiles the pattern without `re.MULTILINE`, so `^` matches only at the start of the file and a claim using it silently counts 0. Done when: either `MULTILINE` is set and `^` means line start, or the limitation is documented next to the claim grammar with the working alternative, which today is a literal `
 ` prefix.
@@ -343,7 +347,6 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 -> XREF: D00 T04 §2 -- the ledger whose `audit` anchor this section has to clear without editing it
 -> SOURCE: groom-2026-09-17-adjacency-unowned
 
-<!-- claim: absent scripts/check-all.ps1 -->
 <!-- claim: count "anchor-unresolved" scripts/todo-adjacency.py = 1 -->
 <!-- claim: count "anchor-unmatched" scripts/todo-adjacency.py = 1 -->
 <!-- claim: count "section 19" scripts/todo-adjacency.py = 0 -->
