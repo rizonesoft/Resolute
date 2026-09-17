@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**81 findings across 17 sections.**
+**87 findings across 18 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `correctness` | 23 | the code does the wrong thing |
-| `record` | 23 | the plan or the evidence misdescribes what happened |
+| `record` | 25 | the plan or the evidence misdescribes what happened |
+| `correctness` | 24 | the code does the wrong thing |
 | `consistency` | 16 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 6 | fails under hostile or unexpected input |
+| `adversarial` | 9 | fails under hostile or unexpected input |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `integration` | 3 | a consumer, caller, or downstream artifact no longer holds |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -74,6 +74,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T02 §2` | F4 | `adversarial` | fixed | RAII does not survive a process death, and the checkpoint could not see it |
 | `D00 T02 §2` | F5 | `adversarial` | corrected | the registry root sat one level below live user settings |
 | `D00 T02 §2` | F6 | `record` | cleared | the unelevated claim was checked rather than assumed |
+| `D00 T02 §3` | F1 | `record` | corrected | the section was the wrong shape, and the operator's question found it |
+| `D00 T02 §3` | F2 | `adversarial` | fixed | the helper sent input to whatever had focus, and I had already said so |
+| `D00 T02 §3` | F3 | `adversarial` | fixed | the cleanup could kill a process the operator already had open |
+| `D00 T02 §3` | F4 | `adversarial` | fixed | no target meant "capture the first window you find" |
+| `D00 T02 §3` | F5 | `correctness` | fixed | a committed sidecar said 100% while the image was stretched at 150% |
+| `D00 T02 §3` | F6 | `record` | fixed | the plan named the section by a title it no longer had |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |

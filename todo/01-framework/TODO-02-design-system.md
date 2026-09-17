@@ -129,7 +129,9 @@ The difference between an application that looks like it belongs on Windows 11 a
 Every custom-drawn control in this suite reports nothing to a screen reader today, and every control in this suite is custom-drawn. That is the largest single accessibility gap the project has, and it is invisible to anyone not using assistive technology.
 
 > [!IMPORTANT]
-> **This section carries a second payoff: it is what makes control-level test driving possible.** Measured 2026-09-16 against the shipped binary and recorded in [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md): the UI Automation tree for a running window contains **four unnamed panes and nothing inside them**, because Direct2D draws pixels rather than automation elements.
+> **This section carries a second payoff: it is what makes control-level test driving possible.**
+> -> XREF: D00 T02 §3 -- the house-style contract, which binds layout and tokens and explicitly cannot answer whether a surface RENDERED what it specified. That question waits on the tree this section builds.
+> Measured 2026-09-16 against the shipped binary and recorded in [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md): the UI Automation tree for a running window contains **four unnamed panes and nothing inside them**, because Direct2D draws pixels rather than automation elements.
 >
 > Until providers exist, a driver can launch the app, read its title, screenshot it, and click at a coordinate, and nothing more. It cannot find a control, read a label, count list rows, or assert a state.
 >
