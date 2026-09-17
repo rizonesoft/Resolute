@@ -374,19 +374,59 @@ Every UI section in this plan carries a `Fidelity:` line naming an artifact it m
 
 ## 4. Parity Driver for a Built Tool
 
+> **Started:** 2026-09-17T18:13:50Z
+
 The fifth proof type of this project rests entirely on this section. Without it, 1:1 with the AutoIt version is an intention rather than a gate.
 
 **Needs:** Windows host (build/test)
 
-- [ ] Define the parity record: a declarative file listing the system state a run touched, keyed by target, with values and types. Done when: the format is documented and one hand-written example parses.
-- [ ] Drive a built executable far enough to run its main action against a fixture, and emit a parity record. Done when: the driver runs the first ported tool and writes a record.
-- [ ] Record what the driver can and cannot reach **today**, and what unblocks the rest. Done when: this section cites [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md), states that launch, title, screenshot, coordinate click, and close work now while control-level driving needs `D01 T02 §5`, and states which parity records can therefore be produced before that section ships. Cheaper substitute that fails the checkpoint: coordinate clicking presented as control-level driving, which encodes the layout into every test and still passes when the click lands on the wrong control.
-- [ ] Run the AutoIt counterpart from `resolute_au3/` against the same fixture and emit the same record format. Done when: both implementations produce records for `Ownership` on the same fixture tree.
-- [ ] Compare two records field by field and report the differences, not a boolean. Done when: two deliberately different records produce a named per-field diff, and two identical ones report parity. Cheaper substitute that fails the checkpoint: comparing exit codes, which is how two tools that did completely different things both report success.
-- [ ] State plainly what parity does not cover. Done when: this section records that the rendered surface is excluded, with the reason, so no later section claims a pixel comparison as parity.
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Three blockers and one factual correction that reaches past this section. Operator agreed the basis below on 2026-09-17.**
+>
+> **`Ownership` does not do what the plan says it does.** It never calls `takeown` or `icacls`. Its entire system effect is writing four registry trees, `HKCR\*\shell\runas`, `HKCR\dllfile\shell\runas`, `HKCR\Directory\shell\runas` and `HKCR\Drive\shell\runas`, whose `\command` value is `cmd.exe /c takeown /f "%1" /r /d y && icacls "%1" /grant administrators:F /t`. **It is a context-menu installer.** The `takeown` runs later, when a user right-clicks something. The only `Run`/`ShellExecute` calls in the tool open URLs and relaunch the 64-bit build.
+>
+> The measurement already said so and nobody asked what it implied: `D04 T01 §2` records `Ownership` at **2 net functions and 77 net lines**, which is a registry writer, not an ACL engine. `D04 T01 §1` is corrected in the same commit, because it describes "the filesystem ACLs, read back by the verify step" and a reverse that "restores every path's owner and ACL".
+>
+> **Blocker 1, circular.** Items below say "the first ported tool" and "both implementations of `Ownership`". No C++ `Ownership` exists, and `D04 T01 §1` lists **`D00 T02 §4`** among its own unmet dependencies. Each waits on the other.
+>
+> **Blocker 2, not drivable.** `grep` finds no `$CmdLine` handling in `Ownership.au3` or in `ReBar.au3`, so every tool in the AutoIt suite is GUI-only. Driving one's action today needs coordinate clicking, which item 3 below names as the cheaper substitute that **fails** this checkpoint.
+>
+> **Blocker 3, destructive to the developer's machine.** Those writes go to `HKCR`, which needs elevation and would add a "Take Ownership" entry to Explorer's context menu. `AGENTS.md` requires a destructive path be confirmed rather than trusted, and running one for a test is not a confirmation.
+>
+> **So this section builds the instrument and not the first pair.** The driver, the record format and the field-by-field comparison are all provable today against real system state using `§2`'s fixtures. The first cross-implementation pair belongs to the section that creates the second implementation, which breaks the circle in the honest direction.
+>
+> **The driver snapshots around the run rather than asking the tool to report.** That is what makes it work for both implementations identically: an AutoIt binary cannot be instrumented and does not need to be, because the record is the difference between a before and an after taken from outside.
+
+- [x] Define the parity record: a declarative file listing the system state a run touched, keyed by target, with values and types. Done when: the format is documented and one hand-written example parses.
+  **Done 2026-09-17.** The format is `tests/parity/parity.h`, line-oriented and tab-separated: one operation character (`+` added, `-` removed, `~` changed), then kind, target, field, type and value, with `#` header lines. Chosen over a structured format because it is diffable in git, greppable, and parseable by anything, including a future AutoIt-side emitter that will not have this library. The hand-written example parses: `A hand-written parity record parses`, and it found two defects doing so, both recorded below.
+- [x] Emit a parity record for a run, by snapshotting the declared scope before and after it. **Corrected 2026-09-17:** this said "the driver runs the first ported tool", and there is no ported tool; `D04 T01 §1` is blocked on this very section. Done when: a change made to a fixture between two snapshots produces a record naming it, proven against both a registry scope and a filesystem scope. The driver takes the record from **outside** the run, so it needs no cooperation from the thing it measures, which is the only way an uninstrumentable AutoIt binary can be compared at all.
+  **Done 2026-09-17.** Proven against both scopes: `A registry change between snapshots appears in the record` and `A filesystem change between snapshots appears in the record`, each using `§2`'s disposable fixtures so the assertions are against real system state rather than a mock.
+- [x] Record what the driver can and cannot reach **today**, and what unblocks the rest. Done when: this section cites [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md), states that launch, title, screenshot, coordinate click, and close work now while control-level driving needs `D01 T02 §5`, and states which parity records can therefore be produced before that section ships. Cheaper substitute that fails the checkpoint: coordinate clicking presented as control-level driving, which encodes the layout into every test and still passes when the click lands on the wrong control.
+
+  **What the driver reaches today, recorded 2026-09-17** from [`docs/captures/ui-automation-spike.md`](../../docs/captures/ui-automation-spike.md), which measured it against the shipped binary rather than reasoning about it.
+
+  **Works now:** launch and window attach (471 ms measured), window title read back, screenshot, coordinate click, and `CloseMainWindow` with a clean exit code 0.
+
+  **Does not work, and needs `D01 T02 §5`:** finding a control by name or automation id, reading the text of a label, a status bar or a list row, asserting a row count, a checkbox state, a selection or an enabled state, and clicking a named button rather than a guessed position. The cause is measured, not assumed: the UI Automation tree exposes four unnamed panes with nothing inside them, because everything within them is drawn in Direct2D, and `shared/resolute-ui/` and `src/` contain no `WM_GETOBJECT`, no `IRawElementProviderSimple` and no `IAccessible`.
+
+  **So which parity records can be produced before `D01 T02 §5` ships?** All of them, and this is the reason the instrument is built this way. A parity record is the difference between two snapshots taken from **outside** the process, so producing one needs launch and close and nothing else. What control-level driving is required for is **reaching a surface that is behind a control**: a tool whose effect happens only after the user clicks a named button cannot have that effect driven today, and its parity record must be taken around a run the operator drove by hand. Nothing about the record, the format or the comparison waits on `D01 T02 §5`.
+  -> XREF: D01 T02 §5 -- the automation providers that would let a run be driven rather than performed
+- [ ] ~~Run the AutoIt counterpart from `resolute_au3/` against the same fixture and emit the same record format.~~ **Deferred 2026-09-17 to the section that creates the second implementation.** Three reasons, each sufficient: no C++ `Ownership` exists and `D04 T01 §1` depends on this section; no AutoIt tool has a command line, so driving one needs the coordinate clicking item 3 forbids; and `Ownership` writes `HKCR`, which needs elevation and would alter the developer's Explorer context menu. The record format and the comparison are proven here without it, so the port inherits a working instrument rather than building one.
+  -> XREF: D04 T01 §1 (item: "Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference") -- the item that inherits this work, named so closure is detectable rather than asserted
+- [x] Compare two records field by field and report the differences, not a boolean. Done when: two deliberately different records produce a named per-field diff, and two identical ones report parity. Cheaper substitute that fails the checkpoint: comparing exit codes, which is how two tools that did completely different things both report success.
+  **Done 2026-09-17.** `Compare` returns a list of `Difference`, never a boolean: `Two different records name every differing field` asserts the differing field is named with **both** sides' values, `Two identical records report parity` asserts the empty case, and `A field present on one side only is named, not ignored` covers the asymmetric case, because a comparison that ignored a field one side never wrote would pass two tools that did different amounts of work.
+- [x] State plainly what parity does not cover. Done when: this section records that the rendered surface is excluded, with the reason, so no later section claims a pixel comparison as parity.
+
+  **Parity does not cover the rendered surface, recorded 2026-09-17.** It compares system **effects**: registry values, file content, file ownership. It says nothing about what the tool looked like while producing them.
+
+  The reason is that the two are independent in both directions. **Two tools can produce identical system state and look nothing alike**, which is the expected outcome here, because `AGENTS.md` decides the UI is rebuilt rather than reproduced and the AutoIt windows are neither DPI-aware nor dark-mode capable. **And two tools can look identical and do different things**, which is the dangerous direction: a screenshot comparison passing would be positive evidence for a claim it cannot support.
+
+  So appearance is owned elsewhere and a pixel comparison is never parity evidence: `DESIGN.md` and `§3`'s contract own what a surface must specify, and `D01 T02 §5` owns whether it rendered what it specified. The statement is repeated at the top of `tests/parity/parity.h`, where somebody about to extend the instrument will read it.
 - [ ] Commit: `"workspace: parity driver comparing a C++ tool against its AutoIt counterpart"`
 
-**Test checkpoint:** The driver produces parity records for both implementations of one tool against one fixture. Two deliberately different records produce a per-field diff naming each difference; two identical records report parity. The exclusion of the rendered surface is stated in this section. All outputs are quoted.
+**Test checkpoint:** The driver emits a parity record from a before-and-after snapshot of a declared scope, proven against a registry scope and a filesystem scope, and a change made between the snapshots is named in the record. Two deliberately different records produce a per-field diff naming each difference; two identical records report parity. A hand-written record parses. The exclusion of the rendered surface is stated in this section. All outputs are quoted.
+
+**Corrected 2026-09-17:** this required "records for **both implementations** of one tool", which cannot be satisfied while the second implementation does not exist, and this section is what `D04 T01 §1` waits on to build it. The requirement is not dropped: it moves to that section with an XREF, and what remains here is falsifiable on its own, because a differ that reported parity between two different records would fail it.
 
 ## 5. Cover the Inherited UI Library
 

@@ -56,7 +56,26 @@ track: P2
 `Ownership` is roughly 77 lines of real logic on top of 1,556 lines of framework, which makes it the cheapest possible proof that the framework and the repair contract actually work together on a real product. If the architecture is wrong, it is wrong here, cheaply.
 
 **Fidelity:** the Ownership main window and its result list, against `docs/captures/house-style/` and a pre-change capture of the shipped build.
-**Job:** a user can take ownership of a path, see exactly what changed, and put it back. Consumer: the filesystem ACLs, read back by the verify step.
+**Job:** a user can add or remove the "Take Ownership" context-menu entry, see exactly what changed, and put it back. Consumer: the `HKCR` shell keys, read back by the verify step.
+
+> [!IMPORTANT]
+> **Corrected 2026-09-17 by `D00 T02 §4`, which read the source while building the parity driver. This section described behaviour the tool does not have.**
+>
+> It read "a user can take ownership of a path" and "Consumer: the filesystem ACLs". **`Ownership.exe` never calls `takeown` or `icacls`.** Its entire system effect is writing four registry trees:
+>
+> ```
+> HKCR\*\shell\runas          HKCR\Directory\shell\runas
+> HKCR\dllfile\shell\runas    HKCR\Drive\shell\runas
+>   \command = cmd.exe /c takeown /f "%1" /r /d y && icacls "%1" /grant administrators:F /t
+> ```
+>
+> It is a **context-menu installer**. The `takeown` runs later, when a user right-clicks something, in a process this tool never starts. The only `Run` and `ShellExecute` calls in the source open URLs and relaunch the 64-bit build.
+>
+> **The measurement in `§2` already said so.** `Ownership` is **2 net functions and 77 net lines**, which is a registry writer rather than an ACL engine, and that figure was recorded without anybody asking what it implied.
+>
+> **What this changes for this section.** Parity is a **registry** comparison, not a filesystem ACL comparison. The reverse is deleting four key trees, not restoring owners. The freeze check pins what the tool writes to `HKCR`, including the exact `\command` string, because that string is what eventually runs against a user's files. And the elevation requirement is real and is the tool's own: `HKCR` writes need admin, which is why `D01 T01 §6`'s guard matters here.
+>
+> **What it does not change.** The vertical slice is still the right first port and is still cheap, and `D00 T02 §2`'s `RegistryFixture` is the right disposable target for it. That fixture's **`FileTreeFixture`** half was justified in `§2`'s stamp as carrying "the exact values `D04 T01 §1` compares", which was wrong in the same way; it remains useful for the tools that do touch ACLs, `PixRepair` and `ComIntRep` among them.
 **Treatment:** the prior owner and ACL recorded before the change, so undo restores what was actually there. Cheaper substitute that fails the checkpoint: a reverse that sets ownership to the current user or to `TrustedInstaller` by convention.
 **Chrome:** consume the framework and the repair contract. Do not keep a private copy of either.
 **Needs:** Windows host (build/test)
@@ -78,13 +97,18 @@ track: P2
   **What the fixture store gives this section, and what it does not**, recorded 2026-09-17 when `D00 T02 §2` shipped: `FileTreeFixture` creates a tree this process owns, with declared ACLs, and reads the owner back as a SID string, which is the before-and-after comparison this port needs. It runs **unelevated**. What it does not solve is taking ownership of an object owned by somebody else, which needs `SeTakeOwnershipPrivilege`; that half of this section needs its own arrangement rather than assuming the fixtures cover it.
 - [ ] Port the tool to `extensions/Ownership/` as framework plus repair contract plus its own items, and nothing else. Done when: it builds as its own standalone executable and the source contains no settings, log, localization, or loop code.
 - [ ] Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference. Done when: the parity report is quoted and shows zero differing fields.
-- [ ] Prove the reverse: a takeover followed by undo restores every path's owner and ACL, compared entry by entry. Done when: the assertion compares owner and ACL before and after.
+  -> XREF: D00 T02 §4 -- the parity instrument this inherits, and the section that deferred the first cross-implementation pair to this item
+
+  **This item inherits work, recorded 2026-09-17 when `D00 T02 §4` shipped.** That section built the record format, the snapshot driver and the field-by-field comparison, and **deliberately did not produce the first cross-implementation pair**, because doing so was circular: no C++ `Ownership` existed, and `§4` is listed among this section's own unmet dependencies. It also could not be driven, since no AutoIt tool in the suite parses a command line, and running one writes `HKCR` on the developer's machine.
+
+  **So the first AutoIt-side parity record is this item's to produce**, and the first item of this section is where it is captured. The instrument is already proven against real registry and filesystem state, so what remains here is running it around two implementations rather than building it. The snapshot is taken from **outside** the run, which is why an AutoIt binary that exposes nothing needs no cooperation to be measured.
+- [ ] Prove the reverse: installing the context-menu entry followed by undo leaves `HKCR` exactly as it was, compared key by key and value by value. **Corrected 2026-09-17:** this said "restores every path's owner and ACL", which is not what the tool touches. Done when: the assertion compares the four `HKCR` subtrees before and after, including the `\command` string, and a `RegistryFixture` gives it a disposable target.
 - [ ] Prove the refusal: a path the process cannot touch is refused by name, leaving every other path in the batch accounted for. Done when: a deny-ACE fixture produces the refusal and the batch counts reconcile.
 - [ ] Account for the surface: every control is working or deferred to a named section. Done when: the account is written and each deferral resolves.
 - [ ] Record what the slice proved and what it did not. Done when: this section states which framework and contract assumptions are now evidence rather than intention.
 - [ ] Commit: `"ownership: port to the framework and the repair contract"`
 
-**Freeze check:** What `Ownership` grants on takeover does not change. Evidence is the parity report showing zero differing fields against the shipped AutoIt build on `tests/fixtures/filetree/`.
+**Freeze check:** What `Ownership` writes to `HKCR` does not change, **including the exact `\command` string**, because that string is what eventually runs against a user's files and a change to it changes what happens to them. **Corrected 2026-09-17:** this read "what `Ownership` grants on takeover" against a file tree fixture, and the tool grants nothing at run time. Evidence is the parity report showing zero differing fields against the shipped AutoIt build over the four `HKCR` subtrees.
 
 **Test checkpoint:** The parity driver reports zero differing fields between the C++ and AutoIt implementations on the same fixture tree, quoted. Takeover followed by undo restores every owner and ACL, asserted. A deny-ACE path is refused by name with the batch reconciling. The rendered window is compared against the pre-change capture.
 

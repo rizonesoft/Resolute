@@ -28,6 +28,7 @@ add_executable(resolute_tests
     ${RESOLUTE_TEST_SOURCES}
     fixtures/fixtures.cpp
     fixtures/suite_teardown.cpp
+    parity/parity.cpp
 )
 
 # The disposable fixture store lives under the build directory. CMake
