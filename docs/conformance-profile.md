@@ -45,7 +45,7 @@ Every tool in the suite, ported or new.
 | C12 | universal | capture | Every surface renders correctly at 100, 125, 150, and 200 percent scaling. | A capture at each of the four scalings with nothing clipped, truncated, or misaligned. | D01 T01 §7 |
 | C13 | universal | capture | Every surface renders correctly in both appearances. | A capture in each appearance. | D01 T01 §7 |
 | C14 | universal | run | Placed alone in an empty directory with only its own files, the tool starts, localizes, shows About, and checks for updates. | A driven run in an empty directory on a machine with no suite install. | D01 T01 §9 |
-| C15 | universal | run | The tool writes nothing outside its own folder. | A file-system trace of a full session shows no write outside it. | D01 T01 §9 |
+| C15 | universal | run | The tool's **own persistence** stays in its own folder: settings, log, cache, language packs, and crash reports are written nowhere else. | A file-system trace of a session that performs no repair shows no write outside the tool's folder. | D01 T01 §9 |
 | C16 | universal | run | The tool is one standalone executable and requires no other tool, and no suite-wide file, at runtime. | A driven run with every sibling tool absent. | D06 T01 §1 |
 | C17 | universal | search | Every visual and interaction value comes from the design contract. The tool hardcodes none of them. | The token check finds no colour, size, or spacing literal in the tool's source. | D01 T02 §1 |
 | C18 | universal | run | Every control reports its name, role, value, and state, and every surface is reachable without a mouse. | An automation tree walk naming each control, and a mouse-free drive of every surface. | D01 T02 §5 |
@@ -72,6 +72,17 @@ The distinction matters because a tool that reads and reports owes none of this,
 | C30 | repair | run | Every action and every refusal produces exactly one log line. | Both paths driven, both counted. | D02 T01 §6 |
 | C31 | repair | run | Elevation is checked at the action, not only at startup, and the refusal is proven. | An unelevated run reaches the action and is refused by name, with the batch still reconciling. | D01 T01 §6 |
 | C32 | repair | exists | The user can carry the result away as a transcript. | The transcript is exported and read back. | D02 T01 §5 |
+| C33 | repair | run | Every write the tool makes outside its own folder is a declared repair target, and nothing else. | A file-system trace of a repair run: every path written appears in the tool's declared items, and no path outside them is touched. | D02 T01 §1 |
+
+### Why C15 is about persistence and not about writes
+
+**A repair tool's whole purpose is writing outside its own folder**, and an earlier draft of C15 read "the tool writes nothing outside its own folder", which would have made every repair tool non-conformant by construction.
+
+`ComIntRep` restores the hosts file at `%WindowsDir%\System32\drivers\etc\hosts`, taking a `.bak` beside it first. That effect is **frozen**: `AGENTS.md` says what these six tools compute and write does not change, because the effect lands on somebody's machine. A clause forbidding it would have forced a choice between a tool that fails the bar and a tool that changed a frozen behaviour, and both are wrong.
+
+So the confinement clause is about **persistence the framework owns**, which is what the AutoIt defects were actually about: a settings file in the wrong place, a log at a shared root, a language pack the tool cannot find alone. C15 is traced on a session that performs no repair, so it measures exactly that.
+
+Repair writes are not exempt, they are **governed instead**, and more strictly: C33 requires every path written outside the folder to be a declared repair target, C27 requires the prior state recorded first, C28 requires the effect read back, C29 requires a reverse or a stated reason there is none, and C30 requires a log line. A repair tool therefore owes more about its outside writes than a read-only tool owes about having none.
 
 ## What each measured defect maps to
 

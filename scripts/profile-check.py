@@ -19,6 +19,10 @@ of the checkpoint is now something this script decides:
   3. every measured defect class is closed by at least one clause that exists
   4. no design value is restated here, because DESIGN.md is the one source
 
+Run with --self-test to prove the checks can fail. That is not decoration: a
+checker nothing exercises is the thing it exists to prevent, and the
+independent review of this section found exactly that defect here.
+
 Exit codes:
   0  the profile holds
   1  the profile is broken, and every reason is named
@@ -44,8 +48,15 @@ METHODS = {"exists", "absent", "search", "run", "readback", "capture", "count"}
 # appeared nowhere in the source it pointed at.
 EXPECTED_DEFECTS = 8
 
-CLAUSE_ROW = re.compile(r"^\|\s*(C\d+)\s*\|")
-DEFECT_ROW = re.compile(r"^\|\s*(D\d+)\s*\|")
+# LEADING WHITESPACE IS PART OF THE ROW, not something to require the absence
+# of. Markdown renders an indented table row exactly like an unindented one, so
+# anchoring at the line start made a clause VISIBLE to a reader and INVISIBLE
+# to this check: indenting C31 by two spaces and clearing its owner returned
+# "31 clause(s) ok". Found by the independent review of D07 T01 §1, and it is
+# the defect this script exists to prevent, one level up: a check reporting
+# success on something it never looked at.
+CLAUSE_ROW = re.compile(r"^[\s>]*\|\s*(C\d+)\s*\|")
+DEFECT_ROW = re.compile(r"^[\s>]*\|\s*(D\d+)\s*\|")
 SECTION_REF = re.compile(r"^D\d\d T\d\d §\d+$")
 CLAUSE_CITE = re.compile(r"C\d+")
 
@@ -60,15 +71,15 @@ def cells(line):
     return [c.strip() for c in line.strip().strip("|").split("|")]
 
 
-def resolves(ref, cache):
+def resolves_via_graph(ref, cache):
     """Does this section reference name a section that exists?
 
     `todo-graph.py resolve` is the front door for this everywhere else in the
-    repository, so it is the front door here too rather than a second parser
-    of the same tree. Exit 0 is open, 3 is already shipped, 4 is open with
-    unmet dependencies: all three mean the section EXISTS, which is all a
-    clause owner has to be. Exit 1 is no such section and 5 is a section that
-    moved out of the tree, and a clause pointing at either has no address.
+    repository, so it is the front door here too rather than a second parser of
+    the same tree. Exit 0 is open, 3 is already shipped, 4 is open with unmet
+    dependencies: all three mean the section EXISTS, which is all a clause
+    owner has to be. Exit 1 is no such section and 5 is a section that moved
+    out of the tree, and a clause pointing at either has no address.
     """
     if ref in cache:
         return cache[ref]
@@ -80,15 +91,14 @@ def resolves(ref, cache):
     return cache[ref]
 
 
-def main():
-    if not PROFILE.exists():
-        print(f"profile-check: {PROFILE.relative_to(REPO)} does not exist")
-        return 2
+def evaluate(text, resolver):
+    """Return (problems, clauses, defects, owners_checked) for a profile.
 
-    text = PROFILE.read_text(encoding="utf-8")
+    Takes the document as text and the owner resolver as an argument so the
+    self-test can drive it without a repository or a subprocess.
+    """
     lines = text.split("\n")
     problems = []
-
     clauses = {}
     defects = {}
 
@@ -153,7 +163,7 @@ def main():
     cache = {}
     for cid, clause in sorted(clauses.items()):
         owner = clause["owner"]
-        if SECTION_REF.match(owner) and not resolves(owner, cache):
+        if SECTION_REF.match(owner) and not resolver(owner, cache):
             problems.append(
                 f"line {clause['line']}: clause {cid} owner '{owner}' does not "
                 "resolve to a section that exists")
@@ -188,6 +198,130 @@ def main():
                 f"line {number}: '{found}' is a design value restated here. "
                 "DESIGN.md is the one source; adopt it by reference.")
 
+    return problems, clauses, defects, cache
+
+
+# ── the self-test ────────────────────────────────────────────
+#
+# Each case is a minimal profile that is correct except for one thing, and the
+# assertion is that the one thing is NAMED. A case asserting only a non-zero
+# exit would pass on a checker that rejected everything.
+
+def _minimal(clause_rows=None, defect_rows=None):
+    """A profile that holds, so a mutation of it isolates one defect."""
+    clause_rows = clause_rows if clause_rows is not None else [
+        "| C01 | universal | search | Something universal. | Looked at. | D07 T01 §1 |",
+        "| C02 | repair | run | Something for repairs. | Driven. | D07 T01 §1 |",
+    ]
+    defect_rows = defect_rows if defect_rows is not None else [
+        f"| D{n} | Measured. | C01 |" for n in range(1, EXPECTED_DEFECTS + 1)
+    ]
+    return "\n".join(clause_rows + defect_rows)
+
+
+def _always(ref, cache):
+    cache[ref] = True
+    return True
+
+
+def _never(ref, cache):
+    cache[ref] = False
+    return False
+
+
+def self_test():
+    failures = []
+
+    def case(name, text, resolver, expect):
+        problems, _, _, _ = evaluate(text, resolver)
+        joined = " | ".join(problems)
+        if expect is None:
+            if problems:
+                failures.append(f"{name}: expected no problem, got: {joined}")
+        elif expect not in joined:
+            failures.append(f"{name}: expected {expect!r}, got: {joined or 'nothing'}")
+
+    case("a correct profile passes", _minimal(), _always, None)
+
+    case("missing owner", _minimal([
+        "| C01 | universal | search | Something. | Looked at. |  |",
+        "| C02 | repair | run | Something. | Driven. | D07 T01 §1 |",
+    ]), _always, "names no owner section")
+
+    # THE REGRESSION THE REVIEW FOUND. An indented row renders identically and
+    # was skipped entirely, so its missing owner went unreported.
+    case("indented row is still checked", _minimal([
+        "  | C01 | universal | search | Something. | Looked at. |  |",
+        "| C02 | repair | run | Something. | Driven. | D07 T01 §1 |",
+    ]), _always, "names no owner section")
+
+    case("indented defect row is still checked", _minimal(None, [
+        "  | D1 | Measured. |  |",
+    ] + [f"| D{n} | Measured. | C01 |" for n in range(2, EXPECTED_DEFECTS + 1)]),
+        _always, "closed by no clause")
+
+    case("owner that does not resolve", _minimal(), _never,
+         "does not resolve to a section that exists")
+
+    case("method outside the closed set", _minimal([
+        "| C01 | universal | reasonably | Something. | Looked at. | D07 T01 §1 |",
+        "| C02 | repair | run | Something. | Driven. | D07 T01 §1 |",
+    ]), _always, "not stated in evaluable terms")
+
+    case("kind outside the closed set", _minimal([
+        "| C01 | universal | search | Something. | Looked at. | D07 T01 §1 |",
+        "| C02 | sometimes | run | Something. | Driven. | D07 T01 §1 |",
+    ]), _always, "is not one of")
+
+    case("a defect citing a clause that is absent",
+         _minimal(None, ["| D1 | Measured. | C99 |"]
+                  + [f"| D{n} | Measured. | C01 |" for n in range(2, EXPECTED_DEFECTS + 1)]),
+         _always, "which is not in the profile")
+
+    case("too few defect classes", _minimal(None, ["| D1 | Measured. | C01 |"]),
+         _always, "expected 8")
+
+    case("only one tool kind", _minimal([
+        "| C01 | universal | search | Something. | Looked at. | D07 T01 §1 |",
+    ]), _always, "does not distinguish the two tool kinds")
+
+    case("a restated colour", _minimal() + "\n\nThe accent is #2F6FEB.",
+         _always, "design value restated")
+
+    case("a restated size", _minimal() + "\n\nThe gutter is 16px.",
+         _always, "design value restated")
+
+    case("a clause with too few cells", _minimal([
+        "| C01 | universal | search | Something. | D07 T01 §1 |",
+        "| C02 | repair | run | Something. | Driven. | D07 T01 §1 |",
+    ]), _always, "needs 6")
+
+    case("a duplicated clause id", _minimal([
+        "| C01 | universal | search | Something. | Looked at. | D07 T01 §1 |",
+        "| C01 | repair | run | Something. | Driven. | D07 T01 §1 |",
+    ]), _always, "declared twice")
+
+    total = 14
+    if failures:
+        print(f"profile-check self-test: {len(failures)} of {total} case(s) FAILED")
+        for failure in failures:
+            print(f"  {failure}")
+        return 1
+    print(f"profile-check self-test: {total} case(s) ok")
+    return 0
+
+
+def main(argv):
+    if "--self-test" in argv:
+        return self_test()
+
+    if not PROFILE.exists():
+        print(f"profile-check: {PROFILE.relative_to(REPO)} does not exist")
+        return 2
+
+    problems, clauses, defects, cache = evaluate(
+        PROFILE.read_text(encoding="utf-8"), resolves_via_graph)
+
     if problems:
         print(f"profile-check: {len(problems)} problem(s) in "
               f"{PROFILE.relative_to(REPO)}")
@@ -201,10 +335,10 @@ def main():
           f"-- {universal} universal, {repair} repair "
           f"-- {len(defects)} measured defect class(es), all closed "
           f"-- {len(cache)} owner section(s), all resolve")
-    for did, defect in sorted(defects.items()):
+    for did, defect in sorted(defects.items(), key=lambda kv: int(kv[0][1:])):
         print(f"  {did} closed by {', '.join(defect['cites'])}")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))

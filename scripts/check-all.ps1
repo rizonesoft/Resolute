@@ -299,6 +299,9 @@ Invoke-Gate -Name 'findings ledger' -LogName 'gate-findings' -Command {
 Invoke-Gate -Name 'conformance profile' -LogName 'gate-profile' -Command {
     & python (Join-Path $RepoRoot 'scripts\profile-check.py')
 }
+Invoke-Gate -Name 'profile self-test' -LogName 'gate-profile-selftest' -Command {
+    & python (Join-Path $RepoRoot 'scripts\profile-check.py') --self-test
+}
 
 # ── toolchain currency, ADVISORY ─────────────────────────────
 #
