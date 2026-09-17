@@ -24,7 +24,19 @@ FetchContent_MakeAvailable(Catch2)
 
 file(GLOB RESOLUTE_TEST_SOURCES CONFIGURE_DEPENDS "*_test.cpp")
 
-add_executable(resolute_tests ${RESOLUTE_TEST_SOURCES})
+add_executable(resolute_tests
+    ${RESOLUTE_TEST_SOURCES}
+    fixtures/fixtures.cpp
+    fixtures/suite_teardown.cpp
+)
+
+# The disposable fixture store lives under the build directory. CMake
+# supplies the path so no absolute path is written into a tracked build
+# file, which is what D00 T01 §4 requires. D00 T02 §2.
+target_compile_definitions(resolute_tests PRIVATE
+    RESOLUTE_FIXTURE_ROOT="${CMAKE_BINARY_DIR}/fixtures"
+)
+target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Ours, so it answers to the warning policy. Catch2 does not: it is a
 # FetchContent dependency and nothing applies the policy to it.

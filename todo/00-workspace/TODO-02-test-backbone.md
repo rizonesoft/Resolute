@@ -171,18 +171,79 @@ Catch2 is a dependency, not a design. What this section decides is the shape of 
 
 ## 2. Fixture Store and Disposable Targets
 
+> **Started:** 2026-09-17T15:33:04Z
+
 This is the section that makes the destructive half of the suite testable. The AutoIt tools went years without a test on their most dangerous paths for one reason: there was nothing safe to point them at.
 
 **Needs:** Windows host (build/test)
 
-- [ ] Create the disposable registry target under `HKCU\Software\Rizonesoft\Fixtures`, with helpers to seed it from a declared state and tear it down. Done when: seeding and teardown are assertable, and teardown leaves the key absent.
-- [ ] Create the disposable file tree under the build directory, with declared owners and ACLs so the ownership tests have something real to change. Done when: a fixture tree is created, its ACLs read back as declared, and teardown removes it.
-- [ ] Use `HKCU` and a user-writable path so the fixtures need no elevation. Done when: the full fixture suite runs green in an unelevated session, and this section states which fixtures genuinely need elevation and why.
-- [ ] Guarantee cleanup on failure. Done when: a test that throws mid-run still leaves no fixture residue, proven by asserting the key and tree are absent after a deliberately aborted run.
-- [ ] Refuse to run against anything outside the fixture roots. Done when: a fixture helper handed a path outside its root fails with a named message rather than acting. Cheaper substitute: trusting every caller, which is how a test suite eventually deletes somebody's documents.
-- [ ] Commit: `"workspace: disposable registry and filesystem fixtures"`
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. One correction, and it is about where a delete lands.**
+>
+> **`HKCU\Software\Rizonesoft` exists on this machine and holds real product settings.** It has two subkeys, `ClassicPanel` and `Office`. The section proposes creating a **deletable** fixture root as a sibling of live user data, under the same parent, and teardown's whole job is recursive deletion.
+>
+> The guard in the fifth item defends against a caller passing a bad path. It does not defend against the root itself being one level away from settings a user would miss, and `AGENTS.md` is explicit that a destructive path is confirmed rather than trusted. Moved to `HKCU\Software\ResoluteTestFixtures`, which is unambiguously test-only, shares no parent with product data except `HKCU\Software` itself, and needs no elevation. A key named for the test suite cannot be mistaken for a key holding somebody's preferences.
+>
+> **The unelevated requirement was checked rather than assumed.** Setting a DACL on a file this process owns succeeds in a session where `IsInRole(Administrator)` is **False**, verified directly. So the ownership fixtures can carry declared ACLs without elevation, which is what the third item needs and what would otherwise have been discovered halfway through.
 
-**Test checkpoint:** The fixture suite runs green unelevated. A deliberately aborted run leaves `HKCU\Software\Rizonesoft\Fixtures` absent and the fixture tree removed, both asserted. A helper handed an out-of-root path fails by name. All three are quoted.
+- [x] Create the disposable registry target under `HKCU\Software\ResoluteTestFixtures`, with helpers to seed it from a declared state and tear it down. **Corrected 2026-09-17:** this named `HKCU\Software\Rizonesoft\Fixtures`, and that key's parent holds this user's real `ClassicPanel` and `Office` settings. A recursive teardown one level too high would take them. Done when: seeding and teardown are assertable, and teardown leaves the key absent.
+
+  **Done 2026-09-17.** `RegistryFixture` in `tests/fixtures/` seeds strings, dwords and nested subkeys, and every assertion **reads the value back out of the registry** rather than trusting the setter, which is the rule `§1` wrote and could not yet exercise. Teardown is asserted from outside the object: `RegistryFixture::Exists()` is false after the scope closes.
+- [x] Create the disposable file tree under the build directory, with declared owners and ACLs so the ownership tests have something real to change. **Done 2026-09-17.** `FileTreeFixture` creates a tree under `<build>/fixtures/<name>`, and the path comes from CMake as a compile definition so **no absolute path is written into a tracked build file**, which is what `D00 T01 §4` requires.
+
+  The owner is read back as a SID string off the filesystem and the DACL entry count is read back after a grant, because those are exactly the values `D04 T01 §1`'s ownership port has to compare before and after. A helper that reported its own success would prove nothing there.
+- [x] Use `HKCU` and a user-writable path so the fixtures need no elevation. **Verified 2026-09-17 in a session where `IsInRole(Administrator)` is False:**
+
+  ```
+  100% tests passed out of 16
+    fixtures = 10 tests      registry = 5      files = 5
+  ```
+
+  **Which fixtures genuinely need elevation: none of these, and that is a statement about scope rather than a clean bill.** Everything here writes under `HKCU` and into a directory this process owns, and setting a DACL on a file you own needs no privilege. What *does* need elevation is taking ownership of an object owned by somebody else, which requires `SeTakeOwnershipPrivilege`, and repairing anything under `HKLM`. `D04 T01 §1` meets the first of those, and the honest position is that these fixtures give it a target for the unprivileged half and that the elevated half needs its own arrangement rather than being quietly assumed to work here.
+- [x] Guarantee cleanup on failure. **Two different failures, and only one of them is solved by RAII.**
+
+  **A test that throws** is handled by the destructor: both fixtures seed state, throw mid-test, and the key and tree are asserted absent afterwards from outside the object. Two tests do exactly that.
+
+  **A process that dies is not**, and this was measured rather than assumed. A probe that seeded both fixtures and then called `std::abort()`:
+
+  ```
+  process exit=-1073740791          destructors do NOT run
+  registry leftover: abort-residue
+  tree leftover    : abort-residue, seeded.txt
+  ```
+
+  So RAII alone leaves residue on a crash, which is a real hole and the checkpoint would not have caught it: every in-test assertion passed the whole time.
+
+  **Closed by sweeping at run start as well as end.** The suite listener removes both roots before the first test, so a previous run's crash cannot outlive the next run. Driven against the residue the abort left:
+
+  ```
+  before   registry: abort-residue    tree: abort-residue
+  run      All tests passed
+  after    registry: absent           tree: absent
+  ```
+
+  **What this still does not cover, stated plainly:** two test processes running concurrently would sweep each other's roots. The suite runs as one process here and `ctest` is not configured for parallelism, so it is a limitation rather than a bug today, and it is written down so it is not discovered by somebody adding `-j`.
+- [x] Refuse to run against anything outside the fixture roots. **Both helpers refuse, and the refusal is asserted to be a refusal rather than just a throw.**
+
+  ```
+  registry   \Software\Rizonesoft     refused, absolute
+             ..\..\Rizonesoft          refused, traversal
+             HKLM:\Software            refused, qualified
+  files      ..\escaped.txt            refused, resolves outside the root
+             C:\Windows\escaped.txt    refused, absolute
+  ```
+
+  **The filesystem guard resolves before it judges**, using `weakly_canonical` and then comparing against the root component by component. A guard that pattern-matched on `..` would refuse `a\b\..\c`, which stays inside and is legitimate, and would miss anything that escapes without the characters it looks for. A test asserts that `a\b\..\c` is **allowed** and lands at `<root>/a/c`, which is what makes this a boundary check rather than a spelling check.
+
+  **The messages name what was refused and where the boundary is**, asserted by a test that reads the message rather than only catching the type, because a refusal nobody can act on sends the reader to the fixture source.
+- [x] Commit: `"workspace: disposable registry and filesystem fixtures"`
+
+<!-- claim: exists tests/fixtures/fixtures.h -->
+<!-- claim: exists tests/fixtures/suite_teardown.cpp -->
+<!-- claim: count "ResoluteTestFixtures" tests/fixtures/fixtures.h = 3 -->
+<!-- claim: count "Rizonesoft" tests/fixtures/fixtures.h = 1 -->
+
+**Test checkpoint:** The fixture suite runs green unelevated. A deliberately aborted run leaves `HKCU\Software\ResoluteTestFixtures` absent and the fixture tree removed, both asserted. A helper handed an out-of-root path fails by name. All three are quoted.
 
 ## 3. House-Style Capture Store
 
