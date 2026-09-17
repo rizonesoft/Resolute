@@ -20,6 +20,7 @@
       "probe": "bin/clang.exe",
       "versionArgs": ["--version"],
       "versionMatch": "clang version ([0-9.]+)",
+      "reportsOwnVersion": false,
       "note": "Self-contained UCRT-targeting archive. Carries its own headers and import libraries, so no Windows SDK is needed and no licence question arises. Targets the MinGW-w64 environment, not the MSVC ABI."
     },
     {
@@ -31,7 +32,8 @@
       "dir": "cmake",
       "probe": "bin/cmake.exe",
       "versionArgs": ["--version"],
-      "versionMatch": "cmake version ([0-9.]+)"
+      "versionMatch": "cmake version ([0-9.]+)",
+      "reportsOwnVersion": true
     },
     {
       "name": "ninja",
@@ -42,7 +44,8 @@
       "dir": "ninja",
       "probe": "ninja.exe",
       "versionArgs": ["--version"],
-      "versionMatch": "^([0-9.]+)"
+      "versionMatch": "^([0-9.]+)",
+      "reportsOwnVersion": true
     }
   ]
 }

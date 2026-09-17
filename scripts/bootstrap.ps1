@@ -91,13 +91,14 @@ function Test-PinnedVersion {
         install: the ONLY thing that can attest to which archive was unpacked. #>
     param($Component, [string]$Dir)
 
-    $stamp = Join-Path $Dir '.pinned-version'
-    if (Test-Path $stamp) {
-        return ((Get-Content $stamp -Raw).Trim() -eq $Component.version)
-    }
     $reported = Get-InstalledVersion -Component $Component -Dir $Dir
-    if ($null -eq $reported) { return $false }
-    return ($reported -eq $Component.version)
+    if ($null -eq $reported) { return $false }   # cannot probe: not the pin
+    if ($Component.reportsOwnVersion) {
+        # Its own answer is authoritative; a stamp cannot override it.
+        return ($reported -eq $Component.version)
+    }
+    $stamp = Join-Path $Dir '.pinned-version'
+    return (Test-Path $stamp) -and ((Get-Content $stamp -Raw).Trim() -eq $Component.version)
 }
 
 function Assert-InsideResKit {
@@ -164,8 +165,13 @@ foreach ($c in $Pins.components) {
             Write-Host "         being wrong is higher than one extra flag." -ForegroundColor DarkGray
             exit 1
         }
+        # NOT deleted here. The old install stays until a replacement has been
+        # downloaded, hash-verified and extracted, because a network failure or
+        # a hash mismatch between the delete and the install would destroy a
+        # working toolchain while the abort message claimed reskit/ was
+        # unchanged. That message was a lie for exactly this window. Found by
+        # the independent review of 6bb635e, which reproduced the loss.
         Write-Host "  [REPLACE] found $foundText, wanted $($c.version)" -ForegroundColor Yellow
-        Remove-Item $dir -Recurse -Force
     }
 
     Write-Host "  [DOWNLOAD] $($c.url.Split('/')[-1])" -ForegroundColor Yellow
@@ -200,6 +206,10 @@ foreach ($c in $Pins.components) {
         $tempExtract
     }
 
+    # Everything above succeeded, so the replacement exists and is verified.
+    # Only now does the old install go, and the window between the two is one
+    # rename rather than a download.
+    Assert-InsideResKit -Path $dir -Component $c.name
     if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
     Move-Item -Path $source -Destination $dir -Force
 

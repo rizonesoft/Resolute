@@ -96,13 +96,29 @@ foreach ($c in $Pins.components) {
         $reported = $null
     }
 
-    # llvm-mingw reports a clang version rather than its own release, so the
-    # pinned marker is the stamp bootstrap writes after a verified install.
-    $stamp = Join-Path $dir '.pinned-version'
-    $pinnedOk = if (Test-Path $stamp) {
-        ((Get-Content $stamp -Raw).Trim() -eq $c.version)
-    } else {
-        ($reported -eq $c.version)
+    # The probe must have answered. A component that cannot say what it is
+    # cannot be accepted as the pin, whatever a file next to it claims.
+    if ($null -eq $reported) {
+        $pinnedOk = $false
+    }
+    elseif ($c.reportsOwnVersion) {
+        # cmake and ninja report their real version, so that IS the answer.
+        # A stamp cannot rescue a binary that reports something else.
+        $pinnedOk = ($reported -eq $c.version)
+    }
+    elseif ($source -eq 'reskit') {
+        # llvm-mingw reports a clang version, never its own release, so the
+        # stamp bootstrap wrote after a verified install is the only attestation
+        # available. It is trusted ONLY for the repository copy: reading it for
+        # an executable that resolved from PATH let an unrelated binary pass on
+        # the strength of a stamp belonging to something else. Found by the
+        # independent review of 6bb635e, which reproduced it.
+        $stamp = Join-Path $dir '.pinned-version'
+        $pinnedOk = (Test-Path $stamp) -and ((Get-Content $stamp -Raw).Trim() -eq $c.version)
+    }
+    else {
+        # From PATH, with no way to identify the release. Not the pin.
+        $pinnedOk = $false
     }
 
     $shown = if ($reported) { $reported } else { 'unknown' }
