@@ -100,6 +100,27 @@ function Test-PinnedVersion {
     return ($reported -eq $Component.version)
 }
 
+function Assert-InsideResKit {
+    <#  Every Remove-Item in this script deletes a path built from a `dir` value
+        in toolchain.json. That file is tracked and trusted, but a destructive
+        operation driven by a config value with no bounds check is exactly what
+        AGENTS.md means by an unconfirmed destructive path: `"dir": "../.."`
+        would recursively delete the repository. Found by self-review of
+        D00 T01 §1. #>
+    param([string]$Path, [string]$Component)
+
+    $full = [System.IO.Path]::GetFullPath($Path)
+    $root = [System.IO.Path]::GetFullPath($ResKitRoot)
+    if (-not $full.StartsWith($root + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+        Write-Host "bootstrap: refusing to touch a path outside reskit/" -ForegroundColor Red
+        Write-Host "  component: $Component" -ForegroundColor DarkGray
+        Write-Host "  resolved : $full" -ForegroundColor DarkGray
+        Write-Host "  reskit   : $root" -ForegroundColor DarkGray
+        Write-Host "  Fix the 'dir' value in toolchain.json. Nothing was changed." -ForegroundColor DarkGray
+        exit 1
+    }
+}
+
 $installed = 0
 $skipped   = 0
 $i         = 0
@@ -107,6 +128,7 @@ $i         = 0
 foreach ($c in $Pins.components) {
     $i++
     $dir = Join-Path $ResKitRoot $c.dir
+    Assert-InsideResKit -Path $dir -Component $c.name
     Write-Host "[$i/$($Pins.components.Count)] $($c.name) $($c.version)" -ForegroundColor Cyan
 
     if ((Test-Path $dir) -and -not $Force) {
