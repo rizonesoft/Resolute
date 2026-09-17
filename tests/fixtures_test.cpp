@@ -167,6 +167,48 @@ TEST_CASE("File tree refuses paths outside its root", "[fixtures][files]") {
     CHECK(std::filesystem::exists(tree.Root() / L"a" / L"c"));
 }
 
+// D00 T02 §2's independent review found the constructor escaping the store.
+// On Windows a ROOT-RELATIVE name like `\escape` is not `is_absolute()`, and
+// `base / "\escape"` keeps the base's drive while DISCARDING its directories,
+// so the fixture landed outside the store and its destructor deleted it.
+TEST_CASE("File tree refuses a root-relative name for its own root",
+          "[fixtures][files]") {
+    // The name that escaped. It must be refused before anything is created.
+    CHECK_THROWS_AS(FileTreeFixture(L"\\escaped-root"), FixtureError);
+    CHECK_THROWS_AS(FileTreeFixture(L"/escaped-root"), FixtureError);
+    CHECK_THROWS_AS(FileTreeFixture(L"C:\\escaped-root"), FixtureError);
+    CHECK_THROWS_AS(FileTreeFixture(L"..\\escaped-root"), FixtureError);
+    CHECK_THROWS_AS(FileTreeFixture(L""), FixtureError);
+
+    // And nothing was created on the way out: the store root is still absent
+    // or, if another fixture is live, contains no such directory.
+    CHECK_FALSE(std::filesystem::exists(
+        FileTreeFixture::StoreRoot().root_path() / L"escaped-root"));
+}
+
+// The same hole, in the member path. Kept separate because the constructor and
+// the members used to have different checks, which is exactly how the
+// constructor's hole survived.
+TEST_CASE("File tree refuses a root-relative member path", "[fixtures][files]") {
+    FileTreeFixture tree(L"rootrel");
+    CHECK_THROWS_AS(tree.WriteFile(L"\\escaped.txt", "no"), FixtureError);
+    CHECK_THROWS_AS(tree.MakeDir(L"\\escaped"), FixtureError);
+}
+
+// A string longer than any fixed buffer must survive a round trip, or a seeded
+// state cannot be verified and the read-back rule is unenforceable.
+TEST_CASE("Registry fixture reads back a string of any length",
+          "[fixtures][registry]") {
+    RegistryFixture fixture(L"long-string");
+    const std::wstring long_value(4096, L'x');
+
+    fixture.SetString(L"Long", long_value);
+    const std::wstring read_back = fixture.GetString(L"Long");
+
+    CHECK(read_back.size() == long_value.size());
+    CHECK(read_back == long_value);
+}
+
 TEST_CASE("File tree refusal names the boundary", "[fixtures][files]") {
     FileTreeFixture tree(L"refusal-tree-message");
     try {

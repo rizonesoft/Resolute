@@ -236,6 +236,15 @@ This is the section that makes the destructive half of the suite testable. The A
   **The filesystem guard resolves before it judges**, using `weakly_canonical` and then comparing against the root component by component. A guard that pattern-matched on `..` would refuse `a\b\..\c`, which stays inside and is legitimate, and would miss anything that escapes without the characters it looks for. A test asserts that `a\b\..\c` is **allowed** and lands at `<root>/a/c`, which is what makes this a boundary check rather than a spelling check.
 
   **The messages name what was refused and where the boundary is**, asserted by a test that reads the message rather than only catching the type, because a refusal nobody can act on sends the reader to the fixture source.
+
+  > [!WARNING]
+  > **The guard was not applied to the one path that mattered most, and the independent review found it. P1, corrected 2026-09-17.**
+  >
+  > The **members** used the careful resolve-then-compare check. The **constructor**, which decides where the fixture's own root lives and whose destructor recursively deletes it, used a weaker hand-rolled check. That check tested `is_absolute()`, and on Windows a **root-relative** name like `\escape` is not absolute: `is_absolute()` wants a root name *and* a root directory. Worse, `base / "\escape"` keeps the base's drive and **discards its directories**, so the fixture landed at `R:\escape` and its destructor deleted it.
+  >
+  > So the section's central safety property held everywhere except the place where a mistake deletes a real directory. Two checks for one boundary is what let that happen, and there is now **one** function: the constructor and every member call the same `ResolveUnder`, which refuses absolute, drive-qualified and root-relative names, and refuses a path that resolves to the root itself. Five regression tests cover the exact names that escaped.
+  >
+  > **Two more, both the same shape as defects this file has found in its own tooling.** The startup sweep discarded its `error_code`, so a read-only leftover meant the sweep **reported success while leaving residue** and the next test ran against contaminated state. Both sweeps now check the status *and* verify the outcome, and fail the run naming the path. And `GetString` used a fixed 1,024-character buffer, so `SetString` accepted a valid string that `GetString` could not read back, which makes a seeded state unverifiable and quietly disables the one rule `tests/README.md` insists on. It now asks the registry for the size first, proven with a 4,096-character round trip.
 - [x] Commit: `"workspace: disposable registry and filesystem fixtures"`
 
 <!-- claim: exists tests/fixtures/fixtures.h -->

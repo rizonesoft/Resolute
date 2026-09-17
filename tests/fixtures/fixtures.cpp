@@ -130,14 +130,23 @@ void RegistryFixture::SetDword(const std::wstring& valueName, DWORD data) {
 }
 
 std::wstring RegistryFixture::GetString(const std::wstring& valueName) const {
-    wchar_t buffer[1024]{};
-    DWORD size = sizeof(buffer);
+    // Ask how big it is, then allocate. A fixed buffer meant SetString would
+    // accept a valid string that GetString could not read back, so a seeded
+    // state could not be verified: D00 T02 §2's review set 1,024 characters and
+    // got ERROR_MORE_DATA on the way out. A fixture that cannot read back what
+    // it wrote is useless for the one rule tests/README.md insists on.
+    const wchar_t* name = valueName.empty() ? nullptr : valueName.c_str();
+    DWORD size = 0;
     DWORD type = 0;
-    LSTATUS status = RegGetValueW(HKEY_CURRENT_USER, m_subPath.c_str(),
-                                  valueName.empty() ? nullptr : valueName.c_str(),
-                                  RRF_RT_REG_SZ, &type, buffer, &size);
+    LSTATUS status = RegGetValueW(HKEY_CURRENT_USER, m_subPath.c_str(), name,
+                                  RRF_RT_REG_SZ, &type, nullptr, &size);
+    if (status != ERROR_SUCCESS) Throw("fixture could not size a string", status);
+
+    std::vector<wchar_t> buffer(size / sizeof(wchar_t) + 1, L'\0');
+    status = RegGetValueW(HKEY_CURRENT_USER, m_subPath.c_str(), name,
+                          RRF_RT_REG_SZ, &type, buffer.data(), &size);
     if (status != ERROR_SUCCESS) Throw("fixture could not read a string", status);
-    return std::wstring(buffer);
+    return std::wstring(buffer.data());
 }
 
 DWORD RegistryFixture::GetDword(const std::wstring& valueName) const {
@@ -202,7 +211,16 @@ void RegistryFixture::RemoveRootIfEmpty() {
 void RegistryFixture::SweepRoot() {
     // The root is named for the test suite and can hold nothing else, which
     // is why this is safe to do unconditionally at run start.
-    DeleteKeyTree(kRegistryRoot);
+    //
+    // The status is CHECKED. A sweep that fails and returns quietly leaves the
+    // next test running against contaminated state while the suite still
+    // reports success, which is the defect this repository has now found five
+    // times in its own tooling. D00 T02 §2's review found it here.
+    LSTATUS status = DeleteKeyTree(kRegistryRoot);
+    if (status != ERROR_SUCCESS) {
+        Throw("fixture sweep could not remove HKCU\\Software\\ResoluteTestFixtures; "
+              "the next test would run against residue", status);
+    }
 }
 
 // ── FileTreeFixture ──────────────────────────────────────────
@@ -226,22 +244,40 @@ std::filesystem::path FileTreeFixture::StoreRoot() {
 // still be under it. This catches `..`, an absolute path, and a drive-qualified
 // path alike, because all three are visible after resolution and none is
 // reliably visible before it.
-std::filesystem::path FileTreeFixture::Resolve(const std::wstring& relative) const {
+// The boundary check, used for the fixture's own root and for every path
+// handed to a member. It must be ONE function.
+//
+// D00 T02 §2's review found the constructor using a weaker hand-rolled check
+// while the members used the careful one, and the hand-rolled check had the
+// hole: on Windows a ROOT-RELATIVE name like `\foo` is not `is_absolute()`,
+// because that wants a root name AND a root directory. Worse, `base / "\foo"`
+// keeps the base's drive and DISCARDS its directories, so the fixture landed
+// at `R:\foo` and its destructor recursively deleted it. The guard this
+// section exists to provide was not applied to the one path that matters most.
+static std::filesystem::path ResolveUnder(const std::filesystem::path& base,
+                                   const std::wstring& relative,
+                                   const std::string& what) {
     if (relative.empty()) {
-        throw FixtureError("fixture refused an empty path");
+        throw FixtureError("fixture refused an empty " + what);
     }
     std::filesystem::path candidate(relative);
-    if (candidate.is_absolute()) {
-        throw FixtureError("fixture refused an absolute path: '"
+    // Absolute, drive-qualified, AND root-relative are all refused. The last
+    // is the one that escaped.
+    if (candidate.is_absolute() || candidate.has_root_name()
+        || candidate.has_root_directory()) {
+        throw FixtureError("fixture refused a rooted " + what + ": '"
                            + Narrow(relative) + "'. Paths are relative to "
-                           + m_root.string());
+                           + base.string());
     }
-    std::filesystem::path combined = m_root / candidate;
-    // weakly_canonical resolves `..` without requiring the target to exist,
-    // which matters because most of these paths are about to be created.
-    std::filesystem::path resolved = std::filesystem::weakly_canonical(combined);
-    std::filesystem::path root = std::filesystem::weakly_canonical(m_root);
+    std::filesystem::path resolved =
+        std::filesystem::weakly_canonical(base / candidate);
+    std::filesystem::path root = std::filesystem::weakly_canonical(base);
 
+    // Strictly beneath: equal to the root is not inside it either.
+    if (resolved == root) {
+        throw FixtureError("fixture refused a " + what + " that names the root itself: '"
+                           + Narrow(relative) + "'");
+    }
     auto rootIt = root.begin();
     auto resIt = resolved.begin();
     for (; rootIt != root.end(); ++rootIt, ++resIt) {
@@ -255,12 +291,13 @@ std::filesystem::path FileTreeFixture::Resolve(const std::wstring& relative) con
     return resolved;
 }
 
+std::filesystem::path FileTreeFixture::Resolve(const std::wstring& relative) const {
+    return ResolveUnder(m_root, relative, "path");
+}
+
 FileTreeFixture::FileTreeFixture(const std::wstring& name) : m_name(name) {
-    if (name.empty() || name.find(L"..") != std::wstring::npos
-        || std::filesystem::path(name).is_absolute()) {
-        throw FixtureError("fixture refused the tree name '" + Narrow(name) + "'");
-    }
-    m_root = StoreRoot() / name;
+    // The SAME check the members use, applied to the fixture's own root.
+    m_root = ResolveUnder(StoreRoot(), name, "tree name");
     std::error_code ec;
     std::filesystem::create_directories(m_root, ec);
     if (ec) {
@@ -431,6 +468,17 @@ bool FileTreeFixture::StoreRootExists() {
 void FileTreeFixture::SweepStoreRoot() {
     std::error_code ec;
     std::filesystem::remove_all(StoreRoot(), ec);
+    if (ec) {
+        throw FixtureError("fixture sweep could not remove " + StoreRoot().string()
+                           + ": " + ec.message()
+                           + ". The next test would run against residue.");
+    }
+    // remove_all reports no error for some read-only content, so the outcome
+    // is verified rather than inferred from the status alone.
+    if (std::filesystem::exists(StoreRoot(), ec)) {
+        throw FixtureError("fixture sweep left " + StoreRoot().string()
+                           + " in place. The next test would run against residue.");
+    }
 }
 
 void FileTreeFixture::RemoveStoreRootIfEmpty() {
