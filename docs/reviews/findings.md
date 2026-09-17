@@ -4,15 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**25 findings across 8 sections.**
+**31 findings across 9 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `correctness` | 8 | the code does the wrong thing |
-| `record` | 7 | the plan or the evidence misdescribes what happened |
-| `consistency` | 6 | disagrees with the rest of the suite, its naming, or its layout |
+| `correctness` | 10 | the code does the wrong thing |
+| `record` | 8 | the plan or the evidence misdescribes what happened |
+| `consistency` | 7 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 2 | fails under hostile or unexpected input |
 | `performance` | 2 | correct, and too slow or too costly to be used |
 | `integration` | 1 | a consumer, caller, or downstream artifact no longer holds |
 | `reproducibility` | 1 | the same input does not produce the same output |
@@ -21,6 +22,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 
 | Section | # | Category | Disposition | Summary |
 | --- | --- | --- | --- | --- |
+| `D00 T01 §1` | F1 | `correctness` | fixed | the abort message was a lie for one window |
+| `D00 T01 §1` | F2 | `correctness` | fixed | a stale stamp let a foreign binary pass |
+| `D00 T01 §1` | F3 | `adversarial` | fixed | manifest-controlled recursive deletion was unbounded |
+| `D00 T01 §1` | F4 | `consistency` | fixed | a parser stack trace is not failing by name |
+| `D00 T01 §1` | F5 | `adversarial` | fixed | an optional field silently changed what was trusted |
+| `D00 T01 §1` | F6 | `record` | corrected | the self-contained claim is narrower than the section originally stated |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |

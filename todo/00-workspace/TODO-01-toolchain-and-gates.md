@@ -42,7 +42,7 @@ track: W1
 
 | Order | Section | Deliverable                                  | Depends On | Status |
 | :---: | :-----: | -------------------------------------------- | ---------- | :----: |
-|   1   |   §1    | Harden the toolchain bootstrap               | D00 T03 §3 |  [ ]   |
+|   1   |   §1    | Harden the toolchain bootstrap               | D00 T03 §3 |  [x]   |
 |   2   |   §2    | CMake structure and dependencies             | §1         |  [ ]   |
 |   3   |   §3    | Warnings as errors at one level              | §2         |  [ ]   |
 |   4   |   §4    | One command builds any tool                  | §2         |  [ ]   |
@@ -146,6 +146,13 @@ What it lacks is hash verification, detect-before-download, a locator that fails
 - [x] Commit: `"workspace: harden the repository-scoped toolchain bootstrap"` **Corrected 2026-09-17:** the message said `clang-cl`, which is the MSVC-ABI driver. This toolchain is llvm-mingw targeting MinGW-w64, a tradeoff another item in this section requires be recorded.
 
 **Test checkpoint:** `pwsh scripts/bootstrap.ps1` populates the toolchain directory from the pins and leaves `git status` clean. A second run downloads nothing and finishes in seconds, quoted. A non-pinned llvm-mingw release is reported rather than accepted, naming found and wanted, driven by planting a wrong version. A corrupted hash aborts with a named message and leaves `reskit/` unchanged, driven. `pwsh scripts/cpp-env.ps1` prints three resolved versions; deleting one component makes it exit 1 naming that component and the command that restores it, driven. A program calling `CreateFileW` and a Direct2D entry point compiles and links, and the compiler's dumped search paths contain no directory outside `reskit/`. `NTDDI_VERSION` names 1809 and the built `Resolute.exe` carries a manifest, read back from the binary. The bare-machine claim is **not** proven here and is `§7`'s: this machine has Visual Studio and the Windows Kits installed, checked directly.
+
+> **Verified:** 2026-09-17 | §1 | `toolchain.json` pins all three components with URLs and SHA-256 taken from real downloads and independently cross-checked against GitHub's own recorded digests, all three matching · second bootstrap run installs nothing in 0.7s and leaves `git status` clean · a corrupted hash aborts naming expected and actual **and the old install survives**, driven · a `dir` escaping `reskit/` is refused, driven · `cpp-env.ps1` proves four paths: all resolving, this machine's real ninja 1.13.2 on PATH rejected against the pin, not-found-anywhere, and a component missing a required field, each naming what it looked at and what fixes it · the self-contained probe calling `CreateFileW` and `D2D1CreateFactory` compiles, links and **runs**, with 3 include and 4 library paths all inside `reskit/` · the floor is genuinely 1809: `NTDDI_VERSION=0x0A000006` added where only a generic `0x0A00` existed, and `Resolute.exe` now carries a manifest, read back from the binary
+> **Review:** round 2, candidate `6bb635e` `87fbb48` `9874bf8` `8437dd5` plus the follow-up fix -- `adversarial` approve after fixes (4) · `consistency` approve · `integration` approve · `source-defect` approve · `design` not-applicable · `record` approve. Raw findings: docs/reviews/00-workspace/D00-T01-s1.md
+> **Independent:** `codex review --commit 6bb635e` (gpt-6-astra, high) returned **three P2 findings**; two new and both correct, the third already fixed in a commit it had not read. Its value was probe specificity: on the stale-stamp defect it constructed the case mine missed by one step, removing only the executable and leaving the attestation behind, which is the difference between testing that a check fires and testing what it trusts. Two earlier invocations against this commit produced no output within their window; a third succeeded, and a smaller commit reviewed in seconds, so the cause appears to be commit size.
+> **CRUD:** applicable | driven: `bootstrap.ps1` wrote `reskit/llvm-mingw` from a hash-verified download and its `.pinned-version` stamp was read back by `cpp-env.ps1`; the destructive path was exercised twice, once by hash mismatch and once by a traversal `dir`, and in both the existing install was still present afterwards
+> **Duration:** 335
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## 2. CMake Structure and Dependencies
 

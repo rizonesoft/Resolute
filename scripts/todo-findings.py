@@ -64,7 +64,15 @@ CATEGORIES = {
 }
 
 # A disposition is what was DONE about the finding, normalised to its first word.
-DISPOSITIONS = {"fixed", "filed", "refuted", "advisory", "routed", "cleared"}
+#
+# `corrected` added 2026-09-17 by decision, not by invention at the point of
+# writing, which is what D00 T04 §2 requires. It is genuinely distinct from the
+# others: a finding about the PLAN, corrected in the plan before any code was
+# written. `fixed` means code changed, `filed` means another section owns it,
+# `refuted` means the finding was wrong. Several sections have produced this
+# kind and had nowhere to put it.
+DISPOSITIONS = {"fixed", "filed", "refuted", "advisory", "routed", "cleared",
+                "corrected"}
 
 
 # `FILED to \`D07 T01 §2\`` -- the section a finding was handed to. D00 T04 §4

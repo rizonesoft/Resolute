@@ -61,6 +61,24 @@ if (-not $Pins.components) {
     exit 1
 }
 
+# Every component must declare the fields these scripts trust. An absent
+# `reportsOwnVersion` reads as $null, which is falsy, which silently routes a
+# component down the stamp-trust path: an optional field that changes what is
+# believed about a binary. Found by self-review of D00 T01 §1.
+$required = @('name','version','url','sha256','dir','probe','versionArgs','versionMatch','reportsOwnVersion')
+foreach ($c in $Pins.components) {
+    foreach ($f in $required) {
+        if ($null -eq $c.PSObject.Properties[$f]) {
+            Write-Host "bootstrap: toolchain.json component is missing a required field" -ForegroundColor Red
+            Write-Host "  component: $(if ($c.name) { $c.name } else { '<unnamed>' })" -ForegroundColor DarkGray
+            Write-Host "  missing  : $f" -ForegroundColor DarkGray
+            Write-Host "  Every field is required. An absent one would be read as a" -ForegroundColor DarkGray
+            Write-Host "  default, and these decide what is trusted about a binary." -ForegroundColor DarkGray
+            exit 1
+        }
+    }
+}
+
 Write-Host "ResKit Bootstrap" -ForegroundColor Cyan
 Write-Host "================" -ForegroundColor Cyan
 Write-Host "  pins dated $($Pins.pinned), $($Pins.components.Count) component(s)" -ForegroundColor DarkGray
