@@ -35,7 +35,24 @@ if (-not (Test-Path $Manifest)) {
     exit 1
 }
 
-$Pins = Get-Content $Manifest -Raw | ConvertFrom-Json
+try {
+    $Pins = Get-Content $Manifest -Raw | ConvertFrom-Json
+} catch {
+    # A parser stack trace names the parser, not the problem. This script
+    # promises to fail by name, and "toolchain.json is not valid JSON" is the
+    # name. Found by self-review of D00 T01 §1.
+    Write-Host "cpp-env: toolchain.json is not valid JSON" -ForegroundColor Red
+    Write-Host "  file  : $Manifest" -ForegroundColor DarkGray
+    Write-Host "  parser: $($_.Exception.Message)" -ForegroundColor DarkGray
+    Write-Host "  Nothing was read, so nothing was changed." -ForegroundColor DarkGray
+    exit 1
+}
+if (-not $Pins.components) {
+    Write-Host "cpp-env: toolchain.json has no 'components' array" -ForegroundColor Red
+    Write-Host "  file: $Manifest" -ForegroundColor DarkGray
+    Write-Host "  There is nothing pinned, so there is nothing to act on." -ForegroundColor DarkGray
+    exit 1
+}
 
 Write-Host "Resolute C++ environment" -ForegroundColor Cyan
 Write-Host "========================" -ForegroundColor Cyan
