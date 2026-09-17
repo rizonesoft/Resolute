@@ -10,7 +10,7 @@
 
 .EXAMPLE
     . .\reskit\Init-ResKit.ps1
-    reskit\Build-All.ps1
+    pwsh scripts\build.ps1 -All
 #>
 
 param(

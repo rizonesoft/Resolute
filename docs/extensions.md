@@ -104,7 +104,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release/Syst
 ### 4. Build and verify
 
 ```powershell
-pwsh reskit/Build-Resolute.ps1 -Release
+pwsh scripts/build.ps1 -All
 Get-ChildItem Bin/Release/System/*.exe
 ```
 

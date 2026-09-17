@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.25)
 project(RegStudio LANGUAGES CXX RC)
 
 # The suite's link policy. Included by path rather than inherited, because this
-# is a standalone project: reskit/Build-Extension.ps1 configures it with
-# `cmake ..` from this directory and never reads the root CMakeLists.txt.
+# is a standalone project: scripts/build.ps1 configures it directly in this
+# directory and never reads the root CMakeLists.txt.
 # Removing the flags from here on the assumption the root supplied them added
 # libc++.dll and libunwind.dll imports to the standalone build, caught by the
 # independent review of 6062ecb.
@@ -12,7 +12,11 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteWarnings.cmake")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+# CURRENT_SOURCE_DIR, not SOURCE_DIR. This extension is built two ways: as a
+# standalone project, where the two are the same, and potentially from the root,
+# where CMAKE_SOURCE_DIR is the repository root and this would write the
+# executable into the repository itself. D00 T01 §4.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 # Source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")

@@ -13,8 +13,8 @@
 # construction rather than of somebody remembering.
 #
 # Why a FILE rather than a macro at the root: an extension is a standalone
-# CMake project with its own `project()` call, and `reskit/Build-Extension.ps1`
-# configures it directly with `cmake ..`. The root is never read on that path.
+# CMake project with its own `project()` call, and `scripts/build.ps1`
+# configures it directly. The root is never read on that path.
 # `cmake/ResoluteLinkPolicy.cmake` carries the same reasoning and D00 T01 §2
 # learned it the expensive way.
 

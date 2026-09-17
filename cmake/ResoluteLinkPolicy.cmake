@@ -3,9 +3,9 @@
 #
 # Why this exists rather than `add_link_options` at the root: an extension is a
 # standalone CMake project with its own `project()` call, and
-# `reskit/Build-Extension.ps1` configures it directly with `cmake ..` from
-# inside its own directory. The root `CMakeLists.txt` is never read on that
-# path, so anything set only at the root does not reach it.
+# `scripts/build.ps1` configures it directly from inside its own directory.
+# The root `CMakeLists.txt` is never read on that path, so anything set only at
+# the root does not reach it.
 #
 # D00 T01 §2 learned this the expensive way. The flags were moved to the root
 # and deleted from `extensions/RegStudio`, on the reasoning that the root would

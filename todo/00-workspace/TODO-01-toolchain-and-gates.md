@@ -389,18 +389,95 @@ A warning level that varies per target is a warning level nobody trusts. A gate 
 
 ## 4. One Command Builds Any Tool
 
+> **Started:** 2026-09-17T07:58:18Z
+
 The AutoIt suite reached fourteen tools with no way to build them all, which is how thirteen `.sni` descriptors came to point at a directory that no longer exists. One command, exercised from the start, is what keeps that from happening again.
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] `scripts/build.ps1 <Tool>` builds one tool for both architectures. Done when: it builds the placeholder from §2 and exits non-zero with a named message for an unknown tool name.
-- [ ] `scripts/build.ps1 -All` builds every tool the project defines. Done when: it builds everything currently defined and its output names each target and its result.
-- [ ] Support a release configuration alongside debug. Done when: both configurations build and the script says which it produced.
-- [ ] Make the output location predictable and repository-relative. Done when: built executables land in one documented place under `build/` and no absolute path appears in any build file. Cheaper substitute: the absolute-path habit that broke every `.sni` in the AutoIt tree.
-- [ ] Prove a clean-checkout build. Done when: a fresh clone into a different directory builds without editing a single file, and this section records the directory it was proven in.
-- [ ] Commit: `"workspace: one command builds any tool or all of them"`
+> [!NOTE]
+> **The motivating claim was checked and holds, exactly as written.** All **13** `.sni` descriptors under `resolute_au3/SDK/Concrete/` carry paths rooted at `R:\Workspace\Resolute`, **91 occurrences** in total, and that directory does not exist: this repository is at `R:\conclave\projects\Resolute`. Every `ScriptPath`, `Icon`, `OutFilePath` and `DistributionPath` in the AutoIt build system points into nothing. This is the failure the section exists to prevent, and it is real rather than rhetorical.
 
-**Test checkpoint:** `pwsh scripts/build.ps1 -All` exits 0 and names every target built. A fresh clone into a different absolute path builds with no file edited, and that path is quoted. An unknown tool name exits non-zero with the named message.
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Six corrections, and two of them change what items have to do.**
+>
+> **"Both architectures" contradicts a decision `§1` already recorded.** `§1` settled it as a dated default: **x86-64 is the only architecture built**, ARM64 is out of scope until there is a machine to drive a test on, and `armv7` and `i686` are "noted and not wanted: 32-bit Windows is outside the 1809 floor's practical audience". The phrase is inherited from the AutoIt suite, where all 13 descriptors set `CompileBoth=Y` and shipped an `X64` binary beside a 32-bit one. That was true of AutoIt and is not true here. Corrected to the one architecture the suite builds.
+>
+> **`scripts/build.ps1` does not exist, and three build scripts already do.** `reskit/Build-Resolute.ps1` and `reskit/Build-Extension.ps1` both work and were driven in `§2`. `reskit/Build-All.ps1` **is broken**: it decides whether to build the launcher with `Test-Path shell/CMakeLists.txt`, and there is no `shell/` directory, so `$HasShell` is false and **it silently builds no launcher at all**. It also bypasses the presets, configuring with a raw `cmake .. -G Ninja` and repeating all four tool paths inline. This is the same failure `§1` and `§2` each found once: a script that reports success while doing nothing teaches the reader to ignore it.
+>
+> **The output location item names the wrong directory.** It asks that executables land "under `build/`". `build/` is where CMake's own trees live, one per preset; the **shipped** output is `Bin/<Config>/`, set at `CMakeLists.txt:40-41`, and it is what `§2`'s stamp recorded as "Bin/Release, launcher build: exactly one file". Moving the output to `build/` would contradict a stamped section and mix derived CMake state with shipped binaries. Corrected to `Bin/<Config>/`, which satisfies what the item actually requires: one documented, predictable, repository-relative place with no absolute path.
+>
+> **"The placeholder from §2" is stale**, the same phrase `§3` carried. `§2` proved the structure builds the real application; `Resolute`, `ResoluteUI_static` and `Lucide_static` are real targets.
+>
+> **Two genuine output defects were found while checking that item, and this section owns both.** `extensions/RegStudio/CMakeLists.txt:15` sets `CMAKE_RUNTIME_OUTPUT_DIRECTORY` to `${CMAKE_SOURCE_DIR}/bin`, which is the extension's own directory only while it is built standalone; built from the root it would write into the repository root. And `Build-Extension.ps1` deploys to `Bin\Release\System` unconditionally, so a **Debug** extension build lands in the **Release** tree.
+>
+> **No absolute path appears in any tracked build file today**, checked across every `CMakeLists.txt`, `CMakePresets.json`, `.cmake` and `.ps1` that `git ls-files` reports. The only match was `https://github.com/sammycage/lunasvg.git`, which is a URL. So that half of the item is already true and the work is keeping it true.
+
+- [x] `scripts/build.ps1 <Tool>` builds one tool. **Corrected 2026-09-17, twice.** It read "for both architectures", which contradicts `§1`'s dated default that x86-64 is the only architecture built and that `i686` is noted and not wanted; the phrase came from the AutoIt suite, where all 13 descriptors set `CompileBoth=Y`. And it read "builds the placeholder from `§2`", and there is no placeholder: `§2` proved the structure builds the real application. Done when: it builds `Resolute` and it builds `RegStudio`, and exits non-zero with a named message for an unknown tool name. **It must also replace the three build scripts already in `reskit/` rather than become a fourth**, because "one command" is the deliverable and four commands is the thing this section exists to prevent.
+
+  **Done 2026-09-17.** `scripts/build.ps1` builds either target and the three `reskit/Build-*.ps1` scripts are gone. Targets are **discovered**, not listed: any directory under `extensions/` with a `CMakeLists.txt` is a target, so a tool added later is built without this script being edited.
+
+  ```
+  pwsh scripts/build.ps1 NotATool
+    build: unknown tool 'NotATool'
+      known targets: Resolute, RegStudio
+      or build everything with: pwsh scripts/build.ps1 -All
+    exit 2
+  ```
+
+  **An extension is built standalone, with its own `project()` call and the root never read.** That is deliberate: `§2` shipped a defect that appears only on that path, and a build command that reached extensions through the root could not see that class of defect at all.
+- [x] `scripts/build.ps1 -All` builds every tool the project defines. Verified 2026-09-17, both configurations:
+
+  ```
+  building 2 target(s), Release, x86-64
+    Resolute         OK      Bin\Release\Resolute.exe
+    RegStudio        OK      Bin\Release\System\RegStudio.exe
+  build: 2 target(s) built, Release, output under Bin\Release  exit 0
+  ```
+
+  Each target is named with its result and the path it landed at, and a failure prints `FAILED` beside the target and exits non-zero with a count, so the report cannot say "done" while something did not build. That is the defect the script it replaces had.
+- [x] Support a release configuration alongside debug. Verified 2026-09-17: `-Config Debug` and `-Config Release` both build both targets, the configuration is named in the opening line, in every per-target line, and in the closing summary. Release defaults, because that is what ships.
+- [x] Make the output location predictable and repository-relative. **Corrected 2026-09-17:** this said "under `build/`". `build/` holds CMake's own trees, one per preset; the shipped output is `Bin/<Config>/`, set at `CMakeLists.txt:40-41` and recorded in `§2`'s stamp as "Bin/Release, launcher build: exactly one file". Moving it would contradict a stamped section and mix derived CMake state with shipped binaries. Done when: the launcher lands in `Bin/<Config>/` and every extension in `Bin/<Config>/System/`, for **both** configurations, documented in the script's own help, and no absolute path appears in any tracked build file. Cheaper substitute: the absolute-path habit that broke every `.sni` in the AutoIt tree.
+
+  **Two real defects found while checking this, both owned here.** `extensions/RegStudio/CMakeLists.txt:15` sets the output directory from `${CMAKE_SOURCE_DIR}`, which is the extension's own directory only while it is built standalone and becomes the repository root when it is built from the root. And `Build-Extension.ps1` deploys to `Bin\Release\System` unconditionally, so a Debug build of an extension lands in the Release tree, which is precisely an unpredictable output location.
+
+  **Both fixed, and the output proven for both configurations 2026-09-17:**
+
+  ```
+  2512384  Bin/Release/Resolute.exe
+   772096  Bin/Release/System/RegStudio.exe
+  8703488  Bin/Debug/Resolute.exe
+  1036288  Bin/Debug/System/RegStudio.exe
+  ```
+
+  A Debug extension now lands in the Debug tree. Under the script this replaces it would have landed in `Bin/Release/System/`, overwriting the Release binary with a Debug one carrying the same name, which is the kind of defect that is found by somebody shipping the wrong file.
+
+  **No absolute path appears in any tracked build file**, re-checked after the change across every `CMakeLists.txt`, `CMakePresets.json`, `.cmake` and `.ps1` that `git ls-files` reports. The one match is `https://github.com/sammycage/lunasvg.git`, a URL.
+- [x] Prove a clean-checkout build. Done when: a fresh clone into a different absolute path builds without editing a single file, and this section records the path it was proven in. **Stated plainly 2026-09-17:** a fresh clone has the scripts and no toolchain, because everything `scripts/bootstrap.ps1` downloads into `reskit/` is gitignored. So the proof is clone, supply the toolchain the way a new machine would, then build with nothing edited. What this actually tests is that no absolute path is baked into a build file, which is why the clone must be at a **different** path rather than a copy of this one.
+
+  **Proven 2026-09-17 at `R:
+esolute-cleancheck`**, a clean export of all **8,124** tracked files, given the toolchain the way a new machine would be, and then built with nothing edited:
+
+  ```
+  building at: R:
+esolute-cleancheck
+    Resolute         OK      Bin\Release\Resolute.exe
+    RegStudio        OK      Bin\Release\System\RegStudio.exe
+  exit 0
+  ```
+
+  The checkout started with no `Bin/` and no `build/`, the launcher it produced is 2,512,384 bytes, the same as this tree's, and it **runs**: window 'Resolute', responding. Tracked files changed by the build: **0**, measured by diffing the built tree against the index it was exported from, which is the check that makes "without editing a single file" falsifiable rather than assumed.
+
+  > [!WARNING]
+  > **The first attempt failed, and the reason is worth recording.** Exporting into the session scratchpad aborted with `Filename too long` on hundreds of files. The longest tracked path is **165 characters**, inside `resolute_au3/samples/`, and Windows' classic limit is 260, so the repository can only be checked out where the root path is under roughly 95 characters. At `R:\conclave\projects\Resolute` that leaves ample room and nothing is wrong today. It is recorded because "clone it anywhere and it builds" is not quite true, the failure is a checkout failure rather than a build failure, and the fix is `git config core.longpaths true` on the clone rather than anything in this repository.
+- [x] Commit: `"workspace: one command builds any tool or all of them"`
+
+<!-- claim: exists scripts/build.ps1 -->
+<!-- claim: absent reskit/Build-All.ps1 -->
+<!-- claim: absent reskit/Build-Resolute.ps1 -->
+<!-- claim: absent reskit/Build-Extension.ps1 -->
+
+**Test checkpoint:** `pwsh scripts/build.ps1 -All` exits 0 and names every target built, in both configurations. A fresh clone into a different absolute path builds with no file edited, and that path is quoted. An unknown tool name exits non-zero with the named message. The three superseded scripts in `reskit/` are gone, proven by search, so "one command" is true rather than aspirational.
 
 ## 5. One Command Runs Every Gate
 
@@ -490,7 +567,7 @@ A clean VM, a Windows Sandbox instance, or a second physical machine all serve. 
 
 - [ ] `pwsh scripts/bootstrap.ps1` populates the toolchain from the pins and leaves `git status` clean
 - [ ] `pwsh scripts/cpp-env.ps1` exits 0 and prints every resolved component version
-- [ ] `pwsh scripts/build.ps1 -All` builds every defined target for both architectures
+- [ ] `pwsh scripts/build.ps1 -All` builds every defined target. **Corrected 2026-09-17:** this read "for both architectures", which contradicts `§1`'s recorded default that x86-64 is the only architecture built
 - [ ] `pwsh scripts/check-all.ps1` exits 0 on a clean tree
 - [ ] A fresh clone into a different absolute path builds with no file edited
 - [ ] Bootstrap and build succeed on a machine with no Visual Studio and no Windows SDK installed
