@@ -2,7 +2,7 @@
 """Advisory feature ownership from TODO declarations and implementing bodies.
 
 This is a source matcher, not proof that a business feature works. Semantic
-warnings stay outside the structural validator's ratchet (D00 T03 section 19).
+warnings stay outside the structural validator's ratchet (D00 T04 §5).
 Only an explicit closeout/conformance request turns them into a refusal.
 """
 from __future__ import annotations
@@ -27,7 +27,7 @@ KEYWORDS = {
     "reporting": r"\b(?:reports?|reporting|dashboards?|variance|reconciliation|analytics|summary)\b",
     "notifications": r"\b(?:notifications?|notify|mail|email|whatsapp|alerts?|recipients?)\b",
     "permissions": r"\b(?:permissions?|403|forbidden|authori[sz]\w*|polic(?:y|ies)|guests?|roles?)\b",
-    "audit": r"\b(?:audit\w*|history|timeline|actor|per.run record|immutable log)\b",
+    "audit": r"\b(?:audit\w*|ledgers?|history|timeline|actor|per.run record|immutable log)\b",
     "exchange": r"\b(?:imports?|exports?|upload\w*|download\w*|ingest\w*|artifact delivery|file transfer)\b",
     "reverse": r"\b(?:cancel\w*|reopen\w*|void|delet\w*|prun\w*|undo|rollback|revo[ck]\w*|deactivat\w*|withdraw|restor\w*|retry|revers\w*)\b",
 }
@@ -204,6 +204,26 @@ def ref(todo, number):
     return f"D{todo.domain[:2]} T{todo.number} §{number}"
 
 
+def vocabulary(kind, limit=6):
+    """The words the matcher actually looks for, so a diagnostic can name them.
+
+    A check that reports a failure without saying what it tested teaches the
+    reader to ignore it, which is the failure D00 T01 §1, §2 and §4 each found
+    in a script that reported success while doing nothing.
+    """
+    # Suffix fragments of optional groups, such as the able/ing in
+    # print(?:able|ing)?. They are regex, not vocabulary, and printing them
+    # tells the reader nothing about what the check wanted.
+    fragments = {"able", "ing", "ies", "ers", "sz", "ck", "ed", "es"}
+    words = re.findall("[a-zA-Z]+", KEYWORDS.get(kind, ""))
+    cleaned = []
+    for word in words:
+        if len(word) > 2 and word not in fragments and word not in cleaned:
+            cleaned.append(word)
+    shown = cleaned[:limit]
+    return "/".join(shown) + ("/..." if len(cleaned) > limit else "")
+
+
 def owners(kind, todo, catalog, explicit=None):
     selected = [(todo, num) for num in catalog[todo.path]["bodies"]]
     if explicit:
@@ -302,8 +322,28 @@ def inspect(graph, todos=None, only=None):
             if status == "applicable":
                 counts[kind]["owned" if matches else "unowned"] += 1
                 if not matches:
-                    diagnostics.append({"file": todo.path, "line": line, "code": "unowned", "kind": kind,
-                                        "message": "applicable kind has no implementing owner" + (": " + reference if reference else "")})
+                    # Three different defects used to share one message, and the
+                    # message named none of them. D00 T04 §5 measured what that
+                    # costs: a groom pass read "has no implementing owner" as a
+                    # matcher bug and went looking in the matcher, when three of
+                    # the four cases it was chasing were wrong anchors in the
+                    # declaration. Say which one this is, and say what was
+                    # searched for, so the reader can tell them apart.
+                    if reference and target is None:
+                        code = "anchor-unresolved"
+                        message = ("anchor names no section that exists: " + reference +
+                                   " -- fix the reference in the Adjacency declaration")
+                    elif reference:
+                        code = "anchor-unmatched"
+                        message = ("anchored section does not read as '" + kind + "': " + reference +
+                                   " -- either it is the wrong anchor, or the section delivers " + kind +
+                                   " without using the words " + vocabulary(kind))
+                    else:
+                        code = "unowned"
+                        message = ("applicable kind has no implementing owner, and the declaration names no anchor"
+                                   " -- add '@ <ref>' naming the section that delivers it")
+                    diagnostics.append({"file": todo.path, "line": line, "code": code, "kind": kind,
+                                        "message": message})
             elif not matches:
                 state["inferred_candidate"] = "no positive owner found; applicability undeclared"
         steps = stated_steps(todo, catalog, todos)

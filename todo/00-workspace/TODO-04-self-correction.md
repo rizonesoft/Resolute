@@ -47,7 +47,7 @@ track: W1
 - What a section cost is recorded against what it was estimated, and the estimates improve.
 - The plan's sequencing answers to evidence rather than to the order things were written in.
 
-**Adjacency:** list=applicable @ D00 T04 §3; document=applicable @ D00 T04 §4; settings=not-applicable (this tooling owns no user-facing settings); reporting=applicable @ D00 T04 §3; notifications=not-applicable (a local check notifies nobody); permissions=not-applicable (no role model in repository tooling); audit=applicable @ D00 T04 §2; exchange=not-applicable (nothing is imported or exported); reverse=not-applicable (a check changes nothing that needs undoing)
+**Adjacency:** list=not-applicable (D00 T04 §5, 2026-09-17: this anchored on Section Calibration, whose table is already claimed by `reporting` below. One behaviour, one kind: repository tooling holds no records a user browses); document=not-applicable (D00 T04 §5, 2026-09-17: this anchored on Re-Sequencing on Evidence, which prints a critical chain to a terminal. Nothing here produces a document a user carries); settings=not-applicable (this tooling owns no user-facing settings); reporting=applicable @ D00 T04 §3; notifications=not-applicable (a local check notifies nobody); permissions=not-applicable (no role model in repository tooling); audit=applicable @ D00 T04 §2; exchange=not-applicable (nothing is imported or exported); reverse=not-applicable (a check changes nothing that needs undoing)
 
 **Adjacency rationale:** Audit anchors on §2 because the review ledger **is** the project's memory of its own defects, and a finding that is not recorded is a finding that recurs. List and reporting pair on §3 because calibration is only useful when somebody can see the pattern across many sections rather than one at a time.
 
@@ -258,35 +258,95 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 
 ## 5. Make the Adjacency Advisory Actionable
 
+> **Started:** 2026-09-17T09:03:25Z
+
 `scripts/todo-adjacency.py` emits **72** advisory diagnostics, every one of them the same message: `applicable kind has no implementing owner`. A signal that never clears is a signal nobody reads, and this file exists because the tree has to be able to tell the truth about itself.
 
 **Measured 2026-09-17 during a groom pass.** The mechanism is keyword matching. When an `**Adjacency:**` declaration carries an `@` reference, `owners()` narrows to that one section and tests its prose against a per-kind regex from `KEYWORDS`. The declaration is then reported unowned when the anchored section's **wording** misses the vocabulary, which is not the same question as whether the section delivers the capability.
 
-Of the six kind-anchors pointing at **shipped** sections, two are owned and four are not. In all four the capability is delivered and the words are absent:
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Three corrections, and the first one inverts this section's premise.**
+>
+> **The advisory is mostly right and the declarations are mostly wrong.** This section was filed assuming the matcher was at fault in all four shipped cases. Judging each against what the kind actually means, three of the four are **bad anchors**, not matcher misses:
+>
+> | anchor | kind | verdict |
+> | --- | --- | --- |
+> | `D00 T03 §4` | `document` | that section corrects **repository documentation**; the `document` kind is a user-carried artifact, a PDF or a print or an attachment. Wrong anchor. |
+> | `D00 T04 §4` | `document` | that section prints the critical chain. Not a document a user carries. Wrong anchor. |
+> | `D00 T04 §3` | `list` | that section renders the calibration table, and `reporting @ §3` is **already owned**. Duplicate anchor for the same behaviour. |
+> | `D00 T04 §2` | `audit` | a review-finding ledger genuinely **is** an audit record, and the prose never says "audit", "history" or "record". A real matcher miss. |
+>
+> So the compound `document` rule, which this section called "the sharpest case", is **doing its job**: it declined to classify repository documentation as a user-facing document, correctly.
+>
+> **And the declarations are file-level, which removes the constraint this section was built around.** They sit at `TODO-03:44` and `TODO-04:50`, above the Implementation Order and outside every section body. Correcting an anchor touches no stamped section, so "clear the four without editing a `[x]` section" is not the hard problem it was filed as.
+>
+> **The counts were wrong.** This said "of the six kind-anchors pointing at shipped sections, two are owned and four are not", which conflated distinct anchors with kind-anchors. Measured from `--json`: **120** anchored applicable kinds, 50 owned and **70 unowned**, across **78** distinct anchors of which **6** are shipped. Those 6 carry **7** kind-anchors, **3 owned and 4 unowned**. The 72 diagnostics are those 70 plus 2 `stated-step-unowned`.
+>
+> **The harm was overstated.** This said 72 advisories "train the reader to ignore the tree's own health signal". The tool's own docstring says these are advisory by design and stay outside the structural validator's ratchet, escalating only under `--require-owned` or `--require-conformance`, and `validate` reports them on their own line as `adjacency advisory` rather than among fatals and warnings. The defensible defect is narrower and sharper, and it survives: **the message says "applicable kind has no implementing owner" when what it measured is "the anchored section's prose does not match a keyword regex".** A diagnostic that misdescribes its own measurement is what sent this section looking for a matcher bug when three quarters of the evidence was pointing at the declarations.
+>
+> **A stale citation, found while reading the source.** `scripts/todo-adjacency.py:5` and `scripts/todo-validate.py:468` both cite "D00 T03 section 19" as the decision that keeps semantic warnings out of the ratchet. `TODO-03` has **4** sections and **no TODO in this tree has 15 or more**, so the citation resolves to nothing. It arrived with the tooling in `abc84fa` and does not appear in the archived AutoIt plan either.
 
-| anchor | kind | reality |
-| --- | --- | --- |
-| `D00 T04 §2` | `audit` | it **is** the review-finding ledger, and never writes "audit" or "history" |
-| `D00 T04 §3` | `list` | it renders the calibration table, and never writes "list" |
-| `D00 T04 §4` | `document` | one `documents` hit, short of the compound rule |
-| `D00 T03 §4` | `document` | six document-word hits, still short of the compound rule |
+**The wrong fix is available and tempting.** Rewording a shipped section so a matcher recognises it is gaming the check, and `AGENTS.md` forbids rewriting a stamped checklist. Any solution that requires editing a `[x]` section body is the wrong one, and after the correction above no solution needs to.
 
-**The compound rule is the sharpest case.** `document` requires a second match from `pdf|print|preview|signature|photo|attachment`, or `documents?` together with `render|download|upload|display|template|layout`. A section titled "Correct the Stale Documentation" that uses the word six times does not clear it.
+- [x] Establish what the advisory should mean before changing how it is computed. **It is a claim about the prose, and it should stay one.** The tool's own docstring already says it is "a source matcher, not proof that a business feature works", and that is the honest description of what a regex over a Markdown body can know. What was wrong was not the measurement but the reporting of it: a matcher that says "has no implementing owner" is asserting something it never tested. The answer is now written at the emission site in `scripts/todo-adjacency.py`, where the next person to change this code will read it before they change it.
+- [x] Separate "not owned" from "not recognised". **Three defects shared one message and the message named none of them.** They are now three codes:
 
-**This is the failure mode this repository keeps finding in its own tooling**, and it is on the other side of it for once. `D00 T01 §1` found a bootstrap that printed "reskit/ is unchanged" while deleting a toolchain, `§2` found a script warning "No .exe found" immediately after linking one, and `§4` found a build script that reported success while building no launcher. Each taught the reader to ignore output. Seventy-two unclearable advisories teach the same lesson about `validate`.
+  | code | means | what to do |
+  | --- | --- | --- |
+  | `anchor-unresolved` | the `@` reference names no section that exists | fix the reference |
+  | `anchor-unmatched` | the anchored section exists and its prose does not read as the kind | wrong anchor, or the section delivers it without the words |
+  | `unowned` | applicable, and the declaration names no anchor at all | add `@ <ref>` |
 
-**The fix belongs in the instrument, and the wrong fix is available and tempting.** Rewording a shipped section so a matcher recognises it is gaming the check, and `AGENTS.md` forbids rewriting a stamped checklist. Any solution that requires editing `[x]` sections is the wrong one.
+  Each message now also names **what was searched for**, which is the part that would have saved this section a wrong turn:
 
-- [ ] Establish what the advisory should mean before changing how it is computed. Done when: this section states whether an anchored kind is a claim about the section's **prose** or about its **delivered behaviour**, and the answer is written where the next reader of `todo-adjacency.py` will find it.
-- [ ] Separate "not owned" from "not recognised". Done when: a declaration whose anchor resolves to a section that exists reports differently from one whose anchor names nothing, because today they share a message and are different defects.
-- [ ] Make the four shipped cases above clear without touching a stamped section. Done when: all four report as owned, and `git diff` shows no change inside any `[x]` section's body. Cheaper substitute that fails the checkpoint: adding the missing words to those four sections, which makes the number go down and the check mean less.
-- [ ] Decide the compound `document` rule explicitly: keep it, loosen it, or drop the second clause. Done when: the decision is dated with its reason, and whichever way it goes, "Correct the Stale Documentation" is classified correctly.
-- [ ] Re-measure the advisory count and record it. Done when: the new total is in this section beside the 72, and any advisory that remains is one a reader can act on.
-- [ ] Prove the check can still fail. Done when: a declaration anchored at a section that genuinely does not implement its kind is still reported, with a fixture or a driven case, so the count did not fall by the check going blind.
-- [ ] Commit: `"todo: make the adjacency advisory actionable"`
+  ```
+  audit: anchored section does not read as 'audit': D00 T04 §1 -- either it is
+  the wrong anchor, or the section delivers audit without using the words
+  audit/ledgers/history/timeline/actor/per/...
+  ```
+- [x] Make the four shipped cases above clear without touching a stamped section. **Three were bad anchors and one was a real matcher miss**, which is the correction in the block above and the reason this was easier than filed:
+
+  - `D00 T03 §4` `document` and `D00 T04 §4` `document` are now `not-applicable`, each with its reason: one anchored on repository prose, the other on a critical chain printed to a terminal, and neither is an artifact a user carries.
+  - `D00 T04 §3` `list` is now `not-applicable`: its table is already claimed by `reporting @ §3`, so it was one behaviour declared twice.
+  - `D00 T04 §2` `audit` stays, and the **instrument** changed: `ledgers?` joined the `audit` vocabulary, because a ledger is an audit record. `ledger` appears 17 times in that section's body, so this recognises what was already written rather than requiring anything to be written.
+
+  All four shipped anchors now report as owned. **Proven rather than asserted:** every changed line in both files was checked against the line ranges of every `[x]` section, and the count inside a stamped body is **0**. Cheaper substitute that would have failed: adding the missing words to those four sections.
+- [x] Decide the compound `document` rule explicitly. **Kept, 2026-09-17, and the case this section filed against it is the case for keeping it.**
+
+  The rule requires a second match beyond the word "documents", from `pdf|print|preview|signature|photo|attachment` or from `render|download|upload|display|template|layout`. This section was filed calling that "the sharpest case", because a section titled "Correct the Stale Documentation" using the word six times did not clear it.
+
+  On inspection that is the rule working. `document` means an artifact a user carries away. Repository documentation is prose about the project, and if the bare word were enough, every TODO that mentions its own documentation would claim a user-facing document it does not have. **"Correct the Stale Documentation" is now classified correctly**, as `not-applicable`, by fixing the declaration rather than by loosening the rule.
+- [x] Re-measure the advisory count and record it.
+
+  | | before | after |
+  | --- | ---: | ---: |
+  | advisory diagnostics | 72 | **68** |
+  | anchored applicable kinds | 120 | 117 |
+  | of those, unowned | 70 | 66 |
+  | kind-anchors on shipped sections | 7 | 4 |
+  | of those, unowned | **4** | **0** |
+
+  **The headline number moved by four and that is the honest result.** Three anchors became `not-applicable` and one match was recognised, so 72 became 68. The number that mattered is the last row: every anchor pointing at a section that has actually shipped now resolves. The remaining 66 all point at **open** sections, which is the expected state for work not yet written, and each now names its anchor and the vocabulary it wanted, so it is a thing a reader can act on rather than a thing to scroll past.
+- [x] Prove the check can still fail. **Driven both ways, because a count that falls is exactly what a blinded check looks like.**
+
+  ```
+  probe A  audit=applicable @ D07 T01 §99   (no such section)
+           -> anchor names no section that exists: D07 T01 §99
+  probe B  audit=applicable @ D00 T04 §1    (real section, not an audit trail)
+           -> anchored section does not read as 'audit': D00 T04 §1
+           -> count 68 rises to 69
+  ```
+
+  Probe B is the one that matters: it re-points a **resolvable** anchor at a section that does not deliver the kind, and the count goes up. Both probes were reverted and the count returned to 68. `--require-owned` still exits 1 while diagnostics exist, so the opt-in escalation path is intact.
+- [x] Commit: `"todo: make the adjacency advisory actionable"`
 
 -> XREF: D00 T04 §2 -- the ledger whose `audit` anchor this section has to clear without editing it
 -> SOURCE: groom-2026-09-17-adjacency-unowned
+
+<!-- claim: absent scripts/check-all.ps1 -->
+<!-- claim: count "anchor-unresolved" scripts/todo-adjacency.py = 1 -->
+<!-- claim: count "anchor-unmatched" scripts/todo-adjacency.py = 1 -->
+<!-- claim: count "section 19" scripts/todo-adjacency.py = 0 -->
 
 **Test checkpoint:** `python scripts/todo-graph.py validate` reports an advisory count recorded in this section, down from 72, with every remaining advisory naming something a reader can act on. The four shipped anchors above report as owned and `git diff` shows no change inside any `[x]` section body. A deliberately wrong anchor is still reported, driven, so the fall in count is not the check going blind. `python scripts/todo-graph.py self-test` stays green.
 

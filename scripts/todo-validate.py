@@ -465,7 +465,7 @@ def validate(graph, _args) -> int:
         except Exception as error:
             flag("pending-control-contract", f"coming-soon inspection failed: {error}")
 
-    # D00 T03 section 19: semantic feature ownership needs human judgment.
+    # D00 T04 §5: semantic feature ownership needs human judgment.
     # It is advisory even with an empty/populated warning baseline. Existing
     # structural failures and ratcheted warning classes retain their decisions.
     advisory = []
