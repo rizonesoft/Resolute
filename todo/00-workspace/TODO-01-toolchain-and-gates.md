@@ -156,27 +156,86 @@ What it lacks is hash verification, detect-before-download, a locator that fails
 
 ## 2. CMake Structure and Dependencies
 
+> **Started:** 2026-09-17T06:16:45Z
+
 The intake brings a working CMake structure: C++23, presets driving Ninja, LTO on release, and full static linking. This section makes it the repository's structure rather than one application's, and settles how dependencies arrive now that there is no vcpkg and no wxWidgets.
+
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Five corrections, and one of them changes what the main item has to do.**
+>
+> **`samples/` has not been deleted.** An item below says "before the operator deleted `samples/`". All four checkouts are still on disk: `ExoSuite`, `RegStudio`, `SDImage`, `Undelete`, with `git ls-files samples` empty. What *is* true, and is the thing that matters, is that `build/release/CMakeCache.txt` contains **zero** references to `samples`.
+>
+> **The static-linking item is already satisfied, and not by what it names.** It asks for `-static -static-libgcc -static-libstdc++` "set once for every target". The root `CMakeLists.txt:46` sets only `add_link_options(-static)`; the other two appear solely inside `extensions/RegStudio`. And yet the objective holds: `llvm-objdump -p Bin/Release/Resolute.exe` lists **no compiler runtime DLL at all**, no `libgcc_s_seh-1`, no `libstdc++-6`, no `libwinpthread-1`. The `api-ms-win-crt-*` entries are the OS UCRT, not a compiler runtime. So the item's *goal* is met while its *prescription* is not, and the honest fix is to make the flags match what already works rather than to add flags that change nothing.
+>
+> **The executable already imports neither shipped DLL.** `Resolute.exe` names neither `ResoluteUI.dll` nor `Lucide.dll` in its import table, which confirms `ResoluteUI_static` is linked and leaves exactly one thing standing between this and a single file: the runtime `LoadLibraryW` in the icon loader. That is the section's real work, and everything else here is already true or nearly so.
+>
+> **Two paths are stale from `§3`'s rename.** The `Test checkpoint` still cites `shared/exo-ui/src/icons.cpp:15`, and an item still names `System/ExoUI.dll`. Both moved to `resolute-ui` and `ResoluteUI.dll`.
+>
+> **The sizes moved again, by 3,584 bytes.** `§1` added an application manifest. `Resolute.exe` is **1,384,960** bytes against the 1,381,376 recorded here, and the shipped set is **4,079,106** against 4,074,176.
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] Make the presets resolve their compiler and generator from the bootstrapped toolchain rather than from `PATH`. Done when: configuring with a different `clang` earlier on `PATH` still selects the bootstrapped one, proven by the configure output.
-- [ ] **Cut the build's dependency on the gitignored `samples/` tree.** Filed 2026-09-17 by the review of `D00 T03 §1`. `build/release/CMakeCache.txt` resolved `CMAKE_CXX_COMPILER`, `CMAKE_MAKE_PROGRAM`, and `CMAKE_COMMAND` into `samples/ExoSuite/exokit/`, while the merged tree's own `exokit/` held only scripts. `D00 T03 §1` states the local checkouts are working copies that may stay on disk, and that is false while the compiler is resolved through one of them: deleting `samples/` breaks the build. Done when: a configure from a tree with `samples/` absent succeeds, proven by moving it aside and configuring, and no cache path in `build/` contains the string `samples`. **Half proven 2026-09-17 before the operator deleted `samples/`:** the directory was renamed aside, `build/release` deleted, and a clean configure and 52/52 build ran with it absent. What that does **not** prove, and what this item still owes, is preference: the toolchain was found because `Init-ExoKit.ps1` puts it on `PATH` first, not because a preset pins it, so a stray `clang` earlier on `PATH` could still win. Cheaper substitute that fails the checkpoint: deleting `build/` and reconfiguring on a machine where `samples/` still exists, which proves nothing because the bootstrap would find it again.
-- [ ] Generate no Visual Studio solution and commit none. Done when: the repository contains no `.sln` or `.vcxproj`, and the presets drive VS, VS Code, and a bare terminal identically.
-- [ ] Settle how dependencies arrive. **Corrected 2026-09-17 after independent review:** the tree does **not** have none. `shared/lucide/CMakeLists.txt:9` fetches `sammycage/lunasvg` v3.5.0 through `FetchContent` at configure time and links it into Lucide, so a fresh configure reaches GitHub. Retiring the `libvterm` submodule removed the `--recursive` requirement, not the dependency. Done when: the decision is dated, covers **lunasvg and Catch2** as the third-party code, states whether lunasvg is pinned by tag or by hash, and gives the rule for adding a dependency later. Cheaper substitute: adding a package manager for two dependencies.
+- [x] Make the presets resolve their compiler and generator from the bootstrapped toolchain rather than from `PATH`. **The defect was exactly as described:** both presets carried `"CMAKE_C_COMPILER": "clang"`, a bare name, so whatever `PATH` offered first won. All four tool paths are now pinned to `${sourceDir}/reskit`, including `CMAKE_RC_COMPILER` and `CMAKE_MAKE_PROGRAM`, which were not mentioned and were resolving the same way.
+
+  **Driven proof.** A decoy `clang.cmd`, `clang++.cmd` and `ninja.cmd` were placed first on `PATH`, verified to be what `Get-Command` resolved, and the configure still selected:
+
+  ```
+  CMAKE_CXX_COMPILER:STRING=R:/.../Resolute/reskit/llvm-mingw/bin/clang++.exe
+  CMAKE_MAKE_PROGRAM:UNINITIALIZED=R:/.../Resolute/reskit/ninja/ninja.exe
+  ```
+
+  **What this does not pin, stated plainly:** `cmake` itself. The presets govern what CMake *uses*; CMake has to be found before it can read them. `reskit/Init-ResKit.ps1` or an explicit path is still required, and `scripts/cpp-env.ps1` is what reports whether the right one is there.
+- [x] **Cut the build's dependency on the gitignored `samples/` tree.** **Closed 2026-09-17 by the preset pinning above**, which is the preference half this item still owed: the toolchain is now selected because the presets name it, proven against a decoy first on `PATH`, not because something put it there first. Filed 2026-09-17 by the review of `D00 T03 §1`. `build/release/CMakeCache.txt` resolved `CMAKE_CXX_COMPILER`, `CMAKE_MAKE_PROGRAM`, and `CMAKE_COMMAND` into `samples/ExoSuite/exokit/`, while the merged tree's own `exokit/` held only scripts. `D00 T03 §1` states the local checkouts are working copies that may stay on disk, and that is false while the compiler is resolved through one of them: deleting `samples/` breaks the build. Done when: a configure from a tree with `samples/` absent succeeds, proven by moving it aside and configuring, and no cache path in `build/` contains the string `samples`. **Half proven 2026-09-17. Corrected: `samples/` has not been deleted**, all four checkouts are still on disk and `git ls-files samples` is empty, so the tree is unchanged from when this was written. What was proven: the directory was renamed aside, `build/release` deleted, and a clean configure and 52/52 build ran with it absent. What that does **not** prove, and what this item still owes, is preference: the toolchain was found because `Init-ExoKit.ps1` puts it on `PATH` first, not because a preset pins it, so a stray `clang` earlier on `PATH` could still win. Cheaper substitute that fails the checkpoint: deleting `build/` and reconfiguring on a machine where `samples/` still exists, which proves nothing because the bootstrap would find it again.
+- [x] Generate no Visual Studio solution and commit none. Verified 2026-09-17: `git ls-files` matching `.sln` or `.vcxproj` returns nothing, and the generator is Ninja in both presets, so VS, VS Code and a bare terminal all drive the same configure.
+- [x] Settle how dependencies arrive. **Corrected 2026-09-17 after independent review:** the tree does **not** have none. `shared/lucide/CMakeLists.txt:9` fetches `sammycage/lunasvg` v3.5.0 through `FetchContent` at configure time and links it into Lucide, so a fresh configure reaches GitHub. Retiring the `libvterm` submodule removed the `--recursive` requirement, not the dependency. Done when: the decision is dated, covers **lunasvg and Catch2** as the third-party code, states whether lunasvg is pinned by tag or by hash, and gives the rule for adding a dependency later. Cheaper substitute: adding a package manager for two dependencies.
+
+  **Decided 2026-09-17. `FetchContent`, pinned by commit, and no package manager.**
+
+  lunasvg was pinned by the **tag** `v3.5.0`, and it is now pinned by the commit that tag resolved to, `83c58df8103dc7dca423dfd824992af94d49bed6`. A tag is a movable reference: it can be repointed at different code while the version string stays the same, and a `FetchContent` build follows it without anything appearing to change. `GIT_SHALLOW` had to go with it, because a shallow clone fetches only a branch tip and an arbitrary commit need not be reachable from one. Verified by a full clean rebuild: the fetched source is at that commit.
+
+  Catch2 arrives the same way when `D00 T02 §1` lands, pinned by commit for the same reason.
+
+  **The rule for adding a dependency later:** it arrives through `FetchContent` pinned by commit, it is recorded here with what it is for, and the decision names what the suite would do without it. Two dependencies do not justify a package manager, and a package manager is itself a dependency with its own bootstrap, its own pinning story and its own failure modes. That trade changes if the count grows past a handful, and this line is where to revisit it.
 <!-- claim: count "lunasvg" shared/lucide/CMakeLists.txt = 6 -->
 <!-- claim: absent .gitmodules -->
-- [ ] Keep static linking explicit and enforced. Done when: `-static -static-libgcc -static-libstdc++` is set once for every target, and a build producing a runtime DLL dependency fails, proven by checking the built executable's imports.
-- [ ] **Replace the runtime icon loader, which is what actually breaks standalone.** Corrected 2026-09-17 after independent review: an earlier draft of this item blamed the `SHARED` library targets, which was wrong. `src/CMakeLists.txt` links `ResoluteUI_static`, so the UI library is already static. The real dependency is explicit: `LucideIcons::Load()` at `shared/resolute-ui/src/icons.cpp:15` calls `LoadLibraryW(L"System\Lucide.dll")` and resolves entry points with `GetProcAddress`. Done when: icons render with **no DLL present beside the executable**, proven by deleting `System/` and running. Cheaper substitute that fails the checkpoint: checking the executable's import table, which cannot see a runtime `LoadLibrary` and would pass a tool that still needs a DLL.
-<!-- claim: count "LoadLibraryW" shared/resolute-ui/src/icons.cpp = 2 -->
-<!-- claim: count "ResoluteUI_static" src/CMakeLists.txt = 1 -->
-- [ ] Record what the release preset ships today, so the change has a before. Measured 2026-09-17: `Bin/Release/Resolute.exe` at **1,381,376** bytes plus `System/ExoUI.dll` and `System/Lucide.dll`, 4,074,176 bytes in total. **Corrected 2026-09-17 by `D00 T03 §2`:** this read `ExoSuite.exe` at 1,380,352 bytes. The rename added 1,024 bytes, which is the version-resource block that executable had never carried. `shared/resolute-ui/CMakeLists.txt:33` and `shared/lucide/CMakeLists.txt:58` still build `SHARED` targets even though the application does not link ExoUI's. Done when: the unused shared target is either removed or its purpose recorded.
-- [ ] Put all build output under `build/`, which is already gitignored, with nothing written inside `src/`. Done when: a full configure and build leaves `git status` clean.
-- [ ] Prove the structure builds the real application, not a placeholder. Done when: `Resolute.exe` builds from a clean checkout after bootstrap, cloned **without** `--recursive`.
-- [ ] Record the binary size as the baseline the per-tool size budget is measured against. Done when: the size is in this section, dated, against the 1.39 MB the pre-intake build produced.
-- [ ] Commit: `"workspace: repository cmake structure and dependency policy"`
+- [x] Keep static linking explicit and enforced. **Corrected 2026-09-17:** the goal is already met and the prescription is not. The root sets only `add_link_options(-static)`; `-static-libgcc` and `-static-libstdc++` appear nowhere outside `extensions/RegStudio`. `llvm-objdump -p` on the built executable nonetheless lists no compiler runtime DLL. Done when: all three flags are set **once at the root** so every target inherits them and no per-tool `CMakeLists.txt` has to remember, `extensions/RegStudio` stops setting its own copy, and the import table is re-checked after the change and still names no compiler runtime. Cheaper substitute that fails the checkpoint: leaving the flags per-target, which is the fourteen-copies failure `AGENTS.md` exists to prevent, arriving one tool at a time.
 
-**Test checkpoint:** `cmake --preset release && cmake --build --preset release` succeeds on a clean checkout after bootstrap and produces `Resolute.exe`. The executable's imports are listed and carry no compiler runtime DLL. **Separately, the executable is run with `System/` deleted and its icons still render**, because the import table cannot see the `LoadLibraryW` in `shared/exo-ui/src/icons.cpp:15` and an import-only check would pass a tool that still needs a DLL. No path in `build/` names `samples`, and a configure succeeds with `samples/` moved aside. `git status` is clean afterwards. The binary size is quoted against the 1.39 MB baseline.
+  **Done 2026-09-17.** All three flags are set once at `CMakeLists.txt:46` and `extensions/RegStudio` no longer repeats them. Re-checked after the change: `llvm-objdump -p Bin/Release/Resolute.exe` lists **23 imports, none of them a compiler runtime**, no `libgcc_s_seh-1`, no `libstdc++-6`, no `libwinpthread-1`, and neither shipped DLL.
+- [x] **Replace the runtime icon loader, which is what actually breaks standalone.** Corrected 2026-09-17 after independent review: an earlier draft of this item blamed the `SHARED` library targets, which was wrong. `src/CMakeLists.txt` links `ResoluteUI_static`, so the UI library is already static. The real dependency is explicit: `LucideIcons::Load()` at `shared/resolute-ui/src/icons.cpp:15` calls `LoadLibraryW(L"System\Lucide.dll")` and resolves entry points with `GetProcAddress`. Done when: icons render with **no DLL present beside the executable**, proven by deleting `System/` and running. Cheaper substitute that fails the checkpoint: checking the executable's import table, which cannot see a runtime `LoadLibrary` and would pass a tool that still needs a DLL.
+
+  **Done 2026-09-17.** `Lucide_static` was added beside the DLL target, `lucide.h` gained a `LUCIDE_STATIC` branch so the API carries no import or export decoration when linked in, and `LucideIcons::Load()` binds the six entry points **directly** under that definition. Every call site is unchanged: the function pointers are still what callers use, only their source differs.
+
+  Then both SHARED targets were removed, because nothing linked them and nothing could: `AGENTS.md` states a tool may never depend at runtime on another tool, on the launcher, or on a suite-wide file, which is exactly what a shared `ResoluteUI.dll` would be. Checked by search before removing: the launcher links the static variant and `extensions/RegStudio` links only Win32 libraries.
+
+  **Proven three ways, because the import table cannot see this defect:**
+
+  ```
+  Bin/Release contains exactly one file        Resolute.exe
+  launched with no DLL anywhere                window 'Resolute', four control classes live
+  loaded Lucide/ResoluteUI modules             NONE
+  icon count read from a linked binary         icons=29  first=badge-info
+  ```
+
+  The last line is the one the checkpoint insists on: a launcher with no icons still draws a window, so counting them is the only thing that distinguishes a working icon set from a missing one.
+<!-- claim: count "LoadLibraryW" shared/resolute-ui/src/icons.cpp = 3 -->
+<!-- claim: count "LUCIDE_STATIC" shared/resolute-ui/src/icons.cpp = 2 -->
+<!-- claim: count "Lucide_static" src/CMakeLists.txt = 1 -->
+<!-- claim: count "ResoluteUI_static" src/CMakeLists.txt = 1 -->
+- [x] Record what the release preset ships today, so the change has a before. **Re-measured 2026-09-17 after `§1` added the application manifest:** `Bin/Release/Resolute.exe` at **1,384,960** bytes plus `System/ResoluteUI.dll` at 898,048 and `System/Lucide.dll` at 1,717,760, **4,079,106** bytes in total. This read 1,381,376 and `ExoUI.dll` before; the manifest added 3,584 bytes and `§3` renamed the library. **Corrected 2026-09-17 by `D00 T03 §2`:** this read `ExoSuite.exe` at 1,380,352 bytes. The rename added 1,024 bytes, which is the version-resource block that executable had never carried. `shared/resolute-ui/CMakeLists.txt:33` and `shared/lucide/CMakeLists.txt:58` still build `SHARED` targets even though the application does not link ExoUI's. Done when: the unused shared target is either removed or its purpose recorded.
+- [x] Put all build output under `build/`, which is already gitignored, with nothing written inside `src/`. Verified 2026-09-17 after a full clean configure and build from a deleted `build/` and `Bin/`: `git status --porcelain build/ Bin/` is empty, and `src/` shows only the intended source edits. The generated `Resolute.rc` lands in `build/`, not beside its `.rc.in`.
+- [x] Prove the structure builds the real application, not a placeholder. Verified 2026-09-17: `build/` and `Bin/` deleted, configure and build from scratch produce `Bin/Release/Resolute.exe`, which **runs** and creates its window with all four control classes live. There are no submodules, so `--recursive` is moot; `.gitmodules` is absent and claimed as such.
+- [x] Record the binary size as the baseline the per-tool size budget is measured against. **Measured 2026-09-17, and the number moved for a reason worth recording:**
+
+  | Stage | Shipped set | Bytes |
+  | --- | --- | ---: |
+  | pre-intake | `ExoSuite.exe` alone | 1,423,872 |
+  | before this section | `Resolute.exe` + 2 DLLs | 4,079,106 |
+  | **after this section** | **`Resolute.exe` alone** | **2,512,384** |
+
+  The executable grew because Lucide and lunasvg are now inside it; the **shipped set** fell by 1,566,722 bytes, 38 percent, because two DLLs stopped shipping. The per-tool budget is measured against the shipped set, not the executable, so **2,512,384 bytes is the baseline** and the launcher is the fattest thing the suite will ship: it carries the icon set every tool draws from.
+- [x] Commit: `"workspace: repository cmake structure and dependency policy"`
+
+**Test checkpoint:** `cmake --preset release && cmake --build --preset release` succeeds on a clean checkout after bootstrap and produces `Resolute.exe`. The executable's imports are listed and carry no compiler runtime DLL. **Separately, the executable is run with `System/` deleted and its icons still render**, because the import table cannot see the `LoadLibraryW` in `shared/resolute-ui/src/icons.cpp` and an import-only check would pass a tool that still needs a DLL. The icon count is read back from the running process, not inferred from the window appearing: a launcher with no icons still draws a window. No path in `build/` names `samples`, and a configure succeeds with `samples/` moved aside. `git status` is clean afterwards. The binary size is quoted against the 1.39 MB baseline.
 
 ## 3. Warnings as Errors at One Level
 

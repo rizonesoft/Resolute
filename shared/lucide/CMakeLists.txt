@@ -11,8 +11,15 @@ include(FetchContent)
 FetchContent_Declare(
     lunasvg
     GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
-    GIT_TAG        v3.5.0
-    GIT_SHALLOW    TRUE
+    # Pinned by COMMIT, not by tag. D00 T01 §2, 2026-09-17: a tag is a movable
+    # reference, so `v3.5.0` can be repointed at different code without the
+    # version appearing to change, and a FetchContent build would silently
+    # follow it. This is the commit v3.5.0 resolved to when it was pinned.
+    GIT_TAG        83c58df8103dc7dca423dfd824992af94d49bed6   # v3.5.0
+    # GIT_SHALLOW cannot be used with a commit hash: a shallow clone fetches
+    # only the tip of a branch, and an arbitrary commit may not be reachable
+    # from it.
+    GIT_SHALLOW    FALSE
 )
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(LUNASVG_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -54,28 +61,33 @@ file(WRITE "${GENERATED_DIR}/icons_data.h"
 "};\n"
 )
 
-# ── Build DLL ────────────────────────────────────────────────
-add_library(Lucide SHARED
+# ── Static library ───────────────────────────────────────────
+# The launcher links this, so the icons are inside the executable and there is
+# no DLL to find at runtime. D00 T01 §2: the LoadLibraryW in the icon loader was
+# the last thing standing between this build and a single shipped file.
+add_library(Lucide_static STATIC
     src/lucide.cpp
 )
 
-target_include_directories(Lucide
+target_include_directories(Lucide_static
     PUBLIC  include
     PRIVATE ${GENERATED_DIR}
             ${lunasvg_SOURCE_DIR}/include
 )
 
-target_link_libraries(Lucide PRIVATE lunasvg)
+target_link_libraries(Lucide_static PUBLIC lunasvg)
 
-target_compile_definitions(Lucide PRIVATE LUCIDE_BUILD)
+# PUBLIC so every consumer sees the undecorated declarations. PRIVATE here would
+# let the library build with no decoration while its callers still saw
+# dllimport, which links against an import stub that does not exist.
+target_compile_definitions(Lucide_static PUBLIC LUCIDE_STATIC)
 
-# Output to Bin/Release/System/ or Bin/Debug/System/
-set_target_properties(Lucide PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release/System"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/Bin/Debug/System"
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release/System"
-    LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/Bin/Debug/System"
-    ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release/System"
-    ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/Bin/Debug/System"
-    PREFIX ""
-)
+# The SHARED Lucide target was removed 2026-09-17 by D00 T01 §2.
+#
+# Nothing linked it and nothing loaded it once the launcher bound
+# Lucide_static directly. It was 1,717,760 bytes of the release set, and the
+# LoadLibraryW that reached for it was the single thing keeping this build
+# from shipping as one file.
+#
+# lucide.h keeps its dllexport/dllimport branches, so restoring a DLL build
+# is a CMake change with no source change.

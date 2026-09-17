@@ -28,6 +28,7 @@ target_link_options(Resolute PRIVATE -municode -mwindows)
 
 target_link_libraries(Resolute PRIVATE
     ResoluteUI_static
+    Lucide_static
     comctl32
     dwmapi
     uxtheme

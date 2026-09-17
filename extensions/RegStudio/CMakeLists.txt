@@ -15,11 +15,12 @@ add_executable(RegStudio WIN32 ${SOURCES} ${RESOURCES})
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # MinGW GCC
     target_compile_options(RegStudio PRIVATE -municode -O3 -Wall)
-    target_link_options(RegStudio PRIVATE -municode -static -static-libgcc -static-libstdc++)
+    # Static flags come from the root CMakeLists.txt, set once for every target.
+    target_link_options(RegStudio PRIVATE -municode)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # Clang/LLVM-MinGW
     target_compile_options(RegStudio PRIVATE -O3 -Wall)
-    target_link_options(RegStudio PRIVATE -static -municode)
+    target_link_options(RegStudio PRIVATE -municode)
     # Define UNICODE for wWinMain entry point
     target_compile_definitions(RegStudio PRIVATE UNICODE _UNICODE)
 elseif(MSVC)

@@ -104,7 +104,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §3` | Section Calibration                            |   6   |
 | [x] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   7   |
 | [x] | `D00 T01 §1` | Portable toolchain bootstrap                   |  14   |
-| [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest              |  11   |
+| [ ] | `D00 T01 §2` | CMake structure and dependencies               |  11   |
 | [ ] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
 | [ ] | `D00 T01 §4` | One command builds any tool                    |   6   |
 | [ ] | `D00 T01 §5` | One command runs every gate                    |   6   |

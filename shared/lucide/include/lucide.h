@@ -6,7 +6,11 @@
 extern "C" {
 #endif
 
-#ifdef LUCIDE_BUILD
+#if defined(LUCIDE_STATIC)
+    // Linked into the caller. No import or export decoration: the symbols are
+    // ordinary ones, which is what lets the launcher ship as a single file.
+    #define LUCIDE_API
+#elif defined(LUCIDE_BUILD)
     #define LUCIDE_API __declspec(dllexport)
 #else
     #define LUCIDE_API __declspec(dllimport)

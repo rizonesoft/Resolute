@@ -13,9 +13,11 @@
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+                "CMAKE_C_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang.exe",
+                "CMAKE_CXX_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang++.exe",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_RC_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/llvm-windres.exe",
+                "CMAKE_MAKE_PROGRAM": "${sourceDir}/reskit/ninja/ninja.exe"
             }
         },
         {
@@ -25,9 +27,11 @@
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON"
+                "CMAKE_C_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang.exe",
+                "CMAKE_CXX_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang++.exe",
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON",
+                "CMAKE_RC_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/llvm-windres.exe",
+                "CMAKE_MAKE_PROGRAM": "${sourceDir}/reskit/ninja/ninja.exe"
             }
         }
     ],

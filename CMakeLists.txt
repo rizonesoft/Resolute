@@ -41,9 +41,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Bin/Debug")
 
 # ── Static C++ Runtime ───────────────────────────────────────
-# Bake libc++, libunwind, pthreads into every binary so no
-# LLVM-MinGW runtime DLLs need to ship alongside the app.
-add_link_options(-static)
+# Bake libc++, libunwind, pthreads into every binary so no LLVM-MinGW runtime
+# DLLs need to ship alongside the app. Set ONCE here and inherited by every
+# target, so no per-tool CMakeLists.txt has to remember: a flag repeated per
+# tool is the fourteen-copies failure arriving one tool at a time.
+#
+# D00 T01 §2, 2026-09-17: only -static was set, and the other two appeared
+# solely inside extensions/RegStudio. The import table was already clean, so
+# this makes the prescription match what was already true rather than changing
+# the output.
+add_link_options(-static -static-libgcc -static-libstdc++)
 
 # ── Subdirectories ───────────────────────────────────────────
 add_subdirectory(shared/resolute-ui)

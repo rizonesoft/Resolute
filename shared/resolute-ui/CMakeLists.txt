@@ -27,20 +27,21 @@ set(RESOLUTEUI_LIBS comctl32 dwmapi d2d1 dwrite ole32 msimg32)
 add_library(ResoluteUI_static STATIC ${RESOLUTEUI_SOURCES})
 target_include_directories(ResoluteUI_static PUBLIC include)
 target_compile_definitions(ResoluteUI_static PUBLIC RESOLUTEUI_STATIC)
+# The static UI library is what the single-file launcher links, so its icon
+# loader must bind Lucide directly rather than reach for a DLL at runtime.
+target_compile_definitions(ResoluteUI_static PUBLIC LUCIDE_STATIC)
+target_link_libraries(ResoluteUI_static PUBLIC Lucide_static)
 target_link_libraries(ResoluteUI_static PUBLIC ${RESOLUTEUI_LIBS})
 
 # ── Shared DLL (for extensions in System/) ───────────────────
-add_library(ResoluteUI SHARED ${RESOLUTEUI_SOURCES})
-target_include_directories(ResoluteUI PUBLIC include)
-target_compile_definitions(ResoluteUI PRIVATE RESOLUTEUI_BUILD)
-target_link_libraries(ResoluteUI PRIVATE ${RESOLUTEUI_LIBS})
-
-set_target_properties(ResoluteUI PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release/System"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/Bin/Debug/System"
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release/System"
-    LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/Bin/Debug/System"
-    ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Bin/Release/System"
-    ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/Bin/Debug/System"
-    PREFIX ""
-)
+# The SHARED ResoluteUI target was removed 2026-09-17 by D00 T01 §2.
+#
+# It had no consumer. The launcher links ResoluteUI_static and extensions/
+# RegStudio links only Win32 libraries, checked by search. It could not gain
+# one either: AGENTS.md states a tool may never depend at runtime on another
+# tool, on the launcher, or on a suite-wide file, which is exactly what a
+# shared ResoluteUI.dll would be. Building and shipping it was 898,048 bytes
+# of the release set that nothing loaded.
+#
+# Reversing this is cheap: git history has the target, and export.h keeps its
+# dllexport/dllimport branches so a future DLL build needs no source change.
