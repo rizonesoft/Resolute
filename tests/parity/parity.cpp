@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iomanip>
 #include <set>
 #include <sstream>
 
@@ -25,6 +26,11 @@ std::string Narrow(const std::wstring& text) {
 // A field separator that cannot appear in a registry path, a value name, or a
 // SID, so the format stays line-oriented and unambiguous without quoting.
 constexpr char kSep = '\t';
+
+// The one string both file readers return when they could not see the
+// object. It is ALSO recorded as an observation failure, because two
+// unreadable objects otherwise carry the same value and compare equal.
+constexpr const char* kUnreadable = "unreadable";
 constexpr char BS = '\\';
 constexpr wchar_t WBS = L'\\';
 
@@ -109,7 +115,8 @@ std::string TypeName(DWORD type) {
 // child paths cheap to build with += rather than a chain of temporaries.
 void WalkRegistry(HKEY root, const std::wstring& subKey,
                   const std::wstring& displayPrefix,
-                  std::map<std::string, Entry>& into) {
+                  std::map<std::string, Entry>& into,
+                  std::vector<std::string>& failures) {
     struct Pending {
         std::wstring path;
         std::wstring display;
@@ -122,30 +129,74 @@ void WalkRegistry(HKEY root, const std::wstring& subKey,
         work.pop_back();
 
         HKEY key{};
-        if (RegOpenKeyExW(root, current.path.c_str(), 0, KEY_READ, &key)
-            != ERROR_SUCCESS) {
+        const LSTATUS opened =
+            RegOpenKeyExW(root, current.path.c_str(), 0, KEY_READ, &key);
+        if (opened != ERROR_SUCCESS) {
+            // ABSENCE IS AN OBSERVATION; REFUSAL IS NOT. A key that is not
+            // there has been seen not to be there, and the record says so by
+            // carrying no entry for it. Any other error means this snapshot
+            // did not see part of its own scope, and a record built from it
+            // must never be able to report parity.
+            if (opened != ERROR_FILE_NOT_FOUND) {
+                failures.push_back("registry key unreadable: "
+                                   + Narrow(current.display) + " (error "
+                                   + std::to_string(opened) + ")");
+            }
             continue;
         }
 
+        // THE KEY ITSELF IS A FACT. Recording only values made creating or
+        // deleting an empty key invisible, so an undo that removed values and
+        // left the key trees behind compared equal to a complete removal.
+        // D04 T01 §1 compares Ownership's four HKCR trees key by key, which
+        // that hole would have defeated. Found by the independent review.
+        Entry keyEntry;
+        keyEntry.kind = "registry";
+        keyEntry.target = Narrow(current.display);
+        keyEntry.field = "(key)";
+        keyEntry.type = "key";
+        keyEntry.value = "present";
+        into[keyEntry.Key()] = keyEntry;
+
         DWORD valueCount = 0, maxNameLen = 0, subKeyCount = 0, maxSubKeyLen = 0;
-        RegQueryInfoKeyW(key, nullptr, nullptr, nullptr, &subKeyCount,
-                         &maxSubKeyLen, nullptr, &valueCount, &maxNameLen,
-                         nullptr, nullptr, nullptr);
+        const LSTATUS queried =
+            RegQueryInfoKeyW(key, nullptr, nullptr, nullptr, &subKeyCount,
+                             &maxSubKeyLen, nullptr, &valueCount, &maxNameLen,
+                             nullptr, nullptr, nullptr);
+        if (queried != ERROR_SUCCESS) {
+            failures.push_back("registry key not enumerable: "
+                               + Narrow(current.display) + " (error "
+                               + std::to_string(queried) + ")");
+            RegCloseKey(key);
+            continue;
+        }
 
         for (DWORD i = 0; i < valueCount; ++i) {
             std::vector<wchar_t> name(maxNameLen + 2, L'\0');
             DWORD nameLen = static_cast<DWORD>(name.size());
             DWORD type = 0;
             DWORD dataLen = 0;
-            if (RegEnumValueW(key, i, name.data(), &nameLen, nullptr, &type,
-                              nullptr, &dataLen) != ERROR_SUCCESS) {
+            const LSTATUS sized =
+                RegEnumValueW(key, i, name.data(), &nameLen, nullptr, &type,
+                              nullptr, &dataLen);
+            if (sized != ERROR_SUCCESS) {
+                failures.push_back("registry value unreadable under "
+                                   + Narrow(current.display) + " (index "
+                                   + std::to_string(i) + ", error "
+                                   + std::to_string(sized) + ")");
                 continue;
             }
             std::vector<BYTE> data(dataLen + sizeof(wchar_t), 0);
             nameLen = static_cast<DWORD>(name.size());
             DWORD size = dataLen;
-            if (RegEnumValueW(key, i, name.data(), &nameLen, nullptr, &type,
-                              data.data(), &size) != ERROR_SUCCESS) {
+            const LSTATUS read =
+                RegEnumValueW(key, i, name.data(), &nameLen, nullptr, &type,
+                              data.data(), &size);
+            if (read != ERROR_SUCCESS) {
+                failures.push_back("registry value unreadable under "
+                                   + Narrow(current.display) + " (index "
+                                   + std::to_string(i) + ", error "
+                                   + std::to_string(read) + ")");
                 continue;
             }
 
@@ -164,9 +215,14 @@ void WalkRegistry(HKEY root, const std::wstring& subKey,
                 entry.value = std::to_string(*reinterpret_cast<DWORD*>(data.data()));
             }
             else {
+                // TWO DIGITS PER BYTE, always. Without the padding,
+                // {0x01,0x23} and {0x12,0x03} both encode as "123", so a
+                // change between them recorded NO change at all. Found by the
+                // independent review of this section with a compiled probe.
                 std::ostringstream hex;
+                hex << std::hex << std::setfill('0');
                 for (DWORD b = 0; b < size; ++b) {
-                    hex << std::hex << static_cast<int>(data[b]);
+                    hex << std::setw(2) << static_cast<unsigned>(data[b]);
                 }
                 entry.value = hex.str();
             }
@@ -176,8 +232,14 @@ void WalkRegistry(HKEY root, const std::wstring& subKey,
         for (DWORD i = 0; i < subKeyCount; ++i) {
             std::vector<wchar_t> name(maxSubKeyLen + 2, L'\0');
             DWORD nameLen = static_cast<DWORD>(name.size());
-            if (RegEnumKeyExW(key, i, name.data(), &nameLen, nullptr, nullptr,
-                              nullptr, nullptr) != ERROR_SUCCESS) {
+            const LSTATUS enumerated =
+                RegEnumKeyExW(key, i, name.data(), &nameLen, nullptr, nullptr,
+                              nullptr, nullptr);
+            if (enumerated != ERROR_SUCCESS) {
+                failures.push_back("registry subkey unreadable under "
+                                   + Narrow(current.display) + " (index "
+                                   + std::to_string(i) + ", error "
+                                   + std::to_string(enumerated) + ")");
                 continue;
             }
             const std::wstring child(name.data());
@@ -202,10 +264,10 @@ std::string OwnerSidOf(const std::filesystem::path& path) {
     if (GetNamedSecurityInfoW(path.c_str(), SE_FILE_OBJECT,
                               OWNER_SECURITY_INFORMATION, &owner, nullptr,
                               nullptr, nullptr, &descriptor) != ERROR_SUCCESS) {
-        return "unreadable";
+        return kUnreadable;
     }
     LPWSTR text = nullptr;
-    std::string result = "unreadable";
+    std::string result = kUnreadable;
     if (ConvertSidToStringSidW(owner, &text)) {
         result = Narrow(text);
         LocalFree(text);
@@ -220,7 +282,7 @@ std::string OwnerSidOf(const std::filesystem::path& path) {
 // became.
 std::string ContentDigest(const std::filesystem::path& path) {
     std::ifstream file(path, std::ios::binary);
-    if (!file) return "unreadable";
+    if (!file) return kUnreadable;
     unsigned long long sum = 1469598103934665603ULL;
     size_t bytes = 0;
     char buffer[4096];
@@ -257,7 +319,7 @@ std::string Change::Describe() const {
 Snapshot Snapshot::OfRegistry(const std::wstring& subKeyUnderHkcu) {
     Snapshot snapshot;
     WalkRegistry(HKEY_CURRENT_USER, subKeyUnderHkcu, L"HKCU\\" + subKeyUnderHkcu,
-                 snapshot.m_entries);
+                 snapshot.m_entries, snapshot.m_failures);
     return snapshot;
 }
 
@@ -266,9 +328,22 @@ Snapshot Snapshot::OfFileTree(const std::filesystem::path& root) {
     std::error_code ec;
     if (!std::filesystem::exists(root, ec)) return snapshot;
 
+    if (ec) {
+        snapshot.m_failures.push_back("file tree unreadable: " + root.string()
+                                      + " (" + ec.message() + ")");
+        return snapshot;
+    }
+
     for (auto it = std::filesystem::recursive_directory_iterator(root, ec);
          it != std::filesystem::recursive_directory_iterator(); it.increment(ec)) {
-        if (ec) break;
+        if (ec) {
+            // A walk that stopped early has NOT seen the rest of the tree.
+            // Breaking silently returned a partial snapshot that compared
+            // equal to another partial one.
+            snapshot.m_failures.push_back("file tree walk stopped under "
+                                          + root.string() + " (" + ec.message() + ")");
+            break;
+        }
         const auto& path = it->path();
         const std::string target = path.string();
 
@@ -278,6 +353,9 @@ Snapshot Snapshot::OfFileTree(const std::filesystem::path& root) {
         owner.field = "owner";
         owner.type = "sid";
         owner.value = OwnerSidOf(path);
+        if (owner.value == kUnreadable) {
+            snapshot.m_failures.push_back("file owner unreadable: " + target);
+        }
         snapshot.m_entries[owner.Key()] = owner;
 
         if (it->is_regular_file(ec)) {
@@ -287,6 +365,9 @@ Snapshot Snapshot::OfFileTree(const std::filesystem::path& root) {
             content.field = "content";
             content.type = "bytes";
             content.value = ContentDigest(path);
+            if (content.value == kUnreadable) {
+                snapshot.m_failures.push_back("file content unreadable: " + target);
+            }
             snapshot.m_entries[content.Key()] = content;
         }
     }
@@ -295,6 +376,15 @@ Snapshot Snapshot::OfFileTree(const std::filesystem::path& root) {
 
 Record Record::Between(const Snapshot& before, const Snapshot& after) {
     Record record;
+    // Either snapshot failing to see part of its scope makes the RECORD
+    // incomplete, not just that snapshot. The difference between a complete
+    // observation and a partial one is exactly what a parity claim rests on.
+    for (const auto& failure : before.Failures()) {
+        record.m_failures.push_back("before: " + failure);
+    }
+    for (const auto& failure : after.Failures()) {
+        record.m_failures.push_back("after: " + failure);
+    }
     const auto& b = before.Entries();
     const auto& a = after.Entries();
 
@@ -324,11 +414,16 @@ Record Record::Between(const Snapshot& before, const Snapshot& after) {
     return record;
 }
 
+// The serialised form carries the failures, so a record committed as evidence
+// cannot be re-read as a clean one.
 std::string Record::Serialise() const {
     std::ostringstream out;
     out << "# parity-record v1\n";
     for (const auto& [name, value] : m_header) {
         out << "# " << name << ": " << value << "\n";
+    }
+    for (const auto& failure : m_failures) {
+        out << "# incomplete: " << Escape(failure) << "\n";
     }
     for (const auto& change : m_changes) {
         const Entry& e = (change.kind == Change::Kind::Removed) ? change.before : change.after;
@@ -349,7 +444,9 @@ Record Record::Parse(const std::string& text) {
     Record record;
     std::istringstream stream(text);
     std::string line;
+    size_t lineNumber = 0;
     while (std::getline(stream, line)) {
+        ++lineNumber;
         if (!line.empty() && line.back() == '\r') line.pop_back();
         if (line.empty()) continue;
         if (line[0] == '#') {
@@ -358,12 +455,36 @@ Record Record::Parse(const std::string& text) {
                 std::string name = line.substr(2, colon - 2);
                 std::string value = line.substr(colon + 1);
                 while (!value.empty() && value.front() == ' ') value.erase(0, 1);
-                record.m_header[name] = value;
+                // A list, not a map entry: several failures are normal and a
+                // map keyed by name would keep only the last one.
+                if (name == "incomplete") {
+                    record.m_failures.push_back(Unescape(value));
+                }
+                else {
+                    record.m_header[name] = value;
+                }
             }
             continue;
         }
-        auto parts = Split(line, kSep);
-        if (parts.size() < 6) continue;
+
+        // STRICT. A row that cannot be read is a defect in the evidence, not a
+        // row to skip. Silently dropping a short row let a record compare EQUAL
+        // to one that did not contain the change the row described. An unknown
+        // operation character was worse: it fell through to "changed" and was
+        // counted as a real observation. Both found by the independent review.
+        const auto parts = Split(line, kSep);
+        const std::string& op = parts[0];
+        if (op != "+" && op != "-" && op != "~") {
+            throw ParityError("parity record line " + std::to_string(lineNumber)
+                              + ": unknown operation, expected one of + - ~");
+        }
+        const size_t expected = (op == "~") ? 7 : 6;
+        if (parts.size() != expected) {
+            throw ParityError("parity record line " + std::to_string(lineNumber)
+                              + ": operation " + op + " needs "
+                              + std::to_string(expected) + " fields, found "
+                              + std::to_string(parts.size()));
+        }
 
         Entry entry;
         entry.kind = Unescape(parts[1]);
@@ -385,7 +506,7 @@ Record Record::Parse(const std::string& text) {
             change.kind = Change::Kind::Changed;
             change.after = entry;
             change.before = entry;
-            if (parts.size() >= 7) change.before.value = Unescape(parts[6]);
+            change.before.value = Unescape(parts[6]);
         }
         record.m_changes.push_back(change);
     }
@@ -422,6 +543,25 @@ std::vector<Difference> Compare(const Record& a, const Record& b) {
     for (const auto& [k, v] : ib) keys.insert(k);
 
     std::vector<Difference> differences;
+
+    // AN UNOBSERVED SCOPE IS NOT AN IDENTICAL ONE. Each failure becomes a
+    // difference of its own, so a record that could not see part of its scope
+    // can never return an empty comparison and can never be reported as
+    // parity. Two runs that both failed to read the same key would otherwise
+    // have produced two empty snapshots and compared equal.
+    std::map<std::string, std::pair<bool, bool>> failed;
+    differences.reserve(a.Failures().size() + b.Failures().size());
+    for (const auto& failure : a.Failures()) failed[failure].first = true;
+    for (const auto& failure : b.Failures()) failed[failure].second = true;
+    for (const auto& [reason, sides] : failed) {
+        // One row per distinct failure, each side labelled with what it
+        // actually did. Two rows for a failure BOTH sides hit would read as a
+        // disagreement between them, which is not what happened.
+        differences.push_back({"incomplete|" + reason,
+                               sides.first ? "observation failed" : "observed",
+                               sides.second ? "observation failed" : "observed"});
+    }
+
     for (const auto& key : keys) {
         auto fa = ia.find(key);
         auto fb = ib.find(key);
@@ -437,6 +577,21 @@ std::string Report(const Record& a, const Record& b,
     const auto differences = Compare(a, b);
     std::ostringstream out;
     out << "parity: " << labelA << " vs " << labelB << "\n";
+
+    // Said first and said plainly. A reader skimming for the verdict must
+    // not have to notice that the differing fields happen to be failures.
+    // The word PARITY is deliberately absent from this branch.
+    if (!a.Complete() || !b.Complete()) {
+        out << "  NOT COMPARABLE. The observation was incomplete, so no\n";
+        out << "  claim about equivalence can be made from it.\n";
+        for (const auto& failure : a.Failures()) {
+            out << "    " << labelA << ": " << failure << "\n";
+        }
+        for (const auto& failure : b.Failures()) {
+            out << "    " << labelB << ": " << failure << "\n";
+        }
+    }
+
     if (differences.empty()) {
         out << "  PARITY. " << a.Size() << " change(s) each, no differing fields.\n";
         return out.str();

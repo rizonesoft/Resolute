@@ -12,9 +12,12 @@
 
 #include <string>
 
+#include <windows.h>
+
 using resolute::fixtures::FileTreeFixture;
 using resolute::fixtures::RegistryFixture;
 using resolute::parity::Compare;
+using resolute::parity::ParityError;
 using resolute::parity::Record;
 using resolute::parity::Report;
 using resolute::parity::Snapshot;
@@ -196,4 +199,114 @@ TEST_CASE("A field present on one side only is named, not ignored", "[parity]") 
     // A comparison that silently ignored a field one side never wrote would
     // pass two tools that did different amounts of work.
     CHECK(Report(a, b, "cpp", "autoit").find("absent") != std::string::npos);
+}
+
+// ── Failing to observe is not observing no difference ────────
+//
+// Four routes to a FALSE PARITY, every one found by the independent review of
+// this section with a compiled probe, and every one the same shape: the
+// instrument could not see a difference and reported that there was none.
+
+TEST_CASE("Two different binary values do not collide", "[parity]") {
+    RegistryFixture fixture(L"parity-binary");
+
+    // Unpadded hex encoded both of these as "123", so a change between them
+    // recorded NO change at all.
+    const BYTE first[] = {0x01, 0x23};
+    const BYTE second[] = {0x12, 0x03};
+
+    // Written through the Win32 API rather than the fixture, which has no
+    // binary setter: this test is about how the SNAPSHOT encodes bytes, and
+    // adding a setter to a shipped helper for one test is scope it does not
+    // need.
+    const std::wstring sub = std::wstring(kScope) + L"\\parity-binary";
+    REQUIRE(RegSetKeyValueW(HKEY_CURRENT_USER, sub.c_str(), L"Blob", REG_BINARY,
+                            first, sizeof(first)) == ERROR_SUCCESS);
+    const Snapshot before = Snapshot::OfRegistry(kScope);
+    REQUIRE(RegSetKeyValueW(HKEY_CURRENT_USER, sub.c_str(), L"Blob", REG_BINARY,
+                            second, sizeof(second)) == ERROR_SUCCESS);
+    const Snapshot after = Snapshot::OfRegistry(kScope);
+
+    const Record record = Record::Between(before, after);
+    INFO(record.Serialise());
+    REQUIRE(record.Size() == 1);
+    CHECK(record.Changes()[0].before.value == "0123");
+    CHECK(record.Changes()[0].after.value == "1203");
+}
+
+TEST_CASE("An empty key is recorded, not invisible", "[parity]") {
+    RegistryFixture fixture(L"parity-emptykey");
+    const Snapshot before = Snapshot::OfRegistry(kScope);
+
+    fixture.CreateSubkey(L"EmptyChild");
+    const Snapshot after = Snapshot::OfRegistry(kScope);
+
+    const Record record = Record::Between(before, after);
+    const std::string text = record.Serialise();
+    INFO(text);
+    // A key with no values left no trace at all, so an undo that removed
+    // values and left the key trees behind compared equal to a complete
+    // removal. That is exactly what D04 T01 §1 compares key by key.
+    REQUIRE(record.Size() == 1);
+    CHECK(text.find("EmptyChild") != std::string::npos);
+    CHECK(text.find("(key)") != std::string::npos);
+}
+
+TEST_CASE("A malformed record is refused, not silently shortened", "[parity]") {
+    // Six columns with the final separator missing. This parsed as five
+    // fields, was discarded, and the record then compared EQUAL to one that
+    // never contained the row at all.
+    CHECK_THROWS_AS(Record::Parse(
+        "+\tregistry\tHKCU\\X\tField\tREG_SZ\tvalue\n"
+        "+\tregistry\tHKCU\\X\tOther\tREG_SZ\n"), ParityError);
+
+    // An unknown operation fell through to "changed" and was counted as a
+    // real observation.
+    CHECK_THROWS_AS(Record::Parse(
+        "?\tregistry\tHKCU\\X\tField\tREG_SZ\tvalue\n"), ParityError);
+
+    // A changed row needs its before value; six fields is not enough.
+    CHECK_THROWS_AS(Record::Parse(
+        "~\tregistry\tHKCU\\X\tField\tREG_SZ\tafter\n"), ParityError);
+
+    // And a well-formed record still parses, so the check is not merely
+    // refusing everything it is handed.
+    CHECK_NOTHROW(Record::Parse(
+        "+\tregistry\tHKCU\\X\tField\tREG_SZ\tvalue\n"));
+}
+
+TEST_CASE("An incomplete observation cannot report parity", "[parity]") {
+    // The serialised form of a record whose snapshot was REFUSED a key. Two
+    // runs that both failed to read it produced two empty snapshots and
+    // compared equal, reporting parity for a scope neither had seen.
+    const Record blind = Record::Parse(
+        "# impl: cpp\n"
+        "# incomplete: registry key unreadable: HKCU\\Software\\X (error 5)\n");
+    const Record alsoBlind = Record::Parse(
+        "# impl: autoit\n"
+        "# incomplete: registry key unreadable: HKCU\\Software\\X (error 5)\n");
+
+    CHECK_FALSE(blind.Complete());
+    REQUIRE(blind.Size() == 0);
+    REQUIRE(alsoBlind.Size() == 0);
+
+    // Both empty, both identical, and still not parity.
+    CHECK_FALSE(Compare(blind, alsoBlind).empty());
+
+    const std::string report = Report(blind, alsoBlind, "cpp", "autoit");
+    INFO(report);
+    CHECK(report.find("NOT COMPARABLE") != std::string::npos);
+    CHECK(report.find("PARITY.") == std::string::npos);
+    CHECK(report.find("error 5") != std::string::npos);
+}
+
+TEST_CASE("An observation failure survives the round trip", "[parity]") {
+    // If serialising dropped the failure, a record committed as evidence
+    // would be re-read as a clean one and could then be reported as parity.
+    const Record blind = Record::Parse(
+        "# incomplete: file owner unreadable: C:\\fixture\\a.txt\n");
+    const Record reparsed = Record::Parse(blind.Serialise());
+    CHECK_FALSE(reparsed.Complete());
+    REQUIRE(reparsed.Failures().size() == 1);
+    CHECK(reparsed.Failures()[0] == blind.Failures()[0]);
 }

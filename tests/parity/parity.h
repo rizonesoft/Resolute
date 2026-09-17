@@ -22,16 +22,34 @@
 // identical and do different things. Pixels are not effects. DESIGN.md and
 // D00 T02 §3's contract own appearance; D01 T02 §5 owns whether a surface
 // rendered what it specified. A pixel comparison is never parity evidence.
+//
+// FAILING TO OBSERVE IS NOT OBSERVING NO DIFFERENCE. Every way this library
+// can fail to see the system is recorded as an observation failure, and a
+// record carrying one can never report parity. The independent review of this
+// section found four routes by which it could: an unreadable scope became an
+// empty snapshot, an empty registry key left no trace at all, two different
+// binary values collided into one string, and a malformed row was discarded.
+// Each of those let two runs that did different things compare equal, which is
+// the one failure a parity instrument must not have.
 
 #include <windows.h>
 
 #include <cstdint>
 #include <filesystem>
+#include <stdexcept>
 #include <map>
 #include <string>
 #include <vector>
 
 namespace resolute::parity {
+
+// Thrown when a parity record is malformed. A record is evidence, so a row
+// that cannot be read is a defect in the evidence rather than a row to skip:
+// silently dropping it lets a record compare equal to one that does not contain
+// the change the dropped row described.
+struct ParityError : std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
 
 // One observed fact about the system: a target, a field on it, a type, and a
 // value. Keyed by target plus field, which is what makes a field-by-field
@@ -70,8 +88,16 @@ public:
     const std::map<std::string, Entry>& Entries() const { return m_entries; }
     size_t Size() const { return m_entries.size(); }
 
+    // Every place this snapshot could not see the system. A key it was refused,
+    // a value it could not enumerate, a file whose owner or content it could
+    // not read. NOT the same as finding nothing there: a scope that does not
+    // exist is an observation of absence and is complete.
+    const std::vector<std::string>& Failures() const { return m_failures; }
+    bool Complete() const { return m_failures.empty(); }
+
 private:
     std::map<std::string, Entry> m_entries;
+    std::vector<std::string> m_failures;
 };
 
 // The parity record: what changed between two snapshots of the same scope.
@@ -94,9 +120,15 @@ public:
     }
     std::string Header(const std::string& name) const;
 
+    // Carried from both snapshots. A record that could not observe part of its
+    // scope is not comparable, and Compare() will never return empty for one.
+    const std::vector<std::string>& Failures() const { return m_failures; }
+    bool Complete() const { return m_failures.empty(); }
+
 private:
     std::vector<Change> m_changes;
     std::map<std::string, std::string> m_header;
+    std::vector<std::string> m_failures;
 };
 
 // One difference between two records, for the field-by-field report.
@@ -108,7 +140,9 @@ struct Difference {
 };
 
 // Compare two records. An empty result is parity; anything else names every
-// field that differs and what each side said.
+// field that differs and what each side said. An incomplete record on either
+// side always yields at least one difference, so an unobserved scope cannot be
+// mistaken for an identical one.
 std::vector<Difference> Compare(const Record& a, const Record& b);
 
 // The human-readable report. Names every differing field, or says parity.
