@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **10 of 121 sections complete (8%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **11 of 121 sections complete (9%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -105,7 +105,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   7   |
 | [x] | `D00 T01 §1` | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2` | CMake structure and dependencies               |  11   |
-| [ ] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
+| [x] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
 | [ ] | `D00 T01 §4` | One command builds any tool                    |   6   |
 | [ ] | `D00 T01 §5` | One command runs every gate                    |   6   |
 | [ ] | `D00 T01 §6` | Keep the toolchain current                     |  12   |

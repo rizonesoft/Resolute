@@ -4,17 +4,18 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**36 findings across 10 sections.**
+**43 findings across 11 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `correctness` | 13 | the code does the wrong thing |
-| `record` | 9 | the plan or the evidence misdescribes what happened |
-| `consistency` | 8 | disagrees with the rest of the suite, its naming, or its layout |
+| `correctness` | 14 | the code does the wrong thing |
+| `record` | 12 | the plan or the evidence misdescribes what happened |
+| `consistency` | 10 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 2 | fails under hostile or unexpected input |
 | `performance` | 2 | correct, and too slow or too costly to be used |
+| `design` | 1 | the rendered surface disagrees with the design contract |
 | `integration` | 1 | a consumer, caller, or downstream artifact no longer holds |
 | `reproducibility` | 1 | the same input does not produce the same output |
 
@@ -33,6 +34,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T01 §2` | F3 | `correctness` | fixed | a reinterpret_cast defeated the type check it existed to enable |
 | `D00 T01 §2` | F4 | `record` | corrected | "Bin/Release contains exactly one file" was true and readable as more |
 | `D00 T01 §2` | F5 | `consistency` | corrected | a claim cited build output |
+| `D00 T01 §3` | F1 | `correctness` | fixed | the baseline was measured by an instrument that dropped a whole category |
+| `D00 T01 §3` | F2 | `consistency` | corrected | the third-party exemption and the section's own Done-when were in direct conflict |
+| `D00 T01 §3` | F3 | `record` | corrected | the 93 lunasvg warnings were an artifact of my own probe |
+| `D00 T01 §3` | F4 | `record` | corrected | the section was written against a toolchain that no longer exists |
+| `D00 T01 §3` | F5 | `record` | corrected | an unsourced figure that read as a measurement |
+| `D00 T01 §3` | F6 | `design` | corrected | 91 percent of the first baseline was one style check |
+| `D00 T01 §3` | F7 | `consistency` | fixed | two claims went stale from this commit |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |

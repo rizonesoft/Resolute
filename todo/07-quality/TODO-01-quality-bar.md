@@ -63,7 +63,13 @@ The document every other domain is measured against. It runs first because a bar
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] Record the per-target baseline for compiler warnings and static-analysis findings. Done when: the baseline file exists and the combined gate compares against it.
+The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warnings rather than baselining them, so `-Werror` is on with nothing suppressed and there is no compiler-warning baseline to ratchet. What this section ratchets is the **analysis** count, `todo/.tidy-baseline`, which starts at 59.
+-> XREF: D00 T01 §3 -- the gate and the baseline this section ratchets
+
+> [!IMPORTANT]
+> **Read `todo/.tidy-baseline` before writing the counter.** It records the exact reproduction procedure, and two traps that produce a plausible wrong number rather than an error. The second one already cost `D00 T01 §3` a round: `clang-analyzer` checks are spelled `clang-analyzer-security.ArrayBound`, with uppercase letters and dots, so a check-name character class of `[a-z0-9.-]+` silently drops every analyzer finding. That is how the baseline was first recorded as 52 instead of 59.
+
+- [ ] Record the per-target baseline for compiler warnings and static-analysis findings. Done when: the baseline file exists and the combined gate compares against it. **The analysis baseline already exists** at `todo/.tidy-baseline`, written by `D00 T01 §3` at 59; this item adds the per-target split and the comparison.
 - [ ] Make the ratchet one-way. Done when: a count above the baseline fails, a count equal passes, and a count below rewrites the baseline down in the same commit.
 - [ ] Report which target regressed, not just that something did. Done when: a deliberate regression names the target and the finding.
 - [ ] Prevent a silent baseline raise. Done when: raising a baseline requires an explicit recorded reason and the check names it.
