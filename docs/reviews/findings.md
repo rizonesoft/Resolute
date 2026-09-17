@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**75 findings across 16 sections.**
+**81 findings across 17 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 22 | the plan or the evidence misdescribes what happened |
-| `correctness` | 21 | the code does the wrong thing |
+| `correctness` | 23 | the code does the wrong thing |
+| `record` | 23 | the plan or the evidence misdescribes what happened |
 | `consistency` | 16 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 6 | fails under hostile or unexpected input |
 | `design` | 4 | the rendered surface disagrees with the design contract |
-| `adversarial` | 3 | fails under hostile or unexpected input |
 | `integration` | 3 | a consumer, caller, or downstream artifact no longer holds |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
 | `performance` | 2 | correct, and too slow or too costly to be used |
@@ -68,6 +68,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T02 §1` | F4 | `design` | corrected | the tool tag is not printable, and the requirement was still met |
 | `D00 T02 §1` | F5 | `record` | corrected | the checkpoint still named the preset its own first item had corrected |
 | `D00 T02 §1` | F6 | `consistency` | corrected | a scratch file that was never a test |
+| `D00 T02 §2` | F1 | `adversarial` | fixed | the boundary guard was not applied to the fixture's own root |
+| `D00 T02 §2` | F2 | `correctness` | fixed | the sweep reported success while leaving residue |
+| `D00 T02 §2` | F3 | `correctness` | fixed | a fixture that could not read back what it wrote |
+| `D00 T02 §2` | F4 | `adversarial` | fixed | RAII does not survive a process death, and the checkpoint could not see it |
+| `D00 T02 §2` | F5 | `adversarial` | corrected | the registry root sat one level below live user settings |
+| `D00 T02 §2` | F6 | `record` | cleared | the unelevated claim was checked rather than assumed |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |

@@ -73,6 +73,9 @@ track: P2
 7. **Record what the slice proved** before porting anything else. Done when: this section states which framework and contract assumptions are now evidence, so `§2` starts from fact.
 
 - [ ] Capture the shipped AutoIt `Ownership` first: a driven run against the fixture tree with its effects and window recorded. Done when: the baseline is committed.
+  -> XREF: D00 T02 §2 -- the disposable file tree this runs against, which reads back owner SIDs and DACL entry counts for exactly this comparison
+
+  **What the fixture store gives this section, and what it does not**, recorded 2026-09-17 when `D00 T02 §2` shipped: `FileTreeFixture` creates a tree this process owns, with declared ACLs, and reads the owner back as a SID string, which is the before-and-after comparison this port needs. It runs **unelevated**. What it does not solve is taking ownership of an object owned by somebody else, which needs `SeTakeOwnershipPrivilege`; that half of this section needs its own arrangement rather than assuming the fixtures cover it.
 - [ ] Port the tool to `extensions/Ownership/` as framework plus repair contract plus its own items, and nothing else. Done when: it builds as its own standalone executable and the source contains no settings, log, localization, or loop code.
 - [ ] Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference. Done when: the parity report is quoted and shows zero differing fields.
 - [ ] Prove the reverse: a takeover followed by undo restores every path's owner and ACL, compared entry by entry. Done when: the assertion compares owner and ACL before and after.

@@ -42,7 +42,7 @@ track: W1
 | Order | Section | Deliverable                                | Depends On     | Status |
 | :---: | :-----: | ------------------------------------------ | -------------- | :----: |
 |   1   |   §1    | Catch2 harness and assertion conventions   | D00 T01 §2     |  [x]   |
-|   2   |   §2    | Fixture store and disposable targets       | §1             |  [ ]   |
+|   2   |   §2    | Fixture store and disposable targets       | §1             |  [x]   |
 |   3   |   §3    | House-style capture store                  | --             |  [ ]   |
 |   4   |   §4    | Parity driver for a built tool             | §1, §2         |  [ ]   |
 |   5   |   §5    | Cover the inherited UI library             | §1, D00 T03 §3 |  [ ]   |
@@ -163,7 +163,7 @@ Catch2 is a dependency, not a design. What this section decides is the shape of 
 > **CRUD:** applicable | driven: the suite was **run** rather than inspected in six states, which is how the `wmain` link failure, the tag's absence from Catch2's reporter, and the dependency findings were each seen. The failure path is exercised directly: a deliberately failing assertion fails the gate and the run exits non-zero. **The read-back convention this section decides is written and not yet exercised**, because `Dpi` is pure and has nothing to read back; it is written for `D00 T02 §2`'s fixtures, and saying so is better than implying it is proven.
 > **Duration:** 19
 > **Implementer:** Claude Opus 5 (claude-opus-5[1m])
-> **Deferred:** the read-back rule's first real exercise waits on a disposable target for destructive code. -> XREF: D00 T02 §2 -- the fixture store that gives it one
+> **Resolved:** 2026-09-17 in `2536f52`. The read-back rule's first real exercise waited on a disposable target for destructive code. `§2` built it, and every fixture assertion now reads the effect back out of the registry or the filesystem rather than trusting a helper's return. -> XREF: D00 T02 §2 -- the fixture store that gives it one
 
 **Test checkpoint:** `ctest --preset debug` runs and exits 0. A deliberately failing assertion exits non-zero and prints tool tag, expected, and actual; both outputs are quoted. `pwsh scripts/check-all.ps1` fails when a test fails.
 
@@ -251,6 +251,14 @@ This is the section that makes the destructive half of the suite testable. The A
 <!-- claim: exists tests/fixtures/suite_teardown.cpp -->
 <!-- claim: count "ResoluteTestFixtures" tests/fixtures/fixtures.h = 3 -->
 <!-- claim: count "Rizonesoft" tests/fixtures/fixtures.h = 1 -->
+
+> **Verified:** 2026-09-17 | §2 | the destructive half of the suite has somewhere safe to point: **19 tests, all passing, in a session where `IsInRole(Administrator)` is False** · every assertion **reads the effect back** from the registry or the filesystem rather than trusting a helper, which is the rule `§1` wrote and could not exercise because its first tests were pure · the owner is read back as a SID and the DACL entry count after a grant, the exact values `D04 T01 §1` compares · **the registry root was moved off the product key**: the section named `HKCU\\Software\\Rizonesoft\\Fixtures` and that parent holds this user's real `ClassicPanel` and `Office`, one arithmetic mistake from a recursive teardown · **cleanup on failure is two failures and RAII solves one**: a throw unwinds, but `std::abort` runs no destructors and a probe left residue in both stores while every in-test assertion passed, so both roots are now swept at run **start** as well as end, driven against the residue an abort actually left · the boundary guard refuses absolute, traversing, drive-qualified and root-relative names and **allows** `a\\b\\..\\c`, which is what makes it a boundary check rather than a spelling check · the fixture store lives under `<build>/fixtures` with the path supplied by CMake, so no absolute path enters a tracked build file · `HKCU\\Software\\Rizonesoft` still holds exactly `ClassicPanel, Office` after every run
+> **Review:** round 2, candidate `2536f52` `339bfd9` -- `adversarial` approve after fixes (3) · `consistency` approve after fix (1) · `integration` approve · `source-defect` approve after fix (1) · `design` approve · `record` approve. Raw findings: docs/reviews/00-workspace/D00-T02-s2.md
+> **Independent:** `codex review --commit 2536f52` (gpt-6-astra, high) returned **one P1 and two P2, all three right**. The P1 is this section's central safety property failing in the one place a mistake costs a real directory: the **members** used the careful resolve-then-compare guard and the **constructor**, whose destructor calls `remove_all` on the root it chooses, used a weaker hand-rolled one. It tested `is_absolute()`, and on Windows a root-relative `\escape` is not absolute, while `base / "\escape"` keeps the base's drive and discards its directories. The fixture landed outside the store and deleted it. **Two checks for one boundary is what allowed it**, and there is now one. Eighth section running where the reviewer found something by constructing a state I had not, and the first where that state was an input to my own safety check.
+> **CRUD:** applicable | this section IS the data path: it creates, seeds, reads back and deletes registry keys and file trees. Every failure path is driven rather than reasoned about, including the two the checkpoint could not see: a process death leaving residue, and a sweep that reported success while leaving it. The reverse is the whole point and is asserted from outside the objects, by asking the registry and the filesystem after the scope closes.
+> **Duration:** 18
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
+> **Deferred:** two concurrent test processes would sweep each other's roots. One process today and `ctest` is not configured for parallelism, so it is a limitation rather than a bug, recorded where somebody adding `-j` will meet it. Elevated fixtures are also out of scope: taking ownership of an object owned by somebody else needs `SeTakeOwnershipPrivilege` and its own arrangement. -> XREF: D04 T01 §1 -- the ownership port that needs the elevated half
 
 **Test checkpoint:** The fixture suite runs green unelevated. A deliberately aborted run leaves `HKCU\Software\ResoluteTestFixtures` absent and the fixture tree removed, both asserted. A helper handed an out-of-root path fails by name. All three are quoted.
 
