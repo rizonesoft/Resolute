@@ -38,7 +38,7 @@ track: Q1
 
 | Order | Section | Deliverable                            | Depends On   | Status |
 | :---: | :-----: | -------------------------------------- | ------------ | :----: |
-|   1   |   §1    | The conformance profile                | --           |  [ ]   |
+|   1   |   §1    | The conformance profile                | --           |  [x]   |
 |   2   |   §2    | Warning and analysis ratchet           | D00 T01 §3   |  [ ]   |
 |   3   |   §3    | Conformance check and its report       | §1           |  [ ]   |
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [ ]   |
@@ -95,6 +95,14 @@ The document every other domain is measured against. It runs first because a bar
 **Test checkpoint:** `python scripts/profile-check.py` passes against `docs/conformance-profile.md` and is driven to **fail** in each of its four ways: a clause with no owner, an owner reference that does not resolve to a real section, a clause not stated in evaluable terms, and a measured defect class no clause covers. Every one of the eight measured AutoIt defect classes maps to at least one clause, printed by the check rather than asserted in prose. The profile distinguishes universal clauses from repair-tool clauses, requires standalone-ness as behaviour, and adopts `DESIGN.md` by reference with no design value restated. All outputs quoted.
 
 **Corrected 2026-09-17:** the previous checkpoint asked that clauses be "stated in evaluable terms" and that a mapping "is quoted", which a careless author satisfies by asserting both. Every clause of it is now something a script decides.
+
+> **Verified:** 2026-09-17 | §1 | [`docs/conformance-profile.md`](../../docs/conformance-profile.md) carries **33 clauses**, 24 universal and 9 repair-only, each a row with a `Method` from a closed set of seven, an `Evidence` cell, and an `Owner` across **23 distinct sections in five domains** · **"evaluable" is mechanical rather than asserted**: a method outside the closed set fails by name, driven with `reasonably` · **every owner RESOLVES** through `todo-graph.py resolve`, the same front door the skills use, so a reference in valid form pointing at nothing is refused, driven by pointing a clause at section 77 of a file that has five · all **eight** measured defect classes are closed and the mapping is **printed by the check**, `D1 -> C02, C03` through `D8 -> C22` · `DESIGN.md` is adopted by reference and the cheaper substitute is refused by the gate rather than avoided by discipline, driven with a planted colour and size · **standalone-ness is stated as behaviour and names no paths**, so whichever layout `D01 T01 §9` chooses cannot invalidate this document, with the cost of that default recorded in both places · `profile-check self-test: 14 case(s) ok`, each case asserting the problem is **named** rather than that the exit is non-zero, which would pass on a checker that rejected everything · `profile-check: 33 clause(s) ok`, `check-all: 13 gate(s) ok`, whole suite `100% tests passed out of 36`, tidy `169 finding(s), baseline 169, over 21 TU(s)`
+> **Review:** round 2, candidate `a73addf` `e02cb85` -- `adversarial` approve after fix (1) · `consistency` approve · `integration` approve after fix (1) · `source-defect` approve after fixes (2) · `design` approve · `record` approve after fixes (3). Raw findings: docs/reviews/07-quality/D07-T01-s1.md
+>
+> **CRUD:** not applicable | this section ships a document and a checker over it, and touches no user system and no user data. What stands in for it is that the checker's every refusal was **driven** rather than described, five by hand and fourteen by self-test, because a gate nobody has seen fail is a gate nobody has seen.
+> **Duration:** 18
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
+> **Deferred:** the profile checks that a tool needs nothing outside its own folder, and **cannot** check that it put its files in the agreed place, because the standalone on-disk layout is not chosen. Stated as behaviour deliberately, so the choice cannot invalidate this document. -> XREF: D01 T01 §9 (item: "Define the standalone layout: exactly what files a single tool ships with and where it finds each") -- the item that chooses it
 
 ## 2. Warning and Analysis Ratchet
 

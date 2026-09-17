@@ -61,7 +61,16 @@ CATEGORIES = {
     "design":          "the rendered surface disagrees with the design contract",
     "performance":     "correct, and too slow or too costly to be used",
     "reproducibility": "the same input does not produce the same output",
+    "test-coverage":   "correct, and nothing exercises it, so a regression would be silent",
 }
+
+# `test-coverage` added 2026-09-17 by decision, the same way `corrected` was.
+# It is distinct from `correctness`: the code under it does the right thing
+# today, and the finding is that NOTHING WOULD NOTICE if it stopped. D07 T01
+# §1 produced the first one that had nowhere to go: a checker whose five
+# failure modes had all been driven by hand, which missed a sixth because a
+# hand-driven probe is bounded by what its author thought to try. Filing that
+# as `correctness` would have said the checker was wrong, and it was not.
 
 # A disposition is what was DONE about the finding, normalised to its first word.
 #

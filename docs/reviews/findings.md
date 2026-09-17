@@ -4,21 +4,22 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**95 findings across 19 sections.**
+**101 findings across 20 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 28 | the plan or the evidence misdescribes what happened |
-| `correctness` | 27 | the code does the wrong thing |
+| `record` | 31 | the plan or the evidence misdescribes what happened |
+| `correctness` | 28 | the code does the wrong thing |
 | `consistency` | 16 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 11 | fails under hostile or unexpected input |
+| `adversarial` | 12 | fails under hostile or unexpected input |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `integration` | 3 | a consumer, caller, or downstream artifact no longer holds |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
 | `performance` | 2 | correct, and too slow or too costly to be used |
 | `reproducibility` | 1 | the same input does not produce the same output |
+| `test-coverage` | 1 | correct, and nothing exercises it, so a regression would be silent |
 
 ## Every finding
 
@@ -119,3 +120,9 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §5` | F4 | `consistency` | fixed | a citation that resolved to nothing, in two source files |
 | `D00 T04 §5` | F5 | `design` | fixed | the vocabulary helper printed regex, not words |
 | `D00 T04 §5` | F6 | `record` | advisory | my own measuring instruments failed three times |
+| `D07 T01 §1` | F1 | `record` | corrected | the measured defect classes are eight, not seven |
+| `D07 T01 §1` | F2 | `record` | routed | the section was told to wait for a decision that has no owner here |
+| `D07 T01 §1` | F3 | `record` | corrected | the checkpoint could not fail |
+| `D07 T01 §1` | F4 | `correctness` | fixed | C15 forbade the entire purpose of a repair tool |
+| `D07 T01 §1` | F5 | `adversarial` | fixed | two spaces bypassed the checker entirely |
+| `D07 T01 §1` | F6 | `test-coverage` | fixed | the checker had nothing exercising it |
