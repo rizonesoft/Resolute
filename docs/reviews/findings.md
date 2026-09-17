@@ -4,15 +4,15 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**43 findings across 11 sections.**
+**50 findings across 12 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `correctness` | 14 | the code does the wrong thing |
-| `record` | 12 | the plan or the evidence misdescribes what happened |
-| `consistency` | 10 | disagrees with the rest of the suite, its naming, or its layout |
+| `correctness` | 17 | the code does the wrong thing |
+| `record` | 14 | the plan or the evidence misdescribes what happened |
+| `consistency` | 12 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 2 | fails under hostile or unexpected input |
 | `performance` | 2 | correct, and too slow or too costly to be used |
 | `design` | 1 | the rendered surface disagrees with the design contract |
@@ -41,6 +41,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T01 §3` | F5 | `record` | corrected | an unsourced figure that read as a measurement |
 | `D00 T01 §3` | F6 | `design` | corrected | 91 percent of the first baseline was one style check |
 | `D00 T01 §3` | F7 | `consistency` | fixed | two claims went stale from this commit |
+| `D00 T01 §4` | F1 | `correctness` | fixed | a Debug binary shipped as Release, and it had already happened here |
+| `D00 T01 §4` | F2 | `correctness` | fixed | the launcher could only be built from the repository root |
+| `D00 T01 §4` | F3 | `consistency` | fixed | a failed compile discarded the compiler's diagnostics |
+| `D00 T01 §4` | F4 | `consistency` | corrected | "both architectures" contradicted a decision `§1` had already recorded |
+| `D00 T01 §4` | F5 | `record` | corrected | the output item named the wrong directory |
+| `D00 T01 §4` | F6 | `correctness` | corrected | a build script that had never built the launcher |
+| `D00 T01 §4` | F7 | `record` | corrected | an escape sequence corrupted the record |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |

@@ -45,7 +45,7 @@ track: W1
 |   1   |   §1    | Harden the toolchain bootstrap               | D00 T03 §3 |  [x]   |
 |   2   |   §2    | CMake structure and dependencies             | §1         |  [x]   |
 |   3   |   §3    | Warnings as errors at one level              | §2         |  [x]   |
-|   4   |   §4    | One command builds any tool                  | §2         |  [ ]   |
+|   4   |   §4    | One command builds any tool                  | §2         |  [x]   |
 |   5   |   §5    | One command runs every gate                  | §3, §4     |  [ ]   |
 |   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [ ]   |
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
@@ -487,18 +487,24 @@ The AutoIt suite reached fourteen tools with no way to build them all, which is 
   ```
 - [x] Prove a clean-checkout build. Done when: a fresh clone into a different absolute path builds without editing a single file, and this section records the path it was proven in. **Stated plainly 2026-09-17:** a fresh clone has the scripts and no toolchain, because everything `scripts/bootstrap.ps1` downloads into `reskit/` is gitignored. So the proof is clone, supply the toolchain the way a new machine would, then build with nothing edited. What this actually tests is that no absolute path is baked into a build file, which is why the clone must be at a **different** path rather than a copy of this one.
 
-  **Proven 2026-09-17 at `R:
-esolute-cleancheck`**, a clean export of all **8,124** tracked files, given the toolchain the way a new machine would be, and then built with nothing edited:
+  **Proven 2026-09-17 at `R:\resolute-cleancheck`**, a clean export of all **8,124** tracked files, given the toolchain the way a new machine would be, and then built with nothing edited:
 
   ```
-  building at: R:
-esolute-cleancheck
+  building at: R:\resolute-cleancheck
     Resolute         OK      Bin\Release\Resolute.exe
-    RegStudio        OK      Bin\Release\System\RegStudio.exe
-  exit 0
+    RegStudio        OK      Bin\Release\System\RegStudio.exe      exit 0
+    Resolute         OK      Bin\Debug\Resolute.exe
+    RegStudio        OK      Bin\Debug\System\RegStudio.exe        exit 0
+
+  2512384  Bin/Release/Resolute.exe     772096  Bin/Release/System/RegStudio.exe
+  8698880  Bin/Debug/Resolute.exe      1035776  Bin/Debug/System/RegStudio.exe
   ```
 
-  The checkout started with no `Bin/` and no `build/`, the launcher it produced is 2,512,384 bytes, the same as this tree's, and it **runs**: window 'Resolute', responding. Tracked files changed by the build: **0**, measured by diffing the built tree against the index it was exported from, which is the check that makes "without editing a single file" falsifiable rather than assumed.
+  The checkout started with no `Bin/` and no `build/`, and it **runs**: window 'Resolute', responding. Tracked files changed by the build: **0**, measured by diffing the built tree against the index it was exported from, which is the check that makes "without editing a single file" falsifiable rather than assumed.
+
+  **Re-run after the review fixes rather than carried forward**, and both configurations built this time. The first pass proved the pre-fix code, and this section had just been shown what stale evidence costs.
+
+  The two **Release** binaries are byte-identical to this tree's. The two **Debug** ones differ by a few hundred bytes, which is expected rather than alarming: `§2` established that this build is not reproducible, and debug information embeds the build directory, which is the one thing deliberately different between the two trees. Release matching while Debug does not is the signature of exactly that, and it doubles as an unplanned check that no build path reaches the shipped binary.
 
   > [!WARNING]
   > **The first attempt failed, and the reason is worth recording.** Exporting into the session scratchpad aborted with `Filename too long` on hundreds of files. The longest tracked path is **165 characters**, inside `resolute_au3/samples/`, and Windows' classic limit is 260, so the repository can only be checked out where the root path is under roughly 95 characters. At `R:\conclave\projects\Resolute` that leaves ample room and nothing is wrong today. It is recorded because "clone it anywhere and it builds" is not quite true, the failure is a checkout failure rather than a build failure, and the fix is `git config core.longpaths true` on the clone rather than anything in this repository.
@@ -508,6 +514,14 @@ esolute-cleancheck
 <!-- claim: absent reskit/Build-All.ps1 -->
 <!-- claim: absent reskit/Build-Resolute.ps1 -->
 <!-- claim: absent reskit/Build-Extension.ps1 -->
+
+> **Verified:** 2026-09-17 | §4 | `scripts/build.ps1` builds the launcher, any extension, or everything with `-All`, in either configuration, and the three `reskit/Build-*.ps1` are gone, so "one command" is true rather than aspirational · targets are **discovered** from `extensions/`, so a tool added later builds without editing the script · an extension is built **standalone**, with its own `project()` call and the root never read, which is the only path on which `§2`'s P1 was visible · `-All` reports every target with its result and its output path, and exits non-zero with a count when any fails · an unknown tool exits **2** naming it and listing the known targets · **the clean-checkout proof**: 8,124 tracked files exported to `R:\resolute-cleancheck`, no `Bin/` and no `build/`, toolchain supplied as a new machine would get it, both configurations built with **0 tracked files changed**, measured by diffing the built tree against the index it came from, and the launcher runs there: window 'Resolute', responding · the Release binaries are byte-identical to this tree's while the Debug ones differ, the expected signature of debug info embedding the build directory and an unplanned check that no build path reaches the shipped binary · output is one documented place, `Bin/<Config>/` and `Bin/<Config>/System/`, proven for both configurations · no absolute path in any tracked build file, excluding one `https://` URL · a deliberate compile error surfaces the failing command and all three diagnostics from `build/logs/`
+> **Review:** round 2, candidate `b87af92` `67554f2` -- `adversarial` approve after fixes · `consistency` approve after fixes (2) · `integration` approve after fixes · `source-defect` approve after fix (1) · `design` not-applicable · `record` approve after fixes (2). Raw findings: docs/reviews/00-workspace/D00-T01-s4.md
+> **Independent:** `codex review --commit b87af92` (gpt-6-astra, high) returned **three findings, one P1 and two P2, and all three were right**. The P1: `RegStudio` wrote its executable to one path for every configuration, so Release, Debug, Release again leaves ninja reporting the third build up to date and the **Debug** binary is deployed as Release. The reviewer found the two byte-identical, and this repository had already done it: `Bin/Release/System/RegStudio.exe` was the 1,036,288-byte Debug binary. This section had already "fixed" that line during validation, `CMAKE_SOURCE_DIR` to `CMAKE_CURRENT_SOURCE_DIR`, correcting a real defect and leaving a worse one. Its advantage was again probe construction, and this time the probe was a **sequence**: any one build passes, any two pass, only the third exposes it.
+> **CRUD:** applicable | driven: the script was **run** in every mode rather than inspected, which is how the unknown-tool path, the cross-configuration deploy, the working-directory dependency and the discarded diagnostics were each seen. The failure path is exercised directly: a deliberate syntax error in `src/main.cpp` produces `FAILED`, the exact clang invocation and three diagnostics, then reverted.
+> **Duration:** 18
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
+> **Deferred:** the repository cannot be checked out where the root path exceeds roughly 95 characters, because the longest tracked path is 165 and Windows' classic limit is 260. The fix is `git config core.longpaths true` on the clone rather than anything here, and the deep paths are inside `resolute_au3/samples/`, which the maintenance domain owns. -> XREF: D09 T01 §1 -- the AutoIt tree's build paths
 
 **Test checkpoint:** `pwsh scripts/build.ps1 -All` exits 0 and names every target built, in both configurations. A fresh clone into a different absolute path builds with no file edited, and that path is quoted. An unknown tool name exits non-zero with the named message. The three superseded scripts in `reskit/` are gone, proven by search, so "one command" is true rather than aspirational.
 

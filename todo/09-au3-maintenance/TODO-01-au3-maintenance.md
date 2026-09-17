@@ -54,7 +54,11 @@ A shipping product that cannot be built from its own repository cannot be fixed.
 
 - [ ] Replace the hardcoded `R:\Workspace\Resolute\...` paths in all thirteen `.sni` descriptors with repository-relative equivalents. Done when: no descriptor contains an absolute path, checked rather than eyeballed.
 - [ ] Note the scope, measured 2026-09-16: **the `#AutoIt3Wrapper_` directives are already repository-relative and correct.** `Resolute.au3` emits to `..\..\..\Resolute.exe`, which resolves to `resolute_au3/Resolute.exe` after the move, and the tool scripts emit to `..\..\..\Resolute\<Tool>.exe`, which resolves into `resolute_au3/Resolute/`. Only the `.sni` descriptors carry absolute paths. Done when: this section confirms the directives were checked and left alone, so the fix is scoped to the descriptors rather than to every script.
-- [ ] Prove a clean-checkout build. Done when: a fresh clone into a different absolute path builds at least one tool to both architectures with no file edited, and the path is recorded.
+- [ ] Prove a clean-checkout build. Done when: a fresh clone into a different absolute path builds at least one tool to both architectures with no file edited, and the path is recorded. **Both architectures is correct here** and is not the stale phrase `D00 T01 §4` removed from the C++ side: all thirteen descriptors set `CompileBoth=Y`, so the AutoIt suite really does ship a 32-bit and a 64-bit binary.
+  -> XREF: D00 T01 §4 -- the C++ side's clean-checkout proof, and the path-length limit this one will meet
+
+  > [!IMPORTANT]
+  > **The clone path has to be short, and this is where that bites hardest.** `D00 T01 §4` proved the C++ tree at `R:esolute-cleancheck` and hit `Filename too long` on the first attempt. The longest tracked path in the repository is **165 characters** and every one of the worst offenders is under `resolute_au3/samples/`, which this domain owns. Against Windows' 260-character limit that leaves roughly 95 characters for the clone root, so a clone into a deep directory fails at **checkout**, before any build is attempted. Either keep the root short or set `git config core.longpaths true` on the clone.
 - [ ] Record which tools build and which do not. Done when: all thirteen are attempted and the result per tool is recorded here.
 - [ ] Commit: `"au3: make the autoit suite build from a clean checkout"`
 
