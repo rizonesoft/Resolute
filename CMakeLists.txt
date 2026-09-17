@@ -50,7 +50,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Bin/Debug")
 # solely inside extensions/RegStudio. The import table was already clean, so
 # this makes the prescription match what was already true rather than changing
 # the output.
-add_link_options(-static -static-libgcc -static-libstdc++)
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteLinkPolicy.cmake")
 
 # ── Subdirectories ───────────────────────────────────────────
 add_subdirectory(shared/resolute-ui)

@@ -37,7 +37,7 @@ if (-not (Test-Path $BuildDir)) {
 }
 
 Push-Location $BuildDir
-$cmakeResult = & cmake $RepoRoot -G Ninja "-DCMAKE_BUILD_TYPE=$BuildType" "-DCMAKE_C_COMPILER=clang" "-DCMAKE_CXX_COMPILER=clang++" 2>&1
+$cmakeResult = & cmake $RepoRoot -G Ninja "-DCMAKE_BUILD_TYPE=$BuildType" "-DCMAKE_C_COMPILER=$RepoRoot\reskit\llvm-mingw\bin\clang.exe" "-DCMAKE_CXX_COMPILER=$RepoRoot\reskit\llvm-mingw\bin\clang++.exe" "-DCMAKE_RC_COMPILER=$RepoRoot\reskit\llvm-mingw\bin\llvm-windres.exe" "-DCMAKE_MAKE_PROGRAM=$RepoRoot\reskit\ninja\ninja.exe" 2>&1
 $cmakeExit = $LASTEXITCODE
 $cmakeResult | Out-Host
 if ($cmakeExit -ne 0) {

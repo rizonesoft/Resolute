@@ -52,7 +52,7 @@ if (-not (Test-Path $BuildDir)) {
 }
 
 Push-Location $BuildDir
-cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BuildType -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BuildType -DCMAKE_C_COMPILER="$RepoRoot\reskit\llvm-mingw\bin\clang.exe" -DCMAKE_CXX_COMPILER="$RepoRoot\reskit\llvm-mingw\bin\clang++.exe" -DCMAKE_RC_COMPILER="$RepoRoot\reskit\llvm-mingw\bin\llvm-windres.exe" -DCMAKE_MAKE_PROGRAM="$RepoRoot\reskit\ninja\ninja.exe"
 if ($LASTEXITCODE -ne 0) {
     Pop-Location
     Write-Host "CMake configure failed!" -ForegroundColor Red

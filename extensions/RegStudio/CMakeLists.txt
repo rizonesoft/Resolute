@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.25)
 project(RegStudio LANGUAGES CXX RC)
 
+# The suite's link policy. Included by path rather than inherited, because this
+# is a standalone project: reskit/Build-Extension.ps1 configures it with
+# `cmake ..` from this directory and never reads the root CMakeLists.txt.
+# Removing the flags from here on the assumption the root supplied them added
+# libc++.dll and libunwind.dll imports to the standalone build, caught by the
+# independent review of 6062ecb.
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteLinkPolicy.cmake")
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
