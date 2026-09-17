@@ -119,7 +119,6 @@ private:
     uint32_t m_indicatorAnimId = 0;
 
     // Tooltip
-    HWND     m_tooltipHwnd  = nullptr;
     int      m_tooltipIdx   = -1;
     UINT_PTR m_tooltipTimer = 0;
     float    m_tooltipAlpha = 0.0f;

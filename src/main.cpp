@@ -30,7 +30,6 @@ enum CtrlId : int {
 // config files, no registry. Drop an .exe with RESEXT, done.
 #include <shellapi.h>
 #include <string>
-#pragma comment(lib, "shell32.lib")
 
 static std::vector<rui::ListItem> g_allItems;       // all scanned extensions
 static std::vector<rui::ListItem*> g_filteredItems;  // current visible subset
@@ -365,7 +364,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
                 [app](float v, const rui::Animation&) {
                     app->statusbar.SetProgress(v);
                 },
-                [app, hwnd]() {
+                [app]() {
                     app->statusbar.HideProgress();
                     app->statusbar.RemoveNotifyIcon(1);
                     app->statusbar.AddNotifyIcon(2, rui::NotifyIconKind::Success);

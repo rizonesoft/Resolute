@@ -26,6 +26,8 @@ target_include_directories(Resolute PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(Resolute PRIVATE -municode)
 target_link_options(Resolute PRIVATE -municode -mwindows)
 
+resolute_set_warnings(Resolute)
+
 target_link_libraries(Resolute PRIVATE
     ResoluteUI_static
     Lucide_static
@@ -33,4 +35,5 @@ target_link_libraries(Resolute PRIVATE
     dwmapi
     uxtheme
     shlwapi
+    shell32   # was a #pragma comment(lib) in main.cpp, which clang ignores
 )

@@ -29,6 +29,7 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_C_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang.exe",
                 "CMAKE_CXX_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/clang++.exe",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON",
                 "CMAKE_RC_COMPILER": "${sourceDir}/reskit/llvm-mingw/bin/llvm-windres.exe",
                 "CMAKE_MAKE_PROGRAM": "${sourceDir}/reskit/ninja/ninja.exe"

@@ -52,6 +52,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Bin/Debug")
 # the output.
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteLinkPolicy.cmake")
 
+# The warning policy is applied per target rather than here, because a
+# FetchContent dependency is a subdirectory of this build and would inherit
+# anything set at the root. D00 T01 §3.
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteWarnings.cmake")
+
 # ── Subdirectories ───────────────────────────────────────────
 add_subdirectory(shared/resolute-ui)
 add_subdirectory(shared/lucide)
@@ -61,3 +66,7 @@ add_subdirectory(src)
 # Console retired by D00 T03 §1: off-mission for a repair suite, and the only
 # consumer of the deps/libvterm submodule. Source preserved in history at ac97ed7.
 # add_subdirectory(extensions/RegStudio)
+
+# Last, so every subdirectory has declared its targets: fail the configure if
+# any target this project owns never got the warning policy. D00 T01 §3.
+resolute_assert_warnings_complete()

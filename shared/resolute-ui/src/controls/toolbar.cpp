@@ -259,7 +259,6 @@ void Toolbar::OnPaint() {
     RebuildIconCache();
 
     auto& c = Theme::Colors();
-    float fontSize = Dpi::ScaleF(static_cast<float>(BASE_FONT_SIZE), m_dpi);
     int iconSz = IconSize();
 
     m_rt->BeginDraw();
@@ -375,8 +374,6 @@ void Toolbar::OnPaint() {
 
         // ── Button / Dropdown ───────────────────────────────
         bool active = false;  // No toggle items in current layout
-        bool hovered = (i == m_hovered);
-        bool pressed = (i == m_pressed);
 
         D2D1_RECT_F btnRc = itemRc;
 

@@ -293,8 +293,6 @@ void Sidebar::OnPaint() {
     int itemH   = ItemHeight();
     int padX    = PaddingX();
     int iconSz  = IconSize();
-    float fontSize   = Dpi::ScaleF(static_cast<float>(BASE_FONT_SIZE), m_dpi);
-    float headerSize = Dpi::ScaleF(static_cast<float>(BASE_HEADER_FONT), m_dpi);
 
     m_rt->BeginDraw();
     m_rt->Clear(ToD2DColor(c.surface));
@@ -448,9 +446,6 @@ void Sidebar::OnPaint() {
             m_rt->FillRoundedRectangle(
                 D2D1::RoundedRect(itemRc, 4.0f, 4.0f), pressBrush.Get());
         }
-
-        // Choose brush: accent for selected, normal for others
-        ID2D1SolidColorBrush* labelBrush = isSelected ? accentBrush.Get() : textBrush.Get();
 
         // Icon (center horizontally when collapsed, pad when expanded)
         float fIconSz = static_cast<float>(iconSz);

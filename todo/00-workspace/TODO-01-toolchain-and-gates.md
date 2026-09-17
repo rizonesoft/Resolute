@@ -196,7 +196,7 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
   Catch2 arrives the same way when `D00 T02 §1` lands, pinned by commit for the same reason.
 
   **The rule for adding a dependency later:** it arrives through `FetchContent` pinned by commit, it is recorded here with what it is for, and the decision names what the suite would do without it. Two dependencies do not justify a package manager, and a package manager is itself a dependency with its own bootstrap, its own pinning story and its own failure modes. That trade changes if the count grows past a handful, and this line is where to revisit it.
-<!-- claim: count "lunasvg" shared/lucide/CMakeLists.txt = 6 -->
+<!-- claim: count "lunasvg" shared/lucide/CMakeLists.txt = 7 -->
 <!-- claim: absent .gitmodules -->
 - [x] Keep static linking explicit and enforced. **Corrected 2026-09-17:** the goal is already met and the prescription is not. The root sets only `add_link_options(-static)`; `-static-libgcc` and `-static-libstdc++` appear nowhere outside `extensions/RegStudio`. `llvm-objdump -p` on the built executable nonetheless lists no compiler runtime DLL. Done when: all three flags are set **once at the root** so every target inherits them and no per-tool `CMakeLists.txt` has to remember, `extensions/RegStudio` stops setting its own copy, and the import table is re-checked after the change and still names no compiler runtime. Cheaper substitute that fails the checkpoint: leaving the flags per-target, which is the fourteen-copies failure `AGENTS.md` exists to prevent, arriving one tool at a time.
 
@@ -254,18 +254,120 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
 
 ## 3. Warnings as Errors at One Level
 
-A warning level that varies per target is a warning level nobody trusts. The AutoIt tree carried 45 to 68 warnings per tool for years because the gate was optional; this is the section that stops that from recurring.
+> **Started:** 2026-09-17T07:17:17Z
+
+A warning level that varies per target is a warning level nobody trusts. A gate that is optional is a gate that is off, and this is the section that stops that from recurring.
+
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Five corrections, and one of them changes what two items have to do.**
+>
+> **This section was written against a toolchain that no longer exists.** Two items and the checkpoint name **vcpkg** and **wxWidgets** as the third-party code that must be exempt from warnings as errors. `§2` settled that there is no vcpkg and no wxWidgets: dependencies arrive through `FetchContent` pinned by commit. The real third-party code is **lunasvg**, and it lands in `build/<preset>/_deps`, so the exemption has to be written against that path rather than against a package manager.
+>
+> **The figure in the opening sentence could not be verified and has been removed.** It read "the AutoIt tree carried 45 to 68 warnings per tool for years". That range appears nowhere else in the tree, carries no recorded source, and **cannot be re-derived**: checking it needs `Au3Check.exe` and an AutoIt toolchain, neither of which is on this machine nor bootstrapped by `reskit`. An unsourced number that reads as a measurement is worse than no number, because the next reader has no way to know it was never measured. The argument does not depend on it.
+>
+> **"The placeholder target" is stale.** The item asks that `clang-tidy` run "over the placeholder target". There is no placeholder: `Resolute`, `ResoluteUI_static` and `Lucide_static` are real targets building real code, proven by `§2`.
+>
+> **`clang-tidy` has no compile database on release.** Only the debug preset sets `CMAKE_EXPORT_COMPILE_COMMANDS`, so `build/release` has no `compile_commands.json` and `clang-tidy` cannot run there at all. `clang-tidy.exe` itself **is** present, at `reskit/llvm-mingw/bin/clang-tidy.exe`. There is also no `.clang-tidy` file, so the tool would run its default checks rather than a chosen set.
+>
+> **There are no warning flags at the root at all.** `-Wall` appears only at `extensions/RegStudio/CMakeLists.txt:25` and `:30`, per target, twice, which is the exact pattern the `§2` P1 was about: a policy set where only one entry point reads it. The launcher and the shared library are compiled with **no** warning flags today.
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] Set the project warning level once, in one place, applied to every target the project owns. Done when: a new target added with no extra configuration inherits it, proven by adding a throwaway target with a deliberate warning and watching it fail.
-- [ ] Enable warnings as errors for project targets and **disable** them for vcpkg dependencies. Done when: a warning in `src/` fails the build and a warning inside wxWidgets does not.
-- [ ] Add `clang-tidy` configuration and wire it to the compile database. Done when: `clang-tidy` runs over the placeholder target and reports a count.
-- [ ] Record the starting finding count as the ratchet baseline. Done when: the number is in `todo/.tidy-baseline` and named here. Cheaper substitute: leaving the baseline implicit and comparing against zero, which makes the first real run unfixably red.
-- [ ] Prove the gate can fail. Done when: a deliberate unused-variable in `src/` fails the build with the expected diagnostic, and reverting it passes.
-- [ ] Commit: `"workspace: warnings as errors at one level, with a tidy baseline"`
+**Measured 2026-09-17 before any fix**, with `-Wall -Wextra` applied at the root as a temporary probe and then reverted:
 
-**Test checkpoint:** A deliberate warning in `src/` fails the build; the same warning inside a vcpkg dependency does not. `clang-tidy` reports a count that matches `todo/.tidy-baseline`. The failing and passing outputs are both quoted.
+| Source | Warnings under the probe |
+| --- | ---: |
+| `build/release/_deps` (lunasvg) | 93 |
+| **ours** (`shared/resolute-ui`, `src`) | **13** |
+| total | 106 |
+
+**Thirteen is small enough to fix rather than baseline**, so `-Werror` goes on with nothing suppressed and no warning baseline file for the compiler gate. That is the difference between a gate that is on and a gate that is on with an exception list nobody revisits.
+
+> [!WARNING]
+> **The 93 is an artifact of the probe and not a property of this build. Corrected 2026-09-17, during implementation.**
+>
+> The probe applied `-Wall -Wextra` with `add_compile_options` **at the root**, and a `FetchContent` dependency is an ordinary subdirectory of the same build, so lunasvg inherited the flags. That inheritance is the thing the shipped policy exists to prevent. Under the policy as it ships, nothing applies those flags to lunasvg: a clean rebuild recompiles its 23 translation units and emits **0** warnings.
+>
+> So the count was never measuring lunasvg's own build. It was measuring what would happen if the policy were written the wrong way, which is worth knowing and is not the same claim.
+>
+> **This also invalidated the proof the checkpoint was going to use.** "Leave lunasvg's 93 warnings in place while the build succeeds" cannot be run, because there are no 93 warnings to leave. The exemption is proven directly instead, and the direct proof is strictly better: the **same** deliberate unused variable is compiled in `src/main.cpp` and in `lunasvg.cpp`, and only one of them fails. A count that happens to be non-zero shows a dependency is noisy; an identical probe passing on one side of the line and failing on the other shows where the line is.
+
+- [x] Set the project warning level once, in one place, applied to every target the project owns. `cmake/ResoluteWarnings.cmake` holds the level, `-Wall -Wextra -Werror`, and both entry points include it: the root and `extensions/RegStudio`, the same two the link policy taught `§2` to cover.
+
+  **The Done-when was delivered by a different mechanism, and the substitution is the interesting part of this section.** It asked that a new target "with no extra configuration" *inherit* the level. Inheritance is `add_compile_options` at a directory scope, and that is exactly what reaches lunasvg, because a `FetchContent` dependency is an ordinary subdirectory of this same build. The prescription and the next item are in direct conflict: you cannot have inheritance and a by-construction third-party exemption from the same mechanism.
+
+  What shipped is the stronger half. The policy is applied per target, so nothing can leak into a dependency, and `resolute_assert_warnings_complete()` runs last at both entry points and **fails the configure** naming any target the project owns that never got it. A missed target is therefore impossible to ship rather than merely unlikely, which is what the item was protecting against. Inheritance can also be defeated by a target that sets its own options; an audit of what was actually applied cannot.
+
+  **Driven both ways.** A throwaway `add_library(ThrowawayProbe STATIC throwaway_probe.cpp)` added with no warning configuration:
+
+  ```
+  configure   exit 1
+    resolute_set_warnings() was never called for: ThrowawayProbe
+  ```
+
+  and with the one line added, the configure passes and the target's deliberate warning fails the build:
+
+  ```
+  throwaway_probe.cpp:1:23: error: unused variable 'deliberately_unused' [-Werror,-Wunused-variable]
+  ```
+
+  The second run is the falsifiability check: without it the first failure could have been the target being broken for some unrelated reason.
+- [x] Enable warnings as errors for project targets and **disable** them for third-party dependencies. **Corrected 2026-09-17:** this read "for vcpkg dependencies" and "a warning inside wxWidgets", and neither exists; `§2` settled that dependencies arrive by `FetchContent` and the third-party code is **lunasvg**, which carries 93 of the tree's 106 warnings. Done when: a warning in `src/` fails the build, and lunasvg still compiles with its 93 warnings without failing anything. The exemption must hold **by construction**, not by an exclusion list: a dependency is exempt because nothing applied the policy to it, so a dependency added later is exempt without anybody remembering to add it.
+
+  **Verified 2026-09-17 by compiling the identical probe on both sides of the line.** The same `int deliberately_unused = 42;` was inserted into `src/main.cpp` and into `_deps/lunasvg-src/source/lunasvg.cpp`:
+
+  ```
+  src/main.cpp      error: unused variable [-Werror,-Wunused-variable]   build exit 1
+  lunasvg.cpp       recompiled, 0 errors                                 build exit 0
+  ```
+
+  This is a better proof than counting a dependency's warnings, because it holds the code constant and varies only which side of the policy it sits on.
+
+  **And the exemption is structural, read from the build itself.** `build/release/compile_commands.json` carries `-Werror` on **13 of 13** of our C++ translation units and **0 of 21** under `_deps`. Nothing names lunasvg anywhere: it is exempt because no call reached it.
+- [x] Add `clang-tidy` configuration and wire it to the compile database. **Corrected 2026-09-17:** there is no "placeholder target"; `Resolute`, `ResoluteUI_static` and `Lucide_static` are real. Also, only the debug preset exports a compile database, so `clang-tidy` cannot run against release at all, and no `.clang-tidy` file exists so the tool would run an unchosen default set. Done when: a `.clang-tidy` exists naming the checks, **both** presets export `compile_commands.json`, and `clang-tidy` runs over our real translation units and reports a count.
+
+  **Done 2026-09-17.** `.clang-tidy` names the set, `CMakePresets.json` now sets `CMAKE_EXPORT_COMPILE_COMMANDS` on **release as well as debug**, and `clang-tidy` runs over the 13 translation units the compile database lists as ours.
+
+  **The check set is narrower than "everything", and the reason is in the file.** What is in: `bugprone-*`, `clang-analyzer-*`, `performance-*`, `misc-*`, the families that find defects. What is out: `modernize-*` and `readability-*`, which are churn and style, and style is `DESIGN.md`'s decision rather than a linter's.
+
+  **One exclusion is worth stating here because the number is startling.** `misc-const-correctness` alone produced **524 of 577** findings on the first run, 91 percent, every one of them "this local could be `const`". A baseline that is nine parts one style check is a baseline where a real regression is invisible, which is the opposite of what the ratchet exists for. It is excluded on the same defects-not-style principle as `readability-*`, and re-enabling it is a decision to make `const` a suite-wide convention and fix 524 sites, not a config tweak.
+- [x] Record the starting finding count as the ratchet baseline. **The number is 52**, in `todo/.tidy-baseline`, measured 2026-09-17 over the 13 translation units the release compile database lists as ours.
+
+  **52 unique findings from 75 raw diagnostic lines**, and the gap is the part that matters. A finding in a header is reported once per translation unit that includes it, and the same header arrives as both `resolute/theme.h` and `resolute/controls/../theme.h`. So the baseline file specifies the count as unique `(file, line, column, check)` tuples with the path normalised, because `D07 T01 §2` has to re-derive this number and a baseline nobody can reproduce is a number rather than a measurement.
+
+  | Check | Findings |
+  | --- | ---: |
+  | `performance-no-int-to-ptr` | 25 |
+  | `bugprone-switch-missing-default-case` | 12 |
+  | `performance-enum-size` | 8 |
+  | `performance-unnecessary-value-param` | 2 |
+  | five others, one each | 5 |
+  | **total** | **52** |
+
+  The 25 `performance-no-int-to-ptr` are Win32 talking: `LPARAM` and `WPARAM` are integers that carry pointers, so the cast is the API rather than a mistake.
+
+  **One of the 52 is a latent defect rather than a finding, and it is named in the baseline file so the ratchet starts with a target.** `bugprone-use-after-move` at `shared/resolute-ui/src/animation.cpp:55`: `AnimationManager::Add` reads `anim.id` after `std::move(anim)`. It returns the correct value today only because `Animation`'s implicit move copies its trivially-copyable `uint32_t id` rather than stealing it. Give `Animation` a user-defined move constructor and every caller storing an animation handle starts getting garbage, and it will not look like a memory bug.
+
+  **Not fixed here, deliberately.** This section owns the gate, not the code the gate found; fixing it would be the section widening into work `D07 T01 §2` exists to sequence. Recorded rather than silently carried.
+- [x] Prove the gate can fail. Verified 2026-09-17:
+
+  ```
+  src/main.cpp:34:41: error: unused variable 'deliberately_unused' [-Werror,-Wunused-variable]
+  build exit 1
+  ```
+
+  and reverting it returns the build to exit 0 with zero warnings in our code. The diagnostic names `-Werror` itself, so the failure is the gate rather than a compile error that would have happened anyway.
+- [x] Commit: `"workspace: warnings as errors at one level, with a tidy baseline"`
+
+<!-- claim: exists cmake/ResoluteWarnings.cmake -->
+<!-- claim: exists .clang-tidy -->
+<!-- claim: exists todo/.tidy-baseline -->
+<!-- claim: count "CMAKE_EXPORT_COMPILE_COMMANDS" CMakePresets.json = 2 -->
+<!-- claim: count "resolute_set_warnings" cmake/ResoluteWarnings.cmake = 4 -->
+
+**Test checkpoint:** A deliberate warning in `src/` fails the build; the same warning inside **lunasvg** does not, proven by leaving lunasvg's own 93 warnings in place while the build succeeds. `clang-tidy` reports a count that matches `todo/.tidy-baseline`. The failing and passing outputs are both quoted.
+
+**Corrected 2026-09-17:** this named a "vcpkg dependency", which does not exist. The substitution is not cosmetic: a package manager's exemption would be configured per package, and `FetchContent` brings the dependency in as an ordinary subdirectory of the same build, so the exemption has to come from **not applying** the policy rather than from turning it off. The checkpoint therefore also requires that the third-party exemption survive a dependency being added without anybody editing a list.
 
 ## 4. One Command Builds Any Tool
 

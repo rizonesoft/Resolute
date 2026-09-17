@@ -77,6 +77,10 @@ target_include_directories(Lucide_static
 
 target_link_libraries(Lucide_static PUBLIC lunasvg)
 
+# Our wrapper, so it answers to the warning policy. lunasvg itself does not:
+# it is a FetchContent dependency and nothing applies the policy to it.
+resolute_set_warnings(Lucide_static)
+
 # PUBLIC so every consumer sees the undecorated declarations. PRIVATE here would
 # let the library build with no decoration while its callers still saw
 # dllimport, which links against an import stub that does not exist.

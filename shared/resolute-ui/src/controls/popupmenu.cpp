@@ -256,7 +256,8 @@ WORD PopupMenu::Show(HWND parent, POINT screenPt,
 
     // Keep on screen
     HMONITOR hm = MonitorFromPoint(screenPt, MONITOR_DEFAULTTONEAREST);
-    MONITORINFO mi{ sizeof(mi) };
+    MONITORINFO mi{};
+    mi.cbSize = sizeof(mi);
     GetMonitorInfoW(hm, &mi);
     if (screenPt.x + sz.cx > mi.rcWork.right)
         screenPt.x = mi.rcWork.right - sz.cx;

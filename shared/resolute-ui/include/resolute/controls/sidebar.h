@@ -84,7 +84,6 @@ private:
     int      m_cachedIconSize    = 0;
     uint32_t m_cachedIconColor   = 0;
     uint32_t m_cachedAccentColor = 0;
-    float    m_mouseY = -1000.0f;  // current mouse Y for proximity warmth
 
     // ── Animation State ─────────────────────────────────────
     // Selection slide (animated Y position of accent bar)

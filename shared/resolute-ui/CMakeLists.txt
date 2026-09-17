@@ -25,6 +25,7 @@ set(RESOLUTEUI_LIBS comctl32 dwmapi d2d1 dwrite ole32 msimg32)
 
 # ── Static lib (for Resolute.exe — no DLL dependency) ────────
 add_library(ResoluteUI_static STATIC ${RESOLUTEUI_SOURCES})
+resolute_set_warnings(ResoluteUI_static)
 target_include_directories(ResoluteUI_static PUBLIC include)
 target_compile_definitions(ResoluteUI_static PUBLIC RESOLUTEUI_STATIC)
 # The static UI library is what the single-file launcher links, so its icon

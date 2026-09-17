@@ -268,7 +268,6 @@ void ContentView::OnPaint() {
         float gap = Dpi::ScaleF(8.0f, m_dpi);
         float margin = Dpi::ScaleF(12.0f, m_dpi);
         float radius = Dpi::ScaleF(6.0f, m_dpi);
-        float fontSize = Dpi::ScaleF(13.0f, m_dpi);
 
         // Slide position
         float slideOffset = m_errorSlideY * (bannerH + margin);
@@ -330,7 +329,6 @@ void ContentView::OnPaint() {
         float gap = Dpi::ScaleF(8.0f, m_dpi);
         float margin = Dpi::ScaleF(12.0f, m_dpi);
         float radius = Dpi::ScaleF(6.0f, m_dpi);
-        float fontSize = Dpi::ScaleF(13.0f, m_dpi);
 
         // Position below error banner if visible, otherwise at top
         float topOffset = (m_errorAlpha > 0.001f) ? bannerH + margin * 2 : margin;

@@ -1,0 +1,48 @@
+# The suite's static-analysis level. D00 T01 §3.
+#
+# The set is deliberately narrower than "everything". A check list nobody can
+# get to zero is a list somebody turns off, and this one is attached to a
+# ratchet (`todo/.tidy-baseline`) that only moves down.
+#
+# What is in: the families that find defects rather than style opinions.
+#   bugprone-*        real mistakes: misuse, narrowing, dangling, bad casts
+#   clang-analyzer-*  path-sensitive analysis: leaks, null derefs, uninit reads
+#   performance-*     copies and conversions that cost something
+#   misc-*            the leftovers that are still defects
+#
+# What is out, and why, so the next person does not re-litigate it:
+#   modernize-*       churn across the whole intake for no behavioural gain
+#   readability-*     style, and DESIGN.md is where style is decided
+#   *-magic-numbers   a Direct2D surface is made of them
+#   misc-non-private-member-variables-in-classes  the control structs are PODs
+#   misc-include-cleaner  reports Win32 umbrella headers as unused
+#   misc-const-correctness  see below
+#
+# `misc-const-correctness` is excluded on the same defects-not-style principle,
+# and it is called out because the number is startling. It alone accounted for
+# 524 of 577 findings on the first run, 91 percent, all of them "this local
+# could be const". A baseline that is nine parts one style check is a baseline
+# where a real regression is invisible, which is the opposite of what the
+# ratchet in D07 T01 §2 is for. Re-enabling it is a decision to make const a
+# suite-wide convention and fix 524 sites, not a config tweak.
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  performance-*,
+  misc-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-narrowing-conversions,
+  -misc-non-private-member-variables-in-classes,
+  -misc-include-cleaner,
+  -misc-use-anonymous-namespace,
+  -misc-const-correctness,
+  -readability-magic-numbers,
+  -bugprone-magic-numbers
+
+# Our code only. A dependency is not ours to fix, which is the same rule the
+# warning policy states: `cmake/ResoluteWarnings.cmake`.
+HeaderFilterRegex: '.*[/\](src|shared)[/\].*'
+
+WarningsAsErrors: ''
+FormatStyle: none

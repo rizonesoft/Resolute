@@ -8,6 +8,7 @@ project(RegStudio LANGUAGES CXX RC)
 # libc++.dll and libunwind.dll imports to the standalone build, caught by the
 # independent review of 6062ecb.
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteLinkPolicy.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteWarnings.cmake")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,16 +19,17 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 set(RESOURCES "resources/resource.rc")
 
 add_executable(RegStudio WIN32 ${SOURCES} ${RESOURCES})
+resolute_set_warnings(RegStudio)
 
 # Compiler-specific flags
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # MinGW GCC
-    target_compile_options(RegStudio PRIVATE -municode -O3 -Wall)
+    target_compile_options(RegStudio PRIVATE -municode -O3)
     # Static flags come from the root CMakeLists.txt, set once for every target.
     target_link_options(RegStudio PRIVATE -municode)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # Clang/LLVM-MinGW
-    target_compile_options(RegStudio PRIVATE -O3 -Wall)
+    target_compile_options(RegStudio PRIVATE -O3)
     target_link_options(RegStudio PRIVATE -municode)
     # Define UNICODE for wWinMain entry point
     target_compile_definitions(RegStudio PRIVATE UNICODE _UNICODE)
@@ -45,3 +47,7 @@ target_link_libraries(RegStudio PRIVATE
     uxtheme     # Visual Styles (Explorer look)
     advapi32    # Registry API
 )
+
+# Standalone project: the root is never read on this path, so the completeness
+# check runs here too. D00 T01 §3.
+resolute_assert_warnings_complete()

@@ -1,0 +1,73 @@
+# clang-tidy ratchet baseline
+#
+# Measured by D00 T01 §3 on 2026-09-17. Ratcheted by D07 T01 §2, which is what
+# makes it one-way: a count above this fails, equal passes, below rewrites this
+# file down in the same commit.
+#
+# Format: the first line that is not blank and does not start with '#' is
+# `count: <integer>`. Everything else here is for the person reading it.
+
+count: 52
+
+# ── How to reproduce this number exactly ─────────────────────
+#
+# A baseline nobody can re-derive is a number, not a measurement. Three things
+# decide it, and all three have to match:
+#
+# 1. THE TRANSLATION UNITS. Every entry in `build/release/compile_commands.json`
+#    whose file is not under `_deps/` and does not end in `.rc`. That was 13.
+#    Taking the list from the compile database rather than from a glob is what
+#    keeps it honest: a source nobody compiles cannot hide findings.
+#
+# 2. THE CONFIG. The repository's `.clang-tidy`, which is why the check set is
+#    committed rather than passed on a command line.
+#
+#      clang-tidy -p build/release --quiet <file>
+#
+# 3. THE DEDUPLICATION. Count UNIQUE (file, line, column, check) tuples, with
+#    the file path normalised: separators to '/', '..' segments collapsed, and
+#    case folded. Without this the number is wrong twice over. A diagnostic in
+#    a header is reported once per translation unit that includes it, so the
+#    raw line count was 75 against 52 real findings; and the same header is
+#    reached as both `resolute/theme.h` and `resolute/controls/../theme.h`,
+#    which counts twice unless the path is normalised.
+#
+# Release, not debug: release is what ships, and only release carries the
+# optimiser-dependent analyser paths.
+
+# ── What the 52 are ──────────────────────────────────────────
+#
+#   25  performance-no-int-to-ptr
+#   12  bugprone-switch-missing-default-case
+#    8  performance-enum-size
+#    2  performance-unnecessary-value-param
+#    1  bugprone-use-after-move
+#    1  misc-redundant-expression
+#    1  bugprone-misplaced-widening-cast
+#    1  bugprone-implicit-widening-of-multiplication-result
+#    1  bugprone-nondeterministic-pointer-iteration-order
+#
+# The 25 `performance-no-int-to-ptr` are Win32 talking: LPARAM and WPARAM are
+# integers that carry pointers, and the cast is the API rather than a mistake.
+# They are the first candidates for a targeted suppression, not for a fix.
+#
+# ── The one that is a defect rather than a finding ───────────
+#
+# `bugprone-use-after-move` at shared/resolute-ui/src/animation.cpp:55
+#
+#   uint32_t AnimationManager::Add(Animation anim) {
+#       anim.id = m_nextId++;
+#       m_animations.push_back(std::move(anim));
+#       return anim.id;                          // <-- read after the move
+#   }
+#
+# This returns the right value today, and only by accident. `Animation` has an
+# implicit move constructor, so its `uint32_t id` is copied rather than stolen
+# and survives the move. The day `Animation` gains a user-defined move, or `id`
+# stops being trivially copyable, this starts returning garbage to every caller
+# that stores an animation handle, and it will not look like a memory bug.
+#
+# Left in the baseline deliberately: D00 T01 §3 owns the gate, not the code the
+# gate found, and fixing it here would be the section widening itself. It is
+# called out so the ratchet in D07 T01 §2 starts with a known first target
+# rather than a flat list.
