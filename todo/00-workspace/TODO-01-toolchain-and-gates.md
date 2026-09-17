@@ -43,7 +43,7 @@ track: W1
 | Order | Section | Deliverable                                  | Depends On | Status |
 | :---: | :-----: | -------------------------------------------- | ---------- | :----: |
 |   1   |   §1    | Harden the toolchain bootstrap               | D00 T03 §3 |  [x]   |
-|   2   |   §2    | CMake structure and dependencies             | §1         |  [ ]   |
+|   2   |   §2    | CMake structure and dependencies             | §1         |  [x]   |
 |   3   |   §3    | Warnings as errors at one level              | §2         |  [ ]   |
 |   4   |   §4    | One command builds any tool                  | §2         |  [ ]   |
 |   5   |   §5    | One command runs every gate                  | §3, §4     |  [ ]   |
@@ -244,6 +244,13 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
 - [x] Commit: `"workspace: repository cmake structure and dependency policy"`
 
 **Test checkpoint:** `cmake --preset release && cmake --build --preset release` succeeds on a clean checkout after bootstrap and produces `Resolute.exe`. The executable's imports are listed and carry no compiler runtime DLL. **Separately, the executable is run with `System/` deleted and its icons still render**, because the import table cannot see the `LoadLibraryW` in `shared/resolute-ui/src/icons.cpp` and an import-only check would pass a tool that still needs a DLL. The icon count is read back from the running process, not inferred from the window appearing: a launcher with no icons still draws a window. No path in `build/` names `samples`, and a configure succeeds with `samples/` moved aside. `git status` is clean afterwards. The binary size is quoted against the 1.39 MB baseline.
+
+> **Verified:** 2026-09-17 | §2 | the **launcher ships as one file**, `Bin/Release/Resolute.exe` at 2,512,384 bytes, down from three files totalling 4,079,106 · proven by the only instrument that can see this defect: launched with no DLL anywhere it creates its window with four control classes live and loads **no** Lucide or ResoluteUI module, and a linked binary reports **icons=29, first=badge-info**, because a launcher with no icons still draws a window · imports 23, none a compiler runtime or shipped DLL · both SHARED targets removed after checking by search that nothing linked them and `AGENTS.md` forbids anything ever doing so · presets pin all four tool paths to `reskit`, proven against decoy `clang`, `clang++` and `ninja` placed first on `PATH` · lunasvg moved from the movable tag `v3.5.0` to commit `83c58df8`, verified by a clean refetch · both presets build; `git status` clean after a full configure and build
+> **Review:** round 2, candidate `6062ecb` `701fd87` `820047c` `85c3707` plus the follow-up -- `adversarial` approve after fixes · `consistency` approve after fix (1) · `integration` approve after fixes (2) · `source-defect` approve · `design` not-applicable · `record` approve after fix (1). Raw findings: docs/reviews/00-workspace/D00-T01-s2.md
+> **Independent:** `codex review --commit 6062ecb` (gpt-6-astra, high) returned **one P1**, the first of this project, and it was worth more than a list. Centralising the link flags broke RegStudio's standalone build, adding `libc++.dll` and `libunwind.dll` imports. I had written into this section that the change was "unbuilt" because RegStudio is commented out of the **root** build; it is a standalone CMake project its own script configures directly. The reviewer did not argue that, it built it. Second section running where its advantage was constructing a probe rather than reading a diff.
+> **CRUD:** applicable | driven: `reskit/Build-Resolute.ps1` and `reskit/Build-Extension.ps1` were **run**, not inspected, which is how three defects surfaced including one predating this session: PowerShell does not expand `$Var` in the bareword `-DNAME=$Var`, so these scripts had never configured a build type
+> **Duration:** 19
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 ## 3. Warnings as Errors at One Level
 
