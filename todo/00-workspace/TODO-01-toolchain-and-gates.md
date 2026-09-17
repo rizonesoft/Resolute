@@ -222,6 +222,8 @@ The intake brings a working CMake structure: C++23, presets driving Ninja, LTO o
   icon count read from a linked binary         icons=29  first=badge-info
   ```
 
+  **Read that first line precisely.** It means the *launcher* ships as one file. `Bin/Release/System/` is not empty in general: it is where **extension executables** are deployed for the launcher to discover, which is the `RESEXT` model in `docs/extensions.md`. Building RegStudio puts `RegStudio.exe` there, as it should. What is gone is shared **libraries**: no tool loads a DLL that another tool owns, which is the rule `AGENTS.md` states and which the two removed SHARED targets would have broken.
+
   The last line is the one the checkpoint insists on: a launcher with no icons still draws a window, so counting them is the only thing that distinguishes a working icon set from a missing one.
 <!-- claim: count "LoadLibraryW" shared/resolute-ui/src/icons.cpp = 3 -->
 <!-- claim: count "LUCIDE_STATIC" shared/resolute-ui/src/icons.cpp = 2 -->

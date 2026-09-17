@@ -15,6 +15,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path $PSScriptRoot -Parent
+# CMake reads a backslash as an escape in the cache files it writes, so any
+# tool path handed to it must use forward slashes. $RepoRoot is a Windows
+# path; this is the same value with separators CMake can store.
+$RepoRootFwd = $RepoRoot -replace '\\', '/'
 
 # Initialize ResKit
 $ResKitInit = Join-Path $RepoRoot "reskit\Init-ResKit.ps1"
@@ -37,7 +41,7 @@ if (-not (Test-Path $BuildDir)) {
 }
 
 Push-Location $BuildDir
-$cmakeResult = & cmake $RepoRoot -G Ninja "-DCMAKE_BUILD_TYPE=$BuildType" "-DCMAKE_C_COMPILER=$RepoRoot\reskit\llvm-mingw\bin\clang.exe" "-DCMAKE_CXX_COMPILER=$RepoRoot\reskit\llvm-mingw\bin\clang++.exe" "-DCMAKE_RC_COMPILER=$RepoRoot\reskit\llvm-mingw\bin\llvm-windres.exe" "-DCMAKE_MAKE_PROGRAM=$RepoRoot\reskit\ninja\ninja.exe" 2>&1
+$cmakeResult = & cmake $RepoRoot -G Ninja "-DCMAKE_BUILD_TYPE=$BuildType" "-DCMAKE_C_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang.exe" "-DCMAKE_CXX_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang++.exe" "-DCMAKE_RC_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/llvm-windres.exe" "-DCMAKE_MAKE_PROGRAM=$RepoRootFwd/reskit/ninja/ninja.exe" 2>&1
 $cmakeExit = $LASTEXITCODE
 $cmakeResult | Out-Host
 if ($cmakeExit -ne 0) {

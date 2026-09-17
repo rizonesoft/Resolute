@@ -20,6 +20,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path $PSScriptRoot -Parent
+# CMake reads a backslash as an escape in the cache files it writes, so any
+# tool path handed to it must use forward slashes. $RepoRoot is a Windows
+# path; this is the same value with separators CMake can store.
+$RepoRootFwd = $RepoRoot -replace '\\', '/'
 
 # Initialize ResKit if available
 $ResKitInit = Join-Path $RepoRoot "reskit\Init-ResKit.ps1"
@@ -52,7 +56,7 @@ if (-not (Test-Path $BuildDir)) {
 }
 
 Push-Location $BuildDir
-cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BuildType -DCMAKE_C_COMPILER="$RepoRoot\reskit\llvm-mingw\bin\clang.exe" -DCMAKE_CXX_COMPILER="$RepoRoot\reskit\llvm-mingw\bin\clang++.exe" -DCMAKE_RC_COMPILER="$RepoRoot\reskit\llvm-mingw\bin\llvm-windres.exe" -DCMAKE_MAKE_PROGRAM="$RepoRoot\reskit\ninja\ninja.exe"
+cmake .. -G Ninja "-DCMAKE_BUILD_TYPE=$BuildType" -DCMAKE_C_COMPILER="$RepoRootFwd/reskit/llvm-mingw/bin/clang.exe" -DCMAKE_CXX_COMPILER="$RepoRootFwd/reskit/llvm-mingw/bin/clang++.exe" -DCMAKE_RC_COMPILER="$RepoRootFwd/reskit/llvm-mingw/bin/llvm-windres.exe" -DCMAKE_MAKE_PROGRAM="$RepoRootFwd/reskit/ninja/ninja.exe"
 if ($LASTEXITCODE -ne 0) {
     Pop-Location
     Write-Host "CMake configure failed!" -ForegroundColor Red
@@ -69,7 +73,16 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Copy built exe to System folder
-$BuiltExe = Get-ChildItem -Path $BuildDir -Filter "*.exe" -Exclude "*.dir" | Select-Object -First 1
+# Search the build directory AND the extension's own bin/, because an
+# extension may set CMAKE_RUNTIME_OUTPUT_DIRECTORY: RegStudio sends its
+# executable to extensions/RegStudio/bin. Looking only in the build directory
+# made this script warn "No .exe found" immediately after linking one, which
+# teaches the reader to ignore its output. D00 T01 §2.
+$SearchDirs = @($BuildDir, (Join-Path $ExtPath 'bin')) | Where-Object { Test-Path $_ }
+$BuiltExe = $SearchDirs |
+    ForEach-Object { Get-ChildItem -Path $_ -Filter "*.exe" -File -ErrorAction SilentlyContinue } |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1
 if ($BuiltExe) {
     Copy-Item $BuiltExe.FullName -Destination $SystemDir -Force
     Write-Host "[3/3] Done! Output: Bin\Release\System\$($BuiltExe.Name)" -ForegroundColor Green
