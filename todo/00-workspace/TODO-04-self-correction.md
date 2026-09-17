@@ -59,7 +59,7 @@ track: W1
 |   2   |   §2    | The review-finding ledger                  | --         |  [x]   |
 |   3   |   §3    | Section calibration                        | §2         |  [x]   |
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [x]   |
-|   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [ ]   |
+|   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [x]   |
 
 ---
 
@@ -347,6 +347,13 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 <!-- claim: count "anchor-unresolved" scripts/todo-adjacency.py = 1 -->
 <!-- claim: count "anchor-unmatched" scripts/todo-adjacency.py = 1 -->
 <!-- claim: count "section 19" scripts/todo-adjacency.py = 0 -->
+
+> **Verified:** 2026-09-17 | §5 | the advisory was mostly right and this section's filed premise was wrong, which is the finding worth keeping · of the four shipped anchors that failed, **three were bad anchors and one was a real matcher miss**: `document` anchored on repository prose, `document` anchored on a critical chain printed to a terminal, `list` duplicating a table `reporting` already claimed, and `audit` on a ledger whose body says "ledger" 17 times · so the compound `document` rule this section called "the sharpest case" was **doing its job** and is kept, dated, with its reason · the defect that survives is the reporting rather than the measurement: one message covered three different defects and asserted ownership it never tested, and is now `anchor-unresolved`, `anchor-unmatched` and `unowned`, each naming what to do and each naming **the vocabulary it searched for** · advisory diagnostics **72 to 68**, anchored applicable kinds 120 to 117, and the row that matters, kind-anchors on shipped sections unowned **4 to 0** · the remaining 66 all point at **open** sections, the expected state for unwritten work, and they are left rather than suppressed because each now names its anchor and the vocabulary it wanted, which is what makes it actionable when that section is built. This is deliberately **not** a deferral: no section owns them, they clear as the sections they name get written · **no stamped section body was edited**, proven by checking every changed line against the line ranges of every `[x]` section: 0 · the check is not blind, driven both ways · a citation to "D00 T03 section 19" in two source files resolved to nothing and is corrected
+> **Review:** round 1, candidate `625f3dc` -- `adversarial` approve · `consistency` approve after fix (1) · `integration` approve · `source-defect` approve after fix (1) · `design` approve after fix (1) · `record` approve after fixes (1). Raw findings: docs/reviews/00-workspace/D00-T04-s5.md
+> **Independent:** `codex review --commit 625f3dc` (gpt-6-astra, high) returned **no actionable regressions**, confirming the ownership checks and escalation behaviour are preserved. First clean sweep in five sections, and the reason looks structural rather than lucky: this candidate changed a diagnostic's wording and three declarations, with the behaviour-changing part limited to one added regex alternative, where the four before it each changed how something was built. Its transcript did surface a stale `build/todo-progress.json`, a derived gitignored artifact, before my own sweep did, because I ran `plan --check` before ticking the items rather than after. Synced.
+> **CRUD:** not-applicable | this reads the plan and writes no user data. The behavioural evidence is the pair of probes: **A** re-anchors at a section that does not exist and is reported as `anchor-unresolved`; **B** re-anchors a **resolvable** reference at a section that does not deliver the kind and the count rises 68 to 69. B is the load-bearing one, because only a resolvable anchor can distinguish a fixed check from a blinded one. Both reverted, and `--require-owned` still exits 1 while diagnostics exist.
+> **Duration:** 7
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 **Test checkpoint:** `python scripts/todo-graph.py validate` reports an advisory count recorded in this section, down from 72, with every remaining advisory naming something a reader can act on. The four shipped anchors above report as owned and `git diff` shows no change inside any `[x]` section body. A deliberately wrong anchor is still reported, driven, so the fall in count is not the check going blind. `python scripts/todo-graph.py self-test` stays green.
 

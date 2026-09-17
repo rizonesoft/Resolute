@@ -4,20 +4,21 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**50 findings across 12 sections.**
+**56 findings across 13 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `correctness` | 17 | the code does the wrong thing |
-| `record` | 14 | the plan or the evidence misdescribes what happened |
-| `consistency` | 12 | disagrees with the rest of the suite, its naming, or its layout |
+| `correctness` | 18 | the code does the wrong thing |
+| `record` | 16 | the plan or the evidence misdescribes what happened |
+| `consistency` | 13 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 2 | fails under hostile or unexpected input |
+| `design` | 2 | the rendered surface disagrees with the design contract |
 | `performance` | 2 | correct, and too slow or too costly to be used |
-| `design` | 1 | the rendered surface disagrees with the design contract |
 | `integration` | 1 | a consumer, caller, or downstream artifact no longer holds |
 | `reproducibility` | 1 | the same input does not produce the same output |
+| `source-defect` | 1 | a Win32 contract, registry layout, or other source read wrongly |
 
 ## Every finding
 
@@ -73,3 +74,9 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §4` | F2 | `correctness` | fixed | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | `correctness` | fixed | unreadable evidence was reported as absent evidence |
 | `D00 T04 §4` | F4 | `record` | fixed | the headline number counted work that cannot be delayed |
+| `D00 T04 §5` | F1 | `record` | corrected | the section's own premise was wrong, and the advisory was mostly right |
+| `D00 T04 §5` | F2 | `source-defect` | corrected | the compound `document` rule was accused and is correct |
+| `D00 T04 §5` | F3 | `correctness` | fixed | one message covered three defects and asserted what it had not tested |
+| `D00 T04 §5` | F4 | `consistency` | fixed | a citation that resolved to nothing, in two source files |
+| `D00 T04 §5` | F5 | `design` | fixed | the vocabulary helper printed regex, not words |
+| `D00 T04 §5` | F6 | `record` | advisory | my own measuring instruments failed three times |
