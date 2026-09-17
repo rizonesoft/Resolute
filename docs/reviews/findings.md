@@ -4,19 +4,19 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**69 findings across 15 sections.**
+**75 findings across 16 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 21 | the plan or the evidence misdescribes what happened |
-| `correctness` | 20 | the code does the wrong thing |
-| `consistency` | 15 | disagrees with the rest of the suite, its naming, or its layout |
+| `record` | 22 | the plan or the evidence misdescribes what happened |
+| `correctness` | 21 | the code does the wrong thing |
+| `consistency` | 16 | disagrees with the rest of the suite, its naming, or its layout |
+| `design` | 4 | the rendered surface disagrees with the design contract |
 | `adversarial` | 3 | fails under hostile or unexpected input |
-| `design` | 3 | the rendered surface disagrees with the design contract |
-| `integration` | 2 | a consumer, caller, or downstream artifact no longer holds |
-| `source-defect` | 2 | a Win32 contract, registry layout, or other source read wrongly |
+| `integration` | 3 | a consumer, caller, or downstream artifact no longer holds |
+| `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
 | `performance` | 2 | correct, and too slow or too costly to be used |
 | `reproducibility` | 1 | the same input does not produce the same output |
 
@@ -62,6 +62,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T01 §6` | F4 | `record` | corrected | the size baseline named a figure its own source superseded |
 | `D00 T01 §6` | F5 | `adversarial` | corrected | a network check was being wired into a gate that must work offline |
 | `D00 T01 §6` | F6 | `source-defect` | cleared | clang-tidy 21 had a false positive that 23 retired |
+| `D00 T02 §1` | F1 | `correctness` | fixed | a defect `§5` already fixed, reintroduced here |
+| `D00 T02 §1` | F2 | `integration` | fixed | adding our own tests put 37 dependency findings into the baseline |
+| `D00 T02 §1` | F3 | `source-defect` | fixed | the link failed because UNICODE propagates publicly |
+| `D00 T02 §1` | F4 | `design` | corrected | the tool tag is not printable, and the requirement was still met |
+| `D00 T02 §1` | F5 | `record` | corrected | the checkpoint still named the preset its own first item had corrected |
+| `D00 T02 §1` | F6 | `consistency` | corrected | a scratch file that was never a test |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |

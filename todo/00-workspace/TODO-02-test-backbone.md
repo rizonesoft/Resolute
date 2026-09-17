@@ -41,7 +41,7 @@ track: W1
 
 | Order | Section | Deliverable                                | Depends On     | Status |
 | :---: | :-----: | ------------------------------------------ | -------------- | :----: |
-|   1   |   §1    | Catch2 harness and assertion conventions   | D00 T01 §2     |  [ ]   |
+|   1   |   §1    | Catch2 harness and assertion conventions   | D00 T01 §2     |  [x]   |
 |   2   |   §2    | Fixture store and disposable targets       | §1             |  [ ]   |
 |   3   |   §3    | House-style capture store                  | --             |  [ ]   |
 |   4   |   §4    | Parity driver for a built tool             | §1, §2         |  [ ]   |
@@ -156,6 +156,14 @@ Catch2 is a dependency, not a design. What this section decides is the shape of 
 <!-- claim: exists tests/CMakeLists.txt -->
 <!-- claim: count "testPresets" CMakePresets.json = 1 -->
 <!-- claim: count "--preset debug --output-on-failure" scripts/check-all.ps1 = 1 -->
+
+> **Verified:** 2026-09-17 | §1 | the suite exists, runs, and gates: `ctest --preset debug` reports **6 tests, 100 percent passed, exit 0**, and `check-all` reads **`11 gate(s) ok`** with no `1 not present`, the first time every gate in this repository has actually run · Catch2 v3.16.0 through `FetchContent` pinned to the **commit** `317ac1ed`, not the annotated tag object `fd79eadb`, per `D00 T01 §2`'s recorded policy · `testPresets` added for both configurations, which `CMakePresets.json` had never carried, with `noTestsAction: error` so a suite discovering nothing fails rather than reporting success over zero tests · **the link failed first and was diagnosed by reading the archive**: `ResoluteUI_static` defines `UNICODE` publicly so Catch2 compiled `wmain`, `llvm-nm` on `libCatch2Maind.a` shows `T wmain` and no `main`, and without `-municode` the CRT pulled mingw's GUI stub `crtexewin.o` and failed on `WinMain` · a failing test fails the gate, and the failure carries all three things the item asked for in one log: the tag `dpi ui`, the expansion `4 == 99`, and the captures · `test_font.cpp` deleted with `git rm` and its claim flipped `exists` to `absent`, because 30 lines that print font metrics and assert nothing is not a test and could not become one · the first tests were chosen to be worth having, pinning `MulDiv`'s round-to-nearest, invisible at 100 percent scaling and visible on every odd value at 125
+> **Review:** round 2, candidate `35b0ef8` `c195629` -- `adversarial` approve after fix (1) · `consistency` approve after fixes (2) · `integration` approve after fix (1) · `source-defect` approve · `design` approve · `record` approve. Raw findings: docs/reviews/00-workspace/D00-T02-s1.md
+> **Independent:** `codex review --commit 35b0ef8` (gpt-6-astra, high) returned **one P2 and it was right**, and it is a defect **its own review of `D00 T01 §5` already found once**. `ctest --preset` reads `CMakePresets.json` from the current directory; run from `scripts/` the gate failed while the tree was healthy. `§5`'s review found the same thing for `cmake --preset` and I fixed the **instance** rather than the class, so this section rebuilt it two sections later. The reviewer proposed wrapping the `ctest` call, which would have closed instance two and left the class open; `check-all.ps1` now runs from the repository root once for every gate, which immediately caught a third instance nobody had reported, `plan --check`. **A defect the reviewer already found once is the cheapest probe available, and I did not re-run it.**
+> **CRUD:** applicable | driven: the suite was **run** rather than inspected in six states, which is how the `wmain` link failure, the tag's absence from Catch2's reporter, and the dependency findings were each seen. The failure path is exercised directly: a deliberately failing assertion fails the gate and the run exits non-zero. **The read-back convention this section decides is written and not yet exercised**, because `Dpi` is pure and has nothing to read back; it is written for `D00 T02 §2`'s fixtures, and saying so is better than implying it is proven.
+> **Duration:** 19
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
+> **Deferred:** the read-back rule's first real exercise waits on a disposable target for destructive code. -> XREF: D00 T02 §2 -- the fixture store that gives it one
 
 **Test checkpoint:** `ctest --preset debug` runs and exits 0. A deliberately failing assertion exits non-zero and prints tool tag, expected, and actual; both outputs are quoted. `pwsh scripts/check-all.ps1` fails when a test fails.
 

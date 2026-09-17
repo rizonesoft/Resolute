@@ -646,7 +646,7 @@ Five gates that must each be remembered are five gates that get skipped under ti
 > **CRUD:** applicable | driven: the gate was **run** in six states rather than inspected, which is how the report format, the two-configuration failure, and the interaction between the probe and the claims gate were each seen. Two probes were rebuilt after their first run taught something: the build warning moved out of `src/main.cpp` because that file carries a `lines` claim and appending to it failed a second gate, and the coverage-floor fixture stopped raising `COVERAGE_FLOOR` because that value is **itself claimed**, so lowering the floor to pass is not available.
 > **Duration:** 35
 > **Implementer:** Claude Opus 5 (claude-opus-5[1m])
-> **Deferred:** the tests gate's `not present` branch is a tolerance, not a pass, and it is removed by the section that lands the harness. -> XREF: D00 T02 §1 -- lands the Catch2 harness and deletes this branch
+> **Resolved:** 2026-09-17 in `35b0ef8`. The tests gate's `not present` branch is a tolerance, not a pass, and it is removed by the section that lands the harness. `D00 T02 §1` landed Catch2 and deleted the branch; the summary line changed from `10 gate(s) ok, 1 not present` to `11 gate(s) ok`. -> XREF: D00 T02 §1 -- lands the Catch2 harness and deletes this branch
 
 **Test checkpoint:** `pwsh scripts/check-all.ps1` exits 0 on a clean tree and prints one line per gate. Introducing one deliberate warning makes it exit non-zero and show only that gate's detail. A tidy count one above the baseline fails. All three runs are quoted in the commit body.
 

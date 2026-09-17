@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **15 of 122 sections complete (12%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **16 of 122 sections complete (13%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -110,7 +110,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T01 §4` | One command builds any tool                    |   6   |
 | [x] | `D00 T01 §5` | One command runs every gate                    |   6   |
 | [x] | `D00 T01 §6` | Keep the toolchain current                     |  12   |
-| [ ] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   6   |
+| [x] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   6   |
 | [ ] | `D00 T02 §2` | Fixture store and disposable targets           |   6   |
 | [ ] | `D00 T02 §3` | House-style capture store                      |   5   |
 | [ ] | `D00 T02 §4` | Parity driver for a built tool                 |   7   |
