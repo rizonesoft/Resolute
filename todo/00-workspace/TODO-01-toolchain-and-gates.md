@@ -331,18 +331,27 @@ A warning level that varies per target is a warning level nobody trusts. A gate 
   **The check set is narrower than "everything", and the reason is in the file.** What is in: `bugprone-*`, `clang-analyzer-*`, `performance-*`, `misc-*`, the families that find defects. What is out: `modernize-*` and `readability-*`, which are churn and style, and style is `DESIGN.md`'s decision rather than a linter's.
 
   **One exclusion is worth stating here because the number is startling.** `misc-const-correctness` alone produced **524 of 577** findings on the first run, 91 percent, every one of them "this local could be `const`". A baseline that is nine parts one style check is a baseline where a real regression is invisible, which is the opposite of what the ratchet exists for. It is excluded on the same defects-not-style principle as `readability-*`, and re-enabling it is a decision to make `const` a suite-wide convention and fix 524 sites, not a config tweak.
-- [x] Record the starting finding count as the ratchet baseline. **The number is 52**, in `todo/.tidy-baseline`, measured 2026-09-17 over the 13 translation units the release compile database lists as ours.
+- [x] Record the starting finding count as the ratchet baseline. **The number is 59**, in `todo/.tidy-baseline`, measured 2026-09-17 over the 13 translation units the release compile database lists as ours.
 
-  **52 unique findings from 75 raw diagnostic lines**, and the gap is the part that matters. A finding in a header is reported once per translation unit that includes it, and the same header arrives as both `resolute/theme.h` and `resolute/controls/../theme.h`. So the baseline file specifies the count as unique `(file, line, column, check)` tuples with the path normalised, because `D07 T01 §2` has to re-derive this number and a baseline nobody can reproduce is a number rather than a measurement.
+  **59 unique findings from 84 raw diagnostic lines**, and the gap is the part that matters. A finding in a header is reported once per translation unit that includes it, and the same header arrives as both `resolute/theme.h` and `resolute/controls/../theme.h`. So the baseline file specifies the count as unique `(file, line, column, check)` tuples with the path normalised, because `D07 T01 §2` has to re-derive this number and a baseline nobody can reproduce is a number rather than a measurement.
 
   | Check | Findings |
   | --- | ---: |
   | `performance-no-int-to-ptr` | 25 |
   | `bugprone-switch-missing-default-case` | 12 |
   | `performance-enum-size` | 8 |
+  | `clang-analyzer-security.ArrayBound` | 4 |
   | `performance-unnecessary-value-param` | 2 |
-  | five others, one each | 5 |
-  | **total** | **52** |
+  | `clang-analyzer-deadcode.DeadStores` | 2 |
+  | six others, one each | 6 |
+  | **total** | **59** |
+
+  > [!WARNING]
+  > **This was committed as 52 and corrected to 59 by the independent review.** The seven missing findings were every `clang-analyzer-*` diagnostic, and they were in the log the whole time. My counting script matched the check name with the character class `[a-z0-9,.-]+`, and analyzer checks are spelled `clang-analyzer-security.ArrayBound`, with uppercase letters. Every one of them failed to match and was dropped silently, leaving a plausible total that was quietly wrong.
+  >
+  > **The measurement instrument was the defect, not the run.** The number came out looking reasonable, which is exactly why nothing flagged it: a parser that drops a whole category reports a smaller number, not an error. Had it shipped, the ratchet's first honest run would have reported 59 against a baseline of 52 and failed this unchanged tree as a regression.
+  >
+  > The character-class trap is now written into `todo/.tidy-baseline` itself, because `D07 T01 §2` has to write this same parser and would meet the same edge.
 
   The 25 `performance-no-int-to-ptr` are Win32 talking: `LPARAM` and `WPARAM` are integers that carry pointers, so the cast is the API rather than a mistake.
 
