@@ -113,22 +113,58 @@ function Get-OutputDir {
     return (Join-Path $RepoRoot "Bin\$Configuration")
 }
 
+# ── Keep the diagnostics, bound the output ───────────────────
+#
+# Piping a failed compile to Out-Null throws away the one thing the reader
+# needs: ninja prints the failing command and the compiler's diagnostics on
+# stdout. The full log is kept under build/logs/, which is gitignored, and a
+# bounded excerpt is printed on failure. That is AGENTS.md's output discipline
+# rather than an exception to it, and the independent review found the script
+# reporting "compile failed" with nothing a reader could act on.
+$LogDir = Join-Path $RepoRoot 'build\logs'
+
+function Invoke-Logged {
+    param([string]$LogName, [scriptblock]$Command)
+
+    New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
+    $log = Join-Path $LogDir "$LogName.log"
+    & $Command 2>&1 | Tee-Object -FilePath $log | Out-Null
+    $code = $LASTEXITCODE
+    if ($code -ne 0) {
+        Write-Host "  --- last 25 lines of $LogName.log ---" -ForegroundColor DarkYellow
+        Get-Content $log -Tail 25 | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkYellow }
+        Write-Host "  --- full log: $log" -ForegroundColor DarkYellow
+    }
+    return $code
+}
+
 # ── The launcher ─────────────────────────────────────────────
 
 function Build-Launcher {
     param([string]$Configuration)
 
     $preset = $Configuration.ToLowerInvariant()
+
+    # `cmake --preset` looks for CMakePresets.json in the CURRENT directory, so
+    # this has to run from the repository root or the launcher cannot be built
+    # from anywhere else. Found by the independent review, which ran the script
+    # from scripts/.
     Write-Host "  configuring Resolute ($Configuration)..." -ForegroundColor DarkGray
-    & $Cmake --preset $preset | Out-Null
-    if ($LASTEXITCODE -ne 0) {
+    Push-Location $RepoRoot
+    try {
+        $code = Invoke-Logged "Resolute-$Configuration-configure" { & $Cmake --preset $preset }
+    }
+    finally {
+        Pop-Location
+    }
+    if ($code -ne 0) {
         Write-Host 'build: configure failed for Resolute' -ForegroundColor Red
         return $false
     }
 
     Write-Host "  compiling Resolute ($Configuration)..." -ForegroundColor DarkGray
-    & $Cmake --build "$RepoRoot\build\$preset" | Out-Null
-    if ($LASTEXITCODE -ne 0) {
+    $code = Invoke-Logged "Resolute-$Configuration-build" { & $Cmake --build (Join-Path $RepoRoot "build\$preset") }
+    if ($code -ne 0) {
         Write-Host 'build: compile failed for Resolute' -ForegroundColor Red
         return $false
     }
@@ -161,20 +197,22 @@ function Build-Extension {
         # CMAKE_C_COMPILER unused, and CMake says so on every configure. A
         # build command that prints a warning nobody can act on is a build
         # command whose output stops being read.
-        & $Cmake "$extPath" -G Ninja --no-warn-unused-cli `
-            "-DCMAKE_BUILD_TYPE=$Configuration" `
-            "-DCMAKE_C_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang.exe" `
-            "-DCMAKE_CXX_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang++.exe" `
-            "-DCMAKE_RC_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/llvm-windres.exe" `
-            "-DCMAKE_MAKE_PROGRAM=$RepoRootFwd/reskit/ninja/ninja.exe" | Out-Null
-        if ($LASTEXITCODE -ne 0) {
+        $code = Invoke-Logged "$ExtName-$Configuration-configure" {
+            & $Cmake "$extPath" -G Ninja --no-warn-unused-cli `
+                "-DCMAKE_BUILD_TYPE=$Configuration" `
+                "-DCMAKE_C_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang.exe" `
+                "-DCMAKE_CXX_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang++.exe" `
+                "-DCMAKE_RC_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/llvm-windres.exe" `
+                "-DCMAKE_MAKE_PROGRAM=$RepoRootFwd/reskit/ninja/ninja.exe"
+        }
+        if ($code -ne 0) {
             Write-Host "build: configure failed for $ExtName" -ForegroundColor Red
             return $false
         }
 
         Write-Host "  compiling $ExtName ($Configuration)..." -ForegroundColor DarkGray
-        & $Cmake --build . | Out-Null
-        if ($LASTEXITCODE -ne 0) {
+        $code = Invoke-Logged "$ExtName-$Configuration-build" { & $Cmake --build . }
+        if ($code -ne 0) {
             Write-Host "build: compile failed for $ExtName" -ForegroundColor Red
             return $false
         }
@@ -183,14 +221,19 @@ function Build-Extension {
         Pop-Location
     }
 
-    # Search the build tree AND the extension's own bin\, because an extension
-    # may set CMAKE_RUNTIME_OUTPUT_DIRECTORY. Looking only in the build tree
-    # made the old script warn "No .exe found" immediately after linking one,
-    # which is D00 T01 §2's third defect.
-    $searchDirs = @($buildDir, (Join-Path $extPath "bin\$Configuration"), (Join-Path $extPath 'bin')) |
-        Where-Object { Test-Path $_ }
-    $built = $searchDirs |
-        ForEach-Object { Get-ChildItem -Path $_ -Filter '*.exe' -File -ErrorAction SilentlyContinue } |
+    # Search ONLY this configuration's own build tree. The previous version also
+    # searched the extension's source-tree bin\ and took whichever executable
+    # was newest, and the independent review showed what that costs: RegStudio
+    # wrote every configuration to one path, so building Release, then Debug,
+    # then Release again left the Debug binary in place, up to date as far as
+    # ninja was concerned, and it was deployed as Release. The two files were
+    # byte-identical.
+    #
+    # The extension now writes to its build tree (extensions/<T>/build/<Config>),
+    # so scoping the search to that tree makes cross-configuration contamination
+    # impossible rather than unlikely. Looking in a shared directory and sorting
+    # by timestamp is a guess; looking in exactly one place is an answer.
+    $built = Get-ChildItem -Path $buildDir -Filter '*.exe' -File -Recurse -ErrorAction SilentlyContinue |
         Sort-Object LastWriteTime -Descending |
         Select-Object -First 1
 

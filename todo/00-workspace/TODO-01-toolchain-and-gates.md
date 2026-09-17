@@ -452,7 +452,39 @@ The AutoIt suite reached fourteen tools with no way to build them all, which is 
 
   A Debug extension now lands in the Debug tree. Under the script this replaces it would have landed in `Bin/Release/System/`, overwriting the Release binary with a Debug one carrying the same name, which is the kind of defect that is found by somebody shipping the wrong file.
 
+  > [!WARNING]
+  > **The table above was true when measured and had already stopped being true, and the independent review caught it. Corrected 2026-09-17.**
+  >
+  > Separating the *build trees* by configuration was not enough, because `RegStudio` wrote its executable to one path for every configuration. Build Release, build Debug, then build Release again: nothing changed, so ninja reports the Release build up to date, the Debug executable is still sitting at that path, and it is deployed as Release. The reviewer reproduced it and found the two files byte-identical; re-checking this repository found `Bin/Release/System/RegStudio.exe` already **was** the Debug binary at 1,036,288 bytes.
+  >
+  > So the first fix in this item, `CMAKE_SOURCE_DIR` to `CMAKE_CURRENT_SOURCE_DIR`, corrected a real defect and left a worse one behind it. The output now derives from `CMAKE_CURRENT_BINARY_DIR`, which is already per configuration, and the script searches only that configuration's own build tree instead of taking the newest executable from a shared directory. Looking in a shared directory and sorting by timestamp is a guess; looking in exactly one place is an answer.
+  >
+  > Re-driven as the reviewer drove it, Release then Debug then Release:
+  >
+  > ```
+  > 2512384  Bin/Release/Resolute.exe
+  >  772096  Bin/Release/System/RegStudio.exe
+  > 8703488  Bin/Debug/Resolute.exe
+  > 1036288  Bin/Debug/System/RegStudio.exe
+  > ```
+  >
+  > **This is the second time in two sections that an evidence table of mine recorded a number that was accurate at the moment of measurement and wrong by the time it was read.** `§3`'s was a parser that dropped a category; this one is a build that overwrote its own subject. Neither was caught by re-reading the table.
+
   **No absolute path appears in any tracked build file**, re-checked after the change across every `CMakeLists.txt`, `CMakePresets.json`, `.cmake` and `.ps1` that `git ls-files` reports. The one match is `https://github.com/sammycage/lunasvg.git`, a URL.
+
+  **Two further review findings, both fixed and both driven.** `cmake --preset` reads `CMakePresets.json` from the **current** directory, so the launcher could only be built from the repository root; the configure now runs from the root and `pwsh ./build.ps1 Resolute` works from `scripts/`. And every command was piped to `Out-Null`, so a failed compile printed "compile failed" and discarded the compiler's diagnostics. The full output is now kept under `build/logs/`, gitignored, with the last 25 lines printed on failure:
+
+  ```
+  --- last 25 lines of Resolute-Release-build.log ---
+  FAILED: [code=1] src/CMakeFiles/Resolute.dir/main.cpp.obj
+  src/main.cpp:574:13: error: variable has incomplete type 'void'
+  ...
+  --- full log: build\logs\Resolute-Release-build.log
+  build: compile failed for Resolute
+    Resolute         FAILED
+  build: 1 of 1 target(s) failed (Release)
+  exit 1
+  ```
 - [x] Prove a clean-checkout build. Done when: a fresh clone into a different absolute path builds without editing a single file, and this section records the path it was proven in. **Stated plainly 2026-09-17:** a fresh clone has the scripts and no toolchain, because everything `scripts/bootstrap.ps1` downloads into `reskit/` is gitignored. So the proof is clone, supply the toolchain the way a new machine would, then build with nothing edited. What this actually tests is that no absolute path is baked into a build file, which is why the clone must be at a **different** path rather than a copy of this one.
 
   **Proven 2026-09-17 at `R:

@@ -12,11 +12,22 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteWarnings.cmake")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# CURRENT_SOURCE_DIR, not SOURCE_DIR. This extension is built two ways: as a
-# standalone project, where the two are the same, and potentially from the root,
-# where CMAKE_SOURCE_DIR is the repository root and this would write the
-# executable into the repository itself. D00 T01 §4.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+# CURRENT_BINARY_DIR, so the executable lands in the build tree that produced
+# it. Two separate bugs live in the alternatives, and D00 T01 §4 hit both.
+#
+# CMAKE_SOURCE_DIR is the repository root when this is built from the root
+# rather than standalone, which writes the executable into the repository.
+#
+# CMAKE_CURRENT_SOURCE_DIR fixes that and leaves a worse one: it is the SAME
+# directory for every configuration, so a Debug build and a Release build write
+# to one path. The independent review reproduced the consequence: build Release,
+# build Debug, build Release again, and the Release build is up to date, so the
+# Debug executable is still sitting there and gets deployed as Release. The
+# binaries were byte-identical.
+#
+# The build tree is already per-configuration, so deriving the output from it
+# makes cross-configuration contamination impossible rather than unlikely.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 # Source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
