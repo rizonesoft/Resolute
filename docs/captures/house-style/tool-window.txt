@@ -1,12 +1,14 @@
-capture      : tool-window.png
-describes    : The standard tool window every AutoIt tool draws through ReBar: title bar, toolbar, content area, status bar.
-window title : Beep Codes Viewer 11 : Build 1994 - (Beta 3) : 64-Bit
-source binary: C:\Users\DERICK~1\AppData\Local\Temp\claude\R--conclave-projects-Resolute\67b3a728-fec6-4448-b545-0df5478a2108\scratchpad\capture-run\BiosCodes.exe
-file version : 11.3.1.1994
-size         : 1194 x 929 px
-window dpi   : 96  (100% scaling)
-windows build: 10.0.26200.0
-captured     : 2026-09-17
+capture       : tool-window.png
+describes     : The shipped AutoIt tool window, as a record of what is being replaced. Not a target: AGENTS.md says the UI is rebuilt rather than reproduced.
+window title  : Beep Codes Viewer 11 : Build 1994 - (Beta 3) : 64-Bit
+source binary : C:\Users\DerickPayne\AppData\Local\Temp\claude\R--conclave-projects-Resolute\67b3a728-fec6-4448-b545-0df5478a2108\scratchpad\capture-run\BiosCodes_X64.exe
+file version  : 11.3.1.1994
+size          : 1194 x 929 px
+monitor dpi   : 144  (150% scaling) -- what the image was rendered at
+window dpi    : 96  (logical dpi the process sees)
+dpi aware     : False  -- Windows bitmap-scales this window
+windows build : 10.0.26200.0
+captured      : 2026-09-17
 
 Reproduce with scripts/capture-window.ps1. Where this capture and
 DESIGN.md disagree, the contract wins and this capture is restaked.

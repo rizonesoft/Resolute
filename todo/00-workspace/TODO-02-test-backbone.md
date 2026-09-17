@@ -331,8 +331,28 @@ Every UI section in this plan carries a `Fidelity:` line naming an artifact it m
   **The example is the C++ launcher, not an AutoIt tool**, which is the point of the rewrite: it is the one real surface of the thing being built.
 
   ```
-  2026-09-17-D00-T02-s3-launcher-window.png   1100x720 @ 144 dpi
+  2026-09-17-D00-T02-s3-launcher-window.png   1100x720, monitor 144 dpi, aware=True
   ```
+
+  > [!WARNING]
+  > **The independent review found four defects in the capture helper, two of them P1, and the first is one I had already written about. Corrected 2026-09-17.**
+  >
+  > **P1, and it is the worse for being known.** The helper still called `SetForegroundWindow` and ignored the result, then sent keystrokes. Windows refuses that call from a background process, so the input went wherever focus happened to be. I described that exact failure in the commit message and left the code path enabled: documenting a hazard is not removing it. Synthetic input is now **gone from the script**, not gated. A surface behind a menu is opened by the operator and this attaches to the result.
+  >
+  > **And it now fails closed.** If the target does not own the foreground at the moment of capture it refuses rather than copying whatever is on top of it, because a capture of an overlapping window filed as the target's evidence is worse than no capture. Driven: with a window of mine deliberately in front, the run exits **3** and writes nothing.
+  >
+  > **P1, second.** When the launched stub exited, the fallback matched a process by name and the cleanup then force-killed it, so an instance **the operator already had open** could be captured and then terminated. Matching processes are now recorded **before** launching and only one that appeared afterwards is ever eligible or stopped. Driven with a pre-existing launcher running: it survives, `pid still alive? True`.
+  >
+  > **P2.** Called with neither `-Path` nor `-WindowTitle` it enumerated every window and took the first, which could foreground and save an unrelated application. Refused now, exit **2**, before anything is enumerated.
+  >
+  > **P2, and it made a committed sidecar untrue.** `GetDpiForWindow` returns a DPI-**unaware** window's *logical* dpi, which is 96 even on a 150 percent display, so the AutoIt capture's sidecar read `96 (100% scaling)` while the image was bitmap-stretched by Windows at 144. The sidecar now carries both figures, and the pair is better evidence than either alone:
+  >
+  > ```
+  > AutoIt tool     monitor 144 dpi   window  96 dpi   aware=False
+  > C++ launcher    monitor 144 dpi   window 144 dpi   aware=True
+  > ```
+  >
+  > That is the DPI deviation this section names, visible in the metadata rather than asserted in prose.
 - [x] Commit: `"workspace: house-style contract, checked against source"`
 
 <!-- claim: exists docs/captures/house-style/contract.md -->
