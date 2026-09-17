@@ -110,7 +110,6 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T01 §4` | One command builds any tool                    |   6   |
 | [x] | `D00 T01 §5` | One command runs every gate                    |   6   |
 | [x] | `D00 T01 §6` | Keep the toolchain current                     |  12   |
-| [ ] | `D00 T01 §7` | The bare-machine proof                         |   6   |
 | [ ] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   6   |
 | [ ] | `D00 T02 §2` | Fixture store and disposable targets           |   6   |
 | [ ] | `D00 T02 §3` | House-style capture store                      |   5   |
@@ -239,6 +238,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §1` | Release Descriptors, Portable by Construction  |   5   |
 | [ ] | `D06 T01 §2` | One Command Builds the Release Set             |   5   |
 | [ ] | `D06 T01 §3` | Installers: Per Tool and Whole Suite           |   9   |
+| [ ] | `D00 T01 §7` | The bare-machine proof                         |   6   |
 | [ ] | `D06 T01 §4` | Migration From the AutoIt Suite                |   7   |
 | [ ] | `D06 T01 §5` | Update Files and Consolidation Announcements   |   6   |
 | [ ] | `D06 T01 §6` | Version Rule, Changelog, and Release Checklist |   5   |

@@ -824,6 +824,35 @@ The whole argument for a repository-scoped toolchain is that a machine with noth
 
 A clean VM, a Windows Sandbox instance, or a second physical machine all serve. Windows Sandbox is the cheapest: it needs the `Containers-DisposableClientVM` feature enabled, which requires elevation and a reboot, so it is an operator action rather than something a session can arrange.
 
+> [!IMPORTANT]
+> **Moved to Phase 4 and narrowed, 2026-09-17. Operator decision, after asking what this section was still for.**
+>
+> **Nothing depends on it.** `D00 T01 §7` appears in no section's `Depends On` column, checked. It was sitting in Phase 0 where it read as though the foundation were waiting on it, and it is a **release** gate: the standalone-distribution promise proven once before anything ships. It now sits beside `D06 T01 §3`, which needs a clean machine for install testing anyway, so one machine serves both.
+>
+> **Most of what this section feared was measured here and did not happen.** The fear is that something silently reaches for Visual Studio because Visual Studio is present. Driven on the development machine, which has five Visual Studio installations:
+>
+> ```
+> compiler include paths        3, all inside reskit/. No SDK, no MSVC
+> default target triple         x86_64-w64-windows-gnu, the MinGW target
+> INCLUDE, LIB, LIBPATH,
+> VCINSTALLDIR, VCToolsInstallDir,
+> WindowsSdkDir, WindowsSDKVersion,
+> VSINSTALLDIR                  all ALREADY unset during a normal build
+> all eight poisoned to Z:\poison\   build exit 0, binary BYTE-IDENTICAL
+> ```
+>
+> **And the runtime half.** Every import is an OS DLL present in `System32`, except the thirteen `api-ms-win-crt-*` entries, and **none of those exists as a file on disk at all**: they are API set contracts the loader maps to `ucrtbase.dll`, which is present, and which has been a Windows component since 1507, well below this suite's 1809 floor. So the CRT dependency is satisfied by Windows itself rather than by anything a developer machine happens to have.
+>
+> With `§4`'s clean-checkout build at a different absolute path changing **0** tracked files, and `§6`'s bootstrap from a deleted component, the toolchain demonstrably does not consult MSVC.
+>
+> **What is still genuinely unproven, and is all this section now owes:**
+>
+> 1. **A registry fallback.** Clang can consult the registry to locate MSVC. It should not for the `-gnu` triple, and nothing here has watched it not do so. Environment poisoning does not cover the registry.
+> 2. **Something on `PATH`.** A redistributable directory on the development machine's `PATH` could satisfy a load that a clean machine would fail.
+> 3. **The unknown one.** Which is the entire reason absence-testing exists and cannot be enumerated in advance.
+>
+> **The items below are unchanged and still correct.** They are what proves 1, 2 and 3 at once, and they are cheap once the machine exists. What changed is that a failure here would now be a **surprise** rather than a coin toss, and that this section is no longer sitting in front of the foundation looking like a blocker.
+
 - [ ] Record what the machine is before anything is installed on it. Done when: its Windows build number, and the verified absence of Visual Studio, the Windows Kits, `cl.exe` and `msbuild`, are written here, gathered the same way `§1` gathered them for the development machine.
 - [ ] Clone and bootstrap with nothing else present. Done when: `git clone` without `--recursive` followed by `pwsh scripts/bootstrap.ps1` populates `reskit/` on that machine, and the elapsed time is recorded.
 - [ ] Build the real application, not a sample. Done when: `cmake --preset release && cmake --build --preset release` produces `Bin/Release/Resolute.exe` on that machine, and the binary's size is compared against the figure this repository records.
