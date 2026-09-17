@@ -18,7 +18,7 @@ track: W1
 > <!-- claim: exists shared/resolute-ui/include/resolute/theme.h -->
 > <!-- claim: exists scripts/bootstrap.ps1 -->
 > <!-- claim: lines src/main.cpp = 573 -->
-> <!-- claim: count "llvm-mingw" scripts/bootstrap.ps1 = 4 -->
+> <!-- claim: count "llvm-mingw" toolchain.json = 4 -->
 >
 > **Corrected 2026-09-16** during `§1` validation, three claims in the paragraph above were wrong:
 >

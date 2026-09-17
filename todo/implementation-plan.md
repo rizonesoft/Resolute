@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **8 of 120 sections complete (7%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **8 of 121 sections complete (7%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -103,12 +103,13 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §2` | The Review-Finding Ledger                      |   8   |
 | [x] | `D00 T04 §3` | Section Calibration                            |   6   |
 | [x] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   7   |
-| [ ] | `D00 T01 §1` | Portable toolchain bootstrap                   |  15   |
+| [ ] | `D00 T01 §1` | Portable toolchain bootstrap                   |  14   |
 | [ ] | `D00 T01 §2` | CMake skeleton and vcpkg manifest              |  11   |
 | [ ] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
 | [ ] | `D00 T01 §4` | One command builds any tool                    |   6   |
 | [ ] | `D00 T01 §5` | One command runs every gate                    |   6   |
 | [ ] | `D00 T01 §6` | Keep the toolchain current                     |  12   |
+| [ ] | `D00 T01 §7` | The bare-machine proof                         |   6   |
 | [ ] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   6   |
 | [ ] | `D00 T02 §2` | Fixture store and disposable targets           |   6   |
 | [ ] | `D00 T02 §3` | House-style capture store                      |   5   |

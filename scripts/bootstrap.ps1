@@ -1,97 +1,180 @@
 <#
 .SYNOPSIS
-    Bootstrap ResKit toolchain for Resolute.
+    Bootstrap the pinned C++ toolchain for Resolute.
 
 .DESCRIPTION
-    Downloads and installs the required C++ build tools into the reskit/ folder.
-    Run this once before building Resolute.
+    Reads toolchain.json, which is the only place a version, URL or hash is
+    written, and populates reskit/ with llvm-mingw, CMake and Ninja.
+
+    Three properties this script owes, each one a D00 T01 §1 item:
+
+      * It DETECTS BEFORE IT DOWNLOADS, and detects the pinned version
+        specifically. A directory holding some other release does not satisfy
+        the check: that is the whole point of pinning, and accepting any
+        present toolchain makes two machines disagree while both report success.
+      * It VERIFIES THE HASH of everything it downloads and refuses to install
+        on a mismatch, leaving reskit/ untouched.
+      * It FAILS BY NAME. Every refusal says which component, what was found,
+        what was wanted, and the command that fixes it.
 
 .EXAMPLE
-    .\scripts\bootstrap.ps1
+    pwsh scripts/bootstrap.ps1
+    pwsh scripts/bootstrap.ps1 -Force        # re-download even if present
+    pwsh scripts/bootstrap.ps1 -Replace      # replace a non-pinned version
 #>
 
 param(
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Replace
 )
 
 $ErrorActionPreference = 'Stop'
+
 # This script lives in scripts/; the toolchain is its sibling reskit/.
-$ResKitRoot = Join-Path (Split-Path -Parent $PSScriptRoot) "reskit"
+$RepoRoot   = Split-Path -Parent $PSScriptRoot
+$ResKitRoot = Join-Path $RepoRoot 'reskit'
+$Manifest   = Join-Path $RepoRoot 'toolchain.json'
+
+if (-not (Test-Path $Manifest)) {
+    Write-Host "bootstrap: toolchain.json is missing at $Manifest" -ForegroundColor Red
+    Write-Host "  Nothing is pinned, so there is nothing to install. This file is the" -ForegroundColor DarkGray
+    Write-Host "  single source of versions, URLs and hashes." -ForegroundColor DarkGray
+    exit 1
+}
+
+$Pins = Get-Content $Manifest -Raw | ConvertFrom-Json
 
 Write-Host "ResKit Bootstrap" -ForegroundColor Cyan
 Write-Host "================" -ForegroundColor Cyan
+Write-Host "  pins dated $($Pins.pinned), $($Pins.components.Count) component(s)" -ForegroundColor DarkGray
+Write-Host ""
 
-# Tool versions
-$LlvmVersion = "20251216"
-$CmakeVersion = "4.2.3"
-$NinjaVersion = "1.13.1"
+New-Item -ItemType Directory -Force -Path $ResKitRoot | Out-Null
 
-# Directories
-$LlvmDir = Join-Path $ResKitRoot "llvm-mingw"
-$CmakeDir = Join-Path $ResKitRoot "cmake"
-$NinjaDir = Join-Path $ResKitRoot "ninja"
+function Get-InstalledVersion {
+    <#  The version a component REPORTS, not the directory it sits in. A folder
+        name can say anything; the binary cannot. #>
+    param($Component, [string]$Dir)
 
-# Download URLs
-$LlvmUrl = "https://github.com/mstorsjo/llvm-mingw/releases/download/$LlvmVersion/llvm-mingw-$LlvmVersion-ucrt-x86_64.zip"
-$CmakeUrl = "https://github.com/Kitware/CMake/releases/download/v$CmakeVersion/cmake-$CmakeVersion-windows-x86_64.zip"
-$NinjaUrl = "https://github.com/ninja-build/ninja/releases/download/v$NinjaVersion/ninja-win.zip"
-
-function Install-Tool {
-    param(
-        [string]$Name,
-        [string]$Url,
-        [string]$DestDir,
-        [string]$ExtractPath
-    )
-    
-    if ((Test-Path $DestDir) -and -not $Force) {
-        Write-Host "  [SKIP] $Name already installed" -ForegroundColor DarkGray
-        return
+    $probe = Join-Path $Dir $Component.probe
+    if (-not (Test-Path $probe)) { return $null }
+    try {
+        $out = & $probe @($Component.versionArgs) 2>&1 | Out-String
+    } catch {
+        return $null
     }
-    
-    Write-Host "  [DOWNLOAD] $Name..." -ForegroundColor Yellow
-    $tempZip = Join-Path $env:TEMP "$Name.zip"
-    
-    Invoke-WebRequest -Uri $Url -OutFile $tempZip -UseBasicParsing
-    
-    Write-Host "  [EXTRACT] $Name..." -ForegroundColor Yellow
-    $tempExtract = Join-Path $env:TEMP "$Name-extract"
-    if (Test-Path $tempExtract) { Remove-Item $tempExtract -Recurse -Force }
-    Expand-Archive -Path $tempZip -DestinationPath $tempExtract -Force
-    
-    # Find the actual content (may be in a subfolder)
-    $content = Get-ChildItem $tempExtract
-    if ($content.Count -eq 1 -and $content[0].PSIsContainer) {
-        $source = $content[0].FullName
-    }
-    else {
-        $source = $tempExtract
-    }
-    
-    if (Test-Path $DestDir) { Remove-Item $DestDir -Recurse -Force }
-    Move-Item $source $DestDir -Force
-    
-    Remove-Item $tempZip -Force
-    if (Test-Path $tempExtract) { Remove-Item $tempExtract -Recurse -Force }
-    
-    Write-Host "  [OK] $Name installed" -ForegroundColor Green
+    if ($out -match $Component.versionMatch) { return $Matches[1] }
+    return $null
 }
 
-# Install LLVM-MinGW
-Write-Host ""
-Write-Host "[1/3] LLVM-MinGW" -ForegroundColor Cyan
-Install-Tool -Name "llvm-mingw" -Url $LlvmUrl -DestDir $LlvmDir
+function Test-PinnedVersion {
+    <#  llvm-mingw reports a clang version, not its own release date, so its
+        release cannot be read back from the binary. For that component the
+        pinned marker is a stamp file this script writes after a verified
+        install: the ONLY thing that can attest to which archive was unpacked. #>
+    param($Component, [string]$Dir)
 
-# Install CMake
-Write-Host ""
-Write-Host "[2/3] CMake" -ForegroundColor Cyan
-Install-Tool -Name "cmake" -Url $CmakeUrl -DestDir $CmakeDir
+    $stamp = Join-Path $Dir '.pinned-version'
+    if (Test-Path $stamp) {
+        return ((Get-Content $stamp -Raw).Trim() -eq $Component.version)
+    }
+    $reported = Get-InstalledVersion -Component $Component -Dir $Dir
+    if ($null -eq $reported) { return $false }
+    return ($reported -eq $Component.version)
+}
 
-# Install Ninja
-Write-Host ""
-Write-Host "[3/3] Ninja" -ForegroundColor Cyan
-Install-Tool -Name "ninja" -Url $NinjaUrl -DestDir $NinjaDir
+$installed = 0
+$skipped   = 0
+$i         = 0
+
+foreach ($c in $Pins.components) {
+    $i++
+    $dir = Join-Path $ResKitRoot $c.dir
+    Write-Host "[$i/$($Pins.components.Count)] $($c.name) $($c.version)" -ForegroundColor Cyan
+
+    if ((Test-Path $dir) -and -not $Force) {
+        if (Test-PinnedVersion -Component $c -Dir $dir) {
+            Write-Host "  [SKIP] pinned version already present" -ForegroundColor DarkGray
+            $skipped++
+            continue
+        }
+
+        # Present, but NOT the pin. Silence here is what makes two machines
+        # disagree while both report success.
+        $found = Get-InstalledVersion -Component $c -Dir $dir
+        $hasStamp = Test-Path (Join-Path $dir '.pinned-version')
+        $foundText = if (-not $hasStamp) {
+            # No stamp means this install was not made by a verified run of this
+            # script, so its provenance is unknown. Saying "found 21.1.8" would
+            # be worse than saying nothing: 21.1.8 is the clang version, not the
+            # llvm-mingw release, and the two are not comparable.
+            if ($found) {
+                "an install with no verified-provenance stamp (its $($c.name) reports $found)"
+            } else {
+                "an install with no verified-provenance stamp"
+            }
+        } elseif ($found) { $found } else { 'an unrecognised build' }
+        if (-not $Replace) {
+            Write-Host "  [STOP] $($c.name) is present but is not the pinned version" -ForegroundColor Red
+            Write-Host "         found:  $foundText" -ForegroundColor Red
+            Write-Host "         wanted: $($c.version)" -ForegroundColor Red
+            Write-Host "         Re-run with -Replace to overwrite it, or delete $dir" -ForegroundColor DarkGray
+            Write-Host "         Decided 2026-09-17: report and stop rather than replace" -ForegroundColor DarkGray
+            Write-Host "         silently. An unasked-for replacement discards a toolchain" -ForegroundColor DarkGray
+            Write-Host "         somebody may have put there deliberately, and the cost of" -ForegroundColor DarkGray
+            Write-Host "         being wrong is higher than one extra flag." -ForegroundColor DarkGray
+            exit 1
+        }
+        Write-Host "  [REPLACE] found $foundText, wanted $($c.version)" -ForegroundColor Yellow
+        Remove-Item $dir -Recurse -Force
+    }
+
+    Write-Host "  [DOWNLOAD] $($c.url.Split('/')[-1])" -ForegroundColor Yellow
+    $tempZip = Join-Path $env:TEMP "reskit-$($c.name).zip"
+    if (Test-Path $tempZip) { Remove-Item $tempZip -Force }
+    Invoke-WebRequest -Uri $c.url -OutFile $tempZip -UseBasicParsing
+
+    Write-Host "  [VERIFY] sha256" -ForegroundColor Yellow
+    $actual = (Get-FileHash $tempZip -Algorithm SHA256).Hash.ToLower()
+    if ($actual -ne $c.sha256.ToLower()) {
+        Remove-Item $tempZip -Force
+        Write-Host "  [ABORT] $($c.name) hash mismatch. Nothing was installed." -ForegroundColor Red
+        Write-Host "          expected: $($c.sha256)" -ForegroundColor Red
+        Write-Host "          actual:   $actual" -ForegroundColor Red
+        Write-Host "          The archive at that URL is not the archive this" -ForegroundColor DarkGray
+        Write-Host "          repository pinned. Either the release was re-cut in" -ForegroundColor DarkGray
+        Write-Host "          place, or the download is not what it claims to be." -ForegroundColor DarkGray
+        Write-Host "          reskit/ is unchanged." -ForegroundColor DarkGray
+        exit 1
+    }
+
+    Write-Host "  [EXTRACT]" -ForegroundColor Yellow
+    $tempExtract = Join-Path $env:TEMP "reskit-$($c.name)-extract"
+    if (Test-Path $tempExtract) { Remove-Item $tempExtract -Recurse -Force }
+    Expand-Archive -Path $tempZip -DestinationPath $tempExtract -Force
+
+    # The content may sit in a single wrapper directory, or at the archive root.
+    $content = Get-ChildItem $tempExtract
+    $source = if ($content.Count -eq 1 -and $content[0].PSIsContainer) {
+        $content[0].FullName
+    } else {
+        $tempExtract
+    }
+
+    if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+    Move-Item -Path $source -Destination $dir -Force
+
+    # Written only after a verified install, so it attests to what was unpacked
+    # rather than to what somebody typed.
+    Set-Content -Path (Join-Path $dir '.pinned-version') -Value $c.version -NoNewline -Encoding utf8
+
+    Remove-Item $tempZip -Force
+    if (Test-Path $tempExtract) { Remove-Item $tempExtract -Recurse -Force }
+    Write-Host "  [OK] installed" -ForegroundColor Green
+    $installed++
+}
 
 Write-Host ""
-Write-Host "ResKit bootstrap complete!" -ForegroundColor Green
-Write-Host "Run '.\reskit\Init-ResKit.ps1' to activate the toolchain." -ForegroundColor DarkGray
+Write-Host "ResKit bootstrap complete: $installed installed, $skipped already pinned." -ForegroundColor Green
+Write-Host "Run '.\reskit\Init-ResKit.ps1' to put the toolchain on PATH." -ForegroundColor DarkGray
+Write-Host "Run 'pwsh scripts/cpp-env.ps1' to check what resolves." -ForegroundColor DarkGray

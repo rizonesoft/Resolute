@@ -1,0 +1,48 @@
+{
+  "$comment": [
+    "The pinned toolchain. scripts/bootstrap.ps1 reads this file; it is the only",
+    "place a version or a URL is written. D00 T01 §1 owns the format, D00 T01 §6",
+    "owns bumping the pins.",
+    "",
+    "Every sha256 was taken from a real download on 2026-09-17 and independently",
+    "cross-checked against the digest GitHub records for the same asset. A pin",
+    "without a hash is reproducible only until a release is re-cut in place."
+  ],
+  "pinned": "2026-09-17",
+  "components": [
+    {
+      "name": "llvm-mingw",
+      "version": "20251216",
+      "url": "https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-x86_64.zip",
+      "sha256": "2d96a4b758f7f8deaec5065833fe025aa53cfc5f704d0524002510984da0ccf4",
+      "bytes": 181343612,
+      "dir": "llvm-mingw",
+      "probe": "bin/clang.exe",
+      "versionArgs": ["--version"],
+      "versionMatch": "clang version ([0-9.]+)",
+      "note": "Self-contained UCRT-targeting archive. Carries its own headers and import libraries, so no Windows SDK is needed and no licence question arises. Targets the MinGW-w64 environment, not the MSVC ABI."
+    },
+    {
+      "name": "cmake",
+      "version": "4.2.3",
+      "url": "https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-windows-x86_64.zip",
+      "sha256": "eb4ebf5155dbb05436d675706b2a08189430df58904257ae5e91bcba4c86933c",
+      "bytes": 50391842,
+      "dir": "cmake",
+      "probe": "bin/cmake.exe",
+      "versionArgs": ["--version"],
+      "versionMatch": "cmake version ([0-9.]+)"
+    },
+    {
+      "name": "ninja",
+      "version": "1.13.1",
+      "url": "https://github.com/ninja-build/ninja/releases/download/v1.13.1/ninja-win.zip",
+      "sha256": "26a40fa8595694dec2fad4911e62d29e10525d2133c9a4230b66397774ae25bf",
+      "bytes": 289808,
+      "dir": "ninja",
+      "probe": "ninja.exe",
+      "versionArgs": ["--version"],
+      "versionMatch": "^([0-9.]+)"
+    }
+  ]
+}

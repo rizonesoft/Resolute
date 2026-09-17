@@ -268,7 +268,7 @@ A section that cannot run without a live host or device the plan cannot otherwis
 **Needs:** Windows host (build/test)
 ```
 
-The value comes from a closed list (`todo-graph.py` `NEEDS_ALLOWED`; `validate` refuses any other): `Windows host (build/test)`, `C++ toolchain (compile)`, `Optical drive (drive test)`, `USB device (drive test)`, `Signing certificate (release)`. `resolve` prints it as `needs`, so a future runner can skip the row while the device is not attached and take the next unblocked row instead.
+The value comes from a closed list (`todo-graph.py` `NEEDS_ALLOWED`; `validate` refuses any other): `Windows host (build/test)`, `C++ toolchain (compile)`, `Optical drive (drive test)`, `USB device (drive test)`, `Signing certificate (release)`, `Clean Windows machine (no Visual Studio)`. `resolve` prints it as `needs`, so a future runner can skip the row while the device is not attached and take the next unblocked row instead.
 
 A section whose open work is worked OUTSIDE this tree carries a `Moved:` marker under its heading:
 

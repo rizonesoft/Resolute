@@ -206,6 +206,13 @@ NEEDS_ALLOWED: dict[str, str] = {
     "Optical drive (drive test)": "optical-drive",
     "USB device (drive test)": "usb-device",
     "Signing certificate (release)": "signing-cert",
+    # Added 2026-09-17 by D00 T01 §7. A machine WITHOUT Visual Studio and the
+    # Windows Kits, which the development machine is not: absence cannot be
+    # simulated on a machine that has the thing, because a toolchain can fall
+    # back to a registry key or a well-known path and only a genuinely clean
+    # machine shows that it does not. A clean VM, a Windows Sandbox instance, or
+    # a second physical machine all serve.
+    "Clean Windows machine (no Visual Studio)": "clean-windows",
 }
 FIDELITY_EXEMPT_RE = re.compile(
     r"no surface of its own|not a surface|no page of its own|not a page|the library is not a surface",

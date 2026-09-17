@@ -48,12 +48,28 @@ track: W1
 |   4   |   §4    | One command builds any tool                  | §2         |  [ ]   |
 |   5   |   §5    | One command runs every gate                  | §3, §4     |  [ ]   |
 |   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [ ]   |
+|   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
 
 ---
 
 ## 1. Harden the Toolchain Bootstrap
 
-The toolchain is repository-scoped: a bare Windows machine with no Visual Studio installed runs one script and can build. **That already works.** `D00 T03 §3` moves ExoKit's bootstrap to the repository root; this section hardens it to the standard the rest of the plan needs.
+> **Started:** 2026-09-16T23:55:44Z
+
+The toolchain is repository-scoped: a bare Windows machine with no Visual Studio installed runs one script and can build. **That already works.** `D00 T03 §3` moved the bootstrap to the repository root; this section hardens it to the standard the rest of the plan needs.
+
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Five corrections, and one of them is a scope decision worth seeing.**
+>
+> **The bare-machine proof is moved to `§7`, not weakened.** Its own Build order calls it "the only stage needing a second machine", and this development machine has Visual Studio and the Windows Kits installed, checked directly. Windows Sandbox, which would have served as a clean machine, is not installed and enabling it needs elevation and a reboot, which is an operator action. So the item cannot be satisfied here by any honest means. Leaving it inside this section would hold thirteen items that need nothing, and with them the 27 open sections that depend on this one, against hardware nobody has today. It becomes `§7` with its own `**Needs:**` line and a checkpoint at least as strict.
+>
+> **What *can* be proven here, and is, is narrower and still worth having:** that a compile and link consults nothing outside `reskit/`. That is the actual self-contained claim. It is not the same as proving a machine without Visual Studio works, because absence cannot be simulated on a machine that has it, and `§7` says so.
+>
+> **The floor macros are already set, and not to what this section says.** `CMakeLists.txt:23-24` sets `WINVER=0x0A00` and `_WIN32_WINNT=0x0A00`, which is Windows 10 generically. **1809 is nowhere expressed**: that needs `NTDDI_VERSION=0x0A000006`, which is absent. And `Resolute.exe` ships **no application manifest at all**, so the third leg of the floor does not exist; only `extensions/RegStudio` has one.
+>
+> **`cpp-env.ps1` "prints all six" is wrong.** Three components are pinned, and the checkpoint in this same section says three. Corrected to three.
+>
+> **The commit message contradicts the toolchain.** It says `clang-cl`, which is the MSVC-ABI driver. This toolchain is llvm-mingw targeting MinGW-w64, which another item in this very section requires be recorded as a tradeoff. Corrected.
 
 What it pulls today is llvm-mingw 20251216 ucrt-x86_64, CMake 4.2.3, and Ninja 1.13.1. llvm-mingw matters because it is a **self-contained UCRT-targeting archive carrying its own headers and import libraries**, so there is no Windows SDK to acquire and no licence question to answer. That was the single largest risk in this domain and the existing bootstrap removes it.
 
@@ -69,25 +85,61 @@ What it lacks is hash verification, detect-before-download, a locator that fails
 3. **Add detect-before-download**, checking the toolchain directory first. Done when: a second bootstrap run downloads nothing and finishes in seconds, timed and quoted.
 4. **Add the fail-by-name locator** as `scripts/cpp-env.ps1`. Done when: deleting one component makes it exit 1 naming that component and the command that restores it.
 5. **Set the Windows floor** in CMake only, not in the bootstrap. Done when: `WINVER` and `_WIN32_WINNT` are set once and every target inherits them.
-6. **Prove the bare-machine claim last**, because it is the only stage needing a second machine. Done when: bootstrap and build both succeed where no Visual Studio and no Windows SDK are installed.
+6. **Prove that nothing outside `reskit/` is consulted.** Done when: a compile and link of a program using `CreateFileW` and a Direct2D entry point shows no include or library path outside `reskit/`. The stronger claim, that a machine without Visual Studio works, moved to `§7`: it needs hardware this one is not.
 
-- [ ] Record the pins in `toolchain.json` at the repository root: the llvm-mingw release, CMake, and Ninja, each with a download URL and a SHA-256. Done when: every value is an exact version and every entry carries a hash, and the versions match what the ExoKit bootstrap pulls today. Cheaper substitute: naming versions without hashes, which makes the bootstrap reproducible only until a URL is re-cut.
-- [ ] `scripts/bootstrap.ps1` **detects before it downloads**, in a fixed order: `reskit/` first, then the machine's installed components. **Corrected 2026-09-17 by `D00 T03 §3`:** this said `.toolchain/`, while the Build order below said `reskit/` and the Inputs said `exokit/`. Three names for one directory in one section. `reskit/` is what `§3` creates and what `.gitignore` already covers. Done when: a second run downloads nothing and finishes in seconds, and the detection order is documented so a repository-scoped component always wins over a machine-installed one of the same version.
-- [ ] Detect the **pinned version specifically**, not merely presence. Done when: a directory carrying a different llvm-mingw release than the pin does not silently satisfy the check. Cheaper substitute that defeats the point of pinning: accepting any toolchain that is present, which makes two machines disagree while both report success.
-- [ ] Decide and record what happens when only a non-pinned version is present: replace it with the pin, or report and stop for the operator to choose. Done when: the behavior is a dated default with its cost of changing, and the message names both the found version and the wanted one.
-- [ ] Download each missing component into `reskit/`, verify its hash, and refuse to proceed on a mismatch. **Corrected 2026-09-17 by `D00 T03 §3`**, same reason. Done when: a deliberately corrupted hash aborts the bootstrap with a named message and leaves `reskit/` unchanged.
-- [ ] Confirm the self-contained claim rather than assuming it. Done when: a machine with no Visual Studio and no Windows SDK compiles and links a program calling `CreateFileW` and a Direct2D entry point, using only the bootstrapped toolchain.
-- [ ] Record the MinGW-w64 tradeoff plainly. Done when: this section states that the toolchain targets the MinGW-w64 environment rather than the MSVC ABI, so MSVC-built static libraries cannot be linked and debugging is LLDB, with the cost of changing that decision.
-- [ ] Record what the extra llvm-mingw targets are worth. Done when: the `aarch64`, `arm64ec`, `armv7`, and `i686` targets are named and this section states whether ARM64 Windows is in scope, as a dated default.
-- [ ] Set the runtime floor to Windows 10 1809 through `WINVER`, `_WIN32_WINNT`, and the application manifest, in one place in CMake. Done when: the floor macros are set once and inherited by every target. The Windows SDK pin is not needed here: llvm-mingw supplies its own headers, which is why decision 21's separate-pin problem does not arise under this toolchain.
-- [ ] Add a floor check so an above-floor API cannot ship silently. Done when: a deliberate call to an API newer than the floor fails the build or is flagged by `clang-tidy`, and the diagnostic is quoted. Record which mechanism was used.
-- [ ] Record why the floor is Windows 10 1809 rather than the Vista-through-Win10 range the AutoIt manifests declare. Done when: this section names dark mode, per-monitor DPI v2, and Direct2D SVG rendering as the features that set it, with the cost of lowering it.
-- [ ] Ensure the bootstrapped toolchain directory is gitignored. Done when: a full bootstrap leaves `git status` clean.
-- [ ] `scripts/cpp-env.ps1` reports every resolved component and its version, and fails by name. Done when: it prints all six on a bootstrapped machine, and deleting one component makes it exit 1 naming that component and the bootstrap command that restores it.
-- [ ] Prove the bare-machine claim. Done when: bootstrap and build succeed on a Windows machine with no Visual Studio installed, and this section records where that was proven and on what Windows build.
-- [ ] Commit: `"workspace: repository-scoped clang-cl toolchain bootstrap"`
+- [x] Record the pins in `toolchain.json` at the repository root: the llvm-mingw release, CMake, and Ninja, each with a download URL and a SHA-256. Done when: every value is an exact version and every entry carries a hash, and the versions match what the ExoKit bootstrap pulls today. Cheaper substitute: naming versions without hashes, which makes the bootstrap reproducible only until a URL is re-cut.
+- [x] `scripts/bootstrap.ps1` **detects before it downloads**, in a fixed order: `reskit/` first, then the machine's installed components. **Corrected 2026-09-17 by `D00 T03 §3`:** this said `.toolchain/`, while the Build order below said `reskit/` and the Inputs said `exokit/`. Three names for one directory in one section. `reskit/` is what `§3` creates and what `.gitignore` already covers. Done when: a second run downloads nothing and finishes in seconds, and the detection order is documented so a repository-scoped component always wins over a machine-installed one of the same version.
+- [x] Detect the **pinned version specifically**, not merely presence. Done when: a directory carrying a different llvm-mingw release than the pin does not silently satisfy the check. Cheaper substitute that defeats the point of pinning: accepting any toolchain that is present, which makes two machines disagree while both report success.
+- [x] Decide and record what happens when only a non-pinned version is present. **Decided 2026-09-17: report and stop.** `bootstrap.ps1` exits 1 naming the component, what it found, what was wanted, and the `-Replace` flag that overwrites. It does not replace on its own.
 
-**Test checkpoint:** `pwsh scripts/bootstrap.ps1` populates the toolchain directory from the pins and leaves `git status` clean. A second run downloads nothing and finishes in seconds, quoted. A non-pinned llvm-mingw release is reported rather than accepted, naming found and wanted. A corrupted hash aborts with a named message. `pwsh scripts/cpp-env.ps1` prints three resolved versions; deleting one component makes it exit 1 naming it. Bootstrap and build both succeed on a machine with no Visual Studio and no Windows SDK, compiling a Direct2D entry point, and that machine's Windows build is quoted.
+  The reason is asymmetric cost. Replacing silently discards a toolchain somebody may have put there deliberately, and the operator finds out when their build changes behaviour. Stopping costs one extra flag. Cost of changing: one branch in `bootstrap.ps1`.
+
+  **A third state turned up that the item did not anticipate**, and it is the one that occurs in practice: a component installed by an *earlier* bootstrap, before this section existed, carries no provenance stamp. Reporting "found 21.1.8, wanted 20251216" there would be actively misleading, because 21.1.8 is the clang version and 20251216 is the llvm-mingw release and the two are not comparable. It now says "an install with no verified-provenance stamp (its llvm-mingw reports 21.1.8)".
+- [x] Download each missing component into `reskit/`, verify its hash, and refuse to proceed on a mismatch. **Corrected 2026-09-17 by `D00 T03 §3`**, same reason. Done when: a deliberately corrupted hash aborts the bootstrap with a named message and leaves `reskit/` unchanged.
+- [x] Confirm the self-contained claim rather than assuming it. **Narrowed 2026-09-17:** the original wording required a machine with no Visual Studio and no Windows SDK, and this one has both, checked directly. Done when: a program calling `CreateFileW` and a Direct2D entry point compiles and links with the bootstrapped toolchain, **and the compiler's own search paths are dumped and shown to contain nothing outside `reskit/`**. Cheaper substitute that fails the checkpoint: observing that it compiles, which on a machine with the Windows SDK installed proves only that some header was found somewhere.
+- [x] Record the MinGW-w64 tradeoff plainly. **Written 2026-09-17.**
+
+  This toolchain is llvm-mingw: clang targeting the **MinGW-w64 environment**, not the MSVC ABI. Four consequences, and none of them is hypothetical:
+
+  1. **An MSVC-built static library cannot be linked.** Anything shipped as a `.lib` built by `cl` is unusable without rebuilding it from source with this compiler. A vendor who ships binaries only is a vendor this suite cannot consume.
+  2. **Debugging is LLDB**, not the Visual Studio debugger. Visual Studio can attach to the process, but the DWARF debug info clang emits here is not what its debugger reads best.
+  3. **The C++ runtime is libc++ with the UCRT underneath**, so the MSVC C++ ABI does not apply and a C++ interface cannot be shared across the boundary with an MSVC-built module. A C interface can.
+  4. **Windows-specific MSVC extensions are not all available**, most visibly the SEH forms that assume the MSVC personality.
+
+  What is bought for that: a self-contained archive with its own headers and import libraries, so a machine needs no Visual Studio and no Windows SDK, and there is no licence question about redistributing an SDK.
+
+  **Cost of changing:** moving to clang-cl or MSVC means acquiring and pinning a Windows SDK separately, which is the problem `AGENTS.md` decision 21 describes and which this toolchain sidesteps. The code itself is portable between them; the acquisition story is not.
+- [x] Record what the extra llvm-mingw targets are worth. **Measured and decided 2026-09-17.** The archive carries four target trees beside `x86_64-w64-mingw32`: `aarch64-w64-mingw32`, `arm64ec-w64-mingw32`, `armv7-w64-mingw32`, and `i686-w64-mingw32`. They are present at no extra cost, since they ship in the same archive already pinned.
+
+  **Dated default: ARM64 Windows is out of scope, and x86-64 is the only architecture built.** Not because it is hard, but because nothing yet proves the rest: every tool in this suite is a Windows system utility whose behaviour is verified by driven runs against a real machine, and there is no ARM64 machine here to drive one on. Shipping an untested ARM64 binary of a tool that takes ownership of files or repairs a drive is worse than shipping none.
+
+  **Cost of changing:** low and falling. The toolchain already has the target, so it is a preset and a CI machine rather than a toolchain change. `armv7` and `i686` are noted and not wanted: 32-bit Windows is outside the 1809 floor's practical audience.
+- [x] Set the runtime floor to Windows 10 1809 through `WINVER`, `_WIN32_WINNT`, `NTDDI_VERSION`, and the application manifest, in one place in CMake. **Corrected 2026-09-17:** two of these already exist and neither expresses 1809. `CMakeLists.txt:23-24` sets `WINVER=0x0A00` and `_WIN32_WINNT=0x0A00`, which is Windows 10 generically; the release is carried by `NTDDI_VERSION`, which is absent, so **1809 is nowhere stated**. `Resolute.exe` also ships **no application manifest**, so the third leg does not exist at all. Done when: all three macros are set once and inherited, `NTDDI_VERSION` names 1809 specifically, and the executable carries a manifest declaring its supported OS and DPI awareness, read back from the built binary. The Windows SDK pin decision 21 describes is not needed here: llvm-mingw supplies its own headers, so the separate-pin problem does not arise under this toolchain.
+- [x] Add a floor check so an above-floor API cannot ship silently. **Mechanism: the mingw-w64 header guards themselves, driven by `NTDDI_VERSION`.** No `clang-tidy` rule was needed. Measured 2026-09-17: 161 headers in this toolchain gate declarations on `NTDDI_VERSION >=` and 187 on `_WIN32_WINNT >=`.
+
+  Proven in both directions, using the macros `CMakeLists.txt` actually sets. `GetCurrentPackageInfo2` is gated at `NTDDI_WIN10_19H1`, one release above the floor:
+
+  ```
+  at NTDDI_VERSION=0x0A000006 (1809)   exit 1
+    error: use of undeclared identifier 'PackagePathType_Effective'
+  at NTDDI_VERSION=0x0A000007 (19H1)   exit 0
+  ```
+
+  The second line is the falsifiability check: without it the failure could have been a typo rather than the floor.
+
+  **The guarding is incomplete, and that matters more than the mechanism working.** `GetMachineTypeAttributes` is a Windows 11 API, and this toolchain gates it at `_WIN32_WINNT >= _WIN32_WINNT_WIN10`, which the floor satisfies, so it compiles cleanly at 1809. `_WIN32_WINNT_WIN10` is a single value for every Windows 10 and 11 release; only `NTDDI_VERSION` carries the release, and not every declaration uses it. So this check catches an above-floor API **when the header gates on `NTDDI_VERSION`**, and silently permits one gated only at `_WIN32_WINNT`. It is a real check with a known hole, not a guarantee, and a tool that must run on 1809 still owes a driven run there.
+- [x] Record why the floor is Windows 10 1809 rather than the Vista-through-Win10 range the AutoIt manifests declare. **Written 2026-09-17.** Three features set it, and each one is load-bearing rather than cosmetic:
+
+  1. **Dark mode.** The undocumented `uxtheme` entry points the suite uses to darken window chrome appeared in 1809. Below it the title bar and common controls stay light while the Direct2D surface is dark, which looks broken rather than unstyled.
+  2. **Per-monitor DPI v2 as this suite uses it.** The awareness mode arrived in 1703, but automatic non-client and dialog scaling settled in 1809. Below it every dialog needs hand-scaling, which is exactly the per-tool duplication `DESIGN.md` exists to prevent.
+  3. **Direct2D SVG rendering.** `ID2D1DeviceContext5` and the SVG document API are 1809. Lucide ships SVG, and the alternative is rasterising every icon at every scale factor.
+
+  **Cost of lowering it:** each feature needs a runtime-detected fallback path, and each fallback is a second rendering path nobody drives. The AutoIt suite declares Vista through Windows 10 in its manifests, which was correct for a toolkit drawing standard controls and is not correct for one drawing its own.
+- [x] Ensure the bootstrapped toolchain directory is gitignored. Done when: a full bootstrap leaves `git status` clean.
+- [x] `scripts/cpp-env.ps1` reports every resolved component and its version, and fails by name. **Corrected 2026-09-17:** this said "all six" against **three** pinned components, and the checkpoint in this same section already said three. Done when: it prints all three with their versions on a bootstrapped machine, and deleting one component makes it exit 1 naming that component and the bootstrap command that restores it.
+- [x] Commit: `"workspace: harden the repository-scoped toolchain bootstrap"` **Corrected 2026-09-17:** the message said `clang-cl`, which is the MSVC-ABI driver. This toolchain is llvm-mingw targeting MinGW-w64, a tradeoff another item in this section requires be recorded.
+
+**Test checkpoint:** `pwsh scripts/bootstrap.ps1` populates the toolchain directory from the pins and leaves `git status` clean. A second run downloads nothing and finishes in seconds, quoted. A non-pinned llvm-mingw release is reported rather than accepted, naming found and wanted, driven by planting a wrong version. A corrupted hash aborts with a named message and leaves `reskit/` unchanged, driven. `pwsh scripts/cpp-env.ps1` prints three resolved versions; deleting one component makes it exit 1 naming that component and the command that restores it, driven. A program calling `CreateFileW` and a Direct2D entry point compiles and links, and the compiler's dumped search paths contain no directory outside `reskit/`. `NTDDI_VERSION` names 1809 and the built `Resolute.exe` carries a manifest, read back from the binary. The bare-machine claim is **not** proven here and is `§7`'s: this machine has Visual Studio and the Windows Kits installed, checked directly.
 
 ## 2. CMake Structure and Dependencies
 
@@ -173,9 +225,12 @@ Five gates that must each be remembered are five gates that get skipped under ti
 >
 > The pinned llvm-mingw carries clang 21.1.8, measured from a real bootstrap on 2026-09-17.
 
-<!-- claim: count "20251216" scripts/bootstrap.ps1 = 1 -->
-<!-- claim: count "4\.2\.3" scripts/bootstrap.ps1 = 1 -->
-<!-- claim: count "1\.13\.1" scripts/bootstrap.ps1 = 1 -->
+<!-- claim: count "20251216" toolchain.json = 3 -->
+<!-- claim: exists scripts/cpp-env.ps1 -->
+<!-- claim: exists src/Resolute.manifest -->
+<!-- claim: count "NTDDI_VERSION=0x0A000006" CMakeLists.txt = 1 -->
+<!-- claim: count "4\.2\.3" toolchain.json = 3 -->
+<!-- claim: count "1\.13\.1" toolchain.json = 2 -->
 
 **The tension this section resolves.** Pinning and "latest" pull against each other and both are right: a pin buys reproducibility, currency buys compiler fixes and newer C++23 support. The resolution is that **a pin is a dated decision, not a permanent one**, and that falling behind must be *visible* rather than discovered by accident nine months later.
 
@@ -201,6 +256,28 @@ Five gates that must each be remembered are five gates that get skipped under ti
 - [ ] Commit: `"workspace: bring the toolchain pins current and report when they fall behind"`
 
 **Test checkpoint:** `toolchain.json` names llvm-mingw `20260908`, CMake `4.4.3`, and Ninja `1.13.2`, each with a URL and a SHA-256, and a clean bootstrap from those pins populates the toolchain directory and leaves `git status` clean. `scripts/check-all.ps1` passes at each of the three bumps, run separately. Every new compiler diagnostic is named here with its disposition. The binary size is quoted against the 1.39 MB baseline. `pwsh scripts/toolchain-latest.ps1` exits 0 with all three current; lowering one pin makes it exit non-zero naming the component, the pinned version, and the latest. The check writes nothing, proven by there being no write path to `toolchain.json`.
+
+## 7. The Bare-Machine Proof
+
+The whole argument for a repository-scoped toolchain is that a machine with nothing installed can build this. Until that is run on such a machine, it is a design intention rather than a fact.
+
+> [!IMPORTANT]
+> **Split out of `§1` on 2026-09-17, and not weakened in the move.** `§1`'s own Build order called this "the only stage needing a second machine". The development machine has Visual Studio and the Windows Kits installed, verified directly, and Windows Sandbox is not installed, so there is no honest way to run this here. Holding `§1`'s other thirteen items, and the 27 open sections downstream of it, against hardware nobody has was the wrong trade.
+>
+> **`§1` proves the narrower claim** that a compile and link consults nothing outside `reskit/`. That is real and it is not this. **Absence cannot be simulated on a machine that has the thing**: a toolchain can silently fall back to a registry key, an environment variable, or a well-known path, and only a machine genuinely without Visual Studio can show that it does not.
+
+**Needs:** Clean Windows machine (no Visual Studio)
+
+A clean VM, a Windows Sandbox instance, or a second physical machine all serve. Windows Sandbox is the cheapest: it needs the `Containers-DisposableClientVM` feature enabled, which requires elevation and a reboot, so it is an operator action rather than something a session can arrange.
+
+- [ ] Record what the machine is before anything is installed on it. Done when: its Windows build number, and the verified absence of Visual Studio, the Windows Kits, `cl.exe` and `msbuild`, are written here, gathered the same way `§1` gathered them for the development machine.
+- [ ] Clone and bootstrap with nothing else present. Done when: `git clone` without `--recursive` followed by `pwsh scripts/bootstrap.ps1` populates `reskit/` on that machine, and the elapsed time is recorded.
+- [ ] Build the real application, not a sample. Done when: `cmake --preset release && cmake --build --preset release` produces `Bin/Release/Resolute.exe` on that machine, and the binary's size is compared against the figure this repository records.
+- [ ] Run it. Done when: the executable starts on that machine and creates its window, which is the only thing that proves the produced binary has no unmet runtime dependency. Cheaper substitute that fails the checkpoint: a successful link, which says nothing about what the loader will ask for.
+- [ ] Record what the run needed that the bootstrap did not supply, if anything. Done when: either nothing is named, or each missing piece is named with where it came from, because that list is the real content of this section.
+- [ ] Commit: `"workspace: the bare-machine proof"`
+
+**Test checkpoint:** The machine's Windows build is quoted alongside evidence that Visual Studio, the Windows Kits, `cl.exe` and `msbuild` are all absent. A clone without `--recursive` and one bootstrap produce a working toolchain, timed. `Resolute.exe` builds and its size matches what this repository records, or the difference is explained. The executable **runs** and creates its window on that machine. Anything the run needed beyond the bootstrap is named with its source.
 
 ## Verification
 
