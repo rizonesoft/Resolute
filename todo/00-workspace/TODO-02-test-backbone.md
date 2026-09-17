@@ -51,20 +51,100 @@ track: W1
 
 ## 1. Catch2 Harness and Assertion Conventions
 
+> **Started:** 2026-09-17T15:06:21Z
+
 Catch2 is a dependency, not a design. What this section decides is the shape of an assertion, because fourteen tools written against three different assertion styles is the same drift problem in a new place.
 
 **Needs:** C++ toolchain (compile)
 
-- [ ] Add a `tests/` target built by the same preset set, linking Catch2 through whatever mechanism `D00 T01 §2` settled. **Corrected 2026-09-17 by `D00 T01 §5`, which read this while wiring the test gate:** there is no `x64-debug` preset. `CMakePresets.json` declares `debug` and `release`, and **no `testPresets` block at all**, so `ctest --preset` cannot work until this section adds one. Done when: a `testPresets` entry exists and `ctest --preset debug` discovers and runs at least one test.
-- [ ] Write the conventions into `tests/README.md`: naming, tagging by tool, and the rule that a test asserting a system effect reads the effect back rather than trusting a return value. Done when: the file exists and the first tests follow it.
-- [ ] Prove a failure is legible. Done when: a deliberately failing assertion prints the tool tag, the expected value, and the actual value, and the output is quoted here.
-- [ ] Wire the suite into `scripts/check-all.ps1`, replacing the not-present branch that section left. **The branch now exists and has a known shape, recorded 2026-09-17 when `D00 T01 §5` shipped it:** the gate tests `Test-Path tests/`, and while that is false it reports `not present` in yellow, counts separately in the summary as `10 gate(s) ok, 1 not present`, and does not fail the run. Done when: the branch is gone and a failing test fails the combined gate.
-  -> XREF: D00 T01 §5 -- the combined gate, and the tolerance this item removes
-- [ ] Remove the root scratch file `test_font.cpp`, or move it under `tests/` as a real test if it still proves something. **Filed 2026-09-17 by the review of `D00 T03 §1`:** the intake left it tracked at the repository root, where it is built by nothing and named in no layout. Its `.exe` and `.obj` were gitignored during the intake, but the source itself travelled. Done when: `git ls-files test_font.cpp` is empty, or the file lives under `tests/` and `ctest` runs it. Cheaper substitute that fails the checkpoint: gitignoring it while leaving it tracked, which changes nothing because git keeps tracking what it already tracks.
-<!-- claim: exists test_font.cpp -->
-- [ ] Commit: `"workspace: catch2 harness and assertion conventions"`
+> [!IMPORTANT]
+> **Validated 2026-09-17 before implementation. Three findings.**
+>
+> **The checkpoint still named the preset the first item had already corrected.** `D00 T01 §5` fixed `x64-debug` in the item while wiring the test gate and did not reach the `Test checkpoint` six lines below, so this section carried the correction and the error simultaneously. Corrected.
+>
+> **`test_font.cpp` is not a test and cannot become one.** It is 30 lines, tracked at the repository root, and it `printf`s DirectWrite metrics for Cascadia Mono. It contains no assertion of any kind. The item offers to keep it "as a real test if it still proves something", and it does not: a test asserting that a font has a particular height would pin a machine's installed font version rather than this suite's behaviour. It is deleted, and the reason is recorded rather than the file being quietly dropped.
+>
+> **Catch2 arrives the way `D00 T01 §2` settled it**, by `FetchContent` pinned to a **commit** rather than a tag, for the reason recorded there: a tag can be repointed at different code while the version string stays the same. `v3.16.0` is an annotated tag, so the tag object `fd79eadb` is not the commit; the commit it resolves to is `317ac1ed4c0bb6e6b91eafc817e05c488feffcb3`, and that is what is pinned.
 
-**Test checkpoint:** `ctest --preset x64-debug` runs and exits 0. A deliberately failing assertion exits non-zero and prints tool tag, expected, and actual; both outputs are quoted. `pwsh scripts/check-all.ps1` fails when a test fails.
+- [x] Add a `tests/` target built by the same preset set, linking Catch2 through whatever mechanism `D00 T01 §2` settled. **Corrected 2026-09-17 by `D00 T01 §5`, which read this while wiring the test gate:** there is no `x64-debug` preset. `CMakePresets.json` declares `debug` and `release`, and **no `testPresets` block at all**, so `ctest --preset` cannot work until this section adds one. Done when: a `testPresets` entry exists and `ctest --preset debug` discovers and runs at least one test.
+
+  **Done 2026-09-17.** `testPresets` added for both configurations, and `catch_discover_tests` registers each `TEST_CASE` with ctest individually so a failure names the case rather than the executable:
+
+  ```
+  6/6 Test #6: ScaleF keeps the fraction that Scale rounds away ... Passed
+  100% tests passed out of 6                                        exit 0
+  ```
+
+  **`noTestsAction: error` is set deliberately.** A suite that discovers nothing would otherwise report success over zero tests, which is the quiet form of the defect `D00 T01 §5` was built to prevent.
+
+  **The link failed first, and the reason is worth keeping.** `ResoluteUI_static` defines `UNICODE` and `_UNICODE` **publicly**, so Catch2 compiled its entry point as `wmain` rather than `main`. Without `-municode` the CRT looked for `main` or `WinMain`, found neither, and pulled mingw's GUI startup stub:
+
+  ```
+  ld.lld: error: undefined symbol: WinMain
+  >>> referenced by ../crt/crtexewin.c:62
+  ```
+
+  Diagnosed by reading the archive rather than guessing: `llvm-nm` on `libCatch2Maind.a` shows it defines `wmain`, not `main`. The test target now sets `-municode` and deliberately **not** `-mwindows`, because a test runner is a console program.
+- [x] Write the conventions into `tests/README.md`: naming, tagging by tool, and the rule that a test asserting a system effect reads the effect back rather than trusting a return value. Done when: the file exists and the first tests follow it.
+
+  **The load-bearing convention is the read-back rule**, and it is not a style preference: six tools in this suite change a user's registry, ACLs or drive, and `AGENTS.md` freezes what they write. A test asserting `TakeOwnership() == true` proves a function's opinion of itself. Reading the owner back off the path proves the thing the user cares about.
+
+  **The first tests follow it by being chosen for it.** `Dpi::Scale` and `ScaleF` are pure, so there is nothing to read back and the rule is not yet exercised; it is written for `D00 T02 §2`'s fixtures, which is where destructive code first gets a disposable target.
+- [x] Prove a failure is legible. **All three appear in one log, quoted from a real failing run:**
+
+  ```
+  tests/gatefail_probe_test.cpp:9: FAILED:
+    REQUIRE( rui::Dpi::Scale(value, dpi) == 99 )
+  with expansion:
+    4 == 99
+    value := 3
+    dpi := 120
+  ...
+  The following tests FAILED:
+      1 - PROBE: this test fails on purpose (Failed)        dpi ui
+  ```
+
+  Expected and actual come from Catch2's expansion. **The tool tag took a second attempt.** Catch2's console reporter does not print tags at any verbosity, checked at `--verbosity high`. `catch_discover_tests(... ADD_TAGS_AS_LABELS)` carries each case's tags through as **ctest labels**, and ctest prints labels in its failure summary, which is the `dpi ui` above. That is strictly more useful than a printed string, because a label can also be filtered: `ctest --preset debug -L ui`.
+- [x] Wire the suite into `scripts/check-all.ps1`, replacing the not-present branch that section left. **The branch now exists and has a known shape, recorded 2026-09-17 when `D00 T01 §5` shipped it:** the gate tests `Test-Path tests/`, and while that is false it reports `not present` in yellow, counts separately in the summary as `10 gate(s) ok, 1 not present`, and does not fail the run. Done when: the branch is gone and a failing test fails the combined gate.
+
+  **Both done 2026-09-17.** The branch is deleted, and the summary line changed with it:
+
+  ```
+  before   tests  not present  0.0s  tests/ does not exist
+           check-all: 10 gate(s) ok, 1 not present
+  after    tests  ok           0.2s
+           check-all: 11 gate(s) ok
+  ```
+
+  A failing test fails the gate, driven: `tests FAILED`, run exits non-zero, and the excerpt carries the tag, the expansion and the captures.
+
+  > [!WARNING]
+  > **Adding our own tests put 37 findings from a dependency into the tidy baseline, and the cause is a regex that meant something narrower than it said.**
+  >
+  > The first gate run after the suite landed reported `206 finding(s), above the baseline of 169`. The 169 were unchanged and **zero** were in `tests/`: all 37 were in `_deps/catch2-src/src/catch2/`.
+  >
+  > `.clang-tidy` carried `HeaderFilterRegex: '.*[/\](src|shared)[/\].*'`, intended as "this repository's `src` and `shared`". It matches **any** directory called `src` anywhere, and Catch2 keeps its headers in one. The tidy gate filtered translation units by path and not findings, which was invisible while every TU of ours included only our headers.
+  >
+  > Fixed where the number is computed: `scripts/check-all.ps1` now drops any finding whose path contains `/_deps/`, whichever TU surfaced it. That is the same by-construction exemption the warning policy states. `llvm::Regex` has no negative lookahead so the header filter cannot express "not under `_deps`", and the limitation is now written into `.clang-tidy` rather than left to be rediscovered.
+  >
+  > Back to `169 finding(s), baseline 169, over 15 TU(s)`: one more translation unit, no more findings, because the test code is clean.
+  -> XREF: D00 T01 §5 -- the combined gate, and the tolerance this item removes
+- [x] Remove the root scratch file `test_font.cpp`, or move it under `tests/` as a real test if it still proves something. **Filed 2026-09-17 by the review of `D00 T03 §1`:** the intake left it tracked at the repository root, where it is built by nothing and named in no layout. Its `.exe` and `.obj` were gitignored during the intake, but the source itself travelled. Done when: `git ls-files test_font.cpp` is empty, or the file lives under `tests/` and `ctest` runs it. Cheaper substitute that fails the checkpoint: gitignoring it while leaving it tracked, which changes nothing because git keeps tracking what it already tracks.
+
+  **Deleted 2026-09-17, with the reasoning rather than quietly.** It is 30 lines that `printf` DirectWrite metrics for Cascadia Mono and contain **no assertion of any kind**. The item offered to keep it as a real test "if it still proves something", and it does not: a test asserting a font has a particular height would pin the machine's installed font version rather than this suite's behaviour, and would fail on a machine with a different Cascadia build.
+
+  `git rm` rather than gitignore, which is the cheaper substitute this item names. The claim above is flipped from `exists` to `absent`, so the deletion is now re-measured rather than asserted.
+<!-- claim: absent test_font.cpp -->
+- [x] Commit: `"workspace: catch2 harness and assertion conventions"`
+
+<!-- claim: exists tests/README.md -->
+<!-- claim: exists tests/CMakeLists.txt -->
+<!-- claim: count "testPresets" CMakePresets.json = 1 -->
+<!-- claim: count "--preset debug --output-on-failure" scripts/check-all.ps1 = 1 -->
+
+**Test checkpoint:** `ctest --preset debug` runs and exits 0. A deliberately failing assertion exits non-zero and prints tool tag, expected, and actual; both outputs are quoted. `pwsh scripts/check-all.ps1` fails when a test fails.
+
+**Corrected 2026-09-17:** the checkpoint said `ctest --preset x64-debug`. `D00 T01 §5` corrected the same stale name in the first item above and did not reach the checkpoint, so the section carried the correction and the error at once. There is no `x64-debug` preset and there is no `testPresets` block at all; this section adds one.
 
 ## 2. Fixture Store and Disposable Targets
 

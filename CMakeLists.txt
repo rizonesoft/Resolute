@@ -67,6 +67,15 @@ add_subdirectory(src)
 # consumer of the deps/libvterm submodule. Source preserved in history at ac97ed7.
 # add_subdirectory(extensions/RegStudio)
 
+# ── Tests ────────────────────────────────────────────────────
+# D00 T02 §1. On by default: a suite nobody builds is a suite nobody runs, and
+# `check-all.ps1` needs it present to gate on it.
+option(RESOLUTE_BUILD_TESTS "Build the Catch2 test suite" ON)
+if(RESOLUTE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
 # Last, so every subdirectory has declared its targets: fail the configure if
 # any target this project owns never got the warning policy. D00 T01 §3.
 resolute_assert_warnings_complete()

@@ -42,7 +42,14 @@ Checks: >
 
 # Our code only. A dependency is not ours to fix, which is the same rule the
 # warning policy states: `cmake/ResoluteWarnings.cmake`.
-HeaderFilterRegex: '.*[/\](src|shared)[/\].*'
+# Our headers only. NOTE the trap this pattern does not close: it matches any
+# `src` or `shared` directory ANYWHERE, including a dependency's own. Catch2
+# lives at _deps/catch2-src/src/catch2/, so it matches, and D00 T02 §1 found
+# 37 Catch2 findings arriving in the baseline the moment tests/ included it.
+# llvm::Regex has no negative lookahead, so `src but not under _deps` cannot
+# be written here. The authoritative exclusion is in scripts/check-all.ps1,
+# which drops any finding whose path contains /_deps/ before counting.
+HeaderFilterRegex: '.*[/\](src|shared|tests)[/\].*'
 
 WarningsAsErrors: ''
 FormatStyle: none

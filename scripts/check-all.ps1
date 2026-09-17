@@ -23,10 +23,16 @@
     above todo/.tidy-baseline. Rewriting the baseline down, naming which target
     regressed, and refusing a silent raise belong to D07 T01 §2.
 
-    A GATE THAT CANNOT RUN YET. The Catch2 suite arrives with D00 T02 §1. Until
-    then the tests gate reports "not present" and does NOT fail the run, and
-    that tolerance is removed by the section that lands the harness. Reporting
-    a gate as passed when it never ran would be worse than not having it.
+    THE TESTS GATE RUNS FOR REAL. D00 T02 §1 landed the Catch2 harness and
+    deleted the "not present" tolerance this script shipped with. A failing
+    test now fails the gate, and `ctest` is configured with noTestsAction=error
+    so a suite that discovers nothing fails rather than reporting success over
+    zero tests, which is the same defect in a quieter form.
+
+    The Invoke-Gate -Tolerate switch is kept and currently unused. It exists
+    for the next gate that legitimately cannot run yet, and its contract is
+    that a tolerated gate reports "not present" and is counted separately from
+    ok, never folded into it.
 
 .PARAMETER SkipBuild
     Skip the build and tidy gates. For a documentation-only change, where the
@@ -50,6 +56,7 @@ New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
 $Cmake = Join-Path $RepoRoot 'reskit\cmake\bin\cmake.exe'
 $ClangTidy = Join-Path $RepoRoot 'reskit\llvm-mingw\bin\clang-tidy.exe'
+$Ctest = Join-Path $RepoRoot 'reskit\cmake\bin\ctest.exe'
 $BaselineFile = Join-Path $RepoRoot 'todo\.tidy-baseline'
 
 $results = [System.Collections.ArrayList]::new()
@@ -135,6 +142,14 @@ function Get-TidyCount {
         if (-not $m.Success) { continue }
         $file = $m.Groups['file'].Value -replace '\\', '/'
         try { $file = [System.IO.Path]::GetFullPath($file) -replace '\\', '/' } catch { }
+        # A finding INSIDE a dependency is not ours, whichever translation
+        # unit surfaced it. Filtering TUs by path is not enough once one of
+        # our TUs includes a dependency's headers: D00 T02 §1 added tests/,
+        # which includes Catch2, and 37 findings in catch2-src arrived in a
+        # baseline that had never counted a dependency. Same by-construction
+        # exemption the warning policy states, applied where the number is
+        # actually computed.
+        if ($file -match '/_deps/') { continue }
         $key = ($file.ToLowerInvariant() + '|' + $m.Groups['line'].Value + '|' +
                 $m.Groups['col'].Value + '|' + $m.Groups['check'].Value)
         [void]$seen.Add($key)
@@ -228,13 +243,11 @@ if (-not $SkipBuild) {
 
 # ── tests ────────────────────────────────────────────────────
 
-$testsDir = Join-Path $RepoRoot 'tests'
-Invoke-Gate -Name 'tests' -LogName 'gate-tests' `
-    -Tolerate:(-not (Test-Path $testsDir)) `
-    -TolerateWhen:$(if (Test-Path $testsDir) { '' } else { 'tests/ does not exist; D00 T02 §1 lands the harness and removes this tolerance' }) `
-    -Command {
-        & $Cmake --build (Join-Path $RepoRoot 'build\debug') --target test
-    }
+# The not-present tolerance D00 T01 §5 left here is GONE, removed by
+# D00 T02 §1 which landed the harness. A failing test now fails the gate.
+Invoke-Gate -Name 'tests' -LogName 'gate-tests' -Command {
+    & $Ctest --preset debug --output-on-failure
+}
 
 # ── validate, and the plan projection ────────────────────────
 
