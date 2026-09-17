@@ -43,7 +43,7 @@ track: W1
 | :---: | :-----: | ------------------------------------------ | -------------- | :----: |
 |   1   |   §1    | Catch2 harness and assertion conventions   | D00 T01 §2     |  [x]   |
 |   2   |   §2    | Fixture store and disposable targets       | §1             |  [x]   |
-|   3   |   §3    | House-style capture store                  | --             |  [ ]   |
+|   3   |   §3    | House-style contract, checked against source | --            |  [ ]   |
 |   4   |   §4    | Parity driver for a built tool             | §1, §2         |  [ ]   |
 |   5   |   §5    | Cover the inherited UI library             | §1, D00 T03 §3 |  [ ]   |
 
@@ -262,19 +262,87 @@ This is the section that makes the destructive half of the suite testable. The A
 
 **Test checkpoint:** The fixture suite runs green unelevated. A deliberately aborted run leaves `HKCU\Software\ResoluteTestFixtures` absent and the fixture tree removed, both asserted. A helper handed an out-of-root path fails by name. All three are quoted.
 
-## 3. House-Style Capture Store
+## 3. House-Style Contract, Checked Against Source
+
+> **Started:** 2026-09-17T16:28:45Z
+
+> [!IMPORTANT]
+> **Rewritten 2026-09-17 on operator instruction, after the operator asked why a visual capture was needed at all. The answer was that it is not, and the question is the finding.**
+>
+> This section was "House-Style Capture Store": screenshot five shipped AutoIt surfaces and commit the PNGs. **The geometry is already in source, exactly and diffably, on both sides:**
+>
+> ```
+> AutoIt   GUICtrlCreateLabel($g_sProgName, $g_iSizeIcon + 22, 15, 300, 35)
+> C++      BASE_WIDTH = 200   BASE_ITEM_HEIGHT = 40   BASE_FONT_SIZE = 14
+> ```
+>
+> **What a PNG costs.** It is a binary blob, so review sees that something changed and never what. It is machine-dependent: the one capture taken before this rewrite needed a sidecar recording `96 dpi` and `Windows 10.0.26200` precisely because the image does not travel. Reaching anything behind a menu needs input automation, which on this machine sent keystrokes into an unrelated application. And it goes stale silently, because nobody re-stakes a screenshot after a padding change.
+>
+> **What it buys that source does not** is proof that the code *rendered*, as opposed to being specified: correct coordinates with the wrong brush, clipped text, or bad z-order all read fine in source. That is real, and `docs/captures/ui-automation-spike.md` already assigned it to `D01 T02 §5`, observing that a screenshot "proves something rendered rather than that it rendered the truth". It is not this section's job.
+>
+> **And for the AutoIt captures specifically the premise was already dead.** `AGENTS.md` says the UI is "rebuilt rather than reproduced, because the AutoIt windows are not DPI-aware and have no dark mode". A screenshot of a surface the suite has decided not to copy is not a baseline for anything.
+>
+> **The path does not change.** 29 `Fidelity:` citations across 15 files point at `docs/captures/house-style/`, and they need something to point at. What changes is what lives there: a derived contract a test enforces, rather than images a human compares by eye. `docs/captures/` stays correctly named because `runs/` below still holds real captures.
 
 Every UI section in this plan carries a `Fidelity:` line naming an artifact it must match. Those artifacts have to exist before anything cites them, or the fidelity rule is a rule about a file nobody has.
 
-**Needs:** Windows host (build/test)
+**Needs:** C++ toolchain (compile)
 
-- [ ] Capture the shipped AutoIt surfaces that define the house style: the standard tool window, the About dialog, the preferences dialog, the update notice, and a result list. Done when: five captures are committed under `docs/captures/house-style/` and each names the tool and build it came from.
-- [ ] Write `docs/captures/house-style/README.md` describing what each capture is authoritative for. Done when: each of the five has a stated scope and a named successor surface in the C++ suite.
-- [ ] State what the C++ suite deliberately changes, by naming [`DESIGN.md`](../../DESIGN.md) as the authority. Done when: the capture README records that where a capture and the contract disagree, the contract wins and the capture is restaked.
-- [ ] Set the convention for run captures under `docs/captures/runs/`, which driven-run checkpoints commit to. Done when: the convention is written and one example capture exists.
-- [ ] Commit: `"workspace: house-style capture store"`
+- [x] Derive the house-style contract from source into `docs/captures/house-style/contract.md`: the geometry, typography, spacing and colour tokens every shared control uses, each value naming the symbol it came from. Done when: every number in the file cites the header and constant it was read out of, so a reader can check it without trusting this file. Cheaper substitute that fails the checkpoint: writing the numbers by hand, which produces a second source of truth that drifts from the first.
 
-**Test checkpoint:** `docs/captures/house-style/` holds five captures, each naming its source tool and build, with a README giving each a scope and a successor. The approved-deviation list names DPI and dark mode. One example run capture exists under `docs/captures/runs/`.
+  **Done 2026-09-17. 25 tokens across four controls**, each row naming the class, constant and header it came from:
+
+  ```
+  Sidebar     6 tokens   Toolbar    3 tokens
+  StatusBar   5 tokens   ListView  11 tokens
+  ```
+
+  **What the contract deliberately does not cover, stated in the file:** colour, because `Theme::Colors()` changes with theme and system accent so a single number would be wrong in at least one state; and the type ramp, because where a control passes a raw size rather than a `TypeStyle` entry that is a defect for `D01 T02` rather than a value to enshrine.
+- [x] Make drift fail the gate rather than fail to be noticed. Done when: a Catch2 test asserts the contract's values against the constants themselves, changing a constant without changing the contract fails `check-all.ps1`, and both the failing and passing outputs are quoted. Cheaper substitute: comparing two images by eye, which is what this section stopped doing and why.
+
+  **Driven both ways 2026-09-17.** `Sidebar::BASE_WIDTH` changed from 200 to 220 without touching the contract:
+
+  ```
+  house_style_test.cpp:121: FAILED:
+    CHECK( found->second == actual )
+  with expansion:
+    200 == 220
+  with messages:
+    symbol := "Sidebar::BASE_WIDTH"
+
+  The following tests FAILED:
+    1 - Every contract value matches the constant it names (Failed)  housestyle ui
+  check-all: tests FAILED
+  ```
+
+  Reverting returns the suite to 22 passing. **The test carries no numbers of its own**: its table maps a contract row to its constant, the expected value is read from `contract.md` at run time, so there is no third copy to drift. Three tests, and the other two matter: one asserts the contract parses to something, because a contract parsing to nothing would let every other assertion pass vacuously, and one checks the reverse direction so a row naming a renamed constant cannot sit in the file unchecked.
+- [x] Write `docs/captures/house-style/README.md` describing what the directory is authoritative for and what it is not. Done when: it states that the contract binds layout and tokens, that rendering fidelity is `D01 T02 §5`'s, and that a `Fidelity:` citation means the contract plus [`DESIGN.md`](../../DESIGN.md). **Done**, and it also records why the directory is not a screenshot store, so the next person to ask the question this section was rewritten by finds the answer rather than re-deriving it.
+- [x] State what the C++ suite deliberately changes, by naming [`DESIGN.md`](../../DESIGN.md) as the authority. Done when: the README records that where the contract and `DESIGN.md` disagree the contract file is wrong and is restaked, and that **DPI awareness and dark mode are the approved deviations** from the AutoIt suite, which had neither.
+
+  **Both are recorded with what makes them real rather than aspirational.** DPI awareness is pinned by `tests/dpi_test.cpp` and every contract value is a base at 96 scaled through `Dpi::Scale` at draw time; the example run capture below is taken at **144 dpi** and the launcher renders correctly, which is the deviation visible rather than asserted. Dark mode is `Theme::Colors()` returning a palette per theme, which is also why colour is deliberately absent from the contract.
+
+  **`DESIGN.md` was updated in the same change**, because its "How it binds" paragraph said a `Fidelity:` block names "this file and the captures". It now names the contract, and records why a contract replaced screenshots so the reasoning sits with the rule rather than only in this section.
+- [x] Set the convention for run captures under `docs/captures/runs/`, which driven-run checkpoints commit to. Done when: the convention is written, it says what a run capture must carry to be evidence rather than a screenshot, and one example capture exists.
+
+  **Four things, and a capture missing any of them is a picture of a moment nobody can place:** what it proves, what produced it, the machine it came from, and its date. `scripts/capture-window.ps1` writes a sidecar carrying all four.
+
+  **The convention says prefer text**, because a log line or an `.ini` readback is diffable, travels between machines, and can be asserted in a test, and an image is none of those. An image is for something genuinely visual with no textual form.
+
+  **The example is the C++ launcher, not an AutoIt tool**, which is the point of the rewrite: it is the one real surface of the thing being built.
+
+  ```
+  2026-09-17-D00-T02-s3-launcher-window.png   1100x720 @ 144 dpi
+  ```
+- [x] Commit: `"workspace: house-style contract, checked against source"`
+
+<!-- claim: exists docs/captures/house-style/contract.md -->
+<!-- claim: exists docs/captures/house-style/README.md -->
+<!-- claim: exists docs/captures/runs/README.md -->
+<!-- claim: exists tests/house_style_test.cpp -->
+<!-- claim: count "BASE_WIDTH" docs/captures/house-style/contract.md = 1 -->
+
+**Test checkpoint:** `docs/captures/house-style/contract.md` exists and every value in it names the symbol it was derived from. A Catch2 test asserts the contract against the constants; changing a constant without the contract fails `pwsh scripts/check-all.ps1`, and reverting passes, both quoted. The README states the directory's scope, names `DESIGN.md` as the authority, and names DPI and dark mode as the approved deviations. One example run capture exists under `docs/captures/runs/` with the convention written.
+
 
 ## 4. Parity Driver for a Built Tool
 
@@ -312,7 +380,7 @@ The library that fourteen tools are about to depend on has **no tests at all**. 
 
 - [ ] `ctest --preset x64-debug` exits 0 with the fixture, parity, and ui suites reporting
 - [ ] A deliberately aborted run leaves no fixture residue in registry or filesystem
-- [ ] `docs/captures/house-style/` holds the five authoritative captures with their README
+- [ ] `docs/captures/house-style/` holds the derived contract and its README, and a test fails when the code drifts from it
 - [ ] The parity driver produces comparable records from both implementations of one tool
 - [ ] The inherited UI library has coverage, and what is uncovered is listed with its reason
 - [ ] `python scripts/todo-graph.py validate` clean

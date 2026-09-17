@@ -112,7 +112,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T01 §6` | Keep the toolchain current                     |  12   |
 | [x] | `D00 T02 §1` | Catch2 harness and assertion conventions       |   6   |
 | [x] | `D00 T02 §2` | Fixture store and disposable targets           |   6   |
-| [ ] | `D00 T02 §3` | House-style capture store                      |   5   |
+| [ ] | `D00 T02 §3` | House-style capture store                      |   6   |
 | [ ] | `D00 T02 §4` | Parity driver for a built tool                 |   7   |
 | [ ] | `D07 T01 §1` | The conformance profile                        |   7   |
 | [ ] | `D07 T01 §2` | Warning and analysis ratchet                   |   5   |

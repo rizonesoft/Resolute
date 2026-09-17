@@ -4,7 +4,9 @@ The design contract for Resolute. Every surface in every tool is held to this.
 
 This is a **contract, not a roadmap.** It says what is true of a finished surface. Work that makes it true lives in `todo/`, primarily `D01 T01 §7`-`§8` and `D01 T02`. If a rule here is not yet implemented everywhere, that is a gap in the plan, not permission to deviate.
 
-**How it binds.** `todo/README.md` requires every user-facing section to carry a `Fidelity:` block. That block names this file and the captures under `docs/captures/house-style/`. `review-todo-section` compares a rendered surface against both before stamping, and `D07 T01 §3` checks it per tool.
+**How it binds.** `todo/README.md` requires every user-facing section to carry a `Fidelity:` block. That block names this file and the house-style contract under `docs/captures/house-style/`. `review-todo-section` compares a rendered surface against both before stamping, and `D07 T01 §3` checks it per tool.
+
+**Why a contract rather than screenshots.** `D00 T02 §3` was written to store captured images and was rewritten on 2026-09-17 when the operator asked what a screenshot proved that the source did not. The geometry, typography and spacing are already constants in the shared controls, so the house style is derived from them and a test fails when the two disagree. That makes drift a failing gate rather than something somebody notices while comparing two images. What a screenshot does prove, that a surface *rendered* rather than was merely specified, belongs to `D01 T02 §5` and the automation tree it builds.
 
 **How to change it.** Edit this file in a commit that says what changed and why, and update the affected captures in the same commit. A deviation that is agreed becomes a rule here; a deviation that is not agreed is a defect. Never fork a rule into a tool.
 

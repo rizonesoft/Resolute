@@ -35,6 +35,9 @@ add_executable(resolute_tests
 # file, which is what D00 T01 §4 requires. D00 T02 §2.
 target_compile_definitions(resolute_tests PRIVATE
     RESOLUTE_FIXTURE_ROOT="${CMAKE_BINARY_DIR}/fixtures"
+    # The house-style contract the test asserts against the constants.
+    # Supplied by CMake so no absolute path enters a tracked build file.
+    RESOLUTE_CONTRACT_PATH="${CMAKE_SOURCE_DIR}/docs/captures/house-style/contract.md"
 )
 target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
