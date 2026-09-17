@@ -32,6 +32,8 @@ track: W1
 <!-- claim: count "def _longest_chain" scripts/todo-graph.py = 1 -->
 <!-- claim: count "def _filing_couplings" scripts/todo-graph.py = 1 -->
 <!-- claim: count "FILED_TO_RE" scripts/todo-findings.py = 2 -->
+<!-- claim: count "gpt-5.6-sol" .claude/skills/process-todo-section/SKILL.md = 2 -->
+<!-- claim: count "model_reasoning_effort" .claude/skills/process-todo-section/SKILL.md = 1 -->
 
 ## Inputs
 
@@ -60,6 +62,7 @@ track: W1
 |   3   |   §3    | Section calibration                        | §2         |  [x]   |
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [x]   |
 |   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [x]   |
+|   6   |   §6    | The adversarial reviewer                   | §2         |  [ ]   |
 
 ---
 
@@ -359,6 +362,57 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 > **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 
 **Test checkpoint:** `python scripts/todo-graph.py validate` reports an advisory count recorded in this section, down from 72, with every remaining advisory naming something a reader can act on. The four shipped anchors above report as owned and `git diff` shows no change inside any `[x]` section body. A deliberately wrong anchor is still reported, driven, so the fall in count is not the check going blind. `python scripts/todo-graph.py self-test` stays green.
+
+## 6. The Adversarial Reviewer
+
+Every other section in this file makes the plan notice something about **itself**. This one is about the only check in the process that is not run by the party being checked.
+
+**Measured 2026-09-17 from the findings ledger**, which is `§2`'s output and the reason that section exists:
+
+| | count |
+| --- | ---: |
+| findings in the ledger | 101 |
+| raised by the independent reviewer, across 20 runs | 37 |
+| of those, later refuted | 0 |
+| runs that found nothing actionable | 5 of 20 |
+| findings categorised `adversarial`, the lens the authoring session runs on itself | 12 |
+| findings categorised `record`, the lens that session is good at | 31 |
+
+**The split is the argument.** Self-review is good at stale facts and internal contradiction, which is what `record` at 31 measures. It is weak at imagining hostile input against its own design, because the same imagination drew the design. `D07 T01 §1` put a number on that: five failure modes driven by hand, and the sixth found by the reviewer, missed because the author does not think of Markdown table rows as indentable.
+
+`review-todo-section` names an `adversarial` lens and is explicit that the authoring session running it is a stand-in:
+
+> Until the external review panel is wired (see Deferred in the repo README), the session performs the lenses itself
+
+**That pointer resolves to nothing.** `README.md` has no Deferred section, and no file in `todo/` or `docs/` mentions a review panel. So the one thing that would own a real adversarial reviewer has been cited by a skill and owned by nobody, which is an unfalsifiable deferral with no address: the exact defect `§2` was built to stop recurring, sitting inside the review system itself.
+
+**What changed on 2026-09-17, and why this is now cheap.** The reviewer was repointed at `gpt-5.6-sol` at high effort, **pinned in the command** rather than read from the machine's codex config, because a stamp that names its reviewer is only true if the command fixed it. In the same run two facts were established by driving them:
+
+- **A stamp commit is worth reviewing.** Its first run read the stamp for `D07 T01 §1` and returned three P2 and one P3, all correct, while every runtime gate was green. The convention recorded in `D00 T03 §1`, that a stamp commit "carries only this stamp" and is left unreviewed by design, is falsified by its own counter-example.
+- **An instructed pass is possible after all.** `--commit`, `--base` and `--uncommitted` each refuse a `[PROMPT]`, which an earlier skill generalised into "do not reintroduce one". A **bare** prompt with no scope flag is legal, reviews the latest commit on a clean tree, and obeys its instructions, driven with a sentinel phrase that came back.
+
+So this section is mostly wiring and measurement rather than construction, and it must not become a project.
+
+**Build order.** Wire the cheap catch first, then measure whether more is warranted, and only then decide whether to spend anything. The trap is building a review panel because it sounds thorough; the evidence for a second model has to come from the ledger, not from taste.
+
+1. **Review the stamp before it is pushed.** The staged stamp, not the pushed commit, so there is no circularity. Done when: `review-todo-section` runs it and a deliberately wrong figure in a staged stamp is named before the push.
+2. **Record who raised each finding**, so the split above is a query rather than three greps in two phrasings. Done when: `todo-findings.py` reports it and a finding with no source is reported rather than bucketed.
+3. **Add the instructed pass**, with its scope caveat written down. Done when: it runs, obeys, and the caveat is recorded.
+4. **Repair the stale pointer**, in the same commit as the section that replaces it.
+5. **Decide on a second model from the data**, or record that the sample is too small and name the threshold.
+
+- [ ] Wire the stamp review into `review-todo-section` step 7, before the STAMP push, reviewing the **staged** stamp with the pinned model. Done when: the skill carries the command, and a staged stamp containing a deliberately wrong figure is **named by the reviewer before the push**, quoted. Cheaper substitute that fails the checkpoint: reviewing the stamp commit after pushing it, which is the current state and means the wrong figure is already published while being discussed.
+- [ ] Record the source of every finding, `independent` or `self`, and teach `scripts/todo-findings.py` to report the split beside category and disposition. Done when: the split prints, a finding whose source is missing or outside the closed set is **reported rather than bucketed**, in the same way an unknown category already is, and the self-test covers both. Cheaper substitute that fails the checkpoint: inferring the source by grepping review prose for the reviewer's name, which is how the 37 above were counted and took two different phrasings across twenty files to find.
+- [ ] Add the instructed adversarial pass as a second, advisory run, with a prompt that asks for constructed hostile states rather than a diff read. Done when: a driven run shows the instructions obeyed, and the skill records that a bare prompt **cannot pin a SHA** so the pass is only trustworthy on a clean tree immediately after the SHIP push, with the summary checked to name the right work.
+- [ ] Repair the stale pointer at `.claude/skills/review-todo-section/SKILL.md`, which cites a Deferred record in the repository README that does not exist. Done when: it cites this section, and a search for "review panel" across `todo/`, `docs/` and `README.md` either resolves or returns nothing because the phrase is gone.
+- [ ] Decide whether a **second reviewer model** is worth its cost, from the recorded split rather than from taste. Done when: the decision is dated and cites the measured independent-versus-self numbers; if the sample is too small to decide, **that is the recorded answer**, with the sample size needed to revisit it named. Cheaper substitute that fails the checkpoint: adding a second model because two reviewers sound better than one, which doubles the cost of every section for an unmeasured gain.
+- [ ] State what the independent reviewer has repeatedly **failed** to catch, from the ledger. Done when: this section names the classes, so nobody reads `0 refuted` as `nothing missed`. Three are already recorded in stamps: a duplicate resource id that is legal and therefore invisible to a diff reader, surviving identifiers on lines that are internally consistent, and a performance regression invisible to any probe that only asks whether the output is correct.
+- [ ] Commit: `"workspace: the adversarial reviewer, wired and measured"`
+
+**Test checkpoint:** A staged stamp carrying a deliberately wrong figure is named by the independent reviewer **before** the STAMP push, quoted. `python scripts/todo-findings.py` prints the independent-versus-self split, and a finding with a missing or unknown source is reported by name rather than bucketed, both quoted, with the self-test covering both. The instructed pass is driven and its instructions are shown to have been obeyed. A search for "review panel" across `todo/`, `docs/` and `README.md` resolves or is empty. The second-model decision is dated and cites the split, or records the sample as insufficient and names the threshold. This section names at least three defect classes the independent reviewer has missed.
+
+> **Filed 2026-09-17 by the operator**, from a question asked during `D07 T01 §1`: "do we have an adversarial reviewer?" The measurement above is the answer, and it is *partly*. The evidence is `§2`'s ledger, which is what that section was for.
+> -> SOURCE: docs/reviews/findings.md
 
 ## Verification
 
