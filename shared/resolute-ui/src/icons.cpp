@@ -27,7 +27,11 @@ bool LucideIcons::Load() {
     s_getName   = &LucideGetIconName;
     s_render    = &LucideRenderIcon;
     s_free      = &LucideFree;
-    s_createBmp = reinterpret_cast<FnCreateBmp>(&LucideCreateHBitmap);
+    // No cast. FnCreateBmp is void*(*)(const char*, int, uint32_t) and that is
+    // exactly LucideCreateHBitmap's signature, so a plain assignment is
+    // type-checked. A reinterpret_cast here would compile whatever the
+    // signature became, which is the opposite of what direct binding is for.
+    s_createBmp = &LucideCreateHBitmap;
     s_getSvg    = &LucideGetSvgData;
     return true;
 #else
