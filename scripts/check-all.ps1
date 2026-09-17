@@ -51,6 +51,20 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $RepoRoot = Split-Path $PSScriptRoot -Parent
+
+# Every gate runs from the repository root, once, here.
+#
+# Two gates resolve paths against the CURRENT directory rather than an
+# absolute one: `ctest --preset` looks for CMakePresets.json beside it, and
+# `plan --check` reads its derived JSON under build/. Run from scripts/, both
+# fail with the tree perfectly healthy.
+#
+# D00 T01 §5's review found exactly this for `cmake --preset` and it was fixed
+# for the launcher build alone. D00 T02 §1 then reintroduced the same class
+# with `ctest --preset`. Fixing it per-invocation is what allowed that, so it
+# is fixed once for the whole script instead: a command whose promise is that
+# it can always be run should not care where it is run from.
+Push-Location $RepoRoot
 $LogDir = Join-Path $RepoRoot 'build\logs'
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
@@ -348,6 +362,7 @@ foreach ($r in $failed) {
 Write-Host ''
 if ($failed.Count -gt 0) {
     Write-Host "check-all: $($failed.Count) of $($results.Count) gate(s) FAILED" -ForegroundColor Red
+    Pop-Location
     exit 1
 }
 $tolerated = @($results | Where-Object { $_.Status -eq 'not present' })
@@ -357,4 +372,5 @@ if ($tolerated.Count -gt 0) {
 else {
     Write-Host "check-all: $($results.Count) gate(s) ok" -ForegroundColor Green
 }
+Pop-Location
 exit 0

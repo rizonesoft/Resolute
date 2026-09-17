@@ -119,6 +119,21 @@ Catch2 is a dependency, not a design. What this section decides is the shape of 
   A failing test fails the gate, driven: `tests FAILED`, run exits non-zero, and the excerpt carries the tag, the expansion and the captures.
 
   > [!WARNING]
+  > **The independent review found I had reintroduced a defect `D00 T01 §5`'s review already caught. Corrected 2026-09-17.**
+  >
+  > `ctest --preset` reads `CMakePresets.json` from the **current** directory. Run from `scripts/`, the gate failed with `Could not read presets` while the tree was perfectly healthy. `§5`'s review found exactly this for `cmake --preset`, and the fix there was applied to the launcher build **alone**, so the class stayed open and this section walked into it two sections later.
+  >
+  > **Fixing it per-invocation is what allowed the recurrence**, so it is fixed once for the whole script: `check-all.ps1` now runs from the repository root. That also caught a second instance nobody had reported, `plan --check`, which resolves its derived JSON under `build/` the same way.
+  >
+  > ```
+  > before   from scripts/   tests FAILED, plan --check FAILED, 2 of 8
+  > after    from scripts/   8 gate(s) ok
+  >          from the root   11 gate(s) ok
+  > ```
+  >
+  > A command whose whole promise is that it can always be run should not care where it is run from.
+
+  > [!WARNING]
   > **Adding our own tests put 37 findings from a dependency into the tidy baseline, and the cause is a regex that meant something narrower than it said.**
   >
   > The first gate run after the suite landed reported `206 finding(s), above the baseline of 169`. The 169 were unchanged and **zero** were in `tests/`: all 37 were in `_deps/catch2-src/src/catch2/`.
