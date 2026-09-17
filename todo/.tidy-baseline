@@ -7,15 +7,37 @@
 # Format: the first line that is not blank and does not start with '#' is
 # `count: <integer>`. Everything else here is for the person reading it.
 
-count: 59
+count: 103
 
+# ── Raised 59 -> 103 on 2026-09-17, and why that is not a regression
+#
+# D00 T01 §5's independent review found the combined gate analysing only the
+# ROOT compile database. RegStudio is commented out of the root CMakeLists and
+# builds standalone, so its translation units were in no database the gate read
+# and its own build tree exported none at all. An entire shipped extension was
+# unanalysed while the gate reported success.
+#
+# The gate now reads every database, the root's and each extension's. The count
+# rose by exactly the findings that were always there and never looked at:
+#
+#     launcher + shared   59    unchanged, which is the check on this move
+#     RegStudio           44    newly covered
+#     total              103
+#
+# The 59 not moving is what makes this a coverage increase rather than a
+# regression. This file says the ratchet only goes down, and that rule stands:
+# raising it needed this paragraph, and the next raise needs its own.
+#
 # ── How to reproduce this number exactly ─────────────────────
 #
 # A baseline nobody can re-derive is a number, not a measurement. Three things
 # decide it, and all three have to match:
 #
 # 1. THE TRANSLATION UNITS. Every entry in `build/release/compile_commands.json`
-#    whose file is not under `_deps/` and does not end in `.rc`. That was 13.
+#    whose file is not under `_deps/` and does not end in `.rc`, PLUS the same
+#    from every `extensions/<Tool>/build/Release/compile_commands.json`. The
+#    root database alone is not the project: it excludes every extension that
+#    builds standalone, which is all of them.
 #    Taking the list from the compile database rather than from a glob is what
 #    keeps it honest: a source nobody compiles cannot hide findings.
 #
@@ -44,10 +66,11 @@ count: 59
 # Release, not debug: release is what ships, and only release carries the
 # optimiser-dependent analyser paths.
 
-# ── What the 59 are ──────────────────────────────────────────
+# ── What the 103 are ─────────────────────────────────────────
 #
-#   25  performance-no-int-to-ptr
-#   12  bugprone-switch-missing-default-case
+#   36  performance-no-int-to-ptr
+#   29  misc-use-internal-linkage
+#   16  bugprone-switch-missing-default-case
 #    8  performance-enum-size
 #    4  clang-analyzer-security.ArrayBound
 #    2  performance-unnecessary-value-param

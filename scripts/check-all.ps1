@@ -147,21 +147,50 @@ if (-not $SkipBuild) {
     $clock = [System.Diagnostics.Stopwatch]::StartNew()
     $tidyStatus = 'ok'; $tidyDetail = ''; $tidyFailed = $false
 
-    $db = Join-Path $RepoRoot 'build\release\compile_commands.json'
-    if (-not (Test-Path $db)) {
+    # EVERY compile database, not just the root's. RegStudio is commented out
+    # of the root CMakeLists and builds standalone, so the root database does
+    # not contain it and analysing only the root leaves an entire shipped
+    # extension unchecked while the gate reports success. The independent
+    # review of D00 T01 §5 found that: 0 RegStudio translation units in the
+    # root database, and no database in its own build tree either.
+    $databases = @(Join-Path $RepoRoot 'build\release\compile_commands.json')
+    $extRoot = Join-Path $RepoRoot 'extensions'
+    if (Test-Path $extRoot) {
+        $databases += @(Get-ChildItem -Path $extRoot -Directory |
+            ForEach-Object { Join-Path $_.FullName 'build\Release\compile_commands.json' })
+    }
+    $databases = @($databases | Where-Object { Test-Path $_ })
+
+    if ($databases.Count -eq 0) {
         $tidyStatus = 'FAILED'; $tidyFailed = $true
-        $tidyDetail = "no compile database at $db; the release build must run first"
+        $tidyDetail = 'no compile database anywhere; the release build must run first'
         Set-Content -Path $tidyLog -Value $tidyDetail
     }
     else {
-        $tus = (Get-Content $db -Raw | ConvertFrom-Json) |
-            Where-Object { $_.file -notmatch '_deps' -and $_.file -notmatch '\.rc$' } |
-            ForEach-Object { $_.file }
+        $tus = @()
+        foreach ($db in $databases) {
+            $dir = Split-Path $db -Parent
+            $tus += @((Get-Content $db -Raw | ConvertFrom-Json) |
+                Where-Object { $_.file -notmatch '_deps' -and $_.file -notmatch '\.rc$' } |
+                ForEach-Object { [pscustomobject]@{ File = $_.file; BuildDir = $dir } })
+        }
 
         Remove-Item $tidyLog -ErrorAction SilentlyContinue
+        # Track EVERY invocation's exit code. Ignoring them is how a gate comes
+        # to report success on analysis that never ran: clang-tidy that fails to
+        # configure or fails to parse emits errors and zero warnings, and a
+        # counter that only counts warnings then reports 0, which is under any
+        # baseline. The independent review reproduced exactly that.
+        $failedRuns = 0
         foreach ($tu in $tus) {
-            & $ClangTidy -p (Join-Path $RepoRoot 'build\release') --quiet $tu *>> $tidyLog
+            & $ClangTidy -p $tu.BuildDir --quiet $tu.File *>> $tidyLog
+            if ($LASTEXITCODE -ne 0) { $failedRuns++ }
         }
+
+        # An error diagnostic means the analysis did not complete over that
+        # translation unit, so its warning count is not evidence of anything.
+        $errorLines = @(Select-String -Path $tidyLog -Pattern 'clang-diagnostic-error|error: |Error while processing' `
+            -ErrorAction SilentlyContinue)
 
         $count = Get-TidyCount -LogPath $tidyLog
         $baseline = $null
@@ -172,7 +201,12 @@ if (-not $SkipBuild) {
                 break
             }
         }
-        if ($null -eq $baseline) {
+
+        if ($failedRuns -gt 0 -or $errorLines.Count -gt 0) {
+            $tidyStatus = 'FAILED'; $tidyFailed = $true
+            $tidyDetail = "analysis did not complete: $failedRuns of $($tus.Count) invocation(s) exited non-zero, $($errorLines.Count) error diagnostic(s). The finding count is not evidence until this is clean."
+        }
+        elseif ($null -eq $baseline) {
             $tidyStatus = 'FAILED'; $tidyFailed = $true
             $tidyDetail = "todo/.tidy-baseline has no 'count: <n>' line"
         }
@@ -181,7 +215,7 @@ if (-not $SkipBuild) {
             $tidyDetail = "clang-tidy found $count finding(s), above the baseline of $baseline"
         }
         else {
-            $tidyDetail = "$count finding(s), baseline $baseline"
+            $tidyDetail = "$count finding(s), baseline $baseline, over $($tus.Count) TU(s) from $($databases.Count) database(s)"
         }
     }
     $clock.Stop()

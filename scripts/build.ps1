@@ -200,6 +200,7 @@ function Build-Extension {
         $code = Invoke-Logged "$ExtName-$Configuration-configure" {
             & $Cmake "$extPath" -G Ninja --no-warn-unused-cli `
                 "-DCMAKE_BUILD_TYPE=$Configuration" `
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON" `
                 "-DCMAKE_C_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang.exe" `
                 "-DCMAKE_CXX_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang++.exe" `
                 "-DCMAKE_RC_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/llvm-windres.exe" `

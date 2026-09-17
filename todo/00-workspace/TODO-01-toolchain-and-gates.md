@@ -602,6 +602,29 @@ Five gates that must each be remembered are five gates that get skipped under ti
 
   The second was driven by lowering the baseline rather than by manufacturing a finding, because it is the **comparator** under test and varying the cheaper side keeps the probe honest and reversible.
 
+  > [!WARNING]
+  > **The independent review found this gate reporting success on analysis that never ran, and an entire extension it never looked at. Corrected 2026-09-17.**
+  >
+  > **P1.** The loop ignored every `clang-tidy` exit code and the counter recognised only `warning:` lines. Analysis that cannot complete emits **errors and zero warnings**, so a broken config, an unreadable compile database or a failed analyser produced a count of 0, which is under any baseline, and the gate reported `ok`. Reproduced with an invalid `.clang-tidy` key.
+  >
+  > **This is the fifth time this file has found a check that reports success while doing nothing**, after `§1`'s "reskit/ is unchanged" on a destructive abort, `§2`'s "No .exe found" after a successful link, `§4`'s build script that built no launcher, and `§4`'s Debug binary deployed as Release. It is the first one I wrote myself, in the section whose whole purpose is that the checks cannot be skipped, while writing comments about that exact failure.
+  >
+  > **And the obvious half of the fix was not the half that works.** The review proposed tracking failures for every invocation. Driven, `clang-tidy` **exits 0** on an unknown config key: the probe reports `0 of 14 invocation(s) exited non-zero, 56 error diagnostic(s)`. Exit codes alone would not have caught it. The load-bearing check is scanning for `clang-diagnostic-error`, `error: ` and `Error while processing`, and both are kept because they fail differently.
+  >
+  > **P2.** The gate read only the **root** compile database. `RegStudio` is commented out of the root `CMakeLists.txt` and builds standalone, so it appeared in no database the gate read, **0 of 35 root entries**, and its own build tree exported none at all. A shipped extension was analysed by nothing while the combined command reported success.
+  >
+  > `scripts/build.ps1` now exports a compile database for every extension, and the gate reads all of them.
+  >
+  > **The baseline moved 59 to 103, and that is a coverage increase rather than a regression:**
+  >
+  > | | findings |
+  > | --- | ---: |
+  > | launcher + shared | 59, **unchanged** |
+  > | `RegStudio`, newly covered | 44 |
+  > | total | **103** |
+  >
+  > The 59 not moving is the check on the move. `todo/.tidy-baseline` records the raise with this reasoning, because that file says the ratchet only goes down and a raise has to earn its paragraph.
+
   **The counter is reimplemented in PowerShell here and it agrees with the Python one**, both reporting 59 on the same tree. That is worth stating: `§3` recorded a baseline of 52 instead of 59 because its check-name character class was lowercase-only, and a second independent implementation landing on the same number is the check that mistake never got.
 - [x] Tolerate the harness not existing yet. Verified 2026-09-17: `tests/` does not exist, the gate reports `not present` with the reason and the section that removes it, and the run still exits 0.
 
