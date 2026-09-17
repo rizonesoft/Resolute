@@ -203,10 +203,14 @@ Push the SHIP push. The commit must exist on the remote before the next step, be
 **An outside reviewer reads the commit before this session stamps its own work.** The session that built a section is the worst judge of whether it is right, and this step exists to break that.
 
 ```bash
-codex review --commit <SHIP_SHA>
+codex review --commit <SHIP_SHA> -c model="gpt-5.6-sol" -c model_reasoning_effort="high"
 ```
 
-Codex is configured here with `gpt-6-astra` at high reasoning effort, so no model flag is needed. It reviews read-only and changes nothing.
+It reviews read-only and changes nothing.
+
+**The model is pinned in the command, not left to the machine's config.** `~/.codex/config.toml` has a `model` key and an earlier version of this skill relied on it, saying "no model flag is needed". That made every stamp's `Review:` line unverifiable: a stamp records which reviewer read a commit, and if the model came from a config file that anybody can edit at any time, the claim is only as good as the config on the day somebody reads it back. Pinning it means the command in this skill and the commit in the stamp together say exactly what reviewed what.
+
+**Changed 2026-09-17 from `gpt-6-astra` to `gpt-5.6-sol`**, at the operator's instruction. Stamps written before that date name `gpt-6-astra` and are left alone: they record what actually read those commits, and rewriting them would falsify the one thing a stamp is for. Record the model in the `Independent:` line of each stamp, so the reviewer of record travels with the evidence rather than being inferred from the date.
 
 **`--commit` takes no review instructions.** Verified 2026-09-17 while processing `D00 T03 §1`: the usage line prints `codex review --commit <SHA> [PROMPT]`, but supplying either a prompt string or `-` for stdin fails with `the argument '--commit <SHA>' cannot be used with '[PROMPT]'`. An earlier version of this skill documented a long prompt here, and it could never have run. Do not reintroduce one.
 

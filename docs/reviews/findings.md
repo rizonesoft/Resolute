@@ -4,15 +4,15 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**101 findings across 20 sections.**
+**105 findings across 20 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 31 | the plan or the evidence misdescribes what happened |
-| `correctness` | 28 | the code does the wrong thing |
-| `consistency` | 16 | disagrees with the rest of the suite, its naming, or its layout |
+| `record` | 33 | the plan or the evidence misdescribes what happened |
+| `correctness` | 29 | the code does the wrong thing |
+| `consistency` | 17 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 12 | fails under hostile or unexpected input |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `integration` | 3 | a consumer, caller, or downstream artifact no longer holds |
@@ -126,3 +126,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D07 T01 §1` | F4 | `correctness` | fixed | C15 forbade the entire purpose of a repair tool |
 | `D07 T01 §1` | F5 | `adversarial` | fixed | two spaces bypassed the checker entirely |
 | `D07 T01 §1` | F6 | `test-coverage` | fixed | the checker had nothing exercising it |
+| `D07 T01 §1` | F7 | `consistency` | fixed | the C15 fix did not reach the two places that summarise it |
+| `D07 T01 §1` | F8 | `correctness` | fixed | the checker counted defect classes instead of identifying them |
+| `D07 T01 §1` | F9 | `record` | fixed | the stamp's own inventory was wrong |
+| `D07 T01 §1` | F10 | `record` | fixed | the self-test was described as 14 refusal cases and is not |

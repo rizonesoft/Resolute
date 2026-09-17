@@ -113,7 +113,7 @@ Two things are deliberately absent, and naming them here is what stops a later s
 
 **Design values.** Every colour, size, spacing, weight, and motion value lives in [`DESIGN.md`](../DESIGN.md), and C17 adopts that contract by reference. This document restates none of them, and `scripts/profile-check.py` fails if one appears here. A profile that copied the numbers would become a second source of truth, and the two would disagree the first time either moved.
 
-**The standalone on-disk layout.** C14, C15, and C16 state standalone-ness as **behaviour**: alone in an empty directory, the tool works and writes nothing outside its folder. They name no paths.
+**The standalone on-disk layout.** C14, C15, and C16 state standalone-ness as **behaviour**: alone in an empty directory, the tool works, and its own persistence stays beside it. They name no paths. **Corrected 2026-09-17:** this summary read "writes nothing outside its folder", the wording C15 itself was corrected away from, which would have re-taught a repair-tool implementer the rule the clause no longer states.
 
 That is deliberate and it has a cost. The shipped suite puts `Language/<Tool>/`, `Logging/`, and `Docs/<Tool>/` at a shared root, while the Complete Windows Repair intake keeps everything in one folder beside the executable. The two have not been reconciled, and `D01 T01 §9` owns choosing. Stating the clause as behaviour means it is true under either layout, so that decision cannot invalidate this document. What the profile therefore **cannot** check is whether a tool put its files in the agreed place, only that it needs nothing outside its own folder. `D01 T01 §9` closes that gap and `D07 T01 §3` turns the chosen layout into a check.
 

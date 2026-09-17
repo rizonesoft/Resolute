@@ -46,7 +46,14 @@ METHODS = {"exists", "absent", "search", "run", "readback", "capture", "count"}
 # The measured AutoIt defect classes the profile is derived from. Eight, and
 # the count is load-bearing: `D07 T01 §1` originally said seven, a figure that
 # appeared nowhere in the source it pointed at.
-EXPECTED_DEFECTS = 8
+#
+# THE EXACT IDS, not the count. Counting alone let a renumbered row pass: swap
+# D8 for D9 and the table still holds eight unique rows, so the gate reported
+# all classes closed while one measured class had silently left the profile.
+# Found by the independent review of the stamp commit, and it is the same
+# defect one more level up: a check that looks at the shape of the evidence
+# rather than at the evidence.
+EXPECTED_DEFECT_IDS = {f"D{n}" for n in range(1, 9)}
 
 # LEADING WHITESPACE IS PART OF THE ROW, not something to require the absence
 # of. Markdown renders an indented table row exactly like an unindented one, so
@@ -178,10 +185,18 @@ def evaluate(text, resolver):
 
     if not clauses:
         problems.append("the profile contains no clauses at all")
-    if len(defects) != EXPECTED_DEFECTS:
+    missing = sorted(EXPECTED_DEFECT_IDS - set(defects),
+                     key=lambda d: int(d[1:]))
+    unknown = sorted(set(defects) - EXPECTED_DEFECT_IDS,
+                     key=lambda d: int(d[1:]))
+    if missing:
         problems.append(
-            f"the profile maps {len(defects)} measured defect class(es), "
-            f"expected {EXPECTED_DEFECTS}")
+            "the profile no longer maps measured defect class(es) "
+            + ", ".join(missing))
+    if unknown:
+        problems.append(
+            "the profile maps defect class(es) that were never measured: "
+            + ", ".join(unknown))
 
     for kind in sorted(KINDS):
         if not any(c["kind"] == kind for c in clauses.values()):
@@ -214,7 +229,8 @@ def _minimal(clause_rows=None, defect_rows=None):
         "| C02 | repair | run | Something for repairs. | Driven. | D07 T01 §1 |",
     ]
     defect_rows = defect_rows if defect_rows is not None else [
-        f"| D{n} | Measured. | C01 |" for n in range(1, EXPECTED_DEFECTS + 1)
+        f"| {did} | Measured. | C01 |"
+        for did in sorted(EXPECTED_DEFECT_IDS, key=lambda d: int(d[1:]))
     ]
     return "\n".join(clause_rows + defect_rows)
 
@@ -257,7 +273,7 @@ def self_test():
 
     case("indented defect row is still checked", _minimal(None, [
         "  | D1 | Measured. |  |",
-    ] + [f"| D{n} | Measured. | C01 |" for n in range(2, EXPECTED_DEFECTS + 1)]),
+    ] + [f"| D{n} | Measured. | C01 |" for n in range(2, 9)]),
         _always, "closed by no clause")
 
     case("owner that does not resolve", _minimal(), _never,
@@ -275,11 +291,24 @@ def self_test():
 
     case("a defect citing a clause that is absent",
          _minimal(None, ["| D1 | Measured. | C99 |"]
-                  + [f"| D{n} | Measured. | C01 |" for n in range(2, EXPECTED_DEFECTS + 1)]),
+                  + [f"| D{n} | Measured. | C01 |" for n in range(2, 9)]),
          _always, "which is not in the profile")
 
     case("too few defect classes", _minimal(None, ["| D1 | Measured. | C01 |"]),
-         _always, "expected 8")
+         _always, "no longer maps measured defect class(es) D2")
+
+    # THE SECOND REGRESSION THE REVIEW FOUND. Eight unique rows, one of them
+    # renumbered, so a count-only check saw nothing wrong while a measured
+    # class had left the profile.
+    case("a renumbered defect class", _minimal(None,
+         [f"| D{n} | Measured. | C01 |" for n in range(1, 8)]
+         + ["| D9 | Measured. | C01 |"]),
+         _always, "no longer maps measured defect class(es) D8")
+
+    case("a defect class that was never measured", _minimal(None,
+         [f"| D{n} | Measured. | C01 |" for n in range(1, 9)]
+         + ["| D9 | Measured. | C01 |"]),
+         _always, "never measured: D9")
 
     case("only one tool kind", _minimal([
         "| C01 | universal | search | Something. | Looked at. | D07 T01 §1 |",
@@ -301,7 +330,7 @@ def self_test():
         "| C01 | repair | run | Something. | Driven. | D07 T01 §1 |",
     ]), _always, "declared twice")
 
-    total = 14
+    total = 16
     if failures:
         print(f"profile-check self-test: {len(failures)} of {total} case(s) FAILED")
         for failure in failures:
