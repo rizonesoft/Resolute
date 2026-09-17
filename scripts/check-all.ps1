@@ -291,6 +291,15 @@ Invoke-Gate -Name 'findings ledger' -LogName 'gate-findings' -Command {
     & python (Join-Path $RepoRoot 'scripts\todo-findings.py') --check
 }
 
+# The conformance profile is a contract other domains are measured against, so
+# a clause whose owner section was renumbered away would otherwise dangle with
+# nothing noticing. This checks the DOCUMENT; D07 T01 §3 checks tools against
+# it, and the two are separate because a broken profile makes every tool result
+# meaningless and has to be visible on its own. D07 T01 §1.
+Invoke-Gate -Name 'conformance profile' -LogName 'gate-profile' -Command {
+    & python (Join-Path $RepoRoot 'scripts\profile-check.py')
+}
+
 # ── toolchain currency, ADVISORY ─────────────────────────────
 #
 # A pin that has fallen behind is information, not a failure. The build is

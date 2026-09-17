@@ -232,6 +232,9 @@ Every tool is distributed on its own. This section proves the framework did not 
 **Needs:** Windows host (build/test)
 
 - [ ] Define the standalone layout: exactly what files a single tool ships with and where it finds each. Done when: the layout is documented and reconciled against the `Doors/` convention used by Complete Windows Repair. Cheaper substitute: assuming the suite layout and discovering the gap at release.
+  -> XREF: D07 T01 §1 -- the conformance profile, which states standalone-ness as BEHAVIOUR and deliberately names no paths, waiting on this item for the layout
+
+  **This item owns a decision another section was told to wait for, recorded 2026-09-17 when `D07 T01 §1` shipped.** The brainstorm record says the layout "needs reconciling before the conformance profile is written". The profile was written anyway, by stating the requirement as behaviour: a tool alone in an empty directory starts, localizes, shows About, and checks for updates. That clause is true under the shipped suite's `Language/<Tool>/` plus shared `Logging/` and `Docs/<Tool>/` root **and** under Complete Windows Repair's one-folder `Doors/` convention, so this item is free to choose either without invalidating the profile. What the profile therefore cannot check is whether a tool put its files in the **agreed** place, only that it needs nothing outside its folder. Closing that gap is this item's, and `D07 T01 §3` turns the chosen layout into a check.
 - [ ] Place one built tool alone in an empty directory with only its own files and start it. Done when: it starts, localizes, shows About, opens preferences, and checks for updates, all captured.
 - [ ] Prove it writes its settings and its log in that directory and nowhere else. Done when: a file-system trace shows no write outside the tool's own folder, quoted.
 - [ ] Prove no shared root is required. Done when: the tool runs on a machine with no `Resolute/` directory anywhere.
