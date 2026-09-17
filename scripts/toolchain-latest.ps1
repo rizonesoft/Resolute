@@ -140,15 +140,27 @@ foreach ($r in $rows) {
 }
 Write-Host ''
 
+# Report what was ESTABLISHED before reporting what could not be. A component
+# confirmed behind is a fact whether or not a different component's lookup
+# failed, and an early exit on the unreachable case used to discard it.
+#
+# Found by the independent review of D00 T01 §6, with CMake timing out while
+# Ninja returned a newer tag: the run reported only "unreachable" and the known
+# stale pin vanished. That is the same defect this script was built to avoid,
+# inverted. Guarding against asserting what the check did not establish is half
+# of it; not throwing away what it did establish is the other half.
+foreach ($b in $behind) {
+    Write-Host "toolchain-latest: $($b.Name) is behind, pinned $($b.Pinned), latest $($b.Latest)" -ForegroundColor Yellow
+}
+if ($behind.Count -gt 0) {
+    Write-Host 'Moving a pin is a decision, not an update. See D00 T01 §6.' -ForegroundColor Yellow
+}
+
 if ($unreachable.Count -gt 0) {
     Write-Host "toolchain-latest: could not reach upstream for $($unreachable -join ', '). Currency is UNKNOWN, not current." -ForegroundColor DarkYellow
     exit 2
 }
 if ($behind.Count -gt 0) {
-    foreach ($b in $behind) {
-        Write-Host "toolchain-latest: $($b.Name) is behind, pinned $($b.Pinned), latest $($b.Latest)" -ForegroundColor Yellow
-    }
-    Write-Host 'Moving a pin is a decision, not an update. See D00 T01 §6.' -ForegroundColor Yellow
     exit 1
 }
 Write-Host "toolchain-latest: all $($rows.Count) pin(s) current" -ForegroundColor Green

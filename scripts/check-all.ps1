@@ -280,12 +280,25 @@ $tcClock = [System.Diagnostics.Stopwatch]::StartNew()
 $tcCode = $LASTEXITCODE
 $tcClock.Stop()
 
-$tcStatus, $tcDetail = switch ($tcCode) {
-    0       { 'ok',        'all pins current' }
-    1       { 'behind',    ((Select-String -Path $tcLog -Pattern 'is behind, pinned' |
-                            ForEach-Object { $_.Line.Trim() -replace '^toolchain-latest: ', '' }) -join '; ') }
-    2       { 'unknown',   'upstream unreachable; currency not checked, not current' }
-    default { 'unknown',   "toolchain-latest exited $tcCode" }
+# Computed separately rather than inside the switch: `'x', (a) -join ';'`
+# joins across the comma, which collapsed both values into one string and
+# printed "unknown; System.Object[]" the first time this was written.
+$tcBehind = @(Select-String -Path $tcLog -Pattern 'is behind, pinned' -ErrorAction SilentlyContinue |
+    ForEach-Object { $_.Line.Trim() -replace '^toolchain-latest: ', '' })
+
+$tcStatus = switch ($tcCode) {
+    0       { 'ok' }
+    1       { 'behind' }
+    2       { 'unknown' }
+    default { 'unknown' }
+}
+# A pin confirmed behind is reported even when another lookup failed, because
+# it is a fact the check established. D00 T01 §6's independent review.
+$tcDetail = switch ($tcCode) {
+    0       { 'all pins current' }
+    1       { $tcBehind -join '; ' }
+    2       { (@('upstream unreachable; currency not checked, not current') + $tcBehind) -join '; ' }
+    default { "toolchain-latest exited $tcCode" }
 }
 [void]$results.Add([pscustomobject]@{
     Name = 'toolchain'; Status = $tcStatus

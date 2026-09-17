@@ -748,6 +748,25 @@ Five gates that must each be remembered are five gates that get skipped under ti
   ```
 
   The unreachable case was driven by pointing the process at a dead proxy, not simulated. **Exit 2 is the one that matters**: a check reporting "current" because it reached nothing would be the sixth instance in this file of a check claiming success for work it never did, and `§5` was the fifth.
+
+  > [!WARNING]
+  > **The independent review found the mirror of that defect, and it was mine too. Corrected 2026-09-17.**
+  >
+  > Guarding against asserting what the check never established is half the job. The other half is not **throwing away what it did**. With one component unreachable and another confirmed behind, the early `exit 2` fired first and the confirmed finding was never printed: the combined gate showed only the generic unreachable line and the known stale pin vanished.
+  >
+  > Established facts are now reported before unknowns are, and the exit code still says 2, because overall currency really is unknown. Driven with `cmake` pointed at a nonexistent repository while `ninja` was pinned to `1.0.0`:
+  >
+  > ```
+  > toolchain-latest: ninja is behind, pinned 1.0.0, latest 1.13.2
+  > toolchain-latest: could not reach upstream for cmake. Currency is UNKNOWN, not current.
+  > exit 2
+  >
+  > check-all: toolchain  unknown  upstream unreachable; currency not checked,
+  >                                not current; ninja is behind, pinned 1.0.0,
+  >                                latest 1.13.2
+  > ```
+  >
+  > **The first attempt at that fix printed `unknown; System.Object[]`.** In PowerShell, `'x', (expr) -join '; '` joins across the comma rather than binding to the parenthesised expression, so the two-value assignment collapsed into one string. Caught by reading the output rather than by any check, which is the argument for reading it.
 - [x] **Keep the check advisory, never automatic.** **Proven by search rather than asserted:** `toolchain.json` is referenced four times in `scripts/toolchain-latest.ps1`, at `Test-Path`, in an error message, and at `Get-Content`. There are **zero** `Set-Content`, `Out-File` or `ConvertTo-Json` calls in the file. There is no write path.
 
   The reason is recorded in the script's own header, where somebody about to add one will read it: an unattended bump of a compiler can break a build nobody is watching, and the reproducibility a pin buys is worth more than being current by a few days. This section is what the decision to move a pin looks like written down, and it took three separate gate runs to make.
