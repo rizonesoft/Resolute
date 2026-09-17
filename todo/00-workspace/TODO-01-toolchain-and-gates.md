@@ -46,7 +46,7 @@ track: W1
 |   2   |   §2    | CMake structure and dependencies             | §1         |  [x]   |
 |   3   |   §3    | Warnings as errors at one level              | §2         |  [x]   |
 |   4   |   §4    | One command builds any tool                  | §2         |  [x]   |
-|   5   |   §5    | One command runs every gate                  | §3, §4     |  [ ]   |
+|   5   |   §5    | One command runs every gate                  | §3, §4     |  [x]   |
 |   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [ ]   |
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
 
@@ -639,6 +639,14 @@ Five gates that must each be remembered are five gates that get skipped under ti
 
 <!-- claim: exists scripts/check-all.ps1 -->
 <!-- claim: count "COVERAGE_FLOOR" scripts/check-all.ps1 = 0 -->
+
+> **Verified:** 2026-09-17 | §5 | `scripts/check-all.ps1` runs **ten gates in one invocation** and exits 0 on a clean tree: both build configurations, `clang-tidy` against the baseline, the Catch2 suite, graph validate, graph self-test, `plan --check`, claims, claims self-test and the findings ledger, one line each with its duration and **detail printed only for gates that failed** · every failure path driven against its own fixture: a build warning fails both build gates while eight pass, a baseline lowered to 58 fails tidy alone naming both numbers, a claim pointed at a nonexistent file fails claims by name, and claims disabled in two covered blocks produce `coverage fell to 2, below the recorded floor of 3` · `plan --check` needed no fixture, **failing on the first real run** and catching a stale `build/todo-operator.json` nothing else in the sweep would have, which is the evidence for extending the item arriving before the item was finished · the tests gate reports `not present` with the section that removes it and is counted separately rather than folded into ok, because a gate that never ran must not read as one that passed · tidy now covers **14 TUs from 2 databases** including the standalone extension, baseline **103** with the launcher and shared library unchanged at 59
+> **Review:** round 2, candidate `e7d634f` `cecf69f` -- `adversarial` approve after fixes · `consistency` approve after fixes (2) · `integration` approve after fix (1) · `source-defect` approve · `design` approve · `record` approve after fixes (3). Raw findings: docs/reviews/00-workspace/D00-T01-s5.md
+> **Independent:** `codex review --commit e7d634f` (gpt-6-astra, high) returned **one P1 and one P2, both right**. The P1 is the worst finding in this file: the tidy gate ignored every `clang-tidy` exit code and counted only `warning:` lines, so analysis that could not complete produced **errors and zero warnings**, a count under any baseline, and the gate said `ok`. **The fifth check this file has caught reporting success while doing nothing, and the first I wrote myself**, in the section whose purpose is that checks cannot be skipped. The reviewer built an isolated fixture with an invalid `.clang-tidy` rather than arguing from the loop. Its proposed fix, tracking per-invocation failures, would **not** have caught its own reproduction: `clang-tidy` exits 0 on an unknown config key, `0 of 14 invocation(s) exited non-zero, 56 error diagnostic(s)`. The load-bearing check is the error-diagnostic scan; both are kept.
+> **CRUD:** applicable | driven: the gate was **run** in six states rather than inspected, which is how the report format, the two-configuration failure, and the interaction between the probe and the claims gate were each seen. Two probes were rebuilt after their first run taught something: the build warning moved out of `src/main.cpp` because that file carries a `lines` claim and appending to it failed a second gate, and the coverage-floor fixture stopped raising `COVERAGE_FLOOR` because that value is **itself claimed**, so lowering the floor to pass is not available.
+> **Duration:** 35
+> **Implementer:** Claude Opus 5 (claude-opus-5[1m])
+> **Deferred:** the tests gate's `not present` branch is a tolerance, not a pass, and it is removed by the section that lands the harness. -> XREF: D00 T02 §1 -- lands the Catch2 harness and deletes this branch
 
 **Test checkpoint:** `pwsh scripts/check-all.ps1` exits 0 on a clean tree and prints one line per gate. Introducing one deliberate warning makes it exit non-zero and show only that gate's detail. A tidy count one above the baseline fails. All three runs are quoted in the commit body.
 

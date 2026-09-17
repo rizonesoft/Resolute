@@ -4,19 +4,19 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**56 findings across 13 sections.**
+**63 findings across 14 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `correctness` | 18 | the code does the wrong thing |
-| `record` | 16 | the plan or the evidence misdescribes what happened |
-| `consistency` | 13 | disagrees with the rest of the suite, its naming, or its layout |
+| `correctness` | 19 | the code does the wrong thing |
+| `record` | 19 | the plan or the evidence misdescribes what happened |
+| `consistency` | 15 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 2 | fails under hostile or unexpected input |
 | `design` | 2 | the rendered surface disagrees with the design contract |
+| `integration` | 2 | a consumer, caller, or downstream artifact no longer holds |
 | `performance` | 2 | correct, and too slow or too costly to be used |
-| `integration` | 1 | a consumer, caller, or downstream artifact no longer holds |
 | `reproducibility` | 1 | the same input does not produce the same output |
 | `source-defect` | 1 | a Win32 contract, registry layout, or other source read wrongly |
 
@@ -49,6 +49,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T01 §4` | F5 | `record` | corrected | the output item named the wrong directory |
 | `D00 T01 §4` | F6 | `correctness` | corrected | a build script that had never built the launcher |
 | `D00 T01 §4` | F7 | `record` | corrected | an escape sequence corrupted the record |
+| `D00 T01 §5` | F1 | `correctness` | fixed | the gate reported success on analysis that never ran |
+| `D00 T01 §5` | F2 | `integration` | fixed | an entire shipped extension was analysed by nothing |
+| `D00 T01 §5` | F3 | `consistency` | corrected | "both architectures", for the second time in one file |
+| `D00 T01 §5` | F4 | `record` | corrected | a claim was filed into the wrong section, and this section falsified it |
+| `D00 T01 §5` | F5 | `record` | corrected | writing about a claim filed a claim |
+| `D00 T01 §5` | F6 | `record` | corrected | a checkpoint written before the build had two configurations |
+| `D00 T01 §5` | F7 | `consistency` | corrected | a stale preset name in another section |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |
