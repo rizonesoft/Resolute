@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **12 of 121 sections complete (10%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **12 of 122 sections complete (10%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -30,7 +30,7 @@ process todo section: | [ ] | `D00 T03 §1` | Subtree merge with history preserv
 
 ## The acceptance bar
 
-The finished suite is **fourteen Rizonesoft products that behave like one product**, each built by one command from a clean checkout on a machine with no Visual Studio, each checked by the same gates, each proven to do exactly what its AutoIt predecessor did, each storing settings through one writer, logging every action, speaking the user's language on every surface, refusing by name when it lacks a privilege, undoing every system change it makes or saying plainly that it cannot, rendering correctly at every DPI and in both appearances, and running standalone in an empty folder.
+The finished suite is **every Rizonesoft product behaving like one product**, **Groomed 2026-09-17: this said "fourteen", which is the size of the suite being replaced rather than the size of the one being built.** Fourteen is right for `D04 T01`, the port. `D05` adds the intakes and the new tools on top of it, and the recorded target in the brainstorm record is **80 tools and a repair library**. The bar below is what each of them is held to, and the count is deliberately not repeated here: read it from `query stats`, because a number written into prose is the thing this tree keeps having to correct. Each is built by one command from a clean checkout on a machine with no Visual Studio, each checked by the same gates, each proven to do exactly what its AutoIt predecessor did, each storing settings through one writer, logging every action, speaking the user's language on every surface, refusing by name when it lacks a privilege, undoing every system change it makes or saying plainly that it cannot, rendering correctly at every DPI and in both appearances, and running standalone in an empty folder.
 
 | Aim                                  | Owned by                                                                     |
 | ------------------------------------ | ---------------------------------------------------------------------------- |
@@ -56,7 +56,7 @@ The finished suite is **fourteen Rizonesoft products that behave like one produc
 
 Nothing in this plan has been built, but the C++ tree is **not** starting from zero.
 
-The ExoSuite codebase, taken in by `D00 T03 §1` and renamed to Resolute by `§2`, is a working native C++23 application: a 6,865-line Direct2D and DirectWrite UI framework, a 573-line application shell, a working repository-scoped llvm-mingw toolchain, an extension model where each tool builds as a standalone executable, and a 1.39 MB fully static binary. It has no tests, no vcpkg, and none of the non-UI framework layers. It becomes the Resolute launcher, and its UI library becomes the framework's UI half.
+The ExoSuite codebase, taken in by `D00 T03 §1` and renamed to Resolute by `§2`, is a working native C++23 application: a 6,865-line Direct2D and DirectWrite UI framework, a 573-line application shell at intake, 572 after `D00 T01 §3` removed an MSVC-only pragma, a working repository-scoped llvm-mingw toolchain, an extension model where each tool builds as a standalone executable, and a 1.39 MB fully static binary. It has no tests, no vcpkg, and none of the non-UI framework layers. It becomes the Resolute launcher, and its UI library becomes the framework's UI half.
 
 The suite being replaced is mature and shipping: fourteen tools, roughly 43,000 lines of AutoIt3, a working builder, and an installer. Two measurements shape this plan. Roughly **21,000 of those 43,000 lines are fourteen copies of one framework**, which is why the real porting job is one framework plus fourteen small bodies of logic rather than a 43,000-line rewrite. And the per-tool logic, with that framework subtracted, is: `Ownership` 77 lines, `USBRepair` 147, `DVDRepair` 274, `PixRepair` 341, `BiosCodes` 960, `ComIntRep` 1,903.
 
@@ -103,6 +103,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §2` | The Review-Finding Ledger                      |   8   |
 | [x] | `D00 T04 §3` | Section Calibration                            |   6   |
 | [x] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   7   |
+| [ ] | `D00 T04 §5` | Make the Adjacency Advisory Actionable         |   7   |
 | [x] | `D00 T01 §1` | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2` | CMake structure and dependencies               |  11   |
 | [x] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
@@ -169,7 +170,7 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
 | [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
-| [ ] | `D04 T01 §2` | The five remaining frozen tools              |   7   |
+| [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
 | [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   8   |
 | [ ] | `D04 T01 §4` | Drive Repair: USBRepair and DVDRepair merged |   8   |
 | [ ] | `D04 T01 §5` | MemBoost and BiosCodes                       |   8   |

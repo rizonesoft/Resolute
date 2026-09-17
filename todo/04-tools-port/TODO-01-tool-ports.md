@@ -44,7 +44,7 @@ track: P2
 | Order | Section | Deliverable                                  | Depends On                 | Status |
 | :---: | :-----: | -------------------------------------------- | -------------------------- | :----: |
 |   1   |   §1    | Vertical slice: Ownership end to end         | D01 T01 §9, D02 T01 §4, D00 T02 §4 |  [ ]   |
-|   2   |   §2    | The five remaining frozen tools              | §1                         |  [ ]   |
+|   2   |   §2    | The remaining frozen tools: ComIntRep, PixRepair | §1                |  [ ]   |
 |   3   |   §3    | Browser optimizer: four tools into one       | §1                         |  [ ]   |
 |   4   |   §4    | Drive Repair: USBRepair and DVDRepair merged | §2                         |  [ ]   |
 |   5   |   §5    | MemBoost and BiosCodes                       | §2                         |  [ ]   |
@@ -85,27 +85,53 @@ track: P2
 
 **Test checkpoint:** The parity driver reports zero differing fields between the C++ and AutoIt implementations on the same fixture tree, quoted. Takeover followed by undo restores every owner and ACL, asserted. A deny-ACE path is refused by name with the batch reconciling. The rendered window is compared against the pre-change capture.
 
-## 2. The Five Remaining Frozen Tools
+## 2. The Remaining Frozen Tools: ComIntRep and PixRepair
 
-`ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, and `BiosCodes`. With the slice proven this should be repetitive, and if it is not, the seam in `D02 T01 §1` was drawn in the wrong place.
+> [!IMPORTANT]
+> **Groomed 2026-09-17. This section claimed five tools and owns two, because three of them are ported by its own dependents.**
+>
+> It read "`ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, and `BiosCodes`" and asked that each be ported "as its own standalone executable". But `§4` merges `USBRepair` and `DVDRepair` into **one** tool with the device type as data, and `§5` ports `BiosCodes`. Both of those sections **depend on this one**, so as written this section would build five executables and its own dependents would then delete two of them and rebuild a third.
+>
+> That is not a scheduling preference, it is a contradiction: `§2` says two standalone executables and `§4` says one merged tool, about the same two tools. Resolved toward `§4` and `§5`, which are the later and more specific decisions and each carry their own Fidelity, Job and Treatment reasoning for the shape they build.
+>
+> **The dependency on this section still holds and is worth keeping.** `ComIntRep` is by a distance the largest thing in this domain, so proving the framework and the repair contract against it before `§4` and `§5` run is the point of the ordering, rather than the porting of their tools.
+
+`ComIntRep` and `PixRepair`. With the slice proven this should be repetitive, and if it is not, the seam in `D02 T01 §1` was drawn in the wrong place.
+
+**`ComIntRep` is specified before it is built.** Measured 2026-09-17 against `resolute_au3/SDK/Concrete/`, netting out the 58 functions every tool inherits from its copy of `ReBar`:
+
+| tool | net functions | net lines |
+| --- | ---: | ---: |
+| `Ownership`, the slice | 2 | 77 |
+| `USBRepair` | 12 | 147 |
+| `DVDRepair` | 14 | 274 |
+| `PixRepair` | 19 | 341 |
+| `BiosCodes` | 28 | 960 |
+| **`ComIntRep`** | **83** | **1,903** |
+
+`ComIntRep` is four times the next largest and forty times the vertical slice. `AGENTS.md` is explicit that anything larger than a one-surface utility gets its own TODO file first, and on this evidence it is the one tool in this domain that clearly qualifies. `PixRepair` sits in the same band as the tools the other sections size honestly, so it is built from the items here.
 
 **Fidelity:** each tool's main window and result list against its own pre-change capture and `docs/captures/house-style/`.
 **Job:** each tool does what it did before, with a reverse and a trail it did not have. Consumer: the system state each changes, read back by verify.
-**Treatment:** each proven against its own fixture, not inferred from `Ownership`. Cheaper substitute that fails the checkpoint: porting all five and declaring them proven because the slice worked.
+**Treatment:** each proven against its own fixture, not inferred from `Ownership`. Cheaper substitute that fails the checkpoint: porting both and declaring them proven because the slice worked.
 **Chrome:** consume the framework and the repair contract. No private copies.
 **Needs:** Windows host (build/test)
 
-- [ ] Capture each shipped AutoIt tool first, with its effects on its fixture and its window. Done when: five baselines are committed.
-- [ ] Port each to `extensions/<Tool>/` as framework plus contract plus items. Done when: each builds as its own standalone executable and none of the five contains settings, log, localization, or loop code.
-- [ ] Prove parity per tool. Done when: five parity reports each show zero differing fields, all quoted.
-- [ ] Prove the reverse per tool, or state plainly which actions have none and what the user should do instead, on the surface. Done when: each of the five carries one of those two and the checkpoint proves which.
-- [ ] Prove the elevation refusal per tool. Done when: five unelevated assertions each show the action refused by name, nothing changed, one log line.
-- [ ] Account for each surface. Done when: five accounts are written and each deferral resolves.
-- [ ] Commit: `"system tools: port the five remaining frozen tools"`
+- [ ] **Specify** `ComIntRep` in its own TODO file before building it. Required scope: every repair it performs enumerated from `resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.au3` with its source line; which repairs are reversible and which are not; the component and internet repair areas it touches; and the freeze check below, which transfers to that file because that is where the writing happens. Done when: the file exists, validates, and its sections appear in the plan.
+- [ ] Capture each shipped AutoIt tool first, with its effects on its fixture and its window. Done when: two baselines are committed.
+- [ ] Port `PixRepair` to `extensions/PixRepair/` as framework plus contract plus items. Done when: it builds as its own standalone executable and contains no settings, log, localization, or loop code.
+- [ ] Prove parity per tool, `ComIntRep` through its own spec's sections and `PixRepair` here. Done when: two parity reports each show zero differing fields, both quoted.
+- [ ] Prove the reverse per tool, or state plainly which actions have none and what the user should do instead, on the surface. Done when: each carries one of those two and the checkpoint proves which.
+- [ ] Prove the elevation refusal per tool. Done when: two unelevated assertions each show the action refused by name, nothing changed, one log line.
+- [ ] Account for each surface. Done when: two accounts are written and each deferral resolves.
+- [ ] Commit: `"system tools: port comintrep and pixrepair"`
 
-**Freeze check:** No tool's effect changes. Evidence is five parity reports with zero differing fields against the shipped AutoIt builds on their own fixtures.
+**Freeze check:** Neither tool's effect changes. Evidence is two parity reports with zero differing fields against the shipped AutoIt builds on their own fixtures. **The `ComIntRep` half transfers to its spec**, which is where its repairs are declared.
+-> XREF: D04 T01 §4 -- ports `USBRepair` and `DVDRepair`, merged, which this section no longer does
+-> XREF: D04 T01 §5 -- ports `BiosCodes`, which this section no longer does
 
-**Test checkpoint:** Five parity reports show zero differing fields, all quoted. Five reverse behaviors are proven or their absence stated on the surface. Five unelevated refusals each produce one log line. All five rendered surfaces compared against their captures.
+**Test checkpoint:** `ComIntRep` has an authored TODO file that validates and appears in the plan. Two parity reports show zero differing fields, both quoted. Two reverse behaviors are proven or their absence stated on the surface. Two unelevated refusals each produce one log line. Both rendered surfaces compared against their captures.
+
 
 ## 3. Browser Optimizer: Four Tools Into One
 
@@ -170,7 +196,16 @@ The two tools that consume the framework but not the repair contract: one trims 
 - [ ] Account for both surfaces. Done when: two accounts are written and each deferral resolves.
 - [ ] Commit: `"memboost, bioscodes: port to the framework"`
 
-**Freeze check:** `MemBoost`'s trim path does not change. Evidence is the parity report with zero differing fields on the trim fixture.
+> [!IMPORTANT]
+> **Groomed 2026-09-17: a question for the operator about `BiosCodes`, not a change.**
+>
+> `AGENTS.md` lists six tools whose behaviour is frozen because they "change a user's system in ways that are hard to undo": `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, and **`BiosCodes`**. This section says the opposite about the same tool, that it "looks up a code" and that it does not consume the repair contract "because neither repairs anything", and this section is right.
+>
+> Measured in `resolute_au3/SDK/Concrete/BiosCodes/BiosCodes.au3`: **no `RegWrite`, no `RegDelete`, no `FileWrite`, no `FileDelete`**. The only writes are 10 `IniWrite` calls, which are its own settings file. For contrast `ComIntRep`, which belongs on that list, carries 4 `RegDelete`, 7 `FileDelete`, 24 `FileWrite` and 1 `FileCopy`.
+>
+> So `BiosCodes` appears to be on the frozen list for the same reason `AGENTS.md` already records `ReBar` being wrongly placed by the archived AutoIt plan: inherited rather than checked. **Not acted on here.** `AGENTS.md` is the contract, changing it is an operator decision, and a frozen tool that turns out not to need freezing costs only a parity check nobody needed. Flagged so the decision is made deliberately rather than by a port quietly skipping a freeze check.
+
+**Freeze check:** `MemBoost`'s trim path does not change. Evidence is the parity report with zero differing fields on the trim fixture. **`BiosCodes` carries no freeze check here**, which is consistent with this section's own reading and inconsistent with `AGENTS.md`'s frozen list; see the note above, which is where that is to be resolved.
 
 **Test checkpoint:** `MemBoost` parity reports zero differing fields. `BiosCodes` writes a log line per lookup, exports a file matching the rendered result, and fails visibly on a read-only target. The filter narrows and restores. `MemBoost` statistics are compared against an independent measurement with the method recorded.
 

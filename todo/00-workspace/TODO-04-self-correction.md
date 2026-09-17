@@ -59,6 +59,7 @@ track: W1
 |   2   |   §2    | The review-finding ledger                  | --         |  [x]   |
 |   3   |   §3    | Section calibration                        | §2         |  [x]   |
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [x]   |
+|   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [ ]   |
 
 ---
 
@@ -254,6 +255,40 @@ The plan estimates effort as an item count. Nothing has ever checked whether tha
 > **CRUD:** not applicable (this reads the plan and the findings ledger and writes nothing)
 > **Duration:** 8
 > **Implementer:** Claude Opus 5 (claude-opus-5[1m])
+
+## 5. Make the Adjacency Advisory Actionable
+
+`scripts/todo-adjacency.py` emits **72** advisory diagnostics, every one of them the same message: `applicable kind has no implementing owner`. A signal that never clears is a signal nobody reads, and this file exists because the tree has to be able to tell the truth about itself.
+
+**Measured 2026-09-17 during a groom pass.** The mechanism is keyword matching. When an `**Adjacency:**` declaration carries an `@` reference, `owners()` narrows to that one section and tests its prose against a per-kind regex from `KEYWORDS`. The declaration is then reported unowned when the anchored section's **wording** misses the vocabulary, which is not the same question as whether the section delivers the capability.
+
+Of the six kind-anchors pointing at **shipped** sections, two are owned and four are not. In all four the capability is delivered and the words are absent:
+
+| anchor | kind | reality |
+| --- | --- | --- |
+| `D00 T04 §2` | `audit` | it **is** the review-finding ledger, and never writes "audit" or "history" |
+| `D00 T04 §3` | `list` | it renders the calibration table, and never writes "list" |
+| `D00 T04 §4` | `document` | one `documents` hit, short of the compound rule |
+| `D00 T03 §4` | `document` | six document-word hits, still short of the compound rule |
+
+**The compound rule is the sharpest case.** `document` requires a second match from `pdf|print|preview|signature|photo|attachment`, or `documents?` together with `render|download|upload|display|template|layout`. A section titled "Correct the Stale Documentation" that uses the word six times does not clear it.
+
+**This is the failure mode this repository keeps finding in its own tooling**, and it is on the other side of it for once. `D00 T01 §1` found a bootstrap that printed "reskit/ is unchanged" while deleting a toolchain, `§2` found a script warning "No .exe found" immediately after linking one, and `§4` found a build script that reported success while building no launcher. Each taught the reader to ignore output. Seventy-two unclearable advisories teach the same lesson about `validate`.
+
+**The fix belongs in the instrument, and the wrong fix is available and tempting.** Rewording a shipped section so a matcher recognises it is gaming the check, and `AGENTS.md` forbids rewriting a stamped checklist. Any solution that requires editing `[x]` sections is the wrong one.
+
+- [ ] Establish what the advisory should mean before changing how it is computed. Done when: this section states whether an anchored kind is a claim about the section's **prose** or about its **delivered behaviour**, and the answer is written where the next reader of `todo-adjacency.py` will find it.
+- [ ] Separate "not owned" from "not recognised". Done when: a declaration whose anchor resolves to a section that exists reports differently from one whose anchor names nothing, because today they share a message and are different defects.
+- [ ] Make the four shipped cases above clear without touching a stamped section. Done when: all four report as owned, and `git diff` shows no change inside any `[x]` section's body. Cheaper substitute that fails the checkpoint: adding the missing words to those four sections, which makes the number go down and the check mean less.
+- [ ] Decide the compound `document` rule explicitly: keep it, loosen it, or drop the second clause. Done when: the decision is dated with its reason, and whichever way it goes, "Correct the Stale Documentation" is classified correctly.
+- [ ] Re-measure the advisory count and record it. Done when: the new total is in this section beside the 72, and any advisory that remains is one a reader can act on.
+- [ ] Prove the check can still fail. Done when: a declaration anchored at a section that genuinely does not implement its kind is still reported, with a fixture or a driven case, so the count did not fall by the check going blind.
+- [ ] Commit: `"todo: make the adjacency advisory actionable"`
+
+-> XREF: D00 T04 §2 -- the ledger whose `audit` anchor this section has to clear without editing it
+-> SOURCE: groom-2026-09-17-adjacency-unowned
+
+**Test checkpoint:** `python scripts/todo-graph.py validate` reports an advisory count recorded in this section, down from 72, with every remaining advisory naming something a reader can act on. The four shipped anchors above report as owned and `git diff` shows no change inside any `[x]` section body. A deliberately wrong anchor is still reported, driven, so the fall in count is not the check going blind. `python scripts/todo-graph.py self-test` stays green.
 
 ## Verification
 
