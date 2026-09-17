@@ -238,7 +238,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §1` | Release Descriptors, Portable by Construction  |   5   |
 | [ ] | `D06 T01 §2` | One Command Builds the Release Set             |   5   |
 | [ ] | `D06 T01 §3` | Installers: Per Tool and Whole Suite           |   9   |
-| [ ] | `D00 T01 §7` | The bare-machine proof                         |   6   |
+| [ ] | `D06 T01 §9` | The Bare-Machine Proof                         |   7   |
 | [ ] | `D06 T01 §4` | Migration From the AutoIt Suite                |   7   |
 | [ ] | `D06 T01 §5` | Update Files and Consolidation Announcements   |   6   |
 | [ ] | `D06 T01 §6` | Version Rule, Changelog, and Release Checklist |   5   |
@@ -249,6 +249,8 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D08 T01 §3` | Coverage matrix and pack hygiene               |   6   |
 | [ ] | `D08 T01 §4` | Rewrite the shipped documentation              |   7   |
 | [ ] | `D08 T01 §5` | Repository and developer documentation         |   5   |
+
+> **Moved:** `D00 T01 §7` -- 2026-09-17 to todo/06-distro-release/TODO-01-build-and-release.md (operator instruction); worked there as `D06 T01 §9` by that file's owner.
 
 ---
 

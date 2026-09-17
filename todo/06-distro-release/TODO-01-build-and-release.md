@@ -21,6 +21,7 @@ track: R1
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the ports this release ships
 - -> XREF: [`08-docs-localization/TODO-01 §1`](../08-docs-localization/TODO-01-docs-and-localization.md) -- the documentation set every release includes
 - -> XREF: [`05-new-tools/TODO-05 §1`](../05-new-tools/TODO-05-recovery-and-imaging.md) -- the two GPL v3 ports whose attribution obligations §7 records
+- -> XREF: [`00-workspace/TODO-01 §7`](../00-workspace/TODO-01-toolchain-and-gates.md) -- where §9 was written before it moved here, and the narrower toolchain claim that stayed there
 
 ## Outcome
 
@@ -51,6 +52,7 @@ track: R1
 |   6   |   §6    | Version rule, changelog, and release checklist | §2          |  [ ]   |
 |   7   |   §7    | Focused builds from one codebase              | §1, §5      |  [ ]   |
 |   8   |   §8    | Licensing and attribution                     | --          |  [ ]   |
+|   9   |   §9    | The bare-machine proof                        | §3          |  [ ]   |
 
 ---
 
@@ -203,6 +205,55 @@ The tree currently carries two licences with no recorded decision, and ships thi
 - [ ] Commit: `"release: licence policy, attributions, and the missing licence files"`
 
 **Test checkpoint:** The licence policy is recorded with its reasoning. A root `LICENSE` exists, `shared/resolute-ui` carries MIT, and `shared/lucide` carries ISC with its copyright notice. Every release set includes its licence and attributions, generated. A tool with a missing licence fails the release, proven deliberately. The verification report is quoted.
+
+## 9. The Bare-Machine Proof
+
+> **Arrived 2026-09-17 from `D00 T01 §7`**, by operator decision. It was written as a toolchain concern and it is a **distribution** one: the claim it proves is that a machine with nothing installed can build and run this suite, which is the promise the whole architecture was chosen for. Sitting in Phase 0 it blocked the test backbone and the entire framework, because two files depend on all of `D00 T01`. It belongs here, beside `§3`, which needs the same clean machine for install testing.
+
+The whole argument for a repository-scoped toolchain is that a machine with nothing installed can build this. Until that is run on such a machine, it is a design intention rather than a fact.
+
+**Needs:** Clean Windows machine (no Visual Studio)
+
+A clean VM, a Windows Sandbox instance, or a second physical machine all serve. Windows Sandbox is the cheapest: it needs the `Containers-DisposableClientVM` feature enabled, which requires elevation and a reboot, so it is an operator action rather than something a session can arrange. `§3` needs a clean machine too, and one serves both.
+
+> [!IMPORTANT]
+> **Most of what this section feared was measured on 2026-09-17 and did not happen.** The fear is that something silently reaches for Visual Studio because Visual Studio is present. Driven on the development machine, which has five Visual Studio installations:
+>
+> ```
+> compiler include paths        3, all inside reskit/. No SDK, no MSVC
+> default target triple         x86_64-w64-windows-gnu, the MinGW target
+> INCLUDE, LIB, LIBPATH,
+> VCINSTALLDIR, VCToolsInstallDir,
+> WindowsSdkDir, WindowsSDKVersion,
+> VSINSTALLDIR                  all ALREADY unset during a normal build
+> all eight poisoned to a nonexistent drive   build exit 0, byte-identical binary
+> ```
+>
+> **The runtime half.** Every import is an OS DLL present in `System32`, except the thirteen `api-ms-win-crt-*` entries, and **none of those exists as a file on disk at all**: they are API set contracts the loader maps to `ucrtbase.dll`, present, and a Windows component since 1507, well below this suite's 1809 floor. The CRT dependency is satisfied by Windows itself rather than by anything a developer machine happens to carry.
+>
+> With `D00 T01 §4`'s clean-checkout build at a different absolute path changing **0** tracked files, and `§6`'s bootstrap from a deleted component, the toolchain demonstrably does not consult MSVC.
+>
+> **What is still genuinely unproven, and is all this section owes:**
+>
+> 1. **A registry fallback.** Clang can consult the registry to locate MSVC. It should not for the `-gnu` triple, and nothing has watched it not do so. Environment poisoning does not cover the registry.
+> 2. **Something on `PATH`.** A redistributable directory on a development machine's `PATH` could satisfy a load that a clean machine would fail.
+> 3. **The unknown one.** Which is the entire reason absence-testing exists and cannot be enumerated in advance.
+>
+> **Absence cannot be simulated on a machine that has the thing.** That is why the items below still run on real hardware, and why a failure there would now be a surprise rather than a coin toss.
+
+- [ ] Record what the machine is before anything is installed on it. Done when: its Windows build number, and the verified absence of Visual Studio, the Windows Kits, `cl.exe` and `msbuild`, are written here, gathered the same way `D00 T01 §1` gathered them for the development machine.
+- [ ] Clone and bootstrap with nothing else present. Done when: `git clone` without `--recursive` followed by `pwsh scripts/bootstrap.ps1` populates `reskit/` on that machine, and the elapsed time is recorded.
+- [ ] Build the real application, not a sample. Done when: `cmake --preset release && cmake --build --preset release` produces `Bin/Release/Resolute.exe` on that machine, and the binary's size is compared against the figure this repository records, currently **2,744,832 bytes** after `D00 T01 §6`.
+- [ ] Run it. Done when: the executable starts on that machine and creates its window, which is the only thing that proves the produced binary has no unmet runtime dependency. Cheaper substitute that fails the checkpoint: a successful link, which says nothing about what the loader will ask for.
+- [ ] Watch for the two named residuals. Done when: the run either shows no registry read for MSVC and no dependency satisfied from `PATH`, or names what it found. Cheaper substitute that fails the checkpoint: reporting only that it worked, which loses the one piece of information a clean machine can give that this one cannot.
+- [ ] Record what the run needed that the bootstrap did not supply, if anything. Done when: either nothing is named, or each missing piece is named with where it came from, because that list is the real content of this section.
+- [ ] Commit: `"release: the bare-machine proof"`
+
+-> XREF: D06 T01 §3 -- the installer testing that needs the same clean machine
+-> XREF: D00 T01 §7 -- where this section was written, and the narrower toolchain claim that stayed there
+
+**Test checkpoint:** The machine's Windows build is quoted alongside evidence that Visual Studio, the Windows Kits, `cl.exe` and `msbuild` are all absent. A clone without `--recursive` and one bootstrap produce a working toolchain, timed. `Resolute.exe` builds and its size matches what this repository records, or the difference is explained. The executable **runs** and creates its window on that machine. The two named residuals, a registry fallback and a `PATH` dependency, are each reported present or absent. Anything the run needed beyond the bootstrap is named with its source.
+
 
 ## Verification
 
