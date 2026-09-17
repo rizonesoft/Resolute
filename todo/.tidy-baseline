@@ -7,8 +7,39 @@
 # Format: the first line that is not blank and does not start with '#' is
 # `count: <integer>`. Everything else here is for the person reading it.
 
-count: 103
+count: 169
 
+# ── Raised 103 -> 169 on 2026-09-17: a stronger analyser, not worse code
+#
+# D00 T01 §6 bumped llvm-mingw 20251216 -> 20260908, which carries clang
+# 23.1.1 in place of 21.1.8. Two major versions of clang-tidy with it.
+#
+# EVERY PRE-EXISTING CHECK REPORTS AN IDENTICAL COUNT. That is the whole
+# argument, and it is checkable line by line below: 36 stayed 36, 16 stayed
+# 16, 8 stayed 8, 4 stayed 4, and every single-finding check kept its one. The
+# same code analysed by the same checks produced the same numbers.
+#
+# The +66 is accounted for exactly:
+#
+#     + 49  bugprone-signed-bitwise              check is new in this clang-tidy
+#     + 12  bugprone-unhandled-code-paths        check is new in this clang-tidy
+#     +  4  misc-use-internal-linkage            existing check, widened
+#     +  2  performance-faster-string-find       check is new in this clang-tidy
+#     -  1  bugprone-nondeterministic-pointer-iteration-order
+#     ----
+#     + 66
+#
+# The one that DISAPPEARED is worth more than the ones that arrived. It fired
+# at src/main.cpp:382, "sorting pointers is nondeterministic". The code is
+# unchanged, and the check still exists in clang-tidy 23; it simply no longer
+# fires. The sort is `std::sort` over a vector of pointers with a comparator
+# that compares CELL CONTENTS and never a pointer value, so the order is
+# deterministic. clang-tidy 21 was wrong and 23 is right. A bump that fixes a
+# false positive is the return on currency that D00 T01 §6 exists to collect.
+#
+# The compiler side of the same bump produced ZERO new warnings at
+# -Wall -Wextra -Werror across the whole tree.
+#
 # ── Raised 59 -> 103 on 2026-09-17, and why that is not a regression
 #
 # D00 T01 §5's independent review found the combined gate analysing only the
@@ -66,23 +97,25 @@ count: 103
 # Release, not debug: release is what ships, and only release carries the
 # optimiser-dependent analyser paths.
 
-# ── What the 103 are ─────────────────────────────────────────
+# ── What the 169 are ─────────────────────────────────────────
 #
+#   49  bugprone-signed-bitwise
 #   36  performance-no-int-to-ptr
-#   29  misc-use-internal-linkage
+#   33  misc-use-internal-linkage
 #   16  bugprone-switch-missing-default-case
+#   12  bugprone-unhandled-code-paths
 #    8  performance-enum-size
 #    4  clang-analyzer-security.ArrayBound
 #    2  performance-unnecessary-value-param
 #    2  clang-analyzer-deadcode.DeadStores
+#    2  performance-faster-string-find
 #    1  bugprone-use-after-move
 #    1  clang-analyzer-optin.performance.Padding
 #    1  misc-redundant-expression
 #    1  bugprone-misplaced-widening-cast
 #    1  bugprone-implicit-widening-of-multiplication-result
-#    1  bugprone-nondeterministic-pointer-iteration-order
 #
-# The 25 `performance-no-int-to-ptr` are Win32 talking: LPARAM and WPARAM are
+# The 36 `performance-no-int-to-ptr` are Win32 talking: LPARAM and WPARAM are
 # integers that carry pointers, and the cast is the API rather than a mistake.
 # They are the first candidates for a targeted suppression, not for a fix.
 #

@@ -264,11 +264,44 @@ Invoke-Gate -Name 'findings ledger' -LogName 'gate-findings' -Command {
     & python (Join-Path $RepoRoot 'scripts\todo-findings.py') --check
 }
 
+# ── toolchain currency, ADVISORY ─────────────────────────────
+#
+# A pin that has fallen behind is information, not a failure. The build is
+# reproducible either way, which is the entire point of pinning, so a stale
+# pin must never stop a push. D00 T01 §6.
+#
+# But "could not reach the API" is reported as its own thing, because an
+# unreachable network is not a current pin and saying so would be a check
+# claiming success for work it never did. Exit 2 means unknown.
+
+$tcLog = Join-Path $LogDir 'gate-toolchain.log'
+$tcClock = [System.Diagnostics.Stopwatch]::StartNew()
+& pwsh -NoProfile -File (Join-Path $RepoRoot 'scripts\toolchain-latest.ps1') *> $tcLog
+$tcCode = $LASTEXITCODE
+$tcClock.Stop()
+
+$tcStatus, $tcDetail = switch ($tcCode) {
+    0       { 'ok',        'all pins current' }
+    1       { 'behind',    ((Select-String -Path $tcLog -Pattern 'is behind, pinned' |
+                            ForEach-Object { $_.Line.Trim() -replace '^toolchain-latest: ', '' }) -join '; ') }
+    2       { 'unknown',   'upstream unreachable; currency not checked, not current' }
+    default { 'unknown',   "toolchain-latest exited $tcCode" }
+}
+[void]$results.Add([pscustomobject]@{
+    Name = 'toolchain'; Status = $tcStatus
+    Seconds = [math]::Round($tcClock.Elapsed.TotalSeconds, 1)
+    Log = $tcLog; Detail = $tcDetail; Failed = $false
+})
+
+
 # ── Report ───────────────────────────────────────────────────
 
 Write-Host ''
 foreach ($r in $results) {
-    $colour = if ($r.Failed) { 'Red' } elseif ($r.Status -eq 'not present') { 'Yellow' } else { 'Green' }
+    $colour = if ($r.Failed) { 'Red' }
+              elseif ($r.Status -eq 'not present' -or $r.Status -eq 'behind') { 'Yellow' }
+              elseif ($r.Status -eq 'unknown') { 'DarkYellow' }
+              else { 'Green' }
     $secs = $r.Seconds.ToString('0.0', [System.Globalization.CultureInfo]::InvariantCulture)
     $line = '  {0,-18} {1,-12} {2,6}s' -f $r.Name, $r.Status, $secs
     if ($r.Detail) { $line += "  $($r.Detail)" }
