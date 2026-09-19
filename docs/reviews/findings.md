@@ -4,22 +4,22 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**105 findings across 20 sections.**
+**121 findings across 21 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 33 | the plan or the evidence misdescribes what happened |
+| `record` | 40 | the plan or the evidence misdescribes what happened |
 | `correctness` | 29 | the code does the wrong thing |
-| `consistency` | 17 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 12 | fails under hostile or unexpected input |
+| `consistency` | 19 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 13 | fails under hostile or unexpected input |
+| `integration` | 6 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
-| `integration` | 3 | a consumer, caller, or downstream artifact no longer holds |
+| `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
 | `performance` | 2 | correct, and too slow or too costly to be used |
 | `reproducibility` | 1 | the same input does not produce the same output |
-| `test-coverage` | 1 | correct, and nothing exercises it, so a regression would be silent |
 
 ## Every finding
 
@@ -89,6 +89,22 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T02 §4` | F6 | `adversarial` | fixed | a malformed row was discarded rather than refused |
 | `D00 T02 §4` | F7 | `correctness` | fixed | the parser lost a trailing empty field, and a backslash |
 | `D00 T02 §4` | F8 | `record` | filed | XREF reciprocity is enforced per FILE, not per section |
+| `D00 T02 §5` | F1 | `adversarial` | corrected | forcing high contrast was demanded, and no override exists to verify |
+| `D00 T02 §5` | F2 | `test-coverage` | corrected | the crossfade endpoint was covered as blend math, not delivery |
+| `D00 T02 §5` | F3 | `record` | corrected | the controls item was ticked while three behaviors sat in Uncovered |
+| `D00 T02 §5` | F4 | `record` | corrected | the manager test counted subscribers but never delivered a tick |
+| `D00 T02 §5` | F5 | `record` | fixed | the checkpoint's three failures were asserted, never quoted |
+| `D00 T02 §5` | F6 | `test-coverage` | fixed | three easings had no midpoint pin |
+| `D00 T02 §5` | F7 | `integration` | fixed | controls cases left manager-held `[this]` lambdas behind at teardown |
+| `D00 T02 §5` | F8 | `record` | corrected | the record claimed the cases share no state |
+| `D00 T02 §5` | F9 | `record` | corrected | covered behavior was listed as uncovered, and a read as a write |
+| `D00 T02 §5` | F10 | `consistency` | fixed | two comments described code other than what followed them |
+| `D00 T02 §5` | F11 | `integration` | fixed | palette save and restore was hand-rolled, not RAII |
+| `D00 T02 §5` | F12 | `record` | fixed | the checkpoint command itself was never quoted |
+| `D00 T02 §5` | F13 | `consistency` | fixed | the TU relied on transitive includes for Win32 and wide strings |
+| `D00 T02 §5` | F14 | `integration` | fixed | the edit-sessions item died before the view borrowing it |
+| `D00 T02 §5` | F15 | `record` | corrected | the tidy citation rotted when the guard moved the line |
+| `D00 T02 §5` | F16 | `test-coverage` | filed | the collapse case checks a value against itself |
 | `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |
