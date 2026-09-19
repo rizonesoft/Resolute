@@ -49,6 +49,7 @@ track: W1
 |   5   |   §5    | One command runs every gate                  | §3, §4     |  [x]   |
 |   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [x]   |
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
+|   8   |   §8    | Run the unit suite under release             | §5         |  [ ]   |
 
 ---
 
@@ -830,6 +831,18 @@ Five gates that must each be remembered are five gates that get skipped under ti
 
 **Test checkpoint:** Moved with the section. `D06 T01 §9` carries it.
 
+## 8. Run the Unit Suite Under Release
+
+`testPresets` exist for both configurations (`D00 T02 §1`) but `check-all` runs `ctest --preset debug` only, so everything the suite pins is proven under debug: asserts live, optimization off. What release changes, asserts compiled out and optimization on, is exactly the class of difference a second run would catch, and today nothing runs it.
+
+**Needs:** Windows host (build/test)
+
+- [ ] Run the unit suite under the release preset in `check-all`. Done when: `ctest --preset release` runs green beside debug and a debug-only pass cannot gate the tree.
+- [ ] Commit: `"gates: run the unit suite under release"`
+
+**Test checkpoint:** `check-all` reports both presets green, quoted; a deliberately release-only failure fails the gate, quoted.
+
+-> SOURCE: plan-D00-T02-s5-2026-09-19-PR17 D00-T02-S5-PR17
 
 ## Verification
 

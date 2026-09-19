@@ -47,6 +47,8 @@ track: W1
 |   4   |   §4    | Parity driver for a built tool             | §1, §2         |  [x]   |
 |   5   |   §5    | Cover the inherited UI library             | §1, D00 T03 §3 |  [ ]   |
 |   6   |   §6    | Remove the tautological width check        | §5             |  [ ]   |
+|   7   |   §7    | Driven UI completion tests                 | §5             |  [ ]   |
+|   8   |   §8    | Icon manifest audit                        | §5             |  [ ]   |
 
 ---
 
@@ -466,11 +468,42 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 **Needs:** Windows host (build/test)
 
 - [ ] Delete the tautological check from `Sidebar collapse toggles both ways`. Done when: no assertion in the case compares a value with itself, and the diff touches nothing else.
+- [ ] Record §5's suite counts as remeasurable claims in this section: the `TEST_CASE` count in `tests/ui_test.cpp` and the `IsHighContrast` caller count in `shared/resolute-ui/src`. Done when: `todo-claims.py` reports both holding.
 - [ ] Commit: `"test: remove the tautological width check"`
+
+-> SOURCE: plan-D00-T02-s5-2026-09-19-PR19 D00-T02-S5-PR19
 
 **Test checkpoint:** `ctest --preset debug -L ui` exits 0 with `100% tests passed out of 42`, and the direct binary run reports the same 42 cases with one fewer assertion than §5's 271.
 
 -> SOURCE: panel-D00-T02-s5-2026-09-19 D00-T02-S5-F16
+
+## 7. Driven UI Completion Tests
+
+§5's Uncovered names two clusters no section owns: timer completion (the manager timer, `Theme::AnimateToggle`, content-view hide and error completion, settled sidebar collapse widths) and window-backed interaction (hit-testing, drag, scroll, column resize, popups). Both need what headless cannot give: a pumping message loop and real windows. This section builds the driven host both clusters run on and proves the completions the stuck-transition failure mode would otherwise hide: a transition that never finishes is a user-visible framework defect, not a test gap.
+
+**Needs:** Windows host (build/test)
+
+- [ ] Drive timer completion to its endpoint: `AnimateToggle` lands on the target palette, content-view hide and error settle, collapse widths settle. Done when: each completion is asserted after a pumped loop, and a stuck transition fails the run rather than hanging it.
+- [ ] Drive core interactions on window-backed controls: hit-testing, scroll, and column resize on the list view. Done when: each is asserted against a real window and the run is green headful.
+- [ ] Commit: `"test: driven ui completion tests"`
+
+**Test checkpoint:** The driven run pumps the manager timer to completion and asserts the settled state for the toggle, the content view, and collapse widths; hit-testing, scroll, and column resize pass against real windows. A deliberately stuck transition fails by name. All outputs are quoted.
+
+-> SOURCE: plan-D00-T02-s5-2026-09-19-PR7 D00-T02-S5-PR7
+
+## 8. Icon Manifest Audit
+
+Icons are referenced by string name and an unknown name resolves to null, which renders as a silently missing control. §5 pins one glyph and the null path; nothing checks that every name the suite references actually resolves. This section enumerates every icon name referenced by the launcher, the shared controls, and the tool descriptors and asserts each one resolves, so a typo fails the gate instead of shipping an invisible control.
+
+**Needs:** Windows host (build/test)
+
+- [ ] Enumerate the referenced icon names from the launcher, the shared controls, and the tool descriptors into one manifest. Done when: the manifest is committed and a name referenced nowhere else still resolves or is named as dead.
+- [ ] Assert every manifest entry resolves to SVG and to a bitmap. Done when: all resolve, and a deliberately removed icon fails by name, quoted.
+- [ ] Commit: `"test: icon manifest audit"`
+
+**Test checkpoint:** The manifest lists every referenced icon name with its referrer; all resolve to SVG and bitmap. A deliberately removed icon fails naming the icon. Counts are quoted.
+
+-> SOURCE: plan-D00-T02-s5-2026-09-19-PR13 D00-T02-S5-PR13
 
 ## Verification
 
