@@ -28,6 +28,7 @@ track: P2
 - -> XREF: D04 T02 §1 -- the Ownership inventory this slice builds from ([TODO-02](./TODO-02-ownership-complete.md))
 - -> XREF: D04 T03 §1 -- the ComIntRep spec this section ordered ([TODO-03](./TODO-03-comintrep-complete.md))
 - -> XREF: D04 T04 §1 -- the PixRepair spec this section builds ([TODO-04](./TODO-04-pixrepair-complete.md))
+- -> XREF: D04 T05 §1 -- the BiosCodes spec this section builds ([TODO-05](./TODO-05-bioscodes-complete.md))
 - -> XREF: [`09-au3-maintenance/TODO-01 §1`](../09-au3-maintenance/TODO-01-au3-maintenance.md) -- the AutoIt tool each port retires
 
 ## Outcome
@@ -50,7 +51,7 @@ track: P2
 |   2   |   §2    | The remaining frozen tools: ComIntRep, PixRepair | §1, D04 T03 §1, D04 T03 §2, D04 T04 §1, D04 T04 §2 |  [ ]   |
 |   3   |   §3    | Browser optimizer: four tools into one       | §1                         |  [ ]   |
 |   4   |   §4    | Drive Repair: USBRepair and DVDRepair merged | §2                         |  [ ]   |
-|   5   |   §5    | MemBoost and BiosCodes                       | §2                         |  [ ]   |
+|   5   |   §5    | MemBoost and BiosCodes                       | §2, D04 T05 §1, D04 T05 §2 |  [ ]   |
 
 ---
 

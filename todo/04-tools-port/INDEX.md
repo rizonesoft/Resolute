@@ -12,6 +12,7 @@ Every existing tool ported to the C++ framework, proven 1:1 against its AutoIt c
 | [TODO-02](./TODO-02-ownership-complete.md) | Ownership: Complete Port and Enhancement | draft |
 | [TODO-03](./TODO-03-comintrep-complete.md) | ComIntRep: Complete Port and Enhancement | draft |
 | [TODO-04](./TODO-04-pixrepair-complete.md) | PixRepair: Complete Port and Enhancement | draft |
+| [TODO-05](./TODO-05-bioscodes-complete.md) | BiosCodes: Complete Port and Enhancement | draft |
 
 ## Completed
 
