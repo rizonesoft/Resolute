@@ -59,6 +59,7 @@ track: R1
 |  13   |   §13   | Stamped-surface agreement test                | §12         |  [ ]   |
 |  14   |   §14   | Help content pipeline: guide to offline HTML  | --          |  [ ]   |
 |  15   |   §15   | Web publishing and link switch                | §9, §14     |  [ ]   |
+|  16   |   §16   | Final acceptance: the suite as shipped        | §9, §4, §5  |  [ ]   |
 
 ---
 
@@ -375,6 +376,23 @@ Publishing the guide to the project website is explicitly deferred past the firs
 **Test checkpoint:** The deployed guide matches local HTML anchor for anchor, the read base serves the web, and cut-network help opens local pages cleanly. Cheaper substitute that fails the checkpoint: flipping the base without the fallback proof, which strands offline users on the first outage.
 
 -> XREF: D06 T01 §14 -- the pipeline this section publishes
+
+## 16. Final Acceptance: The Suite As Shipped
+
+The last row of the release: one executable pass proving the finished suite is distribution-ready, run fresh on a clean machine. The §9 bare-machine proof shows install works when installers land; this section shows everything works when everything has landed. `process-plan` re-executes this procedure terminally after the last row flips, so the evidence here must be re-runnable from the section alone.
+
+**Needs:** Clean Windows machine (no Visual Studio)
+
+- [ ] Install everything clean: the whole-suite installer plus every standalone tool installer on a clean machine, and confirm each installed tool starts. Done when: every installer reports success and every tool launches, quoted.
+- [ ] Prove upgrade and update: a machine carrying the real AutoIt suite upgrades with settings preserved and one copy left, and every installed tool's update check reaches its feed. Done when: both paths are driven and quoted. Cheaper substitute that fails the checkpoint: upgrading from a fixture install, which proves the migrator runs rather than the migration works.
+- [ ] Prove the shipped set per tool: docs, language packs, icon, About, F1, and the guide page each resolve for every tool. Done when: the per-tool checklist is confirmed present, quoted, with any gap named rather than skipped.
+- [ ] Prove conformance and agreement: the `D07 T01 §3` check passes for every tool and the stamped-surface agreement test passes on the installed set. Done when: both reports are quoted green.
+- [ ] Prove clean removal: uninstall every tool and the suite, and confirm nothing remains but user data with its keep-or-remove choice honored. Done when: the machine reads clean, quoted.
+- [ ] Commit: `"release: final acceptance of the suite as shipped"`
+
+**Test checkpoint:** Clean install of all installers with every tool launching; real AutoIt upgrade with settings preserved; update checks reaching feeds; per-tool docs, packs, icon, About, F1, and guide confirmed; conformance and agreement green; removal clean. All quoted from one fresh machine. Cheaper substitute that fails the checkpoint: assembling the evidence from earlier sections' stamps, which proves each part worked once rather than the suite working now.
+
+-> XREF: D06 T01 §9 -- the bare-machine harness this acceptance reuses
 
 ## Verification
 

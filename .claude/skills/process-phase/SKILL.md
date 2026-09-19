@@ -68,7 +68,9 @@ Skip rows whose `resolve` is not exit 0 or whose verdict is runnable-elsewhere h
 
 ## Step 4 -- closeout
 
-When the table is all `[x]`: re-run the full suite once, confirm the plan shows the phase complete, write the closeout (what shipped, what was repaired, what was learned), commit, delete the guard if pinned standalone (the plan deletes it when chained), and report. A phase is complete when its table says so and the closeout is written: not before.
+When the table is all `[x]`, close the files before closing the phase: for every TODO file with a row this phase shipped, invoke `process-todo-file`. It runs the file-level Verification block, sweeps loose ends, reconciles deferrals, and sets `status: done` where the whole file is exhausted; a file with rows in later phases gets the sweep and keeps its status. A finding the sweep produces is filed before the closeout, never carried silently.
+
+Then re-run the full suite once, confirm the plan shows the phase complete, write the closeout (what shipped, what was repaired, what was learned, which files closed), commit, delete the guard if pinned standalone (the plan deletes it when chained), and report. A phase is complete when its table says so, its touched files are closed out, and the closeout is written: not before.
 
 ## Guardrails
 
