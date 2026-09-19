@@ -228,6 +228,7 @@ Finding headings take the form `### F<n> -- summary -- category -- disposition (
 The stamp makes factual claims no lens has checked: the panel reviewed the candidate, not the record of the review. Stage the stamp commit (`git add` the stamped TODO, the plan, the findings file, the attestation, and the ledger; no commit yet), then review the staged stamp with the pinned model:
 
 ```bash
+python scripts/review_prompt.py attest --read-back <findings stem>.attest.json  # the staged attestation reads back now, not only at emit: an altered file fails here, never ships
 TREE=$(git write-tree)  # the index identity FIRST: anything staged after this line is not under review
 git diff --cached > $RUNDIR/stamp.patch
 [ "$(git write-tree)" = "$TREE" ] || { echo "BLOCKED: the index moved while capturing the stamp patch; re-stage and restart"; exit 1; }

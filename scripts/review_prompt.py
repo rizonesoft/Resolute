@@ -12,6 +12,7 @@ WSL checkouts agree), and reviewer output is validated whole (item 15: one
 valid-looking row must not mask malformed trailing findings).
 """
 
+import datetime
 import hashlib
 import json
 import re
@@ -154,8 +155,12 @@ MANIFEST_RE = re.compile(
 # or post-binary `rename from/to` pairs are ignored by
 # construction. Combined diffs (`diff --cc` / `diff --combined`)
 # are refused at the manifest, never parsed: a merge candidate
-# fences no file list rather than a guessed one.
-_DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP")
+# fences no file list rather than a guessed one. The title match is
+# case-insensitive so a mistyped `candidate diff` still demands
+# base/head; novel labels stay outside the contract (the skill's
+# titles are fixed strings, and content-sniffing would re-admit
+# the prose forgery the title gate exists to refuse).
+_DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP", re.IGNORECASE)
 _DIFF_LINE_RE = re.compile(r"^diff --git (?P<rest>.+?)\s*$")
 _DIFF_QUOTED_RE = re.compile(r'^"a/((?:[^"\\]|\\.)*)"\s+(?P<right>.*)$')
 _RENAME_RE = re.compile(r"^rename (?P<dir>from|to) (?P<path>.+?)\s*$")
@@ -581,13 +586,18 @@ def write_attestation(*, manifest_sha: str, candidate_base: str, candidate_head:
     if verdict not in ("approve", "needs-attention"):
         raise ValueError(
             f"attestation verdict is {verdict!r}, want approve or needs-attention")
-    if not isinstance(checker, str) or not checker.startswith("PASS"):
+    if not isinstance(checker, str) or not checker.startswith("PASS "):
         raise ValueError(
             f"attestation checker is {checker!r}, want the PASS line")
     if not isinstance(timestamp, str) or not re.fullmatch(
             r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", timestamp):
         raise ValueError(
             f"attestation timestamp is {timestamp!r}, want %Y-%m-%dT%H:%M:%SZ")
+    try:
+        datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        raise ValueError(
+            f"attestation timestamp is {timestamp!r}, want a real calendar date")
     doc = {"schema": ATTEST_SCHEMA, "manifest_sha": manifest_sha,
            "candidate_base": candidate_base, "candidate_head": candidate_head,
            "tree": tree, "reviewer": reviewer, "model": model,
@@ -832,6 +842,13 @@ def _self_test() -> int:
         check("identity-ok", True)
     except ValueError as exc:
         check("identity-ok", False, str(exc))
+    try:
+        assert_candidate_identity([("candidate diff", "prose, no diff lines\n")],
+                                  None, None)
+        check("identity-title-case-insensitive", False, "no ValueError")
+    except ValueError as exc:
+        check("identity-title-case-insensitive",
+              "without base and head" in str(exc), str(exc))
     # The CLI emits UTF-8 even when the console is cp1252 (the Windows
     # default): a diff carrying box drawing must fence exit 0 with
     # decodable bytes. Driven 2026-09-20 against 68c7ea9a, whose tree
@@ -916,15 +933,19 @@ def _self_test() -> int:
                 model="m", verdict="approve",
                 checker="PASS four lenses, one verdict each",
                 timestamp="2026-09-19T19:00:00Z")
-    for field, bad_val in (("verdict", "banana"),
-                           ("checker", "FAIL line 1 is not a receipt"),
-                           ("timestamp", "t")):
+    for case, field, bad_val in (("verdict", "verdict", "banana"),
+                                 ("checker-fail", "checker",
+                                  "FAIL line 1 is not a receipt"),
+                                 ("checker-passive", "checker", "PASSIVE"),
+                                 ("timestamp-loose", "timestamp", "t"),
+                                 ("timestamp-impossible", "timestamp",
+                                  "2026-99-99T99:99:99Z")):
         probe = dict(good, **{field: bad_val})
         try:
             write_attestation(**probe)
-            check(f"attest-bad-{field}", False, "no ValueError")
+            check(f"attest-bad-{case}", False, "no ValueError")
         except ValueError as exc:
-            check(f"attest-bad-{field}", field in str(exc), str(exc))
+            check(f"attest-bad-{case}", field in str(exc), str(exc))
     try:
         read_attestation("not json {{{")
         check("attest-not-json", False, "no ValueError")
