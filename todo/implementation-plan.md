@@ -106,7 +106,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §5` | Make the Adjacency Advisory Actionable         |   7   |
 | [x] | `D00 T04 §6` | The Adversarial Reviewer                       |   7   |
 | [ ] | `D00 T04 §7` | Review-run records                             |   4   |
-| [ ] | `D00 T04 §8` | Revisit the two-model decision                 |   5   |
+| [ ] | `D00 T04 §8` | Revisit the two-model decision                 |   6   |
 | [ ] | `D00 T04 §9` | Review-input integrity                         |   5   |
 | [x] | `D00 T01 §1` | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2` | CMake structure and dependencies               |  11   |

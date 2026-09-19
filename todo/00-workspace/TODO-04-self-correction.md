@@ -66,6 +66,7 @@ track: W1
 |   7   |   §7    | Review-run records                         | §6         |  [ ]   |
 |   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [ ]   |
 |   9   |   §9    | Review-input integrity                     | §6         |  [ ]   |
+|  10   |   §10   | Run-record follow-ups                      | §7         |  [ ]   |
 
 ---
 
@@ -443,6 +444,7 @@ So this section is mostly wiring and measurement rather than construction, and i
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR1 D00-T04-S6-PR1
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR3 D00-T04-S6-PR3
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR7 D00-T04-S6-PR7
+-> XREF: D00 T04 §10 -- the follow-ups this section's plan review filed
 
 > **Started:** 2026-09-19T05:38:00Z
 
@@ -455,6 +457,7 @@ So this section is mostly wiring and measurement rather than construction, and i
 - [ ] Specify the cut threshold before deciding: the rolling window, the overlap denominator, severity weighting, and the cost measure. Done when: the rule names all four, and a worked example shows a cut and a keep.
 - [ ] Compare lens and prompt diversity against model diversity on shared candidates. Done when: same-candidate adversarial, integration, record, and performance passes are measured against the second model, and the decision says which diversity carries the finds.
 - [ ] Decide keep or cut from the run records. Done when: the decision is dated, cites the measured numbers, and either keeps with the next revisit named or cuts with the losing rung's duties reassigned.
+- [ ] Record severity per finding and compare weighted value per cost, not raw counts. Done when: the severity scale is stated beside the dispositions, every finding carries one, and the keep-or-cut comparison weights unique accepted finds by severity against the §10 cost fields.
 - [ ] Commit: `"workspace: revisit the two-model decision"`
 
 **Test checkpoint:** The decision cites the run-record queries, quoted; the blinded comparison exists with its overlap measured; the threshold names window, denominator, severity, and cost. Starts after five panel-reviewed sections exist in the run records; blocked until then, explicitly.
@@ -463,6 +466,8 @@ So this section is mostly wiring and measurement rather than construction, and i
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR4 D00-T04-S6-PR4
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR6 D00-T04-S6-PR6
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR16 D00-T04-S6-PR16
+-> XREF: D00 T04 §10 -- the enriched records this decision consumes
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR20 D00-T04-S7-PR20
 
 ## 9. Review-Input Integrity
 
@@ -481,6 +486,33 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR10 D00-T04-S6-PR10
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR11 D00-T04-S6-PR11
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR13 D00-T04-S6-PR13
+
+## 10. Run-Record Follow-Ups
+
+§7 made the runs queryable, and its plan review found the queries §8 will need that the records cannot yet answer: which model version ran, what it cost, what each round had the opportunity to find, and what the review was for. It also found the schema unfinished (no version, no terminology block, `empty` undefined for refuted-only runs, self coverage unstated) and the report unbound to any commit. This section closes those gaps before §8 decides on the records.
+
+- [ ] Pin the schema: one terminology block (run, round, engagement, panel), a schema version beside the parser, `empty` defined for refuted-only runs, and the self side stated as ledger-derived with its validation named. Done when: the runs file header carries all four, and a prose-only round still reports through the existing comment rule.
+- [ ] Enrich each round with what §8 must query: provider and exact model version, normalized cost and latency, opportunity-to-find metadata, review purpose, and provenance confidence with unresolved fields marked rather than guessed. Done when: every field is on the round line or in a named sidecar the checker reads, and the backfilled Opus versions read unresolved.
+- [ ] Bind every report to its commit and timestamp, and expose a versioned machine export §8 consumes directly. Done when: `--report` prints its as-of, the export has a version the checker asserts, and §8 reads the export rather than the prose.
+- [ ] Preserve dated outcome transitions with their deciding evidence instead of final states only. Done when: a refuted, withdrawn, duplicate, or routed finding keeps its when, why, and evidence, quoted from the record.
+- [ ] Commit: `"workspace: run-record follow-ups"`
+
+**Test checkpoint:** The schema block, the enriched fields, the as-of binding, and one transition are quoted from a driven `--report` and `--check`; the export version is asserted, not described.
+
+-> XREF: D00 T04 §7 -- the records this section hardens
+-> XREF: D00 T04 §8 -- the decision that consumes the enriched records
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR4 D00-T04-S7-PR4
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR7 D00-T04-S7-PR7
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR8 D00-T04-S7-PR8
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR9 D00-T04-S7-PR9
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR11 D00-T04-S7-PR11
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR13 D00-T04-S7-PR13
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR14 D00-T04-S7-PR14
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR15 D00-T04-S7-PR15
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR18 D00-T04-S7-PR18
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR21 D00-T04-S7-PR21
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR22 D00-T04-S7-PR22
+-> SOURCE: plan-D00-T04-s7-2026-09-19-PR23 D00-T04-S7-PR23
 
 ## Verification
 
