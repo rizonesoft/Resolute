@@ -76,6 +76,7 @@ track: W1
 |  17   |   §17   | Report without walking the corpus twice       | §10     |  [ ]   |
 |  18   |   §18   | Second two-model revisit, independently rated | §8      |  [ ]   |
 |  19   |   §19   | No partial flips                            | --      |  [ ]   |
+|  20   |   §20   | Review-tooling operability follow-ups       | §12     |  [ ]   |
 
 ---
 
@@ -616,6 +617,7 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 -> SOURCE: plan-D00-T04-s11-2026-09-19-PR4 D00-T04-S11-PR4
 -> SOURCE: plan-D00-T04-s11-2026-09-19-PR6 D00-T04-S11-PR6
 -> XREF: D00 T04 §13 -- the OID resolution this section's independent-review P2 files
+-> XREF: D00 T04 §20 -- operability follow-ups from this section's review
 
 > **Started:** 2026-09-19T19:05:40Z
 
@@ -760,6 +762,20 @@ A `[x]` row with an open checklist reads as done while work remains, which is th
 **Test checkpoint:** `validate` fails naming file, section, and item on a fixture with a shipped row and a plain open item; the self-test pins the rule plus all four exemptions; the live tree quotes zero fires. A `[x]` row with an open checklist can no longer reach the plan.
 
 -> SOURCE: operator-2026-09-19-completion-first
+
+## 20. Review-Tooling Operability Follow-Ups
+
+Two §12-review findings about the review machinery itself: the skill's fence commands do not run on the project's Windows machine, and three script self-tests run nowhere in the gate set. Both are small, both lack an owner, and neither blocks §12, whose review proceeds with an in-session workaround (cygpath-translated fence paths) and manual self-test runs.
+
+- [ ] Run every fence block in `review-todo-section` on Windows: the panel, plan-review, stamp, and architecture prompts. Done when: each block's `fence TITLE=path` arguments reach Windows python as Windows paths (MSYS2 converts bare path arguments but not paths embedded in `TITLE=path`, so python resolves Git Bash `/tmp` to the wrong place and fence exits 2 with `cannot read`), quoted from driven runs of all four blocks on this machine, and the skill carries the working form. Cheaper substitute that fails the checkpoint: documenting the workaround in chat, which the next review will not read.
+- [ ] Gate the three ungated self-tests in `scripts/check-all.ps1`: `review_prompt --self-test` (66 cases, measured in the §12 review), `todo-findings --self-test` (29 cases per its source), and `todo-runs --self-test` (counted at implementation). Done when: check-all runs all three with a named gate each, a deliberately broken case in each fails its gate quoted, and the sweep reports the new gates green. (`todo-graph`, `todo-claims`, and `profile-check` self-tests are already gated; `todo-adjacency` and `todo-validate` carry no self-test. Measured 2026-09-20.)
+- [ ] Commit: `"workspace: review-tooling operability follow-ups"`
+
+**Test checkpoint:** All four skill fence blocks run green on Windows, quoted; check-all reports the three new self-test gates green, quoted; a broken case in each fails its gate, quoted.
+
+-> XREF: D00 T04 §12 -- the review that found these; the fence fix corrects §12-era skill commands
+-> SOURCE: self-2026-09-20-fence-paths
+-> SOURCE: self-2026-09-20-ungated-selftests
 
 ## Verification
 
