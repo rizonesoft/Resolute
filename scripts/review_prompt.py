@@ -164,11 +164,11 @@ def _scan_diff_block(lines: list[str]) -> list[str]:
         rm = _RENAME_RE.match(line)
         if rm and rm.group("dir") not in renames:
             renames[rm.group("dir")] = _rename_path(rm.group("path"))
+    if diff_line is None:
+        return []
     if "from" in renames and "to" in renames:
         old, new = renames["from"], renames["to"]
         return [new] if old == new else [old, new]
-    if diff_line is None:
-        return []
     return _diff_paths(diff_line)
 
 
@@ -550,6 +550,11 @@ def _self_test() -> int:
     mline4, _ = build_manifest(tag, [("CANDIDATE DIFF", hostile)])
     check("manifest-rename-authoritative",
           "diff-files=old b/x.md|new b/y.md" in mline4, mline4)
+    poisoned = ("a commit message musing\n"
+                "rename from nowhere\n"
+                "rename to nothing\n")
+    mline5, _ = build_manifest(tag, [("CANDIDATE DIFF", poisoned)])
+    check("manifest-rename-needs-diff-line", "diff-files=" not in mline5, mline5)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
