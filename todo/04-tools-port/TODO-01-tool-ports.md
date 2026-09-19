@@ -26,6 +26,7 @@ track: P2
 - -> XREF: [`05-new-tools/TODO-01 §1`](../05-new-tools/TODO-01-intake-and-new-tools.md) -- the intake contract, which reuses this file's porting pattern
 - -> XREF: [`06-distro-release/TODO-01 §1`](../06-distro-release/TODO-01-build-and-release.md) -- the release that ships these ports
 - -> XREF: D04 T02 §1 -- the Ownership inventory this slice builds from ([TODO-02](./TODO-02-ownership-complete.md))
+- -> XREF: D04 T03 §1 -- the ComIntRep spec this section ordered ([TODO-03](./TODO-03-comintrep-complete.md))
 - -> XREF: [`09-au3-maintenance/TODO-01 §1`](../09-au3-maintenance/TODO-01-au3-maintenance.md) -- the AutoIt tool each port retires
 
 ## Outcome
@@ -145,7 +146,7 @@ track: P2
 **Chrome:** consume the framework and the repair contract. No private copies.
 **Needs:** Windows host (build/test)
 
-- [ ] **Specify** `ComIntRep` in its own TODO file before building it. Required scope: every repair it performs enumerated from `resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.au3` with its source line; which repairs are reversible and which are not; the component and internet repair areas it touches; and the freeze check below, which transfers to that file because that is where the writing happens. Done when: the file exists, validates, and its sections appear in the plan.
+- [x] **Specify** `ComIntRep` in its own TODO file before building it. Required scope: every repair it performs enumerated from `resolute_au3/SDK/Concrete/ComIntRep/ComIntRep.au3` with its source line; which repairs are reversible and which are not; the component and internet repair areas it touches; and the freeze check below, which transfers to that file because that is where the writing happens. Done when: the file exists, validates, and its sections appear in the plan. Done: `D04 T03` authored, validated, and planned; the freeze check transfers to its Outcome and §1 verdicts.
 - [ ] Capture each shipped AutoIt tool first, with its effects on its fixture and its window. Done when: two baselines are committed.
 - [ ] Port `PixRepair` to `extensions/PixRepair/` as framework plus contract plus items. Done when: it builds as its own standalone executable and contains no settings, log, localization, or loop code.
 - [ ] Prove parity per tool, `ComIntRep` through its own spec's sections and `PixRepair` here. Done when: two parity reports each show zero differing fields, both quoted.

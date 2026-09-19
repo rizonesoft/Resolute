@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **25 of 171 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **25 of 177 sections complete (14%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -209,6 +209,12 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D04 T02 §2` | Ownership distribution completeness          |   7   |
 | [ ] | `D04 T02 §3` | Verify-after-write, per-tree status          |   6   |
 | [ ] | `D04 T02 §4` | Remove-all, stuck-state repair               |   4   |
+| [ ] | `D04 T03 §1` | ComIntRep repair inventory, reversibility    |   5   |
+| [ ] | `D04 T03 §2` | ComIntRep surface inventory, layer map       |   5   |
+| [ ] | `D04 T03 §3` | ComIntRep distribution completeness          |   7   |
+| [ ] | `D04 T03 §4` | Per-repair verification and outcome          |   6   |
+| [ ] | `D04 T03 §5` | Pre-repair restore-point offer               |   4   |
+| [ ] | `D04 T03 §6` | Opt-in completion chime                      |   3   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
 | [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   8   |
