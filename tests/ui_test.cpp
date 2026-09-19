@@ -94,6 +94,35 @@ TEST_CASE("Palette field count matches the struct", "[ui][theme]") {
 // IsDarkMode reads the live OS setting. The test re-reads the same value
 // key independently: it pins the path (HKCU Personalize AppsUseLightTheme,
 // 0 means dark), not the user's current choice.
+TEST_CASE("System accent derivation wires the registry value", "[ui][theme]") {
+    // ReadSystemAccent rewrites the shared palettes, so save and restore them:
+    // later cases pin the compiled-in defaults, and a live accent must not
+    // leak into them. The assertion pins the wiring (registry value lands on
+    // both palettes' accent, or the compiled default when the key is absent);
+    // the lightness math inside stays interior.
+    rui::ColorPalette darkSaved = rui::DarkPalette;
+    rui::ColorPalette lightSaved = rui::LightPalette;
+    DWORD abgr = 0;
+    DWORD size = sizeof(abgr);
+    LSTATUS status = RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM",
+                                  L"AccentColor", RRF_RT_DWORD, nullptr, &abgr, &size);
+    COLORREF expected = (status == ERROR_SUCCESS) ? (abgr & 0x00FFFFFFu) : RGB(0, 120, 212);
+    Theme::ReadSystemAccent();
+    CHECK(rui::DarkPalette.accent == expected);
+    CHECK(rui::LightPalette.accent == expected);
+    CHECK(rui::DarkPalette.surfaceActive == expected);
+    rui::DarkPalette = darkSaved;
+    rui::LightPalette = lightSaved;
+    CHECK(rui::DarkPalette.accent == darkSaved.accent);
+}
+
+TEST_CASE("IsHighContrast agrees with the system call", "[ui][theme]") {
+    HIGHCONTRASTW hc{};
+    hc.cbSize = sizeof(hc);
+    SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(hc), &hc, 0);
+    CHECK(Theme::IsHighContrast() == ((hc.dwFlags & HCF_HIGHCONTRASTON) != 0));
+}
+
 TEST_CASE("IsDarkMode agrees with the registry value", "[ui][theme]") {
     DWORD value = 1;
     DWORD size = sizeof(value);
@@ -103,21 +132,10 @@ TEST_CASE("IsDarkMode agrees with the registry value", "[ui][theme]") {
     CHECK(Theme::IsDarkMode() == (value == 0));
 }
 
-// AnimateToggle starts a transition: the mode flips at once while the colors
-// blend toward it. Completion needs the manager's timer (a message loop), so
-// headless coverage ends at the start; the blend math itself is LerpColor,
-// covered above at both endpoints. Runs last in the theme group: the
-// transition stays open (no timer ticks headless), and Colors() reads the
-// blended palette from here on. No later case depends on Colors().
-TEST_CASE("AnimateToggle opens a transition toward the new mode", "[ui][theme]") {
-    while (Theme::GetMode() != Theme::Mode::System)
-        Theme::Toggle();
-    REQUIRE_FALSE(Theme::IsTransitioning());
-    Theme::AnimateToggle(300.0f);
-    CHECK(Theme::GetMode() == Theme::Mode::Dark);
-    CHECK(Theme::IsDark());
-    CHECK(Theme::IsTransitioning());
-}
+// AnimateToggle is deliberately uncovered: it opens a transition that only the
+// manager's timer can complete, so running it would poison Colors() for every
+// later case in the process under any execution order. The blend math itself
+// is LerpColor, covered at both endpoints and the midpoint below.
 
 // ── Animation ─────────────────────────────────────────────────────────
 
@@ -156,6 +174,20 @@ TEST_CASE("Known easing values pin the curves", "[ui][anim]") {
     CHECK_THAT(rui::ease::InOutQuad(0.25f) + rui::ease::InOutQuad(0.75f), WithinAbs(1.0f, 0.00001f));
     // OutBack overshoots: the header promises values past 1 mid-flight.
     CHECK(rui::ease::OutBack(0.7f) > 1.0f);
+}
+
+TEST_CASE("Every easing pins its midpoint", "[ui][anim]") {
+    // Exact powers of two where the curve is polynomial; looser where it is
+    // transcendental (the value below is the computed constant, verified by
+    // running, not derived by hand).
+    CHECK_THAT(rui::ease::InCubic(0.5f), WithinAbs(0.125f, 0.00001f));
+    CHECK_THAT(rui::ease::OutCubic(0.5f), WithinAbs(0.875f, 0.00001f));
+    CHECK_THAT(rui::ease::InOutCubic(0.5f), WithinAbs(0.5f, 0.00001f));
+    CHECK_THAT(rui::ease::InQuart(0.5f), WithinAbs(0.0625f, 0.00001f));
+    CHECK_THAT(rui::ease::OutQuart(0.5f), WithinAbs(0.9375f, 0.00001f));
+    CHECK_THAT(rui::ease::InOutQuart(0.5f), WithinAbs(0.5f, 0.00001f));
+    CHECK_THAT(rui::ease::OutElastic(0.5f), WithinAbs(1.015625f, 0.0001f));
+    CHECK_THAT(rui::ease::Spring(0.5f), WithinAbs(0.96245f, 0.001f));
 }
 
 TEST_CASE("Animation ticks to finished exactly once", "[ui][anim]") {
@@ -222,17 +254,8 @@ TEST_CASE("Lerp hits both ends and the midpoint", "[ui][anim]") {
 
 // ── Icons ─────────────────────────────────────────────────────────────
 
-// Before Load, every accessor fails closed: count zero, pointers null.
-// This runs first in the group because Load is sticky once called.
-TEST_CASE("Lucide accessors fail closed before load", "[ui][icons]") {
-    // NOTE: order-coupled by design -- no earlier case in this binary calls
-    // Load (verified by grep at authoring time), so the guards still hold.
-    CHECK(rui::LucideIcons::GetCount() == 0);
-    CHECK(rui::LucideIcons::GetName(0) == nullptr);
-    CHECK(rui::LucideIcons::GetSvgData("view-list") == nullptr);
-    CHECK(rui::LucideIcons::Render("view-list", 16, 0xFFFFFFu) == nullptr);
-}
-
+// The pre-Load fail-closed guards are deliberately uncovered: Load() is sticky
+// with no reset seam, so no execution order can guarantee a pre-Load state.
 TEST_CASE("Lucide loads statically with a non-empty set", "[ui][icons]") {
     REQUIRE(rui::LucideIcons::Load());
     CHECK(rui::LucideIcons::Load());  // second load is a no-op true
