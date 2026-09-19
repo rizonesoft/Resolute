@@ -133,9 +133,43 @@ MANIFEST_RE = re.compile(
 )
 # Chunks carrying a unified diff name it in the title (CANDIDATE DIFF,
 # STAGED STAMP); only those are scanned for changed files, so a `+++`
-# line in prose can never forge the file list.
+# line in prose can never forge the file list. Git C-quotes an
+# unusual path (`a/"my file"`), so the b-side accepts quoted or bare;
+# combined diffs (`diff --cc`, merge candidates only, and this tree
+# stays linear) are the stated residual.
 _DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP")
-_DIFF_FILE_RE = re.compile(r"^diff --git a/\S+ b/(?P<path>\S+)\s*$", re.MULTILINE)
+_DIFF_FILE_RE = re.compile(
+    r"^diff --git a/(?:\"(?:[^\"\\]|\\.)*\"|\S+) b/(?:\"(?P<quoted>(?:[^\"\\]|\\.)*)\"|(?P<bare>\S+))\s*$",
+    re.MULTILINE,
+)
+
+
+def _unquote_git_path(raw: str) -> str:
+    """Undo git's C-style quoting on a diff path: backslash, double
+    quote, n/r/t, and octal escapes (the last is how non-ASCII names
+    arrive, one escape per UTF-8 byte, so bytes accumulate and decode
+    once). Unknown escapes stay literal rather than vanishing."""
+    out = bytearray()
+    i = 0
+    simple = {"\\": b"\\", '"': b'"', "n": b"\n", "r": b"\r", "t": b"\t"}
+    while i < len(raw):
+        if raw[i] == "\\" and i + 1 < len(raw):
+            nxt = raw[i + 1]
+            if nxt in simple:
+                out.extend(simple[nxt])
+                i += 2
+                continue
+            octal = raw[i + 1:i + 4]
+            if len(octal) == 3 and all(c in "01234567" for c in octal):
+                out.append(int(octal, 8))
+                i += 4
+                continue
+            out.extend(b"\\")
+            i += 1
+            continue
+        out.extend(raw[i].encode("utf-8"))
+        i += 1
+    return bytes(out).decode("utf-8", "replace")
 RECEIPT_RE = re.compile(r"^RECEIPT\s+sha=(?P<sha>[0-9a-f]{64})\s+end=(?P<end>\S+)\s*$")
 TAG_LINE_RE = re.compile(r"^TAG\s+(?P<tag>\S+)\s*$")
 
@@ -155,7 +189,9 @@ def build_manifest(tag: str, chunks: list[tuple[str, str]],
     diff_files = []
     for title, chunk_body in chunks:
         if _DIFF_TITLE_RE.search(title):
-            diff_files.extend(m.group("path") for m in _DIFF_FILE_RE.finditer(chunk_body))
+            for m in _DIFF_FILE_RE.finditer(chunk_body):
+                quoted = m.group("quoted")
+                diff_files.append(_unquote_git_path(quoted) if quoted is not None else m.group("bare"))
     if diff_files:
         line += " diff-files=" + "|".join(diff_files)
     if base is not None:
@@ -418,6 +454,11 @@ def _self_test() -> int:
     check("manifest-prose-trap", "fake" not in mline, mline)
     mline2, _ = build_manifest(tag, [("SECTION", prose_trap)])
     check("manifest-no-diff-chunks", "diff-files=" not in mline2, mline2)
+    quoted = ('diff --git a/"my file.md" b/"my file.md"\n'
+              'diff --git a/"caf\\303\\251.md" b/"caf\\303\\251.md"\n')
+    mline3, _ = build_manifest(tag, [("CANDIDATE DIFF", quoted)])
+    check("manifest-quoted-spaces", "diff-files=my file.md|" in mline3, mline3)
+    check("manifest-quoted-octal", "caf\u00e9.md" in mline3, mline3)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
