@@ -49,6 +49,10 @@ python scripts/todo-graph.py plan --check
 
 Commit as one `todo:` commit. Report the file, its sections, the competitor table with what beats each rival, and the new plan totals.
 
+## Combined use with plan-tool-port
+
+When the tool builds on an incomplete port or sample, read that skill's inventory first and scope this skill to the gaps: the job paragraph starts from what exists, the competitor survey covers the finished tool, and new sections land in the **same** file after the parity sections. Never re-inventory what the port skill already recorded; cite it.
+
 ## Guardrails
 
 - Do not plan without the job paragraph and the non-goals. A tool without a fence grows until it ships nothing.

@@ -23,6 +23,10 @@ find resolute_au3 -iname '<Tool>.sni' -o -iname '<Tool>.au3' | head
 
 Read the `.au3` main script, the `.sni` build descriptor, the English language pack (UTF-16: decode with `iconv -f UTF-16 -t UTF-8`), the documentation set, and the update file. For a sample rather than a Concrete tool, read the sample directory the same way and record what a sample lacks (descriptor, packs, docs) as scope, not as an excuse.
 
+For a **merge** (N tools into one, such as the four browser optimizers), run this step and step 2 per source, then write the merge map before anything else: behavior shared by all sources (ported once), per-source deltas (kept, cut, or unified with a reason each), and the picker or router surface that replaces N front doors. The merge map is the file's first section; nothing builds without it.
+
+For a **C++ source** (a sample or existing `extensions/` app with no AutoIt), replace the AutoIt reads with the C++ equivalents: the build files, the headers plus public interfaces, the tests if any, the bug list as scope (every known defect is a port item or a cut-with-reason, never inherited silently), and whatever docs exist. Steps 2 through 6 run unchanged against that inventory.
+
 Check whether the tool is frozen: `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair`, `BiosCodes` (AGENTS.md). A frozen tool's computed effect is reproduced exactly; enhancements to a frozen tool add surfaces and conveniences around the effect, never change the effect.
 
 ### 2. Inventory everything
@@ -82,6 +86,10 @@ python scripts/todo-graph.py plan --check
 ```
 
 Commit as one `todo:` commit. Report the file, its sections, the enhancement list with the competitor gaps each closes, and the new plan totals.
+
+## Combined use with plan-new-tool
+
+When the source is incomplete (a sample missing features, docs, or surfaces), run this skill first for what exists (inventory plus parity), then `plan-new-tool` scoped to the gaps: the port inventory's gap list becomes the new-tool job definition, and the competitor survey covers the finished tool, not the sample. Author **one** file: parity sections first, new-capability sections after, each fenced by kind. Two files for one tool is a defect in the plan.
 
 ## Guardrails
 
