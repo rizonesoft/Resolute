@@ -71,6 +71,7 @@ track: W1
 |  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [ ]   |
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
+|  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [ ]   |
 
 ---
 
@@ -469,6 +470,7 @@ So this section is mostly wiring and measurement rather than construction, and i
 - [ ] Compare lens and prompt diversity against model diversity on shared candidates. Done when: same-candidate adversarial, integration, record, and performance passes are measured against the second model, and the decision says which diversity carries the finds.
 - [ ] Decide keep or cut from the run-record export, not the prose. Done when: the decision is dated, cites the measured numbers from `todo-runs.py --export` (version asserted by `--check-export`), and either keeps with the next revisit named or cuts with the losing rung's duties reassigned.
 - [ ] Record severity per finding and compare weighted value per cost, not raw counts. Done when: the severity scale is stated beside the dispositions, every finding carries one, and the keep-or-cut comparison weights unique accepted finds by severity against the §10 cost fields.
+- [ ] Decide from a fresh export, never a carried file: regenerate `--export` from the live records at decision time and assert it with `--check-export`, since a stale export stays internally sound. Done when: the decision cites the regeneration and the assertion, quoted.
 - [ ] Commit: `"workspace: revisit the two-model decision"`
 
 **Test checkpoint:** The decision cites the run-record export, quoted; the blinded comparison exists with its overlap measured; the threshold names window, denominator, severity, and cost. Starts after five panel-reviewed sections exist in the run records; blocked until then, explicitly.
@@ -479,6 +481,7 @@ So this section is mostly wiring and measurement rather than construction, and i
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR16 D00-T04-S6-PR16
 -> XREF: D00 T04 §10 -- the enriched records this decision consumes
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR20 D00-T04-S7-PR20
+-> SOURCE: plan-D00-T04-s10-2026-09-19-PR7 D00-T04-S10-PR7
 
 ## 9. Review-Input Integrity
 
@@ -525,6 +528,7 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 -> XREF: D00 T04 §7 -- the records this section hardens
 -> XREF: D00 T04 §8 -- the decision that consumes the enriched records
 -> XREF: D00 T04 §14 -- the sign-off advisory this section's panel filed
+-> XREF: D00 T04 §15 -- the plan-review minors this section's review filed
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR4 D00-T04-S7-PR4
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR7 D00-T04-S7-PR7
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR8 D00-T04-S7-PR8
@@ -607,6 +611,22 @@ The §10 sign-off round proved `check_export` accepts `"export_version": true, "
 
 -> XREF: D00 T04 §10 -- the gate this section hardens
 -> SOURCE: panel-D00-T04-s10-2026-09-19 D00-T04-S10-F9
+
+## 15. Run-Record Vocabulary and Evidence Follow-Ups
+
+The §10 plan review accepted three minors the enriched records leave open: latency carries a unit (`<int>s`) but no measurement boundary, unresolved-field coverage is reported for cost only, and transition evidence is quoted without a commit binding the quote to the record it came from. All three are small, all three lack an owner, and none blocks §8, which decides from regenerated exports with cost in tokens.
+
+- [ ] Define the latency boundary: what interval a round's `<int>s` measures, stated in the records header beside the unit. Done when: the header names the boundary, quoted, and mixed-boundary values have nowhere to hide.
+- [ ] Report unresolved-field coverage per field and model in `--report`, extending the existing cost line. Done when: version, latency, and cost each show recorded-vs-unresolved counts, quoted from a driven report.
+- [ ] Bind each transition's evidence to the commit whose tree holds the quoted record. Done when: every block carries the binding, the checker asserts it resolves, and one rebinding failure is quoted.
+- [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
+
+**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; all quoted from driven runs.
+
+-> XREF: D00 T04 §10 -- the records this section tightens
+-> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
+-> SOURCE: plan-D00-T04-s10-2026-09-19-PR6 D00-T04-S10-PR6
+-> SOURCE: plan-D00-T04-s10-2026-09-19-PR10 D00-T04-S10-PR10
 
 ## Verification
 
