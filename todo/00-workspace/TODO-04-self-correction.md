@@ -77,6 +77,7 @@ track: W1
 |  18   |   §18   | Second two-model revisit, independently rated | §8      |  [ ]   |
 |  19   |   §19   | No partial flips                            | --      |  [ ]   |
 |  20   |   §20   | Review-tooling operability follow-ups       | §12     |  [ ]   |
+|  21   |   §21   | Review-input integrity hardening            | §12     |  [ ]   |
 
 ---
 
@@ -776,6 +777,19 @@ Two §12-review findings about the review machinery itself: the skill's fence co
 -> XREF: D00 T04 §12 -- the review that found these; the fence fix corrects §12-era skill commands
 -> SOURCE: self-2026-09-20-fence-paths
 -> SOURCE: self-2026-09-20-ungated-selftests
+
+## 21. Review-Input Integrity Hardening
+
+Two §12 sign-off findings ask for stronger machinery than §12's contract: the cross-check verifies file sets but not content coverage, and the stamp rung demands a receipt nothing verifies. Both are new tooling, neither blocks §12 (the designed contiguous flow is construction-safe and the stamp receipt is eyeballed per the skill), and both need an owner before the next review leans on the gap. (Depends On §12 carries the relation; no XREF lines, so this filing touches no stamped-or-stamping section.)
+
+- [ ] Verify cross-check content coverage, not just file sets: a fenced chunk that drops commits inside base..head while keeping the file set must fail. Done when: the dropped-commit shape fails closed quoted, with content comparison, per-commit manifests, or a tool-driven union proof for non-contiguous candidates (the implementation chooses, and the §12 round-3 demonstration, `633e32b` inside the span yet absent from the chunk with sets agreeing, is the regression case), the designed contiguous flow still passes, and the self-test pins both. Cheaper substitute that fails the checkpoint: documenting the limitation, which leaves the next non-contiguous review on its honor.
+- [ ] Verify the stamp reviewer's output mechanically: receipt plus verdict shape, like check-panel and check-plan. Done when: a stamp-output check validates the receipt against the stamp manifest and the `STAMP HOLDS`-vs-namings shape, the skill wires it after the stamp runner, a truncated stamp review fails quoted, and the self-test pins receipt, holds, and naming legs. Cheaper substitute that fails the checkpoint: the eyeball verification, which is the gap.
+- [ ] Commit: `"workspace: review-input integrity hardening"`
+
+**Test checkpoint:** The dropped-commit chunk fails quoted and the contiguous chunk passes; the truncated stamp review fails quoted and `STAMP HOLDS` passes; both self-tests pin their legs.
+
+-> SOURCE: panel-D00-T04-s12-2026-09-20 D00-T04-S12-F11
+-> SOURCE: panel-D00-T04-s12-2026-09-20 D00-T04-S12-F12
 
 ## Verification
 
