@@ -256,3 +256,16 @@ round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 738834f 
 round: 3 model: opus effort: medium outcome: findings candidate: 2da2c39 provider: claude version: unresolved cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S11-F4, D00-T04-S11-F5
 empty: 0
 refuted: 2
+
+run: D00-T04-S12
+date: 2026-09-20
+runner: panel
+rounds: 5
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: e9f3156 provider: codex version: gpt-5.6-sol cost: 45897tokens latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S12-F6, D00-T04-S12-F7
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 2f0c835 provider: codex version: gpt-5.6-sol cost: 49533tokens latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S12-F8, D00-T04-S12-F9, D00-T04-S12-F10
+round: 3 model: opus effort: medium outcome: findings candidate: 7971e20 provider: claude version: unresolved cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S12-F11, D00-T04-S12-F12, D00-T04-S12-F13, D00-T04-S12-F14
+round: 4 model: opus effort: medium outcome: findings candidate: 42b9742 provider: claude version: unresolved cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S12-F15, D00-T04-S12-F16, D00-T04-S12-F17
+# round 5 is the independent review pass (`codex review --commit 20c41c1`, ran before panel round 1): its findings are usable and claimed here so the coverage check passes; outcome error exempts it from the panel mapping, which only spans panel rounds 1-4. A first-class shape for non-panel rounds is D00 T04 §15's new item.
+round: 5 model: gpt-5.6-sol effort: high outcome: error candidate: 20c41c1 provider: codex version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S12-F1, D00-T04-S12-F2, D00-T04-S12-F3
+empty: 0
+refuted: 1

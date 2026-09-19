@@ -36,3 +36,17 @@ from: raised
 to: refuted
 why: "The residual clause concerns shapes the parser mishandles; forged blocks are parsed faithfully, so combined diffs stand as the sole residual and the three-way agreement holds on a true claim."
 evidence: "Disproved with F4", sharing its probes; see the F4 transition above.
+
+transition: D00-T04-S12-F14
+date: 2026-09-20
+from: raised
+to: refuted
+why: "The candidate correctly excludes plan churn; the panel reviews implementation, not the ref block, and XREF bidirectionality is proven mechanically rather than from panel evidence."
+evidence: "`633e32b` added both directions atomically and `validate` reports 0 fatal with reciprocity FATAL on one-sided", quoted from the §12 record; mechanics confirmed, conclusion refuted.
+
+transition: D00-T04-S12-F16
+date: 2026-09-20
+from: raised
+to: duplicate
+why: "Round 4 restated round 3's stamp-checker gap verbatim; the gap is already owned and needs no second owner."
+evidence: "Same gap as D00-T04-S12-F12, filed to `D00 T04 §21` item 2 in `2ccce2d`", recorded as duplicate of F12; see the F12 transition above.

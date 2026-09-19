@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**175 findings across 27 sections.**
+**192 findings across 28 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 56 | the plan or the evidence misdescribes what happened |
-| `correctness` | 35 | the code does the wrong thing |
-| `consistency` | 28 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 27 | fails under hostile or unexpected input |
-| `integration` | 15 | a consumer, caller, or downstream artifact no longer holds |
+| `record` | 62 | the plan or the evidence misdescribes what happened |
+| `correctness` | 36 | the code does the wrong thing |
+| `adversarial` | 33 | fails under hostile or unexpected input |
+| `consistency` | 30 | disagrees with the rest of the suite, its naming, or its layout |
+| `integration` | 17 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 85 | wrong behavior in code, plan, or record |
-| `minor` | 84 | polish or wording, or no surviving defect |
+| `major` | 91 | wrong behavior in code, plan, or record |
+| `minor` | 95 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -146,6 +146,23 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §11` | F3 | minor | `record` | fixed | independent | the Done note overclaims agreement |
 | `D00 T04 §11` | F4 | minor | `adversarial` | refuted | independent | pasted diff lines forge the file list |
 | `D00 T04 §11` | F5 | minor | `record` | refuted | independent | the residual agreement is agreement on a false claim |
+| `D00 T04 §12` | F1 | major | `correctness` | fixed | independent | cross-check rejects valid rename candidates |
+| `D00 T04 §12` | F2 | major | `record` | fixed | independent | attested tree comes from the checkout, not the candidate |
+| `D00 T04 §12` | F3 | major | `record` | fixed | independent | attestation identity floats free of the manifest |
+| `D00 T04 §12` | F4 | minor | `adversarial` | fixed | self | read-back admits non-integer schemas |
+| `D00 T04 §12` | F5 | major | `adversarial` | fixed | self | fence emission crashes on non-cp1252 diffs |
+| `D00 T04 §12` | F6 | major | `adversarial` | fixed | independent | cross-check range floats free of the manifest pair |
+| `D00 T04 §12` | F7 | minor | `record` | fixed | independent | attestation text fields carry no semantics |
+| `D00 T04 §12` | F8 | minor | `adversarial` | fixed | independent | mistitled diffs bypass identity enforcement |
+| `D00 T04 §12` | F9 | minor | `consistency` | fixed | independent | stamp-time read-back claimed but not wired |
+| `D00 T04 §12` | F10 | minor | `record` | fixed | independent | checker prefix and timestamp shape admit nonsense |
+| `D00 T04 §12` | F11 | minor | `adversarial` | filed | independent | cross-check blind to dropped commits |
+| `D00 T04 §12` | F12 | minor | `consistency` | filed | independent | stamp receipt demanded but never verified |
+| `D00 T04 §12` | F13 | major | `integration` | fixed | independent | stamp read-back verifies the disk file, not the staged blob |
+| `D00 T04 §12` | F14 | minor | `record` | refuted | independent | §20 back-XREF outside the fenced candidate |
+| `D00 T04 §12` | F15 | minor | `adversarial` | filed | independent | unanchored identity parse poisoned by paths |
+| `D00 T04 §12` | F16 | minor | `integration` | duplicate | independent | stamp receipt eyeballed, not checked |
+| `D00 T04 §12` | F17 | minor | `record` | fixed | independent | attestation missing beside the findings file |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |

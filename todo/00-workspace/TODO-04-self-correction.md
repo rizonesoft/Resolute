@@ -68,7 +68,7 @@ track: W1
 |   9   |   §9    | Review-input integrity                     | §6         |  [x]   |
 |  10   |   §10   | Run-record follow-ups                      | §7         |  [x]   |
 |  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [x]   |
-|  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [ ]   |
+|  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [x]   |
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [ ]   |
@@ -621,6 +621,13 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 -> XREF: D00 T04 §20 -- operability follow-ups from this section's review
 
 > **Started:** 2026-09-19T19:05:40Z
+
+> **Verified:** 2026-09-19 | §12 | the old two-field receipt fails (`FAIL line 1 is not a receipt`, exit 1), the full receipt passes (`PASS four lenses, one verdict each`, exit 0), and a wrong nonce fails naming both nonces · a baseless candidate and a combined diff both refuse naming the shape, exit 1 · cross-check agrees on 3 files, diverges loudly on a tampered manifest, agrees on 68 rename files under `--no-renames`, and refuses a swapped pair · one attestation writes and reads back while mismatched heads, `banana` verdicts, non-PASS checkers, loose and impossible timestamps, and non-int schemas all fail naming their field · per-terminator smuggle pins and binary-body bounds hold in the suite at 74 green · emission is UTF-8 under any console (the `68c7ea9a` fence crashed exit 1 before, fences exit 0 after) · the stamp flow reads back the staged attestation blob past the write-tree fix-point · panel: Sol rounds 1-2, Opus sign-off 3, Opus blocking re-round 4, 17 findings (12 fixed, 3 filed to §21, 1 refuted with driven disproof, 1 duplicate) · plan review: 5 findings, 2 filed to §21, 2 rejected, 1 accepted
+> **Review:** round 4 Opus re-round, candidate `20c41c1` `b7d8692` `7809a48`-hunk `1832370` `e9f3156` `2f0c835` `7971e20` `42b9742` plus wording-only `a209c4a` post-round-4 (one clause, no re-round: no behavior, contract, or checkpoint change, and a filing could never touch the frozen checklist) -- `adversarial` needs-attention fixed in-loop (F1 cross-check renames, F6 range identity, F8 title case) and filed (F11 content coverage, F15 anchor parse) · `consistency` needs-attention fixed in-loop (F9 stamp read-back) and filed (F12 stamp checker) · `integration` needs-attention fixed in-loop (F13 staged blob) with F16 duplicate of F12 · `record` needs-attention fixed in-loop (F2 tree from candidate, F3 attest identity, F4 exact-int schema, F5 UTF-8 emission, F7/F10 field semantics, F17 attestation emitted) and F14 refuted with driven disproof · independent `codex review --commit 20c41c1` (gpt-5.6-sol, high): 4 findings, all correct, all fixed · `source-defect`/`design` not owed. Raw findings: docs/reviews/00-workspace/D00-T04-s12.md
+> **Plan review:** gpt (run 20260920-D00-T04-S12-gpt) -- filed: D00 T04 §21 (checker-run binding, findings hash); 2 rejected and 1 accepted with reasons in the ledger
+> **CRUD:** this section writes review tooling (closing nonce, mandatory base/head, combined-diff refusal, NUL cross-check, attestation with read-back, smuggle and binary pins, UTF-8 emission, exact-int schema, shared identity check, strict attestation fields, case-insensitive titles), the review skill (nonce receipt, cross-check wiring, attestation emit/read-back, staged-blob stamp read-back), plan record (Done notes with driven quotes), and run records (the S12 block). It reads git (diff, show, rev-parse, write-tree) and the TODO tree. The behavioral surface it changes is the review-prompt CLI and the review skill's commands; fenced output for previously-valid inputs is unchanged except the added receipt, manifest, and attestation fields. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-19T19:05:40Z to 2026-09-19T23:32:14Z
+> **Implementer:** Muse Code
 
 ## 13. Bind the Stamp to the Push
 
