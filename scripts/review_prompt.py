@@ -13,6 +13,7 @@ valid-looking row must not mask malformed trailing findings).
 """
 
 import hashlib
+import json
 import re
 import secrets
 
@@ -77,17 +78,24 @@ def unique_tag(prefix: str) -> str:
     return f"{prefix}-{secrets.token_hex(8)}"
 
 
-def fence_chunks(tag: str, chunks: list[tuple[str, str]]) -> str:
+def unique_nonce() -> str:
+    """A closing nonce no truncation can predict: 64 random bits, hex."""
+    return secrets.token_hex(8)
+
+
+def fence_chunks(tag: str, chunks: list[tuple[str, str]], *, nonce: str) -> str:
     """Wrap (title, body) chunks in tagged delimiter lines.
 
     The tag is the control: a fake `--- SECTION ---` inside untrusted TODO
-    text carries no tag and matches nothing.
+    text carries no tag and matches nothing. The nonce rides the closing
+    END line only, so a receipt quoting it proves the reviewer saw the
+    tail of the stream.
     """
     parts = []
     for title, body in chunks:
         parts.append(f"--- {title} [{tag}] ---")
         parts.append(body.rstrip("\n"))
-    parts.append(f"--- END [{tag}] ---")
+    parts.append(f"--- END [{tag}] nonce={nonce} ---")
     return "\n".join(parts) + "\n"
 
 
@@ -96,21 +104,25 @@ def fence_chunks(tag: str, chunks: list[tuple[str, str]]) -> str:
 # chunk, with bounded retries. A tag that appears in the payload would
 # let TODO text forge structure, so generation retries until the tag is
 # absent (a collision at 64 bits is a broken RNG, not luck, which is
-# why exhaustion raises instead of degrading to a weak tag).
+# why exhaustion raises instead of degrading to a weak tag). The
+# closing nonce (D00 T04 §12) shares the check: a nonce the payload
+# already carries would receipt a cut stream.
 TAG_ENTROPY_BITS = 64
 TAG_MAX_ATTEMPTS = 100
 
 
-def fence_chunks_checked(prefix: str, chunks: list[tuple[str, str]]) -> tuple[str, str]:
-    """Fence chunks under a fresh tag proven absent from the payload.
+def fence_chunks_checked(prefix: str, chunks: list[tuple[str, str]]) -> tuple[str, str, str]:
+    """Fence chunks under a fresh tag proven absent from the payload,
+    with a fresh closing nonce on the END line.
 
-    Returns (tag, prompt). Raises RuntimeError if every attempt collides.
+    Returns (tag, nonce, prompt). Raises RuntimeError if every attempt collides.
     """
     bodies = [body for _, body in chunks]
     for _ in range(TAG_MAX_ATTEMPTS):
         tag = unique_tag(prefix)
-        if all(tag not in body for body in bodies):
-            return tag, fence_chunks(tag, chunks)
+        nonce = unique_nonce()
+        if all(tag not in body and nonce not in body for body in bodies):
+            return tag, nonce, fence_chunks(tag, chunks, nonce=nonce)
     raise RuntimeError(f"tag collided with the payload {TAG_MAX_ATTEMPTS} times; refusing a weak tag")
 
 
@@ -119,14 +131,16 @@ def canonical_prompt_bytes(text: str) -> bytes:
     return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
 
 
-# Completeness manifest (D00 T04 §9): the fence emits what the session
-# sent (byte count, file list, sha, base/head when the chunks are a
-# diff), and the reviewer opens its output with a receipt quoting the
-# manifest sha plus the closing END tag. A tail-truncated prompt never
-# shows the reviewer its END line, so the receipt is unforgeable from
-# a cut stream and the checker fails the round instead of approving
-# from partial input. The model never counts bytes: it copies two
-# strings it saw, and the byte count stays the session's own record.
+# Completeness manifest (D00 T04 §9, hardened §12): the fence emits
+# what the session sent (byte count, file list, sha, base/head on
+# candidate manifests), and the reviewer opens its output with a
+# receipt quoting the manifest sha, the closing END tag, and the
+# closing nonce. The nonce rides the END line only: the preamble
+# never carries it, so a stream cut past the manifest but before the
+# END line yields no valid receipt, and the checker fails the round
+# instead of approving from partial input. The model never counts
+# bytes: it copies three strings it saw, and the byte count stays
+# the session's own record.
 MANIFEST_RE = re.compile(
     r"^MANIFEST\s+bytes=(?P<bytes>[0-9]+)\s+files=(?P<files>[0-9]+)\s+"
     r"sha=(?P<sha>[0-9a-f]{64})(?P<rest>.*)$"
@@ -136,14 +150,16 @@ MANIFEST_RE = re.compile(
 # line in prose can never forge the file list. Each side of a `diff
 # --git` line is independently bare or whole-token C-quoted, so the
 # parse is a small tokenizer, not one regex. The rename scan stops
-# at the hunk body, so pasted post-hunk `rename from/to` pairs are
-# ignored by construction; combined diffs (`diff --cc`, merge
-# candidates only, and this tree stays linear) stand as the sole
-# residual.
+# at the hunk body and at binary-diff bodies, so pasted post-hunk
+# or post-binary `rename from/to` pairs are ignored by
+# construction. Combined diffs (`diff --cc` / `diff --combined`)
+# are refused at the manifest, never parsed: a merge candidate
+# fences no file list rather than a guessed one.
 _DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP")
 _DIFF_LINE_RE = re.compile(r"^diff --git (?P<rest>.+?)\s*$")
 _DIFF_QUOTED_RE = re.compile(r'^"a/((?:[^"\\]|\\.)*)"\s+(?P<right>.*)$')
 _RENAME_RE = re.compile(r"^rename (?P<dir>from|to) (?P<path>.+?)\s*$")
+_COMBINED_RE = re.compile(r"^diff --(?:cc|combined)\b")
 
 
 def _rename_path(raw: str) -> str:
@@ -158,15 +174,16 @@ def _scan_diff_block(lines: list[str]) -> list[str]:
     """Changed paths from one diff block: the `rename from/to` pair
     from the header when git names one (exact even when both sides
     carry spaces), else the `diff --git` sides. The rename scan stops
-    at the hunk body (`--- `, `+++ `, or `@@`): git emits the pair
-    above it, so anything below is pasted input, never a rename.
-    With the scan bound, combined diffs stand as the sole residual."""
+    at the hunk body (`--- `, `+++ `, or `@@`) and at binary-diff
+    bodies (`GIT binary patch`, `Binary files ... differ`): git emits
+    the pair above both, so anything below is pasted input, never a
+    rename. Combined diffs are refused at the manifest, never parsed."""
     renames: dict[str, str] = {}
     diff_line = None
     for line in lines:
         if diff_line is None and _DIFF_LINE_RE.match(line):
             diff_line = line
-        if line.startswith(("--- ", "+++ ", "@@")):
+        if line.startswith(("--- ", "+++ ", "@@", "GIT binary patch", "Binary files ")):
             break
         rm = _RENAME_RE.match(line)
         if rm and rm.group("dir") not in renames:
@@ -244,18 +261,37 @@ def _unquote_git_path(raw: str) -> str:
         out.extend(raw[i].encode("utf-8"))
         i += 1
     return bytes(out).decode("utf-8", "replace")
-RECEIPT_RE = re.compile(r"^RECEIPT\s+sha=(?P<sha>[0-9a-f]{64})\s+end=(?P<end>\S+)\s*$")
-TAG_LINE_RE = re.compile(r"^TAG\s+(?P<tag>\S+)\s*$")
+RECEIPT_RE = re.compile(r"^RECEIPT\s+sha=(?P<sha>[0-9a-f]{64})\s+end=(?P<end>\S+)\s+nonce=(?P<nonce>[0-9a-f]{16})\s*$")
+TAG_LINE_RE = re.compile(r"^TAG\s+(?P<tag>\S+)\s+nonce=(?P<nonce>[0-9a-f]{16})\s*$")
+
+
+def assert_candidate_identity(chunks: list[tuple[str, str]],
+                              base: str | None, head: str | None) -> None:
+    """A candidate manifest (any diff-titled chunk) without both base
+    and head floats free: it lists files no commit pair pins down.
+    Raise ValueError naming the missing sides."""
+    diff_titles = sorted({title for title, _ in chunks if _DIFF_TITLE_RE.search(title)})
+    if not diff_titles:
+        return
+    missing = [name for name, val in (("base", base), ("head", head)) if not val]
+    if missing:
+        raise ValueError(
+            f"refusing candidate manifest without {' and '.join(missing)} "
+            f"(diff in: {'|'.join(diff_titles)}; pass --base/--head)"
+        )
 
 
 def build_manifest(tag: str, chunks: list[tuple[str, str]],
-                   base: str | None = None, head: str | None = None) -> tuple[str, str]:
+                   base: str | None = None, head: str | None = None,
+                   *, nonce: str) -> tuple[str, str]:
     """Fence chunks and describe them. Returns (manifest_line, fenced_body).
 
     The manifest covers the fenced body only, never itself: it is
     emitted ahead of the body and counts the bytes that follow it.
+    A combined-diff opener in a diff-titled chunk raises ValueError
+    naming the shape: merge candidates are refused, never parsed.
     """
-    body = fence_chunks(tag, chunks)
+    body = fence_chunks(tag, chunks, nonce=nonce)
     digest = hashlib.sha256(canonical_prompt_bytes(body)).hexdigest()
     count = len(canonical_prompt_bytes(body))
     titles = "|".join(title for title, _ in chunks)
@@ -263,6 +299,13 @@ def build_manifest(tag: str, chunks: list[tuple[str, str]],
     diff_files = []
     for title, chunk_body in chunks:
         if _DIFF_TITLE_RE.search(title):
+            for chunk_line in chunk_body.splitlines():
+                cm = _COMBINED_RE.match(chunk_line)
+                if cm:
+                    raise ValueError(
+                        f"refusing combined diff ({cm.group(0)}) in {title}: "
+                        "merge candidates list no files; fence a non-merge range instead"
+                    )
             block: list[str] = []
             for chunk_line in chunk_body.splitlines():
                 if _DIFF_LINE_RE.match(chunk_line) and block:
@@ -283,22 +326,23 @@ def build_manifest(tag: str, chunks: list[tuple[str, str]],
     return line, body
 
 
-def parse_manifest_file(text: str) -> tuple[str, str]:
-    """Read (tag, sha) from saved TAG + MANIFEST lines. Raises ValueError."""
-    tag = sha = None
+def parse_manifest_file(text: str) -> tuple[str, str, str]:
+    """Read (tag, sha, nonce) from saved TAG + MANIFEST lines. Raises ValueError."""
+    tag = sha = nonce = None
     for line in text.splitlines():
         tm = TAG_LINE_RE.match(line.strip())
         if tm:
             tag = tm.group("tag")
+            nonce = tm.group("nonce")
         mm = MANIFEST_RE.match(line.strip())
         if mm:
             sha = mm.group("sha")
-    if tag is None or sha is None:
+    if tag is None or sha is None or nonce is None:
         raise ValueError("manifest file carries no TAG + MANIFEST pair")
-    return tag, sha
+    return tag, sha, nonce
 
 
-def strip_receipt(text: str, tag: str, sha: str) -> tuple[str | None, str]:
+def strip_receipt(text: str, tag: str, sha: str, nonce: str) -> tuple[str | None, str]:
     """Verify the opening receipt against the manifest. Returns (rest, \"\")
     on success, (None, reason) when the receipt is missing or wrong."""
     lines = text.splitlines()
@@ -312,6 +356,8 @@ def strip_receipt(text: str, tag: str, sha: str) -> tuple[str | None, str]:
         return None, f"line {first + 1} receipts sha {m.group('sha')[:12]}..., manifest wants {sha[:12]}..."
     if m.group("end") != tag:
         return None, f"line {first + 1} receipts end {m.group('end')!r}, manifest tag is {tag!r}"
+    if m.group("nonce") != nonce:
+        return None, f"line {first + 1} receipts nonce {m.group('nonce')[:12]}..., manifest wants {nonce[:12]}..."
     rest = [ln for j, ln in enumerate(lines) if j != first]
     return "\n".join(rest) + ("\n" if rest else ""), ""
 
@@ -333,7 +379,7 @@ def _output_within_bounds(text: str) -> tuple[bool, str] | None:
     return None
 
 
-def check_panel_output(text: str, manifest: tuple[str, str] | None = None) -> tuple[bool, str]:
+def check_panel_output(text: str, manifest: tuple[str, str, str] | None = None) -> tuple[bool, str]:
     """Whole-output validation for a panel round: every lens verdicts
     exactly once, and every other non-blank line is a detail line under the
     most recent non-approve verdict (an approve takes no details, and
@@ -347,7 +393,7 @@ def check_panel_output(text: str, manifest: tuple[str, str] | None = None) -> tu
     if bounded is not None:
         return bounded
     if manifest is not None:
-        text, reason = strip_receipt(text, manifest[0], manifest[1])
+        text, reason = strip_receipt(text, manifest[0], manifest[1], manifest[2])
         if text is None:
             return False, reason
     seen: dict[str, int] = {}
@@ -447,7 +493,7 @@ def next_run_id(todo_path: str, section: int, family: str, date: str, *texts: st
     return f"{base}-r{mx + 1}"
 
 
-def check_plan_output(text: str, manifest: tuple[str, str] | None = None) -> tuple[bool, str]:
+def check_plan_output(text: str, manifest: tuple[str, str, str] | None = None) -> tuple[bool, str]:
     """Whole-output validation for a plan-review round: every non-blank line
     is one `- ` finding (or the round is an explicit no-findings
     statement). With a manifest the output must open with its receipt.
@@ -456,7 +502,7 @@ def check_plan_output(text: str, manifest: tuple[str, str] | None = None) -> tup
     if bounded is not None:
         return bounded
     if manifest is not None:
-        text, reason = strip_receipt(text, manifest[0], manifest[1])
+        text, reason = strip_receipt(text, manifest[0], manifest[1], manifest[2])
         if text is None:
             return False, reason
     lines = [ln for ln in text.splitlines() if ln.strip()]
@@ -472,6 +518,91 @@ def check_plan_output(text: str, manifest: tuple[str, str] | None = None) -> tup
     return True, f"{len(lines)} findings, one per line"
 
 
+def parse_manifest_diff_files(text: str) -> list[str]:
+    """The diff-files list from saved TAG + MANIFEST lines. Raises
+    ValueError when no MANIFEST line reads; an absent diff-files field
+    reads as the empty list (a manifest that lists no files). Paths
+    may carry spaces, so the value runs to the next ` base=`/` head=`
+    field or EOL; a path containing those tokens truncates the list,
+    which the cross-check then fails loudly rather than agreeing."""
+    for line in text.splitlines():
+        mm = MANIFEST_RE.match(line.strip())
+        if mm:
+            dm = re.search(r"diff-files=(?P<files>.*?)(?:\s+base=|\s+head=|$)", mm.group("rest"))
+            if dm is None or not dm.group("files"):
+                return []
+            return dm.group("files").split("|")
+    raise ValueError("manifest file carries no MANIFEST line")
+
+
+def parse_nul_file_list(data: bytes) -> list[str]:
+    """Split git's -z file list: NUL-delimited UTF-8, decoded like the
+    diff parse (`replace`), trailing NUL tolerated, empties dropped."""
+    return [p for p in data.decode("utf-8", "replace").split("\0") if p]
+
+
+def cross_check_files(parsed: list[str], nul_data: bytes) -> list[str]:
+    """Divergences between the manifest's parsed set and git's own NUL
+    list, as sorted `only in ...` lines; empty when the sets agree.
+    Order-insensitive: the manifest lists in encounter order, git sorts."""
+    want = set(parsed)
+    got = set(parse_nul_file_list(nul_data))
+    lines = [f"only in manifest: {p}" for p in sorted(want - got)]
+    lines += [f"only in git: {p}" for p in sorted(got - want)]
+    return lines
+
+
+ATTEST_SCHEMA = 1
+_ATTEST_FIELDS = ("manifest_sha", "candidate_base", "candidate_head", "tree",
+                  "reviewer", "model", "verdict", "checker", "timestamp")
+
+
+def write_attestation(*, manifest_sha: str, candidate_base: str, candidate_head: str,
+                      tree: str, reviewer: str, model: str, verdict: str,
+                      checker: str, timestamp: str) -> str:
+    """A machine-readable review attestation as JSON: which manifest
+    sha, which candidate pair and tree, who reviewed with what model,
+    what verdict at what time, and what the checker said. OIDs must
+    read full-length hex and every text field non-blank; anything else
+    raises ValueError, so a malformed attestation never ships."""
+    for name, oid, size in (("manifest_sha", manifest_sha, 64),
+                            ("candidate_base", candidate_base, 40),
+                            ("candidate_head", candidate_head, 40),
+                            ("tree", tree, 40)):
+        if not isinstance(oid, str) or len(oid) != size or not re.fullmatch(r"[0-9a-f]+", oid):
+            shown = oid if isinstance(oid, str) else repr(oid)
+            raise ValueError(f"attestation {name} is not {size} hex chars: {shown[:80]!r}")
+    for name, val in (("reviewer", reviewer), ("model", model), ("verdict", verdict),
+                      ("checker", checker), ("timestamp", timestamp)):
+        if not isinstance(val, str) or not val.strip():
+            raise ValueError(f"attestation {name} is empty")
+    doc = {"schema": ATTEST_SCHEMA, "manifest_sha": manifest_sha,
+           "candidate_base": candidate_base, "candidate_head": candidate_head,
+           "tree": tree, "reviewer": reviewer, "model": model,
+           "verdict": verdict, "checker": checker, "timestamp": timestamp}
+    return json.dumps(doc, indent=2, sort_keys=True) + "\n"
+
+
+def read_attestation(text: str) -> dict:
+    """Read an attestation back: JSON parses, schema asserts, every
+    field re-validates through the writer. Raises ValueError naming
+    the first defect."""
+    try:
+        doc = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"attestation is not JSON: {exc}")
+    if not isinstance(doc, dict):
+        raise ValueError("attestation is not an object")
+    if doc.get("schema") != ATTEST_SCHEMA:
+        raise ValueError(
+            f"attestation schema is {doc.get('schema')!r}, this reader asserts {ATTEST_SCHEMA}")
+    try:
+        write_attestation(**{k: doc[k] for k in _ATTEST_FIELDS})
+    except KeyError as exc:
+        raise ValueError(f"attestation misses field {exc}")
+    return doc
+
+
 def _self_test() -> int:
     failures = []
     total = [0]
@@ -482,8 +613,9 @@ def _self_test() -> int:
             failures.append(f"{name}: {detail or 'failed'}")
 
     tag = "PANEL-deadbeefdeadbeef"
+    nonce = "0123456789abcdef"
     chunks = [("SECTION", "section text\n"), ("CANDIDATE DIFF", "diff text\n")]
-    manifest, body = build_manifest(tag, chunks, "base000", "head111")
+    manifest, body = build_manifest(tag, chunks, "base000", "head111", nonce=nonce)
     expect_sha = hashlib.sha256(canonical_prompt_bytes(body)).hexdigest()
     check("manifest-sha", f"sha={expect_sha}" in manifest, manifest)
     check("manifest-bytes", f"bytes={len(canonical_prompt_bytes(body))}" in manifest, manifest)
@@ -491,13 +623,17 @@ def _self_test() -> int:
           manifest)
     check("manifest-base-head", "base=base000" in manifest and "head=head111" in manifest,
           manifest)
-    plain, _ = build_manifest(tag, chunks)
+    plain, _ = build_manifest(tag, chunks, nonce=nonce)
     check("manifest-no-base-head", "base=" not in plain and "head=" not in plain, plain)
     check("manifest-covers-body-only",
-          hashlib.sha256(canonical_prompt_bytes(fence_chunks(tag, chunks))).hexdigest() == expect_sha)
+          hashlib.sha256(canonical_prompt_bytes(
+              fence_chunks(tag, chunks, nonce=nonce))).hexdigest() == expect_sha)
+    check("manifest-end-carries-nonce", f"nonce={nonce}" in body, body)
+    check("manifest-preamble-lacks-nonce", nonce not in manifest, manifest)
 
-    mtag, msha = parse_manifest_file(f"TAG {tag}\n{manifest}\n")
-    check("parse-manifest", (mtag, msha) == (tag, expect_sha), f"{mtag} {msha}")
+    mtag, msha, mnonce = parse_manifest_file(f"TAG {tag} nonce={nonce}\n{manifest}\n")
+    check("parse-manifest", (mtag, msha, mnonce) == (tag, expect_sha, nonce),
+          f"{mtag} {msha} {mnonce}")
     try:
         parse_manifest_file("TAG only\n")
         check("parse-manifest-incomplete", False, "no ValueError")
@@ -505,36 +641,47 @@ def _self_test() -> int:
         check("parse-manifest-incomplete", True)
 
     approves = "**adversarial: approve**\n**consistency: approve**\n**integration: approve**\n**record: approve**\n"
-    receipt = f"RECEIPT sha={expect_sha} end={tag}\n"
-    ok, reason = check_panel_output(receipt + approves, (tag, expect_sha))
+    receipt = f"RECEIPT sha={expect_sha} end={tag} nonce={nonce}\n"
+    manifest3 = (tag, expect_sha, nonce)
+    ok, reason = check_panel_output(receipt + approves, manifest3)
     check("receipt-pass", ok, reason)
     ok, reason = check_panel_output(approves, None)
     check("no-manifest-backward-compat", ok, reason)
-    ok, reason = check_panel_output(approves, (tag, expect_sha))
+    ok, reason = check_panel_output(approves, manifest3)
     check("missing-receipt-fails", (not ok) and "not a receipt" in reason, reason)
     bad_sha = "0" * 64
-    ok, reason = check_panel_output(f"RECEIPT sha={bad_sha} end={tag}\n" + approves, (tag, expect_sha))
+    ok, reason = check_panel_output(f"RECEIPT sha={bad_sha} end={tag} nonce={nonce}\n" + approves,
+                                    manifest3)
     check("wrong-sha-fails", (not ok) and "receipts sha" in reason, reason)
-    ok, reason = check_panel_output(f"RECEIPT sha={expect_sha} end=WRONG\n" + approves, (tag, expect_sha))
+    ok, reason = check_panel_output(f"RECEIPT sha={expect_sha} end=WRONG nonce={nonce}\n" + approves,
+                                    manifest3)
     check("wrong-end-fails", (not ok) and "receipts end" in reason, reason)
-    ok, reason = check_panel_output("RECEIPT nonsense\n" + approves, (tag, expect_sha))
+    ok, reason = check_panel_output("RECEIPT nonsense\n" + approves, manifest3)
     check("malformed-receipt-fails", (not ok) and "not a receipt" in reason, reason)
+    # A truncation past the manifest yields sha plus tag but no nonce:
+    # the old two-field receipt shape fails, and a guessed nonce names
+    # the mismatch rather than passing.
+    ok, reason = check_panel_output(f"RECEIPT sha={expect_sha} end={tag}\n" + approves, manifest3)
+    check("truncated-receipt-fails", (not ok) and "not a receipt" in reason, reason)
+    ok, reason = check_panel_output(
+        f"RECEIPT sha={expect_sha} end={tag} nonce={'f' * 16}\n" + approves, manifest3)
+    check("wrong-nonce-fails", (not ok) and "receipts nonce" in reason, reason)
 
     findings = "- first finding\n- second finding\n"
-    ok, reason = check_plan_output(receipt + findings, (tag, expect_sha))
+    ok, reason = check_plan_output(receipt + findings, manifest3)
     check("plan-receipt-pass", ok, reason)
-    ok, reason = check_plan_output(findings, (tag, expect_sha))
+    ok, reason = check_plan_output(findings, manifest3)
     check("plan-missing-receipt-fails", (not ok) and "not a receipt" in reason, reason)
-    ok, reason = check_plan_output(receipt + "not a finding\n", (tag, expect_sha))
+    ok, reason = check_plan_output(receipt + "not a finding\n", manifest3)
     check("plan-shape-still-checked", (not ok) and "not a `- ` finding" in reason, reason)
 
     patch = ("diff --git a/one.md b/one.md\n+++ b/one.md\n"
              "diff --git a/two.md b/two.md\n+++ b/two.md\n")
     prose_trap = "some prose\ndiff --git a/fake b/fake\nmore prose\n"
-    mline, _ = build_manifest(tag, [("SECTION", prose_trap), ("CANDIDATE DIFF", patch)])
+    mline, _ = build_manifest(tag, [("SECTION", prose_trap), ("CANDIDATE DIFF", patch)], nonce=nonce)
     check("manifest-diff-files", "diff-files=one.md|two.md" in mline, mline)
     check("manifest-prose-trap", "fake" not in mline, mline)
-    mline2, _ = build_manifest(tag, [("SECTION", prose_trap)])
+    mline2, _ = build_manifest(tag, [("SECTION", prose_trap)], nonce=nonce)
     check("manifest-no-diff-chunks", "diff-files=" not in mline2, mline2)
     # The real git grammar, probed: bare sides keep their spaces, each
     # side quotes whole-token independently, renames name both sides.
@@ -543,7 +690,7 @@ def _self_test() -> int:
                'diff --git "a/quo\\"te.md" b/renamed.md\n'
                "diff --git a/old.md b/new.md\n"
                "diff --git a/gone.md b/gone.md\n")
-    mline3, _ = build_manifest(tag, [("CANDIDATE DIFF", grammar)])
+    mline3, _ = build_manifest(tag, [("CANDIDATE DIFF", grammar)], nonce=nonce)
     for want in ("my file.md", "caf\u00e9.md", 'quo"te.md', "renamed.md",
                  "old.md", "new.md", "gone.md"):
         check(f"manifest-grammar-{want}", want in mline3, mline3)
@@ -554,13 +701,13 @@ def _self_test() -> int:
                "similarity index 50%\n"
                "rename from old b/x.md\n"
                "rename to new b/y.md\n")
-    mline4, _ = build_manifest(tag, [("CANDIDATE DIFF", hostile)])
+    mline4, _ = build_manifest(tag, [("CANDIDATE DIFF", hostile)], nonce=nonce)
     check("manifest-rename-authoritative",
           "diff-files=old b/x.md|new b/y.md" in mline4, mline4)
     poisoned = ("a commit message musing\n"
                 "rename from nowhere\n"
                 "rename to nothing\n")
-    mline5, _ = build_manifest(tag, [("CANDIDATE DIFF", poisoned)])
+    mline5, _ = build_manifest(tag, [("CANDIDATE DIFF", poisoned)], nonce=nonce)
     check("manifest-rename-needs-diff-line", "diff-files=" not in mline5, mline5)
     smuggled = ("diff --git a/real.md b/real.md\n"
                 "--- a/real.md\n"
@@ -570,9 +717,120 @@ def _self_test() -> int:
                 "+new\n"
                 "rename from smuggled.md\n"
                 "rename to smuggled2.md\n")
-    mline6, _ = build_manifest(tag, [("CANDIDATE DIFF", smuggled)])
+    mline6, _ = build_manifest(tag, [("CANDIDATE DIFF", smuggled)], nonce=nonce)
     check("manifest-rename-stops-at-hunk",
           "diff-files=real.md" in mline6 and "smuggled" not in mline6, mline6)
+    # One smuggle case per hunk-body terminator: each marker alone
+    # stops the scan, with the other two absent.
+    for first_marker, case_name in (("--- a/s.md\n", "dashes"),
+                                    ("+++ b/s.md\n", "pluses"),
+                                    ("@@ -1 +1 @@\n", "hunk")):
+        smuggle = ("diff --git a/s.md b/s.md\n" + first_marker +
+                   "rename from smuggled.md\nrename to smuggled2.md\n")
+        smline, _ = build_manifest(tag, [("CANDIDATE DIFF", smuggle)], nonce=nonce)
+        check(f"manifest-smuggle-stops-at-{case_name}",
+              "diff-files=s.md" in smline and "smuggled" not in smline, smline)
+    # Binary-diff bodies bound the scan like the hunk body: a rename
+    # pair past either marker is pasted input, never a rename.
+    binpatch = ("diff --git a/b.bin b/b.bin\n"
+                "GIT binary patch\n"
+                "literal 3\n"
+                "zcmV+b0ssC0\n"
+                "rename from smuggled.md\n"
+                "rename to smuggled2.md\n")
+    binline, _ = build_manifest(tag, [("CANDIDATE DIFF", binpatch)], nonce=nonce)
+    check("manifest-binary-patch-bound",
+          "diff-files=b.bin" in binline and "smuggled" not in binline, binline)
+    bindiffer = ("diff --git a/c.bin b/c.bin\n"
+                 "Binary files a/c.bin and b/c.bin differ\n"
+                 "rename from smuggled.md\n"
+                 "rename to smuggled2.md\n")
+    binline2, _ = build_manifest(tag, [("CANDIDATE DIFF", bindiffer)], nonce=nonce)
+    check("manifest-binary-differ-bound",
+          "diff-files=c.bin" in binline2 and "smuggled" not in binline2, binline2)
+    # Combined diffs are refused, never parsed, naming the shape.
+    for opener in ("diff --cc m.md\n", "diff --combined m.md\n"):
+        shape = opener.split()[1]
+        try:
+            build_manifest(tag, [("CANDIDATE DIFF", opener)], nonce=nonce)
+            check(f"manifest-combined-refused-{shape}", False, "no ValueError")
+        except ValueError as exc:
+            check(f"manifest-combined-refused-{shape}",
+                  "combined diff" in str(exc) and shape in str(exc), str(exc))
+    # A candidate manifest without base and head floats free; a plan
+    # manifest (no diff chunks) needs neither; an empty side is missing.
+    try:
+        assert_candidate_identity([("CANDIDATE DIFF", patch)], None, None)
+        check("identity-diff-needs-base-head", False, "no ValueError")
+    except ValueError as exc:
+        check("identity-diff-needs-base-head",
+              "without base and head" in str(exc), str(exc))
+    try:
+        assert_candidate_identity([("CANDIDATE DIFF", patch)], "base000", None)
+        check("identity-diff-needs-head", False, "no ValueError")
+    except ValueError as exc:
+        check("identity-diff-needs-head", "without head" in str(exc), str(exc))
+    try:
+        assert_candidate_identity([("CANDIDATE DIFF", patch)], "", "head111")
+        check("identity-empty-base", False, "no ValueError")
+    except ValueError as exc:
+        check("identity-empty-base", "without base" in str(exc), str(exc))
+    try:
+        assert_candidate_identity([("CANDIDATE DIFF", patch)], "base000", "head111")
+        assert_candidate_identity([("SECTION", "prose\n")], None, None)
+        check("identity-ok", True)
+    except ValueError as exc:
+        check("identity-ok", False, str(exc))
+    # The cross-check compares sets, not order: the manifest lists in
+    # encounter order, git sorts.
+    check("crosscheck-agree",
+          cross_check_files(["b.md", "a.md"], b"a.md\0b.md\0") == [])
+    check("crosscheck-manifest-only",
+          cross_check_files(["a.md", "ghost.md"], b"a.md\0") == ["only in manifest: ghost.md"])
+    check("crosscheck-git-only",
+          cross_check_files(["a.md"], b"a.md\0b.md\0") == ["only in git: b.md"])
+    check("crosscheck-empty", cross_check_files([], b"") == [])
+    check("parse-nul-tolerates-trailing",
+          parse_nul_file_list(b"a.md\0\0") == ["a.md"])
+    check("manifest-diff-files-parse",
+          parse_manifest_diff_files(f"TAG {tag} nonce={nonce}\n{mline4}\n") == ["old b/x.md", "new b/y.md"])
+    check("manifest-diff-files-absent",
+          parse_manifest_diff_files(f"TAG {tag} nonce={nonce}\n{mline2}\n") == [])
+    spaced = (f"MANIFEST bytes=1 files=1 sha={'0' * 64} titles=CANDIDATE DIFF "
+              "diff-files=old b/x.md|new.md base=base000 head=head111\n")
+    check("manifest-diff-files-stops-at-base",
+          parse_manifest_diff_files(spaced) == ["old b/x.md", "new.md"])
+    # The attestation round-trips; malformed input fails at either end.
+    att = write_attestation(
+        manifest_sha="a" * 64, candidate_base="b" * 40, candidate_head="c" * 40,
+        tree="d" * 40, reviewer="codex-panel", model="gpt-5.6-sol",
+        verdict="approve", checker="PASS four lenses, one verdict each",
+        timestamp="2026-09-19T19:00:00Z")
+    check("attest-round-trip", read_attestation(att)["verdict"] == "approve", att)
+    try:
+        write_attestation(
+            manifest_sha="short", candidate_base="b" * 40, candidate_head="c" * 40,
+            tree="d" * 40, reviewer="r", model="m", verdict="v", checker="c",
+            timestamp="t")
+        check("attest-bad-sha", False, "no ValueError")
+    except ValueError as exc:
+        check("attest-bad-sha", "manifest_sha" in str(exc), str(exc))
+    try:
+        read_attestation('{"schema": 1, "verdict": "approve"}')
+        check("attest-missing-field", False, "no ValueError")
+    except ValueError as exc:
+        check("attest-missing-field", "misses" in str(exc), str(exc))
+    try:
+        read_attestation(att.replace('"schema": 1', '"schema": 99'))
+        check("attest-bad-schema", False, "no ValueError")
+    except ValueError as exc:
+        check("attest-bad-schema", "schema" in str(exc), str(exc))
+    try:
+        read_attestation("not json {{{")
+        check("attest-not-json", False, "no ValueError")
+    except ValueError as exc:
+        check("attest-not-json", "not JSON" in str(exc), str(exc))
+    check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
@@ -619,14 +877,111 @@ if __name__ == "__main__":
             print("fence: no chunks to fence", file=sys.stderr)
             sys.exit(2)
         try:
-            tag, prompt = fence_chunks_checked(sys.argv[2], chunks)
-            manifest, _ = build_manifest(tag, chunks, base, head)
-        except RuntimeError as exc:
+            assert_candidate_identity(chunks, base, head)
+            tag, nonce, prompt = fence_chunks_checked(sys.argv[2], chunks)
+            manifest, _ = build_manifest(tag, chunks, base, head, nonce=nonce)
+        except (RuntimeError, ValueError) as exc:
             print(f"fence: {exc}", file=sys.stderr)
             sys.exit(1)
-        print(f"TAG {tag}")
+        print(f"TAG {tag} nonce={nonce}")
         print(manifest)
         print(prompt, end="")
+        sys.exit(0)
+    if len(sys.argv) == 5 and sys.argv[1] == "cross-check":
+        # cross-check <manifest-file> <base> <head>: git's own NUL file
+        # list for the range against the manifest's parsed diff-files.
+        # Divergence fails closed; run from the repository root.
+        import subprocess
+        try:
+            with open(sys.argv[2], encoding="utf-8") as fh:
+                parsed = parse_manifest_diff_files(fh.read())
+        except OSError as exc:
+            print(f"cross-check: cannot read {sys.argv[2]}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        except ValueError as exc:
+            print(f"cross-check: {exc}", file=sys.stderr)
+            sys.exit(2)
+        try:
+            proc = subprocess.run(
+                ["git", "diff", "--name-only", "-z", sys.argv[3], sys.argv[4]],
+                capture_output=True, check=False)
+        except OSError as exc:
+            print(f"cross-check: git failed: {exc}", file=sys.stderr)
+            sys.exit(1)
+        if proc.returncode != 0:
+            detail = proc.stderr.decode("utf-8", "replace").strip()[:200]
+            print(f"cross-check: git diff refused the range: {detail}", file=sys.stderr)
+            sys.exit(1)
+        diverged = cross_check_files(parsed, proc.stdout)
+        if diverged:
+            for line in diverged:
+                print(f"cross-check: {line}", file=sys.stderr)
+            sys.exit(1)
+        print(f"cross-check: {len(parsed)} file(s) agree")
+        sys.exit(0)
+    if len(sys.argv) >= 3 and sys.argv[1] == "attest":
+        # attest --out <path> --manifest <file> --base <b> --head <h>
+        #   --tree <t> --reviewer <r> --model <m> --verdict <v>
+        #   --checker <c> --timestamp <ts>
+        # attest --read-back <path>
+        # The manifest sha pins the reviewed input (the attestation
+        # cannot claim a sha the manifest never had); the timestamp
+        # rides explicit, no hidden clock.
+        args = sys.argv[2:]
+        if args[:1] == ["--read-back"] and len(args) == 2:
+            try:
+                with open(args[1], encoding="utf-8") as fh:
+                    doc = read_attestation(fh.read())
+            except OSError as exc:
+                print(f"attest: cannot read {args[1]}: {exc}", file=sys.stderr)
+                sys.exit(2)
+            except ValueError as exc:
+                print(f"attest: {exc}", file=sys.stderr)
+                sys.exit(1)
+            print(f"attest: schema {doc['schema']}, verdict {doc['verdict']}, "
+                  f"manifest {doc['manifest_sha'][:12]}..., candidate "
+                  f"{doc['candidate_base'][:12]}...{doc['candidate_head'][:12]}..., "
+                  f"tree {doc['tree'][:12]}..., reviewer {doc['reviewer']}, "
+                  f"model {doc['model']}, checker: {doc['checker']}")
+            sys.exit(0)
+        want = {"--out": None, "--manifest": None, "--base": None, "--head": None,
+                "--tree": None, "--reviewer": None, "--model": None,
+                "--verdict": None, "--checker": None, "--timestamp": None}
+        rest = list(args)
+        while len(rest) >= 2 and rest[0] in want:
+            want[rest[0]] = rest[1]
+            rest = rest[2:]
+        if rest or any(v is None for v in want.values()):
+            print("attest: want --out <path> --manifest <file> --base <b> --head <h> "
+                  "--tree <t> --reviewer <r> --model <m> --verdict <v> --checker <c> "
+                  "--timestamp <ts> | --read-back <path>", file=sys.stderr)
+            sys.exit(2)
+        try:
+            with open(want["--manifest"], encoding="utf-8") as fh:
+                _, sha, _ = parse_manifest_file(fh.read())
+        except OSError as exc:
+            print(f"attest: cannot read {want['--manifest']}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        except ValueError as exc:
+            print(f"attest: {exc}", file=sys.stderr)
+            sys.exit(2)
+        try:
+            body = write_attestation(
+                manifest_sha=sha, candidate_base=want["--base"],
+                candidate_head=want["--head"], tree=want["--tree"],
+                reviewer=want["--reviewer"], model=want["--model"],
+                verdict=want["--verdict"], checker=want["--checker"],
+                timestamp=want["--timestamp"])
+        except ValueError as exc:
+            print(f"attest: {exc}", file=sys.stderr)
+            sys.exit(1)
+        try:
+            with open(want["--out"], "w", encoding="utf-8") as fh:
+                fh.write(body)
+        except OSError as exc:
+            print(f"attest: cannot write {want['--out']}: {exc}", file=sys.stderr)
+            sys.exit(1)
+        print(f"attest: wrote {want['--out']}")
         sys.exit(0)
     if len(sys.argv) >= 6 and sys.argv[1] == "run-id":
         # run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>...
@@ -679,7 +1034,7 @@ if __name__ == "__main__":
         rest = []
     if checker_arg not in checkers or rest:
         print(
-            f"usage: {sys.argv[0]} tag <prefix> | fence <prefix> [--base <sha> --head <sha>] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan [--manifest <file>] < output.txt",
+            f"usage: {sys.argv[0]} tag <prefix> | fence <prefix> [--base <sha> --head <sha>] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan [--manifest <file>] < output.txt | cross-check <manifest-file> <base> <head> | attest (--out <path> --manifest <file> --base <b> --head <h> --tree <t> --reviewer <r> --model <m> --verdict <v> --checker <c> --timestamp <ts> | --read-back <path>)",
             file=sys.stderr,
         )
         sys.exit(2)
