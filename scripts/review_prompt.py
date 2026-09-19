@@ -563,8 +563,9 @@ def write_attestation(*, manifest_sha: str, candidate_base: str, candidate_head:
     """A machine-readable review attestation as JSON: which manifest
     sha, which candidate pair and tree, who reviewed with what model,
     what verdict at what time, and what the checker said. OIDs must
-    read full-length hex and every text field non-blank; anything else
-    raises ValueError, so a malformed attestation never ships."""
+    read full-length hex; reviewer and model read non-blank; verdict,
+    checker, and timestamp carry exact semantics. Anything else raises
+    ValueError, so a malformed attestation never ships."""
     for name, oid, size in (("manifest_sha", manifest_sha, 64),
                             ("candidate_base", candidate_base, 40),
                             ("candidate_head", candidate_head, 40),
@@ -572,10 +573,21 @@ def write_attestation(*, manifest_sha: str, candidate_base: str, candidate_head:
         if not isinstance(oid, str) or len(oid) != size or not re.fullmatch(r"[0-9a-f]+", oid):
             shown = oid if isinstance(oid, str) else repr(oid)
             raise ValueError(f"attestation {name} is not {size} hex chars: {shown[:80]!r}")
-    for name, val in (("reviewer", reviewer), ("model", model), ("verdict", verdict),
-                      ("checker", checker), ("timestamp", timestamp)):
+    for name, val in (("reviewer", reviewer), ("model", model)):
         if not isinstance(val, str) or not val.strip():
             raise ValueError(f"attestation {name} is empty")
+    # Reviewer and model stay open: a new runner or model must attest
+    # without a code change. The rest have exact producer semantics.
+    if verdict not in ("approve", "needs-attention"):
+        raise ValueError(
+            f"attestation verdict is {verdict!r}, want approve or needs-attention")
+    if not isinstance(checker, str) or not checker.startswith("PASS"):
+        raise ValueError(
+            f"attestation checker is {checker!r}, want the PASS line")
+    if not isinstance(timestamp, str) or not re.fullmatch(
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", timestamp):
+        raise ValueError(
+            f"attestation timestamp is {timestamp!r}, want %Y-%m-%dT%H:%M:%SZ")
     doc = {"schema": ATTEST_SCHEMA, "manifest_sha": manifest_sha,
            "candidate_base": candidate_base, "candidate_head": candidate_head,
            "tree": tree, "reviewer": reviewer, "model": model,
@@ -602,15 +614,23 @@ def parse_manifest_identity(text: str) -> tuple[str | None, str | None]:
     raise ValueError("manifest file carries no MANIFEST line")
 
 
-def check_attest_identity(manifest_text: str, base: str, head: str) -> str | None:
+def check_manifest_identity(manifest_text: str, base: str, head: str,
+                            cmd: str) -> str | None:
     """None when the claimed pair equals the manifest's base/head, else
-    the failure line: an attestation must name the candidate its
-    manifest pinned, never an independently supplied pair."""
+    the failure line: a checker must verify the range its manifest
+    pinned, never an independently supplied pair (a swapped or foreign
+    range with the same file set would otherwise pass silently)."""
     mbase, mhead = parse_manifest_identity(manifest_text)
     if mbase != base or mhead != head:
-        return (f"attest: --base/--head ({base}...{head}) do not match "
+        return (f"{cmd}: --base/--head ({base}...{head}) do not match "
                 f"the manifest (base={mbase} head={mhead})")
     return None
+
+
+def check_attest_identity(manifest_text: str, base: str, head: str) -> str | None:
+    """Attest's leg of the manifest-identity check, shared with
+    cross-check since round-1 F6."""
+    return check_manifest_identity(manifest_text, base, head, "attest")
 
 
 def read_attestation(text: str) -> dict:
@@ -891,6 +911,20 @@ def _self_test() -> int:
             check(f"attest-schema-not-{case}", False, "no ValueError")
         except ValueError as exc:
             check(f"attest-schema-not-{case}", "schema" in str(exc), str(exc))
+    good = dict(manifest_sha="a" * 64, candidate_base="b" * 40,
+                candidate_head="c" * 40, tree="d" * 40, reviewer="r",
+                model="m", verdict="approve",
+                checker="PASS four lenses, one verdict each",
+                timestamp="2026-09-19T19:00:00Z")
+    for field, bad_val in (("verdict", "banana"),
+                           ("checker", "FAIL line 1 is not a receipt"),
+                           ("timestamp", "t")):
+        probe = dict(good, **{field: bad_val})
+        try:
+            write_attestation(**probe)
+            check(f"attest-bad-{field}", False, "no ValueError")
+        except ValueError as exc:
+            check(f"attest-bad-{field}", field in str(exc), str(exc))
     try:
         read_attestation("not json {{{")
         check("attest-not-json", False, "no ValueError")
@@ -908,6 +942,16 @@ def _self_test() -> int:
     check("attest-identity-mismatch",
           mismatch is not None and mismatch.startswith("attest: --base/--head"),
           mismatch or "matched")
+    check("crosscheck-identity-match",
+          check_manifest_identity(
+              f"TAG {tag} nonce={nonce}\n{manifest}\n", "base000", "head111",
+              "cross-check") is None)
+    xbad = check_manifest_identity(
+        f"TAG {tag} nonce={nonce}\n{manifest}\n", "head111", "base000",
+        "cross-check")
+    check("crosscheck-identity-mismatch",
+          xbad is not None and xbad.startswith("cross-check: --base/--head"),
+          xbad or "matched")
     check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
@@ -984,13 +1028,19 @@ if __name__ == "__main__":
         import subprocess
         try:
             with open(sys.argv[2], encoding="utf-8") as fh:
-                parsed = parse_manifest_diff_files(fh.read())
+                manifest_text = fh.read()
+            parsed = parse_manifest_diff_files(manifest_text)
         except OSError as exc:
             print(f"cross-check: cannot read {sys.argv[2]}: {exc}", file=sys.stderr)
             sys.exit(2)
         except ValueError as exc:
             print(f"cross-check: {exc}", file=sys.stderr)
             sys.exit(2)
+        identity_bad = check_manifest_identity(
+            manifest_text, sys.argv[3], sys.argv[4], "cross-check")
+        if identity_bad is not None:
+            print(identity_bad, file=sys.stderr)
+            sys.exit(1)
         try:
             proc = subprocess.run(
                 ["git", "diff", "--name-only", "-z", "--no-renames", sys.argv[3], sys.argv[4]],
