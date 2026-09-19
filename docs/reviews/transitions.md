@@ -22,3 +22,17 @@ from: raised
 to: routed
 why: "That layout is owned by `D01 T01 §9`, which has not shipped. Stalling was not an option and guessing would have put a second, drifting copy of the layout in this document."
 evidence: "So **standalone-ness is stated as behaviour and names no paths**" with "The cost is written down in both places", routed to `D01 T01 §9` in `a73addf` (resolves: Standalone Proof in an Empty Folder).
+
+transition: D00-T04-S11-F4
+date: 2026-09-19
+from: raised
+to: refuted
+why: "The manifest faithfully reports chunk structure: the forged `diff --git` line is in the chunk and the rename pair sits in header position of its block, so body and manifest agree. F10's defect was manifest-body mismatch; nothing leaks here. Forgery only adds, the forged block stays visible, and input authenticity is §12's scope, not §11's."
+evidence: "Driven probes yield `diff-files=real.md|fake.md` and `diff-files=real.md|x.md|y.md`, exactly as claimed", quoted from the §11 record; mechanics confirmed, conclusion refuted.
+
+transition: D00-T04-S11-F5
+date: 2026-09-19
+from: raised
+to: refuted
+why: "The residual clause concerns shapes the parser mishandles; forged blocks are parsed faithfully, so combined diffs stand as the sole residual and the three-way agreement holds on a true claim."
+evidence: "Disproved with F4", sharing its probes; see the F4 transition above.

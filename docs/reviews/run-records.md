@@ -250,8 +250,9 @@ refuted: 0
 run: D00-T04-S11
 date: 2026-09-19
 runner: panel
-rounds: 2
+rounds: 3
 round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: e5da9ae provider: codex version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S11-F1
 round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 738834f provider: codex version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S11-F2, D00-T04-S11-F3
+round: 3 model: opus effort: medium outcome: findings candidate: 2da2c39 provider: claude version: unresolved cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S11-F4, D00-T04-S11-F5
 empty: 0
-refuted: 0
+refuted: 2

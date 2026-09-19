@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**173 findings across 27 sections.**
+**175 findings across 27 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 55 | the plan or the evidence misdescribes what happened |
+| `record` | 56 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
 | `consistency` | 28 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 26 | fails under hostile or unexpected input |
+| `adversarial` | 27 | fails under hostile or unexpected input |
 | `integration` | 15 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -27,7 +27,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
 | `major` | 85 | wrong behavior in code, plan, or record |
-| `minor` | 82 | polish or wording, or no surviving defect |
+| `minor` | 84 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -144,6 +144,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §11` | F1 | minor | `record` | fixed | independent | the proof quote records the verdict fragment, not the probe output |
 | `D00 T04 §11` | F2 | minor | `consistency` | fixed | independent | the docstring omits the sole-residual sentence |
 | `D00 T04 §11` | F3 | minor | `record` | fixed | independent | the Done note overclaims agreement |
+| `D00 T04 §11` | F4 | minor | `adversarial` | refuted | independent | pasted diff lines forge the file list |
+| `D00 T04 §11` | F5 | minor | `record` | refuted | independent | the residual agreement is agreement on a false claim |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |
