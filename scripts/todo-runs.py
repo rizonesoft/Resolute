@@ -312,7 +312,10 @@ def panel_verdicts(path):
 
 
 def check_panel_rounds(runs):
-    """Panel runs re-read their round verdicts: numbers, models, full lenses."""
+    """Panel runs re-read their round verdicts: numbers, models, full lenses.
+
+    Error rounds (voided attempts) carry no verdicts and are skipped in
+    the mapping: usable rounds meet panel sections 1..k in run order."""
     errors = []
     for run in runs:
         path = _review_path(run.section)
@@ -331,7 +334,10 @@ def check_panel_rounds(runs):
         by_number = {}
         for (family, n), lens in verdicts.items():
             by_number.setdefault(n, []).append((family, lens))
-        for _rl_lineno, n, items in run.round_lines:
+        usable = [(n, items) for _, n, items in run.round_lines
+                  if items.get("outcome") != "error"]
+        for panel_n, (_n, items) in enumerate(usable, 1):
+            n = panel_n
             if n not in by_number:
                 errors.append((run.lineno, f"round {n} has no panel section in the review file"))
                 continue

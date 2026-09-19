@@ -197,6 +197,20 @@ round: 4 model: opus effort: medium outcome: empty candidate: 091262f findings:
 empty: 2
 refuted: 0
 
+run: D00-T04-S9
+date: 2026-09-19
+runner: panel
+rounds: 6
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: 2b4b493 findings: D00-T04-S9-F1, D00-T04-S9-F2, D00-T04-S9-F3
+round: 2 model: gpt-5.6-sol effort: medium outcome: error candidate: e8ee5e8 findings: D00-T04-S9-F4
+round: 3 model: gpt-5.6-sol effort: medium outcome: findings candidate: 965df5f findings: D00-T04-S9-F5
+round: 4 model: opus effort: medium outcome: findings candidate: 41bdbc1 findings: D00-T04-S9-F6, D00-T04-S9-F7
+round: 5 model: opus effort: medium outcome: findings candidate: bbaaad5 findings: D00-T04-S9-F8, D00-T04-S9-F9
+round: 6 model: opus effort: medium outcome: findings candidate: 9495dab findings: D00-T04-S9-F10, D00-T04-S9-F11
+# round 2 is the voided attempt: another session's contract rode the prompt, so its contract-judging verdicts are void, but its diff chunk was intact and F4 verified independently. Panel sections number the five usable rounds.
+empty: 0
+refuted: 0
+
 run: D07-T01-S1
 date: 2026-09-17
 runner: codex

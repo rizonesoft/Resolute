@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**140 findings across 23 sections.**
+**151 findings across 24 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 43 | the plan or the evidence misdescribes what happened |
+| `record` | 47 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
-| `consistency` | 23 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 17 | fails under hostile or unexpected input |
-| `integration` | 8 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 24 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 22 | fails under hostile or unexpected input |
+| `integration` | 9 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -155,6 +155,17 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §7` | F5 | `record` | fixed | independent | missing fields defaulted instead of reporting |
 | `D00 T04 §7` | F6 | `adversarial` | fixed | independent | an unreadable runs file crashed the checker |
 | `D00 T04 §7` | F7 | `consistency` | fixed | independent | the records prose was hard-wrapped |
+| `D00 T04 §9` | F1 | `adversarial` | fixed | independent | the binding reviewed one tree and recorded another |
+| `D00 T04 §9` | F2 | `consistency` | fixed | independent | the file list counted chunks, not changed files |
+| `D00 T04 §9` | F3 | `record` | fixed | independent | two items stood complete over known gaps |
+| `D00 T04 §9` | F4 | `adversarial` | fixed | independent | quoted paths vanished from the file list |
+| `D00 T04 §9` | F5 | `integration` | fixed | independent | the quoting model matched no real git output |
+| `D00 T04 §9` | F6 | `adversarial` | fixed | independent | the bare split fabricated a path |
+| `D00 T04 §9` | F7 | `record` | fixed | independent | the proof claim overstated the evidence |
+| `D00 T04 §9` | F8 | `adversarial` | fixed | independent | the rename branch fired without a diff line |
+| `D00 T04 §9` | F9 | `record` | fixed | independent | the proof quote was missing |
+| `D00 T04 §9` | F10 | `adversarial` | filed | independent | post-hunk rename lines hijack the block |
+| `D00 T04 §9` | F11 | `record` | filed | independent | the residual clause omits the post-hunk shape |
 | `D07 T01 §1` | F1 | `record` | corrected | self | the measured defect classes are eight, not seven |
 | `D07 T01 §1` | F2 | `record` | routed | self | the section was told to wait for a decision that has no owner here |
 | `D07 T01 §1` | F3 | `record` | corrected | self | the checkpoint could not fail |
