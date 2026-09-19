@@ -623,11 +623,15 @@ def check_export(doc):
         problems.append("runs is not a list")
         return problems
     seen = set()
+    homed: dict[str, str] = {}
     for run in runs:
         if not isinstance(run, dict):
             problems.append("a run entry is not an object")
             continue
         section = run.get("section", "?")
+        if not isinstance(section, str):
+            problems.append(f"a run entry names its section with {section!r}, not a string")
+            section = "?"
         if section in seen:
             problems.append(f"{section}: duplicate run entry")
         seen.add(section)
@@ -638,6 +642,8 @@ def check_export(doc):
         for key in ("rounds", "empty", "refuted"):
             if not _is_int(run.get(key)) or run[key] < 0:
                 problems.append(f"{section}: {key} must be a non-negative int")
+        if _is_int(run.get("rounds")) and run["rounds"] < 1:
+            problems.append(f"{section}: rounds must be a positive number")
         lines = run.get("round_lines", [])
         if not isinstance(lines, list):
             problems.append(f"{section}: round_lines is not a list")
@@ -700,6 +706,15 @@ def check_export(doc):
                 for ref in refs:
                     if not (isinstance(ref, str) and REF_RE.match(ref)):
                         problems.append(f"{section} round {num}: ref {ref!r} is not D..-T..-S..-F<n>")
+                        continue
+                    home = ref.rsplit("-F", 1)[0]
+                    if home != section:
+                        problems.append(f"{section} round {num}: ref {ref} belongs to {home}")
+                    if ref in homed:
+                        problems.append(f"{ref} claimed twice: {homed[ref]} and "
+                                        f"{section} round {num}")
+                    else:
+                        homed[ref] = f"{section} round {num}"
                 if line.get("outcome") == "empty" and refs:
                     problems.append(f"{section} round {num}: an empty round lists no findings")
     return problems
@@ -897,6 +912,32 @@ refuted: 0
     tampered["runs"][0]["round_lines"][1]["findings"] = ["D00-T01-S1-F9"]
     check("export-empty-clean",
           any("empty round lists no findings" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+
+    # Round 2 closed the crash and the silent shapes: unhashable sections,
+    # zero-round runs, mis-homed and double-claimed refs.
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["section"] = ["D00-T01-S1"]
+    check("export-section-typed",
+          any("not a string" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["rounds"] = 0
+    tampered["runs"][0]["round_lines"] = []
+    tampered["runs"][0]["empty"] = 0
+    check("export-rounds-positive",
+          any("positive number" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["round_lines"][0]["findings"] = ["D00-T01-S9-F1"]
+    check("export-ref-homed",
+          any("belongs to D00-T01-S9" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["round_lines"][0]["findings"] = ["D00-T01-S1-F1",
+                                                         "D00-T01-S1-F1"]
+    check("export-ref-unique",
+          any("claimed twice" in m for m in check_export(tampered)),
           f"{check_export(tampered)}")
 
     # Round 1 bound the as-of to content identity: HEAD only when HEAD's
