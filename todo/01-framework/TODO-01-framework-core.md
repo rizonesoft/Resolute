@@ -104,6 +104,7 @@ This section exists because the AutoIt suite typed its settings path fourteen ti
 - [ ] Carry the portable and installed distinction the AutoIt tools support, resolving to the correct location for each. Done when: both modes resolve and this section records how a tool learns which it is in.
 - [ ] Migrate an existing `<Tool>.lng` settings file to `<Tool>.ini` on first start, with a log line. Done when: a fixture `.lng` taken from the AutoIt tree migrates and the line is written.
 - [ ] Add assertions for round trip, defaults, atomic-write failure, and migration. Done when: four assertions run.
+- [ ] Record why settings stay INI rather than moving to JSON, TOML, the registry, or a packaged store, with the cost of changing. Done when: this section names the AutoIt readback parity, portable file-beside-exe, dependency-free, and human-editable reasons, states that structured per-tool data lives in a data file rather than settings, and states the migration a future format would owe.
 - [ ] Commit: `"framework: one settings writer and one settings path"`
 
 **Test checkpoint:** `ctest` runs four settings assertions green. An `.ini` written by the shipped AutoIt tool reads back identically. A write to a read-only target reports failure with the original intact. A fixture `.lng` migrates with its log line. All quoted.

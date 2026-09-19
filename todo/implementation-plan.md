@@ -160,7 +160,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 |  ✔  | Section       | Deliverable                                  | Items |
 | :-: | ------------- | -------------------------------------------- | :---: |
 | [ ] | `D01 T01 §1`  | Application shell and lifecycle              |   7   |
-| [ ] | `D01 T01 §2`  | Settings: one writer, one path               |   7   |
+| [ ] | `D01 T01 §2`  | Settings: one writer, one path               |   8   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                  |   6   |
 | [ ] | `D01 T01 §4`  | Localization and the pack loader             |   7   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement  |   7   |
@@ -309,7 +309,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | :-: | ------------- | ---------------------------------------------- | :---: |
 | [ ] | `D06 T01 §1`  | Release Descriptors, Portable by Construction  |   5   |
 | [ ] | `D06 T01 §2`  | One Command Builds the Release Set             |   5   |
-| [ ] | `D06 T01 §3`  | Installers: Per Tool and Whole Suite           |   9   |
+| [ ] | `D06 T01 §3`  | Installers: Per Tool and Whole Suite           |  10   |
 | [ ] | `D06 T01 §9`  | The Bare-Machine Proof                         |   7   |
 | [ ] | `D06 T01 §4`  | Migration From the AutoIt Suite                |   7   |
 | [ ] | `D06 T01 §5`  | Update Files and Consolidation Announcements   |   6   |
