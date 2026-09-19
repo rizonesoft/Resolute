@@ -110,7 +110,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §9`  | Review-input integrity                         |   5   |
 | [x] | `D00 T04 §10` | Run-record follow-ups                          |   5   |
 | [ ] | `D00 T04 §11` | Bind the rename scan to the diff header        |   3   |
-| [ ] | `D00 T04 §12` | Prove the manifest, not just emit it           |   6   |
+| [ ] | `D00 T04 §12` | Prove the manifest, not just emit it           |   8   |
 | [ ] | `D00 T04 §13` | Bind the stamp to the push                     |   6   |
 | [ ] | `D00 T04 §14` | Bar bool versions from the export gate         |   2   |
 | [ ] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |  10   |

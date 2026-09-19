@@ -584,16 +584,18 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 
 ## 12. Prove the Manifest, Not Just Emit It
 
-§9's plan review broke the manifest's core claim: sha and tag both sit in the preamble, so a truncation past the manifest still receipts validly, and the drill only proved receiptless output fails. Base and head float optional, combined diffs stay an admitted residual, the parse trusts hand-rolled quoting, and no attestation survives the terminal. This section makes the manifest prove what §9 says it proves.
+§9's plan review broke the manifest's core claim: sha and tag both sit in the preamble, so a truncation past the manifest still receipts validly, and the drill only proved receiptless output fails. Base and head float optional, combined diffs stay an admitted residual, the parse trusts hand-rolled quoting, and no attestation survives the terminal. This section makes the manifest prove what §9 says it proves. §11's residual clause names combined diffs as the sole residual; this section owns that residual.
 
 - [ ] Close the preamble hole: the receipt must quote a closing nonce (or equivalent tail-only evidence) verified against a session-side value the prompt never carries. Done when: a truncation past the manifest fails, quoted, and the full receipt still passes.
 - [ ] Require base and head on every candidate manifest, and reject a manifest that floats free. Done when: a candidate review without both fails closed, quoted.
 - [ ] Parse combined diffs or refuse them explicitly. Done when: a merge candidate either lists every changed file or fails naming the shape, quoted.
 - [ ] Cross-check the parsed file set against a NUL-delimited `git diff` file list. Done when: a divergence fails closed, quoted, with the self-test covering it.
 - [ ] Emit a machine-readable review attestation: manifest hash, candidate and tree OIDs, reviewer and model identity, verdict, timestamp, and checker result. Done when: one attestation per review exists beside the findings file and the skill reads it back.
+- [ ] Pin each hunk-body terminator (`--- `, `+++ `, `@@`) as the first marker with its own post-hunk-smuggle case: §11's suite proves the bound once with all three present, which a partial implementation also passes. Done when: three cases run, each breaking on a different first marker, quoted.
+- [ ] Bound the rename scan at binary-diff bodies (`GIT binary patch`, `Binary files ... differ`): pasted binary-shaped input can otherwise place authoritative-looking rename lines beyond any hunk marker. Done when: a post-binary-patch pair is ignored, quoted, with the self-test covering it.
 - [ ] Commit: `"workspace: prove the manifest"`
 
-**Test checkpoint:** The preamble truncation fails, the full receipt passes, a baseless manifest fails, a merge candidate lists or refuses, the cross-check diverges loudly, and one attestation reads back. All quoted.
+**Test checkpoint:** The preamble truncation fails, the full receipt passes, a baseless manifest fails, a merge candidate lists or refuses, the cross-check diverges loudly, one attestation reads back, each hunk terminator pins its own smuggle case, and a post-binary-patch pair is ignored. All quoted.
 
 -> XREF: D00 T04 §9 -- the manifest this section hardens
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR1 D00-T04-S9-PR1
@@ -602,6 +604,9 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR6 D00-T04-S9-PR6
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR7 D00-T04-S9-PR7
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR17 D00-T04-S9-PR17
+-> SOURCE: plan-D00-T04-s11-2026-09-19-PR3 D00-T04-S11-PR3
+-> SOURCE: plan-D00-T04-s11-2026-09-19-PR4 D00-T04-S11-PR4
+-> SOURCE: plan-D00-T04-s11-2026-09-19-PR6 D00-T04-S11-PR6
 
 ## 13. Bind the Stamp to the Push
 
