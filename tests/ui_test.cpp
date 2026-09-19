@@ -12,7 +12,10 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cstring>
+#include <cwchar>
 #include <string>
+
+#include <windows.h>
 
 #include <resolute/animation.h>
 #include <resolute/controls/contentview.h>
@@ -377,12 +380,12 @@ TEST_CASE("ListView columns add and clear", "[ui][controls]") {
 }
 
 TEST_CASE("ListView edit sessions open and close", "[ui][controls]") {
+    rui::ListItem item;  // declared first: the provider borrows it, so it must outlive the view
     rui::ListView lv;
     DrainAnimations drain;
-    rui::ListItem item;
     item.cells = {L"alpha", L"beta"};
     lv.SetItemCount(4);
-    lv.SetItemProvider([&](int) -> const rui::ListItem& { return item; });
+    lv.SetItemProvider([&item](int) -> const rui::ListItem& { return item; });
     lv.BeginEdit(2, 1);
     CHECK(lv.IsEditing());
     lv.EndEdit(false);
