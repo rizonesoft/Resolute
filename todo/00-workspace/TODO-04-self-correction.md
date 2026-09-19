@@ -64,7 +64,7 @@ track: W1
 |   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [x]   |
 |   6   |   §6    | The adversarial reviewer                   | §2         |  [x]   |
 |   7   |   §7    | Review-run records                         | §6         |  [x]   |
-|   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [ ]   |
+|   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [x]   |
 |   9   |   §9    | Review-input integrity                     | §6         |  [x]   |
 |  10   |   §10   | Run-record follow-ups                      | §7         |  [x]   |
 |  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [ ]   |
@@ -492,6 +492,13 @@ So this section is mostly wiring and measurement rather than construction, and i
 
 > **Started:** 2026-09-19T09:05:00Z
 
+> **Verified:** 2026-09-19 | §8 | keep both models, decided from the asserted export (version 1, 25 runs) joined to the severity ledger: Sol 11 panel rounds, 31 accepted, value 79 (1 critical, 20 major, 10 minor); Opus 11 rounds, 17 accepted, value 31 (7 major, 10 minor); the join reproduced both ways with panel-only giving exactly these figures (the stamp-review round excluded) · the blinded comparison on frozen `f118e30` reads Jaccard 0.22 over 9 union finds with 2 same-defect matches, and voids any Opus zeros since Opus holds no full-scope observation (all 11 rounds delta-plus-regressions) while Sol clears the zero leg at full scope (5/2/5/3/4, never zero) · the cut rule names window, overlap, weights, and cost with worked keep and cut, the zero leg counting full-scope sections only with blinded arbitration · prompt diversity recovers 2 of 7 blinded Opus finds, so no cheaper substitute exists · severity rollout tags every finding with the gate enforcing it (rollout 160: 6/77/77; ledger 170: 6/85/79 with this review's ten) · cost unmeasured (44/44 unresolved at decision) with recording filed to §15 · panel: 3 usable rounds plus 1 void attempt, 10 findings (8 fixed, 2 filed to §16 and §18) · plan review: 21 findings, 14 filed (§18 carries 10, §16 two, §17 and §15 one each), 5 rejected, 2 duplicate
+> **Review:** re-review round 3 sign-off plus 1 void attempt, candidate `d72afe0` `2dde74b` `a27e296` `296a838` `de3f66a` -- `adversarial` approve (F1 filed to §16) · `consistency` approve after fix (F2, F4 fixed outside the candidate) · `integration` approve after fixes (F7, F9) · `source-defect`/`design` not owed · `record` advisory at close (F10 filed to §18) after fixes (F3, F8). The void round's F4-F6 verified in-session and fixed outside the candidate. Raw findings: docs/reviews/00-workspace/D00-T04-s8.md
+> **Plan review:** gpt (run 20260919-D00-T04-S8-gpt) -- filed: D00 T04 §18 (3 new items, item 2 and context extended), D00 T04 §16 (scope plus semantic), D00 T04 §17 (pins), D00 T04 §15 (trigger item); 5 rejected and 2 duplicate with reasons in the ledger
+> **CRUD:** this section writes plan record (the keep decision with its numbers), the derived ledger (severity views), review tooling (SEVERITIES, the severity report, the never-defect rule it states but does not enforce), and run records (the S8 block with its void noted). It reads the review files, the run records, and the git history. The behavioral surfaces it adds are the findings gate failing on a missing or unknown severity and the runs gate failing on unclaimed refs and runless files. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-19T09:05:00Z to 2026-09-19T17:39:37Z
+> **Implementer:** Muse Code
+
 ## 9. Review-Input Integrity
 
 Three soundness holes share one theme: the reviewer may not have reviewed what the record claims. A stamp approved staged becomes pushed unstaged (time-of-check gap); the wrong-figure probe covers one defect shape; and an inline diff is never proven complete, so a truncation approves falsely. This section closes all three.
@@ -639,9 +646,10 @@ The §10 plan review accepted three minors the enriched records leave open: late
 - [ ] Settle the provider vocabulary: round lines record runner names (`codex`, `claude`) where provider-level queries want the serving provider. Done when: the header defines what `provider` names, quoted, and the closed set matches the definition.
 - [ ] Record cost and latency at record time: the review skill writes measured cost in tokens and latency on every new round line, so the §8 value-per-cost comparison stops reading `unresolved`. Done when: the skill carries the recording step, and a round line written by following it resolves both fields, quoted from a driven record.
 - [ ] Report the revisit-trigger state in `--report`: panel-reviewed sections counted past the §8 window of five, so the §18 trigger reads from the query rather than a hand count. Done when: the report prints the count with the window named, quoted from a driven report.
+- [ ] Give stamp-review rounds a record shape the panel mapping skips, so the STAMP HOLDS verdict survives the session: today a stamp round in a panel block would demand four-lens verdicts it cannot have, and outside one it has no home. Done when: this review's stamp round is recorded, quoted, and `--check` passes.
 - [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
 
-**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; all quoted from driven runs.
+**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; the §8 stamp round reads in the records; all quoted from driven runs.
 
 -> XREF: D00 T04 §10 -- the records this section tightens
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
@@ -652,6 +660,7 @@ The §10 plan review accepted three minors the enriched records leave open: late
 -> SOURCE: div-D00-T04-s8-2026-09-19-R4 D00-T04-S8-D2
 -> SOURCE: gap-phase0-2026-09-19-cost
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR15 D00-T04-S8-PR15
+-> SOURCE: self-2026-09-19-stamp-rounds
 
 ## 16. Blinded-Run Checker Defects
 
