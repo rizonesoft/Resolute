@@ -114,7 +114,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T04 §13` | Bind the stamp to the push                     |   6   |
 | [ ] | `D00 T04 §14` | Bar bool versions from the export gate         |   2   |
 | [ ] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |   8   |
-| [ ] | `D00 T04 §16` | Blinded-run checker defects                    |   4   |
+| [ ] | `D00 T04 §16` | Blinded-run checker defects                    |   5   |
 | [ ] | `D00 T04 §17` | Report without walking the corpus twice        |   2   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2`  | CMake structure and dependencies               |  11   |

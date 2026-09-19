@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**160 findings across 25 sections.**
+**163 findings across 26 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 49 | the plan or the evidence misdescribes what happened |
+| `record` | 50 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
-| `adversarial` | 25 | fails under hostile or unexpected input |
-| `consistency` | 25 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 26 | fails under hostile or unexpected input |
+| `consistency` | 26 | disagrees with the rest of the suite, its naming, or its layout |
 | `integration` | 12 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 76 | wrong behavior in code, plan, or record |
-| `minor` | 78 | polish or wording, or no surviving defect |
+| `major` | 80 | wrong behavior in code, plan, or record |
+| `minor` | 77 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -172,6 +172,9 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §7` | F5 | major | `record` | fixed | independent | missing fields defaulted instead of reporting |
 | `D00 T04 §7` | F6 | major | `adversarial` | fixed | independent | an unreadable runs file crashed the checker |
 | `D00 T04 §7` | F7 | minor | `consistency` | fixed | independent | the records prose was hard-wrapped |
+| `D00 T04 §8` | F1 | major | `adversarial` | filed | independent | the parser accepts a never-defect carrying critical |
+| `D00 T04 §8` | F2 | major | `consistency` | fixed | independent | plan-stage corrections rated minor without exception contradicts the scale |
+| `D00 T04 §8` | F3 | major | `record` | fixed | independent | the worked KEEP reads fix-loop finds as zero-leg evidence |
 | `D00 T04 §9` | F1 | critical | `adversarial` | fixed | independent | the binding reviewed one tree and recorded another |
 | `D00 T04 §9` | F2 | major | `consistency` | fixed | independent | the file list counted chunks, not changed files |
 | `D00 T04 §9` | F3 | minor | `record` | fixed | independent | two items stood complete over known gaps |
@@ -185,7 +188,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §9` | F11 | minor | `record` | filed | independent | the residual clause omits the post-hunk shape |
 | `D07 T01 §1` | F1 | minor | `record` | corrected | self | the measured defect classes are eight, not seven |
 | `D07 T01 §1` | F2 | minor | `record` | routed | self | the section was told to wait for a decision that has no owner here |
-| `D07 T01 §1` | F3 | minor | `record` | corrected | self | the checkpoint could not fail |
+| `D07 T01 §1` | F3 | major | `record` | corrected | self | the checkpoint could not fail |
 | `D07 T01 §1` | F4 | major | `correctness` | fixed | independent | C15 forbade the entire purpose of a repair tool |
 | `D07 T01 §1` | F5 | major | `adversarial` | fixed | independent | two spaces bypassed the checker entirely |
 | `D07 T01 §1` | F6 | major | `test-coverage` | fixed | independent | the checker had nothing exercising it |
