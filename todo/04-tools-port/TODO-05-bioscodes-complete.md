@@ -49,6 +49,7 @@ track: P2
 |   4   |   §4    | Cross-vendor pattern search | D04 T01 §5, §6 |  [ ]   |
 |   5   |   §5    | Vendor auto-detect from WMI | D04 T01 §5, §6 |  [ ]   |
 |   6   |   §6    | Migrate beep data to reference DB | D04 T01 §5, D00 T06 §3, D01 T01 §14 |  [ ]   |
+|   7   |   §7    | User-editable database (CRUD) | §6 |  [ ]   |
 
 ---
 
@@ -168,6 +169,28 @@ BiosCodes becomes the platform's first consumer: its lookups read the embedded b
 **Test checkpoint:** Pack-driven lookups are gone with the diff at zero; every extended entry is reachable; finer details are driven or captured; the parity comparison re-runs clean. Cheaper substitute that fails the checkpoint: new tabs without the migration diff, which ship new answers on an unproven store.
 
 -> XREF: D00 T06 §3 -- the migrated dataset this section consumes
+-> XREF: D04 T01 §5 -- the parity check this section must not disturb
+
+## 7. User-Editable Database (CRUD)
+
+**Deliberate new behavior.** The shipped database is frozen and read-only; this section layers a user stratum over it: the user adds, edits, and deletes their own beep, blink, and POST entries, stored per-user, badged as user data, and included in lookup and search. Nobody waits for a release to record a code they just decoded.
+
+**Fidelity:** the user-entry editor and badged rows, against `DESIGN.md`; new surface, no AutoIt baseline.
+**Job:** a user records a code the database lacks and finds it again like any other entry. Consumer: the user stratum file and the lookup answers.
+**Treatment:** user entries live beside shipped data, never inside it; shipped entries cannot be edited, only supplemented. Cheaper substitute that fails the checkpoint: editing shipped entries in place, which corrupts the frozen data with local guesses.
+**Chrome:** consume the framework list surfaces, dialog, and message layer. No new dialog chrome beyond the editor.
+**Needs:** Windows host (build/test)
+
+- [ ] Store the user stratum per-user with atomic write and readback: add, edit, and delete entries across all three families with validation (pattern shape, required meaning, vendor exists). Done when: all three operations round-trip through a forced restart, and invalid input is refused naming the field, quoted.
+- [ ] Keep shipped entries immutable and badge user entries: shipped rows render locked with no edit path, user rows render badged, and a user entry never overwrites a shipped answer (same pattern plus vendor renders both, shipped first). Done when: the lock and badge rules hold on fixtures, quoted.
+- [ ] Include user entries in lookup and cross-vendor search with their badge, and in F1 results. Done when: a user entry is found by lookup, by search, and by F1, quoted.
+- [ ] Export and import the user stratum: one file out with the entries plus their versions, one file in with validation refusing bad rows by number, so entries carry to another machine. Done when: a round-trip preserves every entry and a corrupt file is refused naming its row, quoted.
+- [ ] Cover the finer details: keyboard path, screen-reader names and announcements, both themes and DPI scalings, empty-stratum presentation, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.
+- [ ] Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped, and a populated user stratum leaves every shipped answer unchanged. Done when: both comparisons are quoted showing no difference.
+- [ ] Commit: `"bioscodes: user-editable database"`
+
+**Test checkpoint:** CRUD round-trips with validation; shipped locked and user badged with both rendered on collision; user entries found by lookup, search, and F1; export/import round-trips with corrupt refused by row; finer details driven or captured; parity clean with empty and populated strata. Cheaper substitute that fails the checkpoint: user entries without the badge, which present guesses as vendor data.
+
 -> XREF: D04 T01 §5 -- the parity check this section must not disturb
 
 ## Verification

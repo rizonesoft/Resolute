@@ -67,6 +67,7 @@ The pipeline from database to executable: export each tool's declared datasets t
 - [ ] Export datasets to committed files: one command dumps every declared dataset to its generated file in a fixed format with stable ordering. Done when: two consecutive exports are byte-identical, quoted.
 - [ ] Fail CI on drift: the gate re-exports and compares, failing with the dataset and version on any difference. Done when: a deliberately edited export fails naming the dataset, quoted. Cheaper substitute that fails the checkpoint: exporting at build time without committing, which makes every build need a server.
 - [ ] Embed per tool at build: each tool embeds exactly the datasets it declares through the §5 contract, no more. Done when: a tool's binary contains its datasets and no other's, proven by inspection.
+- [ ] Compress embedded datasets: the export compresses each dataset and the loader decompresses on open, so reference text costs roughly a third of its raw size. Done when: a shipped dataset measures smaller embedded than raw with loads verified, quoted.
 - [ ] Stamp and verify versions: every embedded dataset carries its version, readable at runtime, and the stamped-surface agreement test covers it. Done when: the version reads back and a mismatched stamp fails naming the dataset.
 - [ ] Plug into the one-command build: the export and drift check run inside `D06 T01 §2` with no new command to remember. Done when: the §2 build runs them, quoted.
 - [ ] Commit: `"data: build-time export, embedding, versioning"`
