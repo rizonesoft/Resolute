@@ -119,7 +119,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T04 §18` | Second two-model revisit, independently rated  |   7   |
 | [ ] | `D00 T04 §19` | No partial flips                               |   4   |
 | [ ] | `D00 T04 §20` | Review-tooling operability follow-ups          |   3   |
-| [ ] | `D00 T04 §21` | Review-input integrity hardening               |   4   |
+| [ ] | `D00 T04 §21` | Review-input integrity hardening               |   6   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2`  | CMake structure and dependencies               |  11   |
 | [x] | `D00 T01 §3`  | Warnings as errors at one level                |   6   |
