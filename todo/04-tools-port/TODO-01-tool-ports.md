@@ -47,7 +47,7 @@ track: P2
 | Order | Section | Deliverable                                  | Depends On                 | Status |
 | :---: | :-----: | -------------------------------------------- | -------------------------- | :----: |
 |   1   |   §1    | Vertical slice: Ownership end to end         | D01 T01 §9, D02 T01 §4, D00 T02 §4, D04 T02 §1 |  [ ]   |
-|   2   |   §2    | The remaining frozen tools: ComIntRep, PixRepair | §1                |  [ ]   |
+|   2   |   §2    | The remaining frozen tools: ComIntRep, PixRepair | §1, D04 T03 §1, D04 T03 §2, D04 T04 §1, D04 T04 §2 |  [ ]   |
 |   3   |   §3    | Browser optimizer: four tools into one       | §1                         |  [ ]   |
 |   4   |   §4    | Drive Repair: USBRepair and DVDRepair merged | §2                         |  [ ]   |
 |   5   |   §5    | MemBoost and BiosCodes                       | §2                         |  [ ]   |
