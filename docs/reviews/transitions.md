@@ -7,7 +7,7 @@ date: 2026-09-19
 from: raised
 to: refuted
 why: "writes are serial (one session owns the tree, so two reviews of one tree cannot run), a local symlink planter is outside every threat model this repo states, and the same `/tmp` shape is used by every panel command in the skill by design, so fixing one command would be incoherent."
-evidence: "The sign-off round accepted the refutation and did not re-report." Scope note, quoted from the §9 record: "another session's contract rode the shared `/tmp` path" — the cross-session variant, outside the one-tree scope above, which §9 closed with per-run directories.
+evidence: "The sign-off round accepted the refutation and did not re-report." Scope note, quoted from the §9 record: "another session's contract rode the shared `/tmp` path", the cross-session variant, outside the one-tree scope above, which §9 closed with per-run directories.
 
 transition: D00-T03-S4-F3
 date: 2026-09-17

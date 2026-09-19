@@ -70,6 +70,7 @@ REQUIRED_ROUND_KEYS = ("model", "effort", "outcome", "candidate", "provider", "v
                        "cost", "latency", "opportunity", "purpose", "provenance")
 COST_RE = re.compile(r"^(?:unresolved|[0-9]+tokens)$")
 LATENCY_RE = re.compile(r"^(?:unresolved|[0-9]+s)$")
+TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 REF_RE = re.compile(r"^D\d{2}-T\d{2}-S\d+-F\d+$")
@@ -431,25 +432,40 @@ def run_check(runs_path):
     return runs, errors
 
 
-def as_of():
-    """The report's binding: HEAD commit plus UTC timestamp, or unresolved
-    when git is unavailable. Never guessed: a report that cannot name
-    its commit says so."""
+def as_of(runs_path):
+    """The report's binding: the HEAD commit whose tree holds exactly the
+    exported bytes, plus a UTC timestamp. Content identity, not a label:
+    the file's hash must equal HEAD's copy of it, so a dirty tree, an
+    older file, or any other path reads `unresolved` rather than
+    borrowing the checkout's HEAD. Never guessed: a report that cannot
+    name its commit says so."""
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
         hit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
                              capture_output=True, text=True, timeout=30)
         sha = hit.stdout.strip() if hit.returncode == 0 else ""
     except (OSError, subprocess.SubprocessError):
         sha = ""
-    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     if not SHA_RE.match(sha) or len(sha) != 40:
+        return {"commit": "unresolved", "timestamp": stamp}
+    try:
+        rel = Path(runs_path).resolve().relative_to(ROOT).as_posix()
+        have = subprocess.run(["git", "hash-object", str(runs_path)], cwd=ROOT,
+                              capture_output=True, text=True, timeout=30)
+        want = subprocess.run(["git", "rev-parse", f"HEAD:{rel}"], cwd=ROOT,
+                              capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return {"commit": "unresolved", "timestamp": stamp}
+    if have.returncode != 0 or want.returncode != 0:
+        return {"commit": "unresolved", "timestamp": stamp}
+    if have.stdout.strip() != want.stdout.strip():
         return {"commit": "unresolved", "timestamp": stamp}
     return {"commit": sha, "timestamp": stamp}
 
 
-def report(runs):
+def report(runs, runs_path):
     lines = []
-    binding = as_of()
+    binding = as_of(runs_path)
     lines.append(f"as-of: {binding['commit']} {binding['timestamp']}")
     lines.append(f"{len(runs)} review runs, "
                  f"{sum(r.rounds or 0 for r in runs)} independent rounds.")
@@ -544,14 +560,14 @@ def report(runs):
     return "\n".join(lines) + "\n"
 
 
-def export_runs(runs):
+def export_runs(runs, runs_path):
     """The machine export §8 consumes: versioned JSON with the as-of
     binding and every run's rounds. Consumers assert export_version
     before reading anything else."""
     return {
         "export_version": EXPORT_VERSION,
         "schema": SCHEMA_VERSION,
-        "as_of": as_of(),
+        "as_of": as_of(runs_path),
         "runs": [
             {
                 "section": run.section,
@@ -572,10 +588,18 @@ def export_runs(runs):
     }
 
 
+def _is_int(value):
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 def check_export(doc):
-    """Assert an export file: version, shape, internal counts. Returns a
-    list of messages (empty means sound). The as-of binds the snapshot;
-    live-tree agreement is NOT checked here, a snapshot is a moment."""
+    """Assert an export file: version, shape, values, internal counts.
+    Returns a list of messages (empty means sound). Every closed set the
+    parser enforces is re-asserted here, so a hand-edited export cannot
+    smuggle values the records could never hold. The as-of binds the
+    snapshot; live-tree agreement is NOT checked here, a snapshot is a
+    moment, so `refuted` is bounded by the listed refs rather than proven
+    against the ledger."""
     problems = []
     if not isinstance(doc, dict):
         return ["export is not an object"]
@@ -583,9 +607,17 @@ def check_export(doc):
         problems.append(f"export_version is {doc.get('export_version')!r}, "
                         f"this checker asserts {EXPORT_VERSION}")
         return problems
+    if doc.get("schema") != SCHEMA_VERSION:
+        problems.append(f"schema is {doc.get('schema')!r}, "
+                        f"this checker asserts {SCHEMA_VERSION}")
     as_of_doc = doc.get("as_of", {})
-    if not isinstance(as_of_doc, dict) or "commit" not in as_of_doc or "timestamp" not in as_of_doc:
-        problems.append("as_of lacks commit and timestamp")
+    commit = as_of_doc.get("commit") if isinstance(as_of_doc, dict) else None
+    stamp = as_of_doc.get("timestamp") if isinstance(as_of_doc, dict) else None
+    if commit != "unresolved" and not (isinstance(commit, str) and len(commit) == 40
+                                       and SHA_RE.match(commit)):
+        problems.append("as_of commit is neither a full sha nor `unresolved`")
+    if not (isinstance(stamp, str) and TIMESTAMP_RE.match(stamp)):
+        problems.append("as_of timestamp is not UTC `YYYY-MM-DDTHH:MM:SSZ`")
     runs = doc.get("runs")
     if not isinstance(runs, list):
         problems.append("runs is not a list")
@@ -599,11 +631,24 @@ def check_export(doc):
         if section in seen:
             problems.append(f"{section}: duplicate run entry")
         seen.add(section)
+        if not (isinstance(run.get("date"), str) and DATE_RE.match(run["date"])):
+            problems.append(f"{section}: date is not YYYY-MM-DD")
+        if run.get("runner") not in RUNNERS:
+            problems.append(f"{section}: runner must be one of {RUNNERS}")
+        for key in ("rounds", "empty", "refuted"):
+            if not _is_int(run.get(key)) or run[key] < 0:
+                problems.append(f"{section}: {key} must be a non-negative int")
         lines = run.get("round_lines", [])
+        if not isinstance(lines, list):
+            problems.append(f"{section}: round_lines is not a list")
+            continue
         if run.get("rounds") != len(lines):
             problems.append(f"{section}: rounds says {run.get('rounds')} but "
                             f"{len(lines)} round lines present")
-        numbers = sorted(line.get("number") for line in lines if isinstance(line, dict))
+        numbers = sorted(line["number"] for line in lines
+                         if isinstance(line, dict) and _is_int(line.get("number")))
+        if any(not (isinstance(line, dict) and _is_int(line.get("number"))) for line in lines):
+            problems.append(f"{section}: every round line numbers itself with an int")
         if numbers != list(range(1, len(lines) + 1)):
             problems.append(f"{section}: round numbers must run 1..N, got {numbers}")
         empties = sum(1 for line in lines if isinstance(line, dict)
@@ -611,6 +656,11 @@ def check_export(doc):
         if run.get("empty") != empties:
             problems.append(f"{section}: empty says {run.get('empty')} but "
                             f"{empties} round(s) came back empty")
+        listed = sum(len(line["findings"]) for line in lines
+                     if isinstance(line, dict) and isinstance(line.get("findings"), list))
+        if _is_int(run.get("refuted")) and run["refuted"] > listed:
+            problems.append(f"{section}: refuted says {run['refuted']} but "
+                            f"only {listed} ref(s) listed")
         for line in lines:
             if not isinstance(line, dict):
                 problems.append(f"{section}: a round line is not an object")
@@ -619,6 +669,39 @@ def check_export(doc):
                 (["findings"] if "findings" not in line else [])
             if missing:
                 problems.append(f"{section} round {line.get('number')}: misses {', '.join(missing)}")
+                continue
+            num = line.get("number")
+            if not (isinstance(line.get("model"), str) and line["model"]):
+                problems.append(f"{section} round {num}: model is not a name")
+            if line.get("effort") not in EFFORTS:
+                problems.append(f"{section} round {num}: effort must be one of {EFFORTS}")
+            if line.get("outcome") not in OUTCOMES:
+                problems.append(f"{section} round {num}: outcome must be one of {OUTCOMES}")
+            if not (isinstance(line.get("candidate"), str) and SHA_RE.match(line["candidate"])):
+                problems.append(f"{section} round {num}: candidate is not a hex sha")
+            if line.get("provider") not in PROVIDERS:
+                problems.append(f"{section} round {num}: provider must be one of {PROVIDERS}")
+            if not (isinstance(line.get("version"), str) and line["version"]):
+                problems.append(f"{section} round {num}: version is not a name")
+            if not (isinstance(line.get("cost"), str) and COST_RE.match(line["cost"])):
+                problems.append(f"{section} round {num}: cost reads `<int>tokens` or `unresolved`")
+            if not (isinstance(line.get("latency"), str) and LATENCY_RE.match(line["latency"])):
+                problems.append(f"{section} round {num}: latency reads `<int>s` or `unresolved`")
+            if line.get("opportunity") not in OPPORTUNITIES:
+                problems.append(f"{section} round {num}: opportunity must be one of {OPPORTUNITIES}")
+            if line.get("purpose") not in PURPOSES:
+                problems.append(f"{section} round {num}: purpose must be one of {PURPOSES}")
+            if line.get("provenance") not in PROVENANCES:
+                problems.append(f"{section} round {num}: provenance must be one of {PROVENANCES}")
+            refs = line.get("findings")
+            if not isinstance(refs, list):
+                problems.append(f"{section} round {num}: findings is not a list")
+            else:
+                for ref in refs:
+                    if not (isinstance(ref, str) and REF_RE.match(ref)):
+                        problems.append(f"{section} round {num}: ref {ref!r} is not D..-T..-S..-F<n>")
+                if line.get("outcome") == "empty" and refs:
+                    problems.append(f"{section} round {num}: an empty round lists no findings")
     return problems
 
 
@@ -761,7 +844,11 @@ refuted: 0
         check_runs(_r, errors_g)
         check(f"bad-{bad_key}-fails", any(want in m for _, m in errors_g), f"{errors_g}")
 
-    exported = export_runs(runs)
+    import tempfile
+    tmp = Path(tempfile.mkdtemp(prefix="todo-runs-"))
+    other = tmp / "other-records.md"
+    other.write_text(good, encoding="utf-8")
+    exported = export_runs(runs, other)
     check("export-version", exported["export_version"] == EXPORT_VERSION, f"{exported!r}"[:200])
     check("export-round-trip", check_export(exported) == [], f"{check_export(exported)}")
     tampered = json.loads(json.dumps(exported))
@@ -772,6 +859,64 @@ refuted: 0
     tampered["runs"][0]["rounds"] = 99
     check("export-counts-asserted",
           any("rounds says 99" in m for m in check_export(tampered)), f"{check_export(tampered)}")
+
+    # Round 1 hardened the export checker past presence: values now assert.
+    tampered = json.loads(json.dumps(exported))
+    tampered["as_of"]["commit"] = "xyz"
+    tampered["as_of"]["timestamp"] = "soon"
+    tampered["schema"] = 99
+    shape = check_export(tampered)
+    check("export-binding-asserted",
+          any("neither a full sha" in m for m in shape)
+          and any("not UTC" in m for m in shape)
+          and any("schema is 99" in m for m in shape), f"{shape}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["date"] = "yesterday"
+    tampered["runs"][0]["runner"] = "speedy"
+    tampered["runs"][0]["rounds"] = "2"
+    meta = check_export(tampered)
+    check("export-runmeta-asserted",
+          any("not YYYY-MM-DD" in m for m in meta)
+          and any("runner must be" in m for m in meta)
+          and any("rounds must be a non-negative int" in m for m in meta), f"{meta}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["round_lines"][0]["effort"] = "extreme"
+    tampered["runs"][0]["round_lines"][0]["cost"] = "free"
+    tampered["runs"][0]["round_lines"][0]["findings"] = "D00-T01-S1-F1"
+    vals = check_export(tampered)
+    check("export-roundvals-asserted",
+          any("effort must be" in m for m in vals)
+          and any("cost reads" in m for m in vals)
+          and any("findings is not a list" in m for m in vals), f"{vals}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["refuted"] = 99
+    check("export-refuted-bounded",
+          any("only 2 ref(s) listed" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["round_lines"][1]["findings"] = ["D00-T01-S1-F9"]
+    check("export-empty-clean",
+          any("empty round lists no findings" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+
+    # Round 1 bound the as-of to content identity: HEAD only when HEAD's
+    # tree holds exactly the exported bytes, `unresolved` otherwise.
+    foreign = as_of(other)
+    check("as-of-foreign-unresolved", foreign["commit"] == "unresolved", f"{foreign}")
+    check("as-of-stamp-shaped", bool(TIMESTAMP_RE.match(foreign["timestamp"])), f"{foreign}")
+    live = as_of(DEFAULT_RUNS)
+    agree = subprocess.run(["git", "hash-object", str(DEFAULT_RUNS)], cwd=ROOT,
+                           capture_output=True, text=True, timeout=30)
+    want = subprocess.run(["git", "rev-parse", "HEAD:docs/reviews/run-records.md"], cwd=ROOT,
+                          capture_output=True, text=True, timeout=30)
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                          capture_output=True, text=True, timeout=30)
+    identical = (agree.returncode == 0 and want.returncode == 0
+                 and agree.stdout.strip() == want.stdout.strip())
+    expect = head.stdout.strip() if identical else "unresolved"
+    check("as-of-agrees-with-git", live["commit"] == expect, f"{live} want {expect}")
+    other.unlink()
+    tmp.rmdir()
 
     print(f"todo-runs self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
@@ -811,9 +956,9 @@ def main(argv=None):
             print(f"{where}: {msg}")
         return 1
     if mode_report:
-        sys.stdout.write(report(runs))
+        sys.stdout.write(report(runs, runs_path))
     elif mode_export:
-        sys.stdout.write(json.dumps(export_runs(runs), indent=2) + "\n")
+        sys.stdout.write(json.dumps(export_runs(runs, runs_path), indent=2) + "\n")
     else:
         rounds = sum(r.rounds or 0 for r in runs)
         print(f"{len(runs)} runs, {rounds} rounds: all resolve, all covered, counts agree")
