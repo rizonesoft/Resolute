@@ -16,13 +16,15 @@ already has one, and it drifts exactly like a figure duplicated in prose.
 
 A finding is a Markdown heading in a findings file:
 
-    ### F1 -- four claims pointed into gitignored `samples/` -- consistency -- FIXED
-    ### F2 -- the build is not reproducible -- reproducibility -- FILED to `D07 T01`
+    ### F1 -- four claims pointed into gitignored `samples/` -- consistency -- FIXED (self)
+    ### F2 -- the build is not reproducible -- reproducibility -- FILED to `D07 T01` (independent)
 
 Four fields separated by ` -- `: the number, the summary, the category, the disposition.
-A heading this cannot parse is REPORTED, never skipped: skipping is how the split-claim
-defect hid in the claims checker, where the count simply dropped and the total still
-said everything held.
+The disposition carries a trailing source marker, `(independent)` or `(self)`: who
+raised the finding, not who fixed it. A heading this cannot parse, or a finding
+whose source is missing or outside the closed set, is REPORTED, never skipped:
+skipping is how the split-claim defect hid in the claims checker, where the count
+simply dropped and the total still said everything held.
 
 Exit codes: 0 everything parsed, 1 at least one heading could not be read.
 """
@@ -89,12 +91,28 @@ DISPOSITIONS = {"fixed", "filed", "refuted", "advisory", "routed", "cleared",
 FILED_TO_RE = re.compile(r"\bFILED\s+to\s+`?(D\d{2}\s+T\d{2}\s+§\d+)`?", re.IGNORECASE)
 
 
+# Who raised the finding. `independent` is anyone or anything other than the
+# implementing session: the external reviewer, a panel round, the operator.
+# `self` is the session's own work: its lenses, probes, validation runs, gates.
+# A gate is self, not independent: the session runs the gate on its own work,
+# the way it runs a probe. Anything outside the set is reported, never bucketed.
+SOURCES = {
+    "independent": "raised by someone other than the implementing session",
+    "self":        "raised by the implementing session itself",
+}
+
+# The trailing source marker on the disposition: `FIXED (self)`,
+# `FILED to D07 T01 (independent)`. Only the trailing parenthetical counts;
+# a parenthetical anywhere earlier is prose and is ignored.
+SOURCE_RE = re.compile(r"\(([^()]*)\)\s*$")
+
+
 class Finding:
     __slots__ = ("ref", "path", "line", "number", "summary", "category", "disposition",
-                 "filed_to")
+                 "filed_to", "source")
 
     def __init__(self, ref, path, line, number, summary, category, disposition,
-                 filed_to=None):
+                 filed_to=None, source=None):
         self.ref = ref
         self.path = path
         self.line = line
@@ -103,6 +121,7 @@ class Finding:
         self.category = category
         self.disposition = disposition
         self.filed_to = filed_to
+        self.source = source
 
 
 def _ref_for(name: str) -> str | None:
@@ -149,9 +168,17 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
         if disp is None:
             bad.append((path, lineno, f"unreadable disposition {disposition!r}; expected one of {sorted(DISPOSITIONS)}"))
             continue
+        sm = SOURCE_RE.search(disposition)
+        if sm is None:
+            bad.append((path, lineno, f"no source marker; end the disposition with (independent) or (self)"))
+            continue
+        source = sm.group(1).strip().lower()
+        if source not in SOURCES:
+            bad.append((path, lineno, f"unknown source {sm.group(1)!r}; expected one of {sorted(SOURCES)}"))
+            continue
         target = FILED_TO_RE.search(disposition)
         findings.append(Finding(ref, path, lineno, number, summary, cat, disp,
-                                target.group(1) if target else None))
+                                target.group(1) if target else None, source))
     return findings, bad
 
 
@@ -204,6 +231,11 @@ def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
     for disp, n in by_disp.most_common():
         print(f"    {disp:16} {n}")
 
+    by_source = Counter(f.source for f in findings)
+    print("\n  by source")
+    for src, n in by_source.most_common():
+        print(f"    {src:16} {n}")
+
     repeats = [(c, n) for c, n in by_cat.most_common() if n >= 2]
     if repeats:
         print("\n  repeats, which D00 T04 §2 says must become a question")
@@ -246,11 +278,11 @@ def render_ledger(findings: list[Finding]) -> str:
     out.append("")
     out.append("## Every finding")
     out.append("")
-    out.append("| Section | # | Category | Disposition | Summary |")
-    out.append("| --- | --- | --- | --- | --- |")
+    out.append("| Section | # | Category | Disposition | Source | Summary |")
+    out.append("| --- | --- | --- | --- | --- | --- |")
     for ref in sorted(by_section):
         for f in by_section[ref]:
-            out.append(f"| `{ref}` | {f.number} | `{f.category}` | {f.disposition} | {f.summary} |")
+            out.append(f"| `{ref}` | {f.number} | `{f.category}` | {f.disposition} | {f.source} | {f.summary} |")
     out.append("")
     return "\n".join(out)
 
@@ -261,22 +293,32 @@ def _self_test() -> int:
     f = tmp / "D00-T99-s1.md"
     f.write_text(
         "# R\n\n"
-        "### F1 -- a thing went wrong -- consistency -- FIXED\n\n"
-        "### F2 -- another thing -- consistency -- FILED to `D01 T01 §1`\n\n"
+        "### F1 -- a thing went wrong -- consistency -- FIXED (self)\n\n"
+        "### F2 -- another thing -- consistency -- FILED to `D01 T01 §1` (independent)\n\n"
         "### F3 -- a third -- performance -- FIXED\n\n"
-        "### F4 -- no category here -- FIXED\n\n"
-        "### F5 -- bad category -- nonsense -- FIXED\n\n"
+        "### F4 -- no category here -- FIXED (self)\n\n"
+        "### F5 -- bad category -- nonsense -- FIXED (self)\n\n"
+        "### F6 -- bad source -- record -- FIXED (codex)\n\n"
         "### Not a finding heading\n",
         encoding="utf-8",
     )
     failed = 0
     findings, bad = parse_file(f)
 
-    if len(findings) != 3:
-        print(f"  FAIL  expected 3 parsed findings, got {len(findings)}")
+    if len(findings) != 2:
+        print(f"  FAIL  expected 2 parsed findings, got {len(findings)}")
         failed += 1
-    if len(bad) != 2:
-        print(f"  FAIL  expected 2 unreadable headings, got {len(bad)}")
+    if len(bad) != 4:
+        print(f"  FAIL  expected 4 unreadable headings, got {len(bad)}")
+        failed += 1
+    if not any("no source marker" in w for _, _, w in bad):
+        print("  FAIL  a missing source was not reported")
+        failed += 1
+    if not any("unknown source" in w for _, _, w in bad):
+        print("  FAIL  an unknown source was not reported")
+        failed += 1
+    if [f.source for f in findings] != ["self", "independent"]:
+        print(f"  FAIL  sources parsed wrong: {[f.source for f in findings]}")
         failed += 1
     if findings and findings[0].ref != "D00 T99 §1":
         print(f"  FAIL  ref from filename wrong: {findings[0].ref}")
@@ -314,7 +356,7 @@ def _self_test() -> int:
     NL = chr(10)
     noise.write_text(NL.join([
         "## Findings", "", "### Findings", "", "### Frozen check", "",
-        "### Fixes applied", "", "### F1 -- real -- record -- FIXED", "",
+        "### Fixes applied", "", "### F1 -- real -- record -- FIXED (self)", "",
     ]), encoding="utf-8")
     nf, nb = parse_file(noise)
     if len(nf) != 1 or nb:
@@ -343,7 +385,7 @@ def _self_test() -> int:
     for x in (f, other):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 11 cases, {failed} failed")
+    print(f"todo-findings self-test: 14 cases, {failed} failed")
     return 1 if failed else 0
 
 

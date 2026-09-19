@@ -23,126 +23,126 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 
 ## Every finding
 
-| Section | # | Category | Disposition | Summary |
-| --- | --- | --- | --- | --- |
-| `D00 T01 §1` | F1 | `correctness` | fixed | the abort message was a lie for one window |
-| `D00 T01 §1` | F2 | `correctness` | fixed | a stale stamp let a foreign binary pass |
-| `D00 T01 §1` | F3 | `adversarial` | fixed | manifest-controlled recursive deletion was unbounded |
-| `D00 T01 §1` | F4 | `consistency` | fixed | a parser stack trace is not failing by name |
-| `D00 T01 §1` | F5 | `adversarial` | fixed | an optional field silently changed what was trusted |
-| `D00 T01 §1` | F6 | `record` | corrected | the self-contained claim is narrower than the section originally stated |
-| `D00 T01 §2` | F1 | `correctness` | fixed | centralising the link flags broke the standalone extension build |
-| `D00 T01 §2` | F2 | `correctness` | fixed | the build scripts had never worked |
-| `D00 T01 §2` | F3 | `correctness` | fixed | a reinterpret_cast defeated the type check it existed to enable |
-| `D00 T01 §2` | F4 | `record` | corrected | "Bin/Release contains exactly one file" was true and readable as more |
-| `D00 T01 §2` | F5 | `consistency` | corrected | a claim cited build output |
-| `D00 T01 §3` | F1 | `correctness` | fixed | the baseline was measured by an instrument that dropped a whole category |
-| `D00 T01 §3` | F2 | `consistency` | corrected | the third-party exemption and the section's own Done-when were in direct conflict |
-| `D00 T01 §3` | F3 | `record` | corrected | the 93 lunasvg warnings were an artifact of my own probe |
-| `D00 T01 §3` | F4 | `record` | corrected | the section was written against a toolchain that no longer exists |
-| `D00 T01 §3` | F5 | `record` | corrected | an unsourced figure that read as a measurement |
-| `D00 T01 §3` | F6 | `design` | corrected | 91 percent of the first baseline was one style check |
-| `D00 T01 §3` | F7 | `consistency` | fixed | two claims went stale from this commit |
-| `D00 T01 §4` | F1 | `correctness` | fixed | a Debug binary shipped as Release, and it had already happened here |
-| `D00 T01 §4` | F2 | `correctness` | fixed | the launcher could only be built from the repository root |
-| `D00 T01 §4` | F3 | `consistency` | fixed | a failed compile discarded the compiler's diagnostics |
-| `D00 T01 §4` | F4 | `consistency` | corrected | "both architectures" contradicted a decision `§1` had already recorded |
-| `D00 T01 §4` | F5 | `record` | corrected | the output item named the wrong directory |
-| `D00 T01 §4` | F6 | `correctness` | corrected | a build script that had never built the launcher |
-| `D00 T01 §4` | F7 | `record` | corrected | an escape sequence corrupted the record |
-| `D00 T01 §5` | F1 | `correctness` | fixed | the gate reported success on analysis that never ran |
-| `D00 T01 §5` | F2 | `integration` | fixed | an entire shipped extension was analysed by nothing |
-| `D00 T01 §5` | F3 | `consistency` | corrected | "both architectures", for the second time in one file |
-| `D00 T01 §5` | F4 | `record` | corrected | a claim was filed into the wrong section, and this section falsified it |
-| `D00 T01 §5` | F5 | `record` | corrected | writing about a claim filed a claim |
-| `D00 T01 §5` | F6 | `record` | corrected | a checkpoint written before the build had two configurations |
-| `D00 T01 §5` | F7 | `consistency` | corrected | a stale preset name in another section |
-| `D00 T01 §6` | F1 | `correctness` | fixed | established facts were discarded when a different lookup failed |
-| `D00 T01 §6` | F2 | `design` | fixed | my fix for F1 printed `System.Object[]` |
-| `D00 T01 §6` | F3 | `record` | cleared | the version table was re-measured rather than trusted |
-| `D00 T01 §6` | F4 | `record` | corrected | the size baseline named a figure its own source superseded |
-| `D00 T01 §6` | F5 | `adversarial` | corrected | a network check was being wired into a gate that must work offline |
-| `D00 T01 §6` | F6 | `source-defect` | cleared | clang-tidy 21 had a false positive that 23 retired |
-| `D00 T02 §1` | F1 | `correctness` | fixed | a defect `§5` already fixed, reintroduced here |
-| `D00 T02 §1` | F2 | `integration` | fixed | adding our own tests put 37 dependency findings into the baseline |
-| `D00 T02 §1` | F3 | `source-defect` | fixed | the link failed because UNICODE propagates publicly |
-| `D00 T02 §1` | F4 | `design` | corrected | the tool tag is not printable, and the requirement was still met |
-| `D00 T02 §1` | F5 | `record` | corrected | the checkpoint still named the preset its own first item had corrected |
-| `D00 T02 §1` | F6 | `consistency` | corrected | a scratch file that was never a test |
-| `D00 T02 §2` | F1 | `adversarial` | fixed | the boundary guard was not applied to the fixture's own root |
-| `D00 T02 §2` | F2 | `correctness` | fixed | the sweep reported success while leaving residue |
-| `D00 T02 §2` | F3 | `correctness` | fixed | a fixture that could not read back what it wrote |
-| `D00 T02 §2` | F4 | `adversarial` | fixed | RAII does not survive a process death, and the checkpoint could not see it |
-| `D00 T02 §2` | F5 | `adversarial` | corrected | the registry root sat one level below live user settings |
-| `D00 T02 §2` | F6 | `record` | cleared | the unelevated claim was checked rather than assumed |
-| `D00 T02 §3` | F1 | `record` | corrected | the section was the wrong shape, and the operator's question found it |
-| `D00 T02 §3` | F2 | `adversarial` | fixed | the helper sent input to whatever had focus, and I had already said so |
-| `D00 T02 §3` | F3 | `adversarial` | fixed | the cleanup could kill a process the operator already had open |
-| `D00 T02 §3` | F4 | `adversarial` | fixed | no target meant "capture the first window you find" |
-| `D00 T02 §3` | F5 | `correctness` | fixed | a committed sidecar said 100% while the image was stretched at 150% |
-| `D00 T02 §3` | F6 | `record` | fixed | the plan named the section by a title it no longer had |
-| `D00 T02 §4` | F1 | `record` | corrected | `Ownership` does not do what the plan said it did |
-| `D00 T02 §4` | F2 | `record` | corrected | the section asked for something circular, undrivable and destructive |
-| `D00 T02 §4` | F3 | `correctness` | fixed | unpadded hex collided two different binary values |
-| `D00 T02 §4` | F4 | `adversarial` | fixed | an unreadable scope became an empty snapshot |
-| `D00 T02 §4` | F5 | `correctness` | fixed | an empty registry key left no trace |
-| `D00 T02 §4` | F6 | `adversarial` | fixed | a malformed row was discarded rather than refused |
-| `D00 T02 §4` | F7 | `correctness` | fixed | the parser lost a trailing empty field, and a backslash |
-| `D00 T02 §4` | F8 | `record` | filed | XREF reciprocity is enforced per FILE, not per section |
-| `D00 T02 §5` | F1 | `adversarial` | corrected | forcing high contrast was demanded, and no override exists to verify |
-| `D00 T02 §5` | F2 | `test-coverage` | corrected | the crossfade endpoint was covered as blend math, not delivery |
-| `D00 T02 §5` | F3 | `record` | corrected | the controls item was ticked while three behaviors sat in Uncovered |
-| `D00 T02 §5` | F4 | `record` | corrected | the manager test counted subscribers but never delivered a tick |
-| `D00 T02 §5` | F5 | `record` | fixed | the checkpoint's three failures were asserted, never quoted |
-| `D00 T02 §5` | F6 | `test-coverage` | fixed | three easings had no midpoint pin |
-| `D00 T02 §5` | F7 | `integration` | fixed | controls cases left manager-held `[this]` lambdas behind at teardown |
-| `D00 T02 §5` | F8 | `record` | corrected | the record claimed the cases share no state |
-| `D00 T02 §5` | F9 | `record` | corrected | covered behavior was listed as uncovered, and a read as a write |
-| `D00 T02 §5` | F10 | `consistency` | fixed | two comments described code other than what followed them |
-| `D00 T02 §5` | F11 | `integration` | fixed | palette save and restore was hand-rolled, not RAII |
-| `D00 T02 §5` | F12 | `record` | fixed | the checkpoint command itself was never quoted |
-| `D00 T02 §5` | F13 | `consistency` | fixed | the TU relied on transitive includes for Win32 and wide strings |
-| `D00 T02 §5` | F14 | `integration` | fixed | the edit-sessions item died before the view borrowing it |
-| `D00 T02 §5` | F15 | `record` | corrected | the tidy citation rotted when the guard moved the line |
-| `D00 T02 §5` | F16 | `test-coverage` | filed | the collapse case checks a value against itself |
-| `D00 T03 §1` | F1 | `consistency` | fixed | four claims pointed into gitignored `samples/` |
-| `D00 T03 §1` | F2 | `record` | fixed | the Test checkpoint named components, not paths |
-| `D00 T03 §1` | F3 | `consistency` | fixed | `AGENTS.md` did not describe the root it now has |
-| `D00 T03 §1` | F4 | `integration` | cleared | the build depended on the gitignored `samples/` tree |
-| `D00 T03 §1` | F5 | `consistency` | filed | `test_font.cpp` tracked at the repository root |
-| `D00 T03 §2` | F1 | `consistency` | fixed | `IDI_APPFALLBACK` defined twice |
-| `D00 T03 §2` | F2 | `consistency` | advisory | the `Resolute_32.png` and `Resolute_48.png` assets are referenced by nothing |
-| `D00 T03 §3` | F1 | `consistency` | fixed | three identifier families survived the rename |
-| `D00 T03 §3` | F2 | `reproducibility` | filed | the build is not reproducible |
-| `D00 T03 §4` | F1 | `record` | fixed | both superseded-file headers stated their own line count |
-| `D00 T03 §4` | F2 | `correctness` | filed | the claims checker silently drops a claim it cannot parse |
-| `D00 T03 §4` | F3 | `record` | routed | `TODO.md` held one idea the plan does not cover |
-| `D00 T03 §4` | F4 | `record` | filed | there is no `LICENSE` file |
-| `D00 T04 §1` | F1-F4 | `correctness` | fixed | raised by the independent review, all four correct |
-| `D00 T04 §1` | F5 | `performance` | fixed | the default run paid for an analysis it did not use |
-| `D00 T04 §1` | F6 | `record` | fixed | the section's own block had gone stale |
-| `D00 T04 §2` | F1-F2 | `correctness` | fixed | raised by the independent review, both correct |
-| `D00 T04 §2` | F3 | `correctness` | fixed | the heading pattern matched ordinary headings |
-| `D00 T04 §2` | F4 | `record` | fixed | the ledger goes stale on every review that does not regenerate it |
-| `D00 T04 §3` | F1-F3 | `correctness` | fixed | raised by the independent review, all three correct |
-| `D00 T04 §3` | F4 | `performance` | fixed | the whole git log was re-fetched once per section |
-| `D00 T04 §4` | F1 | `correctness` | fixed | the chain was wrong, in the way that matters most |
-| `D00 T04 §4` | F2 | `correctness` | fixed | a documented reference form matched nothing |
-| `D00 T04 §4` | F3 | `correctness` | fixed | unreadable evidence was reported as absent evidence |
-| `D00 T04 §4` | F4 | `record` | fixed | the headline number counted work that cannot be delayed |
-| `D00 T04 §5` | F1 | `record` | corrected | the section's own premise was wrong, and the advisory was mostly right |
-| `D00 T04 §5` | F2 | `source-defect` | corrected | the compound `document` rule was accused and is correct |
-| `D00 T04 §5` | F3 | `correctness` | fixed | one message covered three defects and asserted what it had not tested |
-| `D00 T04 §5` | F4 | `consistency` | fixed | a citation that resolved to nothing, in two source files |
-| `D00 T04 §5` | F5 | `design` | fixed | the vocabulary helper printed regex, not words |
-| `D00 T04 §5` | F6 | `record` | advisory | my own measuring instruments failed three times |
-| `D07 T01 §1` | F1 | `record` | corrected | the measured defect classes are eight, not seven |
-| `D07 T01 §1` | F2 | `record` | routed | the section was told to wait for a decision that has no owner here |
-| `D07 T01 §1` | F3 | `record` | corrected | the checkpoint could not fail |
-| `D07 T01 §1` | F4 | `correctness` | fixed | C15 forbade the entire purpose of a repair tool |
-| `D07 T01 §1` | F5 | `adversarial` | fixed | two spaces bypassed the checker entirely |
-| `D07 T01 §1` | F6 | `test-coverage` | fixed | the checker had nothing exercising it |
-| `D07 T01 §1` | F7 | `consistency` | fixed | the C15 fix did not reach the two places that summarise it |
-| `D07 T01 §1` | F8 | `correctness` | fixed | the checker counted defect classes instead of identifying them |
-| `D07 T01 §1` | F9 | `record` | fixed | the stamp's own inventory was wrong |
-| `D07 T01 §1` | F10 | `record` | fixed | the self-test was described as 14 refusal cases and is not |
+| Section | # | Category | Disposition | Source | Summary |
+| --- | --- | --- | --- | --- | --- |
+| `D00 T01 §1` | F1 | `correctness` | fixed | independent | the abort message was a lie for one window |
+| `D00 T01 §1` | F2 | `correctness` | fixed | independent | a stale stamp let a foreign binary pass |
+| `D00 T01 §1` | F3 | `adversarial` | fixed | self | manifest-controlled recursive deletion was unbounded |
+| `D00 T01 §1` | F4 | `consistency` | fixed | self | a parser stack trace is not failing by name |
+| `D00 T01 §1` | F5 | `adversarial` | fixed | self | an optional field silently changed what was trusted |
+| `D00 T01 §1` | F6 | `record` | corrected | self | the self-contained claim is narrower than the section originally stated |
+| `D00 T01 §2` | F1 | `correctness` | fixed | independent | centralising the link flags broke the standalone extension build |
+| `D00 T01 §2` | F2 | `correctness` | fixed | self | the build scripts had never worked |
+| `D00 T01 §2` | F3 | `correctness` | fixed | self | a reinterpret_cast defeated the type check it existed to enable |
+| `D00 T01 §2` | F4 | `record` | corrected | self | "Bin/Release contains exactly one file" was true and readable as more |
+| `D00 T01 §2` | F5 | `consistency` | corrected | self | a claim cited build output |
+| `D00 T01 §3` | F1 | `correctness` | fixed | independent | the baseline was measured by an instrument that dropped a whole category |
+| `D00 T01 §3` | F2 | `consistency` | corrected | self | the third-party exemption and the section's own Done-when were in direct conflict |
+| `D00 T01 §3` | F3 | `record` | corrected | self | the 93 lunasvg warnings were an artifact of my own probe |
+| `D00 T01 §3` | F4 | `record` | corrected | self | the section was written against a toolchain that no longer exists |
+| `D00 T01 §3` | F5 | `record` | corrected | self | an unsourced figure that read as a measurement |
+| `D00 T01 §3` | F6 | `design` | corrected | self | 91 percent of the first baseline was one style check |
+| `D00 T01 §3` | F7 | `consistency` | fixed | self | two claims went stale from this commit |
+| `D00 T01 §4` | F1 | `correctness` | fixed | independent | a Debug binary shipped as Release, and it had already happened here |
+| `D00 T01 §4` | F2 | `correctness` | fixed | independent | the launcher could only be built from the repository root |
+| `D00 T01 §4` | F3 | `consistency` | fixed | independent | a failed compile discarded the compiler's diagnostics |
+| `D00 T01 §4` | F4 | `consistency` | corrected | self | "both architectures" contradicted a decision `§1` had already recorded |
+| `D00 T01 §4` | F5 | `record` | corrected | self | the output item named the wrong directory |
+| `D00 T01 §4` | F6 | `correctness` | corrected | self | a build script that had never built the launcher |
+| `D00 T01 §4` | F7 | `record` | corrected | self | an escape sequence corrupted the record |
+| `D00 T01 §5` | F1 | `correctness` | fixed | independent | the gate reported success on analysis that never ran |
+| `D00 T01 §5` | F2 | `integration` | fixed | independent | an entire shipped extension was analysed by nothing |
+| `D00 T01 §5` | F3 | `consistency` | corrected | self | "both architectures", for the second time in one file |
+| `D00 T01 §5` | F4 | `record` | corrected | self | a claim was filed into the wrong section, and this section falsified it |
+| `D00 T01 §5` | F5 | `record` | corrected | self | writing about a claim filed a claim |
+| `D00 T01 §5` | F6 | `record` | corrected | self | a checkpoint written before the build had two configurations |
+| `D00 T01 §5` | F7 | `consistency` | corrected | self | a stale preset name in another section |
+| `D00 T01 §6` | F1 | `correctness` | fixed | independent | established facts were discarded when a different lookup failed |
+| `D00 T01 §6` | F2 | `design` | fixed | self | my fix for F1 printed `System.Object[]` |
+| `D00 T01 §6` | F3 | `record` | cleared | self | the version table was re-measured rather than trusted |
+| `D00 T01 §6` | F4 | `record` | corrected | self | the size baseline named a figure its own source superseded |
+| `D00 T01 §6` | F5 | `adversarial` | corrected | self | a network check was being wired into a gate that must work offline |
+| `D00 T01 §6` | F6 | `source-defect` | cleared | self | clang-tidy 21 had a false positive that 23 retired |
+| `D00 T02 §1` | F1 | `correctness` | fixed | independent | a defect `§5` already fixed, reintroduced here |
+| `D00 T02 §1` | F2 | `integration` | fixed | self | adding our own tests put 37 dependency findings into the baseline |
+| `D00 T02 §1` | F3 | `source-defect` | fixed | self | the link failed because UNICODE propagates publicly |
+| `D00 T02 §1` | F4 | `design` | corrected | self | the tool tag is not printable, and the requirement was still met |
+| `D00 T02 §1` | F5 | `record` | corrected | self | the checkpoint still named the preset its own first item had corrected |
+| `D00 T02 §1` | F6 | `consistency` | corrected | self | a scratch file that was never a test |
+| `D00 T02 §2` | F1 | `adversarial` | fixed | independent | the boundary guard was not applied to the fixture's own root |
+| `D00 T02 §2` | F2 | `correctness` | fixed | independent | the sweep reported success while leaving residue |
+| `D00 T02 §2` | F3 | `correctness` | fixed | independent | a fixture that could not read back what it wrote |
+| `D00 T02 §2` | F4 | `adversarial` | fixed | self | RAII does not survive a process death, and the checkpoint could not see it |
+| `D00 T02 §2` | F5 | `adversarial` | corrected | self | the registry root sat one level below live user settings |
+| `D00 T02 §2` | F6 | `record` | cleared | self | the unelevated claim was checked rather than assumed |
+| `D00 T02 §3` | F1 | `record` | corrected | independent | the section was the wrong shape, and the operator's question found it |
+| `D00 T02 §3` | F2 | `adversarial` | fixed | independent | the helper sent input to whatever had focus, and I had already said so |
+| `D00 T02 §3` | F3 | `adversarial` | fixed | independent | the cleanup could kill a process the operator already had open |
+| `D00 T02 §3` | F4 | `adversarial` | fixed | independent | no target meant "capture the first window you find" |
+| `D00 T02 §3` | F5 | `correctness` | fixed | independent | a committed sidecar said 100% while the image was stretched at 150% |
+| `D00 T02 §3` | F6 | `record` | fixed | self | the plan named the section by a title it no longer had |
+| `D00 T02 §4` | F1 | `record` | corrected | self | `Ownership` does not do what the plan said it did |
+| `D00 T02 §4` | F2 | `record` | corrected | self | the section asked for something circular, undrivable and destructive |
+| `D00 T02 §4` | F3 | `correctness` | fixed | independent | unpadded hex collided two different binary values |
+| `D00 T02 §4` | F4 | `adversarial` | fixed | independent | an unreadable scope became an empty snapshot |
+| `D00 T02 §4` | F5 | `correctness` | fixed | independent | an empty registry key left no trace |
+| `D00 T02 §4` | F6 | `adversarial` | fixed | independent | a malformed row was discarded rather than refused |
+| `D00 T02 §4` | F7 | `correctness` | fixed | self | the parser lost a trailing empty field, and a backslash |
+| `D00 T02 §4` | F8 | `record` | filed | self | XREF reciprocity is enforced per FILE, not per section |
+| `D00 T02 §5` | F1 | `adversarial` | corrected | independent | forcing high contrast was demanded, and no override exists to verify |
+| `D00 T02 §5` | F2 | `test-coverage` | corrected | independent | the crossfade endpoint was covered as blend math, not delivery |
+| `D00 T02 §5` | F3 | `record` | corrected | independent | the controls item was ticked while three behaviors sat in Uncovered |
+| `D00 T02 §5` | F4 | `record` | corrected | independent | the manager test counted subscribers but never delivered a tick |
+| `D00 T02 §5` | F5 | `record` | fixed | independent | the checkpoint's three failures were asserted, never quoted |
+| `D00 T02 §5` | F6 | `test-coverage` | fixed | independent | three easings had no midpoint pin |
+| `D00 T02 §5` | F7 | `integration` | fixed | independent | controls cases left manager-held `[this]` lambdas behind at teardown |
+| `D00 T02 §5` | F8 | `record` | corrected | independent | the record claimed the cases share no state |
+| `D00 T02 §5` | F9 | `record` | corrected | independent | covered behavior was listed as uncovered, and a read as a write |
+| `D00 T02 §5` | F10 | `consistency` | fixed | independent | two comments described code other than what followed them |
+| `D00 T02 §5` | F11 | `integration` | fixed | independent | palette save and restore was hand-rolled, not RAII |
+| `D00 T02 §5` | F12 | `record` | fixed | independent | the checkpoint command itself was never quoted |
+| `D00 T02 §5` | F13 | `consistency` | fixed | independent | the TU relied on transitive includes for Win32 and wide strings |
+| `D00 T02 §5` | F14 | `integration` | fixed | independent | the edit-sessions item died before the view borrowing it |
+| `D00 T02 §5` | F15 | `record` | corrected | independent | the tidy citation rotted when the guard moved the line |
+| `D00 T02 §5` | F16 | `test-coverage` | filed | independent | the collapse case checks a value against itself |
+| `D00 T03 §1` | F1 | `consistency` | fixed | self | four claims pointed into gitignored `samples/` |
+| `D00 T03 §1` | F2 | `record` | fixed | self | the Test checkpoint named components, not paths |
+| `D00 T03 §1` | F3 | `consistency` | fixed | self | `AGENTS.md` did not describe the root it now has |
+| `D00 T03 §1` | F4 | `integration` | cleared | self | the build depended on the gitignored `samples/` tree |
+| `D00 T03 §1` | F5 | `consistency` | filed | self | `test_font.cpp` tracked at the repository root |
+| `D00 T03 §2` | F1 | `consistency` | fixed | self | `IDI_APPFALLBACK` defined twice |
+| `D00 T03 §2` | F2 | `consistency` | advisory | self | the `Resolute_32.png` and `Resolute_48.png` assets are referenced by nothing |
+| `D00 T03 §3` | F1 | `consistency` | fixed | self | three identifier families survived the rename |
+| `D00 T03 §3` | F2 | `reproducibility` | filed | self | the build is not reproducible |
+| `D00 T03 §4` | F1 | `record` | fixed | self | both superseded-file headers stated their own line count |
+| `D00 T03 §4` | F2 | `correctness` | filed | self | the claims checker silently drops a claim it cannot parse |
+| `D00 T03 §4` | F3 | `record` | routed | self | `TODO.md` held one idea the plan does not cover |
+| `D00 T03 §4` | F4 | `record` | filed | self | there is no `LICENSE` file |
+| `D00 T04 §1` | F1-F4 | `correctness` | fixed | independent | raised by the independent review, all four correct |
+| `D00 T04 §1` | F5 | `performance` | fixed | self | the default run paid for an analysis it did not use |
+| `D00 T04 §1` | F6 | `record` | fixed | self | the section's own block had gone stale |
+| `D00 T04 §2` | F1-F2 | `correctness` | fixed | independent | raised by the independent review, both correct |
+| `D00 T04 §2` | F3 | `correctness` | fixed | self | the heading pattern matched ordinary headings |
+| `D00 T04 §2` | F4 | `record` | fixed | self | the ledger goes stale on every review that does not regenerate it |
+| `D00 T04 §3` | F1-F3 | `correctness` | fixed | independent | raised by the independent review, all three correct |
+| `D00 T04 §3` | F4 | `performance` | fixed | self | the whole git log was re-fetched once per section |
+| `D00 T04 §4` | F1 | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
+| `D00 T04 §4` | F2 | `correctness` | fixed | independent | a documented reference form matched nothing |
+| `D00 T04 §4` | F3 | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
+| `D00 T04 §4` | F4 | `record` | fixed | self | the headline number counted work that cannot be delayed |
+| `D00 T04 §5` | F1 | `record` | corrected | self | the section's own premise was wrong, and the advisory was mostly right |
+| `D00 T04 §5` | F2 | `source-defect` | corrected | self | the compound `document` rule was accused and is correct |
+| `D00 T04 §5` | F3 | `correctness` | fixed | self | one message covered three defects and asserted what it had not tested |
+| `D00 T04 §5` | F4 | `consistency` | fixed | self | a citation that resolved to nothing, in two source files |
+| `D00 T04 §5` | F5 | `design` | fixed | self | the vocabulary helper printed regex, not words |
+| `D00 T04 §5` | F6 | `record` | advisory | self | my own measuring instruments failed three times |
+| `D07 T01 §1` | F1 | `record` | corrected | self | the measured defect classes are eight, not seven |
+| `D07 T01 §1` | F2 | `record` | routed | self | the section was told to wait for a decision that has no owner here |
+| `D07 T01 §1` | F3 | `record` | corrected | self | the checkpoint could not fail |
+| `D07 T01 §1` | F4 | `correctness` | fixed | independent | C15 forbade the entire purpose of a repair tool |
+| `D07 T01 §1` | F5 | `adversarial` | fixed | independent | two spaces bypassed the checker entirely |
+| `D07 T01 §1` | F6 | `test-coverage` | fixed | independent | the checker had nothing exercising it |
+| `D07 T01 §1` | F7 | `consistency` | fixed | independent | the C15 fix did not reach the two places that summarise it |
+| `D07 T01 §1` | F8 | `correctness` | fixed | independent | the checker counted defect classes instead of identifying them |
+| `D07 T01 §1` | F9 | `record` | fixed | independent | the stamp's own inventory was wrong |
+| `D07 T01 §1` | F10 | `record` | fixed | independent | the self-test was described as 14 refusal cases and is not |
