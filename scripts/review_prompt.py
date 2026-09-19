@@ -623,9 +623,10 @@ def read_attestation(text: str) -> dict:
         raise ValueError(f"attestation is not JSON: {exc}")
     if not isinstance(doc, dict):
         raise ValueError("attestation is not an object")
-    if doc.get("schema") != ATTEST_SCHEMA:
+    schema = doc.get("schema")
+    if type(schema) is not int or schema != ATTEST_SCHEMA:
         raise ValueError(
-            f"attestation schema is {doc.get('schema')!r}, this reader asserts {ATTEST_SCHEMA}")
+            f"attestation schema is {schema!r}, this reader asserts {ATTEST_SCHEMA}")
     try:
         write_attestation(**{k: doc[k] for k in _ATTEST_FIELDS})
     except KeyError as exc:
@@ -882,6 +883,14 @@ def _self_test() -> int:
         check("attest-bad-schema", False, "no ValueError")
     except ValueError as exc:
         check("attest-bad-schema", "schema" in str(exc), str(exc))
+    # `True == 1` and `1.0 == 1` in Python, so `!=` alone admits both
+    # (the §14 bug class, in this reader): the schema gates on exact int.
+    for bad_schema, case in (("true", "bool"), ("1.0", "float")):
+        try:
+            read_attestation(att.replace('"schema": 1', f'"schema": {bad_schema}'))
+            check(f"attest-schema-not-{case}", False, "no ValueError")
+        except ValueError as exc:
+            check(f"attest-schema-not-{case}", "schema" in str(exc), str(exc))
     try:
         read_attestation("not json {{{")
         check("attest-not-json", False, "no ValueError")
