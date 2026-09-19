@@ -141,13 +141,43 @@ MANIFEST_RE = re.compile(
 _DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP")
 _DIFF_LINE_RE = re.compile(r"^diff --git (?P<rest>.+?)\s*$")
 _DIFF_QUOTED_RE = re.compile(r'^"a/((?:[^"\\]|\\.)*)"\s+(?P<right>.*)$')
+_RENAME_RE = re.compile(r"^rename (?P<dir>from|to) (?P<path>.+?)\s*$")
+
+
+def _rename_path(raw: str) -> str:
+    """One `rename from/to` value: whole-token C-quoted or bare to EOL."""
+    raw = raw.strip()
+    if len(raw) >= 2 and raw.startswith('"') and raw.endswith('"'):
+        return _unquote_git_path(raw[1:-1])
+    return raw
+
+
+def _scan_diff_block(lines: list[str]) -> list[str]:
+    """Changed paths from one diff block (a `diff --git` line plus its
+    header): the `rename from/to` pair when git names one (exact even
+    when both sides carry spaces), else the `diff --git` sides."""
+    renames: dict[str, str] = {}
+    diff_line = None
+    for line in lines:
+        if diff_line is None and _DIFF_LINE_RE.match(line):
+            diff_line = line
+        rm = _RENAME_RE.match(line)
+        if rm and rm.group("dir") not in renames:
+            renames[rm.group("dir")] = _rename_path(rm.group("path"))
+    if "from" in renames and "to" in renames:
+        old, new = renames["from"], renames["to"]
+        return [new] if old == new else [old, new]
+    if diff_line is None:
+        return []
+    return _diff_paths(diff_line)
 
 
 def _diff_paths(line: str) -> list[str]:
     """Changed paths from one `diff --git` line: the b-side always, the
     a-side too when a rename makes them differ. Bare sides may carry
     spaces (git leaves those unquoted); several ` b/` splits prefer
-    the one whose sides agree, else the last, deterministically."""
+    the one whose sides agree, which real non-renames always have,
+    else the last, which fires only on lines git never emits."""
     m = _DIFF_LINE_RE.match(line)
     if m is None:
         return []
@@ -226,10 +256,17 @@ def build_manifest(tag: str, chunks: list[tuple[str, str]],
     diff_files = []
     for title, chunk_body in chunks:
         if _DIFF_TITLE_RE.search(title):
+            block: list[str] = []
             for chunk_line in chunk_body.splitlines():
-                for path in _diff_paths(chunk_line):
-                    if path not in diff_files:
-                        diff_files.append(path)
+                if _DIFF_LINE_RE.match(chunk_line) and block:
+                    for path in _scan_diff_block(block):
+                        if path not in diff_files:
+                            diff_files.append(path)
+                    block = []
+                block.append(chunk_line)
+            for path in _scan_diff_block(block):
+                if path not in diff_files:
+                    diff_files.append(path)
     if diff_files:
         line += " diff-files=" + "|".join(diff_files)
     if base is not None:
@@ -503,6 +540,16 @@ def _self_test() -> int:
     for want in ("my file.md", "caf\u00e9.md", 'quo"te.md', "renamed.md",
                  "old.md", "new.md", "gone.md"):
         check(f"manifest-grammar-{want}", want in mline3, mline3)
+    # The adversarial split: bare ` b/` on both sides of a rename, where
+    # the agree-else-last rule fabricates a path in neither side. The
+    # rename pair git emits for exactly this case is authoritative.
+    hostile = ("diff --git a/old b/x.md b/new b/y.md\n"
+               "similarity index 50%\n"
+               "rename from old b/x.md\n"
+               "rename to new b/y.md\n")
+    mline4, _ = build_manifest(tag, [("CANDIDATE DIFF", hostile)])
+    check("manifest-rename-authoritative",
+          "diff-files=old b/x.md|new b/y.md" in mline4, mline4)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
