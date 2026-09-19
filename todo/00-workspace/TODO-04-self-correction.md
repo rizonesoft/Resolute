@@ -73,6 +73,7 @@ track: W1
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [ ]   |
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [ ]   |
+|  17   |   §17   | Report without walking the corpus twice       | §10     |  [ ]   |
 
 ---
 
@@ -468,7 +469,7 @@ So this section is mostly wiring and measurement rather than construction, and i
 **Trigger met 2026-09-19:** five `runner: panel` blocks exist: D00-T02-S5, D00-T04-S6, D00-T04-S7, D00-T04-S9, D00-T04-S10. The explicit block is lifted.
 
 
-- [ ] Compare both rungs on shared candidates, blinded: each rung reviews one frozen candidate without seeing the other's output or its fixes. Done when: at least one blinded comparison exists and the overlap is measured on shared input.
+- [x] Compare both rungs on shared candidates, blinded: each rung reviews one frozen candidate without seeing the other's output or its fixes. Done when: at least one blinded comparison exists and the overlap is measured on shared input. Done: frozen candidate `f118e30` (diff plus period §10 contract), both rungs in a detached worktree at the candidate so the fix commits are unreadable, separate invocations, both outputs `PASS four lenses, one verdict each`. Sol found 4, Opus 7; same-defect matches 2 (panel-shape terminology, round_lines type crash), union 9, Jaccard 0.22. Sol-only: presence-only generality, pre-change-commit binding (Opus approved record). Opus-only: number crash, dead-ref dupe gap, em dash, flag conflict, double schema message. Four live defects filed (§15 terminology item, §16); the fixed five confirm the panel's F1-F4 class re-finds blinded.
 - [ ] Specify the cut threshold before deciding: the rolling window, the overlap denominator, severity weighting, and the cost measure. Done when: the rule names all four, and a worked example shows a cut and a keep.
 - [ ] Compare lens and prompt diversity against model diversity on shared candidates. Done when: same-candidate adversarial, integration, record, and performance passes are measured against the second model, and the decision says which diversity carries the finds.
 - [ ] Decide keep or cut from the run-record export, not the prose. Done when: the decision is dated, cites the measured numbers from `todo-runs.py --export` (version asserted by `--check-export`), and either keeps with the next revisit named or cuts with the losing rung's duties reassigned.
@@ -484,6 +485,7 @@ So this section is mostly wiring and measurement rather than construction, and i
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR16 D00-T04-S6-PR16
 -> XREF: D00 T04 §10 -- the enriched records this decision consumes
 -> XREF: D00 T04 §16 -- the checker defects this section's blinded runs filed
+-> XREF: D00 T04 §17 -- the double traversal this section's diversity runs filed
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR20 D00-T04-S7-PR20
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR7 D00-T04-S10-PR7
 
@@ -632,6 +634,8 @@ The §10 plan review accepted three minors the enriched records leave open: late
 - [ ] Report unresolved-field coverage per field and model in `--report`, extending the existing cost line. Done when: version, latency, and cost each show recorded-vs-unresolved counts, quoted from a driven report.
 - [ ] Bind each transition's evidence to the commit whose tree holds the quoted record. Done when: every block carries the binding, the checker asserts it resolves, and one rebinding failure is quoted.
 - [ ] Pin the panel shape against voided rounds: the terminology block states Sol rounds 1-2 with the Opus sign-off at round 3 unconditionally, while the S9 block numbers a voided Sol round 2 and signs off at round 4. Done when: the header admits voids consuming numbers, quoted, and the S9 block reads consistent with it.
+- [ ] Carry per-finding dispositions in the export, so a snapshot consumer can compute accepted yield without rejoining live records that may postdate the as-of. Done when: the export asserts dispositions per ref, quoted, and the live round-trip passes.
+- [ ] Settle the provider vocabulary: round lines record runner names (`codex`, `claude`) where provider-level queries want the serving provider. Done when: the header defines what `provider` names, quoted, and the closed set matches the definition.
 - [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
 
 **Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; all quoted from driven runs.
@@ -641,6 +645,8 @@ The §10 plan review accepted three minors the enriched records leave open: late
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR6 D00-T04-S10-PR6
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR10 D00-T04-S10-PR10
 -> SOURCE: blind-D00-T04-s8-2026-09-19-term D00-T04-S8-B1
+-> SOURCE: div-D00-T04-s8-2026-09-19-I4 D00-T04-S8-D1
+-> SOURCE: div-D00-T04-s8-2026-09-19-R4 D00-T04-S8-D2
 
 ## 16. Blinded-Run Checker Defects
 
@@ -657,6 +663,18 @@ The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three
 -> SOURCE: blind-D00-T04-s8-2026-09-19-OA3 D00-T04-S8-B2
 -> SOURCE: blind-D00-T04-s8-2026-09-19-OI1 D00-T04-S8-B3
 -> SOURCE: blind-D00-T04-s8-2026-09-19-OI2 D00-T04-S8-B4
+
+## 17. Report Without Walking the Corpus Twice
+
+The §8 diversity runs found `report()` calls `TF.collect()` after `run_check()` already collected the same corpus through `cross_check`, doubling repository-wide file reads and parsing on every `--report`. True and cheap to fix by threading the collected findings through; unnoticed because the corpus is 25 files and the report runs in milliseconds, which is also why this is a single-item section rather than a performance project.
+
+- [ ] Thread the collected findings from `run_check` through `report` so `--report` walks the review corpus once. Done when: one `TF.collect()` serves the check and the report, quoted from the code path, and the report output is byte-identical before and after.
+- [ ] Commit: `"workspace: report without walking the corpus twice"`
+
+**Test checkpoint:** The report output is byte-identical across the change, quoted; the self-test pins the single collection.
+
+-> XREF: D00 T04 §8 -- the diversity runs that found this
+-> SOURCE: div-D00-T04-s8-2026-09-19-P1 D00-T04-S8-D3
 
 ## Verification
 
