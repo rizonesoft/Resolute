@@ -373,7 +373,7 @@ def run_check(runs_path):
     try:
         text = io.open(runs_path, encoding="utf-8").read()
     except OSError as exc:
-        return [(0, f"cannot read {runs_path}: {exc}")]
+        return [], [(0, f"cannot read {runs_path}: {exc}")]
     runs, errors = parse_runs(text)
     check_runs(runs, errors)
     if not errors:
@@ -545,6 +545,10 @@ refuted: 0
     _r, _e = parse_runs(only_self)
     cc = cross_check(_r, collected=fixture, review_sections=sections | {"D00-T01-S9"})
     check("missing-run-reported", any("no run block" in m for _, m in cc), f"{cc}")
+
+    runs_u, errors_u = run_check(Path("/tmp/nope-does-not-exist.md"))
+    check("unreadable-reported", runs_u == [] and any("cannot read" in m for _, m in errors_u),
+          f"{runs_u} {errors_u}")
 
     print(f"todo-runs self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:

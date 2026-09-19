@@ -1,29 +1,15 @@
 # Review-run records
 
-One block per stamped section whose review reached an independent round.
-Checked by `scripts/todo-runs.py --check`, which cross-reads the per-section
-review files: every listed ref must resolve to an independent-marked finding
-heading, every `(independent)` mark must be listed by exactly one run, every
-review file must have a run block, `empty` must equal the rounds with outcome
-`empty`, and `refuted` must equal the listed refs whose disposition is
-refuted. Panel runs additionally re-read their round verdicts from the review
-file's panel sections, and every candidate must be a commit that exists.
+One block per stamped section whose review reached an independent round. Checked by `scripts/todo-runs.py --check`, which cross-reads the per-section review files: every listed ref must resolve to an independent-marked finding heading, every `(independent)` mark must be listed by exactly one run, every review file must have a run block, `empty` must equal the rounds with outcome `empty`, and `refuted` must equal the listed refs whose disposition is refuted. Panel runs additionally re-read their round verdicts from the review file's panel sections, and every candidate must be a commit that exists.
 
-Rounds here are independent rounds only; the review files' own `Rounds:`
-counts include the self pass and differ. Round candidates are the commits
-reviewed: explicit `--commit` shas for codex rounds, and for panel rounds the
-tree each round read (the pre-panel commit for round 1, each round's fix
-commit for the round after). Each round line carries the refs that round
-raised, so per-model yield is a query. Findings described only in review
-prose, without a ref, are noted in `#` comments and counted nowhere.
+Rounds here are independent rounds only; the review files' own `Rounds:` counts include the self pass and differ. Round candidates are the commits reviewed: explicit `--commit` shas for codex rounds, and for panel rounds the tree each round read (the pre-panel commit for round 1, each round's fix commit for the round after). Each round line carries the refs that round raised, so per-model yield is a query. Findings described only in review prose, without a ref, are noted in `#` comments and counted nowhere.
 
 run: D00-T01-S1
 date: 2026-09-17
 runner: codex
 rounds: 1
 round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 6bb635e findings: D00-T01-S1-F1, D00-T01-S1-F2
-# round 1 also returned a third P2 against code already fixed in a later
-# commit it had not read; a stale-candidate report, not a finding.
+# round 1 also returned a third P2 against code already fixed in a later commit it had not read; a stale-candidate report, not a finding.
 empty: 0
 refuted: 0
 
@@ -88,9 +74,7 @@ date: 2026-09-17
 runner: codex
 rounds: 1
 round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 0ea2877 findings: D00-T02-S3-F1, D00-T02-S3-F2, D00-T02-S3-F3, D00-T02-S3-F4, D00-T02-S3-F5
-# the round returned four; F1 carries the mark but the prose credits the
-# operator's question. The record follows the mark; the tension is the
-# file's, and the file is stamped.
+# the round returned four; F1 carries the mark but the prose credits the operator's question. The record follows the mark; the tension is the file's, and the file is stamped.
 empty: 0
 refuted: 0
 
@@ -121,8 +105,7 @@ runner: codex
 rounds: 2
 round: 1 model: gpt-6-astra effort: high outcome: findings candidate: ffa97c3 findings:
 round: 2 model: gpt-6-astra effort: high outcome: empty candidate: 8ba1f20 findings:
-# round 1 raised two P2s recorded in prose only, before refs existed; see
-# the review file. They are not counted in the dimensions.
+# round 1 raised two P2s recorded in prose only, before refs existed; see the review file. They are not counted in the dimensions.
 empty: 1
 refuted: 0
 
@@ -208,7 +191,6 @@ runner: codex
 rounds: 2
 round: 1 model: gpt-6-astra effort: high outcome: findings candidate: a73addf findings: D07-T01-S1-F4, D07-T01-S1-F5, D07-T01-S1-F6
 round: 2 model: gpt-5.6-sol effort: high outcome: findings candidate: 235a71f findings: D07-T01-S1-F7, D07-T01-S1-F8, D07-T01-S1-F9, D07-T01-S1-F10
-# round 1: two P2 plus the regression-test request; round 2 read the stamp
-# commit itself.
+# round 1: two P2 plus the regression-test request; round 2 read the stamp commit itself.
 empty: 0
 refuted: 0
