@@ -3,22 +3,26 @@
 
 Reads docs/reviews/run-records.md, one block per stamped section whose review
 reached an independent round. Each block names the section, the date, the
-runner, and every independent round with its model, effort, outcome, and
-reviewed candidate, plus the finding refs raised and the empty/refuted counts.
+runner, and every independent round with its model, effort, outcome, reviewed
+candidate, and the finding refs that round raised, plus the empty/refuted
+counts. Attribution is per round, on the round line, so per-model yield is a
+query rather than a reading of comments.
 
 A run records the finding REFS its rounds raised, exactly the refs carrying an
 (independent) mark in the section's review file. Findings described only in
 review prose, without a ref, are noted in `#` comments and counted nowhere:
 dimensions count refs, and a ref-less finding must not silently join them.
 
-Cross-checks (--check): every listed ref resolves to a finding parsed by
-todo-findings.py; every independent-marked ref appears in exactly one run's
-findings; empty equals the rounds with outcome empty; refuted equals the
-listed refs whose disposition is refuted; panel sections re-read their
-round verdicts from the review file.
+Cross-checks (--check): every listed ref resolves to an independent-marked
+finding parsed by todo-findings.py; every independent-marked ref appears in
+exactly one run's rounds; every review file has a run block, so a deleted
+engagement fails loudly; empty equals the rounds with outcome empty; refuted
+equals the listed refs whose disposition is refuted; panel runs re-read their
+round verdicts from the review file; every candidate is a commit that exists.
 
---report prints the three run dimensions: rounds per section, panel verdict
-overlap (rounds sharing a four-lens signature), and the empty-round index.
+--report prints the run dimensions: engagements, rounds per section, panel
+verdict overlap (rounds sharing a four-lens signature), the empty-round
+index, and the source split (independent from runs, self from ledger).
 """
 
 import importlib.util
@@ -49,8 +53,10 @@ OUTCOMES = ("findings", "empty", "error")
 FAMILY_MODEL = {"GPT": "gpt-5.6-sol", "Opus": "opus"}
 
 RUN_RE = re.compile(r"^run:\s*(?P<section>D\d{2}-T\d{2}-S\d+)\s*$")
-FIELD_RE = re.compile(r"^(?P<key>date|runner|rounds|round|findings|empty|refuted):\s*(?P<value>.*)$")
+FIELD_RE = re.compile(r"^(?P<key>date|runner|rounds|round|empty|refuted):\s*(?P<value>.*)$")
 ROUND_ITEM_RE = re.compile(r"(?P<key>model|effort|outcome|candidate):\s*(?P<value>\S+)")
+ROUND_FINDINGS_RE = re.compile(r"\bfindings:\s*(?P<refs>.*)$")
+REQUIRED_FIELDS = ("date", "runner", "rounds", "empty", "refuted")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 REF_RE = re.compile(r"^D\d{2}-T\d{2}-S\d+-F\d+$")
@@ -63,7 +69,7 @@ LENSES = ("adversarial", "consistency", "integration", "record")
 
 class Run:
     __slots__ = ("section", "date", "runner", "rounds", "round_lines",
-                 "findings", "empty", "refuted", "lineno")
+                 "empty", "refuted", "lineno", "fields_seen")
 
     def __init__(self, section, lineno):
         self.section = section
@@ -71,10 +77,18 @@ class Run:
         self.date = None
         self.runner = None
         self.rounds = None
-        self.round_lines = []  # (lineno, number, {model, effort, outcome, candidate})
-        self.findings = []  # [ref, ...]
+        # (lineno, number, {model, effort, outcome, candidate, findings?})
+        self.round_lines = []
         self.empty = None
         self.refuted = None
+        self.fields_seen = {"run"}
+
+    def findings(self):
+        """All refs raised, in round order: the per-round attribution union."""
+        refs = []
+        for _lineno, _n, items in sorted(self.round_lines, key=lambda r: r[1]):
+            refs.extend(items.get("findings", []))
+        return refs
 
 
 def parse_runs(text):
@@ -82,10 +96,12 @@ def parse_runs(text):
     runs = []
     errors = []
     current = None
-    seen_field = set()
 
     def finish():
         if current is not None:
+            for field in REQUIRED_FIELDS:
+                if field not in current.fields_seen:
+                    errors.append((current.lineno, f"missing field {field!r}, reported not assumed"))
             runs.append(current)
 
     for lineno, raw in enumerate(text.splitlines(), 1):
@@ -96,12 +112,15 @@ def parse_runs(text):
         if m:
             finish()
             current = Run(m.group("section"), lineno)
-            seen_field = {"run"}
             continue
         if current is None:
             if not runs and not errors:
                 continue  # header preamble before the first run block
             errors.append((lineno, f"outside any run block: {raw.strip()!r}"))
+            continue
+        if re.match(r"^findings\s*:", line):
+            errors.append((lineno, "run-level findings moved to the round lines; "
+                                   "attribute each ref to its round"))
             continue
         f = FIELD_RE.match(line)
         if f is None:
@@ -113,16 +132,20 @@ def parse_runs(text):
             if rm is None:
                 errors.append((lineno, "round line needs a number first"))
                 continue
-            items = dict(ROUND_ITEM_RE.findall(rm.group("rest")))
+            rest = rm.group("rest")
+            items = dict(ROUND_ITEM_RE.findall(rest))
+            fm = ROUND_FINDINGS_RE.search(rest)
+            if fm is None:
+                errors.append((lineno, "round line misses findings (write it empty, never omit it)"))
+                continue
+            items["findings"] = [r.strip() for r in fm.group("refs").split(",") if r.strip()]
             current.round_lines.append((lineno, int(rm.group("n")), items))
             continue
-        if key in seen_field:
+        if key in current.fields_seen:
             errors.append((lineno, f"duplicate field {key!r}"))
             continue
-        seen_field.add(key)
-        if key == "findings":
-            current.findings = [r.strip() for r in value.split(",") if r.strip()]
-        elif key in ("rounds", "empty", "refuted"):
+        current.fields_seen.add(key)
+        if key in ("rounds", "empty", "refuted"):
             if not re.fullmatch(r"\d+", value):
                 errors.append((lineno, f"{key} is not a number: {value!r}"))
                 continue
@@ -163,9 +186,11 @@ def check_runs(runs, errors):
                 errors.append((rl_lineno, f"outcome must be one of {OUTCOMES}"))
             if "candidate" in items and not SHA_RE.match(items["candidate"]):
                 errors.append((rl_lineno, f"candidate is not a hex sha: {items['candidate']!r}"))
-        for ref in run.findings:
-            if not REF_RE.match(ref):
-                errors.append((run.lineno, f"finding ref must be D..-T..-S..-F<n>, got {ref!r}"))
+            for ref in items.get("findings", []):
+                if not REF_RE.match(ref):
+                    errors.append((rl_lineno, f"finding ref must be D..-T..-S..-F<n>, got {ref!r}"))
+            if items.get("outcome") == "empty" and items.get("findings"):
+                errors.append((rl_lineno, "an empty round lists no findings; move them or fix the outcome"))
         empties = sum(1 for _, _, items in run.round_lines if items.get("outcome") == "empty")
         if run.empty is not None and run.empty != empties:
             errors.append((run.lineno, f"empty says {run.empty} but {empties} round(s) came back empty"))
@@ -195,13 +220,26 @@ def _review_path(compact):
     return None
 
 
-def cross_check(runs):
-    """Refs resolve, independent marks are covered exactly once, refuted counts.
+def _review_files():
+    """Compact sections with a committed-shape review file under docs/reviews/."""
+    sections = set()
+    if not TF.REVIEWS.is_dir():
+        return sections
+    for path in TF.REVIEWS.rglob("*.md"):
+        display = TF._ref_for(path.name)
+        if display is not None:
+            sections.add(_compact_section(display))
+    return sections
 
+
+def cross_check(runs, collected=None, review_sections=None):
+    """Refs resolve, marks are covered exactly once, every file has a run.
+
+    `collected` and `review_sections` override the tree reads for tests.
     Returns a list of (lineno, message) with lineno 0 when no run line fits.
     """
     errors = []
-    findings, bad = TF.collect()
+    findings, bad = collected if collected is not None else TF.collect()
     for path, lineno, msg in bad:
         errors.append((0, f"{path.name}:{lineno}: unparseable heading, runs cannot cover it: {msg}"))
     by_ref = {}
@@ -210,9 +248,13 @@ def cross_check(runs):
         by_ref.setdefault(ref, []).append(f)
     claimed = {}
     for run in runs:
-        for ref in run.findings:
+        for ref in run.findings():
             if ref not in by_ref:
                 errors.append((run.lineno, f"{ref} resolves to no finding heading"))
+                continue
+            if by_ref[ref][0].source != "independent":
+                errors.append((run.lineno, f"{ref} is not independent-marked; "
+                                           f"runs list independent refs only"))
                 continue
             claimed.setdefault(ref, []).append(run.section)
             if _section_of_ref(ref) != run.section:
@@ -223,10 +265,15 @@ def cross_check(runs):
     for ref, fs in sorted(by_ref.items()):
         if fs[0].source == "independent" and ref not in claimed:
             errors.append((0, f"{ref} carries (independent) but no run lists it"))
+    have_runs = {run.section for run in runs}
+    files = review_sections if review_sections is not None else _review_files()
+    for section in sorted(files - have_runs):
+        errors.append((0, f"{section} has a review file but no run block; "
+                          f"a deleted engagement changes the counts silently"))
     for run in runs:
         if run.refuted is None:
             continue
-        got = sum(1 for ref in run.findings
+        got = sum(1 for ref in run.findings()
                   if ref in by_ref and by_ref[ref][0].disposition == "refuted")
         if got != run.refuted:
             errors.append((run.lineno, f"refuted says {run.refuted} but {got} listed ref(s) are refuted"))
@@ -315,9 +362,9 @@ def check_candidates(runs):
     shas = sorted({items["candidate"] for run in runs for _, _, items in run.round_lines
                    if "candidate" in items and SHA_RE.match(items["candidate"])})
     for sha in shas:
-        hit = subprocess.run(["git", "cat-file", "-e", sha], cwd=ROOT,
-                             capture_output=True)
-        if hit.returncode != 0:
+        hit = subprocess.run(["git", "cat-file", "-t", sha], cwd=ROOT,
+                             capture_output=True, text=True)
+        if hit.returncode != 0 or hit.stdout.strip() != "commit":
             errors.append((0, f"candidate {sha} is not a commit in this repository"))
     return errors
 
@@ -350,7 +397,7 @@ def report(runs):
         models = ",".join(dict.fromkeys(items.get("model", "?")
                                         for _, _, items in run.round_lines))
         lines.append(f"- {run.section}: {run.rounds} round(s), {models}, "
-                     f"{len(run.findings)} finding(s), {run.empty} empty")
+                     f"{len(run.findings())} finding(s), {run.empty} empty")
     lines.append("")
     lines.append("Panel verdict overlap (rounds sharing a four-lens signature):")
     sigs = {}
@@ -387,7 +434,7 @@ def report(runs):
     total_ind = total_self = 0
     for run in runs:
         ledger = ledger_by_section.get(run.section, [])
-        independent = len(run.findings)
+        independent = len(run.findings())
         self_raised = len(ledger) - independent
         total_ind += independent
         total_self += self_raised
@@ -409,9 +456,8 @@ def _self_test():
 date: 2026-09-17
 runner: codex
 rounds: 2
-round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 6bb635e
-round: 2 model: gpt-6-astra effort: high outcome: empty candidate: 8437dd5
-findings: D00-T01-S1-F1, D00-T01-S1-F2
+round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 6bb635e findings: D00-T01-S1-F1, D00-T01-S1-F2
+round: 2 model: gpt-6-astra effort: high outcome: empty candidate: 8437dd5 findings:
 empty: 1
 refuted: 0
 """
@@ -420,8 +466,8 @@ refuted: 0
     check_runs(runs, errors)
     check("check-clean", not errors, f"{errors}")
     check("round-count", runs[0].round_lines[1][1] == 2)
-    check("findings-split", runs[0].findings == ["D00-T01-S1-F1", "D00-T01-S1-F2"],
-          f"{runs[0].findings}")
+    check("findings-split", runs[0].findings() == ["D00-T01-S1-F1", "D00-T01-S1-F2"],
+          f"{runs[0].findings()}")
 
     commented = "# a comment\n\n" + good.replace(
         "empty: 1\n", "empty: 1\n# round 1 also saw a stale duplicate; not a finding\n")
@@ -464,6 +510,41 @@ refuted: 0
     _r, errors_d = parse_runs(dupe)
     check_runs(_r, errors_d)
     check("duplicate-run-fails", any("duplicate run" in m for _, m in errors_d), f"{errors_d}")
+
+    missing_field = good.replace("empty: 1\n", "")
+    _r, errors_m = parse_runs(missing_field)
+    check("missing-field-reported", any("missing field 'empty'" in m for _, m in errors_m),
+          f"{errors_m}")
+
+    no_findings_key = good.replace("candidate: 8437dd5 findings:", "candidate: 8437dd5")
+    _r, errors_k = parse_runs(no_findings_key)
+    check("missing-findings-key-fails", any("misses findings" in m for _, m in errors_k),
+          f"{errors_k}")
+
+    run_level = good.replace("round: 2 model", "findings: D00-T01-S1-F9\nround: 2 model")
+    _r, errors_l = parse_runs(run_level)
+    check("run-level-findings-fails", any("moved to the round lines" in m for _, m in errors_l),
+          f"{errors_l}")
+
+    empty_with = good.replace("outcome: empty candidate: 8437dd5 findings:",
+                              "outcome: empty candidate: 8437dd5 findings: D00-T01-S1-F9")
+    _r, errors_w = parse_runs(empty_with)
+    check_runs(_r, errors_w)
+    check("empty-with-findings-fails", any("empty round lists no findings" in m for _, m in errors_w),
+          f"{errors_w}")
+
+    ind = TF.Finding("D00 T01 §1", None, 1, "F1", "s", "record", "fixed", None, "independent")
+    slf = TF.Finding("D00 T01 §1", None, 2, "F2", "s", "record", "fixed", None, "self")
+    fixture = ([ind, slf], [])
+    sections = {"D00-T01-S1"}
+    _r, _e = parse_runs(good)
+    cc = cross_check(_r, collected=fixture, review_sections=sections)
+    check("self-ref-rejected", any("not independent-marked" in m for _, m in cc), f"{cc}")
+
+    only_self = good.replace("D00-T01-S1-F1, D00-T01-S1-F2", "D00-T01-S1-F1")
+    _r, _e = parse_runs(only_self)
+    cc = cross_check(_r, collected=fixture, review_sections=sections | {"D00-T01-S9"})
+    check("missing-run-reported", any("no run block" in m for _, m in cc), f"{cc}")
 
     print(f"todo-runs self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
