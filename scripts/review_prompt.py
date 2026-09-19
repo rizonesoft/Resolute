@@ -12,6 +12,7 @@ WSL checkouts agree), and reviewer output is validated whole (item 15: one
 valid-looking row must not mask malformed trailing findings).
 """
 
+import hashlib
 import re
 import secrets
 
@@ -118,6 +119,74 @@ def canonical_prompt_bytes(text: str) -> bytes:
     return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
 
 
+# Completeness manifest (D00 T04 §9): the fence emits what the session
+# sent (byte count, file list, sha, base/head when the chunks are a
+# diff), and the reviewer opens its output with a receipt quoting the
+# manifest sha plus the closing END tag. A tail-truncated prompt never
+# shows the reviewer its END line, so the receipt is unforgeable from
+# a cut stream and the checker fails the round instead of approving
+# from partial input. The model never counts bytes: it copies two
+# strings it saw, and the byte count stays the session's own record.
+MANIFEST_RE = re.compile(
+    r"^MANIFEST\s+bytes=(?P<bytes>[0-9]+)\s+files=(?P<files>[0-9]+)\s+"
+    r"sha=(?P<sha>[0-9a-f]{64})(?P<rest>.*)$"
+)
+RECEIPT_RE = re.compile(r"^RECEIPT\s+sha=(?P<sha>[0-9a-f]{64})\s+end=(?P<end>\S+)\s*$")
+TAG_LINE_RE = re.compile(r"^TAG\s+(?P<tag>\S+)\s*$")
+
+
+def build_manifest(tag: str, chunks: list[tuple[str, str]],
+                   base: str | None = None, head: str | None = None) -> tuple[str, str]:
+    """Fence chunks and describe them. Returns (manifest_line, fenced_body).
+
+    The manifest covers the fenced body only, never itself: it is
+    emitted ahead of the body and counts the bytes that follow it.
+    """
+    body = fence_chunks(tag, chunks)
+    digest = hashlib.sha256(canonical_prompt_bytes(body)).hexdigest()
+    count = len(canonical_prompt_bytes(body))
+    titles = "|".join(title for title, _ in chunks)
+    line = f"MANIFEST bytes={count} files={len(chunks)} sha={digest} titles={titles}"
+    if base is not None:
+        line += f" base={base}"
+    if head is not None:
+        line += f" head={head}"
+    return line, body
+
+
+def parse_manifest_file(text: str) -> tuple[str, str]:
+    """Read (tag, sha) from saved TAG + MANIFEST lines. Raises ValueError."""
+    tag = sha = None
+    for line in text.splitlines():
+        tm = TAG_LINE_RE.match(line.strip())
+        if tm:
+            tag = tm.group("tag")
+        mm = MANIFEST_RE.match(line.strip())
+        if mm:
+            sha = mm.group("sha")
+    if tag is None or sha is None:
+        raise ValueError("manifest file carries no TAG + MANIFEST pair")
+    return tag, sha
+
+
+def strip_receipt(text: str, tag: str, sha: str) -> tuple[str | None, str]:
+    """Verify the opening receipt against the manifest. Returns (rest, \"\")
+    on success, (None, reason) when the receipt is missing or wrong."""
+    lines = text.splitlines()
+    first = next((i for i, ln in enumerate(lines) if ln.strip()), None)
+    if first is None:
+        return None, "empty output carries no receipt"
+    m = RECEIPT_RE.match(lines[first].strip())
+    if m is None:
+        return None, f"line {first + 1} is not a receipt: {lines[first].strip()[:80]}"
+    if m.group("sha") != sha:
+        return None, f"line {first + 1} receipts sha {m.group('sha')[:12]}..., manifest wants {sha[:12]}..."
+    if m.group("end") != tag:
+        return None, f"line {first + 1} receipts end {m.group('end')!r}, manifest tag is {tag!r}"
+    rest = [ln for j, ln in enumerate(lines) if j != first]
+    return "\n".join(rest) + ("\n" if rest else ""), ""
+
+
 def _output_within_bounds(text: str) -> tuple[bool, str] | None:
     """The size gate both checkers run before semantic comparison, or
     None when the output fits. Bytes count UTF-8; lines count newline
@@ -135,17 +204,23 @@ def _output_within_bounds(text: str) -> tuple[bool, str] | None:
     return None
 
 
-def check_panel_output(text: str) -> tuple[bool, str]:
+def check_panel_output(text: str, manifest: tuple[str, str] | None = None) -> tuple[bool, str]:
     """Whole-output validation for a panel round: every lens verdicts
     exactly once, and every other non-blank line is a detail line under the
     most recent non-approve verdict (an approve takes no details, and
     nothing precedes the first verdict). A declared finding count must
-    equal the numbered-item tally under its verdict. Returns (ok,
-    reason); the first bad line is the reason, so trailing garbage after
-    four good verdicts still fails instead of masking."""
+    equal the numbered-item tally under its verdict. With a manifest the
+    output must open with its receipt, proving the reviewer saw the
+    stream through the END line. Returns (ok, reason); the first bad
+    line is the reason, so trailing garbage after four good verdicts
+    still fails instead of masking."""
     bounded = _output_within_bounds(text)
     if bounded is not None:
         return bounded
+    if manifest is not None:
+        text, reason = strip_receipt(text, manifest[0], manifest[1])
+        if text is None:
+            return False, reason
     seen: dict[str, int] = {}
     detail_open = False
     declared: int | None = None
@@ -243,13 +318,18 @@ def next_run_id(todo_path: str, section: int, family: str, date: str, *texts: st
     return f"{base}-r{mx + 1}"
 
 
-def check_plan_output(text: str) -> tuple[bool, str]:
+def check_plan_output(text: str, manifest: tuple[str, str] | None = None) -> tuple[bool, str]:
     """Whole-output validation for a plan-review round: every non-blank line
     is one `- ` finding (or the round is an explicit no-findings
-    statement). Returns (ok, reason)."""
+    statement). With a manifest the output must open with its receipt.
+    Returns (ok, reason)."""
     bounded = _output_within_bounds(text)
     if bounded is not None:
         return bounded
+    if manifest is not None:
+        text, reason = strip_receipt(text, manifest[0], manifest[1])
+        if text is None:
+            return False, reason
     lines = [ln for ln in text.splitlines() if ln.strip()]
     if not lines:
         return False, "empty output"
@@ -263,8 +343,73 @@ def check_plan_output(text: str) -> tuple[bool, str]:
     return True, f"{len(lines)} findings, one per line"
 
 
+def _self_test() -> int:
+    failures = []
+    total = [0]
+
+    def check(name, cond, detail=""):
+        total[0] += 1
+        if not cond:
+            failures.append(f"{name}: {detail or 'failed'}")
+
+    tag = "PANEL-deadbeefdeadbeef"
+    chunks = [("SECTION", "section text\n"), ("CANDIDATE DIFF", "diff text\n")]
+    manifest, body = build_manifest(tag, chunks, "base000", "head111")
+    expect_sha = hashlib.sha256(canonical_prompt_bytes(body)).hexdigest()
+    check("manifest-sha", f"sha={expect_sha}" in manifest, manifest)
+    check("manifest-bytes", f"bytes={len(canonical_prompt_bytes(body))}" in manifest, manifest)
+    check("manifest-files", "files=2" in manifest and "titles=SECTION|CANDIDATE DIFF" in manifest,
+          manifest)
+    check("manifest-base-head", "base=base000" in manifest and "head=head111" in manifest,
+          manifest)
+    plain, _ = build_manifest(tag, chunks)
+    check("manifest-no-base-head", "base=" not in plain and "head=" not in plain, plain)
+    check("manifest-covers-body-only",
+          hashlib.sha256(canonical_prompt_bytes(fence_chunks(tag, chunks))).hexdigest() == expect_sha)
+
+    mtag, msha = parse_manifest_file(f"TAG {tag}\n{manifest}\n")
+    check("parse-manifest", (mtag, msha) == (tag, expect_sha), f"{mtag} {msha}")
+    try:
+        parse_manifest_file("TAG only\n")
+        check("parse-manifest-incomplete", False, "no ValueError")
+    except ValueError:
+        check("parse-manifest-incomplete", True)
+
+    approves = "**adversarial: approve**\n**consistency: approve**\n**integration: approve**\n**record: approve**\n"
+    receipt = f"RECEIPT sha={expect_sha} end={tag}\n"
+    ok, reason = check_panel_output(receipt + approves, (tag, expect_sha))
+    check("receipt-pass", ok, reason)
+    ok, reason = check_panel_output(approves, None)
+    check("no-manifest-backward-compat", ok, reason)
+    ok, reason = check_panel_output(approves, (tag, expect_sha))
+    check("missing-receipt-fails", (not ok) and "not a receipt" in reason, reason)
+    bad_sha = "0" * 64
+    ok, reason = check_panel_output(f"RECEIPT sha={bad_sha} end={tag}\n" + approves, (tag, expect_sha))
+    check("wrong-sha-fails", (not ok) and "receipts sha" in reason, reason)
+    ok, reason = check_panel_output(f"RECEIPT sha={expect_sha} end=WRONG\n" + approves, (tag, expect_sha))
+    check("wrong-end-fails", (not ok) and "receipts end" in reason, reason)
+    ok, reason = check_panel_output("RECEIPT nonsense\n" + approves, (tag, expect_sha))
+    check("malformed-receipt-fails", (not ok) and "not a receipt" in reason, reason)
+
+    findings = "- first finding\n- second finding\n"
+    ok, reason = check_plan_output(receipt + findings, (tag, expect_sha))
+    check("plan-receipt-pass", ok, reason)
+    ok, reason = check_plan_output(findings, (tag, expect_sha))
+    check("plan-missing-receipt-fails", (not ok) and "not a receipt" in reason, reason)
+    ok, reason = check_plan_output(receipt + "not a finding\n", (tag, expect_sha))
+    check("plan-shape-still-checked", (not ok) and "not a `- ` finding" in reason, reason)
+
+    print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
+    for failure in failures:
+        print(f"FAIL {failure}")
+    return 1 if failures else 0
+
+
 if __name__ == "__main__":
     import sys
+
+    if len(sys.argv) == 2 and sys.argv[1] == "--self-test":
+        sys.exit(_self_test())
 
     # `tag` serves ad-hoc uses: one randomness source, no copies
     # (`$RANDOM` is a bash-ism that degrades to a bare timestamp under sh).
@@ -275,8 +420,16 @@ if __name__ == "__main__":
         print(unique_tag(sys.argv[2]))
         sys.exit(0)
     if len(sys.argv) >= 4 and sys.argv[1] == "fence":
+        args = sys.argv[3:]
+        base = head = None
+        while len(args) >= 2 and args[0] in ("--base", "--head"):
+            if args[0] == "--base":
+                base = args[1]
+            else:
+                head = args[1]
+            args = args[2:]
         chunks = []
-        for pair in sys.argv[3:]:
+        for pair in args:
             title, sep, path = pair.partition("=")
             if not sep or not title or not path:
                 print(f"fence: want <title>=<path>, got {pair!r}", file=sys.stderr)
@@ -287,12 +440,17 @@ if __name__ == "__main__":
             except OSError as exc:
                 print(f"fence: cannot read {path}: {exc}", file=sys.stderr)
                 sys.exit(2)
+        if not chunks:
+            print("fence: no chunks to fence", file=sys.stderr)
+            sys.exit(2)
         try:
             tag, prompt = fence_chunks_checked(sys.argv[2], chunks)
+            manifest, _ = build_manifest(tag, chunks, base, head)
         except RuntimeError as exc:
             print(f"fence: {exc}", file=sys.stderr)
             sys.exit(1)
         print(f"TAG {tag}")
+        print(manifest)
         print(prompt, end="")
         sys.exit(0)
     if len(sys.argv) >= 6 and sys.argv[1] == "run-id":
@@ -327,9 +485,26 @@ if __name__ == "__main__":
             sys.exit(2)
         sys.exit(0)
     checkers = {"check-panel": check_panel_output, "check-plan": check_plan_output}
-    if len(sys.argv) != 2 or sys.argv[1] not in checkers:
+    manifest = None
+    checker_arg = sys.argv[1] if len(sys.argv) >= 2 else ""
+    rest = sys.argv[2:]
+    if checker_arg in checkers and rest[:1] == ["--manifest"]:
+        if len(rest) != 2:
+            print(f"{checker_arg}: --manifest wants exactly one file", file=sys.stderr)
+            sys.exit(2)
+        try:
+            with open(rest[1], encoding="utf-8") as fh:
+                manifest = parse_manifest_file(fh.read())
+        except OSError as exc:
+            print(f"{checker_arg}: cannot read {rest[1]}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        except ValueError as exc:
+            print(f"{checker_arg}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        rest = []
+    if checker_arg not in checkers or rest:
         print(
-            f"usage: {sys.argv[0]} tag <prefix> | fence <prefix> <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan < output.txt",
+            f"usage: {sys.argv[0]} tag <prefix> | fence <prefix> [--base <sha> --head <sha>] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan [--manifest <file>] < output.txt",
             file=sys.stderr,
         )
         sys.exit(2)
@@ -342,6 +517,6 @@ if __name__ == "__main__":
     if len(raw) > OUTPUT_MAX_BYTES:
         print(f"FAIL output exceeds {OUTPUT_MAX_BYTES} bytes")
         sys.exit(1)
-    ok, reason = checkers[sys.argv[1]](raw.decode("utf-8", "replace"))
+    ok, reason = checkers[checker_arg](raw.decode("utf-8", "replace"), manifest)
     print(("PASS " if ok else "FAIL ") + reason)
     sys.exit(0 if ok else 1)

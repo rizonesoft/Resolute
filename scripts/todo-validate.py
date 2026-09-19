@@ -1485,6 +1485,30 @@ def validate(graph, _args) -> int:
                             f"{t.path}:{s.line}: §{num} findings {fm.group(1)} row {rid} supersedes {tgt} across review namespaces",
                         )
 
+    # 26. skill-to-plan citations resolve: every full section ref in a skill
+    # names a live section, or the skill teaches a dead address (D00 T04 §9).
+    # Only full D-refs are checked; a bare §N has no origin in a skill file.
+    # The scan root rides the graph global so fixtures substitute their own.
+    if todos:
+        origin = todos[0]
+        skills_dir = getattr(graph, "SKILLS_DIR", graph.REPO / ".claude" / "skills")
+        if skills_dir.is_dir():
+            for path in sorted(skills_dir.glob("*/SKILL.md")):
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except OSError:
+                    continue
+                for lineno, line in enumerate(text.splitlines(), 1):
+                    for cite in graph.SKILL_CITE_RE.finditer(line):
+                        ref = cite.group(0)
+                        r = graph.resolve_ref(ref, origin, by_key)
+                        target = by_id.get(r[0]) if r else None
+                        if target is None or r[1] not in target.sections:
+                            flag(
+                                "skill-citation-unresolved",
+                                f"{path}:{lineno}: skill cites {ref}, which resolves to no live section",
+                            )
+
     # The warning BASELINE. A count that only grows is a count nobody reads,
     # and 17 of these have stood for over a week: 15 name STAMPED sections
     # whose warning text says in as many words "do not reopen the stamp to add

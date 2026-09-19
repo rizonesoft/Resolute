@@ -481,10 +481,10 @@ So this section is mostly wiring and measurement rather than construction, and i
 Three soundness holes share one theme: the reviewer may not have reviewed what the record claims. A stamp approved staged becomes pushed unstaged (time-of-check gap); the wrong-figure probe covers one defect shape; and an inline diff is never proven complete, so a truncation approves falsely. This section closes all three.
 
 
-- [ ] Bind stamp approval to the staged tree: record the index identity at review time and recheck it before the push. Done when: an edit after approval forces re-review, quoted, and the skill carries the commands.
-- [ ] Add stamp-review regression cases: wrong candidate identity, unsupported evidence, stale references, and contradictory stamps. Done when: each is driven against a staged stamp and named, all quoted.
-- [ ] Prove inline diffs complete: byte count, file list, base and head identities, and reviewer receipt. Done when: the fence subcommand emits the manifest and every review prompt requires the receipt, with a truncated input proven to fail rather than approve.
-- [ ] Check skill-to-plan citations resolve. Done when: the validator names an unresolvable citation by file and line, quoted, with the self-test covering it.
+- [x] Bind stamp approval to the staged tree: record the index identity at review time and recheck it before the push. Done when: an edit after approval forces re-review, quoted, and the skill carries the commands. Done: the skill records `TREE=$(git write-tree)` beside the stamp prompt and rechecks before committing with `BLOCKED` on mismatch; driven both directions on the real index (`recheck: match, may commit`, then `BLOCKED: the staged tree moved since STAMP HOLDS; re-stage and re-review` after an edit).
+- [x] Add stamp-review regression cases: wrong candidate identity, unsupported evidence, stale references, and contradictory stamps. Done when: each is driven against a staged stamp and named, all quoted. Done: a seeded stamp drew `` `31 findings` should be `2 findings` `` (unsupported evidence), `` `round 4` should be `round 2` `` (the contradictory side), and `` `aaaaaaa` should be `bbbbbbb` `` (wrong candidate); the stale path drew `STAMP HOLDS` twice, which sharpened the prompt to verify every file path exists, after which it named `` `todo/00-workspace/TODO-09-seeded.md` should exist ... where it is absent ``. All at high effort with receipts.
+- [x] Prove inline diffs complete: byte count, file list, base and head identities, and reviewer receipt. Done when: the fence subcommand emits the manifest and every review prompt requires the receipt, with a truncated input proven to fail rather than approve. Done: `fence` emits `MANIFEST bytes/files/sha/titles` plus `base/head` when given, all four skill prompts require the opening `RECEIPT sha/end` line, and both checkers take `--manifest`; `review-prompt self-test` 17 cases green, and live a correct receipt passes while the receiptless (truncated) output fails as `FAIL line 1 is not a receipt`.
+- [x] Check skill-to-plan citations resolve. Done when: the validator names an unresolvable citation by file and line, quoted, with the self-test covering it. Done: check 26 with class `skill-citation-unresolved` (FATAL, README-mirrored) scans full D-refs in every `SKILL.md`; a planted `D00 T04 §99` fails as `SKILL.md:3: skill cites D00 T04 §99, which resolves to no live section`, removal returns to 0 fatal; self-test 507 cases green including the two fixture cases.
 - [ ] Commit: `"workspace: review-input integrity"`
 
 **Test checkpoint:** The time-of-check gap is driven shut, all four regression cases are named, a truncated diff fails loudly, and an unresolvable citation is reported by file and line. All quoted.
@@ -493,6 +493,8 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR10 D00-T04-S6-PR10
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR11 D00-T04-S6-PR11
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR13 D00-T04-S6-PR13
+
+> **Started:** 2026-09-19T06:25:00Z
 
 ## 10. Run-Record Follow-Ups
 

@@ -449,6 +449,7 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 | `risk-acceptance-malformed` | FATAL | A `Risk accepted:` line outside the record shape, with an uncoverable target, expiring before it is recorded, or reviewed outside its record-expiry window. |
 | `risk-acceptance-silent-edit` | FATAL | A risk acceptance whose owning record changed after the evidence commit without a superseding record. |
 | `risk-acceptance-chain-broken` | FATAL | A `supersedes <date>` link that names no earlier record on its target, points forward, branches, or cycles. |
+| `skill-citation-unresolved` | FATAL | A skill citing a full section ref (`D00 T04 §6`) that resolves to no live section. |
 
 Treat a warning as a decision to make rather than noise to clear. The tree starts at zero FATAL and zero non-baselined warnings, and it is worth keeping there.
 

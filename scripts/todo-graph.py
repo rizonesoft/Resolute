@@ -60,6 +60,7 @@ for _stream in (sys.stdout, sys.stderr):
 REPO = Path(__file__).resolve().parent.parent
 TODO_DIR = REPO / "todo"
 CACHE = REPO / "build" / "todo-cache.json"
+SKILLS_DIR = REPO / ".claude" / "skills"
 
 ID_RE = re.compile(r"^[a-z][a-z0-9-]{0,58}[a-z0-9]$")
 STATUSES = {"draft", "active", "blocked", "done", "superseded"}
@@ -73,6 +74,8 @@ ROW_RE = re.compile(
 BODY_RE = re.compile(r"^##\s+(?P<num>\d+)\.\s+(?P<title>.+?)\s*$")
 # §1 | T02 §3 | D02 T01 §4
 XREF_RE = re.compile(r"(?:D(?P<dom>\d{2})\s+)?(?:T(?P<todo>\d{2})\s+)?§(?P<sec>\d+)")
+# Skills cite sections absolutely (D00 T04 §6): a bare §N has no origin there.
+SKILL_CITE_RE = re.compile(r"D(?P<dom>\d{2})\s+T(?P<todo>\d{2})\s+§(?P<sec>\d+)")
 BARE_TODO_RE = re.compile(r"(?<![\w§])(?:D\d{2}\s+)?T\d{2}(?!\s*§)(?![\w-])")
 STAMP_RE = re.compile(
     r"^>\s*\*\*(?P<kind>Verified|Deferred|Resolved|Review|Duration|CRUD|Verification|Implementer|Moved|Plan review|Reopened):\*\*\s*(?P<body>.+?)\s*$"
@@ -889,6 +892,10 @@ SEVERITY_MAP: dict[str, str] = {
     "risk-acceptance-malformed": "fatal",
     "risk-acceptance-silent-edit": "fatal",
     "risk-acceptance-chain-broken": "fatal",
+    # a skill citing a section that does not exist teaches a reader a dead
+    # address; the fix is mechanical (correct the citation or write the
+    # section) and only full D-refs are checked, bare §N having no origin.
+    "skill-citation-unresolved": "fatal",
 }
 
 
@@ -5157,8 +5164,8 @@ def cmd_self_test(_args) -> int:
     def check(name: str, got, want) -> None:
         cases.append((name, got, want))
 
-    global TODO_DIR, PLAN  # noqa: PLW0603 -- rebinding is the point
-    saved_todo_dir, saved_plan = TODO_DIR, PLAN
+    global TODO_DIR, PLAN, SKILLS_DIR  # noqa: PLW0603 -- rebinding is the point
+    saved_todo_dir, saved_plan, saved_skills = TODO_DIR, PLAN, SKILLS_DIR
     tmp = tempfile.TemporaryDirectory(prefix="todo-graph-selftest-")
     try:
         root = Path(tmp.name)
@@ -5171,6 +5178,10 @@ def cmd_self_test(_args) -> int:
         plan.write_text(SELF_TEST_PLAN, encoding="utf-8")
         TODO_DIR = root / "todo"
         PLAN = plan
+        # Fixture validates scan fixture skills, never the live skills: the
+        # live files cite live sections that fixture trees do not have.
+        (root / "skills").mkdir(exist_ok=True)
+        SKILLS_DIR = root / "skills"
 
         todos = load_todos()
         check("load_todos finds both fixtures", len(todos), 2)
@@ -5292,6 +5303,26 @@ def cmd_self_test(_args) -> int:
                   any("runnable now" in ln and "runnable elsewhere" in ln for ln in lines), True)
         finally:
             gamma.unlink()
+        # --- skill-to-plan citations (D00 T04 §9) ------------------------------
+        probe = root / "skills" / "probe-skill"
+        probe.mkdir(parents=True)
+        probe_skill = probe / "SKILL.md"
+        probe_skill.write_text(
+            "See D90 T01 §2 for the shape.\n\nBut D90 T01 §9 does not exist.\n",
+            encoding="utf-8",
+        )
+        try:
+            sbuf = _bio.StringIO()
+            with _bctx.redirect_stdout(sbuf), _bctx.redirect_stderr(_bio.StringIO()):
+                cmd_validate(None)
+            sfatal = [ln for ln in sbuf.getvalue().splitlines() if ln.startswith("FATAL")]
+            check("a resolving skill citation draws no FATAL",
+                  any("D90 T01 §2" in ln for ln in sfatal), False)
+            check("an unresolving skill citation is FATAL by file and line",
+                  any("SKILL.md:3" in ln and "D90 T01 §9" in ln for ln in sfatal), True)
+        finally:
+            probe_skill.unlink()
+            probe.rmdir()
         check("§2 has a Commit item", ta.sections[2].has_commit_item, True)
         check("beta §1 has a Freeze check", tb.sections[1].has_freeze_check, True)
         check("every body section has a row", all(s.has_row for s in ta.sections.values()), True)
@@ -7351,7 +7382,7 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
                 (root / _rp).unlink()
 
     finally:
-        TODO_DIR, PLAN = saved_todo_dir, saved_plan
+        TODO_DIR, PLAN, SKILLS_DIR = saved_todo_dir, saved_plan, saved_skills
         tmp.cleanup()
 
     failed = [(n, got, want) for n, got, want in cases if got != want]
