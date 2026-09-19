@@ -46,8 +46,9 @@ track: P2
 |   1   |   §1    | Beep data and WMI inventory | -- |  [ ]   |
 |   2   |   §2    | Surface inventory with shared-layer map | -- |  [ ]   |
 |   3   |   §3    | Distribution completeness | D04 T01 §5 |  [ ]   |
-|   4   |   §4    | Cross-vendor pattern search | D04 T01 §5 |  [ ]   |
-|   5   |   §5    | Vendor auto-detect from WMI | D04 T01 §5 |  [ ]   |
+|   4   |   §4    | Cross-vendor pattern search | D04 T01 §5, §6 |  [ ]   |
+|   5   |   §5    | Vendor auto-detect from WMI | D04 T01 §5, §6 |  [ ]   |
+|   6   |   §6    | Migrate beep data to reference DB | D04 T01 §5, D00 T06 §3, D01 T01 §14 |  [ ]   |
 
 ---
 
@@ -146,6 +147,27 @@ Competitor context (source-based, hands-on owed at build): web references (Compu
 
 **Test checkpoint:** Three matched fixtures and both fallbacks open correctly; finer details are driven or captured; the parity comparison re-runs clean. Cheaper substitute that fails the checkpoint: auto-detect without the fallbacks, which strands every unknown machine on a wrong vendor's codes.
 
+-> XREF: D04 T01 §5 -- the parity check this section must not disturb
+
+## 6. Migrate Beep Data to the Reference Database
+
+BiosCodes becomes the platform's first consumer: its lookups read the embedded beep dataset through the framework loader instead of the packs, and the extended data from `D00 T06 §4` (new vendors, blink codes, POST codes) ships in the tool with its surfaces. A migration, not a rewrite: every original answer stays identical.
+
+**Fidelity:** the vendor tabs plus the new blink family presentation, against `DESIGN.md`; new vendors follow the existing tab shape.
+**Job:** a user looks up beep, blink, and POST codes from one database that keeps growing. Consumer: the lookup answers and the WMI page.
+**Treatment:** same answers from a new store, then new answers from new data, proven in that order. Cheaper substitute that fails the checkpoint: migrating and extending in one step, which cannot tell a moved answer from a new one.
+**Chrome:** consume the framework list surfaces and the loader. No new dialog for the migration itself.
+**Needs:** Windows host (build/test)
+
+- [ ] Migrate lookups to the loader: every vendor table and the WMI page read through `D01 T01 §14`, and the packs carry UI strings only. Done when: the pack-driven code path is gone and the lookup diff from `D00 T06 §3` still shows zero differences, quoted.
+- [ ] Ship the extended data: new vendor tabs, the blink family as a typed presentation distinct from beeps, and POST codes, all with pack-keyed UI strings. Done when: every new entry from `D00 T06 §4` is reachable and rendered, quoted.
+- [ ] Cover the finer details: keyboard path, screen-reader names and announcements, both themes and DPI scalings, and the exact texts with pack keys. Done when: each is driven or captured, none deferred.
+- [ ] Prove non-interference: the `D04 T01 §5` parity check re-runs clean with this section shipped. Done when: the comparison is quoted showing no difference.
+- [ ] Commit: `"bioscodes: migrate beep data to the reference database"`
+
+**Test checkpoint:** Pack-driven lookups are gone with the diff at zero; every extended entry is reachable; finer details are driven or captured; the parity comparison re-runs clean. Cheaper substitute that fails the checkpoint: new tabs without the migration diff, which ship new answers on an unproven store.
+
+-> XREF: D00 T06 §3 -- the migrated dataset this section consumes
 -> XREF: D04 T01 §5 -- the parity check this section must not disturb
 
 ## Verification

@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **25 of 189 sections complete (13%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **25 of 196 sections complete (13%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -141,6 +141,11 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance           |   4   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files            |   6   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility             |   5   |
+| [ ] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow               |   5   |
+| [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                  |   6   |
+| [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs              |   5   |
+| [ ] | `D00 T06 §4`  | Data Extension: Vendors, Blink, POST           |   5   |
+| [ ] | `D00 T06 §5`  | Consumer Contract for Tools                    |   4   |
 | [ ] | `D10 T01 §1`  | About Bar, Topics, Social Preview              |   4   |
 | [ ] | `D10 T01 §2`  | Branch Protection, Real Check Names            |   4   |
 | [ ] | `D10 T01 §3`  | Cold-Reader Taste Pass                         |   3   |
@@ -226,6 +231,7 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D04 T05 §3` | BiosCodes distribution completeness          |   7   |
 | [ ] | `D04 T05 §4` | Cross-vendor pattern search                  |   5   |
 | [ ] | `D04 T05 §5` | Vendor auto-detect from WMI                  |   4   |
+| [ ] | `D04 T05 §6` | Migrate Beep Data to Reference DB            |   5   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
 | [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   8   |
@@ -305,6 +311,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §10` | Identity Registry and Version Agreement        |   9   |
 | [ ] | `D01 T01 §12` | About Dialog, From the Registry                |   8   |
 | [ ] | `D01 T01 §13` | F1 Context Help Through the Surface Map        |   5   |
+| [ ] | `D01 T01 §14` | Embedded Dataset Loader                        |   4   |
 | [ ] | `D06 T01 §11` | Tag-Derived Version Scheme Record              |   5   |
 | [ ] | `D06 T01 §12` | Versioner Wiring and String Migration          |   4   |
 | [ ] | `D06 T01 §13` | Stamped-Surface Agreement Test                 |   5   |

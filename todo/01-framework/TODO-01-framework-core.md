@@ -70,6 +70,7 @@ track: F1
 |  11   |   §11   | Command line and exit codes                     | §1, §3, §6             |  [ ]   |
 |  12   |   §12   | About dialog, from the registry                 | §7, D06 T01 §10, D01 T03 §7 |  [ ]   |
 |  13   |   §13   | F1 context help through the surface map         | §7, D06 T01 §14        |  [ ]   |
+|  14   |   §14   | Embedded dataset loader                         | §1, D00 T06 §2, D00 T06 §5 |  [ ]   |
 
 ---
 
@@ -332,6 +333,25 @@ F1 opens context help: the guide page for the focused surface through the `D06 T
 **Test checkpoint:** F1 opens the mapped page and help-home covers unmapped and no-focus; every window's Help entry opens help-home with no tool-side code; the launcher falls back offline; the guide page shares the implementation commit. Cheaper substitute that fails the checkpoint: testing F1 by hand on one window, which proves nothing about the map default.
 
 -> XREF: D06 T01 §14 -- the pipeline and map this behavior reads
+
+## 14. Embedded Dataset Loader
+
+The framework runtime half of the reference-data platform: tools declare datasets through the `D00 T06 §5` contract, and this loader opens them from the embedded store, answers entry queries, and reports versions. No tool reads the embedded bytes directly; a second loader is a defect.
+
+**Fidelity:** no surface of its own; failures render through the framework message layer.
+**Job:** a tool asks for versioned reference data and gets it or a named failure. Consumer: the declared datasets, queried by entry ID.
+**Treatment:** open by name, query by stable ID, version always readable, missing-or-stale never rendered partial. Cheaper substitute that fails the checkpoint: a loader that returns null on missing data, which pushes the failure presentation into every tool.
+**Chrome Needs:** none; failures use the message layer.
+
+- [ ] Implement the loader API: open by dataset name, query entries by stable ID, read dataset version, with the exact failure rules from the §5 contract. Done when: the API matches the contract call for call, quoted against it.
+- [ ] Render missing-or-stale through the message layer with the contract's texts, and log one line naming dataset and versions. Done when: both failures render exactly as specified, quoted by drive.
+- [ ] Prove isolation: a tool sees exactly its declared datasets; an undeclared open fails naming the dataset. Done when: quoted, with the beep dataset visible to BiosCodes and invisible elsewhere.
+- [ ] Commit: `"framework: embedded dataset loader"`
+
+**Test checkpoint:** API matches the contract; both failures render with texts and log lines; undeclared opens fail naming the dataset. Cheaper substitute that fails the checkpoint: testing the loader only through BiosCodes, which proves one consumer rather than the contract.
+
+-> XREF: D00 T06 §2 -- the pipeline whose output this loader reads
+-> XREF: D00 T06 §5 -- the contract this loader implements
 
 ## Verification
 
