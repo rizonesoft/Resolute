@@ -67,6 +67,7 @@ track: W1
 |   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [ ]   |
 |   9   |   §9    | Review-input integrity                     | §6         |  [ ]   |
 |  10   |   §10   | Run-record follow-ups                      | §7         |  [ ]   |
+|  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [ ]   |
 
 ---
 
@@ -493,6 +494,7 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR10 D00-T04-S6-PR10
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR11 D00-T04-S6-PR11
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR13 D00-T04-S6-PR13
+-> XREF: D00 T04 §11 -- the round-5 advisories this section's panel filed
 
 > **Started:** 2026-09-19T06:25:00Z
 
@@ -522,6 +524,20 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR21 D00-T04-S7-PR21
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR22 D00-T04-S7-PR22
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR23 D00-T04-S7-PR23
+
+## 11. Bind the Rename Scan to the Diff Header
+
+Round 5 of the §9 panel left two advisories at the hard cap: rename lines past the hunk body hijack the block's file list, and the residual clause does not name that shape. The scan only ever fences `git show` output, whose rename lines sit in the header, so pasted input is the only route; still, a manifest that can list files from prose is a manifest that can lie, and the fix is small.
+
+- [ ] Stop the rename scan at the hunk body: `--- `, `+++ `, or `@@`. Done when: a post-hunk `rename from/to` pair is ignored, quoted, with the self-test covering it.
+- [ ] Confirm the residual: with the scan bound, combined diffs stand as the sole residual. Done when: the comment, the docstring, and the proof quote agree, quoted from the driven run.
+- [ ] Commit: `"workspace: bind the rename scan to the diff header"`
+
+**Test checkpoint:** The post-hunk probe resolves to the real path, quoted; the residual clause reads the same in code, comment, and quote.
+
+-> XREF: D00 T04 §9 -- the panel that left these at the hard cap
+-> SOURCE: panel-D00-T04-s9-2026-09-19 D00-T04-S9-F10
+-> SOURCE: panel-D00-T04-s9-2026-09-19 D00-T04-S9-F11
 
 ## Verification
 
