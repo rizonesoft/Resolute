@@ -246,3 +246,11 @@ round: 3 model: gpt-5.6-sol effort: medium outcome: findings candidate: 296a838 
 round: 4 model: opus effort: medium outcome: findings candidate: de3f66a provider: claude version: unresolved cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S8-F9, D00-T04-S8-F10
 empty: 0
 refuted: 0
+
+run: D00-T04-S11
+date: 2026-09-19
+runner: panel
+rounds: 1
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: e5da9ae provider: codex version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S11-F1
+empty: 0
+refuted: 0
