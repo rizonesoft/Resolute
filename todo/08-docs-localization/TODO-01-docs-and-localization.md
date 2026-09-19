@@ -73,9 +73,12 @@ The templates already exist at `resolute_au3/SDK/Concrete/ReBar/Templates/`, so 
 - [ ] Define what a changelog entry is, so `Changes.txt` stops ranging from 10 lines to 632. Done when: the entry shape is documented, and the rule for what is worth recording is stated.
 - [ ] Give every shipped tool a complete set, including the four that have none. Done when: no tool is missing one, proven by the conformance check rather than by inspection.
 - [ ] Write the user guide for the surfaces users actually meet. Done when: every shipped tool's main surface has a page, and each page names the tool version it describes.
+- [ ] State the same-commit guide rule. Done when: every new user-facing surface ships its guide page in the same commit as the surface, so pages are written in fresh context and reviewed against behavior; `D01 T01 §12` is the first instance and `D01 T01 §13` the second.
 - [ ] Commit: `"docs: the documentation contract, with metadata generated"`
 
 **Test checkpoint:** Every shipped tool has a complete set, proven by the conformance check. No documentation file contains a typed version, date, requirement list, or disk figure, proven by search. The full GPL v3 text ships with every tool. One copyright form appears across the suite. The user guide covers every shipped tool's main surface, each naming its version.
+
+-> XREF: D06 T01 §14 -- the pipeline that renders this contract's guide to offline HTML
 
 ## 2. Shared String Pool and Build-Time Composition
 

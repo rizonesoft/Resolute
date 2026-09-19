@@ -46,7 +46,7 @@ track: R1
 | :---: | :-----: | --------------------------------------------- | ------------ | :----: |
 |   1   |   §1    | Release descriptors, portable by construction | D04 T01 §1   |  [ ]   |
 |   2   |   §2    | One command builds the release set            | §1           |  [ ]   |
-|   3   |   §3    | Installers: per tool and whole suite          | §2, §10, §11 |  [ ]   |
+|   3   |   §3    | Installers: per tool and whole suite          | §2, §10, §11, §14 |  [ ]   |
 |   4   |   §4    | Migration from the AutoIt suite               | §3, D01 T01 §2 |  [ ]   |
 |   5   |   §5    | Update files and consolidation announcements  | §2, §10, §11 |  [ ]   |
 |   6   |   §6    | Version rule, changelog, and release checklist | §2          |  [ ]   |
@@ -57,6 +57,8 @@ track: R1
 |  11   |   §11   | Tag-derived version scheme record             | --          |  [ ]   |
 |  12   |   §12   | Versioner wiring and string migration         | §11         |  [ ]   |
 |  13   |   §13   | Stamped-surface agreement test                | §12         |  [ ]   |
+|  14   |   §14   | Help content pipeline: guide to offline HTML  | --          |  [ ]   |
+|  15   |   §15   | Web publishing and link switch                | §9, §14     |  [ ]   |
 
 ---
 
@@ -342,6 +344,37 @@ One test asserts every stamped surface reports the same version: the binary vers
 
 -> XREF: D06 T01 §10 -- the registry this test covers
 -> XREF: D06 T01 §12 -- the wiring this test proves
+
+## 14. Help Content Pipeline: Guide to Offline HTML
+
+The user guide the `D08 T01 §1` contract defines ships as local HTML generated at build time from the Markdown sources: offline-first, no in-app viewer, no CHM. This section builds the pipeline that renders it, the surface map F1 reads, the link check that keeps it honest, and the switchable read base that later flips to the web without regenerating content. There is no guide directory yet and no per-surface doc rule in force beyond the `D08 T01 §1` same-commit item this filing adds, so the pipeline defines the location and naming it renders from.
+
+**Needs:** C++ toolchain (compile)
+
+- [ ] Render the guide to local HTML with stable anchors. Done when: the build produces one HTML page per guide source through the entrypoint that exists at build time, every heading carries an anchor that survives regeneration, and the anchor scheme is recorded. Cheaper substitute that fails the checkpoint: hand-written HTML or per-build anchors, which break every F1 map link on the next build.
+- [ ] Map focusable surfaces to guide anchors with a help-home default. Done when: the map covers the surfaces that exist at build time, an unmapped surface or no-focus resolves to help-home, and the map format is recorded. Cheaper substitute that fails the checkpoint: a hardcoded table in the F1 handler, which rots the first time a surface is renamed.
+- [ ] Check link integrity in the test runner. Done when: every internal link plus its anchor resolves, external registry and site URLs are well-formed, and a broken link fails the gate naming the page. Cheaper substitute that fails the checkpoint: checking links by hand before release, which is how dead anchors ship.
+- [ ] Switch the read base by config without regenerating content. Done when: local package paths serve v1, a config key flips the base to web URLs, unreachable web falls back to local, and the flip changes no generated file, quoted both ways.
+- [ ] Commit: `"release: help content pipeline, guide to offline HTML"`
+
+**Test checkpoint:** The build renders every guide source to HTML with stable anchors; the map resolves a mapped surface and defaults to help-home; the link gate passes and fails naming a deliberately broken link; the read base serves local and web from identical content with the offline fallback quoted. Cheaper substitute that fails the checkpoint: rendering the HTML once by hand and shipping it as a static file, which silently divorces help from the guide it claims to show.
+
+-> XREF: D08 T01 §1 -- the content contract this pipeline renders
+-> XREF: D06 T01 §15 -- the publishing step this pipeline feeds
+-> XREF: D01 T01 §13 -- the F1 behavior that reads this map
+
+## 15. Web Publishing and Link Switch
+
+Publishing the guide to the project website is explicitly deferred past the first release: this row parks on `D06 T01 §9` until a release exists to document. When it runs, it deploys the guide, flips the §14 read base to web, and proves the offline fallback still holds. Operator-confirmed 2026-09-19: the deploy mechanism and the site docs path are decided at build time, not guessed here; support links point at the project homepage.
+
+- [ ] Deploy the guide to the project site with the operator-confirmed mechanism. Done when: the mechanism and the site docs path are recorded, and the deployed pages match the local HTML anchor for anchor.
+- [ ] Flip the read base to web. Done when: the config key from §14 points at the site and fresh content serves from the web, quoted.
+- [ ] Prove the offline fallback. Done when: with the network cut, help opens the local pages with no error and no blank window, quoted.
+- [ ] Commit: `"release: guide web publishing and link switch"`
+
+**Test checkpoint:** The deployed guide matches local HTML anchor for anchor, the read base serves the web, and cut-network help opens local pages cleanly. Cheaper substitute that fails the checkpoint: flipping the base without the fallback proof, which strands offline users on the first outage.
+
+-> XREF: D06 T01 §14 -- the pipeline this section publishes
 
 ## Verification
 

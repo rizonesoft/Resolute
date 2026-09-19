@@ -68,6 +68,7 @@ track: F1
 |  10   |   §10   | Crash handling and single instance              | §1, §3                 |  [ ]   |
 |  11   |   §11   | Command line and exit codes                     | §1, §3, §6             |  [ ]   |
 |  12   |   §12   | About dialog, from the registry                 | §7, D06 T01 §10        |  [ ]   |
+|  13   |   §13   | F1 context help through the surface map         | §7, D06 T01 §14        |  [ ]   |
 
 ---
 
@@ -311,6 +312,25 @@ The suite gets one traditional modal About dialog, Help menu > About, owned by t
 
 -> XREF: D06 T01 §10 -- the identity registry this dialog renders
 -> XREF: D01 T01 §7 -- the UI surfaces this dialog builds on
+
+## 13. F1 Context Help
+
+F1 opens context help: the guide page for the focused surface through the `D06 T01 §14` map, help-home for unmapped surfaces and no-focus. F1 is unbound today (no `VK_F1` handler and no URL launcher anywhere in `src/` or the UI library), and the AutoIt suite has no F1 help either, so this section is a deliberate addition fenced as new behavior: it changes no cloned surface, it adds a key the originals never had. Operator-confirmed 2026-09-19: a Help menu entry ships alongside F1, matching the §12 About pattern of one framework entry in the launcher shell and every tool window.
+
+**Fidelity:** no surface of its own; the default browser showing the guide page is the surface, rendered from §14 HTML.
+**Job:** a user stuck on any surface presses F1 and lands on the page that explains it. Consumer: the focused surface, resolved through the map.
+**Treatment:** window-level F1 through the map, opened in the default browser with local fallback, plus a Help menu entry on every window. Cheaper substitute that fails the checkpoint: a Help menu entry alone with no F1 binding, which leaves keyboard users with no path to the page they stand on.
+**Chrome Needs:** a Help menu entry per window, following the §12 entries; no other visible control.
+
+- [ ] Route window-level F1 through the surface map. Done when: F1 on a mapped surface opens its guide page, F1 on an unmapped surface or with no focus opens help-home, quoted by drive.
+- [ ] Invoke the default browser with local fallback. Done when: the first real URL launcher seam ships here (the §12 drive mocks it), web-unreachable falls back to the local pages, and no tool carries its own launcher. Cheaper substitute that fails the checkpoint: shelling the URL from each window, which is how fourteen launchers drift apart.
+- [ ] Add the Help menu entry alongside F1. Done when: the launcher shell and every tool window carry it, and each entry opens help-home, quoted by drive with no tool-side code.
+- [ ] Write the guide page documenting the behavior in the same commit as the implementation. Done when: the page exists under the `D08 T01 §1` same-commit rule, documents F1 plus the fallback, and shares the implementation commit.
+- [ ] Commit: `"framework: F1 context help through the surface map"`
+
+**Test checkpoint:** F1 opens the mapped page and help-home covers unmapped and no-focus; every window's Help entry opens help-home with no tool-side code; the launcher falls back offline; the guide page shares the implementation commit. Cheaper substitute that fails the checkpoint: testing F1 by hand on one window, which proves nothing about the map default.
+
+-> XREF: D06 T01 §14 -- the pipeline and map this behavior reads
 
 ## Verification
 
