@@ -74,8 +74,8 @@ TEST_CASE("Scrim opacity differs by mode", "[ui][theme]") {
 }
 
 // Icon colors pack the live text tokens as 0xRRGGBB. The dark values are
-// pinned end to end (token plus packing); no test in this binary calls
-// ReadSystemAccent, so the accent default stands.
+// pinned end to end (token plus packing); the accent test restores the
+// palettes it rewrites, so the compiled default stands here under any order.
 TEST_CASE("Icon colors pack the text tokens", "[ui][theme]") {
     Theme::SetDark(true);
     CHECK(Theme::IconColor() == 0xE6E6E6u);
@@ -91,29 +91,40 @@ TEST_CASE("Palette field count matches the struct", "[ui][theme]") {
     CHECK(rui::kPaletteFieldCount * static_cast<int>(sizeof(COLORREF)) == static_cast<int>(sizeof(rui::ColorPalette)));
 }
 
-// IsDarkMode reads the live OS setting. The test re-reads the same value
-// key independently: it pins the path (HKCU Personalize AppsUseLightTheme,
-// 0 means dark), not the user's current choice.
+namespace {
+// ReadSystemAccent rewrites the shared palettes; restore them on unwind so a
+// live accent never leaks into the pinned defaults, even on a REQUIRE failure.
+struct RestorePalettes {
+    rui::ColorPalette dark = rui::DarkPalette;
+    rui::ColorPalette light = rui::LightPalette;
+    ~RestorePalettes() {
+        rui::DarkPalette = dark;
+        rui::LightPalette = light;
+    }
+};
+}  // namespace
+
 TEST_CASE("System accent derivation wires the registry value", "[ui][theme]") {
-    // ReadSystemAccent rewrites the shared palettes, so save and restore them:
-    // later cases pin the compiled-in defaults, and a live accent must not
-    // leak into them. The assertion pins the wiring (registry value lands on
-    // both palettes' accent, or the compiled default when the key is absent);
-    // the lightness math inside stays interior.
-    rui::ColorPalette darkSaved = rui::DarkPalette;
-    rui::ColorPalette lightSaved = rui::LightPalette;
-    DWORD abgr = 0;
-    DWORD size = sizeof(abgr);
-    LSTATUS status = RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM",
-                                  L"AccentColor", RRF_RT_DWORD, nullptr, &abgr, &size);
-    COLORREF expected = (status == ERROR_SUCCESS) ? (abgr & 0x00FFFFFFu) : RGB(0, 120, 212);
-    Theme::ReadSystemAccent();
-    CHECK(rui::DarkPalette.accent == expected);
-    CHECK(rui::LightPalette.accent == expected);
-    CHECK(rui::DarkPalette.surfaceActive == expected);
-    rui::DarkPalette = darkSaved;
-    rui::LightPalette = lightSaved;
-    CHECK(rui::DarkPalette.accent == darkSaved.accent);
+    // The assertion pins the wiring (registry value lands on both palettes'
+    // accent, or the compiled default when the key is absent); the lightness
+    // math inside stays interior. The guard restores the compiled defaults on
+    // unwind, and the trailing checks prove the restore ran.
+    rui::ColorPalette darkBefore = rui::DarkPalette;
+    rui::ColorPalette lightBefore = rui::LightPalette;
+    {
+        RestorePalettes saved;
+        DWORD abgr = 0;
+        DWORD size = sizeof(abgr);
+        LSTATUS status = RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM",
+                                      L"AccentColor", RRF_RT_DWORD, nullptr, &abgr, &size);
+        COLORREF expected = (status == ERROR_SUCCESS) ? (abgr & 0x00FFFFFFu) : RGB(0, 120, 212);
+        Theme::ReadSystemAccent();
+        CHECK(rui::DarkPalette.accent == expected);
+        CHECK(rui::LightPalette.accent == expected);
+        CHECK(rui::DarkPalette.surfaceActive == expected);
+    }
+    CHECK(rui::DarkPalette.accent == darkBefore.accent);
+    CHECK(rui::LightPalette.accent == lightBefore.accent);
 }
 
 TEST_CASE("IsHighContrast agrees with the system call", "[ui][theme]") {
@@ -123,6 +134,9 @@ TEST_CASE("IsHighContrast agrees with the system call", "[ui][theme]") {
     CHECK(Theme::IsHighContrast() == ((hc.dwFlags & HCF_HIGHCONTRASTON) != 0));
 }
 
+// IsDarkMode reads the live OS setting. The test re-reads the same value
+// key independently: it pins the path (HKCU Personalize AppsUseLightTheme,
+// 0 means dark), not the user's current choice.
 TEST_CASE("IsDarkMode agrees with the registry value", "[ui][theme]") {
     DWORD value = 1;
     DWORD size = sizeof(value);
