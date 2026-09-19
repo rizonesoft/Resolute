@@ -27,6 +27,7 @@ track: P2
 - -> XREF: [`06-distro-release/TODO-01 §1`](../06-distro-release/TODO-01-build-and-release.md) -- the release that ships these ports
 - -> XREF: D04 T02 §1 -- the Ownership inventory this slice builds from ([TODO-02](./TODO-02-ownership-complete.md))
 - -> XREF: D04 T03 §1 -- the ComIntRep spec this section ordered ([TODO-03](./TODO-03-comintrep-complete.md))
+- -> XREF: D04 T04 §1 -- the PixRepair spec this section builds ([TODO-04](./TODO-04-pixrepair-complete.md))
 - -> XREF: [`09-au3-maintenance/TODO-01 §1`](../09-au3-maintenance/TODO-01-au3-maintenance.md) -- the AutoIt tool each port retires
 
 ## Outcome
