@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**151 findings across 24 sections.**
+**160 findings across 25 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 47 | the plan or the evidence misdescribes what happened |
+| `record` | 49 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
-| `consistency` | 24 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 22 | fails under hostile or unexpected input |
-| `integration` | 9 | a consumer, caller, or downstream artifact no longer holds |
+| `adversarial` | 25 | fails under hostile or unexpected input |
+| `consistency` | 25 | disagrees with the rest of the suite, its naming, or its layout |
+| `integration` | 12 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -124,6 +124,15 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §1` | F4 | `correctness` | fixed | independent | raised by the independent review, all four correct |
 | `D00 T04 §1` | F5 | `performance` | fixed | self | the default run paid for an analysis it did not use |
 | `D00 T04 §1` | F6 | `record` | fixed | self | the section's own block had gone stale |
+| `D00 T04 §10` | F1 | `adversarial` | fixed | independent | the export checker asserted presence while ignoring values |
+| `D00 T04 §10` | F2 | `consistency` | fixed | independent | the transitions scope note used an em dash |
+| `D00 T04 §10` | F3 | `integration` | fixed | independent | the as-of labeled any file with the checkout's HEAD |
+| `D00 T04 §10` | F4 | `record` | fixed | independent | the proof quoted a commit older than the data |
+| `D00 T04 §10` | F5 | `adversarial` | fixed | independent | an unhashable section crashed the export checker |
+| `D00 T04 §10` | F6 | `integration` | fixed | independent | a zero-round run passed the export checker |
+| `D00 T04 §10` | F7 | `integration` | fixed | independent | refs were neither homed nor unique |
+| `D00 T04 §10` | F8 | `record` | fixed | independent | the proof quote omitted the timestamp |
+| `D00 T04 §10` | F9 | `adversarial` | filed | independent | bool versions pass the export gates |
 | `D00 T04 §2` | F1 | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | `correctness` | fixed | self | the heading pattern matched ordinary headings |

@@ -66,7 +66,7 @@ track: W1
 |   7   |   §7    | Review-run records                         | §6         |  [x]   |
 |   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [ ]   |
 |   9   |   §9    | Review-input integrity                     | §6         |  [x]   |
-|  10   |   §10   | Run-record follow-ups                      | §7         |  [ ]   |
+|  10   |   §10   | Run-record follow-ups                      | §7         |  [x]   |
 |  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [ ]   |
 |  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [ ]   |
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
@@ -543,6 +543,12 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR23 D00-T04-S7-PR23
 
 > **Started:** 2026-09-19T08:08:00Z
+> **Verified:** 2026-09-19 | §10 | the runs file header pins terminology, `schema: 1`, the outcome-based `empty` rule, and the ledger-derived self side, all asserted by the parser · all 41 round lines carry provider, version, cost, latency, opportunity, purpose, and provenance, backfilled Opus versions reading `unresolved` · the report binds its commit by content identity, driven all three legs (committed-identical records bind `f118e30`, foreign and dirty read `unresolved`) · the export carries version 1 with as-of, asserted field by field including ref homing and uniqueness, and §8 decides from the regenerated export · every non-final finding keeps its transition (3 blocks), enforced exactly-one by `--check` · panel: 3 rounds, 9 findings, 8 fixed in-round, 1 filed to §14 · plan review: 16 findings into §15 and the §8 regenerate-at-decision item
+> **Review:** round 3 sign-off, candidate `f118e30` `986d912` `0ab7076` -- `adversarial` advisory at close (F9 filed) after fixes (2) · `consistency` approve after fix (1) · `integration` approve after fixes (3) · `source-defect` approve · `design` approve · `record` approve after fixes (2). Raw findings: docs/reviews/00-workspace/D00-T04-s10.md
+> **Plan review:** gpt (run 20260919-D00-T04-S10-gpt) -- filed: D00 T04 §15, D00 T04 §8 item; 12 rejected with reasons in the ledger
+> **CRUD:** this section writes the runs-file header (terminology, schema version, empty rule, self side), seven new round-line fields across 41 lines, the content-identity as-of, the versioned JSON export with its asserting checker, and the transitions file with its completeness gate. It reads the review files, the findings ledger, and the git object store; it writes records, never user systems. The only behavioral surfaces it adds are the `--export`/`--check-export` round-trip, the as-of line on `--report`, and the transitions gate inside `--check`. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-19T08:08:00Z to 2026-09-19T09:01:00Z
+> **Implementer:** Muse Code
 
 ## 11. Bind the Rename Scan to the Diff Header
 
