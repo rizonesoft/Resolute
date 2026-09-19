@@ -1026,7 +1026,7 @@ if __name__ == "__main__":
             print(f"attest: {exc}", file=sys.stderr)
             sys.exit(1)
         try:
-            with open(want["--out"], "w", encoding="utf-8") as fh:
+            with open(want["--out"], "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(body)
         except OSError as exc:
             print(f"attest: cannot write {want['--out']}: {exc}", file=sys.stderr)

@@ -73,6 +73,16 @@ $ClangTidy = Join-Path $RepoRoot 'reskit\llvm-mingw\bin\clang-tidy.exe'
 $Ctest = Join-Path $RepoRoot 'reskit\cmake\bin\ctest.exe'
 $BaselineFile = Join-Path $RepoRoot 'todo\.tidy-baseline'
 
+# The TODO scripts are stdlib-only and run under any Python 3, but the name
+# on PATH differs by platform and install: `python` on Windows, `python3`
+# under WSL and CI, `py` as the Windows launcher fallback. Resolve once so a
+# bare `python` that is missing (or shadowed by the Store stub) fails here
+# with a name, not eight gates down with a confusing error.
+$Python = @('python', 'python3', 'py') | ForEach-Object {
+    Get-Command $_ -ErrorAction SilentlyContinue
+} | Select-Object -First 1 -ExpandProperty Source
+if (-not $Python) { throw 'check-all: no Python 3 on PATH (looked for python, python3, py)' }
+
 $results = [System.Collections.ArrayList]::new()
 
 # ── One gate, one line, detail only when it fails ────────────
@@ -266,13 +276,13 @@ Invoke-Gate -Name 'tests' -LogName 'gate-tests' -Command {
 # ── validate, and the plan projection ────────────────────────
 
 Invoke-Gate -Name 'graph validate' -LogName 'gate-validate' -Command {
-    & python (Join-Path $RepoRoot 'scripts\todo-graph.py') validate
+    & $Python (Join-Path $RepoRoot 'scripts\todo-graph.py') validate
 }
 Invoke-Gate -Name 'graph self-test' -LogName 'gate-selftest' -Command {
-    & python (Join-Path $RepoRoot 'scripts\todo-graph.py') self-test
+    & $Python (Join-Path $RepoRoot 'scripts\todo-graph.py') self-test
 }
 Invoke-Gate -Name 'plan --check' -LogName 'gate-plan' -Command {
-    & python (Join-Path $RepoRoot 'scripts\todo-graph.py') plan --check
+    & $Python (Join-Path $RepoRoot 'scripts\todo-graph.py') plan --check
 }
 
 # ── claims, and the findings ledger ──────────────────────────
@@ -282,13 +292,13 @@ Invoke-Gate -Name 'plan --check' -LogName 'gate-plan' -Command {
 # by D00 T04 §1, which owns the checks and not this script.
 
 Invoke-Gate -Name 'claims' -LogName 'gate-claims' -Command {
-    & python (Join-Path $RepoRoot 'scripts\todo-claims.py')
+    & $Python (Join-Path $RepoRoot 'scripts\todo-claims.py')
 }
 Invoke-Gate -Name 'claims self-test' -LogName 'gate-claims-selftest' -Command {
-    & python (Join-Path $RepoRoot 'scripts\todo-claims.py') --self-test
+    & $Python (Join-Path $RepoRoot 'scripts\todo-claims.py') --self-test
 }
 Invoke-Gate -Name 'findings ledger' -LogName 'gate-findings' -Command {
-    & python (Join-Path $RepoRoot 'scripts\todo-findings.py') --check
+    & $Python (Join-Path $RepoRoot 'scripts\todo-findings.py') --check
 }
 
 # The conformance profile is a contract other domains are measured against, so
@@ -297,10 +307,10 @@ Invoke-Gate -Name 'findings ledger' -LogName 'gate-findings' -Command {
 # it, and the two are separate because a broken profile makes every tool result
 # meaningless and has to be visible on its own. D07 T01 §1.
 Invoke-Gate -Name 'conformance profile' -LogName 'gate-profile' -Command {
-    & python (Join-Path $RepoRoot 'scripts\profile-check.py')
+    & $Python (Join-Path $RepoRoot 'scripts\profile-check.py')
 }
 Invoke-Gate -Name 'profile self-test' -LogName 'gate-profile-selftest' -Command {
-    & python (Join-Path $RepoRoot 'scripts\profile-check.py') --self-test
+    & $Python (Join-Path $RepoRoot 'scripts\profile-check.py') --self-test
 }
 
 # ── toolchain currency, ADVISORY ─────────────────────────────

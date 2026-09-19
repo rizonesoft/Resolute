@@ -93,7 +93,7 @@ Each lens ends in a verdict: `approve`, `needs-attention` (with findings), or `a
 
 ### The mixed panel
 
-Every review mints one private directory and stages every prompt file under it: fixed `/tmp` names collide across concurrent sessions on one machine, proven when a §9 round fenced another session's contract as its own and voided the round. Mint once per review, reuse for every round, plan review, and stamp review of that review, and keep the directory as evidence (no trap-delete; the OS scrubs `/tmp`).
+Every review mints one private directory and stages every prompt file under it: fixed `/tmp` names collide across concurrent sessions on one machine, proven when a §9 round fenced another session's contract as its own and voided the round. Mint once per review, reuse for every round, plan review, and stamp review of that review, and keep the directory as evidence (no trap-delete; the OS scrubs `/tmp`). On Windows, run every `bash` block in this skill under Git Bash at `C:\Program Files\Git\bin\bash.exe`, never the `bash` on PATH (that is WSL's, and it resolves `python3` to Ubuntu's interpreter against the wrong tree). Git Bash carries `mktemp`, `timeout`, `sed`, and `date`, and both `python` and `python3` there resolve to the same Windows interpreter (probed 2026-09-19), so the blocks below run verbatim.
 
 ```bash
 RUNDIR=$(mktemp -d /tmp/review-XXXXXXXX)

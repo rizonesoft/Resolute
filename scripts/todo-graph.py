@@ -1750,6 +1750,7 @@ def cmd_warnings(args: argparse.Namespace) -> int:
         f"# accepted {len(current)} warning(s)\n"
         + ("\n".join(current) + "\n" if current else ""),
         encoding="utf-8",
+        newline=chr(10),
     )
     try:
         shown = WARNING_BASELINE.relative_to(REPO)
@@ -4865,7 +4866,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
         return 0
 
     text = _align_tables(text)
-    PLAN.write_text(text, encoding="utf-8")
+    PLAN.write_text(text, encoding="utf-8", newline=chr(10))
     write_progress_json(todos)
     write_operator_json(todos)
     for r in dupes:
