@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**133 findings across 22 sections.**
+**140 findings across 23 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 42 | the plan or the evidence misdescribes what happened |
+| `record` | 43 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
-| `consistency` | 21 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 14 | fails under hostile or unexpected input |
-| `integration` | 7 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 23 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 17 | fails under hostile or unexpected input |
+| `integration` | 8 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -148,6 +148,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §6` | F4 | `integration` | fixed | independent | the failover names an Opus round but gives no command |
 | `D00 T04 §6` | F5 | `record` | corrected | independent | zero overlap cannot mean complementarity across sequential candidates |
 | `D00 T04 §6` | F6 | `consistency` | fixed | independent | three em dashes in new authored prose |
+| `D00 T04 §7` | F1 | `adversarial` | fixed | independent | a self-marked ref passed as an independent find |
+| `D00 T04 §7` | F2 | `adversarial` | fixed | independent | a deleted engagement changed the counts silently |
+| `D00 T04 §7` | F3 | `consistency` | fixed | independent | per-round attribution lived in ignored comments |
+| `D00 T04 §7` | F4 | `integration` | fixed | independent | a blob or tree passed as a reviewed candidate |
+| `D00 T04 §7` | F5 | `record` | fixed | independent | missing fields defaulted instead of reporting |
+| `D00 T04 §7` | F6 | `adversarial` | fixed | independent | an unreadable runs file crashed the checker |
+| `D00 T04 §7` | F7 | `consistency` | fixed | independent | the records prose was hard-wrapped |
 | `D07 T01 §1` | F1 | `record` | corrected | self | the measured defect classes are eight, not seven |
 | `D07 T01 §1` | F2 | `record` | routed | self | the section was told to wait for a decision that has no owner here |
 | `D07 T01 §1` | F3 | `record` | corrected | self | the checkpoint could not fail |

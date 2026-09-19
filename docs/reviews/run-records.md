@@ -185,6 +185,18 @@ round: 4 model: opus effort: medium outcome: empty candidate: 79979a6 findings:
 empty: 1
 refuted: 1
 
+run: D00-T04-S7
+date: 2026-09-19
+runner: panel
+rounds: 4
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: e44b137 findings: D00-T04-S7-F1, D00-T04-S7-F2, D00-T04-S7-F3, D00-T04-S7-F4, D00-T04-S7-F5
+round: 2 model: gpt-5.6-sol effort: medium outcome: empty candidate: 2a184a9 findings:
+round: 3 model: opus effort: medium outcome: findings candidate: 2a184a9 findings: D00-T04-S7-F6, D00-T04-S7-F7
+round: 4 model: opus effort: medium outcome: empty candidate: 091262f findings:
+# round 1: F1-F5; round 2: empty; round 3: F6-F7; round 4: empty.
+empty: 2
+refuted: 0
+
 run: D07-T01-S1
 date: 2026-09-17
 runner: codex

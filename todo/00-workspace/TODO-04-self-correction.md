@@ -63,7 +63,7 @@ track: W1
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [x]   |
 |   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [x]   |
 |   6   |   §6    | The adversarial reviewer                   | §2         |  [x]   |
-|   7   |   §7    | Review-run records                         | §6         |  [ ]   |
+|   7   |   §7    | Review-run records                         | §6         |  [x]   |
 |   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [ ]   |
 |   9   |   §9    | Review-input integrity                     | §6         |  [ ]   |
 |  10   |   §10   | Run-record follow-ups                      | §7         |  [ ]   |
@@ -447,6 +447,13 @@ So this section is mostly wiring and measurement rather than construction, and i
 -> XREF: D00 T04 §10 -- the follow-ups this section's plan review filed
 
 > **Started:** 2026-09-19T05:38:00Z
+
+> **Verified:** 2026-09-19 | §7 | the runs are records now: 22 backfilled engagements over 31 independent rounds in `docs/reviews/run-records.md`, `todo-runs.py --check` cross-reading every ref against the review files, `--report` deriving 22 engagements, 4 empty, 1 refuted, and the split (independent 64, self 69) agreeing exactly with the ledger's by-source counts · ranges expand (127 + 6 = 133, the §6 methodology note's first difference superseded, the second standing) · the five outcome queries print `refuted 1, withdrawn 0, duplicate 0, routed 2, non-defect 5`, and the item's `0 refuted` corrected to the measured 1 · self-test 20 cases green, a missing field reported not defaulted, an unreadable file reported not crashed · panel: 4 rounds, 7 findings, all fixed in-round · plan review: 23 findings into D00 T04 §10 and the §8 severity item
+> **Review:** round 4, candidate `e44b137` `2a184a9` `091262f` -- `adversarial` approve after fixes (3) · `consistency` approve after fixes (2) · `integration` approve after fix (1) · `source-defect` approve · `design` approve · `record` approve after fix (1). Raw findings: docs/reviews/00-workspace/D00-T04-s7.md
+> **Plan review:** gpt (run 20260919-D00-T04-S7-gpt) -- filed: D00 T04 §10, D00 T04 §8 severity item; 7 rejected and 3 duplicate with reasons in the ledger
+> **CRUD:** this section writes review-run records, a runs checker, and the ledger's range and outcome queries. It reads 22 findings files and the git history; it writes the run records, per-round attribution the checker verifies, and the regenerated ledger at 133. The only behavioral surfaces it adds are the runs gate failing on an unresolving ref, an uncovered mark, a runless file, or a miscounted total, and the findings gate expanding ranges. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 43
+> **Implementer:** Muse Code
 
 ## 8. Revisit the Two-Model Decision
 

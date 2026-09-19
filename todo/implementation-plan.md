@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **22 of 131 sections complete (17%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **23 of 131 sections complete (18%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -105,7 +105,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §4`  | Re-Sequencing on Evidence                      |   7   |
 | [x] | `D00 T04 §5`  | Make the Adjacency Advisory Actionable         |   7   |
 | [x] | `D00 T04 §6`  | The Adversarial Reviewer                       |   7   |
-| [ ] | `D00 T04 §7`  | Review-run records                             |   4   |
+| [x] | `D00 T04 §7`  | Review-run records                             |   4   |
 | [ ] | `D00 T04 §8`  | Revisit the two-model decision                 |   6   |
 | [ ] | `D00 T04 §9`  | Review-input integrity                         |   5   |
 | [ ] | `D00 T04 §10` | Run-record follow-ups                          |   5   |
