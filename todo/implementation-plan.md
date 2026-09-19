@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **25 of 167 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **25 of 171 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -205,6 +205,10 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D03 T02 §5` | Suite log viewer surface                     |   5   |
 | [ ] | `D03 T02 §6` | Symptom search surface                       |   5   |
 | [ ] | `D03 T02 §7` | Launcher chrome and notices                  |   6   |
+| [ ] | `D04 T02 §1` | Ownership inventory, shared-layer map        |   6   |
+| [ ] | `D04 T02 §2` | Ownership distribution completeness          |   7   |
+| [ ] | `D04 T02 §3` | Verify-after-write, per-tree status          |   6   |
+| [ ] | `D04 T02 §4` | Remove-all, stuck-state repair               |   4   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
 | [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   8   |

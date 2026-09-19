@@ -25,6 +25,7 @@ track: P2
 - -> XREF: [`03-launcher/TODO-01 §1`](../03-launcher/TODO-01-launcher.md) -- the launcher that discovers these tools
 - -> XREF: [`05-new-tools/TODO-01 §1`](../05-new-tools/TODO-01-intake-and-new-tools.md) -- the intake contract, which reuses this file's porting pattern
 - -> XREF: [`06-distro-release/TODO-01 §1`](../06-distro-release/TODO-01-build-and-release.md) -- the release that ships these ports
+- -> XREF: D04 T02 §1 -- the Ownership inventory this slice builds from ([TODO-02](./TODO-02-ownership-complete.md))
 - -> XREF: [`09-au3-maintenance/TODO-01 §1`](../09-au3-maintenance/TODO-01-au3-maintenance.md) -- the AutoIt tool each port retires
 
 ## Outcome
@@ -43,7 +44,7 @@ track: P2
 
 | Order | Section | Deliverable                                  | Depends On                 | Status |
 | :---: | :-----: | -------------------------------------------- | -------------------------- | :----: |
-|   1   |   §1    | Vertical slice: Ownership end to end         | D01 T01 §9, D02 T01 §4, D00 T02 §4 |  [ ]   |
+|   1   |   §1    | Vertical slice: Ownership end to end         | D01 T01 §9, D02 T01 §4, D00 T02 §4, D04 T02 §1 |  [ ]   |
 |   2   |   §2    | The remaining frozen tools: ComIntRep, PixRepair | §1                |  [ ]   |
 |   3   |   §3    | Browser optimizer: four tools into one       | §1                         |  [ ]   |
 |   4   |   §4    | Drive Repair: USBRepair and DVDRepair merged | §2                         |  [ ]   |

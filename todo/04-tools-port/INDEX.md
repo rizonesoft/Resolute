@@ -9,6 +9,7 @@ Every existing tool ported to the C++ framework, proven 1:1 against its AutoIt c
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-tool-ports.md) | Tool Ports | draft |
+| [TODO-02](./TODO-02-ownership-complete.md) | Ownership: Complete Port and Enhancement | draft |
 
 ## Completed
 
