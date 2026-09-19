@@ -16,15 +16,17 @@ already has one, and it drifts exactly like a figure duplicated in prose.
 
 A finding is a Markdown heading in a findings file:
 
-    ### F1 -- four claims pointed into gitignored `samples/` -- consistency -- FIXED (self)
-    ### F2 -- the build is not reproducible -- reproducibility -- FILED to `D07 T01` (independent)
+    ### F1 -- four claims pointed into gitignored `samples/` -- consistency -- FIXED (self) [major]
+    ### F2 -- the build is not reproducible -- reproducibility -- FILED to `D07 T01` (independent) [major]
 
 Four fields separated by ` -- `: the number, the summary, the category, the disposition.
 The disposition carries a trailing source marker, `(independent)` or `(self)`: who
-raised the finding, not who fixed it. A heading this cannot parse, or a finding
-whose source is missing or outside the closed set, is REPORTED, never skipped:
-skipping is how the split-claim defect hid in the claims checker, where the count
-simply dropped and the total still said everything held.
+raised the finding, not who fixed it. The heading closes with a severity marker,
+`[critical]`, `[major]`, or `[minor]`: how bad it is, rated as raised. A heading
+this cannot parse, or a finding whose source or severity is missing or outside
+the closed set, is REPORTED, never skipped: skipping is how the split-claim
+defect hid in the claims checker, where the count simply dropped and the total
+still said everything held.
 
 Exit codes: 0 everything parsed, 1 at least one heading could not be read.
 """
@@ -122,18 +124,38 @@ SOURCES = {
     "self":        "raised by the implementing session itself",
 }
 
+# How bad the finding is, rated as raised. The scale mirrors the plan-review
+# ledger's, so one vocabulary covers both: critical invalidates safety, data
+# integrity, or the stamp; major is wrong behavior; minor is polish. Findings
+# that were never defects (refuted, withdrawn, duplicate) carry minor:
+# nothing weighs there, because the defect either was not one or, for
+# duplicates, counts at its home row. Cleared rates as raised like fixed:
+# the disposition marks a resolved question, and the question can be major.
+# Anything outside the set is reported, never bucketed, like every other
+# marker on the heading.
+SEVERITIES = {
+    "critical": "invalidates safety, data integrity, or the stamp",
+    "major":    "wrong behavior in code, plan, or record",
+    "minor":    "polish or wording, or no surviving defect",
+}
+
 # The trailing source marker on the disposition: `FIXED (self)`,
 # `FILED to D07 T01 (independent)`. Only the trailing parenthetical counts;
 # a parenthetical anywhere earlier is prose and is ignored.
 SOURCE_RE = re.compile(r"\(([^()]*)\)\s*$")
 
+# The severity marker closes the heading: `FIXED (self) [major]`. Trailing
+# only, like the source: a bracket anywhere earlier is prose. Stripped before
+# the source is read, so the source rule never sees it.
+SEVERITY_RE = re.compile(r"\[(?P<sev>[^\[\]]*)\]\s*$")
+
 
 class Finding:
     __slots__ = ("ref", "path", "line", "number", "summary", "category", "disposition",
-                 "filed_to", "source")
+                 "filed_to", "source", "severity")
 
     def __init__(self, ref, path, line, number, summary, category, disposition,
-                 filed_to=None, source=None):
+                 filed_to=None, source=None, severity=None):
         self.ref = ref
         self.path = path
         self.line = line
@@ -143,6 +165,7 @@ class Finding:
         self.disposition = disposition
         self.filed_to = filed_to
         self.source = source
+        self.severity = severity
 
 
 def _ref_for(name: str) -> str | None:
@@ -189,7 +212,16 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
         if disp is None:
             bad.append((path, lineno, f"unreadable disposition {disposition!r}; expected one of {sorted(DISPOSITIONS)}"))
             continue
-        sm = SOURCE_RE.search(disposition)
+        vm = SEVERITY_RE.search(disposition)
+        if vm is None:
+            bad.append((path, lineno, f"no severity marker; end the heading with [critical], [major], or [minor]"))
+            continue
+        severity = vm.group("sev").strip().lower()
+        if severity not in SEVERITIES:
+            bad.append((path, lineno, f"unknown severity {vm.group('sev')!r}; expected one of {sorted(SEVERITIES)}"))
+            continue
+        unmarked = disposition[:vm.start()].rstrip()
+        sm = SOURCE_RE.search(unmarked)
         if sm is None:
             bad.append((path, lineno, f"no source marker; end the disposition with (independent) or (self)"))
             continue
@@ -197,7 +229,7 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
         if source not in SOURCES:
             bad.append((path, lineno, f"unknown source {sm.group(1)!r}; expected one of {sorted(SOURCES)}"))
             continue
-        target = FILED_TO_RE.search(disposition)
+        target = FILED_TO_RE.search(unmarked)
         rm = RANGE_RE.match(number)
         if rm is not None:
             lo, hi = int(rm.group("lo")), int(rm.group("hi"))
@@ -209,7 +241,8 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
             numbers = [number]
         for num in numbers:
             findings.append(Finding(ref, path, lineno, num, summary, cat, disp,
-                                    target.group(1) if target else None, source))
+                                    target.group(1) if target else None, source,
+                                    severity))
     return findings, bad
 
 
@@ -354,6 +387,11 @@ def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
     for src, n in by_source.most_common():
         print(f"    {src:16} {n}")
 
+    by_sev = Counter(f.severity for f in findings)
+    print("\n  by severity")
+    for sev in ("critical", "major", "minor"):
+        print(f"    {sev:16} {by_sev[sev]}")
+
     print("\n  by outcome")
     for name in ("refuted", "withdrawn", "duplicate", "routed", "non-defect"):
         n = by_disp[name] if name != "non-defect" else by_disp["refuted"] + by_disp["cleared"]
@@ -383,6 +421,7 @@ def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
 
 def render_ledger(findings: list[Finding]) -> str:
     by_cat = Counter(f.category for f in findings)
+    by_sev = Counter(f.severity for f in findings)
     by_section = defaultdict(list)
     for f in findings:
         by_section[f.ref].append(f)
@@ -407,13 +446,20 @@ def render_ledger(findings: list[Finding]) -> str:
     for cat, n in by_cat.most_common():
         out.append(f"| `{cat}` | {n} | {CATEGORIES[cat]} |")
     out.append("")
+    out.append("## By severity")
+    out.append("")
+    out.append("| Severity | Count | What it means |")
+    out.append("| --- | ---: | --- |")
+    for sev in ("critical", "major", "minor"):
+        out.append(f"| `{sev}` | {by_sev[sev]} | {SEVERITIES[sev]} |")
+    out.append("")
     out.append("## Every finding")
     out.append("")
-    out.append("| Section | # | Category | Disposition | Source | Summary |")
-    out.append("| --- | --- | --- | --- | --- | --- |")
+    out.append("| Section | # | Severity | Category | Disposition | Source | Summary |")
+    out.append("| --- | --- | --- | --- | --- | --- | --- |")
     for ref in sorted(by_section):
         for f in by_section[ref]:
-            out.append(f"| `{ref}` | {f.number} | `{f.category}` | {f.disposition} | {f.source} | {f.summary} |")
+            out.append(f"| `{ref}` | {f.number} | {f.severity} | `{f.category}` | {f.disposition} | {f.source} | {f.summary} |")
     out.append("")
     return "\n".join(out)
 
@@ -424,12 +470,12 @@ def _self_test() -> int:
     f = tmp / "D00-T99-s1.md"
     f.write_text(
         "# R\n\n"
-        "### F1 -- a thing went wrong -- consistency -- FIXED (self)\n\n"
-        "### F2 -- another thing -- consistency -- FILED to `D01 T01 §1` (independent)\n\n"
-        "### F3 -- a third -- performance -- FIXED\n\n"
+        "### F1 -- a thing went wrong -- consistency -- FIXED (self) [major]\n\n"
+        "### F2 -- another thing -- consistency -- FILED to `D01 T01 §1` (independent) [major]\n\n"
+        "### F3 -- a third -- performance -- FIXED [major]\n\n"
         "### F4 -- no category here -- FIXED (self)\n\n"
         "### F5 -- bad category -- nonsense -- FIXED (self)\n\n"
-        "### F6 -- bad source -- record -- FIXED (codex)\n\n"
+        "### F6 -- bad source -- record -- FIXED (codex) [major]\n\n"
         "### Not a finding heading\n",
         encoding="utf-8",
     )
@@ -453,8 +499,8 @@ def _self_test() -> int:
         failed += 1
     # Range headings expand; a backward range reports instead
     (tmp / "D00-T10-s1.md").write_text(
-        "### F1-F3 -- three at once -- record -- FIXED (self)\n\n"
-        "### F5-F2 -- backward -- record -- FIXED (self)\n",
+        "### F1-F3 -- three at once -- record -- FIXED (self) [minor]\n\n"
+        "### F5-F2 -- backward -- record -- FIXED (self) [minor]\n",
         encoding="utf-8",
     )
     rf, rb = parse_file(tmp / "D00-T10-s1.md")
@@ -466,8 +512,8 @@ def _self_test() -> int:
         failed += 1
     # New outcome dispositions parse; the queries derive from them
     (tmp / "D00-T10-s2.md").write_text(
-        "### F1 -- retracted -- record -- WITHDRAWN (self)\n\n"
-        "### F2 -- twice seen -- record -- DUPLICATE (independent)\n",
+        "### F1 -- retracted -- record -- WITHDRAWN (self) [minor]\n\n"
+        "### F2 -- twice seen -- record -- DUPLICATE (independent) [minor]\n",
         encoding="utf-8",
     )
     of, ob = parse_file(tmp / "D00-T10-s2.md")
@@ -515,7 +561,7 @@ def _self_test() -> int:
     NL = chr(10)
     noise.write_text(NL.join([
         "## Findings", "", "### Findings", "", "### Frozen check", "",
-        "### Fixes applied", "", "### F1 -- real -- record -- FIXED (self)", "",
+        "### Fixes applied", "", "### F1 -- real -- record -- FIXED (self) [major]", "",
     ]), encoding="utf-8")
     nf, nb = parse_file(noise)
     if len(nf) != 1 or nb:
@@ -543,9 +589,9 @@ def _self_test() -> int:
     # Transitions: every non-final row keeps its when, why, and evidence.
     tfind = [
         Finding("D00 T04 §9", f, 1, "F1", "retracted", "record", "withdrawn",
-                source="self"),
+                source="self", severity="minor"),
         Finding("D00 T04 §9", f, 2, "F2", "stays fixed", "record", "fixed",
-                source="self"),
+                source="self", severity="major"),
     ]
     tpath = tmp / "transitions.md"
     tpath.write_text(
@@ -629,10 +675,30 @@ def _self_test() -> int:
         failed += 1
     tpath.unlink()
 
-    for x in (f, other, tmp / "D00-T10-s1.md", tmp / "D00-T10-s2.md"):
+    # Severity closes the heading: missing and unknown both report, and a
+    # bracket earlier in the line is prose, not the marker.
+    (tmp / "D00-T10-s3.md").write_text(
+        "### F1 -- unmarked -- record -- FIXED (self)\n\n"
+        "### F2 -- odd mark -- record -- FIXED (self) [trivial]\n\n"
+        "### F3 -- [bracketed] prose -- record -- FIXED (self) [minor]\n",
+        encoding="utf-8",
+    )
+    sf, sb = parse_file(tmp / "D00-T10-s3.md")
+    if not any("no severity marker" in w for _, _, w in sb):
+        print("  FAIL  a missing severity was not reported")
+        failed += 1
+    if not any("unknown severity 'trivial'" in w for _, _, w in sb):
+        print("  FAIL  an unknown severity was not reported")
+        failed += 1
+    if [x.severity for x in sf] != ["minor"]:
+        print(f"  FAIL  severity parsed wrong: {[x.severity for x in sf]}")
+        failed += 1
+
+    for x in (f, other, tmp / "D00-T10-s1.md", tmp / "D00-T10-s2.md",
+              tmp / "D00-T10-s3.md"):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 26 cases, {failed} failed")
+    print(f"todo-findings self-test: 29 cases, {failed} failed")
     return 1 if failed else 0
 
 
