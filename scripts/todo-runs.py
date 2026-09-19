@@ -25,8 +25,10 @@ verdict overlap (rounds sharing a four-lens signature), the empty-round
 index, and the source split (independent from runs, self from ledger).
 """
 
+import datetime
 import importlib.util
 import io
+import json
 import re
 import subprocess
 import sys
@@ -50,13 +52,24 @@ DEFAULT_RUNS = ROOT / "docs" / "reviews" / "run-records.md"
 RUNNERS = ("codex", "panel")
 EFFORTS = ("high", "medium", "low")
 OUTCOMES = ("findings", "empty", "error")
+PROVIDERS = ("codex", "claude")
+OPPORTUNITIES = ("full-scope", "delta-plus-regressions", "unresolved")
+PURPOSES = ("section-review", "stamp-review", "sign-off", "fix-loop", "unresolved")
+PROVENANCES = ("recorded", "reconstructed")
 FAMILY_MODEL = {"GPT": "gpt-5.6-sol", "Opus": "opus"}
+SCHEMA_VERSION = 1
+EXPORT_VERSION = 1
 
 RUN_RE = re.compile(r"^run:\s*(?P<section>D\d{2}-T\d{2}-S\d+)\s*$")
+SCHEMA_RE = re.compile(r"^schema:\s*(?P<version>\d+)\s*$")
 FIELD_RE = re.compile(r"^(?P<key>date|runner|rounds|round|empty|refuted):\s*(?P<value>.*)$")
-ROUND_ITEM_RE = re.compile(r"(?P<key>model|effort|outcome|candidate):\s*(?P<value>\S+)")
+ROUND_ITEM_RE = re.compile(r"(?P<key>model|effort|outcome|candidate|provider|version|cost|latency|opportunity|purpose|provenance):\s*(?P<value>\S+)")
 ROUND_FINDINGS_RE = re.compile(r"\bfindings:\s*(?P<refs>.*)$")
 REQUIRED_FIELDS = ("date", "runner", "rounds", "empty", "refuted")
+REQUIRED_ROUND_KEYS = ("model", "effort", "outcome", "candidate", "provider", "version",
+                       "cost", "latency", "opportunity", "purpose", "provenance")
+COST_RE = re.compile(r"^(?:unresolved|[0-9]+tokens)$")
+LATENCY_RE = re.compile(r"^(?:unresolved|[0-9]+s)$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 REF_RE = re.compile(r"^D\d{2}-T\d{2}-S\d+-F\d+$")
@@ -96,6 +109,7 @@ def parse_runs(text):
     runs = []
     errors = []
     current = None
+    schema_lineno = None
 
     def finish():
         if current is not None:
@@ -112,6 +126,18 @@ def parse_runs(text):
         if m:
             finish()
             current = Run(m.group("section"), lineno)
+            continue
+        sm = SCHEMA_RE.match(line)
+        if sm is not None:
+            if current is not None or runs:
+                errors.append((lineno, "schema declares once, ahead of the first run block"))
+            elif schema_lineno is not None:
+                errors.append((lineno, "duplicate schema declaration"))
+            elif int(sm.group("version")) != SCHEMA_VERSION:
+                errors.append((lineno, f"schema {sm.group('version')} is not {SCHEMA_VERSION}; "
+                                       f"this parser reads {SCHEMA_VERSION} only"))
+            else:
+                schema_lineno = lineno
             continue
         if current is None:
             if not runs and not errors:
@@ -153,6 +179,8 @@ def parse_runs(text):
         else:
             setattr(current, key, value)
     finish()
+    if schema_lineno is None:
+        errors.append((0, f"no schema declaration; declare `schema: {SCHEMA_VERSION}` ahead of the runs"))
     return runs, errors
 
 
@@ -177,7 +205,7 @@ def check_runs(runs, errors):
             errors.append((run.lineno,
                            f"rounds says {run.rounds} but {len(run.round_lines)} round lines present"))
         for rl_lineno, _n, items in run.round_lines:
-            for need in ("model", "effort", "outcome", "candidate"):
+            for need in REQUIRED_ROUND_KEYS:
                 if need not in items:
                     errors.append((rl_lineno, f"round line misses {need}"))
             if "effort" in items and items["effort"] not in EFFORTS:
@@ -186,6 +214,20 @@ def check_runs(runs, errors):
                 errors.append((rl_lineno, f"outcome must be one of {OUTCOMES}"))
             if "candidate" in items and not SHA_RE.match(items["candidate"]):
                 errors.append((rl_lineno, f"candidate is not a hex sha: {items['candidate']!r}"))
+            if "provider" in items and items["provider"] not in PROVIDERS:
+                errors.append((rl_lineno, f"provider must be one of {PROVIDERS}"))
+            # version is free text by design (pins differ per provider);
+            # unknown versions read `unresolved` by convention, not by gate.
+            if "cost" in items and not COST_RE.match(items["cost"]):
+                errors.append((rl_lineno, "cost reads `<int>tokens` or `unresolved`"))
+            if "latency" in items and not LATENCY_RE.match(items["latency"]):
+                errors.append((rl_lineno, "latency reads `<int>s` or `unresolved`"))
+            if "opportunity" in items and items["opportunity"] not in OPPORTUNITIES:
+                errors.append((rl_lineno, f"opportunity must be one of {OPPORTUNITIES}"))
+            if "purpose" in items and items["purpose"] not in PURPOSES:
+                errors.append((rl_lineno, f"purpose must be one of {PURPOSES}"))
+            if "provenance" in items and items["provenance"] not in PROVENANCES:
+                errors.append((rl_lineno, f"provenance must be one of {PROVENANCES}"))
             for ref in items.get("findings", []):
                 if not REF_RE.match(ref):
                     errors.append((rl_lineno, f"finding ref must be D..-T..-S..-F<n>, got {ref!r}"))
@@ -389,14 +431,67 @@ def run_check(runs_path):
     return runs, errors
 
 
+def as_of():
+    """The report's binding: HEAD commit plus UTC timestamp, or unresolved
+    when git is unavailable. Never guessed: a report that cannot name
+    its commit says so."""
+    try:
+        hit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                             capture_output=True, text=True, timeout=30)
+        sha = hit.stdout.strip() if hit.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        sha = ""
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    if not SHA_RE.match(sha) or len(sha) != 40:
+        return {"commit": "unresolved", "timestamp": stamp}
+    return {"commit": sha, "timestamp": stamp}
+
+
 def report(runs):
     lines = []
+    binding = as_of()
+    lines.append(f"as-of: {binding['commit']} {binding['timestamp']}")
     lines.append(f"{len(runs)} review runs, "
                  f"{sum(r.rounds or 0 for r in runs)} independent rounds.")
     empty_engagements = sum(1 for r in runs if all(
         items.get("outcome") == "empty" for _, _, items in r.round_lines))
     lines.append(f"{len(runs)} engagements, {empty_engagements} empty, "
                  f"{sum(r.refuted or 0 for r in runs)} refuted.")
+    lines.append("")
+    lines.append("Findings by model (rounds, findings raised, refuted among them):")
+    by_model: dict[str, list] = {}
+    for run in runs:
+        for _lineno, _n, items in run.round_lines:
+            slot = by_model.setdefault(items.get("model", "?"), [0, 0])
+            slot[0] += 1
+            slot[1] += len(items.get("findings", []))
+    refuted_by_model: dict[str, int] = {}
+    findings, _bad = TF.collect()
+    by_ref = {f"{_compact_section(f.ref)}-{f.number}": f for f in findings}
+    for run in runs:
+        for _lineno, _n, items in run.round_lines:
+            got = sum(1 for ref in items.get("findings", [])
+                      if ref in by_ref and by_ref[ref].disposition == "refuted")
+            if got:
+                refuted_by_model[items.get("model", "?")] = \
+                    refuted_by_model.get(items.get("model", "?"), 0) + got
+    for model in sorted(by_model):
+        rounds_n, raised = by_model[model]
+        lines.append(f"- {model}: {rounds_n} round(s), {raised} raised, "
+                     f"{refuted_by_model.get(model, 0)} refuted")
+    lines.append("")
+    lines.append("Cost (recorded tokens; USD prices outside the record):")
+    known = [(run.section, n, items["cost"])
+             for run in runs for _, n, items in run.round_lines
+             if items.get("cost") != "unresolved"]
+    total_rounds = sum(run.rounds or 0 for run in runs)
+    if known:
+        total_tokens = sum(int(cost[:-6]) for _, _, cost in known)
+        lines.append(f"- {len(known)}/{total_rounds} rounds recorded, {total_tokens} tokens")
+        for section, n, cost in known:
+            lines.append(f"- {section} round {n}: {cost}")
+    else:
+        lines.append(f"- no recorded cost ({total_rounds}/{total_rounds} unresolved)")
     lines.append("")
     lines.append("Rounds per section:")
     for run in runs:
@@ -449,6 +544,84 @@ def report(runs):
     return "\n".join(lines) + "\n"
 
 
+def export_runs(runs):
+    """The machine export §8 consumes: versioned JSON with the as-of
+    binding and every run's rounds. Consumers assert export_version
+    before reading anything else."""
+    return {
+        "export_version": EXPORT_VERSION,
+        "schema": SCHEMA_VERSION,
+        "as_of": as_of(),
+        "runs": [
+            {
+                "section": run.section,
+                "date": run.date,
+                "runner": run.runner,
+                "rounds": run.rounds,
+                "empty": run.empty,
+                "refuted": run.refuted,
+                "round_lines": [
+                    {"number": n, **{k: items.get(k) for k in REQUIRED_ROUND_KEYS
+                                    if k in items},
+                     "findings": list(items.get("findings", []))}
+                    for _, n, items in sorted(run.round_lines, key=lambda r: r[1])
+                ],
+            }
+            for run in runs
+        ],
+    }
+
+
+def check_export(doc):
+    """Assert an export file: version, shape, internal counts. Returns a
+    list of messages (empty means sound). The as-of binds the snapshot;
+    live-tree agreement is NOT checked here, a snapshot is a moment."""
+    problems = []
+    if not isinstance(doc, dict):
+        return ["export is not an object"]
+    if doc.get("export_version") != EXPORT_VERSION:
+        problems.append(f"export_version is {doc.get('export_version')!r}, "
+                        f"this checker asserts {EXPORT_VERSION}")
+        return problems
+    as_of_doc = doc.get("as_of", {})
+    if not isinstance(as_of_doc, dict) or "commit" not in as_of_doc or "timestamp" not in as_of_doc:
+        problems.append("as_of lacks commit and timestamp")
+    runs = doc.get("runs")
+    if not isinstance(runs, list):
+        problems.append("runs is not a list")
+        return problems
+    seen = set()
+    for run in runs:
+        if not isinstance(run, dict):
+            problems.append("a run entry is not an object")
+            continue
+        section = run.get("section", "?")
+        if section in seen:
+            problems.append(f"{section}: duplicate run entry")
+        seen.add(section)
+        lines = run.get("round_lines", [])
+        if run.get("rounds") != len(lines):
+            problems.append(f"{section}: rounds says {run.get('rounds')} but "
+                            f"{len(lines)} round lines present")
+        numbers = sorted(line.get("number") for line in lines if isinstance(line, dict))
+        if numbers != list(range(1, len(lines) + 1)):
+            problems.append(f"{section}: round numbers must run 1..N, got {numbers}")
+        empties = sum(1 for line in lines if isinstance(line, dict)
+                      and line.get("outcome") == "empty")
+        if run.get("empty") != empties:
+            problems.append(f"{section}: empty says {run.get('empty')} but "
+                            f"{empties} round(s) came back empty")
+        for line in lines:
+            if not isinstance(line, dict):
+                problems.append(f"{section}: a round line is not an object")
+                continue
+            missing = [k for k in REQUIRED_ROUND_KEYS if k not in line] + \
+                (["findings"] if "findings" not in line else [])
+            if missing:
+                problems.append(f"{section} round {line.get('number')}: misses {', '.join(missing)}")
+    return problems
+
+
 def _self_test():
     failures = []
     total = [0]
@@ -458,12 +631,13 @@ def _self_test():
         if not cond:
             failures.append(f"{name}: {detail or 'failed'}")
 
-    good = """run: D00-T01-S1
+    good = """schema: 1
+run: D00-T01-S1
 date: 2026-09-17
 runner: codex
 rounds: 2
-round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 6bb635e findings: D00-T01-S1-F1, D00-T01-S1-F2
-round: 2 model: gpt-6-astra effort: high outcome: empty candidate: 8437dd5 findings:
+round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 6bb635e provider: codex version: gpt-6-astra cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: reconstructed findings: D00-T01-S1-F1, D00-T01-S1-F2
+round: 2 model: gpt-6-astra effort: high outcome: empty candidate: 8437dd5 provider: codex version: gpt-6-astra cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: reconstructed findings:
 empty: 1
 refuted: 0
 """
@@ -522,7 +696,8 @@ refuted: 0
     check("missing-field-reported", any("missing field 'empty'" in m for _, m in errors_m),
           f"{errors_m}")
 
-    no_findings_key = good.replace("candidate: 8437dd5 findings:", "candidate: 8437dd5")
+    no_findings_key = good.replace("provenance: reconstructed findings:",
+                                    "provenance: reconstructed")
     _r, errors_k = parse_runs(no_findings_key)
     check("missing-findings-key-fails", any("misses findings" in m for _, m in errors_k),
           f"{errors_k}")
@@ -532,8 +707,8 @@ refuted: 0
     check("run-level-findings-fails", any("moved to the round lines" in m for _, m in errors_l),
           f"{errors_l}")
 
-    empty_with = good.replace("outcome: empty candidate: 8437dd5 findings:",
-                              "outcome: empty candidate: 8437dd5 findings: D00-T01-S1-F9")
+    empty_with = good.replace("purpose: fix-loop provenance: reconstructed findings:",
+                              "purpose: fix-loop provenance: reconstructed findings: D00-T01-S1-F9")
     _r, errors_w = parse_runs(empty_with)
     check_runs(_r, errors_w)
     check("empty-with-findings-fails", any("empty round lists no findings" in m for _, m in errors_w),
@@ -556,6 +731,48 @@ refuted: 0
     check("unreadable-reported", runs_u == [] and any("cannot read" in m for _, m in errors_u),
           f"{runs_u} {errors_u}")
 
+    no_schema = good.replace("schema: 1\n", "")
+    _r, errors_s = parse_runs(no_schema)
+    check("missing-schema-fails", any("no schema declaration" in m for _, m in errors_s),
+          f"{errors_s}")
+    wrong_schema = good.replace("schema: 1\n", "schema: 99\n")
+    _r, errors_v = parse_runs(wrong_schema)
+    check("wrong-schema-fails", any("is not 1" in m for _, m in errors_v), f"{errors_v}")
+    late_schema = good.replace("empty: 1\n", "empty: 1\nschema: 1\n")
+    _r, errors_t = parse_runs(late_schema)
+    check("late-schema-fails", any("ahead of the first run" in m for _, m in errors_t),
+          f"{errors_t}")
+
+    no_provider = good.replace("provider: codex ", "")
+    _r, errors_p = parse_runs(no_provider)
+    check_runs(_r, errors_p)
+    check("missing-provider-fails", any("misses provider" in m for _, m in errors_p),
+          f"{errors_p}")
+    for bad_key, orig, bad_val, want in (("provider", "codex", "anthropic", "provider must be"),
+                                          ("cost", "unresolved", "12", "cost reads"),
+                                          ("cost", "unresolved", "12 dollars", "cost reads"),
+                                          ("latency", "unresolved", "soon", "latency reads"),
+                                          ("opportunity", "full-scope", "partial", "opportunity must be"),
+                                          ("purpose", "section-review", "vibes", "purpose must be"),
+                                          ("provenance", "reconstructed", "oral-tradition",
+                                           "provenance must be")):
+        bad = good.replace(f"{bad_key}: {orig}", f"{bad_key}: {bad_val}", 1)
+        _r, errors_g = parse_runs(bad)
+        check_runs(_r, errors_g)
+        check(f"bad-{bad_key}-fails", any(want in m for _, m in errors_g), f"{errors_g}")
+
+    exported = export_runs(runs)
+    check("export-version", exported["export_version"] == EXPORT_VERSION, f"{exported!r}"[:200])
+    check("export-round-trip", check_export(exported) == [], f"{check_export(exported)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["export_version"] = 99
+    check("export-version-asserted",
+          any("export_version" in m for m in check_export(tampered)), f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["runs"][0]["rounds"] = 99
+    check("export-counts-asserted",
+          any("rounds says 99" in m for m in check_export(tampered)), f"{check_export(tampered)}")
+
     print(f"todo-runs self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
         print(f"FAIL {failure}")
@@ -566,8 +783,26 @@ def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     if "--self-test" in args:
         return _self_test()
+    if "--check-export" in args:
+        rest = [a for a in args if a != "--check-export"]
+        if len(rest) != 1:
+            print("usage: todo-runs.py --check-export <export.json>", file=sys.stderr)
+            return 2
+        try:
+            doc = json.loads(Path(rest[0]).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            print(f"{rest[0]}: cannot read export: {exc}")
+            return 1
+        problems = check_export(doc)
+        for problem in problems:
+            print(f"{rest[0]}: {problem}")
+        if not problems:
+            print(f"{rest[0]}: export version {EXPORT_VERSION}, "
+                  f"{len(doc['runs'])} runs, internally sound")
+        return 1 if problems else 0
     mode_report = "--report" in args
-    rest = [a for a in args if a not in ("--check", "--report")]
+    mode_export = "--export" in args
+    rest = [a for a in args if a not in ("--check", "--report", "--export")]
     runs_path = Path(rest[0]) if rest else DEFAULT_RUNS
     runs, errors = run_check(runs_path)
     if errors:
@@ -577,6 +812,8 @@ def main(argv=None):
         return 1
     if mode_report:
         sys.stdout.write(report(runs))
+    elif mode_export:
+        sys.stdout.write(json.dumps(export_runs(runs), indent=2) + "\n")
     else:
         rounds = sum(r.rounds or 0 for r in runs)
         print(f"{len(runs)} runs, {rounds} rounds: all resolve, all covered, counts agree")

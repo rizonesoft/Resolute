@@ -41,6 +41,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 REVIEWS = ROOT / "docs" / "reviews"
 LEDGER = REVIEWS / "findings.md"
+TRANSITIONS = REVIEWS / "transitions.md"
+NONFINAL = ("refuted", "withdrawn", "duplicate", "routed")
 
 # D00-T03-s1.md -> ("D00 T03 §1")
 FILE_RE = re.compile(r"^D(?P<dom>\d{2})-T(?P<todo>\d{2})-s(?P<sec>\d+)\.md$")
@@ -223,6 +225,93 @@ def collect() -> tuple[list[Finding], list[tuple[Path, int, str]]]:
     return findings, bad
 
 
+TRANSITION_RE = re.compile(r"^transition:\s*(?P<ref>D\d{2}-T\d{2}-S\d+-F\d+)\s*$")
+TRANSITION_FIELD_RE = re.compile(r"^(?P<key>date|from|to|why|evidence):\s*(?P<value>.*)$")
+TRANSITION_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_TRANSITION_FROM_OK = frozenset(set(DISPOSITIONS) | {"raised"})
+_COMPACT_RE = re.compile(r"^D(?P<dom>\d{2}) T(?P<todo>\d{2}) §(?P<sec>\d+)$")
+
+
+def _compact_ref(display: str, number: str) -> str | None:
+    m = _COMPACT_RE.match(display)
+    if not m:
+        return None
+    return f"D{m.group('dom')}-T{m.group('todo')}-S{m.group('sec')}-{number}"
+
+
+def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list[str]:
+    """Every non-final ledger row keeps its when, why, and evidence.
+
+    Returns problems (empty means complete): each block needs its
+    five fields, must name a live row, and its `to` must agree with
+    the row's disposition; each non-final row needs exactly one block.
+    """
+    problems: list[str] = []
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"{path}: cannot read transitions: {exc}"]
+    blocks: list[tuple[int, str, dict[str, str]]] = []
+    current: tuple[int, str, dict[str, str]] | None = None
+    for lineno, raw in enumerate(text.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        m = TRANSITION_RE.match(line)
+        if m:
+            if current is not None:
+                blocks.append(current)
+            current = (lineno, m.group("ref"), {})
+            continue
+        if current is None:
+            continue  # header preamble before the first block
+        f = TRANSITION_FIELD_RE.match(line)
+        if f is None:
+            problems.append(f"{path}:{lineno}: not a transition field: {line[:60]!r}")
+            continue
+        key, value = f.group("key"), f.group("value").strip()
+        if key in current[2]:
+            problems.append(f"{path}:{lineno}: duplicate field {key!r}")
+            continue
+        if not value:
+            problems.append(f"{path}:{lineno}: empty field {key!r}, quoted not blank")
+            continue
+        current[2][key] = value
+    if current is not None:
+        blocks.append(current)
+    by_ref: dict[str, Finding] = {}
+    for f in findings:
+        compact = _compact_ref(f.ref, f.number)
+        if compact is not None:
+            by_ref[compact] = f
+    seen: dict[str, int] = {}
+    for lineno, ref, fields in blocks:
+        for need in ("date", "from", "to", "why", "evidence"):
+            if need not in fields:
+                problems.append(f"{path}:{lineno}: {ref} misses {need}")
+        if "date" in fields and not TRANSITION_DATE_RE.match(fields["date"]):
+            problems.append(f"{path}:{lineno}: {ref} date is not YYYY-MM-DD")
+        if "from" in fields and fields["from"] not in _TRANSITION_FROM_OK:
+            problems.append(f"{path}:{lineno}: {ref} moves from {fields['from']!r}, unknown")
+        if "to" in fields and fields["to"] not in NONFINAL:
+            problems.append(f"{path}:{lineno}: {ref} moves to {fields['to']!r}, "
+                            f"transitions track {', '.join(NONFINAL)}")
+        if ref not in by_ref:
+            problems.append(f"{path}:{lineno}: {ref} names no live finding")
+            continue
+        if "to" in fields and by_ref[ref].disposition != fields["to"]:
+            problems.append(f"{path}:{lineno}: {ref} says {fields['to']} but "
+                            f"the row reads {by_ref[ref].disposition}")
+        if ref in seen:
+            problems.append(f"{path}:{lineno}: {ref} already has a block at line {seen[ref]}")
+        else:
+            seen[ref] = lineno
+    for ref in sorted(r for r, f in by_ref.items() if f.disposition in NONFINAL):
+        if ref not in seen:
+            problems.append(f"{path}: {ref} reads {by_ref[ref].disposition} but keeps no transition")
+    return problems
+
+
 REPEAT_QUESTION = (
     "seen {n} times: what check would have caught this? Record the answer in "
     "D00 T04 §2, even when the answer is that no cheap check exists."
@@ -280,8 +369,16 @@ def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
         print()
         _print_bad(bad)
 
-    print(f"todo-findings: {len(findings)} parsed, {len(bad)} unreadable")
-    return 1 if bad else 0
+    tproblems = check_transitions(findings)
+    if tproblems:
+        print("  transitions incomplete, one line each:")
+        for p in tproblems:
+            print(f"    {p}")
+        print()
+
+    print(f"todo-findings: {len(findings)} parsed, {len(bad)} unreadable, "
+          f"{len(tproblems)} transition problem(s)")
+    return 1 if (bad or tproblems) else 0
 
 
 def render_ledger(findings: list[Finding]) -> str:
@@ -443,11 +540,99 @@ def _self_test() -> int:
         print("  FAIL  _print_bad printed something with nothing to report")
         failed += 1
 
+    # Transitions: every non-final row keeps its when, why, and evidence.
+    tfind = [
+        Finding("D00 T04 §9", f, 1, "F1", "retracted", "record", "withdrawn",
+                source="self"),
+        Finding("D00 T04 §9", f, 2, "F2", "stays fixed", "record", "fixed",
+                source="self"),
+    ]
+    tpath = tmp / "transitions.md"
+    tpath.write_text(
+        "# fixture\n\n"
+        "transition: D00-T04-S9-F1\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: the raiser retracted it\n"
+        "evidence: D00-T04-s9.md round 3\n",
+        encoding="utf-8",
+    )
+    if check_transitions(tfind, tpath):
+        print(f"  FAIL  a complete transition block was not accepted: "
+              f"{check_transitions(tfind, tpath)}")
+        failed += 1
+    # A block missing a field, naming nothing live, and disagreeing with the row.
+    tpath.write_text(
+        "transition: D00-T04-S9-F1\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: duplicate\n"
+        "evidence: x\n"
+        "\n"
+        "transition: D00-T04-S9-F9\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: ghost\n"
+        "evidence: x\n",
+        encoding="utf-8",
+    )
+    tp = check_transitions(tfind, tpath)
+    if not any("misses why" in p for p in tp):
+        print("  FAIL  a transition block missing `why` was not reported")
+        failed += 1
+    if not any("names no live finding" in p for p in tp):
+        print("  FAIL  a transition naming no live row was not reported")
+        failed += 1
+    if not any("says duplicate but the row reads withdrawn" in p for p in tp):
+        print("  FAIL  a transition disagreeing with its row was not reported")
+        failed += 1
+    # A non-final row with no block, a duplicate block, a bad date, a `to`
+    # outside the tracked set.
+    tpath.write_text(
+        "transition: D00-T04-S9-F1\n"
+        "date: 19-09-2026\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: x\n"
+        "evidence: y\n"
+        "\n"
+        "transition: D00-T04-S9-F1\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: x\n"
+        "evidence: y\n"
+        "\n"
+        "transition: D00-T04-S9-F2\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: fixed\n"
+        "why: x\n"
+        "evidence: y\n",
+        encoding="utf-8",
+    )
+    tp2 = check_transitions(tfind, tpath)
+    if not any("date is not YYYY-MM-DD" in p for p in tp2):
+        print("  FAIL  a transition with a bad date was not reported")
+        failed += 1
+    if not any("already has a block" in p for p in tp2):
+        print("  FAIL  a duplicate transition block was not reported")
+        failed += 1
+    if not any("moves to 'fixed'" in p for p in tp2):
+        print("  FAIL  a transition to a final disposition was not reported")
+        failed += 1
+    tpath.write_text("# nothing tracked yet\n", encoding="utf-8")
+    if not any("keeps no transition" in p for p in check_transitions(tfind, tpath)):
+        print("  FAIL  a non-final row without a block was not reported")
+        failed += 1
+    tpath.unlink()
 
     for x in (f, other, tmp / "D00-T10-s1.md", tmp / "D00-T10-s2.md"):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 18 cases, {failed} failed")
+    print(f"todo-findings self-test: 26 cases, {failed} failed")
     return 1 if failed else 0
 
 
@@ -486,7 +671,15 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"todo-findings: ledger matches, but {len(bad)} heading(s) "
                       "above are missing from it")
                 return 1
-            print(f"todo-findings: ledger current, {len(findings)} finding(s)")
+            tproblems = check_transitions(findings)
+            if tproblems:
+                print("  transitions incomplete, one line each:")
+                for p in tproblems:
+                    print(f"    {p}")
+                print()
+                return 1
+            print(f"todo-findings: ledger current, {len(findings)} finding(s), "
+                  "transitions complete")
             return 0
         if bad:
             # Refuse to publish a ledger known to be incomplete. Overwriting it
