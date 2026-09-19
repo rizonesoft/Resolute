@@ -70,6 +70,7 @@ track: W1
 |  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [ ]   |
 |  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [ ]   |
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
+|  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
 
 ---
 
@@ -523,6 +524,7 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 
 -> XREF: D00 T04 §7 -- the records this section hardens
 -> XREF: D00 T04 §8 -- the decision that consumes the enriched records
+-> XREF: D00 T04 §14 -- the sign-off advisory this section's panel filed
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR4 D00-T04-S7-PR4
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR7 D00-T04-S7-PR7
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR8 D00-T04-S7-PR8
@@ -593,6 +595,18 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR9 D00-T04-S9-PR9
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR10 D00-T04-S9-PR10
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR11 D00-T04-S9-PR11
+
+## 14. Bar Bool Versions from the Export Gate
+
+The §10 sign-off round proved `check_export` accepts `"export_version": true, "schema": true` as internally sound: the two version gates compare with `!=` against ints, and `True == 1` in Python, while every other integer field in the same checker bars bools through `_is_int`. The exporter never emits bools, so this bites only a hand-crafted export, which is why it filed as an advisory rather than a fix-loop round; still, a gate that asserts versions should assert their type too.
+
+- [ ] Reject bool versions and schemas in `check_export`. Done when: an export carrying `"export_version": true` fails naming the type, quoted, and the live export still passes.
+- [ ] Commit: `"workspace: bar bool versions from the export gate"`
+
+**Test checkpoint:** The bool-versioned export fails, quoted from a driven `--check-export`; the self-test covers both gates.
+
+-> XREF: D00 T04 §10 -- the gate this section hardens
+-> SOURCE: panel-D00-T04-s10-2026-09-19 D00-T04-S10-F9
 
 ## Verification
 
