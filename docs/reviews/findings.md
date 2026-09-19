@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**121 findings across 21 sections.**
+**127 findings across 22 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 40 | the plan or the evidence misdescribes what happened |
+| `record` | 42 | the plan or the evidence misdescribes what happened |
 | `correctness` | 29 | the code does the wrong thing |
-| `consistency` | 19 | disagrees with the rest of the suite, its naming, or its layout |
-| `adversarial` | 13 | fails under hostile or unexpected input |
-| `integration` | 6 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 21 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 14 | fails under hostile or unexpected input |
+| `integration` | 7 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -136,6 +136,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §5` | F4 | `consistency` | fixed | self | a citation that resolved to nothing, in two source files |
 | `D00 T04 §5` | F5 | `design` | fixed | self | the vocabulary helper printed regex, not words |
 | `D00 T04 §5` | F6 | `record` | advisory | self | my own measuring instruments failed three times |
+| `D00 T04 §6` | F1 | `consistency` | fixed | independent | the stamp review ran at medium against the pinned high |
+| `D00 T04 §6` | F2 | `record` | corrected | independent | the query claim overreached and the prose kept the old 31 |
+| `D00 T04 §6` | F3 | `adversarial` | refuted | independent | predictable /tmp files let concurrent reviews contaminate each other |
+| `D00 T04 §6` | F4 | `integration` | fixed | independent | the failover names an Opus round but gives no command |
+| `D00 T04 §6` | F5 | `record` | corrected | independent | zero overlap cannot mean complementarity across sequential candidates |
+| `D00 T04 §6` | F6 | `consistency` | fixed | independent | three em dashes in new authored prose |
 | `D07 T01 §1` | F1 | `record` | corrected | self | the measured defect classes are eight, not seven |
 | `D07 T01 §1` | F2 | `record` | routed | self | the section was told to wait for a decision that has no owner here |
 | `D07 T01 §1` | F3 | `record` | corrected | self | the checkpoint could not fail |

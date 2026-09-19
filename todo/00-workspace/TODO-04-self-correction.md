@@ -62,7 +62,7 @@ track: W1
 |   3   |   §3    | Section calibration                        | §2         |  [x]   |
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [x]   |
 |   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [x]   |
-|   6   |   §6    | The adversarial reviewer                   | §2         |  [ ]   |
+|   6   |   §6    | The adversarial reviewer                   | §2         |  [x]   |
 |   7   |   §7    | Review-run records                         | §6         |  [ ]   |
 |   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [ ]   |
 |   9   |   §9    | Review-input integrity                     | §6         |  [ ]   |
@@ -420,6 +420,13 @@ So this section is mostly wiring and measurement rather than construction, and i
 > -> SOURCE: docs/reviews/findings.md
 
 > **Started:** 2026-09-19T04:55:00Z
+
+> **Verified:** 2026-09-19 | §6 | the split is a query now: source markers (`independent` or `self`) on all 121 findings across 21 files, `todo-findings: 121 parsed, 0 unreadable`, split `self 69` and `independent 52`, self-test 14 cases green, missing and unknown both quoted from a driven fixture · the stamp review is wired into the skill at high effort and driven both directions at the shipped effort: `272 assertions` staged was named as `271 assertions` against Live proof, and the correct stamp returned `STAMP HOLDS.` · the measurements read 121 / 52 / 0 / 5-of-22 / 13 / 40 with the hand-count methodology differences recorded (ranges count once, the operator counts as independent) · the second-model decision is keep, provisional, resting on 7 added real finds with the complementarity inference withdrawn and a blinded comparison owed at revisit · the three blind-spot classes verified against the review records that state the misses · the instructed pass stands superseded by the panel's adversarial lens with §5's F7 as the driven evidence · panel: 4 rounds, 6 findings (5 fixed or corrected, the /tmp race refuted with the single-writer reason and the refutation accepted at sign-off) · plan review: 16 findings into D00 T04 §7, §8, §9 and the D07 T01 §2 item
+> **Review:** round 4, candidate `5689e3b` `6cd4676` `11e6de7` `f0c3db3` `79979a6` -- `adversarial` approve after refutation (1) · `consistency` approve after fixes (2) · `integration` approve after fix (1) · `source-defect` approve · `design` approve · `record` approve after fixes (3). Raw findings: docs/reviews/00-workspace/D00-T04-s6.md
+> **Plan review:** gpt (run 20260919-D00-T04-S6-gpt) -- filed: D00 T04 §7, D00 T04 §8, D00 T04 §9, D07 T01 §2 item; 2 rejected and 2 duplicate with reasons in the ledger
+> **CRUD:** this section writes plan record, derived ledger, and review tooling. It reads 21 findings files and the git history; it writes source markers into the headings, the skill's stamp-review command, and the regenerated ledger. The only behavioral surface it adds is the findings gate failing on a missing or unknown source. It touches no user system, no C++, and no shipped behavior; the library and the gates it does not own are byte-identical.
+> **Duration:** 37
+> **Implementer:** Muse Code
 
 ## 7. Review-Run Records
 

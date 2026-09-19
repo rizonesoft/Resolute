@@ -119,6 +119,7 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 - [ ] Report which target regressed, not just that something did. Done when: a deliberate regression names the target and the finding.
 - [ ] Prevent a silent baseline raise. Done when: raising a baseline requires an explicit recorded reason and the check names it.
 - [ ] Route duplicate resource-id detection into the ratchet: a twice-defined resource id must fail the gate by name. Done when: the D00 T03 §2 `IDI_APPFALLBACK` shape fails loudly, quoted. Not filed here: the rename-residue sweep (a one-shot migration whose residue is fixed, with no recurring work to check) and script timing budgets (flaky in shared CI; a human noticing remains the detector).
+  -> XREF: D00 T04 §6 -- the plan review that filed the detection item above
 - [ ] Commit: `"quality: a ratchet that only goes down"`
 
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR14 D00-T04-S6-PR14
