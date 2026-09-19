@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **25 of 197 sections complete (13%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **25 of 203 sections complete (12%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -233,6 +233,12 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D04 T05 §5` | Vendor auto-detect from WMI                  |   4   |
 | [ ] | `D04 T05 §6` | Migrate Beep Data to Reference DB            |   5   |
 | [ ] | `D04 T05 §7` | User-Editable Database (CRUD)                |   7   |
+| [ ] | `D04 T06 §1` | MemBoost trim path, triggers                 |   5   |
+| [ ] | `D04 T06 §2` | MemBoost surface inventory, layer map        |   5   |
+| [ ] | `D04 T06 §3` | MemBoost distribution completeness           |   7   |
+| [ ] | `D04 T06 §4` | Editable exclusion list                      |   5   |
+| [ ] | `D04 T06 §5` | Per-process trim report                      |   5   |
+| [ ] | `D04 T06 §6` | Only-list trim mode                          |   5   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
 | [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   9   |

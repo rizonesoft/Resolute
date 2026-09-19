@@ -29,6 +29,7 @@ track: P2
 - -> XREF: D04 T03 §1 -- the ComIntRep spec this section ordered ([TODO-03](./TODO-03-comintrep-complete.md))
 - -> XREF: D04 T04 §1 -- the PixRepair spec this section builds ([TODO-04](./TODO-04-pixrepair-complete.md))
 - -> XREF: D04 T05 §1 -- the BiosCodes spec this section builds ([TODO-05](./TODO-05-bioscodes-complete.md))
+- -> XREF: D04 T06 §1 -- the MemBoost spec this section builds ([TODO-06](./TODO-06-memboost-complete.md))
 - -> XREF: [`09-au3-maintenance/TODO-01 §1`](../09-au3-maintenance/TODO-01-au3-maintenance.md) -- the AutoIt tool each port retires
 
 ## Outcome
@@ -220,7 +221,7 @@ The two tools that consume the framework but not the repair contract: one trims 
 **Chrome:** consume the framework. Neither tool consumes the repair contract, because neither repairs anything.
 **Needs:** Windows host (build/test)
 
-- [ ] **Specify** `MemBoost` in its own TODO file before building it. Required scope: the trim path with its source lines and frozen effect, the trim schedule and its settings, and the no-logging gap this section closes. Done when: the file exists, validates, and its sections appear in the plan. (`BiosCodes` already has `D04 T05`.)
+- [x] **Specify** `MemBoost` in its own TODO file before building it. Required scope: the trim path with its source lines and frozen effect, the trim schedule and its settings, and the no-logging gap this section closes. Done when: the file exists, validates, and its sections appear in the plan. Done: `D04 T06` authored, validated, and planned. (`BiosCodes` already has `D04 T05`.)
 - [ ] Capture both shipped tools first, with their effects and windows. Done when: two baselines are committed.
 - [ ] Port `MemBoost` with its trim path frozen. Done when: the parity report against the shipped build shows zero differing fields on the trim fixture.
 - [ ] Port `BiosCodes`, adding the logging it has never had. Done when: a driven lookup writes a log line naming the code.
