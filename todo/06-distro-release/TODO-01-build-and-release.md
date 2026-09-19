@@ -46,13 +46,14 @@ track: R1
 | :---: | :-----: | --------------------------------------------- | ------------ | :----: |
 |   1   |   §1    | Release descriptors, portable by construction | D04 T01 §1   |  [ ]   |
 |   2   |   §2    | One command builds the release set            | §1           |  [ ]   |
-|   3   |   §3    | Installers: per tool and whole suite          | §2           |  [ ]   |
+|   3   |   §3    | Installers: per tool and whole suite          | §2, §10      |  [ ]   |
 |   4   |   §4    | Migration from the AutoIt suite               | §3, D01 T01 §2 |  [ ]   |
-|   5   |   §5    | Update files and consolidation announcements  | §2           |  [ ]   |
+|   5   |   §5    | Update files and consolidation announcements  | §2, §10      |  [ ]   |
 |   6   |   §6    | Version rule, changelog, and release checklist | §2          |  [ ]   |
 |   7   |   §7    | Focused builds from one codebase              | §1, §5      |  [ ]   |
 |   8   |   §8    | Licensing and attribution                     | --          |  [ ]   |
 |   9   |   §9    | The bare-machine proof                        | §3          |  [ ]   |
+|  10   |   §10   | Identity registry and version agreement       | §1, §6, §8  |  [ ]   |
 
 ---
 
@@ -69,6 +70,8 @@ Thirteen descriptors pointing at a directory that no longer exists is the cleare
 - [ ] Commit: `"release: declarative, path-portable release descriptors"`
 
 **Test checkpoint:** Every shipped tool has a release declaration derived from the build. A declaration with an absolute path fails with a named message. No source contains a hardcoded copyright year and all built executables report the same one. Each release set is self-contained, proven by check.
+
+-> XREF: D06 T01 §10 -- the identity registry that joins this descriptor family
 
 ## 2. One Command Builds the Release Set
 
@@ -167,6 +170,8 @@ The channel to every user who already installed something. Four products are ret
 
 **Test checkpoint:** The version rule explains the current spread and the auto-increment convention. A release produces a per-tool changelog whose entries trace to commits. A second person runs the checklist end to end and the result is recorded.
 
+-> XREF: D06 T01 §10 -- the version source of record that implements this rule
+
 ## 7. Focused Builds From One Codebase
 
 A landing page for "fix windows search" earns traffic that a page for a general repair tool does not. This section makes it possible to ship that page a focused product without a second codebase, so the suite gains marketing surface without regaining the duplication this rewrite exists to remove.
@@ -205,6 +210,8 @@ The tree currently carries two licences with no recorded decision, and ships thi
 - [ ] Commit: `"release: licence policy, attributions, and the missing licence files"`
 
 **Test checkpoint:** The licence policy is recorded with its reasoning. A root `LICENSE` exists, `shared/resolute-ui` carries MIT, and `shared/lucide` carries ISC with its copyright notice. Every release set includes its licence and attributions, generated. A tool with a missing licence fails the release, proven deliberately. The verification report is quoted.
+
+-> XREF: D06 T01 §10 -- the registry whose license line and brand assets this section's texts cover
 
 ## 9. The Bare-Machine Proof
 
@@ -254,6 +261,28 @@ A clean VM, a Windows Sandbox instance, or a second physical machine all serve. 
 
 **Test checkpoint:** The machine's Windows build is quoted alongside evidence that Visual Studio, the Windows Kits, `cl.exe` and `msbuild` are all absent. A clone without `--recursive` and one bootstrap produce a working toolchain, timed. `Resolute.exe` builds and its size matches what this repository records, or the difference is explained. The executable **runs** and creates its window on that machine. The two named residuals, a registry fallback and a `PATH` dependency, are each reported present or absent. Anything the run needed beyond the bootstrap is named with its source.
 
+## 10. Identity Registry and Version Agreement
+
+Every identity string the suite shows, publisher, license, copyright, version, links, comes from one machine-readable JSON registry, or fourteen tools will drift into fourteen identities the way fourteen About dialogs did. The dialog renders from it, the binary, installer, and feed stamp from it, and a test fails anything pasted. Operator-confirmed 2026-09-19: the version source of record is the CMake project `VERSION` (0.1.0 today), not a tag scheme the repo does not have.
+
+**Needs:** C++ toolchain (compile)
+
+- [ ] Declare the registry schema: publisher, license id, copyright template, version slot, link table (home, corporate, GitHub, X, repo, support), asset manifest. Done when: the schema is documented and an empty registry fails validation naming the missing field.
+- [ ] Substitute the build year at build time into the verbatim line `© [build-year] Rizonetech (Pty) Ltd. All rights reserved`. Done when: no source contains a hardcoded year and the built registry reports the build year.
+- [ ] Stamp the CMake `VERSION` as the single version into the registry, the binary (`Resolute.rc.in`), the installer, and the feed. Done when: one version bump propagates to all four, quoted from the built artifacts.
+- [ ] Carry the six links, all https: project home `https://rizonesoft.com`, corporate `https://rizonetech.com`, GitHub `https://github.com/rizonesoft/`, X `https://x.com/DerickPayneDev`, plus the repo URL and the support URL, those two confirmed with the operator at build time and recorded. Done when: a test fails any non-https or undeclared link, quoted.
+- [ ] Refuse hardcoded identity strings in UI code: publisher, copyright, version, or link literals pasted instead of read from the registry. Done when: a deliberate pasted string fails the test by name, quoted.
+- [ ] Assert dialog, binary, installer, and feed agreement on version and identity. Done when: the test reads all four and passes, and a deliberate mismatch in one fails naming it, quoted.
+- [ ] Ship GitHub and X brand icons as registry assets with their license noted (official kits or Simple Icons). Done when: the assets are in the tree, §8's attribution records their license, and the dialog renders them.
+- [ ] Declare the `resources/logos/` theme pair (`rizonesoft-logo-light.svg`, `rizonesoft-logo-dark.svg`) as registry assets, own work, with the dialog link target `https://rizonesoft.com` recorded beside them. Done when: the manifest names both vectors and the link, and the shipped set carries them.
+- [ ] Commit: `"release: identity registry and version agreement"`
+
+**Test checkpoint:** An empty registry fails naming its missing field. No source holds a year and the build reports one. One version bump reaches dialog, binary, installer, and feed. A non-https link and a pasted identity string each fail by name. A mismatched version in one artifact fails naming it. Brand icons ship with their license recorded, and the logo theme pair ships with its link target recorded. Cheaper substitute that fails the checkpoint: hand-maintained About strings per tool, which is how fourteen dialogs drifted apart.
+
+-> XREF: D06 T01 §1 -- the descriptor family this registry joins, and its build-year rule
+-> XREF: D06 T01 §6 -- the version rule this source of record implements
+-> XREF: D06 T01 §8 -- the license texts and attribution this registry points at
+-> XREF: D01 T01 §12 -- the dialog that renders this registry
 
 ## Verification
 

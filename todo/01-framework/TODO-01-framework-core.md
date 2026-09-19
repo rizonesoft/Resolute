@@ -67,6 +67,7 @@ track: F1
 |   9   |   §9    | Standalone proof in an empty folder             | §2, §4, §5, §7         |  [ ]   |
 |  10   |   §10   | Crash handling and single instance              | §1, §3                 |  [ ]   |
 |  11   |   §11   | Command line and exit codes                     | §1, §3, §6             |  [ ]   |
+|  12   |   §12   | About dialog, from the registry                 | §7, D06 T01 §10        |  [ ]   |
 
 ---
 
@@ -193,7 +194,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 
 - [ ] Bind the UI library's text rendering to the localization loader from §4, so every string on every control resolves from a pack. Done when: driving with an incomplete pack lists the missing keys and nothing renders as bare English.
 - [ ] Bind the theme mode to the settings writer from §2, so light, dark, and follow-system persist. Done when: each is driven and survives a restart, proven by readback.
-- [ ] Build the About dialog on the library's controls, from the tool descriptor, with no per-tool copy. Done when: two different tools render correct About dialogs with no tool-side code.
+- [ ] Build the About dialog on the library's controls, from the §12 identity registry, with no per-tool copy. Done when: two different tools render correct About dialogs with no tool-side code.
 - [ ] Build the preferences host covering language, logging, update frequency, and process priority. Done when: every control persists through the §2 writer and survives a restart.
 - [ ] Let a tool add its own preferences page without forking the host. Done when: a tool contributes a page and the framework's pages are unchanged.
 - [ ] Account for the surface: every control on all three surfaces is working or deferred to a named section. Done when: the account is written and each deferral resolves.
@@ -201,6 +202,8 @@ This section connects the two, and it is adoption rather than construction. DPI 
 - [ ] Commit: `"framework: standard window, about, and preferences"`
 
 **Test checkpoint:** Two different tools render correct About dialogs with no tool-side code. Every preferences control persists and survives a restart, proven by readback. The three rendered surfaces are compared against their captures with differences listed. Captures committed under `docs/captures/runs/`.
+
+-> XREF: D01 T01 §12 -- the About dialog specified in full, rendered from the registry
 
 ## 8. Extend the UI Library for the Tools
 
@@ -284,6 +287,30 @@ Every tool in this suite is something an IT administrator would want to run acro
 - [ ] Commit: `"framework: one command-line grammar and one set of exit codes"`
 
 **Test checkpoint:** A fixture repair runs unattended from a script with no window, writes its transcript, and returns. Each of the five exit codes is produced by a fixture run and matches its documented value. An unattended destructive run without the authorising flag refuses with the refusal code. `--help` and `--version` work on two tools with no tool-side code. An unelevated unattended run refuses by name and changes nothing.
+
+## 12. About Dialog, From the Registry
+
+The suite gets one traditional modal About dialog, Help menu > About, owned by the framework and rendered from the `D06 T01 §10` identity registry: no per-tool copy, no pasted string, no settings sidebar panel. Operator-confirmed 2026-09-19: the logo renders at 80px, and every tool window plus the launcher shell gains a Help menu entry. The tool descriptor selects which registry entry a tool shows; the registry holds every string the dialog draws.
+
+**Fidelity:** the modal dialog, centered with its rows, against `docs/captures/house-style/`. Layout and terminology match the captures; DPI and theme are the approved deviations.
+**Job:** a user opens Help > About and learns exactly what they run, who publishes it, and where to go next. Consumer: the dialog rows, each traced to the registry.
+**Treatment:** one dialog implementation in the framework, parameterized by registry entry. Cheaper substitute that fails the checkpoint: a settings sidebar panel instead of a modal, or a per-tool About copy, which is how fourteen dialogs drifted apart.
+**Chrome:** consume the framework's own controls, theme, and localization loader. No tool draws its own row.
+**Needs:** C++ toolchain (compile)
+
+- [ ] Build the modal shell: centered on the parent, OK button with Enter accepting and Esc cancelling, single instance with re-invoking focusing instead of stacking. Done when: a double open shows one dialog focused, and Enter and Esc are each driven and quoted.
+- [ ] Render every row from the registry: app logo at 80px from the `resources/logos/` theme pair linked to `https://rizonesoft.com`, app name, version with channel where applicable, the verbatim copyright line, publisher `Rizonetech (Pty) Ltd.`, clickable project/corporate/social links with brand icons, the `GPL-3.0-or-later` line linking the full license text, third-party notices link. Done when: a UI drive proves every row from registry values with launcher URIs matched and the launcher seam mocked.
+- [ ] Render light and dark themes with the theme-correct assets. Done when: both themes are driven and the logo and icons match the declared theme assets.
+- [ ] Keep the dialog keyboard navigable with screen-reader names on links and buttons. Done when: the tab order runs end to end by drive, and every link and button exposes its asserted name.
+- [ ] Add Help menu entries everywhere: the launcher shell and every tool window. Done when: the launcher entry opens the dialog, and the framework harness opens it for two tool descriptors with no tool-side code.
+- [ ] Compare golden captures for both themes. Done when: captures are committed and the comparison passes with differences listed.
+- [ ] Write the user-guide page for the dialog in the same commit as the implementation. Done when: the page exists, describes every row, and shares the implementation commit.
+- [ ] Commit: `"framework: about dialog from the identity registry"`
+
+**Test checkpoint:** One dialog focuses on double open; Enter and Esc quoted. Every row traces to the registry with URIs matched. Both themes render their declared assets. Tab order and screen-reader names asserted by drive. Launcher entry plus two harness descriptors open it with no tool-side code. Golden captures pass for both themes. The user-guide page shares the implementation commit. Cheaper substitute that fails the checkpoint: a sidebar panel instead of a modal, which the operator explicitly rejected.
+
+-> XREF: D06 T01 §10 -- the identity registry this dialog renders
+-> XREF: D01 T01 §7 -- the UI surfaces this dialog builds on
 
 ## Verification
 

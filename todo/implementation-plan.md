@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **25 of 138 sections complete (18%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **25 of 140 sections complete (18%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -249,22 +249,24 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 
 The suite is correct by here. This phase makes it shippable and makes it speak every language the suite speaks, including to the users of the four products that are retiring.
 
-|  ✔  | Section      | Deliverable                                    | Items |
-| :-: | ------------ | ---------------------------------------------- | :---: |
-| [ ] | `D06 T01 §1` | Release Descriptors, Portable by Construction  |   5   |
-| [ ] | `D06 T01 §2` | One Command Builds the Release Set             |   5   |
-| [ ] | `D06 T01 §3` | Installers: Per Tool and Whole Suite           |   9   |
-| [ ] | `D06 T01 §9` | The Bare-Machine Proof                         |   7   |
-| [ ] | `D06 T01 §4` | Migration From the AutoIt Suite                |   7   |
-| [ ] | `D06 T01 §5` | Update Files and Consolidation Announcements   |   6   |
-| [ ] | `D06 T01 §6` | Version Rule, Changelog, and Release Checklist |   5   |
-| [ ] | `D06 T01 §7` | Focused Builds From One Codebase               |   7   |
-| [ ] | `D06 T01 §8` | Licensing and Attribution                      |  12   |
-| [ ] | `D08 T01 §1` | Documentation set for every tool               |   8   |
-| [ ] | `D08 T01 §2` | Shared string pool and build-time composition  |   6   |
-| [ ] | `D08 T01 §3` | Coverage matrix and pack hygiene               |   6   |
-| [ ] | `D08 T01 §4` | Rewrite the shipped documentation              |   7   |
-| [ ] | `D08 T01 §5` | Repository and developer documentation         |   5   |
+|  ✔  | Section       | Deliverable                                    | Items |
+| :-: | ------------- | ---------------------------------------------- | :---: |
+| [ ] | `D06 T01 §1`  | Release Descriptors, Portable by Construction  |   5   |
+| [ ] | `D06 T01 §2`  | One Command Builds the Release Set             |   5   |
+| [ ] | `D06 T01 §3`  | Installers: Per Tool and Whole Suite           |   9   |
+| [ ] | `D06 T01 §9`  | The Bare-Machine Proof                         |   7   |
+| [ ] | `D06 T01 §4`  | Migration From the AutoIt Suite                |   7   |
+| [ ] | `D06 T01 §5`  | Update Files and Consolidation Announcements   |   6   |
+| [ ] | `D06 T01 §6`  | Version Rule, Changelog, and Release Checklist |   5   |
+| [ ] | `D06 T01 §7`  | Focused Builds From One Codebase               |   7   |
+| [ ] | `D06 T01 §8`  | Licensing and Attribution                      |  12   |
+| [ ] | `D06 T01 §10` | Identity Registry and Version Agreement        |   9   |
+| [ ] | `D01 T01 §12` | About Dialog, From the Registry                |   8   |
+| [ ] | `D08 T01 §1`  | Documentation set for every tool               |   8   |
+| [ ] | `D08 T01 §2`  | Shared string pool and build-time composition  |   6   |
+| [ ] | `D08 T01 §3`  | Coverage matrix and pack hygiene               |   6   |
+| [ ] | `D08 T01 §4`  | Rewrite the shipped documentation              |   7   |
+| [ ] | `D08 T01 §5`  | Repository and developer documentation         |   5   |
 
 > **Moved:** `D00 T01 §7` -- 2026-09-17 to todo/06-distro-release/TODO-01-build-and-release.md (operator instruction); worked there as `D06 T01 §9` by that file's owner.
 
