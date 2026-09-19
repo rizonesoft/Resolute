@@ -179,7 +179,11 @@ TEST_CASE("Known easing values pin the curves", "[ui][anim]") {
 TEST_CASE("Every easing pins its midpoint", "[ui][anim]") {
     // Exact powers of two where the curve is polynomial; looser where it is
     // transcendental (the value below is the computed constant, verified by
-    // running, not derived by hand).
+    // running, not derived by hand). InQuad and OutQuad midpoints are pinned
+    // in the Known test; with the three below every easing has one.
+    CHECK_THAT(rui::ease::Linear(0.5f), WithinAbs(0.5f, 0.00001f));
+    CHECK_THAT(rui::ease::InOutQuad(0.5f), WithinAbs(0.5f, 0.00001f));
+    CHECK_THAT(rui::ease::OutBack(0.5f), WithinAbs(1.0876975f, 0.00001f));
     CHECK_THAT(rui::ease::InCubic(0.5f), WithinAbs(0.125f, 0.00001f));
     CHECK_THAT(rui::ease::OutCubic(0.5f), WithinAbs(0.875f, 0.00001f));
     CHECK_THAT(rui::ease::InOutCubic(0.5f), WithinAbs(0.5f, 0.00001f));
@@ -301,8 +305,21 @@ TEST_CASE("Unknown icon names resolve to null, never crash", "[ui][icons]") {
 
 // ── Controls: ListView ────────────────────────────────────────────────
 
+// Ordinary control calls arm manager-held [this] lambdas (Select, sort,
+// collapse, empty/error), and the singleton manager outlives the stack
+// control. Headless the timer never fires, which makes the dangling latency
+// invisible, not absent: every case below drains the manager before its
+// control unwinds. Declared after the control so it runs first, and RAII so
+// a REQUIRE failure still drains.
+namespace {
+struct DrainAnimations {
+    ~DrainAnimations() { rui::AnimationManager::Instance().CancelAll(); }
+};
+}  // namespace
+
 TEST_CASE("ListView starts empty and unselected", "[ui][controls]") {
     rui::ListView lv;
+    DrainAnimations drain;
     CHECK(lv.ItemCount() == 0);
     CHECK(lv.SelectedIndex() == -1);
     CHECK(lv.SortColumn() == -1);
@@ -314,6 +331,7 @@ TEST_CASE("ListView starts empty and unselected", "[ui][controls]") {
 
 TEST_CASE("ListView selection clamps to the item range", "[ui][controls]") {
     rui::ListView lv;
+    DrainAnimations drain;
     lv.SetItemCount(10);
     CHECK(lv.ItemCount() == 10);
     lv.Select(3);
@@ -326,6 +344,7 @@ TEST_CASE("ListView selection clamps to the item range", "[ui][controls]") {
 
 TEST_CASE("ListView sort state round-trips", "[ui][controls]") {
     rui::ListView lv;
+    DrainAnimations drain;
     lv.SetSortColumn(1, true);
     CHECK(lv.SortColumn() == 1);
     CHECK(lv.SortDirection() == rui::SortDir::Ascending);
@@ -335,6 +354,7 @@ TEST_CASE("ListView sort state round-trips", "[ui][controls]") {
 
 TEST_CASE("ListView columns add and clear", "[ui][controls]") {
     rui::ListView lv;
+    DrainAnimations drain;
     lv.AddColumn(L"Name", 160.0f);
     lv.AddColumn(nullptr, 80.0f);  // null label stores empty, never crashes
     CHECK(lv.ColumnCount() == 2);
@@ -344,6 +364,7 @@ TEST_CASE("ListView columns add and clear", "[ui][controls]") {
 
 TEST_CASE("ListView edit sessions open and close", "[ui][controls]") {
     rui::ListView lv;
+    DrainAnimations drain;
     rui::ListItem item;
     item.cells = {L"alpha", L"beta"};
     lv.SetItemCount(4);
@@ -360,6 +381,7 @@ TEST_CASE("ListView edit sessions open and close", "[ui][controls]") {
 
 TEST_CASE("ListView view mode round-trips", "[ui][controls]") {
     rui::ListView lv;
+    DrainAnimations drain;
     for (auto mode : {rui::ViewMode::LargeIcons, rui::ViewMode::SmallIcons, rui::ViewMode::List,
                       rui::ViewMode::Details}) {
         lv.SetViewMode(mode);
@@ -371,6 +393,7 @@ TEST_CASE("ListView view mode round-trips", "[ui][controls]") {
 
 TEST_CASE("Sidebar starts unselected badges at zero width", "[ui][controls]") {
     rui::Sidebar bar;
+    DrainAnimations drain;
     CHECK(bar.Selected() == 0);
     CHECK(bar.Badge(0) == 0);
     CHECK(bar.Badge(-1) == 0);
@@ -381,6 +404,7 @@ TEST_CASE("Sidebar starts unselected badges at zero width", "[ui][controls]") {
 
 TEST_CASE("Sidebar badges set in range and ignore the rest", "[ui][controls]") {
     rui::Sidebar bar;
+    DrainAnimations drain;
     bar.SetBadge(2, 5);
     CHECK(bar.Badge(2) == 5);
     bar.SetBadge(-1, 9);
@@ -391,6 +415,7 @@ TEST_CASE("Sidebar badges set in range and ignore the rest", "[ui][controls]") {
 
 TEST_CASE("Sidebar collapse toggles both ways", "[ui][controls]") {
     rui::Sidebar bar;
+    DrainAnimations drain;
     bar.SetCollapsed(true);
     CHECK(bar.IsCollapsed());
     bar.ToggleCollapsed();
@@ -410,6 +435,7 @@ TEST_CASE("Sidebar category table keeps its shape", "[ui][controls]") {
 TEST_CASE("Toolbar and StatusBar scale their heights", "[ui][controls]") {
     rui::Toolbar tb;
     rui::StatusBar sb;
+    DrainAnimations drain;
     CHECK(tb.ScaledHeight() == 40);  // BASE_HEIGHT at the default 96 DPI
     CHECK(sb.ScaledHeight() == 26);  // BASE_HEIGHT at the default 96 DPI
 }
@@ -429,6 +455,7 @@ TEST_CASE("Command IDs stay pinned", "[ui][controls]") {
 
 TEST_CASE("ContentView empty state shows and hides", "[ui][controls]") {
     rui::ContentView cv;
+    DrainAnimations drain;
     CHECK_FALSE(cv.IsEmpty());
     cv.HideEmpty();  // hiding while hidden is a no-op, never a crash
     CHECK_FALSE(cv.IsEmpty());
