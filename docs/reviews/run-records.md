@@ -234,3 +234,14 @@ round: 2 model: gpt-5.6-sol effort: high outcome: findings candidate: 235a71f pr
 # round 1: two P2 plus the regression-test request; round 2 read the stamp commit itself.
 empty: 0
 refuted: 0
+
+run: D00-T04-S8
+date: 2026-09-19
+runner: panel
+rounds: 3
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: a27e296 provider: codex version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S8-F1, D00-T04-S8-F2, D00-T04-S8-F3
+round: 2 model: gpt-5.6-sol effort: medium outcome: error candidate: 296a838 provider: codex version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S8-F4, D00-T04-S8-F5, D00-T04-S8-F6
+round: 3 model: gpt-5.6-sol effort: medium outcome: findings candidate: 296a838 provider: codex version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S8-F7, D00-T04-S8-F8
+# round 2 is the voided attempt: the candidate range spanned 30 commits instead of the section's 4, so its verdicts are void as §8 review, but all three findings verified in-session and fixed outside the candidate. Error rounds carry no verdicts; panel sections number the usable rounds.
+empty: 0
+refuted: 0

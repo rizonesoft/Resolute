@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**163 findings across 26 sections.**
+**168 findings across 26 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 50 | the plan or the evidence misdescribes what happened |
+| `record` | 52 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
+| `consistency` | 27 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 26 | fails under hostile or unexpected input |
-| `consistency` | 26 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 12 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 14 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 80 | wrong behavior in code, plan, or record |
-| `minor` | 77 | polish or wording, or no surviving defect |
+| `major` | 84 | wrong behavior in code, plan, or record |
+| `minor` | 78 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -175,6 +175,11 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §8` | F1 | major | `adversarial` | filed | independent | the parser accepts a never-defect carrying critical |
 | `D00 T04 §8` | F2 | major | `consistency` | fixed | independent | plan-stage corrections rated minor without exception contradicts the scale |
 | `D00 T04 §8` | F3 | major | `record` | fixed | independent | the worked KEEP reads fix-loop finds as zero-leg evidence |
+| `D00 T04 §8` | F4 | major | `consistency` | fixed | independent | the frozen-effect parity wording excludes PixRepair and BiosCodes |
+| `D00 T04 §8` | F5 | major | `integration` | fixed | independent | phase closeout invokes a skill that refuses partial files |
+| `D00 T04 §8` | F6 | minor | `record` | fixed | independent | the run record's resolve counts disagree with its enumerations |
+| `D00 T04 §8` | F7 | major | `integration` | fixed | independent | the review file has findings but no run block |
+| `D00 T04 §8` | F8 | major | `record` | fixed | independent | the candidate table and count lines lag the review |
 | `D00 T04 §9` | F1 | critical | `adversarial` | fixed | independent | the binding reviewed one tree and recorded another |
 | `D00 T04 §9` | F2 | major | `consistency` | fixed | independent | the file list counted chunks, not changed files |
 | `D00 T04 §9` | F3 | minor | `record` | fixed | independent | two items stood complete over known gaps |
