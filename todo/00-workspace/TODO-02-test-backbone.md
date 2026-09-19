@@ -46,6 +46,7 @@ track: W1
 |   3   |   §3    | House-style contract, checked against source | --            |  [x]   |
 |   4   |   §4    | Parity driver for a built tool             | §1, §2         |  [x]   |
 |   5   |   §5    | Cover the inherited UI library             | §1, D00 T03 §3 |  [ ]   |
+|   6   |   §6    | Remove the tautological width check        | §5             |  [ ]   |
 
 ---
 
@@ -457,6 +458,19 @@ Uncovered, with reasons: the render pipeline and every Paint path (need a D2D de
 **Test checkpoint:** `ctest --preset debug -L ui` exits 0. A deliberately wrong token mapping, a wrong easing value, and an unknown icon name each fail by name, all three quoted. The uncovered surface is listed with its reason. **Corrected 2026-09-19:** the checkpoint read `ctest --preset x64-debug --tests-regex ui`; no `x64-debug` preset exists (the presets are `debug`/`release`), and `--tests-regex` matches test names, none of which contain `ui` -- the label flag `-L ui` is the selector the suite wires via `ADD_TAGS_AS_LABELS`. **Driven to fail 2026-09-19, all three quoted:** a token mapping of `RGB(31, 30, 30)` fails `Theme colors follow the dark flag` with `1973790 (0x1e1e1e) == 1973791 (0x1e1e1f)`; an easing midpoint of `0.126f` fails `Every easing pins its midpoint` with `0.125f is within 0.00000999999974738 of 0.12600000202655792`; a flipped unknown-name guard fails `Unknown icon names resolve to null, never crash` with `nullptr != nullptr`. Each break was reverted after capture; the tree carries only the passing suite.
 
 > **Started:** 2026-09-19T05:15:00Z
+
+## 6. Remove the Tautological Width Check
+
+Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it for tracked work: `Sidebar collapse toggles both ways` checks `bar.TargetWidth() == bar.ScaledWidth()`, but `TargetWidth()` is defined as `return ScaledWidth();` (`shared/resolute-ui/src/controls/sidebar.cpp:29`), so both sides are the same const call on the same object and the check cannot fail. It proves nothing about collapse width and must go rather than sit as a passing assertion that guards nothing. There is no meaningful replacement headless: settled widths ride the collapse animation, which is why §5 lists them as uncovered, so the fix is deletion, not substitution.
+
+**Needs:** Windows host (build/test)
+
+- [ ] Delete the tautological check from `Sidebar collapse toggles both ways`. Done when: no assertion in the case compares a value with itself, and the diff touches nothing else.
+- [ ] Commit: `"test: remove the tautological width check"`
+
+**Test checkpoint:** `ctest --preset debug -L ui` exits 0 with `100% tests passed out of 42`, and the direct binary run reports the same 42 cases with one fewer assertion than §5's 271.
+
+-> SOURCE: panel-D00-T02-s5-2026-09-19 D00-T02-S5-F16
 
 ## Verification
 

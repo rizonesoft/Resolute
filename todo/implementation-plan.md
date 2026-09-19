@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **20 of 123 sections complete (16%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **20 of 124 sections complete (16%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -123,6 +123,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D09 T01 §2` | Clear the housekeeping defects                 |   5   |
 | [ ] | `D09 T01 §3` | Maintenance scope and retirement procedure     |   7   |
 | [ ] | `D00 T02 §5` | Cover the inherited UI library                 |   7   |
+| [ ] | `D00 T02 §6` | Remove the tautological width check            |   2   |
 
 
 ### Phase 1 -- The two shared layers
