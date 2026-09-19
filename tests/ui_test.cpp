@@ -234,12 +234,17 @@ TEST_CASE("Animation manager counts its subscribers", "[ui][anim]") {
     mgr.CancelAll();
     CHECK(mgr.Count() == 0);
     CHECK_FALSE(mgr.IsAnimating());
-    mgr.Animate(0.0f, 1.0f, 200.0f, rui::ease::Linear, [](float, const rui::Animation&) {});
+    uint32_t first =
+        mgr.Animate(0.0f, 1.0f, 200.0f, rui::ease::Linear, [](float, const rui::Animation&) {});
     mgr.Animate(0.0f, 1.0f, 200.0f, rui::ease::Linear, [](float, const rui::Animation&) {});
     CHECK(mgr.Count() == 2);
     CHECK(mgr.IsAnimating());
+    mgr.Cancel(first);  // single-cancel routes by id: one left, still animating
+    CHECK(mgr.Count() == 1);
+    CHECK(mgr.IsAnimating());
     mgr.CancelAll();
     CHECK(mgr.Count() == 0);
+    CHECK_FALSE(mgr.IsAnimating());
 }
 
 TEST_CASE("Lerp hits both ends and the midpoint", "[ui][anim]") {
