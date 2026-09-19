@@ -811,6 +811,33 @@ def _self_test() -> int:
         check("identity-ok", True)
     except ValueError as exc:
         check("identity-ok", False, str(exc))
+    # The CLI emits UTF-8 even when the console is cp1252 (the Windows
+    # default): a diff carrying box drawing must fence exit 0 with
+    # decodable bytes. Driven 2026-09-20 against 68c7ea9a, whose tree
+    # diagram crashed emission as `UnicodeEncodeError ... cp1252`.
+    import os
+    import subprocess
+    import sys
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix="review-emission-") as tmpd:
+        chunkp = os.path.join(tmpd, "chunk.md")
+        with open(chunkp, "w", encoding="utf-8") as fh:
+            fh.write("diff --git a/t.md b/t.md\n+\u2500\u2500 tree\n")
+        env = dict(os.environ, PYTHONIOENCODING="cp1252")
+        proc = subprocess.run(
+            [sys.executable, __file__, "fence", "PANEL",
+             "--base", "base000", "--head", "head111",
+             f"CANDIDATE DIFF={chunkp}"],
+            capture_output=True, env=env)
+        try:
+            out = proc.stdout.decode("utf-8")
+        except UnicodeDecodeError:
+            out = ""
+        check("fence-emits-utf8-under-cp1252",
+              proc.returncode == 0 and out.startswith("TAG ")
+              and "\nMANIFEST " in out
+              and out.splitlines()[-1].startswith("--- END ["),
+              f"exit={proc.returncode} err={proc.stderr[-160:]!r}")
     # The cross-check compares sets, not order: the manifest lists in
     # encounter order, git sorts.
     check("crosscheck-agree",
@@ -882,6 +909,15 @@ def _self_test() -> int:
 
 if __name__ == "__main__":
     import sys
+
+    # Fenced TODO text and diffs carry characters outside the Windows
+    # console code page (box drawing, arrows); emission must never depend
+    # on the console, so both streams are UTF-8 before any subcommand runs.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(encoding="utf-8")
+        except (AttributeError, ValueError):
+            pass
 
     if len(sys.argv) == 2 and sys.argv[1] == "--self-test":
         sys.exit(_self_test())
