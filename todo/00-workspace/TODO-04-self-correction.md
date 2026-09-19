@@ -72,6 +72,7 @@ track: W1
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [ ]   |
+|  16   |   §16   | Blinded-run checker defects                   | §10     |  [ ]   |
 
 ---
 
@@ -464,6 +465,8 @@ So this section is mostly wiring and measurement rather than construction, and i
 
 §6 kept both models provisionally on a sample of one panel review, with revisit owed after five. A prose promise with no owner rots, so this section is the owner: after five panel-reviewed sections exist in the run records, it decides again with data, blinded where §6 was confounded.
 
+**Trigger met 2026-09-19:** five `runner: panel` blocks exist: D00-T02-S5, D00-T04-S6, D00-T04-S7, D00-T04-S9, D00-T04-S10. The explicit block is lifted.
+
 
 - [ ] Compare both rungs on shared candidates, blinded: each rung reviews one frozen candidate without seeing the other's output or its fixes. Done when: at least one blinded comparison exists and the overlap is measured on shared input.
 - [ ] Specify the cut threshold before deciding: the rolling window, the overlap denominator, severity weighting, and the cost measure. Done when: the rule names all four, and a worked example shows a cut and a keep.
@@ -480,8 +483,11 @@ So this section is mostly wiring and measurement rather than construction, and i
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR6 D00-T04-S6-PR6
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR16 D00-T04-S6-PR16
 -> XREF: D00 T04 §10 -- the enriched records this decision consumes
+-> XREF: D00 T04 §16 -- the checker defects this section's blinded runs filed
 -> SOURCE: plan-D00-T04-s7-2026-09-19-PR20 D00-T04-S7-PR20
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR7 D00-T04-S10-PR7
+
+> **Started:** 2026-09-19T09:05:00Z
 
 ## 9. Review-Input Integrity
 
@@ -625,6 +631,7 @@ The §10 plan review accepted three minors the enriched records leave open: late
 - [ ] Define the latency boundary: what interval a round's `<int>s` measures, stated in the records header beside the unit. Done when: the header names the boundary, quoted, and mixed-boundary values have nowhere to hide.
 - [ ] Report unresolved-field coverage per field and model in `--report`, extending the existing cost line. Done when: version, latency, and cost each show recorded-vs-unresolved counts, quoted from a driven report.
 - [ ] Bind each transition's evidence to the commit whose tree holds the quoted record. Done when: every block carries the binding, the checker asserts it resolves, and one rebinding failure is quoted.
+- [ ] Pin the panel shape against voided rounds: the terminology block states Sol rounds 1-2 with the Opus sign-off at round 3 unconditionally, while the S9 block numbers a voided Sol round 2 and signs off at round 4. Done when: the header admits voids consuming numbers, quoted, and the S9 block reads consistent with it.
 - [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
 
 **Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; all quoted from driven runs.
@@ -633,6 +640,23 @@ The §10 plan review accepted three minors the enriched records leave open: late
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR6 D00-T04-S10-PR6
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR10 D00-T04-S10-PR10
+-> SOURCE: blind-D00-T04-s8-2026-09-19-term D00-T04-S8-B1
+
+## 16. Blinded-Run Checker Defects
+
+The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three refusal-shape defects that survive in the shipped checkers, all driven: a duplicate transition block for a dead ref reports "names no live finding" twice without ever reporting the duplicate, `--report --export` silently prints only the report, and `schema: 99` emits the true version error plus a false "no schema declaration". (A fourth find, the panel-shape terminology contradicting the S9 block's voided round 2, filed as a §15 item.) Each is a five-line fix with a refusal test; none blocks the §8 decision.
+
+- [ ] Report duplicate transition blocks even when the ref is dead. Done when: two blocks for one dead ref draw the duplicate message, quoted, and the live transitions still pass.
+- [ ] Reject conflicting `--report --export` flags with a usage error instead of silently printing the report. Done when: the combination fails naming the conflict, quoted, and each flag alone still works.
+- [ ] Emit only the version error for a wrong schema declaration, not a false "no schema declaration" beside it. Done when: `schema: 99` draws exactly one message, quoted.
+- [ ] Commit: `"workspace: blinded-run checker defects"`
+
+**Test checkpoint:** The duplicate, the flag conflict, and the double message are each quoted from driven runs; the self-tests cover all three refusals.
+
+-> XREF: D00 T04 §8 -- the blinded runs that found these
+-> SOURCE: blind-D00-T04-s8-2026-09-19-OA3 D00-T04-S8-B2
+-> SOURCE: blind-D00-T04-s8-2026-09-19-OI1 D00-T04-S8-B3
+-> SOURCE: blind-D00-T04-s8-2026-09-19-OI2 D00-T04-S8-B4
 
 ## Verification
 
