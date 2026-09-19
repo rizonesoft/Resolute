@@ -583,6 +583,36 @@ def write_attestation(*, manifest_sha: str, candidate_base: str, candidate_head:
     return json.dumps(doc, indent=2, sort_keys=True) + "\n"
 
 
+def parse_manifest_identity(text: str) -> tuple[str | None, str | None]:
+    """The (base, head) pair from saved TAG + MANIFEST lines, each None
+    when the manifest carries no such field. Raises ValueError when no
+    MANIFEST line reads."""
+    for line in text.splitlines():
+        mm = MANIFEST_RE.match(line.strip())
+        if mm:
+            rest = mm.group("rest")
+            base = head = None
+            bm = re.search(r"\sbase=(\S+)", rest)
+            if bm:
+                base = bm.group(1)
+            hm = re.search(r"\shead=(\S+)", rest)
+            if hm:
+                head = hm.group(1)
+            return base, head
+    raise ValueError("manifest file carries no MANIFEST line")
+
+
+def check_attest_identity(manifest_text: str, base: str, head: str) -> str | None:
+    """None when the claimed pair equals the manifest's base/head, else
+    the failure line: an attestation must name the candidate its
+    manifest pinned, never an independently supplied pair."""
+    mbase, mhead = parse_manifest_identity(manifest_text)
+    if mbase != base or mhead != head:
+        return (f"attest: --base/--head ({base}...{head}) do not match "
+                f"the manifest (base={mbase} head={mhead})")
+    return None
+
+
 def read_attestation(text: str) -> dict:
     """Read an attestation back: JSON parses, schema asserts, every
     field re-validates through the writer. Raises ValueError naming
@@ -830,6 +860,18 @@ def _self_test() -> int:
         check("attest-not-json", False, "no ValueError")
     except ValueError as exc:
         check("attest-not-json", "not JSON" in str(exc), str(exc))
+    check("parse-manifest-identity",
+          parse_manifest_identity(f"TAG {tag} nonce={nonce}\n{manifest}\n") == ("base000", "head111"))
+    check("parse-manifest-identity-absent",
+          parse_manifest_identity(f"TAG {tag} nonce={nonce}\n{plain}\n") == (None, None))
+    check("attest-identity-match",
+          check_attest_identity(
+              f"TAG {tag} nonce={nonce}\n{manifest}\n", "base000", "head111") is None)
+    mismatch = check_attest_identity(
+        f"TAG {tag} nonce={nonce}\n{manifest}\n", "base000", "deadbeef")
+    check("attest-identity-mismatch",
+          mismatch is not None and mismatch.startswith("attest: --base/--head"),
+          mismatch or "matched")
     check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
@@ -891,6 +933,9 @@ if __name__ == "__main__":
         # cross-check <manifest-file> <base> <head>: git's own NUL file
         # list for the range against the manifest's parsed diff-files.
         # Divergence fails closed; run from the repository root.
+        # --no-renames lists both sides of a rename, matching the
+        # manifest's [old, new]; without it every valid rename
+        # diverges as `only in manifest: <old>`.
         import subprocess
         try:
             with open(sys.argv[2], encoding="utf-8") as fh:
@@ -903,7 +948,7 @@ if __name__ == "__main__":
             sys.exit(2)
         try:
             proc = subprocess.run(
-                ["git", "diff", "--name-only", "-z", sys.argv[3], sys.argv[4]],
+                ["git", "diff", "--name-only", "-z", "--no-renames", sys.argv[3], sys.argv[4]],
                 capture_output=True, check=False)
         except OSError as exc:
             print(f"cross-check: git failed: {exc}", file=sys.stderr)
@@ -958,13 +1003,18 @@ if __name__ == "__main__":
             sys.exit(2)
         try:
             with open(want["--manifest"], encoding="utf-8") as fh:
-                _, sha, _ = parse_manifest_file(fh.read())
+                manifest_text = fh.read()
+            _, sha, _ = parse_manifest_file(manifest_text)
         except OSError as exc:
             print(f"attest: cannot read {want['--manifest']}: {exc}", file=sys.stderr)
             sys.exit(2)
         except ValueError as exc:
             print(f"attest: {exc}", file=sys.stderr)
             sys.exit(2)
+        identity_bad = check_attest_identity(manifest_text, want["--base"], want["--head"])
+        if identity_bad is not None:
+            print(identity_bad, file=sys.stderr)
+            sys.exit(1)
         try:
             body = write_attestation(
                 manifest_sha=sha, candidate_base=want["--base"],
