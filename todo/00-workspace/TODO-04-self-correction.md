@@ -63,6 +63,9 @@ track: W1
 |   4   |   §4    | Re-sequencing on evidence                  | §3         |  [x]   |
 |   5   |   §5    | Make the adjacency advisory actionable     | §2         |  [x]   |
 |   6   |   §6    | The adversarial reviewer                   | §2         |  [ ]   |
+|   7   |   §7    | Review-run records                         | §6         |  [ ]   |
+|   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [ ]   |
+|   9   |   §9    | Review-input integrity                     | §6         |  [ ]   |
 
 ---
 
@@ -417,6 +420,58 @@ So this section is mostly wiring and measurement rather than construction, and i
 > -> SOURCE: docs/reviews/findings.md
 
 > **Started:** 2026-09-19T04:55:00Z
+
+## 7. Review-Run Records
+
+§6 made the finding split a query, but everything around it is still hand-maintained: engagements, empty engagements, and refuted have no records to query, per-model attribution does not exist (the marker says `independent`, never which rung), and the source itself is self-attested by the session being measured. The §8 revisit cannot run on hand counts. This section adds one structured record per review run (reviewer, model, run id, candidate, rounds, findings raised by ref and number, empty and refuted flags) and derives the split, the engagement counts, and the outcome queries from it.
+
+
+- [ ] Record every review run structurally: reviewer, model, run id, candidate, rounds, and findings raised by ref and number. Done when: the §6 review has a record, and the split, engagements, empty engagements, and refuted all derive from records rather than prose.
+- [ ] Expand range headings so each finding counts. Done when: `F1-F4` parses as four findings, the ledger total moves from 121 to 127, and the §6 table's methodology note is superseded by the query.
+- [ ] Define refuted, withdrawn, duplicate, routed, and non-defect as outcome queries and report them. Done when: each has a definition beside the dispositions, the report prints the counts, and `0 refuted` is a query result rather than a hand count.
+- [ ] Commit: `"workspace: review-run records"`
+
+**Test checkpoint:** The run records cover every engagement §6 counted, quoted; the split, engagement, and outcome queries agree with the §6 table after the range expansion; a record with a missing field is reported rather than bucketed, quoted, with the self-test covering it.
+
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR1 D00-T04-S6-PR1
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR3 D00-T04-S6-PR3
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR7 D00-T04-S6-PR7
+
+## 8. Revisit the Two-Model Decision
+
+§6 kept both models provisionally on a sample of one panel review, with revisit owed after five. A prose promise with no owner rots, so this section is the owner: after five panel-reviewed sections exist in the run records, it decides again with data, blinded where §6 was confounded.
+
+
+- [ ] Compare both rungs on shared candidates, blinded: each rung reviews one frozen candidate without seeing the other's output or its fixes. Done when: at least one blinded comparison exists and the overlap is measured on shared input.
+- [ ] Specify the cut threshold before deciding: the rolling window, the overlap denominator, severity weighting, and the cost measure. Done when: the rule names all four, and a worked example shows a cut and a keep.
+- [ ] Compare lens and prompt diversity against model diversity on shared candidates. Done when: same-candidate adversarial, integration, record, and performance passes are measured against the second model, and the decision says which diversity carries the finds.
+- [ ] Decide keep or cut from the run records. Done when: the decision is dated, cites the measured numbers, and either keeps with the next revisit named or cuts with the losing rung's duties reassigned.
+- [ ] Commit: `"workspace: revisit the two-model decision"`
+
+**Test checkpoint:** The decision cites the run-record queries, quoted; the blinded comparison exists with its overlap measured; the threshold names window, denominator, severity, and cost. Starts after five panel-reviewed sections exist in the run records; blocked until then, explicitly.
+
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR5 D00-T04-S6-PR5
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR4 D00-T04-S6-PR4
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR6 D00-T04-S6-PR6
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR16 D00-T04-S6-PR16
+
+## 9. Review-Input Integrity
+
+Three soundness holes share one theme: the reviewer may not have reviewed what the record claims. A stamp approved staged becomes pushed unstaged (time-of-check gap); the wrong-figure probe covers one defect shape; and an inline diff is never proven complete, so a truncation approves falsely. This section closes all three.
+
+
+- [ ] Bind stamp approval to the staged tree: record the index identity at review time and recheck it before the push. Done when: an edit after approval forces re-review, quoted, and the skill carries the commands.
+- [ ] Add stamp-review regression cases: wrong candidate identity, unsupported evidence, stale references, and contradictory stamps. Done when: each is driven against a staged stamp and named, all quoted.
+- [ ] Prove inline diffs complete: byte count, file list, base and head identities, and reviewer receipt. Done when: the fence subcommand emits the manifest and every review prompt requires the receipt, with a truncated input proven to fail rather than approve.
+- [ ] Check skill-to-plan citations resolve. Done when: the validator names an unresolvable citation by file and line, quoted, with the self-test covering it.
+- [ ] Commit: `"workspace: review-input integrity"`
+
+**Test checkpoint:** The time-of-check gap is driven shut, all four regression cases are named, a truncated diff fails loudly, and an unresolvable citation is reported by file and line. All quoted.
+
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR9 D00-T04-S6-PR9
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR10 D00-T04-S6-PR10
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR11 D00-T04-S6-PR11
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR13 D00-T04-S6-PR13
 
 ## Verification
 

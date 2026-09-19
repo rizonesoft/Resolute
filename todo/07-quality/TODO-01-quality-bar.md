@@ -118,7 +118,10 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 - [ ] Make the ratchet one-way. Done when: a count above the baseline fails, a count equal passes, and a count below rewrites the baseline down in the same commit.
 - [ ] Report which target regressed, not just that something did. Done when: a deliberate regression names the target and the finding.
 - [ ] Prevent a silent baseline raise. Done when: raising a baseline requires an explicit recorded reason and the check names it.
+- [ ] Route duplicate resource-id detection into the ratchet: a twice-defined resource id must fail the gate by name. Done when: the D00 T03 §2 `IDI_APPFALLBACK` shape fails loudly, quoted. Not filed here: the rename-residue sweep (a one-shot migration whose residue is fixed, with no recurring work to check) and script timing budgets (flaky in shared CI; a human noticing remains the detector).
 - [ ] Commit: `"quality: a ratchet that only goes down"`
+
+-> SOURCE: plan-D00-T04-s6-2026-09-19-PR14 D00-T04-S6-PR14
 
 **Test checkpoint:** A count above the baseline fails and names the target and finding. A count equal passes. A count below rewrites the baseline down. A raise without a recorded reason is refused. All four quoted.
 

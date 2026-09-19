@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **21 of 127 sections complete (17%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **21 of 130 sections complete (16%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -105,6 +105,9 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §4` | Re-Sequencing on Evidence                      |   7   |
 | [x] | `D00 T04 §5` | Make the Adjacency Advisory Actionable         |   7   |
 | [ ] | `D00 T04 §6` | The Adversarial Reviewer                       |   7   |
+| [ ] | `D00 T04 §7` | Review-run records                             |   4   |
+| [ ] | `D00 T04 §8` | Revisit the two-model decision                 |   5   |
+| [ ] | `D00 T04 §9` | Review-input integrity                         |   5   |
 | [x] | `D00 T01 §1` | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2` | CMake structure and dependencies               |  11   |
 | [x] | `D00 T01 §3` | Warnings as errors at one level                |   6   |
@@ -116,7 +119,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §3` | House-Style Contract, Checked Against Source   |   6   |
 | [x] | `D00 T02 §4` | Parity driver for a built tool                 |   7   |
 | [x] | `D07 T01 §1` | The conformance profile                        |   7   |
-| [ ] | `D07 T01 §2` | Warning and analysis ratchet                   |   5   |
+| [ ] | `D07 T01 §2` | Warning and analysis ratchet                   |   6   |
 | [ ] | `D07 T01 §3` | Conformance check and its report               |  12   |
 | [ ] | `D07 T01 §4` | Standing smoke run over the suite              |   5   |
 | [ ] | `D09 T01 §1` | Make the AutoIt suite buildable again          |   5   |
