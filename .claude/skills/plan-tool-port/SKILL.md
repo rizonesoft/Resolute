@@ -57,7 +57,7 @@ A second settings writer, log format, About dialog, progress bar, or message box
 
 ### 4. Plan parity
 
-One section per surface or behavior cluster, each born complete per `create-todo`: context, micro-step checklist with Done-when per item, Test checkpoint with a cheaper-substitute-that-fails line, Fidelity/Job/Treatment/Chrome on UI sections, Commit item.
+One section per surface or behavior cluster, each born complete per `create-todo`: context, micro-step checklist with Done-when per item, Test checkpoint with a cheaper-substitute-that-fails line, Fidelity/Job/Treatment/Chrome on UI sections, Commit item. UI sections owe the D00 T02 §9 capture matrix (light/dark by 100/150 percent with TXT sidecars) as checkpoint evidence.
 
 Every parity section owes the parity proof: the C++ tool and its `resolute_au3/` counterpart run against the same fixture and produce the same effect, compared field by field. Frozen tools prove byte-for-byte effect on registry, ACLs, or drive contents; the section names the fixture and the comparison.
 

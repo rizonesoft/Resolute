@@ -49,6 +49,7 @@ track: W1
 |   6   |   §6    | Remove the tautological width check        | §5             |  [ ]   |
 |   7   |   §7    | Driven UI completion tests                 | §5             |  [ ]   |
 |   8   |   §8    | Icon manifest audit                        | §5             |  [ ]   |
+|   9   |   §9    | Rendered-output regression tests           | §5             |  [ ]   |
 
 ---
 
@@ -511,6 +512,21 @@ Icons are referenced by string name and an unknown name resolves to null, which 
 **Test checkpoint:** The manifest lists every referenced icon name with its referrer; all resolve to SVG and bitmap. A deliberately removed icon fails naming the icon. Counts are quoted.
 
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR13 D00-T02-S5-PR13
+
+## 9. Rendered-Output Regression Tests
+
+§5's Uncovered hands rendering correctness to "the captures," and §3 defers rendering fidelity to the automation tree, but no section builds systematic rendered-output testing, and an automation tree answers wiring (the right data in the right control) rather than painting (clipped text, overlapping controls, an unpainted region, a dark token a control ignores, a layout that breaks at 150 percent). Unit tests prove the constants, the parity driver proves the system effects, and neither proves what the user sees. This section builds the layer that does: offscreen golden renders of every shared control, pixel-diffed in ctest, plus the capture-matrix convention every shipped surface owes, so composition bugs fail a gate and UX issues meet human eyes before they ship. The goldens dodge the §3 objection to PNGs by being offscreen renders at fixed logical DPI rather than window captures: no machine dependence, and the runs/ retention rule (restake in the same commit as the layout change) keeps them from going stale silently.
+
+**Needs:** Windows host (build/test)
+
+- [ ] Render every shared control offscreen (D2D bitmap target through WIC, no window) in light and dark at 100 and 150 percent, and commit the outputs as golden images under `tests/golden/`, named by control, appearance, and DPI. Done when: every control in `shared/resolute-ui/src/controls/` has four goldens, and a deliberately shifted layout fails the diff naming the control.
+- [ ] Pixel-diff the renders against the goldens under ctest with a stated per-pixel tolerance, saving the diff image and the differing-pixel count beside the run on failure. Done when: a green run quotes zero differences, a one-pixel shift fails naming the control with its count quoted, and the tolerance value is recorded in the test with its reason.
+- [ ] Extend the runs/ capture convention with the matrix: every section that ships a user-visible surface owes light-by-dark by 100-by-150 captures under `docs/captures/runs/`, named `<date>-<section>-<surface>-<mode>-<dpi>.png`, reusing the §3 sidecar with appearance added, and each shipped surface extends the goldens with its own renders. Done when: the matrix naming is written in `docs/captures/runs/README.md` beside the existing convention and the launcher's four captures plus sidecars are committed as the first instance.
+- [ ] Commit: `"test: rendered-output regression tests"`
+
+**Test checkpoint:** `ctest --preset debug -L render` exits 0 with zero differences quoted; a one-pixel shift of one control fails naming the control with its differing-pixel count quoted; `docs/captures/runs/` holds the launcher matrix (four PNG with sidecars) and the convention README. The goldens prove composition, the matrix proves a human looked, and the UIA tree keeps the wiring half.
+
+-> SOURCE: operator-2026-09-19-visual-testing
 
 ## Verification
 

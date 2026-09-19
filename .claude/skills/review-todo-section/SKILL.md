@@ -86,7 +86,7 @@ Run each lens as a separate pass over the candidate, recording findings in the f
 | `consistency` | Does this agree with the rest of the suite: naming, the source layout in `AGENTS.md`, `DESIGN.md`, the settings writer, the logging call? |
 | `integration` | Do the callers and consumers still hold: every tool that includes the changed header, the launcher that starts it, the release descriptor that ships it, the language pack that names it? |
 | `source-defect` | When owed (a Win32 contract, a registry layout, or another tool's behavior is at stake): is the source read correctly, and is the deviation declared? |
-| `design` | On a surface: judge the RENDERED surface against the baseline or contract, never source alone. Screenshots or driven captures, not impressions. |
+| `design` | On a surface: judge the RENDERED surface against the baseline or contract, never source alone. Screenshots or driven captures, not impressions. A UI section without the D00 T02 §9 capture matrix is needs-attention, never approve. |
 | `record` | Is the record honest: does the stamp's evidence match what ran, do deferrals name owners, is the row flip earned? |
 
 Each lens ends in a verdict: `approve`, `needs-attention` (with findings), or `advisory` (noted, not blocking). Findings are fixed in the candidate and the affected lens re-runs: iterate until no lens reports anything the plan would fix, under the soft-3/hard-5 caps below (the early sequence always runs whole before the Opus sign-off, which always runs because it governs the stamp). A unit patched three rounds running is stopped and re-thought instead of patched again.

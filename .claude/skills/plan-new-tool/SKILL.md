@@ -31,7 +31,7 @@ Every tool, no exceptions, plans its share of: settings keys with defaults throu
 
 ### 5. Define acceptance
 
-Each section is born complete per `create-todo`: context, micro-step checklist with Done-when per item, Test checkpoint with a cheaper-substitute-that-fails line, Fidelity/Job/Treatment/Chrome on UI sections, Commit item. New behavior has no parity baseline, so every Test checkpoint drives the behavior and quotes it, including the failure path: corrupted input, missing privilege, unreachable network, full disk. Unit tests run under the harness (`D00 T02 §1`); the tool passes the conformance check (`D07 T01 §3`).
+Each section is born complete per `create-todo`: context, micro-step checklist with Done-when per item, Test checkpoint with a cheaper-substitute-that-fails line, Fidelity/Job/Treatment/Chrome on UI sections, Commit item. New behavior has no parity baseline, so every Test checkpoint drives the behavior and quotes it, including the failure path: corrupted input, missing privilege, unreachable network, full disk. Unit tests run under the harness (`D00 T02 §1`); the tool passes the conformance check (`D07 T01 §3`). UI sections owe the D00 T02 §9 capture matrix (light/dark by 100/150 percent with TXT sidecars) as checkpoint evidence.
 
 ### 6. Finer-details pass
 
