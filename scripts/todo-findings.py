@@ -83,7 +83,26 @@ CATEGORIES = {
 # `refuted` means the finding was wrong. Several sections have produced this
 # kind and had nowhere to put it.
 DISPOSITIONS = {"fixed", "filed", "refuted", "advisory", "routed", "cleared",
-                "corrected"}
+                "corrected", "withdrawn", "duplicate"}
+
+# Outcome queries over dispositions. `refuted` is raised-then-disproven by
+# evidence (not triage judgement); `withdrawn` is retracted by the raiser;
+# `duplicate` is already tracked elsewhere; `routed` left this section (see
+# filed_to); `non-defect` is the union that answers "raised but not a defect".
+# A query with no matches prints zero rather than vanishing, so the report's
+# shape is stable and a future first use shows up as a count, not a new line.
+OUTCOMES = {
+    "refuted":    "raised, then shown not-a-defect by evidence",
+    "withdrawn":  "raised, then retracted by the raiser",
+    "duplicate":  "the same defect already tracked elsewhere",
+    "routed":     "handed to another section",
+    "non-defect": "raised but not a defect: refuted or cleared",
+}
+
+# A range heading names several findings at once: `F1-F4`, `F1 - 4`. Each
+# counts separately, because totals, splits, and rates are per finding and a
+# range that counts once understates all three (D00 T04 §7).
+RANGE_RE = re.compile(r"^F(?P<lo>\d+)\s*-\s*F?(?P<hi>\d+)$")
 
 
 # `FILED to \`D07 T01 §2\`` -- the section a finding was handed to. D00 T04 §4
@@ -177,8 +196,18 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
             bad.append((path, lineno, f"unknown source {sm.group(1)!r}; expected one of {sorted(SOURCES)}"))
             continue
         target = FILED_TO_RE.search(disposition)
-        findings.append(Finding(ref, path, lineno, number, summary, cat, disp,
-                                target.group(1) if target else None, source))
+        rm = RANGE_RE.match(number)
+        if rm is not None:
+            lo, hi = int(rm.group("lo")), int(rm.group("hi"))
+            if lo >= hi:
+                bad.append((path, lineno, f"range {number} runs backward; write the lower number first"))
+                continue
+            numbers = [f"F{n}" for n in range(lo, hi + 1)]
+        else:
+            numbers = [number]
+        for num in numbers:
+            findings.append(Finding(ref, path, lineno, num, summary, cat, disp,
+                                    target.group(1) if target else None, source))
     return findings, bad
 
 
@@ -235,6 +264,11 @@ def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
     print("\n  by source")
     for src, n in by_source.most_common():
         print(f"    {src:16} {n}")
+
+    print("\n  by outcome")
+    for name in ("refuted", "withdrawn", "duplicate", "routed", "non-defect"):
+        n = by_disp[name] if name != "non-defect" else by_disp["refuted"] + by_disp["cleared"]
+        print(f"    {name:16} {n}")
 
     repeats = [(c, n) for c, n in by_cat.most_common() if n >= 2]
     if repeats:
@@ -320,6 +354,34 @@ def _self_test() -> int:
     if [f.source for f in findings] != ["self", "independent"]:
         print(f"  FAIL  sources parsed wrong: {[f.source for f in findings]}")
         failed += 1
+    # Range headings expand; a backward range reports instead
+    (tmp / "D00-T10-s1.md").write_text(
+        "### F1-F3 -- three at once -- record -- FIXED (self)\n\n"
+        "### F5-F2 -- backward -- record -- FIXED (self)\n",
+        encoding="utf-8",
+    )
+    rf, rb = parse_file(tmp / "D00-T10-s1.md")
+    if [f.number for f in rf] != ["F1", "F2", "F3"]:
+        print(f"  FAIL  range expanded wrong: {[f.number for f in rf]}")
+        failed += 1
+    if not any("runs backward" in w for _, _, w in rb):
+        print("  FAIL  a backward range was not reported")
+        failed += 1
+    # New outcome dispositions parse; the queries derive from them
+    (tmp / "D00-T10-s2.md").write_text(
+        "### F1 -- retracted -- record -- WITHDRAWN (self)\n\n"
+        "### F2 -- twice seen -- record -- DUPLICATE (independent)\n",
+        encoding="utf-8",
+    )
+    of, ob = parse_file(tmp / "D00-T10-s2.md")
+    if [f.disposition for f in of] != ["withdrawn", "duplicate"] or ob:
+        print("  FAIL  outcome dispositions did not parse clean")
+        failed += 1
+    both = findings + rf + of
+    by = Counter(f.disposition for f in both)
+    if by["withdrawn"] != 1 or by["duplicate"] != 1 or by["refuted"] + by["cleared"] != 0:
+        print("  FAIL  outcome counts wrong")
+        failed += 1
     if findings and findings[0].ref != "D00 T99 §1":
         print(f"  FAIL  ref from filename wrong: {findings[0].ref}")
         failed += 1
@@ -382,10 +444,10 @@ def _self_test() -> int:
         failed += 1
 
 
-    for x in (f, other):
+    for x in (f, other, tmp / "D00-T10-s1.md", tmp / "D00-T10-s2.md"):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 14 cases, {failed} failed")
+    print(f"todo-findings self-test: 18 cases, {failed} failed")
     return 1 if failed else 0
 
 

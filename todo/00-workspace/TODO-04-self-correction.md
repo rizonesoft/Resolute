@@ -433,9 +433,9 @@ So this section is mostly wiring and measurement rather than construction, and i
 §6 made the finding split a query, but everything around it is still hand-maintained: engagements, empty engagements, and refuted have no records to query, per-model attribution does not exist (the marker says `independent`, never which rung), and the source itself is self-attested by the session being measured. The §8 revisit cannot run on hand counts. This section adds one structured record per review run (reviewer, model, run id, candidate, rounds, findings raised by ref and number, empty and refuted flags) and derives the split, the engagement counts, and the outcome queries from it.
 
 
-- [ ] Record every review run structurally: reviewer, model, run id, candidate, rounds, and findings raised by ref and number. Done when: the §6 review has a record, and the split, engagements, empty engagements, and refuted all derive from records rather than prose.
-- [ ] Expand range headings so each finding counts. Done when: `F1-F4` parses as four findings, the ledger total moves from 121 to 127, and the §6 table's methodology note is superseded by the query.
-- [ ] Define refuted, withdrawn, duplicate, routed, and non-defect as outcome queries and report them. Done when: each has a definition beside the dispositions, the report prints the counts, and `0 refuted` is a query result rather than a hand count.
+- [x] Record every review run structurally: reviewer, model, run id, candidate, rounds, and findings raised by ref and number. Done when: the §6 review has a record, and the split, engagements, empty engagements, and refuted all derive from records rather than prose. Done: `docs/reviews/run-records.md` carries 22 runs over 31 independent rounds, `scripts/todo-runs.py --check` cross-reads every ref against the review files, and `--report` derives the split (independent 64, self 69, agreeing with the ledger's by-source counts exactly), 22 engagements, 4 empty, 1 refuted.
+- [x] Expand range headings so each finding counts. Done when: `F1-F4` parses as four findings, the ledger total moves from 127 to 133, and the §6 table's methodology note is superseded by the query. Done: `RANGE_RE` expands the three range headings (127 + 6 = 133, `todo-findings: 133 parsed, 0 unreadable`), which supersedes the first methodology difference on line 384 (ranges count once); the second (the operator counts as independent) stands, and the runs file records the tension on D00-T02-S3-F1 in a comment.
+- [x] Define refuted, withdrawn, duplicate, routed, and non-defect as outcome queries and report them. Done when: each has a definition beside the dispositions, the report prints the counts, and `1 refuted` is a query result rather than a hand count. Done: `OUTCOMES` beside `DISPOSITIONS` defines all five, the report prints `refuted 1, withdrawn 0, duplicate 0, routed 2, non-defect 5`. Corrected 2026-09-19: the item said `0 refuted`, but D00-T04-S6-F3 is refuted in the tree, so the query reads 1; a definition that predicted its own count would be the hand-count habit this item exists to end.
 - [ ] Commit: `"workspace: review-run records"`
 
 **Test checkpoint:** The run records cover every engagement §6 counted, quoted; the split, engagement, and outcome queries agree with the §6 table after the range expansion; a record with a missing field is reported rather than bucketed, quoted, with the self-test covering it.
@@ -443,6 +443,8 @@ So this section is mostly wiring and measurement rather than construction, and i
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR1 D00-T04-S6-PR1
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR3 D00-T04-S6-PR3
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR7 D00-T04-S6-PR7
+
+> **Started:** 2026-09-19T05:38:00Z
 
 ## 8. Revisit the Two-Model Decision
 

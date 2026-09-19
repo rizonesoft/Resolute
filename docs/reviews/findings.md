@@ -4,14 +4,14 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**127 findings across 22 sections.**
+**133 findings across 22 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
 | `record` | 42 | the plan or the evidence misdescribes what happened |
-| `correctness` | 29 | the code does the wrong thing |
+| `correctness` | 35 | the code does the wrong thing |
 | `consistency` | 21 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 14 | fails under hostile or unexpected input |
 | `integration` | 7 | a consumer, caller, or downstream artifact no longer holds |
@@ -118,13 +118,19 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T03 §4` | F2 | `correctness` | filed | self | the claims checker silently drops a claim it cannot parse |
 | `D00 T03 §4` | F3 | `record` | routed | self | `TODO.md` held one idea the plan does not cover |
 | `D00 T03 §4` | F4 | `record` | filed | self | there is no `LICENSE` file |
-| `D00 T04 §1` | F1-F4 | `correctness` | fixed | independent | raised by the independent review, all four correct |
+| `D00 T04 §1` | F1 | `correctness` | fixed | independent | raised by the independent review, all four correct |
+| `D00 T04 §1` | F2 | `correctness` | fixed | independent | raised by the independent review, all four correct |
+| `D00 T04 §1` | F3 | `correctness` | fixed | independent | raised by the independent review, all four correct |
+| `D00 T04 §1` | F4 | `correctness` | fixed | independent | raised by the independent review, all four correct |
 | `D00 T04 §1` | F5 | `performance` | fixed | self | the default run paid for an analysis it did not use |
 | `D00 T04 §1` | F6 | `record` | fixed | self | the section's own block had gone stale |
-| `D00 T04 §2` | F1-F2 | `correctness` | fixed | independent | raised by the independent review, both correct |
+| `D00 T04 §2` | F1 | `correctness` | fixed | independent | raised by the independent review, both correct |
+| `D00 T04 §2` | F2 | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | `correctness` | fixed | self | the heading pattern matched ordinary headings |
 | `D00 T04 §2` | F4 | `record` | fixed | self | the ledger goes stale on every review that does not regenerate it |
-| `D00 T04 §3` | F1-F3 | `correctness` | fixed | independent | raised by the independent review, all three correct |
+| `D00 T04 §3` | F1 | `correctness` | fixed | independent | raised by the independent review, all three correct |
+| `D00 T04 §3` | F2 | `correctness` | fixed | independent | raised by the independent review, all three correct |
+| `D00 T04 §3` | F3 | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F4 | `performance` | fixed | self | the whole git log was re-fetched once per section |
 | `D00 T04 §4` | F1 | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | `correctness` | fixed | independent | a documented reference form matched nothing |
