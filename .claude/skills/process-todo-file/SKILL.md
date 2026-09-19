@@ -12,6 +12,7 @@ The last pass over a finished TODO. Its job is to catch what section-by-section 
 - Every row in the Implementation Order table is `[x]`.
 - A runner reports a file exhausted.
 - The user asks to close, finish, or graduate a TODO.
+- A phase closeout names the file for a sweep while rows remain open: run steps 1-4 for the shipped rows only, skip step 5, and leave `status` untouched.
 
 Do NOT use it to force a file closed. If sections remain open, they get implemented or explicitly deferred with owners: not swept.
 
@@ -23,7 +24,7 @@ Do NOT use it to force a file closed. If sections remain open, they get implemen
 python scripts/todo-graph.py validate
 ```
 
-Every row `[x]`, every `[x]` covered by a `Verified:` stamp, zero FATALs. If a row is `[x]` without a stamp, the validator says so: go fix that first.
+Every row `[x]`, every `[x]` covered by a `Verified:` stamp, zero FATALs. If a row is `[x]` without a stamp, the validator says so: go fix that first. In sweep-only mode (phase closeout with open rows remaining), the shipped rows carry stamps instead, and step 5 is skipped: the file keeps its status until exhaustion.
 
 ### 2. Run the file-level Verification block
 
@@ -85,7 +86,7 @@ Tell the user plainly:
 
 ## Guardrails
 
-- Do not close a file with open sections. Implement or explicitly defer with an owner.
+- Do not close a file with open sections. Implement or explicitly defer with an owner. Sweep-only mode never sets `status: done`.
 - Do not close a file whose deferrals point nowhere.
 - Do not claim the Verification block passed without running it: quote the output.
 - Do not delete section detail on closure. The shipped TODO is the record of how it was built.
