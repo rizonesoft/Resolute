@@ -570,15 +570,17 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 
 Round 5 of the §9 panel left two advisories at the hard cap: rename lines past the hunk body hijack the block's file list, and the residual clause does not name that shape. The scan only ever fences `git show` output, whose rename lines sit in the header, so pasted input is the only route; still, a manifest that can list files from prose is a manifest that can lie, and the fix is small.
 
-- [ ] Stop the rename scan at the hunk body: `--- `, `+++ `, or `@@`. Done when: a post-hunk `rename from/to` pair is ignored, quoted, with the self-test covering it.
-- [ ] Confirm the residual: with the scan bound, combined diffs stand as the sole residual. Done when: the comment, the docstring, and the proof quote agree, quoted from the driven run.
-- [ ] Commit: `"workspace: bind the rename scan to the diff header"`
+- [x] Stop the rename scan at the hunk body: `--- `, `+++ `, or `@@`. Done when: a post-hunk `rename from/to` pair is ignored, quoted, with the self-test covering it. Done: `_scan_diff_block` breaks at the first `--- `/`+++ `/`@@` line; the self-test's `manifest-rename-stops-at-hunk` case passes with the suite at 30 cases green; the driven `fence` probe resolves to `diff-files=real.md`, quoted.
+- [x] Confirm the residual: with the scan bound, combined diffs stand as the sole residual. Done when: the comment, the docstring, and the proof quote agree, quoted from the driven run. Done: the module comment, the `_scan_diff_block` docstring, and the driven probe quote agree combined diffs stand sole.
+- [x] Commit: `"workspace: bind the rename scan to the diff header"`
 
 **Test checkpoint:** The post-hunk probe resolves to the real path, quoted; the residual clause reads the same in code, comment, and quote.
 
 -> XREF: D00 T04 §9 -- the panel that left these at the hard cap
 -> SOURCE: panel-D00-T04-s9-2026-09-19 D00-T04-S9-F10
 -> SOURCE: panel-D00-T04-s9-2026-09-19 D00-T04-S9-F11
+
+> **Started:** 2026-09-19T18:02:46Z
 
 ## 12. Prove the Manifest, Not Just Emit It
 

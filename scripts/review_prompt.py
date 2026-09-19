@@ -135,9 +135,11 @@ MANIFEST_RE = re.compile(
 # STAGED STAMP); only those are scanned for changed files, so a `+++`
 # line in prose can never forge the file list. Each side of a `diff
 # --git` line is independently bare or whole-token C-quoted, so the
-# parse is a small tokenizer, not one regex; combined diffs
-# (`diff --cc`, merge candidates only, and this tree stays linear)
-# are the stated residual.
+# parse is a small tokenizer, not one regex. The rename scan stops
+# at the hunk body, so pasted post-hunk `rename from/to` pairs are
+# ignored by construction; combined diffs (`diff --cc`, merge
+# candidates only, and this tree stays linear) stand as the sole
+# residual.
 _DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP")
 _DIFF_LINE_RE = re.compile(r"^diff --git (?P<rest>.+?)\s*$")
 _DIFF_QUOTED_RE = re.compile(r'^"a/((?:[^"\\]|\\.)*)"\s+(?P<right>.*)$')
@@ -153,14 +155,18 @@ def _rename_path(raw: str) -> str:
 
 
 def _scan_diff_block(lines: list[str]) -> list[str]:
-    """Changed paths from one diff block (a `diff --git` line plus its
-    header): the `rename from/to` pair when git names one (exact even
-    when both sides carry spaces), else the `diff --git` sides."""
+    """Changed paths from one diff block: the `rename from/to` pair
+    from the header when git names one (exact even when both sides
+    carry spaces), else the `diff --git` sides. The rename scan stops
+    at the hunk body (`--- `, `+++ `, or `@@`): git emits the pair
+    above it, so anything below is pasted input, never a rename."""
     renames: dict[str, str] = {}
     diff_line = None
     for line in lines:
         if diff_line is None and _DIFF_LINE_RE.match(line):
             diff_line = line
+        if line.startswith(("--- ", "+++ ", "@@")):
+            break
         rm = _RENAME_RE.match(line)
         if rm and rm.group("dir") not in renames:
             renames[rm.group("dir")] = _rename_path(rm.group("path"))
@@ -555,6 +561,17 @@ def _self_test() -> int:
                 "rename to nothing\n")
     mline5, _ = build_manifest(tag, [("CANDIDATE DIFF", poisoned)])
     check("manifest-rename-needs-diff-line", "diff-files=" not in mline5, mline5)
+    smuggled = ("diff --git a/real.md b/real.md\n"
+                "--- a/real.md\n"
+                "+++ b/real.md\n"
+                "@@ -1 +1 @@\n"
+                "-old\n"
+                "+new\n"
+                "rename from smuggled.md\n"
+                "rename to smuggled2.md\n")
+    mline6, _ = build_manifest(tag, [("CANDIDATE DIFF", smuggled)])
+    check("manifest-rename-stops-at-hunk",
+          "diff-files=real.md" in mline6 and "smuggled" not in mline6, mline6)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
