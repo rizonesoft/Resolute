@@ -75,6 +75,7 @@ track: W1
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [ ]   |
 |  17   |   §17   | Report without walking the corpus twice       | §10     |  [ ]   |
 |  18   |   §18   | Second two-model revisit, independently rated | §8      |  [ ]   |
+|  19   |   §19   | No partial flips                            | --      |  [ ]   |
 
 ---
 
@@ -633,6 +634,7 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 
 -> XREF: D00 T04 §9 -- the binding this section extends
 -> XREF: D00 T04 §12 -- the attest path whose OID resolution this section owns
+-> XREF: D00 T04 §19 -- the row-side guard: no shipped row with an open checklist
 -> SOURCE: independent-D00-T04-s12-2026-09-19
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR4 D00-T04-S9-PR4
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR5 D00-T04-S9-PR5
@@ -741,6 +743,23 @@ D00 T04 §8 kept both models on a value margin (79 vs 31) computed from severiti
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR12 D00-T04-S8-PR12
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR16 D00-T04-S8-PR16
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR21 D00-T04-S8-PR21
+
+## 19. No Partial Flips
+
+A `[x]` row with an open checklist reads as done while work remains, which is the one state the completion-first policy (`todo/README.md`) refuses to represent. Nothing checks it today: stamps cover sections, boxes project rows, and nobody compares the row against the items. This section adds the comparison as a FATAL: a shipped row whose section still carries an unchecked micro-step fails `validate` by file and line.
+
+**Design, measured 2026-09-19 against the live tree:** three shapes are excused, each for a stated reason. `Commit:` lines are excused because the commit is proven by history rather than by the checkbox, and ticking one on a shipped section would rewrite a stamped checklist, which the spec forbids (5 live cases: `D00 T02 §4`, `D00 T04 §7`, `D00 T04 §9`, `D00 T04 §10`, `D07 T01 §1`). Struck `~~` items carrying a `Deferred` marker are excused because they are filed debt with an owner, not open work. Fenced code blocks are stripped before the scan (precedent: the panel-verdict scan), and the stamp region below `Verified:` is out of scope. With those exemptions the live tree reports zero, quoted, so the rule lands green with no migration.
+
+-> XREF: D00 T04 §13 -- the sibling flip-integrity machinery; this rule guards the row, that section binds the stamp
+
+- [ ] Fail `validate` with a named class when an Implementation Order `[x]` row's section carries an unchecked `- [ ]` outside the exemptions, quoting file, section, and item. Done when: the class, its `SEVERITY_MAP` entry, and its `todo/README.md` map row land together (the self-test compares map to table row-for-row), with the exemptions above stated beside the rule.
+- [ ] Pin the rule in the self-test: a shipped row with a plain open item fails, and each exemption (a `Commit:` line, a struck deferral, a fenced example, a stamp-region quote) passes. Done when: the cases run green and a removed exemption breaks its case, quoted.
+- [ ] Drive the rule against the live tree and quote zero fires with the exemption counts. Done when: the output names the 5 excused `Commit:` lines and every struck deferral under a shipped row, proving the rule lands without a migration.
+- [ ] Commit: `"workspace: fail validate on partial flips"`
+
+**Test checkpoint:** `validate` fails naming file, section, and item on a fixture with a shipped row and a plain open item; the self-test pins the rule plus all four exemptions; the live tree quotes zero fires. A `[x]` row with an open checklist can no longer reach the plan.
+
+-> SOURCE: operator-2026-09-19-completion-first
 
 ## Verification
 

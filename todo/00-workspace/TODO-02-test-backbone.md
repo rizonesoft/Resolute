@@ -14,6 +14,8 @@ track: W1
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** No tests exist anywhere in this repository, in either tree. The AutoIt suite has never had a test, which is the stated reason its most destructive code was never exercised: there was no safe target to run it against. The C++ codebase arriving through `D00 T03` has none either: `test_font.cpp` is a scratch file, and the 6,865-line UI library that fourteen tools will depend on is entirely uncovered. `tests/` does not exist. **Groomed 2026-09-17: `docs/captures/` now does exist**, holding a single tracked file, `ui-automation-spike.md`. The correction is worth making precisely rather than deleting the sentence: the directory is present and the capture store this section needs is still empty, so nothing here is satisfied by its existence. The parity driver, which this project's fifth proof type depends on entirely, does not exist and has no precedent to copy.
+>
+> **Filed 2026-09-19:** §§10-12 (focus-free UI suite conversion, nightly full-suite regression run, port-vs-port visual comparison). Open: §§6-12.
 
 ## Inputs
 
@@ -50,6 +52,9 @@ track: W1
 |   7   |   §7    | Driven UI completion tests                 | §5             |  [ ]   |
 |   8   |   §8    | Icon manifest audit                        | §5             |  [ ]   |
 |   9   |   §9    | Rendered-output regression tests           | §5             |  [ ]   |
+|  10   |   §10   | Focus-free UI suite conversion             | §7             |  [ ]   |
+|  11   |   §11   | Nightly full-suite regression run          | §10            |  [ ]   |
+|  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [ ]   |
 
 ---
 
@@ -440,6 +445,8 @@ The fifth proof type of this project rests entirely on this section. Without it,
 > **Implementer:** Claude Opus 5 (claude-opus-5[1m])
 > **Deferred:** the first cross-implementation parity record, because no C++ `Ownership` exists, no AutoIt tool parses a command line, and the writes land in `HKCR` on the developer's machine. The format, the driver and the comparison are proven here without it, so the port inherits a working instrument rather than building one. -> XREF: D04 T01 §1 (item: "Prove parity: both implementations run against the same fixture tree and the parity driver reports no difference") -- the item that produces it
 
+- -> XREF: D00 T02 §12 -- the visual half that pairs with these effect records; same fixture state, structure compared, pixels never parity
+
 ## 5. Cover the Inherited UI Library
 
 The library that fourteen tools are about to depend on has **no tests at all**. It renders the launcher correctly today, which is evidence that it works, not evidence that it keeps working. This section buys the right to change it.
@@ -499,6 +506,8 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR7 D00-T02-S5-PR7
 
+- -> XREF: D00 T02 §10 -- the focus fence this host runs under; the driven completions ship headful, the gate proves the default run never is
+
 ## 8. Icon Manifest Audit
 
 Icons are referenced by string name and an unknown name resolves to null, which renders as a silently missing control. §5 pins one glyph and the null path; nothing checks that every name the suite references actually resolves. This section enumerates every icon name referenced by the launcher, the shared controls, and the tool descriptors and asserts each one resolves, so a typo fails the gate instead of shipping an invisible control.
@@ -527,6 +536,79 @@ Icons are referenced by string name and an unknown name resolves to null, which 
 **Test checkpoint:** `ctest --preset debug -L render` exits 0 with zero differences quoted; a one-pixel shift of one control fails naming the control with its differing-pixel count quoted; `docs/captures/runs/` holds the launcher matrix (four PNG with sidecars) and the convention README. The goldens prove composition, the matrix proves a human looked, and the UIA tree keeps the wiring half.
 
 -> SOURCE: operator-2026-09-19-visual-testing
+
+- -> XREF: D00 T02 §10 -- the focus fence that runs the headful tests; these goldens carry the default tier's rendering proof
+- -> XREF: D00 T02 §12 -- the capture pairs that extend this matrix with the implementation axis, region-diffed
+
+## 10. Focus-Free UI Suite Conversion
+
+Why this section exists: the suite cannot run while the operator works. `D00 T02 §7` needs real windows and a pumping message loop, and §3's `scripts/capture-window.ps1` refuses (exit 3) unless its target owns the foreground, so a full daytime run steals focus repeatedly and a mistimed capture files the wrong window as evidence. ScratchPad measured the same shape on 2026-09-17 (112 focus-dependent input calls) and its `D00 T02 §8` is the proven split this section ports: a background-safe default tier that runs any time without interrupting, and a fenced headful tier that runs only visibly or in the night window `D00 T02 §11` owns. **Corrected 2026-09-19:** the first filing funneled every suite window to the secondary monitor and gated on zero primary-monitor windows. That repeats the ScratchPad mistake the operator rejects: DPI awareness must be proven on both DPIs and positioning tests must target their declared monitor, so the fence carries per-test placement intent (which monitor, which DPI, why) and the census verifies actual placement against it instead of asserting absence. **Corrected 2026-09-19 (completion-first):** no section waits for the window to test, review, stamp, and flip: outside the window the fenced tier self-skips and the skip list becomes a `Night-owed:` line on the stamp (flip on DAY-green, debt recorded); `D00 T02 §11` collects the debt at night and a red night result reopens through audit stance. Operator defaults 2026-09-19: no frozen-tool carve-out, one retry before reopen, and no decision wait: collection widens to idle-unlocked daytime automatically, hardware-absent debt re-probes nightly and auto-collects on appearance, and age is report information, never an escalation.
+
+**Needs:** Windows host (build/test)
+
+**Requires:** display-session -- convicted by scripts/capture-window.ps1 failing closed (exit 3) without the foreground and D00 T02 §7 asserting against real windows
+
+- -> XREF: D00 T02 §7 -- the driven host this fence runs under; nothing headful runs outside the fenced tier
+- -> XREF: D00 T02 §9 -- the offscreen goldens that carry the default tier's rendering proof with no window
+- -> XREF: D00 T02 §11 -- the nightly run that executes the fenced tier; the two tiers are that run's two halves
+- -> XREF: D00 T02 §12 -- the capture pairs that run inside the fenced tier, never in the default run
+
+- [ ] Audit every focus-dependent site in `tests/` (window creation, foreground assertions, `capture-window.ps1` invocations, synthetic input if any) into a committed table with a disposition each: convert to offscreen or message-loop-only, fence as headful, or keep with a reason. Every fenced site additionally declares its placement intent: which monitor, which DPI, and why that surface needs that screen (DPI-100 rendering, DPI-150 rendering, cross-monitor move, absolute positioning). Done when: the table quotes every site with its disposition and zero sites are unaccounted, and every fenced site carries a placement intent a second reader can challenge.
+- [ ] Convertibles move to forms that need no foreground (offscreen targets, pumped loops without visible windows) behind shared helpers, and the converted tests stay green. Done when: the default label-filtered run passes with zero focus-dependent calls outside the fenced set.
+- [ ] True-headful tests (whose point is a visible window: driven completion, foreground captures, per-monitor DPI rendering, cross-monitor moves) are fenced behind a label excluded from the default run and runnable visibly on demand, each running on its declared monitor and DPI from the audit. Done when: the default run activates no window (proven by a foreground log) and the fenced set passes visibly with every window on its declared screen.
+- [ ] Window census joins the gate: the foreground proof records every test HWND with monitor, rect, iconic state, and the monitor's measured DPI, and the gate asserts two things: the default run shows zero visible test windows anywhere plus zero foreground holds, and the fenced run shows every window on its declared monitor and DPI. Done when: a full default run log is quoted clean on the absence half and a fenced run log is quoted clean on the placement half, with one deliberate misplacement failing the gate by name.
+- [ ] `docs/testing.md` documents the uninterrupted gate: the exact default-run command, the fenced on-demand command, and what green means for each. Done when: a second section can follow it without asking.
+- [ ] Fenced headful tests self-skip outside the quiet-hours window (02:00-06:50 local) through one shared gate, so a daytime full run cannot interrupt. Done when: boundary fixtures pin the window math, a daytime fenced run skips every headful test with the window named, the nighttime full run executes them, and the window plus overrides are recorded in `docs/testing.md`. Every skip prints one machine-readable `SKIP <test> <reason>` line, which is the debt list the stamp records rather than a hand-typed copy. The gate honors an idle-collect signal from the §11 runner (session unlocked plus idle past the stated threshold), and collection aborts instantly on input with completed tests recorded and the rest re-queued.
+- [ ] `review-todo-section` gains the debt-completeness check: every fenced test the audit table names for the section's surface appears in the green list or the `Night-owed:` list, and a test in neither fails review like an unaccounted control. Done when: the skill carries the check and this section's own review quotes the comparison.
+- [ ] Commit: `"workspace: convert UI suite to focus-free input"`
+
+**Test checkpoint:** The default `tests/` run passes while the operator's foreground window never changes (foreground log plus census quoted clean); the fenced set passes in a visible on-demand run. Cheaper substitute that fails: running the suite while the operator is away and calling it uninterrupted. A section shipping outside the window flips on DAY-green with its `SKIP` lines recorded as `Night-owed:`; nothing waits for 02:00.
+
+-> SOURCE: operator-2026-09-19-visual-timers-s10
+
+## 11. Nightly Full-Suite Regression Run
+
+Why this section exists: the fenced headful set has no owner, no schedule, and no record: per-section gates prove the background-safe default run, and nothing proves the whole. The nightly run closes that: one governed full-suite execution while the operator sleeps, with its evidence filed where the next morning finds it. ScratchPad's `D00 T02 §9` plus `tools/nightly.ps1` (quiet-hours window, lock detection, two halves, Task Scheduler task) is the proven shape this section ports. **Corrected 2026-09-19:** the run opens with an environment probe (monitors, DPIs, lock state) because placement intents are meaningless against unmeasured hardware: measured 2026-09-19 from the Console session, the main monitor is 3840x2160 at 150% and the secondary 1920x1080 at 100% (AppliedDPI 144 agrees). An earlier probe read both at 100% because it ran DPI-unaware and the OS virtualized the answer to 96: the probe sets per-monitor awareness before measuring, or it repeats the error. **Corrected 2026-09-19 (completion-first):** the run is a debt collector: it queries every open `Night-owed:` line, executes the fenced tests on their declared screens, and appends `Night-verified:` per section on green. One automatic retry on red absorbs flakes with both attempts quoted; a second red reopens the section through audit stance (the existing `Reopened:` machinery voids downstream proof). Collection never waits for a decision: the quiet window collects when unlocked, idle-unlocked daytime collects opportunistically with abort on input, and hardware-absent debt re-probes every run and auto-collects on appearance; age is report information, never an escalation.
+
+**Needs:** Windows host (build/test)
+
+**Requires:** display-session -- convicted by the D00 T02 §10 fence: window captures fail closed headless (scripts/capture-window.ps1 exit 3), so the fenced half needs an interactive session inside the window
+
+- -> XREF: D00 T02 §10 -- the fence this run executes; the two tiers (default plus fenced) are this run's two halves
+
+- [ ] `docs/testing.md` carries the nightly procedure: trigger (nightly schedule inside 02:00-06:50 local plus idle-unlocked daytime collection with its idle threshold), the two commands (background-safe default run with foreground-plus-census proof, then the full run with the fenced set), and the pass/fail bar for each half. The procedure defines the DAY/NIGHT tier split, the `Night-owed:` / `Night-verified:` line shapes, and the flip rule: DAY-green flips any hour with debt recorded; NIGHT clears by collection, never by waiting. Done when: a second operator can run it or read the schedule without asking.
+- [ ] Nightly logs land under `build/nightly/YYYY-MM-DD-{default,full}.log` (ignored scratch, never committed) with the run's section range and HEAD recorded at the top. Done when: the convention is written and the first logs follow it.
+- [ ] The morning report names per-half counts (passed, failed, skipped-with-reason) and files every failure as a finding in the owning file before the next section starts. Done when: the report format is written with one worked example, and the report lands at a fixed path the operator checks first. Collection results ride the same report: every `Night-verified:` cleared, every retry quoted, every reopen filed, and open debt listed with its age in nights plus the standing proof (offscreen goldens) or the last skip reason. Age is information, and collection needs no decision.
+- [ ] The fenced half executes inside the quiet-hours window with zero quiet-hours skips (citing the §10 gate proof, not re-owning it), runs every test on its declared monitor and DPI from the §10 placement plan, and skips honestly on a locked workstation (a locked session cannot drive windows, so the phase logs its skip and the run continues) or when a declared DPI is absent (a 150% test with no 150% monitor skips with the probe output quoted, never fails, never silently passes). The half consumes the cross-section debt queue rather than one section's tests. Collection runs in the quiet window when unlocked and opportunistically whenever the session is unlocked plus idle past the stated threshold, aborting instantly on input or lock with per-test atomicity (completed tests recorded, the rest re-queued). Done when: the full log shows the fenced count executed on the declared screens, an idle collection plus an abort are quoted from driven runs, and every skip names its reason with the probe line beside it.
+- [ ] The schedule is provisioned by script, not by clicks: a `tools/nightly.ps1` runner plus a registration step that creates the `\Resolute\Nightly` scheduled task, so a fresh machine gets the run from the repo alone. Done when: the script runs the procedure end to end by hand and the task fires it once inside the window, quoted.
+- [ ] `query night-debt` lists every open `Night-owed:` line with its section, test, placement intent, and age in nights, derived from stamps at query time so no side ledger can rot. Done when: the query prints the shape with one worked entry and the nightly runner consumes it in the first governed run.
+- [ ] The first governed run executes the procedure end to end on the schedule and its evidence (both logs plus the morning report) is quoted here. Done when: the log paths and the report are cited with their outcomes.
+- [ ] Commit: `"workspace: govern the nightly regression run"`
+
+**Test checkpoint:** Procedure, log convention, and report format written; first governed run quoted with both logs; fenced half executed in-window. Cheaper substitute that fails: an ad-hoc night run whose evidence lives in chat.
+
+-> SOURCE: operator-2026-09-19-visual-timers-s11
+
+## 12. Port-vs-Port Visual Comparison
+
+Why this section exists: `D00 T02 §4` compares what two implementations DID, field by field, and `D00 T02 §9` proves the C++ controls render stably, but nothing compares what the user SEES across the AutoIt tool and its C++ port at the same fixture state: a port that writes the right registry values while dropping a control, renaming a label, or leaving a region unpainted passes every gate it has. This section builds that comparison as capture pairs plus region diffs, explicitly NOT as pixel parity: `todo/README.md` refuses pixel comparisons across implementations ("Comparing them pixel to pixel would freeze the defects the rewrite exists to fix") and §4 repeats the exclusion with the reason, so DPI and theme differences are out of scope by rule and the harness compares structure (same controls, same labels and values, same painted regions), never raw pixels. **Corrected 2026-09-19:** pairs are captured per attached DPI (150% main and 100% secondary today, per the §10 placement plan), and DPI awareness itself is proven same-implementation: the C++ capture at 150 must match the §9 150 golden, while the AutoIt 150 capture is expected bitmap-stretched (DPI-unaware by construction) and asserts structure only. The launcher is the first pair: the C++ launcher renders today (§5) and `resolute_au3/SDK/Concrete/Resolute/Resolute.au3` is its counterpart, so the harness is provable now and each ported tool extends it with its own pair.
+
+**Needs:** Windows host (build/test)
+
+**Requires:** display-session -- convicted by scripts/capture-window.ps1 failing closed (exit 3) without the foreground: capture pairs need visible windows on both implementations
+
+- -> XREF: D00 T02 §4 -- the effects parity this visual half pairs with; effects plus visuals, never one claimed as the other
+- -> XREF: D00 T02 §9 -- the capture-matrix convention the pairs extend, and the goldens that keep C++-vs-C++ pixel-stable
+- -> XREF: D00 T02 §10 -- the fenced tier the pairs run inside; captures steal the foreground by construction
+
+- [ ] Capture pairs: for the launcher at its startup state, capture the AutoIt window and the C++ window through §3's `scripts/capture-window.ps1` with sidecars, on each attached DPI (150% main, 100% secondary), falling back to an honest skip with the probe quoted when a declared DPI is absent, both stored under `docs/captures/runs/` in the §9 matrix naming with the implementation and DPI added. Done when: the 100% pair exists with both sidecars and a second operator can reproduce either half from the sidecar alone, and the 150% pair exists or its skip is quoted.
+- [ ] Region diff: each pair carries enumerated control regions (from the launcher's section spec, not guessed from pixels) compared with a stated tolerance, and DPI-only or theme-only differences pass with the exemption quoted, never silently. The C++ half at 150 additionally diffs against the §9 150 golden (the DPI-awareness proof: crisp rendering at the right layout), while the AutoIt half at 150 asserts structure only (bitmap-stretched by construction). Done when: a deliberately renamed label fails naming the control, a deliberately removed control fails naming the region, a dark-vs-light pair of the same layout passes with the exemption quoted, and a deliberately blurred C++ 150 capture fails against its golden.
+- [ ] The harness runs headful-only inside the §10 fenced tier and self-skips in the default run with the tier named. Done when: the default run quotes the skip and the fenced run quotes the diff counts.
+- [ ] Commit: `"workspace: compare ports visually, region by region"`
+
+**Test checkpoint:** The launcher's AutoIt-vs-C++ capture pair exists with sidecars; a renamed label and a removed control each fail naming what diverged; a theme-only difference passes with the exemption quoted. Cheaper substitute that fails: a pixel diff across implementations presented as comparison, which `todo/README.md` refuses.
+
+-> SOURCE: operator-2026-09-19-visual-timers-s12
 
 ## Verification
 

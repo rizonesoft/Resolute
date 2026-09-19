@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **27 of 205 sections complete (13%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **27 of 209 sections complete (13%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -60,7 +60,7 @@ The ExoSuite codebase, taken in by `D00 T03 §1` and renamed to Resolute by `§2
 
 The suite being replaced is mature and shipping: fourteen tools, roughly 43,000 lines of AutoIt3, a working builder, and an installer. Two measurements shape this plan. Roughly **21,000 of those 43,000 lines are fourteen copies of one framework**, which is why the real porting job is one framework plus fourteen small bodies of logic rather than a 43,000-line rewrite. And the per-tool logic, with that framework subtracted, is: `Ownership` 77 lines, `USBRepair` 147, `DVDRepair` 274, `PixRepair` 341, `BiosCodes` 960, `ComIntRep` 1,903.
 
-Every open section is in scope and must appear in exactly one phase. A dependency may park a row; it does not remove it. `plan --check` is the proof.
+Every open section is in scope and must appear in exactly one phase. A dependency may park a row; it does not remove it. `plan --check` is the proof. Completion-first: a row flips only whole, and debt always names its collector (`D00 T04 §19` owns the mechanical check).
 
 ---
 
@@ -117,6 +117,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T04 §16` | Blinded-run checker defects                    |   5   |
 | [ ] | `D00 T04 §17` | Report without walking the corpus twice        |   2   |
 | [ ] | `D00 T04 §18` | Second two-model revisit, independently rated  |   7   |
+| [ ] | `D00 T04 §19` | No partial flips                               |   4   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2`  | CMake structure and dependencies               |  11   |
 | [x] | `D00 T01 §3`  | Warnings as errors at one level                |   6   |
@@ -139,6 +140,9 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T02 §7`  | Driven UI completion tests                     |   3   |
 | [ ] | `D00 T02 §8`  | Icon manifest audit                            |   3   |
 | [ ] | `D00 T02 §9`  | Rendered-output regression tests               |   4   |
+| [ ] | `D00 T02 §10` | Focus-free UI suite conversion                 |   8   |
+| [ ] | `D00 T02 §11` | Nightly full-suite regression run              |   8   |
+| [ ] | `D00 T02 §12` | Port-vs-port visual comparison                 |   4   |
 | [ ] | `D00 T01 §8`  | Run the unit suite under release               |   2   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance           |   4   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files            |   7   |
