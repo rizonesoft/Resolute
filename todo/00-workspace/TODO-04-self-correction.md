@@ -74,6 +74,7 @@ track: W1
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [ ]   |
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [ ]   |
 |  17   |   §17   | Report without walking the corpus twice       | §10     |  [ ]   |
+|  18   |   §18   | Second two-model revisit, independently rated | §8      |  [ ]   |
 
 ---
 
@@ -679,6 +680,21 @@ The §8 diversity runs found `report()` calls `TF.collect()` after `run_check()`
 
 -> XREF: D00 T04 §8 -- the diversity runs that found this
 -> SOURCE: div-D00-T04-s8-2026-09-19-P1 D00-T04-S8-D3
+
+## 18. Second Two-Model Revisit, Independently Rated
+
+D00 T04 §8 kept both models on a value margin (79 vs 31) computed from severities the implementing session assigned in bulk after every outcome was known, then used to decide. That self-attestation confound is the same one D00 T04 §7 removed for the source split by deriving it from run records; the keep stands on the blinded Jaccard 0.22 corroboration, but the next revisit must not repeat the methodology. This section re-decides after five more panel-reviewed sections with severities assigned independently of the decision.
+
+**Trigger: starts after five more panel-reviewed sections exist in the run records past the §8 window of five.** Counted by query, not by prose. Until the trigger is met this section waits, however its dependencies read: a revisit decided on the same window is a second opinion from the same data.
+
+- [ ] Re-rate severity independently: every finding in the new window carries a severity assigned by a party other than the deciding session (a blinded re-rating pass, or the panel's own rating at finding time), with the rater recorded per finding. Done when: no severity in the window is decider-attested, quoted from the records.
+- [ ] Re-apply the §8 cut rule on the new window: rolling five sections, mean blinded Jaccard with a fresh comparison, 9/3/1 weights, recorded cost where available. Done when: each leg reads from regenerated exports, quoted, with the overlap leg dormant rather than cut when the window holds no comparison.
+- [ ] Decide keep or cut with the losing rung's duties reassigned on a cut, and name the third revisit. Done when: the decision is dated, cites the export, and either keeps with the next trigger named or cuts with duties reassigned.
+- [ ] Commit: `"workspace: second two-model revisit, independently rated"`
+
+**Test checkpoint:** The window counts five new panel sections by query; no severity in it is decider-attested; the cut rule reads from fresh exports with Jaccard measured; the decision cites the export and names the next trigger. Blocked on the trigger until it is met, explicitly.
+
+-> SOURCE: panel-D00-T04-s8-2026-09-19-signoff D00-T04-S8-F10
 
 ## Verification
 
