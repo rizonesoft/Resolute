@@ -67,7 +67,7 @@ track: W1
 |   8   |   §8    | Revisit the two-model decision             | §6, §7     |  [x]   |
 |   9   |   §9    | Review-input integrity                     | §6         |  [x]   |
 |  10   |   §10   | Run-record follow-ups                      | §7         |  [x]   |
-|  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [ ]   |
+|  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [x]   |
 |  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [ ]   |
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
@@ -581,6 +581,13 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 -> SOURCE: panel-D00-T04-s9-2026-09-19 D00-T04-S9-F11
 
 > **Started:** 2026-09-19T18:02:46Z
+
+> **Verified:** 2026-09-19 | §11 | `_scan_diff_block` breaks at the first `--- `/`+++ `/`@@` line, so pasted post-hunk rename pairs are ignored: the driven `fence` probe resolves to `diff-files=real.md` (bytes 310, tag and sha per-run) and the `manifest-rename-stops-at-hunk` self-test pins it with the suite at 30 green · the module comment, docstring, and probe quote agree combined diffs stand as the sole residual · forged well-formed blocks are faithfully reported, not lies (probes yield `real.md|fake.md` and `real.md|x.md|y.md`), so the residual stands and input authenticity stays §12's scope · panel: Sol rounds 1-2, Opus sign-off round 3, 5 findings (3 fixed, 2 refuted with driven disproof) · plan review: 7 findings, 3 filed to §12, 4 rejected
+> **Review:** round 3 Opus sign-off, candidate `e5da9ae` `738834f` `2da2c39` -- `adversarial`/`record` needs-attention at sign-off, both refuted with driven disproof (F4/F5) · `record` needs-attention fixed in-loop (F1) · `consistency`/`record` needs-attention fixed in-loop (F2/F3) · `integration` approve throughout · `source-defect`/`design` not owed. Raw findings: docs/reviews/00-workspace/D00-T04-s11.md
+> **Plan review:** gpt (run 20260919-D00-T04-S11-gpt) -- filed: D00 T04 §12 (2 items plus the ownership pointer); 4 rejected with reasons in the ledger
+> **CRUD:** this section writes review tooling (the hunk-body stop in the rename scan), plan record (Done notes with the probe quote), and run records (the S11 block). It reads nothing new. The behavioral surface it changes is the manifest file list ignoring post-hunk rename lines; git-emitted manifests are byte-identical. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-19T18:02:46Z to 2026-09-19T18:24:06Z
+> **Implementer:** Muse Code
 
 ## 12. Prove the Manifest, Not Just Emit It
 
