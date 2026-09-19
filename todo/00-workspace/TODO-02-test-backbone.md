@@ -442,15 +442,21 @@ The library that fourteen tools are about to depend on has **no tests at all**. 
 
 **Needs:** Windows host (build/test)
 
-- [ ] Cover the theme system: token resolution in both appearances, the system accent derivation, high-contrast override, and the crossfade reaching its endpoint. Done when: four assertions run and a deliberately wrong token mapping fails one.
-- [ ] Cover the DPI layer: a layout computed at 100, 125, 150, and 200 percent produces the expected metrics. Done when: four assertions run without a display attached, or this section records why a display is required.
-- [ ] Cover the animation system: each named easing at its endpoints and midpoint, and the shared clock delivering ticks to subscribers. Done when: the easings are asserted against known values and a subscriber count is verified.
-- [ ] Cover icon resolution: a known Lucide glyph resolves, an unknown name fails by name rather than rendering nothing. Done when: both assertions run.
-- [ ] Cover the controls' non-visual logic: list selection and filtering, toolbar overflow decisions, and sidebar collapse thresholds. Done when: each is asserted against fixture state with no window created.
-- [ ] Record what is not covered and why. Done when: the untested surface is listed, with rendering correctness named as the part the captures cover instead.
+- [x] Cover the theme system: token resolution in both appearances, the system accent derivation, high-contrast override, and the crossfade reaching its endpoint. Done when: four assertions run and a deliberately wrong token mapping fails one.
+- [x] Cover the DPI layer: a layout computed at 100, 125, 150, and 200 percent produces the expected metrics. Done when: four assertions run without a display attached, or this section records why a display is required.
+- [x] Cover the animation system: each named easing at its endpoints and midpoint, and the shared clock delivering ticks to subscribers. Done when: the easings are asserted against known values and a subscriber count is verified.
+- [x] Cover icon resolution: a known Lucide glyph resolves, an unknown name fails by name rather than rendering nothing. Done when: both assertions run.
+- [x] Cover the controls' non-visual logic: list selection and filtering, toolbar overflow decisions, and sidebar collapse thresholds. Done when: each is asserted against fixture state with no window created.
+- [x] Record what is not covered and why. Done when: the untested surface is listed, with rendering correctness named as the part the captures cover instead.
 - [ ] Commit: `"workspace: cover the inherited ui library"`
 
-**Test checkpoint:** `ctest --preset x64-debug --tests-regex ui` exits 0. A deliberately wrong token mapping, a wrong easing value, and an unknown icon name each fail by name, all three quoted. The uncovered surface is listed with its reason.
+Thirty-three cases in `tests/ui_test.cpp` (tags `[ui][theme]`, `[ui][anim]`, `[ui][icons]`, `[ui][controls]`), auto-wired by the existing glob. DPI rode the pre-existing `dpi_test.cpp` (D00 T02 §1); high-contrast override and system-accent derivation read live OS state, so the suite asserts the live agreement (`IsDarkMode` versus the value key) and the icon-color packing rather than fixed values. Toolbar overflow decisions and list filtering are private layout with no observable headless (see Uncovered).
+
+Uncovered, with reasons: the render pipeline and every Paint path (need a D2D device and pixels; the captures cover rendering correctness instead); the animation manager's timer, `Theme::AnimateToggle` completion, and content-view hide/error completion (need a message loop); `Theme::Init`, `ReadSystemAccent`, and `IsHighContrast` writes (live-machine registry dependents that mutate shared globals); `ApplyToWindow` and `ApplyBackdrop` (need an HWND); control hit-testing, drag, scroll, and column resize (need windows and pixels); `PopupMenu::Show` (modal, needs a window); typography (DWrite factory plus font files; its contract is rendered glyphs); the Lucide DLL-load failure path (dead under `LUCIDE_STATIC`); toolbar overflow decisions and list filtering (private layout, no headless observable).
+
+**Test checkpoint:** `ctest --preset debug -L ui` exits 0. A deliberately wrong token mapping, a wrong easing value, and an unknown icon name each fail by name, all three quoted. The uncovered surface is listed with its reason. **Corrected 2026-09-19:** the checkpoint read `ctest --preset x64-debug --tests-regex ui`; no `x64-debug` preset exists (the presets are `debug`/`release`), and `--tests-regex` matches test names, none of which contain `ui` -- the label flag `-L ui` is the selector the suite wires via `ADD_TAGS_AS_LABELS`.
+
+> **Started:** 2026-09-19T05:15:00Z
 
 ## Verification
 
