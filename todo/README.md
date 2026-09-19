@@ -365,6 +365,14 @@ Split into a new `## N.` when the work has a different dependency, a different t
 
 **Do not rewrite a `[x]` section's checklist.** That is the contract the stamp covers. New granularity on shipped work is a new section.
 
+## Completion-first
+
+A section ships whole or it does not ship. Complete means every micro-step `[x]`, the Test checkpoint quoted from a real run, and a `Verified:` stamp written by `review-todo-section`: a `[x]` row with an open checklist reads as done while work remains, so it is a defect, not a head start.
+
+What cannot ship now is filed, not dropped: through `add-todo` with an owner, as a new section, an item on an open section, or a deferral the owner closes. Night-owed test debt (`D00 T02 §10`) is the same shape with a collector instead of an owner: recorded on the stamp, collected by the nightly run plus idle-unlocked daytime runs, with hardware-absent debt re-probing nightly until it can collect. Age is report information, and collection never waits for a decision. Waiting is never a strategy: a blocked row parks with its blocker named, and work that can proceed does.
+
+Reviewers refuse stamps on partial scope. The mechanical check (a `[x]` row with an open checklist fails `validate`) is owned by `D00 T04 §19`.
+
 ## Tooling
 
 ```bash

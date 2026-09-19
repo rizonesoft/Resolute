@@ -137,6 +137,7 @@ A checkpoint citing a gate that does not exist yet is unfalsifiable and is not a
 - **Every surface answers to [`DESIGN.md`](./DESIGN.md).** A tool never draws a control the shared library provides, and never hardcodes a colour, a size, or a spacing value. Application icons are the one deliberate exception.
 - **No em dashes** in authored prose. One line per paragraph and list item in Markdown.
 - **Source of truth:** target behavior via the `resolute_au3/` source and a driven run of the shipped tool, the design rules via `DESIGN.md` with the captures under `docs/captures/` as its visual reference, plan state via `todo/`. Disagreements are recorded decisions, not silent reinterpretations.
+- **Completion-first, no partial ships:** a runner finishes what it starts: a section, tool, or feature is complete only when every micro-step is `[x]`, its checkpoint is quoted from a real run, and review stamped it. Anything genuinely unshippable now files through `add-todo` with an owner (debt with a collector, never a silent drop), and waiting is never a strategy. Reviewers refuse stamps on partial scope.
 
 ## Frozen behavior
 
