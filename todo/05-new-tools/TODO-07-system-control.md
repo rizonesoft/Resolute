@@ -11,7 +11,8 @@ track: P3
 
 # TODO-07 -- System Control and Configuration
 
-> **Goal:** Thirty tools covering the configuration surfaces Windows either hides, exposes badly, or has stopped serving. The first three answer needs that research on 2026-09-16 found documented and currently unmet.
+> **Goal:** Twenty-eight tools covering the configuration surfaces Windows either hides, exposes badly, or has stopped serving. The first three answer needs that research on 2026-09-16 found documented and currently unmet.
+> **Groomed 2026-09-19:** the count was thirty; §§1-8 name 25 `extensions/` tools and §9 specifies three more, which is twenty-eight.
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** None of these exists. All are new development at `extensions/<Tool>/` per the source layout in `AGENTS.md`.

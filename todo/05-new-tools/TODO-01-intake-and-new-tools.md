@@ -22,7 +22,7 @@ track: P3
 - -> XREF: [`02-repair-contract/TODO-01 §1`](../02-repair-contract/TODO-01-repair-contract.md) -- the contract every repairing intake consumes from its first commit
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the porting pattern this file reuses
 - -> XREF: [`05-new-tools/TODO-02 §1`](./TODO-02-regstudio.md) -- RegStudio, the largest intake, measured against the contract §1 writes
-- -> XREF: [`05-new-tools/TODO-03 §1`](./TODO-03-system-utilities.md) -- the nine new utilities, measured against the same contract
+- -> XREF: [`05-new-tools/TODO-03 §1`](./TODO-03-system-utilities.md) -- the eleven new utilities, measured against the same contract
 - -> XREF: [`05-new-tools/TODO-04 §1`](./TODO-04-diagnostics.md) -- the diagnostics, which compose §5's enumerators rather than writing their own
 - -> XREF: [`05-new-tools/TODO-05 §3`](./TODO-05-recovery-and-imaging.md) -- the erase verification that proves §3's `QuickErase` claim
 
@@ -62,7 +62,7 @@ The whole point of doing the framework first is that a new tool should be cheap 
 **Needs:** C++ toolchain (compile)
 
 - [ ] Write the intake contract as a document: what a candidate must have before it starts, what the framework supplies, what the tool must supply, and what it owes before it can ship. Done when: the document exists and names the conformance profile as its acceptance test.
-- [ ] **Require a per-tool TODO file before any tool larger than a single surface is built.** Done when: the contract states that a tool is specified in `TODO-NN-<Tool>.md` enumerating its features as micro-steps, that the file is authored through `create-todo` into the domain that owns the tool, and that building from a single checklist item is not permitted. Cheaper substitute that fails the checkpoint: building from a one-line description, which freezes a guess at the tool instead of the tool.
+- [ ] **Require a per-tool TODO file before any tool larger than a single surface is built.** Done when: the contract states that a tool is specified in `TODO-NN-<Tool>.md` enumerating its features as micro-steps, that the file is authored through `create-todo` into the domain that owns the tool, that the file meets the `plan-new-tool` standard (competitor survey with versions used, finer-details pass on the owning sections, distribution checklist), and that building from a single checklist item is not permitted. Cheaper substitute that fails the checkpoint: building from a one-line description, which freezes a guess at the tool instead of the tool. **Groomed 2026-09-19:** the `plan-new-tool` standard is now named explicitly, so intake requires competitor parity and distribution proof rather than implying them.
 - [ ] State when a tool is small enough to skip that. Done when: the rule is written, naming a genuinely single-surface utility as the exception and stating that the default is to specify first, because a short spec costs an hour and a tool built from one line costs a rewrite.
 - [ ] Require the tool descriptor, a documentation set, an update short name, and an English language pack as intake minimums. Done when: a candidate missing any of them fails the contract by name.
 - [ ] Prove it on UUIDGen, at 209 lines the cheapest candidate in the set. Done when: UUIDGen ships conformant and the elapsed effort is recorded here as the intake baseline.

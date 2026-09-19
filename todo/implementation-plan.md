@@ -235,9 +235,9 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D04 T05 §7` | User-Editable Database (CRUD)                |   7   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
-| [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   8   |
-| [ ] | `D04 T01 §4` | Drive Repair: USBRepair and DVDRepair merged |   8   |
-| [ ] | `D04 T01 §5` | MemBoost and BiosCodes                       |   8   |
+| [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   9   |
+| [ ] | `D04 T01 §4` | Drive Repair: USBRepair and DVDRepair merged |   9   |
+| [ ] | `D04 T01 §5` | MemBoost and BiosCodes                       |   9   |
 
 
 ### Phase 3 -- Intake and new capability

@@ -174,6 +174,7 @@ Four byte-identical 2,389-line scripts become one tool with a browser picker. `F
 **Chrome:** consume the framework. The optimizer is not a repair tool and does not consume the repair contract.
 **Needs:** Windows host (build/test)
 
+- [ ] **Specify** the merged optimizer in its own TODO file before building it. Required scope: the four tools' shared behavior with its source lines, the browser picker, per-browser memory figures, and what the 35 Firemin packs carry that the others do not. Done when: the file exists, validates, and its sections appear in the plan.
 - [ ] Capture each of the four shipped tools first, against its own running browser, with before and after memory figures. Done when: four baselines are committed.
 - [ ] Declare each browser as data: display name, process name, default install path, settings key. Done when: all four are table entries and the default paths match what each AutoIt script uses today, line for line.
 - [ ] Keep the user override working: the browser path is read from settings with the declared default as fallback. Done when: a fixture override is honored and an absent key falls back.
@@ -195,6 +196,7 @@ Two tools with near-identical shape become one. Neither can be fully proven with
 **Chrome:** consume the framework and the repair contract.
 **Needs:** USB device (drive test)
 
+- [ ] **Specify** Drive Repair in its own TODO file before building it. Required scope: every action of both tools with source lines, the no-device path, per-action drive verification, and the hardware-gated proofs with what substitutes where no device exists. Done when: the file exists, validates, and its sections appear in the plan.
 - [ ] Enumerate the actions both AutoIt tools perform and record them here with their source locations. Done when: both lists are complete and each entry names its function.
 - [ ] Handle the no-device case: a named message, a log line, no action attempted. Done when: driven on a host with no removable and no optical drive, it produces the message and changes nothing. This part needs no device and is proven first.
 - [ ] Port both action sets into one tool with the device type as data. Done when: both sets are present and the tool detects which device types are attached.
@@ -218,6 +220,7 @@ The two tools that consume the framework but not the repair contract: one trims 
 **Chrome:** consume the framework. Neither tool consumes the repair contract, because neither repairs anything.
 **Needs:** Windows host (build/test)
 
+- [ ] **Specify** `MemBoost` in its own TODO file before building it. Required scope: the trim path with its source lines and frozen effect, the trim schedule and its settings, and the no-logging gap this section closes. Done when: the file exists, validates, and its sections appear in the plan. (`BiosCodes` already has `D04 T05`.)
 - [ ] Capture both shipped tools first, with their effects and windows. Done when: two baselines are committed.
 - [ ] Port `MemBoost` with its trim path frozen. Done when: the parity report against the shipped build shows zero differing fields on the trim fixture.
 - [ ] Port `BiosCodes`, adding the logging it has never had. Done when: a driven lookup writes a log line naming the code.

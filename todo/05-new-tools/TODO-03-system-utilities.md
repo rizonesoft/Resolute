@@ -11,7 +11,8 @@ track: P3
 
 # TODO-03 -- New System Utilities
 
-> **Goal:** Nine new tools that fill the gaps the ported suite leaves, every one of them built on the framework and the repair contract from its first commit, so none of them ever joins a cleanup backlog. The first of them makes every other tool in the suite safer.
+> **Goal:** Eleven new tools that fill the gaps the ported suite leaves, every one of them built on the framework and the repair contract from its first commit, so none of them ever joins a cleanup backlog. The first of them makes every other tool in the suite safer.
+> **Groomed 2026-09-19:** the count was nine; §§1-6 hold six tools, §7 holds three, §8 holds two, which is eleven.
 
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** None of these exists in any form. They are new development, not intakes, and none of them has AutoIt source to port or a parity check to satisfy. `resolute_au3/SDK/Includes/CompInfo.au3` is the only prior art in the repository and is relevant to §6 alone. Every section here depends on the repair contract already shipping, because each tool's whole safety story is the contract's restore record and undo.
