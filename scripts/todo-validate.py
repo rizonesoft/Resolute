@@ -26,6 +26,9 @@ def validate(graph, _args) -> int:
     # pre-convention kinds moves here -- queryable via `warnings --acked`,
     # never printed as WARN. The stamped/open distinction is the row's `[x]`
     # plus the Verified stamp, both already parsed; never a ref allowlist.
+    # PANEL_CUTOFF below is not a third ack cutoff: it grandfathers a FATAL
+    # (rule 16), acks nothing, and moves no warning. It sits with the other
+    # cutoffs for discoverability only.
     # "Pre-convention" is DATE-BOUND PER RULE (terminal integration findings):
     # only a stamp dated on or before the RULE'S OWN cutoff qualifies, so a
     # later stamp carrying the same defect stays in the live channel instead
@@ -38,6 +41,9 @@ def validate(graph, _args) -> int:
     # 17 acknowledged, and every one of them is stamped 2026-08-21 or earlier.
     FIDELITY_ACK_CUTOFF = "2026-08-27"
     FILTER_ACK_CUTOFF = "2026-08-22"
+    # The panel rule landed with the 2026-09-19 review-system port; every
+    # Resolute stamp (newest 2026-09-17) predates it.
+    PANEL_CUTOFF = "2026-09-18"
 
     def pre_convention(sec, cutoff: str) -> bool:
         return (
@@ -152,6 +158,23 @@ def validate(graph, _args) -> int:
                         )
                     else:
                         flag("filter-overclaim-open", fmsg)
+            # 8d. a `**Requires:**` value must come from the closed list, and
+            # the mark must cite its reason. Shipped sections carry no marks
+            # and need none: grandfathered, not retrofitted.
+            if s.requires_has_line and (s.requires_unknown or not s.requires):
+                allowed = ", ".join(f"`{k}`" for k in graph.REQUIRES_ALLOWED)
+                bad = ", ".join(f"`{v}`" for v in s.requires_unknown) or "no values"
+                flag(
+                    "requires-unknown",
+                    f"{t.path}:{s.line}: §{num} has **Requires:** {bad}, "
+                    f"not in the closed list ({allowed})",
+                )
+            if s.requires_has_line and not s.requires_reason:
+                flag(
+                    "requires-no-reason",
+                    f"{t.path}:{s.line}: §{num} has **Requires:** with no reason; "
+                    "cite the measurement that convicted the section after ` -- `",
+                )
             # 13. every section ends on a commit item
             if not s.has_commit_item:
                 flag("no-commit-item", f"{t.path}:{s.line}: §{num} has no '- [ ] Commit:' checklist item")
@@ -384,6 +407,1083 @@ def validate(graph, _args) -> int:
     for t in todos:
         for lineno, detail in t.malformed_stamps:
             flag("malformed-stamp", f"{t.path}:{lineno}: refused '> **Verified:** {detail}")
+
+    # 16. a stamp dated after the Opus-panel rule landed must point at
+    # findings carrying the panel's verdicts. The skill makes
+    # headless-Opus lens verdicts mandatory; this rule is what stops a
+    # session stamping without running the panel. It enforces the RECORD
+    # (findings file exists, has an `Opus panel` section, all four lenses
+    # carry a verdict word), which defeats forgetfulness; it cannot prove
+    # Opus ran rather than a hand-typed verdict, and does not try.
+    # When the Opus panel is unreachable the skill runs the same four
+    # lenses through the GPT fallback rung, recorded under a `GPT panel`
+    # heading with an Opus outage note, and that record satisfies this
+    # rule. The LAST panel section of either family governs: a fallback
+    # round authorizes the stamp exactly like an Opus round, so
+    # last-wins crosses families and a superseded section of either
+    # family never validates the stamp. The honesty limit is unchanged
+    # (a mislabeled heading defeats forgetfulness, not forgery).
+    # Grandfathering is date-bound like rule 8b/13 (cutoff declared
+    # beside the others above): stamps on or before the rule's landing
+    # date predate enforcement. FATAL, not WARN: an unpaneled stamp
+    # reads as reviewed evidence while verifying nothing. The date test
+    # is open-coded rather than via pre_convention() deliberately: that
+    # predicate conjoins row-status [x], but the stamp is the claim
+    # here, so an undated stamp fails closed (evaluated, not skipped)
+    # per the file convention that an undated stamp never acks.
+    # Unreachable today (the parser dates every covered section), kept
+    # as defense if that invariant changes.
+    PANEL_LENSES = ("adversarial", "consistency", "integration", "record")
+    PANEL_VERDICTS = ("approve", "needs-attention", "advisory")
+    # Level 2+ and STARTING with the words: a `# Review:` title may itself
+    # mention the Opus panel, and matching it would slice the verdicts
+    # away and false-fire on a clean file. Levels run to 6 (the
+    # documented "or deeper"), and any heading level ends the panel
+    # section, so a `##### Leftover notes` tail after the panel can
+    # neither supply lens verdicts nor displace the record.
+    PANEL_HEADING_RE = re.compile(r"^#{2,6}\s+Opus panel\b", re.IGNORECASE | re.MULTILINE)
+    # Same level and word-boundary rules as the Opus heading: the fallback
+    # record differs in family, not in shape. Runs on the same stripped
+    # text, so fenced `GPT panel` quotes are invisible for free.
+    GPT_PANEL_HEADING_RE = re.compile(r"^#{2,6}\s+GPT panel\b", re.IGNORECASE | re.MULTILINE)
+    # The outage note is words, not a shape: the skill mandates the
+    # `Opus outage: <what>` line, and the rule checks the words survived
+    # transcription. Substring, not line-anchored: the note explains, it
+    # does not authorize, so marker strictness would reject honest prose.
+    GPT_OUTAGE_RE = re.compile(r"opus outage", re.IGNORECASE)
+    # Verdicts are line-anchored, never substring: the mandated shape puts
+    # each verdict on its own marker-led line, so unheaded prose after an
+    # incomplete panel (or a mid-line mention anywhere) must not supply a
+    # verdict. The marker run is required and same-line: a bare `record
+    # approve` prose line, even at column 0, does not count.
+    PANEL_VERDICT_RES = {
+        lens: re.compile(
+            r"^[ \t]{0,3}[*`>-][ *`>-]*`?"
+            + lens
+            + r"`?[^\w\n]{1,4}("
+            + "|".join(PANEL_VERDICTS)
+            + r")\b",
+            re.IGNORECASE | re.MULTILINE,
+        )
+        for lens in PANEL_LENSES
+    }
+
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            if s.stamped_on is not None and s.stamped_on <= PANEL_CUTOFF:
+                continue
+            stamp_day = s.stamped_on if s.stamped_on is not None else "undated"
+            where = f"{t.path}:{s.line}: §{num} stamped {stamp_day}"
+            body = getattr(s, "review_body", None) or ""
+            m = graph.FINDINGS_RE.search(body)
+            if not m:
+                flag(
+                    "stamp-no-opus-panel",
+                    f"{where} names no findings file in its Review: line "
+                    f"(needs 'Raw findings: <path>' to panel verdicts)",
+                )
+                continue
+            # TODO_DIR.parent, not REPO: the self-test rebinds TODO_DIR to a
+            # fixture tree, and findings paths are repo-relative.
+            findings = graph.TODO_DIR.parent / m.group(1)
+            try:
+                text = findings.read_text(encoding="utf-8")
+            except OSError:
+                flag(
+                    "stamp-no-opus-panel",
+                    f"{where} names findings {m.group(1)}, which does not exist",
+                )
+                continue
+            # Fenced code blocks are invisible to the scan: findings files
+            # quote the mandated panel shape inside fences (the skill shows
+            # it), and a quoted `## Opus panel (round N)` must neither
+            # satisfy the rule nor, under last-wins, displace the real
+            # panel. The stripper lives in the graph module (shared with
+            # `query plan-health`).
+            text, unbalanced = graph.strip_fenced_code(text)
+            if unbalanced is not None:
+                flag(
+                    "stamp-no-opus-panel",
+                    f"{where} findings {m.group(1)} has an unbalanced fence "
+                    f"opened at line {unbalanced}",
+                )
+                continue
+            heads = list(PANEL_HEADING_RE.finditer(text))
+            gpt_heads = list(GPT_PANEL_HEADING_RE.finditer(text))
+            if not heads and not gpt_heads:
+                flag(
+                    "stamp-no-opus-panel",
+                    f"{where} findings {m.group(1)} carry no `Opus panel` section",
+                )
+                continue
+            last_is_gpt = gpt_heads and (
+                not heads or gpt_heads[-1].start() > heads[-1].start()
+            )
+            if last_is_gpt:
+                # GPT fallback path: same verdict bar as the Opus panel,
+                # plus the Opus outage note that earns the fallback. Taken
+                # when the last panel section of either family is GPT: a
+                # fallback round authorizes the stamp, so an Opus section
+                # anywhere earlier never excuses a defective GPT last.
+                gpt = text[gpt_heads[-1].end():]
+                nxt = re.search(r"^#{1,6}\s+", gpt, re.MULTILINE)
+                if nxt:
+                    gpt = gpt[:nxt.start()]
+                missing = [
+                    lens
+                    for lens in PANEL_LENSES
+                    if not PANEL_VERDICT_RES[lens].search(gpt)
+                ]
+                if missing:
+                    flag(
+                        "stamp-no-opus-panel",
+                        f"{where} findings {m.group(1)} GPT panel lacks verdicts for: "
+                        + ", ".join(missing),
+                    )
+                if not GPT_OUTAGE_RE.search(gpt):
+                    flag(
+                        "stamp-no-opus-panel",
+                        f"{where} findings {m.group(1)} GPT panel lacks the Opus outage note",
+                    )
+                continue
+            # The LAST panel section of either family is the record (the
+            # branch above took the GPT-last case): fix-loop rounds append,
+            # so reading anything but the last would validate a superseded
+            # round and never the verdicts that authorize the stamp.
+            panel = text[heads[-1].end():]
+            nxt = re.search(r"^#{1,6}\s+", panel, re.MULTILINE)
+            if nxt:
+                panel = panel[:nxt.start()]
+            missing = [
+                lens
+                for lens in PANEL_LENSES
+                if not PANEL_VERDICT_RES[lens].search(panel)
+            ]
+            if missing:
+                flag(
+                    "stamp-no-opus-panel",
+                    f"{where} findings {m.group(1)} panel lacks verdicts for: "
+                    + ", ".join(missing),
+                )
+
+    # 17. a stamp dated after the plan-review rule landed must carry the
+    # review's completion marker. The skill runs the review after
+    # panel-close and the marker rides the stamp commit, so a stamp
+    # without it either skipped the second-family round or lost the
+    # record. Grandfathering is date-bound like rule 16: stamps on or
+    # before the cutoff predate enforcement, and an undated stamp fails
+    # closed (evaluated, not skipped). FATAL, not WARN: an unmarked stamp
+    # reads as fully reviewed while the required round may never have
+    # run. The marker names the filings or `no findings`; the ledger
+    # lives in the findings file, not here, so presence is the whole
+    # check.
+    # All `Plan review:` lines of one section, in order: the parser keeps
+    # the last (last-governs), but lineage is a property of the chain, so
+    # the validator re-slices the span. Marker helpers live in the graph
+    # module: the validator and the run query share one `outage marker`
+    # reading and one chain slice, so the two can never drift apart.
+    todo_lines: dict[str, list[str]] = {}
+
+    def section_markers(todo, num: int) -> list[str] | None:
+        return graph.section_markers(todo_lines, todo, num)
+
+    def marker_states(body: str) -> dict[str, bool]:
+        return graph.marker_states(body)
+
+    def is_outage_marker(body: str) -> bool:
+        return graph.is_outage_marker(body)
+
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            if s.stamped_on is not None and s.stamped_on <= graph.PLAN_REVIEW_CUTOFF:
+                continue
+            marker = getattr(s, "plan_review_body", None) or ""
+            if not marker.strip():
+                stamp_day = s.stamped_on if s.stamped_on is not None else "undated"
+                flag(
+                    "stamp-no-plan-review",
+                    f"{t.path}:{s.line}: §{num} stamped {stamp_day} carries no "
+                    f"`Plan review:` completion marker (name the filings or `no findings`)",
+                )
+                continue
+            # The marker's claims are checked, not just its presence. Every
+            # ref it names must resolve (a filing that points nowhere is a
+            # dropped filing), and every ledger `filed` row's target must
+            # appear in the marker (the marker claims filing completeness).
+            # `outage:` markers skip both: there was no review to file from.
+            # Rule 16 owns missing or unreadable findings, so the
+            # cross-check quietly skips those. The marker grammar, checked
+            # before the outage skip (grammar binds every marker). The last
+            # marker line governs: the parser overwrites, so this body
+            # already IS the last one, and a superseded line's claims are
+            # void. States are mutually exclusive where they contradict: `no
+            # findings` beside a `filed` claim, and any filing claim beside
+            # `outage:`, are FATAL; outage purity also forbids `no findings`
+            # (nothing ran, so nothing was found) and `retry-owed` (no
+            # fallback ran, so no rerun is owed) beside `outage:`.
+            # Coherent pairs stay silent: filings or `no findings` beside
+            # `retry-owed` (the fallback ran and owes a second-family
+            # rerun), and prose refs like `attempted §N` beside `outage:`
+            # (an attempt is not a filing claim). `partial: <rung>`: one
+            # rung failed while the other produced findings, so filings
+            # beside `partial:` stay silent (the survivor's findings
+            # stand) while `outage:` beside `partial:` is FATAL (an outage
+            # produced nothing).
+            st = marker_states(marker)
+            has_outage = st["outage"]
+            has_nofind = st["nofind"]
+            has_filed = st["filed"]
+            has_retry = st["retry"]
+            has_partial = st["partial"]
+            if has_nofind and has_filed:
+                flag(
+                    "stamp-no-plan-review",
+                    f"{t.path}:{s.line}: §{num} marker claims both `no findings` and filings",
+                )
+            if has_outage and has_filed:
+                flag(
+                    "stamp-no-plan-review",
+                    f"{t.path}:{s.line}: §{num} outage marker carries filing claims",
+                )
+            if has_outage and has_nofind:
+                flag(
+                    "stamp-no-plan-review",
+                    f"{t.path}:{s.line}: §{num} outage marker claims `no findings` (nothing ran)",
+                )
+            if has_outage and has_retry:
+                flag(
+                    "stamp-no-plan-review",
+                    f"{t.path}:{s.line}: §{num} outage marker carries `retry-owed` (no fallback ran)",
+                )
+            if has_outage and has_partial:
+                flag(
+                    "stamp-no-plan-review",
+                    f"{t.path}:{s.line}: §{num} outage marker carries `partial:` (an outage produced no findings)",
+                )
+            # Partial-owed-rerun coherence. `partial:` names the FAILED rung
+            # (`gpt rung`, the primary, or `opus rung`, the fallback); the
+            # survivor is the other family. A fallback survivor is a
+            # same-family run and owes a second-family rerun, so it carries
+            # `retry-owed`; a primary survivor is a complete second-family
+            # review and carries neither `retry-owed` nor accountability
+            # fields (there is nothing to own). Unknown rungs fail:
+            # positional names cannot say which family survived.
+            if has_partial and not has_outage:
+                prm = re.search(
+                    r"\bpartial\s*:\s*([a-z][a-z0-9]*(?:\s+[a-z][a-z0-9]*)?)",
+                    marker.lower(),
+                )
+                rung = prm.group(1) if prm else ""
+                if rung not in ("gpt rung", "opus rung"):
+                    flag(
+                        "stamp-no-plan-review",
+                        f"{t.path}:{s.line}: §{num} partial names no known rung (gpt rung or opus rung)",
+                    )
+                elif rung == "opus rung":
+                    if has_retry:
+                        flag(
+                            "stamp-no-plan-review",
+                            f"{t.path}:{s.line}: §{num} complete partial run owes no retry (drop retry-owed)",
+                        )
+                    elif graph.OWNER_RE.search(marker) or graph.DUE_RE.search(marker):
+                        flag(
+                            "stamp-no-plan-review",
+                            f"{t.path}:{s.line}: §{num} complete partial run carries accountability fields with nothing owed",
+                        )
+                elif not has_retry:
+                    flag(
+                        "stamp-no-plan-review",
+                        f"{t.path}:{s.line}: §{num} partial run with a fallback survivor owes a retry (retry-owed (owner, due))",
+                    )
+            if has_outage:
+                continue
+            for xm in graph.XREF_RE.finditer(marker):
+                r = graph.resolve_ref(xm.group(0), t, by_key)
+                if not r or r[0] not in by_id or r[1] not in by_id[r[0]].sections:
+                    flag(
+                        "stamp-no-plan-review",
+                        f"{t.path}:{s.line}: §{num} marker names unresolvable filing {xm.group(0)!r}",
+                    )
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            # Per-marker, deliberately not deduped: the omission is each
+            # marker's own (a shared file's second section can omit a
+            # target the first one named), so every marker is checked
+            # independently. Reports on identical markers sharing one file
+            # are distinct per-marker defects, not duplicates.
+            ftext, _u = graph.strip_fenced_code(ftext)
+            # Marker lineage. A marker whose findings carry a Plan review
+            # record binds to it by run ID: the last line carries `run
+            # <id>`, rerun lines chain via `supersedes <prior-run>`, runs
+            # never repeat within the section, and the last run is one
+            # the manifest carries. Markers over record-less findings
+            # (panel-shape probes) carry nothing to bind to and stay
+            # exempt; outage markers skipped above.
+            heads = list(graph.PLAN_REVIEW_HEADING_RE.finditer(ftext))
+            chain = section_markers(t, num) or []
+            if heads and chain:
+                runs: list[str | None] = []
+                for body in chain:
+                    rm = graph.RUN_ID_RE.search(body)
+                    runs.append(rm.group(1) if rm else None)
+                last_run = runs[-1] if runs else None
+                if last_run is None:
+                    flag(
+                        "plan-review-no-lineage",
+                        f"{t.path}:{s.line}: §{num} marker carries no run ID "
+                        f"(name the review run: run YYYYMMDD-DNN-TNN-SN-<family>[-rN])",
+                    )
+                elif not graph.RUN_ID_SHAPE_RE.match(last_run):
+                    flag(
+                        "plan-review-no-lineage",
+                        f"{t.path}:{s.line}: §{num} marker run {last_run!r} is outside the run-ID shape",
+                    )
+                prior_outage = len(chain) > 1 and is_outage_marker(chain[-2])
+                follows = graph.FOLLOWS_OUTAGE_RE.search(chain[-1]) is not None
+                if len(chain) == 1 and graph.SUPERSEDES_RE.search(chain[0]) is not None:
+                    # A singleton marker is genesis: run, no supersedes.
+                    # One carrying a supersedes edge names ancestry it
+                    # cannot have: deleted or fabricated lineage
+                    # masquerading as a first run.
+                    flag(
+                        "plan-review-no-lineage",
+                        f"{t.path}:{s.line}: §{num} genesis marker carries supersedes (a first run has no ancestry to name)",
+                    )
+                claimed: set[str] = set()
+                for _ci, _cbody in enumerate(chain):
+                    _csm = graph.SUPERSEDES_RE.search(_cbody)
+                    if _csm is None:
+                        continue
+                    _ctgt = graph.normalize_run_id(_csm.group(1))
+                    if _ctgt in claimed:
+                        # Two successors, one predecessor: the second claim
+                        # breaks the directed chain. The flag names the
+                        # later marker by run (or position when the marker
+                        # carries no run).
+                        _claimer = runs[_ci] if runs[_ci] is not None else f"marker {_ci + 1}"
+                        flag(
+                            "plan-review-no-lineage",
+                            f"{t.path}:{s.line}: §{num} run {_claimer} re-supersedes {_csm.group(1)} (two successors claim one predecessor)",
+                        )
+                    else:
+                        claimed.add(_ctgt)
+                if len(chain) > 1:
+                    for _ei in range(len(chain) - 1):
+                        _esm = graph.SUPERSEDES_RE.search(chain[_ei])
+                        if _esm is None:
+                            continue
+                        _past = {graph.normalize_run_id(r) for r in runs[:_ei] if r is not None}
+                        if graph.normalize_run_id(_esm.group(1)) not in _past:
+                            # Edges point strictly backward: the last marker
+                            # keeps its specific unknown-run diagnostic
+                            # above, and every earlier edge must name a run
+                            # already in the chain. A forward or dangling
+                            # edge is a cycle or a fabrication.
+                            _whom = runs[_ei] if runs[_ei] is not None else f"marker {_ei + 1}"
+                            flag(
+                                "plan-review-no-lineage",
+                                f"{t.path}:{s.line}: §{num} run {_whom} supersedes {_esm.group(1)} outside its past (edges point strictly backward)",
+                            )
+                    seen_runs = set()
+                    for run in runs:
+                        if run is not None:
+                            nrun = graph.normalize_run_id(run)
+                            if nrun in seen_runs:
+                                flag(
+                                    "plan-review-no-lineage",
+                                    f"{t.path}:{s.line}: §{num} marker reuses run {run} (a rerun is a new run)",
+                                )
+                            seen_runs.add(nrun)
+                    sm = graph.SUPERSEDES_RE.search(chain[-1])
+                    prior = {graph.normalize_run_id(r) for r in runs[:-1] if r is not None}
+                    if sm is None and not (prior_outage and follows):
+                        # A rerun chains via supersedes, unless the marker
+                        # right before it is an outage: outage markers
+                        # carry no run to name, so the rerun carries
+                        # `follows-outage` instead (the predecessor is
+                        # immediate, never anywhere-upchain). A singleton
+                        # marker is genesis: run, no supersedes, silent.
+                        flag(
+                            "plan-review-no-lineage",
+                            f"{t.path}:{s.line}: §{num} rerun marker names no superseded run (supersedes <prior-run>)",
+                        )
+                    elif sm is not None and graph.normalize_run_id(sm.group(1)) not in prior:
+                        flag(
+                            "plan-review-no-lineage",
+                            f"{t.path}:{s.line}: §{num} marker supersedes unknown run {sm.group(1)}",
+                        )
+                if follows and not prior_outage:
+                    # Dangling on any chain length: a singleton carrying
+                    # `follows-outage` follows nothing at all.
+                    flag(
+                        "plan-review-no-lineage",
+                        f"{t.path}:{s.line}: §{num} marker follows no outage (dangling follows-outage)",
+                    )
+                if last_run is not None and graph.RUN_ID_SHAPE_RE.match(last_run):
+                    manifest_runs = set()
+                    for h in heads:
+                        hsec = ftext[h.end():]
+                        hnxt = re.search(r"^#{1,6}\s+", hsec, re.MULTILINE)
+                        if hnxt:
+                            hsec = hsec[: hnxt.start()]
+                        hmm = graph.MANIFEST_RE.search(hsec)
+                        if hmm and hmm.group(4):
+                            manifest_runs.add(graph.normalize_run_id(hmm.group(4)))
+                    if manifest_runs and graph.normalize_run_id(last_run) not in manifest_runs:
+                        flag(
+                            "plan-review-no-lineage",
+                            f"{t.path}:{s.line}: §{num} marker run {last_run} matches no manifest run",
+                        )
+            marker_keys = set()
+            for xm in graph.XREF_RE.finditer(marker):
+                r = graph.resolve_ref(xm.group(0), t, by_key)
+                if r and r[0] in by_id and r[1] in by_id[r[0]].sections:
+                    marker_keys.add(r)
+            for h in graph.PLAN_REVIEW_HEADING_RE.finditer(ftext):
+                sec = ftext[h.end():]
+                nxt = re.search(r"^#{1,6}\s+", sec, re.MULTILINE)
+                if nxt:
+                    sec = sec[: nxt.start()]
+                block, _bproblem = graph.ledger_block(sec)
+                if block is None:
+                    continue
+                for lr in graph.LEDGER_ROW_RE.finditer(block):
+                    if lr.group(3).lower() != "filed":
+                        continue
+                    rest = block[lr.end() :].split("\n", 1)[0]
+                    for xm in graph.XREF_RE.finditer(rest):
+                        r = graph.resolve_ref(xm.group(0), t, by_key)
+                        key = (
+                            r
+                            if r and r[0] in by_id and r[1] in by_id[r[0]].sections
+                            else None
+                        )
+                        if key is None or key not in marker_keys:
+                            # Quoted like message (a): a bare §ref here would
+                            # trip per-section silence checks keyed on "§N ".
+                            flag(
+                                "stamp-no-plan-review",
+                                f"{t.path}:{s.line}: §{num} filed target {xm.group(0)!r} not named in marker",
+                            )
+
+    # 18. plan-review records of post-cutoff stamps must be machine-shaped:
+    # the query parses manifests and ledgers, so a record it cannot parse
+    # is a record that silently drops out of governance. Every `Plan
+    # review` section needs its `Manifest:` line and its `Ledger:`/`End
+    # of ledger` block (rows are only rows inside the block); every
+    # non-blank line inside the block must match the row shape.
+    # Post-cutoff manifests carry the run; the optional field stays for
+    # pre-cutoff records only, plus run-less chains (outage-only records
+    # name no run by design). Date-scoped like rules 16-17. FATAL: the
+    # fix is mechanical (shape the record) and the defect breaks the
+    # query's contract.
+    seen_18 = set()
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            if s.stamped_on is not None and s.stamped_on <= graph.PLAN_REVIEW_CUTOFF:
+                continue
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm or fm.group(1) in seen_18:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            # One file, one report: the shape defect is the file's, not the
+            # marker's, so sections sharing a findings file would
+            # otherwise multi-fire it. First reporter wins in sorted
+            # order, so the report is deterministic. (Rule 17b above is
+            # per-marker and stays un-deduped: each marker's omission is
+            # its own defect.)
+            seen_18.add(fm.group(1))
+            ftext, _u = graph.strip_fenced_code(ftext)
+            for h in graph.PLAN_REVIEW_HEADING_RE.finditer(ftext):
+                sec = ftext[h.end() :]
+                nxt = re.search(r"^#{1,6}\s+", sec, re.MULTILINE)
+                if nxt:
+                    sec = sec[: nxt.start()]
+                mm = graph.MANIFEST_RE.search(sec)
+                if not mm:
+                    flag(
+                        "plan-review-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} Plan review section without a Manifest line",
+                    )
+                elif not mm.group(4):
+                    # A run-less post-cutoff manifest names a review run
+                    # nothing can resolve: the run field is optional for
+                    # pre-cutoff records only, which skip this whole rule
+                    # by stamp date above. Chains that carry no run stay
+                    # exempt: an outage-only record has no run to name
+                    # (run IDs for unruns are false attribution), and a
+                    # run-less non-outage marker already fires its own
+                    # lineage flag, so a second fire here would
+                    # double-count one defect.
+                    _chain = section_markers(t, num) or []
+                    if any(graph.RUN_ID_RE.search(_c or "") for _c in _chain):
+                        flag(
+                            "plan-review-malformed",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} post-cutoff Manifest without a run (name the review run: run YYYYMMDD-DNN-TNN-SN-<family>[-rN])",
+                        )
+                block, problem = graph.ledger_block(sec)
+                if block is None:
+                    flag(
+                        "plan-review-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} Plan review section {problem}",
+                    )
+                    continue
+                for ln in block.splitlines():
+                    if ln.strip() and not graph.LEDGER_ROW_RE.match(ln):
+                        flag(
+                            "plan-review-malformed",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} malformed ledger row: {ln.strip()[:80]}",
+                        )
+                # Row-legality for the content-bearing dispositions. A
+                # `deferred` row must carry its owner, date, and trigger
+                # (an unaccountable deferral satisfies the shape while
+                # promising nothing); a `duplicate` row must name its
+                # canonical finding; a `filed` row must name a target (a
+                # filing that points nowhere is filed nowhere). An
+                # `accepted` critical or major must carry its owner and
+                # due date (open high-severity findings are accountable
+                # or they sit invisible).
+                for lr in graph.LEDGER_ROW_RE.finditer(block):
+                    sev = lr.group(2).lower()
+                    disp = lr.group(3).lower()
+                    rest = block[lr.end():].split("\n", 1)[0]
+                    if disp == "deferred":
+                        if not (
+                            "owner" in rest.lower()
+                            and re.search(r"\d{4}-\d{2}-\d{2}", rest)
+                            and "trigger" in rest.lower()
+                        ):
+                            flag(
+                                "plan-review-malformed",
+                                f"{t.path}:{s.line}: §{num} findings {fm.group(1)} deferred row without owner, date, and trigger: {lr.group(1)}",
+                            )
+                    elif disp == "duplicate":
+                        if not re.search(r"\bPR\d+\b|[A-Z0-9]+-T\d+-S\d+-PR\d+", rest):
+                            flag(
+                                "plan-review-malformed",
+                                f"{t.path}:{s.line}: §{num} findings {fm.group(1)} duplicate row names no canonical finding: {lr.group(1)}",
+                            )
+                    elif disp == "filed":
+                        if not list(graph.XREF_RE.finditer(rest)):
+                            flag(
+                                "plan-review-malformed",
+                                f"{t.path}:{s.line}: §{num} findings {fm.group(1)} filed row names no target: {lr.group(1)}",
+                            )
+                    elif disp == "accepted" and sev in ("critical", "major"):
+                        if not (graph.OWNER_RE.search(rest) and graph.DUE_RE.search(rest)):
+                            flag(
+                                "plan-review-malformed",
+                                f"{t.path}:{s.line}: §{num} findings {fm.group(1)} accepted {sev} row without owner and due: {lr.group(1)}",
+                            )
+
+    # 19. filed rows trace back from the target: every filed row's ID
+    # must appear in its target's file, word-bounded so PR1 never matches
+    # inside PR10. A filing untraceable from the target side cannot
+    # attribute remediation to the finding. Date-scoped like rules 16-18.
+    # Unresolvable targets are skipped: rule 17 already convicts the
+    # marker that names them. File-scoped with first-reporter dedup like
+    # rules 18 and 20 (unlike 17b, whose claim each marker owns): the
+    # missing back-link is a property of the row and target, identical
+    # for every section over a shared file.
+    target_texts: dict[str, str] = {}
+    seen_19 = set()
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            if s.stamped_on is not None and s.stamped_on <= graph.PLAN_REVIEW_CUTOFF:
+                continue
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm or fm.group(1) in seen_19:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            seen_19.add(fm.group(1))
+            ftext, _u = graph.strip_fenced_code(ftext)
+            for h in graph.PLAN_REVIEW_HEADING_RE.finditer(ftext):
+                sec = ftext[h.end():]
+                nxt = re.search(r"^#{1,6}\s+", sec, re.MULTILINE)
+                if nxt:
+                    sec = sec[: nxt.start()]
+                block, _bproblem = graph.ledger_block(sec)
+                if block is None:
+                    continue
+                for lr in graph.LEDGER_ROW_RE.finditer(block):
+                    if lr.group(3).lower() != "filed":
+                        continue
+                    rest = block[lr.end():].split("\n", 1)[0]
+                    for xm in graph.XREF_RE.finditer(rest):
+                        r = graph.resolve_ref(xm.group(0), t, by_key)
+                        if not r or r[0] not in by_id or r[1] not in by_id[r[0]].sections:
+                            continue
+                        tpath = by_id[r[0]].path
+                        if tpath not in target_texts:
+                            try:
+                                target_texts[tpath] = (graph.TODO_DIR.parent / tpath).read_text(
+                                    encoding="utf-8"
+                                )
+                            except OSError:
+                                target_texts[tpath] = ""
+                        if not re.search(r"\b" + re.escape(lr.group(1)) + r"\b", target_texts[tpath]):
+                            tlabel = f"{by_id[r[0]].path} §{r[1]}"
+                            flag(
+                                "filed-target-no-backlink",
+                                f"{t.path}:{s.line}: §{num} filed row {lr.group(1)} has no back-link in {tlabel}",
+                            )
+
+    # 20. finding IDs unique per ledger: the same ID twice in one file is
+    # FATAL even with identical targets, because the second row reads as
+    # a second finding and remediation attaches to the wrong one.
+    # Multi-target findings ride one row naming every target (clearance
+    # already requires all of them), so split rows are never the honest
+    # shape. IDs compare case-insensitively (PR1 and pr1 collide).
+    # File-scoped with first-reporter dedup like rule 18 (the defect is
+    # the file's). Date-scoped like rules 16-18.
+    seen_20 = set()
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            if s.stamped_on is not None and s.stamped_on <= graph.PLAN_REVIEW_CUTOFF:
+                continue
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm or fm.group(1) in seen_20:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            seen_20.add(fm.group(1))
+            ftext, _u = graph.strip_fenced_code(ftext)
+            ids: dict[str, str] = {}
+            flagged: set[str] = set()
+            for h in graph.PLAN_REVIEW_HEADING_RE.finditer(ftext):
+                sec = ftext[h.end():]
+                nxt = re.search(r"^#{1,6}\s+", sec, re.MULTILINE)
+                if nxt:
+                    sec = sec[: nxt.start()]
+                block, _bproblem = graph.ledger_block(sec)
+                if block is None:
+                    continue
+                for lr in graph.LEDGER_ROW_RE.finditer(block):
+                    key = lr.group(1).lower()
+                    if key in ids and key not in flagged:
+                        flagged.add(key)
+                        flag(
+                            "plan-review-duplicate-id",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} duplicate finding ID {lr.group(1)}",
+                        )
+                    ids.setdefault(key, lr.group(1))
+
+    # 21. a reopen voids proof downstream: the body must read `<YYYY-MM-DD>
+    # | <finding ref> | <reason>` with a resolvable §ref (the audit locus
+    # whose finding voids this stamp); the row must be [ ] (a checked
+    # reopened row claims shipped work on voided proof); and no verified
+    # section may keep a reopened section anywhere in its Depends closure
+    # (the cascade is recursive: a verified dependent of a verified
+    # dependent builds on voided proof exactly like a direct one, so
+    # dependents park until the root re-stamps, bottom-up). No date
+    # scope: the mechanism is new, so nothing predates it.
+    reopened = {
+        (t.id, num)
+        for t in todos
+        for num, s in t.sections.items()
+        if (getattr(s, "reopened_body", None) or "").strip()
+    }
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            body = (getattr(s, "reopened_body", None) or "").strip()
+            if not body:
+                continue
+            m = graph.REOPENED_BODY_RE.match(body)
+            ref_ok = False
+            if m:
+                for xm in graph.XREF_RE.finditer(m.group("rest")):
+                    r = graph.resolve_ref(xm.group(0), t, by_key)
+                    if r and r[0] in by_id and r[1] in by_id[r[0]].sections:
+                        ref_ok = True
+                        break
+            if not m or not ref_ok:
+                flag(
+                    "stamp-reopened",
+                    f"{t.path}:{s.line}: §{num} Reopened line outside `<date> | <finding ref> | <reason>` with a resolvable ref",
+                )
+            if s.status == "x":
+                flag(
+                    "stamp-reopened",
+                    f"{t.path}:{s.line}: §{num} reopened but still [x]: uncheck the row (the stamp is void)",
+                )
+    rev_deps: dict[tuple[str, int], set[tuple[str, int]]] = {}
+    for t in todos:
+        for num, s in t.sections.items():
+            for raw in s.depends_on:
+                r = graph.resolve_ref(raw, t, by_key)
+                if r and r[0] in by_id and r[1] in by_id[r[0]].sections:
+                    rev_deps.setdefault(r, set()).add((t.id, num))
+    for root in sorted(reopened):
+        # The cascade walks the whole reverse closure, not just direct
+        # dependents: every verified section downstream of the root parks.
+        reached: set[tuple[str, int]] = set()
+        queue = sorted(rev_deps.get(root, ()))
+        while queue:
+            key = queue.pop(0)
+            if key in reached:
+                continue
+            reached.add(key)
+            queue.extend(sorted(rev_deps.get(key, ())))
+        for t in todos:
+            for num, s in sorted(t.sections.items()):
+                if (t.id, num) in reached and num in t.verified_sections:
+                    # Quoted like rule 17b's message (a): a bare §ref here
+                    # would trip per-section silence checks keyed on "§N ".
+                    flag(
+                        "stamp-reopened",
+                        f"{t.path}:{s.line}: §{num} still stamped while {root[0]} '§{root[1]}' is reopened: park until it re-stamps",
+                    )
+
+    # 22. ledger rows keep their history: every ledger row's disposition
+    # is diffed against the committed record, and forbidden transitions
+    # fail. Triage stays open (`accepted` may move anywhere; a correction
+    # is not a rewrite), `deferred` may only file, and `filed`,
+    # `rejected`, and `duplicate` are terminal: later evidence against a
+    # terminal row lands as a NEW row naming the superseded ID
+    # (amendment by supersession, never by editing the old row), so a
+    # row that vanishes between HEAD and the tree fails too. A new ID
+    # (rerun continuation numbers past the previous max) is always
+    # silent. No date scope: old ledgers deserve the same protection.
+    # Uncommitted findings (no HEAD bytes) skip: without history nothing
+    # is provable.
+    HISTORY_OK = {
+        "accepted": {"accepted", "filed", "deferred", "rejected", "duplicate"},
+        "deferred": {"deferred", "filed"},
+        "filed": {"filed"},
+        "rejected": {"rejected"},
+        "duplicate": {"duplicate"},
+    }
+    seen_22 = set()
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm or fm.group(1) in seen_22:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            committed = graph.git_file_at("HEAD", fm.group(1))
+            if committed is None:
+                continue
+            seen_22.add(fm.group(1))
+
+            def _ledger_ids(text: str) -> dict[str, str]:
+                ids: dict[str, str] = {}
+                stripped, _u = graph.strip_fenced_code(text)
+                for h in graph.PLAN_REVIEW_HEADING_RE.finditer(stripped):
+                    hsec = stripped[h.end():]
+                    hnxt = re.search(r"^#{1,6}\s+", hsec, re.MULTILINE)
+                    if hnxt:
+                        hsec = hsec[: hnxt.start()]
+                    # Rows inside the block when one exists, else by row
+                    # shape: a pre-block committed record still diffs row
+                    # for row across the migration, and a tree that merely
+                    # lost its block markers reports once (rule 18), not
+                    # once per row here.
+                    hblock, _hp = graph.ledger_block(hsec)
+                    for lr in graph.LEDGER_ROW_RE.finditer(hblock if hblock is not None else hsec):
+                        ids[lr.group(1).lower()] = lr.group(3).lower()
+                return ids
+
+            now_ids = _ledger_ids(ftext)
+            was_ids = _ledger_ids(committed)
+            for gone in sorted(set(was_ids) - set(now_ids)):
+                flag(
+                    "ledger-history-violation",
+                    f"{t.path}:{s.line}: §{num} findings {fm.group(1)} ledger row {gone} vanished "
+                    f"against the committed record (amend via a new row, never by deleting)",
+                )
+            for rid in sorted(set(now_ids) & set(was_ids)):
+                if now_ids[rid] not in HISTORY_OK.get(was_ids[rid], set()):
+                    flag(
+                        "ledger-history-violation",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} ledger row {rid} moved "
+                        f"{was_ids[rid]} -> {now_ids[rid]} against the committed record "
+                        f"(terminal rows amend via a new row)",
+                    )
+
+    # 23. provenance binds live quotes to runs: every post-cutoff findings
+    # file needs its `Provenance:` lines, each carrying all seven fields
+    # in order (candidate, command, exit, tool, digest, path, run). The
+    # run must be shaped and carried by a marker of the reviewing
+    # section; the candidate must resolve in git; the path must exist in
+    # the tree. Malformed, missing, run-less, unresolving, or dangling
+    # provenance fails closed. First reporter wins per file (the defect
+    # is the file's). Date-scoped: pre-cutoff files predate the mandate.
+    # No HEAD legs: presence and shape only, never history.
+    seen_23 = set()
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            if s.stamped_on is not None and s.stamped_on <= graph.PLAN_REVIEW_CUTOFF:
+                continue
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm or fm.group(1) in seen_23:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            seen_23.add(fm.group(1))
+            ftext, _u = graph.strip_fenced_code(ftext)
+            # Marker runs of this section: every provenance run must be
+            # one a marker of the reviewing section carries (a run no
+            # marker carries attests nothing for this review). Range
+            # stamps read their parsed fallback via the shared slice.
+            chain = section_markers(t, num) or []
+            marker_runs = set()
+            for body in chain:
+                rm = graph.RUN_ID_RE.search(body)
+                if rm:
+                    marker_runs.add(graph.normalize_run_id(rm.group(1)))
+            provs: list[tuple[str, str, str, str, str, str, str]] = []
+            malformed = False
+            for ln in ftext.splitlines():
+                if not ln.startswith("Provenance:"):
+                    continue
+                pm = graph.PROVENANCE_RE.match(ln)
+                if pm is None:
+                    malformed = True
+                    break
+                provs.append(
+                    (
+                        pm.group(1),
+                        pm.group(2),
+                        pm.group(3),
+                        pm.group(4),
+                        pm.group(5),
+                        pm.group(6),
+                        pm.group(7),
+                    )
+                )
+            if malformed or not provs:
+                flag(
+                    "provenance-malformed",
+                    f"{t.path}:{s.line}: §{num} findings {fm.group(1)} has "
+                    + (
+                        "a malformed Provenance: line (seven fields in order: candidate, command, exit, tool, digest, path, run)"
+                        if malformed
+                        else "no Provenance: line (every post-cutoff findings file names its runs)"
+                    ),
+                )
+                continue
+            for cand, _cmd, _exit, _tool, _digest, ppath, run in provs:
+                if not graph.RUN_ID_SHAPE_RE.match(run):
+                    flag(
+                        "provenance-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} provenance run {run!r} is outside the run-ID shape",
+                    )
+                elif graph.normalize_run_id(run) not in marker_runs:
+                    flag(
+                        "provenance-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} provenance run {run} "
+                        f"is carried by no marker of this section",
+                    )
+                if graph.git_resolves(cand) is not True:
+                    flag(
+                        "provenance-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} provenance candidate {cand} resolves to nothing",
+                    )
+                if not (graph.TODO_DIR.parent / ppath).exists():
+                    flag(
+                        "provenance-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} provenance path {ppath} does not exist",
+                    )
+
+    # 24. risk acceptances terminate escalations in a checkable shape: each
+    # `Risk accepted:` line carries its target, approver, action owner,
+    # record date, expiry, review date, evidence commit, optional
+    # supersedes link, and rationale. Legs: shape, target coverage (a
+    # finding ID, a shaped run, or an outage instance), forward
+    # chronology (recorded <= expires), review-inside-window (recorded
+    # <= review <= expires), evidence equals the current owning-record
+    # bytes at the recorded commit (a silent edit voids and must renew),
+    # and chain integrity (a `supersedes <date>` link names an earlier
+    # record on the same target, chains never branch or cycle).
+    # Findings-file scoped like rule 18 (acceptances live beside the
+    # escalations they terminate); first reporter wins per file. No date
+    # scope: a waiver is current procedure whenever it is written.
+    seen_24 = set()
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm or fm.group(1) in seen_24:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            seen_24.add(fm.group(1))
+            raw_text = ftext
+            ftext, _u = graph.strip_fenced_code(ftext)
+            accs = graph.acceptance_lines(ftext)
+            for ln in ftext.splitlines():
+                if ln.startswith("Risk accepted:") and graph.RISK_ACCEPTED_RE.match(ln) is None:
+                    flag(
+                        "risk-acceptance-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} malformed Risk accepted line: {ln.strip()[:100]}",
+                    )
+            for tgt, appr, own, exp, rec, rvw, evi, sup, rat, kind in accs:
+                if rec > exp:
+                    flag(
+                        "risk-acceptance-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} acceptance for {tgt} expires {exp} before it is recorded {rec}",
+                    )
+                if rvw < rec or rvw > exp:
+                    flag(
+                        "risk-acceptance-malformed",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} acceptance for {tgt} reviewed {rvw} outside its record-expiry window {rec}..{exp}",
+                    )
+                owner_path = fm.group(1) if kind == "finding" else t.path
+                owner_text = raw_text if kind == "finding" else target_texts.get(
+                    t.path,
+                    (lambda: target_texts.setdefault(
+                        t.path,
+                        (
+                            (graph.TODO_DIR.parent / t.path).read_text(encoding="utf-8")
+                            if (graph.TODO_DIR.parent / t.path).exists()
+                            else ""
+                        ),
+                    ))(),
+                )
+                if not graph.evidence_fresh(evi, owner_path, owner_text):
+                    flag(
+                        "risk-acceptance-silent-edit",
+                        f"{t.path}:{s.line}: §{num} findings {fm.group(1)} acceptance for {tgt} "
+                        f"evidence {evi} no longer matches the owning record (renew via a superseding record)",
+                    )
+            # Chain integrity: same-target links only, strictly backward,
+            # acyclic, unbranched. Malformed sup dates (unshaped or absent
+            # from the file's records on that target) fail here, not as
+            # silent history.
+            by_target: dict[str, list[tuple[str, str]]] = {}
+            for tgt, _appr, _own, _exp, rec, _rvw, _evi, sup, _rat, _kind in accs:
+                by_target.setdefault(tgt.lower(), []).append((rec, sup))
+            for tgt, chain in sorted(by_target.items()):
+                records = {rec for rec, _sup in chain}
+                succ: dict[str, str] = {}
+                for rec, sup in chain:
+                    if not sup:
+                        continue
+                    if sup not in records:
+                        flag(
+                            "risk-acceptance-chain-broken",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} acceptance for {tgt} "
+                            f"supersedes {sup}, which names no record on this target",
+                        )
+                        continue
+                    if sup >= rec:
+                        flag(
+                            "risk-acceptance-chain-broken",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} acceptance for {tgt} "
+                            f"supersedes {sup}, which is not earlier than {rec} (edges point strictly backward)",
+                        )
+                        continue
+                    if sup in succ:
+                        flag(
+                            "risk-acceptance-chain-broken",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} two acceptances for {tgt} "
+                            f"supersede {sup} (the chain branches)",
+                        )
+                        continue
+                    succ[sup] = rec
+                seen_c: set[str] = set()
+                # Cycle walk from every head: a link set with no head is a
+                # pure cycle, so heads-first would miss it.
+                for rec, sup in chain:
+                    cur: str | None = sup or None
+                    path: list[str] = [rec]
+                    while cur is not None and cur in records and cur not in seen_c:
+                        if cur in path:
+                            flag(
+                                "risk-acceptance-chain-broken",
+                                f"{t.path}:{s.line}: §{num} findings {fm.group(1)} acceptance chain for {tgt} "
+                                f"cycles at {cur}",
+                            )
+                            break
+                        path.append(cur)
+                        nxt = next((s2 for r2, s2 in chain if r2 == cur), "")
+                        cur = nxt or None
+                    seen_c.update(path)
+
+    # 25. ledger amendments link or fail: a row carrying `supersedes
+    # <finding-id>` must name another row of the same block in the same
+    # review namespace, and neither end may sit in a supersedes cycle.
+    # Orphaned links, cross-namespace links, and cycles fail: an
+    # amendment that names nothing (or contradicts itself) leaves the
+    # chain head ambiguous. File-scoped with first-reporter dedup like
+    # rules 18-20. No date scope: amendment history is current procedure
+    # whenever it is written.
+    seen_25 = set()
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if num not in t.verified_sections:
+                continue
+            fm = graph.FINDINGS_RE.search(getattr(s, "review_body", None) or "")
+            if not fm or fm.group(1) in seen_25:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            seen_25.add(fm.group(1))
+            ftext, _u = graph.strip_fenced_code(ftext)
+            for h in graph.PLAN_REVIEW_HEADING_RE.finditer(ftext):
+                sec = ftext[h.end():]
+                nxt = re.search(r"^#{1,6}\s+", sec, re.MULTILINE)
+                if nxt:
+                    sec = sec[: nxt.start()]
+                block, _bproblem = graph.ledger_block(sec)
+                if block is None:
+                    continue
+                links = graph.ledger_supersedes(block)
+                _valid, cyclic = graph.ledger_supersession(block)
+                ids = {lr.group(1).lower() for lr in graph.LEDGER_ROW_RE.finditer(block)}
+                for rid, tgt in sorted(links.items()):
+                    if rid in cyclic:
+                        flag(
+                            "ledger-supersession-broken",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} row {rid} sits in a supersedes cycle",
+                        )
+                    elif tgt.lower() not in ids:
+                        flag(
+                            "ledger-supersession-broken",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} row {rid} supersedes {tgt}, which names no row of its block",
+                        )
+                    elif graph.finding_namespace(tgt) != graph.finding_namespace(rid):
+                        flag(
+                            "ledger-supersession-broken",
+                            f"{t.path}:{s.line}: §{num} findings {fm.group(1)} row {rid} supersedes {tgt} across review namespaces",
+                        )
 
     # The warning BASELINE. A count that only grows is a count nobody reads,
     # and 17 of these have stood for over a week: 15 name STAMPED sections

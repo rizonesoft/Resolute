@@ -1,13 +1,13 @@
 ---
 name: process-phase
-description: Attended runner that takes one phase of todo/implementation-plan.md to 100% -- repair the phase, gap-check it, then ship section after section via process-todo-section plus review-todo-section, parking only when every leftover row is blocked. Use when the user says process, run, or finish a phase.
+description: Attended runner that takes one phase of todo/implementation-plan.md to 100% -- repair the phase, gap-check it, then ship section after section via process-todo-section plus review-todo-section, parking only when every leftover row is blocked or runnable-elsewhere in this context. Use when the user says process, run, or finish a phase.
 ---
 
 # Process Phase
 
-One phase, start to 100%, or parked when the rest of it is blocked. You do not stop in between.
+One phase, start to 100%, or parked when the rest of it is blocked or runnable-elsewhere here. You do not stop in between.
 
-**Exactly three endings.** Zero open rows and a written closeout. Every leftover row blocked, so the phase is **parked** and `process-plan` moves to the next ready phase. Or the operator's own pause. There is no fourth, and a parked phase is neither complete nor a stall.
+**Exactly three endings.** Zero open rows and a written closeout. Every leftover row blocked or runnable-elsewhere here, so the phase is **parked** and `process-plan` moves to the next ready phase. Or the operator's own pause. There is no fourth, and a parked phase is neither complete nor a stall.
 
 The whole plan is `process-plan`, not this skill. This skill is one named phase. When the session entered through `process-plan` with no phase argument, return to it after closeout or park so it can start the next ready phase; a session pinned to one phase ends here.
 
@@ -15,7 +15,7 @@ The user is present but is not the engine. Talk to them when something genuinely
 
 **Completion-first never buys completion with a bypass.** `--no-verify`, `--amend`, and force-push are forbidden to this run. If a gate refuses, the run fixes the cause. It does not push, and it does not pause: a red gate is work. A failed push is a red gate, not a skip: diagnose, fix, retry. Never leave an unpushed stack on the theory that CI will catch up later.
 
-**Attended means interruptible, not stoppable.** When the user sends a message mid-run, answer it briefly and continue the loop in the same turn. The one exception outranks everything: **if the user tells you to stop or pause the run, obey immediately**, confirm, and wait. Their instruction beats completion-first, always.
+**Attended means interruptible, not stoppable.** When the user sends a message mid-run, answer it briefly and continue the loop in the same turn. The one exception outranks everything: **if the user tells you to stop or pause the run, obey immediately**, confirm, and wait. Their instruction beats completion-first, always. Stopping or pausing deletes the run guard first, so no heartbeat resumes against the operator's instruction; resume recreates it before any other step.
 
 ## Step 0 -- open the run
 
@@ -34,6 +34,8 @@ Check that no other writer holds the tree (`git status`, and ask about unfamilia
 
 Read the most recent prior file in `docs/phase-runs/` for this phase, if one exists: anything unresolved there is this run's first input.
 
+Run guard: if this session entered through `process-plan`, the plan owns the guard; verify it exists (list scheduled jobs) and record the check, but do not create a second. If pinned to this phase standalone, start the guard exactly as the `process-plan` skill specifies, with this phase's run file, and record its job id in Critical events.
+
 ## Step 1 -- repair the phase before running it
 
 The phase table is a plan, and plans drift. Fix it before building on it. In order:
@@ -41,7 +43,8 @@ The phase table is a plan, and plans drift. Fix it before building on it. In ord
 1. `python scripts/todo-graph.py validate`: fix every FATAL now.
 2. `python scripts/todo-graph.py plan --check`: if stale, `plan --sync`.
 3. For EVERY open row in the phase: `python scripts/todo-graph.py resolve '<ref>'`. Record the exit code.
-   - Exit 4 with unmet deps **outside this phase** is a **leftover, not a stall**. Leave the row here, ship every exit-0 row, and park when only leftovers remain. Do not drag a later phase's dependency into this one, and do not loop back hoping the answer changes.
+   - Exit 4 with unmet deps **outside this phase** is a **leftover, not a stall**. Leave the row here, ship every exit-0 runnable-now row, and park when only leftovers remain. Do not drag a later phase's dependency into this one, and do not loop back hoping the answer changes.
+   - A row whose `resolve` verdict is runnable-elsewhere **in this context** is a leftover, not a shippable row, whatever the exit code: it stays visible, never ships here, and parks with the rest when only leftovers remain. Re-run `resolve` rather than trusting a previous verdict.
    - Exit 1/2: the row cites a section that does not exist: repair the reference against the TODO file. A broken ref is repairable work, so it blocks a park.
 4. Read each open section's TODO file top to bottom, looking for **phase-level** staleness only (per-section validation happens again inside `process-todo-section`): sections whose work already shipped elsewhere, sections made moot by a decision since, callouts whose blocker no longer exists. Correct with dated `**Corrected YYYY-MM-DD:**` notes.
 
@@ -61,11 +64,11 @@ Read the phase as a user would use it, end to end, and ask what is missing: surf
 
 In table order, for each open row: `process-todo-section`, then `review-todo-section`. Record each outcome in the findings file's Sections log. After each stamp, sync the plan. Commit per section; push per the two-push discipline (ship push, then stamp push).
 
-Skip rows whose `resolve` is not exit 0, and re-check them after each stamp: the graph moves as rows flip. When every remaining open row is exit 4 (or otherwise unshippable here), the phase parks: write the park record (each leftover, what blocks it, where the blocker lives), commit the findings file, and return to `process-plan` (or end, if pinned).
+Skip rows whose `resolve` is not exit 0 or whose verdict is runnable-elsewhere here, and re-check them after each stamp: the graph moves as rows flip. When every remaining open row is exit 4 (or otherwise unshippable here), the phase parks: write the park record (each leftover, what blocks it, where the blocker lives), commit the findings file, and if pinned standalone delete the guard and record its deletion. Then return to `process-plan` (or end, if pinned).
 
 ## Step 4 -- closeout
 
-When the table is all `[x]`: re-run the full suite once, confirm the plan shows the phase complete, write the closeout (what shipped, what was repaired, what was learned), commit, and report. A phase is complete when its table says so and the closeout is written: not before.
+When the table is all `[x]`: re-run the full suite once, confirm the plan shows the phase complete, write the closeout (what shipped, what was repaired, what was learned), commit, delete the guard if pinned standalone (the plan deletes it when chained), and report. A phase is complete when its table says so and the closeout is written: not before.
 
 ## Guardrails
 
@@ -74,3 +77,4 @@ When the table is all `[x]`: re-run the full suite once, confirm the plan shows 
 - Do not claim a phase complete while its table has `[ ]` rows.
 - Do not call a parked phase complete, and do not call it a stall.
 - Do not end the turn on the audit. Ship, park, or close out.
+- Do not leave a run guarded after it ends, and do not pause with the guard live: stop deletes first, resume recreates.

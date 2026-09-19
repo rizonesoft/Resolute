@@ -49,6 +49,8 @@ Use the `skill arg` line it prints as the canonical form for the rest of the run
 
 **If `resolve` printed a `needs` line, the section needs a Windows host.** Confirm the host is reachable before writing `Started:`. If it is not, stop and say which host the section waits on: starting a host-bound section with no host is how a run burns a session producing nothing committable.
 
+**If `resolve` printed a `requires` line with requirements missing here, the section needs that environment.** Confirm it is reachable before writing `Started:`. If it is not, stop and say which capability the section waits on: starting an environment-bound section with no environment burns a session the same way.
+
 **Write `Started:` now, at the first resolve.** If the section body carries no `> **Started:**` line, add one with the current UTC instant (`date -u +%Y-%m-%dT%H:%M:%SZ`). Do **not** overwrite an existing one on resume: review subtracts it from stamp time for `Duration:`, which is the whole working interval. A section resumed after a session death would otherwise report the wrong half of its own cost.
 
 **Stop here if another writer holds the tree.** Check `git status` for unfamiliar uncommitted work you do not understand, and ask before building over it. Two writers on one tree is how a call ships without its interface.

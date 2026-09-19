@@ -17,6 +17,12 @@ markdown cannot answer by grep -- what is ready, what is blocked, and on what.
 Stdlib only -- this runs before platform/ has a composer.json, let alone vendor/.
 Format spec: todo/README.md
 
+Ported machinery: the review-record subsystem (Requires/Context, the run and
+plan-health/summary queries, stamp-field parsing for Plan review/Reopened and
+Duration ranges, and their validators) arrived from ScratchPad on 2026-09-19.
+Section and item numbers in those comments (D00 T01 §N) are ScratchPad's, kept
+so the rationale trail survives the port.
+
 A campaign may edit this file when the inflight section already names it
 (Build order or dirty list). That is planned section work, not a mid-run
 self-improvement. The intelligence hook allows that path (INT-0012); the
@@ -29,6 +35,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import functools
 import re
 import subprocess
@@ -68,8 +75,12 @@ BODY_RE = re.compile(r"^##\s+(?P<num>\d+)\.\s+(?P<title>.+?)\s*$")
 XREF_RE = re.compile(r"(?:D(?P<dom>\d{2})\s+)?(?:T(?P<todo>\d{2})\s+)?§(?P<sec>\d+)")
 BARE_TODO_RE = re.compile(r"(?<![\w§])(?:D\d{2}\s+)?T\d{2}(?!\s*§)(?![\w-])")
 STAMP_RE = re.compile(
-    r"^>\s*\*\*(?P<kind>Verified|Deferred|Resolved|Review|Duration|CRUD|Verification|Implementer|Moved):\*\*\s*(?P<body>.+?)\s*$"
+    r"^>\s*\*\*(?P<kind>Verified|Deferred|Resolved|Review|Duration|CRUD|Verification|Implementer|Moved|Plan review|Reopened):\*\*\s*(?P<body>.+?)\s*$"
 )
+# A reopened section names the finding that voided its proof: `<YYYY-MM-DD> |
+# <finding ref> | <reason>`. The validator requires the date, the bar, and a
+# resolvable §ref in the rest.
+REOPENED_BODY_RE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2})\s*\|\s*(?P<rest>.+)$")
 # `> **Implementer:** Fable 5.1 (claude-fable-5-1)` or `not recorded (<why>)`.
 # D00 T08 §1: the runner writes it from its own transcript, never by hand.
 IMPLEMENTER_RE = re.compile(
@@ -114,6 +125,7 @@ REVIEW_KIND_LABELS = {
     "adversarial-final": "Qwen final",
 }
 DURATION_BODY_RE = re.compile(r"^(?P<minutes>\d+)\s*m?$")
+DURATION_END_RE = re.compile(r"^\S+\s+to\s+(?P<end>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$")
 VERIFIED_DATE_RE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2})\b")
 # A deferral names its owner with "-> XREF: <ref>" and, optionally, the exact
 # checklist item that owner carries. Both are what make closure checkable.
@@ -214,6 +226,39 @@ NEEDS_ALLOWED: dict[str, str] = {
     # a second physical machine all serve.
     "Clean Windows machine (no Visual Studio)": "clean-windows",
 }
+
+# Environment capabilities a section can require (`**Requires:**` line,
+# ported from ScratchPad D00 T01 §13). CLOSED like NEEDS_ALLOWED:
+# `validate` refuses any other value, and refuses a mark without its
+# reason, so a typo cannot silently unmark a section and every mark
+# cites the measurement that convicted it. One value today (the first
+# evidenced mark); a second value is one more entry here, one detector
+# branch below, and its self-test cases.
+REQUIRES_ALLOWED: tuple[str, ...] = (
+    "display-session",
+)
+REQUIRES_BLOCK_RE = re.compile(r"^\*\*Requires:\*\*\s*(?P<body>.+?)\s*$")
+REQUIRES_REASON_SEP = " -- "
+
+
+def detect_context(platform: str | None = None, environ=None) -> set[str]:
+    """The runner capabilities `query ready` evaluates `**Requires:**` against.
+
+    `platform`/`environ` default to the live interpreter and process
+    environment; tests pass fakes. display-session holds on Windows with
+    SESSIONNAME naming an interactive session (console or remote) and
+    nowhere else -- in particular never under WSL, whose
+    window-station-less session cannot drive the built tools or capture
+    their windows, and never as session 0, which names itself
+    "Services" and has no window station (headless services, CI runners).
+    """
+    plat = sys.platform if platform is None else platform
+    env = os.environ if environ is None else environ
+    ctx: set[str] = set()
+    session = (env.get("SESSIONNAME") or "").strip()
+    if plat == "win32" and session and session.lower() != "services":
+        ctx.add("display-session")
+    return ctx
 FIDELITY_EXEMPT_RE = re.compile(
     r"no surface of its own|not a surface|no page of its own|not a page|the library is not a surface",
     re.I,
@@ -290,10 +335,18 @@ class Section:
     has_chrome: bool = False
     needs_raw: str = ""          # the `**Needs:**` value as written
     needs: list[str] = field(default_factory=list)  # closed-list keys, e.g. windows-host
+    requires_has_line: bool = False  # a `**Requires:**` line is present
+    requires_raw: str = ""           # the line body as written (values + reason)
+    requires: list[str] = field(default_factory=list)  # closed-list values
+    requires_unknown: list[str] = field(default_factory=list)  # values outside REQUIRES_ALLOWED
+    requires_reason: str = ""        # the cited measurement (required)
     line: int = 0
     duration_minutes: int | None = None
+    duration_end: str | None = None  # `Duration:` range end instant, Zulu shaped or None
     stamped_on: str | None = None
     review_body: str = ""
+    plan_review_body: str = ""
+    reopened_body: str = ""
     crud_body: str = ""
     verification_body: str = ""
     implementer_body: str = ""
@@ -465,13 +518,45 @@ def parse_todo(path: Path) -> Todo:
                     for target in stamp_targets:
                         target.stamped_on = day
             elif kind == "Duration" and current is not None:
-                parsed = DURATION_BODY_RE.fullmatch(body.strip())
-                if parsed:
-                    for target in stamp_targets or ([] if stamp_orphaned else [current]):
-                        target.duration_minutes = int(parsed.group("minutes"))
+                for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                    # Last marker governs: each Duration line resets
+                    # both fields, then applies its own shape. A range
+                    # computes its minutes, so minute and range forms
+                    # project identically; an unshaped, calendar-invalid,
+                    # or inverted range leaves both None (fail-soft:
+                    # clearance falls back to day stamps, and no strptime
+                    # ever escapes the parser into the query).
+                    target.duration_minutes = None
+                    target.duration_end = None
+                    m = DURATION_BODY_RE.fullmatch(body.strip())
+                    if m is not None:
+                        target.duration_minutes = int(m.group("minutes"))
+                        continue
+                    e = DURATION_END_RE.fullmatch(body.strip())
+                    if e is None:
+                        continue
+                    try:
+                        start = datetime.strptime(
+                            body.strip().split(" to ")[0], "%Y-%m-%dT%H:%M:%SZ"
+                        ).replace(tzinfo=timezone.utc)
+                        end = datetime.strptime(
+                            e.group("end"), "%Y-%m-%dT%H:%M:%SZ"
+                        ).replace(tzinfo=timezone.utc)
+                    except ValueError:
+                        continue
+                    if end <= start:
+                        continue
+                    target.duration_end = e.group("end")
+                    target.duration_minutes = int((end - start).total_seconds() // 60)
             elif kind == "Review" and current is not None:
                 for target in stamp_targets or ([] if stamp_orphaned else [current]):
                     target.review_body = body
+            elif kind == "Plan review" and current is not None:
+                for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                    target.plan_review_body = body
+            elif kind == "Reopened" and current is not None:
+                for target in stamp_targets or ([] if stamp_orphaned else [current]):
+                    target.reopened_body = body
             elif kind == "CRUD" and current is not None:
                 for target in stamp_targets or ([] if stamp_orphaned else [current]):
                     target.crud_body = body
@@ -570,12 +655,30 @@ def parse_todo(path: Path) -> Todo:
                 current.needs_raw = needs.group("value").strip()
                 key = NEEDS_ALLOWED.get(current.needs_raw)
                 current.needs = [key] if key else []
+            req = REQUIRES_BLOCK_RE.match(st)
+            if req:
+                current.requires_has_line = True
+                body = req.group("body").strip()
+                current.requires_raw = body
+                values_part, sep, reason = body.partition(REQUIRES_REASON_SEP)
+                current.requires_reason = reason.strip() if sep else ""
+                values = [v.strip() for v in values_part.split(",") if v.strip()]
+                current.requires = [v for v in values if v in REQUIRES_ALLOWED]
+                current.requires_unknown = [v for v in values if v not in REQUIRES_ALLOWED]
 
         if "-> XREF:" in line:
             todo.xrefs.append(line.split("-> XREF:", 1)[1].strip())
         for bare in BARE_TODO_RE.findall(line):
             if "XREF" in line or "Depends" in line or "|" in line:
                 todo.bare_refs.append(f"line {lineno}: {bare}")
+
+    # A reopen voids the stamp: the section reads as unverified everywhere
+    # downstream, so rule 7 fires until the row is unchecked and dependents
+    # must park. The `Verified:` line itself stays in the text as history;
+    # the validator requires the row flip.
+    for num, s in todo.sections.items():
+        if s.reopened_body.strip():
+            todo.verified_sections.discard(num)
 
     return todo
 
@@ -729,11 +832,793 @@ SEVERITY_MAP: dict[str, str] = {
     # that pointer, so a dead pointer would hide work (writers-and-reviewers §2).
     "moved-target-missing": "fatal",
     "pending-control-contract": "fatal",
+    # a stamp dated after the Opus-panel rule landed whose findings carry no
+    # panel verdicts reads as reviewed evidence while verifying nothing --
+    # the same lie as a malformed stamp, so the same severity.
+    "stamp-no-opus-panel": "fatal",
+    # a `**Requires:**` value outside REQUIRES_ALLOWED: the list is closed
+    # so a misspelt capability cannot silently unmark a section.
+    "requires-unknown": "fatal",
+    # a `**Requires:**` mark without its reason: the citation is what makes
+    # the mark auditable instead of vibes.
+    "requires-no-reason": "fatal",
+    # a stamp dated after the plan-review rule landed that carries no
+    # `Plan review:` completion marker: the second-family round is required
+    # procedure, so an unmarked stamp reads as fully reviewed while the
+    # round may never have run.
+    "stamp-no-plan-review": "fatal",
+    # a post-cutoff plan-review record the query cannot parse (a Plan
+    # review section without its Manifest line or its Ledger block, a
+    # non-row line inside the block, or a content-illegal row):
+    # unparseable records silently drop out of governance.
+    "plan-review-malformed": "fatal",
+    # a filed ledger row whose target file carries no back-link: the filing
+    # is untraceable from the target side, so remediation cannot be
+    # attributed to the finding.
+    "filed-target-no-backlink": "fatal",
+    # a `> **Reopened:**` line outside its shape, on a still-checked row,
+    # or with a still-stamped dependent: a reopen that does not void proof
+    # downstream lets work continue on invalid evidence.
+    "stamp-reopened": "fatal",
+    # a finding ID appearing twice in one ledger: duplicated IDs attach one
+    # finding to the wrong remediation, so multi-target findings ride one
+    # row with every target, never split rows.
+    "plan-review-duplicate-id": "fatal",
+    # a `Plan review:` marker without run lineage (no run ID, a reused run
+    # ID, a rerun marker naming no superseded run, or a run the manifest
+    # does not carry): precedence without lineage rests on line position
+    # alone.
+    "plan-review-no-lineage": "fatal",
+    # a ledger row whose disposition moved the forbidden way against the
+    # committed record, or a row that vanished: later evidence amends via
+    # a new row, never by rewriting the old one.
+    "ledger-history-violation": "fatal",
+    # a post-cutoff findings file without a well-formed `Provenance:`
+    # line, or a provenance line outside the field shape, without a
+    # shaped run ID, with an unresolving candidate, a missing path, or
+    # a run no marker of its section carries: unattributed or
+    # misattributed live quotes.
+    "provenance-malformed": "fatal",
+    # a ledger row whose `supersedes` link names no row of its block,
+    # crosses review namespaces, or closes a cycle: orphaned or
+    # contradictory amendment history.
+    "ledger-supersession-broken": "fatal",
+    # a `Risk accepted:` line outside the record shape, with an
+    # uncoverable target, expiring before it is recorded, or reviewed
+    # outside its record-expiry window: an unauditable waiver.
+    "risk-acceptance-malformed": "fatal",
+    "risk-acceptance-silent-edit": "fatal",
+    "risk-acceptance-chain-broken": "fatal",
 }
 
 
 # The file a `Moved:` body points at: the first `path/to/file.md` token.
 MOVED_PATH_RE = re.compile(r"(?P<path>(?:[\w.-]+/)+[\w.-]+\.md)")
+
+
+def _fence_shape(line: str) -> tuple[int, str, int, str]:
+    # (quote depth, marker char, marker run, info string) for a fence
+    # marker line; (quote depth, "", 0, "") otherwise. Blockquote
+    # prefixes never hide a fence, but depth is tracked so a quoted
+    # close cannot close an unquoted fence and vice versa. Markers
+    # indented 4+ past the quote prefix are indented code, not fences.
+    m = re.match(r"(?:[ \t]{0,3}>[ \t]?)+", line)
+    qd = m.group(0).count(">") if m else 0
+    rest = line[m.end():] if m else line
+    stripped = rest.strip()
+    indent = rest[: len(rest) - len(rest.lstrip())]
+    if len(indent.replace("\t", "    ")) >= 4:
+        return qd, "", 0, ""
+    if stripped.startswith("```") or stripped.startswith("~~~"):
+        ch = stripped[0]
+        run = len(stripped) - len(stripped.lstrip(ch))
+        return qd, ch, run, stripped[run:]
+    return qd, "", 0, ""
+
+
+def strip_fenced_code(text: str) -> tuple[str, int | None]:
+    """Return (text with fenced code blocks removed, unbalanced opener lineno or None).
+
+    One fence implementation for the validator's panel rule and the
+    plan-health query, which scan the same findings files: two copies
+    would drift back into fixed bugs.
+    """
+    kept = []
+    fence = None  # (char, run, opener lineno, quote depth) in one
+    raw_lines = text.splitlines()
+    for fence_lineno, ln in enumerate(raw_lines, start=1):
+        qd, fence_ch, fence_run, info = _fence_shape(ln)
+        if fence is not None and qd < fence[3]:
+            # Below the open fence's quote depth, the quote ended,
+            # closing the fence with it: CommonMark laziness never
+            # applies to fenced-code content, so there is no
+            # lookahead for a later same-depth close (its
+            # whole-remainder scan let later quoted blocks swallow
+            # the lines between, hiding whole panels). A blank line
+            # is not a blockquote continuation line (CommonMark
+            # 0.31.2 section 5.1, example 228), so it ends a quoted
+            # fence too; an unquoted fence needs no such bar because
+            # its depth already matches (0 < 0 is false), keeping
+            # blank lines legal content there. Reprocess the line
+            # below: it may open a new fence at its own depth.
+            fence = None
+        if fence_run:
+            if fence is None:
+                # CommonMark: a backtick in a backtick-fence info
+                # string makes the line a paragraph, never a fence.
+                # (Tilde info strings may hold anything.)
+                if fence_ch == "`" and "`" in info:
+                    kept.append(ln)
+                else:
+                    fence = (fence_ch, fence_run, fence_lineno, qd)
+            elif (
+                qd == fence[3]
+                and fence_ch == fence[0]
+                and fence_run >= fence[1]
+                and info == ""
+            ):
+                # CommonMark close: same quote depth and char, run
+                # at least the opener's, and no info string. A
+                # ```text line, a shorter or other-char run, or a
+                # close at another quote depth is content, never a
+                # close; without these bars, quoted verdicts leak
+                # out and satisfy the rule. Same-length nesting
+                # cannot exist, so genuinely crossed fences fall out
+                # as unbalanced below instead of mis-toggling.
+                fence = None
+            continue
+        if fence is None:
+            kept.append(ln)
+    if fence is not None:
+        return "\n".join(kept), fence[2]
+    return "\n".join(kept), None
+
+
+# Stamps on or before this date predate the plan-review marker rule and are
+# grandfathered. Set to the 2026-09-19 ScratchPad port date, so every
+# Resolute stamp predates it. Module-level, not in the validator, because
+# `query plan-health` needs the same boundary: one constant, no copies.
+PLAN_REVIEW_CUTOFF = "2026-09-19"
+# The grandfathered migration deadline: past this date, unmigrated
+# batches read OVERDUE and fail `--check`.
+MIGRATION_DEADLINE = "2026-12-31"
+
+
+def migration_overdue_today(today: str) -> bool:
+    """Whether the grandfathered migration is past its deadline."""
+    return today > MIGRATION_DEADLINE
+
+
+# An open major older than this many days past its review's stamp is
+# overdue by age (a blown row due date also counts). Recorded default:
+# a week is long enough to file or defer, short enough to notice;
+# changing it is one constant.
+PLAN_REVIEW_OVERDUE_DAYS = 7
+# Machine contract for `query plan-health --json`: `schema` is
+# `plan-health/<n>`, bumped on any key-shape change. The report exits 0
+# (it is a reading, not a gate) unless `--check` or `--fail-on` arms
+# it; usage errors exit 2 via argparse. Every list carries a TOTAL sort
+# key (the tuple of its scalar fields, so ties are impossible and two
+# runs over one tree diff clean) and every field is one type always:
+# strings for refs, IDs, owners, dates, and runs ("" when absent, never
+# null), bools for flags, ints for counts and line numbers.
+PLAN_HEALTH_SCHEMA = "plan-health/4"
+# The plan-review record shapes. Module-level because the query and the
+# rules all parse them: one pattern, no copies.
+PLAN_REVIEW_HEADING_RE = re.compile(r"^#{2,6}\s+Plan review\b", re.IGNORECASE | re.MULTILINE)
+FINDINGS_RE = re.compile(r"Raw findings:\s*(\S+\.md)")
+# A risk acceptance terminates one escalation: target (a finding ID, a
+# run ID, or `outage <rung> <date>`), approver, action owner, record
+# date, expiry, review date, evidence commit, an optional supersedes
+# link, and a free-text rationale tail. Semicolon-separated like
+# provenance; the rationale rides last so it may itself contain
+# semicolons.
+RISK_ACCEPTED_RE = re.compile(
+    r"^Risk accepted:\s*(.+?);\s*approver\s+([A-Za-z0-9_.-]+);\s*owner\s+([A-Za-z0-9_.-]+);\s*"
+    r"date\s+(\d{4}-\d{2}-\d{2});\s*expires\s+(\d{4}-\d{2}-\d{2});\s*review\s+(\d{4}-\d{2}-\d{2});\s*"
+    r"evidence\s+([0-9a-f]{7,40});\s*(?:supersedes\s+(\d{4}-\d{2}-\d{2});\s*)?rationale\s+(.+?)\s*$"
+)
+RISK_TARGET_RE = re.compile(r"(?:[A-Z0-9]+-T[0-9]+-S[0-9]+-)?PR[0-9]+$", re.IGNORECASE)
+# An outage target binds its instance: the rung plus the outage
+# marker's stamp date, date last so multi-word rungs still parse. A
+# true both-rung outage carries no run, so no compound can name one;
+# the rung-plus-date key is the instance.
+RISK_OUTAGE_RE = re.compile(r"^outage\s+(.+?)\s+(\d{4}-\d{2}-\d{2})$", re.IGNORECASE)
+
+
+def risk_target_kind(target: str) -> str | None:
+    """Classify a risk-acceptance target.
+
+    Returns `finding` for a ledger row ID (namespaced or bare `PRn`,
+    file-scoped at cover time), `run` for a shaped run ID, `outage`
+    for `outage <rung> <date>`, or None when the target names nothing
+    coverable. One classifier serves the validator's shape leg and
+    the query's covering lookup.
+    """
+    if RISK_TARGET_RE.match(target):
+        return "finding"
+    if RUN_ID_SHAPE_RE.match(target):
+        return "run"
+    om = RISK_OUTAGE_RE.match(target.strip())
+    if om is not None:
+        try:
+            datetime.strptime(om.group(2), "%Y-%m-%d")
+        except ValueError:
+            return None
+        if om.group(1).strip():
+            return "outage"
+    return None
+
+
+def outage_key(target: str) -> tuple[str, str] | None:
+    """The (rung, date) instance key of an outage target, or None when
+    the target is not a shaped outage (the classifier already failed
+    it; this never disagrees)."""
+    om = RISK_OUTAGE_RE.match(target.strip())
+    if om is None:
+        return None
+    return (om.group(1).strip().lower(), om.group(2))
+
+
+def acceptance_lines(stripped_text: str) -> list[tuple[str, str, str, str, str, str, str, str, str, str]]:
+    """Parse live `Risk accepted:` lines from fence-stripped findings text.
+
+    Returns (target, approver, owner, expires, recorded, review,
+    evidence, supersedes, rationale, kind) per well-formed line, in
+    file order (supersedes is "" when the record stands alone).
+    Malformed or uncoverable lines are skipped, never fatal: they are
+    the validator's to flag; the query only consults acceptances for
+    live escalations, so a bad line fails loud as a persisting
+    escalation, never as a query crash.
+    """
+    out = []
+    for ln in stripped_text.splitlines():
+        if not ln.startswith("Risk accepted:"):
+            continue
+        am = RISK_ACCEPTED_RE.match(ln)
+        if am is None:
+            continue
+        kind = risk_target_kind(am.group(1))
+        if kind is None:
+            continue
+        out.append(
+            (
+                am.group(1),
+                am.group(2),
+                am.group(3),
+                am.group(5),
+                am.group(4),
+                am.group(6),
+                am.group(7),
+                am.group(8) or "",
+                am.group(9),
+                kind,
+            )
+        )
+    return out
+
+
+def acceptances_in(ftext: str) -> list[tuple[str, str, str, str, str, str, str, str, str, str]]:
+    """Parse `Risk accepted:` lines from raw findings text (fences strip first)."""
+    stripped, _u = strip_fenced_code(ftext)
+    return acceptance_lines(stripped)
+
+
+def review_ordered(
+    tend: str | None, rend: str | None, tgt_day: str | None, reviewer_day: str
+) -> bool:
+    """Whether the target review postdates the finding review.
+
+    Duration ends order when both reviews carry them (same-day fixes
+    order by completion instant; ties fail closed); without both ends
+    the day-stamp rule applies and same-day fails closed. Zulu shapes
+    compare lexicographically; the parser stores only shaped ends.
+    """
+    if tend is not None and rend is not None:
+        return tend > rend
+    return (tgt_day or "") > reviewer_day
+
+
+def fix_postdates_review(fix_ts: int | None, rts: int | None, reviewer_day: str) -> bool:
+    """Whether the fix postdates the review completion.
+
+    Unprovable timestamps fail closed. With a reviewer instant the fix
+    must land strictly after it; without one the fix UTC day must
+    strictly postdate the review day.
+    """
+    if fix_ts is None:
+        return False
+    if rts is not None:
+        return fix_ts > rts
+    fday = datetime.fromtimestamp(fix_ts, tz=timezone.utc).date().isoformat()
+    return fday > reviewer_day
+
+
+def acceptance_live(recorded: str, expires: str, today: str) -> bool:
+    """Whether an acceptance covers today.
+
+    Coverage needs recorded <= today <= expires: a post-dated record
+    (a typo'd year, a waiver from the future) validates clean, which is
+    shape plus inversion only and stays wall-clock-free, but covers
+    nothing, so the escalation persists loud like any other dangling
+    target. ISO dates compare lexicographically; the regex guarantees
+    both fields are shaped.
+    """
+    return recorded <= today <= expires
+
+
+def run_day(run_id: str) -> str:
+    """The calendar day of a run ID's date prefix, or "" when the
+    prefix is not a real date (shaped IDs always are; the guard keeps
+    the query total)."""
+    try:
+        return datetime.strptime(run_id[:8], "%Y%m%d").date().isoformat()
+    except ValueError:
+        return ""
+
+
+def superseded_acceptances(
+    accs: list[tuple[str, str, str, str, str, str, str, str, str, str]],
+) -> set[tuple[str, str]]:
+    """Acceptance records a later line supersedes: (target, record
+    date) pairs named by a `supersedes <date>` link on the same
+    target. The chain head governs covering and the review leg;
+    superseded records are history, never current."""
+    return {(tgt.lower(), sup) for tgt, _a, _o, _e, _r, _v, _i, sup, _t, _k in accs if sup}
+
+
+def evidence_fresh(sha: str, repo_path: str, current_text: str) -> bool:
+    """Whether the owning record still reads as the acceptance's
+    evidence commit saw it: the file bytes at the recorded commit
+    equal today's bytes. Any change voids (fail-closed materiality:
+    renewal rides a superseding record), and an unresolvable commit
+    voids too (unprovable fails closed). The self-test patches
+    `git_file_at`, never a repo.
+    """
+    was = git_file_at(sha, repo_path)
+    if was is None:
+        return False
+    return was == current_text
+
+
+def dim_failing(name: str, entries: list, strict: bool = False) -> bool:
+    """Whether a plan-health dimension fails the gate.
+
+    Strict (explicit `--fail-on`) fails on non-emptiness, exactly as the
+    flag documents: zero tolerance, even for covered or complete items.
+    Lenient (`--check`, `query summary`) fails only on actionables: a
+    live risk acceptance terminates the escalation including the gate,
+    and a bare partial is a complete review whose spare failed, so it
+    lists but never fails (a gate that fails with nothing owed names no
+    next action). Criticals and majors fail on any uncovered entry;
+    degraded fails only on owed states (outage or retry-owed) without a
+    live acceptance; all other dimensions fail on non-emptiness.
+    """
+    if strict:
+        return bool(entries)
+    if name == "degraded":
+        return any(
+            ("outage" in e.get("state", "") or "retry-owed" in e.get("state", ""))
+            and not e.get("accepted_by")
+            for e in entries
+        )
+    if name in ("criticals", "majors"):
+        return any(not e.get("accepted_by") for e in entries)
+    if name == "reviews":
+        # Review-due is a warning, never a failure; review-overdue is
+        # an owed action.
+        return any(e.get("state") == "review-overdue" for e in entries)
+    return bool(entries)
+
+
+# The ledger is a structured block, not prose the query squints at:
+# rows live between `Ledger:` and `End of ledger`, every non-blank
+# line inside is a row or malformed, and `- [` lines outside the block
+# are prose, never rows. No heuristic, no residuals.
+LEDGER_OPEN_RE = re.compile(r"^Ledger:\s*$", re.IGNORECASE | re.MULTILINE)
+LEDGER_CLOSE_RE = re.compile(r"^End of ledger\s*$", re.IGNORECASE | re.MULTILINE)
+LEDGER_ROW_RE = re.compile(
+    r"^\s*-\s*\[((?:[A-Z0-9]+-T[0-9]+-S[0-9]+-)?PR[0-9]+)\]\s*\[(critical|major|minor)\]\s+.+?->\s*(accepted|filed|duplicate|rejected|deferred)\b",
+    re.IGNORECASE | re.MULTILINE,
+)
+MANIFEST_RE = re.compile(
+    r"^Manifest:\s*sections\s*\[(.*?)\];\s*dependents\s*\[(.*?)\];\s*bytes\s*(\d+)(?:;\s*run\s+(\S+))?\s*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+# Row parts for the run query: the same shape LEDGER_ROW_RE just
+# matched, split so structural fields (ID, severity, disposition)
+# print whole while only prose truncates.
+ROW_PARTS_RE = re.compile(
+    r"^\s*-\s*\[(?P<id>[^\]]+)\]\s*\[(?P<sev>[^\]]+)\]\s*(?P<text>.+?)\s*->\s*(?P<disp>[A-Za-z]+)\s*$"
+)
+# A run ID binds one review run across its marker, manifest, rows, and
+# artifacts: `YYYYMMDD-DNN-TNN-SN-<family>[-rN]`. The date prefix is
+# the run's timestamp; `-rN` disambiguates reruns. Numbering: within
+# one date base the bare base is run 1, `-rN` is run N for N >= 2,
+# `-r1` is run 1's accepted synonym (never minted), and `-r0` is
+# outside the shape (no leading zeros anywhere in the suffix).
+# Numbering restarts per day; the date keeps runs distinct.
+RUN_ID_SHAPE_RE = re.compile(r"^\d{8}-D\d+-T\d+-S\d+-[a-z0-9]+(-r[1-9][0-9]*)?$")
+_RUN_BASE_RE = re.compile(r"^\d{8}-D\d+-T\d+-S\d+-[a-z0-9]+$")
+
+
+def normalize_run_id(run: str) -> str:
+    """Read a run ID through the `-r1` synonym.
+
+    Every lineage comparison (duplicate runs, supersedes targets,
+    marker-manifest match) normalizes first, so `-r1` and the bare base
+    compare as the run they both name. The strip applies only when the
+    remainder is a bare base, so a family literally named `r1` survives.
+    """
+    if run.endswith("-r1") and _RUN_BASE_RE.match(run[:-3]):
+        return run[:-3]
+    return run
+
+
+def marker_states(body: str) -> dict[str, bool]:
+    # The five grammar predicates over one marker body. One function
+    # serves the validator's last-line grammar, the outage-predecessor
+    # test, and the run query, so every site reads `outage marker` the
+    # same way (a bare `outage:` substring also matches prose about an
+    # outage beside real filings).
+    low = body.lower()
+    return {
+        "outage": "outage:" in low,
+        "nofind": "no findings" in low,
+        "filed": re.search(r"\bfiled\b", low) is not None,
+        "retry": "retry-owed" in low,
+        "partial": re.search(r"\bpartial\s*:", low) is not None,
+    }
+
+
+def is_outage_marker(body: str) -> bool:
+    # A predecessor counts as the outage a rerun follows only when it
+    # parses as an outage marker: `outage:` with none of the success
+    # states beside it. Prose that merely mentions an outage beside
+    # filings is a normal marker, and a rerun after it chains via
+    # `supersedes`.
+    st = marker_states(body)
+    return st["outage"] and not (st["filed"] or st["nofind"] or st["retry"] or st["partial"])
+
+
+def section_markers(todo_lines: dict[str, list[str]], todo: Todo, num: int) -> list[str] | None:
+    """Every `Plan review:` line body of one section, in file order.
+
+    A range stamp's fields reach sections whose spans hold no marker
+    lines; those read the parsed body as their single line.
+    """
+    if todo.path not in todo_lines:
+        try:
+            todo_lines[todo.path] = (TODO_DIR.parent / todo.path).read_text(encoding="utf-8").splitlines()
+        except OSError:
+            return None
+    lines = todo_lines[todo.path]
+    spans = sorted((s2.line or 0, n2) for n2, s2 in todo.sections.items())
+    start = max(todo.sections[num].line or 0, 1)
+    following = [ln for ln, _n in spans if ln > start]
+    end = following[0] if following else len(lines) + 1
+    out = []
+    for ln in lines[start - 1 : end - 1]:
+        sm = STAMP_RE.match(ln)
+        if sm and sm.group("kind") == "Plan review":
+            out.append(sm.group("body"))
+    if not out:
+        parsed = (todo.sections[num].plan_review_body or "").strip()
+        if parsed:
+            out.append(parsed)
+    return out
+
+
+RETIRED_RE = re.compile(r"^>\s*\*\*Retired:\*\*\s*(\d{4}-\d{2}-\d{2})\s*\|\s*([^|]+?)\s*\|\s*(.+?)\s*$")
+
+
+def section_retired(todo_lines: dict[str, list[str]], todo: Todo, num: int) -> str | None:
+    """Retirement date of one section, or None.
+
+    A retirement note (`> **Retired:** YYYY-MM-DD | ref | reason`)
+    migrates a grandfathered stamp without asserting a review that
+    never ran. Fail-closed: the date must be real, the ref must name
+    this section (a copied note never migrates its new neighbor),
+    and the reason must be non-empty, so prose merely mentioning
+    retirement never counts. Malformed notes read as absent: the
+    stamp stays listed and the gap stays visible.
+    """
+    if todo.path not in todo_lines:
+        try:
+            todo_lines[todo.path] = (TODO_DIR.parent / todo.path).read_text(encoding="utf-8").splitlines()
+        except OSError:
+            return None
+    lines = todo_lines[todo.path]
+    spans = sorted((s2.line or 0, n2) for n2, s2 in todo.sections.items())
+    start = max(todo.sections[num].line or 0, 1)
+    following = [ln for ln, _n in spans if ln > start]
+    end = following[0] if following else len(lines) + 1
+    for ln in lines[start - 1 : end - 1]:
+        rm = RETIRED_RE.match(ln)
+        if rm is None:
+            continue
+        try:
+            datetime.strptime(rm.group(1), "%Y-%m-%d")
+        except ValueError:
+            continue
+        xm = XREF_RE.fullmatch(rm.group(2).strip())
+        if xm is None or int(xm.group("sec")) != num:
+            continue
+        xdom, xtodo = xm.group("dom"), xm.group("todo")
+        if xdom is not None and not todo.domain.startswith(xdom + "-"):
+            continue
+        if xtodo is not None and xtodo != todo.number:
+            continue
+        if not rm.group(3).strip():
+            continue
+        return rm.group(1)
+    return None
+
+
+RUN_ID_RE = re.compile(r"\brun\s+(\S+?)(?=[,;)]|\s|$)")
+SUPERSEDES_RE = re.compile(r"\bsupersedes\s+(\S+?)(?=[,;)]|\s|$)")
+# A clearance names the commit that carries the fix: `fix <sha>` in the
+# target section, proven against the commit's tree. Multi-commit fix
+# loops name the range instead: `fix <base>..<tip>` proves the tip
+# tree, base-to-tip ancestry, and a touch inside the range. Shorts stay
+# legal: git refuses ambiguous ones, so resolution failure fails closed
+# like any unprovable leg.
+FIX_COMMIT_RE = re.compile(r"\bfix\s+([0-9a-fA-F]{7,40})(?:\.\.([0-9a-fA-F]{7,40}))?\b")
+# A clearance names its proof: `proof <finding-id> <path>[::<test>]`
+# in the target section, resolved at the fix tip tree. The query
+# proves the pointer names this row and resolves; the target's own
+# review attests the test exercises the finding's acceptance condition.
+PROOF_RE = re.compile(r"\bproof\s+(\S+)\s+(\S+)")
+OWNER_RE = re.compile(r"\bowner\s+([A-Za-z0-9_.-]+)")
+DUE_RE = re.compile(r"\bdue\s+(\d{4}-\d{2}-\d{2})")
+FOLLOWS_OUTAGE_RE = re.compile(r"\bfollows-outage\b")
+# A provenance line binds one live quote to its run: candidate,
+# command, exit, tool, digest, path, and run, in that order,
+# semicolon-separated. The run is mandatory: run-less provenance
+# fails the shape.
+PROVENANCE_RE = re.compile(
+    r"^Provenance:\s*candidate\s+(\S+);\s*command\s+(.+?);\s*exit\s+(\d+);\s*tool\s+(.+?);\s*digest\s+([0-9a-fA-F]+);\s*path\s+(\S+?);\s*run\s+(\S+?)\s*$"
+)
+
+
+def ledger_block(sec: str) -> tuple[str | None, str | None]:
+    """The ledger rows of one Plan review section, or the block defect.
+
+    Returns (block_text, None) on a well-formed block, (None, problem)
+    when the `Ledger:`/`End of ledger` structure is missing or broken.
+    Rows are only rows inside the block; outside it, `- [` lines are
+    prose and no heuristic reads them.
+    """
+    opens = list(LEDGER_OPEN_RE.finditer(sec))
+    closes = list(LEDGER_CLOSE_RE.finditer(sec))
+    if not opens:
+        return None, "without a Ledger: block"
+    if len(opens) > 1:
+        return None, "with two Ledger: openers"
+    if not closes:
+        return None, "with an unclosed Ledger: block"
+    if closes[0].start() < opens[0].end():
+        return None, "with End of ledger before Ledger:"
+    return sec[opens[0].end():closes[0].start()], None
+
+
+# A finding ID on its own: the row grammar's group 1 as a full token,
+# so a `supersedes <target>` link names a row, never prose.
+FINDING_ID_RE = re.compile(r"(?:[A-Z0-9]+-T[0-9]+-S[0-9]+-)?PR[0-9]+\Z", re.IGNORECASE)
+
+
+def finding_namespace(fid: str) -> str:
+    """The review namespace of a finding ID: the `D..-T..-S..-` prefix,
+    or "" for a bare `PRn`. Amendments stay inside one namespace, so a
+    bare row amends bare rows and a namespaced row amends its review."""
+    m = re.match(r"(.*?)(PR[0-9]+)\Z", fid, re.IGNORECASE)
+    return m.group(1).lower() if m else ""
+
+
+def ledger_supersedes(block: str) -> dict[str, str]:
+    """Row ID (lowercased) -> superseded target for one ledger block.
+
+    The link is `supersedes <finding-id>` after the disposition: the
+    token must be exactly ID-shaped, so prose before the arrow (a
+    title like `Singleton supersedes stays silent`) and non-ID tokens
+    after it are never links. First link wins per row.
+    """
+    links: dict[str, str] = {}
+    for lr in LEDGER_ROW_RE.finditer(block):
+        rest = block[lr.end():].split("\n", 1)[0]
+        sm = SUPERSEDES_RE.search(rest)
+        if sm is None or not FINDING_ID_RE.fullmatch(sm.group(1)):
+            continue
+        links.setdefault(lr.group(1).lower(), sm.group(1))
+    return links
+
+
+def ledger_supersession(block: str) -> tuple[dict[str, str], set[str]]:
+    """(valid links, cyclic rows) for one ledger block.
+
+    A link is valid when its target names another row of the same
+    block in the same review namespace and neither end sits in a
+    supersedes cycle. Cycles invalidate the members' links (the
+    validator owns the failure); the query resolves the rest, so a
+    broken link never hides a row and never loops the scan.
+    """
+    ids = {lr.group(1).lower() for lr in LEDGER_ROW_RE.finditer(block)}
+    valid: dict[str, str] = {}
+    for rid, tgt in ledger_supersedes(block).items():
+        if finding_namespace(tgt) != finding_namespace(rid):
+            continue
+        if tgt.lower() not in ids:
+            continue
+        valid[rid] = tgt.lower()
+    cyclic: set[str] = set()
+    for start in valid:
+        path: list[str] = []
+        cur: str | None = start
+        while cur is not None and cur in valid and cur not in path:
+            path.append(cur)
+            cur = valid[cur]
+        if cur is not None and cur in path:
+            cyclic.update(path[path.index(cur):])
+    for rid in cyclic:
+        valid.pop(rid, None)
+    return valid, cyclic
+
+
+def superseded_ids(block: str) -> set[str]:
+    """Rows of one ledger block another valid row supersedes:
+    plan-health reads the un-superseded head of each chain as current
+    and skips the rest."""
+    return set(ledger_supersession(block)[0].values())
+
+
+def git_file_at(ref: str, repo_path: str) -> str | None:
+    """File bytes at a git ref, or None when unprovable (no git, no ref,
+    no file). One reader for the history rule and the clearance proof;
+    the self-test patches this name, never a repo."""
+    try:
+        import subprocess
+
+        out = subprocess.run(
+            ["git", "-C", str(REPO), "show", f"{ref}:{repo_path}"],
+            capture_output=True,
+            timeout=30,
+        )
+    except Exception:
+        return None
+    if out.returncode != 0:
+        return None
+    try:
+        return out.stdout.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+
+
+def git_commit_touches(sha: str, repo_path: str) -> bool | None:
+    """Whether a commit touched a path, or None when unprovable. The
+    clearance proof names non-merge commits (merges list no files, so
+    they fail closed); the self-test patches this name, never a repo."""
+    try:
+        import subprocess
+
+        out = subprocess.run(
+            ["git", "-C", str(REPO), "show", "--pretty=format:", "--name-only", sha, "--", repo_path],
+            capture_output=True,
+            timeout=30,
+        )
+    except Exception:
+        return None
+    if out.returncode != 0:
+        return None
+    return repo_path in out.stdout.decode("utf-8", "replace").splitlines()
+
+
+def git_commit_ts(sha: str) -> int | None:
+    """Committer time of a commit (unix epoch, offset-free), or None when
+    unprovable.
+
+    The clearance recency leg: the fix must postdate the review
+    completion. Committer time, not author time: landing is the ordered
+    event. Unix epoch, never a rendered day: `%cs` renders in the
+    commit's own offset, so a day read off it is not UTC. Off-shape
+    output reads None, never raises; the self-test patches this name,
+    never a repo.
+    """
+    try:
+        import subprocess
+
+        out = subprocess.run(
+            ["git", "-C", str(REPO), "log", "-1", "--pretty=%ct", sha],
+            capture_output=True,
+            timeout=30,
+        )
+    except Exception:
+        return None
+    if out.returncode != 0:
+        return None
+    raw = out.stdout.decode("utf-8", "replace").strip()
+    if not re.fullmatch(r"\d+", raw):
+        return None
+    return int(raw)
+
+
+def git_is_ancestor(base: str, tip: str) -> bool | None:
+    """Whether base is an ancestor of tip, or None when unprovable. The
+    range sanity leg: a fix loop is linear, so a tip that does not
+    descend from its base fails closed."""
+    try:
+        import subprocess
+
+        out = subprocess.run(
+            ["git", "-C", str(REPO), "merge-base", "--is-ancestor", base, tip],
+            capture_output=True,
+            timeout=30,
+        )
+    except Exception:
+        return None
+    if out.returncode == 0:
+        return True
+    if out.returncode == 1:
+        return False
+    return None
+
+
+def git_range_touches(base: str, tip: str, repo_path: str) -> bool | None:
+    """Whether a non-merge commit in base..tip touched a path, or None
+    when unprovable. The range touch leg."""
+    try:
+        import subprocess
+
+        out = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(REPO),
+                "log",
+                "--no-merges",
+                "--pretty=format:",
+                "--name-only",
+                f"{base}..{tip}",
+                "--",
+                repo_path,
+            ],
+            capture_output=True,
+            timeout=30,
+        )
+    except Exception:
+        return None
+    if out.returncode != 0:
+        return None
+    return repo_path in out.stdout.decode("utf-8", "replace").splitlines()
+
+
+def git_resolves(sha: str) -> bool | None:
+    """Whether a sha names an object in the repo, or None when
+    unprovable. The provenance-candidate leg: a recorded candidate
+    that resolves to nothing attests nothing. Shorts stay legal: git
+    refuses ambiguous ones, so resolution failure fails closed like
+    any unprovable leg; the self-test patches this name, never a
+    repo. `rev-parse --verify --quiet` carries the three states (0
+    resolves, 1 names nothing, anything else unprovable): `cat-file
+    -e` conflates an absent short with a fatal at 128, which would
+    report every bogus candidate as unprovable instead of missing.
+    The `^{object}` peel forces the existence check a bare
+    full-length hex skips (rev-parse prints an absent 40-hex back at
+    exit 0; peeled it exits 1 like an absent short)."""
+    try:
+        import subprocess
+
+        out = subprocess.run(
+            ["git", "-C", str(REPO), "rev-parse", "--verify", "--quiet", f"{sha}^{{object}}"],
+            capture_output=True,
+            timeout=30,
+        )
+    except Exception:
+        return None
+    if out.returncode == 0:
+        return True
+    if out.returncode == 1:
+        return False
+    return None
 
 
 def moved_target(body: str) -> str:
@@ -750,6 +1635,22 @@ def _moved_by_ref(todos: list["Todo"]) -> dict[str, str]:
             if s.moved:
                 out[f"D{dom} T{t.number} §{num}"] = s.moved
     return out
+
+
+def review_dependents(key, rev: dict, rev_xref: dict) -> set:
+    """Review dependents: direct reverse Depends, XREF-only consumers,
+    and one transitive Depends hop past the direct set. One hop is the
+    documented bound: the manifest records it, and deeper chains
+    surface hop by hop as each layer reviews, so no chain is
+    invisible, only ever one review away. Full transitive closure
+    would pin every review's scope to the whole downstream tree; the
+    bound keeps the manifest review-sized while the hop-by-hop
+    surfacing keeps it complete."""
+    direct = set(rev.get(key, ())) | set(rev_xref.get(key, ()))
+    trans = set()
+    for d in direct:
+        trans |= set(rev.get(d, ()))
+    return direct | trans
 
 
 def cmd_validate(_args) -> int:
@@ -986,6 +1887,9 @@ def unmet_dependencies(
 
 
 def cmd_query(args) -> int:
+    if args.what != "run" and getattr(args, "target", None):
+        print(f"query {args.what} takes no target")
+        return 2
     if args.what == "adjacency":
         return adjacency_module().cli(sys.modules[__name__], args)
     todos = load_todos()
@@ -1201,6 +2105,163 @@ def cmd_query(args) -> int:
         print("is exactly why this list exists.")
         return 0
 
+    if what == "run":
+        # One ID resolves to candidate, scope, findings, marker
+        # lineage, outage state, and verified artifacts: the
+        # operator's one run view instead of manual joins across
+        # markers, manifests, and provenance lines. Comparisons read
+        # through the -r1 synonym, so the base and -r1 name the same
+        # run. A missing target exits 2 (no subject); an unmatched ID
+        # exits 1 (nothing to show).
+        target = (getattr(args, "target", None) or "").strip()
+        if not target:
+            print("usage: todo-graph.py query run <run-id>")
+            return 2
+        want = normalize_run_id(target)
+
+        def _one_line(text: str, width: int) -> str:
+            return re.sub(r"\s+", " ", text).strip()[:width]
+
+        # Marker chains through the shared slice, so range-stamped
+        # sections read their parsed fallback exactly like the
+        # validator does and the two can never drift apart.
+        chains: dict[tuple[str, int], list[str]] = {}
+        _chain_lines: dict[str, list[str]] = {}
+        for t in todos:
+            for num in t.sections:
+                bodies = section_markers(_chain_lines, t, num) or []
+                if bodies:
+                    chains[(t.path, num)] = bodies
+
+        def _carries(bodies: list[str]) -> bool:
+            for b in bodies:
+                rm = RUN_ID_RE.search(b)
+                if rm and normalize_run_id(rm.group(1)) == want:
+                    return True
+            return False
+
+        carrying = {key: bodies for key, bodies in chains.items() if _carries(bodies)}
+        # Findings files: every referenced file, deduped, fence-
+        # stripped like the validator, so an orphan manifest run
+        # still resolves to its record.
+        seen_files: dict[str, str] = {}
+        for t in todos:
+            for _num, _s in t.sections.items():
+                _fm = FINDINGS_RE.search(getattr(_s, "review_body", None) or "")
+                if not _fm or _fm.group(1) in seen_files:
+                    continue
+                try:
+                    _raw = (TODO_DIR.parent / _fm.group(1)).read_text(encoding="utf-8")
+                except OSError:
+                    continue
+                seen_files[_fm.group(1)], _u = strip_fenced_code(_raw)
+        manifests: list[tuple[str, str, str]] = []
+        rows: list[tuple[str, str]] = []
+        for _path, _text in sorted(seen_files.items()):
+            for h in PLAN_REVIEW_HEADING_RE.finditer(_text):
+                _sec = _text[h.end() :]
+                _nxt = re.search(r"^#{1,6}\s+", _sec, re.MULTILINE)
+                if _nxt:
+                    _sec = _sec[: _nxt.start()]
+                _mm = MANIFEST_RE.search(_sec)
+                if not _mm or not _mm.group(4):
+                    continue
+                if normalize_run_id(_mm.group(4)) != want:
+                    continue
+                manifests.append((_path, _mm.group(1), _mm.group(2)))
+                _block, _bp = ledger_block(_sec)
+                if _block is None:
+                    continue
+                for _lr in LEDGER_ROW_RE.finditer(_block):
+                    _rest = _block[_lr.end() :].split("\n", 1)[0]
+                    _rm = ROW_PARTS_RE.match(_lr.group(0))
+                    _rtext = _one_line(_rm.group("text"), 80) if _rm else ""
+                    _row = f"- [{_lr.group(1)}] [{_lr.group(2)}] -> {_lr.group(3)}"
+                    if _rest.strip():
+                        _row += f" {_one_line(_rest, 140)}"
+                    if _rtext:
+                        _row += f" :: {_rtext}"
+                    rows.append((_path, _row))
+        candidates: list[tuple[str, str]] = []
+        # File-level by design: Candidate lines name panel rounds and
+        # carry no run, so per-record attribution is impossible; the
+        # file's candidates are the review's candidates across its
+        # rounds. Single-record files attribute exactly; multi-record
+        # files decline rather than misattribute.
+        for _path, _text in sorted(seen_files.items()):
+            if not any(_path == _mp for _mp, _ms, _md in manifests):
+                continue
+            _records = len(list(PLAN_REVIEW_HEADING_RE.finditer(_text)))
+            _lines = []
+            for _cl in re.finditer(r"^Candidate:\s*(.+)$", _text, re.MULTILINE):
+                _shas = re.findall(r"[0-9a-fA-F]{7,40}", _cl.group(1))
+                if _shas:
+                    _lines.append(" ".join(_shas))
+            if _records > 1:
+                candidates.append((_path, f"({len(_lines)} candidates across {_records} records: unattributable to one run)"))
+            else:
+                candidates.extend((_path, _ln) for _ln in _lines)
+        artifacts: list[tuple[str, str, str, str, str, str, str]] = []
+        for _path, _text in sorted(seen_files.items()):
+            for _ln in _text.splitlines():
+                _pm = PROVENANCE_RE.match(_ln)
+                if not _pm or normalize_run_id(_pm.group(7)) != want:
+                    continue
+                artifacts.append(
+                    (_path, _pm.group(1), _pm.group(2), _pm.group(3), _pm.group(4), _pm.group(5), _pm.group(6))
+                )
+        if not carrying and not manifests and not artifacts:
+            print(f"unknown run: {target}")
+            return 1
+        print(f"run {target}")
+        print("candidate -- review candidates in files carrying this run (file-level: rounds share the file)")
+        if not candidates:
+            print("    (none recorded)")
+        for _path, _shas in candidates:
+            print(f"    {_path} {_shas}")
+        print("scope -- manifest scope carrying this run")
+        if not manifests:
+            print("    (none)")
+        for _path, _scope, _deps in manifests:
+            print(f"    {_path} sections [{_scope}] dependents [{_deps}]")
+        print("findings -- ledger rows under this run")
+        if not rows:
+            print("    (none)")
+        for _path, _row in rows:
+            print(f"    {_path} {_row}")
+        print("marker lineage -- full chains carrying this run")
+        if not carrying:
+            print("    (none)")
+        for (_path, _num), _bodies in sorted(carrying.items()):
+            for _i, _b in enumerate(_bodies, 1):
+                _rm2 = RUN_ID_RE.search(_b)
+                _run2 = _rm2.group(1) if _rm2 else "none"
+                _sm2 = SUPERSEDES_RE.search(_b)
+                _edge = f" supersedes {_sm2.group(1)}" if _sm2 else ""
+                if FOLLOWS_OUTAGE_RE.search(_b):
+                    _edge += " follows-outage"
+                print(f"    {_path} §{_num} [{_i}/{len(_bodies)}] run={_run2}{_edge} :: {_one_line(_b, 120)}")
+        print("outage state")
+        _outages = [
+            (_path, _num, _b)
+            for (_path, _num), _bodies in sorted(carrying.items())
+            for _b in _bodies
+            if is_outage_marker(_b)
+        ]
+        if not _outages:
+            print("    clean (no outage markers)")
+        for _path, _num, _b in _outages:
+            print(f"    {_path} §{_num} {_one_line(_b, 160)}")
+        print("verified artifacts -- provenance bound to this run")
+        if not artifacts:
+            print("    (none)")
+        for _path, _cand, _cmd, _exit, _tool, _digest, _ppath in artifacts:
+            print(
+                f"    {_path} candidate {_cand} exit {_exit} digest {_digest} "
+                f"{_one_line(_cmd, 80)} ({_one_line(_tool, 40)}) {_ppath}"
+            )
+        return 0
+
     if what == "frozen":
         for t in todos:
             if not t.frozen:
@@ -1244,6 +2305,1047 @@ def cmd_query(args) -> int:
         print(f"\n{len(present)} present, {len(missing)} missing")
         return 0
 
+    if what in ("plan-health", "summary"):
+        # Governance visibility for the review loop. All dimensions are
+        # mechanical (marker presence, heading scans, ledger rows, graph
+        # edges); nothing here judges prose quality. Text and JSON share
+        # one report dict. `query summary` shares this collection and
+        # renders the operator digest (text-only, like ready/blocked/
+        # stats; machines read --json).
+        by_id = {t.id: t for t in todos if t.id}
+        by_key = {(t.domain, t.number): t for t in todos}
+
+        def _owed(s) -> bool:
+            # One predicate for both dimensions: a stamp owes a plan
+            # review unless the marker rule excuses it.
+            return s.stamped_on is None or s.stamped_on > PLAN_REVIEW_CUTOFF
+
+        # Structural XREF edges: only `-> XREF:` lines count, never bare
+        # §mentions in prose or `filed §N` marker pointers. Filing
+        # pointers are claims about where findings went, not scope the
+        # review covered.
+        out_xref: dict[tuple[str, int], set[tuple[str, int]]] = {}
+        rev_xref: dict[tuple[str, int], set[tuple[str, int]]] = {}
+        starts: dict[str, list[tuple[int, int]]] = {}
+        for t in todos:
+            secs = sorted(t.sections.items())
+            starts[t.path or ""] = [(s.line or 0, num) for num, s in secs]
+        for t in todos:
+            if not t.path:
+                continue
+            try:
+                raw = (TODO_DIR.parent / t.path).read_text(encoding="utf-8").splitlines()
+            except OSError:
+                continue
+            spans = starts.get(t.path, [])
+            for lineno, line in enumerate(raw, start=1):
+                if "-> XREF:" not in line:
+                    continue
+                num = None
+                for sl, sn in spans:
+                    if sl <= lineno:
+                        num = sn
+                    else:
+                        break
+                if num is None or num not in t.sections:
+                    continue
+                # The clause only: trailing `-- prose`, `;`-joined SOURCE
+                # keys, and parentheticals are not edges (a bare §ref in a
+                # SOURCE clause once leaked §14 into §16's scope).
+                clause = line.split("-> XREF:", 1)[1]
+                for sep in (" -- ", ";", " ("):
+                    clause = clause.split(sep, 1)[0]
+                for xm in XREF_RE.finditer(clause):
+                    r = resolve_ref(xm.group(0), t, by_key)
+                    if r and r[0] in by_id and r[1] in by_id[r[0]].sections:
+                        out_xref.setdefault((t.id, num), set()).add(r)
+                        rev_xref.setdefault(r, set()).add((t.id, num))
+
+        marked = {}
+        unmarked = []
+        degraded = []
+        grandfathered = []
+        _ret_lines: dict[str, list[str]] = {}
+        today = datetime.now(timezone.utc).date().isoformat()
+        # Acceptance provenance: the validator checks only files
+        # attached to a post-cutoff (or undated) stamp, first reporter
+        # wins per file, so the query consults exactly that set. An
+        # acceptance in a grandfathered-only file covers nothing: an
+        # unvalidated waiver must fail loud as a persisting escalation,
+        # never silence a gate.
+        validated_files: set[str] = set()
+        for _vt in todos:
+            for _vnum in sorted(_vt.verified_sections):
+                _vs = _vt.sections.get(_vnum)
+                if _vs is None:
+                    continue
+                if (
+                    _vs.stamped_on is not None
+                    and _vs.stamped_on <= PLAN_REVIEW_CUTOFF
+                ):
+                    continue
+                _vm = FINDINGS_RE.search(_vs.review_body or "")
+                if _vm:
+                    validated_files.add(_vm.group(1))
+        acc_cache: dict[str, list] = {}
+        todo_bytes: dict[str, str] = {}
+
+        def todo_text(path: str) -> str:
+            if path not in todo_bytes:
+                try:
+                    todo_bytes[path] = (TODO_DIR.parent / path).read_text(encoding="utf-8")
+                except OSError:
+                    todo_bytes[path] = ""
+            return todo_bytes[path]
+
+        def file_acceptances(path: str) -> list:
+            if path not in acc_cache:
+                if path not in validated_files:
+                    acc_cache[path] = []
+                else:
+                    try:
+                        acc_cache[path] = acceptances_in(
+                            (TODO_DIR.parent / path).read_text(encoding="utf-8")
+                        )
+                    except OSError:
+                        acc_cache[path] = []
+            return acc_cache[path]
+
+        for t in todos:
+            for num in sorted(t.verified_sections):
+                s = t.sections.get(num)
+                if s is None:
+                    continue
+                body = (s.plan_review_body or "").strip()
+                if not _owed(s):
+                    # Unmarked and excused: the coverage hole `0 unmarked`
+                    # hides. Marked grandfathered stamps stay in `marked`;
+                    # retired ones drain out of the list (a dated
+                    # retirement note migrates without asserting a
+                    # review); only the invisible unmigrated set lists
+                    # here.
+                    if not body:
+                        if section_retired(_ret_lines, t, num) is None:
+                            grandfathered.append(
+                                (
+                                    f"{t.path} §{num}",
+                                    s.stamped_on or "undated",
+                                    migration_overdue_today(today),
+                                )
+                            )
+                    else:
+                        marked[(t.id, num)] = s.stamped_on or "undated"
+                    continue
+                if body:
+                    marked[(t.id, num)] = s.stamped_on or "undated"
+                    # Degraded states carry their accountability:
+                    # `outage: <rung> (owner <n>, due <d>)`, `retry-owed
+                    # (owner <n>, due <d>)`, or `partial: <rung>` (one
+                    # rung failed, the other's findings stand). Missing
+                    # fields read as unaccountable; a past due date reads
+                    # as overdue and names its escalation (recipient
+                    # operator, trigger the passed due date, action a
+                    # rerun or recorded risk acceptance, terminal state a
+                    # superseding marker or the acceptance note). A bare
+                    # `partial` is a complete review whose spare failed,
+                    # so missing fields are not unaccountable (the
+                    # validator forbids accountability fields there);
+                    # overdue still reads the due date, which only owed
+                    # states can carry on a clean tree.
+                    state = ""
+                    if "outage:" in body.lower():
+                        state = "outage"
+                    if "retry-owed" in body:
+                        state = f"{state}+retry-owed" if state else "retry-owed"
+                    if re.search(r"\bpartial\s*:", body.lower()):
+                        state = f"{state}+partial" if state else "partial"
+                    if state:
+                        om = OWNER_RE.search(body)
+                        dm = DUE_RE.search(body)
+                        owner = om.group(1) if om else ""
+                        due = dm.group(1) if dm else ""
+                        overdue = bool(due and due < today)
+                        # A live risk acceptance terminates the escalation:
+                        # run targets match the marker's run through the
+                        # -r1 synonym, outage targets match the marker's
+                        # rung plus stamp date (instance key), and finding
+                        # targets never cover markers. Bare partials carry
+                        # no escalation, so nothing consults for them.
+                        ab, ae, ar, at, ao = "", "", "", "", ""
+                        esc_owner = ""
+                        if "outage" in state or "retry-owed" in state:
+                            fm = FINDINGS_RE.search(s.review_body or "")
+                            rm = RUN_ID_RE.search(body)
+                            mrun = normalize_run_id(rm.group(1)) if rm else None
+                            omt = re.search(r"outage:\s*([^\(;]+)", body.lower())
+                            orung = omt.group(1).strip() if omt else None
+                            stamp_day = s.stamped_on or ""
+                            if fm:
+                                accs = file_acceptances(fm.group(1))
+                                supd = superseded_acceptances(accs)
+                                for tgt, appr, own, exp, rec, rvw, evi, sup, rat, kind in accs:
+                                    if (tgt.lower(), rec) in supd:
+                                        continue
+                                    okey = outage_key(tgt) if kind == "outage" else None
+                                    match = (
+                                        kind == "run"
+                                        and mrun is not None
+                                        and normalize_run_id(tgt) == mrun
+                                    ) or (
+                                        kind == "outage"
+                                        and okey is not None
+                                        and orung is not None
+                                        and okey == (orung, stamp_day)
+                                    )
+                                    if not match:
+                                        continue
+                                    # The target predates the record (run
+                                    # date prefix, outage stamp day); a
+                                    # prewritten waiver covers nothing.
+                                    tday = run_day(tgt) if kind == "run" else stamp_day
+                                    if not tday or tday > rec:
+                                        continue
+                                    if not acceptance_live(rec, exp, today):
+                                        # An expired match names the
+                                        # escalation owner instead of
+                                        # covering.
+                                        if not esc_owner:
+                                            esc_owner = own
+                                        continue
+                                    # Stale evidence voids (the TODO file
+                                    # owns run and outage records). A
+                                    # reopen needs no check here: it
+                                    # discards the section from
+                                    # verified_sections, so no acceptance
+                                    # is ever consulted for it and every
+                                    # cover voids by construction.
+                                    if not evidence_fresh(evi, t.path, todo_text(t.path)):
+                                        continue
+                                    ab, ae, ar, at, ao = appr, exp, rvw, rat, own
+                                    break
+                            if ab:
+                                overdue = False
+                        degraded.append(
+                            {
+                                "ref": f"{t.path} §{num}",
+                                "state": state,
+                                "owner": owner,
+                                "due": due,
+                                "overdue": overdue,
+                                "escalation": (
+                                    (
+                                        f"{esc_owner}: renew the acceptance or rerun the review"
+                                        if esc_owner
+                                        else "operator: rerun the review or record risk acceptance"
+                                    )
+                                    if overdue
+                                    else ""
+                                ),
+                                "accepted_by": ab,
+                                "accepted_owner": ao,
+                                "accepted_expires": ae,
+                                "accepted_review": ar,
+                                "accepted_rationale": at,
+                            }
+                        )
+                else:
+                    unmarked.append((f"{t.path} §{num}", s.stamped_on or "undated"))
+        labels = {(t.id, num): f"{t.path} §{num}" for t in todos for num in t.sections}
+        rev = {}
+        for t in todos:
+            for num, s in t.sections.items():
+                for raw in s.depends_on:
+                    r = resolve_ref(raw, t, by_key)
+                    if r and r[0] in by_id:
+                        rev.setdefault((r[0], r[1]), set()).add((t.id, num))
+
+        def _dependents(key) -> set:
+            return review_dependents(key, rev, rev_xref)
+
+        uncoverable = {
+            (t.id, num)
+            for t in todos
+            for num in t.verified_sections
+            if num in t.sections and _owed(t.sections[num])
+        }
+        uncovered = []
+        for key in sorted(marked):
+            for dep in sorted(_dependents(key)):
+                # Stamped, review-owed dependents only: an unstamped section
+                # cannot have had a plan review at all, and a
+                # grandfathered stamp is excused. Either in this list
+                # would be a gap no work can clear.
+                if dep not in marked and dep in uncoverable:
+                    uncovered.append((labels.get(dep, f"{dep[0]} §{dep[1]}"), labels.get(key, f"{key[0]} §{key[1]}")))
+        gpt_heading_re = re.compile(r"^#{2,6}\s+GPT panel\b", re.IGNORECASE | re.MULTILINE)
+        # Planned GPT-early rounds under an Opus sign-off are not
+        # fallback, so the leg mirrors the panel rule's last-wins
+        # instead of matching any GPT heading.
+        opus_heading_re = re.compile(r"^#{2,6}\s+Opus panel\b", re.IGNORECASE | re.MULTILINE)
+        outage_re = re.compile(r"opus outage", re.IGNORECASE)
+        head_re = re.compile(r"^#{1,6}\s+", re.MULTILINE)
+        fallback, outages, criticals, unreadable, stale = [], [], [], [], []
+        majors, legacy = [], []
+        seen = set()
+        owners: dict[str, list] = {}
+        unshaped: set[str] = set()
+        target_texts: dict[str, str] = {}
+        old_line = (datetime.now(timezone.utc).date() - timedelta(days=PLAN_REVIEW_OVERDUE_DAYS)).isoformat()
+        for t in todos:
+            for num in sorted(t.verified_sections):
+                s = t.sections.get(num)
+                if s is None:
+                    continue
+                m = FINDINGS_RE.search(s.review_body or "")
+                if not m:
+                    continue
+                owners.setdefault(m.group(1), []).append((t, num))
+                if m.group(1) in seen:
+                    continue
+                seen.add(m.group(1))
+                try:
+                    text = (TODO_DIR.parent / m.group(1)).read_text(encoding="utf-8")
+                except OSError:
+                    continue
+                # Raw bytes stay for the evidence leg: the owning record
+                # compares byte-for-byte against the evidence commit,
+                # never stripped (a fence edit is a material change too).
+                raw_text = text
+                # Same stripper as the panel rule: a fenced worked
+                # example must neither count as fallback usage nor as a
+                # live critical. An unbalanced fence truncates the scan
+                # at the opener, so the file is reported, never silently
+                # half-read: the panel rule FATALs this only for
+                # post-cutoff stamps, and grandfathered files have no
+                # other diagnostic.
+                text, unbalanced_opener = strip_fenced_code(text)
+                if unbalanced_opener is not None:
+                    unreadable.append((m.group(1), unbalanced_opener))
+                gpt_heads = list(gpt_heading_re.finditer(text))
+                opus_heads = list(opus_heading_re.finditer(text))
+                last_is_gpt = bool(gpt_heads) and (
+                    not opus_heads or gpt_heads[-1].start() > opus_heads[-1].start()
+                )
+                if last_is_gpt:
+                    fallback.append(m.group(1))
+                if outage_re.search(text):
+                    outages.append(m.group(1))
+                for h in PLAN_REVIEW_HEADING_RE.finditer(text):
+                    sec = text[h.end():]
+                    nxt = head_re.search(sec)
+                    if nxt:
+                        sec = sec[:nxt.start()]
+                    mm = MANIFEST_RE.search(sec)
+                    block, _problem = ledger_block(sec)
+                    if mm:
+                        scope = set()
+                        for grp in (mm.group(1), mm.group(2)):
+                            for xm in XREF_RE.finditer(grp):
+                                r = resolve_ref(xm.group(0), t, by_key)
+                                if r and r[0] in by_id:
+                                    scope.add(r)
+                        current = {(t.id, num)}
+                        for raw in (s.depends_on or []):
+                            r = resolve_ref(raw, t, by_key)
+                            if r and r[0] in by_id:
+                                current.add(r)
+                        current |= out_xref.get((t.id, num), set())
+                        current |= _dependents((t.id, num))
+                        new = current - scope
+                        # Growth and removals both flag: a review that
+                        # covered removed scope reviewed work that no
+                        # longer exists there, which is stale, not
+                        # generous. The manifest's run rides along;
+                        # records predating runs report "".
+                        gone = scope - current
+                        if new or gone:
+                            stale.append(
+                                (
+                                    m.group(1),
+                                    mm.group(4) or "",
+                                    sorted(labels.get(k, f"{k[0]} §{k[1]}") for k in new),
+                                    sorted(labels.get(k, f"{k[0]} §{k[1]}") for k in gone),
+                                )
+                            )
+                    else:
+                        unshaped.add(m.group(1))
+                    if block is None:
+                        unshaped.add(m.group(1))
+                        continue
+                    # A superseded row reads as amended, not current: the
+                    # chain head governs both dimensions, so superseded
+                    # rows skip before severity sorts them.
+                    skipped = superseded_ids(block)
+                    for lr in LEDGER_ROW_RE.finditer(block):
+                        if lr.group(1).lower() in skipped:
+                            continue
+                        sev = lr.group(2).lower()
+                        disp = lr.group(3).lower()
+                        rest = block[lr.end():].split("\n", 1)[0]
+                        om = OWNER_RE.search(rest)
+                        dm = DUE_RE.search(rest)
+                        owner = om.group(1) if om else ""
+                        # A deferred row's review date IS its due date
+                        # under the deferred vocabulary
+                        # (owner/date/trigger), so the query reports it
+                        # as `due` rather than flagging a
+                        # validator-legal row UNACCOUNTABLE: accepted
+                        # rows must spell `due`, deferred rows satisfy
+                        # it through `date`.
+                        if dm:
+                            due = dm.group(1)
+                        elif disp == "deferred":
+                            dd = re.search(r"\d{4}-\d{2}-\d{2}", rest)
+                            due = dd.group(0) if dd else ""
+                        else:
+                            due = ""
+                        # A live acceptance for this row terminates its
+                        # escalation; file-scoped, so bare PRn targets
+                        # are unambiguous here. The match folds case
+                        # like the duplicate-ID rule (the target
+                        # pattern admits lowercase, so an exact compare
+                        # would validate a waiver that never covers);
+                        # padded variants stay distinct IDs per that
+                        # same rule, and a padded target dangles loud
+                        # as a persisting escalation.
+                        ab, ae, ar, at, ao = "", "", "", "", ""
+                        esc_owner = ""
+                        _accs = file_acceptances(m.group(1))
+                        _supd = superseded_acceptances(_accs)
+                        for tgt, appr, own, exp, rec, rvw, evi, sup, rat, kind in _accs:
+                            if (tgt.lower(), rec) in _supd:
+                                continue
+                            if not (kind == "finding" and tgt.lower() == lr.group(1).lower()):
+                                continue
+                            # The row exists (this loop holds it) and the
+                            # review predates the record (marker run day,
+                            # stamp day when run-less); a prewritten
+                            # waiver covers nothing.
+                            _rm = RUN_ID_RE.search(s.plan_review_body or "")
+                            _tday = run_day(_rm.group(1)) if _rm else (s.stamped_on or "")
+                            if not _tday or _tday > rec:
+                                continue
+                            if not acceptance_live(rec, exp, today):
+                                # An expired match names the escalation
+                                # owner instead of covering.
+                                if not esc_owner:
+                                    esc_owner = own
+                                continue
+                            # Stale evidence voids (the findings file owns
+                            # finding records). Reopen voids by
+                            # construction, never reaching this loop; no
+                            # check here.
+                            if not evidence_fresh(evi, m.group(1), raw_text):
+                                continue
+                            ab, ae, ar, at, ao = appr, exp, rvw, rat, own
+                            break
+                        if sev == "major" and disp in ("accepted", "deferred"):
+                            # Open majors age visibly (deferred majors
+                            # count too, or triaging down a level hides
+                            # them from the dimension that exists to
+                            # watch them). Known wrong plan behavior must
+                            # not sit invisible. Overdue is an old review
+                            # OR a blown row due date (the accountability
+                            # date must fire, not just sit printed);
+                            # missing owner or due surfaces; the
+                            # validator requires both on new rows, the
+                            # query reports the gap everywhere.
+                            since = s.stamped_on or ""
+                            row_overdue = bool(not since or since < old_line) or bool(
+                                due and due < today
+                            )
+                            if ab:
+                                row_overdue = False
+                            majors.append(
+                                (
+                                    m.group(1),
+                                    lr.group(1),
+                                    since or "undated",
+                                    owner,
+                                    due,
+                                    row_overdue,
+                                    (
+                                        (
+                                            f"{esc_owner}: renew the acceptance or remediate the finding"
+                                            if esc_owner
+                                            else "operator: remediate the finding or record risk acceptance"
+                                        )
+                                        if row_overdue
+                                        else ""
+                                    ),
+                                    ab,
+                                    ao,
+                                    ae,
+                                    ar,
+                                    at,
+                                )
+                            )
+                            continue
+                        if sev != "critical":
+                            continue
+                        if disp in ("accepted", "deferred"):
+                            crow_overdue = bool(due and due < today)
+                            if ab:
+                                crow_overdue = False
+                            criticals.append(
+                                (
+                                    m.group(1),
+                                    lr.group(1),
+                                    owner,
+                                    due,
+                                    crow_overdue,
+                                    (
+                                        (
+                                            f"{esc_owner}: renew the acceptance or remediate the finding"
+                                            if esc_owner
+                                            else "operator: remediate the finding or record risk acceptance"
+                                        )
+                                        if crow_overdue
+                                        else ""
+                                    ),
+                                    ab,
+                                    ao,
+                                    ae,
+                                    ar,
+                                    at,
+                                )
+                            )
+                        elif disp == "filed":
+                            # A filed row clears only when every named
+                            # target carries a post-finding verified
+                            # remediation: resolved, stamped strictly after
+                            # this review (a stamp predating the finding
+                            # proves no remediation; day granularity fails
+                            # closed), with the finding ID in the target's
+                            # file (word-bounded so PR1 never matches
+                            # inside PR10), and with a `fix <sha>` naming a
+                            # non-merge commit that touched the target file
+                            # and whose tree contains the ID (fix-commit
+                            # attribution bound to the target's post-finding
+                            # stamp). Ranges name `fix <base>..<tip>`
+                            # instead: the tip tree carries the ID, the tip
+                            # descends from the base, and a non-merge
+                            # commit inside the range touched the file
+                            # (base excluded, so name the pre-loop tip,
+                            # never the first fix commit). Ordering reads
+                            # Duration ends when both reviews carry them
+                            # (same-day fixes order by completion
+                            # instant); without both ends the day-stamp
+                            # rule applies and same-day fails closed. The
+                            # fix committer timestamp must postdate the
+                            # review completion, with the same day
+                            # fallback. And the target names `proof
+                            # <finding-id> <path>[::<test>]` resolving at
+                            # the fix tip tree. Stated boundary: bytes
+                            # prove attribution plus a named proof
+                            # pointer, not remediation: the semantic proof
+                            # that the test exercises the finding's
+                            # acceptance condition is the target's own
+                            # review and stamp. A sha whose tree lacks the
+                            # ID, that never touched the file, that git
+                            # cannot prove, that predates the review, or
+                            # whose proof names nothing resolving fails
+                            # closed, as do unresolvable, unverified,
+                            # pre-dated, unlinked, and unnamed targets.
+                            # And the review's recorded candidate must be
+                            # an ancestor of the fix (causal history, not
+                            # wall clocks alone): records predating the
+                            # provenance mandate carry no candidate and
+                            # skip the leg.
+                            refs = [xm.group(0) for xm in XREF_RE.finditer(rest)]
+                            provable = bool(refs)
+                            reviewer_day = s.stamped_on or "\uffff"  # undated reviewer fails closed
+                            rend = s.duration_end
+                            rts = (
+                                int(
+                                    datetime.strptime(rend, "%Y-%m-%dT%H:%M:%SZ")
+                                    .replace(tzinfo=timezone.utc)
+                                    .timestamp()
+                                )
+                                if rend is not None
+                                else None
+                            )
+                            for ref in refs:
+                                r = resolve_ref(ref, t, by_key)
+                                if not r or r[0] not in by_id or r[1] not in by_id[r[0]].sections:
+                                    provable = False
+                                    break
+                                tgt = by_id[r[0]].sections[r[1]]
+                                if r[1] not in by_id[r[0]].verified_sections:
+                                    provable = False
+                                    break
+                                if not review_ordered(
+                                    tgt.duration_end,
+                                    rend,
+                                    tgt.stamped_on,
+                                    reviewer_day,
+                                ):
+                                    provable = False
+                                    break
+                                tpath = by_id[r[0]].path
+                                if tpath not in target_texts:
+                                    try:
+                                        target_texts[tpath] = (TODO_DIR.parent / tpath).read_text(
+                                            encoding="utf-8"
+                                        )
+                                    except OSError:
+                                        target_texts[tpath] = ""
+                                if not re.search(
+                                    r"\b" + re.escape(lr.group(1)) + r"\b",
+                                    target_texts[tpath],
+                                ):
+                                    provable = False
+                                    break
+                                spans = sorted(starts.get(tpath, []))
+                                tgt_start = tgt.line or 1
+                                tgt_end = next(
+                                    (ln for ln, _sn in spans if ln > tgt_start),
+                                    len(target_texts[tpath].splitlines()) + 1,
+                                )
+                                tgt_text = "\n".join(
+                                    target_texts[tpath].splitlines()[tgt_start - 1:tgt_end - 1]
+                                )
+                                fm = FIX_COMMIT_RE.search(tgt_text)
+                                if fm is None:
+                                    provable = False
+                                    break
+                                base, tip = fm.group(1), fm.group(2) or fm.group(1)
+                                fixed = git_file_at(tip, tpath)
+                                if fixed is None or not re.search(
+                                    r"\b" + re.escape(lr.group(1)) + r"\b", fixed
+                                ):
+                                    provable = False
+                                    break
+                                if fm.group(2) is not None:
+                                    if not git_is_ancestor(base, tip):
+                                        provable = False
+                                        break
+                                    if not git_range_touches(base, tip, tpath):
+                                        provable = False
+                                        break
+                                elif not git_commit_touches(tip, tpath):
+                                    provable = False
+                                    break
+                                fix_ts = git_commit_ts(tip)
+                                if not fix_postdates_review(fix_ts, rts, reviewer_day):
+                                    provable = False
+                                    break
+                                proof_ok = False
+                                for pm in PROOF_RE.finditer(tgt_text):
+                                    if pm.group(1).lower() != lr.group(1).lower():
+                                        continue
+                                    ppath, _, pname = pm.group(2).partition("::")
+                                    pbytes = git_file_at(tip, ppath)
+                                    if pbytes is None:
+                                        continue
+                                    if pname and not re.search(
+                                        r"\b" + re.escape(pname) + r"\b", pbytes
+                                    ):
+                                        continue
+                                    proof_ok = True
+                                    break
+                                if not proof_ok:
+                                    provable = False
+                                    break
+                                cands = []
+                                for pln in text.splitlines():
+                                    pcm = PROVENANCE_RE.match(pln)
+                                    if pcm is not None:
+                                        cands.append(pcm.group(1))
+                                if cands and not any(
+                                    git_is_ancestor(c, tip) for c in cands
+                                ):
+                                    provable = False
+                                    break
+                            if not provable:
+                                crow_overdue = bool(due and due < today)
+                                if ab:
+                                    crow_overdue = False
+                                criticals.append(
+                                    (
+                                        m.group(1),
+                                        lr.group(1),
+                                        owner,
+                                        due,
+                                        crow_overdue,
+                                        (
+                                            (
+                                                f"{esc_owner}: renew the acceptance or remediate the finding"
+                                                if esc_owner
+                                                else "operator: remediate the finding or record risk acceptance"
+                                            )
+                                            if crow_overdue
+                                            else ""
+                                        ),
+                                        ab,
+                                        ao,
+                                        ae,
+                                        ar,
+                                        at,
+                                    )
+                                )
+        for path in sorted(unshaped):
+            # Legacy records: a Plan review section without a Manifest or
+            # without a Ledger block, in a file whose every reviewing
+            # stamp predates enforcement. Post-cutoff shapeliness is the
+            # validator's FATAL; only the grandfathered set lists here.
+            own = owners.get(path, [])
+            if own and all(not _owed(ot.sections[onum]) for ot, onum in own if onum in ot.sections):
+                legacy.append(path)
+        # Acceptance review states: live, un-superseded acceptances whose
+        # review date is near (due: within 7 days before) or past
+        # (overdue). History never lists (a superseded record's review
+        # rode its successor), and lapsed records never list either
+        # (expiry escalates on the covered dimension). Overdue clears
+        # only through a superseding record whose rationale is the
+        # review outcome.
+        reviews = []
+        due_line = (datetime.now(timezone.utc).date() + timedelta(days=7)).isoformat()
+        for path in sorted(seen):
+            _paccs = file_acceptances(path)
+            _psupd = superseded_acceptances(_paccs)
+            for tgt, _appr, own, exp, rec, rvw, _evi, _sup, _rat, _kind in _paccs:
+                if (tgt.lower(), rec) in _psupd:
+                    continue
+                if not acceptance_live(rec, exp, today):
+                    continue
+                if rvw < rec or rvw > exp:
+                    # A review date outside its own record-expiry
+                    # window is validator-malformed and names no
+                    # coherent obligation; the FATAL is the signal,
+                    # not this list.
+                    continue
+                if rvw < today:
+                    _rstate = "review-overdue"
+                elif rvw <= due_line:
+                    _rstate = "review-due"
+                else:
+                    continue
+                reviews.append(
+                    (
+                        path,
+                        tgt,
+                        rvw,
+                        _rstate,
+                        own,
+                        (
+                            f"{own}: record the review outcome in a superseding acceptance"
+                            if _rstate == "review-overdue"
+                            else ""
+                        ),
+                    )
+                )
+        # Total sort keys: the tuple of every scalar field, so no two
+        # entries tie and text and JSON share one order each.
+        degraded_sorted = sorted(
+            degraded,
+            key=lambda d: (
+                d["ref"],
+                d["state"],
+                d["owner"],
+                d["due"],
+                d["overdue"],
+                d["escalation"],
+                d["accepted_by"],
+                d["accepted_owner"],
+                d["accepted_expires"],
+                d["accepted_review"],
+                d["accepted_rationale"],
+            ),
+        )
+        majors_sorted = sorted(
+            majors, key=lambda m: (m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11])
+        )
+        criticals_sorted = sorted(
+            criticals, key=lambda c: (c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8], c[9], c[10])
+        )
+        stale_sorted = sorted(stale, key=lambda e: (e[0], e[1]))
+        uncovered_sorted = sorted(uncovered)
+        unmarked_sorted = sorted(unmarked)
+        grandfathered_sorted = sorted(grandfathered)
+        fallback_sorted = sorted(fallback)
+        outages_sorted = sorted(outages)
+        legacy_sorted = sorted(legacy)
+        unreadable_sorted = sorted(unreadable)
+        reviews_sorted = sorted(reviews)
+        report = {
+            "schema": PLAN_HEALTH_SCHEMA,
+            "reviewed": {
+                "marked": len(marked),
+                "unmarked": [{"ref": label, "stamped": day} for label, day in unmarked_sorted],
+            },
+            "uncovered": [
+                {"dependent": dep, "waits_on": on} for dep, on in uncovered_sorted
+            ],
+            "degraded": degraded_sorted,
+            "stale": [
+                {"file": f, "run": run, "unreviewed": new, "removed": gone}
+                for f, run, new, gone in stale_sorted
+            ],
+            "fallback": fallback_sorted,
+            "outages": outages_sorted,
+            "criticals": [
+                {
+                    "id": pr,
+                    "file": f,
+                    "owner": own,
+                    "due": due,
+                    "overdue": od,
+                    "escalation": esc,
+                    "accepted_by": ab,
+                    "accepted_owner": ao,
+                    "accepted_expires": ae,
+                    "accepted_review": ar,
+                    "accepted_rationale": at,
+                }
+                for f, pr, own, due, od, esc, ab, ao, ae, ar, at in criticals_sorted
+            ],
+            "majors": [
+                {
+                    "id": pr,
+                    "file": f,
+                    "since": day,
+                    "overdue": od,
+                    "owner": own,
+                    "due": due,
+                    "escalation": esc,
+                    "accepted_by": ab,
+                    "accepted_owner": ao,
+                    "accepted_expires": ae,
+                    "accepted_review": ar,
+                    "accepted_rationale": at,
+                }
+                for f, pr, day, own, due, od, esc, ab, ao, ae, ar, at in majors_sorted
+            ],
+            "grandfathered": [
+                {"ref": label, "stamped": day, "overdue": od}
+                for label, day, od in grandfathered_sorted
+            ],
+            "legacy": legacy_sorted,
+            "unreadable": [{"file": f, "opener": opener} for f, opener in unreadable_sorted],
+            "reviews": [
+                {"file": f, "target": tgt, "review": rvw, "state": st, "owner": own, "escalation": esc}
+                for f, tgt, rvw, st, own, esc in reviews_sorted
+            ],
+        }
+        # Gate mode: `--fail-on` names dimensions whose non-emptiness
+        # fails the run; `--check` is the recommended set (everything
+        # actionable except the informational, excused, and chronic
+        # sets: fallback, outages, grandfathered, legacy, and stale,
+        # which stays gateable explicitly but never passes by default
+        # on a growing tree, so a gate that included it would never be
+        # green).
+        gate_dims = []
+        check_mode = getattr(args, "check", False) or what == "summary"
+        if check_mode:
+            gate_dims += ["unmarked", "uncovered", "degraded", "criticals", "majors", "unreadable", "reviews"]
+            # Deadline gate: past the migration deadline, leftover
+            # grandfathered batches join `--check`. Explicit `--fail-on
+            # grandfathered` gates progress on any date; the default
+            # set stays green while time remains.
+            if any(e["overdue"] for e in report["grandfathered"]):
+                gate_dims += ["grandfathered"]
+        if getattr(args, "fail_on", None):
+            # Union, not elif: an explicit --fail-on beside --check adds
+            # dimensions (a CI gate written `--check --fail-on stale` must
+            # gate stale, not silently drop it). Order-stable dedup keeps
+            # the verdict line clean.
+            gate_dims += [d.strip() for d in args.fail_on.split(",") if d.strip()]
+        gate_dims = list(dict.fromkeys(gate_dims))
+        dim_lists = {
+            "unmarked": report["reviewed"]["unmarked"],
+            "uncovered": report["uncovered"],
+            "degraded": report["degraded"],
+            "stale": report["stale"],
+            "fallback": report["fallback"],
+            "outages": report["outages"],
+            "criticals": report["criticals"],
+            "majors": report["majors"],
+            "grandfathered": report["grandfathered"],
+            "legacy": report["legacy"],
+            "unreadable": report["unreadable"],
+            "reviews": report["reviews"],
+        }
+        unknown = [d for d in gate_dims if d not in dim_lists]
+        if unknown:
+            print(f"plan-health: unknown dimension(s): {', '.join(unknown)}", file=sys.stderr)
+            return 2
+        # Explicit dims gate strict (non-emptiness); check-set dims gate
+        # lenient (actionables only). Union dims go strict: an explicit
+        # flag beside --check means zero tolerance for that dimension.
+        explicit = (
+            {d.strip() for d in args.fail_on.split(",") if d.strip()}
+            if getattr(args, "fail_on", None)
+            else set()
+        )
+        failing = [d for d in gate_dims if dim_failing(d, dim_lists[d], strict=(d in explicit))]
+        if getattr(args, "json", False):
+            print(json.dumps(report, indent=2))
+            return 1 if failing else 0
+        if what == "summary":
+            # Operator digest: incomplete runs are owed states without
+            # a live acceptance (bare partials are complete, covered
+            # escalations terminated); blocked clearances are uncovered
+            # criticals; overdue owners group every overdue escalation;
+            # next names the first uncovered entry of the first failing
+            # dimension in gate order.
+            incomplete = [
+                d
+                for d in degraded_sorted
+                if ("outage" in d["state"] or "retry-owed" in d["state"])
+                and not d["accepted_by"]
+            ]
+            blocked = [c for c in criticals_sorted if not c[6]]
+            od_by_owner: dict[str, list[str]] = {}
+            for d in degraded_sorted:
+                if d["overdue"]:
+                    od_by_owner.setdefault(d["owner"] or "?", []).append(d["due"])
+            for _f, _pr, own, due, od, _esc, _ab, _ao, _ae, _ar, _at in criticals_sorted:
+                if od:
+                    od_by_owner.setdefault(own or "?", []).append(due)
+            for _f, _pr, _day, own, due, od, _esc, _ab, _ao, _ae, _ar, _at in majors_sorted:
+                if od:
+                    od_by_owner.setdefault(own or "?", []).append(due)
+            print(f"incomplete runs     {len(incomplete)}")
+            for d in incomplete:
+                print(
+                    f"    {d['ref']}  {d['state']}  owner {d['owner'] or '?'}  due {d['due'] or '?'}"
+                    + ("  OVERDUE" if d["overdue"] else "")
+                )
+            print(f"blocked clearances  {len(blocked)}")
+            for f, pr, own, due, od, _esc, _ab, _ao, _ae, _ar, _at in blocked:
+                print(
+                    f"    {pr}  in {f}  owner {own or '?'}  due {due or '?'}"
+                    + ("  OVERDUE" if od else "")
+                )
+            print(f"overdue owners      {len(od_by_owner)}")
+            for own in sorted(od_by_owner):
+                dues = sorted(x for x in od_by_owner[own] if x)
+                oldest = f" (oldest due {dues[0]})" if dues else ""
+                print(f"    {own}: {len(od_by_owner[own])} overdue{oldest}")
+            nxt = "nothing actionable"
+            if failing:
+                dim = failing[0]
+                pool = dim_lists[dim]
+                if dim == "degraded":
+                    pool = [
+                        e
+                        for e in pool
+                        if ("outage" in e["state"] or "retry-owed" in e["state"])
+                        and not e.get("accepted_by")
+                    ]
+                elif dim in ("criticals", "majors"):
+                    pool = [e for e in pool if not e.get("accepted_by")]
+                # Strict dims fail on presence, so an empty actionable
+                # pool falls back to the first entry as named.
+                first = pool[0] if pool else dim_lists[dim][0]
+                if dim == "degraded":
+                    nxt = f"{first['ref']} {first['state']} (owner {first['owner'] or '?'}, due {first['due'] or '?'})"
+                elif dim in ("criticals", "majors"):
+                    nxt = f"{first['id']} in {first['file']} (owner {first['owner'] or '?'}, due {first['due'] or '?'})"
+                elif dim == "reviews":
+                    nxt = f"{first['target']} in {first['file']} ({first['state']}, owner {first['owner'] or '?'})"
+                elif dim == "uncovered":
+                    nxt = f"{first['dependent']} waits on {first['waits_on']}"
+                elif dim == "unreadable":
+                    nxt = f"{first['file']} (fence opened at line {first['opener']})"
+                elif dim == "stale":
+                    nxt = f"{first['file']} ({len(first['unreviewed'])} unreviewed, {len(first['removed'])} removed)"
+                elif isinstance(first, str):
+                    nxt = f"{first} ({dim})"
+                else:
+                    nxt = first.get("ref", dim)
+            print(f"next: {nxt}")
+            print(f"gate: {'FAIL (' + ', '.join(failing) + ')' if failing else 'ok'}")
+            return 1 if failing else 0
+        print(f"reviewed sections   {len(marked)} marked, {len(unmarked_sorted)} unmarked post-cutoff")
+        for label, day in unmarked_sorted:
+            print(f"    {label}  stamped {day}")
+        print(f"uncovered dependents  {len(uncovered_sorted)}")
+        for dep, on in uncovered_sorted:
+            print(f"    {dep}  waits on marked {on}")
+        print(f"degraded reviews    {len(degraded_sorted)} degraded markers")
+        for d in degraded_sorted:
+            tags = f"owner {d['owner'] or '?'}  due {d['due'] or '?'}"
+            if d["overdue"]:
+                tags += f"  OVERDUE  escalate {d['escalation'].split(':', 1)[0] if d['escalation'] else 'operator'}"
+            if d["accepted_by"]:
+                tags += (
+                    f"  accepted by {d['accepted_by']} owner {d['accepted_owner']}"
+                    f" expires {d['accepted_expires']}"
+                    f" review {d['accepted_review']} rationale {d['accepted_rationale']}"
+                )
+            # UNACCOUNTABLE pairs with the owed predicate at collection:
+            # a bare partial carries no fields because none are owed.
+            if (not d["owner"] or not d["due"]) and (
+                "outage" in d["state"] or "retry-owed" in d["state"]
+            ):
+                tags += "  UNACCOUNTABLE"
+            print(f"    {d['ref']}  {d['state']}  {tags}")
+        print(f"stale scope         {len(stale_sorted)} reviews whose scope changed since")
+        for f, run, new, gone in stale_sorted:
+            bits = []
+            if run:
+                bits.append(f"run {run}")
+            if new:
+                bits.append(f"unreviewed: {', '.join(new)}")
+            if gone:
+                bits.append(f"removed: {', '.join(gone)}")
+            print(f"    {f}  {'; '.join(bits)}")
+        print(f"fallback usage      {len(fallback_sorted)} findings with a GPT-last panel")
+        for f in fallback_sorted:
+            print(f"    {f}")
+        print(f"outages             {len(outages_sorted)} findings with an Opus outage note")
+        for f in outages_sorted:
+            print(f"    {f}")
+        print(f"unresolved critical {len(criticals_sorted)}")
+        for f, pr, own, due, od, esc, ab, ao, ae, ar, at in criticals_sorted:
+            acct = f"owner {own or '?'}  due {due or '?'}"
+            if od:
+                acct += f"  OVERDUE  escalate {esc.split(':', 1)[0] if esc else 'operator'}"
+            if ab:
+                acct += f"  accepted by {ab} owner {ao} expires {ae} review {ar} rationale {at}"
+            if not own or not due:
+                acct += "  UNACCOUNTABLE"
+            print(f"    {pr}  in {f}  {acct}")
+        print(
+            f"open majors         {len(majors_sorted)} "
+            f"({sum(1 for m in majors_sorted if m[5])} overdue)"
+        )
+        for f, pr, day, own, due, od, esc, ab, ao, ae, ar, at in majors_sorted:
+            acct = f"owner {own or '?'}  due {due or '?'}"
+            if od:
+                acct += f"  OVERDUE  escalate {esc.split(':', 1)[0] if esc else 'operator'}"
+            if ab:
+                acct += f"  accepted by {ab} owner {ao} expires {ae} review {ar} rationale {at}"
+            if not own or not due:
+                acct += "  UNACCOUNTABLE"
+            print(f"    {pr}  in {f}  since {day}  {acct}")
+        print(
+            f"grandfathered stamps {len(grandfathered_sorted)} (pre-cutoff, excused, unmarked; migrate by {MIGRATION_DEADLINE})"
+        )
+        batch_left: dict[str, int] = {}
+        for label, _day, _od in grandfathered_sorted:
+            bf = label.rsplit(" §", 1)[0]
+            batch_left[bf] = batch_left.get(bf, 0) + 1
+        for bf in sorted(batch_left):
+            print(f"    batch {bf}  {batch_left[bf]} left")
+        for label, day, od in grandfathered_sorted:
+            print(f"    {label}  stamped {day}" + ("  OVERDUE" if od else ""))
+        print(f"legacy records      {len(legacy_sorted)} (grandfathered, Plan review without Manifest or Ledger block)")
+        for f in legacy_sorted:
+            print(f"    {f}")
+        print(f"unreadable findings {len(unreadable_sorted)} (unbalanced fence; scans truncated)")
+        for f, opener in unreadable_sorted:
+            print(f"    {f}  fence opened at line {opener}")
+        print(f"acceptance reviews  {len(reviews_sorted)} acceptances due or overdue for review")
+        for f, tgt, rvw, st, own, _esc in reviews_sorted:
+            print(f"    {tgt}  in {f}  review {rvw}  {st}  owner {own or '?'}")
+        if gate_dims:
+            print(f"gate: {'FAIL (' + ', '.join(failing) + ')' if failing else 'ok'}")
+            return 1 if failing else 0
+        return 0
+
     rows = []
     for t in todos:
         for num, s in sorted(t.sections.items()):
@@ -1257,11 +3359,32 @@ def cmd_query(args) -> int:
             rows.append((t, num, s, missing))
 
     if what == "ready":
+        explicit = getattr(args, "context", None)
+        ctx = set(explicit) if explicit is not None else detect_context()
+        ctx_note = ", ".join(sorted(ctx)) if ctx else "none"
         ready = [r for r in rows if not r[3]]
-        for t, num, s, _ in sorted(ready, key=lambda r: (r[0].domain, r[0].number, r[2].order or 0)):
+        ranked = sorted(ready, key=lambda r: (r[0].domain, r[0].number, r[2].order or 0))
+        now = []
+        elsewhere = []
+        for r in ranked:
+            s = r[2]
+            # Unknown values never clear: `validate` refuses the mark, and no
+            # declared context can name them (`--context` choices are closed).
+            missing = [v for v in s.requires if v not in ctx]
+            missing += [f"unknown:{v}" for v in s.requires_unknown]
+            if s.requires_has_line and not s.requires and not s.requires_unknown:
+                missing.append("no values (see validate)")
+            (elsewhere if missing else now).append((r, missing))
+        for (t, num, s, _), _missing in now:
             flag = " 🔒" if t.frozen else ""
             print(f"{t.domain}/{Path(t.path).name} §{num}{flag}  {s.deliverable}")
-        print(f"\n{len(ready)} section(s) ready")
+        if elsewhere:
+            print(f"\nrunnable elsewhere (context: {ctx_note}):")
+            for (t, num, s, _), missing in elsewhere:
+                flag = " 🔒" if t.frozen else ""
+                reqs = ", ".join(s.requires + [f"unknown:{v}" for v in s.requires_unknown]) or s.requires_raw
+                print(f"{t.domain}/{Path(t.path).name} §{num}{flag}  {s.deliverable}  requires {reqs} (missing: {', '.join(missing)})")
+        print(f"\n{len(now)} runnable now, {len(elsewhere)} runnable elsewhere")
     else:  # blocked
         blocked = [r for r in rows if r[3]]
         for t, num, s, missing in sorted(blocked, key=lambda r: (r[0].domain, r[0].number, r[1])):
@@ -1379,6 +3502,36 @@ def needs_for_ref(raw: str, todos: list[Todo]) -> list[str]:
     return list(section.needs)
 
 
+def requires_missing_for_ref(raw: str, todos: list[Todo]) -> list[str]:
+    """Closed-list `requires` values unmet by the local context; [] for no marker, an unknown ref, or everything met.
+
+    Same reference forms as `resolve`. The operator snapshot holds a row
+    with unmet requirements out of `first_ready`, the way `query ready`
+    holds it out of runnable-now.
+    """
+    by_prefix = {(t.domain.split("-")[0], t.number): t for t in todos}
+    m = re.search(r"D(?P<dom>\d{2})\s+T(?P<todo>\d{2})\s+§(?P<sec>\d+)", raw.strip())
+    if m:
+        target = by_prefix.get((m.group("dom"), m.group("todo")))
+        sec = int(m.group("sec"))
+    else:
+        m2 = re.search(r"§(?P<sec>\d+)", raw)
+        if not m2:
+            return []
+        sec = int(m2.group("sec"))
+        frag = raw[: m2.start()].strip().strip("`|").strip()
+        hits = [t for t in todos if frag and frag in t.path]
+        target = hits[0] if len(hits) == 1 else None
+    if target is None or sec not in target.sections:
+        return []
+    section = target.sections[sec]
+    if section.requires_unknown or (section.requires_has_line and not section.requires):
+        # Never read as runnable: `validate` refuses the value.
+        return [f"unknown:{v}" for v in section.requires_unknown] or ["unknown:no-values"]
+    have = detect_context()
+    return [v for v in section.requires if v not in have]
+
+
 def cmd_needs(args: argparse.Namespace) -> int:
     """The `**Needs:**` keys of many refs in one graph load. JSON {ref: [keys]}."""
     refs = [r.strip() for r in args.refs if str(r).strip()]
@@ -1489,6 +3642,15 @@ def cmd_resolve(args: argparse.Namespace) -> int:
     if s.needs_raw:
         keys = ', '.join(s.needs) if s.needs else 'UNKNOWN -- not in the closed list'
         print(f"needs      {keys} ({s.needs_raw}); confirm the host or device is available before writing Started:")
+    if s.requires_has_line:
+        if s.requires_unknown or not s.requires:
+            bad = f"unknown value(s): {', '.join(s.requires_unknown)}" if s.requires_unknown else "no values"
+            print(f"requires   {s.requires_raw}; INVALID -- {bad} (see validate)")
+        else:
+            have = detect_context()
+            missing = [v for v in s.requires if v not in have]
+            verdict = "runnable here" if not missing else f"missing here: {', '.join(missing)}"
+            print(f"requires   {s.requires_raw}; {verdict}")
     if unmet:
         print(f"UNMET      {', '.join(unmet)}")
     print()
@@ -2284,7 +4446,7 @@ def _campaign_snapshot(todos: list[Todo]) -> dict:
     first_blocked: dict | None = None
     for phase_n, heading, refs in _open_plan_phases(PLAN.read_text(encoding="utf-8")):
         codes = {ref: resolve_exit_code(ref, todos) for ref in refs}
-        ready = [ref for ref in refs if codes[ref] == 0]
+        ready = [ref for ref in refs if codes[ref] == 0 and not requires_missing_for_ref(ref, todos)]
         broken = [ref for ref in refs if codes[ref] not in (0, 3, 4)]
         if ready or broken:
             payload["phase"] = heading
@@ -2813,6 +4975,91 @@ frozen: true
 **Freeze check:** fixture
 """
 
+SELF_TEST_TODO_C = """---
+schema_version: 1
+id: self-test-gamma
+domain: 90-selftest
+status: active
+title: "TODO-03 -- Self-test gamma"
+track: Z1
+---
+
+# TODO-03 -- Self-test gamma
+
+> **Goal:** Fixture. Requires-mark shapes for the environment gate.
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Unknown value | -- |  [ ]   |
+|   2   |   §2    | Missing reason | -- |  [ ]   |
+|   3   |   §3    | Empty values | -- |  [ ]   |
+|   4   |   §4    | Valid mark | -- |  [ ]   |
+|   5   |   §5    | Shipped unmarked | -- |  [x]   |
+|   6   |   §6    | Two lines, last wins | -- |  [ ]   |
+
+---
+
+## 1. Unknown value
+
+**Requires:** printerz -- because testing
+
+- [ ] Do the thing
+- [ ] Commit: `"selftest: gamma"`
+
+**Test checkpoint:** `true`
+
+## 2. Missing reason
+
+**Requires:** display-session
+
+- [ ] Do the thing
+- [ ] Commit: `"selftest: gamma"`
+
+**Test checkpoint:** `true`
+
+## 3. Empty values
+
+**Requires:** ,
+
+- [ ] Do the thing
+- [ ] Commit: `"selftest: gamma"`
+
+**Test checkpoint:** `true`
+
+## 4. Valid mark
+
+**Requires:** display-session -- fixture reason, with comma (and parens)
+
+- [ ] Do the thing
+- [ ] Commit: `"selftest: gamma"`
+
+**Test checkpoint:** `true`
+
+## 5. Shipped unmarked
+
+- [x] Did the thing
+- [x] Commit: `"selftest: gamma"`
+
+**Test checkpoint:** `true`
+
+> **Verified:** 2026-01-01 | §5 | fixture shipped unmarked
+> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` approve
+> **CRUD:** applicable | fixture
+
+## 6. Two lines, last wins
+
+**Requires:** printerz -- first line loses
+
+**Requires:** display-session -- second wins
+
+- [ ] Do the thing
+- [ ] Commit: `"selftest: gamma"`
+
+**Test checkpoint:** `true`
+"""
+
 SELF_TEST_PLAN = """# Implementation plan
 
 ### Phase 0 -- Fixture phase
@@ -2956,11 +5203,192 @@ def cmd_self_test(_args) -> int:
             needs_for_ref("| [ ] | `D90 T01 §2` | Open thing | 2 |", todos),
             ["windows-host"],
         )
+
+        # --- the Requires marker ---------------------------------------------
+        import io as _bio
+        import contextlib as _bctx
+        check("a section with no Requires line parses empty",
+              (ta.sections[3].requires_has_line, ta.sections[3].requires,
+               ta.sections[3].requires_unknown, ta.sections[3].requires_reason),
+              (False, [], [], ""))
+        gamma = root / "todo" / "90-selftest" / "TODO-03-self-test-gamma.md"
+        gamma.write_text(SELF_TEST_TODO_C, encoding="utf-8")
+        try:
+            todos2 = load_todos()
+            g = next(t for t in todos2 if t.number == "03")
+            check("a valid mark parses values plus reason",
+                  (g.sections[4].requires, g.sections[4].requires_reason),
+                  (["display-session"], "fixture reason, with comma (and parens)"))
+            check("a second Requires line wins fully",
+                  (g.sections[6].requires, g.sections[6].requires_unknown,
+                   g.sections[6].requires_reason),
+                  (["display-session"], [], "second wins"))
+            check("an unknown value parses into requires_unknown",
+                  (g.sections[1].requires, g.sections[1].requires_unknown),
+                  ([], ["printerz"]))
+            check("a mark without its separator parses reason-empty",
+                  (g.sections[2].requires, g.sections[2].requires_reason),
+                  (["display-session"], ""))
+            check("a mark with no values parses empty",
+                  (g.sections[3].requires, g.sections[3].requires_unknown,
+                   g.sections[3].requires_reason),
+                  ([], [], ""))
+            vbuf = _bio.StringIO()
+            with _bctx.redirect_stdout(vbuf), _bctx.redirect_stderr(_bio.StringIO()):
+                cmd_validate(None)
+            rfatal = [ln for ln in vbuf.getvalue().splitlines()
+                      if ln.startswith("FATAL") and "Requires" in ln]
+            check("an unknown Requires value is FATAL (requires-unknown)",
+                  any("§1" in ln and "not in the closed list" in ln for ln in rfatal), True)
+            check("a Requires mark without its reason is FATAL (requires-no-reason)",
+                  any("§2" in ln and "with no reason" in ln for ln in rfatal), True)
+            check("a Requires mark with no values is FATAL (requires-unknown)",
+                  any("§3" in ln and "no values" in ln for ln in rfatal), True)
+            check("a mark with no values and no reason draws both FATALs",
+                  sum(1 for ln in rfatal if "§3" in ln), 2)
+            check("a valid mark draws no Requires FATAL",
+                  any("§4" in ln for ln in rfatal), False)
+            check("a shipped section without a mark draws no Requires FATAL",
+                  any("§5" in ln for ln in rfatal), False)
+            check("a valid last line draws no Requires FATAL",
+                  any("§6" in ln for ln in rfatal), False)
+            check("display-session holds on Windows with SESSIONNAME",
+                  detect_context(platform="win32", environ={"SESSIONNAME": "Console"}),
+                  {"display-session"})
+            check("display-session fails on Windows without a session",
+                  detect_context(platform="win32", environ={"SESSIONNAME": "  "}),
+                  set())
+            check("display-session fails when SESSIONNAME is missing",
+                  detect_context(platform="win32", environ={}),
+                  set())
+            check("display-session fails off Windows",
+                  detect_context(platform="linux", environ={}),
+                  set())
+            check("display-session fails in session 0 (Services)",
+                  detect_context(platform="win32", environ={"SESSIONNAME": "Services"}),
+                  set())
+
+            def ready_lines(**kw):
+                buf = _bio.StringIO()
+                with _bctx.redirect_stdout(buf):
+                    code = cmd_query(argparse.Namespace(what="ready", all=False, **kw))
+                return code, buf.getvalue().splitlines()
+
+            code, lines = ready_lines(context=["display-session"])
+            check("an explicit display context lists the marked row runnable",
+                  (code, any("§4" in ln and "requires" not in ln for ln in lines)), (0, True))
+            code, lines = ready_lines(context=[])
+            check("an empty context parks the marked row with its requirement named",
+                  (code, any("requires display-session (missing: display-session)" in ln and "§4" in ln for ln in lines)), (0, True))
+            code, lines = ready_lines(context=["display-session"])
+            check("an unknown value parks even in a display context",
+                  (code, any("unknown:printerz" in ln and "§1" in ln for ln in lines)), (0, True))
+            check("a mark with no values parks even in a display context",
+                  (code, any("no values (see validate)" in ln and "§3" in ln for ln in lines)), (0, True))
+            code, lines = ready_lines()
+            check("query ready without a context flag still exits 0",
+                  code, 0)
+            check("the split summary names both counts",
+                  any("runnable now" in ln and "runnable elsewhere" in ln for ln in lines), True)
+        finally:
+            gamma.unlink()
         check("§2 has a Commit item", ta.sections[2].has_commit_item, True)
         check("beta §1 has a Freeze check", tb.sections[1].has_freeze_check, True)
         check("every body section has a row", all(s.has_row for s in ta.sections.values()), True)
         check("every row has a body", all(s.has_body for s in ta.sections.values()), True)
         check("§1 duration parsed", ta.sections[1].duration_minutes, 7)
+        check("§1 duration end absent", ta.sections[1].duration_end, None)
+        check("§2 duration fully absent", (ta.sections[2].duration_end, ta.sections[2].duration_minutes), (None, None))
+        dur = root / "todo" / "90-selftest" / "TODO-06-duration.md"
+        dur.write_text(
+            """---
+schema_version: 1
+id: self-test-duration
+domain: 90-selftest
+status: active
+title: "TODO-06 -- duration"
+track: Z1
+---
+
+# TODO-06 -- duration
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Minutes then range | - |  [x]   |
+|   2   |   §2    | Range then minutes | - |  [x]   |
+|   3   |   §3    | Bad range | - |  [x]   |
+|   4   |   §4    | Inverted range | - |  [x]   |
+|   5   |   §5    | Range then unshaped | - |  [x]   |
+
+## 1. Minutes then range
+
+- [x] Commit: `"selftest: duration"`
+
+> **Verified:** 2026-01-01 | §1 | fixture
+> **Duration:** 7
+> **Duration:** 2026-01-01T10:00:00Z to 2026-01-01T10:07:00Z
+
+## 2. Range then minutes
+
+- [x] Commit: `"selftest: duration"`
+
+> **Verified:** 2026-01-01 | §2 | fixture
+> **Duration:** 2026-01-01T10:00:00Z to 2026-01-01T10:07:00Z
+> **Duration:** 9
+
+## 3. Bad range
+
+- [x] Commit: `"selftest: duration"`
+
+> **Verified:** 2026-01-01 | §3 | fixture
+> **Duration:** 2026-09-31T10:00:00Z to 2026-09-31T10:07:00Z
+
+## 4. Inverted range
+
+- [x] Commit: `"selftest: duration"`
+
+> **Verified:** 2026-01-01 | §4 | fixture
+> **Duration:** 2026-01-01T10:07:00Z to 2026-01-01T10:00:00Z
+
+## 5. Range then unshaped
+
+- [x] Commit: `"selftest: duration"`
+
+> **Verified:** 2026-01-01 | §5 | fixture
+> **Duration:** 2026-01-01T10:00:00Z to 2026-01-01T10:07:00Z
+> **Duration:** unclear
+""",
+            encoding="utf-8",
+        )
+        dd = parse_todo(dur)
+        check(
+            "stacked Duration resolves last-wins",
+            (
+                dd.sections[1].duration_end,
+                dd.sections[1].duration_minutes,
+                dd.sections[2].duration_end,
+                dd.sections[2].duration_minutes,
+            ),
+            ("2026-01-01T10:07:00Z", 7, None, 9),
+        )
+        check(
+            "calendar-invalid Duration fails soft",
+            (dd.sections[3].duration_end, dd.sections[3].duration_minutes),
+            (None, None),
+        )
+        check(
+            "inverted Duration fails soft",
+            (dd.sections[4].duration_end, dd.sections[4].duration_minutes),
+            (None, None),
+        )
+        check(
+            "unshaped Duration clears a prior range",
+            (dd.sections[5].duration_end, dd.sections[5].duration_minutes),
+            (None, None),
+        )
+        dur.unlink()
         check("§1 is in verified_sections", 1 in ta.verified_sections, True)
         check("alpha carries one deferral", len(ta.deferred), 1)
         check("the deferral names its owner", ta.deferred[0].ref, "D90 T02 §1")
@@ -4383,6 +6811,545 @@ An oversized section: the clean single-WARN shape (over-30-items).
             False,
         )
 
+        # --- review-record units ------------------------------------------------
+        check(
+            "run-id shape rejects -r0 and -r01, accepts -r1",
+            (
+                RUN_ID_SHAPE_RE.match("20260920-D90-T07-S4-gpt-r0") is None
+                and RUN_ID_SHAPE_RE.match("20260920-D90-T07-S4-gpt-r01") is None
+                and RUN_ID_SHAPE_RE.match("20260920-D90-T07-S4-gpt-r1") is not None
+            ),
+            True,
+        )
+        check(
+            "normalize reads -r1 as the base, keeps family r1",
+            (
+                normalize_run_id("20260920-D90-T07-S4-gpt-r1") == "20260920-D90-T07-S4-gpt"
+                and normalize_run_id("20260920-D90-T07-S4-r1") == "20260920-D90-T07-S4-r1"
+            ),
+            True,
+        )
+        check(
+            "risk targets classify by shape",
+            (
+                risk_target_kind("D90-T07-S4-PR1")
+                == risk_target_kind("PR1")
+                == "finding"
+                and risk_target_kind("20260920-D90-T07-S4-gpt-r2") == "run"
+                and risk_target_kind("outage both rungs 2026-09-19") == "outage"
+                and risk_target_kind("outage both rungs") is None
+                and risk_target_kind("outage both rungs 2026-13-99") is None
+                and outage_key("outage both rungs 2026-09-19") == ("both rungs", "2026-09-19")
+                and outage_key("outage both rungs") is None
+                and risk_target_kind("tomorrow") is None
+            ),
+            True,
+        )
+        check(
+            "gate fails owed uncovered entries, passes the rest",
+            (
+                dim_failing("degraded", [{"state": "retry-owed", "accepted_by": ""}])
+                and not dim_failing("degraded", [{"state": "retry-owed", "accepted_by": "bob"}])
+                and not dim_failing("degraded", [{"state": "partial", "accepted_by": ""}])
+                and dim_failing("criticals", [{"accepted_by": ""}])
+                and not dim_failing("majors", [{"accepted_by": "bob"}])
+                and dim_failing("stale", [{"file": "x"}])
+                and not dim_failing("stale", [])
+                and dim_failing("degraded", [{"state": "partial", "accepted_by": ""}], strict=True)
+                and dim_failing("criticals", [{"accepted_by": "bob"}], strict=True)
+            ),
+            True,
+        )
+        check(
+            "acceptance covers only between record and expiry",
+            (
+                acceptance_live("2026-09-01", "2099-01-01", "2026-09-18")
+                and acceptance_live("2026-09-18", "2026-09-18", "2026-09-18")
+                and not acceptance_live("2020-01-05", "2020-06-01", "2026-09-18")
+                and not acceptance_live("2099-01-01", "2099-12-31", "2026-09-18")
+            ),
+            True,
+        )
+        check(
+            "clearance ordering fails closed on ties, inversions, and dateless days",
+            (
+                review_ordered(
+                    "2026-09-18T15:00:00Z",
+                    "2026-09-18T12:00:00Z",
+                    "2026-09-18",
+                    "2026-09-18",
+                )
+                and not review_ordered(
+                    "2026-09-18T12:00:00Z",
+                    "2026-09-18T12:00:00Z",
+                    "2026-09-18",
+                    "2026-09-18",
+                )
+                and not review_ordered(
+                    "2026-09-18T11:00:00Z",
+                    "2026-09-18T12:00:00Z",
+                    "2026-09-18",
+                    "2026-09-18",
+                )
+                and review_ordered(None, None, "2026-09-19", "2026-09-18")
+                and not review_ordered(None, None, "2026-09-18", "2026-09-18")
+                and not review_ordered(
+                    "2026-09-18T15:00:00Z", None, "2026-09-18", "2026-09-18"
+                )
+                and fix_postdates_review(1001, 1000, "2026-09-18")
+                and not fix_postdates_review(1000, 1000, "2026-09-18")
+                and not fix_postdates_review(999, 1000, "2026-09-18")
+                and not fix_postdates_review(None, 1000, "2026-09-18")
+                and fix_postdates_review(
+                    int(
+                        datetime(2026, 9, 19, tzinfo=timezone.utc).timestamp()
+                    ),
+                    None,
+                    "2026-09-18",
+                )
+                and not fix_postdates_review(
+                    int(
+                        datetime(2026, 9, 18, tzinfo=timezone.utc).timestamp()
+                    ),
+                    None,
+                    "2026-09-18",
+                )
+            ),
+            True,
+        )
+        check("run day reads the date prefix", run_day("20260920-D90-T08-S2-sol"), "2026-09-20")
+        check("run day fails closed off-shape", run_day("not-a-run"), "")
+        check("migration is not overdue before the deadline", migration_overdue_today("2026-09-19"), False)
+        check("migration is overdue past the deadline", migration_overdue_today("2027-01-01"), True)
+        check(
+            "outage markers parse, prose mentions do not",
+            (
+                is_outage_marker("opus (run 20260920-D90-T08-S2-opus) outage: opus rung (owner zed, due 2099-01-01)")
+                and not is_outage_marker("sol (run 20260920-D90-T08-S2-sol) filed D90 T08 §9")
+            ),
+            True,
+        )
+        check(
+            "fences strip, unbalanced openers report",
+            (
+                strip_fenced_code("keep\n```\nhide\n```\nkeep2\n"),
+                strip_fenced_code("keep\n```\nnever closed\n"),
+            ),
+            (("keep\nkeep2", None), ("keep", 2)),
+        )
+        check("finding namespaces split bare from namespaced", (finding_namespace("PR4"), finding_namespace("D90-T08-S2-PR4")), ("", "d90-t08-s2-"))
+        _sup_block = "- [D90-T08-S2-PR9] [major] followup -> accepted supersedes D90-T08-S2-PR8\n- [D90-T08-S2-PR8] [major] original -> accepted\n"
+        check("supersession resolves heads", (ledger_supersedes(_sup_block), superseded_ids(_sup_block)), ({"d90-t08-s2-pr9": "D90-T08-S2-PR8"}, {"d90-t08-s2-pr8"}))
+        check("ledger block defects report", ledger_block("no block here"), (None, "without a Ledger: block"))
+
+        # --- run / plan-health / summary queries --------------------------------
+        import io as _qio
+        import contextlib as _qctx
+        import json as _qjson
+
+        def _qrun(ns):
+            buf = _qio.StringIO()
+            with _qctx.redirect_stdout(buf), _qctx.redirect_stderr(_qio.StringIO()):
+                code = cmd_query(ns)
+            return code, buf.getvalue()
+
+        # The severity ratchet test above removed 90-selftest; rebuild it.
+        (root / "todo" / "90-selftest").mkdir(parents=True, exist_ok=True)
+        rev_todo = root / "todo" / "90-selftest" / "TODO-08-review.md"
+        rev_todo.write_text(
+            """---
+schema_version: 1
+id: self-test-review
+domain: 90-selftest
+status: active
+title: "TODO-08 -- Self-test review records"
+track: Z1
+---
+
+# TODO-08 -- Self-test review records
+
+> **Goal:** Fixture. Plan-review markers, ledgers, and runs for the queries.
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Grandfathered stamp | -- |  [x]   |
+|   2   |   §2    | Marked review | -- |  [x]   |
+|   3   |   §3    | Unmarked review | -- |  [x]   |
+|   4   |   §4    | Degraded review | -- |  [x]   |
+
+---
+
+## 1. Grandfathered stamp
+
+- [x] Did the thing
+- [x] Commit: `"selftest: review"`
+
+**Test checkpoint:** `true`
+
+> **Verified:** 2026-01-01 | §1 | fixture
+> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` approve
+> **CRUD:** applicable | fixture
+
+## 2. Marked review
+
+- [x] Did the thing
+- [x] Commit: `"selftest: review"`
+
+**Test checkpoint:** `true`
+
+> **Verified:** 2026-09-20 | §2 | fixture
+> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` approve. Raw findings: docs/selftest-review.md
+> **Plan review:** sol (run 20260920-D90-T08-S2-sol)
+> **CRUD:** applicable | fixture
+
+## 3. Unmarked review
+
+-> XREF: D90 T08 §2
+
+- [x] Did the thing
+- [x] Commit: `"selftest: review"`
+
+**Test checkpoint:** `true`
+
+> **Verified:** 2026-09-20 | §3 | fixture
+> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` approve
+> **CRUD:** applicable | fixture
+
+## 4. Degraded review
+
+- [x] Did the thing
+- [x] Commit: `"selftest: review"`
+
+**Test checkpoint:** `true`
+
+> **Verified:** 2026-09-20 | §4 | fixture
+> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` approve. Raw findings: docs/selftest-fallback.md
+> **Plan review:** sol (run 20260920-D90-T08-S4-sol) retry-owed (owner zed, due 2099-12-31)
+> **CRUD:** applicable | fixture
+""",
+            encoding="utf-8",
+        )
+        (root / "docs").mkdir(exist_ok=True)
+        (root / "docs" / "selftest-review.md").write_text(
+            """# Review: fixture
+
+## Opus panel
+
+- `adversarial` approve
+- `consistency` approve
+- `integration` approve
+- `record` approve
+
+## Plan review
+
+Manifest: sections [D90 T08 §2]; dependents [none]; bytes 128; run 20260920-D90-T08-S2-sol
+
+Ledger:
+- [D90-T08-S2-PR1] [critical] bad thing -> accepted (owner alice, due 2099-01-01)
+- [D90-T08-S2-PR2] [major] old thing -> accepted (owner bob, due 2026-01-01)
+- [D90-T08-S2-PR3] [minor] polish -> accepted
+- [D90-T08-S2-PR4] [critical] filed thing -> filed D90 T08 §9
+End of ledger
+
+Provenance: candidate abc1234; command true; exit 0; tool fixture 1; digest deadbeef; path docs/selftest-review.md; run 20260920-D90-T08-S2-sol
+""",
+            encoding="utf-8",
+        )
+        (root / "docs" / "selftest-fallback.md").write_text(
+            """# Review: fixture fallback
+
+## Opus panel
+
+- `adversarial` approve
+- `consistency` approve
+- `integration` approve
+- `record` approve
+
+## GPT panel
+
+- `adversarial` approve
+- `consistency` approve
+- `integration` approve
+- `record` approve
+
+Opus outage: sign-off rung unreachable, failed over to Sol.
+""",
+            encoding="utf-8",
+        )
+        try:
+            code, out = _qrun(argparse.Namespace(what="run", target="20260920-D90-T08-S2-sol"))
+            check("query run exits 0 on a recorded run", code, 0)
+            check("query run prints marker lineage", "marker lineage" in out and "TODO-08-review.md §2" in out, True)
+            check("query run prints ledger rows", "D90-T08-S2-PR1" in out and "D90-T08-S2-PR4" in out, True)
+            check("query run prints provenance artifacts", "digest deadbeef" in out, True)
+            check("query run prints manifest scope", "sections [D90 T08 §2]" in out, True)
+            code, _o = _qrun(argparse.Namespace(what="run", target="20260920-D90-T08-S2-sol-r1"))
+            check("query run reads through the -r1 synonym", code, 0)
+            code, out = _qrun(argparse.Namespace(what="run", target="20260920-D90-T08-S9-gpt"))
+            check("query run exits 1 on an unknown run", (code, "unknown run" in out), (1, True))
+            code, _o = _qrun(argparse.Namespace(what="run", target=""))
+            check("query run exits 2 with no target", code, 2)
+
+            code, out = _qrun(argparse.Namespace(what="plan-health"))
+            check("plan-health exits 0 as a reading", code, 0)
+            check("plan-health lists the grandfathered stamp", "TODO-08-review.md §1" in out and "grandfathered stamps 1 " in out, True)
+            check("plan-health lists the unmarked review", "TODO-08-review.md §3" in out, True)
+            check("plan-health lists the degraded marker", "retry-owed" in out and "TODO-08-review.md §4" in out, True)
+            check("plan-health lists the uncovered dependent", "waits on marked" in out and "TODO-08-review.md §3" in out, True)
+            check("plan-health lists the open critical", "D90-T08-S2-PR1" in out, True)
+            check("plan-health lists the overdue major", "D90-T08-S2-PR2" in out, True)
+            check("plan-health skips the minor", "D90-T08-S2-PR3" in out, False)
+            check("plan-health lists the fallback file", "docs/selftest-fallback.md" in out, True)
+            check("plan-health flags stale scope", "stale scope         1 " in out, True)
+            code, out = _qrun(argparse.Namespace(what="plan-health", check=True))
+            check("plan-health --check fails on actionables", (code, "gate: FAIL" in out), (1, True))
+            code, _o = _qrun(argparse.Namespace(what="plan-health", fail_on="bogus"))
+            check("plan-health --fail-on bogus exits 2", code, 2)
+            code, _o = _qrun(argparse.Namespace(what="plan-health", fail_on="stale"))
+            check("plan-health --fail-on stale fails on presence", code, 1)
+            code, out = _qrun(argparse.Namespace(what="plan-health", json=True))
+            rep = _qjson.loads(out)
+            check("plan-health --json carries the schema", rep["schema"], "plan-health/4")
+            check("plan-health --json grandfathered count", len(rep["grandfathered"]), 1)
+            check("plan-health --json unmarked count", len(rep["reviewed"]["unmarked"]), 1)
+
+            code, out = _qrun(argparse.Namespace(what="summary"))
+            check("summary exits 1 while actionables stand", code, 1)
+            check("summary names the first failing dimension entry", "TODO-08-review.md §3" in out, True)
+            check("summary counts the unaccepted retry-owed run", "incomplete runs     1" in out, True)
+        finally:
+            rev_todo.unlink()
+            (root / "docs" / "selftest-review.md").unlink()
+            (root / "docs" / "selftest-fallback.md").unlink()
+        clean = root / "clean"
+        (clean / "todo" / "90-clean").mkdir(parents=True)
+        (clean / "todo" / "90-clean" / "TODO-01-clean.md").write_text(
+            "---\nschema_version: 1\nid: clean\ndomain: 90-clean\nstatus: active\n"
+            'title: "TODO-01 -- Clean"\ntrack: Z9\n---\n\n# TODO-01 -- Clean\n\n'
+            "> **Goal:** Fixture: one grandfathered stamp, nothing actionable.\n\n"
+            "## Implementation Order\n\n"
+            "| Order | Section | Deliverable | Depends On | Status |\n"
+            "| :---: | :-----: | ----------- | ---------- | :----: |\n"
+            "|   1   |   §1    | Old work | -- |  [x]   |\n\n---\n\n## 1. Old work\n\n"
+            "- [x] Did the thing\n- [x] Commit: `\"selftest: clean\"`\n\n"
+            "**Test checkpoint:** `true`\n\n> **Verified:** 2026-09-01 | §1 | fixture\n",
+            encoding="utf-8",
+        )
+        saved_tree = TODO_DIR
+        TODO_DIR = clean / "todo"
+        try:
+            code, _o = _qrun(argparse.Namespace(what="plan-health", check=True))
+            check("plan-health --check passes on a clean tree", code, 0)
+            code, out = _qrun(argparse.Namespace(what="summary"))
+            check("summary exits 0 on a clean tree", code, 0)
+            check(
+                "summary on a clean tree names nothing actionable",
+                ("incomplete runs     0" in out and "next: nothing actionable" in out),
+                True,
+            )
+        finally:
+            TODO_DIR = saved_tree
+
+        # --- validator rules 16-25 --------------------------------------------
+        # One fixture TODO plus one findings file per section: each rule fires
+        # on its own section while the clean records (§1 Opus, §13 GPT
+        # fallback) stay silent. Presence-asserted per section, never
+        # buffer-counted: the fixture tree carries known unrelated findings
+        # (the deliberately missing 90-selftest INDEX).
+        PANEL4 = (
+            "## Opus panel\n\n"
+            "- `adversarial` approve\n- `consistency` approve\n"
+            "- `integration` approve\n- `record` approve\n"
+        )
+        PANEL3 = (
+            "## Opus panel\n\n"
+            "- `adversarial` approve\n- `consistency` approve\n- `integration` approve\n"
+        )
+
+        def _prov(run: str, path: str) -> str:
+            return (
+                f"Provenance: candidate abc1234; command true; exit 0; tool fixture 1; "
+                f"digest deadbeef; path {path}; run {run}\n"
+            )
+
+        def _record(fid: str, run: str, ledger_rows: str) -> str:
+            return (
+                f"## Plan review\n\nManifest: sections [D90 T09 {fid}]; dependents [none]; "
+                f"bytes 64; run {run}\n\nLedger:\n{ledger_rows}End of ledger\n"
+            )
+
+        R1 = "20260920-D90-T09-S1-sol"
+        R2 = "20260920-D90-T09-S2-sol"
+        R4 = "20260920-D90-T09-S4-sol"
+        R5 = "20260920-D90-T09-S5-sol"
+        R6 = "20260920-D90-T09-S6-sol"
+        R7 = "20260920-D90-T09-S7-sol"
+        R9 = "20260920-D90-T09-S9-sol"
+        R11 = "20260920-D90-T09-S11-sol"
+        R12 = "20260920-D90-T09-S12-sol"
+        R13 = "20260920-D90-T09-S13-sol"
+        R14 = "20260920-D90-T09-S14-sol"
+        findings_09 = {
+            "docs/selftest-r01.md": (
+                PANEL4 + _record("§1", R1, "- [D90-T09-S1-PR1] [critical] bad -> accepted (owner al, due 2099-01-01)\n")
+                + _prov(R1, "docs/selftest-r01.md")
+            ),
+            "docs/selftest-r02.md": PANEL3 + _prov(R2, "docs/selftest-r02.md"),
+            "docs/selftest-r03.md": PANEL4 + _prov("20260920-D90-T09-S3-sol", "docs/selftest-r03.md"),
+            "docs/selftest-r04.md": PANEL4 + _prov(R4, "docs/selftest-r04.md"),
+            "docs/selftest-r05.md": (
+                PANEL4
+                + _record("§5", R5, "- [D90-T09-S5-PR1] [major] thing -> accepted (owner al, due 2099-01-01)\nthis is not a row\n")
+                + _prov(R5, "docs/selftest-r05.md")
+            ),
+            "docs/selftest-r06.md": (
+                PANEL4
+                + _record(
+                    "§6",
+                    R6,
+                    "- [D90-T09-S6-PR1] [major] one -> accepted (owner al, due 2099-01-01)\n"
+                    "- [D90-T09-S6-PR1] [major] two -> accepted (owner al, due 2099-01-01)\n",
+                )
+                + _prov(R6, "docs/selftest-r06.md")
+            ),
+            "docs/selftest-r07.md": (
+                PANEL4
+                + _record("§7", R7, "- [D90-T09-S7-PR7] [critical] filed thing -> filed D90 T09 §1\n")
+                + _prov(R7, "docs/selftest-r07.md")
+            ),
+            "docs/selftest-r08.md": PANEL4,
+            "docs/selftest-r09.md": (
+                PANEL4
+                + _record("§9", R9, "- [D90-T09-S9-PR1] [critical] thing -> accepted (owner al, due 2099-01-01)\n")
+                + _prov(R9, "docs/selftest-r09.md")
+            ),
+            "docs/selftest-r10.md": PANEL4,
+            "docs/selftest-r11.md": PANEL4 + "Risk accepted: garbage line\n" + _prov("20260920-D90-T09-S11-sol", "docs/selftest-r11.md"),
+            "docs/selftest-r12.md": (
+                PANEL4
+                + _record(
+                    "§12",
+                    R12,
+                    "- [D90-T09-S12-PR1] [major] thing -> accepted (owner al, due 2099-01-01) supersedes D90-T09-S12-PR99\n",
+                )
+                + _prov(R12, "docs/selftest-r12.md")
+            ),
+            "docs/selftest-r13.md": (
+                "## GPT panel\n\n"
+                "- `adversarial` approve\n- `consistency` approve\n"
+                "- `integration` approve\n- `record` approve\n\n"
+                "Opus outage: sign-off rung unreachable, failed over to Sol.\n"
+                + _prov("20260920-D90-T09-S13-sol", "docs/selftest-r13.md")
+            ),
+            "docs/selftest-r14.md": (
+                _prov("20260920-D90-T09-S14-sol", "docs/selftest-r14.md")
+                + PANEL4 + "```\nnever closed\n"
+            ),
+        }
+        COMMITTED_R09 = (
+            "# Review: committed\n\n## Plan review\n\n"
+            "Manifest: sections [D90 T09 §9]; dependents [none]; bytes 64; run " + R9 + "\n\n"
+            "Ledger:\n- [D90-T09-S9-PR1] [critical] thing -> filed D90 T09 §1\nEnd of ledger\n"
+        )
+
+        def _sec09(num: int, findings: str, marker: str | None, extra: str = "") -> str:
+            stamp = (
+                f"\n## {num}. Rule probe {num}\n\n- [x] Did the thing\n"
+                f'- [x] Commit: `"selftest: rules"`\n\n**Test checkpoint:** `true`\n\n'
+                f"> **Verified:** 2026-09-20 | §{num} | fixture\n"
+                f"> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` approve. Raw findings: {findings}\n"
+            )
+            if marker is not None:
+                stamp += f"> **Plan review:** {marker}\n"
+            stamp += "> **CRUD:** applicable | fixture\n" + extra
+            return stamp
+
+        rules_todo = root / "todo" / "90-selftest" / "TODO-09-rules.md"
+        (root / "todo" / "90-selftest").mkdir(parents=True, exist_ok=True)
+        _rows09 = "\n".join(
+            f"|   {n}   |   §{n}    | Rule probe {n} | -- |  [x]   |" for n in range(1, 15)
+        )
+        rules_todo.write_text(
+            "---\nschema_version: 1\nid: self-test-rules\ndomain: 90-selftest\nstatus: active\n"
+            'title: "TODO-09 -- Self-test validator rules"\ntrack: Z1\n---\n\n'
+            "# TODO-09 -- Self-test validator rules\n\n> **Goal:** Fixture. One firing section per review rule.\n\n"
+            "## Implementation Order\n\n| Order | Section | Deliverable | Depends On | Status |\n"
+            "| :---: | :-----: | ----------- | ---------- | :----: |\n" + _rows09 + "\n\n---\n"
+            + _sec09(1, "docs/selftest-r01.md", f"sol (run {R1})")
+            + _sec09(2, "docs/selftest-r02.md", f"sol (run {R2}) no findings")
+            + _sec09(3, "docs/selftest-r03.md", None)
+            + _sec09(4, "docs/selftest-r04.md", f"sol (run {R4}) no findings filed D90 T09 §1")
+            + _sec09(5, "docs/selftest-r05.md", f"sol (run {R5})")
+            + _sec09(6, "docs/selftest-r06.md", f"sol (run {R6})")
+            + _sec09(7, "docs/selftest-r07.md", f"sol (run {R7}) filed D90 T09 §1")
+            + _sec09(
+                8,
+                "docs/selftest-r08.md",
+                "sol no findings",
+                extra="> **Reopened:** 2026-09-20 | D90 T09 §8 | voided by late finding\n",
+            )
+            + _sec09(9, "docs/selftest-r09.md", f"sol (run {R9})")
+            + _sec09(10, "docs/selftest-r10.md", "sol no findings")
+            + _sec09(11, "docs/selftest-r11.md", f"sol (run {R11}) no findings")
+            + _sec09(12, "docs/selftest-r12.md", f"sol (run {R12})")
+            + _sec09(13, "docs/selftest-r13.md", f"sol (run {R13}) no findings")
+            + _sec09(14, "docs/selftest-r14.md", f"sol (run {R14}) no findings"),
+            encoding="utf-8",
+        )
+        for _rp, _rt in findings_09.items():
+            (root / _rp).write_text(_rt, encoding="utf-8")
+        _real_resolves = git_resolves
+        _real_file_at = git_file_at
+        globals()["git_resolves"] = lambda _sha: True
+
+        def _canned_file_at(_ref: str, _path: str):
+            if _ref == "HEAD" and _path == "docs/selftest-r09.md":
+                return COMMITTED_R09
+            return None
+
+        globals()["git_file_at"] = _canned_file_at
+        try:
+            vbuf = _bio.StringIO()
+            with _bctx.redirect_stdout(vbuf):
+                vcode = cmd_validate(argparse.Namespace())
+            vout = vbuf.getvalue()
+            check("validator rules fire fatals on the probe tree", vcode, 1)
+            check("rule 16 fires on a missing lens", ("§2 " in vout and "lacks verdicts for: record" in vout), True)
+            check("rule 16 fires on an unbalanced fence", ("§14 " in vout and "unbalanced fence" in vout), True)
+            check("rule 17 fires on a missing marker", ("§3 " in vout and "carries no `Plan review:`" in vout), True)
+            check("rule 17 fires on nofindings-plus-filings", ("§4 " in vout and "both `no findings` and filings" in vout), True)
+            check("rule 18 fires on a non-row ledger line", ("§5 " in vout and "malformed ledger row" in vout), True)
+            check("rule 20 fires on a duplicate ID", ("§6 " in vout and "duplicate finding ID" in vout), True)
+            check("rule 19 fires on a missing back-link", ("§7 " in vout and "no back-link" in vout), True)
+            check("rule 21 fires on a still-checked reopen", ("§8 " in vout and "reopened but still [x]" in vout), True)
+            check("rule 22 fires on a terminal rewrite", ("§9 " in vout and "moved filed -> accepted" in vout), True)
+            check("rule 23 fires on missing provenance", ("§10 " in vout and "no Provenance: line" in vout), True)
+            check("rule 24 fires on a malformed acceptance", ("§11 " in vout and "malformed Risk accepted line" in vout), True)
+            check("rule 25 fires on an orphaned supersedes", ("§12 " in vout and "names no row of its block" in vout), True)
+            # Silence is subject-exact (this file, `: §N `) outside advisory
+            # lines: other rules legitimately NAME these sections (rule 19
+            # names its target), other fixtures have their own §1, and
+            # advisories summarize the file.
+            _nonadv = [ln for ln in vout.splitlines() if "adjacency advisory" not in ln]
+            check(
+                "the clean Opus record stays silent",
+                not any(re.search(r"TODO-09-rules\.md:\d+: §1 ", ln) for ln in _nonadv),
+                True,
+            )
+            check(
+                "the clean GPT fallback stays silent",
+                not any(re.search(r"TODO-09-rules\.md:\d+: §13 ", ln) for ln in _nonadv),
+                True,
+            )
+        finally:
+            globals()["git_resolves"] = _real_resolves
+            globals()["git_file_at"] = _real_file_at
+            rules_todo.unlink()
+            for _rp in findings_09:
+                (root / _rp).unlink()
+
     finally:
         TODO_DIR, PLAN = saved_todo_dir, saved_plan
         tmp.cleanup()
@@ -4418,14 +7385,24 @@ def main() -> int:
     q = sub.add_parser("query", help="ask the graph a question")
     q.add_argument(
         "what",
-        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency", "calibration", "sequence"],
+        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency", "calibration", "sequence", "plan-health", "summary", "run"],
     )
+    q.add_argument("target", nargs="?", help="run: run ID to inspect")
     q.add_argument("--all", action="store_true", help="findings: include ones already done")
     q.add_argument("--file", help="adjacency: exact repository-relative TODO path")
     q.add_argument("--at", help="adjacency: inspect an isolated historical commit")
-    q.add_argument("--json", action="store_true", help="adjacency: machine-readable report")
+    q.add_argument("--json", action="store_true", help="adjacency, plan-health: machine-readable report")
+    q.add_argument("--check", action="store_true", help="plan-health: exit 1 on actionable entries (covered escalations and bare partials pass; --fail-on gates presence)")
+    q.add_argument("--fail-on", metavar="DIMS", help="plan-health: comma-separated dimensions whose non-emptiness exits 1")
     q.add_argument("--require-owned", action="store_true", help="adjacency: refuse incomplete file ownership at closeout")
     q.add_argument("--require-conformance", action="store_true", help="adjacency: require non-vacuous tree-wide kind coverage")
+    q.add_argument(
+        "--context",
+        nargs="*",
+        choices=sorted(REQUIRES_ALLOWED),
+        default=None,
+        help="ready: evaluate requirements against exactly these capabilities instead of the detected local context (planning)",
+    )
     q.set_defaults(fn=cmd_query)
     sub.add_parser("render", help="mermaid dependency graph on stdout").set_defaults(fn=cmd_render)
     rs = sub.add_parser("resolve", help="turn any section reference into its file and number")

@@ -31,7 +31,7 @@ Read the candidates. A home exists when a section's scope already covers the wor
 
 ### 3. New sections are born complete
 
-A new section carries everything the format requires from birth: context paragraph, micro-step checklist with a `Commit:` item, `Test checkpoint:` citing one of the four proofs in `todo/README.md`, Fidelity/Job/Treatment/Chrome when it builds a surface, `Needs:` when it needs a host or a device, and its Implementation Order row with a real `Depends On`. A section filed as a one-line stub is a plan defect, not a head start.
+A new section carries everything the format requires from birth: context paragraph, micro-step checklist with a `Commit:` item, `Test checkpoint:` citing one of the four proofs in `todo/README.md`, Fidelity/Job/Treatment/Chrome when it builds a surface, `Needs:` when it needs a host or a device, `Requires:` when it needs an environment capability, and its Implementation Order row with a real `Depends On`. A section filed as a one-line stub is a plan defect, not a head start.
 
 Give it a dependency edge, not a wish. If it must wait on another section, say so in `Depends On`; if it truly stands alone, `--`.
 

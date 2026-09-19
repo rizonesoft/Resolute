@@ -57,7 +57,7 @@ superseded_by: other-todo-id         # optional -- set with status: superseded
 > **Goal:** One paragraph. What is true when this file is finished, in plain terms.
 
 > [!IMPORTANT]
-> **Current state:** What exists RIGHT NOW, before this TODO runs. Without this the implementer has to grep the repo to find the starting line. Name real files and real gaps.
+> **Current state:** What exists RIGHT NOW, before this TODO runs. Without this the implementer has to grep the repo to find the starting line. Name real files and real gaps. The `## Current state` heading is optional and exists for addressability: sections that must cite the block name the heading, and files that need no citation keep the unheaded shape.
 
 ## Inputs
 
@@ -164,16 +164,30 @@ One paragraph of context, then the checklist.
 > **Verified:** 2026-09-16 | §3 | build clean both arches · clang-tidy 0 new · driven run trimmed 412 MB, log line quoted
 > **Deferred:** per-process exclusion list -> XREF: D05 T01 §6 -- needs the settings store first
 > **Review:** round 1, fingerprint `a3f91c2e5b04` -- `adversarial` approve · `consistency` approve · `integration` needs-attention (1). Raw findings: docs/reviews/05-memboost/D05-T01-s3.md
+> **Plan review:** sol high, no findings (run 20260919-D05-T01-S3-sol)
 > **CRUD:** applicable | driven run: set the interval in Settings, readback from `MemBoost.ini`, restart, value survived
 > **Implementer:** assistant name (model-id)
+```
+
+Alternative markers, one per stamp (the last marker line governs, so these never stack):
+
+```md
+> **Plan review:** sol high, filed D00 T01 §16 (run 20260919-D00-T01-S16-sol)
+> **Plan review:** sol outage then Opus auth failure, outage: both rungs (owner ann, due 2026-09-25)
+> **Plan review:** sol high, filed D00 T01 §16 (run 20260919-D00-T01-S16-sol-r2, supersedes 20260919-D00-T01-S16-sol)
+> **Plan review:** sol high, partial: opus rung, filed D00 T01 §16 (run 20260919-D00-T01-S16-sol)
 ```
 
 - `Verified:` -- date, sections covered, and the *evidence*: real command output, not "it works".
 - `Deferred:` -- one line per deferral, each naming a concrete owner via XREF. A deferral without an owner is an abandonment.
 - `Review:` -- the independent review's cost and outcome: rounds, each lens's verdict with its finding count, then a link to the raw findings under `docs/reviews/`. A `Review:` line names its round and its candidate fingerprint, so a stale record cannot satisfy a freshness check for a different candidate.
+- `Plan review:` -- the second-family round's completion marker: which family ran it and the filings it produced, `no findings`, `outage: <rung> (owner <name>, due <YYYY-MM-DD>)` when both runners failed, `retry-owed (owner <name>, due <YYYY-MM-DD>)` on a same-family fallback run, or `partial: <rung>` when one rung failed and the other's findings stand (filings beside `partial:` are the survivor's; the failed rung is `gpt rung` or `opus rung`: a fallback survivor owes `retry-owed (owner, due)`, a primary survivor carries no retry and no accountability fields). Lineage: every marker over a review record carries `(run <YYYYMMDD-DNN-TNN-SN-family[-rN]>)` minted by the `run-id` subcommand, the run's date prefix is its timestamp; within one date base the bare base is run 1 and `-rN` is run N for N >= 2 (numbering restarts per day, the date keeps runs distinct) (`-r1` is run 1's synonym and reads as the base in every comparison, `-r0` is outside the shape); genesis is a singleton marker (run, no supersedes), and a rerun marker chains with `supersedes <prior-run>` or with `follows-outage` when the immediately preceding marker is an outage marker; runs never repeat within a section and the last run is one the manifest carries. A rerun opens a new `Plan review` record (rows number past the file max across records). Grammar: the last marker line governs; `no findings` never sits beside filings; `outage:` never sits beside filings, `no findings`, `retry-owed`, or `partial:`; `partial:` composes with `retry-owed` exactly when the survivor is the fallback. Counts read in accepted findings (triaged ledger rows) versus implementation items (checklist lines); a merge states both numbers. Required on stamps dated after 2026-09-19; earlier stamps predate the rule.
+- `Reopened:` -- `<YYYY-MM-DD> | <finding ref> | <reason>`, naming the audit locus whose finding voids the stamp. A reopened section reads as unverified everywhere downstream: its row must be `[ ]` and its stamped dependents park until it re-stamps.
+- `Retired:` -- `<YYYY-MM-DD> | <section ref> | <reason>`, migrating a grandfathered stamp without asserting a review that never ran. Validator-silent prose by design (no validator class reads it, so it owns no rule-table row); plan-health drains stamps carrying a well-formed note (real date, ref naming the section, non-empty reason) out of grandfathered, and malformed notes read as absent so the stamp stays listed.
 - `CRUD:` -- behavioral evidence for the section: the write path exercised and read back, not just checked for syntax. Either `applicable | <what ran and what it proved>` or `not applicable (<reason>)`. A section with a `**Job:**` cannot claim not applicable.
 - `Started:` -- optional UTC instant written when implementation starts. Do not overwrite on resume.
-- `Duration:` -- optional integer minutes from `Started:` to stamp (implement, review, and stamp).
+- `Duration:` -- optional minutes or instant range from `Started:` to stamp (implement, review, and stamp): either integer minutes (`7`, `45m`) or `<start> to <end>` Zulu instants (`2026-09-19T14:54:33Z to 2026-09-19T16:35:19Z`). The range end orders clearance: when both reviews carry ends the target must complete strictly after the finding's review, else day stamps rule and same-day fails closed.
+- Clearance tokens -- a section clearing a filed critical names `fix <sha>` (or `fix <base>..<tip>` for a multi-commit loop, base excluded) and `proof <finding-id> <path>[::<test>]` in its own text; the query proves the fix against git and the proof against the fix tree, and a clearance missing either stays listed.
 - `Implementer:` -- optional `Name (model-id)` recording who built the section.
 - `Resolved:` -- a deferral that has been closed. Replaces the `Deferred:` marker **in place**, keeping the original text and XREF and adding the date and what closed it. Closure is a state change, not a deletion: what was owed, and who paid it, both stay on the record.
 
@@ -270,6 +284,16 @@ A section that cannot run without a live host or device the plan cannot otherwis
 
 The value comes from a closed list (`todo-graph.py` `NEEDS_ALLOWED`; `validate` refuses any other): `Windows host (build/test)`, `C++ toolchain (compile)`, `Optical drive (drive test)`, `USB device (drive test)`, `Signing certificate (release)`, `Clean Windows machine (no Visual Studio)`. `resolve` prints it as `needs`, so a future runner can skip the row while the device is not attached and take the next unblocked row instead.
 
+A section that cannot run without an environment capability the plan cannot otherwise see carries one more line, anywhere in its body:
+
+`**Requires:** display-session -- convicted by <measurement pointer>`
+
+Values are comma-separated closed vocabulary (`todo-graph.py` `REQUIRES_ALLOWED`); the reason after ` -- ` is required and cites the measurement that convicted the section. `validate` refuses an unknown value (`requires-unknown`) and a mark without its reason (`requires-no-reason`), both FATAL. `query ready` splits dependency-ready rows into runnable-now (requirements met by the runner's context) versus runnable-elsewhere (requirements named per row); `resolve` prints the line with the local verdict. The runner's local context is detected (`display-session` holds on Windows with `SESSIONNAME` naming an interactive session -- never session 0 (`Services`), never elsewhere); `query ready --context` evaluates a declared set instead, for planning. Shipped sections are grandfathered: no retroactive marking, and a mark added later needs its reason like any other. `Needs:` (host) keeps its own closed list and its pre-start host check; the two lines compose, never merge.
+
+| Value | Means | Detected how (local context) |
+| ----- | ----- | ---------------------------- |
+| `display-session` | A Windows interactive session able to show windows: driven runs of the built tools, eyeball checks, captures instead of black frames | `sys.platform == "win32"` with `SESSIONNAME` naming an interactive session (not `Services`, never empty); every other context evaluates False |
+
 A section whose open work is worked OUTSIDE this tree carries a `Moved:` marker under its heading:
 
 ```
@@ -347,9 +371,12 @@ Split into a new `## N.` when the work has a different dependency, a different t
 python scripts/todo-graph.py build      # parse todo/ -> build/todo-cache.json
 python scripts/todo-graph.py validate   # structural + graph integrity checks
 python scripts/todo-graph.py self-test  # the script's own suite; must stay green
-python scripts/todo-graph.py query ready        # sections with all deps met
+python scripts/todo-graph.py query ready        # sections with all deps met, split into runnable-now versus runnable-elsewhere by the runner's context
 python scripts/todo-graph.py query blocked      # sections waiting on something
 python scripts/todo-graph.py query stats        # tree health
+python scripts/todo-graph.py query plan-health  # review-loop governance: --json emits schema plan-health/4 (total sort keys, exits 0); --check/--fail-on gate automation
+python scripts/todo-graph.py query summary      # operator digest: incomplete runs, blocked clearances, overdue owners, next action, gate verdict (text-only; exits 1 when the gate fails)
+python scripts/todo-graph.py query run <id>     # one run ID resolves to candidate, scope, findings, lineage, outage, artifacts
 python scripts/todo-graph.py render             # mermaid dependency graph
 python scripts/todo-graph.py plan --sync        # re-derive the checkboxes AND re-align every table
 python scripts/todo-graph.py plan --check       # fail if the boxes are stale
@@ -368,7 +395,9 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 
 `build/` is gitignored: the cache is always reproducible from the markdown.
 
-[`implementation-plan.md`](./implementation-plan.md) is the second derived artefact, and the only one that is committed: it is prose a person reads, so it cannot live in `build/`. Its boxes are a projection of the Implementation Order tables and **are never ticked by hand**; run `plan --check` before a push so a stale projection is caught rather than quietly misinforming whoever reads it next. Run `plan --sync` after any row flips.
+[`implementation-plan.md`](./implementation-plan.md) is the second derived artefact, and the only one that is committed: it is prose a person reads, so it cannot live in `build/`. Its boxes are a projection of the Implementation Order tables and **are never ticked by hand**; `plan --check` runs in CI so a stale projection fails the build instead of quietly misinforming whoever reads it next. Run `plan --sync` after any row flips.
+
+**CI enforces exactly this contract and nothing more.** The todo workflow runs `validate` on every push touching `todo/`, `scripts/todo-graph.py`, or the workflow itself, so a FATAL (or a NEW warning) fails the build like any other defect.
 
 ### FATAL blocks; WARN is ratcheted
 
@@ -405,6 +434,21 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 | `needs-unknown` | FATAL | A `**Needs:**` value outside the closed list in `todo-graph.py` (`NEEDS_ALLOWED`). The list is closed so a misspelt host cannot silently unmark a section that cannot run without it. |
 | `moved-target-missing` | FATAL | A `> **Moved:**` marker that names no file, or a file that does not exist. The marker takes the section out of `query ready`, the plan and the progress totals on the strength of that pointer, so a dead pointer would hide work. |
 | `pending-control-contract` | FATAL | Reserved: the coming-soon inspector is not ported yet, so this class cannot fire until it lands. |
+| `stamp-no-opus-panel` | FATAL | A stamp dated after the Opus-panel rule landed whose findings carry no panel verdicts. It reads as reviewed evidence while verifying nothing. |
+| `requires-unknown` | FATAL | A `**Requires:**` value outside the closed list in `todo-graph.py` (`REQUIRES_ALLOWED`). The list is closed so a misspelt capability cannot silently unmark a section. |
+| `requires-no-reason` | FATAL | A `**Requires:**` mark without its `-- reason`. The citation is what makes the mark auditable instead of vibes. |
+| `stamp-no-plan-review` | FATAL | A stamp dated after the plan-review rule landed that carries no `Plan review:` completion marker. The second-family round is required procedure. |
+| `plan-review-malformed` | FATAL | A post-cutoff plan-review record the query cannot parse: a `Plan review` section without its Manifest line or its Ledger block, a non-row line inside the block, or a content-illegal row. |
+| `filed-target-no-backlink` | FATAL | A filed ledger row whose target file carries no back-link. The filing is untraceable from the target side, so remediation cannot be attributed to the finding. |
+| `stamp-reopened` | FATAL | A `> **Reopened:**` line outside its shape, on a still-checked row, or with a still-stamped dependent. A reopen that does not void proof downstream lets work continue on invalid evidence. |
+| `plan-review-duplicate-id` | FATAL | A finding ID appearing twice in one ledger. Multi-target findings ride one row with every target, never split rows. |
+| `plan-review-no-lineage` | FATAL | A `Plan review:` marker without run lineage: no run ID, a reused run ID, a rerun marker naming no superseded run, or a run the manifest does not carry. |
+| `ledger-history-violation` | FATAL | A ledger row whose disposition moved the forbidden way against the committed record, or a row that vanished. Later evidence amends via a new row, never by rewriting the old one. |
+| `provenance-malformed` | FATAL | A post-cutoff findings file without a well-formed `Provenance:` line, or a provenance line outside the field shape, without a shaped run ID, with an unresolving candidate, a missing path, or a run no marker of its section carries. |
+| `ledger-supersession-broken` | FATAL | A ledger row whose `supersedes` link names no row of its block, crosses review namespaces, or closes a cycle. |
+| `risk-acceptance-malformed` | FATAL | A `Risk accepted:` line outside the record shape, with an uncoverable target, expiring before it is recorded, or reviewed outside its record-expiry window. |
+| `risk-acceptance-silent-edit` | FATAL | A risk acceptance whose owning record changed after the evidence commit without a superseding record. |
+| `risk-acceptance-chain-broken` | FATAL | A `supersedes <date>` link that names no earlier record on its target, points forward, branches, or cycles. |
 
 Treat a warning as a decision to make rather than noise to clear. The tree starts at zero FATAL and zero non-baselined warnings, and it is worth keeping there.
 

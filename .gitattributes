@@ -1,6 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# The pre-commit hook must check out LF everywhere: a CR in the blob breaks
+# the shebang on POSIX runners, and the plan.yml gate pins this line.
+tools/githooks/pre-commit eol=lf
+
 # ExoSuite carried Git LFS rules for *.exe, *.dll, and Bin/** at intake.
 # They are deliberately not merged: its own comment recorded them as unused,
 # all three paths are gitignored here, and LFS filters on never-committed
