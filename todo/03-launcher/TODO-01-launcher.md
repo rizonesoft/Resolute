@@ -23,6 +23,7 @@ track: P1
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the tools this launcher discovers and starts
 - -> XREF: [`05-new-tools/TODO-06 §1`](../05-new-tools/TODO-06-system-inspection.md) -- the inspection tools, which take the suite past the point where a list is browsable
 - -> XREF: [`05-new-tools/TODO-07 §1`](../05-new-tools/TODO-07-system-control.md) -- the configuration tools, routed by the same symptom search
+- -> XREF: D03 T02 §1 -- the surface specification this launcher builds from ([TODO-02](./TODO-02-launcher-surfaces.md))
 
 ## Outcome
 
@@ -41,12 +42,12 @@ track: P1
 
 | Order | Section | Deliverable                               | Depends On   | Status |
 | :---: | :-----: | ----------------------------------------- | ------------ | :----: |
-|   1   |   §1    | Launcher on the framework                 | D01 T01 §1   |  [ ]   |
-|   2   |   §2    | Tool discovery and the tool list          | §1           |  [ ]   |
-|   3   |   §3    | Launch, failure reporting, and elevation  | §2           |  [ ]   |
-|   4   |   §4    | Windows system locations                  | §2           |  [ ]   |
-|   5   |   §5    | Suite log viewer                          | §1           |  [ ]   |
-|   6   |   §6    | Symptom routing                           | §2, D01 T01 §4 |  [ ]   |
+|   1   |   §1    | Launcher on the framework                 | D01 T01 §1, D03 T02 §1, D03 T02 §2 |  [ ]   |
+|   2   |   §2    | Tool discovery and the tool list          | §1, D03 T02 §3 |  [ ]   |
+|   3   |   §3    | Launch, failure reporting, and elevation  | §2, D03 T02 §7 |  [ ]   |
+|   4   |   §4    | Windows system locations                  | §2, D03 T02 §4 |  [ ]   |
+|   5   |   §5    | Suite log viewer                          | §1, D03 T02 §5 |  [ ]   |
+|   6   |   §6    | Symptom routing                           | §2, D01 T01 §4, D03 T02 §6 |  [ ]   |
 
 ---
 

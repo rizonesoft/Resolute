@@ -9,6 +9,7 @@ The Resolute hub: tool discovery, launch, failure reporting, the suite log viewe
 | TODO | Title | Status |
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-launcher.md) | Resolute Launcher | draft |
+| [TODO-02](./TODO-02-launcher-surfaces.md) | Launcher Surface Specification | draft |
 
 ## Completed
 

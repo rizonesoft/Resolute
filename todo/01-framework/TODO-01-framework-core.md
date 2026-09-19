@@ -33,6 +33,7 @@ track: F1
 - -> XREF: [`04-tools-port/TODO-01 §1`](../04-tools-port/TODO-01-tool-ports.md) -- the ports, every one of which consumes this
 - -> XREF: [`07-quality/TODO-01 §1`](../07-quality/TODO-01-quality-bar.md) -- the conformance profile, which is largely "consumes this framework correctly"
 - -> XREF: [`08-docs-localization/TODO-01 §2`](../08-docs-localization/TODO-01-docs-and-localization.md) -- the language packs the localization layer loads
+- -> XREF: D01 T03 §1 -- the surface specification this framework builds from ([TODO-03](./TODO-03-framework-surfaces.md))
 
 ## Outcome
 
@@ -58,16 +59,16 @@ track: F1
 | :---: | :-----: | ----------------------------------------------- | ---------------------- | :----: |
 |   1   |   §1    | Application shell and lifecycle                 | D00 T01 §4, D00 T02 §1 |  [ ]   |
 |   2   |   §2    | Settings: one writer, one path                  | §1                     |  [ ]   |
-|   3   |   §3    | Logging and the log surface                     | §1                     |  [ ]   |
+|   3   |   §3    | Logging and the log surface                     | §1, D01 T03 §4         |  [ ]   |
 |   4   |   §4    | Localization and the pack loader                | §2                     |  [ ]   |
-|   5   |   §5    | Update check and consolidation announcement     | §2, §4                 |  [ ]   |
-|   6   |   §6    | Elevation and its refusal path                  | §3, §4                 |  [ ]   |
-|   7   |   §7    | Adopt the UI library and its surfaces           | §4, D00 T03 §3         |  [ ]   |
+|   5   |   §5    | Update check and consolidation announcement     | §2, §4, D01 T03 §5     |  [ ]   |
+|   6   |   §6    | Elevation and its refusal path                  | §3, §4, D01 T03 §6     |  [ ]   |
+|   7   |   §7    | Adopt the UI library and its surfaces           | §4, D00 T03 §3, D01 T03 §1, D01 T03 §2, D01 T03 §3 |  [ ]   |
 |   8   |   §8    | Extend the UI library for the tools             | §7                     |  [ ]   |
 |   9   |   §9    | Standalone proof in an empty folder             | §2, §4, §5, §7         |  [ ]   |
-|  10   |   §10   | Crash handling and single instance              | §1, §3                 |  [ ]   |
+|  10   |   §10   | Crash handling and single instance              | §1, §3, D01 T03 §6     |  [ ]   |
 |  11   |   §11   | Command line and exit codes                     | §1, §3, §6             |  [ ]   |
-|  12   |   §12   | About dialog, from the registry                 | §7, D06 T01 §10        |  [ ]   |
+|  12   |   §12   | About dialog, from the registry                 | §7, D06 T01 §10, D01 T03 §7 |  [ ]   |
 |  13   |   §13   | F1 context help through the surface map         | §7, D06 T01 §14        |  [ ]   |
 
 ---

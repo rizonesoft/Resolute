@@ -10,6 +10,7 @@ The shared framework every tool consumes. Startup, settings, logging, localizati
 | ---- | ----- | :----: |
 | [TODO-01](./TODO-01-framework-core.md) | Framework Core | draft |
 | [TODO-02](./TODO-02-design-system.md) | Design System | draft |
+| [TODO-03](./TODO-03-framework-surfaces.md) | Framework Surface Specification | draft |
 
 ## Completed
 

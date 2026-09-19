@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **25 of 153 sections complete (16%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **25 of 167 sections complete (15%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -177,6 +177,13 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T02 §5`  | The accessibility floor                      |  10   |
 | [ ] | `D01 T02 §6`  | Performance floor                            |   8   |
 | [ ] | `D01 T02 §7`  | Text presentation and machine values         |   5   |
+| [ ] | `D01 T03 §1`  | Standard window, menus, message layer        |   6   |
+| [ ] | `D01 T03 §2`  | Preferences shell, general, performance      |   6   |
+| [ ] | `D01 T03 §3`  | Language page and tool-page contract         |   5   |
+| [ ] | `D01 T03 §4`  | Per-tool log surface                         |   5   |
+| [ ] | `D01 T03 §5`  | Update dialog and announcement               |   5   |
+| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown          |   6   |
+| [ ] | `D01 T03 §7`  | Splash, donate, string audit                 |   4   |
 
 
 ### Phase 2 -- The launcher and the ports
@@ -191,6 +198,13 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D03 T01 §4` | Windows system locations                     |   6   |
 | [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
 | [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
+| [ ] | `D03 T02 §1` | Start bar and cascade map                    |   6   |
+| [ ] | `D03 T02 §2` | Main content and repair groups               |   6   |
+| [ ] | `D03 T02 §3` | Tool list surface                            |   5   |
+| [ ] | `D03 T02 §4` | System locations browser                     |   4   |
+| [ ] | `D03 T02 §5` | Suite log viewer surface                     |   5   |
+| [ ] | `D03 T02 §6` | Symptom search surface                       |   5   |
+| [ ] | `D03 T02 §7` | Launcher chrome and notices                  |   6   |
 | [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
 | [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   8   |
