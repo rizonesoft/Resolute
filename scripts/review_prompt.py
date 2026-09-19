@@ -133,15 +133,52 @@ MANIFEST_RE = re.compile(
 )
 # Chunks carrying a unified diff name it in the title (CANDIDATE DIFF,
 # STAGED STAMP); only those are scanned for changed files, so a `+++`
-# line in prose can never forge the file list. Git C-quotes an
-# unusual path (`a/"my file"`), so the b-side accepts quoted or bare;
-# combined diffs (`diff --cc`, merge candidates only, and this tree
-# stays linear) are the stated residual.
+# line in prose can never forge the file list. Each side of a `diff
+# --git` line is independently bare or whole-token C-quoted, so the
+# parse is a small tokenizer, not one regex; combined diffs
+# (`diff --cc`, merge candidates only, and this tree stays linear)
+# are the stated residual.
 _DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP")
-_DIFF_FILE_RE = re.compile(
-    r"^diff --git a/(?:\"(?:[^\"\\]|\\.)*\"|\S+) b/(?:\"(?P<quoted>(?:[^\"\\]|\\.)*)\"|(?P<bare>\S+))\s*$",
-    re.MULTILINE,
-)
+_DIFF_LINE_RE = re.compile(r"^diff --git (?P<rest>.+?)\s*$")
+_DIFF_QUOTED_RE = re.compile(r'^"a/((?:[^"\\]|\\.)*)"\s+(?P<right>.*)$')
+
+
+def _diff_paths(line: str) -> list[str]:
+    """Changed paths from one `diff --git` line: the b-side always, the
+    a-side too when a rename makes them differ. Bare sides may carry
+    spaces (git leaves those unquoted); several ` b/` splits prefer
+    the one whose sides agree, else the last, deterministically."""
+    m = _DIFF_LINE_RE.match(line)
+    if m is None:
+        return []
+    rest = m.group("rest")
+    sides: tuple[str, str] | None = None
+    q = _DIFF_QUOTED_RE.match(rest)
+    if q is not None:
+        after = q.group("right")
+        if after.startswith('"b/') and after.endswith('"') and len(after) >= 4:
+            sides = (_unquote_git_path(q.group(1)), _unquote_git_path(after[3:-1]))
+        elif after.startswith("b/"):
+            sides = (_unquote_git_path(q.group(1)), after[2:])
+    elif rest.startswith("a/"):
+        body = rest[2:]
+        qi = body.find(' "b/')
+        if qi >= 0 and body.endswith('"'):
+            sides = (body[:qi], _unquote_git_path(body[qi + 4:-1]))
+        elif " b/" in body:
+            splits = []
+            start = 0
+            while True:
+                i = body.find(" b/", start)
+                if i < 0:
+                    break
+                splits.append((body[:i], body[i + 3:]))
+                start = i + 1
+            sides = next((s for s in splits if s[0] == s[1]), splits[-1])
+    if sides is None:
+        return []
+    old, new = sides
+    return [new] if old == new else [old, new]
 
 
 def _unquote_git_path(raw: str) -> str:
@@ -189,9 +226,10 @@ def build_manifest(tag: str, chunks: list[tuple[str, str]],
     diff_files = []
     for title, chunk_body in chunks:
         if _DIFF_TITLE_RE.search(title):
-            for m in _DIFF_FILE_RE.finditer(chunk_body):
-                quoted = m.group("quoted")
-                diff_files.append(_unquote_git_path(quoted) if quoted is not None else m.group("bare"))
+            for chunk_line in chunk_body.splitlines():
+                for path in _diff_paths(chunk_line):
+                    if path not in diff_files:
+                        diff_files.append(path)
     if diff_files:
         line += " diff-files=" + "|".join(diff_files)
     if base is not None:
@@ -454,11 +492,17 @@ def _self_test() -> int:
     check("manifest-prose-trap", "fake" not in mline, mline)
     mline2, _ = build_manifest(tag, [("SECTION", prose_trap)])
     check("manifest-no-diff-chunks", "diff-files=" not in mline2, mline2)
-    quoted = ('diff --git a/"my file.md" b/"my file.md"\n'
-              'diff --git a/"caf\\303\\251.md" b/"caf\\303\\251.md"\n')
-    mline3, _ = build_manifest(tag, [("CANDIDATE DIFF", quoted)])
-    check("manifest-quoted-spaces", "diff-files=my file.md|" in mline3, mline3)
-    check("manifest-quoted-octal", "caf\u00e9.md" in mline3, mline3)
+    # The real git grammar, probed: bare sides keep their spaces, each
+    # side quotes whole-token independently, renames name both sides.
+    grammar = ("diff --git a/my file.md b/my file.md\n"
+               'diff --git "a/caf\\303\\251.md" "b/caf\\303\\251.md"\n'
+               'diff --git "a/quo\\"te.md" b/renamed.md\n'
+               "diff --git a/old.md b/new.md\n"
+               "diff --git a/gone.md b/gone.md\n")
+    mline3, _ = build_manifest(tag, [("CANDIDATE DIFF", grammar)])
+    for want in ("my file.md", "caf\u00e9.md", 'quo"te.md', "renamed.md",
+                 "old.md", "new.md", "gone.md"):
+        check(f"manifest-grammar-{want}", want in mline3, mline3)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
