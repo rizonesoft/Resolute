@@ -46,14 +46,17 @@ track: R1
 | :---: | :-----: | --------------------------------------------- | ------------ | :----: |
 |   1   |   §1    | Release descriptors, portable by construction | D04 T01 §1   |  [ ]   |
 |   2   |   §2    | One command builds the release set            | §1           |  [ ]   |
-|   3   |   §3    | Installers: per tool and whole suite          | §2, §10      |  [ ]   |
+|   3   |   §3    | Installers: per tool and whole suite          | §2, §10, §11 |  [ ]   |
 |   4   |   §4    | Migration from the AutoIt suite               | §3, D01 T01 §2 |  [ ]   |
-|   5   |   §5    | Update files and consolidation announcements  | §2, §10      |  [ ]   |
+|   5   |   §5    | Update files and consolidation announcements  | §2, §10, §11 |  [ ]   |
 |   6   |   §6    | Version rule, changelog, and release checklist | §2          |  [ ]   |
 |   7   |   §7    | Focused builds from one codebase              | §1, §5      |  [ ]   |
 |   8   |   §8    | Licensing and attribution                     | --          |  [ ]   |
 |   9   |   §9    | The bare-machine proof                        | §3          |  [ ]   |
-|  10   |   §10   | Identity registry and version agreement       | §1, §6, §8  |  [ ]   |
+|  10   |   §10   | Identity registry and version agreement       | §1, §6, §8, §11 |  [ ]   |
+|  11   |   §11   | Tag-derived version scheme record             | --          |  [ ]   |
+|  12   |   §12   | Versioner wiring and string migration         | §11         |  [ ]   |
+|  13   |   §13   | Stamped-surface agreement test                | §12         |  [ ]   |
 
 ---
 
@@ -171,6 +174,7 @@ The channel to every user who already installed something. Four products are ret
 **Test checkpoint:** The version rule explains the current spread and the auto-increment convention. A release produces a per-tool changelog whose entries trace to commits. A second person runs the checklist end to end and the result is recorded.
 
 -> XREF: D06 T01 §10 -- the version source of record that implements this rule
+-> XREF: D06 T01 §11 -- the tag scheme that completes this rule
 
 ## 7. Focused Builds From One Codebase
 
@@ -263,13 +267,13 @@ A clean VM, a Windows Sandbox instance, or a second physical machine all serve. 
 
 ## 10. Identity Registry and Version Agreement
 
-Every identity string the suite shows, publisher, license, copyright, version, links, comes from one machine-readable JSON registry, or fourteen tools will drift into fourteen identities the way fourteen About dialogs did. The dialog renders from it, the binary, installer, and feed stamp from it, and a test fails anything pasted. Operator-confirmed 2026-09-19: the version source of record is the CMake project `VERSION` (0.1.0 today), not a tag scheme the repo does not have.
+Every identity string the suite shows, publisher, license, copyright, version, links, comes from one machine-readable JSON registry, or fourteen tools will drift into fourteen identities the way fourteen About dialogs did. The dialog renders from it, the binary, installer, and feed stamp from it, and a test fails anything pasted. The version it carries is the tag-derived version under the §11 scheme (supersedes the CMake-`VERSION` answer on 2026-09-19: the operator chose tag-as-truth, releasing is tagging).
 
 **Needs:** C++ toolchain (compile)
 
 - [ ] Declare the registry schema: publisher, license id, copyright template, version slot, link table (home, corporate, GitHub, X, repo, support), asset manifest. Done when: the schema is documented and an empty registry fails validation naming the missing field.
 - [ ] Substitute the build year at build time into the verbatim line `© [build-year] Rizonetech (Pty) Ltd. All rights reserved`. Done when: no source contains a hardcoded year and the built registry reports the build year.
-- [ ] Stamp the CMake `VERSION` as the single version into the registry, the binary (`Resolute.rc.in`), the installer, and the feed. Done when: one version bump propagates to all four, quoted from the built artifacts.
+- [ ] Stamp the §11 tag-derived version as the single version into the registry, the binary (`Resolute.rc.in`), the installer, and the feed. Done when: tagging `vX.Y.Z` propagates that version to all four, quoted from the built artifacts.
 - [ ] Carry the six links, all https: project home `https://rizonesoft.com`, corporate `https://rizonetech.com`, GitHub `https://github.com/rizonesoft/`, X `https://x.com/DerickPayneDev`, plus the repo URL and the support URL, those two confirmed with the operator at build time and recorded. Done when: a test fails any non-https or undeclared link, quoted.
 - [ ] Refuse hardcoded identity strings in UI code: publisher, copyright, version, or link literals pasted instead of read from the registry. Done when: a deliberate pasted string fails the test by name, quoted.
 - [ ] Assert dialog, binary, installer, and feed agreement on version and identity. Done when: the test reads all four and passes, and a deliberate mismatch in one fails naming it, quoted.
@@ -277,12 +281,67 @@ Every identity string the suite shows, publisher, license, copyright, version, l
 - [ ] Declare the `resources/logos/` theme pair (`rizonesoft-logo-light.svg`, `rizonesoft-logo-dark.svg`) as registry assets, own work, with the dialog link target `https://rizonesoft.com` recorded beside them. Done when: the manifest names both vectors and the link, and the shipped set carries them.
 - [ ] Commit: `"release: identity registry and version agreement"`
 
-**Test checkpoint:** An empty registry fails naming its missing field. No source holds a year and the build reports one. One version bump reaches dialog, binary, installer, and feed. A non-https link and a pasted identity string each fail by name. A mismatched version in one artifact fails naming it. Brand icons ship with their license recorded, and the logo theme pair ships with its link target recorded. Cheaper substitute that fails the checkpoint: hand-maintained About strings per tool, which is how fourteen dialogs drifted apart.
+**Test checkpoint:** An empty registry fails naming its missing field. No source holds a year and the build reports one. One tag reaches dialog, binary, installer, and feed. A non-https link and a pasted identity string each fail by name. A mismatched version in one artifact fails naming it. Brand icons ship with their license recorded, and the logo theme pair ships with its link target recorded. Cheaper substitute that fails the checkpoint: hand-maintained About strings per tool, which is how fourteen dialogs drifted apart.
 
 -> XREF: D06 T01 §1 -- the descriptor family this registry joins, and its build-year rule
 -> XREF: D06 T01 §6 -- the version rule this source of record implements
 -> XREF: D06 T01 §8 -- the license texts and attribution this registry points at
 -> XREF: D01 T01 §12 -- the dialog that renders this registry
+-> XREF: D06 T01 §11 -- the tag scheme this registry's version defers to
+-> XREF: D06 T01 §12 -- the wiring that stamps this registry
+-> XREF: D06 T01 §13 -- the agreement test that covers this registry
+
+## 11. Tag-Derived Version Scheme Record
+
+Releasing is tagging: the git tag is the single source of truth, and no hand-edited version string ships anywhere. Operator-confirmed 2026-09-19: tag shape `vMAJOR.MINOR.PATCH`, channels stable and preview only, agreement across the discovered surfaces (binary, tool-list UI, installer, feed, registry, manifests). This section locks every rule with an example string before anything wires to it.
+
+**Needs:** C++ toolchain (compile)
+
+- [ ] Lock the tag shape `vMAJOR.MINOR.PATCH` with SemVer rules: numeric parts, no leading zeros, prereleases carry height as `v1.2.3-preview.<height>+<sha>`. Done when: each rule carries an example string, quoted.
+- [ ] Lock the channel rule: a tag on the default branch reads stable, everything else reads preview. Done when: a stable and a preview example are both recorded with their tag and branch.
+- [ ] Lock tagless behavior: local builds without a tag read `0.0.0-preview+<sha>`, never a plausible release number. Done when: the shape is recorded with an example, and the reason (a tagless build must not impersonate a release) is stated beside it.
+- [ ] Lock the Windows derivations: four-part file/product versions from SemVer plus channel mapping for the version resource. Done when: `v1.2.3` and a preview each show their four-part form, quoted.
+- [ ] Commit: `"release: tag-derived version scheme record"`
+
+**Test checkpoint:** Every rule above carries a quoted example string a later reader can test a versioner against. Cheaper substitute that fails the checkpoint: describing the scheme in prose without example strings, which lets two implementers build two schemes.
+
+-> XREF: D06 T01 §6 -- the version rule this scheme completes
+-> XREF: D06 T01 §10 -- the registry that consumes this scheme
+-> XREF: D06 T01 §12 -- the wiring that implements this scheme
+
+## 12. Versioner Wiring and String Migration
+
+The stack is CMake driving C++ with PowerShell entrypoints, Inno Setup heritage for installers, and Catch2 plus Python gates for tests, so the versioner is CMake GitVersion-style: `git describe --tags` at configure time, parsed into SemVer, stamped into a generated header, the RC template, manifests, and installer/feed inputs. MinVer lost: it is .NET-only and nothing transfers. The hardcoded strings below are the migration scope; the quoted grep goes clean.
+
+**Needs:** C++ toolchain (compile)
+
+- [ ] Pin the versioner: a CMake module running `git describe --tags --long` at configure time and parsing tag, height, and sha. Done when: the module is pinned in the tree and prints its parsed parts for a fixture tag, quoted.
+- [ ] Expose exactly one runtime version API and stamp every consumer from it: generated header, `Resolute.rc.in` four-part versions, extension-manifest `version` keys, installer inputs, feed inputs. Done when: each consumer reads the API and a missing or blanked stamp fails loud, quoted.
+- [ ] Migrate the hardcoded strings: `CMakeLists.txt:9` (`VERSION 0.1.0`) becomes tag-derived at configure time, and `docs/extensions.md:61` (`"version": "0.1.0"`) becomes a stamped manifest value. Done when: the discovery grep for `VERSION 0|0\.1\.0` reports no tracked source hit.
+- [ ] Commit: `"release: versioner wiring and string migration"`
+
+**Test checkpoint:** A fixture tag produces quoted parsed parts, every consumer reads the one API, a blanked stamp fails loud, and the hardcoded-version grep is clean. Cheaper substitute that fails the checkpoint: stamping some surfaces from the tag while `CMakeLists.txt` keeps its own number, which is two sources of truth.
+
+-> XREF: D06 T01 §11 -- the scheme this wiring implements
+-> XREF: D06 T01 §10 -- the registry this wiring stamps
+-> XREF: D06 T01 §13 -- the agreement test that proves this wiring
+
+## 13. Stamped-Surface Agreement Test
+
+One test asserts every stamped surface reports the same version: the binary version resource, the launcher tool-list Version column, the installer `AppVersion`, the update feed, the identity-registry JSON, and the extension-manifest `version` keys. Surfaces landing later are named below as skipped-until-landed with their owner refs, so the test grows instead of rotting.
+
+**Needs:** C++ toolchain (compile)
+
+- [ ] Bind the surfaces that exist now: binary resource, tool-list column, and manifests. Done when: the test reads all three from a built tree and passes, quoted.
+- [ ] Bind the registry surface when §10 lands: skipped until `D06 T01 §10` ships, then the same test reads the registry JSON. Done when: the skip names its owner, and landing removes the skip.
+- [ ] Bind the installer and feed surfaces when they land: skipped until `D06 T01 §3` and `D06 T01 §5` ship. Done when: each skip names its owner, and landing removes it.
+- [ ] Prove the probe is red on mismatch: a deliberately mismatched stamp in one surface fails the test naming it. Done when: quoted.
+- [ ] Commit: `"release: stamped-surface agreement test"`
+
+**Test checkpoint:** The test passes on a built tree, names its skipped surfaces with owners, and fails naming a deliberately mismatched stamp. Cheaper substitute that fails the checkpoint: eyeballing the About dialog once per release, which is how version drift ships.
+
+-> XREF: D06 T01 §10 -- the registry this test covers
+-> XREF: D06 T01 §12 -- the wiring this test proves
 
 ## Verification
 

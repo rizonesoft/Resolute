@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **25 of 140 sections complete (18%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **25 of 143 sections complete (17%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -262,6 +262,9 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §8`  | Licensing and Attribution                      |  12   |
 | [ ] | `D06 T01 §10` | Identity Registry and Version Agreement        |   9   |
 | [ ] | `D01 T01 §12` | About Dialog, From the Registry                |   8   |
+| [ ] | `D06 T01 §11` | Tag-Derived Version Scheme Record              |   5   |
+| [ ] | `D06 T01 §12` | Versioner Wiring and String Migration          |   4   |
+| [ ] | `D06 T01 §13` | Stamped-Surface Agreement Test                 |   5   |
 | [ ] | `D08 T01 §1`  | Documentation set for every tool               |   8   |
 | [ ] | `D08 T01 §2`  | Shared string pool and build-time composition  |   6   |
 | [ ] | `D08 T01 §3`  | Coverage matrix and pack hygiene               |   6   |
