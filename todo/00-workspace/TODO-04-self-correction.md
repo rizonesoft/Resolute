@@ -68,6 +68,8 @@ track: W1
 |   9   |   §9    | Review-input integrity                     | §6         |  [ ]   |
 |  10   |   §10   | Run-record follow-ups                      | §7         |  [ ]   |
 |  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [ ]   |
+|  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [ ]   |
+|  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
 
 ---
 
@@ -482,10 +484,10 @@ So this section is mostly wiring and measurement rather than construction, and i
 Three soundness holes share one theme: the reviewer may not have reviewed what the record claims. A stamp approved staged becomes pushed unstaged (time-of-check gap); the wrong-figure probe covers one defect shape; and an inline diff is never proven complete, so a truncation approves falsely. This section closes all three.
 
 
-- [x] Bind stamp approval to the staged tree: record the index identity at review time and recheck it before the push. Done when: an edit after approval forces re-review, quoted, and the skill carries the commands. Done: the skill captures `TREE=$(git write-tree)` before the patch, verifies patch against tree immediately, and rechecks before committing with `BLOCKED` on mismatch; driven both directions on the real index, including the capture-window drill (`patch/tree: agree, under review`, then `BLOCKED: the index moved while capturing the stamp patch` after an edit). Round 1 caught the first shape reviewing one tree while recording another; the capture order is the fix, with the check-then-commit instant named as the single-writer residual.
-- [x] Add stamp-review regression cases: wrong candidate identity, unsupported evidence, stale references, and contradictory stamps. Done when: each is driven against a staged stamp and named, all quoted. Done: a seeded stamp drew `` `31 findings` should be `2 findings` `` (unsupported evidence), `` `round 4` should be `round 2` `` (the contradictory side), and `` `aaaaaaa` should be `bbbbbbb` `` (wrong candidate); the stale path drew `STAMP HOLDS` twice, which sharpened the prompt to verify every file path exists, after which it named `` `todo/00-workspace/TODO-09-seeded.md` should exist ... where it is absent ``. All at high effort with receipts.
-- [x] Prove inline diffs complete: byte count, file list, base and head identities, and reviewer receipt. Done when: the fence subcommand emits the manifest and every review prompt requires the receipt, with a truncated input proven to fail rather than approve. Done: `fence` emits `MANIFEST bytes/files/sha/titles` plus `diff-files` scanned from diff-titled chunks and `base/head` when given, all four skill prompts require the opening `RECEIPT sha/end` line, and both checkers take `--manifest`; `review-prompt self-test` 29 cases green (including a prose `diff --git` line the title gate refuses, the adversarial rename split, and the poisoned preamble), and live a correct receipt passes while the receiptless (truncated) output fails as `FAIL line 1 is not a receipt`. Round 1 caught `files=2` counting chunks instead of the candidate's changed files; round 2 caught the first scan missing git's real quoting (bare spaces, whole-token quotes, mixed rename sides). The sign-off round caught the bare-split rule fabricating a path when both sides carry ` b/`; the fix reads git's `rename from/to` pair as authoritative, proven against a live ambiguous rename resolving to `diff-files=old b/x.md|new b/y.md`, and the residual is combined diffs only. Round 4 caught the rename branch firing without a `diff --git` line (prose injection through commit messages); the guard now leads, with a poisoned-preamble case pinning it.
-- [x] Check skill-to-plan citations resolve. Done when: the validator names an unresolvable citation by file and line, quoted, with the self-test covering it. Done: check 26 with class `skill-citation-unresolved` (FATAL, README-mirrored) scans full D-refs in every `SKILL.md`; a planted `D00 T04 §99` fails as `SKILL.md:3: skill cites D00 T04 §99, which resolves to no live section`, removal returns to 0 fatal; self-test 507 cases green including the two fixture cases.
+- [x] Bind stamp approval to the staged tree: record the index identity at review time and recheck it before the push. Done when: an edit after approval forces re-review, quoted, and the skill carries the commands. Done: the skill captures `TREE=$(git write-tree)` before the patch, verifies patch against tree immediately, and rechecks before committing with `BLOCKED` on mismatch; driven both directions on the real index, including the capture-window drill (`patch/tree: agree, under review`, then `BLOCKED: the index moved while capturing the stamp patch` after an edit). Round 1 caught the first shape reviewing one tree while recording another; the capture order is the fix, with the check-then-commit instant named as the single-writer residual. Scoped by the plan review: the recheck binds the commit, not the push, and hook mutation after the last check is unhandled; both file to D00 T04 §13.
+- [x] Add stamp-review regression cases: wrong candidate identity, unsupported evidence, stale references, and contradictory stamps. Done when: each is driven against a staged stamp and named, all quoted. Done: a seeded stamp drew `` `31 findings` should be `2 findings` `` (unsupported evidence), `` `round 4` should be `round 2` `` (the contradictory side), and `` `aaaaaaa` should be `bbbbbbb` `` (wrong candidate); the stale path drew `STAMP HOLDS` twice, which sharpened the prompt to verify every file path exists, after which it named `` `todo/00-workspace/TODO-09-seeded.md` should exist ... where it is absent ``. All at high effort with receipts. Scoped by the plan review: the contradiction evidence names the wrong side rather than two live conflicting stamps, the stale evidence covers absent paths rather than dead anchors in live files, and the candidate match compares text rather than resolving OIDs; all three file to D00 T04 §13.
+- [x] Prove inline diffs complete: byte count, file list, base and head identities, and reviewer receipt. Done when: the fence subcommand emits the manifest and every review prompt requires the receipt, with a truncated input proven to fail rather than approve. Done: `fence` emits `MANIFEST bytes/files/sha/titles` plus `diff-files` scanned from diff-titled chunks and `base/head` when given, all four skill prompts require the opening `RECEIPT sha/end` line, and both checkers take `--manifest`; `review-prompt self-test` 29 cases green (including a prose `diff --git` line the title gate refuses, the adversarial rename split, and the poisoned preamble), and live a correct receipt passes while the receiptless (truncated) output fails as `FAIL line 1 is not a receipt`. Round 1 caught `files=2` counting chunks instead of the candidate's changed files; round 2 caught the first scan missing git's real quoting (bare spaces, whole-token quotes, mixed rename sides). The sign-off round caught the bare-split rule fabricating a path when both sides carry ` b/`; the fix reads git's `rename from/to` pair as authoritative, proven against a live ambiguous rename resolving to `diff-files=old b/x.md|new b/y.md`, and the residual is combined diffs only. Round 4 caught the rename branch firing without a `diff --git` line (prose injection through commit messages); the guard now leads, with a poisoned-preamble case pinning it. Scoped by the plan review: the drill proves receiptless truncation fails, while a truncation past the manifest still receipts validly from the preamble; the closing nonce, mandatory base/head, combined-diff handling, the NUL cross-check, and the attestation file to D00 T04 §12.
+- [x] Check skill-to-plan citations resolve. Done when: the validator names an unresolvable citation by file and line, quoted, with the self-test covering it. Done: check 26 with class `skill-citation-unresolved` (FATAL, README-mirrored) scans full D-refs in every `SKILL.md`; a planted `D00 T04 §99` fails as `SKILL.md:3: skill cites D00 T04 §99, which resolves to no live section`, removal returns to 0 fatal; self-test 507 cases green including the two fixture cases. Scoped by the plan review: only full D-refs are checked, and short forms in skills stay unchecked; filed to D00 T04 §13.
 - [ ] Commit: `"workspace: review-input integrity"`
 
 **Test checkpoint:** The time-of-check gap is driven shut, all four regression cases are named, a truncated diff fails loudly, and an unresolvable citation is reported by file and line. All quoted.
@@ -495,6 +497,8 @@ Three soundness holes share one theme: the reviewer may not have reviewed what t
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR11 D00-T04-S6-PR11
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR13 D00-T04-S6-PR13
 -> XREF: D00 T04 §11 -- the round-5 advisories this section's panel filed
+-> XREF: D00 T04 §12 -- the manifest gaps this section's plan review filed
+-> XREF: D00 T04 §13 -- the binding gaps this section's plan review filed
 
 > **Started:** 2026-09-19T06:25:00Z
 
@@ -538,6 +542,48 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 -> XREF: D00 T04 §9 -- the panel that left these at the hard cap
 -> SOURCE: panel-D00-T04-s9-2026-09-19 D00-T04-S9-F10
 -> SOURCE: panel-D00-T04-s9-2026-09-19 D00-T04-S9-F11
+
+## 12. Prove the Manifest, Not Just Emit It
+
+§9's plan review broke the manifest's core claim: sha and tag both sit in the preamble, so a truncation past the manifest still receipts validly, and the drill only proved receiptless output fails. Base and head float optional, combined diffs stay an admitted residual, the parse trusts hand-rolled quoting, and no attestation survives the terminal. This section makes the manifest prove what §9 says it proves.
+
+- [ ] Close the preamble hole: the receipt must quote a closing nonce (or equivalent tail-only evidence) verified against a session-side value the prompt never carries. Done when: a truncation past the manifest fails, quoted, and the full receipt still passes.
+- [ ] Require base and head on every candidate manifest, and reject a manifest that floats free. Done when: a candidate review without both fails closed, quoted.
+- [ ] Parse combined diffs or refuse them explicitly. Done when: a merge candidate either lists every changed file or fails naming the shape, quoted.
+- [ ] Cross-check the parsed file set against a NUL-delimited `git diff` file list. Done when: a divergence fails closed, quoted, with the self-test covering it.
+- [ ] Emit a machine-readable review attestation: manifest hash, candidate and tree OIDs, reviewer and model identity, verdict, timestamp, and checker result. Done when: one attestation per review exists beside the findings file and the skill reads it back.
+- [ ] Commit: `"workspace: prove the manifest"`
+
+**Test checkpoint:** The preamble truncation fails, the full receipt passes, a baseless manifest fails, a merge candidate lists or refuses, the cross-check diverges loudly, and one attestation reads back. All quoted.
+
+-> XREF: D00 T04 §9 -- the manifest this section hardens
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR1 D00-T04-S9-PR1
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR2 D00-T04-S9-PR2
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR3 D00-T04-S9-PR3
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR6 D00-T04-S9-PR6
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR7 D00-T04-S9-PR7
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR17 D00-T04-S9-PR17
+
+## 13. Bind the Stamp to the Push
+
+§9 binds approval to the staged tree at commit time; its plan review found the binding ends too early and trusts too much. The push is unverified, a pre-commit hook can rewrite the tree after the last check, the candidate identity is compared as text rather than resolved, the contradiction and stale-anchor shapes were only half-probed, and short citation forms bypass the validator. This section carries the binding from the index to the push.
+
+- [ ] Recheck at push time: verify the created commit's tree and expected parent, and that the same commit remains at HEAD immediately before push. Done when: a post-review replacement fails closed, quoted, and the skill carries the commands.
+- [ ] Fail closed on hook mutation: compare the resulting commit tree with the reviewed tree. Done when: a hook that rewrites the tree forces re-review, quoted.
+- [ ] Resolve the candidate mechanically: OID exists, tree matches the reviewed tree, before any stamp is accepted. Done when: an unresolving or mismatched candidate fails closed, quoted.
+- [ ] Probe the contradiction shape with conflicting live stamps, and the stale-anchor shape with an existing file behind a dead section, line, or candidate anchor. Done when: each is driven against a staged stamp and named, both quoted.
+- [ ] Validate every citation form in skills, or ban ambiguous shorthand there. Done when: the validator names short-form violations by file and line, quoted, with the self-test covering it.
+- [ ] Commit: `"workspace: bind the stamp to the push"`
+
+**Test checkpoint:** The push recheck, the hook check, the OID resolution, both probes, and the short-form report are quoted from driven runs.
+
+-> XREF: D00 T04 §9 -- the binding this section extends
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR4 D00-T04-S9-PR4
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR5 D00-T04-S9-PR5
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR8 D00-T04-S9-PR8
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR9 D00-T04-S9-PR9
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR10 D00-T04-S9-PR10
+-> SOURCE: plan-D00-T04-s9-2026-09-19-PR11 D00-T04-S9-PR11
 
 ## Verification
 
