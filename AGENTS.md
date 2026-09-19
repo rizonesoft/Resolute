@@ -101,7 +101,7 @@ The exception is a genuinely single-surface tool, such as a hash verifier or a l
 
 `todo/` is the live execution plan; **format spec: `todo/README.md`.** Markdown is canonical and `build/` holds derived, gitignored projections.
 
-Ten flat-numbered domains `00`-`09`. Numbers are stable addresses: a new domain appends after `09`.
+Eleven flat-numbered domains `00`-`10`. Numbers are stable addresses: a new domain appends after the last one.
 
 Files are `todo/NN-domain/TODO-NN-short-name.md`. The **Implementation Order table is the dependency graph**: every `## N.` section has exactly one row and vice versa, and a row flips to `[x]` only when a `Verified:` stamp covers it. Cross-references use section marks in the forms `SN`, `TNN SN`, and `DNN TNN SN` as spelled out in `todo/README.md`, and must be bidirectional.
 

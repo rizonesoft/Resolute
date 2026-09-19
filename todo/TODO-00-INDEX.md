@@ -34,6 +34,7 @@ Domains are numbered in **allocation order**. `DNN TNN §N` cross-references enc
 | 07 | [Quality](./07-quality/INDEX.md) | 0 | The bar, written before the work rather than after it. |
 | 08 | [Documentation and Localization](./08-docs-localization/INDEX.md) | 4 | A complete documentation set per tool, and one shared string pool composed into each tool's pack at build time so a standalone tool still carries everything it needs. |
 | 09 | [AutoIt Maintenance](./09-au3-maintenance/INDEX.md) | 0 | Keeping the shipping AutoIt suite alive and buildable for as long as the rewrite takes, without it becoming a second development effort. |
+| 10 | [Operator](./10-operator/INDEX.md) | 0 | Work no agent session can perform, reserved for the operator; no runner takes rows from this domain. |
 
 The Phase column is the coarse domain grouping, not an executable schedule. Current dependency-safe sequencing and live counts come only from [`implementation-plan.md`](./implementation-plan.md) plus `python scripts/todo-graph.py query stats`. Do not infer readiness from a domain number or repeat fixed totals here.
 

@@ -12,6 +12,7 @@ Toolchain, gates, build, and the test backbone every later domain leans on. Noth
 | [TODO-02](./TODO-02-test-backbone.md) | Test Backbone | draft |
 | [TODO-03](./TODO-03-codebase-intake.md) | ExoSuite Codebase Intake | draft |
 | [TODO-04](./TODO-04-self-correction.md) | Self-Correction and Feedback | draft |
+| [TODO-05](./TODO-05-repo-face.md) | Repo Face and Setup-Path CI | draft |
 
 ## Completed
 
