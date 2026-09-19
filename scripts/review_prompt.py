@@ -159,7 +159,8 @@ def _scan_diff_block(lines: list[str]) -> list[str]:
     from the header when git names one (exact even when both sides
     carry spaces), else the `diff --git` sides. The rename scan stops
     at the hunk body (`--- `, `+++ `, or `@@`): git emits the pair
-    above it, so anything below is pasted input, never a rename."""
+    above it, so anything below is pasted input, never a rename.
+    With the scan bound, combined diffs stand as the sole residual."""
     renames: dict[str, str] = {}
     diff_line = None
     for line in lines:

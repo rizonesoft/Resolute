@@ -4,15 +4,15 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**171 findings across 27 sections.**
+**173 findings across 27 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 54 | the plan or the evidence misdescribes what happened |
+| `record` | 55 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
-| `consistency` | 27 | disagrees with the rest of the suite, its naming, or its layout |
+| `consistency` | 28 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 26 | fails under hostile or unexpected input |
 | `integration` | 15 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
@@ -27,7 +27,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
 | `major` | 85 | wrong behavior in code, plan, or record |
-| `minor` | 80 | polish or wording, or no surviving defect |
+| `minor` | 82 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -142,6 +142,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §10` | F8 | minor | `record` | fixed | independent | the proof quote omitted the timestamp |
 | `D00 T04 §10` | F9 | minor | `adversarial` | filed | independent | bool versions pass the export gates |
 | `D00 T04 §11` | F1 | minor | `record` | fixed | independent | the proof quote records the verdict fragment, not the probe output |
+| `D00 T04 §11` | F2 | minor | `consistency` | fixed | independent | the docstring omits the sole-residual sentence |
+| `D00 T04 §11` | F3 | minor | `record` | fixed | independent | the Done note overclaims agreement |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |
