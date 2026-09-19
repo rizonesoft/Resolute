@@ -638,9 +638,10 @@ The §10 plan review accepted three minors the enriched records leave open: late
 - [ ] Carry per-finding dispositions in the export, so a snapshot consumer can compute accepted yield without rejoining live records that may postdate the as-of. Done when: the export asserts dispositions per ref, quoted, and the live round-trip passes.
 - [ ] Settle the provider vocabulary: round lines record runner names (`codex`, `claude`) where provider-level queries want the serving provider. Done when: the header defines what `provider` names, quoted, and the closed set matches the definition.
 - [ ] Record cost and latency at record time: the review skill writes measured cost in tokens and latency on every new round line, so the §8 value-per-cost comparison stops reading `unresolved`. Done when: the skill carries the recording step, and a round line written by following it resolves both fields, quoted from a driven record.
+- [ ] Report the revisit-trigger state in `--report`: panel-reviewed sections counted past the §8 window of five, so the §18 trigger reads from the query rather than a hand count. Done when: the report prints the count with the window named, quoted from a driven report.
 - [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
 
-**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; all quoted from driven runs.
+**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; all quoted from driven runs.
 
 -> XREF: D00 T04 §10 -- the records this section tightens
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
@@ -650,15 +651,16 @@ The §10 plan review accepted three minors the enriched records leave open: late
 -> SOURCE: div-D00-T04-s8-2026-09-19-I4 D00-T04-S8-D1
 -> SOURCE: div-D00-T04-s8-2026-09-19-R4 D00-T04-S8-D2
 -> SOURCE: gap-phase0-2026-09-19-cost
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR15 D00-T04-S8-PR15
 
 ## 16. Blinded-Run Checker Defects
 
-The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three refusal-shape defects that survive in the shipped checkers, all driven: a duplicate transition block for a dead ref reports "names no live finding" twice without ever reporting the duplicate, `--report --export` silently prints only the report, and `schema: 99` emits the true version error plus a false "no schema declaration". (A fourth find, the panel-shape terminology contradicting the S9 block's voided round 2, filed as a §15 item.) Each is a five-line fix with a refusal test; none blocks the §8 decision.
+The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three refusal-shape defects that survive in the shipped checkers, all driven: a duplicate transition block for a dead ref reports "names no live finding" twice without ever reporting the duplicate, `--report --export` silently prints only the report, and `schema: 99` emits the true version error plus a false "no schema declaration". (A fourth find, the panel-shape terminology contradicting the S9 block's voided round 2, filed as a §15 item.) A fifth, the never-defect severity loophole (the parser accepts a refuted finding carrying critical against the stated minor rule), filed from this review's sign-off as the fourth fix item. Each is a five-line fix with a refusal test; none blocks the §8 decision.
 
 - [ ] Report duplicate transition blocks even when the ref is dead. Done when: two blocks for one dead ref draw the duplicate message, quoted, and the live transitions still pass.
 - [ ] Reject conflicting `--report --export` flags with a usage error instead of silently printing the report. Done when: the combination fails naming the conflict, quoted, and each flag alone still works.
 - [ ] Emit only the version error for a wrong schema declaration, not a false "no schema declaration" beside it. Done when: `schema: 99` draws exactly one message, quoted.
-- [ ] Enforce the never-defect severity rule in the parser: a refuted, withdrawn, or duplicate finding carrying anything but minor fails the gate by name. Done when: `REFUTED (self) [critical]` is reported naming the rule, quoted, and the live ledger still passes.
+- [ ] Enforce the never-defect severity rule in the parser: a refuted, withdrawn, or duplicate finding carrying anything but minor fails the gate by name. Severity rates surviving contribution, not alleged impact: a duplicate of a critical is minor because it contributes nothing new. Done when: `REFUTED (self) [critical]` is reported naming the rule, quoted, the SEVERITIES comment states the semantic, and the live ledger still passes.
 - [ ] Commit: `"workspace: blinded-run checker defects"`
 
 **Test checkpoint:** The duplicate, the flag conflict, and the double message are each quoted from driven runs; a never-defect carrying major or critical fails naming the rule; the self-tests cover all four refusals.
@@ -668,33 +670,49 @@ The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three
 -> SOURCE: blind-D00-T04-s8-2026-09-19-OI1 D00-T04-S8-B3
 -> SOURCE: blind-D00-T04-s8-2026-09-19-OI2 D00-T04-S8-B4
 -> SOURCE: panel-D00-T04-s8-2026-09-19 D00-T04-S8-F1
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR18 D00-T04-S8-PR18
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR19 D00-T04-S8-PR19
 
 ## 17. Report Without Walking the Corpus Twice
 
 The §8 diversity runs found `report()` calls `TF.collect()` after `run_check()` already collected the same corpus through `cross_check`, doubling repository-wide file reads and parsing on every `--report`. True and cheap to fix by threading the collected findings through; unnoticed because the corpus is 25 files and the report runs in milliseconds, which is also why this is a single-item section rather than a performance project.
 
-- [ ] Thread the collected findings from `run_check` through `report` so `--report` walks the review corpus once. Done when: one `TF.collect()` serves the check and the report, quoted from the code path, and the report output is byte-identical before and after.
+- [ ] Thread the collected findings from `run_check` through `report` so `--report` walks the review corpus once. Done when: one `TF.collect()` serves the check and the report, quoted from the code path, the report output is byte-identical before and after, and `--check` and `--export` outputs and exit codes are pinned unchanged, quoted.
 - [ ] Commit: `"workspace: report without walking the corpus twice"`
 
 **Test checkpoint:** The report output is byte-identical across the change, quoted; the self-test pins the single collection.
 
 -> XREF: D00 T04 §8 -- the diversity runs that found this
 -> SOURCE: div-D00-T04-s8-2026-09-19-P1 D00-T04-S8-D3
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR20 D00-T04-S8-PR20
 
 ## 18. Second Two-Model Revisit, Independently Rated
 
-D00 T04 §8 kept both models on a value margin (79 vs 31) computed from severities the implementing session assigned in bulk after every outcome was known, then used to decide. That self-attestation confound is the same one D00 T04 §7 removed for the source split by deriving it from run records; the keep stands on the blinded Jaccard 0.22 corroboration, but the next revisit must not repeat the methodology. This section re-decides after five more panel-reviewed sections with severities assigned independently of the decision.
+D00 T04 §8 kept both models on a value margin (79 vs 31) computed from severities the implementing session assigned in bulk after every outcome was known, then used to decide. That self-attestation confound is the same one D00 T04 §7 removed for the source split by deriving it from run records; the keep stands on the blinded Jaccard 0.22 corroboration, but the next revisit must not repeat the methodology. This section re-decides after five more panel-reviewed sections with severities assigned independently of the decision. Reading note: where D00 T04 §8 item 1 says both blinded outputs returned PASS, PASS means well-formed four-lens output, not approval.
 
 **Trigger: starts after five more panel-reviewed sections exist in the run records past the §8 window of five.** Counted by query, not by prose. Until the trigger is met this section waits, however its dependencies read: a revisit decided on the same window is a second opinion from the same data.
 
 - [ ] Re-rate severity independently: every finding in the new window carries a severity assigned by a party other than the deciding session (a blinded re-rating pass, or the panel's own rating at finding time), with the rater recorded per finding. Done when: no severity in the window is decider-attested, quoted from the records.
-- [ ] Re-apply the §8 cut rule on the new window: rolling five sections, mean blinded Jaccard with a fresh comparison, 9/3/1 weights, recorded cost where available. Done when: each leg reads from regenerated exports, quoted, with the overlap leg dormant rather than cut when the window holds no comparison.
+- [ ] Re-apply the §8 cut rule on the new window: rolling five sections, mean blinded Jaccard with a fresh comparison, 9/3/1 weights, recorded cost where available. Done when: each leg reads from regenerated exports, quoted, with the overlap leg dormant rather than cut when the window holds no comparison, and the fresh comparison runs as a controlled crossover: object-isolated snapshots with no future objects, identical prompts, lenses, effort, token limits, tool access, and pinned versions per rung, matched passes per lens per rung, recorded matched pairs with disagreements and rationale, and persisted inputs (export, ledger snapshot, join logic) with hashes.
 - [ ] Decide keep or cut with the losing rung's duties reassigned on a cut, and name the third revisit. Done when: the decision is dated, cites the export, and either keeps with the next trigger named or cuts with duties reassigned.
+- [ ] Close the cut-rule holes before applying it: directional tie-handling when overlap is high (which rung the trailing clause names on ties, with the margin), and minimum activation (how many blinded comparisons over how diverse a candidate set before the overlap leg can cut). Done when: both rules are stated with worked ties, quoted.
+- [ ] Mark the §6 provisional cut rule superseded with a pointer to §8, so one threshold is authoritative (post-stamp prose pointer, following the §1 "Updated by §5" precedent; checklist and stamp untouched). Done when: the §6 rule carries the pointer and no second threshold reads as live.
+- [ ] Render the decision inputs as a compact dashboard: matched unique weighted value, cost, latency, outcomes, and confidence by model and candidate class. Done when: the next decision reads the dashboard rather than bespoke prose.
 - [ ] Commit: `"workspace: second two-model revisit, independently rated"`
 
 **Test checkpoint:** The window counts five new panel sections by query; no severity in it is decider-attested; the cut rule reads from fresh exports with Jaccard measured; the decision cites the export and names the next trigger. Blocked on the trigger until it is met, explicitly.
 
 -> SOURCE: panel-D00-T04-s8-2026-09-19-signoff D00-T04-S8-F10
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR4 D00-T04-S8-PR4
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR5 D00-T04-S8-PR5
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR6 D00-T04-S8-PR6
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR7 D00-T04-S8-PR7
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR9 D00-T04-S8-PR9
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR10 D00-T04-S8-PR10
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR11 D00-T04-S8-PR11
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR12 D00-T04-S8-PR12
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR16 D00-T04-S8-PR16
+-> SOURCE: plan-D00-T04-s8-2026-09-19-PR21 D00-T04-S8-PR21
 
 ## Verification
 
