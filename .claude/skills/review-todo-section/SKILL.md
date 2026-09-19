@@ -228,10 +228,11 @@ Finding headings take the form `### F<n> -- summary -- category -- disposition (
 The stamp makes factual claims no lens has checked: the panel reviewed the candidate, not the record of the review. Stage the stamp commit (`git add` the stamped TODO, the plan, the findings file, the attestation, and the ledger; no commit yet), then review the staged stamp with the pinned model:
 
 ```bash
-python scripts/review_prompt.py attest --read-back <findings stem>.attest.json  # the staged attestation reads back now, not only at emit: an altered file fails here, never ships
 TREE=$(git write-tree)  # the index identity FIRST: anything staged after this line is not under review
 git diff --cached > $RUNDIR/stamp.patch
 [ "$(git write-tree)" = "$TREE" ] || { echo "BLOCKED: the index moved while capturing the stamp patch; re-stage and restart"; exit 1; }
+git show :<findings stem>.attest.json > $RUNDIR/staged.attest.json  # the STAGED blob: the disk file may differ after staging, and only the blob ships
+python scripts/review_prompt.py attest --read-back $RUNDIR/staged.attest.json  # the staged attestation reads back now: an altered blob fails here, never ships
 python scripts/review_prompt.py fence STAMP --base $(git rev-parse HEAD) --head $TREE "STAGED STAMP=$RUNDIR/stamp.patch" "FINDINGS FILE=<findings path>" > $RUNDIR/stamp-fenced.md
 TAG=$(sed -n '1s/^TAG \([^ ]*\).*/\1/p' $RUNDIR/stamp-fenced.md)
 head -n 2 $RUNDIR/stamp-fenced.md > $RUNDIR/stamp-manifest.md
