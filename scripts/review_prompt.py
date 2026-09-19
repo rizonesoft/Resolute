@@ -131,6 +131,11 @@ MANIFEST_RE = re.compile(
     r"^MANIFEST\s+bytes=(?P<bytes>[0-9]+)\s+files=(?P<files>[0-9]+)\s+"
     r"sha=(?P<sha>[0-9a-f]{64})(?P<rest>.*)$"
 )
+# Chunks carrying a unified diff name it in the title (CANDIDATE DIFF,
+# STAGED STAMP); only those are scanned for changed files, so a `+++`
+# line in prose can never forge the file list.
+_DIFF_TITLE_RE = re.compile(r"DIFF|PATCH|STAMP")
+_DIFF_FILE_RE = re.compile(r"^diff --git a/\S+ b/(?P<path>\S+)\s*$", re.MULTILINE)
 RECEIPT_RE = re.compile(r"^RECEIPT\s+sha=(?P<sha>[0-9a-f]{64})\s+end=(?P<end>\S+)\s*$")
 TAG_LINE_RE = re.compile(r"^TAG\s+(?P<tag>\S+)\s*$")
 
@@ -147,6 +152,12 @@ def build_manifest(tag: str, chunks: list[tuple[str, str]],
     count = len(canonical_prompt_bytes(body))
     titles = "|".join(title for title, _ in chunks)
     line = f"MANIFEST bytes={count} files={len(chunks)} sha={digest} titles={titles}"
+    diff_files = []
+    for title, chunk_body in chunks:
+        if _DIFF_TITLE_RE.search(title):
+            diff_files.extend(m.group("path") for m in _DIFF_FILE_RE.finditer(chunk_body))
+    if diff_files:
+        line += " diff-files=" + "|".join(diff_files)
     if base is not None:
         line += f" base={base}"
     if head is not None:
@@ -398,6 +409,15 @@ def _self_test() -> int:
     check("plan-missing-receipt-fails", (not ok) and "not a receipt" in reason, reason)
     ok, reason = check_plan_output(receipt + "not a finding\n", (tag, expect_sha))
     check("plan-shape-still-checked", (not ok) and "not a `- ` finding" in reason, reason)
+
+    patch = ("diff --git a/one.md b/one.md\n+++ b/one.md\n"
+             "diff --git a/two.md b/two.md\n+++ b/two.md\n")
+    prose_trap = "some prose\ndiff --git a/fake b/fake\nmore prose\n"
+    mline, _ = build_manifest(tag, [("SECTION", prose_trap), ("CANDIDATE DIFF", patch)])
+    check("manifest-diff-files", "diff-files=one.md|two.md" in mline, mline)
+    check("manifest-prose-trap", "fake" not in mline, mline)
+    mline2, _ = build_manifest(tag, [("SECTION", prose_trap)])
+    check("manifest-no-diff-chunks", "diff-files=" not in mline2, mline2)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
