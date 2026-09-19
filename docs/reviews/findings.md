@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 77 | wrong behavior in code, plan, or record |
-| `minor` | 77 | polish or wording, or no surviving defect |
+| `major` | 76 | wrong behavior in code, plan, or record |
+| `minor` | 78 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -185,7 +185,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §9` | F11 | minor | `record` | filed | independent | the residual clause omits the post-hunk shape |
 | `D07 T01 §1` | F1 | minor | `record` | corrected | self | the measured defect classes are eight, not seven |
 | `D07 T01 §1` | F2 | minor | `record` | routed | self | the section was told to wait for a decision that has no owner here |
-| `D07 T01 §1` | F3 | major | `record` | corrected | self | the checkpoint could not fail |
+| `D07 T01 §1` | F3 | minor | `record` | corrected | self | the checkpoint could not fail |
 | `D07 T01 §1` | F4 | major | `correctness` | fixed | independent | C15 forbade the entire purpose of a repair tool |
 | `D07 T01 §1` | F5 | major | `adversarial` | fixed | independent | two spaces bypassed the checker entirely |
 | `D07 T01 §1` | F6 | major | `test-coverage` | fixed | independent | the checker had nothing exercising it |

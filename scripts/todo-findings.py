@@ -201,7 +201,7 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
             continue
         parts = [p.strip() for p in m.group("body").split(" -- ")]
         if len(parts) < 4:
-            bad.append((path, lineno, f"needs 'F<n> -- summary -- category -- disposition', got {len(parts)} field(s)"))
+            bad.append((path, lineno, f"needs 'F<n> -- summary -- category -- disposition (source) [severity]', got {len(parts)} field(s)"))
             continue
         number, summary, category, disposition = parts[0], parts[1], parts[2], " -- ".join(parts[3:])
         cat = category.strip("`*_ ").lower()
