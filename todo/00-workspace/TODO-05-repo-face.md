@@ -73,14 +73,16 @@ The README follows the full shape: purpose, badges, screenshot, audience, quick 
 - [ ] Write the quick start and configuration. Done when: the quick start runs clone to green build in copy-paste commands, and every configuration knob is named with its default. Cheaper substitute that fails the checkpoint: a quick start the author never ran cold, which is what §3 exists to prevent.
 - [ ] Write usage, troubleshooting, docs and contributing, status and license. Done when: each of the four is present, troubleshooting answers the failures the clean-checkout build actually produced, and the license section names GPL v3 with the `D06 T01 §8` file as its landing place.
 - [ ] Add `CONTRIBUTING.md` and the pull-request template. Done when: both exist, contributing states the trunk-master and no-force-push rules, and the template asks for the proof the change owes.
+- [ ] Run the gates in the quick start, not just the build: the clone-to-green path executes `scripts/check-all.ps1` so the §3 lane and the D10 T01 §2 branch rule gate on tests and analysis rather than on compilation alone. Done when: the quick start's green includes the gate verdict, quoted from a cold run.
 - [ ] Commit: `"docs: full-structure README plus contributor files"`
 
-**Test checkpoint:** Every one of the ten README sections is present; every badge renders and the toolchain badge matches the pin file; `CONTRIBUTING.md` and the pull-request template exist. Cheaper substitute that fails the checkpoint: a README that reads well but whose quick start was never executed, which §3 catches.
+**Test checkpoint:** Every one of the ten README sections is present; every badge renders and the toolchain badge matches the pin file; `CONTRIBUTING.md` and the pull-request template exist; the quick start runs check-all with the gate verdict quoted. Cheaper substitute that fails the checkpoint: a README that reads well but whose quick start was never executed, which §3 catches.
 
 -> XREF: D00 T05 §1 -- the captures this README embeds
 -> XREF: D00 T05 §3 -- the CI that runs this quick start verbatim
 -> XREF: D10 T01 §1 -- the About bar that quotes this one-liner
 -> XREF: D10 T01 §3 -- the cold-reader pass that proofs this README
+-> SOURCE: gap-phase0-2026-09-19-ci-gates
 
 ## 3. Setup-Path CI Plus Reproducibility Record
 

@@ -113,7 +113,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T04 §12` | Prove the manifest, not just emit it           |   6   |
 | [ ] | `D00 T04 §13` | Bind the stamp to the push                     |   6   |
 | [ ] | `D00 T04 §14` | Bar bool versions from the export gate         |   2   |
-| [ ] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |   7   |
+| [ ] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |   8   |
 | [ ] | `D00 T04 §16` | Blinded-run checker defects                    |   4   |
 | [ ] | `D00 T04 §17` | Report without walking the corpus twice        |   2   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                   |  14   |
@@ -140,7 +140,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T02 §9`  | Rendered-output regression tests               |   4   |
 | [ ] | `D00 T01 §8`  | Run the unit suite under release               |   2   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance           |   4   |
-| [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files            |   6   |
+| [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files            |   7   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility             |   5   |
 | [ ] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow               |   5   |
 | [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                  |   7   |

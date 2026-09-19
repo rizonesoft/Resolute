@@ -636,9 +636,10 @@ The §10 plan review accepted three minors the enriched records leave open: late
 - [ ] Pin the panel shape against voided rounds: the terminology block states Sol rounds 1-2 with the Opus sign-off at round 3 unconditionally, while the S9 block numbers a voided Sol round 2 and signs off at round 4. Done when: the header admits voids consuming numbers, quoted, and the S9 block reads consistent with it.
 - [ ] Carry per-finding dispositions in the export, so a snapshot consumer can compute accepted yield without rejoining live records that may postdate the as-of. Done when: the export asserts dispositions per ref, quoted, and the live round-trip passes.
 - [ ] Settle the provider vocabulary: round lines record runner names (`codex`, `claude`) where provider-level queries want the serving provider. Done when: the header defines what `provider` names, quoted, and the closed set matches the definition.
+- [ ] Record cost and latency at record time: the review skill writes measured cost in tokens and latency on every new round line, so the §8 value-per-cost comparison stops reading `unresolved`. Done when: the skill carries the recording step, and a round line written by following it resolves both fields, quoted from a driven record.
 - [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
 
-**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; all quoted from driven runs.
+**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; all quoted from driven runs.
 
 -> XREF: D00 T04 §10 -- the records this section tightens
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
@@ -647,6 +648,7 @@ The §10 plan review accepted three minors the enriched records leave open: late
 -> SOURCE: blind-D00-T04-s8-2026-09-19-term D00-T04-S8-B1
 -> SOURCE: div-D00-T04-s8-2026-09-19-I4 D00-T04-S8-D1
 -> SOURCE: div-D00-T04-s8-2026-09-19-R4 D00-T04-S8-D2
+-> SOURCE: gap-phase0-2026-09-19-cost
 
 ## 16. Blinded-Run Checker Defects
 
