@@ -671,9 +671,10 @@ The §10 plan review accepted three minors the enriched records leave open: late
 - [ ] Record cost and latency at record time: the review skill writes measured cost in tokens and latency on every new round line, so the §8 value-per-cost comparison stops reading `unresolved`. Done when: the skill carries the recording step, and a round line written by following it resolves both fields, quoted from a driven record.
 - [ ] Report the revisit-trigger state in `--report`: panel-reviewed sections counted past the §8 window of five, so the §18 trigger reads from the query rather than a hand count. Done when: the report prints the count with the window named, quoted from a driven report.
 - [ ] Give stamp-review rounds a record shape the panel mapping skips, so the STAMP HOLDS verdict survives the session: today a stamp round in a panel block would demand four-lens verdicts it cannot have, and outside one it has no home. Done when: this review's stamp round is recorded, quoted, and `--check` passes.
+- [ ] Give independent passes a record shape the panel mapping skips, so a review with both an independent pass and panel rounds records honestly: today the pass rides an `error` round line (see the §12 block comment), which mislabels usable findings as a voided attempt. Done when: the pass reads in the records under its own shape, the panel mapping still spans panel rounds only, and `--check` passes, quoted.
 - [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
 
-**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; the §8 stamp round reads in the records; all quoted from driven runs.
+**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; the §8 stamp round reads in the records; the independent pass reads under its own shape; all quoted from driven runs.
 
 -> XREF: D00 T04 §10 -- the records this section tightens
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
@@ -685,6 +686,7 @@ The §10 plan review accepted three minors the enriched records leave open: late
 -> SOURCE: gap-phase0-2026-09-19-cost
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR15 D00-T04-S8-PR15
 -> SOURCE: self-2026-09-19-stamp-rounds
+-> SOURCE: self-2026-09-20-independent-rounds
 
 ## 16. Blinded-Run Checker Defects
 
