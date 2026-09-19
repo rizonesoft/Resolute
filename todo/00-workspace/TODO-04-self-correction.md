@@ -784,12 +784,14 @@ Two §12 sign-off findings ask for stronger machinery than §12's contract: the 
 
 - [ ] Verify cross-check content coverage, not just file sets: a fenced chunk that drops commits inside base..head while keeping the file set must fail. Done when: the dropped-commit shape fails closed quoted, with content comparison, per-commit manifests, or a tool-driven union proof for non-contiguous candidates (the implementation chooses, and the §12 round-3 demonstration, `633e32b` inside the span yet absent from the chunk with sets agreeing, is the regression case), the designed contiguous flow still passes, and the self-test pins both. Cheaper substitute that fails the checkpoint: documenting the limitation, which leaves the next non-contiguous review on its honor.
 - [ ] Verify the stamp reviewer's output mechanically: receipt plus verdict shape, like check-panel and check-plan. Done when: a stamp-output check validates the receipt against the stamp manifest and the `STAMP HOLDS`-vs-namings shape, the skill wires it after the stamp runner, a truncated stamp review fails quoted, and the self-test pins receipt, holds, and naming legs. Cheaper substitute that fails the checkpoint: the eyeball verification, which is the gap.
+- [ ] Anchor the manifest identity parse to the trailing fields: `parse_manifest_identity` searches the whole MANIFEST line, so a path or title containing ` base=` or ` head=` poisons the pair cross-check and attest compare. Done when: the parse anchors on the trailing `base=`/`head=` fields, a manifest carrying ` base=` inside `diff-files` parses the true pair quoted, and the self-test pins the poisoned case plus the clean case. Cheaper substitute that fails the checkpoint: documenting the filename restriction, which the next rename will violate.
 - [ ] Commit: `"workspace: review-input integrity hardening"`
 
-**Test checkpoint:** The dropped-commit chunk fails quoted and the contiguous chunk passes; the truncated stamp review fails quoted and `STAMP HOLDS` passes; both self-tests pin their legs.
+**Test checkpoint:** The dropped-commit chunk fails quoted and the contiguous chunk passes; the truncated stamp review fails quoted and `STAMP HOLDS` passes; the poisoned manifest parses the true pair quoted; all three self-tests pin their legs.
 
 -> SOURCE: panel-D00-T04-s12-2026-09-20 D00-T04-S12-F11
 -> SOURCE: panel-D00-T04-s12-2026-09-20 D00-T04-S12-F12
+-> SOURCE: panel-D00-T04-s12-2026-09-20 D00-T04-S12-F15
 
 ## Verification
 
