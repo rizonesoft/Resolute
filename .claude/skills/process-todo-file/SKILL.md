@@ -28,7 +28,7 @@ Every row `[x]`, every `[x]` covered by a `Verified:` stamp, zero FATALs. If a r
 
 ### 2. Run the file-level Verification block
 
-The `## Verification` section is not decoration. Run every item in it and record the real output. This is the only place the file is checked as a whole rather than section by section, and it is where integration gaps surface.
+The `## Verification` section is not decoration. Run every item in it and record the real output. This is the only place the file is checked as a whole rather than section by section, and it is where integration gaps surface. In sweep-only mode, a Verification item the shipped rows cannot satisfy is recorded as not-yet-runnable with the owning open section named, never executed speculatively and never trimmed silently.
 
 For a code TODO that means the **full** sweep, not the filtered runs individual sections used:
 
@@ -37,7 +37,7 @@ pwsh scripts/check-all.ps1             # build both architectures, clang-tidy, t
 ctest --preset x64-debug               # the whole suite, once it exists (D00 T02 §1)
 ```
 
-plus the file's other Verification items (both architectures built, captures refreshed, parity reports quoted where the file owes one, a clean-machine install check where the file owes one), each executed, none trimmed.
+plus the file's other Verification items (both architectures built, captures refreshed, parity reports quoted where the file owes one, a clean-machine install check where the file owes one), each executed, none trimmed (in sweep-only mode: executed where the shipped rows allow, otherwise recorded not-yet-runnable with its owner).
 
 ### 3. Loose-end sweep
 

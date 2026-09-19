@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**168 findings across 26 sections.**
+**170 findings across 26 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 52 | the plan or the evidence misdescribes what happened |
+| `record` | 53 | the plan or the evidence misdescribes what happened |
 | `correctness` | 35 | the code does the wrong thing |
 | `consistency` | 27 | disagrees with the rest of the suite, its naming, or its layout |
 | `adversarial` | 26 | fails under hostile or unexpected input |
-| `integration` | 14 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 15 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 84 | wrong behavior in code, plan, or record |
-| `minor` | 78 | polish or wording, or no surviving defect |
+| `major` | 85 | wrong behavior in code, plan, or record |
+| `minor` | 79 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -180,6 +180,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §8` | F6 | minor | `record` | fixed | independent | the run record's resolve counts disagree with its enumerations |
 | `D00 T04 §8` | F7 | major | `integration` | fixed | independent | the review file has findings but no run block |
 | `D00 T04 §8` | F8 | major | `record` | fixed | independent | the candidate table and count lines lag the review |
+| `D00 T04 §8` | F9 | major | `integration` | fixed | independent | sweep-only mode still demands the whole Verification block |
+| `D00 T04 §8` | F10 | minor | `record` | filed | independent | the severity self-attestation confound goes unnamed |
 | `D00 T04 §9` | F1 | critical | `adversarial` | fixed | independent | the binding reviewed one tree and recorded another |
 | `D00 T04 §9` | F2 | major | `consistency` | fixed | independent | the file list counted chunks, not changed files |
 | `D00 T04 §9` | F3 | minor | `record` | fixed | independent | two items stood complete over known gaps |
