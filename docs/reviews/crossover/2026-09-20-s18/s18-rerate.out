@@ -1,0 +1,22 @@
+B1: critical -- the candidate-identity gate accepts a tree in place of the reviewed commit.
+B2: critical -- the content binding omits the live findings ledger consumed by the stamped analysis.
+B3: major -- the run record cites figures with no committed source artifact.
+B4: critical -- the commit-type gate can be bypassed through Git replacement refs.
+B5: major -- the completion note contradicts its own recorded output differences.
+B6: critical -- the export checker accepts fabricated bindings that resolve to no evidence.
+B7: critical -- the identity and attestation gates permit replacement-ref substitution of candidate content.
+B8: major -- the shipped section record falsely describes an enforced rule as unenforced.
+B9: critical -- the agreement checker can present non-candidate content to the reviewer.
+B10: major -- the resolver reports version-control failures as internal tracebacks.
+B11: critical -- the stamp patch can differ from the staged change being certified.
+B12: minor -- the exact-message allegation was refuted.
+B13: major -- the self-test repository is not isolated from mutating global Git configuration.
+B14: major -- the skill record falsely characterizes unmeasured and unpersisted results.
+B15: minor -- the evidence-binding allegation duplicates a previously decided finding.
+B16: major -- the run record presents reconstructed abbreviated identifiers as quoted output.
+B17: major -- the proof record attributes values to committed evidence that contains none.
+B18: major -- the diagnostic record falsely claims abbreviated identifiers were quoted.
+B19: critical -- the checkpoint depends circularly on evidence created only by the stamp itself.
+B20: major -- the scope record claims call-site coverage beyond the implemented fix.
+B21: major -- the rationale record asserts an unproved protection without supporting run evidence.
+B22: major -- the coverage record falsely claims all instructed reads use the required flags.

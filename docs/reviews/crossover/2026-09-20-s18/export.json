@@ -1,0 +1,1956 @@
+{
+  "export_version": 2,
+  "schema": 1,
+  "as_of": {
+    "commit": "7a4ca972f56ac6d2e85d205e5e770e2aa05c0147",
+    "timestamp": "2026-09-20T05:57:28Z"
+  },
+  "runs": [
+    {
+      "section": "D00-T01-S1",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "6bb635e",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T01-S1-F1",
+            "D00-T01-S1-F2"
+          ],
+          "dispositions": {
+            "D00-T01-S1-F1": "fixed",
+            "D00-T01-S1-F2": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T01-S2",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "6062ecb",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T01-S2-F1"
+          ],
+          "dispositions": {
+            "D00-T01-S2-F1": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T01-S3",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "cbd5164",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T01-S3-F1"
+          ],
+          "dispositions": {
+            "D00-T01-S3-F1": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T01-S4",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "b87af92",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T01-S4-F1",
+            "D00-T01-S4-F2",
+            "D00-T01-S4-F3"
+          ],
+          "dispositions": {
+            "D00-T01-S4-F1": "fixed",
+            "D00-T01-S4-F2": "fixed",
+            "D00-T01-S4-F3": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T01-S5",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "e7d634f",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T01-S5-F1",
+            "D00-T01-S5-F2"
+          ],
+          "dispositions": {
+            "D00-T01-S5-F1": "fixed",
+            "D00-T01-S5-F2": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T01-S6",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "0227f4b",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T01-S6-F1"
+          ],
+          "dispositions": {
+            "D00-T01-S6-F1": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T02-S1",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "35b0ef8",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S1-F1"
+          ],
+          "dispositions": {
+            "D00-T02-S1-F1": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T02-S2",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "2536f52",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S2-F1",
+            "D00-T02-S2-F2",
+            "D00-T02-S2-F3"
+          ],
+          "dispositions": {
+            "D00-T02-S2-F1": "fixed",
+            "D00-T02-S2-F2": "fixed",
+            "D00-T02-S2-F3": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T02-S3",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "0ea2877",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S3-F1",
+            "D00-T02-S3-F2",
+            "D00-T02-S3-F3",
+            "D00-T02-S3-F4",
+            "D00-T02-S3-F5"
+          ],
+          "dispositions": {
+            "D00-T02-S3-F1": "corrected",
+            "D00-T02-S3-F2": "fixed",
+            "D00-T02-S3-F3": "fixed",
+            "D00-T02-S3-F4": "fixed",
+            "D00-T02-S3-F5": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T02-S4",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "18a9c6a",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S4-F3",
+            "D00-T02-S4-F4",
+            "D00-T02-S4-F5",
+            "D00-T02-S4-F6"
+          ],
+          "dispositions": {
+            "D00-T02-S4-F3": "fixed",
+            "D00-T02-S4-F4": "fixed",
+            "D00-T02-S4-F5": "fixed",
+            "D00-T02-S4-F6": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T02-S5",
+      "date": "2026-09-19",
+      "runner": "panel",
+      "rounds": 5,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "0f554fc",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S5-F1",
+            "D00-T02-S5-F2",
+            "D00-T02-S5-F3",
+            "D00-T02-S5-F4",
+            "D00-T02-S5-F5"
+          ],
+          "dispositions": {
+            "D00-T02-S5-F1": "corrected",
+            "D00-T02-S5-F2": "corrected",
+            "D00-T02-S5-F3": "corrected",
+            "D00-T02-S5-F4": "corrected",
+            "D00-T02-S5-F5": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "9fa74b7",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S5-F6",
+            "D00-T02-S5-F7",
+            "D00-T02-S5-F8",
+            "D00-T02-S5-F9"
+          ],
+          "dispositions": {
+            "D00-T02-S5-F6": "fixed",
+            "D00-T02-S5-F7": "fixed",
+            "D00-T02-S5-F8": "corrected",
+            "D00-T02-S5-F9": "corrected"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "73603b9",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S5-F10",
+            "D00-T02-S5-F11",
+            "D00-T02-S5-F12"
+          ],
+          "dispositions": {
+            "D00-T02-S5-F10": "fixed",
+            "D00-T02-S5-F11": "fixed",
+            "D00-T02-S5-F12": "fixed"
+          }
+        },
+        {
+          "number": 4,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "1de9d3c",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S5-F13",
+            "D00-T02-S5-F14",
+            "D00-T02-S5-F15"
+          ],
+          "dispositions": {
+            "D00-T02-S5-F13": "fixed",
+            "D00-T02-S5-F14": "fixed",
+            "D00-T02-S5-F15": "corrected"
+          }
+        },
+        {
+          "number": 5,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "96988df",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T02-S5-F16"
+          ],
+          "dispositions": {
+            "D00-T02-S5-F16": "filed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T03-S1",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 2,
+      "empty": 1,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "ffa97c3",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 2,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "empty",
+          "candidate": "8ba1f20",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T03-S2",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 1,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "empty",
+          "candidate": "7d3ac0d",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T03-S3",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 1,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "empty",
+          "candidate": "68c7ea9",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T03-S4",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 1,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "empty",
+          "candidate": "74caddc",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S1",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "f875758",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S1-F1",
+            "D00-T04-S1-F2",
+            "D00-T04-S1-F3",
+            "D00-T04-S1-F4"
+          ],
+          "dispositions": {
+            "D00-T04-S1-F1": "fixed",
+            "D00-T04-S1-F2": "fixed",
+            "D00-T04-S1-F3": "fixed",
+            "D00-T04-S1-F4": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S2",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "43a299a",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S2-F1",
+            "D00-T04-S2-F2"
+          ],
+          "dispositions": {
+            "D00-T04-S2-F1": "fixed",
+            "D00-T04-S2-F2": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S3",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "6fb88f3",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S3-F1",
+            "D00-T04-S3-F2",
+            "D00-T04-S3-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S3-F1": "fixed",
+            "D00-T04-S3-F2": "fixed",
+            "D00-T04-S3-F3": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S4",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "390b560",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S4-F1",
+            "D00-T04-S4-F2",
+            "D00-T04-S4-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S4-F1": "fixed",
+            "D00-T04-S4-F2": "fixed",
+            "D00-T04-S4-F3": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S5",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 1,
+      "empty": 1,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "empty",
+          "candidate": "625f3dc",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S6",
+      "date": "2026-09-19",
+      "runner": "panel",
+      "rounds": 4,
+      "empty": 1,
+      "refuted": 1,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "6cd4676",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S6-F1",
+            "D00-T04-S6-F2"
+          ],
+          "dispositions": {
+            "D00-T04-S6-F1": "fixed",
+            "D00-T04-S6-F2": "corrected"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "11e6de7",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S6-F3",
+            "D00-T04-S6-F4",
+            "D00-T04-S6-F5"
+          ],
+          "dispositions": {
+            "D00-T04-S6-F3": "refuted",
+            "D00-T04-S6-F4": "fixed",
+            "D00-T04-S6-F5": "corrected"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "f0c3db3",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S6-F6"
+          ],
+          "dispositions": {
+            "D00-T04-S6-F6": "fixed"
+          }
+        },
+        {
+          "number": 4,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "79979a6",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S7",
+      "date": "2026-09-19",
+      "runner": "panel",
+      "rounds": 4,
+      "empty": 2,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "e44b137",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S7-F1",
+            "D00-T04-S7-F2",
+            "D00-T04-S7-F3",
+            "D00-T04-S7-F4",
+            "D00-T04-S7-F5"
+          ],
+          "dispositions": {
+            "D00-T04-S7-F1": "fixed",
+            "D00-T04-S7-F2": "fixed",
+            "D00-T04-S7-F3": "fixed",
+            "D00-T04-S7-F4": "fixed",
+            "D00-T04-S7-F5": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "2a184a9",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "2a184a9",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S7-F6",
+            "D00-T04-S7-F7"
+          ],
+          "dispositions": {
+            "D00-T04-S7-F6": "fixed",
+            "D00-T04-S7-F7": "fixed"
+          }
+        },
+        {
+          "number": 4,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "091262f",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S9",
+      "date": "2026-09-19",
+      "runner": "panel",
+      "rounds": 6,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "2b4b493",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S9-F1",
+            "D00-T04-S9-F2",
+            "D00-T04-S9-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S9-F1": "fixed",
+            "D00-T04-S9-F2": "fixed",
+            "D00-T04-S9-F3": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "error",
+          "candidate": "e8ee5e8",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S9-F4"
+          ],
+          "dispositions": {
+            "D00-T04-S9-F4": "fixed"
+          }
+        },
+        {
+          "number": 3,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "965df5f",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S9-F5"
+          ],
+          "dispositions": {
+            "D00-T04-S9-F5": "fixed"
+          }
+        },
+        {
+          "number": 4,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "41bdbc1",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S9-F6",
+            "D00-T04-S9-F7"
+          ],
+          "dispositions": {
+            "D00-T04-S9-F6": "fixed",
+            "D00-T04-S9-F7": "fixed"
+          }
+        },
+        {
+          "number": 5,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "bbaaad5",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S9-F8",
+            "D00-T04-S9-F9"
+          ],
+          "dispositions": {
+            "D00-T04-S9-F8": "fixed",
+            "D00-T04-S9-F9": "fixed"
+          }
+        },
+        {
+          "number": 6,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "9495dab",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "reconstructed",
+          "findings": [
+            "D00-T04-S9-F10",
+            "D00-T04-S9-F11"
+          ],
+          "dispositions": {
+            "D00-T04-S9-F10": "filed",
+            "D00-T04-S9-F11": "filed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S10",
+      "date": "2026-09-19",
+      "runner": "panel",
+      "rounds": 3,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "f118e30",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S10-F1",
+            "D00-T04-S10-F2",
+            "D00-T04-S10-F3",
+            "D00-T04-S10-F4"
+          ],
+          "dispositions": {
+            "D00-T04-S10-F1": "fixed",
+            "D00-T04-S10-F2": "fixed",
+            "D00-T04-S10-F3": "fixed",
+            "D00-T04-S10-F4": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "986d912",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S10-F5",
+            "D00-T04-S10-F6",
+            "D00-T04-S10-F7",
+            "D00-T04-S10-F8"
+          ],
+          "dispositions": {
+            "D00-T04-S10-F5": "fixed",
+            "D00-T04-S10-F6": "fixed",
+            "D00-T04-S10-F7": "fixed",
+            "D00-T04-S10-F8": "fixed"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "0ab7076",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S10-F9"
+          ],
+          "dispositions": {
+            "D00-T04-S10-F9": "filed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D07-T01-S1",
+      "date": "2026-09-17",
+      "runner": "codex",
+      "rounds": 2,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-6-astra",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "a73addf",
+          "provider": "openai",
+          "version": "gpt-6-astra",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D07-T01-S1-F4",
+            "D07-T01-S1-F5",
+            "D07-T01-S1-F6"
+          ],
+          "dispositions": {
+            "D07-T01-S1-F4": "fixed",
+            "D07-T01-S1-F5": "fixed",
+            "D07-T01-S1-F6": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "high",
+          "outcome": "findings",
+          "candidate": "235a71f",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "stamp-review",
+          "provenance": "reconstructed",
+          "findings": [
+            "D07-T01-S1-F7",
+            "D07-T01-S1-F8",
+            "D07-T01-S1-F9",
+            "D07-T01-S1-F10"
+          ],
+          "dispositions": {
+            "D07-T01-S1-F7": "fixed",
+            "D07-T01-S1-F8": "fixed",
+            "D07-T01-S1-F9": "fixed",
+            "D07-T01-S1-F10": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S8",
+      "date": "2026-09-19",
+      "runner": "panel",
+      "rounds": 5,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "a27e296",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S8-F1",
+            "D00-T04-S8-F2",
+            "D00-T04-S8-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S8-F1": "filed",
+            "D00-T04-S8-F2": "fixed",
+            "D00-T04-S8-F3": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "error",
+          "candidate": "296a838",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S8-F4",
+            "D00-T04-S8-F5",
+            "D00-T04-S8-F6"
+          ],
+          "dispositions": {
+            "D00-T04-S8-F4": "fixed",
+            "D00-T04-S8-F5": "fixed",
+            "D00-T04-S8-F6": "fixed"
+          }
+        },
+        {
+          "number": 3,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "296a838",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S8-F7",
+            "D00-T04-S8-F8"
+          ],
+          "dispositions": {
+            "D00-T04-S8-F7": "fixed",
+            "D00-T04-S8-F8": "fixed"
+          }
+        },
+        {
+          "number": 4,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "de3f66a",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S8-F9",
+            "D00-T04-S8-F10"
+          ],
+          "dispositions": {
+            "D00-T04-S8-F9": "fixed",
+            "D00-T04-S8-F10": "filed"
+          }
+        },
+        {
+          "number": 5,
+          "model": "gpt-5.6-sol",
+          "effort": "high",
+          "outcome": "stamp",
+          "candidate": "730a4db",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "stamp-review",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S11",
+      "date": "2026-09-19",
+      "runner": "panel",
+      "rounds": 3,
+      "empty": 0,
+      "refuted": 2,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "e5da9ae",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S11-F1"
+          ],
+          "dispositions": {
+            "D00-T04-S11-F1": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "738834f",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S11-F2",
+            "D00-T04-S11-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S11-F2": "fixed",
+            "D00-T04-S11-F3": "fixed"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "2da2c39",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S11-F4",
+            "D00-T04-S11-F5"
+          ],
+          "dispositions": {
+            "D00-T04-S11-F4": "refuted",
+            "D00-T04-S11-F5": "refuted"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S12",
+      "date": "2026-09-20",
+      "runner": "panel",
+      "rounds": 5,
+      "empty": 0,
+      "refuted": 1,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "e9f3156",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "45897tokens",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S12-F6",
+            "D00-T04-S12-F7"
+          ],
+          "dispositions": {
+            "D00-T04-S12-F6": "fixed",
+            "D00-T04-S12-F7": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "2f0c835",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "49533tokens",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S12-F8",
+            "D00-T04-S12-F9",
+            "D00-T04-S12-F10"
+          ],
+          "dispositions": {
+            "D00-T04-S12-F8": "fixed",
+            "D00-T04-S12-F9": "fixed",
+            "D00-T04-S12-F10": "fixed"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "7971e20",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S12-F11",
+            "D00-T04-S12-F12",
+            "D00-T04-S12-F13",
+            "D00-T04-S12-F14"
+          ],
+          "dispositions": {
+            "D00-T04-S12-F11": "filed",
+            "D00-T04-S12-F12": "filed",
+            "D00-T04-S12-F13": "fixed",
+            "D00-T04-S12-F14": "refuted"
+          }
+        },
+        {
+          "number": 4,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "42b9742",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S12-F15",
+            "D00-T04-S12-F16",
+            "D00-T04-S12-F17"
+          ],
+          "dispositions": {
+            "D00-T04-S12-F15": "filed",
+            "D00-T04-S12-F16": "duplicate",
+            "D00-T04-S12-F17": "fixed"
+          }
+        },
+        {
+          "number": 5,
+          "model": "gpt-5.6-sol",
+          "effort": "high",
+          "outcome": "independent",
+          "candidate": "20c41c1",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S12-F1",
+            "D00-T04-S12-F2",
+            "D00-T04-S12-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S12-F1": "fixed",
+            "D00-T04-S12-F2": "fixed",
+            "D00-T04-S12-F3": "fixed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S13",
+      "date": "2026-09-20",
+      "runner": "panel",
+      "rounds": 5,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "ff90910",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "24849tokens",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S13-F1",
+            "D00-T04-S13-F2",
+            "D00-T04-S13-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S13-F1": "fixed",
+            "D00-T04-S13-F2": "fixed",
+            "D00-T04-S13-F3": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "740bbac",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "20415tokens",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S13-F4",
+            "D00-T04-S13-F5"
+          ],
+          "dispositions": {
+            "D00-T04-S13-F4": "fixed",
+            "D00-T04-S13-F5": "fixed"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "e7a4756",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S13-F6",
+            "D00-T04-S13-F7"
+          ],
+          "dispositions": {
+            "D00-T04-S13-F6": "fixed",
+            "D00-T04-S13-F7": "fixed"
+          }
+        },
+        {
+          "number": 4,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "397bc2f",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S13-F8",
+            "D00-T04-S13-F9"
+          ],
+          "dispositions": {
+            "D00-T04-S13-F8": "fixed",
+            "D00-T04-S13-F9": "fixed"
+          }
+        },
+        {
+          "number": 5,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "2d0d406",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S13-F10",
+            "D00-T04-S13-F11"
+          ],
+          "dispositions": {
+            "D00-T04-S13-F10": "filed",
+            "D00-T04-S13-F11": "filed"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S14",
+      "date": "2026-09-20",
+      "runner": "panel",
+      "rounds": 3,
+      "empty": 3,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "bc5f92a",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "13041tokens",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "bc5f92a",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "17409tokens",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "bc5f92a",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S15",
+      "date": "2026-09-20",
+      "runner": "panel",
+      "rounds": 4,
+      "empty": 0,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "d0b5690",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "90805tokens",
+          "latency": "228s",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S15-F1",
+            "D00-T04-S15-F2"
+          ],
+          "dispositions": {
+            "D00-T04-S15-F1": "fixed",
+            "D00-T04-S15-F2": "fixed"
+          }
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "67a2f68",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "17122tokens",
+          "latency": "44s",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S15-F3",
+            "D00-T04-S15-F4"
+          ],
+          "dispositions": {
+            "D00-T04-S15-F3": "fixed",
+            "D00-T04-S15-F4": "fixed"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "0d5b50c",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "53s",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S15-F5",
+            "D00-T04-S15-F6"
+          ],
+          "dispositions": {
+            "D00-T04-S15-F5": "fixed",
+            "D00-T04-S15-F6": "fixed"
+          }
+        },
+        {
+          "number": 4,
+          "model": "gpt-5.6-sol",
+          "effort": "high",
+          "outcome": "stamp",
+          "candidate": "56a8bb6",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "132909tokens",
+          "latency": "424s",
+          "opportunity": "full-scope",
+          "purpose": "stamp-review",
+          "provenance": "reconstructed",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S16",
+      "date": "2026-09-20",
+      "runner": "panel",
+      "rounds": 3,
+      "empty": 2,
+      "refuted": 0,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "513a487",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "18732tokens",
+          "latency": "46s",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "513a487",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "12566tokens",
+          "latency": "31s",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "513a487",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "157s",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S16-F1",
+            "D00-T04-S16-F2",
+            "D00-T04-S16-F3"
+          ],
+          "dispositions": {
+            "D00-T04-S16-F1": "filed",
+            "D00-T04-S16-F2": "filed",
+            "D00-T04-S16-F3": "duplicate"
+          }
+        }
+      ]
+    },
+    {
+      "section": "D00-T04-S17",
+      "date": "2026-09-20",
+      "runner": "panel",
+      "rounds": 4,
+      "empty": 2,
+      "refuted": 1,
+      "round_lines": [
+        {
+          "number": 1,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "ef4160f",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "15515tokens",
+          "latency": "30s",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 2,
+          "model": "gpt-5.6-sol",
+          "effort": "medium",
+          "outcome": "findings",
+          "candidate": "ef4160f",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "15395tokens",
+          "latency": "35s",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "fix-loop",
+          "provenance": "recorded",
+          "findings": [
+            "D00-T04-S17-F1",
+            "D00-T04-S17-F2"
+          ],
+          "dispositions": {
+            "D00-T04-S17-F1": "fixed",
+            "D00-T04-S17-F2": "refuted"
+          }
+        },
+        {
+          "number": 3,
+          "model": "opus",
+          "effort": "medium",
+          "outcome": "empty",
+          "candidate": "0cffc14",
+          "provider": "anthropic",
+          "version": "unresolved",
+          "cost": "unresolved",
+          "latency": "40s",
+          "opportunity": "delta-plus-regressions",
+          "purpose": "sign-off",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        },
+        {
+          "number": 4,
+          "model": "gpt-5.6-sol",
+          "effort": "high",
+          "outcome": "independent",
+          "candidate": "ef4160f",
+          "provider": "openai",
+          "version": "gpt-5.6-sol",
+          "cost": "unresolved",
+          "latency": "unresolved",
+          "opportunity": "full-scope",
+          "purpose": "section-review",
+          "provenance": "recorded",
+          "findings": [],
+          "dispositions": {}
+        }
+      ]
+    }
+  ]
+}
