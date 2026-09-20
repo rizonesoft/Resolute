@@ -113,3 +113,11 @@ to: duplicate
 why: "Round-3 A2 restates F4 a fourth time. The panel acknowledges the D00 T04 §24 filing and asks for more; the §24 item owns run-witnessing. No new defect."
 evidence: "Same checker-evidence gap as D00-T04-S21-F4", recorded as duplicate of F4.
 as-of: 26e0612e
+
+transition: D00-T04-S21-F35
+date: 2026-09-20
+from: raised
+to: refuted
+why: "Round-5 R2 reads the §24 debt item's 'seven stale evidence cites' against its six enumerated paths and calls the enumeration one short. Re-driven: the sweep fires 7 failure lines over 6 paths (`cpp-env.ps1` cited twice, D00 T01 §1 lines 152 and 155), so the count was always cites, not paths, and the enumeration is complete."
+evidence: "The count stands; the item now reads 'seven stale evidence cites over six paths' with the double cite named", clarified in 624a83b; the F35 record carries the re-drive.
+as-of: da5a00a4
