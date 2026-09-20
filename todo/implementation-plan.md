@@ -122,7 +122,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §21` | Review-input integrity hardening               |  17   |
 | [ ] | `D00 T04 §22` | Checker diagnostic codes and structured errors |   4   |
 | [ ] | `D00 T04 §23` | Third two-model revisit                        |   6   |
-| [ ] | `D00 T04 §24` | Review-tooling follow-ups                      |  22   |
+| [ ] | `D00 T04 §24` | Review-tooling follow-ups                      |  24   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                   |  14   |
 | [x] | `D00 T01 §2`  | CMake structure and dependencies               |  11   |
 | [x] | `D00 T01 §3`  | Warnings as errors at one level                |   6   |
