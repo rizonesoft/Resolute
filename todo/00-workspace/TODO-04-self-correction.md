@@ -760,16 +760,18 @@ The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three
 
 ## 17. Report Without Walking the Corpus Twice
 
-The §8 diversity runs found `report()` calls `TF.collect()` after `run_check()` already collected the same corpus through `cross_check`, doubling repository-wide file reads and parsing on every `--report`. True and cheap to fix by threading the collected findings through; unnoticed because the corpus is 25 files and the report runs in milliseconds, which is also why this is a single-item section rather than a performance project.
+The §8 diversity runs found `report()` calls `TF.collect()` after `run_check()` already collected the same corpus through `cross_check`, doubling repository-wide file reads and parsing on every `--report`. **Corrected 2026-09-20:** it said "doubling" and "25 files"; `report()` now collects twice itself (refuted-by-model and source-split), so `--report` walks the corpus three times, and the corpus is 36 files. True and cheap to fix by threading the collected findings through; unnoticed because the corpus is small and the report runs in milliseconds, which is also why this is a single-item section rather than a performance project.
 
-- [ ] Thread the collected findings from `run_check` through `report` so `--report` walks the review corpus once. Done when: one `TF.collect()` serves the check and the report, quoted from the code path, the report output is byte-identical before and after, and `--check` and `--export` outputs and exit codes are pinned unchanged, quoted.
-- [ ] Commit: `"workspace: report without walking the corpus twice"`
+- [x] Thread the collected findings from `run_check` through `report` so `--report` walks the review corpus once. Done when: one `TF.collect()` serves the check and the report, quoted from the code path, the report output is byte-identical before and after, and `--check` and `--export` outputs and exit codes are pinned unchanged, quoted. Done: `main()` collects once (`collected = TF.collect()`) and threads it through `run_check(runs_path, collected)` and `report(runs, runs_path, collected)`; `report()`'s two internal collects collapsed into the one override, the `cross_check`/`export_runs` idiom. The report is byte-identical past the as-of line (`cmp` silent; the as-of lines differ only in clock, same commit `deb947a`). `--check` byte-identical exit 0/0; `--export` identical past its timestamp exit 0/0. Pin `report-single-collection`: red before (`0 3 collects`, the triple walk), green after (68 cases, 0 failed). `--export` keeps its own collect (contract scope is check plus report; its output pinned unchanged). Error paths walk once extra (the collect precedes `run_check`; milliseconds, recorded here).
+- [x] Commit: `"workspace: report without walking the corpus twice"`
 
 **Test checkpoint:** The report output is byte-identical across the change, quoted; the self-test pins the single collection.
 
 -> XREF: D00 T04 §8 -- the diversity runs that found this
 -> SOURCE: div-D00-T04-s8-2026-09-19-P1 D00-T04-S8-D3
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR20 D00-T04-S8-PR20
+
+> **Started:** 2026-09-20T04:50:19Z
 
 ## 18. Second Two-Model Revisit, Independently Rated
 

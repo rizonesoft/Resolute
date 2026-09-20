@@ -439,7 +439,9 @@ def check_candidates(runs):
     return errors
 
 
-def run_check(runs_path):
+def run_check(runs_path, collected=None):
+    """Check the runs file. `collected` overrides the ledger read, so one
+    TF.collect() serves the check and the report (§17)."""
     try:
         text = io.open(runs_path, encoding="utf-8").read()
     except OSError as exc:
@@ -447,7 +449,7 @@ def run_check(runs_path):
     runs, errors = parse_runs(text)
     check_runs(runs, errors)
     if not errors:
-        errors.extend(cross_check(runs))
+        errors.extend(cross_check(runs, collected))
         errors.extend(check_panel_rounds(runs))
         errors.extend(check_candidates(runs))
     return runs, errors
@@ -529,8 +531,11 @@ def revisit_lines(runs):
     return lines
 
 
-def report(runs, runs_path):
+def report(runs, runs_path, collected=None):
+    """The run dimensions. `collected` overrides the ledger reads, so one
+    TF.collect() serves the check and the report (§17)."""
     lines = []
+    findings, _bad = collected if collected is not None else TF.collect()
     binding = as_of(runs_path)
     lines.append(f"as-of: {binding['commit']} {binding['timestamp']}")
     lines.append(f"{len(runs)} review runs, "
@@ -548,7 +553,6 @@ def report(runs, runs_path):
             slot[0] += 1
             slot[1] += len(items.get("findings", []))
     refuted_by_model: dict[str, int] = {}
-    findings, _bad = TF.collect()
     by_ref = {f"{_compact_section(f.ref)}-{f.number}": f for f in findings}
     for run in runs:
         for _lineno, _n, items in run.round_lines:
@@ -612,7 +616,6 @@ def report(runs, runs_path):
         lines.append("- no empty round recorded")
     lines.append("")
     lines.append("Source split (independent from runs, self from ledger):")
-    findings, _bad = TF.collect()
     ledger_by_section = {}
     for f in findings:
         ledger_by_section.setdefault(_compact_section(f.ref), []).append(f)
@@ -1206,6 +1209,36 @@ refuted: 0
           errors_v == [(1, "schema 99 is not 1; this parser reads 1 only")],
           f"{errors_v}")
 
+    # §17: one TF.collect() serves the check and the report.
+    head_sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
+                              capture_output=True, text=True,
+                              timeout=30).stdout.strip()
+    one_text = good.replace("6bb635e", head_sha).replace("8437dd5", head_sha)
+    one_path = tmp / "runs-one.md"
+    one_path.write_text(one_text, encoding="utf-8")
+    ind1 = TF.Finding("D00 T01 §1", None, 1, "F1", "s", "record", "fixed",
+                      source="independent", severity="minor")
+    ind2 = TF.Finding("D00 T01 §1", None, 2, "F2", "s", "record", "fixed",
+                      source="independent", severity="minor")
+    collect_calls = []
+    real_collect = TF.collect
+    real_files = _review_files
+    TF.collect = lambda *a, **k: (collect_calls.append(1),
+                                  ([ind1, ind2], []))[1]
+    globals()["_review_files"] = lambda: {"D00-T01-S1"}
+    old_out = sys.stdout
+    sys.stdout = io.StringIO()
+    try:
+        one_code = main(["--report", str(one_path)])
+    finally:
+        sys.stdout = old_out
+        TF.collect = real_collect
+        globals()["_review_files"] = real_files
+    one_path.unlink()
+    check("report-single-collection",
+          one_code == 0 and len(collect_calls) == 1,
+          f"{one_code} {len(collect_calls)} collects")
+
     # Round 1 bound the as-of to content identity: HEAD only when HEAD's
     # tree holds exactly the exported bytes, `unresolved` otherwise.
     foreign = as_of(other)
@@ -1262,14 +1295,15 @@ def main(argv=None):
         return 2
     rest = [a for a in args if a not in ("--check", "--report", "--export")]
     runs_path = Path(rest[0]) if rest else DEFAULT_RUNS
-    runs, errors = run_check(runs_path)
+    collected = TF.collect()
+    runs, errors = run_check(runs_path, collected)
     if errors:
         for lineno, msg in errors:
             where = f"{runs_path}:{lineno}" if lineno else f"{runs_path}"
             print(f"{where}: {msg}")
         return 1
     if mode_report:
-        sys.stdout.write(report(runs, runs_path))
+        sys.stdout.write(report(runs, runs_path, collected))
     elif mode_export:
         sys.stdout.write(json.dumps(export_runs(runs, runs_path), indent=2) + "\n")
     else:
