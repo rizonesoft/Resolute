@@ -77,7 +77,7 @@ track: W1
 |  18   |   §18   | Second two-model revisit, independently rated | §8      |  [x]   |
 |  19   |   §19   | No partial flips                            | --      |  [x]   |
 |  20   |   §20   | Review-tooling operability follow-ups       | §12     |  [x]   |
-|  21   |   §21   | Review-input integrity hardening            | §12     |  [ ]   |
+|  21   |   §21   | Review-input integrity hardening            | §12     |  [x]   |
 |  22   |   §22   | Checker diagnostic codes and structured errors | §16  |  [ ]   |
 |  23   |   §23   | Third two-model revisit                        | §18  |  [ ]   |
 |  24   |   §24   | Review-tooling follow-ups                      | §20, §21  |  [ ]   |
@@ -961,6 +961,12 @@ Two §12 sign-off findings ask for stronger machinery than §12's contract: the 
 -> SOURCE: plan-D00-T04-s19-2026-09-20-PR12 D00-T04-S19-PR12
 -> SOURCE: plan-D00-T04-s19-2026-09-20-PR15 D00-T04-S19-PR15
 -> SOURCE: plan-D00-T04-s20-2026-09-20-PR8 D00-T04-S20-PR8
+
+> **Verified:** 2026-09-20 | §21 | content leg exact over declared unions (diminishing consumption, surplus rejection, CRLF-blind, marker-bound metadata commits) · stamp output checked (HOLDS vs namings, bare-HOLDS accepted, figure-less re-runs, failover redirect) · manifest identity anchored, merge candidates and spanning ranges refused · schema-2 attestation (bound checker, findings hash, runner output hash, runner-derived reviewer/model/timestamp, codex stderr model) emitted after step 9 with per-loop re-emission · replacement-blind reads, explicit push with remote readback, merge-parent refusal · anchors resolve OIDs/lines/sections/full-refs with shipshape normalization, tracked cites, and non-repo refusal · short-form citations FATAL on stamps, findings, and attestations with range-coverage stripping · role-tagged candidates, kind-typed heads, quoted hostile names, hostile-path pins · panel: independent 7 findings (6 fixed, 1 filed) plus Sol 1-2 plus Opus 3-5 to the hard cap, 36 findings (29 fixed including 1 self-review, 2 filed, 3 duplicate, 2 refuted) · plan review: 20 findings, 9 filed, 1 corrected pre-stamp, 10 rejected
+> **Review:** round 5 Opus hard-cap, candidates `3005d15f`(round 1) `ef2f7470`(round 2) `edef994f`(round 3) `bb2a95d6`(round 4) `638f67e0`(round 5) -- `adversarial` needs-attention at round 5, closed: 7 fixed, 2 filed, 2 duplicate, 1 refuted · `consistency` needs-attention at round 5, closed: 3 fixed · `integration` needs-attention at round 5, closed: 9 fixed · `record` needs-attention at round 5, closed: 9 fixed, 1 duplicate, 1 refuted · self 1 fixed (F8) · `source-defect` approves in-session · `design` not owed. Independent: `codex review --commit 734e5c0` (gpt-5.6-sol, high) 7 findings, 6 fixed, 1 filed to D00 T04 §24. Round-5 answers land under the hard-cap rule without re-round (see Verified). Raw findings: docs/reviews/00-workspace/D00-T04-s21.md Attestation: docs/reviews/00-workspace/D00-T04-s21.attest.json
+> **Plan review:** gpt (run 20260920-D00-T04-S21-gpt) -- filed: D00 T04 §24 (PR1, PR5, PR6, PR9, PR10, PR11, PR15, PR17, PR20); 1 corrected pre-stamp (PR8 tracked-drift wording); 10 rejected with reasons in the ledger
+> **CRUD:** not applicable (review checkers, test gates, skill text, and review records; writes no user-facing data path)
+> **Duration:** 2026-09-20T13:30:00Z to 2026-09-20T17:39:37Z
 
 ## 22. Checker Diagnostic Codes and Structured Errors
 

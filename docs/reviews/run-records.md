@@ -355,3 +355,17 @@ round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 898cc17 
 round: 3 model: opus effort: medium outcome: findings candidate: e66535e provider: anthropic version: unresolved cost: 2318481tokens latency: 102s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S20-F7
 empty: 0
 refuted: 0
+run: D00-T04-S21
+date: 2026-09-20
+runner: panel
+rounds: 6
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: 3005d15f provider: openai version: gpt-5.6-sol cost: 87839tokens latency: 190s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S21-F9, D00-T04-S21-F10, D00-T04-S21-F11, D00-T04-S21-F12
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: ef2f7470 provider: openai version: gpt-5.6-sol cost: 89305tokens latency: 195s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S21-F13, D00-T04-S21-F14, D00-T04-S21-F15, D00-T04-S21-F16
+round: 3 model: opus effort: medium outcome: findings candidate: edef994f provider: anthropic version: unresolved cost: 137706tokens latency: 15s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S21-F17, D00-T04-S21-F18, D00-T04-S21-F19, D00-T04-S21-F20, D00-T04-S21-F21, D00-T04-S21-F22, D00-T04-S21-F23
+round: 4 model: opus effort: medium outcome: findings candidate: bb2a95d6 provider: anthropic version: unresolved cost: 164290tokens latency: 113s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S21-F24, D00-T04-S21-F25, D00-T04-S21-F26, D00-T04-S21-F27, D00-T04-S21-F28, D00-T04-S21-F29, D00-T04-S21-F30
+# round 5 is the Full hard cap: needs-attention with no re-round; its answers land under the cap rule, never reviewed by a sixth round.
+round: 5 model: opus effort: medium outcome: findings candidate: 638f67e0 provider: anthropic version: unresolved cost: 170149tokens latency: 85s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S21-F31, D00-T04-S21-F32, D00-T04-S21-F33, D00-T04-S21-F34, D00-T04-S21-F35, D00-T04-S21-F36
+# opus rounds: the envelope model field came back empty, so version stays unresolved per the D00 T04 §18 precedent (modelUsage reads claude-opus-5 on all three).
+round: 6 model: gpt-5.6-sol effort: high outcome: independent candidate: 734e5c0 provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S21-F1, D00-T04-S21-F2, D00-T04-S21-F3, D00-T04-S21-F4, D00-T04-S21-F5, D00-T04-S21-F6, D00-T04-S21-F7
+empty: 0
+refuted: 2
