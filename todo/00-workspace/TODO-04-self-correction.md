@@ -782,17 +782,19 @@ A `[x]` row with an open checklist reads as done while work remains, which is th
 
 ## 20. Review-Tooling Operability Follow-Ups
 
-Two §12-review findings about the review machinery itself: the skill's fence commands do not run on the project's Windows machine, and three script self-tests run nowhere in the gate set. Both are small, both lack an owner, and neither blocks §12, whose review proceeds with an in-session workaround (cygpath-translated fence paths) and manual self-test runs.
+Two §12-review findings about the review machinery itself: the skill's fence commands do not run on the project's Windows machine, and three script self-tests run nowhere in the gate set. Both are small, both lack an owner, and neither blocks §12, whose review proceeds with an in-session workaround (cygpath-translated fence paths) and manual self-test runs. A §13 sweep adds a third: the `graph self-test` gate fails on a pre-existing stderr hint while the suite itself passes.
 
 - [ ] Run every fence block in `review-todo-section` on Windows: the panel, plan-review, stamp, and architecture prompts. Done when: each block's `fence TITLE=path` arguments reach Windows python as Windows paths (MSYS2 converts bare path arguments but not paths embedded in `TITLE=path`, so python resolves Git Bash `/tmp` to the wrong place and fence exits 2 with `cannot read`), quoted from driven runs of all four blocks on this machine, and the skill carries the working form. Cheaper substitute that fails the checkpoint: documenting the workaround in chat, which the next review will not read.
 - [ ] Gate the three ungated self-tests in `scripts/check-all.ps1`: `review_prompt --self-test` (66 cases, measured in the §12 review), `todo-findings --self-test` (29 cases per its source), and `todo-runs --self-test` (counted at implementation). Done when: check-all runs all three with a named gate each, a deliberately broken case in each fails its gate quoted, and the sweep reports the new gates green. (`todo-graph`, `todo-claims`, and `profile-check` self-tests are already gated; `todo-adjacency` and `todo-validate` carry no self-test. Measured 2026-09-20.)
+- [ ] Quiet the `graph self-test` gate's stderr failure: the suite passes (exit 0, cases green) but the rules-16-25 probe leg redirects stdout only, so the fixture's baseline hint reaches stderr and check-all's `Stop` preference fails the gate (bisected: reproduces identically at `ef362d6` in its own workdir, so it predates §13). Done when: the leg redirects both streams like every sibling leg (or the gate tolerates the hinted-but-green shape), `check-all` reports the gate green quoted, and the suite count is unchanged. Cheaper substitute that fails the checkpoint: deleting the hint, which other flows rely on.
 - [ ] Commit: `"workspace: review-tooling operability follow-ups"`
 
-**Test checkpoint:** All four skill fence blocks run green on Windows, quoted; check-all reports the three new self-test gates green, quoted; a broken case in each fails its gate, quoted.
+**Test checkpoint:** All four skill fence blocks run green on Windows, quoted; check-all reports the three new self-test gates green, quoted; a broken case in each fails its gate, quoted; the self-test gate reports green with the suite count unchanged, quoted.
 
 -> XREF: D00 T04 §12 -- the review that found these; the fence fix corrects §12-era skill commands
 -> SOURCE: self-2026-09-20-fence-paths
 -> SOURCE: self-2026-09-20-ungated-selftests
+-> SOURCE: self-2026-09-20-selftest-stderr
 
 ## 21. Review-Input Integrity Hardening
 
