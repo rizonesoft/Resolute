@@ -195,13 +195,13 @@ def validate(graph, _args) -> int:
                     problems.append(f"owner {raw_ref!r} resolves to nothing")
                     continue
                 target = by_id[r[0]]
-                tsections = target.sections[r[1]]
+                tsec = target.sections[r[1]]
                 back = any(
                     graph.resolve_ref(dep, target, by_key) == (todo.id, s_num)
-                    for dep in tsections.depends_on
+                    for dep in tsec.depends_on
                 )
                 if not back:
-                    tspan = span_lines(target.path, tsections.line)
+                    tspan = span_lines(target.path, tsec.line)
                     back = tspan is not None and any(
                         graph.resolve_ref(m.group("ref"), target, by_key) == (todo.id, s_num)
                         for tln in tspan
