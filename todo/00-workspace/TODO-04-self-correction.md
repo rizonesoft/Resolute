@@ -678,7 +678,7 @@ The §10 sign-off round proved `check_export` accepts `"export_version": true, "
 
 ## 15. Run-Record Vocabulary and Evidence Follow-Ups
 
-The §10 plan review accepted three minors the enriched records leave open: latency carries a unit (`<int>s`) but no measurement boundary, unresolved-field coverage is reported for cost only, and transition evidence is quoted without a commit binding the quote to the record it came from. All three are small, all three lack an owner, and none blocks §8, which decides from regenerated exports with cost in tokens.
+The §10 plan review accepted three minors the enriched records leave open: latency carries a unit (`<int>s`) but no measurement boundary, unresolved-field coverage is reported for cost only, and transition evidence is quoted without a commit binding the quote to the record it came from. All three are small, all three lack an owner, and none blocks §8, which decides from regenerated exports with cost in tokens. The §14 plan review adds one more: gate evidence counts bound to their producing commit.
 
 - [ ] Define the latency boundary: what interval a round's `<int>s` measures, stated in the records header beside the unit. Done when: the header names the boundary, quoted, and mixed-boundary values have nowhere to hide.
 - [ ] Report unresolved-field coverage per field and model in `--report`, extending the existing cost line. Done when: version, latency, and cost each show recorded-vs-unresolved counts, quoted from a driven report.
@@ -690,9 +690,10 @@ The §10 plan review accepted three minors the enriched records leave open: late
 - [ ] Report the revisit-trigger state in `--report`: panel-reviewed sections counted past the §8 window of five, so the §18 trigger reads from the query rather than a hand count. Done when: the report prints the count with the window named, quoted from a driven report.
 - [ ] Give stamp-review rounds a record shape the panel mapping skips, so the STAMP HOLDS verdict survives the session: today a stamp round in a panel block would demand four-lens verdicts it cannot have, and outside one it has no home. Done when: this review's stamp round is recorded, quoted, and `--check` passes.
 - [ ] Give independent passes a record shape the panel mapping skips, so a review with both an independent pass and panel rounds records honestly: today the pass rides an `error` round line (see the §12 block comment), which mislabels usable findings as a voided attempt. Done when: the pass reads in the records under its own shape, the panel mapping still spans panel rounds only, and `--check` passes, quoted.
+- [ ] Bind gate evidence counts to their producing commit: §14's proof quotes `29 runs` where §10 recorded 24 with no stated commit, so growth reads as drift. Done when: the evidence convention names where a gate quote's producing commit rides, one live quote demonstrates it, and the 29-vs-24 delta reads explained, all quoted. Cheaper substitute that fails the checkpoint: restating the count without the commit, which is the gap.
 - [ ] Commit: `"workspace: run-record vocabulary and evidence follow-ups"`
 
-**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; the §8 stamp round reads in the records; the independent pass reads under its own shape; all quoted from driven runs.
+**Test checkpoint:** The boundary reads in the header, the coverage counts read in the report, and the evidence bindings resolve; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; the §8 stamp round reads in the records; the independent pass reads under its own shape; gate evidence binds its commit and the 29-vs-24 delta reads explained; all quoted from driven runs.
 
 -> XREF: D00 T04 §10 -- the records this section tightens
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
@@ -705,6 +706,7 @@ The §10 plan review accepted three minors the enriched records leave open: late
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR15 D00-T04-S8-PR15
 -> SOURCE: self-2026-09-19-stamp-rounds
 -> SOURCE: self-2026-09-20-independent-rounds
+-> SOURCE: plan-D00-T04-s14-2026-09-20-PR5 D00-T04-S14-PR5
 
 ## 16. Blinded-Run Checker Defects
 

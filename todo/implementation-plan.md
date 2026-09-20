@@ -113,7 +113,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §12` | Prove the manifest, not just emit it           |   8   |
 | [x] | `D00 T04 §13` | Bind the stamp to the push                     |   6   |
 | [ ] | `D00 T04 §14` | Bar bool versions from the export gate         |   2   |
-| [ ] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |  11   |
+| [ ] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |  12   |
 | [ ] | `D00 T04 §16` | Blinded-run checker defects                    |   5   |
 | [ ] | `D00 T04 §17` | Report without walking the corpus twice        |   2   |
 | [ ] | `D00 T04 §18` | Second two-model revisit, independently rated  |   7   |
