@@ -73,3 +73,11 @@ to: refuted
 why: "The item's quoted string is the message core; the parenthetical is the section address": every section ship commit appends the ref parenthetical, so the appended ` (D00 T04 §17)` follows convention rather than breaking the item.
 evidence: "`c33cb6e` 'workspace: blinded-run checker defects (D00 T04 §16)'" and "`d0b5690` 'workspace: run-record vocabulary and evidence follow-ups (D00 T04 §15)'", quoted from the commit subjects; no panel has flagged the shape.
 as-of: 0cffc14
+
+transition: D00-T04-S19-F2
+date: 2026-09-20
+from: raised
+to: refuted
+why: "the matcher was mirror-exact with parse_todo (same opener test, same lowercase-x done test), so no disagreement existed; the panel never saw the parser."
+evidence: "one checklist_state called by both parser and rule, so drift is impossible rather than tested-for, with 4 semantic pins", landed in 1cfd083; "zero live [X] occurrences, grepped 2026-09-20" for the uppercase residue.
+as-of: 1cfd083

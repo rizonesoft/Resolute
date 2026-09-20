@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**221 findings across 33 sections.**
+**226 findings across 34 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 76 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 41 | fails under hostile or unexpected input |
+| `record` | 78 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 42 | fails under hostile or unexpected input |
 | `correctness` | 39 | the code does the wrong thing |
-| `consistency` | 34 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 17 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 35 | disagrees with the rest of the suite, its naming, or its layout |
+| `integration` | 18 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 104 | wrong behavior in code, plan, or record |
-| `minor` | 111 | polish or wording, or no surviving defect |
+| `major` | 107 | wrong behavior in code, plan, or record |
+| `minor` | 113 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -192,6 +192,11 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §18` | F5 | major | `adversarial` | fixed | independent | join prints [0] for a rung with no full-scope round |
 | `D00 T04 §18` | F6 | minor | `consistency` | fixed | independent | crossover find filed under self- instead of blind- |
 | `D00 T04 §18` | F7 | minor | `record` | fixed | independent | trigger 8/5 stands as prose without the query line quoted |
+| `D00 T04 §19` | F1 | major | `adversarial` | fixed | independent | any-pass owners let a defective owner ride a valid one |
+| `D00 T04 §19` | F2 | minor | `consistency` | refuted | independent | item matcher disagrees with parsed checklist state |
+| `D00 T04 §19` | F3 | major | `integration` | fixed | independent | deferral block does not stop at headers |
+| `D00 T04 §19` | F4 | major | `record` | fixed | independent | design claims BODY_RE reuse the code never performs |
+| `D00 T04 §19` | F5 | minor | `record` | filed | independent | design says three shapes, enumerates four |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |

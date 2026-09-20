@@ -75,7 +75,7 @@ track: W1
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [x]   |
 |  17   |   §17   | Report without walking the corpus twice       | §10     |  [x]   |
 |  18   |   §18   | Second two-model revisit, independently rated | §8      |  [x]   |
-|  19   |   §19   | No partial flips                            | --      |  [ ]   |
+|  19   |   §19   | No partial flips                            | --      |  [x]   |
 |  20   |   §20   | Review-tooling operability follow-ups       | §12     |  [ ]   |
 |  21   |   §21   | Review-input integrity hardening            | §12     |  [ ]   |
 |  22   |   §22   | Checker diagnostic codes and structured errors | §16  |  [ ]   |
@@ -845,6 +845,12 @@ A `[x]` row with an open checklist reads as done while work remains, which is th
 -> SOURCE: plan-D00-T04-s13-2026-09-20-PR16 D00-T04-S13-PR16
 -> SOURCE: plan-D00-T04-s13-2026-09-20-PR17 D00-T04-S13-PR17
 -> SOURCE: plan-D00-T04-s13-2026-09-20-PR18 D00-T04-S13-PR18
+
+> **Verified:** 2026-09-20 | §19 | the rule fails naming file, section, and item (`§1 is [x] but carries an unticked item: 'Forgot this one entirely'`, exit 1) · suite 531 green (20 new pins: 14 rule shapes, 2 round-1 regressions, 4 helper semantics) · live tree zero fires with 5 `Commit:` lines and 1 struck deferral excused, 0 fenced, 0 stamp-region, 0 plain · pre/post `validate` identical (0 fatal, 100 advisory), the retirement verdict-neutral · the `Commit:` order reads in README Completion-first and beside the rule · the live struck deferral passes (single owner, Depends back) · panel: Sol rounds 1-2, Opus sign-off 3, 5 findings (3 fixed in-round, 1 refuted with a structural answer, 1 filed to §20) · plan review: 15 findings, 9 filed to §20/§21, 5 rejected, 1 duplicate
+> **Review:** round 3 sign-off, candidate `f87139b` `e4ba39f` `568ea51` `1cfd083` -- `adversarial` approve at close after fix (F1) · `consistency` approve at close after refutation (F2) · `integration` approve at close after fix (F3) · `record` needs-attention at close (F5 filed to §20) after fix (F4) · `source-defect` approves in-session · `design` not owed. Raw findings: docs/reviews/00-workspace/D00-T04-s19.md Attestation: docs/reviews/00-workspace/D00-T04-s19.attest.json
+> **Plan review:** gpt (run 20260920-D00-T04-S19-gpt) -- filed: D00 T04 §20 (7 items), D00 T04 §21 (2 items); 5 rejected and 1 duplicate with reasons in the ledger
+> **CRUD:** not applicable (the rule reads TODO text and emits diagnostics; it writes no user-facing data path)
+> **Duration:** 2026-09-20T07:58:37Z to 2026-09-20T08:57:05Z
 
 ## 20. Review-Tooling Operability Follow-Ups
 
