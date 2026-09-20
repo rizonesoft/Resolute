@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**214 findings across 32 sections.**
+**221 findings across 33 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 73 | the plan or the evidence misdescribes what happened |
+| `record` | 76 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 41 | fails under hostile or unexpected input |
 | `correctness` | 39 | the code does the wrong thing |
-| `adversarial` | 38 | fails under hostile or unexpected input |
-| `consistency` | 33 | disagrees with the rest of the suite, its naming, or its layout |
+| `consistency` | 34 | disagrees with the rest of the suite, its naming, or its layout |
 | `integration` | 17 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 99 | wrong behavior in code, plan, or record |
-| `minor` | 109 | polish or wording, or no surviving defect |
+| `major` | 104 | wrong behavior in code, plan, or record |
+| `minor` | 111 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -185,6 +185,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §16` | F3 | minor | `record` | duplicate | independent | Done notes quote bare counts without as-of binding |
 | `D00 T04 §17` | F1 | minor | `record` | fixed | independent | Done note claims byte-identity while the as-of lines differ |
 | `D00 T04 §17` | F2 | minor | `record` | refuted | independent | ship subject appends the section ref parenthetical |
+| `D00 T04 §18` | F1 | major | `adversarial` | fixed | independent | key on disk leaves the blinded pass unestablished |
+| `D00 T04 §18` | F2 | major | `record` | fixed | independent | maximally complementary overstates one-sided Jaccard |
+| `D00 T04 §18` | F3 | major | `adversarial` | fixed | independent | output evidence does not prove the rater never resolved the key |
+| `D00 T04 §18` | F4 | major | `record` | fixed | independent | byte figure and checkout claim contradict the blob manifest |
+| `D00 T04 §18` | F5 | major | `adversarial` | fixed | independent | join prints [0] for a rung with no full-scope round |
+| `D00 T04 §18` | F6 | minor | `consistency` | fixed | independent | crossover find filed under self- instead of blind- |
+| `D00 T04 §18` | F7 | minor | `record` | fixed | independent | trigger 8/5 stands as prose without the query line quoted |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |

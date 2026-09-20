@@ -324,3 +324,14 @@ round: 3 model: opus effort: medium outcome: empty candidate: 0cffc14 provider: 
 round: 4 model: gpt-5.6-sol effort: high outcome: independent candidate: ef4160f provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings:
 empty: 2
 refuted: 1
+run: D00-T04-S18
+date: 2026-09-20
+runner: panel
+rounds: 4
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: 149f3db provider: openai version: gpt-5.6-sol cost: 93705tokens latency: 157s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S18-F1, D00-T04-S18-F2
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: b1377a4 provider: openai version: gpt-5.6-sol cost: 124334tokens latency: 171s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S18-F3, D00-T04-S18-F4
+round: 3 model: opus effort: medium outcome: findings candidate: 9a58624 provider: anthropic version: unresolved cost: unresolved latency: 61s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S18-F5, D00-T04-S18-F6, D00-T04-S18-F7
+# round 4 is the independent pass on 4b0cf1b (P1-P3 per 42ddb73's message, answered there); model/effort/provider follow the §17 independent shape with pre-compaction telemetry lost, flagged uncertain, see s18.md.
+round: 4 model: gpt-5.6-sol effort: high outcome: independent candidate: 4b0cf1b provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings:
+empty: 0
+refuted: 0

@@ -74,7 +74,7 @@ track: W1
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [x]   |
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [x]   |
 |  17   |   §17   | Report without walking the corpus twice       | §10     |  [x]   |
-|  18   |   §18   | Second two-model revisit, independently rated | §8      |  [ ]   |
+|  18   |   §18   | Second two-model revisit, independently rated | §8      |  [x]   |
 |  19   |   §19   | No partial flips                            | --      |  [ ]   |
 |  20   |   §20   | Review-tooling operability follow-ups       | §12     |  [ ]   |
 |  21   |   §21   | Review-input integrity hardening            | §12     |  [ ]   |
@@ -815,6 +815,12 @@ D00 T04 §8 kept both models on a value margin (79 vs 31) computed from severiti
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR21 D00-T04-S8-PR21
 
 > **Started:** 2026-09-20T05:53:11Z
+> **Verified:** 2026-09-20 | §18 | two blinded rating passes over all 22 window findings, confined pass adopted whole (21/22 agree, B17 the sole move) · join re-runs clean (Sol 60 at 6.00/round, Opus 54 at 7.71/round, full-scope [15, 0, 12, 0, 0], Jaccard 0.00, overlap dormant) with export/s-file/ratings ref-sets equal · keep-decision dated with legs replayed and none firing, third revisit named · trigger quoted live at 9/5 (8/5 at decision time) · suites green at the stamp tree (graph 511, claims 26, runs 80, ledger 221) · panel: Sol rounds 1-2 (4 findings fixed in-loop), Opus sign-off 3 (3 findings fixed direct below bar) · plan review: 18 findings, 11 filed (§23 four items, §20 three items), 1 accepted, 6 rejected
+> **Review:** round 3 Opus sign-off, candidates `149f3db` `b1377a4` `9a58624` `fe7f3c9` -- `adversarial` needs-attention (F1, F3 fixed in-loop; F5 fixed direct) · `consistency` needs-attention (F6 fixed direct) · `integration` approve · `record` needs-attention (F2, F4 fixed in-loop; F7 fixed direct) · `source-defect` approve in-session, `design` not owed. Independent: pre-compaction pass on `4b0cf1b` (runner and telemetry unrecorded, round-4 line follows the §17 shape flagged uncertain), P1-P3 answered in `42ddb73`. Raw findings: docs/reviews/00-workspace/D00-T04-s18.md Attestation: docs/reviews/00-workspace/D00-T04-s18.attest.json
+> **Plan review:** gpt (run 20260920-D00-T04-S18-gpt) -- filed: D00 T04 §23 (4 items extended: PR1+PR2 item 1, PR12 item 2, PR10+PR13 item 3, PR6+PR11+PR18 item 5), D00 T04 §20 (3 new items: PR3, PR5, PR8); 1 accepted direct (PR9 Opus-2 disposition clause); 6 rejected with reasons in the ledger
+> **CRUD:** this section re-decides the two-model question on the S13-S17 window: two blinded severity passes with the confined pass adopted, a controlled Sol/Opus crossover on frozen c33cb6e, the join re-run with the cut legs replayed, a dated keep with the third revisit named, and hole-closings (tie-handling, activation, consecutiveness) plus the §6 supersession pointer. It reads the runs file, the review corpus, the findings ledger, and the persisted crossover inputs. The behavioral surface it changes is review process and records (one decision, three watch items, one standing schedule) plus one scoped git rule (crossover/** pinned LF); previously-passing records behave identically. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-20T05:53:11Z to 2026-09-20T07:21:46Z
+> **Implementer:** Muse Code
 
 ## 19. No Partial Flips
 
