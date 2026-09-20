@@ -756,6 +756,56 @@ def _self_test() -> int:
     ]:
         print(f"  FAIL  the dead-ref duplicate refusal shape drifted: {dup_problems}")
         failed += 1
+    # §16 plan review: two distinct dead refs draw two dead messages, never a duplicate.
+    tpath.write_text(
+        "transition: D00-T04-S9-F9\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: ghost\n"
+        "evidence: x\n"
+        "as-of: 0a24c03\n"
+        "\n"
+        "transition: D00-T04-S9-F8\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: another ghost\n"
+        "evidence: x\n"
+        "as-of: 0a24c03\n",
+        encoding="utf-8",
+    )
+    distinct = check_transitions(tfind, tpath)
+    if [p for p in distinct if "names no live finding" in p] != [
+        f"{tpath}:1: D00-T04-S9-F9 names no live finding",
+        f"{tpath}:9: D00-T04-S9-F8 names no live finding",
+    ] or any("already has a block" in p for p in distinct):
+        print(f"  FAIL  distinct dead refs misfired: {distinct}")
+        failed += 1
+    # §16 plan review: a live ref duplicated draws only the duplicate message.
+    tpath.write_text(
+        "transition: D00-T04-S9-F1\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: the raiser retracted it\n"
+        "evidence: x\n"
+        "as-of: 0a24c03\n"
+        "\n"
+        "transition: D00-T04-S9-F1\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: still retracted\n"
+        "evidence: x\n"
+        "as-of: 0a24c03\n",
+        encoding="utf-8",
+    )
+    if check_transitions(tfind, tpath) != [
+        f"{tpath}:9: D00-T04-S9-F1 already has a block at line 1",
+    ]:
+        print(f"  FAIL  the live duplicate refusal shape drifted: {check_transitions(tfind, tpath)}")
+        failed += 1
     # §16: a never-defect carrying anything but minor fails by name.
     # All six bad cells fire (refuted/withdrawn/duplicate by major/critical).
     fpath = tmp / "D00-T04-s99.md"

@@ -1258,7 +1258,7 @@ def main(argv=None):
     mode_export = "--export" in args
     if mode_report and mode_export:
         print("usage: todo-runs.py [--check] [--report | --export] [runs-file]; "
-              "--report and --export conflict, pass exactly one", file=sys.stderr)
+              "--report and --export conflict, pass at most one", file=sys.stderr)
         return 2
     rest = [a for a in args if a not in ("--check", "--report", "--export")]
     runs_path = Path(rest[0]) if rest else DEFAULT_RUNS
