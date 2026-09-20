@@ -276,8 +276,11 @@ def _compact_ref(display: str, number: str) -> str | None:
 
 def _transition_commit_resolves(sha: str) -> bool:
     """The as-of binding resolves to a commit in this repository. Needs git."""
-    hit = subprocess.run(["git", "cat-file", "-t", sha], cwd=ROOT,
-                         capture_output=True, text=True, timeout=30)
+    try:
+        hit = subprocess.run(["git", "cat-file", "-t", sha], cwd=ROOT,
+                             capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return False
     return hit.returncode == 0 and hit.stdout.strip() == "commit"
 
 
