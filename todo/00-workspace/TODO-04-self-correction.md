@@ -80,6 +80,7 @@ track: W1
 |  21   |   §21   | Review-input integrity hardening            | §12     |  [ ]   |
 |  22   |   §22   | Checker diagnostic codes and structured errors | §16  |  [ ]   |
 |  23   |   §23   | Third two-model revisit                        | §18  |  [ ]   |
+|  24   |   §24   | Review-tooling follow-ups                      | §20  |  [ ]   |
 
 ---
 
@@ -910,7 +911,7 @@ Two §12-review findings about the review machinery itself: the skill's fence co
 
 ## 21. Review-Input Integrity Hardening
 
-Two §12 sign-off findings ask for stronger machinery than §12's contract: the cross-check verifies file sets but not content coverage, and the stamp rung demands a receipt nothing verifies. Both are new tooling, neither blocks §12 (the designed contiguous flow is construction-safe and the stamp receipt is eyeballed per the skill), and both need an owner before the next review leans on the gap. A §13 hard-cap finding adds a sixth leg in the same hardening: the stamp patch flows through an unflagged `git diff --cached`. The §13 plan review adds seven more: explicit push with remote readback, merge-parent handling, runner-emitted attestation fields, mechanical anchor rejection, citation forms beyond skills, merge-range legality, and length-safe file lists. A §19 plan review adds two more: round-role candidate citation and typed manifest identity fields. (Depends On §12 carries the relation; no XREF lines, so this filing touches no stamped-or-stamping section.)
+Two §12 sign-off findings ask for stronger machinery than §12's contract: the cross-check verifies file sets but not content coverage, and the stamp rung demands a receipt nothing verifies. Both are new tooling, neither blocks §12 (the designed contiguous flow is construction-safe and the stamp receipt is eyeballed per the skill), and both need an owner before the next review leans on the gap. A §13 hard-cap finding adds a sixth leg in the same hardening: the stamp patch flows through an unflagged `git diff --cached`. The §13 plan review adds seven more: explicit push with remote readback, merge-parent handling, runner-emitted attestation fields, mechanical anchor rejection, citation forms beyond skills, merge-range legality, and length-safe file lists. A §19 plan review adds two more: round-role candidate citation and typed manifest identity fields. A §20 plan review adds one more: hostile fence paths. (Depends On §12 carries the relation; no XREF lines, so this filing touches no stamped-or-stamping section.)
 
 - [ ] Verify cross-check content coverage, not just file sets: a fenced chunk that drops commits inside base..head while keeping the file set must fail. Done when: the dropped-commit shape fails closed quoted, with content comparison, per-commit manifests, or a tool-driven union proof for non-contiguous candidates (the implementation chooses, and the §12 round-3 demonstration, `633e32b` inside the span yet absent from the chunk with sets agreeing, is the regression case), the designed contiguous flow still passes, and the self-test pins both. Cheaper substitute that fails the checkpoint: documenting the limitation, which leaves the next non-contiguous review on its honor.
 - [ ] Verify the stamp reviewer's output mechanically: receipt plus verdict shape, like check-panel and check-plan. Done when: a stamp-output check validates the receipt against the stamp manifest and the `STAMP HOLDS`-vs-namings shape, the skill wires it after the stamp runner, a truncated stamp review fails quoted, and the self-test pins receipt, holds, and naming legs. Cheaper substitute that fails the checkpoint: the eyeball verification, which is the gap.
@@ -927,9 +928,10 @@ Two §12 sign-off findings ask for stronger machinery than §12's contract: the 
 - [ ] Carry the manifest file list in a length-safe encoding: `diff-files` serializes NUL-safe git output into `|`-joined text, so adversarial names weaken at the manifest boundary. Done when: the manifest either escapes or length-prefixes names (or rejects unrepresentable ones naming the name) quoted on a pipe-and-newline fixture, and the self-test pins the hostile-name case plus the clean case. Cheaper substitute that fails the checkpoint: assuming sane filenames, which the next rename will violate.
 - [ ] Cite multi-commit candidates with round roles: §13's Review line lists five bare OIDs, so round-to-commit mapping lives only in findings prose. Done when: the skill's Review-line grammar pairs each candidate OID with its round (or names one authoritative pair with the fix chain beside it), a role-less multi-OID line fails quoted (validator or stamp-review check, the implementation chooses), and the self-test pins roled and role-less shapes; §13's own line stands as history (no audit rewrite for a record nicety). Cheaper substitute that fails the checkpoint: prose round lists in findings files, which the validator never reads.
 - [ ] Type the manifest identity fields: `head` carries a commit OID on the panel path and a staged tree on the stamp path (deliberate per §12's candidate-resolution item), so a wrong-kind OID passes shape checks. Done when: the manifest (or its parse) distinguishes commit identity from tree identity (`commit_oid`/`tree_oid` split or kind-tagged fields, the implementation chooses), a cross-kind pair fails quoted naming the expected kind, existing stamp and panel flows re-pass, and the self-test pins both paths plus the cross-kind refusal. Cheaper substitute that fails the checkpoint: the current deliberate overload, which the next caller will misuse.
+- [ ] Pin fence path handling against hostile paths: the `cygpath` fix (§20) has driven evidence only for the current workspace, so spaces, Unicode, equals signs, or alternate temp roots can restore the Windows-only failure. Done when: the self-test pins fence reads through paths carrying spaces, non-ASCII, `=` inside `TITLE=path`, and an alternate temp root, a regression in any leg fails quoted, and the live fence re-passes.
 - [ ] Commit: `"workspace: review-input integrity hardening"`
 
-**Test checkpoint:** The dropped-commit chunk fails quoted and the contiguous chunk passes; the truncated stamp review fails quoted and `STAMP HOLDS` passes; the poisoned manifest parses the true pair quoted; the unbound checker fails quoted; the replaced findings file fails read-back quoted; the replacement drill reads the real HEAD quoted; the bare-remote push proves the landing quoted; the merge candidate fails or reviews every parent quoted; the attestation fields ride the runner quoted; the dead anchor fails mechanically quoted; the short form in a stamp fails quoted; the arbitrary-parent range fails quoted; the hostile name parses quoted; the role-less candidate line fails quoted; the cross-kind identity pair fails quoted; all fifteen self-tests pin their legs.
+**Test checkpoint:** The dropped-commit chunk fails quoted and the contiguous chunk passes; the truncated stamp review fails quoted and `STAMP HOLDS` passes; the poisoned manifest parses the true pair quoted; the unbound checker fails quoted; the replaced findings file fails read-back quoted; the replacement drill reads the real HEAD quoted; the bare-remote push proves the landing quoted; the merge candidate fails or reviews every parent quoted; the attestation fields ride the runner quoted; the dead anchor fails mechanically quoted; the short form in a stamp fails quoted; the arbitrary-parent range fails quoted; the hostile name parses quoted; the role-less candidate line fails quoted; the cross-kind identity pair fails quoted; the hostile path legs fail quoted; all sixteen self-tests pin their legs.
 
 -> SOURCE: panel-D00-T04-s12-2026-09-20 D00-T04-S12-F11
 -> SOURCE: panel-D00-T04-s12-2026-09-20 D00-T04-S12-F12
@@ -950,6 +952,7 @@ Two §12 sign-off findings ask for stronger machinery than §12's contract: the 
 -> SOURCE: plan-D00-T04-s13-2026-09-20-PR15 D00-T04-S13-PR15
 -> SOURCE: plan-D00-T04-s19-2026-09-20-PR12 D00-T04-S19-PR12
 -> SOURCE: plan-D00-T04-s19-2026-09-20-PR15 D00-T04-S19-PR15
+-> SOURCE: plan-D00-T04-s20-2026-09-20-PR8 D00-T04-S20-PR8
 
 ## 22. Checker Diagnostic Codes and Structured Errors
 
@@ -989,6 +992,31 @@ D00 T04 §18 kept both models on blinded values 60-54 with Jaccard 0.00 and no l
 -> SOURCE: plan-D00-T04-s18-2026-09-20-PR12 D00-T04-S18-PR12
 -> SOURCE: plan-D00-T04-s18-2026-09-20-PR13 D00-T04-S18-PR13
 -> SOURCE: plan-D00-T04-s18-2026-09-20-PR18 D00-T04-S18-PR18
+
+## 24. Review-Tooling Follow-Ups
+
+The §20 sign-off and plan review accept seven follow-ups the §20 contract does not own: the README never states the struck-item deferral contract the rule enforces (F7), the comparisons bank has no freshness check (PR4), the trigger report never states what each state owes (PR5), ticked `Commit:` lines bind nothing (PR9), subject-prefix binding wants an immutable OID (PR11), the shipped-owner proof cannot disambiguate multiple deferrals (PR15), and suite counts in flight go stale before the commit (PR19). All seven harden §20's machinery rather than revisiting its decisions.
+
+- [ ] Document the struck-item deferral contract in `todo/README.md`: the forward XREF must carry `(item: ...)`, the owner must carry those words in order and consecutively (diverging from the stamp-line lifecycle's containment, with the reason stated), and a shipped owner must carry `> **Resolved:**` citing the deferrer. Done when: the README carries the contract beside the stamp lifecycle with each requirement naming its rule, a planted violation of each of the three fails quoted against the existing fixtures (§29/§33/§23), and `validate` stays green. Cheaper substitute that fails the checkpoint: code comments only, which the rule already has; the gap is the author-facing spec.
+- [ ] Report comparisons-bank freshness in the interim watch: a stale bank silently delays a required revisit. Done when: the interim reports the newest banked comparison against the window the implementation defines quoted, staleness files the early revisit like an ARMED leg, and the self-test pins fresh and stale banks.
+- [ ] Print a trigger legend beside the trigger lines: the report never states what each state owes. Done when: the legend names the scheduled count state (§23 unblocked, runs on schedule), the cut states (FIRED/ARMED file the early revisit now), and the quiet state (nothing owed) quoted, and the self-test pins the legend text.
+- [ ] Bind ticked `Commit:` lines to history: the §20 binding visits unchecked lines only, so a ticked claim on a shipped section is mechanically unverified. Done when: the scan visits ticked `Commit:` lines for binding while keeping them excused from the open-item rule, a shipped fixture with a ticked `Commit:` quoting thin air fails quoted, the live ticked cases re-pass, and the self-test pins bound and unbound ticked legs.
+- [ ] Bind `Commit:` lines to immutable commit OIDs: subject-prefix matching can bless an unrelated or duplicated historical subject. Done when: the representation records the OID (line-carried or resolved-and-pinned, the implementation chooses with the migration for the 5 live lines stated), ancestry and section identity verify, a duplicated-subject fixture binds the right commit quoted, and the self-test pins bound, unbound, and duplicate legs.
+- [ ] Cite the item in the shipped-owner proof: `> **Resolved:**` citing only the section cannot disambiguate multiple deferred items from one deferrer. Done when: the proof grammar requires `(item: ...)` matching one of the deferrer's deferred items, a two-deferral fixture with a section-only proof fails quoted, an item-citing proof passes, and the self-test pins both.
+- [ ] Record suite counts at commit-time only: §20 corrected its counts three times in flight (filed, re-measured, review pins). Done when: the process skill carries the discipline quoted (counts quoted from the commit being created or reviewed, never in flight; per-item test deltas in Dones), and this section demonstrates it by quoting its counts once at its commit.
+- [ ] Commit: `"workspace: review-tooling follow-ups"`
+
+**Test checkpoint:** The README carries the deferral contract beside the stamp lifecycle; the interim reports bank freshness quoted; the trigger legend prints quoted; the ticked thin-air `Commit:` fails quoted; the OID binding pins quoted; the section-only `Resolved:` fails quoted; the skill carries the count discipline quoted.
+
+-> XREF: D00 T04 §20 -- follow-ups this review filed
+-> XREF: D00 T04 §19 -- the rule four items harden
+-> SOURCE: panel-D00-T04-s20-2026-09-20 D00-T04-S20-F7
+-> SOURCE: plan-D00-T04-s20-2026-09-20-PR4 D00-T04-S20-PR4
+-> SOURCE: plan-D00-T04-s20-2026-09-20-PR5 D00-T04-S20-PR5
+-> SOURCE: plan-D00-T04-s20-2026-09-20-PR9 D00-T04-S20-PR9
+-> SOURCE: plan-D00-T04-s20-2026-09-20-PR11 D00-T04-S20-PR11
+-> SOURCE: plan-D00-T04-s20-2026-09-20-PR15 D00-T04-S20-PR15
+-> SOURCE: plan-D00-T04-s20-2026-09-20-PR19 D00-T04-S20-PR19
 
 ## Verification
 
