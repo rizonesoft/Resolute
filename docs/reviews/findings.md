@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**226 findings across 34 sections.**
+**233 findings across 35 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 78 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 42 | fails under hostile or unexpected input |
+| `record` | 80 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 45 | fails under hostile or unexpected input |
 | `correctness` | 39 | the code does the wrong thing |
-| `consistency` | 35 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 18 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 36 | disagrees with the rest of the suite, its naming, or its layout |
+| `integration` | 19 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 107 | wrong behavior in code, plan, or record |
-| `minor` | 113 | polish or wording, or no surviving defect |
+| `major` | 113 | wrong behavior in code, plan, or record |
+| `minor` | 114 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -201,6 +201,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |
 | `D00 T04 §2` | F4 | minor | `record` | fixed | self | the ledger goes stale on every review that does not regenerate it |
+| `D00 T04 §20` | F1 | major | `adversarial` | fixed | independent | cost telemetry coerced instead of rejected |
+| `D00 T04 §20` | F2 | major | `adversarial` | fixed | independent | substring citation satisfies off unrelated items |
+| `D00 T04 §20` | F3 | major | `integration` | fixed | independent | interim overlap announces unfired cuts |
+| `D00 T04 §20` | F4 | major | `record` | fixed | independent | cost item struck ahead of its evidence |
+| `D00 T04 §20` | F5 | major | `adversarial` | fixed | independent | unordered word match satisfies reordered citations |
+| `D00 T04 §20` | F6 | minor | `record` | advisory | independent | stamp ineligible until sign-off cost records |
+| `D00 T04 §20` | F7 | major | `consistency` | filed | independent | README lacks the struck-item deferral spec |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |

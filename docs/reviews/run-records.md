@@ -345,3 +345,13 @@ round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 568ea51 
 round: 3 model: opus effort: medium outcome: findings candidate: 1cfd083 provider: anthropic version: unresolved cost: unresolved latency: 67s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S19-F5
 empty: 0
 refuted: 1
+run: D00-T04-S20
+date: 2026-09-20
+runner: panel
+rounds: 3
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: 24b05a4 provider: openai version: gpt-5.6-sol cost: 103949tokens latency: 174s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S20-F1, D00-T04-S20-F2, D00-T04-S20-F3, D00-T04-S20-F4
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 898cc17 provider: openai version: gpt-5.6-sol cost: 31554tokens latency: 95s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S20-F5, D00-T04-S20-F6
+# round 3 is the first envelope-captured Claude round: cost resolved via round-cost (input 34 + output 15798 + cache-read 2174797 + cache-create 127852); the envelope's model field came back empty, so version stays unresolved per the §18 precedent.
+round: 3 model: opus effort: medium outcome: findings candidate: e66535e provider: anthropic version: unresolved cost: 2318481tokens latency: 102s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S20-F7
+empty: 0
+refuted: 0
