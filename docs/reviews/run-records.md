@@ -369,3 +369,16 @@ round: 5 model: opus effort: medium outcome: findings candidate: 638f67e0 provid
 round: 6 model: gpt-5.6-sol effort: high outcome: independent candidate: 734e5c0 provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S21-F1, D00-T04-S21-F2, D00-T04-S21-F3, D00-T04-S21-F4, D00-T04-S21-F5, D00-T04-S21-F6, D00-T04-S21-F7
 empty: 0
 refuted: 2
+
+run: D00-T04-S22
+date: 2026-09-20
+runner: panel
+rounds: 4
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: 178cdfe4 provider: openai version: gpt-5.6-sol cost: 45904tokens latency: 124s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S22-F1, D00-T04-S22-F2, D00-T04-S22-F3, D00-T04-S22-F4
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: c65a3700 provider: openai version: gpt-5.6-sol cost: 61706tokens latency: 184s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S22-F5, D00-T04-S22-F6, D00-T04-S22-F7, D00-T04-S22-F8
+round: 3 model: opus effort: medium outcome: findings candidate: 092801d1 provider: anthropic version: unresolved cost: 926627tokens latency: 88s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S22-F9, D00-T04-S22-F10, D00-T04-S22-F11, D00-T04-S22-F12, D00-T04-S22-F13, D00-T04-S22-F14
+# round 3 is the Full sign-off: needs-attention past it, so round 4 confirms the restructured candidate instead of filing.
+round: 4 model: opus effort: medium outcome: findings candidate: 9f481c80 provider: anthropic version: unresolved cost: 670218tokens latency: 89s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S22-F15, D00-T04-S22-F16, D00-T04-S22-F17
+# opus rounds: the envelope model field came back empty, so version stays unresolved per the D00 T04 §18 precedent (modelUsage reads claude-opus-5 on both).
+empty: 0
+refuted: 1
