@@ -995,7 +995,7 @@ D00 T04 §18 kept both models on blinded values 60-54 with Jaccard 0.00 and no l
 
 ## 24. Review-Tooling Follow-Ups
 
-The §20 sign-off and plan review accept seven follow-ups the §20 contract does not own: the README never states the struck-item deferral contract the rule enforces (F7), the comparisons bank has no freshness check (PR4), the trigger report never states what each state owes (PR5), ticked `Commit:` lines bind nothing (PR9), subject-prefix binding wants an immutable OID (PR11), the shipped-owner proof cannot disambiguate multiple deferrals (PR15), and suite counts in flight go stale before the commit (PR19). All seven harden §20's machinery rather than revisiting its decisions.
+The §20 sign-off and plan review accept eight follow-ups the §20 contract does not own: the README never states the struck-item deferral contract the rule enforces (F7), the comparisons bank has no freshness check (PR4), the trigger report never states what each state owes (PR5), ticked `Commit:` lines bind nothing (PR9), subject-prefix binding wants an immutable OID (PR11), the shipped-owner proof cannot disambiguate multiple deferrals (PR15), suite counts in flight go stale before the commit (PR19), and the plan-review prompt rides an argv form that breaks past 48KB on this machine (transport observation). All eight harden §20's machinery rather than revisiting its decisions.
 
 - [ ] Document the struck-item deferral contract in `todo/README.md`: the forward XREF must carry `(item: ...)`, the owner must carry those words in order and consecutively (diverging from the stamp-line lifecycle's containment, with the reason stated), and a shipped owner must carry `> **Resolved:**` citing the deferrer. Done when: the README carries the contract beside the stamp lifecycle with each requirement naming its rule, a planted violation of each of the three fails quoted against the existing fixtures (§29/§33/§23), and `validate` stays green. Cheaper substitute that fails the checkpoint: code comments only, which the rule already has; the gap is the author-facing spec.
 - [ ] Report comparisons-bank freshness in the interim watch: a stale bank silently delays a required revisit. Done when: the interim reports the newest banked comparison against the window the implementation defines quoted, staleness files the early revisit like an ARMED leg, and the self-test pins fresh and stale banks.
@@ -1004,9 +1004,10 @@ The §20 sign-off and plan review accept seven follow-ups the §20 contract does
 - [ ] Bind `Commit:` lines to immutable commit OIDs: subject-prefix matching can bless an unrelated or duplicated historical subject. Done when: the representation records the OID (line-carried or resolved-and-pinned, the implementation chooses with the migration for the 5 live lines stated), ancestry and section identity verify, a duplicated-subject fixture binds the right commit quoted, and the self-test pins bound, unbound, and duplicate legs.
 - [ ] Cite the item in the shipped-owner proof: `> **Resolved:**` citing only the section cannot disambiguate multiple deferred items from one deferrer. Done when: the proof grammar requires `(item: ...)` matching one of the deferrer's deferred items, a two-deferral fixture with a section-only proof fails quoted, an item-citing proof passes, and the self-test pins both.
 - [ ] Record suite counts at commit-time only: §20 corrected its counts three times in flight (filed, re-measured, review pins). Done when: the process skill carries the discipline quoted (counts quoted from the commit being created or reviewed, never in flight; per-item test deltas in Dones), and this section demonstrates it by quoting its counts once at its commit.
+- [ ] Run plan-review prompts over stdin, not argv: the skill's `"$(cat ...)"` form fails past 48KB on this machine (`Argument list too long` through the node codex shim, proven by the §20 plan review at 48451 bytes), while the panel's stdin form carries 200KB. Done when: the skill's plan-review command reads the prompt from stdin like the panel runner, a fenced plan prompt over 48KB runs quoted, and the argv form is gone from the skill.
 - [ ] Commit: `"workspace: review-tooling follow-ups"`
 
-**Test checkpoint:** The README carries the deferral contract beside the stamp lifecycle; the interim reports bank freshness quoted; the trigger legend prints quoted; the ticked thin-air `Commit:` fails quoted; the OID binding pins quoted; the section-only `Resolved:` fails quoted; the skill carries the count discipline quoted.
+**Test checkpoint:** The README carries the deferral contract beside the stamp lifecycle; the interim reports bank freshness quoted; the trigger legend prints quoted; the ticked thin-air `Commit:` fails quoted; the OID binding pins quoted; the section-only `Resolved:` fails quoted; the skill carries the count discipline quoted; the 48KB plan prompt runs over stdin quoted.
 
 -> XREF: D00 T04 §20 -- follow-ups this review filed
 -> XREF: D00 T04 §19 -- the rule four items harden
@@ -1017,6 +1018,7 @@ The §20 sign-off and plan review accept seven follow-ups the §20 contract does
 -> SOURCE: plan-D00-T04-s20-2026-09-20-PR11 D00-T04-S20-PR11
 -> SOURCE: plan-D00-T04-s20-2026-09-20-PR15 D00-T04-S20-PR15
 -> SOURCE: plan-D00-T04-s20-2026-09-20-PR19 D00-T04-S20-PR19
+-> SOURCE: plan-D00-T04-s20-2026-09-20
 
 ## Verification
 
