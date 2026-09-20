@@ -6646,6 +6646,8 @@ track: Z1
 |  32   |   §32   | Deferral, XREF past fence | - |  [x]   |
 |  33   |   §33   | Deferral, vague citation | - |  [x]   |
 |  34   |   §34   | Target, substring only | §33 |  [ ]   |
+|  35   |   §35   | Deferral, reordered citation | - |  [x]   |
+|  36   |   §36   | Target, reordered words | §35 |  [ ]   |
 
 ## 1. Plain open item
 
@@ -6987,6 +6989,24 @@ fenced code here
 - [ ] Commit: `"selftest: target-vague"`
 
 **Test checkpoint:** run tests/AlphaTest.php.
+
+## 35. Deferral, reordered citation
+
+- [x] Did it
+- [ ] ~~Handed with shuffled words.~~ **Deferred 2026-01-01 to a section carrying the same words in another order.**
+  -> XREF: §36 (item: "work the network") -- the owner
+- [x] Commit: `"selftest: defer-reordered"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §35 | fixture
+
+## 36. Target, reordered words
+
+- [ ] Do the network work
+- [ ] Commit: `"selftest: target-reordered"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
 """,
             encoding="utf-8",
         )
@@ -7102,6 +7122,7 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
         check("partial-flip: untyped forward fails", pf_fires(29, "names no item"), True)
         check("partial-flip: XREF past a fence is unattached", pf_fires(32, "naming no owner"), True)
         check("partial-flip: vague citation fails", pf_fires(33, "carries no such item"), True)
+        check("partial-flip: reordered citation fails", pf_fires(35, "carries no such item"), True)
         check("open-stamped row fails",
               any(line.startswith("FATAL") and "TODO-10-partial-flip.md" in line
                   and "§31 is [ ]" in line and "stamp covers it" in line

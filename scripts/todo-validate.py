@@ -203,6 +203,12 @@ def validate(graph, _args) -> int:
             )
         return history_cache[root]
 
+    def _contains_seq(hay: list[str], needle: list[str]) -> bool:
+        """Whether the needle words appear in the hay words in order, consecutively."""
+        if not needle or len(needle) > len(hay):
+            return False
+        return any(hay[i:i + len(needle)] == needle for i in range(len(hay) - len(needle) + 1))
+
     def commit_shape(span: list[str]) -> list[str]:
         """Section-level Commit shape problems (cardinality, placement): message tails."""
         last_item = None
@@ -296,15 +302,20 @@ def validate(graph, _args) -> int:
                 continue
             target = by_id[r[0]]
             tsec = target.sections[r[1]]
-            # Word matching, not substring (D00 T04 §20 round 1 F2): a
-            # vague citation like `(item: "work")` must not satisfy the
-            # acknowledgment off an unrelated item's substring, while a
-            # genuine citation keeps its reword tolerance word by word.
-            # The stamp-line lifecycle keeps containment; the two rules
-            # differ deliberately, each recorded beside its own match.
-            want_words = set(word_re.findall(cited.group("item").lower()))
-            item_ok = bool(want_words) and any(
-                want_words <= set(word_re.findall(item_text.lower()))
+            # Contiguous word-sequence matching, not substring (D00 T04
+            # §20 round 1 F2, round 2 F5): a vague citation like `(item:
+            # "net")` must not satisfy off an unrelated item's
+            # substring, and neither must a reordered bag of common
+            # words like `(item: "work the network")` off "Do the
+            # network work". The citation's words must appear in order
+            # and consecutively, case- and punctuation-insensitive; a
+            # genuine citation keeps affix tolerance but not reorder
+            # tolerance. The stamp-line lifecycle keeps containment;
+            # the two rules differ deliberately, each recorded beside
+            # its own match.
+            want_seq = word_re.findall(cited.group("item").lower())
+            item_ok = bool(want_seq) and any(
+                _contains_seq(word_re.findall(item_text.lower()), want_seq)
                 for _done, item_text in tsec.items)
             want = cited.group("item").strip()
             if not item_ok:
@@ -623,9 +634,9 @@ def validate(graph, _args) -> int:
             # must resolve to a live section that points back, either
             # with an XREF or through Depends On. The forward XREF names
             # the owner's item (`(item: ...)`), and the owner must carry
-            # every word of that item: a section link to an item-silent
-            # target fails, and so does a vague citation matching only a
-            # substring.
+            # those words in order and consecutively: a section link to
+            # an item-silent target fails, and so do vague or reordered
+            # citations matching only a substring or a bag of words.
             # When the owner ships, its stamp must record the debt done
             # (`Resolved:` citing the deferrer), or the deferral fails.
             # Fenced code blocks strip before the scan. Everything else
