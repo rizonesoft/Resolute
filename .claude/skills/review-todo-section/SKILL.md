@@ -102,7 +102,7 @@ RUNDIR=$(mktemp -d /tmp/review-XXXXXXXX)
 Run the lenses through the mixed headless panel, with the candidate diff and the section contract inline (no tools needed, nothing to install): rounds 1-2 on Sol, round 3 up on Opus. The Opus rung (the sign-off and every round past it, plus all rounds when Sol is unreachable):
 
 ```bash
-git show <candidate> > $RUNDIR/review-diff.patch
+git --no-replace-objects show <candidate> > $RUNDIR/review-diff.patch
 <section text: context, micro-steps, checkpoint> > $RUNDIR/section.md
 python scripts/review_prompt.py fence PANEL --base $(git --no-replace-objects rev-parse <candidate>^) --head $(git --no-replace-objects rev-parse <candidate>) "SECTION CONTRACT=$RUNDIR/section.md" "CANDIDATE DIFF=$RUNDIR/review-diff.patch" > $RUNDIR/fenced.md
 TAG=$(sed -n '1s/^TAG \([^ ]*\).*/\1/p' $RUNDIR/fenced.md)
@@ -231,7 +231,7 @@ The stamp makes factual claims no lens has checked: the panel reviewed the candi
 TREE=$(git write-tree)  # the index identity FIRST: anything staged after this line is not under review
 git diff --cached > $RUNDIR/stamp.patch
 [ "$(git write-tree)" = "$TREE" ] || { echo "BLOCKED: the index moved while capturing the stamp patch; re-stage and restart"; exit 1; }
-git show :<findings stem>.attest.json > $RUNDIR/staged.attest.json  # the STAGED blob: the disk file may differ after staging, and only the blob ships
+git --no-replace-objects show :<findings stem>.attest.json > $RUNDIR/staged.attest.json  # the STAGED blob: the disk file may differ after staging, and only the blob ships
 python scripts/review_prompt.py attest --read-back $RUNDIR/staged.attest.json  # the staged attestation reads back now: an altered blob fails here, never ships
 python scripts/review_prompt.py fence STAMP --base $(git --no-replace-objects rev-parse HEAD) --head $TREE "STAGED STAMP=$RUNDIR/stamp.patch" "FINDINGS FILE=<findings path>" > $RUNDIR/stamp-fenced.md
 TAG=$(sed -n '1s/^TAG \([^ ]*\).*/\1/p' $RUNDIR/stamp-fenced.md)
@@ -245,7 +245,7 @@ timeout 600 codex exec -m "gpt-5.6-sol" -c model_reasoning_effort="high" -s read
 
 Bind the approval to the staged tree (D00 T04 §9): a stamp approved staged becomes pushed unstaged when anything moves the index between the review and the commit. The tree is captured before the patch, the patch is verified against it immediately (an index change between the two commands would otherwise review one tree and record another), and the tree is rechecked immediately before committing. A mismatch re-stages and re-reviews; it never commits. Residual: the instant between the final recheck and the commit, closed by the single-writer rule, not by a command.
 
-Carry the binding from the commit to the push (D00 T04 §13): the commit must land on the expected parent with the reviewed tree, and the same commit must still sit at HEAD immediately before the push. A pre-commit hook that rewrites the tree invalidates the review exactly like an index move: the committed tree is compared against the reviewed tree, and a mismatch forces re-review, never a quiet accept. Every `rev-parse` on this page passes `--no-replace-objects`: a replacement ref would otherwise substitute the compared parent, tree, and fenced range. Residual: the instant between the push recheck and the push, closed by the single-writer rule.
+Carry the binding from the commit to the push (D00 T04 §13): the commit must land on the expected parent with the reviewed tree, and the same commit must still sit at HEAD immediately before the push. A pre-commit hook that rewrites the tree invalidates the review exactly like an index move: the committed tree is compared against the reviewed tree, and a mismatch forces re-review, never a quiet accept. Every `rev-parse` and `show` on this page passes `--no-replace-objects` (cross-check's `git diff` likewise): a replacement ref would otherwise substitute the compared parent, tree, fenced range, and shown content. Residual: the instant between the push recheck and the push, closed by the single-writer rule.
 
 ```bash
 # ... the stamp review runs ...

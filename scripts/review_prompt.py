@@ -679,6 +679,18 @@ def git_object_type(oid: str, cwd=None) -> str | None:
     return proc.stdout.strip()
 
 
+def git_diff_names(base: str, head: str, cwd=None):
+    """The cross-check file listing: NUL-delimited paths, no rename
+    detection, replacement refs disabled so a refs/replace cannot swap
+    the compared content. Returns the completed process; raises OSError
+    when git cannot spawn."""
+    import subprocess
+    return subprocess.run(
+        ["git", "--no-replace-objects", "diff", "--name-only", "-z",
+         "--no-renames", base, head],
+        capture_output=True, check=False, cwd=cwd)
+
+
 def check_attest_resolution(base: str, head: str, tree: str, cwd=None) -> str | None:
     """Resolve the attest triple before anything is written: base and head
     must be commits (existence alone admits a tree-as-head, since
@@ -1054,6 +1066,18 @@ def _self_test() -> int:
         rtree = subprocess.run(["git", "-C", tmpd, "rev-parse", "HEAD^{tree}"],
                                capture_output=True, text=True,
                                check=True).stdout.strip()
+        with open(os.path.join(tmpd, "g.md"), "w", encoding="utf-8") as fh:
+            fh.write("second\n")
+        subprocess.run(["git", "-C", tmpd, "add", "g.md"],
+                       capture_output=True, check=True)
+        subprocess.run(["git", "-C", tmpd, "-c", "user.email=t@t.invalid",
+                        "-c", "user.name=t", "-c", "commit.gpgsign=false",
+                        "-c", "core.hooksPath=" + empty,
+                        "commit", "-qm", "second"], capture_output=True,
+                       check=True)
+        rhead2 = subprocess.run(["git", "-C", tmpd, "rev-parse", "HEAD"],
+                                capture_output=True, text=True,
+                                check=True).stdout.strip()
         check("resolve-oid-exists", git_oid_exists(rhead, cwd=tmpd)
               and git_oid_exists(rtree, cwd=tmpd))
         check("resolve-oid-missing",
@@ -1078,6 +1102,19 @@ def _self_test() -> int:
         got_rtype = git_object_type(rtree, cwd=tmpd)
         check("resolve-ignores-replace-refs",
               got_rtype == "tree", got_rtype or "none")
+        subprocess.run(["git", "-C", tmpd, "update-ref",
+                        f"refs/replace/{rhead}", rhead2],
+                       capture_output=True, check=True)
+        empty_tree = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        raw_diff = subprocess.run(
+            ["git", "-C", tmpd, "diff", "--name-only", "-z",
+             "--no-renames", empty_tree, rhead],
+            capture_output=True, check=True)
+        check("resolve-diff-replace-swaps-unflagged",
+              raw_diff.stdout == b"f.md\x00g.md\x00", raw_diff.stdout)
+        got_diff = git_diff_names(empty_tree, rhead, cwd=tmpd)
+        check("resolve-diff-ignores-replace-refs",
+              got_diff.stdout == b"f.md\x00", got_diff.stdout)
     check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
@@ -1176,9 +1213,7 @@ if __name__ == "__main__":
                       file=sys.stderr)
                 sys.exit(1)
         try:
-            proc = subprocess.run(
-                ["git", "diff", "--name-only", "-z", "--no-renames", sys.argv[3], sys.argv[4]],
-                capture_output=True, check=False)
+            proc = git_diff_names(sys.argv[3], sys.argv[4])
         except OSError as exc:
             print(f"cross-check: git failed: {exc}", file=sys.stderr)
             sys.exit(1)
