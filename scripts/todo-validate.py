@@ -1980,8 +1980,11 @@ def validate(graph, _args) -> int:
     # is no same-section exemption for new records (even its own section
     # reads as a full ref). Findings scan unfenced: fences strip from
     # every scan, so transcripts never trip the rule. The Verified
-    # coverage segment (`DATE | §N |`) is stamp grammar, not a citation,
-    # and strips before the scan.
+    # coverage segment (`DATE | §N, §M |`) is stamp grammar, not a
+    # citation, and strips before the scan: the strip mirrors the
+    # graph's own coverage grammar (`STAMP_BODY_RE` plus per-element
+    # `COVER_ITEM_RE`), so a range stamp the graph accepts never trips
+    # the rule (round-4 C1: the single-§ strip flagged `§12, §13`).
     def _flag_shorts(text: str, where: str) -> None:
         full_spans = [m.span() for m in graph.SKILL_CITE_RE.finditer(text)]
         for short in graph.SKILL_SHORT_RE.finditer(text):
@@ -2006,7 +2009,11 @@ def validate(graph, _args) -> int:
                 if not body:
                     continue
                 if kind == "Verified":
-                    body = re.sub(r"^\d{4}-\d{2}-\d{2} \| §\d+ \| ?", "", body)
+                    shaped = graph.STAMP_BODY_RE.match(body.strip())
+                    if shaped is not None and all(
+                            graph.COVER_ITEM_RE.match(element.strip()) is not None
+                            for element in shaped.group("cover").split(",")):
+                        body = shaped.group("evidence")
                 _flag_shorts(body, f"{t.path}:{s.line}: §{num} {kind}")
             fm = graph.FINDINGS_RE.search(s.review_body or "")
             if fm:

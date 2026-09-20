@@ -586,7 +586,7 @@ def check_plan_output(text: str, manifest: tuple[str, str, str] | None = None) -
     return True, f"{len(lines)} findings, one per line"
 
 
-_STAMP_HOLDS_RE = re.compile(r"^STAMP HOLDS\.\s*$")
+_STAMP_HOLDS_RE = re.compile(r"^STAMP HOLDS\.?\s*$")
 
 
 def check_stamp_output(text: str, manifest: tuple[str, str, str] | None = None) -> tuple[bool, str]:
@@ -957,6 +957,22 @@ def _anchor_root_ok(span: str, topdirs: set[str]) -> bool:
         return True
     first = re.split(r"[\\/]", span, maxsplit=1)[0]
     return first in topdirs
+
+
+def _anchor_inside_repo(path: str, root: str) -> bool:
+    """Whether a cited path resolves inside the working tree: realpath
+    containment, case-normalized (a bare `isabs` misses Windows
+    drive-relative `/tmp/...`, which resolves outside the repo while
+    reading relative). Different drives are outside by definition."""
+    import os
+    try:
+        here = os.path.normcase(os.path.realpath(path))
+    except OSError:
+        return False
+    try:
+        return os.path.commonpath((root, here)) == root
+    except ValueError:
+        return False
 _ANCHOR_FULLREF_RE = re.compile(r"D(?P<dom>\d\d)\s+T(?P<todo>\d\d)\s+§(?P<sec>\d+)")
 _ANCHOR_BAREREF_RE = re.compile(r"(?<![\wT])§(?P<sec>\d+)")
 _ANCHOR_SECTION_RE = re.compile(r"^##\s+(?P<num>\d+)\.")
@@ -1025,7 +1041,10 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
     and relative prefixes check, commands skip); bare spaced spans
     verify when they resolve and stay silent otherwise (a bare
     spaced span that resolves to nothing is prose-shaped as often
-    as it is a dead cite: documented recall limit). Bare `§N`
+    as it is a dead cite: documented recall limit). Every cited
+    path that resolves must also be tracked (one `ls-files`: an
+    untracked cite ships in a commit without its file, round-4 A1),
+    and outside-repo paths fail as non-repo evidence. Bare `§N`
     resolves in-file; full D-refs resolve dir, file, and heading.
     Failures name file, stamp line, and the dead anchor."""
     import os
@@ -1038,8 +1057,10 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
     try:
         topdirs = {d for d in os.listdir(".")
                    if os.path.isdir(os.path.join(".", d))}
+        root = os.path.normcase(os.path.realpath("."))
     except OSError as exc:
         return [f"{todo_path}: cannot list repo root: {exc}"]
+    cited: dict[str, str] = {}
     for lineno, kind, body in _stamp_anchor_lines(todo_text, section):
         where = f"{todo_path}:{lineno}"
         if kind == "Review":
@@ -1068,6 +1089,10 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                         continue
                     failures.append(f"{where}: cites missing file {path}")
                     continue
+                if path.startswith("~") or not _anchor_inside_repo(path, root):
+                    failures.append(f"{where}: cites non-repo path {path}")
+                    continue
+                cited.setdefault(path, where)
                 try:
                     with open(path, encoding="utf-8", errors="replace") as fh:
                         total = len(fh.read().splitlines())
@@ -1086,6 +1111,11 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                     continue
                 if not os.path.exists(span):
                     failures.append(f"{where}: cites missing file {span}")
+                    continue
+                if span.startswith("~") or not _anchor_inside_repo(span, root):
+                    failures.append(f"{where}: cites non-repo path {span}")
+                    continue
+                cited.setdefault(span, where)
                 continue
             if " " in span and ":" not in span \
                     and _ANCHOR_SPACED_PATH_RE.match(span) is not None:
@@ -1095,9 +1125,13 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                 # rest (documented recall limit). Rooted spaced spans
                 # are unambiguous cites and fire when missing.
                 if ("/" in span or "\\" in span) \
-                        and _anchor_root_ok(span, topdirs) \
-                        and not os.path.exists(span):
-                    failures.append(f"{where}: cites missing file {span}")
+                        and _anchor_root_ok(span, topdirs):
+                    if not os.path.exists(span):
+                        failures.append(f"{where}: cites missing file {span}")
+                    elif span.startswith("~") or not _anchor_inside_repo(span, root):
+                        failures.append(f"{where}: cites non-repo path {span}")
+                    else:
+                        cited.setdefault(span, where)
                 continue
         full_spans = [m.span() for m in _ANCHOR_FULLREF_RE.finditer(body)]
         for fm in _ANCHOR_FULLREF_RE.finditer(body):
@@ -1109,6 +1143,23 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                 continue
             if not _todo_section_exists(todo_path, int(bm.group("sec"))):
                 failures.append(f"{where}: cites dead in-file §{bm.group('sec')}")
+    if cited:
+        # Round-4 A1: a cite that exists on disk but was never added
+        # passes the worktree legs, then ships in a commit without the
+        # cited file. One `ls-files` over every cited path proves each
+        # ships; without git the leg fails loud, never open.
+        import subprocess
+        try:
+            proc = subprocess.run(
+                ["git", "--no-replace-objects", "ls-files", "-z", "--",
+                 *sorted(cited)],
+                capture_output=True, check=False)
+        except OSError as exc:
+            failures.append(f"{todo_path}: cannot run git ls-files: {exc}")
+            return failures
+        tracked = set(parse_nul_file_list(proc.stdout))
+        for path in sorted(set(cited) - tracked):
+            failures.append(f"{cited[path]}: cites untracked file {path}")
     return failures
 
 
@@ -2090,6 +2141,9 @@ def _self_test() -> int:
     check("stamp-holds",
           check_stamp_output(good_receipt + "STAMP HOLDS.\n", stamp_man)
           == (True, "stamp holds"))
+    check("stamp-holds-bare",
+          check_stamp_output(good_receipt + "STAMP HOLDS\n", stamp_man)
+          == (True, "stamp holds"))
     check("stamp-namings",
           check_stamp_output(good_receipt + "`a` -> `b`\n`c` -> `d`\n", stamp_man)
           == (True, "2 naming(s) to answer"))
@@ -2440,6 +2494,39 @@ def _self_test() -> int:
                       for d in seed_dead)
               and any("dead ref D00 T99 §1" in d for d in seed_dead),
               str(seed_dead))
+        # Round-4 A1: an untracked cite resolves on disk but ships
+        # without its file; an absolute cite is non-repo evidence.
+        # Both temps carry screaming names and a finally removes them:
+        # the suite must never leave the tree dirty.
+        stray = "s21-anchors-untracked-%d.md" % os.getpid()
+        with open(stray, "w", encoding="utf-8") as fh:
+            fh.write("stray\n")
+        drive, _ = os.path.splitdrive(os.getcwd())
+        absdir = os.path.join((drive + os.sep) if drive else os.sep, "tmp")
+        os.makedirs(absdir, exist_ok=True)
+        absfile = os.path.join(
+            absdir, "s21-anchors-nonrepo-%d.md" % os.getpid())
+        with open(absfile, "w", encoding="utf-8") as fh:
+            fh.write("stray\n")
+        seed2 = os.path.join(tmpd, "TODO-99-seed2.md")
+        with open(seed2, "w", encoding="utf-8") as fh:
+            fh.write("## 1. Seed\n\n> **Verified:** 2026-09-21 | §1 | "
+                     f"untracked `{stray}`, nonrepo "
+                     f"`/tmp/s21-anchors-nonrepo-{os.getpid()}.md`\n")
+        try:
+            seed2_dead = check_stamp_anchors(seed2, 1)
+        finally:
+            for junk in (stray, absfile):
+                try:
+                    os.unlink(junk)
+                except OSError:
+                    pass
+        check("anchors-untracked-fires",
+              len(seed2_dead) == 2
+              and any("cites untracked file " + stray in d for d in seed2_dead)
+              and any("cites non-repo path /tmp/s21-anchors-nonrepo-" in d
+                      for d in seed2_dead),
+              str(seed2_dead))
         # The cross-check CLI legs (items 1, 15): the content leg and
         # the kind gate over the fixture repo.
         def _cc(*a):
@@ -2682,16 +2769,23 @@ def _self_test() -> int:
             ("skill-tree-clean",
              "git --no-replace-objects diff --quiet ||"),
             ("skill-failover-redirect",
-             "Read < $RUNDIR/stamp-prompt.md > $RUNDIR/stamp.out")):
+             "Read < $RUNDIR/stamp-prompt.md > $RUNDIR/stamp.out"),
+            ("skill-holds-period",
+             "The period is part of the verdict."),
+            ("skill-refusal-rerun",
+             "names no figure (refusal, off-topic) re-runs")):
         check(pin, needle in skill_text, skill_path)
     try:
-        attest_ordered = (skill_text.index("### 8. Plan review")
+        attest_ordered = (skill_text.index("### 9. Write the stamp and flip the row")
                           < skill_text.index("### Attestation")
-                          < skill_text.index("### 9. Write the stamp and flip the row"))
+                          < skill_text.index("### Stamp review (before the STAMP push)"))
     except ValueError:
         attest_ordered = False
-    check("skill-attest-after-plan", attest_ordered,
-          "attestation emits after the plan review, before the stamp")
+    check("skill-attest-after-stampwrite", attest_ordered,
+          "attestation emits after the stamp and Live proof, before the stamp review")
+    check("skill-stamp-rounds-runfile",
+          "Stamp rounds ride the run file, never the findings file" in skill_text,
+          skill_path)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:

@@ -7101,6 +7101,10 @@ track: Z1
 |   8   |   §8    | Findings short | - |  [x]   |
 |   9   |   §9    | Deferred XREF | - |  [x]   |
 |  10   |   §10   | XREF target | - |  [ ]   |
+|  11   |   §11   | Range stamp pair | - |  [x]   |
+|  12   |   §12   | Range twin | - |  [ ]   |
+|  13   |   §13   | Dash range stamp | - |  [x]   |
+|  14   |   §14   | Dash range twin | - |  [ ]   |
 
 ## 1. Short in Verified
 
@@ -7195,6 +7199,38 @@ track: Z1
 
 - [ ] Carry the leftover for §9
 - [ ] Commit: `"selftest: evtarget"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 11. Range stamp pair
+
+- [x] Did both
+- [x] Commit: `"selftest: ev11"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §11, §12 | clean evidence
+
+## 12. Range twin
+
+- [ ] Twin half of the §11 range stamp
+- [ ] Commit: `"selftest: ev12"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 13. Dash range stamp
+
+- [x] Did both
+- [x] Commit: `"selftest: ev13"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §13-§14 | clean evidence
+
+## 14. Dash range twin
+
+- [ ] Twin half of the §13 range stamp
+- [ ] Commit: `"selftest: ev14"`
 
 **Test checkpoint:** run tests/AlphaTest.php.
 """,
@@ -7345,6 +7381,10 @@ Fenced transcript citing §1 never trips the scan.
               not any(line.startswith("FATAL") and "D91-T11-s8.md:15" in line
                       for line in sev_out.splitlines()), True)
         check("evidence-cite: Deferred XREF keeps its grammar", ev_silent(9), True)
+        check("evidence-cite: range coverage pair silent",
+              ev_silent(11) and ev_silent(12), True)
+        check("evidence-cite: dash range coverage silent",
+              ev_silent(13) and ev_silent(14), True)
 
         # --- D00 T04 §20: the disposition report ----------------------
         rep_buf = _io.StringIO()
