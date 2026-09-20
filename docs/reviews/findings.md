@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**277 findings across 37 sections.**
+**283 findings across 37 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 95 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 59 | fails under hostile or unexpected input |
+| `record` | 97 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 60 | fails under hostile or unexpected input |
+| `consistency` | 43 | disagrees with the rest of the suite, its naming, or its layout |
 | `correctness` | 40 | the code does the wrong thing |
-| `consistency` | 40 | disagrees with the rest of the suite, its naming, or its layout |
 | `integration` | 29 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 138 | wrong behavior in code, plan, or record |
-| `minor` | 133 | polish or wording, or no surviving defect |
+| `major` | 139 | wrong behavior in code, plan, or record |
+| `minor` | 138 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -252,6 +252,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §22` | F6 | major | `integration` | fixed | independent | unreadable exports ignore the structured form |
 | `D00 T04 §22` | F7 | minor | `record` | refuted | independent | attestation file absent mid-review |
 | `D00 T04 §22` | F8 | minor | `record` | fixed | independent | no-behavior-changed record contradicts the fix it follows |
+| `D00 T04 §22` | F9 | major | `adversarial` | fixed | independent | self-test plus format slips past usage refusal |
+| `D00 T04 §22` | F10 | minor | `consistency` | fixed | independent | describe docstring names the wrong exception |
+| `D00 T04 §22` | F11 | minor | `consistency` | fixed | independent | schema-keys constant ships unread |
+| `D00 T04 §22` | F12 | minor | `consistency` | fixed | independent | exit-code docs omit exit 2 and the runs map |
+| `D00 T04 §22` | F13 | minor | `record` | fixed | independent | live-green quotes stale at the candidate tip |
+| `D00 T04 §22` | F14 | minor | `record` | fixed | independent | record omits the head record commit |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
