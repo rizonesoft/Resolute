@@ -670,15 +670,25 @@ def _is_int(value):
     return isinstance(value, int) and not isinstance(value, bool)
 
 
+def _commit_resolves(sha):
+    """The as-of binding resolves to a commit in this repository. Needs git."""
+    hit = subprocess.run(["git", "cat-file", "-t", sha], cwd=ROOT,
+                         capture_output=True, text=True, timeout=30)
+    return hit.returncode == 0 and hit.stdout.strip() == "commit"
+
+
 def check_export(doc):
     """Assert an export file: version, shape, values, internal counts.
     Returns a list of messages (empty means sound). Every closed set the
     parser enforces is re-asserted here, so a hand-edited export cannot
     smuggle values the records could never hold. The as-of binds the
-    snapshot; live-tree agreement is NOT checked here, a snapshot is a
-    moment, so `refuted` is bounded by the listed refs rather than proven
-    against the ledger. Dispositions ride per ref so the snapshot stands
-    alone; a value outside the ledger set fails."""
+    snapshot: a well-formed commit must resolve here, so a fabricated
+    binding fails instead of riding an `internally sound` verdict.
+    Byte-agreement with the bound tree is NOT checked here, a snapshot
+    is a moment, so `refuted` is bounded by the listed refs rather than
+    proven against the ledger; consumers regenerate at consume time
+    rather than trusting handed files. Dispositions ride per ref so the
+    snapshot stands alone; a value outside the ledger set fails."""
     problems = []
     if not isinstance(doc, dict):
         return ["export is not an object"]
@@ -702,6 +712,9 @@ def check_export(doc):
     if commit != "unresolved" and not (isinstance(commit, str) and len(commit) == 40
                                        and SHA_RE.match(commit)):
         problems.append("as_of commit is neither a full sha nor `unresolved`")
+    elif isinstance(commit, str) and len(commit) == 40 and SHA_RE.match(commit) \
+            and not _commit_resolves(commit):
+        problems.append("as_of commit resolves to no commit in this repository")
     if not (isinstance(stamp, str) and TIMESTAMP_RE.match(stamp)):
         problems.append("as_of timestamp is not UTC `YYYY-MM-DDTHH:MM:SSZ`")
     runs = doc.get("runs")
@@ -1156,6 +1169,19 @@ refuted: 0
           export_sound_line(bound) == f"export version {EXPORT_VERSION}, "
           f"2 runs, as-of {'f' * 40}, internally sound",
           export_sound_line(bound))
+
+    # Round 2: a fabricated as-of fails even when well-formed; a real one holds.
+    tampered = json.loads(json.dumps(injected))
+    tampered["as_of"]["commit"] = "0" * 40
+    check("export-asof-fabricated",
+          any("resolves to no commit" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(injected))
+    tampered["as_of"]["commit"] = "730a4db2185da1621d4c88ad013551d30b25b40e"
+    check("export-asof-resolving",
+          not any("resolves to no commit" in m or "neither a full sha" in m
+                  for m in check_export(tampered)),
+          f"{check_export(tampered)}")
 
     # Round 1 bound the as-of to content identity: HEAD only when HEAD's
     # tree holds exactly the exported bytes, `unresolved` otherwise.
