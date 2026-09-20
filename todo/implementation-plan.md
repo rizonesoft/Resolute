@@ -118,7 +118,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §17` | Report without walking the corpus twice        |   2   |
 | [ ] | `D00 T04 §18` | Second two-model revisit, independently rated  |   8   |
 | [ ] | `D00 T04 §19` | No partial flips                               |   6   |
-| [ ] | `D00 T04 §20` | Review-tooling operability follow-ups          |   8   |
+| [ ] | `D00 T04 §20` | Review-tooling operability follow-ups          |  11   |
 | [ ] | `D00 T04 §21` | Review-input integrity hardening               |  14   |
 | [ ] | `D00 T04 §22` | Checker diagnostic codes and structured errors |   4   |
 | [ ] | `D00 T04 §23` | Third two-model revisit                        |   6   |
