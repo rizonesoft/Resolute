@@ -91,6 +91,134 @@ def validate(graph, _args) -> int:
         if t.status == "superseded" and not t.superseded_by:
             flag("superseded-no-successor", f"{t.path}: status is 'superseded' but superseded_by is unset")
 
+    # Raw span cache for rule 14: path -> file lines. The partial-flip
+    # rule scans spans, not s.items, because its exemptions need line
+    # context the parser does not keep (fence state, stamp position,
+    # the owner XREFs on a deferral's continuation lines). Separate
+    # from the marker cache below: that one reads raw lines, this one
+    # strips fences per span.
+    span_cache: dict[str, list[str] | None] = {}
+    deferred_mark_re = re.compile(r"\bdeferred\b", re.IGNORECASE)
+
+    def is_item_line(stripped: str) -> bool:
+        # The parser's item shape exactly (parse_todo): a `- [ ]` or
+        # `- [x]` opener. Mirrored, not imported, because the parser
+        # inlines it; any drift breaks the self-test twins that pin it.
+        return stripped.startswith("- [") and len(stripped) > 4 and stripped[4] == "]"
+
+    def span_lines(path: str, sec_line: int) -> list[str] | None:
+        """Stripped, stamp-cut body lines of one section span, or None.
+
+        Span mirrors the parser: from the `## N.` heading to the next
+        `## ` line of any kind (a `## Verification` block ends the
+        span exactly as it clears `current`). Fences strip per span
+        through the shared stripper, keeping the rule on the parser's
+        own section model; a span-local unbalanced fence falls back to
+        the raw span, which is what the fence-blind parser sees. The
+        stamp region below the first `Verified:` line is out of scope.
+        """
+        if path not in span_cache:
+            try:
+                span_cache[path] = (graph.TODO_DIR.parent / path).read_text(encoding="utf-8").splitlines()
+            except OSError:
+                span_cache[path] = None
+        raw = span_cache[path]
+        if raw is None:
+            return None
+        start = max(sec_line, 1)
+        end = len(raw) + 1
+        for j in range(start + 1, len(raw) + 1):
+            if raw[j - 1].startswith("## "):
+                end = j
+                break
+        span = raw[start : end - 1]
+        stripped, unbalanced = graph.strip_fenced_code("\n".join(span))
+        lines = span if unbalanced is not None else stripped.splitlines()
+        cut = len(lines)
+        for i, ln in enumerate(lines):
+            sm = graph.STAMP_RE.match(ln)
+            if sm and sm.group("kind") == "Verified":
+                cut = i
+                break
+        return lines[:cut]
+
+    def partial_flip_scan(todo, s_num: int, sec) -> None:
+        span = span_lines(todo.path, sec.line)
+        if span is None:
+            return
+        for i, ln in enumerate(span):
+            st = ln.strip()
+            if not is_item_line(st) or st[3] == "x":
+                continue
+            text = st[5:].strip()
+            where = f"{todo.path}:{sec.line}: §{s_num}"
+            if text.lower().startswith("commit:"):
+                continue
+            if not text.startswith("~~"):
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries an unticked item: {text[:100]!r} -- "
+                    f"tick it, defer it with an owner, or unship the row",
+                )
+                continue
+            if not deferred_mark_re.search(text):
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries a struck item with no Deferred marker: "
+                    f"{text[:100]!r} -- a strike without the marker reads as hidden work",
+                )
+                continue
+            # A deferral's owner rides the contiguous lines belonging to
+            # the item: the item line itself plus following lines until a
+            # blank line or the next item. (D00 T02 §4 defers to D04 T01
+            # §1 exactly this way, owner on the next line.)
+            block = [ln]
+            for cont in span[i + 1 :]:
+                cst = cont.strip()
+                if not cst or is_item_line(cst):
+                    break
+                block.append(cont)
+            owners = [
+                m.group("ref") for line in block for m in graph.DEFER_REF_RE.finditer(line)
+            ]
+            if not owners:
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries a deferral naming no owner: "
+                    f"{text[:100]!r} -- attach '-> XREF:' to the owning section",
+                )
+                continue
+            problems = []
+            for raw_ref in owners:
+                r = graph.resolve_ref(raw_ref, todo, by_key)
+                if r is None or r[0] not in by_id or r[1] not in by_id[r[0]].sections:
+                    problems.append(f"owner {raw_ref!r} resolves to nothing")
+                    continue
+                target = by_id[r[0]]
+                tsections = target.sections[r[1]]
+                back = any(
+                    graph.resolve_ref(dep, target, by_key) == (todo.id, s_num)
+                    for dep in tsections.depends_on
+                )
+                if not back:
+                    tspan = span_lines(target.path, tsections.line)
+                    back = tspan is not None and any(
+                        graph.resolve_ref(m.group("ref"), target, by_key) == (todo.id, s_num)
+                        for tln in tspan
+                        for m in graph.DEFER_REF_RE.finditer(tln)
+                    )
+                if not back:
+                    problems.append(
+                        f"owner {r[0]} §{r[1]} carries no back-pointer "
+                        f"(neither an XREF nor Depends On {todo.id} §{s_num})"
+                    )
+            if len(problems) == len(owners):
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries a deferral with no live owner: "
+                    f"{text[:100]!r} -- " + "; ".join(problems),
+                )
+
     for t in todos:
         # 4. Implementation Order rows <-> body sections
         for num, s in sorted(t.sections.items()):
@@ -178,22 +306,31 @@ def validate(graph, _args) -> int:
             # 13. every section ends on a commit item
             if not s.has_commit_item:
                 flag("no-commit-item", f"{t.path}:{s.line}: §{num} has no '- [ ] Commit:' checklist item")
-            # 14. a CLOSED section must not carry orphaned work.
+            # 14. a CLOSED section must not carry open work: a `[x]` row
+            # with an open checklist reads as done while work remains,
+            # the one state the completion-first policy refuses to
+            # represent (D00 T04 §19, superseding `orphaned-items-shipped`).
             #
             # A finding filed as a plain checklist item inside a section that later
             # ships is invisible: the section is done, nobody reopens it, and the
             # item sits unticked forever. Found 2026-08-14 with 21 such items across
             # 8 closed sections, one of them a real review-panel finding.
             #
-            # Three shapes are legitimate and are not flagged. A struck item
-            # (`~~...~~`) is a decision recorded against, not work owed. A bare
-            # `-> XREF:` line is a cross-reference, not a task. A `Commit:` item is
-            # bookkeeping the stamp already covers.
-            #
-            # WARN and not FATAL, deliberately, and the reasoning is D00 T03 §3's:
-            # a rule that fails 21 existing items the day it lands gets disabled in
-            # its first week and takes the rest of the gate with it. Promote it once
-            # the existing ones are re-homed.
+            # Four shapes are excused, each for a stated reason. A `Commit:`
+            # line is proven by history rather than by the checkbox, and
+            # ticking one on a shipped section would rewrite a stamped
+            # checklist. The row determines its reading: unticked on `[ ]`
+            # means doing, unticked on `[x]` means excused, ticked means
+            # done (todo/README.md's Completion-first states the order).
+            # A struck `~~` item carrying a `Deferred` marker
+            # is filed debt with an owner, not open work -- and the owner
+            # must resolve to a live section that points back, either
+            # with an XREF or through Depends On. Fenced code blocks
+            # strip before the scan, and the stamp region below the
+            # first `Verified:` line is out of scope. Everything else
+            # unticked fails, including a struck item without the marker
+            # and a checkbox-wrapped `-> XREF:` (a cross-reference needs
+            # no checkbox).
             if s.moved:
                 moved_path = graph.moved_target(s.moved)
                 if not moved_path or not (graph.TODO_DIR.parent / moved_path).is_file():
@@ -203,21 +340,7 @@ def validate(graph, _args) -> int:
                         f"existing file ({s.moved[:80]!r}); the work it points at cannot be found",
                     )
             if s.status == "x":
-                orphaned = [
-                    txt for done, txt in s.items
-                    if not done
-                    and not txt.lstrip().startswith("~~")
-                    and not txt.lstrip().startswith("->")
-                    and not txt.lstrip().lower().startswith("commit:")
-                ]
-                if orphaned:
-                    flag(
-                        "orphaned-items-shipped",
-                        f"{t.path}:{s.line}: §{num} is [x] but carries {len(orphaned)} "
-                        f"unticked item(s) that are neither struck through nor a bare XREF -- "
-                        f"orphaned work in a shipped section. Re-home each to an OPEN section, "
-                        f"strike it with the decision, or tick it. First: {orphaned[0][:80]!r}"
-                    )
+                partial_flip_scan(t, num, s)
             if (
                 s.has_fidelity_block
                 and not s.fidelity_exempt

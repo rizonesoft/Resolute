@@ -807,9 +807,9 @@ SEVERITY_MAP: dict[str, str] = {
     "filter-overclaim-stamped": "warn",
     # one section = one commit is the format's core contract.
     "no-commit-item": "fatal",
-    # unticked, unstruck work inside a shipped [x] section is an integrity
-    # break in the shipped claim itself.
-    "orphaned-items-shipped": "fatal",
+    # an unticked micro-step outside the exemptions inside a shipped
+    # [x] section is an integrity break in the shipped claim itself.
+    "partial-flip-shipped": "fatal",
     # Fidelity missing Job/Treatment/Chrome on an OPEN section is already
     # fatal at the emitter; the stamped branches are §38 fix-forward.
     "fidelity-missing-lines-open": "fatal",
@@ -6447,7 +6447,8 @@ track: Z1
         # probe covers the set.
         (root / "todo" / "91-severity").mkdir(parents=True)
         (root / "todo" / "91-severity" / "INDEX.md").write_text(
-            "# 91-severity\n\n- [TODO-05](TODO-05-severity.md)\n- [TODO-06](TODO-06-super.md)\n",
+            "# 91-severity\n\n- [TODO-05](TODO-05-severity.md)\n- [TODO-06](TODO-06-super.md)\n"
+            "- [TODO-10](TODO-10-partial-flip.md)\n",
             encoding="utf-8",
         )
         (root / "todo" / "91-severity" / "TODO-05-severity.md").write_text(
@@ -6469,7 +6470,7 @@ See todo/91-severity/TODO-06-super.md for the superseded case.
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | No commit item | - |  [ ]   |
-|   2   |   §2    | Orphaned in shipped | - |  [x]   |
+|   2   |   §2    | Partial flip in shipped | - |  [x]   |
 |   3   |   §3    | Empty | - |  [ ]   |
 |   4   |   §4    | Oversized | - |  [ ]   |
 |   5   |   §5    | Deferral and resolution | - |  [ ]   |
@@ -6480,11 +6481,11 @@ See todo/91-severity/TODO-06-super.md for the superseded case.
 
 **Test checkpoint:** run tests/AlphaTest.php.
 
-## 2. Orphaned in shipped
+## 2. Partial flip in shipped
 
 - [x] Did it
 - [ ] Never finished this one
-- [x] Commit: `"selftest: orphaned"`
+- [x] Commit: `"selftest: partial"`
 
 **Test checkpoint:** run tests/AlphaTest.php.
 
@@ -6546,6 +6547,219 @@ track: Z1
 """,
             encoding="utf-8",
         )
+        # --- D00 T04 §19: the partial-flip rule, one section per shape ----
+        # Every XREF stays in-file: the one-sided rule skips same-file refs,
+        # so these fixtures cannot drown in reciprocity fires. The §13/§14
+        # and §15/§16 pairs are twins: identical item text, one exempt and
+        # one failing, so a removed exemption breaks its case by construction.
+        (root / "todo" / "91-severity" / "TODO-10-partial-flip.md").write_text(
+            """---
+schema_version: 1
+id: self-test-partial
+domain: 91-severity
+status: active
+title: "TODO-10 -- partial-flip fixtures"
+track: Z1
+---
+
+# TODO-10 -- partial-flip fixtures
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Plain open item | - |  [x]   |
+|   2   |   §2    | Struck without marker | - |  [x]   |
+|   3   |   §3    | Checkboxed XREF | - |  [x]   |
+|   4   |   §4    | Commit excused | - |  [x]   |
+|   5   |   §5    | Deferral, Depends owner | - |  [x]   |
+|   6   |   §6    | Deferral, XREF owner | - |  [x]   |
+|   7   |   §7    | Deferral, no owner | - |  [x]   |
+|   8   |   §8    | Deferral, ghost owner | - |  [x]   |
+|   9   |   §9    | Target, Depends back | §5 |  [ ]   |
+|  10   |   §10   | Target, XREF back | - |  [ ]   |
+|  11   |   §11   | Deferral, unlinked owner | - |  [x]   |
+|  12   |   §12   | Target, unlinked | - |  [ ]   |
+|  13   |   §13   | Fenced example | - |  [x]   |
+|  14   |   §14   | Unfenced twin | - |  [x]   |
+|  15   |   §15   | Stamp-region quote | - |  [x]   |
+|  16   |   §16   | Above-stamp twin | - |  [x]   |
+|  17   |   §17   | Commit without colon | - |  [x]   |
+
+## 1. Plain open item
+
+- [x] Did it
+- [ ] Never finished this one either
+- [x] Commit: `"selftest: plain"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §1 | fixture
+
+## 2. Struck without marker
+
+- [x] Did it
+- [ ] ~~Decided against, or so the strike claims~~
+- [x] Commit: `"selftest: struck"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §2 | fixture
+
+## 3. Checkboxed XREF
+
+- [x] Did it
+- [ ] -> XREF: §4 -- a cross-reference wearing a checkbox
+- [x] Commit: `"selftest: xref-item"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §3 | fixture
+
+## 4. Commit excused
+
+- [x] Did it
+- [ ] Commit: `"selftest: commit-excused"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §4 | fixture
+
+## 5. Deferral, Depends owner
+
+- [x] Did it
+- [ ] ~~Handed to the owning section.~~ **Deferred 2026-01-01 to the section that owns it.**
+  -> XREF: §9 (item: "Do the owned work") -- the owner
+- [x] Commit: `"selftest: defer-depends"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §5 | fixture
+
+## 6. Deferral, XREF owner
+
+- [x] Did it
+- [ ] ~~Handed to the owning section.~~ **Deferred 2026-01-01 to the section that owns it.**
+  -> XREF: §10 (item: "Do the other owned work") -- the owner
+- [x] Commit: `"selftest: defer-xref"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §6 | fixture
+
+## 7. Deferral, no owner
+
+- [x] Did it
+- [ ] ~~Handed to nobody.~~ **Deferred 2026-01-01 to nobody in particular.**
+
+- [x] Commit: `"selftest: defer-unowned"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §7 | fixture
+
+## 8. Deferral, ghost owner
+
+- [x] Did it
+- [ ] ~~Handed to a ghost.~~ **Deferred 2026-01-01 to a section that does not exist.**
+  -> XREF: §99 (item: "Do the ghost work") -- the owner
+- [x] Commit: `"selftest: defer-ghost"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §8 | fixture
+
+## 9. Target, Depends back
+
+- [ ] Do the owned work
+- [ ] Commit: `"selftest: target-depends"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 10. Target, XREF back
+
+-> XREF: §6 -- acknowledges the hand-off from §6
+
+- [ ] Do the other owned work
+- [ ] Commit: `"selftest: target-xref"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 11. Deferral, unlinked owner
+
+- [x] Did it
+- [ ] ~~Handed nowhere.~~ **Deferred 2026-01-01 to a section that never acknowledged it.**
+  -> XREF: §12 (item: "Do the unowned work") -- the owner
+- [x] Commit: `"selftest: defer-unlinked"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §11 | fixture
+
+## 12. Target, unlinked
+
+- [ ] Do the unowned work
+- [ ] Commit: `"selftest: target-unlinked"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 13. Fenced example
+
+- [x] Did it
+- [x] Commit: `"selftest: fenced"`
+
+The quoted shape:
+
+```
+- [ ] Looks open but is quoted
+```
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §13 | fixture
+
+## 14. Unfenced twin
+
+- [x] Did it
+- [ ] Looks open but is quoted
+- [x] Commit: `"selftest: unfenced"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §14 | fixture
+
+## 15. Stamp-region quote
+
+- [x] Did it
+- [x] Commit: `"selftest: stamp-region"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §15 | fixture
+- [ ] Quoted below the stamp
+
+## 16. Above-stamp twin
+
+- [x] Did it
+- [ ] Quoted below the stamp
+- [x] Commit: `"selftest: above-stamp"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §16 | fixture
+
+## 17. Commit without colon
+
+- [x] Did it
+- [ ] Commit without the colon is not the bookkeeping shape
+- [x] Commit: `"selftest: colon-boundary"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §17 | fixture
+""",
+            encoding="utf-8",
+        )
         # An unindexed file in the ORIGINAL domain (which has no INDEX.md at
         # all -- absent INDEX means every file there flags, which the earlier
         # fixtures would drown in). Instead: a third domain with an INDEX
@@ -6596,7 +6810,7 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
 
         check("severity: superseded-no-successor is FATAL", sev_line("FATAL", "superseded_by is unset"), True)
         check("severity: no-commit-item is FATAL", sev_line("FATAL", "§1 has no '- [ ] Commit:'"), True)
-        check("severity: orphaned-in-shipped is FATAL", sev_line("FATAL", "orphaned work in a shipped section"), True)
+        check("severity: partial-flip-shipped is FATAL", sev_line("FATAL", "carries an unticked item"), True)
         check("severity: no-checklist-items is FATAL (co-emits no-commit)", sev_line("FATAL", "§3 has no checklist items"), True)
         check("severity: over-30 stays WARN", sev_line("WARN", "31 checklist items"), True)
         check("severity: over-30 never FATAL", sev_line("FATAL", "31 checklist items"), False)
@@ -6610,6 +6824,49 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
         check("severity: validate exits 1 on the fixture set", sev_rc, 1)
         # The ratchet layer: a WARN absent from the baseline is marked NEW.
         check("severity: a new WARN carries the ratchet marker", "WARN*" in sev_out, True)
+
+        # --- D00 T04 §19: the partial-flip probes -------------------------
+        # The tag anchors on the `§N is [x]` location shape, never on a
+        # bare `§N`: quoted item text carries refs of its own (§3's
+        # message quotes `§4`), and a bare match would cross-fire.
+        def pf_fires(num: int, needle: str) -> bool:
+            tag = f"§{num} is [x]"
+            return any(
+                line.startswith("FATAL")
+                and "TODO-10-partial-flip.md" in line
+                and tag in line
+                and needle in line
+                for line in sev_out.splitlines()
+            )
+
+        def pf_silent(num: int) -> bool:
+            tag = f"§{num} is [x]"
+            return not any(
+                line.startswith("FATAL")
+                and "TODO-10-partial-flip.md" in line
+                and tag in line
+                for line in sev_out.splitlines()
+            )
+
+        check("partial-flip: plain open item fails", pf_fires(1, "Never finished this one either"), True)
+        check("partial-flip: struck item without marker fails", pf_fires(2, "no Deferred marker"), True)
+        check("partial-flip: checkboxed XREF fails", pf_fires(3, "cross-reference wearing a checkbox"), True)
+        check("partial-flip: Commit line passes", pf_silent(4), True)
+        check("partial-flip: deferral with Depends owner passes", pf_silent(5), True)
+        check("partial-flip: deferral with XREF owner passes", pf_silent(6), True)
+        check("partial-flip: deferral naming no owner fails", pf_fires(7, "naming no owner"), True)
+        check("partial-flip: deferral with ghost owner fails", pf_fires(8, "resolves to nothing"), True)
+        check("partial-flip: deferral with unlinked owner fails", pf_fires(11, "no back-pointer"), True)
+        check("partial-flip: fenced example passes", pf_silent(13), True)
+        check("partial-flip: unfenced twin fails", pf_fires(14, "Looks open but is quoted"), True)
+        check("partial-flip: stamp-region quote passes", pf_silent(15), True)
+        check("partial-flip: above-stamp twin fails", pf_fires(16, "Quoted below the stamp"), True)
+        check("partial-flip: Commit without colon fails", pf_fires(17, "not the bookkeeping shape"), True)
+
+        # The partial-flip fixtures fire FATAL by design: remove them now so
+        # the frozen, ratchet, sync, and plan-health legs below read the tree
+        # they expect. (The ratchet leg repeats this for the older fixtures.)
+        (root / "todo" / "91-severity" / "TODO-10-partial-flip.md").unlink()
 
         # frozen-no-freeze-check needs frozen: true with NO check anywhere --
         # its own file, since TODO-06 carries the inverse case.

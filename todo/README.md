@@ -367,7 +367,7 @@ Split into a new `## N.` when the work has a different dependency, a different t
 
 ## Completion-first
 
-A section ships whole or it does not ship. Complete means every micro-step `[x]`, the Test checkpoint quoted from a real run, and a `Verified:` stamp written by `review-todo-section`: a `[x]` row with an open checklist reads as done while work remains, so it is a defect, not a head start.
+A section ships whole or it does not ship. Complete means every micro-step `[x]`, the Test checkpoint quoted from a real run, and a `Verified:` stamp written by `review-todo-section`: a `[x]` row with an open checklist reads as done while work remains, so it is a defect, not a head start. The `Commit:` micro-step is the one exception to the ticked rule: it is ticked in the implementation commit, and the row determines the reading of an unticked one (`[ ]` means doing, `[x]` means excused by syntax, the commit being proven by history rather than by the checkbox).
 
 What cannot ship now is filed, not dropped: through `add-todo` with an owner, as a new section, an item on an open section, or a deferral the owner closes. Night-owed test debt (`D00 T02 §10`) is the same shape with a collector instead of an owner: recorded on the stamp, collected by the nightly run plus idle-unlocked daytime runs, with hardware-absent debt re-probing nightly until it can collect. Age is report information, and collection never waits for a decision. Waiting is never a strategy: a blocked row parks with its blocker named, and work that can proceed does.
 
@@ -426,7 +426,7 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 | `filter-overclaim-open` | FATAL | An open checkpoint that cannot detect its promised regression; naming the tests or scripts is a two-minute fix. |
 | `filter-overclaim-stamped` | WARN | The stamp must not be reopened; the fix-forward channel owns it. |
 | `no-commit-item` | FATAL | One section = one commit is the format's core contract. |
-| `orphaned-items-shipped` | FATAL | Unticked, unstruck work inside a `[x]` section breaks the shipped claim itself. |
+| `partial-flip-shipped` | FATAL | An unticked micro-step outside the exemptions inside a `[x]` section breaks the shipped claim itself. |
 | `fidelity-missing-lines-open` | FATAL | A Fidelity surface with no Job/Treatment/Chrome is unimplementable in house style. |
 | `fidelity-missing-lines-stamped` | WARN | Fix-forward: the gap is real, the stamp stays. |
 | `no-checklist-items` | FATAL | An empty section is unimplementable (co-emits `no-commit-item`). |
