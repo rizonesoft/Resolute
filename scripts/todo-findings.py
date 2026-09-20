@@ -748,20 +748,40 @@ def _self_test() -> int:
         "as-of: 0a24c03\n",
         encoding="utf-8",
     )
-    if not any("already has a block" in p for p in check_transitions(tfind, tpath)):
-        print("  FAIL  a duplicate block for a dead ref was not reported")
+    dup_problems = [p for p in check_transitions(tfind, tpath) if "S9-F9" in p]
+    if dup_problems != [
+        f"{tpath}:1: D00-T04-S9-F9 names no live finding",
+        f"{tpath}:9: D00-T04-S9-F9 already has a block at line 1",
+        f"{tpath}:9: D00-T04-S9-F9 names no live finding",
+    ]:
+        print(f"  FAIL  the dead-ref duplicate refusal shape drifted: {dup_problems}")
         failed += 1
     # §16: a never-defect carrying anything but minor fails by name.
+    # All six bad cells fire (refuted/withdrawn/duplicate by major/critical).
     fpath = tmp / "D00-T04-s99.md"
-    fpath.write_text("### F1 -- x -- record -- REFUTED (self) [critical]\n", encoding="utf-8")
+    fpath.write_text(
+        "### F1 -- x -- record -- REFUTED (self) [critical]\n"
+        "### F2 -- x -- record -- REFUTED (self) [major]\n"
+        "### F3 -- x -- record -- WITHDRAWN (self) [critical]\n"
+        "### F4 -- x -- record -- WITHDRAWN (self) [major]\n"
+        "### F5 -- x -- record -- DUPLICATE (self) [critical]\n"
+        "### F6 -- x -- record -- DUPLICATE (self) [major]\n",
+        encoding="utf-8",
+    )
     _f, _b = parse_file(fpath)
-    if not any("never-defect severity rule" in m for _, _, m in _b):
-        print("  FAIL  a refuted critical was not reported by name")
+    ruled = [m for _, _, m in _b if "never-defect severity rule" in m]
+    if len(ruled) != 6 or _f:
+        print(f"  FAIL  not all six bad never-defect cells fired: {_b} {_f}")
         failed += 1
-    fpath.write_text("### F1 -- x -- record -- REFUTED (self) [minor]\n", encoding="utf-8")
+    fpath.write_text(
+        "### F1 -- x -- record -- REFUTED (self) [minor]\n"
+        "### F2 -- x -- record -- WITHDRAWN (self) [minor]\n"
+        "### F3 -- x -- record -- DUPLICATE (self) [minor]\n",
+        encoding="utf-8",
+    )
     _f, _b = parse_file(fpath)
-    if _b or not _f or _f[0].severity != "minor":
-        print(f"  FAIL  a refuted minor was not accepted: {_b} {_f}")
+    if _b or len(_f) != 3 or any(f.severity != "minor" for f in _f):
+        print(f"  FAIL  minor never-defects were not accepted: {_b} {_f}")
         failed += 1
     tpath.write_text("# nothing tracked yet\n", encoding="utf-8")
     if not any("keeps no transition" in p for p in check_transitions(tfind, tpath)):
