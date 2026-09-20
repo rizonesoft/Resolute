@@ -101,6 +101,7 @@ def validate(graph, _args) -> int:
     span_cache: dict[str, list[str] | None] = {}
     deferred_mark_re = re.compile(r"\bdeferred\b", re.IGNORECASE)
     header_re = re.compile(r"#{1,6}(?:\s|$)")
+    word_re = re.compile(r"[a-z0-9]+")
     commit_quote_re = re.compile(r"""^commit:\s*`"(?P<msg>[^"]+)"`""", re.IGNORECASE)
     # Commit-subject cache for the history binding: repo root -> subjects,
     # None when git cannot read them. Keyed by root because the self-test
@@ -295,9 +296,17 @@ def validate(graph, _args) -> int:
                 continue
             target = by_id[r[0]]
             tsec = target.sections[r[1]]
+            # Word matching, not substring (D00 T04 §20 round 1 F2): a
+            # vague citation like `(item: "work")` must not satisfy the
+            # acknowledgment off an unrelated item's substring, while a
+            # genuine citation keeps its reword tolerance word by word.
+            # The stamp-line lifecycle keeps containment; the two rules
+            # differ deliberately, each recorded beside its own match.
+            want_words = set(word_re.findall(cited.group("item").lower()))
+            item_ok = bool(want_words) and any(
+                want_words <= set(word_re.findall(item_text.lower()))
+                for _done, item_text in tsec.items)
             want = cited.group("item").strip()
-            item_ok = any(want.lower() in item_text.lower()
-                          for _done, item_text in tsec.items)
             if not item_ok:
                 problems.append(
                     f"owner {r[0]} §{r[1]} carries no such item "
@@ -614,7 +623,9 @@ def validate(graph, _args) -> int:
             # must resolve to a live section that points back, either
             # with an XREF or through Depends On. The forward XREF names
             # the owner's item (`(item: ...)`), and the owner must carry
-            # that item: a section link to an item-silent target fails.
+            # every word of that item: a section link to an item-silent
+            # target fails, and so does a vague citation matching only a
+            # substring.
             # When the owner ships, its stamp must record the debt done
             # (`Resolved:` citing the deferrer), or the deferral fails.
             # Fenced code blocks strip before the scan. Everything else

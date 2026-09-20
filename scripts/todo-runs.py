@@ -648,7 +648,14 @@ def leg_lines(runs, findings, bank_path=None):
         mean = sum(c["jaccard"] for c in comps) / len(comps)
         state = f"ACTIVE, mean Jaccard {mean:.2f}"
         if mean > 0.5:
-            state += (" FIRED -- file the early revisit (D00 T04 §23 trigger) "
+            # ARMED, never FIRED (D00 T04 §20 round 1 F3): the Jaccard
+            # half is met, but the cut also needs the trailing rung's
+            # value-per-cost below half the leader's, which only
+            # blinded ratings can supply. The revisit runs that half;
+            # the interim watch cannot announce a cut the rule would
+            # not fire.
+            state += (" ARMED (Jaccard half met, blinded value half pending) "
+                      "-- file the early revisit (D00 T04 §23 trigger) "
                       "with these lines quoted")
     else:
         state = "DORMANT (activation needs 2 spanning 2 classes)"
@@ -1498,11 +1505,12 @@ refuted: 0
                         "comparison: 2026-09-21-cal class: plan-record "
                         "jaccard: 0.80 pairs: 4 union: 5\n", encoding="utf-8")
     got_hot = leg_lines(quiet_runs, [leg_find, leg_dead], bank_hot)
-    check("legs-overlap-fired",
+    check("legs-overlap-armed",
           got_hot[2] == "- overlap comparisons banked: 2 spanning 2 class(es) "
           "(review-tooling Jaccard 0.60 over union 5; "
           "plan-record Jaccard 0.80 over union 5): ACTIVE, mean Jaccard 0.70 "
-          "FIRED -- file the early revisit (D00 T04 §23 trigger) "
+          "ARMED (Jaccard half met, blinded value half pending) "
+          "-- file the early revisit (D00 T04 §23 trigger) "
           "with these lines quoted", f"{got_hot}")
     got_nobank = leg_lines(quiet_runs, [leg_find, leg_dead],
                             tmp / "leg-bank-absent.md")

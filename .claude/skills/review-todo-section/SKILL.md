@@ -269,7 +269,7 @@ COMMIT=$(git --no-replace-objects rev-parse HEAD)
 git push
 ```
 
-After stamping a panel-reviewed section (D00 T04 §20): run `python scripts/todo-runs.py --report` and read the cut-leg interim lines beside the revisit trigger. On a FIRED leg, file the early revisit through add-todo against the D00 T04 §23 trigger with the interim lines quoted; a quiet watch reads as one line in the run record.
+After stamping a panel-reviewed section (D00 T04 §20): run `python scripts/todo-runs.py --report` and read the cut-leg interim lines beside the revisit trigger. On a FIRED or ARMED leg, file the early revisit through add-todo against the D00 T04 §23 trigger with the interim lines quoted (FIRED: the zero rule fires; ARMED: the overlap Jaccard half is met and the revisit runs the blinded value half); a quiet watch reads as one line in the run record.
 
 ### 10. Audit stance
 

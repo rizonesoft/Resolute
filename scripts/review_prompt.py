@@ -413,7 +413,10 @@ def round_cost_from_envelope(text: str) -> tuple[int | None, str | None]:
 
     Total is the runs header's cost sum: input + output + cache_read +
     cache_creation, each at face value. Returns an error naming the
-    missing shape instead of guessing.
+    missing shape instead of guessing. Present classes must be strict
+    integers (D00 T04 §20 round 1 F1): `int()` coercion would accept
+    bools, floats, and numeric strings as false costs. Absent classes
+    read as zero: omission is the envelope's zero, not malformation.
     """
     try:
         obj = json.loads(text)
@@ -424,15 +427,13 @@ def round_cost_from_envelope(text: str) -> tuple[int | None, str | None]:
     usage = obj.get("usage")
     if not isinstance(usage, dict):
         return None, "JSON envelope carries no `usage` block"
-    try:
-        total = (
-            int(usage.get("input_tokens", 0))
-            + int(usage.get("output_tokens", 0))
-            + int(usage.get("cache_read_input_tokens", 0))
-            + int(usage.get("cache_creation_input_tokens", 0))
-        )
-    except (TypeError, ValueError):
-        return None, "usage block carries non-integer token counts"
+    total = 0
+    for key in ("input_tokens", "output_tokens", "cache_read_input_tokens",
+                "cache_creation_input_tokens"):
+        value = usage.get(key, 0)
+        if type(value) is not int or value < 0:
+            return None, f"usage block carries non-integer token count for {key}"
+        total += value
     return total, None
 
 
@@ -868,6 +869,18 @@ def _self_test() -> int:
     check("round-cost-no-usage-fails",
           cost_total is None and "no `usage` block" in (cost_err or ""),
           f"{cost_total} {cost_err}")
+    for bad_usage, leg in (({"input_tokens": True}, "bool"),
+                           ({"output_tokens": 4.5}, "float"),
+                           ({"input_tokens": "12"}, "string"),
+                           ({"input_tokens": -1}, "negative")):
+        cost_total, cost_err = round_cost_from_envelope(json.dumps({"usage": bad_usage}))
+        check(f"round-cost-{leg}-fails",
+              cost_total is None and "non-integer token count" in (cost_err or ""),
+              f"{cost_total} {cost_err}")
+    cost_total, cost_err = round_cost_from_envelope(
+        json.dumps({"usage": {"input_tokens": 2, "output_tokens": 4}}))
+    check("round-cost-absent-classes-zero",
+          cost_total == 6 and cost_err is None, f"{cost_total} {cost_err}")
 
     findings = "- first finding\n- second finding\n"
     ok, reason = check_plan_output(receipt + findings, manifest3)

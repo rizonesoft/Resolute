@@ -6644,6 +6644,8 @@ track: Z1
 |  30   |   §30   | Target, typed-back | §29 |  [ ]   |
 |  31   |   §31   | Open row with stamp | - |  [ ]   |
 |  32   |   §32   | Deferral, XREF past fence | - |  [x]   |
+|  33   |   §33   | Deferral, vague citation | - |  [x]   |
+|  34   |   §34   | Target, substring only | §33 |  [ ]   |
 
 ## 1. Plain open item
 
@@ -6967,6 +6969,24 @@ fenced code here
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-01-01 | §32 | fixture
+
+## 33. Deferral, vague citation
+
+- [x] Did it
+- [ ] ~~Handed with one vague word.~~ **Deferred 2026-01-01 to a section carrying the word only inside another.**
+  -> XREF: §34 (item: "net") -- the owner
+- [x] Commit: `"selftest: defer-vague"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §33 | fixture
+
+## 34. Target, substring only
+
+- [ ] Do the network work
+- [ ] Commit: `"selftest: target-vague"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
 """,
             encoding="utf-8",
         )
@@ -7081,6 +7101,7 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
         check("partial-flip: item-silent target fails", pf_fires(27, "carries no such item"), True)
         check("partial-flip: untyped forward fails", pf_fires(29, "names no item"), True)
         check("partial-flip: XREF past a fence is unattached", pf_fires(32, "naming no owner"), True)
+        check("partial-flip: vague citation fails", pf_fires(33, "carries no such item"), True)
         check("open-stamped row fails",
               any(line.startswith("FATAL") and "TODO-10-partial-flip.md" in line
                   and "§31 is [ ]" in line and "stamp covers it" in line
