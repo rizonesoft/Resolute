@@ -89,3 +89,11 @@ to: duplicate
 why: "Round-1 A2 restates F4 (filed to D00 T04 §24 before round 1): a pasted-but-unrun PASS still attests. No new defect; the §24 item owns it."
 evidence: "Same checker-evidence gap as D00-T04-S21-F4, filed to `D00 T04 §24` in `81c4fd78`", recorded as duplicate of F4; see the §24 item carrying the Done and checkpoint clause.
 as-of: 68e77a1
+
+transition: D00-T04-S21-F16
+date: 2026-09-20
+from: raised
+to: duplicate
+why: "Round-2 R restates F4 a third time (independent F4, round-1 A2): a forged PASS still attests while item 4's Done reads complete. The Done names the residual and its owner since R1; the item's letter is met and run-witnessing is the filed strengthening. No new defect."
+evidence: "Same checker-evidence gap as D00-T04-S21-F4", recorded as duplicate of F4; the §24 item owns run-witnessing.
+as-of: 4be7d03

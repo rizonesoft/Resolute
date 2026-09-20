@@ -2678,7 +2678,11 @@ def _self_test() -> int:
             ("skill-stamp-staged",
              "ls-files --error-unmatch"),
             ("skill-stamp-clean",
-             "git --no-replace-objects diff --quiet -- <todo-path>")):
+             "git --no-replace-objects diff --quiet -- <todo-path>"),
+            ("skill-tree-clean",
+             "git --no-replace-objects diff --quiet ||"),
+            ("skill-failover-redirect",
+             "Read < $RUNDIR/stamp-prompt.md > $RUNDIR/stamp.out")):
         check(pin, needle in skill_text, skill_path)
     try:
         attest_ordered = (skill_text.index("### 8. Plan review")
