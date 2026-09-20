@@ -2438,10 +2438,13 @@ def _self_test() -> int:
             ("skill-findings-staged",
              "git --no-replace-objects diff --quiet -- <findings path>")):
         check(pin, needle in skill_text, skill_path)
-    check("skill-attest-after-plan",
-          skill_text.index("### 8. Plan review")
-          < skill_text.index("### Attestation")
-          < skill_text.index("### 9. Write the stamp and flip the row"),
+    try:
+        attest_ordered = (skill_text.index("### 8. Plan review")
+                          < skill_text.index("### Attestation")
+                          < skill_text.index("### 9. Write the stamp and flip the row"))
+    except ValueError:
+        attest_ordered = False
+    check("skill-attest-after-plan", attest_ordered,
           "attestation emits after the plan review, before the stamp")
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
