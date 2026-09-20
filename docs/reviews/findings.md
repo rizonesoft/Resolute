@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**256 findings across 36 sections.**
+**263 findings across 36 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 86 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 54 | fails under hostile or unexpected input |
+| `record` | 88 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 56 | fails under hostile or unexpected input |
 | `correctness` | 40 | the code does the wrong thing |
-| `consistency` | 37 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 25 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 38 | disagrees with the rest of the suite, its naming, or its layout |
+| `integration` | 27 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 127 | wrong behavior in code, plan, or record |
-| `minor` | 123 | polish or wording, or no surviving defect |
+| `major` | 131 | wrong behavior in code, plan, or record |
+| `minor` | 126 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -231,6 +231,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §21` | F21 | minor | `record` | fixed | independent | stale line-count quote |
 | `D00 T04 §21` | F22 | minor | `record` | fixed | independent | candidate table omits edef994 |
 | `D00 T04 §21` | F23 | minor | `record` | fixed | independent | round-2 record missing |
+| `D00 T04 §21` | F24 | major | `adversarial` | fixed | independent | untracked cites pass anchors |
+| `D00 T04 §21` | F25 | major | `adversarial` | fixed | independent | bare HOLDS loops with no figure |
+| `D00 T04 §21` | F26 | major | `consistency` | fixed | independent | range-stamp coverage trips the citation ban |
+| `D00 T04 §21` | F27 | major | `integration` | fixed | independent | Live proof postdates the attestation |
+| `D00 T04 §21` | F28 | minor | `integration` | fixed | independent | §24 items lack their §21 relation |
+| `D00 T04 §21` | F29 | minor | `record` | fixed | independent | candidate table understates again |
+| `D00 T04 §21` | F30 | minor | `record` | fixed | independent | SOURCE without finding ID; F15 misread |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
