@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**269 findings across 36 sections.**
+**273 findings across 37 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 91 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 57 | fails under hostile or unexpected input |
+| `record` | 93 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 58 | fails under hostile or unexpected input |
 | `correctness` | 40 | the code does the wrong thing |
-| `consistency` | 39 | disagrees with the rest of the suite, its naming, or its layout |
+| `consistency` | 40 | disagrees with the rest of the suite, its naming, or its layout |
 | `integration` | 28 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 134 | wrong behavior in code, plan, or record |
-| `minor` | 129 | polish or wording, or no surviving defect |
+| `major` | 136 | wrong behavior in code, plan, or record |
+| `minor` | 131 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -244,6 +244,10 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §21` | F34 | minor | `record` | fixed | independent | stale line-count quote again |
 | `D00 T04 §21` | F35 | minor | `record` | refuted | independent | seven cites over six paths, not one short |
 | `D00 T04 §21` | F36 | minor | `record` | fixed | independent | candidate-tip suite counts stale |
+| `D00 T04 §22` | F1 | major | `adversarial` | fixed | independent | unknown flags and surplus positionals slip past usage refusal |
+| `D00 T04 §22` | F2 | major | `consistency` | fixed | independent | code list restated outside the registry |
+| `D00 T04 §22` | F3 | minor | `record` | fixed | independent | single-place record false while docstrings duplicate |
+| `D00 T04 §22` | F4 | minor | `record` | fixed | independent | exit-2 record false for unknown switches |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
