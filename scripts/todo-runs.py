@@ -603,11 +603,18 @@ def check_export(doc):
     problems = []
     if not isinstance(doc, dict):
         return ["export is not an object"]
+    if not _is_int(doc.get("export_version")):
+        problems.append(f"export_version must be an int, got "
+                        f"{type(doc.get('export_version')).__name__}")
+        return problems
     if doc.get("export_version") != EXPORT_VERSION:
         problems.append(f"export_version is {doc.get('export_version')!r}, "
                         f"this checker asserts {EXPORT_VERSION}")
         return problems
-    if doc.get("schema") != SCHEMA_VERSION:
+    if not _is_int(doc.get("schema")):
+        problems.append(f"schema must be an int, got "
+                        f"{type(doc.get('schema')).__name__}")
+    elif doc.get("schema") != SCHEMA_VERSION:
         problems.append(f"schema is {doc.get('schema')!r}, "
                         f"this checker asserts {SCHEMA_VERSION}")
     as_of_doc = doc.get("as_of", {})
@@ -870,6 +877,16 @@ refuted: 0
     tampered["export_version"] = 99
     check("export-version-asserted",
           any("export_version" in m for m in check_export(tampered)), f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["export_version"] = True
+    check("export-version-not-bool",
+          any("export_version must be an int, got bool" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(exported))
+    tampered["schema"] = True
+    check("export-schema-not-bool",
+          any("schema must be an int, got bool" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
     tampered = json.loads(json.dumps(exported))
     tampered["runs"][0]["rounds"] = 99
     check("export-counts-asserted",

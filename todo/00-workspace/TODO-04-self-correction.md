@@ -666,13 +666,15 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 
 The §10 sign-off round proved `check_export` accepts `"export_version": true, "schema": true` as internally sound: the two version gates compare with `!=` against ints, and `True == 1` in Python, while every other integer field in the same checker bars bools through `_is_int`. The exporter never emits bools, so this bites only a hand-crafted export, which is why it filed as an advisory rather than a fix-loop round; still, a gate that asserts versions should assert their type too.
 
-- [ ] Reject bool versions and schemas in `check_export`. Done when: an export carrying `"export_version": true` fails naming the type, quoted, and the live export still passes.
-- [ ] Commit: `"workspace: bar bool versions from the export gate"`
+- [x] Reject bool versions and schemas in `check_export`. Done when: an export carrying `"export_version": true` fails naming the type, quoted, and the live export still passes. Done: both version gates now assert `_is_int` first (the checker's own idiom), failing as `export_version must be an int, got bool` and `schema must be an int, got bool`, both exit 1, quoted from driven `--check-export` runs; wrong-int values keep their existing messages; the live export passes as `export version 1, 29 runs, internally sound`, exit 0. Self-test pins `export-version-not-bool` and `export-schema-not-bool`; suite 49 green (47 before).
+- [x] Commit: `"workspace: bar bool versions from the export gate"`
 
 **Test checkpoint:** The bool-versioned export fails, quoted from a driven `--check-export`; the self-test covers both gates.
 
 -> XREF: D00 T04 §10 -- the gate this section hardens
 -> SOURCE: panel-D00-T04-s10-2026-09-19 D00-T04-S10-F9
+
+> **Started:** 2026-09-20T01:31:18Z
 
 ## 15. Run-Record Vocabulary and Evidence Follow-Ups
 
