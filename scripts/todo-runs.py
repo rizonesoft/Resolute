@@ -149,6 +149,7 @@ def parse_runs(text):
             elif int(sm.group("version")) != SCHEMA_VERSION:
                 errors.append((lineno, f"schema {sm.group('version')} is not {SCHEMA_VERSION}; "
                                        f"this parser reads {SCHEMA_VERSION} only"))
+                schema_lineno = lineno
             else:
                 schema_lineno = lineno
             continue
@@ -1186,6 +1187,25 @@ refuted: 0
                   for m in check_export(tampered)),
           f"{check_export(tampered)}")
 
+    # §16: conflicting mode flags fail naming the conflict.
+    old_err = sys.stderr
+    sys.stderr = io.StringIO()
+    try:
+        conflict_code = main(["--report", "--export"])
+        conflict_text = sys.stderr.getvalue()
+    finally:
+        sys.stderr = old_err
+    check("report-export-conflict",
+          conflict_code == 2 and "--report and --export conflict" in conflict_text,
+          f"{conflict_code} {conflict_text!r}")
+
+    # §16: a wrong schema draws exactly one message, never the false absence.
+    bad_schema = good.replace("schema: 1", "schema: 99", 1)
+    _r, errors_v = parse_runs(bad_schema)
+    check("schema-version-exactly-one",
+          errors_v == [(1, "schema 99 is not 1; this parser reads 1 only")],
+          f"{errors_v}")
+
     # Round 1 bound the as-of to content identity: HEAD only when HEAD's
     # tree holds exactly the exported bytes, `unresolved` otherwise.
     foreign = as_of(other)
@@ -1236,6 +1256,10 @@ def main(argv=None):
         return 1 if problems else 0
     mode_report = "--report" in args
     mode_export = "--export" in args
+    if mode_report and mode_export:
+        print("usage: todo-runs.py [--check] [--report | --export] [runs-file]; "
+              "--report and --export conflict, pass exactly one", file=sys.stderr)
+        return 2
     rest = [a for a in args if a not in ("--check", "--report", "--export")]
     runs_path = Path(rest[0]) if rest else DEFAULT_RUNS
     runs, errors = run_check(runs_path)

@@ -127,13 +127,14 @@ SOURCES = {
 
 # How bad the finding is, rated as raised. The scale mirrors the plan-review
 # ledger's, so one vocabulary covers both: critical invalidates safety, data
-# integrity, or the stamp; major is wrong behavior; minor is polish. Findings
-# that were never defects (refuted, withdrawn, duplicate) carry minor:
-# nothing weighs there, because the defect either was not one or, for
-# duplicates, counts at its home row. Cleared rates as raised like fixed:
-# the disposition marks a resolved question, and the question can be major.
-# Anything outside the set is reported, never bucketed, like every other
-# marker on the heading.
+# integrity, or the stamp; major is wrong behavior; minor is polish. Severity
+# rates surviving contribution, not alleged impact: findings that were never
+# defects (refuted, withdrawn, duplicate) carry minor, because the defect
+# either was not one or, for duplicates, counts at its home row. Cleared
+# rates as raised like fixed: the disposition marks a resolved question, and
+# the question can be major. Anything outside the set is reported, never
+# bucketed, like every other marker on the heading. The parser enforces the
+# never-defect minor rule below: anything but minor fails the gate by name.
 SEVERITIES = {
     "critical": "invalidates safety, data integrity, or the stamp",
     "major":    "wrong behavior in code, plan, or record",
@@ -220,6 +221,11 @@ def parse_file(path: Path) -> tuple[list[Finding], list[tuple[Path, int, str]]]:
         severity = vm.group("sev").strip().lower()
         if severity not in SEVERITIES:
             bad.append((path, lineno, f"unknown severity {vm.group('sev')!r}; expected one of {sorted(SEVERITIES)}"))
+            continue
+        if disp in ("refuted", "withdrawn", "duplicate") and severity != "minor":
+            bad.append((path, lineno, f"never-defect severity rule: {number} is {disp} "
+                        f"but carries {severity}; refuted, withdrawn, and duplicate "
+                        f"findings are minor"))
             continue
         unmarked = disposition[:vm.start()].rstrip()
         sm = SOURCE_RE.search(unmarked)
@@ -350,16 +356,16 @@ def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list
         if "to" in fields and fields["to"] not in NONFINAL:
             problems.append(f"{path}:{lineno}: {ref} moves to {fields['to']!r}, "
                             f"transitions track {', '.join(NONFINAL)}")
+        if ref in seen:
+            problems.append(f"{path}:{lineno}: {ref} already has a block at line {seen[ref]}")
+        else:
+            seen[ref] = lineno
         if ref not in by_ref:
             problems.append(f"{path}:{lineno}: {ref} names no live finding")
             continue
         if "to" in fields and by_ref[ref].disposition != fields["to"]:
             problems.append(f"{path}:{lineno}: {ref} says {fields['to']} but "
                             f"the row reads {by_ref[ref].disposition}")
-        if ref in seen:
-            problems.append(f"{path}:{lineno}: {ref} already has a block at line {seen[ref]}")
-        else:
-            seen[ref] = lineno
     for ref in sorted(r for r, f in by_ref.items() if f.disposition in NONFINAL):
         if ref not in seen:
             problems.append(f"{path}: {ref} reads {by_ref[ref].disposition} but keeps no transition")
@@ -723,6 +729,40 @@ def _self_test() -> int:
     if not any("not a sha" in p for p in check_transitions(tfind, tpath)):
         print("  FAIL  a transition binding a non-sha was not reported")
         failed += 1
+    # §16: a duplicate block reports even when the ref is dead.
+    tpath.write_text(
+        "transition: D00-T04-S9-F9\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: ghost\n"
+        "evidence: x\n"
+        "as-of: 0a24c03\n"
+        "\n"
+        "transition: D00-T04-S9-F9\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: ghost again\n"
+        "evidence: x\n"
+        "as-of: 0a24c03\n",
+        encoding="utf-8",
+    )
+    if not any("already has a block" in p for p in check_transitions(tfind, tpath)):
+        print("  FAIL  a duplicate block for a dead ref was not reported")
+        failed += 1
+    # §16: a never-defect carrying anything but minor fails by name.
+    fpath = tmp / "D00-T04-s99.md"
+    fpath.write_text("### F1 -- x -- record -- REFUTED (self) [critical]\n", encoding="utf-8")
+    _f, _b = parse_file(fpath)
+    if not any("never-defect severity rule" in m for _, _, m in _b):
+        print("  FAIL  a refuted critical was not reported by name")
+        failed += 1
+    fpath.write_text("### F1 -- x -- record -- REFUTED (self) [minor]\n", encoding="utf-8")
+    _f, _b = parse_file(fpath)
+    if _b or not _f or _f[0].severity != "minor":
+        print(f"  FAIL  a refuted minor was not accepted: {_b} {_f}")
+        failed += 1
     tpath.write_text("# nothing tracked yet\n", encoding="utf-8")
     if not any("keeps no transition" in p for p in check_transitions(tfind, tpath)):
         print("  FAIL  a non-final row without a block was not reported")
@@ -749,10 +789,10 @@ def _self_test() -> int:
         failed += 1
 
     for x in (f, other, tmp / "D00-T10-s1.md", tmp / "D00-T10-s2.md",
-              tmp / "D00-T10-s3.md"):
+              tmp / "D00-T10-s3.md", fpath):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 31 cases, {failed} failed")
+    print(f"todo-findings self-test: 34 cases, {failed} failed")
     return 1 if failed else 0
 
 

@@ -297,9 +297,11 @@ refuted: 0
 run: D00-T04-S15
 date: 2026-09-20
 runner: panel
-rounds: 3
+rounds: 4
 round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: d0b5690 provider: openai version: gpt-5.6-sol cost: 90805tokens latency: 228s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S15-F1, D00-T04-S15-F2
 round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 67a2f68 provider: openai version: gpt-5.6-sol cost: 17122tokens latency: 44s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S15-F3, D00-T04-S15-F4
 round: 3 model: opus effort: medium outcome: findings candidate: 0d5b50c provider: anthropic version: unresolved cost: unresolved latency: 53s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S15-F5, D00-T04-S15-F6
+# round 4 is the stamp round: Sol-high over the staged stamp in three attempts (two standing figures, one transcript-note correction, then STAMP HOLDS); latency recovered from the codex session log after the driver's echo truncated; no ref filed, see the review file and the run file's stamp record.
+round: 4 model: gpt-5.6-sol effort: high outcome: stamp candidate: 56a8bb6 provider: openai version: gpt-5.6-sol cost: 132909tokens latency: 424s opportunity: full-scope purpose: stamp-review provenance: reconstructed findings:
 empty: 0
 refuted: 0
