@@ -50,6 +50,7 @@ track: W1
 |   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [x]   |
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
 |   8   |   §8    | Run the unit suite under release             | §5         |  [ ]   |
+|   9   |   §9    | Remove the Linux execution surface         | §5         |  [ ]   |
 
 ---
 
@@ -843,6 +844,22 @@ Five gates that must each be remembered are five gates that get skipped under ti
 **Test checkpoint:** `check-all` reports both presets green, quoted; a deliberately release-only failure fails the gate, quoted.
 
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR17 D00-T02-S5-PR17
+
+## 9. Remove the Linux Execution Surface
+
+Resolute is a Windows-only suite, per the operator's 2026-09-20 decision, but the tree still carries a Linux-development surface: `scripts/wsl.sh` bridges WSL to the Windows scripts, and CI jobs, tests, or docs may assume a Linux interpreter. Every such surface is untested ground that rots: nobody runs it, so nobody notices when it breaks, and its presence invites the next contributor to lean on it. This section inventories the surface and removes it, leaving the Windows-native tooling untouched.
+
+**Needs:** Windows host (build/test)
+
+- [ ] Inventory every Linux/WSL-execution surface: `scripts/wsl.sh`, CI jobs on Linux runners, scripts requiring a Linux interpreter, tests that fork Linux tooling, and docs or plan text instructing WSL flows. Done when: the inventory lists each item with its references (what calls or cites it), quoted from grep, and names what stays: Git Bash at `C:\Program Files\Git\bin\bash.exe`, which the review skill requires; the llvm-mingw Windows-targeting toolchain; the stdlib Python tooling that runs on Windows.
+- [ ] Remove the bridge and its callers: delete `scripts/wsl.sh` and re-point or delete everything referencing it. Done when: no reference to `wsl.sh` or WSL execution remains outside this section's own record, quoted from grep.
+- [ ] Remove the remaining inventoried surface: Linux-runner CI jobs, Linux-gated tests, Linux-conditional code paths. Done when: the step-1 inventory reads empty item by item, each quoted, and nothing removed has a live caller left behind (grep for each removed name returns nothing outside this section's record).
+- [ ] Prove the Windows tree whole: full gates green plus one review-prompt fence round under Git Bash. Done when: `check-all` reports green quoted, and a `fence`/`cross-check` round runs under Git Bash quoted, proving the purge took no Windows-native tooling with it.
+- [ ] Commit: `"workspace: remove the Linux execution surface"`
+
+**Test checkpoint:** The inventory reads empty, grep for the removed names returns only this section's record, `check-all` is green, and one fence round runs under Git Bash. All quoted from driven runs.
+
+-> SOURCE: operator-2026-09-20-no-linux
 
 ## Verification
 
