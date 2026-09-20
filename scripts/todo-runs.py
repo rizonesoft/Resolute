@@ -31,6 +31,9 @@ docstring names the registry, never the mapping). `--format json`
 renders refusals as one JSON array of code/path/line/message objects;
 usage errors stay text, since argv did not parse and no format was
 selected.
+
+Exit codes: 0 the run file is sound, 1 a refusal fired (an unreadable
+input or a failed cross-check), 2 usage.
 """
 
 import datetime
@@ -1705,6 +1708,12 @@ refuted: 0
         code, _, err = _run_main(["--self-test", "--check"])
         check("exit-selftest-surplus", code == 2 and "[RUN-001]" in err,
               f"{code} {err!r}")
+        code_s, _, err_s = _run_main(["--self-test", "--format", "json"])
+        code_e, _, err_e = _run_main(["--self-test", "--format=json"])
+        check("exit-selftest-format",
+              code_s == 2 and "[RUN-001]" in err_s
+              and code_e == 2 and "[RUN-001]" in err_e,
+              f"{code_s} {err_s!r} / {code_e} {err_e!r}")
         rp.write_text("not a runs file at all\n", encoding="utf-8")
         code, out, _ = _run_main(
             ["--check", "--format=json", str(rp)])
@@ -1771,37 +1780,58 @@ refuted: 0
     return 1 if failures else 0
 
 
-def main(argv=None, collected=None, review_sections=None):
-    args = list(sys.argv[1:] if argv is None else argv)
+class _Usage(Exception):
+    """A RUN-001 usage refusal. main renders it; it never escapes main."""
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+
+
+def _tokenize(raw):
+    """One non-mutating pass over raw argv. Returns (fmt, rest): the
+    selected format plus every token the gates see, `--format` shapes
+    consumed, order kept. Raises _Usage on a malformed --format. No
+    gate pops: every gate reads the same `rest`, so a flag swallowed
+    before a gate (round-3 A1) is structurally unrepresentable. A
+    doubled --format resolves last-wins, sequentially."""
     fmt = "text"
-    for i, arg in enumerate(args):
+    rest = []
+    i, n = 0, len(raw)
+    while i < n:
+        arg = raw[i]
         if arg.startswith("--format="):
             fmt = arg.split("=", 1)[1]
-            args.pop(i)
-            break
-    if "--format" in args:
-        i = args.index("--format")
-        args.pop(i)
-        if i >= len(args) or args[i].startswith("--"):
-            fmt = None
+            i += 1
+        elif arg == "--format":
+            if i + 1 >= n or raw[i + 1].startswith("--"):
+                raise _Usage("usage: --format wants text or json")
+            fmt = raw[i + 1]
+            i += 2
         else:
-            fmt = args.pop(i)
+            rest.append(arg)
+            i += 1
     if fmt not in ("text", "json"):
-        print(DIAG.emit("RUN-001", None, None,
-                        "usage: --format wants text or json"
-                        + ("" if fmt is None else f", got {fmt!r}")),
-              file=sys.stderr)
-        return 2
-    json_mode = fmt == "json"
-    if "--self-test" in args and sorted(args) == ["--self-test"]:
-        return _self_test()
-    if "--self-test" in args:
+        raise _Usage("usage: --format wants text or json, got %r" % (fmt,))
+    return fmt, rest
+
+
+def main(argv=None, collected=None, review_sections=None):
+    args = list(sys.argv[1:] if argv is None else argv)
+    if "--self-test" in args and args != ["--self-test"]:
         print(DIAG.emit("RUN-001", None, None,
                         "usage: todo-runs.py --self-test takes no other arguments"),
               file=sys.stderr)
         return 2
-    if "--check-export" in args:
-        rest = [a for a in args if a != "--check-export"]
+    if args == ["--self-test"]:
+        return _self_test()
+    try:
+        fmt, rest = _tokenize(args)
+    except _Usage as exc:
+        print(DIAG.emit("RUN-001", None, None, exc.message), file=sys.stderr)
+        return 2
+    json_mode = fmt == "json"
+    if "--check-export" in rest:
+        rest = [a for a in rest if a != "--check-export"]
         if len(rest) != 1 or rest[0].startswith("--"):
             detail = (
                 f"; unknown option {rest[0]!r}"
@@ -1848,7 +1878,7 @@ def main(argv=None, collected=None, review_sections=None):
                         "most one"),
               file=sys.stderr)
         return 2
-    rest = [a for a in args if a not in ("--check", "--report", "--export")]
+    rest = [a for a in rest if a not in ("--check", "--report", "--export")]
     for a in rest:
         if a.startswith("--"):
             print(DIAG.emit("RUN-001", None, None,

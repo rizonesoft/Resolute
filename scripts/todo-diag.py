@@ -45,7 +45,7 @@ SCHEMA_KEYS = ("code", "path", "line", "message")
 
 
 def describe(code: str) -> tuple[int, str]:
-    """(exit, family) for a code. Unlisted codes raise KeyError:
+    """(exit, family) for a code. Unlisted codes raise ValueError:
     emit nothing that is not in the registry."""
     try:
         return CODES[code]
@@ -68,9 +68,12 @@ def emit(code: str, path: str | None, line: int | None, message: str) -> str:
 
 def refusal(code: str, path: str | None, line: int | None,
              message: str) -> dict:
-    """One structured refusal. Same membership rule as emit."""
+    """One structured refusal. Same membership rule as emit. Keys ride
+    SCHEMA_KEYS order, so the constant is live: a drifted key fails
+    here (KeyError) or in the suites' literal schema legs."""
     describe(code)
-    return {"code": code, "path": path, "line": line, "message": message}
+    vals = {"code": code, "path": path, "line": line, "message": message}
+    return {key: vals[key] for key in SCHEMA_KEYS}
 
 
 def dumps(items: list[dict]) -> str:

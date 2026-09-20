@@ -28,7 +28,9 @@ the closed set, is REPORTED, never skipped: skipping is how the split-claim
 defect hid in the claims checker, where the count simply dropped and the total
 still said everything held.
 
-Exit codes: 0 everything parsed, 1 at least one heading could not be read.
+Exit codes: 0 everything parsed, 1 a refusal fired (an unreadable
+input, a stale ledger, incomplete transitions, or a refused write),
+2 usage.
 
 Refusals carry stable diagnostic codes from the single registry in
 `scripts/todo-diag.py` (D00 T04 §22): `CODES` maps each code to its exit
