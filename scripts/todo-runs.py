@@ -1675,6 +1675,21 @@ refuted: 0
         code, _, err = _run_main(["--check-export"])
         check("exit-check-export-usage", code == 2 and "[RUN-001]" in err,
               f"{code} {err!r}")
+        code, _, err = _run_main(["--check-export", "--bogus"])
+        check("exit-export-flag", code == 2 and "[RUN-001]" in err
+              and "unknown option" in err, f"{code} {err!r}")
+        code, out, _ = _run_main(["--check-export", "--format", "json",
+                                 str(tmp / "missing22.json")])
+        try:
+            unread_doc = json.loads(out)
+        except ValueError:
+            unread_doc = None
+        check("json-export-unreadable",
+              code == 1 and isinstance(unread_doc, list) and unread_doc
+              and all(sorted(d) == ["code", "line", "message", "path"]
+                      for d in unread_doc)
+              and unread_doc[0]["code"] == "RUN-007",
+              f"{code} {out!r}")
         code, _, err = _run_main(["--format"])
         check("exit-format-usage", code == 2 and "[RUN-001]" in err,
               f"{code} {err!r}")
@@ -1787,17 +1802,28 @@ def main(argv=None, collected=None, review_sections=None):
         return 2
     if "--check-export" in args:
         rest = [a for a in args if a != "--check-export"]
-        if len(rest) != 1:
+        if len(rest) != 1 or rest[0].startswith("--"):
+            detail = (
+                f"; unknown option {rest[0]!r}"
+                if rest and rest[0].startswith("--")
+                else ""
+            )
             print(DIAG.emit("RUN-001", None, None,
-                            "usage: todo-runs.py --check-export <export.json>"),
+                            "usage: todo-runs.py --check-export <export.json>"
+                            + detail),
                   file=sys.stderr)
             return 2
         try:
             xport = Path(rest[0]).as_posix()
             doc = json.loads(Path(rest[0]).read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
-            print(DIAG.emit("RUN-007", xport, None,
-                            f"cannot read export: {exc}"))
+            if json_mode:
+                print(DIAG.dumps([DIAG.refusal(
+                    "RUN-007", xport, None,
+                    f"cannot read export: {exc}")]), end="")
+            else:
+                print(DIAG.emit("RUN-007", xport, None,
+                                f"cannot read export: {exc}"))
             return 1
         problems = check_export(doc)
         if problems:
