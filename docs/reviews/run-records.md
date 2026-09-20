@@ -335,3 +335,13 @@ round: 3 model: opus effort: medium outcome: findings candidate: 9a58624 provide
 round: 4 model: gpt-5.6-sol effort: high outcome: independent candidate: 4b0cf1b provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings:
 empty: 0
 refuted: 0
+run: D00-T04-S19
+date: 2026-09-20
+runner: panel
+rounds: 3
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: e4ba39f provider: openai version: gpt-5.6-sol cost: 32289tokens latency: 101s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S19-F1, D00-T04-S19-F2, D00-T04-S19-F3, D00-T04-S19-F4
+# round 2 re-reported F2 with no new ref; answered structurally in 1cfd083, see s19.md.
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: 568ea51 provider: openai version: gpt-5.6-sol cost: 17249tokens latency: 27s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+round: 3 model: opus effort: medium outcome: findings candidate: 1cfd083 provider: anthropic version: unresolved cost: unresolved latency: 67s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S19-F5
+empty: 0
+refuted: 1
