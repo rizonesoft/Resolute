@@ -647,7 +647,7 @@ def git_oid_exists(oid: str, cwd=None) -> bool:
     """True when git resolves the OID to an object in the repo."""
     import subprocess
     proc = subprocess.run(
-        ["git", "cat-file", "-e", oid],
+        ["git", "--no-replace-objects", "cat-file", "-e", oid],
         capture_output=True, cwd=cwd)
     return proc.returncode == 0
 
@@ -658,7 +658,7 @@ def git_head_tree(head: str, cwd=None) -> str | None:
     the tree (driven), so callers needing a commit gate the type first."""
     import subprocess
     proc = subprocess.run(
-        ["git", "rev-parse", f"{head}^{{tree}}"],
+        ["git", "--no-replace-objects", "rev-parse", f"{head}^{{tree}}"],
         capture_output=True, text=True, cwd=cwd)
     if proc.returncode != 0:
         return None
@@ -666,10 +666,13 @@ def git_head_tree(head: str, cwd=None) -> str | None:
 
 
 def git_object_type(oid: str, cwd=None) -> str | None:
-    """The object type of an OID, else None when it resolves to nothing."""
+    """The object type of an OID, else None when it resolves to nothing.
+    Replacement refs stay disabled on every identity call: a
+    refs/replace/<tree> pointing at a commit would otherwise spoof the
+    type gate (driven)."""
     import subprocess
     proc = subprocess.run(
-        ["git", "cat-file", "-t", oid],
+        ["git", "--no-replace-objects", "cat-file", "-t", oid],
         capture_output=True, text=True, cwd=cwd)
     if proc.returncode != 0:
         return None
@@ -1069,6 +1072,12 @@ def _self_test() -> int:
         check("resolve-attest-tree-base-refused",
               got_base == f"attest: --base {rtree} is not a commit",
               got_base or "ok")
+        subprocess.run(["git", "-C", tmpd, "update-ref",
+                        f"refs/replace/{rtree}", rhead],
+                       capture_output=True, check=True)
+        got_rtype = git_object_type(rtree, cwd=tmpd)
+        check("resolve-ignores-replace-refs",
+              got_rtype == "tree", got_rtype or "none")
     check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
