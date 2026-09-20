@@ -99,6 +99,7 @@ def validate(graph, _args) -> int:
     # strips fences per span.
     span_cache: dict[str, list[str] | None] = {}
     deferred_mark_re = re.compile(r"\bdeferred\b", re.IGNORECASE)
+    header_re = re.compile(r"#{1,6}(?:\s|$)")
 
     def is_item_line(stripped: str) -> bool:
         # The parser's item shape exactly (parse_todo): a `- [ ]` or
@@ -170,12 +171,13 @@ def validate(graph, _args) -> int:
                 continue
             # A deferral's owner rides the contiguous lines belonging to
             # the item: the item line itself plus following lines until a
-            # blank line or the next item. (D00 T02 §4 defers to D04 T01
-            # §1 exactly this way, owner on the next line.)
+            # blank line, the next item, or a header. (D00 T02 §4 defers
+            # to D04 T01 §1 exactly this way, owner on the next line.)
+            # No fence stop applies here: fences strip before the scan.
             block = [ln]
             for cont in span[i + 1 :]:
                 cst = cont.strip()
-                if not cst or is_item_line(cst):
+                if not cst or is_item_line(cst) or header_re.match(cst):
                     break
                 block.append(cont)
             owners = [
@@ -212,10 +214,10 @@ def validate(graph, _args) -> int:
                         f"owner {r[0]} §{r[1]} carries no back-pointer "
                         f"(neither an XREF nor Depends On {todo.id} §{s_num})"
                     )
-            if len(problems) == len(owners):
+            if problems:
                 flag(
                     "partial-flip-shipped",
-                    f"{where} is [x] but carries a deferral with no live owner: "
+                    f"{where} is [x] but carries a deferral with a defective owner: "
                     f"{text[:100]!r} -- " + "; ".join(problems),
                 )
 

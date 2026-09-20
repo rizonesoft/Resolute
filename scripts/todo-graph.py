@@ -6585,6 +6585,9 @@ track: Z1
 |  15   |   §15   | Stamp-region quote | - |  [x]   |
 |  16   |   §16   | Above-stamp twin | - |  [x]   |
 |  17   |   §17   | Commit without colon | - |  [x]   |
+|  18   |   §18   | Deferral, mixed owners | - |  [x]   |
+|  19   |   §19   | Target, mixed back | §18 |  [ ]   |
+|  20   |   §20   | Deferral, XREF past header | - |  [x]   |
 
 ## 1. Plain open item
 
@@ -6757,6 +6760,37 @@ The quoted shape:
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-01-01 | §17 | fixture
+
+## 18. Deferral, mixed owners
+
+- [x] Did it
+- [ ] ~~Handed twice.~~ **Deferred 2026-01-01 to one live owner and one ghost.**
+  -> XREF: §19 (item: "Do the mixed work") -- the live owner
+  -> XREF: §99 (item: "Do the ghost work") -- the ghost
+- [x] Commit: `"selftest: defer-mixed"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §18 | fixture
+
+## 19. Target, mixed back
+
+- [ ] Do the mixed work
+- [ ] Commit: `"selftest: target-mixed"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 20. Deferral, XREF past header
+
+- [x] Did it
+- [ ] ~~Handed past a header.~~ **Deferred 2026-01-01 to an owner below a header.**
+### A note between the item and the XREF
+  -> XREF: §9 (item: "Do the owned work") -- past the header, not attached
+- [x] Commit: `"selftest: defer-header"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §20 | fixture
 """,
             encoding="utf-8",
         )
@@ -6862,6 +6896,8 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
         check("partial-flip: stamp-region quote passes", pf_silent(15), True)
         check("partial-flip: above-stamp twin fails", pf_fires(16, "Quoted below the stamp"), True)
         check("partial-flip: Commit without colon fails", pf_fires(17, "not the bookkeeping shape"), True)
+        check("partial-flip: mixed owners fail on the ghost", pf_fires(18, "resolves to nothing"), True)
+        check("partial-flip: XREF past a header is unattached", pf_fires(20, "naming no owner"), True)
 
         # The partial-flip fixtures fire FATAL by design: remove them now so
         # the frozen, ratchet, sync, and plan-health legs below read the tree
