@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**233 findings across 35 sections.**
+**245 findings across 36 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 80 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 45 | fails under hostile or unexpected input |
-| `correctness` | 39 | the code does the wrong thing |
+| `record` | 82 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 51 | fails under hostile or unexpected input |
+| `correctness` | 40 | the code does the wrong thing |
 | `consistency` | 36 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 19 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 22 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 113 | wrong behavior in code, plan, or record |
-| `minor` | 114 | polish or wording, or no surviving defect |
+| `major` | 122 | wrong behavior in code, plan, or record |
+| `minor` | 117 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -208,6 +208,18 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §20` | F5 | major | `adversarial` | fixed | independent | unordered word match satisfies reordered citations |
 | `D00 T04 §20` | F6 | minor | `record` | advisory | independent | stamp ineligible until sign-off cost records |
 | `D00 T04 §20` | F7 | major | `consistency` | filed | independent | README lacks the struck-item deferral spec |
+| `D00 T04 §21` | F1 | major | `integration` | fixed | independent | content leg unwired into the skill flow |
+| `D00 T04 §21` | F2 | major | `record` | fixed | independent | attestation hashed findings before later edits |
+| `D00 T04 §21` | F3 | major | `integration` | fixed | independent | check-anchors never invoked |
+| `D00 T04 §21` | F4 | major | `adversarial` | filed | independent | checker evidence unbound to runner output |
+| `D00 T04 §21` | F5 | major | `adversarial` | fixed | independent | non-textual changes vacuously covered |
+| `D00 T04 §21` | F6 | major | `adversarial` | fixed | independent | staged-vs-disk findings at read-back |
+| `D00 T04 §21` | F7 | major | `adversarial` | fixed | independent | manifest lookalike filenames |
+| `D00 T04 §21` | F8 | minor | `correctness` | fixed | self | attest-order pin crashes on renamed headers |
+| `D00 T04 §21` | F9 | major | `adversarial` | fixed | independent | content consumption never diminishes, surplus rides free |
+| `D00 T04 §21` | F10 | minor | `adversarial` | duplicate | independent | checker evidence unbound (round-1 restatement) |
+| `D00 T04 §21` | F11 | major | `integration` | fixed | independent | untracked findings pass the staged proof, anchors read the worktree |
+| `D00 T04 §21` | F12 | minor | `record` | fixed | independent | completion record contradicts the filed residual |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
