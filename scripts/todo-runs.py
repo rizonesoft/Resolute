@@ -23,6 +23,14 @@ round verdicts from the review file; every candidate is a commit that exists.
 --report prints the run dimensions: engagements, rounds per section, panel
 verdict overlap (rounds sharing a four-lens signature), the empty-round
 index, and the source split (independent from runs, self from ledger).
+
+Refusals carry stable diagnostic codes (D00 T04 §22, `scripts/todo-diag.py`):
+usage is RUN-001 (exit 2); run-file read/parse RUN-002, run-block shape
+RUN-003, attribution and coverage RUN-004, panel correspondence RUN-005,
+candidate resolution RUN-006, export problems RUN-007 (exit 1 each).
+`--format json` renders refusals as one JSON array of code/path/line/
+message objects; usage errors stay text, since argv did not parse and no
+format was selected.
 """
 
 import datetime
@@ -45,6 +53,21 @@ def _load_findings():
 
 
 TF = _load_findings()
+
+
+def _load_diag():
+    """The shared diagnostic registry (one instance per process)."""
+    mod = sys.modules.get("todo_diag")
+    if mod is not None:
+        return mod
+    spec = importlib.util.spec_from_file_location("todo_diag", HERE / "todo-diag.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["todo_diag"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+DIAG = _load_diag()
 
 ROOT = HERE.parent
 DEFAULT_RUNS = ROOT / "docs" / "reviews" / "run-records.md"
@@ -453,20 +476,30 @@ def check_candidates(runs):
     return errors
 
 
-def run_check(runs_path, collected=None):
+def run_check(runs_path, collected=None, review_sections=None):
     """Check the runs file. `collected` overrides the ledger read, so one
-    TF.collect() serves the check and the report (§17)."""
+    TF.collect() serves the check and the report (§17); `review_sections`
+    overrides the review-file scan the same way, so main-level drives
+    stay hermetic (D00 T04 §22). Errors return as (code, lineno, message),
+    one code per checking phase; the phases themselves still append plain
+    (lineno, message) pairs."""
     try:
         text = io.open(runs_path, encoding="utf-8").read()
     except OSError as exc:
-        return [], [(0, f"cannot read {runs_path}: {exc}")]
+        return [], [("RUN-002", 0, f"cannot read {runs_path}: {exc}")]
     runs, errors = parse_runs(text)
-    check_runs(runs, errors)
-    if not errors:
-        errors.extend(cross_check(runs, collected))
-        errors.extend(check_panel_rounds(runs))
-        errors.extend(check_candidates(runs))
-    return runs, errors
+    tagged = [("RUN-002", lineno, msg) for lineno, msg in errors]
+    shape: list = []
+    check_runs(runs, shape)
+    tagged += [("RUN-003", lineno, msg) for lineno, msg in shape]
+    if not tagged:
+        tagged += [("RUN-004", lineno, msg)
+                   for lineno, msg in cross_check(runs, collected, review_sections)]
+        tagged += [("RUN-005", lineno, msg)
+                   for lineno, msg in check_panel_rounds(runs)]
+        tagged += [("RUN-006", lineno, msg)
+                   for lineno, msg in check_candidates(runs)]
+    return runs, tagged
 
 
 def _corpus_clean() -> bool:
@@ -1083,7 +1116,10 @@ refuted: 0
     check("missing-run-reported", any("no run block" in m for _, m in cc), f"{cc}")
 
     runs_u, errors_u = run_check(Path("/tmp/nope-does-not-exist.md"))
-    check("unreadable-reported", runs_u == [] and any("cannot read" in m for _, m in errors_u),
+    check("unreadable-reported",
+          runs_u == [] and errors_u
+          and errors_u[0][0] == "RUN-002"
+          and any("cannot read" in m for _, _, m in errors_u),
           f"{runs_u} {errors_u}")
 
     no_schema = good.replace("schema: 1\n", "")
@@ -1517,10 +1553,181 @@ refuted: 0
     check("legs-bank-unreadable",
           got_nobank[2].startswith("- overlap comparisons banked: bank unreadable ")
           and got_nobank[2].endswith(": DORMANT (unmeasured)"), f"{got_nobank}")
+    # D00 T04 §22: the RUN registry is closed (codes plus exits), and an
+    # unlisted code fails closed instead of printing.
+    run_codes = {c: DIAG.CODES[c] for c in DIAG.CODES if c.startswith("RUN-")}
+    check("codes-registry-closed", run_codes == {
+        "RUN-001": (2, "usage: conflicting flags or bad arguments"),
+        "RUN-002": (1, "run-file read or parse"),
+        "RUN-003": (1, "run-block shape"),
+        "RUN-004": (1, "finding attribution and coverage"),
+        "RUN-005": (1, "panel-round correspondence"),
+        "RUN-006": (1, "candidate resolution"),
+        "RUN-007": (1, "export document problems")}, f"{run_codes}")
+    for bad_call in (lambda: DIAG.emit("RUN-999", None, None, "x"),
+                     lambda: DIAG.refusal("RUN-999", None, None, "x")):
+        try:
+            bad_call()
+            check("codes-unlisted-closed", False, "an unlisted code printed")
+        except ValueError as exc:
+            check("codes-unlisted-closed",
+                  "unlisted diagnostic code 'RUN-999'" in str(exc), f"{exc}")
+
+    # D00 T04 §22: main-level exits plus codes, driven against fixture
+    # runs files. Post-shape legs thread collected plus review_sections
+    # so no leg reads the live tree; the review-file scan rebinds the
+    # same way and restores below.
+    import contextlib
+
+    def _run_main(argv, **kw):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = main(argv, **kw)
+        return code, out.getvalue(), err.getvalue()
+
+    real_sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                              capture_output=True, text=True,
+                              timeout=30).stdout.strip()[:7]
+    mrev = tmp / "reviews22"
+    mdom = mrev / "99-domain"
+    mdom.mkdir(parents=True)
+    mreview = mdom / "D00-T99-s9.md"
+    mreview.write_text(
+        "## Opus panel Round 1\n\n"
+        "`adversarial` needs-attention\n"
+        "`consistency` approve\n"
+        "`integration` approve\n"
+        "`record` approve\n",
+        encoding="utf-8",
+    )
+    base_run = ("schema: 1\nrun: D00-T99-S9\ndate: 2026-09-20\n"
+                "runner: panel\nrounds: 1\n"
+                "round: 1 model: opus effort: medium outcome: findings "
+                "candidate: %s provider: anthropic version: unresolved "
+                "cost: unresolved latency: unresolved opportunity: full-scope "
+                "purpose: section-review provenance: recorded "
+                "findings: D00-T99-S9-F1\n"
+                "empty: 0\nrefuted: 0\n")
+    f1 = TF.Finding("D00 T99 §9", None, 1, "F1", "s", "record", "fixed",
+                    None, "independent")
+    saved_reviews = TF.REVIEWS
+    TF.REVIEWS = mrev
+    try:
+        rp = tmp / "runs22.md"
+        rp.write_text("not a runs file at all\n", encoding="utf-8")
+        code, out, _ = _run_main(["--check", str(rp)])
+        check("exit-parse", code == 1 and "[RUN-002]" in out, f"{code} {out!r}")
+        rp.write_text(base_run % real_sha, encoding="utf-8")
+        bad_effort = rp.read_text(encoding="utf-8").replace(
+            "effort: medium", "effort: bogus", 1)
+        rp.write_text(bad_effort, encoding="utf-8")
+        code, out, _ = _run_main(["--check", str(rp)])
+        check("exit-shape", code == 1 and "[RUN-003]" in out, f"{code} {out!r}")
+        code, out, _ = _run_main(["--check", str(tmp / "missing22.md")])
+        check("exit-unreadable", code == 1 and "[RUN-002]" in out,
+              f"{code} {out!r}")
+        rp.write_text(base_run % real_sha, encoding="utf-8")
+        f9 = TF.Finding("D00 T99 §9", None, 9, "F9", "s", "record", "fixed",
+                        None, "independent")
+        code, out, _ = _run_main(
+            ["--check", str(rp)], collected=([f1, f9], []),
+            review_sections={"D00-T99-S9"})
+        check("exit-coverage",
+              code == 1 and "[RUN-004]" in out
+              and "but no run lists it" in out
+              and "[RUN-005]" not in out and "[RUN-006]" not in out,
+              f"{code} {out!r}")
+        mreview.write_text("# no panel sections here\n", encoding="utf-8")
+        code, out, _ = _run_main(
+            ["--check", str(rp)], collected=([f1], []),
+            review_sections={"D00-T99-S9"})
+        check("exit-panel",
+              code == 1 and "[RUN-005]" in out
+              and "no panel sections" in out
+              and "[RUN-004]" not in out and "[RUN-006]" not in out,
+              f"{code} {out!r}")
+        mreview.write_text(
+            "## Opus panel Round 1\n\n"
+            "`adversarial` needs-attention\n"
+            "`consistency` approve\n"
+            "`integration` approve\n"
+            "`record` approve\n",
+            encoding="utf-8",
+        )
+        rp.write_text(base_run % "0000000", encoding="utf-8")
+        code, out, _ = _run_main(
+            ["--check", str(rp)], collected=([f1], []),
+            review_sections={"D00-T99-S9"})
+        check("exit-candidates",
+              code == 1 and "[RUN-006]" in out
+              and "is not a commit in this repository" in out
+              and "[RUN-004]" not in out and "[RUN-005]" not in out,
+              f"{code} {out!r}")
+        rp.write_text(base_run % real_sha, encoding="utf-8")
+        code, out, _ = _run_main(
+            ["--check", str(rp)], collected=([f1], []),
+            review_sections={"D00-T99-S9"})
+        check("exit-green",
+              code == 0 and "all resolve, all covered, counts agree" in out,
+              f"{code} {out!r}")
+        code, _, err = _run_main(["--report", "--export"])
+        check("exit-conflict", code == 2 and "[RUN-001]" in err, f"{code} {err!r}")
+        code, _, err = _run_main(["--check-export"])
+        check("exit-check-export-usage", code == 2 and "[RUN-001]" in err,
+              f"{code} {err!r}")
+        code, _, err = _run_main(["--format"])
+        check("exit-format-usage", code == 2 and "[RUN-001]" in err,
+              f"{code} {err!r}")
+        code, _, err = _run_main(["--format", "yaml"])
+        check("exit-format-value", code == 2 and "[RUN-001]" in err,
+              f"{code} {err!r}")
+        code, out, _ = _run_main(
+            ["--check-export", str(tmp / "missing22.json")])
+        check("exit-export-unreadable", code == 1 and "[RUN-007]" in out,
+              f"{code} {out!r}")
+        xp = tmp / "export22.json"
+        xp.write_text('{"schema": 99}\n', encoding="utf-8")
+        code, out, _ = _run_main(["--check-export", str(xp)])
+        check("exit-export-problems", code == 1 and "[RUN-007]" in out,
+              f"{code} {out!r}")
+        rp.write_text("not a runs file at all\n", encoding="utf-8")
+        code, out, _ = _run_main(["--check", "--format", "json", str(rp)])
+        try:
+            malformed_doc = json.loads(out)
+        except ValueError:
+            malformed_doc = None
+        check("json-malformed-schema",
+              code == 1 and isinstance(malformed_doc, list)
+              and malformed_doc
+              and all(sorted(d) == ["code", "line", "message", "path"]
+                      for d in malformed_doc)
+              and malformed_doc[0]["code"] == "RUN-002"
+              and malformed_doc[0]["code"] in DIAG.CODES,
+              f"{code} {out!r}")
+        code, out, _ = _run_main(
+            ["--check-export", "--format", "json", str(xp)])
+        try:
+            export_doc = json.loads(out)
+        except ValueError:
+            export_doc = None
+        check("json-export-schema",
+              code == 1 and isinstance(export_doc, list) and export_doc
+              and all(sorted(d) == ["code", "line", "message", "path"]
+                      for d in export_doc)
+              and export_doc[0]["code"] == "RUN-007",
+              f"{code} {out!r}")
+    finally:
+        TF.REVIEWS = saved_reviews
+
     bank_one.unlink()
     bank_two.unlink()
     bank_hot.unlink()
     other.unlink()
+    (tmp / "reviews22" / "99-domain" / "D00-T99-s9.md").unlink()
+    (tmp / "reviews22" / "99-domain").rmdir()
+    (tmp / "reviews22").rmdir()
+    (tmp / "runs22.md").unlink()
+    (tmp / "export22.json").unlink()
     tmp.rmdir()
 
     print(f"todo-runs self-test: {total[0]} cases, {len(failures)} failed")
@@ -1529,45 +1736,82 @@ refuted: 0
     return 1 if failures else 0
 
 
-def main(argv=None):
+def main(argv=None, collected=None, review_sections=None):
     args = list(sys.argv[1:] if argv is None else argv)
+    fmt = "text"
+    if "--format" in args:
+        i = args.index("--format")
+        args.pop(i)
+        if i >= len(args) or args[i].startswith("--"):
+            print(DIAG.emit("RUN-001", None, None,
+                            "usage: --format wants text or json"),
+                  file=sys.stderr)
+            return 2
+        fmt = args.pop(i)
+        if fmt not in ("text", "json"):
+            print(DIAG.emit("RUN-001", None, None,
+                            f"usage: --format wants text or json, got {fmt!r}"),
+                  file=sys.stderr)
+            return 2
+    json_mode = fmt == "json"
     if "--self-test" in args:
         return _self_test()
     if "--check-export" in args:
         rest = [a for a in args if a != "--check-export"]
         if len(rest) != 1:
-            print("usage: todo-runs.py --check-export <export.json>", file=sys.stderr)
+            print(DIAG.emit("RUN-001", None, None,
+                            "usage: todo-runs.py --check-export <export.json>"),
+                  file=sys.stderr)
             return 2
         try:
             doc = json.loads(Path(rest[0]).read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
-            print(f"{rest[0]}: cannot read export: {exc}")
+            print(DIAG.emit("RUN-007", rest[0], None,
+                            f"cannot read export: {exc}"))
             return 1
         problems = check_export(doc)
-        for problem in problems:
-            print(f"{rest[0]}: {problem}")
-        if not problems:
+        if problems:
+            if json_mode:
+                print(DIAG.dumps([DIAG.refusal("RUN-007", rest[0], None, p)
+                                  for p in problems]), end="")
+            else:
+                for problem in problems:
+                    print(DIAG.emit("RUN-007", rest[0], None, problem))
+            return 1
+        if not json_mode:
             print(f"{rest[0]}: {export_sound_line(doc)}")
-        return 1 if problems else 0
+        else:
+            print(DIAG.dumps([]), end="")
+        return 0
     mode_report = "--report" in args
     mode_export = "--export" in args
     if mode_report and mode_export:
-        print("usage: todo-runs.py [--check] [--report | --export] [runs-file]; "
-              "--report and --export conflict, pass at most one", file=sys.stderr)
+        print(DIAG.emit("RUN-001", None, None,
+                        "usage: todo-runs.py [--check] [--report | --export] "
+                        "[runs-file]; --report and --export conflict, pass at "
+                        "most one"),
+              file=sys.stderr)
         return 2
     rest = [a for a in args if a not in ("--check", "--report", "--export")]
     runs_path = Path(rest[0]) if rest else DEFAULT_RUNS
-    collected = TF.collect()
-    runs, errors = run_check(runs_path, collected)
+    if collected is None:
+        collected = TF.collect()
+    runs, errors = run_check(runs_path, collected, review_sections)
     if errors:
-        for lineno, msg in errors:
-            where = f"{runs_path}:{lineno}" if lineno else f"{runs_path}"
-            print(f"{where}: {msg}")
+        if json_mode:
+            print(DIAG.dumps(
+                [DIAG.refusal(code, str(runs_path), lineno or None, msg)
+                 for code, lineno, msg in errors]), end="")
+        else:
+            for code, lineno, msg in errors:
+                print(DIAG.emit(code, str(runs_path), lineno or None, msg))
         return 1
     if mode_report:
         sys.stdout.write(report(runs, runs_path, collected))
     elif mode_export:
         sys.stdout.write(json.dumps(export_runs(runs, runs_path), indent=2) + "\n")
+    elif json_mode:
+        print(DIAG.dumps([]), end="")
     else:
         rounds = sum(r.rounds or 0 for r in runs)
         print(f"{len(runs)} runs, {rounds} rounds: all resolve, all covered, counts agree")

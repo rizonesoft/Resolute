@@ -29,6 +29,13 @@ defect hid in the claims checker, where the count simply dropped and the total
 still said everything held.
 
 Exit codes: 0 everything parsed, 1 at least one heading could not be read.
+
+Refusals carry stable diagnostic codes (D00 T04 §22, `scripts/todo-diag.py`):
+usage is FIND-001 (exit 2), unreadable headings FIND-002, a stale ledger
+FIND-003, incomplete transitions FIND-004, a refused write FIND-005
+(exit 1 each). `--format json` renders refusals as one JSON array of
+code/path/line/message objects; usage errors stay text, since argv did
+not parse and no format was selected.
 """
 
 from __future__ import annotations
@@ -40,6 +47,24 @@ import subprocess
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
+
+
+def _load_diag():
+    """The shared diagnostic registry, loaded by path so this script
+    stays runnable however it is entered (CLI, importlib, self-test)."""
+    import importlib.util
+    mod = sys.modules.get("todo_diag")
+    if mod is not None:
+        return mod
+    spec = importlib.util.spec_from_file_location(
+        "todo_diag", Path(__file__).with_name("todo-diag.py"))
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["todo_diag"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+DIAG = _load_diag()
 
 ROOT = Path(__file__).resolve().parent.parent
 REVIEWS = ROOT / "docs" / "reviews"
@@ -290,8 +315,11 @@ def _transition_commit_resolves(sha: str) -> bool:
     return hit.returncode == 0 and hit.stdout.strip() == "commit"
 
 
-def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list[str]:
+def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list[tuple[int, str]]:
     """Every non-final ledger row keeps its when, why, and evidence.
+
+    Returns (lineno, message) problems, unlocated as lineno 0; the
+    caller adds the path and the FIND-004 code at emission.
 
     Returns problems (empty means complete): each block needs its
     six fields, must name a live row, and its `to` must agree with
@@ -299,11 +327,11 @@ def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list
     holds the quoted record and must resolve; each non-final row
     needs exactly one block.
     """
-    problems: list[str] = []
+    problems: list[tuple[int, str]] = []
     try:
         text = path.read_text(encoding="utf-8")
     except OSError as exc:
-        return [f"{path}: cannot read transitions: {exc}"]
+        return [(0, f"cannot read transitions: {exc}")]
     blocks: list[tuple[int, str, dict[str, str]]] = []
     current: tuple[int, str, dict[str, str]] | None = None
     for lineno, raw in enumerate(text.splitlines(), 1):
@@ -320,14 +348,14 @@ def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list
             continue  # header preamble before the first block
         f = TRANSITION_FIELD_RE.match(line)
         if f is None:
-            problems.append(f"{path}:{lineno}: not a transition field: {line[:60]!r}")
+            problems.append((lineno, f"not a transition field: {line[:60]!r}"))
             continue
         key, value = f.group("key"), f.group("value").strip()
         if key in current[2]:
-            problems.append(f"{path}:{lineno}: duplicate field {key!r}")
+            problems.append((lineno, f"duplicate field {key!r}"))
             continue
         if not value:
-            problems.append(f"{path}:{lineno}: empty field {key!r}, quoted not blank")
+            problems.append((lineno, f"empty field {key!r}, quoted not blank"))
             continue
         current[2][key] = value
     if current is not None:
@@ -341,34 +369,34 @@ def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list
     for lineno, ref, fields in blocks:
         for need in ("date", "from", "to", "why", "evidence", "as-of"):
             if need not in fields:
-                problems.append(f"{path}:{lineno}: {ref} misses {need}")
+                problems.append((lineno, f"{ref} misses {need}"))
         if "date" in fields and not TRANSITION_DATE_RE.match(fields["date"]):
-            problems.append(f"{path}:{lineno}: {ref} date is not YYYY-MM-DD")
+            problems.append((lineno, f"{ref} date is not YYYY-MM-DD"))
         if "as-of" in fields:
             if not TRANSITION_SHA_RE.match(fields["as-of"]):
-                problems.append(f"{path}:{lineno}: {ref} binds as-of "
-                                f"{fields['as-of']!r}, not a sha")
+                problems.append((lineno, f"{ref} binds as-of "
+                                f"{fields['as-of']!r}, not a sha"))
             elif not _transition_commit_resolves(fields["as-of"]):
-                problems.append(f"{path}:{lineno}: {ref} binds as-of {fields['as-of']}, "
-                                f"which resolves to no commit")
+                problems.append((lineno, f"{ref} binds as-of {fields['as-of']}, "
+                                f"which resolves to no commit"))
         if "from" in fields and fields["from"] not in _TRANSITION_FROM_OK:
-            problems.append(f"{path}:{lineno}: {ref} moves from {fields['from']!r}, unknown")
+            problems.append((lineno, f"{ref} moves from {fields['from']!r}, unknown"))
         if "to" in fields and fields["to"] not in NONFINAL:
-            problems.append(f"{path}:{lineno}: {ref} moves to {fields['to']!r}, "
-                            f"transitions track {', '.join(NONFINAL)}")
+            problems.append((lineno, f"{ref} moves to {fields['to']!r}, "
+                            f"transitions track {', '.join(NONFINAL)}"))
         if ref in seen:
-            problems.append(f"{path}:{lineno}: {ref} already has a block at line {seen[ref]}")
+            problems.append((lineno, f"{ref} already has a block at line {seen[ref]}"))
         else:
             seen[ref] = lineno
         if ref not in by_ref:
-            problems.append(f"{path}:{lineno}: {ref} names no live finding")
+            problems.append((lineno, f"{ref} names no live finding"))
             continue
         if "to" in fields and by_ref[ref].disposition != fields["to"]:
-            problems.append(f"{path}:{lineno}: {ref} says {fields['to']} but "
-                            f"the row reads {by_ref[ref].disposition}")
+            problems.append((lineno, f"{ref} says {fields['to']} but "
+                            f"the row reads {by_ref[ref].disposition}"))
     for ref in sorted(r for r, f in by_ref.items() if f.disposition in NONFINAL):
         if ref not in seen:
-            problems.append(f"{path}: {ref} reads {by_ref[ref].disposition} but keeps no transition")
+            problems.append((0, f"{ref} reads {by_ref[ref].disposition} but keeps no transition"))
     return problems
 
 
@@ -378,20 +406,44 @@ REPEAT_QUESTION = (
 )
 
 
+def _rel(path: Path) -> str:
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()   # a self-test fixture outside the repository
+
+
+def _bad_items(bad: list[tuple[Path, int, str]]) -> list[dict]:
+    """The unreadable headings as structured refusals (FIND-002)."""
+    return [DIAG.refusal("FIND-002", _rel(path), lineno, why)
+            for path, lineno, why in bad]
+
+
 def _print_bad(bad: list[tuple[Path, int, str]]) -> None:
     if not bad:
         return
     print("  headings this could not read, reported rather than skipped:")
     for path, lineno, why in bad:
-        try:
-            rel = path.relative_to(ROOT).as_posix()
-        except ValueError:
-            rel = path.as_posix()   # a self-test fixture outside the repository
-        print(f"    {rel}:{lineno}  {why}")
+        print(f"    {DIAG.emit('FIND-002', _rel(path), lineno, why)}")
     print()
 
 
-def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
+def _transition_items(tproblems: list[tuple[int, str]],
+                      path: Path) -> list[dict]:
+    """Transition problems as structured refusals (FIND-004)."""
+    return [DIAG.refusal("FIND-004", _rel(path), lineno or None, p)
+            for lineno, p in tproblems]
+
+
+def _print_transitions(tproblems: list[tuple[int, str]], path: Path) -> None:
+    print("  transitions incomplete, one line each:")
+    for lineno, p in tproblems:
+        print(f"    {DIAG.emit('FIND-004', _rel(path), lineno or None, p)}")
+    print()
+
+
+def report(findings: list[Finding], bad: list[tuple[Path, int, str]],
+           json_mode: bool = False) -> int:
     by_cat = Counter(f.category for f in findings)
     by_disp = Counter(f.disposition for f in findings)
     by_section = defaultdict(list)
@@ -430,16 +482,17 @@ def report(findings: list[Finding], bad: list[tuple[Path, int, str]]) -> int:
         for cat, n in repeats:
             print(f"    {cat}: " + REPEAT_QUESTION.format(n=n))
 
-    if bad:
-        print()
-        _print_bad(bad)
-
-    tproblems = check_transitions(findings)
-    if tproblems:
-        print("  transitions incomplete, one line each:")
-        for p in tproblems:
-            print(f"    {p}")
-        print()
+    tproblems = check_transitions(findings, TRANSITIONS)
+    if json_mode:
+        items = _bad_items(bad) + _transition_items(tproblems, TRANSITIONS)
+        if items:
+            print(DIAG.dumps(items), end="")
+    else:
+        if bad:
+            print()
+            _print_bad(bad)
+        if tproblems:
+            _print_transitions(tproblems, TRANSITIONS)
 
     print(f"todo-findings: {len(findings)} parsed, {len(bad)} unreadable, "
           f"{len(tproblems)} transition problem(s)")
@@ -655,13 +708,13 @@ def _self_test() -> int:
         encoding="utf-8",
     )
     tp = check_transitions(tfind, tpath)
-    if not any("misses why" in p for p in tp):
+    if not any("misses why" in p for _, p in tp):
         print("  FAIL  a transition block missing `why` was not reported")
         failed += 1
-    if not any("names no live finding" in p for p in tp):
+    if not any("names no live finding" in p for _, p in tp):
         print("  FAIL  a transition naming no live row was not reported")
         failed += 1
-    if not any("says duplicate but the row reads withdrawn" in p for p in tp):
+    if not any("says duplicate but the row reads withdrawn" in p for _, p in tp):
         print("  FAIL  a transition disagreeing with its row was not reported")
         failed += 1
     # A non-final row with no block, a duplicate block, a bad date, a `to`
@@ -693,13 +746,13 @@ def _self_test() -> int:
         encoding="utf-8",
     )
     tp2 = check_transitions(tfind, tpath)
-    if not any("date is not YYYY-MM-DD" in p for p in tp2):
+    if not any("date is not YYYY-MM-DD" in p for _, p in tp2):
         print("  FAIL  a transition with a bad date was not reported")
         failed += 1
-    if not any("already has a block" in p for p in tp2):
+    if not any("already has a block" in p for _, p in tp2):
         print("  FAIL  a duplicate transition block was not reported")
         failed += 1
-    if not any("moves to 'fixed'" in p for p in tp2):
+    if not any("moves to 'fixed'" in p for _, p in tp2):
         print("  FAIL  a transition to a final disposition was not reported")
         failed += 1
     # §15: the as-of binds a resolving commit, and a dead binding fails.
@@ -713,7 +766,7 @@ def _self_test() -> int:
         "as-of: 0000000\n",
         encoding="utf-8",
     )
-    if not any("resolves to no commit" in p for p in check_transitions(tfind, tpath)):
+    if not any("resolves to no commit" in p for _, p in check_transitions(tfind, tpath)):
         print("  FAIL  a transition binding a dead commit was not reported")
         failed += 1
     tpath.write_text(
@@ -726,7 +779,7 @@ def _self_test() -> int:
         "as-of: yesterday\n",
         encoding="utf-8",
     )
-    if not any("not a sha" in p for p in check_transitions(tfind, tpath)):
+    if not any("not a sha" in p for _, p in check_transitions(tfind, tpath)):
         print("  FAIL  a transition binding a non-sha was not reported")
         failed += 1
     # §16: a duplicate block reports even when the ref is dead.
@@ -748,11 +801,11 @@ def _self_test() -> int:
         "as-of: 0a24c03\n",
         encoding="utf-8",
     )
-    dup_problems = [p for p in check_transitions(tfind, tpath) if "S9-F9" in p]
+    dup_problems = [p for _, p in check_transitions(tfind, tpath) if "S9-F9" in p]
     if dup_problems != [
-        f"{tpath}:1: D00-T04-S9-F9 names no live finding",
-        f"{tpath}:9: D00-T04-S9-F9 already has a block at line 1",
-        f"{tpath}:9: D00-T04-S9-F9 names no live finding",
+        "D00-T04-S9-F9 names no live finding",
+        "D00-T04-S9-F9 already has a block at line 1",
+        "D00-T04-S9-F9 names no live finding",
     ]:
         print(f"  FAIL  the dead-ref duplicate refusal shape drifted: {dup_problems}")
         failed += 1
@@ -776,10 +829,10 @@ def _self_test() -> int:
         encoding="utf-8",
     )
     distinct = check_transitions(tfind, tpath)
-    if [p for p in distinct if "names no live finding" in p] != [
-        f"{tpath}:1: D00-T04-S9-F9 names no live finding",
-        f"{tpath}:9: D00-T04-S9-F8 names no live finding",
-    ] or any("already has a block" in p for p in distinct):
+    if [p for _, p in distinct if "names no live finding" in p] != [
+        "D00-T04-S9-F9 names no live finding",
+        "D00-T04-S9-F8 names no live finding",
+    ] or any("already has a block" in p for _, p in distinct):
         print(f"  FAIL  distinct dead refs misfired: {distinct}")
         failed += 1
     # §16 plan review: a live ref duplicated draws only the duplicate message.
@@ -802,7 +855,7 @@ def _self_test() -> int:
         encoding="utf-8",
     )
     if check_transitions(tfind, tpath) != [
-        f"{tpath}:9: D00-T04-S9-F1 already has a block at line 1",
+        (9, "D00-T04-S9-F1 already has a block at line 1"),
     ]:
         print(f"  FAIL  the live duplicate refusal shape drifted: {check_transitions(tfind, tpath)}")
         failed += 1
@@ -834,7 +887,7 @@ def _self_test() -> int:
         print(f"  FAIL  minor never-defects were not accepted: {_b} {_f}")
         failed += 1
     tpath.write_text("# nothing tracked yet\n", encoding="utf-8")
-    if not any("keeps no transition" in p for p in check_transitions(tfind, tpath)):
+    if not any("keeps no transition" in p for _, p in check_transitions(tfind, tpath)):
         print("  FAIL  a non-final row without a block was not reported")
         failed += 1
     tpath.unlink()
@@ -858,16 +911,143 @@ def _self_test() -> int:
         print(f"  FAIL  severity parsed wrong: {[x.severity for x in sf]}")
         failed += 1
 
+    # D00 T04 §22: the FIND registry is closed (codes plus exits), and an
+    # unlisted code fails closed instead of printing.
+    find_codes = {c: DIAG.CODES[c] for c in DIAG.CODES if c.startswith("FIND-")}
+    if find_codes != {"FIND-001": (2, "usage: bad flags or arguments"),
+                      "FIND-002": (1, "unreadable finding headings"),
+                      "FIND-003": (1, "stale findings ledger"),
+                      "FIND-004": (1, "incomplete outcome transitions"),
+                      "FIND-005": (1, "write refused: ledger would drop headings")}:
+        print(f"  FAIL  FIND registry drifted: {find_codes}")
+        failed += 1
+    for bad_call in (lambda: DIAG.emit("FIND-999", None, None, "x"),
+                     lambda: DIAG.refusal("FIND-999", None, None, "x")):
+        try:
+            bad_call()
+            print("  FAIL  an unlisted code printed instead of failing")
+            failed += 1
+        except ValueError as exc:
+            if "unlisted diagnostic code 'FIND-999'" not in str(exc):
+                print(f"  FAIL  unlisted code failed wrong: {exc}")
+                failed += 1
+
+    # D00 T04 §22: main-level exits plus codes, driven against a fixture
+    # corpus with the tree globals rebound (restored below).
+    mdir = tmp / "main"
+    mrev = mdir / "reviews"
+    mrev.mkdir(parents=True)
+    clean = ("### F1 -- x -- record -- FIXED (self) [minor]\n")
+    (mrev / "D00-T99-s1.md").write_text("# R\n\n" + clean, encoding="utf-8")
+    (mrev / "transitions.md").write_text("# nothing tracked yet\n", encoding="utf-8")
+    mledger = mrev / "findings.md"
+    saved_globals = (REVIEWS, LEDGER, TRANSITIONS)
+    globals()["REVIEWS"], globals()["LEDGER"], globals()["TRANSITIONS"] = \
+        mrev, mledger, mrev / "transitions.md"
+    import contextlib
+    import json as _json
+
+    def _run_main(argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                code = main(argv)
+            except SystemExit as exited:
+                code = f"exit:{exited.code}"
+        return code, out.getvalue(), err.getvalue()
+
+    try:
+        mfind, _mbad = collect()
+        mledger.write_text(render_ledger(mfind), encoding="utf-8")
+        code, out, _ = _run_main(["--check"])
+        if code != 0:
+            print(f"  FAIL  fixture green --check exited {code}: {out}")
+            failed += 1
+        mledger.write_text("stale\n", encoding="utf-8")
+        code, out, _ = _run_main(["--check"])
+        if code != 1 or "[FIND-003]" not in out:
+            print(f"  FAIL  stale ledger fired wrong: exit={code} {out!r}")
+            failed += 1
+        code, out, _ = _run_main(["--check", "--format", "json"])
+        try:
+            stale_doc = _json.loads(out)
+        except ValueError:
+            stale_doc = None
+        if (code != 1 or not isinstance(stale_doc, list)
+                or [sorted(d) for d in stale_doc]
+                != [["code", "line", "message", "path"]]
+                or stale_doc[0]["code"] != "FIND-003"
+                or stale_doc[0]["code"] not in DIAG.CODES):
+            print(f"  FAIL  stale JSON schema wrong: exit={code} {out!r}")
+            failed += 1
+        (mrev / "D00-T99-s2.md").write_text(
+            "# R\n\n### F1 -- x -- record -- FIXED\n", encoding="utf-8")
+        mfind2, _mbad2 = collect()
+        mledger.write_text(render_ledger(mfind2), encoding="utf-8")
+        code, out, _ = _run_main(["--check"])
+        if code != 1 or "[FIND-002]" not in out:
+            print(f"  FAIL  bad heading fired wrong: exit={code} {out!r}")
+            failed += 1
+        code, out, _ = _run_main(["--check", "--format", "json"])
+        try:
+            bad_doc = _json.loads(out)
+        except ValueError:
+            bad_doc = None
+        if (code != 1 or not isinstance(bad_doc, list) or not bad_doc
+                or any(sorted(d) != ["code", "line", "message", "path"]
+                       for d in bad_doc)
+                or bad_doc[0]["code"] != "FIND-002"):
+            print(f"  FAIL  malformed input JSON wrong: exit={code} {out!r}")
+            failed += 1
+        (mrev / "D00-T99-s2.md").unlink()
+        (mrev / "D00-T99-s1.md").write_text(
+            "# R\n\n### F1 -- x -- record -- WITHDRAWN (self) [minor]\n",
+            encoding="utf-8")
+        mfind3, _mbad3 = collect()
+        mledger.write_text(render_ledger(mfind3), encoding="utf-8")
+        code, out, _ = _run_main(["--check"])
+        if code != 1 or "[FIND-004]" not in out:
+            print(f"  FAIL  transition gap fired wrong: exit={code} {out!r}")
+            failed += 1
+        (mrev / "D00-T99-s1.md").write_text("# R\n\n" + clean, encoding="utf-8")
+        (mrev / "D00-T99-s2.md").write_text(
+            "# R\n\n### F1 -- x -- record -- FIXED\n", encoding="utf-8")
+        if mledger.is_file():
+            mledger.unlink()
+        code, out, _ = _run_main(["--write"])
+        if code != 1 or "[FIND-005]" not in out or mledger.is_file():
+            print(f"  FAIL  write refusal fired wrong: exit={code} {out!r}")
+            failed += 1
+        code, _, err = _run_main(["--bogus"])
+        if code != "exit:2" or "[FIND-001]" not in err:
+            print(f"  FAIL  usage fired wrong: {code} {err!r}")
+            failed += 1
+    finally:
+        globals()["REVIEWS"], globals()["LEDGER"], globals()["TRANSITIONS"] = \
+            saved_globals
+
     for x in (f, other, tmp / "D00-T10-s1.md", tmp / "D00-T10-s2.md",
               tmp / "D00-T10-s3.md", fpath):
         x.unlink()
+    import shutil
+    shutil.rmtree(mdir, ignore_errors=True)
     tmp.rmdir()
-    print(f"todo-findings self-test: 34 cases, {failed} failed")
+    print(f"todo-findings self-test: 45 cases, {failed} failed")
     return 1 if failed else 0
 
 
+class _CodedParser(argparse.ArgumentParser):
+    """Usage errors carry FIND-001: the synopsis stays bare help, the
+    error line is the refusal."""
+
+    def error(self, message):
+        self.print_usage(sys.stderr)
+        print(DIAG.emit("FIND-001", None, None, message), file=sys.stderr)
+        self.exit(2)
+
+
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(
+    ap = _CodedParser(
         prog="todo-findings",
         description="Report what review keeps finding, across every section.",
     )
@@ -876,12 +1056,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check", action="store_true",
                     help="fail if findings.md is stale, without rewriting it")
     ap.add_argument("--self-test", action="store_true", help="prove this script against a fixture")
+    ap.add_argument("--format", choices=("text", "json"), default="text",
+                    help="render refusals as text lines or one JSON array")
     args = ap.parse_args(argv)
 
     if args.self_test:
         return _self_test()
 
     findings, bad = collect()
+    json_mode = args.format == "json"
 
     if args.write or args.check:
         # Unreadable headings are named in EVERY mode. The first version printed
@@ -889,43 +1072,75 @@ def main(argv: list[str] | None = None) -> int:
         # unparsed findings missing and said nothing, and --check then printed
         # "ledger current" while exiting 1: a failure with no reason attached.
         # Found by the independent review of 43a299a.
-        _print_bad(bad)
+        if not json_mode:
+            _print_bad(bad)
         want = render_ledger(findings)
         have = LEDGER.read_text(encoding="utf-8") if LEDGER.is_file() else ""
         if args.check:
             if want != have:
-                print("todo-findings: docs/reviews/findings.md is stale -- "
-                      "run `python scripts/todo-findings.py --write`")
+                if json_mode:
+                    print(DIAG.dumps(
+                        _bad_items(bad) + [DIAG.refusal(
+                            "FIND-003", _rel(LEDGER), None,
+                            "ledger is stale -- run "
+                            "`python scripts/todo-findings.py --write`")]),
+                        end="")
+                else:
+                    print(DIAG.emit(
+                        "FIND-003", _rel(LEDGER), None,
+                        "ledger is stale -- run "
+                        "`python scripts/todo-findings.py --write`"))
                 return 1
             if bad:
-                print(f"todo-findings: ledger matches, but {len(bad)} heading(s) "
-                      "above are missing from it")
+                if json_mode:
+                    print(DIAG.dumps(_bad_items(bad)), end="")
+                else:
+                    print(DIAG.emit(
+                        "FIND-002", None, None,
+                        f"ledger matches, but {len(bad)} heading(s) "
+                        "above are missing from it"))
                 return 1
-            tproblems = check_transitions(findings)
+            tproblems = check_transitions(findings, TRANSITIONS)
             if tproblems:
-                print("  transitions incomplete, one line each:")
-                for p in tproblems:
-                    print(f"    {p}")
-                print()
+                if json_mode:
+                    print(DIAG.dumps(
+                        _transition_items(tproblems, TRANSITIONS)), end="")
+                else:
+                    _print_transitions(tproblems, TRANSITIONS)
                 return 1
-            print(f"todo-findings: ledger current, {len(findings)} finding(s), "
-                  "transitions complete")
+            if not json_mode:
+                print(f"todo-findings: ledger current, {len(findings)} finding(s), "
+                      "transitions complete")
+            else:
+                print(DIAG.dumps([]), end="")
             return 0
         if bad:
             # Refuse to publish a ledger known to be incomplete. Overwriting it
             # with whatever happened to parse makes the omission permanent and
             # invisible, which is the opposite of what this file is for.
-            print(f"todo-findings: refusing to write a ledger missing {len(bad)} "
-                  "finding(s). Fix the heading(s) above first.")
+            if json_mode:
+                print(DIAG.dumps(
+                    _bad_items(bad) + [DIAG.refusal(
+                        "FIND-005", _rel(LEDGER), None,
+                        f"refusing to write a ledger missing {len(bad)} "
+                        "finding(s)")]),
+                    end="")
+            else:
+                print(DIAG.emit(
+                    "FIND-005", _rel(LEDGER), None,
+                    f"refusing to write a ledger missing {len(bad)} "
+                    "finding(s). Fix the heading(s) above first."))
             return 1
         LEDGER.parent.mkdir(parents=True, exist_ok=True)
         LEDGER.write_text(want, encoding="utf-8", newline=chr(10))
-        print(f"todo-findings: wrote {LEDGER.relative_to(ROOT).as_posix()}, "
-              f"{len(findings)} finding(s)")
+        if not json_mode:
+            print(f"todo-findings: wrote {LEDGER.relative_to(ROOT).as_posix()}, "
+                  f"{len(findings)} finding(s)")
+        else:
+            print(DIAG.dumps([]), end="")
         return 0
 
-
-    return report(findings, bad)
+    return report(findings, bad, json_mode)
 
 
 if __name__ == "__main__":
