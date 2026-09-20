@@ -621,11 +621,13 @@ def check_stamp_output(text: str, manifest: tuple[str, str, str] | None = None) 
 
 def quote_manifest_name(name: str) -> str:
     """Escape one file name for the `diff-files` field: backslash, pipe,
-    and newline escape (spaces stay literal, git C-quote style), so
-    hostile names round-trip exactly (D00 T04 §21: adversarial names
-    weakened at the manifest boundary)."""
+    newline, space, tab, and CR escape (space as `\\s`: a literal space
+    would let a name ending `foo commits=deadbeef` parse as manifest
+    metadata), so hostile names round-trip exactly (D00 T04 §21: the
+    §21 independent review caught the lookalike-F7)."""
     return (name.replace("\\", "\\\\").replace("|", "\\|")
-                .replace("\n", "\\n"))
+                .replace("\n", "\\n").replace(" ", "\\s")
+                .replace("\t", "\\t").replace("\r", "\\r"))
 
 
 def split_manifest_names(field: str) -> list[str]:
@@ -633,7 +635,10 @@ def split_manifest_names(field: str) -> list[str]:
     name. Lenient on unknown escapes (`\\` plus anything unlisted keeps
     both chars), so legacy unquoted names carrying backslashes survive
     the read; the writer never emits a trailing lone backslash, and a
-    hand-made one keeps its backslash."""
+    hand-made one keeps its backslash. A pre-`\\s` unquoted name that
+    already carries a literal backslash-s reads wrong, but no manifest
+    is ever committed (review scratch only), so no legacy corpus
+    exists to corrupt; hand-made manifests avoid backslash-s."""
     names: list[str] = []
     cur: list[str] = []
     esc = False
@@ -641,6 +646,12 @@ def split_manifest_names(field: str) -> list[str]:
         if esc:
             if ch == "n":
                 cur.append("\n")
+            elif ch == "s":
+                cur.append(" ")
+            elif ch == "t":
+                cur.append("\t")
+            elif ch == "r":
+                cur.append("\r")
             elif ch in "\\|":
                 cur.append(ch)
             else:
@@ -667,9 +678,11 @@ def parse_manifest_diff_files(text: str) -> list[str]:
     fields strip from the END (`commits`, then the anchored `base`/
     `head` pair): a mid-value lookalike (`x base=y` inside a hostile
     name) can never match an end-anchored field, so the remainder is
-    the value whole. It then splits on unescaped pipes: quoted
-    emissions round-trip hostile names exactly, and legacy unquoted
-    values read as before."""
+    the value whole (and writer-emitted names carry no literal space
+    at all, so on review output the strips only ever match real
+    fields). It then splits on unescaped pipes: quoted emissions
+    round-trip hostile names exactly, and legacy unquoted values read
+    as before."""
     for line in text.splitlines():
         mm = MANIFEST_RE.match(line.strip())
         if mm:
@@ -818,6 +831,40 @@ def _diff_change_lines(diff_text: str) -> dict[str, "Counter[str]"]:
         if line.startswith("+"):
             per_file.setdefault(cur, Counter())[line] += 1
         elif line.startswith("-"):
+            per_file.setdefault(cur, Counter())[line] += 1
+    return per_file
+
+
+_SIGNAL_PREFIXES = ("old mode ", "new mode ", "new file mode ",
+                    "deleted file mode ", "similarity index ",
+                    "dissimilarity index ", "rename from ", "rename to ",
+                    "copy from ", "copy to ", "Binary files ")
+
+
+def _diff_signal_lines(diff_text: str) -> dict[str, "Counter[str]"]:
+    """Per-file block-marker multisets from unified diff text: the
+    mode, rename/copy, similarity, and binary markers a metadata-only
+    commit leaves (a pure rename, mode flip, or binary patch has no
+    +/- lines, so the content leg alone covers it vacuously: the §21
+    independent review caught the hole-F5). Attribution is the
+    block's b-side (`_diff_paths` last), deterministic on both
+    sides. The `diff --git` and `index` lines are NOT signals: a
+    range-diff chunk re-emits them per net block with net sides and
+    collapsed hashes, so per-commit values would false-fail on
+    contiguous ranges; mode/rename/binary markers survive range
+    diffs verbatim. Content lines can never collide: every +/-/space
+    body line starts with its prefix, never a bare marker."""
+    from collections import Counter
+    per_file: dict[str, Counter[str]] = {}
+    cur: str | None = None
+    for line in diff_text.splitlines():
+        if _DIFF_LINE_RE.match(line):
+            sides = _diff_paths(line)
+            cur = sides[-1] if sides else None
+            continue
+        if cur is None:
+            continue
+        if line.startswith(_SIGNAL_PREFIXES):
             per_file.setdefault(cur, Counter())[line] += 1
     return per_file
 
@@ -1015,15 +1062,20 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
     oid must resolve to a non-merge commit (a merge's resolution has
     no line decomposition the tool can verify, so it fails closed
     naming itself); each of its per-file +/- multisets must sit inside
-    the fenced diff chunks'. Failures name commit, file, and the first
-    uncovered line, bounded. Order-insensitive like the file leg: the
-    chunk may concatenate commits in any order."""
+    the fenced diff chunks', and so must its per-file block-marker
+    multisets (mode/rename/binary: the metadata-only shape the +/-
+    leg covers vacuously). Failures name commit, file, and the first
+    uncovered line or marker, bounded. Order-insensitive like the
+    file leg: the chunk may concatenate commits in any order."""
     from collections import Counter
     failures: list[str] = []
     chunk: dict[str, Counter[str]] = {}
+    chunk_signals: dict[str, Counter[str]] = {}
     for body in unfence_diff_bodies(body_text, tag):
         for path, counts in _diff_change_lines(body).items():
             chunk[path] = chunk.get(path, Counter()) + counts
+        for path, counts in _diff_signal_lines(body).items():
+            chunk_signals[path] = chunk_signals.get(path, Counter()) + counts
     for oid in commits:
         if not git_oid_exists(oid, cwd=cwd):
             failures.append(f"declared commit {oid} resolves to nothing")
@@ -1049,8 +1101,8 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
             detail = proc.stderr.decode("utf-8", "replace").strip()[:120]
             failures.append(f"declared commit {oid} unreadable: {detail}")
             continue
-        for path, counts in _diff_change_lines(
-                proc.stdout.decode("utf-8", "replace")).items():
+        patch_text = proc.stdout.decode("utf-8", "replace")
+        for path, counts in _diff_change_lines(patch_text).items():
             have = chunk.get(path)
             if have is None:
                 failures.append(
@@ -1062,6 +1114,18 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
                 failures.append(
                     f"declared commit {oid} leaves {sum(missing.values())} "
                     f"line(s) uncovered in {path} (e.g. {first!r})")
+        for path, counts in _diff_signal_lines(patch_text).items():
+            have = chunk_signals.get(path)
+            if have is None:
+                failures.append(
+                    f"declared commit {oid} marks {path}, absent from the chunk")
+                continue
+            missing = counts - have
+            if missing:
+                first = sorted(missing.elements())[0][:80]
+                failures.append(
+                    f"declared commit {oid} leaves {sum(missing.values())} "
+                    f"marker(s) uncovered in {path} (e.g. {first!r})")
     return failures
 
 
@@ -1241,6 +1305,18 @@ def git_diff_names(base: str, head: str, cwd=None):
     return subprocess.run(
         ["git", "--no-replace-objects", "diff", "--name-only", "-z",
          "--no-renames", base, head],
+        capture_output=True, check=False, cwd=cwd)
+
+
+def git_commit_names(oid: str, cwd=None):
+    """One commit's touched paths: NUL-delimited, no rename detection
+    (both sides list, matching the manifest's [old, new]), message
+    suppressed, replacement refs disabled. Returns the completed
+    process; raises OSError when git cannot spawn."""
+    import subprocess
+    return subprocess.run(
+        ["git", "--no-replace-objects", "show", "--format=",
+         "--name-only", "-z", "--no-renames", oid],
         capture_output=True, check=False, cwd=cwd)
 
 
@@ -1490,7 +1566,7 @@ def _self_test() -> int:
                "diff --git a/old.md b/new.md\n"
                "diff --git a/gone.md b/gone.md\n")
     mline3, _ = build_manifest(tag, [("CANDIDATE DIFF", grammar)], nonce=nonce)
-    for want in ("my file.md", "caf\u00e9.md", 'quo"te.md', "renamed.md",
+    for want in ("my\\sfile.md", "caf\u00e9.md", 'quo"te.md', "renamed.md",
                  "old.md", "new.md", "gone.md"):
         check(f"manifest-grammar-{want}", want in mline3, mline3)
     check("manifest-grammar-roundtrip",
@@ -1507,7 +1583,7 @@ def _self_test() -> int:
                "rename to new b/y.md\n")
     mline4, _ = build_manifest(tag, [("CANDIDATE DIFF", hostile)], nonce=nonce)
     check("manifest-rename-authoritative",
-          "diff-files=old b/x.md|new b/y.md" in mline4, mline4)
+          "diff-files=old\\sb/x.md|new\\sb/y.md" in mline4, mline4)
     check("manifest-rename-roundtrip",
           parse_manifest_diff_files(f"TAG {tag} nonce={nonce}\n{mline4}\n") == [
               "old b/x.md", "new b/y.md"],
@@ -1819,10 +1895,15 @@ def _self_test() -> int:
     check("identity-non-trailing-closed",
           parse_manifest_identity(mid_pair) == (None, None))
     hostile_names = ["a|b.md", "li\nne.md", "sp ace.md", "back\\slash.md",
-                     "x base=y.md"]
+                     "x base=y.md", "weird commits=deadbeef", "ta	b.md"]
     quoted = "|".join(quote_manifest_name(n) for n in hostile_names)
     check("manifest-quote-hostile-roundtrip",
           split_manifest_names(quoted) == hostile_names, quoted)
+    check("manifest-quote-space-form",
+          quote_manifest_name("sp ace.md") == "sp\\sace.md")
+    check("manifest-quote-no-literal-space",
+          " " not in quoted and "\t" not in quoted and "\r" not in quoted,
+          quoted)
     hostile_line = (f"TAG {tag} nonce={nonce}\n"
                     f"MANIFEST bytes=1 files=1 sha={'5' * 64} titles=X diff-files="
                     + quoted + " base=b0 head=h1\n")
@@ -1861,6 +1942,40 @@ def _self_test() -> int:
           _diff_change_lines(tricky) == {
               "t": _Counter({"--- x": 1, "+-- y": 1, "+++ z": 1})},
           str(_diff_change_lines(tricky)))
+    rename_block = ("diff --git a/o.md b/n.md\nsimilarity index 91% 100%\n"
+                    "rename from o.md\nrename to n.md\n"
+                    "--- a/o.md\n+++ b/n.md\n@@\n-old\n+new\n")
+    check("signal-lines-rename",
+          _diff_signal_lines(rename_block) == {
+              "n.md": _Counter({"similarity index 91% 100%": 1,
+                                "rename from o.md": 1,
+                                "rename to n.md": 1})},
+          str(_diff_signal_lines(rename_block)))
+    check("signal-lines-rename-changes",
+          _diff_change_lines(rename_block) == {
+              "n.md": _Counter({"-old": 1, "+new": 1})},
+          str(_diff_change_lines(rename_block)))
+    mode_block = ("diff --git a/f.md b/f.md\nold mode 100644\n"
+                  "new mode 100755\n")
+    check("signal-lines-mode",
+          _diff_signal_lines(mode_block) == {
+              "f.md": _Counter({"old mode 100644": 1,
+                                "new mode 100755": 1})},
+          str(_diff_signal_lines(mode_block)))
+    check("signal-lines-mode-no-changes",
+          _diff_change_lines(mode_block) == {},
+          str(_diff_change_lines(mode_block)))
+    bin_block = ("diff --git a/b.bin b/b.bin\n"
+                 "Binary files a/b.bin and b/b.bin differ\n")
+    check("signal-lines-binary",
+          _diff_signal_lines(bin_block) == {
+              "b.bin": _Counter(
+                  {"Binary files a/b.bin and b/b.bin differ": 1})},
+          str(_diff_signal_lines(bin_block)))
+    check("signal-lines-index-excluded",
+          _diff_signal_lines("diff --git a/f b/f\nindex aaa..bbb 100644\n"
+                             "--- a/f\n+++ b/f\n@@\n+x\n") == {},
+          "index and diff-git lines are not signals")
     stamp_man = ("STAMP-abc", "3" * 64, "4" * 16)
     good_receipt = f"RECEIPT sha={'3' * 64} end=STAMP-abc nonce={'4' * 16}\n"
     check("stamp-holds",
@@ -2034,6 +2149,34 @@ def _self_test() -> int:
         check("parents-kind-commit",
               git_object_type(r3, cwd=tmpd) == "commit"
               and git_object_type(rtree, cwd=tmpd) == "tree")
+        # The metadata-only shape (independent-review F5): a pure rename
+        # commit has no +/- lines, so only the marker leg can catch a
+        # chunk that drops it while another commit preserves the files.
+        # (Placed after the f.md legs: the rename moves that file.)
+        _git("checkout", "-q", "main")
+        _git("mv", "f.md", "g.md")
+        _git("commit", "-qm", "r5 rename")
+        r5 = _git("rev-parse", "HEAD").stdout.strip()
+        show5 = subprocess.run(
+            ["git", "--no-replace-objects", "show", "--format=", r5],
+            cwd=tmpd, capture_output=True, check=True, text=True).stdout
+        rtag, rnonce, rbody = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", show5)])
+        rcline, _ = build_manifest(rtag, [("CANDIDATE DIFF", show5)],
+                                   r3, r5, nonce=rnonce, commits=[r5])
+        rfenced = (f"TAG {rtag} nonce={rnonce}\n{rcline}\n{rbody}")
+        check("commits-rename-covered",
+              check_commits_covered([r5], rtag, rfenced, cwd=tmpd) == [])
+        mtag, mnonce, mbody = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", show2)])
+        mcline, _ = build_manifest(mtag, [("CANDIDATE DIFF", show2)],
+                                   r1, r2, nonce=mnonce, commits=[r5])
+        mfenced = (f"TAG {mtag} nonce={mnonce}\n{mcline}\n{mbody}")
+        rmissed = check_commits_covered([r5], mtag, mfenced, cwd=tmpd)
+        check("commits-rename-dropped-fails",
+              len(rmissed) == 1 and r5 in rmissed[0]
+              and "marks g.md" in rmissed[0],
+              str(rmissed))
         # Hostile fence paths (D00 T04 §21 item 16): spaces, non-ASCII,
         # and `=` inside TITLE=path read clean.
         hostile_dir = os.path.join(tmpd, "my dir", "café")
@@ -2141,6 +2284,69 @@ def _self_test() -> int:
         check("crosscheck-kind-cross",
               got.returncode == 1 and "is a commit, want tree" in got.stderr,
               f"exit={got.returncode} err={got.stderr!r}")
+        # The assembled shape (review fix F1): an excluded middle commit
+        # touches a file no declared commit touches, so the range diff
+        # reports `only in git` while the declared union agrees.
+        with open(os.path.join(tmpd, "qa.md"), "w", encoding="utf-8") as fh:
+            fh.write("a\n")
+        _git("add", "qa.md")
+        _git("commit", "-qm", "uA")
+        uA = _git("rev-parse", "HEAD").stdout.strip()
+        with open(os.path.join(tmpd, "qb.md"), "w", encoding="utf-8") as fh:
+            fh.write("b\n")
+        _git("add", "qb.md")
+        _git("commit", "-qm", "uB")
+        with open(os.path.join(tmpd, "qa.md"), "a", encoding="utf-8") as fh:
+            fh.write("a2\n")
+        _git("commit", "-qam", "uC")
+        uC = _git("rev-parse", "HEAD").stdout.strip()
+        uA_par = _git("rev-parse", f"{uA}^").stdout.strip()
+
+        def _show(oid):
+            return subprocess.run(
+                ["git", "--no-replace-objects", "show", "--format=", oid],
+                cwd=tmpd, capture_output=True, check=True, text=True).stdout
+
+        uchunk = _show(uA) + _show(uC)
+        utag, unonce, ubody = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", uchunk)])
+        ucline, _ = build_manifest(utag, [("CANDIDATE DIFF", uchunk)],
+                                   uA_par, uC, nonce=unonce, commits=[uA, uC])
+        uman = os.path.join(tmpd, "union-manifest.md")
+        ufen = os.path.join(tmpd, "union-fenced.md")
+        with open(uman, "w", encoding="utf-8") as fh:
+            fh.write(f"TAG {utag} nonce={unonce}\n{ucline}\n")
+        with open(ufen, "w", encoding="utf-8") as fh:
+            fh.write(f"TAG {utag} nonce={unonce}\n{ucline}\n{ubody}")
+        got = _cc(uman, uA_par, uC, "--body", ufen)
+        check("crosscheck-union-assembled",
+              got.returncode == 0 and "2 commit(s) covered" in got.stdout,
+              f"exit={got.returncode} out={got.stdout!r} err={got.stderr!r}")
+        # The same chunk fenced the legacy way: the range oracle sees
+        # the excluded commit's file and refuses, proving the union leg
+        # is what admits the assembly.
+        ltag2, lnonce2, _lbody2 = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", uchunk)])
+        lcline2, _ = build_manifest(ltag2, [("CANDIDATE DIFF", uchunk)],
+                                    uA_par, uC, nonce=lnonce2)
+        uman2 = os.path.join(tmpd, "union-legacy-manifest.md")
+        with open(uman2, "w", encoding="utf-8") as fh:
+            fh.write(f"TAG {ltag2} nonce={lnonce2}\n{lcline2}\n")
+        got = _cc(uman2, uA_par, uC)
+        check("crosscheck-union-range-diverges",
+              got.returncode == 1 and "only in git: qb.md" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+        bogus = "0" * 40
+        bcline, _ = build_manifest(utag, [("CANDIDATE DIFF", uchunk)],
+                                   uA_par, uC, nonce=unonce, commits=[bogus])
+        bman = os.path.join(tmpd, "union-bogus-manifest.md")
+        with open(bman, "w", encoding="utf-8") as fh:
+            fh.write(f"TAG {utag} nonce={unonce}\n{bcline}\n")
+        got = _cc(bman, uA_par, uC, "--body", ufen)
+        check("crosscheck-union-unresolvable",
+              got.returncode == 1
+              and f"declared commit {bogus} resolves to nothing" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
         # The schema-2 attest CLI (items 4, 5, 9): emit, read back,
         # mismatch, and replacement legs over the fixture repo.
         arunner = os.path.join(tmpd, "runner.out")
@@ -2224,8 +2430,19 @@ def _self_test() -> int:
             ("skill-kind-stamp", "--expect-head-kind tree"),
             ("skill-attest-v2", "--runner-output <panel output file>"),
             ("skill-attest-checker", "--checker-output $RUNDIR/check.out"),
-            ("skill-attest-findings", "--findings <findings path>")):
+            ("skill-attest-findings", "--findings <findings path>"),
+            ("skill-assembled-commits", "--commits <o1,o2,...>"),
+            ("skill-assembled-body", "--body $RUNDIR/fenced.md"),
+            ("skill-anchors-tool",
+             "python scripts/review_prompt.py check-anchors <todo-path> <section>"),
+            ("skill-findings-staged",
+             "git --no-replace-objects diff --quiet -- <findings path>")):
         check(pin, needle in skill_text, skill_path)
+    check("skill-attest-after-plan",
+          skill_text.index("### 8. Plan review")
+          < skill_text.index("### Attestation")
+          < skill_text.index("### 9. Write the stamp and flip the row"),
+          "attestation emits after the plan review, before the stamp")
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
@@ -2320,8 +2537,11 @@ if __name__ == "__main__":
     if len(sys.argv) >= 5 and sys.argv[1] == "cross-check":
         # cross-check <manifest-file> <base> <head> [--body <file>]
         #   [--expect-head-kind commit|tree]: git's own NUL file list for
-        # the range against the manifest's parsed diff-files. Divergence
-        # fails closed; run from the repository root. --no-renames lists
+        # the range against the manifest's parsed diff-files (or, when
+        # the manifest declares commits, the union of the declared
+        # commits' touched files: the span may hold voided commits the
+        # chunk excludes). Divergence fails closed; run from the
+        # repository root. --no-renames lists
         # both sides of a rename, matching the manifest's [old, new];
         # without it every valid rename diverges as
         # `only in manifest: <old>`. --body runs the content leg when the
@@ -2378,16 +2598,40 @@ if __name__ == "__main__":
                 print(f"cross-check: --head {sys.argv[4]} is a {actual}, "
                       f"want {expect_kind}", file=sys.stderr)
                 sys.exit(1)
-        try:
-            proc = git_diff_names(sys.argv[3], sys.argv[4])
-        except OSError as exc:
-            print(f"cross-check: git failed: {exc}", file=sys.stderr)
-            sys.exit(1)
-        if proc.returncode != 0:
-            detail = proc.stderr.decode("utf-8", "replace").strip()[:200]
-            print(f"cross-check: git diff refused the range: {detail}", file=sys.stderr)
-            sys.exit(1)
-        diverged = cross_check_files(parsed, proc.stdout)
+        if commits:
+            # Assembled candidates (D00 T04 §21 review fix F1): the span
+            # between the anchored base/head may hold voided commits the
+            # chunk deliberately excludes, so the range diff is the wrong
+            # oracle (it lists files no declared commit touches). The
+            # file leg compares against the union of the declared
+            # commits' own touched files instead; span merges are
+            # likewise irrelevant (nothing traverses the range).
+            union: set[str] = set()
+            for oid in commits:
+                try:
+                    cproc = git_commit_names(oid)
+                except OSError as exc:
+                    print(f"cross-check: git failed: {exc}", file=sys.stderr)
+                    sys.exit(1)
+                if cproc.returncode != 0:
+                    print(f"cross-check: declared commit {oid} resolves to "
+                          "nothing", file=sys.stderr)
+                    sys.exit(1)
+                union |= set(parse_nul_file_list(cproc.stdout))
+            git_side = "\0".join(sorted(union)).encode("utf-8")
+        else:
+            try:
+                proc = git_diff_names(sys.argv[3], sys.argv[4])
+            except OSError as exc:
+                print(f"cross-check: git failed: {exc}", file=sys.stderr)
+                sys.exit(1)
+            if proc.returncode != 0:
+                detail = proc.stderr.decode("utf-8", "replace").strip()[:200]
+                print(f"cross-check: git diff refused the range: {detail}",
+                      file=sys.stderr)
+                sys.exit(1)
+            git_side = proc.stdout
+        diverged = cross_check_files(parsed, git_side)
         if diverged:
             for line in diverged:
                 print(f"cross-check: {line}", file=sys.stderr)
