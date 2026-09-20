@@ -704,6 +704,7 @@ The §10 plan review accepted three minors the enriched records leave open: late
 **Test checkpoint:** The boundary reads in the header, voids consuming numbers read beside it, and provider reads defined; the coverage counts read in the report, and the evidence bindings resolve; the export asserts dispositions per ref with the live round-trip passing; a fresh round line resolves cost and latency; the report prints the revisit-trigger count; the §8 stamp round reads in the records; the independent pass reads under its own shape; gate evidence binds its commit and the 29-vs-24 delta reads explained; all quoted from driven runs. **Corrected 2026-09-20:** the checkpoint named eight legs and left the voids rule, the dispositions export, and the provider definition to their items alone; all eleven now read in the checkpoint.
 
 -> XREF: D00 T04 §10 -- the records this section tightens
+-> XREF: D00 T04 §18 -- the revisit trigger this section's query serves
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR3 D00-T04-S10-PR3
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR6 D00-T04-S10-PR6
 -> SOURCE: plan-D00-T04-s10-2026-09-19-PR10 D00-T04-S10-PR10
@@ -726,9 +727,10 @@ The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three
 - [ ] Reject conflicting `--report --export` flags with a usage error instead of silently printing the report. Done when: the combination fails naming the conflict, quoted, and each flag alone still works.
 - [ ] Emit only the version error for a wrong schema declaration, not a false "no schema declaration" beside it. Done when: `schema: 99` draws exactly one message, quoted.
 - [ ] Enforce the never-defect severity rule in the parser: a refuted, withdrawn, or duplicate finding carrying anything but minor fails the gate by name. Severity rates surviving contribution, not alleged impact: a duplicate of a critical is minor because it contributes nothing new. Done when: `REFUTED (self) [critical]` is reported naming the rule, quoted, the SEVERITIES comment states the semantic, and the live ledger still passes.
+- [ ] Record the §15 stamp round: the §15 review's stamp round postdates the stamp commit it reviews, so it records here with `provenance: reconstructed`, following the §8 precedent (§15 item 9). Done when: the S15 block carries the stamp round (outcome `stamp`, purpose `stamp-review`, candidate the §15 stamp commit, model/effort/cost/latency per the s15 Stamp review section) quoted, the panel mapping still spans panel rounds only, and `--check` passes. Cheaper substitute that fails the checkpoint: leaving the STAMP HOLDS verdict to the review file alone, which is the gap §15 item 9 exists to close.
 - [ ] Commit: `"workspace: blinded-run checker defects"`
 
-**Test checkpoint:** The duplicate, the flag conflict, and the double message are each quoted from driven runs; a never-defect carrying major or critical fails naming the rule; the self-tests cover all four refusals.
+**Test checkpoint:** The duplicate, the flag conflict, and the double message are each quoted from driven runs; a never-defect carrying major or critical fails naming the rule; the self-tests cover all four refusals; the §15 stamp round reads in the S15 block quoted.
 
 -> XREF: D00 T04 §8 -- the blinded runs that found these
 -> SOURCE: blind-D00-T04-s8-2026-09-19-OA3 D00-T04-S8-B2
@@ -737,6 +739,7 @@ The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three
 -> SOURCE: panel-D00-T04-s8-2026-09-19 D00-T04-S8-F1
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR18 D00-T04-S8-PR18
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR19 D00-T04-S8-PR19
+-> SOURCE: self-2026-09-20-s15-stamp-round
 
 ## 17. Report Without Walking the Corpus Twice
 
@@ -767,6 +770,7 @@ D00 T04 §8 kept both models on a value margin (79 vs 31) computed from severiti
 
 **Test checkpoint:** The window counts five new panel sections by query; no severity in it is decider-attested; the cut rule reads from fresh exports with Jaccard measured; the decision cites the export and names the next trigger. Blocked on the trigger until it is met, explicitly.
 
+-> XREF: D00 T04 §15 -- the revisit-trigger query this trigger reads
 -> SOURCE: panel-D00-T04-s8-2026-09-19-signoff D00-T04-S8-F10
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR4 D00-T04-S8-PR4
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR5 D00-T04-S8-PR5
@@ -803,19 +807,23 @@ A `[x]` row with an open checklist reads as done while work remains, which is th
 
 ## 20. Review-Tooling Operability Follow-Ups
 
-Two §12-review findings about the review machinery itself: the skill's fence commands do not run on the project's Windows machine, and three script self-tests run nowhere in the gate set. Both are small, both lack an owner, and neither blocks §12, whose review proceeds with an in-session workaround (cygpath-translated fence paths) and manual self-test runs. A §13 sweep adds a third: the `graph self-test` gate fails on a pre-existing stderr hint while the suite itself passes.
+Two §12-review findings about the review machinery itself: the skill's fence commands do not run on the project's Windows machine, and three script self-tests run nowhere in the gate set. Both are small, both lack an owner, and neither blocks §12, whose review proceeds with an in-session workaround (cygpath-translated fence paths) and manual self-test runs. A §13 sweep adds a third: the `graph self-test` gate fails on a pre-existing stderr hint while the suite itself passes. A §15 sweep adds two more: comparable cost accounting with Claude capture, and the candidate check's git-failure guard.
 
 - [ ] Run every fence block in `review-todo-section` on Windows: the panel, plan-review, stamp, and architecture prompts. Done when: each block's `fence TITLE=path` arguments reach Windows python as Windows paths (MSYS2 converts bare path arguments but not paths embedded in `TITLE=path`, so python resolves Git Bash `/tmp` to the wrong place and fence exits 2 with `cannot read`), quoted from driven runs of all four blocks on this machine, and the skill carries the working form. Cheaper substitute that fails the checkpoint: documenting the workaround in chat, which the next review will not read.
 - [ ] Gate the three ungated self-tests in `scripts/check-all.ps1`: `review_prompt --self-test` (66 cases, measured in the §12 review), `todo-findings --self-test` (29 cases per its source), and `todo-runs --self-test` (counted at implementation). Done when: check-all runs all three with a named gate each, a deliberately broken case in each fails its gate quoted, and the sweep reports the new gates green. (`todo-graph`, `todo-claims`, and `profile-check` self-tests are already gated; `todo-adjacency` and `todo-validate` carry no self-test. Measured 2026-09-20.)
 - [ ] Quiet the `graph self-test` gate's stderr failure: the suite passes (exit 0, cases green) but the rules-16-25 probe leg redirects stdout only, so the fixture's baseline hint reaches stderr and check-all's `Stop` preference fails the gate (bisected: reproduces identically at `ef362d6` in its own workdir, so it predates §13). Done when: the leg redirects both streams like every sibling leg (or the gate tolerates the hinted-but-green shape), `check-all` reports the gate green quoted, and the suite count is unchanged. Cheaper substitute that fails the checkpoint: deleting the hint, which other flows rely on.
+- [ ] Define comparable cost accounting and capture Claude costs: `cost` is an aggregate token counter with no input/output/cache/reasoning semantics, so cross-runner value-per-cost compares unlike quantities, and Claude rounds read `unresolved` for lack of telemetry. Done when: the header defines the cost sum (which token classes count, settling the cache policy S10-PR2 deferred until the first recorded cost); the codex `tokens used` figure's composition is determined by drive and classified under the sum; Claude usage is captured from `--output-format json` (probed 2026-09-20: full `usage` block with input/output/cache tokens) with check-panel reading the verdicts from the json envelope, self-test pinned; a Claude round records resolved cost quoted from a driven round; and the coverage report reads both runners. Cheaper substitute that fails the checkpoint: summing json totals beside opaque codex figures, which is the unlike-quantities gap restated.
+- [ ] Report git failure from `check_candidates` instead of crashing: the §15 sign-off advisory guarded the two new resolvers but left the pre-existing candidate check unguarded, so a missing git or an expired timeout propagates a traceback out of `--check`. Done when: the check returns False on `(OSError, subprocess.SubprocessError)` like its siblings, a driven git-failure run reports the candidate problem quoted instead of tracing, and the self-test pins the guarded shape. Cheaper substitute that fails the checkpoint: guarding without the driven failure, which repeats the untested-gate error.
 - [ ] Commit: `"workspace: review-tooling operability follow-ups"`
 
-**Test checkpoint:** All four skill fence blocks run green on Windows, quoted; check-all reports the three new self-test gates green, quoted; a broken case in each fails its gate, quoted; the self-test gate reports green with the suite count unchanged, quoted.
+**Test checkpoint:** All four skill fence blocks run green on Windows, quoted; check-all reports the three new self-test gates green, quoted; a broken case in each fails its gate, quoted; the self-test gate reports green with the suite count unchanged, quoted; the cost sum defines its token classes with Claude costs captured quoted; git failure reports from the candidate check quoted.
 
 -> XREF: D00 T04 §12 -- the review that found these; the fence fix corrects §12-era skill commands
 -> SOURCE: self-2026-09-20-fence-paths
 -> SOURCE: self-2026-09-20-ungated-selftests
 -> SOURCE: self-2026-09-20-selftest-stderr
+-> SOURCE: plan-D00-T04-s15-2026-09-20-PR7 D00-T04-S15-PR7
+-> SOURCE: panel-D00-T04-s15-2026-09-20 D00-T04-S15-F5
 
 ## 21. Review-Input Integrity Hardening
 
