@@ -4,15 +4,15 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**203 findings across 29 sections.**
+**209 findings across 30 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 66 | the plan or the evidence misdescribes what happened |
+| `record` | 69 | the plan or the evidence misdescribes what happened |
+| `correctness` | 39 | the code does the wrong thing |
 | `adversarial` | 38 | fails under hostile or unexpected input |
-| `correctness` | 36 | the code does the wrong thing |
 | `consistency` | 32 | disagrees with the rest of the suite, its naming, or its layout |
 | `integration` | 17 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 96 | wrong behavior in code, plan, or record |
-| `minor` | 101 | polish or wording, or no surviving defect |
+| `major` | 98 | wrong behavior in code, plan, or record |
+| `minor` | 105 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -174,6 +174,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §13` | F9 | minor | `record` | fixed | independent | false show rationale recorded as fact |
 | `D00 T04 §13` | F10 | major | `adversarial` | filed | independent | stamp patch reads through replacement |
 | `D00 T04 §13` | F11 | minor | `consistency` | filed | independent | page-coverage sentence overstates again |
+| `D00 T04 §15` | F1 | major | `correctness` | fixed | independent | as-of bound the runs file while dispositions floated from the live ledger |
+| `D00 T04 §15` | F2 | minor | `record` | fixed | independent | skill called unmeasured cost untimed and claimed unpersisted values complete |
+| `D00 T04 §15` | F3 | major | `correctness` | fixed | independent | check-export blessed fabricated as-of bindings on syntax alone |
+| `D00 T04 §15` | F4 | minor | `record` | fixed | independent | fresh-round proof quoted values no committed line carried |
+| `D00 T04 §15` | F5 | minor | `correctness` | fixed | independent | git resolvers crashed instead of reporting when git failed |
+| `D00 T04 §15` | F6 | minor | `record` | fixed | independent | checkpoint leg unverifiable from the tree until the stamp writes the block |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |
