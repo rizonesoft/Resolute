@@ -112,7 +112,7 @@ def main():
               f"value/token {vpc_tok}")
     for section in WINDOW:
         print(f"{section} full-scope value by rung: "
-              f"sol {per_section[section]['sol'] or [0]}, "
+              f"sol {per_section[section]['sol'] or 'no full-scope round'}, "
               f"opus {per_section[section]['opus'] or 'no full-scope round'}")
     # Crossover Jaccard (adjudicated): Sol 0 finds, Opus O1/O2/O3 accepted,
     # zero same-defect pairs (nothing to pair). Union 3, intersection 0.
