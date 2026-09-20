@@ -78,6 +78,7 @@ track: W1
 |  19   |   §19   | No partial flips                            | --      |  [ ]   |
 |  20   |   §20   | Review-tooling operability follow-ups       | §12     |  [ ]   |
 |  21   |   §21   | Review-input integrity hardening            | §12     |  [ ]   |
+|  22   |   §22   | Checker diagnostic codes and structured errors | §16  |  [ ]   |
 
 ---
 
@@ -775,13 +776,15 @@ D00 T04 §8 kept both models on a value margin (79 vs 31) computed from severiti
 - [ ] Close the cut-rule holes before applying it: directional tie-handling when overlap is high (which rung the trailing clause names on ties, with the margin), and minimum activation (how many blinded comparisons over how diverse a candidate set before the overlap leg can cut). Done when: both rules are stated with worked ties, quoted.
 - [ ] Mark the §6 provisional cut rule superseded with a pointer to §8, so one threshold is authoritative (post-stamp prose pointer, following the §1 "Updated by §5" precedent; checklist and stamp untouched). Done when: the §6 rule carries the pointer and no second threshold reads as live.
 - [ ] Render the decision inputs as a compact dashboard: matched unique weighted value, cost, latency, outcomes, and confidence by model and candidate class. Done when: the next decision reads the dashboard rather than bespoke prose.
+- [ ] Rotate the panel's first rung and schedule periodic shared-input rounds: Sol always reviews first at full scope while Opus signs off on fixed candidates, so the cut legs accumulate incomparable evidence and §8's comparability gap recurs within the new window. Done when: the revisit states the first-rung rotation across the window's sections (or the reason one rung stays first) and the schedule of blinded shared-input rounds feeding both cut legs, quoted. Cheaper substitute that fails the checkpoint: the single crossover comparison alone, which measures one candidate rather than accumulating comparable legs.
 - [ ] Commit: `"workspace: second two-model revisit, independently rated"`
 
-**Test checkpoint:** The window counts five new panel sections by query; no severity in it is decider-attested; the cut rule reads from fresh exports with Jaccard measured; the decision cites the export and names the next trigger. Blocked on the trigger until it is met, explicitly.
+**Test checkpoint:** The window counts five new panel sections by query; no severity in it is decider-attested; the cut rule reads from fresh exports with Jaccard measured; the decision cites the export and names the next trigger; the first-rung rotation and shared-input schedule read quoted. Blocked on the trigger until it is met, explicitly.
 
 -> XREF: D00 T04 §15 -- the revisit-trigger query this trigger reads
 -> SOURCE: panel-D00-T04-s8-2026-09-19-signoff D00-T04-S8-F10
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR4 D00-T04-S8-PR4
+-> SOURCE: plan-D00-T04-s16-2026-09-20-PR12 D00-T04-S16-PR12
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR5 D00-T04-S8-PR5
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR6 D00-T04-S8-PR6
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR7 D00-T04-S8-PR7
@@ -876,6 +879,20 @@ Two §12 sign-off findings ask for stronger machinery than §12's contract: the 
 -> SOURCE: plan-D00-T04-s13-2026-09-20-PR13 D00-T04-S13-PR13
 -> SOURCE: plan-D00-T04-s13-2026-09-20-PR14 D00-T04-S13-PR14
 -> SOURCE: plan-D00-T04-s13-2026-09-20-PR15 D00-T04-S13-PR15
+
+## 22. Checker Diagnostic Codes and Structured Errors
+
+The §16 plan review found the checkers speak human text only: every refusal is a line-numbered English message with no stable code, so IDE, CI, and dashboard consumers must string-match prose that edits like §16's own "exactly one" to "at most one" can move. It also found CLI exit codes pinned for just one refusal family (the runs flag conflict, exit 2) while parse-level refusals surface through gate exits nothing drives. Both are new surface on the §16 refusal families, neither blocks §16. (Depends On §16 carries the relation; no XREF lines, so this filing touches no stamped-or-stamping section.)
+
+- [ ] Assign a stable diagnostic code to every refusal family across `todo-findings.py` and `todo-runs.py`, carried beside the line-numbered message. Done when: each family's message fires with its code quoted from a drive, the code list lives in exactly one documented place, and an unlisted code fails closed quoted. Cheaper substitute that fails the checkpoint: codes on the §16 families only, which leaves the next consumer matching prose again.
+- [ ] Emit refusals in a structured machine-readable form for CI, IDE, and dashboard consumption without string matching. Done when: both checkers offer the structured form quoted (code, path, line, message at minimum), and the self-test pins its schema plus one malformed-input leg. Cheaper substitute that fails the checkpoint: the human text with codes prepended, which is still prose to a parser.
+- [ ] Pin the CLI exit code of every refusal family through `main()`: usage errors exit 2, problem reports exit 1, green runs exit 0. Done when: each family maps to its documented exit by a main-level drive quoted, and the live green runs of both checkers still exit 0 quoted. Cheaper substitute that fails the checkpoint: message-text pins alone, which is the gap PR11 names.
+- [ ] Commit: `"workspace: checker diagnostic codes and structured errors"`
+
+**Test checkpoint:** Every refusal family fires its code quoted; the structured form validates quoted with its malformed leg; every family's exit is pinned by a main-level drive quoted; both live checkers exit 0 quoted.
+
+-> SOURCE: plan-D00-T04-s16-2026-09-20-PR16 D00-T04-S16-PR16
+-> SOURCE: plan-D00-T04-s16-2026-09-20-PR11 D00-T04-S16-PR11
 
 ## Verification
 
