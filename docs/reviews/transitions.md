@@ -97,3 +97,19 @@ to: duplicate
 why: "Round-2 R restates F4 a third time (independent F4, round-1 A2): a forged PASS still attests while item 4's Done reads complete. The Done names the residual and its owner since R1; the item's letter is met and run-witnessing is the filed strengthening. No new defect."
 evidence: "Same checker-evidence gap as D00-T04-S21-F4", recorded as duplicate of F4; the §24 item owns run-witnessing.
 as-of: 4be7d03
+
+transition: D00-T04-S21-F17
+date: 2026-09-20
+from: raised
+to: refuted
+why: "Honest flows cannot produce it (fence titles are skill-fixed keys; paths never enter `titles=`); a forger who can inject titles can forge `commits=` directly, gaining no privilege; garbage claims fail closed downstream (unresolvable or uncovered, exit 1). No exploitable defect."
+evidence: "a forger who can inject titles can forge `commits=` directly, gaining no privilege", quoted from the F17 record; mechanics confirmed, conclusion refuted.
+as-of: 26e0612e
+
+transition: D00-T04-S21-F18
+date: 2026-09-20
+from: raised
+to: duplicate
+why: "Round-3 A2 restates F4 a fourth time. The panel acknowledges the D00 T04 §24 filing and asks for more; the §24 item owns run-witnessing. No new defect."
+evidence: "Same checker-evidence gap as D00-T04-S21-F4", recorded as duplicate of F4.
+as-of: 26e0612e
