@@ -418,6 +418,19 @@ class Todo:
     malformed_stamps: list[tuple[int, str]] = field(default_factory=list)
 
 
+def checklist_state(stripped: str) -> bool | None:
+    """Checked state of a checklist opener, None for anything else.
+
+    One shape for the parser and the partial-flip rule (D00 T04 §19):
+    two copies would drift back into fixed bugs. Lowercase `x` only,
+    matching the parser's long-standing reading; uppercase `[X]` reads
+    open in both, deliberately unchanged here.
+    """
+    if not (stripped.startswith("- [") and len(stripped) > 4 and stripped[4] == "]"):
+        return None
+    return stripped[3] == "x"
+
+
 def parse_todo(path: Path) -> Todo:
     try:
         rel = path.relative_to(REPO).as_posix()
@@ -637,16 +650,16 @@ def parse_todo(path: Path) -> Todo:
 
         if current is not None:
             st = line.strip()
-            if st.startswith("- [") and len(st) > 4 and st[4] == "]":
+            state = checklist_state(st)
+            if state is not None:
                 current.items_total += 1
-                done = st[3] == "x"
-                if done:
+                if state:
                     current.items_done += 1
-                current.items.append((done, st[5:].strip()))
+                current.items.append((state, st[5:].strip()))
                 low = st.lower()
                 if "commit:" in low:
                     current.has_commit_item = True
-                    if done:
+                    if state:
                         current.commit_done = True
             if "**Test checkpoint:**" in line:
                 current.has_test_checkpoint = True
@@ -6898,6 +6911,10 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
         check("partial-flip: Commit without colon fails", pf_fires(17, "not the bookkeeping shape"), True)
         check("partial-flip: mixed owners fail on the ghost", pf_fires(18, "resolves to nothing"), True)
         check("partial-flip: XREF past a header is unattached", pf_fires(20, "naming no owner"), True)
+        check("checklist_state: open reads False", checklist_state("- [ ] x"), False)
+        check("checklist_state: ticked reads True", checklist_state("- [x] x"), True)
+        check("checklist_state: uppercase X reads open", checklist_state("- [X] x"), False)
+        check("checklist_state: prose reads None", checklist_state("just prose"), None)
 
         # The partial-flip fixtures fire FATAL by design: remove them now so
         # the frozen, ratchet, sync, and plan-health legs below read the tree

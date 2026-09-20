@@ -101,12 +101,6 @@ def validate(graph, _args) -> int:
     deferred_mark_re = re.compile(r"\bdeferred\b", re.IGNORECASE)
     header_re = re.compile(r"#{1,6}(?:\s|$)")
 
-    def is_item_line(stripped: str) -> bool:
-        # The parser's item shape exactly (parse_todo): a `- [ ]` or
-        # `- [x]` opener. Mirrored, not imported, because the parser
-        # inlines it; any drift breaks the self-test twins that pin it.
-        return stripped.startswith("- [") and len(stripped) > 4 and stripped[4] == "]"
-
     def span_lines(path: str, sec_line: int) -> list[str] | None:
         """Stripped, stamp-cut body lines of one section span, or None.
 
@@ -149,7 +143,8 @@ def validate(graph, _args) -> int:
             return
         for i, ln in enumerate(span):
             st = ln.strip()
-            if not is_item_line(st) or st[3] == "x":
+            state = graph.checklist_state(st)
+            if state is None or state:
                 continue
             text = st[5:].strip()
             where = f"{todo.path}:{sec.line}: §{s_num}"
@@ -177,7 +172,7 @@ def validate(graph, _args) -> int:
             block = [ln]
             for cont in span[i + 1 :]:
                 cst = cont.strip()
-                if not cst or is_item_line(cst) or header_re.match(cst):
+                if not cst or graph.checklist_state(cst) is not None or header_re.match(cst):
                     break
                 block.append(cont)
             owners = [
