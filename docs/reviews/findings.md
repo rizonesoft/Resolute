@@ -4,13 +4,13 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**212 findings across 31 sections.**
+**214 findings across 32 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 71 | the plan or the evidence misdescribes what happened |
+| `record` | 73 | the plan or the evidence misdescribes what happened |
 | `correctness` | 39 | the code does the wrong thing |
 | `adversarial` | 38 | fails under hostile or unexpected input |
 | `consistency` | 33 | disagrees with the rest of the suite, its naming, or its layout |
@@ -27,7 +27,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
 | `major` | 99 | wrong behavior in code, plan, or record |
-| `minor` | 107 | polish or wording, or no surviving defect |
+| `minor` | 109 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -183,6 +183,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §16` | F1 | minor | `consistency` | filed | independent | section 8 CRUD still states the never-defect rule unenforced |
 | `D00 T04 §16` | F2 | major | `record` | filed | independent | reconstructed stamp-round figures have no committed source |
 | `D00 T04 §16` | F3 | minor | `record` | duplicate | independent | Done notes quote bare counts without as-of binding |
+| `D00 T04 §17` | F1 | minor | `record` | fixed | independent | Done note claims byte-identity while the as-of lines differ |
+| `D00 T04 §17` | F2 | minor | `record` | refuted | independent | ship subject appends the section ref parenthetical |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |

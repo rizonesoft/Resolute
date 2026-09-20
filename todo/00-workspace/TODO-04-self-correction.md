@@ -73,7 +73,7 @@ track: W1
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [x]   |
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [x]   |
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [x]   |
-|  17   |   §17   | Report without walking the corpus twice       | §10     |  [ ]   |
+|  17   |   §17   | Report without walking the corpus twice       | §10     |  [x]   |
 |  18   |   §18   | Second two-model revisit, independently rated | §8      |  [ ]   |
 |  19   |   §19   | No partial flips                            | --      |  [ ]   |
 |  20   |   §20   | Review-tooling operability follow-ups       | §12     |  [ ]   |
@@ -772,6 +772,13 @@ The §8 diversity runs found `report()` calls `TF.collect()` after `run_check()`
 -> SOURCE: plan-D00-T04-s8-2026-09-19-PR20 D00-T04-S8-PR20
 
 > **Started:** 2026-09-20T04:50:19Z
+
+> **Verified:** 2026-09-20 | §17 | `main()` collects once and threads the collection through `run_check` and `report`, collapsing three corpus walks into one · the report is byte-identical past the as-of clock line (`cmp` silent, same commit `deb947a`) · `--check` byte-identical and `--export` identical past its timestamp, all exits 0 · pin `report-single-collection` red before at 3 collects, green after, suite 68 green · plan corrected in place (triple walk, 36 files) · independent review clean · panel: Sol round 1 all approve, round 2 one record finding fixed (F1 byte-identity measure) plus one refuted (F2 subject parenthetical, convention), Opus sign-off 3 all approve · plan review: 22 findings, 0 filed, 0 accepted, 10 rejected, 12 duplicate
+> **Review:** round 3 Opus sign-off, candidates `ef4160f` `0cffc14` -- `adversarial` approve · `consistency` approve · `integration` approve · `record` approve after fix-loop (F1 fixed, F2 refuted) · `source-defect`/`design` not owed. Independent: `codex review --commit ef4160f` (gpt-5.6-sol, high) clean. Raw findings: docs/reviews/00-workspace/D00-T04-s17.md Attestation: docs/reviews/00-workspace/D00-T04-s17.attest.json
+> **Plan review:** gpt (run 20260920-D00-T04-S17-gpt) -- no filings; 10 rejected and 12 duplicate with reasons in the ledger
+> **CRUD:** this section threads one `TF.collect()` through the check and the report, collapsing `report()`'s two internal collects into the shared override. It reads the runs file, the review corpus, and git history. The behavioral surface it changes is nothing observable: `--report`, `--check`, and `--export` outputs are byte-identical past the per-run as-of clock, proven by before/after capture. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-20T04:50:19Z to 2026-09-20T05:11:54Z
+> **Implementer:** Muse Code
 
 ## 18. Second Two-Model Revisit, Independently Rated
 

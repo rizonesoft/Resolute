@@ -314,3 +314,13 @@ round: 2 model: gpt-5.6-sol effort: medium outcome: empty candidate: 513a487 pro
 round: 3 model: opus effort: medium outcome: findings candidate: 513a487 provider: anthropic version: unresolved cost: unresolved latency: 157s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S16-F1, D00-T04-S16-F2, D00-T04-S16-F3
 empty: 2
 refuted: 0
+run: D00-T04-S17
+date: 2026-09-20
+runner: panel
+rounds: 4
+round: 1 model: gpt-5.6-sol effort: medium outcome: empty candidate: ef4160f provider: openai version: gpt-5.6-sol cost: 15515tokens latency: 30s opportunity: full-scope purpose: section-review provenance: recorded findings:
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: ef4160f provider: openai version: gpt-5.6-sol cost: 15395tokens latency: 35s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S17-F1, D00-T04-S17-F2
+round: 3 model: opus effort: medium outcome: empty candidate: 0cffc14 provider: anthropic version: unresolved cost: unresolved latency: 40s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings:
+round: 4 model: gpt-5.6-sol effort: high outcome: independent candidate: ef4160f provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings:
+empty: 2
+refuted: 1

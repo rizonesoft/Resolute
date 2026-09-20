@@ -65,3 +65,11 @@ to: duplicate
 why: "The §16 Done evidence reintroduces it", the bare-counts pattern S15-PR4 already decided: Done notes quote candidate-time drives, bound outputs ride the stamp's Live proof.
 evidence: "placeholders mark pre-commit unknowns honestly; exact bound outputs ride the stamp's Live proof", quoted from the S15-PR4 ledger row in docs/reviews/00-workspace/D00-T04-s15.md; the §16 instance matches the decided shape, so the rejection stands as the rule.
 as-of: 6002a21
+
+transition: D00-T04-S17-F2
+date: 2026-09-20
+from: raised
+to: refuted
+why: "The item's quoted string is the message core; the parenthetical is the section address": every section ship commit appends the ref parenthetical, so the appended ` (D00 T04 §17)` follows convention rather than breaking the item.
+evidence: "`c33cb6e` 'workspace: blinded-run checker defects (D00 T04 §16)'" and "`d0b5690` 'workspace: run-record vocabulary and evidence follow-ups (D00 T04 §15)'", quoted from the commit subjects; no panel has flagged the shape.
+as-of: 0cffc14
