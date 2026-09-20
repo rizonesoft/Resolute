@@ -937,8 +937,26 @@ def git_resolve_oid(oid: str, cwd=None) -> str | None:
 _ANCHOR_TICK_RE = re.compile(r"`(?P<body>[^`]+)`")
 _ANCHOR_OID_RE = re.compile(r"\A[0-9a-f]{7,40}\Z")
 _ANCHOR_RANGE_RE = re.compile(r"\A([0-9a-f]{7,40})\.\.([0-9a-f]{7,40})\Z")
-_ANCHOR_PATHLINE_RE = re.compile(r"\A(?P<path>[\w./-]+\.\w+):(?P<first>\d+)(?:-(?P<last>\d+))?\Z")
-_ANCHOR_PATH_RE = re.compile(r"\A[\w./-]+\.(?:md|py|ps1|json)\Z")
+_ANCHOR_PATHLINE_RE = re.compile(
+    r"\A(?P<path>[^`:=|*?\[\]]+?\.(?=\w*[A-Za-z])\w+)"
+    r":(?P<first>\d+)(?:-(?P<last>\d+))?\Z")
+_ANCHOR_PATH_RE = re.compile(
+    r"\A(?P<path>[^`:=|*?\[\] ]+?\.(?:md|py|ps1|json|sh|au3|txt|yml|yaml|toml))\Z")
+_ANCHOR_SPACED_PATH_RE = re.compile(
+    r"\A[^`:=|*?\[\]]+?\.(?:md|py|ps1|json|sh|au3|txt|yml|yaml|toml)\Z")
+_ANCHOR_MID_DOTTED_RE = re.compile(r" \S*\.\w+ ")
+_ANCHOR_REL_PREFIX_RE = re.compile(r"\A(?:\./|\.\./|\.\\|\.\.\\|/|~/)")
+
+
+def _anchor_root_ok(span: str, topdirs: set[str]) -> bool:
+    """Whether a slashed cite starts where cites start: an explicit
+    relative or absolute prefix, or a live top-level directory.
+    Anything else is a command (`pwsh scripts/...`), not a cite, and
+    skips (round-2 I: the sweep's command spans must not flag)."""
+    if _ANCHOR_REL_PREFIX_RE.match(span) is not None:
+        return True
+    first = re.split(r"[\\/]", span, maxsplit=1)[0]
+    return first in topdirs
 _ANCHOR_FULLREF_RE = re.compile(r"D(?P<dom>\d\d)\s+T(?P<todo>\d\d)\s+§(?P<sec>\d+)")
 _ANCHOR_BAREREF_RE = re.compile(r"(?<![\wT])§(?P<sec>\d+)")
 _ANCHOR_SECTION_RE = re.compile(r"^##\s+(?P<num>\d+)\.")
@@ -1000,9 +1018,16 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
     stays as the semantic backstop). Oids resolve only on Review
     lines: Verified evidence quotes version dates (`20251216`), report
     shas, and external commits no same-repo gate may judge. Path:line
-    cites resolve file plus range; bare `§N` resolves in-file; full
-    D-refs resolve dir, file, and heading. Failures name file, stamp
-    line, and the dead anchor."""
+    cites resolve file plus range (round-2 I: spaced paths resolve,
+    with `=|*?[]` spans, unrooted slashes, and mid-list shapes
+    skipping as prose). Bare path cites check-or-fire when
+    slash-free and spaceless; slashed spans root-gate (repo roots
+    and relative prefixes check, commands skip); bare spaced spans
+    verify when they resolve and stay silent otherwise (a bare
+    spaced span that resolves to nothing is prose-shaped as often
+    as it is a dead cite: documented recall limit). Bare `§N`
+    resolves in-file; full D-refs resolve dir, file, and heading.
+    Failures name file, stamp line, and the dead anchor."""
     import os
     failures: list[str] = []
     try:
@@ -1010,6 +1035,11 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
             todo_text = fh.read()
     except OSError as exc:
         return [f"{todo_path}: cannot read: {exc}"]
+    try:
+        topdirs = {d for d in os.listdir(".")
+                   if os.path.isdir(os.path.join(".", d))}
+    except OSError as exc:
+        return [f"{todo_path}: cannot list repo root: {exc}"]
     for lineno, kind, body in _stamp_anchor_lines(todo_text, section):
         where = f"{todo_path}:{lineno}"
         if kind == "Review":
@@ -1028,9 +1058,14 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
             span = tick.group("body")
             pm = _ANCHOR_PATHLINE_RE.match(span)
             if pm is not None:
+                if ("/" in span or "\\" in span) \
+                        and not _anchor_root_ok(span, topdirs):
+                    continue
                 path, first = pm.group("path"), int(pm.group("first"))
                 last = int(pm.group("last")) if pm.group("last") else first
                 if not os.path.exists(path):
+                    if _ANCHOR_MID_DOTTED_RE.search(span) is not None:
+                        continue
                     failures.append(f"{where}: cites missing file {path}")
                     continue
                 try:
@@ -1046,8 +1081,24 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                         f"(file has {total})")
                 continue
             if _ANCHOR_PATH_RE.match(span) is not None and ":" not in span:
+                if ("/" in span or "\\" in span) \
+                        and not _anchor_root_ok(span, topdirs):
+                    continue
                 if not os.path.exists(span):
                     failures.append(f"{where}: cites missing file {span}")
+                continue
+            if " " in span and ":" not in span \
+                    and _ANCHOR_SPACED_PATH_RE.match(span) is not None:
+                # A bare spaced span that resolves to nothing is
+                # prose-shaped (commands, word lists) as often as it is
+                # a dead cite: verify what resolves, stay silent on the
+                # rest (documented recall limit). Rooted spaced spans
+                # are unambiguous cites and fire when missing.
+                if ("/" in span or "\\" in span) \
+                        and _anchor_root_ok(span, topdirs) \
+                        and not os.path.exists(span):
+                    failures.append(f"{where}: cites missing file {span}")
+                continue
         full_spans = [m.span() for m in _ANCHOR_FULLREF_RE.finditer(body)]
         for fm in _ANCHOR_FULLREF_RE.finditer(body):
             bad = _resolve_full_ref(fm.group("dom"), fm.group("todo"), int(fm.group("sec")))
@@ -1437,11 +1488,13 @@ def derive_runner_identity(runner_text: str) -> tuple[str | None, str | None, st
     envelope's non-empty model (None when absent or empty: the §20
     Opus envelope carried an empty model field, honestly unmeasured
     rather than guessed). Anything else reads codex-panel with no
-    model: codex output names none, so the skill's model pin fills it
-    (recorded, with the transcript hashed). An error envelope, or a
-    dict JSON without a string result, fails exactly as the output
-    checker fails it: the attestation never derives from output the
-    checker would refuse."""
+    model: codex stdout names none, so the banner of `--runner-stderr`
+    derives it when supplied, else the skill's model pin fills it
+    (recorded, with the transcript hashed; without stderr no codex
+    mismatch can fire, round-2 C). An error envelope, or a dict JSON
+    without a string result, fails exactly as the output checker
+    fails it: the attestation never derives from output the checker
+    would refuse."""
     _, envelope_err = panel_text_from_envelope(runner_text)
     if envelope_err is not None:
         return None, None, envelope_err
@@ -1454,6 +1507,33 @@ def derive_runner_identity(runner_text: str) -> tuple[str | None, str | None, st
     model = obj.get("model")
     model = model.strip() if isinstance(model, str) and model.strip() else None
     return "claude-panel", model, None
+
+
+_CODEX_BANNER_MODEL_RE = re.compile(r"\Amodel:\s*(?P<model>\S+)\s*\Z")
+
+
+def parse_codex_stderr_model(stderr_text: str) -> str | None:
+    """The model from a codex runner's stderr banner: the `model:` line
+    between the first two `--------` rules (probed `model: gpt-5.6-sol`
+    on v0.155.1). Only the banner region reads: the prompt echo below
+    it may contain its own `model:` lines, which are data, never
+    provenance. None when the banner or the line is absent (round-2 C:
+    codex stdout names no model, so without stderr the `--model` pin
+    is trusted and no mismatch can fire)."""
+    in_banner = False
+    for raw in stderr_text.splitlines():
+        line = raw.strip()
+        if line == "--------":
+            if in_banner:
+                break
+            in_banner = True
+            continue
+        if not in_banner:
+            continue
+        m = _CODEX_BANNER_MODEL_RE.match(line)
+        if m is not None:
+            return m.group("model")
+    return None
 
 
 def runner_timestamp(path: str) -> str:
@@ -2065,6 +2145,17 @@ def _self_test() -> int:
           derive_runner_identity('{"a": 1}')[2] is not None)
     check("runner-id-brace-text",
           derive_runner_identity("{not json") == ("codex-panel", None, None))
+    banner = ("OpenAI Codex v0.155.1\n--------\nworkdir: R:\\x\n"
+              "model: gpt-5.6-sol\nprovider: openai\n--------\nuser\n"
+              "model: evil-echo\n")
+    check("stderr-model-banner",
+          parse_codex_stderr_model(banner) == "gpt-5.6-sol")
+    check("stderr-model-echo-ignored",
+          parse_codex_stderr_model("user\nmodel: evil-echo\n") is None)
+    check("stderr-model-no-banner",
+          parse_codex_stderr_model("hook: Stop\ntokens used\n7\n") is None)
+    check("stderr-model-no-rules",
+          parse_codex_stderr_model("model: gpt-5.6-sol\n") is None)
     # Git-backed legs: a linear r1->r2->r3 plus a merge, fenced and
     # cross-checked end to end (D00 T04 §21 items 1, 8, 12, 15).
     with tempfile.TemporaryDirectory(prefix="review-s21-") as tmpd:
@@ -2297,33 +2388,55 @@ def _self_test() -> int:
               and "\nMANIFEST " in aout,
               f"exit={proc.returncode} err={proc.stderr[-160:]!r}")
         # Stamp anchors (D00 T04 §21 item 10): a seeded stamp with a
-        # dead oid, a dead line, a dead section, a missing file, and a
-        # dead full ref, beside passing twins (a live range, a live
-        # file, a live section, a live ref) the rule must not flag. The
-        # null oid never resolves in any repo, so the dead-oid leg is
-        # history-proof; the live legs ride trunk commits, append-only.
+        # dead oid, a dead line, a dead section, a missing file, a
+        # spaced pathline ghost, a rooted missing file, and a dead
+        # full ref, beside passing twins (a live range, a live file,
+        # live spaced cites riding the frozen au3 tree, a live
+        # section, a live ref, a bare spaced ghost that stays silent
+        # by the recall limit, and the sweep's prose spans: commands,
+        # a word list, a glob, kv/pipe fragments, versions) the rule
+        # must not flag. The null oid never resolves in any repo, so
+        # the dead-oid leg is history-proof; the live legs ride trunk
+        # commits and frozen-tree files, append-only.
         seed_todo = os.path.join(tmpd, "TODO-99-seed.md")
         with open(seed_todo, "w", encoding="utf-8") as fh:
             fh.write(
                 "## 1. Seed\n\n"
                 "> **Verified:** 2026-09-20 | §1 | evidence "
                 "`scripts/review_prompt.py:999999` `§99` "
-                "`s21-seed-missing-ghost.md` D00 T99 §1, and live twins "
+                "`s21-seed-missing-ghost.md` "
+                "`s21 seed missing ghost.md:5` "
+                "`todo/00-workspace/nope-missing.md` D00 T99 §1, "
+                "silent twins `s21 seed missing ghost.md` "
+                "`pwsh scripts/bootstrap.ps1` "
+                "`grep -c samples CMakeCache.txt` "
+                "`src shared extensions scripts reskit CMakeLists.txt "
+                "CMakePresets.json` `. .\\reskit\\Init-ResKit.ps1` "
+                "`reskit/Build-*.ps1` `diff-files=real.md` "
+                "`real.md|fake.md` `v1.2` `v1.2:34` `cost: 17/83` "
+                "`2026-09-20`, and live twins "
                 "`scripts/review_prompt.py:1` `§1` `todo/README.md` "
-                "D00 T04 §21\n"
+                "`resolute_au3/samples/ComWinRep/~Samples/Alien UDFs/"
+                "CoreFunctions.au3:1` "
+                "`resolute_au3/samples/ComWinRep/~Samples/Alien UDFs/"
+                "CoreFunctions.au3` D00 T04 §21\n"
                 "> **Review:** round 1, candidate "
                 "`0000000000000000000000000000000000000000` plus range "
                 "`fceed42..dbe5d0e` -- approve. "
                 "Raw findings: docs/reviews/00-workspace/D00-T04-s99.md\n"
                 "> **CRUD:** not applicable\n")
         seed_dead = check_stamp_anchors(seed_todo, 1)
-        check("anchors-dead-five",
-              len(seed_dead) == 5
+        check("anchors-dead-seven",
+              len(seed_dead) == 7
               and any("dead oid 0000000" in d for d in seed_dead)
               and any("dead lines scripts/review_prompt.py:999999" in d
                       for d in seed_dead)
               and any("dead in-file §99" in d for d in seed_dead)
               and any("missing file s21-seed-missing-ghost.md" in d
+                      for d in seed_dead)
+              and any("missing file s21 seed missing ghost.md" in d
+                      for d in seed_dead)
+              and any("missing file todo/00-workspace/nope-missing.md" in d
                       for d in seed_dead)
               and any("dead ref D00 T99 §1" in d for d in seed_dead),
               str(seed_dead))
@@ -2477,6 +2590,53 @@ def _self_test() -> int:
         check("attest-v2-model-mismatch",
               got.returncode == 1 and "disagrees with the runner output" in got.stderr,
               f"exit={got.returncode} err={got.stderr!r}")
+        # The codex stderr banner (round-2 C): codex stdout names no
+        # model, so the banner derives it when supplied.
+        serr = os.path.join(tmpd, "codex.err")
+        with open(serr, "w", encoding="utf-8") as fh:
+            fh.write("OpenAI Codex v0.155.1\n--------\nmodel: gpt-5.6-sol\n"
+                     "--------\nuser\n")
+        with open(arunner, "w", encoding="utf-8") as fh:
+            fh.write("RECEIPT sha=x\n**adversarial: approve**\n")
+        got = _at("--out", aout, "--manifest", aman, "--base", r1,
+                  "--head", r3, "--tree", rtree, "--runner-output", arunner,
+                  "--checker-output", acheck, "--findings", "find.md",
+                  "--verdict", "approve", "--runner-stderr", serr)
+        import json as _json
+        try:
+            doc_model = _json.loads(open(aout, encoding="utf-8").read())["model"]
+        except (OSError, ValueError, KeyError):
+            doc_model = None
+        check("attest-v2-stderr-derives",
+              got.returncode == 0 and doc_model == "gpt-5.6-sol",
+              f"exit={got.returncode} model={doc_model!r} err={got.stderr!r}")
+        got = _at("--out", aout, "--manifest", aman, "--base", r1,
+                  "--head", r3, "--tree", rtree, "--runner-output", arunner,
+                  "--checker-output", acheck, "--findings", "find.md",
+                  "--verdict", "approve", "--runner-stderr", serr,
+                  "--model", "gpt-6-astra")
+        check("attest-v2-stderr-mismatch",
+              got.returncode == 1 and "disagrees with the runner output" in got.stderr
+              and "gpt-5.6-sol" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+        with open(serr, "w", encoding="utf-8") as fh:
+            fh.write("hook: Stop\n")
+        got = _at("--out", aout, "--manifest", aman, "--base", r1,
+                  "--head", r3, "--tree", rtree, "--runner-output", arunner,
+                  "--checker-output", acheck, "--findings", "find.md",
+                  "--verdict", "approve", "--runner-stderr", serr,
+                  "--model", "gpt-5.6-sol")
+        check("attest-v2-stderr-no-banner",
+              got.returncode == 1 and "no codex model banner" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+        got = _at("--out", aout, "--manifest", aman, "--base", r1,
+                  "--head", r3, "--tree", rtree, "--runner-output", arunner,
+                  "--checker-output", acheck, "--findings", "find.md",
+                  "--verdict", "approve", "--runner-stderr",
+                  os.path.join(tmpd, "nope.err"), "--model", "gpt-5.6-sol")
+        check("attest-v2-stderr-unreadable",
+              got.returncode == 2 and "cannot read" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
     # The skill surface the tooling assumes (D00 T04 §21 items 2, 6, 7,
     # 8, 12, 14, 15): the suite reads the skill text, so a prose edit
     # that drops a wired command fails here, not at the next review.
@@ -2510,6 +2670,7 @@ def _self_test() -> int:
             ("skill-attest-v2", "--runner-output <panel output file>"),
             ("skill-attest-checker", "--checker-output $RUNDIR/check.out"),
             ("skill-attest-findings", "--findings <findings path>"),
+            ("skill-attest-stderr", "--runner-stderr <panel stderr file>"),
             ("skill-assembled-commits", "--commits <o1,o2,...>"),
             ("skill-assembled-body", "--body $RUNDIR/fenced.md"),
             ("skill-anchors-tool",
@@ -2826,7 +2987,7 @@ if __name__ == "__main__":
         want = {"--out": None, "--manifest": None, "--base": None, "--head": None,
                 "--tree": None, "--runner-output": None, "--checker-output": None,
                 "--findings": None, "--verdict": None, "--reviewer": None,
-                "--model": None, "--timestamp": None}
+                "--model": None, "--timestamp": None, "--runner-stderr": None}
         rest = list(args)
         while len(rest) >= 2 and rest[0] in want:
             want[rest[0]] = rest[1]
@@ -2836,7 +2997,8 @@ if __name__ == "__main__":
         if rest or any(want[k] is None for k in required):
             print("attest: want --out <path> --manifest <file> --base <b> --head <h> "
                   "--tree <t> --runner-output <f> --checker-output <f> --findings <f> "
-                  "--verdict <v> [--reviewer <r> --model <m> --timestamp <ts>] | "
+                  "--verdict <v> [--reviewer <r> --model <m> --timestamp <ts> "
+                  "--runner-stderr <f>] | "
                   "--read-back <path> [--findings <f>]", file=sys.stderr)
             sys.exit(2)
         try:
@@ -2864,12 +3026,28 @@ if __name__ == "__main__":
         if run_err is not None:
             print(f"attest: {run_err}", file=sys.stderr)
             sys.exit(1)
-        if envelope_model is not None and want["--model"] is not None \
-                and want["--model"] != envelope_model:
+        stderr_model = None
+        if want["--runner-stderr"] is not None and reviewer == "codex-panel":
+            try:
+                with open(want["--runner-stderr"], encoding="utf-8",
+                          errors="replace") as fh:
+                    stderr_text = fh.read()
+            except OSError as exc:
+                print(f"attest: cannot read {want['--runner-stderr']}: {exc}",
+                      file=sys.stderr)
+                sys.exit(2)
+            stderr_model = parse_codex_stderr_model(stderr_text)
+            if stderr_model is None:
+                print(f"attest: {want['--runner-stderr']} names no codex "
+                      "model banner", file=sys.stderr)
+                sys.exit(1)
+        derived_model = envelope_model if envelope_model is not None else stderr_model
+        if derived_model is not None and want["--model"] is not None \
+                and want["--model"] != derived_model:
             print(f"attest: hand-supplied model {want['--model']} disagrees "
-                  f"with the runner output {envelope_model}", file=sys.stderr)
+                  f"with the runner output {derived_model}", file=sys.stderr)
             sys.exit(1)
-        model = envelope_model if envelope_model is not None else want["--model"]
+        model = derived_model if derived_model is not None else want["--model"]
         if model is None:
             print("attest: the runner output names no model; pass --model",
                   file=sys.stderr)
@@ -3013,7 +3191,7 @@ if __name__ == "__main__":
         rest = []
     if checker_arg not in checkers or rest:
         print(
-            f"usage: {sys.argv[0]} tag <prefix> | round-cost <envelope-file> | fence <prefix> [--base <sha> --head <sha> [--commits <o1,o2>]] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan|check-stamp [--manifest <file>] < output.txt | cross-check <manifest-file> <base> <head> [--body <file>] [--expect-head-kind commit|tree] | check-parents <commit> <expected-parent> | check-anchors <todo-path> <section> | attest (--out <path> --manifest <file> --base <b> --head <h> --tree <t> --runner-output <f> --checker-output <f> --findings <f> --verdict <v> [--reviewer <r> --model <m> --timestamp <ts>] | --read-back <path> [--findings <f>])",
+            f"usage: {sys.argv[0]} tag <prefix> | round-cost <envelope-file> | fence <prefix> [--base <sha> --head <sha> [--commits <o1,o2>]] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan|check-stamp [--manifest <file>] < output.txt | cross-check <manifest-file> <base> <head> [--body <file>] [--expect-head-kind commit|tree] | check-parents <commit> <expected-parent> | check-anchors <todo-path> <section> | attest (--out <path> --manifest <file> --base <b> --head <h> --tree <t> --runner-output <f> --checker-output <f> --findings <f> --verdict <v> [--reviewer <r> --model <m> --timestamp <ts> --runner-stderr <f>] | --read-back <path> [--findings <f>])",
             file=sys.stderr,
         )
         sys.exit(2)

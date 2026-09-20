@@ -81,3 +81,11 @@ to: refuted
 why: "the matcher was mirror-exact with parse_todo (same opener test, same lowercase-x done test), so no disagreement existed; the panel never saw the parser."
 evidence: "one checklist_state called by both parser and rule, so drift is impossible rather than tested-for, with 4 semantic pins", landed in 1cfd083; "zero live [X] occurrences, grepped 2026-09-20" for the uppercase residue.
 as-of: 1cfd083
+
+transition: D00-T04-S21-F10
+date: 2026-09-20
+from: raised
+to: duplicate
+why: "Round-1 A2 restates F4 (filed to D00 T04 §24 before round 1): a pasted-but-unrun PASS still attests. No new defect; the §24 item owns it."
+evidence: "Same checker-evidence gap as D00-T04-S21-F4, filed to `D00 T04 §24` in `81c4fd78`", recorded as duplicate of F4; see the §24 item carrying the Done and checkpoint clause.
+as-of: 68e77a1
