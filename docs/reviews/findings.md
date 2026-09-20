@@ -4,15 +4,15 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**283 findings across 37 sections.**
+**286 findings across 37 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
 | `record` | 97 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 60 | fails under hostile or unexpected input |
-| `consistency` | 43 | disagrees with the rest of the suite, its naming, or its layout |
+| `adversarial` | 61 | fails under hostile or unexpected input |
+| `consistency` | 45 | disagrees with the rest of the suite, its naming, or its layout |
 | `correctness` | 40 | the code does the wrong thing |
 | `integration` | 29 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 139 | wrong behavior in code, plan, or record |
-| `minor` | 138 | polish or wording, or no surviving defect |
+| `major` | 140 | wrong behavior in code, plan, or record |
+| `minor` | 140 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -258,6 +258,9 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §22` | F12 | minor | `consistency` | fixed | independent | exit-code docs omit exit 2 and the runs map |
 | `D00 T04 §22` | F13 | minor | `record` | fixed | independent | live-green quotes stale at the candidate tip |
 | `D00 T04 §22` | F14 | minor | `record` | fixed | independent | record omits the head record commit |
+| `D00 T04 §22` | F15 | major | `adversarial` | filed | independent | single-dash tokens parse as paths, not usage |
+| `D00 T04 §22` | F16 | minor | `consistency` | filed | independent | format docstrings miss the report-mode carve-out |
+| `D00 T04 §22` | F17 | minor | `consistency` | filed | independent | refusal docstring overclaims the live mechanism |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
