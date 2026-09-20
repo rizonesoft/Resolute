@@ -51,14 +51,26 @@ DEFAULT_RUNS = ROOT / "docs" / "reviews" / "run-records.md"
 
 RUNNERS = ("codex", "panel")
 EFFORTS = ("high", "medium", "low")
-OUTCOMES = ("findings", "empty", "error")
-PROVIDERS = ("codex", "claude")
+OUTCOMES = ("findings", "empty", "error", "stamp", "independent")
+PROVIDERS = ("openai", "anthropic")
+# Outcomes the panel mapping skips: error voids the attempt's verdicts,
+# while stamp (a stamp-review pass) and independent (a non-panel
+# independent pass) never had panel verdicts. Skipped rounds keep their
+# refs: usable findings count in yield and coverage, but meet no panel
+# section.
+SKIPPED_OUTCOMES = ("error", "stamp", "independent")
+# The §8 decision window: the last 5 panel-reviewed sections at decision
+# time, per-section Sol full-scope 5/2/5/3/4. §18 counts past this set.
+REVISIT_WINDOW = ("D00-T02-S5", "D00-T04-S6", "D00-T04-S7", "D00-T04-S9", "D00-T04-S10")
+REVISIT_NEED = 5
 OPPORTUNITIES = ("full-scope", "delta-plus-regressions", "unresolved")
 PURPOSES = ("section-review", "stamp-review", "sign-off", "fix-loop", "unresolved")
 PROVENANCES = ("recorded", "reconstructed")
 FAMILY_MODEL = {"GPT": "gpt-5.6-sol", "Opus": "opus"}
 SCHEMA_VERSION = 1
-EXPORT_VERSION = 1
+# Version 2 adds per-ref dispositions to every round line, so a snapshot
+# consumer computes accepted yield without rejoining live records.
+EXPORT_VERSION = 2
 
 RUN_RE = re.compile(r"^run:\s*(?P<section>D\d{2}-T\d{2}-S\d+)\s*$")
 SCHEMA_RE = re.compile(r"^schema:\s*(?P<version>\d+)\s*$")
@@ -354,11 +366,20 @@ def panel_verdicts(path):
     return rounds
 
 
+def panel_usable(round_lines):
+    """Rounds the panel mapping spans, in run order: every round whose
+    outcome carries panel verdicts. Skipped outcomes (SKIPPED_OUTCOMES)
+    meet no panel section, whatever numbers they consumed, so usable
+    rounds meet panel sections 1..k."""
+    return [(n, items) for _, n, items in round_lines
+            if items.get("outcome") not in SKIPPED_OUTCOMES]
+
+
 def check_panel_rounds(runs):
     """Panel runs re-read their round verdicts: numbers, models, full lenses.
 
-    Error rounds (voided attempts) carry no verdicts and are skipped in
-    the mapping: usable rounds meet panel sections 1..k in run order."""
+    Skipped rounds carry no verdicts and are skipped in the mapping:
+    usable rounds meet panel sections 1..k in run order."""
     errors = []
     for run in runs:
         path = _review_path(run.section)
@@ -377,8 +398,7 @@ def check_panel_rounds(runs):
         by_number = {}
         for (family, n), lens in verdicts.items():
             by_number.setdefault(n, []).append((family, lens))
-        usable = [(n, items) for _, n, items in run.round_lines
-                  if items.get("outcome") != "error"]
+        usable = panel_usable(run.round_lines)
         for panel_n, (_n, items) in enumerate(usable, 1):
             n = panel_n
             if n not in by_number:
@@ -463,6 +483,35 @@ def as_of(runs_path):
     return {"commit": sha, "timestamp": stamp}
 
 
+def coverage_lines(runs):
+    """Recorded-vs-unresolved counts per field and model over round lines."""
+    lines = ["Coverage (recorded vs unresolved, by field and model):"]
+    rounds = [items for run in runs for _, _, items in run.round_lines]
+    models = sorted({items.get("model", "?") for items in rounds})
+    for field in ("cost", "latency", "version"):
+        per = [(m, sum(1 for items in rounds
+                       if items.get("model", "?") == m and items.get(field) != "unresolved"),
+                sum(1 for items in rounds if items.get("model", "?") == m))
+               for m in models]
+        got = sum(g for _, g, _ in per)
+        detail = ", ".join(f"{m} {g}/{t}" for m, g, t in per)
+        lines.append(f"- {field}: {got}/{len(rounds)} recorded ({detail})")
+    return lines
+
+
+def revisit_lines(runs):
+    """The §18 trigger from the query: panel sections past the §8 window."""
+    past = [run.section for run in runs
+            if run.runner == "panel" and run.section not in REVISIT_WINDOW]
+    lines = ["Revisit trigger (§18 past the §8 window of five: "
+             f"{', '.join(REVISIT_WINDOW)}):"]
+    state = "trigger met" if len(past) >= REVISIT_NEED else "trigger open"
+    names = ", ".join(past) if past else "none"
+    lines.append(f"- {len(past)}/{REVISIT_NEED} panel-reviewed sections past the window "
+                 f"({names}): {state}")
+    return lines
+
+
 def report(runs, runs_path):
     lines = []
     binding = as_of(runs_path)
@@ -508,6 +557,8 @@ def report(runs, runs_path):
             lines.append(f"- {section} round {n}: {cost}")
     else:
         lines.append(f"- no recorded cost ({total_rounds}/{total_rounds} unresolved)")
+    lines.append("")
+    lines.extend(coverage_lines(runs))
     lines.append("")
     lines.append("Rounds per section:")
     for run in runs:
@@ -557,13 +608,22 @@ def report(runs, runs_path):
         total_self += self_raised
         lines.append(f"- {run.section}: independent {independent}, self {self_raised}")
     lines.append(f"- total: independent {total_ind}, self {total_self}")
+    lines.append("")
+    lines.extend(revisit_lines(runs))
     return "\n".join(lines) + "\n"
 
 
-def export_runs(runs, runs_path):
+def export_runs(runs, runs_path, collected=None):
     """The machine export §8 consumes: versioned JSON with the as-of
     binding and every run's rounds. Consumers assert export_version
-    before reading anything else."""
+    before reading anything else. Every round line carries its refs'
+    ledger dispositions, so a snapshot consumer computes accepted yield
+    without rejoining live records that may postdate the as-of.
+    `collected` overrides the ledger read for tests."""
+    findings, _bad = collected if collected is not None else TF.collect()
+    by_ref = {}
+    for f in findings:
+        by_ref.setdefault(f"{_compact_section(f.ref)}-{f.number}", f.disposition)
     return {
         "export_version": EXPORT_VERSION,
         "schema": SCHEMA_VERSION,
@@ -579,7 +639,9 @@ def export_runs(runs, runs_path):
                 "round_lines": [
                     {"number": n, **{k: items.get(k) for k in REQUIRED_ROUND_KEYS
                                     if k in items},
-                     "findings": list(items.get("findings", []))}
+                     "findings": list(items.get("findings", [])),
+                     "dispositions": {ref: by_ref.get(ref, "unresolved")
+                                      for ref in items.get("findings", [])}}
                     for _, n, items in sorted(run.round_lines, key=lambda r: r[1])
                 ],
             }
@@ -599,7 +661,8 @@ def check_export(doc):
     smuggle values the records could never hold. The as-of binds the
     snapshot; live-tree agreement is NOT checked here, a snapshot is a
     moment, so `refuted` is bounded by the listed refs rather than proven
-    against the ledger."""
+    against the ledger. Dispositions ride per ref so the snapshot stands
+    alone; a value outside the ledger set fails."""
     problems = []
     if not isinstance(doc, dict):
         return ["export is not an object"]
@@ -679,7 +742,7 @@ def check_export(doc):
                 problems.append(f"{section}: a round line is not an object")
                 continue
             missing = [k for k in REQUIRED_ROUND_KEYS if k not in line] + \
-                (["findings"] if "findings" not in line else [])
+                [k for k in ("findings", "dispositions") if k not in line]
             if missing:
                 problems.append(f"{section} round {line.get('number')}: misses {', '.join(missing)}")
                 continue
@@ -724,7 +787,33 @@ def check_export(doc):
                         homed[ref] = f"{section} round {num}"
                 if line.get("outcome") == "empty" and refs:
                     problems.append(f"{section} round {num}: an empty round lists no findings")
+            disps = line.get("dispositions")
+            if not isinstance(disps, dict):
+                problems.append(f"{section} round {num}: dispositions is not an object")
+            elif isinstance(refs, list):
+                for ref in refs:
+                    if not isinstance(ref, str):
+                        continue  # already reported above
+                    if ref not in disps:
+                        problems.append(f"{section} round {num}: ref {ref} carries "
+                                        f"no disposition")
+                    elif disps[ref] not in TF.DISPOSITIONS:
+                        problems.append(f"{section} round {num}: ref {ref} disposition "
+                                        f"{disps[ref]!r} is outside the ledger set")
+                for ref in disps:
+                    if ref not in refs:
+                        problems.append(f"{section} round {num}: disposition for {ref} "
+                                        f"names no listed ref")
     return problems
+
+
+def export_sound_line(doc):
+    """The --check-export PASS line: version, run count, and the as-of
+    binding, so a gate quote of the count rides its producing commit."""
+    as_of_doc = doc.get("as_of", {})
+    commit = as_of_doc.get("commit") if isinstance(as_of_doc, dict) else None
+    return (f"export version {EXPORT_VERSION}, {len(doc['runs'])} runs, "
+            f"as-of {commit}, internally sound")
 
 
 def _self_test():
@@ -741,8 +830,8 @@ run: D00-T01-S1
 date: 2026-09-17
 runner: codex
 rounds: 2
-round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 6bb635e provider: codex version: gpt-6-astra cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: reconstructed findings: D00-T01-S1-F1, D00-T01-S1-F2
-round: 2 model: gpt-6-astra effort: high outcome: empty candidate: 8437dd5 provider: codex version: gpt-6-astra cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: reconstructed findings:
+round: 1 model: gpt-6-astra effort: high outcome: findings candidate: 6bb635e provider: openai version: gpt-6-astra cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: reconstructed findings: D00-T01-S1-F1, D00-T01-S1-F2
+round: 2 model: gpt-6-astra effort: high outcome: empty candidate: 8437dd5 provider: openai version: gpt-6-astra cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: reconstructed findings:
 empty: 1
 refuted: 0
 """
@@ -848,12 +937,13 @@ refuted: 0
     check("late-schema-fails", any("ahead of the first run" in m for _, m in errors_t),
           f"{errors_t}")
 
-    no_provider = good.replace("provider: codex ", "")
+    no_provider = good.replace("provider: openai ", "")
     _r, errors_p = parse_runs(no_provider)
     check_runs(_r, errors_p)
     check("missing-provider-fails", any("misses provider" in m for _, m in errors_p),
           f"{errors_p}")
-    for bad_key, orig, bad_val, want in (("provider", "codex", "anthropic", "provider must be"),
+    for bad_key, orig, bad_val, want in (("provider", "openai", "xai", "provider must be"),
+                                          ("outcome", "findings", "vibes", "outcome must be"),
                                           ("cost", "unresolved", "12", "cost reads"),
                                           ("cost", "unresolved", "12 dollars", "cost reads"),
                                           ("latency", "unresolved", "soon", "latency reads"),
@@ -957,6 +1047,100 @@ refuted: 0
           any("claimed twice" in m for m in check_export(tampered)),
           f"{check_export(tampered)}")
 
+    # §15: skipped outcomes parse, and the panel mapping spans usable only.
+    shapes = """schema: 1
+run: D00-T01-S9
+date: 2026-09-20
+runner: panel
+rounds: 5
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: 6bb635e provider: openai version: gpt-5.6-sol cost: 12tokens latency: 34s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T01-S9-F1
+round: 2 model: gpt-5.6-sol effort: medium outcome: error candidate: 8437dd5 provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+round: 3 model: gpt-5.6-sol effort: medium outcome: findings candidate: 8437dd5 provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+round: 4 model: opus effort: medium outcome: independent candidate: 8437dd5 provider: anthropic version: unresolved cost: unresolved latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T01-S9-F2
+round: 5 model: gpt-5.6-sol effort: high outcome: stamp candidate: 8437dd5 provider: openai version: gpt-5.6-sol cost: unresolved latency: unresolved opportunity: full-scope purpose: stamp-review provenance: recorded findings:
+empty: 0
+refuted: 0
+"""
+    runs_k, errors_k = parse_runs(shapes)
+    check_runs(runs_k, errors_k)
+    check("skipped-outcomes-parse", not errors_k, f"{errors_k}")
+    usable_k = panel_usable(runs_k[0].round_lines)
+    check("mapping-skips-nonpanel", [n for n, _ in usable_k] == [1, 3], f"{usable_k}")
+
+    # §15: unresolved-field coverage per field and model.
+    cov = coverage_lines(runs_k)
+    check("coverage-fields", cov == [
+        "Coverage (recorded vs unresolved, by field and model):",
+        "- cost: 1/5 recorded (gpt-5.6-sol 1/4, opus 0/1)",
+        "- latency: 1/5 recorded (gpt-5.6-sol 1/4, opus 0/1)",
+        "- version: 4/5 recorded (gpt-5.6-sol 4/4, opus 0/1)",
+    ], f"{cov}")
+
+    # §15: the §18 trigger reads from the query, window named.
+    def _mkrun(section, runner):
+        run = Run(section, 1)
+        run.runner = runner
+        return run
+    trig_open = [_mkrun(s, "panel") for s in REVISIT_WINDOW[:2]] + \
+        [_mkrun("D00-T04-S11", "panel"), _mkrun("D00-T01-S1", "codex")]
+    got_open = revisit_lines(trig_open)
+    check("revisit-open", got_open == [
+        "Revisit trigger (§18 past the §8 window of five: "
+        "D00-T02-S5, D00-T04-S6, D00-T04-S7, D00-T04-S9, D00-T04-S10):",
+        "- 1/5 panel-reviewed sections past the window (D00-T04-S11): trigger open",
+    ], f"{got_open}")
+    trig_met = [_mkrun(s, "panel") for s in REVISIT_WINDOW] + \
+        [_mkrun(s, "panel") for s in ("D00-T04-S8", "D00-T04-S11", "D00-T04-S12",
+                                      "D00-T04-S13", "D00-T04-S14")]
+    got_met = revisit_lines(trig_met)
+    check("revisit-met", got_met[1] == "- 5/5 panel-reviewed sections past the window "
+          "(D00-T04-S8, D00-T04-S11, D00-T04-S12, D00-T04-S13, D00-T04-S14): "
+          "trigger met", f"{got_met}")
+
+    # §15: per-ref dispositions ride the export and the checker asserts them.
+    f1 = TF.Finding("D00 T01 §1", None, 1, "F1", "s", "record", "fixed", None, "independent")
+    f2 = TF.Finding("D00 T01 §1", None, 2, "F2", "s", "record", "refuted", None, "independent")
+    injected = export_runs(runs, other, collected=([f1, f2], []))
+    first = injected["runs"][0]["round_lines"][0]
+    check("export-dispositions-carried",
+          first["dispositions"] == {"D00-T01-S1-F1": "fixed",
+                                    "D00-T01-S1-F2": "refuted"},
+          f"{first['dispositions']}")
+    check("export-dispositions-round-trip", check_export(injected) == [],
+          f"{check_export(injected)}")
+    tampered = json.loads(json.dumps(injected))
+    del tampered["runs"][0]["round_lines"][0]["dispositions"]["D00-T01-S1-F1"]
+    check("export-disposition-missing",
+          any("carries no disposition" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(injected))
+    tampered["runs"][0]["round_lines"][0]["dispositions"]["D00-T01-S1-F1"] = "vibes"
+    check("export-disposition-valued",
+          any("outside the ledger set" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(injected))
+    tampered["runs"][0]["round_lines"][0]["dispositions"]["D00-T01-S1-F9"] = "fixed"
+    check("export-disposition-homed",
+          any("names no listed ref" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+    tampered = json.loads(json.dumps(injected))
+    del tampered["runs"][0]["round_lines"][0]["dispositions"]
+    check("export-dispositions-required",
+          any("misses dispositions" in m for m in check_export(tampered)),
+          f"{check_export(tampered)}")
+
+    # §15: the sound line binds the count to its producing commit.
+    check("export-sound-foreign",
+          export_sound_line(injected) == f"export version {EXPORT_VERSION}, "
+          f"1 runs, as-of {injected['as_of']['commit']}, internally sound",
+          export_sound_line(injected))
+    bound = {"export_version": EXPORT_VERSION, "runs": [{}, {}],
+             "as_of": {"commit": "f" * 40, "timestamp": "2026-09-20T00:00:00Z"}}
+    check("export-sound-commit",
+          export_sound_line(bound) == f"export version {EXPORT_VERSION}, "
+          f"2 runs, as-of {'f' * 40}, internally sound",
+          export_sound_line(bound))
+
     # Round 1 bound the as-of to content identity: HEAD only when HEAD's
     # tree holds exactly the exported bytes, `unresolved` otherwise.
     foreign = as_of(other)
@@ -1000,8 +1184,7 @@ def main(argv=None):
         for problem in problems:
             print(f"{rest[0]}: {problem}")
         if not problems:
-            print(f"{rest[0]}: export version {EXPORT_VERSION}, "
-                  f"{len(doc['runs'])} runs, internally sound")
+            print(f"{rest[0]}: {export_sound_line(doc)}")
         return 1 if problems else 0
     mode_report = "--report" in args
     mode_export = "--export" in args

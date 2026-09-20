@@ -164,6 +164,10 @@ python scripts/review_prompt.py attest --read-back <findings stem>.attest.json
 
 (The manifest sha pins the reviewed input: the attestation cannot claim a sha the manifest never had, and a pre-nonce manifest refuses, so only the hardened flow attests. `--base`/`--head` must equal the manifest's pair; anything else fails before the file is written. The tree derives from the candidate (`<candidate>^{tree}`), never the checkout: an audit after HEAD advanced must still bind the reviewed revision. The verdict is the round's headline: `needs-attention` when any lens reports it, else `approve` (`advisory` never headlines: it files, per the ledger rules above). The reviewer names the rung that ran the sign-off (`codex-panel` / `claude-panel`), the model its pin (`gpt-5.6-sol` / `opus`). The timestamp rides explicit. `--read-back` asserts schema, OIDs, and fields; a failure is a broken attestation, re-emitted, never shipped. The file commits with the stamp; the stamp's `Review:` line names it beside the raw findings as `Attestation: <repo-relative path>`.)
 
+### Record the round
+
+Every round line the review writes (panel rounds, stamp rounds, independent passes) carries measured cost and latency, so the value-per-cost comparison stops reading `unresolved`. Time each round invocation (`START=$(date +%s)` before, `END=$(date +%s)` after) and record `latency: <END-START>s`: wall-clock seconds from the round's reviewer invocation to its returned output, the one boundary the records header states. Record cost from the runner's reported token figure when it reports one: codex prints `tokens used` with the figure on the next line of the round's stderr, thousands comma stripped (`7,435` records as `cost: 7435tokens`); a runner that reports nothing records `cost: unresolved`, honestly untimed and unmeasured rather than guessed.
+
 ### 5. Re-run the gates
 
 After the last fix, re-run the section's Test checkpoint and the owed gates (affected suites, warnings, analysis, `validate`). Quote the outputs. A fix verified by reasoning is not verified.

@@ -36,6 +36,7 @@ from __future__ import annotations
 import argparse
 import io
 import re
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -259,8 +260,9 @@ def collect() -> tuple[list[Finding], list[tuple[Path, int, str]]]:
 
 
 TRANSITION_RE = re.compile(r"^transition:\s*(?P<ref>D\d{2}-T\d{2}-S\d+-F\d+)\s*$")
-TRANSITION_FIELD_RE = re.compile(r"^(?P<key>date|from|to|why|evidence):\s*(?P<value>.*)$")
+TRANSITION_FIELD_RE = re.compile(r"^(?P<key>date|from|to|why|evidence|as-of):\s*(?P<value>.*)$")
 TRANSITION_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+TRANSITION_SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 _TRANSITION_FROM_OK = frozenset(set(DISPOSITIONS) | {"raised"})
 _COMPACT_RE = re.compile(r"^D(?P<dom>\d{2}) T(?P<todo>\d{2}) §(?P<sec>\d+)$")
 
@@ -272,12 +274,21 @@ def _compact_ref(display: str, number: str) -> str | None:
     return f"D{m.group('dom')}-T{m.group('todo')}-S{m.group('sec')}-{number}"
 
 
+def _transition_commit_resolves(sha: str) -> bool:
+    """The as-of binding resolves to a commit in this repository. Needs git."""
+    hit = subprocess.run(["git", "cat-file", "-t", sha], cwd=ROOT,
+                         capture_output=True, text=True, timeout=30)
+    return hit.returncode == 0 and hit.stdout.strip() == "commit"
+
+
 def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list[str]:
     """Every non-final ledger row keeps its when, why, and evidence.
 
     Returns problems (empty means complete): each block needs its
-    five fields, must name a live row, and its `to` must agree with
-    the row's disposition; each non-final row needs exactly one block.
+    six fields, must name a live row, and its `to` must agree with
+    the row's disposition; the `as-of` binds the commit whose tree
+    holds the quoted record and must resolve; each non-final row
+    needs exactly one block.
     """
     problems: list[str] = []
     try:
@@ -319,11 +330,18 @@ def check_transitions(findings: list[Finding], path: Path = TRANSITIONS) -> list
             by_ref[compact] = f
     seen: dict[str, int] = {}
     for lineno, ref, fields in blocks:
-        for need in ("date", "from", "to", "why", "evidence"):
+        for need in ("date", "from", "to", "why", "evidence", "as-of"):
             if need not in fields:
                 problems.append(f"{path}:{lineno}: {ref} misses {need}")
         if "date" in fields and not TRANSITION_DATE_RE.match(fields["date"]):
             problems.append(f"{path}:{lineno}: {ref} date is not YYYY-MM-DD")
+        if "as-of" in fields:
+            if not TRANSITION_SHA_RE.match(fields["as-of"]):
+                problems.append(f"{path}:{lineno}: {ref} binds as-of "
+                                f"{fields['as-of']!r}, not a sha")
+            elif not _transition_commit_resolves(fields["as-of"]):
+                problems.append(f"{path}:{lineno}: {ref} binds as-of {fields['as-of']}, "
+                                f"which resolves to no commit")
         if "from" in fields and fields["from"] not in _TRANSITION_FROM_OK:
             problems.append(f"{path}:{lineno}: {ref} moves from {fields['from']!r}, unknown")
         if "to" in fields and fields["to"] not in NONFINAL:
@@ -601,7 +619,8 @@ def _self_test() -> int:
         "from: raised\n"
         "to: withdrawn\n"
         "why: the raiser retracted it\n"
-        "evidence: D00-T04-s9.md round 3\n",
+        "evidence: D00-T04-s9.md round 3\n"
+        "as-of: 0a24c03\n",
         encoding="utf-8",
     )
     if check_transitions(tfind, tpath):
@@ -615,13 +634,15 @@ def _self_test() -> int:
         "from: raised\n"
         "to: duplicate\n"
         "evidence: x\n"
+        "as-of: 0a24c03\n"
         "\n"
         "transition: D00-T04-S9-F9\n"
         "date: 2026-09-19\n"
         "from: raised\n"
         "to: withdrawn\n"
         "why: ghost\n"
-        "evidence: x\n",
+        "evidence: x\n"
+        "as-of: 0a24c03\n",
         encoding="utf-8",
     )
     tp = check_transitions(tfind, tpath)
@@ -643,6 +664,7 @@ def _self_test() -> int:
         "to: withdrawn\n"
         "why: x\n"
         "evidence: y\n"
+        "as-of: 0a24c03\n"
         "\n"
         "transition: D00-T04-S9-F1\n"
         "date: 2026-09-19\n"
@@ -650,13 +672,15 @@ def _self_test() -> int:
         "to: withdrawn\n"
         "why: x\n"
         "evidence: y\n"
+        "as-of: 0a24c03\n"
         "\n"
         "transition: D00-T04-S9-F2\n"
         "date: 2026-09-19\n"
         "from: raised\n"
         "to: fixed\n"
         "why: x\n"
-        "evidence: y\n",
+        "evidence: y\n"
+        "as-of: 0a24c03\n",
         encoding="utf-8",
     )
     tp2 = check_transitions(tfind, tpath)
@@ -668,6 +692,33 @@ def _self_test() -> int:
         failed += 1
     if not any("moves to 'fixed'" in p for p in tp2):
         print("  FAIL  a transition to a final disposition was not reported")
+        failed += 1
+    # §15: the as-of binds a resolving commit, and a dead binding fails.
+    tpath.write_text(
+        "transition: D00-T04-S9-F1\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: the raiser retracted it\n"
+        "evidence: D00-T04-s9.md round 3\n"
+        "as-of: 0000000\n",
+        encoding="utf-8",
+    )
+    if not any("resolves to no commit" in p for p in check_transitions(tfind, tpath)):
+        print("  FAIL  a transition binding a dead commit was not reported")
+        failed += 1
+    tpath.write_text(
+        "transition: D00-T04-S9-F1\n"
+        "date: 2026-09-19\n"
+        "from: raised\n"
+        "to: withdrawn\n"
+        "why: the raiser retracted it\n"
+        "evidence: D00-T04-s9.md round 3\n"
+        "as-of: yesterday\n",
+        encoding="utf-8",
+    )
+    if not any("not a sha" in p for p in check_transitions(tfind, tpath)):
+        print("  FAIL  a transition binding a non-sha was not reported")
         failed += 1
     tpath.write_text("# nothing tracked yet\n", encoding="utf-8")
     if not any("keeps no transition" in p for p in check_transitions(tfind, tpath)):
@@ -698,7 +749,7 @@ def _self_test() -> int:
               tmp / "D00-T10-s3.md"):
         x.unlink()
     tmp.rmdir()
-    print(f"todo-findings self-test: 29 cases, {failed} failed")
+    print(f"todo-findings self-test: 31 cases, {failed} failed")
     return 1 if failed else 0
 
 
