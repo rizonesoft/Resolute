@@ -11,8 +11,11 @@
 *.md text eol=lf
 tools/githooks/** text eol=lf
 
-# Persisted decision inputs hash by blob bytes: LF everywhere, so the
-# manifest validates from any checkout, archive, or `git show` alike.
+# Persisted decision inputs hash by blob bytes: LF in every blob, so the
+# manifest validates from a fresh checkout, an archive, or `git show` alike.
+# Worktrees materialized before this rule carry CRLF: delete and re-checkout
+# the directory to re-materialize LF (status reads clean either way, because
+# the clean filter normalizes before comparing).
 docs/reviews/crossover/** text eol=lf
 
 # ExoSuite carried Git LFS rules for *.exe, *.dll, and Bin/** at intake.

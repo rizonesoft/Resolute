@@ -1,0 +1,22 @@
+B1: critical -- the candidate-identity gate accepts a non-commit head and invalidates candidate provenance.
+B2: critical -- the content binding omits the findings ledger consumed by analysis and invalidates the stamp.
+B3: major -- the run record cites figures with no committed source in the repository.
+B4: critical -- the commit-type gate trusts replacement refs and permits forged candidate identity.
+B5: major -- the completion note falsely claims byte-identical output despite recorded differences.
+B6: critical -- the export checker accepts fabricated unresolved bindings and invalidates evidence integrity.
+B7: critical -- the identity and attestation gates permit replacement-ref substitution of candidate content.
+B8: major -- the shipped section record incorrectly describes an enforced rule as unenforced.
+B9: critical -- the agreement check can present reviewers with content that is not the candidate’s.
+B10: major -- the resolver crashes instead of returning a controlled version-control failure.
+B11: critical -- the stamp fence can present a spoofed patch instead of the staged change.
+B12: minor -- the ship-message finding was refuted.
+B13: major -- the self-test fixture is vulnerable to mutation or failure from inherited Git configuration.
+B14: major -- the skill record falsely characterizes unmeasured and unpersisted evidence as complete.
+B15: minor -- the evidence-binding finding was marked duplicate.
+B16: major -- the run record presents reconstructed abbreviated identifiers as quoted output.
+B17: critical -- the proof relies on values absent from every committed source and cannot support the stamp.
+B18: major -- the diagnostic record falsely claims abbreviated identifiers were quoted.
+B19: critical -- the checkpoint depends circularly on a block created only by the stamp itself.
+B20: major -- the scope record claims broader call-site coverage than the implementation provides.
+B21: major -- the rationale record claims an unproven protection without supporting run evidence.
+B22: major -- the coverage record falsely claims complete flagging while instructed reads remain unflagged.
