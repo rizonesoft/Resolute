@@ -653,8 +653,9 @@ def git_oid_exists(oid: str, cwd=None) -> bool:
 
 
 def git_head_tree(head: str, cwd=None) -> str | None:
-    """The tree of a commit OID, else None when it resolves to
-    nothing or to no tree."""
+    """The `^{tree}` of an OID, else None when it resolves to nothing.
+    Pass-through for trees: `rev-parse <tree>^{tree}` exits 0 echoing
+    the tree (driven), so callers needing a commit gate the type first."""
     import subprocess
     proc = subprocess.run(
         ["git", "rev-parse", f"{head}^{{tree}}"],
@@ -662,6 +663,34 @@ def git_head_tree(head: str, cwd=None) -> str | None:
     if proc.returncode != 0:
         return None
     return proc.stdout.strip()
+
+
+def git_object_type(oid: str, cwd=None) -> str | None:
+    """The object type of an OID, else None when it resolves to nothing."""
+    import subprocess
+    proc = subprocess.run(
+        ["git", "cat-file", "-t", oid],
+        capture_output=True, text=True, cwd=cwd)
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.strip()
+
+
+def check_attest_resolution(base: str, head: str, tree: str, cwd=None) -> str | None:
+    """Resolve the attest triple before anything is written: base and head
+    must be commits (existence alone admits a tree-as-head, since
+    `rev-parse <tree>^{tree}` passes the tree through), and the tree must
+    belong to the head. Returns the failure line, else None."""
+    for name, oid in (("--base", base), ("--head", head)):
+        if not git_oid_exists(oid, cwd=cwd):
+            return f"attest: {name} {oid} resolves to nothing"
+        if git_object_type(oid, cwd=cwd) != "commit":
+            return f"attest: {name} {oid} is not a commit"
+    if not git_oid_exists(tree, cwd=cwd):
+        return f"attest: --tree {tree} resolves to nothing"
+    if git_head_tree(head, cwd=cwd) != tree:
+        return f"attest: --tree {tree} is not the tree of --head {head}"
+    return None
 
 
 def read_attestation(text: str) -> dict:
@@ -995,20 +1024,25 @@ def _self_test() -> int:
           xbad is not None and xbad.startswith("cross-check: --base/--head"),
           xbad or "matched")
     # OID resolution runs against a scratch repo (hermetic: no config
-    # writes, all identity via -c flags), so the cases pass on any
-    # machine with git, which the CLI paths under test require throughout.
+    # writes, all identity via -c flags, an empty template dir, and an
+    # empty hooks dir, so configured init.templateDir and core.hooksPath
+    # cannot reach the fixture), on any machine with git, which the CLI
+    # paths under test require throughout.
     import os
     import subprocess
     import tempfile
     with tempfile.TemporaryDirectory(prefix="review-resolve-") as tmpd:
-        subprocess.run(["git", "init", "-q", tmpd], capture_output=True,
-                       check=True)
+        empty = os.path.join(tmpd, "empty")
+        os.mkdir(empty)
+        subprocess.run(["git", "init", "-q", "--template=" + empty, tmpd],
+                       capture_output=True, check=True)
         with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
             fh.write("fixture\n")
         subprocess.run(["git", "-C", tmpd, "add", "f.md"],
                        capture_output=True, check=True)
         subprocess.run(["git", "-C", tmpd, "-c", "user.email=t@t.invalid",
                         "-c", "user.name=t", "-c", "commit.gpgsign=false",
+                        "-c", "core.hooksPath=" + empty,
                         "commit", "-qm", "fixture"], capture_output=True,
                        check=True)
         rhead = subprocess.run(["git", "-C", tmpd, "rev-parse", "HEAD"],
@@ -1025,6 +1059,16 @@ def _self_test() -> int:
               git_head_tree(rhead, cwd=tmpd) == rtree)
         check("resolve-head-tree-missing",
               git_head_tree("deadbeef" * 5, cwd=tmpd) is None)
+        check("resolve-attest-triple-ok",
+              check_attest_resolution(rhead, rhead, rtree, cwd=tmpd) is None)
+        got_head = check_attest_resolution(rhead, rtree, rtree, cwd=tmpd)
+        check("resolve-attest-tree-head-refused",
+              got_head == f"attest: --head {rtree} is not a commit",
+              got_head or "ok")
+        got_base = check_attest_resolution(rtree, rhead, rtree, cwd=tmpd)
+        check("resolve-attest-tree-base-refused",
+              got_base == f"attest: --base {rtree} is not a commit",
+              got_base or "ok")
     check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
@@ -1114,6 +1158,9 @@ if __name__ == "__main__":
         if identity_bad is not None:
             print(identity_bad, file=sys.stderr)
             sys.exit(1)
+        # Existence only, never commit-typed: the stamp flow cross-checks
+        # (HEAD, TREE) with a staged tree as head by design, so a type gate
+        # here would refuse the flow it exists to check (D00 T04 §13 F1).
         for name, oid in (("--base", sys.argv[3]), ("--head", sys.argv[4])):
             if not git_oid_exists(oid):
                 print(f"cross-check: {name} {oid} resolves to nothing",
@@ -1198,14 +1245,10 @@ if __name__ == "__main__":
         except ValueError as exc:
             print(f"attest: {exc}", file=sys.stderr)
             sys.exit(1)
-        for name in ("--base", "--head", "--tree"):
-            if not git_oid_exists(want[name]):
-                print(f"attest: {name} {want[name]} resolves to nothing",
-                      file=sys.stderr)
-                sys.exit(1)
-        if git_head_tree(want["--head"]) != want["--tree"]:
-            print(f"attest: --tree {want['--tree']} is not the tree of "
-                  f"--head {want['--head']}", file=sys.stderr)
+        resolve_bad = check_attest_resolution(
+            want["--base"], want["--head"], want["--tree"])
+        if resolve_bad is not None:
+            print(resolve_bad, file=sys.stderr)
             sys.exit(1)
         try:
             with open(want["--out"], "w", encoding="utf-8", newline="\n") as fh:
