@@ -959,6 +959,17 @@ def _anchor_root_ok(span: str, topdirs: set[str]) -> bool:
     return first in topdirs
 
 
+def _anchor_shipshape(path: str) -> str:
+    """The cited spelling normalized to `ls-files` spelling: separators
+    to forward slashes, `.` segments collapsed, leading `./` stripped
+    (`./x` and `.\\x` cite the tracked `x`). Case stays exact: a
+    wrong-case cite fires untracked, and the session fixes the case
+    (round-5 A1: without this, `./scripts/x.py` could never appear in
+    the forward-slash `ls-files` set and false-fired)."""
+    import posixpath
+    return posixpath.normpath(path.replace("\\", "/"))
+
+
 def _anchor_inside_repo(path: str, root: str) -> bool:
     """Whether a cited path resolves inside the working tree: realpath
     containment, case-normalized (a bare `isabs` misses Windows
@@ -1060,7 +1071,7 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
         root = os.path.normcase(os.path.realpath("."))
     except OSError as exc:
         return [f"{todo_path}: cannot list repo root: {exc}"]
-    cited: dict[str, str] = {}
+    cited: dict[str, tuple[str, str]] = {}
     for lineno, kind, body in _stamp_anchor_lines(todo_text, section):
         where = f"{todo_path}:{lineno}"
         if kind == "Review":
@@ -1092,7 +1103,7 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                 if path.startswith("~") or not _anchor_inside_repo(path, root):
                     failures.append(f"{where}: cites non-repo path {path}")
                     continue
-                cited.setdefault(path, where)
+                cited.setdefault(_anchor_shipshape(path), (where, path))
                 try:
                     with open(path, encoding="utf-8", errors="replace") as fh:
                         total = len(fh.read().splitlines())
@@ -1115,7 +1126,7 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                 if span.startswith("~") or not _anchor_inside_repo(span, root):
                     failures.append(f"{where}: cites non-repo path {span}")
                     continue
-                cited.setdefault(span, where)
+                cited.setdefault(_anchor_shipshape(span), (where, span))
                 continue
             if " " in span and ":" not in span \
                     and _ANCHOR_SPACED_PATH_RE.match(span) is not None:
@@ -1131,7 +1142,7 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
                     elif span.startswith("~") or not _anchor_inside_repo(span, root):
                         failures.append(f"{where}: cites non-repo path {span}")
                     else:
-                        cited.setdefault(span, where)
+                        cited.setdefault(_anchor_shipshape(span), (where, span))
                 continue
         full_spans = [m.span() for m in _ANCHOR_FULLREF_RE.finditer(body)]
         for fm in _ANCHOR_FULLREF_RE.finditer(body):
@@ -1158,8 +1169,9 @@ def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
             failures.append(f"{todo_path}: cannot run git ls-files: {exc}")
             return failures
         tracked = set(parse_nul_file_list(proc.stdout))
-        for path in sorted(set(cited) - tracked):
-            failures.append(f"{cited[path]}: cites untracked file {path}")
+        for shape in sorted(set(cited) - tracked):
+            where, original = cited[shape]
+            failures.append(f"{where}: cites untracked file {original}")
     return failures
 
 
@@ -2512,7 +2524,8 @@ def _self_test() -> int:
         with open(seed2, "w", encoding="utf-8") as fh:
             fh.write("## 1. Seed\n\n> **Verified:** 2026-09-21 | §1 | "
                      f"untracked `{stray}`, nonrepo "
-                     f"`/tmp/s21-anchors-nonrepo-{os.getpid()}.md`\n")
+                     f"`/tmp/s21-anchors-nonrepo-{os.getpid()}.md`, "
+                     "respelt `./todo/README.md` `todo\\README.md`\n")
         try:
             seed2_dead = check_stamp_anchors(seed2, 1)
         finally:
@@ -2527,6 +2540,11 @@ def _self_test() -> int:
               and any("cites non-repo path /tmp/s21-anchors-nonrepo-" in d
                       for d in seed2_dead),
               str(seed2_dead))
+        check("anchors-shipshape",
+              _anchor_shipshape("./todo/README.md") == "todo/README.md"
+              and _anchor_shipshape("todo\\README.md") == "todo/README.md"
+              and _anchor_shipshape("todo/./README.md") == "todo/README.md"
+              and _anchor_shipshape("todo/README.md") == "todo/README.md")
         # The cross-check CLI legs (items 1, 15): the content leg and
         # the kind gate over the fixture repo.
         def _cc(*a):
@@ -2773,7 +2791,11 @@ def _self_test() -> int:
             ("skill-holds-period",
              "The period is part of the verdict."),
             ("skill-refusal-rerun",
-             "names no figure (refusal, off-topic) re-runs")):
+             "names no figure (refusal, off-topic) re-runs"),
+            ("skill-findings-fullrefs",
+             "Findings prose cites full refs too"),
+            ("skill-loop-reemits",
+             "Every fix loop re-emits the attestation")):
         check(pin, needle in skill_text, skill_path)
     try:
         attest_ordered = (skill_text.index("### 9. Write the stamp and flip the row")
