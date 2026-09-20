@@ -452,13 +452,27 @@ def run_check(runs_path):
     return runs, errors
 
 
+def _corpus_clean() -> bool:
+    """The findings corpus matches HEAD: no staged, unstaged, or
+    untracked difference under docs/reviews. The export and report read
+    dispositions and counts from these files beside the runs file, so
+    any difference would postdate the bound commit and voids it."""
+    try:
+        status = subprocess.run(["git", "status", "--porcelain=v1", "-z",
+                                 "--", "docs/reviews"],
+                                cwd=ROOT, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return status.returncode == 0 and not status.stdout
+
+
 def as_of(runs_path):
     """The report's binding: the HEAD commit whose tree holds exactly the
     exported bytes, plus a UTC timestamp. Content identity, not a label:
-    the file's hash must equal HEAD's copy of it, so a dirty tree, an
-    older file, or any other path reads `unresolved` rather than
-    borrowing the checkout's HEAD. Never guessed: a report that cannot
-    name its commit says so."""
+    the file's hash must equal HEAD's copy of it, and the findings
+    corpus must match HEAD too, so a dirty tree, an older file, or any
+    other path reads `unresolved` rather than borrowing the checkout's
+    HEAD. Never guessed: a report that cannot name its commit says so."""
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
         hit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
@@ -479,6 +493,8 @@ def as_of(runs_path):
     if have.returncode != 0 or want.returncode != 0:
         return {"commit": "unresolved", "timestamp": stamp}
     if have.stdout.strip() != want.stdout.strip():
+        return {"commit": "unresolved", "timestamp": stamp}
+    if not _corpus_clean():
         return {"commit": "unresolved", "timestamp": stamp}
     return {"commit": sha, "timestamp": stamp}
 
@@ -1155,7 +1171,10 @@ refuted: 0
                           capture_output=True, text=True, timeout=30)
     identical = (agree.returncode == 0 and want.returncode == 0
                  and agree.stdout.strip() == want.stdout.strip())
-    expect = head.stdout.strip() if identical else "unresolved"
+    st = subprocess.run(["git", "status", "--porcelain=v1", "-z", "--", "docs/reviews"],
+                        cwd=ROOT, capture_output=True, text=True, timeout=30)
+    corpus_clean = st.returncode == 0 and not st.stdout
+    expect = head.stdout.strip() if (identical and corpus_clean) else "unresolved"
     check("as-of-agrees-with-git", live["commit"] == expect, f"{live} want {expect}")
     other.unlink()
     tmp.rmdir()
