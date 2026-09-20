@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**192 findings across 28 sections.**
+**203 findings across 29 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 62 | the plan or the evidence misdescribes what happened |
+| `record` | 66 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 38 | fails under hostile or unexpected input |
 | `correctness` | 36 | the code does the wrong thing |
-| `adversarial` | 33 | fails under hostile or unexpected input |
-| `consistency` | 30 | disagrees with the rest of the suite, its naming, or its layout |
+| `consistency` | 32 | disagrees with the rest of the suite, its naming, or its layout |
 | `integration` | 17 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 91 | wrong behavior in code, plan, or record |
-| `minor` | 95 | polish or wording, or no surviving defect |
+| `major` | 96 | wrong behavior in code, plan, or record |
+| `minor` | 101 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -163,6 +163,17 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §12` | F15 | minor | `adversarial` | filed | independent | unanchored identity parse poisoned by paths |
 | `D00 T04 §12` | F16 | minor | `integration` | duplicate | independent | stamp receipt eyeballed, not checked |
 | `D00 T04 §12` | F17 | minor | `record` | fixed | independent | attestation missing beside the findings file |
+| `D00 T04 §13` | F1 | major | `adversarial` | fixed | independent | tree-as-head passes existence checks |
+| `D00 T04 §13` | F2 | minor | `consistency` | fixed | independent | hermetic fixture inherits templates and hooks |
+| `D00 T04 §13` | F3 | minor | `record` | fixed | independent | abbreviated OIDs quoted as run evidence |
+| `D00 T04 §13` | F4 | major | `adversarial` | fixed | independent | replacement refs spoof the type gate |
+| `D00 T04 §13` | F5 | minor | `record` | fixed | independent | hook prefixes marked, not quoted |
+| `D00 T04 §13` | F6 | major | `adversarial` | fixed | independent | shell identity calls honor replacement refs |
+| `D00 T04 §13` | F7 | minor | `record` | fixed | independent | recorded scope overstates the fix |
+| `D00 T04 §13` | F8 | major | `adversarial` | fixed | independent | unflagged show and diff break the cross-check rationale |
+| `D00 T04 §13` | F9 | minor | `record` | fixed | independent | false show rationale recorded as fact |
+| `D00 T04 §13` | F10 | major | `adversarial` | filed | independent | stamp patch reads through replacement |
+| `D00 T04 §13` | F11 | minor | `consistency` | filed | independent | page-coverage sentence overstates again |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |

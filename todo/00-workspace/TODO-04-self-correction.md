@@ -69,7 +69,7 @@ track: W1
 |  10   |   §10   | Run-record follow-ups                      | §7         |  [x]   |
 |  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [x]   |
 |  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [x]   |
-|  13   |   §13   | Bind the stamp to the push                 | §9         |  [ ]   |
+|  13   |   §13   | Bind the stamp to the push                 | §9         |  [x]   |
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [ ]   |
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [ ]   |
@@ -654,6 +654,13 @@ Round 5 of the §9 panel left two advisories at the hard cap: rename lines past 
 -> SOURCE: plan-D00-T04-s9-2026-09-19-PR11 D00-T04-S9-PR11
 
 > **Started:** 2026-09-19T23:37:44Z
+
+> **Verified:** 2026-09-20 | §13 | the push recheck prints PARENT_OK/TREE_OK/HEAD_OK and a post-review replacement draws `BLOCKED: HEAD moved since the stamp commit; re-review` · the hook drill draws `BLOCKED: a hook rewrote the tree (373f59ffd5177d369fdf31fb16b583c507db57d4 reviewed, 5302969f24a5480cd1c9bcb16291c11edef949c9 committed); re-review` quoted whole · attest and cross-check resolve base/head/tree mechanically with tree-as-head refused as `is not a commit` · attest/cross-check reads are replacement-blind; the stamp patch and self-review reads remain unflagged, filed to §21 · both probe shapes named at high effort (78→74 contradiction, three stale anchors) with the prompt standing unsharpened · short citation forms are FATAL with the span guard pinning wide-spaced full refs · suites at 84 and 511 green · panel: Sol rounds 1-2, Opus sign-off 3, Opus blocking re-rounds 4-5 at the hard cap, 11 findings (9 fixed in-round, 2 filed to §21) · plan review: 20 findings, 13 filed to §21 and §19, 5 rejected, 2 duplicate
+> **Review:** round 5 at the hard cap, candidate `ff90910` `740bbac` `e7a4756` `397bc2f` `2d0d406` -- `adversarial` needs-attention at close (F10 filed) after fixes (4) · `consistency` advisory at close (F11 filed) after fix (1) · `integration` approve throughout · `record` approve at close after fixes (4) · `source-defect`/`design` not owed. Raw findings: docs/reviews/00-workspace/D00-T04-s13.md Attestation: docs/reviews/00-workspace/D00-T04-s13.attest.json
+> **Plan review:** gpt (run 20260920-D00-T04-S13-gpt) -- filed: D00 T04 §21 (7 items), D00 T04 §19 (2 items); 5 rejected and 2 duplicate with reasons in the ledger
+> **CRUD:** this section writes review tooling (push-time rechecks, hook-tree comparison, OID resolution with commit types, replacement-blind git reads, short-form FATAL with span guard), the review skill (push binding block, flagged rev-parse/show reads), plan record (Done notes with driven quotes), and run records (the S13 block). It reads git (rev-parse, cat-file, diff, show, write-tree) and the TODO tree. The behavioral surface it changes is the review-prompt CLI (resolution gates, diff helper) and the review skill's commands; previously-valid inputs behave identically except refused non-commit attestations and flagged reads. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-19T23:37:44Z to 2026-09-20T00:58:54Z
+> **Implementer:** Muse Code
 
 ## 14. Bar Bool Versions from the Export Gate
 
