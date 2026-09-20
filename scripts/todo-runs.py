@@ -1681,6 +1681,17 @@ refuted: 0
         code, _, err = _run_main(["--format", "yaml"])
         check("exit-format-value", code == 2 and "[RUN-001]" in err,
               f"{code} {err!r}")
+        rp.write_text("not a runs file at all\n", encoding="utf-8")
+        code, out, _ = _run_main(
+            ["--check", "--format=json", str(rp)])
+        try:
+            eq_doc = json.loads(out)
+        except ValueError:
+            eq_doc = None
+        check("format-equals-form",
+              code == 1 and isinstance(eq_doc, list) and eq_doc
+              and eq_doc[0]["code"] == "RUN-002",
+              f"{code} {out!r}")
         code, out, _ = _run_main(
             ["--check-export", str(tmp / "missing22.json")])
         check("exit-export-unreadable", code == 1 and "[RUN-007]" in out,
@@ -1739,20 +1750,24 @@ refuted: 0
 def main(argv=None, collected=None, review_sections=None):
     args = list(sys.argv[1:] if argv is None else argv)
     fmt = "text"
+    for i, arg in enumerate(args):
+        if arg.startswith("--format="):
+            fmt = arg.split("=", 1)[1]
+            args.pop(i)
+            break
     if "--format" in args:
         i = args.index("--format")
         args.pop(i)
         if i >= len(args) or args[i].startswith("--"):
-            print(DIAG.emit("RUN-001", None, None,
-                            "usage: --format wants text or json"),
-                  file=sys.stderr)
-            return 2
-        fmt = args.pop(i)
-        if fmt not in ("text", "json"):
-            print(DIAG.emit("RUN-001", None, None,
-                            f"usage: --format wants text or json, got {fmt!r}"),
-                  file=sys.stderr)
-            return 2
+            fmt = None
+        else:
+            fmt = args.pop(i)
+    if fmt not in ("text", "json"):
+        print(DIAG.emit("RUN-001", None, None,
+                        "usage: --format wants text or json"
+                        + ("" if fmt is None else f", got {fmt!r}")),
+              file=sys.stderr)
+        return 2
     json_mode = fmt == "json"
     if "--self-test" in args:
         return _self_test()
@@ -1764,19 +1779,20 @@ def main(argv=None, collected=None, review_sections=None):
                   file=sys.stderr)
             return 2
         try:
+            xport = Path(rest[0]).as_posix()
             doc = json.loads(Path(rest[0]).read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
-            print(DIAG.emit("RUN-007", rest[0], None,
+            print(DIAG.emit("RUN-007", xport, None,
                             f"cannot read export: {exc}"))
             return 1
         problems = check_export(doc)
         if problems:
             if json_mode:
-                print(DIAG.dumps([DIAG.refusal("RUN-007", rest[0], None, p)
+                print(DIAG.dumps([DIAG.refusal("RUN-007", xport, None, p)
                                   for p in problems]), end="")
             else:
                 for problem in problems:
-                    print(DIAG.emit("RUN-007", rest[0], None, problem))
+                    print(DIAG.emit("RUN-007", xport, None, problem))
             return 1
         if not json_mode:
             print(f"{rest[0]}: {export_sound_line(doc)}")
@@ -1800,11 +1816,11 @@ def main(argv=None, collected=None, review_sections=None):
     if errors:
         if json_mode:
             print(DIAG.dumps(
-                [DIAG.refusal(code, str(runs_path), lineno or None, msg)
+                [DIAG.refusal(code, runs_path.as_posix(), lineno or None, msg)
                  for code, lineno, msg in errors]), end="")
         else:
             for code, lineno, msg in errors:
-                print(DIAG.emit(code, str(runs_path), lineno or None, msg))
+                print(DIAG.emit(code, runs_path.as_posix(), lineno or None, msg))
         return 1
     if mode_report:
         sys.stdout.write(report(runs, runs_path, collected))
