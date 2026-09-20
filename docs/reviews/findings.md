@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**273 findings across 37 sections.**
+**277 findings across 37 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 93 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 58 | fails under hostile or unexpected input |
+| `record` | 95 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 59 | fails under hostile or unexpected input |
 | `correctness` | 40 | the code does the wrong thing |
 | `consistency` | 40 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 28 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 29 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 136 | wrong behavior in code, plan, or record |
-| `minor` | 131 | polish or wording, or no surviving defect |
+| `major` | 138 | wrong behavior in code, plan, or record |
+| `minor` | 133 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -248,6 +248,10 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §22` | F2 | major | `consistency` | fixed | independent | code list restated outside the registry |
 | `D00 T04 §22` | F3 | minor | `record` | fixed | independent | single-place record false while docstrings duplicate |
 | `D00 T04 §22` | F4 | minor | `record` | fixed | independent | exit-2 record false for unknown switches |
+| `D00 T04 §22` | F5 | major | `adversarial` | fixed | independent | check-export flags slip past usage refusal |
+| `D00 T04 §22` | F6 | major | `integration` | fixed | independent | unreadable exports ignore the structured form |
+| `D00 T04 §22` | F7 | minor | `record` | refuted | independent | attestation file absent mid-review |
+| `D00 T04 §22` | F8 | minor | `record` | fixed | independent | no-behavior-changed record contradicts the fix it follows |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |

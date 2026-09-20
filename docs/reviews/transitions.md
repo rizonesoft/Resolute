@@ -121,3 +121,11 @@ to: refuted
 why: "Round-5 R2 reads the §24 debt item's 'seven stale evidence cites' against its six enumerated paths and calls the enumeration one short. Re-driven: the sweep fires 7 failure lines over 6 paths (`cpp-env.ps1` cited twice, D00 T01 §1 lines 152 and 155), so the count was always cites, not paths, and the enumeration is complete."
 evidence: "The count stands; the item now reads 'seven stale evidence cites over six paths' with the double cite named", clarified in 624a83b; the F35 record carries the re-drive.
 as-of: da5a00a4
+
+transition: D00-T04-S22-F7
+date: 2026-09-20
+from: raised
+to: refuted
+why: "Round-2 R1 reads the record's `Attestation:` line as a claim that the attest file exists mid-review. The skill emits the attestation only after step 9 completes (stamp written, `Live proof` quoted, ledger regenerated), because attesting earlier binds bytes a later step rewrites; creating the file mid-review to satisfy the reading would fabricate evidence. The line is a locator for the owed file, not an existence claim."
+evidence: "That is the skill's own ordering, not a defect", the F7 record carries the refutation; as-of binds the round-2 fix commit, the state the refutation reads.
+as-of: 3b7ed181
