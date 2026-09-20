@@ -281,3 +281,13 @@ round: 4 model: opus effort: medium outcome: findings candidate: 397bc2f provide
 round: 5 model: opus effort: medium outcome: findings candidate: 2d0d406 provider: claude version: unresolved cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S13-F10, D00-T04-S13-F11
 empty: 0
 refuted: 0
+
+run: D00-T04-S14
+date: 2026-09-20
+runner: panel
+rounds: 3
+round: 1 model: gpt-5.6-sol effort: medium outcome: empty candidate: bc5f92a provider: codex version: gpt-5.6-sol cost: 13041tokens latency: unresolved opportunity: full-scope purpose: section-review provenance: recorded findings:
+round: 2 model: gpt-5.6-sol effort: medium outcome: empty candidate: bc5f92a provider: codex version: gpt-5.6-sol cost: 17409tokens latency: unresolved opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+round: 3 model: opus effort: medium outcome: empty candidate: bc5f92a provider: claude version: unresolved cost: unresolved latency: unresolved opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings:
+empty: 3
+refuted: 0

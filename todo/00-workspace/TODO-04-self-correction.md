@@ -70,7 +70,7 @@ track: W1
 |  11   |   §11   | Bind the rename scan to the diff header    | §9         |  [x]   |
 |  12   |   §12   | Prove the manifest, not just emit it       | §9         |  [x]   |
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [x]   |
-|  14   |   §14   | Bar bool versions from the export gate     | §10        |  [ ]   |
+|  14   |   §14   | Bar bool versions from the export gate     | §10        |  [x]   |
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [ ]   |
 |  16   |   §16   | Blinded-run checker defects                   | §10     |  [ ]   |
 |  17   |   §17   | Report without walking the corpus twice       | §10     |  [ ]   |
@@ -675,6 +675,14 @@ The §10 sign-off round proved `check_export` accepts `"export_version": true, "
 -> SOURCE: panel-D00-T04-s10-2026-09-19 D00-T04-S10-F9
 
 > **Started:** 2026-09-20T01:31:18Z
+
+> **Verified:** 2026-09-20 | §14 | both version gates assert `_is_int` first, failing bools as `export_version must be an int, got bool` and `schema must be an int, got bool`, exit 1, quoted from driven `--check-export` runs · wrong-integer values keep their existing messages · the live export passes as `export version 1, 29 runs, internally sound`, exit 0 · self-test pins both gates, suite 49 green · independent review clean · panel: Sol rounds 1-2, Opus sign-off 3, all approve, zero findings · plan review: 10 findings, 1 filed to §15, 8 rejected, 1 duplicate
+> **Review:** round 3 sign-off, candidate `bc5f92a` -- `adversarial` approve · `consistency` approve · `integration` approve · `record` approve · `source-defect`/`design` not owed. Raw findings: docs/reviews/00-workspace/D00-T04-s14.md Attestation: docs/reviews/00-workspace/D00-T04-s14.attest.json
+> **Independent:** `codex review --commit bc5f92a` model gpt-5.6-sol -- clean, no findings.
+> **Plan review:** gpt (run 20260920-D00-T04-S14-gpt) -- filed: D00 T04 §15 (gate-evidence binding item); 8 rejected and 1 duplicate with reasons in the ledger
+> **CRUD:** this section writes two type gates in the export checker (`check_export` asserts `_is_int` before the version comparisons) and two self-test pins. It reads export documents. The behavioral surface it changes is the failure message for non-integer versions (bools, strings, nulls, missing fields now name the type); valid and wrong-integer inputs behave identically. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-20T01:31:18Z to 2026-09-20T01:45:35Z
+> **Implementer:** Muse Code
 
 ## 15. Run-Record Vocabulary and Evidence Follow-Ups
 

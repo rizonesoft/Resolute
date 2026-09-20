@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **29 of 212 sections complete (14%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **30 of 212 sections complete (14%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -112,7 +112,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §11` | Bind the rename scan to the diff header        |   3   |
 | [x] | `D00 T04 §12` | Prove the manifest, not just emit it           |   8   |
 | [x] | `D00 T04 §13` | Bind the stamp to the push                     |   6   |
-| [ ] | `D00 T04 §14` | Bar bool versions from the export gate         |   2   |
+| [x] | `D00 T04 §14` | Bar bool versions from the export gate         |   2   |
 | [ ] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |  12   |
 | [ ] | `D00 T04 §16` | Blinded-run checker defects                    |   5   |
 | [ ] | `D00 T04 §17` | Report without walking the corpus twice        |   2   |
