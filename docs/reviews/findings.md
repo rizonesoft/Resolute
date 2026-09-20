@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**249 findings across 36 sections.**
+**256 findings across 36 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 83 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 52 | fails under hostile or unexpected input |
+| `record` | 86 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 54 | fails under hostile or unexpected input |
 | `correctness` | 40 | the code does the wrong thing |
 | `consistency` | 37 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 23 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 25 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 125 | wrong behavior in code, plan, or record |
-| `minor` | 118 | polish or wording, or no surviving defect |
+| `major` | 127 | wrong behavior in code, plan, or record |
+| `minor` | 123 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -224,6 +224,13 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §21` | F14 | major | `consistency` | fixed | independent | codex model claim unfalsifiable |
 | `D00 T04 §21` | F15 | major | `integration` | fixed | independent | spaced cites skip silently; sweep finds stale D00 T01 cites |
 | `D00 T04 §21` | F16 | minor | `record` | duplicate | independent | PASS binding restatement (third report) |
+| `D00 T04 §21` | F17 | minor | `adversarial` | refuted | independent | title-carried commits claim diverges the parsers |
+| `D00 T04 §21` | F18 | minor | `adversarial` | duplicate | independent | checker binding restatement (fourth report) |
+| `D00 T04 §21` | F19 | major | `integration` | fixed | independent | stamp failover checks stale bytes |
+| `D00 T04 §21` | F20 | major | `integration` | fixed | independent | anchors read non-stamp files unverified |
+| `D00 T04 §21` | F21 | minor | `record` | fixed | independent | stale line-count quote |
+| `D00 T04 §21` | F22 | minor | `record` | fixed | independent | candidate table omits edef994 |
+| `D00 T04 §21` | F23 | minor | `record` | fixed | independent | round-2 record missing |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
