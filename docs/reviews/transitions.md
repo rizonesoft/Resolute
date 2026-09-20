@@ -57,3 +57,11 @@ to: duplicate
 why: "Round 4 restated round 3's stamp-checker gap verbatim; the gap is already owned and needs no second owner."
 evidence: "Same gap as D00-T04-S12-F12, filed to `D00 T04 §21` item 2 in `2ccce2d`", recorded as duplicate of F12; see the F12 transition above.
 as-of: ef362d6
+
+transition: D00-T04-S16-F3
+date: 2026-09-20
+from: raised
+to: duplicate
+why: "The §16 Done evidence reintroduces it", the bare-counts pattern S15-PR4 already decided: Done notes quote candidate-time drives, bound outputs ride the stamp's Live proof.
+evidence: "placeholders mark pre-commit unknowns honestly; exact bound outputs ride the stamp's Live proof", quoted from the S15-PR4 ledger row in docs/reviews/00-workspace/D00-T04-s15.md; the §16 instance matches the decided shape, so the rejection stands as the rule.
+as-of: 6002a21

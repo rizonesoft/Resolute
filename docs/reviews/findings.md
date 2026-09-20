@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**209 findings across 30 sections.**
+**212 findings across 31 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 69 | the plan or the evidence misdescribes what happened |
+| `record` | 71 | the plan or the evidence misdescribes what happened |
 | `correctness` | 39 | the code does the wrong thing |
 | `adversarial` | 38 | fails under hostile or unexpected input |
-| `consistency` | 32 | disagrees with the rest of the suite, its naming, or its layout |
+| `consistency` | 33 | disagrees with the rest of the suite, its naming, or its layout |
 | `integration` | 17 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 98 | wrong behavior in code, plan, or record |
-| `minor` | 105 | polish or wording, or no surviving defect |
+| `major` | 99 | wrong behavior in code, plan, or record |
+| `minor` | 107 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -180,6 +180,9 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §15` | F4 | minor | `record` | fixed | independent | fresh-round proof quoted values no committed line carried |
 | `D00 T04 §15` | F5 | minor | `correctness` | fixed | independent | git resolvers crashed instead of reporting when git failed |
 | `D00 T04 §15` | F6 | minor | `record` | fixed | independent | checkpoint leg unverifiable from the tree until the stamp writes the block |
+| `D00 T04 §16` | F1 | minor | `consistency` | filed | independent | section 8 CRUD still states the never-defect rule unenforced |
+| `D00 T04 §16` | F2 | major | `record` | filed | independent | reconstructed stamp-round figures have no committed source |
+| `D00 T04 §16` | F3 | minor | `record` | duplicate | independent | Done notes quote bare counts without as-of binding |
 | `D00 T04 §2` | F1 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F2 | major | `correctness` | fixed | independent | raised by the independent review, both correct |
 | `D00 T04 §2` | F3 | major | `correctness` | fixed | self | the heading pattern matched ordinary headings |

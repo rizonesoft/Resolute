@@ -72,7 +72,7 @@ track: W1
 |  13   |   §13   | Bind the stamp to the push                 | §9         |  [x]   |
 |  14   |   §14   | Bar bool versions from the export gate     | §10        |  [x]   |
 |  15   |   §15   | Run-record vocabulary and evidence follow-ups | §10     |  [x]   |
-|  16   |   §16   | Blinded-run checker defects                   | §10     |  [ ]   |
+|  16   |   §16   | Blinded-run checker defects                   | §10     |  [x]   |
 |  17   |   §17   | Report without walking the corpus twice       | §10     |  [ ]   |
 |  18   |   §18   | Second two-model revisit, independently rated | §8      |  [ ]   |
 |  19   |   §19   | No partial flips                            | --      |  [ ]   |
@@ -751,6 +751,13 @@ The §8 blinded runs re-reviewed `f118e30` with the fixes hidden and found three
 
 > **Started:** 2026-09-20T03:39:43Z
 
+> **Verified:** 2026-09-20 | §16 | the dead-ref duplicate draws the exact three-message sequence (dead, duplicate naming line 1, dead), pinned, with distinct-dead and live-duplicate boundaries pinned beside it · the flag conflict exits 2 with `pass at most one` while each flag alone still works · `schema: 99` draws exactly one message, pinned by equality · a never-defect carrying major or critical fails naming the rule, pinned all six bad cells plus the three minor accepts · the S15 round-4 stamp round reads in the block (outcome stamp, purpose stamp-review, candidate `56a8bb6`, provenance reconstructed) · suites green at the stamp tree (runs 67, findings 34, review-prompt 84, graph 511), `--check` passing 32 runs with 72 rounds, ledger at 212 · panel: Sol rounds 1-2 all approve, Opus sign-off 3 with 1 advisory (F1 filed to §20) and 2 record findings (F2 filed to §20, F3 duplicate of S15-PR4) · plan review: 16 findings, 4 filed (§18 once, §20 merge with F2, §22 twice), 3 accepted direct, 6 rejected, 3 duplicate
+> **Review:** round 3 Opus sign-off, candidates `c33cb6e` `513a487` plus plan-review direct `aed5f63` -- `adversarial` approve · `consistency` advisory (F1 filed to §20) · `integration` approve · `record` needs-attention (F2 filed to §20, F3 duplicate of S15-PR4) · `source-defect`/`design` not owed. Raw findings: docs/reviews/00-workspace/D00-T04-s16.md Attestation: docs/reviews/00-workspace/D00-T04-s16.attest.json
+> **Plan review:** gpt (run 20260920-D00-T04-S16-gpt) -- filed: D00 T04 §18 (rotation item), D00 T04 §20 (committed-source item, merge with F2), D00 T04 §22 (codes section with the exit-pin item); 3 accepted (usage wording, six-cell note, boundary fixtures, direct in `aed5f63`); 6 rejected and 3 duplicate with reasons in the ledger
+> **CRUD:** this section hardens the two review checkers' refusals: duplicate-before-liveness in transitions, the flag-conflict usage error, the wrong-schema single message, and never-defect severity enforcement, each pinned at exact-message level, plus the §15 stamp round in the run records. It reads the review files, the run records, and the findings ledger. The behavioral surface it changes is checker refusal shape (changed messages, one new usage error) and one run-record block; previously-passing records behave identically except the now-refused shapes. It touches no user system, no C++, and no shipped behavior.
+> **Duration:** 2026-09-20T03:39:43Z to 2026-09-20T04:25:17Z
+> **Implementer:** Muse Code
+
 ## 17. Report Without Walking the Corpus Twice
 
 The §8 diversity runs found `report()` calls `TF.collect()` after `run_check()` already collected the same corpus through `cross_check`, doubling repository-wide file reads and parsing on every `--report`. True and cheap to fix by threading the collected findings through; unnoticed because the corpus is 25 files and the report runs in milliseconds, which is also why this is a single-item section rather than a performance project.
@@ -840,6 +847,7 @@ Two §12-review findings about the review machinery itself: the skill's fence co
 -> SOURCE: panel-D00-T04-s15-2026-09-20 D00-T04-S15-F5
 -> SOURCE: panel-D00-T04-s16-2026-09-20 D00-T04-S16-F1
 -> SOURCE: panel-D00-T04-s16-2026-09-20 D00-T04-S16-F2
+-> SOURCE: plan-D00-T04-s16-2026-09-20-PR6 D00-T04-S16-PR6
 
 ## 21. Review-Input Integrity Hardening
 
