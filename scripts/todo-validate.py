@@ -6,6 +6,7 @@ warning accounting use the same state as query/resolve. No copied constants.
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 import re
 import subprocess
@@ -1969,6 +1970,90 @@ def validate(graph, _args) -> int:
                         flag(
                             "skill-citation-short-form",
                             f"{path}:{lineno}: skill cites short form {form}, use a full DNN TNN §N ref",
+                        )
+
+    # 27. evidence surfaces cite full refs (D00 T04 §21, generalizing
+    # §13's skill ban to stamps, findings files, and attestations).
+    # Pre-cutoff stamps stand as history (670 live shorts on sealed
+    # records no rule may rewrite); Deferred/Resolved lines are
+    # ownership pointers, not prose, and keep their XREF grammar; there
+    # is no same-section exemption for new records (even its own section
+    # reads as a full ref). Findings scan unfenced: fences strip from
+    # every scan, so transcripts never trip the rule. The Verified
+    # coverage segment (`DATE | §N |`) is stamp grammar, not a citation,
+    # and strips before the scan.
+    def _flag_shorts(text: str, where: str) -> None:
+        full_spans = [m.span() for m in graph.SKILL_CITE_RE.finditer(text)]
+        for short in graph.SKILL_SHORT_RE.finditer(text):
+            if any(s <= short.start() and short.end() <= e
+                   for s, e in full_spans):
+                continue
+            flag(
+                "evidence-citation-short-form",
+                f"{where} cites short form {short.group(0)}, use a full DNN TNN §N ref",
+            )
+
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if pre_convention(s, graph.EVIDENCE_CITE_CUTOFF):
+                continue
+            bodies = (("Verified", s.verified_body), ("Review", s.review_body),
+                      ("Plan review", s.plan_review_body), ("CRUD", s.crud_body),
+                      ("Duration", s.duration_body))
+            if not any(body for _, body in bodies):
+                continue
+            for kind, body in bodies:
+                if not body:
+                    continue
+                if kind == "Verified":
+                    body = re.sub(r"^\d{4}-\d{2}-\d{2} \| §\d+ \| ?", "", body)
+                _flag_shorts(body, f"{t.path}:{s.line}: §{num} {kind}")
+            fm = graph.FINDINGS_RE.search(s.review_body or "")
+            if fm:
+                # TODO_DIR.parent, like the panel rule: findings paths are
+                # repo-relative, and the self-test rebinds TODO_DIR.
+                fpath = fm.group(1)
+                try:
+                    ftext = (graph.TODO_DIR.parent / fpath).read_text(encoding="utf-8")
+                except OSError:
+                    ftext = None
+                if ftext is not None:
+                    kept, _u = graph.strip_fenced_map(ftext)
+                    for lineno, (line, keep) in enumerate(
+                            zip(ftext.splitlines(), kept), 1):
+                        if keep:
+                            _flag_shorts(line, f"{fpath}:{lineno}")
+                apath = str(Path(fpath).with_suffix("")) + ".attest.json"
+                try:
+                    adoc = json.loads(
+                        (graph.TODO_DIR.parent / apath).read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    adoc = None
+                if isinstance(adoc, dict):
+                    for key, val in adoc.items():
+                        if isinstance(val, str):
+                            _flag_shorts(val, f"{apath} field {key}")
+
+    # 28. multi-commit Review lines tag every candidate with its round:
+    # `oid`(round N) (D00 T04 §21: round-to-commit mapping must be
+    # mechanical, not findings prose). Pre-cutoff stamps stand as
+    # history; §13's own line stands by explicit exemption (a record
+    # nicety, no audit rewrite). Single-oid lines pass: one candidate
+    # needs no mapping.
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if pre_convention(s, graph.EVIDENCE_CITE_CUTOFF):
+                continue
+            if t.domain == "00-workspace" and t.number == "04" and num == 13:
+                continue
+            oids = list(graph.REVIEW_OID_RE.finditer(s.review_body or ""))
+            if len(oids) >= 2:
+                for m in oids:
+                    if m.group("tag") is None:
+                        flag(
+                            "review-citation-role-less",
+                            f"{t.path}:{s.line}: §{num} Review cites untagged "
+                            f"candidate {m.group('oid')}, tag each with (round N)",
                         )
 
     # The warning BASELINE. A count that only grows is a count nobody reads,

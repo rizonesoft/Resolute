@@ -169,6 +169,8 @@ One paragraph of context, then the checklist.
 > **Implementer:** assistant name (model-id)
 ```
 
+Stamp prose cites full `DNN TNN §N` refs on stamps dated after 2026-09-20, including the section's own: no same-section exemption, and multi-commit Review lines tag every candidate `` `oid`(round N) ``. Ownership pointers (`Deferred:`, `Resolved:`, `Depends On`, `-> XREF:`) keep their short XREF grammar; records stamped on or before 2026-09-20 stand as history.
+
 Alternative markers, one per stamp (the last marker line governs, so these never stack):
 
 ```md
@@ -422,6 +424,8 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 | ----- | -------- | --- |
 | `over-section-cap` | FATAL | A TODO file may hold at most **55** sections. Past that the next work opens a NEW file in the same domain, split by subject. Section numbers are permanent addresses, so a file can never be renumbered or made smaller. |
 | `duplicate-source-key` | FATAL | Two sections claim the same `-> SOURCE: <key>`. An automated filer stamps what it filed FROM, so a scanner that runs twice a day cannot open a second row for one build failure. |
+| `evidence-citation-short-form` | FATAL | New evidence cites full `DNN TNN §N` refs on stamps, findings files, and attestations; pre-cutoff records stand as history. |
+| `review-citation-role-less` | FATAL | A multi-commit Review line tags every candidate with its round; round-to-commit mapping must be mechanical. |
 | `superseded-no-successor` | FATAL | A superseded TODO must name where its work went; mechanical. |
 | `filter-overclaim-open` | FATAL | An open checkpoint that cannot detect its promised regression; naming the tests or scripts is a two-minute fix. |
 | `filter-overclaim-stamped` | WARN | The stamp must not be reopened; the fix-forward channel owns it. |

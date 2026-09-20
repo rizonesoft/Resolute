@@ -288,13 +288,18 @@ def assert_candidate_identity(chunks: list[tuple[str, str]],
 
 def build_manifest(tag: str, chunks: list[tuple[str, str]],
                    base: str | None = None, head: str | None = None,
-                   *, nonce: str) -> tuple[str, str]:
+                   *, nonce: str,
+                   commits: list[str] | None = None) -> tuple[str, str]:
     """Fence chunks and describe them. Returns (manifest_line, fenced_body).
 
     The manifest covers the fenced body only, never itself: it is
     emitted ahead of the body and counts the bytes that follow it.
     A combined-diff opener in a diff-titled chunk raises ValueError
     naming the shape: merge candidates are refused, never parsed.
+    `commits` names the assembled commits a non-contiguous chunk
+    claims to cover; the content leg verifies the claim (D00 T04
+    §21). It rides ahead of base/head, which stay trailing for the
+    anchored identity parse.
     """
     body = fence_chunks(tag, chunks, nonce=nonce)
     digest = hashlib.sha256(canonical_prompt_bytes(body)).hexdigest()
@@ -323,7 +328,9 @@ def build_manifest(tag: str, chunks: list[tuple[str, str]],
                 if path not in diff_files:
                     diff_files.append(path)
     if diff_files:
-        line += " diff-files=" + "|".join(diff_files)
+        line += " diff-files=" + "|".join(quote_manifest_name(p) for p in diff_files)
+    if commits:
+        line += " commits=" + "|".join(commits)
     if base is not None:
         line += f" base={base}"
     if head is not None:
@@ -579,20 +586,111 @@ def check_plan_output(text: str, manifest: tuple[str, str, str] | None = None) -
     return True, f"{len(lines)} findings, one per line"
 
 
+_STAMP_HOLDS_RE = re.compile(r"^STAMP HOLDS\.\s*$")
+
+
+def check_stamp_output(text: str, manifest: tuple[str, str, str] | None = None) -> tuple[bool, str]:
+    """Whole-output validation for a stamp-review round: the receipt
+    (against the stamp manifest), then exactly `STAMP HOLDS.` or one or
+    more naming lines (D00 T04 §21: the eyeball verification was the
+    gap). Like check-panel, findings still pass: namings are valid
+    reviewer output the session must answer, so they pass with their
+    count and the skill branches on the reason (`stamp holds` proceeds;
+    `N naming(s)` re-stages; anything else re-runs). A receipt-less,
+    empty, or HOLDS-plus-junk output fails. Returns (ok, reason)."""
+    text, envelope_err = panel_text_from_envelope(text)
+    if envelope_err is not None:
+        return False, envelope_err
+    bounded = _output_within_bounds(text)
+    if bounded is not None:
+        return bounded
+    if manifest is not None:
+        text, reason = strip_receipt(text, manifest[0], manifest[1], manifest[2])
+        if text is None:
+            return False, reason
+    numbered = [(i, ln) for i, ln in enumerate(text.splitlines(), start=1)
+                if ln.strip()]
+    if not numbered:
+        return False, "no verdict after the receipt"
+    if _STAMP_HOLDS_RE.match(numbered[0][1]):
+        if len(numbered) > 1:
+            return False, f"line {numbered[1][0]} follows STAMP HOLDS"
+        return True, "stamp holds"
+    return True, f"{len(numbered)} naming(s) to answer"
+
+
+def quote_manifest_name(name: str) -> str:
+    """Escape one file name for the `diff-files` field: backslash, pipe,
+    and newline escape (spaces stay literal, git C-quote style), so
+    hostile names round-trip exactly (D00 T04 §21: adversarial names
+    weakened at the manifest boundary)."""
+    return (name.replace("\\", "\\\\").replace("|", "\\|")
+                .replace("\n", "\\n"))
+
+
+def split_manifest_names(field: str) -> list[str]:
+    """Split a `diff-files` field on unescaped pipes, unescaping each
+    name. Lenient on unknown escapes (`\\` plus anything unlisted keeps
+    both chars), so legacy unquoted names carrying backslashes survive
+    the read; the writer never emits a trailing lone backslash, and a
+    hand-made one keeps its backslash."""
+    names: list[str] = []
+    cur: list[str] = []
+    esc = False
+    for ch in field:
+        if esc:
+            if ch == "n":
+                cur.append("\n")
+            elif ch in "\\|":
+                cur.append(ch)
+            else:
+                cur.append("\\")
+                cur.append(ch)
+            esc = False
+        elif ch == "\\":
+            esc = True
+        elif ch == "|":
+            names.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+    if esc:
+        cur.append("\\")
+    names.append("".join(cur))
+    return names
+
+
 def parse_manifest_diff_files(text: str) -> list[str]:
     """The diff-files list from saved TAG + MANIFEST lines. Raises
     ValueError when no MANIFEST line reads; an absent diff-files field
-    reads as the empty list (a manifest that lists no files). Paths
-    may carry spaces, so the value runs to the next ` base=`/` head=`
-    field or EOL; a path containing those tokens truncates the list,
-    which the cross-check then fails loudly rather than agreeing."""
+    reads as the empty list (a manifest that lists no files). Trailing
+    fields strip from the END (`commits`, then the anchored `base`/
+    `head` pair): a mid-value lookalike (`x base=y` inside a hostile
+    name) can never match an end-anchored field, so the remainder is
+    the value whole. It then splits on unescaped pipes: quoted
+    emissions round-trip hostile names exactly, and legacy unquoted
+    values read as before."""
     for line in text.splitlines():
         mm = MANIFEST_RE.match(line.strip())
         if mm:
-            dm = re.search(r"diff-files=(?P<files>.*?)(?:\s+base=|\s+head=|$)", mm.group("rest"))
-            if dm is None or not dm.group("files"):
+            rest = mm.group("rest")
+            dm = re.search(r"diff-files=", rest)
+            if dm is None:
                 return []
-            return dm.group("files").split("|")
+            tail = rest[dm.end():]
+            for pat in (r"\s+base=\S+\s+head=\S+\s*$",
+                        r"\s+base=\S+\s*$",
+                        r"\s+head=\S+\s*$"):
+                tm = re.search(pat, tail)
+                if tm is not None:
+                    tail = tail[:tm.start()]
+                    break
+            cm = re.search(r"\s+commits=\S+\s*$", tail)
+            if cm is not None:
+                tail = tail[:cm.start()]
+            if not tail:
+                return []
+            return split_manifest_names(tail)
     raise ValueError("manifest file carries no MANIFEST line")
 
 
@@ -611,6 +709,360 @@ def cross_check_files(parsed: list[str], nul_data: bytes) -> list[str]:
     lines = [f"only in manifest: {p}" for p in sorted(want - got)]
     lines += [f"only in git: {p}" for p in sorted(got - want)]
     return lines
+
+
+def parse_manifest_commits(text: str) -> list[str]:
+    """The commits= claim from saved TAG + MANIFEST lines: the assembled
+    commits a non-contiguous chunk claims to cover. Empty when the field
+    is absent (the contiguous flow claims nothing). The last match wins:
+    titles precede the field and quoted diff-files carry no literal
+    space, so only the real field can sit last; a forged claim still
+    fails closed downstream (unresolvable, or uncovered)."""
+    for line in text.splitlines():
+        mm = MANIFEST_RE.match(line.strip())
+        if mm:
+            found = re.findall(r"\scommits=(\S+)", mm.group("rest"))
+            if found:
+                return [c for c in found[-1].split("|") if c]
+            return []
+    raise ValueError("manifest file carries no MANIFEST line")
+
+
+_FENCE_OPEN_RE = re.compile(r"^--- (?P<title>.+) \[(?P<tag>[^\]]+)\] ---\s*$")
+_FENCE_END_RE = re.compile(r"^--- END \[(?P<tag>[^\]]+)\] nonce=[0-9a-f]{16} ---\s*$")
+
+
+def unfence_diff_bodies(text: str, tag: str) -> list[str]:
+    """Diff-titled chunk bodies from a fenced file: only lines carrying
+    [tag] delimit, mirroring the reviewer's contract (a colliding tag
+    cannot exist: fencing refuses it). Returns the bodies of chunks
+    whose title reads as a diff (DIFF/PATCH/STAMP)."""
+    bodies: list[str] = []
+    cur: list[str] | None = None
+    want = False
+    for line in text.splitlines():
+        m = _FENCE_OPEN_RE.match(line)
+        if m is not None and m.group("tag") == tag:
+            if cur is not None and want:
+                bodies.append("\n".join(cur))
+            cur = []
+            want = bool(_DIFF_TITLE_RE.search(m.group("title")))
+            continue
+        e = _FENCE_END_RE.match(line)
+        if e is not None and e.group("tag") == tag:
+            if cur is not None and want:
+                bodies.append("\n".join(cur))
+            break
+        if cur is not None and want:
+            cur.append(line)
+    else:
+        if cur is not None and want:
+            bodies.append("\n".join(cur))
+    return bodies
+
+
+_PLUS3_RE = re.compile(r"^\+\+\+ (?P<path>.+?)\s*$")
+_MINUS3_RE = re.compile(r"^--- (?P<path>.+?)\s*$")
+
+
+def _header_path(raw: str) -> str | None:
+    """One side of a `---`/`+++` pair: a/ and b/ prefixes stripped,
+    C-quoted forms unquoted, /dev/null as None (the other side names
+    the file)."""
+    raw = raw.strip()
+    if raw == "/dev/null":
+        return None
+    if len(raw) >= 2 and raw.startswith('"') and raw.endswith('"'):
+        raw = _unquote_git_path(raw[1:-1])
+    for prefix in ("a/", "b/"):
+        if raw.startswith(prefix):
+            return raw[len(prefix):]
+    return raw
+
+
+def _diff_change_lines(diff_text: str) -> dict[str, "Counter[str]"]:
+    """Per-file (sign, line) multisets from unified diff text. Each
+    `diff --git` block opens expecting its `---`/`+++` pair; only that
+    pair names the file (`+++` wins unless /dev/null, so deletions
+    attribute to the `---` side), and every `---`/`+++`-looking line
+    past it is content (a removed `-- x` line reads `--- x`: position,
+    not shape, disambiguates). `+`/`-` lines count with their sign;
+    headers, hunk markers, and prose never count. A dangling pair
+    (truncated hand assembly) drops its lines, failing closed
+    downstream: fewer chunk lines only ever add failures."""
+    from collections import Counter
+    per_file: dict[str, Counter[str]] = {}
+    cur: str | None = None
+    state = "idle"
+    for line in diff_text.splitlines():
+        if _DIFF_LINE_RE.match(line):
+            cur, state = None, "minus"
+            continue
+        if state == "minus":
+            nm = _MINUS3_RE.match(line)
+            if nm is not None:
+                got = _header_path(nm.group("path"))
+                cur = got if got is not None else cur
+                state = "plus"
+            continue
+        if state == "plus":
+            pm = _PLUS3_RE.match(line)
+            if pm is not None:
+                got = _header_path(pm.group("path"))
+                if got is not None:
+                    cur = got
+                state = "content"
+            continue
+        if state != "content" or cur is None:
+            continue
+        if line.startswith("+"):
+            per_file.setdefault(cur, Counter())[line] += 1
+        elif line.startswith("-"):
+            per_file.setdefault(cur, Counter())[line] += 1
+    return per_file
+
+
+def git_show_patch(oid: str, cwd=None):
+    """One commit's patch without its message (`--format=` suppresses
+    the header, so message lines can never pollute the line count),
+    replacement refs disabled like every review read. Returns the
+    completed process; raises OSError when git cannot spawn."""
+    import subprocess
+    return subprocess.run(
+        ["git", "--no-replace-objects", "show", "--format=", oid],
+        capture_output=True, check=False, cwd=cwd)
+
+
+def git_commit_parents(oid: str, cwd=None) -> list[str] | None:
+    """The parent oids of a commit, None when git cannot list them."""
+    import subprocess
+    proc = subprocess.run(
+        ["git", "--no-replace-objects", "rev-list", "--parents", "-1", oid],
+        capture_output=True, check=False, cwd=cwd)
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.decode("utf-8", "replace").split()[1:]
+
+
+def check_parent_binding(commit: str, expected: str, cwd=None) -> str | None:
+    """None when a commit lands on its expected parent, else the
+    failure. A merge fails naming every parent (D00 T04 §21: `HEAD^`
+    reads the first parent, so the second side's resolution would ride
+    unreviewed); the linear tree this project keeps is why merges stay
+    rare, and this gate is why a stray one never slips through."""
+    if not git_oid_exists(commit, cwd=cwd):
+        return f"check-parents: {commit} resolves to nothing"
+    if git_object_type(commit, cwd=cwd) != "commit":
+        return f"check-parents: {commit} is not a commit"
+    parents = git_commit_parents(commit, cwd=cwd)
+    if parents is None:
+        return f"check-parents: {commit} lists no parents"
+    if len(parents) > 1:
+        return (f"check-parents: {commit} is a merge "
+                f"(parents {' '.join(parents)}); linear stamps refuse merges")
+    if not parents:
+        return f"check-parents: {commit} sits on none (root), want {expected}"
+    want_full = git_resolve_oid(expected, cwd=cwd)
+    if want_full is None:
+        return f"check-parents: expected parent {expected} resolves to nothing"
+    if parents[0] != want_full:
+        return f"check-parents: {commit} sits on {parents[0]}, want {expected}"
+    return None
+
+
+def git_resolve_oid(oid: str, cwd=None) -> str | None:
+    """The full oid for a revision, None when it resolves to nothing."""
+    import subprocess
+    proc = subprocess.run(
+        ["git", "--no-replace-objects", "rev-parse", "--verify", "--quiet",
+         oid + "^{commit}"],
+        capture_output=True, check=False, cwd=cwd)
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.decode("utf-8", "replace").strip() or None
+
+
+_ANCHOR_TICK_RE = re.compile(r"`(?P<body>[^`]+)`")
+_ANCHOR_OID_RE = re.compile(r"\A[0-9a-f]{7,40}\Z")
+_ANCHOR_RANGE_RE = re.compile(r"\A([0-9a-f]{7,40})\.\.([0-9a-f]{7,40})\Z")
+_ANCHOR_PATHLINE_RE = re.compile(r"\A(?P<path>[\w./-]+\.\w+):(?P<first>\d+)(?:-(?P<last>\d+))?\Z")
+_ANCHOR_PATH_RE = re.compile(r"\A[\w./-]+\.(?:md|py|ps1|json)\Z")
+_ANCHOR_FULLREF_RE = re.compile(r"D(?P<dom>\d\d)\s+T(?P<todo>\d\d)\s+§(?P<sec>\d+)")
+_ANCHOR_BAREREF_RE = re.compile(r"(?<![\wT])§(?P<sec>\d+)")
+_ANCHOR_SECTION_RE = re.compile(r"^##\s+(?P<num>\d+)\.")
+_STAMP_KINDS = ("Verified", "Review", "Plan review", "CRUD", "Duration",
+                "Deferred", "Resolved")
+
+
+def _stamp_anchor_lines(todo_text: str, section: int) -> list[tuple[int, str, str]]:
+    """(lineno, kind, body) stamp lines of one section: `## <section>.`
+    to the next `## ` heading, lines shaped `> **Kind:** body`."""
+    out: list[tuple[int, str, str]] = []
+    inside = False
+    for lineno, line in enumerate(todo_text.splitlines(), start=1):
+        m = _ANCHOR_SECTION_RE.match(line)
+        if m is not None:
+            inside = int(m.group("num")) == section
+            continue
+        if not inside:
+            continue
+        sm = re.match(r"^>\s*\*\*(?P<kind>[A-Za-z ]+):\*\*\s*(?P<body>.+?)\s*$", line)
+        if sm is not None and sm.group("kind") in _STAMP_KINDS:
+            out.append((lineno, sm.group("kind"), sm.group("body")))
+    return out
+
+
+def _todo_section_exists(todo_path: str, section: int) -> bool:
+    """Whether `## <section>.` heads a section of a TODO file."""
+    import os
+    try:
+        with open(todo_path, encoding="utf-8") as fh:
+            text = fh.read()
+    except OSError:
+        return False
+    return any(_ANCHOR_SECTION_RE.match(line) is not None
+               and int(_ANCHOR_SECTION_RE.match(line).group("num")) == section
+               for line in text.splitlines())
+
+
+def _resolve_full_ref(dom: str, todo: str, sec: int) -> str | None:
+    """The failure for an unresolvable `DNN TNN §N` ref, else None:
+    domain dir, TODO file, and section heading must each exist."""
+    import glob
+    import os
+    dirs = sorted(glob.glob(os.path.join("todo", f"{dom}-*")))
+    if not dirs or not os.path.isdir(dirs[0]):
+        return f"D{dom} T{todo} §{sec}: no D{dom} domain dir"
+    files = sorted(glob.glob(os.path.join(dirs[0], f"TODO-{todo}-*.md")))
+    if not files:
+        return f"D{dom} T{todo} §{sec}: no TODO-{todo} file"
+    if not _todo_section_exists(files[0], sec):
+        return f"D{dom} T{todo} §{sec}: no §{sec} in {files[0]}"
+    return None
+
+
+def check_stamp_anchors(todo_path: str, section: int) -> list[str]:
+    """Dead anchors in one section's stamp block, empty when every
+    cited line, section, and oid resolves (D00 T04 §21: reviewer
+    judgment caught these nondeterministically; the reviewer round
+    stays as the semantic backstop). Oids resolve only on Review
+    lines: Verified evidence quotes version dates (`20251216`), report
+    shas, and external commits no same-repo gate may judge. Path:line
+    cites resolve file plus range; bare `§N` resolves in-file; full
+    D-refs resolve dir, file, and heading. Failures name file, stamp
+    line, and the dead anchor."""
+    import os
+    failures: list[str] = []
+    try:
+        with open(todo_path, encoding="utf-8") as fh:
+            todo_text = fh.read()
+    except OSError as exc:
+        return [f"{todo_path}: cannot read: {exc}"]
+    for lineno, kind, body in _stamp_anchor_lines(todo_text, section):
+        where = f"{todo_path}:{lineno}"
+        if kind == "Review":
+            for tick in _ANCHOR_TICK_RE.finditer(body):
+                span = tick.group("body")
+                rm = _ANCHOR_RANGE_RE.match(span)
+                if rm is not None:
+                    for side in rm.groups():
+                        if not git_oid_exists(side):
+                            failures.append(f"{where}: Review range cites dead oid {side}")
+                    continue
+                if _ANCHOR_OID_RE.match(span) is not None:
+                    if not git_oid_exists(span):
+                        failures.append(f"{where}: Review cites dead oid {span}")
+        for tick in _ANCHOR_TICK_RE.finditer(body):
+            span = tick.group("body")
+            pm = _ANCHOR_PATHLINE_RE.match(span)
+            if pm is not None:
+                path, first = pm.group("path"), int(pm.group("first"))
+                last = int(pm.group("last")) if pm.group("last") else first
+                if not os.path.exists(path):
+                    failures.append(f"{where}: cites missing file {path}")
+                    continue
+                try:
+                    with open(path, encoding="utf-8", errors="replace") as fh:
+                        total = len(fh.read().splitlines())
+                except OSError as exc:
+                    failures.append(f"{where}: cites unreadable file {path}: {exc}")
+                    continue
+                if not (1 <= first <= last <= total):
+                    failures.append(
+                        f"{where}: cites dead lines {path}:{first}"
+                        f"{('-' + str(last)) if last != first else ''} "
+                        f"(file has {total})")
+                continue
+            if _ANCHOR_PATH_RE.match(span) is not None and ":" not in span:
+                if not os.path.exists(span):
+                    failures.append(f"{where}: cites missing file {span}")
+        full_spans = [m.span() for m in _ANCHOR_FULLREF_RE.finditer(body)]
+        for fm in _ANCHOR_FULLREF_RE.finditer(body):
+            bad = _resolve_full_ref(fm.group("dom"), fm.group("todo"), int(fm.group("sec")))
+            if bad is not None:
+                failures.append(f"{where}: cites dead ref {bad}")
+        for bm in _ANCHOR_BAREREF_RE.finditer(body):
+            if any(s <= bm.start() and bm.end() <= e for s, e in full_spans):
+                continue
+            if not _todo_section_exists(todo_path, int(bm.group("sec"))):
+                failures.append(f"{where}: cites dead in-file §{bm.group('sec')}")
+    return failures
+
+
+def check_commits_covered(commits: list[str], tag: str, body_text: str,
+                          cwd=None) -> list[str]:
+    """Failures of the content leg, empty when covered. Each declared
+    oid must resolve to a non-merge commit (a merge's resolution has
+    no line decomposition the tool can verify, so it fails closed
+    naming itself); each of its per-file +/- multisets must sit inside
+    the fenced diff chunks'. Failures name commit, file, and the first
+    uncovered line, bounded. Order-insensitive like the file leg: the
+    chunk may concatenate commits in any order."""
+    from collections import Counter
+    failures: list[str] = []
+    chunk: dict[str, Counter[str]] = {}
+    for body in unfence_diff_bodies(body_text, tag):
+        for path, counts in _diff_change_lines(body).items():
+            chunk[path] = chunk.get(path, Counter()) + counts
+    for oid in commits:
+        if not git_oid_exists(oid, cwd=cwd):
+            failures.append(f"declared commit {oid} resolves to nothing")
+            continue
+        if git_object_type(oid, cwd=cwd) != "commit":
+            failures.append(f"declared commit {oid} is not a commit")
+            continue
+        parents = git_commit_parents(oid, cwd=cwd)
+        if parents is None:
+            failures.append(f"declared commit {oid} lists no parents")
+            continue
+        if len(parents) > 1:
+            failures.append(
+                f"declared commit {oid} is a merge ({len(parents)} parents); "
+                "declare linear commits")
+            continue
+        try:
+            proc = git_show_patch(oid, cwd=cwd)
+        except OSError as exc:
+            failures.append(f"declared commit {oid} unreadable: {exc}")
+            continue
+        if proc.returncode != 0:
+            detail = proc.stderr.decode("utf-8", "replace").strip()[:120]
+            failures.append(f"declared commit {oid} unreadable: {detail}")
+            continue
+        for path, counts in _diff_change_lines(
+                proc.stdout.decode("utf-8", "replace")).items():
+            have = chunk.get(path)
+            if have is None:
+                failures.append(
+                    f"declared commit {oid} touches {path}, absent from the chunk")
+                continue
+            missing = counts - have
+            if missing:
+                first = sorted(missing.elements())[0][:80]
+                failures.append(
+                    f"declared commit {oid} leaves {sum(missing.values())} "
+                    f"line(s) uncovered in {path} (e.g. {first!r})")
+    return failures
 
 
 ATTEST_SCHEMA = 1
@@ -664,19 +1116,25 @@ def write_attestation(*, manifest_sha: str, candidate_base: str, candidate_head:
 def parse_manifest_identity(text: str) -> tuple[str | None, str | None]:
     """The (base, head) pair from saved TAG + MANIFEST lines, each None
     when the manifest carries no such field. Raises ValueError when no
-    MANIFEST line reads."""
+    MANIFEST line reads. The pair anchors to the line's trailing
+    fields: a `base=` or `head=` inside `diff-files` or `titles` is
+    payload, never identity (D00 T04 §21: a hostile path poisoned the
+    old whole-line search). A pair anywhere but trailing reads as no
+    pair, failing closed at the identity check."""
     for line in text.splitlines():
         mm = MANIFEST_RE.match(line.strip())
         if mm:
             rest = mm.group("rest")
-            base = head = None
-            bm = re.search(r"\sbase=(\S+)", rest)
-            if bm:
-                base = bm.group(1)
-            hm = re.search(r"\shead=(\S+)", rest)
-            if hm:
-                head = hm.group(1)
-            return base, head
+            m = re.search(r"\sbase=(\S+)\s+head=(\S+)\s*$", rest)
+            if m:
+                return m.group(1), m.group(2)
+            m = re.search(r"\sbase=(\S+)\s*$", rest)
+            if m:
+                return m.group(1), None
+            m = re.search(r"\shead=(\S+)\s*$", rest)
+            if m:
+                return None, m.group(1)
+            return None, None
     raise ValueError("manifest file carries no MANIFEST line")
 
 
@@ -735,6 +1193,45 @@ def git_object_type(oid: str, cwd=None) -> str | None:
     return proc.stdout.strip()
 
 
+def git_range_merges(base: str, head: str, cwd=None) -> list[str] | None:
+    """Merge commits in (base..head], None when git cannot list them
+    (an unresolvable pair or a non-commit endpoint: the offline path
+    skips the merge gate, since only resolved commit pairs fence in
+    the skill flows)."""
+    import subprocess
+    proc = subprocess.run(
+        ["git", "--no-replace-objects", "rev-list", "--merges",
+         f"{base}..{head}"],
+        capture_output=True, check=False, cwd=cwd)
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.decode("utf-8", "replace").split()
+
+
+def refuse_merge_candidate(base: str | None, head: str | None,
+                           cwd=None) -> str | None:
+    """The merge-candidate refusal, else None when fenceable. Merge
+    candidates are forbidden outright (D00 T04 §21): any parent range
+    satisfies the old advice while concealing merge-resolution
+    behavior, so a merge head or a range spanning a merge refuses
+    naming the merges. Unresolvable pairs and tree heads skip (the
+    offline path: the stamp flow fences a staged tree by design)."""
+    if base is None or head is None:
+        return None
+    if git_object_type(head, cwd=cwd) == "commit":
+        parents = git_commit_parents(head, cwd=cwd) or []
+        if len(parents) > 1:
+            return (f"refusing merge candidate {head} "
+                    f"(parents {' '.join(parents)}): fence a linear range instead")
+    merges = git_range_merges(base, head, cwd=cwd)
+    if merges:
+        shown = " ".join(merges[:3])
+        more = "" if len(merges) <= 3 else f" (+{len(merges) - 3} more)"
+        return (f"refusing range {base}..{head} spanning merge(s) "
+                f"{shown}{more}: fence a linear range instead")
+    return None
+
+
 def git_diff_names(base: str, head: str, cwd=None):
     """The cross-check file listing: NUL-delimited paths, no rename
     detection, replacement refs disabled so a refs/replace cannot swap
@@ -766,8 +1263,10 @@ def check_attest_resolution(base: str, head: str, tree: str, cwd=None) -> str | 
 
 def read_attestation(text: str) -> dict:
     """Read an attestation back: JSON parses, schema asserts, every
-    field re-validates through the writer. Raises ValueError naming
-    the first defect."""
+    field re-validates through its schema's writer. Schema 1 is the
+    frozen legacy shape (bare PASS checker, no bindings); schema 2
+    carries the emit-time bindings (D00 T04 §21). Raises ValueError
+    naming the first defect."""
     try:
         doc = json.loads(text)
     except json.JSONDecodeError as exc:
@@ -775,14 +1274,99 @@ def read_attestation(text: str) -> dict:
     if not isinstance(doc, dict):
         raise ValueError("attestation is not an object")
     schema = doc.get("schema")
-    if type(schema) is not int or schema != ATTEST_SCHEMA:
+    if type(schema) is not int or schema not in (ATTEST_SCHEMA, ATTEST_SCHEMA_V2):
         raise ValueError(
-            f"attestation schema is {schema!r}, this reader asserts {ATTEST_SCHEMA}")
+            f"attestation schema is {schema!r}, want {ATTEST_SCHEMA} or {ATTEST_SCHEMA_V2}")
+    fields = _ATTEST_FIELDS if schema == ATTEST_SCHEMA else _ATTEST_V2_FIELDS
+    writer = write_attestation if schema == ATTEST_SCHEMA else write_attestation_v2
     try:
-        write_attestation(**{k: doc[k] for k in _ATTEST_FIELDS})
+        writer(**{k: doc[k] for k in fields})
     except KeyError as exc:
         raise ValueError(f"attestation misses field {exc}")
     return doc
+
+
+ATTEST_SCHEMA_V2 = 2
+_ATTEST_V2_FIELDS = ("manifest_sha", "candidate_base", "candidate_head", "tree",
+                     "reviewer", "model", "verdict", "checker", "timestamp",
+                     "findings_path", "findings_sha256", "runner_sha256")
+_CHECKER_BOUND_RE = re.compile(r"^PASS (?P<reason>.+) :: (?P<sha>[0-9a-f]{64})$")
+
+
+def write_attestation_v2(*, manifest_sha: str, candidate_base: str,
+                         candidate_head: str, tree: str, reviewer: str,
+                         model: str, verdict: str, checker: str,
+                         timestamp: str, findings_path: str,
+                         findings_sha256: str, runner_sha256: str) -> str:
+    """A schema-2 attestation: the v1 fields plus emit-time bindings.
+    The shared fields re-validate through the frozen v1 writer (one
+    shape authority); the checker must be a bound PASS line (`PASS
+    <reason> :: <transcript sha>`, from the check step's own output
+    file, never a pasted string); findings_path is repo-relative with
+    its sha binding the artifact beside the attestation; runner_sha256
+    binds the runner output the reviewer/model/timestamp derived from.
+    Anything else raises ValueError."""
+    base = json.loads(write_attestation(
+        manifest_sha=manifest_sha, candidate_base=candidate_base,
+        candidate_head=candidate_head, tree=tree, reviewer=reviewer,
+        model=model, verdict=verdict, checker=checker, timestamp=timestamp))
+    m = _CHECKER_BOUND_RE.match(checker)
+    if m is None or not m.group("reason").strip():
+        raise ValueError(
+            "attestation checker is not a bound PASS line "
+            "(`PASS <reason> :: <64hex transcript sha>`)")
+    segs = findings_path.split("/") if isinstance(findings_path, str) else []
+    if (not isinstance(findings_path, str) or not findings_path
+            or "\\" in findings_path or findings_path.startswith("/")
+            or any(s in ("", ".", "..") for s in segs)):
+        raise ValueError(
+            f"attestation findings_path is not a repo-relative path: "
+            f"{findings_path[:80]!r}")
+    for name, oid in (("findings_sha256", findings_sha256),
+                      ("runner_sha256", runner_sha256)):
+        if not isinstance(oid, str) or not re.fullmatch(r"[0-9a-f]{64}", oid):
+            shown = oid if isinstance(oid, str) else repr(oid)
+            raise ValueError(
+                f"attestation {name} is not 64 hex chars: {shown[:80]!r}")
+    base["schema"] = ATTEST_SCHEMA_V2
+    base["findings_path"] = findings_path
+    base["findings_sha256"] = findings_sha256
+    base["runner_sha256"] = runner_sha256
+    return json.dumps(base, indent=2, sort_keys=True) + "\n"
+
+
+def derive_runner_identity(runner_text: str) -> tuple[str | None, str | None, str | None]:
+    """(reviewer, model-or-None, error) from the runner's own output. A
+    JSON envelope with a string result reads claude-panel, with the
+    envelope's non-empty model (None when absent or empty: the §20
+    Opus envelope carried an empty model field, honestly unmeasured
+    rather than guessed). Anything else reads codex-panel with no
+    model: codex output names none, so the skill's model pin fills it
+    (recorded, with the transcript hashed). An error envelope, or a
+    dict JSON without a string result, fails exactly as the output
+    checker fails it: the attestation never derives from output the
+    checker would refuse."""
+    _, envelope_err = panel_text_from_envelope(runner_text)
+    if envelope_err is not None:
+        return None, None, envelope_err
+    try:
+        obj = json.loads(runner_text)
+    except ValueError:
+        return "codex-panel", None, None
+    if not isinstance(obj, dict) or not isinstance(obj.get("result"), str):
+        return "codex-panel", None, None
+    model = obj.get("model")
+    model = model.strip() if isinstance(model, str) and model.strip() else None
+    return "claude-panel", model, None
+
+
+def runner_timestamp(path: str) -> str:
+    """The run clock: the runner-output file's mtime in UTC. The skill
+    redirects the runner into that file, so its mtime is the run's end
+    (a hand-supplied --timestamp must equal it, never override it)."""
+    import os
+    return datetime.datetime.fromtimestamp(
+        os.path.getmtime(path), tz=datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _self_test() -> int:
@@ -909,6 +1493,11 @@ def _self_test() -> int:
     for want in ("my file.md", "caf\u00e9.md", 'quo"te.md', "renamed.md",
                  "old.md", "new.md", "gone.md"):
         check(f"manifest-grammar-{want}", want in mline3, mline3)
+    check("manifest-grammar-roundtrip",
+          parse_manifest_diff_files(f"TAG {tag} nonce={nonce}\n{mline3}\n") == [
+              "my file.md", "caf\u00e9.md", 'quo"te.md', "renamed.md",
+              "old.md", "new.md", "gone.md"],
+          mline3)
     # The adversarial split: bare ` b/` on both sides of a rename, where
     # the agree-else-last rule fabricates a path in neither side. The
     # rename pair git emits for exactly this case is authoritative.
@@ -919,6 +1508,10 @@ def _self_test() -> int:
     mline4, _ = build_manifest(tag, [("CANDIDATE DIFF", hostile)], nonce=nonce)
     check("manifest-rename-authoritative",
           "diff-files=old b/x.md|new b/y.md" in mline4, mline4)
+    check("manifest-rename-roundtrip",
+          parse_manifest_diff_files(f"TAG {tag} nonce={nonce}\n{mline4}\n") == [
+              "old b/x.md", "new b/y.md"],
+          mline4)
     poisoned = ("a commit message musing\n"
                 "rename from nowhere\n"
                 "rename to nothing\n")
@@ -1205,6 +1798,434 @@ def _self_test() -> int:
         check("resolve-diff-ignores-replace-refs",
               got_diff.stdout == b"f.md\x00", got_diff.stdout)
     check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
+    # D00 T04 §21 pins: review-input integrity hardening.
+    poison = (f"TAG {tag} nonce={nonce}\n"
+              f"MANIFEST bytes=1 files=1 sha={'1' * 64} titles=CANDIDATE DIFF "
+              "diff-files=a base=evil|b head=fake base=realbase head=realhead\n")
+    check("identity-anchored-poisoned",
+          parse_manifest_identity(poison) == ("realbase", "realhead"),
+          str(parse_manifest_identity(poison)))
+    clean_id = (f"TAG {tag} nonce={nonce}\n"
+                f"MANIFEST bytes=1 files=1 sha={'1' * 64} titles=X base=b0 head=h1\n")
+    check("identity-anchored-clean",
+          parse_manifest_identity(clean_id) == ("b0", "h1"))
+    base_only = (f"TAG {tag} nonce={nonce}\n"
+                 f"MANIFEST bytes=1 files=1 sha={'1' * 64} titles=X base=b0\n")
+    check("identity-anchored-base-only",
+          parse_manifest_identity(base_only) == ("b0", None))
+    mid_pair = (f"TAG {tag} nonce={nonce}\n"
+                f"MANIFEST bytes=1 files=1 sha={'1' * 64} titles=X "
+                "base=b0 head=h1 extra=junk\n")
+    check("identity-non-trailing-closed",
+          parse_manifest_identity(mid_pair) == (None, None))
+    hostile_names = ["a|b.md", "li\nne.md", "sp ace.md", "back\\slash.md",
+                     "x base=y.md"]
+    quoted = "|".join(quote_manifest_name(n) for n in hostile_names)
+    check("manifest-quote-hostile-roundtrip",
+          split_manifest_names(quoted) == hostile_names, quoted)
+    hostile_line = (f"TAG {tag} nonce={nonce}\n"
+                    f"MANIFEST bytes=1 files=1 sha={'5' * 64} titles=X diff-files="
+                    + quoted + " base=b0 head=h1\n")
+    check("manifest-quote-hostile-boundary",
+          parse_manifest_diff_files(hostile_line) == hostile_names, hostile_line)
+    check("manifest-quote-legacy-backslash",
+          split_manifest_names("a\\b|c") == ["a\\b", "c"])
+    check("manifest-quote-trailing-backslash",
+          split_manifest_names("a\\") == ["a\\"])
+    mcomm = (f"TAG {tag} nonce={nonce}\n"
+             f"MANIFEST bytes=1 files=1 sha={'2' * 64} titles=X "
+             "commits=aaa|bbb base=b0 head=h1\n")
+    check("manifest-commits-parse",
+          parse_manifest_commits(mcomm) == ["aaa", "bbb"])
+    check("manifest-commits-absent", parse_manifest_commits(clean_id) == [])
+    _utag, _unonce, _fenced = fence_chunks_checked(
+        "PANEL", [("SECTION", "prose\n+notacount\n"),
+                  ("CANDIDATE DIFF", "diff --git a/f b/f\n--- a/f\n+++ b/f\n@@\n+x\n")])
+    check("unfence-diff-only",
+          unfence_diff_bodies(_fenced, _utag) == [
+              "diff --git a/f b/f\n--- a/f\n+++ b/f\n@@\n+x"],
+          _fenced)
+    check("unfence-wrong-tag", unfence_diff_bodies(_fenced, "OTHER") == [])
+    from collections import Counter as _Counter
+    sample = ("diff --git a/f.md b/f.md\n--- a/f.md\n+++ b/f.md\n@@ -1 +1 @@\n-old\n+new\n"
+              "diff --git a/g.md b/g.md\n--- a/g.md\n+++ /dev/null\n@@\n-gone\n"
+              "diff --git a/h.md b/h.md\n--- /dev/null\n+++ b/h.md\n@@\n+born\n")
+    check("change-lines-add-del-new",
+          _diff_change_lines(sample) == {
+              "f.md": _Counter({"-old": 1, "+new": 1}),
+              "g.md": _Counter({"-gone": 1}),
+              "h.md": _Counter({"+born": 1})},
+          str(_diff_change_lines(sample)))
+    tricky = "diff --git a/t b/t\n--- a/t\n+++ b/t\n@@\n--- x\n+-- y\n+++ z\n"
+    check("change-lines-content-ambiguity",
+          _diff_change_lines(tricky) == {
+              "t": _Counter({"--- x": 1, "+-- y": 1, "+++ z": 1})},
+          str(_diff_change_lines(tricky)))
+    stamp_man = ("STAMP-abc", "3" * 64, "4" * 16)
+    good_receipt = f"RECEIPT sha={'3' * 64} end=STAMP-abc nonce={'4' * 16}\n"
+    check("stamp-holds",
+          check_stamp_output(good_receipt + "STAMP HOLDS.\n", stamp_man)
+          == (True, "stamp holds"))
+    check("stamp-namings",
+          check_stamp_output(good_receipt + "`a` -> `b`\n`c` -> `d`\n", stamp_man)
+          == (True, "2 naming(s) to answer"))
+    check("stamp-truncated",
+          check_stamp_output("STAMP HOLDS.\n", stamp_man)[0] is False)
+    check("stamp-empty",
+          check_stamp_output(good_receipt + "\n", stamp_man)
+          == (False, "no verdict after the receipt"))
+    check("stamp-holds-junk",
+          check_stamp_output(good_receipt + "STAMP HOLDS.\n`x` -> `y`\n", stamp_man)
+          == (False, "line 2 follows STAMP HOLDS"))
+    v2good = dict(
+        manifest_sha="a" * 64, candidate_base="b" * 40,
+        candidate_head="c" * 40, tree="d" * 40, reviewer="claude-panel",
+        model="opus", verdict="approve",
+        checker="PASS four lenses, one verdict each :: " + "e" * 64,
+        timestamp="2026-09-20T13:00:00Z",
+        findings_path="docs/reviews/00-workspace/D00-T04-s21.md",
+        findings_sha256="f" * 64, runner_sha256="0" * 64)
+    doc2 = write_attestation_v2(**v2good)
+    check("attest-v2-roundtrip", read_attestation(doc2)["schema"] == 2)
+    try:
+        write_attestation_v2(**dict(v2good, checker="PASS four lenses, one verdict each"))
+        v2_unbound = False
+    except ValueError as exc:
+        v2_unbound = "bound PASS" in str(exc)
+    check("attest-v2-unbound-checker", v2_unbound)
+    try:
+        write_attestation_v2(**dict(v2good, findings_path="/abs/path.md"))
+        v2_abspath = False
+    except ValueError as exc:
+        v2_abspath = "repo-relative" in str(exc)
+    check("attest-v2-absolute-findings", v2_abspath)
+    try:
+        write_attestation_v2(**dict(v2good, findings_path="docs/../x.md"))
+        v2_dotdot = False
+    except ValueError as exc:
+        v2_dotdot = "repo-relative" in str(exc)
+    check("attest-v2-dotdot-findings", v2_dotdot)
+    check("attest-v1-legacy-reads", read_attestation(att)["schema"] == 1)
+    check("runner-id-codex",
+          derive_runner_identity("RECEIPT sha=x\n**adversarial: approve**")
+          == ("codex-panel", None, None))
+    check("runner-id-claude",
+          derive_runner_identity('{"result": "x", "model": "opus"}')
+          == ("claude-panel", "opus", None))
+    check("runner-id-empty-model",
+          derive_runner_identity('{"result": "x", "model": ""}')
+          == ("claude-panel", None, None))
+    check("runner-id-error",
+          derive_runner_identity('{"is_error": true, "subtype": "x"}')[2] is not None)
+    check("runner-id-dict-no-result",
+          derive_runner_identity('{"a": 1}')[2] is not None)
+    check("runner-id-brace-text",
+          derive_runner_identity("{not json") == ("codex-panel", None, None))
+    # Git-backed legs: a linear r1->r2->r3 plus a merge, fenced and
+    # cross-checked end to end (D00 T04 §21 items 1, 8, 12, 15).
+    with tempfile.TemporaryDirectory(prefix="review-s21-") as tmpd:
+        def _git(*a):
+            return subprocess.run(["git", *a], cwd=tmpd, capture_output=True,
+                                  check=True, text=True)
+
+        _git("init", "-q", "-b", "main")
+        _git("config", "user.email", "t@t")
+        _git("config", "user.name", "t")
+        _git("config", "commit.gpgsign", "false")
+        with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
+            fh.write("one\n")
+        _git("add", "f.md")
+        _git("commit", "-qm", "r1")
+        with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
+            fh.write("one\ntwo\n")
+        _git("commit", "-qam", "r2")
+        with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
+            fh.write("one\ntwo\nthree\n")
+        _git("commit", "-qam", "r3")
+        r1 = _git("rev-parse", "HEAD~2").stdout.strip()
+        r2 = _git("rev-parse", "HEAD~1").stdout.strip()
+        r3 = _git("rev-parse", "HEAD").stdout.strip()
+        show2 = subprocess.run(
+            ["git", "--no-replace-objects", "show", "--format=", r2],
+            cwd=tmpd, capture_output=True, check=True, text=True).stdout
+        show3 = subprocess.run(
+            ["git", "--no-replace-objects", "show", "--format=", r3],
+            cwd=tmpd, capture_output=True, check=True, text=True).stdout
+        # The §12 regression shape: r3 dropped from the chunk while the
+        # file sets still agree on f.md (r2's file), so only the content
+        # leg can catch it.
+        full_chunk = show2 + show3
+        dropped_chunk = show2
+        for name, chunk in (("full", full_chunk), ("dropped", dropped_chunk)):
+            ctag, cnonce, cbody = fence_chunks_checked(
+                "PANEL", [("CANDIDATE DIFF", chunk)])
+            cline, _ = build_manifest(ctag, [("CANDIDATE DIFF", chunk)],
+                                      r1, r3, nonce=cnonce, commits=[r2, r3])
+            with open(os.path.join(tmpd, f"{name}-manifest.md"), "w",
+                      encoding="utf-8") as fh:
+                fh.write(f"TAG {ctag} nonce={cnonce}\n{cline}\n")
+            with open(os.path.join(tmpd, f"{name}-fenced.md"), "w",
+                      encoding="utf-8") as fh:
+                fh.write(f"TAG {ctag} nonce={cnonce}\n{cline}\n{cbody}")
+        # The same dropped chunk fenced the legacy way (no commits
+        # claim): the file-set leg agrees, proving the gap.
+        ltag, lnonce, _lbody = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", dropped_chunk)])
+        lcline, _ = build_manifest(ltag, [("CANDIDATE DIFF", dropped_chunk)],
+                                   r1, r3, nonce=lnonce)
+        with open(os.path.join(tmpd, "legacy-manifest.md"), "w",
+                  encoding="utf-8") as fh:
+            fh.write(f"TAG {ltag} nonce={lnonce}\n{lcline}\n")
+        fenced_full = open(os.path.join(tmpd, "full-fenced.md"),
+                           encoding="utf-8").read()
+        ttag = parse_manifest_file(
+            open(os.path.join(tmpd, "full-manifest.md"),
+                 encoding="utf-8").read())[0]
+        check("commits-covered",
+              check_commits_covered([r2, r3], ttag, fenced_full, cwd=tmpd) == [])
+        fenced_dropped = open(os.path.join(tmpd, "dropped-fenced.md"),
+                              encoding="utf-8").read()
+        dtag = parse_manifest_file(
+            open(os.path.join(tmpd, "dropped-manifest.md"),
+                 encoding="utf-8").read())[0]
+        missed = check_commits_covered([r2, r3], dtag, fenced_dropped, cwd=tmpd)
+        check("commits-dropped-fails",
+              len(missed) == 1 and r3 in missed[0] and "f.md" in missed[0],
+              str(missed))
+        check("commits-unresolvable",
+              check_commits_covered(["0" * 40], ttag, fenced_full, cwd=tmpd)
+              == ["declared commit " + "0" * 40 + " resolves to nothing"])
+        # The merge legs: a merge head and a mid-range merge refuse;
+        # linear, unresolvable, and tree heads fence.
+        _git("checkout", "-qb", "side", r1)
+        with open(os.path.join(tmpd, "s.md"), "w", encoding="utf-8") as fh:
+            fh.write("side\n")
+        _git("add", "s.md")
+        _git("commit", "-qm", "side1")
+        _git("checkout", "-q", "main")
+        _git("merge", "--no-ff", "-qm", "merge", "side")
+        mg = _git("rev-parse", "HEAD").stdout.strip()
+        p1 = _git("rev-parse", "HEAD^1").stdout.strip()
+        check("merge-head-refused",
+              (refuse_merge_candidate(r1, mg, cwd=tmpd) or "").startswith(
+                  f"refusing merge candidate {mg} (parents "))
+        with open(os.path.join(tmpd, "f.md"), "a", encoding="utf-8") as fh:
+            fh.write("four\n")
+        _git("commit", "-qam", "r4")
+        r4 = _git("rev-parse", "HEAD").stdout.strip()
+        check("merge-range-refused",
+              (refuse_merge_candidate(r1, r4, cwd=tmpd) or "").startswith(
+                  f"refusing range {r1}..{r4} spanning merge(s) "))
+        check("merge-linear-passes",
+              refuse_merge_candidate(r1, r3, cwd=tmpd) is None)
+        check("merge-offline-skips",
+              refuse_merge_candidate("base000", "head111", cwd=tmpd) is None)
+        rtree = _git("rev-parse", f"{r3}^{{tree}}").stdout.strip()
+        check("merge-tree-head-skips",
+              refuse_merge_candidate(r1, rtree, cwd=tmpd) is None)
+        check("parents-linear-ok",
+              check_parent_binding(r3, r2, cwd=tmpd) is None)
+        check("parents-wrong",
+              (check_parent_binding(r3, r1, cwd=tmpd) or "").startswith(
+                  f"check-parents: {r3} sits on "))
+        check("parents-merge",
+              (check_parent_binding(mg, p1, cwd=tmpd) or "").startswith(
+                  f"check-parents: {mg} is a merge (parents "))
+        check("parents-kind-commit",
+              git_object_type(r3, cwd=tmpd) == "commit"
+              and git_object_type(rtree, cwd=tmpd) == "tree")
+        # Hostile fence paths (D00 T04 §21 item 16): spaces, non-ASCII,
+        # and `=` inside TITLE=path read clean.
+        hostile_dir = os.path.join(tmpd, "my dir", "café")
+        os.makedirs(hostile_dir)
+        hostile_chunk = os.path.join(hostile_dir, "a=b.md")
+        with open(hostile_chunk, "w", encoding="utf-8") as fh:
+            fh.write("section text\n")
+        proc = subprocess.run(
+            [sys.executable, __file__, "fence", "PANEL",
+             f"SECTION HOSTILE={hostile_chunk}"],
+            capture_output=True, cwd=tmpd)
+        try:
+            hout = proc.stdout.decode("utf-8")
+        except UnicodeDecodeError:
+            hout = ""
+        check("fence-hostile-path",
+              proc.returncode == 0 and hout.startswith("TAG ")
+              and "\nMANIFEST " in hout,
+              f"exit={proc.returncode} err={proc.stderr[-160:]!r}")
+        # An alternate temp root: TMP/TEMP/TMPDIR all redirected (Windows
+        # python ignores TMPDIR, so all three move), chunk inside.
+        alt_root = os.path.join(tmpd, "alt temp")
+        os.makedirs(alt_root)
+        alt_chunk = os.path.join(alt_root, "c.md")
+        with open(alt_chunk, "w", encoding="utf-8") as fh:
+            fh.write("alt-root text\n")
+        alt_env = dict(os.environ, TMP=alt_root, TEMP=alt_root,
+                       TMPDIR=alt_root)
+        proc = subprocess.run(
+            [sys.executable, __file__, "fence", "PANEL",
+             f"SECTION ALT={alt_chunk}"],
+            capture_output=True, cwd=tmpd, env=alt_env)
+        try:
+            aout = proc.stdout.decode("utf-8")
+        except UnicodeDecodeError:
+            aout = ""
+        check("fence-alt-temp-root",
+              proc.returncode == 0 and aout.startswith("TAG ")
+              and "\nMANIFEST " in aout,
+              f"exit={proc.returncode} err={proc.stderr[-160:]!r}")
+        # Stamp anchors (D00 T04 §21 item 10): a seeded stamp with a
+        # dead oid, a dead line, a dead section, a missing file, and a
+        # dead full ref, beside passing twins (a live range, a live
+        # file, a live section, a live ref) the rule must not flag. The
+        # null oid never resolves in any repo, so the dead-oid leg is
+        # history-proof; the live legs ride trunk commits, append-only.
+        seed_todo = os.path.join(tmpd, "TODO-99-seed.md")
+        with open(seed_todo, "w", encoding="utf-8") as fh:
+            fh.write(
+                "## 1. Seed\n\n"
+                "> **Verified:** 2026-09-20 | §1 | evidence "
+                "`scripts/review_prompt.py:999999` `§99` "
+                "`s21-seed-missing-ghost.md` D00 T99 §1, and live twins "
+                "`scripts/review_prompt.py:1` `§1` `todo/README.md` "
+                "D00 T04 §21\n"
+                "> **Review:** round 1, candidate "
+                "`0000000000000000000000000000000000000000` plus range "
+                "`fceed42..dbe5d0e` -- approve. "
+                "Raw findings: docs/reviews/00-workspace/D00-T04-s99.md\n"
+                "> **CRUD:** not applicable\n")
+        seed_dead = check_stamp_anchors(seed_todo, 1)
+        check("anchors-dead-five",
+              len(seed_dead) == 5
+              and any("dead oid 0000000" in d for d in seed_dead)
+              and any("dead lines scripts/review_prompt.py:999999" in d
+                      for d in seed_dead)
+              and any("dead in-file §99" in d for d in seed_dead)
+              and any("missing file s21-seed-missing-ghost.md" in d
+                      for d in seed_dead)
+              and any("dead ref D00 T99 §1" in d for d in seed_dead),
+              str(seed_dead))
+        # The cross-check CLI legs (items 1, 15): the content leg and
+        # the kind gate over the fixture repo.
+        def _cc(*a):
+            return subprocess.run(
+                [sys.executable, __file__, "cross-check", *a],
+                capture_output=True, cwd=tmpd, text=True)
+
+        full_man = os.path.join(tmpd, "full-manifest.md")
+        full_fen = os.path.join(tmpd, "full-fenced.md")
+        drop_man = os.path.join(tmpd, "dropped-manifest.md")
+        drop_fen = os.path.join(tmpd, "dropped-fenced.md")
+        got = _cc(full_man, r1, r3, "--body", full_fen,
+                  "--expect-head-kind", "commit")
+        check("crosscheck-body-covered",
+              got.returncode == 0 and "commit(s) covered" in got.stdout,
+              f"exit={got.returncode} out={got.stdout!r} err={got.stderr!r}")
+        # The dropped chunk's file set still covers f.md: the legacy
+        # (commits-less) manifest agrees, proving the gap the content
+        # leg closes.
+        got = _cc(os.path.join(tmpd, "legacy-manifest.md"), r1, r3)
+        check("crosscheck-body-gap",
+              got.returncode == 0 and "file(s) agree" in got.stdout,
+              f"exit={got.returncode} out={got.stdout!r} err={got.stderr!r}")
+        got = _cc(drop_man, r1, r3, "--body", drop_fen)
+        check("crosscheck-body-dropped",
+              got.returncode == 1 and r3 in got.stderr and "f.md" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+        got = _cc(full_man, r1, r3)
+        check("crosscheck-body-missing",
+              got.returncode == 2 and "no --body was given" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+        got = _cc(full_man, r1, r3, "--body", full_fen,
+                  "--expect-head-kind", "tree")
+        check("crosscheck-kind-cross",
+              got.returncode == 1 and "is a commit, want tree" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+        # The schema-2 attest CLI (items 4, 5, 9): emit, read back,
+        # mismatch, and replacement legs over the fixture repo.
+        arunner = os.path.join(tmpd, "runner.out")
+        with open(arunner, "w", encoding="utf-8") as fh:
+            fh.write("RECEIPT sha=x\n**adversarial: approve**\n")
+        acheck = os.path.join(tmpd, "check.out")
+        with open(acheck, "w", encoding="utf-8") as fh:
+            fh.write("PASS four lenses, one verdict each\n")
+        afind = os.path.join(tmpd, "find.md")
+        with open(afind, "w", encoding="utf-8") as fh:
+            fh.write("# findings\n")
+        aout = os.path.join(tmpd, "t.attest.json")
+        aman = os.path.join(tmpd, "attest-manifest.md")
+        with open(aman, "w", encoding="utf-8") as fh:
+            fh.write(f"TAG PANEL-{'a' * 16} nonce={'b' * 16}\n"
+                     f"MANIFEST bytes=1 files=0 sha={'c' * 64} titles=X "
+                     f"base={r1} head={r3}\n")
+
+        def _at(*a):
+            return subprocess.run(
+                [sys.executable, __file__, "attest", *a],
+                capture_output=True, cwd=tmpd, text=True)
+
+        got = _at("--out", aout, "--manifest", aman, "--base", r1,
+                  "--head", r3, "--tree", rtree, "--runner-output", arunner,
+                  "--checker-output", acheck, "--findings", "find.md",
+                  "--verdict", "approve", "--reviewer", "codex-panel",
+                  "--model", "gpt-5.6-sol")
+        check("attest-v2-emit",
+              got.returncode == 0 and f"wrote {aout}" in got.stdout,
+              f"exit={got.returncode} out={got.stdout!r} err={got.stderr!r}")
+        got = _at("--read-back", aout, "--findings", "find.md")
+        check("attest-v2-readback",
+              got.returncode == 0 and "schema 2" in got.stdout,
+              f"exit={got.returncode} out={got.stdout!r} err={got.stderr!r}")
+        with open(afind, "w", encoding="utf-8") as fh:
+            fh.write("# findings replaced\n")
+        got = _at("--read-back", aout, "--findings", "find.md")
+        check("attest-v2-replacement",
+              got.returncode == 1 and "hashes" in got.stderr
+              and "binds" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+        with open(arunner, "w", encoding="utf-8") as fh:
+            fh.write('{"result": "x", "model": "opus"}\n')
+        got = _at("--out", aout, "--manifest", aman, "--base", r1,
+                  "--head", r3, "--tree", rtree, "--runner-output", arunner,
+                  "--checker-output", acheck, "--findings", "find.md",
+                  "--verdict", "approve", "--model", "gpt-5.6-sol")
+        check("attest-v2-model-mismatch",
+              got.returncode == 1 and "disagrees with the runner output" in got.stderr,
+              f"exit={got.returncode} err={got.stderr!r}")
+    # The skill surface the tooling assumes (D00 T04 §21 items 2, 6, 7,
+    # 8, 12, 14, 15): the suite reads the skill text, so a prose edit
+    # that drops a wired command fails here, not at the next review.
+    skill_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "..", ".claude", "skills", "review-todo-section",
+                              "SKILL.md")
+    try:
+        with open(skill_path, encoding="utf-8") as fh:
+            skill_text = fh.read()
+    except OSError:
+        skill_text = ""
+    for pin, needle in (
+            ("skill-diff-flagged", "--no-replace-objects diff --cached"),
+            ("skill-selfreview-flagged", "`git --no-replace-objects diff`"),
+            ("skill-coverage-sentence",
+             "Every `rev-parse`, `show`, and `diff` on this page passes `--no-replace-objects`"),
+            ("skill-push-explicit", "git push origin $COMMIT:refs/heads/master"),
+            ("skill-push-readback",
+             'git ls-remote origin refs/heads/master | cut -f1)" = "$COMMIT"'),
+            ("skill-push-residual", "a concurrent force-push after it still moves the ref"),
+            ("skill-parents-tool",
+             "python scripts/review_prompt.py check-parents"),
+            ("skill-linear-sentence", "this tree stays linear"),
+            ("skill-stamp-check",
+             "python scripts/review_prompt.py check-stamp --manifest $RUNDIR/stamp-manifest.md"),
+            ("skill-stamp-branch", "PASS stamp holds` proceeds"),
+            ("skill-merge-forbid", "refuses merge candidates outright"),
+            ("skill-round-grammar", "`oid`(round N)"),
+            ("skill-kind-panel", "--expect-head-kind commit"),
+            ("skill-kind-stamp", "--expect-head-kind tree"),
+            ("skill-attest-v2", "--runner-output <panel output file>"),
+            ("skill-attest-checker", "--checker-output $RUNDIR/check.out"),
+            ("skill-attest-findings", "--findings <findings path>")):
+        check(pin, needle in skill_text, skill_path)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
     for failure in failures:
@@ -1251,11 +2272,19 @@ if __name__ == "__main__":
     if len(sys.argv) >= 4 and sys.argv[1] == "fence":
         args = sys.argv[3:]
         base = head = None
-        while len(args) >= 2 and args[0] in ("--base", "--head"):
+        commits: list[str] | None = None
+        while len(args) >= 2 and args[0] in ("--base", "--head", "--commits"):
             if args[0] == "--base":
                 base = args[1]
-            else:
+            elif args[0] == "--head":
                 head = args[1]
+            else:
+                commits = [c for c in
+                           (p.strip() for p in args[1].split(","))
+                           if c]
+                if not commits:
+                    print("fence: --commits names no commits", file=sys.stderr)
+                    sys.exit(2)
             args = args[2:]
         chunks = []
         for pair in args:
@@ -1272,10 +2301,15 @@ if __name__ == "__main__":
         if not chunks:
             print("fence: no chunks to fence", file=sys.stderr)
             sys.exit(2)
+        merged = refuse_merge_candidate(base, head)
+        if merged is not None:
+            print(f"fence: {merged}", file=sys.stderr)
+            sys.exit(1)
         try:
             assert_candidate_identity(chunks, base, head)
             tag, nonce, prompt = fence_chunks_checked(sys.argv[2], chunks)
-            manifest, _ = build_manifest(tag, chunks, base, head, nonce=nonce)
+            manifest, _ = build_manifest(tag, chunks, base, head, nonce=nonce,
+                                         commits=commits)
         except (RuntimeError, ValueError) as exc:
             print(f"fence: {exc}", file=sys.stderr)
             sys.exit(1)
@@ -1283,18 +2317,40 @@ if __name__ == "__main__":
         print(manifest)
         print(prompt, end="")
         sys.exit(0)
-    if len(sys.argv) == 5 and sys.argv[1] == "cross-check":
-        # cross-check <manifest-file> <base> <head>: git's own NUL file
-        # list for the range against the manifest's parsed diff-files.
-        # Divergence fails closed; run from the repository root.
-        # --no-renames lists both sides of a rename, matching the
-        # manifest's [old, new]; without it every valid rename
-        # diverges as `only in manifest: <old>`.
+    if len(sys.argv) >= 5 and sys.argv[1] == "cross-check":
+        # cross-check <manifest-file> <base> <head> [--body <file>]
+        #   [--expect-head-kind commit|tree]: git's own NUL file list for
+        # the range against the manifest's parsed diff-files. Divergence
+        # fails closed; run from the repository root. --no-renames lists
+        # both sides of a rename, matching the manifest's [old, new];
+        # without it every valid rename diverges as
+        # `only in manifest: <old>`. --body runs the content leg when the
+        # manifest declares commits (D00 T04 §21: sets agreeing proved
+        # nothing once a chunk dropped 633e32b inside the span).
+        # --expect-head-kind types the overloaded head per path (D00 T04
+        # §21: commit on the panel path, tree on the stamp path).
         import subprocess
+        cargs = sys.argv[5:]
+        body_path = None
+        expect_kind = None
+        while cargs:
+            if cargs[:1] == ["--body"] and len(cargs) >= 2:
+                body_path, cargs = cargs[1], cargs[2:]
+            elif cargs[:1] == ["--expect-head-kind"] and len(cargs) >= 2:
+                expect_kind, cargs = cargs[1], cargs[2:]
+            else:
+                print(f"cross-check: unknown argument {cargs[0]!r}", file=sys.stderr)
+                sys.exit(2)
+        if expect_kind is not None and expect_kind not in ("commit", "tree"):
+            print(f"cross-check: --expect-head-kind wants commit or tree, got {expect_kind!r}",
+                  file=sys.stderr)
+            sys.exit(2)
         try:
             with open(sys.argv[2], encoding="utf-8") as fh:
                 manifest_text = fh.read()
             parsed = parse_manifest_diff_files(manifest_text)
+            tag, sha, _ = parse_manifest_file(manifest_text)
+            commits = parse_manifest_commits(manifest_text)
         except OSError as exc:
             print(f"cross-check: cannot read {sys.argv[2]}: {exc}", file=sys.stderr)
             sys.exit(2)
@@ -1309,10 +2365,18 @@ if __name__ == "__main__":
         # Existence only, never commit-typed: the stamp flow cross-checks
         # (HEAD, TREE) with a staged tree as head by design, so a type gate
         # here would refuse the flow it exists to check (D00 T04 §13 F1).
+        # --expect-head-kind types the head per CALLER instead: the path
+        # declares what it fenced, and a cross-kind oid fails naming it.
         for name, oid in (("--base", sys.argv[3]), ("--head", sys.argv[4])):
             if not git_oid_exists(oid):
                 print(f"cross-check: {name} {oid} resolves to nothing",
                       file=sys.stderr)
+                sys.exit(1)
+        if expect_kind is not None:
+            actual = git_object_type(sys.argv[4])
+            if actual != expect_kind:
+                print(f"cross-check: --head {sys.argv[4]} is a {actual}, "
+                      f"want {expect_kind}", file=sys.stderr)
                 sys.exit(1)
         try:
             proc = git_diff_names(sys.argv[3], sys.argv[4])
@@ -1328,18 +2392,66 @@ if __name__ == "__main__":
             for line in diverged:
                 print(f"cross-check: {line}", file=sys.stderr)
             sys.exit(1)
-        print(f"cross-check: {len(parsed)} file(s) agree")
+        if commits:
+            if body_path is None:
+                print("cross-check: the manifest declares commits but no --body was given",
+                      file=sys.stderr)
+                sys.exit(2)
+            try:
+                with open(body_path, encoding="utf-8") as fh:
+                    body_text = fh.read()
+            except OSError as exc:
+                print(f"cross-check: cannot read {body_path}: {exc}", file=sys.stderr)
+                sys.exit(2)
+            blines = body_text.splitlines(keepends=True)
+            if (len(blines) < 3
+                    or TAG_LINE_RE.match(blines[0].strip()) is None
+                    or MANIFEST_RE.match(blines[1].strip()) is None):
+                print("cross-check: --body is not a fenced prompt",
+                      file=sys.stderr)
+                sys.exit(1)
+            prompt = "".join(blines[2:])
+            if hashlib.sha256(canonical_prompt_bytes(prompt)).hexdigest() != sha:
+                print("cross-check: --body is not the manifested prompt",
+                      file=sys.stderr)
+                sys.exit(1)
+            body_text = prompt
+            uncovered = check_commits_covered(commits, tag, body_text)
+            if uncovered:
+                for line in uncovered:
+                    print(f"cross-check: {line}", file=sys.stderr)
+                sys.exit(1)
+            print(f"cross-check: {len(parsed)} file(s) agree, {len(commits)} commit(s) covered")
+        else:
+            print(f"cross-check: {len(parsed)} file(s) agree")
         sys.exit(0)
     if len(sys.argv) >= 3 and sys.argv[1] == "attest":
         # attest --out <path> --manifest <file> --base <b> --head <h>
-        #   --tree <t> --reviewer <r> --model <m> --verdict <v>
-        #   --checker <c> --timestamp <ts>
-        # attest --read-back <path>
-        # The manifest sha pins the reviewed input (the attestation
-        # cannot claim a sha the manifest never had); the timestamp
-        # rides explicit, no hidden clock.
+        #   --tree <t> --runner-output <f> --checker-output <f>
+        #   --findings <f> --verdict <v>
+        #   [--reviewer <r> --model <m> --timestamp <ts>]
+        # attest --read-back <path> [--findings <f>]
+        # Schema 2 (D00 T04 §21) binds every field to a run: the checker
+        # rides the check step's own output file (a pasted PASS string has
+        # no file and refuses); reviewer/model derive from the runner's
+        # output with the skill's flags as assertions a mismatch fails;
+        # the timestamp is the runner output's mtime; the findings hash
+        # binds the artifact beside the attestation, re-hashed at
+        # read-back. Schema 1 still READS (legacy records stand); only
+        # schema 2 emits.
         args = sys.argv[2:]
-        if args[:1] == ["--read-back"] and len(args) == 2:
+        if args[:1] == ["--read-back"] and 2 <= len(args) <= 4:
+            rb_findings = None
+            if len(args) == 4:
+                if args[2] != "--findings":
+                    print("attest: want --read-back <path> [--findings <file>]",
+                          file=sys.stderr)
+                    sys.exit(2)
+                rb_findings = args[3]
+            elif len(args) == 3:
+                print("attest: want --read-back <path> [--findings <file>]",
+                      file=sys.stderr)
+                sys.exit(2)
             try:
                 with open(args[1], encoding="utf-8") as fh:
                     doc = read_attestation(fh.read())
@@ -1349,6 +2461,34 @@ if __name__ == "__main__":
             except ValueError as exc:
                 print(f"attest: {exc}", file=sys.stderr)
                 sys.exit(1)
+            if doc["schema"] == ATTEST_SCHEMA_V2:
+                if rb_findings is None:
+                    print("attest: schema-2 attestation needs --findings to re-hash",
+                          file=sys.stderr)
+                    sys.exit(2)
+                want_path = doc["findings_path"].replace("\\", "/")
+                got_path = rb_findings.replace("\\", "/")
+                while got_path.startswith("./"):
+                    got_path = got_path[2:]
+                if got_path != want_path:
+                    print(f"attest: findings file is {rb_findings}, "
+                          f"attestation binds {doc['findings_path']}", file=sys.stderr)
+                    sys.exit(1)
+                try:
+                    with open(rb_findings, "rb") as fh:
+                        got_sha = hashlib.sha256(fh.read()).hexdigest()
+                except OSError as exc:
+                    print(f"attest: cannot read {rb_findings}: {exc}", file=sys.stderr)
+                    sys.exit(2)
+                if got_sha != doc["findings_sha256"]:
+                    print(f"attest: findings file {rb_findings} hashes {got_sha[:12]}..., "
+                          f"attestation binds {doc['findings_sha256'][:12]}...",
+                          file=sys.stderr)
+                    sys.exit(1)
+            elif rb_findings is not None:
+                print("attest: schema-1 attestation binds no findings file",
+                      file=sys.stderr)
+                sys.exit(2)
             print(f"attest: schema {doc['schema']}, verdict {doc['verdict']}, "
                   f"manifest {doc['manifest_sha'][:12]}..., candidate "
                   f"{doc['candidate_base'][:12]}...{doc['candidate_head'][:12]}..., "
@@ -1356,16 +2496,20 @@ if __name__ == "__main__":
                   f"model {doc['model']}, checker: {doc['checker']}")
             sys.exit(0)
         want = {"--out": None, "--manifest": None, "--base": None, "--head": None,
-                "--tree": None, "--reviewer": None, "--model": None,
-                "--verdict": None, "--checker": None, "--timestamp": None}
+                "--tree": None, "--runner-output": None, "--checker-output": None,
+                "--findings": None, "--verdict": None, "--reviewer": None,
+                "--model": None, "--timestamp": None}
         rest = list(args)
         while len(rest) >= 2 and rest[0] in want:
             want[rest[0]] = rest[1]
             rest = rest[2:]
-        if rest or any(v is None for v in want.values()):
+        required = ("--out", "--manifest", "--base", "--head", "--tree",
+                    "--runner-output", "--checker-output", "--findings", "--verdict")
+        if rest or any(want[k] is None for k in required):
             print("attest: want --out <path> --manifest <file> --base <b> --head <h> "
-                  "--tree <t> --reviewer <r> --model <m> --verdict <v> --checker <c> "
-                  "--timestamp <ts> | --read-back <path>", file=sys.stderr)
+                  "--tree <t> --runner-output <f> --checker-output <f> --findings <f> "
+                  "--verdict <v> [--reviewer <r> --model <m> --timestamp <ts>] | "
+                  "--read-back <path> [--findings <f>]", file=sys.stderr)
             sys.exit(2)
         try:
             with open(want["--manifest"], encoding="utf-8") as fh:
@@ -1382,12 +2526,69 @@ if __name__ == "__main__":
             print(identity_bad, file=sys.stderr)
             sys.exit(1)
         try:
-            body = write_attestation(
+            with open(want["--runner-output"], "rb") as fh:
+                runner_bytes = fh.read()
+        except OSError as exc:
+            print(f"attest: cannot read {want['--runner-output']}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        reviewer, envelope_model, run_err = derive_runner_identity(
+            runner_bytes.decode("utf-8", "replace"))
+        if run_err is not None:
+            print(f"attest: {run_err}", file=sys.stderr)
+            sys.exit(1)
+        if envelope_model is not None and want["--model"] is not None \
+                and want["--model"] != envelope_model:
+            print(f"attest: hand-supplied model {want['--model']} disagrees "
+                  f"with the runner output {envelope_model}", file=sys.stderr)
+            sys.exit(1)
+        model = envelope_model if envelope_model is not None else want["--model"]
+        if model is None:
+            print("attest: the runner output names no model; pass --model",
+                  file=sys.stderr)
+            sys.exit(2)
+        if want["--reviewer"] is not None and want["--reviewer"] != reviewer:
+            print(f"attest: hand-supplied reviewer {want['--reviewer']} disagrees "
+                  f"with the runner output {reviewer}", file=sys.stderr)
+            sys.exit(1)
+        try:
+            timestamp = runner_timestamp(want["--runner-output"])
+        except OSError as exc:
+            print(f"attest: cannot stat {want['--runner-output']}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        if want["--timestamp"] is not None and want["--timestamp"] != timestamp:
+            print(f"attest: hand-supplied timestamp {want['--timestamp']} disagrees "
+                  f"with the run clock {timestamp}", file=sys.stderr)
+            sys.exit(1)
+        try:
+            with open(want["--checker-output"], "rb") as fh:
+                checker_bytes = fh.read()
+        except OSError as exc:
+            print(f"attest: cannot read {want['--checker-output']}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        checker_lines = checker_bytes.decode("utf-8", "replace").strip().splitlines()
+        if len(checker_lines) != 1 or not checker_lines[0].startswith("PASS "):
+            print("attest: the checker output is not a single PASS line",
+                  file=sys.stderr)
+            sys.exit(1)
+        checker = f"{checker_lines[0]} :: {hashlib.sha256(checker_bytes).hexdigest()}"
+        findings_arg = want["--findings"].replace("\\", "/")
+        while findings_arg.startswith("./"):
+            findings_arg = findings_arg[2:]
+        try:
+            with open(want["--findings"], "rb") as fh:
+                findings_sha = hashlib.sha256(fh.read()).hexdigest()
+        except OSError as exc:
+            print(f"attest: cannot read {want['--findings']}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        try:
+            body = write_attestation_v2(
                 manifest_sha=sha, candidate_base=want["--base"],
                 candidate_head=want["--head"], tree=want["--tree"],
-                reviewer=want["--reviewer"], model=want["--model"],
-                verdict=want["--verdict"], checker=want["--checker"],
-                timestamp=want["--timestamp"])
+                reviewer=reviewer, model=model,
+                verdict=want["--verdict"], checker=checker,
+                timestamp=timestamp, findings_path=findings_arg,
+                findings_sha256=findings_sha,
+                runner_sha256=hashlib.sha256(runner_bytes).hexdigest())
         except ValueError as exc:
             print(f"attest: {exc}", file=sys.stderr)
             sys.exit(1)
@@ -1435,7 +2636,36 @@ if __name__ == "__main__":
             print(f"run-id: {exc}", file=sys.stderr)
             sys.exit(2)
         sys.exit(0)
-    checkers = {"check-panel": check_panel_output, "check-plan": check_plan_output}
+    if len(sys.argv) == 4 and sys.argv[1] == "check-parents":
+        # check-parents <commit> <expected-parent>: the stamp lands on
+        # its expected parent, and a merge fails naming every parent
+        # (D00 T04 §21: HEAD^ reads the first parent only).
+        bad = check_parent_binding(sys.argv[2], sys.argv[3])
+        if bad is not None:
+            print(bad, file=sys.stderr)
+            sys.exit(1)
+        print(f"check-parents: {sys.argv[2]} sits on {sys.argv[3]}")
+        sys.exit(0)
+    if len(sys.argv) == 4 and sys.argv[1] == "check-anchors":
+        # check-anchors <todo-path> <section>: every cited line,
+        # section, and oid in the section's stamp block resolves
+        # (D00 T04 §21: mechanical dead-anchor rejection, with the
+        # reviewer round kept as the semantic backstop).
+        try:
+            section = int(sys.argv[3])
+        except ValueError:
+            print(f"check-anchors: section {sys.argv[3]!r} is not an integer",
+                  file=sys.stderr)
+            sys.exit(2)
+        dead = check_stamp_anchors(sys.argv[2], section)
+        if dead:
+            for line in dead:
+                print(line, file=sys.stderr)
+            sys.exit(1)
+        print(f"check-anchors: {sys.argv[2]} §{section} cites resolve")
+        sys.exit(0)
+    checkers = {"check-panel": check_panel_output, "check-plan": check_plan_output,
+                "check-stamp": check_stamp_output}
     manifest = None
     checker_arg = sys.argv[1] if len(sys.argv) >= 2 else ""
     rest = sys.argv[2:]
@@ -1455,7 +2685,7 @@ if __name__ == "__main__":
         rest = []
     if checker_arg not in checkers or rest:
         print(
-            f"usage: {sys.argv[0]} tag <prefix> | round-cost <envelope-file> | fence <prefix> [--base <sha> --head <sha>] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan [--manifest <file>] < output.txt | cross-check <manifest-file> <base> <head> | attest (--out <path> --manifest <file> --base <b> --head <h> --tree <t> --reviewer <r> --model <m> --verdict <v> --checker <c> --timestamp <ts> | --read-back <path>)",
+            f"usage: {sys.argv[0]} tag <prefix> | round-cost <envelope-file> | fence <prefix> [--base <sha> --head <sha> [--commits <o1,o2>]] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan|check-stamp [--manifest <file>] < output.txt | cross-check <manifest-file> <base> <head> [--body <file>] [--expect-head-kind commit|tree] | check-parents <commit> <expected-parent> | check-anchors <todo-path> <section> | attest (--out <path> --manifest <file> --base <b> --head <h> --tree <t> --runner-output <f> --checker-output <f> --findings <f> --verdict <v> [--reviewer <r> --model <m> --timestamp <ts>] | --read-back <path> [--findings <f>])",
             file=sys.stderr,
         )
         sys.exit(2)

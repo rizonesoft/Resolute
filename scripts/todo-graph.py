@@ -87,6 +87,11 @@ SKILL_SHORT_RE = re.compile(
     r"|(?P<todo>(?<!D\d\d )(?<!\w)T\d\d §\d+)"
     r"|(?P<bare>(?<!\w)(?<!T\d\d )§\d+)"
 )
+# A backticked candidate oid (or a..b range) on a Review line, with its
+# optional round tag (D00 T04 §21: every candidate carries its round).
+REVIEW_OID_RE = re.compile(
+    r"`(?P<oid>[0-9a-f]{7,40}(?:\.\.[0-9a-f]{7,40})?)`(?P<tag>\(round \d+\))?"
+)
 BARE_TODO_RE = re.compile(r"(?<![\w§])(?:D\d{2}\s+)?T\d{2}(?!\s*§)(?![\w-])")
 STAMP_RE = re.compile(
     r"^>\s*\*\*(?P<kind>Verified|Deferred|Resolved|Review|Duration|CRUD|Verification|Implementer|Moved|Plan review|Reopened):\*\*\s*(?P<body>.+?)\s*$"
@@ -358,6 +363,8 @@ class Section:
     duration_minutes: int | None = None
     duration_end: str | None = None  # `Duration:` range end instant, Zulu shaped or None
     stamped_on: str | None = None
+    verified_body: str = ""
+    duration_body: str = ""
     review_body: str = ""
     plan_review_body: str = ""
     reopened_body: str = ""
@@ -544,6 +551,7 @@ def parse_todo(path: Path) -> Todo:
                     stamp_orphaned = False
                     for target in stamp_targets:
                         target.stamped_on = day
+                        target.verified_body = body
             elif kind == "Duration" and current is not None:
                 for target in stamp_targets or ([] if stamp_orphaned else [current]):
                     # Last marker governs: each Duration line resets
@@ -555,6 +563,7 @@ def parse_todo(path: Path) -> Todo:
                     # ever escapes the parser into the query).
                     target.duration_minutes = None
                     target.duration_end = None
+                    target.duration_body = body
                     m = DURATION_BODY_RE.fullmatch(body.strip())
                     if m is not None:
                         target.duration_minutes = int(m.group("minutes"))
@@ -809,6 +818,14 @@ SEVERITY_MAP: dict[str, str] = {
     # two sections claiming the same provenance key is a duplicate filing --
     # the one thing an automated filer can and must prove it did not do.
     "duplicate-source-key": "fatal",
+    # a short section ref on a post-cutoff evidence surface (stamp prose,
+    # findings file, attestation): new evidence cites full DNN TNN §N
+    # refs, like skills since §13 (D00 T04 §21).
+    "evidence-citation-short-form": "fatal",
+    # a post-cutoff Review line with two or more candidate oids and an
+    # untagged one: round-to-commit mapping must be mechanical (D00 T04
+    # §21; §13's own line stands as history by explicit exemption).
+    "review-citation-role-less": "fatal",
     # superseded frontmatter must name its successor: mechanical, structural.
     "superseded-no-successor": "fatal",
     # an OPEN section whose --filter checkpoint claims another suite stays
@@ -1042,6 +1059,12 @@ def strip_fenced_map(text: str) -> tuple[list[bool], int | None]:
 # Resolute stamp predates it. Module-level, not in the validator, because
 # `query plan-health` needs the same boundary: one constant, no copies.
 PLAN_REVIEW_CUTOFF = "2026-09-19"
+# Stamps on or before this date predate the evidence-citation rules and
+# stand as history (D00 T04 §21): 670 live short forms and 31 role-less
+# Review lines sit on sealed records no rule may rewrite. Set to
+# 2026-09-20, the day §21 landed; stamps after it cite full refs and
+# round-tagged candidates.
+EVIDENCE_CITE_CUTOFF = "2026-09-20"
 # The grandfathered migration deadline: past this date, unmigrated
 # batches read OVERDUE and fail `--check`.
 MIGRATION_DEADLINE = "2026-12-31"
@@ -7047,6 +7070,157 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
 """,
             encoding="utf-8",
         )
+        # --- D00 T04 §21: evidence-citation fixtures ---------------------
+        # Post-cutoff stamps (2026-09-21) fire on short forms and untagged
+        # candidates; the 2026-09-20 twin stands as history; Deferred
+        # pointer lines keep their XREF grammar; fenced transcript lines
+        # never trip the findings scan.
+        (root / "todo" / "91-severity" / "TODO-11-evidence-cite.md").write_text(
+            """---
+schema_version: 1
+id: self-test-evidence
+domain: 91-severity
+status: active
+title: "TODO-11 -- evidence-citation fixtures"
+track: Z1
+---
+
+# TODO-11 -- evidence-citation fixtures
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Short in Verified | - |  [x]   |
+|   2   |   §2    | Short in Review | - |  [x]   |
+|   3   |   §3    | Clean full refs | - |  [x]   |
+|   4   |   §4    | Pre-cutoff twin | - |  [x]   |
+|   5   |   §5    | Untagged pair | - |  [x]   |
+|   6   |   §6    | Tagged pair | - |  [x]   |
+|   7   |   §7    | Single oid | - |  [x]   |
+|   8   |   §8    | Findings short | - |  [x]   |
+|   9   |   §9    | Deferred XREF | - |  [x]   |
+|  10   |   §10   | XREF target | - |  [ ]   |
+
+## 1. Short in Verified
+
+- [x] Did it
+- [x] Commit: `"selftest: ev1"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §1 | filed to §2 for the follow-up
+
+## 2. Short in Review
+
+- [x] Did it
+- [x] Commit: `"selftest: ev2"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §2 | clean evidence D91 T11 §3
+> **Review:** round 1, candidate `abc1234` -- advisory, see §3 notes
+
+## 3. Clean full refs
+
+- [x] Did it
+- [x] Commit: `"selftest: ev3"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §3 | filed to D91 T11 §10 for the follow-up
+> **Review:** round 1, candidate `abc1234`(round 1) `def5678`(round 1) -- approve
+
+## 4. Pre-cutoff twin
+
+- [x] Did it
+- [x] Commit: `"selftest: ev4"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-20 | §4 | filed to §2 for the follow-up
+> **Review:** round 1, candidate `abc1234` `def5678` -- approve, see §3 notes
+
+## 5. Untagged pair
+
+- [x] Did it
+- [x] Commit: `"selftest: ev5"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §5 | clean evidence
+> **Review:** round 2, candidate `abc1234` `def5678` -- approve
+
+## 6. Tagged pair
+
+- [x] Did it
+- [x] Commit: `"selftest: ev6"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §6 | clean evidence
+> **Review:** round 2, candidate `abc1234`(round 1) `def5678`(round 2) -- approve
+
+## 7. Single oid
+
+- [x] Did it
+- [x] Commit: `"selftest: ev7"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §7 | clean evidence
+> **Review:** round 1, candidate `abc1234` -- approve
+
+## 8. Findings short
+
+- [x] Did it
+- [x] Commit: `"selftest: ev8"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §8 | clean evidence
+> **Review:** round 1, candidate `abc1234` -- approve. Raw findings: docs/reviews/91-severity/D91-T11-s8.md
+
+## 9. Deferred XREF
+
+- [x] Did it
+- [x] Commit: `"selftest: ev9"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §9 | clean evidence
+> **Deferred:** leftover -> XREF: §10 -- needs the target first
+
+## 10. XREF target
+
+- [ ] Carry the leftover for §9
+- [ ] Commit: `"selftest: evtarget"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+""",
+            encoding="utf-8",
+        )
+        (root / "docs" / "reviews" / "91-severity").mkdir(parents=True)
+        (root / "docs" / "reviews" / "91-severity" / "D91-T11-s8.md").write_text(
+            """# Review -- D91 T11 §8, fixture
+
+## Opus panel Round 1
+
+Round 1 over `abc1234` (1 file). Cost 10tokens.
+
+`adversarial` approve
+`consistency` approve
+`integration` approve
+`record` approve
+
+Unfenced prose citing §1 trips the findings scan.
+
+```
+Fenced transcript citing §1 never trips the scan.
+```
+""",
+            encoding="utf-8",
+        )
 
         sev_buf = _io.StringIO()
         with _ctx.redirect_stdout(sev_buf), _ctx.redirect_stderr(sev_buf):
@@ -7127,6 +7301,50 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
               any(line.startswith("FATAL") and "TODO-10-partial-flip.md" in line
                   and "§31 is [ ]" in line and "stamp covers it" in line
                   for line in sev_out.splitlines()), True)
+
+        # --- D00 T04 §21: evidence-citation rules ----------------------
+        # Needles scope to this file's sections and the rule's own
+        # message: panel and marker rules fire on these young stamps
+        # too, and their noise must not read as ours.
+        def ev_fires(num: int, needle: str) -> bool:
+            tag = f"§{num} "
+            return any(
+                line.startswith("FATAL")
+                and "TODO-11-evidence-cite.md" in line
+                and tag in line
+                and needle in line
+                for line in sev_out.splitlines()
+            )
+
+        def ev_silent(num: int) -> bool:
+            tag = f"§{num} "
+            return not any(
+                line.startswith("FATAL")
+                and "TODO-11-evidence-cite.md" in line
+                and tag in line
+                and ("short form" in line or "untagged" in line)
+                for line in sev_out.splitlines()
+            )
+
+        check("evidence-cite: short in Verified fails",
+              ev_fires(1, "Verified cites short form §2"), True)
+        check("evidence-cite: short in Review fails",
+              ev_fires(2, "Review cites short form §3"), True)
+        check("evidence-cite: clean full refs pass", ev_silent(3), True)
+        check("evidence-cite: pre-cutoff twin stands", ev_silent(4), True)
+        check("evidence-cite: untagged pair fails",
+              ev_fires(5, "untagged candidate abc1234")
+              and ev_fires(5, "untagged candidate def5678"), True)
+        check("evidence-cite: tagged pair passes", ev_silent(6), True)
+        check("evidence-cite: single oid passes", ev_silent(7), True)
+        check("evidence-cite: findings short fails",
+              any(line.startswith("FATAL")
+                  and "D91-T11-s8.md:12" in line and "short form §1" in line
+                  for line in sev_out.splitlines()), True)
+        check("evidence-cite: fenced short silent",
+              not any(line.startswith("FATAL") and "D91-T11-s8.md:15" in line
+                      for line in sev_out.splitlines()), True)
+        check("evidence-cite: Deferred XREF keeps its grammar", ev_silent(9), True)
 
         # --- D00 T04 §20: the disposition report ----------------------
         rep_buf = _io.StringIO()
@@ -7304,8 +7522,10 @@ track: Z1
         # then prove: NEW warn = exit 1 with the WARN* marker; the SAME warn
         # baselined = exit 0. WARNING_BASELINE is rebound like TODO_DIR --
         # the live baseline must never absorb fixture keys.
-        for f in ("TODO-05-severity.md", "TODO-06-super.md", "TODO-08-frozen.md"):
+        for f in ("TODO-05-severity.md", "TODO-06-super.md", "TODO-08-frozen.md",
+                  "TODO-11-evidence-cite.md"):
             (root / "todo" / "91-severity" / f).unlink()
+        (root / "docs" / "reviews" / "91-severity" / "D91-T11-s8.md").unlink()
         (root / "todo" / "91-severity" / "INDEX.md").write_text(
             "# 91-severity\n\n- [TODO-09](TODO-09-warn-only.md)\n", encoding="utf-8"
         )
