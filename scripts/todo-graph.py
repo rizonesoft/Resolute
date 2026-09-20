@@ -76,6 +76,17 @@ BODY_RE = re.compile(r"^##\s+(?P<num>\d+)\.\s+(?P<title>.+?)\s*$")
 XREF_RE = re.compile(r"(?:D(?P<dom>\d{2})\s+)?(?:T(?P<todo>\d{2})\s+)?§(?P<sec>\d+)")
 # Skills cite sections absolutely (D00 T04 §6): a bare §N has no origin there.
 SKILL_CITE_RE = re.compile(r"D(?P<dom>\d{2})\s+T(?P<todo>\d{2})\s+§(?P<sec>\d+)")
+# Short citation forms, banned in skills (D00 T04 §13): a bare §N has no
+# origin, a TNN §N without its domain is ambiguous across domains, and a
+# file §N is shorthand however real the path. Single-space full D-refs
+# never match (each alternative excludes that span); wider spacing falls
+# to the span guard at the check-26 site, since fixed-width lookbehinds
+# cannot cover SKILL_CITE_RE's \s+.
+SKILL_SHORT_RE = re.compile(
+    r"(?P<file>[\w./-]+\.md §\d+)"
+    r"|(?P<todo>(?<!D\d\d )(?<!\w)T\d\d §\d+)"
+    r"|(?P<bare>(?<!\w)(?<!T\d\d )§\d+)"
+)
 BARE_TODO_RE = re.compile(r"(?<![\w§])(?:D\d{2}\s+)?T\d{2}(?!\s*§)(?![\w-])")
 STAMP_RE = re.compile(
     r"^>\s*\*\*(?P<kind>Verified|Deferred|Resolved|Review|Duration|CRUD|Verification|Implementer|Moved|Plan review|Reopened):\*\*\s*(?P<body>.+?)\s*$"
@@ -896,6 +907,10 @@ SEVERITY_MAP: dict[str, str] = {
     # address; the fix is mechanical (correct the citation or write the
     # section) and only full D-refs are checked, bare §N having no origin.
     "skill-citation-unresolved": "fatal",
+    # a skill citing a short section form (bare §N, TNN §N, file §N)
+    # teaches an ambiguous address; the fix is mechanical (expand to a
+    # full DNN TNN §N ref). D00 T04 §13.
+    "skill-citation-short-form": "fatal",
 }
 
 
@@ -5309,7 +5324,9 @@ def cmd_self_test(_args) -> int:
         probe.mkdir(parents=True)
         probe_skill = probe / "SKILL.md"
         probe_skill.write_text(
-            "See D90 T01 §2 for the shape.\n\nBut D90 T01 §9 does not exist.\n",
+            "See D90 T01 §2 for the shape.\n\nBut D90 T01 §9 does not exist.\n"
+            "Bare §9, T04 §9, and probe.md §9 are all short forms.\n"
+            "Spaced D90  T01  §2 and tabbed D90\tT01\t§2 stay legal.\n",
             encoding="utf-8",
         )
         try:
@@ -5321,6 +5338,14 @@ def cmd_self_test(_args) -> int:
                   any("D90 T01 §2" in ln for ln in sfatal), False)
             check("an unresolving skill citation is FATAL by file and line",
                   any("SKILL.md:3" in ln and "D90 T01 §9" in ln for ln in sfatal), True)
+            check("a bare §N in a skill is FATAL by file and line",
+                  any("SKILL.md:4" in ln and "short form §9" in ln for ln in sfatal), True)
+            check("a TNN §N in a skill is FATAL by file and line",
+                  any("SKILL.md:4" in ln and "short form T04 §9" in ln for ln in sfatal), True)
+            check("a file §N in a skill is FATAL by file and line",
+                  any("SKILL.md:4" in ln and "short form probe.md §9" in ln for ln in sfatal), True)
+            check("a wide-spaced full ref in a skill draws no FATAL",
+                  any("SKILL.md:5" in ln for ln in sfatal), False)
         finally:
             probe_skill.unlink()
             probe.rmdir()

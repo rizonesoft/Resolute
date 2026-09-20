@@ -1487,7 +1487,8 @@ def validate(graph, _args) -> int:
 
     # 26. skill-to-plan citations resolve: every full section ref in a skill
     # names a live section, or the skill teaches a dead address (D00 T04 §9).
-    # Only full D-refs are checked; a bare §N has no origin in a skill file.
+    # Short forms are banned outright (D00 T04 §13): a bare §N has no
+    # origin in a skill file, and TNN §N and file §N are shorthand.
     # The scan root rides the graph global so fixtures substitute their own.
     if todos:
         origin = todos[0]
@@ -1508,6 +1509,20 @@ def validate(graph, _args) -> int:
                                 "skill-citation-unresolved",
                                 f"{path}:{lineno}: skill cites {ref}, which resolves to no live section",
                             )
+                    full_spans = [m.span() for m in graph.SKILL_CITE_RE.finditer(line)]
+                    for short in graph.SKILL_SHORT_RE.finditer(line):
+                        form = short.group(0)
+                        # A full ref with wide spacing (tabs, doubled
+                        # spaces) is legal per SKILL_CITE_RE's \s+, but the
+                        # short-form lookbehinds only exclude single-space
+                        # spans: anything inside a full ref's span stays.
+                        if any(s <= short.start() and short.end() <= e
+                               for s, e in full_spans):
+                            continue
+                        flag(
+                            "skill-citation-short-form",
+                            f"{path}:{lineno}: skill cites short form {form}, use a full DNN TNN §N ref",
+                        )
 
     # The warning BASELINE. A count that only grows is a count nobody reads,
     # and 17 of these have stood for over a week: 15 name STAMPED sections

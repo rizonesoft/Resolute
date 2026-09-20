@@ -93,7 +93,7 @@ Each lens ends in a verdict: `approve`, `needs-attention` (with findings), or `a
 
 ### The mixed panel
 
-Every review mints one private directory and stages every prompt file under it: fixed `/tmp` names collide across concurrent sessions on one machine, proven when a §9 round fenced another session's contract as its own and voided the round. Mint once per review, reuse for every round, plan review, and stamp review of that review, and keep the directory as evidence (no trap-delete; the OS scrubs `/tmp`). On Windows, run every `bash` block in this skill under Git Bash at `C:\Program Files\Git\bin\bash.exe`, never the `bash` on PATH (that is WSL's, and it resolves `python3` to Ubuntu's interpreter against the wrong tree). Git Bash carries `mktemp`, `timeout`, `sed`, and `date`, and both `python` and `python3` there resolve to the same Windows interpreter (probed 2026-09-19), so the blocks below run verbatim.
+Every review mints one private directory and stages every prompt file under it: fixed `/tmp` names collide across concurrent sessions on one machine, proven when a `D00 T04 §9` round fenced another session's contract as its own and voided the round. Mint once per review, reuse for every round, plan review, and stamp review of that review, and keep the directory as evidence (no trap-delete; the OS scrubs `/tmp`). On Windows, run every `bash` block in this skill under Git Bash at `C:\Program Files\Git\bin\bash.exe`, never the `bash` on PATH (that is WSL's, and it resolves `python3` to Ubuntu's interpreter against the wrong tree). Git Bash carries `mktemp`, `timeout`, `sed`, and `date`, and both `python` and `python3` there resolve to the same Windows interpreter (probed 2026-09-19), so the blocks below run verbatim.
 
 ```bash
 RUNDIR=$(mktemp -d /tmp/review-XXXXXXXX)
@@ -245,10 +245,21 @@ timeout 600 codex exec -m "gpt-5.6-sol" -c model_reasoning_effort="high" -s read
 
 Bind the approval to the staged tree (D00 T04 §9): a stamp approved staged becomes pushed unstaged when anything moves the index between the review and the commit. The tree is captured before the patch, the patch is verified against it immediately (an index change between the two commands would otherwise review one tree and record another), and the tree is rechecked immediately before committing. A mismatch re-stages and re-reviews; it never commits. Residual: the instant between the final recheck and the commit, closed by the single-writer rule, not by a command.
 
+Carry the binding from the commit to the push (D00 T04 §13): the commit must land on the expected parent with the reviewed tree, and the same commit must still sit at HEAD immediately before the push. A pre-commit hook that rewrites the tree invalidates the review exactly like an index move: the committed tree is compared against the reviewed tree, and a mismatch forces re-review, never a quiet accept. Residual: the instant between the push recheck and the push, closed by the single-writer rule.
+
 ```bash
 # ... the stamp review runs ...
+PRE_HEAD=$(git rev-parse HEAD)  # the expected parent: the commit lands on today's HEAD
 [ "$(git write-tree)" = "$TREE" ] || { echo "BLOCKED: the staged tree moved since STAMP HOLDS; re-stage and re-review"; exit 1; }
 git commit -m 'review: stamp ...'
+COMMIT=$(git rev-parse HEAD)
+[ "$(git rev-parse HEAD^)" = "$PRE_HEAD" ] || { echo "BLOCKED: the commit landed on an unexpected parent; re-review"; exit 1; }
+[ "$(git rev-parse HEAD^{tree})" = "$TREE" ] || { echo "BLOCKED: a hook rewrote the tree ($TREE reviewed, $(git rev-parse HEAD^{tree}) committed); re-review"; exit 1; }
+# ... immediately before the push, with nothing between the recheck and the push but the push:
+[ "$(git rev-parse HEAD)" = "$COMMIT" ] || { echo "BLOCKED: HEAD moved since the stamp commit; re-review"; exit 1; }
+[ "$(git rev-parse HEAD^)" = "$PRE_HEAD" ] || { echo "BLOCKED: the commit parent moved since the stamp; re-review"; exit 1; }
+[ "$(git rev-parse HEAD^{tree})" = "$TREE" ] || { echo "BLOCKED: HEAD tree differs from the reviewed tree; re-review"; exit 1; }
+git push
 ```
 
 ### 10. Audit stance

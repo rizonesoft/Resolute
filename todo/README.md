@@ -458,6 +458,7 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 | `risk-acceptance-silent-edit` | FATAL | A risk acceptance whose owning record changed after the evidence commit without a superseding record. |
 | `risk-acceptance-chain-broken` | FATAL | A `supersedes <date>` link that names no earlier record on its target, points forward, branches, or cycles. |
 | `skill-citation-unresolved` | FATAL | A skill citing a full section ref (`D00 T04 §6`) that resolves to no live section. |
+| `skill-citation-short-form` | FATAL | A skill citing a short section form (bare `§6`, `T04 §6`, or `file.md §6`) instead of a full `DNN TNN §N` ref. |
 
 Treat a warning as a decision to make rather than noise to clear. The tree starts at zero FATAL and zero non-baselined warnings, and it is worth keeping there.
 

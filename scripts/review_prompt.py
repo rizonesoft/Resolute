@@ -643,6 +643,27 @@ def check_attest_identity(manifest_text: str, base: str, head: str) -> str | Non
     return check_manifest_identity(manifest_text, base, head, "attest")
 
 
+def git_oid_exists(oid: str, cwd=None) -> bool:
+    """True when git resolves the OID to an object in the repo."""
+    import subprocess
+    proc = subprocess.run(
+        ["git", "cat-file", "-e", oid],
+        capture_output=True, cwd=cwd)
+    return proc.returncode == 0
+
+
+def git_head_tree(head: str, cwd=None) -> str | None:
+    """The tree of a commit OID, else None when it resolves to
+    nothing or to no tree."""
+    import subprocess
+    proc = subprocess.run(
+        ["git", "rev-parse", f"{head}^{{tree}}"],
+        capture_output=True, text=True, cwd=cwd)
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.strip()
+
+
 def read_attestation(text: str) -> dict:
     """Read an attestation back: JSON parses, schema asserts, every
     field re-validates through the writer. Raises ValueError naming
@@ -973,6 +994,37 @@ def _self_test() -> int:
     check("crosscheck-identity-mismatch",
           xbad is not None and xbad.startswith("cross-check: --base/--head"),
           xbad or "matched")
+    # OID resolution runs against a scratch repo (hermetic: no config
+    # writes, all identity via -c flags), so the cases pass on any
+    # machine with git, which the CLI paths under test require throughout.
+    import os
+    import subprocess
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix="review-resolve-") as tmpd:
+        subprocess.run(["git", "init", "-q", tmpd], capture_output=True,
+                       check=True)
+        with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
+            fh.write("fixture\n")
+        subprocess.run(["git", "-C", tmpd, "add", "f.md"],
+                       capture_output=True, check=True)
+        subprocess.run(["git", "-C", tmpd, "-c", "user.email=t@t.invalid",
+                        "-c", "user.name=t", "-c", "commit.gpgsign=false",
+                        "commit", "-qm", "fixture"], capture_output=True,
+                       check=True)
+        rhead = subprocess.run(["git", "-C", tmpd, "rev-parse", "HEAD"],
+                               capture_output=True, text=True,
+                               check=True).stdout.strip()
+        rtree = subprocess.run(["git", "-C", tmpd, "rev-parse", "HEAD^{tree}"],
+                               capture_output=True, text=True,
+                               check=True).stdout.strip()
+        check("resolve-oid-exists", git_oid_exists(rhead, cwd=tmpd)
+              and git_oid_exists(rtree, cwd=tmpd))
+        check("resolve-oid-missing",
+              not git_oid_exists("deadbeef" * 5, cwd=tmpd))
+        check("resolve-head-tree-match",
+              git_head_tree(rhead, cwd=tmpd) == rtree)
+        check("resolve-head-tree-missing",
+              git_head_tree("deadbeef" * 5, cwd=tmpd) is None)
     check("nonce-shape", re.fullmatch(r"[0-9a-f]{16}", unique_nonce()) is not None)
 
     print(f"review-prompt self-test: {total[0]} cases, {len(failures)} failed")
@@ -1062,6 +1114,11 @@ if __name__ == "__main__":
         if identity_bad is not None:
             print(identity_bad, file=sys.stderr)
             sys.exit(1)
+        for name, oid in (("--base", sys.argv[3]), ("--head", sys.argv[4])):
+            if not git_oid_exists(oid):
+                print(f"cross-check: {name} {oid} resolves to nothing",
+                      file=sys.stderr)
+                sys.exit(1)
         try:
             proc = subprocess.run(
                 ["git", "diff", "--name-only", "-z", "--no-renames", sys.argv[3], sys.argv[4]],
@@ -1140,6 +1197,15 @@ if __name__ == "__main__":
                 timestamp=want["--timestamp"])
         except ValueError as exc:
             print(f"attest: {exc}", file=sys.stderr)
+            sys.exit(1)
+        for name in ("--base", "--head", "--tree"):
+            if not git_oid_exists(want[name]):
+                print(f"attest: {name} {want[name]} resolves to nothing",
+                      file=sys.stderr)
+                sys.exit(1)
+        if git_head_tree(want["--head"]) != want["--tree"]:
+            print(f"attest: --tree {want['--tree']} is not the tree of "
+                  f"--head {want['--head']}", file=sys.stderr)
             sys.exit(1)
         try:
             with open(want["--out"], "w", encoding="utf-8", newline="\n") as fh:

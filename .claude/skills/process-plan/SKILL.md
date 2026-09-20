@@ -67,7 +67,7 @@ A parked phase is **not** complete, and it is **not** a stall. Do not call it ei
 python scripts/todo-graph.py query ready
 ```
 
-If another phase has a ready row, re-point the guard to the new phase's run file (delete, recreate, record the new id) and start `process-phase` on it in the same turn. Same session, same rules. If no phase has a ready row, the remaining leftovers are blocked, runnable-elsewhere in this context, or the plan is done: report which. When the plan is done (no `[ ]` rows anywhere), run the terminal acceptance before deleting the guard: re-execute the `D06 T01 §16` procedure fresh on a clean machine. A failure reopens §16 through `review-todo-section` in audit stance and the plan is not done; a pass is recorded in the findings file, then the guard is deleted. The acceptance row proves the suite shippable when it ships; the re-run proves it still is when everything else has landed.
+If another phase has a ready row, re-point the guard to the new phase's run file (delete, recreate, record the new id) and start `process-phase` on it in the same turn. Same session, same rules. If no phase has a ready row, the remaining leftovers are blocked, runnable-elsewhere in this context, or the plan is done: report which. When the plan is done (no `[ ]` rows anywhere), run the terminal acceptance before deleting the guard: re-execute the `D06 T01 §16` procedure fresh on a clean machine. A failure reopens `D06 T01 §16` through `review-todo-section` in audit stance and the plan is not done; a pass is recorded in the findings file, then the guard is deleted. The acceptance row proves the suite shippable when it ships; the re-run proves it still is when everything else has landed.
 
 ## 3. Deny
 

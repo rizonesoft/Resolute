@@ -31,7 +31,7 @@ It accepts whatever the caller had in front of them:
 | --- | :-: |
 | `D01 T01 §3` | yes |
 | <code>&#124; [ ] &#124; \`D01 T01 §3\` &#124; Logging contract … &#124; 5 &#124;</code> (a plan row, pasted whole) | yes |
-| `01-sdk-core/TODO-01-shared-include-contracts.md §3` | yes |
+| `<todo-path> §<n>` (a file path plus its section number, e.g. under `todo/`) | yes |
 | Any prose containing one of the above | yes |
 
 It prints the path, the section title, the item count, whether the TODO is frozen, and **which dependencies are unmet**. Its exit code is the instruction:
