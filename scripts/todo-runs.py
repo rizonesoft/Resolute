@@ -24,13 +24,13 @@ round verdicts from the review file; every candidate is a commit that exists.
 verdict overlap (rounds sharing a four-lens signature), the empty-round
 index, and the source split (independent from runs, self from ledger).
 
-Refusals carry stable diagnostic codes (D00 T04 §22, `scripts/todo-diag.py`):
-usage is RUN-001 (exit 2); run-file read/parse RUN-002, run-block shape
-RUN-003, attribution and coverage RUN-004, panel correspondence RUN-005,
-candidate resolution RUN-006, export problems RUN-007 (exit 1 each).
-`--format json` renders refusals as one JSON array of code/path/line/
-message objects; usage errors stay text, since argv did not parse and no
-format was selected.
+Refusals carry stable diagnostic codes from the single registry in
+`scripts/todo-diag.py` (D00 T04 §22): `CODES` maps each code to its exit
+and family, and is the only documented place the list lives (this
+docstring names the registry, never the mapping). `--format json`
+renders refusals as one JSON array of code/path/line/message objects;
+usage errors stay text, since argv did not parse and no format was
+selected.
 """
 
 import datetime
@@ -1681,6 +1681,15 @@ refuted: 0
         code, _, err = _run_main(["--format", "yaml"])
         check("exit-format-value", code == 2 and "[RUN-001]" in err,
               f"{code} {err!r}")
+        code, _, err = _run_main(["--bogus"])
+        check("exit-unknown-flag", code == 2 and "[RUN-001]" in err
+              and "unknown option" in err, f"{code} {err!r}")
+        code, _, err = _run_main(["a.md", "b.md"])
+        check("exit-surplus-positional", code == 2 and "[RUN-001]" in err
+              and "at most one" in err, f"{code} {err!r}")
+        code, _, err = _run_main(["--self-test", "--check"])
+        check("exit-selftest-surplus", code == 2 and "[RUN-001]" in err,
+              f"{code} {err!r}")
         rp.write_text("not a runs file at all\n", encoding="utf-8")
         code, out, _ = _run_main(
             ["--check", "--format=json", str(rp)])
@@ -1769,8 +1778,13 @@ def main(argv=None, collected=None, review_sections=None):
               file=sys.stderr)
         return 2
     json_mode = fmt == "json"
-    if "--self-test" in args:
+    if "--self-test" in args and sorted(args) == ["--self-test"]:
         return _self_test()
+    if "--self-test" in args:
+        print(DIAG.emit("RUN-001", None, None,
+                        "usage: todo-runs.py --self-test takes no other arguments"),
+              file=sys.stderr)
+        return 2
     if "--check-export" in args:
         rest = [a for a in args if a != "--check-export"]
         if len(rest) != 1:
@@ -1809,6 +1823,19 @@ def main(argv=None, collected=None, review_sections=None):
               file=sys.stderr)
         return 2
     rest = [a for a in args if a not in ("--check", "--report", "--export")]
+    for a in rest:
+        if a.startswith("--"):
+            print(DIAG.emit("RUN-001", None, None,
+                            "usage: todo-runs.py [--check] [--report | --export] "
+                            f"[runs-file]; unknown option {a!r}"),
+                  file=sys.stderr)
+            return 2
+    if len(rest) > 1:
+        print(DIAG.emit("RUN-001", None, None,
+                        "usage: todo-runs.py [--check] [--report | --export] "
+                        "[runs-file]; at most one runs-file path"),
+              file=sys.stderr)
+        return 2
     runs_path = Path(rest[0]) if rest else DEFAULT_RUNS
     if collected is None:
         collected = TF.collect()

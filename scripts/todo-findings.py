@@ -30,12 +30,13 @@ still said everything held.
 
 Exit codes: 0 everything parsed, 1 at least one heading could not be read.
 
-Refusals carry stable diagnostic codes (D00 T04 §22, `scripts/todo-diag.py`):
-usage is FIND-001 (exit 2), unreadable headings FIND-002, a stale ledger
-FIND-003, incomplete transitions FIND-004, a refused write FIND-005
-(exit 1 each). `--format json` renders refusals as one JSON array of
-code/path/line/message objects; usage errors stay text, since argv did
-not parse and no format was selected.
+Refusals carry stable diagnostic codes from the single registry in
+`scripts/todo-diag.py` (D00 T04 §22): `CODES` maps each code to its exit
+and family, and is the only documented place the list lives (this
+docstring names the registry, never the mapping). `--format json`
+renders refusals as one JSON array of code/path/line/message objects;
+usage errors stay text, since argv did not parse and no format was
+selected.
 """
 
 from __future__ import annotations
