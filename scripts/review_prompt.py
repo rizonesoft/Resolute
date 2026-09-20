@@ -802,12 +802,15 @@ def _diff_change_lines(diff_text: str) -> dict[str, "Counter[str]"]:
     not shape, disambiguates). `+`/`-` lines count with their sign;
     headers, hunk markers, and prose never count. A dangling pair
     (truncated hand assembly) drops its lines, failing closed
-    downstream: fewer chunk lines only ever add failures."""
+    downstream: fewer chunk lines only ever add failures. A trailing
+    CR strips per line (CRLF blobs compare logically: the fence reads
+    chunk files in text mode while `git show` yields raw bytes)."""
     from collections import Counter
     per_file: dict[str, Counter[str]] = {}
     cur: str | None = None
     state = "idle"
-    for line in diff_text.splitlines():
+    for raw in diff_text.splitlines():
+        line = raw[:-1] if raw.endswith("\r") else raw
         if _DIFF_LINE_RE.match(line):
             cur, state = None, "minus"
             continue
@@ -853,11 +856,13 @@ def _diff_signal_lines(diff_text: str) -> dict[str, "Counter[str]"]:
     collapsed hashes, so per-commit values would false-fail on
     contiguous ranges; mode/rename/binary markers survive range
     diffs verbatim. Content lines can never collide: every +/-/space
-    body line starts with its prefix, never a bare marker."""
+    body line starts with its prefix, never a bare marker. A trailing
+    CR strips per line, like the change parser."""
     from collections import Counter
     per_file: dict[str, Counter[str]] = {}
     cur: str | None = None
-    for line in diff_text.splitlines():
+    for raw in diff_text.splitlines():
+        line = raw[:-1] if raw.endswith("\r") else raw
         if _DIFF_LINE_RE.match(line):
             sides = _diff_paths(line)
             cur = sides[-1] if sides else None
@@ -1064,9 +1069,15 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
     naming itself); each of its per-file +/- multisets must sit inside
     the fenced diff chunks', and so must its per-file block-marker
     multisets (mode/rename/binary: the metadata-only shape the +/-
-    leg covers vacuously). Failures name commit, file, and the first
-    uncovered line or marker, bounded. Order-insensitive like the
-    file leg: the chunk may concatenate commits in any order."""
+    leg covers vacuously). Consumption diminishes: an identical line
+    in two commits needs two chunk occurrences, so one occurrence
+    never covers both (D00 T04 §21 round-1 A1). After every commit
+    consumes, unclaimed chunk lines and markers fail naming the file:
+    the content leg is exact like the file leg, and surplus rides
+    nothing. Failures name commit, file, and the first uncovered line
+    or marker, bounded. Order-insensitive like the file leg: the chunk
+    may concatenate commits in any order, and any consumption order
+    covers a complete chunk (its counts are the commits' sum)."""
     from collections import Counter
     failures: list[str] = []
     chunk: dict[str, Counter[str]] = {}
@@ -1114,6 +1125,7 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
                 failures.append(
                     f"declared commit {oid} leaves {sum(missing.values())} "
                     f"line(s) uncovered in {path} (e.g. {first!r})")
+            chunk[path] = have - counts
         for path, counts in _diff_signal_lines(patch_text).items():
             have = chunk_signals.get(path)
             if have is None:
@@ -1126,6 +1138,14 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
                 failures.append(
                     f"declared commit {oid} leaves {sum(missing.values())} "
                     f"marker(s) uncovered in {path} (e.g. {first!r})")
+            chunk_signals[path] = have - counts
+    for path in sorted(set(chunk) | set(chunk_signals)):
+        extra = (sum(chunk.get(path, Counter()).values())
+                 + sum(chunk_signals.get(path, Counter()).values()))
+        if extra:
+            failures.append(
+                f"the chunk carries {extra} unclaimed change(s) in {path} "
+                "no declared commit owns")
     return failures
 
 
@@ -1976,6 +1996,15 @@ def _self_test() -> int:
           _diff_signal_lines("diff --git a/f b/f\nindex aaa..bbb 100644\n"
                              "--- a/f\n+++ b/f\n@@\n+x\n") == {},
           "index and diff-git lines are not signals")
+    check("change-lines-crlf",
+          _diff_change_lines("diff --git a/f b/f\r\n--- a/f\r\n+++ b/f\r\n"
+                             "@@\r\n-old\r\n+new\r\n") == {
+                                 "f": _Counter({"-old": 1, "+new": 1})})
+    check("signal-lines-crlf",
+          _diff_signal_lines("diff --git a/f b/f\r\nold mode 100644\r\n"
+                             "new mode 100755\r\n") == {
+                                 "f": _Counter({"old mode 100644": 1,
+                                                "new mode 100755": 1})})
     stamp_man = ("STAMP-abc", "3" * 64, "4" * 16)
     good_receipt = f"RECEIPT sha={'3' * 64} end=STAMP-abc nonce={'4' * 16}\n"
     check("stamp-holds",
@@ -2107,9 +2136,12 @@ def _self_test() -> int:
         check("commits-dropped-fails",
               len(missed) == 1 and r3 in missed[0] and "f.md" in missed[0],
               str(missed))
+        unres = check_commits_covered(["0" * 40], ttag, fenced_full, cwd=tmpd)
         check("commits-unresolvable",
-              check_commits_covered(["0" * 40], ttag, fenced_full, cwd=tmpd)
-              == ["declared commit " + "0" * 40 + " resolves to nothing"])
+              len(unres) == 2
+              and unres[0] == "declared commit " + "0" * 40 + " resolves to nothing"
+              and "unclaimed" in unres[1] and "f.md" in unres[1],
+              str(unres))
         # The merge legs: a merge head and a mid-range merge refuse;
         # linear, unresolvable, and tree heads fence.
         _git("checkout", "-qb", "side", r1)
@@ -2174,9 +2206,56 @@ def _self_test() -> int:
         mfenced = (f"TAG {mtag} nonce={mnonce}\n{mcline}\n{mbody}")
         rmissed = check_commits_covered([r5], mtag, mfenced, cwd=tmpd)
         check("commits-rename-dropped-fails",
-              len(rmissed) == 1 and r5 in rmissed[0]
-              and "marks g.md" in rmissed[0],
+              len(rmissed) == 2 and r5 in rmissed[0]
+              and "marks g.md" in rmissed[0]
+              and "unclaimed" in rmissed[1] and "f.md" in rmissed[1],
               str(rmissed))
+        # Shared-line diminishing (round-1 A1): an identical `+same`
+        # line in two commits needs two chunk occurrences.
+        with open(os.path.join(tmpd, "w.md"), "w", encoding="utf-8") as fh:
+            fh.write("same\n")
+        _git("add", "w.md")
+        _git("commit", "-qm", "w1")
+        w1 = _git("rev-parse", "HEAD").stdout.strip()
+        with open(os.path.join(tmpd, "w.md"), "a", encoding="utf-8") as fh:
+            fh.write("same\n")
+        _git("commit", "-qam", "w2")
+        w2 = _git("rev-parse", "HEAD").stdout.strip()
+        showW1 = subprocess.run(
+            ["git", "--no-replace-objects", "show", "--format=", w1],
+            cwd=tmpd, capture_output=True, check=True, text=True).stdout
+        showW2 = subprocess.run(
+            ["git", "--no-replace-objects", "show", "--format=", w2],
+            cwd=tmpd, capture_output=True, check=True, text=True).stdout
+        wtag, wnonce, wbody = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", showW1 + showW2)])
+        wcline, _ = build_manifest(wtag, [("CANDIDATE DIFF", showW1 + showW2)],
+                                   w1, w2, nonce=wnonce, commits=[w1, w2])
+        wfenced = f"TAG {wtag} nonce={wnonce}\n{wcline}\n{wbody}"
+        check("commits-diminish-covered",
+              check_commits_covered([w1, w2], wtag, wfenced, cwd=tmpd) == [])
+        stag, snonce, sbody = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", showW1)])
+        scline, _ = build_manifest(stag, [("CANDIDATE DIFF", showW1)],
+                                   w1, w2, nonce=snonce, commits=[w1, w2])
+        sfenced = f"TAG {stag} nonce={snonce}\n{scline}\n{sbody}"
+        smissed = check_commits_covered([w1, w2], stag, sfenced, cwd=tmpd)
+        check("commits-diminish-shared-fails",
+              len(smissed) == 1 and w2 in smissed[0]
+              and "w.md" in smissed[0],
+              str(smissed))
+        # Surplus (round-1 A1): a chunk line no declared commit owns fails.
+        xchunk = showW1 + "+smuggled\n"
+        xtag, xnonce, xbody = fence_chunks_checked(
+            "PANEL", [("CANDIDATE DIFF", xchunk)])
+        xcline, _ = build_manifest(xtag, [("CANDIDATE DIFF", xchunk)],
+                                   w1, w1, nonce=xnonce, commits=[w1])
+        xfenced = f"TAG {xtag} nonce={xnonce}\n{xcline}\n{xbody}"
+        xmissed = check_commits_covered([w1], xtag, xfenced, cwd=tmpd)
+        check("commits-surplus-fails",
+              len(xmissed) == 1 and "unclaimed" in xmissed[0]
+              and "w.md" in xmissed[0],
+              str(xmissed))
         # Hostile fence paths (D00 T04 §21 item 16): spaces, non-ASCII,
         # and `=` inside TITLE=path read clean.
         hostile_dir = os.path.join(tmpd, "my dir", "café")
@@ -2435,8 +2514,10 @@ def _self_test() -> int:
             ("skill-assembled-body", "--body $RUNDIR/fenced.md"),
             ("skill-anchors-tool",
              "python scripts/review_prompt.py check-anchors <todo-path> <section>"),
-            ("skill-findings-staged",
-             "git --no-replace-objects diff --quiet -- <findings path>")):
+            ("skill-stamp-staged",
+             "ls-files --error-unmatch"),
+            ("skill-stamp-clean",
+             "git --no-replace-objects diff --quiet -- <todo-path>")):
         check(pin, needle in skill_text, skill_path)
     try:
         attest_ordered = (skill_text.index("### 8. Plan review")

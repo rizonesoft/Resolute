@@ -240,7 +240,8 @@ The stamp makes factual claims no lens has checked: the panel reviewed the candi
 TREE=$(git write-tree)  # the index identity FIRST: anything staged after this line is not under review
 git --no-replace-objects diff --cached > $RUNDIR/stamp.patch
 [ "$(git write-tree)" = "$TREE" ] || { echo "BLOCKED: the index moved while capturing the stamp patch; re-stage and restart"; exit 1; }
-git --no-replace-objects diff --quiet -- <findings path> || { echo "BLOCKED: the findings file differs from its staged blob; re-stage and restart"; exit 1; }  # disk equals staged: only the blob ships, so read-back must hash the blob's bytes
+for f in <todo-path> todo/implementation-plan.md <findings path> <findings stem>.attest.json docs/reviews/findings.md; do git --no-replace-objects ls-files --error-unmatch -- "$f" >/dev/null || { echo "BLOCKED: $f is not staged; stage the stamp set and restart"; exit 1; }; done  # every stamp file staged: an unstaged file never ships, and read-back plus anchors must verify the shipped bytes
+git --no-replace-objects diff --quiet -- <todo-path> todo/implementation-plan.md <findings path> <findings stem>.attest.json docs/reviews/findings.md || { echo "BLOCKED: the worktree differs from the staged stamp set; re-stage and restart"; exit 1; }  # disk equals staged on the stamp set: drift after staging voids the review (`diff --quiet` alone ignores untracked paths, which the loop above already refused)
 git --no-replace-objects show :<findings stem>.attest.json > $RUNDIR/staged.attest.json  # the STAGED blob: the disk file may differ after staging, and only the blob ships
 python scripts/review_prompt.py attest --read-back $RUNDIR/staged.attest.json --findings <findings path>  # the staged attestation reads back now: an altered blob fails here, never ships
 STW=$(cygpath -w $RUNDIR/stamp.patch); FFW=$(cygpath -w <findings path>)
