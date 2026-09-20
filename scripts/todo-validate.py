@@ -8,6 +8,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 
@@ -100,121 +101,404 @@ def validate(graph, _args) -> int:
     span_cache: dict[str, list[str] | None] = {}
     deferred_mark_re = re.compile(r"\bdeferred\b", re.IGNORECASE)
     header_re = re.compile(r"#{1,6}(?:\s|$)")
+    commit_quote_re = re.compile(r"""^commit:\s*`"(?P<msg>[^"]+)"`""", re.IGNORECASE)
+    # Commit-subject cache for the history binding: repo root -> subjects,
+    # None when git cannot read them. Keyed by root because the self-test
+    # rebinds TODO_DIR between trees within one process.
+    history_cache: dict[str, list[str] | None] = {}
 
-    def span_lines(path: str, sec_line: int) -> list[str] | None:
-        """Stripped, stamp-cut body lines of one section span, or None.
-
-        Span mirrors the parser: from the `## N.` heading to the next
-        `## ` line of any kind (a `## Verification` block ends the
-        span exactly as it clears `current`). Fences strip per span
-        through the shared stripper, keeping the rule on the parser's
-        own section model; a span-local unbalanced fence falls back to
-        the raw span, which is what the fence-blind parser sees. The
-        stamp region below the first `Verified:` line is out of scope.
-        """
+    def _span_file(path: str) -> list[str] | None:
         if path not in span_cache:
             try:
                 span_cache[path] = (graph.TODO_DIR.parent / path).read_text(encoding="utf-8").splitlines()
             except OSError:
                 span_cache[path] = None
-        raw = span_cache[path]
-        if raw is None:
-            return None
+        return span_cache[path]
+
+    def _span_slice(raw: list[str], sec_line: int) -> tuple[list[str], int]:
+        """Raw span lines plus the 1-based lineno of the first: one slicing for both views."""
         start = max(sec_line, 1)
         end = len(raw) + 1
         for j in range(start + 1, len(raw) + 1):
             if raw[j - 1].startswith("## "):
                 end = j
                 break
-        span = raw[start : end - 1]
-        stripped, unbalanced = graph.strip_fenced_code("\n".join(span))
-        lines = span if unbalanced is not None else stripped.splitlines()
-        cut = len(lines)
-        for i, ln in enumerate(lines):
-            sm = graph.STAMP_RE.match(ln)
-            if sm and sm.group("kind") == "Verified":
-                cut = i
+        return raw[start : end - 1], start + 1
+
+    def _marked_stripped(raw: list[str], flags: list[bool]
+                       ) -> tuple[list[str], dict[int, int]]:
+        """Stripped lines with one blank marker per dropped region, plus the raw index map.
+
+        The marker is what stops deferral owner collection at fence
+        boundaries (D00 T04 §20): a fence is at least as strong a
+        boundary as a blank line, so each stripped region collapses to
+        one. The map carries raw span indexes to stripped indexes for
+        the report, which classifies raw lines against stripped blocks.
+        """
+        stripped: list[str] = []
+        at_stripped: dict[int, int] = {}
+        prev_dropped = False
+        for r_i, (ln, keep) in enumerate(zip(raw, flags)):
+            if keep:
+                at_stripped[r_i] = len(stripped)
+                stripped.append(ln)
+                prev_dropped = False
+            elif not prev_dropped:
+                stripped.append("")
+                prev_dropped = True
+        return stripped, at_stripped
+
+    def span_lines(path: str, sec_line: int) -> list[str] | None:
+        """Stripped body lines of one whole section span, or None.
+
+        Span mirrors the parser: from the `## N.` heading to the next
+        `## ` line of any kind (a `## Verification` block ends the
+        span exactly as it clears `current`). Fences strip per span
+        through the shared stripper, keeping the rule on the parser's
+        own section model; a span-local unbalanced fence falls back to
+        the raw span, which is what the fence-blind parser sees. Each
+        stripped region leaves one blank boundary marker, so deferral
+        owner collection stops at fences. No stamp cut applies (D00
+        T04 §20 removed it): below-stamp checklist items fail as
+        appended work, while genuine stamp fields ride `>` lines the
+        item scan never matches.
+        """
+        raw = _span_file(path)
+        if raw is None:
+            return None
+        span, _first = _span_slice(raw, sec_line)
+        flags, unbalanced = graph.strip_fenced_map("\n".join(span))
+        if unbalanced is not None:
+            return span
+        stripped, _at = _marked_stripped(span, flags)
+        return stripped
+
+    def span_raw(path: str, sec_line: int) -> tuple[list[str] | None, int | None]:
+        """Raw span lines with the 1-based lineno of the first, or (None, None).
+
+        The disposition report's view: same span model as `span_lines`,
+        unstripped, so fenced items keep their lines.
+        """
+        raw = _span_file(path)
+        if raw is None:
+            return None, None
+        lines, first = _span_slice(raw, sec_line)
+        return lines, first
+
+    def commit_subjects() -> list[str] | None:
+        """One `git log` per tree: the subjects a `Commit:` line may bind to."""
+        root = str(graph.TODO_DIR.parent)
+        if root not in history_cache:
+            try:
+                proc = subprocess.run(
+                    ["git", "log", "--format=%s"], cwd=root,
+                    capture_output=True, text=True, timeout=60,
+                )
+            except (OSError, subprocess.SubprocessError):
+                proc = None
+            history_cache[root] = (
+                proc.stdout.splitlines() if proc is not None and proc.returncode == 0
+                else None
+            )
+        return history_cache[root]
+
+    def commit_shape(span: list[str]) -> list[str]:
+        """Section-level Commit shape problems (cardinality, placement): message tails."""
+        last_item = None
+        commits = []
+        for i, ln in enumerate(span):
+            if graph.checklist_state(ln.strip()) is None:
+                continue
+            last_item = i
+            if ln.strip()[5:].strip().lower().startswith("commit:"):
+                commits.append(i)
+        if len(commits) > 1:
+            return [f"carries {len(commits)} Commit items -- one section ends on one commit"]
+        if len(commits) == 1 and commits[0] != last_item:
+            return ["its Commit item is not the final checklist item -- the commit ends the section"]
+        return []
+
+    def classify_unchecked(todo, s_num: int, span: list[str], i: int, text: str
+                           ) -> tuple[str, str]:
+        """One unchecked item's disposition: (code, payload).
+
+        The scan and the disposition report share this classifier, so the
+        report can never describe a rule the scan does not enforce.
+        Codes: commit-bound (payload: the bound subject), commit-unquoted,
+        commit-unverified, commit-unbound (payload: the quoted message),
+        plain-open, struck-unmarked, deferral-unowned, deferral-ok
+        (payload: the owner acknowledgments), deferral-bad (payload: the
+        semicolon-joined problems).
+        """
+        ln = span[i]
+        if text.lower().startswith("commit:"):
+            # Proven by history, mechanically (D00 T04 §20): the quoted
+            # message binds when a commit subject equals it or starts
+            # with it. Exact-or-prefix, not substring: every live
+            # binding is one of the two (suffixes append, never
+            # prepend), while a substring would bless mid-subject
+            # lookalikes -- and not boundary-prefix either, which a
+            # future suffix shape would brick into a FATAL on a
+            # stamped checklist no one may edit.
+            quote = commit_quote_re.match(text)
+            if quote is None:
+                return ("commit-unquoted", "")
+            subjects = commit_subjects()
+            if subjects is None:
+                return ("commit-unverified", "")
+            msg = quote.group("msg")
+            bound = next((s for s in subjects if s == msg or s.startswith(msg)), None)
+            if bound is None:
+                return ("commit-unbound", msg)
+            return ("commit-bound", bound)
+        if not text.startswith("~~"):
+            return ("plain-open", "")
+        if not deferred_mark_re.search(text):
+            return ("struck-unmarked", "")
+        # A deferral's owner rides the contiguous lines belonging to
+        # the item: the item line itself plus following lines until a
+        # blank line, the next item, or a header. (D00 T02 §4 defers
+        # to D04 T01 §1 exactly this way, owner on the next line.)
+        # Fences stop collection too: each stripped region leaves one
+        # blank boundary marker in the span.
+        block = [ln]
+        for cont in span[i + 1 :]:
+            cst = cont.strip()
+            if not cst or graph.checklist_state(cst) is not None or header_re.match(cst):
                 break
-        return lines[:cut]
+            block.append(cont)
+        owners = [
+            (m.group("ref"), line) for line in block
+            for m in graph.DEFER_REF_RE.finditer(line)
+        ]
+        if not owners:
+            return ("deferral-unowned", "")
+        problems = []
+        acks = []
+        for raw_ref, src_line in owners:
+            # The typed citation (D00 T04 §20): the forward XREF names
+            # the owner's item, and the owner acknowledges it by
+            # carrying that item and linking back. A section link to
+            # an item-silent target fails, as does an untyped forward
+            # XREF -- the pair is section plus item, named at the
+            # source (D00 T02 §4 names D04 T01 §1's pair exactly so).
+            cited = graph.DEFER_ITEM_RE.search(src_line)
+            if cited is None:
+                problems.append(
+                    f"owner {raw_ref!r} names no item (no '(item: ...)' "
+                    "on its XREF line)"
+                )
+                continue
+            r = graph.resolve_ref(raw_ref, todo, by_key)
+            if r is None or r[0] not in by_id or r[1] not in by_id[r[0]].sections:
+                problems.append(f"owner {raw_ref!r} resolves to nothing")
+                continue
+            target = by_id[r[0]]
+            tsec = target.sections[r[1]]
+            want = cited.group("item").strip()
+            item_ok = any(want.lower() in item_text.lower()
+                          for _done, item_text in tsec.items)
+            if not item_ok:
+                problems.append(
+                    f"owner {r[0]} §{r[1]} carries no such item "
+                    f"({want[:80]!r}) -- it was reworded or removed"
+                )
+            tspan = span_lines(target.path, tsec.line)
+            back_depends = any(
+                graph.resolve_ref(dep, target, by_key) == (todo.id, s_num)
+                for dep in tsec.depends_on
+            )
+            back_xref = tspan is not None and any(
+                graph.resolve_ref(m.group("ref"), target, by_key) == (todo.id, s_num)
+                for tln in tspan
+                for m in graph.DEFER_REF_RE.finditer(tln)
+            )
+            if not (back_depends or back_xref):
+                problems.append(
+                    f"owner {r[0]} §{r[1]} carries no back-pointer "
+                    f"(neither an XREF nor Depends On {todo.id} §{s_num})"
+                )
+            elif tsec.status == "x":
+                # Ship-time resolution proof (D00 T04 §20): a deferral
+                # whose owner has shipped fails unless the owner's stamp
+                # records the debt done -- a `Resolved:` line citing the
+                # deferring section. The proof lands owner-side because
+                # the deferring checklist is stamped and uneditable; an
+                # open-owner requirement would FATAL it the day the
+                # owner ships, with no legal fix.
+                proof = tspan is not None and any(
+                    (sm := graph.STAMP_RE.match(tln)) is not None
+                    and sm.group("kind") == "Resolved"
+                    and any(
+                        graph.resolve_ref(m.group("ref"), target, by_key)
+                        == (todo.id, s_num)
+                        for m in graph.DEFER_REF_RE.finditer(tln)
+                    )
+                    for tln in tspan
+                )
+                if not proof:
+                    problems.append(
+                        f"owner {r[0]} §{r[1]} has shipped without recording "
+                        f"the debt done (no '> **Resolved:**' citing {todo.id} "
+                        f"§{s_num})"
+                    )
+                elif item_ok:
+                    acks.append(f"{r[0]} §{r[1]} carries {want[:60]!r}, "
+                                "shipped with proof")
+            elif item_ok:
+                legs = "+".join(leg for leg, ok in
+                                (("Depends", back_depends), ("XREF", back_xref)) if ok)
+                acks.append(f"{r[0]} §{r[1]} carries {want[:60]!r}, {legs} back, "
+                            "owner open")
+        if problems:
+            return ("deferral-bad", "; ".join(problems))
+        return ("deferral-ok", "; ".join(acks))
+
+    def _report_entry(path: str, lineno: int, st: str, code: str, payload: str,
+                      counts: dict[str, int]) -> tuple[str, str, str]:
+        """(tag, item location, detail) for one classified line, counting it."""
+        item = f"{path}:{lineno}: {st[:100]}"
+        if code == "commit-bound":
+            counts["commit"] += 1
+            return ("EXEMPT Commit", item, f"bound to {payload!r}")
+        if code == "commit-unverified":
+            counts["unverified"] += 1
+            return ("UNVERIFIED Commit", item, "history unreadable")
+        if code == "commit-unquoted":
+            counts["fail"] += 1
+            return ("FAIL", item, "Commit line with no quoted subject")
+        if code == "commit-unbound":
+            counts["fail"] += 1
+            return ("FAIL", item, f"bound to no commit (quoted {payload!r})")
+        if code == "plain-open":
+            counts["fail"] += 1
+            return ("FAIL", item, "unticked item")
+        if code == "struck-unmarked":
+            counts["fail"] += 1
+            return ("FAIL", item, "struck item with no Deferred marker")
+        if code == "deferral-unowned":
+            counts["fail"] += 1
+            return ("FAIL", item, "deferral naming no owner")
+        if code == "deferral-ok":
+            counts["deferral"] += 1
+            return ("EXEMPT deferral", item, payload)
+        counts["fail"] += 1
+        return ("FAIL", item, payload)  # deferral-bad
+
+    def report_shipped_items() -> int:
+        """Every unchecked item under shipped rows with its disposition.
+
+        The committed form of the §19 probe: the exemption counts
+        re-derive from this query instead of ad-hoc inspection. A
+        reading, not a gate: always exits 0.
+        """
+        counts = {"commit": 0, "deferral": 0, "fenced": 0, "unverified": 0, "fail": 0}
+        for t in todos:
+            for num, s in sorted(t.sections.items()):
+                if s.status != "x" or not s.has_body:
+                    continue
+                raw, first = span_raw(t.path, s.line)
+                if raw is None or first is None:
+                    continue
+                flags, unbalanced = graph.strip_fenced_map("\n".join(raw))
+                if unbalanced is None:
+                    stripped, at_stripped = _marked_stripped(raw, flags)
+                else:
+                    stripped = list(raw)
+                    at_stripped = {r_i: r_i for r_i in range(len(raw))}
+                entries = []
+                for tail in commit_shape(stripped):
+                    entries.append(("FAIL shape", "", tail))
+                    counts["fail"] += 1
+                for r_i, ln in enumerate(raw):
+                    st = ln.strip()
+                    state = graph.checklist_state(st)
+                    if state is None or state:
+                        continue
+                    if unbalanced is None and not flags[r_i]:
+                        entries.append(("EXEMPT fenced", f"{t.path}:{first + r_i}: {st[:100]}",
+                                        "stripped before the scan"))
+                        counts["fenced"] += 1
+                        continue
+                    code, payload = classify_unchecked(t, num, stripped, at_stripped[r_i],
+                                                       st[5:].strip())
+                    entries.append(_report_entry(t.path, first + r_i, st, code, payload, counts))
+                if entries:
+                    print(f"{t.path} §{num}:")
+                    for tag, where_item, detail in entries:
+                        if where_item:
+                            print(f"  - [{tag}] {where_item} -- {detail}")
+                        else:
+                            print(f"  - [{tag}] {detail}")
+        print(f"shipped items: {counts['commit']} Commit, {counts['deferral']} deferral, "
+              f"{counts['fenced']} fenced, {counts['unverified']} unverified, "
+              f"{counts['fail']} failures")
+        return 0
 
     def partial_flip_scan(todo, s_num: int, sec) -> None:
         span = span_lines(todo.path, sec.line)
         if span is None:
             return
+        where = f"{todo.path}:{sec.line}: §{s_num}"
+        # One section ends on one commit (D00 T04 §20): at most one
+        # `Commit:` item in any state, and it is the final checklist
+        # item, so a duplicate or mid-list lookalike cannot read as
+        # bookkeeping.
+        for tail in commit_shape(span):
+            flag("partial-flip-shipped", f"{where} is [x] but {tail}")
         for i, ln in enumerate(span):
             st = ln.strip()
             state = graph.checklist_state(st)
             if state is None or state:
                 continue
             text = st[5:].strip()
-            where = f"{todo.path}:{sec.line}: §{s_num}"
-            if text.lower().startswith("commit:"):
+            code, payload = classify_unchecked(todo, s_num, span, i, text)
+            if code in ("commit-bound", "deferral-ok"):
                 continue
-            if not text.startswith("~~"):
+            if code == "commit-unverified":
+                flag(
+                    "commit-history-unreadable",
+                    f"{where} carries an unchecked Commit line but git history "
+                    f"cannot be read; the binding is unverified: {text[:100]!r}",
+                )
+            elif code == "commit-unquoted":
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries a Commit line with no quoted subject: "
+                    f"{text[:100]!r} -- quote the committed subject",
+                )
+            elif code == "commit-unbound":
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries a Commit line bound to no commit: "
+                    f"{text[:100]!r} -- quote the committed subject",
+                )
+            elif code == "plain-open":
                 flag(
                     "partial-flip-shipped",
                     f"{where} is [x] but carries an unticked item: {text[:100]!r} -- "
                     f"tick it, defer it with an owner, or unship the row",
                 )
-                continue
-            if not deferred_mark_re.search(text):
+            elif code == "struck-unmarked":
                 flag(
                     "partial-flip-shipped",
                     f"{where} is [x] but carries a struck item with no Deferred marker: "
                     f"{text[:100]!r} -- a strike without the marker reads as hidden work",
                 )
-                continue
-            # A deferral's owner rides the contiguous lines belonging to
-            # the item: the item line itself plus following lines until a
-            # blank line, the next item, or a header. (D00 T02 §4 defers
-            # to D04 T01 §1 exactly this way, owner on the next line.)
-            # No fence stop applies here: fences strip before the scan.
-            block = [ln]
-            for cont in span[i + 1 :]:
-                cst = cont.strip()
-                if not cst or graph.checklist_state(cst) is not None or header_re.match(cst):
-                    break
-                block.append(cont)
-            owners = [
-                m.group("ref") for line in block for m in graph.DEFER_REF_RE.finditer(line)
-            ]
-            if not owners:
+            elif code == "deferral-unowned":
                 flag(
                     "partial-flip-shipped",
                     f"{where} is [x] but carries a deferral naming no owner: "
                     f"{text[:100]!r} -- attach '-> XREF:' to the owning section",
                 )
-                continue
-            problems = []
-            for raw_ref in owners:
-                r = graph.resolve_ref(raw_ref, todo, by_key)
-                if r is None or r[0] not in by_id or r[1] not in by_id[r[0]].sections:
-                    problems.append(f"owner {raw_ref!r} resolves to nothing")
-                    continue
-                target = by_id[r[0]]
-                tsec = target.sections[r[1]]
-                back = any(
-                    graph.resolve_ref(dep, target, by_key) == (todo.id, s_num)
-                    for dep in tsec.depends_on
-                )
-                if not back:
-                    tspan = span_lines(target.path, tsec.line)
-                    back = tspan is not None and any(
-                        graph.resolve_ref(m.group("ref"), target, by_key) == (todo.id, s_num)
-                        for tln in tspan
-                        for m in graph.DEFER_REF_RE.finditer(tln)
-                    )
-                if not back:
-                    problems.append(
-                        f"owner {r[0]} §{r[1]} carries no back-pointer "
-                        f"(neither an XREF nor Depends On {todo.id} §{s_num})"
-                    )
-            if problems:
+            elif code == "deferral-bad":
                 flag(
                     "partial-flip-shipped",
                     f"{where} is [x] but carries a deferral with a defective owner: "
-                    f"{text[:100]!r} -- " + "; ".join(problems),
+                    f"{text[:100]!r} -- " + payload,
                 )
+    if getattr(_args, "report_shipped_items", False):
+        return report_shipped_items()
 
     for t in todos:
         # 4. Implementation Order rows <-> body sections
@@ -313,20 +597,30 @@ def validate(graph, _args) -> int:
             # item sits unticked forever. Found 2026-08-14 with 21 such items across
             # 8 closed sections, one of them a real review-panel finding.
             #
-            # Four shapes are excused, each for a stated reason. A `Commit:`
-            # line is proven by history rather than by the checkbox, and
-            # ticking one on a shipped section would rewrite a stamped
-            # checklist. The row determines its reading: unticked on `[ ]`
-            # means doing, unticked on `[x]` means excused, ticked means
-            # done (todo/README.md's Completion-first states the order).
+            # Three shapes are excused, each for a stated reason (D00 T04
+            # §20 removed the fourth, the stamp-region cut: below-stamp
+            # items fail as appended work). A `Commit:` line is excused
+            # when its quoted message binds to a commit subject by
+            # exact-or-prefix containment, proven by history rather than
+            # by the checkbox -- and ticking one on a shipped section
+            # would rewrite a stamped checklist. The row determines its
+            # reading: unticked on `[ ]` means doing, unticked on `[x]`
+            # means excused, ticked means done (todo/README.md's
+            # Completion-first states the order). One section ends on
+            # one commit: a second `Commit:` item or a non-final one
+            # fails, in any tick state.
             # A struck `~~` item carrying a `Deferred` marker
             # is filed debt with an owner, not open work -- and the owner
             # must resolve to a live section that points back, either
-            # with an XREF or through Depends On. Fenced code blocks
-            # strip before the scan, and the stamp region below the
-            # first `Verified:` line is out of scope. Everything else
-            # unticked fails, including a struck item without the marker
-            # and a checkbox-wrapped `-> XREF:` (a cross-reference needs
+            # with an XREF or through Depends On. The forward XREF names
+            # the owner's item (`(item: ...)`), and the owner must carry
+            # that item: a section link to an item-silent target fails.
+            # When the owner ships, its stamp must record the debt done
+            # (`Resolved:` citing the deferrer), or the deferral fails.
+            # Fenced code blocks strip before the scan. Everything else
+            # unticked fails,
+            # including a struck item without the marker and a
+            # checkbox-wrapped `-> XREF:` (a cross-reference needs
             # no checkbox).
             if s.moved:
                 moved_path = graph.moved_target(s.moved)
@@ -385,6 +679,17 @@ def validate(graph, _args) -> int:
                 fatal.append(
                     f"{t.path}: §{num} is [x] in Implementation Order but no "
                     f"'> **Verified:**' stamp covers it"
+                )
+            # 7b. [ ] must not carry Verified coverage: an open row with a
+            # stamp reads as reviewed-but-open (D00 T04 §20). Audit-stance
+            # reopens do not fire: the parser discards Reopened sections
+            # from coverage. The converse is deliberately NOT a rule --
+            # ticked-then-reviewed is the review flow, so a fully ticked
+            # open row waits without failing.
+            if s.status != "x" and num in t.verified_sections:
+                fatal.append(
+                    f"{t.path}: §{num} is [ ] in Implementation Order but a "
+                    f"'> **Verified:**' stamp covers it -- flip the row"
                 )
             # 9. frozen TODOs need at least one freeze check
         if t.frozen and not any(s.has_freeze_check for s in t.sections.values()):

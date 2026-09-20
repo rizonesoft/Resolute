@@ -823,6 +823,9 @@ SEVERITY_MAP: dict[str, str] = {
     # an unticked micro-step outside the exemptions inside a shipped
     # [x] section is an integrity break in the shipped claim itself.
     "partial-flip-shipped": "fatal",
+    # history the binding cannot read is unverified, not broken: a
+    # bare-tree export must still validate (D00 T04 §20).
+    "commit-history-unreadable": "warn",
     # Fidelity missing Job/Treatment/Chrome on an OPEN section is already
     # fatal at the emitter; the stamped branches are §38 fix-forward.
     "fidelity-missing-lines-open": "fatal",
@@ -951,16 +954,15 @@ def _fence_shape(line: str) -> tuple[int, str, int, str]:
     return qd, "", 0, ""
 
 
-def strip_fenced_code(text: str) -> tuple[str, int | None]:
-    """Return (text with fenced code blocks removed, unbalanced opener lineno or None).
+def _fenced_flags(raw_lines: list[str]) -> tuple[list[bool], int | None]:
+    """Per-line kept flags plus the unbalanced opener lineno: the one fence machine.
 
-    One fence implementation for the validator's panel rule and the
-    plan-health query, which scan the same findings files: two copies
-    would drift back into fixed bugs.
+    `strip_fenced_code` (the text view) and `strip_fenced_map` (the
+    line view) both read this walk, so the two views cannot drift
+    back into fixed bugs.
     """
-    kept = []
+    kept: list[bool] = []
     fence = None  # (char, run, opener lineno, quote depth) in one
-    raw_lines = text.splitlines()
     for fence_lineno, ln in enumerate(raw_lines, start=1):
         qd, fence_ch, fence_run, info = _fence_shape(ln)
         if fence is not None and qd < fence[3]:
@@ -983,9 +985,10 @@ def strip_fenced_code(text: str) -> tuple[str, int | None]:
                 # string makes the line a paragraph, never a fence.
                 # (Tilde info strings may hold anything.)
                 if fence_ch == "`" and "`" in info:
-                    kept.append(ln)
+                    kept.append(True)
                 else:
                     fence = (fence_ch, fence_run, fence_lineno, qd)
+                    kept.append(False)
             elif (
                 qd == fence[3]
                 and fence_ch == fence[0]
@@ -1001,12 +1004,37 @@ def strip_fenced_code(text: str) -> tuple[str, int | None]:
                 # cannot exist, so genuinely crossed fences fall out
                 # as unbalanced below instead of mis-toggling.
                 fence = None
+                kept.append(False)
+            else:
+                kept.append(False)
             continue
         if fence is None:
-            kept.append(ln)
+            kept.append(True)
+        else:
+            kept.append(False)
     if fence is not None:
-        return "\n".join(kept), fence[2]
-    return "\n".join(kept), None
+        return kept, fence[2]
+    return kept, None
+
+
+def strip_fenced_code(text: str) -> tuple[str, int | None]:
+    """Return (text with fenced code blocks removed, unbalanced opener lineno or None).
+
+    One fence implementation for the validator's panel rule and the
+    plan-health query, which scan the same findings files: two copies
+    would drift back into fixed bugs.
+    """
+    raw_lines = text.splitlines()
+    flags, unbalanced = _fenced_flags(raw_lines)
+    return "\n".join(ln for ln, keep in zip(raw_lines, flags) if keep), unbalanced
+
+
+def strip_fenced_map(text: str) -> tuple[list[bool], int | None]:
+    """Per-line kept flags plus the unbalanced opener lineno, from the one fence machine.
+
+    The disposition report's view: which raw span lines the rule sees.
+    """
+    return _fenced_flags(text.splitlines())
 
 
 # Stamps on or before this date predate the plan-review marker rule and are
@@ -6565,6 +6593,9 @@ track: Z1
         # so these fixtures cannot drown in reciprocity fires. The §13/§14
         # and §15/§16 pairs are twins: identical item text, one exempt and
         # one failing, so a removed exemption breaks its case by construction.
+        # D00 T04 §20 retargeted the §15/§16 twins to the failing shape:
+        # below-stamp items fail as appended work, and only a `>`-quoted
+        # stamp field still passes.
         (root / "todo" / "91-severity" / "TODO-10-partial-flip.md").write_text(
             """---
 schema_version: 1
@@ -6595,12 +6626,24 @@ track: Z1
 |  12   |   §12   | Target, unlinked | - |  [ ]   |
 |  13   |   §13   | Fenced example | - |  [x]   |
 |  14   |   §14   | Unfenced twin | - |  [x]   |
-|  15   |   §15   | Stamp-region quote | - |  [x]   |
-|  16   |   §16   | Above-stamp twin | - |  [x]   |
+|  15   |   §15   | Appended work below stamp | - |  [x]   |
+|  16   |   §16   | Stamp-field quote | - |  [x]   |
 |  17   |   §17   | Commit without colon | - |  [x]   |
 |  18   |   §18   | Deferral, mixed owners | - |  [x]   |
 |  19   |   §19   | Target, mixed back | §18 |  [ ]   |
 |  20   |   §20   | Deferral, XREF past header | - |  [x]   |
+|  21   |   §21   | Two Commit items | - |  [x]   |
+|  22   |   §22   | Commit not final | - |  [x]   |
+|  23   |   §23   | Deferral, shipped owner, no proof | - |  [x]   |
+|  24   |   §24   | Target, shipped, no proof | §23 |  [x]   |
+|  25   |   §25   | Deferral, shipped owner, proof | - |  [x]   |
+|  26   |   §26   | Target, shipped, with proof | §25 |  [x]   |
+|  27   |   §27   | Deferral, item-silent target | - |  [x]   |
+|  28   |   §28   | Target, item-silent | §27 |  [ ]   |
+|  29   |   §29   | Deferral, untyped forward | - |  [x]   |
+|  30   |   §30   | Target, typed-back | §29 |  [ ]   |
+|  31   |   §31   | Open row with stamp | - |  [ ]   |
+|  32   |   §32   | Deferral, XREF past fence | - |  [x]   |
 
 ## 1. Plain open item
 
@@ -6744,25 +6787,25 @@ The quoted shape:
 
 > **Verified:** 2026-01-01 | §14 | fixture
 
-## 15. Stamp-region quote
+## 15. Appended work below stamp
 
 - [x] Did it
-- [x] Commit: `"selftest: stamp-region"`
+- [x] Commit: `"selftest: stamp-appended"`
 
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-01-01 | §15 | fixture
 - [ ] Quoted below the stamp
 
-## 16. Above-stamp twin
+## 16. Stamp-field quote
 
 - [x] Did it
-- [ ] Quoted below the stamp
-- [x] Commit: `"selftest: above-stamp"`
+- [x] Commit: `"selftest: stamp-field"`
 
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-01-01 | §16 | fixture
+> **Review:** round 1 quoted `- [ ] Quoted below the stamp` verbatim
 
 ## 17. Commit without colon
 
@@ -6804,6 +6847,126 @@ The quoted shape:
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-01-01 | §20 | fixture
+
+## 21. Two Commit items
+
+- [x] Did it
+- [x] Commit: `"selftest: commit-first"`
+- [x] Commit: `"selftest: commit-second"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §21 | fixture
+
+## 22. Commit not final
+
+- [x] Did it
+- [x] Commit: `"selftest: commit-early"`
+- [x] More work after the commit
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §22 | fixture
+
+## 23. Deferral, shipped owner, no proof
+
+- [x] Did it
+- [ ] ~~Handed to a section that shipped.~~ **Deferred 2026-01-01 to the shipped owner.**
+  -> XREF: §24 (item: "Do the shipped work") -- the owner
+- [x] Commit: `"selftest: defer-shipped"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §23 | fixture
+
+## 24. Target, shipped, no proof
+
+- [x] Do the shipped work
+- [x] Commit: `"selftest: target-shipped"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §24 | fixture
+
+## 25. Deferral, shipped owner, proof
+
+- [x] Did it
+- [ ] ~~Handed to a section that shipped.~~ **Deferred 2026-01-01 to the shipped owner.**
+  -> XREF: §26 (item: "Do the proven work") -- the owner
+- [x] Commit: `"selftest: defer-proven"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §25 | fixture
+
+## 26. Target, shipped, with proof
+
+- [x] Do the proven work
+- [x] Commit: `"selftest: target-proven"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §26 | fixture
+> **Resolved:** 2026-01-02 | §25 debt done -> XREF: §25 -- the deferred work shipped here
+
+## 27. Deferral, item-silent target
+
+- [x] Did it
+- [ ] ~~Handed to a linked section.~~ **Deferred 2026-01-01 to a section that links back but carries no such item.**
+  -> XREF: §28 (item: "Do the silent work") -- the owner
+- [x] Commit: `"selftest: defer-silent"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §27 | fixture
+
+## 28. Target, item-silent
+
+- [ ] Do something unrelated
+- [ ] Commit: `"selftest: target-silent"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 29. Deferral, untyped forward
+
+- [x] Did it
+- [ ] ~~Handed with a bare XREF.~~ **Deferred 2026-01-01 to a section named without its item.**
+  -> XREF: §30 -- the owner, no item named
+- [x] Commit: `"selftest: defer-untyped"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §29 | fixture
+
+## 30. Target, typed-back
+
+- [ ] Do the untyped work
+- [ ] Commit: `"selftest: target-untyped"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+## 31. Open row with stamp
+
+- [x] Did it
+- [x] Commit: `"selftest: open-stamped"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §31 | fixture
+
+## 32. Deferral, XREF past fence
+
+- [x] Did it
+- [ ] ~~Handed past a fence.~~ **Deferred 2026-01-01 to an owner past a fence.**
+```
+fenced code here
+```
+  -> XREF: §9 (item: "Do the owned work") -- past the fence, not attached
+- [x] Commit: `"selftest: defer-fence"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §32 | fixture
 """,
             encoding="utf-8",
         )
@@ -6906,15 +7069,140 @@ Also carries a one-sided XREF: -> XREF: D90 T01 §1 -- alpha never points back.
         check("partial-flip: deferral with unlinked owner fails", pf_fires(11, "no back-pointer"), True)
         check("partial-flip: fenced example passes", pf_silent(13), True)
         check("partial-flip: unfenced twin fails", pf_fires(14, "Looks open but is quoted"), True)
-        check("partial-flip: stamp-region quote passes", pf_silent(15), True)
-        check("partial-flip: above-stamp twin fails", pf_fires(16, "Quoted below the stamp"), True)
+        check("partial-flip: appended work below stamp fails", pf_fires(15, "Quoted below the stamp"), True)
+        check("partial-flip: stamp-field quote passes", pf_silent(16), True)
         check("partial-flip: Commit without colon fails", pf_fires(17, "not the bookkeeping shape"), True)
         check("partial-flip: mixed owners fail on the ghost", pf_fires(18, "resolves to nothing"), True)
         check("partial-flip: XREF past a header is unattached", pf_fires(20, "naming no owner"), True)
+        check("partial-flip: two Commit items fail", pf_fires(21, "carries 2 Commit items"), True)
+        check("partial-flip: non-final Commit fails", pf_fires(22, "not the final checklist item"), True)
+        check("partial-flip: shipped owner without proof fails", pf_fires(23, "without recording the debt done"), True)
+        check("partial-flip: shipped owner with proof passes", pf_silent(25), True)
+        check("partial-flip: item-silent target fails", pf_fires(27, "carries no such item"), True)
+        check("partial-flip: untyped forward fails", pf_fires(29, "names no item"), True)
+        check("partial-flip: XREF past a fence is unattached", pf_fires(32, "naming no owner"), True)
+        check("open-stamped row fails",
+              any(line.startswith("FATAL") and "TODO-10-partial-flip.md" in line
+                  and "§31 is [ ]" in line and "stamp covers it" in line
+                  for line in sev_out.splitlines()), True)
+
+        # --- D00 T04 §20: the disposition report ----------------------
+        rep_buf = _io.StringIO()
+        with _ctx.redirect_stdout(rep_buf), _ctx.redirect_stderr(rep_buf):
+            rep_rc = cmd_validate(argparse.Namespace(report_shipped_items=True))
+        rep_out = rep_buf.getvalue()
+        rep_lines = rep_out.splitlines()
+        check("report-shipped-items: exit 0", rep_rc, 0)
+        check("report-shipped-items: plain open fails",
+              any("[FAIL]" in line and "Never finished this one either" in line
+                  for line in rep_lines), True)
+        check("report-shipped-items: non-repo Commit unverified",
+              any("[UNVERIFIED Commit]" in line and "selftest: commit-excused" in line
+                  for line in rep_lines), True)
+        check("report-shipped-items: deferral exempt with ack",
+              any("[EXEMPT deferral]" in line and "Do the owned work" in line
+                  and "owner open" in line for line in rep_lines), True)
+        check("report-shipped-items: fenced exempt",
+              any("[EXEMPT fenced]" in line and "Looks open but is quoted" in line
+                  for line in rep_lines), True)
+        check("report-shipped-items: below-stamp fails",
+              any("[FAIL]" in line and "Quoted below the stamp" in line
+                  for line in rep_lines), True)
+        check("report-shipped-items: cardinality noted",
+              any("[FAIL shape]" in line and "2 Commit items" in line
+                  for line in rep_lines), True)
+        check("report-shipped-items: quiet sections silent",
+              not any(line == "todo/91-severity/TODO-10-partial-flip.md §16:"
+                      for line in rep_lines), True)
+        check("report-shipped-items: summary shape",
+              bool(re.search(r"^shipped items: \d+ Commit, \d+ deferral, \d+ fenced, "
+                             r"\d+ unverified, \d+ failures$", rep_out, re.MULTILINE)), True)
         check("checklist_state: open reads False", checklist_state("- [ ] x"), False)
         check("checklist_state: ticked reads True", checklist_state("- [x] x"), True)
         check("checklist_state: uppercase X reads open", checklist_state("- [X] x"), False)
         check("checklist_state: prose reads None", checklist_state("just prose"), None)
+
+        # --- D00 T04 §20: the Commit history binding -------------------
+        # The fixture tree sits outside any repo, so its §4 Commit line
+        # draws the unreadable warning, never a FATAL.
+        check("partial-flip: unreadable history warns, not fatals",
+              any(line.startswith("WARN") and "TODO-10-partial-flip.md" in line
+                  and "§4" in line and "cannot be read" in line
+                  for line in sev_out.splitlines()), True)
+        # Bound and unbound legs need a real repo: init one, commit the
+        # bound subject with a section suffix (the prefix leg), and
+        # validate a two-section tree against it.
+        brepo = Path(tempfile.mkdtemp(prefix="todo-graph-commitbind-"))
+        try:
+            (brepo / "todo" / "90-bind").mkdir(parents=True)
+            (brepo / "skills").mkdir(exist_ok=True)
+            (brepo / "todo" / "90-bind" / "INDEX.md").write_text(
+                "# 90-bind\n\n- [TODO-01](TODO-01-bind.md)\n", encoding="utf-8")
+            (brepo / "todo" / "90-bind" / "TODO-01-bind.md").write_text(
+                """---
+schema_version: 1
+id: self-test-commitbind
+domain: 90-bind
+status: active
+title: "TODO-01 -- commit binding"
+track: Z1
+---
+
+# TODO-01 -- commit binding
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Bound prefix | - |  [x]   |
+|   2   |   §2    | Never committed | - |  [x]   |
+
+## 1. Bound prefix
+
+- [x] Did it
+- [ ] Commit: `"workspace: bound work"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §1 | fixture
+
+## 2. Never committed
+
+- [x] Did it
+- [ ] Commit: `"workspace: never committed anywhere"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §2 | fixture
+""",
+                encoding="utf-8",
+            )
+            subprocess.run(["git", "init"], cwd=brepo, capture_output=True,
+                           text=True, timeout=60)
+            subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t",
+                            "commit", "--allow-empty", "-m",
+                            "workspace: bound work (D00 T99 §1)"],
+                           cwd=brepo, capture_output=True, text=True, timeout=60)
+            saved_bind = (TODO_DIR, PLAN, SKILLS_DIR)
+            TODO_DIR, PLAN, SKILLS_DIR = (brepo / "todo",
+                                          brepo / "todo" / "implementation-plan.md",
+                                          brepo / "skills")
+            try:
+                bind_buf = _io.StringIO()
+                with _ctx.redirect_stdout(bind_buf), _ctx.redirect_stderr(bind_buf):
+                    cmd_validate(None)
+            finally:
+                TODO_DIR, PLAN, SKILLS_DIR = saved_bind
+            bind_out = bind_buf.getvalue()
+            check("partial-flip: bound prefix passes",
+                  not any(line.startswith("FATAL") and "§1 is [x]" in line
+                          for line in bind_out.splitlines()), True)
+            check("partial-flip: unbound Commit fails",
+                  any(line.startswith("FATAL") and "TODO-01-bind.md" in line
+                      and "§2 is [x]" in line and "bound to no commit" in line
+                      for line in bind_out.splitlines()), True)
+        finally:
+            shutil.rmtree(brepo, ignore_errors=True)
 
         # The partial-flip fixtures fire FATAL by design: remove them now so
         # the frozen, ratchet, sync, and plan-health legs below read the tree
@@ -7679,7 +7967,7 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
         globals()["git_file_at"] = _canned_file_at
         try:
             vbuf = _bio.StringIO()
-            with _bctx.redirect_stdout(vbuf):
+            with _bctx.redirect_stdout(vbuf), _bctx.redirect_stderr(_bio.StringIO()):
                 vcode = cmd_validate(argparse.Namespace())
             vout = vbuf.getvalue()
             check("validator rules fire fatals on the probe tree", vcode, 1)
@@ -7732,7 +8020,13 @@ def main() -> int:
     p = argparse.ArgumentParser(prog="todo-graph", description=__doc__.split("\n")[0])
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("build", help="parse todo/ into build/todo-cache.json").set_defaults(fn=cmd_build)
-    sub.add_parser("validate", help="structural and graph integrity checks").set_defaults(fn=cmd_validate)
+    va = sub.add_parser("validate", help="structural and graph integrity checks")
+    va.add_argument(
+        "--report-shipped-items",
+        action="store_true",
+        help="list every unchecked item under shipped rows with its disposition (a reading, not a gate)",
+    )
+    va.set_defaults(fn=cmd_validate)
     wa = sub.add_parser("warnings", help="show or re-accept the warning baseline")
     # Mutually exclusive: --accept writes the baseline (the one durable side
     # effect here) and --acked only reads; passing both must be an argparse

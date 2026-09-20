@@ -300,6 +300,15 @@ Invoke-Gate -Name 'claims self-test' -LogName 'gate-claims-selftest' -Command {
 Invoke-Gate -Name 'findings ledger' -LogName 'gate-findings' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\todo-findings.py') --check
 }
+Invoke-Gate -Name 'review-prompt self-test' -LogName 'gate-reviewprompt-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\review_prompt.py') --self-test
+}
+Invoke-Gate -Name 'findings self-test' -LogName 'gate-findings-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\todo-findings.py') --self-test
+}
+Invoke-Gate -Name 'runs self-test' -LogName 'gate-runs-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\todo-runs.py') --self-test
+}
 
 # The conformance profile is a contract other domains are measured against, so
 # a clause whose owner section was renumbered away would otherwise dangle with

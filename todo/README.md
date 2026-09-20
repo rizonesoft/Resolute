@@ -427,6 +427,7 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 | `filter-overclaim-stamped` | WARN | The stamp must not be reopened; the fix-forward channel owns it. |
 | `no-commit-item` | FATAL | One section = one commit is the format's core contract. |
 | `partial-flip-shipped` | FATAL | An unticked micro-step outside the exemptions inside a `[x]` section breaks the shipped claim itself. |
+| `commit-history-unreadable` | WARN | History the `Commit:` binding cannot read is unverified, not broken; a bare-tree export must still validate. |
 | `fidelity-missing-lines-open` | FATAL | A Fidelity surface with no Job/Treatment/Chrome is unimplementable in house style. |
 | `fidelity-missing-lines-stamped` | WARN | Fix-forward: the gap is real, the stamp stays. |
 | `no-checklist-items` | FATAL | An empty section is unimplementable (co-emits `no-commit-item`). |

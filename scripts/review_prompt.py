@@ -384,6 +384,58 @@ def _output_within_bounds(text: str) -> tuple[bool, str] | None:
     return None
 
 
+def panel_text_from_envelope(text: str) -> tuple[str, str | None]:
+    """Unwrap a Claude JSON envelope to its `result` text, else passthrough.
+
+    Bare reviewer output (RECEIPT-led) passes through untouched; only a
+    `{`-led payload parses as JSON. A parsed envelope without a string
+    `result`, or one flagging `is_error`, fails naming the shape: a
+    failed round approves nothing.
+    """
+    if not text.lstrip().startswith("{"):
+        return text, None
+    try:
+        obj = json.loads(text)
+    except ValueError:
+        return text, None
+    if not isinstance(obj, dict):
+        return text, None
+    if obj.get("is_error") is True:
+        return text, f"round errored ({obj.get('subtype', 'unknown subtype')}), approving nothing"
+    result = obj.get("result")
+    if not isinstance(result, str):
+        return text, "JSON envelope carries no string `result`"
+    return result, None
+
+
+def round_cost_from_envelope(text: str) -> tuple[int | None, str | None]:
+    """(total tokens, error) from a Claude JSON envelope's usage block.
+
+    Total is the runs header's cost sum: input + output + cache_read +
+    cache_creation, each at face value. Returns an error naming the
+    missing shape instead of guessing.
+    """
+    try:
+        obj = json.loads(text)
+    except ValueError as exc:
+        return None, f"not a JSON envelope: {exc}"
+    if not isinstance(obj, dict):
+        return None, "JSON envelope is not an object"
+    usage = obj.get("usage")
+    if not isinstance(usage, dict):
+        return None, "JSON envelope carries no `usage` block"
+    try:
+        total = (
+            int(usage.get("input_tokens", 0))
+            + int(usage.get("output_tokens", 0))
+            + int(usage.get("cache_read_input_tokens", 0))
+            + int(usage.get("cache_creation_input_tokens", 0))
+        )
+    except (TypeError, ValueError):
+        return None, "usage block carries non-integer token counts"
+    return total, None
+
+
 def check_panel_output(text: str, manifest: tuple[str, str, str] | None = None) -> tuple[bool, str]:
     """Whole-output validation for a panel round: every lens verdicts
     exactly once, and every other non-blank line is a detail line under the
@@ -394,6 +446,9 @@ def check_panel_output(text: str, manifest: tuple[str, str, str] | None = None) 
     stream through the END line. Returns (ok, reason); the first bad
     line is the reason, so trailing garbage after four good verdicts
     still fails instead of masking."""
+    text, envelope_err = panel_text_from_envelope(text)
+    if envelope_err is not None:
+        return False, envelope_err
     bounded = _output_within_bounds(text)
     if bounded is not None:
         return bounded
@@ -792,6 +847,27 @@ def _self_test() -> int:
     ok, reason = check_panel_output(
         f"RECEIPT sha={expect_sha} end={tag} nonce={'f' * 16}\n" + approves, manifest3)
     check("wrong-nonce-fails", (not ok) and "receipts nonce" in reason, reason)
+    env = json.dumps({"type": "result", "subtype": "success", "is_error": False,
+                      "result": receipt + approves,
+                      "usage": {"input_tokens": 2, "output_tokens": 4,
+                                "cache_read_input_tokens": 0,
+                                "cache_creation_input_tokens": 39821}})
+    ok, reason = check_panel_output(env, manifest3)
+    check("envelope-pass", ok, reason)
+    env_err = json.dumps({"type": "result", "subtype": "error", "is_error": True,
+                          "result": receipt + approves})
+    ok, reason = check_panel_output(env_err, manifest3)
+    check("envelope-error-fails", (not ok) and "approving nothing" in reason, reason)
+    env_nores = json.dumps({"type": "result", "subtype": "success", "is_error": False})
+    ok, reason = check_panel_output(env_nores, manifest3)
+    check("envelope-no-result-fails", (not ok) and "no string `result`" in reason, reason)
+    cost_total, cost_err = round_cost_from_envelope(env)
+    check("round-cost-sums-classes", cost_total == 39827 and cost_err is None,
+          f"{cost_total} {cost_err}")
+    cost_total, cost_err = round_cost_from_envelope(json.dumps({"type": "result"}))
+    check("round-cost-no-usage-fails",
+          cost_total is None and "no `usage` block" in (cost_err or ""),
+          f"{cost_total} {cost_err}")
 
     findings = "- first finding\n- second finding\n"
     ok, reason = check_plan_output(receipt + findings, manifest3)
@@ -1146,6 +1222,19 @@ if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == "tag":
         print(unique_tag(sys.argv[2]))
         sys.exit(0)
+    if len(sys.argv) == 3 and sys.argv[1] == "round-cost":
+        try:
+            with open(sys.argv[2], encoding="utf-8") as fh:
+                envelope = fh.read()
+        except OSError as exc:
+            print(f"round-cost: cannot read {sys.argv[2]}: {exc}", file=sys.stderr)
+            sys.exit(2)
+        total, err = round_cost_from_envelope(envelope)
+        if err is not None:
+            print(f"round-cost: {err}", file=sys.stderr)
+            sys.exit(1)
+        print(f"{total}tokens")
+        sys.exit(0)
     if len(sys.argv) >= 4 and sys.argv[1] == "fence":
         args = sys.argv[3:]
         base = head = None
@@ -1353,7 +1442,7 @@ if __name__ == "__main__":
         rest = []
     if checker_arg not in checkers or rest:
         print(
-            f"usage: {sys.argv[0]} tag <prefix> | fence <prefix> [--base <sha> --head <sha>] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan [--manifest <file>] < output.txt | cross-check <manifest-file> <base> <head> | attest (--out <path> --manifest <file> --base <b> --head <h> --tree <t> --reviewer <r> --model <m> --verdict <v> --checker <c> --timestamp <ts> | --read-back <path>)",
+            f"usage: {sys.argv[0]} tag <prefix> | round-cost <envelope-file> | fence <prefix> [--base <sha> --head <sha>] <title=path>... | run-id <todo-path> <section> <family> <YYYYMMDD> <scan-file>... | check-panel|check-plan [--manifest <file>] < output.txt | cross-check <manifest-file> <base> <head> | attest (--out <path> --manifest <file> --base <b> --head <h> --tree <t> --reviewer <r> --model <m> --verdict <v> --checker <c> --timestamp <ts> | --read-back <path>)",
             file=sys.stderr,
         )
         sys.exit(2)

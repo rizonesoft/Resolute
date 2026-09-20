@@ -48,6 +48,7 @@ TF = _load_findings()
 
 ROOT = HERE.parent
 DEFAULT_RUNS = ROOT / "docs" / "reviews" / "run-records.md"
+DEFAULT_BANK = ROOT / "docs" / "reviews" / "crossover" / "comparisons.md"
 
 RUNNERS = ("codex", "panel")
 EFFORTS = ("high", "medium", "low")
@@ -86,6 +87,14 @@ TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
 REF_RE = re.compile(r"^D\d{2}-T\d{2}-S\d+-F\d+$")
+COMPARISON_RE = re.compile(r"^comparison:\s*(?P<dir>\S+)\s+class:\s*(?P<class>\S+)"
+                           r"\s+jaccard:\s*(?P<jaccard>\S+)\s+"
+                           r"pairs:\s*(?P<pairs>\d+)\s+union:\s*(?P<union>\d+)\s*$")
+# Findings that carry no value in the cut legs: raised-then-disproven,
+# retracted, or already tracked elsewhere. Anything else (fixed, filed,
+# advisory, corrected, cleared, routed) and any unresolvable ref counts
+# as a find, so bad data breaks a zero run instead of arming it.
+ZERO_BLIND_DISPOSITIONS = ("refuted", "withdrawn", "duplicate")
 PANEL_HEADING_RE = re.compile(r"^#{2,}\s*(?P<family>GPT|Opus) panel Round (?P<n>\d+)\s*$")
 PANEL_VERDICT_RE = re.compile(r"^\s*`(?P<lens>[A-Za-z-]+)`\s+(?P<verdict>approve|needs-attention|advisory)\b")
 HEADING_RE = re.compile(r"^#{1,6}\s+")
@@ -237,7 +246,8 @@ def check_runs(runs, errors):
             if "latency" in items and not LATENCY_RE.match(items["latency"]):
                 errors.append((rl_lineno, "latency reads `<int>s` or `unresolved`"))
             if "opportunity" in items and items["opportunity"] not in OPPORTUNITIES:
-                errors.append((rl_lineno, f"opportunity must be one of {OPPORTUNITIES}"))
+                errors.append((rl_lineno, f"opportunity {items['opportunity']!r} must be "
+                                          f"one of {OPPORTUNITIES}"))
             if "purpose" in items and items["purpose"] not in PURPOSES:
                 errors.append((rl_lineno, f"purpose must be one of {PURPOSES}"))
             if "provenance" in items and items["provenance"] not in PROVENANCES:
@@ -432,8 +442,12 @@ def check_candidates(runs):
     shas = sorted({items["candidate"] for run in runs for _, _, items in run.round_lines
                    if "candidate" in items and SHA_RE.match(items["candidate"])})
     for sha in shas:
-        hit = subprocess.run(["git", "cat-file", "-t", sha], cwd=ROOT,
-                             capture_output=True, text=True)
+        try:
+            hit = subprocess.run(["git", "cat-file", "-t", sha], cwd=ROOT,
+                                 capture_output=True, text=True, timeout=30)
+        except (OSError, subprocess.SubprocessError) as exc:
+            errors.append((0, f"candidate {sha} could not be checked: git failed ({exc})"))
+            continue
         if hit.returncode != 0 or hit.stdout.strip() != "commit":
             errors.append((0, f"candidate {sha} is not a commit in this repository"))
     return errors
@@ -518,6 +532,31 @@ def coverage_lines(runs):
     return lines
 
 
+def cost_lines(runs):
+    """Recorded cost totals: grand, per model, then per round."""
+    lines = ["Cost (recorded tokens; USD prices outside the record):"]
+    known = [(run.section, n, items["cost"], items.get("model", "?"))
+             for run in runs for _, n, items in run.round_lines
+             if items.get("cost") != "unresolved"]
+    total_rounds = sum(run.rounds or 0 for run in runs)
+    if not known:
+        lines.append(f"- no recorded cost ({total_rounds}/{total_rounds} unresolved)")
+        return lines
+    total_tokens = sum(int(cost[:-6]) for _, _, cost, _ in known)
+    lines.append(f"- {len(known)}/{total_rounds} rounds recorded, {total_tokens} tokens")
+    per_model: dict[str, list[int]] = {}
+    for _, _, cost, model in known:
+        slot = per_model.setdefault(model, [0, 0])
+        slot[0] += int(cost[:-6])
+        slot[1] += 1
+    for model in sorted(per_model):
+        tokens, rounds_n = per_model[model]
+        lines.append(f"- {model}: {tokens} tokens over {rounds_n} recorded round(s)")
+    for section, n, cost, _model in known:
+        lines.append(f"- {section} round {n}: {cost}")
+    return lines
+
+
 def revisit_lines(runs):
     """The §18 trigger from the query: panel sections past the §8 window."""
     past = [run.section for run in runs
@@ -528,6 +567,93 @@ def revisit_lines(runs):
     names = ", ".join(past) if past else "none"
     lines.append(f"- {len(past)}/{REVISIT_NEED} panel-reviewed sections past the window "
                  f"({names}): {state}")
+    return lines
+
+
+def _read_bank(bank_path):
+    """Banked blinded comparisons, or the reason the bank won't read."""
+    try:
+        text = Path(bank_path).read_text(encoding="utf-8")
+    except OSError as exc:
+        return [], f"bank unreadable ({exc.strerror or exc})"
+    comps, bad = [], None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        match = COMPARISON_RE.match(stripped)
+        if match is None:
+            bad = f"bank line unparsed: {stripped}"
+            break
+        try:
+            jaccard = float(match.group("jaccard"))
+        except ValueError:
+            bad = f"bank jaccard unparsed: {stripped}"
+            break
+        comps.append({"dir": match.group("dir"), "class": match.group("class"),
+                      "jaccard": jaccard, "pairs": int(match.group("pairs")),
+                      "union": int(match.group("union"))})
+    return comps, bad
+
+
+def leg_lines(runs, findings, bank_path=None):
+    """The §20 interim cut-leg assessment between revisits: trailing
+    full-scope zero sections per panel rung (fix-loop sections and
+    sections with no full-scope round for the rung are invisible,
+    per §18 consecutiveness), and the banked overlap comparisons
+    with their activation state. A zero is a section whose full-scope
+    rounds raised no surviving finding; surviving means a ledger
+    disposition outside the never-defect triple, and unresolvable
+    refs count as finds."""
+    by_ref = {}
+    for f in findings:
+        by_ref.setdefault(f"{_compact_section(f.ref)}-{f.number}", f.disposition)
+    panel = [run for run in runs if run.runner == "panel"]
+    lines = ["Cut-leg interim (§20 between-revisit watch):"]
+    bits = []
+    for family, model in FAMILY_MODEL.items():
+        sections = []
+        for run in panel:
+            full = [items for _, _, items in run.round_lines
+                    if items.get("model") == model
+                    and items.get("opportunity") == "full-scope"]
+            if not full:
+                continue
+            zero = not any(by_ref.get(ref, "unresolved") not in ZERO_BLIND_DISPOSITIONS
+                           for items in full for ref in items.get("findings", []))
+            sections.append(zero)
+        if not sections:
+            bits.append(f"{family} ({model}): no full-scope round observed")
+            continue
+        run_len = 0
+        for zero in reversed(sections):
+            if not zero:
+                break
+            run_len += 1
+        bit = f"{family} ({model}): {run_len} trailing full-scope zero(s)"
+        if run_len >= 3:
+            bit += (" FIRED -- file the early revisit (D00 T04 §23 trigger) "
+                    "with these lines quoted")
+        bits.append(bit)
+    lines.append("- zero runs (trailing full-scope zero sections per rung, "
+                 "fix-loop invisible): " + "; ".join(bits))
+    comps, bad = _read_bank(bank_path or DEFAULT_BANK)
+    if bad is not None:
+        lines.append(f"- overlap comparisons banked: {bad}: DORMANT (unmeasured)")
+        return lines
+    classes = sorted({c["class"] for c in comps})
+    detail = "; ".join(f"{c['class']} Jaccard {c['jaccard']:.2f} "
+                       f"over union {c['union']}" for c in comps) or "none banked"
+    if len(comps) >= 2 and len(classes) >= 2:
+        mean = sum(c["jaccard"] for c in comps) / len(comps)
+        state = f"ACTIVE, mean Jaccard {mean:.2f}"
+        if mean > 0.5:
+            state += (" FIRED -- file the early revisit (D00 T04 §23 trigger) "
+                      "with these lines quoted")
+    else:
+        state = "DORMANT (activation needs 2 spanning 2 classes)"
+    lines.append(f"- overlap comparisons banked: {len(comps)} spanning "
+                 f"{len(classes)} class(es) ({detail}): {state}")
     return lines
 
 
@@ -566,18 +692,7 @@ def report(runs, runs_path, collected=None):
         lines.append(f"- {model}: {rounds_n} round(s), {raised} raised, "
                      f"{refuted_by_model.get(model, 0)} refuted")
     lines.append("")
-    lines.append("Cost (recorded tokens; USD prices outside the record):")
-    known = [(run.section, n, items["cost"])
-             for run in runs for _, n, items in run.round_lines
-             if items.get("cost") != "unresolved"]
-    total_rounds = sum(run.rounds or 0 for run in runs)
-    if known:
-        total_tokens = sum(int(cost[:-6]) for _, _, cost in known)
-        lines.append(f"- {len(known)}/{total_rounds} rounds recorded, {total_tokens} tokens")
-        for section, n, cost in known:
-            lines.append(f"- {section} round {n}: {cost}")
-    else:
-        lines.append(f"- no recorded cost ({total_rounds}/{total_rounds} unresolved)")
+    lines.extend(cost_lines(runs))
     lines.append("")
     lines.extend(coverage_lines(runs))
     lines.append("")
@@ -630,6 +745,8 @@ def report(runs, runs_path, collected=None):
     lines.append(f"- total: independent {total_ind}, self {total_self}")
     lines.append("")
     lines.extend(revisit_lines(runs))
+    lines.append("")
+    lines.extend(leg_lines(runs, findings))
     return "\n".join(lines) + "\n"
 
 
@@ -800,7 +917,8 @@ def check_export(doc):
             if not (isinstance(line.get("latency"), str) and LATENCY_RE.match(line["latency"])):
                 problems.append(f"{section} round {num}: latency reads `<int>s` or `unresolved`")
             if line.get("opportunity") not in OPPORTUNITIES:
-                problems.append(f"{section} round {num}: opportunity must be one of {OPPORTUNITIES}")
+                problems.append(f"{section} round {num}: opportunity "
+                                f"{line.get('opportunity')!r} must be one of {OPPORTUNITIES}")
             if line.get("purpose") not in PURPOSES:
                 problems.append(f"{section} round {num}: purpose must be one of {PURPOSES}")
             if line.get("provenance") not in PROVENANCES:
@@ -983,7 +1101,8 @@ refuted: 0
                                           ("cost", "unresolved", "12", "cost reads"),
                                           ("cost", "unresolved", "12 dollars", "cost reads"),
                                           ("latency", "unresolved", "soon", "latency reads"),
-                                          ("opportunity", "full-scope", "partial", "opportunity must be"),
+                                          ("opportunity", "full-scope", "partial",
+                                           "opportunity 'partial' must be"),
                                           ("purpose", "section-review", "vibes", "purpose must be"),
                                           ("provenance", "reconstructed", "oral-tradition",
                                            "provenance must be")):
@@ -991,6 +1110,19 @@ refuted: 0
         _r, errors_g = parse_runs(bad)
         check_runs(_r, errors_g)
         check(f"bad-{bad_key}-fails", any(want in m for _, m in errors_g), f"{errors_g}")
+    # §20: the opportunity refusal names the label, and the accepted triple passes.
+    mislabeled = good.replace("opportunity: full-scope", "opportunity: partial", 1)
+    _r, errors_m = parse_runs(mislabeled)
+    check_runs(_r, errors_m)
+    check("bad-opportunity-names-label",
+          any("opportunity 'partial' must be one of" in m for _, m in errors_m),
+          f"{errors_m}")
+    for label in OPPORTUNITIES:
+        relabeled = good.replace("opportunity: full-scope", f"opportunity: {label}", 1)
+        _r, errors_l = parse_runs(relabeled)
+        check_runs(_r, errors_l)
+        check(f"opportunity-{label}-passes",
+              not any("opportunity" in m for _, m in errors_l), f"{errors_l}")
 
     import tempfile
     tmp = Path(tempfile.mkdtemp(prefix="todo-runs-"))
@@ -1111,6 +1243,39 @@ refuted: 0
         "- latency: 1/5 recorded (gpt-5.6-sol 1/4, opus 0/1)",
         "- version: 4/5 recorded (gpt-5.6-sol 4/4, opus 0/1)",
     ], f"{cov}")
+
+    # §20: the cost report reads both runners.
+    both = shapes.replace("provider: anthropic version: unresolved cost: unresolved",
+                          "provider: anthropic version: opus cost: 8tokens", 1)
+    runs_b, errors_b = parse_runs(both)
+    check_runs(runs_b, errors_b)
+    check("cost-both-runners-parse", not errors_b, f"{errors_b}")
+    lines_b = cost_lines(runs_b)
+    check("cost-per-model", lines_b == [
+        "Cost (recorded tokens; USD prices outside the record):",
+        "- 2/5 rounds recorded, 20 tokens",
+        "- gpt-5.6-sol: 12 tokens over 1 recorded round(s)",
+        "- opus: 8 tokens over 1 recorded round(s)",
+        "- D00-T01-S9 round 1: 12tokens",
+        "- D00-T01-S9 round 4: 8tokens",
+    ], f"{lines_b}")
+
+    # §20: the candidate check reports git failure instead of tracing.
+    mock_run = Run("D00-T01-S9", 1)
+    mock_run.round_lines = [(0, 1, {"candidate": "6bb635e"})]
+    real_subprocess_run = subprocess.run
+
+    def _boom(*_a, **_k):
+        raise OSError("drill: git missing")
+
+    subprocess.run = _boom
+    try:
+        cand_errs = check_candidates([mock_run])
+    finally:
+        subprocess.run = real_subprocess_run
+    check("candidates-git-failure-reports",
+          any("could not be checked" in m and "6bb635e" in m for _, m in cand_errs),
+          f"{cand_errs}")
 
     # §15: the §18 trigger reads from the query, window named.
     def _mkrun(section, runner):
@@ -1258,6 +1423,95 @@ refuted: 0
     corpus_clean = st.returncode == 0 and not st.stdout
     expect = head.stdout.strip() if (identical and corpus_clean) else "unresolved"
     check("as-of-agrees-with-git", live["commit"] == expect, f"{live} want {expect}")
+
+    # §20: the interim leg query reads trailing zero runs and the bank.
+    def _mkleg(section, rounds):
+        run = _mkrun(section, "panel")
+        run.round_lines = [(0, n + 1, items) for n, items in enumerate(rounds)]
+        return run
+    sol = FAMILY_MODEL["GPT"]
+    leg_find = TF.Finding("D00 T04 §31", None, 1, "F1", "s", "record",
+                          "fixed", None, "independent")
+    leg_dead = TF.Finding("D00 T04 §31", None, 2, "F2", "s", "record",
+                          "refuted", None, "independent")
+    quiet_runs = [
+        _mkleg("D00-T04-S31", [{"model": sol, "opportunity": "full-scope",
+                                "findings": []}]),
+        _mkleg("D00-T04-S32", [{"model": sol, "opportunity": "full-scope",
+                                "findings": ["D00-T04-S31-F1"]}]),
+    ]
+    bank_one = tmp / "leg-bank-one.md"
+    bank_one.write_text("comparison: 2026-09-20-s18 class: review-tooling "
+                        "jaccard: 0.00 pairs: 0 union: 3\n", encoding="utf-8")
+    got_quiet = leg_lines(quiet_runs, [leg_find, leg_dead], bank_one)
+    check("legs-quiet", got_quiet == [
+        "Cut-leg interim (§20 between-revisit watch):",
+        "- zero runs (trailing full-scope zero sections per rung, fix-loop "
+        f"invisible): GPT ({sol}): 0 trailing full-scope zero(s); "
+        "Opus (opus): no full-scope round observed",
+        "- overlap comparisons banked: 1 spanning 1 class(es) "
+        "(review-tooling Jaccard 0.00 over union 3): "
+        "DORMANT (activation needs 2 spanning 2 classes)",
+    ], f"{got_quiet}")
+    fired_runs = [
+        _mkleg("D00-T04-S31", [{"model": sol, "opportunity": "full-scope",
+                                "findings": []}]),
+        _mkleg("D00-T04-S32", [{"model": sol,
+                                "opportunity": "delta-plus-regressions",
+                                "findings": ["D00-T04-S31-F1"]}]),
+        _mkleg("D00-T04-S33", [{"model": sol, "opportunity": "full-scope",
+                                "findings": ["D00-T04-S31-F2"]}]),
+        _mkleg("D00-T04-S34", [{"model": sol, "opportunity": "full-scope",
+                                "findings": []}]),
+    ]
+    got_fired = leg_lines(fired_runs, [leg_find, leg_dead], bank_one)
+    check("legs-zero-fired",
+          got_fired[1] == "- zero runs (trailing full-scope zero sections per rung, "
+          "fix-loop invisible): "
+          f"GPT ({sol}): 3 trailing full-scope zero(s) FIRED -- file the early "
+          "revisit (D00 T04 §23 trigger) with these lines quoted; "
+          "Opus (opus): no full-scope round observed", f"{got_fired}")
+    unknown_runs = [
+        _mkleg("D00-T04-S31", [{"model": sol, "opportunity": "full-scope",
+                                "findings": []}]),
+        _mkleg("D00-T04-S32", [{"model": sol, "opportunity": "full-scope",
+                                "findings": ["D00-T04-S99-F9"]}]),
+    ]
+    got_unknown = leg_lines(unknown_runs, [leg_find, leg_dead], bank_one)
+    check("legs-unknown-ref-breaks-run",
+          f"GPT ({sol}): 0 trailing full-scope zero(s)" in got_unknown[1]
+          and "FIRED" not in got_unknown[1], f"{got_unknown}")
+    bank_two = tmp / "leg-bank-two.md"
+    bank_two.write_text("comparison: 2026-09-20-s18 class: review-tooling "
+                        "jaccard: 0.00 pairs: 0 union: 3\n"
+                        "comparison: 2026-09-21-cal class: plan-record "
+                        "jaccard: 0.40 pairs: 2 union: 5\n", encoding="utf-8")
+    got_active = leg_lines(quiet_runs, [leg_find, leg_dead], bank_two)
+    check("legs-overlap-active-quiet",
+          got_active[2] == "- overlap comparisons banked: 2 spanning 2 class(es) "
+          "(review-tooling Jaccard 0.00 over union 3; "
+          "plan-record Jaccard 0.40 over union 5): ACTIVE, mean Jaccard 0.20",
+          f"{got_active}")
+    bank_hot = tmp / "leg-bank-hot.md"
+    bank_hot.write_text("comparison: 2026-09-20-s18 class: review-tooling "
+                        "jaccard: 0.60 pairs: 3 union: 5\n"
+                        "comparison: 2026-09-21-cal class: plan-record "
+                        "jaccard: 0.80 pairs: 4 union: 5\n", encoding="utf-8")
+    got_hot = leg_lines(quiet_runs, [leg_find, leg_dead], bank_hot)
+    check("legs-overlap-fired",
+          got_hot[2] == "- overlap comparisons banked: 2 spanning 2 class(es) "
+          "(review-tooling Jaccard 0.60 over union 5; "
+          "plan-record Jaccard 0.80 over union 5): ACTIVE, mean Jaccard 0.70 "
+          "FIRED -- file the early revisit (D00 T04 §23 trigger) "
+          "with these lines quoted", f"{got_hot}")
+    got_nobank = leg_lines(quiet_runs, [leg_find, leg_dead],
+                            tmp / "leg-bank-absent.md")
+    check("legs-bank-unreadable",
+          got_nobank[2].startswith("- overlap comparisons banked: bank unreadable ")
+          and got_nobank[2].endswith(": DORMANT (unmeasured)"), f"{got_nobank}")
+    bank_one.unlink()
+    bank_two.unlink()
+    bank_hot.unlink()
     other.unlink()
     tmp.rmdir()
 
