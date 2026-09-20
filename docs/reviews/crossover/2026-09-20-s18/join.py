@@ -121,7 +121,8 @@ def main():
     print(f"crossover: sol {sol_xo} finds, opus {opus_xo} finds, "
           f"{pairs} pairs, Jaccard "
           f"{pairs / union if union else 0.0:.2f} (frozen c33cb6e)")
-    print("overlap leg: DORMANT (1 in-window comparison, needs 2+")
+    print("overlap leg: DORMANT (1 in-window comparison; needs 2+ spanning "
+          "2 classes)")
 
 
 if __name__ == "__main__":
