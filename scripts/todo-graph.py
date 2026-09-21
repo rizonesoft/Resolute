@@ -826,6 +826,10 @@ SEVERITY_MAP: dict[str, str] = {
     # untagged one: round-to-commit mapping must be mechanical (D00 T04
     # §21; §13's own line stands as history by explicit exemption).
     "review-citation-role-less": "fatal",
+    # a post-cutoff round tag resolving to no recorded panel round, or
+    # two candidates sharing one round: the mapping must correspond,
+    # not merely exist (D00 T04 §24 item 18).
+    "review-citation-role-mismatch": "fatal",
     # superseded frontmatter must name its successor: mechanical, structural.
     "superseded-no-successor": "fatal",
     # an OPEN section whose --filter checkpoint claims another suite stays
@@ -6671,6 +6675,12 @@ track: Z1
 |  34   |   §34   | Target, substring only | §33 |  [ ]   |
 |  35   |   §35   | Deferral, reordered citation | - |  [x]   |
 |  36   |   §36   | Target, reordered words | §35 |  [ ]   |
+|  37   |   §37   | Deferral, two debts, section-only proof | - |  [x]   |
+|  38   |   §38   | Target, shipped, section-only proof | §37 |  [x]   |
+|  39   |   §39   | Deferral, two debts, item proofs | - |  [x]   |
+|  40   |   §40   | Target, shipped, item proofs | §39 |  [x]   |
+|  41   |   §41   | Deferral, wrong-item proof | - |  [x]   |
+|  42   |   §42   | Target, shipped, wrong-item proof | §41 |  [x]   |
 
 ## 1. Plain open item
 
@@ -6934,7 +6944,7 @@ The quoted shape:
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-01-01 | §26 | fixture
-> **Resolved:** 2026-01-02 | §25 debt done -> XREF: §25 -- the deferred work shipped here
+> **Resolved:** 2026-01-02 | §25 debt done -> XREF: §25 (item: "Do the proven work") -- the deferred work shipped here
 
 ## 27. Deferral, item-silent target
 
@@ -7030,6 +7040,76 @@ fenced code here
 - [ ] Commit: `"selftest: target-reordered"`
 
 **Test checkpoint:** run tests/AlphaTest.php.
+
+## 37. Deferral, two debts, section-only proof
+
+- [x] Did it
+- [ ] ~~Handed two debts to one owner.~~ **Deferred 2026-01-01, first debt.**
+  -> XREF: §38 (item: "Do the first debt") -- the owner
+- [ ] ~~Handed two debts to one owner.~~ **Deferred 2026-01-01, second debt.**
+  -> XREF: §38 (item: "Do the second debt") -- the owner
+- [x] Commit: `"selftest: defer-two-debts"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §37 | fixture
+
+## 38. Target, shipped, section-only proof
+
+- [x] Do the first debt
+- [x] Do the second debt
+- [x] Commit: `"selftest: target-two-debts"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §38 | fixture
+> **Resolved:** 2026-01-02 | §37 debts done -> XREF: §37 -- the deferred work shipped here
+
+## 39. Deferral, two debts, item proofs
+
+- [x] Did it
+- [ ] ~~Handed two debts to one owner.~~ **Deferred 2026-01-01, third debt.**
+  -> XREF: §40 (item: "Do the third debt") -- the owner
+- [ ] ~~Handed two debts to one owner.~~ **Deferred 2026-01-01, fourth debt.**
+  -> XREF: §40 (item: "Do the fourth debt") -- the owner
+- [x] Commit: `"selftest: defer-two-proofs"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §39 | fixture
+
+## 40. Target, shipped, item proofs
+
+- [x] Do the third debt
+- [x] Do the fourth debt
+- [x] Commit: `"selftest: target-two-proofs"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §40 | fixture
+> **Resolved:** 2026-01-02 | third debt done -> XREF: §39 (item: "Do the third debt") -- shipped here
+> **Resolved:** 2026-01-02 | fourth debt done -> XREF: §39 (item: "Do the fourth debt") -- shipped here
+
+## 41. Deferral, wrong-item proof
+
+- [x] Did it
+- [ ] ~~Handed one debt to one owner.~~ **Deferred 2026-01-01 to the shipped owner.**
+  -> XREF: §42 (item: "Do the claimed work") -- the owner
+- [x] Commit: `"selftest: defer-wrong-item"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §41 | fixture
+
+## 42. Target, shipped, wrong-item proof
+
+- [x] Do the claimed work
+- [x] Commit: `"selftest: target-wrong-item"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §42 | fixture
+> **Resolved:** 2026-01-02 | claimed work done -> XREF: §41 (item: "Do the wrong work") -- shipped here
 """,
             encoding="utf-8",
         )
@@ -7133,7 +7213,7 @@ track: Z1
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-09-21 | §3 | filed to D91 T11 §10 for the follow-up
-> **Review:** round 1, candidate `abc1234`(round 1) `def5678`(round 1) -- approve
+> **Review:** round 1, candidate `abc1234`(round 1) `def5678`(round 2) -- approve
 
 ## 4. Pre-cutoff twin
 
@@ -7257,6 +7337,93 @@ Fenced transcript citing §1 never trips the scan.
 """,
             encoding="utf-8",
         )
+        # --- D00 T04 §24 item 18: role-correspondence fixtures --------
+        # Post-cutoff stamps whose round tags resolve (§1), miss (§2:
+        # round 3 of one recorded round, plus round zero), or collide
+        # (§3: two candidates sharing round 1).
+        (root / "todo" / "91-severity" / "TODO-12-role-match.md").write_text(
+            """---
+schema_version: 1
+id: self-test-role-match
+domain: 91-severity
+status: active
+title: "TODO-12 -- role-correspondence fixtures"
+track: Z1
+---
+
+# TODO-12 -- role-correspondence fixtures
+
+## Implementation Order
+
+| Order | Section | Deliverable | Depends On | Status |
+| :---: | :-----: | ----------- | ---------- | :----: |
+|   1   |   §1    | Matched tags | - |  [x]   |
+|   2   |   §2    | Mistagged round | - |  [x]   |
+|   3   |   §3    | Duplicate round | - |  [x]   |
+
+## 1. Matched tags
+
+- [x] Did it
+- [x] Commit: `"selftest: ro1"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §1 | clean evidence
+> **Review:** round 2, candidate `abc1234`(round 1) `def5678`(round 2) -- approve. Raw findings: docs/reviews/91-severity/D91-T12-s1.md
+
+## 2. Mistagged round
+
+- [x] Did it
+- [x] Commit: `"selftest: ro2"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §2 | clean evidence
+> **Review:** round 2, candidate `abc1234`(round 1) `def5678`(round 3) `9abc123`(round 0) -- approve. Raw findings: docs/reviews/91-severity/D91-T12-s2.md
+
+## 3. Duplicate round
+
+- [x] Did it
+- [x] Commit: `"selftest: ro3"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §3 | clean evidence
+> **Review:** round 2, candidate `abc1234`(round 1) `def5678`(round 1) -- approve. Raw findings: docs/reviews/91-severity/D91-T12-s1.md
+""",
+            encoding="utf-8",
+        )
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s1.md").write_text(
+            """# Review -- D91 T12 §1, fixture
+
+## GPT panel Round 1
+
+`adversarial` approve
+`consistency` approve
+`integration` approve
+`record` approve
+
+## Opus panel Round 2
+
+`adversarial` approve
+`consistency` approve
+`integration` approve
+`record` approve
+""",
+            encoding="utf-8",
+        )
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s2.md").write_text(
+            """# Review -- D91 T12 §2, fixture
+
+## Opus panel Round 1
+
+`adversarial` approve
+`consistency` approve
+`integration` approve
+`record` approve
+""",
+            encoding="utf-8",
+        )
 
         sev_buf = _io.StringIO()
         with _ctx.redirect_stdout(sev_buf), _ctx.redirect_stderr(sev_buf):
@@ -7328,6 +7495,9 @@ Fenced transcript citing §1 never trips the scan.
         check("partial-flip: non-final Commit fails", pf_fires(22, "not the final checklist item"), True)
         check("partial-flip: shipped owner without proof fails", pf_fires(23, "without recording the debt done"), True)
         check("partial-flip: shipped owner with proof passes", pf_silent(25), True)
+        check("partial-flip: two-debt section-only proof fails", pf_fires(37, "on its Resolved line"), True)
+        check("partial-flip: two-debt item proofs pass", pf_silent(39), True)
+        check("partial-flip: wrong-item proof fails", pf_fires(41, "not the deferred item"), True)
         check("partial-flip: item-silent target fails", pf_fires(27, "carries no such item"), True)
         check("partial-flip: untyped forward fails", pf_fires(29, "names no item"), True)
         check("partial-flip: XREF past a fence is unattached", pf_fires(32, "naming no owner"), True)
@@ -7385,6 +7555,40 @@ Fenced transcript citing §1 never trips the scan.
               ev_silent(11) and ev_silent(12), True)
         check("evidence-cite: dash range coverage silent",
               ev_silent(13) and ev_silent(14), True)
+
+        # --- D00 T04 §24 item 18: role correspondence ------------------
+        def ro_fires(num: int, needle: str) -> bool:
+            tag = f"§{num} "
+            return any(
+                line.startswith("FATAL")
+                and "TODO-12-role-match.md" in line
+                and tag in line
+                and needle in line
+                for line in sev_out.splitlines()
+            )
+
+        def ro_silent(num: int) -> bool:
+            tag = f"§{num} "
+            return not any(
+                line.startswith("FATAL")
+                and "TODO-12-role-match.md" in line
+                and tag in line
+                and ("matching no recorded panel round" in line
+                     or "one round reviews one candidate" in line)
+                for line in sev_out.splitlines()
+            )
+
+        check("role-match: matched tags pass", ro_silent(1), True)
+        check("role-match: mistagged round fails",
+              ro_fires(2, "tags round 3 on def5678, matching no recorded panel round (1 recorded)"), True)
+        check("role-match: round zero fails",
+              ro_fires(2, "tags round 0 on 9abc123, matching no recorded panel round (1 recorded)"), True)
+        check("role-match: duplicate round fails",
+              ro_fires(3, "tags round 1 on 2 candidates (abc1234, def5678), one round reviews one candidate"), True)
+        check("role-match: duplicated rounds skip correspondence",
+              not any(line.startswith("FATAL") and "TODO-12-role-match.md" in line
+                      and "§3 " in line and "matching no recorded" in line
+                      for line in sev_out.splitlines()), True)
 
         # --- D00 T04 §20: the disposition report ----------------------
         rep_buf = _io.StringIO()
@@ -7456,6 +7660,10 @@ track: Z1
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | Bound prefix | - |  [x]   |
 |   2   |   §2    | Never committed | - |  [x]   |
+|   3   |   §3    | Ticked bound | - |  [x]   |
+|   4   |   §4    | Ticked thin air | - |  [x]   |
+|   5   |   §5    | Duplicate binds right | - |  [x]   |
+|   6   |   §6    | Duplicate short fails | - |  [x]   |
 
 ## 1. Bound prefix
 
@@ -7474,15 +7682,66 @@ track: Z1
 **Test checkpoint:** run tests/AlphaTest.php.
 
 > **Verified:** 2026-01-01 | §2 | fixture
+
+## 3. Ticked bound
+
+- [x] Did it
+- [x] Commit: `"workspace: bound work"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §3 | fixture
+
+## 4. Ticked thin air
+
+- [x] Did it
+- [x] Commit: `"workspace: quoted thin air"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §4 | fixture
+
+## 5. Duplicate binds right
+
+- [x] Did it
+- [ ] Commit: `"workspace: dup subject (extended)"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §5 | fixture
+
+## 6. Duplicate short fails
+
+- [x] Did it
+- [ ] Commit: `"workspace: dup subject"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-01-01 | §6 | fixture
 """,
                 encoding="utf-8",
             )
             subprocess.run(["git", "init"], cwd=brepo, capture_output=True,
                            text=True, timeout=60)
+            bind_rel = Path("todo") / "90-bind" / "TODO-01-bind.md"
+            subprocess.run(["git", "add", bind_rel.as_posix()], cwd=brepo,
+                           capture_output=True, text=True, timeout=60)
             subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t",
-                            "commit", "--allow-empty", "-m",
+                            "commit", "-m",
                             "workspace: bound work (D00 T99 §1)"],
                            cwd=brepo, capture_output=True, text=True, timeout=60)
+            # Two more commits sharing a subject prefix: the duplicate
+            # fixture (§§5-6). Both touch the TODO file, so the longer
+            # quote binds by subject, not by touch luck.
+            for subject in ("workspace: dup subject",
+                            "workspace: dup subject (extended)"):
+                with (brepo / bind_rel).open("a", encoding="utf-8") as fh:
+                    fh.write("\n")
+                subprocess.run(["git", "-c", "user.name=t",
+                                "-c", "user.email=t@t",
+                                "commit", "-am", subject],
+                               cwd=brepo, capture_output=True, text=True,
+                               timeout=60)
             saved_bind = (TODO_DIR, PLAN, SKILLS_DIR)
             TODO_DIR, PLAN, SKILLS_DIR = (brepo / "todo",
                                           brepo / "todo" / "implementation-plan.md",
@@ -7500,6 +7759,20 @@ track: Z1
             check("partial-flip: unbound Commit fails",
                   any(line.startswith("FATAL") and "TODO-01-bind.md" in line
                       and "§2 is [x]" in line and "bound to no commit" in line
+                      for line in bind_out.splitlines()), True)
+            check("partial-flip: ticked bound passes",
+                  not any(line.startswith("FATAL") and "§3 is [x]" in line
+                          for line in bind_out.splitlines()), True)
+            check("partial-flip: ticked thin air fails",
+                  any(line.startswith("FATAL") and "TODO-01-bind.md" in line
+                      and "§4 is [x]" in line and "quoting thin air" in line
+                      for line in bind_out.splitlines()), True)
+            check("partial-flip: duplicate binds right",
+                  not any(line.startswith("FATAL") and "§5 is [x]" in line
+                          for line in bind_out.splitlines()), True)
+            check("partial-flip: duplicate short fails ambiguous",
+                  any(line.startswith("FATAL") and "TODO-01-bind.md" in line
+                      and "§6 is [x]" in line and "matching several commits" in line
                       for line in bind_out.splitlines()), True)
         finally:
             shutil.rmtree(brepo, ignore_errors=True)
@@ -7563,9 +7836,11 @@ track: Z1
         # baselined = exit 0. WARNING_BASELINE is rebound like TODO_DIR --
         # the live baseline must never absorb fixture keys.
         for f in ("TODO-05-severity.md", "TODO-06-super.md", "TODO-08-frozen.md",
-                  "TODO-11-evidence-cite.md"):
+                  "TODO-11-evidence-cite.md", "TODO-12-role-match.md"):
             (root / "todo" / "91-severity" / f).unlink()
         (root / "docs" / "reviews" / "91-severity" / "D91-T11-s8.md").unlink()
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s1.md").unlink()
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s2.md").unlink()
         (root / "todo" / "91-severity" / "INDEX.md").write_text(
             "# 91-severity\n\n- [TODO-09](TODO-09-warn-only.md)\n", encoding="utf-8"
         )

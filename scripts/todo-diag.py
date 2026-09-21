@@ -68,8 +68,9 @@ def emit(code: str, path: str | None, line: int | None, message: str) -> str:
 
 def refusal(code: str, path: str | None, line: int | None,
              message: str) -> dict:
-    """One structured refusal. Same membership rule as emit. Keys ride
-    SCHEMA_KEYS order, so the constant is live: a drifted key fails
+    """One structured refusal. Same membership rule as emit. Keys are
+    exactly SCHEMA_KEYS by membership (order never reaches output:
+    dumps sorts keys), so the constant is live: a drifted key fails
     here (KeyError) or in the suites' literal schema legs."""
     describe(code)
     vals = {"code": code, "path": path, "line": line, "message": message}

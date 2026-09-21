@@ -140,7 +140,7 @@ track: W1
   | `github.com/rizonesoft/RegStudio` | `git subtree add` | `c9b8a0bc51809b2d0805f874919b41f99347ce85` | `extensions/RegStudio` |
 
   ExoSuite was taken from the local checkout because the remote lacked 52 entries; `fffd8b4` is the commit that captured them and is identical in both once pushed.
-- [x] Commit: `"intake: merge the exosuite codebase with its history"` -- landed as `ac97ed7`, with the four follow-on commits named in the items above.
+- [x] Commit: `"intake: merge the ExoSuite codebase with its history"` -- landed as `ac97ed7`, with the four follow-on commits named in the items above.
 
 **Test checkpoint:** The precondition above is resolved and the chosen option is recorded with its date. `git log -- shared/` shows pre-merge commits including `efdce6177` and `09b1f92ab`. `extensions/Console/` and `TODO-ux.md` are present at the merge commit, and so are the ten `shared/exo-ui` files, **checked at these exact paths** because their absence is the failure this section nearly shipped:
 

@@ -36,9 +36,11 @@ Refusals carry stable diagnostic codes from the single registry in
 `scripts/todo-diag.py` (D00 T04 §22): `CODES` maps each code to its exit
 and family, and is the only documented place the list lives (this
 docstring names the registry, never the mapping). `--format json`
-renders refusals as one JSON array of code/path/line/message objects;
-usage errors stay text, since argv did not parse and no format was
-selected.
+renders gate-mode refusals (`--check`, `--write`) as one JSON array
+of code/path/line/message objects (green prints `[]`); the default
+report prints prose with its refusal section as one array mid-stream
+(prose, array, closing count line) when problems stand; usage errors
+stay text, since argv did not parse and no format was selected.
 """
 
 from __future__ import annotations
@@ -1025,6 +1027,31 @@ def _self_test() -> int:
         if code != "exit:2" or "[FIND-001]" not in err:
             print(f"  FAIL  usage fired wrong: {code} {err!r}")
             failed += 1
+        # Single dash refuses as usage (D00 T04 §24 item 22 pins the
+        # sibling side, so the runs fix cannot invert the asymmetry).
+        code, _, err = _run_main(["-check"])
+        if code != "exit:2" or "[FIND-001]" not in err:
+            print(f"  FAIL  single-dash usage fired wrong: {code} {err!r}")
+            failed += 1
+        # Report-mode --format json interleaves (D00 T04 §24 item 23):
+        # prose, one refusal array, closing count line. The corpus
+        # carries one clean and one unreadable heading here.
+        import json
+        code, out, _ = _run_main(["--format", "json"])
+        head_at = out.find("finding(s) across")
+        open_at = out.find("[")
+        close_at = out.rfind("]")
+        tail_at = out.find("unreadable")
+        try:
+            inter_doc = json.loads(out[open_at:close_at + 1])
+        except ValueError:
+            inter_doc = None
+        if code != 1 or head_at < 0 \
+                or not (head_at < open_at < close_at < tail_at) \
+                or not isinstance(inter_doc, list) or not inter_doc \
+                or inter_doc[0].get("code") != "FIND-002":
+            print(f"  FAIL  report interleaved wrong: {code} {out!r}")
+            failed += 1
     finally:
         globals()["REVIEWS"], globals()["LEDGER"], globals()["TRANSITIONS"] = \
             saved_globals
@@ -1035,7 +1062,7 @@ def _self_test() -> int:
     import shutil
     shutil.rmtree(mdir, ignore_errors=True)
     tmp.rmdir()
-    print(f"todo-findings self-test: 45 cases, {failed} failed")
+    print(f"todo-findings self-test: 47 cases, {failed} failed")
     return 1 if failed else 0
 
 

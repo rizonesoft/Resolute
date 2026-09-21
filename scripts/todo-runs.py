@@ -28,9 +28,12 @@ Refusals carry stable diagnostic codes from the single registry in
 `scripts/todo-diag.py` (D00 T04 §22): `CODES` maps each code to its exit
 and family, and is the only documented place the list lives (this
 docstring names the registry, never the mapping). `--format json`
-renders refusals as one JSON array of code/path/line/message objects;
-usage errors stay text, since argv did not parse and no format was
-selected.
+renders gate-mode refusals as one JSON array of
+code/path/line/message objects (green prints `[]`); `--report`
+prints prose with no array once the gate passes (problems refuse as
+one array first, like the gate), and `--export` prints the export
+document; usage errors stay text, since argv did not parse and no
+format was selected.
 
 Exit codes: 0 the run file is sound, 1 a refusal fired (an unreadable
 input or a failed cross-check), 2 usage.
@@ -75,6 +78,19 @@ DIAG = _load_diag()
 ROOT = HERE.parent
 DEFAULT_RUNS = ROOT / "docs" / "reviews" / "run-records.md"
 DEFAULT_BANK = ROOT / "docs" / "reviews" / "crossover" / "comparisons.md"
+# Panel sections past the newest banked comparison before the bank reads
+# stale: the mid-window calibration point of a 5-section window (§18
+# standing schedule banks one decision crossover plus one mid-window
+# calibration round per window). Cost of changing: re-pin the fresh and
+# stale bank legs below.
+BANK_STALE_AFTER = 3
+# What each trigger state owes (D00 T04 §24 item 3), pinned verbatim.
+TRIGGER_LEGEND = (
+    'Trigger legend:',
+    '- count met (§23 unblocked, runs on schedule)',
+    '- FIRED or ARMED (file the early revisit now, quoting these lines)',
+    '- quiet (nothing owed)',
+)
 
 RUNNERS = ("codex", "panel")
 EFFORTS = ("high", "medium", "low")
@@ -676,6 +692,7 @@ def leg_lines(runs, findings, bank_path=None):
     comps, bad = _read_bank(bank_path or DEFAULT_BANK)
     if bad is not None:
         lines.append(f"- overlap comparisons banked: {bad}: DORMANT (unmeasured)")
+        lines.append(f"- bank freshness: {bad}: unmeasured")
         return lines
     classes = sorted({c["class"] for c in comps})
     detail = "; ".join(f"{c['class']} Jaccard {c['jaccard']:.2f} "
@@ -697,6 +714,28 @@ def leg_lines(runs, findings, bank_path=None):
         state = "DORMANT (activation needs 2 spanning 2 classes)"
     lines.append(f"- overlap comparisons banked: {len(comps)} spanning "
                  f"{len(classes)} class(es) ({detail}): {state}")
+    if not comps:
+        since = len(panel)
+        head, tail, past = "none banked", "panel sections on record", 1
+        stale = since >= past
+    else:
+        newest = comps[-1]["dir"]
+        newest_date = newest[:10] if DATE_RE.match(newest[:10]) else None
+        if newest_date is None:
+            since = len(panel)
+            head, tail, past = f"{newest} (undated)", "panel sections on record", 1
+            stale = since >= past
+        else:
+            since = sum(1 for run in panel if run.date and run.date > newest_date)
+            head, tail, past = newest, "panel sections since", BANK_STALE_AFTER
+            stale = since >= past
+    if stale:
+        fresh = (f"STALE (calibration owed past {past}) "
+                 "-- file the early revisit (D00 T04 \u00a723 trigger) "
+                 "with these lines quoted")
+    else:
+        fresh = "fresh"
+    lines.append(f"- bank freshness: newest banked {head}; {since} {tail}: {fresh}")
     return lines
 
 
@@ -790,6 +829,8 @@ def report(runs, runs_path, collected=None):
     lines.extend(revisit_lines(runs))
     lines.append("")
     lines.extend(leg_lines(runs, findings))
+    lines.append("")
+    lines.extend(TRIGGER_LEGEND)
     return "\n".join(lines) + "\n"
 
 
@@ -1498,7 +1539,47 @@ refuted: 0
         "- overlap comparisons banked: 1 spanning 1 class(es) "
         "(review-tooling Jaccard 0.00 over union 3): "
         "DORMANT (activation needs 2 spanning 2 classes)",
+        "- bank freshness: newest banked 2026-09-20-s18; 0 panel sections "
+        "since: fresh",
     ], f"{got_quiet}")
+    def _mkdated(section, date):
+        run = _mkrun(section, "panel")
+        run.date = date
+        run.round_lines = []
+        return run
+    fresh_runs = [_mkdated("D00-T04-S40", "2026-09-21"),
+                  _mkdated("D00-T04-S41", "2026-09-22")]
+    got_fresh = leg_lines(fresh_runs, [], bank_one)
+    check("legs-bank-fresh",
+          got_fresh[3] == "- bank freshness: newest banked 2026-09-20-s18; "
+          "2 panel sections since: fresh", f"{got_fresh}")
+    stale_runs = fresh_runs + [_mkdated("D00-T04-S42", "2026-09-23")]
+    got_stale = leg_lines(stale_runs, [], bank_one)
+    check("legs-bank-stale",
+          got_stale[3] == "- bank freshness: newest banked 2026-09-20-s18; "
+          "3 panel sections since: STALE (calibration owed past 3) -- file "
+          "the early revisit (D00 T04 \u00a723 trigger) with these lines quoted",
+          f"{got_stale}")
+    bank_empty = tmp / "leg-bank-empty.md"
+    bank_empty.write_text("# nothing banked yet\n", encoding="utf-8")
+    got_empty = leg_lines(fresh_runs, [], bank_empty)
+    check("legs-bank-empty-stale",
+          got_empty[3] == "- bank freshness: newest banked none banked; "
+          "2 panel sections on record: STALE (calibration owed past 1) -- file "
+          "the early revisit (D00 T04 \u00a723 trigger) with these lines quoted",
+          f"{got_empty}")
+    bank_undated = tmp / "leg-bank-undated.md"
+    bank_undated.write_text("comparison: s99 class: review-tooling "
+                            "jaccard: 0.00 pairs: 0 union: 1\n", encoding="utf-8")
+    got_undated = leg_lines(fresh_runs, [], bank_undated)
+    check("legs-bank-undated-stale",
+          got_undated[3] == "- bank freshness: newest banked s99 (undated); "
+          "2 panel sections on record: STALE (calibration owed past 1) -- file "
+          "the early revisit (D00 T04 \u00a723 trigger) with these lines quoted",
+          f"{got_undated}")
+    legend_out = report([], tmp / "runs22.md", collected=([], [])).splitlines()
+    check("report-legend", legend_out[-4:] == list(TRIGGER_LEGEND),
+          f"{legend_out[-4:]}")
     fired_runs = [
         _mkleg("D00-T04-S31", [{"model": sol, "opportunity": "full-scope",
                                 "findings": []}]),
@@ -1673,6 +1754,12 @@ refuted: 0
         check("exit-green",
               code == 0 and "all resolve, all covered, counts agree" in out,
               f"{code} {out!r}")
+        code, out, _ = _run_main(
+            ["--report", "--format", "json", str(rp)], collected=([f1], []),
+            review_sections={"D00-T99-S9"})
+        check("report-json-prose",
+              code == 0 and "review runs," in out and "[" not in out,
+              f"{code} {out!r}")
         code, _, err = _run_main(["--report", "--export"])
         check("exit-conflict", code == 2 and "[RUN-001]" in err, f"{code} {err!r}")
         code, _, err = _run_main(["--check-export"])
@@ -1702,6 +1789,15 @@ refuted: 0
         code, _, err = _run_main(["--bogus"])
         check("exit-unknown-flag", code == 2 and "[RUN-001]" in err
               and "unknown option" in err, f"{code} {err!r}")
+        code, _, err = _run_main(["-check"])
+        check("exit-single-dash", code == 2 and "[RUN-001]" in err
+              and "unknown option '-check'" in err, f"{code} {err!r}")
+        code, _, err = _run_main(["-bogus"])
+        check("exit-single-dash-bogus", code == 2 and "[RUN-001]" in err
+              and "unknown option '-bogus'" in err, f"{code} {err!r}")
+        code, _, err = _run_main(["--check-export", "-x"])
+        check("exit-export-single-dash", code == 2 and "[RUN-001]" in err
+              and "unknown option '-x'" in err, f"{code} {err!r}")
         code, _, err = _run_main(["a.md", "b.md"])
         check("exit-surplus-positional", code == 2 and "[RUN-001]" in err
               and "at most one" in err, f"{code} {err!r}")
@@ -1766,6 +1862,8 @@ refuted: 0
     bank_one.unlink()
     bank_two.unlink()
     bank_hot.unlink()
+    bank_empty.unlink()
+    bank_undated.unlink()
     other.unlink()
     (tmp / "reviews22" / "99-domain" / "D00-T99-s9.md").unlink()
     (tmp / "reviews22" / "99-domain").rmdir()
@@ -1832,10 +1930,13 @@ def main(argv=None, collected=None, review_sections=None):
     json_mode = fmt == "json"
     if "--check-export" in rest:
         rest = [a for a in rest if a != "--check-export"]
-        if len(rest) != 1 or rest[0].startswith("--"):
+        # Single dash refuses like double (D00 T04 §24 item 22): a
+        # mistyped flag must not parse as a path (RUN-002/RUN-007);
+        # a runs file with a leading dash spells ./-name.
+        if len(rest) != 1 or rest[0].startswith("-"):
             detail = (
                 f"; unknown option {rest[0]!r}"
-                if rest and rest[0].startswith("--")
+                if rest and rest[0].startswith("-")
                 else ""
             )
             print(DIAG.emit("RUN-001", None, None,
@@ -1879,8 +1980,10 @@ def main(argv=None, collected=None, review_sections=None):
               file=sys.stderr)
         return 2
     rest = [a for a in rest if a not in ("--check", "--report", "--export")]
+    # Single dash refuses here too (D00 T04 §24 item 22, like the
+    # --check-export gate above): never a runs path.
     for a in rest:
-        if a.startswith("--"):
+        if a.startswith("-"):
             print(DIAG.emit("RUN-001", None, None,
                             "usage: todo-runs.py [--check] [--report | --export] "
                             f"[runs-file]; unknown option {a!r}"),

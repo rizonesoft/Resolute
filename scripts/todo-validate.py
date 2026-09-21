@@ -12,6 +12,26 @@ import re
 import subprocess
 import sys
 
+_ROLE_PANEL_RE = re.compile(
+    r"^#{2,6}\s+(?:Opus panel|GPT panel)\b", re.IGNORECASE | re.MULTILINE)
+_ROLE_ROUND_SUFFIX_RE = re.compile(r"Round (\d+)\s*$")
+
+
+def parse_panel_rounds(stripped_text: str) -> list[int]:
+    """Claimed round of each panel section in document order (D00 T04
+    §24 item 18): a `Round N` suffix claims N, a bare panel claims
+    its 1-based position. Callers strip fenced code first (shared
+    stripper), so quoted panels never claim. Heading shape mirrors
+    rule 16's panel regexes (levels 2-6, either family)."""
+    heads = list(_ROLE_PANEL_RE.finditer(stripped_text))
+    rounds = []
+    for idx, m in enumerate(heads):
+        eol = stripped_text.find("\n", m.start())
+        line = stripped_text[m.start():] if eol < 0 else stripped_text[m.start():eol]
+        sm = _ROLE_ROUND_SUFFIX_RE.search(line)
+        rounds.append(int(sm.group(1)) if sm else idx + 1)
+    return rounds
+
 
 def validate(graph, _args) -> int:
     todos = graph.load_todos()
@@ -104,10 +124,13 @@ def validate(graph, _args) -> int:
     header_re = re.compile(r"#{1,6}(?:\s|$)")
     word_re = re.compile(r"[a-z0-9]+")
     commit_quote_re = re.compile(r"""^commit:\s*`"(?P<msg>[^"]+)"`""", re.IGNORECASE)
-    # Commit-subject cache for the history binding: repo root -> subjects,
-    # None when git cannot read them. Keyed by root because the self-test
-    # rebinds TODO_DIR between trees within one process.
-    history_cache: dict[str, list[str] | None] = {}
+    # Commit-history cache for the OID binding: repo root -> [(oid,
+    # subject)], None when git cannot read them. Keyed by root because
+    # the self-test rebinds TODO_DIR between trees within one process.
+    # Ancestry and file-touch verdicts cache per (root, oid) beside it.
+    history_cache: dict[str, list[tuple[str, str]] | None] = {}
+    ancestry_cache: dict[tuple[str, str], bool] = {}
+    touch_cache: dict[tuple[str, str, str], bool] = {}
 
     def _span_file(path: str) -> list[str] | None:
         if path not in span_cache:
@@ -187,22 +210,74 @@ def validate(graph, _args) -> int:
         lines, first = _span_slice(raw, sec_line)
         return lines, first
 
-    def commit_subjects() -> list[str] | None:
-        """One `git log` per tree: the subjects a `Commit:` line may bind to."""
+    def commit_bindings() -> list[tuple[str, str]] | None:
+        """One `git log` per tree: the (oid, subject) pairs a `Commit:`
+        line may bind to. Subjects resolve; OIDs verify."""
         root = str(graph.TODO_DIR.parent)
         if root not in history_cache:
             try:
                 proc = subprocess.run(
-                    ["git", "log", "--format=%s"], cwd=root,
-                    capture_output=True, text=True, timeout=60,
+                    ["git", "log", "--all", "--format=%H %s"], cwd=root,
+                    capture_output=True, text=True, encoding="utf-8",
+                    timeout=60,
                 )
             except (OSError, subprocess.SubprocessError):
                 proc = None
-            history_cache[root] = (
-                proc.stdout.splitlines() if proc is not None and proc.returncode == 0
-                else None
-            )
+            pairs: list[tuple[str, str]] | None = None
+            if proc is not None and proc.returncode == 0:
+                pairs = []
+                for line in proc.stdout.splitlines():
+                    oid, _, subject = line.partition(" ")
+                    if oid and subject:
+                        pairs.append((oid, subject))
+            history_cache[root] = pairs
         return history_cache[root]
+
+    def _in_ancestry(oid: str) -> bool:
+        """Whether the oid sits in HEAD's ancestry (not a side branch)."""
+        root = str(graph.TODO_DIR.parent)
+        key = (root, oid)
+        if key not in ancestry_cache:
+            try:
+                proc = subprocess.run(
+                    ["git", "merge-base", "--is-ancestor", oid, "HEAD"],
+                    cwd=root, capture_output=True, timeout=60,
+                )
+                ancestry_cache[key] = proc.returncode == 0
+            except (OSError, subprocess.SubprocessError):
+                ancestry_cache[key] = False
+        return ancestry_cache[key]
+
+    def _touches_file(oid: str, path: str) -> bool:
+        """Whether the commit's diff touches the section's TODO file:
+        the section-identity half of the binding. `-m` keeps merges
+        honest (a bare `show` prints no files for a merge); `--root`
+        keeps root commits honest (`-m` diffs against parents, of
+        which a root has none, so without it a root touches nothing)."""
+        root = str(graph.TODO_DIR.parent)
+        key = (root, oid, path)
+        want = path
+        probe = Path(path)
+        if probe.is_absolute():
+            try:
+                want = probe.relative_to(root).as_posix()
+            except ValueError:
+                return False  # Outside this tree: no commit in it touches it.
+        if key not in touch_cache:
+            try:
+                proc = subprocess.run(
+                    ["git", "diff-tree", "--no-commit-id", "--name-only",
+                     "-r", "-m", "--root", oid],
+                    cwd=root, capture_output=True, text=True,
+                    encoding="utf-8", timeout=60,
+                )
+                touch_cache[key] = (
+                    proc.returncode == 0
+                    and want in proc.stdout.splitlines()
+                )
+            except (OSError, subprocess.SubprocessError):
+                touch_cache[key] = False
+        return touch_cache[key]
 
     def _contains_seq(hay: list[str], needle: list[str]) -> bool:
         """Whether the needle words appear in the hay words in order, consecutively."""
@@ -251,14 +326,22 @@ def validate(graph, _args) -> int:
             quote = commit_quote_re.match(text)
             if quote is None:
                 return ("commit-unquoted", "")
-            subjects = commit_subjects()
-            if subjects is None:
+            bindings = commit_bindings()
+            if bindings is None:
                 return ("commit-unverified", "")
             msg = quote.group("msg")
-            bound = next((s for s in subjects if s == msg or s.startswith(msg)), None)
-            if bound is None:
+            matches = [(o, s) for o, s in bindings
+                       if s == msg or s.startswith(msg)]
+            in_history = [(o, s) for o, s in matches if _in_ancestry(o)]
+            if not in_history:
                 return ("commit-unbound", msg)
-            return ("commit-bound", bound)
+            if len(in_history) > 1:
+                return ("commit-ambiguous",
+                        f"{msg} matches {len(in_history)} commits")
+            oid = in_history[0][0]
+            if not _touches_file(oid, todo.path):
+                return ("commit-foreign", oid)
+            return ("commit-bound", oid)
         if not text.startswith("~~"):
             return ("plain-open", "")
         if not deferred_mark_re.search(text):
@@ -346,23 +429,50 @@ def validate(graph, _args) -> int:
                 # deferring section. The proof lands owner-side because
                 # the deferring checklist is stamped and uneditable; an
                 # open-owner requirement would FATAL it the day the
-                # owner ships, with no legal fix.
-                proof = tspan is not None and any(
-                    (sm := graph.STAMP_RE.match(tln)) is not None
+                # owner ships, with no legal fix. The proof names the
+                # item (D00 T04 §24 item 6): a section-only proof cannot
+                # disambiguate multiple deferred items from one
+                # deferrer. The cited item matches the deferral's item
+                # verbatim after stripping: identity, not containment --
+                # a reference names its debt exactly, the way the OID
+                # binding names its commit.
+                cited = [
+                    tln for tln in (tspan or [])
+                    if (sm := graph.STAMP_RE.match(tln)) is not None
                     and sm.group("kind") == "Resolved"
                     and any(
                         graph.resolve_ref(m.group("ref"), target, by_key)
                         == (todo.id, s_num)
                         for m in graph.DEFER_REF_RE.finditer(tln)
                     )
-                    for tln in tspan
-                )
+                ]
+                proof_items = [
+                    m.group("item").strip()
+                    for tln in cited
+                    if (m := graph.DEFER_ITEM_RE.search(tln)) is not None
+                ]
+                proof = want in proof_items
                 if not proof:
-                    problems.append(
-                        f"owner {r[0]} §{r[1]} has shipped without recording "
-                        f"the debt done (no '> **Resolved:**' citing {todo.id} "
-                        f"§{s_num})"
-                    )
+                    if not cited:
+                        problems.append(
+                            f"owner {r[0]} §{r[1]} has shipped without recording "
+                            f"the debt done for ({want[:60]!r}) (no "
+                            f"'> **Resolved:**' citing {todo.id} §{s_num} "
+                            f"with (item: ...))"
+                        )
+                    elif not proof_items:
+                        problems.append(
+                            f"owner {r[0]} §{r[1]} has shipped without recording "
+                            f"the debt done for ({want[:60]!r}) (its "
+                            f"'> **Resolved:**' citing {todo.id} §{s_num} "
+                            f"names no item (no '(item: ...)' on its Resolved line))"
+                        )
+                    else:
+                        problems.append(
+                            f"owner {r[0]} §{r[1]} has shipped without recording "
+                            f"the debt done for ({want[:60]!r}) (its proof "
+                            f"cites ({proof_items[0][:60]!r}), not the deferred item)"
+                        )
                 elif item_ok:
                     acks.append(f"{r[0]} §{r[1]} carries {want[:60]!r}, "
                                 "shipped with proof")
@@ -381,7 +491,13 @@ def validate(graph, _args) -> int:
         item = f"{path}:{lineno}: {st[:100]}"
         if code == "commit-bound":
             counts["commit"] += 1
-            return ("EXEMPT Commit", item, f"bound to {payload!r}")
+            return ("EXEMPT Commit", item, f"bound to {payload}")
+        if code == "commit-ambiguous":
+            counts["fail"] += 1
+            return ("FAIL", item, f"ambiguous ({payload})")
+        if code == "commit-foreign":
+            counts["fail"] += 1
+            return ("FAIL", item, f"bound commit {payload} touches no file of this section")
         if code == "commit-unverified":
             counts["unverified"] += 1
             return ("UNVERIFIED Commit", item, "history unreadable")
@@ -470,7 +586,50 @@ def validate(graph, _args) -> int:
         for i, ln in enumerate(span):
             st = ln.strip()
             state = graph.checklist_state(st)
-            if state is None or state:
+            if state is None:
+                continue
+            if state:
+                # Ticked lines stay excused from the open-item rule, but a
+                # ticked Commit line still binds: a shipped claim quoting
+                # thin air is mechanically unverified (D00 T04 §24 item 4).
+                text = st[5:].strip()
+                if not text.lower().startswith("commit:"):
+                    continue
+                code, payload = classify_unchecked(todo, s_num, span, i, text)
+                if code == "commit-bound":
+                    continue
+                if code == "commit-unverified":
+                    # Unreadable history stays silent on ticked lines: a
+                    # shipped claim fails open where an open claim fails
+                    # closed, because hermetic fixture trees have no git
+                    # and must not FATAL the suite that proves this rule.
+                    continue
+                if code == "commit-unquoted":
+                    flag(
+                        "partial-flip-shipped",
+                        f"{where} is [x] but carries a ticked Commit line with no "
+                        f"quoted subject: {text[:100]!r} -- quote the committed subject",
+                    )
+                elif code == "commit-ambiguous":
+                    flag(
+                        "partial-flip-shipped",
+                        f"{where} is [x] but carries a ticked Commit line matching "
+                        f"several commits: {text[:100]!r} ({payload}) -- quote a "
+                        "longer subject to disambiguate",
+                    )
+                elif code == "commit-foreign":
+                    flag(
+                        "partial-flip-shipped",
+                        f"{where} is [x] but carries a ticked Commit line bound "
+                        f"outside its section: {text[:100]!r} (commit {payload} "
+                        f"touches no file of {todo.id} §{s_num})",
+                    )
+                else:
+                    flag(
+                        "partial-flip-shipped",
+                        f"{where} is [x] but carries a ticked Commit line quoting "
+                        f"thin air: {text[:100]!r} -- quote the committed subject",
+                    )
                 continue
             text = st[5:].strip()
             code, payload = classify_unchecked(todo, s_num, span, i, text)
@@ -493,6 +652,20 @@ def validate(graph, _args) -> int:
                     "partial-flip-shipped",
                     f"{where} is [x] but carries a Commit line bound to no commit: "
                     f"{text[:100]!r} -- quote the committed subject",
+                )
+            elif code == "commit-ambiguous":
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries a Commit line matching "
+                    f"several commits: {text[:100]!r} ({payload}) -- quote a "
+                    "longer subject to disambiguate",
+                )
+            elif code == "commit-foreign":
+                flag(
+                    "partial-flip-shipped",
+                    f"{where} is [x] but carries a Commit line bound outside "
+                    f"its section: {text[:100]!r} (commit {payload} touches no "
+                    f"file of {todo.id} §{s_num})",
                 )
             elif code == "plain-open":
                 flag(
@@ -2062,6 +2235,60 @@ def validate(graph, _args) -> int:
                             f"{t.path}:{s.line}: §{num} Review cites untagged "
                             f"candidate {m.group('oid')}, tag each with (round N)",
                         )
+
+    # 28b. tagged rounds resolve to recorded panel rounds: each
+    # `oid`(round N) names a panel round of the review (D00 T04 §24
+    # item 18, PR15: presence never proved correspondence).
+    # Uniqueness enforced (one round reviews one candidate: two oids
+    # sharing a round fail, and correspondence skips duplicated
+    # rounds so one defect owns one fault); ordering free (tags
+    # resolve by number, line order carries no meaning); findings
+    # absence is rule 16's fault (skip, never double).
+    for t in todos:
+        for num, s in sorted(t.sections.items()):
+            if pre_convention(s, graph.EVIDENCE_CITE_CUTOFF):
+                continue
+            tagged = []
+            for m in graph.REVIEW_OID_RE.finditer(s.review_body or ""):
+                if m.group("tag") is not None:
+                    tagged.append(
+                        (m.group("oid"), int(m.group("tag")[len("(round "):-1])))
+            if not tagged:
+                continue
+            seen: dict[int, list[str]] = {}
+            for oid, rnd in tagged:
+                seen.setdefault(rnd, []).append(oid)
+            for rnd in sorted(seen):
+                if len(seen[rnd]) > 1:
+                    flag(
+                        "review-citation-role-mismatch",
+                        f"{t.path}:{s.line}: §{num} Review tags round {rnd} "
+                        f"on {len(seen[rnd])} candidates "
+                        f"({', '.join(seen[rnd])}), one round reviews one "
+                        "candidate",
+                    )
+            fm = graph.FINDINGS_RE.search(s.review_body or "")
+            if not fm:
+                continue
+            try:
+                ftext = (graph.TODO_DIR.parent / fm.group(1)).read_text(
+                    encoding="utf-8")
+            except OSError:
+                continue
+            stripped, unbalanced = graph.strip_fenced_code(ftext)
+            if unbalanced is not None:
+                continue
+            rounds = parse_panel_rounds(stripped)
+            for oid, rnd in tagged:
+                if len(seen[rnd]) > 1:
+                    continue
+                if rnd not in rounds:
+                    flag(
+                        "review-citation-role-mismatch",
+                        f"{t.path}:{s.line}: §{num} Review tags round {rnd} "
+                        f"on {oid}, matching no recorded panel round "
+                        f"({len(rounds)} recorded)",
+                    )
 
     # The warning BASELINE. A count that only grows is a count nobody reads,
     # and 17 of these have stood for over a week: 15 name STAMPED sections

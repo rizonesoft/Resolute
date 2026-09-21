@@ -162,6 +162,7 @@ If step 2 finds nothing, say so in one line and move on: that is the expected ou
 
 Work the checklist top to bottom. Tick each item as its Done-when becomes true, in the file, as you go: the file is the record of progress, not a form filled in at the end.
 
+- Count discipline: Dones carry per-item test deltas (which legs this item added, which cases it changed), never suite totals: a total typed mid-item goes stale when the next item lands legs, which is how D00 T04 §20 corrected its counts three times in flight. Totals are quoted once, from the commit being created (step 7).
 - Build the cheaper substitute's failure into the work: the checkpoint must be able to catch the wrong thing, so build the test that distinguishes them.
 - Keep the diff to the section. Adjacent wrongness gets filed with `add-todo`, not fixed in passing.
 - UI sections: consume the shared includes named in `**Chrome:**`. A second progress bar, About dialog, or localization loader is a defect, not a shortcut.
@@ -197,6 +198,8 @@ Commit as one section commit with the evidence in the body:
 <checkpoint output, quoted>
 <plan corrections, if any>
 ```
+
+Quote every suite count in the body from the commit being created: re-run the suites at this commit and quote those figures, never figures measured mid-item. Live-green quotes ride the same commit-time discipline: two non-simultaneous measurements never jointly satisfy one checkpoint.
 
 Push the SHIP push. The commit must exist on the remote before the next step, because the independent reviewer reads the commit.
 

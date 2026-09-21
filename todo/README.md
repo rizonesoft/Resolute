@@ -207,7 +207,7 @@ A deferral hands work to another section, and the parser resolves the owner and 
 
 The stale case is fatal because advisory is what lets rot happen. The moment a section ships, any deferral waiting on it turns the build red until someone closes it: so **the section that resolves a deferral is the section that closes it**, which is also the only moment anyone has the information to write the closure line.
 
-A deferral whose owner has *not* shipped is not stale; it is pending, and it stays open silently. Name the `(item: "…")` whenever one exists: without it, closure can only be detected when the whole target section completes, which is much later and much coarser.
+A deferral whose owner has *not* shipped is not stale; it is pending, and it stays open silently. Name the `(item: "…")` always: the contract below makes it required, because without it closure can only be detected when the whole target section completes, which is much later and much coarser.
 
 Write a closure as:
 
@@ -216,6 +216,14 @@ Write a closure as:
 ```
 
 `query deferred` lists open and resolved separately. Staleness is not reported there, because a stale deferral cannot reach that list: `validate` fails first.
+
+### The struck-item deferral contract
+
+A struck checklist item (`- [ ] ~~…~~`) hands its work to an owner section, and three rules make the handoff checkable, all FATAL under the partial-flip family. They diverge from the stamp-line lifecycle's containment on purpose: a stamp line matches by containment, but a deferred item must match word for word, because a containment match would bless a reworded item as the same debt. The reason for the divergence is that the stamp lifecycle answers "is this section's work recorded" while the deferral contract answers "is this exact debt still owed", and only the second question needs the words.
+
+1. The forward `-> XREF:` names the item: `(item: "…")` rides the XREF line (rule: untyped forward, `names no item`; self-test fixture §29). A bare XREF fails: the handoff names no debt.
+2. The owner carries those exact words in order and consecutively, as whole words (rule: item carry, `carries no such item`; self-test fixtures §33 for substring, §35 for reorder). `net` inside `network`, or the same words shuffled, fails: the item was reworded or removed.
+3. A shipped owner records the debt done: `> **Resolved:**` citing the deferrer with `(item: ...)` matching the deferred item verbatim after stripping (rule: shipped proof, `without recording the debt done`; self-test fixtures §23 no-proof, §37/§38 section-only, §39/§40 item-citing pass, §41/§42 wrong-item; passing twin §25/§26 now item-citing). The closure lives in the owner, beside the shipped work, in the shape above.
 
 **Two kinds of rot the validator cannot see**, both owned by `process-todo-section`'s fact-check: a deferral whose *description* has drifted while its owner is still legitimately open, and one whose work was quietly done by someone who never ticked the owning box. Neither is stale by the rule above, so both need a human reading the line against today's repository. Closing the second means ticking the owner's item too; leaving it unticked moves the rot up a level rather than removing it.
 
@@ -426,6 +434,7 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 | `duplicate-source-key` | FATAL | Two sections claim the same `-> SOURCE: <key>`. An automated filer stamps what it filed FROM, so a scanner that runs twice a day cannot open a second row for one build failure. |
 | `evidence-citation-short-form` | FATAL | New evidence cites full `DNN TNN §N` refs on stamps, findings files, and attestations; pre-cutoff records stand as history. |
 | `review-citation-role-less` | FATAL | A multi-commit Review line tags every candidate with its round; round-to-commit mapping must be mechanical. |
+| `review-citation-role-mismatch` | FATAL | A round tag matching no recorded panel round, or two candidates sharing one round; the mapping must correspond, not merely exist. |
 | `superseded-no-successor` | FATAL | A superseded TODO must name where its work went; mechanical. |
 | `filter-overclaim-open` | FATAL | An open checkpoint that cannot detect its promised regression; naming the tests or scripts is a two-minute fix. |
 | `filter-overclaim-stamped` | WARN | The stamp must not be reopened; the fix-forward channel owns it. |
