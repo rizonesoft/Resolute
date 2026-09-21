@@ -719,7 +719,11 @@ def leg_lines(runs, findings, bank_path=None):
         head, tail, past = "none banked", "panel sections on record", 1
         stale = since >= past
     else:
-        newest = comps[-1]["dir"]
+        # Newest by directory, not by list position (panel round 5
+        # F19): a hand-appended out-of-order bank line made the
+        # last-listed entry pose as newest, so `since` under-counted
+        # and the leg read fresh on overdue calibration.
+        newest = max(c["dir"] for c in comps)
         newest_date = newest[:10] if DATE_RE.match(newest[:10]) else None
         if newest_date is None:
             since = len(panel)
@@ -1577,6 +1581,18 @@ refuted: 0
           "2 panel sections on record: STALE (calibration owed past 1) -- file "
           "the early revisit (D00 T04 \u00a723 trigger) with these lines quoted",
           f"{got_undated}")
+    # Newest, not last-listed (panel round 5 F19): the newer entry
+    # leads the bank, so position-based reading would count two
+    # sections since the older tail.
+    bank_ooo = tmp / "leg-bank-ooo.md"
+    bank_ooo.write_text("comparison: 2026-09-21-cal class: plan-record "
+                        "jaccard: 0.40 pairs: 2 union: 5\n"
+                        "comparison: 2026-09-20-s18 class: review-tooling "
+                        "jaccard: 0.00 pairs: 0 union: 3\n", encoding="utf-8")
+    got_ooo = leg_lines(fresh_runs, [], bank_ooo)
+    check("legs-bank-newest-not-last",
+          got_ooo[3] == "- bank freshness: newest banked 2026-09-21-cal; "
+          "1 panel sections since: fresh", f"{got_ooo}")
     legend_out = report([], tmp / "runs22.md", collected=([], [])).splitlines()
     check("report-legend", legend_out[-4:] == list(TRIGGER_LEGEND),
           f"{legend_out[-4:]}")
@@ -1864,6 +1880,7 @@ refuted: 0
     bank_hot.unlink()
     bank_empty.unlink()
     bank_undated.unlink()
+    bank_ooo.unlink()
     other.unlink()
     (tmp / "reviews22" / "99-domain" / "D00-T99-s9.md").unlink()
     (tmp / "reviews22" / "99-domain").rmdir()

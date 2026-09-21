@@ -1454,25 +1454,25 @@ def _consume_subseq(pool: list[str], part: list[str]) -> bool:
     return True
 
 
-# Declared commits past this count refuse before matching (panel
-# round 2 F9): the order leg tries distinct permutations, so an
-# unbounded declaration is a factorial hang in attacker-controlled
-# manifest size. Six bounds the search at 720 orders; assemblies are
-# hand-picks of a few commits (three is the largest observed), and a
-# bigger shape fences as a range instead of declaring.
-_SEQ_MAX_COMMITS = 6
+# Orders tried per file before the search exhausts (panel round 5
+# F18): declaration-first plus a full 6! sweep. A count cap sits at
+# live size (this review fences six) and its range advice fails
+# voided spans; a work cap bounds the factorial DoS at a constant
+# 721 orders per file while declaration-ordered chunks of any size
+# verify on the first try.
+_SEQ_MAX_ORDERS = 721
 
 
-def _seq_partitioned(chunk: list[str], parts: list[list[str]]) -> bool:
+def _seq_partitioned(chunk: list[str], parts: list[list[str]]) -> bool | None:
     """Whether the chunk sequence partitions into the commit sequences
     as diminishing subsequences (D00 T04 §24 item 10, round-2 A/F13:
-    sequence, not membership). Each commit's lines match in order,
-    each chunk line consumed once; commit order is free (declaration
-    order tries first, then distinct permutations), so any
-    concatenation passes, an interleaved-but-ordered chunk passes,
-    and a rearranged chunk fails. Identical orders try once.
-    Windows are small (a section ships one commit; ranges span a
-    handful), so permutation search stays trivial."""
+    sequence, not membership), or None when the order search
+    exhausts. Each commit's lines match in order, each chunk line
+    consumed once; commit order is free (declaration order tries
+    first, then distinct permutations, identical orders once), so
+    any concatenation passes, an interleaved-but-ordered chunk
+    passes, and a rearranged chunk fails. Past `_SEQ_MAX_ORDERS`
+    distinct attempts the answer is unknown, not rearranged."""
     import itertools
     parts = [p for p in parts if p]
     if sum(map(len, parts)) != len(chunk):
@@ -1480,11 +1480,15 @@ def _seq_partitioned(chunk: list[str], parts: list[list[str]]) -> bool:
     if not parts:
         return True
     seen: set[tuple[tuple[str, ...], ...]] = set()
+    tried = 0
     for order in itertools.permutations(parts):
         key = tuple(tuple(p) for p in order)
         if key in seen:
             continue
         seen.add(key)
+        tried += 1
+        if tried > _SEQ_MAX_ORDERS:
+            return None
         remaining = list(chunk)
         if all(_consume_subseq(remaining, part) for part in order):
             return True
@@ -1514,16 +1518,12 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
     while a rearranged chunk fails (D00 T04 §24 item 10, round-2
     A/F13). The multiset legs run first, so a coverage gap reports as
     coverage; the order leg fires only on a fully covered file.
-    Declarations past `_SEQ_MAX_COMMITS` refuse before matching: the
-    order leg's permutation search is factorial in declaration size,
-    so an unbounded claim hangs the gate (panel round 2 F9)."""
+    The order search tries declaration order first, then distinct
+    permutations up to `_SEQ_MAX_ORDERS` per file: past the budget
+    the file reports exhausted rather than rearranged, since an
+    untried order may still tile it (panel round 5 F18)."""
     from collections import Counter
     failures: list[str] = []
-    if len(commits) > _SEQ_MAX_COMMITS:
-        return [f"{len(commits)} declared commits exceed the "
-                f"{_SEQ_MAX_COMMITS}-commit permutation bound "
-                f"({_SEQ_MAX_COMMITS}! orders); "
-                "fence the range instead of declaring"]
     chunk: dict[str, Counter[str]] = {}
     chunk_signals: dict[str, Counter[str]] = {}
     patches: dict[str, str] = {}
@@ -1610,16 +1610,30 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
                 commit_signal_seq.setdefault(oid, {}).setdefault(
                     path, []).append(line)
         for path in sorted(set(chunk_change_seq) | set(chunk_signal_seq)):
-            if not _seq_partitioned(chunk_change_seq.get(path, []),
-                                    [commit_change_seq.get(o, {}).get(path, [])
-                                     for o in commits]):
+            parted = _seq_partitioned(
+                chunk_change_seq.get(path, []),
+                [commit_change_seq.get(o, {}).get(path, [])
+                 for o in commits])
+            if parted is None:
+                failures.append(
+                    f"chunk content in {path} is unverified: order search "
+                    f"exhausted past {_SEQ_MAX_ORDERS} attempts; concatenate "
+                    "shows in declaration order, or narrow the declaration")
+            elif not parted:
                 failures.append(
                     f"chunk content in {path} is rearranged: the declared "
                     "commits' change lines match only as multisets, not "
                     "as diminishing subsequences")
-            if not _seq_partitioned(chunk_signal_seq.get(path, []),
-                                    [commit_signal_seq.get(o, {}).get(path, [])
-                                     for o in commits]):
+            mparted = _seq_partitioned(
+                chunk_signal_seq.get(path, []),
+                [commit_signal_seq.get(o, {}).get(path, [])
+                 for o in commits])
+            if mparted is None:
+                failures.append(
+                    f"chunk markers in {path} are unverified: order search "
+                    f"exhausted past {_SEQ_MAX_ORDERS} attempts; concatenate "
+                    "shows in declaration order, or narrow the declaration")
+            elif not mparted:
                 failures.append(
                     f"chunk markers in {path} are rearranged: the declared "
                     "commits' marker lines match only as multisets, not "
@@ -3227,16 +3241,66 @@ def _self_test() -> int:
               and unres[0] == "declared commit " + "0" * 40 + " resolves to nothing"
               and "unclaimed" in unres[1] and "f.md" in unres[1],
               str(unres))
-        # Permutation bound (panel round 2 F9): seven declared oids
-        # refuse before matching (fake oids prove the bound fires
-        # first), so no manifest can hang the gate factorially.
-        capped = check_commits_covered(["0" * 40] * 7, ttag, fenced_full,
-                                       cwd=tmpd)
-        check("commits-bound-refuses",
-              len(capped) == 1 and "7 declared commits" in capped[0]
-              and "6-commit permutation bound" in capped[0]
-              and "fence the range instead" in capped[0],
-              str(capped))
+        # Attempt cap, not count cap (panel round 5 F18: the F9
+        # count cap sat at the live assembly size, so seven declared
+        # oids refused legitimate work): seven commits in declaration
+        # order verify on the first try whatever N is, six in any
+        # order still verify (full 6! sweep within budget), and a
+        # seven no tried order tiles reports exhausted rather than
+        # rearranged. Two lines per commit: single-line parts tile
+        # under every order, so only intra-commit disorder can
+        # exhaust the search.
+        sev_oids = []
+        for n in range(1, 8):
+            with open(os.path.join(tmpd, "seven.md"),
+                      "a" if n > 1 else "w", encoding="utf-8") as fh:
+                fh.write(f"seven-{n}-a\nseven-{n}-b\n")
+            if n == 1:
+                _git("add", "seven.md")
+                _git("commit", "-qm", "seven1")
+            else:
+                _git("commit", "-qam", f"seven{n}")
+            sev_oids.append(_git("rev-parse", "HEAD").stdout.strip())
+        sev_shows = [subprocess.run(
+            ["git", "--no-replace-objects", "show", "--format=", o],
+            cwd=tmpd, capture_output=True, check=True,
+            text=True).stdout for o in sev_oids]
+
+        def _sevfenced(chunk):
+            etag, enonce, ebody = fence_chunks_checked(
+                "PANEL", [("CANDIDATE DIFF", chunk)])
+            ecline, _ = build_manifest(
+                etag, [("CANDIDATE DIFF", chunk)], sev_oids[0],
+                sev_oids[-1], nonce=enonce, commits=sev_oids)
+            return etag, f"TAG {etag} nonce={enonce}\n{ecline}\n{ebody}"
+
+        vtag, vfenced = _sevfenced("".join(sev_shows))
+        check("commits-seven-in-order-passes",
+              check_commits_covered(sev_oids, vtag, vfenced,
+                                    cwd=tmpd) == [])
+        scrambled = "".join(reversed(sev_shows)).replace(
+            "+seven-4-a\n+seven-4-b\n", "+seven-4-b\n+seven-4-a\n", 1)
+        rtag, rfenced = _sevfenced(scrambled)
+        got_rev = check_commits_covered(sev_oids, rtag, rfenced, cwd=tmpd)
+        check("commits-disordered-exhausts",
+              len(got_rev) == 1
+              and "order search exhausted past 721 attempts" in got_rev[0]
+              and "concatenate shows in declaration order" in got_rev[0],
+              str(got_rev))
+        six = sev_oids[:6]
+        six_shows = sev_shows[:6]
+
+        def _sevfenced6(chunk):
+            etag, enonce, ebody = fence_chunks_checked(
+                "PANEL", [("CANDIDATE DIFF", chunk)])
+            ecline, _ = build_manifest(
+                etag, [("CANDIDATE DIFF", chunk)], six[0], six[-1],
+                nonce=enonce, commits=six)
+            return etag, f"TAG {etag} nonce={enonce}\n{ecline}\n{ebody}"
+
+        xtag, xfenced = _sevfenced6("".join(reversed(six_shows)))
+        check("commits-six-reversed-passes",
+              check_commits_covered(six, xtag, xfenced, cwd=tmpd) == [])
         # The merge legs: a merge head and a mid-range merge refuse;
         # linear, unresolvable, and tree heads fence.
         _git("checkout", "-qb", "side", r1)
@@ -4590,6 +4654,45 @@ def _self_test() -> int:
               and "transcripts pass 2/2" in gotplv.stdout,
               f"emit={gotpl.returncode} exit={gotplv.returncode} "
               f"out={gotplv.stdout!r} err={gotplv.stderr!r}")
+        # Witnessed shapes (panel round 5 F21): the holding patterns
+        # duplicate checker reason strings, so these legs pipe real
+        # checker stdout into the transcripts -- if a reason drifts,
+        # the witnessed transcript drifts with it and the pattern
+        # fails, instead of every suite staying green.
+        bplan = subprocess.run(
+            [sys.executable, __file__, "check-plan"],
+            input="- alpha\n- beta\n", capture_output=True, cwd=tmpd,
+            text=True)
+        wplanf = _bwrite("b-wplan-transcript.txt", bplan.stdout)
+        wplanb = os.path.join(tmpd, "wplantrans.bundle.zip")
+        gotwp = _bd(*_bargs(wplanb,
+                             "https://example.invalid/canonical.git", r3)
+                     + ("--checker-transcript", wplanf))
+        gotwpv = _bv(wplanb)
+        check("bundle-plan-transcript-witnessed",
+              bplan.returncode == 0 and gotwp.returncode == 0
+              and gotwpv.returncode == 0
+              and "transcripts pass 2/2" in gotwpv.stdout,
+              f"checker={bplan.returncode} emit={gotwp.returncode} "
+              f"exit={gotwpv.returncode} out={gotwpv.stdout!r} "
+              f"err={gotwpv.stderr!r}")
+        bstamp = subprocess.run(
+            [sys.executable, __file__, "check-stamp"],
+            input="STAMP HOLDS.\n", capture_output=True, cwd=tmpd,
+            text=True)
+        wstampf = _bwrite("b-wstamp-transcript.txt", bstamp.stdout)
+        wstampb = os.path.join(tmpd, "wstamptrans.bundle.zip")
+        gotws = _bd(*_bargs(wstampb,
+                             "https://example.invalid/canonical.git", r3)
+                     + ("--checker-transcript", wstampf))
+        gotwsv = _bv(wstampb)
+        check("bundle-stamp-transcript-witnessed",
+              bstamp.returncode == 0 and gotws.returncode == 0
+              and gotwsv.returncode == 0
+              and "transcripts pass 2/2" in gotwsv.stdout,
+              f"checker={bstamp.returncode} emit={gotws.returncode} "
+              f"exit={gotwsv.returncode} out={gotwsv.stdout!r} "
+              f"err={gotwsv.stderr!r}")
         gotg = _bv(bout, "--recheck-graph")
         check("bundle-recheck-graph",
               gotg.returncode == 0
