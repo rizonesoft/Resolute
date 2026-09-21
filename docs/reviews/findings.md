@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**286 findings across 37 sections.**
+**308 findings across 38 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 97 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 61 | fails under hostile or unexpected input |
-| `consistency` | 45 | disagrees with the rest of the suite, its naming, or its layout |
+| `record` | 102 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 68 | fails under hostile or unexpected input |
+| `consistency` | 50 | disagrees with the rest of the suite, its naming, or its layout |
 | `correctness` | 40 | the code does the wrong thing |
-| `integration` | 29 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 34 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 140 | wrong behavior in code, plan, or record |
-| `minor` | 140 | polish or wording, or no surviving defect |
+| `major` | 148 | wrong behavior in code, plan, or record |
+| `minor` | 154 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -261,6 +261,28 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §22` | F15 | major | `adversarial` | filed | independent | single-dash tokens parse as paths, not usage |
 | `D00 T04 §22` | F16 | minor | `consistency` | filed | independent | format docstrings miss the report-mode carve-out |
 | `D00 T04 §22` | F17 | minor | `consistency` | filed | independent | refusal docstring overclaims the live mechanism |
+| `D00 T04 §24` | F1 | major | `adversarial` | fixed | independent | attested pair resolves without proving a chain |
+| `D00 T04 §24` | F2 | minor | `adversarial` | refuted | independent | bundle manifest unsigned against consistent rewrite |
+| `D00 T04 §24` | F3 | minor | `consistency` | refuted | independent | OID binding re-resolves instead of pinning persistently |
+| `D00 T04 §24` | F4 | major | `integration` | fixed | independent | item-8 drive missing from the candidate |
+| `D00 T04 §24` | F5 | minor | `record` | fixed | independent | Commit item unchecked across two same-section commits |
+| `D00 T04 §24` | F6 | major | `adversarial` | fixed | independent | legacy skips bypass binding for new stamps |
+| `D00 T04 §24` | F7 | minor | `adversarial` | refuted | independent | carried transcripts not replayed against their inputs |
+| `D00 T04 §24` | F8 | major | `consistency` | fixed | independent | round-suffix case split plus ambiguous recorded duplicates |
+| `D00 T04 §24` | F9 | major | `integration` | fixed | independent | unbounded permutation search hangs the content leg |
+| `D00 T04 §24` | F10 | minor | `integration` | duplicate | independent | OID binding re-resolves instead of pinning persistently |
+| `D00 T04 §24` | F11 | minor | `record` | duplicate | independent | bundle delivered unsigned against a signed title |
+| `D00 T04 §24` | F12 | minor | `record` | refuted | independent | sweep contradiction across the item-11 and item-17 records |
+| `D00 T04 §24` | F13 | minor | `consistency` | fixed | independent | dead post-cutoff cite fails twice for one defect |
+| `D00 T04 §24` | F14 | minor | `record` | fixed | independent | history-silence record names impossible and false consequences |
+| `D00 T04 §24` | F15 | major | `adversarial` | fixed | independent | blocking stamp transcript verifies as a passing record |
+| `D00 T04 §24` | F16 | minor | `consistency` | refuted | independent | history-unreadable class allegedly unregistered and unmirrored |
+| `D00 T04 §24` | F17 | minor | `integration` | filed | independent | oversized assemblies with voided members have no legal path |
+| `D00 T04 §24` | F18 | major | `adversarial` | fixed | independent | count cap sits at the live assembly size |
+| `D00 T04 §24` | F19 | major | `adversarial` | fixed | independent | bank newest reads last-listed, not newest |
+| `D00 T04 §24` | F20 | minor | `consistency` | fixed | independent | in-flight suite total survives in item 12 against item 7 |
+| `D00 T04 §24` | F21 | minor | `integration` | fixed | independent | holding patterns unwitnessed against checker wording |
+| `D00 T04 §24` | F22 | minor | `record` | duplicate | independent | sizing observation stale at the live assembly size |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
