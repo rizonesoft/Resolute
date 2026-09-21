@@ -2098,13 +2098,31 @@ BUNDLE_MAX_MEMBER = 16 * 1024 * 1024
 BUNDLE_MAX_TOTAL = 64 * 1024 * 1024
 BUNDLE_MAX_COUNT = 64
 _BUNDLE_OID_RE = re.compile(r"\A[0-9a-f]{40}\Z")
+# The checkers' holding outputs, and only these (panel round 4 F15):
+# panel's single holding shape, plan's two, stamp's holding-only
+# line. A blocking stamp transcript (`PASS N naming(s) to answer`,
+# exit 0 by the skill's branch-on-reason design) and a forged
+# PASS-led line match none, so neither verifies as a passing
+# record. The three shapes are disjoint, so no role plumbing is
+# needed: a transcript holds iff exactly one pattern matches.
+_BUNDLE_HOLDING_RES = (
+    re.compile(r"\APASS four lenses, one verdict each\Z"),
+    re.compile(r"\APASS (?:explicit no-findings statement"
+               r"|\d+ findings, one per line)\Z"),
+    re.compile(r"\APASS stamp holds\Z"),
+)
+
+
 def _bundle_transcript_ok(raw: bytes) -> bool:
-    """A carried transcript is exactly the checker's successful
-    output: one PASS-led line (self-review fix 6). A transcript with
-    failures plus an injected PASS line is not a passing record,
-    and containing-PASS would report it as one."""
+    """A carried transcript is exactly one holding PASS line: single
+    line matching one checker's holding output (self-review fix 6
+    narrowed to holding shapes by panel round 4 F15). A transcript
+    with failures plus an injected PASS line is not a passing
+    record, a blocking stamp transcript is not a hold, and a
+    forged PASS-led line matches no checker's output."""
     text = raw.decode("utf-8", "replace").strip()
-    return bool(text) and "\n" not in text and text.startswith("PASS ")
+    return (bool(text) and "\n" not in text
+            and any(rx.match(text) for rx in _BUNDLE_HOLDING_RES))
 # The zip floor date: identical inputs emit identical bundle bytes on
 # any machine (no mtime, fixed order and attrs), so the operator's
 # digest quote identifies the bytes, never the emit.
@@ -2239,7 +2257,8 @@ def _bundle_check_bindings(members: dict, roles: dict, doc: dict,
         return "bundle: carried body re-hashes outside the manifest sha"
     for name in roles["transcripts"]:
         if not _bundle_transcript_ok(members[name]):
-            return f"bundle: transcript {name} is not a single PASS line"
+            return (f"bundle: transcript {name} is not a holding "
+                    "PASS line")
     if not isinstance(push.get("remote_url"), str) \
             or not push["remote_url"]:
         return "bundle: push receipt names no remote URL"
@@ -4459,7 +4478,7 @@ def _self_test() -> int:
                      + ("--checker-transcript", bad_trans))
         check("bundle-emit-refuses-transcript",
               gotbt.returncode == 1
-              and "is not a single PASS line" in gotbt.stderr,
+              and "is not a holding PASS line" in gotbt.stderr,
               f"exit={gotbt.returncode} out={gotbt.stdout!r} "
               f"err={gotbt.stderr!r}")
         multi_trans = _bwrite("b-multi-transcript.txt",
@@ -4469,7 +4488,7 @@ def _self_test() -> int:
                      + ("--checker-transcript", multi_trans))
         check("bundle-emit-refuses-injected-pass",
               gotmt.returncode == 1
-              and "is not a single PASS line" in gotmt.stderr,
+              and "is not a holding PASS line" in gotmt.stderr,
               f"exit={gotmt.returncode} out={gotmt.stdout!r} "
               f"err={gotmt.stderr!r}")
         injected = os.path.join(tmpd, "injected.bundle.zip")
@@ -4497,9 +4516,80 @@ def _self_test() -> int:
         gotij = _bv(injected)
         check("bundle-verify-refuses-injected-pass",
               gotij.returncode == 1
-              and "is not a single PASS line" in gotij.stderr,
+              and "is not a holding PASS line" in gotij.stderr,
               f"exit={gotij.returncode} out={gotij.stdout!r} "
               f"err={gotij.stderr!r}")
+        # Holding shapes only (panel round 4 F15): a blocking stamp
+        # transcript (`PASS N naming(s)`, exit 0 by design) and a
+        # forged PASS-led line match no checker's holding output, so
+        # both refuse at emit and fail at verify; the parameterized
+        # plan shape still accepts.
+        def _bswap(out, member, data):
+            zin = zipfile.ZipFile(bout)
+            shape = {n: zin.read(n) for n in zin.namelist()}
+            zin.close()
+            shape[member] = data
+            zout = zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED)
+            for n, b in shape.items():
+                if n == "manifest.json":
+                    sman = json.loads(b.decode("utf-8"))
+                    sman["members"][member] = {
+                        "bytes": len(shape[member]),
+                        "sha256": hashlib.sha256(
+                            shape[member]).hexdigest()}
+                    b = (json.dumps(sman, indent=2, sort_keys=True)
+                         + "\n").encode("utf-8")
+                zout.writestr(n, b)
+            zout.close()
+
+        block_trans = _bwrite("b-block-transcript.txt",
+                              "PASS 2 naming(s) to answer\n")
+        gotbl = _bd(*_bargs(os.path.join(tmpd, "blocktrans.zip"),
+                             "https://example.invalid/canonical.git", r3)
+                     + ("--checker-transcript", block_trans))
+        check("bundle-emit-refuses-blocking-stamp",
+              gotbl.returncode == 1
+              and "is not a holding PASS line" in gotbl.stderr,
+              f"exit={gotbl.returncode} out={gotbl.stdout!r} "
+              f"err={gotbl.stderr!r}")
+        blocked = os.path.join(tmpd, "blocked.bundle.zip")
+        _bswap(blocked, "transcript-1.txt",
+               b"PASS 2 naming(s) to answer\n")
+        gotbv = _bv(blocked)
+        check("bundle-verify-refuses-blocking-stamp",
+              gotbv.returncode == 1
+              and "is not a holding PASS line" in gotbv.stderr,
+              f"exit={gotbv.returncode} out={gotbv.stdout!r} "
+              f"err={gotbv.stderr!r}")
+        forged_trans = _bwrite("b-forged-transcript.txt", "PASS forged\n")
+        gotfg = _bd(*_bargs(os.path.join(tmpd, "forgedtrans.zip"),
+                             "https://example.invalid/canonical.git", r3)
+                     + ("--checker-transcript", forged_trans))
+        check("bundle-emit-refuses-forged-pass",
+              gotfg.returncode == 1
+              and "is not a holding PASS line" in gotfg.stderr,
+              f"exit={gotfg.returncode} out={gotfg.stdout!r} "
+              f"err={gotfg.stderr!r}")
+        forged = os.path.join(tmpd, "forged.bundle.zip")
+        _bswap(forged, "transcript-1.txt", b"PASS forged\n")
+        gotfgv = _bv(forged)
+        check("bundle-verify-refuses-forged-pass",
+              gotfgv.returncode == 1
+              and "is not a holding PASS line" in gotfgv.stderr,
+              f"exit={gotfgv.returncode} out={gotfgv.stdout!r} "
+              f"err={gotfgv.stderr!r}")
+        plan_trans = _bwrite("b-plan-transcript.txt",
+                             "PASS 24 findings, one per line\n")
+        planb = os.path.join(tmpd, "plantrans.bundle.zip")
+        gotpl = _bd(*_bargs(planb,
+                             "https://example.invalid/canonical.git", r3)
+                     + ("--checker-transcript", plan_trans))
+        gotplv = _bv(planb)
+        check("bundle-plan-transcript-accepts",
+              gotpl.returncode == 0 and gotplv.returncode == 0
+              and "transcripts pass 2/2" in gotplv.stdout,
+              f"emit={gotpl.returncode} exit={gotplv.returncode} "
+              f"out={gotplv.stdout!r} err={gotplv.stderr!r}")
         gotg = _bv(bout, "--recheck-graph")
         check("bundle-recheck-graph",
               gotg.returncode == 0
@@ -5178,7 +5268,7 @@ if __name__ == "__main__":
 
         for tpath in transcripts:
             if not _bundle_transcript_ok(_bread(tpath)):
-                print(f"bundle: transcript {tpath} is not a single PASS line",
+                print(f"bundle: transcript {tpath} is not a holding PASS line",
                       file=sys.stderr)
                 sys.exit(1)
         members = {"manifest.md": _bread(want["--manifest"]),
