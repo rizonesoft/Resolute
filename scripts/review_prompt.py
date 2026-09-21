@@ -1313,6 +1313,11 @@ def check_stamp_anchors(todo_path: str, section: int, cwd=None) -> list[str]:
                         f"{where}: cites dead lines {path}:{first}"
                         f"{('-' + str(last)) if last != first else ''} "
                         f"(file has {total})")
+                    # One defect owns one fault (panel round 3 F13):
+                    # content verdicts stay silent on a dead span, so
+                    # a dead post-cutoff cite fails once (dead lines),
+                    # never twice (plus content-unbound or malformed).
+                    continue
                 want = pm.group("hash")
                 if want is not None:
                     if not re.fullmatch(r"[0-9a-f]{12}", want):
@@ -4237,6 +4242,21 @@ def _self_test() -> int:
         got_unatto = check_stamp_anchors(u18o, 1, cwd=tmpd)
         check("anchors-unattested-legacy-skips", got_unatto == [],
               str(got_unatto))
+        # One defect owns one fault (panel round 3 F13): a dead
+        # post-cutoff span fails dead-lines once, with the
+        # content-unbound and malformed verdicts staying silent.
+        d18 = os.path.join(tmpd, "TODO-99-citedead.md")
+        _cite_todo_day(d18, "todo/README.md:999999", "2026-09-22")
+        got_dead = check_stamp_anchors(d18, 1)
+        check("anchors-dead-skips-unbound",
+              len(got_dead) == 1 and "cites dead lines" in got_dead[0],
+              str(got_dead))
+        d18m = os.path.join(tmpd, "TODO-99-citedeadm.md")
+        _cite_todo_day(d18m, "todo/README.md:999999#xyz", "2026-09-22")
+        got_deadm = check_stamp_anchors(d18m, 1)
+        check("anchors-dead-skips-malformed",
+              len(got_deadm) == 1 and "cites dead lines" in got_deadm[0],
+              str(got_deadm))
         # The portable review bundle (D00 T04 §24 item 20, PR20): one
         # command packs the sign-off round's artifacts with the tool
         # record, candidate graph, push receipt, and verification

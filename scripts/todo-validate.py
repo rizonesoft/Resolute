@@ -612,10 +612,16 @@ def validate(graph, _args) -> int:
                 if code == "commit-unverified":
                     if _history_soft():
                         # Silence only where verification is
-                        # impossible (no git binary, no .git):
-                        # hermetic fixture trees must not FATAL the
-                        # suite that proves this rule. A repo whose
-                        # history git cannot read fails closed.
+                        # impossible (no git binary, no .git): a
+                        # shipped claim in a gitless tree is
+                        # unverifiable, not unverified, and warning
+                        # there trains readers to skip the channel
+                        # (panel round 3 F14: the old comment named
+                        # an impossible FATAL on this WARN path).
+                        # An open claim still warns in soft cases:
+                        # its unverified state is live, not shipped.
+                        # A repo whose history git cannot read warns
+                        # below, like an open claim.
                         continue
                     flag(
                         "commit-history-unreadable",
