@@ -1095,10 +1095,11 @@ def check_review_membership(att_ref: str, att_where: str,
     fix-loop round oids pass as ancestors); when the attestation
     declares an assembly, each must equal a declared member instead
     (a voided span commit is ancestral but unreviewed). The attested
-    pair, tree, and declaration re-resolve against git first, so a
-    forged attestation fails naming itself. A named-but-unreadable
-    attestation fails closed. The first `Attestation:` line wins;
-    callers skip the test when none exists (legacy stamps)."""
+    pair, tree, and declaration re-resolve against git first (plus
+    base-ancestral-to-head coherence), so a forged attestation fails
+    naming itself. A named-but-unreadable attestation fails closed.
+    The first `Attestation:` line wins; callers skip the test when
+    none exists (legacy stamps)."""
     import os
     failures: list[str] = []
     path = att_ref if os.path.isabs(att_ref) else os.path.join(cwd or ".",
@@ -1134,6 +1135,20 @@ def check_review_membership(att_ref: str, att_where: str,
         return [f"{att_where}: attestation {att_ref} binds tree "
                 f"{doc['tree'][:12]}..., head re-resolves "
                 f"{(now_tree or '?')[:12]}..."]
+    # Pair coherence (panel round 1 F1): resolving endpoints are not
+    # enough -- a forged pair of arbitrary real commits must also be
+    # a chain, or membership judges oids against a head the base never
+    # reaches. Binding the pair to the review's manifest is refused in
+    # place: the session supplies every input including the manifest,
+    # so the binding is vacuous, and the no-Attestation skip means a
+    # forgery never needs a forged attestation at all.
+    coherent, why = git_is_ancestor(base, head, cwd=cwd)
+    if coherent is None:
+        return [f"{att_where}: attestation {att_ref} pair ancestry "
+                f"untestable: {why}"]
+    if not coherent:
+        return [f"{att_where}: attestation {att_ref} pair incoherent: "
+                f"base {base[:12]}... not ancestral to head {head[:12]}..."]
     declared = doc.get("commits")
     if declared:
         triple_failures, _full = check_declaration_within_pair(
@@ -3976,10 +3991,12 @@ def _self_test() -> int:
         # ancestry (declared-equal for assemblies). Shorts like real
         # stamps; the stranger (uC, a live descendant) resolves yet
         # fails; the undeclared span member fails the assembly.
-        def _anch16_att(path, commits=None, head=None, tree=None):
+        def _anch16_att(path, commits=None, head=None, tree=None,
+                        base=None):
             with open(path, "w", encoding="utf-8") as fh:
                 fh.write(write_attestation_v2(
-                    manifest_sha="a" * 64, candidate_base=r1,
+                    manifest_sha="a" * 64,
+                    candidate_base=r1 if base is None else base,
                     candidate_head=r3 if head is None else head,
                     tree=rtree if tree is None else tree,
                     reviewer="codex-panel",
@@ -4052,6 +4069,19 @@ def _self_test() -> int:
         check("anchors-attestation-forged-declaration",
               len(got_h) == 1 and "declaration fails" in got_h[0],
               str(got_h))
+        # Pair coherence (panel round 1 F1): swapped real endpoints
+        # resolve and the head's real tree matches, yet the pair is no
+        # chain -- membership must fail naming the incoherence.
+        r1tree = _git("rev-parse", f"{r1}^{{tree}}").stdout.strip()
+        i16 = os.path.join(tmpd, "anch16i.attest.json")
+        _anch16_att(i16, base=r3, head=r1, tree=r1tree)
+        w16 = os.path.join(tmpd, "TODO-99-anch16i.md")
+        _anch16_todo(w16, [r1[:7]], i16)
+        got_i = check_stamp_anchors(w16, 1, cwd=tmpd)
+        check("anchors-attestation-incoherent-pair",
+              len(got_i) == 1 and "pair incoherent" in got_i[0]
+              and r3[:12] in got_i[0] and r1[:12] in got_i[0],
+              str(got_i))
         # Content-bound cites (D00 T04 §24 item 17, PR11): a path:line
         # cite carrying #hash12 must match the lines' current text.
         # Tracked repo files only (tmpd cites read non-repo from the
