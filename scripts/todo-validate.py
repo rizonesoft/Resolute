@@ -14,7 +14,9 @@ import sys
 
 _ROLE_PANEL_RE = re.compile(
     r"^#{2,6}\s+(?:Opus panel|GPT panel)\b", re.IGNORECASE | re.MULTILINE)
-_ROLE_ROUND_SUFFIX_RE = re.compile(r"Round (\d+)\s*$")
+# Case-insensitive like the heading it suffixes (panel round 2 F8):
+# `## OPUS PANEL ROUND 2` claims round 2, never its position.
+_ROLE_ROUND_SUFFIX_RE = re.compile(r"Round (\d+)\s*$", re.IGNORECASE)
 
 
 def parse_panel_rounds(stripped_text: str) -> list[int]:
@@ -2256,11 +2258,13 @@ def validate(graph, _args) -> int:
     # 28b. tagged rounds resolve to recorded panel rounds: each
     # `oid`(round N) names a panel round of the review (D00 T04 §24
     # item 18, PR15: presence never proved correspondence).
-    # Uniqueness enforced (one round reviews one candidate: two oids
-    # sharing a round fail, and correspondence skips duplicated
-    # rounds so one defect owns one fault); ordering free (tags
-    # resolve by number, line order carries no meaning); findings
-    # absence is rule 16's fault (skip, never double).
+    # Uniqueness enforced both sides (one round reviews one
+    # candidate: two oids sharing a round fail; two headings
+    # claiming one round fail, panel round 2 F8 -- and
+    # correspondence skips duplicated rounds so one defect owns one
+    # fault); ordering free (tags resolve by number, line order
+    # carries no meaning); findings absence is rule 16's fault
+    # (skip, never double).
     for t in todos:
         for num, s in sorted(t.sections.items()):
             if pre_convention(s, graph.EVIDENCE_CITE_CUTOFF):
@@ -2296,6 +2300,20 @@ def validate(graph, _args) -> int:
             if unbalanced is not None:
                 continue
             rounds = parse_panel_rounds(stripped)
+            # Recorded rounds run once (panel round 2 F8): two
+            # headings claiming one round leave every tag to it
+            # ambiguously matched, so the duplicate fails naming
+            # itself and correspondence skips (one defect owns one
+            # fault, mirroring the tag-duplicate skip above).
+            dupes = sorted({r for r in rounds if rounds.count(r) > 1})
+            if dupes:
+                flag(
+                    "review-citation-role-mismatch",
+                    f"{t.path}:{s.line}: §{num} Review's findings record "
+                    f"round(s) {', '.join(map(str, dupes))} twice "
+                    f"({len(rounds)} panel headings), rounds run once",
+                )
+                continue
             for oid, rnd in tagged:
                 if len(seen[rnd]) > 1:
                     continue

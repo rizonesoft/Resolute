@@ -7339,8 +7339,10 @@ Fenced transcript citing §1 never trips the scan.
         )
         # --- D00 T04 §24 item 18: role-correspondence fixtures --------
         # Post-cutoff stamps whose round tags resolve (§1), miss (§2:
-        # round 3 of one recorded round, plus round zero), or collide
-        # (§3: two candidates sharing round 1).
+        # round 3 of one recorded round, plus round zero), collide
+        # (§3: two candidates sharing round 1), meet duplicated
+        # records (§4: two headings claiming round 1), or meet an
+        # all-caps suffix (§5: OPUS PANEL ROUND 2 claims 2).
         (root / "todo" / "91-severity" / "TODO-12-role-match.md").write_text(
             """---
 schema_version: 1
@@ -7360,6 +7362,8 @@ track: Z1
 |   1   |   §1    | Matched tags | - |  [x]   |
 |   2   |   §2    | Mistagged round | - |  [x]   |
 |   3   |   §3    | Duplicate round | - |  [x]   |
+|   4   |   §4    | Recorded duplicate | - |  [x]   |
+|   5   |   §5    | Case-blind suffix | - |  [x]   |
 
 ## 1. Matched tags
 
@@ -7390,6 +7394,26 @@ track: Z1
 
 > **Verified:** 2026-09-21 | §3 | clean evidence
 > **Review:** round 2, candidate `abc1234`(round 1) `def5678`(round 1) -- approve. Raw findings: docs/reviews/91-severity/D91-T12-s1.md
+
+## 4. Recorded duplicate
+
+- [x] Did it
+- [x] Commit: `"selftest: ro4"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §4 | clean evidence
+> **Review:** round 2, candidate `abc1234`(round 1) -- approve. Raw findings: docs/reviews/91-severity/D91-T12-s4.md
+
+## 5. Case-blind suffix
+
+- [x] Did it
+- [x] Commit: `"selftest: ro5"`
+
+**Test checkpoint:** run tests/AlphaTest.php.
+
+> **Verified:** 2026-09-21 | §5 | clean evidence
+> **Review:** round 2, candidate `abc1234`(round 1) `def5678`(round 2) -- approve. Raw findings: docs/reviews/91-severity/D91-T12-s5.md
 """,
             encoding="utf-8",
         )
@@ -7416,6 +7440,37 @@ track: Z1
             """# Review -- D91 T12 §2, fixture
 
 ## Opus panel Round 1
+
+`adversarial` approve
+`consistency` approve
+`integration` approve
+`record` approve
+""",
+            encoding="utf-8",
+        )
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s4.md").write_text(
+            """# Review -- D91 T12 §4, fixture
+
+## GPT panel Round 1
+
+`adversarial` approve
+`consistency` approve
+`integration` approve
+`record` approve
+
+## Opus panel Round 1
+
+`adversarial` approve
+`consistency` approve
+`integration` approve
+`record` approve
+""",
+            encoding="utf-8",
+        )
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s5.md").write_text(
+            """# Review -- D91 T12 §5, fixture
+
+## OPUS PANEL ROUND 2
 
 `adversarial` approve
 `consistency` approve
@@ -7588,6 +7643,22 @@ track: Z1
         check("role-match: duplicated rounds skip correspondence",
               not any(line.startswith("FATAL") and "TODO-12-role-match.md" in line
                       and "§3 " in line and "matching no recorded" in line
+                      for line in sev_out.splitlines()), True)
+        # Panel round 2 F8: two headings claiming round 1 fail naming
+        # the recorded duplicate (and correspondence skips, one fault
+        # owning one defect); an all-caps ROUND 2 suffix claims 2, so
+        # the round-1 tag misses while the round-2 tag matches.
+        check("role-match: recorded duplicate fails",
+              ro_fires(4, "findings record round(s) 1 twice (2 panel headings), rounds run once"), True)
+        check("role-match: recorded duplicate skips correspondence",
+              not any(line.startswith("FATAL") and "TODO-12-role-match.md" in line
+                      and "§4 " in line and "matching no recorded" in line
+                      for line in sev_out.splitlines()), True)
+        check("role-match: all-caps suffix claims its round",
+              ro_fires(5, "tags round 1 on abc1234, matching no recorded panel round (1 recorded)"), True)
+        check("role-match: all-caps round tag matches",
+              not any(line.startswith("FATAL") and "TODO-12-role-match.md" in line
+                      and "§5 " in line and "tags round 2 on def5678" in line
                       for line in sev_out.splitlines()), True)
 
         # --- D00 T04 §20: the disposition report ----------------------
@@ -7888,6 +7959,8 @@ track: Z1
         (root / "docs" / "reviews" / "91-severity" / "D91-T11-s8.md").unlink()
         (root / "docs" / "reviews" / "91-severity" / "D91-T12-s1.md").unlink()
         (root / "docs" / "reviews" / "91-severity" / "D91-T12-s2.md").unlink()
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s4.md").unlink()
+        (root / "docs" / "reviews" / "91-severity" / "D91-T12-s5.md").unlink()
         (root / "todo" / "91-severity" / "INDEX.md").write_text(
             "# 91-severity\n\n- [TODO-09](TODO-09-warn-only.md)\n", encoding="utf-8"
         )

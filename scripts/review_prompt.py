@@ -968,6 +968,14 @@ def git_is_ancestor(oid: str, head: str, cwd=None) -> tuple[bool | None, str]:
 
 
 _ANCHOR_TICK_RE = re.compile(r"`(?P<body>[^`]+)`")
+# New stamps bind their cites; sealed stamps keep their shape (panel
+# round 2 F6): a stamp dated after this cutoff fails hashless
+# path:line cites and oid cites with no `Attestation:` line, so the
+# legacy skips grandfather sealed history without offering new stamps
+# a bypass. Mirrors the short-form cutoff: a stamp landing ON the
+# cutoff escapes, and proves the rule by hygiene instead.
+CITEHASH_CUTOFF = "2026-09-21"
+_VERIFIED_DAY_RE = re.compile(r"\A(\d{4}-\d{2}-\d{2})\b")
 _ANCHOR_OID_RE = re.compile(r"\A[0-9a-f]{7,40}\Z")
 _ANCHOR_RANGE_RE = re.compile(r"\A([0-9a-f]{7,40})\.\.([0-9a-f]{7,40})\Z")
 _ANCHOR_ATTESTATION_RE = re.compile(r"Attestation:\s*(?P<path>\S+)")
@@ -1216,9 +1224,14 @@ def check_stamp_anchors(todo_path: str, section: int, cwd=None) -> list[str]:
     an ancestor-or-self of the attested head (declared-equal for
     assemblies, since a voided span commit is ancestral but
     unreviewed). No `Attestation:` line skips the test (legacy
-    stamps); a named-but-unreadable attestation fails closed. `cwd`
-    roots the attestation path and the oid reads (existence plus
-    ancestry; the CLI runs at the repo root, legs pass their
+    stamps); a named-but-unreadable attestation fails closed.
+    Post-cutoff stamps bind every cite (panel round 2 F6): a
+    path:line cite without `#hash12` fails as content-unbound, and
+    resolving Review-line oids without an `Attestation:` line fail
+    as unattested, so the legacy skips cannot serve new stamps as
+    a bypass. Undated stamps skip both (unjudgeable, legacy-safe).
+    `cwd` roots the attestation path and the oid reads (existence
+    plus ancestry; the CLI runs at the repo root, legs pass their
     fixture; path cites still resolve from the process working
     tree)."""
     import os
@@ -1239,7 +1252,16 @@ def check_stamp_anchors(todo_path: str, section: int, cwd=None) -> list[str]:
     review_oids: list[tuple[str, str]] = []
     attest_ref: str | None = None
     attest_where = ""
-    for lineno, kind, body in _stamp_anchor_lines(todo_text, section):
+    stamp_lines = _stamp_anchor_lines(todo_text, section)
+    verified_day: str | None = None
+    for _ln, _kind, _body in stamp_lines:
+        if _kind == "Verified":
+            dm = _VERIFIED_DAY_RE.match(_body)
+            if dm is not None:
+                verified_day = dm.group(1)
+            break
+    bound = verified_day is not None and verified_day > CITEHASH_CUTOFF
+    for lineno, kind, body in stamp_lines:
         where = f"{todo_path}:{lineno}"
         if kind == "Review":
             if attest_ref is None:
@@ -1303,6 +1325,10 @@ def check_stamp_anchors(todo_path: str, section: int, cwd=None) -> list[str]:
                             failures.append(
                                 f"{where}: cites stale content {span} "
                                 f"(lines now hash {now})")
+                elif bound:
+                    failures.append(
+                        f"{where}: cites content-unbound {span} "
+                        "(mint `path:line#hash12` via cite-hash)")
                 continue
             if _ANCHOR_PATH_RE.match(span) is not None and ":" not in span:
                 if ("/" in span or "\\" in span) \
@@ -1368,6 +1394,11 @@ def check_stamp_anchors(todo_path: str, section: int, cwd=None) -> list[str]:
     if attest_ref is not None and review_oids:
         failures.extend(check_review_membership(
             attest_ref, attest_where, review_oids, cwd=cwd))
+    elif attest_ref is None and review_oids and bound:
+        where0, span0 = review_oids[0]
+        failures.append(
+            f"{where0}: Review cites {span0} with no `Attestation:` line "
+            f"({len(review_oids)} oid(s) unattested on a post-cutoff stamp)")
     if cited or marked:
         # Round-4 A1: a cite that exists on disk but was never added
         # passes the worktree legs, then ships in a commit without the
@@ -1416,6 +1447,15 @@ def _consume_subseq(pool: list[str], part: list[str]) -> bool:
     for i in reversed(take):
         del pool[i]
     return True
+
+
+# Declared commits past this count refuse before matching (panel
+# round 2 F9): the order leg tries distinct permutations, so an
+# unbounded declaration is a factorial hang in attacker-controlled
+# manifest size. Six bounds the search at 720 orders; assemblies are
+# hand-picks of a few commits (three is the largest observed), and a
+# bigger shape fences as a range instead of declaring.
+_SEQ_MAX_COMMITS = 6
 
 
 def _seq_partitioned(chunk: list[str], parts: list[list[str]]) -> bool:
@@ -1468,9 +1508,17 @@ def check_commits_covered(commits: list[str], tag: str, body_text: str,
     (any concatenation order passes, interleaved-but-ordered passes),
     while a rearranged chunk fails (D00 T04 §24 item 10, round-2
     A/F13). The multiset legs run first, so a coverage gap reports as
-    coverage; the order leg fires only on a fully covered file."""
+    coverage; the order leg fires only on a fully covered file.
+    Declarations past `_SEQ_MAX_COMMITS` refuse before matching: the
+    order leg's permutation search is factorial in declaration size,
+    so an unbounded claim hangs the gate (panel round 2 F9)."""
     from collections import Counter
     failures: list[str] = []
+    if len(commits) > _SEQ_MAX_COMMITS:
+        return [f"{len(commits)} declared commits exceed the "
+                f"{_SEQ_MAX_COMMITS}-commit permutation bound "
+                f"({_SEQ_MAX_COMMITS}! orders); "
+                "fence the range instead of declaring"]
     chunk: dict[str, Counter[str]] = {}
     chunk_signals: dict[str, Counter[str]] = {}
     patches: dict[str, str] = {}
@@ -3155,6 +3203,16 @@ def _self_test() -> int:
               and unres[0] == "declared commit " + "0" * 40 + " resolves to nothing"
               and "unclaimed" in unres[1] and "f.md" in unres[1],
               str(unres))
+        # Permutation bound (panel round 2 F9): seven declared oids
+        # refuse before matching (fake oids prove the bound fires
+        # first), so no manifest can hang the gate factorially.
+        capped = check_commits_covered(["0" * 40] * 7, ttag, fenced_full,
+                                       cwd=tmpd)
+        check("commits-bound-refuses",
+              len(capped) == 1 and "7 declared commits" in capped[0]
+              and "6-commit permutation bound" in capped[0]
+              and "fence the range instead" in capped[0],
+              str(capped))
         # The merge legs: a merge head and a mid-range merge refuse;
         # linear, unresolvable, and tree heads fence.
         _git("checkout", "-qb", "side", r1)
@@ -4129,6 +4187,56 @@ def _self_test() -> int:
               == f"{os.path.abspath('todo/README.md')}:1#{expect}",
               f"exit={mint.returncode} out={mint.stdout!r} "
               f"err={mint.stderr!r}")
+        # Post-cutoff binding (panel round 2 F6): the legacy skips
+        # grandfather sealed stamps, never new ones. A hashless
+        # path:line cite fails past the cutoff (and the cutoff date
+        # itself escapes, mirroring the short-form precedent), a
+        # hashed cite passes there, and resolving Review-line oids
+        # with no `Attestation:` line fail as unattested -- while a
+        # dated-legacy unattested line still skips.
+        def _cite_todo_day(path, cite, day):
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(f"## 1. Seed\n\n> **Verified:** {day} | §1 | "
+                         f"evidence `{cite}` stands.\n")
+
+        c18 = os.path.join(tmpd, "TODO-99-citefut.md")
+        _cite_todo_day(c18, "todo/README.md:1", "2026-09-22")
+        got_fut = check_stamp_anchors(c18, 1)
+        check("anchors-citehash-cutoff-fails",
+              len(got_fut) == 1 and "content-unbound" in got_fut[0]
+              and "todo/README.md:1" in got_fut[0],
+              str(got_fut))
+        c18e = os.path.join(tmpd, "TODO-99-citeedge.md")
+        _cite_todo_day(c18e, "todo/README.md:1", CITEHASH_CUTOFF)
+        got_edge = check_stamp_anchors(c18e, 1)
+        check("anchors-citehash-cutoff-passes", got_edge == [],
+              str(got_edge))
+        c18h = os.path.join(tmpd, "TODO-99-citefuth.md")
+        _cite_todo_day(c18h, f"todo/README.md:1#{fresh_hash}",
+                       "2026-09-22")
+        got_futh = check_stamp_anchors(c18h, 1)
+        check("anchors-citehash-cutoff-hashed-passes", got_futh == [],
+              str(got_futh))
+
+        def _unatt_todo(path, day):
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(f"## 1. Seed\n\n> **Verified:** {day} | §1 | "
+                         "evidence stands.\n"
+                         "> **Review:** round 1, candidate "
+                         f"`{r1[:7]}` -- approve.\n")
+
+        u18 = os.path.join(tmpd, "TODO-99-unatt.md")
+        _unatt_todo(u18, "2026-09-22")
+        got_unatt = check_stamp_anchors(u18, 1, cwd=tmpd)
+        check("anchors-unattested-oids-fail",
+              len(got_unatt) == 1 and "unattested" in got_unatt[0]
+              and r1[:7] in got_unatt[0],
+              str(got_unatt))
+        u18o = os.path.join(tmpd, "TODO-99-unatto.md")
+        _unatt_todo(u18o, "2026-09-20")
+        got_unatto = check_stamp_anchors(u18o, 1, cwd=tmpd)
+        check("anchors-unattested-legacy-skips", got_unatto == [],
+              str(got_unatto))
         # The portable review bundle (D00 T04 §24 item 20, PR20): one
         # command packs the sign-off round's artifacts with the tool
         # record, candidate graph, push receipt, and verification
