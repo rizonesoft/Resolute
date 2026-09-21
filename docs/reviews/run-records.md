@@ -382,3 +382,18 @@ round: 4 model: opus effort: medium outcome: findings candidate: 9f481c80 provid
 # opus rounds: the envelope model field came back empty, so version stays unresolved per the D00 T04 §18 precedent (modelUsage reads claude-opus-5 on both).
 empty: 0
 refuted: 1
+
+run: D00-T04-S24
+date: 2026-09-21
+runner: panel
+rounds: 5
+round: 1 model: gpt-5.6-sol effort: medium outcome: findings candidate: 9900286d provider: openai version: gpt-5.6-sol cost: 145582tokens latency: 126s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S24-F1, D00-T04-S24-F2, D00-T04-S24-F3, D00-T04-S24-F4, D00-T04-S24-F5
+round: 2 model: gpt-5.6-sol effort: medium outcome: findings candidate: f3511316 provider: openai version: gpt-5.6-sol cost: 149389tokens latency: 130s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S24-F6, D00-T04-S24-F7, D00-T04-S24-F8, D00-T04-S24-F9, D00-T04-S24-F10, D00-T04-S24-F11, D00-T04-S24-F12
+round: 3 model: opus effort: medium outcome: findings candidate: b4eae82b provider: anthropic version: unresolved cost: 2945391tokens latency: 109s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S24-F13, D00-T04-S24-F14
+# round 3 is the Full sign-off attempt: 2 below-bar findings fixed in-loop, so round 4 verifies the fixes instead of filing.
+round: 4 model: opus effort: medium outcome: findings candidate: 2ddbc7d2 provider: anthropic version: unresolved cost: 277549tokens latency: 73s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S24-F15, D00-T04-S24-F16, D00-T04-S24-F17
+# round 5 is the Full hard cap: needs-attention with no re-round; its answers land under the cap rule, never reviewed by a sixth round.
+round: 5 model: opus effort: medium outcome: findings candidate: 78a0e002 provider: anthropic version: unresolved cost: 279584tokens latency: 70s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S24-F18, D00-T04-S24-F19, D00-T04-S24-F20, D00-T04-S24-F21, D00-T04-S24-F22
+# opus rounds: the envelope model field came back empty, so version stays unresolved per the D00 T04 §18 precedent (modelUsage reads claude-opus-5 on all three).
+empty: 0
+refuted: 5

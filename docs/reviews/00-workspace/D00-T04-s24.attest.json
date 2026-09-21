@@ -1,0 +1,24 @@
+{
+  "candidate_base": "efdc54e0dceaf4ac967b1295a36ea1231e439b31",
+  "candidate_head": "78a0e002012cdae7a6d1f766f5cf1c8c87a235da",
+  "checker": "PASS four lenses, one verdict each :: e7dbed91567cb60b0f7bb6ed8495e32bc50649ea06fee309338639d0e6457baf",
+  "commits": [
+    "1eb1d979f6c46ea8806ea336bbd26eabfc1531b4",
+    "9900286d2d488a270d8c50a4ae4814212623154f",
+    "f3511316f47cab1f6995312badfd97822150af26",
+    "b4eae82b18bd751f7856247fb359f3b9f1e43e46",
+    "2ddbc7d2eaefeadf828ff9167cd273f6e36f0863",
+    "78a0e002012cdae7a6d1f766f5cf1c8c87a235da"
+  ],
+  "findings_path": "docs/reviews/00-workspace/D00-T04-s24.md",
+  "findings_sha256": "197059f611524b98816da8d601efe2015aad22cdb34650bcfde955d3abaa331d",
+  "manifest_sha": "6f296b6c38b05c5ef5d70d02a35ca67d712102519695f108075ffc3388da5a04",
+  "model": "opus",
+  "model_provenance": "trusted",
+  "reviewer": "claude-panel",
+  "runner_sha256": "27d25331ed7f19b61793fea8b1a513bd62659bb96dedbf9a89dc0dd2f57cf935",
+  "schema": 2,
+  "timestamp": "2026-09-21T04:59:17Z",
+  "tree": "eeea6323549cfc9fa2fefde8c0417d57d86580fc",
+  "verdict": "needs-attention"
+}
