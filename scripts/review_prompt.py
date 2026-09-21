@@ -1094,10 +1094,11 @@ def check_review_membership(att_ref: str, att_where: str,
     candidate's ancestry (ancestor-or-self of the attested head, so
     fix-loop round oids pass as ancestors); when the attestation
     declares an assembly, each must equal a declared member instead
-    (a voided span commit is ancestral but unreviewed). A
-    named-but-unreadable attestation fails closed. The first
-    `Attestation:` line wins; callers skip the test when none exists
-    (legacy stamps)."""
+    (a voided span commit is ancestral but unreviewed). The attested
+    pair, tree, and declaration re-resolve against git first, so a
+    forged attestation fails naming itself. A named-but-unreadable
+    attestation fails closed. The first `Attestation:` line wins;
+    callers skip the test when none exists (legacy stamps)."""
     import os
     failures: list[str] = []
     path = att_ref if os.path.isabs(att_ref) else os.path.join(cwd or ".",
@@ -1114,8 +1115,32 @@ def check_review_membership(att_ref: str, att_where: str,
         return [f"{att_where}: Review names attestation {att_ref}, "
                 f"broken: {exc}"]
     head = doc["candidate_head"]
+    base = doc["candidate_base"]
+    # Verify what membership consumes (self-review fix 4): the attested
+    # pair, tree, and declaration re-resolve against git before any
+    # oid is judged against them, so a forged attestation fails
+    # naming itself instead of lending its pair to unrelated oids.
+    # Git objects are the trust root here, never the attestation's
+    # own bytes (read-back shape-checks plus re-hashes; it does not
+    # resolve).
+    if git_resolve_oid(base, cwd=cwd) is None:
+        return [f"{att_where}: attestation {att_ref} base {base[:12]}... "
+                "resolves to nothing"]
+    if git_resolve_oid(head, cwd=cwd) is None:
+        return [f"{att_where}: attestation {att_ref} head {head[:12]}... "
+                "resolves to nothing"]
+    now_tree = git_head_tree(head, cwd=cwd)
+    if now_tree != doc["tree"]:
+        return [f"{att_where}: attestation {att_ref} binds tree "
+                f"{doc['tree'][:12]}..., head re-resolves "
+                f"{(now_tree or '?')[:12]}..."]
     declared = doc.get("commits")
     if declared:
+        triple_failures, _full = check_declaration_within_pair(
+            declared, base, head, cwd=cwd)
+        if triple_failures:
+            return [f"{att_where}: attestation {att_ref} declaration "
+                    f"fails: {triple_failures[0]}"]
         members = set(declared)
         for owhere, span in oids:
             full = git_resolve_oid(span, cwd=cwd)
@@ -1127,7 +1152,6 @@ def check_review_membership(att_ref: str, att_where: str,
                     f"member ({len(members)} declared under "
                     f"{doc['candidate_base'][:12]}...{head[:12]})")
         return failures
-    base = doc["candidate_base"]
     for owhere, span in oids:
         full = git_resolve_oid(span, cwd=cwd)
         if full is None:
@@ -2000,8 +2024,19 @@ BUNDLE_VERDICTS = ("approve", "needs-attention")
 # the bounds are headroom, not targets.
 BUNDLE_MAX_FILE = 64 * 1024 * 1024
 BUNDLE_MAX_MEMBER = 16 * 1024 * 1024
+# ... plus the total the members expand to and their count
+# (self-review fix 5): per-member bounds alone still admit a thousand
+# small members expanding past memory. Reviews carry under ten members.
+BUNDLE_MAX_TOTAL = 64 * 1024 * 1024
+BUNDLE_MAX_COUNT = 64
 _BUNDLE_OID_RE = re.compile(r"\A[0-9a-f]{40}\Z")
-_BUNDLE_PASS_RE = re.compile(r"^PASS ", re.MULTILINE)
+def _bundle_transcript_ok(raw: bytes) -> bool:
+    """A carried transcript is exactly the checker's successful
+    output: one PASS-led line (self-review fix 6). A transcript with
+    failures plus an injected PASS line is not a passing record,
+    and containing-PASS would report it as one."""
+    text = raw.decode("utf-8", "replace").strip()
+    return bool(text) and "\n" not in text and text.startswith("PASS ")
 # The zip floor date: identical inputs emit identical bundle bytes on
 # any machine (no mtime, fixed order and attrs), so the operator's
 # digest quote identifies the bytes, never the emit.
@@ -2135,9 +2170,8 @@ def _bundle_check_bindings(members: dict, roles: dict, doc: dict,
     if hashlib.sha256(prompt_bytes).hexdigest() != triple[1]:
         return "bundle: carried body re-hashes outside the manifest sha"
     for name in roles["transcripts"]:
-        if _BUNDLE_PASS_RE.search(
-                members[name].decode("utf-8", "replace")) is None:
-            return f"bundle: transcript {name} carries no PASS line"
+        if not _bundle_transcript_ok(members[name]):
+            return f"bundle: transcript {name} is not a single PASS line"
     if not isinstance(push.get("remote_url"), str) \
             or not push["remote_url"]:
         return "bundle: push receipt names no remote URL"
@@ -2155,7 +2189,9 @@ def _bundle_check_bindings(members: dict, roles: dict, doc: dict,
 def verify_review_bundle(path: str, *, recheck_graph: bool = False,
                          recheck_remote: bool = False,
                          max_file_bytes: int = BUNDLE_MAX_FILE,
-                         max_member_bytes: int = BUNDLE_MAX_MEMBER
+                         max_member_bytes: int = BUNDLE_MAX_MEMBER,
+                         max_total_bytes: int = BUNDLE_MAX_TOTAL,
+                         max_count: int = BUNDLE_MAX_COUNT
                          ) -> tuple[int, str]:
     """Verify a review bundle from its bytes alone (exit, report).
 
@@ -2190,10 +2226,18 @@ def verify_review_bundle(path: str, *, recheck_graph: bool = False,
         if BUNDLE_MANIFEST_NAME not in names:
             return 1, f"bundle: {path} carries no {BUNDLE_MANIFEST_NAME}"
         infos = {info.filename: info for info in zf.infolist()}
+        if len(names) > max_count:
+            return 1, (f"bundle: {len(names)} members exceed the "
+                       f"{max_count}-member verifiable bound")
+        total = 0
         for name in names:
             if infos[name].file_size > max_member_bytes:
                 return 1, (f"bundle: member {name} exceeds the "
                            f"{max_member_bytes}-byte verifiable bound")
+            total += infos[name].file_size
+        if total > max_total_bytes:
+            return 1, (f"bundle: members expand to {total} bytes, past the "
+                       f"{max_total_bytes}-byte verifiable bound")
         members: dict[str, bytes] = {}
         for name in names:
             if name == BUNDLE_MANIFEST_NAME:
@@ -3460,6 +3504,22 @@ def _self_test() -> int:
                   for d in seed3_dead),
               str(seed3_dead))
         check("anchors-markers-count", len(seed3_dead) == 4, str(seed3_dead))
+        # Blockquote probe (self-review fix 7): the stamp-line regex consumes
+        # the leading `>`, and spans are tick-delimited, so quote
+        # prefixes cannot leak into cites by construction. A body with
+        # `>` prose still resolves its live cite, and no failure may
+        # name a `>` span. The wrapped continuation line is out of the
+        # one-line stamp grammar: its ghost tick is unchecked, a pinned
+        # recall limit, not a leak.
+        seedq = os.path.join(tmpd, "TODO-99-seedq.md")
+        with open(seedq, "w", encoding="utf-8") as fh:
+            fh.write("## 1. Seed\n\n"
+                     "> **Verified:** 2026-09-21 | §1 | a>b arrow -> live "
+                     "`todo/README.md`\n"
+                     "> wrapped continuation, out of grammar "
+                     "`s24-quote-continuation-ghost.md`\n")
+        seedq_dead = check_stamp_anchors(seedq, 1)
+        check("anchors-quote-clean", seedq_dead == [], str(seedq_dead))
         # The cross-check CLI legs (items 1, 15): the content leg and
         # the kind gate over the fixture repo.
         def _cc(*a):
@@ -3916,11 +3976,13 @@ def _self_test() -> int:
         # ancestry (declared-equal for assemblies). Shorts like real
         # stamps; the stranger (uC, a live descendant) resolves yet
         # fails; the undeclared span member fails the assembly.
-        def _anch16_att(path, commits=None):
+        def _anch16_att(path, commits=None, head=None, tree=None):
             with open(path, "w", encoding="utf-8") as fh:
                 fh.write(write_attestation_v2(
                     manifest_sha="a" * 64, candidate_base=r1,
-                    candidate_head=r3, tree=rtree, reviewer="codex-panel",
+                    candidate_head=r3 if head is None else head,
+                    tree=rtree if tree is None else tree,
+                    reviewer="codex-panel",
                     model="gpt-5.6-sol", verdict="approve",
                     checker="PASS four lenses, one verdict each :: "
                     + "e" * 64,
@@ -3963,6 +4025,33 @@ def _self_test() -> int:
         _anch16_todo(n16, [uC[:7]], None)
         got_n = check_stamp_anchors(n16, 1, cwd=tmpd)
         check("anchors-candidate-noattestation-skips", got_n == [], str(got_n))
+        # Forged attestations fail naming themselves (self-review fix 4):
+        # the pair, tree, and declaration re-resolve before any oid
+        # is judged, so shape-valid lies lend nothing to membership.
+        f16 = os.path.join(tmpd, "anch16f.attest.json")
+        _anch16_att(f16, head="d" * 40)
+        t16 = os.path.join(tmpd, "TODO-99-anch16f.md")
+        _anch16_todo(t16, [r1[:7]], f16)
+        got_f = check_stamp_anchors(t16, 1, cwd=tmpd)
+        check("anchors-attestation-forged-head",
+              len(got_f) == 1 and "head dddddddddddd" in got_f[0]
+              and "resolves to nothing" in got_f[0], str(got_f))
+        g16 = os.path.join(tmpd, "anch16g.attest.json")
+        _anch16_att(g16, tree="0" * 40)
+        u16t = os.path.join(tmpd, "TODO-99-anch16g.md")
+        _anch16_todo(u16t, [r1[:7]], g16)
+        got_g = check_stamp_anchors(u16t, 1, cwd=tmpd)
+        check("anchors-attestation-forged-tree",
+              len(got_g) == 1 and "binds tree 000000000000" in got_g[0]
+              and "re-resolves" in got_g[0], str(got_g))
+        h16 = os.path.join(tmpd, "anch16h.attest.json")
+        _anch16_att(h16, commits=[uC])
+        v16 = os.path.join(tmpd, "TODO-99-anch16h.md")
+        _anch16_todo(v16, [r1[:7]], h16)
+        got_h = check_stamp_anchors(v16, 1, cwd=tmpd)
+        check("anchors-attestation-forged-declaration",
+              len(got_h) == 1 and "declaration fails" in got_h[0],
+              str(got_h))
         # Content-bound cites (D00 T04 §24 item 17, PR11): a path:line
         # cite carrying #hash12 must match the lines' current text.
         # Tracked repo files only (tmpd cites read non-repo from the
@@ -4165,11 +4254,14 @@ def _self_test() -> int:
               f"exit={goth.returncode} out={goth.stdout!r} "
               f"err={goth.stderr!r}")
         duped = os.path.join(tmpd, "duped.bundle.zip")
-        zout = zipfile.ZipFile(duped, "w", zipfile.ZIP_DEFLATED)
-        for n, b in payloads.items():
-            zout.writestr(n, b)
-        zout.writestr("findings.md", payloads["findings.md"])
-        zout.close()
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            zout = zipfile.ZipFile(duped, "w", zipfile.ZIP_DEFLATED)
+            for n, b in payloads.items():
+                zout.writestr(n, b)
+            zout.writestr("findings.md", payloads["findings.md"])
+            zout.close()
         gotd = _bv(duped)
         check("bundle-duplicate-names",
               gotd.returncode == 1
@@ -4184,6 +4276,14 @@ def _self_test() -> int:
         check("bundle-cap-member",
               cap_member[0] == 1 and "exceeds the 10-byte" in cap_member[1],
               f"{cap_member!r}")
+        cap_total = verify_review_bundle(bout, max_total_bytes=10)
+        check("bundle-cap-total",
+              cap_total[0] == 1 and "past the 10-byte" in cap_total[1],
+              f"{cap_total!r}")
+        cap_count = verify_review_bundle(bout, max_count=2)
+        check("bundle-cap-count",
+              cap_count[0] == 1 and "2-member verifiable bound" in cap_count[1],
+              f"{cap_count!r}")
         with open(bfindf, "ab") as fh:
             fh.write(b"late edit\n")
         gotr = _bd(*_bargs(os.path.join(tmpd, "rebind.zip"),
@@ -4200,9 +4300,48 @@ def _self_test() -> int:
                              "https://example.invalid/canonical.git", r3)
                      + ("--checker-transcript", bad_trans))
         check("bundle-emit-refuses-transcript",
-              gotbt.returncode == 1 and "carries no PASS line" in gotbt.stderr,
+              gotbt.returncode == 1
+              and "is not a single PASS line" in gotbt.stderr,
               f"exit={gotbt.returncode} out={gotbt.stdout!r} "
               f"err={gotbt.stderr!r}")
+        multi_trans = _bwrite("b-multi-transcript.txt",
+                              "FAIL line 1 is not a receipt\nPASS smuggled\n")
+        gotmt = _bd(*_bargs(os.path.join(tmpd, "multitrans.zip"),
+                             "https://example.invalid/canonical.git", r3)
+                     + ("--checker-transcript", multi_trans))
+        check("bundle-emit-refuses-injected-pass",
+              gotmt.returncode == 1
+              and "is not a single PASS line" in gotmt.stderr,
+              f"exit={gotmt.returncode} out={gotmt.stdout!r} "
+              f"err={gotmt.stderr!r}")
+        injected = os.path.join(tmpd, "injected.bundle.zip")
+        zout = zipfile.ZipFile(injected, "w", zipfile.ZIP_DEFLATED)
+        for n, b in payloads.items():
+            if n == "transcript-1.txt":
+                b += b"FAIL tailing line\n"
+            zout.writestr(n, b)
+        zout.close()
+        zin = zipfile.ZipFile(injected)
+        rehash = {n: zin.read(n) for n in zin.namelist()}
+        zin.close()
+        zout = zipfile.ZipFile(injected, "w", zipfile.ZIP_DEFLATED)
+        for n, b in rehash.items():
+            if n == "manifest.json":
+                rman = json.loads(b.decode("utf-8"))
+                rman["members"]["transcript-1.txt"] = {
+                    "bytes": len(rehash["transcript-1.txt"]),
+                    "sha256": hashlib.sha256(
+                        rehash["transcript-1.txt"]).hexdigest()}
+                b = (json.dumps(rman, indent=2, sort_keys=True)
+                     + "\n").encode("utf-8")
+            zout.writestr(n, b)
+        zout.close()
+        gotij = _bv(injected)
+        check("bundle-verify-refuses-injected-pass",
+              gotij.returncode == 1
+              and "is not a single PASS line" in gotij.stderr,
+              f"exit={gotij.returncode} out={gotij.stdout!r} "
+              f"err={gotij.stderr!r}")
         gotg = _bv(bout, "--recheck-graph")
         check("bundle-recheck-graph",
               gotg.returncode == 0
@@ -4880,9 +5019,8 @@ if __name__ == "__main__":
                 sys.exit(2)
 
         for tpath in transcripts:
-            if _BUNDLE_PASS_RE.search(
-                    _bread(tpath).decode("utf-8", "replace")) is None:
-                print(f"bundle: transcript {tpath} carries no PASS line",
+            if not _bundle_transcript_ok(_bread(tpath)):
+                print(f"bundle: transcript {tpath} is not a single PASS line",
                       file=sys.stderr)
                 sys.exit(1)
         members = {"manifest.md": _bread(want["--manifest"]),

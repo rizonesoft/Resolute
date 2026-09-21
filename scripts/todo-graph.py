@@ -7774,6 +7774,53 @@ track: Z1
                   any(line.startswith("FATAL") and "TODO-01-bind.md" in line
                       and "§6 is [x]" in line and "matching several commits" in line
                       for line in bind_out.splitlines()), True)
+            # Unreadable history on ticked lines (self-review fix 3): silent
+            # only where verification is impossible (no .git at all),
+            # loud where a repo exists but git cannot read it. Copy
+            # the bound tree twice: one bare of .git, one with an
+            # empty .git git refuses.
+            soft = Path(tempfile.mkdtemp(prefix="todo-graph-unreadable-soft-"))
+            hard = Path(tempfile.mkdtemp(prefix="todo-graph-unreadable-hard-"))
+            try:
+                shutil.copytree(brepo / "todo", soft / "todo")
+                (soft / "skills").mkdir(exist_ok=True)
+                shutil.copytree(brepo / "todo", hard / "todo")
+                (hard / "skills").mkdir(exist_ok=True)
+                (hard / ".git").mkdir()
+                saved_soft = (TODO_DIR, PLAN, SKILLS_DIR)
+                TODO_DIR, PLAN, SKILLS_DIR = (soft / "todo",
+                                              soft / "todo" / "implementation-plan.md",
+                                              soft / "skills")
+                try:
+                    soft_buf = _io.StringIO()
+                    with _ctx.redirect_stdout(soft_buf), _ctx.redirect_stderr(soft_buf):
+                        cmd_validate(None)
+                finally:
+                    TODO_DIR, PLAN, SKILLS_DIR = saved_soft
+                soft_out = soft_buf.getvalue()
+                check("partial-flip: ticked unverified silent without .git",
+                      not any((line.startswith("FATAL") or line.startswith("WARN"))
+                              and "TODO-01-bind.md" in line
+                              and "§4 is [x]" in line
+                              for line in soft_out.splitlines()), True)
+                saved_hard = (TODO_DIR, PLAN, SKILLS_DIR)
+                TODO_DIR, PLAN, SKILLS_DIR = (hard / "todo",
+                                              hard / "todo" / "implementation-plan.md",
+                                              hard / "skills")
+                try:
+                    hard_buf = _io.StringIO()
+                    with _ctx.redirect_stdout(hard_buf), _ctx.redirect_stderr(hard_buf):
+                        cmd_validate(None)
+                finally:
+                    TODO_DIR, PLAN, SKILLS_DIR = saved_hard
+                hard_out = hard_buf.getvalue()
+                check("partial-flip: ticked unverified fails with broken .git",
+                      any(line.startswith("WARN") and "TODO-01-bind.md" in line
+                          and "§4 is [x]" in line and "history unreadable" in line
+                          for line in hard_out.splitlines()), True)
+            finally:
+                shutil.rmtree(soft, ignore_errors=True)
+                shutil.rmtree(hard, ignore_errors=True)
         finally:
             shutil.rmtree(brepo, ignore_errors=True)
 

@@ -233,6 +233,15 @@ def validate(graph, _args) -> int:
             history_cache[root] = pairs
         return history_cache[root]
 
+    def _history_soft() -> bool:
+        """Whether unreadable history stays silent (self-review fix 3): only
+        where verification is impossible -- no git binary, or no
+        .git (a hermetic fixture tree). A repo whose history git
+        cannot read fails closed like an open claim."""
+        import shutil
+        root = graph.TODO_DIR.parent
+        return shutil.which("git") is None or not (root / ".git").exists()
+
     def _in_ancestry(oid: str) -> bool:
         """Whether the oid sits in HEAD's ancestry (not a side branch)."""
         root = str(graph.TODO_DIR.parent)
@@ -599,10 +608,18 @@ def validate(graph, _args) -> int:
                 if code == "commit-bound":
                     continue
                 if code == "commit-unverified":
-                    # Unreadable history stays silent on ticked lines: a
-                    # shipped claim fails open where an open claim fails
-                    # closed, because hermetic fixture trees have no git
-                    # and must not FATAL the suite that proves this rule.
+                    if _history_soft():
+                        # Silence only where verification is
+                        # impossible (no git binary, no .git):
+                        # hermetic fixture trees must not FATAL the
+                        # suite that proves this rule. A repo whose
+                        # history git cannot read fails closed.
+                        continue
+                    flag(
+                        "commit-history-unreadable",
+                        f"{where} is [x] but carries a ticked Commit line git "
+                        f"cannot verify (history unreadable): {text[:100]!r}",
+                    )
                     continue
                 if code == "commit-unquoted":
                     flag(
