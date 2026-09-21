@@ -129,3 +129,67 @@ to: refuted
 why: "Round-2 R1 reads the record's `Attestation:` line as a claim that the attest file exists mid-review. The skill emits the attestation only after step 9 completes (stamp written, `Live proof` quoted, ledger regenerated), because attesting earlier binds bytes a later step rewrites; creating the file mid-review to satisfy the reading would fabricate evidence. The line is a locator for the owed file, not an existence claim."
 evidence: "That is the skill's own ordering, not a defect", the F7 record carries the refutation; as-of binds the round-2 fix commit, the state the refutation reads.
 as-of: 3b7ed181
+
+transition: D00-T04-S24-F2
+date: 2026-09-21
+from: raised
+to: refuted
+why: "this is self-review fix 8's recorded residual, and offline detection of a consistent rewrite without an external anchor is information-theoretically impossible."
+evidence: "The design's anchors are the run-record digest quote and `--recheck-remote` against the live remote", quoted from the F2 record; the item-20 Done-when criteria all pass and `gpg --detach-sign` over the deterministic bytes stays a one-liner.
+as-of: decb549b
+
+transition: D00-T04-S24-F3
+date: 2026-09-21
+from: raised
+to: refuted
+why: "`resolved-and-pinned` is the representation the item-5 Done-when permits, implemented as specified"; "every non-equivalent rewrite fails loud" (dropped fails `commit-unbound`, duplicated fails `commit-ambiguous`, rebased-away fails the ancestry gate).
+evidence: "The remaining silent case is a deliberate equivalent recommit under single-writer linear history with branch protection, which should rebind; a persistent pin is line-carried, the rejected alternative", quoted from the F3 record.
+as-of: decb549b
+
+transition: D00-T04-S24-F7
+date: 2026-09-21
+from: raised
+to: refuted
+why: "replay needs carried plan/stamp inputs the item-20 contract never specifies, and replay would not stop forgery anyway (forged inputs replay clean beside forged transcripts)".
+evidence: "As mistake-catching, replay duplicates the emitter's deterministic transcript re-runs, which already fail the emit when a transcript no longer passes", quoted from the F7 record; full replay sits in the round-1 F2 residual's trust class.
+as-of: decb549b
+
+transition: D00-T04-S24-F10
+date: 2026-09-21
+from: raised
+to: duplicate
+why: "Round-2 I2: the same no-persistent-pin claim as round-1 C1 (F3), citing the same resolver lines and the same item-5 Done."
+evidence: "Answered at F3; no new claim", recorded as duplicate of F3; see the F3 transition above.
+as-of: decb549b
+
+transition: D00-T04-S24-F11
+date: 2026-09-21
+from: raised
+to: duplicate
+why: "Round-2 R1: the same unsigned-manifest claim as round-1 A2 (F2), citing the same skill sentence and the same item-20 Done."
+evidence: "Answered at F2; no new claim", recorded as duplicate of F2; see the F2 transition above.
+as-of: decb549b
+
+transition: D00-T04-S24-F12
+date: 2026-09-21
+from: raised
+to: refuted
+why: "No contradiction: the item-11 sweep ran before the item-16 membership gate existed, and the item-17 sweep applied the new gate; dated evidence from different gates."
+evidence: "in both, the attested head is ancestral to the cited oid (quoted `merge-base --is-ancestor` exits)" with "no gate runs membership over sealed stamps", quoted from the F12 record; sealed reds grandfather by design like every new gate.
+as-of: decb549b
+
+transition: D00-T04-S24-F16
+date: 2026-09-21
+from: raised
+to: refuted
+why: "the entry exists at `scripts/todo-graph.py:849` (`commit-history-unreadable: warn`, with the D00 T04 §20 bare-tree comment) and the mirror row at `todo/README.md:443`".
+evidence: "the class predates this candidate (D00 T04 §20), which only narrowed its emission. The panel cited a wrong line and a false absence, twice", quoted from the F16 record.
+as-of: decb549b
+
+transition: D00-T04-S24-F22
+date: 2026-09-21
+from: raised
+to: duplicate
+why: "Round-5 R1: item 12's `three observed largest` rationale postdates the 6-commit candidate."
+evidence: "Answered at F18, whose fix replaces the count cap and its rationale; the F9 sentence stands as dated history (true at the 3-commit round 2), corrected by the F18 note beside it", recorded as duplicate of F18; see the F18 ledger row (fixed in `e0d43fc9`).
+as-of: decb549b
