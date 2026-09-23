@@ -75,6 +75,22 @@ def _load_diag():
 
 DIAG = _load_diag()
 
+
+def _load_panel_slots():
+    """The review wiring table's loader (D00 T04 §27): model names live
+    in `.conclave/panel.toml`, never in this module."""
+    mod = sys.modules.get("panel_slots")
+    if mod is not None:
+        return mod
+    spec = importlib.util.spec_from_file_location("panel_slots", HERE / "panel_slots.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["panel_slots"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+PANEL_SLOTS = _load_panel_slots()
+
 ROOT = HERE.parent
 DEFAULT_RUNS = ROOT / "docs" / "reviews" / "run-records.md"
 DEFAULT_BANK = ROOT / "docs" / "reviews" / "crossover" / "comparisons.md"
@@ -109,7 +125,16 @@ REVISIT_NEED = 5
 OPPORTUNITIES = ("full-scope", "delta-plus-regressions", "unresolved")
 PURPOSES = ("section-review", "stamp-review", "sign-off", "fix-loop", "unresolved")
 PROVENANCES = ("recorded", "reconstructed")
-FAMILY_MODEL = {"GPT": "gpt-5.6-sol", "Opus": "opus"}
+# Panel heading word -> every model of that family the registry names,
+# retired pins included so historical rounds keep checking (D00 T04 §27:
+# `Claude panel` is the family word, legacy records say `Opus panel`).
+FAMILY_MODELS = {
+    "GPT": PANEL_SLOTS.family_models("codex"),
+    "Opus": PANEL_SLOTS.family_models("claude"),
+    "Claude": PANEL_SLOTS.family_models("claude"),
+}
+# The rungs the cut-leg interim reports, one per family.
+CUT_LEG_FAMILIES = ("GPT", "Claude")
 SCHEMA_VERSION = 1
 # Version 2 adds per-ref dispositions to every round line, so a snapshot
 # consumer computes accepted yield without rejoining live records.
@@ -137,7 +162,7 @@ COMPARISON_RE = re.compile(r"^comparison:\s*(?P<dir>\S+)\s+class:\s*(?P<class>\S
 # advisory, corrected, cleared, routed) and any unresolvable ref counts
 # as a find, so bad data breaks a zero run instead of arming it.
 ZERO_BLIND_DISPOSITIONS = ("refuted", "withdrawn", "duplicate")
-PANEL_HEADING_RE = re.compile(r"^#{2,}\s*(?P<family>GPT|Opus) panel Round (?P<n>\d+)\s*$")
+PANEL_HEADING_RE = re.compile(r"^#{2,}\s*(?P<family>GPT|Opus|Claude) panel Round (?P<n>\d+)\s*$")
 PANEL_VERDICT_RE = re.compile(r"^\s*`(?P<lens>[A-Za-z-]+)`\s+(?P<verdict>approve|needs-attention|advisory)\b")
 HEADING_RE = re.compile(r"^#{1,6}\s+")
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
@@ -462,8 +487,7 @@ def check_panel_rounds(runs):
                 errors.append((run.lineno, f"round {n} has {len(families)} panel sections"))
                 continue
             family, lens = families[0]
-            want = FAMILY_MODEL[family]
-            if items.get("model") != want:
+            if items.get("model") not in FAMILY_MODELS[family]:
                 errors.append((run.lineno,
                                f"round {n} is a {family} panel round but lists model {items.get('model')!r}"))
             missing = [lens_name for lens_name in LENSES if lens_name not in lens]
@@ -663,11 +687,12 @@ def leg_lines(runs, findings, bank_path=None):
     panel = [run for run in runs if run.runner == "panel"]
     lines = ["Cut-leg interim (§20 between-revisit watch):"]
     bits = []
-    for family, model in FAMILY_MODEL.items():
+    for family in CUT_LEG_FAMILIES:
+        models = FAMILY_MODELS[family]
         sections = []
         for run in panel:
             full = [items for _, _, items in run.round_lines
-                    if items.get("model") == model
+                    if items.get("model") in models
                     and items.get("opportunity") == "full-scope"]
             if not full:
                 continue
@@ -675,14 +700,14 @@ def leg_lines(runs, findings, bank_path=None):
                            for items in full for ref in items.get("findings", []))
             sections.append(zero)
         if not sections:
-            bits.append(f"{family} ({model}): no full-scope round observed")
+            bits.append(f"{family}: no full-scope round observed")
             continue
         run_len = 0
         for zero in reversed(sections):
             if not zero:
                 break
             run_len += 1
-        bit = f"{family} ({model}): {run_len} trailing full-scope zero(s)"
+        bit = f"{family}: {run_len} trailing full-scope zero(s)"
         if run_len >= 3:
             bit += (" FIRED -- file the early revisit (D00 T04 §23 trigger) "
                     "with these lines quoted")
@@ -1520,7 +1545,7 @@ refuted: 0
         run = _mkrun(section, "panel")
         run.round_lines = [(0, n + 1, items) for n, items in enumerate(rounds)]
         return run
-    sol = FAMILY_MODEL["GPT"]
+    sol = FAMILY_MODELS["GPT"][0]
     leg_find = TF.Finding("D00 T04 §31", None, 1, "F1", "s", "record",
                           "fixed", None, "independent")
     leg_dead = TF.Finding("D00 T04 §31", None, 2, "F2", "s", "record",
@@ -1538,8 +1563,8 @@ refuted: 0
     check("legs-quiet", got_quiet == [
         "Cut-leg interim (§20 between-revisit watch):",
         "- zero runs (trailing full-scope zero sections per rung, fix-loop "
-        f"invisible): GPT ({sol}): 0 trailing full-scope zero(s); "
-        "Opus (opus): no full-scope round observed",
+        "invisible): GPT: 0 trailing full-scope zero(s); "
+        "Claude: no full-scope round observed",
         "- overlap comparisons banked: 1 spanning 1 class(es) "
         "(review-tooling Jaccard 0.00 over union 3): "
         "DORMANT (activation needs 2 spanning 2 classes)",
@@ -1611,9 +1636,9 @@ refuted: 0
     check("legs-zero-fired",
           got_fired[1] == "- zero runs (trailing full-scope zero sections per rung, "
           "fix-loop invisible): "
-          f"GPT ({sol}): 3 trailing full-scope zero(s) FIRED -- file the early "
+          "GPT: 3 trailing full-scope zero(s) FIRED -- file the early "
           "revisit (D00 T04 §23 trigger) with these lines quoted; "
-          "Opus (opus): no full-scope round observed", f"{got_fired}")
+          "Claude: no full-scope round observed", f"{got_fired}")
     unknown_runs = [
         _mkleg("D00-T04-S31", [{"model": sol, "opportunity": "full-scope",
                                 "findings": []}]),
@@ -1622,7 +1647,7 @@ refuted: 0
     ]
     got_unknown = leg_lines(unknown_runs, [leg_find, leg_dead], bank_one)
     check("legs-unknown-ref-breaks-run",
-          f"GPT ({sol}): 0 trailing full-scope zero(s)" in got_unknown[1]
+          "GPT: 0 trailing full-scope zero(s)" in got_unknown[1]
           and "FIRED" not in got_unknown[1], f"{got_unknown}")
     bank_two = tmp / "leg-bank-two.md"
     bank_two.write_text("comparison: 2026-09-20-s18 class: review-tooling "

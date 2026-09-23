@@ -309,6 +309,14 @@ Invoke-Gate -Name 'findings self-test' -LogName 'gate-findings-selftest' -Comman
 Invoke-Gate -Name 'runs self-test' -LogName 'gate-runs-selftest' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\todo-runs.py') --self-test
 }
+# The review wiring: one table names the writer and pins every review slot,
+# and a governing slot never shares the writer's family. D00 T04 §27.
+Invoke-Gate -Name 'panel slots' -LogName 'gate-panel-slots' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\panel_slots.py') validate
+}
+Invoke-Gate -Name 'panel slots self-test' -LogName 'gate-panel-slots-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\panel_slots.py') --self-test
+}
 
 # The conformance profile is a contract other domains are measured against, so
 # a clause whose owner section was renumbered away would otherwise dangle with

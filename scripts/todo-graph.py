@@ -1063,6 +1063,29 @@ def strip_fenced_map(text: str) -> tuple[list[bool], int | None]:
 # Resolute stamp predates it. Module-level, not in the validator, because
 # `query plan-health` needs the same boundary: one constant, no copies.
 PLAN_REVIEW_CUTOFF = "2026-09-19"
+# D00 T04 §27: from this date Claude Code is the only writer and GPT
+# governs the panel; the validator's rule 16 and plan-health both read it.
+GPT_GOVERNS_FROM = "2026-09-23"
+_GPT_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+GPT panel\b", re.IGNORECASE | re.MULTILINE)
+_CLAUDE_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+(?:Opus|Claude) panel\b", re.IGNORECASE | re.MULTILINE)
+_OPUS_OUTAGE_RE = re.compile(r"opus outage", re.IGNORECASE)
+_GPT_OUTAGE_RE = re.compile(r"gpt outage", re.IGNORECASE)
+
+
+def panel_fallback(stripped_text: str, stamped_on: str | None) -> tuple[bool, bool]:
+    """(ran on the fallback family, carries the matching outage note) for
+    one fence-stripped findings text. Before GPT_GOVERNS_FROM, Opus
+    governed and a GPT-last record was the fallback; from it, GPT
+    governs and a Claude-last record (legacy `Opus panel` or `Claude
+    panel`) is the cross-fill. A text with no panel section is neither."""
+    gpt = list(_GPT_PANEL_HEAD_RE.finditer(stripped_text))
+    claude = list(_CLAUDE_PANEL_HEAD_RE.finditer(stripped_text))
+    if not gpt and not claude:
+        return False, False
+    last_is_gpt = bool(gpt) and (not claude or gpt[-1].start() > claude[-1].start())
+    gpt_governs = (stamped_on or "") >= GPT_GOVERNS_FROM
+    note = (_GPT_OUTAGE_RE if gpt_governs else _OPUS_OUTAGE_RE).search(stripped_text) is not None
+    return last_is_gpt != gpt_governs, note
 # Stamps on or before this date predate the evidence-citation rules and
 # stand as history (D00 T04 §21): 670 live short forms and 31 role-less
 # Review lines sit on sealed records no rule may rewrite. Set to
@@ -2668,12 +2691,9 @@ def cmd_query(args) -> int:
                 # would be a gap no work can clear.
                 if dep not in marked and dep in uncoverable:
                     uncovered.append((labels.get(dep, f"{dep[0]} §{dep[1]}"), labels.get(key, f"{key[0]} §{key[1]}")))
-        gpt_heading_re = re.compile(r"^#{2,6}\s+GPT panel\b", re.IGNORECASE | re.MULTILINE)
-        # Planned GPT-early rounds under an Opus sign-off are not
-        # fallback, so the leg mirrors the panel rule's last-wins
-        # instead of matching any GPT heading.
-        opus_heading_re = re.compile(r"^#{2,6}\s+Opus panel\b", re.IGNORECASE | re.MULTILINE)
-        outage_re = re.compile(r"opus outage", re.IGNORECASE)
+        # Fallback and outage classification: panel_fallback() reads the
+        # stamp date against GPT_GOVERNS_FROM (D00 T04 §27), mirroring the
+        # panel rule's last-wins instead of matching any heading.
         head_re = re.compile(r"^#{1,6}\s+", re.MULTILINE)
         fallback, outages, criticals, unreadable, stale = [], [], [], [], []
         majors, legacy = [], []
@@ -2712,14 +2732,10 @@ def cmd_query(args) -> int:
                 text, unbalanced_opener = strip_fenced_code(text)
                 if unbalanced_opener is not None:
                     unreadable.append((m.group(1), unbalanced_opener))
-                gpt_heads = list(gpt_heading_re.finditer(text))
-                opus_heads = list(opus_heading_re.finditer(text))
-                last_is_gpt = bool(gpt_heads) and (
-                    not opus_heads or gpt_heads[-1].start() > opus_heads[-1].start()
-                )
-                if last_is_gpt:
+                is_fallback, has_note = panel_fallback(text, s.stamped_on)
+                if is_fallback:
                     fallback.append(m.group(1))
-                if outage_re.search(text):
+                if has_note:
                     outages.append(m.group(1))
                 for h in PLAN_REVIEW_HEADING_RE.finditer(text):
                     sec = text[h.end():]
@@ -3383,10 +3399,10 @@ def cmd_query(args) -> int:
             if gone:
                 bits.append(f"removed: {', '.join(gone)}")
             print(f"    {f}  {'; '.join(bits)}")
-        print(f"fallback usage      {len(fallback_sorted)} findings with a GPT-last panel")
+        print(f"fallback usage      {len(fallback_sorted)} findings whose governing panel ran on the fallback family")
         for f in fallback_sorted:
             print(f"    {f}")
-        print(f"outages             {len(outages_sorted)} findings with an Opus outage note")
+        print(f"outages             {len(outages_sorted)} findings with an outage note for their era")
         for f in outages_sorted:
             print(f"    {f}")
         print(f"unresolved critical {len(criticals_sorted)}")
@@ -8515,6 +8531,11 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             "- `adversarial` approve\n- `consistency` approve\n"
             "- `integration` approve\n- `record` approve\n"
         )
+        GPT4 = (
+            "## GPT panel\n\n"
+            "- `adversarial` approve\n- `consistency` approve\n"
+            "- `integration` approve\n- `record` approve\n"
+        )
         PANEL3 = (
             "## Opus panel\n\n"
             "- `adversarial` approve\n- `consistency` approve\n- `integration` approve\n"
@@ -8599,6 +8620,27 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
                 _prov("20260920-D90-T09-S14-sol", "docs/selftest-r14.md")
                 + PANEL4 + "```\nnever closed\n"
             ),
+            # D00 T04 §27: stamps from 2026-09-23 are GPT-governed.
+            "docs/selftest-r15.md": (
+                PANEL4 + "\n" + GPT4 + _prov("20260923-D90-T09-S15-sol", "docs/selftest-r15.md")
+            ),
+            "docs/selftest-r16.md": (
+                GPT4.replace("GPT panel", "GPT panel Round 1") + "\n"
+                + "## Claude panel Round 2\n\n"
+                "- `adversarial` approve\n- `consistency` approve\n"
+                "- `integration` approve\n- `record` approve\n\n"
+                "GPT outage: sol and terra both timed out, cross-fill ran.\n"
+                + _prov("20260923-D90-T09-S16-sol", "docs/selftest-r16.md")
+            ),
+            "docs/selftest-r17.md": (
+                GPT4 + "\n" + PANEL4.replace("Opus panel", "Claude panel")
+                + _prov("20260923-D90-T09-S17-sol", "docs/selftest-r17.md")
+            ),
+            "docs/selftest-r18.md": (
+                PANEL4 + "\n## GPT panel\n\n"
+                "- `adversarial` approve\n- `consistency` approve\n- `integration` approve\n"
+                + _prov("20260923-D90-T09-S18-sol", "docs/selftest-r18.md")
+            ),
         }
         COMMITTED_R09 = (
             "# Review: committed\n\n## Plan review\n\n"
@@ -8606,11 +8648,12 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             "Ledger:\n- [D90-T09-S9-PR1] [critical] thing -> filed D90 T09 §1\nEnd of ledger\n"
         )
 
-        def _sec09(num: int, findings: str, marker: str | None, extra: str = "") -> str:
+        def _sec09(num: int, findings: str, marker: str | None, extra: str = "",
+                   day: str = "2026-09-20") -> str:
             stamp = (
                 f"\n## {num}. Rule probe {num}\n\n- [x] Did the thing\n"
                 f'- [x] Commit: `"selftest: rules"`\n\n**Test checkpoint:** `true`\n\n'
-                f"> **Verified:** 2026-09-20 | §{num} | fixture\n"
+                f"> **Verified:** {day} | §{num} | fixture\n"
                 f"> **Review:** round 1, fingerprint `abc123def456` -- `adversarial` approve. Raw findings: {findings}\n"
             )
             if marker is not None:
@@ -8621,7 +8664,7 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
         rules_todo = root / "todo" / "90-selftest" / "TODO-09-rules.md"
         (root / "todo" / "90-selftest").mkdir(parents=True, exist_ok=True)
         _rows09 = "\n".join(
-            f"|   {n}   |   §{n}    | Rule probe {n} | -- |  [x]   |" for n in range(1, 15)
+            f"|   {n}   |   §{n}    | Rule probe {n} | -- |  [x]   |" for n in range(1, 19)
         )
         rules_todo.write_text(
             "---\nschema_version: 1\nid: self-test-rules\ndomain: 90-selftest\nstatus: active\n"
@@ -8647,7 +8690,11 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             + _sec09(11, "docs/selftest-r11.md", f"sol (run {R11}) no findings")
             + _sec09(12, "docs/selftest-r12.md", f"sol (run {R12})")
             + _sec09(13, "docs/selftest-r13.md", f"sol (run {R13}) no findings")
-            + _sec09(14, "docs/selftest-r14.md", f"sol (run {R14}) no findings"),
+            + _sec09(14, "docs/selftest-r14.md", f"sol (run {R14}) no findings")
+            + _sec09(15, "docs/selftest-r15.md", "sol (run 20260923-D90-T09-S15-sol) no findings", day="2026-09-23")
+            + _sec09(16, "docs/selftest-r16.md", "sol (run 20260923-D90-T09-S16-sol) no findings", day="2026-09-23")
+            + _sec09(17, "docs/selftest-r17.md", "sol (run 20260923-D90-T09-S17-sol) no findings", day="2026-09-23")
+            + _sec09(18, "docs/selftest-r18.md", "sol (run 20260923-D90-T09-S18-sol) no findings", day="2026-09-23"),
             encoding="utf-8",
         )
         for _rp, _rt in findings_09.items():
@@ -8670,6 +8717,21 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             check("validator rules fire fatals on the probe tree", vcode, 1)
             check("rule 16 fires on a missing lens", ("§2 " in vout and "lacks verdicts for: record" in vout), True)
             check("rule 16 fires on an unbalanced fence", ("§14 " in vout and "unbalanced fence" in vout), True)
+            check("panel_fallback: pre-cutover GPT last is fallback with its note",
+                  panel_fallback("## Opus panel\n\n## GPT panel\nOpus outage: x\n", "2026-09-20"), (True, True))
+            check("panel_fallback: pre-cutover Opus last is governing",
+                  panel_fallback("## GPT panel\n\n## Opus panel\n", "2026-09-20"), (False, False))
+            check("panel_fallback: post-cutover GPT last is governing",
+                  panel_fallback("## Opus panel\n\n## GPT panel\n", "2026-09-23"), (False, False))
+            check("panel_fallback: post-cutover Claude last is the cross-fill",
+                  panel_fallback("## GPT panel\n\n## Claude panel\nGPT outage: x\n", "2026-09-23"), (True, True))
+            check("panel_fallback: post-cutover reads the GPT note, not the Opus one",
+                  panel_fallback("## Claude panel\nOpus outage: x\n", "2026-09-23"), (True, False))
+            check("panel_fallback: no panel is neither", panel_fallback("## Plan review\n", "2026-09-23"), (False, False))
+            check("rule 16 fires on a post-cutover Claude-last without the GPT outage note",
+                  ("§17 " in vout and "without the GPT outage note" in vout), True)
+            check("rule 16 fires on a post-cutover GPT-last missing lens",
+                  ("§18 " in vout and "GPT panel lacks verdicts for: record" in vout), True)
             check("rule 17 fires on a missing marker", ("§3 " in vout and "carries no `Plan review:`" in vout), True)
             check("rule 17 fires on nofindings-plus-filings", ("§4 " in vout and "both `no findings` and filings" in vout), True)
             check("rule 18 fires on a non-row ledger line", ("§5 " in vout and "malformed ledger row" in vout), True)
@@ -8694,6 +8756,16 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
                 "the clean GPT fallback stays silent",
                 not any(re.search(r"TODO-09-rules\.md:\d+: §13 ", ln) for ln in _nonadv),
                 True,
+            )
+            check(
+                "the post-cutover GPT-governed record stays silent",
+                [ln for ln in _nonadv if re.search(r"TODO-09-rules\.md:\d+: §15 ", ln)],
+                [],
+            )
+            check(
+                "the post-cutover Claude cross-fill with its note stays silent",
+                [ln for ln in _nonadv if re.search(r"TODO-09-rules\.md:\d+: §16 ", ln)],
+                [],
             )
         finally:
             globals()["git_resolves"] = _real_resolves

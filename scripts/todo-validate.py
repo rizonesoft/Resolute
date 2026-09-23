@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 _ROLE_PANEL_RE = re.compile(
-    r"^#{2,6}\s+(?:Opus panel|GPT panel)\b", re.IGNORECASE | re.MULTILINE)
+    r"^#{2,6}\s+(?:Opus panel|Claude panel|GPT panel)\b", re.IGNORECASE | re.MULTILINE)
 # Case-insensitive like the heading it suffixes (panel round 2 F8):
 # `## OPUS PANEL ROUND 2` claims round 2, never its position.
 _ROLE_ROUND_SUFFIX_RE = re.compile(r"Round (\d+)\s*$", re.IGNORECASE)
@@ -68,6 +68,11 @@ def validate(graph, _args) -> int:
     # The panel rule landed with the 2026-09-19 review-system port; every
     # Resolute stamp (newest 2026-09-17) predates it.
     PANEL_CUTOFF = "2026-09-18"
+    # D00 T04 §27: from this date Claude Code is the only writer and GPT
+    # governs the panel. Stamps dated on or after it read the GPT record
+    # as governing and a Claude-family last section as a cross-fill that
+    # owes a `GPT outage` note; earlier stamps keep the Opus-governed rule.
+    GPT_GOVERNS_FROM = graph.GPT_GOVERNS_FROM
 
     def pre_convention(sec, cutoff: str) -> bool:
         return (
@@ -1087,7 +1092,9 @@ def validate(graph, _args) -> int:
     # documented "or deeper"), and any heading level ends the panel
     # section, so a `##### Leftover notes` tail after the panel can
     # neither supply lens verdicts nor displace the record.
-    PANEL_HEADING_RE = re.compile(r"^#{2,6}\s+Opus panel\b", re.IGNORECASE | re.MULTILINE)
+    # The Claude family: `Opus panel` is the legacy word, `Claude panel`
+    # the family word from D00 T04 §27 on; both read as one family.
+    PANEL_HEADING_RE = re.compile(r"^#{2,6}\s+(?:Opus|Claude) panel\b", re.IGNORECASE | re.MULTILINE)
     # Same level and word-boundary rules as the Opus heading: the fallback
     # record differs in family, not in shape. Runs on the same stripped
     # text, so fenced `GPT panel` quotes are invisible for free.
@@ -1097,6 +1104,8 @@ def validate(graph, _args) -> int:
     # transcription. Substring, not line-anchored: the note explains, it
     # does not authorize, so marker strictness would reject honest prose.
     GPT_OUTAGE_RE = re.compile(r"opus outage", re.IGNORECASE)
+    # The post-cutover mirror: a Claude cross-fill explains the GPT outage.
+    CLAUDE_OUTAGE_RE = re.compile(r"gpt outage", re.IGNORECASE)
     # Verdicts are line-anchored, never substring: the mandated shape puts
     # each verdict on its own marker-led line, so unheaded prose after an
     # incomplete panel (or a mid-line mention anywhere) must not supply a
@@ -1167,6 +1176,35 @@ def validate(graph, _args) -> int:
             last_is_gpt = gpt_heads and (
                 not heads or gpt_heads[-1].start() > heads[-1].start()
             )
+            gpt_governs = s.stamped_on is not None and s.stamped_on >= GPT_GOVERNS_FROM
+            if gpt_governs:
+                # D00 T04 §27: the GPT record governs. GPT last is the
+                # normal record and owes no note; Claude last is the
+                # double-outage cross-fill and owes the `GPT outage` note.
+                lead = gpt_heads[-1] if last_is_gpt else heads[-1]
+                family = "GPT" if last_is_gpt else "Claude"
+                panel = text[lead.end():]
+                nxt = re.search(r"^#{1,6}\s+", panel, re.MULTILINE)
+                if nxt:
+                    panel = panel[:nxt.start()]
+                missing = [
+                    lens
+                    for lens in PANEL_LENSES
+                    if not PANEL_VERDICT_RES[lens].search(panel)
+                ]
+                if missing:
+                    flag(
+                        "stamp-no-opus-panel",
+                        f"{where} findings {m.group(1)} {family} panel lacks verdicts for: "
+                        + ", ".join(missing),
+                    )
+                if not last_is_gpt and not CLAUDE_OUTAGE_RE.search(panel):
+                    flag(
+                        "stamp-no-opus-panel",
+                        f"{where} findings {m.group(1)} Claude panel governs a stamp dated "
+                        f"{GPT_GOVERNS_FROM} or later without the GPT outage note",
+                    )
+                continue
             if last_is_gpt:
                 # GPT fallback path: same verdict bar as the Opus panel,
                 # plus the Opus outage note that earns the fallback. Taken

@@ -4775,7 +4775,13 @@ def _self_test() -> int:
             ("skill-tree-clean",
              "git --no-replace-objects diff --quiet ||"),
             ("skill-failover-redirect",
-             "Read < $RUNDIR/stamp-prompt.md > $RUNDIR/stamp-N-opus.out"),
+             "exec signoff-fallback < $RUNDIR/stamp-prompt.md > $RUNDIR/stamp-N-fallback.out"),
+            ("skill-panel-slot",
+             "python scripts/panel_slots.py exec <slot> < $RUNDIR/review-prompt.md"),
+            ("skill-plan-slot", "python scripts/panel_slots.py exec plan-primary"),
+            ("skill-stamp-slot", "python scripts/panel_slots.py exec stamp-check"),
+            ("skill-arch-slot", "python scripts/panel_slots.py exec arch-primary"),
+            ("skill-cross-fill-note", "carrying the words `GPT outage`"),
             ("skill-holds-period",
              "The period is part of the verdict."),
             ("skill-refusal-rerun",
@@ -4806,6 +4812,11 @@ def _self_test() -> int:
              "a re-run takes the next N rather than overwriting")):
         check(pin, needle in skill_text, skill_path)
     check("skill-attest-no-checker", "--checker-output" not in skill_text,
+          skill_path)
+    # D00 T04 §27: every review pin lives in .conclave/panel.toml, so the
+    # skill names slots and never a model or a model alias.
+    check("skill-no-model-literal",
+          re.search(r"gpt-\d|claude-opus|--model opus", skill_text) is None,
           skill_path)
     try:
         attest_ordered = (skill_text.index("### 9. Write the stamp and flip the row")
