@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 _ROLE_PANEL_RE = re.compile(
-    r"^#{2,6}\s+(?:Opus panel|Claude panel|GPT panel)\b", re.IGNORECASE | re.MULTILINE)
+    r"^#{2,6}\s+(?:Opus panel|Claude panel|GPT panel|Grok panel)\b", re.IGNORECASE | re.MULTILINE)
 # Case-insensitive like the heading it suffixes (panel round 2 F8):
 # `## OPUS PANEL ROUND 2` claims round 2, never its position.
 _ROLE_ROUND_SUFFIX_RE = re.compile(r"Round (\d+)\s*$", re.IGNORECASE)
@@ -1104,8 +1104,11 @@ def validate(graph, _args) -> int:
     # transcription. Substring, not line-anchored: the note explains, it
     # does not authorize, so marker strictness would reject honest prose.
     GPT_OUTAGE_RE = re.compile(r"opus outage", re.IGNORECASE)
-    # The post-cutover mirror: a Claude cross-fill explains the GPT outage.
+    # The post-cutover mirror: a Grok fallback round explains the GPT
+    # outage that put it there (D00 T04 §29).
     CLAUDE_OUTAGE_RE = re.compile(r"gpt outage", re.IGNORECASE)
+    # Grok fallback rounds (D00 T04 §29): same level and word rules.
+    GROK_PANEL_HEADING_RE = re.compile(r"^#{2,6}\s+Grok panel\b", re.IGNORECASE | re.MULTILINE)
     # Verdicts are line-anchored, never substring: the mandated shape puts
     # each verdict on its own marker-led line, so unheaded prose after an
     # incomplete panel (or a mid-line mention anywhere) must not supply a
@@ -1167,7 +1170,8 @@ def validate(graph, _args) -> int:
                 continue
             heads = list(PANEL_HEADING_RE.finditer(text))
             gpt_heads = list(GPT_PANEL_HEADING_RE.finditer(text))
-            if not heads and not gpt_heads:
+            grok_heads = list(GROK_PANEL_HEADING_RE.finditer(text))
+            if not heads and not gpt_heads and not grok_heads:
                 flag(
                     "stamp-no-opus-panel",
                     f"{where} findings {m.group(1)} carry no `Opus panel` section",
@@ -1176,13 +1180,29 @@ def validate(graph, _args) -> int:
             last_is_gpt = gpt_heads and (
                 not heads or gpt_heads[-1].start() > heads[-1].start()
             )
+            if not heads and not gpt_heads and not (
+                    s.stamped_on is not None and s.stamped_on >= GPT_GOVERNS_FROM):
+                flag(
+                    "stamp-no-opus-panel",
+                    f"{where} findings {m.group(1)} carry no `Opus panel` section",
+                )
+                continue
             gpt_governs = s.stamped_on is not None and s.stamped_on >= GPT_GOVERNS_FROM
             if gpt_governs:
-                # D00 T04 §27: the GPT record governs. GPT last is the
-                # normal record and owes no note; Claude last is the
-                # double-outage cross-fill and owes the `GPT outage` note.
-                lead = gpt_heads[-1] if last_is_gpt else heads[-1]
-                family = "GPT" if last_is_gpt else "Claude"
+                # D00 T04 §27 and §29: GPT governs, Grok is every fallback,
+                # and the writer's family never reviews. GPT last owes no
+                # note; Grok last owes the `GPT outage` note; a Claude-family
+                # last section fails outright.
+                lasts = [(h[-1].start(), fam, h[-1]) for fam, h in
+                         (("GPT", gpt_heads), ("Grok", grok_heads), ("Claude", heads)) if h]
+                _pos, family, lead = max(lasts, key=lambda item: item[0])
+                if family == "Claude":
+                    flag(
+                        "stamp-no-opus-panel",
+                        f"{where} findings {m.group(1)} Claude panel governs a stamp dated "
+                        f"{GPT_GOVERNS_FROM} or later: the writer's family never reviews",
+                    )
+                    continue
                 panel = text[lead.end():]
                 nxt = re.search(r"^#{1,6}\s+", panel, re.MULTILINE)
                 if nxt:
@@ -1198,10 +1218,10 @@ def validate(graph, _args) -> int:
                         f"{where} findings {m.group(1)} {family} panel lacks verdicts for: "
                         + ", ".join(missing),
                     )
-                if not last_is_gpt and not CLAUDE_OUTAGE_RE.search(panel):
+                if family == "Grok" and not CLAUDE_OUTAGE_RE.search(panel):
                     flag(
                         "stamp-no-opus-panel",
-                        f"{where} findings {m.group(1)} Claude panel governs a stamp dated "
+                        f"{where} findings {m.group(1)} Grok panel governs a stamp dated "
                         f"{GPT_GOVERNS_FROM} or later without the GPT outage note",
                     )
                 continue
@@ -1362,12 +1382,17 @@ def validate(graph, _args) -> int:
                     marker.lower(),
                 )
                 rung = prm.group(1) if prm else ""
-                if rung not in ("gpt rung", "opus rung"):
+                # D00 T04 §29: the plan fallback is Grok, a second family,
+                # so a failed `grok rung` beside a GPT survivor, or a GPT
+                # failure a Grok run survived (marker led by `grok`), is a
+                # complete review that owes no retry.
+                grok_survivor = rung == "gpt rung" and marker.lstrip().lower().startswith("grok")
+                if rung not in ("gpt rung", "opus rung", "grok rung"):
                     flag(
                         "stamp-no-plan-review",
-                        f"{t.path}:{s.line}: §{num} partial names no known rung (gpt rung or opus rung)",
+                        f"{t.path}:{s.line}: §{num} partial names no known rung (gpt rung, grok rung, or opus rung)",
                     )
-                elif rung == "opus rung":
+                elif rung in ("opus rung", "grok rung") or grok_survivor:
                     if has_retry:
                         flag(
                             "stamp-no-plan-review",

@@ -391,13 +391,20 @@ def _output_within_bounds(text: str) -> tuple[bool, str] | None:
     return None
 
 
+def _grok_envelope(obj: dict) -> bool:
+    """A Grok headless JSON envelope (D00 T04 §29): string `text` plus a
+    `stopReason`, where a Claude envelope carries `result`."""
+    return isinstance(obj.get("text"), str) and "stopReason" in obj and "result" not in obj
+
+
 def panel_text_from_envelope(text: str) -> tuple[str, str | None]:
-    """Unwrap a Claude JSON envelope to its `result` text, else passthrough.
+    """Unwrap a Claude or Grok JSON envelope to its text, else passthrough.
 
     Bare reviewer output (RECEIPT-led) passes through untouched; only a
-    `{`-led payload parses as JSON. A parsed envelope without a string
-    `result`, or one flagging `is_error`, fails naming the shape: a
-    failed round approves nothing.
+    `{`-led payload parses as JSON. A Claude envelope yields `result`, a
+    Grok envelope yields `text` (D00 T04 §29). An envelope flagging
+    `is_error`, a Grok `{"type": "error"}` envelope, or one with neither
+    text shape fails naming the shape: a failed round approves nothing.
     """
     if not text.lstrip().startswith("{"):
         return text, None
@@ -409,6 +416,12 @@ def panel_text_from_envelope(text: str) -> tuple[str, str | None]:
         return text, None
     if obj.get("is_error") is True:
         return text, f"round errored ({obj.get('subtype', 'unknown subtype')}), approving nothing"
+    if obj.get("type") == "error":
+        message = obj.get("message")
+        shown = message[:120] if isinstance(message, str) else "no message"
+        return text, f"round errored ({shown}), approving nothing"
+    if _grok_envelope(obj):
+        return obj["text"], None
     result = obj.get("result")
     if not isinstance(result, str):
         return text, "JSON envelope carries no string `result`"
@@ -2062,6 +2075,12 @@ def derive_runner_identity(runner_text: str) -> tuple[str | None, str | None, st
         obj = json.loads(runner_text)
     except ValueError:
         return "codex-panel", None, None
+    if isinstance(obj, dict) and _grok_envelope(obj):
+        # Grok names what ran in `modelUsage`; exactly one key derives,
+        # anything else stays honestly unmeasured (D00 T04 §29).
+        usage = obj.get("modelUsage")
+        keys = [k for k in usage if isinstance(k, str) and k.strip()] if isinstance(usage, dict) else []
+        return "grok-panel", (keys[0].strip() if len(keys) == 1 else None), None
     if not isinstance(obj, dict) or not isinstance(obj.get("result"), str):
         return "codex-panel", None, None
     model = obj.get("model")
@@ -2595,6 +2614,21 @@ def _self_test() -> int:
         json.dumps({"usage": {"input_tokens": 2, "output_tokens": 4}}))
     check("round-cost-absent-classes-zero",
           cost_total == 6 and cost_err is None, f"{cost_total} {cost_err}")
+    # D00 T04 §29: Grok's headless envelope carries `text`, not `result`,
+    # the same usage classes, and a `{"type": "error"}` failure shape.
+    grok_panel = json.dumps({"text": receipt + approves, "stopReason": "end_turn",
+                             "usage": {"input_tokens": 10, "output_tokens": 5,
+                                       "cache_read_input_tokens": 20,
+                                       "reasoning_tokens": 7}})
+    ok, reason = check_panel_output(grok_panel, manifest3)
+    check("envelope-grok-unwraps", ok, reason)
+    ok, reason = check_panel_output(json.dumps({"type": "error", "message": "API error (status 402)"}),
+                                    manifest3)
+    check("envelope-grok-error-fails", (not ok) and "402" in reason and "approving nothing" in reason,
+          reason)
+    cost_total, cost_err = round_cost_from_envelope(grok_panel)
+    check("round-cost-grok-sums-classes", cost_total == 35 and cost_err is None,
+          f"{cost_total} {cost_err}")
 
     findings = "- first finding\n- second finding\n"
     ok, reason = check_plan_output(receipt + findings, manifest3)
@@ -3153,6 +3187,16 @@ def _self_test() -> int:
           derive_runner_identity('{"a": 1}')[2] is not None)
     check("runner-id-brace-text",
           derive_runner_identity("{not json") == ("codex-panel", None, None))
+    grok_env = json.dumps({"text": "RECEIPT sha=x", "stopReason": "end_turn",
+                           "modelUsage": {"grok-4.7": {"input_tokens": 1}}})
+    check("runner-id-grok",
+          derive_runner_identity(grok_env) == ("grok-panel", "grok-4.7", None))
+    check("runner-id-grok-ambiguous-model",
+          derive_runner_identity(json.dumps({"text": "x", "stopReason": "end_turn",
+                                             "modelUsage": {"a": {}, "b": {}}}))
+          == ("grok-panel", None, None))
+    check("runner-id-grok-error",
+          derive_runner_identity('{"type": "error", "message": "402"}')[2] is not None)
     banner = ("OpenAI Codex v0.155.1\n--------\nworkdir: R:\\x\n"
               "model: gpt-5.6-sol\nprovider: openai\n--------\nuser\n"
               "model: evil-echo\n")
@@ -4782,6 +4826,8 @@ def _self_test() -> int:
             ("skill-stamp-slot", "python scripts/panel_slots.py exec stamp-check"),
             ("skill-arch-slot", "python scripts/panel_slots.py exec arch-primary"),
             ("skill-cross-fill-note", "carrying the words `GPT outage`"),
+            ("skill-grok-fallback", "re-runs once on its Grok fallback over the same prompt"),
+            ("skill-no-third-rung", "the writer's family never fills a round"),
             ("skill-holds-period",
              "The period is part of the verdict."),
             ("skill-refusal-rerun",
@@ -4816,7 +4862,7 @@ def _self_test() -> int:
     # D00 T04 §27: every review pin lives in .conclave/panel.toml, so the
     # skill names slots and never a model or a model alias.
     check("skill-no-model-literal",
-          re.search(r"gpt-\d|claude-opus|--model opus", skill_text) is None,
+          re.search(r"gpt-\d|grok-\d|claude-opus|--model opus", skill_text) is None,
           skill_path)
     try:
         attest_ordered = (skill_text.index("### 9. Write the stamp and flip the row")

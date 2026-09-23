@@ -125,16 +125,23 @@ REVISIT_NEED = 5
 OPPORTUNITIES = ("full-scope", "delta-plus-regressions", "unresolved")
 PURPOSES = ("section-review", "stamp-review", "sign-off", "fix-loop", "unresolved")
 PROVENANCES = ("recorded", "reconstructed")
-# Panel heading word -> every model of that family the registry names,
-# retired pins included so historical rounds keep checking (D00 T04 §27:
-# `Claude panel` is the family word, legacy records say `Opus panel`).
-FAMILY_MODELS = {
-    "GPT": PANEL_SLOTS.family_models("codex"),
-    "Opus": PANEL_SLOTS.family_models("claude"),
-    "Claude": PANEL_SLOTS.family_models("claude"),
-}
+# Panel heading word -> the registry family it records (D00 T04 §27:
+# `Claude panel` is the family word, legacy records say `Opus panel`;
+# D00 T04 §29 adds `Grok panel` for the Grok fallbacks).
+HEADING_FAMILY = {"GPT": "codex", "Opus": "claude", "Claude": "claude", "Grok": "grok"}
+PANEL_TABLE = PANEL_SLOTS.load()
+
+
+def family_accepts(heading: str, model) -> bool:
+    """A round's `model:` belongs to its heading's family: a registered
+    model (retired pins included, so historical rounds keep checking),
+    or a concrete model a `newest` entry resolves to (`grok-4.7`)."""
+    return isinstance(model, str) and PANEL_SLOTS.family_accepts(
+        HEADING_FAMILY[heading], model, PANEL_TABLE)
+
+
 # The rungs the cut-leg interim reports, one per family.
-CUT_LEG_FAMILIES = ("GPT", "Claude")
+CUT_LEG_FAMILIES = ("GPT", "Grok", "Claude")
 SCHEMA_VERSION = 1
 # Version 2 adds per-ref dispositions to every round line, so a snapshot
 # consumer computes accepted yield without rejoining live records.
@@ -162,7 +169,7 @@ COMPARISON_RE = re.compile(r"^comparison:\s*(?P<dir>\S+)\s+class:\s*(?P<class>\S
 # advisory, corrected, cleared, routed) and any unresolvable ref counts
 # as a find, so bad data breaks a zero run instead of arming it.
 ZERO_BLIND_DISPOSITIONS = ("refuted", "withdrawn", "duplicate")
-PANEL_HEADING_RE = re.compile(r"^#{2,}\s*(?P<family>GPT|Opus|Claude) panel Round (?P<n>\d+)\s*$")
+PANEL_HEADING_RE = re.compile(r"^#{2,}\s*(?P<family>GPT|Opus|Claude|Grok) panel Round (?P<n>\d+)\s*$")
 PANEL_VERDICT_RE = re.compile(r"^\s*`(?P<lens>[A-Za-z-]+)`\s+(?P<verdict>approve|needs-attention|advisory)\b")
 HEADING_RE = re.compile(r"^#{1,6}\s+")
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
@@ -487,7 +494,7 @@ def check_panel_rounds(runs):
                 errors.append((run.lineno, f"round {n} has {len(families)} panel sections"))
                 continue
             family, lens = families[0]
-            if items.get("model") not in FAMILY_MODELS[family]:
+            if not family_accepts(family, items.get("model")):
                 errors.append((run.lineno,
                                f"round {n} is a {family} panel round but lists model {items.get('model')!r}"))
             missing = [lens_name for lens_name in LENSES if lens_name not in lens]
@@ -688,11 +695,10 @@ def leg_lines(runs, findings, bank_path=None):
     lines = ["Cut-leg interim (§20 between-revisit watch):"]
     bits = []
     for family in CUT_LEG_FAMILIES:
-        models = FAMILY_MODELS[family]
         sections = []
         for run in panel:
             full = [items for _, _, items in run.round_lines
-                    if items.get("model") in models
+                    if family_accepts(family, items.get("model"))
                     and items.get("opportunity") == "full-scope"]
             if not full:
                 continue
@@ -1545,7 +1551,16 @@ refuted: 0
         run = _mkrun(section, "panel")
         run.round_lines = [(0, n + 1, items) for n, items in enumerate(rounds)]
         return run
-    sol = FAMILY_MODELS["GPT"][0]
+    sol = PANEL_SLOTS.family_models("codex")[0]
+    # D00 T04 §29: Grok rounds record the concrete model that ran; the
+    # registry's `newest` entry accepts any matching release, never a
+    # suffixed variant, and never across families.
+    check("grok-round-accepts-resolved-model", family_accepts("Grok", "grok-4.7"))
+    check("grok-round-accepts-a-new-release", family_accepts("Grok", "grok-4.8"))
+    check("grok-round-refuses-suffixed-variant", not family_accepts("Grok", "grok-4.7-build-fast"))
+    check("grok-round-accepts-served-name", family_accepts("Grok", "grok-4.7-build"))
+    check("gpt-round-refuses-grok-model", not family_accepts("GPT", "grok-4.7"))
+    check("legacy-opus-round-still-accepts", family_accepts("Opus", "opus"))
     leg_find = TF.Finding("D00 T04 §31", None, 1, "F1", "s", "record",
                           "fixed", None, "independent")
     leg_dead = TF.Finding("D00 T04 §31", None, 2, "F2", "s", "record",
@@ -1564,6 +1579,7 @@ refuted: 0
         "Cut-leg interim (§20 between-revisit watch):",
         "- zero runs (trailing full-scope zero sections per rung, fix-loop "
         "invisible): GPT: 0 trailing full-scope zero(s); "
+        "Grok: no full-scope round observed; "
         "Claude: no full-scope round observed",
         "- overlap comparisons banked: 1 spanning 1 class(es) "
         "(review-tooling Jaccard 0.00 over union 3): "
@@ -1638,6 +1654,7 @@ refuted: 0
           "fix-loop invisible): "
           "GPT: 3 trailing full-scope zero(s) FIRED -- file the early "
           "revisit (D00 T04 §23 trigger) with these lines quoted; "
+          "Grok: no full-scope round observed; "
           "Claude: no full-scope round observed", f"{got_fired}")
     unknown_runs = [
         _mkleg("D00-T04-S31", [{"model": sol, "opportunity": "full-scope",

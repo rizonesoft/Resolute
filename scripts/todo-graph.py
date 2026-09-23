@@ -1068,6 +1068,7 @@ PLAN_REVIEW_CUTOFF = "2026-09-19"
 GPT_GOVERNS_FROM = "2026-09-23"
 _GPT_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+GPT panel\b", re.IGNORECASE | re.MULTILINE)
 _CLAUDE_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+(?:Opus|Claude) panel\b", re.IGNORECASE | re.MULTILINE)
+_GROK_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+Grok panel\b", re.IGNORECASE | re.MULTILINE)
 _OPUS_OUTAGE_RE = re.compile(r"opus outage", re.IGNORECASE)
 _GPT_OUTAGE_RE = re.compile(r"gpt outage", re.IGNORECASE)
 
@@ -1076,13 +1077,16 @@ def panel_fallback(stripped_text: str, stamped_on: str | None) -> tuple[bool, bo
     """(ran on the fallback family, carries the matching outage note) for
     one fence-stripped findings text. Before GPT_GOVERNS_FROM, Opus
     governed and a GPT-last record was the fallback; from it, GPT
-    governs and a Claude-last record (legacy `Opus panel` or `Claude
-    panel`) is the cross-fill. A text with no panel section is neither."""
+    governs and any other last record (a Grok fallback, D00 T04 §29, or
+    a Claude-family section, which rule 16 also fails) ran on the
+    fallback. A text with no panel section is neither."""
     gpt = list(_GPT_PANEL_HEAD_RE.finditer(stripped_text))
     claude = list(_CLAUDE_PANEL_HEAD_RE.finditer(stripped_text))
-    if not gpt and not claude:
+    grok = list(_GROK_PANEL_HEAD_RE.finditer(stripped_text))
+    if not gpt and not claude and not grok:
         return False, False
-    last_is_gpt = bool(gpt) and (not claude or gpt[-1].start() > claude[-1].start())
+    others = [h[-1].start() for h in (claude, grok) if h]
+    last_is_gpt = bool(gpt) and (not others or gpt[-1].start() > max(others))
     gpt_governs = (stamped_on or "") >= GPT_GOVERNS_FROM
     note = (_GPT_OUTAGE_RE if gpt_governs else _OPUS_OUTAGE_RE).search(stripped_text) is not None
     return last_is_gpt != gpt_governs, note
@@ -8626,10 +8630,10 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             ),
             "docs/selftest-r16.md": (
                 GPT4.replace("GPT panel", "GPT panel Round 1") + "\n"
-                + "## Claude panel Round 2\n\n"
+                + "## Grok panel Round 2\n\n"
                 "- `adversarial` approve\n- `consistency` approve\n"
                 "- `integration` approve\n- `record` approve\n\n"
-                "GPT outage: sol and terra both timed out, cross-fill ran.\n"
+                "GPT outage: sol timed out, the Grok fallback ran.\n"
                 + _prov("20260923-D90-T09-S16-sol", "docs/selftest-r16.md")
             ),
             "docs/selftest-r17.md": (
@@ -8640,6 +8644,23 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
                 PANEL4 + "\n## GPT panel\n\n"
                 "- `adversarial` approve\n- `consistency` approve\n- `integration` approve\n"
                 + _prov("20260923-D90-T09-S18-sol", "docs/selftest-r18.md")
+            ),
+            "docs/selftest-r19.md": (
+                GPT4 + "\n" + PANEL4.replace("Opus panel", "Claude panel")
+                + "\nGPT outage: sol and grok both down.\n"
+                + _prov("20260923-D90-T09-S19-sol", "docs/selftest-r19.md")
+            ),
+            "docs/selftest-r21.md": (
+                GPT4 + _record("§21", "20260923-D90-T09-S21-sol", "- [D90-T09-S21-PR0] [minor] clean round -> accepted\n")
+                + _prov("20260923-D90-T09-S21-sol", "docs/selftest-r21.md")
+            ),
+            "docs/selftest-r22.md": (
+                GPT4 + _record("§22", "20260923-D90-T09-S22-grok", "- [D90-T09-S22-PR0] [minor] clean round -> accepted\n")
+                + _prov("20260923-D90-T09-S22-grok", "docs/selftest-r22.md")
+            ),
+            "docs/selftest-r20.md": (
+                GPT4 + "\n" + PANEL4.replace("Opus panel", "Grok panel")
+                + _prov("20260923-D90-T09-S20-sol", "docs/selftest-r20.md")
             ),
         }
         COMMITTED_R09 = (
@@ -8664,7 +8685,7 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
         rules_todo = root / "todo" / "90-selftest" / "TODO-09-rules.md"
         (root / "todo" / "90-selftest").mkdir(parents=True, exist_ok=True)
         _rows09 = "\n".join(
-            f"|   {n}   |   §{n}    | Rule probe {n} | -- |  [x]   |" for n in range(1, 19)
+            f"|   {n}   |   §{n}    | Rule probe {n} | -- |  [x]   |" for n in range(1, 23)
         )
         rules_todo.write_text(
             "---\nschema_version: 1\nid: self-test-rules\ndomain: 90-selftest\nstatus: active\n"
@@ -8694,7 +8715,11 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             + _sec09(15, "docs/selftest-r15.md", "sol (run 20260923-D90-T09-S15-sol) no findings", day="2026-09-23")
             + _sec09(16, "docs/selftest-r16.md", "sol (run 20260923-D90-T09-S16-sol) no findings", day="2026-09-23")
             + _sec09(17, "docs/selftest-r17.md", "sol (run 20260923-D90-T09-S17-sol) no findings", day="2026-09-23")
-            + _sec09(18, "docs/selftest-r18.md", "sol (run 20260923-D90-T09-S18-sol) no findings", day="2026-09-23"),
+            + _sec09(18, "docs/selftest-r18.md", "sol (run 20260923-D90-T09-S18-sol) no findings", day="2026-09-23")
+            + _sec09(19, "docs/selftest-r19.md", "sol (run 20260923-D90-T09-S19-sol) no findings", day="2026-09-23")
+            + _sec09(20, "docs/selftest-r20.md", "sol (run 20260923-D90-T09-S20-sol) no findings", day="2026-09-23")
+            + _sec09(21, "docs/selftest-r21.md", "sol (run 20260923-D90-T09-S21-sol) partial: grok rung no findings", day="2026-09-23")
+            + _sec09(22, "docs/selftest-r22.md", "grok (run 20260923-D90-T09-S22-grok) partial: gpt rung no findings", day="2026-09-23"),
             encoding="utf-8",
         )
         for _rp, _rt in findings_09.items():
@@ -8725,11 +8750,20 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
                   panel_fallback("## Opus panel\n\n## GPT panel\n", "2026-09-23"), (False, False))
             check("panel_fallback: post-cutover Claude last is the cross-fill",
                   panel_fallback("## GPT panel\n\n## Claude panel\nGPT outage: x\n", "2026-09-23"), (True, True))
+            check("panel_fallback: post-cutover Grok last is the fallback",
+                  panel_fallback("## GPT panel\n\n## Grok panel\nGPT outage: x\n", "2026-09-23"), (True, True))
+            check("panel_fallback: post-cutover GPT after Grok governs",
+                  panel_fallback("## Grok panel\n\n## GPT panel\n", "2026-09-23"), (False, False))
             check("panel_fallback: post-cutover reads the GPT note, not the Opus one",
                   panel_fallback("## Claude panel\nOpus outage: x\n", "2026-09-23"), (True, False))
             check("panel_fallback: no panel is neither", panel_fallback("## Plan review\n", "2026-09-23"), (False, False))
-            check("rule 16 fires on a post-cutover Claude-last without the GPT outage note",
-                  ("§17 " in vout and "without the GPT outage note" in vout), True)
+            check("rule 16 fires on a post-cutover Claude-last",
+                  ("§17 " in vout and "the writer's family never reviews" in vout), True)
+            check("rule 16 fires on a post-cutover Claude-last even with a GPT outage note",
+                  ("§19 " in vout and "the writer's family never reviews" in vout), True)
+            check("rule 16 fires on a post-cutover Grok-last without the GPT outage note",
+                  ("§20 " in vout and "Grok panel governs" in vout and "without the GPT outage note" in vout),
+                  True)
             check("rule 16 fires on a post-cutover GPT-last missing lens",
                   ("§18 " in vout and "GPT panel lacks verdicts for: record" in vout), True)
             check("rule 17 fires on a missing marker", ("§3 " in vout and "carries no `Plan review:`" in vout), True)
@@ -8762,8 +8796,12 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
                 [ln for ln in _nonadv if re.search(r"TODO-09-rules\.md:\d+: §15 ", ln)],
                 [],
             )
+            for _n, _what in ((21, "a failed grok rung beside a GPT survivor"),
+                              (22, "a GPT failure a Grok plan run survived")):
+                check(f"plan-review grammar accepts {_what} with no retry owed",
+                      [ln for ln in _nonadv if re.search(rf"TODO-09-rules\.md:\d+: §{_n} ", ln)], [])
             check(
-                "the post-cutover Claude cross-fill with its note stays silent",
+                "the post-cutover Grok fallback with its note stays silent",
                 [ln for ln in _nonadv if re.search(r"TODO-09-rules\.md:\d+: §16 ", ln)],
                 [],
             )
