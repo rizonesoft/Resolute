@@ -94,7 +94,7 @@ It also makes the engine structurally incapable of writing to the volume it read
 - [ ] Guard raw volume access behind the framework's elevation check, at the call. Done when: an unelevated scan is refused by name and nothing is opened.
 - [ ] Confirm the result is unencumbered. Done when: the engine carries no third-party copyright notice, `D06 T01 §8` records it as owned code, and the licence it ships under is the suite's choice rather than an inherited obligation.
 - [ ] Add engine assertions against committed fixture images, with no physical disk. Done when: each supported format asserts headlessly.
-- [ ] Commit: `"recovery engine: port the file system parser, read-only"`
+- [ ] Commit: `"recovery engine: clean-room file system parser, read-only"`
 
 **Freeze check:** What the engine reports as recoverable is frozen once shipped, because a user deletes data on the strength of it. Evidence is a fixture image per format producing an identical entry list across changes. Fixture source: `tests/fixtures/volumes/`.
 

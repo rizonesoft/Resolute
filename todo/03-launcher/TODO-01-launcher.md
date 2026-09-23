@@ -13,7 +13,7 @@ track: P1
 > **Goal:** The hub that finds every installed tool, launches it, reports honestly when it cannot, and gives the suite one place for settings, logs, and the Windows system locations a power user wants.
 
 > [!IMPORTANT]
-> **Current state (verified 2026-09-16):** Nothing exists in C++. The AutoIt launcher is `resolute_au3/SDK/Concrete/Resolute/Resolute.au3` at 2,663 lines, version 23.2.0.858, which is the only tool whose version is in the 23 series. It writes its settings to `Resolute.lng` (`Resolute.au3:435,1889`), the same language-pack extension defect six other tools have. It ships exactly one language pack, English, against `ComIntRep`'s sixteen and `Firemin`'s thirty-five. Its menu strings are not localized. `WinPower`, whose shell-location features belong here, is at `resolute_au3/samples/WinPower 0.0.3.325922/` and the 151-entry CLSID catalog that feeds them is in git history at `8d7469a^`.
+> **Current state (verified 2026-09-16):** Nothing exists in C++ (**Groomed 2026-09-23:** a C++ launcher shell now exists, `src/main.cpp`, building `Bin/Release/Resolute.exe`, not yet on the framework; `§1` rebuilds it on the framework). The AutoIt launcher is `resolute_au3/SDK/Concrete/Resolute/Resolute.au3` at 2,663 lines, version 23.2.0.858, which is the only tool whose version is in the 23 series. It writes its settings to `Resolute.lng` (`Resolute.au3:435,1889`), the same language-pack extension defect six other tools have. It ships exactly one language pack, English, against `ComIntRep`'s sixteen and `Firemin`'s thirty-five. Its menu strings are not localized. `WinPower`, whose shell-location features belong here, is at `resolute_au3/samples/WinPower 0.0.3.325922/` and the 151-entry CLSID catalog that feeds them is in git history at `8d7469a^`.
 
 ## Inputs
 
@@ -47,7 +47,7 @@ track: P1
 |   3   |   §3    | Launch, failure reporting, and elevation  | §2, D03 T02 §7 |  [ ]   |
 |   4   |   §4    | Windows system locations                  | §2, D03 T02 §4 |  [ ]   |
 |   5   |   §5    | Suite log viewer                          | §1, D03 T02 §5 |  [ ]   |
-|   6   |   §6    | Symptom routing                           | §2, D01 T01 §4, D03 T02 §6 |  [ ]   |
+|   6   |   §6    | Symptom routing                           | §2, D01 T01 §4, D03 T02 §6, D01 T01 §11 |  [ ]   |
 
 ---
 
@@ -68,7 +68,7 @@ The launcher is the first product built on the framework, so it is where the fra
 - [ ] Account for the surface: every control and menu item is working or deferred to a named section. Done when: the account is written and each deferral resolves.
 - [ ] Commit: `"launcher: rebuild on the shared framework"`
 
-**Test checkpoint:** The launcher builds for both architectures. A fixture `Resolute.lng` migrates to `.ini` with every value surviving, quoted. An incomplete pack produces a missing-key list with no bare English. The rendered window is compared against the pre-change capture with differences listed.
+**Test checkpoint:** The launcher builds for x86-64 in both configurations (**Groomed 2026-09-23:** `D00 T01 §1` decided x86-64 is the only architecture built). A fixture `Resolute.lng` migrates to `.ini` with every value surviving, quoted. An incomplete pack produces a missing-key list with no bare English. The rendered window is compared against the pre-change capture with differences listed.
 
 ## 2. Tool Discovery and the Tool List
 

@@ -87,6 +87,7 @@ Everything else in this file hangs off the shell. It decides what a tool is stru
 - [ ] Implement shutdown: persist configuration, flush the log, release resources. Done when: a forced close still writes the configuration, proven by a readback.
 - [ ] Draw the seam explicitly: the framework owns lifecycle and shared surface, the tool owns its own logic and its own window contents. Done when: the seam is documented and nothing tool-specific exists on the framework side.
 - [ ] Add assertions for the lifecycle order and the shutdown persist. Done when: both run under Catch2.
+- [ ] Apply the saved process priority and the memory-trim behaviour at startup (groom 2026-09-23 gap scan) : `D01 T03 §2` specifies the priority combo and the reduce-memory checkbox and `§2` persists them, but nothing applies either, so both are settings with no consumer, and `AGENTS.md` names process priority as framework-owned. Done when: a saved priority reads back as the process's priority class after startup, the save-above-high guard refuses silently raising past High, and the reduce-memory setting drives one trim path, each quoted from a drive.
 - [ ] Commit: `"framework: application shell and lifecycle"`
 
 **Test checkpoint:** A minimal tool built on the shell starts and exits cleanly for both architectures. The documented startup order matches the asserted order. A forced close persists configuration, proven by readback. All three quoted.
@@ -126,6 +127,7 @@ Six of fourteen AutoIt tools write no log at all, including every browser optimi
 - [ ] Honor the enable switch and the size cap, with rotation. Done when: disabling stops the writes and a small cap triggers rotation, both observed.
 - [ ] Guarantee a log line cannot be lost for an action already performed. Done when: an action followed by forced termination still leaves its line, proven by a driven run.
 - [ ] Add assertions for format, rotation, and the disable switch. Done when: three assertions run.
+- [ ] Resolve the log directory per mode, mirroring `§2`'s settings path (groom 2026-09-23 gap scan) : the crash report (`§10`), the restore record (`D02 T01 §4`), the launcher's suite log viewer (`D03 T01 §5`), and Repair History (`D05 T04 §2`) all need the log location, and no item provides one while the Verification forbids tool-side paths. Done when: one resolver returns the portable and installed log directories, every consumer calls it, and a fixture proves both modes, quoted.
 - [ ] Commit: `"framework: one log format, one log writer"`
 
 **Test checkpoint:** Three logging assertions run green. A line from the new writer matches the AutoIt shape on a fixture. Disabling produces no writes; a small cap rotates. An action followed by forced termination still leaves its line. All quoted.
@@ -163,6 +165,8 @@ The update mechanism already works and its file format is already deployed to us
 - [ ] Handle the offline and malformed cases without blocking startup. Done when: an unreachable server and a truncated file each produce one log line and no dialog, both observed.
 - [ ] Honor the check frequency setting, including never. Done when: each setting is driven and the observed behavior matches.
 - [ ] Add assertions for URL derivation, unknown-key tolerance, the successor template, and the offline path. Done when: four assertions run.
+- [ ] Honour the update dialog's don't-show-again choice and validate every link the update file carries (groom 2026-09-23 gap scan) : `D01 T03 §5` specifies the `CheckBox_NoUpdate` control with no setting key or consumer here, and the dialog opens `UpdateURL` and the successor link from the downloaded file unchecked (`resolute_au3/SDK/Includes/Update.au3:98`). Done when: the checkbox writes one settings key that suppresses the next notice for that version, quoted, and a non-https or unknown-host link is refused with one log line and the registry home link opened instead, from a fixture file.
+- [ ] Parse the update file's version for both old and new clients (groom 2026-09-23 gap scan) : AutoIt clients compare a whole-number `LatestBuild` (`Update.au3:93`, `:109`) and the C++ dialog compares versions (`D01 T03 §5`), but this section parses only `LatestBuild`. Done when: the parser reads the version key `D06 T01 §5` defines, falls back to `LatestBuild` when it is absent, and a fixture file carrying both proves the C++ client reads the version, quoted.
 - [ ] Commit: `"framework: update check and the consolidation announcement"`
 
 **Test checkpoint:** Four update assertions run green. A fixture naming a successor renders the announcement from the language pack, quoted in two languages. A file with unknown keys parses. An unreachable server produces one log line and no dialog. All quoted.
@@ -182,6 +186,7 @@ Every AutoIt tool requests elevation at startup and then assumes it holds for th
 - [ ] Log every refusal exactly once. Done when: a refused action writes one line naming the tool and the action, asserted.
 - [ ] Support the case where a tool can still do something useful unelevated. Done when: the framework exposes the distinction and this section records that each tool declares its own answer.
 - [ ] Add assertions for the guard, the refusal message, and the single log line. Done when: three assertions run unelevated.
+- [ ] Decide the manifest execution level and add the elevated relaunch (groom 2026-09-23 gap scan) : this section only refuses, `D01 T03 §6` requires the refusal to offer a next step, and `D03 T01` assumes tools prompt for UAC at launch, but no item decides `asInvoker` against `requireAdministrator`; with the latter the guard never fires in the window and its checkpoint is unreachable. Done when: the decision is dated with its reason, the refusal offers "restart as administrator" that relaunches with the same command line and writes one log line, and both the unelevated refusal and the elevated relaunch are driven, quoted.
 - [ ] Commit: `"framework: gate privileged actions at the call site"`
 
 **Test checkpoint:** Three elevation assertions run green in an unelevated session, each proving the action was refused by name, nothing changed, and exactly one log line was written. The refusal message is quoted.
@@ -205,6 +210,8 @@ This section connects the two, and it is adoption rather than construction. DPI 
 - [ ] Let a tool add its own preferences page without forking the host. Done when: a tool contributes a page and the framework's pages are unchanged.
 - [ ] Account for the surface: every control on all three surfaces is working or deferred to a named section. Done when: the account is written and each deferral resolves.
 - [ ] Compare each rendered surface against its house-style capture and list every difference. Done when: three comparisons are recorded and each difference is either approved or fixed.
+- [ ] Build the per-tool log surface `D01 T03 §4` specifies (groom 2026-09-23 gap scan) : `§3` builds the writer before the UI library is adopted, so the surface it is titled for (level icons, copy, follow-tail, clear, the empty state, the three failure presentations, the General page Clear button, and File > Logging open-file and open-folder) has no build item. Done when: every control on the `D01 T03 §4` spec is working on a driven tool window or deferred to a named section, quoted.
+- [ ] Wire every Help and File menu target to a real destination (groom 2026-09-23 gap scan) : `D01 T03 §1` specifies update check, publisher home, downloads, support, and issue creation, but only the About and F1 entries have build items. Done when: each target opens the destination the tool descriptor names (re-pointed at the `D06 T01 §10` registry when it ships), driven per entry with the launcher seam mocked, quoted.
 - [ ] Commit: `"framework: standard window, about, and preferences"`
 
 **Test checkpoint:** Two different tools render correct About dialogs with no tool-side code. Every preferences control persists and survives a restart, proven by readback. The three rendered surfaces are compared against their captures with differences listed. Captures committed under `docs/captures/runs/`.
@@ -269,6 +276,7 @@ Two lifecycle guarantees the plan assumed and never assigned. Both matter more h
 - [ ] Enforce a single instance per tool, keyed by tool and by installation. Done when: launching a second copy focuses the first rather than starting, proven by driving it twice.
 - [ ] Decide and record the portable exception. Done when: this section states whether a portable copy on a USB stick may run alongside an installed copy, dated, with the cost of changing it. Cheaper substitute that fails the checkpoint: a global mutex that silently blocks a technician's portable copy because the machine has the suite installed.
 - [ ] Prove the guard holds where it matters. Done when: two copies of a repair tool cannot run a repair simultaneously against the same target, asserted.
+- [ ] Build the crash notice's restart offer (groom 2026-09-23 gap scan) : `D01 T03 §6` specifies the restart offer and its buttons, and this section writes the report without it. Done when: after a seeded crash the notice offers restart, restart relaunches the tool with its command line, and dismiss exits with one log line, driven, quoted.
 - [ ] Commit: `"framework: crash handling and single instance"`
 
 **Test checkpoint:** A deliberately faulted fixture tool produces a report, not the Windows crash dialog, and no tool installs its own handler, proven by search. A tool faulted mid-repair leaves a usable restore record, proven by undoing it from `Repair History`. The notice names the tool and whether the machine changed, captured. A second launch focuses the first. Two copies cannot repair the same target simultaneously, asserted.
@@ -290,6 +298,7 @@ Every tool in this suite is something an IT administrator would want to run acro
 - [ ] Implement `--help` and `--version` for every tool, generated from the tool descriptor and the registered verbs. Done when: both work on two different tools with no tool-side code.
 - [ ] Honour the elevation contract on the command line. Done when: an unattended run without the required privilege refuses by name, returns the refusal code, and changes nothing.
 - [ ] Record what the command line deliberately cannot do. Done when: anything reachable only through the window is listed, so an administrator is not left guessing.
+- [ ] Add a shared "open item" verb to the command-line grammar (groom 2026-09-23 gap scan) : `D03 T02` requires that launching from a symptom opens the named repair item, not just the tool (`TODO-02-launcher-surfaces.md:161`), and the grammar has no verb for it. Done when: `--open <item-id>` (or the grammar's chosen spelling) selects the named item or surface on start, an unknown id refuses by name with the documented exit code, and `D03 T01 §6` consumes it, quoted.
 - [ ] Commit: `"framework: one command-line grammar and one set of exit codes"`
 
 **Test checkpoint:** A fixture repair runs unattended from a script with no window, writes its transcript, and returns. Each of the five exit codes is produced by a fixture run and matches its documented value. An unattended destructive run without the authorising flag refuses with the refusal code. `--help` and `--version` work on two tools with no tool-side code. An unelevated unattended run refuses by name and changes nothing.

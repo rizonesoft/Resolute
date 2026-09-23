@@ -22,8 +22,8 @@ track: P3
 
 ## Inputs
 
-- [`samples/RegStudio/src/main.cpp`](../../samples/RegStudio/src/main.cpp) -- the whole tool today, 1,086 lines
-- [`samples/RegStudio/TODO.md`](../../samples/RegStudio/TODO.md) -- 95 done, 323 open; this file routes what is still wanted
+- [`extensions/RegStudio/src/main.cpp`](../../extensions/RegStudio/src/main.cpp) -- the whole tool today, 1,086 lines (**Groomed 2026-09-23:** repointed from the gitignored `samples/` copy)
+- [`extensions/RegStudio/TODO.md`](../../extensions/RegStudio/TODO.md) -- 95 done, 323 open; this file routes what is still wanted (**Groomed 2026-09-23:** repointed from the gitignored `samples/` copy)
 - -> XREF: [`00-workspace/TODO-03 §1`](../00-workspace/TODO-03-codebase-intake.md) -- the intake that reconciles the two copies and brings the history in
 - -> XREF: [`02-repair-contract/TODO-01 §4`](../02-repair-contract/TODO-01-repair-contract.md) -- the restore record and undo every edit here goes through
 - -> XREF: [`05-new-tools/TODO-01 §1`](./TODO-01-intake-and-new-tools.md) -- the intake contract this tool is measured against
@@ -63,7 +63,7 @@ track: P3
 **Chrome:** consume the framework and the shared UI library. Do not keep a private control layer, settings writer, or theme handling.
 **Needs:** C++ toolchain (compile)
 
-- [ ] Reconcile the two copies and record which was taken. Done when: only one RegStudio source tree exists in the repository and this section names the commit it came from.
+- [ ] Reconcile the two copies and record which was taken. Done when: only one RegStudio source tree exists in the repository and this section names the commit it came from (**Groomed 2026-09-23:** the Done-when already reads true in tracked files, per the Current state's `862cfb5` and `1b99463`; the section ticks it when it runs, and deletes the untracked on-disk leftovers `samples/RegStudio` and `samples/ExoSuite/extensions/RegStudio` or records why not).
 - [ ] Split `main.cpp` into the structure its own layout intends: registry logic under `core/`, surfaces under `ui/`, and an entry point that does neither. Done when: no file mixes registry access with rendering, and `core/` has no dependency on any UI header.
 - [ ] Replace the `comctl32` control layer with the shared UI library. Done when: no `WC_TREEVIEW`, `WC_LISTVIEW`, or `comctl32` control remains, proven by search.
 - [ ] Remove its private dark-title-bar handling in favour of the framework's theme. Done when: the tool's own `DwmSetWindowAttribute` call is gone and the window still themes correctly in both appearances.
@@ -192,5 +192,5 @@ A `.reg` file is the registry's exchange format, and importing one is the most d
 - [ ] Every registry write goes through the repair contract and is undoable after a restart
 - [ ] Every freeze check in this file ran and passed
 - [ ] RegStudio passes the conformance check and runs standalone in an empty folder
-- [ ] Every open item in `samples/RegStudio/TODO.md` is shipped here, routed elsewhere, or marked superseded
+- [ ] Every open item in `extensions/RegStudio/TODO.md` is shipped here, routed elsewhere, or marked superseded
 - [ ] `python scripts/todo-graph.py validate` clean

@@ -81,19 +81,19 @@ track: P2
 > **What this changes for this section.** Parity is a **registry** comparison, not a filesystem ACL comparison. The reverse is deleting four key trees, not restoring owners. The freeze check pins what the tool writes to `HKCR`, including the exact `\command` string, because that string is what eventually runs against a user's files. And the elevation requirement is real and is the tool's own: `HKCR` writes need admin, which is why `D01 T01 §6`'s guard matters here.
 >
 > **What it does not change.** The vertical slice is still the right first port and is still cheap, and `D00 T02 §2`'s `RegistryFixture` is the right disposable target for it. That fixture's **`FileTreeFixture`** half was justified in `§2`'s stamp as carrying "the exact values `D04 T01 §1` compares", which was wrong in the same way; it remains useful for the tools that do touch ACLs, `PixRepair` and `ComIntRep` among them.
-**Treatment:** the prior owner and ACL recorded before the change, so undo restores what was actually there. Cheaper substitute that fails the checkpoint: a reverse that sets ownership to the current user or to `TrustedInstaller` by convention.
+**Treatment:** the prior state of the four `HKCR` subtrees recorded before the change, so undo restores what was actually there (**Groomed 2026-09-23:** this read "the prior owner and ACL", which the 2026-09-17 correction above shows the tool never touches). Cheaper substitute that fails the checkpoint: a reverse that sets ownership to the current user or to `TrustedInstaller` by convention.
 **Chrome:** consume the framework and the repair contract. Do not keep a private copy of either.
 **Needs:** Windows host (build/test)
 
 
 **Build order.** This slice decides whether the framework and the contract are right. Capture the baseline **before** writing any C++, because the shipped tool is the only source of truth for what it does.
 
-1. **Capture the AutoIt baseline first.** Run `resolute_au3/Resolute/Ownership.exe` against `tests/fixtures/filetree/` and record its effects and window. Done when: the baseline is committed under `docs/captures/` and the parity record exists for the AutoIt side.
+1. **Capture the AutoIt baseline first.** Run `resolute_au3/Resolute/Ownership.exe` around a `RegistryFixture` snapshot of the four `HKCR` subtrees and record its effects and window (**Groomed 2026-09-23:** `tests/fixtures/filetree/` does not exist and a file tree is not what the tool changes). Done when: the baseline is committed under `docs/captures/` and the parity record exists for the AutoIt side.
 2. **Enumerate what the tool does** from `resolute_au3/SDK/Concrete/Ownership/Ownership.au3`, ignoring the roughly 1,556 framework lines and reading only its real logic. Done when: every action it performs is listed with its source line.
 3. **Declare those actions as repair-contract items**, with no loop of their own. Done when: the tool compiles and `D02 T01 §1`'s loop runs them.
 4. **Run the parity driver** and fix differences until it reports zero. Done when: the parity report shows no differing fields, quoted.
-5. **Prove the reverse**, which the AutoIt tool never had, so it has no baseline. Done when: takeover then undo restores every owner and ACL, asserted.
-6. **Prove the refusal** with a deny-ACE fixture. Done when: the path is refused by name and the batch counts still reconcile.
+5. **Prove the reverse**, which the AutoIt tool never had, so it has no baseline. Done when: install then undo leaves the four `HKCR` subtrees equal before and after, including the `\command` string, asserted (**Groomed 2026-09-23:** this read "restores every owner and ACL").
+6. **Prove the refusal** unelevated. Done when: an unelevated install or uninstall is refused by name, the four `HKCR` subtrees are unchanged, and one log line records it, plus the elevated success leg (**Groomed 2026-09-23:** this read "a deny-ACE fixture", a file-permission case the tool never meets).
 7. **Record what the slice proved** before porting anything else. Done when: this section states which framework and contract assumptions are now evidence, so `§2` starts from fact.
 
 - [ ] Capture the shipped AutoIt `Ownership` first: a driven run against the fixture tree with its effects and window recorded. Done when: the baseline is committed.
@@ -108,14 +108,14 @@ track: P2
 
   **So the first AutoIt-side parity record is this item's to produce**, and the first item of this section is where it is captured. The instrument is already proven against real registry and filesystem state, so what remains here is running it around two implementations rather than building it. The snapshot is taken from **outside** the run, which is why an AutoIt binary that exposes nothing needs no cooperation to be measured.
 - [ ] Prove the reverse: installing the context-menu entry followed by undo leaves `HKCR` exactly as it was, compared key by key and value by value. **Corrected 2026-09-17:** this said "restores every path's owner and ACL", which is not what the tool touches. Done when: the assertion compares the four `HKCR` subtrees before and after, including the `\command` string, and a `RegistryFixture` gives it a disposable target.
-- [ ] Prove the refusal: a path the process cannot touch is refused by name, leaving every other path in the batch accounted for. Done when: a deny-ACE fixture produces the refusal and the batch counts reconcile.
+- [ ] Prove the refusal: an unelevated install or uninstall is refused by name with nothing written. Done when: the four `HKCR` subtrees read unchanged after the refusal, one log line records it, and the elevated leg succeeds (**Groomed 2026-09-23:** this read "a deny-ACE fixture produces the refusal and the batch counts reconcile", a file-permission case the tool never meets).
 - [ ] Account for the surface: every control is working or deferred to a named section. Done when: the account is written and each deferral resolves.
 - [ ] Record what the slice proved and what it did not. Done when: this section states which framework and contract assumptions are now evidence rather than intention.
 - [ ] Commit: `"ownership: port to the framework and the repair contract"`
 
 **Freeze check:** What `Ownership` writes to `HKCR` does not change, **including the exact `\command` string**, because that string is what eventually runs against a user's files and a change to it changes what happens to them. **Corrected 2026-09-17:** this read "what `Ownership` grants on takeover" against a file tree fixture, and the tool grants nothing at run time. Evidence is the parity report showing zero differing fields against the shipped AutoIt build over the four `HKCR` subtrees.
 
-**Test checkpoint:** The parity driver reports zero differing fields between the C++ and AutoIt implementations on the same fixture tree, quoted. Takeover followed by undo restores every owner and ACL, asserted. A deny-ACE path is refused by name with the batch reconciling. The rendered window is compared against the pre-change capture.
+**Test checkpoint:** The parity driver reports zero differing fields between the C++ and AutoIt implementations on the same fixture tree, quoted. Install followed by undo leaves the four `HKCR` subtrees as they were, asserted. An unelevated install is refused by name with nothing written, plus the elevated leg (**Groomed 2026-09-23:** this checkpoint named file ACLs and a deny-ACE path). The rendered window is compared against the pre-change capture.
 
 ## 2. The Remaining Frozen Tools: ComIntRep and PixRepair
 
@@ -156,6 +156,7 @@ track: P2
 - [ ] Prove the reverse per tool, or state plainly which actions have none and what the user should do instead, on the surface. Done when: each carries one of those two and the checkpoint proves which.
 - [ ] Prove the elevation refusal per tool. Done when: two unelevated assertions each show the action refused by name, nothing changed, one log line.
 - [ ] Account for each surface. Done when: two accounts are written and each deferral resolves.
+- [ ] Port `ComIntRep` to `extensions/ComIntRep/` as framework plus contract plus the items `D04 T03 §1` declares, with the `D04 T03 §2` surface (groom 2026-09-23 gap scan) : `D04 T03` says its build and parity proof stay here, but this section's only port item is `PixRepair`, so nothing builds the 14 repairs, 5 menus, 4 Export commands, the Troubleshoot and Tools launches, or the reboot prompt. Done when: the tool builds as its own executable, the parity driver reports zero differing fields against `resolute_au3/` on the same fixture, and the unelevated refusal leg runs for `ComIntRep` alone (`PixRepair` needs no elevation, `D04 T04 §2`, so its refusal leg reads not-applicable with that reason).
 - [ ] Commit: `"system tools: port comintrep and pixrepair"`
 
 **Freeze check:** Neither tool's effect changes. Evidence is two parity reports with zero differing fields against the shipped AutoIt builds on their own fixtures. **The `ComIntRep` half transfers to its spec**, which is where its repairs are declared.
@@ -205,6 +206,7 @@ Two tools with near-identical shape become one. Neither can be fully proven with
 - [ ] Prove parity for the USB actions against the shipped `USBRepair`. Done when: the parity report is quoted.
 - [ ] Prove parity for the optical actions against the shipped `DVDRepair`, or record the leg as not run with its reason. Done when: either the report is quoted or the reason is recorded and this row does not stamp.
 - [ ] State plainly which actions have no reverse, on the surface. Done when: each irreversible action carries that statement where the user sees it.
+- [ ] Cover the registry writes both drive tools actually make (groom 2026-09-23 gap scan) : `USBRepair` deletes the `UpperFilters` and `LowerFilters` values under the HKLM device-class keys (`USBRepair.au3:987-988`), and `DVDRepair` also writes or deletes about twelve autorun policy values, the `IniFileMapping\Autorun.inf` default, and `atapi\Controller0 EnumDevice1` (`DVDRepair.au3:1032-1076`); none acts on a drive letter. Done when: the Drive Repair specification lists every value written and deleted, each is captured in the restore record with undo proven on a `RegistryFixture`, an unelevated HKLM write is refused by name, the freeze check pins the exact value set, and the autorun toggle's enable and disable directions are both specified.
 - [ ] Commit: `"drive repair: merge usbrepair and dvdrepair"`
 
 **Freeze check:** What either tool does to a drive does not change. Evidence is the recorded action lists before and after, plus parity reports per device type.

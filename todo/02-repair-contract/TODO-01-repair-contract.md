@@ -39,7 +39,7 @@ track: F2
 - Every action and every refusal writes exactly one log line.
 - A user can carry the result away as a file.
 
-**Adjacency:** list=applicable @ D02 T01 §5; document=applicable @ D02 T01 §5; settings=not-applicable (the contract owns no settings of its own; the framework's writer holds everything); reporting=applicable @ D02 T01 §3; notifications=applicable @ D02 T01 §3; permissions=applicable @ D02 T01 §2; audit=applicable @ D02 T01 §6; exchange=applicable @ D02 T01 §4; reverse=applicable @ D02 T01 §4
+**Adjacency:** list=applicable @ D02 T01 §4; document=applicable @ D02 T01 §5; settings=not-applicable (the contract owns no settings of its own; the framework's writer holds everything); reporting=applicable @ D02 T01 §3; notifications=applicable @ D02 T01 §3; permissions=applicable @ D02 T01 §1; audit=applicable @ D02 T01 §6; exchange=applicable @ D02 T01 §4; reverse=applicable @ D02 T01 §4
 
 **Adjacency rationale:** Reverse and exchange both anchor on §4 because a restore record is simultaneously the undo mechanism and a file that outlives the process, may be carried to another machine, and may be hand-edited, which makes it untrusted input on the way back in. List and document pair on §5 because the result of a repair run is the one artifact a user genuinely wants to keep and carry to whoever is helping them.
 
@@ -150,6 +150,7 @@ The part users actually need and the part nobody builds. A repair with no revers
 - [ ] Make undo all-or-nothing, or state plainly on the surface and in the log that it is not and what the user must do after a partial undo. Done when: the behavior is one of those two and the checkpoint proves which.
 - [ ] Give records a findable identity: what run they came from, what they cover, and when. Done when: a user with several records can pick one without opening it, captured.
 - [ ] Handle the irreversible item honestly: the contract refuses to let it claim a reverse, and the surface says so before the user commits. Done when: a fixture item declared irreversible shows the statement on the surface, not only in the documentation.
+- [ ] Give restore records a retention rule and a delete (groom 2026-09-23 gap scan) : records are created per run, listed, and undone, but never pruned or deleted, so they accumulate forever and Repair History (`D05 T04 §2`) has no delete to offer. Done when: a retention setting bounds the store, deleting one record goes through the destructive confirmation, warns that the run can no longer be undone, and writes one log line, and a fixture proves prune and delete leave every other record intact, quoted.
 - [ ] Commit: `"repair: restore records and a real undo"`
 
 **Freeze check:** The contract changes no tool's repair effect. What changes is that the prior state is recorded first. Evidence is a fixture run before and after the change producing byte-identical effects. Fixture source: `tests/fixtures/`.

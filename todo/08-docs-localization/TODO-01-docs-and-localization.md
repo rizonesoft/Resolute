@@ -24,7 +24,7 @@ track: D1
 > - **`License.txt` comes in two shapes and neither is the licence.** Seven tools ship a 7-line GPL v3 **notice**; `Firemin`, `Chromin`, and `Resolute` ship a 63 to 64-line structured agreement. Neither contains the GPL v3 text itself, although every one of them says "You should have received a copy of the GNU General Public License along with this program."
 > - **Two different copyright holders appear.** The older files say `Copyright (C) 2023 RIZONESOFT`; the newer say `Copyright © 2025 Rizonetech (Pty) Ltd.` and add that Rizonesoft is a trading name of it.
 >
-> **The repository `README.md` is 2 lines**: a title and a blank.
+> **The repository `README.md` was 2 lines** on 2026-09-16: a title and a blank (**Groomed 2026-09-23:** `D00 T03 §4` rewrote it to 101 lines, and `D00 T05 §2` owns its premium rewrite).
 >
 > `resolute_au3/SDK/Concrete/ReBar/Templates/` holds `Changes.tpl`, `License.tpl`, and `Readme.tpl`, which is what a documentation set was meant to be generated from. `Ownership/Changes.txt` records "Upgraded to Resolute Framework 11", confirming that `ReBar` is the framework by its internal name.
 
@@ -100,6 +100,7 @@ The change that turns an impossible translation job into a tractable one. Most s
 - [ ] Build the coverage matrix: every tool by every language, with completeness. Done when: the matrix renders and is committed.
 - [ ] Report a tool's missing keys from a driven run rather than by inspection. Done when: every shipped tool is driven with every available pack and its missing keys are reported.
 - [ ] Decide and record what happens to a language that is incomplete for a tool. Done when: the policy is dated with its cost of changing.
+- [ ] Extract each tool's key set from source and check every pack against it (groom 2026-09-23 gap scan) : clause C07 forbids literal strings (`docs/conformance-profile.md:40`), but completeness is checked only by a driven run, which misses undriven surfaces and never finds orphaned keys. Done when: a build step extracts every key each tool references, every composed pack is checked for missing and orphaned keys, and a seeded missing key and a seeded orphan each fail the release by name, quoted.
 - [ ] Commit: `"localization: coverage matrix and pack hygiene"`
 
 **Test checkpoint:** Every pack follows one naming rule, checked. A malformed pack fails the release, proven with three malformed fixtures. The coverage matrix renders every tool by every language. Every shipped tool is driven with every pack and missing keys are reported.
@@ -124,15 +125,19 @@ The existing readmes are not empty, which is the trap: `ComIntRep`'s is 52 lines
 
 ## 5. Repository and Developer Documentation
 
-The repository `README.md` is two lines. Somebody arriving at this project cold, including a future maintainer, has `AGENTS.md`, `DESIGN.md`, and a 93-section plan, and nothing that tells them what any of it is.
+The repository `README.md` was two lines on 2026-09-16. Somebody arriving at this project cold, including a future maintainer, has `AGENTS.md`, `DESIGN.md`, and a plan of more than two hundred sections, and needs something that tells them what any of it is. **Groomed 2026-09-23:** `D00 T03 §4` rewrote the README to 101 lines, and the README has one owner, `D00 T05 §2`, which now carries the premium rewrite; the three README items below hand over to it word for word. This section keeps the bootstrap document.
 
-- [ ] Write the repository `README.md`: what Resolute is, what the two trees are, how to bootstrap and build, and where the plan lives. Done when: a reader who has never seen the project can bootstrap the toolchain and build from it alone.
-- [ ] Explain the shape, because it is unusual and will otherwise be misread. Done when: the readme states that `resolute_au3/` is a frozen specification rather than a maintenance target, and that `src/`, `shared/`, and `extensions/` are the work.
-- [ ] Write the bootstrap document the build actually needs, following `intelligent-notepad/docs/bootstrap.md` in form: from zero to a green build with no improvisation. Done when: a second person follows it on a machine with no toolchain and records the result.
-- [ ] Point at the contracts rather than restating them. Done when: the readme links `AGENTS.md`, `DESIGN.md`, and `todo/README.md`, and duplicates none of their content.
+- [ ] ~~Write the repository `README.md`: what Resolute is, what the two trees are, how to bootstrap and build, and where the plan lives~~ -> `D00 T05 §2`
+- [ ] ~~Explain the shape, because it is unusual and will otherwise be misread~~ -> `D00 T05 §2`
+- [ ] Write the bootstrap document the build actually needs, from zero to a green build with no improvisation (**Groomed 2026-09-23:** the form model it named, `intelligent-notepad/docs/bootstrap.md`, exists in no project on this machine, so the section sets the form itself). Done when: a second person follows it on a machine with no toolchain and records the result.
+- [ ] ~~Point at the contracts rather than restating them~~ -> `D00 T05 §2`
 - [ ] Commit: `"docs: a repository readme and a bootstrap document"`
 
-**Test checkpoint:** A reader with no prior exposure bootstraps the toolchain and builds from the readme alone, and the run is recorded. The readme states the role of both trees. It links the three contracts and restates none of them.
+-> XREF: D00 T05 §2 (item: "Write the repository `README.md`: what Resolute is, what the two trees are, how to bootstrap and build, and where the plan lives") -- the README owner
+-> XREF: D00 T05 §2 (item: "Explain the shape, because it is unusual and will otherwise be misread") -- the README owner
+-> XREF: D00 T05 §2 (item: "Point at the contracts rather than restating them") -- the README owner
+
+**Test checkpoint:** A second person bootstraps the toolchain and builds from the bootstrap document alone, and the run is recorded. The README duties are proven in `D00 T05 §2`.
 
 ## Verification
 
