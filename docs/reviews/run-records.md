@@ -399,3 +399,16 @@ round: 5 model: opus effort: medium outcome: findings candidate: 78a0e002 provid
 # opus rounds: the envelope model field came back empty, so version stays unresolved per the D00 T04 §18 precedent (modelUsage reads claude-opus-5 on all three).
 empty: 0
 refuted: 5
+
+run: D00-T04-S27
+date: 2026-09-23
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-sol effort: medium outcome: findings candidate: a492a734 provider: openai version: gpt-6-sol cost: 54589tokens latency: 98s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S27-F1, D00-T04-S27-F2, D00-T04-S27-F3
+round: 2 model: gpt-6-sol effort: medium outcome: findings candidate: c2c6c176 provider: openai version: gpt-6-sol cost: 49168tokens latency: 53s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S27-F4
+round: 3 model: gpt-6-sol effort: high outcome: findings candidate: b8f3b74f provider: openai version: gpt-6-sol cost: 48669tokens latency: 50s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S27-F5
+# round 3 is the Full sign-off on the GPT-governed wiring (D00 T04 §27): its one finding was stamp-invalidating, so round 4 verifies the fix on the depth slot.
+round: 4 model: gpt-6-sol effort: high outcome: findings candidate: 867e2813 provider: openai version: gpt-6-sol cost: 61378tokens latency: 127s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S27-F6
+# round 4's finding sits below the blocking bar and files to D00 T04 §26 without a fifth round.
+empty: 0
+refuted: 0

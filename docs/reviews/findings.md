@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**308 findings across 38 sections.**
+**314 findings across 39 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 102 | the plan or the evidence misdescribes what happened |
+| `record` | 104 | the plan or the evidence misdescribes what happened |
 | `adversarial` | 68 | fails under hostile or unexpected input |
-| `consistency` | 50 | disagrees with the rest of the suite, its naming, or its layout |
-| `correctness` | 40 | the code does the wrong thing |
-| `integration` | 34 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 51 | disagrees with the rest of the suite, its naming, or its layout |
+| `correctness` | 42 | the code does the wrong thing |
+| `integration` | 35 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 148 | wrong behavior in code, plan, or record |
-| `minor` | 154 | polish or wording, or no surviving defect |
+| `major` | 151 | wrong behavior in code, plan, or record |
+| `minor` | 157 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -283,6 +283,12 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §24` | F20 | minor | `consistency` | fixed | independent | in-flight suite total survives in item 12 against item 7 |
 | `D00 T04 §24` | F21 | minor | `integration` | fixed | independent | holding patterns unwitnessed against checker wording |
 | `D00 T04 §24` | F22 | minor | `record` | duplicate | independent | sizing observation stale at the live assembly size |
+| `D00 T04 §27` | F1 | major | `correctness` | fixed | independent | outage-fill slots never required to run the writer family |
+| `D00 T04 §27` | F2 | minor | `consistency` | fixed | independent | plan fallback record called same-family after naming the writer family |
+| `D00 T04 §27` | F3 | major | `integration` | fixed | independent | heartbeat liveness reads the campaign session's own transcript |
+| `D00 T04 §27` | F4 | minor | `record` | fixed | independent | Done note quotes the pre-fix self-test count |
+| `D00 T04 §27` | F5 | major | `record` | fixed | independent | skills item describes liveness the candidate no longer implements |
+| `D00 T04 §27` | F6 | minor | `correctness` | filed | independent | POSIX timeout kills the producer but not its children |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
