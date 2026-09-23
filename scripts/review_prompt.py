@@ -950,6 +950,200 @@ def check_parent_binding(commit: str, expected: str, cwd=None) -> str | None:
     return None
 
 
+# --- reachable provenance and CI read-back (D00 T04 §30) ---------------------
+
+_PROVENANCE_CANDIDATE_RE = re.compile(r"^Provenance:\s*candidate\s+([0-9a-fA-F]{7,40});", re.MULTILINE)
+
+
+def provenance_candidates(findings_text: str) -> list[str]:
+    """Every distinct `Provenance: candidate <oid>` a findings file cites,
+    in first-seen order. Fenced text counts too: a quoted candidate is
+    still a claim a reader will try to resolve."""
+    seen: list[str] = []
+    for m in _PROVENANCE_CANDIDATE_RE.finditer(findings_text):
+        if m.group(1) not in seen:
+            seen.append(m.group(1))
+    return seen
+
+
+def _git_out(args: list[str], cwd=None) -> tuple[int, str]:
+    import subprocess
+    proc = subprocess.run(["git", "--no-replace-objects", *args], capture_output=True,
+                          text=True, cwd=cwd)
+    return proc.returncode, proc.stdout
+
+
+def _object_identity(oid: str, cwd=None) -> tuple[str, str] | None:
+    """(full oid, type) for an object this repository holds, else None."""
+    rc, out = _git_out(["rev-parse", "--verify", "--quiet", oid + "^{object}"], cwd)
+    if rc != 0 or not out.strip():
+        return None
+    full = out.strip()
+    rc, kind = _git_out(["cat-file", "-t", full], cwd)
+    return (full, kind.strip()) if rc == 0 else None
+
+
+def reachable_objects(refs: list[str], cwd=None) -> tuple[set[str], set[str]] | None:
+    """(commits, root trees) reachable from `refs`, or None when git cannot
+    walk them. Candidates are commits or staged root trees (`git
+    write-tree`), so a commit's own tree is the only tree reach that
+    matters; subtrees and blobs are never cited."""
+    if not refs:
+        return set(), set()
+    rc, out = _git_out(["log", "--format=%H %T", *refs, "--"], cwd)
+    if rc != 0:
+        return None
+    commits, trees = set(), set()
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) == 2:
+            commits.add(parts[0])
+            trees.add(parts[1])
+    return commits, trees
+
+
+def remote_ref_oids(remote: str, cwd=None) -> list[str] | None:
+    """Every commit a remote's branches and tags point at (peeled), or
+    None when the remote cannot be read. Only objects this clone holds
+    are returned: a remote oid the clone lacks cannot vouch for a
+    candidate the clone would have to walk to."""
+    rc, out = _git_out(["ls-remote", remote], cwd)
+    if rc != 0:
+        return None
+    oids: dict[str, str] = {}
+    for line in out.splitlines():
+        parts = line.split("\t")
+        if len(parts) != 2:
+            continue
+        oid, ref = parts
+        if not (ref.startswith("refs/heads/") or ref.startswith("refs/tags/") or ref == "HEAD"):
+            continue
+        base = ref[:-3] if ref.endswith("^{}") else ref
+        if ref.endswith("^{}") or base not in oids:
+            oids[base] = oid
+    held = []
+    for oid in dict.fromkeys(oids.values()):
+        ident = _object_identity(oid, cwd)
+        if ident and ident[1] == "commit":
+            held.append(oid)
+    return held
+
+
+def unreachable_candidates(candidates: list[str], refs: list[str], cwd=None) -> list[str] | None:
+    """Candidates no commit or root tree reachable from `refs` accounts
+    for, each with its reason; None when git cannot walk the refs."""
+    reach = reachable_objects(refs, cwd)
+    if reach is None:
+        return None
+    commits, trees = reach
+    bad = []
+    for cand in candidates:
+        ident = _object_identity(cand, cwd)
+        if ident is None:
+            bad.append(f"{cand} (resolves to nothing here)")
+        elif ident[1] == "commit" and ident[0] not in commits:
+            bad.append(f"{cand} (commit {ident[0][:12]} reached by no pushed ref)")
+        elif ident[1] == "tree" and ident[0] not in trees:
+            bad.append(f"{cand} (tree {ident[0][:12]} is no pushed commit's tree)")
+        elif ident[1] not in ("commit", "tree"):
+            bad.append(f"{cand} (a {ident[1]}, not a commit or root tree)")
+    return bad
+
+
+def provenance_tag(candidate: str, prefix: str, cwd=None) -> tuple[str | None, str]:
+    """Create `provenance/<prefix>-<short8>` for a candidate: a commit is
+    tagged directly, a tree is wrapped in a parentless commit first so a
+    tag can reach it. Idempotent: an existing tag on the same target is
+    reused, a tag on a different target refuses. Returns (tag, error)."""
+    import subprocess
+    ident = _object_identity(candidate, cwd)
+    if ident is None:
+        return None, f"{candidate} resolves to nothing, so nothing can be tagged"
+    full, kind = ident
+    tag = f"provenance/{prefix}-{full[:8]}"
+    rc, existing = _git_out(["rev-parse", "--verify", "--quiet", f"refs/tags/{tag}^{{commit}}"], cwd)
+    if kind == "commit":
+        target = full
+    elif kind == "tree":
+        if rc == 0 and existing.strip():
+            rc2, tree = _git_out(["rev-parse", existing.strip() + "^{tree}"], cwd)
+            if rc2 == 0 and tree.strip() == full:
+                return tag, ""
+            return None, f"{tag} exists on a commit whose tree is not {full[:12]}"
+        msg = (f"provenance: {prefix} staged tree {full[:8]}\n\n"
+               f"A provenance candidate cited by the {prefix} findings, captured\n"
+               f"with git write-tree and never committed. This commit only makes\n"
+               f"the tree reachable from a pushed ref (D00 T04 §30).\n")
+        proc = subprocess.run(["git", "--no-replace-objects", "commit-tree", full, "-m", msg],
+                              capture_output=True, text=True, cwd=cwd)
+        if proc.returncode != 0:
+            return None, f"commit-tree {full[:12]} failed: {proc.stderr.strip()[:160]}"
+        target = proc.stdout.strip()
+    else:
+        return None, f"{candidate} is a {kind}, not a commit or root tree"
+    if rc == 0 and existing.strip():
+        if existing.strip() == target:
+            return tag, ""
+        return None, f"{tag} exists on {existing.strip()[:12]}, not {target[:12]}"
+    rc3, _ = _git_out(["tag", tag, target], cwd)
+    if rc3 != 0:
+        return None, f"git tag {tag} failed"
+    return tag, ""
+
+
+def _gh_argv() -> list[str]:
+    """The GitHub CLI: `GH` when set (a `.py` path runs under this
+    interpreter, which is how the self-test fakes it), else `gh` on PATH,
+    else the Windows installer's default location."""
+    import shutil
+    env = os.environ.get("GH")
+    if env:
+        return [sys.executable, env] if env.endswith(".py") else [env]
+    found = shutil.which("gh")
+    if found:
+        return [found]
+    default = r"C:\Program Files\GitHub CLI\gh.exe"
+    return [default] if os.path.isfile(default) else ["gh"]
+
+
+def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float) -> tuple[int, str]:
+    """Wait for `workflow`'s run on `sha` and return (exit, line): 0 green,
+    1 red (any completed conclusion but success), 2 unverifiable (no gh,
+    no run by the deadline, or unreadable output). `gh run list
+    --commit` matches only a full 40-hex sha (a short one returns `[]`,
+    probed 2026-09-23), so the caller resolves it first."""
+    import json as _json
+    import subprocess
+    import time
+    deadline = time.monotonic() + timeout
+    last = "no run listed yet"
+    while True:
+        try:
+            proc = subprocess.run(
+                [*_gh_argv(), "run", "list", "--commit", sha, "--workflow", workflow,
+                 "--json", "status,conclusion,url,databaseId,headSha"],
+                capture_output=True, text=True, timeout=120)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            return 2, f"ci-wait: gh unavailable: {exc}"
+        if proc.returncode != 0:
+            return 2, f"ci-wait: gh exited {proc.returncode}: {proc.stderr.strip()[:200]}"
+        try:
+            runs = _json.loads(proc.stdout or "[]")
+        except ValueError:
+            return 2, f"ci-wait: gh output is not JSON: {proc.stdout[:120]!r}"
+        runs = [r for r in runs if isinstance(r, dict) and r.get("headSha", sha) == sha]
+        if runs:
+            run = max(runs, key=lambda r: r.get("databaseId") or 0)
+            if run.get("status") == "completed":
+                verdict = run.get("conclusion") or "unknown"
+                line = f"ci-wait: {sha[:12]} {workflow} {verdict} {run.get('url', '')}".rstrip()
+                return (0 if verdict == "success" else 1), line
+            last = f"run {run.get('databaseId')} {run.get('status')}"
+        if time.monotonic() >= deadline:
+            return 2, f"ci-wait: {sha[:12]} {workflow} not concluded within {int(timeout)}s ({last})"
+        time.sleep(interval)
+
+
 def git_resolve_oid(oid: str, cwd=None) -> str | None:
     """The full oid for a revision, None when it resolves to nothing."""
     import subprocess
@@ -4775,6 +4969,104 @@ def _self_test() -> int:
               gotw.returncode == 1 and "receipt binds" in gotw.stderr,
               f"exit={gotw.returncode} out={gotw.stdout!r} "
               f"err={gotw.stderr!r}")
+    # D00 T04 §30: provenance candidates must be reachable from a pushed
+    # ref, and CI is read back after the push.
+    with tempfile.TemporaryDirectory(prefix="review-s30-") as tmpd:
+        def _g(*a):
+            return subprocess.run(["git", *a], cwd=tmpd, capture_output=True,
+                                  check=True, text=True)
+        _g("init", "-q", "-b", "main")
+        _g("config", "user.email", "t@t")
+        _g("config", "user.name", "t")
+        _g("config", "commit.gpgsign", "false")
+        with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
+            fh.write("one\n")
+        _g("add", "f.md")
+        _g("commit", "-qm", "c1")
+        c1 = _g("rev-parse", "HEAD").stdout.strip()
+        bare = os.path.join(tmpd, "remote.git")
+        subprocess.run(["git", "init", "-q", "--bare", bare], capture_output=True, check=True)
+        _g("remote", "add", "origin", bare)
+        _g("push", "-q", "origin", "main")
+        with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
+            fh.write("one\nstaged\n")
+        _g("add", "f.md")
+        staged = _g("write-tree").stdout.strip()
+        findings = os.path.join(tmpd, "findings.md")
+        with open(findings, "w", encoding="utf-8") as fh:
+            fh.write(f"Provenance: candidate {c1}; command true; exit 0; tool t 1; digest ab; path x; run r\n"
+                     f"Provenance: candidate {staged}; command true; exit 0; tool t 1; digest ab; path x; run r\n")
+        me = os.path.abspath(__file__)
+
+        def _rp(*a):
+            return subprocess.run([sys.executable, me, *a], cwd=tmpd, capture_output=True, text=True)
+        check("provenance-candidates-parsed",
+              provenance_candidates(open(findings, encoding="utf-8").read()) == [c1, staged])
+        got = _rp("check-reachable", "--findings", findings, "--remote", "origin")
+        check("reachable-refuses-local-only-tree",
+              got.returncode == 1 and staged[:12] in got.stderr and "no pushed commit's tree" in got.stderr
+              and c1[:12] not in got.stderr, f"exit={got.returncode} err={got.stderr!r}")
+        got = _rp("check-reachable", "--findings", findings, "--refs", "HEAD")
+        check("reachable-refuses-before-push",
+              got.returncode == 1 and staged[:12] in got.stderr, f"exit={got.returncode} err={got.stderr!r}")
+        got = _rp("provenance-tags", "--findings", findings, "--prefix", "d90-t30-s1")
+        tag = f"provenance/d90-t30-s1-{staged[:8]}"
+        check("provenance-tags-wraps-the-tree",
+              got.returncode == 0 and got.stdout.strip() == tag, f"exit={got.returncode} out={got.stdout!r} err={got.stderr!r}")
+        again = _rp("provenance-tags", "--findings", findings, "--prefix", "d90-t30-s1")
+        check("provenance-tags-idempotent", again.returncode == 0 and again.stdout.strip() == tag,
+              f"exit={again.returncode} out={again.stdout!r}")
+        got = _rp("check-reachable", "--findings", findings, "--refs", "HEAD", tag)
+        check("reachable-passes-with-the-tag-in-the-push-set", got.returncode == 0, got.stderr)
+        subprocess.run(["git", "push", "-q", "origin", tag], cwd=tmpd, capture_output=True)
+        got = _rp("check-reachable", "--findings", findings, "--remote", "origin")
+        check("reachable-passes-after-the-tag-lands",
+              got.returncode == 0 and "2 candidate(s) reachable" in got.stdout, f"{got.stdout!r} {got.stderr!r}")
+        clone = os.path.join(tmpd, "clone")
+        subprocess.run(["git", "clone", "-q", bare, clone], capture_output=True, check=True)
+        check("fresh-clone-resolves-the-tagged-tree",
+              _object_identity(staged, cwd=clone) is not None)
+        with open(findings, "a", encoding="utf-8") as fh:
+            fh.write("Provenance: candidate deadbeefdeadbeef; command true; exit 0; tool t 1; digest ab; path x; run r\n")
+        got = _rp("check-reachable", "--findings", findings, "--remote", "origin")
+        check("reachable-refuses-an-unknown-object",
+              got.returncode == 1 and "resolves to nothing here" in got.stderr, got.stderr)
+        # ci-wait against a faked gh: green, red, pending past the deadline.
+        fake = os.path.join(tmpd, "fake_gh.py")
+        state = os.path.join(tmpd, "gh-state.txt")
+        with open(fake, "w", encoding="utf-8") as fh:
+            fh.write(
+                "import json, sys, os\n"
+                f"state = {state!r}\n"
+                "mode = open(state).read().strip()\n"
+                "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
+                "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
+                "elif mode == 'none': runs = []\n"
+                "else: runs = [{'status': 'completed', 'conclusion': mode, 'databaseId': 9, 'headSha': sha, 'url': 'https://x/9'}]\n"
+                "print(json.dumps(runs))\n")
+        old_gh = os.environ.get("GH")
+        os.environ["GH"] = fake
+        try:
+            for mode, want, needle in (("success", 0, "plan-gates success https://x/9"),
+                                       ("failure", 1, "plan-gates failure"),
+                                       ("pending", 2, "not concluded within 0s (run 7 in_progress)"),
+                                       ("none", 2, "no run listed yet")):
+                with open(state, "w", encoding="utf-8") as fh:
+                    fh.write(mode)
+                code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+                check(f"ci-wait-{mode}", code == want and needle in line, f"code={code} line={line!r}")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("failure")
+            got = subprocess.run([sys.executable, me, "ci-wait", c1[:10], "--timeout", "0", "--interval", "0"],
+                                 cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-cli-resolves-short-sha-and-fails-red",
+                  got.returncode == 1 and c1[:12] in got.stderr and "failure" in got.stderr,
+                  f"exit={got.returncode} err={got.stderr!r}")
+        finally:
+            if old_gh is None:
+                os.environ.pop("GH", None)
+            else:
+                os.environ["GH"] = old_gh
     # The skill surface the tooling assumes (D00 T04 §21 items 2, 6, 7,
     # 8, 12, 14, 15): the suite reads the skill text, so a prose edit
     # that drops a wired command fails here, not at the next review.
@@ -4792,6 +5084,11 @@ def _self_test() -> int:
             ("skill-coverage-sentence",
              "Every `rev-parse`, `show`, and `diff` on this page passes `--no-replace-objects`"),
             ("skill-push-explicit", "git push origin $COMMIT:refs/heads/master"),
+            ("skill-provenance-tags", "python scripts/review_prompt.py provenance-tags --findings"),
+            ("skill-reachable-before-push", "check-reachable --findings <findings path> --refs $COMMIT"),
+            ("skill-reachable-after-push", "check-reachable --findings <findings path> --remote origin"),
+            ("skill-ci-wait", "python scripts/review_prompt.py ci-wait $COMMIT"),
+            ("skill-ci-red-stops", "A red or unverifiable read-back stops the run"),
             ("skill-push-readback",
              'git ls-remote origin refs/heads/master | cut -f1)" = "$COMMIT"'),
             ("skill-push-residual", "a concurrent force-push after it still moves the ref"),
@@ -5572,6 +5869,103 @@ if __name__ == "__main__":
             print(f"run-id: {exc}", file=sys.stderr)
             sys.exit(2)
         sys.exit(0)
+    if len(sys.argv) >= 3 and sys.argv[1] in ("check-reachable", "provenance-tags"):
+        # check-reachable --findings F (--refs R... | --remote NAME)
+        # provenance-tags --findings F --prefix P [--head REF]
+        # (D00 T04 §30): every provenance candidate a findings file cites
+        # must be reachable from a pushed ref, or a fresh clone (CI)
+        # cannot resolve it.
+        cmd, rest = sys.argv[1], sys.argv[2:]
+        opts: dict[str, list[str]] = {}
+        key = None
+        for arg in rest:
+            if arg.startswith("--"):
+                key = arg
+                opts.setdefault(key, [])
+            elif key is None:
+                print(f"{cmd}: unexpected argument {arg!r}", file=sys.stderr)
+                sys.exit(2)
+            else:
+                opts[key].append(arg)
+        if len(opts.get("--findings", [])) != 1:
+            print(f"{cmd}: --findings takes exactly one path", file=sys.stderr)
+            sys.exit(2)
+        try:
+            with open(opts["--findings"][0], encoding="utf-8") as fh:
+                cands = provenance_candidates(fh.read())
+        except OSError as exc:
+            print(f"{cmd}: cannot read findings: {exc}", file=sys.stderr)
+            sys.exit(2)
+        if cmd == "provenance-tags":
+            if len(opts.get("--prefix", [])) != 1 or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", opts["--prefix"][0]):
+                print("provenance-tags: --prefix takes one lowercase slug", file=sys.stderr)
+                sys.exit(2)
+            head = (opts.get("--head") or ["HEAD"])[0]
+            need = unreachable_candidates(cands, [head])
+            if need is None:
+                print(f"provenance-tags: cannot walk {head}", file=sys.stderr)
+                sys.exit(2)
+            failed = False
+            for entry in need:
+                tag, err = provenance_tag(entry.split(" ", 1)[0], opts["--prefix"][0])
+                if tag:
+                    print(tag)
+                else:
+                    print(f"provenance-tags: {err}", file=sys.stderr)
+                    failed = True
+            sys.exit(1 if failed else 0)
+        if ("--refs" in opts) == ("--remote" in opts):
+            print("check-reachable: pass exactly one of --refs or --remote", file=sys.stderr)
+            sys.exit(2)
+        if "--remote" in opts:
+            if len(opts["--remote"]) != 1:
+                print("check-reachable: --remote takes one name", file=sys.stderr)
+                sys.exit(2)
+            refs = remote_ref_oids(opts["--remote"][0])
+            if refs is None:
+                print(f"check-reachable: cannot read remote {opts['--remote'][0]}", file=sys.stderr)
+                sys.exit(2)
+            where = f"remote {opts['--remote'][0]}"
+        else:
+            refs = opts["--refs"]
+            where = "refs " + " ".join(refs)
+        bad = unreachable_candidates(cands, refs)
+        if bad is None:
+            print(f"check-reachable: cannot walk {where}", file=sys.stderr)
+            sys.exit(2)
+        if bad:
+            for entry in bad:
+                print(f"check-reachable: unreachable from {where}: {entry}", file=sys.stderr)
+            sys.exit(1)
+        print(f"check-reachable: {len(cands)} candidate(s) reachable from {where}")
+        sys.exit(0)
+    if len(sys.argv) >= 3 and sys.argv[1] == "ci-wait":
+        # ci-wait <sha> [--workflow W] [--timeout S] [--interval S]
+        # (D00 T04 §30): read CI back after a push; red stops the run.
+        rest = sys.argv[2:]
+        sha_arg, workflow, timeout, interval = rest[0], "plan-gates", 900.0, 15.0
+        i = 1
+        try:
+            while i < len(rest):
+                if rest[i] == "--workflow":
+                    workflow = rest[i + 1]
+                elif rest[i] == "--timeout":
+                    timeout = float(rest[i + 1])
+                elif rest[i] == "--interval":
+                    interval = float(rest[i + 1])
+                else:
+                    raise ValueError(rest[i])
+                i += 2
+        except (IndexError, ValueError) as exc:
+            print(f"ci-wait: bad argument {exc}", file=sys.stderr)
+            sys.exit(2)
+        ident = _object_identity(sha_arg)
+        if ident is None or ident[1] != "commit":
+            print(f"ci-wait: {sha_arg} is not a commit here", file=sys.stderr)
+            sys.exit(2)
+        code, line = ci_conclusion(ident[0], workflow, timeout, interval)
+        print(line, file=sys.stdout if code == 0 else sys.stderr)
+        sys.exit(code)
     if len(sys.argv) == 4 and sys.argv[1] == "check-parents":
         # check-parents <commit> <expected-parent>: the stamp lands on
         # its expected parent, and a merge fails naming every parent

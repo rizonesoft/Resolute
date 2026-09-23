@@ -274,9 +274,15 @@ python scripts/review_prompt.py check-parents $(git --no-replace-objects rev-par
 : "${CANONICAL_URL:?BLOCKED: CANONICAL_URL is unset; export the quoted canonical from the run record in this shell and restart}"  # fail instructive, never empty: an unset wanted URL must name its fix, not mismatch every origin (no apostrophe in the word: bash cannot parse one inside :?)
 PUSH_URL=$(git remote get-url --push --all origin)  # effective push destination: honors pushurl plus insteadOf/pushInsteadOf rewrites, and lists every push URL
 [ "$PUSH_URL" = "$CANONICAL_URL" ] || { echo "BLOCKED: origin pushes to $PUSH_URL, want $CANONICAL_URL; re-point origin or re-confirm the canonical and restart"; exit 1; }
-git push origin $COMMIT:refs/heads/master
+TAGS=$(python scripts/review_prompt.py provenance-tags --findings <findings path> --prefix <dNN-tNN-sN> --head $COMMIT) || { echo "BLOCKED: a provenance candidate could not be tagged"; exit 1; }  # a staged tree or unpushed commit the findings cite, made reachable
+python scripts/review_prompt.py check-reachable --findings <findings path> --refs $COMMIT $TAGS || { echo "BLOCKED: a provenance candidate is reachable from nothing this push carries"; exit 1; }
+git push origin $COMMIT:refs/heads/master $(for t in $TAGS; do printf 'refs/tags/%s ' "$t"; done)
 [ "$(git ls-remote origin refs/heads/master | cut -f1)" = "$COMMIT" ] || { echo "BLOCKED: the landing did not read back; re-review"; exit 1; }
+python scripts/review_prompt.py check-reachable --findings <findings path> --remote origin || { echo "BLOCKED: a provenance candidate did not land; push its tag"; exit 1; }
+python scripts/review_prompt.py ci-wait $COMMIT  # read CI back: record the line in the run file
 ```
+
+Keep every provenance candidate reachable from a pushed ref (D00 T04 §30): the findings' `Provenance: candidate` lines are checked by the validator, which resolves them locally and in CI's fresh clone, and a staged tree captured with `git write-tree` exists only on the writing machine. From 2026-09-20 to 2026-09-23 three such trees made every CI run fail while every local gate passed. `provenance-tags` tags each candidate the pushed commit does not reach as `provenance/<dNN-tNN-sN>-<short8>` (a tree is wrapped in a parentless commit first), `check-reachable --refs` refuses before the push when anything still would not land, and `check-reachable --remote` proves the landing. Then read CI back: `ci-wait` waits for the `plan-gates` run on the pushed commit (a full sha is resolved for it; `gh run list --commit` ignores short ones) and prints one line with the conclusion and run URL, which the run file records. A red or unverifiable read-back stops the run: the next section never starts on a red build, and the red is fixed first, because nothing else notices it (five stamps landed on a red run before this rule).
 
 After stamping a panel-reviewed section (D00 T04 §20): run `python scripts/todo-runs.py --report` and read the cut-leg interim lines beside the revisit trigger. On a FIRED or ARMED leg, file the early revisit through add-todo against the D00 T04 §23 trigger with the interim lines quoted (FIRED: the zero rule fires; ARMED: the overlap Jaccard half is met and the revisit runs the blinded value half); a quiet watch reads as one line in the run record.
 
