@@ -1,0 +1,159 @@
+﻿
+[Nederlands]
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Annuleer
+LSAVEASBUTTON=Opslaan Als...
+LANALYZEBUTTON=Analyseer
+LDEFRAGBUTTON=Defragmenteer
+LCLOSEBUTTON=Sluiten
+LRESTARTBUTTON=Herstarten
+LLATERBUTTON=Later
+LREPORTBUTTON=Rapport Maken...
+LSTOPBUTTON=Stop
+LBROWSEBUTTON=Bladeren...
+LERROR=Fout
+LENABLED=Aan
+LDISABLED=Uit
+LNOTSUPPORTED=Niet Ondersteund
+LREGREPLACE=Fout - RegReplaceKey staat uit. Herstart Windows en probeer opnieuw.
+LRESTOREPOINTNOT=Herstelpunt niet ondersteund.
+LCREATINGRESTORE=Herstelpunt Maken...
+LNEVERUSED=Nooit gebruikt
+
+;MAIN WINDOW
+LNEVERUSED=Nooit gebruikt
+LMENUOPTIONS=Opties
+LMENUHELP=Help
+LMENUABOUT=Over
+LOVERVIEW=Overzicht
+LLASTDEFRAG=Laatste Defragmentatie:
+LSIZERECOVERED=Teruggewonnen Plaats:
+LPERCENT=Percentage:
+LWOULDLIKE=Wat zou u willen doen?
+LDEFRAGTITLE=Defragmenteer Register
+LREGINFOTITLE=Verkrijg Register Informatie
+LUPDATEOK=U gebruikt de laatste versie.
+LUPDATEDISABLED=Auto check update staat uit.
+LUPDATENEW=Nieuwe versie is beschikbaar.
+LUPDATEWAIT=Controleren voor nieuwe versie. Even Geduld.
+LMOREINFO=meer info...
+LUPDATES=Updates
+
+;ABOUT WINDOW
+LABOUTTITLE=Over
+LVERSION=Versie
+LICON=Ikonen gemaakt door
+
+;OPTIONS WINDOW
+LOPTIONS=Opties
+LOPTIONSDESCRIPTION=Configureer Programma Instellingen.
+LSETTINGS=Algemene Instellingen
+LLANGUAGE=Taal
+LCHKCHECKUPDATE=Automatisch controleren voor updates
+LCHECKNOW=Nu controleren voor nieuwe updates...
+LCHKDEFRAGMYCOMPUTER=Voeg "Register Defragmenteren..." toe aan Deze Computer context menu
+LCHKREGINFOMYCOMPUTER=Voeg "Verkrijg Register Informatie" toe aan Deze Computer context menu
+LBACKUPS=Backups
+LAUTOREGFILES=Automatisch register bestanden backuppen voor defragmentatie
+LAUTORESTOREPOINT=Automatisch herstelpunt maken voor defragmentatie
+LBACKUPFOLDER=Backups Map:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Informatie
+LREGINFODESCRIPTION=Informatie over het Windows Register.
+LSO=Besturingssysteem:
+LUSER=Gebruiker:
+LREGSIZE=Register Grootte:
+LCOLUMNPATH=Pad
+LCOLUMNSIZE=Grootte
+LREGISTRYFILES=Register Bestanden
+LNUMBERFILES=Aantal Bestanden:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnose
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Hive Naam:
+LLOGICALPATH=Logisch Pad:
+LMAPPATH=Map Pad:
+LTEMPPATH=Temp Pad:
+LHIVESIZE=Hive Grootte:
+LKEY=Sleutel:
+LVALIDFILE=Bestand bestaat.
+LNOTVALIDFILE=Bestand bestaat niet.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Optimaliseer en Comprimeer het Windows Register.
+LTITLEPROBLEM=Problemen en Oplossingen
+LMAINTEXT=Register data wordt constant geschreven en verwijderd tijdens een normale Windows werking. Na enige tijd wordt deze data gefragmenteerd. Deze tool optimaliseert uw register door gaten, fragmenten en verspilde plaats te verwijderen in Windows register bestanden.
+LBENEFITS=Quicksys RegDefrag verbetert de gehele systeem prestaties en voert de toegang tot het register op.
+LTITLESTEPS=Stappen
+LSTEP1=1. Analyseer uw register.
+LSTEP2=2. Bekijk de resultaten.
+LSTEP3=3. Defragmenteer het register. Herstarten is vereist.
+LTITLEANALYZE=klik "Analyseer" om het proces te starten.
+LAUTOBACKUP=Automatische Backup:
+LAUTORESTORE=Automatisch Herstelpunt:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analysatie register. Even Geduld.
+LPROGRESS=Vooruitgang:
+LREADING=Controleren:
+LSTOPPROCESS=Processen stoppen...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Analyse Resultaten
+LCOMPARATION=Vergelijking
+LCONCLUSION=Conclusie
+LREGISTRYFRAGMENTATION=Register Fragmentatie
+LCURRENTSIZE=Huidige Register Grootte:
+LNEWSIZE=Nieuwe Register Grootte:
+LSIZEDIFFERENCE=Grootte Verschil:
+LLEGFRAG=gefragmenteerd
+LLEGALLOC=toegewezen plaats
+LBACKREGFILES=Backup van register bestanden:
+LBACKRESTORE=Maak herstelpunt:
+LCONCLUSION=Conclusie
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defragmentatie Voltooid!
+LFINISHED=Succesvol voltooid.
+LRESTARTREQUIRED=U moet uw computer herstarten om de wijzigingen toe te passen.
+LRESTARTMSGBOX=Wilt u nu herstarten?
+LHTMLREPORT=U kan een html rapport maken met informatie over de defragmentatie.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=U moet de computer herstarten om een nieuwe analyse te maken.
+LDEFRAGMSGBOX1=Sluit alle programma's.
+LDEFRAGMSGBOX2=Analyse kan enkele minuten duren.
+LDEFRAGMSGBOX3=Tijdens dit proces kan het zijn dat uw computer niet reageert.
+LDEFRAGMSGBOX4=klik op "Yes" om voort te doen
+LFEWFRAGMENTS=Weinig fragmenten gevonden. Het is niet nodig om het register te defragmenteren.
+LNOFRAGMENTS=Geen fragmenten gevonden. Het is niet mogelijk om het register te defragmenteren.
+LTOOFRAGMENTS=Te veel fragmenten gevonden. Klik op "Defragmenteren" om het register te optimaliseren.
+
+;REPORT 
+LNAMEREPORT=Rapport
+LH1=Defragmentatie Rapport
+LCREATEDBY=Gemaakt door
+LDATE=Datum:
+LTIME=Tijd:
+LSUMMARY=Defragmentatie Samenvatting
+LREGPROCESSED=Register bestanden verwerkt:
+LREGANASTART=Start register analyse:
+LREGANAFINISHED=Register analyse voltooid:
+LREGTOTALFINISHED=Totale tijd register analyse:
+LREGSIZEBEFORE=Register grootte voor:
+LREGSIZEAFTER=Register grootte na:
+LREGSIZEDIFFERENCE=Register grootte verschil:
+LREGFILESSUMMARY=Register Bestanden Samenvatting
+LCOLUMNREGFILE=Register Bestand
+LCOLUMNREGBEFORE=Grootte Voor
+LCOLUMNAFTER=Grootte Na
+LCOLUMNDIFFERENCE=Grootte Verschil
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Defragmentatie Register
+LDEFRAGNOW=Defragmentering:

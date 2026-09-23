@@ -1,0 +1,4 @@
+Repair cmd Association:
+
+The regkeys that are change are located in the program folder under "files\regfiles\file_associations"
+You can right click the reg file and choose edit to see what keys are changed.

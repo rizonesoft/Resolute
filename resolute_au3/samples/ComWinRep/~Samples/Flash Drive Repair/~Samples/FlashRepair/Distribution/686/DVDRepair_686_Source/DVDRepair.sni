@@ -1,0 +1,67 @@
+[SDK]
+Compatibilty = Rizonesoft.SDK.2
+Script = DVDRepair.au3
+
+[Signing]
+CertificateSet = Signing\Certum.ini
+Description = DVD Drive Repair
+Website = http://www.rizonesoft.com
+
+[Documents]
+Product = DVD Drive Repair
+Short_Description = DVD Drive Repair
+Company = Rizonesoft
+CompanyURL = http://www.rizonesoft.com
+SupportURL = http://www.rizonesoft.com
+ContactURL = http://www.rizonesoft.com
+
+[Update]
+UpdateURL = http://www.rizonesoft.com/downloads/dvd-drive-repair/
+
+[DocumentFiles]
+Changes.tpl = Changes.txt
+License.tpl = License.txt
+Readme.tpl = Readme.txt
+
+[Files]
+File01 = DVDRepair.exe
+File02 = DVDRepair_X64.exe
+File04 = DoorsShell.dll
+File05 = Fugue.dll
+File06 = DVDRepair.ini
+
+[Dirs]
+; Dirs01 = Logging
+
+[Sources]
+File01 = Themes\Icons\DVDRepair.ico
+File02 = Themes\Icons\DVDRepairH.ico
+File03 = UDF\ReBar_Options.au3
+File04 = Fugue.dll
+File05 = DoorsShell.dll
+File06 = DVDRepair.ini
+File07 = DVDRepair.sni
+
+[SourceDirs]
+Dirs01 = Logging
+
+[Environment]
+ScriptPath=D:\RizonesoftSDK\Concrete\DVDRepair
+ScriptFullPath=D:\RizonesoftSDK\Concrete\DVDRepair\DVDRepair.au3
+ProgramName=DVD Drive Repair
+ProgramShortName=DVDRepair
+ProgramVersion=1.0.2.686
+ProgramMajor=1
+ProgramVersionMaintenance=2
+ProgramVersionBuild=686
+ProgramDescription=Repair unrecognised or missing DVD Drive
+DistributionPath=D:\RizonesoftSDK\Concrete\DVDRepair\Distribution\686
+DistributionPortableName=DVDRepair_686
+DistributionPortablePath=D:\RizonesoftSDK\Concrete\DVDRepair\Distribution\686\DVDRepair_686
+DistributionPathSource=D:\RizonesoftSDK\Concrete\DVDRepair\Distribution\686\DVDRepair_686_Source
+OutputFile=DVDRepair.exe
+OutputFilePath=D:\RizonesoftSDK\Concrete\DVDRepair\DVDRepair.exe
+OutputFile64Bit=DVDRepair_X64.exe
+OutputFile64BitPath=D:\RizonesoftSDK\Concrete\DVDRepair\DVDRepair_X64.exe
+InstallScriptPath=D:\RizonesoftSDK\Concrete\DVDRepair\Distribution\686\DVDRepair_686_Setup.iss
+InstallOutputPath=D:\RizonesoftSDK\Concrete\DVDRepair\Distribution\686\DVDRepair_686_Setup.exe

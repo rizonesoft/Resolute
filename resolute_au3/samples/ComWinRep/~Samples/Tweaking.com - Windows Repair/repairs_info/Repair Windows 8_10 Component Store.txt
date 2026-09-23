@@ -1,0 +1,19 @@
+Repair Windows 8/10 Component Store
+
+The following commands are done.
+
+Dism /Online /Cleanup-Image /StartComponentCleanup
+Dism /Online /Cleanup-Image /RestoreHealth
+
+The first command cleans up the component store (WinSxS Folder) in windows, reducing it size and removing old entries.
+
+The 2nd command is used to repair corrupt files and corrupt entries in the component store.
+
+Reasons for this repair:
+Used to fix Windows component store corruption when a SFC /SCANNOW command is unable to repair corrupted system files because the store (source) is corrupted, then run the SFC command again.
+Used to fix Windows component store corruption when the same Windows Updates continue to appear to be available to install even though they already show successfully installed in update history.
+
+More information on these commands can be found here:
+http://technet.microsoft.com/en-us/library/hh824869.aspx
+and
+http://www.eightforums.com/tutorials/26512-dism-fixing-component-store-corruption-windows-8-a.html

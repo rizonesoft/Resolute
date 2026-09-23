@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+
+  <assemblyIdentity
+      type="win32"
+      name="Rizonesoft.Resolute"
+      version="1.0.0.0"
+      processorArchitecture="amd64"/>
+
+  <description>Resolute Power Tools</description>
+
+  <!-- The runtime floor, declared to the loader. The macros in CMakeLists.txt
+       tell the compiler what may be called; this tells Windows what the binary
+       was built against. Both have to say the same thing or one of them is a
+       comment rather than a contract. -->
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- Windows 10 and 11. Nothing older is supported: D00 T01 §1 records
+           dark mode, per-monitor DPI v2 and Direct2D SVG as the features that
+           set the floor at 1809. -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/>
+    </application>
+  </compatibility>
+
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <!-- Per-monitor v2, which is the reason the floor is 1809 rather than
+           1507: v2 arrived in 1703 and the dialog and non-client scaling this
+           suite relies on settled in 1809. -->
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2</dpiAwareness>
+      <!-- The down-level form, read by Windows releases that ignore the above. -->
+      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+      <!-- A repair suite walks paths the shell created and does not control. -->
+      <longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">true</longPathAware>
+      <!-- UTF-8 for the ANSI code page, so a narrow API called anywhere in a
+           dependency does not mangle a path outside the machine's code page. -->
+      <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings">UTF-8</activeCodePage>
+    </windowsSettings>
+  </application>
+
+  <!-- Common Controls v6. Without this the process gets the v5 comctl32 and
+       every standard control renders in the Windows 2000 style. -->
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity
+          type="win32"
+          name="Microsoft.Windows.Common-Controls"
+          version="6.0.0.0"
+          processorArchitecture="amd64"
+          publicKeyToken="6595b64144ccf1df"
+          language="*"/>
+    </dependentAssembly>
+  </dependency>
+
+  <!-- The launcher runs as the invoking user. Elevation is checked at the
+       action by each tool that needs it, never claimed at startup: AGENTS.md
+       makes that a working rule, and requireAdministrator here would elevate
+       everything the launcher starts. -->
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+
+</assembly>

@@ -1,0 +1,42 @@
+[0.1.8]
+
+The garbage handling behavior slightly changed. Some issues with ID3v2 tags being removed should be gone now.
+
+[0.1.7]
+
+This is mainly a bugfix release. Some issues from Sourceforge bug tracker and from Debian bug tracker have been addressed.
+
+[+] More precise report about CRC.
+[+] A new option added to keep file timestamps.
+[*] Added more accurate handling of write errors (Debian #413946).
+[*] Attributes are now correctly preserved.
+
+[0.1.6]
+
+[+] CRCs are now checked!
+[+] A new option to delete .bak files after file repair
+[*] Minor code cleaning
+
+[0.1.5]
+
+At last (after a long delay) MP3val 0.1.5 is released. It features some minor changes:
+
+[+] A new warning message for files with a "couple" of MPEG frames
+[+] A new warning message for VBR files without VBR header
+[*] An old CVS patch fixing a error that prevented mp3val from being compiled on AMD64.
+
+[0.1.4]
+
+This is a bugfix release. Nothing (almost) was changed in Windows version, but Linux version contained a major bug that is (I hope) fixed in this release.
+
+[0.1.3]
+
+Minor bugfix in command-line parsing, a few options added.
+
+[0.1.2]
+
+Ported to Unix API, fixed minor bug with file repairing.
+
+[0.1.1]
+
+First public release!

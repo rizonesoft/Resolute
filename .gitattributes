@@ -1,0 +1,24 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Scripts and prose check out LF everywhere: a CR breaks the shebang on POSIX
+# runners, and mixed endings churn diffs and fence bytes across platforms.
+# The plan.yml gate pins the hook line; C++ sources stay on text=auto (native
+# endings, which every compiler here accepts).
+*.py text eol=lf
+*.ps1 text eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+tools/githooks/** text eol=lf
+
+# Persisted decision inputs hash by blob bytes: LF in every blob, so the
+# manifest validates from a fresh checkout, an archive, or `git show` alike.
+# Worktrees materialized before this rule carry CRLF: delete and re-checkout
+# the directory to re-materialize LF (status reads clean either way, because
+# the clean filter normalizes before comparing).
+docs/reviews/crossover/** text eol=lf
+
+# ExoSuite carried Git LFS rules for *.exe, *.dll, and Bin/** at intake.
+# They are deliberately not merged: its own comment recorded them as unused,
+# all three paths are gitignored here, and LFS filters on never-committed
+# files would require git-lfs on every clone for no benefit.

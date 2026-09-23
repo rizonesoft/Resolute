@@ -1,0 +1,8 @@
+Repair Print Spooler:
+
+This repair will replace the spooler service reg keys and run the following commands:
+
+net stop spooler
+del /F /Q %systemroot%\System32\spool\PRINTERS\*
+del /F /Q %systemroot%\System32\spool\SERVERS\*
+net start spooler

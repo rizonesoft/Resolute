@@ -1,0 +1,15 @@
+{
+  "candidate_base": "dbe5d0e1652d6b0ecb880df8a749ff334c88211e",
+  "candidate_head": "638f67e01d85b2b948f0e15c77305712c8ba5583",
+  "checker": "PASS four lenses, one verdict each :: 7df509065fc6752ec1ea3cbe586ee5645d8578c3f23d3b7fda020befa0b437db",
+  "findings_path": "docs/reviews/00-workspace/D00-T04-s21.md",
+  "findings_sha256": "8e489cf1d442777213d6082302a35395899b65d2228b2b7679d4f6922edfaa7b",
+  "manifest_sha": "b2e1671608aefa855638eaf0a82ab879aeedbdbddd2477faafeb8285ad68fe01",
+  "model": "opus",
+  "reviewer": "claude-panel",
+  "runner_sha256": "3b08798ad89680ae83a6e98034085cd004a5f848a685ef9471003e81f724c9f6",
+  "schema": 2,
+  "timestamp": "2026-09-20T16:39:11Z",
+  "tree": "d74e6b3a6916016e3c4c4b65aca7abe602d4d50f",
+  "verdict": "needs-attention"
+}

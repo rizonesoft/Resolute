@@ -1,0 +1,60 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 11
+Script = Firemin.au3
+
+[Modules]
+Build = 1
+Compress = 0
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://rizonesoft.com
+
+[Distribute]
+File=%RootDir%\Firemin.exe
+File=%RootDir%\Firemin_X64.exe
+File=%SourceDir%\Firemin.ini
+File=%RootDir%\Docs\Firemin\Changes.txt
+File=%RootDir%\Docs\Firemin\License.txt
+File=%RootDir%\Docs\Firemin\Readme.txt
+File=%RootDir%\Processing\32\Stroke.ani
+File=%RootDir%\Processing\64\Globe.ani
+
+[Sources]
+
+[Environment]
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Firemin.au3
+Company=Rizonesoft
+CompanyURL=https://rizonesoft.com
+Name=Firemin
+ShortName=Firemin
+Description=Firemin
+Type=N
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\Firemin.ico
+Version=12.2.1.9558
+VersionMajor=12
+VersionMaintenance=1
+VersionBuild=9558
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=Firemin.exe
+OutFileX64=Firemin_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\Firemin.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\Firemin_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Distribution\9558
+DistributionName=Firemin_9558
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558
+DistroSourceName=Firemin_9558_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\Firemin\Distribution\9558\Firemin_9558_Source

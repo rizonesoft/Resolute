@@ -1,0 +1,15 @@
+[Group]
+name0=.
+url0=.\
+name1=..
+url1=..\
+name2=Groups
+url2=.\Groups
+name3=Plugin
+url3=.\Plugin
+name4=Resource
+url4=.\Resource
+name5=Skin
+url5=.\Skin
+name6=User
+url6=.\User

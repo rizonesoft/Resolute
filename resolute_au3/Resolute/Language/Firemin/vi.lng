@@ -1,0 +1,167 @@
+;~ =============================================================================
+;~ Rizonesoft Language File
+;~ =============================================================================
+;~ Date.........: 15 March 2025
+;~ Author.......: Derick Payne (Rizonesoft)
+;~ Link.........: https://rizonesoft.com
+;~ =============================================================================
+
+[Main]
+Product = Firemin
+Version = 12
+
+[Language]
+;~ Please ad the translated language name next to the English name. For example; Ελληνικά - Greek
+Name = Tiếng Việt - Vietnamese
+Code = vi
+Encoding = Unicode (UTF-16) LE BOM
+
+[Translations]
+;~ Please do not translate this section.
+About = About
+Custom = Custom
+Donate = Donate
+Menus = Menus
+Messages = Messages
+Messages2 = Messages2
+Preferences = Preferences
+Update = Update
+Versioning = Versioning
+
+[About]
+Window_Title = Về %{Program.Name}
+Label_Version = Phiên bản
+Label_AutoIt = Được xây dựng với AutoIt phiên bản
+Label_Copyright = Bản quyền
+Tip_Title_Donate = Ủng hộ cho chúng tôi
+Tip_Message_Donate = Khi bạn ủng hộ, bạn giúp giữ phần mềm của chúng tôi miễn phí\r\nvà cho phép chúng tôi có được các công cụ và dịch vụ\r\nmà chúng tôi sử dụng để phục vụ bạn.
+Label_Home = Trang chủ
+Label_License = Giấy phép
+Label_Support = Nhận hỗ trợ
+Tip_Title_Country = Được tạo tại Nam Phi
+Tip_Message_Country = %{Program.Name} được sinh ra tại Nam Phi.
+Label_Contributors = Người đóng góp
+Button_Ok = Đồng ý
+Label_RAM = (RAM) %d MB CÒN TRỐNG TRONG %d MB (%d%%)
+Label_HDD = (%s) %.2f GB CÒN TRỐNG TRONG %.2f GB (%d%%)
+Tip_Facebook = Thích chúng tôi trên Facebook.
+Tip_GitHub = %{Program.Name} trên GitHub.
+
+[Custom]
+Label_Status_Welcome = Bắt đầu bằng cách tải trình duyệt (chọn tên tệp).\r\n%{Program.Name} sẽ tự động phát hiện quy trình từ tệp thực thi bạn chọn.
+Label_Status_Updates = Đang kiểm tra cập nhật
+Group_Load_Browser = Tải trình duyệt
+Label_Executable = Đường dẫn tệp thực thi (%s):
+Label_Process_Usage = Sử dụng | Đỉnh:
+Label_Process_Count = Số quy trình:
+Button_Browse = &Duyệt
+Group_Options = Tùy chọn
+Checkbox_Reduce_Mem = Giảm bộ nhớ mỗi:
+Label_Milliseconds = mili giây
+Checkbox_Reduce_Limit = Chỉ giảm bộ nhớ nếu sử dụng vượt quá:
+Checkbox_Start_With = Khởi động %s khi %{Program.Name} khởi động
+Checkbox_Enable_Extended_Processes = Bật quy trình mở rộng
+Button_Extended_Processes = Quy trình &mở rộng
+Checkbox_Start_Windows = Khởi động %{Program.Name} khi Windows khởi động
+Label_Settings_Updated = Cài đặt đã được cập nhật.
+Button_Cancel = Hủy
+Button_Save = Lưu
+Time_Unit_01 = mili giây
+Time_Unit_02 = giây
+Time_Unit_03 = phút
+Time_Unit_04 = giờ
+Label_Boost_Description = Giảm mỗi %s %s nếu sử dụng vượt quá %s MB.
+Title_Select_Browser = Chọn trình duyệt
+Tip_Minimized_Title = %{Program.Name} vẫn đang chạy!
+Tip_Minimized_Message = %{Program.Name} sẽ tiếp tục chạy để tối ưu hóa việc sử dụng bộ nhớ của %s.\r\nNhấp vào biểu tượng khay hệ thống để thay đổi các tùy chọn tối ưu hóa khác nhau.
+Label_Notice = %{Program.Name} được thiết kế để chạy trên máy tính để bàn hoặc laptop.\r\nChúng tôi đã tạo Firemin Server cho môi trường máy chủ. Đọc thêm...
+
+[Donate]
+Label_Heading = Tại sao không ủng hộ một chút để giữ phần mềm của chúng tôi miễn phí mãi mãi?
+Label_Message = Nhấp vào nút PayPal bên dưới, chọn số tiền và gửi cho chúng tôi khoản ủng hộ của bạn.\r\nKhoản ủng hộ của bạn sẽ được sử dụng để cải thiện phần mềm của chúng tôi và giữ mọi thứ miễn phí trên Rizonesoft.\r\nKhoản ủng hộ $20 sẽ giúp chúng tôi hoạt động ít nhất một tháng.
+Label_Donate = Bạn có muốn cân nhắc một món quà nhỏ $10 để giúp cải thiện %{Program.Name} và giữ đèn sáng không?
+
+[Menus]
+File = &Tệp
+File_Preferences = &Tùy chọn
+File_Close = Đón&g\tShift+Alt+F4
+Help = T&rợ giúp
+Help_Update = Kiểm tra cập &nhật
+Help_Home = %{Company.Name} &Trang chủ
+Help_Downloads = Tải xuống &thêm
+Help_Support = &Nhận hỗ trợ
+Help_Issue = Tạo một &vấn đề
+Help_Donate = Ủng hộ cho &chúng tôi
+Help_About = Về %{Program.Name}
+Tray_About = Về %{Program.Name} %s
+Tray_Open = Mở %{Program.Name}
+Tray_Extended_Processes = Quy trình mở rộng
+Tray_Run = Chạy %s
+Tray_Run_Safemode = Chạy %s trong chế độ an toàn
+
+[Messages]
+Info_Title = Xin lưu ý
+Warning_Title = Cảnh báo!
+Error_Title = Rất tiếc! Đã xảy ra lỗi!
+Error_Oops = Rất tiếc!
+Singleton = Một phiên bản khác của %{Program.Name} đang chạy.\r\nMẹo: Nhấp vào biểu tượng %{Program.Name} trong khay hệ thống.
+Compatible = %{Program.Name} không tương thích với phiên bản Windows của bạn.\r\nNếu bạn nghĩ đây là lỗi, đừng ngần ngại để lại tin nhắn tại '%s' với tất cả chi tiết.
+Compatible_Bit = Rất tiếc, %{Program.Name} 32 Bit không tương thích với phiên bản Windows của bạn.\r\nVui lòng tải xuống %{Program.Name} 64 Bit từ '%s'
+
+[Preferences]
+Window_Title = Tùy chọn
+Tab_General = Chung
+Tab_Performance = Hiệu suất
+Tab_Language = Ngôn ngữ
+Group_Notifications = Thông báo
+Group_Extended_Processes = Quy trình mở rộng
+Group_Priority = Ưu tiên
+Group_Memory = Bộ nhớ
+Group_Language = Ngôn ngữ
+Checkbox_Notifications = Hiển thị thông báo khay hệ thống
+Label_Extended_Processes = Nhập tên của bất kỳ quy trình bổ sung nào bạn muốn %{Program.Name} tối ưu hóa tại đây.\r\nDanh sách phải được phân tách bằng dấu phẩy (Process01.exe, Process02.exe, v.v.)
+Label_SetPriority = Đặt mức ưu tiên quy trình:
+Checkbox_SaveRealtime = Lưu mức ưu tiên trên cao (không khuyến nghị).
+Checkbox_ReduceMemory = Giảm bộ nhớ trên hệ thống có bộ nhớ thấp.
+Label_Language_Message = Chọn ngôn ngữ ưa thích của bạn và nhấn nút %s để tiếp tục. (Yêu cầu khởi động lại)
+Button_Save = Lưu
+Button_Cancel = Hủy
+Label_Updated = Đã cập nhật tùy chọn
+MsgBox_Language_Title = Đã thay đổi ngôn ngữ
+MsgBox_Language_Message = Ngôn ngữ đã chọn đã được thay đổi.\r\n%{Program.Name} phải được khởi động lại để ngôn ngữ đã chọn có hiệu lực.
+MsgBox_Closing_Title = Đang đóng %{Program.Name}
+MsgBox_Closing_Message = Bạn có muốn đóng %{Program.Name} ngay bây giờ không?
+Button_Export = Xuất
+Dialog_Export_Title = Xuất Quy Trình Mở Rộng
+Dialog_Export_Error_Title = Lỗi Xuất
+Dialog_Export_Error_Message = Không thể tạo tệp xuất.
+Dialog_Export_Success_Title = Xuất Thành Công
+Dialog_Export_Success_Message = Danh sách Quy Trình Mở Rộng đã được xuất đến:
+Button_Import = Nhập
+Dialog_Import_Title = Nhập Quy Trình Mở Rộng
+Dialog_Import_Error_Title = Lỗi Nhập
+Dialog_Import_Error_Message = Không thể đọc tệp nhập.
+Dialog_Import_Success_Title = Nhập Thành Công
+Dialog_Import_Success_Message = Danh sách Quy Trình Mở Rộng đã được nhập thành công.
+Dialog_Import_Empty_Title = Không Tìm Thấy Quy Trình
+Dialog_Import_Empty_Message = Không tìm thấy quy trình hợp lệ trong tệp đã chọn.
+
+[Update]
+Window_Title_Available = Có bản cập nhật
+Window_Title_Congratulations = Chúc mừng!
+Window_Title_Error = Đã xảy ra lỗi!
+Label_Message_Update = Có phiên bản mới của '%{Program.Name}'.
+Label_Message_Latest = Bạn đang sử dụng phiên bản mới nhất của '%{Program.Name}'.
+Label_Message_Error = Không thể truy xuất thông tin về phiên bản mới nhất của '%{Program.Name}'.
+Label_Message_Internet = Vui lòng kiểm tra kết nối internet của bạn và thử lại.
+Label_Build_Current = Phiên bản hiện tại:
+Label_Build_Update = Phiên bản cập nhật:
+CheckBox_NoUpdate = Không kiểm tra cập nhật khi khởi động.
+Button_Update = Đọc thêm
+Button_Close = Đóng
+
+[Versioning]
+Administrator = Quản trị viên
+Build = Phiên bản
+AutoIt_Version = sử dụng AutoIt phiên bản %{AutoIt.Version}
+Bit = Bit 

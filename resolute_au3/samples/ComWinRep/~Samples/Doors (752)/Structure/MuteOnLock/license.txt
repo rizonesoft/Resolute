@@ -1,0 +1,28 @@
+SUPERUTILS.COM SOFTWARE MUTE ON LOCK LICENSE AGREEMENT
+
+1. GRANT OF LICENSE: Subject to the terms below, SuperUtils.com Software hereby grants you a non-exclusive, non-transferable license to install and to use the downloadable version of Mute on Lock ("Software").
+
+Your license will be free to you for the term of the Agreement and you may: (i) install and use the Software on a single computer for your own, internal use and (ii) copy the Software for back-up or archival purposes.
+
+You may not: (i) reverse engineer, decompile, or disassemble the Software; (ii) modify, or create derivative works based upon the Software in whole or in part; (iii) distribute copies of the Software; (iv) remove any proprietary notices or labels on the Software; or (v) resell, lease, rent, transfer, sublicense, or otherwise transfer rights to the Software.
+
+2. TITLE: You acknowledge that no title to the intellectual property in the Software is transferred to you. Title, ownership, rights, and intellectual property rights in and to the Software shall remain in SuperUtils.com Software. The Software is protected by copyright law and international treaties.
+
+3. UPDATES. From time to time, SuperUtils.com Software may make available updates to the software. You may download and install or otherwise use those updates to the software that are released by SuperUtils.com Software. All updates to the Software are governed by this Agreement, unless other license terms are provided with the update.
+
+4. DISCLAIMER OF WARRANTY: The software is provided to you at no charge. You agree that SuperUtils.com Software has made no express warranties, oral or written, to you regarding the products and that the products are being provided to you "as is" without warranty of any kind. SuperUtils.com Software disclaims any and all other warranties, whether expressed, implied, or statutory, including, but without limitation, the implied warranties of noninfringement of third party rights, merchantability, and fitness for a particular purpose. SuperUtils.com Software shall not be liable for indirect, incidental, special, cover, reliance, or consequential damages (including, but not limited to, loss of anticipated profit) arising from any cause under or related to this Agreement.
+
+5. LIMITATION OF LIABILITY: You must assume the entire risk of using the Software. In no event shall SuperUtils.com Software be liable to you for any damages, including any lost profits, lost savings, or other incidental, indirect or consequential damages of any kind arising out of the use of the Software, even if SuperUtils.com Software has been advised of the possibility of such damages. In no event will SuperUtils.com Software's liability for any claim, whether in contract, tort, or any other theory of liability, exceed the license fee paid by you. However, if the Software was provided to you at no charge, YOU AGREE THAT SUPERUTILS.COM SOFTWARE SHALL NOT BE LIABLE TO YOU FOR ANY DAMAGES.
+
+6. TERMINATION: This Agreement shall terminate automatically if you fail to comply with the limitations described in this Agreement. No notice shall be required from SuperUtils.com Software to effect such termination. Upon termination, you must uninstall and destroy all copies of the Software.
+
+7. MISCELLANEOUS:
+
+Severability.
+In the event of invalidity of any provision of this Agreement, the parties agree that such invalidity shall not affect the validity of the remaining portions of this Agreement.
+
+Entire Agreement.
+You agree that this is the entire agreement between you and SuperUtils.com Software, which supersedes any prior agreement, whether written or oral, and all other communications between SuperUtils.com Software and you relating to the subject matter of this Agreement.
+
+Reservation of rights.
+All rights not expressly granted in this Agreement are reserved by SuperUtils.com Software.

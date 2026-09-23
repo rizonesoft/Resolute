@@ -1,0 +1,4 @@
+Repair MDAC & MS Jet:
+
+Any program that needs to work with a database and uses MDAC or MS Jet will fail if they are corrupt. This repair will fix MDAC and MS Jet.
+

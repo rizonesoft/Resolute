@@ -1,0 +1,166 @@
+﻿
+[Magyar]
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Mégse
+LSAVEASBUTTON=Mentés másként...
+LANALYZEBUTTON=Elemzés
+LDEFRAGBUTTON=Mentesítés
+LCLOSEBUTTON=Bezárás
+LRESTARTBUTTON=Újraindítás
+LLATERBUTTON=Később
+LREPORTBUTTON=Jelentés létrehozása...
+LSTOPBUTTON=Leállítás
+LBROWSEBUTTON=Tallózás...
+LERROR=Hiba
+LENABLED=Engedélyezve
+LDISABLED=Letiltva
+LNOTSUPPORTED=Nem támogatott
+LREGREPLACE=Hiba - a RegReplaceKey letiltva. Indítsa újra a Windows-t és próbálja újra.
+LRESTOREPOINTNOT=A visszaállítási pont létrehozása nem támogatott.
+LCREATINGRESTORE=Visszaállítási pont létrehozása...
+
+;MAIN WINDOW
+LNEVERUSED=Nem volt még használva
+LMENUOPTIONS=Beállítások
+LMENUHELP=Súgó
+LMENUABOUT=Névjegy
+LOVERVIEW=Áttekintés
+LLASTDEFRAG=Utolsó mentesítés:
+LSIZERECOVERED=Visszanyert méret:
+LPERCENT=Százalék:
+LWOULDLIKE=Mit szeretne tenni?
+LDEFRAGTITLE=Rendszerleíró töredezettségmentesítése
+LREGINFOTITLE=Rendszerleíró információinak összegyűjtése
+LUPDATEOK=Ön a legfrissebb verziót használja.
+LUPDATEDISABLED=A frissítések automatikus ellenőrzése letiltva.
+LUPDATENEW=Új verzió érhető el.
+LUPDATEWAIT=Új verzió ellenőrzése. Kérem várjon...
+LMOREINFO=további információ...
+LUPDATES=Frissítések
+
+;ABOUT WINDOW
+LABOUTTITLE=Névjegy
+LVERSION=Verzió
+LICON=Az ikonokat készítette
+
+;OPTIONS WINDOW
+LOPTIONS=Beállítások
+LOPTIONSDESCRIPTION=A program beállításainak az elvégzése.
+LSETTINGS=Általános beállítások
+LLANGUAGE=Nyelv
+LCHKCHECKUPDATE=Frissítések automatikus ellenőrzése
+LCHECKNOW=Frissítések ellenőrzése most...
+LCHKDEFRAGMYCOMPUTER="Rendszerleíró mentesítése..." opció a Sajátgép környezeti menüjében
+LCHKREGINFOMYCOMPUTER="Rendszerleíró információk" opció a Sajátgép környezeti menüjében
+LBACKUPS=Biztonsági másolatok
+LAUTOREGFILES=Automatikus mentés a töredezettségmentesítés előtt
+LAUTORESTOREPOINT=Automatikus visszaállítási pont készítése a mentesítés előtt
+LBACKUPFOLDER=Biztonsági mentések mappája:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Információk
+LREGINFODESCRIPTION=Információk a Windows Rendszerleíró adatbázisáról.
+LSO=Operációsrendszer:
+LUSER=Felhasználó:
+LREGSIZE=Rendszerleíró mérete:
+LCOLUMNPATH=Útvonal
+LCOLUMNSIZE=Méret
+LREGISTRYFILES=Rendszerleíró fájlok
+LNUMBERFILES=Fájlok száma:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnosztika
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Név:
+LLOGICALPATH=Logikai útvonal:
+LMAPPATH=Térkép útvonala:
+LTEMPPATH=Ideiglenes útvonal:
+LHIVESIZE=Méret:
+LKEY=Kulcs:
+LVALIDFILE=A fájl létezik.
+LNOTVALIDFILE=A fájl nem létezik.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Rendszerleíró optimalizálása és tömörítése.
+LTITLEPROBLEM=Probléma és megoldás
+LMAINTEXT=Az adatok a normál műveletek közben folyamatosan írásra és eltávolításra kerülnek. Idővel ezek az adatok töredezetté válnak. Az eszköz a hézagok eltávolításával, a területek visszanyerésével segít a Rendszerleírót optimalizálni.
+LBENEFITS=A Quicksys RegDefrag megnöveli a rendszere teljesítményét és gyorsabb hozzáférést biztosít a Rendszerleíróhoz.
+LTITLESTEPS=Lépések
+LSTEP1=1. Rendszerleíró elemzése.
+LSTEP2=2. Ellenőrzés eredményének áttekintése.
+LSTEP3=3. Rendszerleíró töredezettségmentesítése. Újraindítás szükséges.
+LTITLEANALYZE=Kattintson az "Elemzés" gombra az indításhoz.
+LAUTOBACKUP=Automatikus mentés:
+LAUTORESTORE=Automatikus visszaállítási pont:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Rendszerleíró elemzése. Kérem várjon...
+LPROGRESS=Folyamat:
+LREADING=Ellenőrzés:
+LSTOPPROCESS=Folyamat leállítása...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Elemzés eredménye
+LCOMPARATION=Összehasonlítás
+LCONCLUSION=Következtetés
+LREGISTRYFRAGMENTATION=Rendszerleíró töredezettség
+LCURRENTSIZE=Aktuális méret:
+LNEWSIZE=Új méret:
+LSIZEDIFFERENCE=Méretkülönbség:
+LLEGFRAG=töredezett
+LLEGALLOC=lefoglalt terület
+LBACKREGFILES=Biztonsági mentés létrehozása:
+LBACKRESTORE=Visszaállítási pont létrehozása:
+LCONCLUSION=Következtetés
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=A töredezettségmentesítés kész!
+LFINISHED=Sikeresen végrehajtva.
+LRESTARTREQUIRED=Most újra kell indítania a számítógépét, a módosítások érvényesítéséhez.
+LRESTARTMSGBOX=Szeretné újraindítani most?
+LHTMLREPORT=Létrehozhat egy HTML jelentést a töredezettségmentesítésről.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Egy új elemzés végrehajtásához a számítógép újraindítása szükséges.
+LDEFRAGMSGBOX1=Zárjon be minden futó programot.
+LDEFRAGMSGBOX2=Az elemzés néhány percig is eltarthat.
+LDEFRAGMSGBOX3=Lehet, hogy a folyamat közben a számítógép nem reagál semmire se.
+LDEFRAGMSGBOX4=A folytatáshoz kattintson az "Igen" gombra.
+LFEWFRAGMENTS=Csak néhány töredezett adat található. A töredezettségmentesítés nem szükséges.
+LNOFRAGMENTS=Nincsenek töredezett adatok, a rendszerleíró mentesítése nem szükséges.
+LTOOFRAGMENTS=Túl sok töredezett adatot találtam. Kattintson a "Mentesítés" gombra az optimalizáláshoz.
+
+;REPORT 
+LNAMEREPORT=Jelentés
+LH1=Töredezettségmentesítési jelentés
+LCREATEDBY=Készítette
+LDATE=Dátum:
+LTIME=Idő:
+LSUMMARY=Töredezettségmentesítés összegzése
+LREGPROCESSED=Feldolgozott fájlok:
+LREGANASTART=Elemzés elindítva:
+LREGANAFINISHED=Elemzés befejezve:
+LREGTOTALFINISHED=Elemzés teljes ideje:
+LREGSIZEBEFORE=Méret előtte:
+LREGSIZEAFTER=Méret utána:
+LREGSIZEDIFFERENCE=Méretkülönbség:
+LREGFILESSUMMARY=Rendszerleíró fájlok összegzése
+LCOLUMNREGFILE=Rendszerleíró fájl
+LCOLUMNREGBEFORE=Méret előtte
+LCOLUMNAFTER=Méret utána
+LCOLUMNDIFFERENCE=Méretkülönbség
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Rendszerleíró töredezettség-mentesítés
+LDEFRAGNOW=Mentesítés:
+
+;NEW PHRASES! Please, translate!
+LHTMLCREATED=A HTML jelentés sikeresen létrehozásra került.
+LOPENNOW=Megnyitja?
+LNOTHTMLCREATED=Hiba! A HTML jelentés NEM került létrehozásra.
+LFILE=Fájl
+LFREESPACE=Nincs elég szabad terület a mentesítéshez. Ellenőrizze és próbálja újra.
+LERROREGREAD=Hiba! A Rendszerleíró információi nem olvashatók be.

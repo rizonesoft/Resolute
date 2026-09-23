@@ -1,0 +1,160 @@
+﻿
+[Polski]
+;Translated by Tomasz Stanislawski
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Anuluj
+LSAVEASBUTTON=Zapisz jako...
+LANALYZEBUTTON=Analizuj
+LDEFRAGBUTTON=Defragmentuj
+LCLOSEBUTTON=Zamknij
+LRESTARTBUTTON=Zrestartuj
+LLATERBUTTON=Pozniej
+LREPORTBUTTON=Utworz Raport...
+LSTOPBUTTON=Stop
+LBROWSEBUTTON=Przegladaj...
+LERROR=Blad
+LENABLED=Wlaczone
+LDISABLED=Wylaczone
+LNOTSUPPORTED=Nie wspierane
+LREGREPLACE=Blad - RegReplaceKey jest wylaczone. Uruchom ponownie Windows i sprobuj jeszcze raz.
+LRESTOREPOINTNOT=Tworznie punktu przywracania wylaczone/nie wspierane.
+LCREATINGRESTORE=Utworz punkt przywracania systemu...
+LNEVERUSED=Nieuzywany
+
+;MAIN WINDOW
+LNEVERUSED=Nieuzywany
+LMENUOPTIONS=Opcje
+LMENUHELP=Pomoc
+LMENUABOUT=O programie
+LOVERVIEW=Przeglad funkcji
+LLASTDEFRAG=Data ostatniej defragmentacji:
+LSIZERECOVERED=Zaoszczedzona przestrzen:
+LPERCENT=Procent:
+LWOULDLIKE=Co chcesz zrobic?
+LDEFRAGTITLE=Defragmentuj rejestr
+LREGINFOTITLE=Pokaz informacje o rejestrze
+LUPDATEOK=U¿ywasz najnowszej wersji programu.
+LUPDATEDISABLED=Automatyczne sprawdzanie uaktualnien wylaczone.
+LUPDATENEW=Aktualniejsza wersja jest dostepna.
+LUPDATEWAIT=Sprawdzanie w poszukiwaniu nowszych wersji. Prosze czekac.
+LMOREINFO=wiecej informacji...
+LUPDATES=Uaktualnienia
+
+;ABOUT WINDOW
+LABOUTTITLE=O programie
+LVERSION=Wersja
+LICON=Autorstwo ikon:
+
+;OPTIONS WINDOW
+LOPTIONS=Opcje
+LOPTIONSDESCRIPTION=Skonfiguruj ustawienia progamu.
+LSETTINGS=Ustawienia ogolne
+LLANGUAGE=Jezyk
+LCHKCHECKUPDATE=Automatyczne sprawdzanie uaktualnien
+LCHECKNOW=Sprawdz w poszukiwaniu aktualizacji...
+LCHKDEFRAGMYCOMPUTER=Dodaj opcje "Defragmentuj Rejestr..." w menu kontekstowym Moj komputer
+LCHKREGINFOMYCOMPUTER=Dodaj opcje "Pokaz informacje o rejestrze" w menu kontekstowym Moj komputer
+LBACKUPS=Kopie bezpieczenstwa
+LAUTOREGFILES=Utworz kopie bezpieczenstwa plikow rejestru przed defragmentacja
+LAUTORESTOREPOINT=Utworz punkt przywracania przed defragmentacja
+LBACKUPFOLDER=Folder kopii bezpieczenstwa:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Informacje
+LREGINFODESCRIPTION=Informacje o rejestrze Windows.
+LSO=System operacyjny:
+LUSER=Zalogowany uzytkownik:
+LREGSIZE=Rozmiar rejestru:
+LCOLUMNPATH=Sciezka
+LCOLUMNSIZE=Rozmiar
+LREGISTRYFILES=Pliki rejestru
+LNUMBERFILES=Liczba plikow:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnostyka
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Galaz rejestru:
+LLOGICALPATH=Sciezka Logiczna:
+LMAPPATH=Map Path:
+LTEMPPATH=Sciezka Tymczasowa:
+LHIVESIZE=Rozmiar galezi rejestru:
+LKEY=Klucz:
+LVALIDFILE=Plik istnieje.
+LNOTVALIDFILE=Plik nie istnieje.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Optymalizacja i kompaktowanie rejestru Windows.
+LTITLEPROBLEM=Problem i rozwiazanie
+LMAINTEXT=Dane rejestru sa ciagle zapisywane i usuwane podczas normalnej pracy systemy operacyjnego. Z czasem dane te ulegaja fragmentacji. To narzedzie optymalizuje rejestr usuwajac przerwy, fragmenty i zle zagospodarowane miejsce w plikach rejestru Windows.
+LBENEFITS=Quicksys RegDefrag przyspiesza dostep do rejestru i poprawia wydajnosc calego systemu.
+LTITLESTEPS=Kroki
+LSTEP1=1. Analiza rejestru.
+LSTEP2=2. Przeglad rezultatow analizy.
+LSTEP3=3. Defragmentacja rejestru. (Wymaga ponownego uruchomienia)
+LTITLEANALYZE=Kliknij "Analizuj" by rozpoczac proces.
+LAUTOBACKUP=Automatyczna kopia bezpieczenstwa:
+LAUTORESTORE=Automatyczne Tworzenie Punktu Przywracania:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analizowanie rejestru. Prosze czekac.
+LPROGRESS=Postep:
+LREADING=Sprawdzanie:
+LSTOPPROCESS=Zatrzymywanie procesu...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Analiza wynikowS
+LCOMPARATION=Porownanie
+LCONCLUSION=Wniosek
+LREGISTRYFRAGMENTATION=Fragmentacja Rejestruu
+LCURRENTSIZE=Obecny rozmiar rejestru:
+LNEWSIZE=Nowy rozmiar rejestru:
+LSIZEDIFFERENCE=Roznica rozmiarow:
+LLEGFRAG=pofragmentowany
+LLEGALLOC=przydzielone miejsce
+LBACKREGFILES=Utworz kopie rejestru:
+LBACKRESTORE=Utworz punkt przywracania:
+LCONCLUSION=Wniosek
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Defragmentacja Zakonczona!
+LFINISHED=Zakonczono powodzeniem.
+LRESTARTREQUIRED=Musisz uruchomic ponownie komputer aby zmiany odniosly skutek.
+LRESTARTMSGBOX=Czy chcesz teraz uruchomic ponownie?
+LHTMLREPORT=Mozesz utworzyc raport HTML zawieraj¹cy informacje o defragmentacji.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=By dokonac nowej analizy niezbedne jest ponowne uruchomienie komputera.
+LDEFRAGMSGBOX1=Zamknij wszystkie programy.
+LDEFRAGMSGBOX2=Analiza mo¿e potrwac kilka minut.
+LDEFRAGMSGBOX3=Podczas procesu defragmentacji, system moze nie odpowiadac.
+LDEFRAGMSGBOX4=By kontynuowac kliknij "Tak".
+LFEWFRAGMENTS=Nieznaczna fragmentacja. Defragmentacja rejestru nie jest potrzebna.
+LNOFRAGMENTS=Brak fragmentacji. Defragmentacja rejestru nie jest mozliwa.
+LTOOFRAGMENTS=Du¿a fragmetacja. Kliknij "Defragmentuj" by zoptymalizowac rejestr.
+
+;REPORT 
+LNAMEREPORT=Raport
+LH1=Raport z Defragmetacji
+LCREATEDBY=Utworzony przez
+LDATE=Data:
+LTIME=Czas:
+LSUMMARY=Podsumowanie Defragmentacji
+LREGPROCESSED=Przetworzone pliki rejestru:
+LREGANASTART=Analiza rejestru rozpoczeta:
+LREGANAFINISHED=Analiza rejestru zakonczona:
+LREGTOTALFINISHED=Calkowity czas analizy rejestru:
+LREGSIZEBEFORE=Rozmiar rejestru przed:
+LREGSIZEAFTER=Rozmiar rejestru po:
+LREGSIZEDIFFERENCE=Roznica wielkosci rejestru:
+LREGFILESSUMMARY=Pliki Rejestru Podsumowanie
+LCOLUMNREGFILE=Plik Rejestru
+LCOLUMNREGBEFORE=Rozmiar Przed
+LCOLUMNAFTER=Rozmiar po
+LCOLUMNDIFFERENCE=Roznica rozmiarow
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Defragmentowanie Rejestru
+LDEFRAGNOW=Defragmentacja:

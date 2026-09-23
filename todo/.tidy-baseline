@@ -1,0 +1,155 @@
+# clang-tidy ratchet baseline
+#
+# Measured by D00 T01 §3 on 2026-09-17. Ratcheted by D07 T01 §2, which is what
+# makes it one-way: a count above this fails, equal passes, below rewrites this
+# file down in the same commit.
+#
+# Format: the first line that is not blank and does not start with '#' is
+# `count: <integer>`. Everything else here is for the person reading it.
+
+count: 169
+
+# ── Raised 103 -> 169 on 2026-09-17: a stronger analyser, not worse code
+#
+# D00 T01 §6 bumped llvm-mingw 20251216 -> 20260908, which carries clang
+# 23.1.1 in place of 21.1.8. Two major versions of clang-tidy with it.
+#
+# EVERY PRE-EXISTING CHECK REPORTS AN IDENTICAL COUNT. That is the whole
+# argument, and it is checkable line by line below: 36 stayed 36, 16 stayed
+# 16, 8 stayed 8, 4 stayed 4, and every single-finding check kept its one. The
+# same code analysed by the same checks produced the same numbers.
+#
+# The +66 is accounted for exactly:
+#
+#     + 49  bugprone-signed-bitwise              check is new in this clang-tidy
+#     + 12  bugprone-unhandled-code-paths        check is new in this clang-tidy
+#     +  4  misc-use-internal-linkage            existing check, widened
+#     +  2  performance-faster-string-find       check is new in this clang-tidy
+#     -  1  bugprone-nondeterministic-pointer-iteration-order
+#     ----
+#     + 66
+#
+# The one that DISAPPEARED is worth more than the ones that arrived. It fired
+# at src/main.cpp:382, "sorting pointers is nondeterministic". The code is
+# unchanged, and the check still exists in clang-tidy 23; it simply no longer
+# fires. The sort is `std::sort` over a vector of pointers with a comparator
+# that compares CELL CONTENTS and never a pointer value, so the order is
+# deterministic. clang-tidy 21 was wrong and 23 is right. A bump that fixes a
+# false positive is the return on currency that D00 T01 §6 exists to collect.
+#
+# The compiler side of the same bump produced ZERO new warnings at
+# -Wall -Wextra -Werror across the whole tree.
+#
+# ── Raised 59 -> 103 on 2026-09-17, and why that is not a regression
+#
+# D00 T01 §5's independent review found the combined gate analysing only the
+# ROOT compile database. RegStudio is commented out of the root CMakeLists and
+# builds standalone, so its translation units were in no database the gate read
+# and its own build tree exported none at all. An entire shipped extension was
+# unanalysed while the gate reported success.
+#
+# The gate now reads every database, the root's and each extension's. The count
+# rose by exactly the findings that were always there and never looked at:
+#
+#     launcher + shared   59    unchanged, which is the check on this move
+#     RegStudio           44    newly covered
+#     total              103
+#
+# The 59 not moving is what makes this a coverage increase rather than a
+# regression. This file says the ratchet only goes down, and that rule stands:
+# raising it needed this paragraph, and the next raise needs its own.
+#
+# ── How to reproduce this number exactly ─────────────────────
+#
+# A baseline nobody can re-derive is a number, not a measurement. Three things
+# decide it, and all three have to match:
+#
+# 1. THE TRANSLATION UNITS. Every entry in `build/release/compile_commands.json`
+#    whose file is not under `_deps/` and does not end in `.rc`, PLUS the same
+#    from every `extensions/<Tool>/build/Release/compile_commands.json`. The
+#    root database alone is not the project: it excludes every extension that
+#    builds standalone, which is all of them.
+#    Taking the list from the compile database rather than from a glob is what
+#    keeps it honest: a source nobody compiles cannot hide findings.
+#
+# 2. THE CONFIG. The repository's `.clang-tidy`, which is why the check set is
+#    committed rather than passed on a command line.
+#
+#      clang-tidy -p build/release --quiet <file>
+#
+# 3. THE DEDUPLICATION. Count UNIQUE (file, line, column, check) tuples, with
+#    the file path normalised: separators to '/', '..' segments collapsed, and
+#    case folded. Without this the number is wrong twice over. A diagnostic in
+#    a header is reported once per translation unit that includes it, so the
+#    raw line count was 84 against 59 real findings; and the same header is
+#    reached as both `resolute/theme.h` and `resolute/controls/../theme.h`,
+#    which counts twice unless the path is normalised.
+#
+#    AND THE CHECK NAME IS NOT LOWERCASE. `clang-analyzer` checks are spelled
+#    `clang-analyzer-security.ArrayBound`: uppercase letters and dots. A parser
+#    whose check-name character class is `[a-z0-9.-]+` drops every analyzer
+#    finding and reports a plausible, quietly wrong total. That is not a
+#    hypothetical: it is how the first version of this file came to say 52
+#    instead of 59, and the independent review of D00 T01 §3 caught it. Whoever
+#    implements the ratchet writes this parser again, so it is written down
+#    here rather than learned again.
+#
+# Release, not debug: release is what ships, and only release carries the
+# optimiser-dependent analyser paths.
+
+# ── What the 169 are ─────────────────────────────────────────
+#
+#   49  bugprone-signed-bitwise
+#   36  performance-no-int-to-ptr
+#   33  misc-use-internal-linkage
+#   16  bugprone-switch-missing-default-case
+#   12  bugprone-unhandled-code-paths
+#    8  performance-enum-size
+#    4  clang-analyzer-security.ArrayBound
+#    2  performance-unnecessary-value-param
+#    2  clang-analyzer-deadcode.DeadStores
+#    2  performance-faster-string-find
+#    1  bugprone-use-after-move
+#    1  clang-analyzer-optin.performance.Padding
+#    1  misc-redundant-expression
+#    1  bugprone-misplaced-widening-cast
+#    1  bugprone-implicit-widening-of-multiplication-result
+#
+# The 36 `performance-no-int-to-ptr` are Win32 talking: LPARAM and WPARAM are
+# integers that carry pointers, and the cast is the API rather than a mistake.
+# They are the first candidates for a targeted suppression, not for a fix.
+#
+# ── The four bounds findings ─────────────────────────────────
+#
+#   sidebar.cpp:951, :1014   m_iconScale[m_hovered], m_iconScale[prev]
+#   sidebar.cpp:56           access preceding 'query'
+#   toolbar.cpp:677          access preceding 'kItems'
+#
+# The two `m_iconScale` sites share one shape: the index is guarded on ONE
+# side. `if (prev >= 0)` proves the lower bound and says nothing about
+# `kCategoryCount`, so the write is in range only because every producer of
+# `m_hovered` happens to hit-test within the array. That is an invariant held
+# by convention across several functions rather than by the check at the point
+# of use, which is the condition under which this kind of bug survives a
+# refactor. Not known to be reachable today.
+#
+# ── The one that is a defect rather than a finding ───────────
+#
+# `bugprone-use-after-move` at shared/resolute-ui/src/animation.cpp:55
+#
+#   uint32_t AnimationManager::Add(Animation anim) {
+#       anim.id = m_nextId++;
+#       m_animations.push_back(std::move(anim));
+#       return anim.id;                          // <-- read after the move
+#   }
+#
+# This returns the right value today, and only by accident. `Animation` has an
+# implicit move constructor, so its `uint32_t id` is copied rather than stolen
+# and survives the move. The day `Animation` gains a user-defined move, or `id`
+# stops being trivially copyable, this starts returning garbage to every caller
+# that stores an animation handle, and it will not look like a memory bug.
+#
+# Left in the baseline deliberately: D00 T01 §3 owns the gate, not the code the
+# gate found, and fixing it here would be the section widening itself. It is
+# called out so the ratchet in D07 T01 §2 starts with a known first target
+# rather than a flat list.

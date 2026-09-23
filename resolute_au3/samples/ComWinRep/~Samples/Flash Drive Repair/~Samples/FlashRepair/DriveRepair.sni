@@ -1,0 +1,67 @@
+[SDK]
+Compatibilty = Rizonesoft.SDK.2
+Script = FlashRepair.au3
+
+[Signing]
+CertificateSet = Signing\Certum.ini
+Description = USB Drive Repair
+Website = http://www.rizonesoft.com
+
+[Documents]
+Product = USB Drive Repair
+Short_Description = USB Drive Repair
+Company = Rizonesoft
+CompanyURL = http://www.rizonesoft.com
+SupportURL = http://www.rizonesoft.com
+ContactURL = http://www.rizonesoft.com
+
+[Update]
+UpdateURL = http://www.rizonesoft.com
+
+[DocumentFiles]
+Changes.tpl = Changes.txt
+License.tpl = License.txt
+Readme.tpl = Readme.txt
+
+[Files]
+File01 = DVDRepair.exe
+File02 = DVDRepair_X64.exe
+File04 = DoorsShell.dll
+File05 = Fugue.dll
+File06 = DVDRepair.ini
+
+[Dirs]
+; Dirs01 = Logging
+
+[Sources]
+File01 = Themes\Icons\DriveRepair.ico
+File02 = Themes\Icons\DriveRepairH.ico
+File03 = UDF\ReBar_Options.au3
+File04 = Fugue.dll
+File05 = DoorsShell.dll
+File06 = DVDRepair.ini
+File07 = DVDRepair.sni
+
+[SourceDirs]
+Dirs01 = Logging
+
+[Environment]
+ScriptPath=D:\RizonesoftSDK\Concrete\FlashRepair
+ScriptFullPath=D:\RizonesoftSDK\Concrete\FlashRepair\FlashRepair.au3
+ProgramName=USB Drive Repair
+ProgramShortName=FlashRepair
+ProgramVersion=1.0.2.844
+ProgramMajor=1
+ProgramVersionMaintenance=2
+ProgramVersionBuild=844
+ProgramDescription=Rizonesoft USB Drive Repair
+DistributionPath=D:\RizonesoftSDK\Concrete\FlashRepair\Distribution\844
+DistributionPortableName=FlashRepair_844
+DistributionPortablePath=D:\RizonesoftSDK\Concrete\FlashRepair\Distribution\844\FlashRepair_844
+DistributionPathSource=D:\RizonesoftSDK\Concrete\FlashRepair\Distribution\844\FlashRepair_844_Source
+OutputFile=DriveRepair.exe
+OutputFilePath=D:\RizonesoftSDK\Concrete\FlashRepair\DriveRepair.exe
+OutputFile64Bit=DriveRepair_X64.exe
+OutputFile64BitPath=D:\RizonesoftSDK\Concrete\FlashRepair\DriveRepair_X64.exe
+InstallScriptPath=D:\RizonesoftSDK\Concrete\DVDRepair\Distribution\828\DVDRepair_828_Setup.iss
+InstallOutputPath=D:\RizonesoftSDK\Concrete\DVDRepair\Distribution\828\DVDRepair_828_Setup.exe

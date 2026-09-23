@@ -1,0 +1,20 @@
+FixWin 10.0.1.0 for Windows 10
+
+We are pleased to release FixWin for Windows 10. It is a  freeware portable application to repair & fix common Windows 10 annoyances & issues, that does not require to be installed.
+
+It has been tested on Windows 10, 32-bit and 64-bit versions.
+
+We first suggest that you to create a System Restore Point.
+
+Having done that, apply at most one fix at a time and restart your computer.
+
+FixWin.exe is freeware and can be freely used for any personal non-commercial purposes only. It is supplied "as-is". The publisher or the author assumes no liability for damages, direct or consequential, which may result from the use of this software.
+
+All product names, logos, and trademarks are acknowledged as the registered intellectual property of their respective owners.
+
+FixWin has been developed for The Windows Club by Paras Sidhu.
+
+Home Page: http://www.thewindowsclub.com/fixwin-for-windows-10
+
+
+

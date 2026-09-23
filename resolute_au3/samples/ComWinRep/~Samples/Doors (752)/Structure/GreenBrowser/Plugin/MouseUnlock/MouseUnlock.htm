@@ -1,0 +1,50 @@
+<script language="JavaScript">
+function cancelError() {return true;} onerror=cancelError;
+
+function enableMouse()
+{
+	if (event != null)
+	{
+		event.returnValue=true;
+		event.cancelBubble=false;
+	}
+	return true;
+}
+function doEnableMouse(obj)
+{
+	obj.onmousedown=enableMouse;
+	obj.onmouseup=enableMouse;
+	obj.onmousemove=enableMouse;
+	obj.oncontextmenu=enableMouse;
+	obj.onselectstart=enableMouse;
+	obj.ondragstart=enableMouse;
+	obj.onbeforecopy=enableMouse;
+	obj.oncopy=enableMouse;
+	obj.onselect=enableMouse;
+}
+function doDocument(doc)
+{
+	try
+	{
+		doEnableMouse(doc);
+		doEnableMouse(doc.body);
+		var frs=doc.frames;
+		if (frs != null && frs.length>0)
+		{
+		    for (var i=0; i < frs.length; i++)
+		    {
+		    	doDocument(frs[i].document);
+		    }
+		}
+	}catch(e){}
+}
+doDocument(document);
+//10.9.19
+if (document.URL.indexOf('.qidian.')>0)
+{
+	try{
+	document.detachEvent("oncontextmenu", showmenuie5);
+	document.detachEvent("onselectstart", OnSelectText);
+	}catch(e){}
+}
+</script>

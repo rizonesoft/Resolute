@@ -1,0 +1,12 @@
+You can use keywords in the backup path.
+Example: %WindowsDrive%\RegBackups\
+Output: C:\RegBackups\
+
+Current Keywords:
+
+%CurrentProfile%
+%WindowsFolder%
+%WindowsDrive%
+%CurrentDrive%
+%AllUsersDocs%
+%MyDocuments%

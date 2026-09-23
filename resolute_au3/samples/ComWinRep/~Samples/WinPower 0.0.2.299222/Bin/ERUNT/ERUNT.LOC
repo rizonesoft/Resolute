@@ -1,0 +1,233 @@
+;
+; This is the localization file for ERUNT.
+; Only change lines beginning with #
+;
+; Other #'s or ##'s in a line are replaced at
+; runtime with certain text strings (file names
+; etc.), so include them in your translation!
+;
+; To make sure OEM characters are saved correctly,
+; please use a Windows based text editor (such as
+; Notepad) to edit this file.
+;
+
+: 1
+; 1 line only
+# ERU for Windows NT
+
+: 2
+; multiple lines possible
+# Emergency Recovery Utility NT -
+# Registry Backup for Windows NT/2000/XP
+
+: 3
+; 1 line only
+# Written by
+
+: 4
+; 1 line only
+# Welcome!
+
+: 5
+; multiple lines possible
+# This program backs up the registry files of your
+# Windows NT/2000/XP system to a folder of your
+# choice.
+
+: 6
+; multiple lines possible
+# Syntax:
+#
+# ERUNT
+#
+# - or -
+#
+# ERUNT DestinationFolder [sysreg] [curuser] [otherusers]
+# [/noconfirmdelete] [/noprogresswindow]
+
+: 7
+; 1 line only
+# Warning!
+
+: 8
+; multiple lines possible
+# This program requires Windows NT/2000/XP!
+#
+# Continue anyway?
+
+: 9
+; 2 lines here
+# Please specify a folder where the registry backup
+# should be saved.
+
+: 10
+; 1 line only
+# &Backup to:
+
+: 11
+; 1 line only
+# Backup options
+
+: 12
+; 1 line only
+# &System registry
+
+: 13
+; 1 line only
+# Current user &registry
+
+: 14
+; 1 line only
+# Other open &user registries
+
+: 15
+; 2 lines here
+# &OK
+# &Cancel
+
+: 16
+; multiple lines possible
+# At least one backup option must be selected.
+
+: 17
+; multiple lines possible
+# Please specify a folder.
+
+: 18
+; multiple lines possible
+# System variable %SystemRoot% is empty!
+#
+# Continue anyway?
+
+: 19
+; 1 line only
+# Error!
+
+: 20
+; multiple lines possible
+# Registry key not found:
+# HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\hivelist
+
+: 21
+; multiple lines possible
+# Without the information from this key no user registries can be
+# backed up.
+
+: 22
+; multiple lines possible
+# ERUNT can try to backup the system registry with default values.
+# User registries cannot be saved that way, however.
+#
+# Continue?
+
+: 23
+; multiple lines possible
+# No registry files found to save
+# for the selected options!
+
+: 24
+; multiple lines possible
+# No registry files found to save
+# for the system registry.
+
+: 25
+; multiple lines possible
+# No registry files found to save
+# for the current user.
+
+: 26
+; multiple lines possible
+# No registry files found to save
+# for other users.
+
+: 27
+; multiple lines possible
+# Backup of the remaining registries
+# will continue.
+
+: 28
+; 1 line only
+# Question
+
+: 29
+; multiple lines possible
+# Folder does not exist:
+# #
+#
+# Create it?
+
+: 30
+; multiple lines possible
+# Unable to create folder:
+# #
+
+: 31
+; multiple lines possible
+# Folder already exists:
+# #
+#
+# Delete the contents of this folder?
+
+: 32
+; multiple lines possible
+# The contents of folder
+# #
+# could not be completely deleted!
+
+: 33
+; multiple lines possible
+# Unable to create file:
+# #
+#
+# Registry backup will continue, but no restore information
+# for the ERDNT program will be saved. This means that later
+# restoration of the registry can only be done manually, by
+# using another OS to copy back the files.
+
+: 34
+; 1 line only
+# Backing up registry to #
+
+: 35
+; 1 line only
+# Current file:
+
+: 36
+; 1 line only
+# # of ## files saved
+
+: 37
+; multiple lines possible
+# Error saving file
+# # !
+#
+# Continue with the next file?
+
+: 38
+; 1 line only
+# Copying restoration program:
+
+: 39
+; multiple lines possible
+# File not found:
+# #
+#
+# This file is part of the restoration program ERDNT.
+# Without this file later restoration of the registry can
+# only be done manually, by using another OS to copy back
+# the files.
+
+: 40
+; multiple lines possible
+# Error copying file #
+# to the restore folder!
+
+: 41
+; multiple lines possible
+# Registry backup is complete!
+
+: 42
+; multiple lines possible
+# To restore the registry at a later point,
+# run the ERDNT program from folder
+# # .

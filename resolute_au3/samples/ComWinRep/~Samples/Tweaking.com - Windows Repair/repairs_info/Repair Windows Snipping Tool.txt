@@ -1,0 +1,20 @@
+Repair Windows Snipping Tool:
+
+This will try to repair the Windows Snipping Tool
+
+This repair will only run on Vista or newer.
+
+The following reg keys are applied
+
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\AppID\{7F429620-16D1-471E-A81A-114992148034}]
+@="wisptis"
+"RunAs"="Interactive User"
+"LaunchPermission"=hex:01,00,14,80,64,00,00,00,74,00,00,00,14,00,00,00,30,00,\
+00,00,02,00,1c,00,01,00,00,00,11,00,14,00,04,00,00,00,01,01,00,00,00,00,00,\
+10,00,10,00,00,02,00,34,00,02,00,00,00,00,00,18,00,1f,00,00,00,01,02,00,00,\
+00,00,00,05,20,00,00,00,20,02,00,00,00,00,14,00,0b,00,00,00,01,01,00,00,00,\
+00,00,01,00,00,00,00,01,02,00,00,00,00,00,05,20,00,00,00,20,02,00,00,01,02,\
+00,00,00,00,00,05,20,00,00,00,20,02,00,00
+

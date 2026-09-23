@@ -1,0 +1,7 @@
+Restore Windows 8/10 COM+ Unmarshalers:
+
+Starting in Windows 8/10 the COM+ depends on a set of registry keys located under HKEY_CLASSES_ROOT\Unmarshalers\System
+
+There is a bug in Windows 8/10 where those registry keys are sometimes removed, which when they are COM+ will no longer function and many things in windows stop working including audio, Windows Defender, Windows Firewall, WMI and many more.
+
+When these keys are restored COM+ functions again. These registry keys where not in older versions of Windows and is new to Windows 8/10.

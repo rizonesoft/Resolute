@@ -1,0 +1,61 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 11
+Script = DVDRepair.au3
+
+[Modules]
+Build = 1
+Compress = 0
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://rizonesoft.com
+
+[Distribute]
+File=%RootDir%\DVDRepair.exe
+File=%RootDir%\DVDRepair_X64.exe
+File=%SourceDir%\DVDRepair.ini
+File=%RootDir%\Docs\DVDRepair\Changes.txt
+File=%RootDir%\Docs\DVDRepair\License.txt
+File=%RootDir%\Docs\DVDRepair\Readme.txt
+File=%RootDir%\Processing\32\Stroke.ani
+File=%RootDir%\Processing\64\Stroke.ani
+File=%RootDir%\Processing\64\Globe.ani
+
+[Sources]
+
+[Environment]
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\DVDRepair\DVDRepair.au3
+Company=Rizonesoft
+CompanyURL=https://rizonesoft.com
+Name=DVD Drive Repair
+ShortName=DVDRepair
+Description=Rizonesoft DVD Drive Repair
+Type=N
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\DVDRepair.ico
+Version=11.2.3.2921
+VersionMajor=11
+VersionMaintenance=3
+VersionBuild=2921
+UseBeta=B
+UseX64=Y
+CompileBoth=Y
+OutFile=DVDRepair.exe
+OutFileX64=DVDRepair_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\DVDRepair.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\DVDRepair_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\DVDRepair\Distribution\2921
+DistributionName=DVDRepair_2921
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\DVDRepair\Distribution\2921\DVDRepair_2921
+DistroSourceName=DVDRepair_2921_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\DVDRepair\Distribution\2921\DVDRepair_2921_Source
