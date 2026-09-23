@@ -83,6 +83,7 @@ track: W1
 |  24   |   §24   | Review-tooling follow-ups                      | §20, §21, §22 |  [x]   |
 |  25   |   §25   | Checker diagnostic follow-ups                  | §22 |  [ ]   |
 |  26   |   §26   | Review-flow follow-ups                         | §24 |  [ ]   |
+|  27   |   §27   | One writer, a GPT-governed panel, slot-bound pins | §24 |  [ ]   |
 
 ---
 
@@ -994,6 +995,8 @@ The §16 plan review found the checkers speak human text only: every refusal is 
 
 ## 23. Third Two-Model Revisit
 
+**Corrected 2026-09-23:** superseded in substance by the operator's one-writer, GPT-reviewer decision; see D00 T04 §27. Partial items 1-3 are parked on branch `wip/d00-t04-s23-revisit`.
+
 D00 T04 §18 kept both models on blinded values 60-54 with Jaccard 0.00 and no leg firing, and named this revisit with three watch items: Sol carries two consecutive full-scope zeros (S16, S17), Opus costs read unresolved (rounds proxy again), and the window held one candidate class (review tooling). This section re-decides on the next window in the §18 shape. (Depends On §18 carries the relation; no XREF lines, so this filing touches no stamped-or-stamping section.)
 
 **Trigger: five more panel-reviewed sections past S17 (the §8-anchored query reads 13/5), or immediately if either cut trigger fires.** Until then this section waits, however its dependencies read.
@@ -1149,6 +1152,23 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR13 D00-T04-S24-PR13
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR16 D00-T04-S24-PR16
 -> SOURCE: panel-D00-T04-s24-2026-09-21 D00-T04-S24-F17
+
+## 27. One Writer, a GPT-Governed Panel, Slot-Bound Pins
+
+Operator decision 2026-09-23: Claude Code on Opus 5.5 is the only writer, Muse leaves the writer and researcher roles, and GPT-6 Sol is the reviewer. Today the panel's governing sign-off runs on Opus, the model that now writes every section, so the writer would approve its own work; and every reviewer pin is a literal typed into the skills (`gpt-5.6-sol` five times across two skills, `--model opus` on the sign-off), so each re-pin is a find-and-replace across prose that D00 T04 §19-style sweeps keep missing. This section ports ScratchPad's D00 T04 §15 slot table and §23 implementer-independent panel: one file binds every review role to a model, effort, and timeout; one module validates it and runs the producer; the skills name slots, never models; and the stamp validator requires a GPT-governed record for stamps from 2026-09-23. Justified defaults, each cheap to change: the same-family fallback is `gpt-5.6-terra` and the double-GPT-outage cross-fill is the writer's own family with a mandatory `GPT outage` note (ScratchPad's matrix, kept so a GPT outage degrades rather than halts); retired pins stay registered so historical run records still parse; the researcher pass moves to the writer session because it needs sources and the web, not independence.
+
+**Corrected 2026-09-23:** D00 T04 §23 (third two-model revisit) is superseded in substance: its keep-or-cut question between Sol and Opus as panel rungs is answered by the operator decision above. Its partial work (items 1-3) is parked unmerged on branch `wip/d00-t04-s23-revisit` (commit `189a3d01`); §23 stays open until it is either re-scoped to the new matrix or closed with that reason.
+
+- [ ] Add `.conclave/panel.toml` as the single source of truth for review wiring: a `[writer]` table (the writing model), a `[model.*]` registry (family, probe date, retired date for pins that only historical records name), and `[slot.*]` tables (model, effort, timeout) for `bulk`, `signoff`, `depth`, `bulk-fallback`, `signoff-fallback`, `cross-fill`, `plan-primary`, `plan-fallback`, `stamp-check`, and `independent`. Done when: the file parses, every GPT slot names `gpt-6-sol` except the two `-fallback` GPT slots on `gpt-5.6-terra`, `cross-fill` and `plan-fallback` name the writer family, and every probe date is quoted from a live echo probe.
+- [ ] Add `scripts/panel_slots.py`: load and validate the table (exact slot set, registered non-retired models, closed effort set, positive timeouts, same-family fallbacks repeat their leader's effort), enforce independence (every governing slot, which is all but `cross-fill` and `plan-fallback`, has a family different from the writer's), and expose `validate`, `show`, `argv <slot>`, `get <slot> <field>`, `family <model>`, `models <family>`, and `exec <slot> [extra args]` (prompt on stdin, the slot timeout enforced, exit 124 on expiry like `timeout`). Done when: `--self-test` passes with legs for each refusal (unknown slot, unregistered model, retired model in a slot, missing slot, extra slot, bad effort, bad timeout, parity break, writer-family governing slot) and a live `exec bulk` echo round-trips.
+- [ ] Rewire the skills to name slots, never models: `review-todo-section` (panel rungs, plan review, stamp check, outage matrix, research pass) and `process-todo-section` (the independent `codex review`) call `python scripts/panel_slots.py exec <slot>`; the rung roles become GPT bulk, GPT sign-off, GPT depth, terra same-family fallback, and Claude cross-fill only when both GPT pins fail; the researcher is the writer session; `process-plan` reads Claude session transcripts, not Muse logs, for run liveness. Done when: a grep for `gpt-[0-9]`, `claude-opus`, and `--model opus` over `.claude/skills/` prints only the historical-record paragraphs that name what reviewed past stamps, quoted.
+- [ ] Govern post-cutover stamps by the GPT record: `todo-validate.py` rule 16 requires, for stamps dated on or after 2026-09-23, that the last panel section is a `GPT panel` (no outage note owed), or a `Claude panel` (or legacy `Opus panel`) carrying a `GPT outage` note; earlier stamps keep the Opus-governed rule. `todo-graph.py` plan-health stops counting a post-cutover GPT-last record as fallback. `todo-runs.py` reads family-to-model sets from the registry instead of its literal map and accepts `Claude panel` round headings. Done when: validator self-test legs pass for GPT-last-clean, Claude-last-with-note, Claude-last-without-note (fatal), and a pre-cutover Opus-governed stamp (unchanged), and the live tree validates with 0 fatal.
+- [ ] Record the writer rule where every session reads it: `AGENTS.md` states the one-writer rule and points at the slot table; `todo/README.md` states the post-cutover record shape; `docs/reviews/run-records.md` terminology names the new panel; `scripts/check-all.ps1` runs the slot validator and its self-test as gates. Done when: the four files read as stated, quoted, and `check-all.ps1 validate` passes with the new gates listed.
+- [ ] Commit: `"workspace: one writer, GPT-governed panel, slot-bound pins"`
+
+**Test checkpoint:** Unit test (`panel_slots.py --self-test`, `todo-graph.py self-test`, `todo-runs.py --self-test`, `review_prompt.py --self-test` green, counts quoted) plus driven run (a live `exec bulk` echo, `panel_slots.py validate` over the checked-in table, `todo-graph.py validate` 0 fatal, and the model-literal grep over the skills quoted). The failure path is proven by the writer-family governing-slot refusal and the Claude-last-without-note fatal.
+
+-> XREF: D00 T04 §24 -- the review machinery whose pins this section moves into one table
 
 ## Verification
 
