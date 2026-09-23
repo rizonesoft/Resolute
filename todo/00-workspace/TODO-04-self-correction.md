@@ -85,6 +85,7 @@ track: W1
 |  25   |   §25   | Checker diagnostic follow-ups                  | §22 |  [ ]   |
 |  26   |   §26   | Review-flow follow-ups                         | §24 |  [ ]   |
 |  27   |   §27   | One writer, a GPT-governed panel, slot-bound pins | §24 |  [ ]   |
+|  28   |   §28   | Slot-table review follow-ups                   | §27 |  [ ]   |
 
 ---
 
@@ -1007,6 +1008,7 @@ D00 T04 §18 kept both models on blinded values 60-54 with Jaccard 0.00 and no l
 - [ ] Run the fresh crossover on a plan-record or shipped-code candidate (the minimum-activation rule wants the second class), and obtain token-limit and exact-version controls for both rungs if the CLIs expose them. Done when: the comparison runs controlled with persisted hashed inputs as §18's did, the controls read pinned and quoted, or the still-missing controls file forward with the accepted gap recorded as §18 recorded it; both rungs run confined to their snapshots with no live-tree reads, quoted from the runner invocations (in §18 all finds derived from prompt plus snapshot, but confinement rested on procedure rather than mechanism); the candidate is selected by a stated deterministic rule and frozen before either rung runs (selection recorded with the freeze commit), so no unusually favorable candidate can be cherry-picked; and same-defect pairs are matched by an independent party blinded to rung (matcher recorded), with disagreements adjudicated in the record naming matcher and dissenter. Cheaper substitute that fails the checkpoint: a third tooling-class crossover, which leaves the overlap leg dormant another window.
 - [ ] Run the mid-window calibration round from the §18 standing schedule: both rungs blinded on one frozen candidate, scored into the overlap leg. Done when: the round's pairs and Jaccard read quoted beside the decision crossover's.
 - [ ] Decide keep or cut from a fresh export with the dashboard re-rendered, and name the fourth revisit. Done when: the decision is dated, cites the export, replays the §18 legs (zero with its consecutiveness rule, overlap with tie-handling, activation, empty-union handling, and minimum defect mass), normalizes value-per-cost by opportunity before the tie margin compares rungs (full-scope and fix-loop inputs separated, or the pooling justified), re-renders the dashboard carrying per-class unique critical/major finds, median latency, normalized cost, trigger history, and confidence trend, and either keeps with the next trigger named or cuts with duties reassigned.
+- [ ] Re-scope or close this revisit under the D00 T04 §27 matrix: the keep-or-cut question between Sol and Opus as panel rungs is answered by the operator's one-writer decision, so the section either re-scopes to measuring the GPT-governed panel (sol against terra, or the cross-fill rate) or closes with that reason and the parked branch `wip/d00-t04-s23-revisit` disposed (plan review of the D00 T04 §27 candidate, PR10). Done when: the section's items read the chosen scope quoted, or a closure note names the decision and the branch's fate quoted, and the §8-anchored trigger in `todo-runs.py` reads accordingly.
 - [ ] Commit: `"workspace: third two-model revisit"`
 
 **Test checkpoint:** The trigger reads met by query; the window's severities are independent; the crossover spans the second class with controls pinned-or-filed; the calibration round reads quoted; the decision cites the export and names its successor. Blocked on the trigger until it is met, explicitly.
@@ -1020,6 +1022,7 @@ D00 T04 §18 kept both models on blinded values 60-54 with Jaccard 0.00 and no l
 -> SOURCE: plan-D00-T04-s18-2026-09-20-PR12 D00-T04-S18-PR12
 -> SOURCE: plan-D00-T04-s18-2026-09-20-PR13 D00-T04-S18-PR13
 -> SOURCE: plan-D00-T04-s18-2026-09-20-PR18 D00-T04-S18-PR18
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR10 D00-T04-S27-PR10
 
 ## 24. Review-Tooling Follow-Ups
 
@@ -1126,7 +1129,7 @@ The §22 plan review files nine findings the §22 contract does not own: the reg
 
 ## 26. Review-Flow Follow-Ups
 
-The §24 plan review files nine findings plus one panel advisory the §24 contract does not own: span exclusions lack an independent list (PR1), trusted pins are unenforced on approvals (PR4), recorded rounds lack candidate OIDs (PR5), multiple attestations mask by first-wins (PR7), undated stamps escape binding (PR8), the bundle name overclaims signing (PR10), the second-machine proof shares its host (PR12), the bundle carries no chain (PR13, premium win), and the fix-commit exception reads nowhere (PR16); the round-4 advisory adds the mega-assembly path (F17). All ten extend §24's review machinery rather than revisiting its decisions. (Depends On §24 carries the relation.)
+The §24 plan review files nine findings plus one panel advisory the §24 contract does not own, and the D00 T04 §27 panel adds an eleventh (a POSIX producer-tree timeout): span exclusions lack an independent list (PR1), trusted pins are unenforced on approvals (PR4), recorded rounds lack candidate OIDs (PR5), multiple attestations mask by first-wins (PR7), undated stamps escape binding (PR8), the bundle name overclaims signing (PR10), the second-machine proof shares its host (PR12), the bundle carries no chain (PR13, premium win), and the fix-commit exception reads nowhere (PR16); the round-4 advisory adds the mega-assembly path (F17). All ten extend §24's review machinery rather than revisiting its decisions. (Depends On §24 carries the relation.)
 
 - [ ] Review span exclusions against an independent list: the union leg proves declared inside pair but cannot tell a forgotten content commit from a legitimate record-commit exclusion, so an omitted commit ships unreviewed under a reviewed stamp (plan review of the §24 candidate, PR1; needs §24 shipped: it constrains §24's assembly binding). Done when: every in-span commit is either declared or exclusion-ledgered with a reviewed reason quoted, an undeclared-neither commit fails quoted, transcript-set completeness rides the same omission rule (a bundle missing a checker transcript fails), and the self-test pins omission plus ledgered-exclusion legs. Cheaper substitute that fails the checkpoint: the declared-only union, which is the current gap.
 - [ ] Forbid trusted model pins on approval artifacts: `trusted` marks honestly-unmeasured runs, but nothing stops a sign-off attestation from carrying one, turning a label into authorization (plan review of the §24 candidate, PR4; needs §24 shipped: it constrains §24's provenance marking). Done when: sign-off rounds require derived provenance quoted (attest refuses a trusted pin where derivation was owed, or the read-back fails it -- the implementation chooses the enforcement point with the skill updated), the banner-less non-sign-off path still attests marked `trusted` quoted, and the self-test pins refused plus still-honest legs. Cheaper substitute that fails the checkpoint: the marker alone, which labels without enforcing.
@@ -1141,9 +1144,9 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 - [ ] Kill the whole producer tree on a POSIX slot timeout: `panel_slots.py exec` kills only the producer process off Windows (Windows already runs `taskkill /T`), so a child the producer spawned can keep writing the round output after exit 124 and overlap the fallback round (panel round 4 of the D00 T04 §27 review, F6; needs §27 shipped: it hardens §27's runner). Done when: POSIX producers start in their own session and a timeout kills the process group, a self-test leg spawns a grandchild that outlives a single-process kill and proves it gone after 124 quoted, and the Windows leg stays green. Cheaper substitute that fails the checkpoint: documenting the platform limit without a kill.
 - [ ] Commit: `"workspace: review-flow follow-ups"`
 
-**Test checkpoint:** The undeclared-neither fails quoted; the trusted sign-off refuses quoted; the OID-mismatched tag fails quoted; the conflicting attestation fails quoted; the undated escape closes-or-proves quoted; the bundle name reads unsigned quoted; the separate-machine replay greens quoted; the chain verifies quoted; the exception reads quoted; the mega-assembly paths quoted.
+**Test checkpoint:** The undeclared-neither fails quoted; the trusted sign-off refuses quoted; the OID-mismatched tag fails quoted; the conflicting attestation fails quoted; the undated escape closes-or-proves quoted; the bundle name reads unsigned quoted; the separate-machine replay greens quoted; the chain verifies quoted; the exception reads quoted; the mega-assembly paths quoted; the POSIX grandchild is gone after exit 124 quoted.
 
--> XREF: D00 T04 §24 -- the review machinery ten items extend
+-> XREF: D00 T04 §24 -- the review machinery ten items extend (the eleventh extends D00 T04 §27)
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR1 D00-T04-S24-PR1
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR4 D00-T04-S24-PR4
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR5 D00-T04-S24-PR5
@@ -1155,6 +1158,8 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR16 D00-T04-S24-PR16
 -> SOURCE: panel-D00-T04-s24-2026-09-21 D00-T04-S24-F17
 -> SOURCE: panel-D00-T04-s27-2026-09-23 D00-T04-S27-F6
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR7 D00-T04-S27-PR7
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR9 D00-T04-S27-PR9
 -> XREF: D00 T04 §27 -- the slot runner one item hardens
 
 ## 27. One Writer, a GPT-Governed Panel, Slot-Bound Pins
@@ -1176,6 +1181,27 @@ Operator decision 2026-09-23: Claude Code on Opus 5.5 is the only writer, Muse l
 
 -> XREF: D00 T04 §24 -- the review machinery whose pins this section moves into one table
 -> XREF: D00 T04 §26 -- the POSIX timeout follow-up filed from this section's panel round 4
+-> XREF: D00 T04 §28 -- the plan-review follow-ups filed from this section
+
+## 28. Slot-Table Review Follow-Ups
+
+The §27 plan review files five findings the §27 contract does not own: a `GPT outage` note alone authorizes the writer-family cross-fill (PR2), the governing heading is a word rather than a derived identity (PR3), a re-pin can change how an older round reads (PR4), `exec` extra arguments are not barred from overriding the pin (PR5), and derived provenance binds the sign-off only (PR6). All five harden §27's table, runner, or rule 16.
+
+- [ ] Require recorded failed attempts before a cross-fill governs: a `GPT outage` line is prose, so a chosen bypass and a real outage read the same (plan review of the §27 candidate, PR2; needs §27 shipped: it constrains §27's rule 16). Done when: a Claude-last record after 2026-09-23 must cite both GPT attempts (slot, model from the `exec` stderr line, exit code, stderr file) in a parseable shape quoted, a note without them fails quoted, and the self-test pins both legs. Cheaper substitute that fails the checkpoint: stricter note wording.
+- [ ] Bind the governing heading to the derived runner identity: rule 16 reads the heading word, so a mislabeled round could govern (plan review of the §27 candidate, PR3; needs §27 shipped: it extends §27's rule 16). Done when: post-cutover stamps require the attestation's derived reviewer family to match the last panel heading's family quoted, a mismatch fails quoted, and the live §27 record re-passes. Cheaper substitute that fails the checkpoint: a heading-spelling check.
+- [ ] Persist the resolved pin and table revision with every round: a later re-pin changes what a slot name means, so an old round's slot reads ambiguously (plan review of the §27 candidate, PR4; needs §27 shipped: it extends §27's runner). Done when: `exec` prints the table's content hash beside the resolved model and effort, the round record carries both quoted, and a re-pinned fixture proves the old round still names its original model quoted. Cheaper substitute that fails the checkpoint: relying on git history of the table.
+- [ ] Refuse extra arguments that override the pin: `exec <slot> [extra...]` appends caller arguments to the producer argv, so `-m`, `--model`, `--effort`, or a `model_reasoning_effort` override would bypass the table (plan review of the §27 candidate, PR5; needs §27 shipped: it constrains §27's runner). Done when: `exec` refuses any extra argument that names a model or effort flag (an allowlist per slot kind: `--commit <sha>` for `independent`, nothing for the rest) quoted, and the self-test pins the refusal plus the allowed shape. Cheaper substitute that fails the checkpoint: documenting the rule.
+- [ ] Extend derived provenance to every governing role: D00 T04 §26 refuses trusted pins on sign-off approvals only, while `stamp-check`, `depth`, and the cross-fill also authorize (plan review of the §27 candidate, PR6; needs §27 shipped: it names §27's slots). Done when: every governing slot's approval artifact carries derived provenance or refuses quoted, the D00 T04 §26 item reads the slot list from the table, and the self-test pins a trusted `stamp-check` refusal. Cheaper substitute that fails the checkpoint: a sign-off-only rule.
+- [ ] Commit: `"workspace: slot-table review follow-ups"`
+
+**Test checkpoint:** The bare-note cross-fill fails quoted; the heading-identity mismatch fails quoted; the re-pinned fixture names its original model quoted; the override refusal fires quoted; the trusted `stamp-check` refuses quoted.
+
+-> XREF: D00 T04 §27 -- the slot table, runner, and rule five items harden
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR2 D00-T04-S27-PR2
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR3 D00-T04-S27-PR3
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR4 D00-T04-S27-PR4
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR5 D00-T04-S27-PR5
+-> SOURCE: plan-D00-T04-s27-2026-09-23-PR6 D00-T04-S27-PR6
 
 ## Verification
 
