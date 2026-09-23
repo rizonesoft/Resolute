@@ -200,7 +200,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 
 - [ ] Bind the UI library's text rendering to the localization loader from §4, so every string on every control resolves from a pack. Done when: driving with an incomplete pack lists the missing keys and nothing renders as bare English.
 - [ ] Bind the theme mode to the settings writer from §2, so light, dark, and follow-system persist. Done when: each is driven and survives a restart, proven by readback.
-- [ ] Build the About dialog on the library's controls, from the §12 identity registry, with no per-tool copy. Done when: two different tools render correct About dialogs with no tool-side code.
+- [ ] Build the About dialog on the library's controls, from the tool descriptor, with no per-tool copy (**Groomed 2026-09-23:** the registry-backed rows arrive with `D06 T01 §17`, moved from this file's §12; this item ships the dialog every tool has before the registry exists). Done when: two different tools render correct About dialogs with no tool-side code.
 - [ ] Build the preferences host covering language, logging, update frequency, and process priority. Done when: every control persists through the §2 writer and survives a restart.
 - [ ] Let a tool add its own preferences page without forking the host. Done when: a tool contributes a page and the framework's pages are unchanged.
 - [ ] Account for the surface: every control on all three surfaces is working or deferred to a named section. Done when: the account is written and each deferral resolves.
@@ -209,7 +209,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 
 **Test checkpoint:** Two different tools render correct About dialogs with no tool-side code. Every preferences control persists and survives a restart, proven by readback. The three rendered surfaces are compared against their captures with differences listed. Captures committed under `docs/captures/runs/`.
 
--> XREF: D01 T01 §12 -- the About dialog specified in full, rendered from the registry
+-> XREF: D06 T01 §17 -- the About dialog specified in full, rendered from the registry (moved from this file's §12 on 2026-09-23)
 
 ## 8. Extend the UI Library for the Tools
 
@@ -296,46 +296,38 @@ Every tool in this suite is something an IT administrator would want to run acro
 
 ## 12. About Dialog, From the Registry
 
-The suite gets one traditional modal About dialog, Help menu > About, owned by the framework and rendered from the `D06 T01 §10` identity registry: no per-tool copy, no pasted string, no settings sidebar panel. Operator-confirmed 2026-09-19: the logo renders at 80px, and every tool window plus the launcher shell gains a Help menu entry. The tool descriptor selects which registry entry a tool shows; the registry holds every string the dialog draws.
+> **Moved:** 2026-09-23 to todo/06-distro-release/TODO-01-build-and-release.md (operator instruction); worked there as `D06 T01 §17` by that file's owner.
 
-**Fidelity:** the modal dialog, centered with its rows, against `docs/captures/house-style/`. Layout and terminology match the captures; DPI and theme are the approved deviations.
-**Job:** a user opens Help > About and learns exactly what they run, who publishes it, and where to go next. Consumer: the dialog rows, each traced to the registry.
-**Treatment:** one dialog implementation in the framework, parameterized by registry entry. Cheaper substitute that fails the checkpoint: a settings sidebar panel instead of a modal, or a per-tool About copy, which is how fourteen dialogs drifted apart.
-**Chrome:** consume the framework's own controls, theme, and localization loader. No tool draws its own row.
-**Needs:** C++ toolchain (compile)
+**Why it left** (groom 2026-09-23, operator decision). This section renders rows from the `D06 T01 §10` identity registry, and `D06 T01` gates on the whole of `D04 T01`, which gates on the whole of this file. Sitting here it closed a loop no row could ever break: `D04 T01 §1` waited on this file, this section waited on `D06 T01 §10`, and `D06 T01 §10` waited on `D04 T01 §1`. Every domain that gates on this file (`D01 T02`, `D02 T01`, `D03 T01`, `D04 T01`, `D05 T01`, `D08 T01`) inherited the stall. The same whole-TODO gate moved `D00 T01 §7` to `D06` on 2026-09-17.
 
-- [ ] Build the modal shell: centered on the parent, OK button with Enter accepting and Esc cancelling, single instance with re-invoking focusing instead of stacking. Done when: a double open shows one dialog focused, and Enter and Esc are each driven and quoted.
-- [ ] Render every row from the registry: app logo at 80px from the `resources/logos/` theme pair linked to `https://rizonesoft.com`, app name, version with channel where applicable, the verbatim copyright line, publisher `Rizonetech (Pty) Ltd.`, clickable project/corporate/social links with brand icons, the `GPL-3.0-or-later` line linking the full license text, third-party notices link. Done when: a UI drive proves every row from registry values with launcher URIs matched and the launcher seam mocked.
-- [ ] Render light and dark themes with the theme-correct assets. Done when: both themes are driven and the logo and icons match the declared theme assets.
-- [ ] Keep the dialog keyboard navigable with screen-reader names on links and buttons. Done when: the tab order runs end to end by drive, and every link and button exposes its asserted name.
-- [ ] Add Help menu entries everywhere: the launcher shell and every tool window. Done when: the launcher entry opens the dialog, and the framework harness opens it for two tool descriptors with no tool-side code.
-- [ ] Compare golden captures for both themes. Done when: captures are committed and the comparison passes with differences listed.
-- [ ] Write the user-guide page for the dialog in the same commit as the implementation. Done when: the page exists, describes every row, and shares the implementation commit.
-- [ ] Commit: `"framework: about dialog from the identity registry"`
+**What went with it**, so nothing was lost: every item, the checkpoint, the Fidelity, Job, Treatment, and Chrome lines, and both operator confirmations of 2026-09-19. The framework still owns the dialog's code under `src/framework/ui/` per `AGENTS.md`; `D06 T01 §17` edits it there, and `D01 T01 §7` keeps the descriptor-driven About the tools ship with first.
 
-**Test checkpoint:** One dialog focuses on double open; Enter and Esc quoted. Every row traces to the registry with URIs matched. Both themes render their declared assets. Tab order and screen-reader names asserted by drive. Launcher entry plus two harness descriptors open it with no tool-side code. Golden captures pass for both themes. The user-guide page shares the implementation commit. Cheaper substitute that fails the checkpoint: a sidebar panel instead of a modal, which the operator explicitly rejected.
+- [ ] ~~Build the modal shell: centered on the parent, OK button with Enter accepting and Esc cancelling, single instance with re-invoking focusing instead of stacking~~ -> `D06 T01 §17`
+- [ ] ~~Render every row from the registry: app logo at 80px from the `resources/logos/` theme pair linked to `https://rizonesoft.com`, app name, version with channel where applicable, the verbatim copyright line, publisher `Rizonetech (Pty) Ltd.`, clickable project/corporate/social links with brand icons, the `GPL-3.0-or-later` line linking the full license text, third-party notices link~~ -> `D06 T01 §17`
+- [ ] ~~Render light and dark themes with the theme-correct assets~~ -> `D06 T01 §17`
+- [ ] ~~Keep the dialog keyboard navigable with screen-reader names on links and buttons~~ -> `D06 T01 §17`
+- [ ] ~~Add Help menu entries everywhere: the launcher shell and every tool window~~ -> `D06 T01 §17`
+- [ ] ~~Compare golden captures for both themes~~ -> `D06 T01 §17`
+- [ ] ~~Write the user-guide page for the dialog in the same commit as the implementation~~ -> `D06 T01 §17`
+- [ ] Commit: ~~`"framework: about dialog from the identity registry"`~~ -> `D06 T01 §17`, which commits as `"release: about dialog from the identity registry"`
 
--> XREF: D06 T01 §10 -- the identity registry this dialog renders
--> XREF: D01 T01 §7 -- the UI surfaces this dialog builds on
+**Test checkpoint:** Moved with the section. `D06 T01 §17` carries it.
 
 ## 13. F1 Context Help
 
-F1 opens context help: the guide page for the focused surface through the `D06 T01 §14` map, help-home for unmapped surfaces and no-focus. F1 is unbound today (no `VK_F1` handler and no URL launcher anywhere in `src/` or the UI library), and the AutoIt suite has no F1 help either, so this section is a deliberate addition fenced as new behavior: it changes no cloned surface, it adds a key the originals never had. Operator-confirmed 2026-09-19: a Help menu entry ships alongside F1, matching the §12 About pattern of one framework entry in the launcher shell and every tool window.
+> **Moved:** 2026-09-23 to todo/06-distro-release/TODO-01-build-and-release.md (operator instruction); worked there as `D06 T01 §18` by that file's owner.
 
-**Fidelity:** no surface of its own; the default browser showing the guide page is the surface, rendered from §14 HTML.
-**Job:** a user stuck on any surface presses F1 and lands on the page that explains it. Consumer: the focused surface, resolved through the map.
-**Treatment:** window-level F1 through the map, opened in the default browser with local fallback, plus a Help menu entry on every window. Cheaper substitute that fails the checkpoint: a Help menu entry alone with no F1 binding, which leaves keyboard users with no path to the page they stand on.
-**Chrome Needs:** a Help menu entry per window, following the §12 entries; no other visible control.
+**Why it left** (groom 2026-09-23, operator decision). This section renders rows from the `D06 T01 §10` identity registry through the `D06 T01 §14` surface map (the same registry-and-pipeline layer), and `D06 T01` gates on the whole of `D04 T01`, which gates on the whole of this file. Sitting here it closed a loop no row could ever break: `D04 T01 §1` waited on this file, this section waited on `D06 T01 §10`, and `D06 T01 §10` waited on `D04 T01 §1`. Every domain that gates on this file (`D01 T02`, `D02 T01`, `D03 T01`, `D04 T01`, `D05 T01`, `D08 T01`) inherited the stall. The same whole-TODO gate moved `D00 T01 §7` to `D06` on 2026-09-17.
 
-- [ ] Route window-level F1 through the surface map. Done when: F1 on a mapped surface opens its guide page, F1 on an unmapped surface or with no focus opens help-home, quoted by drive.
-- [ ] Invoke the default browser with local fallback. Done when: the first real URL launcher seam ships here (the §12 drive mocks it), web-unreachable falls back to the local pages, and no tool carries its own launcher. Cheaper substitute that fails the checkpoint: shelling the URL from each window, which is how fourteen launchers drift apart.
-- [ ] Add the Help menu entry alongside F1. Done when: the launcher shell and every tool window carry it, and each entry opens help-home, quoted by drive with no tool-side code.
-- [ ] Write the guide page documenting the behavior in the same commit as the implementation. Done when: the page exists under the `D08 T01 §1` same-commit rule, documents F1 plus the fallback, and shares the implementation commit.
-- [ ] Commit: `"framework: F1 context help through the surface map"`
+**What went with it**, so nothing was lost: every item, the checkpoint, the Fidelity, Job, Treatment, and Chrome lines, and both operator confirmations of 2026-09-19. The framework still owns the dialog's code under `src/framework/ui/` per `AGENTS.md`; `D06 T01 §18` edits it there, and `D01 T01 §7` keeps the descriptor-driven About the tools ship with first.
 
-**Test checkpoint:** F1 opens the mapped page and help-home covers unmapped and no-focus; every window's Help entry opens help-home with no tool-side code; the launcher falls back offline; the guide page shares the implementation commit. Cheaper substitute that fails the checkpoint: testing F1 by hand on one window, which proves nothing about the map default.
+- [ ] ~~Route window-level F1 through the surface map~~ -> `D06 T01 §18`
+- [ ] ~~Invoke the default browser with local fallback~~ -> `D06 T01 §18`
+- [ ] ~~Add the Help menu entry alongside F1~~ -> `D06 T01 §18`
+- [ ] ~~Write the guide page documenting the behavior in the same commit as the implementation~~ -> `D06 T01 §18`
+- [ ] Commit: ~~`"framework: F1 context help through the surface map"`~~ -> `D06 T01 §18`, which commits as `"release: F1 context help through the surface map"`
 
--> XREF: D06 T01 §14 -- the pipeline and map this behavior reads
+**Test checkpoint:** Moved with the section. `D06 T01 §18` carries it.
 
 ## 14. Embedded Dataset Loader
 

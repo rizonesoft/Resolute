@@ -146,6 +146,8 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
 | [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
 | [x] | `D00 T02 §5`  | Cover the inherited UI library                    |   7   |
+| [ ] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
+| [ ] | `D00 T01 §9`  | Remove the Linux execution surface                |   5   |
 | [ ] | `D00 T02 §6`  | Remove the tautological width check               |   3   |
 | [ ] | `D00 T02 §7`  | Driven UI completion tests                        |   3   |
 | [ ] | `D00 T02 §8`  | Icon manifest audit                               |   3   |
@@ -153,8 +155,6 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T02 §10` | Focus-free UI suite conversion                    |   8   |
 | [ ] | `D00 T02 §11` | Nightly full-suite regression run                 |   8   |
 | [ ] | `D00 T02 §12` | Port-vs-port visual comparison                    |   4   |
-| [ ] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
-| [ ] | `D00 T01 §9`  | Remove the Linux execution surface                |   5   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |   4   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |   7   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
@@ -177,13 +177,19 @@ The framework every tool consumes, the repair contract the destructive half cons
 | :-: | ------------- | -------------------------------------------- | :---: |
 | [ ] | `D01 T01 §1`  | Application shell and lifecycle              |   7   |
 | [ ] | `D01 T01 §2`  | Settings: one writer, one path               |  10   |
-| [ ] | `D01 T01 §3`  | Logging and the log surface                  |   6   |
 | [ ] | `D01 T01 §4`  | Localization and the pack loader             |   7   |
-| [ ] | `D01 T01 §5`  | Update check and consolidation announcement  |   7   |
-| [ ] | `D01 T01 §6`  | Elevation and its refusal path               |   6   |
+| [ ] | `D01 T03 §1`  | Standard window, menus, message layer        |   6   |
+| [ ] | `D01 T03 §2`  | Preferences shell, general, performance      |   6   |
+| [ ] | `D01 T03 §3`  | Language page and tool-page contract         |   5   |
 | [ ] | `D01 T01 §7`  | Standard window, About, and preferences      |   8   |
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme               |   7   |
+| [ ] | `D01 T03 §4`  | Per-tool log surface                         |   5   |
+| [ ] | `D01 T01 §3`  | Logging and the log surface                  |   6   |
+| [ ] | `D01 T03 §5`  | Update dialog and announcement               |   5   |
+| [ ] | `D01 T01 §5`  | Update check and consolidation announcement  |   7   |
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder          |   6   |
+| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown          |   6   |
+| [ ] | `D01 T01 §6`  | Elevation and its refusal path               |   6   |
 | [ ] | `D01 T01 §10` | Crash Handling and Single Instance           |   8   |
 | [ ] | `D01 T01 §11` | Command Line and Exit Codes                  |   8   |
 | [ ] | `D02 T01 §1`  | The repair item and the run loop             |   6   |
@@ -199,12 +205,6 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T02 §5`  | The accessibility floor                      |  10   |
 | [ ] | `D01 T02 §6`  | Performance floor                            |   8   |
 | [ ] | `D01 T02 §7`  | Text presentation and machine values         |   5   |
-| [ ] | `D01 T03 §1`  | Standard window, menus, message layer        |   6   |
-| [ ] | `D01 T03 §2`  | Preferences shell, general, performance      |   6   |
-| [ ] | `D01 T03 §3`  | Language page and tool-page contract         |   5   |
-| [ ] | `D01 T03 §4`  | Per-tool log surface                         |   5   |
-| [ ] | `D01 T03 §5`  | Update dialog and announcement               |   5   |
-| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown          |   6   |
 | [ ] | `D01 T03 §7`  | Splash, donate, string audit                 |   4   |
 
 
@@ -214,53 +214,53 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 
 |  ✔  | Section      | Deliverable                                  | Items |
 | :-: | ------------ | -------------------------------------------- | :---: |
-| [ ] | `D03 T01 §1` | Launcher on the framework                    |   6   |
-| [ ] | `D03 T01 §2` | Tool discovery and the tool list             |   5   |
-| [ ] | `D03 T01 §3` | Launch, failure reporting, and elevation     |   5   |
-| [ ] | `D03 T01 §4` | Windows system locations                     |   6   |
-| [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
-| [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
 | [ ] | `D03 T02 §1` | Start bar and cascade map                    |   6   |
 | [ ] | `D03 T02 §2` | Main content and repair groups               |   6   |
+| [ ] | `D03 T01 §1` | Launcher on the framework                    |   6   |
 | [ ] | `D03 T02 §3` | Tool list surface                            |   5   |
+| [ ] | `D03 T01 §2` | Tool discovery and the tool list             |   5   |
 | [ ] | `D03 T02 §4` | System locations browser                     |   4   |
+| [ ] | `D03 T01 §4` | Windows system locations                     |   6   |
 | [ ] | `D03 T02 §5` | Suite log viewer surface                     |   5   |
+| [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
 | [ ] | `D03 T02 §6` | Symptom search surface                       |   5   |
+| [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
 | [ ] | `D03 T02 §7` | Launcher chrome and notices                  |   6   |
+| [ ] | `D03 T01 §3` | Launch, failure reporting, and elevation     |   5   |
 | [ ] | `D04 T02 §1` | Ownership inventory, shared-layer map        |   6   |
+| [ ] | `D04 T03 §1` | ComIntRep repair inventory, reversibility    |   5   |
+| [ ] | `D04 T03 §2` | ComIntRep surface inventory, layer map       |   5   |
+| [ ] | `D04 T04 §1` | PixRepair sequences and timing               |   5   |
+| [ ] | `D04 T04 §2` | PixRepair surface inventory, layer map       |   5   |
+| [ ] | `D04 T05 §1` | BiosCodes beep data and WMI inventory        |   5   |
+| [ ] | `D04 T05 §2` | BiosCodes surface inventory, layer map       |   5   |
+| [ ] | `D04 T06 §1` | MemBoost trim path, triggers                 |   5   |
+| [ ] | `D04 T06 §2` | MemBoost surface inventory, layer map        |   5   |
+| [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
 | [ ] | `D04 T02 §2` | Ownership distribution completeness          |   7   |
 | [ ] | `D04 T02 §3` | Verify-after-write, per-tree status          |   6   |
 | [ ] | `D04 T02 §4` | Remove-all, stuck-state repair               |   4   |
-| [ ] | `D04 T03 §1` | ComIntRep repair inventory, reversibility    |   5   |
-| [ ] | `D04 T03 §2` | ComIntRep surface inventory, layer map       |   5   |
+| [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
 | [ ] | `D04 T03 §3` | ComIntRep distribution completeness          |   7   |
 | [ ] | `D04 T03 §4` | Per-repair verification and outcome          |   6   |
 | [ ] | `D04 T03 §5` | Pre-repair restore-point offer               |   4   |
 | [ ] | `D04 T03 §6` | Opt-in completion chime                      |   3   |
-| [ ] | `D04 T04 §1` | PixRepair sequences and timing               |   5   |
-| [ ] | `D04 T04 §2` | PixRepair surface inventory, layer map       |   5   |
 | [ ] | `D04 T04 §3` | PixRepair distribution completeness          |   7   |
 | [ ] | `D04 T04 §4` | Display corrections                          |   5   |
 | [ ] | `D04 T04 §5` | Draggable targeted window                    |   5   |
 | [ ] | `D04 T04 §6` | Session timer with auto-stop                 |   4   |
-| [ ] | `D04 T05 §1` | BiosCodes beep data and WMI inventory        |   5   |
-| [ ] | `D04 T05 §2` | BiosCodes surface inventory, layer map       |   5   |
+| [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   9   |
+| [ ] | `D04 T01 §4` | Drive Repair: USBRepair and DVDRepair merged |   9   |
+| [ ] | `D04 T01 §5` | MemBoost and BiosCodes                       |   9   |
 | [ ] | `D04 T05 §3` | BiosCodes distribution completeness          |   7   |
+| [ ] | `D04 T05 §6` | Migrate Beep Data to Reference DB            |   5   |
 | [ ] | `D04 T05 §4` | Cross-vendor pattern search                  |   5   |
 | [ ] | `D04 T05 §5` | Vendor auto-detect from WMI                  |   4   |
-| [ ] | `D04 T05 §6` | Migrate Beep Data to Reference DB            |   5   |
 | [ ] | `D04 T05 §7` | User-Editable Database (CRUD)                |   7   |
-| [ ] | `D04 T06 §1` | MemBoost trim path, triggers                 |   5   |
-| [ ] | `D04 T06 §2` | MemBoost surface inventory, layer map        |   5   |
 | [ ] | `D04 T06 §3` | MemBoost distribution completeness           |   7   |
 | [ ] | `D04 T06 §4` | Editable exclusion list                      |   5   |
 | [ ] | `D04 T06 §5` | Per-process trim report                      |   5   |
 | [ ] | `D04 T06 §6` | Only-list trim mode                          |   5   |
-| [ ] | `D04 T01 §1` | Vertical slice: Ownership end to end         |   8   |
-| [ ] | `D04 T01 §2` | The five remaining frozen tools              |   8   |
-| [ ] | `D04 T01 §3` | Browser optimizer: four tools into one       |   9   |
-| [ ] | `D04 T01 §4` | Drive Repair: USBRepair and DVDRepair merged |   9   |
-| [ ] | `D04 T01 §5` | MemBoost and BiosCodes                       |   9   |
 
 
 ### Phase 3 -- Intake and new capability
@@ -325,21 +325,21 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | :-: | ------------- | ---------------------------------------------- | :---: |
 | [ ] | `D06 T01 §1`  | Release Descriptors, Portable by Construction  |   5   |
 | [ ] | `D06 T01 §2`  | One Command Builds the Release Set             |   5   |
-| [ ] | `D06 T01 §3`  | Installers: Per Tool and Whole Suite           |  11   |
-| [ ] | `D06 T01 §9`  | The Bare-Machine Proof                         |   7   |
-| [ ] | `D06 T01 §4`  | Migration From the AutoIt Suite                |   7   |
-| [ ] | `D06 T01 §5`  | Update Files and Consolidation Announcements   |   6   |
 | [ ] | `D06 T01 §6`  | Version Rule, Changelog, and Release Checklist |   5   |
-| [ ] | `D06 T01 §7`  | Focused Builds From One Codebase               |   7   |
 | [ ] | `D06 T01 §8`  | Licensing and Attribution                      |  12   |
-| [ ] | `D06 T01 §10` | Identity Registry and Version Agreement        |   9   |
-| [ ] | `D01 T01 §12` | About Dialog, From the Registry                |   8   |
-| [ ] | `D01 T01 §13` | F1 Context Help Through the Surface Map        |   5   |
 | [ ] | `D01 T01 §14` | Embedded Dataset Loader                        |   4   |
 | [ ] | `D06 T01 §11` | Tag-Derived Version Scheme Record              |   5   |
+| [ ] | `D06 T01 §10` | Identity Registry and Version Agreement        |   9   |
+| [ ] | `D06 T01 §17` | About Dialog, From the Registry                |   8   |
+| [ ] | `D06 T01 §5`  | Update Files and Consolidation Announcements   |   6   |
+| [ ] | `D06 T01 §7`  | Focused Builds From One Codebase               |   7   |
 | [ ] | `D06 T01 §12` | Versioner Wiring and String Migration          |   4   |
 | [ ] | `D06 T01 §13` | Stamped-Surface Agreement Test                 |   5   |
 | [ ] | `D06 T01 §14` | Help Content Pipeline: Guide to Offline HTML   |   5   |
+| [ ] | `D06 T01 §18` | F1 Context Help Through the Surface Map        |   5   |
+| [ ] | `D06 T01 §3`  | Installers: Per Tool and Whole Suite           |  11   |
+| [ ] | `D06 T01 §9`  | The Bare-Machine Proof                         |   7   |
+| [ ] | `D06 T01 §4`  | Migration From the AutoIt Suite                |   7   |
 | [ ] | `D06 T01 §15` | Web Publishing and Link Switch                 |   4   |
 | [ ] | `D06 T01 §16` | Final Acceptance: The Suite As Shipped         |   6   |
 | [ ] | `D08 T01 §1`  | Documentation set for every tool               |   9   |
@@ -347,6 +347,9 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D08 T01 §3`  | Coverage matrix and pack hygiene               |   6   |
 | [ ] | `D08 T01 §4`  | Rewrite the shipped documentation              |   7   |
 | [ ] | `D08 T01 §5`  | Repository and developer documentation         |   5   |
+
+> **Moved:** `D01 T01 §12` -- 2026-09-23 to todo/06-distro-release/TODO-01-build-and-release.md (operator instruction); worked there as `D06 T01 §17` by that file's owner.
+> **Moved:** `D01 T01 §13` -- 2026-09-23 to todo/06-distro-release/TODO-01-build-and-release.md (operator instruction); worked there as `D06 T01 §18` by that file's owner.
 
 > **Moved:** `D00 T01 §7` -- 2026-09-17 to todo/06-distro-release/TODO-01-build-and-release.md (operator instruction); worked there as `D06 T01 §9` by that file's owner.
 
