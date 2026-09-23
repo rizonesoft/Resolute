@@ -87,6 +87,7 @@ track: W1
 |  27   |   §27   | One writer, a GPT-governed panel, slot-bound pins | §24 |  [x]   |
 |  28   |   §28   | Slot-table review follow-ups                   | §27 |  [ ]   |
 |  29   |   §29   | Grok fallbacks on the newest Grok model        | §27 |  [x]   |
+|  30   |   §30   | CI read-back and reachable provenance          | §24 |  [ ]   |
 
 ---
 
@@ -1140,8 +1141,6 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 - [ ] State the review-fix exception to one-section-one-commit: fixes go forward in new commits (every panel-reviewed section ships several), but the contract as written forbids what the skill requires (plan review of the §24 candidate, PR16; needs §24 shipped: it records §24's shape). Done when: the skill plus AGENTS.md state the exception (implementation commit plus `review: answer` fix commits, each tagged to its round) quoted, the mechanical bound is cited (role tags plus correspondence plus the attested declaration), and no tree prose contradicts the exception quoted. Cheaper substitute that fails the checkpoint: the bare contract sentence, which every reviewed section already breaches.
 - [ ] Give oversized assemblies a legal path: past the order-search budget a non-declaration-ordered assembly with voided span members is unfenceable (declaring exhausts, ranging re-admits), per the D00 T04 §24 round-4 I1 advisory narrowed by the round-5 attempt cap (needs §24 shipped: it extends §24's assembly binding). Done when: a designed path exists quoted (chunked declarations, smarter matching, or a reasoned wont-fix with the trigger that reopens it), the refusal message points at it quoted, and the self-test pins the new shape. Cheaper substitute that fails the checkpoint: the exhausted message alone, which names no path for that corner.
 - [ ] Kill the whole producer tree on a POSIX slot timeout: `panel_slots.py exec` kills only the producer process off Windows (Windows already runs `taskkill /T`), so a child the producer spawned can keep writing the round output after exit 124 and overlap the fallback round (panel round 4 of the D00 T04 §27 review, F6; needs §27 shipped: it hardens §27's runner). Done when: POSIX producers start in their own session and a timeout kills the process group, a self-test leg spawns a grandchild that outlives a single-process kill and proves it gone after 124 quoted, and the Windows leg stays green. Cheaper substitute that fails the checkpoint: documenting the platform limit without a kill.
-- [ ] Keep every provenance candidate reachable from a pushed ref: the D00 T04 §22 and §24 findings cite staged trees captured with `git write-tree` (`c6b1413d`, `d7e58618`, `49ff4978`) that no pushed commit contains, so they resolved locally and every local gate passed while CI's fresh clone failed 17 fatals on every push from 2026-09-20 to 2026-09-23 (found 2026-09-23 while grooming; repaired by tagging each tree under `refs/tags/provenance/`). Done when: the stamp flow tags any uncommitted tree or commit it cites as `provenance/<section>-<short>` and pushes the tag with the stamp, the validator (or the push fence) refuses a candidate no pushed ref reaches, quoted from a fixture, and the skill states the rule.
-- [ ] Read CI back after every push: the stamp flow's push reads back the ref but never the workflow, so five stamps landed on a red `plan-gates` run without anyone noticing (found 2026-09-23). Done when: after each push the flow waits for the `plan-gates` run for that commit and records its conclusion in the run file, a red conclusion stops the run instead of starting the next section, and the check is quoted from a drive.
 - [ ] Commit: `"workspace: review-flow follow-ups"`
 
 **Test checkpoint:** The undeclared-neither fails quoted; the trusted sign-off refuses quoted; the OID-mismatched tag fails quoted; the conflicting attestation fails quoted; the undated escape closes-or-proves quoted; the bundle name reads unsigned quoted; the separate-machine replay greens quoted; the chain verifies quoted; the exception reads quoted; the mega-assembly paths quoted; the POSIX grandchild is gone after exit 124 quoted.
@@ -1157,12 +1156,11 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR13 D00-T04-S24-PR13
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR16 D00-T04-S24-PR16
 -> SOURCE: panel-D00-T04-s24-2026-09-21 D00-T04-S24-F17
--> SOURCE: groom-2026-09-23-ci-provenance-trees
--> SOURCE: groom-2026-09-23-ci-readback
 -> SOURCE: panel-D00-T04-s27-2026-09-23 D00-T04-S27-F6
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR7 D00-T04-S27-PR7
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR9 D00-T04-S27-PR9
 -> XREF: D00 T04 §27 -- the slot runner one item hardens
+-> XREF: D00 T04 §30 -- the two CI items split out of this section on 2026-09-23
 
 ## 27. One Writer, a GPT-Governed Panel, Slot-Bound Pins
 
@@ -1251,6 +1249,20 @@ Operator decision 2026-09-23, after D00 T04 §27 shipped: every fallback slot ru
 > **CRUD:** not applicable (review wiring, checkers, test gates, skill text, and review records; writes no user-facing data path)
 > **Duration:** 2026-09-23T17:05:37Z to 2026-09-23T18:33:17Z
 > **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
+
+## 30. CI Read-Back and Reachable Provenance
+
+Split out of D00 T04 §26 on 2026-09-23 by operator instruction, ahead of the campaign. CI (`plan-gates`) failed on every push from 2026-09-20 to 2026-09-23, and five stamps landed on the red run unnoticed. The cause was provenance candidates in the D00 T04 §22 and §24 findings: staged trees captured with `git write-tree` that no pushed commit contains, so they resolved on the writing machine and every local gate passed, while CI's fresh clone failed 17 fatals. The immediate repair tagged each tree under `refs/tags/provenance/` (commit `657a1d88` turned CI green, run 35924459201). This section makes the failure impossible to repeat and makes a red CI stop the campaign that would otherwise build on it. Both items touch the review skill's stamp-and-push path, which is why they ship together.
+
+- [ ] Keep every provenance candidate reachable from a pushed ref: the D00 T04 §22 and §24 findings cite staged trees captured with `git write-tree` (`c6b1413d`, `d7e58618`, `49ff4978`) that no pushed commit contains, so they resolved locally and every local gate passed while CI's fresh clone failed 17 fatals on every push from 2026-09-20 to 2026-09-23 (found 2026-09-23 while grooming; repaired by tagging each tree under `refs/tags/provenance/`). Done when: the stamp flow tags any uncommitted tree or commit it cites as `provenance/<section>-<short>` and pushes the tag with the stamp, the validator (or the push fence) refuses a candidate no pushed ref reaches, quoted from a fixture, and the skill states the rule.
+- [ ] Read CI back after every push: the stamp flow's push reads back the ref but never the workflow, so five stamps landed on a red `plan-gates` run without anyone noticing (found 2026-09-23). Done when: after each push the flow waits for the `plan-gates` run for that commit and records its conclusion in the run file, a red conclusion stops the run instead of starting the next section, and the check is quoted from a drive.
+- [ ] Commit: `"workspace: CI read-back and reachable provenance"`
+
+**Test checkpoint:** A fixture candidate that only a local object store holds is refused before the push, quoted; the stamp flow tags and pushes a cited staged tree, and a fresh clone resolves it, quoted; the post-push read-back records the `plan-gates` conclusion for the pushed commit, and a red conclusion stops the run, quoted from a drive.
+
+-> XREF: D00 T04 §26 -- where these two items were filed before the split
+-> SOURCE: groom-2026-09-23-ci-provenance-trees
+-> SOURCE: groom-2026-09-23-ci-readback
 
 ## Verification
 

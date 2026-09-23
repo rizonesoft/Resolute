@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **41 of 220 sections complete (19%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **41 of 221 sections complete (19%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -121,10 +121,11 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §20` | Review-tooling operability follow-ups             |  20   |
 | [x] | `D00 T04 §21` | Review-input integrity hardening                  |  17   |
 | [x] | `D00 T04 §22` | Checker diagnostic codes and structured errors    |   4   |
+| [ ] | `D00 T04 §30` | CI read-back and reachable provenance             |   3   |
 | [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   6   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
-| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  14   |
+| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  12   |
 | [x] | `D00 T04 §27` | One writer, a GPT-governed panel, slot-bound pins |   6   |
 | [ ] | `D00 T04 §28` | Slot-table review follow-ups                      |  11   |
 | [x] | `D00 T04 §29` | Grok fallbacks on the newest Grok model           |   6   |
