@@ -222,7 +222,7 @@ def family_accepts(family: str, model: str, table: dict | None = None) -> bool:
     for name, entry in models.items():
         if entry["family"] != family:
             continue
-        if name == model:
+        if name == model and entry["newest"] is None:
             return True
         if entry["newest"] is not None and entry["newest"].fullmatch(model):
             return True
@@ -269,7 +269,9 @@ def resolve_model(model: str, table: dict, lister=list_family_models) -> str:
         return model
     listing = lister(entry["family"])
     best: tuple[tuple[int, ...], str] | None = None
-    for token in re.findall(r"[A-Za-z0-9][A-Za-z0-9._-]*", listing):
+    # Only list items (`* name` or `- name` lines) are listed models:
+    # a name mentioned in descriptive text never runs.
+    for token in re.findall(r"(?m)^\s*[*-]\s+([A-Za-z0-9][A-Za-z0-9._-]*)", listing):
         m = pattern.fullmatch(token)
         if not m:
             continue
@@ -347,6 +349,10 @@ def exec_slot(slot: str, extra: list[str], stdin, stdout, stderr, table: dict | 
         feed = None
     if slot == "independent":
         feed = None
+    if entry["family"] == "grok" and extra:
+        raise PanelSlotsError(
+            f"panel slot {slot!r} runs grok and takes no extra arguments ({' '.join(extra)}): "
+            f"nothing may follow its read-only tool restrictions")
     argv = argv_for_slot(slot, extra, table, model=model, prompt_file=prompt_file)
     argv[0] = _exe(argv[0])
     try:
@@ -510,6 +516,9 @@ def _self_test() -> int:
     check("family accepts a resolved concrete model", family_accepts("grok", "k-4.9", good))
     check("family refuses a suffixed variant", not family_accepts("grok", "k-4.9-build-fast", good))
     check("family accepts the served name", family_accepts("grok", "k-4.7-build", good))
+    check("family refuses the newest alias as a recorded model", not family_accepts("grok", "k-newest", good))
+    check("prose around the listing never resolves",
+          resolve_model("k-newest", good, listing("Default model: k-9.9\n\n  * k-4.7 (default)\n")) == "k-4.7")
     check("served name never decides what runs",
           resolve_model("k-newest", good, listing("  - k-4.7\n  - k-4.9-build\n")) == "k-4.7")
     refuses("served bad regex", GOOD.replace(r"served = 'k-(\d+)\.(\d+)-build'", 'served = "k-("'),
@@ -600,6 +609,12 @@ def _self_test() -> int:
                   rc == 0 and fout.read() == b"cba" and seen["model"] == "k-4.8"
                   and not os.path.exists(seen["file"]), f"rc={rc} {seen}")
         try:
+            exec_slot("signoff-fallback", ["--tools", "edit_file"], subprocess.DEVNULL,
+                      subprocess.DEVNULL, subprocess.DEVNULL, good, lister=listing("  * k-4.7\n"))
+            check("exec refuses extra arguments on a grok slot", False)
+        except PanelSlotsError as exc:
+            check("exec refuses extra arguments on a grok slot", "takes no extra arguments" in str(exc))
+        try:
             exec_slot("signoff-fallback", [], subprocess.DEVNULL, subprocess.DEVNULL,
                       subprocess.DEVNULL, good, lister=listing("nothing here"))
             check("exec with a dead listing refuses before running", False)
@@ -640,7 +655,10 @@ def main(argv: list[str]) -> int:
             for name, entry in table["slots"].items():
                 shown = entry["model"]
                 if table["models"][shown]["newest"] is not None:
-                    shown += " (newest listed)"
+                    try:
+                        shown = f"{resolve_model(shown, table)} (newest of {shown})"
+                    except PanelSlotsError as exc:
+                        shown = f"{shown} (unresolved: {exc})"
                 print(f"{name:<17} {shown:<28} {entry['family']:<7} "
                       f"{entry['effort']:<7} {entry['timeout']}s")
             return 0
