@@ -338,6 +338,10 @@ def exec_slot(slot: str, extra: list[str], stdin, stdout, stderr, table: dict | 
     named = model if model == entry["model"] else f"{model} (resolved from {entry['model']})"
     print(f"panel_slots: slot {slot} model {named} effort {entry['effort']} "
           f"timeout {timeout}s", file=sys.stderr, flush=True)
+    if entry["family"] == "grok" and extra:
+        raise PanelSlotsError(
+            f"panel slot {slot!r} runs grok and takes no extra arguments ({' '.join(extra)}): "
+            f"nothing may follow its read-only tool restrictions")
     prompt_file = None
     feed = stdin
     if entry["family"] == "grok":
@@ -349,10 +353,6 @@ def exec_slot(slot: str, extra: list[str], stdin, stdout, stderr, table: dict | 
         feed = None
     if slot == "independent":
         feed = None
-    if entry["family"] == "grok" and extra:
-        raise PanelSlotsError(
-            f"panel slot {slot!r} runs grok and takes no extra arguments ({' '.join(extra)}): "
-            f"nothing may follow its read-only tool restrictions")
     argv = argv_for_slot(slot, extra, table, model=model, prompt_file=prompt_file)
     argv[0] = _exe(argv[0])
     try:
@@ -614,6 +614,14 @@ def _self_test() -> int:
             check("exec refuses extra arguments on a grok slot", False)
         except PanelSlotsError as exc:
             check("exec refuses extra arguments on a grok slot", "takes no extra arguments" in str(exc))
+        before = set(os.listdir(tempfile.gettempdir()))
+        try:
+            exec_slot("signoff-fallback", ["--x"], subprocess.DEVNULL, subprocess.DEVNULL,
+                      subprocess.DEVNULL, good, lister=listing("  * k-4.7\n"))
+        except PanelSlotsError:
+            pass
+        leaked = [n for n in set(os.listdir(tempfile.gettempdir())) - before if n.startswith("panel-prompt-")]
+        check("a refused grok call leaves no prompt file behind", leaked == [], str(leaked))
         try:
             exec_slot("signoff-fallback", [], subprocess.DEVNULL, subprocess.DEVNULL,
                       subprocess.DEVNULL, good, lister=listing("nothing here"))
