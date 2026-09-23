@@ -1141,6 +1141,10 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 - [ ] State the review-fix exception to one-section-one-commit: fixes go forward in new commits (every panel-reviewed section ships several), but the contract as written forbids what the skill requires (plan review of the §24 candidate, PR16; needs §24 shipped: it records §24's shape). Done when: the skill plus AGENTS.md state the exception (implementation commit plus `review: answer` fix commits, each tagged to its round) quoted, the mechanical bound is cited (role tags plus correspondence plus the attested declaration), and no tree prose contradicts the exception quoted. Cheaper substitute that fails the checkpoint: the bare contract sentence, which every reviewed section already breaches.
 - [ ] Give oversized assemblies a legal path: past the order-search budget a non-declaration-ordered assembly with voided span members is unfenceable (declaring exhausts, ranging re-admits), per the D00 T04 §24 round-4 I1 advisory narrowed by the round-5 attempt cap (needs §24 shipped: it extends §24's assembly binding). Done when: a designed path exists quoted (chunked declarations, smarter matching, or a reasoned wont-fix with the trigger that reopens it), the refusal message points at it quoted, and the self-test pins the new shape. Cheaper substitute that fails the checkpoint: the exhausted message alone, which names no path for that corner.
 - [ ] Kill the whole producer tree on a POSIX slot timeout: `panel_slots.py exec` kills only the producer process off Windows (Windows already runs `taskkill /T`), so a child the producer spawned can keep writing the round output after exit 124 and overlap the fallback round (panel round 4 of the D00 T04 §27 review, F6; needs §27 shipped: it hardens §27's runner). Done when: POSIX producers start in their own session and a timeout kills the process group, a self-test leg spawns a grandchild that outlives a single-process kill and proves it gone after 124 quoted, and the Windows leg stays green. Cheaper substitute that fails the checkpoint: documenting the platform limit without a kill.
+- [ ] Define what a red CI after the STAMP push does to the stamped section: `ci-wait` stops the next section, but the `Verified:` stamp already sits on a failing commit (plan review of the D00 T04 §30 candidate, PR2; needs §30 shipped: it extends §30's read-back). Done when: the skill states that a red read-back caused by the stamped change reopens the section through audit stance (and one caused elsewhere is fixed forward without reopening), a fixture drive shows the reopen shape validating, quoted.
+- [ ] Match the CI read-back to the exact push: `ci-wait` filters by commit and workflow but not by branch, event, or run attempt, so a re-run or an unrelated green run on the same sha could stand in (plan review of the D00 T04 §30 candidate, PR3; needs §30 shipped: it hardens §30's read-back). Done when: the read-back requires the `push` event on `master` and reads the latest attempt, and fixture legs refuse a wrong-branch and a superseded-attempt run, quoted.
+- [ ] Confirm "not triggered" against GitHub before trusting it: the local path-filter calculation can misread a workflow shape it does not model (`paths-ignore`, several `on:` triggers), and a wrong `not triggered` hides a missing CI run (plan review of the D00 T04 §30 candidate, PR4; needs §30 shipped: it hardens §30's read-back). Done when: a `not triggered` verdict is confirmed by a grace-period `gh run list` that finds no run (a run that appears is waited on), unmodelled workflow keys make the calculation fail closed to waiting, and fixture legs pin both, quoted.
+- [ ] Carry the provenance tags in the portable bundle: the bundle can verify while a cited staged tree is unreachable from a fresh clone (plan review of the D00 T04 §30 candidate, PR5; needs §30 shipped: it records §30's tags). Done when: the bundle records each provenance tag name and target, `bundle-verify --recheck-remote` confirms each tag on the remote, and a removed tag fails the recheck by name, quoted.
 - [ ] Commit: `"workspace: review-flow follow-ups"`
 
 **Test checkpoint:** The undeclared-neither fails quoted; the trusted sign-off refuses quoted; the OID-mismatched tag fails quoted; the conflicting attestation fails quoted; the undated escape closes-or-proves quoted; the bundle name reads unsigned quoted; the separate-machine replay greens quoted; the chain verifies quoted; the exception reads quoted; the mega-assembly paths quoted; the POSIX grandchild is gone after exit 124 quoted.
@@ -1161,6 +1165,10 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR9 D00-T04-S27-PR9
 -> XREF: D00 T04 §27 -- the slot runner one item hardens
 -> XREF: D00 T04 §30 -- the two CI items split out of this section on 2026-09-23
+-> SOURCE: plan-D00-T04-s30-2026-09-23-PR2 D00-T04-S30-PR2
+-> SOURCE: plan-D00-T04-s30-2026-09-23-PR3 D00-T04-S30-PR3
+-> SOURCE: plan-D00-T04-s30-2026-09-23-PR4 D00-T04-S30-PR4
+-> SOURCE: plan-D00-T04-s30-2026-09-23-PR5 D00-T04-S30-PR5
 
 ## 27. One Writer, a GPT-Governed Panel, Slot-Bound Pins
 
@@ -1262,7 +1270,7 @@ Split out of D00 T04 §26 on 2026-09-23 by operator instruction, ahead of the ca
 
 **Test checkpoint:** A fixture candidate that only a local object store holds is refused before the push, quoted; the stamp flow tags and pushes a cited staged tree, and a fresh clone resolves it, quoted; the post-push read-back records the `plan-gates` conclusion for the pushed commit, and a red conclusion stops the run, quoted from a drive.
 
--> XREF: D00 T04 §26 -- where these two items were filed before the split
+-> XREF: D00 T04 §26 -- where these two items were filed before the split, and where four plan-review findings on this section landed
 -> SOURCE: groom-2026-09-23-ci-provenance-trees
 -> SOURCE: groom-2026-09-23-ci-readback
 
