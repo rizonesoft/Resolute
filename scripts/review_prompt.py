@@ -5200,7 +5200,7 @@ def _self_test() -> int:
             ("skill-selfreview-flagged", "`git --no-replace-objects diff`"),
             ("skill-coverage-sentence",
              "Every `rev-parse`, `show`, and `diff` on this page passes `--no-replace-objects`"),
-            ("skill-push-explicit", "git push origin $COMMIT:refs/heads/master"),
+            ("skill-push-explicit", "git push --atomic origin $COMMIT:refs/heads/master"),
             ("skill-provenance-tags", "python scripts/review_prompt.py provenance-tags --findings"),
             ("skill-reachable-before-push", "check-reachable --findings <findings path> --refs $COMMIT"),
             ("skill-reachable-after-push", "check-reachable --findings <findings path> --remote origin"),
