@@ -1201,9 +1201,11 @@ The §27 plan review files five findings the §27 contract does not own: a `GPT 
 - [ ] Persist the resolved pin and table revision with every round: a later re-pin changes what a slot name means, so an old round's slot reads ambiguously (plan review of the §27 candidate, PR4; needs §27 shipped: it extends §27's runner). Done when: `exec` prints the table's content hash beside the resolved model and effort, the round record carries both quoted, and a re-pinned fixture proves the old round still names its original model quoted. Cheaper substitute that fails the checkpoint: relying on git history of the table.
 - [ ] Refuse extra arguments that override the pin: `exec <slot> [extra...]` appends caller arguments to the producer argv, so `-m`, `--model`, `--effort`, or a `model_reasoning_effort` override would bypass the table (plan review of the §27 candidate, PR5; needs §27 shipped: it constrains §27's runner). Done when: `exec` refuses any extra argument that names a model or effort flag (an allowlist per slot kind: `--commit <sha>` for `independent`, nothing for the rest) quoted, and the self-test pins the refusal plus the allowed shape. Cheaper substitute that fails the checkpoint: documenting the rule.
 - [ ] Extend derived provenance to every governing role: D00 T04 §26 refuses trusted pins on sign-off approvals only, while `stamp-check`, `depth`, and the cross-fill also authorize (plan review of the §27 candidate, PR6; needs §27 shipped: it names §27's slots). Done when: every governing slot's approval artifact (the Grok fallbacks included, **Corrected 2026-09-23** for D00 T04 §29) carries derived provenance or refuses quoted, the D00 T04 §26 item reads the slot list from the table, and the self-test pins a trusted `stamp-check` refusal. Cheaper substitute that fails the checkpoint: a sign-off-only rule.
+- [ ] Clean the Grok prompt file on every path: `exec` writes the prompt to a temp file before the `finally` that removes it is armed, so an exception while reading stdin, writing the file, or building argv leaves the prompt on disk (panel round 3 of the D00 T04 §29 review, F8; needs §29 shipped: it hardens §29's runner). Done when: the temp file is created inside the cleanup scope, a self-test leg injects a failure at each step and proves no `panel-prompt-*` file survives quoted. Cheaper substitute that fails the checkpoint: a best-effort sweep of stale prompt files.
+- [ ] Retire the last pre-Grok matrix wording: the review skill's opening still says GPT runs every round, and `todo/README.md`'s `Plan review:` marker entry still lists only `gpt rung` and `opus rung` with a retry owed by every fallback survivor, both contradicting D00 T04 §29 (panel round 3 of the D00 T04 §29 review, F9; needs §29 shipped: it records §29's matrix). Done when: both sites name the Grok fallback and the Grok no-retry rule quoted, a family sweep over the skills and README for `opus rung`, `cross-fill`, and `every round` reads clean quoted, and the skill pins re-pass. Cheaper substitute that fails the checkpoint: fixing one site.
 - [ ] Commit: `"workspace: slot-table review follow-ups"`
 
-**Test checkpoint:** The bare-note cross-fill fails quoted; the heading-identity mismatch fails quoted; the re-pinned fixture names its original model quoted; the override refusal fires quoted; the trusted `stamp-check` refuses quoted.
+**Test checkpoint:** The injected prompt-file failures leave nothing quoted; the pre-Grok wording sweep reads clean quoted; the bare-note cross-fill fails quoted; the heading-identity mismatch fails quoted; the re-pinned fixture names its original model quoted; the override refusal fires quoted; the trusted `stamp-check` refuses quoted.
 
 -> XREF: D00 T04 §27 -- the slot table, runner, and rule five items harden
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR2 D00-T04-S27-PR2
@@ -1211,6 +1213,9 @@ The §27 plan review files five findings the §27 contract does not own: a `GPT 
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR4 D00-T04-S27-PR4
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR5 D00-T04-S27-PR5
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR6 D00-T04-S27-PR6
+-> SOURCE: panel-D00-T04-s29-2026-09-23-F8 D00-T04-S29-F8
+-> SOURCE: panel-D00-T04-s29-2026-09-23-F9 D00-T04-S29-F9
+-> XREF: D00 T04 §29 -- the Grok runner and matrix two items harden
 
 ## 29. Grok Fallbacks on the Newest Grok Model
 
@@ -1228,6 +1233,7 @@ Operator decision 2026-09-23, after D00 T04 §27 shipped: every fallback slot ru
 **Test checkpoint:** Unit test (`panel_slots.py --self-test`, `review_prompt.py --self-test`, `todo-graph.py self-test`, `todo-runs.py --self-test` green, counts quoted) plus driven run (a live `exec signoff-fallback` echo on the resolved Grok model, `panel_slots.py show`, `validate` 0 fatal). The failure path is proven by the suffix-only listing refusal, the failing-listing exit, and the Claude-last fatal.
 
 -> XREF: D00 T04 §27 -- the slot table and outage matrix whose fallbacks this section moves to Grok
+-> XREF: D00 T04 §28 -- the two sign-off findings filed from this section's panel round 3
 
 ## Verification
 
