@@ -86,6 +86,7 @@ track: W1
 |  26   |   §26   | Review-flow follow-ups                         | §24 |  [ ]   |
 |  27   |   §27   | One writer, a GPT-governed panel, slot-bound pins | §24 |  [x]   |
 |  28   |   §28   | Slot-table review follow-ups                   | §27 |  [ ]   |
+|  29   |   §29   | Grok fallbacks on the newest Grok model        | §27 |  [ ]   |
 
 ---
 
@@ -1182,6 +1183,7 @@ Operator decision 2026-09-23: Claude Code on Opus 5.5 is the only writer, Muse l
 -> XREF: D00 T04 §24 -- the review machinery whose pins this section moves into one table
 -> XREF: D00 T04 §26 -- the POSIX timeout follow-up filed from this section's panel round 4
 -> XREF: D00 T04 §28 -- the plan-review follow-ups filed from this section
+-> XREF: D00 T04 §29 -- the operator's move of every fallback to Grok
 
 > **Verified:** 2026-09-23 | §27 | slot table validates quoted (`panel slots ok: writer claude-opus-5-5 (claude), 12 slots, 6 registered models`); slot self-test `30 cases, 0 failed` quoted with the writer-family governing refusal and the writer-family fill refusal; live `exec bulk` echo exit 0 on `gpt-6-sol` quoted; every panel round of this review ran through `exec` with its pin quoted from stderr; skills carry no model literal quoted (one history paragraph) and a planted `--model opus` fails `skill-no-model-literal` quoted; post-cutover rule-16 legs pass and a 2099 cutover fails two quoted; `todo-graph.py self-test` `593 cases, 0 failed`, `todo-runs.py --self-test` `116 cases, 0 failed`, `review_prompt.py --self-test` `312 cases, 0 failed` quoted; `check-all.ps1 validate` `18 gate(s) ok` quoted with both panel-slots gates listed
 > **Review:** round 4 GPT depth, candidates `a492a734`(round 1) `c2c6c176`(round 2) `b8f3b74f`(round 3) `867e2813`(round 4) -- `adversarial` needs-attention at round 4, closed: 1 fixed, 1 filed (D00 T04 §26) · `consistency` approves at round 4, closed: 1 fixed · `integration` approves at round 4, closed: 1 fixed · `record` approves at round 4, closed: 2 fixed · `source-defect` approves in-session · `design` not owed. No independent pass; panel governs, every round on the `bulk`, `signoff`, or `depth` slot (gpt-6-sol). Round-4 finding below bar, filed without a fifth round. Raw findings: docs/reviews/00-workspace/D00-T04-s27.md Attestation: docs/reviews/00-workspace/D00-T04-s27.attest.json
@@ -1209,6 +1211,21 @@ The §27 plan review files five findings the §27 contract does not own: a `GPT 
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR4 D00-T04-S27-PR4
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR5 D00-T04-S27-PR5
 -> SOURCE: plan-D00-T04-s27-2026-09-23-PR6 D00-T04-S27-PR6
+
+## 29. Grok Fallbacks on the Newest Grok Model
+
+Operator decision 2026-09-23, after D00 T04 §27 shipped: every fallback slot runs Grok on the newest Grok model the CLI offers (Grok 4.7 today; a Grok 4.8 release must be picked up with no edit). D00 T04 §27 left the fallbacks on `gpt-5.6-terra` (same family as Sol, so one provider outage takes both rungs) and a writer-family `cross-fill` (Claude reviewing Claude's work, the independence gap its plan review raised as PR1). Moving the fallbacks to a third family removes both: a GPT outage fails over to an independent reviewer, and the writer never reviews. Justified defaults, each cheap to change: the resolver reads `grok models` at run time and takes the highest `grok-X.Y` (variants with a suffix, such as `-build-fast`, are not candidates); a failed listing fails the round rather than guessing a model; the producer runs headless with a read-only tool allowlist, since Grok's OS sandbox profiles do not apply on Windows; `cross-fill` is removed, so when Sol and Grok are both down the review stops and waits for the operator.
+
+- [ ] Add the Grok family to `.conclave/panel.toml` and `scripts/panel_slots.py`: a `grok` family, a registry entry that resolves to the newest listed Grok model at run time, the five fallback slots (`bulk-fallback`, `signoff-fallback`, `plan-fallback`, `arch-fallback`, and the stamp review's fallback through `signoff-fallback`) on it, `cross-fill` removed, and every slot refused when it shares the writer's family. Done when: `panel_slots.py show` prints Grok on every fallback with the resolved model named, a fixture listing with `grok-4.8` resolves to `grok-4.8` and one with only suffixed variants refuses, and the self-test pins both plus the no-writer-family rule quoted.
+- [ ] Run Grok headless through `exec`: the prompt from stdin rides a temp file (`--prompt-file`), JSON output, the slot's effort, a read-only tool allowlist, subagents and web tools removed, and the resolved model printed on the first stderr line. Done when: a live `exec signoff-fallback` echo returns exit 0 with the resolved model quoted, and a failing listing exits nonzero quoted.
+- [ ] Read Grok output in the review checkers: `review_prompt.py` unwraps Grok's JSON envelope (`text`), fails its error envelope, derives `grok-panel` with the model from `modelUsage`, and sums its `usage` block for cost. Done when: self-test legs pin the unwrap, the error refusal, the identity, and the cost, quoted.
+- [ ] Govern the record by family: rule 16 reads `Grok panel` headings; from 2026-09-23 a `GPT panel` last section governs with no note, a `Grok panel` last section governs with a `GPT outage` line, and a Claude-family last section fails (the writer never governs); plan-health counts a Grok-last record as fallback; the plan-review grammar knows `grok rung`, and a Grok-run plan review owes no retry (it is second-family); `todo-runs.py` accepts `Grok panel` rounds and matches resolved Grok models. Done when: validator legs pass for Grok-last with note, Grok-last without note (fatal), Claude-last post-cutover (fatal), and the pre-cutover shapes unchanged, and the live tree validates 0 fatal.
+- [ ] Rewrite the outage matrix and the records: the review skill, `process-plan` liveness (Grok producers count), `AGENTS.md`, `todo/README.md`, and the run-records header describe Grok fallbacks and no cross-fill, with no model literal in the skills. Done when: the model-literal grep over `.claude/skills/` prints only history, and `check-all.ps1 validate` passes.
+- [ ] Commit: `"workspace: Grok fallbacks on the newest Grok model"`
+
+**Test checkpoint:** Unit test (`panel_slots.py --self-test`, `review_prompt.py --self-test`, `todo-graph.py self-test`, `todo-runs.py --self-test` green, counts quoted) plus driven run (a live `exec signoff-fallback` echo on the resolved Grok model, `panel_slots.py show`, `validate` 0 fatal). The failure path is proven by the suffix-only listing refusal, the failing-listing exit, and the Claude-last fatal.
+
+-> XREF: D00 T04 §27 -- the slot table and outage matrix whose fallbacks this section moves to Grok
 
 ## Verification
 
