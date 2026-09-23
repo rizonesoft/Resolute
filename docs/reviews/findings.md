@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**323 findings across 40 sections.**
+**327 findings across 41 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 106 | the plan or the evidence misdescribes what happened |
+| `record` | 107 | the plan or the evidence misdescribes what happened |
 | `adversarial` | 68 | fails under hostile or unexpected input |
 | `consistency` | 54 | disagrees with the rest of the suite, its naming, or its layout |
-| `correctness` | 46 | the code does the wrong thing |
+| `correctness` | 49 | the code does the wrong thing |
 | `integration` | 35 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 154 | wrong behavior in code, plan, or record |
-| `minor` | 163 | polish or wording, or no surviving defect |
+| `major` | 157 | wrong behavior in code, plan, or record |
+| `minor` | 164 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -302,6 +302,10 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F4 | minor | `performance` | fixed | self | the whole git log was re-fetched once per section |
+| `D00 T04 §30` | F1 | major | `correctness` | fixed | independent | the CI read-back waits out code-only pushes that start no run |
+| `D00 T04 §30` | F2 | major | `correctness` | fixed | independent | the read-back trusts the working tree's workflow filter |
+| `D00 T04 §30` | F3 | minor | `record` | fixed | independent | the SHIP read-back line has no record |
+| `D00 T04 §30` | F4 | major | `correctness` | fixed | independent | the stamp can land without its provenance tags |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |

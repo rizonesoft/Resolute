@@ -424,3 +424,16 @@ round: 3 model: gpt-6-sol effort: high outcome: findings candidate: cbcc00fc pro
 round: 4 model: gpt-6-sol effort: high outcome: empty candidate: dc0ad96c provider: openai version: gpt-6-sol cost: 49122tokens latency: 32s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
 empty: 1
 refuted: 0
+
+run: D00-T04-S30
+date: 2026-09-23
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-sol effort: medium outcome: findings candidate: d9e6ca4e provider: openai version: gpt-6-sol cost: 44392tokens latency: 149s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S30-F2, D00-T04-S30-F3
+# round 1 fenced the D00 T04 §29 contract by a round-script slip; its findings are diff findings, recorded in the findings file.
+round: 2 model: gpt-6-sol effort: medium outcome: findings candidate: 6cd781e0 provider: openai version: gpt-6-sol cost: 26789tokens latency: 52s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S30-F4
+round: 3 model: gpt-6-sol effort: high outcome: empty candidate: 6981ac4b provider: openai version: gpt-6-sol cost: 43792tokens latency: 131s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings:
+# round 4 is the independent pass (`panel_slots.py exec independent --commit da5ca346`, ran before panel round 1); the runner printed no token figure.
+round: 4 model: gpt-6-sol effort: high outcome: independent candidate: da5ca346 provider: openai version: gpt-6-sol cost: unresolved latency: 219s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S30-F1
+empty: 1
+refuted: 0
