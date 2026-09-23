@@ -1,0 +1,166 @@
+﻿[Slovenski]
+;Translated by Peter Kordiš
+
+;COMMON VALUES
+LOKBUTTON=V redu
+LCANCELBUTTON=Preklic
+LSAVEASBUTTON=Shrani kot...
+LANALYZEBUTTON=Analiza
+LDEFRAGBUTTON=Stiskanje
+LCLOSEBUTTON=Zapri
+LRESTARTBUTTON=Ponoven zagon
+LLATERBUTTON=Kasneje
+LREPORTBUTTON=Poročilo...
+LSTOPBUTTON=Prekini
+LBROWSEBUTTON=Brskaj...
+LERROR=Napaka
+LENABLED=Omogoči
+LDISABLED=Onemogoči
+LNOTSUPPORTED=Ni podprto
+LREGREPLACE=Napaka - "RegReplaceKey" je onemogočen. Ponovno poskušajte po vnovičnem zagonu Oken.
+LRESTOREPOINTNOT=Točka prvotnega stanja ni podprta.
+LCREATINGRESTORE=Ustvarjanje točke prvotnega stanja...
+
+;MAIN WINDOW
+LNEVERUSED=Nikoli uporabljeno
+LMENUOPTIONS=Opcije
+LMENUHELP=Pomoč
+LMENUABOUT=O programu
+LOVERVIEW=Pregled
+LLASTDEFRAG=Zadnja uporaba:
+LSIZERECOVERED=Zmanjšano za:
+LPERCENT=Odstotek:
+LWOULDLIKE=Kaj želite?
+LDEFRAGTITLE=Stiskanje registra
+LREGINFOTITLE=Informacije o registru
+LUPDATEOK=Uporabljate zadnjo verzijo programa.
+LUPDATEDISABLED=Avtomatsko preverjanje posodabitev je onemogočeno.
+LUPDATENEW=Na voljo je nova verzija programa.
+LUPDATEWAIT=Preverjanje novih posodobitev. Potrpite.
+LMOREINFO=Več informacij...
+LUPDATES=Posodobitev
+
+;ABOUT WINDOW
+LABOUTTITLE=O programu
+LVERSION=Verzija
+LICON=Ikone je izdelal
+
+;OPTIONS WINDOW
+LOPTIONS=Opcije
+LOPTIONSDESCRIPTION=Nastavitve programa.
+LSETTINGS=Splošne nastavitve
+LLANGUAGE=Jezik
+LCHKCHECKUPDATE=Avtomatsko proverjanje posodobitev
+LCHECKNOW=Preveri ali je posodobitev...
+LCHKDEFRAGMYCOMPUTER=Dodaj "Stiskanje registra..." ukaz v kontekstni meni "Moj računalnik" 
+LCHKREGINFOMYCOMPUTER=Dodaj "Informacije o registru" ukaz v kontekstni meni "Moj računalnik"
+LBACKUPS=Varnostne kopije
+LAUTOREGFILES=Avtomatska varnostna kopija registra pred stiskanjem
+LAUTORESTOREPOINT=Avtomatsko ustvari točko povrnitve stanja pred stiskanjem
+LBACKUPFOLDER=Mapa varnostnih kopij:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Podatki
+LREGINFODESCRIPTION=Podatki o registru
+LSO=Operacijski sistem:
+LUSER=Uporabnik:
+LREGSIZE=Velikost registra:
+LCOLUMNPATH=Pot
+LCOLUMNSIZE=Velikost
+LREGISTRYFILES=Datoteke registra
+LNUMBERFILES=Število datotek:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnoza
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Ime zbirke:
+LLOGICALPATH=Logična pot:
+LMAPPATH=Pot mape:
+LTEMPPATH=Začasna pot:
+LHIVESIZE=Velikost zbirke:
+LKEY=Ključ:
+LVALIDFILE=Datoteka obstaja.
+LNOTVALIDFILE=Datoteka ne obstaja.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Optimiziranje in zgoščevanje registra Oken.
+LTITLEPROBLEM=Problem in rešitev
+LMAINTEXT=Med delom, operacijski sistem Oken stalno uporablja register z vnosom ali z odstranjanjem podatkov. Medtem prihaja do fragmentacije. To orodje optimizira register z odstranjevanjem praznega prostora in spajanjem fragmentov.
+LBENEFITS="Quicksys RegDefrag" povečuje učinkovitost sistema s hitrejšim dostopom in uporabo registra.
+LTITLESTEPS=Koraki
+LSTEP1=1. Analiza registra.
+LSTEP2=2. Pregled analize rezultata.
+LSTEP3=3. Stiskanje registra. Nujno je ponovno zagnati računalnik.
+LTITLEANALYZE=Kliknite "Analiza" in začnite proces.
+LAUTOBACKUP=Avtomatska varnostna kopija:
+LAUTORESTORE=Avtomatska točka povrnitve atanja:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Analiziranje registra. Počakajte trenutek.
+LPROGRESS=Potek:
+LREADING=Branje:
+LSTOPPROCESS=Prekinitev procesa...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Analiza rezultata
+LCOMPARATION=Primerjava
+LCONCLUSION=Zaključek
+LREGISTRYFRAGMENTATION=Stiskanje registra
+LCURRENTSIZE=Sedanja velikost registra:
+LNEWSIZE=Nova velikost registra:
+LSIZEDIFFERENCE=Razlika:
+LLEGFRAG=delcev
+LLEGALLOC=praznina
+LBACKREGFILES=Delanje varnostne kopije registra:
+LBACKRESTORE=Ustvarjanje točke povrvotnega stanja:
+LCONCLUSION=Zaključek
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Stiskanje je končano!
+LFINISHED=Uspešno končano.
+LRESTARTREQUIRED=Spremembe bodo nastopile po ponovnem zagonu računalnika.
+LRESTARTMSGBOX=Želite sedaj ponovno zagnati računalnik?
+LHTMLREPORT=V HTML poročilu lahko pregledate podatke o stiskanju.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Za novo analizo je nujno ponovno zagnati računalnik.
+LDEFRAGMSGBOX1=Zaprite vse programe.
+LDEFRAGMSGBOX2=Analiza lahko traja nekaj minut.
+LDEFRAGMSGBOX3=Med procesom računalnik lahko deluje "zamrznjen".
+LDEFRAGMSGBOX4=Za nadaljevanje kliknite "Yes".
+LFEWFRAGMENTS=Najđeno je le nekoliko fragmentov. Stiskanje ni potrebno.
+LNOFRAGMENTS=Ni fragmentov. Stiskanje se ne izvaja.
+LTOOFRAGMENTS=Preveč fragmentov. Kliknite "Defrag" za optimiziranje registra.
+
+;REPORT 
+LNAMEREPORT=Poročilo
+LH1=Poročilo o stiskanju
+LCREATEDBY=Ustvaril
+LDATE=Datum:
+LTIME=Čas:
+LSUMMARY=Podrobnosti o stiskanju 
+LREGPROCESSED=Procesirano datotek registra:
+LREGANASTART=Analiza registra je bila začeta:
+LREGANAFINISHED=Analiza registra je bila končana:
+LREGTOTALFINISHED=Analiza registra je trajala:
+LREGSIZEBEFORE=Velikost registra prej:
+LREGSIZEAFTER=Velikost registra potem:
+LREGSIZEDIFFERENCE=Razlika v velikosti registra:
+LREGFILESSUMMARY=Pregled datotek registra
+LCOLUMNREGFILE=Datoteka registra
+LCOLUMNREGBEFORE=Velikost prej:
+LCOLUMNAFTER=Velikost potem:
+LCOLUMNDIFFERENCE=Razlika v velikosti:
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Stiskanje registra
+LDEFRAGNOW=Stiskanje:
+
+;NEW PHRASES! Please, translate!
+LHTMLCREATED=HTML poročilo je uspešno kreirano. 
+LOPENNOW=Odprem sedaj?
+LNOTHTMLCREATED=Napaka! HTML poročilo NI! bilo uspešno kreirano.
+LFILE=Datoteka
+LFREESPACE=Ni dovolj prostega prostora za stiskanje. Preglej in poskusi ponovno.
+LERROREGREAD=Napaka! Ni možno brati infa registra.

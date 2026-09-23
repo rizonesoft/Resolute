@@ -1,0 +1,72 @@
+The program accepts these key words. When it loads any of the custom scripts it will replace
+the key words with the values of the system.
+
+Here are the key words with an example of their output
+
+
+%%%RepairLogFolder%%% = Example: C:\Program Files (x86)\Tweaking.com\Windows Repair (All in One)\Logs
+
+%%%ComputerName%%% = Example: SMC
+
+%%%WindowsDriveLetter%%% = Example: C:
+
+%%%ProfilesLocation%%% = Example: C:\Users
+
+%%%TEMP%%% = Example: C:\Windows\Temp
+
+%%%SID%%% = Example: S-1-5-21-539179819-1093931537-578437617-1003
+
+%%%APP.PATH%%% = Example: C:\Program Files (x86)\Tweaking.com\Windows Repair (All in One)
+
+%%%PROGRAMS%%% = Example: C:\Users\Shane\AppData\Roaming\Microsoft\Windows\Start Menu\Programs
+
+%%%PERSONAL%%% = Example: C:\Users\Shane\Documents
+
+%%%FAVORITES%%% = Example: C:\Users\Shane\Favorites
+
+%%%STARTUP%%% = Example: C:\Users\Shane\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
+
+%%%STARTMENU%%% = Example: C:\Users\Shane\AppData\Roaming\Microsoft\Windows\Start Menu 
+
+%%%DESKTOPDIRECTORY%%% = Example: C:\Users\Shane\Desktop
+
+%%%FONTS%%% = Example: C:\Windows\Fonts
+
+%%%COMMON_STARTMENU%%% = Example: C:\ProgramData\Microsoft\Windows\Start Menu
+
+%%%COMMON_PROGRAMS%%% = Example: C:\ProgramData\Microsoft\Windows\Start Menu\Programs
+
+%%%COMMON_STARTUP%%% = Example: C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup
+
+%%%COMMON_DESKTOPDIRECTORY%%% = Example: C:\Users\Public\Desktop
+
+%%%APPDATA%%% = Example: C:\Users\Shane\AppData\Roaming
+
+%%%LOCAL_SETTINGS%%% = Example: C:\Users\Shane\AppData\Local
+
+%%%COMMON_FAVORITES%%% = Example: C:\Users\Shane\Favorites
+
+%%%COMMON_APPDATA%%% = Example: C:\ProgramData
+
+%%%WINDOWS%%% = Example: C:\Windows
+
+%%%SYSTEM%%% = Example: C:\Windows\system32
+
+%%%PROGRAM_FILES%%% = Example: C:\Program Files
+
+%%%MYPICTURES%%% = Example: C:\Users\Shane\Pictures
+
+%%%PROFILE%%% = Example: C:\Users\Shane
+
+%%%SYSTEMX86%%% = Example: C:\Windows\SysWOW64
+
+%%%PROGRAM_FILESX86%%% = Example: C:\Program Files (x86)
+
+%%%PROGRAM_FILES_COMMON%%% = Example: C:\Program Files\Common Files
+
+%%%PROGRAM_FILES_COMMONX86%%% = Example: C:\Program Files (x86)\Common Files
+
+%%%COMMON_DOCUMENTS%%% = Example: C:\Users\Public\Documents
+
+%%%IE_INTERNET_CACHE%%% = Example: C:\Users\Shane\AppData\Local\Microsoft\Windows\Temporary Internet Files
+

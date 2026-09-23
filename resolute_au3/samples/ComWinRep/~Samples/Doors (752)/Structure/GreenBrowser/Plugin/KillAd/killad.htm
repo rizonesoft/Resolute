@@ -1,0 +1,10 @@
+<script language="Javascript">
+function cancelError() {return true;} onerror=cancelError;
+var objs=document.all;
+var l=objs.length;
+for (i=0;i<l;i++)
+{
+	if (objs[i].style.position=="absolute")
+	  	objs[i].style.visibility="hidden";
+}
+</script>

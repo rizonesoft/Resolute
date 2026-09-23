@@ -1,0 +1,125 @@
+[Evil.Info]
+Version=1.30
+Translator=Hakeem
+Modified by=
+E-mail=hakeem86 # gmail # com
+Website=www.hakeem.gigahost.dk
+Comment=
+
+
+[menu]
+01=Play
+02=Pause
+03=Resume
+04=Stop
+05=Previous
+06=Next
+07=Record
+08=Shuffle
+09=Add
+10=Playlist
+11=Remove
+12=Options
+13=History
+14=Repeat
+15=Repeat All
+16=Mode
+17=No Repeat
+18=Tags
+19=Search
+20=Queue
+
+[add]
+01=Add Media
+02=Add URL
+03=Add Directory
+
+[playlist]
+01=New Playlist
+02=Load Playlist
+03=Save Playlist
+
+[options]
+01=Always On Top
+02=Show Tray Icon
+03=Minimize To tray
+04=Show In Taskbar
+05=VU-Meter
+06=Slim Mode
+07=Time Display
+08=Transparency
+09=Audio Device
+10=Language
+11=Time Elapsed
+12=Time Remaining
+13=Disable
+14=Global Hotkeys
+15=Seekbar
+16=MSN Now Playing
+17=General
+18=Close To Tray
+19=Volume
+20=Up (5%)
+21=Down (5%)
+22=Plug-ins
+23=No Plug-ins
+24=History Menu
+25=Music Folder
+26=Open Folder
+27=Refresh
+28=File Association
+29=Select All
+30=Miscellaneous
+31=Sort Playlist
+32=Theme
+33=Clear History
+34=Minimize Evil Player
+35=Exit Evil Player
+36=No Function
+37=ESC Key Function
+38=Proxy
+39=Passive Mode FTP
+40=Remember Playlist
+41=Show Balloon Hints
+42=Last.fm
+
+[tray]
+01=Now Playing:
+02=Playback
+03=About
+04=Close
+05=Donate
+
+[tags]
+01=File
+02=Tags
+03=Track #
+04=Title
+05=Artist
+06=Album
+07=Year
+08=Genre
+09=Comment
+
+[strings]
+01=BASS version 2.4 not loaded!
+02=Can´t initialize audio device
+03=Error
+04=Successfully Saved!
+05=All Supported Types
+06=All Files (*.*)
+07=Select a Directory
+08=Open URL
+09=Enter a URL to open here:
+10=Unable to add stream!
+11=(none)
+12=Translation by
+13=Empty
+14=Select Your Music Folder
+15=Unable to delete file!
+16=Proxy Settings
+17=Example: user:pass@server:port or server:port
+18=Last.fm Settings
+19=Username:
+20=Password: 
+21=Modified by

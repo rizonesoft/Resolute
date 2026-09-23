@@ -1,0 +1,10 @@
+What's new (+) and enhanced (!) in Mute on Lock 1.0 released on January 20, 2010 (comparing to v0.9)?
+
+No news at this moment because it's initial release of Mute on Lock.
+
+
+History of Changes
+-----------------------------------
+
+1.0 (January 20, 2010)
+First public release of Mute on Lock.

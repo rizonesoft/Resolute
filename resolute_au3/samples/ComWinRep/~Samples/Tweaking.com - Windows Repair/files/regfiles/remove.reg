@@ -1,0 +1,9 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\COMPONENTS]
+"PendingXmlIdentifier"=-
+"NextQueueEntryIndex"=-
+"AdvancedInstallersNeedResolving"=-
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate]
+"DisableWindowsUpdateAccess"=dword:00000000

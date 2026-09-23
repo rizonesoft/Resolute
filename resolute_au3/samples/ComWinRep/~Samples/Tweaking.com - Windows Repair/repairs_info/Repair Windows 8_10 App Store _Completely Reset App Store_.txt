@@ -1,0 +1,5 @@
+Repair Windows 8/10 App Store (Completely Reset App Store):
+
+This does the commands as the "Repair Windows 8/10 App Store" but this goes the extra mile and completely resets the app store.
+
+This has been successful at getting a broken app store working again when all else fails. You will have to re-download any apps from the app store again once done.

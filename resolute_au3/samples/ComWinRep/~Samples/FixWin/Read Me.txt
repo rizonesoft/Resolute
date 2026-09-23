@@ -1,0 +1,23 @@
+FixWin v 1.1.
+
+We are pleased to release a first-of-its-kind  application for Windows 7 & Vista: FixWin. FixWin is a 529 KB freeware portable application to repair & fix common Windows annoyances & issues.
+
+The solutions to repair and fix 50 common Windows annoyances, issues & problems have been categorized under 5 tabs, viz : Windows Explorer, Internet & Connectivity, Windows Media, System Tools & Misc Additional Fixes.
+
+It has been tested on Windows 7 & Vista, 32-bit and 64-bit versions.
+
+We first suggest that you run the System File Checker Utility.
+
+Next we urge you to create a System Restore Point.
+
+Having done that, apply at most one fix at a time and restart your computer.
+
+FixWin is freeware and can be freely used for any personal non-commercial purposes only. It is supplied "as-is". The publisher or the author assumes no liability for damages, direct or consequential, which may result from the use of this software.
+
+All product names, logos, and trademarks are acknowledged as the registered intellectual property of their respective owners.
+
+FixWin has been developed for The Windows Club by Ramesh Kumar. FixWin v 1.1 fixes minor bugs.
+
+HomePage: http://www.thewindowsclub.com/repair-fix-windows-7-vista-problems-with-fixwin-utility
+
+

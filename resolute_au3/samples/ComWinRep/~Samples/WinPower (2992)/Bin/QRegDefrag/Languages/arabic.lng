@@ -1,0 +1,167 @@
+﻿
+[Arabic]
+;Translated by Quicksys
+
+;COMMON VALUES
+LOKBUTTON=حسناً
+LCANCELBUTTON=إلغاء الأمر
+LSAVEASBUTTON=...حفظ بإسم
+LANALYZEBUTTON=تحليل
+LDEFRAGBUTTON=إلغاء التجزئة
+LCLOSEBUTTON=إغلاق
+LRESTARTBUTTON=إعادة تشغيل
+LLATERBUTTON=لاحقاً
+LREPORTBUTTON=...إنشاء تقرير
+LSTOPBUTTON=إيقاف
+LBROWSEBUTTON=...استعراض
+LERROR=خطأ
+LENABLED=تمكين
+LDISABLED=تعطيل
+LNOTSUPPORTED=غير مدعوم
+LREGREPLACE=ثم حاول مرةً اخرى Windows خطأ "مفتاح" ريجستري الاستبدال معطل. قم بإعادة تشغيل
+LRESTOREPOINTNOT=استعادة النقاط غير مدعومه
+LCREATINGRESTORE=إنشاء نقطة استعادة
+
+;MAIN WINDOW
+LNEVERUSED=لم يستخدم
+LMENUOPTIONS=الخيارات
+LMENUHELP=مساعدة
+LMENUABOUT=حول البرنامج
+LOVERVIEW=نظرة عامة
+LLASTDEFRAG=آخر عملية لإلغاء التجزئة :
+LSIZERECOVERED=حجم المسترجع :
+LPERCENT=النسبه :
+LWOULDLIKE=ماذا تريد أن تفعل ؟
+LDEFRAGTITLE=إلغاء تجزئة الريجستري
+LREGINFOTITLE=الحصول على معلومات عن الريجستري
+LUPDATEOK=أنت تستخدم أحدث إصدار
+LUPDATEDISABLED=جاري تعطيل خانة إختيار التحديث التلقائي
+LUPDATENEW=إصدار جديد متوفر
+LUPDATEWAIT=جاري التحقق من وجود إصدارات جديدة . الرجاء الانتظار
+LMOREINFO=ترجمة : سعد الفراعنه
+LUPDATES=التحديثات
+
+;ABOUT WINDOW
+LABOUTTITLE=حول البرنامج
+LVERSION=الإصدار
+LICON=ترجمة : سعد الفراعنه
+
+;OPTIONS WINDOW
+LOPTIONS=الخيارات
+LOPTIONSDESCRIPTION=تكوين إعدادات البرنامج
+LSETTINGS=إعدادات عامة
+LLANGUAGE=اللغة
+LCHKCHECKUPDATE=التحقق تلقائياً من وجود تحديثات
+LCHECKNOW=التحقق من وجود تحديثات جديدة الآن
+LCHKDEFRAGMYCOMPUTER=في "قائمة السياق" على جهاز الكمبيوتر"Defrag Registry..." أضف خيار
+LCHKREGINFOMYCOMPUTER=في "قائمة السياق" على جهاز الكمبيوتر"Get Registry Information" أضف خيار
+LBACKUPS=النسخ الإحتياطي
+LAUTOREGFILES=أخذ نسخه احتياطيه تلقائياً لملفات الريجستري قبل إلغاء التجزئة
+LAUTORESTOREPOINT=إنشاء نقطة إستعادة للنظام تلقائياً قبل إلغاء التجزئة
+LBACKUPFOLDER=مجلد النسخ الاحتياطية :
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=معلومات
+LREGINFODESCRIPTION=Windows معلومات حول ريجستري الـ
+LSO=نظام التشغيل :
+LUSER=اسم المستخدم :
+LREGSIZE=حجم الريجستري :
+LCOLUMNPATH=المسار
+LCOLUMNSIZE=الحجم
+LREGISTRYFILES=ملفات الريجستري
+LNUMBERFILES=عدد الملفات :
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=التشخيص
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Hive Name:
+LLOGICALPATH=المسار المنطقي :
+LMAPPATH=تعيين مسار :
+LTEMPPATH=مسار الملف المؤقت :
+LHIVESIZE=حجم الخلية :
+LKEY=المفتاح :
+LVALIDFILE=الملف موجود
+LNOTVALIDFILE=الملف غير موجود
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Windows تحسين و ضغط ريجستري الـ
+LTITLEPROBLEM=المشكلة و الحل
+LMAINTEXT=بيانات ريجستري الوندوز من خلال العمليات وإزالة وإضافة البرامج تتراكم مسببتاً مع مرور الوقت تجزئة لهذه الملفات , اذاً هذه الآداه هي لتحسين الريجستري الخاص بك بواسطة إلغاء التجزئة وسد الثغرات والمساحات المهدره في ملفات ريجستري الوندوز
+LBENEFITS=لتحسين أداء النظام بأكمله و تعزيز إمكانية الوصول إلى الريجستري Quicksys RegDefrag
+LTITLESTEPS=الخطوات
+LSTEP1=تحليل الريجستري ــ 1
+LSTEP2=استعراض وتحليل النتائج ــ 2
+LSTEP3=إلغاء تجزئة الريجستري . يجب إعادة التشغيل ــ3
+LTITLEANALYZE=انقر فوق "تحليل" لبدء العملية
+LAUTOBACKUP=النسخ الاحتياطي التلقائي :
+LAUTORESTORE=نقاط الاستعادة التلقائية :
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING= جاري تحليل الريجستري . الرجاء الانتظار
+LPROGRESS=التقدم :
+LREADING=جاري التدقيق :
+LSTOPPROCESS= جاري إيقاف العملية
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=تحليل النتائج
+LCOMPARATION=المقارنة
+LCONCLUSION=الإستنتاج
+LREGISTRYFRAGMENTATION=تجزئة الريجستري
+LCURRENTSIZE=حجم الريجستري الحالي :
+LNEWSIZE=حجم الريجستري الجديد :
+LSIZEDIFFERENCE=حجم الفرق :
+LLEGFRAG=مجزأ
+LLEGALLOC=المساحة المخصصة
+LBACKREGFILES=إنشاء نسخة احتياطية من ملفات الريجستري :
+LBACKRESTORE=إنشاء نقطة استعادة :
+LCONCLUSION=الإستنتاج
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=! إكتملت إلغاء التجزئة 
+LFINISHED=انتهى بنجاح
+LRESTARTREQUIRED=يجب إعادة تشغيل الكمبيوتر لتصبح التغييرات سارية المفعول
+LRESTARTMSGBOX=هل تريد إعادة التشغيل الآن ?
+LHTMLREPORT=مع معلومات إلغاء التجزئة HTML يمكنك إنشاء تقرير
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=من الضروري إعادة تشغيل الكمبيوتر لبدء تحليل جديد لإلغاء التجزئة
+LDEFRAGMSGBOX1=أغلق كافة البرامج
+LDEFRAGMSGBOX2=التحليل قد يستغرق عدة دقائق
+LDEFRAGMSGBOX3=أثناء هذه العملية قد لا يستجيب جهاز الكمبيوتر الخاص بك 
+LDEFRAGMSGBOX4="للمتابعة، انقر فوق "نعم
+LFEWFRAGMENTS=تم العثور على أخطاء قليله . ليس من الضروري إلغاء تجزئة الريجستري
+LNOFRAGMENTS=لم يتم العثور على شئ . لا يمكن إلغاء تجزئة الريجستري
+LTOOFRAGMENTS=لقد تم العثور على أجزاء كثيرة جداً . انقر فوق "إلغاء التجزئة" لتحسين الريجستري
+
+;REPORT 
+LNAMEREPORT=تقرير
+LH1=تقرير إلغاء التجزئة
+LCREATEDBY=تم إنشاؤه بواسطة
+LDATE=التاريخ :
+LTIME=الوقت :
+LSUMMARY=ملخص إلغاء التجزئة
+LREGPROCESSED=جاري معالجة ملفات الريجستري :
+LREGANASTART=بدأ تحليل الريجستري :
+LREGANAFINISHED=انتهى تحليل الريجستري :
+LREGTOTALFINISHED=الوقت الإجمالي لتحليل الريجستري :
+LREGSIZEBEFORE=حجم الريجستري قبل :
+LREGSIZEAFTER=حجم الريجستري بعد :
+LREGSIZEDIFFERENCE=الفرق :
+LREGFILESSUMMARY=ملخص ملفات الريجستري
+LCOLUMNREGFILE=ملفات الريجستري
+LCOLUMNREGBEFORE=الحجم قبل
+LCOLUMNAFTER=الحجم بعد
+LCOLUMNDIFFERENCE=الفرق
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=إلغاء تجزئة الريجستري
+LDEFRAGNOW=جاري إلغاء التجزئة :
+
+;NEW PHRASES! Please, translate!
+;LHTMLCREATED=بنجاح HTML تم إنشاء تقرير 
+;LOPENNOW=فتح الآن ?
+;LNOTHTMLCREATED=HTML خطأ ! لم ينجح إنشاء تقرير الـ
+;LFILE=ملف
+;LFREESPACE=المساحة غير كافية لإلغاء التجزئة. تحقق من ثم حاول مرة أخرى
+;LERROREGREAD=خطأ ! تعذر قراءة معلومات الريجستري

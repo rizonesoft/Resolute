@@ -1,0 +1,179 @@
+[Program]
+Name=Build System
+Company=Rizonesoft
+
+[Common]
+; Shared strings across all build tools
+BuildSuccess=Build completed successfully
+BuildFailed=Build failed with errors
+Processing=Processing...
+Compiling=Compiling executables...
+GeneratingDocs=Generating documentation...
+CreatingDist=Creating distribution package...
+CreatingInstaller=Creating installer...
+CreatingUpdates=Creating update files...
+Complete=Complete
+Failed=Failed
+Success=Success
+Error=Error
+Warning=Warning
+Information=Information
+Loading=Loading...
+Saving=Saving...
+Ready=Ready
+Canceling=Canceling operation...
+Canceled=Operation canceled
+PleaseWait=Please wait...
+
+[Distro]
+Name=Distro Building Environment
+Description=GUI tool for building Resolute programs
+WindowTitle=Distro Building Environment
+SelectSolution=Select a solution to build
+BuildModules=Build Modules
+Prerequisites=Prerequisites
+Solutions=Solutions
+BuildProgress=Build Progress
+LoggingWindow=Logging Window
+RunSelected=Run Selected
+StopBuild=Stop Build
+Configuration=Configuration
+BuildAll=Build All
+CheckUpdates=Check for Updates
+About=About Distro
+Help=Help
+Exit=Exit
+ToolsNotFound=Required build tools not found
+AutoItNotFound=AutoIt3 not found. Please install AutoIt3.
+InnoSetupNotFound=Inno Setup not found. Please install Inno Setup 6.x
+BuildInProgress=Build in progress. Please wait...
+BuildComplete=Build completed. Check the log for details.
+NoSolutionSelected=No solution selected. Please select a solution first.
+InvalidSolutionFile=Invalid solution file format
+LoadingSolutions=Loading solutions...
+SolutionLoaded=Solution loaded successfully
+CompilationStarted=Compilation started
+CompilationComplete=Compilation complete
+DocumentationGenerated=Documentation generated
+DistributionCreated=Distribution created
+InstallerCreated=Installer created
+UpdateFilesCreated=Update files created
+
+[DistroCLI]
+Name=DistroCLI
+Description=Command-line build automation tool
+UsageHelp=DistroCLI - Command-line interface for Resolute SDK build system
+CommandNotFound=Command not found
+InvalidArguments=Invalid command-line arguments
+SNIFileNotFound=SNI file not found
+SNIFileInvalid=Invalid SNI file format
+BuildStarted=Starting build process...
+DocsStarted=Starting documentation generation...
+DistStarted=Starting distribution creation...
+InstallerStarted=Starting installer creation...
+UpdateStarted=Starting update file creation...
+AllStepsStarted=Running complete build pipeline...
+StepComplete=Step completed
+StepFailed=Step failed
+AutoItWrapperNotFound=AutoIt3Wrapper not found
+ScriptNotFound=Script file not found
+InnoSetupNotFound=Inno Setup compiler not found
+DistPathNotSet=Distribution path not set in SNI file
+NoTemplates=No templates directory found
+VerboseMode=Verbose mode enabled
+ExitCode=Exit code
+PipelineComplete=Build pipeline complete
+
+[Resolute]
+Name=Resolute
+Description=Resolute power tools launcher and manager
+WindowTitle=Resolute Power Tools
+SystemTools=System Tools
+BrowserTools=Browser Tools
+UtilityTools=Utility Tools
+BuildTools=Build Tools
+HardwareInfo=Hardware Information
+SystemInfo=System Information
+Extensions=Extensions
+About=About Resolute
+Help=Help
+Exit=Exit
+LaunchTool=Launch Tool
+ToolNotFound=Tool executable not found
+ToolLaunchFailed=Failed to launch tool
+Settings=Settings
+Language=Language
+Theme=Theme
+Updates=Updates
+CheckForUpdates=Check for Updates
+UpdateAvailable=Update available
+NoUpdatesAvailable=No updates available
+Downloading=Downloading update...
+Installing=Installing update...
+UpdateInstalled=Update installed successfully
+UpdateFailed=Update installation failed
+Documentation=Documentation
+ViewChangelog=View Changelog
+ViewReadme=View Readme
+ViewLicense=View License
+
+[BuildMessages]
+; Messages used during build process
+PrerequisiteCheck=Checking prerequisites...
+PrerequisiteFound=Prerequisite found
+PrerequisiteMissing=Prerequisite missing
+LoadingConfiguration=Loading configuration...
+ConfigurationLoaded=Configuration loaded
+ParsingTemplate=Parsing template
+ProcessingPlaceholders=Processing placeholders
+WritingOutput=Writing output file
+CopyingFiles=Copying files...
+FilesCopied=Files copied successfully
+CreatingDirectory=Creating directory
+DirectoryCreated=Directory created
+RunningCompiler=Running compiler...
+CompilerOutput=Compiler output
+SigningExecutable=Signing executable...
+SigningComplete=Signing complete
+CompressingExecutable=Compressing executable...
+CompressionComplete=Compression complete
+GeneratingScript=Generating installer script...
+CompilingInstaller=Compiling installer...
+InstallerCompiled=Installer compiled successfully
+CreatingZipPackage=Creating ZIP package...
+ZipPackageCreated=ZIP package created
+UpdateFilesGenerated=Update files generated
+CleaningUp=Cleaning up temporary files...
+CleanupComplete=Cleanup complete
+
+[ErrorMessages]
+; Error messages
+FileNotFound=File not found: %s
+DirectoryNotFound=Directory not found: %s
+AccessDenied=Access denied: %s
+InvalidPath=Invalid path: %s
+ReadError=Error reading file: %s
+WriteError=Error writing file: %s
+CompilationError=Compilation error: %s
+UnknownError=Unknown error occurred
+OperationFailed=Operation failed: %s
+InvalidConfiguration=Invalid configuration: %s
+MissingParameter=Missing required parameter: %s
+ToolNotInstalled=Required tool not installed: %s
+VersionMismatch=Version mismatch: %s
+DependencyMissing=Missing dependency: %s
+NetworkError=Network error: %s
+TimeoutError=Operation timed out
+UserCanceled=User canceled operation
+
+[SuccessMessages]
+; Success messages
+OperationComplete=Operation completed successfully
+FileSaved=File saved successfully
+FilesCopied=Files copied successfully
+BuildSuccessful=Build successful
+DocumentationComplete=Documentation generation complete
+DistributionComplete=Distribution creation complete
+InstallerComplete=Installer creation complete
+UpdateFilesComplete=Update files creation complete
+AllStepsComplete=All build steps completed successfully

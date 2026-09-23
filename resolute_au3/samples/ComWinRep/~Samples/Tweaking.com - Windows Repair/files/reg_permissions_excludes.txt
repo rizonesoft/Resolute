@@ -1,0 +1,18 @@
+#Exlude list for file permissions.
+#The program uses SetACL and the -fltr option to filter keywords.
+
+-fltr "bcd00000000"
+-fltr "system\controlset001"
+-fltr "system\controlset002"
+-fltr "classes\appx"
+-fltr "wow6432node\classes"
+-fltr "classes\wow6432node\appid"
+-fltr "classes\wow6432node\protocols"
+-fltr "classes\wow6432node\typelib"
+-fltr "components\canonicaldata\catalogs"
+-fltr "components\canonicaldata\deployments"
+-fltr "components\deriveddata\components"
+-fltr "components\deriveddata\versionedindex"
+-fltr "microsoft\windows nt\currentversion\perflib\009"
+-fltr "microsoft\windows nt\currentversion\perflib\currentlanguage"
+-fltr "tweakingtemp"

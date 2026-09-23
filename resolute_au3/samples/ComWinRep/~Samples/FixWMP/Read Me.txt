@@ -1,0 +1,12 @@
+Fix WMP Utility v 1.0
+
+This freeware portable utility re-registers over 40 concerned dll files required for the smooth operation of Windows Media Player. 
+
+Please run this utility and see if it addresses your issues, before moving on to advanced trouble-shooting.
+
+All product names, logos, and trademarks, eg Windows, Internet Explorer, are acknowledged as the registered intellectual property of their respective owners viz Microsoft.
+
+The utility is being offered as a freeware on a as-is basis without any warranties. Always best to create a System Restore point first before making any changes to your system.
+
+This utility has been released by www.TheWindowsClub.com .
+

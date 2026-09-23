@@ -1,0 +1,23 @@
+#!/bin/sh
+# pre-commit: refuse the commit when the staged tree fails TODO-graph validation.
+# Validates the index (what will be committed) in a temp checkout; the worktree gets an advisory probe only, never a refusal.
+# Installed per clone via `git config core.hooksPath tools/githooks` (see AGENTS.md).
+set -u
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "pre-commit: not inside a git work tree" >&2; exit 1; }
+cd "$ROOT" || { echo "pre-commit: cannot enter the work tree" >&2; exit 1; }
+pick_python() {
+  for c in python3 python py; do
+    if command -v "$c" >/dev/null 2>&1 && "$c" -c 'import sys; sys.exit(sys.version_info[0] < 3)' 2>/dev/null; then
+      printf '%s' "$c"; return 0
+    fi
+  done
+  return 1
+}
+PY="$(pick_python)" || { echo "pre-commit: no working Python 3 (python3, python, or py) on PATH; install Python 3 so the TODO gate can run" >&2; exit 1; }
+# Temp dir lives under the git dir so its path is native on every platform (no /tmp translation under Git Bash).
+GITDIR="$(git rev-parse --absolute-git-dir 2>/dev/null)" || { echo "pre-commit: cannot locate the git dir" >&2; exit 1; }
+WORK="$(mktemp -d "$GITDIR/hookgate.XXXXXX" 2>/dev/null)" || { echo "pre-commit: cannot make a temp dir" >&2; exit 1; }
+trap 'rm -rf "$WORK"' EXIT INT TERM
+git checkout-index -a --prefix="$WORK/" || { echo "pre-commit: cannot stage the index for validation" >&2; exit 1; }
+(cd "$WORK" && "$PY" scripts/todo-graph.py validate) || { echo "pre-commit: todo-graph validate is red on the staged tree; fix the findings above and retry" >&2; exit 1; }
+git diff --quiet -- scripts todo docs || { "$PY" scripts/todo-graph.py validate >/dev/null 2>&1 || echo "pre-commit: warning: unstaged changes carry findings; this gate validated only the staged tree" >&2; }

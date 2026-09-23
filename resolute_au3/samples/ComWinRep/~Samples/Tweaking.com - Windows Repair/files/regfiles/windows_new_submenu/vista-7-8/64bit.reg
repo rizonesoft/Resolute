@@ -1,0 +1,652 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}]
+@="New Menu Handler"
+"flags"=dword:00000000
+
+[HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}\InProcServer32]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,00,00
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Wow6432Node\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}]
+@="New Menu Handler"
+"flags"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Wow6432Node\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}\InProcServer32]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,00,00
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}]
+@="New Menu Handler"
+"flags"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}\InProcServer32]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,00,00
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+
+[HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew\Config]
+"IsFolder"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Wow6432Node\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Wow6432Node\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew\Config]
+"IsFolder"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew\Config]
+"IsFolder"=""
+
+[HKEY_CLASSES_ROOT\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}]
+@="New Menu Handler"
+"flags"=dword:00000000
+
+[HKEY_CLASSES_ROOT\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}\InProcServer32]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,00,00
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\Directory]
+"AlwaysShowExt"=""
+@="File Folder"
+"EditFlags"=hex:d2,01,00,00
+"FriendlyTypeName"="@shell32.dll,-10152"
+"FullDetails"="prop:System.PropGroup.Description;System.DateCreated;System.FileCount;System.TotalFileSize"
+"InfoTip"="prop:System.Comment;System.DateCreated"
+"NoRecentDocs"=""
+"PreviewDetails"="prop:System.DateModified;*System.SharedWith;*System.OfflineAvailability;*System.OfflineStatus"
+"PreviewTitle"="prop:System.ItemNameDisplay;System.ItemTypeText"
+
+[HKEY_CLASSES_ROOT\Directory\Background]
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell]
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\cmd]
+@="@shell32.dll,-8506"
+"Extended"=""
+"NoWorkingDirectory"=""
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\cmd\command]
+@="cmd.exe /s /k pushd \"%V\""
+
+[HKEY_CLASSES_ROOT\Directory\Background\shellex]
+
+[HKEY_CLASSES_ROOT\Directory\Background\shellex\ContextMenuHandlers]
+
+[HKEY_CLASSES_ROOT\Directory\Background\shellex\ContextMenuHandlers\Gadgets]
+@="{6B9228DA-9C15-419e-856C-19E768A13BDC}"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shellex\ContextMenuHandlers\New]
+@="{D969A300-E7FF-11d0-A93B-00A0C90F2719}"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shellex\ContextMenuHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_CLASSES_ROOT\Directory\DefaultIcon]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,33,00,00,00
+
+[HKEY_CLASSES_ROOT\Directory\shell]
+@="none"
+
+[HKEY_CLASSES_ROOT\Directory\shell\cmd]
+@="@shell32.dll,-8506"
+"Extended"=""
+"NoWorkingDirectory"=""
+
+[HKEY_CLASSES_ROOT\Directory\shell\cmd\command]
+@="cmd.exe /s /k pushd \"%V\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\find]
+"LegacyDisable"=""
+"SuppressionPolicy"=dword:00000080
+
+[HKEY_CLASSES_ROOT\Directory\shell\find\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,45,00,78,00,70,00,6c,00,6f,00,72,00,65,00,72,00,2e,00,65,00,78,00,\
+  65,00,00,00
+"DelegateExecute"="{a015411a-f97d-4ef3-8425-8a38d022aebc}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\EncryptionMenu]
+@="{A470F8CF-A1E8-4f65-8335-227475AA5C46}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\Offline Files]
+@="{474C98EE-CF3D-41f5-80E3-4AAB0AB04301}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\CopyHookHandlers]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\CopyHookHandlers\FileSystem]
+@="{217FC9C0-3AEA-1069-A2DB-08002B30309D}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex\CopyHookHandlers\Sharing]
+@="{40dd6e20-7c17-11ce-a804-00aa003ca9f6}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers\Offline Files]
+@="{7EFA68C6-086B-43e1-A2D2-55A113531240}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers\{1f2e5c40-9550-11ce-99d2-00aa006e086c}]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers\{4a7ded0a-ad25-11d0-98a8-0800361b1103}]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers\{ECCDF543-45CC-11CE-B9BF-0080C87CDBA6}]
+
+[HKEY_CLASSES_ROOT\Directory\shellex\PropertySheetHandlers\{ef43ecfe-2ab9-4632-bf21-58909dd177f0}]
+@=""
+
+[HKEY_CLASSES_ROOT\LibraryFolder]
+@="Library Folder"
+"NeverShowExt"=""
+"NoOpenWith"=""
+"IncludeShare"=""
+"IncludeSync"=""
+"CanRecursivelySearch"=""
+"NoPreviousVersions"=""
+"FriendlyTypeName"="@shell32.dll,-34560"
+"EditFlags"=dword:00100000
+"DefaultDropEffect"=dword:00000004
+"TileInfo"="prop:System.ItemTypeText"
+"ExtendedTileInfo"="prop:System.ItemTypeText"
+"InfoTip"="prop:System.ItemTypeText;System.DateModified"
+"PreviewDetails"="prop:System.DateModified;*System.SharedWith"
+"FullDetails"="prop:System.ItemNameDisplay;System.ItemTypeText;System.DateModified;*System.SharedWith"
+"NoJumpListPathTooltip"=""
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shellex]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shellex\ContextMenuHandlers]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shellex\ContextMenuHandlers\New]
+@="{D969A300-E7FF-11d0-A93B-00A0C90F2719}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\background\shellex\ContextMenuHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\CLSID]
+@="{a5a3563a-5755-4a6f-854e-afa3230b199f}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\DefaultIcon]
+@="%SystemRoot%\\System32\\imageres.dll,-8"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\ContextMenuHandlers]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\ContextMenuHandlers\LibraryFolder]
+@="{0af96ede-aebf-41ed-a1c8-cf7a685505b6}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\IconHandler]
+@="{14074e0b-7216-4862-96e6-53cada442a56}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\LibraryDescriptionHandler]
+@="{fe5afcf2-e681-4ada-9703-ef39b8ecb9bf}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\PropertySheetHandlers]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\PropertySheetHandlers\{66275315-bfa5-451b-88b6-e56ebc8d9b58}]
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\SharingHandler]
+@="{fe5afcf2-e681-4ada-9703-ef39b8ecb9bf}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}]
+@="{9DBD2C50-62AD-11D0-B806-00C04FD706EC}"
+
+[HKEY_CLASSES_ROOT\LibraryFolder\shellex\{e357fccd-a995-4576-b01f-234630154e96}]
+@="{9DBD2C50-62AD-11D0-B806-00C04FD706EC}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}]
+@="New Menu Handler"
+"flags"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{D969A300-E7FF-11d0-A93B-00A0C90F2719}\InProcServer32]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,00,00
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory]
+"AlwaysShowExt"=""
+@="File Folder"
+"EditFlags"=hex:d2,01,00,00
+"FriendlyTypeName"="@shell32.dll,-10152"
+"FullDetails"="prop:System.PropGroup.Description;System.DateCreated;System.FileCount;System.TotalFileSize"
+"InfoTip"="prop:System.Comment;System.DateCreated"
+"NoRecentDocs"=""
+"PreviewDetails"="prop:System.DateModified;*System.SharedWith;*System.OfflineAvailability;*System.OfflineStatus"
+"PreviewTitle"="prop:System.ItemNameDisplay;System.ItemTypeText"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shell]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shell\cmd]
+@="@shell32.dll,-8506"
+"Extended"=""
+"NoWorkingDirectory"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shell\cmd\command]
+@="cmd.exe /s /k pushd \"%V\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shellex]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shellex\ContextMenuHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shellex\ContextMenuHandlers\Gadgets]
+@="{6B9228DA-9C15-419e-856C-19E768A13BDC}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shellex\ContextMenuHandlers\New]
+@="{D969A300-E7FF-11d0-A93B-00A0C90F2719}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\Background\shellex\ContextMenuHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\DefaultIcon]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,\
+  65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,33,00,00,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell]
+@="none"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell\cmd]
+@="@shell32.dll,-8506"
+"Extended"=""
+"NoWorkingDirectory"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell\cmd\command]
+@="cmd.exe /s /k pushd \"%V\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell\find]
+"LegacyDisable"=""
+"SuppressionPolicy"=dword:00000080
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell\find\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,45,00,78,00,70,00,6c,00,6f,00,72,00,65,00,72,00,2e,00,65,00,78,00,\
+  65,00,00,00
+"DelegateExecute"="{a015411a-f97d-4ef3-8425-8a38d022aebc}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\ContextMenuHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\ContextMenuHandlers\EncryptionMenu]
+@="{A470F8CF-A1E8-4f65-8335-227475AA5C46}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\ContextMenuHandlers\Offline Files]
+@="{474C98EE-CF3D-41f5-80E3-4AAB0AB04301}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\ContextMenuHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\ContextMenuHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\CopyHookHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\CopyHookHandlers\FileSystem]
+@="{217FC9C0-3AEA-1069-A2DB-08002B30309D}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\CopyHookHandlers\Sharing]
+@="{40dd6e20-7c17-11ce-a804-00aa003ca9f6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\Offline Files]
+@="{7EFA68C6-086B-43e1-A2D2-55A113531240}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\{1f2e5c40-9550-11ce-99d2-00aa006e086c}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\{4a7ded0a-ad25-11d0-98a8-0800361b1103}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\{596AB062-B4D2-4215-9F74-E9109B0A8153}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\{ECCDF543-45CC-11CE-B9BF-0080C87CDBA6}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shellex\PropertySheetHandlers\{ef43ecfe-2ab9-4632-bf21-58909dd177f0}]
+@=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder]
+@="Library Folder"
+"NeverShowExt"=""
+"NoOpenWith"=""
+"IncludeShare"=""
+"IncludeSync"=""
+"CanRecursivelySearch"=""
+"NoPreviousVersions"=""
+"FriendlyTypeName"="@shell32.dll,-34560"
+"EditFlags"=dword:00100000
+"DefaultDropEffect"=dword:00000004
+"TileInfo"="prop:System.ItemTypeText"
+"ExtendedTileInfo"="prop:System.ItemTypeText"
+"InfoTip"="prop:System.ItemTypeText;System.DateModified"
+"PreviewDetails"="prop:System.DateModified;*System.SharedWith"
+"FullDetails"="prop:System.ItemNameDisplay;System.ItemTypeText;System.DateModified;*System.SharedWith"
+"NoJumpListPathTooltip"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\background]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\background\shellex]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\background\shellex\ContextMenuHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\background\shellex\ContextMenuHandlers\New]
+@="{D969A300-E7FF-11d0-A93B-00A0C90F2719}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\background\shellex\ContextMenuHandlers\Sharing]
+@="{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\CLSID]
+@="{a5a3563a-5755-4a6f-854e-afa3230b199f}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\DefaultIcon]
+@="%SystemRoot%\\System32\\imageres.dll,-8"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\ContextMenuHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\ContextMenuHandlers\LibraryFolder]
+@="{0af96ede-aebf-41ed-a1c8-cf7a685505b6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\IconHandler]
+@="{14074e0b-7216-4862-96e6-53cada442a56}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\LibraryDescriptionHandler]
+@="{fe5afcf2-e681-4ada-9703-ef39b8ecb9bf}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\PropertySheetHandlers]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\PropertySheetHandlers\{66275315-bfa5-451b-88b6-e56ebc8d9b58}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\SharingHandler]
+@="{fe5afcf2-e681-4ada-9703-ef39b8ecb9bf}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}]
+@="{9DBD2C50-62AD-11D0-B806-00C04FD706EC}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\LibraryFolder\shellex\{e357fccd-a995-4576-b01f-234630154e96}]
+@="{9DBD2C50-62AD-11D0-B806-00C04FD706EC}"
+
+[HKEY_CLASSES_ROOT\.bmp\ShellNew]
+"ItemName"=hex(2):40,00,25,00,73,00,79,00,73,00,74,00,65,00,6d,00,72,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,6d,00,73,00,70,00,61,00,69,00,6e,00,74,00,2e,00,65,00,78,00,65,00,2c,00,\
+  2d,00,35,00,39,00,34,00,31,00,34,00,00,00
+"NullFile"=""
+
+[HKEY_CLASSES_ROOT\.contact\ShellNew]
+"command"=hex(2):22,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,\
+  69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,\
+  00,20,00,4d,00,61,00,69,00,6c,00,5c,00,57,00,61,00,62,00,2e,00,65,00,78,00,\
+  65,00,22,00,20,00,2f,00,43,00,72,00,65,00,61,00,74,00,65,00,43,00,6f,00,6e,\
+  00,74,00,61,00,63,00,74,00,20,00,22,00,25,00,31,00,22,00,00,00
+"iconpath"=hex(2):25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,69,00,\
+  6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,00,20,\
+  00,4d,00,61,00,69,00,6c,00,5c,00,77,00,61,00,62,00,2e,00,65,00,78,00,65,00,\
+  2c,00,31,00,00,00
+"MenuText"=hex(2):40,00,25,00,43,00,6f,00,6d,00,6d,00,6f,00,6e,00,50,00,72,00,\
+  6f,00,67,00,72,00,61,00,6d,00,46,00,69,00,6c,00,65,00,73,00,25,00,5c,00,73,\
+  00,79,00,73,00,74,00,65,00,6d,00,5c,00,77,00,61,00,62,00,33,00,32,00,72,00,\
+  65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,00,31,00,30,00,32,00,30,00,33,\
+  00,00,00
+
+[HKEY_CLASSES_ROOT\.jnt\jntfile\ShellNew]
+"ItemName"=hex(2):40,00,22,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,\
+  46,00,69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,\
+  00,73,00,20,00,4a,00,6f,00,75,00,72,00,6e,00,61,00,6c,00,5c,00,4a,00,6f,00,\
+  75,00,72,00,6e,00,61,00,6c,00,2e,00,65,00,78,00,65,00,22,00,2c,00,2d,00,33,\
+  00,30,00,37,00,39,00,00,00
+"FileName"="journal.jnt"
+"Command"=hex(2):22,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,\
+  69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,\
+  00,20,00,4a,00,6f,00,75,00,72,00,6e,00,61,00,6c,00,5c,00,4a,00,6f,00,75,00,\
+  72,00,6e,00,61,00,6c,00,2e,00,65,00,78,00,65,00,22,00,20,00,2f,00,6e,00,20,\
+  00,30,00,00,00
+
+[HKEY_CLASSES_ROOT\.library-ms\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+"NullFile"=""
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,\
+  00,6d,00,61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,30,00,30,00,31,00,00,00
+
+[HKEY_CLASSES_ROOT\.library-ms\ShellNew\Config]
+"IsFolder"=""
+"IsOptIn"=""
+"NoEmptyFile"=""
+
+[HKEY_CLASSES_ROOT\.lnk\ShellNew]
+"Handler"="{ceefea1b-3e29-4ef1-b34c-fec79c4f70af}"
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
+  00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,00,\
+  31,00,36,00,37,00,36,00,39,00,00,00
+"ItemName"="@shell32.dll,-30397"
+"MenuText"="@shell32.dll,-30318"
+"NullFile"=""
+
+[HKEY_CLASSES_ROOT\.lnk\ShellNew\Config]
+"DontRename"=""
+
+[HKEY_CLASSES_ROOT\.rtf\ShellNew]
+"ItemName"=hex(2):40,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,\
+  69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,\
+  00,20,00,4e,00,54,00,5c,00,41,00,63,00,63,00,65,00,73,00,73,00,6f,00,72,00,\
+  69,00,65,00,73,00,5c,00,57,00,4f,00,52,00,44,00,50,00,41,00,44,00,2e,00,45,\
+  00,58,00,45,00,2c,00,2d,00,32,00,31,00,33,00,00,00
+"Data"="{\\rtf1}"
+
+
+[HKEY_CLASSES_ROOT\.txt\ShellNew]
+"ItemName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,6e,00,6f,00,74,00,65,00,70,00,61,00,64,00,2e,00,65,00,78,00,65,00,2c,00,\
+  2d,00,34,00,37,00,30,00,00,00
+"NullFile"=""
+
+[HKEY_CLASSES_ROOT\.zip\CompressedFolder\ShellNew]
+"Data"=hex:50,4b,05,06,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
+"ItemName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,7a,00,69,00,70,00,66,00,6c,00,64,00,72,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,30,00,31,00,39,00,34,00,00,00
+
+[HKEY_CLASSES_ROOT\Briefcase\ShellNew]
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
+  00,79,00,6e,00,63,00,75,00,69,00,2e,00,64,00,6c,00,6c,00,2c,00,30,00,00,00
+"ItemName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,36,00,34,00,39,00,33,00,00,00
+"Directory"=""
+"Handler"="{85BBD920-42A0-1069-A2E4-08002B30309D}"
+
+[HKEY_CLASSES_ROOT\Briefcase\ShellNew\Config]
+"IsFolder"=""
+"NoExtension"=""
+
+[HKEY_CLASSES_ROOT\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+
+[HKEY_CLASSES_ROOT\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew\Config]
+"IsFolder"=""
+
+[HKEY_CLASSES_ROOT\Folder\ShellNew]
+"Directory"=""
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
+  00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,33,00,\
+  00,00
+"ItemName"="@shell32.dll,-30396"
+"MenuText"="@shell32.dll,-30317"
+"NonLFNFileSpec"="@shell32.dll,-30319"
+
+[HKEY_CLASSES_ROOT\Folder\ShellNew\Config]
+"AllDrives"=""
+"IsFolder"=""
+"NoExtension"=""
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Discardable\PostSetup\ShellNew]
+"Classes"=hex(7):2e,00,62,00,6d,00,70,00,00,00,2e,00,63,00,6f,00,6e,00,74,00,\
+  61,00,63,00,74,00,00,00,2e,00,6a,00,6e,00,74,00,00,00,2e,00,6c,00,69,00,62,\
+  00,72,00,61,00,72,00,79,00,2d,00,6d,00,73,00,00,00,2e,00,6c,00,6e,00,6b,00,\
+  00,00,2e,00,72,00,74,00,66,00,00,00,2e,00,74,00,78,00,74,00,00,00,2e,00,7a,\
+  00,69,00,70,00,00,00,42,00,72,00,69,00,65,00,66,00,63,00,61,00,73,00,65,00,\
+  00,00,46,00,6f,00,6c,00,64,00,65,00,72,00,00,00,00,00
+"~reserved~"=hex:08,00,00,00,00,00,06,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.bmp\ShellNew]
+"ItemName"=hex(2):40,00,25,00,73,00,79,00,73,00,74,00,65,00,6d,00,72,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,6d,00,73,00,70,00,61,00,69,00,6e,00,74,00,2e,00,65,00,78,00,65,00,2c,00,\
+  2d,00,35,00,39,00,34,00,31,00,34,00,00,00
+"NullFile"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.contact\ShellNew]
+"command"=hex(2):22,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,\
+  69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,\
+  00,20,00,4d,00,61,00,69,00,6c,00,5c,00,57,00,61,00,62,00,2e,00,65,00,78,00,\
+  65,00,22,00,20,00,2f,00,43,00,72,00,65,00,61,00,74,00,65,00,43,00,6f,00,6e,\
+  00,74,00,61,00,63,00,74,00,20,00,22,00,25,00,31,00,22,00,00,00
+"iconpath"=hex(2):25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,69,00,\
+  6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,00,20,\
+  00,4d,00,61,00,69,00,6c,00,5c,00,77,00,61,00,62,00,2e,00,65,00,78,00,65,00,\
+  2c,00,31,00,00,00
+"MenuText"=hex(2):40,00,25,00,43,00,6f,00,6d,00,6d,00,6f,00,6e,00,50,00,72,00,\
+  6f,00,67,00,72,00,61,00,6d,00,46,00,69,00,6c,00,65,00,73,00,25,00,5c,00,73,\
+  00,79,00,73,00,74,00,65,00,6d,00,5c,00,77,00,61,00,62,00,33,00,32,00,72,00,\
+  65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,00,31,00,30,00,32,00,30,00,33,\
+  00,00,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.jnt\jntfile\ShellNew]
+"ItemName"=hex(2):40,00,22,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,\
+  46,00,69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,\
+  00,73,00,20,00,4a,00,6f,00,75,00,72,00,6e,00,61,00,6c,00,5c,00,4a,00,6f,00,\
+  75,00,72,00,6e,00,61,00,6c,00,2e,00,65,00,78,00,65,00,22,00,2c,00,2d,00,33,\
+  00,30,00,37,00,39,00,00,00
+"FileName"="journal.jnt"
+"Command"=hex(2):22,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,\
+  69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,\
+  00,20,00,4a,00,6f,00,75,00,72,00,6e,00,61,00,6c,00,5c,00,4a,00,6f,00,75,00,\
+  72,00,6e,00,61,00,6c,00,2e,00,65,00,78,00,65,00,22,00,20,00,2f,00,6e,00,20,\
+  00,30,00,00,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.library-ms\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+"NullFile"=""
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,69,\
+  00,6d,00,61,00,67,00,65,00,72,00,65,00,73,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,30,00,30,00,31,00,00,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.library-ms\ShellNew\Config]
+"IsFolder"=""
+"IsOptIn"=""
+"NoEmptyFile"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.lnk\ShellNew]
+"Handler"="{ceefea1b-3e29-4ef1-b34c-fec79c4f70af}"
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
+  00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,2d,00,\
+  31,00,36,00,37,00,36,00,39,00,00,00
+"ItemName"="@shell32.dll,-30397"
+"MenuText"="@shell32.dll,-30318"
+"NullFile"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.lnk\ShellNew\Config]
+"DontRename"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.rtf\ShellNew]
+"ItemName"=hex(2):40,00,25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,\
+  69,00,6c,00,65,00,73,00,25,00,5c,00,57,00,69,00,6e,00,64,00,6f,00,77,00,73,\
+  00,20,00,4e,00,54,00,5c,00,41,00,63,00,63,00,65,00,73,00,73,00,6f,00,72,00,\
+  69,00,65,00,73,00,5c,00,57,00,4f,00,52,00,44,00,50,00,41,00,44,00,2e,00,45,\
+  00,58,00,45,00,2c,00,2d,00,32,00,31,00,33,00,00,00
+"Data"="{\\rtf1}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.txt\ShellNew]
+"ItemName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,6e,00,6f,00,74,00,65,00,70,00,61,00,64,00,2e,00,65,00,78,00,65,00,2c,00,\
+  2d,00,34,00,37,00,30,00,00,00
+"NullFile"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.zip\CompressedFolder\ShellNew]
+"Data"=hex:50,4b,05,06,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
+"ItemName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,7a,00,69,00,70,00,66,00,6c,00,64,00,72,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,30,00,31,00,39,00,34,00,00,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Briefcase\ShellNew]
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
+  00,79,00,6e,00,63,00,75,00,69,00,2e,00,64,00,6c,00,6c,00,2c,00,30,00,00,00
+"ItemName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,73,00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,36,00,34,00,39,00,33,00,00,00
+"Directory"=""
+"Handler"="{85BBD920-42A0-1069-A2E4-08002B30309D}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Briefcase\ShellNew\Config]
+"IsFolder"=""
+"NoExtension"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew]
+"Handler"="{c7ca6167-2f46-4c4c-98b2-c92591368971}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{a5a3563a-5755-4a6f-854e-afa3230b199f}\ShellNew\Config]
+"IsFolder"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\ShellNew]
+"Directory"=""
+"IconPath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
+  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
+  00,68,00,65,00,6c,00,6c,00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,33,00,\
+  00,00
+"ItemName"="@shell32.dll,-30396"
+"MenuText"="@shell32.dll,-30317"
+"NonLFNFileSpec"="@shell32.dll,-30319"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\ShellNew\Config]
+"AllDrives"=""
+"IsFolder"=""
+"NoExtension"=""
+

@@ -1,0 +1,33 @@
+# Build output
+bin/
+build/
+out/
+*.exe
+*.dll
+*.obj
+*.o
+*.a
+*.lib
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Ninja
+.ninja_deps
+.ninja_log
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+
+# Backup files
+*.bak
+*~

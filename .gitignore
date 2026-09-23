@@ -1,0 +1,68 @@
+# Build artifacts and distribution folders
+# Paths are unanchored so they keep matching wherever the AutoIt tree sits.
+**/SDK/Concrete/*/Distribution/
+
+# Compiled executables
+*.exe
+
+# Log files
+*.log
+**/Resolute/Logging/
+
+# Temporary and cache files
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+.idea/
+*.ntvs_analysis.dat
+
+# AutoIt compiled files
+*.a3x
+
+# Zip packages
+**/SDK/Concrete/*/*.zip
+**/SDK/Concrete/*/Distribution/*/*.zip
+
+# Windows thumbnail cache
+ehthumbs.db
+Desktop.ini
+
+# Removed from repo
+rescue-db/
+.windsurf/
+implementation_plan.md
+
+# C++ build outputs, merged from ExoSuite at intake
+/out/
+/Bin/
+extensions/*/build/
+extensions/*/bin/
+test_font.obj
+
+# The bootstrapped toolchain, never committed.
+# Renamed exokit -> reskit by D00 T03 §3, which completed; the exokit rules are
+# gone with the directory rather than kept as dead weight.
+/reskit/llvm-mingw/
+/reskit/cmake/
+/reskit/ninja/
+
+# TODO graph derived cache (always reproducible from todo/*.md)
+build/
+__pycache__/
+
+# Local working copies of the intake sources. Not part of this repository.
+# ExoSuite, RegStudio, and SDImage are separate repositories under
+# github.com/rizonesoft, merged in with their history rather than committed
+# here. Undelete is third-party reference material and is deliberately kept
+# out of the tree; see D05 T05.
+# Anchored with a leading slash so resolute_au3/samples/ is unaffected.
+/samples/

@@ -1,0 +1,26 @@
+Repair Start Menu Icons Removed By Infections:
+
+This repair will put back the missing icons in the start menu, quick launch, and desktop that are moved by a rogue virus.
+
+All the icons by the virus are moved to the temp folder under the folder SMTMP.
+
+SMTMP folder
+XP - C:\Documents and Settings\(Your Username)\Local Settings\Temp\SMTMP
+Vista/7 - C:\Users\(Your Username)\AppData\Local\Temp\SMTMP
+
+Folder 1 contains the All Users Start Menu shortcuts
+XP - C:\Documents and Settings\All Users\Start Menu
+Vista/7 - C:\Program Data\Microsoft\Windows\Start Menu
+
+Folder 2 contains the Quick Launch shortcuts
+XP - C:\Documents and Settings\(Your Username)\Application Data\Microsoft\Internet Explorer\Quick Launch
+Vista/7 - C:\Users\(Your Username)\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch
+
+Folder 3 contains Windows 7 Taskbar icons (not needed in Windows XP)
+XP - N/A
+Vista/7 - C:\Users\(Your Username)\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar
+
+Folder 4 does have Desktop icons
+XP - C:\Documents and Settings\All Users\Desktop
+Vista/7 - C:\Users\Public\Public Desktop
+

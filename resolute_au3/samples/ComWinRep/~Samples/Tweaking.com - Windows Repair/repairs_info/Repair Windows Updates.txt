@@ -1,0 +1,5 @@
+Repair Windows Updates:
+
+If windows updates are not working then this repair may help. This will reset windows updates and get all the windows update files registered.
+
+Run this repair if windows updates are failing and is not working correctly. This repair will also restore the BITS service reg keys in Vista and newer.

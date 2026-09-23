@@ -1,0 +1,12 @@
+{
+  "candidate_base": "a22f7e2d99754cd25d17195fc32822556215a5fb",
+  "candidate_head": "1cfd0833defc7e9429e03bcd0195306b5dee2a12",
+  "checker": "PASS four lenses, one verdict each",
+  "manifest_sha": "5ddc04b6cdc17758af74183f1c8bf14520ddfc6d0f30de3139875c3816a3f9be",
+  "model": "opus",
+  "reviewer": "claude-panel",
+  "schema": 1,
+  "timestamp": "2026-09-20T08:54:40Z",
+  "tree": "5c7afa5bc9b68747b204a6b3e6690a49ec6aa581",
+  "verdict": "needs-attention"
+}

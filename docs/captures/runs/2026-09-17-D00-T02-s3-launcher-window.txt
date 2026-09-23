@@ -1,0 +1,14 @@
+capture       : 2026-09-17-D00-T02-s3-launcher-window.png
+describes     : The C++ launcher main window, running. Example run capture for the convention in this directory.
+window title  : Resolute
+source binary : R:\conclave\projects\Resolute\Bin\Release\Resolute.exe
+file version  : 0.1.0.0
+size          : 1100 x 720 px
+monitor dpi   : 144  (150% scaling) -- what the image was rendered at
+window dpi    : 144  (logical dpi the process sees)
+dpi aware     : True
+windows build : 10.0.26200.0
+captured      : 2026-09-17
+
+Reproduce with scripts/capture-window.ps1. Where this capture and
+DESIGN.md disagree, the contract wins and this capture is restaked.

@@ -1,0 +1,12 @@
+[0.1.1]
+
+This is a BETA release.
+
+[+] Added toolbar
+[+] Added preferences
+[+] Window style slightly improved
+[*] A lot of minor bugfixes and improvements
+
+[0.1.0]
+
+The first alpha release.
