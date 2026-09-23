@@ -124,7 +124,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T04 §23` | Third two-model revisit                           |   6   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
-| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  11   |
+| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  12   |
 | [ ] | `D00 T04 §27` | One writer, a GPT-governed panel, slot-bound pins |   6   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                      |  14   |
 | [x] | `D00 T01 §2`  | CMake structure and dependencies                  |  11   |

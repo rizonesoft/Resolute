@@ -1138,6 +1138,7 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 - [ ] Carry the full approval chain in the bundle: today only the sign-off round's artifacts ship, so one portable artifact cannot reconstruct attempts, candidate transitions, fix dispositions, or superseded attestations (plan review of the §24 candidate, PR13, premium win; needs §24 shipped: it extends §24's bundle). Done when: per-round outputs, the candidate transition list, fix dispositions, and superseded attestations ride as members quoted, verify replays the chain quoted, the schema versions the growth, and the second-machine proof re-passes. Cheaper substitute that fails the checkpoint: the sign-off snapshot plus prose pointers, which is the current state.
 - [ ] State the review-fix exception to one-section-one-commit: fixes go forward in new commits (every panel-reviewed section ships several), but the contract as written forbids what the skill requires (plan review of the §24 candidate, PR16; needs §24 shipped: it records §24's shape). Done when: the skill plus AGENTS.md state the exception (implementation commit plus `review: answer` fix commits, each tagged to its round) quoted, the mechanical bound is cited (role tags plus correspondence plus the attested declaration), and no tree prose contradicts the exception quoted. Cheaper substitute that fails the checkpoint: the bare contract sentence, which every reviewed section already breaches.
 - [ ] Give oversized assemblies a legal path: past the order-search budget a non-declaration-ordered assembly with voided span members is unfenceable (declaring exhausts, ranging re-admits), per the D00 T04 §24 round-4 I1 advisory narrowed by the round-5 attempt cap (needs §24 shipped: it extends §24's assembly binding). Done when: a designed path exists quoted (chunked declarations, smarter matching, or a reasoned wont-fix with the trigger that reopens it), the refusal message points at it quoted, and the self-test pins the new shape. Cheaper substitute that fails the checkpoint: the exhausted message alone, which names no path for that corner.
+- [ ] Kill the whole producer tree on a POSIX slot timeout: `panel_slots.py exec` kills only the producer process off Windows (Windows already runs `taskkill /T`), so a child the producer spawned can keep writing the round output after exit 124 and overlap the fallback round (panel round 4 of the D00 T04 §27 review, F6; needs §27 shipped: it hardens §27's runner). Done when: POSIX producers start in their own session and a timeout kills the process group, a self-test leg spawns a grandchild that outlives a single-process kill and proves it gone after 124 quoted, and the Windows leg stays green. Cheaper substitute that fails the checkpoint: documenting the platform limit without a kill.
 - [ ] Commit: `"workspace: review-flow follow-ups"`
 
 **Test checkpoint:** The undeclared-neither fails quoted; the trusted sign-off refuses quoted; the OID-mismatched tag fails quoted; the conflicting attestation fails quoted; the undated escape closes-or-proves quoted; the bundle name reads unsigned quoted; the separate-machine replay greens quoted; the chain verifies quoted; the exception reads quoted; the mega-assembly paths quoted.
@@ -1153,6 +1154,8 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR13 D00-T04-S24-PR13
 -> SOURCE: plan-D00-T04-s24-2026-09-21-PR16 D00-T04-S24-PR16
 -> SOURCE: panel-D00-T04-s24-2026-09-21 D00-T04-S24-F17
+-> SOURCE: panel-D00-T04-s27-2026-09-23 D00-T04-S27-F6
+-> XREF: D00 T04 §27 -- the slot runner one item hardens
 
 ## 27. One Writer, a GPT-Governed Panel, Slot-Bound Pins
 
@@ -1172,6 +1175,7 @@ Operator decision 2026-09-23: Claude Code on Opus 5.5 is the only writer, Muse l
 **Test checkpoint:** Unit test (`panel_slots.py --self-test`, `todo-graph.py self-test`, `todo-runs.py --self-test`, `review_prompt.py --self-test` green, counts quoted) plus driven run (a live `exec bulk` echo, `panel_slots.py validate` over the checked-in table, `todo-graph.py validate` 0 fatal, and the model-literal grep over the skills quoted). The failure path is proven by the writer-family governing-slot refusal and the Claude-last-without-note fatal.
 
 -> XREF: D00 T04 §24 -- the review machinery whose pins this section moves into one table
+-> XREF: D00 T04 §26 -- the POSIX timeout follow-up filed from this section's panel round 4
 
 ## Verification
 
