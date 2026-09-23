@@ -78,6 +78,7 @@ DIAG = _load_diag()
 ROOT = HERE.parent
 DEFAULT_RUNS = ROOT / "docs" / "reviews" / "run-records.md"
 DEFAULT_BANK = ROOT / "docs" / "reviews" / "crossover" / "comparisons.md"
+DEFAULT_CROSSOVER = ROOT / "docs" / "reviews" / "crossover"
 # Panel sections past the newest banked comparison before the bank reads
 # stale: the mid-window calibration point of a 5-section window (§18
 # standing schedule banks one decision crossover plus one mid-window
@@ -106,6 +107,22 @@ SKIPPED_OUTCOMES = ("error", "stamp", "independent")
 # time, per-section Sol full-scope 5/2/5/3/4. §18 counts past this set.
 REVISIT_WINDOW = ("D00-T02-S5", "D00-T04-S6", "D00-T04-S7", "D00-T04-S9", "D00-T04-S10")
 REVISIT_NEED = 5
+# The §18 decision window (closed: §18 decided on S13-S17).
+REVISIT_WINDOW_18 = ("D00-T04-S13", "D00-T04-S14", "D00-T04-S15",
+                     "D00-T04-S16", "D00-T04-S17")
+# The §23 decision window (open: §23 rates and decides on it): the five
+# non-revisit panel sections past the §18 window (D00 T04 §23 item 2).
+REVISIT_WINDOW_23 = ("D00-T04-S19", "D00-T04-S20", "D00-T04-S21",
+                     "D00-T04-S22", "D00-T04-S24")
+# Sections that ARE revisits: their reviews evaluate the decision
+# machinery, so the trigger count excludes them (D00 T04 §23 item 1; S18's
+# stamping advanced the old count 8/5 to 9/5, proving the rule
+# load-bearing). The fourth revisit extends this set when filed.
+REVISIT_SECTIONS = ("D00-T04-S8", "D00-T04-S18", "D00-T04-S23")
+# Decision windows that have closed: members read valued without consulting
+# the ratings files. The §23 window joins this set when the fourth revisit
+# rolls the trigger.
+CLOSED_WINDOWS = (REVISIT_WINDOW, REVISIT_WINDOW_18)
 OPPORTUNITIES = ("full-scope", "delta-plus-regressions", "unresolved")
 PURPOSES = ("section-review", "stamp-review", "sign-off", "fix-loop", "unresolved")
 PROVENANCES = ("recorded", "reconstructed")
@@ -609,16 +626,81 @@ def cost_lines(runs):
     return lines
 
 
-def revisit_lines(runs):
-    """The §18 trigger from the query: panel sections past the §8 window."""
+def _rated_sections(crossover_dir):
+    """Sections with blinded ratings on disk: the section half of every
+    finding ref in any ratings.json below the crossover dir. A missing dir
+    or an unreadable file reads as no ratings, never a crash: absence of
+    evidence is not evidence of absence."""
+    rated = set()
+    try:
+        files = sorted(Path(crossover_dir).glob("*/ratings.json"))
+    except OSError:
+        return rated
+    for path in files:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        ratings = data.get("ratings") if isinstance(data, dict) else None
+        if not isinstance(ratings, dict):
+            continue
+        for ref in ratings:
+            if "-" in ref:
+                rated.add(ref.rsplit("-", 1)[0])
+    return rated
+
+
+def revisit_lines(runs, rated):
+    """The revisit trigger from the query, rolled to §23 (D00 T04 §23
+    item 1): the §18 line reads retired beside the new §23 line, the new
+    count excludes revisit sections, and every counted-never-valued section
+    carries its disposition (value, carry, or drop with reason), so no
+    section falls silently between windows again. `rated` is the set of
+    sections with blinded ratings (the report scans the crossover dir; the
+    self-test passes fixtures, never live files). Past-the-window means
+    positioned after the window in run-record order (the records append
+    chronologically), never set exclusion: the §23 window sits mid-history,
+    so set exclusion would count older sections as progress toward the
+    fourth revisit."""
     past = [run.section for run in runs
             if run.runner == "panel" and run.section not in REVISIT_WINDOW]
     lines = ["Revisit trigger (§18 past the §8 window of five: "
              f"{', '.join(REVISIT_WINDOW)}):"]
-    state = "trigger met" if len(past) >= REVISIT_NEED else "trigger open"
     names = ", ".join(past) if past else "none"
     lines.append(f"- {len(past)}/{REVISIT_NEED} panel-reviewed sections past the window "
-                 f"({names}): {state}")
+                 f"({names}): retired")
+    lines.append("")
+    lines.append("Revisit trigger (§23 past the §23 window of five: "
+                 f"{', '.join(REVISIT_WINDOW_23)}):")
+    edge = max([i for i, run in enumerate(runs)
+                if run.section in REVISIT_WINDOW_23], default=None)
+    after = runs[edge + 1:] if edge is not None else []
+    fresh = [run.section for run in after
+             if run.runner == "panel"
+             and run.section not in REVISIT_WINDOW_23
+             and run.section not in REVISIT_SECTIONS]
+    state = "trigger met" if len(fresh) >= REVISIT_NEED else "trigger open"
+    fresh_names = ", ".join(fresh) if fresh else "none"
+    lines.append(f"- {len(fresh)}/{REVISIT_NEED} non-revisit panel-reviewed sections past "
+                 f"the window ({fresh_names}): {state}")
+    valued = set(rated)
+    for window in CLOSED_WINDOWS:
+        valued.update(window)
+    pos = {}
+    for i, run in enumerate(runs):
+        pos.setdefault(run.section, i)
+    counted = [s for s in past if s not in valued]
+    for section in counted:
+        if section in REVISIT_SECTIONS:
+            lines.append(f"- {section}: drop (revisit reviews are meta, "
+                         f"never valued evidence)")
+        elif section in REVISIT_WINDOW_23:
+            lines.append(f"- {section}: value (§23 window; pending rating)")
+        elif edge is not None and pos.get(section, -1) > edge:
+            lines.append(f"- {section}: carry (awaits the fourth window)")
+        else:
+            lines.append(f"- {section}: value (between-window batch; "
+                         f"pending rating)")
     return lines
 
 
@@ -830,7 +912,7 @@ def report(runs, runs_path, collected=None):
         lines.append(f"- {run.section}: independent {independent}, self {self_raised}")
     lines.append(f"- total: independent {total_ind}, self {total_self}")
     lines.append("")
-    lines.extend(revisit_lines(runs))
+    lines.extend(revisit_lines(runs, _rated_sections(DEFAULT_CROSSOVER)))
     lines.append("")
     lines.extend(leg_lines(runs, findings))
     lines.append("")
@@ -1375,19 +1457,62 @@ refuted: 0
         return run
     trig_open = [_mkrun(s, "panel") for s in REVISIT_WINDOW[:2]] + \
         [_mkrun("D00-T04-S11", "panel"), _mkrun("D00-T01-S1", "codex")]
-    got_open = revisit_lines(trig_open)
+    got_open = revisit_lines(trig_open, frozenset())
     check("revisit-open", got_open == [
         "Revisit trigger (§18 past the §8 window of five: "
         "D00-T02-S5, D00-T04-S6, D00-T04-S7, D00-T04-S9, D00-T04-S10):",
-        "- 1/5 panel-reviewed sections past the window (D00-T04-S11): trigger open",
+        "- 1/5 panel-reviewed sections past the window (D00-T04-S11): retired",
+        "",
+        "Revisit trigger (§23 past the §23 window of five: "
+        "D00-T04-S19, D00-T04-S20, D00-T04-S21, D00-T04-S22, D00-T04-S24):",
+        "- 0/5 non-revisit panel-reviewed sections past the window (none): "
+        "trigger open",
+        "- D00-T04-S11: value (between-window batch; pending rating)",
     ], f"{got_open}")
     trig_met = [_mkrun(s, "panel") for s in REVISIT_WINDOW] + \
-        [_mkrun(s, "panel") for s in ("D00-T04-S8", "D00-T04-S11", "D00-T04-S12",
-                                      "D00-T04-S13", "D00-T04-S14")]
-    got_met = revisit_lines(trig_met)
-    check("revisit-met", got_met[1] == "- 5/5 panel-reviewed sections past the window "
-          "(D00-T04-S8, D00-T04-S11, D00-T04-S12, D00-T04-S13, D00-T04-S14): "
-          "trigger met", f"{got_met}")
+        [_mkrun(s, "panel") for s in REVISIT_WINDOW_23] + \
+        [_mkrun(s, "panel") for s in ("D00-T04-S30", "D00-T04-S31", "D00-T04-S32",
+                                      "D00-T04-S33", "D00-T04-S34",
+                                      "D00-T04-S8")]
+    got_met = revisit_lines(trig_met, frozenset({"D00-T04-S30"}))
+    check("revisit-met", got_met == [
+        "Revisit trigger (§18 past the §8 window of five: "
+        "D00-T02-S5, D00-T04-S6, D00-T04-S7, D00-T04-S9, D00-T04-S10):",
+        "- 11/5 panel-reviewed sections past the window (D00-T04-S19, "
+        "D00-T04-S20, D00-T04-S21, D00-T04-S22, D00-T04-S24, D00-T04-S30, "
+        "D00-T04-S31, D00-T04-S32, D00-T04-S33, D00-T04-S34, D00-T04-S8): "
+        "retired",
+        "",
+        "Revisit trigger (§23 past the §23 window of five: "
+        "D00-T04-S19, D00-T04-S20, D00-T04-S21, D00-T04-S22, D00-T04-S24):",
+        "- 5/5 non-revisit panel-reviewed sections past the window "
+        "(D00-T04-S30, D00-T04-S31, D00-T04-S32, D00-T04-S33, "
+        "D00-T04-S34): trigger met",
+        "- D00-T04-S19: value (§23 window; pending rating)",
+        "- D00-T04-S20: value (§23 window; pending rating)",
+        "- D00-T04-S21: value (§23 window; pending rating)",
+        "- D00-T04-S22: value (§23 window; pending rating)",
+        "- D00-T04-S24: value (§23 window; pending rating)",
+        "- D00-T04-S31: carry (awaits the fourth window)",
+        "- D00-T04-S32: carry (awaits the fourth window)",
+        "- D00-T04-S33: carry (awaits the fourth window)",
+        "- D00-T04-S34: carry (awaits the fourth window)",
+        "- D00-T04-S8: drop (revisit reviews are meta, never valued evidence)",
+    ], f"{got_met}")
+    rated_dir = tmp / "xo-ratings"
+    (rated_dir / "2026-09-20-s18").mkdir(parents=True)
+    (rated_dir / "2026-09-20-s18" / "ratings.json").write_text(
+        '{"ratings": {"D00-T04-S13-F1": {"blinded": "major"}, '
+        '"D00-T04-S15-F2": {"blinded": "minor"}}}', encoding="utf-8")
+    (rated_dir / "2026-09-21-s23").mkdir(parents=True)
+    (rated_dir / "2026-09-21-s23" / "ratings.json").write_text(
+        "not json", encoding="utf-8")
+    check("revisit-rated-scans-sections",
+          _rated_sections(rated_dir) == {"D00-T04-S13", "D00-T04-S15"},
+          f"{_rated_sections(rated_dir)}")
+    check("revisit-rated-missing-dir-empty",
+          _rated_sections(tmp / "xo-absent") == set(),
+          f"{_rated_sections(tmp / 'xo-absent')}")
 
     # §15: per-ref dispositions ride the export and the checker asserts them.
     f1 = TF.Finding("D00 T01 §1", None, 1, "F1", "s", "record", "fixed", None, "independent")
@@ -1887,6 +2012,11 @@ refuted: 0
     (tmp / "reviews22").rmdir()
     (tmp / "runs22.md").unlink()
     (tmp / "export22.json").unlink()
+    (tmp / "xo-ratings" / "2026-09-20-s18" / "ratings.json").unlink()
+    (tmp / "xo-ratings" / "2026-09-20-s18").rmdir()
+    (tmp / "xo-ratings" / "2026-09-21-s23" / "ratings.json").unlink()
+    (tmp / "xo-ratings" / "2026-09-21-s23").rmdir()
+    (tmp / "xo-ratings").rmdir()
     tmp.rmdir()
 
     print(f"todo-runs self-test: {total[0]} cases, {len(failures)} failed")

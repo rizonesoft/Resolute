@@ -1,0 +1,23 @@
+PAIR X3 Y7 -- incompatible WM_COMMAND packing conventions break a single parent-dispatch contract
+PAIR X4 Y13 -- row-based navigation and scrolling contradict icon-mode grid geometry
+PAIR X5 Y8 -- item-count changes force scrollbar visibility instead of deriving it from overflow
+PAIR X7 Y4 -- discarding the icon mask and forcing zero alpha opaque breaks mask-only icons
+PAIR X9 Y3 -- scrollbar hit-testing ignores visibility and alpha, allowing an invisible track to capture clicks
+SOLO X1
+SOLO X2
+SOLO X6
+SOLO X8
+SOLO X10
+SOLO Y1
+SOLO Y2
+SOLO Y5
+SOLO Y6
+SOLO Y9
+SOLO Y10
+SOLO Y11
+SOLO Y12
+SOLO Y14
+SOLO Y15
+SOLO Y16
+SOLO Y17
+SOLO Y18

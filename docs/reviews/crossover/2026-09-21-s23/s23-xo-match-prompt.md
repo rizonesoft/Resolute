@@ -1,0 +1,45 @@
+You are matching defect findings from two independent reviews (X and Y) of the same file. Pair findings that describe the same underlying defect.
+
+Rules:
+- A pair matches when both findings describe the same defect mechanism at overlapping locations; wording and lens may differ.
+- One-to-one: each finding appears in at most one pair. When one finding overlaps several, pair it with the closest mechanism and note the near-miss after the pair line as `NEAR <id> <id>`.
+- Severity is out of scope: match mechanisms, never severities (none are given).
+
+Output:
+- One line per pair: `PAIR X<n> Y<m> -- <one-clause shared mechanism>`.
+- Then one line per unpaired finding: `SOLO X<n>` or `SOLO Y<m>`.
+- Every finding appears exactly once (paired or solo). No other text.
+
+FINDINGS X (10):
+
+X1 [adversarial]: negative column index unchecked at listview.cpp:432,437: converts to unsigned and indexes unchecked.
+X2 [adversarial]: signed w*h*4 arithmetic for caller icon dimensions at listview.cpp:138 can overflow and under-allocate the buffer written at listview.cpp:140.
+X3 [consistency]: two incompatible WM_COMMAND dispatch conventions: notification-in-low-word at listview.cpp:294,462 vs control-ID-in-low-word at listview.cpp:1035,1069.
+X4 [consistency]: linear row geometry and single-item vertical navigation at listview.cpp:312,317,1077,1086 contradict the grid geometry of icon modes.
+X5 [consistency]: listview.cpp:207 changes the item count without validating it or reconciling selection and scroll, and marks the scrollbar visible even when empty or non-overflowing.
+X6 [integration]: no edited-text accessor (listview.h:52,103,104) and the commit notification at listview.cpp:462 carries only the control window, so callers cannot retrieve the edited value.
+X7 [integration]: icon transparency lost: reads only the color bitmap (listview.cpp:139), discards the mask (listview.cpp:144), forces zero-alpha opaque (listview.cpp:159); mask-only icons render from a zero buffer.
+X8 [integration]: inline editor implements character insertion (listview.cpp:1075,1107) but no backspace, delete, cursor movement, home, or end.
+X9 [integration]: scrollbar drag starts at listview.cpp:986 without checking visibility or alpha, so an invisible track captures clicks on the right edge.
+X10 [record]: listview.h:4 claims animated selection, but listview.cpp:690,771 render selections directly and ignore the animated position updated at listview.cpp:256.
+
+FINDINGS Y (18):
+
+Y1 [adversarial]: null deref at listview.cpp:868: self dereferenced before the null guard at listview.cpp:872; windows of the process-wide class created without passing this die during WM_NCCREATE.
+Y2 [adversarial]: stale column index at listview.cpp:907: clearing columns (listview.cpp:216) empties the vector without resetting the resize and sort indices, so a clear during a drag turns the next mouse move into an out-of-bounds write.
+Y3 [adversarial]: invisible scrollbar captures clicks: the hit test (listview.cpp:352-357,986) ignores visibility and alpha that painting (listview.cpp:492) requires, so clicks near the right edge start a drag on an unscrollable list.
+Y4 [adversarial]: mask-only icons render as opaque black squares: color-bitmap-only read (listview.cpp:139) leaves pixels zero for 1-bpp icons, the alpha probe (listview.cpp:149-152) reports none, zero-alpha forced opaque (listview.cpp:159), cached permanently (listview.cpp:177).
+Y5 [adversarial]: icon cache keyed on the raw handle with no per-entry eviction (listview.cpp:104,111): recycled handles after destroy serve the previous icon's bitmap.
+Y6 [adversarial]: editing animation use-after-free: the blink loop (listview.cpp:443-451) re-arms from its own callback with a raw pointer and nothing cancels it on destroy; same for animation lambdas capturing this (listview.cpp:247,255,268,272,290,305,935,1130).
+Y7 [consistency]: contradictory WM_COMMAND packings for the same parent contract: notification-in-id-position at listview.cpp:294,462 vs id-in-id-position at listview.cpp:1035,1069,1082,1091; no parent dispatcher decodes both.
+Y8 [consistency]: listview.cpp:207 sets scrollbar-visible unconditionally, contradicting the derived flag at listview.cpp:189; a non-overflowing list paints a full thumb until resize.
+Y9 [consistency]: dead helpers: ColumnX (listview.cpp:53, listview.h:171), TotalColumnsWidth (listview.cpp:60, listview.h:172), GridRows (listview.cpp:73, listview.h:177) defined and declared but never called.
+Y10 [consistency]: dead key check at listview.cpp:1110: return and escape are below 0x20 and already rejected by the same line range term.
+Y11 [consistency]: ellipsis trimming installed only on one text format (listview.cpp:587); four other formats (listview.cpp:512,675,748,815) set no-wrap without trimming, so overlong text spills past its rect.
+Y12 [consistency]: arrow keys (listview.cpp:1077,1086) ungated on edit-active while character input (listview.cpp:1108) gates on it: arrows during an edit move selection while the overlay stays pinned (listview.cpp:635) and pending text follows the old row.
+Y13 [integration]: icon-mode scrolling broken: ScrollToItem (listview.cpp:314), EnsureVisible (listview.cpp:322-328), and the wheel step (listview.cpp:892) use row height while icon modes lay out on cell height and grid columns (listview.cpp:411); EnsureVisible can scroll the selection out of view.
+Y14 [integration]: DPI change leaves stale scroll offsets: UpdateDpi (listview.cpp:195) recomputes only the highlight position; scroll offsets stay in old-DPI pixels unclamped and the render target is not resized.
+Y15 [integration]: click-to-rename unreachable: double-click registration (listview.cpp:85) plus timer kill (listview.cpp:1066-1067) plus expiry (listview.cpp:1039,1138) leave no path where the second click lands (listview.cpp:1025).
+Y16 [integration]: dead timer id retained: KillTimer at listview.cpp:368 without zeroing, with re-arm skipped when hovered or dragging (listview.cpp:370); the member names a timer that no longer exists.
+Y17 [record]: header claims virtual scrolling (listview.h:3) but icon modes iterate every item per frame (listview.cpp:685,703) and merely skip off-screen ones; only Details and List compute visible ranges (listview.cpp:577-580,754-757).
+Y18 [record]: DPI comment overclaims (listview.cpp:196): recalculate cached positions while the body refreshes only the highlight; scroll and animation targets stay at old-DPI magnitudes (listview.cpp:222,255,305).

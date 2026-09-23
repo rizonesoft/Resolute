@@ -1,0 +1,19 @@
+RECEIPT sha=7535918bb3a6fb867bf8e4158d3984f2dbb62f929b72b07f6cc83e510c4e8ea3 end=PANEL-40b31d483fee92c3 nonce=ab5af02f2e87adf7
+
+**adversarial: needs-attention** (2)
+1. listview.cpp:432 and listview.cpp:437 fail to reject a negative `colIdx`, causing unchecked vector access after conversion to an unsigned index.
+2. listview.cpp:138 performs signed `w * h * 4` arithmetic for caller-supplied icon dimensions; overflow can under-allocate the buffer subsequently written by `GetDIBits` at listview.cpp:140.
+
+**consistency: needs-attention** (3)
+1. listview.cpp:294 and listview.cpp:462 place notification constants in the low word of `WM_COMMAND`, while listview.cpp:1035 and listview.cpp:1069 place the control ID there and the notification in the high word, leaving callers with two incompatible dispatch conventions.
+2. listview.cpp:312, listview.cpp:317, listview.cpp:1077, and listview.cpp:1086 use linear row geometry and single-item vertical navigation in every view, contradicting the grid geometry used by the icon modes.
+3. listview.cpp:207 changes the item count without validating it or reconciling selection and scroll state, and marks the scrollbar visible even for an empty or non-overflowing model.
+
+**integration: needs-attention** (4)
+1. listview.h:52 exposes only immutable items, listview.h:103 and listview.h:104 expose no edited-text accessor, and listview.cpp:462 sends only the control window in the commit notification, so a caller cannot retrieve or persist the edited value.
+2. listview.cpp:139 reads only the color bitmap, listview.cpp:144 discards the mask, and listview.cpp:159 makes zero-alpha pixels opaque; legacy masked icons lose transparency and mask-only monochrome icons render from an uninitialized-by-conversion zero buffer.
+3. listview.cpp:1075 and listview.cpp:1107 implement character insertion but no backspace, delete, cursor movement, home, or end behavior, so the advertised inline editor cannot perform basic text correction.
+4. listview.cpp:986 starts scrollbar dragging without checking `m_scrollbarVisible` or its alpha, allowing an invisible scrollbar track to capture and consume clicks along the control’s right edge.
+
+**record: advisory** (1)
+1. listview.h:4 claims animated selection across the multi-view control, but listview.cpp:690 and listview.cpp:771 render icon and list selections directly from `m_selected` and ignore the animated position updated at listview.cpp:256.

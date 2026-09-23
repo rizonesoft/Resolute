@@ -1,0 +1,109 @@
+B1: minor -- the cited-path enumeration claim is refuted in the review record.
+B2: major -- the exit-code documentation gives developers an incorrect checker contract.
+B3: critical -- the attestation read-back accepts invalid integer fields into the stamp record.
+B4: minor -- the diagnostic-registration claim is refuted for the checker registry.
+B5: minor -- the OID-binding claim duplicates another finding against the identity gate.
+B6: major -- the review-fence emitter crashes on valid non-console-encoded diffs.
+B7: critical -- the citation checker falsely accepts reordered evidence into the stamp.
+B8: major -- the checklist record falsely leaves an implemented Commit item incomplete.
+B9: major -- the candidate plan omits the required item drive and completion evidence.
+B10: minor -- the stamp plan's temporary ineligibility is cured by its ordinary sign-off flow.
+B11: major -- the checker docstrings materially misstate the report-mode output contract.
+B12: critical -- the content-coverage gate falsely approves non-textual changes without evidence.
+B13: major -- the registry record falsely claims exclusive ownership of the exit-code mapping.
+B14: major -- the content-order checker can hang indefinitely on a valid large declaration.
+B15: major -- the proof record cites a verdict fragment instead of the required probe output.
+B16: critical -- the attestation checker accepts meaningless checker and timestamp metadata into the stamp.
+B17: major -- the history-silence record states impossible failure behavior and nonexistent diagnostics.
+B18: minor -- the persistent OID-pinning claim is refuted for the identity gate.
+B19: major -- the completion record falsely denies the behavior change it documents.
+B20: critical -- the content-coverage checker falsely reuses evidence and ignores surplus patch lines.
+B21: major -- the cost checklist records completion before its required round evidence exists.
+B22: major -- the citation tracker falsely rejects equivalent spellings of tracked paths.
+B23: major -- the stamp-review loop leaves its attestation stale after routine findings edits.
+B24: minor -- the PASS-binding claim duplicates existing findings against the run record.
+B25: critical -- the candidate cross-check silently approves non-contiguous ranges with dropped commits.
+B26: major -- the candidate-tip proof record reports a stale findings count.
+B27: major -- the checker CLI misparses an invalid single-dash option as a path.
+B28: minor -- the design record merely misdescribes the span-cut implementation as pattern reuse.
+B29: major -- the attestation record becomes stale when later review edits change the hashed findings.
+B30: minor -- the unsigned-manifest claim is refuted for the offline bundle verifier.
+B31: minor -- the premature attestation-filename claim is refuted in the plan record.
+B32: minor -- the unsigned-bundle claim duplicates another manifest finding.
+B33: critical -- the identity gate authorizes unrelated commits without proving the candidate ancestry chain.
+B34: major -- the interim overlap report announces cuts before measuring all required conditions.
+B35: major -- the identity parser can fail loudly after path text poisons its field extraction.
+B36: minor -- the transcript-replay claim is refuted for the run-record verifier.
+B37: minor -- the fenced-candidate completeness claim is refuted in the plan record.
+B38: minor -- the checklist-state mismatch claim is refuted for the item matcher.
+B39: major -- the checker CLI silently accepts unsupported flags and surplus positional arguments.
+B40: minor -- the findings record's temporarily absent attestation is produced by the ordinary final-round flow.
+B41: minor -- the hostile-title parser-divergence claim is refuted for the bundle manifest.
+B42: critical -- the run-record verifier falsely treats a blocking stamp transcript as passing evidence.
+B43: critical -- the staged-proof gate can ship an untracked findings file without validating it.
+B44: critical -- the stamp read-back verifies worktree bytes instead of the staged artifact.
+B45: major -- the candidate-tip run record reports stale suite and findings totals.
+B46: critical -- the review-range record excludes a head commit covered by the claimed stamp.
+B47: major -- the completion record falsely claims the registry mapping exists in one place.
+B48: critical -- the attestation records a checkout tree instead of the candidate tree.
+B49: major -- the manifest cross-check incorrectly rejects every valid rename candidate.
+B50: major -- the checker CLI executes an invalid self-test and format combination.
+B51: major -- the test suite cannot detect drift between holding patterns and checker diagnostics.
+B52: critical -- the identity gate lets differently cased review titles bypass commit binding.
+B53: major -- the author guide omits a fatal struck-item deferral requirement.
+B54: major -- the stamp failover validates stale file bytes instead of its fresh result.
+B55: major -- the candidate table omits record commits inside its reviewed range.
+B56: minor -- the unchecked stamp-receipt claim duplicates another finding against the procedure.
+B57: major -- the findings parser binds case-varied and duplicate round headings ambiguously.
+B58: major -- the citation validator incorrectly rejects a legal range-stamp form.
+B59: minor -- the checker-binding claim duplicates existing PASS-evidence findings.
+B60: critical -- the attestation schema accepts semantically meaningless verdict and timestamp fields.
+B61: minor -- the assembly-sizing observation duplicates a superseding cap finding.
+B62: major -- the order-pin checker traceback-crashes when a required header is renamed.
+B63: minor -- the unbound-checker-evidence claim duplicates another run-record finding.
+B64: critical -- the anchor checker accepts untracked and external paths as shippable evidence.
+B65: major -- the follow-up ledger omits graph links to the originating findings.
+B66: major -- the completion record falsely claims every usage error exits with code 2.
+B67: major -- the finalized findings record invalidates its earlier attestation and fails read-back.
+B68: minor -- the refusal docstring imprecisely describes membership behavior without stating a false outcome.
+B69: critical -- the manifest parser lets crafted filenames impersonate trusted metadata.
+B70: critical -- the review procedure never invokes the anchor checker required for stamp evidence.
+B71: major -- the export-check CLI accepts invalid flags instead of issuing the required refusal.
+B72: critical -- the content verifier approves rearranged patches that differ from the reviewed artifact.
+B73: critical -- the cost ledger silently corrupts invalid telemetry types into false cost values.
+B74: critical -- the deferral checker approves invalid owner references whenever one owner resolves.
+B75: critical -- the review runner cannot verify that stamp evidence came from the required model.
+B76: major -- the assembly procedure provides no valid route for oversized ranges containing voided commits.
+B77: minor -- the residual-agreement claim is refuted in the findings record.
+B78: minor -- the design record contains only a stale enumeration count.
+B79: critical -- the attestation identity is not bound to the candidate manifest.
+B80: minor -- the contradictory sweep-record claim is refuted in the plan.
+B81: major -- the candidate table omits the latest fix commit from its record.
+B82: minor -- the unread schema-key constant creates maintainability drift without current behavioral impact.
+B83: major -- the review procedure omits a citation rule enforced against findings and attestations.
+B84: major -- the declaration cap makes the next valid assembly impossible to process.
+B85: critical -- the anchor proof trusts unverified worktree bytes for non-stamp evidence files.
+B86: major -- the follow-up ledger loses finding provenance and misstates another item's reference.
+B87: critical -- the calibration checker can falsely report overdue evidence as fresh.
+B88: critical -- the stamp flow permits post-emission findings changes to reach review without read-back.
+B89: minor -- the forged file-list claim is refuted for the manifest parser.
+B90: major -- the stamp workflow can enter an inescapable loop on a bare hold verdict.
+B91: minor -- the describe docstring contains a one-word exception-name error.
+B92: critical -- the citation checker accepts unrelated evidence through substring matching.
+B93: minor -- the checker docstring merely omits a residual clause already stated in code.
+B94: major -- the findings ledger omits a round cited by its completion records.
+B95: critical -- the review procedure never runs the content-coverage gate.
+B96: critical -- the deferral parser misattributes references across intervening section headers.
+B97: critical -- the legacy exemption lets newly authored stamps bypass evidence binding.
+B98: critical -- the review procedure can award a stamp without mechanically verifying its receipt.
+B99: major -- the completion record contradicts its own filed residual defect.
+B100: minor -- the completion record contains only a stale file-size quote.
+B101: critical -- the anchor checker silently skips spaced citations in shipped sections.
+B102: minor -- the completion record contains a stale line-count quote.
+B103: critical -- the attestation read-back verifies disk findings instead of the staged artifact.
+B104: major -- the export checker violates its structured-output contract for unreadable files.
+B105: minor -- the completion note overstates agreement with an incomplete docstring.
+B106: critical -- the cross-check accepts a foreign or reversed range unbound to the manifest identity.
+B107: minor -- the plan record retains a stale absolute suite total forbidden by its discipline.
+B108: critical -- the attestation verifier accepts fabricated PASS evidence unbound to runner output.
+B109: major -- the citation checker emits two failures for one dead-citation defect.

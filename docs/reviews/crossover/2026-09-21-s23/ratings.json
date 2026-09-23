@@ -1,0 +1,568 @@
+{
+ "meta": {
+  "decision": "D00 T04 \u00a723 item 2",
+  "rater": "blinded-sol-20260921",
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "date": "2026-09-21",
+  "latency_s": 196,
+  "cost_tokens": 6324,
+  "exit": 0,
+  "agreement_rater": "blinded-opus-20260921",
+  "agreement_model": "opus",
+  "agreement_effort": "medium",
+  "agreement_latency_s": 20,
+  "agreement_cost_tokens": 38425,
+  "agreement_exit": 0,
+  "blinding": "rung, section, fate detail, current severity, and the decision withheld; scale and disposition rules in-prompt; order shuffled (seed 23); only the prompt on disk in the rating dir during both passes",
+  "rule": "ratings accepted verbatim; overriding any would re-attest; Sol-family pass governs whole, Opus-family pass is the agreement check (pre-committed before either pass ran)",
+  "confirmation": "opus agreement 88/109; differences: B15 (D00-T04-S11-F1) sol-major opus-minor; B28 (D00-T04-S19-F4) sol-minor opus-major; B29 (D00-T04-S21-F2) sol-major opus-critical; B40 (D00-T04-S12-F17) sol-minor opus-major; B46 (D00-T04-S22-F14) sol-critical opus-major; B48 (D00-T04-S12-F2) sol-critical opus-major; B67 (D00-T04-S21-F27) sol-major opus-critical; B69 (D00-T04-S21-F7) sol-critical opus-major; B70 (D00-T04-S21-F3) sol-critical opus-major; B74 (D00-T04-S19-F1) sol-critical opus-major; B75 (D00-T04-S21-F14) sol-critical opus-major; B82 (D00-T04-S22-F11) sol-minor opus-major; B87 (D00-T04-S24-F19) sol-critical opus-major; B88 (D00-T04-S12-F9) sol-critical opus-major; B92 (D00-T04-S20-F2) sol-critical opus-major; B95 (D00-T04-S21-F1) sol-critical opus-major; B96 (D00-T04-S19-F3) sol-critical opus-major; B98 (D00-T04-S12-F12) sol-critical opus-major; B101 (D00-T04-S21-F15) sol-critical opus-major; B105 (D00-T04-S11-F3) sol-minor opus-major; B109 (D00-T04-S24-F13) sol-major opus-minor"
+ },
+ "ratings": {
+  "D00-T04-S21-F35": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F12": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F4": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F16": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F10": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F5": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S20-F5": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S24-F5": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F4": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S20-F6": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F16": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F5": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S22-F2": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S24-F9": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S11-F1": {
+   "blinded": "major",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F10": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F14": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F3": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F8": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F9": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S20-F4": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F31": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F33": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F16": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F11": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F13": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F15": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S19-F4": {
+   "blinded": "minor",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F2": {
+   "blinded": "major",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S24-F2": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F7": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F11": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F1": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S20-F3": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S12-F15": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F7": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F14": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S19-F2": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F1": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S12-F17": {
+   "blinded": "minor",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F17": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F15": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S21-F11": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S12-F13": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S21-F36": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F14": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F3": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F2": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S12-F1": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S22-F9": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S24-F21": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F8": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "minor"
+  },
+  "D00-T04-S20-F7": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F19": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F29": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F16": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F8": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F26": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F18": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F7": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F22": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F8": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F10": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F24": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S21-F28": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F4": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F27": {
+   "blinded": "major",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S22-F17": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F7": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F3": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S22-F5": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F13": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S20-F1": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S19-F1": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F14": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S24-F17": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S11-F5": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S19-F5": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F3": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S24-F12": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F22": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S22-F11": {
+   "blinded": "minor",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F32": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S24-F18": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F20": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S21-F30": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S24-F19": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S12-F9": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S11-F4": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F25": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S22-F10": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S20-F2": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S11-F2": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F23": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F1": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S19-F3": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S24-F6": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S12-F12": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F12": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F34": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F15": {
+   "blinded": "critical",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S21-F21": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F6": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S22-F6": {
+   "blinded": "major",
+   "agreement": "major",
+   "heading": "major"
+  },
+  "D00-T04-S11-F3": {
+   "blinded": "minor",
+   "agreement": "major",
+   "heading": "minor"
+  },
+  "D00-T04-S12-F6": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S24-F20": {
+   "blinded": "minor",
+   "agreement": "minor",
+   "heading": "minor"
+  },
+  "D00-T04-S21-F4": {
+   "blinded": "critical",
+   "agreement": "critical",
+   "heading": "major"
+  },
+  "D00-T04-S24-F13": {
+   "blinded": "major",
+   "agreement": "minor",
+   "heading": "minor"
+  }
+ }
+}
