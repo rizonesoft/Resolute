@@ -163,6 +163,10 @@ def load(path: str | None = None) -> dict:
             raise PanelSlotsError(
                 f"panel slot {name!r} runs the writer's family {family!r}: "
                 f"a governing slot never reviews its own writer")
+        if name in WRITER_FAMILY_SLOTS and family != wfamily:
+            raise PanelSlotsError(
+                f"panel slot {name!r} runs family {family!r}, not the writer's {wfamily!r}: "
+                f"an outage fill in the failing family fills nothing")
         slots[name] = {"model": model, "effort": effort, "timeout": timeout, "family": family}
     if slots["independent"]["family"] != "codex":
         raise PanelSlotsError("panel slot 'independent' runs `codex review` and needs a codex model")
@@ -383,6 +387,10 @@ def _self_test() -> int:
             "does not repeat slot 'signoff'")
     refuses("writer family governs", slot_line(GOOD, "signoff", "model", '"w-claude"'),
             "never reviews its own writer")
+    refuses("cross-fill leaves the writer family", slot_line(GOOD, "cross-fill", "model", '"g-two"'),
+            "an outage fill in the failing family fills nothing")
+    refuses("plan-fallback leaves the writer family", slot_line(GOOD, "plan-fallback", "model", '"g-one"'),
+            "an outage fill in the failing family fills nothing")
     refuses("writer family bulk", slot_line(GOOD, "bulk", "model", '"w-claude"'),
             "never reviews its own writer")
     refuses("unregistered writer", GOOD.replace('model = "w-claude"\n[model', 'model = "x"\n[model', 1),
