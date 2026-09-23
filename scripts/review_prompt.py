@@ -1227,7 +1227,8 @@ def failed_log_report(run_id: str, limit: int = 20) -> str:
     except (OSError, subprocess.TimeoutExpired) as exc:
         return f"ci-wait: failed-step log unavailable ({exc}); the run is still red"
     if proc.returncode != 0:
-        return (f"ci-wait: failed-step log unavailable (gh exited {proc.returncode}); "
+        reason = " ".join(proc.stderr.split())[:200] or "no stderr"
+        return (f"ci-wait: failed-step log unavailable (gh exited {proc.returncode}: {reason}); "
                 f"the run is still red")
     steps, lines = summarize_failed_log(proc.stdout, limit)
     out = [f"ci-wait: failing step(s): {'; '.join(steps) if steps else 'not named by the log'}"]
@@ -5174,7 +5175,9 @@ def _self_test() -> int:
                 "mode = open(state).read().strip()\n"
                 "sys.stdout.reconfigure(encoding='utf-8')\n"
                 "if sys.argv[1:3] == ['run', 'view']:\n"
-                "    if mode == 'nolog': sys.exit(1)\n"
+                "    if mode == 'nolog':\n"
+                "        sys.stderr.write('HTTP 404: log expired for run 9\\n')\n"
+                "        sys.exit(1)\n"
                 "    print('plan-gates\\tValidate the TODO tree\\t\\ufeff2026-09-23T21:37:54.1Z ##[group]Run validate')\n"
                 "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.1Z WARN [adjacency advisory] noise')\n"
                 "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.2Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
@@ -5214,7 +5217,8 @@ def _self_test() -> int:
                 fh.write("nolog")
             code, line = ci_conclusion(c1, "plan-gates", 0, 0)
             check("ci-wait-red-without-a-log-stays-red",
-                  code == 1 and "failed-step log unavailable" in line and "still red" in line, line)
+                  code == 1 and "failed-step log unavailable" in line and "still red" in line
+                  and "HTTP 404: log expired for run 9" in line, line)
             steps, lines = summarize_failed_log("job\tstep\t2026-01-01T00:00:00Z plain\n" * 30, 5)
             steps2, lines2 = summarize_failed_log(
                 "".join(f"j\ts\t2026-01-01T00:00:00Z error {i}\n" for i in range(9)), 3)
