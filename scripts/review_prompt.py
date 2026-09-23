@@ -1179,6 +1179,62 @@ def _gh_argv() -> list[str]:
     return [default] if os.path.isfile(default) else ["gh"]
 
 
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*m|\^\[\[[0-9;]*m")
+_LOG_TS_RE = re.compile(r"^﻿?\d{4}-\d{2}-\d{2}T[\d:.]+Z\s?")
+_LOG_SIGNAL_RE = re.compile(r"(?i)\b(fatal|error|fail(ed|ure)?|exception|traceback|refused)\b")
+
+
+def summarize_failed_log(text: str, limit: int = 20) -> tuple[list[str], list[str]]:
+    """(failing `job / step` names in order, bounded excerpt) from `gh run
+    view --log-failed` output, whose lines read `job<TAB>step<TAB>log`
+    (probed 2026-09-24). The excerpt prefers the signal lines (fatal,
+    error, fail, traceback) and falls back to the log's last lines, so a
+    repair starts from the evidence (D00 T04 §31)."""
+    steps: list[str] = []
+    body: list[str] = []
+    for raw in text.splitlines():
+        parts = raw.split("\t", 2)
+        if len(parts) == 3:
+            name = f"{parts[0]} / {parts[1]}"
+            if name not in steps:
+                steps.append(name)
+            line = parts[2]
+        else:
+            line = raw
+        line = _ANSI_RE.sub("", _LOG_TS_RE.sub("", line)).rstrip()
+        if line and not line.startswith("##[group]") and not line.startswith("##[endgroup]"):
+            body.append(line)
+    signal = [ln for ln in body if _LOG_SIGNAL_RE.search(ln)]
+    # Repeated lines collapse to one with a count, in first-seen order: a
+    # validator reports one defect once per cite, and seven identical
+    # lines hide the other defects inside the bound.
+    counts: dict[str, int] = {}
+    for ln in (signal or body):
+        counts[ln] = counts.get(ln, 0) + 1
+    picked = [ln if n == 1 else f"{ln} (x{n})" for ln, n in counts.items()][-limit:]
+    return steps, picked
+
+
+def failed_log_report(run_id: str, limit: int = 20) -> str:
+    """The failing steps and a bounded excerpt of a red run, or the reason
+    the log could not be read: a red verdict never becomes less red
+    because its log was unavailable."""
+    import subprocess
+    try:
+        proc = subprocess.run([*_gh_argv(), "run", "view", run_id, "--log-failed"],
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", timeout=120)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return f"ci-wait: failed-step log unavailable ({exc}); the run is still red"
+    if proc.returncode != 0:
+        return (f"ci-wait: failed-step log unavailable (gh exited {proc.returncode}); "
+                f"the run is still red")
+    steps, lines = summarize_failed_log(proc.stdout, limit)
+    out = [f"ci-wait: failing step(s): {'; '.join(steps) if steps else 'not named by the log'}"]
+    out += [f"ci-wait: | {ln}" for ln in lines]
+    return "\n".join(out)
+
+
 def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float) -> tuple[int, str]:
     """Wait for `workflow`'s run on `sha` and return (exit, line): 0 green,
     1 red (any completed conclusion but success), 2 unverifiable (no gh,
@@ -1212,6 +1268,8 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float) -> t
             if run.get("status") == "completed":
                 verdict = run.get("conclusion") or "unknown"
                 line = f"ci-wait: {sha[:12]} {workflow} {verdict} {run.get('url', '')}".rstrip()
+                if verdict != "success" and run.get("databaseId"):
+                    line += "\n" + failed_log_report(str(run["databaseId"]))
                 return (0 if verdict == "success" else 1), line
             last = f"run {run.get('databaseId')} {run.get('status')}"
         if time.monotonic() >= deadline:
@@ -5114,6 +5172,20 @@ def _self_test() -> int:
                 "import json, sys, os\n"
                 f"state = {state!r}\n"
                 "mode = open(state).read().strip()\n"
+                "sys.stdout.reconfigure(encoding='utf-8')\n"
+                "if sys.argv[1:3] == ['run', 'view']:\n"
+                "    if mode == 'nolog': sys.exit(1)\n"
+                "    print('plan-gates\\tValidate the TODO tree\\t\\ufeff2026-09-23T21:37:54.1Z ##[group]Run validate')\n"
+                "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.1Z WARN [adjacency advisory] noise')\n"
+                "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.2Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
+                "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.3Z ##[error]Process completed with exit code 1.')\n"
+                "    sys.exit(0)\n"
+                "if mode == 'flaky':\n"
+                "    count = os.path.join(os.path.dirname(state), 'flaky-count')\n"
+                "    n = int(open(count).read()) if os.path.exists(count) else 0\n"
+                "    open(count, 'w').write(str(n + 1))\n"
+                "    mode = 'pending' if n == 0 else 'success'\n"
+                "if mode == 'nolog': mode = 'failure'\n"
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
@@ -5130,6 +5202,44 @@ def _self_test() -> int:
                     fh.write(mode)
                 code, line = ci_conclusion(c1, "plan-gates", 0, 0)
                 check(f"ci-wait-{mode}", code == want and needle in line, f"code={code} line={line!r}")
+            # D00 T04 §31: red shows the failing step and the evidence.
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("failure")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+            check("ci-wait-red-names-the-failing-step",
+                  code == 1 and "failing step(s): plan-gates / Validate the TODO tree" in line
+                  and "FATAL x.md:9 candidate c6b1 resolves to nothing" in line
+                  and "adjacency advisory" not in line and "##[group]" not in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("nolog")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+            check("ci-wait-red-without-a-log-stays-red",
+                  code == 1 and "failed-step log unavailable" in line and "still red" in line, line)
+            steps, lines = summarize_failed_log("job\tstep\t2026-01-01T00:00:00Z plain\n" * 30, 5)
+            steps2, lines2 = summarize_failed_log(
+                "".join(f"j\ts\t2026-01-01T00:00:00Z error {i}\n" for i in range(9)), 3)
+            check("failed-log-excerpt-keeps-the-last-distinct-lines",
+                  lines2 == ["error 6", "error 7", "error 8"], str(lines2))
+            check("failed-log-excerpt-bounded-with-fallback", steps == ["job / step"] and lines == ["plain (x30)"],
+                  f"{steps} {lines}")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("flaky")
+            got_fl = subprocess.run([sys.executable, me, "ci-wait", c1, "--since", "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                                     "--workflow-file", os.path.join(tmpd, "no-such.yml"),
+                                     "--timeout", "0", "--interval", "0", "--retry-wait", "0"],
+                                    cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-retries-an-unverifiable-read-back-once",
+                  got_fl.returncode == 0 and "retrying once" in got_fl.stderr and "plan-gates success" in got_fl.stdout,
+                  f"exit={got_fl.returncode} out={got_fl.stdout!r} err={got_fl.stderr!r}")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("pending")
+            got_esc = subprocess.run([sys.executable, me, "ci-wait", c1, "--since", "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                                      "--workflow-file", os.path.join(tmpd, "no-such.yml"),
+                                      "--timeout", "0", "--interval", "0", "--retry-wait", "0"],
+                                     cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-escalates-after-one-retry",
+                  got_esc.returncode == 2 and "still unverifiable after one retry: escalate" in got_esc.stderr,
+                  f"exit={got_esc.returncode} err={got_esc.stderr!r}")
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("failure")
             got = subprocess.run([sys.executable, me, "ci-wait", c1[:10], "--since", "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
@@ -5205,7 +5315,10 @@ def _self_test() -> int:
             ("skill-reachable-before-push", "check-reachable --findings <findings path> --refs $COMMIT"),
             ("skill-reachable-after-push", "check-reachable --findings <findings path> --remote origin"),
             ("skill-ci-wait", "python scripts/review_prompt.py ci-wait $COMMIT"),
-            ("skill-ci-red-stops", "A red or unverifiable read-back stops the run"),
+            ("skill-ci-red-repairs", "A red read-back is a failed gate, and the run repairs it rather than waiting on it"),
+            ("skill-ci-repair-bound", "at most three repair attempts per red"),
+            ("skill-ci-escalation", "escalates to the operator only for a cause the tree cannot fix"),
+            ("skill-ci-continue", "On green it continues with the next section in the same turn"),
             ("skill-push-readback",
              'git ls-remote origin refs/heads/master | cut -f1)" = "$COMMIT"'),
             ("skill-push-residual", "a concurrent force-push after it still moves the ref"),
@@ -6065,6 +6178,7 @@ if __name__ == "__main__":
         # (independent review of the §30 ship, P1).
         rest = sys.argv[2:]
         sha_arg, workflow, timeout, interval = rest[0], "plan-gates", 900.0, 15.0
+        retry_wait = 60.0
         since = None
         wf_file = None
         wf_path = ".github/workflows/plan.yml"
@@ -6081,6 +6195,8 @@ if __name__ == "__main__":
                     timeout = float(rest[i + 1])
                 elif rest[i] == "--interval":
                     interval = float(rest[i + 1])
+                elif rest[i] == "--retry-wait":
+                    retry_wait = float(rest[i + 1])
                 else:
                     raise ValueError(rest[i])
                 i += 2
@@ -6104,6 +6220,16 @@ if __name__ == "__main__":
                   f"({len(changed)} changed path(s), none in the workflow's path filter)")
             sys.exit(0)
         code, line = ci_conclusion(ident[0], workflow, timeout, interval)
+        if code == 2:
+            # One retry before escalating (D00 T04 §31): GitHub lag or a
+            # transient gh failure is not yet a cause outside the tree.
+            print(f"{line}\nci-wait: unverifiable, retrying once in {int(retry_wait)}s", file=sys.stderr)
+            import time as _time
+            _time.sleep(retry_wait)
+            code, line = ci_conclusion(ident[0], workflow, timeout, interval)
+            if code == 2:
+                line += ("\nci-wait: still unverifiable after one retry: escalate "
+                         "(GitHub, gh, or the runner is outside the tree)")
         print(line, file=sys.stdout if code == 0 else sys.stderr)
         sys.exit(code)
     if len(sys.argv) == 4 and sys.argv[1] == "check-parents":
