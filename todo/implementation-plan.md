@@ -121,7 +121,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §20` | Review-tooling operability follow-ups             |  20   |
 | [x] | `D00 T04 §21` | Review-input integrity hardening                  |  17   |
 | [x] | `D00 T04 §22` | Checker diagnostic codes and structured errors    |   4   |
-| [ ] | `D00 T04 §23` | Third two-model revisit                           |   7   |
+| [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   6   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
 | [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  12   |
