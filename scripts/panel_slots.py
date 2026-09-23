@@ -555,8 +555,8 @@ def _self_test() -> int:
             GOOD.replace('family = "codex"\nprobed = "2026-09-23"\n[model."g-old"]',
                          'family = "codex"\n[model."g-old"]'),
             "carries no probed date")
-    refuses("bad family", GOOD.replace('[model."g-one"]\nfamily = "codex"', '[model."g-one"]\nfamily = "muse"'),
-            "family 'muse' is outside")
+    refuses("bad family", GOOD.replace('[model."g-one"]\nfamily = "codex"', '[model."g-one"]\nfamily = "other"'),
+            "family 'other' is outside")
     refuses("bad toml", "[writer\n", "does not parse")
     # Writer flips to codex: every codex slot now fails.
     flipped = GOOD.replace('[writer]\nmodel = "w-claude"', '[writer]\nmodel = "g-one"')

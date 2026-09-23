@@ -105,7 +105,7 @@ REOPENED_BODY_RE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2})\s*\|\s*(?P<rest>.+)
 IMPLEMENTER_RE = re.compile(
     r"^(?:(?P<name>[A-Za-z][A-Za-z0-9 .-]{0,120}?)\s*\((?P<model>[a-z][a-z0-9.-]{0,120})\)|not recorded\b.*)$"
 )
-REVIEW_FAMILIES = ("codex", "grok", "claude", "kimi", "opencode", "qwen", "muse", "gemini")
+REVIEW_FAMILIES = ("codex", "grok", "claude", "kimi", "opencode", "qwen", "gemini")
 # A per-kind verdict. Corrected 2026-08-30: a required job id between kind and
 # verdict matched no real stamp, so the Progress page showed no chips. The gap
 # may cross no `|`, `·` or BACKTICK -- else a match on the fingerprint eats the
@@ -122,7 +122,7 @@ REVIEW_ENTRY_RE = re.compile(
     r"[^|·\n`]{0,60}?"
     r"\b(?P<verdict>approve|needs-attention|advisory|skipped(?:-limit|\s*\(limit\))?)"
     r"(?:\s*\(\d+[^)]*\))?"
-    r"(?:\s*\((?:(?P<family>codex|grok|claude|kimi|opencode|qwen|muse|gemini)"
+    r"(?:\s*\((?:(?P<family>codex|grok|claude|kimi|opencode|qwen|gemini)"
     r"(?:\s+(?P<model>[A-Za-z0-9][\w.:/-]*))?(?:\s*×(?P<runs>\d+))?"
     r"|(?P<unrecorded>model not recorded))\))?",
     re.IGNORECASE,
@@ -139,8 +139,7 @@ REVIEW_KIND_LABELS = {
     "design": "Design",
     "fidelity": "Fidelity",
     "integration": "Integration",
-    # The stage 3 and 4 advisory passes (writers-and-reviewers §7): gray badges.
-    "muse-final": "Muse final",
+    # The stage 4 advisory pass (writers-and-reviewers §7): a gray badge.
     "adversarial-final": "Qwen final",
 }
 DURATION_BODY_RE = re.compile(r"^(?P<minutes>\d+)\s*m?$")
@@ -5612,9 +5611,9 @@ track: Z1
         check("provenance: count then family, no model", (prov[1]["family"], prov[1]["model"], prov[1]["runs"]), ("grok", None, 7))
         check("provenance: model not recorded", (prov[2]["family"], prov[2]["model"], prov[2]["status"]), (None, None, "passed"))
         check("provenance: claude opus", (prov[3]["family"], prov[3]["model"]), ("claude", "opus"))
-        final = _review_entries("`adversarial` approve (codex gpt-6-astra ×1) · `adversarial-final` advisory (qwen qwen3.8-max ×1) · `muse-final` advisory (skipped)")
+        final = _review_entries("`adversarial` approve (codex gpt-6-astra ×1) · `adversarial-final` advisory (qwen qwen3.8-max ×1) · `fidelity` advisory (skipped)")
         check("advisory pass: family, model, status", (final[1]["kind"], final[1]["family"], final[1]["model"], final[1]["status"], final[1]["label"]), ("adversarial-final", "qwen", "qwen3.8-max", "advisory", "Qwen final"))
-        check("advisory skipped: status skipped, no family", (final[2]["kind"], final[2]["family"], final[2]["status"]), ("muse-final", None, "skipped"))
+        check("advisory skipped: status skipped, no family", (final[2]["kind"], final[2]["family"], final[2]["status"]), ("fidelity", None, "skipped"))
         bare = _review_entries("`adversarial` approve · `record` needs-attention (1)")
         check("a stamp without provenance still yields its kinds", [(r["kind"], r["family"]) for r in bare], [("adversarial", None), ("record", None)])
         # D00 T08 §4: Git abbreviations are a range, not just 12-character fingerprints.
@@ -5627,7 +5626,7 @@ track: Z1
         legacy_kinds = (
             "correctness", "data-safety", "integration", "fix-review", "adversarial",
             "consistency", "optimisation", "record", "opus", "source-defect", "design",
-            "muse-final", "adversarial-final", "fidelity", "escalation", "security",
+            "adversarial-final", "fidelity", "escalation", "security",
         )
         for kind in legacy_kinds:
             entry = _review_entries(f"`{kind}` approve (claude opus ×2)")
