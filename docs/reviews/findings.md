@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**314 findings across 39 sections.**
+**323 findings across 40 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 104 | the plan or the evidence misdescribes what happened |
+| `record` | 106 | the plan or the evidence misdescribes what happened |
 | `adversarial` | 68 | fails under hostile or unexpected input |
-| `consistency` | 51 | disagrees with the rest of the suite, its naming, or its layout |
-| `correctness` | 42 | the code does the wrong thing |
+| `consistency` | 54 | disagrees with the rest of the suite, its naming, or its layout |
+| `correctness` | 46 | the code does the wrong thing |
 | `integration` | 35 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 151 | wrong behavior in code, plan, or record |
-| `minor` | 157 | polish or wording, or no surviving defect |
+| `major` | 154 | wrong behavior in code, plan, or record |
+| `minor` | 163 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -289,6 +289,15 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §27` | F4 | minor | `record` | fixed | independent | Done note quotes the pre-fix self-test count |
 | `D00 T04 §27` | F5 | major | `record` | fixed | independent | skills item describes liveness the candidate no longer implements |
 | `D00 T04 §27` | F6 | minor | `correctness` | filed | independent | POSIX timeout kills the producer but not its children |
+| `D00 T04 §29` | F1 | major | `correctness` | fixed | independent | caller arguments can follow the Grok tool restrictions |
+| `D00 T04 §29` | F2 | minor | `consistency` | fixed | independent | show prints the alias instead of the model that runs |
+| `D00 T04 §29` | F3 | major | `correctness` | fixed | independent | the resolver can pick a model named only in prose |
+| `D00 T04 §29` | F4 | major | `record` | fixed | independent | the newest alias passes as a recorded model |
+| `D00 T04 §29` | F5 | minor | `correctness` | fixed | independent | a refused Grok call leaves the prompt file on disk |
+| `D00 T04 §29` | F6 | minor | `consistency` | fixed | independent | marker grammar sentence still owes a retry from every fallback |
+| `D00 T04 §29` | F7 | minor | `record` | fixed | independent | failing-listing exit not quoted |
+| `D00 T04 §29` | F8 | minor | `correctness` | filed | independent | prompt file survives an exception before cleanup is armed |
+| `D00 T04 §29` | F9 | minor | `consistency` | filed | independent | pre-Grok matrix wording survives at two sites |
 | `D00 T04 §3` | F1 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F2 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |
 | `D00 T04 §3` | F3 | major | `correctness` | fixed | independent | raised by the independent review, all three correct |

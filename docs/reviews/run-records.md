@@ -412,3 +412,15 @@ round: 4 model: gpt-6-sol effort: high outcome: findings candidate: 867e2813 pro
 # round 4's finding sits below the blocking bar and files to D00 T04 §26 without a fifth round.
 empty: 0
 refuted: 0
+
+run: D00-T04-S29
+date: 2026-09-23
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-sol effort: medium outcome: findings candidate: 4948e49b provider: openai version: gpt-6-sol cost: 41312tokens latency: 52s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S29-F1, D00-T04-S29-F2, D00-T04-S29-F3, D00-T04-S29-F4
+round: 2 model: gpt-6-sol effort: medium outcome: findings candidate: c8a8e738 provider: openai version: gpt-6-sol cost: 47712tokens latency: 67s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S29-F5, D00-T04-S29-F6, D00-T04-S29-F7
+round: 3 model: gpt-6-sol effort: high outcome: findings candidate: cbcc00fc provider: openai version: gpt-6-sol cost: 53403tokens latency: 140s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S29-F8, D00-T04-S29-F9
+# round 3's findings sit below the blocking bar and file to D00 T04 §28; round 4 is the operator-requested confirmation round.
+round: 4 model: gpt-6-sol effort: high outcome: empty candidate: dc0ad96c provider: openai version: gpt-6-sol cost: 49122tokens latency: 32s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+empty: 1
+refuted: 0
