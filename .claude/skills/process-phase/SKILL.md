@@ -62,7 +62,7 @@ Read the phase as a user would use it, end to end, and ask what is missing: surf
 
 ## Step 3 -- ship the phase, one row at a time
 
-In table order, for each open row: `process-todo-section`, then `review-todo-section`. Record each outcome in the findings file's Sections log. After each stamp, sync the plan. Commit per section; push per the two-push discipline (ship push, then stamp push). After every push, `python scripts/review_prompt.py ci-wait <pushed sha>` reads CI back and the run file records its line; a red or unverifiable read-back stops the loop until the build is green again (D00 T04 §30), because every later section would otherwise build on it.
+In table order, for each open row: `process-todo-section`, then `review-todo-section`. Record each outcome in the findings file's Sections log. After each stamp, sync the plan. Commit per section; push per the two-push discipline (ship push, then stamp push). After every push, `python scripts/review_prompt.py ci-wait <pushed head> --since <remote head before the push>` reads CI back (a push whose paths miss the workflow's filter reads `not triggered`) and the run file records its line; a red or unverifiable read-back stops the loop until the build is green again (D00 T04 §30), because every later section would otherwise build on it.
 
 Skip rows whose `resolve` is not exit 0 or whose verdict is runnable-elsewhere here, and re-check them after each stamp: the graph moves as rows flip. When every remaining open row is exit 4 (or otherwise unshippable here), the phase parks: write the park record (each leftover, what blocks it, where the blocker lives), commit the findings file, and if pinned standalone delete the guard and record its deletion. Then return to `process-plan` (or end, if pinned).
 

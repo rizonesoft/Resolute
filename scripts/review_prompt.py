@@ -1091,6 +1091,62 @@ def provenance_tag(candidate: str, prefix: str, cwd=None) -> tuple[str | None, s
     return tag, ""
 
 
+def workflow_path_filters(workflow_file: str) -> list[str] | None:
+    """The `on.push.paths` globs of a GitHub workflow, or None when the
+    workflow filters no paths (every push runs it). Read line by line
+    rather than through a YAML parser, because the tree carries no
+    external dependency: the list items under the first `paths:` key
+    are the filter."""
+    try:
+        with open(workflow_file, encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+    except OSError:
+        return None
+    globs: list[str] = []
+    in_paths = False
+    indent = None
+    for line in lines:
+        stripped = line.strip()
+        if not in_paths:
+            if stripped == "paths:":
+                in_paths = True
+                indent = len(line) - len(line.lstrip())
+            continue
+        if not stripped or stripped.startswith("#"):
+            continue
+        if len(line) - len(line.lstrip()) <= indent or not stripped.startswith("- "):
+            break
+        globs.append(stripped[2:].strip().strip("'\""))
+    return globs or None
+
+
+def _glob_regex(glob: str) -> re.Pattern:
+    """GitHub path-filter semantics for the shapes this tree uses: `**`
+    crosses directories, `*` stays inside one."""
+    out = ""
+    i = 0
+    while i < len(glob):
+        if glob.startswith("**", i):
+            out += ".*"
+            i += 2
+        elif glob[i] == "*":
+            out += "[^/]*"
+            i += 1
+        else:
+            out += re.escape(glob[i])
+            i += 1
+    return re.compile(out + r"\Z")
+
+
+def push_triggers_workflow(changed: list[str], globs: list[str] | None) -> bool:
+    """Whether a push touching `changed` runs a workflow filtered by
+    `globs` (None: unfiltered, so always)."""
+    if globs is None:
+        return True
+    pats = [_glob_regex(g) for g in globs]
+    return any(pat.match(path) for path in changed for pat in pats)
+
+
 def _gh_argv() -> list[str]:
     """The GitHub CLI: `GH` when set (a `.py` path runs under this
     interpreter, which is how the self-test fakes it), else `gh` on PATH,
@@ -1111,7 +1167,9 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float) -> t
     1 red (any completed conclusion but success), 2 unverifiable (no gh,
     no run by the deadline, or unreadable output). `gh run list
     --commit` matches only a full 40-hex sha (a short one returns `[]`,
-    probed 2026-09-23), so the caller resolves it first."""
+    probed 2026-09-23), so the caller resolves it first. GitHub runs a
+    workflow for a push's head commit only, so `sha` must be the pushed
+    head: an intermediate commit of a multi-commit push never gets a run."""
     import json as _json
     import subprocess
     import time
@@ -5057,8 +5115,31 @@ def _self_test() -> int:
                 check(f"ci-wait-{mode}", code == want and needle in line, f"code={code} line={line!r}")
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("failure")
-            got = subprocess.run([sys.executable, me, "ci-wait", c1[:10], "--timeout", "0", "--interval", "0"],
+            got = subprocess.run([sys.executable, me, "ci-wait", c1[:10], "--since", "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                                  "--workflow-file", os.path.join(tmpd, "no-such.yml"),
+                                  "--timeout", "0", "--interval", "0"],
                                  cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            wf = os.path.join(tmpd, "wf.yml")
+            with open(wf, "w", encoding="utf-8") as fh:
+                fh.write("on:\n  push:\n    branches: [master]\n    paths:\n"
+                         "      - 'scripts/**'\n      - 'todo/**'\n      - '.gitattributes'\n"
+                         "jobs:\n  x:\n    runs-on: ubuntu-24.04\n")
+            check("workflow-path-filters-parsed",
+                  workflow_path_filters(wf) == ["scripts/**", "todo/**", ".gitattributes"],
+                  str(workflow_path_filters(wf)))
+            check("push-triggers-on-a-filtered-path",
+                  push_triggers_workflow(["todo/00-x/TODO-01.md"], workflow_path_filters(wf))
+                  and push_triggers_workflow([".gitattributes"], workflow_path_filters(wf)))
+            check("push-skips-code-only-changes",
+                  not push_triggers_workflow(["src/main.cpp", "shared/ui/x.h", "extensions/Tool/a.cpp"],
+                                             workflow_path_filters(wf)))
+            check("unfiltered-workflow-always-triggers", push_triggers_workflow(["src/a.cpp"], None))
+            got_nt = subprocess.run([sys.executable, me, "ci-wait", c1, "--since", c1,
+                                  "--workflow-file", wf, "--timeout", "0", "--interval", "0"],
+                                 cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-reads-not-triggered-without-waiting",
+                  got_nt.returncode == 0 and "not triggered" in got_nt.stdout,
+                  f"exit={got_nt.returncode} out={got_nt.stdout!r} err={got_nt.stderr!r}")
             check("ci-wait-cli-resolves-short-sha-and-fails-red",
                   got.returncode == 1 and c1[:12] in got.stderr and "failure" in got.stderr,
                   f"exit={got.returncode} err={got.stderr!r}")
@@ -5940,15 +6021,25 @@ if __name__ == "__main__":
         print(f"check-reachable: {len(cands)} candidate(s) reachable from {where}")
         sys.exit(0)
     if len(sys.argv) >= 3 and sys.argv[1] == "ci-wait":
-        # ci-wait <sha> [--workflow W] [--timeout S] [--interval S]
-        # (D00 T04 §30): read CI back after a push; red stops the run.
+        # ci-wait <sha> [--since <base>] [--workflow W] [--workflow-file F]
+        #         [--timeout S] [--interval S]
+        # (D00 T04 §30): read CI back after a push; red stops the run. A
+        # push whose changed paths miss the workflow's path filter starts
+        # no run, so it reads "not triggered" instead of waiting it out
+        # (independent review of the §30 ship, P1).
         rest = sys.argv[2:]
         sha_arg, workflow, timeout, interval = rest[0], "plan-gates", 900.0, 15.0
+        since = None
+        wf_file = os.path.join(".github", "workflows", "plan.yml")
         i = 1
         try:
             while i < len(rest):
                 if rest[i] == "--workflow":
                     workflow = rest[i + 1]
+                elif rest[i] == "--since":
+                    since = rest[i + 1]
+                elif rest[i] == "--workflow-file":
+                    wf_file = rest[i + 1]
                 elif rest[i] == "--timeout":
                     timeout = float(rest[i + 1])
                 elif rest[i] == "--interval":
@@ -5963,6 +6054,16 @@ if __name__ == "__main__":
         if ident is None or ident[1] != "commit":
             print(f"ci-wait: {sha_arg} is not a commit here", file=sys.stderr)
             sys.exit(2)
+        base = since or ident[0] + "^"
+        rc_d, diff = _git_out(["diff", "--name-only", base, ident[0]])
+        if rc_d != 0:
+            print(f"ci-wait: cannot list the paths {base}..{ident[0][:12]} changed", file=sys.stderr)
+            sys.exit(2)
+        changed = [ln for ln in diff.splitlines() if ln.strip()]
+        if not push_triggers_workflow(changed, workflow_path_filters(wf_file)):
+            print(f"ci-wait: {ident[0][:12]} {workflow} not triggered "
+                  f"({len(changed)} changed path(s), none in the workflow's path filter)")
+            sys.exit(0)
         code, line = ci_conclusion(ident[0], workflow, timeout, interval)
         print(line, file=sys.stdout if code == 0 else sys.stderr)
         sys.exit(code)
