@@ -124,7 +124,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   6   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
-| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  12   |
+| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  14   |
 | [x] | `D00 T04 §27` | One writer, a GPT-governed panel, slot-bound pins |   6   |
 | [ ] | `D00 T04 §28` | Slot-table review follow-ups                      |  11   |
 | [x] | `D00 T04 §29` | Grok fallbacks on the newest Grok model           |   6   |
