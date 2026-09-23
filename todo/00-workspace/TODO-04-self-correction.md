@@ -88,7 +88,7 @@ track: W1
 |  28   |   §28   | Slot-table review follow-ups                   | §27 |  [ ]   |
 |  29   |   §29   | Grok fallbacks on the newest Grok model        | §27 |  [x]   |
 |  30   |   §30   | CI read-back and reachable provenance          | §24 |  [x]   |
-|  31   |   §31   | Red CI repaired, not waited on                 | §30 |  [ ]   |
+|  31   |   §31   | Red CI repaired, not waited on                 | §30 |  [x]   |
 |  32   |   §32   | Campaign guard: stop hook, heartbeat, breaker  | --  |  [ ]   |
 |  33   |   §33   | CI repair-loop follow-ups                      | §31 |  [ ]   |
 
@@ -1294,13 +1294,20 @@ Operator direction 2026-09-24, correcting D00 T04 §30: a red CI read-back must 
 - [x] Repair a red read-back as a failed gate: the runner diagnoses from the printed log, fixes the cause forward in a repair commit (or, when the red is the just-stamped section's own change, reopens that section through audit stance), pushes, and reads CI back again; on green it continues with the next section in the same turn. Done when: `process-phase`, `process-todo-section`, and the review skill's push block state the loop, the §30 "stops the loop" wording is gone, and skill pins hold the loop's sentences, quoted. Done: the review skill's push block, `process-phase` Step 3, and `process-todo-section` step 7 state the loop (diagnose from the printed evidence, fix forward in a repair commit or reopen the just-stamped section through audit stance, push through the same block, read back, continue on green in the same turn); `grep -rn "stops the run\|stops the loop" .claude/skills/` prints nothing; pins `skill-ci-red-repairs` and `skill-ci-continue` hold the sentences. **Corrected 2026-09-24 by the independent review (two P1s):** a reopened section is repaired, re-reviewed, and re-stamped before anything continues, and a red on a SHIP push makes the repair commit the new candidate for the checkpoint, the independent review, and the panel; pins `skill-ci-reopen-restamp` and `skill-ci-repaired-candidate` hold both.
 - [x] Bound the repair: at most three repair attempts per red, and a unit patched in three consecutive attempts is rethought rather than patched again, matching the review loop's rule. Done when: the skills state the bound and the run file records each attempt (commit, CI line), quoted from the skill text. Done: the skills state at most three repair attempts per red, each recorded in the run file with its commit and `ci-wait` line, and the three-consecutive-patches rethink rule; pin `skill-ci-repair-bound` holds it.
 - [x] Escalate only what the tree cannot fix: a red whose failing step never ran the repository's code (checkout, runner setup, a lost runner), an unverifiable read-back that stays unverifiable after one retry (GitHub unreachable, `gh` missing or unauthenticated, runner quota), or a repair bound exhausted. Done when: `ci-wait` names the failing step so the distinction is visible, the skills name exactly these escalation causes, the run file records the cause before the run reports to the operator, and a fixture leg shows an unverifiable read-back retried once, quoted. Done: the skills name exactly the three causes (a failing step that never ran the repository's code, a read-back still unverifiable after one retry, the repair bound exhausted) and require the run file to record the cause before the report; `ci-wait` retries an unverifiable read-back once (`--retry-wait`, default 60 s) and then prints `still unverifiable after one retry: escalate`. Legs: a flaky listing retried once reads green, a pending one escalates after the retry (2 legs); pin `skill-ci-escalation`.
-- [ ] Commit: `"workspace: red CI repaired, not waited on"`
+- [x] Commit: `"workspace: red CI repaired, not waited on"`
 
 **Test checkpoint:** The red fixture prints the failing step and a bounded excerpt, a failed log fetch still reads red, and the retry leg retries an unverifiable read-back once, all quoted from `review_prompt.py --self-test`; the real red run prints its failing step and lines; the skill pins hold the repair loop, the bound, the escalation list, and the continue-on-green sentence.
 
 -> XREF: D00 T04 §30 -- the read-back this section turns from a stop into a repair loop
 -> SOURCE: operator-2026-09-24-ci-self-repair
 -> XREF: D00 T04 §33 -- the eight plan-review follow-ups filed from this section
+
+> **Verified:** 2026-09-24 | §31 | a red read-back prints its failing job and step and a bounded, deduplicated excerpt, quoted from fixtures and from the real red run `06e570b5` (`plan-gates / Validate the TODO tree`, the three distinct `resolves to nothing` defects); a failed log fetch still reads red with `gh`'s reason; an unverifiable read-back is retried once and then escalates, quoted; the skills state the repair loop, the re-stamp of a reopened section, the repaired head as the new candidate, the three-attempt bound, the escalation causes, and continue-on-green, each held by a pin; `review_prompt.py --self-test` `356 cases, 0 failed`; `scripts/check-all.ps1 validate` `18 gate(s) ok` at the ship commit `bca02b52`
+> **Review:** round 3 GPT signoff, candidates `3b6c5620`(round 1) `7c3ea4cf`(round 3) -- `adversarial` approves at round 3 · `consistency` approves at round 3 · `integration` approves at round 3, closed: 1 fixed · `record` approves at round 3 · `source-defect` approves in-session · `design` not owed. Round 2 read the same candidate as round 3 and approved. Independent pass on the implementation commit bca02b52 (`independent` slot, gpt-6-sol high): two P1s, both right, fixed in 3b6c5620 before round 1. Raw findings: docs/reviews/00-workspace/D00-T04-s31.md Attestation: docs/reviews/00-workspace/D00-T04-s31.attest.json
+> **Plan review:** sol (run 20260923-D00-T04-S31-sol) -- filed: D00 T04 §33 (PR1, PR2, PR3, PR4, PR5, PR6, PR7, PR8)
+> **CRUD:** not applicable (review tooling, skill text, and review records; writes no user-facing data path)
+> **Duration:** 2026-09-23T23:20:26Z to 2026-09-23T23:44:41Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 32. Campaign Guard: Stop Hook, Heartbeat, Breaker
 

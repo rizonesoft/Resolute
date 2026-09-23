@@ -437,3 +437,15 @@ round: 3 model: gpt-6-sol effort: high outcome: empty candidate: 6981ac4b provid
 round: 4 model: gpt-6-sol effort: high outcome: independent candidate: da5ca346 provider: openai version: gpt-6-sol cost: unresolved latency: 219s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S30-F1
 empty: 1
 refuted: 0
+
+run: D00-T04-S31
+date: 2026-09-23
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-sol effort: medium outcome: findings candidate: 3b6c5620 provider: openai version: gpt-6-sol cost: 39800tokens latency: 101s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S31-F3
+round: 2 model: gpt-6-sol effort: medium outcome: empty candidate: 7c3ea4cf provider: openai version: gpt-6-sol cost: 21787tokens latency: 29s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+round: 3 model: gpt-6-sol effort: high outcome: empty candidate: 7c3ea4cf provider: openai version: gpt-6-sol cost: 21603tokens latency: 26s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings:
+# round 4 is the independent pass (`panel_slots.py exec independent --commit bca02b52`, ran before panel round 1); the runner printed no token figure.
+round: 4 model: gpt-6-sol effort: high outcome: independent candidate: bca02b52 provider: openai version: gpt-6-sol cost: unresolved latency: 98s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S31-F1, D00-T04-S31-F2
+empty: 2
+refuted: 0

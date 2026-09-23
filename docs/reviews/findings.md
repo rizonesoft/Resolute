@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**327 findings across 41 sections.**
+**330 findings across 42 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 107 | the plan or the evidence misdescribes what happened |
+| `record` | 108 | the plan or the evidence misdescribes what happened |
 | `adversarial` | 68 | fails under hostile or unexpected input |
 | `consistency` | 54 | disagrees with the rest of the suite, its naming, or its layout |
-| `correctness` | 49 | the code does the wrong thing |
-| `integration` | 35 | a consumer, caller, or downstream artifact no longer holds |
+| `correctness` | 50 | the code does the wrong thing |
+| `integration` | 36 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 157 | wrong behavior in code, plan, or record |
-| `minor` | 164 | polish or wording, or no surviving defect |
+| `major` | 159 | wrong behavior in code, plan, or record |
+| `minor` | 165 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -306,6 +306,9 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §30` | F2 | major | `correctness` | fixed | independent | the read-back trusts the working tree's workflow filter |
 | `D00 T04 §30` | F3 | minor | `record` | fixed | independent | the SHIP read-back line has no record |
 | `D00 T04 §30` | F4 | major | `correctness` | fixed | independent | the stamp can land without its provenance tags |
+| `D00 T04 §31` | F1 | major | `record` | fixed | independent | a SHIP-push repair keeps the pre-repair candidate |
+| `D00 T04 §31` | F2 | major | `correctness` | fixed | independent | a reopened section continues without a new stamp |
+| `D00 T04 §31` | F3 | minor | `integration` | fixed | independent | a failed log fetch drops gh's reason |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
