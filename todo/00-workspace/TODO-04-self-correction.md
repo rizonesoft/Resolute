@@ -90,6 +90,7 @@ track: W1
 |  30   |   §30   | CI read-back and reachable provenance          | §24 |  [x]   |
 |  31   |   §31   | Red CI repaired, not waited on                 | §30 |  [ ]   |
 |  32   |   §32   | Campaign guard: stop hook, heartbeat, breaker  | --  |  [ ]   |
+|  33   |   §33   | CI repair-loop follow-ups                      | §31 |  [ ]   |
 
 ---
 
@@ -1299,6 +1300,7 @@ Operator direction 2026-09-24, correcting D00 T04 §30: a red CI read-back must 
 
 -> XREF: D00 T04 §30 -- the read-back this section turns from a stop into a repair loop
 -> SOURCE: operator-2026-09-24-ci-self-repair
+-> XREF: D00 T04 §33 -- the eight plan-review follow-ups filed from this section
 
 ## 32. Campaign Guard: Stop Hook, Heartbeat, Breaker
 
@@ -1312,6 +1314,32 @@ Operator question 2026-09-24: where is the stop hook, the cron that reminds the 
 **Test checkpoint:** `python scripts/campaign_guard.py --self-test` passes every allow and block case plus the breaker trip and reset, quoted, and runs inside `scripts/check-all.ps1`; `.claude/settings.json` wires the hook; the `process-plan` run guard names the guard file, the heartbeat prompt, and the operator stop.
 
 -> SOURCE: operator-2026-09-24-campaign-guard
+
+## 33. CI Repair-Loop Follow-Ups
+
+The D00 T04 §31 plan review files eight findings the §31 contract does not own: the loop is specified and its diagnostics are proven, but no drive has run it end to end (PR1), a repair outside the stamped section has no owning section (PR2), a red whose log cannot be fetched has no next step (PR3), a slow run can read as unreachable (PR4), a repairable setup failure can escalate (PR5), the bound resets per red (PR6), a push that changes the workflow itself can read as not triggered (PR7), and the stamped D00 T04 §30 text still says a red stops the run (PR8).
+
+- [ ] Run the repair loop end to end: a deliberately red push is diagnosed from `ci-wait`'s evidence, repaired, pushed, and read back green, with the run-file record and, when the red is a stamped section's own, the re-stamp (plan review of the D00 T04 §31 candidate, PR1; needs §31 shipped: it proves §31's loop). Done when: one recorded episode on a scratch branch or a disposable workflow path quotes every step's line, and the run file carries the episode.
+- [ ] Give every repair commit an owner: a red caused outside the just-stamped section is repaired under a section of its own (the reopened owner, or a new section filed through `add-todo` with a checkpoint and review), never as an unowned commit (plan review of the D00 T04 §31 candidate, PR2; needs §31 shipped: it constrains §31's repair). Done when: the skills name the owner rule, and the repair commit's message names its section, quoted.
+- [ ] Diagnose a red whose log cannot be fetched: when `gh run view --log-failed` fails, the runner falls back to the full log, then to re-running the failing step's command locally at the pushed commit (plan review of the D00 T04 §31 candidate, PR3; needs §31 shipped: it extends §31's evidence). Done when: `ci-wait` prints the workflow's command for the failing step when the log is unavailable, and a fixture leg quotes it.
+- [ ] Tell a slow run from an unreachable one: a run still queued or in progress after the deadline keeps being waited on with a longer ceiling, and only a `gh` or GitHub failure counts as unverifiable (plan review of the D00 T04 §31 candidate, PR4; needs §31 shipped: it corrects §31's escalation). Done when: a pending-then-green fixture passes without escalation, and a `gh` error still escalates after its retry, quoted.
+- [ ] Classify a failing setup step by cause: a failure in a repository-controlled step (the workflow file, a pinned action, a setup script) is repairable, and only a runner or platform fault escalates (plan review of the D00 T04 §31 candidate, PR5; needs §31 shipped: it corrects §31's escalation list). Done when: the skills state the rule by cause, and a fixture log for a bad pinned action reads as repairable, quoted.
+- [ ] Cap the whole repair episode: at most three repair attempts across consecutive reds on the same run, not per red, so a new red cannot reset the bound (plan review of the D00 T04 §31 candidate, PR6; needs §31 shipped: it tightens §31's bound). Done when: the skills state the episode cap and the run file counts attempts across the episode, quoted.
+- [ ] Verify a push that changes the workflow: when the pushed range edits or removes `.github/workflows/plan.yml` or its path filter, `ci-wait` never reads `not triggered` from the new filter alone (plan review of the D00 T04 §31 candidate, PR7; needs §31 shipped: it hardens the D00 T04 §30 read-back §31 extends). Done when: a range touching the workflow waits for a run or escalates, and a fixture leg pins it, quoted.
+- [ ] Mark the D00 T04 §30 stop-on-red wording superseded: its stamped item and checkpoint still read that a red conclusion stops the run (plan review of the D00 T04 §31 candidate, PR8; needs §31 shipped: it records §31's supersession). Done when: §30 carries a dated `Corrected` note beside that wording pointing at D00 T04 §31, with the stamp untouched, quoted.
+- [ ] Commit: `"workspace: CI repair-loop follow-ups"`
+
+**Test checkpoint:** The end-to-end episode is recorded; the owner rule, the setup-cause rule, and the episode cap read in the skills; the log-unavailable, slow-run, and workflow-change fixture legs pass; §30 carries its supersession note.
+
+-> XREF: D00 T04 §31 -- the repair loop eight items harden
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR1 D00-T04-S31-PR1
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR2 D00-T04-S31-PR2
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR3 D00-T04-S31-PR3
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR4 D00-T04-S31-PR4
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR5 D00-T04-S31-PR5
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR6 D00-T04-S31-PR6
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR7 D00-T04-S31-PR7
+-> SOURCE: plan-D00-T04-s31-2026-09-23-PR8 D00-T04-S31-PR8
 
 ## Verification
 
