@@ -88,6 +88,8 @@ track: W1
 |  28   |   §28   | Slot-table review follow-ups                   | §27 |  [ ]   |
 |  29   |   §29   | Grok fallbacks on the newest Grok model        | §27 |  [x]   |
 |  30   |   §30   | CI read-back and reachable provenance          | §24 |  [x]   |
+|  31   |   §31   | Red CI repaired, not waited on                 | §30 |  [ ]   |
+|  32   |   §32   | Campaign guard: stop hook, heartbeat, breaker  | --  |  [ ]   |
 
 ---
 
@@ -1280,6 +1282,34 @@ Split out of D00 T04 §26 on 2026-09-23 by operator instruction, ahead of the ca
 > **CRUD:** not applicable (review tooling, skill text, and review records; writes no user-facing data path)
 > **Duration:** 2026-09-23T22:01:35Z to 2026-09-23T22:40:53Z
 > **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
+
+## 31. Red CI Repaired, Not Waited On
+
+Operator direction 2026-09-24, correcting D00 T04 §30: a red CI read-back must be repaired by the run, not parked for the operator. §30 made the read-back stop the next section, and its wording ("stops the loop until the build is green again") would park a campaign on a red build, which `AGENTS.md` forbids: a runner finishes what it starts, waiting is never a strategy, and a gate that refuses is a cause the run fixes. This section turns the stop into a repair loop with a bound and a narrow escalation.
+
+- [ ] Show the failure, not just the verdict: on a red conclusion `ci-wait` fetches the failed steps' log (`gh run view <id> --log-failed`) and prints, bounded, the failing job and step names and the log's last lines, so the runner diagnoses from evidence rather than re-running blind. Done when: fixture legs print the step names and a bounded excerpt on red, a log fetch that fails still reports red with the reason, and a real drive on the D00 T04 §22 era red run (`06e570b5`) prints the `Validate the TODO tree` step and its `resolves to nothing` lines, quoted.
+- [ ] Repair a red read-back as a failed gate: the runner diagnoses from the printed log, fixes the cause forward in a repair commit (or, when the red is the just-stamped section's own change, reopens that section through audit stance), pushes, and reads CI back again; on green it continues with the next section in the same turn. Done when: `process-phase`, `process-todo-section`, and the review skill's push block state the loop, the §30 "stops the loop" wording is gone, and skill pins hold the loop's sentences, quoted.
+- [ ] Bound the repair: at most three repair attempts per red, and a unit patched in three consecutive attempts is rethought rather than patched again, matching the review loop's rule. Done when: the skills state the bound and the run file records each attempt (commit, CI line), quoted from the skill text.
+- [ ] Escalate only what the tree cannot fix: a red whose failing step never ran the repository's code (checkout, runner setup, a lost runner), an unverifiable read-back that stays unverifiable after one retry (GitHub unreachable, `gh` missing or unauthenticated, runner quota), or a repair bound exhausted. Done when: `ci-wait` names the failing step so the distinction is visible, the skills name exactly these escalation causes, the run file records the cause before the run reports to the operator, and a fixture leg shows an unverifiable read-back retried once, quoted.
+- [ ] Commit: `"workspace: red CI repaired, not waited on"`
+
+**Test checkpoint:** The red fixture prints the failing step and a bounded excerpt, a failed log fetch still reads red, and the retry leg retries an unverifiable read-back once, all quoted from `review_prompt.py --self-test`; the real red run prints its failing step and lines; the skill pins hold the repair loop, the bound, the escalation list, and the continue-on-green sentence.
+
+-> XREF: D00 T04 §30 -- the read-back this section turns from a stop into a repair loop
+-> SOURCE: operator-2026-09-24-ci-self-repair
+
+## 32. Campaign Guard: Stop Hook, Heartbeat, Breaker
+
+Operator question 2026-09-24: where is the stop hook, the cron that reminds the run to carry on, and the run guard. Resolute has only a heartbeat described in `process-plan` prose, created when a campaign starts, whose liveness test still read Muse session logs until D00 T04 §27 rewired it, and no Stop hook, no `.claude/settings.json`, and no guard file. ScratchPad shipped the full guard on 2026-09-23 (its commit `0da6bd2`): a Stop hook that blocks the campaign session's end of turn while the run is open and names the next ready row, a stall breaker inside it, a `CronCreate` heartbeat that resumes the idle session with full context, and a gitignored guard file naming the one session the hook may block. This section ports it, adapted to this tree.
+
+- [ ] Port the Stop hook to `.claude/hooks/campaign-stop.ps1` and wire it in `.claude/settings.json`: it blocks only the session named in `build/claude-campaign-guard.json`, names the next ready row, and lets the turn end when the guard is gone, the run file carries `## Closeout` or a column-0 `PARKED` line, or `query ready` prints `0 runnable now`; it fails open on a bad payload or a thrown error. Done when: a driven self-test (`scripts/campaign_guard.py --self-test`, in `scripts/check-all.ps1`) feeds the hook fixture payloads and asserts allow for no guard, another session, closeout, park, and nothing runnable, and block naming the next row for an open run, quoted.
+- [ ] Keep the stall breaker: after three blocks with no change to HEAD, the working-tree diff, the untracked set, or the run file, the hook lets the turn end and counts a trip in `build/claude-campaign-state.json`; real progress resets it. Done when: the self-test drives three unchanged blocks to a trip and a changed tree back to a fresh block count, quoted.
+- [ ] Rewrite `process-plan`'s run guard around the guard file and the heartbeat: start order (adopt or `CronCreate` the heartbeat, write the guard file with the session id and job id, record both in the run file), the canonical heartbeat prompt (finished, stalled twice, or resume), the exact end markers, the 7-day job expiry and new-session rewrite, and the operator stop that deletes the guard, the state file, and the job before confirming. Done when: the skill reads so, the old liveness-based prompt is gone, and `process-phase` points at it, quoted.
+- [ ] Commit: `"workspace: campaign guard with stop hook, heartbeat, and breaker"`
+
+**Test checkpoint:** `python scripts/campaign_guard.py --self-test` passes every allow and block case plus the breaker trip and reset, quoted, and runs inside `scripts/check-all.ps1`; `.claude/settings.json` wires the hook; the `process-plan` run guard names the guard file, the heartbeat prompt, and the operator stop.
+
+-> SOURCE: operator-2026-09-24-campaign-guard
 
 ## Verification
 
