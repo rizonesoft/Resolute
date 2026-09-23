@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **39 of 217 sections complete (18%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **39 of 218 sections complete (18%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -93,77 +93,78 @@ Signing already happens outside this repository. `D06 T01 §3` documents and ver
 
 Nothing in this plan can be proven until this phase is done. It opens by taking the ExoSuite codebase in and renaming it, because that is what makes `src/` real. It also carries the conformance profile, which runs early rather than late because it is what every tool is built against, and the maintenance that keeps the shipping AutoIt suite alive meanwhile.
 
-|  ✔  | Section       | Deliverable                                    | Items |
-| :-: | ------------- | ---------------------------------------------- | :---: |
-| [x] | `D00 T03 §1`  | Subtree merge with history preserved           |  11   |
-| [x] | `D00 T03 §2`  | Rename the product to Resolute                 |   7   |
-| [x] | `D00 T03 §3`  | Rename the library and the toolchain           |   5   |
-| [x] | `D00 T03 §4`  | Correct the stale documentation                |  10   |
-| [x] | `D00 T04 §1`  | Staleness Detection for Every Claim-Free Block |   9   |
-| [x] | `D00 T04 §2`  | The Review-Finding Ledger                      |   8   |
-| [x] | `D00 T04 §3`  | Section Calibration                            |   6   |
-| [x] | `D00 T04 §4`  | Re-Sequencing on Evidence                      |   7   |
-| [x] | `D00 T04 §5`  | Make the Adjacency Advisory Actionable         |   7   |
-| [x] | `D00 T04 §6`  | The Adversarial Reviewer                       |   7   |
-| [x] | `D00 T04 §7`  | Review-run records                             |   4   |
-| [x] | `D00 T04 §8`  | Revisit the two-model decision                 |   7   |
-| [x] | `D00 T04 §9`  | Review-input integrity                         |   5   |
-| [x] | `D00 T04 §10` | Run-record follow-ups                          |   5   |
-| [x] | `D00 T04 §11` | Bind the rename scan to the diff header        |   3   |
-| [x] | `D00 T04 §12` | Prove the manifest, not just emit it           |   8   |
-| [x] | `D00 T04 §13` | Bind the stamp to the push                     |   6   |
-| [x] | `D00 T04 §14` | Bar bool versions from the export gate         |   2   |
-| [x] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups  |  12   |
-| [x] | `D00 T04 §16` | Blinded-run checker defects                    |   6   |
-| [x] | `D00 T04 §17` | Report without walking the corpus twice        |   2   |
-| [x] | `D00 T04 §18` | Second two-model revisit, independently rated  |   8   |
-| [x] | `D00 T04 §19` | No partial flips                               |   6   |
-| [x] | `D00 T04 §20` | Review-tooling operability follow-ups          |  20   |
-| [x] | `D00 T04 §21` | Review-input integrity hardening               |  17   |
-| [x] | `D00 T04 §22` | Checker diagnostic codes and structured errors |   4   |
-| [ ] | `D00 T04 §23` | Third two-model revisit                        |   6   |
-| [x] | `D00 T04 §24` | Review-tooling follow-ups                      |  24   |
-| [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                  |  13   |
-| [ ] | `D00 T04 §26` | Review-flow follow-ups                         |  11   |
-| [x] | `D00 T01 §1`  | Portable toolchain bootstrap                   |  14   |
-| [x] | `D00 T01 §2`  | CMake structure and dependencies               |  11   |
-| [x] | `D00 T01 §3`  | Warnings as errors at one level                |   6   |
-| [x] | `D00 T01 §4`  | One command builds any tool                    |   6   |
-| [x] | `D00 T01 §5`  | One command runs every gate                    |   6   |
-| [x] | `D00 T01 §6`  | Keep the toolchain current                     |  12   |
-| [x] | `D00 T02 §1`  | Catch2 harness and assertion conventions       |   6   |
-| [x] | `D00 T02 §2`  | Fixture store and disposable targets           |   6   |
-| [x] | `D00 T02 §3`  | House-Style Contract, Checked Against Source   |   6   |
-| [x] | `D00 T02 §4`  | Parity driver for a built tool                 |   7   |
-| [x] | `D07 T01 §1`  | The conformance profile                        |   7   |
-| [ ] | `D07 T01 §2`  | Warning and analysis ratchet                   |   6   |
-| [ ] | `D07 T01 §3`  | Conformance check and its report               |  12   |
-| [ ] | `D07 T01 §4`  | Standing smoke run over the suite              |   5   |
-| [ ] | `D09 T01 §1`  | Make the AutoIt suite buildable again          |   5   |
-| [ ] | `D09 T01 §2`  | Clear the housekeeping defects                 |   5   |
-| [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure     |   7   |
-| [x] | `D00 T02 §5`  | Cover the inherited UI library                 |   7   |
-| [ ] | `D00 T02 §6`  | Remove the tautological width check            |   3   |
-| [ ] | `D00 T02 §7`  | Driven UI completion tests                     |   3   |
-| [ ] | `D00 T02 §8`  | Icon manifest audit                            |   3   |
-| [ ] | `D00 T02 §9`  | Rendered-output regression tests               |   4   |
-| [ ] | `D00 T02 §10` | Focus-free UI suite conversion                 |   8   |
-| [ ] | `D00 T02 §11` | Nightly full-suite regression run              |   8   |
-| [ ] | `D00 T02 §12` | Port-vs-port visual comparison                 |   4   |
-| [ ] | `D00 T01 §8`  | Run the unit suite under release               |   2   |
-| [ ] | `D00 T01 §9`  | Remove the Linux execution surface             |   5   |
-| [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance           |   4   |
-| [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files            |   7   |
-| [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility             |   5   |
-| [ ] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow               |   5   |
-| [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                  |   7   |
-| [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs              |   5   |
-| [ ] | `D00 T06 §4`  | Data Extension: Vendors, Blink, POST           |   5   |
-| [ ] | `D00 T06 §5`  | Consumer Contract for Tools                    |   4   |
-| [ ] | `D10 T01 §1`  | About Bar, Topics, Social Preview              |   4   |
-| [ ] | `D10 T01 §2`  | Branch Protection, Real Check Names            |   4   |
-| [ ] | `D10 T01 §3`  | Cold-Reader Taste Pass                         |   3   |
-| [ ] | `D10 T01 §4`  | Demo Clip Recorded and Embedded                |   5   |
+|  ✔  | Section       | Deliverable                                       | Items |
+| :-: | ------------- | ------------------------------------------------- | :---: |
+| [x] | `D00 T03 §1`  | Subtree merge with history preserved              |  11   |
+| [x] | `D00 T03 §2`  | Rename the product to Resolute                    |   7   |
+| [x] | `D00 T03 §3`  | Rename the library and the toolchain              |   5   |
+| [x] | `D00 T03 §4`  | Correct the stale documentation                   |  10   |
+| [x] | `D00 T04 §1`  | Staleness Detection for Every Claim-Free Block    |   9   |
+| [x] | `D00 T04 §2`  | The Review-Finding Ledger                         |   8   |
+| [x] | `D00 T04 §3`  | Section Calibration                               |   6   |
+| [x] | `D00 T04 §4`  | Re-Sequencing on Evidence                         |   7   |
+| [x] | `D00 T04 §5`  | Make the Adjacency Advisory Actionable            |   7   |
+| [x] | `D00 T04 §6`  | The Adversarial Reviewer                          |   7   |
+| [x] | `D00 T04 §7`  | Review-run records                                |   4   |
+| [x] | `D00 T04 §8`  | Revisit the two-model decision                    |   7   |
+| [x] | `D00 T04 §9`  | Review-input integrity                            |   5   |
+| [x] | `D00 T04 §10` | Run-record follow-ups                             |   5   |
+| [x] | `D00 T04 §11` | Bind the rename scan to the diff header           |   3   |
+| [x] | `D00 T04 §12` | Prove the manifest, not just emit it              |   8   |
+| [x] | `D00 T04 §13` | Bind the stamp to the push                        |   6   |
+| [x] | `D00 T04 §14` | Bar bool versions from the export gate            |   2   |
+| [x] | `D00 T04 §15` | Run-record vocabulary and evidence follow-ups     |  12   |
+| [x] | `D00 T04 §16` | Blinded-run checker defects                       |   6   |
+| [x] | `D00 T04 §17` | Report without walking the corpus twice           |   2   |
+| [x] | `D00 T04 §18` | Second two-model revisit, independently rated     |   8   |
+| [x] | `D00 T04 §19` | No partial flips                                  |   6   |
+| [x] | `D00 T04 §20` | Review-tooling operability follow-ups             |  20   |
+| [x] | `D00 T04 §21` | Review-input integrity hardening                  |  17   |
+| [x] | `D00 T04 §22` | Checker diagnostic codes and structured errors    |   4   |
+| [ ] | `D00 T04 §23` | Third two-model revisit                           |   6   |
+| [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
+| [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
+| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  11   |
+| [ ] | `D00 T04 §27` | One writer, a GPT-governed panel, slot-bound pins |   6   |
+| [x] | `D00 T01 §1`  | Portable toolchain bootstrap                      |  14   |
+| [x] | `D00 T01 §2`  | CMake structure and dependencies                  |  11   |
+| [x] | `D00 T01 §3`  | Warnings as errors at one level                   |   6   |
+| [x] | `D00 T01 §4`  | One command builds any tool                       |   6   |
+| [x] | `D00 T01 §5`  | One command runs every gate                       |   6   |
+| [x] | `D00 T01 §6`  | Keep the toolchain current                        |  12   |
+| [x] | `D00 T02 §1`  | Catch2 harness and assertion conventions          |   6   |
+| [x] | `D00 T02 §2`  | Fixture store and disposable targets              |   6   |
+| [x] | `D00 T02 §3`  | House-Style Contract, Checked Against Source      |   6   |
+| [x] | `D00 T02 §4`  | Parity driver for a built tool                    |   7   |
+| [x] | `D07 T01 §1`  | The conformance profile                           |   7   |
+| [ ] | `D07 T01 §2`  | Warning and analysis ratchet                      |   6   |
+| [ ] | `D07 T01 §3`  | Conformance check and its report                  |  12   |
+| [ ] | `D07 T01 §4`  | Standing smoke run over the suite                 |   5   |
+| [ ] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   5   |
+| [ ] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
+| [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
+| [x] | `D00 T02 §5`  | Cover the inherited UI library                    |   7   |
+| [ ] | `D00 T02 §6`  | Remove the tautological width check               |   3   |
+| [ ] | `D00 T02 §7`  | Driven UI completion tests                        |   3   |
+| [ ] | `D00 T02 §8`  | Icon manifest audit                               |   3   |
+| [ ] | `D00 T02 §9`  | Rendered-output regression tests                  |   4   |
+| [ ] | `D00 T02 §10` | Focus-free UI suite conversion                    |   8   |
+| [ ] | `D00 T02 §11` | Nightly full-suite regression run                 |   8   |
+| [ ] | `D00 T02 §12` | Port-vs-port visual comparison                    |   4   |
+| [ ] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
+| [ ] | `D00 T01 §9`  | Remove the Linux execution surface                |   5   |
+| [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |   4   |
+| [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |   7   |
+| [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
+| [ ] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow                  |   5   |
+| [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                     |   7   |
+| [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs                 |   5   |
+| [ ] | `D00 T06 §4`  | Data Extension: Vendors, Blink, POST              |   5   |
+| [ ] | `D00 T06 §5`  | Consumer Contract for Tools                       |   4   |
+| [ ] | `D10 T01 §1`  | About Bar, Topics, Social Preview                 |   4   |
+| [ ] | `D10 T01 §2`  | Branch Protection, Real Check Names               |   4   |
+| [ ] | `D10 T01 §3`  | Cold-Reader Taste Pass                            |   3   |
+| [ ] | `D10 T01 §4`  | Demo Clip Recorded and Embedded                   |   5   |
 
 
 ### Phase 1 -- The two shared layers
