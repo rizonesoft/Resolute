@@ -1,0 +1,928 @@
+ERUNT - Das Emergency Recovery Utility NT
+=========================================
+
+Sicherung und Wiederherstellung der Registrierung von
+Windows NT/2000/2003/XP
+
+v1.1j, 20.10.2005, Freeware
+Geschrieben von Lars Hederer
+E-Mail: lars.hederer@t-online.de
+
+Schauen Sie hier nach, ob es eine neue Version gibt:
+http://www.larshederer.homepage.t-online.de/erunt
+
+Welche Neuigkeiten es in dieser Version gibt, schauen Sie bitte im
+Abschnitt "Versiongeschichte" weiter unten in dieser Datei nach.
+
+
+
+Einführung
+----------
+
+Bei der Entwicklung von Windows 95 traf Microsoft die weise
+Entscheidung, alle computer- und anwendungsbezogenen Daten, die vorher
+über zahllose INI-Dateien verstreut waren, in einer einzigen zentralen
+Datenbank zusammenzufassen, der sogenannten "Registrierung". Diese
+Registrierung ist heutzutage einer der wichtigsten Bestandteile jedes
+Windows-Systems, ohne welche das Betriebssystem noch nicht einmal
+starten würde. Und da die Registrierung ziemlich empfindlich auf
+Beschädigungen reagiert, ist es sehr ratsam, die zugehörigen Dateien
+regelmäßig zu sichern.
+
+In MS-DOS-basierten Windows-Versionen (95, 98, Me) besteht die
+Registrierung aus den Dateien SYSTEM.DAT und USER.DAT (und CLASSES.DAT
+bei Windows Me). Diese Dateien können mit dem Explorer einfach aus
+dem Windows-Ordner an eine sichere Stelle kopiert werden, zum Beispiel
+einen anderen Ordner auf der Festplatte. Microsoft stellt dafür sogar
+ein Utility namens ERU zur Verfügung, welches diese und noch ein paar
+andere wichtige Systemdateien an einem anderen Ort sichert.
+
+Außerdem legen Windows 9x/Me automatisch beim Starten Sicherungskopien
+der Registrierung an; bei Windows 95 ist dies eine Kopie der
+Registrierung der letzten Windows-Sitzung, und Windows 98/Me sichern
+bis zu fünf Stände der letzten fünf Tage, an denen Windows gestartet
+wurde.
+
+Leider ist dies bei Windows-Versionen mit NT-Kern nicht der Fall. Bei
+Windows NT und 2000 werden überhaupt keine automatischen Sicherungen
+der Registrierung angelegt, und bei XP wird die Registrierung nur als
+Teil des überladenen Systemwiederherstellungsprogramms mitgesichert,
+welches aber z. B. wenn Windows auf Grund einer beschädigten
+Registrierung gar nicht mehr startet, noch nicht mal zur
+"Wiederherstellung" benutzt werden kann. Es ist auch nicht mehr
+möglich, die notwendigen Dateien, nun "Hives" genannt und mit Namen
+DEFAULT, SAM, SECURITY, SOFTWARE, SYSTEM im Ordner SYSTEM32\CONFIG, an
+eine andere Stelle zu kopieren, da sie vom Betriebssystem in Benutzung
+sind. Und obwohl die Registrierung eines NT-basierten Windows weniger
+anfällig für Beschädigungen ist als die anderer Versionen, kann es
+immer noch passieren, und für diesen Fall fehlt bei NT einfach eine
+Option zur einfachen Sicherung und Wiederherstellung der
+Registrierung, wie sie bei Windows 9x/Me zur Verfügung steht, um das
+System ohne große Umstände wieder ans Laufen zu bekommen.
+
+Im Jahr 2001, als Windows XP auf vielen neuen Heimanwender-PCs
+vorinstalliert wurde und schon absehbar war, dass es innerhalb der
+nächsten Jahre auch der neue Windows-Standard bekommen könnte,
+entschloss ich mich daher, ein Programm zur Sicherung der
+Registrierung zu schreiben, welches die einfache Bedienung von
+Windows 9x/Me's ERU bietet (daher auch der Name ERUNT), als auch die
+Möglichkeit, die Registrierung automatisch sichern zu lassen, zum
+Beispiel beim Windows-Start.
+
+Oder man kann vor dem Ausprobieren eines neuen Programms die
+Registrierung mit ERUNT sichern, das Programm installieren und testen,
+wieder deinstallieren und anschließend die Registrierung
+wiederherstellen, um ganz sicherzugehen, dass kein Müll zurückbleibt.
+
+Hinweis: Die Funktion "Registrierungsdatei exportieren" in Regedit ist
+NUTZLOS (!), um eine Komplettsicherung der Registrierung anzulegen.
+Weder wird hierdurch die komplette Registrierung exportiert (z. B.
+werden keine Informationen aus dem Schlüssel "SECURITY" gesichert),
+noch kann die exportierte Datei später wieder benutzt werden, um die
+aktuelle Registrierung durch die alte zu ersetzen. Stattdessen wird
+die Datei beim Re-Import mit der aktuellen Registrierung
+zusammengeführt, d. h. es wird nichts von dem wieder entfernt, was der
+Registrierung seit dem Export hinzugefügt wurde. Dies führt zu einem
+heillosen Durcheinander von alten und neuen Einträgen.
+
+
+
+Features
+--------
+
+- Sicherung der Registrierung von Windows NT/2000/2003/XP in einem
+  Ordner Ihrer Wahl
+
+- Auswahlmöglichkeit der System- und Benutzerregistrierungen
+
+- Kommandozeilenoptionen ermöglichen eine automatische Sicherung und
+  Wiederherstellung der Registrierung
+
+- Wiederherstellung der Registrierung in Windows 9x/Me/NT/2000/2003/XP
+  und MS-DOS (All-in-One-Wiederherstellungsprogramm) oder der Windows-
+  Wiederherstellungskonsole
+
+- Zusätzlich im Archiv enthalten:
+  NTREGOPT zur Optimierung der Registrierung
+
+- Alle Programme in diesem Archiv sind komplett lokalisierbar
+  (d. h. können in andere Sprachen übersetzt werden), deutsche Version
+  ist mitgeliefert
+
+
+
+Unterstützte Betriebssysteme
+----------------------------
+
+- Windows NT 3.51
+- Windows NT 4.0
+- Windows 2000
+- Windows 2003
+- Windows XP
+- sowie wahrscheinlich alle zukünftigen Windows-Versionen basierend
+  auf dem NT-Kern
+
+Vom Wiederherstellungsprogramm ERDNT werden zusätzlich unterstützt:
+- MS-DOS
+- Windows 95
+- Windows 98
+- Windows Me
+
+
+
+Installation
+------------
+
+Benutzen Sie das Setup-Programm, um ERUNT auf Ihren PC zu
+installieren.
+
+Oder, wenn Sie die gezippte Version heruntergeladen haben: Entzippen
+Sie alle Dateien in einen Ordner Ihrer Wahl und erzeugen Sie ggf. auf
+dem Desktop Verknüpfungen mit den Dateien ERUNT.EXE bzw. NTREGOPT.EXE.
+
+
+
+Deinstallation
+--------------
+
+Benutzen Sie die Option "Software" in der Windows-Systemsteuerung, um
+ERUNT von Ihrem PC zu deinstallieren.
+
+Oder, wenn Sie die gezippte Version heruntergeladen haben: Löschen Sie
+den ERUNT-Ordner, und löschen Sie die entsprechenden Desktop-Symbole.
+
+(Löschen Sie ggf. auch die Wiederherstellungsordner, die Sie mit dem
+Programm erstellt haben.)
+
+
+
+Sichern der Registrierung mit ERUNT
+-----------------------------------
+
+Hinweis: Um die reibungslose Funktion von ERUNT zu gewährleisten,
+sollten Sie als Systemadministrator angemeldet sein.
+
+Starten Sie ERUNT und bestätigen Sie den Willkommenshinweis.
+
+Tippen Sie den Namen eines Wiederherstellungsordners ein, in welchem
+die gesicherten Registrierungsdateien gespeichert werden sollen, oder
+klicken Sie auf "...", um die Laufwerke Ihres Computers zu durchsuchen
+und einen Ordner auszuwählen. Sie können auch einfach die
+Voreinstellung belassen, dann wird der ERDNT-Ordner in Ihrem Windows-
+Ordner erstellt; dies hat den Vorteil, dass Sie über die Windows-
+Wiederherstellungskonsole Zugriff darauf haben, wenn Windows mal nicht
+mehr startet.
+
+Hinweis: Standardmäßig hängt ERUNT im Zielordner-Eingabefeld noch
+einen Ordner mit dem aktuellen Datum als Namen an den
+Wiederherstellungsordner an. Auf diese Weise können beliebig viele
+Registry-Sicherungen in einem einzigen Wiederherstellungsordner
+aufbewahrt werden, jeweils getrennt durch das Erstellungsdatum. Diese
+Funktion sowie das Erscheinungsbild des Datums können über die Datei
+ERUNT.INI konfiguriert werden (dies wird später noch erläutert). Wenn
+die Sicherung der Registrierung direkt in dem angegebenen Ordner
+angelegt werden soll, können Sie auch das Datum einfach wieder aus dem
+Eingabefeld löschen, bevor Sie auf "OK" klicken.
+
+Wählen Sie als nächstes die Sicherungsoptionen aus:
+
+- Systemregistrierung: Die aktuelle Systemregistrierung, normalerweise
+  bestehend aus den Dateien DEFAULT, SAM, SECURITY, SOFTWARE und
+  SYSTEM.
+
+- Registrierung des aktuellen Benutzers: Die Registrierungsdateien für
+  den aktuell angemeldeten Benutzer, normalerweise NTUSER.DAT und
+  USRCLASS.DAT.
+
+- Andere geöffnete Benutzerregistrierungen: Manchmal hat Windows noch
+  ein paar andere Benutzerregistrierungen im Speicher. Beispiele
+  hierfür sind "generische" Registrierungen, z. B. für den Benutzer
+  "JEDER", oder die Registrierungen anderer Benutzer des Computers,
+  wenn Sie die schnelle Benutzerumschaltung von Windows XP verwenden.
+  Wählen Sie diese Option, um auch alle zusätzlich gefundenen
+  Benutzerregistrierungen zu sichern.
+
+Klicken Sie dann auf "OK" und warten Sie, bis der Sicherungsvorgang
+abgeschlossen ist. (Beachten Sie, dass dies eine kleine Weile dauern
+kann, und dass der erste Balken KEIN Fortschrittsbalken ist, sondern
+lediglich anzeigt, dass das Programm noch läuft.) Das Programm ERDNT
+zum späteren Wiederherstellen der Registrierung wird automatisch mit
+in den Zielordner kopiert.
+
+(Technische Information: ERUNT sichert nur Registrierungsdateien,
+die gerade vom System geöffnet sind. Informationen über diese Dateien
+werden aus dem Registrierungsschlüssel HKEY_LOCAL_MACHINE\System\
+CurrentControlSet\Control\hivelist gelesen. Dort nicht aufgelistete
+Registrierungsdateien, z. B. solche von anderen Benutzern des
+Computers, können von ERUNT nicht gesichert werden.)
+
+
+
+ERUNT Kommandozeilenoptionen
+----------------------------
+
+ERUNT unterstützt Kommandozeilenoptionen, mit denen eine automatische
+Sicherung der Registrierung ohne Benutzereingriff erstellt werden
+kann. Die Kommandozeilen-Syntax für ERUNT ist:
+
+ERUNT Zielordner [sysreg] [curuser] [otherusers]
+[/noconfirmdelete] [/noprogresswindow]
+
+Die Angabe Zielordner wird zur Kommandozeilenausführung von ERUNT
+benötigt, alle anderen Angaben sind optional.
+
+Wenn Sie einen Zielordner in der Kommandozeile angeben, wird ERUNT
+automatisch im "stillen" Modus mit den Standard-Sicherungsoptionen
+(Systemregistrierung und Registrierung des aktuellen Benutzers)
+ausgeführt. Kein Benutzereingriff ist notwendig, AUSSER zur
+Löschbestätigung des Wiederherstellungsordners, falls er existiert,
+oder bei Fehlermeldungen. Die Bestätigungsfrage kann mit der Option
+/noconfirmdelete unterdrückt werden (siehe unten).
+
+Beschreibung der Kommandozeilenoptionen:
+
+Zielordner
+  Der Name des Ordners, in dem die Registrierung gesichert werden
+  soll. Beispiel: C:\WINDOWS\ERDNT
+  Sie können die Zeichenfolgen #Date# und #Time# im Ordnernamen
+  verwenden, um ERUNT an der entsprechenden Stelle das aktuelle Datum
+  bzw. die aktuelle Uhrzeit einfügen zu lassen.
+  Beispiel: C:\WINDOWS\ERDNT\#Date#
+  Die Windows-Umgebungsvariable %SystemRoot% kann in der Kommandozeile
+  als Platzhalter für den Namen des Windows-Ordners verwendet werden.
+  Beispiel: %SystemRoot%\ERDNT\#Date#
+
+sysreg
+  Sicherung der Systemregistrierung
+
+curuser
+  Sicherung der Registrierung des aktuellen Benutzers
+
+otherusers
+  Sicherung anderer geöffneter Benutzerregistrierungen
+
+(Hinweis: Wenn keine der drei obigen Optionen in der Kommandozeile
+übergeben wird, sichert ERUNT automatisch die Systemregistrierung
+und die Registrierung des aktuellen Benutzers.)
+
+/noconfirmdelete
+  Löscht automatisch den Inhalt des Zielordners, ohne den Benutzer zu
+  fragen. SEIEN SIE VORSICHTIG, und benutzen Sie diese Option nur,
+  wenn Sie sich wirklich sicher sind, dass der Inhalt dieses Ordners
+  gelöscht werden kann!
+
+/noprogresswindow
+  Zeigt kein Fortschrittsfenster während des Sicherungsvorgangs an.
+
+Um also die Systemregistrierung im Ordner C:\ERDNT an jedem Tag der
+Woche in einem Unterordner mit dem Namen des entsprechenden Tages
+sichern zu lassen, könnten Sie den integrierten Taskplaner von Windows
+benutzen und für jeden Tag einen anderen ERUNT-Aufruf eintragen:
+
+Für Montag würden Sie folgende Kommandozeile benutzen:
+  C:\ERUNT\ERUNT.EXE C:\ERDNT\Montag sysreg /noconfirmdelete
+
+Für Dienstag würden Sie folgende Kommandozeile benutzen:
+  C:\ERUNT\ERUNT.EXE C:\ERDNT\Dienstag sysreg /noconfirmdelete
+
+... Naja, Sie sehen, worum es geht.
+
+Oder, um ERUNT bei jedem Windows-Start automatisch eine
+Sicherungskopie der Registrierung im Ordner ERDNT innerhalb Ihres
+Windows-Ordners anlegen zu lassen, inklusive Erstellung eines Ordners
+mit dem aktuellen Datum als Namen, könnten Sie in Ihrem Startmenü
+unter Programme/Autostart folgende Verknüpfung erstellen:
+
+  C:\ERUNT\ERUNT.EXE %SystemRoot%\ERDNT\#Date# /noconfirmdelete
+
+Wenn Sie möchten, dass auf diese Weise erstellte alte
+Wiederherstellungsordner von Zeit zu Zeit automatisch gelöscht werden,
+können Sie AUTOBACK.EXE anstelle von ERUNT.EXE verwenden. Die
+Arbeitsweise des AUTOBACK-Tools wird später noch beschrieben. Das
+ERUNT-Setup bietet Ihnen während der Installation übrigens die Option
+an, einen entsprechenden Eintrag in Ihrem Autostart-Ordner automatisch
+zu erstellen.
+
+
+
+Die Datei ERUNT.INI
+-------------------
+
+Über diese Datei können verschiedene ERUNT-Einstellungen konfiguriert
+werden, beispielsweise kann die Voreinstellung für den Zielordner im
+Eingabefeld von ERUNT geändert sowie das automatische Anhängen des
+aktuellen Datums dort abgeschaltet werden.
+
+Benutzen Sie den Editor, um eine Datei mit Namen ERUNT.INI im
+ERUNT-Ordner zu erstellen, und fügen Sie die folgende Zeile hinzu:
+
+[ERUNT]
+
+Unterhalb dieser Zeile tragen Sie nun eine oder mehrere der folgenden
+Konfigurationsoptionen ein:
+
+DefaultDestinationFolder
+  Der Name eines Ordners, der standardmäßig im Ordner-Eingabefeld von
+  ERUNT angezeigt werden soll. Sie können hier auch Umgebungsvariablen
+  verwenden, zum Beispiel %SystemRoot% als Platzhalter für den Namen
+  des Windows-Ordners.
+  Voreinstellung: %SystemRoot%\ERDNT
+Beispiel:
+DefaultDestinationFolder=C:\ERDNT
+
+AppendDateToFolderEditField
+  Hiermit kann das automatische Anhängen des aktuellen Datums in
+  ERUNTs Ordner-Eingabefeld konfiguriert werden.
+  0=deaktiviert, 1=aktiviert, Voreinstellung: 1
+Beispiel:
+AppendDateToFolderEditField=0
+
+AppendTimeToFolderEditField
+  Hiermit kann das automatische Anhängen der aktuellen Uhrzeit in
+  ERUNTs Ordner-Eingabefeld konfiguriert werden. Diese Funktion kann
+  nur aktiviert werden, wenn AppendDateToFolderEditField ebenfalls
+  auf 1 gesetzt ist.
+  0=deaktiviert, 1=aktiviert, Voreinstellung: 0
+Beispiel:
+AppendTimeToFolderEditField=1
+
+DateFormat
+DateSeparator
+  Mit diesen Optionen kann das Erscheinungsbild des Datums im
+  Ordner-Eingabefeld von ERUNT bzw. bei der Benutzung von #Date# in
+  der Kommandozeile angepasst werden. Standardmäßig benutzt ERUNT die
+  Windows-Einstellungen für das kurze Datumsformat. Beachten Sie, dass
+  als Datumstrennzeichen nur "." und "-" verwendet werden können.
+Beispiel:
+DateFormat=dd/mm/yyyy
+DateSeparator=.
+
+TimeFormat
+TimeSeparator
+  Mit diesen Optionen kann das Erscheinungsbild der Uhrzeit im
+  Ordner-Eingabefeld von ERUNT bzw. bei der Benutzung von #Time# in
+  der Kommandozeile angepasst werden. Standardmäßig benutzt ERUNT die
+  Windows-Einstellungen für das kurze Zeitformat. Beachten Sie, dass
+  als Zeittrennzeichen nur "." und "-" verwendet werden können.
+Beispiel:
+TimeFormat=hh:mm:ss
+TimeSeparator=-
+
+DisableFastBackup
+  Auf unterstützten Betriebssystemen (z. B. Windows XP und Server
+  2003) benutzt ERUNT in der Standardeinstellung ein sehr schnelles
+  Sicherungsverfahren. Sollten während des Sicherungsvorganges
+  Probleme auftreten, können Sie diese Funktion versuchsweise
+  abschalten und zur konventionellen (aber langsamen) Methode
+  zurückkehren. Diese Einstellung hat keine Auswirkung bei nicht
+  unterstützten Betriebssystemen, auf welchen grundsätzlich der
+  konventionelle Algorithmus Anwendung findet.
+  0=schnelle Methode, 1=konventionelle Methode, Voreinstellung: 0
+Beispiel:
+DisableFastBackup=1
+
+
+
+Das Tool AUTOBACK.EXE
+---------------------
+
+Das Kommandozeilen-Tool AUTOBACK.EXE benutzt die gleiche Syntax wie
+ERUNT, übernimmt aber noch die zusätzliche Aufgabe, alte
+Wiederherstellungsordner nach dem Anlegen einer neuen Sicherung
+automatisch zu löschen.
+
+Voraussetzung hierfür ist, dass der letzte in der Kommandozeilenoption
+Zielordner angegebene Ordner mit dem aktuellen Datum bzw. dem hierfür
+vorgesehenen Platzhalter #Date# beginnt. Ist dies der Fall, sucht
+AUTOBACK automatisch im übergeordneten Ordner der neu erstellten
+Sicherung nach Ordnernamen mit dem gleichen Datumsformat und löscht
+alle außer den Ordnern der letzten 30 Tage, an denen eine Sicherung
+erstellt wurde.
+
+Die Anzahl der aufzubewahrenden Wiederherstellungsordner kann über die
+Kommandozeilenoption /days:n angepasst werden, mit /days:7 z. B.
+werden nur die Ordner der letzten 7 Sicherungstage aufbewahrt.
+
+In der Standardeinstellung erstellt AUTOBACK keine neue Sicherung,
+wenn für den aktuellen Tag schon eine existiert. Benutzen Sie die
+Kommandozeilenoption /alwayscreate, um dies zu ändern und das Programm
+bei jedem Aufruf eine neue Sicherung erstellen zu lassen.
+
+AUTOBACK setzt auf ERUNT auf und muss daher vom gleichen Ordner aus
+ausgeführt werden. Es benutzt die gleichen Einstellungen für das
+Datumsformat wie ERUNT, d. h. haben Sie in der Datei ERUNT.INI ein
+neues Format festgelegt, wird dies automatisch auch von AUTOBACK
+benutzt.
+
+
+
+Wiederherstellen der Registrierung mit ERDNT
+--------------------------------------------
+
+Situation: Windows ist ganz normal am Laufen.
+
+Um eine frühere Sicherung der Registrierung wiederherzustellen, öffnen
+Sie den Windows-Explorer, wechseln in den Ordner, in dem Sie die
+Sicherung erstellt haben, und doppelklicken auf die Datei ERDNT.EXE,
+um das Wiederherstellungsprogramm zu starten. (Jeder
+Wiederherstellungsordner enthält eine eigene Kopie der Datei
+ERDNT.EXE.) Wählen Sie dann aus, welche Teile der Registrierung
+wiederhergestellt werden sollen, und klicken Sie auf "OK", um die
+Wiederherstellung zu starten. Wenn der Vorgang abgeschlossen ist,
+klicken Sie auf "OK", um den Computer neu zu starten und die
+wiederhergestellte Registrierung zu aktivieren.
+
+Hinweis: Wenn beim Wiederherstellen der Registrierung Probleme
+auftreten, lesen Sie bitte den Abschnitt "Technische Informationen zu
+ERDNT" weiter unten in dieser Dokumentation, in welchem die
+Arbeitsweise von ERDNT näher erläutert wird, oder lesen Sie einfach
+die nächsten Abschnitte, um andere Möglichkeiten zur Wiederherstellung
+der Registrierung kennenzulernen.
+
+
+
+Was tun, wenn Windows nicht mehr startet?
+-----------------------------------------
+
+Wenn Windows nicht mehr normal hochfährt, kann dies eine ganze Reihe
+von Ursachen haben. Zu diesen gehört nicht zuletzt, dass die
+Registrierung beschädigt sein könnte, oder vielleicht haben Sie ein
+mit dem System inkompatibles oder fehlerhaftes Programm oder einen
+Treiber installiert, in welchem Fall die Wiederherstellung eines
+vorherigen Standes der Registrierung, als alles noch problemlos lief,
+auch helfen sollte.
+
+Das erste, was Sie in so einer Situation ausprobieren sollten: Starten
+Sie den Rechner neu und drücken Sie beim Hochfahren die Taste F8,
+direkt bevor das erste Windows-Bild erscheint. Im folgenden Menü
+wählen Sie "Letzte als funktionierend bekannte Konfiguration". Wenn
+Windows jetzt wieder ganz normal hochfährt, ist die Sache schon
+erledigt.
+
+Falls nicht, starten Sie den PC erneut mit F8, und wählen Sie dieses
+Mal die Option "Abgesicherter Modus". Wenn Windows nun im
+abgesicherten Modus startet, können Sie genau wie im normalen Modus
+eine Sicherung der Registrierung wiederherstellen, wie im vorherigen
+Abschnitt beschrieben.
+
+Wenn der abgesicherte Modus auch nicht funktioniert, lesen Sie
+weiter...
+
+
+
+Wiederherstellen der Registrierung mit ERDNT - Notfall-Szenario I
+-----------------------------------------------------------------
+
+Situation: Windows startet weder im normalen noch im abgesicherten
+Modus, aber Sie haben eine DOS-Startdiskette oder ein anderes
+(funktionstüchtiges) Betriebssystem auf Ihrem PC installiert, welches
+vom ERDNT-Wiederherstellungsprogramm unterstützt wird, und unter
+welchem Sie vollen Zugriff auf das Laufwerk/die Laufwerke mit der
+beschädigten Windows-Installation sowie dem Wiederherstellungsordner
+haben.
+
+Starten Sie das funktionierende Betriebssystem, und öffnen Sie den
+Ordner mit der Sicherung der Registrierung, die Sie wiederherstellen
+wollen.
+
+Wenn die Verteilung der Laufwerksbuchstaben anders ist als unter dem
+Windows, unter dem Sie die Sicherung der Registrierung angelegt haben,
+müssen Sie jetzt die Datei ERDNT.INF editieren, damit diese auf die
+neuen Laufwerksbuchstaben verweist, bevor Sie versuchen, die
+Registrierung wiederherzustellen. Wenn zum Beispiel das Laufwerk mit
+der beschädigten Windows-Installation nun den Buchstaben D: anstelle
+von C: hat, würden Sie alle Vorkommen von C:\... in der INF-Datei
+durch D:\... ersetzen. Die Datei kann unter Windows mit dem Editor,
+unter DOS mit dem EDIT-Befehl bearbeitet werden.
+
+Starten Sie nun das Wiederherstellungsprogramm über die Datei
+ERDNT.EXE. Wählen Sie aus, welche Teile der Registrierung
+wiederhergestellt werden sollen (die Systemregistrierung reicht in den
+meisten Fällen aus), und starten Sie die Wiederherstellung. Wenn der
+Vorgang abgeschlossen ist, starten Sie den Computer neu und probieren
+aus, ob die andere Windows-Installation nun repariert ist.
+
+
+
+Wiederherstellen der Registrierung mit ERDNT - Notfall-Szenario II
+------------------------------------------------------------------
+
+Situation: Windows startet weder im normalen noch im abgesicherten
+Modus, und Sie haben auch kein anderes funktionstüchtiges
+Betriebssystem auf Ihrem PC installiert.
+
+Die beiden folgenden Rettungsmethoden erfordern es, dass Ihr PC so
+eingestellt ist, dass er mit einer CD gestartet werden kann. Für
+Informationen dazu schauen Sie ggf. in Ihrer BIOS-Dokumentation nach.
+
+1. Bart's PE Builder
+Benutzen Sie einen anderen Computer mit Internetzugang und CD-Brenner,
+um dieses kostenfreie Programm herunterzuladen (ist über Google leicht
+zu finden), welches eine startfähige Windows-CD mit Vollzugriff auf
+alle Laufwerke (inklusive NTFS) erstellt. Starten Sie den Computer mit
+dieser CD, öffnen Sie das "File Management Utility" und befolgen Sie
+die Schritte im "Notfall-Szenario I", um ERDNT zu starten und die
+Registrierung wiederherzustellen.
+
+2. Die Windows-Wiederherstellungskonsole (Windows 2000 und höher)
+Beachten Sie, dass diese Methode nur benutzt werden kann, wenn der
+Wiederherstellungsordner mit der Sicherung der Registrierung innerhalb
+des Windows-Ordners liegt, und dass durch diesen Vorgang nur die
+Systemregistrierung wiederhergestellt wird. Damit sollten Sie aber auf
+jeden Fall wieder ins Windows hineinkommen, und von da aus können Sie
+dann das ERDNT-Programm starten, um ggf. die Benutzerregistrierungen
+wiederherzustellen.
+- Starten Sie den Computer mit der Windows 2000/2003/XP CD-ROM.
+- Wenn der Willkommensbildschirm erscheint, drücken Sie "R"
+  (bei Windows 2000: "R", dann "K").
+- Tippen Sie die Nummer der Windows-Installation ein, die repariert
+  werden soll (normalerweise 1), und drücken Sie ENTER.
+- Geben Sie das Administratorkennwort ein (wenn Sie sich nicht sicher
+  sind, wie das Kennwort ist, geben Sie probeweise einfach nichts ein)
+  und drücken Sie ENTER.
+- An der Eingabeaufforderung geben Sie ein
+    cd erdnt
+  bzw. ersetzen erdnt durch den Namen, den Sie dem
+  Wiederherstellungsordner gegeben haben, und drücken ENTER.
+- Hatten Sie bei der Installation von ERUNT die automatische Sicherung
+  der Registrierung beim Systemstart aktiviert und möchten nun eine
+  dieser Sicherungen wiederherstellen, geben Sie ein
+    cd autobackup <ENTER>
+- Haben Sie Unterordner für verschiedene Sicherungen der Registrierung
+  angelegt, z. B. mit den verschiedenen Erstellungsdaten, geben Sie
+    dir <ENTER>
+  ein, um eine Liste der verfügbaren Ordner anzuzeigen, dann
+    cd ordnername <ENTER>
+  wobei ordnername der Name eines mit dem dir-Befehl aufgelisteten
+  Ordners ist, um diesen Ordner zu öffnen.
+- Jetzt geben Sie ein
+    batch erdnt.con <ENTER>
+  um die Systemregistrierung aus diesem Ordner wiederherzustellen.
+- Geben Sie
+    exit <ENTER>
+  ein und entfernen Sie die CD aus dem CD-Laufwerk. Der Rechner
+  startet nun neu, mit der wiederhergestellten Registrierung.
+
+
+
+Technische Informationen zu ERDNT
+---------------------------------
+
+ERDNT unterstützt zwei Wiederherstellungsmodi. Der richtige Modus wird
+normalerweise bei jedem Start von ERDNT automatisch eingestellt, aber
+lesen Sie hier weiter, wenn Probleme beim Wiederherstellen der
+Registrierung auftauchen.
+
+Der "NT"-Modus wird benutzt, wenn Sie das Programm ERDNT unter dem
+selben Betriebssystem starten, in dem Sie auch die Sicherung angelegt
+haben. Dies wird überprüft, indem der Eintrag [SystemRoot] in der
+Datei ERDNT.INF mit dem Inhalt der aktuellen Umgebungsvariable
+%SystemRoot% verglichen wird. Der Wiederherstellungsmodus "NT" stellt
+die einzige Möglichkeit dar, die aktive Registrierung des gerade
+laufenden Betriebssystems wiederherzustellen.
+
+"Dateien zurückkopieren" wird benutzt, wenn das aktuelle
+Betriebssystem NICHT auf NT basiert, oder wenn der [SystemRoot]-
+Eintrag nicht mit dem Inhalt der %SystemRoot%-Umgebungsvariable
+übereinstimmt. In diesem Modus werden die gesicherten
+Registrierungsdateien einfach an ihre Originalposition zurückkopiert.
+
+Die MS-DOS-Version von ERDNT unterstützt nur den Modus "Dateien
+zurückkopieren".
+
+Hinweis: Im Wiederherstellungsmodus "NT" werden automatisch
+Sicherungskopien der aktuellen Registrierungsdateien angelegt,
+deswegen steht diese Option hier nicht zur Verfügung. Im
+Wiederherstellungsmodus "Dateien zurückkopieren" werden automatisch
+alle Benutzerregistrierungen wiederhergestellt, Sie können hier also
+nicht zwischen dem "aktuellen Benutzer" und "anderen
+Benutzerregistrierungen" wählen.
+
+Die Sicherungskopien der aktuellen Registrierungsdateien werden im
+selben Ordner wie die Originaldateien gespeichert und haben die
+Dateiendung ".bak".
+
+Fortgeschrittene Anwender brauchen noch nicht einmal das Programm
+ERDNT zu benutzen, um eine Sicherung der Registrierung unter einem
+anderen Betriebssystem wiederherzustellen. Wenn Zugriff auf alle
+entsprechenden Ordner besteht, können die gesicherten Dateien auch
+einfach "von Hand" an den Originalort zurückkopiert werden, nichts
+anderes tut ja ERDNT im Modus "Dateien zurückkopieren". In der Datei
+ERDNT.INF kann nachgeschaut werden, wo die Originaldateien lagen.
+
+
+
+ERDNT Kommandozeilenoptionen
+----------------------------
+
+Auch das Programm ERDNT unterstützt Kommandozeilenoptionen für die
+Ausführung im "stillen" Modus.
+Die Kommandozeilen-Syntax für ERDNT ist:
+
+ERDNT silent [sysreg] [curuser] [otherusers]
+[/mode:nt|filecopy] [/nobackup] [/noprogresswindow] [/reboot]
+
+(Argumente in eckigen Klammern sind optional.)
+
+Beschreibung der Kommandozeilenoptionen:
+
+silent
+  Führt ERDNT im "stillen" Modus aus und aktiviert die Benutzung
+  aller anderen Kommandozeilenoptionen.
+
+sysreg
+  Wiederherstellung der Systemregistrierung
+
+curuser *
+  Wiederherstellung der Registrierung des aktuellen Benutzers
+  (Diese Option wird ignoriert im Wiederherstellungsmodus
+  "Dateien zurückkopieren".)
+
+otherusers
+  Wiederherstellung anderer gesicherter Benutzerregistrierungen
+
+(Hinweis: Wenn keine der drei obigen Optionen in der Kommandozeile
+übergeben wird, stellt ERDNT automatisch die Systemregistrierung
+und die Registrierung des aktuellen Benutzers wieder her.)
+
+/mode:nt oder /mode:filecopy *
+  Deaktiviert die automatische Erkennung des richtigen
+  Wiederherstellungsmodus und aktiviert stattdessen den angegebenen
+  Modus.
+
+/nobackup
+  Keine Sicherungskopien der aktuellen Registrierungsdateien während
+  der Wiederherstellung anlegen.
+  (Diese Option wird ignoriert im Wiederherstellungsmodus "NT".)
+
+/noprogresswindow
+  Zeigt kein Fortschrittsfenster während des
+  Wiederherstellungsvorgangs an.
+
+/reboot *
+  Startet den Computer nach Beendigung des Wiederherstellungsvorgangs
+  automatisch neu.
+
+* = Nicht unterstützt in der DOS-Version von ERDNT.
+
+
+
+Optimierung der Registrierung mit NTREGOPT
+------------------------------------------
+
+Ähnlich wie bei Windows 9x/Me werden die Registrierungsdateien eines
+NT-basierten Systems mit der Zeit fragmentiert, belegen so auf der
+Festplatte mehr Speicherplatz als nötig und verringern die allgemeine
+Systemleistung. Sie sollten das Utility NTREGOPT regelmäßig benutzen,
+auf jeden Fall aber nach der Installation oder Deinstallation eines
+Programms, um die Größe der Registrierung zu minimieren und den
+Zugriff auf die Registrierung zu optimieren.
+
+Das Programm erstellt jede Registrierungsdatei "von Grund auf" neu,
+sodass übrig gebliebene Lücken in den Dateien von geänderten oder
+gelöschten Registrierschlüsseln eliminiert werden.
+
+Beachten Sie, dass das Programm NICHT den Inhalt der Registrierung in
+irgendeiner Weise verändert. Auch findet keine Defragmentierung der
+Dateien auf der Platte statt (etwas, das das Programm PageDefrag von
+SysInternals tut). Die von NTREGOPT durchgeführte Optimierung besteht
+lediglich aus der Verkleinerung der Registrierungsdateien auf die
+kleinstmögliche Größe.
+
+Um die Registrierung zu optimieren, starten Sie einfach NTREGOPT,
+klicken Sie auf "OK", und wenn die Optimierung beendet ist, klicken
+Sie auf "OK", um den Computer neu zu starten. Sie sollten dies sofort
+tun, da alle Änderungen, die nach der Ausführung von NTREGOPT in die
+Registrierung geschrieben werden, nach dem Neustart wieder
+verlorengehen.
+
+
+
+NTREGOPT Kommandozeilenoptionen
+-------------------------------
+
+Die Kommandozeilen-Syntax für NTREGOPT ist:
+
+NTREGOPT silent [/noprogresswindow] [/reboot]
+
+(Argumente in eckigen Klammern sind optional.)
+
+Beschreibung der Kommandozeilenoptionen:
+
+silent
+  Führt NTREGOPT im "stillen" Modus aus und aktiviert die Benutzung
+  der anderen Kommandozeilenoptionen.
+
+/noprogresswindow
+  Zeigt kein Fortschrittsfenster während der Optimierung an.
+
+/reboot
+  Startet den Computer nach Beendigung der Optimierung automatisch
+  neu.
+
+
+
+Bekannte Probleme
+-----------------
+
+Manchmal tritt während der Ausführung von ERUNT und NTREGOPT der
+Fehler 1450 - "Nicht genügend Systemressourcen, um den angeforderten
+Dienst auszuführen" - beim Speichern einer Registrierungsdatei auf.
+Diesen Fehler konnte ich bisher noch auf keinem PC reproduzieren, und
+Berichten von betroffenen Anwendern zu Folge tritt er genauso auch
+beim Versuch einer Sicherung der entsprechenden Datei mit Microsofts
+REGBACK-Programm auf. Dies macht es unwahrscheinlich, dass ich von
+meiner (der Programmierer-) Seite aus etwas tun kann. Einige Anwender
+konnten das Problem allerdings durch Ausführen von ERUNT/NTREGOPT im
+abgesicherten Modus von Windows umgehen, und in einem Fall konnte es
+permanent durch die Deinstallation einer Symantec-Software-Suite
+gelöst werden. Weiterhin berichtete ein Anwender, dass das Problem auf
+seinem System durch Erhöhen des Wertes für "IRPStackSize", wie im
+Microsoft Knowledge Base-Artikel 177078 beschrieben, behoben wurde.
+
+Wenn das System nach einer Wiederherstellung der Registrierung mit
+ERDNT oder einer Optimierung mit NTREGOPT neu gestartet wird,
+erscheint unter Windows Server 2003 während der Anmeldung die
+Ereignisprotokollierung für Herunterfahren und fragt nach, warum das
+System unerwartet heruntergefahren wurde. Dies kommt daher, dass die
+Informationen, dass es in Wirklichkeit doch ein ordnungsgemäßes
+Herunterfahren war, noch in die "alte" Registrierung geschrieben
+werden, welche beim erneuten Hochfahren des Systems komplett durch die
+wiederhergestellte/optimierte Registrierung ersetzt wird. Dadurch
+gehen diese Informationen des ordnungsgemäßen Herunterfahrens verloren
+und die Ereignisprotokollierung denkt, das System sei abgestürzt. Um
+diese Meldung in Zukunft zu unterdrücken, können Sie die
+Ereignisprotokollierung für Herunterfahren abschalten (in der
+Windows-Hilfe finden Sie Informationen dazu, wie das geht).
+
+Sollten Sie auf noch andere Probleme stoßen, schicken Sie mir bitte
+eine E-Mail an lars.hederer@t-online.de mit einer genauen
+Beschreibung, und ich werde mich bemühen, Ihnen zu helfen.
+
+
+
+Übersetzung
+-----------
+
+Sie können alle Programme aus diesem Archiv in Ihre Sprache
+übersetzen, indem Sie die entsprechenden .LOC-Dateien editieren.
+
+Beachten Sie dabei, dass das Editieren der .LOC-Dateien der drei
+Windows-Programme (ERUNT, ERDNTWIN, NTREGOPT) in einem Windows-Editor
+(Notepad) erfolgen sollte, und das Editieren der Datei ERDNTDOS.LOC in
+einem MS-DOS-Editor (EDIT.COM). So ist sichergestellt, dass alle
+Sonderzeichen Ihrer Sprache im Programm korrekt dargestellt werden.
+
+Wenn Ihre Sprache auf meiner Homepage noch nicht vertreten ist und Sie
+Ihre Übersetzung der Allgemeinheit zugänglich machen wollen, können
+Sie mir die vier übersetzten Dateien gerne schicken. Ich werde sie
+dann zum Download anbieten, natürlich mit Hinweis auf den Autor.
+
+Ein deutsches Sprachpaket ist dem Programm bereits beigefügt. Um ERUNT
+in Deutsch zu benutzen, entzippen Sie einfach die Datei LOC_GER.ZIP in
+Ihren ERUNT-Ordner.
+
+
+
+Versionsgeschichte
+------------------
+
+v1.1j, 20.10.2005
+- Kompatibilitätsprobleme mit 64-Bit-Windows behoben (vielen Dank an
+  Ian Smith und Hajo für alle Tests)
+- Erweiterte Fehlermeldungen
+- AutoBackup unterstützt nun alle Datumsformate
+- ERUNT.INI: "TimeSeparator" funktioniert wieder;
+  "DefaultDestinationFolder" unterstützt nun alle Umgebungsvariablen
+  (bisher konnte nur %SystemRoot% benutzt werden)
+- ERDNT zeigt nun zusätzlich zum Erstellungsdatum der Sicherung den
+  Ursprungs-Windows-Ordner an
+
+v1.1i, 17.08.2005
+- AutoBackup: Verbesserte Unterstützung komplexer Datumsformate
+- NTREGOPT: Das Optimierungsergebnis wird nun richtig berechnet, wenn
+  beim Optimieren einer oder mehrerer Registrierungsdateien Fehler
+  auftraten
+
+v1.1h, 06.03.2005
+- Aktualisierung der Homepage-Adresse
+- Neue ERUNT.INI-Option: AppendTimeToFolderEditField
+- Problem behoben, dass auf manchen Systemen die Registrierung des
+  aktuellen Benutzers nicht erkannt wurde
+- Funktionsweise der Option /days:n bei AutoBackup geändert
+
+v1.1g, 02.11.2004
+- ERUNT läuft unter Windows XP und Server 2003 nun VIEL schneller
+- In der Kommandozeile kann nun auch die aktuelle Uhrzeit eingefügt
+  werden
+- AutoBackup erstellt in der Standardeinstellung nun keine neue
+  Sicherung für den aktuellen Tag mehr, wenn schon eine existiert
+
+v1.1f, 26.08.2004
+- Kommandozeilen-Tool AUTOBACK.EXE zum Erstellen von automatischen
+  Registrierungssicherungen mit Löschen alter, vor einer bestimmten
+  Anzahl von Tagen erstellter Wiederherstellungsordner hinzugefügt
+- Die Fensterposition ist nun in der Bildschirmmitte anstatt der
+  Desktopmitte, dies behebt ein Darstellungsproblem bei der Benutzung
+  von mehreren Monitoren (danke John :)
+
+v1.1e, 31.07.2004
+- Das Erscheinungsbild des Datums kann über die Datei ERUNT.INI
+  angepasst werden
+- NTREGOPT: Bei der Anzeige des Optimierungsergebnisses wird das
+  Tausender-Trennzeichen verwendet
+
+v1.1d, 07.07.2004
+- Fehlerbehandlung optimiert
+- DOS- und Windows-Version von ERDNT sind nun in einer einzigen
+  Win32-EXE-Datei kombiniert, damit wurden Probleme mit der vorherigen
+  16 Bit-EXE-Datei auf manchen Systemen sowie mit BartPE behoben
+- Unterstützung der Windows-Wiederherstellungskonsole mit einer ERDNT-
+  Batchdatei
+- Der voreingestellte Zielordner kann nun über die Datei ERUNT.INI
+  konfiguriert werden, dafür wurde die Kommandozeilenoption
+  #Zielordner wieder entfernt
+- Die Voreinstellung für den Zielordner ist nun innerhalb des Windows-
+  Ordners, für problemlosen Zugriff über die Wiederherstellungskonsole
+- Ein neuer Ordner mit dem aktuellen Datum als Name wird automatisch
+  an den Zielordner angehängt (dies kann in der ERUNT.INI abgeschaltet
+  werden)
+- Gesamtüberarbeitung der Dokumentation
+
+v1.1c, 10.05.2004
+- Probleme mit dynamischen Datenträgern behoben
+- Durchsuchen-Funktion für den Zielordner hinzugefügt, sowie die
+  Möglichkeit, den voreingestellten Namen zu ändern (benutzen Sie
+  #Zielordner in der Kommandozeile)
+- Windows NT 3.51 wird wieder unterstützt (Unterstützung war mit v1.1
+  verlorengegangen), außer Durchsuchen-Funktion
+
+v1.1b, 23.04.2004
+- ERUNT und NTREGOPT sind jetzt kompatibel mit Windows Server 2003 und
+  Windows XP Service Pack 2
+- Problem behoben, dass auf manchen Systemen die Registrierungsdateien
+  nicht gesichert/wiederhergestellt/optimiert werden konnten
+- Benennung der Unterordner für die Benutzerregistrierungen im
+  ERDNT-Ordner wurde geändert
+
+v1.1a, 03.10.2002
+- Problem behoben, dass auf manchen Systemen die Registrierungsdateien
+  nicht gesichert/wiederhergestellt/optimiert werden konnten
+
+v1.1, 25.09.2002
+- Problem mit Fehlermeldung "Ungültige Zeigeroperation", welches auf
+  manchen Systemen auftrat, behoben (vielen Dank an Russ Cordner für
+  seine Hilfe beim Einkreisen des Problems)
+- Problem mit Fehlermeldung "Error opening localization file" behoben,
+  wenn ERUNT.EXE von außerhalb des ERUNT-Ordners aufgerufen wurde
+- Probleme im Zusammenhang mit UNC-Pfadnamen behoben
+- Kommandozeilenunterstützung für ERDNT und NTREGOPT hinzugefügt
+- NTREGOPT: Optimierungsergebnis (Größe der Registry vorher/nachher)
+  wird angezeigt
+
+v1.0, 24.11.2001
+- Erste Version
+
+
+
+Vertrieb
+--------
+
+Das ERUNT-Programmpaket (enthält die Programme ERUNT, AUTOBACK, ERDNT
+und NTREGOPT) ist Freeware. Bitte geben Sie es an jeden weiter, der es
+vielleicht nützlich finden könnte.
+
+Ich erlaube explizit die Aufnahme dieses Pakets in ein Datei-Archiv,
+in CD-ROM-Kollektionen oder Kollektionen auf anderen Medien sowie die
+Benutzung in eigenen Programmen, solange alle Dateien erhalten und
+unverändert bleiben. Über eine kurze Nachricht via E-Mail, wo mein
+Programm aufgenommen wurde, freue ich mich.
+
+
+
+Spenden
+-------
+
+Obwohl ich meine Programme als Freeware herausgegeben habe, damit
+niemand für ihre Benutzung bezahlen muss, werden Spenden akzeptiert
+und gerne angenommen. Wenn Sie also meine Programme nützlich finden
+und die weitere Entwicklung unterstützen möchten, besuchen Sie einfach
+meine Homepage und klicken auf eine der "PayPal"-Schaltflächen, oder
+spenden Sie über PayPal direkt an meine E-Mail-Adresse. Vielen Dank im
+Voraus!
+
+Wenn Sie in Deutschland leben, können Sie mir auch direkt einen Betrag
+auf mein Konto überweisen. Setzen Sie sich mit mir in Verbindung, um
+meine Bankverbindung zu erfahren.
+
+
+
+Haftungsausschluss
+------------------
+
+Die Benutzung dieser Software erfolgt auf eigene Gefahr. Ich übernehme
+keine Verantwortung dafür, was Ihnen oder Ihrem PC auf Grund der
+Benutzung meiner Programme zustößt, zum Beispiel: Zerstörung der
+Registrierung, Festplattencrash, Herzanfall...
+
+Kommentare und Vorschläge per E-Mail sind aber immer willkommen!

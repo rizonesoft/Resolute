@@ -1,0 +1,8 @@
+Repair Recycle Bin (Deletes Recycle Bin Contents)
+
+Corrupt recycle bins and/or items that are not able to be removed from the recycle bin are fixed by this repair.
+
+All items in the recycle bin are removed.
+
+This repair will delete the contents of the recycle bin. First setting and correcting the permissions for the recycle bin and all sub items.
+It is also able to remove items with more than 255 character path length.

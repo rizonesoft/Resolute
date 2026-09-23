@@ -1,0 +1,60 @@
+[Rizonesoft SDK]
+Compatibilty = Rizonesoft SDK 11
+Script = BiosCodes.au3
+
+[Modules]
+Build = 1
+Compress = 0
+Sign = 0
+Documentation = 1
+Import = 0
+Distribute = 1
+Portable = 1
+Installation = 1
+SignInstall = 0
+UpdateFile = 1
+
+[Signing]
+CertificateSet = Signing\Signing.ini
+Website = https://rizonesoft.com
+
+[Distribute]
+File=%RootDir%\BiosCodes.exe
+File=%RootDir%\BiosCodes_X64.exe
+File=%SourceDir%\BiosCodes.ini
+File=%RootDir%\Docs\BiosCodes\Changes.txt
+File=%RootDir%\Docs\BiosCodes\License.txt
+File=%RootDir%\Docs\BiosCodes\Readme.txt
+File=%RootDir%\Processing\32\Stroke.ani
+File=%RootDir%\Processing\64\Globe.ani
+
+[Sources]
+
+[Environment]
+ScriptPath=R:\Workspace\Resolute\SDK\Concrete\BiosCodes\BiosCodes.au3
+Company=Rizonesoft
+CompanyURL=https://www.rizonesoft.com
+Name=Beep Codes Viewer
+ShortName=BiosCodes
+Description=Beep Codes Viewer
+Type=N
+Icon=R:\Workspace\Resolute\SDK\Resources\Icons\BiosCodes.ico
+Version=11.3.1.1994
+VersionMajor=11
+VersionMaintenance=1
+VersionBuild=1994
+UseBeta=P
+UseX64=Y
+CompileBoth=Y
+OutFile=BiosCodes.exe
+OutFileX64=BiosCodes_X64.exe
+OutFilePath=R:\Workspace\Resolute\Resolute\BiosCodes.exe
+OutFileX64Path=R:\Workspace\Resolute\Resolute\BiosCodes_X64.exe
+InstallScriptPath=0
+InstallOutputPath=0
+InstallSize=0
+DistributionPath=R:\Workspace\Resolute\SDK\Concrete\BiosCodes\Distribution\1994
+DistributionName=BiosCodes_1994
+FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\BiosCodes\Distribution\1994\BiosCodes_1994
+DistroSourceName=BiosCodes_1994_Source
+DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\BiosCodes\Distribution\1994\BiosCodes_1994_Source

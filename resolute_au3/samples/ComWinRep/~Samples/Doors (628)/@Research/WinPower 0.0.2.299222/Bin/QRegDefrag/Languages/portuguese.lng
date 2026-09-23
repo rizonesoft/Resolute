@@ -1,0 +1,160 @@
+﻿
+[Português (Portugal)]
+;Translated by Ricardo Ferreira
+
+;COMMON VALUES
+LOKBUTTON=OK
+LCANCELBUTTON=Cancelar
+LSAVEASBUTTON=Guardar como...
+LANALYZEBUTTON=Analisar
+LDEFRAGBUTTON=Desfragmentar
+LCLOSEBUTTON=Fechar
+LRESTARTBUTTON=Reiniciar
+LLATERBUTTON=Mais tarde
+LREPORTBUTTON=Gerar Relatório...
+LSTOPBUTTON=Parar
+LBROWSEBUTTON=Procurar...
+LERROR=Erro
+LENABLED=Activo
+LDISABLED=Inactivo
+LREGREPLACE=Erro - RegReplaceKey está desabilitado. Reinicie o Windows e tente novamente.
+LNOTSUPPORTED=Não Suportado
+LRESTOREPOINTNOT=Restauro do Sistema não suportado.
+LCREATINGRESTORE=A criar Ponto de Restauro...
+LNEVERUSED=Nunca utilizado
+
+;MAIN WINDOW
+LNEVERUSED=Nunca utilizado
+LMENUOPTIONS=Opções
+LMENUHELP=Ajuda
+LMENUABOUT=Sobre
+LOVERVIEW=Perspectiva Geral
+LLASTDEFRAG=Última Desfragmentação:
+LSIZERECOVERED=Espaço Recuperado:
+LPERCENT=Percentagem:
+LWOULDLIKE=Que acção pretende realizar?
+LDEFRAGTITLE=Desfragmentar Registo
+LREGINFOTITLE=Obter Informações do Registo
+LUPDATEOK=Está a utilizar a última versão disponível.
+LUPDATEDISABLED=A verificação automática de actualizações está inactiva.
+LUPDATENEW=Está disponível uma nova versão.
+LUPDATEWAIT=A procurar actualizações. Por favor, aguarde...
+LMOREINFO=mais informações...
+LUPDATES=Actualizações
+
+;ABOUT WINDOW
+LABOUTTITLE=Sobre
+LVERSION=Versão
+LICON=Ícones criados por
+
+;OPTIONS WINDOW
+LOPTIONS=Opções
+LOPTIONSDESCRIPTION=Configura as opções do programa.
+LSETTINGS=Definições Gerais
+LLANGUAGE=Idioma
+LCHKCHECKUPDATE=Procurar actualizações automaticamente
+LCHECKNOW=Procurar novas actualizações agora...
+LCHKDEFRAGMYCOMPUTER=Adicionar "Desfragmentar Registo..." ao menu do Meu Computador
+LCHKREGINFOMYCOMPUTER=Adicionar "Obter Informações do Registo" ao menu do Meu Computador
+LBACKUPS=Backups
+LAUTOREGFILES=Criar backup do registo automaticamente antes da desfragmentação
+LAUTORESTOREPOINT=Criar ponto de restauro automaticamente antes da desfragmentação
+LBACKUPFOLDER=Pasta para Backups:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Informações
+LREGINFODESCRIPTION=Informações sobre o registo do Windows.
+LSO=Sistema Operativo:
+LUSER=Sessão inciada como:
+LREGSIZE=Tamanho do Registo:
+LCOLUMNPATH=Localização
+LCOLUMNSIZE=Tamanho
+LREGISTRYFILES=Ficheiros do Registo
+LNUMBERFILES=Número de Ficheiros:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnósticos
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Nome do Hive:
+LLOGICALPATH=Caminho Lógico:
+LMAPPATH=Caminho Simbólico:
+LTEMPPATH=Caminho Temporário:
+LHIVESIZE=Tamanho do Hive:
+LKEY=Chave:
+LVALIDFILE=Ficheiro encontrado.
+LNOTVALIDFILE=Ficheiro não encontrado.
+
+;DEFRAG WINDOW - First Screen
+LTITLEPROBLEM=Porque é necessário?
+LDEFRAGDESCRIPTION=Optimiza e Comprime o Registo do Windows.
+LMAINTEXT=Os dados do registo são constantemente escritos e removidos durante a utilização do Windows. Com o passar do tempo, esses dados fragmentam-se. Esta ferramenta optimiza o registo ao remover fragmentos e espaços em branco do registo do Windows.
+LBENEFITS=O Quicksys RegDefrag melhora o desempenho do sistema e acelera o acesso ao registo.
+LTITLESTEPS=Fases
+LSTEP1=1. Analisa a estrutura do registo.
+LSTEP2=2. Examina os resultados da análise.
+LSTEP3=3. Desfragmenta o registo. É necessário reiniciar o computador.
+LTITLEANALYZE=Clique em "Analisar" para iniciar o processo.
+LAUTOBACKUP=Backup Automático:
+LAUTORESTORE=Ponto de Restauro:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=A analisar o registo. Por favor, aguarde...
+LPROGRESS=Progresso:
+LREADING=A verificar:
+LSTOPPROCESS=A terminar o processo...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=Resultados da Análise
+LCOMPARATION=Comparação
+LCONCLUSION=Conclusão
+LREGISTRYFRAGMENTATION=Fragmentação do Registo
+LCURRENTSIZE=Tamanho actual do Registo:
+LNEWSIZE=Novo tamanho do Registo:
+LSIZEDIFFERENCE=Diferença de tamanho:
+LLEGFRAG=fragmentado
+LLEGALLOC=espaço alocado
+LBACKREGFILES=Criar backup do registo:
+LBACKRESTORE=Criar ponto de restauro:
+LCONCLUSION=Conclusão
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Desfragmentação concluída.
+LFINISHED=Finalizado com sucesso.
+LRESTARTREQUIRED=É necessário reiniciar o computador para que as mudanças tenham efeito.
+LRESTARTMSGBOX=Deseja reiniciar agora?
+LHTMLREPORT=Você pode gerar um relatório em HTML com os dados da desfragmentação.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=É necessário reiniciar o computador para realizar uma nova análise.
+LDEFRAGMSGBOX1=Feche todos os programas.
+LDEFRAGMSGBOX2=A análise pode demorar alguns minutos.
+LDEFRAGMSGBOX3=Durante o processo, o computador pode parar de responder.
+LDEFRAGMSGBOX4=Para continuar, clique "Sim".
+LFEWFRAGMENTS=O Registo possui poucos fragmentos. Não é necessário desfragmentá-lo.
+LNOFRAGMENTS=O Registo já está desfragmentado. 
+LTOOFRAGMENTS=O Registo tem vários fragmentos. Clique em "Desfragmentar" para optimizá-lo.
+
+;REPORT 
+LNAMEREPORT=Relatório
+LH1=Relatório da Desfragmentação
+LCREATEDBY=Criado por
+LDATE=Data:
+LTIME=Hora:
+LSUMMARY=Resumo da Desfragmentação:
+LREGPROCESSED=Ficheiros do registo processados:
+LREGANASTART=Hora de início da análise do registo:
+LREGANAFINISHED=Hora de conclusão da análise do registo:
+LREGTOTALFINISHED=Tempo gasto na análise do registo:
+LREGSIZEBEFORE=Tamanho do registo antes:
+LREGSIZEAFTER=Tamanho do registo depois:
+LREGSIZEDIFFERENCE=Diferença de tamanho do registo:
+LREGFILESSUMMARY=Resumo dos Ficheiros do Registo
+LCOLUMNREGFILE=Ficheiro do Registo
+LCOLUMNREGBEFORE=Tamanho Antes
+LCOLUMNAFTER=Tamanho Depois
+LCOLUMNDIFFERENCE=Diferença de Tamanho
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=A desfragmentar o registo
+LDEFRAGNOW=A desfragmentar:

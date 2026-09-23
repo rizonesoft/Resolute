@@ -1,0 +1,5 @@
+Repair Performance Counters:
+
+This will run the lodctr /r command which will rebuild the Windows Performance counters from a backup file.
+
+When the performance counters become corrupt nothing that pulls from them will be able to pull any data.

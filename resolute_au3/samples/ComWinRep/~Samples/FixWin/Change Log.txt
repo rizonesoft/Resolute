@@ -1,0 +1,11 @@
+FixWin v1.2 - FixWin is a kind of problem solver assistant for Windows 7 and Windows Vista, covering 50 the most common problems and offers its solution with a single click of button.
+
+Change Log: 
+
+# Hanging while you fix “Taskbar JumpList is missing or doesn’t store MRU file list”.
+# Fixing Aero Snap issues doesn’t work.
+# Reconfigure all events of Windows Explorer to apply settings immediately to avoid restart and logoff.
+# Messagebox replaced with new Windows Vista/7 TaskDialog.
+# Code Refactoring is done.
+# Target .NET Framework changed 2.0 now. No need to have .Net Framework v3.5 and its SP1.
+# Crashing on 64bit version of Windows.

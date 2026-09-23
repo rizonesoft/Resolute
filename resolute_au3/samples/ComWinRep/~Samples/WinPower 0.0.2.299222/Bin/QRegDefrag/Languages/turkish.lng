@@ -1,0 +1,167 @@
+﻿
+[Türkçe]
+;Translated by Murat Dibi (muratdibi@gmail.com)
+
+;COMMON VALUES
+LOKBUTTON=TAMAM
+LCANCELBUTTON=İptal
+LSAVEASBUTTON=Farklı Kaydet.
+LANALYZEBUTTON=İncele
+LDEFRAGBUTTON=Birleştir
+LCLOSEBUTTON=Kapat
+LRESTARTBUTTON=Tekrar Başlat
+LLATERBUTTON=Daha sonra
+LREPORTBUTTON=Rapor oluştur...
+LSTOPBUTTON=Durdur
+LBROWSEBUTTON=AÇ...
+LERROR=Hata
+LENABLED=Etkin
+LDISABLED=Etkin değil
+LNOTSUPPORTED=Desteklenmiyor
+LREGREPLACE=Hata - RegReplaceKey etkin değil. Windows u yeniden başlatıp tekrar deneyin.
+LRESTOREPOINTNOT=Geri yükleme noktası desteklenmiyor.
+LCREATINGRESTORE=Geri yükleme noktası oluşturuluyor...
+
+;MAIN WINDOW
+LNEVERUSED=Hiç kullanılmamış
+LMENUOPTIONS=Seçenekler
+LMENUHELP=Yardım
+LMENUABOUT=Hakkında
+LOVERVIEW=Genel Durum
+LLASTDEFRAG=En son birleştirme:
+LSIZERECOVERED=Kazanılan boyut:
+LPERCENT=Yüzde:
+LWOULDLIKE=Ne yapmak istersiniz?
+LDEFRAGTITLE=Kayıt defterini Birleştir
+LREGINFOTITLE=Kayıt defteri bilgisini al.
+LUPDATEOK=En son sürümü kullanıyorsunuz.
+LUPDATEDISABLED=Otomatik güncelleme etkin değil.
+LUPDATENEW=Yeni bir sürüm var.
+LUPDATEWAIT=Yeni sürüm araştırılıyor. Lütfen bekleyin.
+LMOREINFO=Daha fazla bilgi...
+LUPDATES=Güncellemeler.
+
+;ABOUT WINDOW
+LABOUTTITLE=Hakkında
+LVERSION=Sürüm
+LICON=Simgeleri tasarlayan
+
+;OPTIONS WINDOW
+LOPTIONS=Seçenekler
+LOPTIONSDESCRIPTION=Program ayarları.
+LSETTINGS=Genel Ayarlar
+LLANGUAGE=Dil
+LCHKCHECKUPDATE=Güncelleştirmeleri Otomatik araştır.
+LCHECKNOW=Güncelleştirmeleri şimdi araştır...
+LCHKDEFRAGMYCOMPUTER=Bilgisayar içerik menüsüne"Kayıt defterini Birleştir..." seçeneği ekle
+LCHKREGINFOMYCOMPUTER=Bilgisayar içerik menüsüne "Kayıt defteri bilgileri" seçeneği ekle
+LBACKUPS=Yedeklemeler
+LAUTOREGFILES=Birleştirme öncesi kayıt defterini otomatik olarak yedekle
+LAUTORESTOREPOINT=Birleştirme öncesi otomatik olarak Geri yükleme noktası oluştur
+LBACKUPFOLDER=Yedekleme klasörü:
+
+;REGISTRY INFORMATIONS WINDOW
+LINFORMATIONS=Bilgiler
+LREGINFODESCRIPTION=Kayıt defteri hakkında bilgiler.
+LSO=İşletim Sistemi:
+LUSER=Kullanıcı:
+LREGSIZE=Kayıt defteri boyutu:
+LCOLUMNPATH=Yol
+LCOLUMNSIZE=Boyut
+LREGISTRYFILES=Kayıt defteri dosyaları
+LNUMBERFILES=Dosya sayısı:
+
+;DIAGNOSTICS WINDOW
+LDIAGTITLE=Diagnostics
+
+;DIAGNOSTIC WINDOW - ADDITIONAL
+LHIVENAME=Hive Name:
+LLOGICALPATH=Logical Path:
+LMAPPATH=Map Path:
+LTEMPPATH=Temp Path:
+LHIVESIZE=Hive Size:
+LKEY=Anahtar:
+LVALIDFILE=File exists.
+LNOTVALIDFILE=File not exists.
+
+;DEFRAG WINDOW - First Screen
+LDEFRAGDESCRIPTION=Kayıt defterinizi iyileştirir.
+LTITLEPROBLEM=Sorun ve çözümü
+LMAINTEXT=Normal bir windows işlemi sırasında kayıt defterine bilgiler yazılır veya kaldırılır. Böylece Kayıt defterinde parçalanmalar meydana gelebilir. Bu Program kayıt defterindeki parçalanmaları ve gereksiz boşlukları kaldırarak sistemi düzenler.
+LBENEFITS=Quicksys RegDefrag Bilgisayarınızın  performansını arttırır ve kayıt defterine ulaşımı hızlandırır.
+LTITLESTEPS=Adımlar
+LSTEP1=1. Kayıt defterini incele.
+LSTEP2=2. Analiz sonuçlarını göster.
+LSTEP3=3. Kayıt defterini Birleştir. Bilgisayarı yeniden başlatmayı gerektirir.
+LTITLEANALYZE=İşlemi başlatmak için "İncele" seçeneğini tıklatın.
+LAUTOBACKUP=Otomatik yedekle:
+LAUTORESTORE=Otomatik geri yükleme noktası:
+
+;DEFRAG WINDOW - Second Screen
+LSTATUSANALYZING=Kayıt defteri inceleniyor. Lütfen bekleyin
+LPROGRESS=İlerleme:
+LREADING=Kontrol ediliyor:
+LSTOPPROCESS=İlerleme durduruluyor...
+
+;DEFRAG WINDOW - Third Screen
+LRESULTS=İnceleme sonuçları
+LCOMPARATION=Karşılaştırma
+LCONCLUSION=Sonuç
+LREGISTRYFRAGMENTATION=Kayıt defteri parçalanması
+LCURRENTSIZE=Şu anki Kayıt defteri boyutu:
+LNEWSIZE=Yeni Kayıt defteri boyutu:
+LSIZEDIFFERENCE=Birleştirme sonrası değişiklik:
+LLEGFRAG=Parçalanmış
+LLEGALLOC=ayrılmış alan
+LBACKREGFILES=Kayıt defteri yedek dosyası oluştur:
+LBACKRESTORE=Geri yükleme noktası oluştur:
+LCONCLUSION=Sonuç
+
+;DEFRAG WINDOW - Fourth Screen
+LDEFRAGCOMPLETED=Birleştirme tamamlandı!
+LFINISHED=Başarıyla Bitirildi.
+LRESTARTREQUIRED=Değişikliklerin etkili olması için bilgisayarı yeniden başlatmalısınız.
+LRESTARTMSGBOX=Şimdi yeniden başlatmak ister misiniz?
+LHTMLREPORT=Birleştirme sonucu ile ilgili bir HTML dosyası oluşturabilirsiniz.
+
+;DEFRAG WINDOW - Others
+LREDEFRAGRESTART=Yeni bir inceleme için bilgisayarı yeniden başlatmak gerekir
+LDEFRAGMSGBOX1=Bütün programları kapatın.
+LDEFRAGMSGBOX2=İnceleme birkaç dakika sürebilir.
+LDEFRAGMSGBOX3=Birleştirme işlemi sırasında  bilgisayarınızın kullanımı program tarafından kısıtlanacaktır.
+LDEFRAGMSGBOX4=Devam etmek için  "Evet(yes)" seçeneğini tıklatın.
+LFEWFRAGMENTS=Parçalanma çok az. Birleştirmeye gerek yok.
+LNOFRAGMENTS=Hiç parçalanma bulunmadı. Birleştirme mümkün değil.
+LTOOFRAGMENTS=Parçalanma çok fazla. Kayıt defterini iyileştirmek için "Birleştir" seçeneğini tıklayın.
+
+;REPORT 
+LNAMEREPORT=Rapor
+LH1=Birleştirme Raporu
+LCREATEDBY=raporu oluşturan
+LDATE=Tarih:
+LTIME=Saat:
+LSUMMARY=Birleştirme özeti
+LREGPROCESSED=işlenen dosyalar:
+LREGANASTART=İnceleme Başlangıç:
+LREGANAFINISHED=İnceleme Bitiş:
+LREGTOTALFINISHED=İnceleme toplam süre:
+LREGSIZEBEFORE=Birleştirme Önceki boyut:
+LREGSIZEAFTER=Birleştirme sonraki boyut:
+LREGSIZEDIFFERENCE=Boyut Farkı:
+LREGFILESSUMMARY=Kayıt defteri dosyaları özeti
+LCOLUMNREGFILE=Kayıt defteri dosya
+LCOLUMNREGBEFORE=Önceki boyut
+LCOLUMNAFTER=Sonraki boyut
+LCOLUMNDIFFERENCE=Boyut Farkı
+
+;COMMANDLINE - PROGRESSWINDOW
+LDEFRAGMENT=Kayıt defteri birleştiriliyor
+LDEFRAGNOW=Birleştiriliyor:
+
+;NEW PHRASES! Please, translate!
+;LHTMLCREATED=HTML rapor başarıyla oluşturuldu. 
+;LOPENNOW=Şimdi Aç?
+;LNOTHTMLCREATED=Hata. HTML rapor oluşturulamadı
+;LFILE=Dosya
+;LFREESPACE=Birleştirme için yeterli boş alan yok. Kontrol edin ve tekrar dinleyin.
+;LERROREGREAD=Hata! Kayıt defteri Bilgileri okunamıyor.

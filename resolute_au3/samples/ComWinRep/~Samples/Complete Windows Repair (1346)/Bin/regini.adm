@@ -1,0 +1,5 @@
+\Registry\Machine\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer [1 5 8 11 17]
+\Registry\Machine\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon [1 5 8 11 17]
+\Registry\Machine\SYSTEM\ControlSet001\Services\Winmgmt\Parameters [1 5 8 11 17]
+\Registry\Machine\SYSTEM\CurrentControlSet\Control\Session Manager [1 5 8 11 17]
+\Registry\Machine\SYSTEM\CurrentControlSet\services\Winmgmt\Parameters [1 5 8 11 17]

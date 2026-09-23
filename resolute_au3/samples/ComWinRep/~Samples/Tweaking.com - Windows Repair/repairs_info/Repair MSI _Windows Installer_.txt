@@ -1,0 +1,17 @@
+Repair MSI (Windows Installer):
+
+This will try to repair the Windows Installer (MSI)
+
+The following commands are ran:
+
+The MSI Server service is also replaced.
+
+sc config msiserver start= demand
+Net stop msiserver
+
+MSIExec /unregister
+MSIExec /regserver
+regsvr32.exe /s %windir%\system32\msi.dll
+
+Net start msiserver
+

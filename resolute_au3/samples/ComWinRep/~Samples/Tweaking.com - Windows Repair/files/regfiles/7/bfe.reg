@@ -1,0 +1,28 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\BFE]
+"DisplayName"="@%SystemRoot%\\system32\\bfe.dll,-1001"
+"Group"="NetworkProvider"
+"ImagePath"=hex(2):25,00,73,00,79,00,73,00,74,00,65,00,6d,00,72,00,6f,00,6f,00,\
+74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
+00,76,00,63,00,68,00,6f,00,73,00,74,00,2e,00,65,00,78,00,65,00,20,00,2d,00,\
+6b,00,20,00,4c,00,6f,00,63,00,61,00,6c,00,53,00,65,00,72,00,76,00,69,00,63,\
+00,65,00,4e,00,6f,00,4e,00,65,00,74,00,77,00,6f,00,72,00,6b,00,00,00
+"Description"="@%SystemRoot%\\system32\\bfe.dll,-1002"
+"ObjectName"="NT AUTHORITY\\LocalService"
+"ErrorControl"=dword:00000001
+"Start"=dword:00000002
+"Type"=dword:00000020
+"DependOnService"=hex(7):52,00,70,00,63,00,53,00,73,00,00,00,00,00
+"ServiceSidType"=dword:00000003
+"RequiredPrivileges"=hex(7):53,00,65,00,41,00,75,00,64,00,69,00,74,00,50,00,72,\
+00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,00,00
+"FailureActions"=hex:80,51,01,00,00,00,00,00,00,00,00,00,03,00,00,00,14,00,00,\
+00,01,00,00,00,c0,d4,01,00,01,00,00,00,e0,93,04,00,00,00,00,00,00,00,00,00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\BFE\Parameters]
+"ServiceDll"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,\
+00,74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,\
+62,00,66,00,65,00,2e,00,64,00,6c,00,6c,00,00,00
+"ServiceDllUnloadOnStop"=dword:00000001
+"ServiceMain"="BfeServiceMain"

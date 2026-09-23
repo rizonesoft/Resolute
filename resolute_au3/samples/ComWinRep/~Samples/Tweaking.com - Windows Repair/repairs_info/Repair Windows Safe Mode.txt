@@ -1,0 +1,3 @@
+Repair Windows Safe Mode:
+
+This repair will apply the reg keys needed for safe mode to boot. Some viruses remove these keys. This repair will not remove or delete any custom keys in the registry for safe mode. This is done to keep from breaking any custom settings put there, it will simply apply the defaults. This also means that if a virus puts itself there that it wont be removed. So make sure to scan your system.

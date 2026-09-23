@@ -1,0 +1,3 @@
+Repair Windows New Submenu:
+
+When you right click on the desktop or in a folder and go to new and it is missing, empty or is missing the default items then this repair will put back the registry keys for the new menu and its default items.

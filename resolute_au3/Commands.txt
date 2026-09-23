@@ -1,0 +1,140 @@
+- Control Panel (Default)							control										  
+- Control Panel (category view)						shell:::{26EE0668-A00A-44D7-9371-BEB064C98683}
+- Control Panel (icon view)							shell:::{21EC2020-3AEA-1069-A2DD-08002B30309D}
+- Control Panel All Tasks (God Mode):				shell:::{ED7BA470-8E54-465E-825C-99712043E01C}
+- All Applications:									shell:::{4234d49b-0245-4df3-B780-3893943456e1}
+- Add a Device wizard								DevicePairingWizard.exe
+- Add Hardware wizard								hdwwiz.exe
+- Add a Printer wizard								rundll32 shell32.dll,SHHelpShortcuts_RunDLL AddPrinter
+- AutoPlay											shell:::{9C60DE1E-E5FC-40f4-A487-460851A8D915} 												[7, 8, 8.1, 10, 11]
+- Backup and Restore (Windows 7):					shell:::{B98A2BEA-7D42-4558-8BD1-832F41BAC6FD}
+- Biometric Devices									shell:::{0142E4D0-FB7A-11DC-BA4A-000FFE7AB428} 												[7, 8, 8.1]
+- BitLocker Drive Encryption						shell:::{D9EF8727-CAC2-4E60-809E-86F80A666C91} 												[7, 8, 8.1, 10, 11]
+- Color and Appearance								shell:::{ED834ED6-4B5A-4BFE-8F11-A626DCB6A921} -Microsoft.Personalization\pageColorization 	[10, 11]
+- Color Management									shell:::{B2C761C6-29BC-4f19-9251-E6195265BAF1} 												[7, 8, 8.1, 10, 11]
+- Credential Manager								shell:::{1206F5F1-0569-412C-8FEC-3204630DFB70} 												[7, 8, 8.1, 10, 11]
+													[or] control /name Microsoft.CredentialManager)
+- Date and Time (Date and Time)	    		        shell:::{E2E7934B-DCE5-43C4-9576-7FE4F75E7480} 												[7, 8, 8.1, 10, 11]
+													[or] control /name Microsoft.DateAndTime
+													[or] control timedate.cpl 
+													[or] control date/time
+													[or] rundll32 shell32.dll,Control_RunDLL timedate.cpl,,0
+- Date and Time (Additional Clocks)					rundll32 shell32.dll,Control_RunDLL timedate.cpl,,1											[7, 8, 8.1, 10, 11]
+- Default Programs (Set Default Programs)			shell:::{17CD9488-1228-4B2F-88CE-4298E93E0966} 												[7, 8, 8.1, 10, 11]
+													[or] control /name Microsoft.DefaultPrograms /page pageDefaultProgram
+- Default Programs (Set Associations)				control /name Microsoft.DefaultPrograms /page pageFileAssoc
+													
+- Desktop Background						explorer shell:::{ED834ED6-4B5A-4bfe-8F11-A626DCB6A921} -Microsoft.Personalization\pageWallpaper
+- Desktop Icon Settings						rundll32 shell32.dll,Control_RunDLL desk.cpl,,0
+- Device Manager							control /name Microsoft.DeviceManager
+	[OR]									control hdwwiz.cpl
+	[OR]									devmgmt.msc
+- Devices and Printers						control /name Microsoft.DevicesAndPrinters 
+	[OR]									control printers
+- Ease of Access Center						control /name Microsoft.EaseOfAccessCenter
+	[OR] 									control access.cpl
+- File Explorer Options (General tab)		control /name Microsoft.FolderOptions
+	[OR] 									control folders
+	[OR] 									rundll32 shell32.dll,Options_RunDLL 0
+- File Explorer Options (View tab)			rundll32 shell32.dll,Options_RunDLL 7
+- File Explorer Options (Search tab)		rundll32 shell32.dll,Options_RunDLL 2
+- File History								control /name Microsoft.FileHistory
+- Fonts										control /name Microsoft.Fonts
+	[OR] 									control fonts
+- Game Controllers							control /name Microsoft.GameControllers
+	[OR] 									control joy.cpl
+- Get Programs								control /name Microsoft.GetPrograms
+	[OR] 									rundll32 shell32.dll,Control_RunDLL appwiz.cpl,,1
+Indexing Options 							control /name Microsoft.IndexingOptions
+	[OR] 									rundll32 shell32.dll,Control_RunDLL srchadmin.dll
+Infrared									control /name Microsoft.Infrared
+	[OR] 									control irprops.cpl
+	[OR] 									control /name Microsoft.InfraredOptions
+Internet Properties (General tab)			control /name Microsoft.InternetOptions
+	[OR] 									control inetcpl.cpl
+	[OR] 									rundll32 shell32.dll,Control_RunDLL inetcpl.cpl,,0
+Internet Properties (Security tab)			rundll32 shell32.dll,Control_RunDLL inetcpl.cpl,,1
+Internet Properties (Privacy tab)			rundll32 shell32.dll,Control_RunDLL inetcpl.cpl,,2
+Internet Properties (Content tab)			rundll32 shell32.dll,Control_RunDLL inetcpl.cpl,,3
+Internet Properties (Connections tab)		rundll32 shell32.dll,Control_RunDLL inetcpl.cpl,,4
+Internet Properties (Programs tab)			rundll32 shell32.dll,Control_RunDLL inetcpl.cpl,,5
+Internet Properties (Advanced tab)			rundll32 shell32.dll,Control_RunDLL inetcpl.cpl,,6
+iSCSI Initiator								control /name Microsoft.iSCSIInitiator
+Keyboard Properties							control /name Microsoft.Keyboard
+	[OR] 									control keyboard
+Mouse Properties (Buttons tab 0)			control /name Microsoft.Mouse
+	[OR] 									control main.cpl
+	[OR] 									control mouse
+	[OR] 									rundll32 shell32.dll,Control_RunDLL main.cpl,,0
+Mouse Properties (Pointers tab 1)			control main.cpl,,1
+	[OR] 									rundll32 shell32.dll,Control_RunDLL main.cpl,,1
+Mouse Properties (Pointer Options tab 2)	control main.cpl,,2
+	[OR] 									rundll32 shell32.dll,Control_RunDLL main.cpl,,2
+Mouse Properties (Wheel tab 3)				control main.cpl,,3
+	[OR] 									rundll32 shell32.dll,Control_RunDLL main.cpl,,3
+Mouse Properties (Hardware tab 4)			control main.cpl,,4
+	[OR] 											rundll32 shell32.dll,Control_RunDLL main.cpl,,4
+Network and Sharing Center							control /name Microsoft.NetworkAndSharingCenter
+Network Connections	control 						ncpa.cpl
+	[OR] 											control netconnections
+Network Setup Wizard								control netsetup.cpl
+Notification Area Icons								shell:::{05d7b0f4-2121-4eff-bf6b-ed3f69b894d9}
+ODBC Data Source Administrator						control odbccp32.cpl
+Offline Files										control /name Microsoft.OfflineFiles
+Performance Options (Visual Effects)				SystemPropertiesPerformance.exe
+Performance Options (Data Execution Prevention)		SystemPropertiesDataExecutionPrevention.exe
+Personalization										shell:::{ED834ED6-4B5A-4bfe-8F11-A626DCB6A921}
+Phone and Modem										control /name Microsoft.PhoneAndModem
+	[OR] 											control telephon.cpl
+Power Options										control /name Microsoft.PowerOptions
+	[OR] 											control powercfg.cpl
+Power Options - Advanced settings					control powercfg.cpl,,1
+Power Options - Create a Power Plan					control /name Microsoft.PowerOptions /page pageCreateNewPlan
+Power Options - Edit Plan Settings					control /name Microsoft.PowerOptions /page pagePlanSettings
+Power Options - System Settings						control /name Microsoft.PowerOptions /page pageGlobalSettings
+Presentation Settings								PresentationSettings.exe
+Programs and Features								control /name Microsoft.ProgramsAndFeatures
+	[OR] 											control appwiz.cpl
+Recovery											control /name Microsoft.Recovery
+	[OR] 											shell:::{9FE63AFD-59CF-4419-9775-ABCC3849F861}
+Region (Formats tab)								control /name Microsoft.RegionAndLanguage
+	[OR] 											control intl.cpl
+	[OR] 											control international
+RemoteApp and Desktop Connections					control /name Microsoft.RemoteAppAndDesktopConnections
+Scanners and Cameras								control /name Microsoft.ScannersAndCameras
+	[OR] 											control sticpl.cpl
+Screen Saver Settings								rundll32 shell32.dll,Control_RunDLL desk.cpl,,1
+Security and Maintenance							control /name Microsoft.ActionCenter
+	[OR] 											control wscui.cpl
+Sound (Playback tab)								control /name Microsoft.Sound
+	[OR] 											control mmsys.cpl
+	[OR] 											rundll32 shell32.dll,Control_RunDLL mmsys.cpl,,0
+Sound (Recording tab)								rundll32 shell32.dll,Control_RunDLL mmsys.cpl,,1
+Sound (Sounds tab)									rundll32 shell32.dll,Control_RunDLL mmsys.cpl,,2
+Sound (Communications tab)							rundll32 shell32.dll,Control_RunDLL mmsys.cpl,,3
+Speech Recognition									control /name Microsoft.SpeechRecognition
+Storage Spaces										control /name Microsoft.StorageSpaces
+Sync Center											control /name Microsoft.SyncCenter
+System Icons										shell:::{05d7b0f4-2121-4eff-bf6b-ed3f69b894d9} \SystemIcons,,0
+System Properties (Computer Name)					SystemPropertiesComputerName.exe
+System Properties (Hardware)						SystemPropertiesHardware.exe
+System Properties (Advanced)						SystemPropertiesAdvanced.exe
+System Properties (System Protection)				SystemPropertiesProtection.exe
+System Properties (Remote)							SystemPropertiesRemote.exe
+Tablet PC Settings									control /name Microsoft.TabletPCSettings
+Text to Speech										control /name Microsoft.TextToSpeech
+Troubleshooting										shell:::{26EE0668-A00A-44D7-9371-BEB064C98683}\0\::{C58C4893-3BE0-4B45-ABB5-A63E4B8C8651}
+User Accounts										control /name Microsoft.UserAccounts
+	[OR] 											control userpasswords
+User Accounts (netplwiz)							netplwiz
+	[OR] 											control userpasswords2
+Windows Defender Firewall							control /name Microsoft.WindowsFirewall
+	[OR] 											control firewall.cpl
+Windows Defender Firewall Allowed apps				shell:::{4026492F-2F69-46B8-B9BF-5654FC07E423} -Microsoft.WindowsFirewall\pageConfigureApps
+Windows Defender Firewall with Advanced Security	WF.msc
+Windows Features									OptionalFeatures.exe
+	[OR] 											rundll32 shell32.dll,Control_RunDLL appwiz.cpl,,2
+Windows Mobility Center								control /name Microsoft.MobilityCenter
+Windows Tools										control /name Microsoft.AdministrativeTools
+	[OR] 											control admintools
+Work Folders										WorkFolders.exe

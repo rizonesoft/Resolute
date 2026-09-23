@@ -1,0 +1,4 @@
+Remove Temp Files:
+
+This is more of maintenance than a repair. The windows temp folder can grow rather large when not emptied. It can also have files that windows tries to use instead of the proper ones. Also some viruses and infections will be in the temp folder.
+

@@ -1,0 +1,80 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\.msc]
+@="MSCFile"
+
+[HKEY_CLASSES_ROOT\mscfile]
+@="Microsoft Common Console Document"
+"EditFlags"=dword:00100000
+"FriendlyTypeName"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,\
+  00,6f,00,6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,\
+  32,00,5c,00,6d,00,6d,00,63,00,62,00,61,00,73,00,65,00,2e,00,64,00,6c,00,6c,\
+  00,2c,00,2d,00,31,00,33,00,30,00,00,00
+
+[HKEY_CLASSES_ROOT\mscfile\DefaultIcon]
+@="%1"
+
+[HKEY_CLASSES_ROOT\mscfile\shell]
+
+[HKEY_CLASSES_ROOT\mscfile\shell\Author]
+@="&Author"
+"MUIVerb"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,6d,00,6d,00,63,00,62,00,61,00,73,00,65,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,33,00,33,00,35,00,31,00,00,00
+
+[HKEY_CLASSES_ROOT\mscfile\shell\Author\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,6d,00,6d,00,\
+  63,00,2e,00,65,00,78,00,65,00,20,00,2f,00,61,00,20,00,22,00,25,00,31,00,22,\
+  00,20,00,25,00,2a,00,00,00
+
+[HKEY_CLASSES_ROOT\mscfile\shell\open]
+@="&Open"
+"MUIVerb"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,6d,00,6d,00,63,00,62,00,61,00,73,00,65,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,33,00,33,00,34,00,39,00,00,00
+
+[HKEY_CLASSES_ROOT\mscfile\shell\open\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,6d,00,6d,00,\
+  63,00,2e,00,65,00,78,00,65,00,20,00,22,00,25,00,31,00,22,00,20,00,25,00,2a,\
+  00,00,00
+
+[HKEY_CLASSES_ROOT\mscfile\shell\RunAs]
+"HasLUAShield"=""
+@="R&un as..."
+"MUIVerb"=hex(2):40,00,25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,\
+  6f,00,74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,\
+  00,6d,00,6d,00,63,00,62,00,61,00,73,00,65,00,2e,00,64,00,6c,00,6c,00,2c,00,\
+  2d,00,31,00,33,00,33,00,35,00,30,00,00,00
+
+[HKEY_CLASSES_ROOT\mscfile\shell\RunAs\command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,6d,00,6d,00,\
+  63,00,2e,00,65,00,78,00,65,00,20,00,22,00,25,00,31,00,22,00,20,00,25,00,2a,\
+  00,00,00
+
+[HKEY_CLASSES_ROOT\mscfile\shell\runasuser]
+@="@shell32.dll,-50944"
+"SuppressionPolicyEx"="{F211AA05-D4DF-4370-A2A0-9F19C09756A7}"
+"Extended"=""
+
+[HKEY_CLASSES_ROOT\mscfile\shell\runasuser\command]
+"DelegateExecute"="{ea72d00e-4960-42fa-ba92-7792a7944c1d}"
+
+[HKEY_CLASSES_ROOT\mscfile\shellex]
+
+[HKEY_CLASSES_ROOT\mscfile\shellex\ContextMenuHandlers]
+
+[HKEY_CLASSES_ROOT\mscfile\shellex\ContextMenuHandlers\PintoStartScreen]
+@="{470C0EBD-5D73-4d58-9CED-E91E22E23282}"
+
+[HKEY_CLASSES_ROOT\mscfile\shellex\IconHandler]
+@="{7A80E4A8-8005-11D2-BCF8-00C04F72C717}"
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.MSC\UserChoice]
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.MSC\OpenWithProgids]
+"MSCFile"=hex(0):
