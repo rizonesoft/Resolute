@@ -201,7 +201,7 @@ Commit as one section commit with the evidence in the body:
 
 Quote every suite count in the body from the commit being created: re-run the suites at this commit and quote those figures, never figures measured mid-item. Live-green quotes ride the same commit-time discipline: two non-simultaneous measurements never jointly satisfy one checkpoint.
 
-Push the SHIP push. The commit must exist on the remote before the next step, because the independent reviewer reads the commit. Capture the remote head first (`BEFORE=$(git ls-remote origin refs/heads/master | cut -f1)`) and read CI back after it with `python scripts/review_prompt.py ci-wait <SHIP_SHA> --since $BEFORE` (D00 T04 §30): a red or unverifiable read-back is fixed before the review, never carried into it.
+Push the SHIP push. The commit must exist on the remote before the next step, because the independent reviewer reads the commit. Capture the remote head first (`BEFORE=$(git ls-remote origin refs/heads/master | cut -f1)`) and read CI back after it with `python scripts/review_prompt.py ci-wait <SHIP_SHA> --since $BEFORE` (D00 T04 §30), and record its line in the run file: a red or unverifiable read-back is fixed before the review, never carried into it.
 
 ### 8. Independent review, before the stamp
 

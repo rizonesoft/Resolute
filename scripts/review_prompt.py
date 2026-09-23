@@ -1092,16 +1092,33 @@ def provenance_tag(candidate: str, prefix: str, cwd=None) -> tuple[str | None, s
 
 
 def workflow_path_filters(workflow_file: str) -> list[str] | None:
-    """The `on.push.paths` globs of a GitHub workflow, or None when the
-    workflow filters no paths (every push runs it). Read line by line
-    rather than through a YAML parser, because the tree carries no
-    external dependency: the list items under the first `paths:` key
-    are the filter."""
+    """The path filter of a workflow file on disk (fixtures only: a real
+    read-back parses the pushed commit's copy, `committed_path_filters`).
+    None when the file is unreadable or filters nothing, which reads as
+    triggered, the waiting and therefore safe direction."""
     try:
         with open(workflow_file, encoding="utf-8") as fh:
-            lines = fh.read().splitlines()
+            return parse_workflow_path_filters(fh.read())
     except OSError:
         return None
+
+
+def committed_path_filters(commit: str, path: str, cwd=None) -> list[str] | None:
+    """The path filter of the workflow as the pushed commit carries it,
+    never the working tree: GitHub evaluates the committed workflow, and
+    a local edit must not decide whether a red run is waited for (§30
+    panel round 1). A commit without the file reads as unfiltered."""
+    rc, text = _git_out(["show", f"{commit}:{path}"], cwd)
+    return parse_workflow_path_filters(text) if rc == 0 else None
+
+
+def parse_workflow_path_filters(text: str) -> list[str] | None:
+    """The `on.push.paths` globs of a GitHub workflow's text, or None when
+    it filters no paths (every push runs it). Read line by line rather
+    than through a YAML parser, because the tree carries no external
+    dependency: the list items under the first `paths:` key are the
+    filter."""
+    lines = text.splitlines()
     globs: list[str] = []
     in_paths = False
     indent = None
@@ -5140,6 +5157,25 @@ def _self_test() -> int:
             check("ci-wait-reads-not-triggered-without-waiting",
                   got_nt.returncode == 0 and "not triggered" in got_nt.stdout,
                   f"exit={got_nt.returncode} out={got_nt.stdout!r} err={got_nt.stderr!r}")
+            # The committed workflow decides, not a working-tree edit.
+            os.makedirs(os.path.join(tmpd, ".github", "workflows"), exist_ok=True)
+            wfc = os.path.join(tmpd, ".github", "workflows", "plan.yml")
+            with open(wfc, "w", encoding="utf-8") as fh:
+                fh.write("on:\n  push:\n    paths:\n      - 'todo/**'\njobs: {}\n")
+            with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
+                fh.write("one\nstaged\ncommitted\n")
+            _g("add", "f.md", ".github/workflows/plan.yml")
+            _g("commit", "-qm", "c2")
+            c2 = _g("rev-parse", "HEAD").stdout.strip()
+            with open(wfc, "w", encoding="utf-8") as fh:
+                fh.write("on:\n  push:\n    paths:\n      - 'f.md'\njobs: {}\n")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("failure")
+            got_cw = subprocess.run([sys.executable, me, "ci-wait", c2, "--timeout", "0", "--interval", "0"],
+                                    cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-reads-the-committed-workflow-not-the-worktree",
+                  got_cw.returncode == 0 and "not triggered" in got_cw.stdout,
+                  f"exit={got_cw.returncode} out={got_cw.stdout!r} err={got_cw.stderr!r}")
             check("ci-wait-cli-resolves-short-sha-and-fails-red",
                   got.returncode == 1 and c1[:12] in got.stderr and "failure" in got.stderr,
                   f"exit={got.returncode} err={got.stderr!r}")
@@ -6030,7 +6066,8 @@ if __name__ == "__main__":
         rest = sys.argv[2:]
         sha_arg, workflow, timeout, interval = rest[0], "plan-gates", 900.0, 15.0
         since = None
-        wf_file = os.path.join(".github", "workflows", "plan.yml")
+        wf_file = None
+        wf_path = ".github/workflows/plan.yml"
         i = 1
         try:
             while i < len(rest):
@@ -6060,7 +6097,9 @@ if __name__ == "__main__":
             print(f"ci-wait: cannot list the paths {base}..{ident[0][:12]} changed", file=sys.stderr)
             sys.exit(2)
         changed = [ln for ln in diff.splitlines() if ln.strip()]
-        if not push_triggers_workflow(changed, workflow_path_filters(wf_file)):
+        filters = (workflow_path_filters(wf_file) if wf_file is not None
+                   else committed_path_filters(ident[0], wf_path))
+        if not push_triggers_workflow(changed, filters):
             print(f"ci-wait: {ident[0][:12]} {workflow} not triggered "
                   f"({len(changed)} changed path(s), none in the workflow's path filter)")
             sys.exit(0)
