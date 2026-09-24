@@ -91,6 +91,7 @@ track: W1
 |  31   |   §31   | Red CI repaired, not waited on                 | §30 |  [x]   |
 |  32   |   §32   | Campaign guard: stop hook, heartbeat, breaker  | --  |  [ ]   |
 |  33   |   §33   | CI repair-loop follow-ups                      | §31 |  [ ]   |
+|  34   |   §34   | Campaign guard follow-ups                      | §32 |  [ ]   |
 
 ---
 
@@ -1323,6 +1324,7 @@ Operator question 2026-09-24: where is the stop hook, the cron that reminds the 
 **Test checkpoint:** `python scripts/campaign_guard.py --self-test` passes every allow and block case plus the breaker trip and reset, quoted, and runs inside `scripts/check-all.ps1`; `.claude/settings.json` wires the hook; the `process-plan` run guard names the guard file, the heartbeat prompt, and the operator stop.
 
 -> SOURCE: operator-2026-09-24-campaign-guard
+-> XREF: D00 T04 §34 -- the seven plan-review follow-ups filed from this section
 
 ## 33. CI Repair-Loop Follow-Ups
 
@@ -1349,6 +1351,31 @@ The D00 T04 §31 plan review files eight findings the §31 contract does not own
 -> SOURCE: plan-D00-T04-s31-2026-09-23-PR6 D00-T04-S31-PR6
 -> SOURCE: plan-D00-T04-s31-2026-09-23-PR7 D00-T04-S31-PR7
 -> SOURCE: plan-D00-T04-s31-2026-09-23-PR8 D00-T04-S31-PR8
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR8 D00-T04-S32-PR8
+
+## 34. Campaign Guard Follow-Ups
+
+The D00 T04 §32 plan review files seven findings the §32 contract does not own: the guard and an escalation report collide (PR1), run-end cleanup is stated but unproven (PR2), the stall fingerprint misses untracked content (PR4) and counts bookkeeping as progress (PR5), guard ownership is not exclusive (PR6), the heartbeat lifecycle is unexercised (PR7), and a failing hook goes silent (PR9). PR8 joined the episode-cap item in D00 T04 §33, and PR3 was rejected (`0 runnable now` is the plan's one genuine halt, and the runner still owes its `PARKED` record).
+
+- [ ] Hand the guard over before an escalation report: an exhausted repair bound or an unverifiable CI (D00 T04 §31) ends in a report, and the Stop hook would block that turn. (plan review of the D00 T04 §32 candidate, PR1; needs §32 shipped: it hardens §32's guard). Done when: the escalation path writes a column-0 `PARKED` line naming the cause (or deletes the guard) before reporting, and a hook fixture proves the report turn ends, quoted.
+- [ ] Prove every run-end cleanup: closeout, park, plan done, and operator stop each delete the guard file, the state file, and the heartbeat job. (plan review of the D00 T04 §32 candidate, PR2; needs §32 shipped: it hardens §32's guard). Done when: a driven check per end path shows all three gone afterwards, quoted, and a later session is neither blocked nor resumed by leftovers.
+- [ ] Fingerprint untracked content, not just the untracked set: an edit to a new, still-untracked file is real progress the breaker currently cannot see. (plan review of the D00 T04 §32 candidate, PR4; needs §32 shipped: it hardens §32's guard). Done when: the hook hashes untracked file contents (bounded), and a fixture editing an untracked file resets the breaker, quoted.
+- [ ] Exclude bookkeeping from the stall fingerprint: a run file that only gains another heartbeat or retry line reads as progress and keeps the breaker from tripping. (plan review of the D00 T04 §32 candidate, PR5; needs §32 shipped: it hardens §32's guard). Done when: the fingerprint ignores the run file's Critical-events lines (or an equivalent bookkeeping marker), and a fixture that appends only a heartbeat line still trips the breaker, quoted.
+- [ ] Make guard ownership exclusive: two sessions could overwrite one guard file or schedule duplicate heartbeats. (plan review of the D00 T04 §32 candidate, PR6; needs §32 shipped: it hardens §32's guard). Done when: the guard is acquired atomically (create-exclusive or compare-and-swap on `session_id`), a second session refuses to take a live guard without an operator handover, and fixtures pin both, quoted.
+- [ ] Drive the heartbeat lifecycle: the recovery path (CronCreate, idle fire, resume of the named session, 7-day replacement, delete on stop) is specified but unexercised. (plan review of the D00 T04 §32 candidate, PR7; needs §32 shipped: it hardens §32's guard). Done when: a recorded drive creates the job, sees it fire into an idle session and resume, replaces it, and deletes it on stop, each step quoted.
+- [ ] Surface a failed hook: the hook fails open on a thrown error, so a broken guard silently stops guarding. (plan review of the D00 T04 §32 candidate, PR9; needs §32 shipped: it hardens §32's guard). Done when: a failure writes a line to `build/claude-campaign-state.json` (or a hook log), the next heartbeat reports it in the run file, and a fixture that breaks the hook proves the report, quoted.
+- [ ] Commit: `"workspace: campaign guard follow-ups"`
+
+**Test checkpoint:** The escalation report turn ends, each run-end path leaves nothing behind, the untracked-edit and bookkeeping-only fixtures behave, a second session is refused a live guard, the heartbeat lifecycle drive is recorded, and a broken hook is reported, all quoted.
+
+-> XREF: D00 T04 §32 -- the campaign guard seven items harden
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR1 D00-T04-S32-PR1
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR2 D00-T04-S32-PR2
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR4 D00-T04-S32-PR4
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR5 D00-T04-S32-PR5
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR6 D00-T04-S32-PR6
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR7 D00-T04-S32-PR7
+-> SOURCE: plan-D00-T04-s32-2026-09-24-PR9 D00-T04-S32-PR9
 
 ## Verification
 
