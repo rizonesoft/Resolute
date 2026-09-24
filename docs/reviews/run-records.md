@@ -449,3 +449,18 @@ round: 3 model: gpt-6-sol effort: high outcome: empty candidate: 7c3ea4cf provid
 round: 4 model: gpt-6-sol effort: high outcome: independent candidate: bca02b52 provider: openai version: gpt-6-sol cost: unresolved latency: 98s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S31-F1, D00-T04-S31-F2
 empty: 2
 refuted: 0
+
+run: D00-T04-S32
+date: 2026-09-24
+runner: panel
+rounds: 6
+round: 1 model: gpt-6-sol effort: medium outcome: findings candidate: 909413f0 provider: openai version: gpt-6-sol cost: 25368tokens latency: 53s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S32-F2, D00-T04-S32-F3
+round: 2 model: gpt-6-sol effort: medium outcome: findings candidate: 3be78995 provider: openai version: gpt-6-sol cost: 38938tokens latency: 85s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S32-F4, D00-T04-S32-F5
+round: 3 model: gpt-6-sol effort: high outcome: findings candidate: fc45f4ef provider: openai version: gpt-6-sol cost: 30045tokens latency: 127s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S32-F6, D00-T04-S32-F7
+# round 3 is the Full sign-off: its integration finding would end the campaign between phases, treated as blocking, so rounds 4 and 5 ran on depth.
+round: 4 model: gpt-6-sol effort: high outcome: findings candidate: c8eda099 provider: openai version: gpt-6-sol cost: 26270tokens latency: 59s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S32-F8
+round: 5 model: gpt-6-sol effort: high outcome: empty candidate: db30f722 provider: openai version: gpt-6-sol cost: 25927tokens latency: 34s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+# round 6 is the independent pass (`panel_slots.py exec independent --commit 023d7aae`, ran before panel round 1); the runner printed no token figure.
+round: 6 model: gpt-6-sol effort: high outcome: independent candidate: 023d7aae provider: openai version: gpt-6-sol cost: unresolved latency: 200s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S32-F1
+empty: 1
+refuted: 0
