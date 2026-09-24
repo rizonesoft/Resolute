@@ -59,9 +59,9 @@ A run without a guard dies silently when the session stalls, so starting the fir
 
 Start it in this order:
 
-1. `CronList`. If a job whose prompt contains `Claude run-guard heartbeat for Resolute` exists, adopt it and do not create a second. Otherwise `CronCreate` with cron `3-59/5 * * * *`, recurring true, and the canonical prompt below with `<N>` and `<run file>` filled in.
+1. `CronList`. Adopt an existing job only when its prompt contains `Claude run-guard heartbeat for Resolute`, names this run file, and the guard file (if any) names this session; any other heartbeat job for Resolute is stale (another phase's run file, or a guard written by another session) and is `CronDelete`d first, because a heartbeat watching the wrong run file sees that run's closeout and deletes itself while this run is open. Otherwise `CronCreate` with cron `3-59/5 * * * *`, recurring true, and the canonical prompt below with `<N>` and `<run file>` filled in.
 2. Write `build/claude-campaign-guard.json` (gitignored) with `runner` = `claude`, `workspace` = the absolute workspace path, `phase` = the phase number, `run_file` = the repo-relative run file (`docs/phase-runs/<date>-phase-<N>.md`), `session_id` = the value of `$CLAUDE_CODE_SESSION_ID` read in the shell, and `cron_id` = the job id. Delete any stale `build/claude-campaign-state.json`.
-3. Record the job id and the guard write in the run file's Critical events.
+3. Record the session id, the job id, and the guard write in the run file's Critical events.
 
 The run file's end markers are exact: a closeout is a line `## Closeout` followed by the closeout text, and a park is a column-0 line `PARKED <UTC stamp> <one-line reason>` followed by the park record. The hook and the heartbeat read only those two shapes.
 
@@ -93,7 +93,7 @@ A parked phase is **not** complete, and it is **not** a stall. Do not call it ei
 python scripts/todo-graph.py query ready
 ```
 
-If another phase has a ready row, re-point the guard to the new phase's run file (delete, recreate, record the new id) and start `process-phase` on it in the same turn. Same session, same rules. If no phase has a ready row, the remaining leftovers are blocked, runnable-elsewhere in this context, or the plan is done: report which. Commit the phase's run file at closeout or park at the latest (earlier ships allowed): reconstructed round figures must resolve to a committed copy, never an untracked path. When the plan is done (no `[ ]` rows anywhere), run the terminal acceptance before deleting the guard: re-execute the `D06 T01 §16` procedure fresh on a clean machine. A failure reopens `D06 T01 §16` through `review-todo-section` in audit stance and the plan is not done; a pass is recorded in the findings file, then the guard is deleted. The acceptance row proves the suite shippable when it ships; the re-run proves it still is when everything else has landed.
+If another phase has a ready row, re-point the guard to the new phase's run file before anything else: `CronDelete` the old job, `CronCreate` a new one from the canonical prompt with the new phase and run file, rewrite `build/claude-campaign-guard.json` (`phase`, `run_file`, `cron_id`, and `session_id` from this shell), delete `build/claude-campaign-state.json`, and record the new ids in the new run file; then start `process-phase` on it in the same turn. Same session, same rules. If no phase has a ready row, the remaining leftovers are blocked, runnable-elsewhere in this context, or the plan is done: report which. Commit the phase's run file at closeout or park at the latest (earlier ships allowed): reconstructed round figures must resolve to a committed copy, never an untracked path. When the plan is done (no `[ ]` rows anywhere), run the terminal acceptance before deleting the guard: re-execute the `D06 T01 §16` procedure fresh on a clean machine. A failure reopens `D06 T01 §16` through `review-todo-section` in audit stance and the plan is not done; a pass is recorded in the findings file, then the guard is deleted. The acceptance row proves the suite shippable when it ships; the re-run proves it still is when everything else has landed.
 
 ## 3. Deny
 
