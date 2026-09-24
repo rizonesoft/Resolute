@@ -317,6 +317,10 @@ Invoke-Gate -Name 'panel slots' -LogName 'gate-panel-slots' -Command {
 Invoke-Gate -Name 'panel slots self-test' -LogName 'gate-panel-slots-selftest' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\panel_slots.py') --self-test
 }
+# The campaign Stop hook, driven against a throwaway workspace. D00 T04 §32.
+Invoke-Gate -Name 'campaign guard self-test' -LogName 'gate-campaign-guard' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\campaign_guard.py') --self-test
+}
 
 # The conformance profile is a contract other domains are measured against, so
 # a clause whose owner section was renumbered away would otherwise dangle with

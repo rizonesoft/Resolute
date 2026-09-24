@@ -51,11 +51,37 @@ Ready means runnable-now in the current context: `query ready` splits runnable-n
 
 ### Run guard
 
-A run without a guard dies silently when the session stalls, so starting the first phase also starts the run guard, always. List the harness scheduled jobs: if no Run-guard heartbeat for this workspace exists, create one on `*/10 * * * *` (recurring, skips while a run is active) with the canonical prompt below, and record its job id in the run's findings file. If a guard for this workspace already exists, adopt it: record its id and do not create a second. If the harness offers no scheduled jobs, record that the run is unguarded instead of pretending otherwise. The guard skips while a turn holds the token: resurrection of an idle session only, never keepalive of a live one. A fires-during-active guard fired into a live ScratchPad turn on 2026-09-18 and the runtime cancelled the turn plus its background suite run; the same shape here would kill the run it guards.
+A run without a guard dies silently when the session stalls, so starting the first phase also starts the run guard, always (D00 T04 §32, ported from ScratchPad). The guard has three parts, and they cover different failures.
 
-Canonical prompt (fill `<N>`, `<date>`, `<workspace>`; the run file is `docs/phase-runs/<date>-phase-<N>.md`):
+- **Stop hook** (`.claude/hooks/campaign-stop.ps1`, wired in `.claude/settings.json`): while the run is open, it blocks this session's end of turn and names the next ready row. It lets the turn end when the guard file is gone, the run file has a `## Closeout` heading or a column-0 `PARKED` line, or `query ready` prints `0 runnable now`. It blocks only the session named in the guard file, never subagents or a second session, and it fails open on a bad payload or a thrown error. `python scripts/campaign_guard.py --self-test` drives it against a throwaway workspace inside `scripts/check-all.ps1`.
+- **Stall breaker** (inside the hook): after 3 blocks in a row with no change to HEAD, the working-tree diff, the untracked set, or the run file, the hook lets the turn end and counts a trip in `build/claude-campaign-state.json`. Real progress resets the count. A session that cannot move is stuck, and pushing it again only spends money.
+- **Heartbeat** (`CronCreate`): it fires only when this session is idle, and it runs inside this session with full context, so it is a real resume, not a detached reminder. It covers the turns the hook cannot hold: a tripped breaker, an API error, a crash out of the turn.
 
-Run-guard heartbeat for the Resolute Phase <N> run (workspace <workspace>). Decide read-only FIRST whether the run is live: it is live if ANY of these hold: (a) any file under src/ shared/ extensions/ tests/ todo/ scripts/ resources/ docs/ modified in the last 25 minutes (find -newermt, excluding Bin/build); (b) any review producer `scripts/panel_slots.py exec` started for this repo still running (a `codex` or `grok` child; never this session's own transcript, which the heartbeat itself appends to and which therefore always reads fresh); (c) any cmake/ninja/ctest/clang process running for this repo. If live: take NO guard action (no audit, no new run, no guard commits) and CONTINUE the run work in progress in this same turn (process-plan: pick up exactly where the session left off; never end the turn on this heartbeat while work remains). Completion condition: the run is done only when todo/implementation-plan.md shows every row [x] (all sections shipped and stamped) or every leftover row is blocked or runnable-elsewhere in this context and the run file records PARKED; until then, each heartbeat keeps processing (audit, then process-phase on the first ready phase). Blocked rows re-evaluate every heartbeat: re-run `query ready` rather than trusting a previous blocked list, since a row whose blockers have all shipped is dependency-ready and ships in table order when runnable here. If NOT live (a/b/c all stale/absent) AND the run file exists with NEITHER a "## Closeout" header NOR a "PARKED" marker AND `python scripts/todo-graph.py query ready` from the workspace root prints at least one runnable-now row: the run stalled with no live writer, so resume it (audit, then process-phase on the first ready phase), single writer, trunk master, never --no-verify, never force-push. This guard is deleted at run closeout; do not extend it. On Windows, prove liveness with PowerShell: `Get-ChildItem -Recurse` LastWriteTime under src/ shared/ extensions/ tests/ todo/ scripts/ resources/ docs/ excluding Bin/build, running review producers via `Get-CimInstance Win32_Process` whose command line carries `panel_slots.py exec`, and `Get-Process cmake,ninja,ctest,clang` for this repo.
+Start it in this order:
+
+1. `CronList`. If a job whose prompt contains `Claude run-guard heartbeat for Resolute` exists, adopt it and do not create a second. Otherwise `CronCreate` with cron `3-59/5 * * * *`, recurring true, and the canonical prompt below with `<N>` and `<run file>` filled in.
+2. Write `build/claude-campaign-guard.json` (gitignored) with `runner` = `claude`, `workspace` = the absolute workspace path, `phase` = the phase number, `run_file` = the repo-relative run file (`docs/phase-runs/<date>-phase-<N>.md`), `session_id` = the value of `$CLAUDE_CODE_SESSION_ID` read in the shell, and `cron_id` = the job id. Delete any stale `build/claude-campaign-state.json`.
+3. Record the job id and the guard write in the run file's Critical events.
+
+The run file's end markers are exact: a closeout is a line `## Closeout` followed by the closeout text, and a park is a column-0 line `PARKED <UTC stamp> <one-line reason>` followed by the park record. The hook and the heartbeat read only those two shapes.
+
+The heartbeat is session-only: it dies with this session, and a recurring job expires after 7 days. A run still open on day 7 creates a new job and rewrites `cron_id`. A run resumed in a new session rewrites the guard with the new `session_id` and creates a new job; the old guard's session id no longer matches, so the hook never blocks the wrong session.
+
+Operator stop: pressing Esc interrupts without the hook firing. A stop or pause said in words deletes the guard file, the state file, and the job (`CronDelete`), in that order, before confirming. Resume recreates all three before any other step.
+
+A red CI read-back is not a stop either: the run repairs it through the loop the `review-todo-section` push block states (D00 T04 §31), and the hook keeps blocking while it does.
+
+Claude Code is the only runner (`AGENTS.md`, operator decision 2026-09-23). No other harness starts, adopts, or resumes a campaign.
+
+Canonical prompt:
+
+```text
+Claude run-guard heartbeat for Resolute Phase <N> (run file <run file>). This session went idle while a campaign run may still be open. Check, then act, in this turn.
+
+1. If build/claude-campaign-guard.json is missing, or <run file> has a line "## Closeout" or a column-0 line starting "PARKED": the run is over. CronDelete this job (find it with CronList by this prompt's first sentence), delete build/claude-campaign-state.json if present, and reply RUN FINISHED.
+2. If build/claude-campaign-state.json has trips of 2 or more: the run stalled twice with no change to the tree. Do not resume. Append a Critical events line to the run file naming what blocks it, delete the guard file and the state file, CronDelete this job, and report the stall to the operator.
+3. Otherwise resume the campaign under process-plan: re-run `python scripts/todo-graph.py query ready`, pick up the open section in the run file exactly where it stopped, and keep shipping: finish the section, stamp it, then the next section, then the next phase. A commit is not a stop, and a red CI is repaired, not waited on. Stop only at closeout, park, or an operator stop.
+```
 
 ## 2. After a phase closeout or park
 
@@ -77,4 +103,4 @@ If another phase has a ready row, re-point the guard to the new phase's run file
 - Do not claim a phase is complete while its table has `[ ]` rows.
 - Do not treat a named phase as the whole plan. Chaining is this skill's job, and only this skill's.
 - Do not end the turn on the audit table. Starting is the next action, in the same turn.
-- Do not start a run without starting its guard, and do not end, stop, or pause a run without deleting it.
+- Do not start a run without its guard file and heartbeat job, and do not end, stop, or pause a run without deleting both.

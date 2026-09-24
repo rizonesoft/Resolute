@@ -34,7 +34,7 @@ Check that no other writer holds the tree (`git status`, and ask about unfamilia
 
 Read the most recent prior file in `docs/phase-runs/` for this phase, if one exists: anything unresolved there is this run's first input.
 
-Run guard: if this session entered through `process-plan`, the plan owns the guard; verify it exists (list scheduled jobs) and record the check, but do not create a second. If pinned to this phase standalone, start the guard exactly as the `process-plan` skill specifies, with this phase's run file, and record its job id in Critical events.
+Run guard: if this session entered through `process-plan`, the plan owns the guard; verify the guard file `build/claude-campaign-guard.json` names this session and the heartbeat job exists (`CronList`), and record the check, but do not create a second. If pinned to this phase standalone, start the guard exactly as the `process-plan` skill specifies (Stop hook, guard file, heartbeat), with this phase's run file.
 
 ## Step 1 -- repair the phase before running it
 
