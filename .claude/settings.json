@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR\\.claude\\hooks\\campaign-stop.ps1\"",
+            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"& ([System.IO.Path]::Combine([Environment]::GetEnvironmentVariable('CLAUDE_PROJECT_DIR'), '.claude', 'hooks', 'campaign-stop.ps1'))\"",
             "timeout": 30
           }
         ]

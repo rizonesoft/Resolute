@@ -20,6 +20,7 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 HOOK = os.path.normpath(os.path.join(HERE, "..", ".claude", "hooks", "campaign-stop.ps1"))
+SETTINGS = os.path.normpath(os.path.join(HERE, "..", ".claude", "settings.json"))
 SESSION = "11111111-2222-3333-4444-555555555555"
 RUN_FILE = "docs/phase-runs/2099-01-01-phase-0.md"
 
@@ -49,11 +50,40 @@ def run_hook(root: str, session: str) -> tuple[int, dict | None, str]:
     return proc.returncode, parsed, proc.stderr
 
 
+def configured_command() -> str | None:
+    """The Stop hook command exactly as `.claude/settings.json` wires it."""
+    try:
+        with open(SETTINGS, encoding="utf-8") as fh:
+            doc = json.load(fh)
+        return doc["hooks"]["Stop"][0]["hooks"][0]["command"]
+    except (OSError, ValueError, KeyError, IndexError, TypeError):
+        return None
+
+
+def run_configured(root: str, session: str, shell: list[str]) -> tuple[int, dict | None, str]:
+    """Run the configured command the way Claude Code would, through
+    `shell` (Git Bash or PowerShell), with CLAUDE_PROJECT_DIR pointing at
+    the fixture (§32 independent review: a `$VAR` path that one shell
+    does not expand never launches the hook)."""
+    env = dict(os.environ, CLAUDE_PROJECT_DIR=root)
+    payload = json.dumps({"session_id": session, "cwd": root, "hook_event_name": "Stop"})
+    proc = subprocess.run([*shell, configured_command()], input=payload, capture_output=True,
+                          text=True, encoding="utf-8", errors="replace", env=env, cwd=root, timeout=120)
+    out = proc.stdout.strip()
+    try:
+        parsed = json.loads(out) if out else None
+    except ValueError:
+        parsed = {"unparsed": out}
+    return proc.returncode, parsed, proc.stderr
+
+
 def _workspace(tmpd: str) -> str:
     root = os.path.join(tmpd, "ws")
     os.makedirs(os.path.join(root, "scripts"))
     os.makedirs(os.path.join(root, "build"))
     os.makedirs(os.path.join(root, "docs", "phase-runs"))
+    os.makedirs(os.path.join(root, ".claude", "hooks"))
+    shutil.copyfile(HOOK, os.path.join(root, ".claude", "hooks", "campaign-stop.ps1"))
     with open(os.path.join(root, ".gitignore"), "w", encoding="utf-8") as fh:
         fh.write("build/\n")
     # The fake graph prints the runnable count the test writes to ready.txt.
@@ -118,6 +148,27 @@ def _self_test() -> int:
         _guard(root)
         code, out, err = run_hook(root, "99999999-0000-0000-0000-000000000000")
         check("allow-another-session", code == 0 and out is None, f"{code} {out} {err}")
+
+        # The configured command, not just the script: through PowerShell
+        # (a Windows host without Git Bash) and through Git Bash.
+        shells = [("powershell", [_powershell(), "-NoProfile", "-Command"])]
+        # Git Bash by path: the `bash` on PATH can be WSL's, which runs a
+        # different interpreter against the wrong tree.
+        bash = os.path.join(os.environ.get("ProgramFiles", "C:/Program Files"), "Git", "bin", "bash.exe")
+        if os.path.isfile(bash):
+            shells.append(("bash", [bash, "-c"]))
+        check("settings-wire-the-stop-hook", configured_command() is not None
+              and "campaign-stop.ps1" in (configured_command() or ""), str(configured_command()))
+        for label, shell in shells:
+            state_path = os.path.join(root, "build", "claude-campaign-state.json")
+            if os.path.exists(state_path):
+                os.remove(state_path)
+            code, out, err = run_configured(root, SESSION, shell)
+            check(f"configured-command-launches-through-{label}",
+                  isinstance(out, dict) and out.get("decision") == "block", f"{code} {out} {err[:300]}")
+        state_path = os.path.join(root, "build", "claude-campaign-state.json")
+        if os.path.exists(state_path):
+            os.remove(state_path)
 
         code, out, err = run_hook(root, SESSION)
         check("block-open-run-naming-next-row",
