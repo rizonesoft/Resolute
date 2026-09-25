@@ -1588,9 +1588,14 @@ def workflow_steps(text: str | None) -> list[dict]:
             # By identity, not display name: the action and whether it
             # takes inputs that change what it prepares (D00 T04 §37 panel
             # round 1).
-            earlier_steps.append({"name": name, "uses": uses, "with": sorted(
+            with_keys = sorted(
                 k2 for k2, _v2, _c2, _i2 in (_entries(keys["with"][1], _first_col(keys["with"][1]))
-                                             if "with" in keys and _first_col(keys["with"][1]) is not None else []))})
+                                             if "with" in keys and _first_col(keys["with"][1]) is not None else []))
+            if "with" in keys and keys["with"][0] and not with_keys:
+                # A flow mapping (`with: {ref: x}`) or any inline form still
+                # means inputs (D00 T04 §37 panel round 2).
+                with_keys = ["inputs " + keys["with"][0]]
+            earlier_steps.append({"name": name, "uses": uses, "with": with_keys})
     return out
 
 
@@ -1697,8 +1702,8 @@ _SECRET_RES = (
     (re.compile(r"\bxox[abprs]-[A-Za-z0-9-]{10,}\b"), "***"),
     (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S), "***"),
     (re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/-]{8,}=*"), r"\1***"),
-    # A credential-named key or variable, its value quoted or bare (D00 T04 §37 panel round 1).
-    (re.compile(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*\s*[=:]\s*)('[^']*'|\"[^\"]*\"|[^\s'\"]{4,})"), r"\1***"),
+    # A credential-named key or variable, quoted or bare, its value quoted or bare (D00 T04 §37 panel rounds 1 and 2).
+    (re.compile(r"(?i)((?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?\s*[=:]\s*)('[^']*'|\"[^\"]*\"|[^\s'\",}]{4,})"), r"\1***"),
 )
 _SECRET_NAME = re.compile(r"(?i)(secret|token|passw|credential|private|api[_-]?key|auth)")
 
@@ -6113,6 +6118,12 @@ def _self_test() -> int:
             check("checkout-is-identified-by-action-not-name",
                   "diagnostic: earlier steps may have prepared files, tools, or environment (Run actions/checkout@prepare)"
                   in rerun_lines(fk["Build"], "abc")[1], str(rerun_lines(fk["Build"], "abc")))
+            flow_with = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+                         "        with: {ref: other, path: alternate}\n      - name: T\n        run: make test\n")
+            fw = {s["name"]: s for s in workflow_steps(flow_with)}
+            check("a-flow-mapped-checkout-input-is-named-as-context",
+                  "diagnostic:" in rerun_lines(fw["T"], "abc")[1] and "checkout with inputs" in rerun_lines(fw["T"], "abc")[1],
+                  str(rerun_lines(fw["T"], "abc")))
             check("a-checkout-with-inputs-is-named-as-context",
                   "(checkout with ref)" in rerun_lines(fk["Test"], "abc")[1], str(rerun_lines(fk["Test"], "abc")))
             check("a-command-after-a-non-checkout-step-is-diagnostic",
@@ -6435,6 +6446,9 @@ def _self_test() -> int:
                        "          API_TOKEN: abc123\n          MODE: fast\n        run: make\n")
             sec_rows = rerun_lines(workflow_steps(sec_yml)[0], "abc")
             red2 = redact("password='hunter22' token=\"abcdefgh\" API_TOKEN=abcdefgh1 MY_SECRET: s3cr3tvalue MODE=fast")
+            red3 = redact('{"API_TOKEN": "abcdefgh1234", \'db_password\': \'pw123456\', "mode": "fast"}')
+            check("redact-masks-quoted-keys",
+                  "abcdefgh1234" not in red3 and "pw123456" not in red3 and '"mode": "fast"' in red3, red3)
             check("redact-masks-quoted-and-secret-named-assignments",
                   "hunter22" not in red2 and "abcdefgh" not in red2 and "s3cr3tvalue" not in red2
                   and "MODE=fast" in red2, red2)
@@ -6497,7 +6511,7 @@ def _self_test() -> int:
             ("skill-ci-episode-persists", "python scripts/campaign_guard.py repair attempt --red"),
             ("skill-ci-close-evidence", "repair close --green <sha> --workflow <workflow> --run-file <run file> --evidence"),
             ("skill-ci-ceiling-count", "python scripts/campaign_guard.py repair ceiling --run-id"),
-            ("skill-ci-no-run-authorized", "--authorized-by <who> --approved-range <base>..<head>`, which exits 4 `NOT GREEN`"),
+            ("skill-ci-no-run-authorized", "--authorized-by <who> --authorized-at <UTC time> --approved-range <base>..<head>`, which exits 4 `NOT GREEN`"),
             ("skill-ci-quotes-redacted", "a record quotes `ci-wait` only as printed, its secret shapes already masked"),
             ("skill-ci-unknown-cause", "An unknown cause owes bounded evidence gathering"),
             ("skill-ci-escalation-ends-run", "--reason escalation` and `CronDelete` of the heartbeat it names"),
