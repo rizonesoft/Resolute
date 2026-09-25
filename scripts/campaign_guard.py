@@ -7,7 +7,7 @@ deleted only through this module (D00 T04 §34):
 
     python scripts/campaign_guard.py acquire --session S --phase N --run-file F --cron-id J [--handover REASON]
     python scripts/campaign_guard.py end --session S --reason closeout|park|plan-done|operator-stop|escalation
-    python scripts/campaign_guard.py hook-error
+    python scripts/campaign_guard.py hook-error [--session S]
     python scripts/campaign_guard.py --self-test
 
 `acquire` creates the guard exclusively; the owning session may re-point
@@ -59,46 +59,65 @@ def _paths(root: str) -> tuple[str, str]:
 
 
 LOCK_WAIT = 10.0
-LOCK_STALE = 60.0
 
 
 class _Lock:
     """An interprocess lock on the guard: every change (acquire,
     re-point, handover, end) holds it, so a read-then-replace can never
     interleave with another session's change (D00 T04 §34 independent
-    review). The lock is a create-exclusive file; one older than
-    LOCK_STALE seconds is a crashed holder's and is broken."""
+    review). It is an operating-system lock on an open handle
+    (`msvcrt.locking` on Windows, `flock` elsewhere): it never expires
+    while its holder lives, and the OS releases it when the holder
+    closes the handle or dies, so no age test can break a live holder's
+    lock (panel round 1). The lock file itself is never deleted."""
 
     def __init__(self, root: str, wait: float = LOCK_WAIT):
         self.path = os.path.join(root, "build", "claude-campaign-guard.lock")
         self.wait = wait
+        self.fd = None
+
+    def _try(self) -> bool:
+        if os.name == "nt":
+            import msvcrt
+            try:
+                os.lseek(self.fd, 0, os.SEEK_SET)
+                msvcrt.locking(self.fd, msvcrt.LK_NBLCK, 1)
+                return True
+            except OSError:
+                return False
+        import fcntl
+        try:
+            fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return True
+        except OSError:
+            return False
 
     def __enter__(self):
         import time
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        self.fd = os.open(self.path, os.O_RDWR | os.O_CREAT, 0o644)
         deadline = time.monotonic() + self.wait
-        while True:
-            try:
-                fd = os.open(self.path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
-                os.write(fd, str(os.getpid()).encode())
-                os.close(fd)
-                return self
-            except FileExistsError:
-                try:
-                    if time.time() - os.path.getmtime(self.path) > LOCK_STALE:
-                        os.unlink(self.path)
-                        continue
-                except FileNotFoundError:
-                    continue
-                if time.monotonic() >= deadline:
-                    raise GuardError(f"the guard is locked by another change ({self.path}); retry")
-                time.sleep(0.05)
+        while not self._try():
+            if time.monotonic() >= deadline:
+                os.close(self.fd)
+                self.fd = None
+                raise GuardError(f"the guard is locked by another change ({self.path}); retry")
+            time.sleep(0.05)
+        return self
 
     def __exit__(self, *exc):
-        try:
-            os.unlink(self.path)
-        except FileNotFoundError:
-            pass
+        if self.fd is not None:
+            try:
+                if os.name == "nt":
+                    import msvcrt
+                    os.lseek(self.fd, 0, os.SEEK_SET)
+                    msvcrt.locking(self.fd, msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(self.fd, fcntl.LOCK_UN)
+            finally:
+                os.close(self.fd)
+                self.fd = None
         return False
 
 
@@ -163,8 +182,12 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
 
 
 def _ready_count(root: str) -> int | None:
-    proc = subprocess.run([sys.executable, os.path.join(root, "scripts", "todo-graph.py"), "query", "ready"],
-                          capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=root)
+    try:
+        proc = subprocess.run([sys.executable, os.path.join(root, "scripts", "todo-graph.py"), "query", "ready"],
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=root,
+                              timeout=300)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
     m = re.findall(r"(\d+) runnable now", proc.stdout)
     return int(m[-1]) if m else None
 
@@ -178,11 +201,14 @@ def end(root: str, session: str, reason: str) -> str:
         raise GuardError(f"reason {reason!r} is not one of {', '.join(END_REASONS)}")
     if not session:
         raise GuardError("end needs --session (the session that owns the guard)")
+    # The plan query runs before the lock, so no subprocess is ever held
+    # under it (panel round 1).
+    ready = _ready_count(root) if reason == "plan-done" else None
     with _Lock(root):
-        return _end_locked(root, session, reason)
+        return _end_locked(root, session, reason, ready)
 
 
-def _end_locked(root: str, session: str, reason: str) -> str:
+def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
     guard_path, state_path = _paths(root)
     guard = read_guard(root)
     if guard is None:
@@ -201,10 +227,8 @@ def _end_locked(root: str, session: str, reason: str) -> str:
         raise GuardError(f"park needs a column-0 PARKED line in {run_rel}")
     if reason == "escalation" and not re.search(r"(?m)^PARKED\b.*\bescalation:", text):
         raise GuardError(f"escalation needs a column-0 'PARKED <UTC> escalation: <cause>' line in {run_rel}")
-    if reason == "plan-done":
-        n = _ready_count(root)
-        if n != 0:
-            raise GuardError(f"plan-done needs '0 runnable now'; query ready reads {n}")
+    if reason == "plan-done" and ready != 0:
+        raise GuardError(f"plan-done needs '0 runnable now'; query ready reads {ready}")
     for path in (guard_path, state_path):
         try:
             os.unlink(path)
@@ -217,8 +241,15 @@ def _end_locked(root: str, session: str, reason: str) -> str:
             f"(the heartbeat job), then confirm it is gone with CronList")
 
 
-def hook_error(root: str) -> str:
-    """Print and clear the error the hook recorded, if any."""
+def hook_error(root: str, session: str | None = None) -> str:
+    """Print and clear the error the hook recorded, if any. With a
+    session, a guard owned by another session is refused before anything
+    is read or cleared (panel round 1: a former owner's heartbeat must
+    not consume the current owner's failure record)."""
+    if session:
+        guard = read_guard(root)
+        if guard is not None and str(guard.get("session_id", "")) != session:
+            raise GuardError(f"the guard belongs to session {guard.get('session_id')}, not {session}")
     _, state_path = _paths(root)
     try:
         with open(state_path, encoding="utf-8-sig") as fh:
@@ -438,6 +469,15 @@ def _self_test() -> int:
         # D00 T04 §34: the failure is recorded for the heartbeat, then cleared.
         st = _state(root)
         check("a-thrown-error-is-recorded", bool(st.get("hook_error")) and bool(st.get("hook_error_at")), str(st))
+        _guard(root, session="77777777-0000-0000-0000-000000000000")
+        with open(os.path.join(root, "build", "claude-campaign-state.json"), "w", encoding="utf-8") as fh:
+            json.dump({"hook_error": "boom", "hook_error_at": "2099-01-01T00:00:00Z"}, fh)
+        try:
+            hook_error(root, SESSION)
+            check("hook-error-refuses-another-sessions-state", False)
+        except GuardError as exc:
+            check("hook-error-refuses-another-sessions-state",
+                  "belongs to session" in str(exc) and _state(root).get("hook_error") == "boom", str(exc))
         line = hook_error(root)
         check("hook-error-reports-then-clears",
               line.startswith("campaign-stop hook failed at ") and "hook_error" not in _state(root)
@@ -525,17 +565,38 @@ def _self_test() -> int:
         g = read_guard(root)
         check("acquire-hands-over-with-a-reason", "handed over" in msg and g["handover_from"] == SESSION
               and g["session_id"].startswith("22222222"), f"{msg} {g}")
-        lock = os.path.join(root, "build", "claude-campaign-guard.lock")
-        with open(lock, "w", encoding="utf-8") as fh:
-            fh.write("held")
+        # A live holder in another process: the change waits, then refuses.
+        holder = subprocess.Popen(
+            [sys.executable, "-c",
+             "import sys, time; sys.path.insert(0, sys.argv[1]); import campaign_guard as cg\n"
+             "with cg._Lock(sys.argv[2]):\n"
+             "    print('held', flush=True); time.sleep(float(sys.argv[3]))",
+             HERE, root, "3"], stdout=subprocess.PIPE, text=True)
+        holder.stdout.readline()
         try:
-            with _Lock(root, wait=0.2):
+            with _Lock(root, wait=0.3):
                 pass
             check("a-held-lock-refuses-a-change", False, "entered a held lock")
         except GuardError as exc:
             check("a-held-lock-refuses-a-change", "locked by another change" in str(exc), str(exc))
-        os.remove(lock)
-        check("the-lock-is-released-after-a-change", not os.path.exists(lock))
+        holder.wait()
+        entered = False
+        with _Lock(root, wait=2):
+            entered = True
+        check("the-lock-is-released-after-a-change", entered)
+        # A holder that dies without releasing: the OS frees the lock, and
+        # no age test was needed to break it.
+        dead = subprocess.Popen(
+            [sys.executable, "-c",
+             "import os, sys; sys.path.insert(0, sys.argv[1]); import campaign_guard as cg\n"
+             "lock = cg._Lock(sys.argv[2]); lock.__enter__(); print('held', flush=True); os._exit(0)",
+             HERE, root], stdout=subprocess.PIPE, text=True)
+        dead.stdout.readline()
+        dead.wait()
+        entered = False
+        with _Lock(root, wait=2):
+            entered = True
+        check("a-dead-holder-releases-the-lock", entered)
         # Two sessions changing the guard at once: the lock serializes them,
         # and the guard ends owned by exactly the session that changed it last.
         import threading
@@ -556,7 +617,7 @@ def _self_test() -> int:
         check("concurrent-changes-serialize", len(results) == 2 and final is not None
               and final["session_id"] in ("22222222-0000-0000-0000-000000000000",
                                           "55555555-0000-0000-0000-000000000000")
-              and not os.path.exists(lock), f"{results} {final}")
+              and all(r.startswith("acquire: guard") for r in results), f"{results} {final}")
         try:
             end(root, "", "operator-stop")
             check("end-refuses-without-a-session", False)
@@ -613,7 +674,9 @@ def _self_test() -> int:
                         ("skill-ends-through-end", "python scripts/campaign_guard.py end --session"),
                         ("skill-heartbeat-reports-hook-errors", "python scripts/campaign_guard.py hook-error"),
                         ("skill-refused-acquire-cancels-its-job", "A refused `acquire` means another session owns the run"),
-                        ("skill-heartbeat-checks-ownership", "reply NOT THE OWNER")):
+                        ("skill-heartbeat-checks-ownership", "reply NOT THE OWNER"),
+                        ("skill-heartbeat-owner-first",
+                         "1. If build/claude-campaign-guard.json exists but its `session_id`")):
         check(pin, needle in skill, plan_skill)
 
     print(f"campaign_guard self-test: {passed + failed} cases, {failed} failed")
@@ -647,8 +710,8 @@ def main(argv: list[str]) -> int:
         if argv[0] == "end":
             print(end(root, opts.get("session", ""), opts.get("reason", "")))
             return 0
-        if argv[0] == "hook-error" and not opts:
-            line = hook_error(root)
+        if argv[0] == "hook-error" and set(opts) <= {"session"}:
+            line = hook_error(root, opts.get("session"))
             if line:
                 print(line)
             return 0

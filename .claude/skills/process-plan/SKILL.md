@@ -82,8 +82,8 @@ Canonical prompt:
 ```text
 Claude run-guard heartbeat for Resolute Phase <N> (run file <run file>). This session went idle while a campaign run may still be open. Check, then act, in this turn.
 
-1. Run `python scripts/campaign_guard.py hook-error`. If it prints a line, the Stop hook failed open: append that line to <run file>'s Critical events before anything else.
-2. If build/claude-campaign-guard.json exists but its `session_id` is not this session's `$CLAUDE_CODE_SESSION_ID`, this job is not the run's: CronDelete this job, delete nothing else, and reply NOT THE OWNER.
+1. If build/claude-campaign-guard.json exists but its `session_id` is not this session's `$CLAUDE_CODE_SESSION_ID`, this job is not the run's: CronDelete this job, read and change nothing else, and reply NOT THE OWNER.
+2. Run `python scripts/campaign_guard.py hook-error --session $CLAUDE_CODE_SESSION_ID`. If it prints a line, the Stop hook failed open: append that line to <run file>'s Critical events before anything else.
 3. If build/claude-campaign-guard.json is missing, the run is over: CronDelete this job (find it with CronList by this prompt's first sentence), delete build/claude-campaign-state.json if present, and reply RUN FINISHED.
 4. If <run file> has a line "## Closeout" or a column-0 line starting "PARKED", run `python scripts/todo-graph.py query ready`. If it prints `0 runnable now`, the plan run is over: CronDelete this job, delete build/claude-campaign-guard.json and build/claude-campaign-state.json, and reply RUN FINISHED. Otherwise the phase ended but the plan did not: delete nothing, and resume under step 6, where process-plan re-points the guard to the next phase. A phase closeout alone never ends a plan run.
 5. If build/claude-campaign-state.json has trips of 2 or more: the run stalled twice with no change to the tree. Do not resume. Append a Critical events line to the run file naming what blocks it, delete the guard file and the state file, CronDelete this job, and report the stall to the operator.
