@@ -1394,7 +1394,9 @@ def _entries(lines: list[str], col: int) -> list[tuple[str, str, list[str], int]
         # no inline value may hold an indentless sequence at its own
         # column (`steps:` then `- run: x`), both valid YAML (D00 T04 §37
         # independent review).
-        indentless = kv is not None and not kv[1]
+        # An inline comment is not a value: `steps: # build` still holds
+        # an indentless sequence (D00 T04 §37 panel round 3).
+        indentless = kv is not None and (not kv[1] or kv[1].startswith("#"))
         while j < len(lines) and (not lines[j].strip() or lines[j].lstrip().startswith("#")
                                   or _indent(lines[j]) > col
                                   or (indentless and _indent(lines[j]) == col
@@ -1702,8 +1704,8 @@ _SECRET_RES = (
     (re.compile(r"\bxox[abprs]-[A-Za-z0-9-]{10,}\b"), "***"),
     (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S), "***"),
     (re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/-]{8,}=*"), r"\1***"),
-    # A credential-named key or variable, quoted or bare, its value quoted or bare (D00 T04 §37 panel rounds 1 and 2).
-    (re.compile(r"(?i)((?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?\s*[=:]\s*)('[^']*'|\"[^\"]*\"|[^\s'\",}]{4,})"), r"\1***"),
+    # A credential-named key or variable, quoted or bare, its value a full quoted string (escapes included) or a bare token (D00 T04 §37 panel rounds 1 to 3).
+    (re.compile(r"(?i)((?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?\s*[=:]\s*)('(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"|[^\s'\",}]{4,})"), r"\1***"),
 )
 _SECRET_NAME = re.compile(r"(?i)(secret|token|passw|credential|private|api[_-]?key|auth)")
 
@@ -6083,6 +6085,9 @@ def _self_test() -> int:
             commented = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n# a column-zero comment inside the job\n"
                          "    steps:\n    - name: Build\n      run: make\n")
             got_c = workflow_steps(commented)
+            inline_c = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps: # build\n    - name: B\n      run: make\n"
+            check("an-inline-comment-keeps-an-indentless-sequence",
+                  [s["name"] for s in workflow_steps(inline_c)] == ["B"], str(workflow_steps(inline_c)))
             check("a-comment-and-an-indentless-sequence-keep-the-steps",
                   [s["name"] for s in got_c] == ["Build"] and got_c[0]["run"] == "make"
                   and got_c[0]["context"]["runs-on"] == "ubuntu-24.04", str(got_c))
@@ -6447,6 +6452,9 @@ def _self_test() -> int:
             sec_rows = rerun_lines(workflow_steps(sec_yml)[0], "abc")
             red2 = redact("password='hunter22' token=\"abcdefgh\" API_TOKEN=abcdefgh1 MY_SECRET: s3cr3tvalue MODE=fast")
             red3 = redact('{"API_TOKEN": "abcdefgh1234", \'db_password\': \'pw123456\', "mode": "fast"}')
+            red4 = redact('{"API_TOKEN": "abc\\"defghi", "x": 1}')
+            check("redact-consumes-escaped-quotes-whole",
+                  "defghi" not in red4 and "abc" not in red4 and red4.startswith('{"API_TOKEN": ***'), red4)
             check("redact-masks-quoted-keys",
                   "abcdefgh1234" not in red3 and "pw123456" not in red3 and '"mode": "fast"' in red3, red3)
             check("redact-masks-quoted-and-secret-named-assignments",
