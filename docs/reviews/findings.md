@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**380 findings across 47 sections.**
+**400 findings across 48 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 113 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 79 | fails under hostile or unexpected input |
-| `correctness` | 66 | the code does the wrong thing |
-| `consistency` | 57 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 51 | a consumer, caller, or downstream artifact no longer holds |
+| `record` | 118 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 84 | fails under hostile or unexpected input |
+| `correctness` | 69 | the code does the wrong thing |
+| `consistency` | 58 | disagrees with the rest of the suite, its naming, or its layout |
+| `integration` | 57 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 176 | wrong behavior in code, plan, or record |
-| `minor` | 198 | polish or wording, or no surviving defect |
+| `major` | 182 | wrong behavior in code, plan, or record |
+| `minor` | 212 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -359,6 +359,26 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §36` | F10 | minor | `record` | fixed | independent | the interleaving fixture calls communicate on a closed stdin |
 | `D00 T04 §36` | F11 | minor | `adversarial` | filed | independent | the error path writes state when the owner was never captured |
 | `D00 T04 §36` | F12 | minor | `record` | cleared | independent | the checkpoint's suite count is not quoted yet |
+| `D00 T04 §37` | F1 | major | `correctness` | fixed | independent | comments and indentless sequences drop a job's steps |
+| `D00 T04 §37` | F2 | minor | `correctness` | fixed | independent | restored attempts compare by prefix and duplicate |
+| `D00 T04 §37` | F3 | minor | `correctness` | fixed | independent | restore without a workflow binds an empty identity |
+| `D00 T04 §37` | F4 | major | `adversarial` | fixed | independent | quoted and secret-named values pass redaction |
+| `D00 T04 §37` | F5 | minor | `integration` | fixed | independent | triggers compare as raw text |
+| `D00 T04 §37` | F6 | minor | `integration` | fixed | independent | checkout is recognised by display name |
+| `D00 T04 §37` | F7 | minor | `record` | fixed | independent | the authorization records no time |
+| `D00 T04 §37` | F8 | minor | `record` | fixed | independent | the context oracle proves only bash and skips silently |
+| `D00 T04 §37` | F9 | major | `adversarial` | fixed | independent | a quoted credential key passes redaction |
+| `D00 T04 §37` | F10 | minor | `consistency` | fixed | independent | the skills' no-run command omits --authorized-at |
+| `D00 T04 §37` | F11 | minor | `integration` | fixed | independent | flow-mapped checkout inputs are ignored |
+| `D00 T04 §37` | F12 | minor | `record` | cleared | independent | the checkpoint's suite counts are not quoted |
+| `D00 T04 §37` | F13 | major | `adversarial` | fixed | independent | an escaped quote leaks part of a secret |
+| `D00 T04 §37` | F14 | minor | `integration` | fixed | independent | an inline comment hides an indentless sequence |
+| `D00 T04 §37` | F15 | minor | `record` | cleared | independent | the checkpoint's suite counts are not quoted |
+| `D00 T04 §37` | F16 | major | `adversarial` | fixed | independent | adjacent quoted segments leak a suffix |
+| `D00 T04 §37` | F17 | minor | `integration` | filed | independent | restore rebinds the episode's identity |
+| `D00 T04 §37` | F18 | minor | `record` | cleared | independent | the checkpoint's suite counts are not quoted |
+| `D00 T04 §37` | F19 | major | `adversarial` | filed | independent | a bare credential value stops at a comma or brace |
+| `D00 T04 §37` | F20 | minor | `integration` | filed | independent | restore still rebinds identity |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
