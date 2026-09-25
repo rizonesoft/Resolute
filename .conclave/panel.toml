@@ -9,28 +9,37 @@
 # so the writer never reviews its own work.
 #
 # Re-pinning a reviewer is an edit here plus a fresh echo probe date on
-# the model entry; nothing else in the tree changes. A `newest` entry
-# needs no re-pin at all: it runs the highest version the family's CLI
-# lists, so a new release is picked up on the next round.
+# the model entry; nothing else in the tree changes.
+#
+# Operator decision 2026-09-25: every review slot runs GPT-6 Astra (bulk
+# at medium, every other slot at high), and Grok leaves the panel: no
+# fallback slots. A failed round stops for the operator.
 
 # Operator decision 2026-09-23: Claude Code on Opus 5.5 is the only writer.
 [writer]
 model = "claude-opus-5-5"
 
-# The model registry. `family` picks the runner (codex, claude, grok).
+# The model registry. `family` picks the runner (codex or claude; the
+# grok family survives only in retired entries that old records name).
 # `probed` is the date of the last live echo probe through that runner.
 # `retired` marks pins only historical records name: run records and
 # stamps keep parsing, and no slot may use them. `newest` is a regex
-# whose captures are version parts: the entry runs the highest listed
-# model it matches (suffixed variants such as `-build-fast` never match).
-# `served` names what the provider reports having run, for records only.
+# whose captures are version parts: records naming any concrete model it
+# matches (suffixed variants such as `-build-fast` never match) parse.
+# `served` names what the provider reported having run, for records only.
+[model."gpt-6-astra"]
+family = "codex"
+probed = "2026-09-25"
+
 [model."gpt-6-sol"]
 family = "codex"
-probed = "2026-09-23"
+retired = "2026-09-25"
 
+# Retired 2026-09-25 with the Grok fallbacks; kept so the Grok rounds in
+# historical records keep parsing.
 [model."grok-newest"]
 family = "grok"
-probed = "2026-09-23"
+retired = "2026-09-25"
 newest = "grok-(\\d+)\\.(\\d+)"
 served = "grok-(\\d+)\\.(\\d+)-build"
 
@@ -46,77 +55,49 @@ probed = "2026-09-23"
 family = "codex"
 retired = "2026-09-23"
 
-[model."gpt-6-astra"]
-family = "codex"
-retired = "2026-09-17"
-
 [model."opus"]
 family = "claude"
 retired = "2026-09-23"
 
 # Panel rounds. Full: R1-R2 bulk, R3 signoff, R4-R5 depth (blocking
-# findings only). Light: R1 bulk, R2 signoff.
+# findings only). Light: R1 bulk, R2 signoff. There are no fallback
+# slots: a failed round re-runs nothing and waits for the operator.
 [slot.bulk]
-model = "gpt-6-sol"
+model = "gpt-6-astra"
 effort = "medium"
 timeout = 600
 
 [slot.signoff] # governs every stamp from 2026-09-23
-model = "gpt-6-sol"
+model = "gpt-6-astra"
 effort = "high"
 timeout = 600
 
 [slot.depth]
-model = "gpt-6-sol"
-effort = "high"
-timeout = 600
-
-# Sol down: the newest Grok model, same effort as the slot it replaces,
-# and the round record owes a `GPT outage` note. Grok down too: the
-# review stops for the operator; the writer's family never fills.
-[slot.bulk-fallback]
-model = "grok-newest"
-effort = "medium"
-timeout = 600
-
-[slot.signoff-fallback] # replaces signoff, depth, or the stamp review
-model = "grok-newest"
+model = "gpt-6-astra"
 effort = "high"
 timeout = 600
 
 # Plan review after panel close.
 [slot.plan-primary]
-model = "gpt-6-sol"
-effort = "high"
-timeout = 900
-
-# Plan review fallback: Grok, a second family, so no retry is owed.
-[slot.plan-fallback]
-model = "grok-newest"
+model = "gpt-6-astra"
 effort = "high"
 timeout = 900
 
 # The staged-stamp review before the stamp commit.
 [slot.stamp-check]
-model = "gpt-6-sol"
+model = "gpt-6-astra"
 effort = "high"
 timeout = 600
 
 # The independent `codex review --commit` pass in process-todo-section.
 [slot.independent]
-model = "gpt-6-sol"
+model = "gpt-6-astra"
 effort = "high"
 timeout = 900
 
 # The architecture gate after panel close (framework state, storage,
 # extension seams, elevation, restore/undo). Blocking, GPT like the sign-off.
 [slot.arch-primary]
-model = "gpt-6-sol"
+model = "gpt-6-astra"
 effort = "high"
 timeout = 600
-
-# Sol down at the gate: the newest Grok model, same effort.
-[slot.arch-fallback]
-model = "grok-newest"
-effort = "high"
-timeout = 900

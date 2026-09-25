@@ -8,14 +8,12 @@ ScratchPad's D00 T04 §15 and §23, with the model set moved out of this
 module and into the table's registry so a re-pin is one file.
 
 A registry entry may carry `newest = "<regex>"` instead of naming one
-model (D00 T04 §29): at run time the family's CLI lists its models and
-the highest version matching the regex runs, so a new release (Grok 4.8
-after 4.7) is picked up with no edit. The regex's capture groups are the
-version parts, compared as integers; a listing with no match refuses.
-An optional `served = "<regex>"` names what the provider reports having
-run (Grok answers a `grok-4.7` request as `grok-4.7-build` in its
-usage block): records and attestations carry that name, so the family
-accepts it, while `newest` alone decides what runs.
+model (D00 T04 §29 added it for the Grok fallbacks, which ran the
+highest listed Grok version). The operator removed Grok from the panel
+on 2026-09-25, so no slot may name a `newest` entry; the retired Grok
+entry keeps it so records naming the concrete model that ran
+(`grok-4.7`) still parse. An optional `served = "<regex>"` names what
+the provider reported having run (`grok-4.7-build`), for records only.
 
 Governance, not convenience:
 - PANEL_SLOTS is exact. A slot is regime (the outage matrix in the
@@ -23,16 +21,16 @@ Governance, not convenience:
   ungoverned and fails, and a missing one fails.
 - PANEL_EFFORTS is closed. A new level arrives with probes plus review.
 - A slot names a registered model that is not retired.
-- A fallback repeats its primary's effort (EFFORT_PARITY).
+- A slot pins a fixed model of a family with a runner (PANEL_RUNNERS):
+  the grok family survives only in retired entries.
 - No slot runs the writer's family: the writer never reviews its own
-  work, fallbacks included (D00 T04 §29 removed the writer-family
-  cross-fill).
+  work. There are no fallback slots (operator decision 2026-09-25): a
+  failed round waits for the operator.
 
     python scripts/panel_slots.py validate
     python scripts/panel_slots.py show
     python scripts/panel_slots.py argv <slot> [extra...]
     python scripts/panel_slots.py get <slot> model|effort|timeout|family
-    python scripts/panel_slots.py resolve <slot>
     python scripts/panel_slots.py writer [model|family]
     python scripts/panel_slots.py family <model>
     python scripts/panel_slots.py models <codex|claude|grok> [--all]
@@ -42,7 +40,7 @@ Governance, not convenience:
 `exec` runs the slot's producer with the prompt on stdin, enforces the
 slot timeout, and exits 124 on expiry (the `timeout` convention the
 outage matrix keys on). Its first stderr line names the slot and the
-model that actually ran. The `independent` slot runs `codex review`,
+model that ran. The `independent` slot runs `codex review`,
 which takes its scope from the extra arguments (`--commit <sha>`) and
 reads no prompt.
 """
@@ -58,30 +56,21 @@ import tempfile
 import tomllib
 
 PANEL_FAMILIES = ("codex", "claude", "grok")
+# Families a slot may run. `grok` stays a registry family so historical
+# records parse, but it has no runner (operator decision 2026-09-25).
+PANEL_RUNNERS = ("codex", "claude")
 PANEL_EFFORTS = ("medium", "high", "xhigh")
 PANEL_SLOTS = (
     "bulk",
     "signoff",
     "depth",
-    "bulk-fallback",
-    "signoff-fallback",
     "plan-primary",
-    "plan-fallback",
     "stamp-check",
     "independent",
     "arch-primary",
-    "arch-fallback",
 )
-# (fallback, primary): a failover repeats its primary's effort.
-EFFORT_PARITY = (("bulk-fallback", "bulk"), ("signoff-fallback", "signoff"),
-                 ("plan-fallback", "plan-primary"), ("arch-fallback", "arch-primary"))
 TIMEOUT_EXIT = 124
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-# Grok headless runs with read-only built-in tools: its OS sandbox
-# profiles (Landlock, Seatbelt) do not apply on Windows, so the
-# allowlist is the read-only guarantee. Subagents and the web go too.
-GROK_TOOLS = "read_file,grep,list_dir"
-GROK_DENIED = "Agent,web_search,web_fetch,run_terminal_cmd,search_replace"
 
 
 class PanelSlotsError(ValueError):
@@ -185,18 +174,20 @@ def load(path: str | None = None) -> dict:
         if type(timeout) is not int or timeout <= 0:
             raise PanelSlotsError(f"panel slot {name!r} timeout {timeout!r} is not a positive integer")
         family = models[model]["family"]
+        if family not in PANEL_RUNNERS:
+            raise PanelSlotsError(
+                f"panel slot {name!r} model {model!r} runs family {family!r}, which has no runner "
+                f"(runners: {', '.join(PANEL_RUNNERS)})")
+        if models[model]["newest"] is not None:
+            raise PanelSlotsError(
+                f"panel slot {name!r} model {model!r} is a `newest` entry: a slot pins a fixed model")
         if family == wfamily:
             raise PanelSlotsError(
                 f"panel slot {name!r} runs the writer's family {family!r}: "
                 f"no slot reviews its own writer")
         slots[name] = {"model": model, "effort": effort, "timeout": timeout, "family": family}
-    if slots["independent"]["family"] != "codex" or models[slots["independent"]["model"]]["newest"]:
-        raise PanelSlotsError("panel slot 'independent' runs `codex review` and needs a fixed codex model")
-    for follower, leader in EFFORT_PARITY:
-        if slots[follower]["effort"] != slots[leader]["effort"]:
-            raise PanelSlotsError(
-                f"panel slot {follower!r} effort {slots[follower]['effort']!r} does not repeat "
-                f"slot {leader!r} effort {slots[leader]['effort']!r}")
+    if slots["independent"]["family"] != "codex":
+        raise PanelSlotsError("panel slot 'independent' runs `codex review` and needs a codex model")
     return {"writer": {"model": wmodel, "family": wfamily}, "models": models, "slots": slots}
 
 
@@ -216,8 +207,8 @@ def family_models(family: str, path: str | None = None, include_retired: bool = 
 
 def family_accepts(family: str, model: str, table: dict | None = None) -> bool:
     """True when `model` is a registered model of `family`, or a concrete
-    model a `newest` entry of that family resolves to (a record names
-    what ran, `grok-4.7`, never the registry alias)."""
+    model a `newest` entry of that family matches (a record names what
+    ran, `grok-4.7`, never the registry alias)."""
     models = (table or load())["models"]
     for name, entry in models.items():
         if entry["family"] != family:
@@ -232,73 +223,18 @@ def family_accepts(family: str, model: str, table: dict | None = None) -> bool:
 
 
 def _exe(name: str) -> str:
-    # npm installs `codex` as a .cmd shim on Windows, and the Grok
-    # installer puts `grok` under ~/.grok/bin, off PATH: resolve both so
-    # subprocess finds them without a shell.
-    found = shutil.which(name)
-    if found:
-        return found
-    for candidate in (os.path.join(os.path.expanduser("~"), f".{name}", "bin", f"{name}.exe"),
-                      os.path.join(os.path.expanduser("~"), f".{name}", "bin", name)):
-        if os.path.isfile(candidate):
-            return candidate
-    return name
+    # npm installs `codex` as a .cmd shim on Windows: resolve it so
+    # subprocess finds it without a shell.
+    return shutil.which(name) or name
 
 
-def list_family_models(family: str) -> str:
-    """The family CLI's model listing, as text. Only Grok resolves
-    `newest` today; a family without a listing command refuses."""
-    if family != "grok":
-        raise PanelSlotsError(f"family {family!r} has no model listing to resolve `newest` against")
-    try:
-        done = subprocess.run([_exe("grok"), "models"], capture_output=True, text=True,
-                              encoding="utf-8", errors="replace", timeout=60)
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        raise PanelSlotsError(f"grok models failed: {exc}")
-    if done.returncode != 0:
-        raise PanelSlotsError(f"grok models exited {done.returncode}: {done.stderr.strip()[:200]}")
-    return done.stdout
-
-
-def resolve_model(model: str, table: dict, lister=list_family_models) -> str:
-    """The concrete model a registry name runs as: itself, or for a
-    `newest` entry the highest listed version its regex matches."""
-    entry = table["models"][model]
-    pattern = entry["newest"]
-    if pattern is None:
-        return model
-    listing = lister(entry["family"])
-    best: tuple[tuple[int, ...], str] | None = None
-    # Only list items (`* name` or `- name` lines) are listed models:
-    # a name mentioned in descriptive text never runs.
-    for token in re.findall(r"(?m)^\s*[*-]\s+([A-Za-z0-9][A-Za-z0-9._-]*)", listing):
-        m = pattern.fullmatch(token)
-        if not m:
-            continue
-        try:
-            version = tuple(int(g) for g in m.groups())
-        except (TypeError, ValueError):
-            continue
-        if best is None or version > best[0]:
-            best = (version, token)
-    if best is None:
-        raise PanelSlotsError(
-            f"model {model!r} resolves to nothing: no listed {entry['family']} model matches "
-            f"{pattern.pattern!r}")
-    return best[1]
-
-
-def argv_for_slot(slot: str, extra: list[str] | None = None, table: dict | None = None,
-                  model: str | None = None, prompt_file: str | None = None) -> list[str]:
-    """Producer argv for a slot. `model` is the resolved concrete model
-    (defaults to the registry name); `prompt_file` carries the prompt for
-    producers that read no stdin. Raises PanelSlotsError naming why not."""
+def argv_for_slot(slot: str, extra: list[str] | None = None, table: dict | None = None) -> list[str]:
+    """Producer argv for a slot. Raises PanelSlotsError naming why not."""
     slots = (table or load())["slots"]
     if slot not in slots:
         raise PanelSlotsError(f"panel slot {slot!r} is unknown (known: {', '.join(PANEL_SLOTS)})")
     entry = slots[slot]
-    effort, extra = entry["effort"], list(extra or [])
-    model = model or entry["model"]
+    effort, extra, model = entry["effort"], list(extra or []), entry["model"]
     if slot == "independent":
         # `codex review` refuses a prompt beside a scope flag, so the
         # extra args carry the scope and nothing rides stdin.
@@ -307,10 +243,6 @@ def argv_for_slot(slot: str, extra: list[str] | None = None, table: dict | None 
     if entry["family"] == "codex":
         return ["codex", "exec", "-m", model, "-c", f'model_reasoning_effort="{effort}"',
                 "-s", "read-only", *extra, "-"]
-    if entry["family"] == "grok":
-        return ["grok", "--prompt-file", prompt_file or "<prompt-file>", "-m", model,
-                "--effort", effort, "--output-format", "json", "--tools", GROK_TOOLS,
-                "--disallowed-tools", GROK_DENIED, "--no-auto-update", *extra]
     # --allowedTools stays last: the flag is variadic.
     return ["claude", "-p", "--model", model, "--effort", effort,
             "--output-format", "json", *extra, "--allowedTools", "Read"]
@@ -324,53 +256,27 @@ def _kill_tree(proc: subprocess.Popen) -> None:
         proc.kill()
 
 
-def exec_slot(slot: str, extra: list[str], stdin, stdout, stderr, table: dict | None = None,
-              lister=list_family_models) -> int:
-    """Run the slot's producer; return its exit code, or 124 on timeout.
-    A `newest` model that resolves to nothing exits 2 before any round
-    runs, which the outage matrix reads as a failed rung."""
+def exec_slot(slot: str, extra: list[str], stdin, stdout, stderr, table: dict | None = None) -> int:
+    """Run the slot's producer; return its exit code, or 124 on timeout."""
     table = table or load()
     if slot not in table["slots"]:
         raise PanelSlotsError(f"panel slot {slot!r} is unknown (known: {', '.join(PANEL_SLOTS)})")
     entry = table["slots"][slot]
-    model = resolve_model(entry["model"], table, lister)
     timeout = entry["timeout"]
-    named = model if model == entry["model"] else f"{model} (resolved from {entry['model']})"
-    print(f"panel_slots: slot {slot} model {named} effort {entry['effort']} "
+    print(f"panel_slots: slot {slot} model {entry['model']} effort {entry['effort']} "
           f"timeout {timeout}s", file=sys.stderr, flush=True)
-    if entry["family"] == "grok" and extra:
-        raise PanelSlotsError(
-            f"panel slot {slot!r} runs grok and takes no extra arguments ({' '.join(extra)}): "
-            f"nothing may follow its read-only tool restrictions")
-    prompt_file = None
-    feed = stdin
-    if entry["family"] == "grok":
-        # Grok headless takes its prompt from a file, not stdin.
-        fd, prompt_file = tempfile.mkstemp(prefix="panel-prompt-", suffix=".md")
-        with os.fdopen(fd, "wb") as fh:
-            data = stdin.read() if hasattr(stdin, "read") else b""
-            fh.write(data if isinstance(data, bytes) else data.encode("utf-8"))
-        feed = None
-    if slot == "independent":
-        feed = None
-    argv = argv_for_slot(slot, extra, table, model=model, prompt_file=prompt_file)
+    # `codex review` takes its scope from the extra args and reads no prompt.
+    feed = subprocess.DEVNULL if slot == "independent" else stdin
+    argv = argv_for_slot(slot, extra, table)
     argv[0] = _exe(argv[0])
+    proc = subprocess.Popen(argv, stdin=feed, stdout=stdout, stderr=stderr)
     try:
-        proc = subprocess.Popen(argv, stdin=feed if feed is not None else subprocess.DEVNULL,
-                                stdout=stdout, stderr=stderr)
-        try:
-            return proc.wait(timeout=timeout)
-        except subprocess.TimeoutExpired:
-            _kill_tree(proc)
-            proc.wait()
-            print(f"panel_slots: slot {slot} timed out after {timeout}s", file=sys.stderr, flush=True)
-            return TIMEOUT_EXIT
-    finally:
-        if prompt_file is not None:
-            try:
-                os.unlink(prompt_file)
-            except OSError:
-                pass
+        return proc.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        _kill_tree(proc)
+        proc.wait()
+        print(f"panel_slots: slot {slot} timed out after {timeout}s", file=sys.stderr, flush=True)
+        return TIMEOUT_EXIT
 
 
 # --- self-test ---------------------------------------------------------------
@@ -389,7 +295,7 @@ family = "codex"
 retired = "2026-09-01"
 [model."k-newest"]
 family = "grok"
-probed = "2026-09-23"
+retired = "2026-09-25"
 newest = 'k-(\d+)\.(\d+)'
 served = 'k-(\d+)\.(\d+)-build'
 [slot.bulk]
@@ -404,20 +310,8 @@ timeout = 600
 model = "g-one"
 effort = "high"
 timeout = 600
-[slot.bulk-fallback]
-model = "k-newest"
-effort = "medium"
-timeout = 600
-[slot.signoff-fallback]
-model = "k-newest"
-effort = "high"
-timeout = 600
 [slot.plan-primary]
 model = "g-one"
-effort = "high"
-timeout = 900
-[slot.plan-fallback]
-model = "k-newest"
 effort = "high"
 timeout = 900
 [slot.stamp-check]
@@ -432,10 +326,6 @@ timeout = 900
 model = "g-one"
 effort = "high"
 timeout = 600
-[slot.arch-fallback]
-model = "k-newest"
-effort = "high"
-timeout = 900
 """
 
 
@@ -474,22 +364,13 @@ def _self_test() -> int:
         block = re.sub(rf"^{key} = .*$", f"{key} = {value}", block, flags=re.MULTILINE)
         return text[:start] + block + text[end:]
 
-    def listing(text: str):
-        return lambda _family: text
-
     good = load(write(GOOD))
     check("good table loads", good["writer"] == {"model": "w-claude", "family": "claude"})
-    check("slot family derived", good["slots"]["signoff-fallback"]["family"] == "grok")
+    check("slot family derived", good["slots"]["signoff"]["family"] == "codex")
     check("argv codex exec",
           argv_for_slot("bulk", table=good) == ["codex", "exec", "-m", "g-one", "-c",
                                                  'model_reasoning_effort="medium"', "-s",
                                                  "read-only", "-"])
-    grok_argv = argv_for_slot("signoff-fallback", table=good, model="k-4.8", prompt_file="p.md")
-    check("argv grok reads the prompt file, resolved model, slot effort, read-only tools",
-          grok_argv[:8] == ["grok", "--prompt-file", "p.md", "-m", "k-4.8", "--effort", "high",
-                            "--output-format"]
-          and grok_argv[grok_argv.index("--tools") + 1] == GROK_TOOLS
-          and "Agent" in grok_argv[grok_argv.index("--disallowed-tools") + 1], str(grok_argv))
     check("argv independent takes scope, no stdin dash",
           argv_for_slot("independent", ["--commit", "abc"], table=good)
           == ["codex", "review", "--commit", "abc", "-c", 'model="g-one"', "-c",
@@ -500,27 +381,11 @@ def _self_test() -> int:
     except PanelSlotsError as exc:
         check("unknown slot refuses", "unknown" in str(exc))
 
-    # newest resolution: highest version wins, suffixed variants never do.
-    real_listing = ("Available models:\n  * k-4.7 (default)\n  - k-4.7-build-fast\n"
-                    "  - k-4.6\n  - k-4.10\n  - k-4.8-build-fast\n")
-    check("newest picks the highest numeric version",
-          resolve_model("k-newest", good, listing(real_listing)) == "k-4.10")
-    check("newest picks up a new release",
-          resolve_model("k-newest", good, listing("  * k-4.7\n  - k-4.8\n")) == "k-4.8")
-    try:
-        resolve_model("k-newest", good, listing("  - k-4.7-build-fast\n  - other-5.0\n"))
-        check("suffix-only listing refuses", False)
-    except PanelSlotsError as exc:
-        check("suffix-only listing refuses", "resolves to nothing" in str(exc))
-    check("fixed model resolves to itself", resolve_model("g-one", good, listing("")) == "g-one")
-    check("family accepts a resolved concrete model", family_accepts("grok", "k-4.9", good))
+    # A retired `newest` entry still lets historical records parse.
+    check("family accepts a recorded concrete model", family_accepts("grok", "k-4.9", good))
     check("family refuses a suffixed variant", not family_accepts("grok", "k-4.9-build-fast", good))
     check("family accepts the served name", family_accepts("grok", "k-4.7-build", good))
     check("family refuses the newest alias as a recorded model", not family_accepts("grok", "k-newest", good))
-    check("prose around the listing never resolves",
-          resolve_model("k-newest", good, listing("Default model: k-9.9\n\n  * k-4.7 (default)\n")) == "k-4.7")
-    check("served name never decides what runs",
-          resolve_model("k-newest", good, listing("  - k-4.7\n  - k-4.9-build\n")) == "k-4.7")
     refuses("served bad regex", GOOD.replace(r"served = 'k-(\d+)\.(\d+)-build'", 'served = "k-("'),
             "is not a regex")
     check("family accepts a registered model", family_accepts("codex", "g-old", good))
@@ -535,16 +400,19 @@ def _self_test() -> int:
     refuses("bad effort", slot_line(GOOD, "bulk", "effort", '"low"'), "effort 'low' is outside")
     refuses("bad timeout", slot_line(GOOD, "bulk", "timeout", "0"), "not a positive integer")
     refuses("string timeout", slot_line(GOOD, "bulk", "timeout", '"600"'), "not a positive integer")
-    refuses("parity break", slot_line(GOOD, "signoff-fallback", "effort", '"xhigh"'),
-            "does not repeat slot 'signoff'")
-    refuses("plan parity break", slot_line(GOOD, "plan-fallback", "effort", '"medium"'),
-            "does not repeat slot 'plan-primary'")
+    refuses("fallback slot is ungoverned",
+            GOOD + '[slot.signoff-fallback]\nmodel = "g-one"\neffort = "high"\ntimeout = 600\n',
+            "ungoverned slots: signoff-fallback")
+    live_grok = GOOD.replace('family = "grok"\nretired = "2026-09-25"', 'family = "grok"\nprobed = "2026-09-25"')
+    refuses("grok slot has no runner", slot_line(live_grok, "bulk", "model", '"k-newest"'),
+            "which has no runner")
+    live_newest = live_grok.replace('family = "grok"\nprobed', 'family = "codex"\nprobed')
+    refuses("newest slot refuses", slot_line(live_newest, "bulk", "model", '"k-newest"'),
+            "is a `newest` entry")
     refuses("writer family governs", slot_line(GOOD, "signoff", "model", '"w-claude"'),
             "no slot reviews its own writer")
-    refuses("writer family fallback", slot_line(GOOD, "plan-fallback", "model", '"w-claude"'),
+    refuses("writer family plan", slot_line(GOOD, "plan-primary", "model", '"w-claude"'),
             "no slot reviews its own writer")
-    refuses("newest independent", slot_line(GOOD, "independent", "model", '"k-newest"'),
-            "needs a fixed codex model")
     refuses("newest without a capture", GOOD.replace(r"newest = 'k-(\d+)\.(\d+)'", 'newest = "k-4"'),
             "captures no version parts")
     refuses("newest bad regex", GOOD.replace(r"newest = 'k-(\d+)\.(\d+)'", 'newest = "k-("'),
@@ -568,20 +436,18 @@ def _self_test() -> int:
     check("family models include retired", family_models("codex", fam) == ("g-old", "g-one"))
     check("family models live only", family_models("codex", fam, include_retired=False) == ("g-one",))
 
-    # exec: timeout path returns 124 and kills the child; stdin pipes;
-    # a grok slot hands the prompt over as a file; a dead listing fails
-    # the round before anything runs.
+    # exec: timeout path returns 124 and kills the child; stdin pipes.
     slow = dict(good)
     slow_slots = {k: dict(v) for k, v in good["slots"].items()}
     slow_slots["bulk"]["timeout"] = 1
     slow["slots"] = slow_slots
     real_argv = argv_for_slot
     try:
-        globals()["argv_for_slot"] = lambda slot, extra=None, table=None, model=None, prompt_file=None: [
+        globals()["argv_for_slot"] = lambda slot, extra=None, table=None: [
             sys.executable, "-c", "import time; time.sleep(30)"]
         rc = exec_slot("bulk", [], subprocess.DEVNULL, subprocess.DEVNULL, subprocess.DEVNULL, slow)
         check("exec timeout exits 124", rc == TIMEOUT_EXIT, f"rc={rc}")
-        globals()["argv_for_slot"] = lambda slot, extra=None, table=None, model=None, prompt_file=None: [
+        globals()["argv_for_slot"] = lambda slot, extra=None, table=None: [
             sys.executable, "-c", "import sys; sys.stdout.write(sys.stdin.read().upper())"]
         with tempfile.TemporaryFile() as fin, tempfile.TemporaryFile() as fout:
             fin.write(b"echo")
@@ -589,45 +455,6 @@ def _self_test() -> int:
             rc = exec_slot("bulk", [], fin, fout, subprocess.DEVNULL, good)
             fout.seek(0)
             check("exec pipes stdin to stdout", rc == 0 and fout.read() == b"ECHO")
-        seen: dict = {}
-
-        def _fake_grok(slot, extra=None, table=None, model=None, prompt_file=None):
-            seen["model"], seen["file"] = model, prompt_file
-            return [sys.executable, "-c",
-                    "import sys; sys.stdout.write(open(sys.argv[1], encoding='utf-8').read()[::-1])",
-                    prompt_file]
-        globals()["argv_for_slot"] = _fake_grok
-        with tempfile.TemporaryFile() as fin, tempfile.TemporaryFile() as fout, \
-                tempfile.TemporaryFile() as ferr:
-            fin.write(b"abc")
-            fin.seek(0)
-            rc = exec_slot("signoff-fallback", [], fin, fout, ferr, good,
-                           lister=listing("  * k-4.7\n  - k-4.8\n"))
-            fout.seek(0)
-            ferr.seek(0)
-            check("exec grok reads the prompt from a file and runs the newest model",
-                  rc == 0 and fout.read() == b"cba" and seen["model"] == "k-4.8"
-                  and not os.path.exists(seen["file"]), f"rc={rc} {seen}")
-        try:
-            exec_slot("signoff-fallback", ["--tools", "edit_file"], subprocess.DEVNULL,
-                      subprocess.DEVNULL, subprocess.DEVNULL, good, lister=listing("  * k-4.7\n"))
-            check("exec refuses extra arguments on a grok slot", False)
-        except PanelSlotsError as exc:
-            check("exec refuses extra arguments on a grok slot", "takes no extra arguments" in str(exc))
-        before = set(os.listdir(tempfile.gettempdir()))
-        try:
-            exec_slot("signoff-fallback", ["--x"], subprocess.DEVNULL, subprocess.DEVNULL,
-                      subprocess.DEVNULL, good, lister=listing("  * k-4.7\n"))
-        except PanelSlotsError:
-            pass
-        leaked = [n for n in set(os.listdir(tempfile.gettempdir())) - before if n.startswith("panel-prompt-")]
-        check("a refused grok call leaves no prompt file behind", leaked == [], str(leaked))
-        try:
-            exec_slot("signoff-fallback", [], subprocess.DEVNULL, subprocess.DEVNULL,
-                      subprocess.DEVNULL, good, lister=listing("nothing here"))
-            check("exec with a dead listing refuses before running", False)
-        except PanelSlotsError as exc:
-            check("exec with a dead listing refuses before running", "resolves to nothing" in str(exc))
     finally:
         globals()["argv_for_slot"] = real_argv
 
@@ -646,7 +473,7 @@ def main(argv: list[str]) -> int:
     if argv == ["--self-test"]:
         return _self_test()
     if not argv:
-        print("usage: panel_slots.py validate | show | argv <slot> | get <slot> <field> | resolve <slot> | "
+        print("usage: panel_slots.py validate | show | argv <slot> | get <slot> <field> | "
               "writer | family <model> | models <family> [--all] | exec <slot> [extra...] | --self-test",
               file=sys.stderr)
         return 2
@@ -661,27 +488,11 @@ def main(argv: list[str]) -> int:
             table = load()
             print(f"writer  {table['writer']['model']} ({table['writer']['family']})")
             for name, entry in table["slots"].items():
-                shown = entry["model"]
-                if table["models"][shown]["newest"] is not None:
-                    try:
-                        shown = f"{resolve_model(shown, table)} (newest of {shown})"
-                    except PanelSlotsError as exc:
-                        shown = f"{shown} (unresolved: {exc})"
-                print(f"{name:<17} {shown:<28} {entry['family']:<7} "
+                print(f"{name:<17} {entry['model']:<28} {entry['family']:<7} "
                       f"{entry['effort']:<7} {entry['timeout']}s")
             return 0
         if cmd == "argv" and rest:
-            table = load()
-            if rest[0] not in table["slots"]:
-                raise PanelSlotsError(f"panel slot {rest[0]!r} is unknown")
-            model = resolve_model(table["slots"][rest[0]]["model"], table)
-            print(" ".join(argv_for_slot(rest[0], rest[1:], table, model=model)))
-            return 0
-        if cmd == "resolve" and len(rest) == 1:
-            table = load()
-            if rest[0] not in table["slots"]:
-                raise PanelSlotsError(f"panel slot {rest[0]!r} is unknown")
-            print(resolve_model(table["slots"][rest[0]]["model"], table))
+            print(" ".join(argv_for_slot(rest[0], rest[1:])))
             return 0
         if cmd == "get" and len(rest) == 2:
             slots = load_slots()

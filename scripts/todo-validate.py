@@ -73,6 +73,7 @@ def validate(graph, _args) -> int:
     # as governing and a Claude-family last section as a cross-fill that
     # owes a `GPT outage` note; earlier stamps keep the Opus-governed rule.
     GPT_GOVERNS_FROM = graph.GPT_GOVERNS_FROM
+    GROK_RETIRED_FROM = graph.GROK_RETIRED_FROM
 
     def pre_convention(sec, cutoff: str) -> bool:
         return (
@@ -1218,6 +1219,13 @@ def validate(graph, _args) -> int:
                         f"{where} findings {m.group(1)} {family} panel lacks verdicts for: "
                         + ", ".join(missing),
                     )
+                if family == "Grok" and s.stamped_on >= GROK_RETIRED_FROM:
+                    flag(
+                        "stamp-no-opus-panel",
+                        f"{where} findings {m.group(1)} Grok panel governs a stamp dated "
+                        f"{GROK_RETIRED_FROM} or later: Grok left the panel",
+                    )
+                    continue
                 if family == "Grok" and not CLAUDE_OUTAGE_RE.search(panel):
                     flag(
                         "stamp-no-opus-panel",

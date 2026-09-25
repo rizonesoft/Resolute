@@ -217,7 +217,7 @@ It reviews read-only and changes nothing.
 
 **Changed 2026-09-17 from `gpt-6-astra` to `gpt-5.6-sol`**, at the operator's instruction. Stamps written before that date name `gpt-6-astra` and are left alone: they record what actually read those commits, and rewriting them would falsify the one thing a stamp is for. Record the model in the `Independent:` line of each stamp, so the reviewer of record travels with the evidence rather than being inferred from the date.
 
-**Changed 2026-09-23: the pin moved out of this skill into the `independent` slot** (D00 T04 §27, operator decision: Claude Code on Opus 5.5 is the only writer and GPT-6 Sol reviews). Re-pinning is an edit to `.conclave/panel.toml` plus a fresh probe date, never an edit here.
+**Changed 2026-09-23: the pin moved out of this skill into the `independent` slot** (D00 T04 §27, operator decision: Claude Code on Opus 5.5 is the only writer and GPT-6 Sol reviews). Re-pinning is an edit to `.conclave/panel.toml` plus a fresh probe date, never an edit here. **Re-pinned 2026-09-25 to `gpt-6-astra`** at the operator's instruction; stamps between 2026-09-17 and that date name `gpt-5.6-sol` or `gpt-6-sol` and are left alone.
 
 **`--commit` takes no review instructions.** Verified 2026-09-17 while processing `D00 T03 §1`: the usage line prints `codex review --commit <SHA> [PROMPT]`, but supplying either a prompt string or `-` for stdin fails with `the argument '--commit <SHA>' cannot be used with '[PROMPT]'`. An earlier version of this skill documented a long prompt here, and it could never have run. Do not reintroduce one **on this command**.
 

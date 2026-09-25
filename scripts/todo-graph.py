@@ -1065,6 +1065,9 @@ PLAN_REVIEW_CUTOFF = "2026-09-19"
 # D00 T04 §27: from this date Claude Code is the only writer and GPT
 # governs the panel; the validator's rule 16 and plan-health both read it.
 GPT_GOVERNS_FROM = "2026-09-23"
+# Operator decision 2026-09-25: Grok left the panel, so a `Grok panel`
+# record governs no stamp dated on or after this day.
+GROK_RETIRED_FROM = "2026-09-25"
 _GPT_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+GPT panel\b", re.IGNORECASE | re.MULTILINE)
 _CLAUDE_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+(?:Opus|Claude) panel\b", re.IGNORECASE | re.MULTILINE)
 _GROK_PANEL_HEAD_RE = re.compile(r"^#{2,6}\s+Grok panel\b", re.IGNORECASE | re.MULTILINE)
@@ -8657,6 +8660,15 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
                 GPT4 + _record("§22", "20260923-D90-T09-S22-grok", "- [D90-T09-S22-PR0] [minor] clean round -> accepted\n")
                 + _prov("20260923-D90-T09-S22-grok", "docs/selftest-r22.md")
             ),
+            # Grok left the panel 2026-09-25: its round governs nothing after.
+            "docs/selftest-r23.md": (
+                GPT4.replace("GPT panel", "GPT panel Round 1") + "\n"
+                + "## Grok panel Round 2\n\n"
+                "- `adversarial` approve\n- `consistency` approve\n"
+                "- `integration` approve\n- `record` approve\n\n"
+                "GPT outage: astra timed out, a Grok round ran anyway.\n"
+                + _prov("20260925-D90-T09-S23-sol", "docs/selftest-r23.md")
+            ),
             "docs/selftest-r20.md": (
                 GPT4 + "\n" + PANEL4.replace("Opus panel", "Grok panel")
                 + _prov("20260923-D90-T09-S20-sol", "docs/selftest-r20.md")
@@ -8684,7 +8696,7 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
         rules_todo = root / "todo" / "90-selftest" / "TODO-09-rules.md"
         (root / "todo" / "90-selftest").mkdir(parents=True, exist_ok=True)
         _rows09 = "\n".join(
-            f"|   {n}   |   §{n}    | Rule probe {n} | -- |  [x]   |" for n in range(1, 23)
+            f"|   {n}   |   §{n}    | Rule probe {n} | -- |  [x]   |" for n in range(1, 24)
         )
         rules_todo.write_text(
             "---\nschema_version: 1\nid: self-test-rules\ndomain: 90-selftest\nstatus: active\n"
@@ -8718,7 +8730,8 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             + _sec09(19, "docs/selftest-r19.md", "sol (run 20260923-D90-T09-S19-sol) no findings", day="2026-09-23")
             + _sec09(20, "docs/selftest-r20.md", "sol (run 20260923-D90-T09-S20-sol) no findings", day="2026-09-23")
             + _sec09(21, "docs/selftest-r21.md", "sol (run 20260923-D90-T09-S21-sol) partial: grok rung no findings", day="2026-09-23")
-            + _sec09(22, "docs/selftest-r22.md", "grok (run 20260923-D90-T09-S22-grok) partial: gpt rung no findings", day="2026-09-23"),
+            + _sec09(22, "docs/selftest-r22.md", "grok (run 20260923-D90-T09-S22-grok) partial: gpt rung no findings", day="2026-09-23")
+            + _sec09(23, "docs/selftest-r23.md", "sol (run 20260925-D90-T09-S23-sol) no findings", day="2026-09-25"),
             encoding="utf-8",
         )
         for _rp, _rt in findings_09.items():
@@ -8763,6 +8776,10 @@ Opus outage: sign-off rung unreachable, failed over to Sol.
             check("rule 16 fires on a post-cutover Grok-last without the GPT outage note",
                   ("§20 " in vout and "Grok panel governs" in vout and "without the GPT outage note" in vout),
                   True)
+            check("rule 16 fires on a Grok-last stamped after Grok left the panel",
+                  ("§23 " in vout and "Grok left the panel" in vout), True)
+            check("rule 16 keeps a pre-retirement Grok-last with its note",
+                  vout.count("Grok left the panel"), 1)
             check("rule 16 fires on a post-cutover GPT-last missing lens",
                   ("§18 " in vout and "GPT panel lacks verdicts for: record" in vout), True)
             check("rule 17 fires on a missing marker", ("§3 " in vout and "carries no `Plan review:`" in vout), True)
