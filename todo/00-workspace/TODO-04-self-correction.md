@@ -95,6 +95,7 @@ track: W1
 |  35   |   §35   | CI read-back follow-ups                        | §33 |  [x]   |
 |  36   |   §36   | Campaign guard lifecycle follow-ups            | §34 |  [ ]   |
 |  37   |   §37   | CI read-back hardening                         | §35 |  [ ]   |
+|  38   |   §38   | Campaign guard identity and recovery           | §36 |  [ ]   |
 
 ---
 
@@ -1473,6 +1474,7 @@ The D00 T04 §34 review files what its contract does not own. Its sign-off round
 
 **Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the interleaving, generation, pending-cancel, startup-recovery, malformed-report, coverage-boundary, bookkeeping-marker, and marker-binding legs, quoted with the suite count. Driven run with evidence: the expiry-replacement and new-session drive and a health-check repair, each in a run file, quoted.
 
+-> XREF: D00 T04 §38 -- the review findings on the guard lifecycle, filed after the sign-off
 -> XREF: D00 T04 §34 -- the guard lifecycle this section hardens, and the review findings it files
 -> XREF: D00 T04 §32 -- the marker semantics the run binding extends
 -> SOURCE: panel-D00-T04-s34-2026-09-25-F11 D00-T04-S34-F11
@@ -1519,6 +1521,41 @@ The D00 T04 §35 review files what its contract does not own. Its sign-off round
 -> SOURCE: plan-D00-T04-s35-2026-09-25-PR11 D00-T04-S35-PR11
 -> SOURCE: plan-D00-T04-s35-2026-09-25-PR12 D00-T04-S35-PR12
 -> SOURCE: plan-D00-T04-s35-2026-09-25-PR13 D00-T04-S35-PR13
+
+## 38. Campaign Guard Identity and Recovery
+
+The D00 T04 §36 review files what its contract does not own. Its sign-off round (panel round 3, F11) found the hook's error path skipping its guard re-check when the hook failed before it captured the owner, so a malformed-then-repaired guard could have its successor's state overwritten; the hook's lock path was patched in the independent pass and panel rounds 1, 2, and 3 running, so the three-round rule files it here. The D00 T04 §36 plan review (run 20260925-D00-T04-S36-astra) adds fourteen accepted findings, grouped below by the unit they harden.
+
+- [ ] Fence every heartbeat mutation by identity: `whoami` checks the generation once, and every later step (`end`, `reset-state`, `hook-error --ack`, `cancel-confirmed`) acts without re-checking it, the error path writes state when the owner was never captured, and two jobs carrying one generation are indistinguishable (panel round 3 of the D00 T04 §36 review, F11, and plan review PR1 and PR2; needs §36 shipped). Done when: each mutating command takes `--generation` (and the job id) and re-checks both with the run id under the lock, the hook's error path sends an error with no captured owner to its error file, and fixtures pin an obsolete heartbeat refused at each mutation plus a duplicate-generation job, quoted.
+- [ ] Give pending cancellations an owner and a scheduler session: after `end` removes the guard the heartbeat's `NO GUARD` exit can leave a failed cancellation with no one to drain it, and a record names a job without the session whose scheduler holds it (plan review PR3 and PR4; needs §36 shipped). Done when: the record carries the scheduling session, the `NO GUARD` branch drains this session's pending jobs before exiting, a new session reports (not cancels) its predecessor's jobs, and fixtures pin both, quoted.
+- [ ] Scope and prove startup recovery: `reconcile` trusts the job ids it is handed and its fixtures prove classification, not a completed recovery (plan review PR5 and PR6; needs §36 shipped). Done when: a job counts as this workspace's only when its prompt names this repository and run file, and driven interruptions between `CronCreate`, `acquire`, and the run-file record each recover to exactly one current heartbeat and a consistent run record, quoted.
+- [ ] Publish the guard's files crash-consistently: the guard, state, pending-cancellation, and error files are written separately, so a crash mid-change can leave them disagreeing (plan review PR7; needs §36 shipped). Done when: each change publishes by atomic replace in a stated order, a reader tolerates each partial state it can meet, and interruption fixtures kill a change at each step and read back a consistent lifecycle, quoted.
+- [ ] Migrate legacy guards before accepting a marker: a guard without a run id accepts any terminal marker, so a reused run file can still release a migrated campaign (plan review PR8; needs §36 shipped). Done when: a legacy guard is given a run id at its first locked change and only run-tagged markers count after that, with a fixture reusing a run file across the migration, quoted.
+- [ ] Attribute and identify recorded hook errors: an error file carries no event id or originating run, so identical errors or a delivery after a handover can be acknowledged or reported for the wrong run (plan review PR9; needs §36 shipped). Done when: each error carries a unique id and its session, run id, and generation, `--ack` names the id, and fixtures pin two identical errors and a post-handover delivery, quoted.
+- [ ] State what a handover keeps: `acquire` resets the breaker state on a handover or a new run file, which can erase an unacknowledged error or hand a stalled campaign a fresh breaker allowance (plan review PR10; needs §36 shipped). Done when: a handover preserves unacknowledged errors and the stall trips (a new run starts clean), the rule is stated in `process-plan`, and fixtures pin both, quoted.
+- [ ] Check the heartbeat during long sections and drive a repair: health runs only after stamps, and the recorded evidence shows a healthy job, not a repaired one (plan review PR11 and PR12; needs §36 shipped). Done when: `process-phase` also checks health on a bounded interval inside a long section and before any recovery wait, and a recorded drive deletes the live job, sees `health` name it missing, replaces it, and resumes, quoted.
+- [ ] Show the fingerprint's coverage at run time: the degraded-coverage policy is documented but invisible when it bites (plan review PR13; needs §36 shipped). Done when: the hook's block message (or the state file) reports how many untracked paths it hashed, statted, and counted by name, and a fixture past each bound reads the summary, quoted.
+- [ ] Write §36's final acceptance contract: several of its Done notes describe the offset, single-record cancellation, and direct-deletion semantics that later corrections replaced (plan review PR14; needs §36 shipped). Done when: D00 T04 §36 carries a dated acceptance paragraph stating the shipped behavior in one place, its stamp and history untouched, quoted.
+- [ ] Commit: `"workspace: campaign guard identity and recovery"`
+
+**Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the identity-fencing, duplicate-generation, cancellation-ownership, scoped-reconcile, interruption, legacy-migration, error-identity, handover-preservation, and coverage-summary legs, quoted with the suite count. Driven run with evidence: the startup-interruption drives and the health repair drive, each in a run file, quoted.
+
+-> XREF: D00 T04 §36 -- the guard lifecycle this section hardens, and the review findings it files
+-> SOURCE: panel-D00-T04-s36-2026-09-25-F11 D00-T04-S36-F11
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR1 D00-T04-S36-PR1
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR2 D00-T04-S36-PR2
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR3 D00-T04-S36-PR3
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR4 D00-T04-S36-PR4
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR5 D00-T04-S36-PR5
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR6 D00-T04-S36-PR6
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR7 D00-T04-S36-PR7
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR8 D00-T04-S36-PR8
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR9 D00-T04-S36-PR9
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR10 D00-T04-S36-PR10
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR11 D00-T04-S36-PR11
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR12 D00-T04-S36-PR12
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR13 D00-T04-S36-PR13
+-> SOURCE: plan-D00-T04-s36-2026-09-25-PR14 D00-T04-S36-PR14
 
 ## Verification
 
