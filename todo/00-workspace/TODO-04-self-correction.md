@@ -90,7 +90,7 @@ track: W1
 |  30   |   §30   | CI read-back and reachable provenance          | §24 |  [x]   |
 |  31   |   §31   | Red CI repaired, not waited on                 | §30 |  [x]   |
 |  32   |   §32   | Campaign guard: stop hook, heartbeat, breaker  | --  |  [x]   |
-|  33   |   §33   | CI repair-loop follow-ups                      | §31 |  [ ]   |
+|  33   |   §33   | CI repair-loop follow-ups                      | §31 |  [x]   |
 |  34   |   §34   | Campaign guard follow-ups                      | §32 |  [ ]   |
 |  35   |   §35   | CI read-back follow-ups                        | §33 |  [ ]   |
 
@@ -1349,7 +1349,7 @@ The D00 T04 §31 plan review files eight findings the §31 contract does not own
 - [x] Cap the whole repair episode: at most three repair attempts across consecutive reds on the same run, not per red, so a new red cannot reset the bound (plan review of the D00 T04 §31 candidate, PR6; needs §31 shipped: it tightens §31's bound). Done when: the skills state the episode cap and the run file counts attempts across the episode, quoted. Done: both skills bound the repair per episode, from the first red to the next green, at most three repair attempts per repair episode across its consecutive reds, so a new red never resets the count, and the run file numbers each attempt `attempt N of 3`; pins `skill-ci-repair-bound` (changed from the per-red wording) and `skill-ci-episode-no-reset` (+1). The drill's episode counts 2 of 3 across two reds, quoted in the run file.
 - [x] Verify a push that changes the workflow: when the pushed range edits or removes `.github/workflows/plan.yml` or its path filter, `ci-wait` never reads `not triggered` from the new filter alone (plan review of the D00 T04 §31 candidate, PR7; needs §31 shipped: it hardens the D00 T04 §30 read-back §31 extends). Done when: a range touching the workflow waits for a run or escalates, and a fixture leg pins it, quoted. Done: `ci-wait` checks whether the pushed range edits `.github/workflows/`. If it does, it skips the not-triggered shortcut and waits for a run, escalating if none comes, with the workflow read from `--workflow-path` (default `.github/workflows/plan.yml`). Legs (+2): `ci-wait-waits-when-the-range-edits-the-workflow`, `ci-wait-escalates-when-an-edited-workflow-never-runs`; the committed-workflow leg now commits its workflow first so it still pins the committed-filter rule. The drill's red 1 read `the range edits the workflow ...; waiting for a run`. **Corrected 2026-09-25 by the independent review (F3):** the override fired for any file under `.github/workflows/`, so an edit to another workflow waited for a `plan-gates` run that correctly never starts and then escalated; it now fires only for the selected workflow's own file (`--workflow-path`). Leg `ci-wait-another-workflow-edit-reads-through-the-filter` (+1).
 - [x] Mark the D00 T04 §30 stop-on-red wording superseded: its stamped item and checkpoint still read that a red conclusion stops the run (plan review of the D00 T04 §31 candidate, PR8; needs §31 shipped: it records §31's supersession). Done when: §30 carries a dated `Corrected` note beside that wording pointing at D00 T04 §31, with the stamp untouched, quoted. Done: D00 T04 §30 carries a `**Corrected 2026-09-25**` note after its checkpoint that quotes both stop-on-red phrases and points at D00 T04 §31, with its stamp untouched; the `ci-wait` CLI comment that still said `red stops the run` now says a red is repaired. `check-anchors` on §30 still reads `cites resolve`.
-- [ ] Commit: `"workspace: CI repair-loop follow-ups"`
+- [x] Commit: `"workspace: CI repair-loop follow-ups"` Done: `bbb8869c`, with the review answers in `78f2ae26`, `d70deba9`, and `75dad62c`.
 
 **Test checkpoint:** The end-to-end episode is recorded; the owner rule, the setup-cause rule, and the episode cap read in the skills; the log-unavailable, slow-run, and workflow-change fixture legs pass; §30 carries its supersession note.
 
@@ -1364,6 +1364,13 @@ The D00 T04 §31 plan review files eight findings the §31 contract does not own
 -> SOURCE: plan-D00-T04-s31-2026-09-23-PR7 D00-T04-S31-PR7
 -> SOURCE: plan-D00-T04-s31-2026-09-23-PR8 D00-T04-S31-PR8
 -> SOURCE: plan-D00-T04-s32-2026-09-24-PR8 D00-T04-S32-PR8
+
+> **Verified:** 2026-09-25 | §33 | the end-to-end drill is recorded in docs/phase-runs/2026-09-25-phase-0.md: red 1 `784d4fe6` (no job started, read `cause: repairable` after the fix the drill forced), repair attempt 1 of 3 `6b8d79d2` exposing red 2 diagnosed from its real log, repair attempt 2 of 3 `567f64e6` `repair-drill.yml success .../runs/36161821354`, branch deleted; the owner rule, the rule by cause, and the per-episode cap read in both skills and are pinned; the log-unavailable, slow-run, and workflow-change fixture legs pass; D00 T04 §30 carries its supersession note; `review_prompt.py --self-test` `376 cases, 0 failed`; `scripts/check-all.ps1` `19 gate(s) ok`
+> **Review:** round 3 GPT signoff, candidates `78f2ae26`(round 1) `d70deba9`(round 2) `75dad62c`(round 3) -- `adversarial` approves at round 2, closed: 1 fixed · `consistency` approves at every round · `integration` needs-attention at round 3, filed: F8 in D00 T04 §35 (below the blocking bar; the unit was patched three rounds running), closed earlier: 2 fixed · `record` approves at round 2, closed: 1 fixed · `source-defect` approves in-session · `design` not owed. Independent pass on the implementation commit bbb8869c (`independent` slot, gpt-6-astra high): three P2s, all right, fixed in 78f2ae26 before round 1. Raw findings: docs/reviews/00-workspace/D00-T04-s33.md Attestation: docs/reviews/00-workspace/D00-T04-s33.attest.json
+> **Plan review:** astra (run 20260925-D00-T04-S33-astra) -- filed: D00 T04 §35 (PR1, PR2, PR3, PR4, PR5, PR6, PR7, PR9, PR10, PR11, PR12); PR8 rejected as already covered
+> **CRUD:** not applicable (review tooling, skill text, and review records; writes no user-facing data path)
+> **Duration:** 2026-09-25T16:23:22Z to 2026-09-25T17:11:36Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 34. Campaign Guard Follow-Ups
 
