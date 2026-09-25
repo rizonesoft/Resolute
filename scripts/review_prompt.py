@@ -1443,9 +1443,21 @@ def workflow_steps(text: str | None) -> list[dict]:
         # The job's runner decides the default shell: the nearest
         # `runs-on:` above this step (D00 T04 §35 independent review).
         for back in range(i - 1, -1, -1):
-            m_on = re.match(r"\A\s*runs-on:\s*(.*)\Z", lines[back])
+            m_on = re.match(r"\A(\s*)runs-on:\s*(.*)\Z", lines[back])
             if m_on:
-                ctx["runs-on"] = m_on.group(1).strip().strip("'\"")
+                ctx["runs-on"] = m_on.group(2).strip().strip("'\"")
+                # A job `container:` at the same column runs every step
+                # inside that image, where the default shell is `sh`: not
+                # reproducible as a host command (D00 T04 §35 panel round 2).
+                job_col = len(m_on.group(1))
+                top = back
+                while top > 0 and (not lines[top - 1].strip()
+                                   or len(lines[top - 1]) - len(lines[top - 1].lstrip(" ")) >= job_col):
+                    top -= 1
+                for ln_j in lines[top:i]:
+                    if len(ln_j) - len(ln_j.lstrip(" ")) == job_col and ln_j.strip().startswith(("container:", "services:")):
+                        ctx["cannot"].append("the job runs in a container, whose shell and filesystem are not the host's")
+                        break
                 break
         for key in ("shell", "working-directory"):
             if key in keys:
@@ -5862,6 +5874,7 @@ def _self_test() -> int:
                                ("unknown runner", "jobs:\n  j:\n    runs-on: ${{ matrix.os }}\n    steps:\n      - name: a\n        run: make\n"),
                                ("block working-directory", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        working-directory: >-\n          tools\n        run: make\n"),
                                ("block shell", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        shell: |\n          bash {0}\n        run: make\n"),
+                               ("container job", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    container: node:22\n    steps:\n      - name: a\n        run: make\n"),
                                ("windows env", "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        env:\n          X: 1\n        run: make\n")):
                 got_r = rerun_lines(workflow_steps(yml)[0], "abc")[0]
                 check(f"rerun-refuses-unreadable-context: {label}", "cannot reproduce locally" in got_r, got_r)

@@ -306,17 +306,20 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
     bound is exhausted, which is the escalation."""
     path = _repair_path(root)
     with _Lock(root):
+        exists = True
         try:
             with open(path, encoding="utf-8") as fh:
                 ep = json.load(fh)
         except FileNotFoundError:
-            ep = None
+            ep, exists = None, False
         except (OSError, ValueError) as exc:
             # An unreadable episode must never reset the bound (panel round 1).
             raise GuardError(f"the repair episode {path} is unreadable ({exc}); the bound cannot be "
                              f"counted, so escalate rather than repair")
-        if ep is not None and not (isinstance(ep, dict) and isinstance(ep.get("episode"), str)
-                                   and isinstance(ep.get("attempts"), list)):
+        # Only a missing file means no episode: a file holding anything but
+        # a well-formed episode (a JSON null included) refuses (panel round 2).
+        if exists and not (isinstance(ep, dict) and isinstance(ep.get("episode"), str)
+                           and isinstance(ep.get("attempts"), list)):
             raise GuardError(f"the repair episode {path} is malformed; the bound cannot be counted, "
                              f"so escalate rather than repair")
         if action == "status":
@@ -784,7 +787,7 @@ def _self_test() -> int:
               fourth.returncode == 1 and "bound is exhausted, escalate" in fourth.stderr, fourth.stderr)
         with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), encoding="utf-8") as fh:
             saved = fh.read()
-        for label, body in (("corrupt", "{not json"), ("malformed", '{"episode": 3}')):
+        for label, body in (("corrupt", "{not json"), ("malformed", '{"episode": 3}'), ("null", "null")):
             with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), "w", encoding="utf-8") as fh:
                 fh.write(body)
             bad = _repair_cli("attempt", "--red", "red9aaaaaaaaaaaa", "--commit", "fix9aaaaaaaaaaaa")
