@@ -1253,7 +1253,11 @@ def workflow_step_commands(text: str | None) -> list[tuple[str, str]]:
         elif body.startswith("run:"):
             value = body[4:].strip()
             if value in ("|", ">", "|-", ">-"):
-                indent = len(line) - len(line.lstrip())
+                # The block belongs to the `run:` key, whose column sits
+                # past a list dash on a `- run: |` line: a sibling key at
+                # that column (`shell:`, `env:`) ends the block (D00 T04
+                # §33 panel round 2).
+                indent = len(line) - len(line.lstrip()) + (2 if stripped.startswith("- ") else 0)
                 block: list[str] = []
                 i += 1
                 while i < len(lines) and (not lines[i].strip()
@@ -5451,6 +5455,12 @@ def _self_test() -> int:
                          "      - name: Check plan projection is current\n        run: |\n"
                          "          python3 scripts/todo-graph.py plan --sync\n          if true; then\n"
                          "            test -z x\n          fi\n")
+            dash_text = ("    steps:\n      - run: |\n          make all\n          make test\n"
+                         "        shell: bash\n        env:\n          X: 1\n      - name: Next\n        run: echo next\n")
+            check("workflow-step-commands-stop-at-a-sibling-key",
+                  workflow_step_commands(dash_text) == [("Run make all", "make all\nmake test"),
+                                                        ("Next", "echo next")],
+                  str(workflow_step_commands(dash_text)))
             check("workflow-step-commands-parsed",
                   workflow_step_commands(plan_text) == [
                       ("Self-test the TODO graph tool", "python3 scripts/todo-graph.py self-test"),
