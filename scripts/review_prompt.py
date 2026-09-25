@@ -1704,8 +1704,8 @@ _SECRET_RES = (
     (re.compile(r"\bxox[abprs]-[A-Za-z0-9-]{10,}\b"), "***"),
     (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S), "***"),
     (re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/-]{8,}=*"), r"\1***"),
-    # A credential-named key or variable, quoted or bare, its value a full quoted string (escapes included) or a bare token (D00 T04 §37 panel rounds 1 to 3).
-    (re.compile(r"(?i)((?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?\s*[=:]\s*)('(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"|[^\s'\",}]{4,})"), r"\1***"),
+    # A credential-named key or variable, quoted or bare, its value every adjacent quoted or bare segment (YAML's doubled quote, backslash escapes, shell concatenation) (D00 T04 §37 panel rounds 1 to 4).
+    (re.compile(r"(?i)((?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?\s*[=:]\s*)((?:'(?:''|[^'])*'|\"(?:[^\"\\]|\\.)*\"|[^\s'\",}])+)"), r"\1***"),
 )
 _SECRET_NAME = re.compile(r"(?i)(secret|token|passw|credential|private|api[_-]?key|auth)")
 
@@ -6455,6 +6455,9 @@ def _self_test() -> int:
             red4 = redact('{"API_TOKEN": "abc\\"defghi", "x": 1}')
             check("redact-consumes-escaped-quotes-whole",
                   "defghi" not in red4 and "abc" not in red4 and red4.startswith('{"API_TOKEN": ***'), red4)
+            red5 = redact("password: 'it''s-secret' and API_TOKEN='abc'\"defghi\" done")
+            check("redact-consumes-adjacent-quoted-segments",
+                  "s-secret" not in red5 and "defghi" not in red5 and "abc" not in red5 and red5.endswith(" done"), red5)
             check("redact-masks-quoted-keys",
                   "abcdefgh1234" not in red3 and "pw123456" not in red3 and '"mode": "fast"' in red3, red3)
             check("redact-masks-quoted-and-secret-named-assignments",

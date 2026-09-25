@@ -129,7 +129,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §35` | CI read-back follow-ups                           |  10   |
 | [x] | `D00 T04 §36` | Campaign guard lifecycle follow-ups               |  11   |
 | [ ] | `D00 T04 §37` | CI read-back hardening                            |   8   |
-| [ ] | `D00 T04 §38` | Campaign guard identity and recovery              |  11   |
+| [ ] | `D00 T04 §38` | Campaign guard identity and recovery              |  12   |
 | [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   5   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
