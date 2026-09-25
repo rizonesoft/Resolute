@@ -2,7 +2,7 @@
 
 schema: 1
 
-Panel wiring from 2026-09-23 (D00 T04 §27): every round runs a slot from `.conclave/panel.toml`, GPT on every primary slot (`bulk` medium for Full rounds 1-2, `signoff` and `depth` high after) and the newest listed Grok model on every fallback (D00 T04 §29; the writer's family never reviews); round headings read `GPT panel` or `Grok panel`, and a round's `model:` must be a registered model of its heading's family, or the concrete Grok release a `newest` entry resolved to. Blocks before that date keep the wiring described next.
+Panel wiring from 2026-09-23 (D00 T04 §27): every round runs a slot from `.conclave/panel.toml`, GPT on every primary slot (`bulk` medium for Full rounds 1-2, `signoff` and `depth` high after) and the newest listed Grok model on every fallback (D00 T04 §29; the writer's family never reviews); round headings read `GPT panel` or `Grok panel`, and a round's `model:` must be a registered model of its heading's family, or the concrete Grok release a `newest` entry resolved to. From 2026-09-25 (operator decision, commit `0c8ffa5a`) every slot runs `gpt-6-astra` (`bulk` medium, every other slot high) and there are no fallback slots, so a failed round waits for the operator and no new `Grok panel` round is written. Blocks before that date keep the wiring described next.
 
 Terminology, pinned. A run is one section's independent review, however many rounds it took; an engagement is the same thing counted for the report, so runs and engagements agree by construction. A round is one reviewer invocation against one candidate. The panel is the `panel` runner: Sol rounds 1-2 with an Opus sign-off at round 3 and Opus fix-loop rounds after, all at medium effort. Voided rounds keep their numbers: an error round consumes its number and the sign-off floats past it, so panel sections number the usable rounds 1..k in run order. Two more outcomes skip the panel mapping without voiding their findings: stamp, a stamp-review pass over the staged stamp, and independent, a non-panel independent pass inside a panel block; their refs count in yield and coverage, but they meet no panel section. Empty is outcome-based: an engagement is empty when every round came back empty, so a run that raised only refuted findings is not empty (the reviewer found things; they did not survive). The self side is ledger-derived: self equals the ledger's findings for the section minus the run's refs, and the coverage check (every independent mark claimed exactly once) is what validates the split, printed beside it in the report. Rounds that raised findings recorded only in review prose keep outcome findings with an empty ref list and a `#` comment naming the file; comments explain, refs count, and the two never mix.
 
@@ -463,4 +463,17 @@ round: 5 model: gpt-6-sol effort: high outcome: empty candidate: db30f722 provid
 # round 6 is the independent pass (`panel_slots.py exec independent --commit 023d7aae`, ran before panel round 1); the runner printed no token figure.
 round: 6 model: gpt-6-sol effort: high outcome: independent candidate: 023d7aae provider: openai version: gpt-6-sol cost: unresolved latency: 200s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S32-F1
 empty: 1
+refuted: 0
+
+run: D00-T04-S33
+date: 2026-09-25
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 78f2ae26 provider: openai version: gpt-6-astra cost: 29843tokens latency: 51s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S33-F4, D00-T04-S33-F5, D00-T04-S33-F6
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: d70deba9 provider: openai version: gpt-6-astra cost: 30352tokens latency: 32s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S33-F7
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: 75dad62c provider: openai version: gpt-6-astra cost: 31399tokens latency: 48s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S33-F8
+# round 3 is the Full sign-off: its one finding sits below the blocking bar and was filed in D00 T04 §35, so no round 4 ran.
+# round 4 is the independent pass (`panel_slots.py exec independent --commit bbb8869c`, ran before panel round 1); the runner printed no token figure.
+round: 4 model: gpt-6-astra effort: high outcome: independent candidate: bbb8869c provider: openai version: gpt-6-astra cost: unresolved latency: 140s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S33-F1, D00-T04-S33-F2, D00-T04-S33-F3
+empty: 0
 refuted: 0

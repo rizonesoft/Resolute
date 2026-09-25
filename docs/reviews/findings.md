@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**338 findings across 43 sections.**
+**346 findings across 44 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 109 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 68 | fails under hostile or unexpected input |
+| `record` | 110 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 69 | fails under hostile or unexpected input |
+| `correctness` | 56 | the code does the wrong thing |
 | `consistency` | 56 | disagrees with the rest of the suite, its naming, or its layout |
-| `correctness` | 53 | the code does the wrong thing |
-| `integration` | 38 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 41 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 164 | wrong behavior in code, plan, or record |
-| `minor` | 168 | polish or wording, or no surviving defect |
+| `major` | 166 | wrong behavior in code, plan, or record |
+| `minor` | 174 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -317,6 +317,14 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §32` | F6 | major | `correctness` | fixed | independent | a phase closeout ends the whole plan run |
 | `D00 T04 §32` | F7 | minor | `record` | fixed | independent | the self-test counts in the record are stale |
 | `D00 T04 §32` | F8 | major | `correctness` | fixed | independent | the run-over cleanup still follows the resume branch |
+| `D00 T04 §33` | F1 | major | `correctness` | fixed | independent | the cause is judged on the bounded excerpt |
+| `D00 T04 §33` | F2 | minor | `correctness` | fixed | independent | the full-log step filter can drop every line |
+| `D00 T04 §33` | F3 | major | `correctness` | fixed | independent | any workflow edit overrides the selected workflow's filter |
+| `D00 T04 §33` | F4 | minor | `adversarial` | fixed | independent | an empty failed-step log skips both fallbacks |
+| `D00 T04 §33` | F5 | minor | `integration` | fixed | independent | block commands lose indentation and join with && |
+| `D00 T04 §33` | F6 | minor | `record` | fixed | independent | the drill record does not quote its repair commit messages |
+| `D00 T04 §33` | F7 | minor | `integration` | fixed | independent | a dash-led run block swallows its sibling keys |
+| `D00 T04 §33` | F8 | minor | `integration` | filed | independent | the command fallback keeps YAML scalar quoting and folding |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
