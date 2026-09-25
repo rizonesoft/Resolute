@@ -94,6 +94,7 @@ track: W1
 |  34   |   §34   | Campaign guard follow-ups                      | §32 |  [x]   |
 |  35   |   §35   | CI read-back follow-ups                        | §33 |  [ ]   |
 |  36   |   §36   | Campaign guard lifecycle follow-ups            | §34 |  [ ]   |
+|  37   |   §37   | CI read-back hardening                         | §35 |  [ ]   |
 
 ---
 
@@ -1429,6 +1430,7 @@ The D00 T04 §33 review files what its contract does not own. Its sign-off round
 
 **Test checkpoint:** Unit test: `python scripts/review_prompt.py --self-test` carries one leg per scalar form plus the unsupported-form refusal, the ceiling outcome, the cause-evidence fixtures, the restart-mid-episode refusal, and the `--expect-no-run` legs, quoted with the suite count; a mutation that drops the double-quote decoding fails its leg by name. Driven run with evidence: the disposable echo workflow's outputs, the bound-exhaustion and stamped-owner drills in a run file, and §31's supersession notes, quoted.
 
+-> XREF: D00 T04 §37 -- the review findings on the read-back, filed after the sign-off
 -> XREF: D00 T04 §33 -- the command fallback this section rethinks, and the plan-review findings it files
 -> XREF: D00 T04 §31 -- the per-red rules this section marks superseded
 -> SOURCE: panel-D00-T04-s33-2026-09-25-F8 D00-T04-S33-F8
@@ -1476,6 +1478,38 @@ The D00 T04 §34 review files what its contract does not own. Its sign-off round
 -> SOURCE: plan-D00-T04-s34-2026-09-25-PR9 D00-T04-S34-PR9
 -> SOURCE: plan-D00-T04-s34-2026-09-25-PR10 D00-T04-S34-PR10
 -> SOURCE: plan-D00-T04-s34-2026-09-25-PR11 D00-T04-S34-PR11
+
+## 37. CI Read-Back Hardening
+
+The D00 T04 §35 review files what its contract does not own. Its sign-off round (panel round 3, F10 and F11) found the re-run context parser still order-dependent (a job's `container:` or `runs-on:` declared after its steps is missed) and blind to quoted step keys (`"shell": pwsh`); the context parser was patched in the independent pass and panel rounds 1, 2, and 3 running, so the three-round rule files both here rather than patching a fourth time. The D00 T04 §35 plan review (run 20260925-D00-T04-S35-astra) adds thirteen accepted findings, grouped below by the unit they harden.
+
+- [ ] Parse the owning job whole, and quoted keys, or refuse: `workflow_steps` reads job context by scanning backwards from the step and matches only bare keys, so key order and quoting change the printed command (panel round 3 of the D00 T04 §35 review, F10 and F11; needs §35 shipped). Done when: each step's job context (`runs-on`, `container`, `services`, `defaults`, `env`) is read from the whole owning job regardless of key order, quoted and plain keys decode alike or the step refuses as unsupported, and fixtures cover a job declaring `container:` and `runs-on:` after its steps plus each quoted context key, quoted.
+- [ ] Tie a red's cause to the failed step and give `cause: unknown` a next action: the ending-signal rule reads line order alone, and an unknown cause has no decision (plan review of the D00 T04 §35 candidate, PR1 and PR2; needs §35 shipped). Done when: platform and repository signals are correlated with the failed job and step (an ambiguous correlation reads `cause: unknown`), the skills state the bounded evidence gathering an unknown cause owes (the run page, the full log, a local re-run) and its escalation, and fixtures pin a cross-step signal and the unknown path, quoted.
+- [ ] Separate reproducible commands from diagnostic scripts, cover `uses:` failures, and prove execution context: `earlier steps assumed run` hides checkout, generated files, installed tools, and inherited environment; a failing `uses:` step lists unrelated `run:` commands; and the scalar oracle proved text, not context (plan review PR3, PR4, and PR5; needs §35 shipped). Done when: the fallback labels a command reproducible only when its prerequisites are named and otherwise prints it as a diagnostic script; a failing `uses:` step names its action and reports no local reproduction; and a disposable workflow echoes each supported shell, env, and working-directory combination the way the scalar drill did, its outputs becoming the fixture's expectations, quoted.
+- [ ] Bind the repair episode and make its lifecycle idempotent: the episode carries no repository, branch, workflow, or campaign identity, an attempt is counted before or after its push by convention alone, `repair close` accepts any sha, and a lost `build/` file silently starts over (plan review PR6, PR7, PR8, and PR9; needs §35 shipped). Done when: the episode records its repository, branch, workflow, and run file and refuses a mismatched call; an attempt is keyed to its repair commit so a repeat after a crash or failed push counts once; `repair close` requires a green read-back of that workflow on a descendant of the episode's last attempt; a lost episode file during an open run is detected from the run file's attempt lines and restored or escalated; fixtures pin each, quoted.
+- [ ] Account for the ceiling re-run: `re-run ci-wait once` has no persisted count and no disposition for a run still in progress after it (plan review PR10; needs §35 shipped). Done when: the one allowed re-run is recorded beside the repair episode, a second exit 3 on the same run escalates, a restart does not reset the count, and fixtures pin both queued and in-progress runs, quoted.
+- [ ] Record the no-run authorization and keep its outcome distinct: `--expect-no-run` needs only a workflow edit and a reason, and its exit 0 reads like green (plan review PR11 and PR12; needs §35 shipped). Done when: the flag requires an authorization record (who, when, the approved range) and a trigger change in the range, prints and exits with an outcome distinct from green, `repair close` refuses it as evidence, and fixtures pin each, quoted.
+- [ ] Redact what the fallback copies into records: workflow commands, env values, and log excerpts land in review and phase records verbatim (plan review PR13; needs §35 shipped). Done when: `ci-wait` masks values that look like secrets (GitHub's `***` masks kept, token and key shapes, env values named like secrets), the skills say records quote only the redacted form, and redaction fixtures pass, quoted.
+- [ ] Commit: `"workspace: CI read-back hardening"`
+
+**Test checkpoint:** Unit test: `python scripts/review_prompt.py --self-test` and `python scripts/campaign_guard.py --self-test` carry the job-context, quoted-key, correlation, unknown-cause, `uses:`, episode-binding, idempotent-attempt, close-evidence, lost-state, ceiling-count, authorization, and redaction legs, quoted with the suite counts. Driven run with evidence: the execution-context echo workflow's run, quoted in a run file.
+
+-> XREF: D00 T04 §35 -- the CI read-back this section hardens, and the review findings it files
+-> SOURCE: panel-D00-T04-s35-2026-09-25-F10 D00-T04-S35-F10
+-> SOURCE: panel-D00-T04-s35-2026-09-25-F11 D00-T04-S35-F11
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR1 D00-T04-S35-PR1
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR2 D00-T04-S35-PR2
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR3 D00-T04-S35-PR3
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR4 D00-T04-S35-PR4
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR5 D00-T04-S35-PR5
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR6 D00-T04-S35-PR6
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR7 D00-T04-S35-PR7
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR8 D00-T04-S35-PR8
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR9 D00-T04-S35-PR9
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR10 D00-T04-S35-PR10
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR11 D00-T04-S35-PR11
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR12 D00-T04-S35-PR12
+-> SOURCE: plan-D00-T04-s35-2026-09-25-PR13 D00-T04-S35-PR13
 
 ## Verification
 
