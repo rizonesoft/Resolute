@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**368 findings across 46 sections.**
+**380 findings across 47 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 110 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 75 | fails under hostile or unexpected input |
-| `correctness` | 64 | the code does the wrong thing |
-| `consistency` | 56 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 49 | a consumer, caller, or downstream artifact no longer holds |
+| `record` | 113 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 79 | fails under hostile or unexpected input |
+| `correctness` | 66 | the code does the wrong thing |
+| `consistency` | 57 | disagrees with the rest of the suite, its naming, or its layout |
+| `integration` | 51 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 174 | wrong behavior in code, plan, or record |
-| `minor` | 188 | polish or wording, or no surviving defect |
+| `major` | 176 | wrong behavior in code, plan, or record |
+| `minor` | 198 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -347,6 +347,18 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §35` | F9 | minor | `integration` | fixed | independent | container jobs are advertised with the host's shell |
 | `D00 T04 §35` | F10 | minor | `integration` | filed | independent | job context depends on key order |
 | `D00 T04 §35` | F11 | minor | `integration` | filed | independent | quoted step keys are ignored |
+| `D00 T04 §36` | F1 | major | `correctness` | fixed | independent | a byte offset breaks the run binding |
+| `D00 T04 §36` | F2 | minor | `correctness` | fixed | independent | fallback-log errors never reach the heartbeat |
+| `D00 T04 §36` | F3 | major | `adversarial` | fixed | independent | the hook writes state without re-checking the guard under the lock |
+| `D00 T04 §36` | F4 | minor | `adversarial` | fixed | independent | fallback-log appends race the drain |
+| `D00 T04 §36` | F5 | minor | `consistency` | fixed | independent | the phase transition still deletes state directly |
+| `D00 T04 §36` | F6 | minor | `integration` | fixed | independent | a later end overwrites an unconfirmed cancellation |
+| `D00 T04 §36` | F7 | minor | `record` | fixed | independent | the lock legs never interleave a change and nothing exercises the size bound |
+| `D00 T04 §36` | F8 | minor | `adversarial` | fixed | independent | the hook's error path skips the guard re-check |
+| `D00 T04 §36` | F9 | minor | `integration` | fixed | independent | the heartbeat clears a cancellation before CronList confirms it |
+| `D00 T04 §36` | F10 | minor | `record` | fixed | independent | the interleaving fixture calls communicate on a closed stdin |
+| `D00 T04 §36` | F11 | minor | `adversarial` | filed | independent | the error path writes state when the owner was never captured |
+| `D00 T04 §36` | F12 | minor | `record` | cleared | independent | the checkpoint's suite count is not quoted yet |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |

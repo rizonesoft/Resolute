@@ -503,3 +503,16 @@ round: 3 model: gpt-6-astra effort: high outcome: findings candidate: f5072a67 p
 round: 4 model: gpt-6-astra effort: high outcome: independent candidate: 43a59fc6 provider: openai version: gpt-6-astra cost: unresolved latency: 184s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S35-F1, D00-T04-S35-F2, D00-T04-S35-F3, D00-T04-S35-F4
 empty: 0
 refuted: 0
+
+run: D00-T04-S36
+date: 2026-09-25
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 17fabe5a provider: openai version: gpt-6-astra cost: 45266tokens latency: 41s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S36-F3, D00-T04-S36-F4, D00-T04-S36-F5, D00-T04-S36-F6, D00-T04-S36-F7
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: cae84b78 provider: openai version: gpt-6-astra cost: 43183tokens latency: 44s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S36-F8, D00-T04-S36-F9, D00-T04-S36-F10
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: 305e3bd9 provider: openai version: gpt-6-astra cost: 50731tokens latency: 78s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S36-F11, D00-T04-S36-F12
+# round 3 is the Full sign-off: F11 sits below the blocking bar and was filed in D00 T04 §38, and F12 is cleared by the stamp's Live proof, so no round 4 ran. Rounds 1 and 3 latency are measured from rundir file times.
+# round 4 is the independent pass (`panel_slots.py exec independent --commit c9525e42`, ran before panel round 1); the runner printed no token figure.
+round: 4 model: gpt-6-astra effort: high outcome: independent candidate: c9525e42 provider: openai version: gpt-6-astra cost: unresolved latency: 175s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S36-F1, D00-T04-S36-F2
+empty: 0
+refuted: 0
