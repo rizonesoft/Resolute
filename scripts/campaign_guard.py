@@ -7,7 +7,14 @@ deleted only through this module (D00 T04 §34):
 
     python scripts/campaign_guard.py acquire --session S --phase N --run-file F --cron-id J [--handover REASON]
     python scripts/campaign_guard.py end --session S --reason closeout|park|plan-done|operator-stop|escalation|stall
-    python scripts/campaign_guard.py hook-error [--session S]
+    python scripts/campaign_guard.py hook-error [--session S] [--ack LINE]
+    python scripts/campaign_guard.py mint-generation
+    python scripts/campaign_guard.py whoami --session S --generation G
+    python scripts/campaign_guard.py reset-state --session S | --expect-no-guard yes
+    python scripts/campaign_guard.py pending-cancel | cancel-confirmed --cron-id J
+    python scripts/campaign_guard.py reconcile --session S --jobs J1,J2
+    python scripts/campaign_guard.py health --session S --jobs J1,J2
+    python scripts/campaign_guard.py expiry --session S [--now ISO]
     python scripts/campaign_guard.py repair attempt --red SHA --commit SHA | close --green SHA | status
     python scripts/campaign_guard.py --self-test
 
@@ -136,8 +143,27 @@ def read_guard(root: str) -> dict | None:
     return doc
 
 
+def mint_generation() -> str:
+    """A fresh acquisition generation: the heartbeat prompt carries it, so
+    a replaced job in the same session knows it is obsolete (D00 T04 §36)."""
+    import uuid
+    return uuid.uuid4().hex[:12]
+
+
+def _utc_now() -> str:
+    import datetime
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _run_length(root: str, run_file: str) -> int:
+    try:
+        return os.path.getsize(os.path.join(root, run_file))
+    except OSError:
+        return 0
+
+
 def acquire(root: str, session: str, phase: int, run_file: str, cron_id: str,
-            handover: str | None = None) -> str:
+            handover: str | None = None, generation: str | None = None) -> str:
     """Write the guard for `session`. A new guard is created exclusively
     (O_EXCL), so two sessions racing to start a run cannot both win; the
     owner re-points its own guard by compare-and-swap on `session_id`; a
@@ -148,15 +174,30 @@ def acquire(root: str, session: str, phase: int, run_file: str, cron_id: str,
     if os.path.isabs(run_file) or ".." in run_file.replace("\\", "/").split("/"):
         raise GuardError(f"run file {run_file!r} must be a repo-relative path inside the workspace")
     with _Lock(root):
-        return _acquire_locked(root, session, phase, run_file, cron_id, handover)
+        return _acquire_locked(root, session, phase, run_file, cron_id, handover, generation)
 
 
 def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id: str,
-                    handover: str | None) -> str:
-    guard, _ = _paths(root)
+                    handover: str | None, generation: str | None = None) -> str:
+    guard, state_path = _paths(root)
     os.makedirs(os.path.dirname(guard), exist_ok=True)
+    try:
+        previous = read_guard(root) or {}
+    except GuardError:
+        previous = {}
+    same_run = previous.get("run_file") == run_file and previous.get("session_id") == session
     doc = {"runner": "claude", "workspace": root.replace("\\", "/"), "phase": phase,
-           "run_file": run_file, "session_id": session, "cron_id": cron_id}
+           "run_file": run_file, "session_id": session, "cron_id": cron_id,
+           # D00 T04 §36: the generation the heartbeat prompt carries, when
+           # its job was created (the 7-day expiry counts from it), and the
+           # run file's length at acquisition, so a reused run file's old
+           # markers never end this run.
+           "generation": generation or (previous.get("generation") if same_run and
+                                        previous.get("cron_id") == cron_id else None) or mint_generation(),
+           "job_created_at": (previous.get("job_created_at") if previous.get("cron_id") == cron_id
+                              and previous.get("job_created_at") else _utc_now()),
+           "run_offset": (int(previous.get("run_offset", 0)) if same_run
+                          else _run_length(root, run_file))}
     data = json.dumps(doc, indent=2).encode("utf-8")
     try:
         fd = os.open(guard, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
@@ -176,10 +217,22 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
             fh.write(json.dumps(doc, indent=2).encode("utf-8"))
         os.replace(tmp, guard)
         what = "handed over" if owner != session else "re-pointed"
-        return f"acquire: guard {what} for session {session} (phase {phase}, {run_file}, job {cron_id})"
+        if owner != session or not same_run:
+            try:
+                os.unlink(state_path)
+            except FileNotFoundError:
+                pass
+        return (f"acquire: guard {what} for session {session} (phase {phase}, {run_file}, job {cron_id}, "
+                f"generation {doc['generation']})")
     with os.fdopen(fd, "wb") as fh:
         fh.write(data)
-    return f"acquire: guard created for session {session} (phase {phase}, {run_file}, job {cron_id})"
+    # A fresh guard starts a fresh breaker, under the same lock (D00 T04 §36).
+    try:
+        os.unlink(state_path)
+    except FileNotFoundError:
+        pass
+    return (f"acquire: guard created for session {session} (phase {phase}, {run_file}, job {cron_id}, "
+            f"generation {doc['generation']})")
 
 
 def _ready_count(root: str) -> int | None:
@@ -217,11 +270,7 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
     if str(guard.get("session_id", "")) != session:
         raise GuardError(f"the guard belongs to session {guard.get('session_id')}, not {session}")
     run_rel = str(guard.get("run_file", ""))
-    try:
-        with open(os.path.join(root, run_rel), encoding="utf-8") as fh:
-            text = fh.read()
-    except OSError:
-        text = ""
+    text = _run_text_after_offset(root, run_rel, guard)
     if reason == "closeout" and not re.search(r"(?m)^## Closeout\b", text):
         raise GuardError(f"closeout needs a '## Closeout' heading in {run_rel}")
     if reason == "park" and not re.search(r"(?m)^PARKED\b", text):
@@ -238,6 +287,12 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
             trips = 0
         if trips < 2:
             raise GuardError(f"stall needs a state file with trips of 2 or more; it reads {trips}")
+    # The job id outlives the guard until CronDelete is confirmed: a failed
+    # delete stays recoverable (D00 T04 §36).
+    pending = _pending_path(root)
+    with open(pending + ".tmp", "w", encoding="utf-8") as fh:
+        json.dump({"cron_id": guard.get("cron_id"), "reason": reason, "at": _utc_now()}, fh)
+    os.replace(pending + ".tmp", pending)
     for path in (guard_path, state_path):
         try:
             os.unlink(path)
@@ -247,19 +302,164 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
     if left:
         raise GuardError(f"could not delete {', '.join(left)}")
     return (f"end: {reason}: guard and state deleted; CronDelete {guard.get('cron_id')} now "
-            f"(the heartbeat job), then confirm it is gone with CronList")
+            f"(the heartbeat job), confirm it is gone with CronList, then run "
+            f"cancel-confirmed --cron-id {guard.get('cron_id')}")
 
 
-def hook_error(root: str, session: str | None = None) -> str:
+def _run_text_after_offset(root: str, run_rel: str, guard: dict) -> str:
+    """The run file's text written after this run acquired its guard: a
+    reused run file's old markers never end the new run (D00 T04 §36). A
+    file shorter than the offset was rewritten, and none of it counts."""
+    try:
+        with open(os.path.join(root, run_rel), "rb") as fh:
+            data = fh.read()
+    except OSError:
+        return ""
+    offset = int(guard.get("run_offset", 0) or 0)
+    if len(data) < offset:
+        return ""
+    return data[offset:].decode("utf-8", "replace")
+
+
+def _pending_path(root: str) -> str:
+    return os.path.join(root, "build", "claude-campaign-pending-cancel.json")
+
+
+def pending_cancel(root: str) -> str:
+    try:
+        with open(_pending_path(root), encoding="utf-8") as fh:
+            doc = json.load(fh)
+    except FileNotFoundError:
+        return ""
+    except (OSError, ValueError):
+        return "pending-cancel: the record is unreadable: list the jobs and delete any Resolute heartbeat"
+    return f"pending-cancel: CronDelete {doc.get('cron_id')} (ended by {doc.get('reason')} at {doc.get('at')})"
+
+
+def cancel_confirmed(root: str, cron_id: str) -> str:
+    with _Lock(root):
+        try:
+            with open(_pending_path(root), encoding="utf-8") as fh:
+                doc = json.load(fh)
+        except FileNotFoundError:
+            return "cancel-confirmed: nothing pending"
+        except (OSError, ValueError):
+            doc = {}
+        if doc and str(doc.get("cron_id")) != cron_id:
+            raise GuardError(f"the pending cancellation names job {doc.get('cron_id')}, not {cron_id}")
+        os.unlink(_pending_path(root))
+        return f"cancel-confirmed: job {cron_id} is gone; nothing pending"
+
+
+def whoami(root: str, session: str, generation: str | None = None) -> str:
+    """What this heartbeat is to the run: OWNER, NOT THE OWNER, NOT THE
+    CURRENT JOB (a replaced job in the owning session), NO GUARD, or
+    MALFORMED GUARD (D00 T04 §36)."""
+    with _Lock(root):
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            return "MALFORMED GUARD"
+        if guard is None:
+            return "NO GUARD"
+        if str(guard.get("session_id", "")) != session:
+            return "NOT THE OWNER"
+        if generation and str(guard.get("generation", "")) != generation:
+            return "NOT THE CURRENT JOB"
+        return "OWNER"
+
+
+def reset_state(root: str, session: str | None = None, expect_no_guard: bool = False) -> str:
+    """Delete the breaker state under the lock, re-checking ownership or
+    absence first: never a direct delete (D00 T04 §36)."""
+    _, state_path = _paths(root)
+    with _Lock(root):
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            raise GuardError("the guard is unreadable; refusing to reset its state")
+        if expect_no_guard and guard is not None:
+            raise GuardError("a guard exists: a new run started; its state is not this heartbeat's to delete")
+        if not expect_no_guard and (guard is None or str(guard.get("session_id", "")) != session):
+            raise GuardError("reset-state needs the owning --session of a live guard")
+        try:
+            os.unlink(state_path)
+            return "reset-state: state deleted"
+        except FileNotFoundError:
+            return "reset-state: no state"
+
+
+def reconcile(root: str, session: str, jobs: list[str]) -> list[str]:
+    """Startup reconciliation between the guard and the live heartbeat jobs
+    (D00 T04 §36): what to delete or recreate before a run starts."""
+    with _Lock(root):
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            return ["reconcile: the guard is unreadable: report it to the operator and start nothing"]
+    out: list[str] = []
+    if guard is None:
+        out += [f"reconcile: orphan job {j} has no guard: CronDelete it" for j in jobs]
+        return out or ["reconcile: consistent (no guard, no job)"]
+    owner, job = str(guard.get("session_id", "")), str(guard.get("cron_id", ""))
+    if owner != session:
+        return [f"reconcile: the guard belongs to session {owner}: start nothing and report the owner"]
+    if job not in jobs:
+        out.append(f"reconcile: the guard names job {job}, which is not live: CronCreate a heartbeat "
+                   f"and re-point with acquire --cron-id")
+    out += [f"reconcile: stale job {j} is not the guard's: CronDelete it" for j in jobs if j != job]
+    return out or [f"reconcile: consistent (guard and job {job})"]
+
+
+def health(root: str, session: str, jobs: list[str]) -> tuple[int, str]:
+    with _Lock(root):
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            return 1, "health: the guard is unreadable"
+    if guard is None or str(guard.get("session_id", "")) != session:
+        return 1, "health: this session holds no live guard"
+    job = str(guard.get("cron_id", ""))
+    if job not in jobs:
+        return 1, f"health: job {job} is missing: CronCreate a heartbeat and re-point with acquire --cron-id"
+    return 0, f"health: ok, job {job} is live"
+
+
+def expiry(root: str, session: str, now: str | None = None, days: float = 7.0,
+           margin_hours: float = 12.0) -> tuple[int, str]:
+    """Whether the heartbeat job nears its 7-day expiry (D00 T04 §36):
+    exit 1 `replace due` inside the margin, else how long is left."""
+    import datetime
+    with _Lock(root):
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            return 1, "expiry: the guard is unreadable"
+    if guard is None or str(guard.get("session_id", "")) != session:
+        return 1, "expiry: this session holds no live guard"
+    fmt = "%Y-%m-%dT%H:%M:%SZ"
+    try:
+        created = datetime.datetime.strptime(str(guard.get("job_created_at")), fmt)
+    except ValueError:
+        return 1, "expiry: the job's creation time is unknown: replace the job"
+    current = datetime.datetime.strptime(now, fmt) if now else datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0, tzinfo=None)
+    left = datetime.timedelta(days=days) - (current - created)
+    if left <= datetime.timedelta(hours=margin_hours):
+        return 1, (f"expiry: replace due, job {guard.get('cron_id')} created {guard.get('job_created_at')} "
+                   f"expires in {max(left.total_seconds(), 0) / 3600:.1f}h: CronCreate a replacement and re-point")
+    return 0, f"expiry: ok, job {guard.get('cron_id')} expires in {left.total_seconds() / 3600:.1f}h"
+
+
+def hook_error(root: str, session: str | None = None, ack: str | None = None) -> str:
     """Print and clear the error the hook recorded, if any. With a
     session, a guard owned by another session is refused before anything
     is read or cleared (panel round 1: a former owner's heartbeat must
     not consume the current owner's failure record)."""
     with _Lock(root):
-        return _hook_error_locked(root, session)
+        return _hook_error_locked(root, session, ack)
 
 
-def _hook_error_locked(root: str, session: str | None) -> str:
+def _hook_error_locked(root: str, session: str | None, ack: str | None = None) -> str:
     # Under the lock, so no handover lands between the ownership check
     # and the clear (panel round 2). An unreadable guard cannot name an
     # owner, and the error it caused is exactly what must be reported,
@@ -278,16 +478,25 @@ def _hook_error_locked(root: str, session: str | None) -> str:
             state = json.load(fh)
     except (OSError, ValueError):
         return ""
-    err = state.pop("hook_error", None)
-    at = state.pop("hook_error_at", None)
+    err = state.get("hook_error")
+    at = state.get("hook_error_at")
     if not err:
         return ""
+    note = " (the guard file is unreadable: repair it before resuming)" if unreadable else ""
+    line = f"campaign-stop hook failed at {at}: {err}{note}"
+    if ack is None:
+        # Print only: the record clears after the run file holds it and
+        # the heartbeat acknowledges that exact line (D00 T04 §36).
+        return line
+    if ack != line:
+        raise GuardError("the acknowledgement does not match the recorded error; nothing cleared")
+    state.pop("hook_error", None)
+    state.pop("hook_error_at", None)
     tmp = state_path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as fh:
         json.dump(state, fh)
     os.replace(tmp, state_path)
-    note = " (the guard file is unreadable: repair it before resuming)" if unreadable else ""
-    return f"campaign-stop hook failed at {at}: {err}{note}"
+    return f"hook-error: acknowledged and cleared: {line}"
 
 
 REPAIR_BOUND = 3
@@ -560,7 +769,19 @@ def _self_test() -> int:
         line = hook_error(root, SESSION)
         check("hook-error-reports-through-a-malformed-guard",
               line.startswith("campaign-stop hook failed at ") and "guard file is unreadable" in line
-              and "hook_error" not in _state(root), line)
+              and bool(_state(root).get("hook_error")), line)
+        # D00 T04 §36: printing clears nothing; only the exact acknowledged
+        # line clears the record, so an interrupted heartbeat loses nothing.
+        try:
+            hook_error(root, SESSION, ack="some other line")
+            check("hook-error-refuses-a-mismatched-ack", False)
+        except GuardError as exc:
+            check("hook-error-refuses-a-mismatched-ack",
+                  "does not match" in str(exc) and bool(_state(root).get("hook_error")), str(exc))
+        cleared = hook_error(root, SESSION, ack=line)
+        check("hook-error-clears-on-the-exact-ack",
+              cleared.startswith("hook-error: acknowledged and cleared") and "hook_error" not in _state(root),
+              cleared)
         with open(os.path.join(root, "build", "claude-campaign-state.json"), "w", encoding="utf-8") as fh:
             fh.write(saved_state)
         _guard(root, session="77777777-0000-0000-0000-000000000000")
@@ -573,7 +794,8 @@ def _self_test() -> int:
             check("hook-error-refuses-another-sessions-state",
                   "belongs to session" in str(exc) and _state(root).get("hook_error") == "boom", str(exc))
         line = hook_error(root)
-        check("hook-error-reports-then-clears",
+        hook_error(root, ack=line)
+        check("hook-error-reports-then-clears-on-ack",
               line.startswith("campaign-stop hook failed at ") and "hook_error" not in _state(root)
               and hook_error(root) == "", f"{line!r} {_state(root)}")
 
@@ -623,7 +845,7 @@ def _self_test() -> int:
         for _ in range(2):
             run_hook(root, SESSION)
         text = open(run_path, encoding="utf-8").read().replace(
-            "- started\n", "- started\n- heartbeat fired, resumed\n")
+            "- started\n", "- started\n- bookkeeping: heartbeat fired, resumed\n")
         with open(run_path, "w", encoding="utf-8") as fh:
             fh.write(text)
         code, out, err = run_hook(root, SESSION)
@@ -635,6 +857,53 @@ def _self_test() -> int:
             fh.write("\n### D90 T01 §1 -- shipped\n")
         code, out, _ = run_hook(root, SESSION)
         check("a-sections-entry-is-progress", isinstance(out, dict) and out.get("decision") == "block", str(out))
+
+        # D00 T04 §36: a substantive Critical events line is progress; only
+        # a marked bookkeeping line is not.
+        for _ in range(3):
+            run_hook(root, SESSION)
+        text = open(run_path, encoding="utf-8").read().replace(
+            "- started\n", "- started\n- 2099-01-01: repaired the red CI by hand, see the run page\n")
+        with open(run_path, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        code, out, _ = run_hook(root, SESSION)
+        check("a-substantive-critical-events-line-is-progress",
+              isinstance(out, dict) and out.get("decision") == "block" and _state(root).get("trips") == 0,
+              f"{out} {_state(root)}")
+
+        # D00 T04 §36: the hook's state write waits for the guard lock.
+        holder = subprocess.Popen(
+            [sys.executable, "-c",
+             "import sys, time; sys.path.insert(0, sys.argv[1]); import campaign_guard as cg\n"
+             "with cg._Lock(sys.argv[2]):\n"
+             "    print('held', flush=True); time.sleep(2)",
+             HERE, root], stdout=subprocess.PIPE, text=True)
+        holder.stdout.readline()
+        import time as _time
+        began = _time.monotonic()
+        code, out, err = run_hook(root, SESSION)
+        waited = _time.monotonic() - began
+        holder.wait()
+        check("the-hook-waits-for-the-guard-lock",
+              isinstance(out, dict) and out.get("decision") == "block" and waited >= 1.0, f"{waited:.2f}s {out} {err}")
+        holder = subprocess.Popen(
+            [sys.executable, "-c",
+             "import sys, time; sys.path.insert(0, sys.argv[1]); import campaign_guard as cg\n"
+             "with cg._Lock(sys.argv[2]):\n"
+             "    print('held', flush=True); time.sleep(4)",
+             HERE, root], stdout=subprocess.PIPE, text=True)
+        holder.stdout.readline()
+        os.environ["CAMPAIGN_LOCK_WAIT_MS"] = "300"
+        try:
+            code, out, err = run_hook(root, SESSION)
+        finally:
+            del os.environ["CAMPAIGN_LOCK_WAIT_MS"]
+        holder.wait()
+        log = os.path.join(root, "build", "claude-campaign-hook-errors.log")
+        logged = open(log, encoding="utf-8").read() if os.path.exists(log) else ""
+        check("a-lock-timeout-fails-open-into-the-error-log",
+              code == 0 and out is None and "guard lock stayed held" in logged, f"{out} {err} {logged!r}")
+        os.remove(log)
 
         # D00 T04 §34: an escalation parks and ends the run before its report.
         with open(run_path, "a", encoding="utf-8") as fh:
@@ -727,11 +996,15 @@ def _self_test() -> int:
             for f in _paths(root):
                 if os.path.exists(f):
                     os.remove(f)
+            # D00 T04 §36: markers count only after acquisition, so the run
+            # file gains its body after the guard is acquired.
             with open(run_path, "w", encoding="utf-8") as fh:
-                fh.write(body)
+                fh.write("# run\n")
             _set_ready(root, ready)
             acquire(root, SESSION, 0, RUN_FILE, "job-9")
             run_hook(root, SESSION)  # leaves a state file behind
+            with open(run_path, "a", encoding="utf-8") as fh:
+                fh.write(body)
 
         for reason, body, ready in (("closeout", "# r\n\n## Closeout\n\nshipped\n", 3),
                                     ("park", "# r\n\nPARKED 2099-01-01T00:00:00Z leftovers blocked\n", 3),
@@ -767,6 +1040,106 @@ def _self_test() -> int:
             check("end-refuses-another-session", False)
         except GuardError as exc:
             check("end-refuses-another-session", "belongs to session" in str(exc), str(exc))
+
+    # D00 T04 §36: the lifecycle commands, in a fixture of their own.
+    with tempfile.TemporaryDirectory(prefix="campaign-life-") as ltmp:
+        lroot = _workspace(ltmp)
+        run = os.path.join(lroot, RUN_FILE)
+        with open(run, "w", encoding="utf-8") as fh:
+            fh.write("# old run\n\nPARKED 2098-01-01T00:00:00Z an earlier run parked here\n")
+        g1 = mint_generation()
+        acquire(lroot, SESSION, 0, RUN_FILE, "job-a", generation=g1)
+        code, out, _ = run_hook(lroot, SESSION)
+        check("a-reused-run-files-old-marker-keeps-blocking",
+              isinstance(out, dict) and out.get("decision") == "block", str(out))
+        with open(run, "a", encoding="utf-8") as fh:
+            fh.write("\nPARKED 2099-01-01T00:00:00Z this run parked\n")
+        code, out, _ = run_hook(lroot, SESSION)
+        check("a-marker-after-acquisition-ends-the-run", code == 0 and out is None, str(out))
+        check("whoami-owner", whoami(lroot, SESSION, g1) == "OWNER")
+        check("whoami-not-the-current-job", whoami(lroot, SESSION, "stale0000000") == "NOT THE CURRENT JOB")
+        check("whoami-not-the-owner", whoami(lroot, "99999999-0000-0000-0000-000000000000", g1) == "NOT THE OWNER")
+        g2 = mint_generation()
+        acquire(lroot, SESSION, 0, RUN_FILE, "job-b", generation=g2)
+        check("a-replaced-job-is-not-current", whoami(lroot, SESSION, g1) == "NOT THE CURRENT JOB"
+              and whoami(lroot, SESSION, g2) == "OWNER")
+        check("health-ok", health(lroot, SESSION, ["job-b"])[0] == 0)
+        code_h, line_h = health(lroot, SESSION, ["job-a"])
+        check("health-names-a-missing-job", code_h == 1 and "job-b is missing" in line_h, line_h)
+        check("reconcile-consistent", reconcile(lroot, SESSION, ["job-b"]) == ["reconcile: consistent (guard and job job-b)"])
+        rc = reconcile(lroot, SESSION, ["job-a"])
+        check("reconcile-guard-without-job-and-stale-job",
+              any("job-b, which is not live" in r for r in rc) and any("stale job job-a" in r for r in rc), str(rc))
+        g = read_guard(lroot)
+        code_e, line_e = expiry(lroot, SESSION, now=g["job_created_at"])
+        check("expiry-ok-when-fresh", code_e == 0 and "expires in 168.0h" in line_e, line_e)
+        import datetime as _dt
+        later = (_dt.datetime.strptime(g["job_created_at"], "%Y-%m-%dT%H:%M:%SZ")
+                 + _dt.timedelta(days=6, hours=13)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        code_e, line_e = expiry(lroot, SESSION, now=later)
+        check("expiry-replace-due-near-seven-days", code_e == 1 and "replace due" in line_e, line_e)
+        try:
+            reset_state(lroot, "99999999-0000-0000-0000-000000000000")
+            check("reset-state-refuses-another-session", False)
+        except GuardError as exc:
+            check("reset-state-refuses-another-session", "owning --session" in str(exc), str(exc))
+        try:
+            reset_state(lroot, expect_no_guard=True)
+            check("reset-state-refuses-while-a-guard-lives", False)
+        except GuardError as exc:
+            check("reset-state-refuses-while-a-guard-lives", "a guard exists" in str(exc), str(exc))
+        msg = end(lroot, SESSION, "park")
+        check("end-leaves-a-pending-cancellation",
+              pending_cancel(lroot).startswith("pending-cancel: CronDelete job-b") and "cancel-confirmed" in msg,
+              pending_cancel(lroot))
+        try:
+            cancel_confirmed(lroot, "job-zzz")
+            check("cancel-confirmed-refuses-another-job", False)
+        except GuardError as exc:
+            check("cancel-confirmed-refuses-another-job", "names job job-b" in str(exc), str(exc))
+        check("cancel-confirmed-clears-the-pending-record",
+              cancel_confirmed(lroot, "job-b").startswith("cancel-confirmed: job job-b is gone")
+              and pending_cancel(lroot) == "")
+        check("reconcile-orphan-job", reconcile(lroot, SESSION, ["job-x"])
+              == ["reconcile: orphan job job-x has no guard: CronDelete it"])
+        check("reset-state-with-no-guard", reset_state(lroot, expect_no_guard=True).startswith("reset-state:"))
+        check("whoami-no-guard", whoami(lroot, SESSION, g2) == "NO GUARD")
+
+        # D00 T04 §36: the fingerprint's degraded coverage, pinned at small
+        # bounds: content past the hash bound counts only through size and
+        # write time, and past the stat bound only through the name.
+        with open(run, "w", encoding="utf-8") as fh:
+            fh.write("# run\n")
+        acquire(lroot, SESSION, 0, RUN_FILE, "job-c")
+        cov = os.path.join(lroot, "cov")
+        os.makedirs(cov)
+        for n in range(6):
+            with open(os.path.join(cov, f"f{n}.txt"), "w", encoding="utf-8") as fh:
+                fh.write("aaaa\n")
+        env_bounds = {"CAMPAIGN_HASH_FILES": "2", "CAMPAIGN_STAT_FILES": "2"}
+        os.environ.update(env_bounds)
+        try:
+            def _tripped_then(path: str, keep_time: bool) -> dict:
+                for _ in range(4):
+                    run_hook(lroot, SESSION)
+                st_before = os.stat(path)
+                with open(path, "w", encoding="utf-8") as fh:
+                    fh.write("bbbb\n")
+                if keep_time:
+                    os.utime(path, ns=(st_before.st_atime_ns, st_before.st_mtime_ns))
+                run_hook(lroot, SESSION)
+                return _state(lroot)
+            st = _tripped_then(os.path.join(cov, "f0.txt"), keep_time=True)
+            check("coverage-a-hashed-file-edit-counts-even-with-its-time-kept", st.get("trips") == 0, str(st))
+            st = _tripped_then(os.path.join(cov, "f2.txt"), keep_time=True)
+            check("coverage-past-the-hash-bound-a-same-size-same-time-edit-is-invisible", st.get("trips") == 1, str(st))
+            st = _tripped_then(os.path.join(cov, "f3.txt"), keep_time=False)
+            check("coverage-past-the-hash-bound-a-time-change-counts", st.get("trips") == 0, str(st))
+            st = _tripped_then(os.path.join(cov, "f5.txt"), keep_time=False)
+            check("coverage-past-the-stat-bound-only-the-name-counts", st.get("trips") == 1, str(st))
+        finally:
+            for k in env_bounds:
+                del os.environ[k]
 
     # D00 T04 §35: the repair episode survives a restart and refuses a fourth attempt.
     with tempfile.TemporaryDirectory(prefix="campaign-repair-") as rtmp:
@@ -812,10 +1185,14 @@ def _self_test() -> int:
                         ("skill-ends-through-end", "python scripts/campaign_guard.py end --session"),
                         ("skill-heartbeat-reports-hook-errors", "python scripts/campaign_guard.py hook-error"),
                         ("skill-refused-acquire-cancels-its-job", "A refused `acquire` means another session owns the run"),
-                        ("skill-heartbeat-checks-ownership", "reply NOT THE OWNER"),
+                        ("skill-heartbeat-checks-ownership", "NOT THE OWNER or NOT THE CURRENT JOB"),
                         ("skill-heartbeat-ends-through-end", "--reason plan-done`, CronDelete this job"),
                         ("skill-heartbeat-owner-first",
-                         "1. If build/claude-campaign-guard.json exists but its `session_id`")):
+                         "1. Run `python scripts/campaign_guard.py whoami --session"),
+                        ("skill-reconciles-before-starting", "python scripts/campaign_guard.py reconcile --session"),
+                        ("skill-checks-health-at-each-boundary", "python scripts/campaign_guard.py health --session"),
+                        ("skill-confirms-the-cancel", "python scripts/campaign_guard.py cancel-confirmed --cron-id"),
+                        ("skill-marks-bookkeeping", "- bookkeeping: heartbeat resumed")):
         check(pin, needle in skill, plan_skill)
 
     print(f"campaign_guard self-test: {passed + failed} cases, {failed} failed")
@@ -851,16 +1228,46 @@ def main(argv: list[str]) -> int:
         root = opts.pop("root", REPO)
         if argv[0] == "acquire":
             print(acquire(root, opts.get("session", ""), int(opts.get("phase", "0")),
-                          opts.get("run_file", ""), opts.get("cron_id", ""), opts.get("handover")))
+                          opts.get("run_file", ""), opts.get("cron_id", ""), opts.get("handover"),
+                          opts.get("generation")))
             return 0
         if argv[0] == "end":
             print(end(root, opts.get("session", ""), opts.get("reason", "")))
             return 0
-        if argv[0] == "hook-error" and set(opts) <= {"session"}:
-            line = hook_error(root, opts.get("session"))
+        if argv[0] == "hook-error" and set(opts) <= {"session", "ack"}:
+            line = hook_error(root, opts.get("session"), opts.get("ack"))
             if line:
                 print(line)
             return 0
+        if argv[0] == "mint-generation" and not opts:
+            print(mint_generation())
+            return 0
+        if argv[0] == "whoami":
+            print(whoami(root, opts.get("session", ""), opts.get("generation")))
+            return 0
+        if argv[0] == "reset-state":
+            print(reset_state(root, opts.get("session"), opts.get("expect_no_guard") == "yes"))
+            return 0
+        if argv[0] == "pending-cancel" and not opts:
+            line = pending_cancel(root)
+            if line:
+                print(line)
+            return 0
+        if argv[0] == "cancel-confirmed":
+            print(cancel_confirmed(root, opts.get("cron_id", "")))
+            return 0
+        if argv[0] in ("reconcile", "health"):
+            jobs = [j for j in opts.get("jobs", "").split(",") if j]
+            if argv[0] == "reconcile":
+                print("\n".join(reconcile(root, opts.get("session", ""), jobs)))
+                return 0
+            code, line = health(root, opts.get("session", ""), jobs)
+            print(line, file=sys.stdout if code == 0 else sys.stderr)
+            return code
+        if argv[0] == "expiry":
+            code, line = expiry(root, opts.get("session", ""), opts.get("now"))
+            print(line, file=sys.stdout if code == 0 else sys.stderr)
+            return code
     except (GuardError, ValueError) as exc:
         print(f"campaign_guard: {exc}", file=sys.stderr)
         return 1

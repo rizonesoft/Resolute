@@ -19,9 +19,16 @@ $MaxBlocksWithoutProgress = 3
 # tree cannot stall the hook: past these limits a file counts by its
 # size and write time instead, and past the metadata bound by its name
 # alone, so no untracked path ever drops out (D00 T04 section 34).
-$MaxHashedFiles = 500
-$MaxHashedBytes = 4MB
-$MaxStatFiles = 5000
+# The bounds read from the environment when set, so fixtures can pin the
+# boundaries without thousands of files (D00 T04 section 36).
+function EnvInt($name, $default) {
+    $v = [Environment]::GetEnvironmentVariable($name)
+    if ($v -match '^\d+$') { return [int64]$v } else { return $default }
+}
+$MaxHashedFiles = EnvInt 'CAMPAIGN_HASH_FILES' 500
+$MaxHashedBytes = EnvInt 'CAMPAIGN_HASH_BYTES' 4MB
+$MaxStatFiles = EnvInt 'CAMPAIGN_STAT_FILES' 5000
+$LockWaitMs = EnvInt 'CAMPAIGN_LOCK_WAIT_MS' 5000
 $root = $null
 # Windows PowerShell 5.1 decodes native output in the console codepage and
 # writes stdout in it too: plan rows carry section marks, so both sides run
@@ -32,6 +39,28 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 $env:PYTHONIOENCODING = "utf-8"
 
 function Allow { exit 0 }
+
+# The guard lock campaign_guard.py takes (msvcrt.locking on one byte):
+# FileStream.Lock is the same Win32 byte-range lock, so the hook's state
+# read and write never interleave with a handover, an end, or a reset
+# (D00 T04 section 36).
+function Enter-GuardLock($root, $waitMs) {
+    $path = Join-Path $root "build\claude-campaign-guard.lock"
+    $fs = [System.IO.File]::Open($path, [System.IO.FileMode]::OpenOrCreate,
+                                 [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::ReadWrite)
+    $deadline = [DateTime]::UtcNow.AddMilliseconds($waitMs)
+    while ($true) {
+        try { $fs.Lock(0, 1); return $fs }
+        catch [System.IO.IOException] {
+            if ([DateTime]::UtcNow -ge $deadline) { $fs.Dispose(); throw "the guard lock stayed held for $($waitMs)ms" }
+            Start-Sleep -Milliseconds 50
+        }
+    }
+}
+
+function Exit-GuardLock($fs) {
+    if ($fs) { try { $fs.Unlock(0, 1) } catch { } ; $fs.Dispose() }
+}
 
 function Write-State($path, $state) {
     $tmp = "$path.tmp"
@@ -65,8 +94,19 @@ try {
     if (-not (Test-Path -LiteralPath $fullRun)) { Allow }
 
     $text = Get-Content -LiteralPath $fullRun -Raw -Encoding UTF8
-    if ($text -match "(?m)^## Closeout\b") { Allow }
-    if ($text -match "(?m)^PARKED\b") { Allow }
+    if ($null -eq $text) { $text = "" }
+    # Markers count only when written after this run acquired its guard,
+    # so a reused run file's old closeout or PARKED line never ends it
+    # (D00 T04 section 36).
+    $bytes = [System.IO.File]::ReadAllBytes($fullRun)
+    $offset = 0
+    if ($guard.PSObject.Properties.Name -contains 'run_offset') { $offset = [int64]$guard.run_offset }
+    $recent = ""
+    if ($bytes.Length -ge $offset) {
+        $recent = [System.Text.Encoding]::UTF8.GetString($bytes, [int]$offset, [int]($bytes.Length - $offset))
+    }
+    if ($recent -match "(?m)^## Closeout\b") { Allow }
+    if ($recent -match "(?m)^PARKED\b") { Allow }
 
     Push-Location -LiteralPath $root
     # Windows PowerShell turns native stderr (git CRLF warnings) into
@@ -120,12 +160,17 @@ try {
         $ErrorActionPreference = "Stop"
     }
 
-    $work = [regex]::Replace($text, '(?ms)^## Critical events\b.*?(?=^## |\z)', '')
+    # Only lines marked as bookkeeping leave the fingerprint: a heartbeat
+    # or retry note is `- bookkeeping: ...`, and a substantive Critical
+    # events line still counts as progress (D00 T04 section 36).
+    $work = [regex]::Replace($text, '(?m)^- bookkeeping:.*(\r?\n)?', '')
     $sha = [System.Security.Cryptography.SHA256]::Create()
     $bytes = [System.Text.Encoding]::UTF8.GetBytes("$head`n$diff`n$untracked`n$work")
     $fingerprint = [System.BitConverter]::ToString($sha.ComputeHash($bytes)).Replace("-", "")
 
     $statePath = Join-Path $root "build\claude-campaign-state.json"
+    $lock = Enter-GuardLock $root $LockWaitMs
+    try {
     $state = [ordered]@{ fingerprint = ""; blocks = 0; trips = 0; stalled = $false }
     if (Test-Path -LiteralPath $statePath) {
         $old = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -149,6 +194,8 @@ try {
         $state.stalled = $true
         $state.stalled_at = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
         Write-State $statePath $state
+        Exit-GuardLock $lock
+        $lock = $null
         [Console]::Error.WriteLine("campaign-stop: stall breaker tripped ($($state.trips)) after $MaxBlocksWithoutProgress blocks with no tree change")
         Allow
     }
@@ -156,6 +203,8 @@ try {
     $state.blocks = $state.blocks + 1
     $state.stalled = $false
     Write-State $statePath $state
+    }
+    finally { Exit-GuardLock $lock }
 
     $message = "Campaign run is still open ($relative). Do not end the turn. Finish the open section's checklist, run the review panel and stamp it, then the next section, then the next phase. A commit, a green suite, a red CI (repair it: D00 T04 section 31), or a status report is not a stop."
     if ($next) { $message += " Next ready row: $($next.Trim())." }
@@ -168,22 +217,34 @@ catch {
     $reason = $_.Exception.Message
     [Console]::Error.WriteLine("campaign-stop: $reason")
     # Still fail open, but never silently: record the error where the
-    # heartbeat reads it (D00 T04 section 34). Best effort only.
+    # heartbeat reads it (D00 T04 section 34), in the state file under the
+    # guard lock when it can be had, else in an append-only error log that
+    # needs no lock (D00 T04 section 36). Best effort only.
     try {
         if ($root) {
-            $statePath = Join-Path $root "build\claude-campaign-state.json"
-            $state = [ordered]@{ fingerprint = ""; blocks = 0; trips = 0; stalled = $false }
-            if (Test-Path -LiteralPath $statePath) {
+            $at = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            $lock2 = $null
+            try { $lock2 = Enter-GuardLock $root 1000 } catch { $lock2 = $null }
+            if ($lock2) {
                 try {
-                    $old = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
-                    $state.fingerprint = [string]$old.fingerprint
-                    $state.blocks = [int]$old.blocks
-                    $state.trips = [int]$old.trips
-                } catch { }
+                    $statePath = Join-Path $root "build\claude-campaign-state.json"
+                    $state = [ordered]@{ fingerprint = ""; blocks = 0; trips = 0; stalled = $false }
+                    if (Test-Path -LiteralPath $statePath) {
+                        try {
+                            $old = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
+                            $state.fingerprint = [string]$old.fingerprint
+                            $state.blocks = [int]$old.blocks
+                            $state.trips = [int]$old.trips
+                        } catch { }
+                    }
+                    $state.hook_error = $reason
+                    $state.hook_error_at = $at
+                    Write-State $statePath $state
+                } finally { Exit-GuardLock $lock2 }
+            } else {
+                $log = Join-Path $root "build\claude-campaign-hook-errors.log"
+                [System.IO.File]::AppendAllText($log, "$at $reason`n")
             }
-            $state.hook_error = $reason
-            $state.hook_error_at = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
-            Write-State $statePath $state
         }
     } catch { }
     exit 0
