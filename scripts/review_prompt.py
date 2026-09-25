@@ -1509,6 +1509,7 @@ def workflow_steps(text: str | None) -> list[dict]:
         else:
             steps_block = job_child
         earlier: list[str] = []
+        earlier_steps: list[dict] = []
         for item in _sequence_items(steps_block):
             icol = _first_col(item)
             entries = _entries(item, icol) if icol is not None else []
@@ -1519,8 +1520,10 @@ def workflow_steps(text: str | None) -> list[dict]:
                 out.append({"name": name, "kind": "run", "run": None, "uses": None,
                             "refused": "a step shape the decoder does not read (a flow mapping or a scalar item)",
                             "context": {"shell": None, "working-directory": None, "env": {}, "cannot": step_reasons,
-                                        "runs-on": runs_on}, "job": job_name, "earlier": list(earlier)})
+                                        "runs-on": runs_on}, "job": job_name, "earlier": list(earlier),
+                            "earlier_steps": list(earlier_steps)})
                 earlier.append(name)
+                earlier_steps.append({"name": name, "uses": None, "with": []})
                 continue
             run, refused, uses = None, None, None
             if "run" in keys:
@@ -1580,8 +1583,14 @@ def workflow_steps(text: str | None) -> list[dict]:
                 ctx["cannot"].append("it uses ${{ }} expressions (matrix, secrets, or context values)")
             out.append({"name": name, "kind": "uses" if uses and "run" not in keys else "run", "run": run,
                         "uses": uses, "refused": refused, "context": ctx, "job": job_name,
-                        "earlier": list(earlier)})
+                        "earlier": list(earlier), "earlier_steps": list(earlier_steps)})
             earlier.append(name)
+            # By identity, not display name: the action and whether it
+            # takes inputs that change what it prepares (D00 T04 §37 panel
+            # round 1).
+            earlier_steps.append({"name": name, "uses": uses, "with": sorted(
+                k2 for k2, _v2, _c2, _i2 in (_entries(keys["with"][1], _first_col(keys["with"][1]))
+                                             if "with" in keys and _first_col(keys["with"][1]) is not None else []))})
     return out
 
 
@@ -1620,6 +1629,13 @@ def rerun_lines(step: dict, at: str) -> list[str]:
              "pwsh": "pwsh -command \". '{0}'\"", "powershell": "powershell -command \". '{0}'\"",
              "python": "python {0}", "cmd": "cmd /D /E:ON /V:OFF /S /C \"CALL \"{0}\"\""}.get(shell, shell) if shell else shell
     posix = shell is not None and shell.split()[0] in ("bash", "sh")
+    # Only the shells the context oracle proves against GitHub reproduce
+    # locally (bash default, explicit bash, sh); pwsh, powershell, python,
+    # and cmd refuse until a drill proves their templates. A recorded
+    # default: the cost of changing it is one echo drill per shell
+    # (D00 T04 §37 panel round 1).
+    if shell is not None and not posix and not reasons:
+        reasons.append(f"the {shell.split()[0]} template is not proven against GitHub")
     if (ctx["env"] or ctx["working-directory"]) and not posix and not reasons:
         reasons.append(f"its env or working-directory needs a POSIX shell to render, and the step runs {shell}")
     if reasons:
@@ -1628,8 +1644,15 @@ def rerun_lines(step: dict, at: str) -> list[str]:
     # Reproducible only when nothing but a checkout precedes the step: any
     # other earlier step may have prepared files, tools, or environment,
     # and the printout says so (D00 T04 §37).
-    before = [e for e in step.get("earlier", []) if not re.match(r"\ARun actions/checkout@", e)]
-    label = ("reproducible: only a checkout precedes it" if not before
+    prior = step.get("earlier_steps") or [{"name": e, "uses": None, "with": []} for e in step.get("earlier", [])]
+    before = []
+    for e in prior:
+        is_checkout = bool(e.get("uses")) and re.match(r"\Aactions/checkout@", e["uses"] or "")
+        if not is_checkout:
+            before.append(e["name"])
+        elif e.get("with"):
+            before.append(f"{e['name']} (checkout with {', '.join(e['with'])})")
+    label = ("reproducible: only a plain checkout precedes it" if not before
              else f"diagnostic: earlier steps may have prepared files, tools, or environment ({'; '.join(before)})")
     if not ctx["env"] and not ctx["working-directory"] and "\n" not in cmd:
         return [f"{head} {cmd}", f"ci-wait: |   (shell: {shell}; {label})"]
@@ -1674,7 +1697,8 @@ _SECRET_RES = (
     (re.compile(r"\bxox[abprs]-[A-Za-z0-9-]{10,}\b"), "***"),
     (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S), "***"),
     (re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/-]{8,}=*"), r"\1***"),
-    (re.compile(r"(?i)\b((?:password|passwd|secret|token|api[_-]?key|client[_-]?secret)[=:]\s?)[^\s'\"]{4,}"), r"\1***"),
+    # A credential-named key or variable, its value quoted or bare (D00 T04 §37 panel round 1).
+    (re.compile(r"(?i)\b([A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*\s*[=:]\s*)('[^']*'|\"[^\"]*\"|[^\s'\"]{4,})"), r"\1***"),
 )
 _SECRET_NAME = re.compile(r"(?i)(secret|token|passw|credential|private|api[_-]?key|auth)")
 
@@ -3523,12 +3547,13 @@ SCALAR_ECHO_GITHUB = {"plain": ["python3 scripts/check.py --flag value"], "plain
 
 
 # D00 T04 §37: three steps' execution context as GitHub ran them (run
-# 36191008012, the disposable context-echo.yml): each printed its
+# 36191008012, the disposable context-echo.yml; the explicit sh step from
+# run 36194988672, context-echo-sh.yml): each printed its
 # directory, its shell's errexit and pipefail, and its env as a child
 # process sees it. The re-run printout, executed locally under the shell
 # it names, must print the same.
-CONTEXT_ECHO_YML = 'name: context-echo\non:\n  push:\n    branches: [\'drill/**\']\njobs:\n  context-echo:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7\n      - name: default shell\n        run: |\n          basename "$PWD"\n          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac\n          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi\n      - name: explicit bash\n        shell: bash\n        run: |\n          basename "$PWD"\n          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac\n          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi\n      - name: env and directory\n        working-directory: drill/sub dir\n        env:\n          MODE: "two words"\n          QUOTE: it\'s\n        run: |\n          basename "$PWD"\n          echo "$MODE"\n          echo "$QUOTE"\n          bash -c \'echo "child: $MODE"\'\n'
-CONTEXT_ECHO_GITHUB = {"default shell": ["Resolute", "errexit", "nopipefail"], "explicit bash": ["Resolute", "errexit", "pipefail"], "env and directory": ["sub dir", "two words", "it's", "child: two words"]}
+CONTEXT_ECHO_YML = 'name: context-echo\non:\n  push:\n    branches: [\'drill/**\']\njobs:\n  context-echo:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7\n      - name: default shell\n        run: |\n          basename "$PWD"\n          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac\n          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi\n      - name: explicit bash\n        shell: bash\n        run: |\n          basename "$PWD"\n          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac\n          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi\n      - name: env and directory\n        working-directory: drill/sub dir\n        env:\n          MODE: "two words"\n          QUOTE: it\'s\n        run: |\n          basename "$PWD"\n          echo "$MODE"\n          echo "$QUOTE"\n          bash -c \'echo "child: $MODE"\'\n      - name: explicit sh\n        shell: sh\n        working-directory: drill/sub dir\n        env:\n          MODE: "two words"\n        run: |\n          basename "$PWD"\n          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac\n          echo "$MODE"\n          sh -c \'echo "child: $MODE"\'\n'
+CONTEXT_ECHO_GITHUB = {"default shell": ["Resolute", "errexit", "nopipefail"], "explicit bash": ["Resolute", "errexit", "pipefail"], "env and directory": ["sub dir", "two words", "it's", "child: two words"], "explicit sh": ["sub dir", "errexit", "two words", "child: two words"]}
 
 
 def _self_test() -> int:
@@ -6023,7 +6048,7 @@ def _self_test() -> int:
             check("rerun-prints-its-context-as-a-quoted-script",
                   rerun_lines(steps_ctx["ctx"], "abc")
                   == ["ci-wait: rerun locally at abc: ctx: the script below, as written",
-                      "ci-wait: |   (shell: bash -e {0}; reproducible: only a checkout precedes it)",
+                      "ci-wait: |   (shell: bash -e {0}; reproducible: only a plain checkout precedes it)",
                       "ci-wait: |   export MODE='fast'", "ci-wait: |   cd 'tools'", "ci-wait: |   make check"],
                   str(rerun_lines(steps_ctx["ctx"], "abc")))
             q_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: q\n"
@@ -6081,6 +6106,15 @@ def _self_test() -> int:
                   rerun_lines(us["Setup"], "abc")[0]
                   == "ci-wait: rerun locally at abc: Setup: runs the action actions/setup-python@def; no local reproduction, read the action's log and inputs",
                   str(rerun_lines(us["Setup"], "abc")))
+            fake = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: Run actions/checkout@prepare\n"
+                    "        run: make prepare\n      - name: Build\n        run: make\n"
+                    "      - uses: actions/checkout@abc\n        with:\n          ref: other\n      - name: Test\n        run: make test\n")
+            fk = {s["name"]: s for s in workflow_steps(fake)}
+            check("checkout-is-identified-by-action-not-name",
+                  "diagnostic: earlier steps may have prepared files, tools, or environment (Run actions/checkout@prepare)"
+                  in rerun_lines(fk["Build"], "abc")[1], str(rerun_lines(fk["Build"], "abc")))
+            check("a-checkout-with-inputs-is-named-as-context",
+                  "(checkout with ref)" in rerun_lines(fk["Test"], "abc")[1], str(rerun_lines(fk["Test"], "abc")))
             check("a-command-after-a-non-checkout-step-is-diagnostic",
                   "diagnostic: earlier steps may have prepared files, tools, or environment (Setup)"
                   in rerun_lines(us["Build"], "abc")[1], str(rerun_lines(us["Build"], "abc")))
@@ -6089,6 +6123,8 @@ def _self_test() -> int:
             import shutil as _sh
             git_bash = os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "Git", "bin", "bash.exe")
             bash_exe = git_bash if os.path.isfile(git_bash) else (_sh.which("bash") if os.name != "nt" else None)
+            check("context-oracle-has-bash", bool(bash_exe),
+                  "the execution-context oracle needs bash (Git Bash on Windows): it never skips silently")
             if bash_exe:
                 ctx_root = os.path.join(tmpd, "ctxecho", "Resolute")
                 os.makedirs(os.path.join(ctx_root, "drill", "sub dir"), exist_ok=True)
@@ -6103,7 +6139,8 @@ def _self_test() -> int:
                     script = os.path.join(tmpd, "ctxecho", "step.sh")
                     with open(script, "w", encoding="utf-8", newline="\n") as fh:
                         fh.write("\n".join(body) + "\n")
-                    argv = [bash_exe if a == "bash" else a for a in template.split()]
+                    sh_exe = os.path.join(os.path.dirname(bash_exe), "sh.exe") if os.name == "nt" else "sh"
+                    argv = [bash_exe if a == "bash" else (sh_exe if a == "sh" else a) for a in template.split()]
                     argv = [script.replace("\\", "/") if a == "{0}" else a for a in argv]
                     env_run = {k: v for k, v in os.environ.items() if k not in ("MODE", "QUOTE")}
                     got_ctx = subprocess.run(argv, cwd=ctx_root, capture_output=True, text=True, env=env_run)
@@ -6111,8 +6148,9 @@ def _self_test() -> int:
                           got_ctx.stdout.splitlines() == CONTEXT_ECHO_GITHUB[step["name"]],
                           f"{got_ctx.stdout.splitlines()} vs {CONTEXT_ECHO_GITHUB[step['name']]} ({template}) {got_ctx.stderr[:200]}")
             win = "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        run: make\n"
-            check("rerun-names-the-windows-default-shell",
-                  "(shell: pwsh -command" in rerun_lines(workflow_steps(win)[0], "abc")[1], str(rerun_lines(workflow_steps(win)[0], "abc")))
+            check("rerun-refuses-an-unproven-shell-template",
+                  "cannot reproduce locally: the pwsh template is not proven against GitHub"
+                  in rerun_lines(workflow_steps(win)[0], "abc")[0], str(rerun_lines(workflow_steps(win)[0], "abc")))
             check("rerun-refuses-expressions",
                   "cannot reproduce locally: it uses ${{ }} expressions" in rerun_lines(steps_ctx["expr"], "abc")[0]
                   and "cannot reproduce locally" in rerun_lines(steps_ctx["envexpr"], "abc")[0])
@@ -6316,16 +6354,17 @@ def _self_test() -> int:
                   and "edits the workflow" not in got_ow.stderr,
                   f"exit={got_ow.returncode} out={got_ow.stdout!r} err={got_ow.stderr!r}")
             c2w = _g("rev-parse", c3 + "~1").stdout.strip()
-            auth = ["--authorized-by", "operator", "--approved-range", f"{c2w}..{c3}"]
+            auth = ["--authorized-by", "operator", "--authorized-at", "2026-09-25T22:00Z", "--approved-range", f"{c2w}..{c3}"]
             got_enr = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
                                       "--expect-no-run", "trigger retired by the operator", *auth],
                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
             check("ci-wait-expect-no-run-is-a-distinct-not-green-outcome",
-                  got_enr.returncode == 4 and "NOT GREEN: no run within 0s, as authorized by operator" in got_enr.stdout,
+                  got_enr.returncode == 4 and "NOT GREEN: no run within 0s, as authorized by operator at 2026-09-25T22:00Z" in got_enr.stdout,
                   f"exit={got_enr.returncode} out={got_enr.stdout!r} err={got_enr.stderr!r}")
             for label, extra, needle in (
                     ("no authorization", [], "needs --authorized-by"),
-                    ("another range", ["--authorized-by", "operator", "--approved-range", f"{c3}..{c3}"],
+                    ("another range", ["--authorized-by", "operator", "--authorized-at", "2026-09-25T22:00Z",
+                                       "--approved-range", f"{c3}..{c3}"],
                      "is not the pushed range")):
                 got_a = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
                                         "--expect-no-run", "x", *extra],
@@ -6362,8 +6401,27 @@ def _self_test() -> int:
             c5 = _g("rev-parse", "HEAD").stdout.strip()
             got_nt5 = subprocess.run([sys.executable, me, "ci-wait", c5, "--timeout", "0", "--interval", "0",
                                       "--expect-no-run", "x", "--authorized-by", "operator",
-                                      "--approved-range", f"{c4}..{c5}"],
+                                      "--authorized-at", "2026-09-25T22:00Z", "--approved-range", f"{c4}..{c5}"],
                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            # A comment inside the on: block is no trigger change either.
+            with open(wfc, "w", encoding="utf-8") as fh:
+                fh.write("on:\n  push:\n    # a new comment in the trigger block\n    paths:\n      - 'todo/**'\n"
+                         "      - 'retired/**'\njobs: {}\n# a comment only\n")
+            _g("add", ".github/workflows/plan.yml")
+            _g("commit", "-qm", "c6-comment-in-on")
+            c6 = _g("rev-parse", "HEAD").stdout.strip()
+            got_nt6 = subprocess.run([sys.executable, me, "ci-wait", c6, "--timeout", "0", "--interval", "0",
+                                      "--expect-no-run", "x", "--authorized-by", "operator",
+                                      "--authorized-at", "2026-09-25T22:00Z", "--approved-range", f"{c5}..{c6}"],
+                                     cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-expect-no-run-refuses: a comment in the on block",
+                  got_nt6.returncode == 2 and "but not its triggers" in got_nt6.stderr, got_nt6.stderr)
+            got_nt7 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
+                                      "--expect-no-run", "x", "--authorized-by", "operator",
+                                      "--approved-range", f"{c2w}..{c3}"],
+                                     cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-expect-no-run-refuses: no authorization time",
+                  got_nt7.returncode == 2 and "--authorized-at <UTC time>" in got_nt7.stderr, got_nt7.stderr)
             check("ci-wait-expect-no-run-refuses: triggers unchanged",
                   got_nt5.returncode == 2 and "but not its triggers" in got_nt5.stderr, got_nt5.stderr)
             # D00 T04 §37: what ci-wait prints is redacted.
@@ -6376,6 +6434,10 @@ def _self_test() -> int:
             sec_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: s\n        env:\n"
                        "          API_TOKEN: abc123\n          MODE: fast\n        run: make\n")
             sec_rows = rerun_lines(workflow_steps(sec_yml)[0], "abc")
+            red2 = redact("password='hunter22' token=\"abcdefgh\" API_TOKEN=abcdefgh1 MY_SECRET: s3cr3tvalue MODE=fast")
+            check("redact-masks-quoted-and-secret-named-assignments",
+                  "hunter22" not in red2 and "abcdefgh" not in red2 and "s3cr3tvalue" not in red2
+                  and "MODE=fast" in red2, red2)
             check("rerun-masks-secret-named-env",
                   "ci-wait: |   export API_TOKEN='***'   # value masked: set it locally" in sec_rows
                   and "ci-wait: |   export MODE='fast'" in sec_rows and not any("abc123" in r for r in sec_rows),
@@ -7309,6 +7371,7 @@ if __name__ == "__main__":
         ceiling = 3600.0
         expect_no_run = None
         authorized_by = None
+        authorized_at = None
         approved_range = None
         retry_wait = 60.0
         since = None
@@ -7333,6 +7396,8 @@ if __name__ == "__main__":
                     expect_no_run = rest[i + 1]
                 elif rest[i] == "--authorized-by":
                     authorized_by = rest[i + 1]
+                elif rest[i] == "--authorized-at":
+                    authorized_at = rest[i + 1]
                 elif rest[i] == "--approved-range":
                     approved_range = rest[i + 1]
                 elif rest[i] == "--interval":
@@ -7383,9 +7448,10 @@ if __name__ == "__main__":
             # D00 T04 §37: the exception is recorded and bound: who
             # authorized it, the exact range approved, and a trigger change
             # inside that range.
-            if not authorized_by or not approved_range or ".." not in approved_range:
-                print("ci-wait: --expect-no-run needs --authorized-by <who> and --approved-range <base>..<head>",
-                      file=sys.stderr)
+            if (not authorized_by or not approved_range or ".." not in approved_range
+                    or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?Z", authorized_at or "")):
+                print("ci-wait: --expect-no-run needs --authorized-by <who>, --authorized-at <UTC time>, and "
+                      "--approved-range <base>..<head>", file=sys.stderr)
                 sys.exit(2)
             a_base, a_head = approved_range.split("..", 1)
             want_base, want_head = _object_identity(a_base), _object_identity(a_head)
@@ -7402,7 +7468,12 @@ if __name__ == "__main__":
                     return None
                 top_t = _entries(wf_t.splitlines(), 0)
                 on = next((e for e in top_t if e[0] in ("on", "true")), None)
-                return (on[1] + "\n" + "\n".join(on[2])) if on else ""
+                if not on:
+                    return ""
+                # Content only: comments and blank lines are no trigger change
+                # (D00 T04 §37 panel round 1).
+                body = [re.sub(r"\s+#.*\Z", "", ln).strip() for ln in [on[1], *on[2]]]
+                return "\n".join(b for b in body if b and not b.startswith("#"))
             if _triggers(base) == _triggers(ident[0]):
                 print(f"ci-wait: the range edits {wf_path} but not its triggers; --expect-no-run covers a "
                       f"retirement or a trigger change only", file=sys.stderr)
@@ -7419,7 +7490,7 @@ if __name__ == "__main__":
             # A distinct outcome: an authorized silence is never green, and
             # repair close refuses it as evidence (D00 T04 §37).
             print(f"ci-wait: {ident[0][:12]} {workflow} NOT GREEN: no run within {int(timeout)}s, as authorized "
-                  f"by {authorized_by} for {approved_range} ({expect_no_run})")
+                  f"by {authorized_by} at {authorized_at} for {approved_range} ({expect_no_run})")
             sys.exit(4)
         if not touches_workflow and not push_triggers_workflow(changed, filters):
             print(f"ci-wait: {ident[0][:12]} {workflow} not triggered "
