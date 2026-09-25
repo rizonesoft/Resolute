@@ -92,6 +92,7 @@ track: W1
 |  32   |   §32   | Campaign guard: stop hook, heartbeat, breaker  | --  |  [x]   |
 |  33   |   §33   | CI repair-loop follow-ups                      | §31 |  [ ]   |
 |  34   |   §34   | Campaign guard follow-ups                      | §32 |  [ ]   |
+|  35   |   §35   | CI read-back follow-ups                        | §33 |  [ ]   |
 
 ---
 
@@ -1351,6 +1352,7 @@ The D00 T04 §31 plan review files eight findings the §31 contract does not own
 
 **Test checkpoint:** The end-to-end episode is recorded; the owner rule, the setup-cause rule, and the episode cap read in the skills; the log-unavailable, slow-run, and workflow-change fixture legs pass; §30 carries its supersession note.
 
+-> XREF: D00 T04 §35 -- the sign-off finding on the command fallback, filed for a rethink
 -> XREF: D00 T04 §31 -- the repair loop eight items harden
 -> SOURCE: plan-D00-T04-s31-2026-09-23-PR1 D00-T04-S31-PR1
 -> SOURCE: plan-D00-T04-s31-2026-09-23-PR2 D00-T04-S31-PR2
@@ -1385,6 +1387,18 @@ The D00 T04 §32 plan review files seven findings the §32 contract does not own
 -> SOURCE: plan-D00-T04-s32-2026-09-24-PR6 D00-T04-S32-PR6
 -> SOURCE: plan-D00-T04-s32-2026-09-24-PR7 D00-T04-S32-PR7
 -> SOURCE: plan-D00-T04-s32-2026-09-24-PR9 D00-T04-S32-PR9
+
+## 35. CI Read-Back Follow-Ups
+
+The D00 T04 §33 review files what its contract does not own. Its sign-off round (panel round 3) found that `ci-wait`'s no-log fallback does not decode YAML scalars: `workflow_step_commands` keeps a quoted inline `run:` command's enclosing quotes and keeps a folded `>` block's newlines, so the command it prints for a local re-run can differ from the one GitHub executes. The same function was patched in panel rounds 1, 2, and 3 running (indentation, a dash-led block's sibling keys, then this), so the review skill's three-round rule stops the patching and this section rethinks it.
+
+- [ ] Decode `run:` scalars the way GitHub does, or state the forms read: `workflow_step_commands` in `scripts/review_prompt.py` returns raw scalar text, so `run: "python3 scripts/check.py"` prints with its quotes and `run: >` prints unfolded (panel round 3 of the D00 T04 §33 review, F8; needs §33 shipped: it rethinks §33's command fallback). Done when: plain, single-quoted, double-quoted (with escapes), literal `|`, and folded `>` scalars, each with `-`/`+` chomping, decode to the command text GitHub runs, one fixture leg per form quoted; any form still unsupported prints `ci-wait: rerun locally: <step>: unsupported run: form, read the workflow` instead of a guessed command, quoted from a leg; and the three earlier block legs re-pass. Cheaper substitute that fails the checkpoint: a fourth ad hoc patch for the two forms the round named.
+- [ ] Commit: `"workspace: CI read-back follow-ups"`
+
+**Test checkpoint:** Unit test: `python scripts/review_prompt.py --self-test` carries one leg per scalar form plus the unsupported-form refusal, quoted with the suite count; a mutation that drops the double-quote decoding fails its leg by name.
+
+-> XREF: D00 T04 §33 -- the command fallback this section rethinks
+-> SOURCE: panel-D00-T04-s33-2026-09-25-F8 D00-T04-S33-F8
 
 ## Verification
 
