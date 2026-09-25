@@ -1258,10 +1258,16 @@ def workflow_step_commands(text: str | None) -> list[tuple[str, str]]:
                 i += 1
                 while i < len(lines) and (not lines[i].strip()
                                           or len(lines[i]) - len(lines[i].lstrip()) > indent):
-                    if lines[i].strip():
-                        block.append(lines[i].strip())
+                    block.append(lines[i].rstrip())
                     i += 1
-                value = "\n".join(block)
+                # Dedent by the block's own indentation, keeping each line's
+                # relative indent: a Python block or heredoc re-runs as
+                # written (D00 T04 §33 panel round 1).
+                while block and not block[-1].strip():
+                    block.pop()
+                body = [ln for ln in block if ln.strip()]
+                cut = min((len(ln) - len(ln.lstrip()) for ln in body), default=0)
+                value = "\n".join(ln[cut:] for ln in block)
                 i -= 1
             first = value.splitlines()[0] if value else ""
             out.append((name or f"Run {first}", value))
@@ -1345,6 +1351,11 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
     step, run locally at the pushed commit (D00 T04 §33): a red verdict
     never becomes less red because its log was unavailable."""
     ok, out = _gh_text(["run", "view", run_id, "--log-failed"])
+    if ok and not normalized_log_lines(out):
+        # A log that fetched but carries nothing is no evidence: fall
+        # through to the full log and the commands (D00 T04 §33 panel
+        # round 1).
+        ok, out = False, "it carries no lines"
     if ok:
         steps, lines = summarize_failed_log(out, limit)
         rows = [f"ci-wait: failing step(s): {'; '.join(steps) if steps else 'not named by the log'}"]
@@ -1388,7 +1399,11 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         rows.append("ci-wait: failing step unknown; every run step of the workflow follows")
         picked = commands
     for n, c in picked:
-        rows.append(f"ci-wait: rerun locally at {at}: {n}: {c.replace(chr(10), ' && ')}")
+        if "\n" in c:
+            rows.append(f"ci-wait: rerun locally at {at}: {n}: the script below, as written")
+            rows += [f"ci-wait: |   {ln}" for ln in c.splitlines()]
+        else:
+            rows.append(f"ci-wait: rerun locally at {at}: {n}: {c}")
     if not picked:
         rows.append("ci-wait: the pushed commit's workflow names no run step to re-run")
     rows.append(classify_red(failing or [], []))
@@ -5366,6 +5381,10 @@ def _self_test() -> int:
                 "    if mode == 'badpin':\n"
                 "        print('plan-gates\\tSet up job\\t2026-09-23T21:37:50.1Z ##[error]Unable to resolve action `actions/checkout@deadbeef`, unable to find version `deadbeef`')\n"
                 "        sys.exit(0)\n"
+                "    if mode == 'emptylog':\n"
+                "        if '--log-failed' in sys.argv: sys.exit(0)\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.2Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
+                "        sys.exit(0)\n"
                 "    if mode == 'shutdowncancel':\n"
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z The runner has received a shutdown signal.')\n"
                 "        for i in range(25): print(f'plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.1Z ##[error]The operation was canceled. {i}')\n"
@@ -5393,7 +5412,7 @@ def _self_test() -> int:
                 "if mode == 'gherror':\n"
                 "    sys.stderr.write('HTTP 503: service unavailable\\n')\n"
                 "    sys.exit(1)\n"
-                "if mode in ('nolog', 'nologall', 'nojobs', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep'): mode = 'failure'\n"
+                "if mode in ('nolog', 'nologall', 'nojobs', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep', 'emptylog'): mode = 'failure'\n"
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
@@ -5430,12 +5449,14 @@ def _self_test() -> int:
                          "      - name: Self-test the TODO graph tool\n        run: python3 scripts/todo-graph.py self-test\n"
                          "      - name: Validate the TODO tree\n        run: python3 scripts/todo-graph.py validate\n"
                          "      - name: Check plan projection is current\n        run: |\n"
-                         "          python3 scripts/todo-graph.py plan --sync\n          test -z x\n")
+                         "          python3 scripts/todo-graph.py plan --sync\n          if true; then\n"
+                         "            test -z x\n          fi\n")
             check("workflow-step-commands-parsed",
                   workflow_step_commands(plan_text) == [
                       ("Self-test the TODO graph tool", "python3 scripts/todo-graph.py self-test"),
                       ("Validate the TODO tree", "python3 scripts/todo-graph.py validate"),
-                      ("Check plan projection is current", "python3 scripts/todo-graph.py plan --sync\ntest -z x")],
+                      ("Check plan projection is current",
+                       "python3 scripts/todo-graph.py plan --sync\nif true; then\n  test -z x\nfi")],
                   str(workflow_step_commands(plan_text)))
             code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
             check("ci-wait-no-log-prints-the-failing-step-command",
@@ -5447,7 +5468,8 @@ def _self_test() -> int:
             code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
             check("ci-wait-no-step-evidence-lists-every-run-step",
                   code == 1 and "failing step unknown" in line
-                  and "Check plan projection is current: python3 scripts/todo-graph.py plan --sync && test -z x" in line
+                  and "Check plan projection is current: the script below, as written" in line
+                  and "ci-wait: |     test -z x" in line and "&&" not in line
                   and "cause: unknown" in line, line)
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("nojobs")
@@ -5474,6 +5496,13 @@ def _self_test() -> int:
             check("ci-wait-classifies-the-whole-log-not-the-excerpt",
                   code == 1 and "cause: platform fault, escalate" in line
                   and "received a shutdown signal" not in line.split("cause:", 1)[0], line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("emptylog")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
+            check("ci-wait-empty-failed-log-falls-through",
+                  code == 1 and "failed-step log unavailable (it carries no lines)" in line
+                  and "full log read instead" in line
+                  and "FATAL x.md:9 candidate c6b1 resolves to nothing" in line, line)
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("unknownstep")
             code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
