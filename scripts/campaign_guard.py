@@ -196,8 +196,12 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
                                         previous.get("cron_id") == cron_id else None) or mint_generation(),
            "job_created_at": (previous.get("job_created_at") if previous.get("cron_id") == cron_id
                               and previous.get("job_created_at") else _utc_now()),
-           "run_offset": (int(previous.get("run_offset", 0)) if same_run
-                          else _run_length(root, run_file))}
+           # A stable run identity every terminal marker must carry, so a
+           # reused run file's old markers never end this run however the
+           # file is edited (D00 T04 §36 independent review: a byte offset
+           # breaks when a park record is inserted mid-file).
+           "run_id": (previous.get("run_id") if (same_run or (handover and previous.get("run_file") == run_file))
+                      and previous.get("run_id") else mint_generation())}
     data = json.dumps(doc, indent=2).encode("utf-8")
     try:
         fd = os.open(guard, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
@@ -223,7 +227,7 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
             except FileNotFoundError:
                 pass
         return (f"acquire: guard {what} for session {session} (phase {phase}, {run_file}, job {cron_id}, "
-                f"generation {doc['generation']})")
+                f"generation {doc['generation']}, run {doc['run_id']})")
     with os.fdopen(fd, "wb") as fh:
         fh.write(data)
     # A fresh guard starts a fresh breaker, under the same lock (D00 T04 §36).
@@ -232,7 +236,7 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
     except FileNotFoundError:
         pass
     return (f"acquire: guard created for session {session} (phase {phase}, {run_file}, job {cron_id}, "
-            f"generation {doc['generation']})")
+            f"generation {doc['generation']}, run {doc['run_id']})")
 
 
 def _ready_count(root: str) -> int | None:
@@ -270,13 +274,15 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
     if str(guard.get("session_id", "")) != session:
         raise GuardError(f"the guard belongs to session {guard.get('session_id')}, not {session}")
     run_rel = str(guard.get("run_file", ""))
-    text = _run_text_after_offset(root, run_rel, guard)
+    text = _run_markers_text(root, run_rel, guard)
+    rid = guard.get("run_id")
+    tag = f" run={rid}" if rid else ""
     if reason == "closeout" and not re.search(r"(?m)^## Closeout\b", text):
-        raise GuardError(f"closeout needs a '## Closeout' heading in {run_rel}")
+        raise GuardError(f"closeout needs a '## Closeout{tag}' heading in {run_rel}")
     if reason == "park" and not re.search(r"(?m)^PARKED\b", text):
-        raise GuardError(f"park needs a column-0 PARKED line in {run_rel}")
+        raise GuardError(f"park needs a column-0 'PARKED <UTC>{tag} <reason>' line in {run_rel}")
     if reason == "escalation" and not re.search(r"(?m)^PARKED\b.*\bescalation:", text):
-        raise GuardError(f"escalation needs a column-0 'PARKED <UTC> escalation: <cause>' line in {run_rel}")
+        raise GuardError(f"escalation needs a column-0 'PARKED <UTC>{tag} escalation: <cause>' line in {run_rel}")
     if reason == "plan-done" and ready != 0:
         raise GuardError(f"plan-done needs '0 runnable now'; query ready reads {ready}")
     if reason == "stall":
@@ -306,19 +312,27 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
             f"cancel-confirmed --cron-id {guard.get('cron_id')}")
 
 
-def _run_text_after_offset(root: str, run_rel: str, guard: dict) -> str:
-    """The run file's text written after this run acquired its guard: a
-    reused run file's old markers never end the new run (D00 T04 §36). A
-    file shorter than the offset was rewritten, and none of it counts."""
+def marker_run(line: str) -> str | None:
+    m = re.search(r"\brun=([0-9a-f]{6,})\b", line)
+    return m.group(1) if m else None
+
+
+def _run_markers_text(root: str, run_rel: str, guard: dict) -> str:
+    """The run file's lines that count as this run's markers: every line
+    when the guard predates run ids, else only `## Closeout` and `PARKED`
+    lines carrying `run=<this run's id>`, wherever they sit in the file
+    (D00 T04 §36)."""
     try:
-        with open(os.path.join(root, run_rel), "rb") as fh:
-            data = fh.read()
+        with open(os.path.join(root, run_rel), encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
     except OSError:
         return ""
-    offset = int(guard.get("run_offset", 0) or 0)
-    if len(data) < offset:
-        return ""
-    return data[offset:].decode("utf-8", "replace")
+    run_id = guard.get("run_id")
+    if not run_id:
+        return text
+    keep = [ln for ln in text.splitlines()
+            if not re.match(r"\A(## Closeout\b|PARKED\b)", ln) or marker_run(ln) == run_id]
+    return "\n".join(keep)
 
 
 def _pending_path(root: str) -> str:
@@ -366,7 +380,9 @@ def whoami(root: str, session: str, generation: str | None = None) -> str:
             return "NOT THE OWNER"
         if generation and str(guard.get("generation", "")) != generation:
             return "NOT THE CURRENT JOB"
-        return "OWNER"
+        # The run id rides the answer, so the heartbeat reads which markers
+        # are this run's without carrying the id in its prompt.
+        return f"OWNER run={guard.get('run_id')}" if guard.get("run_id") else "OWNER"
 
 
 def reset_state(root: str, session: str | None = None, expect_no_guard: bool = False) -> str:
@@ -459,6 +475,33 @@ def hook_error(root: str, session: str | None = None, ack: str | None = None) ->
         return _hook_error_locked(root, session, ack)
 
 
+def _hook_error_log(root: str, ack: str | None) -> str:
+    """The oldest line of the append-only log the hook writes when it
+    cannot get the guard lock (D00 T04 §36 independent review): printed
+    like a state error, removed only on its exact --ack. Runs under the
+    caller's lock."""
+    log = os.path.join(root, "build", "claude-campaign-hook-errors.log")
+    try:
+        with open(log, encoding="utf-8", errors="replace") as fh:
+            lines = [ln for ln in fh.read().splitlines() if ln.strip()]
+    except OSError:
+        return ""
+    if not lines:
+        return ""
+    at, _, reason = lines[0].partition(" ")
+    line = f"campaign-stop hook failed at {at}: {reason} (recorded without the lock)"
+    if ack is None:
+        return line
+    if ack != line:
+        raise GuardError("the acknowledgement does not match the recorded error; nothing cleared")
+    rest = lines[1:]
+    tmp = log + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        fh.write("".join(ln + "\n" for ln in rest))
+    os.replace(tmp, log)
+    return f"hook-error: acknowledged and cleared: {line}"
+
+
 def _hook_error_locked(root: str, session: str | None, ack: str | None = None) -> str:
     # Under the lock, so no handover lands between the ownership check
     # and the clear (panel round 2). An unreadable guard cannot name an
@@ -477,11 +520,11 @@ def _hook_error_locked(root: str, session: str | None, ack: str | None = None) -
         with open(state_path, encoding="utf-8-sig") as fh:
             state = json.load(fh)
     except (OSError, ValueError):
-        return ""
+        return _hook_error_log(root, ack)
     err = state.get("hook_error")
     at = state.get("hook_error_at")
     if not err:
-        return ""
+        return _hook_error_log(root, ack)
     note = " (the guard file is unreadable: repair it before resuming)" if unreadable else ""
     line = f"campaign-stop hook failed at {at}: {err}{note}"
     if ack is None:
@@ -905,6 +948,23 @@ def _self_test() -> int:
               code == 0 and out is None and "guard lock stayed held" in logged, f"{out} {err} {logged!r}")
         os.remove(log)
 
+        # D00 T04 §36 independent review: an error written to the fallback
+        # log (the lock was unavailable) reaches the heartbeat too.
+        with open(os.path.join(root, "build", "claude-campaign-hook-errors.log"), "w", encoding="utf-8") as fh:
+            fh.write("2099-01-01T00:00:00Z the guard lock stayed held for 300ms\n")
+        st_path = os.path.join(root, "build", "claude-campaign-state.json")
+        if os.path.exists(st_path):
+            st_now = _state(root)
+            st_now.pop("hook_error", None)
+            with open(st_path, "w", encoding="utf-8") as fh:
+                json.dump(st_now, fh)
+        line = hook_error(root)
+        check("hook-error-reads-the-fallback-log",
+              line == "campaign-stop hook failed at 2099-01-01T00:00:00Z: the guard lock stayed held for 300ms "
+                      "(recorded without the lock)", line)
+        hook_error(root, ack=line)
+        check("hook-error-ack-drains-the-fallback-log", hook_error(root) == "", hook_error(root))
+
         # D00 T04 §34: an escalation parks and ends the run before its report.
         with open(run_path, "a", encoding="utf-8") as fh:
             fh.write("\nPARKED 2099-01-01T00:00:00Z escalation: repair bound exhausted on D90 T01 §1\n")
@@ -1003,6 +1063,9 @@ def _self_test() -> int:
             _set_ready(root, ready)
             acquire(root, SESSION, 0, RUN_FILE, "job-9")
             run_hook(root, SESSION)  # leaves a state file behind
+            rid = read_guard(root)["run_id"]
+            body = body.replace("## Closeout", f"## Closeout run={rid}").replace(
+                "PARKED 2099-01-01T00:00:00Z", f"PARKED 2099-01-01T00:00:00Z run={rid}")
             with open(run_path, "a", encoding="utf-8") as fh:
                 fh.write(body)
 
@@ -1034,7 +1097,7 @@ def _self_test() -> int:
             check("end-refuses-a-closeout-without-its-heading", False)
         except GuardError as exc:
             check("end-refuses-a-closeout-without-its-heading",
-                  "needs a '## Closeout' heading" in str(exc) and read_guard(root) is not None, str(exc))
+                  "needs a '## Closeout run=" in str(exc) and read_guard(root) is not None, str(exc))
         try:
             end(root, "33333333-0000-0000-0000-000000000000", "operator-stop")
             check("end-refuses-another-session", False)
@@ -1052,17 +1115,31 @@ def _self_test() -> int:
         code, out, _ = run_hook(lroot, SESSION)
         check("a-reused-run-files-old-marker-keeps-blocking",
               isinstance(out, dict) and out.get("decision") == "block", str(out))
-        with open(run, "a", encoding="utf-8") as fh:
-            fh.write("\nPARKED 2099-01-01T00:00:00Z this run parked\n")
+        rid = read_guard(lroot)["run_id"]
+        # D00 T04 §36 independent review: the park record may sit mid-file
+        # (process-phase puts it under Gap audit); the run id, not its
+        # position, makes it this run's.
+        with open(run, "w", encoding="utf-8") as fh:
+            fh.write(f"# run\n\n## Gap audit\n\nPARKED 2099-01-01T00:00:00Z run={rid} leftovers blocked\n\n"
+                     "## Sections\n\nPARKED 2098-01-01T00:00:00Z an earlier run parked here\n")
         code, out, _ = run_hook(lroot, SESSION)
-        check("a-marker-after-acquisition-ends-the-run", code == 0 and out is None, str(out))
-        check("whoami-owner", whoami(lroot, SESSION, g1) == "OWNER")
+        check("a-mid-file-marker-carrying-the-run-id-ends-the-run", code == 0 and out is None, str(out))
+        with open(run, "w", encoding="utf-8") as fh:
+            fh.write("# run\n\n## Critical events\n\n- a new line above the old marker\n\n"
+                     "PARKED 2098-01-01T00:00:00Z run=0000deadbeef an earlier run parked here\n")
+        code, out, _ = run_hook(lroot, SESSION)
+        check("an-old-marker-pushed-down-the-file-keeps-blocking",
+              isinstance(out, dict) and out.get("decision") == "block", str(out))
+        with open(run, "a", encoding="utf-8") as fh:
+            fh.write(f"\nPARKED 2099-01-01T00:00:00Z run={rid} this run parked\n")
+        check("whoami-owner-names-the-run", whoami(lroot, SESSION, g1) == f"OWNER run={read_guard(lroot)['run_id']}",
+              whoami(lroot, SESSION, g1))
         check("whoami-not-the-current-job", whoami(lroot, SESSION, "stale0000000") == "NOT THE CURRENT JOB")
         check("whoami-not-the-owner", whoami(lroot, "99999999-0000-0000-0000-000000000000", g1) == "NOT THE OWNER")
         g2 = mint_generation()
         acquire(lroot, SESSION, 0, RUN_FILE, "job-b", generation=g2)
         check("a-replaced-job-is-not-current", whoami(lroot, SESSION, g1) == "NOT THE CURRENT JOB"
-              and whoami(lroot, SESSION, g2) == "OWNER")
+              and whoami(lroot, SESSION, g2).startswith("OWNER"))
         check("health-ok", health(lroot, SESSION, ["job-b"])[0] == 0)
         code_h, line_h = health(lroot, SESSION, ["job-a"])
         check("health-names-a-missing-job", code_h == 1 and "job-b is missing" in line_h, line_h)
@@ -1192,7 +1269,8 @@ def _self_test() -> int:
                         ("skill-reconciles-before-starting", "python scripts/campaign_guard.py reconcile --session"),
                         ("skill-checks-health-at-each-boundary", "python scripts/campaign_guard.py health --session"),
                         ("skill-confirms-the-cancel", "python scripts/campaign_guard.py cancel-confirmed --cron-id"),
-                        ("skill-marks-bookkeeping", "- bookkeeping: heartbeat resumed")):
+                        ("skill-marks-bookkeeping", "- bookkeeping: heartbeat resumed"),
+                        ("skill-markers-carry-the-run-id", "a closeout is a line `## Closeout run=<run id>`")):
         check(pin, needle in skill, plan_skill)
 
     print(f"campaign_guard self-test: {passed + failed} cases, {failed} failed")

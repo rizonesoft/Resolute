@@ -95,18 +95,17 @@ try {
 
     $text = Get-Content -LiteralPath $fullRun -Raw -Encoding UTF8
     if ($null -eq $text) { $text = "" }
-    # Markers count only when written after this run acquired its guard,
-    # so a reused run file's old closeout or PARKED line never ends it
-    # (D00 T04 section 36).
-    $bytes = [System.IO.File]::ReadAllBytes($fullRun)
-    $offset = 0
-    if ($guard.PSObject.Properties.Name -contains 'run_offset') { $offset = [int64]$guard.run_offset }
-    $recent = ""
-    if ($bytes.Length -ge $offset) {
-        $recent = [System.Text.Encoding]::UTF8.GetString($bytes, [int]$offset, [int]($bytes.Length - $offset))
+    # A marker ends the run only when it carries this run's id (run=<id>),
+    # wherever it sits in the file, so a reused run file's old closeout or
+    # PARKED line never ends a new run (D00 T04 section 36). A guard with
+    # no run id predates the rule, and any marker counts.
+    $runId = ""
+    if ($guard.PSObject.Properties.Name -contains 'run_id') { $runId = [string]$guard.run_id }
+    foreach ($ml in ($text -split "`r?`n")) {
+        if ($ml -match '^(## Closeout\b|PARKED\b)') {
+            if (-not $runId -or $ml -match ('\brun=' + [regex]::Escape($runId) + '\b')) { Allow }
+        }
     }
-    if ($recent -match "(?m)^## Closeout\b") { Allow }
-    if ($recent -match "(?m)^PARKED\b") { Allow }
 
     Push-Location -LiteralPath $root
     # Windows PowerShell turns native stderr (git CRLF warnings) into
@@ -208,7 +207,7 @@ try {
 
     $message = "Campaign run is still open ($relative). Do not end the turn. Finish the open section's checklist, run the review panel and stamp it, then the next section, then the next phase. A commit, a green suite, a red CI (repair it: D00 T04 section 31), or a status report is not a stop."
     if ($next) { $message += " Next ready row: $($next.Trim())." }
-    $message += " Finished means a '## Closeout' heading or a column-0 'PARKED' line in the run file. Escalating to the operator (an exhausted repair bound, an unverifiable CI, a cause the tree cannot fix) ends the run first: write a column-0 'PARKED <UTC> escalation: <cause>' line, run 'python scripts/campaign_guard.py end --session $owner --reason escalation', CronDelete the heartbeat it names, then report. The breaker allows the stop after $MaxBlocksWithoutProgress pushes with no tree change (this is push $($state.blocks))."
+    $message += " Finished means a '## Closeout run=$runId' heading or a column-0 'PARKED <UTC> run=$runId <reason>' line in the run file. Escalating to the operator (an exhausted repair bound, an unverifiable CI, a cause the tree cannot fix) ends the run first: write a column-0 'PARKED <UTC> run=$runId escalation: <cause>' line, run 'python scripts/campaign_guard.py end --session $owner --reason escalation', CronDelete the heartbeat it names, then report. The breaker allows the stop after $MaxBlocksWithoutProgress pushes with no tree change (this is push $($state.blocks))."
     $payload = @{ decision = "block"; reason = $message } | ConvertTo-Json -Compress
     [Console]::Out.WriteLine($payload)
     exit 0
