@@ -1252,16 +1252,21 @@ def _self_test() -> int:
                  "    time.sleep(0.5)",
                  HERE, lroot, change, go], stdout=subprocess.PIPE, text=True)
             holder.stdout.readline()
+            # The payload rides a file, so communicate() never touches a pipe
+            # this test closed (panel round 2).
+            payload_file = os.path.join(ltmp, "payload.json")
+            with open(payload_file, "w", encoding="utf-8") as fh:
+                json.dump({"session_id": SESSION, "cwd": lroot, "hook_event_name": "Stop"}, fh)
+            payload_in = open(payload_file, "rb")
             hook = subprocess.Popen([_powershell(), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", HOOK],
-                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    stdin=payload_in, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     text=True, encoding="utf-8", errors="replace",
                                     env=dict(os.environ, CLAUDE_PROJECT_DIR=lroot))
-            hook.stdin.write(json.dumps({"session_id": SESSION, "cwd": lroot, "hook_event_name": "Stop"}))
-            hook.stdin.close()
             import time as _t
             _t.sleep(3)  # the hook has read the guard and now waits on the lock
             open(go, "w").close()
             out_h, err_h = hook.communicate(timeout=60)
+            payload_in.close()
             holder.wait()
             return out_h.strip(), err_h, _state(lroot), read_guard(lroot)
 
@@ -1375,6 +1380,8 @@ def _self_test() -> int:
                         ("skill-checks-health-at-each-boundary", "python scripts/campaign_guard.py health --session"),
                         ("skill-confirms-the-cancel", "python scripts/campaign_guard.py cancel-confirmed --cron-id"),
                         ("skill-marks-bookkeeping", "- bookkeeping: heartbeat resumed"),
+                        ("skill-heartbeat-confirms-before-clearing",
+                         "CronDelete this job, confirm it gone with CronList, then run `cancel-confirmed`"),
                         ("skill-markers-carry-the-run-id", "a closeout is a line `## Closeout run=<run id>`")):
         check(pin, needle in skill, plan_skill)
 

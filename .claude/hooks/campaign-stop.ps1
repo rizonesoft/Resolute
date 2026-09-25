@@ -30,6 +30,9 @@ $MaxHashedBytes = EnvInt 'CAMPAIGN_HASH_BYTES' 4MB
 $MaxStatFiles = EnvInt 'CAMPAIGN_STAT_FILES' 5000
 $LockWaitMs = EnvInt 'CAMPAIGN_LOCK_WAIT_MS' 5000
 $root = $null
+$guardPath = $null
+$owner = $null
+$guard = $null
 # Windows PowerShell 5.1 decodes native output in the console codepage and
 # writes stdout in it too: plan rows carry section marks, so both sides run
 # UTF-8 or the block payload stops being valid JSON (D00 T04 section 32
@@ -241,6 +244,21 @@ catch {
             $at = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
             $lock2 = $null
             try { $lock2 = Enter-GuardLock $root 1000 } catch { $lock2 = $null }
+            # The error path re-checks the guard under the lock too: a run
+            # handed over or ended while this hook waited gets the error in
+            # a file of its own, never a write into its state (D00 T04
+            # section 36 panel round 2).
+            if ($lock2 -and $guardPath -and $owner) {
+                $still2 = $null
+                if (Test-Path -LiteralPath $guardPath) {
+                    try { $still2 = Get-Content -LiteralPath $guardPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { $still2 = $null }
+                }
+                $same2 = $still2 -and ([string]$still2.session_id -eq $owner)
+                if ($same2 -and $guard -and ($guard.PSObject.Properties.Name -contains 'run_id')) {
+                    $same2 = ([string]$still2.run_id -eq [string]$guard.run_id)
+                }
+                if (-not $same2) { Exit-GuardLock $lock2; $lock2 = $null }
+            }
             if ($lock2) {
                 try {
                     $statePath = Join-Path $root "build\claude-campaign-state.json"
