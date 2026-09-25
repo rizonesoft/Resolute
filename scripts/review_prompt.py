@@ -1372,13 +1372,20 @@ def workflow_steps(text: str | None) -> list[dict]:
         return out
     lines = text.splitlines()
     global_reasons: list[str] = []
+    # Workflow and job keys sit left of every step list: an `env:` or
+    # `defaults:` there, in block or flow form, changes every step.
+    dashes = [len(ln) - len(ln.lstrip(" ")) for ln in lines if ln.lstrip(" ").startswith("- ")
+              and re.match(r"\A- (name|run|uses|id|if|shell|env|working-directory):", ln.lstrip(" "))]
+    step_col = min(dashes) if dashes else 10 ** 6
     for ln in lines:
         s = ln.strip()
+        ind = len(ln) - len(ln.lstrip(" "))
+        if ind >= step_col:
+            continue
         if s.startswith("defaults:") and "the workflow sets run defaults" not in global_reasons:
             global_reasons.append("the workflow sets run defaults")
-        if re.match(r"\A(env|  env):\s*$", ln) or re.match(r"\A    env:\s*$", ln):
-            if "the workflow or job sets env" not in global_reasons:
-                global_reasons.append("the workflow or job sets env")
+        if s.startswith("env:") and "the workflow or job sets env" not in global_reasons:
+            global_reasons.append("the workflow or job sets env")
     i = 0
     while i < len(lines):
         line = lines[i]
@@ -1431,7 +1438,15 @@ def workflow_steps(text: str | None) -> list[dict]:
         if not name:
             first = (run or value).splitlines()[0] if (run or value) else ""
             name = f"Run {first}"
-        ctx: dict = {"shell": None, "working-directory": None, "env": {}, "cannot": list(global_reasons)}
+        ctx: dict = {"shell": None, "working-directory": None, "env": {}, "cannot": list(global_reasons),
+                     "runs-on": None}
+        # The job's runner decides the default shell: the nearest
+        # `runs-on:` above this step (D00 T04 §35 independent review).
+        for back in range(i - 1, -1, -1):
+            m_on = re.match(r"\A\s*runs-on:\s*(.*)\Z", lines[back])
+            if m_on:
+                ctx["runs-on"] = m_on.group(1).strip().strip("'\"")
+                break
         for key in ("shell", "working-directory"):
             if key in keys:
                 try:
@@ -1439,12 +1454,22 @@ def workflow_steps(text: str | None) -> list[dict]:
                 except ScalarRefused as exc:
                     ctx["cannot"].append(f"its {key} ({exc})")
         if "env" in keys:
-            for ln in keys["env"][1]:
+            inline_env, env_lines = keys["env"]
+            if inline_env:
+                ctx["cannot"].append("its env is a flow mapping or a single value the decoder does not read")
+            for ln in env_lines:
+                if not ln.strip():
+                    continue
                 m = re.match(r"\A\s*([A-Za-z_][A-Za-z0-9_]*):\s*(.*)\Z", ln)
                 if not m:
+                    ctx["cannot"].append("its env holds a line the decoder does not read")
+                    break
+                raw = m.group(2).strip()
+                if not raw or _BLOCK_HEADER.match(raw):
+                    ctx["cannot"].append(f"env {m.group(1)} is a block or empty value")
                     continue
                 try:
-                    ctx["env"][m.group(1)] = _inline_scalar(m.group(2).strip())
+                    ctx["env"][m.group(1)] = _inline_scalar(raw)
                 except ScalarRefused as exc:
                     ctx["cannot"].append(f"env {m.group(1)} ({exc})")
         blob = " ".join([run or ""] + [str(v) for v in ctx["env"].values()]
@@ -1469,19 +1494,34 @@ def rerun_lines(step: dict, at: str) -> list[str]:
     if step["refused"]:
         return [f"{head} unsupported run: form ({step['refused']}), read the workflow"]
     ctx = step["context"]
-    if ctx["cannot"]:
-        return [f"{head} cannot reproduce locally: {'; '.join(ctx['cannot'])}"]
-    prefix = []
-    if ctx["working-directory"]:
-        prefix.append(f"cd {ctx['working-directory']} &&")
-    prefix += [f"{k}={v}" for k, v in ctx["env"].items()]
-    shell = ctx["shell"] or "bash --noprofile --norc -eo pipefail {0}"
+    reasons = list(ctx["cannot"])
+    shell = ctx["shell"]
+    runner = (ctx.get("runs-on") or "").lower()
+    if shell is None:
+        # GitHub's defaults: `bash -e {0}` on Linux and macOS runners,
+        # `pwsh` on Windows; an unknown runner label names no default.
+        if runner.startswith(("ubuntu", "macos")):
+            shell = "bash -e {0}"
+        elif runner.startswith("windows"):
+            shell = "pwsh -command \". '{0}'\""
+        else:
+            reasons.append(f"the runner's default shell is unknown (runs-on: {ctx.get('runs-on') or 'not found'})")
+    posix = shell is not None and shell.split()[0] in ("bash", "sh")
+    if (ctx["env"] or ctx["working-directory"]) and not posix and not reasons:
+        reasons.append(f"its env or working-directory needs a POSIX shell to render, and the step runs {shell}")
+    if reasons:
+        return [f"{head} cannot reproduce locally: {'; '.join(reasons)}"]
     cmd = step["run"].rstrip("\n")
-    if "\n" not in cmd:
-        return [f"{head} {' '.join(prefix + [cmd])}", f"ci-wait: |   (shell: {shell}; earlier steps assumed run)"]
+    if not ctx["env"] and not ctx["working-directory"] and "\n" not in cmd:
+        return [f"{head} {cmd}", f"ci-wait: |   (shell: {shell}; earlier steps assumed run)"]
+    # The step's env reaches the whole script and every value is quoted,
+    # as GitHub's step environment does (D00 T04 §35 independent review).
+    q = lambda v: "'" + str(v).replace("'", "'\\''") + "'"
     rows = [f"{head} the script below, as written"]
-    rows.append(f"ci-wait: |   (shell: {shell}; earlier steps assumed run"
-                + (f"; first: {' '.join(prefix)}" if prefix else "") + ")")
+    rows.append(f"ci-wait: |   (shell: {shell}; earlier steps assumed run)")
+    rows += [f"ci-wait: |   export {k}={q(v)}" for k, v in ctx["env"].items()]
+    if ctx["working-directory"]:
+        rows.append(f"ci-wait: |   cd {q(ctx['working-directory'])}")
     rows += [f"ci-wait: |   {ln}" for ln in cmd.split("\n")]
     return rows
 
@@ -1708,25 +1748,33 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float,
         time.sleep(interval)
 
 
-def expect_no_run_within(sha: str, workflow: str, timeout: float, interval: float) -> str | None:
-    """None when no run of `workflow` is listed for `sha` within `timeout`,
-    else a short description of the run that appeared (D00 T04 §35)."""
+def expect_no_run_within(sha: str, workflow: str, timeout: float,
+                         interval: float) -> tuple[str, str]:
+    """("none", "") when every poll of `workflow`'s runs for `sha` succeeded
+    and listed nothing until `timeout`; ("appeared", run) when a run is
+    listed; ("unverifiable", reason) when gh failed or answered with
+    something other than a JSON list, because silence is only proven by
+    polls that worked (D00 T04 §35 independent review)."""
     import json as _json
     import time
     deadline = time.monotonic() + timeout
     while True:
         ok, out = _gh_text(["run", "list", "--commit", sha, "--workflow", workflow,
                             "--json", "status,conclusion,databaseId,headSha"])
-        if ok:
-            try:
-                runs = [r for r in _json.loads(out or "[]") if isinstance(r, dict)]
-            except ValueError:
-                runs = []
-            if runs:
-                r = runs[0]
-                return f"run {r.get('databaseId')} {r.get('status')} {r.get('conclusion') or ''}".strip()
+        if not ok:
+            return "unverifiable", out
+        try:
+            runs = _json.loads(out or "[]")
+        except ValueError:
+            return "unverifiable", f"gh output is not JSON: {out[:120]!r}"
+        if not isinstance(runs, list):
+            return "unverifiable", f"gh output is not a list: {out[:120]!r}"
+        runs = [r for r in runs if isinstance(r, dict)]
+        if runs:
+            r = runs[0]
+            return "appeared", f"run {r.get('databaseId')} {r.get('status')} {r.get('conclusion') or ''}".strip()
         if time.monotonic() >= deadline:
-            return None
+            return "none", ""
         time.sleep(interval)
 
 
@@ -5694,6 +5742,9 @@ def _self_test() -> int:
                 "    open(count, 'w').write(str(n + 1))\n"
                 "    if mode == 'flaky': mode = 'none' if n == 0 else 'success'\n"
                 "    else: mode = 'pending' if n < 2 else 'success'\n"
+                "if mode == 'notjson':\n"
+                "    print('<html>rate limited</html>')\n"
+                "    sys.exit(0)\n"
                 "if mode == 'gherror':\n"
                 "    sys.stderr.write('HTTP 503: service unavailable\\n')\n"
                 "    sys.exit(1)\n"
@@ -5730,7 +5781,7 @@ def _self_test() -> int:
                   and "HTTP 404: log expired for run 9" in line, line)
             # D00 T04 §33: with no log at all, the workflow's own command
             # for the failing step is printed to re-run locally.
-            plan_text = ("jobs:\n  plan-gates:\n    steps:\n      - uses: actions/checkout@abc\n"
+            plan_text = ("jobs:\n  plan-gates:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
                          "      - name: Self-test the TODO graph tool\n        run: python3 scripts/todo-graph.py self-test\n"
                          "      - name: Validate the TODO tree\n        run: python3 scripts/todo-graph.py validate\n"
                          "      - name: Check plan projection is current\n        run: |\n"
@@ -5774,18 +5825,39 @@ def _self_test() -> int:
                 check(f"rerun-refuses-unsupported: {label}",
                       line.startswith("ci-wait: rerun locally at abc: a: unsupported run: form (")
                       and line.endswith("), read the workflow"), line)
-            ctx_yml = ("jobs:\n  j:\n    steps:\n      - name: ctx\n        working-directory: tools\n"
+            ctx_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: ctx\n        working-directory: tools\n"
                        "        env:\n          MODE: fast\n        run: make check\n"
                        "      - name: expr\n        run: echo ${{ matrix.os }}\n"
                        "      - name: envexpr\n        env:\n          T: ${{ secrets.T }}\n        run: make\n")
             steps_ctx = {s["name"]: s for s in workflow_steps(ctx_yml)}
-            check("rerun-prints-its-context",
-                  rerun_lines(steps_ctx["ctx"], "abc")[0]
-                  == "ci-wait: rerun locally at abc: ctx: cd tools && MODE=fast make check", str(rerun_lines(steps_ctx["ctx"], "abc")))
+            check("rerun-prints-its-context-as-a-quoted-script",
+                  rerun_lines(steps_ctx["ctx"], "abc")
+                  == ["ci-wait: rerun locally at abc: ctx: the script below, as written",
+                      "ci-wait: |   (shell: bash -e {0}; earlier steps assumed run)",
+                      "ci-wait: |   export MODE='fast'", "ci-wait: |   cd 'tools'", "ci-wait: |   make check"],
+                  str(rerun_lines(steps_ctx["ctx"], "abc")))
+            q_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: q\n"
+                     "        working-directory: my dir\n        env:\n          MODE: \"two words\"\n"
+                     "          QUOTE: it's\n        run: echo \"$MODE\" && python check.py\n")
+            got_q = rerun_lines(workflow_steps(q_yml)[0], "abc")
+            check("rerun-quotes-values-and-scopes-env-to-the-script",
+                  "ci-wait: |   export MODE='two words'" in got_q and "ci-wait: |   export QUOTE='it'\\''s'" in got_q
+                  and "ci-wait: |   cd 'my dir'" in got_q
+                  and got_q[-1] == 'ci-wait: |   echo "$MODE" && python check.py', str(got_q))
+            for label, yml in (("flow env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env: {MODE: x}\n        run: make\n"),
+                               ("block env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env:\n          MODE: |\n            x\n        run: make\n"),
+                               ("flow workflow env", "env: {X: 1}\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"),
+                               ("unknown runner", "jobs:\n  j:\n    runs-on: ${{ matrix.os }}\n    steps:\n      - name: a\n        run: make\n"),
+                               ("windows env", "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        env:\n          X: 1\n        run: make\n")):
+                got_r = rerun_lines(workflow_steps(yml)[0], "abc")[0]
+                check(f"rerun-refuses-unreadable-context: {label}", "cannot reproduce locally" in got_r, got_r)
+            win = "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        run: make\n"
+            check("rerun-names-the-windows-default-shell",
+                  "(shell: pwsh -command" in rerun_lines(workflow_steps(win)[0], "abc")[1], str(rerun_lines(workflow_steps(win)[0], "abc")))
             check("rerun-refuses-expressions",
                   "cannot reproduce locally: it uses ${{ }} expressions" in rerun_lines(steps_ctx["expr"], "abc")[0]
                   and "cannot reproduce locally" in rerun_lines(steps_ctx["envexpr"], "abc")[0])
-            wf_env = "env:\n  X: 1\njobs:\n  j:\n    steps:\n      - name: a\n        run: make\n"
+            wf_env = "env:\n  X: 1\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"
             check("rerun-refuses-workflow-env",
                   "cannot reproduce locally: the workflow or job sets env" in rerun_lines(workflow_steps(wf_env)[0], "abc")[0])
             check("workflow-step-commands-parsed",
@@ -5996,6 +6068,14 @@ def _self_test() -> int:
                                       cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
             check("ci-wait-expect-no-run-fails-when-a-run-appears",
                   got_enr2.returncode == 1 and "ran after all" in got_enr2.stderr, got_enr2.stderr)
+            for bad in ("gherror", "notjson"):
+                with open(state, "w", encoding="utf-8") as fh:
+                    fh.write(bad)
+                got_bad = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
+                                          "--expect-no-run", "trigger retired by the operator"],
+                                         cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+                check(f"ci-wait-expect-no-run-refuses-an-unverifiable-poll: {bad}",
+                      got_bad.returncode == 2 and "unverifiable" in got_bad.stderr, got_bad.stderr)
             got_enr3 = subprocess.run([sys.executable, me, "ci-wait", c4, "--timeout", "0", "--interval", "0",
                                        "--expect-no-run", "x"],
                                       cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
@@ -6981,9 +7061,13 @@ if __name__ == "__main__":
                 print(f"ci-wait: --expect-no-run needs a range that edits {wf_path}; this one does not",
                       file=sys.stderr)
                 sys.exit(2)
-            appeared = expect_no_run_within(ident[0], workflow, timeout, interval)
-            if appeared:
-                print(f"ci-wait: {ident[0][:12]} {workflow} ran after all ({appeared}): the no-run "
+            verdict, detail = expect_no_run_within(ident[0], workflow, timeout, interval)
+            if verdict == "unverifiable":
+                print(f"ci-wait: {ident[0][:12]} {workflow} no-run expectation unverifiable ({detail}): "
+                      f"silence is not proven, escalate", file=sys.stderr)
+                sys.exit(2)
+            if verdict == "appeared":
+                print(f"ci-wait: {ident[0][:12]} {workflow} ran after all ({detail}): the no-run "
                       f"expectation ({expect_no_run}) was wrong; read the run", file=sys.stderr)
                 sys.exit(1)
             print(f"ci-wait: {ident[0][:12]} {workflow} started no run within {int(timeout)}s, as the "
