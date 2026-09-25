@@ -1215,39 +1215,185 @@ def summarize_failed_log(text: str, limit: int = 20) -> tuple[list[str], list[st
     return steps, picked
 
 
-def failed_log_report(run_id: str, limit: int = 20) -> str:
-    """The failing steps and a bounded excerpt of a red run, or the reason
-    the log could not be read: a red verdict never becomes less red
-    because its log was unavailable."""
+def workflow_step_commands(text: str | None) -> list[tuple[str, str]]:
+    """(step name, `run:` command) for every run step of a workflow's text,
+    in file order. Read line by line like the path filter (no YAML
+    dependency): `- name:` names the next step, `run:` carries one line or
+    a `|`/`>` block. An unnamed run step takes GitHub's default name,
+    `Run <first command line>`."""
+    out: list[tuple[str, str]] = []
+    if not text:
+        return out
+    lines = text.splitlines()
+    name = None
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        body = stripped[2:].strip() if stripped.startswith("- ") else stripped
+        if stripped.startswith("- "):
+            name = None
+        if body.startswith("name:"):
+            name = body[5:].strip().strip("'\"")
+        elif body.startswith("run:"):
+            value = body[4:].strip()
+            if value in ("|", ">", "|-", ">-"):
+                indent = len(line) - len(line.lstrip())
+                block: list[str] = []
+                i += 1
+                while i < len(lines) and (not lines[i].strip()
+                                          or len(lines[i]) - len(lines[i].lstrip()) > indent):
+                    if lines[i].strip():
+                        block.append(lines[i].strip())
+                    i += 1
+                value = "\n".join(block)
+                i -= 1
+            first = value.splitlines()[0] if value else ""
+            out.append((name or f"Run {first}", value))
+            name = None
+        i += 1
+    return out
+
+
+# A red whose cause lives outside the tree: the runner or the platform
+# failed, not a step the repository controls (D00 T04 §33).
+_PLATFORM_RE = re.compile(
+    r"(?i)runner has received a shutdown signal|lost communication with the server"
+    r"|the hosted runner .* (lost|encountered an error)|runner (is )?offline"
+    r"|internal server error|service unavailable|\b50[234]\b.*github"
+    r"|api rate limit exceeded|the job was not started")
+
+
+NO_JOB = "the workflow file (the run started no job)"
+
+
+def classify_red(steps: list[str], lines: list[str]) -> str:
+    """One `cause:` line for a red run, by cause rather than by step name:
+    a repository-controlled step (the workflow file, a pinned action, a
+    setup script, the repository's own commands) is repairable even when
+    it failed during job setup; only a runner or platform fault
+    escalates (D00 T04 §33)."""
+    hit = next((ln for ln in lines if _PLATFORM_RE.search(ln)), None)
+    if hit is not None:
+        return f"ci-wait: cause: platform fault, escalate ({hit[:160]})"
+    if not steps and not lines:
+        return ("ci-wait: cause: unknown (no step or log evidence); re-run the workflow's "
+                "commands locally before escalating")
+    where = "; ".join(steps) if steps else "the log"
+    return (f"ci-wait: cause: repairable (repository-controlled: {where}); "
+            f"fix it forward and push the repair")
+
+
+def _gh_text(args: list[str]) -> tuple[bool, str]:
+    """(ok, stdout or the failure reason) for one read-only gh call."""
     import subprocess
     try:
-        proc = subprocess.run([*_gh_argv(), "run", "view", run_id, "--log-failed"],
-                              capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", timeout=120)
+        proc = subprocess.run([*_gh_argv(), *args], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=120)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        return f"ci-wait: failed-step log unavailable ({exc}); the run is still red"
+        return False, str(exc)
     if proc.returncode != 0:
         reason = " ".join(proc.stderr.split())[:200] or "no stderr"
-        return (f"ci-wait: failed-step log unavailable (gh exited {proc.returncode}: {reason}); "
-                f"the run is still red")
-    steps, lines = summarize_failed_log(proc.stdout, limit)
-    out = [f"ci-wait: failing step(s): {'; '.join(steps) if steps else 'not named by the log'}"]
-    out += [f"ci-wait: | {ln}" for ln in lines]
-    return "\n".join(out)
+        return False, f"gh exited {proc.returncode}: {reason}"
+    return True, proc.stdout
 
 
-def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float) -> tuple[int, str]:
+def failed_job_steps(run_id: str) -> list[str] | None:
+    """Failing `job / step` names from `gh run view --json jobs`, None
+    when gh cannot say. A run that started no job at all reads as the
+    one-element list `[NO_JOB]`: GitHub could not load the workflow file,
+    which is the repository's own (found by the D00 T04 §33 drill, whose
+    first red was a YAML error that started zero jobs)."""
+    import json as _json
+    ok, out = _gh_text(["run", "view", run_id, "--json", "jobs"])
+    if not ok:
+        return None
+    try:
+        jobs = _json.loads(out or "{}").get("jobs") or []
+    except (ValueError, AttributeError):
+        return None
+    if not jobs:
+        return [NO_JOB]
+    names: list[str] = []
+    for job in jobs:
+        for step in (job.get("steps") or []) if isinstance(job, dict) else []:
+            if isinstance(step, dict) and step.get("conclusion") == "failure":
+                names.append(f"{job.get('name', '?')} / {step.get('name', '?')}")
+    return names
+
+
+def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
+                      workflow_text: str | None = None) -> str:
+    """The failing steps, a bounded excerpt, and the cause of a red run.
+    When the failed-step log cannot be fetched the report falls back to
+    the full log, then to the workflow's own command for each failing
+    step, run locally at the pushed commit (D00 T04 §33): a red verdict
+    never becomes less red because its log was unavailable."""
+    ok, out = _gh_text(["run", "view", run_id, "--log-failed"])
+    if ok:
+        steps, lines = summarize_failed_log(out, limit)
+        rows = [f"ci-wait: failing step(s): {'; '.join(steps) if steps else 'not named by the log'}"]
+        rows += [f"ci-wait: | {ln}" for ln in lines]
+        rows.append(classify_red(steps, lines))
+        return "\n".join(rows)
+    rows = [f"ci-wait: failed-step log unavailable ({out}); the run is still red"]
+    failing = failed_job_steps(run_id)
+    ok_full, full = _gh_text(["run", "view", run_id, "--log"])
+    if ok_full:
+        wanted = set(failing or [])
+        kept = [ln for ln in full.splitlines()
+                if not wanted or "\t".join(ln.split("\t", 2)[:2]).replace("\t", " / ") in wanted]
+        steps, lines = summarize_failed_log("\n".join(kept), limit)
+        steps = failing or steps
+        rows.append(f"ci-wait: full log read instead; failing step(s): "
+                    f"{'; '.join(steps) if steps else 'not named by the log'}")
+        rows += [f"ci-wait: | {ln}" for ln in lines]
+        rows.append(classify_red(steps, lines))
+        return "\n".join(rows)
+    rows.append(f"ci-wait: full log unavailable too ({full})")
+    if failing == [NO_JOB]:
+        rows.append("ci-wait: the run started no job: GitHub could not load the workflow file "
+                    "at the pushed commit; check its syntax locally")
+        rows.append(classify_red(failing, []))
+        return "\n".join(rows)
+    commands = workflow_step_commands(workflow_text)
+    names = [s.split(" / ", 1)[-1] for s in (failing or [])]
+    picked = [(n, c) for n, c in commands if n in names] if names else []
+    at = sha[:12] if sha else "the pushed commit"
+    if picked:
+        rows.append(f"ci-wait: failing step(s): {'; '.join(failing)}")
+    else:
+        rows.append("ci-wait: failing step unknown; every run step of the workflow follows")
+        picked = commands
+    for n, c in picked:
+        rows.append(f"ci-wait: rerun locally at {at}: {n}: {c.replace(chr(10), ' && ')}")
+    if not picked:
+        rows.append("ci-wait: the pushed commit's workflow names no run step to re-run")
+    rows.append(classify_red(failing or [], []))
+    return "\n".join(rows)
+
+
+def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float,
+                  ceiling: float | None = None,
+                  workflow_text: str | None = None) -> tuple[int, str]:
     """Wait for `workflow`'s run on `sha` and return (exit, line): 0 green,
     1 red (any completed conclusion but success), 2 unverifiable (no gh,
-    no run by the deadline, or unreadable output). `gh run list
-    --commit` matches only a full 40-hex sha (a short one returns `[]`,
-    probed 2026-09-23), so the caller resolves it first. GitHub runs a
-    workflow for a push's head commit only, so `sha` must be the pushed
-    head: an intermediate commit of a multi-commit push never gets a run."""
+    no run by the deadline, a run still pending past the ceiling, or
+    unreadable output). `timeout` bounds the wait for a run to be listed;
+    once one is listed and still queued or in progress, the wait extends
+    to `ceiling` (D00 T04 §33: a slow run is not an unreachable one;
+    None means the same as `timeout`). `gh run list --commit` matches
+    only a full 40-hex sha (a short one returns `[]`, probed
+    2026-09-23), so the caller resolves it first. GitHub runs a workflow
+    for a push's head commit only, so `sha` must be the pushed head: an
+    intermediate commit of a multi-commit push never gets a run."""
     import json as _json
     import subprocess
     import time
-    deadline = time.monotonic() + timeout
+    start = time.monotonic()
+    deadline = start + timeout
+    listed_deadline = start + max(timeout, ceiling if ceiling is not None else timeout)
+    seen = False
     last = "no run listed yet"
     while True:
         try:
@@ -1270,11 +1416,15 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float) -> t
                 verdict = run.get("conclusion") or "unknown"
                 line = f"ci-wait: {sha[:12]} {workflow} {verdict} {run.get('url', '')}".rstrip()
                 if verdict != "success" and run.get("databaseId"):
-                    line += "\n" + failed_log_report(str(run["databaseId"]))
+                    line += "\n" + failed_log_report(str(run["databaseId"]), sha=sha,
+                                                     workflow_text=workflow_text)
                 return (0 if verdict == "success" else 1), line
             last = f"run {run.get('databaseId')} {run.get('status')}"
-        if time.monotonic() >= deadline:
-            return 2, f"ci-wait: {sha[:12]} {workflow} not concluded within {int(timeout)}s ({last})"
+            seen = True
+        now = time.monotonic()
+        if (seen and now >= listed_deadline) or (not seen and now >= deadline):
+            waited = int(listed_deadline - start) if seen else int(timeout)
+            return 2, f"ci-wait: {sha[:12]} {workflow} not concluded within {waited}s ({last})"
         time.sleep(interval)
 
 
@@ -5175,20 +5325,43 @@ def _self_test() -> int:
                 "mode = open(state).read().strip()\n"
                 "sys.stdout.reconfigure(encoding='utf-8')\n"
                 "if sys.argv[1:3] == ['run', 'view']:\n"
-                "    if mode == 'nolog':\n"
+                "    if '--json' in sys.argv:\n"
+                "        if mode == 'nojobs':\n"
+                "            print(json.dumps({'jobs': []}))\n"
+                "            sys.exit(0)\n"
+                "        if mode == 'nologall':\n"
+                "            sys.stderr.write('HTTP 502: bad gateway\\n')\n"
+                "            sys.exit(1)\n"
+                "        print(json.dumps({'jobs': [{'name': 'plan-gates', 'steps': [\n"
+                "            {'name': 'Self-test the TODO graph tool', 'conclusion': 'success'},\n"
+                "            {'name': 'Validate the TODO tree', 'conclusion': 'failure'}]}]}))\n"
+                "        sys.exit(0)\n"
+                "    if mode in ('nolog', 'nologall', 'nojobs') or (mode == 'fulllog' and '--log-failed' in sys.argv):\n"
                 "        sys.stderr.write('HTTP 404: log expired for run 9\\n')\n"
                 "        sys.exit(1)\n"
+                "    if mode == 'fulllog':\n"
+                "        print('plan-gates\\tSelf-test the TODO graph tool\\t2026-09-23T21:37:50.1Z error in a passing step')\n"
+                "    if mode == 'badpin':\n"
+                "        print('plan-gates\\tSet up job\\t2026-09-23T21:37:50.1Z ##[error]Unable to resolve action `actions/checkout@deadbeef`, unable to find version `deadbeef`')\n"
+                "        sys.exit(0)\n"
+                "    if mode == 'lostrunner':\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z ##[error]The runner has received a shutdown signal.')\n"
+                "        sys.exit(0)\n"
                 "    print('plan-gates\\tValidate the TODO tree\\t\\ufeff2026-09-23T21:37:54.1Z ##[group]Run validate')\n"
                 "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.1Z WARN [adjacency advisory] noise')\n"
                 "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.2Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
                 "    print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.3Z ##[error]Process completed with exit code 1.')\n"
                 "    sys.exit(0)\n"
-                "if mode == 'flaky':\n"
-                "    count = os.path.join(os.path.dirname(state), 'flaky-count')\n"
+                "if mode in ('flaky', 'slow'):\n"
+                "    count = os.path.join(os.path.dirname(state), mode + '-count')\n"
                 "    n = int(open(count).read()) if os.path.exists(count) else 0\n"
                 "    open(count, 'w').write(str(n + 1))\n"
-                "    mode = 'pending' if n == 0 else 'success'\n"
-                "if mode == 'nolog': mode = 'failure'\n"
+                "    if mode == 'flaky': mode = 'none' if n == 0 else 'success'\n"
+                "    else: mode = 'pending' if n < 2 else 'success'\n"
+                "if mode == 'gherror':\n"
+                "    sys.stderr.write('HTTP 503: service unavailable\\n')\n"
+                "    sys.exit(1)\n"
+                "if mode in ('nolog', 'nologall', 'nojobs', 'fulllog', 'badpin', 'lostrunner'): mode = 'failure'\n"
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
@@ -5219,6 +5392,60 @@ def _self_test() -> int:
             check("ci-wait-red-without-a-log-stays-red",
                   code == 1 and "failed-step log unavailable" in line and "still red" in line
                   and "HTTP 404: log expired for run 9" in line, line)
+            # D00 T04 §33: with no log at all, the workflow's own command
+            # for the failing step is printed to re-run locally.
+            plan_text = ("jobs:\n  plan-gates:\n    steps:\n      - uses: actions/checkout@abc\n"
+                         "      - name: Self-test the TODO graph tool\n        run: python3 scripts/todo-graph.py self-test\n"
+                         "      - name: Validate the TODO tree\n        run: python3 scripts/todo-graph.py validate\n"
+                         "      - name: Check plan projection is current\n        run: |\n"
+                         "          python3 scripts/todo-graph.py plan --sync\n          test -z x\n")
+            check("workflow-step-commands-parsed",
+                  workflow_step_commands(plan_text) == [
+                      ("Self-test the TODO graph tool", "python3 scripts/todo-graph.py self-test"),
+                      ("Validate the TODO tree", "python3 scripts/todo-graph.py validate"),
+                      ("Check plan projection is current", "python3 scripts/todo-graph.py plan --sync\ntest -z x")],
+                  str(workflow_step_commands(plan_text)))
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
+            check("ci-wait-no-log-prints-the-failing-step-command",
+                  code == 1 and "full log unavailable too" in line
+                  and f"rerun locally at {c1[:12]}: Validate the TODO tree: python3 scripts/todo-graph.py validate" in line
+                  and "self-test" not in line.split("rerun locally", 1)[1], line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("nologall")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
+            check("ci-wait-no-step-evidence-lists-every-run-step",
+                  code == 1 and "failing step unknown" in line
+                  and "Check plan projection is current: python3 scripts/todo-graph.py plan --sync && test -z x" in line
+                  and "cause: unknown" in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("nojobs")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
+            check("ci-wait-no-job-reads-a-repairable-workflow-file",
+                  code == 1 and "the run started no job" in line
+                  and "cause: repairable (repository-controlled: the workflow file (the run started no job))" in line
+                  and "rerun locally" not in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("fulllog")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
+            check("ci-wait-falls-back-to-the-full-log",
+                  code == 1 and "full log read instead; failing step(s): plan-gates / Validate the TODO tree" in line
+                  and "FATAL x.md:9 candidate c6b1 resolves to nothing" in line
+                  and "error in a passing step" not in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("badpin")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+            check("ci-wait-bad-pinned-action-reads-repairable",
+                  code == 1 and "cause: repairable (repository-controlled: plan-gates / Set up job)" in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("lostrunner")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+            check("ci-wait-lost-runner-reads-platform",
+                  code == 1 and "cause: platform fault, escalate" in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("failure")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+            check("ci-wait-red-step-reads-repairable",
+                  code == 1 and "cause: repairable (repository-controlled: plan-gates / Validate the TODO tree)" in line, line)
             steps, lines = summarize_failed_log("job\tstep\t2026-01-01T00:00:00Z plain\n" * 30, 5)
             steps2, lines2 = summarize_failed_log(
                 "".join(f"j\ts\t2026-01-01T00:00:00Z error {i}\n" for i in range(9)), 3)
@@ -5236,13 +5463,24 @@ def _self_test() -> int:
                   got_fl.returncode == 0 and "retrying once" in got_fl.stderr and "plan-gates success" in got_fl.stdout,
                   f"exit={got_fl.returncode} out={got_fl.stdout!r} err={got_fl.stderr!r}")
             with open(state, "w", encoding="utf-8") as fh:
-                fh.write("pending")
+                fh.write("slow")
+            got_slow = subprocess.run([sys.executable, me, "ci-wait", c1, "--since", "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                                       "--workflow-file", os.path.join(tmpd, "no-such.yml"),
+                                       "--timeout", "0", "--ceiling", "60", "--interval", "0", "--retry-wait", "0"],
+                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-waits-out-a-slow-run-without-escalating",
+                  got_slow.returncode == 0 and "plan-gates success" in got_slow.stdout
+                  and "retrying" not in got_slow.stderr and "escalate" not in got_slow.stderr,
+                  f"exit={got_slow.returncode} out={got_slow.stdout!r} err={got_slow.stderr!r}")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("gherror")
             got_esc = subprocess.run([sys.executable, me, "ci-wait", c1, "--since", "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
                                       "--workflow-file", os.path.join(tmpd, "no-such.yml"),
                                       "--timeout", "0", "--interval", "0", "--retry-wait", "0"],
                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
-            check("ci-wait-escalates-after-one-retry",
-                  got_esc.returncode == 2 and "still unverifiable after one retry: escalate" in got_esc.stderr,
+            check("ci-wait-escalates-a-gh-error-after-one-retry",
+                  got_esc.returncode == 2 and "gh exited 1: HTTP 503" in got_esc.stderr
+                  and "still unverifiable after one retry: escalate" in got_esc.stderr,
                   f"exit={got_esc.returncode} err={got_esc.stderr!r}")
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("failure")
@@ -5278,7 +5516,9 @@ def _self_test() -> int:
                 fh.write("on:\n  push:\n    paths:\n      - 'todo/**'\njobs: {}\n")
             with open(os.path.join(tmpd, "f.md"), "w", encoding="utf-8") as fh:
                 fh.write("one\nstaged\ncommitted\n")
-            _g("add", "f.md", ".github/workflows/plan.yml")
+            _g("add", ".github/workflows/plan.yml")
+            _g("commit", "-qm", "c2-workflow")
+            _g("add", "f.md")
             _g("commit", "-qm", "c2")
             c2 = _g("rev-parse", "HEAD").stdout.strip()
             with open(wfc, "w", encoding="utf-8") as fh:
@@ -5290,6 +5530,31 @@ def _self_test() -> int:
             check("ci-wait-reads-the-committed-workflow-not-the-worktree",
                   got_cw.returncode == 0 and "not triggered" in got_cw.stdout,
                   f"exit={got_cw.returncode} out={got_cw.stdout!r} err={got_cw.stderr!r}")
+            # D00 T04 §33: a range editing the workflow never reads not
+            # triggered from its own new filter; it waits for the run.
+            with open(wfc, "w", encoding="utf-8") as fh:
+                fh.write("on:\n  push:\n    paths:\n      - 'todo/**'\njobs: {}\n# edited\n")
+            _g("add", ".github/workflows/plan.yml")
+            _g("commit", "-qm", "c3-workflow-only")
+            c3 = _g("rev-parse", "HEAD").stdout.strip()
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("success")
+            got_wf = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0"],
+                                    cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-waits-when-the-range-edits-the-workflow",
+                  got_wf.returncode == 0 and "plan-gates success" in got_wf.stdout
+                  and "not triggered" not in got_wf.stdout and "edits the workflow" in got_wf.stderr,
+                  f"exit={got_wf.returncode} out={got_wf.stdout!r} err={got_wf.stderr!r}")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("none")
+            got_wfn = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
+                                      "--retry-wait", "0"],
+                                     cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-escalates-when-an-edited-workflow-never-runs",
+                  got_wfn.returncode == 2 and "escalate" in got_wfn.stderr,
+                  f"exit={got_wfn.returncode} err={got_wfn.stderr!r}")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("failure")
             check("ci-wait-cli-resolves-short-sha-and-fails-red",
                   got.returncode == 1 and c1[:12] in got.stderr and "failure" in got.stderr,
                   f"exit={got.returncode} err={got.stderr!r}")
@@ -5320,7 +5585,11 @@ def _self_test() -> int:
             ("skill-reachable-after-push", "check-reachable --findings <findings path> --remote origin"),
             ("skill-ci-wait", "python scripts/review_prompt.py ci-wait $COMMIT"),
             ("skill-ci-red-repairs", "A red read-back is a failed gate, and the run repairs it rather than waiting on it"),
-            ("skill-ci-repair-bound", "at most three repair attempts per red"),
+            ("skill-ci-repair-bound", "at most three repair attempts per repair episode"),
+            ("skill-ci-episode-no-reset", "so a new red never resets the count"),
+            ("skill-ci-repair-owner", "Every repair commit has an owner"),
+            ("skill-ci-cause-rule", "the cause decides, not the step's name"),
+            ("skill-ci-slow-run", "a slow run is not an unreachable one"),
             ("skill-ci-escalation", "escalates to the operator only for a cause the tree cannot fix"),
             ("skill-ci-continue", "On green, with any reopened section re-stamped, it continues with the next section in the same turn"),
             ("skill-ci-reopen-restamp", "A reopened section is repaired, re-reviewed, and re-stamped through this skill before anything continues"),
@@ -6177,13 +6446,17 @@ if __name__ == "__main__":
         sys.exit(0)
     if len(sys.argv) >= 3 and sys.argv[1] == "ci-wait":
         # ci-wait <sha> [--since <base>] [--workflow W] [--workflow-file F]
-        #         [--timeout S] [--interval S]
-        # (D00 T04 §30): read CI back after a push; red stops the run. A
+        #         [--workflow-path P] [--timeout S] [--ceiling S] [--interval S]
+        # (D00 T04 §30): read CI back after a push; a red is repaired, not
+        # waited on (D00 T04 §31). A
         # push whose changed paths miss the workflow's path filter starts
         # no run, so it reads "not triggered" instead of waiting it out
-        # (independent review of the §30 ship, P1).
+        # (independent review of the §30 ship, P1). A range that touches
+        # the workflow itself never reads not triggered from its own new
+        # filter: it waits for a run or escalates (D00 T04 §33).
         rest = sys.argv[2:]
         sha_arg, workflow, timeout, interval = rest[0], "plan-gates", 900.0, 15.0
+        ceiling = 3600.0
         retry_wait = 60.0
         since = None
         wf_file = None
@@ -6197,8 +6470,12 @@ if __name__ == "__main__":
                     since = rest[i + 1]
                 elif rest[i] == "--workflow-file":
                     wf_file = rest[i + 1]
+                elif rest[i] == "--workflow-path":
+                    wf_path = rest[i + 1]
                 elif rest[i] == "--timeout":
                     timeout = float(rest[i + 1])
+                elif rest[i] == "--ceiling":
+                    ceiling = float(rest[i + 1])
                 elif rest[i] == "--interval":
                     interval = float(rest[i + 1])
                 elif rest[i] == "--retry-wait":
@@ -6221,18 +6498,30 @@ if __name__ == "__main__":
         changed = [ln for ln in diff.splitlines() if ln.strip()]
         filters = (workflow_path_filters(wf_file) if wf_file is not None
                    else committed_path_filters(ident[0], wf_path))
-        if not push_triggers_workflow(changed, filters):
+        touches_workflow = any(p == wf_path or p.startswith(".github/workflows/") for p in changed)
+        if touches_workflow:
+            print(f"ci-wait: the range edits the workflow ({wf_path}); waiting for a run "
+                  f"rather than trusting its new filter", file=sys.stderr)
+        rc_w, wf_text = _git_out(["show", f"{ident[0]}:{wf_path}"])
+        wf_text = wf_text if rc_w == 0 else None
+        if wf_file is not None:
+            try:
+                with open(wf_file, encoding="utf-8") as fh:
+                    wf_text = fh.read()
+            except OSError:
+                pass
+        if not touches_workflow and not push_triggers_workflow(changed, filters):
             print(f"ci-wait: {ident[0][:12]} {workflow} not triggered "
                   f"({len(changed)} changed path(s), none in the workflow's path filter)")
             sys.exit(0)
-        code, line = ci_conclusion(ident[0], workflow, timeout, interval)
+        code, line = ci_conclusion(ident[0], workflow, timeout, interval, ceiling, wf_text)
         if code == 2:
             # One retry before escalating (D00 T04 §31): GitHub lag or a
             # transient gh failure is not yet a cause outside the tree.
             print(f"{line}\nci-wait: unverifiable, retrying once in {int(retry_wait)}s", file=sys.stderr)
             import time as _time
             _time.sleep(retry_wait)
-            code, line = ci_conclusion(ident[0], workflow, timeout, interval)
+            code, line = ci_conclusion(ident[0], workflow, timeout, interval, ceiling, wf_text)
             if code == 2:
                 line += ("\nci-wait: still unverifiable after one retry: escalate "
                          "(GitHub, gh, or the runner is outside the tree)")
