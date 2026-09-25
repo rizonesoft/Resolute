@@ -170,6 +170,23 @@ try {
     $statePath = Join-Path $root "build\claude-campaign-state.json"
     $lock = Enter-GuardLock $root $LockWaitMs
     try {
+    # Re-read the guard under the lock: a handover or an end that landed
+    # while this hook waited means the state is no longer this run's, and
+    # nothing is written (D00 T04 section 36 panel round 1).
+    $still = $null
+    if (Test-Path -LiteralPath $guardPath) {
+        try { $still = Get-Content -LiteralPath $guardPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { $still = $null }
+    }
+    $sameRun = $still -and ([string]$still.session_id -eq $owner) -and ([string]$still.run_file -eq $relative)
+    if ($sameRun -and ($guard.PSObject.Properties.Name -contains 'run_id')) {
+        $sameRun = ([string]$still.run_id -eq [string]$guard.run_id)
+    }
+    if (-not $sameRun) {
+        Exit-GuardLock $lock
+        $lock = $null
+        [Console]::Error.WriteLine("campaign-stop: the guard changed while this hook waited; nothing written")
+        Allow
+    }
     $state = [ordered]@{ fingerprint = ""; blocks = 0; trips = 0; stalled = $false }
     if (Test-Path -LiteralPath $statePath) {
         $old = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -241,8 +258,12 @@ catch {
                     Write-State $statePath $state
                 } finally { Exit-GuardLock $lock2 }
             } else {
-                $log = Join-Path $root "build\claude-campaign-hook-errors.log"
-                [System.IO.File]::AppendAllText($log, "$at $reason`n")
+                # One file per error, never an append: a drain can never
+                # race a writer (D00 T04 section 36 panel round 1).
+                $dir = Join-Path $root "build\claude-campaign-hook-errors"
+                [void][System.IO.Directory]::CreateDirectory($dir)
+                $name = "{0:D20}-{1}.txt" -f [DateTime]::UtcNow.Ticks, $PID
+                [System.IO.File]::WriteAllText((Join-Path $dir $name), "$at $reason")
             }
         }
     } catch { }

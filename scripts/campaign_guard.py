@@ -296,8 +296,13 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
     # The job id outlives the guard until CronDelete is confirmed: a failed
     # delete stays recoverable (D00 T04 §36).
     pending = _pending_path(root)
+    jobs = _pending_jobs(root)
+    # Every unconfirmed job is kept: a later end never overwrites an
+    # earlier failed cancellation (D00 T04 §36 panel round 1).
+    jobs = [j for j in jobs if j.get("cron_id") != guard.get("cron_id")]
+    jobs.append({"cron_id": guard.get("cron_id"), "reason": reason, "at": _utc_now()})
     with open(pending + ".tmp", "w", encoding="utf-8") as fh:
-        json.dump({"cron_id": guard.get("cron_id"), "reason": reason, "at": _utc_now()}, fh)
+        json.dump(jobs, fh)
     os.replace(pending + ".tmp", pending)
     for path in (guard_path, state_path):
         try:
@@ -339,28 +344,43 @@ def _pending_path(root: str) -> str:
     return os.path.join(root, "build", "claude-campaign-pending-cancel.json")
 
 
-def pending_cancel(root: str) -> str:
+def _pending_jobs(root: str) -> list[dict]:
     try:
         with open(_pending_path(root), encoding="utf-8") as fh:
             doc = json.load(fh)
     except FileNotFoundError:
-        return ""
+        return []
     except (OSError, ValueError):
-        return "pending-cancel: the record is unreadable: list the jobs and delete any Resolute heartbeat"
-    return f"pending-cancel: CronDelete {doc.get('cron_id')} (ended by {doc.get('reason')} at {doc.get('at')})"
+        raise GuardError("the pending-cancellation record is unreadable: list the jobs and delete any "
+                         "Resolute heartbeat by hand")
+    if isinstance(doc, dict):
+        doc = [doc]
+    return [j for j in doc if isinstance(j, dict)] if isinstance(doc, list) else []
+
+
+def pending_cancel(root: str) -> str:
+    try:
+        jobs = _pending_jobs(root)
+    except GuardError as exc:
+        return f"pending-cancel: {exc}"
+    return "\n".join(f"pending-cancel: CronDelete {j.get('cron_id')} (ended by {j.get('reason')} at {j.get('at')})"
+                     for j in jobs)
 
 
 def cancel_confirmed(root: str, cron_id: str) -> str:
     with _Lock(root):
-        try:
-            with open(_pending_path(root), encoding="utf-8") as fh:
-                doc = json.load(fh)
-        except FileNotFoundError:
+        jobs = _pending_jobs(root)
+        if not jobs:
             return "cancel-confirmed: nothing pending"
-        except (OSError, ValueError):
-            doc = {}
-        if doc and str(doc.get("cron_id")) != cron_id:
-            raise GuardError(f"the pending cancellation names job {doc.get('cron_id')}, not {cron_id}")
+        if cron_id not in [str(j.get("cron_id")) for j in jobs]:
+            raise GuardError(f"no pending cancellation names job {cron_id} "
+                             f"(pending: {', '.join(str(j.get('cron_id')) for j in jobs)})")
+        rest = [j for j in jobs if str(j.get("cron_id")) != cron_id]
+        if rest:
+            with open(_pending_path(root) + ".tmp", "w", encoding="utf-8") as fh:
+                json.dump(rest, fh)
+            os.replace(_pending_path(root) + ".tmp", _pending_path(root))
+            return f"cancel-confirmed: job {cron_id} is gone; still pending: {', '.join(str(j.get('cron_id')) for j in rest)}"
         os.unlink(_pending_path(root))
         return f"cancel-confirmed: job {cron_id} is gone; nothing pending"
 
@@ -414,6 +434,11 @@ def reconcile(root: str, session: str, jobs: list[str]) -> list[str]:
         except GuardError:
             return ["reconcile: the guard is unreadable: report it to the operator and start nothing"]
     out: list[str] = []
+    try:
+        out += [f"reconcile: a pending cancellation is unconfirmed: CronDelete {j.get('cron_id')}, then cancel-confirmed"
+                for j in _pending_jobs(root)]
+    except GuardError as exc:
+        out.append(f"reconcile: {exc}")
     if guard is None:
         out += [f"reconcile: orphan job {j} has no guard: CronDelete it" for j in jobs]
         return out or ["reconcile: consistent (no guard, no job)"]
@@ -476,29 +501,30 @@ def hook_error(root: str, session: str | None = None, ack: str | None = None) ->
 
 
 def _hook_error_log(root: str, ack: str | None) -> str:
-    """The oldest line of the append-only log the hook writes when it
-    cannot get the guard lock (D00 T04 §36 independent review): printed
-    like a state error, removed only on its exact --ack. Runs under the
-    caller's lock."""
-    log = os.path.join(root, "build", "claude-campaign-hook-errors.log")
+    """The oldest error the hook recorded without the guard lock (D00 T04
+    §36 independent review): one file per error under
+    `build/claude-campaign-hook-errors/`, so a writer never races this
+    drain (panel round 1); printed like a state error, deleted only on its
+    exact --ack."""
+    folder = os.path.join(root, "build", "claude-campaign-hook-errors")
     try:
-        with open(log, encoding="utf-8", errors="replace") as fh:
-            lines = [ln for ln in fh.read().splitlines() if ln.strip()]
+        names = sorted(n for n in os.listdir(folder) if n.endswith(".txt"))
     except OSError:
         return ""
-    if not lines:
+    if not names:
         return ""
-    at, _, reason = lines[0].partition(" ")
+    oldest = os.path.join(folder, names[0])
+    try:
+        with open(oldest, encoding="utf-8", errors="replace") as fh:
+            at, _, reason = fh.read().strip().partition(" ")
+    except OSError:
+        return ""
     line = f"campaign-stop hook failed at {at}: {reason} (recorded without the lock)"
     if ack is None:
         return line
     if ack != line:
         raise GuardError("the acknowledgement does not match the recorded error; nothing cleared")
-    rest = lines[1:]
-    tmp = log + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as fh:
-        fh.write("".join(ln + "\n" for ln in rest))
-    os.replace(tmp, log)
+    os.unlink(oldest)
     return f"hook-error: acknowledged and cleared: {line}"
 
 
@@ -942,16 +968,20 @@ def _self_test() -> int:
         finally:
             del os.environ["CAMPAIGN_LOCK_WAIT_MS"]
         holder.wait()
-        log = os.path.join(root, "build", "claude-campaign-hook-errors.log")
-        logged = open(log, encoding="utf-8").read() if os.path.exists(log) else ""
-        check("a-lock-timeout-fails-open-into-the-error-log",
-              code == 0 and out is None and "guard lock stayed held" in logged, f"{out} {err} {logged!r}")
-        os.remove(log)
+        folder = os.path.join(root, "build", "claude-campaign-hook-errors")
+        files = sorted(os.listdir(folder)) if os.path.isdir(folder) else []
+        logged = "".join(open(os.path.join(folder, n), encoding="utf-8").read() for n in files)
+        check("a-lock-timeout-fails-open-into-an-error-file",
+              code == 0 and out is None and len(files) == 1 and "guard lock stayed held" in logged,
+              f"{out} {err} {files} {logged!r}")
+        shutil.rmtree(folder)
 
         # D00 T04 §36 independent review: an error written to the fallback
         # log (the lock was unavailable) reaches the heartbeat too.
-        with open(os.path.join(root, "build", "claude-campaign-hook-errors.log"), "w", encoding="utf-8") as fh:
-            fh.write("2099-01-01T00:00:00Z the guard lock stayed held for 300ms\n")
+        os.makedirs(os.path.join(root, "build", "claude-campaign-hook-errors"), exist_ok=True)
+        with open(os.path.join(root, "build", "claude-campaign-hook-errors", "00000000000000000001-1.txt"), "w",
+                  encoding="utf-8") as fh:
+            fh.write("2099-01-01T00:00:00Z the guard lock stayed held for 300ms")
         st_path = os.path.join(root, "build", "claude-campaign-state.json")
         if os.path.exists(st_path):
             st_now = _state(root)
@@ -1173,12 +1203,81 @@ def _self_test() -> int:
             cancel_confirmed(lroot, "job-zzz")
             check("cancel-confirmed-refuses-another-job", False)
         except GuardError as exc:
-            check("cancel-confirmed-refuses-another-job", "names job job-b" in str(exc), str(exc))
+            check("cancel-confirmed-refuses-another-job", "no pending cancellation names job job-zzz" in str(exc), str(exc))
         check("cancel-confirmed-clears-the-pending-record",
               cancel_confirmed(lroot, "job-b").startswith("cancel-confirmed: job job-b is gone")
               and pending_cancel(lroot) == "")
         check("reconcile-orphan-job", reconcile(lroot, SESSION, ["job-x"])
               == ["reconcile: orphan job job-x has no guard: CronDelete it"])
+        # Two unconfirmed cancellations are both kept (panel round 1).
+        with open(run, "w", encoding="utf-8") as fh:
+            fh.write("# run\n")
+        acquire(lroot, SESSION, 0, RUN_FILE, "job-p1")
+        end(lroot, SESSION, "operator-stop")
+        acquire(lroot, SESSION, 0, RUN_FILE, "job-p2")
+        end(lroot, SESSION, "operator-stop")
+        pend = pending_cancel(lroot)
+        check("pending-cancellations-accumulate", "CronDelete job-p1" in pend and "CronDelete job-p2" in pend, pend)
+        check("reconcile-surfaces-a-pending-cancellation",
+              any("pending cancellation is unconfirmed: CronDelete job-p1" in r for r in reconcile(lroot, SESSION, [])))
+        cancel_confirmed(lroot, "job-p1")
+        cancel_confirmed(lroot, "job-p2")
+        check("pending-cancellations-drain-one-by-one", pending_cancel(lroot) == "", pending_cancel(lroot))
+
+        def _interleave(change: str) -> tuple:
+            """Hold the guard lock in another process, start the hook (it
+            reads the guard, then waits on the lock), apply `change` under
+            the held lock, release, and return what the hook did."""
+            for f in _paths(lroot):
+                if os.path.exists(f):
+                    os.remove(f)
+            with open(run, "w", encoding="utf-8") as fh:
+                fh.write("# run\n")
+            acquire(lroot, SESSION, 0, RUN_FILE, "job-i")
+            go = os.path.join(ltmp, "go.flag")
+            if os.path.exists(go):
+                os.remove(go)
+            holder = subprocess.Popen(
+                [sys.executable, "-c",
+                 "import os, sys, time; sys.path.insert(0, sys.argv[1]); import campaign_guard as cg\n"
+                 "root, change, go = sys.argv[2], sys.argv[3], sys.argv[4]\n"
+                 "with cg._Lock(root):\n"
+                 "    print('held', flush=True)\n"
+                 "    while not os.path.exists(go): time.sleep(0.05)\n"
+                 "    if change == 'handover':\n"
+                 "        cg._acquire_locked(root, 'cccccccc-0000-0000-0000-000000000000', 0, cg.RUN_FILE, 'job-h', 'drill')\n"
+                 "    else:\n"
+                 "        g = cg.read_guard(root)\n"
+                 "        cg._end_locked(root, g['session_id'], 'operator-stop', None)\n"
+                 "    time.sleep(0.5)",
+                 HERE, lroot, change, go], stdout=subprocess.PIPE, text=True)
+            holder.stdout.readline()
+            hook = subprocess.Popen([_powershell(), "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", HOOK],
+                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    text=True, encoding="utf-8", errors="replace",
+                                    env=dict(os.environ, CLAUDE_PROJECT_DIR=lroot))
+            hook.stdin.write(json.dumps({"session_id": SESSION, "cwd": lroot, "hook_event_name": "Stop"}))
+            hook.stdin.close()
+            import time as _t
+            _t.sleep(3)  # the hook has read the guard and now waits on the lock
+            open(go, "w").close()
+            out_h, err_h = hook.communicate(timeout=60)
+            holder.wait()
+            return out_h.strip(), err_h, _state(lroot), read_guard(lroot)
+
+        out_h, err_h, st_h, g_h = _interleave("handover")
+        check("a-handover-while-the-hook-waits-writes-no-state",
+              out_h == "" and "guard changed while this hook waited" in err_h and st_h == {}
+              and g_h["session_id"].startswith("cccccccc"), f"{out_h!r} {err_h!r} {st_h} {g_h}")
+        out_h, err_h, st_h, g_h = _interleave("end")
+        check("an-end-while-the-hook-waits-writes-no-state",
+              out_h == "" and "guard changed while this hook waited" in err_h and st_h == {} and g_h is None,
+              f"{out_h!r} {err_h!r} {st_h} {g_h}")
+        for j in ("job-i",):
+            try:
+                cancel_confirmed(lroot, j)
+            except GuardError:
+                pass
         check("reset-state-with-no-guard", reset_state(lroot, expect_no_guard=True).startswith("reset-state:"))
         check("whoami-no-guard", whoami(lroot, SESSION, g2) == "NO GUARD")
 
@@ -1214,6 +1313,12 @@ def _self_test() -> int:
             check("coverage-past-the-hash-bound-a-time-change-counts", st.get("trips") == 0, str(st))
             st = _tripped_then(os.path.join(cov, "f5.txt"), keep_time=False)
             check("coverage-past-the-stat-bound-only-the-name-counts", st.get("trips") == 1, str(st))
+            os.environ["CAMPAIGN_HASH_BYTES"] = "3"
+            try:
+                st = _tripped_then(os.path.join(cov, "f1.txt"), keep_time=True)
+                check("coverage-a-file-past-the-size-bound-counts-by-size-and-time", st.get("trips") == 1, str(st))
+            finally:
+                del os.environ["CAMPAIGN_HASH_BYTES"]
         finally:
             for k in env_bounds:
                 del os.environ[k]
