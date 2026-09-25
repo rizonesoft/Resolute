@@ -93,6 +93,7 @@ track: W1
 |  33   |   §33   | CI repair-loop follow-ups                      | §31 |  [x]   |
 |  34   |   §34   | Campaign guard follow-ups                      | §32 |  [ ]   |
 |  35   |   §35   | CI read-back follow-ups                        | §33 |  [ ]   |
+|  36   |   §36   | Campaign guard lifecycle follow-ups            | §34 |  [ ]   |
 
 ---
 
@@ -1325,6 +1326,7 @@ Operator question 2026-09-24: where is the stop hook, the cron that reminds the 
 
 **Test checkpoint:** `python scripts/campaign_guard.py --self-test` passes every allow and block case plus the breaker trip and reset, quoted, and runs inside `scripts/check-all.ps1`; `.claude/settings.json` wires the hook; the `process-plan` run guard names the guard file, the heartbeat prompt, and the operator stop.
 
+-> XREF: D00 T04 §36 -- the run binding its terminal markers owe
 -> SOURCE: operator-2026-09-24-campaign-guard
 -> XREF: D00 T04 §34 -- the seven plan-review follow-ups filed from this section
 
@@ -1389,6 +1391,7 @@ The D00 T04 §32 plan review files seven findings the §32 contract does not own
 
 **Test checkpoint:** The escalation report turn ends, each run-end path leaves nothing behind, the untracked-edit and bookkeeping-only fixtures behave, a second session is refused a live guard, the heartbeat lifecycle drive is recorded, and a broken hook is reported, all quoted.
 
+-> XREF: D00 T04 §36 -- the review findings on the guard lifecycle, filed after the sign-off
 -> XREF: D00 T04 §32 -- the campaign guard seven items harden
 -> SOURCE: plan-D00-T04-s32-2026-09-24-PR1 D00-T04-S32-PR1
 -> SOURCE: plan-D00-T04-s32-2026-09-24-PR2 D00-T04-S32-PR2
@@ -1429,6 +1432,39 @@ The D00 T04 §33 review files what its contract does not own. Its sign-off round
 -> SOURCE: plan-D00-T04-s33-2026-09-25-PR10 D00-T04-S33-PR10
 -> SOURCE: plan-D00-T04-s33-2026-09-25-PR11 D00-T04-S33-PR11
 -> SOURCE: plan-D00-T04-s33-2026-09-25-PR12 D00-T04-S33-PR12
+
+## 36. Campaign Guard Lifecycle Follow-Ups
+
+The D00 T04 §34 review files what its contract does not own. Its sign-off round (panel round 3, F11) found the state file still deleted outside the guard lock, at `acquire` time and in the heartbeat's missing-guard branch; the guard lifecycle had been patched in panel rounds 1, 2, and 3 running, so the three-round rule files it rather than patching a fourth time. The D00 T04 §34 plan review (run 20260925-D00-T04-S34-astra) adds eleven accepted findings: hook state writes sit outside the lock (PR1, merged with F11), a same-session obsolete heartbeat is indistinguishable from the current one (PR2), a failed `CronDelete` after `end` leaves no record (PR3), startup has no crash recovery (PR4), the 7-day expiry and a new-session migration are undriven (PR5), the malformed-guard path is unproven end to end and `hook-error` clears before the record is durable (PR6, PR7), coverage past the fingerprint bounds is unstated (PR8), the bookkeeping exclusion is coarse (PR9), terminal markers are not bound to the run (PR10), and nothing checks the heartbeat's health after startup (PR11).
+
+- [ ] Serialize every guard-state write under the guard lock: the Stop hook writes `build/claude-campaign-state.json` without the lock, `acquire` time resets and the heartbeat's missing-guard branch delete it directly, so a handover or a new acquisition can have its fresh state overwritten or deleted (panel round 3 of the D00 T04 §34 review, F11, and plan review PR1; needs §34 shipped). Done when: the hook takes the same OS lock around its state read and write (bounded wait, failing open and recording on timeout), `acquire` and a `campaign_guard.py reset-state` command replace every direct deletion, each re-checking ownership or absence under the lock, and fixtures interleave a hook write with a handover and with an `end`, quoted.
+- [ ] Bind the heartbeat to an acquisition generation: session identity alone cannot tell a replaced heartbeat from the current one in the same session (plan review of the D00 T04 §34 candidate, PR2; needs §34 shipped). Done when: `acquire` writes a generation id beside `cron_id`, the canonical prompt carries it, a heartbeat whose generation or job id is not the guard's replies `NOT THE CURRENT JOB` and deletes itself, and a fixture pins it, quoted.
+- [ ] Keep a pending cancellation until `CronDelete` is confirmed: `end` deletes the guard before the job is cancelled, so a failed `CronDelete` loses the job id (plan review PR3; needs §34 shipped). Done when: `end` leaves a `build/claude-campaign-pending-cancel.json` naming the job, the runner clears it only after `CronList` confirms the job gone, the heartbeat retries a pending cancel, and a failed-delete fixture recovers, quoted.
+- [ ] Recover an interrupted startup: a crash between `CronCreate`, `acquire`, and the run-file record leaves an orphan job or a guard without a heartbeat (plan review PR4; needs §34 shipped). Done when: `process-plan` startup reconciles a job without a guard and a guard without a job before starting, and a fixture for each half recovers, quoted.
+- [ ] Drive the expiry and new-session paths: the §34 drive proved create, idle fire, replacement, and delete, not the 7-day expiry replacement or a resume in a new session (plan review PR5; needs §34 shipped). Done when: a recorded drive replaces a job at its expiry boundary (or a shortened test expiry, stated) and resumes a run in a new session through `acquire --handover`, the old session's heartbeat replying `NOT THE OWNER`, quoted.
+- [ ] Prove the malformed-guard report end to end and make the clear durable: the heartbeat checks ownership first but a malformed guard names no owner, and `hook-error` clears the record before the run file holds it (plan review PR6 and PR7; needs §34 shipped). Done when: the canonical prompt states the malformed-guard branch, a fixture carries a hook error through a malformed guard into the run file's Critical events, and `hook-error` only clears after a `--ack` naming the recorded line, so an interrupted heartbeat loses nothing, quoted.
+- [ ] State the fingerprint's degraded coverage: past 5500 untracked files an edit to an existing path cannot reset the breaker, and a large file's metadata can move without content (plan review PR8; needs §34 shipped). Done when: the hook and `process-plan` state the policy (what counts past each bound), and boundary fixtures at 500, 5500, and the size limit pin it, quoted.
+- [ ] Mark bookkeeping explicitly: stripping the whole Critical events section can hide real recovery work logged there (plan review PR9; needs §34 shipped). Done when: bookkeeping lines carry an explicit marker (for example a leading `bookkeeping:`), only those are excluded, a substantive Critical events line resets the breaker, and fixtures pin both, quoted.
+- [ ] Bind terminal markers to the run: a reused run file's old `PARKED` or `## Closeout` could release a new campaign (plan review PR10; needs §34 shipped: it extends §32's marker semantics). Done when: the guard records the run file's length (or a run id) at acquisition, the hook and `end` honour only markers written after it, and a reused-run-file fixture keeps blocking, quoted.
+- [ ] Check the heartbeat's health during the run: nothing notices a missing, expired, or mismatched job after startup (plan review PR11; needs §34 shipped). Done when: each section boundary runs `CronList` against the guard's `cron_id`, recreates a missing job through `acquire`, and the run file records the repair, with a fixture or drive quoted.
+- [ ] Commit: `"workspace: campaign guard lifecycle follow-ups"`
+
+**Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the interleaving, generation, pending-cancel, startup-recovery, malformed-report, coverage-boundary, bookkeeping-marker, and marker-binding legs, quoted with the suite count. Driven run with evidence: the expiry-replacement and new-session drive and a health-check repair, each in a run file, quoted.
+
+-> XREF: D00 T04 §34 -- the guard lifecycle this section hardens, and the review findings it files
+-> XREF: D00 T04 §32 -- the marker semantics the run binding extends
+-> SOURCE: panel-D00-T04-s34-2026-09-25-F11 D00-T04-S34-F11
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR1 D00-T04-S34-PR1
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR2 D00-T04-S34-PR2
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR3 D00-T04-S34-PR3
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR4 D00-T04-S34-PR4
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR5 D00-T04-S34-PR5
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR6 D00-T04-S34-PR6
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR7 D00-T04-S34-PR7
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR8 D00-T04-S34-PR8
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR9 D00-T04-S34-PR9
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR10 D00-T04-S34-PR10
+-> SOURCE: plan-D00-T04-s34-2026-09-25-PR11 D00-T04-S34-PR11
 
 ## Verification
 
