@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**346 findings across 44 sections.**
+**357 findings across 45 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
 | `record` | 110 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 69 | fails under hostile or unexpected input |
-| `correctness` | 56 | the code does the wrong thing |
+| `adversarial` | 72 | fails under hostile or unexpected input |
+| `correctness` | 60 | the code does the wrong thing |
 | `consistency` | 56 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 41 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 45 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 166 | wrong behavior in code, plan, or record |
-| `minor` | 174 | polish or wording, or no surviving defect |
+| `major` | 171 | wrong behavior in code, plan, or record |
+| `minor` | 180 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -325,6 +325,17 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §33` | F6 | minor | `record` | fixed | independent | the drill record does not quote its repair commit messages |
 | `D00 T04 §33` | F7 | minor | `integration` | fixed | independent | a dash-led run block swallows its sibling keys |
 | `D00 T04 §33` | F8 | minor | `integration` | filed | independent | the command fallback keeps YAML scalar quoting and folding |
+| `D00 T04 §34` | F1 | major | `correctness` | fixed | independent | the owner's re-point is not atomic |
+| `D00 T04 §34` | F2 | major | `integration` | fixed | independent | a refused acquire leaves its heartbeat alive |
+| `D00 T04 §34` | F3 | minor | `correctness` | fixed | independent | quoted git names drop non-ASCII files from the fingerprint |
+| `D00 T04 §34` | F4 | minor | `correctness` | fixed | independent | paths past the hash bound drop out of the fingerprint |
+| `D00 T04 §34` | F5 | major | `correctness` | fixed | independent | the escalation command omits the session |
+| `D00 T04 §34` | F6 | major | `adversarial` | fixed | independent | an age-broken lock can break a live holder's lock |
+| `D00 T04 §34` | F7 | minor | `integration` | fixed | independent | the heartbeat clears the hook error before checking ownership |
+| `D00 T04 §34` | F8 | minor | `adversarial` | fixed | independent | hook-error checks and clears outside the lock |
+| `D00 T04 §34` | F9 | major | `integration` | fixed | independent | the heartbeat's end branches bypass end |
+| `D00 T04 §34` | F10 | minor | `integration` | fixed | independent | a malformed guard blocks the report of its own error |
+| `D00 T04 §34` | F11 | minor | `adversarial` | filed | independent | state deletes still happen outside the lock |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
