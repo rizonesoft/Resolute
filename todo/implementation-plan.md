@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **43 of 225 sections complete (19%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **44 of 225 sections complete (20%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -123,7 +123,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §22` | Checker diagnostic codes and structured errors    |   4   |
 | [x] | `D00 T04 §30` | CI read-back and reachable provenance             |   3   |
 | [x] | `D00 T04 §31` | Red CI repaired, not waited on                    |   5   |
-| [ ] | `D00 T04 §32` | Campaign guard: stop hook, heartbeat, breaker     |   4   |
+| [x] | `D00 T04 §32` | Campaign guard: stop hook, heartbeat, breaker     |   4   |
 | [ ] | `D00 T04 §33` | CI repair-loop follow-ups                         |   9   |
 | [ ] | `D00 T04 §34` | Campaign guard follow-ups                         |   8   |
 | [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   5   |
