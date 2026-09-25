@@ -594,16 +594,32 @@ _ATTEMPT_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) attempt (\d+) of \d+
 _CLOSED_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) closed green")
 
 
+def _canon(root: str, rev: str) -> str:
+    """A commit's full sha when git resolves it, else the text as given:
+    attempts compare by canonical identity, never by printed prefix
+    (D00 T04 §37 independent review)."""
+    rc, out = _git(root, "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}")
+    return out if rc == 0 and out else rev
+
+
 def _episode_from_run_file(root: str, run_file: str) -> list[tuple[str, str, str]]:
-    """(episode, commit, red) for every attempt line the run file records
-    after its last closed episode: what a lost episode file held."""
+    """(episode, commit, red) for every distinct attempt the run file
+    records after its last closed episode: what a lost episode file held.
+    An `already counted` line repeats an attempt and is not a new one."""
     try:
         with open(os.path.join(root, run_file), encoding="utf-8", errors="replace") as fh:
             text = fh.read()
     except OSError:
         return []
     last_close = max((m.end() for m in _CLOSED_LINE.finditer(text)), default=0)
-    return [(m.group(1), m.group(3), m.group(4)) for m in _ATTEMPT_LINE.finditer(text, last_close)]
+    out: list[tuple[str, str, str]] = []
+    seen: set[str] = set()
+    for m in _ATTEMPT_LINE.finditer(text, last_close):
+        if m.group(3) in seen:
+            continue
+        seen.add(m.group(3))
+        out.append((m.group(1), m.group(3), m.group(4)))
+    return out
 
 
 def repair(root: str, action: str, red: str = "", commit: str = "", green: str = "",
@@ -661,10 +677,13 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
         if action == "restore":
             if ep:
                 return 0, f"repair: episode {ep['episode'][:12]} is present; nothing to restore"
+            if not workflow or not run_file:
+                raise GuardError("repair restore needs --workflow and --run-file: the restored episode is bound to both")
             found = _episode_from_run_file(root, run_file)
             if not found:
                 return 0, "repair: the run file shows no open episode; nothing to restore"
-            ep = {"episode": found[0][2], "attempts": [{"red": r, "commit": c} for _e, c, r in found],
+            ep = {"episode": _canon(root, found[0][2]),
+                  "attempts": [{"red": _canon(root, r), "commit": _canon(root, c)} for _e, c, r in found],
                   **_repo_identity(root), "workflow": workflow, "run_file": run_file, "restored": True}
             with open(path + ".tmp", "w", encoding="utf-8") as fh:
                 json.dump(ep, fh, indent=1)
@@ -711,8 +730,9 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
                 if lost:
                     raise GuardError(f"the run file shows open episode {lost[0][0]} but its file is lost: "
                                      f"run repair restore first")
+            red, commit = _canon(root, red), _canon(root, commit)
             ep = ep or {"episode": red, "attempts": [], **identity}
-            done = [a for a in ep["attempts"] if a.get("commit") == commit]
+            done = [a for a in ep["attempts"] if _canon(root, a.get("commit", "")) == commit]
             if done:
                 n = ep["attempts"].index(done[0]) + 1
                 return 0, (f"repair: episode {ep['episode'][:12]} attempt {n} of {REPAIR_BOUND} "
@@ -1502,10 +1522,20 @@ def _self_test() -> int:
         blocked = _repair_cli("attempt", "--red", shas[5], "--commit", shas[3], *W)
         check("repair-attempt-refuses-until-restored",
               blocked.returncode == 1 and "run repair restore first" in blocked.stderr, blocked.stderr)
+        no_wf = _repair_cli("restore", "--run-file", runf)
+        check("repair-restore-refuses-without-a-workflow",
+              no_wf.returncode == 1 and "needs --workflow and --run-file" in no_wf.stderr, no_wf.stderr)
+        # An `already counted` line in the run file is not a second attempt.
+        with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
+            fh.write(again2.stdout.strip() + " already counted\n")
         restored = _repair_cli("restore", *W)
         check("repair-restore-rebuilds-from-the-run-file",
               restored.returncode == 0 and "restored from docs/run.md at 1 of 3 attempts" in restored.stdout,
               restored.stdout + restored.stderr)
+        full_retry = _repair_cli("attempt", "--red", shas[4], "--commit", shas[5], *W)
+        check("repair-restored-attempts-compare-by-full-sha",
+              full_retry.returncode == 0 and "already counted" in full_retry.stdout,
+              full_retry.stdout + full_retry.stderr)
         c1 = _repair_cli("ceiling", "--run-id", "777")
         c2 = _repair_cli("ceiling", "--run-id", "777")
         check("repair-ceiling-allows-one-re-run-per-run",

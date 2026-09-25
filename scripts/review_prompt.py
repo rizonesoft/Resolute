@@ -1390,7 +1390,15 @@ def _entries(lines: list[str], col: int) -> list[tuple[str, str, list[str], int]
         kv = _mapping_key(ln.strip())
         child: list[str] = []
         j = k + 1
-        while j < len(lines) and (not lines[j].strip() or _indent(lines[j]) > col):
+        # A comment at any column stays inside the block, and a key with
+        # no inline value may hold an indentless sequence at its own
+        # column (`steps:` then `- run: x`), both valid YAML (D00 T04 §37
+        # independent review).
+        indentless = kv is not None and not kv[1]
+        while j < len(lines) and (not lines[j].strip() or lines[j].lstrip().startswith("#")
+                                  or _indent(lines[j]) > col
+                                  or (indentless and _indent(lines[j]) == col
+                                      and (lines[j].lstrip().startswith("- ") or lines[j].strip() == "-"))):
             child.append(lines[j])
             j += 1
         out.append((kv[0], kv[1], child, k) if kv else ("?", ln.strip(), child, k))
@@ -1433,7 +1441,8 @@ def _scalar_of(value: str, child: list[str], key_col: int) -> str:
     header = _BLOCK_HEADER.match(value)
     if header:
         return _block_scalar(header, child, key_col)
-    if any(c.strip() for c in child):
+    # Comment lines after an inline scalar are not part of it.
+    if any(c.strip() and not c.lstrip().startswith("#") for c in child):
         raise ScalarRefused("a multi-line plain or quoted scalar")
     return _inline_scalar(value)
 
@@ -6041,6 +6050,12 @@ def _self_test() -> int:
                     "  second:\n    steps:\n      - name: s\n        run: make\n    runs-on: ubuntu-24.04\n"
                     "  third:\n    steps:\n      - name: t\n        run: make\n    runs-on: ubuntu-24.04\n    container: node:22\n")
             by = {s["name"]: s for s in workflow_steps(late)}
+            commented = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n# a column-zero comment inside the job\n"
+                         "    steps:\n    - name: Build\n      run: make\n")
+            got_c = workflow_steps(commented)
+            check("a-comment-and-an-indentless-sequence-keep-the-steps",
+                  [s["name"] for s in got_c] == ["Build"] and got_c[0]["run"] == "make"
+                  and got_c[0]["context"]["runs-on"] == "ubuntu-24.04", str(got_c))
             check("job-context-reads-runs-on-declared-after-steps",
                   by["s"]["context"]["runs-on"] == "ubuntu-24.04" and by["f"]["context"]["runs-on"] == "windows-2025",
                   str({k: v["context"]["runs-on"] for k, v in by.items()}))
