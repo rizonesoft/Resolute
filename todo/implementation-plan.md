@@ -126,7 +126,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §32` | Campaign guard: stop hook, heartbeat, breaker     |   4   |
 | [ ] | `D00 T04 §33` | CI repair-loop follow-ups                         |   9   |
 | [ ] | `D00 T04 §34` | Campaign guard follow-ups                         |   8   |
-| [ ] | `D00 T04 §35` | CI read-back follow-ups                           |   2   |
+| [ ] | `D00 T04 §35` | CI read-back follow-ups                           |  10   |
 | [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   5   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
