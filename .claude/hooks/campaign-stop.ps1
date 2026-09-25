@@ -17,9 +17,11 @@ $ErrorActionPreference = "Stop"
 $MaxBlocksWithoutProgress = 3
 # Untracked content is hashed file by file, bounded so a huge scratch
 # tree cannot stall the hook: past these limits a file counts by its
-# size and write time instead (D00 T04 section 34).
-$MaxUntrackedFiles = 500
+# size and write time instead, and past the metadata bound by its name
+# alone, so no untracked path ever drops out (D00 T04 section 34).
+$MaxHashedFiles = 500
 $MaxHashedBytes = 4MB
+$MaxStatFiles = 5000
 $root = $null
 # Windows PowerShell 5.1 decodes native output in the console codepage and
 # writes stdout in it too: plan rows carry section marks, so both sides run
@@ -86,14 +88,21 @@ try {
         $runPath = $relative.Replace('\', '/')
         $head = (& git rev-parse HEAD 2>$null) -join ""
         $diff = (& git diff HEAD -- . ":(exclude)$runPath" 2>$null) -join "`n"
-        $paths = @(& git ls-files --others --exclude-standard 2>$null |
-                   Where-Object { $_ -and $_ -ne $runPath } | Select-Object -First $MaxUntrackedFiles)
+        # NUL-delimited, so git never quotes or escapes a name (a path
+        # like cafe with an accent would otherwise arrive octal-escaped and
+        # name no file).
+        $listed = (& git ls-files -z --others --exclude-standard 2>$null) -join ""
+        $paths = @($listed.Split([char]0) | Where-Object { $_ -and $_ -ne $runPath })
         $small = @()
         $large = @()
+        $index = 0
         foreach ($path in $paths) {
+            $index++
+            if ($index -gt $MaxHashedFiles + $MaxStatFiles) { $large += $path; continue }
             $item = Get-Item -LiteralPath (Join-Path $root $path) -ErrorAction SilentlyContinue
-            if ($item -and $item.Length -le $MaxHashedBytes) { $small += $path }
+            if ($item -and $index -le $MaxHashedFiles -and $item.Length -le $MaxHashedBytes) { $small += $path }
             elseif ($item) { $large += "$path $($item.Length) $($item.LastWriteTimeUtc.Ticks)" }
+            else { $large += "$path missing" }
         }
         $hashes = @()
         # Paths ride the argument list, in chunks, never a pipe: a pipe into
@@ -150,7 +159,7 @@ try {
 
     $message = "Campaign run is still open ($relative). Do not end the turn. Finish the open section's checklist, run the review panel and stamp it, then the next section, then the next phase. A commit, a green suite, a red CI (repair it: D00 T04 section 31), or a status report is not a stop."
     if ($next) { $message += " Next ready row: $($next.Trim())." }
-    $message += " Finished means a '## Closeout' heading or a column-0 'PARKED' line in the run file. Escalating to the operator (an exhausted repair bound, an unverifiable CI, a cause the tree cannot fix) ends the run first: write a column-0 'PARKED <UTC> escalation: <cause>' line and run 'python scripts/campaign_guard.py end --reason escalation', then report. The breaker allows the stop after $MaxBlocksWithoutProgress pushes with no tree change (this is push $($state.blocks))."
+    $message += " Finished means a '## Closeout' heading or a column-0 'PARKED' line in the run file. Escalating to the operator (an exhausted repair bound, an unverifiable CI, a cause the tree cannot fix) ends the run first: write a column-0 'PARKED <UTC> escalation: <cause>' line, run 'python scripts/campaign_guard.py end --session $owner --reason escalation', CronDelete the heartbeat it names, then report. The breaker allows the stop after $MaxBlocksWithoutProgress pushes with no tree change (this is push $($state.blocks))."
     $payload = @{ decision = "block"; reason = $message } | ConvertTo-Json -Compress
     [Console]::Out.WriteLine($payload)
     exit 0

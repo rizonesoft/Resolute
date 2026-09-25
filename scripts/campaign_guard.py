@@ -58,6 +58,50 @@ def _paths(root: str) -> tuple[str, str]:
             os.path.join(root, "build", "claude-campaign-state.json"))
 
 
+LOCK_WAIT = 10.0
+LOCK_STALE = 60.0
+
+
+class _Lock:
+    """An interprocess lock on the guard: every change (acquire,
+    re-point, handover, end) holds it, so a read-then-replace can never
+    interleave with another session's change (D00 T04 §34 independent
+    review). The lock is a create-exclusive file; one older than
+    LOCK_STALE seconds is a crashed holder's and is broken."""
+
+    def __init__(self, root: str, wait: float = LOCK_WAIT):
+        self.path = os.path.join(root, "build", "claude-campaign-guard.lock")
+        self.wait = wait
+
+    def __enter__(self):
+        import time
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        deadline = time.monotonic() + self.wait
+        while True:
+            try:
+                fd = os.open(self.path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+                os.write(fd, str(os.getpid()).encode())
+                os.close(fd)
+                return self
+            except FileExistsError:
+                try:
+                    if time.time() - os.path.getmtime(self.path) > LOCK_STALE:
+                        os.unlink(self.path)
+                        continue
+                except FileNotFoundError:
+                    continue
+                if time.monotonic() >= deadline:
+                    raise GuardError(f"the guard is locked by another change ({self.path}); retry")
+                time.sleep(0.05)
+
+    def __exit__(self, *exc):
+        try:
+            os.unlink(self.path)
+        except FileNotFoundError:
+            pass
+        return False
+
+
 def read_guard(root: str) -> dict | None:
     guard, _ = _paths(root)
     try:
@@ -83,6 +127,12 @@ def acquire(root: str, session: str, phase: int, run_file: str, cron_id: str,
         raise GuardError("acquire needs --session, --run-file, and --cron-id")
     if os.path.isabs(run_file) or ".." in run_file.replace("\\", "/").split("/"):
         raise GuardError(f"run file {run_file!r} must be a repo-relative path inside the workspace")
+    with _Lock(root):
+        return _acquire_locked(root, session, phase, run_file, cron_id, handover)
+
+
+def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id: str,
+                    handover: str | None) -> str:
     guard, _ = _paths(root)
     os.makedirs(os.path.dirname(guard), exist_ok=True)
     doc = {"runner": "claude", "workspace": root.replace("\\", "/"), "phase": phase,
@@ -99,14 +149,11 @@ def acquire(root: str, session: str, phase: int, run_file: str, cron_id: str,
                                  f"refusing to take it without an operator handover (--handover REASON)")
             doc["handover_from"] = owner
             doc["handover_reason"] = handover
+        # The lock is held from the read above through this replace, so no
+        # other change can land in between.
         tmp = guard + f".{os.getpid()}.tmp"
         with open(tmp, "wb") as fh:
             fh.write(json.dumps(doc, indent=2).encode("utf-8"))
-        # Compare-and-swap: the owner read above must still own it.
-        again = read_guard(root) or {}
-        if str(again.get("session_id", "")) != owner:
-            os.unlink(tmp)
-            raise GuardError("the guard changed owner while it was being re-pointed; re-read and retry")
         os.replace(tmp, guard)
         what = "handed over" if owner != session else "re-pointed"
         return f"acquire: guard {what} for session {session} (phase {phase}, {run_file}, job {cron_id})"
@@ -129,6 +176,13 @@ def end(root: str, session: str, reason: str) -> str:
     the returned line names it."""
     if reason not in END_REASONS:
         raise GuardError(f"reason {reason!r} is not one of {', '.join(END_REASONS)}")
+    if not session:
+        raise GuardError("end needs --session (the session that owns the guard)")
+    with _Lock(root):
+        return _end_locked(root, session, reason)
+
+
+def _end_locked(root: str, session: str, reason: str) -> str:
     guard_path, state_path = _paths(root)
     guard = read_guard(root)
     if guard is None:
@@ -332,6 +386,9 @@ def _self_test() -> int:
               code == 0 and isinstance(out, dict) and out.get("decision") == "block"
               and "Next ready row: 00-workspace/TODO-04-self-correction.md §31" in out.get("reason", "")
               and "repair it: D00 T04 section 31" in out.get("reason", ""), f"{code} {out} {err}")
+        check("the-escalation-instruction-names-the-session",
+              isinstance(out, dict) and f"end --session {SESSION} --reason escalation" in out.get("reason", ""),
+              str(out))
 
         # Stall breaker: blocks 2 and 3 with no tree change, then the trip.
         run_hook(root, SESSION)
@@ -401,6 +458,34 @@ def _self_test() -> int:
         st = _state(root)
         check("untracked-content-edit-resets-the-breaker",
               isinstance(out, dict) and out.get("decision") == "block" and st.get("blocks") == 1, f"{out} {st}")
+        with open(os.path.join(root, "caf\u00e9.txt"), "w", encoding="utf-8") as fh:
+            fh.write("work under a non-ASCII name\n")
+        for _ in range(4):
+            run_hook(root, SESSION)
+        with open(os.path.join(root, "caf\u00e9.txt"), "a", encoding="utf-8") as fh:
+            fh.write("an edit only its content hash can see\n")
+        code, out, _ = run_hook(root, SESSION)
+        check("a-non-ascii-untracked-edit-is-progress",
+              isinstance(out, dict) and out.get("decision") == "block" and _state(root).get("blocks") == 1
+              and _state(root).get("trips") == 0,
+              f"{out} {_state(root)}")
+        # Past the content-hash bound every path still counts: a new file
+        # beyond the 500th is progress (D00 T04 §34 independent review).
+        many = os.path.join(root, "many")
+        os.makedirs(many)
+        for i in range(505):
+            with open(os.path.join(many, f"f{i:04d}.txt"), "w", encoding="utf-8") as fh:
+                fh.write("x\n")
+        for _ in range(4):
+            run_hook(root, SESSION)
+        with open(os.path.join(many, "zzzz-new.txt"), "w", encoding="utf-8") as fh:
+            fh.write("new work past the bound\n")
+        code, out, _ = run_hook(root, SESSION)
+        check("a-file-past-the-hash-bound-is-progress",
+              isinstance(out, dict) and out.get("decision") == "block" and _state(root).get("trips") == 0,
+              f"{out} {_state(root)}")
+        shutil.rmtree(many)
+        run_hook(root, SESSION)
         for _ in range(2):
             run_hook(root, SESSION)
         text = open(run_path, encoding="utf-8").read().replace(
@@ -440,6 +525,43 @@ def _self_test() -> int:
         g = read_guard(root)
         check("acquire-hands-over-with-a-reason", "handed over" in msg and g["handover_from"] == SESSION
               and g["session_id"].startswith("22222222"), f"{msg} {g}")
+        lock = os.path.join(root, "build", "claude-campaign-guard.lock")
+        with open(lock, "w", encoding="utf-8") as fh:
+            fh.write("held")
+        try:
+            with _Lock(root, wait=0.2):
+                pass
+            check("a-held-lock-refuses-a-change", False, "entered a held lock")
+        except GuardError as exc:
+            check("a-held-lock-refuses-a-change", "locked by another change" in str(exc), str(exc))
+        os.remove(lock)
+        check("the-lock-is-released-after-a-change", not os.path.exists(lock))
+        # Two sessions changing the guard at once: the lock serializes them,
+        # and the guard ends owned by exactly the session that changed it last.
+        import threading
+        results: list = []
+
+        def _take(sess: str) -> None:
+            try:
+                results.append(acquire(root, sess, 2, RUN_FILE, "job-7", handover="race drill"))
+            except GuardError as exc:
+                results.append(str(exc))
+        threads = [threading.Thread(target=_take, args=(s,)) for s in
+                   ("22222222-0000-0000-0000-000000000000", "55555555-0000-0000-0000-000000000000")]
+        for th in threads:
+            th.start()
+        for th in threads:
+            th.join()
+        final = read_guard(root)
+        check("concurrent-changes-serialize", len(results) == 2 and final is not None
+              and final["session_id"] in ("22222222-0000-0000-0000-000000000000",
+                                          "55555555-0000-0000-0000-000000000000")
+              and not os.path.exists(lock), f"{results} {final}")
+        try:
+            end(root, "", "operator-stop")
+            check("end-refuses-without-a-session", False)
+        except GuardError as exc:
+            check("end-refuses-without-a-session", "needs --session" in str(exc), str(exc))
         try:
             acquire(root, SESSION, 0, "../outside.md", "job-5", handover="x")
             check("acquire-refuses-an-escaping-run-file", False)
@@ -489,7 +611,9 @@ def _self_test() -> int:
         skill = ""
     for pin, needle in (("skill-acquires-the-guard", "python scripts/campaign_guard.py acquire --session"),
                         ("skill-ends-through-end", "python scripts/campaign_guard.py end --session"),
-                        ("skill-heartbeat-reports-hook-errors", "python scripts/campaign_guard.py hook-error")):
+                        ("skill-heartbeat-reports-hook-errors", "python scripts/campaign_guard.py hook-error"),
+                        ("skill-refused-acquire-cancels-its-job", "A refused `acquire` means another session owns the run"),
+                        ("skill-heartbeat-checks-ownership", "reply NOT THE OWNER")):
         check(pin, needle in skill, plan_skill)
 
     print(f"campaign_guard self-test: {passed + failed} cases, {failed} failed")
