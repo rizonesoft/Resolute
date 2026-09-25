@@ -490,3 +490,16 @@ round: 3 model: gpt-6-astra effort: high outcome: findings candidate: 94c8b920 p
 round: 4 model: gpt-6-astra effort: high outcome: independent candidate: 5b1d5eaf provider: openai version: gpt-6-astra cost: unresolved latency: 179s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S34-F1, D00-T04-S34-F2, D00-T04-S34-F3, D00-T04-S34-F4, D00-T04-S34-F5
 empty: 0
 refuted: 0
+
+run: D00-T04-S35
+date: 2026-09-25
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: b8d2246c provider: openai version: gpt-6-astra cost: 42332tokens latency: 50s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S35-F5, D00-T04-S35-F6, D00-T04-S35-F7
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: 4daab1b9 provider: openai version: gpt-6-astra cost: 43358tokens latency: 38s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S35-F8, D00-T04-S35-F9
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: f5072a67 provider: openai version: gpt-6-astra cost: 45356tokens latency: 80s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S35-F10, D00-T04-S35-F11
+# round 3 is the Full sign-off: its two findings sit below the blocking bar and were filed in D00 T04 §37, so no round 4 ran. Rounds 2 and 3 latency are measured from rundir file times.
+# round 4 is the independent pass (`panel_slots.py exec independent --commit 43a59fc6`, ran before panel round 1); the runner printed no token figure.
+round: 4 model: gpt-6-astra effort: high outcome: independent candidate: 43a59fc6 provider: openai version: gpt-6-astra cost: unresolved latency: 184s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S35-F1, D00-T04-S35-F2, D00-T04-S35-F3, D00-T04-S35-F4
+empty: 0
+refuted: 0

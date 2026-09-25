@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**357 findings across 45 sections.**
+**368 findings across 46 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
 | `record` | 110 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 72 | fails under hostile or unexpected input |
-| `correctness` | 60 | the code does the wrong thing |
+| `adversarial` | 75 | fails under hostile or unexpected input |
+| `correctness` | 64 | the code does the wrong thing |
 | `consistency` | 56 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 45 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 49 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 171 | wrong behavior in code, plan, or record |
-| `minor` | 180 | polish or wording, or no surviving defect |
+| `major` | 174 | wrong behavior in code, plan, or record |
+| `minor` | 188 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -336,6 +336,17 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §34` | F9 | major | `integration` | fixed | independent | the heartbeat's end branches bypass end |
 | `D00 T04 §34` | F10 | minor | `integration` | fixed | independent | a malformed guard blocks the report of its own error |
 | `D00 T04 §34` | F11 | minor | `adversarial` | filed | independent | state deletes still happen outside the lock |
+| `D00 T04 §35` | F1 | major | `correctness` | fixed | independent | an unverifiable no-run poll reads as silence |
+| `D00 T04 §35` | F2 | minor | `correctness` | fixed | independent | env forms the parser does not read are dropped or misread |
+| `D00 T04 §35` | F3 | minor | `correctness` | fixed | independent | context is interpolated unquoted and scoped to one command |
+| `D00 T04 §35` | F4 | minor | `correctness` | fixed | independent | the default shell is assumed to be Bash |
+| `D00 T04 §35` | F5 | major | `adversarial` | fixed | independent | an unreadable repair episode resets the bound |
+| `D00 T04 §35` | F6 | minor | `adversarial` | fixed | independent | empty or null run lists read as silence |
+| `D00 T04 §35` | F7 | minor | `integration` | fixed | independent | block-valued shell and working-directory are read as their header |
+| `D00 T04 §35` | F8 | major | `adversarial` | fixed | independent | a JSON null episode resets the bound |
+| `D00 T04 §35` | F9 | minor | `integration` | fixed | independent | container jobs are advertised with the host's shell |
+| `D00 T04 §35` | F10 | minor | `integration` | filed | independent | job context depends on key order |
+| `D00 T04 §35` | F11 | minor | `integration` | filed | independent | quoted step keys are ignored |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
