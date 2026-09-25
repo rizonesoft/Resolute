@@ -6,7 +6,7 @@ turn while its run is open. The guard file it reads is written and
 deleted only through this module (D00 T04 §34):
 
     python scripts/campaign_guard.py acquire --session S --phase N --run-file F --cron-id J [--handover REASON]
-    python scripts/campaign_guard.py end --session S --reason closeout|park|plan-done|operator-stop|escalation
+    python scripts/campaign_guard.py end --session S --reason closeout|park|plan-done|operator-stop|escalation|stall
     python scripts/campaign_guard.py hook-error [--session S]
     python scripts/campaign_guard.py --self-test
 
@@ -46,7 +46,7 @@ RUN_FILE = "docs/phase-runs/2099-01-01-phase-0.md"
 
 
 REPO = os.path.normpath(os.path.join(HERE, ".."))
-END_REASONS = ("closeout", "park", "plan-done", "operator-stop", "escalation")
+END_REASONS = ("closeout", "park", "plan-done", "operator-stop", "escalation", "stall")
 
 
 class GuardError(ValueError):
@@ -229,6 +229,14 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None) -> str:
         raise GuardError(f"escalation needs a column-0 'PARKED <UTC> escalation: <cause>' line in {run_rel}")
     if reason == "plan-done" and ready != 0:
         raise GuardError(f"plan-done needs '0 runnable now'; query ready reads {ready}")
+    if reason == "stall":
+        try:
+            with open(state_path, encoding="utf-8-sig") as fh:
+                trips = int(json.load(fh).get("trips", 0))
+        except (OSError, ValueError, TypeError, AttributeError):
+            trips = 0
+        if trips < 2:
+            raise GuardError(f"stall needs a state file with trips of 2 or more; it reads {trips}")
     for path in (guard_path, state_path):
         try:
             os.unlink(path)
@@ -246,8 +254,21 @@ def hook_error(root: str, session: str | None = None) -> str:
     session, a guard owned by another session is refused before anything
     is read or cleared (panel round 1: a former owner's heartbeat must
     not consume the current owner's failure record)."""
+    with _Lock(root):
+        return _hook_error_locked(root, session)
+
+
+def _hook_error_locked(root: str, session: str | None) -> str:
+    # Under the lock, so no handover lands between the ownership check
+    # and the clear (panel round 2). An unreadable guard cannot name an
+    # owner, and the error it caused is exactly what must be reported,
+    # so it reports rather than refuses (panel round 2).
+    unreadable = False
     if session:
-        guard = read_guard(root)
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            guard, unreadable = None, True
         if guard is not None and str(guard.get("session_id", "")) != session:
             raise GuardError(f"the guard belongs to session {guard.get('session_id')}, not {session}")
     _, state_path = _paths(root)
@@ -264,7 +285,8 @@ def hook_error(root: str, session: str | None = None) -> str:
     with open(tmp, "w", encoding="utf-8") as fh:
         json.dump(state, fh)
     os.replace(tmp, state_path)
-    return f"campaign-stop hook failed at {at}: {err}"
+    note = " (the guard file is unreadable: repair it before resuming)" if unreadable else ""
+    return f"campaign-stop hook failed at {at}: {err}{note}"
 
 
 def _powershell() -> str | None:
@@ -466,9 +488,18 @@ def _self_test() -> int:
             fh.write("{not json")
         code, out, err = run_hook(root, SESSION)
         check("fail-open-on-a-bad-guard", code == 0 and out is None and "campaign-stop:" in err, f"{code} {out} {err}")
-        # D00 T04 §34: the failure is recorded for the heartbeat, then cleared.
+        # D00 T04 §34: the failure is recorded for the heartbeat, then
+        # reported through the still-malformed guard, then cleared.
         st = _state(root)
         check("a-thrown-error-is-recorded", bool(st.get("hook_error")) and bool(st.get("hook_error_at")), str(st))
+        with open(os.path.join(root, "build", "claude-campaign-state.json"), encoding="utf-8-sig") as fh:
+            saved_state = fh.read()
+        line = hook_error(root, SESSION)
+        check("hook-error-reports-through-a-malformed-guard",
+              line.startswith("campaign-stop hook failed at ") and "guard file is unreadable" in line
+              and "hook_error" not in _state(root), line)
+        with open(os.path.join(root, "build", "claude-campaign-state.json"), "w", encoding="utf-8") as fh:
+            fh.write(saved_state)
         _guard(root, session="77777777-0000-0000-0000-000000000000")
         with open(os.path.join(root, "build", "claude-campaign-state.json"), "w", encoding="utf-8") as fh:
             json.dump({"hook_error": "boom", "hook_error_at": "2099-01-01T00:00:00Z"}, fh)
@@ -652,6 +683,17 @@ def _self_test() -> int:
                   gone and "CronDelete job-9" in msg and code == 0 and out is None, f"{msg} {gone} {out}")
         _fresh("# r\n", 3)
         try:
+            end(root, SESSION, "stall")
+            check("end-refuses-a-stall-without-two-trips", False)
+        except GuardError as exc:
+            check("end-refuses-a-stall-without-two-trips", "trips of 2 or more" in str(exc), str(exc))
+        with open(_paths(root)[1], "w", encoding="utf-8") as fh:
+            json.dump({"trips": 2, "stalled": True}, fh)
+        msg = end(root, SESSION, "stall")
+        check("end-stall-leaves-nothing-behind",
+              not any(os.path.exists(f) for f in _paths(root)) and "CronDelete job-9" in msg, msg)
+        _fresh("# r\n", 3)
+        try:
             end(root, SESSION, "closeout")
             check("end-refuses-a-closeout-without-its-heading", False)
         except GuardError as exc:
@@ -675,6 +717,7 @@ def _self_test() -> int:
                         ("skill-heartbeat-reports-hook-errors", "python scripts/campaign_guard.py hook-error"),
                         ("skill-refused-acquire-cancels-its-job", "A refused `acquire` means another session owns the run"),
                         ("skill-heartbeat-checks-ownership", "reply NOT THE OWNER"),
+                        ("skill-heartbeat-ends-through-end", "--reason plan-done`, CronDelete this job"),
                         ("skill-heartbeat-owner-first",
                          "1. If build/claude-campaign-guard.json exists but its `session_id`")):
         check(pin, needle in skill, plan_skill)
