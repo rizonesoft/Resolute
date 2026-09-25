@@ -5685,6 +5685,7 @@ def _self_test() -> int:
             ("skill-ci-repair-owner", "Every repair commit has an owner"),
             ("skill-ci-cause-rule", "the cause decides, not the step's name"),
             ("skill-ci-slow-run", "a slow run is not an unreachable one"),
+            ("skill-ci-escalation-ends-run", "--reason escalation` and `CronDelete` of the heartbeat it names"),
             ("skill-ci-escalation", "escalates to the operator only for a cause the tree cannot fix"),
             ("skill-ci-continue", "On green, with any reopened section re-stamped, it continues with the next section in the same turn"),
             ("skill-ci-reopen-restamp", "A reopened section is repaired, re-reviewed, and re-stamped through this skill before anything continues"),
