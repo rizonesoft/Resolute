@@ -1184,6 +1184,21 @@ _LOG_TS_RE = re.compile(r"^﻿?\d{4}-\d{2}-\d{2}T[\d:.]+Z\s?")
 _LOG_SIGNAL_RE = re.compile(r"(?i)\b(fatal|error|fail(ed|ure)?|exception|traceback|refused)\b")
 
 
+def normalized_log_lines(text: str) -> list[str]:
+    """Every log line of `gh run view --log[-failed]` output, stripped of
+    the job and step columns, timestamps, colour, and group markers: the
+    whole evidence a red's cause is judged on (D00 T04 §33 independent
+    review F1: the bounded excerpt can drop a shutdown signal)."""
+    out: list[str] = []
+    for raw in text.splitlines():
+        parts = raw.split("\t", 2)
+        line = parts[2] if len(parts) == 3 else raw
+        line = _ANSI_RE.sub("", _LOG_TS_RE.sub("", line)).rstrip()
+        if line and not line.startswith("##[group]") and not line.startswith("##[endgroup]"):
+            out.append(line)
+    return out
+
+
 def summarize_failed_log(text: str, limit: int = 20) -> tuple[list[str], list[str]]:
     """(failing `job / step` names in order, bounded excerpt) from `gh run
     view --log-failed` output, whose lines read `job<TAB>step<TAB>log`
@@ -1334,23 +1349,30 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         steps, lines = summarize_failed_log(out, limit)
         rows = [f"ci-wait: failing step(s): {'; '.join(steps) if steps else 'not named by the log'}"]
         rows += [f"ci-wait: | {ln}" for ln in lines]
-        rows.append(classify_red(steps, lines))
+        rows.append(classify_red(steps, normalized_log_lines(out)))
         return "\n".join(rows)
     rows = [f"ci-wait: failed-step log unavailable ({out}); the run is still red"]
     failing = failed_job_steps(run_id)
     ok_full, full = _gh_text(["run", "view", run_id, "--log"])
-    if ok_full:
-        wanted = set(failing or [])
+    if ok_full and normalized_log_lines(full):
+        wanted = set(failing or []) - {NO_JOB}
         kept = [ln for ln in full.splitlines()
                 if not wanted or "\t".join(ln.split("\t", 2)[:2]).replace("\t", " / ") in wanted]
+        # gh labels segments it cannot map to a step `UNKNOWN STEP`: when
+        # the step filter keeps nothing, the unmapped evidence stays
+        # (D00 T04 §33 independent review F2).
+        scope = "failing step(s)"
+        if not normalized_log_lines("\n".join(kept)):
+            kept = full.splitlines()
+            scope = "the whole log, its steps unmapped; failing step(s)"
         steps, lines = summarize_failed_log("\n".join(kept), limit)
         steps = failing or steps
-        rows.append(f"ci-wait: full log read instead; failing step(s): "
+        rows.append(f"ci-wait: full log read instead; {scope}: "
                     f"{'; '.join(steps) if steps else 'not named by the log'}")
         rows += [f"ci-wait: | {ln}" for ln in lines]
-        rows.append(classify_red(steps, lines))
+        rows.append(classify_red(steps, normalized_log_lines("\n".join(kept))))
         return "\n".join(rows)
-    rows.append(f"ci-wait: full log unavailable too ({full})")
+    rows.append(f"ci-wait: full log unavailable too ({full if not ok_full else 'it carries no lines'})")
     if failing == [NO_JOB]:
         rows.append("ci-wait: the run started no job: GitHub could not load the workflow file "
                     "at the pushed commit; check its syntax locally")
@@ -5344,6 +5366,16 @@ def _self_test() -> int:
                 "    if mode == 'badpin':\n"
                 "        print('plan-gates\\tSet up job\\t2026-09-23T21:37:50.1Z ##[error]Unable to resolve action `actions/checkout@deadbeef`, unable to find version `deadbeef`')\n"
                 "        sys.exit(0)\n"
+                "    if mode == 'shutdowncancel':\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z The runner has received a shutdown signal.')\n"
+                "        for i in range(25): print(f'plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.1Z ##[error]The operation was canceled. {i}')\n"
+                "        sys.exit(0)\n"
+                "    if mode == 'unknownstep':\n"
+                "        if '--log-failed' in sys.argv:\n"
+                "            sys.stderr.write('HTTP 404: log expired for run 9\\n')\n"
+                "            sys.exit(1)\n"
+                "        print('plan-gates\\tUNKNOWN STEP\\t2026-09-23T21:37:55.2Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
+                "        sys.exit(0)\n"
                 "    if mode == 'lostrunner':\n"
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z ##[error]The runner has received a shutdown signal.')\n"
                 "        sys.exit(0)\n"
@@ -5361,7 +5393,7 @@ def _self_test() -> int:
                 "if mode == 'gherror':\n"
                 "    sys.stderr.write('HTTP 503: service unavailable\\n')\n"
                 "    sys.exit(1)\n"
-                "if mode in ('nolog', 'nologall', 'nojobs', 'fulllog', 'badpin', 'lostrunner'): mode = 'failure'\n"
+                "if mode in ('nolog', 'nologall', 'nojobs', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep'): mode = 'failure'\n"
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
@@ -5436,6 +5468,18 @@ def _self_test() -> int:
             code, line = ci_conclusion(c1, "plan-gates", 0, 0)
             check("ci-wait-bad-pinned-action-reads-repairable",
                   code == 1 and "cause: repairable (repository-controlled: plan-gates / Set up job)" in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("shutdowncancel")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+            check("ci-wait-classifies-the-whole-log-not-the-excerpt",
+                  code == 1 and "cause: platform fault, escalate" in line
+                  and "received a shutdown signal" not in line.split("cause:", 1)[0], line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("unknownstep")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
+            check("ci-wait-keeps-unmapped-full-log-evidence",
+                  code == 1 and "the whole log, its steps unmapped" in line
+                  and "FATAL x.md:9 candidate c6b1 resolves to nothing" in line, line)
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("lostrunner")
             code, line = ci_conclusion(c1, "plan-gates", 0, 0)
@@ -5550,6 +5594,18 @@ def _self_test() -> int:
             got_wfn = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
                                       "--retry-wait", "0"],
                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            os.makedirs(os.path.join(tmpd, ".github", "workflows"), exist_ok=True)
+            with open(os.path.join(tmpd, ".github", "workflows", "release.yml"), "w", encoding="utf-8") as fh:
+                fh.write("on: workflow_dispatch\njobs: {}\n")
+            _g("add", ".github/workflows/release.yml")
+            _g("commit", "-qm", "c4-other-workflow")
+            c4 = _g("rev-parse", "HEAD").stdout.strip()
+            got_ow = subprocess.run([sys.executable, me, "ci-wait", c4, "--timeout", "0", "--interval", "0"],
+                                    cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-another-workflow-edit-reads-through-the-filter",
+                  got_ow.returncode == 0 and "not triggered" in got_ow.stdout
+                  and "edits the workflow" not in got_ow.stderr,
+                  f"exit={got_ow.returncode} out={got_ow.stdout!r} err={got_ow.stderr!r}")
             check("ci-wait-escalates-when-an-edited-workflow-never-runs",
                   got_wfn.returncode == 2 and "escalate" in got_wfn.stderr,
                   f"exit={got_wfn.returncode} err={got_wfn.stderr!r}")
@@ -6498,7 +6554,10 @@ if __name__ == "__main__":
         changed = [ln for ln in diff.splitlines() if ln.strip()]
         filters = (workflow_path_filters(wf_file) if wf_file is not None
                    else committed_path_filters(ident[0], wf_path))
-        touches_workflow = any(p == wf_path or p.startswith(".github/workflows/") for p in changed)
+        # Only the selected workflow's own file: another workflow's edit
+        # still reads through this one's filter (D00 T04 §33 independent
+        # review F3).
+        touches_workflow = wf_path in changed
         if touches_workflow:
             print(f"ci-wait: the range edits the workflow ({wf_path}); waiting for a run "
                   f"rather than trusting its new filter", file=sys.stderr)
