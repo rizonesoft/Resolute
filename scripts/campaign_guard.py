@@ -8,6 +8,7 @@ deleted only through this module (D00 T04 §34):
     python scripts/campaign_guard.py acquire --session S --phase N --run-file F --cron-id J [--handover REASON]
     python scripts/campaign_guard.py end --session S --reason closeout|park|plan-done|operator-stop|escalation|stall
     python scripts/campaign_guard.py hook-error [--session S]
+    python scripts/campaign_guard.py repair attempt --red SHA --commit SHA | close --green SHA | status
     python scripts/campaign_guard.py --self-test
 
 `acquire` creates the guard exclusively; the owning session may re-point
@@ -287,6 +288,57 @@ def _hook_error_locked(root: str, session: str | None) -> str:
     os.replace(tmp, state_path)
     note = " (the guard file is unreadable: repair it before resuming)" if unreadable else ""
     return f"campaign-stop hook failed at {at}: {err}{note}"
+
+
+REPAIR_BOUND = 3
+
+
+def _repair_path(root: str) -> str:
+    return os.path.join(root, "build", "claude-campaign-repair.json")
+
+
+def repair(root: str, action: str, red: str = "", commit: str = "", green: str = "") -> tuple[int, str]:
+    """The CI repair episode, persisted beside the guard state so a
+    resumed or restarted runner cannot recount from zero (D00 T04 §35).
+    An episode opens at its first red and closes at the next green; at
+    most REPAIR_BOUND repair attempts ride one episode, across however
+    many reds it sees. Returns (exit, line): `attempt` exits 1 when the
+    bound is exhausted, which is the escalation."""
+    path = _repair_path(root)
+    with _Lock(root):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                ep = json.load(fh)
+        except (OSError, ValueError):
+            ep = None
+        if action == "status":
+            if not ep:
+                return 0, "repair: no open episode"
+            return 0, (f"repair: episode {ep['episode'][:12]} open, {len(ep['attempts'])} of "
+                       f"{REPAIR_BOUND} attempts used")
+        if action == "close":
+            if not green:
+                raise GuardError("repair close needs --green <sha>")
+            if not ep:
+                return 0, "repair: no open episode to close"
+            os.unlink(path)
+            return 0, (f"repair: episode {ep['episode'][:12]} closed green at {green[:12]} after "
+                       f"{len(ep['attempts'])} attempt(s)")
+        if action == "attempt":
+            if not red or not commit:
+                raise GuardError("repair attempt needs --red <sha> and --commit <sha>")
+            ep = ep or {"episode": red, "attempts": []}
+            if len(ep["attempts"]) >= REPAIR_BOUND:
+                return 1, (f"repair: episode {ep['episode'][:12]} has used all {REPAIR_BOUND} attempts: "
+                           f"the bound is exhausted, escalate (PARKED ... escalation:, then end --reason escalation)")
+            ep["attempts"].append({"red": red, "commit": commit})
+            tmp = path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as fh:
+                json.dump(ep, fh, indent=1)
+            os.replace(tmp, path)
+            return 0, (f"repair: episode {ep['episode'][:12]} attempt {len(ep['attempts'])} of "
+                       f"{REPAIR_BOUND} ({commit[:12]} repairs {red[:12]})")
+        raise GuardError(f"repair action {action!r} is not attempt, close, or status")
 
 
 def _powershell() -> str | None:
@@ -705,6 +757,29 @@ def _self_test() -> int:
         except GuardError as exc:
             check("end-refuses-another-session", "belongs to session" in str(exc), str(exc))
 
+    # D00 T04 §35: the repair episode survives a restart and refuses a fourth attempt.
+    with tempfile.TemporaryDirectory(prefix="campaign-repair-") as rtmp:
+        os.makedirs(os.path.join(rtmp, "build"))
+
+        def _repair_cli(*args: str) -> subprocess.CompletedProcess:
+            return subprocess.run([sys.executable, os.path.join(HERE, "campaign_guard.py"), "repair", *args,
+                                   "--root", rtmp], capture_output=True, text=True, encoding="utf-8")
+        outs = [_repair_cli("attempt", "--red", f"red{n}aaaaaaaaaaaa", "--commit", f"fix{n}aaaaaaaaaaaa")
+                for n in (1, 2, 3)]
+        check("repair-attempts-count-across-processes",
+              [o.returncode for o in outs] == [0, 0, 0] and "attempt 3 of 3" in outs[2].stdout
+              and "episode red1aaaaaaaa" in outs[2].stdout, str([o.stdout for o in outs]))
+        st = _repair_cli("status")
+        check("repair-status-reads-the-persisted-episode", "3 of 3 attempts used" in st.stdout, st.stdout)
+        fourth = _repair_cli("attempt", "--red", "red4aaaaaaaaaaaa", "--commit", "fix4aaaaaaaaaaaa")
+        check("repair-refuses-a-fourth-attempt-after-a-restart",
+              fourth.returncode == 1 and "bound is exhausted, escalate" in fourth.stderr, fourth.stderr)
+        closed = _repair_cli("close", "--green", "green1aaaaaaaaaa")
+        again = _repair_cli("attempt", "--red", "red5aaaaaaaaaaaa", "--commit", "fix5aaaaaaaaaaaa")
+        check("repair-close-opens-a-fresh-episode",
+              "closed green" in closed.stdout and again.returncode == 0 and "attempt 1 of 3" in again.stdout,
+              f"{closed.stdout} {again.stdout}")
+
     # D00 T04 §34: the runner's contract routes through these commands.
     plan_skill = os.path.normpath(os.path.join(HERE, "..", ".claude", "skills", "process-plan", "SKILL.md"))
     try:
@@ -744,6 +819,13 @@ def main(argv: list[str]) -> int:
         print(__doc__.split("\n\n")[1], file=sys.stderr)
         return 2
     try:
+        if argv[0] == "repair" and len(argv) >= 2:
+            ropts = _opts(argv[2:])
+            rroot = ropts.pop("root", REPO)
+            code, line = repair(rroot, argv[1], ropts.get("red", ""), ropts.get("commit", ""),
+                                ropts.get("green", ""))
+            print(line, file=sys.stdout if code == 0 else sys.stderr)
+            return code
         opts = _opts(argv[1:])
         root = opts.pop("root", REPO)
         if argv[0] == "acquire":

@@ -1230,54 +1230,260 @@ def summarize_failed_log(text: str, limit: int = 20) -> tuple[list[str], list[st
     return steps, picked
 
 
-def workflow_step_commands(text: str | None) -> list[tuple[str, str]]:
-    """(step name, `run:` command) for every run step of a workflow's text,
-    in file order. Read line by line like the path filter (no YAML
-    dependency): `- name:` names the next step, `run:` carries one line or
-    a `|`/`>` block. An unnamed run step takes GitHub's default name,
-    `Run <first command line>`."""
-    out: list[tuple[str, str]] = []
+class ScalarRefused(ValueError):
+    """A `run:` value in a YAML form the decoder does not support."""
+
+
+_DQ_ESCAPES = {"0": "\0", "a": "\a", "b": "\b", "t": "\t", "\t": "\t", "n": "\n", "v": "\v",
+               "f": "\f", "r": "\r", "e": "\x1b", " ": " ", '"': '"', "/": "/", "\\": "\\",
+               "N": "\x85", "_": "\xa0", "L": " ", "P": " "}
+
+
+def _decode_double(body: str) -> str:
+    out: list[str] = []
+    i = 0
+    while i < len(body):
+        c = body[i]
+        if c == "\\":
+            if i + 1 >= len(body):
+                raise ScalarRefused("a dangling escape in a double-quoted scalar")
+            n = body[i + 1]
+            if n in _DQ_ESCAPES:
+                out.append(_DQ_ESCAPES[n])
+                i += 2
+                continue
+            width = {"x": 2, "u": 4, "U": 8}.get(n)
+            digits = body[i + 2:i + 2 + width] if width else ""
+            if not width or len(digits) != width or any(d not in "0123456789abcdefABCDEF" for d in digits):
+                raise ScalarRefused(f"an unknown escape \\{n} in a double-quoted scalar")
+            out.append(chr(int(digits, 16)))
+            i += 2 + width
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
+def _inline_scalar(value: str) -> str:
+    """One-line `run:` value: plain, single-quoted, or double-quoted."""
+    if not value:
+        raise ScalarRefused("an empty run: value")
+    if value[0] in "&*!%@`{[":
+        raise ScalarRefused(f"YAML syntax the decoder does not read ({value[0]!r})")
+    if value[0] == '"':
+        i = 1
+        while i < len(value):
+            if value[i] == "\\":
+                i += 2
+                continue
+            if value[i] == '"':
+                break
+            i += 1
+        else:
+            raise ScalarRefused("a multi-line double-quoted scalar")
+        rest = value[i + 1:].strip()
+        if rest and not rest.startswith("#"):
+            raise ScalarRefused("text after a closing quote")
+        return _decode_double(value[1:i])
+    if value[0] == "'":
+        i = 1
+        while i < len(value):
+            if value[i] == "'":
+                if i + 1 < len(value) and value[i + 1] == "'":
+                    i += 2
+                    continue
+                break
+            i += 1
+        else:
+            raise ScalarRefused("a multi-line single-quoted scalar")
+        rest = value[i + 1:].strip()
+        if rest and not rest.startswith("#"):
+            raise ScalarRefused("text after a closing quote")
+        return value[1:i].replace("''", "'")
+    m = re.search(r"\s#", value)
+    return (value[:m.start()] if m else value).rstrip()
+
+
+_BLOCK_HEADER = re.compile(r"\A([|>])(?:([+-])([1-9])?|([1-9])([+-])?)?\s*(?:#.*)?\Z")
+
+
+def _block_scalar(header: re.Match, lines: list[str], key_col: int) -> str:
+    """A literal (`|`) or folded (`>`) block, with its chomping (`-`, `+`)
+    and optional indentation indicator, decoded per YAML 1.2."""
+    style = header.group(1)
+    chomp = header.group(2) or header.group(5) or ""
+    digit = header.group(3) or header.group(4)
+    if any("\t" in ln[:len(ln) - len(ln.lstrip(" \t"))] for ln in lines):
+        raise ScalarRefused("a tab in a block scalar's indentation")
+    if digit:
+        indent = key_col + int(digit)
+    else:
+        first = next((ln for ln in lines if ln.strip()), "")
+        indent = len(first) - len(first.lstrip(" "))
+    body: list[str] = []
+    for ln in lines:
+        if ln.strip() and len(ln) - len(ln.lstrip(" ")) < indent:
+            raise ScalarRefused("a block line indented less than its block")
+        body.append(ln[indent:] if len(ln) >= indent else "")
+    trailing = 0
+    while body and body[-1] == "":
+        body.pop()
+        trailing += 1
+    if style == "|":
+        text = "\n".join(body)
+    else:
+        text, prev, empties = "", None, 0
+        for ln in body:
+            if ln == "":
+                empties += 1
+                continue
+            more = ln[:1] in (" ", "\t")
+            if prev is None:
+                text += "\n" * empties + ln
+            elif prev == "text" and not more:
+                text += ("\n" * empties if empties else " ") + ln
+            else:
+                text += "\n" + "\n" * empties + ln
+            prev, empties = ("more" if more else "text"), 0
+    if not body:
+        return "\n" * trailing if chomp == "+" else ""
+    if chomp == "-":
+        return text
+    if chomp == "+":
+        return text + "\n" + "\n" * trailing
+    return text + "\n"
+
+
+def workflow_steps(text: str | None) -> list[dict]:
+    """Every run step of a workflow's text, in file order, as
+    {"name", "run", "refused", "context"}: `run` is the command GitHub
+    executes, decoded from the YAML scalar (plain, single-quoted,
+    double-quoted with escapes, literal or folded blocks with chomping
+    and an indentation indicator), and `refused` names why a form this
+    decoder does not read was not guessed at (D00 T04 §35). `context`
+    carries what the command depends on beyond its text: the step's
+    `shell`, `working-directory`, and plain `env`, plus the reason a
+    local re-run cannot reproduce it (`${{ }}` expressions, matrix
+    values, workflow or job `env` and `defaults`). Read line by line,
+    because the tree carries no YAML dependency: the subset is the
+    step-list shape GitHub workflows use, and anything else refuses."""
+    out: list[dict] = []
     if not text:
         return out
     lines = text.splitlines()
-    name = None
+    global_reasons: list[str] = []
+    for ln in lines:
+        s = ln.strip()
+        if s.startswith("defaults:") and "the workflow sets run defaults" not in global_reasons:
+            global_reasons.append("the workflow sets run defaults")
+        if re.match(r"\A(env|  env):\s*$", ln) or re.match(r"\A    env:\s*$", ln):
+            if "the workflow or job sets env" not in global_reasons:
+                global_reasons.append("the workflow or job sets env")
     i = 0
     while i < len(lines):
         line = lines[i]
-        stripped = line.strip()
-        body = stripped[2:].strip() if stripped.startswith("- ") else stripped
-        if stripped.startswith("- "):
-            name = None
-        if body.startswith("name:"):
-            name = body[5:].strip().strip("'\"")
-        elif body.startswith("run:"):
-            value = body[4:].strip()
-            if value in ("|", ">", "|-", ">-"):
-                # The block belongs to the `run:` key, whose column sits
-                # past a list dash on a `- run: |` line: a sibling key at
-                # that column (`shell:`, `env:`) ends the block (D00 T04
-                # §33 panel round 2).
-                indent = len(line) - len(line.lstrip()) + (2 if stripped.startswith("- ") else 0)
-                block: list[str] = []
-                i += 1
-                while i < len(lines) and (not lines[i].strip()
-                                          or len(lines[i]) - len(lines[i].lstrip()) > indent):
-                    block.append(lines[i].rstrip())
-                    i += 1
-                # Dedent by the block's own indentation, keeping each line's
-                # relative indent: a Python block or heredoc re-runs as
-                # written (D00 T04 §33 panel round 1).
-                while block and not block[-1].strip():
-                    block.pop()
-                body = [ln for ln in block if ln.strip()]
-                cut = min((len(ln) - len(ln.lstrip()) for ln in body), default=0)
-                value = "\n".join(ln[cut:] for ln in block)
-                i -= 1
-            first = value.splitlines()[0] if value else ""
-            out.append((name or f"Run {first}", value))
-            name = None
-        i += 1
+        stripped = line.lstrip(" ")
+        if not stripped.startswith("- ") or ":" not in stripped:
+            i += 1
+            continue
+        dash = len(line) - len(stripped)
+        key_col = dash + 2
+        # One step: the dash line plus every following line indented past the dash.
+        j = i + 1
+        while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip(" ")) > dash):
+            j += 1
+        step = [" " * key_col + stripped[2:]] + lines[i + 1:j]
+        keys: dict[str, tuple[str, list[str]]] = {}
+        k = 0
+        while k < len(step):
+            ln = step[k]
+            ind = len(ln) - len(ln.lstrip(" "))
+            m = re.match(r"\A([A-Za-z_-]+):(?:\s+(.*))?\Z", ln.strip()) if ind == key_col else None
+            if not m:
+                k += 1
+                continue
+            child: list[str] = []
+            k += 1
+            while k < len(step) and (not step[k].strip() or len(step[k]) - len(step[k].lstrip(" ")) > key_col):
+                child.append(step[k])
+                k += 1
+            keys[m.group(1)] = ((m.group(2) or "").strip(), child)
+        if "run" not in keys:
+            i = j
+            continue
+        value, child = keys["run"]
+        refused, run = None, None
+        try:
+            header = _BLOCK_HEADER.match(value)
+            if header:
+                run = _block_scalar(header, child, key_col)
+            else:
+                if any(c.strip() for c in child):
+                    raise ScalarRefused("a multi-line plain or quoted scalar")
+                run = _inline_scalar(value)
+        except ScalarRefused as exc:
+            refused = str(exc)
+        name_value = keys.get("name", ("", []))[0]
+        try:
+            name = _inline_scalar(name_value) if name_value else ""
+        except ScalarRefused:
+            name = name_value
+        if not name:
+            first = (run or value).splitlines()[0] if (run or value) else ""
+            name = f"Run {first}"
+        ctx: dict = {"shell": None, "working-directory": None, "env": {}, "cannot": list(global_reasons)}
+        for key in ("shell", "working-directory"):
+            if key in keys:
+                try:
+                    ctx[key] = _inline_scalar(keys[key][0])
+                except ScalarRefused as exc:
+                    ctx["cannot"].append(f"its {key} ({exc})")
+        if "env" in keys:
+            for ln in keys["env"][1]:
+                m = re.match(r"\A\s*([A-Za-z_][A-Za-z0-9_]*):\s*(.*)\Z", ln)
+                if not m:
+                    continue
+                try:
+                    ctx["env"][m.group(1)] = _inline_scalar(m.group(2).strip())
+                except ScalarRefused as exc:
+                    ctx["cannot"].append(f"env {m.group(1)} ({exc})")
+        blob = " ".join([run or ""] + [str(v) for v in ctx["env"].values()]
+                        + [ctx["working-directory"] or "", ctx["shell"] or ""])
+        if "${{" in blob:
+            ctx["cannot"].append("it uses ${{ }} expressions (matrix, secrets, or context values)")
+        out.append({"name": name, "run": run, "refused": refused, "context": ctx})
+        i = j
     return out
+
+
+def workflow_step_commands(text: str | None) -> list[tuple[str, str]]:
+    """(step name, decoded command) for every run step the decoder reads."""
+    return [(s["name"], s["run"].rstrip("\n")) for s in workflow_steps(text) if s["run"] is not None]
+
+
+def rerun_lines(step: dict, at: str) -> list[str]:
+    """How `ci-wait` presents one step for a local re-run: the command
+    with its context, or a refusal naming why it cannot be given
+    (D00 T04 §35: never a guessed command)."""
+    head = f"ci-wait: rerun locally at {at}: {step['name']}:"
+    if step["refused"]:
+        return [f"{head} unsupported run: form ({step['refused']}), read the workflow"]
+    ctx = step["context"]
+    if ctx["cannot"]:
+        return [f"{head} cannot reproduce locally: {'; '.join(ctx['cannot'])}"]
+    prefix = []
+    if ctx["working-directory"]:
+        prefix.append(f"cd {ctx['working-directory']} &&")
+    prefix += [f"{k}={v}" for k, v in ctx["env"].items()]
+    shell = ctx["shell"] or "bash --noprofile --norc -eo pipefail {0}"
+    cmd = step["run"].rstrip("\n")
+    if "\n" not in cmd:
+        return [f"{head} {' '.join(prefix + [cmd])}", f"ci-wait: |   (shell: {shell}; earlier steps assumed run)"]
+    rows = [f"{head} the script below, as written"]
+    rows.append(f"ci-wait: |   (shell: {shell}; earlier steps assumed run"
+                + (f"; first: {' '.join(prefix)}" if prefix else "") + ")")
+    rows += [f"ci-wait: |   {ln}" for ln in cmd.split("\n")]
+    return rows
 
 
 # A red whose cause lives outside the tree: the runner or the platform
@@ -1292,14 +1498,28 @@ _PLATFORM_RE = re.compile(
 NO_JOB = "the workflow file (the run started no job)"
 
 
+# Lines that follow whatever ended the job and say nothing about why:
+# a cancellation after a shutdown, the generic exit-code line.
+_NEUTRAL_RE = re.compile(r"(?i)the operation was canceled|process completed with exit code")
+
+
 def classify_red(steps: list[str], lines: list[str]) -> str:
     """One `cause:` line for a red run, by cause rather than by step name:
     a repository-controlled step (the workflow file, a pinned action, a
     setup script, the repository's own commands) is repairable even when
     it failed during job setup; only a runner or platform fault
-    escalates (D00 T04 §33)."""
-    hit = next((ln for ln in lines if _PLATFORM_RE.search(ln)), None)
-    if hit is not None:
+    escalates (D00 T04 §33). When both appear, the signal that ended the
+    job decides: the last platform line against the last repository
+    error, cancellation and exit-code lines counting as neither (D00 T04
+    §35)."""
+    last_platform = last_repo = None
+    hit = None
+    for idx, ln in enumerate(lines):
+        if _PLATFORM_RE.search(ln):
+            last_platform, hit = idx, ln
+        elif _LOG_SIGNAL_RE.search(ln) and not _NEUTRAL_RE.search(ln):
+            last_repo = idx
+    if last_platform is not None and (last_repo is None or last_platform > last_repo):
         return f"ci-wait: cause: platform fault, escalate ({hit[:160]})"
     if not steps and not lines:
         return ("ci-wait: cause: unknown (no step or log evidence); re-run the workflow's "
@@ -1321,6 +1541,18 @@ def _gh_text(args: list[str]) -> tuple[bool, str]:
         reason = " ".join(proc.stderr.split())[:200] or "no stderr"
         return False, f"gh exited {proc.returncode}: {reason}"
     return True, proc.stdout
+
+
+def workflow_file_issue(run_id: str, conclusion: str | None = None) -> bool:
+    """GitHub's own evidence that a zero-job run failed to load its
+    workflow: a `startup_failure` conclusion, or `gh run view` saying the
+    run likely failed because of a workflow file issue (probed 2026-09-25
+    on the D00 T04 §33 drill's YAML error, whose conclusion read
+    `failure`)."""
+    if conclusion == "startup_failure":
+        return True
+    ok, text = _gh_text(["run", "view", run_id])
+    return ok and "workflow file issue" in text
 
 
 def failed_job_steps(run_id: str) -> list[str] | None:
@@ -1348,7 +1580,7 @@ def failed_job_steps(run_id: str) -> list[str] | None:
 
 
 def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
-                      workflow_text: str | None = None) -> str:
+                      workflow_text: str | None = None, conclusion: str | None = None) -> str:
     """The failing steps, a bounded excerpt, and the cause of a red run.
     When the failed-step log cannot be fetched the report falls back to
     the full log, then to the workflow's own command for each failing
@@ -1389,25 +1621,28 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         return "\n".join(rows)
     rows.append(f"ci-wait: full log unavailable too ({full if not ok_full else 'it carries no lines'})")
     if failing == [NO_JOB]:
-        rows.append("ci-wait: the run started no job: GitHub could not load the workflow file "
-                    "at the pushed commit; check its syntax locally")
-        rows.append(classify_red(failing, []))
+        # A zero-job run reads repairable only on GitHub's own evidence
+        # that the workflow file failed to load (D00 T04 §35).
+        if workflow_file_issue(run_id, conclusion):
+            rows.append("ci-wait: the run started no job: GitHub could not load the workflow file "
+                        "at the pushed commit; check its syntax locally")
+            rows.append(classify_red(failing, []))
+        else:
+            rows.append("ci-wait: the run started no job and GitHub names no workflow-file issue")
+            rows.append("ci-wait: cause: unknown (no step, log, or workflow-file evidence); "
+                        "read the run page before repairing or escalating")
         return "\n".join(rows)
-    commands = workflow_step_commands(workflow_text)
+    steps = workflow_steps(workflow_text)
     names = [s.split(" / ", 1)[-1] for s in (failing or [])]
-    picked = [(n, c) for n, c in commands if n in names] if names else []
+    picked = [s for s in steps if s["name"] in names] if names else []
     at = sha[:12] if sha else "the pushed commit"
     if picked:
         rows.append(f"ci-wait: failing step(s): {'; '.join(failing)}")
     else:
         rows.append("ci-wait: failing step unknown; every run step of the workflow follows")
-        picked = commands
-    for n, c in picked:
-        if "\n" in c:
-            rows.append(f"ci-wait: rerun locally at {at}: {n}: the script below, as written")
-            rows += [f"ci-wait: |   {ln}" for ln in c.splitlines()]
-        else:
-            rows.append(f"ci-wait: rerun locally at {at}: {n}: {c}")
+        picked = steps
+    for step in picked:
+        rows += rerun_lines(step, at)
     if not picked:
         rows.append("ci-wait: the pushed commit's workflow names no run step to re-run")
     rows.append(classify_red(failing or [], []))
@@ -1419,8 +1654,9 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float,
                   workflow_text: str | None = None) -> tuple[int, str]:
     """Wait for `workflow`'s run on `sha` and return (exit, line): 0 green,
     1 red (any completed conclusion but success), 2 unverifiable (no gh,
-    no run by the deadline, a run still pending past the ceiling, or
-    unreadable output). `timeout` bounds the wait for a run to be listed;
+    no run listed by the deadline, or unreadable output), 3 a listed run
+    still queued or in progress past the ceiling (D00 T04 §35: slow, not
+    unreachable, and not red). `timeout` bounds the wait for a run to be listed;
     once one is listed and still queued or in progress, the wait extends
     to `ceiling` (D00 T04 §33: a slow run is not an unreachable one;
     None means the same as `timeout`). `gh run list --commit` matches
@@ -1458,14 +1694,39 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float,
                 line = f"ci-wait: {sha[:12]} {workflow} {verdict} {run.get('url', '')}".rstrip()
                 if verdict != "success" and run.get("databaseId"):
                     line += "\n" + failed_log_report(str(run["databaseId"]), sha=sha,
-                                                     workflow_text=workflow_text)
+                                                     workflow_text=workflow_text, conclusion=verdict)
                 return (0 if verdict == "success" else 1), line
             last = f"run {run.get('databaseId')} {run.get('status')}"
             seen = True
         now = time.monotonic()
-        if (seen and now >= listed_deadline) or (not seen and now >= deadline):
-            waited = int(listed_deadline - start) if seen else int(timeout)
-            return 2, f"ci-wait: {sha[:12]} {workflow} not concluded within {waited}s ({last})"
+        if seen and now >= listed_deadline:
+            return 3, (f"ci-wait: {sha[:12]} {workflow} still {run.get('status')} past the "
+                       f"{int(listed_deadline - start)}s ceiling (run {run.get('databaseId')}): "
+                       f"re-run ci-wait once, then escalate a queue that never drains")
+        if not seen and now >= deadline:
+            return 2, f"ci-wait: {sha[:12]} {workflow} not concluded within {int(timeout)}s ({last})"
+        time.sleep(interval)
+
+
+def expect_no_run_within(sha: str, workflow: str, timeout: float, interval: float) -> str | None:
+    """None when no run of `workflow` is listed for `sha` within `timeout`,
+    else a short description of the run that appeared (D00 T04 §35)."""
+    import json as _json
+    import time
+    deadline = time.monotonic() + timeout
+    while True:
+        ok, out = _gh_text(["run", "list", "--commit", sha, "--workflow", workflow,
+                            "--json", "status,conclusion,databaseId,headSha"])
+        if ok:
+            try:
+                runs = [r for r in _json.loads(out or "[]") if isinstance(r, dict)]
+            except ValueError:
+                runs = []
+            if runs:
+                r = runs[0]
+                return f"run {r.get('databaseId')} {r.get('status')} {r.get('conclusion') or ''}".strip()
+        if time.monotonic() >= deadline:
+            return None
         time.sleep(interval)
 
 
@@ -3035,6 +3296,13 @@ def _bundle_graph_line(candidate: dict) -> str:
         line += (f", {len(candidate['commits'])} declared commit(s) "
                  "within pair")
     return line
+
+
+# D00 T04 §35: the scalar forms and what GitHub decoded them to, read
+# from the disposable drill workflow's own log (run 36175449390, each
+# step's `shell: cat {0}` printing the script file GitHub wrote).
+SCALAR_ECHO_YML = 'name: scalar-echo\n\n# Disposable: the D00 T04 §35 scalar drill. Every step prints the script\n# file GitHub writes from its `run:` value (a custom shell `cat {0}`), so\n# the decoder\'s expected outputs come from GitHub, not from its author.\n# Lives only on the drill/d00-t04-s35 branch.\non:\n  push:\n    branches: [\'drill/**\']\n\njobs:\n  scalar-echo:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: plain\n        shell: cat {0}\n        run: python3 scripts/check.py --flag value\n      - name: plain with a comment\n        shell: cat {0}\n        run: make test # the comment is not part of the command\n      - name: single quoted\n        shell: cat {0}\n        run: \'echo \'\'it\'\'\'\'s\'\' && echo "#not a comment"\'\n      - name: double quoted\n        shell: cat {0}\n        run: "printf \'%s\\\\n\' \\"a\\\\tb\\" café \\\\\\\\path \\x41"\n      - name: literal clip\n        shell: cat {0}\n        run: |\n          first line\n            indented line\n          last line\n      - name: literal strip\n        shell: cat {0}\n        run: |-\n          alpha\n          beta\n      - name: literal keep\n        shell: cat {0}\n        run: |+\n          kept\n\n      - name: literal indentation indicator\n        shell: cat {0}\n        run: |2\n             three extra spaces\n            two extra spaces\n      - name: folded clip\n        shell: cat {0}\n        run: >\n          python3 scripts/long.py\n          --one --two\n\n          --after-a-blank\n      - name: folded more indented\n        shell: cat {0}\n        run: >-\n          folded start\n          continues here\n            kept as is\n            also kept\n          folds again\n          and joins\n      - run: |\n          echo unnamed step\n        shell: cat {0}\n'
+SCALAR_ECHO_GITHUB = {"plain": ["python3 scripts/check.py --flag value"], "plain with a comment": ["make test"], "single quoted": ["echo 'it''s' && echo \"#not a comment\""], "double quoted": ["printf '%s\\n' \"a\\tb\" caf\u00e9 \\\\path A"], "literal clip": ["first line", "  indented line", "last line"], "literal strip": ["alpha", "beta"], "literal keep": ["kept", ""], "literal indentation indicator": ["   three extra spaces", "  two extra spaces"], "folded clip": ["python3 scripts/long.py --one --two", "--after-a-blank"], "folded more indented": ["folded start continues here", "  kept as is", "  also kept", "folds again and joins"], "Run echo unnamed step": ["echo unnamed step"]}
 
 
 def _self_test() -> int:
@@ -5367,7 +5635,7 @@ def _self_test() -> int:
                 "sys.stdout.reconfigure(encoding='utf-8')\n"
                 "if sys.argv[1:3] == ['run', 'view']:\n"
                 "    if '--json' in sys.argv:\n"
-                "        if mode == 'nojobs':\n"
+                "        if mode in ('nojobs', 'nojobsbare'):\n"
                 "            print(json.dumps({'jobs': []}))\n"
                 "            sys.exit(0)\n"
                 "        if mode == 'nologall':\n"
@@ -5377,7 +5645,10 @@ def _self_test() -> int:
                 "            {'name': 'Self-test the TODO graph tool', 'conclusion': 'success'},\n"
                 "            {'name': 'Validate the TODO tree', 'conclusion': 'failure'}]}]}))\n"
                 "        sys.exit(0)\n"
-                "    if mode in ('nolog', 'nologall', 'nojobs') or (mode == 'fulllog' and '--log-failed' in sys.argv):\n"
+                "    if len(sys.argv) == 4:\n"
+                "        print('X run 9' + ('\\n\\nX This run likely failed because of a workflow file issue.' if mode == 'nojobs' else ''))\n"
+                "        sys.exit(0)\n"
+                "    if mode in ('nolog', 'nologall', 'nojobs', 'nojobsbare') or (mode == 'fulllog' and '--log-failed' in sys.argv):\n"
                 "        sys.stderr.write('HTTP 404: log expired for run 9\\n')\n"
                 "        sys.exit(1)\n"
                 "    if mode == 'fulllog':\n"
@@ -5388,6 +5659,16 @@ def _self_test() -> int:
                 "    if mode == 'emptylog':\n"
                 "        if '--log-failed' in sys.argv: sys.exit(0)\n"
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:55.2Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
+                "        sys.exit(0)\n"
+                "    if mode == 'mixedrepo':\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z lost communication with the server, reconnected')\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.1Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.2Z ##[error]Process completed with exit code 1.')\n"
+                "        sys.exit(0)\n"
+                "    if mode == 'mixedplatform':\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.1Z The runner has received a shutdown signal.')\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.2Z ##[error]The operation was canceled.')\n"
                 "        sys.exit(0)\n"
                 "    if mode == 'shutdowncancel':\n"
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z The runner has received a shutdown signal.')\n"
@@ -5416,7 +5697,7 @@ def _self_test() -> int:
                 "if mode == 'gherror':\n"
                 "    sys.stderr.write('HTTP 503: service unavailable\\n')\n"
                 "    sys.exit(1)\n"
-                "if mode in ('nolog', 'nologall', 'nojobs', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep', 'emptylog'): mode = 'failure'\n"
+                "if mode in ('nolog', 'nologall', 'nojobs', 'nojobsbare', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep', 'emptylog', 'mixedrepo', 'mixedplatform', 'nometa'): mode = 'failure'\n"
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
@@ -5427,7 +5708,7 @@ def _self_test() -> int:
         try:
             for mode, want, needle in (("success", 0, "plan-gates success https://x/9"),
                                        ("failure", 1, "plan-gates failure"),
-                                       ("pending", 2, "not concluded within 0s (run 7 in_progress)"),
+                                       ("pending", 3, "still in_progress past the 0s ceiling (run 7)"),
                                        ("none", 2, "no run listed yet")):
                 with open(state, "w", encoding="utf-8") as fh:
                     fh.write(mode)
@@ -5461,6 +5742,52 @@ def _self_test() -> int:
                   workflow_step_commands(dash_text) == [("Run make all", "make all\nmake test"),
                                                         ("Next", "echo next")],
                   str(workflow_step_commands(dash_text)))
+            # D00 T04 §35: every scalar form decodes to what GitHub itself
+            # wrote into the step's script file (run 36175449390).
+            decoded = {s["name"]: s for s in workflow_steps(SCALAR_ECHO_YML)}
+            for step_name, github_lines in SCALAR_ECHO_GITHUB.items():
+                got = decoded.get(step_name)
+                shown = (got or {}).get("run") or ""
+                shown = shown.split(chr(10))
+                if shown and shown[-1] == "":
+                    shown = shown[:-1]
+                ok = got is not None and got["refused"] is None and shown == github_lines
+                check(f"scalar-decodes-as-github: {step_name}", ok, f"{got!r} vs {github_lines!r}")
+            check("scalar-set-covers-every-github-step", set(decoded) == set(SCALAR_ECHO_GITHUB),
+                  f"{sorted(decoded)} vs {sorted(SCALAR_ECHO_GITHUB)}")
+            # Chomping is exact beyond what a log line can show (YAML 1.2).
+            chomp = ("s:\n  - name: c\n    run: |\n      x\n\n  - name: s\n    run: |-\n      x\n\n"
+                     "  - name: k\n    run: |+\n      x\n\n  - name: fk\n    run: >+\n      a\n      b\n\n")
+            got = {s["name"]: s["run"] for s in workflow_steps(chomp)}
+            check("scalar-chomping-clip-strip-keep", got == {"c": "x\n", "s": "x", "k": "x\n\n", "fk": "a b\n\n"},
+                  repr(got))
+            for label, yml, why in (
+                    ("anchor", "s:\n  - name: a\n    run: &cmd make\n", "YAML syntax"),
+                    ("multi-line double", 's:\n  - name: a\n    run: "make\n      all"\n', "multi-line"),
+                    ("multi-line plain", "s:\n  - name: a\n    run: make\n      all\n", "multi-line"),
+                    ("unknown escape", 's:\n  - name: a\n    run: "a\\qb"\n', "unknown escape"),
+                    ("flow sequence", "s:\n  - name: a\n    run: [make, all]\n", "YAML syntax")):
+                step = workflow_steps(yml)[0]
+                check(f"scalar-refuses: {label}", step["run"] is None and why in (step["refused"] or ""),
+                      repr(step))
+                line = rerun_lines(step, "abc")[0]
+                check(f"rerun-refuses-unsupported: {label}",
+                      line.startswith("ci-wait: rerun locally at abc: a: unsupported run: form (")
+                      and line.endswith("), read the workflow"), line)
+            ctx_yml = ("jobs:\n  j:\n    steps:\n      - name: ctx\n        working-directory: tools\n"
+                       "        env:\n          MODE: fast\n        run: make check\n"
+                       "      - name: expr\n        run: echo ${{ matrix.os }}\n"
+                       "      - name: envexpr\n        env:\n          T: ${{ secrets.T }}\n        run: make\n")
+            steps_ctx = {s["name"]: s for s in workflow_steps(ctx_yml)}
+            check("rerun-prints-its-context",
+                  rerun_lines(steps_ctx["ctx"], "abc")[0]
+                  == "ci-wait: rerun locally at abc: ctx: cd tools && MODE=fast make check", str(rerun_lines(steps_ctx["ctx"], "abc")))
+            check("rerun-refuses-expressions",
+                  "cannot reproduce locally: it uses ${{ }} expressions" in rerun_lines(steps_ctx["expr"], "abc")[0]
+                  and "cannot reproduce locally" in rerun_lines(steps_ctx["envexpr"], "abc")[0])
+            wf_env = "env:\n  X: 1\njobs:\n  j:\n    steps:\n      - name: a\n        run: make\n"
+            check("rerun-refuses-workflow-env",
+                  "cannot reproduce locally: the workflow or job sets env" in rerun_lines(workflow_steps(wf_env)[0], "abc")[0])
             check("workflow-step-commands-parsed",
                   workflow_step_commands(plan_text) == [
                       ("Self-test the TODO graph tool", "python3 scripts/todo-graph.py self-test"),
@@ -5488,6 +5815,17 @@ def _self_test() -> int:
                   code == 1 and "the run started no job" in line
                   and "cause: repairable (repository-controlled: the workflow file (the run started no job))" in line
                   and "rerun locally" not in line, line)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("nojobsbare")
+            code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
+            check("ci-wait-zero-jobs-without-evidence-reads-unknown",
+                  code == 1 and "GitHub names no workflow-file issue" in line and "cause: unknown" in line
+                  and "cause: repairable" not in line, line)
+            for mode, want in (("mixedrepo", "cause: repairable"), ("mixedplatform", "cause: platform fault")):
+                with open(state, "w", encoding="utf-8") as fh:
+                    fh.write(mode)
+                code, line = ci_conclusion(c1, "plan-gates", 0, 0)
+                check(f"ci-wait-mixed-cause-the-ending-signal-decides: {mode}", code == 1 and want in line, line)
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("fulllog")
             code, line = ci_conclusion(c1, "plan-gates", 0, 0, workflow_text=plan_text)
@@ -5645,6 +5983,26 @@ def _self_test() -> int:
                   got_ow.returncode == 0 and "not triggered" in got_ow.stdout
                   and "edits the workflow" not in got_ow.stderr,
                   f"exit={got_ow.returncode} out={got_ow.stdout!r} err={got_ow.stderr!r}")
+            got_enr = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
+                                      "--expect-no-run", "trigger retired by the operator"],
+                                     cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-expect-no-run-passes-on-silence",
+                  got_enr.returncode == 0 and "started no run within 0s, as the operator expected" in got_enr.stdout,
+                  f"exit={got_enr.returncode} out={got_enr.stdout!r} err={got_enr.stderr!r}")
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("success")
+            got_enr2 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
+                                       "--expect-no-run", "trigger retired by the operator"],
+                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-expect-no-run-fails-when-a-run-appears",
+                  got_enr2.returncode == 1 and "ran after all" in got_enr2.stderr, got_enr2.stderr)
+            got_enr3 = subprocess.run([sys.executable, me, "ci-wait", c4, "--timeout", "0", "--interval", "0",
+                                       "--expect-no-run", "x"],
+                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-expect-no-run-refuses-a-range-that-keeps-the-workflow",
+                  got_enr3.returncode == 2 and "needs a range that edits" in got_enr3.stderr, got_enr3.stderr)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("none")
             check("ci-wait-escalates-when-an-edited-workflow-never-runs",
                   got_wfn.returncode == 2 and "escalate" in got_wfn.stderr,
                   f"exit={got_wfn.returncode} err={got_wfn.stderr!r}")
@@ -5685,6 +6043,8 @@ def _self_test() -> int:
             ("skill-ci-repair-owner", "Every repair commit has an owner"),
             ("skill-ci-cause-rule", "the cause decides, not the step's name"),
             ("skill-ci-slow-run", "a slow run is not an unreachable one"),
+            ("skill-ci-ceiling-exit", "`ci-wait` exit 3 means it stayed pending past the ceiling"),
+            ("skill-ci-episode-persists", "python scripts/campaign_guard.py repair attempt --red"),
             ("skill-ci-escalation-ends-run", "--reason escalation` and `CronDelete` of the heartbeat it names"),
             ("skill-ci-escalation", "escalates to the operator only for a cause the tree cannot fix"),
             ("skill-ci-continue", "On green, with any reopened section re-stamped, it continues with the next section in the same turn"),
@@ -6543,6 +6903,7 @@ if __name__ == "__main__":
     if len(sys.argv) >= 3 and sys.argv[1] == "ci-wait":
         # ci-wait <sha> [--since <base>] [--workflow W] [--workflow-file F]
         #         [--workflow-path P] [--timeout S] [--ceiling S] [--interval S]
+        #         [--expect-no-run REASON]
         # (D00 T04 §30): read CI back after a push; a red is repaired, not
         # waited on (D00 T04 §31). A
         # push whose changed paths miss the workflow's path filter starts
@@ -6553,6 +6914,7 @@ if __name__ == "__main__":
         rest = sys.argv[2:]
         sha_arg, workflow, timeout, interval = rest[0], "plan-gates", 900.0, 15.0
         ceiling = 3600.0
+        expect_no_run = None
         retry_wait = 60.0
         since = None
         wf_file = None
@@ -6572,6 +6934,8 @@ if __name__ == "__main__":
                     timeout = float(rest[i + 1])
                 elif rest[i] == "--ceiling":
                     ceiling = float(rest[i + 1])
+                elif rest[i] == "--expect-no-run":
+                    expect_no_run = rest[i + 1]
                 elif rest[i] == "--interval":
                     interval = float(rest[i + 1])
                 elif rest[i] == "--retry-wait":
@@ -6609,6 +6973,22 @@ if __name__ == "__main__":
                     wf_text = fh.read()
             except OSError:
                 pass
+        if expect_no_run is not None:
+            # An operator-authorized workflow retirement or trigger change:
+            # the range must edit the workflow, and only silence passes
+            # (D00 T04 §35).
+            if not touches_workflow:
+                print(f"ci-wait: --expect-no-run needs a range that edits {wf_path}; this one does not",
+                      file=sys.stderr)
+                sys.exit(2)
+            appeared = expect_no_run_within(ident[0], workflow, timeout, interval)
+            if appeared:
+                print(f"ci-wait: {ident[0][:12]} {workflow} ran after all ({appeared}): the no-run "
+                      f"expectation ({expect_no_run}) was wrong; read the run", file=sys.stderr)
+                sys.exit(1)
+            print(f"ci-wait: {ident[0][:12]} {workflow} started no run within {int(timeout)}s, as the "
+                  f"operator expected ({expect_no_run})")
+            sys.exit(0)
         if not touches_workflow and not push_triggers_workflow(changed, filters):
             print(f"ci-wait: {ident[0][:12]} {workflow} not triggered "
                   f"({len(changed)} changed path(s), none in the workflow's path filter)")
@@ -6624,6 +7004,8 @@ if __name__ == "__main__":
             if code == 2:
                 line += ("\nci-wait: still unverifiable after one retry: escalate "
                          "(GitHub, gh, or the runner is outside the tree)")
+        # Exit 3 (pending past the ceiling) is not retried here: the skills
+        # say to re-run ci-wait once and then escalate (D00 T04 §35).
         print(line, file=sys.stdout if code == 0 else sys.stderr)
         sys.exit(code)
     if len(sys.argv) == 4 and sys.argv[1] == "check-parents":
