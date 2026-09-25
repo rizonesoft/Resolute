@@ -96,6 +96,7 @@ track: W1
 |  36   |   §36   | Campaign guard lifecycle follow-ups            | §34 |  [x]   |
 |  37   |   §37   | CI read-back hardening                         | §35 |  [ ]   |
 |  38   |   §38   | Campaign guard identity and recovery           | §36 |  [ ]   |
+|  39   |   §39   | CI read-back and repair completeness           | §37 |  [ ]   |
 
 ---
 
@@ -1514,6 +1515,7 @@ The D00 T04 §35 review files what its contract does not own. Its sign-off round
 
 **Test checkpoint:** Unit test: `python scripts/review_prompt.py --self-test` and `python scripts/campaign_guard.py --self-test` carry the job-context, quoted-key, correlation, unknown-cause, `uses:`, episode-binding, idempotent-attempt, close-evidence, lost-state, ceiling-count, authorization, and redaction legs, quoted with the suite counts. Driven run with evidence: the execution-context echo workflow's run, quoted in a run file.
 
+-> XREF: D00 T04 §39 -- the hard-cap finding and plan-review findings filed after this section's review
 -> XREF: D00 T04 §38 -- the restore-identity finding from this section's review round 4
 -> XREF: D00 T04 §35 -- the CI read-back this section hardens, and the review findings it files
 -> SOURCE: panel-D00-T04-s35-2026-09-25-F10 D00-T04-S35-F10
@@ -1549,12 +1551,13 @@ The D00 T04 §36 review files what its contract does not own. Its sign-off round
 - [ ] Restore a lost repair episode with its original identity: `repair restore` binds the rebuilt episode to the caller's branch and workflow, so restoring the same journal elsewhere silently rebinds its attempts (panel round 4 of the D00 T04 §37 review, F17; needs D00 T04 §37 shipped). Done when: each attempt line the run file records carries the episode's repository, branch, and workflow, `restore` recovers them from the journal and refuses a caller whose identity differs, and a fixture restoring on another branch refuses, quoted.
 - [ ] Commit: `"workspace: campaign guard identity and recovery"`
 
-**Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the identity-fencing, duplicate-generation, cancellation-ownership, scoped-reconcile, interruption, legacy-migration, error-identity, handover-preservation, and coverage-summary legs, quoted with the suite count. Driven run with evidence: the startup-interruption drives and the health repair drive, each in a run file, quoted.
+**Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the identity-fencing, duplicate-generation, cancellation-ownership, scoped-reconcile, interruption, legacy-migration, error-identity, handover-preservation, coverage-summary, and restore-identity legs (the restore-identity legs refusing a cross-repository, cross-branch, cross-workflow, mixed, and legacy journal: **Corrected 2026-09-25** by the D00 T04 §37 plan review, PR17), quoted with the suite count. Driven run with evidence: the startup-interruption drives and the health repair drive, each in a run file, quoted.
 
 -> XREF: D00 T04 §36 -- the guard lifecycle this section hardens, and the review findings it files
 -> XREF: D00 T04 §37 -- the repair-episode restore whose identity one item binds
 -> SOURCE: panel-D00-T04-s36-2026-09-25-F11 D00-T04-S36-F11
 -> SOURCE: panel-D00-T04-s37-2026-09-25-F17 D00-T04-S37-F17
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR17 D00-T04-S37-PR17
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR1 D00-T04-S36-PR1
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR2 D00-T04-S36-PR2
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR3 D00-T04-S36-PR3
@@ -1569,6 +1572,42 @@ The D00 T04 §36 review files what its contract does not own. Its sign-off round
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR12 D00-T04-S36-PR12
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR13 D00-T04-S36-PR13
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR14 D00-T04-S36-PR14
+
+## 39. CI Read-Back and Repair Completeness
+
+The D00 T04 §37 review files what its contract does not own. Its hard-cap round (panel round 5, F19) found redaction still leaking a credential suffix after a comma or closing brace in a bare value (`API_TOKEN=abc,defghi` prints `***,defghi`); round 5 is the cap, so it files here as a major finding rather than shipping unreviewed code. GitHub masks registered secrets in its own logs, so the leak is in the defense-in-depth layer, which is why it is not stamp-invalidating. The D00 T04 §37 plan review (run 20260925-D00-T04-S37-astra) adds sixteen accepted findings here, grouped by the unit they harden; its seventeenth (PR17) extends D00 T04 §38's checkpoint.
+
+- [ ] Redact completely, and mark what redaction leaves incomplete: a bare value stops at `,` and `}`, a redacted `'***'` export still reads as a runnable command, and private-key masking depends on seeing the whole block (panel round 5 of the D00 T04 §37 review, F19 [major], and plan review PR14 and PR15; needs §37 shipped). Done when: a credential value is masked to its true end in shell, YAML, and JSON forms (commas, braces, and quotes inside the value), a re-run carrying a masked value is labelled incomplete and names the local inputs it needs, and fixtures cover multiline, escaped-newline, and truncated key blocks, quoted.
+- [ ] Prove close evidence and bind the episode to the campaign: `repair close` accepts a pasted green line, and the episode names a run-file path rather than the campaign run (plan review PR1 and PR2; needs §37 shipped). Done when: `close` re-reads the run from GitHub (repository, workflow, branch, run id, attempt, head sha) instead of trusting the line, and the episode carries the guard's run id, refusing a journal from another campaign, with fixtures for each mismatch, quoted.
+- [ ] Give the repair episode explicit boundaries and a crash-safe lifecycle: restore can resurrect a closed episode, state and journal writes can disagree after a crash, and a failed push leaves an attempt ambiguous (plan review PR3, PR4, and PR5; needs §37 shipped). Done when: the journal records open, attempt-reserved, attempt-pushed, abandoned, and closed transitions, restore reads only the open episode, and interruption fixtures between each state write and its journal line recover without losing or inventing an attempt, quoted.
+- [ ] Recover and identify the ceiling allowance: the allowance lives in a disposable file with no recovery and is keyed by run id alone (plan review PR6 and PR7; needs §37 shipped). Done when: the allowance is journalled beside the episode, a lost or corrupt record is detected and restored or escalated, and the key carries the repository and run attempt, a new attempt earning its own allowance, with fixtures, quoted.
+- [ ] Classify a red with several failures: correlation groups by textual job and step names only (plan review PR8; needs §37 shipped). Done when: jobs and steps are identified by id where GitHub provides one, matrix jobs keep distinct identities, several failing steps each get a cause line with a stated aggregation rule, and fixtures pin a matrix red and a two-cause red, quoted.
+- [ ] Qualify reproducibility and own Windows reproduction: `reproducible` says nothing about runner tools, operating system, or checkout revision, and the refused Windows shells leave the project's primary platform without a local fallback (plan review PR9 and PR10; needs §37 shipped). Done when: the label states what it does not cover (runner image, tools, revision), and a drill proves the pwsh and cmd templates on a Windows runner so they reproduce locally, or a dated decision records why they stay refused, quoted.
+- [ ] Tie authorized silence to the push and to the campaign: the no-run check proves the triggers changed, not that this push is excluded, and exit 4 has no campaign disposition (plan review PR11 and PR12; needs §37 shipped). Done when: the check evaluates the new triggers against the pushed event, branch, and paths and requires that they exclude it, the skills say how an authorized retirement ends or transfers an open repair episode, and fixtures pin an unrelated trigger edit and an open episode, quoted.
+- [ ] Write §35's final acceptance paragraph: D00 T04 §35 still documents exit 0 for authorized silence and the earlier repair command signatures (plan review PR13; needs §37 shipped). Done when: §35 carries a dated paragraph pointing at the current commands and outcomes in D00 T04 §37, its stamp and history untouched, quoted.
+- [ ] Keep the oracle's evidence durable: the scalar and context expectations came from workflows that lived only on deleted branches (plan review PR16; needs §37 shipped). Done when: the drill workflow definitions, the runner image and version, and the captured outputs live under `docs/captures/` with their run ids, and the self-test names that file, quoted.
+- [ ] Commit: `"workspace: CI read-back and repair completeness"`
+
+**Test checkpoint:** Unit test: `python scripts/review_prompt.py --self-test` and `python scripts/campaign_guard.py --self-test` carry the redaction, close-provenance, episode-lifecycle, ceiling-recovery, multi-failure, and push-exclusion legs, quoted with the suite counts. Driven run with evidence: the Windows shell drill (or its dated decision) and the durable oracle evidence under `docs/captures/`, quoted.
+
+-> XREF: D00 T04 §37 -- the read-back and repair episode this section completes, and the review findings it files
+-> SOURCE: panel-D00-T04-s37-2026-09-25-F19 D00-T04-S37-F19
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR1 D00-T04-S37-PR1
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR2 D00-T04-S37-PR2
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR3 D00-T04-S37-PR3
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR4 D00-T04-S37-PR4
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR5 D00-T04-S37-PR5
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR6 D00-T04-S37-PR6
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR7 D00-T04-S37-PR7
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR8 D00-T04-S37-PR8
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR9 D00-T04-S37-PR9
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR10 D00-T04-S37-PR10
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR11 D00-T04-S37-PR11
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR12 D00-T04-S37-PR12
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR13 D00-T04-S37-PR13
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR14 D00-T04-S37-PR14
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR15 D00-T04-S37-PR15
+-> SOURCE: plan-D00-T04-s37-2026-09-25-PR16 D00-T04-S37-PR16
 
 ## Verification
 
