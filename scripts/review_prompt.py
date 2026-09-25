@@ -1449,8 +1449,14 @@ def workflow_steps(text: str | None) -> list[dict]:
                 break
         for key in ("shell", "working-directory"):
             if key in keys:
+                value_k, child_k = keys[key]
+                # A block or multi-line value is refused, never read as its
+                # header (D00 T04 §35 panel round 1).
+                if _BLOCK_HEADER.match(value_k) or any(c.strip() for c in child_k):
+                    ctx["cannot"].append(f"its {key} is a block or multi-line value")
+                    continue
                 try:
-                    ctx[key] = _inline_scalar(keys[key][0])
+                    ctx[key] = _inline_scalar(value_k)
                 except ScalarRefused as exc:
                     ctx["cannot"].append(f"its {key} ({exc})")
         if "env" in keys:
@@ -1763,13 +1769,14 @@ def expect_no_run_within(sha: str, workflow: str, timeout: float,
                             "--json", "status,conclusion,databaseId,headSha"])
         if not ok:
             return "unverifiable", out
+        if not out.strip():
+            return "unverifiable", "gh printed nothing"
         try:
-            runs = _json.loads(out or "[]")
+            runs = _json.loads(out)
         except ValueError:
             return "unverifiable", f"gh output is not JSON: {out[:120]!r}"
-        if not isinstance(runs, list):
-            return "unverifiable", f"gh output is not a list: {out[:120]!r}"
-        runs = [r for r in runs if isinstance(r, dict)]
+        if not isinstance(runs, list) or not all(isinstance(r, dict) for r in runs):
+            return "unverifiable", f"gh output is not a list of runs: {out[:120]!r}"
         if runs:
             r = runs[0]
             return "appeared", f"run {r.get('databaseId')} {r.get('status')} {r.get('conclusion') or ''}".strip()
@@ -5742,6 +5749,11 @@ def _self_test() -> int:
                 "    open(count, 'w').write(str(n + 1))\n"
                 "    if mode == 'flaky': mode = 'none' if n == 0 else 'success'\n"
                 "    else: mode = 'pending' if n < 2 else 'success'\n"
+                "if mode == 'emptylist':\n"
+                "    sys.exit(0)\n"
+                "if mode == 'nullrun':\n"
+                "    print('[null]')\n"
+                "    sys.exit(0)\n"
                 "if mode == 'notjson':\n"
                 "    print('<html>rate limited</html>')\n"
                 "    sys.exit(0)\n"
@@ -5848,6 +5860,8 @@ def _self_test() -> int:
                                ("block env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env:\n          MODE: |\n            x\n        run: make\n"),
                                ("flow workflow env", "env: {X: 1}\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"),
                                ("unknown runner", "jobs:\n  j:\n    runs-on: ${{ matrix.os }}\n    steps:\n      - name: a\n        run: make\n"),
+                               ("block working-directory", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        working-directory: >-\n          tools\n        run: make\n"),
+                               ("block shell", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        shell: |\n          bash {0}\n        run: make\n"),
                                ("windows env", "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        env:\n          X: 1\n        run: make\n")):
                 got_r = rerun_lines(workflow_steps(yml)[0], "abc")[0]
                 check(f"rerun-refuses-unreadable-context: {label}", "cannot reproduce locally" in got_r, got_r)
@@ -6068,7 +6082,7 @@ def _self_test() -> int:
                                       cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
             check("ci-wait-expect-no-run-fails-when-a-run-appears",
                   got_enr2.returncode == 1 and "ran after all" in got_enr2.stderr, got_enr2.stderr)
-            for bad in ("gherror", "notjson"):
+            for bad in ("gherror", "notjson", "emptylist", "nullrun"):
                 with open(state, "w", encoding="utf-8") as fh:
                     fh.write(bad)
                 got_bad = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
