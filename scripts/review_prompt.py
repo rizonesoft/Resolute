@@ -1354,148 +1354,225 @@ def _block_scalar(header: re.Match, lines: list[str], key_col: int) -> str:
     return text + "\n"
 
 
+_KEY_RE = re.compile(r"""\A(?:"((?:[^"\\]|\\.)*)"|'((?:[^']|'')*)'|([A-Za-z_][A-Za-z0-9_.-]*))\s*:(?:\s+(.*))?\s*\Z""")
+
+
+def _mapping_key(stripped: str) -> tuple[str, str] | None:
+    """(key, inline value) of one mapping line, plain or quoted key alike
+    (D00 T04 §37: a quoted `"shell":` is the same key as `shell:`)."""
+    m = _KEY_RE.match(stripped)
+    if not m:
+        return None
+    if m.group(1) is not None:
+        key = _decode_double(m.group(1))
+    elif m.group(2) is not None:
+        key = m.group(2).replace("''", "'")
+    else:
+        key = m.group(3)
+    return key, (m.group(4) or "").strip()
+
+
+def _indent(line: str) -> int:
+    return len(line) - len(line.lstrip(" "))
+
+
+def _entries(lines: list[str], col: int) -> list[tuple[str, str, list[str], int]]:
+    """The mapping entries at column `col` of a block: (key, inline value,
+    child lines, index). A line at `col` that is not a key is recorded
+    under the key `?` so the caller can refuse the shape."""
+    out: list[tuple[str, str, list[str], int]] = []
+    k = 0
+    while k < len(lines):
+        ln = lines[k]
+        if not ln.strip() or ln.lstrip().startswith("#") or _indent(ln) != col:
+            k += 1
+            continue
+        kv = _mapping_key(ln.strip())
+        child: list[str] = []
+        j = k + 1
+        while j < len(lines) and (not lines[j].strip() or _indent(lines[j]) > col):
+            child.append(lines[j])
+            j += 1
+        out.append((kv[0], kv[1], child, k) if kv else ("?", ln.strip(), child, k))
+        k = j
+    return out
+
+
+def _first_col(lines: list[str]) -> int | None:
+    for ln in lines:
+        if ln.strip() and not ln.lstrip().startswith("#"):
+            return _indent(ln)
+    return None
+
+
+def _sequence_items(lines: list[str]) -> list[list[str]]:
+    """The items of a block sequence, each re-based so its mapping sits at
+    one column: the `- ` line's key moves to the item's key column."""
+    col = _first_col(lines)
+    if col is None:
+        return []
+    items: list[list[str]] = []
+    cur: list[str] | None = None
+    for ln in lines:
+        if ln.strip() and _indent(ln) == col and ln.lstrip().startswith("- "):
+            if cur is not None:
+                items.append(cur)
+            cur = [" " * (col + 2) + ln.lstrip()[2:]]
+        elif ln.strip() and _indent(ln) == col and ln.lstrip() == "-":
+            if cur is not None:
+                items.append(cur)
+            cur = []
+        elif cur is not None:
+            cur.append(ln)
+    if cur is not None:
+        items.append(cur)
+    return items
+
+
+def _scalar_of(value: str, child: list[str], key_col: int) -> str:
+    header = _BLOCK_HEADER.match(value)
+    if header:
+        return _block_scalar(header, child, key_col)
+    if any(c.strip() for c in child):
+        raise ScalarRefused("a multi-line plain or quoted scalar")
+    return _inline_scalar(value)
+
+
 def workflow_steps(text: str | None) -> list[dict]:
-    """Every run step of a workflow's text, in file order, as
-    {"name", "run", "refused", "context"}: `run` is the command GitHub
-    executes, decoded from the YAML scalar (plain, single-quoted,
-    double-quoted with escapes, literal or folded blocks with chomping
-    and an indentation indicator), and `refused` names why a form this
-    decoder does not read was not guessed at (D00 T04 §35). `context`
-    carries what the command depends on beyond its text: the step's
-    `shell`, `working-directory`, and plain `env`, plus the reason a
-    local re-run cannot reproduce it (`${{ }}` expressions, matrix
-    values, workflow or job `env` and `defaults`). Read line by line,
+    """Every step of a workflow's text, in file order, as {"name", "kind"
+    (run or uses), "run", "uses", "refused", "context", "job",
+    "earlier"}: `run` is the command GitHub executes, decoded from the
+    YAML scalar (plain, single-quoted, double-quoted with escapes,
+    literal or folded blocks with chomping and an indentation indicator),
+    and `refused` names why a form this decoder does not read was not
+    guessed at (D00 T04 §35). The workflow is read by structure, not by
+    scanning back from a step (D00 T04 §37): the top-level `jobs:`, each
+    job's own keys in any order (`runs-on`, `container`, `services`,
+    `env`, `defaults`, `steps`), and each step's keys, plain or quoted.
+    `context` carries what a command depends on beyond its text (the
+    step's `shell`, `working-directory`, and plain `env`, the job's
+    runner) and every reason a local re-run cannot reproduce it;
+    `earlier` names the steps before it in its job. Read line by line,
     because the tree carries no YAML dependency: the subset is the
-    step-list shape GitHub workflows use, and anything else refuses."""
+    workflow shape GitHub uses, and anything else refuses."""
     out: list[dict] = []
     if not text:
         return out
     lines = text.splitlines()
+    top_col = _first_col(lines)
+    top = _entries(lines, top_col) if top_col is not None else []
     global_reasons: list[str] = []
-    # Workflow and job keys sit left of every step list: an `env:` or
-    # `defaults:` there, in block or flow form, changes every step.
-    dashes = [len(ln) - len(ln.lstrip(" ")) for ln in lines if ln.lstrip(" ").startswith("- ")
-              and re.match(r"\A- (name|run|uses|id|if|shell|env|working-directory):", ln.lstrip(" "))]
-    step_col = min(dashes) if dashes else 10 ** 6
-    for ln in lines:
-        s = ln.strip()
-        ind = len(ln) - len(ln.lstrip(" "))
-        if ind >= step_col:
-            continue
-        if s.startswith("defaults:") and "the workflow sets run defaults" not in global_reasons:
-            global_reasons.append("the workflow sets run defaults")
-        if s.startswith("env:") and "the workflow or job sets env" not in global_reasons:
+    for key, _value, _child, _idx in top:
+        if key == "env" and "the workflow or job sets env" not in global_reasons:
             global_reasons.append("the workflow or job sets env")
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-        stripped = line.lstrip(" ")
-        if not stripped.startswith("- ") or ":" not in stripped:
-            i += 1
-            continue
-        dash = len(line) - len(stripped)
-        key_col = dash + 2
-        # One step: the dash line plus every following line indented past the dash.
-        j = i + 1
-        while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip(" ")) > dash):
-            j += 1
-        step = [" " * key_col + stripped[2:]] + lines[i + 1:j]
-        keys: dict[str, tuple[str, list[str]]] = {}
-        k = 0
-        while k < len(step):
-            ln = step[k]
-            ind = len(ln) - len(ln.lstrip(" "))
-            m = re.match(r"\A([A-Za-z_-]+):(?:\s+(.*))?\Z", ln.strip()) if ind == key_col else None
-            if not m:
-                k += 1
+        if key == "defaults" and "the workflow sets run defaults" not in global_reasons:
+            global_reasons.append("the workflow sets run defaults")
+    jobs_entry = next((e for e in top if e[0] == "jobs"), None)
+    if jobs_entry is not None:
+        job_lines = jobs_entry[2]
+        job_col = _first_col(job_lines)
+        jobs = [(k, v, c) for k, v, c, _i in _entries(job_lines, job_col)] if job_col is not None else []
+    else:
+        # No `jobs:` key: a bare step list under any top-level key (the
+        # fixtures' shape), with no job context to read.
+        jobs = [(k, "", c) for k, _v, c, _i in top]
+    for job_name, _job_value, job_child in jobs:
+        reasons = list(global_reasons)
+        runs_on = None
+        steps_block: list[str] = []
+        key_col = _first_col(job_child)
+        if jobs_entry is not None and key_col is not None:
+            for k, v, c, _i in _entries(job_child, key_col):
+                if k == "?":
+                    reasons.append("the job holds a line the decoder does not read")
+                elif k == "runs-on":
+                    try:
+                        runs_on = _scalar_of(v, c, key_col).strip()
+                    except ScalarRefused:
+                        runs_on = None
+                        reasons.append("its runs-on is a form the decoder does not read")
+                elif k in ("container", "services"):
+                    reasons.append("the job runs in a container, whose shell and filesystem are not the host's")
+                elif k in ("env", "defaults"):
+                    reasons.append("the workflow or job sets env" if k == "env" else "the job sets run defaults")
+                elif k == "steps":
+                    steps_block = c
+        else:
+            steps_block = job_child
+        earlier: list[str] = []
+        for item in _sequence_items(steps_block):
+            icol = _first_col(item)
+            entries = _entries(item, icol) if icol is not None else []
+            keys = {k: (v, c) for k, v, c, _i in entries}
+            step_reasons = list(reasons)
+            if "?" in keys or not entries:
+                name = item[0].strip() if item else "?"
+                out.append({"name": name, "kind": "run", "run": None, "uses": None,
+                            "refused": "a step shape the decoder does not read (a flow mapping or a scalar item)",
+                            "context": {"shell": None, "working-directory": None, "env": {}, "cannot": step_reasons,
+                                        "runs-on": runs_on}, "job": job_name, "earlier": list(earlier)})
+                earlier.append(name)
                 continue
-            child: list[str] = []
-            k += 1
-            while k < len(step) and (not step[k].strip() or len(step[k]) - len(step[k].lstrip(" ")) > key_col):
-                child.append(step[k])
-                k += 1
-            keys[m.group(1)] = ((m.group(2) or "").strip(), child)
-        if "run" not in keys:
-            i = j
-            continue
-        value, child = keys["run"]
-        refused, run = None, None
-        try:
-            header = _BLOCK_HEADER.match(value)
-            if header:
-                run = _block_scalar(header, child, key_col)
-            else:
-                if any(c.strip() for c in child):
-                    raise ScalarRefused("a multi-line plain or quoted scalar")
-                run = _inline_scalar(value)
-        except ScalarRefused as exc:
-            refused = str(exc)
-        name_value = keys.get("name", ("", []))[0]
-        try:
-            name = _inline_scalar(name_value) if name_value else ""
-        except ScalarRefused:
-            name = name_value
-        if not name:
-            first = (run or value).splitlines()[0] if (run or value) else ""
-            name = f"Run {first}"
-        ctx: dict = {"shell": None, "working-directory": None, "env": {}, "cannot": list(global_reasons),
-                     "runs-on": None}
-        # The job's runner decides the default shell: the nearest
-        # `runs-on:` above this step (D00 T04 §35 independent review).
-        for back in range(i - 1, -1, -1):
-            m_on = re.match(r"\A(\s*)runs-on:\s*(.*)\Z", lines[back])
-            if m_on:
-                ctx["runs-on"] = m_on.group(2).strip().strip("'\"")
-                # A job `container:` at the same column runs every step
-                # inside that image, where the default shell is `sh`: not
-                # reproducible as a host command (D00 T04 §35 panel round 2).
-                job_col = len(m_on.group(1))
-                top = back
-                while top > 0 and (not lines[top - 1].strip()
-                                   or len(lines[top - 1]) - len(lines[top - 1].lstrip(" ")) >= job_col):
-                    top -= 1
-                for ln_j in lines[top:i]:
-                    if len(ln_j) - len(ln_j.lstrip(" ")) == job_col and ln_j.strip().startswith(("container:", "services:")):
-                        ctx["cannot"].append("the job runs in a container, whose shell and filesystem are not the host's")
+            run, refused, uses = None, None, None
+            if "run" in keys:
+                try:
+                    run = _scalar_of(keys["run"][0], keys["run"][1], icol)
+                except ScalarRefused as exc:
+                    refused = str(exc)
+            if "uses" in keys:
+                try:
+                    uses = _scalar_of(keys["uses"][0], keys["uses"][1], icol).strip()
+                except ScalarRefused:
+                    uses = keys["uses"][0]
+            name_value = keys.get("name", ("", []))[0]
+            try:
+                name = _inline_scalar(name_value) if name_value else ""
+            except ScalarRefused:
+                name = name_value
+            if not name:
+                if uses:
+                    name = f"Run {uses}"
+                else:
+                    first_v = run or keys.get("run", ("", []))[0]
+                    name = f"Run {first_v.splitlines()[0] if first_v else ''}"
+            ctx: dict = {"shell": None, "working-directory": None, "env": {}, "cannot": step_reasons,
+                         "runs-on": runs_on}
+            for key in ("shell", "working-directory"):
+                if key in keys:
+                    value_k, child_k = keys[key]
+                    # A block or multi-line value is refused, never read as
+                    # its header (D00 T04 §35 panel round 1).
+                    if _BLOCK_HEADER.match(value_k) or any(c.strip() for c in child_k):
+                        ctx["cannot"].append(f"its {key} is a block or multi-line value")
+                        continue
+                    try:
+                        ctx[key] = _inline_scalar(value_k)
+                    except ScalarRefused as exc:
+                        ctx["cannot"].append(f"its {key} ({exc})")
+            if "env" in keys:
+                inline_env, env_lines = keys["env"]
+                if inline_env:
+                    ctx["cannot"].append("its env is a flow mapping or a single value the decoder does not read")
+                ecol = _first_col(env_lines)
+                for k2, v2, c2, _i2 in (_entries(env_lines, ecol) if ecol is not None else []):
+                    if k2 == "?" or not re.match(r"\A[A-Za-z_][A-Za-z0-9_]*\Z", k2):
+                        ctx["cannot"].append("its env holds a line the decoder does not read")
                         break
-                break
-        for key in ("shell", "working-directory"):
-            if key in keys:
-                value_k, child_k = keys[key]
-                # A block or multi-line value is refused, never read as its
-                # header (D00 T04 §35 panel round 1).
-                if _BLOCK_HEADER.match(value_k) or any(c.strip() for c in child_k):
-                    ctx["cannot"].append(f"its {key} is a block or multi-line value")
-                    continue
-                try:
-                    ctx[key] = _inline_scalar(value_k)
-                except ScalarRefused as exc:
-                    ctx["cannot"].append(f"its {key} ({exc})")
-        if "env" in keys:
-            inline_env, env_lines = keys["env"]
-            if inline_env:
-                ctx["cannot"].append("its env is a flow mapping or a single value the decoder does not read")
-            for ln in env_lines:
-                if not ln.strip():
-                    continue
-                m = re.match(r"\A\s*([A-Za-z_][A-Za-z0-9_]*):\s*(.*)\Z", ln)
-                if not m:
-                    ctx["cannot"].append("its env holds a line the decoder does not read")
-                    break
-                raw = m.group(2).strip()
-                if not raw or _BLOCK_HEADER.match(raw):
-                    ctx["cannot"].append(f"env {m.group(1)} is a block or empty value")
-                    continue
-                try:
-                    ctx["env"][m.group(1)] = _inline_scalar(raw)
-                except ScalarRefused as exc:
-                    ctx["cannot"].append(f"env {m.group(1)} ({exc})")
-        blob = " ".join([run or ""] + [str(v) for v in ctx["env"].values()]
-                        + [ctx["working-directory"] or "", ctx["shell"] or ""])
-        if "${{" in blob:
-            ctx["cannot"].append("it uses ${{ }} expressions (matrix, secrets, or context values)")
-        out.append({"name": name, "run": run, "refused": refused, "context": ctx})
-        i = j
+                    if not v2 or _BLOCK_HEADER.match(v2) or any(x.strip() for x in c2):
+                        ctx["cannot"].append(f"env {k2} is a block or empty value")
+                        continue
+                    try:
+                        ctx["env"][k2] = _inline_scalar(v2)
+                    except ScalarRefused as exc:
+                        ctx["cannot"].append(f"env {k2} ({exc})")
+            blob = " ".join([run or ""] + [str(v) for v in ctx["env"].values()]
+                            + [ctx["working-directory"] or "", ctx["shell"] or "", runs_on or ""])
+            if "${{" in blob:
+                ctx["cannot"].append("it uses ${{ }} expressions (matrix, secrets, or context values)")
+            out.append({"name": name, "kind": "uses" if uses and "run" not in keys else "run", "run": run,
+                        "uses": uses, "refused": refused, "context": ctx, "job": job_name,
+                        "earlier": list(earlier)})
+            earlier.append(name)
     return out
 
 
@@ -1509,6 +1586,9 @@ def rerun_lines(step: dict, at: str) -> list[str]:
     with its context, or a refusal naming why it cannot be given
     (D00 T04 §35: never a guessed command)."""
     head = f"ci-wait: rerun locally at {at}: {step['name']}:"
+    if step.get("kind") == "uses":
+        # An action step has no command of its own to re-run (D00 T04 §37).
+        return [f"{head} runs the action {step['uses']}; no local reproduction, read the action's log and inputs"]
     if step["refused"]:
         return [f"{head} unsupported run: form ({step['refused']}), read the workflow"]
     ctx = step["context"]
@@ -1524,20 +1604,34 @@ def rerun_lines(step: dict, at: str) -> list[str]:
             shell = "pwsh -command \". '{0}'\""
         else:
             reasons.append(f"the runner's default shell is unknown (runs-on: {ctx.get('runs-on') or 'not found'})")
+    # A named shell resolves to the template GitHub runs it with, so the
+    # printout names what actually executed (D00 T04 §37: an explicit
+    # `bash` adds --noprofile --norc and pipefail to the default's -e).
+    shell = {"bash": "bash --noprofile --norc -eo pipefail {0}", "sh": "sh -e {0}",
+             "pwsh": "pwsh -command \". '{0}'\"", "powershell": "powershell -command \". '{0}'\"",
+             "python": "python {0}", "cmd": "cmd /D /E:ON /V:OFF /S /C \"CALL \"{0}\"\""}.get(shell, shell) if shell else shell
     posix = shell is not None and shell.split()[0] in ("bash", "sh")
     if (ctx["env"] or ctx["working-directory"]) and not posix and not reasons:
         reasons.append(f"its env or working-directory needs a POSIX shell to render, and the step runs {shell}")
     if reasons:
         return [f"{head} cannot reproduce locally: {'; '.join(reasons)}"]
     cmd = step["run"].rstrip("\n")
+    # Reproducible only when nothing but a checkout precedes the step: any
+    # other earlier step may have prepared files, tools, or environment,
+    # and the printout says so (D00 T04 §37).
+    before = [e for e in step.get("earlier", []) if not re.match(r"\ARun actions/checkout@", e)]
+    label = ("reproducible: only a checkout precedes it" if not before
+             else f"diagnostic: earlier steps may have prepared files, tools, or environment ({'; '.join(before)})")
     if not ctx["env"] and not ctx["working-directory"] and "\n" not in cmd:
-        return [f"{head} {cmd}", f"ci-wait: |   (shell: {shell}; earlier steps assumed run)"]
+        return [f"{head} {cmd}", f"ci-wait: |   (shell: {shell}; {label})"]
     # The step's env reaches the whole script and every value is quoted,
     # as GitHub's step environment does (D00 T04 §35 independent review).
     q = lambda v: "'" + str(v).replace("'", "'\\''") + "'"
     rows = [f"{head} the script below, as written"]
-    rows.append(f"ci-wait: |   (shell: {shell}; earlier steps assumed run)")
-    rows += [f"ci-wait: |   export {k}={q(v)}" for k, v in ctx["env"].items()]
+    rows.append(f"ci-wait: |   (shell: {shell}; {label})")
+    rows += [f"ci-wait: |   export {k}={q('***' if _SECRET_NAME.search(k) else v)}"
+             + ("   # value masked: set it locally" if _SECRET_NAME.search(k) else "")
+             for k, v in ctx["env"].items()]
     if ctx["working-directory"]:
         rows.append(f"ci-wait: |   cd {q(ctx['working-directory'])}")
     rows += [f"ci-wait: |   {ln}" for ln in cmd.split("\n")]
@@ -1561,7 +1655,42 @@ NO_JOB = "the workflow file (the run started no job)"
 _NEUTRAL_RE = re.compile(r"(?i)the operation was canceled|process completed with exit code")
 
 
-def classify_red(steps: list[str], lines: list[str]) -> str:
+# Secret shapes masked in everything ci-wait prints, so a record that
+# quotes it never carries a credential (D00 T04 §37). GitHub's own `***`
+# masks pass through untouched.
+_SECRET_RES = (
+    (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"), "***"),
+    (re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"), "***"),
+    (re.compile(r"\bAKIA[0-9A-Z]{16}\b"), "***"),
+    (re.compile(r"\bxox[abprs]-[A-Za-z0-9-]{10,}\b"), "***"),
+    (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S), "***"),
+    (re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/-]{8,}=*"), r"\1***"),
+    (re.compile(r"(?i)\b((?:password|passwd|secret|token|api[_-]?key|client[_-]?secret)[=:]\s?)[^\s'\"]{4,}"), r"\1***"),
+)
+_SECRET_NAME = re.compile(r"(?i)(secret|token|passw|credential|private|api[_-]?key|auth)")
+
+
+def redact(text: str) -> str:
+    for pat, repl in _SECRET_RES:
+        text = pat.sub(repl, text)
+    return text
+
+
+def lines_by_step(text: str) -> dict[str, list[str]]:
+    """Normalized log lines grouped by their `job / step` column (lines
+    without one fall under the empty key)."""
+    out: dict[str, list[str]] = {}
+    for raw in text.splitlines():
+        parts = raw.split("\t", 2)
+        key = f"{parts[0]} / {parts[1]}" if len(parts) == 3 else ""
+        line = parts[2] if len(parts) == 3 else raw
+        line = _ANSI_RE.sub("", _LOG_TS_RE.sub("", line)).rstrip()
+        if line and not line.startswith("##[group]") and not line.startswith("##[endgroup]"):
+            out.setdefault(key, []).append(line)
+    return out
+
+
+def classify_red(steps: list[str], lines: list[str], by_step: dict[str, list[str]] | None = None) -> str:
     """One `cause:` line for a red run, by cause rather than by step name:
     a repository-controlled step (the workflow file, a pinned action, a
     setup script, the repository's own commands) is repairable even when
@@ -1570,6 +1699,18 @@ def classify_red(steps: list[str], lines: list[str]) -> str:
     job decides: the last platform line against the last repository
     error, cancellation and exit-code lines counting as neither (D00 T04
     §35)."""
+    if by_step:
+        # D00 T04 §37: correlate each signal with its step. A platform
+        # signal in one step and a repository error in another cannot say
+        # which ended the job, so the cause is unknown, never guessed.
+        plat = [s for s, ls in by_step.items() if any(_PLATFORM_RE.search(x) for x in ls)]
+        repo = [s for s, ls in by_step.items()
+                if any(_LOG_SIGNAL_RE.search(x) and not _NEUTRAL_RE.search(x) and not _PLATFORM_RE.search(x)
+                       for x in ls)]
+        if plat and repo and set(plat) != set(repo):
+            return (f"ci-wait: cause: unknown (a platform signal in {'; '.join(p or 'the job' for p in plat)} and a "
+                    f"repository error in {'; '.join(r or 'the job' for r in repo)}); gather the evidence the skills "
+                    f"name before repairing or escalating")
     last_platform = last_repo = None
     hit = None
     for idx, ln in enumerate(lines):
@@ -1654,7 +1795,7 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         steps, lines = summarize_failed_log(out, limit)
         rows = [f"ci-wait: failing step(s): {'; '.join(steps) if steps else 'not named by the log'}"]
         rows += [f"ci-wait: | {ln}" for ln in lines]
-        rows.append(classify_red(steps, normalized_log_lines(out)))
+        rows.append(classify_red(steps, normalized_log_lines(out), lines_by_step(out)))
         return "\n".join(rows)
     rows = [f"ci-wait: failed-step log unavailable ({out}); the run is still red"]
     failing = failed_job_steps(run_id)
@@ -1675,7 +1816,7 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         rows.append(f"ci-wait: full log read instead; {scope}: "
                     f"{'; '.join(steps) if steps else 'not named by the log'}")
         rows += [f"ci-wait: | {ln}" for ln in lines]
-        rows.append(classify_red(steps, normalized_log_lines("\n".join(kept))))
+        rows.append(classify_red(steps, normalized_log_lines("\n".join(kept)), lines_by_step("\n".join(kept))))
         return "\n".join(rows)
     rows.append(f"ci-wait: full log unavailable too ({full if not ok_full else 'it carries no lines'})")
     if failing == [NO_JOB]:
@@ -3370,6 +3511,15 @@ def _bundle_graph_line(candidate: dict) -> str:
 # step's `shell: cat {0}` printing the script file GitHub wrote).
 SCALAR_ECHO_YML = 'name: scalar-echo\n\n# Disposable: the D00 T04 §35 scalar drill. Every step prints the script\n# file GitHub writes from its `run:` value (a custom shell `cat {0}`), so\n# the decoder\'s expected outputs come from GitHub, not from its author.\n# Lives only on the drill/d00-t04-s35 branch.\non:\n  push:\n    branches: [\'drill/**\']\n\njobs:\n  scalar-echo:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: plain\n        shell: cat {0}\n        run: python3 scripts/check.py --flag value\n      - name: plain with a comment\n        shell: cat {0}\n        run: make test # the comment is not part of the command\n      - name: single quoted\n        shell: cat {0}\n        run: \'echo \'\'it\'\'\'\'s\'\' && echo "#not a comment"\'\n      - name: double quoted\n        shell: cat {0}\n        run: "printf \'%s\\\\n\' \\"a\\\\tb\\" café \\\\\\\\path \\x41"\n      - name: literal clip\n        shell: cat {0}\n        run: |\n          first line\n            indented line\n          last line\n      - name: literal strip\n        shell: cat {0}\n        run: |-\n          alpha\n          beta\n      - name: literal keep\n        shell: cat {0}\n        run: |+\n          kept\n\n      - name: literal indentation indicator\n        shell: cat {0}\n        run: |2\n             three extra spaces\n            two extra spaces\n      - name: folded clip\n        shell: cat {0}\n        run: >\n          python3 scripts/long.py\n          --one --two\n\n          --after-a-blank\n      - name: folded more indented\n        shell: cat {0}\n        run: >-\n          folded start\n          continues here\n            kept as is\n            also kept\n          folds again\n          and joins\n      - run: |\n          echo unnamed step\n        shell: cat {0}\n'
 SCALAR_ECHO_GITHUB = {"plain": ["python3 scripts/check.py --flag value"], "plain with a comment": ["make test"], "single quoted": ["echo 'it''s' && echo \"#not a comment\""], "double quoted": ["printf '%s\\n' \"a\\tb\" caf\u00e9 \\\\path A"], "literal clip": ["first line", "  indented line", "last line"], "literal strip": ["alpha", "beta"], "literal keep": ["kept", ""], "literal indentation indicator": ["   three extra spaces", "  two extra spaces"], "folded clip": ["python3 scripts/long.py --one --two", "--after-a-blank"], "folded more indented": ["folded start continues here", "  kept as is", "  also kept", "folds again and joins"], "Run echo unnamed step": ["echo unnamed step"]}
+
+
+# D00 T04 §37: three steps' execution context as GitHub ran them (run
+# 36191008012, the disposable context-echo.yml): each printed its
+# directory, its shell's errexit and pipefail, and its env as a child
+# process sees it. The re-run printout, executed locally under the shell
+# it names, must print the same.
+CONTEXT_ECHO_YML = 'name: context-echo\non:\n  push:\n    branches: [\'drill/**\']\njobs:\n  context-echo:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7\n      - name: default shell\n        run: |\n          basename "$PWD"\n          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac\n          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi\n      - name: explicit bash\n        shell: bash\n        run: |\n          basename "$PWD"\n          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac\n          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi\n      - name: env and directory\n        working-directory: drill/sub dir\n        env:\n          MODE: "two words"\n          QUOTE: it\'s\n        run: |\n          basename "$PWD"\n          echo "$MODE"\n          echo "$QUOTE"\n          bash -c \'echo "child: $MODE"\'\n'
+CONTEXT_ECHO_GITHUB = {"default shell": ["Resolute", "errexit", "nopipefail"], "explicit bash": ["Resolute", "errexit", "pipefail"], "env and directory": ["sub dir", "two words", "it's", "child: two words"]}
 
 
 def _self_test() -> int:
@@ -5732,6 +5882,13 @@ def _self_test() -> int:
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.1Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.2Z ##[error]Process completed with exit code 1.')\n"
                 "        sys.exit(0)\n"
+                "    if mode == 'secretlog':\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z FATAL leaked token=ghp_abcdefghijklmnopqrstuvwxyz0123456789')\n"
+                "        sys.exit(0)\n"
+                "    if mode == 'crossstep':\n"
+                "        print('plan-gates\\tSelf-test the TODO graph tool\\t2026-09-23T21:37:50.1Z The runner has received a shutdown signal.')\n"
+                "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.1Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
+                "        sys.exit(0)\n"
                 "    if mode == 'mixedplatform':\n"
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:50.1Z FATAL x.md:9 candidate c6b1 resolves to nothing')\n"
                 "        print('plan-gates\\tValidate the TODO tree\\t2026-09-23T21:37:51.1Z The runner has received a shutdown signal.')\n"
@@ -5772,7 +5929,7 @@ def _self_test() -> int:
                 "if mode == 'gherror':\n"
                 "    sys.stderr.write('HTTP 503: service unavailable\\n')\n"
                 "    sys.exit(1)\n"
-                "if mode in ('nolog', 'nologall', 'nojobs', 'nojobsbare', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep', 'emptylog', 'mixedrepo', 'mixedplatform', 'nometa'): mode = 'failure'\n"
+                "if mode in ('nolog', 'nologall', 'nojobs', 'nojobsbare', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep', 'emptylog', 'mixedrepo', 'mixedplatform', 'nometa', 'crossstep', 'secretlog'): mode = 'failure'\n"
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
@@ -5857,7 +6014,7 @@ def _self_test() -> int:
             check("rerun-prints-its-context-as-a-quoted-script",
                   rerun_lines(steps_ctx["ctx"], "abc")
                   == ["ci-wait: rerun locally at abc: ctx: the script below, as written",
-                      "ci-wait: |   (shell: bash -e {0}; earlier steps assumed run)",
+                      "ci-wait: |   (shell: bash -e {0}; reproducible: only a checkout precedes it)",
                       "ci-wait: |   export MODE='fast'", "ci-wait: |   cd 'tools'", "ci-wait: |   make check"],
                   str(rerun_lines(steps_ctx["ctx"], "abc")))
             q_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: q\n"
@@ -5878,6 +6035,66 @@ def _self_test() -> int:
                                ("windows env", "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        env:\n          X: 1\n        run: make\n")):
                 got_r = rerun_lines(workflow_steps(yml)[0], "abc")[0]
                 check(f"rerun-refuses-unreadable-context: {label}", "cannot reproduce locally" in got_r, got_r)
+            # D00 T04 §37: the owning job is read whole, keys in any order,
+            # plain or quoted.
+            late = ("jobs:\n  first:\n    runs-on: windows-2025\n    steps:\n      - name: f\n        run: make\n"
+                    "  second:\n    steps:\n      - name: s\n        run: make\n    runs-on: ubuntu-24.04\n"
+                    "  third:\n    steps:\n      - name: t\n        run: make\n    runs-on: ubuntu-24.04\n    container: node:22\n")
+            by = {s["name"]: s for s in workflow_steps(late)}
+            check("job-context-reads-runs-on-declared-after-steps",
+                  by["s"]["context"]["runs-on"] == "ubuntu-24.04" and by["f"]["context"]["runs-on"] == "windows-2025",
+                  str({k: v["context"]["runs-on"] for k, v in by.items()}))
+            check("job-context-reads-a-container-declared-after-steps",
+                  "cannot reproduce locally" in rerun_lines(by["t"], "abc")[0], str(rerun_lines(by["t"], "abc")))
+            quoted = ('jobs:\n  "j":\n    "runs-on": ubuntu-24.04\n    "steps":\n      - "name": q\n'
+                      '        "shell": pwsh\n        "working-directory": tools\n        "run": make\n'
+                      "      - 'name': e\n        \"env\": {MODE: required}\n        'run': make\n")
+            qs = {s["name"]: s for s in workflow_steps(quoted)}
+            check("quoted-keys-decode-like-plain-keys",
+                  qs["q"]["context"]["shell"] == "pwsh" and qs["q"]["context"]["working-directory"] == "tools"
+                  and qs["q"]["run"] == "make" and qs["q"]["context"]["runs-on"] == "ubuntu-24.04", str(qs["q"]))
+            check("a-quoted-flow-env-refuses", "cannot reproduce locally" in rerun_lines(qs["e"], "abc")[0],
+                  str(rerun_lines(qs["e"], "abc")))
+            flow = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - {name: f, run: make}\n"
+            check("a-flow-mapping-step-refuses",
+                  "unsupported run: form (a step shape" in rerun_lines(workflow_steps(flow)[0], "abc")[0],
+                  str(rerun_lines(workflow_steps(flow)[0], "abc")))
+            uses_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+                        "      - name: Setup\n        uses: actions/setup-python@def\n      - name: Build\n        run: make\n")
+            us = {s["name"]: s for s in workflow_steps(uses_yml)}
+            check("a-uses-step-names-its-action",
+                  rerun_lines(us["Setup"], "abc")[0]
+                  == "ci-wait: rerun locally at abc: Setup: runs the action actions/setup-python@def; no local reproduction, read the action's log and inputs",
+                  str(rerun_lines(us["Setup"], "abc")))
+            check("a-command-after-a-non-checkout-step-is-diagnostic",
+                  "diagnostic: earlier steps may have prepared files, tools, or environment (Setup)"
+                  in rerun_lines(us["Build"], "abc")[1], str(rerun_lines(us["Build"], "abc")))
+            # D00 T04 §37: the printed re-run reproduces GitHub's execution
+            # context when executed locally under the shell it names.
+            import shutil as _sh
+            git_bash = os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "Git", "bin", "bash.exe")
+            bash_exe = git_bash if os.path.isfile(git_bash) else (_sh.which("bash") if os.name != "nt" else None)
+            if bash_exe:
+                ctx_root = os.path.join(tmpd, "ctxecho", "Resolute")
+                os.makedirs(os.path.join(ctx_root, "drill", "sub dir"), exist_ok=True)
+                for step in workflow_steps(CONTEXT_ECHO_YML):
+                    if step["kind"] != "run":
+                        continue
+                    rows = rerun_lines(step, "abc")
+                    shell_row = next(r for r in rows if r.startswith("ci-wait: |   (shell: "))
+                    template = shell_row[len("ci-wait: |   (shell: "):].split(";", 1)[0]
+                    body = [r[len("ci-wait: |   "):] for r in rows if r.startswith("ci-wait: |   ")
+                            and not r.startswith("ci-wait: |   (shell: ")]
+                    script = os.path.join(tmpd, "ctxecho", "step.sh")
+                    with open(script, "w", encoding="utf-8", newline="\n") as fh:
+                        fh.write("\n".join(body) + "\n")
+                    argv = [bash_exe if a == "bash" else a for a in template.split()]
+                    argv = [script.replace("\\", "/") if a == "{0}" else a for a in argv]
+                    env_run = {k: v for k, v in os.environ.items() if k not in ("MODE", "QUOTE")}
+                    got_ctx = subprocess.run(argv, cwd=ctx_root, capture_output=True, text=True, env=env_run)
+                    check(f"rerun-reproduces-githubs-context: {step['name']}",
+                          got_ctx.stdout.splitlines() == CONTEXT_ECHO_GITHUB[step["name"]],
+                          f"{got_ctx.stdout.splitlines()} vs {CONTEXT_ECHO_GITHUB[step['name']]} ({template}) {got_ctx.stderr[:200]}")
             win = "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        run: make\n"
             check("rerun-names-the-windows-default-shell",
                   "(shell: pwsh -command" in rerun_lines(workflow_steps(win)[0], "abc")[1], str(rerun_lines(workflow_steps(win)[0], "abc")))
@@ -5920,7 +6137,8 @@ def _self_test() -> int:
             check("ci-wait-zero-jobs-without-evidence-reads-unknown",
                   code == 1 and "GitHub names no workflow-file issue" in line and "cause: unknown" in line
                   and "cause: repairable" not in line, line)
-            for mode, want in (("mixedrepo", "cause: repairable"), ("mixedplatform", "cause: platform fault")):
+            for mode, want in (("mixedrepo", "cause: repairable"), ("mixedplatform", "cause: platform fault"),
+                               ("crossstep", "cause: unknown (a platform signal in plan-gates / Self-test the TODO graph tool")):
                 with open(state, "w", encoding="utf-8") as fh:
                     fh.write(mode)
                 code, line = ci_conclusion(c1, "plan-gates", 0, 0)
@@ -6053,7 +6271,7 @@ def _self_test() -> int:
             # D00 T04 §33: a range editing the workflow never reads not
             # triggered from its own new filter; it waits for the run.
             with open(wfc, "w", encoding="utf-8") as fh:
-                fh.write("on:\n  push:\n    paths:\n      - 'todo/**'\njobs: {}\n# edited\n")
+                fh.write("on:\n  push:\n    paths:\n      - 'todo/**'\n      - 'retired/**'\njobs: {}\n")
             _g("add", ".github/workflows/plan.yml")
             _g("commit", "-qm", "c3-workflow-only")
             c3 = _g("rev-parse", "HEAD").stdout.strip()
@@ -6082,16 +6300,27 @@ def _self_test() -> int:
                   got_ow.returncode == 0 and "not triggered" in got_ow.stdout
                   and "edits the workflow" not in got_ow.stderr,
                   f"exit={got_ow.returncode} out={got_ow.stdout!r} err={got_ow.stderr!r}")
+            c2w = _g("rev-parse", c3 + "~1").stdout.strip()
+            auth = ["--authorized-by", "operator", "--approved-range", f"{c2w}..{c3}"]
             got_enr = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
-                                      "--expect-no-run", "trigger retired by the operator"],
+                                      "--expect-no-run", "trigger retired by the operator", *auth],
                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
-            check("ci-wait-expect-no-run-passes-on-silence",
-                  got_enr.returncode == 0 and "started no run within 0s, as the operator expected" in got_enr.stdout,
+            check("ci-wait-expect-no-run-is-a-distinct-not-green-outcome",
+                  got_enr.returncode == 4 and "NOT GREEN: no run within 0s, as authorized by operator" in got_enr.stdout,
                   f"exit={got_enr.returncode} out={got_enr.stdout!r} err={got_enr.stderr!r}")
+            for label, extra, needle in (
+                    ("no authorization", [], "needs --authorized-by"),
+                    ("another range", ["--authorized-by", "operator", "--approved-range", f"{c3}..{c3}"],
+                     "is not the pushed range")):
+                got_a = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
+                                        "--expect-no-run", "x", *extra],
+                                       cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+                check(f"ci-wait-expect-no-run-refuses: {label}", got_a.returncode == 2 and needle in got_a.stderr,
+                      got_a.stderr)
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("success")
             got_enr2 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
-                                       "--expect-no-run", "trigger retired by the operator"],
+                                       "--expect-no-run", "trigger retired by the operator", *auth],
                                       cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
             check("ci-wait-expect-no-run-fails-when-a-run-appears",
                   got_enr2.returncode == 1 and "ran after all" in got_enr2.stderr, got_enr2.stderr)
@@ -6099,7 +6328,7 @@ def _self_test() -> int:
                 with open(state, "w", encoding="utf-8") as fh:
                     fh.write(bad)
                 got_bad = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
-                                          "--expect-no-run", "trigger retired by the operator"],
+                                          "--expect-no-run", "trigger retired by the operator", *auth],
                                          cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
                 check(f"ci-wait-expect-no-run-refuses-an-unverifiable-poll: {bad}",
                       got_bad.returncode == 2 and "unverifiable" in got_bad.stderr, got_bad.stderr)
@@ -6108,6 +6337,43 @@ def _self_test() -> int:
                                       cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
             check("ci-wait-expect-no-run-refuses-a-range-that-keeps-the-workflow",
                   got_enr3.returncode == 2 and "needs a range that edits" in got_enr3.stderr, got_enr3.stderr)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("none")
+            # A workflow edit that leaves the triggers alone is no retirement.
+            with open(wfc, "a", encoding="utf-8") as fh:
+                fh.write("# a comment only\n")
+            _g("add", ".github/workflows/plan.yml")
+            _g("commit", "-qm", "c5-comment-only")
+            c5 = _g("rev-parse", "HEAD").stdout.strip()
+            got_nt5 = subprocess.run([sys.executable, me, "ci-wait", c5, "--timeout", "0", "--interval", "0",
+                                      "--expect-no-run", "x", "--authorized-by", "operator",
+                                      "--approved-range", f"{c4}..{c5}"],
+                                     cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-expect-no-run-refuses: triggers unchanged",
+                  got_nt5.returncode == 2 and "but not its triggers" in got_nt5.stderr, got_nt5.stderr)
+            # D00 T04 §37: what ci-wait prints is redacted.
+            red_text = ("token=ghp_abcdefghijklmnopqrstuvwxyz0123456789 Authorization: Bearer abc.def.ghi1234 "
+                        "AKIAABCDEFGHIJKLMNOP password=hunter22 masked *** kept")
+            red_out = redact(red_text)
+            check("redact-masks-secret-shapes",
+                  "ghp_" not in red_out and "abc.def.ghi1234" not in red_out and "AKIA" not in red_out
+                  and "hunter22" not in red_out and red_out.count("***") >= 5, red_out)
+            sec_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: s\n        env:\n"
+                       "          API_TOKEN: abc123\n          MODE: fast\n        run: make\n")
+            sec_rows = rerun_lines(workflow_steps(sec_yml)[0], "abc")
+            check("rerun-masks-secret-named-env",
+                  "ci-wait: |   export API_TOKEN='***'   # value masked: set it locally" in sec_rows
+                  and "ci-wait: |   export MODE='fast'" in sec_rows and not any("abc123" in r for r in sec_rows),
+                  str(sec_rows))
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("secretlog")
+            got_sec = subprocess.run([sys.executable, me, "ci-wait", c1, "--since", "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                                      "--workflow-file", os.path.join(tmpd, "no-such.yml"),
+                                      "--timeout", "0", "--interval", "0"],
+                                     cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
+            check("ci-wait-output-is-redacted",
+                  got_sec.returncode == 1 and "ghp_" not in got_sec.stderr and "***" in got_sec.stderr,
+                  got_sec.stderr[-300:])
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("none")
             check("ci-wait-escalates-when-an-edited-workflow-never-runs",
@@ -6152,6 +6418,11 @@ def _self_test() -> int:
             ("skill-ci-slow-run", "a slow run is not an unreachable one"),
             ("skill-ci-ceiling-exit", "`ci-wait` exit 3 means it stayed pending past the ceiling"),
             ("skill-ci-episode-persists", "python scripts/campaign_guard.py repair attempt --red"),
+            ("skill-ci-close-evidence", "repair close --green <sha> --workflow <workflow> --run-file <run file> --evidence"),
+            ("skill-ci-ceiling-count", "python scripts/campaign_guard.py repair ceiling --run-id"),
+            ("skill-ci-no-run-authorized", "--authorized-by <who> --approved-range <base>..<head>`, which exits 4 `NOT GREEN`"),
+            ("skill-ci-quotes-redacted", "a record quotes `ci-wait` only as printed, its secret shapes already masked"),
+            ("skill-ci-unknown-cause", "An unknown cause owes bounded evidence gathering"),
             ("skill-ci-escalation-ends-run", "--reason escalation` and `CronDelete` of the heartbeat it names"),
             ("skill-ci-escalation", "escalates to the operator only for a cause the tree cannot fix"),
             ("skill-ci-continue", "On green, with any reopened section re-stamped, it continues with the next section in the same turn"),
@@ -7022,6 +7293,8 @@ if __name__ == "__main__":
         sha_arg, workflow, timeout, interval = rest[0], "plan-gates", 900.0, 15.0
         ceiling = 3600.0
         expect_no_run = None
+        authorized_by = None
+        approved_range = None
         retry_wait = 60.0
         since = None
         wf_file = None
@@ -7043,6 +7316,10 @@ if __name__ == "__main__":
                     ceiling = float(rest[i + 1])
                 elif rest[i] == "--expect-no-run":
                     expect_no_run = rest[i + 1]
+                elif rest[i] == "--authorized-by":
+                    authorized_by = rest[i + 1]
+                elif rest[i] == "--approved-range":
+                    approved_range = rest[i + 1]
                 elif rest[i] == "--interval":
                     interval = float(rest[i + 1])
                 elif rest[i] == "--retry-wait":
@@ -7088,6 +7365,33 @@ if __name__ == "__main__":
                 print(f"ci-wait: --expect-no-run needs a range that edits {wf_path}; this one does not",
                       file=sys.stderr)
                 sys.exit(2)
+            # D00 T04 §37: the exception is recorded and bound: who
+            # authorized it, the exact range approved, and a trigger change
+            # inside that range.
+            if not authorized_by or not approved_range or ".." not in approved_range:
+                print("ci-wait: --expect-no-run needs --authorized-by <who> and --approved-range <base>..<head>",
+                      file=sys.stderr)
+                sys.exit(2)
+            a_base, a_head = approved_range.split("..", 1)
+            want_base, want_head = _object_identity(a_base), _object_identity(a_head)
+            got_base = _object_identity(base)
+            if not (want_base and want_head and got_base and want_base[0] == got_base[0]
+                    and want_head[0] == ident[0]):
+                print(f"ci-wait: the approved range {approved_range} is not the pushed range "
+                      f"{base[:12]}..{ident[0][:12]}", file=sys.stderr)
+                sys.exit(2)
+
+            def _triggers(rev: str) -> str | None:
+                rc_t, wf_t = _git_out(["show", f"{rev}:{wf_path}"])
+                if rc_t != 0:
+                    return None
+                top_t = _entries(wf_t.splitlines(), 0)
+                on = next((e for e in top_t if e[0] in ("on", "true")), None)
+                return (on[1] + "\n" + "\n".join(on[2])) if on else ""
+            if _triggers(base) == _triggers(ident[0]):
+                print(f"ci-wait: the range edits {wf_path} but not its triggers; --expect-no-run covers a "
+                      f"retirement or a trigger change only", file=sys.stderr)
+                sys.exit(2)
             verdict, detail = expect_no_run_within(ident[0], workflow, timeout, interval)
             if verdict == "unverifiable":
                 print(f"ci-wait: {ident[0][:12]} {workflow} no-run expectation unverifiable ({detail}): "
@@ -7097,9 +7401,11 @@ if __name__ == "__main__":
                 print(f"ci-wait: {ident[0][:12]} {workflow} ran after all ({detail}): the no-run "
                       f"expectation ({expect_no_run}) was wrong; read the run", file=sys.stderr)
                 sys.exit(1)
-            print(f"ci-wait: {ident[0][:12]} {workflow} started no run within {int(timeout)}s, as the "
-                  f"operator expected ({expect_no_run})")
-            sys.exit(0)
+            # A distinct outcome: an authorized silence is never green, and
+            # repair close refuses it as evidence (D00 T04 §37).
+            print(f"ci-wait: {ident[0][:12]} {workflow} NOT GREEN: no run within {int(timeout)}s, as authorized "
+                  f"by {authorized_by} for {approved_range} ({expect_no_run})")
+            sys.exit(4)
         if not touches_workflow and not push_triggers_workflow(changed, filters):
             print(f"ci-wait: {ident[0][:12]} {workflow} not triggered "
                   f"({len(changed)} changed path(s), none in the workflow's path filter)")
@@ -7117,7 +7423,7 @@ if __name__ == "__main__":
                          "(GitHub, gh, or the runner is outside the tree)")
         # Exit 3 (pending past the ceiling) is not retried here: the skills
         # say to re-run ci-wait once and then escalate (D00 T04 §35).
-        print(line, file=sys.stdout if code == 0 else sys.stderr)
+        print(redact(line), file=sys.stdout if code == 0 else sys.stderr)
         sys.exit(code)
     if len(sys.argv) == 4 and sys.argv[1] == "check-parents":
         # check-parents <commit> <expected-parent>: the stamp lands on

@@ -15,7 +15,9 @@ deleted only through this module (D00 T04 §34):
     python scripts/campaign_guard.py reconcile --session S --jobs J1,J2
     python scripts/campaign_guard.py health --session S --jobs J1,J2
     python scripts/campaign_guard.py expiry --session S [--now ISO]
-    python scripts/campaign_guard.py repair attempt --red SHA --commit SHA | close --green SHA | status
+    python scripts/campaign_guard.py repair attempt --red SHA --commit SHA --workflow W --run-file F
+    python scripts/campaign_guard.py repair close --green SHA --workflow W --run-file F --evidence LINE
+    python scripts/campaign_guard.py repair status|restore --run-file F [--workflow W] | ceiling --run-id ID
     python scripts/campaign_guard.py --self-test
 
 `acquire` creates the guard exclusively; the owning session may re-point
@@ -575,13 +577,50 @@ def _repair_path(root: str) -> str:
     return os.path.join(root, "build", "claude-campaign-repair.json")
 
 
-def repair(root: str, action: str, red: str = "", commit: str = "", green: str = "") -> tuple[int, str]:
+def _git(root: str, *args: str) -> tuple[int, str]:
+    proc = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8",
+                          errors="replace")
+    return proc.returncode, proc.stdout.strip()
+
+
+def _repo_identity(root: str) -> dict:
+    """The repository and branch an episode belongs to, read from git."""
+    _rc, url = _git(root, "remote", "get-url", "origin")
+    _rc, branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    return {"repo": url, "branch": branch}
+
+
+_ATTEMPT_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) attempt (\d+) of \d+ \(([0-9a-f]{12}) repairs ([0-9a-f]{12})\)")
+_CLOSED_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) closed green")
+
+
+def _episode_from_run_file(root: str, run_file: str) -> list[tuple[str, str, str]]:
+    """(episode, commit, red) for every attempt line the run file records
+    after its last closed episode: what a lost episode file held."""
+    try:
+        with open(os.path.join(root, run_file), encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError:
+        return []
+    last_close = max((m.end() for m in _CLOSED_LINE.finditer(text)), default=0)
+    return [(m.group(1), m.group(3), m.group(4)) for m in _ATTEMPT_LINE.finditer(text, last_close)]
+
+
+def repair(root: str, action: str, red: str = "", commit: str = "", green: str = "",
+           workflow: str = "", run_file: str = "", evidence: str = "", run_id: str = "") -> tuple[int, str]:
     """The CI repair episode, persisted beside the guard state so a
     resumed or restarted runner cannot recount from zero (D00 T04 §35).
     An episode opens at its first red and closes at the next green; at
     most REPAIR_BOUND repair attempts ride one episode, across however
-    many reds it sees. Returns (exit, line): `attempt` exits 1 when the
-    bound is exhausted, which is the escalation."""
+    many reds it sees. D00 T04 §37 binds it: the episode records its
+    repository, branch, workflow, and run file and refuses a mismatched
+    call; an attempt is keyed to its repair commit, so a repeat after a
+    crash or a failed push counts once; `close` needs a green read-back
+    line for that workflow on a descendant of the last attempt; a lost
+    episode file is detected from the run file's attempt lines and
+    restored; and `ceiling` allows one re-run per GitHub run that stayed
+    pending past the ceiling. Returns (exit, line); exit 1 is the
+    escalation."""
     path = _repair_path(root)
     with _Lock(root):
         exists = True
@@ -594,29 +633,90 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
             # An unreadable episode must never reset the bound (panel round 1).
             raise GuardError(f"the repair episode {path} is unreadable ({exc}); the bound cannot be "
                              f"counted, so escalate rather than repair")
+        if action == "ceiling":
+            cpath = os.path.join(root, "build", "claude-campaign-ceiling.json")
+            try:
+                with open(cpath, encoding="utf-8") as fh:
+                    seen = json.load(fh)
+            except FileNotFoundError:
+                seen = {}
+            except (OSError, ValueError):
+                raise GuardError("the ceiling record is unreadable; escalate rather than wait again")
+            if not run_id:
+                raise GuardError("repair ceiling needs --run-id <GitHub run id>")
+            if seen.get(run_id, 0) >= 1:
+                return 1, (f"repair: run {run_id} already had its one re-run past the ceiling: escalate "
+                           f"(a queue that never drains is outside the tree)")
+            seen[run_id] = seen.get(run_id, 0) + 1
+            with open(cpath + ".tmp", "w", encoding="utf-8") as fh:
+                json.dump(seen, fh)
+            os.replace(cpath + ".tmp", cpath)
+            return 0, f"repair: run {run_id} may re-run ci-wait once more past the ceiling"
         # Only a missing file means no episode: a file holding anything but
         # a well-formed episode (a JSON null included) refuses (panel round 2).
         if exists and not (isinstance(ep, dict) and isinstance(ep.get("episode"), str)
                            and isinstance(ep.get("attempts"), list)):
             raise GuardError(f"the repair episode {path} is malformed; the bound cannot be counted, "
                              f"so escalate rather than repair")
+        if action == "restore":
+            if ep:
+                return 0, f"repair: episode {ep['episode'][:12]} is present; nothing to restore"
+            found = _episode_from_run_file(root, run_file)
+            if not found:
+                return 0, "repair: the run file shows no open episode; nothing to restore"
+            ep = {"episode": found[0][2], "attempts": [{"red": r, "commit": c} for _e, c, r in found],
+                  **_repo_identity(root), "workflow": workflow, "run_file": run_file, "restored": True}
+            with open(path + ".tmp", "w", encoding="utf-8") as fh:
+                json.dump(ep, fh, indent=1)
+            os.replace(path + ".tmp", path)
+            return 0, (f"repair: episode {ep['episode'][:12]} restored from {run_file} at "
+                       f"{len(ep['attempts'])} of {REPAIR_BOUND} attempts")
         if action == "status":
             if not ep:
+                lost = _episode_from_run_file(root, run_file) if run_file else []
+                if lost:
+                    return 1, (f"repair: the episode file is lost but {run_file} shows episode {lost[0][0]} at "
+                               f"{len(lost)} of {REPAIR_BOUND} attempts: run repair restore before any repair")
                 return 0, "repair: no open episode"
             return 0, (f"repair: episode {ep['episode'][:12]} open, {len(ep['attempts'])} of "
                        f"{REPAIR_BOUND} attempts used")
+        identity = {**_repo_identity(root), "workflow": workflow, "run_file": run_file}
+        if ep and action in ("attempt", "close"):
+            for key in ("repo", "branch", "workflow", "run_file"):
+                if ep.get(key, identity[key]) != identity[key]:
+                    raise GuardError(f"the open episode belongs to {key} {ep.get(key)!r}, not {identity[key]!r}; "
+                                     f"refusing to mix episodes")
         if action == "close":
             if not green:
                 raise GuardError("repair close needs --green <sha>")
             if not ep:
                 return 0, "repair: no open episode to close"
+            want = re.compile(rf"\Aci-wait: {re.escape(green[:12])}[0-9a-f]* {re.escape(workflow or ep.get('workflow', ''))} success\b")
+            if not want.match(evidence or ""):
+                raise GuardError("repair close needs --evidence with the green ci-wait line for this sha and "
+                                 "workflow (an authorized no-run is not green)")
+            last = ep["attempts"][-1]["commit"] if ep["attempts"] else ep["episode"]
+            rc, _ = _git(root, "merge-base", "--is-ancestor", last, green)
+            if rc != 0:
+                raise GuardError(f"the green {green[:12]} does not descend from the last attempt {last[:12]}; "
+                                 f"it cannot close this episode")
             os.unlink(path)
             return 0, (f"repair: episode {ep['episode'][:12]} closed green at {green[:12]} after "
                        f"{len(ep['attempts'])} attempt(s)")
         if action == "attempt":
-            if not red or not commit:
-                raise GuardError("repair attempt needs --red <sha> and --commit <sha>")
-            ep = ep or {"episode": red, "attempts": []}
+            if not red or not commit or not workflow or not run_file:
+                raise GuardError("repair attempt needs --red, --commit, --workflow, and --run-file")
+            if not ep:
+                lost = _episode_from_run_file(root, run_file)
+                if lost:
+                    raise GuardError(f"the run file shows open episode {lost[0][0]} but its file is lost: "
+                                     f"run repair restore first")
+            ep = ep or {"episode": red, "attempts": [], **identity}
+            done = [a for a in ep["attempts"] if a.get("commit") == commit]
+            if done:
+                n = ep["attempts"].index(done[0]) + 1
+                return 0, (f"repair: episode {ep['episode'][:12]} attempt {n} of {REPAIR_BOUND} "
+                           f"({commit[:12]} repairs {done[0]['red'][:12]}) already counted")
             if len(ep["attempts"]) >= REPAIR_BOUND:
                 return 1, (f"repair: episode {ep['episode'][:12]} has used all {REPAIR_BOUND} attempts: "
                            f"the bound is exhausted, escalate (PARKED ... escalation:, then end --reason escalation)")
@@ -627,7 +727,7 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
             os.replace(tmp, path)
             return 0, (f"repair: episode {ep['episode'][:12]} attempt {len(ep['attempts'])} of "
                        f"{REPAIR_BOUND} ({commit[:12]} repairs {red[:12]})")
-        raise GuardError(f"repair action {action!r} is not attempt, close, or status")
+        raise GuardError(f"repair action {action!r} is not attempt, close, status, restore, or ceiling")
 
 
 def _powershell() -> str | None:
@@ -1328,38 +1428,89 @@ def _self_test() -> int:
             for k in env_bounds:
                 del os.environ[k]
 
-    # D00 T04 §35: the repair episode survives a restart and refuses a fourth attempt.
+    # D00 T04 §35, §37: the repair episode survives a restart, refuses a
+    # fourth attempt, binds its identity, counts a repeat once, closes only
+    # on proven green, and is restored from the run file when lost.
     with tempfile.TemporaryDirectory(prefix="campaign-repair-") as rtmp:
         os.makedirs(os.path.join(rtmp, "build"))
+        os.makedirs(os.path.join(rtmp, "docs"))
+        for args in (["init", "-q"], ["config", "user.email", "t@t"], ["config", "user.name", "t"],
+                     ["config", "commit.gpgsign", "false"]):
+            subprocess.run(["git", *args], cwd=rtmp, capture_output=True, check=True)
+        with open(os.path.join(rtmp, ".gitignore"), "w", encoding="utf-8") as fh:
+            fh.write("build/\n")
+        shas = []
+        for n in range(6):
+            with open(os.path.join(rtmp, "f.txt"), "w", encoding="utf-8") as fh:
+                fh.write(f"{n}\n")
+            subprocess.run(["git", "add", "-A"], cwd=rtmp, capture_output=True, check=True)
+            subprocess.run(["git", "commit", "-qm", f"c{n}"], cwd=rtmp, capture_output=True, check=True)
+            shas.append(subprocess.run(["git", "rev-parse", "HEAD"], cwd=rtmp, capture_output=True,
+                                       text=True).stdout.strip())
+        runf = "docs/run.md"
+        with open(os.path.join(rtmp, runf), "w", encoding="utf-8") as fh:
+            fh.write("# run\n")
 
         def _repair_cli(*args: str) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, os.path.join(HERE, "campaign_guard.py"), "repair", *args,
                                    "--root", rtmp], capture_output=True, text=True, encoding="utf-8")
-        outs = [_repair_cli("attempt", "--red", f"red{n}aaaaaaaaaaaa", "--commit", f"fix{n}aaaaaaaaaaaa")
-                for n in (1, 2, 3)]
+        W = ("--workflow", "plan-gates", "--run-file", runf)
+        outs = [_repair_cli("attempt", "--red", shas[n - 1], "--commit", shas[n], *W) for n in (1, 2, 3)]
         check("repair-attempts-count-across-processes",
               [o.returncode for o in outs] == [0, 0, 0] and "attempt 3 of 3" in outs[2].stdout
-              and "episode red1aaaaaaaa" in outs[2].stdout, str([o.stdout for o in outs]))
-        st = _repair_cli("status")
+              and f"episode {shas[0][:12]}" in outs[2].stdout, str([o.stdout + o.stderr for o in outs]))
+        again = _repair_cli("attempt", "--red", shas[1], "--commit", shas[2], *W)
+        check("repair-counts-a-repeated-attempt-once",
+              again.returncode == 0 and "already counted" in again.stdout, again.stdout + again.stderr)
+        st = _repair_cli("status", "--run-file", runf)
         check("repair-status-reads-the-persisted-episode", "3 of 3 attempts used" in st.stdout, st.stdout)
-        fourth = _repair_cli("attempt", "--red", "red4aaaaaaaaaaaa", "--commit", "fix4aaaaaaaaaaaa")
+        fourth = _repair_cli("attempt", "--red", shas[3], "--commit", shas[4], *W)
         check("repair-refuses-a-fourth-attempt-after-a-restart",
               fourth.returncode == 1 and "bound is exhausted, escalate" in fourth.stderr, fourth.stderr)
+        other = _repair_cli("attempt", "--red", shas[3], "--commit", shas[4], "--workflow", "release",
+                            "--run-file", runf)
+        check("repair-refuses-a-mismatched-episode",
+              other.returncode == 1 and "belongs to workflow 'plan-gates'" in other.stderr, other.stderr)
         with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), encoding="utf-8") as fh:
             saved = fh.read()
         for label, body in (("corrupt", "{not json"), ("malformed", '{"episode": 3}'), ("null", "null")):
             with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), "w", encoding="utf-8") as fh:
                 fh.write(body)
-            bad = _repair_cli("attempt", "--red", "red9aaaaaaaaaaaa", "--commit", "fix9aaaaaaaaaaaa")
+            bad = _repair_cli("attempt", "--red", shas[3], "--commit", shas[5], *W)
             check(f"repair-refuses-{label}-state-rather-than-resetting",
                   bad.returncode == 1 and "escalate rather than repair" in bad.stderr, bad.stderr)
         with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), "w", encoding="utf-8") as fh:
             fh.write(saved)
-        closed = _repair_cli("close", "--green", "green1aaaaaaaaaa")
-        again = _repair_cli("attempt", "--red", "red5aaaaaaaaaaaa", "--commit", "fix5aaaaaaaaaaaa")
+        no_ev = _repair_cli("close", "--green", shas[5], *W, "--evidence", f"ci-wait: {shas[5][:12]} plan-gates started no run")
+        check("repair-close-refuses-without-green-evidence",
+              no_ev.returncode == 1 and "needs --evidence with the green ci-wait line" in no_ev.stderr, no_ev.stderr)
+        not_desc = _repair_cli("close", "--green", shas[1], *W, "--evidence", f"ci-wait: {shas[1][:12]} plan-gates success x")
+        check("repair-close-refuses-a-green-that-is-not-a-descendant",
+              not_desc.returncode == 1 and "does not descend from the last attempt" in not_desc.stderr, not_desc.stderr)
+        closed = _repair_cli("close", "--green", shas[5], *W, "--evidence", f"ci-wait: {shas[5][:12]} plan-gates success https://x")
+        again2 = _repair_cli("attempt", "--red", shas[4], "--commit", shas[5], *W)
         check("repair-close-opens-a-fresh-episode",
-              "closed green" in closed.stdout and again.returncode == 0 and "attempt 1 of 3" in again.stdout,
-              f"{closed.stdout} {again.stdout}")
+              "closed green" in closed.stdout and again2.returncode == 0 and "attempt 1 of 3" in again2.stdout,
+              f"{closed.stdout}{closed.stderr} {again2.stdout}{again2.stderr}")
+        # A lost episode file is detected from the run file and restored.
+        with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
+            fh.write(again2.stdout)
+        os.remove(os.path.join(rtmp, "build", "claude-campaign-repair.json"))
+        lost = _repair_cli("status", "--run-file", runf)
+        check("repair-status-detects-a-lost-episode-file",
+              lost.returncode == 1 and "the episode file is lost" in lost.stderr, lost.stdout + lost.stderr)
+        blocked = _repair_cli("attempt", "--red", shas[5], "--commit", shas[3], *W)
+        check("repair-attempt-refuses-until-restored",
+              blocked.returncode == 1 and "run repair restore first" in blocked.stderr, blocked.stderr)
+        restored = _repair_cli("restore", *W)
+        check("repair-restore-rebuilds-from-the-run-file",
+              restored.returncode == 0 and "restored from docs/run.md at 1 of 3 attempts" in restored.stdout,
+              restored.stdout + restored.stderr)
+        c1 = _repair_cli("ceiling", "--run-id", "777")
+        c2 = _repair_cli("ceiling", "--run-id", "777")
+        check("repair-ceiling-allows-one-re-run-per-run",
+              c1.returncode == 0 and c2.returncode == 1 and "already had its one re-run" in c2.stderr,
+              c1.stdout + c2.stderr)
 
     # D00 T04 §34: the runner's contract routes through these commands.
     plan_skill = os.path.normpath(os.path.join(HERE, "..", ".claude", "skills", "process-plan", "SKILL.md"))
@@ -1411,7 +1562,8 @@ def main(argv: list[str]) -> int:
             ropts = _opts(argv[2:])
             rroot = ropts.pop("root", REPO)
             code, line = repair(rroot, argv[1], ropts.get("red", ""), ropts.get("commit", ""),
-                                ropts.get("green", ""))
+                                ropts.get("green", ""), ropts.get("workflow", ""), ropts.get("run_file", ""),
+                                ropts.get("evidence", ""), ropts.get("run_id", ""))
             print(line, file=sys.stdout if code == 0 else sys.stderr)
             return code
         opts = _opts(argv[1:])
