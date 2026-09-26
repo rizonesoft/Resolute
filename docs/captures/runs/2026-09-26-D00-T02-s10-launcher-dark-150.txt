@@ -1,0 +1,15 @@
+capture       : 2026-09-26-D00-T02-s10-launcher-dark-150.png
+describes     : the launcher at startup, dark, 150 percent (D00 T02 section 10)
+window title  : Resolute
+source binary : R:\GitHub\Resolute\Bin\Debug\Resolute.exe
+file version  : 0.1.0.0
+size          : 1082 x 711 px
+monitor dpi   : 144  (150% scaling) -- what the image was rendered at
+window dpi    : 144  (logical dpi the process sees)
+dpi aware     : True
+appearance    : dark  (stated by the caller)
+windows build : 10.0.26200.0
+captured      : 2026-09-26
+
+Reproduce with scripts/capture-window.ps1. Where this capture and
+DESIGN.md disagree, the contract wins and this capture is restaked.

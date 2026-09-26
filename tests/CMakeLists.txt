@@ -29,6 +29,11 @@ add_executable(resolute_tests
     fixtures/fixtures.cpp
     fixtures/suite_teardown.cpp
     parity/parity.cpp
+    # The focus guard, the headful fence, and the entry point that runs the
+    # guard around Catch2's session (D00 T02 §10).
+    focus_guard.cpp
+    fence.cpp
+    main.cpp
 )
 
 # The disposable fixture store lives under the build directory. CMake
@@ -47,6 +52,10 @@ target_compile_definitions(resolute_tests PRIVATE
     # actual and diff images. D00 T02 §9.
     RESOLUTE_GOLDEN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/golden"
     RESOLUTE_RENDER_OUT="${CMAKE_BINARY_DIR}/render-out"
+    # Each case's window census, the foreground log the gate quotes, and the
+    # launcher the headful captures start (D00 T02 §10).
+    RESOLUTE_CENSUS_DIR="${CMAKE_BINARY_DIR}/focus-census"
+    RESOLUTE_LAUNCHER="$<TARGET_FILE:Resolute>"
 )
 target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -55,13 +64,19 @@ target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 resolute_set_warnings(resolute_tests)
 
 target_link_libraries(resolute_tests PRIVATE
-    Catch2::Catch2WithMain
+    # Catch2 without its main: tests/main.cpp runs the session inside the
+    # focus guard (D00 T02 §10).
+    Catch2::Catch2
     ResoluteUI_static
     Lucide_static
     # WIC and COM, for the offscreen renders and their PNG goldens (D00 T02 §9).
     windowscodecs
     ole32
+    # GetDpiForMonitor, for the census's per-monitor DPI (D00 T02 §10).
+    shcore
 )
+# The headful captures start the launcher, so a test build carries it.
+add_dependencies(resolute_tests Resolute)
 
 # -municode, and NOT -mwindows.
 #
@@ -85,4 +100,8 @@ include(Catch)
 #   ctest --preset debug -L ui        runs only the UI library's tests
 # Catch2's own failure output already carries the expected and actual values;
 # this is what makes the TAG visible too, which tests/README.md requires.
-catch_discover_tests(resolute_tests ADD_TAGS_AS_LABELS)
+#
+# SKIP_RETURN_CODE 4 is Catch2's all-skipped exit code, so a headful case the
+# fence skips reports as skipped in ctest rather than passed or failed
+# (D00 T02 §10).
+catch_discover_tests(resolute_tests ADD_TAGS_AS_LABELS PROPERTIES SKIP_RETURN_CODE 4)

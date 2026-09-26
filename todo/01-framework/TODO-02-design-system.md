@@ -80,7 +80,7 @@ Three rules from the contract that are currently unimplemented, and they interac
 - [ ] Collapse the sidebar to icon-only below roughly 600px width, and add a manual toggle with animation. Done when: both the automatic and the manual path are driven and captured, and the collapsed state persists.
 - [ ] Move toolbar overflow into a menu when the window is too narrow. Done when: narrowing the window moves buttons into the overflow and widening restores them, captured.
 - [ ] Enforce a minimum window size. Done when: the window cannot be dragged below it and the value is recorded here.
-- [ ] Remember window size and position per monitor, and respect Windows 11 snap zones. Done when: geometry survives a restart on each of two monitors, and a snapped window restores snapped.
+- [ ] Remember window size and position per monitor, and respect Windows 11 snap zones. Done when: geometry survives a restart on each of two monitors, and a snapped window restores snapped. With no remembered geometry, the first size is scaled to the monitor's DPI: D00 T02 §10's captures show the launcher opening at 1100 x 720 physical pixels whatever the DPI, two thirds of its intended size at 150% with two list columns cut off (docs/captures/runs/2026-09-26-D00-T02-s10-launcher-dark-150.png).
 - [ ] Commit: `"design: spacing grid, density modes, and responsive layout"`
 
 **Test checkpoint:** No off-grid spacing survives the §1 check. Three densities render, persist, and are captured. Sidebar collapse is driven both automatically and manually. Toolbar overflow moves and restores. Window geometry survives a restart on two monitors. All captured under `docs/captures/runs/`.

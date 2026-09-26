@@ -233,6 +233,13 @@ LRESULT CALLBACK PopupMenu::PopupProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         if (LOWORD(wp) == WA_INACTIVE && d && d->ready)
             d->dismissed = true;
         return 0;
+
+    // A popup destroyed under the loop (its owner torn down, say) ends the
+    // loop too, which would otherwise wait for a message that never comes
+    // (D00 T02 §10).
+    case WM_DESTROY:
+        if (d) d->dismissed = true;
+        break;
     }
 
     return DefWindowProcW(hwnd, msg, wp, lp);
@@ -289,15 +296,25 @@ WORD PopupMenu::Show(HWND parent, POINT screenPt,
     SetFocus(popup);
     data.ready = true;
 
-    // Simple blocking loop
-    MSG msg;
-    while (!data.dismissed && GetMessageW(&msg, nullptr, 0, 0)) {
+    // Simple blocking loop. A WM_QUIT it takes is posted again for the
+    // caller's loop, which owns the application's shutdown (D00 T02 §10).
+    MSG msg{};
+    bool quit = false;
+    while (!data.dismissed) {
+        const BOOL got = GetMessageW(&msg, nullptr, 0, 0);
+        if (got <= 0) {
+            quit = got == 0;
+            break;
+        }
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }
 
-    SetWindowLongPtrW(popup, GWLP_USERDATA, 0);
-    DestroyWindow(popup);
+    if (IsWindow(popup)) {
+        SetWindowLongPtrW(popup, GWLP_USERDATA, 0);
+        DestroyWindow(popup);
+    }
+    if (quit) PostQuitMessage(static_cast<int>(msg.wParam));
 
     return data.result;
 }

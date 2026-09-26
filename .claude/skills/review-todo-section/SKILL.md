@@ -162,6 +162,15 @@ After the last fix, re-run the section's Test checkpoint and the owed gates (aff
 
 Every control, menu item, dialog, and state on the Fidelity counterpart is working (proven on the rendered surface in this review) or deferred to a named, resolving section. Refuse the stamp for an unaccounted control. Compare the rendered surface against the baseline artifact or design contract before stamping, and confirm the user-guide update shipped in the same commit.
 
+**Debt completeness** (D00 T02 §10): every fenced case `tests/focus-audit.md` names for the section's surface ends the section's fenced run green or on the `Night-owed:` list, and a case in neither refuses the stamp like an unaccounted control. Run the fenced preset at the candidate and let the script compare, never a hand-typed list:
+
+```bash
+ctest --preset headful -V > build/headful.log
+python scripts/fence-debt.py --log build/headful.log --cases "<the surface's fenced cases>" --stamp
+```
+
+Quote its `Night-owed:` line and its summary in the findings file, and carry the `Night-owed:` line onto the stamp. A section that changes the fence itself owes one explicit headful pass (`ctest --preset headful-visible`, or a collecting run) and cannot stamp its own fence on skips (`docs/testing.md`).
+
 ### 7. Frozen check (frozen TODOs)
 
 Every `**Freeze check:**` in the section ran and passed, with the result quoted. No frozen behavior moved without a recorded operator approval. If one did, there is no stamp: there is a question for the operator.

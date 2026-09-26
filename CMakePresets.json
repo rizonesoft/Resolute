@@ -55,7 +55,13 @@
             },
             "execution": {
                 "noTestsAction": "error",
-                "stopOnFailure": false
+                "stopOnFailure": false,
+                "timeout": 120
+            },
+            "filter": {
+                "exclude": {
+                    "label": "headful"
+                }
             }
         },
         {
@@ -66,7 +72,50 @@
             },
             "execution": {
                 "noTestsAction": "error",
-                "stopOnFailure": false
+                "stopOnFailure": false,
+                "timeout": 120
+            },
+            "filter": {
+                "exclude": {
+                    "label": "headful"
+                }
+            }
+        },
+        {
+            "name": "headful",
+            "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false,
+                "timeout": 120
+            },
+            "filter": {
+                "include": {
+                    "label": "headful"
+                }
+            }
+        },
+        {
+            "name": "headful-visible",
+            "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": false,
+                "timeout": 120
+            },
+            "filter": {
+                "include": {
+                    "label": "headful"
+                }
+            },
+            "environment": {
+                "RESOLUTE_HEADFUL": "visible"
             }
         }
     ]

@@ -58,6 +58,10 @@ public:
     // item, a dropdown as a submenu of its choices; nullptr when nothing
     // overflows. The caller destroys it (D00 T02 §9).
     HMENU BuildOverflowMenu() const;
+    // The overflow button's rectangle while anything overflows, the first
+    // item included; one rectangle for paint, hit-test, and the menu. Public
+    // so a driven test can press the real button (D00 T02 §10).
+    D2D1_RECT_F OverflowRect(float totalWidth) const;
     void UpdateDpi(int dpi);
 
 private:
@@ -155,9 +159,6 @@ private:
     void RebuildIconCache();
     D2D1_RECT_F ItemRect(int idx, float totalWidth) const;
     int  HitTest(int mx, int my, float totalWidth);
-    // The overflow button's rectangle while anything overflows, the first
-    // item included; one rectangle for paint, hit-test, and the menu.
-    D2D1_RECT_F OverflowRect(float totalWidth) const;
     void OnPaint();
 
     void AnimateHover(int idx, bool entering);

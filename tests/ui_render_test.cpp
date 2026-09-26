@@ -29,6 +29,8 @@
 #include <resolute/render.h>
 #include <resolute/theme.h>
 
+#include "ui_host.h"
+
 #include <d2d1.h>
 #include <wincodec.h>
 #include <wrl/client.h>
@@ -217,27 +219,10 @@ void CheckGolden(const std::string& name, const Image& actual) {
     CHECK(differing == 0);
 }
 
-// A hidden top-level window the controls are created in; never shown.
-struct Host {
-    HWND hwnd = nullptr;
-    Host() {
-        static const bool ready = rui::RenderContext::Init() && rui::LucideIcons::Load();
-        REQUIRE(ready);
-        WNDCLASSW wc{};
-        wc.lpfnWndProc   = DefWindowProcW;
-        wc.hInstance     = GetModuleHandleW(nullptr);
-        wc.lpszClassName = L"ResoluteRenderHost";
-        RegisterClassW(&wc);
-        hwnd = CreateWindowExW(0, wc.lpszClassName, L"render", WS_OVERLAPPEDWINDOW, 0, 0, 1200, 800, nullptr, nullptr,
-                               wc.hInstance, nullptr);
-        REQUIRE(hwnd != nullptr);
-    }
-    ~Host() {
-        rui::AnimationManager::Instance().CancelAll();
-        DestroyWindow(hwnd);
-    }
-    Host(const Host&)            = delete;
-    Host& operator=(const Host&) = delete;
+// A hidden top-level window the controls are created in; never shown
+// (the shared host, tests/ui_host.h, D00 T02 §10).
+struct Host : uitest::HiddenHost {
+    Host() : HiddenHost(L"ResoluteRenderHost") { REQUIRE(ready); }
 };
 
 // Every golden variant: appearance by DPI, and the theme restored after.

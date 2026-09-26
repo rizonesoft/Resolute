@@ -315,6 +315,11 @@ Invoke-Gate -Name 'findings self-test' -LogName 'gate-findings-selftest' -Comman
 Invoke-Gate -Name 'runs self-test' -LogName 'gate-runs-selftest' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\todo-runs.py') --self-test
 }
+# The fence's debt check: every fenced case ends green or night-owed
+# (D00 T02 §10).
+Invoke-Gate -Name 'fence-debt self-test' -LogName 'gate-fence-debt-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\fence-debt.py') --self-test
+}
 # The review wiring: one table names the writer and pins every review slot,
 # and a governing slot never shares the writer's family. D00 T04 §27.
 Invoke-Gate -Name 'panel slots' -LogName 'gate-panel-slots' -Command {

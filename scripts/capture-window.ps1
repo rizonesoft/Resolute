@@ -40,6 +40,11 @@
 .PARAMETER WindowTitle
     Title, or title fragment, of the window to capture.
 
+.PARAMETER ProcessId
+    The process whose main window to capture, for a caller that started it
+    and knows exactly which one it means: a title fragment can also match
+    the operator's own windows (D00 T02 §10).
+
 .PARAMETER Out
     Destination PNG. The sidecar is written beside it with a .txt extension.
 
@@ -62,6 +67,7 @@ param(
     [string]$Path,
     [string]$WorkingDirectory,
     [string]$WindowTitle,
+    [int]$ProcessId = 0,
     [Parameter(Mandatory = $true)][string]$Out,
     [string]$Describes = '',
 
@@ -80,8 +86,8 @@ Set-StrictMode -Version Latest
 # Neither given means "enumerate every window and take the first", which can
 # foreground and save an unrelated application. Refused before anything is
 # enumerated.
-if (-not $Path -and -not $WindowTitle) {
-    Write-Host "capture-window: give -Path, -WindowTitle, or both." -ForegroundColor Red
+if (-not $Path -and -not $WindowTitle -and -not $ProcessId) {
+    Write-Host "capture-window: give -Path, -WindowTitle, -ProcessId, or a combination." -ForegroundColor Red
     Write-Host "  Without a target this would capture whichever window came first." -ForegroundColor Red
     exit 2
 }
@@ -95,21 +101,32 @@ using System.Runtime.InteropServices;
 public class Win32Capture {
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+    [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr hWnd, int attribute, out RECT value, int size);
     [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr hWnd);
     [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")] public static extern IntPtr MonitorFromWindow(IntPtr hWnd, uint flags);
     [DllImport("shcore.dll")] public static extern int GetDpiForMonitor(IntPtr hMon, int type, out uint x, out uint y);
+    [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT { public int Left, Top, Right, Bottom; }
 }
 '@
 }
 
+# Per-monitor DPI aware from here on, before anything is measured. Without it
+# this thread reads virtualized coordinates on a scaled monitor: the window's
+# rectangle, the screen copy, and the monitor's DPI all come back at 96, so a
+# capture on a 150% monitor was saved at two thirds of its size and labelled
+# 100% (found by D00 T02 §10's first 150% captures). A DPI-unaware target is
+# still reported as bitmap-scaled: its window DPI stays 96 below the monitor's.
+[void][Win32Capture]::SetThreadDpiAwarenessContext([IntPtr]::new(-4))   # PER_MONITOR_AWARE_V2
+
 function Get-Matching {
     param([string]$Stem)
     $all = @(Get-Process | Where-Object { $_.MainWindowHandle -ne 0 })
     if ($Stem) { $all = @($all | Where-Object { $_.ProcessName -like "$Stem*" }) }
     if ($WindowTitle) { $all = @($all | Where-Object { $_.MainWindowTitle -like "*$WindowTitle*" }) }
+    if ($ProcessId) { $all = @($all | Where-Object { $_.Id -eq $ProcessId }) }
     return $all
 }
 
@@ -180,7 +197,12 @@ if ($foreground -ne $hwnd) {
 }
 
 $rect = New-Object Win32Capture+RECT
-if (-not [Win32Capture]::GetWindowRect($hwnd, [ref]$rect)) {
+# The frame DWM draws, not the window rectangle: on Windows 10 and 11 the
+# rectangle includes invisible resize borders, and copying it saves a strip
+# of whatever sits behind the window (the operator's other windows) into a
+# committed capture. Found by D00 T02 §10's launcher captures.
+$framed = [Win32Capture]::DwmGetWindowAttribute($hwnd, 9, [ref]$rect, [System.Runtime.InteropServices.Marshal]::SizeOf($rect)) -eq 0   # DWMWA_EXTENDED_FRAME_BOUNDS
+if (-not $framed -and -not [Win32Capture]::GetWindowRect($hwnd, [ref]$rect)) {
     Write-Host "capture-window: could not read the window rect" -ForegroundColor Red
     Stop-Ours
     exit 1

@@ -35,6 +35,8 @@ Every test carries at least one tag naming what it belongs to, because the suite
 | `[repair]` | the repair contract |
 | `[<tool>]` | that tool specifically, lowercase: `[ownership]`, `[regstudio]` |
 | `[driven]` | pumps a real message loop against real, hidden windows (the UI library's animation endpoints and window-backed input, D00 T02 §7); slower than the headless cases, and never shown on the desktop |
+| `[headful]` | needs the desktop: fenced out of the default run, run in the quiet-hours window or on demand, and carries a `[place:...]` tag naming where its windows go (D00 T02 §10, `docs/testing.md`) |
+| `[fence]` | the fence and the focus guard themselves (D00 T02 §10) |
 
 A second tag narrows: `"[ui][dpi]"`. Run one group with `ctest --preset debug -R` or `catch2 "[dpi]"`.
 

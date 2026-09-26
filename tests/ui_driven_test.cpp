@@ -22,6 +22,8 @@
 #include <resolute/render.h>
 #include <resolute/theme.h>
 
+#include "ui_host.h"
+
 #include <windowsx.h>
 
 #include <cstring>
@@ -41,68 +43,21 @@ LRESULT CALLBACK HostProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     return DefWindowProcW(hwnd, msg, wp, lp);
 }
 
-// A hidden top-level window that owns the manager's timer for one case.
-struct DrivenHost {
-    HWND hwnd  = nullptr;
-    bool ready = false;
-
-    DrivenHost() {
-        // What the launcher initializes before any control exists, once per
-        // process: RenderContext::Init is not idempotent.
-        static const bool rendered = rui::RenderContext::Init() && rui::LucideIcons::Load();
-        ready = rendered;
-        WNDCLASSW wc{};
-        wc.lpfnWndProc   = HostProc;
-        wc.hInstance     = GetModuleHandleW(nullptr);
-        wc.lpszClassName = L"ResoluteDrivenHost";
-        RegisterClassW(&wc);  // a second registration fails harmlessly
-        hwnd = CreateWindowExW(0, wc.lpszClassName, L"driven", WS_OVERLAPPEDWINDOW, 0, 0, 800, 600, nullptr,
-                               nullptr, wc.hInstance, nullptr);
-        AnimationManager::Instance().Start(hwnd);
-    }
-    ~DrivenHost() {
-        AnimationManager::Instance().Stop();
-        DestroyWindow(hwnd);
-    }
-    DrivenHost(const DrivenHost&)            = delete;
-    DrivenHost& operator=(const DrivenHost&) = delete;
+// A hidden top-level window that owns the manager's timer for one case,
+// through the shared host (tests/ui_host.h, D00 T02 §10).
+struct DrivenHost : uitest::HiddenHost {
+    DrivenHost() : HiddenHost(L"ResoluteDrivenHost", HostProc, true, 800, 600) {}
 };
 
-// Pumps the thread's messages until `done()` holds or `deadlineMs` passes.
-// False means the transition never settled: the caller REQUIREs it, so a
-// stuck animation fails the named case instead of hanging ctest.
-template <class Done>
-bool PumpUntil(Done done, DWORD deadlineMs = 3000) {
-    const ULONGLONG end = GetTickCount64() + deadlineMs;
-    MSG msg;
-    while (!done()) {
-        if (GetTickCount64() > end) return false;
-        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
-        MsgWaitForMultipleObjects(0, nullptr, FALSE, 10, QS_ALLINPUT);
-    }
-    return true;
-}
-
-bool Settled() { return !AnimationManager::Instance().IsAnimating(); }
-
-// Pumps for a fixed time, whatever the manager holds: what must NOT happen
-// in that window is asserted afterwards.
-void PumpFor(DWORD ms) {
-    const ULONGLONG start = GetTickCount64();
-    PumpUntil([start, ms] { return GetTickCount64() - start >= ms; }, ms + 1000);
-}
+using uitest::PumpFor;
+using uitest::PumpUntil;
+using uitest::Settled;
 
 bool SamePalette(const rui::ColorPalette& a, const rui::ColorPalette& b) {
     return std::memcmp(&a, &b, sizeof(rui::ColorPalette)) == 0;
 }
 
-void Click(HWND hwnd, int x, int y) {
-    SendMessageW(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(x, y));
-    SendMessageW(hwnd, WM_LBUTTONUP, 0, MAKELPARAM(x, y));
-}
+using uitest::Click;
 
 }  // namespace
 
