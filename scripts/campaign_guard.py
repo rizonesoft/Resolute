@@ -421,6 +421,9 @@ def _tag_legacy_state(root: str, outgoing_run: str | None) -> None:
 def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id: str,
                     handover: str | None, generation: str | None = None) -> str:
     guard, state_path = _paths(root)
+    if cron_id in _cleared_jobs(root):
+        raise GuardError(f"job {cron_id} was cleared for deletion by delete-check; a guard never points at it again: "
+                         f"CronCreate a new heartbeat")
     os.makedirs(os.path.dirname(guard), exist_ok=True)
     try:
         # A legacy guard is migrated first, so a same-run acquisition keeps
@@ -724,7 +727,11 @@ def whoami(root: str, session: str, generation: str | None = None, cronlist: str
         job = str(guard.get("cron_id", ""))
         line = f"OWNER run={guard.get('run_id')} job={job}"
         if cronlist is None or not generation:
-            return line
+            # Without the CronList text there is no evidence of a live
+            # carrier, so the job is withheld (panel round 1 of the D00 T04
+            # §40 review).
+            return (f"OWNER run={guard.get('run_id')} (job withheld: no CronList text given)\n"
+                    f"UNKNOWN LISTING: run whoami with --generation and --cronlist - to release the job")
         if listing_state(cronlist) == "unknown":
             return (f"OWNER run={guard.get('run_id')} (job withheld: the CronList text did not read as a listing)\n"
                     f"UNKNOWN LISTING: pass the CronList printout exactly as the tool printed it, then run whoami again")
@@ -889,10 +896,29 @@ def delete_check(root: str, session: str, cron_id: str) -> tuple[int, str]:
             guard = read_guard(root)
         except GuardError:
             return 1, f"KEEP: the guard is unreadable, so {cron_id} cannot be proven obsolete: repair the guard first"
-    if guard is not None and str(guard.get("session_id", "")) == session and str(guard.get("cron_id", "")) == cron_id:
-        return 1, (f"KEEP: {cron_id} is the live guard's current job; end the run or re-point the guard before "
-                   f"deleting it")
+        if guard is not None and str(guard.get("session_id", "")) == session and str(guard.get("cron_id", "")) == cron_id:
+            return 1, (f"KEEP: {cron_id} is the live guard's current job; end the run or re-point the guard before "
+                       f"deleting it")
+        # The clearance is recorded under the same lock, and `acquire`
+        # refuses to make a cleared job current, so nothing can re-point to
+        # it between this answer and the CronDelete (panel round 1).
+        cleared = _cleared_jobs(root)
+        if cron_id not in cleared and (guard is None or str(guard.get("cron_id", "")) != cron_id):
+            _publish(_cleared_path(root), json.dumps((cleared + [cron_id])[-200:]).encode("utf-8"))
     return 0, f"DELETE OK: {cron_id} is not the live guard's current job"
+
+
+def _cleared_path(root: str) -> str:
+    return os.path.join(root, "build", "claude-campaign-cleared.json")
+
+
+def _cleared_jobs(root: str) -> list[str]:
+    try:
+        with open(_cleared_path(root), encoding="utf-8") as fh:
+            doc = json.load(fh)
+        return [str(x) for x in doc] if isinstance(doc, list) else []
+    except (OSError, ValueError):
+        return []
 
 
 _QUARANTINE = "claude-campaign-quarantine"
@@ -2177,9 +2203,13 @@ def _self_test() -> int:
               isinstance(out, dict) and out.get("decision") == "block", str(out))
         with open(run, "a", encoding="utf-8") as fh:
             fh.write(f"\nPARKED 2099-01-01T00:00:00Z run={rid} this run parked\n")
+        # Panel round 1 of the D00 T04 §40 review: the job is released only
+        # with a listing that shows its carrier.
+        cl_a = _cl(("job-a", heartbeat_tag(lroot, g1, RUN_FILE)))
         check("whoami-owner-names-the-run",
-              whoami(lroot, SESSION, g1) == f"OWNER run={read_guard(lroot)['run_id']} job=job-a",
-              whoami(lroot, SESSION, g1))
+              whoami(lroot, SESSION, g1, cl_a) == f"OWNER run={read_guard(lroot)['run_id']} job=job-a"
+              and "job withheld: no CronList text given" in whoami(lroot, SESSION, g1),
+              whoami(lroot, SESSION, g1, cl_a))
         check("whoami-not-the-current-job", whoami(lroot, SESSION, "stale0000000") == "NOT THE CURRENT JOB")
         check("whoami-not-the-owner", whoami(lroot, "99999999-0000-0000-0000-000000000000", g1) == "NOT THE OWNER")
         g2 = mint_generation()
@@ -2660,6 +2690,7 @@ def _self_test() -> int:
         before = out is None
         mig = whoami(iroot, SESSION)
         g_l = read_guard(iroot)
+        mig = whoami(iroot, SESSION, g_l["generation"], _cl(("job-1", heartbeat_tag(iroot, g_l["generation"], RUN_FILE))))
         code, out, _ = run_hook(iroot, SESSION)
         check("a-legacy-guard-migrates-at-its-first-locked-access",
               before and mig == f"OWNER run={g_l.get('run_id')} job=job-1" and bool(g_l.get("generation"))
@@ -2858,7 +2889,18 @@ def _self_test() -> int:
             check("recover-refuses-another-session", "not " + OTHER in str(exc), str(exc))
         back = recover(froot, SESSION, RUN_FILE)
         check("recover-restores-the-guard-from-the-run-record",
-              "(read back)" in back and whoami(froot, SESSION, g) == f"OWNER run={rid_r} job=job-r", back)
+              "(read back)" in back
+              and whoami(froot, SESSION, g, _cl(("job-r", heartbeat_tag(froot, g, RUN_FILE)))) == f"OWNER run={rid_r} job=job-r",
+              back)
+        # Panel round 1: a job cleared for deletion is never made current.
+        code_c, line_c = delete_check(froot, SESSION, "job-old-r")
+        try:
+            acquire(froot, SESSION, 0, RUN_FILE, "job-old-r", generation=mint_generation())
+            check("a-cleared-job-is-never-made-current", False)
+        except GuardError as exc:
+            check("a-cleared-job-is-never-made-current",
+                  code_c == 0 and "was cleared for deletion by delete-check" in str(exc)
+                  and read_guard(froot)["cron_id"] == "job-r", str(exc))
         check("quarantine-leaves-readable-files-alone",
               quarantine(froot, SESSION) == ["quarantine: every guard file parses; nothing moved"])
         # Item 8: an injected failure at each write, replace, and delete
@@ -3322,6 +3364,8 @@ def _self_test() -> int:
                          "Critical events as a `- bookkeeping: ` line (it repeats on every firing"),
                         ("skill-heartbeat-rotates-a-duplicate-generation",
                          "rotate the generation as that line says (a new job from this prompt with a fresh generation"),
+                        ("skill-phase-advance-creates-before-it-deletes",
+                         "then `delete-check` and `CronDelete` the old job (in that order: the old job stays the guard's"),
                         ("skill-rotation-is-a-compare-and-swap",
                          "re-pointed to it with `--expect-generation` and `--expect-run` (a compare-and-swap"),
                         ("skill-every-crondelete-follows-delete-check",
