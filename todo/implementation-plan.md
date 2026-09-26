@@ -167,7 +167,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T02 §9`  | Rendered-output regression tests                  |   5   |
 | [ ] | `D00 T02 §10` | Focus-free UI suite conversion                    |  11   |
 | [ ] | `D00 T02 §11` | Nightly full-suite regression run                 |   8   |
-| [ ] | `D00 T02 §12` | Port-vs-port visual comparison                    |   4   |
+| [ ] | `D00 T02 §12` | Port-vs-port visual comparison                    |   5   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |   5   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |  18   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
