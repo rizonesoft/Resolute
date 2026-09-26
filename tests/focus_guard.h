@@ -1,8 +1,9 @@
 // The focus guard: continuous observation and the window census. D00 T02 §10.
 //
-// A dedicated thread holds out-of-context WinEvent hooks for foreground
-// changes and window shows, so a transient activation is seen when it
-// happens rather than missed between polls. At the end of every case the
+// WinEvent hooks for foreground changes and window shows see a transient
+// activation when it happens rather than missing it between polls: in
+// context for this process, so a window is judged as it was when shown, and
+// on a dedicated thread for the processes a case adopts. At the end of every case the
 // guard takes a census of the windows the suite owns (this process and any
 // process a case adopts, such as the launcher it starts) and checks it:
 //

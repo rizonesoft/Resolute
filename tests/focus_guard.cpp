@@ -41,6 +41,10 @@ bool SystemClass(const std::wstring& cls) {
     return std::any_of(std::begin(kSystem), std::end(kSystem), [&](const wchar_t* c) { return cls == c; });
 }
 
+HWINEVENTHOOK g_ownForeground = nullptr;
+HWINEVENTHOOK g_ownShow       = nullptr;
+bool          g_adoptedHooks  = false;  // the observer thread's hooks installed
+
 bool Owned(HWND hwnd) {
     DWORD pid = 0;
     GetWindowThreadProcessId(hwnd, &pid);
@@ -48,25 +52,65 @@ bool Owned(HWND hwnd) {
     return g_pids.count(pid) != 0;
 }
 
-void CALLBACK OnEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD, DWORD) {
-    if (!hwnd || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
-    if (!Owned(hwnd)) return;
+void Record(DWORD event, WindowRecord window) {
     Event e;
     e.kind   = event == EVENT_SYSTEM_FOREGROUND ? Event::Kind::Foreground : Event::Kind::Shown;
-    e.window = Describe(hwnd);
+    e.window = std::move(window);
     // A child shown under a hidden parent is not on the desktop.
     if (e.kind == Event::Kind::Shown && !e.window.visible) return;
     std::lock_guard<std::mutex> hold(g_lock);
     g_events.push_back(std::move(e));
 }
 
+// This process's windows, in context: the hook runs on the thread raising
+// the event, before the call that raised it returns, so a window shown and
+// hidden or destroyed at once is judged as it was, not as it is later.
+void CALLBACK OnOwnEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD, DWORD) {
+    if (!hwnd || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
+    Record(event, Describe(hwnd));
+}
+
+DWORD PidOfThread(DWORD threadId) {
+    HANDLE thread = OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, threadId);
+    if (!thread) return 0;
+    const DWORD pid = GetProcessIdOfThread(thread);
+    CloseHandle(thread);
+    return pid;
+}
+
+// An adopted process's windows (the launcher a case starts), out of
+// context: ownership comes from the thread that raised the event, which
+// outlives its windows, and a window gone before delivery is still
+// recorded, as shown somewhere nobody measured.
+void CALLBACK OnAdoptedEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD threadId,
+                             DWORD) {
+    if (!hwnd || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
+    const DWORD pid = PidOfThread(threadId);
+    if (pid == 0 || pid == GetCurrentProcessId()) return;  // the in-context hook has this process
+    {
+        std::lock_guard<std::mutex> hold(g_lock);
+        if (g_pids.count(pid) == 0) return;
+    }
+    WindowRecord w;
+    if (IsWindow(hwnd)) {
+        w = Describe(hwnd);
+    } else {
+        w.hwnd    = hwnd;
+        w.pid     = pid;
+        w.cls     = L"(gone before it was measured)";
+        w.visible = true;
+    }
+    Record(event, std::move(w));
+}
+
 DWORD WINAPI Observe(LPVOID) {
     MSG msg;
     PeekMessageW(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);  // make the queue
-    HWINEVENTHOOK fg   = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr, OnEvent, 0, 0,
+    HWINEVENTHOOK fg   = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr, OnAdoptedEvent, 0,
+                                         0, WINEVENT_OUTOFCONTEXT);
+    HWINEVENTHOOK show = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr, OnAdoptedEvent, 0, 0,
                                          WINEVENT_OUTOFCONTEXT);
-    HWINEVENTHOOK show = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr, OnEvent, 0, 0,
-                                         WINEVENT_OUTOFCONTEXT);
+    g_adoptedHooks = fg != nullptr && show != nullptr;
     SetEvent(g_ready);
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (msg.message == kFlush) SetEvent(g_flushed);
@@ -164,9 +208,27 @@ void Start() {
     g_flushed = CreateEventW(nullptr, TRUE, FALSE, nullptr);
     g_thread = CreateThread(nullptr, 0, Observe, nullptr, 0, &g_threadId);
     WaitForSingleObject(g_ready, 5000);
+    const DWORD self = GetCurrentProcessId();
+    // In-context hooks need a module even when, as here, the callback lives
+    // in the executable and only this process raises the events.
+    HMODULE module = GetModuleHandleW(nullptr);
+    g_ownForeground  = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, module, OnOwnEvent, self, 0,
+                                       WINEVENT_INCONTEXT);
+    g_ownShow = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, module, OnOwnEvent, self, 0, WINEVENT_INCONTEXT);
+    // A guard without its hooks sees nothing and would pass every case: that
+    // fails the run instead (the first in-context attempt, without a module,
+    // installed nothing and said nothing).
+    if (!g_ownForeground || !g_ownShow || !g_adoptedHooks) {
+        std::printf("FOCUS-VIOLATION the focus guard could not install its hooks (error %lu)\n", GetLastError());
+        std::fflush(stdout);
+        ++g_violations;
+    }
 }
 
 void Stop() {
+    if (g_ownForeground) UnhookWinEvent(g_ownForeground);
+    if (g_ownShow) UnhookWinEvent(g_ownShow);
+    g_ownForeground = g_ownShow = nullptr;
     if (!g_thread) return;
     PostThreadMessageW(g_threadId, WM_QUIT, 0, 0);
     WaitForSingleObject(g_thread, 5000);

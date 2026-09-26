@@ -11,8 +11,9 @@ unaccounted control: it ran and failed, or it never ran at all.
     python scripts/fence-debt.py --log build/headful.log --stamp    # the Night-owed: line
     python scripts/fence-debt.py --self-test
 
---cases narrows the check to the named cases (comma-separated), for a
-section whose surface owns only some of the fenced rows.
+--cases narrows the check to one named case, and repeats for more, for a
+section whose surface owns only some of the fenced rows. Names are whole:
+a comma inside one (`Launcher capture, dark at 100 percent`) is part of it.
 """
 
 import argparse
@@ -114,6 +115,12 @@ def self_test():
                    stamp_line(judge(["Alpha case", "Beta case"], log)) ==
                    "Night-owed: Beta case (headful: outside the quiet-hours window)"))
     checks.append(("no debt says none", stamp_line(judge(["Alpha case"], log)) == "Night-owed: none"))
+    launcher = "Launcher capture, dark at 100 percent"
+    audit2 = audit + "\n| d | `" + launcher + "` | fence | fenced | [place:dpi96] |"
+    log2 = log + '\n5: SKIP "' + launcher + '" hardware absent'
+    checks.append(("a case name with a comma is one case",
+                   fenced_cases(audit2)[-1] == launcher and judge([launcher], log2) == [(launcher, "owed", "hardware absent")]))
+    checks.append(("--cases takes a name with a comma whole", main_args_cases(["--cases", launcher]) == [launcher]))
     bad = [n for n, ok in checks if not ok]
     for n in bad:
         print(f"fence-debt self-test FAIL: {n}")
@@ -121,13 +128,23 @@ def self_test():
     return 1 if bad else 0
 
 
-def main(argv):
+def parser():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--log", help="a fenced run's output (ctest --preset headful -V)")
     ap.add_argument("--audit", default=str(AUDIT))
-    ap.add_argument("--cases", help="comma-separated case names to check instead of every fenced row")
+    ap.add_argument("--cases", action="append", default=[],
+                    help="a case name to check instead of every fenced row; repeat for more")
     ap.add_argument("--stamp", action="store_true", help="print the Night-owed: line")
     ap.add_argument("--self-test", action="store_true")
+    return ap
+
+
+def main_args_cases(argv):
+    return [c.strip() for c in parser().parse_args(argv).cases if c.strip()]
+
+
+def main(argv):
+    ap = parser()
     args = ap.parse_args(argv)
     if args.self_test:
         return self_test()
@@ -135,7 +152,7 @@ def main(argv):
         ap.error("--log is required")
     cases = fenced_cases(Path(args.audit).read_text(encoding="utf-8"))
     if args.cases:
-        wanted = [c.strip() for c in args.cases.split(",") if c.strip()]
+        wanted = [c.strip() for c in args.cases if c.strip()]
         missing = [c for c in wanted if c not in cases]
         if missing:
             print("fence-debt: not fenced in the audit table: " + "; ".join(missing))

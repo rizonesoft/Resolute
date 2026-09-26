@@ -153,6 +153,14 @@ TEST_CASE("The popup menu ends when its owner is torn down under it", "[ui][head
     HWND owner = CreateWindowExW(0, L"STATIC", L"owner", WS_POPUP, 0, 0, 10, 10, nullptr, nullptr,
                                  GetModuleHandleW(nullptr), nullptr);
     REQUIRE(owner != nullptr);
+    // Destroyed however the case ends: a collecting run that stands down
+    // before the script destroys it must not leave it behind.
+    struct DestroyOnExit {
+        HWND hwnd;
+        ~DestroyOnExit() {
+            if (IsWindow(hwnd)) DestroyWindow(hwnd);
+        }
+    } cleanup{owner};
     Script s;
     s.destroy = owner;
     const WORD chosen = ShowScripted(owner, s);
@@ -256,6 +264,30 @@ HWND MainWindowOf(DWORD pid) {
     return found;
 }
 
+// Waits up to `ms` for `done`, pumping, and gives up early when the
+// operator returns to a collecting run: the caller then stands down.
+template <class Done>
+bool WaitOrStandDown(Done done, DWORD ms) {
+    const ULONGLONG end = GetTickCount64() + ms;
+    while (!done()) {
+        if (fence::InputResumed() || GetTickCount64() > end) return false;
+        uitest::PumpFor(25);
+    }
+    return !fence::InputResumed();
+}
+
+// A process a case started: ended when the case ends, however it ends.
+struct Child {
+    PROCESS_INFORMATION pi{};
+    ~Child() {
+        if (!pi.hProcess) return;
+        if (WaitForSingleObject(pi.hProcess, 0) == WAIT_TIMEOUT) TerminateProcess(pi.hProcess, 1);
+        WaitForSingleObject(pi.hProcess, 5000);
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+    }
+};
+
 // The launcher a case started: closed when the case ends, however it ends,
 // so a failed assertion never leaves a window on the operator's desktop.
 struct Launched {
@@ -312,20 +344,24 @@ void CaptureLauncher(const char* mode, UINT dpi) {
     std::wstring cmd = L"\"" + std::filesystem::path(RESOLUTE_LAUNCHER).wstring() + L"\"";
     REQUIRE(CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi));
     focusguard::AdoptProcess(pi.dwProcessId);
-    WaitForInputIdle(pi.hProcess, 10000);
     HWND main = nullptr;
-    uitest::PumpUntil([&] { return (main = MainWindowOf(pi.dwProcessId)) != nullptr; }, 10000);
-    REQUIRE(main != nullptr);
+    const bool appeared = WaitOrStandDown([&] { return (main = MainWindowOf(pi.dwProcessId)) != nullptr; }, 10000);
+    RESOLUTE_HEADFUL_CHECK_INPUT();
+    REQUIRE(appeared);
 
     // The launcher starts in System mode; its theme command cycles System,
     // Dark, Light, so one press is dark and two are light.
     const int presses = std::string(mode) == "dark" ? 1 : 2;
     for (int i = 0; i < presses; ++i) {
         SendMessageW(main, WM_COMMAND, MAKEWPARAM(rui::IDC_TB_THEME, 0), 0);
-        uitest::PumpFor(600);
+        WaitOrStandDown([] { return false; }, 600);
+        RESOLUTE_HEADFUL_CHECK_INPUT();
     }
+    // Checked again before the foreground is taken: never take it from an
+    // operator who is back.
+    RESOLUTE_HEADFUL_CHECK_INPUT();
     const bool foreground = TakeForeground(main);
-    uitest::PumpFor(500);
+    WaitOrStandDown([] { return false; }, 500);
     RESOLUTE_HEADFUL_CHECK_INPUT();
     INFO("capture-window.ps1 fails closed unless the launcher owns the foreground");
     REQUIRE(foreground);
@@ -348,13 +384,22 @@ void CaptureLauncher(const char* mode, UINT dpi) {
                       L" percent (D00 T02 section 10)\"";
     STARTUPINFOW psi{};
     psi.cb = sizeof(psi);
-    PROCESS_INFORMATION ppi{};
-    REQUIRE(CreateProcessW(nullptr, ps.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &psi, &ppi));
-    WaitForSingleObject(ppi.hProcess, 60000);
+    Child capture;
+    REQUIRE(CreateProcessW(nullptr, ps.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &psi, &capture.pi));
+    const bool finished =
+        WaitOrStandDown([&] { return WaitForSingleObject(capture.pi.hProcess, 0) == WAIT_OBJECT_0; }, 60000);
+    if (!finished && fence::InputResumed()) {
+        // The capture may hold whatever the operator brought to the front.
+        TerminateProcess(capture.pi.hProcess, 1);
+        WaitForSingleObject(capture.pi.hProcess, 5000);
+        std::error_code ec;
+        std::filesystem::remove(out, ec);
+        std::filesystem::remove(std::filesystem::path(out).replace_extension(".txt"), ec);
+    }
+    RESOLUTE_HEADFUL_CHECK_INPUT();
+    REQUIRE(finished);
     DWORD rc = 1;
-    GetExitCodeProcess(ppi.hProcess, &rc);
-    CloseHandle(ppi.hThread);
-    CloseHandle(ppi.hProcess);
+    GetExitCodeProcess(capture.pi.hProcess, &rc);
     CHECK(rc == 0);
     CHECK(std::filesystem::exists(out));
 

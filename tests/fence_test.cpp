@@ -7,6 +7,7 @@
 #include "ui_host.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -137,4 +138,24 @@ TEST_CASE("The guard's rules name each violation", "[fence]") {
         fg.window = Window(L"ResoluteMain", true, 96);
         CHECK(focusguard::Check("t", true, "place:dpi96", none, {fg}, empty, nullptr).empty());
     }
+}
+
+TEST_CASE("A window shown and gone at once is still seen", "[fence]") {
+    // The guard judges a show when it happens: a window shown, hidden, and
+    // destroyed before anything could look at it afterwards is recorded all
+    // the same (the independent review of D00 T02 §10). The window is 1 x 1
+    // and off every monitor, so nothing reaches the operator's screen, and
+    // the case drains its own events so the show it made on purpose is not
+    // held against it.
+    focusguard::Drain();
+    HWND flash = CreateWindowExW(WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW, L"STATIC", L"transient", WS_POPUP, -32000,
+                                 -32000, 1, 1, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+    REQUIRE(flash != nullptr);
+    ShowWindow(flash, SW_SHOWNOACTIVATE);
+    ShowWindow(flash, SW_HIDE);
+    DestroyWindow(flash);
+    const auto events = focusguard::Drain();
+    CHECK(std::any_of(events.begin(), events.end(), [&](const focusguard::Event& e) {
+        return e.kind == focusguard::Event::Kind::Shown && e.window.hwnd == flash && e.window.cls == L"Static";
+    }));
 }
