@@ -439,7 +439,6 @@ TEST_CASE("Sidebar collapse toggles both ways", "[ui][controls]") {
     CHECK_FALSE(bar.IsCollapsed());
     bar.ToggleCollapsed();
     CHECK(bar.IsCollapsed());
-    CHECK(bar.TargetWidth() == bar.ScaledWidth());
 }
 
 TEST_CASE("Sidebar category table keeps its shape", "[ui][controls]") {

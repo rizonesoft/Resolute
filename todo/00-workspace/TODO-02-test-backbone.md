@@ -478,15 +478,21 @@ Uncovered, with reasons: the render pipeline and every Paint path (need a D2D de
 
 ## 6. Remove the Tautological Width Check
 
+> **Started:** 2026-09-26T11:21:57Z
+
 Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it for tracked work: `Sidebar collapse toggles both ways` checks `bar.TargetWidth() == bar.ScaledWidth()`, but `TargetWidth()` is defined as `return ScaledWidth();` (`shared/resolute-ui/src/controls/sidebar.cpp:29`), so both sides are the same const call on the same object and the check cannot fail. It proves nothing about collapse width and must go rather than sit as a passing assertion that guards nothing. There is no meaningful replacement headless: settled widths ride the collapse animation, which is why §5 lists them as uncovered, so the fix is deletion, not substitution.
 
 **Needs:** Windows host (build/test)
 
-- [ ] Delete the tautological check from `Sidebar collapse toggles both ways`. Done when: no assertion in the case compares a value with itself, and the diff touches nothing else.
-- [ ] Record §5's suite counts as remeasurable claims in this section: the `TEST_CASE` count in `tests/ui_test.cpp` and the `IsHighContrast` caller count in `shared/resolute-ui/src`. Done when: `todo-claims.py` reports both holding.
-- [ ] Commit: `"test: remove the tautological width check"`
+- [x] Delete the tautological check from `Sidebar collapse toggles both ways`. Done when: no assertion in the case compares a value with itself, and the diff touches nothing else. **Done 2026-09-26:** `CHECK(bar.TargetWidth() == bar.ScaledWidth());` deleted from `tests/ui_test.cpp` (one line removed, nothing else in the file touched); the case keeps its three collapse-state checks. The direct binary run reads `All tests passed (270 assertions in 42 test cases)`, one fewer than the parent's `271 assertions in 42 test cases`, both measured here.
+- [x] Record §5's suite counts as remeasurable claims in this section: the `TEST_CASE` count in `tests/ui_test.cpp` and the `IsHighContrast` caller count in `shared/resolute-ui/src`. Done when: `todo-claims.py` reports both holding. **Done 2026-09-26:** three claims below: `TEST_CASE` in `tests/ui_test.cpp` = 33; `IsHighContrast` in `shared/resolute-ui/src/*.cpp` = 1 (its definition in `theme.cpp`, so no caller, as D00 T02 §5 recorded) and in `shared/resolute-ui/src/controls/*.cpp` = 0; `todo-claims: 120 claim(s) -- 120 hold`.
+- [x] Commit: `"test: remove the tautological width check"`
 
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR19 D00-T02-S5-PR19
+
+<!-- claim: count "TEST_CASE" tests/ui_test.cpp = 33 -->
+<!-- claim: count "IsHighContrast" shared/resolute-ui/src/*.cpp = 1 -->
+<!-- claim: count "IsHighContrast" shared/resolute-ui/src/controls/*.cpp = 0 -->
 
 **Test checkpoint:** `ctest --preset debug -L ui` exits 0 with `100% tests passed out of 42`, and the direct binary run reports the same 42 cases with one fewer assertion than §5's 271.
 
