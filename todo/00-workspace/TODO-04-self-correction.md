@@ -98,7 +98,7 @@ track: W1
 |  38   |   §38   | Campaign guard identity and recovery           | §36 |  [x]   |
 |  39   |   §39   | CI read-back and repair completeness           | §37 |  [x]   |
 |  40   |   §40   | Campaign guard fence completeness              | §38 |  [x]   |
-|  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [ ]   |
+|  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [x]   |
 |  42   |   §42   | Campaign guard recovery completeness           | §40, §41 |  [ ]   |
 
 ---
@@ -1730,6 +1730,13 @@ The D00 T04 §39 review files what its contract does not own. Its hard-cap round
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR14 D00-T04-S39-PR14
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR15 D00-T04-S39-PR15
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR18 D00-T04-S39-PR18
+
+> **Verified:** 2026-09-26 | §41 | `campaign_guard.py --self-test` `campaign_guard self-test: 289 cases, 0 failed`, carrying strict journal replay (state machine, identity on every line, torn, duplicate, renumbered, reopened, and edited lines refused, an append-only journal against HEAD), versioned receipts journalled and preferred by restore, remote-checked abandon, attempt- and workflow-id-bound close, re-derived retirement bound to the episode's workflow, a campaign-bound ceiling replayed strictly, and interruption fixtures for every transition; `review_prompt.py --self-test` `review-prompt self-test: 641 cases, 0 failed`, carrying GitHub-ordered filters with refusals, derivable pushed paths, the D1 to D11 decision table, the redaction grammar with its block rule, `secret_scan` and `capture-run` with provenance, and the Windows failure drill (run 36227133366) reproduced locally step by step; the drill in docs/phase-runs/2026-09-25-phase-0.md; `scripts/check-all.ps1` `19 gate(s) ok`
+> **Review:** round 5 GPT depth, candidates `2c60059f`(round 1) `3a516394`(round 2) `bd6d8427`(round 3) `a779094c`(round 4) `1fc1cc0a`(round 5) -- `adversarial` needs-attention at round 5, filed: F17 in D00 T04 §42 (the hard cap; a PowerShell backtick escape), closed earlier: 6 fixed (the redaction opener unit rethought after four rounds) · `consistency` approves at every round · `integration` needs-attention at round 5, filed: F18 and F19 in D00 T04 §42 (the hard cap), closed earlier: 4 fixed · `record` approves at round 5, closed: 2 fixed · `source-defect` owed and done (GitHub's own drill run is the source) · `design` not owed. Independent pass on the implementation commit 83700a9e (`independent` slot, gpt-6-astra high): one P1 and three P2s, all right, fixed in 2c60059f before round 1. Raw findings: docs/reviews/00-workspace/D00-T04-s41.md Attestation: docs/reviews/00-workspace/D00-T04-s41.attest.json
+> **Plan review:** astra (run 20260926-D00-T04-S41-astra) -- filed: D00 T04 §42 (PR1, PR2, PR3, PR5, PR6, PR11, PR12, PR13, PR14)
+> **CRUD:** not applicable (review tooling, the repair journal, CI oracle captures, and skill text; writes only gitignored run state under `build/` and the tracked run file's journal lines)
+> **Duration:** 2026-09-26T06:38:11Z to 2026-09-26T09:14:53Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 42. Campaign Guard Recovery Completeness
 
