@@ -74,8 +74,8 @@ $Ctest = Join-Path $RepoRoot 'reskit\cmake\bin\ctest.exe'
 $BaselineFile = Join-Path $RepoRoot 'todo\.tidy-baseline'
 
 # The TODO scripts are stdlib-only and run under any Python 3, but the name
-# on PATH differs by platform and install: `python` on Windows, `python3`
-# under WSL and CI, `py` as the Windows launcher fallback. Resolve once so a
+# on PATH differs by install: `python` usually, `python3` on some, `py`
+# as the Windows launcher fallback. Resolve once so a
 # bare `python` that is missing (or shadowed by the Store stub) fails here
 # with a name, not eight gates down with a confusing error.
 $Python = @('python', 'python3', 'py') | ForEach-Object {

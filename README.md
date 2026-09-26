@@ -32,16 +32,6 @@ The result is `Bin/Release/Resolute.exe`.
 
 `bootstrap.ps1` skips anything already present, so running it a second time costs under a second. Use `-Force` to re-download. The `debug` preset exists alongside `release` and takes the same two commands.
 
-From WSL, the build itself still runs on the Windows side: the pinned toolchain is Windows binaries and Windows CMake cannot read WSL paths. `scripts/wsl.sh` translates the repository path and re-invokes the named script under Windows PowerShell 7, so every path downstream is native.
-
-```bash
-scripts/wsl.sh cpp-env.ps1        # check the toolchain resolves
-scripts/wsl.sh build.ps1 -All     # same build command, via Windows PowerShell
-scripts/wsl.sh check-all.ps1      # every gate, the same way
-```
-
-The wrapper needs the checkout on a Windows-visible drive (`/mnt/<letter>`) and Windows PowerShell 7 installed, and it passes its exit code through, so a failing gate fails the same way it does natively.
-
 A clone does **not** need `--recursive`: there are no submodules.
 
 ## Layout

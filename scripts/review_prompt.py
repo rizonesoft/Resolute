@@ -7,8 +7,8 @@ the port. Resolute's `review-todo-section` skill is the caller.
 Prompts are ephemeral `/tmp` files, but the rules that build them are
 checked-in code so a fixture can prove them: delimiter tags are unique per
 prompt (item 14: fixed delimiters are injectable from TODO text), prompt
-bytes are canonicalized before counting (item 5: UTF-8/LF, so Windows and
-WSL checkouts agree), and reviewer output is validated whole (item 15: one
+bytes are canonicalized before counting (item 5: UTF-8/LF, so CRLF and LF
+checkouts agree), and reviewer output is validated whole (item 15: one
 valid-looking row must not mask malformed trailing findings).
 """
 

@@ -25,7 +25,7 @@ It is being **rewritten in C++** from a mature AutoIt3 implementation. The AutoI
 | `docs/` | Captures, reviews, phase runs, reports, the brainstorm record |
 | `build/` | Ignored derived output, never an authoritative record |
 
-Everything here is Windows-only. The TODO tooling (`scripts/`, plan checks) is stdlib Python 3 and runs anywhere.
+Everything here is Windows-only, the TODO tooling (`scripts/`, plan checks) included: it is stdlib Python 3, run on the Windows development host and on CI's `windows-2025` runner, and nothing tests it elsewhere (D00 T01 §9).
 
 ## The decisions this project runs on
 
