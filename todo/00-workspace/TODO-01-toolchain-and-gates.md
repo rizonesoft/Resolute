@@ -855,11 +855,14 @@ Resolute is a Windows-only suite, per the operator's 2026-09-20 decision, but th
 - [ ] Remove the bridge and its callers: delete `scripts/wsl.sh` and re-point or delete everything referencing it. Done when: no reference to `wsl.sh` or WSL execution remains outside this section's own record, quoted from grep.
 - [ ] Remove the remaining inventoried surface: Linux-runner CI jobs, Linux-gated tests, Linux-conditional code paths. Done when: the step-1 inventory reads empty item by item, each quoted, and nothing removed has a live caller left behind (grep for each removed name returns nothing outside this section's record).
 - [ ] Prove the Windows tree whole: full gates green plus one review-prompt fence round under Git Bash. Done when: `check-all` reports green quoted, and a `fence`/`cross-check` round runs under Git Bash quoted, proving the purge took no Windows-native tooling with it.
+- [ ] Settle the review-prompt self-test's POSIX status: under WSL `python3 scripts/review_prompt.py --self-test` fails `anchors-untracked-fires` (a fixture cite written with a Windows separator, `todo\README.md`), found by the D00 T04 §39 independent review and present before it (the pre-§39 suite failed three legs under WSL, the post-§39 suite one). Done when: either the self-test is declared Windows-only with the rest of the Linux surface this section removes (and the AGENTS.md line saying the TODO tooling runs anywhere says so), or the fixture is separator-neutral and the suite passes under a POSIX interpreter, quoted.
 - [ ] Commit: `"workspace: remove the Linux execution surface"`
 
 **Test checkpoint:** The inventory reads empty, grep for the removed names returns only this section's record, `check-all` is green, and one fence round runs under Git Bash. All quoted from driven runs.
 
 -> SOURCE: operator-2026-09-20-no-linux
+
+-> XREF: D00 T04 §39 -- the WSL self-test failure its independent review found, filed as an item here
 
 ## Verification
 

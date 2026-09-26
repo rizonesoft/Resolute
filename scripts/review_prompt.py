@@ -1159,12 +1159,13 @@ def _glob_regex(glob: str) -> re.Pattern:
 def _flow_list(value: str, child: list[str]) -> list[str]:
     """A YAML list given inline (`[a, 'b']`, or a single scalar) or as
     `- item` lines, as plain strings."""
-    value = value.strip()
+    strip_c = lambda v: re.sub(r"(?:\A|\s+)#.*\Z", "", v).strip()
+    value = strip_c(value)
     if value.startswith("["):
         return [x.strip().strip("'\"") for x in value.strip("[]").split(",") if x.strip()]
     if value:
         return [value.strip("'\"")]
-    return [ln.strip()[2:].strip().strip("'\"") for ln in child if ln.strip().startswith("- ")]
+    return [strip_c(ln.strip()[2:]).strip("'\"") for ln in child if ln.strip().startswith("- ")]
 
 
 def push_trigger_filter(text: str | None) -> dict | None:
@@ -1174,22 +1175,32 @@ def push_trigger_filter(text: str | None) -> dict | None:
     decoder as the steps (D00 T04 §39)."""
     if not text:
         return None
+    nocomment = lambda v: re.sub(r"(?:\A|\s+)#.*\Z", "", v).strip()
+    plain = {"branches": None, "branches-ignore": None, "paths": None, "paths-ignore": None}
     lines = text.splitlines()
     top = _entries(lines, _first_col(lines) or 0)
     on = next((e for e in top if e[0] in ("on", "true")), None)
     if on is None:
         return None
-    value, child = on[1].strip(), on[2]
+    value, child = nocomment(on[1]), on[2]
+    # A flow mapping, or anything else this reader does not decode, is
+    # never read as "no push": it refuses (D00 T04 §39 independent review).
+    if value.startswith("{"):
+        return {"unknown": "an `on:` flow mapping"}
     if value:
         events = _flow_list(value, [])
-        return {"branches": None, "branches-ignore": None, "paths": None, "paths-ignore": None} if "push" in events else None
+        return dict(plain) if "push" in events else None
     col = _first_col(child)
-    events = {k: (v, c) for k, v, c, _i in (_entries(child, col) if col is not None else [])}
+    events = {k: (nocomment(v), c) for k, v, c, _i in (_entries(child, col) if col is not None else [])}
+    if "?" in events:
+        return {"unknown": "an `on:` line the reader does not decode"}
     if "push" not in events:
-        seq = [ln.strip()[2:].strip() for ln in child if ln.strip().startswith("- ")]
-        return {"branches": None, "branches-ignore": None, "paths": None, "paths-ignore": None} if "push" in seq else None
+        seq = [nocomment(ln.strip()[2:]) for ln in child if ln.strip().startswith("- ")]
+        return dict(plain) if "push" in seq else None
     pv, pc = events["push"]
-    filt = {"branches": None, "branches-ignore": None, "paths": None, "paths-ignore": None}
+    if pv and pv not in ("null", "~"):
+        return {"unknown": f"a push trigger given inline ({pv[:40]})"}
+    filt = dict(plain)
     pcol = _first_col(pc)
     for k, v, c, _i in (_entries(pc, pcol) if pcol is not None else []):
         if k in filt:
@@ -1203,6 +1214,8 @@ def push_excluded(filt: dict | None, branch: str, changed: list[str]) -> tuple[b
     present filter admits the push."""
     if filt is None:
         return True, "the workflow no longer triggers on push"
+    if "unknown" in filt:
+        return False, f"the new triggers use a shape the reader does not decode ({filt['unknown']}), so exclusion is unproven"
     if filt["branches"] is not None and not any(_glob_regex(g).match(branch) for g in filt["branches"]):
         return True, f"its branches filter excludes {branch}"
     if filt["branches-ignore"] is not None and any(_glob_regex(g).match(branch) for g in filt["branches-ignore"]):
@@ -6469,6 +6482,13 @@ def _self_test() -> int:
                         sh_exe = os.path.join(os.path.dirname(bash_exe), "sh.exe") if os.name == "nt" else "sh"
                         argv = [bash_exe if a == "bash" else (sh_exe if a == "sh" else a) for a in template.split()]
                         argv = [script.replace("\\", "/") if a == "{0}" else a for a in argv]
+                    elif os.name != "nt":
+                        # The Windows shells execute only on a Windows host;
+                        # elsewhere the portable legs (the template against
+                        # GitHub's `shell:` line, the durable evidence) still
+                        # run, and this names what did not (independent review).
+                        check(f"windows-reproduction-needs-a-windows-host: {step['name']}", True)
+                        continue
                     else:
                         # D00 T04 §39: the Windows shells run the printed
                         # script under the template GitHub ran, as a .ps1 or
@@ -6482,7 +6502,10 @@ def _self_test() -> int:
                               f"the Windows oracle needs {program} on PATH: it never skips silently")
                         if not win_exe:
                             continue
-                        argv = template.replace("{0}", script).replace(program, f'"{win_exe}"', 1)
+                        # An argument vector for PowerShell; cmd's nested
+                        # quotes need its own command line, as GitHub passes it.
+                        argv = ([win_exe, "-command", f". '{script}'"] if program != "cmd"
+                                else template.replace("{0}", script).replace(program, f'"{win_exe}"', 1))
                     got_ctx = subprocess.run(argv, cwd=ctx_root, capture_output=True, text=True, env=env_run)
                     check(f"rerun-reproduces-githubs-context: {step['name']}",
                           _gh_out is not None and got_ctx.stdout.splitlines() == _gh_out,
@@ -6785,7 +6808,14 @@ def _self_test() -> int:
                     ("paths miss", "on:\n  push:\n    paths: ['todo/**']\njobs: {}\n", "master", ["src/a.cpp"], True),
                     ("paths-ignore covers", "on:\n  push:\n    paths-ignore: ['src/**']\njobs: {}\n", "master",
                      ["src/a.cpp"], True),
-                    ("paths hit", "on:\n  push:\n    paths: ['todo/**']\njobs: {}\n", "master", ["todo/x.md"], False)):
+                    ("paths hit", "on:\n  push:\n    paths: ['todo/**']\njobs: {}\n", "master", ["todo/x.md"], False),
+                    # Independent review: a comment is no event, and a shape
+                    # the reader cannot decode is never proof of exclusion.
+                    ("a comment after on:", "on: # events\n  push:\n    paths: ['todo/**']\njobs: {}\n", "master",
+                     ["todo/x.md"], False),
+                    ("an on flow mapping", "on: {push: null}\njobs: {}\n", "master", ["a"], False),
+                    ("a commented branch item", "on:\n  push:\n    branches:\n      - master # main line\njobs: {}\n",
+                     "master", ["a"], False)):
                 got_ex = push_excluded(push_trigger_filter(wf_t), branch, changed_t)[0]
                 check(f"push-exclusion: {label}", got_ex == want, f"{got_ex} {push_trigger_filter(wf_t)}")
             got_nt7 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",

@@ -983,6 +983,10 @@ def _journal(root: str, run_file: str) -> tuple[dict | None, list[tuple]]:
         if state in (None, "reserved"):
             if not hit:
                 ep["attempts"].append({"commit": commit, "red": red or "", "state": state or "pushed"})
+            elif state == "reserved" and hit[0]["state"] == "abandoned":
+                # An abandoned commit reserved again counts again (D00 T04
+                # §39 independent review).
+                hit[0]["state"] = "reserved"
         elif hit:
             hit[0]["state"] = state
     return ep, idents
@@ -1079,9 +1083,26 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
         campaign = str((guard or {}).get("run_id") or "")
         jep, idents = _journal(root, run_file)
         note = ""
+        if state:
+            # Episode files from before D00 T04 §39 carry no attempt state:
+            # they were recorded after their push.
+            for a in state["attempts"]:
+                a.setdefault("state", "pushed")
+            # The caller's run file must be the episode's before its journal
+            # is read at all (D00 T04 §39 independent review, P1).
+            if state.get("run_file") and state["run_file"] != run_file:
+                raise GuardError(f"the open episode belongs to run file {state['run_file']!r}, not {run_file!r}; "
+                                 f"refusing to read another journal")
         if state and jep is None:
-            # The journal closed (or never opened) what the state holds: a
-            # crash after the closing line, before the state delete.
+            # Only a terminal line for this very episode drops its file: a
+            # crash after the closing line, before the state delete. A
+            # missing or silent journal is no evidence, and never resets
+            # the bound (D00 T04 §39 independent review, P1).
+            ended = re.search(rf"repair: episode {re.escape(state['episode'][:12])} (?:closed green|retired)",
+                              _journal_text(root, run_file))
+            if not ended:
+                raise GuardError(f"the episode file holds episode {state['episode'][:12]} but {run_file} records "
+                                 f"no open or ended episode for it: the bound cannot be counted, so escalate")
             os.unlink(path)
             state, note = None, " (a stale episode file the journal had closed was dropped)"
         elif state and jep and jep["episode"] == state["episode"][:12]:
@@ -1162,6 +1183,20 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
             opening = state is None
             state = state or {"episode": red, "attempts": [], **identity, "run": campaign or None}
             done = [a for a in state["attempts"] if _canon(root, a.get("commit", "")) == commit]
+            if done and done[0].get("state") == "abandoned":
+                # A retried push of an abandoned commit is reserved again and
+                # counts again, under the bound (independent review, P2).
+                if len(_active(state)) >= REPAIR_BOUND:
+                    return 1, (f"repair: episode {state['episode'][:12]} has used all {REPAIR_BOUND} attempts: "
+                               f"the bound is exhausted, escalate (PARKED ... escalation:, then end --reason escalation)")
+                n = state["attempts"].index(done[0]) + 1
+                line = (f"repair: episode {state['episode'][:12]} attempt {n} of {REPAIR_BOUND} reserved "
+                        f"({commit[:12]} repairs {done[0]['red'][:12]}){_ident_suffix(state)}")
+                _journal_append(root, run_file, line)
+                _crash("repair:journal-written")
+                done[0]["state"] = "reserved"
+                _publish(path, json.dumps(state, indent=1).encode("utf-8"))
+                return 0, line + " (reserved again after it was abandoned)"
             if done:
                 n = state["attempts"].index(done[0]) + 1
                 return 0, (f"repair: episode {state['episode'][:12]} attempt {n} of {REPAIR_BOUND} reserved "
@@ -1250,6 +1285,21 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
                             rf"by \S", evidence or ""):
                 raise GuardError("repair retire needs --evidence with the authorized NOT GREEN line for this "
                                  "episode's workflow: only an authorized retirement ends an episode without green")
+            # The evidence binds the episode's repair head: no reservation is
+            # open, the silent push descends from the last pushed attempt,
+            # and it is the approved range's head (independent review, P2).
+            if any(a.get("state") == "reserved" for a in state["attempts"]):
+                raise GuardError("an attempt is still reserved with its push unconfirmed: mark it pushed or "
+                                 "abandoned before retiring")
+            silent = _canon(root, evidence.split()[1])
+            rng = re.search(r" for (\S+)\.\.(\S+)", evidence)
+            if not rng or _canon(root, rng.group(2)) != silent:
+                raise GuardError("the NOT GREEN line's approved range must end at the silent push it names")
+            last = next((a["commit"] for a in reversed(state["attempts"]) if a.get("state") == "pushed"),
+                        state["episode"])
+            if _git(root, "merge-base", "--is-ancestor", last, silent)[0] != 0:
+                raise GuardError(f"the silent push {silent[:12]} does not descend from the last attempt {last[:12]}; "
+                                 f"it cannot retire this episode")
             line = (f"repair: episode {state['episode'][:12]} retired: {wf} no longer runs this push "
                     f"({evidence.split(' as authorized by ', 1)[-1][:120]})")
             _journal_append(root, run_file, line)
@@ -2489,6 +2539,14 @@ def _self_test() -> int:
         blocked_close = _repair_cli("close", "--green", shas[6], *W, "--evidence",
                                     f"ci-wait: {shas[6][:12]} plan-gates success https://github.com/example/here/actions/runs/556")
         ab = _repair_cli("abandon", "--commit", shas[6], "--reason", "the push was rejected", *R)
+        # A retried push of the abandoned commit counts again (independent
+        # review), then is abandoned once more for the legs below.
+        again_ab = _repair_cli("attempt", "--red", shas[5], "--commit", shas[6], *W)
+        st_again = _repair_cli("status", *R)
+        check("repair-an-abandoned-commit-reserved-again-counts-again",
+              "reserved again after it was abandoned" in again_ab.stdout and "1 of 3 attempts used" in st_again.stdout
+              and "reserved, push unconfirmed" in st_again.stdout, again_ab.stdout + st_again.stdout)
+        _repair_cli("abandon", "--commit", shas[6], "--reason", "the push was rejected again", *R)
         st2 = _repair_cli("status", *R)
         check("repair-an-abandoned-attempt-frees-its-place",
               a1.returncode == 0 and blocked_close.returncode == 1 and "still reserved" in blocked_close.stderr
@@ -2502,6 +2560,20 @@ def _self_test() -> int:
               crash.returncode == 97 and "1 of 3 attempts used" in st3.stdout and "recovered from the journal" in st3.stdout
               and "reserved, push unconfirmed" in st3.stdout, st3.stdout + st3.stderr)
         _repair_cli("pushed", "--commit", shas[7], *R)
+        # Another run file, or a journal silent about the episode, never
+        # resets the bound (independent review, P1).
+        other_rf = _repair_cli("status", "--run-file", "docs/other.md")
+        with open(os.path.join(rtmp, runf), encoding="utf-8") as fh:
+            kept_journal = fh.read()
+        with open(os.path.join(rtmp, runf), "w", encoding="utf-8") as fh:
+            fh.write("# run, its journal lost\n")
+        silent = _repair_cli("status", *R)
+        with open(os.path.join(rtmp, runf), "w", encoding="utf-8") as fh:
+            fh.write(kept_journal)
+        check("repair-never-drops-an-episode-without-its-terminal-line",
+              other_rf.returncode == 1 and "belongs to run file 'docs/run.md'" in other_rf.stderr
+              and silent.returncode == 1 and "records no open or ended episode" in silent.stderr and os.path.exists(EP),
+              other_rf.stderr + silent.stderr)
         # A lost episode file is detected from the journal and restored.
         os.remove(EP)
         lost = _repair_cli("status", *R)
@@ -2524,11 +2596,22 @@ def _self_test() -> int:
         check("repair-attempt-lines-carry-the-identity",
               " repo=https://github.com/example/here.git branch=master workflow=plan-gates" in full_retry.stdout,
               full_retry.stdout)
-        # An authorized retirement ends the episode without green.
+        # An authorized retirement ends the episode without green, and only
+        # on evidence bound to the episode's head (independent review).
+        unrelated = _repair_cli("retire", *W, "--evidence",
+                                f"ci-wait: {shas[2][:12]} plan-gates NOT GREEN: no run within 900s, as authorized by "
+                                f"operator at 2026-09-26T03:00Z for {shas[1][:12]}..{shas[2][:12]} (x)")
+        off_range = _repair_cli("retire", *W, "--evidence",
+                                f"ci-wait: {shas[8][:12]} plan-gates NOT GREEN: no run within 900s, as authorized by "
+                                f"operator at 2026-09-26T03:00Z for {shas[1][:12]}..{shas[2][:12]} (x)")
+        check("repair-retire-binds-the-episodes-head",
+              unrelated.returncode == 1 and "does not descend from the last attempt" in unrelated.stderr
+              and off_range.returncode == 1 and "approved range must end at the silent push" in off_range.stderr
+              and os.path.exists(EP), unrelated.stderr + off_range.stderr)
         wrong = _repair_cli("retire", *W, "--evidence", ev)
         retired = _repair_cli("retire", *W, "--evidence",
                               f"ci-wait: {shas[8][:12]} plan-gates NOT GREEN: no run within 900s, as authorized by "
-                              f"operator at 2026-09-26T03:00Z for x..y (retired; the workflow no longer triggers on push)")
+                              f"operator at 2026-09-26T03:00Z for {shas[7][:12]}..{shas[8][:12]} (retired; the workflow no longer triggers on push)")
         check("repair-retire-ends-an-episode-only-on-an-authorized-no-run",
               wrong.returncode == 1 and "authorized NOT GREEN line" in wrong.stderr
               and retired.returncode == 0 and " retired: plan-gates no longer runs this push" in retired.stdout
@@ -2548,6 +2631,23 @@ def _self_test() -> int:
               and foreign_restore.returncode == 1 and "a journal from another campaign" in foreign_restore.stderr,
               bound.stdout + foreign.stderr + foreign_restore.stderr)
         os.remove(os.path.join(rtmp, "build", "claude-campaign-guard.json"))
+        # An episode file from before D00 T04 §39 has no attempt states; its
+        # attempts read as pushed, so close still demands a descendant of
+        # the last repair, never of the original red (independent review).
+        legacy_rf = "docs/legacy.md"
+        ident_l = " repo=https://github.com/example/here.git branch=master workflow=plan-gates"
+        with open(os.path.join(rtmp, legacy_rf), "w", encoding="utf-8") as fh:
+            fh.write(f"repair: episode {shas[3][:12]} attempt 1 of 3 ({shas[4][:12]} repairs {shas[3][:12]}){ident_l}\n")
+        with open(EP, "w", encoding="utf-8") as fh:
+            json.dump({"episode": shas[3], "attempts": [{"red": shas[3], "commit": shas[4]}],
+                       "repo": "https://github.com/example/here.git", "branch": "master", "workflow": "plan-gates",
+                       "run_file": legacy_rf}, fh)
+        leg_close = _repair_cli("close", "--green", shas[3], "--workflow", "plan-gates", "--run-file", legacy_rf,
+                                "--evidence", f"ci-wait: {shas[3][:12]} plan-gates success https://github.com/example/here/actions/runs/1")
+        check("repair-a-legacy-episode-still-closes-only-past-its-repairs",
+              leg_close.returncode == 1 and f"does not descend from the last attempt {shas[4][:12]}" in leg_close.stderr,
+              leg_close.stderr)
+        os.remove(EP)
         # D00 T04 §38: the journal carries the episode's identity, and a
         # restore refuses any caller or journal that would rebind it.
         here_branch = _repo_identity(rtmp)["branch"]

@@ -158,7 +158,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
 | [x] | `D00 T02 §5`  | Cover the inherited UI library                    |   7   |
 | [ ] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
-| [ ] | `D00 T01 §9`  | Remove the Linux execution surface                |   5   |
+| [ ] | `D00 T01 §9`  | Remove the Linux execution surface                |   6   |
 | [ ] | `D00 T02 §6`  | Remove the tautological width check               |   3   |
 | [ ] | `D00 T02 §7`  | Driven UI completion tests                        |   3   |
 | [ ] | `D00 T02 §8`  | Icon manifest audit                               |   3   |
