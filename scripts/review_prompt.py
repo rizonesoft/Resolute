@@ -1168,19 +1168,36 @@ def _flow_list(value: str, child: list[str]) -> list[str]:
         out = []
         for it in items:
             it = it.strip()
-            if it.startswith("'"):
-                out.append(it[1:-1].replace("''", "'"))
-            elif it.startswith('"'):
-                out.append(it[1:-1].replace('\\"', '"'))
-            elif it:
-                out.append(it)
-        return out
+            out.append(_list_scalar(it))
+        return [x for x in out if x]
     if value:
-        return [value.strip("'\"")]
-    return [strip_c(ln.strip()[2:]).strip("'\"") for ln in child if ln.strip().startswith("- ")]
+        return [_list_scalar(value)]
+    return [_list_scalar(strip_c(ln.strip()[2:])) for ln in child if ln.strip().startswith("- ")]
+
+
+def _list_scalar(item: str) -> str:
+    """One list item decoded as YAML does: a single-quoted item with its
+    doubled quote, a double-quoted one with every escape the step decoder
+    knows (panel round 2 of the D00 T04 §39 review), else the plain text.
+    An escape the decoder refuses raises ScalarRefused."""
+    item = item.strip()
+    if len(item) >= 2 and item[0] == item[-1] == "'":
+        return item[1:-1].replace("''", "'")
+    if len(item) >= 2 and item[0] == item[-1] == '"':
+        return _decode_double(item[1:-1])
+    return item
 
 
 def push_trigger_filter(text: str | None) -> dict | None:
+    """`_push_trigger_filter`, with a list item the decoder refuses read as
+    an unproven shape rather than as no push (D00 T04 §39)."""
+    try:
+        return _push_trigger_filter(text)
+    except ScalarRefused as exc:
+        return {"unknown": f"a quoted item the decoder refuses ({exc})"}
+
+
+def _push_trigger_filter(text: str | None) -> dict | None:
     """What a workflow's `on:` says about push events: None when push does
     not trigger it at all, else {"branches", "branches-ignore", "paths",
     "paths-ignore"} (each None when absent). Read with the same line
@@ -1826,7 +1843,14 @@ _SECRET_RES = (
     (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S), "***"),
     (re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/-]{8,}=*"), r"\1***"),
     # A credential-named key or variable, quoted or bare, its value every adjacent quoted or bare segment (YAML's doubled quote, backslash escapes, shell concatenation) (D00 T04 §37 panel rounds 1 to 4).
-    (re.compile(r"(?i)((?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?\s*[=:]\s*)((?:'(?:''|[^'])*'|\"(?:[^\"\\]|\\.)*\"|[^\s'\"])+)"), r"\1***"),
+    # A YAML plain scalar after `key:` runs to the end of its line, spaces
+    # included, short of a trailing comment (panel round 2 of the D00 T04
+    # §39 review).
+    # A mapping line starts its line (after indentation, a list dash, or a
+    # log's job, step, and timestamp columns), which keeps the rule off
+    # prose that merely mentions a key.
+    (re.compile(r"(?im)(^(?:[^\t\n]*\t[^\t\n]*\t\S*[ \t])?[ \t]*(?:-[ \t]+)?[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?[ \t]*:[ \t]+)(?![\"'*])([^\n]*?)(?=[ \t]+#|[ \t]*$)"), r"\1***"),
+    (re.compile(r"(?i)((?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|private[_-]?key)[A-Za-z0-9_]*[\"']?\s*[=:]\s*)((?:'(?:''|[^'])*'|\"(?:[^\"\\]|\\.)*\"|\\.|[^\s'\"\\])+)"), r"\1***"),
     # A bare value runs to its true end: commas and braces are value
     # characters in a shell assignment or a YAML plain scalar (D00 T04 §39,
     # F19 of the D00 T04 §37 review).
@@ -6866,7 +6890,13 @@ def _self_test() -> int:
                      "master", ["a"], False),
                     # Panel round 1: a quoted comma is part of the pattern.
                     ("a quoted comma in a branch", "on:\n  push:\n    branches: ['feature/foo,bar']\njobs: {}\n",
-                     "feature/foo,bar", ["a"], False)):
+                     "feature/foo,bar", ["a"], False),
+                    # Panel round 2: a double-quoted escape decodes as YAML
+                    # does, and one the decoder refuses proves nothing.
+                    ("an escaped branch", "on:\n  push:\n    branches: [\"\\u006daster\"]\njobs: {}\n", "master",
+                     ["a"], False),
+                    ("an escape the decoder refuses", "on:\n  push:\n    branches: [\"\\q\"]\njobs: {}\n", "master",
+                     ["a"], False)):
                 got_ex = push_excluded(push_trigger_filter(wf_t), branch, changed_t)[0]
                 check(f"push-exclusion: {label}", got_ex == want, f"{got_ex} {push_trigger_filter(wf_t)}")
             got_nt7 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
@@ -6931,6 +6961,8 @@ def _self_test() -> int:
             for label, text, gone, kept in (
                     ("a bare value past a comma", "API_TOKEN=abc,defghi", "defghi", "API_TOKEN="),
                     ("a bare value past a brace", "password: abc}defghi", "defghi", "password: "),
+                    ("a YAML plain scalar with a space", "  password: abc defghi # note", "defghi", "# note"),
+                    ("a shell value with an escaped space", "API_TOKEN=abc\\ defghi rest", "defghi", " rest"),
                     ("a JSON value with a comma and brace", '{"token": "a,b}c", "mode": "x"}', "a,b}c", '"mode": "x"'),
                     ("an escaped-newline key", "key=-----BEGIN PRIVATE KEY-----\\nMIIEv\\n-----END PRIVATE KEY----- tail",
                      "MIIEv", "tail"),

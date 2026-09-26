@@ -1076,11 +1076,18 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
                              f"so escalate rather than repair")
         if not run_file:
             raise GuardError(f"repair {action} needs --run-file: the run file's journal is the episode's record")
+        # The campaign an episode belongs to is established or the call
+        # refuses: an unreadable guard never reads as "no campaign" (panel
+        # round 2 of the D00 T04 §39 review).
         try:
             guard = read_guard(root)
         except GuardError:
-            guard = None
+            raise GuardError("the guard is unreadable, so the campaign this episode belongs to cannot be "
+                             "established: repair the guard, then retry")
         campaign = str((guard or {}).get("run_id") or "")
+        if action in ("attempt", "pushed", "abandon", "close", "retire", "restore") and not campaign:
+            raise GuardError(f"repair {action} needs a live campaign guard with a run id: the episode is bound to "
+                             f"its campaign")
         jep, idents = _journal(root, run_file)
         note = ""
         if state:
@@ -2461,6 +2468,13 @@ def _self_test() -> int:
         with open(fake_gh, "w", encoding="utf-8") as fh:
             fh.write("import sys\nprint(open(sys.argv[0][:-len('fake_gh.py')] + 'gh-run.json').read())\n")
         EP = os.path.join(rtmp, "build", "claude-campaign-repair.json")
+        GUARD_R = os.path.join(rtmp, "build", "claude-campaign-guard.json")
+
+        def _campaign(run_id: str) -> None:
+            with open(GUARD_R, "w", encoding="utf-8") as fh:
+                json.dump({"session_id": SESSION, "run_file": "docs/run.md", "cron_id": "j", "generation": "g",
+                           "run_id": run_id}, fh)
+        _campaign("aaaaaaaaaaaa")
 
         def _repair_cli(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, os.path.join(HERE, "campaign_guard.py"), "repair", *args,
@@ -2617,11 +2631,8 @@ def _self_test() -> int:
               and retired.returncode == 0 and " retired: plan-gates no longer runs this push" in retired.stdout
               and not os.path.exists(EP), wrong.stderr + retired.stdout + retired.stderr)
         # The episode binds the campaign's run id (D00 T04 §39).
-        with open(os.path.join(rtmp, "build", "claude-campaign-guard.json"), "w", encoding="utf-8") as fh:
-            json.dump({"session_id": SESSION, "run_file": runf, "cron_id": "j", "generation": "g", "run_id": "aaaaaaaaaaaa"}, fh)
         bound = _repair_cli("attempt", "--red", shas[6], "--commit", shas[7], *W)
-        with open(os.path.join(rtmp, "build", "claude-campaign-guard.json"), "w", encoding="utf-8") as fh:
-            json.dump({"session_id": SESSION, "run_file": runf, "cron_id": "j", "generation": "g", "run_id": "bbbbbbbbbbbb"}, fh)
+        _campaign("bbbbbbbbbbbb")
         foreign = _repair_cli("attempt", "--red", shas[6], "--commit", shas[8], *W)
         os.remove(EP)
         foreign_restore = _repair_cli("restore", *W)
@@ -2630,7 +2641,17 @@ def _self_test() -> int:
               and foreign.returncode == 1 and "belongs to campaign run aaaaaaaaaaaa, not bbbbbbbbbbbb" in foreign.stderr
               and foreign_restore.returncode == 1 and "a journal from another campaign" in foreign_restore.stderr,
               bound.stdout + foreign.stderr + foreign_restore.stderr)
-        os.remove(os.path.join(rtmp, "build", "claude-campaign-guard.json"))
+        # Panel round 2: no campaign, or an unreadable guard, refuses.
+        os.remove(GUARD_R)
+        no_campaign = _repair_cli("attempt", "--red", shas[6], "--commit", shas[8], *W)
+        with open(GUARD_R, "w", encoding="utf-8") as fh:
+            fh.write("{broken")
+        broken_guard = _repair_cli("attempt", "--red", shas[6], "--commit", shas[8], *W)
+        check("repair-refuses-without-an-established-campaign",
+              no_campaign.returncode == 1 and "needs a live campaign guard with a run id" in no_campaign.stderr
+              and broken_guard.returncode == 1 and "the guard is unreadable" in broken_guard.stderr,
+              no_campaign.stderr + broken_guard.stderr)
+        _campaign("aaaaaaaaaaaa")
         # An episode file from before D00 T04 §39 has no attempt states; its
         # attempts read as pushed, so close still demands a descendant of
         # the last repair, never of the original red (independent review).
