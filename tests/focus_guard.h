@@ -4,8 +4,10 @@
 // activation when it happens rather than missing it between polls: in
 // context for this process, so a window is judged as it was when shown, and
 // on a dedicated thread for the processes a case adopts, where every show is
-// kept and measured at delivery. The one limit: an adopted process's show
-// whose raising thread has exited by delivery cannot be attributed to it. At the end of every case the
+// kept and measured at delivery; the adopted processes' threads are
+// snapshotted every 100 ms, so a show whose raising thread has exited by
+// delivery still resolves. The one limit: a thread born and gone inside one
+// 100 ms gap, having shown a window, cannot be attributed. At the end of every case the
 // guard takes a census of the windows the suite owns (this process and any
 // process a case adopts, such as the launcher it starts) and checks it:
 //

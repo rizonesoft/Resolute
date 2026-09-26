@@ -9,12 +9,14 @@
 #include <catch2/reporters/catch_reporter_registrars.hpp>
 
 #include <shellscalingapi.h>
+#include <tlhelp32.h>
 
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
+#include <map>
 #include <mutex>
 #include <set>
 #include <thread>
@@ -70,12 +72,44 @@ void CALLBACK OnOwnEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, L
     Record(event, Describe(hwnd));
 }
 
+// The adopted processes' threads, as last seen: a thread that raised a show
+// and exited before the show was delivered still resolves to its process.
+std::map<DWORD, DWORD> g_threadOwner;
+
+// Records every thread of every adopted process. Taken when a process is
+// adopted, at every drain, and every 100 ms on the observer thread while any
+// process is adopted, so only a thread born and gone inside one such gap,
+// having shown a window, escapes attribution.
+void SnapshotThreads() {
+    std::set<DWORD> pids;
+    {
+        std::lock_guard<std::mutex> hold(g_lock);
+        pids = g_pids;
+    }
+    pids.erase(GetCurrentProcessId());
+    if (pids.empty()) return;
+    HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    if (snap == INVALID_HANDLE_VALUE) return;
+    THREADENTRY32 te{};
+    te.dwSize = sizeof(te);
+    for (BOOL ok = Thread32First(snap, &te); ok; ok = Thread32Next(snap, &te)) {
+        if (pids.count(te.th32OwnerProcessID) == 0) continue;
+        std::lock_guard<std::mutex> hold(g_lock);
+        g_threadOwner[te.th32ThreadID] = te.th32OwnerProcessID;
+    }
+    CloseHandle(snap);
+}
+
 DWORD PidOfThread(DWORD threadId) {
     HANDLE thread = OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, threadId);
-    if (!thread) return 0;
-    const DWORD pid = GetProcessIdOfThread(thread);
-    CloseHandle(thread);
-    return pid;
+    if (thread) {
+        const DWORD pid = GetProcessIdOfThread(thread);
+        CloseHandle(thread);
+        if (pid) return pid;
+    }
+    std::lock_guard<std::mutex> hold(g_lock);
+    const auto it = g_threadOwner.find(threadId);
+    return it == g_threadOwner.end() ? 0 : it->second;
 }
 
 // An adopted process's windows (the launcher a case starts), out of
@@ -115,11 +149,14 @@ DWORD WINAPI Observe(LPVOID) {
     HWINEVENTHOOK show = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr, OnAdoptedEvent, 0, 0,
                                          WINEVENT_OUTOFCONTEXT);
     g_adoptedHooks = fg != nullptr && show != nullptr;
+    const UINT_PTR snapshots = SetTimer(nullptr, 0, 100, nullptr);
     SetEvent(g_ready);
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (msg.message == kFlush) SetEvent(g_flushed);
+        if (msg.message == WM_TIMER && msg.wParam == snapshots) SnapshotThreads();
         DispatchMessageW(&msg);
     }
+    KillTimer(nullptr, snapshots);
     if (fg) UnhookWinEvent(fg);
     if (show) UnhookWinEvent(show);
     return 0;
@@ -243,11 +280,15 @@ void Stop() {
 }
 
 void AdoptProcess(DWORD pid) {
-    std::lock_guard<std::mutex> hold(g_lock);
-    g_pids.insert(pid);
+    {
+        std::lock_guard<std::mutex> hold(g_lock);
+        g_pids.insert(pid);
+    }
+    SnapshotThreads();
 }
 
 std::vector<Event> Drain() {
+    SnapshotThreads();
     if (g_thread) {
         // Out-of-context events reach the observer's queue asynchronously:
         // give them a moment, then post a marker behind them and wait for it.
@@ -329,6 +370,7 @@ public:
         std::lock_guard<std::mutex> hold(g_lock);
         g_pids.clear();
         g_pids.insert(GetCurrentProcessId());
+        g_threadOwner.clear();
         }
         int visible = 0, foreground = 0;
         for (const Event& e : events) (e.kind == Event::Kind::Foreground ? foreground : visible)++;

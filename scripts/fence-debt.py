@@ -26,7 +26,7 @@ AUDIT = ROOT / "tests" / "focus-audit.md"
 
 ROW = re.compile(r"^\|(?P<cells>.*)\|\s*$")
 NAME = re.compile(r"`([^`]+)`")
-RESULT = re.compile(r"Test\s+#\d+:\s+(?P<name>.+?)\s+\.+\s*(?:\*+)?(?P<state>Passed|Skipped|Failed|Timeout|Not Run)\b")
+RESULT = re.compile(r"Test\s+#\d+:\s+(?P<name>.+?)\s+\.+\s*(?:\*+)?(?P<state>Passed|Skipped|Failed|Timeout|Not Run|Exception)\b")
 SKIP = re.compile(r'^(?:\d+:\s+)?SKIP "(?P<name>[^"]+)" (?P<reason>.+?)\s*$')
 
 
@@ -47,8 +47,8 @@ def fenced_cases(audit_text):
 
 
 def read_log(log_text):
-    """(passed names, {skipped name: reason}, {other name: state})."""
-    passed, skipped, other = set(), {}, {}
+    """(passed names, {SKIP-line name: reason}, {other name: state}, skipped-result names)."""
+    passed, skipped, other, finished = set(), {}, {}, set()
     for line in log_text.splitlines():
         s = SKIP.match(line.strip())
         if s:
@@ -59,22 +59,28 @@ def read_log(log_text):
             name, state = r.group("name"), r.group("state")
             if state == "Passed":
                 passed.add(name)
-            elif state != "Skipped":
+            elif state == "Skipped":
+                finished.add(name)
+            else:
                 other[name] = state
-    return passed, skipped, other
+    return passed, skipped, other, finished
 
 
 def judge(cases, log_text):
     """[(case, verdict, detail)] with verdict green, owed, or unaccounted."""
-    passed, skipped, other = read_log(log_text)
+    passed, skipped, other, finished = read_log(log_text)
     out = []
     for case in cases:
         if case in other:
             out.append((case, "unaccounted", other[case]))
-        elif case in skipped:
-            out.append((case, "owed", skipped[case]))
         elif case in passed:
             out.append((case, "green", ""))
+        elif case in skipped and case in finished:
+            out.append((case, "owed", skipped[case]))
+        elif case in skipped:
+            # A SKIP line with no skipped result: the process ended some
+            # other way after printing it, or the log stops short.
+            out.append((case, "unaccounted", "SKIP printed but no Skipped result"))
         else:
             out.append((case, "unaccounted", "absent from the run"))
     return out
@@ -108,6 +114,13 @@ def self_test():
     checks.append(("a failed case is unaccounted", v["Delta case"] == ("unaccounted", "Failed")))
     checks.append(("a case absent from the run is unaccounted",
                    judge(["Epsilon case"], log) == [("Epsilon case", "unaccounted", "absent from the run")]))
+    crashed = log.replace("2/3 Test #2: Beta case ........................***Skipped   0.10 sec",
+                          "2/3 Test #2: Beta case ........................***Exception: SegFault  0.10 sec")
+    checks.append(("a SKIP line then a crash is unaccounted",
+                   judge(["Beta case"], crashed) == [("Beta case", "unaccounted", "Exception")]))
+    cut = log.replace("2/3 Test #2: Beta case ........................***Skipped   0.10 sec\n", "")
+    checks.append(("a SKIP line with no result is unaccounted",
+                   judge(["Beta case"], cut) == [("Beta case", "unaccounted", "SKIP printed but no Skipped result")]))
     checks.append(("a skip without its SKIP line is unaccounted",
                    judge(["Beta case"], log.replace('2: SKIP "Beta case"', "2: nothing")) ==
                    [("Beta case", "unaccounted", "absent from the run")]))
@@ -117,7 +130,8 @@ def self_test():
     checks.append(("no debt says none", stamp_line(judge(["Alpha case"], log)) == "Night-owed: none"))
     launcher = "Launcher capture, dark at 100 percent"
     audit2 = audit + "\n| d | `" + launcher + "` | fence | fenced | [place:dpi96] |"
-    log2 = log + '\n5: SKIP "' + launcher + '" hardware absent'
+    log2 = (log + '\n5: SKIP "' + launcher + '" hardware absent' +
+            "\n5/5 Test #5: " + launcher + " ....***Skipped   0.10 sec")
     checks.append(("a case name with a comma is one case",
                    fenced_cases(audit2)[-1] == launcher and judge([launcher], log2) == [(launcher, "owed", "hardware absent")]))
     checks.append(("--cases takes a name with a comma whole", main_args_cases(["--cases", launcher]) == [launcher]))
