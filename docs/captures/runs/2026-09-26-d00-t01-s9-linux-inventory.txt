@@ -1,0 +1,198 @@
+Proves: D00 T01 §9's inventory of the Linux and WSL execution surface before the purge and what remains after it, each kept hit with its reason in the section's Done notes.
+Produced by: git grep (git 2.55.0.windows.2), commands below, run on Windows Version 10.0.26200.9457, 2026-09-26T10:50:48Z, against commits 73dbcf9104e303e6a433e69e8c31ca9a52046a54 (before) and 0ec273d4239e74a851b99267252454b45297c1fb (after). Text output; it travels.
+
+=== $ git grep -n -I -i -E 'wsl|ubuntu|linux|python3 ' 73dbcf9104e303e6a433e69e8c31ca9a52046a54 -- . :!resolute_au3 :!docs/reviews :!docs/phase-runs :!docs/captures :!docs/brainstorm :!todo/implementation-plan.md
+.claude/skills/review-todo-section/SKILL.md:96:Every review mints one private directory and stages every prompt file under it: fixed `/tmp` names collide across concurrent sessions on one machine, proven when a `D00 T04 §9` round fenced an
+.github/workflows/plan.yml:15:    runs-on: ubuntu-24.04
+.github/workflows/plan.yml:23:        run: python3 scripts/todo-graph.py self-test
+.github/workflows/plan.yml:25:        run: python3 scripts/todo-graph.py validate
+.github/workflows/plan.yml:28:          python3 scripts/todo-graph.py plan --sync
+README.md:35:From WSL, the build itself still runs on the Windows side: the pinned toolchain is Windows binaries and Windows CMake cannot read WSL paths. `scripts/wsl.sh` translates the repository path and re-invokes the named script under 
+README.md:38:scripts/wsl.sh cpp-env.ps1        # check the toolchain resolves
+README.md:39:scripts/wsl.sh build.ps1 -All     # same build command, via Windows PowerShell
+README.md:40:scripts/wsl.sh check-all.ps1      # every gate, the same way
+scripts/campaign_guard.py:2216:        # Git Bash by path: the `bash` on PATH can be WSL's, which runs a
+scripts/check-all.ps1:78:# under WSL and CI, `py` as the Windows launcher fallback. Resolve once so a
+scripts/review_prompt.py:11:WSL checkouts agree), and reviewer output is validated whole (item 15: one
+scripts/review_prompt.py:1848:        # GitHub's defaults: `bash -e {0}` on Linux and macOS runners,
+scripts/review_prompt.py:1850:        if runner.startswith(("ubuntu", "macos")):
+scripts/review_prompt.py:6929:            plan_text = ("jobs:\n  plan-gates:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:6930:                         "      - name: Self-test the TODO graph tool\n        run: python3 scripts/todo-graph.py self-test\n"
+scripts/review_prompt.py:6931:                         "      - name: Validate the TODO tree\n        run: python3 scripts/todo-graph.py validate\n"
+scripts/review_prompt.py:6933:                         "          python3 scripts/todo-graph.py plan --sync\n          if true; then\n"
+scripts/review_prompt.py:7059:            ctx_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: ctx\n        working-directory: tools\n"
+scripts/review_prompt.py:7071:            q_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: q\n"
+scripts/review_prompt.py:7079:            for label, yml in (("flow env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env: {MODE: x}\n        run: make\n"),
+scripts/review_prompt.py:7080:                               ("block env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env:\n          MODE: |\n            x\n        run: make\n"),
+scripts/review_prompt.py:7081:                               ("flow workflow env", "env: {X: 1}\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"),
+scripts/review_prompt.py:7083:                               ("block working-directory", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        working-directory: >-\n          tools\n        run: make\n"),
+scripts/review_prompt.py:7084:                               ("block shell", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        shell: |\n          bash {0}\n        run: make\n"),
+scripts/review_prompt.py:7085:                               ("container job", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    container: node:22\n    steps:\n      - name: a\n        run: make\n"),
+scripts/review_prompt.py:7092:                    "  second:\n    steps:\n      - name: s\n        run: make\n    runs-on: ubuntu-24.04\n"
+scripts/review_prompt.py:7093:                    "  third:\n    steps:\n      - name: t\n        run: make\n    runs-on: ubuntu-24.04\n    container: node:22\n")
+scripts/review_prompt.py:7095:            commented = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n# a column-zero comment inside the job\n"
+scripts/review_prompt.py:7098:            inline_c = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps: # build\n    - name: B\n      run: make\n"
+scripts/review_prompt.py:7103:                  and got_c[0]["context"]["runs-on"] == "ubuntu-24.04", str(got_c))
+scripts/review_prompt.py:7105:                  by["s"]["context"]["runs-on"] == "ubuntu-24.04" and by["f"]["context"]["runs-on"] == "windows-2025",
+scripts/review_prompt.py:7109:            quoted = ('jobs:\n  "j":\n    "runs-on": ubuntu-24.04\n    "steps":\n      - "name": q\n'
+scripts/review_prompt.py:7115:                  and qs["q"]["run"] == "make" and qs["q"]["context"]["runs-on"] == "ubuntu-24.04", str(qs["q"]))
+scripts/review_prompt.py:7118:            flow = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - {name: f, run: make}\n"
+scripts/review_prompt.py:7122:            uses_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:7129:            fake = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: Run actions/checkout@prepare\n"
+scripts/review_prompt.py:7136:            flow_with = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:7299:            wf_env = "env:\n  X: 1\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"
+scripts/review_prompt.py:7304:                      ("Self-test the TODO graph tool", "python3 scripts/todo-graph.py self-test"),
+scripts/review_prompt.py:7305:                      ("Validate the TODO tree", "python3 scripts/todo-graph.py validate"),
+scripts/review_prompt.py:7307:                       "python3 scripts/todo-graph.py plan --sync\nif true; then\n  test -z x\nfi")],
+scripts/review_prompt.py:7312:                  and f"rerun locally at {c1[:12]}: Validate the TODO tree: python3 scripts/todo-graph.py validate" in line
+scripts/review_prompt.py:7428:                         "jobs:\n  x:\n    runs-on: ubuntu-24.04\n")
+scripts/review_prompt.py:7684:            sec_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: s\n        env:\n"
+scripts/review_prompt.py:7864:            cred_step = workflow_steps("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: c\n"
+scripts/todo-graph.py:268:    nowhere else -- in particular never under WSL, whose
+scripts/todo-graph.py:5382:                  detect_context(platform="linux", environ={}),
+scripts/wsl.sh:3:# Run one of this repository's PowerShell scripts on the Windows side, from WSL.
+scripts/wsl.sh:6:# cannot read WSL paths, so the .ps1 scripts cannot run under Linux pwsh.
+scripts/wsl.sh:7:# This wrapper translates the script path with wslpath and re-invokes it
+scripts/wsl.sh:12:#   scripts/wsl.sh <script.ps1> [args...]
+scripts/wsl.sh:13:#   scripts/wsl.sh build.ps1 -All -Config Release
+scripts/wsl.sh:14:#   scripts/wsl.sh check-all.ps1
+scripts/wsl.sh:22:# Windows PowerShell 7. Override the interpreter with WSL_PWSH.
+scripts/wsl.sh:30:    echo "usage: scripts/wsl.sh <script.ps1> [args...]" >&2
+scripts/wsl.sh:31:    echo "  runs a repository PowerShell script on the Windows side, from WSL" >&2
+scripts/wsl.sh:32:    echo "  example: scripts/wsl.sh build.ps1 -All -Config Release" >&2
+scripts/wsl.sh:35:# Outside WSL this wrapper has no job: the .ps1 runs directly.
+scripts/wsl.sh:36:if ! command -v wslpath >/dev/null 2>&1; then
+scripts/wsl.sh:37:    echo "wsl.sh: not running under WSL (wslpath not found)" >&2
+scripts/wsl.sh:53:        echo "wsl.sh: not a .ps1 script: '$name'" >&2
+scripts/wsl.sh:65:    echo "wsl.sh: unknown script '$name'" >&2
+scripts/wsl.sh:76:        echo "wsl.sh: refusing a script outside the repository: $resolved" >&2
+scripts/wsl.sh:81:WIN_REPO="$(wslpath -w "$REPO_ROOT")"
+scripts/wsl.sh:84:        echo "wsl.sh: warning: the checkout is not on a Windows drive ($WIN_REPO)" >&2
+scripts/wsl.sh:85:        echo "  Windows tools reach it over the WSL network share, which is slow" >&2
+scripts/wsl.sh:89:WIN_SCRIPT="$(wslpath -w "$resolved")"
+scripts/wsl.sh:93:PWSH="${WSL_PWSH:-}"
+scripts/wsl.sh:99:        echo "wsl.sh: warning: Windows PowerShell 7 not found, using 5.1" >&2
+scripts/wsl.sh:101:        echo "wsl.sh: no Windows PowerShell found" >&2
+scripts/wsl.sh:104:        echo "  fix: install PowerShell 7 on the Windows side, or set WSL_PWSH" >&2
+todo/00-workspace/TODO-01-toolchain-and-gates.md:53:|   9   |   §9    | Remove the Linux execution surface         | §5         |  [ ]   |
+todo/00-workspace/TODO-01-toolchain-and-gates.md:860:## 9. Remove the Linux Execution Surface
+todo/00-workspace/TODO-01-toolchain-and-gates.md:862:Resolute is a Windows-only suite, per the operator's 2026-09-20 decision, but the tree still carries a Linux-development surface: `scripts/wsl.sh` bridges WSL to the Windows scripts, and 
+todo/00-workspace/TODO-01-toolchain-and-gates.md:866:- [ ] Inventory every Linux/WSL-execution surface: `scripts/wsl.sh`, CI jobs on Linux runners, scripts requiring a Linux interpreter, tests that fork Linux tooling, and docs or plan text 
+todo/00-workspace/TODO-01-toolchain-and-gates.md:867:- [ ] Remove the bridge and its callers: delete `scripts/wsl.sh` and re-point or delete everything referencing it. Done when: no reference to `wsl.sh` or WSL execution remains outside thi
+todo/00-workspace/TODO-01-toolchain-and-gates.md:868:- [ ] Remove the remaining inventoried surface: Linux-runner CI jobs, Linux-gated tests, Linux-conditional code paths. Done when: the step-1 inventory reads empty item by item, each quote
+todo/00-workspace/TODO-01-toolchain-and-gates.md:870:- [ ] Settle the review-prompt self-test's POSIX status: under WSL `python3 scripts/review_prompt.py --self-test` fails `anchors-untracked-fires` (a fixture cite written with a Windows se
+todo/00-workspace/TODO-01-toolchain-and-gates.md:871:- [ ] Scope the purge to what executes: the removal criteria name every WSL reference outside this section's record, which would rewrite stamped review evidence and historical run notes, 
+todo/00-workspace/TODO-01-toolchain-and-gates.md:872:- [ ] Commit: `"workspace: remove the Linux execution surface"`
+todo/00-workspace/TODO-01-toolchain-and-gates.md:876:-> SOURCE: operator-2026-09-20-no-linux
+todo/00-workspace/TODO-01-toolchain-and-gates.md:878:-> XREF: D00 T04 §39 -- the WSL self-test failure its independent review found, filed as an item here
+todo/00-workspace/TODO-04-self-correction.md:1064:- [x] Emit one signed portable review bundle: operators need one independently verifiable artifact rather than convention-linked files (plan review of the §21 candidate, PR20, premium win).
+todo/00-workspace/TODO-04-self-correction.md:1152:- [ ] Replay the bundle verify on a genuinely separate machine: the WSL proof shares the host, so portability past the hypervisor rides assertion (plan review of the §24 candidate, PR12; ne
+todo/00-workspace/TODO-04-self-correction.md:1425:- [x] Decode `run:` scalars the way GitHub does, or state the forms read: `workflow_step_commands` in `scripts/review_prompt.py` returns raw scalar text, so `run: "python3 scripts/check.py"`
+todo/00-workspace/TODO-04-self-correction.md:1429:- [x] Print a re-run command with its context or refuse it: a decoded `run:` line still depends on the step's `shell`, `working-directory`, `env`, `${{ }}` expressions, matrix values, and ea
+todo/00-workspace/TODO-04-self-correction.md:1616:- [x] Keep the oracle's evidence durable: the scalar and context expectations came from workflows that lived only on deleted branches (plan review PR16; needs §37 shipped). Done when: the d
+todo/00-workspace/TODO-04-self-correction.md:1622:-> XREF: D00 T01 §9 -- the WSL-only self-test failure this section's independent review found, filed there
+todo/00-workspace/TODO-04-self-correction.md:1643:> **Review:** round 5 GPT depth, candidates `f122556e`(round 1) `f5c4bc06`(round 2) `96221264`(round 3) `2d337c78`(round 4) `897d6426`(round 5) -- `adversarial` needs-attention at round 5, f
+todo/00-workspace/TODO-05-repo-face.md:87:- [ ] Make it easy to read at length: a short table of contents, one heading level per idea, the long reference parts (WSL, layout, gates) folded into `<details>` blocks, no em dashes, and one line 
+tools/githooks/pre-commit:9:  for c in python3 python py; do
+
+=== $ git grep -n -I -i -E 'wsl|ubuntu|linux|python3 ' 0ec273d4239e74a851b99267252454b45297c1fb -- . :!resolute_au3 :!docs/reviews :!docs/phase-runs :!docs/captures :!docs/brainstorm :!todo/implementation-plan.md
+.claude/skills/review-todo-section/SKILL.md:96:Every review mints one private directory and stages every prompt file under it: fixed `/tmp` names collide across concurrent sessions on one machine, proven when a `D00 T04 §9` round fenced an
+scripts/campaign_guard.py:2216:        # Git Bash by path: the `bash` on PATH can be WSL's, which runs a
+scripts/review_prompt.py:1848:        # GitHub's defaults: `bash -e {0}` on Linux and macOS runners,
+scripts/review_prompt.py:1850:        if runner.startswith(("ubuntu", "macos")):
+scripts/review_prompt.py:6929:            plan_text = ("jobs:\n  plan-gates:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:6930:                         "      - name: Self-test the TODO graph tool\n        run: python3 scripts/todo-graph.py self-test\n"
+scripts/review_prompt.py:6931:                         "      - name: Validate the TODO tree\n        run: python3 scripts/todo-graph.py validate\n"
+scripts/review_prompt.py:6933:                         "          python3 scripts/todo-graph.py plan --sync\n          if true; then\n"
+scripts/review_prompt.py:7059:            ctx_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: ctx\n        working-directory: tools\n"
+scripts/review_prompt.py:7071:            q_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: q\n"
+scripts/review_prompt.py:7079:            for label, yml in (("flow env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env: {MODE: x}\n        run: make\n"),
+scripts/review_prompt.py:7080:                               ("block env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env:\n          MODE: |\n            x\n        run: make\n"),
+scripts/review_prompt.py:7081:                               ("flow workflow env", "env: {X: 1}\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"),
+scripts/review_prompt.py:7083:                               ("block working-directory", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        working-directory: >-\n          tools\n        run: make\n"),
+scripts/review_prompt.py:7084:                               ("block shell", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        shell: |\n          bash {0}\n        run: make\n"),
+scripts/review_prompt.py:7085:                               ("container job", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    container: node:22\n    steps:\n      - name: a\n        run: make\n"),
+scripts/review_prompt.py:7092:                    "  second:\n    steps:\n      - name: s\n        run: make\n    runs-on: ubuntu-24.04\n"
+scripts/review_prompt.py:7093:                    "  third:\n    steps:\n      - name: t\n        run: make\n    runs-on: ubuntu-24.04\n    container: node:22\n")
+scripts/review_prompt.py:7095:            commented = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n# a column-zero comment inside the job\n"
+scripts/review_prompt.py:7098:            inline_c = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps: # build\n    - name: B\n      run: make\n"
+scripts/review_prompt.py:7103:                  and got_c[0]["context"]["runs-on"] == "ubuntu-24.04", str(got_c))
+scripts/review_prompt.py:7105:                  by["s"]["context"]["runs-on"] == "ubuntu-24.04" and by["f"]["context"]["runs-on"] == "windows-2025",
+scripts/review_prompt.py:7109:            quoted = ('jobs:\n  "j":\n    "runs-on": ubuntu-24.04\n    "steps":\n      - "name": q\n'
+scripts/review_prompt.py:7115:                  and qs["q"]["run"] == "make" and qs["q"]["context"]["runs-on"] == "ubuntu-24.04", str(qs["q"]))
+scripts/review_prompt.py:7118:            flow = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - {name: f, run: make}\n"
+scripts/review_prompt.py:7122:            uses_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:7129:            fake = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: Run actions/checkout@prepare\n"
+scripts/review_prompt.py:7136:            flow_with = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:7299:            wf_env = "env:\n  X: 1\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"
+scripts/review_prompt.py:7304:                      ("Self-test the TODO graph tool", "python3 scripts/todo-graph.py self-test"),
+scripts/review_prompt.py:7305:                      ("Validate the TODO tree", "python3 scripts/todo-graph.py validate"),
+scripts/review_prompt.py:7307:                       "python3 scripts/todo-graph.py plan --sync\nif true; then\n  test -z x\nfi")],
+scripts/review_prompt.py:7312:                  and f"rerun locally at {c1[:12]}: Validate the TODO tree: python3 scripts/todo-graph.py validate" in line
+scripts/review_prompt.py:7428:                         "jobs:\n  x:\n    runs-on: ubuntu-24.04\n")
+scripts/review_prompt.py:7684:            sec_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: s\n        env:\n"
+scripts/review_prompt.py:7864:            cred_step = workflow_steps("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: c\n"
+scripts/todo-graph.py:268:    nowhere else -- in particular never under WSL, whose
+scripts/todo-graph.py:5382:                  detect_context(platform="linux", environ={}),
+todo/00-workspace/TODO-01-toolchain-and-gates.md:53:|   9   |   §9    | Remove the Linux execution surface         | §5         |  [ ]   |
+todo/00-workspace/TODO-01-toolchain-and-gates.md:860:## 9. Remove the Linux Execution Surface
+todo/00-workspace/TODO-01-toolchain-and-gates.md:864:Resolute is a Windows-only suite, per the operator's 2026-09-20 decision, but the tree still carries a Linux-development surface: `scripts/wsl.sh` bridges WSL to the Windows scripts, and 
+todo/00-workspace/TODO-01-toolchain-and-gates.md:868:- [x] Inventory every Linux/WSL-execution surface: `scripts/wsl.sh`, CI jobs on Linux runners, scripts requiring a Linux interpreter, tests that fork Linux tooling, and docs or plan text 
+todo/00-workspace/TODO-01-toolchain-and-gates.md:869:- [x] Remove the bridge and its callers: delete `scripts/wsl.sh` and re-point or delete everything referencing it. Done when: no reference to `wsl.sh` or WSL execution remains outside thi
+todo/00-workspace/TODO-01-toolchain-and-gates.md:870:- [x] Remove the remaining inventoried surface: Linux-runner CI jobs, Linux-gated tests, Linux-conditional code paths. Done when: the step-1 inventory reads empty item by item, each quote
+todo/00-workspace/TODO-01-toolchain-and-gates.md:872:- [x] Settle the review-prompt self-test's POSIX status: under WSL `python3 scripts/review_prompt.py --self-test` fails `anchors-untracked-fires` (a fixture cite written with a Windows se
+todo/00-workspace/TODO-01-toolchain-and-gates.md:873:- [x] Scope the purge to what executes: the removal criteria name every WSL reference outside this section's record, which would rewrite stamped review evidence and historical run notes, 
+todo/00-workspace/TODO-01-toolchain-and-gates.md:874:- [x] Commit: `"workspace: remove the Linux execution surface"`
+todo/00-workspace/TODO-01-toolchain-and-gates.md:878:-> SOURCE: operator-2026-09-20-no-linux
+todo/00-workspace/TODO-01-toolchain-and-gates.md:880:-> XREF: D00 T04 §39 -- the WSL self-test failure its independent review found, filed as an item here
+todo/00-workspace/TODO-04-self-correction.md:1064:- [x] Emit one signed portable review bundle: operators need one independently verifiable artifact rather than convention-linked files (plan review of the §21 candidate, PR20, premium win).
+todo/00-workspace/TODO-04-self-correction.md:1152:- [ ] Replay the bundle verify on a genuinely separate machine: the WSL proof shares the host, so portability past the hypervisor rides assertion (plan review of the §24 candidate, PR12; ne
+todo/00-workspace/TODO-04-self-correction.md:1425:- [x] Decode `run:` scalars the way GitHub does, or state the forms read: `workflow_step_commands` in `scripts/review_prompt.py` returns raw scalar text, so `run: "python3 scripts/check.py"`
+todo/00-workspace/TODO-04-self-correction.md:1429:- [x] Print a re-run command with its context or refuse it: a decoded `run:` line still depends on the step's `shell`, `working-directory`, `env`, `${{ }}` expressions, matrix values, and ea
+todo/00-workspace/TODO-04-self-correction.md:1616:- [x] Keep the oracle's evidence durable: the scalar and context expectations came from workflows that lived only on deleted branches (plan review PR16; needs §37 shipped). Done when: the d
+todo/00-workspace/TODO-04-self-correction.md:1622:-> XREF: D00 T01 §9 -- the WSL-only self-test failure this section's independent review found, filed there
+todo/00-workspace/TODO-04-self-correction.md:1643:> **Review:** round 5 GPT depth, candidates `f122556e`(round 1) `f5c4bc06`(round 2) `96221264`(round 3) `2d337c78`(round 4) `897d6426`(round 5) -- `adversarial` needs-attention at round 5, f
+todo/00-workspace/TODO-05-repo-face.md:87:- [ ] Make it easy to read at length: a short table of contents, one heading level per idea, the long reference parts (layout, gates) folded into `<details>` blocks (**Corrected 2026-09-26:** this l
+tools/githooks/pre-commit:9:  for c in python3 python py; do
+
+=== $ git grep -n -I -F 'wsl.sh' 0ec273d4239e74a851b99267252454b45297c1fb -- .github scripts README.md AGENTS.md tools
+(git grep exit 1: no match)
+
+=== $ git grep -n -I -F 'ubuntu-24.04' 0ec273d4239e74a851b99267252454b45297c1fb -- .github scripts README.md AGENTS.md tools
+scripts/review_prompt.py:6929:            plan_text = ("jobs:\n  plan-gates:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:7059:            ctx_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: ctx\n        working-directory: tools\n"
+scripts/review_prompt.py:7071:            q_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: q\n"
+scripts/review_prompt.py:7079:            for label, yml in (("flow env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env: {MODE: x}\n        run: make\n"),
+scripts/review_prompt.py:7080:                               ("block env", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        env:\n          MODE: |\n            x\n       
+scripts/review_prompt.py:7081:                               ("flow workflow env", "env: {X: 1}\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"),
+scripts/review_prompt.py:7083:                               ("block working-directory", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        working-directory: >-\n          
+scripts/review_prompt.py:7084:                               ("block shell", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        shell: |\n          bash {0}\n        run: ma
+scripts/review_prompt.py:7085:                               ("container job", "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    container: node:22\n    steps:\n      - name: a\n        run: make\n"),
+scripts/review_prompt.py:7092:                    "  second:\n    steps:\n      - name: s\n        run: make\n    runs-on: ubuntu-24.04\n"
+scripts/review_prompt.py:7093:                    "  third:\n    steps:\n      - name: t\n        run: make\n    runs-on: ubuntu-24.04\n    container: node:22\n")
+scripts/review_prompt.py:7095:            commented = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n# a column-zero comment inside the job\n"
+scripts/review_prompt.py:7098:            inline_c = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps: # build\n    - name: B\n      run: make\n"
+scripts/review_prompt.py:7103:                  and got_c[0]["context"]["runs-on"] == "ubuntu-24.04", str(got_c))
+scripts/review_prompt.py:7105:                  by["s"]["context"]["runs-on"] == "ubuntu-24.04" and by["f"]["context"]["runs-on"] == "windows-2025",
+scripts/review_prompt.py:7109:            quoted = ('jobs:\n  "j":\n    "runs-on": ubuntu-24.04\n    "steps":\n      - "name": q\n'
+scripts/review_prompt.py:7115:                  and qs["q"]["run"] == "make" and qs["q"]["context"]["runs-on"] == "ubuntu-24.04", str(qs["q"]))
+scripts/review_prompt.py:7118:            flow = "jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - {name: f, run: make}\n"
+scripts/review_prompt.py:7122:            uses_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:7129:            fake = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: Run actions/checkout@prepare\n"
+scripts/review_prompt.py:7136:            flow_with = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@abc\n"
+scripts/review_prompt.py:7299:            wf_env = "env:\n  X: 1\njobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: a\n        run: make\n"
+scripts/review_prompt.py:7428:                         "jobs:\n  x:\n    runs-on: ubuntu-24.04\n")
+scripts/review_prompt.py:7684:            sec_yml = ("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: s\n        env:\n"
+scripts/review_prompt.py:7864:            cred_step = workflow_steps("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: c\n"
+(git grep exit 0)
+
+=== $ git grep -n -I -F 'python3 scripts' 0ec273d4239e74a851b99267252454b45297c1fb -- .github scripts README.md AGENTS.md tools
+scripts/review_prompt.py:6930:                         "      - name: Self-test the TODO graph tool\n        run: python3 scripts/todo-graph.py self-test\n"
+scripts/review_prompt.py:6931:                         "      - name: Validate the TODO tree\n        run: python3 scripts/todo-graph.py validate\n"
+scripts/review_prompt.py:6933:                         "          python3 scripts/todo-graph.py plan --sync\n          if true; then\n"
+scripts/review_prompt.py:7304:                      ("Self-test the TODO graph tool", "python3 scripts/todo-graph.py self-test"),
+scripts/review_prompt.py:7305:                      ("Validate the TODO tree", "python3 scripts/todo-graph.py validate"),
+scripts/review_prompt.py:7307:                       "python3 scripts/todo-graph.py plan --sync\nif true; then\n  test -z x\nfi")],
+scripts/review_prompt.py:7312:                  and f"rerun locally at {c1[:12]}: Validate the TODO tree: python3 scripts/todo-graph.py validate" in line
+(git grep exit 0)
+
