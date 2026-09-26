@@ -3,7 +3,9 @@
 // WinEvent hooks for foreground changes and window shows see a transient
 // activation when it happens rather than missing it between polls: in
 // context for this process, so a window is judged as it was when shown, and
-// on a dedicated thread for the processes a case adopts. At the end of every case the
+// on a dedicated thread for the processes a case adopts, where every show is
+// kept and measured at delivery. The one limit: an adopted process's show
+// whose raising thread has exited by delivery cannot be attributed to it. At the end of every case the
 // guard takes a census of the windows the suite owns (this process and any
 // process a case adopts, such as the launcher it starts) and checks it:
 //

@@ -55,6 +55,9 @@ target_compile_definitions(resolute_tests PRIVATE
     # Each case's window census, the foreground log the gate quotes, and the
     # launcher the headful captures start (D00 T02 §10).
     RESOLUTE_CENSUS_DIR="${CMAKE_BINARY_DIR}/focus-census"
+    # Captures land in build scratch, never in the tracked evidence under
+    # docs/captures/runs/: publishing one there is a deliberate copy.
+    RESOLUTE_CAPTURE_DIR="${CMAKE_BINARY_DIR}/captures"
     RESOLUTE_LAUNCHER="$<TARGET_FILE:Resolute>"
 )
 target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

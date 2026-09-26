@@ -91,15 +91,19 @@ void CALLBACK OnAdoptedEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObjec
         std::lock_guard<std::mutex> hold(g_lock);
         if (g_pids.count(pid) == 0) return;
     }
+    // Every show is kept, whatever the window's visibility by delivery: a
+    // window shown and hidden again still went on the desktop, and its
+    // rectangle still says where. One gone altogether cannot be measured,
+    // and is kept as that.
     WindowRecord w;
     if (IsWindow(hwnd)) {
         w = Describe(hwnd);
     } else {
-        w.hwnd    = hwnd;
-        w.pid     = pid;
-        w.cls     = L"(gone before it was measured)";
-        w.visible = true;
+        w.hwnd = hwnd;
+        w.pid  = pid;
+        w.cls  = L"(gone before it was measured)";
     }
+    w.visible = true;
     Record(event, std::move(w));
 }
 

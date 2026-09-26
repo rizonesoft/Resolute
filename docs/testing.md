@@ -35,6 +35,10 @@ A headful case carries `[headful]` and a `[place:...]` tag, and opens with `RESO
 
 A collecting run (the last two rows) stops a case the moment operator input arrives: the case skips with `operator input resumed; re-queued`, and whatever it drove is dismissed first.
 
+A capture case writes its PNG and sidecar under `build/<preset>/captures/`, never into `docs/captures/runs/`, so a re-run cannot overwrite or delete committed evidence. Publishing a capture is a deliberate step: look at it, copy the PNG and its sidecar into `docs/captures/runs/` under the matrix name, and commit them with the section they prove.
+
+A collecting case also needs the operator away at its own start (no input for 120 seconds, `fence::kCollectIdleMs`). Every case runs in its own process, so when the operator comes back, the case in progress stands down on the input and every later case skips as `the operator is active ...; re-queued`, rather than taking a fresh baseline and the desktop with it.
+
 Placement tags: `[place:primary]` puts the case's windows on the primary monitor; `[place:dpi96]` and `[place:dpi144]` put them on the monitor at that DPI, because the case proves rendering at that scale. A case whose monitor is not attached skips with `hardware absent`, and the night runner re-probes it. `tests/focus-audit.md` gives each fenced case's reason.
 
 ## Skips are debt

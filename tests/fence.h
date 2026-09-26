@@ -12,6 +12,11 @@
 //   02:00 to 06:50 local       the quiet-hours window: run, and abort on input
 //   otherwise                  skip, printing one `SKIP "<test>" <reason>` line
 //
+// A collecting case (the two middle rows) also needs the operator away at
+// its own start: no input for kCollectIdleMs. Each case is its own process,
+// so once the operator returns every later case stands down too, instead of
+// taking a fresh baseline and the desktop with it.
+//
 // The SKIP lines are the debt list a stamp records as `Night-owed:`, taken
 // from the run's output rather than typed by hand. docs/testing.md states
 // the window, the overrides, and the commands.
@@ -30,6 +35,8 @@ namespace fence {
 // First minute inside the window and first minute after it, local time.
 constexpr int kQuietStart = 2 * 60;        // 02:00
 constexpr int kQuietEnd   = 6 * 60 + 50;   // 06:50
+// How long the operator must have been away when a collecting case starts.
+constexpr unsigned long kCollectIdleMs = 120000;
 
 // Whether a minute of the local day (0..1439) is inside the window.
 bool InQuietHours(int minuteOfDay);
@@ -42,8 +49,10 @@ struct Verdict {
 };
 
 // The decision from its inputs, so boundary fixtures can pin it: the two
-// override variables' values (empty when unset) and the local minute.
-Verdict Decide(const std::string& headfulEnv, const std::string& idleCollectEnv, int minuteOfDay);
+// override variables' values (empty when unset), the local minute, and how
+// long ago the operator's last input was.
+Verdict Decide(const std::string& headfulEnv, const std::string& idleCollectEnv, int minuteOfDay,
+               unsigned long idleMs);
 
 // The decision for this process now.
 Verdict Now();

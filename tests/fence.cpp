@@ -36,18 +36,26 @@ std::string Clock(int minuteOfDay) {
 
 bool InQuietHours(int minuteOfDay) { return minuteOfDay >= kQuietStart && minuteOfDay < kQuietEnd; }
 
-Verdict Decide(const std::string& headfulEnv, const std::string& idleCollectEnv, int minuteOfDay) {
+Verdict Decide(const std::string& headfulEnv, const std::string& idleCollectEnv, int minuteOfDay,
+               unsigned long idleMs) {
     if (headfulEnv == "visible") return {Mode::Visible, "visible run requested (RESOLUTE_HEADFUL=visible)"};
+    const bool collecting = idleCollectEnv == "1" || InQuietHours(minuteOfDay);
+    if (!collecting)
+        return {Mode::Skip, "headful: outside the quiet-hours window 02:00-06:50 local (now " + Clock(minuteOfDay) +
+                                "); RESOLUTE_HEADFUL=visible runs it on demand"};
+    if (idleMs < kCollectIdleMs)
+        return {Mode::Skip, "headful: the operator is active (last input " + std::to_string(idleMs / 1000) +
+                                " s ago, under the " + std::to_string(kCollectIdleMs / 1000) +
+                                " s a collecting case needs); re-queued"};
     if (idleCollectEnv == "1") return {Mode::Collect, "idle collection (RESOLUTE_IDLE_COLLECT=1)"};
-    if (InQuietHours(minuteOfDay)) return {Mode::Collect, "quiet hours " + Clock(minuteOfDay)};
-    return {Mode::Skip, "headful: outside the quiet-hours window 02:00-06:50 local (now " + Clock(minuteOfDay) +
-                            "); RESOLUTE_HEADFUL=visible runs it on demand"};
+    return {Mode::Collect, "quiet hours " + Clock(minuteOfDay)};
 }
 
 Verdict Now() {
     SYSTEMTIME st{};
     GetLocalTime(&st);
-    return Decide(Env("RESOLUTE_HEADFUL"), Env("RESOLUTE_IDLE_COLLECT"), st.wHour * 60 + st.wMinute);
+    const unsigned long idle = GetTickCount() - LastInput();
+    return Decide(Env("RESOLUTE_HEADFUL"), Env("RESOLUTE_IDLE_COLLECT"), st.wHour * 60 + st.wMinute, idle);
 }
 
 void Open(Mode mode) {

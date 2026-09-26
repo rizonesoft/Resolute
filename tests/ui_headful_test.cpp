@@ -372,9 +372,13 @@ void CaptureLauncher(const char* mode, UINT dpi) {
     char date[16];
     std::snprintf(date, sizeof(date), "%04u-%02u-%02u", st.wYear, st.wMonth, st.wDay);
     const int pct = static_cast<int>(dpi * 100 / 96);
-    const std::filesystem::path out = std::filesystem::path(RESOLUTE_SOURCE_ROOT) / "docs" / "captures" / "runs" /
+    // Into build scratch: a re-run never overwrites or deletes the tracked
+    // evidence. docs/testing.md gives the publishing step.
+    const std::filesystem::path out = std::filesystem::path(RESOLUTE_CAPTURE_DIR) /
                                       (std::string(date) + "-D00-T02-s10-launcher-" + mode + "-" +
                                        std::to_string(pct) + ".png");
+    std::error_code made;
+    std::filesystem::create_directories(out.parent_path(), made);
     // The capture script, started directly rather than through a shell.
     const std::filesystem::path script = std::filesystem::path(RESOLUTE_SOURCE_ROOT) / "scripts" / "capture-window.ps1";
     std::wstring ps = L"pwsh -NoProfile -File \"" + script.wstring() + L"\" -ProcessId " +
