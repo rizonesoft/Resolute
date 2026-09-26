@@ -658,3 +658,18 @@ round: 3 model: gpt-6-astra effort: high outcome: findings candidate: b1738177 p
 round: 4 model: gpt-6-astra effort: high outcome: independent candidate: a6aaa693 provider: openai version: gpt-6-astra cost: unresolved latency: 70s opportunity: full-scope purpose: section-review provenance: recorded findings:
 empty: 0
 refuted: 0
+
+run: D00-T02-S9
+date: 2026-09-26
+runner: panel
+rounds: 6
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 4d81a3ec provider: openai version: gpt-6-astra cost: 43817tokens latency: 52s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S9-F5, D00-T02-S9-F6, D00-T02-S9-F7
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: d51e60ae provider: openai version: gpt-6-astra cost: 44810tokens latency: 29s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S9-F8, D00-T02-S9-F9
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: bd0feecf provider: openai version: gpt-6-astra cost: 51894tokens latency: 51s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T02-S9-F10, D00-T02-S9-F11
+# round 3 is the Full sign-off: F10 is blocking (item 2's failure path), so rounds 4 and 5 run the depth slot; round 5 is the hard cap and approves.
+round: 4 model: gpt-6-astra effort: high outcome: findings candidate: 714571af provider: openai version: gpt-6-astra cost: 49576tokens latency: 96s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S9-F12, D00-T02-S9-F13
+round: 5 model: gpt-6-astra effort: high outcome: empty candidate: 8e1788a5 provider: openai version: gpt-6-astra cost: 42836tokens latency: 28s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: 
+# round 6 is the independent pass (`panel_slots.py exec independent --commit bba2c4ad`, ran before panel round 1); the runner printed no token figure.
+round: 6 model: gpt-6-astra effort: high outcome: independent candidate: bba2c4ad provider: openai version: gpt-6-astra cost: unresolved latency: 169s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S9-F1, D00-T02-S9-F2, D00-T02-S9-F3, D00-T02-S9-F4
+empty: 1
+refuted: 0

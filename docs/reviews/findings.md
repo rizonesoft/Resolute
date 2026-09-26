@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**483 findings across 55 sections.**
+**496 findings across 56 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 128 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 122 | fails under hostile or unexpected input |
+| `record` | 132 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 127 | fails under hostile or unexpected input |
+| `integration` | 83 | a consumer, caller, or downstream artifact no longer holds |
 | `correctness` | 80 | the code does the wrong thing |
-| `integration` | 79 | a consumer, caller, or downstream artifact no longer holds |
 | `consistency` | 60 | disagrees with the rest of the suite, its naming, or its layout |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 216 | wrong behavior in code, plan, or record |
-| `minor` | 261 | polish or wording, or no surviving defect |
+| `major` | 219 | wrong behavior in code, plan, or record |
+| `minor` | 271 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -124,6 +124,19 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T02 §8` | F1 | minor | `adversarial` | fixed | independent | the audit never checks sources against the manifest |
 | `D00 T02 §8` | F2 | minor | `adversarial` | fixed | independent | names with capitals or underscores escape the scan |
 | `D00 T02 §8` | F3 | minor | `adversarial` | filed | independent | names with doubled or trailing separators or spaces escape the scan |
+| `D00 T02 §9` | F1 | minor | `integration` | fixed | independent | an overflowed View dropdown offers a command nothing handles |
+| `D00 T02 §9` | F2 | minor | `record` | fixed | independent | the capture sidecar labels the system setting as the window's appearance |
+| `D00 T02 §9` | F3 | minor | `adversarial` | fixed | independent | an absent theme value throws under strict mode before the fallback |
+| `D00 T02 §9` | F4 | major | `adversarial` | fixed | independent | the shift leg can read past a smaller golden |
+| `D00 T02 §9` | F5 | minor | `adversarial` | fixed | independent | RenderTo reports success from a pointer, not the drawing's result |
+| `D00 T02 §9` | F6 | minor | `integration` | fixed | independent | a name passed straight to the public icon API bypasses the reporting |
+| `D00 T02 §9` | F7 | minor | `record` | fixed | independent | item 3 and the checkpoint still demand the launcher's four captures |
+| `D00 T02 §9` | F8 | minor | `integration` | fixed | independent | the direct draw calls report an unknown name but still draw nothing |
+| `D00 T02 §9` | F9 | minor | `record` | fixed | independent | the recorded green run predates the review's added cases |
+| `D00 T02 §9` | F10 | major | `adversarial` | fixed | independent | a golden of another size aborts before its artifacts and count |
+| `D00 T02 §9` | F11 | minor | `record` | fixed | independent | the RenderTo failure case exercised only the null guard |
+| `D00 T02 §9` | F12 | major | `integration` | fixed | independent | an offscreen RECREATE_TARGET resets the window's target |
+| `D00 T02 §9` | F13 | minor | `adversarial` | fixed | independent | crossed sizes count the corner neither image has |
 | `D00 T03 §1` | F1 | minor | `consistency` | fixed | self | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | minor | `record` | fixed | self | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | minor | `consistency` | fixed | self | `AGENTS.md` did not describe the root it now has |
