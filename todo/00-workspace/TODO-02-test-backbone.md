@@ -506,11 +506,13 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 
 - [ ] Drive timer completion to its endpoint: `AnimateToggle` lands on the target palette, content-view hide and error settle, collapse widths settle. Done when: each completion is asserted after a pumped loop, and a stuck transition fails the run rather than hanging it.
 - [ ] Drive core interactions on window-backed controls: hit-testing, scroll, and column resize on the list view. Done when: each is asserted against a real window and the run is green headful.
+- [ ] Tear a control down with its animations still pending: D00 T02 §5 found manager-held callbacks outliving control teardown, and its test guards drain them first, so no test shows production teardown is safe (plan review PR4 of the D00 T02 §6 review; needs D00 T02 §6 shipped). Done when: a driven case destroys a control mid-animation, pumps the manager timer past the animation's end, and asserts no callback runs against the destroyed control (or that teardown cancels it), and a deliberately leaked callback fails the case, quoted.
 - [ ] Commit: `"test: driven ui completion tests"`
 
 **Test checkpoint:** The driven run pumps the manager timer to completion and asserts the settled state for the toggle, the content view, and collapse widths; hit-testing, scroll, and column resize pass against real windows. A deliberately stuck transition fails by name. All outputs are quoted.
 
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR7 D00-T02-S5-PR7
+-> SOURCE: plan-D00-T02-s6-2026-09-26-PR4 D00-T02-S6-PR4
 
 - -> XREF: D00 T02 §10 -- the focus fence this host runs under; the driven completions ship headful, the gate proves the default run never is
 
