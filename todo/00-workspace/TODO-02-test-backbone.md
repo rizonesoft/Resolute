@@ -650,11 +650,17 @@ Why this section exists: the fenced headful set has no owner, no schedule, and n
 - [ ] The schedule is provisioned by script, not by clicks: a `tools/nightly.ps1` runner plus a registration step that creates the `\Resolute\Nightly` scheduled task, so a fresh machine gets the run from the repo alone. Done when: the script runs the procedure end to end by hand and the task fires it once inside the window, quoted.
 - [ ] `query night-debt` lists every open `Night-owed:` line with its section, test, placement intent, and age in nights, derived from stamps at query time so no side ledger can rot. Done when: the query prints the shape with one worked entry and the nightly runner consumes it in the first governed run.
 - [ ] The first governed run executes the procedure end to end on the schedule and its evidence (both logs plus the morning report) is quoted here. Done when: the log paths and the report are cited with their outcomes.
+- [ ] Settle the collector's contract from the D00 T02 §10 plan review: night debt binds to the reviewed candidate (its commit, build, and test inventory), so a green run on a newer HEAD never clears an older section's proof; the retry, interruption, hardware-absent, and second-red transitions are written as rules with a failure-path drill each; the scheduled run owns the tree exclusively (it never builds over the writer's work, and every tracked change it would make goes through Claude Code); each run and attempt logs under a unique id with a stable pointer for the morning report; and a timed-out fenced case leaves no orphan behind (the launcher a case starts runs in a job object closed with the test process). Done when: each rule is in `docs/testing.md` with its drill quoted, and a fenced case killed by its timeout mid-capture leaves no launcher or capture process running.
 - [ ] Commit: `"workspace: govern the nightly regression run"`
 
 **Test checkpoint:** Procedure, log convention, and report format written; first governed run quoted with both logs; fenced half executed in-window. Cheaper substitute that fails: an ad-hoc night run whose evidence lives in chat.
 
 -> SOURCE: operator-2026-09-19-visual-timers-s11
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR1 D00-T02-S10-PR1
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR2 D00-T02-S10-PR2
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR3 D00-T02-S10-PR3
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR4 D00-T02-S10-PR4
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR6 D00-T02-S10-PR6
 
 ## 12. Port-vs-Port Visual Comparison
 
@@ -672,6 +678,7 @@ Why this section exists: `D00 T02 §4` compares what two implementations DID, fi
 - [ ] Region diff: each pair carries enumerated control regions (from the launcher's section spec, not guessed from pixels) compared with a stated tolerance, and DPI-only or theme-only differences pass with the exemption quoted, never silently. The C++ half at 150 additionally diffs against the §9 150 golden (the DPI-awareness proof: crisp rendering at the right layout), while the AutoIt half at 150 asserts structure only (bitmap-stretched by construction). Done when: a deliberately renamed label fails naming the control, a deliberately removed control fails naming the region, a dark-vs-light pair of the same layout passes with the exemption quoted, and a deliberately blurred C++ 150 capture fails against its golden.
 - [ ] The harness runs headful-only inside the §10 fenced tier and self-skips in the default run with the tier named. Done when: the default run quotes the skip and the fenced run quotes the diff counts.
 - [ ] Settle the comparison contract from the D00 T02 §9 plan review before building the pair: the C++ half at 150 compares against a composed launcher baseline this section renders offscreen through D00 T02 §9's harness (crop, size, state, and rasterization stated), not against a single-control golden; each region names how its label, value, presence, and painted extent are extracted and compared, with its own acceptance rule; an equivalence map records each intended redesign (a renamed action or moved control) so the comparison keeps function without freezing the AutoIt layout; the DPI-only and theme-only exemptions still require every control present, unclipped, and above the DESIGN.md contrast floor; and the checkpoint states which DPI legs are mandatory and what a skipped leg reports. Done when: the region-diff item and the checkpoint name each of these, and a deliberately clipped control fails under the theme-only exemption, quoted.
+- [ ] Take the D00 T02 §10 conventions from its plan review: a comparison excluded from the default run stays visible as owed coverage through the same `SKIP` and `fence-debt.py` inventory; its captures land in build scratch and are published after review, never written into `docs/captures/runs/` by the run; and each sidecar records enough to recreate the comparison (the implementation's revision and executable, the fixture, launch arguments, locale, appearance, window geometry, and measured DPI). Done when: the harness and the sidecar schema show each, quoted.
 - [ ] Commit: `"workspace: compare ports visually, region by region"`
 
 **Test checkpoint:** The launcher's AutoIt-vs-C++ capture pair exists with sidecars; a renamed label and a removed control each fail naming what diverged; a theme-only difference passes with the exemption quoted. Cheaper substitute that fails: a pixel diff across implementations presented as comparison, which `todo/README.md` refuses.
@@ -682,6 +689,9 @@ Why this section exists: `D00 T02 §4` compares what two implementations DID, fi
 -> SOURCE: plan-D00-T02-s9-2026-09-26-PR9 D00-T02-S9-PR9
 -> SOURCE: plan-D00-T02-s9-2026-09-26-PR10 D00-T02-S9-PR10
 -> SOURCE: plan-D00-T02-s9-2026-09-26-PR11 D00-T02-S9-PR11
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR10 D00-T02-S10-PR10
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR11 D00-T02-S10-PR11
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR12 D00-T02-S10-PR12
 
 ## Verification
 

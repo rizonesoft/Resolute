@@ -80,10 +80,11 @@ Three rules from the contract that are currently unimplemented, and they interac
 - [ ] Collapse the sidebar to icon-only below roughly 600px width, and add a manual toggle with animation. Done when: both the automatic and the manual path are driven and captured, and the collapsed state persists.
 - [ ] Move toolbar overflow into a menu when the window is too narrow. Done when: narrowing the window moves buttons into the overflow and widening restores them, captured.
 - [ ] Enforce a minimum window size. Done when: the window cannot be dragged below it and the value is recorded here.
-- [ ] Remember window size and position per monitor, and respect Windows 11 snap zones. Done when: geometry survives a restart on each of two monitors, and a snapped window restores snapped. With no remembered geometry, the first size is scaled to the monitor's DPI: D00 T02 §10's captures show the launcher opening at 1100 x 720 physical pixels whatever the DPI, two thirds of its intended size at 150% with two list columns cut off (docs/captures/runs/2026-09-26-D00-T02-s10-launcher-dark-150.png).
+- [ ] Remember window size and position per monitor, and respect Windows 11 snap zones. Done when: geometry survives a restart on each of two monitors, and a snapped window restores snapped. With no remembered geometry, the first size is scaled to the monitor's DPI: D00 T02 §10's captures show the launcher opening at 1100 x 720 physical pixels whatever the DPI, two thirds of its intended size at 150% with two list columns cut off (docs/captures/runs/2026-09-26-D00-T02-s10-launcher-dark-150.png). A window moved between monitors of different DPI relayouts on `WM_DPICHANGED`, its hit targets follow, and moving it back restores the first layout, proven in the fenced tier with the window on each declared monitor in turn (D00 T02 §10 plan review).
 - [ ] Commit: `"design: spacing grid, density modes, and responsive layout"`
 
 **Test checkpoint:** No off-grid spacing survives the §1 check. Three densities render, persist, and are captured. Sidebar collapse is driven both automatically and manually. Toolbar overflow moves and restores. Window geometry survives a restart on two monitors. All captured under `docs/captures/runs/`.
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR8 D00-T02-S10-PR8
 
 ## 3. Content Area: Virtualization and Scrolling
 
@@ -161,7 +162,7 @@ Every custom-drawn control in this suite reports nothing to a screen reader toda
 - [ ] Give every interactive control a **stable automation id**, set where the control is created rather than derived from its position or its text. Done when: the ids survive a layout change and a language change, proven by driving the tree in two languages.
 - [ ] Prove the tree is traversable by a driver, not only by a screen reader. Done when: the spike's tree walk is re-run and the descendant count rises from **4** to cover every control on the surface, with the before and after quoted.
 - [ ] Raise notification events for status changes. Done when: a completed repair is announced, driven and quoted.
-- [ ] Make every feature reachable by keyboard, with a logical tab order. Done when: every surface is driven mouse-free end to end and the path is recorded.
+- [ ] Make every feature reachable by keyboard, with a logical tab order. Done when: every surface is driven mouse-free end to end and the path is recorded. The driven proof runs through enabled, visible windows in the fenced tier, focus, capture, and drag included, since the background-safe tier's hosts are disabled by design (D00 T02 §10 plan review).
 - [ ] Render the focus ring per the contract: 2px accent with 1px offset, always visible. Done when: it renders on every focusable control in both appearances, captured.
 - [ ] Honour reduced motion by stopping all motion, not shortening it. Done when: with `SPI_GETCLIENTAREAANIMATION` off, every animation in the suite is absent and state changes still occur, driven.
 - [ ] Meet the hit-target floor: 24x24px at 100 percent DPI, 48x48px for touch. Done when: every interactive element is measured and any failure is corrected.
@@ -169,6 +170,7 @@ Every custom-drawn control in this suite reports nothing to a screen reader toda
 - [ ] Commit: `"design: meet the accessibility floor"`
 
 **Test checkpoint:** Narrator announces name, role, value, and state for every shared control, quoted per control. The UI Automation tree walk from `docs/captures/ui-automation-spike.md` is re-run and the descendant count rises from 4 to cover the surface, with before and after quoted, and a control is found by automation id in two languages. A completed repair raises an announcement, quoted. Every surface is driven mouse-free and the path recorded. The focus ring is captured in both appearances. With reduced motion set, no animation occurs and state still changes. Every hit target is measured against the floor.
+-> SOURCE: plan-D00-T02-s10-2026-09-26-PR7 D00-T02-S10-PR7
 
 ## 6. Performance Floor
 
