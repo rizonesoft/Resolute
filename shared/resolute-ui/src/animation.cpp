@@ -30,6 +30,10 @@ void CALLBACK AnimationManager::TimerCallback(HWND, UINT, UINT_PTR, DWORD) {
 }
 
 void AnimationManager::OnTick() {
+    // A callback that pumps a nested message loop can dispatch another
+    // timer tick; it is skipped, so it cannot clear this frame's
+    // cancellations mid-frame (panel round 1 of the D00 T02 §7 review).
+    if (m_ticking) return;
     if (m_animations.empty()) return;
 
     DWORD now = GetTickCount();

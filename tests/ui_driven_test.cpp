@@ -31,6 +31,16 @@ namespace {
 
 using rui::AnimationManager;
 
+// WM_SIZE messages the host has received: the sidebar's collapse animation
+// sends one to its parent every frame, so a count that stops growing is a
+// callback that stopped running.
+int g_hostSizes = 0;
+
+LRESULT CALLBACK HostProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+    if (msg == WM_SIZE) ++g_hostSizes;
+    return DefWindowProcW(hwnd, msg, wp, lp);
+}
+
 // A hidden top-level window that owns the manager's timer for one case.
 struct DrivenHost {
     HWND hwnd  = nullptr;
@@ -42,7 +52,7 @@ struct DrivenHost {
         static const bool rendered = rui::RenderContext::Init() && rui::LucideIcons::Load();
         ready = rendered;
         WNDCLASSW wc{};
-        wc.lpfnWndProc   = DefWindowProcW;
+        wc.lpfnWndProc   = HostProc;
         wc.hInstance     = GetModuleHandleW(nullptr);
         wc.lpszClassName = L"ResoluteDrivenHost";
         RegisterClassW(&wc);  // a second registration fails harmlessly
@@ -77,6 +87,13 @@ bool PumpUntil(Done done, DWORD deadlineMs = 3000) {
 }
 
 bool Settled() { return !AnimationManager::Instance().IsAnimating(); }
+
+// Pumps for a fixed time, whatever the manager holds: what must NOT happen
+// in that window is asserted afterwards.
+void PumpFor(DWORD ms) {
+    const ULONGLONG start = GetTickCount64();
+    PumpUntil([start, ms] { return GetTickCount64() - start >= ms; }, ms + 1000);
+}
 
 bool SamePalette(const rui::ColorPalette& a, const rui::ColorPalette& b) {
     return std::memcmp(&a, &b, sizeof(rui::ColorPalette)) == 0;
@@ -238,16 +255,26 @@ TEST_CASE("A control torn down mid-animation leaves no callback behind", "[ui][d
     REQUIRE(host.ready);
     auto& mgr = AnimationManager::Instance();
 
-    // Teardown cancels what the control started.
+    // Teardown cancels what the control started: a real sidebar's collapse
+    // reaches the host every frame, and after teardown the host hears
+    // nothing more while the manager is pumped past the collapse's 250 ms.
     auto bar = std::make_unique<rui::Sidebar>();
+    bar->Create(host.hwnd, GetModuleHandleW(nullptr), 102);
+    REQUIRE(bar->Handle() != nullptr);
+    g_hostSizes = 0;
     bar->SetCollapsed(true);
+    {
+        INFO("transition: the collapse reaching the host");
+        REQUIRE(PumpUntil([] { return g_hostSizes > 0; }));
+    }
     REQUIRE(mgr.Count() > 0);
+    DestroyWindow(bar->Handle());
     bar.reset();
     CHECK(mgr.Count() == 0);
-    {
-        INFO("transition: nothing may remain after teardown");
-        REQUIRE(PumpUntil(Settled, 500));
-    }
+    const int sizesAtTeardown = g_hostSizes;
+    PumpFor(400);
+    CHECK(g_hostSizes == sizesAtTeardown);
+    CHECK(mgr.Count() == 0);
 
     // A teardown from inside another animation's callback skips the torn
     // down owner's callbacks in the same frame: the probe never runs.
@@ -291,6 +318,30 @@ TEST_CASE("A control torn down mid-animation leaves no callback behind", "[ui][d
         REQUIRE(PumpUntil(Settled));
     }
     CHECK(completeRuns == 0);
+
+    // A callback that cancels an owner and then pumps a nested message loop
+    // (a modal dialog, say) cannot let a nested tick undo that cancellation.
+    int nestedRuns = 0;
+    int nestedOwner = 0;
+    mgr.AnimateFor(&nestedOwner, 0.0f, 1.0f, 2000.0f, rui::ease::Linear,
+                   [&](float, const rui::Animation&) { ++nestedRuns; });
+    bool pumped = false;
+    mgr.Animate(0.0f, 1.0f, 10.0f, rui::ease::Linear, [&](float, const rui::Animation&) {
+        mgr.CancelOwner(&nestedOwner);
+        if (!pumped) {
+            pumped = true;
+            // A pending animation gives the nested tick something to run,
+            // as a real callback's follow-up animation would.
+            mgr.Animate(0.0f, 1.0f, 10.0f, rui::ease::Linear, nullptr);
+            PumpFor(60);
+        }
+    });
+    {
+        INFO("transition: a cancellation followed by a nested message loop");
+        REQUIRE(PumpUntil(Settled));
+    }
+    CHECK(pumped);
+    CHECK(nestedRuns == 1);
 
     // A callback that starts a new animation mid-frame is safe, and the new
     // one runs to completion after the frame.
