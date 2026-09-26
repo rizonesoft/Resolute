@@ -48,7 +48,7 @@ track: W1
 |   3   |   §3    | House-style contract, checked against source | --            |  [x]   |
 |   4   |   §4    | Parity driver for a built tool             | §1, §2         |  [x]   |
 |   5   |   §5    | Cover the inherited UI library             | §1, D00 T03 §3 |  [x]   |
-|   6   |   §6    | Remove the tautological width check        | §5             |  [ ]   |
+|   6   |   §6    | Remove the tautological width check        | §5             |  [x]   |
 |   7   |   §7    | Driven UI completion tests                 | §5             |  [ ]   |
 |   8   |   §8    | Icon manifest audit                        | §5             |  [ ]   |
 |   9   |   §9    | Rendered-output regression tests           | §5             |  [ ]   |
@@ -497,6 +497,13 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 **Test checkpoint:** `ctest --preset debug -L ui` exits 0 with `100% tests passed out of 42`, and the direct binary run reports the same 42 cases with one fewer assertion than §5's 271.
 
 -> SOURCE: panel-D00-T02-s5-2026-09-19 D00-T02-S5-F16
+
+> **Verified:** 2026-09-26 | §6 | the tautological `CHECK(bar.TargetWidth() == bar.ScaledWidth());` deleted, nothing else in `tests/ui_test.cpp` touched; `ctest --preset debug -L ui` `100% tests passed out of 42`; the direct binary run `All tests passed (270 assertions in 42 test cases)` against the parent's `271`; the three D00 T02 §5 claims hold (`todo-claims: 120 claim(s) -- 120 hold`); `scripts/check-all.ps1` `check-all: 20 gate(s) ok`
+> **Review:** round 2 GPT signoff, candidate `bca229b3` -- `adversarial` approves at every round · `consistency` approves at every round · `integration` approves at every round · `record` approves at every round · `source-defect` not owed · `design` not owed. Independent pass on the implementation commit bca229b3 (`independent` slot, gpt-6-astra high): no findings. Raw findings: docs/reviews/00-workspace/D00-T02-s6.md Attestation: docs/reviews/00-workspace/D00-T02-s6.attest.json
+> **Plan review:** astra (run 20260926-D00-T02-S6-astra) -- filed: D00 T02 §7 (PR4); 6 rejected with reasons in the ledger
+> **CRUD:** not applicable (a test assertion and TODO claims)
+> **Duration:** 2026-09-26T11:21:57Z to 2026-09-26T11:46:28Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 7. Driven UI Completion Tests
 
