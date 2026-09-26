@@ -969,8 +969,10 @@ def provenance_candidates(findings_text: str) -> list[str]:
 
 def _git_out(args: list[str], cwd=None) -> tuple[int, str]:
     import subprocess
+    # Git writes UTF-8; the console code page would mangle a non-ASCII path
+    # (panel round 3 of the D00 T04 §41 review).
     proc = subprocess.run(["git", "--no-replace-objects", *args], capture_output=True,
-                          text=True, cwd=cwd)
+                          text=True, encoding="utf-8", errors="replace", cwd=cwd)
     return proc.returncode, proc.stdout
 
 
@@ -1365,10 +1367,13 @@ def changed_paths_for_push(before: str | None, after: str, cwd=None) -> tuple[li
     ok, _detail = git_is_ancestor(before, after, cwd=cwd)
     if ok is not True:
         return None, "a force push (the before commit is not an ancestor): the compared range cannot be derived"
-    rc, diff = _git_out(["diff", "--name-only", before, after], cwd=cwd)
+    # NUL-delimited and unquoted: `--name-only` alone quotes a non-ASCII,
+    # tab, or newline path, which would never match a filter (panel round 3
+    # of the D00 T04 §41 review).
+    rc, diff = _git_out(["diff", "-z", "--name-only", before, after], cwd=cwd)
     if rc != 0:
         return None, "git could not list the changed paths"
-    paths = [ln for ln in diff.splitlines() if ln.strip()]
+    paths = [p for p in diff.split("\0") if p]
     if len(paths) > PATH_FILTER_FILE_LIMIT:
         return None, f"{len(paths)} changed files, past the {PATH_FILTER_FILE_LIMIT} GitHub's path filter evaluates"
     return paths, ""
@@ -2023,6 +2028,27 @@ def _open_quote(value: str, q: str) -> bool:
     return v.count(q) % 2 == 1
 
 
+def _bracket_depth(text: str) -> int:
+    """Opening minus closing brackets outside quoted strings (panel round 3
+    of the D00 T04 §41 review: a quoted `]` is data, not structure)."""
+    depth, quote, i = 0, "", 0
+    while i < len(text):
+        c = text[i]
+        if quote:
+            if c == "\\" and quote == '"':
+                i += 1
+            elif c == quote:
+                quote = ""
+        elif c in "'\"":
+            quote = c
+        elif c in "([{":
+            depth += 1
+        elif c in ")]}":
+            depth -= 1
+        i += 1
+    return depth
+
+
 def _multiline_opener(value: str) -> tuple[str, object] | None:
     """(kind, end) of the multiline value `value` opens (rule 4), or None."""
     m = _HEREDOC.search(value)
@@ -2036,7 +2062,7 @@ def _multiline_opener(value: str) -> tuple[str, object] | None:
     for q in ('"', "'"):
         if _open_quote(value, q):
             return "quote", q
-    depth = sum(value.count(c) for c in "([{") - sum(value.count(c) for c in ")]}")
+    depth = _bracket_depth(value)
     if depth > 0:
         return "bracket", depth
     return None
@@ -2093,7 +2119,7 @@ def _redact_blocks(text: str) -> str:
                 if kind == "quote" and _open_quote(body, end):
                     break
                 if kind == "bracket":
-                    depth += sum(body.count(c) for c in "([{") - sum(body.count(c) for c in ")]}")
+                    depth += _bracket_depth(body)
                     if depth <= 0:
                         break
             continue
@@ -7604,6 +7630,18 @@ def _self_test() -> int:
             # before-and-after pair.
             p_ok, _w = changed_paths_for_push(c6, c7, cwd=tmpd)
             check("push-paths: a fast-forward range lists its paths", p_ok == [".github/workflows/plan.yml"], str(p_ok))
+            os.makedirs(os.path.join(tmpd, "src"), exist_ok=True)
+            with open(os.path.join(tmpd, "src", "\u00e9.txt"), "w", encoding="utf-8") as fh:
+                fh.write("x\n")
+            _g("add", "src")
+            _g("commit", "-qm", "c-accent")
+            c_acc = _g("rev-parse", "HEAD").stdout.strip()
+            p_acc, _w = changed_paths_for_push(c7, c_acc, cwd=tmpd)
+            check("push-paths: a non-ASCII path reads unquoted", p_acc == ["src/\u00e9.txt"]
+                  and push_excluded({"branches": None, "branches-ignore": None, "paths": ["src/**"],
+                                     "paths-ignore": None, "tags": None, "tags-ignore": None},
+                                    "master", p_acc)[0] is False, str(p_acc))
+            c7 = c_acc
             for label, before, after, frag in (
                     ("a new branch", "0" * 40, c7, "a new branch"),
                     ("a missing before", None, c7, "a new branch"),
@@ -7710,6 +7748,8 @@ def _self_test() -> int:
                     ("a PowerShell here-string", "$env:API_TOKEN = @\"\ns3cr3tline\n\"@\nWrite-Output done",
                      "s3cr3tline", "Write-Output done"),
                     ("a single-quoted here-string", "$secret = @'\ns3cr3tline\n'@\ndone", "s3cr3tline", "done"),
+                    ("a quoted bracket inside a bracket", "token: [" + chr(10) + '  "]",' + chr(10)
+                     + '  "s3cr3tline"' + chr(10) + "]" + chr(10) + "mode: fast", "s3cr3tline", "mode: fast"),
                     ("an indented here-string close", "$env:API_TOKEN = @\"\n  \"@\ns3cr3tline\n\"@\ndone",
                      "s3cr3tline", "done"),
                     ("a quoted multiline value", "password: \"abc\ns3cr3tline\nend\"\nmode: fast", "s3cr3tline",

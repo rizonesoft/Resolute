@@ -1637,8 +1637,11 @@ def _repair(root: str, action: str, red: str, commit: str, green: str, workflow:
                              "established: repair the guard, then retry")
         campaign = str((guard or {}).get("run_id") or "")
         _check_append_only(root, run_file)
+        # Panel round 3 of the D00 T04 §41 review: every command replays the
+        # whole journal, ceiling lines included, before it reads or appends.
+        journalled = _ceiling_replay(root, run_file, campaign)
         if action == "ceiling":
-            return _ceiling(root, run_id, attempt_no or "1", run_file, campaign)
+            return _ceiling(root, run_id, attempt_no or "1", run_file, campaign, journalled)
         try:
             with open(path, encoding="utf-8") as fh:
                 state = json.load(fh)
@@ -1956,36 +1959,12 @@ def _repair(root: str, action: str, red: str, commit: str, green: str, workflow:
                          f"restore, or ceiling")
 
 
-def _ceiling(root: str, run_id: str, attempt: str, run_file: str, campaign: str) -> tuple[int, str]:
-    """One re-run of `ci-wait` past its ceiling per GitHub run attempt,
-    keyed by repository, run id, and attempt, journalled in the run file
-    with the campaign run (D00 T04 §39, §41). The file under build/ is a
-    cache the journal rebuilds; a corrupt cache escalates, and a cache
-    entry for this run file its journal lacks means the journal was changed
-    or truncated, which refuses rather than renewing the allowance."""
-    if not run_id:
-        raise GuardError("repair ceiling needs --run-id <GitHub run id>")
-    if not campaign:
-        raise GuardError("repair ceiling needs a live campaign guard with a run id: the allowance is journalled "
-                         "with its campaign")
-    key = f"{_repo_slug(_repo_identity(root)['repo']) or 'unknown-repo'}#{run_id}@{attempt}"
-    cpath = _ceiling_path(root)
-    try:
-        with open(cpath, encoding="utf-8") as fh:
-            seen = json.load(fh)
-        if not isinstance(seen, dict):
-            raise ValueError("not an object")
-        note = ""
-    except FileNotFoundError:
-        seen, note = {}, ""
-    except (OSError, ValueError):
-        raise GuardError("the ceiling record is unreadable; escalate rather than wait again")
-    # Panel round 1 of the D00 T04 §41 review: ceiling lines replay as
-    # strictly as the episode's. A prose line and the receipt written with
-    # it must agree, a key is used once, every use belongs to this campaign,
-    # and a cached campaign must be the journal's.
-    # Panel round 2: the whole journal replays strictly first (a malformed
-    # receipt anywhere refuses), and a final journal line cut short refuses.
+def _ceiling_replay(root: str, run_file: str, campaign: str) -> dict[str, str]:
+    """The journal replayed strictly, ceiling lines included (D00 T04 §41):
+    the episode state machine first, then a final journal line cut short,
+    then each ceiling use (a prose line and its receipt agree, a key is used
+    once, every use belongs to `campaign` when one is known). Returns each
+    used key's campaign."""
     _journal(root, run_file)
     whole = _journal_text(root, run_file)
     if whole and not whole.endswith("\n") and whole.rsplit("\n", 1)[-1].startswith(("repair: ", "repair-receipt: ")):
@@ -2014,16 +1993,46 @@ def _ceiling(root: str, run_id: str, attempt: str, run_file: str, campaign: str)
             rc = _parse_receipt(ln)
             if rc is not None and rc["event"] == "ceiling":
                 use = (rc["key"], rc["campaign"])
+        elif ln.startswith("repair: ") and not ln.startswith("repair: episode "):
+            raise GuardError(f"{run_file} holds a journal line of no known kind ({ln[:80]!r}): escalate")
         k += 1
         if use is None:
             continue
         if use[0] in journalled:
             raise GuardError(f"{run_file} records the ceiling allowance for {use[0]} twice (a duplicate line): "
                              f"escalate")
-        if use[1] != campaign:
+        if campaign and use[1] != campaign:
             raise GuardError(f"{run_file} records a ceiling allowance under campaign run {use[1]}, not {campaign}: "
                              f"a journal from another campaign; escalate")
         journalled[use[0]] = use[1]
+    return journalled
+
+
+def _ceiling(root: str, run_id: str, attempt: str, run_file: str, campaign: str,
+             journalled: dict[str, str]) -> tuple[int, str]:
+    """One re-run of `ci-wait` past its ceiling per GitHub run attempt,
+    keyed by repository, run id, and attempt, journalled in the run file
+    with the campaign run (D00 T04 §39, §41). The file under build/ is a
+    cache the journal rebuilds; a corrupt cache escalates, and a cache
+    entry for this run file its journal lacks means the journal was changed
+    or truncated, which refuses rather than renewing the allowance."""
+    if not run_id:
+        raise GuardError("repair ceiling needs --run-id <GitHub run id>")
+    if not campaign:
+        raise GuardError("repair ceiling needs a live campaign guard with a run id: the allowance is journalled "
+                         "with its campaign")
+    key = f"{_repo_slug(_repo_identity(root)['repo']) or 'unknown-repo'}#{run_id}@{attempt}"
+    cpath = _ceiling_path(root)
+    try:
+        with open(cpath, encoding="utf-8") as fh:
+            seen = json.load(fh)
+        if not isinstance(seen, dict):
+            raise ValueError("not an object")
+        note = ""
+    except FileNotFoundError:
+        seen, note = {}, ""
+    except (OSError, ValueError):
+        raise GuardError("the ceiling record is unreadable; escalate rather than wait again")
     for key_s, v in seen.items():
         if isinstance(v, dict) and key_s in journalled and v.get("campaign") != journalled[key_s]:
             raise GuardError(f"the ceiling record binds {key_s} to campaign run {v.get('campaign')}, but the journal "
@@ -3960,6 +3969,15 @@ def _self_test() -> int:
         _campaign("")
         c_nocamp = _repair_cli("ceiling", "--run-id", "779", *R)
         _campaign("aaaaaaaaaaaa")
+        # Panel round 3: a damaged ceiling line refuses every command, not
+        # only `ceiling`.
+        with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
+            fh.write("repair: ceiling allowance used for example/here#785@1 run=aaaa")
+        cut_attempt = _repair_cli("status", *R)
+        with open(os.path.join(rtmp, runf), "w", encoding="utf-8") as fh:
+            fh.write(with_ceiling)
+        check("repair-every-command-replays-the-ceiling-lines",
+              cut_attempt.returncode == 1 and "without its newline" in cut_attempt.stderr, cut_attempt.stderr)
         check("repair-ceiling-needs-its-campaign",
               c_nocamp.returncode == 1 and "journalled with its campaign" in c_nocamp.stderr, c_nocamp.stderr)
         with open(os.path.join(rtmp, "build", "claude-campaign-ceiling.json"), "w", encoding="utf-8") as fh:
