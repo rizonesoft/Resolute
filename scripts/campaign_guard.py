@@ -810,6 +810,17 @@ def reconcile(root: str, session: str, cronlist: str, run_file: str | None = Non
         except GuardError:
             return ["reconcile: the guard is unreadable: report it to the operator and start nothing"]
     out: list[str] = []
+    if listing_state(cronlist) == "unknown":
+        # Nothing is named for deletion without a readable listing, not even
+        # a pending cancellation (panel round 2 of the D00 T04 §40 review).
+        try:
+            waiting = [str(j.get("cron_id")) for j in _pending_jobs(root)]
+        except GuardError:
+            waiting = []
+        return (["reconcile: UNKNOWN: the CronList text did not read as a listing; nothing is named for "
+                 "deletion: pass the printout exactly as the tool printed it"]
+                + ([f"reconcile: pending cancellation(s) of {', '.join(waiting)} wait for a readable listing"]
+                   if waiting else []))
     try:
         for j in _pending_jobs(root):
             if j.get("session") and j.get("session") != session:
@@ -904,7 +915,9 @@ def delete_check(root: str, session: str, cron_id: str) -> tuple[int, str]:
         # it between this answer and the CronDelete (panel round 1).
         cleared = _cleared_jobs(root)
         if cron_id not in cleared and (guard is None or str(guard.get("cron_id", "")) != cron_id):
-            _publish(_cleared_path(root), json.dumps((cleared + [cron_id])[-200:]).encode("utf-8"))
+            # Never truncated: a clearance must not expire because other
+            # jobs were checked since (panel round 2); job ids are few per run.
+            _publish(_cleared_path(root), json.dumps(cleared + [cron_id]).encode("utf-8"))
     return 0, f"DELETE OK: {cron_id} is not the live guard's current job"
 
 
@@ -986,6 +999,11 @@ def recover(root: str, session: str, run_file: str) -> str:
     with _Lock(root):
         if os.path.exists(guard_path):
             raise GuardError("a guard file exists: quarantine it first if it does not parse")
+        if job in _cleared_jobs(root):
+            # The recorded job was cleared for deletion: restoring it would
+            # hand a deleted heartbeat the guard (panel round 2).
+            raise GuardError(f"the recorded job {job} was cleared for deletion by delete-check; recover refuses it: "
+                             f"CronCreate a new heartbeat and start the guard with acquire")
         _publish(guard_path, json.dumps(doc, indent=2).encode("utf-8"))
         back = read_guard(root)
     if not back or any(back.get(k) != doc[k] for k in ("session_id", "cron_id", "generation", "run_id", "run_file")):
@@ -2270,7 +2288,7 @@ def _self_test() -> int:
         check("pending-cancellations-accumulate", "CronDelete job-p1" in pend and "CronDelete job-p2" in pend, pend)
         check("reconcile-surfaces-a-pending-cancellation",
               any("pending cancellation is unconfirmed: CronDelete job-p1" in r
-                  for r in reconcile(lroot, SESSION, "", RUN_FILE)))
+                  for r in reconcile(lroot, SESSION, "No scheduled jobs.", RUN_FILE)))
         cancel_confirmed(lroot, "job-p1")
         cancel_confirmed(lroot, "job-p2")
         check("pending-cancellations-drain-one-by-one", pending_cancel(lroot) == "", pending_cancel(lroot))
@@ -2471,7 +2489,7 @@ def _self_test() -> int:
         except GuardError as exc:
             check("cancel-confirmed-refuses-another-sessions-job", "report it rather than confirm it" in str(exc),
                   str(exc))
-        rc = reconcile(iroot, OTHER, "", RUN_FILE)
+        rc = reconcile(iroot, OTHER, "No scheduled jobs.", RUN_FILE)
         check("reconcile-reports-a-predecessors-pending-job",
               any("scheduled by session" in r and "report it, do not cancel it" in r for r in rc), str(rc))
         # The NO GUARD branch drains this session's own record first.
@@ -2945,6 +2963,33 @@ def _self_test() -> int:
         check("an-injected-failure-at-the-guard-publish-leaves-no-guard",
               r_a.returncode == 1 and read_guard(froot) is None
               and not [n for n in os.listdir(os.path.join(froot, "build")) if n.endswith(".tmp")], r_a.stderr)
+        # Panel round 2: recover never restores a cleared job, a clearance
+        # never expires because other jobs were checked, and an unreadable
+        # listing names nothing for deletion, pending records included.
+        _fresh_f()
+        rec2 = acquire(froot, SESSION, 0, RUN_FILE, "job-rc", generation=mint_generation())
+        with open(frun, "a", encoding="utf-8") as fh:
+            fh.write(f"\n- run guard: `{rec2}`\n")
+        acquire(froot, SESSION, 0, RUN_FILE, "job-rc2", generation=mint_generation())
+        delete_check(froot, SESSION, "job-rc")
+        os.remove(_paths(froot)[0])
+        try:
+            recover(froot, SESSION, RUN_FILE)
+            check("recover-refuses-a-cleared-job", False)
+        except GuardError as exc:
+            check("recover-refuses-a-cleared-job",
+                  "was cleared for deletion by delete-check; recover refuses it" in str(exc) and read_guard(froot) is None,
+                  str(exc))
+        for n in range(250):
+            delete_check(froot, SESSION, f"filler-{n}")
+        check("a-clearance-never-expires", "job-rc" in _cleared_jobs(froot), str(len(_cleared_jobs(froot))))
+        acquire(froot, SESSION, 0, RUN_FILE, "job-pc", generation=mint_generation())
+        g_pc, r_pc = read_guard(froot)["generation"], read_guard(froot)["run_id"]
+        end(froot, SESSION, "operator-stop", g_pc, "job-pc", r_pc)
+        rc_pu = reconcile(froot, SESSION, "HTTP 502", RUN_FILE)
+        check("an-unreadable-listing-names-no-pending-job-for-deletion",
+              any("UNKNOWN" in r for r in rc_pu) and not any("CronDelete" in r for r in rc_pu)
+              and any("pending cancellation(s) of job-pc wait for a readable listing" in r for r in rc_pu), str(rc_pu))
         # Independent review (P1): a rotation re-points only the guard it was
         # named for; an ended run or a moved phase refuses.
         _fresh_f()
