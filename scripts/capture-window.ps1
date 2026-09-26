@@ -64,6 +64,12 @@ param(
     [string]$WindowTitle,
     [Parameter(Mandatory = $true)][string]$Out,
     [string]$Describes = '',
+
+    # The appearance the captured window shows. An application can override
+    # the system setting, so matrix captures state it; without it the
+    # sidecar records the system setting, labelled as such (D00 T02 §9).
+    [ValidateSet('', 'light', 'dark')]
+    [string]$Appearance = '',
     [int]$WaitSeconds = 5,
     [switch]$KeepOpen
 )
@@ -213,8 +219,15 @@ $sourcePath = if ($ours) { $target.Path } elseif ($Path) { (Resolve-Path $Path).
 $sidecar = [System.IO.Path]::ChangeExtension($Out, '.txt')
 # The appearance the capture shows (D00 T02 §9: the light-by-dark matrix),
 # read from the setting apps follow; unknown when the value is absent.
-$appsLight = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name AppsUseLightTheme -ErrorAction SilentlyContinue).AppsUseLightTheme
-$appearance = if ($null -eq $appsLight) { 'unknown' } elseif ($appsLight -eq 0) { 'dark' } else { 'light' }
+$appearanceLine = if ($Appearance) {
+    "$Appearance  (stated by the caller)"
+} else {
+    # Strict mode: an absent value or key must not throw before the fallback.
+    $personalize = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -ErrorAction SilentlyContinue
+    $appsLight = if ($personalize -and $personalize.PSObject.Properties.Name -contains 'AppsUseLightTheme') { $personalize.AppsUseLightTheme } else { $null }
+    $system = if ($null -eq $appsLight) { 'unknown' } elseif ($appsLight -eq 0) { 'dark' } else { 'light' }
+    "$system  (the system app setting; the application may override it: pass -Appearance)"
+}
 @(
     "capture       : $(Split-Path $Out -Leaf)"
     "describes     : $Describes"
@@ -225,7 +238,7 @@ $appearance = if ($null -eq $appsLight) { 'unknown' } elseif ($appsLight -eq 0) 
     "monitor dpi   : $monX  ($([math]::Round($monX / 96.0 * 100))% scaling) -- what the image was rendered at"
     "window dpi    : $windowDpi  (logical dpi the process sees)"
     "dpi aware     : $dpiAware$(if (-not $dpiAware) { '  -- Windows bitmap-scales this window' })"
-    "appearance    : $appearance  (the system's app appearance at capture)"
+    "appearance    : $appearanceLine"
     "windows build : $([System.Environment]::OSVersion.Version.ToString())"
     "captured      : $(Get-Date -Format 'yyyy-MM-dd')"
     ""

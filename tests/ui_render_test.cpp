@@ -150,6 +150,8 @@ Image RenderGdi(UINT w, UINT h, const std::function<void(HDC)>& paint) {
 // Pixels where any channel differs by more than the tolerance; `diff`,
 // when given, receives the differing pixels in red over a dimmed actual.
 int DiffCount(const Image& actual, const Image& want, Image* diff = nullptr) {
+    // Callers compare sizes first; a mismatch here is refused, never read.
+    if (actual.w != want.w || actual.h != want.h || actual.px.size() != want.px.size()) return -1;
     if (diff) *diff = actual;
     int differing = 0;
     for (size_t i = 0; i < actual.px.size(); ++i) {
@@ -450,6 +452,8 @@ TEST_CASE("The golden diff catches a one-pixel shift", "[ui][render]") {
 
     Image want;
     REQUIRE(LoadPng(std::filesystem::path(RESOLUTE_GOLDEN_DIR) / "sidebar-light-96.png", want));
+    REQUIRE(want.w == actual.w);
+    REQUIRE(want.h == actual.h);
     REQUIRE(DiffCount(actual, want) == 0);
     Image shifted = actual;
     for (UINT y = 0; y < shifted.h; ++y)
@@ -457,4 +461,31 @@ TEST_CASE("The golden diff catches a one-pixel shift", "[ui][render]") {
     const int moved = DiffCount(shifted, want);
     INFO("differing pixels after a one-pixel shift: " << moved);
     CHECK(moved > 100);
+}
+
+TEST_CASE("An overflowed toolbar offers every hidden command", "[ui][render]") {
+    // Too narrow for even its first item, the toolbar overflows everything
+    // on its left, the View dropdown included, which the overflow menu must
+    // offer as its choices, not as a command nothing handles (independent
+    // review of D00 T02 §9).
+    Host host;
+    rui::Toolbar tb;
+    tb.Create(host.hwnd, GetModuleHandleW(nullptr), 207);
+    tb.UpdateDpi(96);
+    const int w = S(140, 96), h = tb.ScaledHeight();
+    tb.Resize(0, 0, w, h);
+    Render(tb, w, h);  // lays the toolbar out
+    HMENU menu = tb.BuildOverflowMenu();
+    REQUIRE(menu != nullptr);
+    HMENU view = GetSubMenu(menu, 0);
+    REQUIRE(view != nullptr);
+    CHECK(GetMenuItemCount(view) == 4);
+    CHECK(GetMenuItemID(view, 0) == rui::IDC_TB_VIEW_LARGE);
+    CHECK(GetMenuItemID(view, 3) == rui::IDC_TB_VIEW_DETAILS);
+    bool refresh = false;
+    for (int i = 0; i < GetMenuItemCount(menu); ++i)
+        if (GetMenuItemID(menu, i) == rui::IDC_TB_REFRESH) refresh = true;
+    CHECK(refresh);
+    DestroyMenu(menu);
+    DestroyWindow(tb.Handle());
 }

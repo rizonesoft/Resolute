@@ -54,6 +54,10 @@ public:
     // bitmap target, say) instead of its window, sized by the target;
     // the window's own target is untouched. False when drawing failed.
     bool RenderTo(ID2D1RenderTarget* target);
+    // The overflow button's menu for the current layout: every overflowed
+    // item, a dropdown as a submenu of its choices; nullptr when nothing
+    // overflows. The caller destroys it (D00 T02 §9).
+    HMENU BuildOverflowMenu() const;
     void UpdateDpi(int dpi);
 
 private:

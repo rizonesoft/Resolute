@@ -172,6 +172,31 @@ D2D1_RECT_F Toolbar::OverflowRect(float totalWidth) const {
     return D2D1::RectF(left, padF, left + overW, static_cast<float>(Height()) - padF);
 }
 
+HMENU Toolbar::BuildOverflowMenu() const {
+    if (m_overflowStart < 0) return nullptr;
+    HMENU menu = CreatePopupMenu();
+    for (int i = m_overflowStart; i < kItemCount; i++) {
+        if (kItems[i].rightAlign) continue;
+        if (kItems[i].kind == ItemKind::Separator) {
+            AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+            continue;
+        }
+        const wchar_t* label = kItems[i].label && kItems[i].label[0]
+            ? kItems[i].label : kItems[i].tooltip;
+        if (kItems[i].kind == ItemKind::Dropdown && kItems[i].choices) {
+            // A dropdown keeps its choices: its own id is not a command
+            // anything handles (independent review of D00 T02 §9).
+            HMENU sub = CreatePopupMenu();
+            for (int k = 0; k < kItems[i].choiceCount; k++)
+                AppendMenuW(sub, MF_STRING, kItems[i].choices[k].id, kItems[i].choices[k].label);
+            AppendMenuW(menu, MF_POPUP, reinterpret_cast<UINT_PTR>(sub), label);
+            continue;
+        }
+        AppendMenuW(menu, MF_STRING, kItems[i].id, label);
+    }
+    return menu;
+}
+
 int Toolbar::HitTest(int mx, int my, float totalWidth) {
     for (int i = 0; i < kItemCount; i++) {
         // Separators are not clickable
@@ -640,17 +665,7 @@ LRESULT CALLBACK Toolbar::ToolbarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
             if (pressedIdx == -2 && self->m_overflowStart >= 0) {
                 RECT rc;
                 GetClientRect(hwnd, &rc);
-                HMENU hMenu = CreatePopupMenu();
-                for (int i = self->m_overflowStart; i < kItemCount; i++) {
-                    if (kItems[i].rightAlign) continue;
-                    if (kItems[i].kind == ItemKind::Separator) {
-                        AppendMenuW(hMenu, MF_SEPARATOR, 0, nullptr);
-                        continue;
-                    }
-                    const wchar_t* label = kItems[i].label && kItems[i].label[0]
-                        ? kItems[i].label : kItems[i].tooltip;
-                    AppendMenuW(hMenu, MF_STRING, kItems[i].id, label);
-                }
+                HMENU hMenu = self->BuildOverflowMenu();
                 auto overRc = self->OverflowRect(static_cast<float>(rc.right));
                 POINT pt = { static_cast<LONG>(overRc.left),
                     static_cast<LONG>(static_cast<float>(self->Height())) };
