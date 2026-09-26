@@ -889,7 +889,17 @@ def reconcile(root: str, session: str, cronlist: str, run_file: str | None = Non
                    f"rotate it: mint a generation, CronCreate a heartbeat, acquire --cron-id <new job> --generation "
                    f"<new generation> --expect-generation {gen} --expect-run {guard.get('run_id')}, then CronDelete "
                    f"{keep} after delete-check")
-    out += [f"reconcile: stale job {j} is not the guard's: CronDelete it" for j in ours if j != keep]
+    twins = [j for j in ours if j != keep and gens[j] == gen]
+    if keep is not None and keep == job and twins:
+        # A second job with the guard's own generation cannot be told from
+        # it, and one of them may be firing: rotate, never delete one and
+        # keep the other (panel round 4 of the D00 T04 §40 review).
+        out.append(f"reconcile: {', '.join([job] + twins)} carry the guard's generation {gen}: rotate it: mint a "
+                   f"generation, CronCreate a heartbeat, acquire --cron-id <new job> --generation <new generation> "
+                   f"--expect-generation {gen} --expect-run {guard.get('run_id')}, then CronDelete "
+                   f"{', '.join([job] + twins)}, each after delete-check")
+    out += [f"reconcile: stale job {j} is not the guard's: CronDelete it" for j in ours
+            if j != keep and gens[j] != gen]
     if keep is not None:
         try:
             with open(os.path.join(root, target), encoding="utf-8", errors="replace") as fh:
@@ -981,7 +991,23 @@ def quarantine(root: str, session: str) -> list[str]:
                     break
             # Held under the guard lock, so no second quarantine races this
             # name; the unique suffix keeps two in one second apart.
+            salvaged: list[str] = []
+            if path == _cleared_path(root):
+                # The ledger is a set of prohibitions, and more of them is
+                # harmless: every job-id-shaped token in the corrupt bytes is
+                # kept, so quarantine never lifts a clearance (panel round 4,
+                # rethought after three rounds on the clearance unit).
+                try:
+                    with open(path, "rb") as fh:
+                        raw = fh.read().decode("utf-8", "replace")
+                    salvaged = sorted(set(re.findall(r"(?<![0-9A-Za-z])[0-9a-f]{8}(?![0-9A-Za-z])", raw)))
+                except OSError:
+                    salvaged = []
             os.replace(path, dest)
+            if path == _cleared_path(root):
+                _publish(path, json.dumps(salvaged).encode("utf-8"))
+                out.append(f"quarantine: the clearance ledger was rebuilt from the {len(salvaged)} job id(s) its bytes "
+                           f"still carry; a ledger with none left is a total loss this cannot undo")
             out.append(f"quarantine: {os.path.basename(path)} did not parse; moved, bytes kept, to "
                        f"build/{_QUARANTINE}/{os.path.basename(dest)}")
     return out or ["quarantine: every guard file parses; nothing moved"]
@@ -3032,6 +3058,32 @@ def _self_test() -> int:
         check("startup-rotates-rather-than-adopting-a-survivor",
               any(f"job-survivor carries its generation: rotate it" in r and f"--expect-generation {g_sv} --expect-run {rid_sv}" in r
                   for r in rc_sv) and not any("re-point with acquire --cron-id job-survivor" in r for r in rc_sv), str(rc_sv))
+        # Panel round 4: quarantine salvages the ledger's prohibitions, and a
+        # same-generation twin rotates at startup instead of being deleted.
+        _fresh_f()
+        acquire(froot, SESSION, 0, RUN_FILE, "c0c0c0c0", generation=mint_generation())
+        with open(_cleared_path(froot), "w", encoding="utf-8") as fh:
+            fh.write('["a1b2c3d4", "deadbeef", ')
+        salv = quarantine(froot, SESSION)
+        try:
+            acquire(froot, SESSION, 0, RUN_FILE, "deadbeef", generation=mint_generation())
+            salvage_holds = False
+        except GuardError as exc:
+            salvage_holds = "was cleared for deletion" in str(exc)
+        check("quarantine-salvages-the-clearance-ledger",
+              salvage_holds and _cleared_jobs(froot) == ["a1b2c3d4", "deadbeef"]
+              and any("rebuilt from the 2 job id(s)" in m for m in salv), str(salv))
+        g_tw = mint_generation()
+        acquire(froot, SESSION, 0, RUN_FILE, "job-tw1", generation=g_tw)
+        rid_tw = read_guard(froot)["run_id"]
+        with open(frun, "a", encoding="utf-8") as fh:
+            fh.write(f"\n- run guard: job job-tw1 generation {g_tw}\n")
+        rc_tw = reconcile(froot, SESSION, _cl(("job-tw1", heartbeat_tag(froot, g_tw, RUN_FILE)),
+                                              ("job-tw2", heartbeat_tag(froot, g_tw, RUN_FILE))))
+        check("startup-rotates-a-same-generation-twin",
+              any(f"job-tw1, job-tw2 carry the guard's generation {g_tw}: rotate it" in r
+                  and f"--expect-run {rid_tw}" in r for r in rc_tw)
+              and not any("stale job job-tw2" in r for r in rc_tw), str(rc_tw))
         # Independent review (P1): a rotation re-points only the guard it was
         # named for; an ended run or a moved phase refuses.
         _fresh_f()
