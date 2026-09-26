@@ -881,8 +881,14 @@ def reconcile(root: str, session: str, cronlist: str, run_file: str | None = Non
         out.append(f"reconcile: the guard names job {job}, which is not live: CronCreate a heartbeat "
                    f"and re-point with acquire --cron-id")
     elif keep != job:
+        # A survivor carrying the guard's generation is not adopted: a
+        # firing of the lost job may still be in flight with the same
+        # identity, so startup rotates exactly as the heartbeat does (panel
+        # round 3 of the D00 T04 §40 review).
         out.append(f"reconcile: the guard names job {job}, which is not live, and {keep} carries its generation: "
-                   f"re-point with acquire --cron-id {keep} --generation {gen}")
+                   f"rotate it: mint a generation, CronCreate a heartbeat, acquire --cron-id <new job> --generation "
+                   f"<new generation> --expect-generation {gen} --expect-run {guard.get('run_id')}, then CronDelete "
+                   f"{keep} after delete-check")
     out += [f"reconcile: stale job {j} is not the guard's: CronDelete it" for j in ours if j != keep]
     if keep is not None:
         try:
@@ -926,12 +932,21 @@ def _cleared_path(root: str) -> str:
 
 
 def _cleared_jobs(root: str) -> list[str]:
+    """The jobs `delete-check` cleared. A missing ledger is empty; an
+    unreadable one refuses, because reading it as empty would let a cleared
+    job be made current again (panel round 3 of the D00 T04 §40 review)."""
     try:
         with open(_cleared_path(root), encoding="utf-8") as fh:
             doc = json.load(fh)
-        return [str(x) for x in doc] if isinstance(doc, list) else []
-    except (OSError, ValueError):
+    except FileNotFoundError:
         return []
+    except (OSError, ValueError) as exc:
+        raise GuardError(f"the clearance ledger {_cleared_path(root)} is unreadable ({exc}): quarantine it before "
+                         f"any guard change")
+    if not isinstance(doc, list):
+        raise GuardError(f"the clearance ledger {_cleared_path(root)} is not a list: quarantine it before any "
+                         f"guard change")
+    return [str(x) for x in doc]
 
 
 _QUARANTINE = "claude-campaign-quarantine"
@@ -945,7 +960,8 @@ def quarantine(root: str, session: str) -> list[str]:
     out = []
     guard_path, state_path = _paths(root)
     with _Lock(root):
-        for path, want in ((guard_path, dict), (state_path, dict), (_pending_path(root), (list, dict))):
+        for path, want in ((guard_path, dict), (state_path, dict), (_pending_path(root), (list, dict)),
+                           (_cleared_path(root), list)):
             if not os.path.exists(path):
                 continue
             try:
@@ -2990,6 +3006,32 @@ def _self_test() -> int:
         check("an-unreadable-listing-names-no-pending-job-for-deletion",
               any("UNKNOWN" in r for r in rc_pu) and not any("CronDelete" in r for r in rc_pu)
               and any("pending cancellation(s) of job-pc wait for a readable listing" in r for r in rc_pu), str(rc_pu))
+        # Panel round 3: an unreadable clearance ledger refuses guard changes
+        # until quarantined, and startup rotates instead of adopting a
+        # survivor of the guard's generation.
+        _fresh_f()
+        acquire(froot, SESSION, 0, RUN_FILE, "job-lg", generation=mint_generation())
+        with open(_cleared_path(froot), "w", encoding="utf-8") as fh:
+            fh.write("{broken ledger")
+        try:
+            acquire(froot, SESSION, 0, RUN_FILE, "job-lg2", generation=mint_generation())
+            ledger_refused = False
+        except GuardError as exc:
+            ledger_refused = "clearance ledger" in str(exc) and "quarantine it" in str(exc)
+        moved_l = quarantine(froot, SESSION)
+        check("an-unreadable-clearance-ledger-refuses-until-quarantined",
+              ledger_refused and any("claude-campaign-cleared.json" in m for m in moved_l)
+              and acquire(froot, SESSION, 0, RUN_FILE, "job-lg2", generation=mint_generation()).startswith("acquire:"),
+              str(moved_l))
+        g_sv = mint_generation()
+        acquire(froot, SESSION, 0, RUN_FILE, "job-lost", generation=g_sv)
+        rid_sv = read_guard(froot)["run_id"]
+        with open(frun, "a", encoding="utf-8") as fh:
+            fh.write(f"\n- run guard: job job-survivor generation {g_sv}\n")
+        rc_sv = reconcile(froot, SESSION, _cl(("job-survivor", heartbeat_tag(froot, g_sv, RUN_FILE))))
+        check("startup-rotates-rather-than-adopting-a-survivor",
+              any(f"job-survivor carries its generation: rotate it" in r and f"--expect-generation {g_sv} --expect-run {rid_sv}" in r
+                  for r in rc_sv) and not any("re-point with acquire --cron-id job-survivor" in r for r in rc_sv), str(rc_sv))
         # Independent review (P1): a rotation re-points only the guard it was
         # named for; an ended run or a moved phase refuses.
         _fresh_f()
@@ -3415,7 +3457,11 @@ def _self_test() -> int:
                          "re-pointed to it with `--expect-generation` and `--expect-run` (a compare-and-swap"),
                         ("skill-every-crondelete-follows-delete-check",
                          "every CronDelete of any job follows `python scripts/campaign_guard.py delete-check --session S"),
-                        ("skill-states-the-fsync-default", "Files are not fsynced: a power loss can lose the last change"),
+                        ("skill-states-the-fsync-default",
+                         "Files are not fsynced and directory changes carry no ordering barrier, so after a power loss any "
+                         "subset of the last changes may survive"),
+                        ("skill-startup-rotates-never-adopts",
+                         "rotate the generation when only a surviving job carries the guard's generation (never adopt it"),
                         ("skill-quarantine-then-recover",
                          "`python scripts/campaign_guard.py recover --session $CLAUDE_CODE_SESSION_ID --run-file <run file>`"),
                         ("skill-startup-drains-orphan-errors", "--startup yes --ack <id>`"),
