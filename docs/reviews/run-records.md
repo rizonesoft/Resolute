@@ -645,3 +645,16 @@ round: 3 model: gpt-6-astra effort: high outcome: empty candidate: 18111005 prov
 round: 4 model: gpt-6-astra effort: high outcome: independent candidate: c8a31bd3 provider: openai version: gpt-6-astra cost: unresolved latency: 118s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S7-F1, D00-T02-S7-F2
 empty: 2
 refuted: 0
+
+run: D00-T02-S8
+date: 2026-09-26
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: a6aaa693 provider: openai version: gpt-6-astra cost: 17371tokens latency: 21s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S8-F1
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: f4479e69 provider: openai version: gpt-6-astra cost: 18855tokens latency: 22s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S8-F2
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: b1738177 provider: openai version: gpt-6-astra cost: 19818tokens latency: 25s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T02-S8-F3
+# round 3 is the Full sign-off: F3 sits below the blocking bar and is the third variant of one root cause, so it files in D00 T02 §9 and the fix is rethought rather than re-rounded.
+# round 4 is the independent pass (`panel_slots.py exec independent --commit a6aaa693`, ran before panel round 1); the runner printed no token figure.
+round: 4 model: gpt-6-astra effort: high outcome: independent candidate: a6aaa693 provider: openai version: gpt-6-astra cost: unresolved latency: 70s opportunity: full-scope purpose: section-review provenance: recorded findings:
+empty: 0
+refuted: 0

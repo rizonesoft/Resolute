@@ -4,14 +4,14 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**480 findings across 54 sections.**
+**483 findings across 55 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
 | `record` | 128 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 119 | fails under hostile or unexpected input |
+| `adversarial` | 122 | fails under hostile or unexpected input |
 | `correctness` | 80 | the code does the wrong thing |
 | `integration` | 79 | a consumer, caller, or downstream artifact no longer holds |
 | `consistency` | 60 | disagrees with the rest of the suite, its naming, or its layout |
@@ -27,7 +27,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
 | `major` | 216 | wrong behavior in code, plan, or record |
-| `minor` | 258 | polish or wording, or no surviving defect |
+| `minor` | 261 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -121,6 +121,9 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T02 §7` | F2 | major | `adversarial` | fixed | independent | a cancel from an animation's own final update still runs its completion |
 | `D00 T02 §7` | F3 | major | `adversarial` | fixed | independent | a nested tick can clear the frame's cancellations |
 | `D00 T02 §7` | F4 | minor | `record` | fixed | independent | the teardown leg never pumps past the animation |
+| `D00 T02 §8` | F1 | minor | `adversarial` | fixed | independent | the audit never checks sources against the manifest |
+| `D00 T02 §8` | F2 | minor | `adversarial` | fixed | independent | names with capitals or underscores escape the scan |
+| `D00 T02 §8` | F3 | minor | `adversarial` | filed | independent | names with doubled or trailing separators or spaces escape the scan |
 | `D00 T03 §1` | F1 | minor | `consistency` | fixed | self | four claims pointed into gitignored `samples/` |
 | `D00 T03 §1` | F2 | minor | `record` | fixed | self | the Test checkpoint named components, not paths |
 | `D00 T03 §1` | F3 | minor | `consistency` | fixed | self | `AGENTS.md` did not describe the root it now has |
