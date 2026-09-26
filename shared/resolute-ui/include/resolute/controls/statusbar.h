@@ -88,6 +88,7 @@ private:
     ComPtr<ID2D1HwndRenderTarget> m_hwndRt;
     ComPtr<ID2D1RenderTarget>     m_rt;
     void ReleaseDeviceResources();
+    HRESULT m_paintHr = S_OK;  // the last paint's EndDraw result, for RenderTo
 
     // ── Segment State ──────────────────────────────────────
     struct SegmentState {

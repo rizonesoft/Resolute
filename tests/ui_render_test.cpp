@@ -489,3 +489,32 @@ TEST_CASE("An overflowed toolbar offers every hidden command", "[ui][render]") {
     DestroyMenu(menu);
     DestroyWindow(tb.Handle());
 }
+
+TEST_CASE("A name passed straight to the icon API is reported too", "[ui][render]") {
+    // The public entry points still return null for an unknown name, and
+    // now also record it, so no path around Resolve is silent (panel round 1
+    // of the D00 T02 §9 review).
+    REQUIRE(rui::LucideIcons::Load());
+    rui::LucideIcons::ClearUnknownNames();
+    CHECK(rui::LucideIcons::GetSvgData("chevron up") == nullptr);
+    CHECK(rui::LucideIcons::Render("chevron__up", 16, 0xFFFFFFu) == nullptr);
+    CHECK(rui::LucideIcons::CreateBitmap("Chevron-Up", 16, 0xFFFFFFu) == nullptr);
+    CHECK(rui::LucideIcons::UnknownNames() == std::vector<std::string>{"Chevron-Up", "chevron up", "chevron__up"});
+    rui::LucideIcons::ClearUnknownNames();
+}
+
+TEST_CASE("RenderTo reports the drawing's own result", "[ui][render]") {
+    // A target whose drawing fails makes RenderTo false, whatever pointer it
+    // leaves behind: a 1x1 target cannot fail, so a control painted into a
+    // target that was never begun is the failure (panel round 1 of the D00
+    // T02 §9 review). Success is asserted on a real target.
+    Host host;
+    rui::Sidebar bar;
+    bar.Create(host.hwnd, GetModuleHandleW(nullptr), 208);
+    bar.UpdateDpi(96);
+    rui::AnimationManager::Instance().Flush();
+    const Image ok = Render(bar, bar.ScaledWidth(), S(320, 96));
+    CHECK(ok.w > 0);
+    CHECK_FALSE(bar.RenderTo(nullptr));
+    DestroyWindow(bar.Handle());
+}

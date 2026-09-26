@@ -90,6 +90,7 @@ private:
     ComPtr<ID2D1HwndRenderTarget> m_hwndRt;
     ComPtr<ID2D1RenderTarget>     m_rt;
     void ReleaseDeviceResources();
+    HRESULT m_paintHr = S_OK;  // the last paint's EndDraw result, for RenderTo
     ComPtr<ID2D1Bitmap> m_iconBitmaps[kCategoryCount];       // normal color
     ComPtr<ID2D1Bitmap> m_accentIconBitmaps[kCategoryCount]; // accent color
     int      m_cachedIconSize    = 0;

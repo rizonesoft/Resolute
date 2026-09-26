@@ -128,6 +128,7 @@ private:
     ComPtr<ID2D1HwndRenderTarget> m_hwndRt;
     ComPtr<ID2D1RenderTarget>     m_rt;
     void ReleaseDeviceResources();
+    HRESULT m_paintHr = S_OK;  // the last paint's EndDraw result, for RenderTo
 
     // ── Icon Bitmap Cache (HICON → D2D1Bitmap) ──────────────
     std::unordered_map<HICON, ComPtr<ID2D1Bitmap>> m_iconCache;

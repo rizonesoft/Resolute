@@ -496,6 +496,7 @@ void ListView::OnPaint() {
         PaintScrollbar(size, brush.Get());
 
     HRESULT hr = m_rt->EndDraw();
+    m_paintHr = hr;
     if (hr == D2DERR_RECREATE_TARGET) {
         m_rt.Reset();
         m_hwndRt.Reset();
@@ -1165,8 +1166,10 @@ bool ListView::RenderTo(ID2D1RenderTarget* target) {
     RenderContext::ClearSvgCache();
     ComPtr<ID2D1RenderTarget> saved = m_rt;
     m_rt = target;
+    // A paint that returns before EndDraw leaves this unset, and fails.
+    m_paintHr = E_PENDING;
     OnPaint();
-    const bool drew = m_rt != nullptr;
+    const bool drew = SUCCEEDED(m_paintHr);
     m_rt = m_hwndRt ? ComPtr<ID2D1RenderTarget>(m_hwndRt) : saved;
     ReleaseDeviceResources();
     RenderContext::ClearSvgCache();

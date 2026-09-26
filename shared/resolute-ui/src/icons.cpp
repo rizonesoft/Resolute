@@ -56,34 +56,49 @@ bool LucideIcons::Load() {
 int LucideIcons::GetCount() { return s_getCount ? s_getCount() : 0; }
 const char* LucideIcons::GetName(int idx) { return s_getName ? s_getName(idx) : nullptr; }
 
-uint8_t* LucideIcons::Render(const char* name, int size, uint32_t color) {
-    return s_render ? s_render(name, size, color) : nullptr;
-}
-
-void LucideIcons::Free(void* ptr) { if (s_free) s_free(ptr); }
-
-HBITMAP LucideIcons::CreateBitmap(const char* name, int size, uint32_t color) {
-    return s_createBmp ? static_cast<HBITMAP>(s_createBmp(name, size, color)) : nullptr;
-}
-
-const char* LucideIcons::GetSvgData(const char* name) {
-    return s_getSvg ? s_getSvg(name) : nullptr;
-}
-
 namespace {
 std::set<std::string>& UnknownSet() {
     static std::set<std::string> names;
     return names;
 }
-}  // namespace
 
-const char* LucideIcons::Resolve(const char* name) {
-    if (name && GetSvgData(name)) return name;
+// Logs a name that does not resolve, once, and remembers it for UnknownNames.
+void NoteUnknown(const char* name) {
     const std::string shown = name ? name : "(null)";
     if (UnknownSet().insert(shown).second) {
         const std::string line = "ResoluteUI: unknown icon \"" + shown + "\"; drawing the fallback glyph\n";
         OutputDebugStringA(line.c_str());
     }
+}
+}  // namespace
+
+// Each public entry point records a name that does not resolve, so a
+// computed or malformed name passed straight to it is logged and reported
+// by UnknownNames like one passed through Resolve; the entry points still
+// return null for it (D00 T02 §9, panel round 1 of its review).
+uint8_t* LucideIcons::Render(const char* name, int size, uint32_t color) {
+    uint8_t* px = s_render ? s_render(name, size, color) : nullptr;
+    if (!px && name && size > 0 && !(s_getSvg && s_getSvg(name))) NoteUnknown(name);
+    return px;
+}
+
+void LucideIcons::Free(void* ptr) { if (s_free) s_free(ptr); }
+
+HBITMAP LucideIcons::CreateBitmap(const char* name, int size, uint32_t color) {
+    HBITMAP bmp = s_createBmp ? static_cast<HBITMAP>(s_createBmp(name, size, color)) : nullptr;
+    if (!bmp && name && !(s_getSvg && s_getSvg(name))) NoteUnknown(name);
+    return bmp;
+}
+
+const char* LucideIcons::GetSvgData(const char* name) {
+    const char* svg = s_getSvg ? s_getSvg(name) : nullptr;
+    if (!svg && name) NoteUnknown(name);
+    return svg;
+}
+
+const char* LucideIcons::Resolve(const char* name) {
+    if (name && s_getSvg && s_getSvg(name)) return name;
+    NoteUnknown(name);
     return kFallbackIcon;
 }
 
