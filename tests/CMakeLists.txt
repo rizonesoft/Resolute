@@ -43,6 +43,10 @@ target_compile_definitions(resolute_tests PRIVATE
     # D00 T02 §8.
     RESOLUTE_ICON_MANIFEST="${CMAKE_CURRENT_SOURCE_DIR}/icon_manifest.txt"
     RESOLUTE_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+    # The rendered-output goldens, and where a failing render writes its
+    # actual and diff images. D00 T02 §9.
+    RESOLUTE_GOLDEN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/golden"
+    RESOLUTE_RENDER_OUT="${CMAKE_BINARY_DIR}/render-out"
 )
 target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -54,6 +58,9 @@ target_link_libraries(resolute_tests PRIVATE
     Catch2::Catch2WithMain
     ResoluteUI_static
     Lucide_static
+    # WIC and COM, for the offscreen renders and their PNG goldens (D00 T02 §9).
+    windowscodecs
+    ole32
 )
 
 # -municode, and NOT -mwindows.

@@ -29,6 +29,12 @@ public:
     static WORD Show(HWND parent, POINT screenPt,
                      const DropdownChoice* choices, int count, int dpi);
 
+    /// The menu's size at `dpi`, and its items painted into `hdc` (a memory
+    /// DC with a bitmap of that size selected) with `hovered` highlighted,
+    /// through the same path the window paints with. D00 T02 §9.
+    static SIZE Measure(const DropdownChoice* choices, int count, int dpi);
+    static void RenderTo(HDC hdc, const DropdownChoice* choices, int count, int dpi, int hovered = -1);
+
 private:
     static LRESULT CALLBACK PopupProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
     static bool s_classRegistered;

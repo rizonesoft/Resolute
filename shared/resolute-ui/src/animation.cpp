@@ -42,7 +42,10 @@ void AnimationManager::OnTick() {
 
     // Clamp deltatime to avoid huge jumps (e.g., after sleep/breakpoint)
     if (dt > 100.0f) dt = 16.0f;
+    TickAll(dt);
+}
 
+void AnimationManager::TickAll(float dt) {
     // Tick a moved-out copy: animations added by callbacks land in
     // m_animations and join after the frame; cancellations are recorded
     // and skip every later callback of the frame.
@@ -193,6 +196,13 @@ void AnimationManager::CancelOwner(const void* owner) {
             [owner](const Animation& a) { return a.owner == owner; }),
         m_animations.end()
     );
+}
+
+int AnimationManager::Flush(int maxPasses) {
+    if (m_ticking) return Count();
+    for (int pass = 0; pass < maxPasses && !m_animations.empty(); ++pass)
+        TickAll(1.0e9f);  // longer than any duration and delay
+    return Count();
 }
 
 // ── Queries ─────────────────────────────────────────────────

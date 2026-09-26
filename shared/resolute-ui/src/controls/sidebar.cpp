@@ -129,7 +129,7 @@ void Sidebar::Create(HWND parent, HINSTANCE hInst, int id) {
 
 void Sidebar::Resize(int x, int y, int w, int h) {
     MoveWindow(m_hwnd, x, y, w, h, TRUE);
-    if (m_rt) m_rt->Resize(D2D1::SizeU(w, h));
+    if (m_hwndRt) m_hwndRt->Resize(D2D1::SizeU(w, h));
 }
 
 void Sidebar::Repaint() { InvalidateRect(m_hwnd, nullptr, FALSE); }
@@ -154,7 +154,8 @@ void Sidebar::ToggleCollapsed() {
 
 // ── D2D Setup ───────────────────────────────────────────────
 void Sidebar::CreateRenderTarget() {
-    m_rt = RenderContext::CreateHwndTarget(m_hwnd);
+    m_hwndRt = RenderContext::CreateHwndTarget(m_hwnd);
+    m_rt     = m_hwndRt;
     m_cachedIconSize = 0;
 }
 
@@ -173,7 +174,7 @@ void Sidebar::RebuildIconCache() {
     for (int i = 0; i < kCategoryCount; i++) {
         // Normal icons — render at exact display size (1:1 pixel mapping)
         m_iconBitmaps[i].Reset();
-        auto* rgba = LucideIcons::Render(kCategories[i].iconName, displaySz, color);
+        auto* rgba = LucideIcons::Render(LucideIcons::Resolve(kCategories[i].iconName), displaySz, color);
         if (rgba) {
             m_iconBitmaps[i] = RenderContext::CreateBitmapFromRGBA(
                 m_rt.Get(), rgba, displaySz, displaySz);
@@ -181,7 +182,7 @@ void Sidebar::RebuildIconCache() {
         }
         // Selected icons (white in dark, dark in light)
         m_accentIconBitmaps[i].Reset();
-        rgba = LucideIcons::Render(kCategories[i].iconName, displaySz, selectedColor);
+        rgba = LucideIcons::Render(LucideIcons::Resolve(kCategories[i].iconName), displaySz, selectedColor);
         if (rgba) {
             m_accentIconBitmaps[i] = RenderContext::CreateBitmapFromRGBA(
                 m_rt.Get(), rgba, displaySz, displaySz);
@@ -654,7 +655,10 @@ void Sidebar::OnPaint() {
     }
 
     HRESULT hr = m_rt->EndDraw();
-    if (hr == D2DERR_RECREATE_TARGET) m_rt.Reset();
+    if (hr == D2DERR_RECREATE_TARGET) {
+        m_rt.Reset();
+        m_hwndRt.Reset();
+    }
 
 
 }
@@ -710,10 +714,10 @@ LRESULT CALLBACK Sidebar::SidebarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     }
 
     case WM_SIZE:
-        if (self->m_rt) {
+        if (self->m_hwndRt) {
             RECT rc;
             GetClientRect(hwnd, &rc);
-            self->m_rt->Resize(D2D1::SizeU(rc.right, rc.bottom));
+            self->m_hwndRt->Resize(D2D1::SizeU(rc.right, rc.bottom));
         }
         return 0;
 
@@ -1095,6 +1099,29 @@ LRESULT CALLBACK Sidebar::SidebarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     }
 
     return DefWindowProcW(hwnd, msg, wp, lp);
+}
+
+// ── Offscreen rendering (D00 T02 §9) ────────────────────────
+void Sidebar::ReleaseDeviceResources() {
+    for (auto& b : m_iconBitmaps) b.Reset();
+    for (auto& b : m_accentIconBitmaps) b.Reset();
+    m_cachedIconSize = 0;
+}
+
+bool Sidebar::RenderTo(ID2D1RenderTarget* target) {
+    if (!target) return false;
+    // Device-bound resources belong to one target: release them, and the
+    // shared SVG documents, on the way in and on the way out.
+    ReleaseDeviceResources();
+    RenderContext::ClearSvgCache();
+    ComPtr<ID2D1RenderTarget> saved = m_rt;
+    m_rt = target;
+    OnPaint();
+    const bool drew = m_rt != nullptr;
+    m_rt = m_hwndRt ? ComPtr<ID2D1RenderTarget>(m_hwndRt) : saved;
+    ReleaseDeviceResources();
+    RenderContext::ClearSvgCache();
+    return drew;
 }
 
 } // namespace rui

@@ -68,7 +68,7 @@ void Toolbar::Create(HWND parent, HINSTANCE hInst, int id) {
 
 void Toolbar::Resize(int x, int y, int w, int h) {
     MoveWindow(m_hwnd, x, y, w, h, TRUE);
-    if (m_rt) m_rt->Resize(D2D1::SizeU(w, h));
+    if (m_hwndRt) m_hwndRt->Resize(D2D1::SizeU(w, h));
 }
 
 void Toolbar::Repaint() { InvalidateRect(m_hwnd, nullptr, FALSE); }
@@ -81,7 +81,8 @@ void Toolbar::UpdateDpi(int dpi) {
 
 // ── D2D Setup ───────────────────────────────────────────────
 void Toolbar::CreateRenderTarget() {
-    m_rt = RenderContext::CreateHwndTarget(m_hwnd);
+    m_hwndRt = RenderContext::CreateHwndTarget(m_hwnd);
+    m_rt     = m_hwndRt;
     m_cachedIconSize = 0;
 }
 
@@ -107,7 +108,7 @@ void Toolbar::RebuildIconCache() {
             name = CurrentThemeIcon();
 
         m_iconBitmaps[i].Reset();
-        auto* rgba = LucideIcons::Render(name, sz, color);
+        auto* rgba = LucideIcons::Render(LucideIcons::Resolve(name), sz, color);
         if (rgba) {
             m_iconBitmaps[i] = RenderContext::CreateBitmapFromRGBA(
                 m_rt.Get(), rgba, sz, sz);
@@ -115,7 +116,7 @@ void Toolbar::RebuildIconCache() {
         }
 
         m_accentIconBitmaps[i].Reset();
-        rgba = LucideIcons::Render(name, sz, accentColor);
+        rgba = LucideIcons::Render(LucideIcons::Resolve(name), sz, accentColor);
         if (rgba) {
             m_accentIconBitmaps[i] = RenderContext::CreateBitmapFromRGBA(
                 m_rt.Get(), rgba, sz, sz);
@@ -159,6 +160,18 @@ D2D1_RECT_F Toolbar::ItemRect(int idx, float totalWidth) const {
     return D2D1::RectF(x, pad, x + static_cast<float>(ItemWidth(idx)), h - pad);
 }
 
+D2D1_RECT_F Toolbar::OverflowRect(float totalWidth) const {
+    // Right after the last visible left-aligned item, or at the left margin
+    // when even the first item overflows (D00 T02 §9 found that case hiding
+    // every command with no button to reach them).
+    float overW = Dpi::ScaleF(36.0f, m_dpi);
+    float padF  = static_cast<float>(Pad());
+    float left  = m_overflowStart > 0
+        ? ItemRect(m_overflowStart - 1, totalWidth).right + padF
+        : static_cast<float>(Margin());
+    return D2D1::RectF(left, padF, left + overW, static_cast<float>(Height()) - padF);
+}
+
 int Toolbar::HitTest(int mx, int my, float totalWidth) {
     for (int i = 0; i < kItemCount; i++) {
         // Separators are not clickable
@@ -171,14 +184,8 @@ int Toolbar::HitTest(int mx, int my, float totalWidth) {
             return i;
     }
     // Check overflow button
-    if (m_overflowStart >= 0 && m_overflowStart > 0) {
-        auto lastRc = ItemRect(m_overflowStart - 1, totalWidth);
-        float overW = Dpi::ScaleF(36.0f, m_dpi);
-        float padF  = static_cast<float>(Pad());
-        float hF    = static_cast<float>(Height());
-        D2D1_RECT_F overRc = D2D1::RectF(
-            lastRc.right + padF, padF,
-            lastRc.right + padF + overW, hF - padF);
+    if (m_overflowStart >= 0) {
+        D2D1_RECT_F overRc = OverflowRect(totalWidth);
         if (mx >= overRc.left && mx <= overRc.right &&
             my >= overRc.top && my <= overRc.bottom)
             return -2;  // special: overflow button
@@ -532,15 +539,11 @@ void Toolbar::OnPaint() {
     }
 
     // ── Overflow ⋯ Button ─────────────────────────────────────
-    if (m_overflowStart > 0) {
-        // Position: right after the last visible left-aligned item
-        auto lastRc = ItemRect(m_overflowStart - 1, size.width);
-        float overW = Dpi::ScaleF(36.0f, m_dpi);
-        float padF  = static_cast<float>(Pad());
-        D2D1_RECT_F overRc = D2D1::RectF(
-            lastRc.right + padF, padF,
-            lastRc.right + padF + overW,
-            static_cast<float>(Height()) - padF);
+    // Drawn whenever anything overflows, including the first item: with
+    // `> 0` a toolbar too narrow for even its first item hid every command
+    // and offered no way to reach them (found by the D00 T02 §9 goldens).
+    if (m_overflowStart >= 0) {
+        D2D1_RECT_F overRc = OverflowRect(size.width);
 
         // Hover highlight
         if (m_hovered == -2) {
@@ -578,7 +581,10 @@ void Toolbar::OnPaint() {
     }
 
     HRESULT hr = m_rt->EndDraw();
-    if (hr == D2DERR_RECREATE_TARGET) m_rt.Reset();
+    if (hr == D2DERR_RECREATE_TARGET) {
+        m_rt.Reset();
+        m_hwndRt.Reset();
+    }
 }
 
 // ── Window Proc ─────────────────────────────────────────────
@@ -604,10 +610,10 @@ LRESULT CALLBACK Toolbar::ToolbarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     }
 
     case WM_SIZE:
-        if (self->m_rt) {
+        if (self->m_hwndRt) {
             RECT rc;
             GetClientRect(hwnd, &rc);
-            self->m_rt->Resize(D2D1::SizeU(rc.right, rc.bottom));
+            self->m_hwndRt->Resize(D2D1::SizeU(rc.right, rc.bottom));
 
 
         }
@@ -645,9 +651,8 @@ LRESULT CALLBACK Toolbar::ToolbarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
                         ? kItems[i].label : kItems[i].tooltip;
                     AppendMenuW(hMenu, MF_STRING, kItems[i].id, label);
                 }
-                auto lastRc = self->ItemRect(self->m_overflowStart - 1,
-                    static_cast<float>(rc.right));
-                POINT pt = { static_cast<LONG>(lastRc.right + self->Pad()),
+                auto overRc = self->OverflowRect(static_cast<float>(rc.right));
+                POINT pt = { static_cast<LONG>(overRc.left),
                     static_cast<LONG>(static_cast<float>(self->Height())) };
                 ClientToScreen(hwnd, &pt);
                 WORD choiceId = static_cast<WORD>(TrackPopupMenu(hMenu,
@@ -850,6 +855,29 @@ LRESULT CALLBACK Toolbar::ToolbarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     }
 
     return DefWindowProcW(hwnd, msg, wp, lp);
+}
+
+// ── Offscreen rendering (D00 T02 §9) ────────────────────────
+void Toolbar::ReleaseDeviceResources() {
+    for (auto& b : m_iconBitmaps) b.Reset();
+    for (auto& b : m_accentIconBitmaps) b.Reset();
+    m_cachedIconSize = 0;
+}
+
+bool Toolbar::RenderTo(ID2D1RenderTarget* target) {
+    if (!target) return false;
+    // Device-bound resources belong to one target: release them, and the
+    // shared SVG documents, on the way in and on the way out.
+    ReleaseDeviceResources();
+    RenderContext::ClearSvgCache();
+    ComPtr<ID2D1RenderTarget> saved = m_rt;
+    m_rt = target;
+    OnPaint();
+    const bool drew = m_rt != nullptr;
+    m_rt = m_hwndRt ? ComPtr<ID2D1RenderTarget>(m_hwndRt) : saved;
+    ReleaseDeviceResources();
+    RenderContext::ClearSvgCache();
+    return drew;
 }
 
 } // namespace rui

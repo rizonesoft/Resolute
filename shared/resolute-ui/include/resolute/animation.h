@@ -187,6 +187,13 @@ public:
     // Cancel all animations
     void CancelAll();
 
+    // Run every animation to its end now, callbacks included, as if its
+    // whole duration had elapsed; one that restarts itself (a spinner, a
+    // cursor blink) is run for at most `maxPasses` passes. Returns how many
+    // remain. Deterministic, so a rendered state is the settled one
+    // (D00 T02 §9).
+    int Flush(int maxPasses = 8);
+
     // True if any animations are running
     bool IsAnimating() const;
 
@@ -197,6 +204,7 @@ private:
     AnimationManager() = default;
 
     void OnTick();
+    void TickAll(float dt);
     bool Dropped(const Animation& a) const;
 
     static void CALLBACK TimerCallback(HWND hwnd, UINT msg, UINT_PTR id, DWORD time);

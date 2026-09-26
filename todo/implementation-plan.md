@@ -165,7 +165,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §7`  | Driven UI completion tests                        |   4   |
 | [x] | `D00 T02 §8`  | Icon manifest audit                               |   3   |
 | [ ] | `D00 T02 §9`  | Rendered-output regression tests                  |   5   |
-| [ ] | `D00 T02 §10` | Focus-free UI suite conversion                    |  10   |
+| [ ] | `D00 T02 §10` | Focus-free UI suite conversion                    |  11   |
 | [ ] | `D00 T02 §11` | Nightly full-suite regression run                 |   8   |
 | [ ] | `D00 T02 §12` | Port-vs-port visual comparison                    |   4   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |   5   |

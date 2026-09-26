@@ -72,6 +72,77 @@ static HFONT CreateMenuFont(int dpi) {
         L"Segoe UI");
 }
 
+// Paints the menu's items into `memDC` over `rc`: the one painting path,
+// shared by WM_PAINT and RenderTo (D00 T02 §9).
+static void PaintMenu(HDC memDC, const RECT& rc, const PopupMenu::PopupData* d) {
+    auto& c = Theme::Colors();
+    int dpi = d->dpi;
+
+    // Solid background
+    HBRUSH bgBr = CreateSolidBrush(c.surface);
+    FillRect(memDC, &rc, bgBr);
+    DeleteObject(bgBr);
+
+    // 1px border
+    HBRUSH bdrBr = CreateSolidBrush(c.border);
+    FrameRect(memDC, &rc, bdrBr);
+    DeleteObject(bdrBr);
+
+    // Font
+    HFONT font = CreateMenuFont(dpi);
+    HFONT oldFont = static_cast<HFONT>(SelectObject(memDC, font));
+    SetBkMode(memDC, TRANSPARENT);
+    SetTextColor(memDC, c.text);
+
+    int padH   = Dpi::Scale(kPadH, dpi);
+    int iconSz = Dpi::Scale(kIconSz, dpi);
+    int gap    = Dpi::Scale(kGap, dpi);
+    uint32_t iconClr = Theme::IconColor();
+
+    for (int i = 0; i < d->count; i++) {
+        RECT ir = ItemRect(i, rc.right, dpi);
+
+        // Hover highlight
+        if (i == d->hovered) {
+            int ins = Dpi::Scale(4, dpi);
+            RECT hr = { ir.left + ins, ir.top + 1, ir.right - ins, ir.bottom - 1 };
+            HBRUSH hovBr = CreateSolidBrush(c.surfaceHover);
+            FillRect(memDC, &hr, hovBr);
+            DeleteObject(hovBr);
+        }
+
+        // Icon
+        int ix = ir.left + padH;
+        int iy = ir.top + (ir.bottom - ir.top - iconSz) / 2;
+        if (d->choices[i].iconName && d->choices[i].iconName[0]) {
+            HBITMAP hbm = LucideIcons::CreateBitmap(
+                LucideIcons::Resolve(d->choices[i].iconName), iconSz, iconClr);
+            if (hbm) {
+                HDC iconDC = CreateCompatibleDC(memDC);
+                HBITMAP oldBmp = static_cast<HBITMAP>(SelectObject(iconDC, hbm));
+                BLENDFUNCTION bf{};
+                bf.BlendOp = AC_SRC_OVER;
+                bf.SourceConstantAlpha = (i == d->hovered) ? 255 : 180;
+                bf.AlphaFormat = AC_SRC_ALPHA;
+                AlphaBlend(memDC, ix, iy, iconSz, iconSz,
+                           iconDC, 0, 0, iconSz, iconSz, bf);
+                SelectObject(iconDC, oldBmp);
+                DeleteDC(iconDC);
+                DeleteObject(hbm);
+            }
+        }
+
+        // Text
+        int tx = ix + iconSz + gap;
+        RECT tr = { tx, ir.top, ir.right - padH, ir.bottom };
+        DrawTextW(memDC, d->choices[i].label, -1, &tr,
+                  DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+    }
+
+    SelectObject(memDC, oldFont);
+    DeleteObject(font);
+}
+
 // ── Window Procedure ────────────────────────────────────────
 LRESULT CALLBACK PopupMenu::PopupProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     auto* d = reinterpret_cast<PopupData*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
@@ -92,8 +163,6 @@ LRESULT CALLBACK PopupMenu::PopupProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
 
-        auto& c = Theme::Colors();
-        int dpi = d->dpi;
         RECT rc; GetClientRect(hwnd, &rc);
         int w = rc.right, h = rc.bottom;
 
@@ -102,69 +171,7 @@ LRESULT CALLBACK PopupMenu::PopupProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         HBITMAP memBmp = CreateCompatibleBitmap(hdc, w, h);
         HBITMAP oldMemBmp = static_cast<HBITMAP>(SelectObject(memDC, memBmp));
 
-        // Solid background
-        HBRUSH bgBr = CreateSolidBrush(c.surface);
-        FillRect(memDC, &rc, bgBr);
-        DeleteObject(bgBr);
-
-        // 1px border
-        HBRUSH bdrBr = CreateSolidBrush(c.border);
-        FrameRect(memDC, &rc, bdrBr);
-        DeleteObject(bdrBr);
-
-        // Font
-        HFONT font = CreateMenuFont(dpi);
-        HFONT oldFont = static_cast<HFONT>(SelectObject(memDC, font));
-        SetBkMode(memDC, TRANSPARENT);
-        SetTextColor(memDC, c.text);
-
-        int padH   = Dpi::Scale(kPadH, dpi);
-        int iconSz = Dpi::Scale(kIconSz, dpi);
-        int gap    = Dpi::Scale(kGap, dpi);
-        uint32_t iconClr = Theme::IconColor();
-
-        for (int i = 0; i < d->count; i++) {
-            RECT ir = ItemRect(i, rc.right, dpi);
-
-            // Hover highlight
-            if (i == d->hovered) {
-                int ins = Dpi::Scale(4, dpi);
-                RECT hr = { ir.left + ins, ir.top + 1, ir.right - ins, ir.bottom - 1 };
-                HBRUSH hovBr = CreateSolidBrush(c.surfaceHover);
-                FillRect(memDC, &hr, hovBr);
-                DeleteObject(hovBr);
-            }
-
-            // Icon
-            int ix = ir.left + padH;
-            int iy = ir.top + (ir.bottom - ir.top - iconSz) / 2;
-            if (d->choices[i].iconName && d->choices[i].iconName[0]) {
-                HBITMAP hbm = LucideIcons::CreateBitmap(
-                    d->choices[i].iconName, iconSz, iconClr);
-                if (hbm) {
-                    HDC iconDC = CreateCompatibleDC(memDC);
-                    HBITMAP oldBmp = static_cast<HBITMAP>(SelectObject(iconDC, hbm));
-                    BLENDFUNCTION bf{};
-                    bf.BlendOp = AC_SRC_OVER;
-                    bf.SourceConstantAlpha = (i == d->hovered) ? 255 : 180;
-                    bf.AlphaFormat = AC_SRC_ALPHA;
-                    AlphaBlend(memDC, ix, iy, iconSz, iconSz,
-                               iconDC, 0, 0, iconSz, iconSz, bf);
-                    SelectObject(iconDC, oldBmp);
-                    DeleteDC(iconDC);
-                    DeleteObject(hbm);
-                }
-            }
-
-            // Text
-            int tx = ix + iconSz + gap;
-            RECT tr = { tx, ir.top, ir.right - padH, ir.bottom };
-            DrawTextW(memDC, d->choices[i].label, -1, &tr,
-                      DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-        }
-
-        SelectObject(memDC, oldFont);
-        DeleteObject(font);
+        PaintMenu(memDC, rc, d);
 
         // ── Single blit to window ──
         BitBlt(hdc, 0, 0, w, h, memDC, 0, 0, SRCCOPY);
@@ -293,6 +300,25 @@ WORD PopupMenu::Show(HWND parent, POINT screenPt,
     DestroyWindow(popup);
 
     return data.result;
+}
+
+// ── Offscreen rendering (D00 T02 §9) ────────────────────────
+SIZE PopupMenu::Measure(const DropdownChoice* choices, int count, int dpi) {
+    HFONT font = CreateMenuFont(dpi);
+    SIZE sz = MeasureMenu(choices, count, dpi, font);
+    DeleteObject(font);
+    return sz;
+}
+
+void PopupMenu::RenderTo(HDC hdc, const DropdownChoice* choices, int count, int dpi, int hovered) {
+    PopupData d;
+    d.choices = choices;
+    d.count   = count;
+    d.dpi     = dpi;
+    d.hovered = hovered;
+    const SIZE sz = Measure(choices, count, dpi);
+    const RECT rc = {0, 0, sz.cx, sz.cy};
+    PaintMenu(hdc, rc, &d);
 }
 
 } // namespace rui

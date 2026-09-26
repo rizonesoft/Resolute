@@ -13,5 +13,6 @@ Added by D00 T02 §8, whose manifest audit found the shared controls referencing
 | `loader-2.svg` | `icons/loader-circle.svg` |
 | `check.svg` | `icons/check.svg` |
 | `ellipsis.svg` | `icons/ellipsis.svg` |
+| `square-dashed.svg` | `icons/square-dashed.svg` (D00 T02 §9: the fallback drawn for an unknown name) |
 
 `tests/icon_manifest.txt` lists every icon name the code references, and `tests/icon_manifest_test.cpp` asserts each resolves.

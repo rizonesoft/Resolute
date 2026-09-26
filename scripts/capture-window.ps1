@@ -211,6 +211,10 @@ $dpiAware = ($windowDpi -eq $monX)
 
 $sourcePath = if ($ours) { $target.Path } elseif ($Path) { (Resolve-Path $Path).Path } else { $target.Path }
 $sidecar = [System.IO.Path]::ChangeExtension($Out, '.txt')
+# The appearance the capture shows (D00 T02 §9: the light-by-dark matrix),
+# read from the setting apps follow; unknown when the value is absent.
+$appsLight = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name AppsUseLightTheme -ErrorAction SilentlyContinue).AppsUseLightTheme
+$appearance = if ($null -eq $appsLight) { 'unknown' } elseif ($appsLight -eq 0) { 'dark' } else { 'light' }
 @(
     "capture       : $(Split-Path $Out -Leaf)"
     "describes     : $Describes"
@@ -221,6 +225,7 @@ $sidecar = [System.IO.Path]::ChangeExtension($Out, '.txt')
     "monitor dpi   : $monX  ($([math]::Round($monX / 96.0 * 100))% scaling) -- what the image was rendered at"
     "window dpi    : $windowDpi  (logical dpi the process sees)"
     "dpi aware     : $dpiAware$(if (-not $dpiAware) { '  -- Windows bitmap-scales this window' })"
+    "appearance    : $appearance  (the system's app appearance at capture)"
     "windows build : $([System.Environment]::OSVersion.Version.ToString())"
     "captured      : $(Get-Date -Format 'yyyy-MM-dd')"
     ""

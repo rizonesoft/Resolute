@@ -98,6 +98,7 @@ bool RenderContext::DrawSvgIcon(ID2D1RenderTarget* rt, const char* name,
                                  const D2D1_RECT_F& rect, uint32_t color,
                                  float opacity)
 {
+    name = LucideIcons::Resolve(name);  // unknown names draw the fallback (D00 T02 §9)
     if (!rt || !name) return false;
 
     // One-time check: can we QI for ID2D1DeviceContext5?

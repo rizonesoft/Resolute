@@ -51,6 +51,10 @@ public:
     int  Selected() const;
     void Resize(int x, int y, int w, int h);
     void Repaint();
+    // Paints the control's current state into `target` (an offscreen
+    // bitmap target, say) instead of its window, sized by the target;
+    // the window's own target is untouched. False when drawing failed.
+    bool RenderTo(ID2D1RenderTarget* target);
     void UpdateDpi(int dpi);
 
     // Badge counts
@@ -81,7 +85,11 @@ private:
     int     m_searchLen = 0;
     bool    m_searchVisible[kCategoryCount] = {true,true,true,true,true,true};
     void    ApplyFilter();
-    ComPtr<ID2D1HwndRenderTarget> m_rt;
+    // The window's own target, and the one paint draws into: the window's,
+    // or an offscreen target for the duration of RenderTo (D00 T02 §9).
+    ComPtr<ID2D1HwndRenderTarget> m_hwndRt;
+    ComPtr<ID2D1RenderTarget>     m_rt;
+    void ReleaseDeviceResources();
     ComPtr<ID2D1Bitmap> m_iconBitmaps[kCategoryCount];       // normal color
     ComPtr<ID2D1Bitmap> m_accentIconBitmaps[kCategoryCount]; // accent color
     int      m_cachedIconSize    = 0;

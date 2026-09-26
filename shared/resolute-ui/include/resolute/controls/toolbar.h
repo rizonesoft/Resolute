@@ -50,6 +50,10 @@ public:
     HWND Handle() const;
     void Resize(int x, int y, int w, int h);
     void Repaint();
+    // Paints the control's current state into `target` (an offscreen
+    // bitmap target, say) instead of its window, sized by the target;
+    // the window's own target is untouched. False when drawing failed.
+    bool RenderTo(ID2D1RenderTarget* target);
     void UpdateDpi(int dpi);
 
 private:
@@ -99,7 +103,11 @@ private:
     int   m_dpi        = 96;
     bool  m_compact    = false;  // true = icon-only mode (labels hidden)
     int   m_overflowStart = -1; // index of first overflowed left-aligned item (-1 = none)
-    ComPtr<ID2D1HwndRenderTarget> m_rt;
+    // The window's own target, and the one paint draws into: the window's,
+    // or an offscreen target for the duration of RenderTo (D00 T02 §9).
+    ComPtr<ID2D1HwndRenderTarget> m_hwndRt;
+    ComPtr<ID2D1RenderTarget>     m_rt;
+    void ReleaseDeviceResources();
 
     // Icon bitmaps
     ComPtr<ID2D1Bitmap> m_iconBitmaps[kItemCount];
@@ -142,6 +150,9 @@ private:
     void RebuildIconCache();
     D2D1_RECT_F ItemRect(int idx, float totalWidth) const;
     int  HitTest(int mx, int my, float totalWidth);
+    // The overflow button's rectangle while anything overflows, the first
+    // item included; one rectangle for paint, hit-test, and the menu.
+    D2D1_RECT_F OverflowRect(float totalWidth) const;
     void OnPaint();
 
     void AnimateHover(int idx, bool entering);

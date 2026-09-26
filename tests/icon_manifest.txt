@@ -50,6 +50,7 @@ chevron-right	shared/resolute-ui/src/controls/sidebar.cpp
 circle	shared/resolute-ui/src/controls/statusbar.cpp
 loader-2	shared/resolute-ui/src/controls/statusbar.cpp
 check	shared/resolute-ui/src/controls/statusbar.cpp
+square-dashed	shared/resolute-ui/include/resolute/icons.h
 #
 # Declared non-icon literals: !literal<TAB>file [file ...]
 # category: a JSON key the launcher reads

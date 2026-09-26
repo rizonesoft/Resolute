@@ -46,6 +46,10 @@ public:
     HWND Handle() const;
     void Resize(int x, int y, int w, int h);
     void Repaint();
+    // Paints the control's current state into `target` (an offscreen
+    // bitmap target, say) instead of its window, sized by the target;
+    // the window's own target is untouched. False when drawing failed.
+    bool RenderTo(ID2D1RenderTarget* target);
     void UpdateDpi(int dpi);
 
     // ── Segment Text ───────────────────────────────────────
@@ -79,7 +83,11 @@ private:
     HWND m_hwnd     = nullptr;
     HWND m_parent   = nullptr;
     int  m_dpi      = 96;
-    ComPtr<ID2D1HwndRenderTarget> m_rt;
+    // The window's own target, and the one paint draws into: the window's,
+    // or an offscreen target for the duration of RenderTo (D00 T02 §9).
+    ComPtr<ID2D1HwndRenderTarget> m_hwndRt;
+    ComPtr<ID2D1RenderTarget>     m_rt;
+    void ReleaseDeviceResources();
 
     // ── Segment State ──────────────────────────────────────
     struct SegmentState {

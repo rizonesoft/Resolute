@@ -1,5 +1,7 @@
 #include <resolute/icons.h>
 
+#include <set>
+
 namespace rui {
 
 HMODULE LucideIcons::s_dll       = nullptr;
@@ -67,5 +69,28 @@ HBITMAP LucideIcons::CreateBitmap(const char* name, int size, uint32_t color) {
 const char* LucideIcons::GetSvgData(const char* name) {
     return s_getSvg ? s_getSvg(name) : nullptr;
 }
+
+namespace {
+std::set<std::string>& UnknownSet() {
+    static std::set<std::string> names;
+    return names;
+}
+}  // namespace
+
+const char* LucideIcons::Resolve(const char* name) {
+    if (name && GetSvgData(name)) return name;
+    const std::string shown = name ? name : "(null)";
+    if (UnknownSet().insert(shown).second) {
+        const std::string line = "ResoluteUI: unknown icon \"" + shown + "\"; drawing the fallback glyph\n";
+        OutputDebugStringA(line.c_str());
+    }
+    return kFallbackIcon;
+}
+
+std::vector<std::string> LucideIcons::UnknownNames() {
+    return {UnknownSet().begin(), UnknownSet().end()};
+}
+
+void LucideIcons::ClearUnknownNames() { UnknownSet().clear(); }
 
 } // namespace rui
