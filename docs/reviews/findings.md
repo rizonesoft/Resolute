@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**496 findings across 56 sections.**
+**510 findings across 57 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 132 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 127 | fails under hostile or unexpected input |
-| `integration` | 83 | a consumer, caller, or downstream artifact no longer holds |
+| `adversarial` | 135 | fails under hostile or unexpected input |
+| `record` | 134 | the plan or the evidence misdescribes what happened |
+| `integration` | 86 | a consumer, caller, or downstream artifact no longer holds |
 | `correctness` | 80 | the code does the wrong thing |
-| `consistency` | 60 | disagrees with the rest of the suite, its naming, or its layout |
+| `consistency` | 61 | disagrees with the rest of the suite, its naming, or its layout |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 219 | wrong behavior in code, plan, or record |
-| `minor` | 271 | polish or wording, or no surviving defect |
+| `major` | 224 | wrong behavior in code, plan, or record |
+| `minor` | 280 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -81,6 +81,20 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T02 §1` | F4 | minor | `design` | corrected | self | the tool tag is not printable, and the requirement was still met |
 | `D00 T02 §1` | F5 | minor | `record` | corrected | self | the checkpoint still named the preset its own first item had corrected |
 | `D00 T02 §1` | F6 | minor | `consistency` | corrected | self | a scratch file that was never a test |
+| `D00 T02 §10` | F1 | minor | `adversarial` | fixed | independent | the launcher capture checks for the operator only once, after taking the foreground |
+| `D00 T02 §10` | F2 | major | `adversarial` | fixed | independent | a window shown and hidden or destroyed before delivery escapes the guard |
+| `D00 T02 §10` | F3 | minor | `adversarial` | fixed | independent | the popup owner case leaks its owner when collection stands down |
+| `D00 T02 §10` | F4 | minor | `integration` | fixed | independent | fence-debt splits case names on their commas |
+| `D00 T02 §10` | F5 | major | `adversarial` | fixed | independent | a returning operator stands down only the current case |
+| `D00 T02 §10` | F6 | minor | `adversarial` | fixed | independent | an adopted process's show hidden by delivery is discarded |
+| `D00 T02 §10` | F7 | minor | `integration` | fixed | independent | capture cases write into the tracked evidence directory |
+| `D00 T02 §10` | F8 | major | `record` | fixed | independent | the headful pass predates the review's changes |
+| `D00 T02 §10` | F9 | minor | `adversarial` | fixed | independent | an adopted show whose raising thread exited by delivery is dropped |
+| `D00 T02 §10` | F10 | minor | `consistency` | fixed | independent | the audit table omits the transient-show test |
+| `D00 T02 §10` | F11 | minor | `integration` | fixed | independent | a SKIP line counts as debt even when the case then crashed |
+| `D00 T02 §10` | F12 | major | `record` | fixed | independent | the headful pass at the final candidate is still owed |
+| `D00 T02 §10` | F13 | major | `adversarial` | fixed | independent | a thread born and gone between snapshots escapes attribution |
+| `D00 T02 §10` | F14 | minor | `adversarial` | filed | independent | an adopted window's placement is measured at delivery, not when shown |
 | `D00 T02 §2` | F1 | major | `adversarial` | fixed | independent | the boundary guard was not applied to the fixture's own root |
 | `D00 T02 §2` | F2 | major | `correctness` | fixed | independent | the sweep reported success while leaving residue |
 | `D00 T02 §2` | F3 | major | `correctness` | fixed | independent | a fixture that could not read back what it wrote |

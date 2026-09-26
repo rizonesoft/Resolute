@@ -673,3 +673,17 @@ round: 5 model: gpt-6-astra effort: high outcome: empty candidate: 8e1788a5 prov
 round: 6 model: gpt-6-astra effort: high outcome: independent candidate: bba2c4ad provider: openai version: gpt-6-astra cost: unresolved latency: 169s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S9-F1, D00-T02-S9-F2, D00-T02-S9-F3, D00-T02-S9-F4
 empty: 1
 refuted: 0
+
+run: D00-T02-S10
+date: 2026-09-27
+runner: panel
+rounds: 5
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 9986704c provider: openai version: gpt-6-astra cost: 55928tokens latency: 40s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S10-F5, D00-T02-S10-F6, D00-T02-S10-F7, D00-T02-S10-F8
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: 17fe7678 provider: openai version: gpt-6-astra cost: 57778tokens latency: 45s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S10-F9, D00-T02-S10-F10, D00-T02-S10-F11, D00-T02-S10-F12
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: 00f3e931 provider: openai version: gpt-6-astra cost: 59991tokens latency: 48s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T02-S10-F13
+# round 3 is the Full sign-off: F13 is the third report of one root cause, rethought as process-scoped hooks; round 4 runs the depth slot to confirm it, and its one finding sits below the blocking bar and files in D00 T02 §11.
+round: 4 model: gpt-6-astra effort: high outcome: findings candidate: a3edd383 provider: openai version: gpt-6-astra cost: 61072tokens latency: 63s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S10-F14
+# round 5 is the independent pass (`panel_slots.py exec independent --commit f4c884b9`, ran before panel round 1); the runner printed no token figure.
+round: 5 model: gpt-6-astra effort: high outcome: independent candidate: f4c884b9 provider: openai version: gpt-6-astra cost: unresolved latency: 223s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S10-F1, D00-T02-S10-F2, D00-T02-S10-F3, D00-T02-S10-F4
+empty: 0
+refuted: 0
