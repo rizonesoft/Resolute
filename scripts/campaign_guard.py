@@ -14,6 +14,8 @@ deleted only through this module (D00 T04 §34):
     python scripts/campaign_guard.py pending-cancel [--session S]
     python scripts/campaign_guard.py cancel-confirmed --session S --cron-id J --generation G|none
     python scripts/campaign_guard.py reconcile --session S --cronlist FILE|- [--run-file F]
+    python scripts/campaign_guard.py delete-check --session S --cron-id J
+    python scripts/campaign_guard.py quarantine --session S | recover --session S --run-file F
     python scripts/campaign_guard.py health --session S --jobs J1,J2
     python scripts/campaign_guard.py expiry --session S [--now ISO]
     python scripts/campaign_guard.py repair attempt --red SHA --commit SHA --workflow W --run-file F
@@ -74,13 +76,41 @@ def _crash(label: str) -> None:
         os._exit(97)
 
 
+def _fail(label: str) -> None:
+    """An injected failure (D00 T04 §40): the self-test fails a write, a
+    replace, or a delete here, through `CAMPAIGN_FAIL_AT`, to prove a failed
+    operation leaves a consistent lifecycle, not only an interrupted one."""
+    if os.environ.get("CAMPAIGN_FAIL_AT") == label:
+        raise OSError(f"injected failure at {label}")
+
+
 def _publish(path: str, data: bytes) -> None:
     """Replace `path` atomically: a reader sees the old bytes or the new
-    ones, never a torn file (D00 T04 §38)."""
+    ones, never a torn file (D00 T04 §38). A failed write or replace
+    leaves the old bytes and removes its temporary (D00 T04 §40)."""
     tmp = f"{path}.{os.getpid()}.tmp"
-    with open(tmp, "wb") as fh:
-        fh.write(data)
-    os.replace(tmp, path)
+    try:
+        _fail(f"write:{os.path.basename(path)}")
+        with open(tmp, "wb") as fh:
+            fh.write(data)
+        _fail(f"replace:{os.path.basename(path)}")
+        os.replace(tmp, path)
+    except OSError:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def _unlink(path: str, missing_ok: bool = False) -> None:
+    """Delete `path`, failing on demand for the self-test (D00 T04 §40)."""
+    _fail(f"unlink:{os.path.basename(path)}")
+    try:
+        os.unlink(path)
+    except FileNotFoundError:
+        if not missing_ok:
+            raise
 
 
 def repo_name(root: str) -> str:
@@ -92,14 +122,28 @@ def run_stem(run_file: str) -> str:
     return os.path.splitext(os.path.basename(run_file.replace("\\", "/")))[0]
 
 
+def workspace_digest(root: str, run_file: str) -> str:
+    """Twelve hex characters naming one workspace and one run file: the
+    sha256 of the canonical workspace path and the run file, so two
+    checkouts sharing a folder name, or a long path, never collide or
+    overflow (D00 T04 §40)."""
+    import hashlib
+    canon = os.path.normcase(os.path.realpath(root))
+    return hashlib.sha256(f"{canon}\n{run_file.replace(os.sep, '/')}".encode("utf-8")).hexdigest()[:12]
+
+
+HEARTBEAT_TAG_LENGTH = 52
+
+
 def heartbeat_tag(root: str, generation: str, run_file: str) -> str:
-    """The canonical prompt's opening words. `CronList` shows only a
-    prompt's first 80 or so characters, so the identity a job is scoped by
-    (generation, repository, run file) leads the prompt (D00 T04 §38)."""
-    return f"Claude run-guard heartbeat {generation} {repo_name(root)} {run_stem(run_file)}"
+    """The canonical prompt's opening words, always HEARTBEAT_TAG_LENGTH
+    characters. `CronList` shows only a prompt's first 80 or so
+    characters, so the identity a job is scoped by (its generation and the
+    workspace digest) leads the prompt (D00 T04 §38, §40)."""
+    return f"Claude run-guard heartbeat {generation} {workspace_digest(root, run_file)}"
 
 
-_HEARTBEAT = re.compile(r"Claude run-guard heartbeat ([0-9a-f]{12}) (\S+) ([^\s:\u2026]+)(?=[:\s]|$)")
+_HEARTBEAT = re.compile(r"Claude run-guard heartbeat ([0-9a-f]{12}) ([0-9a-f]{12})(?=[:\s]|$)")
 _CRONLIST_LINE = re.compile(r"^\s*([0-9A-Za-z_-]+)\s.*?[\])]:\s?(.*)$")
 
 
@@ -113,16 +157,32 @@ def parse_cronlist(text: str) -> list[tuple[str, str]]:
     return out
 
 
-def classify_job(root: str, prompt: str) -> tuple[str, str, str] | None:
-    """(generation, repository, run stem) for a scoped heartbeat prompt;
-    ("", "", "") for a legacy heartbeat whose prompt carries no identity;
-    None for a job that is not a heartbeat."""
+def classify_job(root: str, prompt: str) -> tuple[str, str] | None:
+    """(generation, workspace digest) for a scoped heartbeat prompt; ("", "")
+    for a legacy heartbeat (before D00 T04 §40's digest) whose scope cannot
+    be proven; None for a job that is not a heartbeat."""
     m = _HEARTBEAT.search(prompt)
     if m:
-        return m.group(1), m.group(2), m.group(3)
+        return m.group(1), m.group(2)
     if "run-guard heartbeat" in prompt:
-        return "", "", ""
+        return "", ""
     return None
+
+
+def listing_state(text: str | None) -> str:
+    """How a `CronList` printout reads (D00 T04 §40): "empty" for the tool's
+    own `No scheduled jobs.`, "ok" when every non-blank line is a job line,
+    else "unknown": a failed, truncated, or garbled listing is never read
+    as "no jobs"."""
+    if text is None:
+        return "unknown"
+    stripped = text.strip()
+    if stripped == "No scheduled jobs.":
+        return "empty"
+    lines = [ln for ln in stripped.splitlines() if ln.strip()]
+    if not lines or not all(_CRONLIST_LINE.match(ln) for ln in lines):
+        return "unknown"
+    return "ok"
 
 
 def _fence(guard: dict | None, session: str | None, generation: str | None = None,
@@ -301,9 +361,33 @@ def _clear_state_if_new_run(root: str, run_id: str, previous_run_id: str | None 
     except (OSError, ValueError):
         pass
     try:
-        os.unlink(state_path)
-    except FileNotFoundError:
+        _unlink(state_path, missing_ok=True)
+    except OSError:
+        # A failed delete leaves a state tagged with another run's id,
+        # which every reader treats as foreign (D00 T04 §40).
         pass
+
+
+def _tag_legacy_state(root: str, outgoing_run: str | None) -> None:
+    """Before a new guard publishes, a state written without a run id is
+    tagged with the outgoing guard's run, or deleted when no guard owned
+    it, so no crash point leaves an untagged state for a new run to adopt
+    (D00 T04 §40, panel round 5 of the D00 T04 §38 review, F16)."""
+    _, state_path = _paths(root)
+    try:
+        with open(state_path, encoding="utf-8-sig") as fh:
+            old = json.load(fh)
+    except FileNotFoundError:
+        return
+    except (OSError, ValueError):
+        return
+    if not isinstance(old, dict) or old.get("run_id"):
+        return
+    if outgoing_run:
+        _publish(state_path, json.dumps(dict(old, run_id=outgoing_run)).encode("utf-8"))
+    else:
+        _unlink(state_path, missing_ok=True)
+    _crash("acquire:state-tagged")
 
 
 def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id: str,
@@ -316,6 +400,7 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
         previous = _migrate_locked(root, read_guard(root)) or {}
     except GuardError:
         previous = {}
+    _tag_legacy_state(root, previous.get("run_id"))
     # Leftovers of a publish a crash interrupted (D00 T04 §38).
     folder = os.path.dirname(guard)
     for name in os.listdir(folder):
@@ -360,7 +445,12 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
         with open(tmp, "wb") as fh:
             fh.write(json.dumps(doc, indent=2).encode("utf-8"))
         _crash("acquire:repoint-tmp")
-        os.replace(tmp, guard)
+        try:
+            _fail("replace:claude-campaign-guard.json")
+            os.replace(tmp, guard)
+        except OSError:
+            os.unlink(tmp)
+            raise
         _crash("acquire:repoint-published")
         what = "handed over" if owner != session else "re-pointed"
         _clear_state_if_new_run(root, doc["run_id"], current.get("run_id"))
@@ -373,9 +463,12 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
     try:
         # An exclusive publish: the link fails if a guard appeared, and a
         # reader never sees a half-written one (D00 T04 §38).
+        _fail("link:claude-campaign-guard.json")
         os.link(tmp, guard)
-    except FileExistsError:
+    except OSError as exc:
         os.unlink(tmp)
+        if not isinstance(exc, FileExistsError):
+            raise
         raise GuardError("a guard appeared while this acquire ran; retry")
     os.unlink(tmp)
     _crash("acquire:create-published")
@@ -460,12 +553,9 @@ def _end_locked(root: str, session: str, reason: str, ready: int | None, generat
     _crash("end:pending-tmp")
     _publish(pending, json.dumps(jobs).encode("utf-8"))
     _crash("end:pending-published")
-    os.unlink(guard_path)
+    _unlink(guard_path)
     _crash("end:guard-deleted")
-    try:
-        os.unlink(state_path)
-    except FileNotFoundError:
-        pass
+    _unlink(state_path, missing_ok=True)
     left = [p for p in (guard_path, state_path) if os.path.exists(p)]
     if left:
         raise GuardError(f"could not delete {', '.join(left)}")
@@ -607,9 +697,12 @@ def whoami(root: str, session: str, generation: str | None = None, cronlist: str
         line = f"OWNER run={guard.get('run_id')} job={job}"
         if cronlist is None or not generation:
             return line
-        stem = run_stem(str(guard.get("run_file", "")))
+        if listing_state(cronlist) == "unknown":
+            return (f"OWNER run={guard.get('run_id')} (job withheld: the CronList text did not read as a listing)\n"
+                    f"UNKNOWN LISTING: pass the CronList printout exactly as the tool printed it, then run whoami again")
+        digest = workspace_digest(root, str(guard.get("run_file", "")))
         carriers = [jid for jid, prompt in parse_cronlist(cronlist)
-                    if classify_job(root, prompt) == (generation, repo_name(root), stem)]
+                    if classify_job(root, prompt) == (generation, digest)]
         # A firing cannot learn its own job id (CronList shows none, and two
         # jobs from one prompt are byte-identical), so the fence instead
         # guarantees one live carrier: while a duplicate or a stale job id
@@ -629,19 +722,22 @@ def whoami(root: str, session: str, generation: str | None = None, cronlist: str
         extras = [c for c in carriers if c != keep]
         if not repoint and not extras:
             return line
-        line = f"OWNER run={guard.get('run_id')} (job withheld until the duplicates below are resolved)"
-        if repoint:
-            line += (f"\nDUPLICATE GENERATION: the guard's job {job} is not live and {keep} carries its "
-                     f"generation: re-point first with acquire --session {session} --phase {guard.get('phase')} "
-                     f"--run-file {guard.get('run_file')} --cron-id {keep} --generation {generation}")
-        if extras:
-            line += (f"\nDUPLICATE GENERATION: CronDelete {', '.join(extras)} (they carry generation "
-                     f"{generation}; the job to keep is {keep})")
-        return line + "\nThen run whoami again: its job id is the only one the fenced steps accept."
+        # Two jobs carrying one generation cannot be told apart, and a
+        # firing already running cannot be recalled, so neither is kept:
+        # the generation rotates, and every old carrier (this firing's own
+        # job among them) then reads NOT THE CURRENT JOB (D00 T04 §40).
+        stale = ", ".join(carriers)
+        return (f"OWNER run={guard.get('run_id')} (job withheld until the generation rotates)\n"
+                f"DUPLICATE GENERATION: {stale} carry generation {generation}"
+                + (f" and the guard's job {job} is not live" if repoint else "")
+                + f": rotate it: python scripts/campaign_guard.py mint-generation, CronCreate a heartbeat from the "
+                  f"canonical prompt with the new generation, acquire --session {session} --phase {guard.get('phase')} "
+                  f"--run-file {guard.get('run_file')} --cron-id <new job> --generation <new generation>, then "
+                  f"CronDelete {stale}, each after delete-check; this firing then stops")
 
 
 def reset_state(root: str, session: str | None = None, expect_no_guard: bool = False,
-                generation: str | None = None, cron_id: str | None = None) -> str:
+                generation: str | None = None, cron_id: str | None = None, run: str | None = None) -> str:
     """Delete the breaker state under the lock, re-checking ownership or
     absence first: never a direct delete (D00 T04 §36). An owner's reset
     is fenced by generation and job (D00 T04 §38)."""
@@ -656,7 +752,7 @@ def reset_state(root: str, session: str | None = None, expect_no_guard: bool = F
         if not expect_no_guard:
             if guard is None or str(guard.get("session_id", "")) != session:
                 raise GuardError("reset-state needs the owning --session of a live guard")
-            _fence(guard, session, generation, cron_id)
+            _fence(guard, session, generation, cron_id, run)
         try:
             os.unlink(state_path)
             return "reset-state: state deleted"
@@ -668,8 +764,9 @@ def reconcile(root: str, session: str, cronlist: str, run_file: str | None = Non
     """Startup reconciliation between the guard, the live heartbeat jobs,
     and the run record (D00 T04 §36, §38). The jobs come from the
     `CronList` text, never from a list of ids the caller vouches for: a job
-    counts as this workspace's only when its prompt names this repository
-    and the run file (the guard's, or `run_file` when no guard lives)."""
+    counts as this workspace's only when its prompt carries this
+    workspace's digest for the run file (the guard's, or `run_file` when no
+    guard lives)."""
     with _Lock(root):
         try:
             guard = _read_locked(root)
@@ -688,9 +785,24 @@ def reconcile(root: str, session: str, cronlist: str, run_file: str | None = Non
                            f"then cancel-confirmed")
     except GuardError as exc:
         out.append(f"reconcile: {exc}")
+    # Hook errors the last run left behind are drained here, at every start
+    # (D00 T04 §40): with no guard, the starting session acknowledges them
+    # under its own identity after the run file records each line.
+    for e in _hook_errors(root):
+        if guard is None:
+            out.append(f"reconcile: an orphan hook error: {_error_line(e)}: append that line to the run file, then "
+                       f"hook-error --session {session} --startup yes --ack {e.get('id')}")
+        else:
+            out.append(f"reconcile: a hook error awaits its acknowledgement through the guard: {_error_line(e)}")
     target = str(guard.get("run_file", "")) if guard is not None else (run_file or "")
     if not target:
         return out + ["reconcile: no guard lives, so name the run file this start is for (--run-file)"]
+    if listing_state(cronlist) == "unknown":
+        # A listing that did not parse names nothing for deletion (D00 T04
+        # §40): missing evidence is not evidence that jobs are absent.
+        return out + ["reconcile: UNKNOWN: the CronList text did not read as a listing; nothing is named for "
+                      "deletion: pass the printout exactly as the tool printed it"]
+    digest = workspace_digest(root, target)
     # Jobs left alone are notes; they never hide this run's verdict.
     notes: list[str] = []
     ours: list[str] = []
@@ -699,12 +811,12 @@ def reconcile(root: str, session: str, cronlist: str, run_file: str | None = Non
         kind = classify_job(root, prompt)
         if kind is None:
             continue
-        gen, repo, stem = kind
+        gen, dig = kind
         if not gen:
-            notes.append(f"reconcile: job {jid} is a legacy heartbeat whose prompt names no generation, so it "
-                       f"cannot be scoped: CronDelete it if it is this workspace's, else leave it")
-        elif repo != repo_name(root) or stem != run_stem(target):
-            notes.append(f"reconcile: job {jid} is a heartbeat for {repo} {stem}, not this run: left alone")
+            notes.append(f"reconcile: job {jid} is a legacy heartbeat whose prompt carries no workspace digest, so "
+                         f"it cannot be scoped: CronDelete it if it is this workspace's, else leave it")
+        elif dig != digest:
+            notes.append(f"reconcile: job {jid} is a heartbeat for another workspace or run (digest {dig}): left alone")
         else:
             ours.append(jid)
             gens[jid] = gen
@@ -734,6 +846,89 @@ def reconcile(root: str, session: str, cronlist: str, run_file: str | None = Non
             out.append(f"reconcile: {target} does not record job {keep} generation {gen}: append the "
                        f"Critical events line before starting")
     return notes + (out or [f"reconcile: consistent (guard and job {job})"])
+
+
+def delete_check(root: str, session: str, cron_id: str) -> tuple[int, str]:
+    """The fence before every `CronDelete` (D00 T04 §40): a session never
+    deletes the live guard's current job while it owns the guard; any
+    other job of its own scheduler (a stale, duplicate, obsolete, or
+    finished heartbeat) may go. Read under the lock, just before the
+    delete, so a re-point between listing and deletion is seen."""
+    with _Lock(root):
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            return 1, f"KEEP: the guard is unreadable, so {cron_id} cannot be proven obsolete: repair the guard first"
+    if guard is not None and str(guard.get("session_id", "")) == session and str(guard.get("cron_id", "")) == cron_id:
+        return 1, (f"KEEP: {cron_id} is the live guard's current job; end the run or re-point the guard before "
+                   f"deleting it")
+    return 0, f"DELETE OK: {cron_id} is not the live guard's current job"
+
+
+_QUARANTINE = "claude-campaign-quarantine"
+
+
+def quarantine(root: str, session: str) -> list[str]:
+    """Move every guard file that does not parse (the guard, the state, the
+    pending-cancellation record) into build/claude-campaign-quarantine/,
+    bytes kept, so a malformed file has a bounded end instead of blocking
+    every command (D00 T04 §40). Readable files are never touched."""
+    out = []
+    guard_path, state_path = _paths(root)
+    with _Lock(root):
+        for path, want in ((guard_path, dict), (state_path, dict), (_pending_path(root), (list, dict))):
+            if not os.path.exists(path):
+                continue
+            try:
+                with open(path, encoding="utf-8-sig") as fh:
+                    doc = json.load(fh)
+                if isinstance(doc, want):
+                    continue
+            except (OSError, ValueError):
+                pass
+            folder = os.path.join(root, "build", _QUARANTINE)
+            os.makedirs(folder, exist_ok=True)
+            dest = os.path.join(folder, f"{_utc_now().replace(':', '')}-{session[:8]}-{os.path.basename(path)}")
+            os.replace(path, dest)
+            out.append(f"quarantine: {os.path.basename(path)} did not parse; moved, bytes kept, to "
+                       f"build/{_QUARANTINE}/{os.path.basename(dest)}")
+    return out or ["quarantine: every guard file parses; nothing moved"]
+
+
+_ACQUIRE_RECORD = re.compile(r"acquire: guard (?:created|re-pointed|handed over) for session (\S+) \(phase (\d+), "
+                             r"(\S+), job (\S+), generation ([0-9a-f]{6,}), run ([0-9a-f]{6,})\)")
+
+
+def recover(root: str, session: str, run_file: str) -> str:
+    """Restore a quarantined guard from the run file's own record: the last
+    `acquire: guard ...` line the run file carries, which names the
+    session, phase, run file, job, generation, and run id (D00 T04 §40).
+    Only the recorded session may recover it, only when no guard lives,
+    and the restored guard is read back before the call succeeds."""
+    if not session or not run_file:
+        raise GuardError("recover needs --session and --run-file")
+    hits = list(_ACQUIRE_RECORD.finditer(_journal_text(root, run_file)))
+    if not hits:
+        raise GuardError(f"{run_file} records no acquire line to recover the guard from; start the run afresh")
+    m = hits[-1]
+    rec_session, phase, rec_file, job, gen, run = m.groups()
+    if rec_session != session:
+        raise GuardError(f"{run_file} records the guard for session {rec_session}, not {session}; a handover "
+                         f"goes through acquire --handover, never recover")
+    if rec_file.rstrip(",") != run_file:
+        raise GuardError(f"the recorded guard names run file {rec_file}, not {run_file}")
+    guard_path, _ = _paths(root)
+    doc = {"runner": "claude", "workspace": root.replace("\\", "/"), "phase": int(phase), "run_file": run_file,
+           "session_id": session, "cron_id": job, "generation": gen, "run_id": run, "recovered_at": _utc_now()}
+    with _Lock(root):
+        if os.path.exists(guard_path):
+            raise GuardError("a guard file exists: quarantine it first if it does not parse")
+        _publish(guard_path, json.dumps(doc, indent=2).encode("utf-8"))
+        back = read_guard(root)
+    if not back or any(back.get(k) != doc[k] for k in ("session_id", "cron_id", "generation", "run_id", "run_file")):
+        raise GuardError("the restored guard did not read back as written")
+    return (f"recover: guard restored from {run_file}: session {session}, job {job}, generation {gen}, run {run} "
+            f"(read back); its job's creation time is unknown, so expiry asks for a replacement")
 
 
 def health(root: str, session: str, jobs: list[str]) -> tuple[int, str]:
@@ -830,7 +1025,8 @@ def _error_line(e: dict, note: str = "") -> str:
 
 
 def hook_error(root: str, session: str | None = None, ack: str | None = None,
-               generation: str | None = None, cron_id: str | None = None) -> str:
+               generation: str | None = None, cron_id: str | None = None, run: str | None = None,
+               startup: bool = False) -> str:
     """Print every error the hook recorded, one line each, or clear the one
     `ack` names by its id. Printing clears nothing (D00 T04 §36). Each line
     carries its error's identity, so an identical error twice is two
@@ -838,11 +1034,12 @@ def hook_error(root: str, session: str | None = None, ack: str | None = None,
     never this one's (D00 T04 §38). An owner's ack is fenced by
     generation and job; the CLI requires them."""
     with _Lock(root):
-        return _hook_error_locked(root, session, ack, generation, cron_id)
+        return _hook_error_locked(root, session, ack, generation, cron_id, run, startup)
 
 
 def _hook_error_locked(root: str, session: str | None, ack: str | None = None,
-                       generation: str | None = None, cron_id: str | None = None) -> str:
+                       generation: str | None = None, cron_id: str | None = None, run: str | None = None,
+                       startup: bool = False) -> str:
     # Under the lock, so no handover lands between the ownership check
     # and the clear (panel round 2). An unreadable guard cannot name an
     # owner, and the error it caused is exactly what must be reported,
@@ -865,8 +1062,16 @@ def _hook_error_locked(root: str, session: str | None, ack: str | None = None,
                              "guard, then acknowledge")
         # No guard means no owner to fence against: a fenced ack refuses
         # rather than trusting identity values that may be obsolete (panel
-        # round 2 of the D00 T04 §38 review).
-        _fence(guard, session, generation, cron_id)
+        # round 2 of the D00 T04 §38 review). At startup, before any guard
+        # is acquired, the starting session acknowledges an orphan error
+        # under its own identity; the error's origin rides the line the run
+        # file records (D00 T04 §40).
+        if startup:
+            if guard is not None:
+                raise GuardError("a startup acknowledgement needs no live guard: acquire first, then acknowledge "
+                                 "through the guard's fence")
+        else:
+            _fence(guard, session, generation, cron_id, run)
     hit = [e for e in errors if str(e.get("id")) == ack]
     if not hit:
         raise GuardError(f"no recorded error has id {ack}; nothing cleared")
@@ -908,7 +1113,15 @@ def _repo_identity(root: str) -> dict:
     review; AGENTS.md: credentials never enter tracked files)."""
     _rc, url = _git(root, "remote", "get-url", "origin")
     _rc, branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
-    return {"repo": re.sub(r"^([A-Za-z][A-Za-z0-9+.-]*://)[^/@]*@", r"\1", url), "branch": branch}
+    return {"repo": credential_free(url), "branch": branch}
+
+
+def credential_free(url: str) -> str:
+    """A remote URL with every place a credential can ride removed: the
+    userinfo (`user:token@`), the query (`?access_token=...`), and the
+    fragment (D00 T04 §40)."""
+    url = re.sub(r"^([A-Za-z][A-Za-z0-9+.-]*://)[^/@]*@", r"\1", url or "")
+    return re.split(r"[?#]", url, maxsplit=1)[0]
 
 
 def _repo_slug(url: str) -> str:
@@ -1467,7 +1680,8 @@ def _cl(*jobs: tuple[str, str]) -> str:
     for jid, prompt in jobs:
         shown = prompt if len(prompt) <= 79 else prompt[:79] + "\u2026"
         lines.append(f"{jid} \u2014 3-59/5 * * * * (recurring) [session-only]: {shown}")
-    return "\n".join(lines)
+    # An empty listing prints the tool's own sentinel, as CronList does.
+    return "\n".join(lines) if lines else "No scheduled jobs."
 
 
 def _state(root: str) -> dict:
@@ -2209,12 +2423,12 @@ def _self_test() -> int:
         acquire(iroot, SESSION, 0, RUN_FILE, "job-1", generation=g)
         tag = heartbeat_tag(iroot, g, RUN_FILE)
         out = whoami(iroot, SESSION, g, _cl(("job-1", tag), ("job-2", tag), ("job-9", "an unrelated reminder")))
+        # D00 T04 §40: duplicates rotate the generation; no carrier is kept.
         check("whoami-names-a-duplicate-generation",
-              out.splitlines()[0] == f"OWNER run={read_guard(iroot)['run_id']} (job withheld until the duplicates "
-                                     f"below are resolved)"
-              and "DUPLICATE GENERATION: CronDelete job-2 (they carry generation" in out and "job-9" not in out
-              and "job=" not in out and out.endswith("run whoami again: its job id is the only one the fenced "
-                                                     "steps accept."), out)
+              out.splitlines()[0] == f"OWNER run={read_guard(iroot)['run_id']} (job withheld until the generation "
+                                     f"rotates)"
+              and f"DUPLICATE GENERATION: job-1, job-2 carry generation {g}: rotate it" in out and "job-9" not in out
+              and "job=" not in out and "CronDelete job-1, job-2, each after delete-check" in out, out)
         # Panel round 1: the job id is released only once one carrier lives.
         out = whoami(iroot, SESSION, g, _cl(("job-1", tag), ("job-9", "an unrelated reminder")))
         check("whoami-releases-the-job-once-one-carrier-lives",
@@ -2239,12 +2453,35 @@ def _self_test() -> int:
         with open(_paths(iroot)[0], "w", encoding="utf-8") as fh:
             json.dump(_eg, fh)
         out = whoami(iroot, SESSION, g, _cl(("job-2", tag), ("job-3", tag)))
-        check("whoami-re-points-to-a-live-duplicate",
-              "the guard's job job-1 is not live and job-2 carries its generation: re-point first" in out
-              and "CronDelete job-3" in out, out)
+        check("whoami-rotates-when-the-guards-job-is-lost",
+              f"DUPLICATE GENERATION: job-2, job-3 carry generation {g} and the guard's job job-1 is not live: "
+              f"rotate it" in out and "CronDelete job-2, job-3" in out, out)
+        # The rotation leaves every old carrier obsolete, an in-flight firing
+        # of a deleted duplicate included, and the fence before CronDelete
+        # refuses only the live guard's current job (D00 T04 §40).
+        g_new = mint_generation()
+        acquire(iroot, SESSION, 0, RUN_FILE, "job-4", generation=g_new)
+        check("a-rotated-generation-makes-every-old-carrier-obsolete",
+              whoami(iroot, SESSION, g, _cl(("job-4", heartbeat_tag(iroot, g_new, RUN_FILE))))
+              == "NOT THE CURRENT JOB", whoami(iroot, SESSION, g))
+        code_k, keep_k = delete_check(iroot, SESSION, "job-4")
+        code_d, keep_d = delete_check(iroot, SESSION, "job-2")
+        code_o, keep_o = delete_check(iroot, OTHER, "job-4")
+        check("delete-check-keeps-only-the-live-guards-job",
+              code_k == 1 and keep_k.startswith("KEEP: job-4 is the live guard's current job")
+              and code_d == 0 and keep_d.startswith("DELETE OK") and code_o == 0, f"{keep_k} {keep_d} {keep_o}")
+        # A re-point between listing and deletion is seen at the delete.
+        listed = "job-5"
+        acquire(iroot, SESSION, 0, RUN_FILE, listed, generation=mint_generation())
+        code_l, line_l = delete_check(iroot, SESSION, listed)
+        check("delete-check-sees-a-re-point-between-listing-and-deletion", code_l == 1 and "KEEP" in line_l, line_l)
+        acquire(iroot, SESSION, 0, RUN_FILE, "job-1", generation=g)
         r = _cli("whoami", "--session", SESSION, "--generation", g, "--cronlist", "-",
                  stdin=_cl(("job-1", tag), ("job-2", tag)))
-        check("whoami-reads-the-cronlist-from-stdin", "CronDelete job-2" in r.stdout, r.stdout + r.stderr)
+        check("whoami-reads-the-cronlist-from-stdin", "CronDelete job-1, job-2" in r.stdout, r.stdout + r.stderr)
+        r_u = _cli("whoami", "--session", SESSION, "--generation", g, "--cronlist", "-", stdin="HTTP 502")
+        check("whoami-withholds-the-job-on-an-unreadable-listing",
+              "UNKNOWN LISTING" in r_u.stdout and "job=" not in r_u.stdout, r_u.stdout + r_u.stderr)
         check("heartbeat-tag-fits-the-cronlist-cut",
               len(heartbeat_tag(REPO, g, "docs/phase-runs/2026-12-31-phase-10.md")) < 79
               and parse_cronlist(_cl(("abc123", heartbeat_tag(REPO, g, "docs/phase-runs/2026-12-31-phase-10.md")
@@ -2254,17 +2491,32 @@ def _self_test() -> int:
         # Scoped reconciliation, and each startup interruption recovering to
         # exactly one current heartbeat and a consistent run record.
         other_run = "docs/phase-runs/2099-02-02-phase-1.md"
-        noise = _cl(("x-repo", f"Claude run-guard heartbeat {g} OtherRepo {run_stem(RUN_FILE)}: ..."),
+        # D00 T04 §40: a checkout sharing this one's folder name, and a long
+        # path, scope by digest; the header keeps its stated length.
+        twin = os.path.join(itmp, "elsewhere", os.path.basename(iroot))
+        deep = os.path.join(itmp, *(["a-long-directory-name"] * 12), os.path.basename(iroot))
+        noise = _cl(("x-repo", heartbeat_tag(twin, g, RUN_FILE) + ": ..."),
                     ("x-run", heartbeat_tag(iroot, g, other_run) + ": ..."),
+                    ("x-v38", f"Claude run-guard heartbeat {g} {repo_name(iroot)} {run_stem(RUN_FILE)}: ..."),
                     ("x-legacy", "Claude run-guard heartbeat for Resolute Phase 0 (run file docs/phase-runs/20"),
                     ("x-plain", "remind me at 3pm"))
         _reset()
         rc = reconcile(iroot, SESSION, noise, RUN_FILE)
-        check("reconcile-scopes-by-repository-and-run-file",
-              "reconcile: job x-repo is a heartbeat for OtherRepo" in "\n".join(rc)
-              and f"job x-run is a heartbeat for {repo_name(iroot)} {run_stem(other_run)}, not this run" in "\n".join(rc)
-              and "job x-legacy is a legacy heartbeat" in "\n".join(rc)
+        check("reconcile-scopes-by-workspace-digest",
+              "reconcile: job x-repo is a heartbeat for another workspace or run" in "\n".join(rc)
+              and "reconcile: job x-run is a heartbeat for another workspace or run" in "\n".join(rc)
+              and "job x-v38 is a legacy heartbeat" in "\n".join(rc) and "job x-legacy is a legacy heartbeat" in "\n".join(rc)
               and not any("x-plain" in r or "orphan" in r for r in rc), str(rc))
+        check("heartbeat-tag-has-a-fixed-length-and-no-collision",
+              {len(heartbeat_tag(p_, g, RUN_FILE)) for p_ in (iroot, twin, deep)} == {HEARTBEAT_TAG_LENGTH}
+              and len({workspace_digest(p_, RUN_FILE) for p_ in (iroot, twin, deep)}) == 3,
+              str([heartbeat_tag(p_, g, RUN_FILE) for p_ in (iroot, twin, deep)]))
+        # An unreadable listing names nothing for deletion (D00 T04 §40).
+        for label, text in (("garbled", "HTTP 502 while listing jobs"), ("truncated", _cl(("job-1", "x"))[:5]),
+                            ("missing", "")):
+            rc_u = reconcile(iroot, SESSION, text, RUN_FILE)
+            check(f"reconcile-an-unreadable-listing-names-nothing: {label}",
+                  any("UNKNOWN" in r for r in rc_u) and not any("CronDelete" in r for r in rc_u), str(rc_u))
         # (1) CronCreate landed, acquire never ran: the job is an orphan.
         g1 = mint_generation()
         live = [("job-c1", heartbeat_tag(iroot, g1, RUN_FILE) + ": ...")]
@@ -2337,7 +2589,7 @@ def _self_test() -> int:
         with open(irun, "a", encoding="utf-8") as fh:
             fh.write(f"\nPARKED 2099-01-01T00:00:00Z run={rid} drill\n")
         end_args = ("end", "--session", SESSION, "--reason", "park", "--generation", "cccccccccccc",
-                    "--cron-id", "job-k")
+                    "--cron-id", "job-k", "--run", rid)
         r = _crashed("end:pending-tmp", *end_args)
         check("crash-before-the-pending-record-leaves-the-run-live",
               r.returncode == 97 and read_guard(iroot) is not None and pending_cancel(iroot) == "",
@@ -2454,6 +2706,172 @@ def _self_test() -> int:
         acquire(iroot, OTHER, 1, other_run, "job-n", handover="drill new run", generation=mint_generation())
         check("a-new-run-starts-a-clean-breaker", _state(iroot) == {} and read_guard(iroot)["run_id"] != rid,
               str(_state(iroot)))
+
+    # D00 T04 §40: the whole identity on every owner mutation, a legacy
+    # state tagged before an acquisition can orphan it, orphan errors and
+    # pending records drained at startup, malformed files quarantined and
+    # the guard recovered from the run record, injected failures, and a
+    # credential-free repository identity.
+    with tempfile.TemporaryDirectory(prefix="campaign-fence-") as ftmp:
+        froot = _workspace(ftmp)
+        frun = os.path.join(froot, RUN_FILE)
+
+        def _fcli(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
+            return subprocess.run([sys.executable, os.path.join(HERE, "campaign_guard.py"), *args, "--root", froot],
+                                  capture_output=True, text=True, encoding="utf-8",
+                                  env=dict(os.environ, PYTHONIOENCODING="utf-8", **(env or {})))
+
+        def _fresh_f(body: str = "# run\n") -> None:
+            for f in (*_paths(froot), _pending_path(froot)):
+                if os.path.exists(f):
+                    os.remove(f)
+            for d in (_errors_dir(froot), os.path.join(froot, "build", _QUARANTINE)):
+                if os.path.isdir(d):
+                    shutil.rmtree(d)
+            with open(frun, "w", encoding="utf-8") as fh:
+                fh.write(body)
+
+        # Item 2: `--run` is required and re-checked.
+        _fresh_f()
+        g = mint_generation()
+        acquire(froot, SESSION, 0, RUN_FILE, "job-f", generation=g)
+        rid = read_guard(froot)["run_id"]
+        for cmd in (["end", "--session", SESSION, "--reason", "operator-stop", "--generation", g, "--cron-id", "job-f"],
+                    ["reset-state", "--session", SESSION, "--generation", g, "--cron-id", "job-f"],
+                    ["hook-error", "--session", SESSION, "--generation", g, "--cron-id", "job-f", "--ack", "x"]):
+            r = _fcli(*cmd)
+            check(f"cli-{cmd[0]}-requires-the-run", r.returncode == 1 and "--run" in r.stderr, r.stderr)
+        stale_run = _fcli("end", "--session", SESSION, "--reason", "operator-stop", "--generation", g,
+                          "--cron-id", "job-f", "--run", "0000deadbeef")
+        check("fence-refuses-a-stale-run",
+              stale_run.returncode == 1 and "the guard's run is" in stale_run.stderr and read_guard(froot) is not None,
+              stale_run.stderr)
+        # Item 1: a legacy two-trip state is tagged with the outgoing run
+        # before a new guard publishes; a crash at each step reads either
+        # the old run's breaker (the old guard still lives) or a fresh one.
+        for label in ("acquire:state-tagged", "acquire:repoint-tmp", "acquire:repoint-published"):
+            _fresh_f()
+            acquire(froot, SESSION, 0, RUN_FILE, "job-f", generation=g)
+            old_run = read_guard(froot)["run_id"]
+            with open(_paths(froot)[1], "w", encoding="utf-8") as fh:
+                json.dump({"fingerprint": "f", "blocks": 2, "trips": 2, "stalled": True}, fh)
+            r = _fcli("acquire", "--session", SESSION, "--phase", "1", "--run-file", "docs/phase-runs/2099-05-05-phase-1.md",
+                      "--cron-id", "job-n", "--generation", mint_generation(), env={"CAMPAIGN_CRASH_AT": label})
+            new_guard = read_guard(froot)
+            moved = new_guard["run_id"] != old_run
+            tagged = _state(froot)
+            with open(os.path.join(froot, "docs/phase-runs/2099-05-05-phase-1.md"), "w", encoding="utf-8") as fh:
+                fh.write("# run\n")
+            code, out, _ = run_hook(froot, SESSION)
+            st = _state(froot)
+            check(f"a-legacy-state-survives-a-crash-at-{label.split(':')[1]}",
+                  r.returncode == 97 and tagged.get("run_id") == old_run and tagged.get("trips") == 2
+                  and (not moved or (st.get("run_id") == new_guard["run_id"] and st.get("trips") == 0
+                                     and st.get("blocks") == 1)),
+                  f"{moved} {tagged} {st} {out}")
+        # Item 5: after a terminated campaign, startup drains this session's
+        # pending record and acknowledges the orphan error under its own
+        # identity, keeping the error's origin in the line it records.
+        _fresh_f()
+        acquire(froot, SESSION, 0, RUN_FILE, "job-t", generation=g)
+        rid_t = read_guard(froot)["run_id"]
+        os.makedirs(_errors_dir(froot), exist_ok=True)
+        with open(os.path.join(_errors_dir(froot), "00000000000000000001-1-eaaaaaaaaaaa.json"), "w", encoding="utf-8") as fh:
+            json.dump({"id": "eaaaaaaaaaaa", "at": "2099-01-01T00:00:00Z", "reason": "late failure",
+                       "session": SESSION, "run_id": rid_t, "generation": g}, fh)
+        end(froot, SESSION, "operator-stop", g, "job-t", rid_t)
+        rc = reconcile(froot, SESSION, "No scheduled jobs.", RUN_FILE)
+        joined = "\n".join(rc)
+        check("startup-drains-a-terminated-campaigns-records",
+              "pending cancellation is unconfirmed: CronDelete job-t" in joined
+              and f"an orphan hook error: campaign-stop hook failed at 2099-01-01T00:00:00Z [id=eaaaaaaaaaaa session={SESSION} "
+                  f"run={rid_t}" in joined and "--startup yes --ack eaaaaaaaaaaa" in joined, joined)
+        acked = _fcli("hook-error", "--session", SESSION, "--startup", "yes", "--ack", "eaaaaaaaaaaa")
+        check("a-startup-ack-clears-an-orphan-error",
+              acked.returncode == 0 and f"session={SESSION} run={rid_t}" in acked.stdout and _hook_errors(froot) == [],
+              acked.stdout + acked.stderr)
+        acquire(froot, SESSION, 0, RUN_FILE, "job-u", generation=g)
+        with open(os.path.join(_errors_dir(froot), "00000000000000000002-1-ebbbbbbbbbbb.json"), "w", encoding="utf-8") as fh:
+            json.dump({"id": "ebbbbbbbbbbb", "at": "2099-01-01T00:00:00Z", "reason": "r"}, fh)
+        live_ack = _fcli("hook-error", "--session", SESSION, "--startup", "yes", "--ack", "ebbbbbbbbbbb")
+        check("a-startup-ack-refuses-while-a-guard-lives",
+              live_ack.returncode == 1 and "needs no live guard" in live_ack.stderr, live_ack.stderr)
+        # Item 7: malformed files are quarantined, bytes kept, and the guard
+        # is recovered from the run file's own acquire record.
+        _fresh_f()
+        rec_line = acquire(froot, SESSION, 0, RUN_FILE, "job-r", generation=g)
+        rid_r = read_guard(froot)["run_id"]
+        with open(frun, "a", encoding="utf-8") as fh:
+            fh.write(f"\n- run guard: `{rec_line}`\n")
+        for name in ("claude-campaign-guard.json", "claude-campaign-state.json", "claude-campaign-pending-cancel.json"):
+            with open(os.path.join(froot, "build", name), "w", encoding="utf-8") as fh:
+                fh.write("{broken " + name)
+        malformed = whoami(froot, SESSION, g)
+        moved_q = quarantine(froot, SESSION)
+        qdir = os.path.join(froot, "build", _QUARANTINE)
+        kept = sorted(open(os.path.join(qdir, n), encoding="utf-8").read() for n in os.listdir(qdir))
+        check("quarantine-moves-each-malformed-file-with-its-bytes",
+              malformed == "MALFORMED GUARD" and len(moved_q) == 3 and len(kept) == 3
+              and all(k.startswith("{broken claude-campaign-") for k in kept)
+              and not any(os.path.exists(p_) for p_ in (*_paths(froot), _pending_path(froot))), f"{moved_q} {kept}")
+        try:
+            recover(froot, OTHER, RUN_FILE)
+            check("recover-refuses-another-session", False)
+        except GuardError as exc:
+            check("recover-refuses-another-session", "not " + OTHER in str(exc), str(exc))
+        back = recover(froot, SESSION, RUN_FILE)
+        check("recover-restores-the-guard-from-the-run-record",
+              "(read back)" in back and whoami(froot, SESSION, g) == f"OWNER run={rid_r} job=job-r", back)
+        check("quarantine-leaves-readable-files-alone",
+              quarantine(froot, SESSION) == ["quarantine: every guard file parses; nothing moved"])
+        # Item 8: an injected failure at each write, replace, and delete
+        # leaves a lifecycle every reader handles.
+        _fresh_f()
+        acquire(froot, SESSION, 0, RUN_FILE, "job-w", generation=g)
+        rid_w = read_guard(froot)["run_id"]
+        with open(frun, "a", encoding="utf-8") as fh:
+            fh.write(f"\nPARKED 2099-01-01T00:00:00Z run={rid_w} drill\n")
+        run_hook(froot, SESSION)
+        end_w = ("end", "--session", SESSION, "--reason", "park", "--generation", g, "--cron-id", "job-w", "--run", rid_w)
+        for label, expect in (("write:claude-campaign-pending-cancel.json", "live"),
+                              ("replace:claude-campaign-pending-cancel.json", "live"),
+                              ("unlink:claude-campaign-guard.json", "incomplete"),
+                              ("unlink:claude-campaign-state.json", "ended")):
+            r = _fcli(*end_w, env={"CAMPAIGN_FAIL_AT": label})
+            pend = pending_cancel(froot, SESSION)
+            state_now = read_guard(froot)
+            ok = (r.returncode == 1 and "injected failure" in r.stderr
+                  and not [n for n in os.listdir(os.path.join(froot, "build")) if n.endswith(".tmp")])
+            if expect == "live":
+                ok = ok and state_now is not None and pend == ""
+            elif expect == "incomplete":
+                ok = ok and state_now is not None and pend.startswith("pending-cancel: end incomplete for job job-w")
+            else:
+                ok = ok and state_now is None and os.path.exists(_paths(froot)[1]) \
+                    and pend.startswith("pending-cancel: CronDelete job-w")
+            check(f"an-injected-failure-leaves-a-consistent-lifecycle: {label}", ok,
+                  f"{r.returncode} {r.stderr[-160:]} {pend} {state_now}")
+            if expect == "incomplete":
+                done = _fcli(*end_w)
+                check("an-end-left-incomplete-by-a-failed-delete-finishes-on-retry",
+                      done.returncode == 0 and read_guard(froot) is None, done.stdout + done.stderr)
+                acquire(froot, SESSION, 0, RUN_FILE, "job-w", generation=g)
+                rid_w = read_guard(froot)["run_id"]
+                run_hook(froot, SESSION)  # writes this run's state before its marker ends the run
+                with open(frun, "a", encoding="utf-8") as fh:
+                    fh.write(f"\nPARKED 2099-01-01T00:00:00Z run={rid_w} drill again\n")
+                end_w = end_w[:-1] + (rid_w,)
+        r_a = _fcli("acquire", "--session", OTHER, "--phase", "0", "--run-file", RUN_FILE, "--cron-id", "job-x",
+                    env={"CAMPAIGN_FAIL_AT": "link:claude-campaign-guard.json"})
+        check("an-injected-failure-at-the-guard-publish-leaves-no-guard",
+              r_a.returncode == 1 and read_guard(froot) is None
+              and not [n for n in os.listdir(os.path.join(froot, "build")) if n.endswith(".tmp")], r_a.stderr)
+        # Item 9: every place a credential can ride leaves the identity.
+        for label, url in (("userinfo", "https://bot:s3cr3t@github.com/o/r.git"),
+                           ("query", "https://github.com/o/r.git?access_token=s3cr3t"),
+                           ("fragment", "https://github.com/o/r.git#s3cr3t")):
+            check(f"credential-free-drops-the-{label}",
+                  credential_free(url) == "https://github.com/o/r.git", credential_free(url))
 
     # D00 T04 §35, §37, §39: the repair episode survives a restart, refuses
     # a fourth attempt, binds its identity and campaign, counts a repeat
@@ -2793,7 +3211,7 @@ def _self_test() -> int:
                         ("skill-refused-acquire-cancels-its-job", "A refused `acquire` means another session owns the run"),
                         ("skill-heartbeat-checks-ownership", "NOT THE OWNER or NOT THE CURRENT JOB"),
                         ("skill-heartbeat-ends-through-end",
-                         "--reason plan-done --generation G --cron-id <job id>`. Only after `end` succeeds for plan-done"),
+                         "--reason plan-done --generation G --cron-id <job id> --run <run id>`. Only after `end` succeeds for plan-done"),
                         # D00 T04 §38: the heartbeat drains its own pending
                         # cancellations first, then asks who it is with the
                         # CronList text, and fences every later mutation.
@@ -2814,15 +3232,21 @@ def _self_test() -> int:
                         ("skill-heartbeat-plan-done-only-after-end-succeeds",
                          "Only after `end` succeeds for plan-done (a refusal follows the rule above), CronDelete this job"),
                         ("skill-heartbeat-no-live-carrier-runs-no-fenced-step",
-                         "If it prints NO LIVE CARRIER, or still withholds the job, run no fenced step this firing"),
+                         "If it prints NO LIVE CARRIER or UNKNOWN LISTING, or otherwise withholds the job, run no fenced step this firing"),
                         ("skill-heartbeat-reports-are-bookkeeping",
                          "Critical events as a `- bookkeeping: ` line (it repeats on every firing"),
-                        ("skill-heartbeat-re-reads-its-job-after-a-re-point",
-                         "then run this step's `whoami` again and keep the job id it prints now"),
+                        ("skill-heartbeat-rotates-a-duplicate-generation",
+                         "rotate the generation as that line says (a new job from this prompt with a fresh generation"),
+                        ("skill-every-crondelete-follows-delete-check",
+                         "every CronDelete of any job follows `python scripts/campaign_guard.py delete-check --session S"),
+                        ("skill-states-the-fsync-default", "Files are not fsynced: a power loss can lose the last change"),
+                        ("skill-quarantine-then-recover",
+                         "`python scripts/campaign_guard.py recover --session $CLAUDE_CODE_SESSION_ID --run-file <run file>`"),
+                        ("skill-startup-drains-orphan-errors", "--startup yes --ack <id>`"),
                         ("skill-heartbeat-acks-by-id-fenced",
-                         "hook-error --session S --generation G --cron-id <job id> --ack <the id inside"),
+                         "hook-error --session S --generation G --cron-id <job id> --run <run id> --ack <the id inside"),
                         ("skill-heartbeat-prompt-leads-with-its-identity",
-                         "Claude run-guard heartbeat <generation> <repository> <run file stem>: the campaign"),
+                         "Claude run-guard heartbeat <generation> <workspace digest>: the campaign"),
                         ("skill-reconciles-before-starting",
                          "python scripts/campaign_guard.py reconcile --session $CLAUDE_CODE_SESSION_ID --run-file "
                          "<run file> --cronlist -"),
@@ -2844,11 +3268,10 @@ def _self_test() -> int:
         check(pin, needle in skill, plan_skill)
     # The canonical prompt's identity fits what CronList shows (D00 T04 §38).
     first = re.search(r"```text\n(Claude run-guard heartbeat [^\n]*)", skill)
-    shown = (first.group(1).replace("<generation>", "0" * 12).replace("<repository>", "Resolute")
-             .replace("<run file stem>", "2026-12-31-phase-10") if first else "")
+    dig = workspace_digest(REPO, "docs/phase-runs/2026-12-31-phase-10.md")
+    shown = (first.group(1).replace("<generation>", "0" * 12).replace("<workspace digest>", dig) if first else "")
     check("skill-prompt-identity-survives-the-cronlist-cut",
-          classify_job(REPO, _cl(("j", shown)).split(": ", 1)[1]) == ("0" * 12, "Resolute", "2026-12-31-phase-10"),
-          shown[:100])
+          classify_job(REPO, _cl(("j", shown)).split(": ", 1)[1]) == ("0" * 12, dig), shown[:100])
     for other, needle in ((".claude/skills/process-phase/SKILL.md", "--reason escalation --generation <generation>"),
                           (".claude/skills/process-phase/SKILL.md", "at least every 60 minutes of wall time"),
                           (".claude/skills/review-todo-section/SKILL.md",
@@ -2916,13 +3339,14 @@ def main(argv: list[str]) -> int:
             with open(src, encoding="utf-8-sig") as fh:
                 return fh.read()
         if argv[0] == "end":
-            need("session", "reason", "generation", "cron_id")
-            print(end(root, opts["session"], opts["reason"], opts["generation"], opts["cron_id"], opts.get("run")))
+            need("session", "reason", "generation", "cron_id", "run")
+            print(end(root, opts["session"], opts["reason"], opts["generation"], opts["cron_id"], opts["run"]))
             return 0
-        if argv[0] == "hook-error" and set(opts) <= {"session", "ack", "generation", "cron_id"}:
+        if argv[0] == "hook-error" and set(opts) <= {"session", "ack", "generation", "cron_id", "run", "startup"}:
             if "ack" in opts:
-                need("session", "generation", "cron_id")
-            line = hook_error(root, opts.get("session"), opts.get("ack"), opts.get("generation"), opts.get("cron_id"))
+                need("session", *(() if opts.get("startup") == "yes" else ("generation", "cron_id", "run")))
+            line = hook_error(root, opts.get("session"), opts.get("ack"), opts.get("generation"), opts.get("cron_id"),
+                              opts.get("run"), opts.get("startup") == "yes")
             if line:
                 print(line)
             return 0
@@ -2938,9 +3362,9 @@ def main(argv: list[str]) -> int:
             return 0
         if argv[0] == "reset-state":
             if opts.get("expect_no_guard") != "yes":
-                need("session", "generation", "cron_id")
+                need("session", "generation", "cron_id", "run")
             print(reset_state(root, opts.get("session"), opts.get("expect_no_guard") == "yes",
-                              opts.get("generation"), opts.get("cron_id")))
+                              opts.get("generation"), opts.get("cron_id"), opts.get("run")))
             return 0
         if argv[0] == "pending-cancel" and set(opts) <= {"session"}:
             line = pending_cancel(root, opts.get("session"))
@@ -2950,6 +3374,19 @@ def main(argv: list[str]) -> int:
         if argv[0] == "cancel-confirmed":
             need("session", "cron_id", "generation")
             print(cancel_confirmed(root, opts["cron_id"], opts["session"], opts["generation"]))
+            return 0
+        if argv[0] == "delete-check":
+            need("session", "cron_id")
+            code, line = delete_check(root, opts["session"], opts["cron_id"])
+            print(line, file=sys.stdout if code == 0 else sys.stderr)
+            return code
+        if argv[0] == "quarantine":
+            need("session")
+            print("\n".join(quarantine(root, opts["session"])))
+            return 0
+        if argv[0] == "recover":
+            need("session", "run_file")
+            print(recover(root, opts["session"], opts["run_file"]))
             return 0
         if argv[0] == "reconcile":
             need("session")
@@ -2964,7 +3401,7 @@ def main(argv: list[str]) -> int:
             code, line = expiry(root, opts.get("session", ""), opts.get("now"))
             print(line, file=sys.stdout if code == 0 else sys.stderr)
             return code
-    except (GuardError, ValueError) as exc:
+    except (GuardError, ValueError, OSError) as exc:
         print(f"campaign_guard: {exc}", file=sys.stderr)
         return 1
     print(f"campaign_guard: unknown command {' '.join(argv)!r}; see the module docstring", file=sys.stderr)

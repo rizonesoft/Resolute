@@ -213,7 +213,10 @@ try {
         # keeps the run id, so its blocks and trips carry over.
         $oldRun = ""
         if ($old.PSObject.Properties.Name -contains 'run_id') { $oldRun = [string]$old.run_id }
-        if (-not $oldRun -or $oldRun -eq $runId) {
+        # An untagged state is foreign once the guard carries a run id:
+        # acquire tags a legacy state with its own run before a new guard
+        # publishes (D00 T04 section 40).
+        if ($oldRun -eq $runId -or (-not $oldRun -and -not $runId)) {
             $state.fingerprint = [string]$old.fingerprint
             $state.blocks = [int]$old.blocks
             $state.trips = [int]$old.trips
