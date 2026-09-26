@@ -1285,8 +1285,8 @@ _PROSE = (
                            r"\(([0-9a-f]{12})(?: repairs ([0-9a-f]{12}))?\)" + _IDENT_STRICT + r"\Z")),
     ("attempt", re.compile(r"repair: episode ([0-9a-f]{12}) attempt (\d+) of \d+ (abandoned) \(([0-9a-f]{12})()\)"
                            + _IDENT_STRICT + r": \S.*\Z")),
-    ("closed", re.compile(r"repair: episode ([0-9a-f]{12}) closed green at [0-9a-f]{12} \(run \d+ attempt \d+ "
-                          r"workflow-id \d+\) after \d+ attempt\(s\)" + _IDENT_STRICT + r"\Z")),
+    ("closed", re.compile(r"repair: episode ([0-9a-f]{12}) closed green at ([0-9a-f]{12}) \(run (\d+) attempt (\d+) "
+                          r"workflow-id (\d+)\) after \d+ attempt\(s\)" + _IDENT_STRICT + r"\Z")),
     ("retired", re.compile(r"repair: episode ([0-9a-f]{12}) retired" + _IDENT_STRICT + r": \S.*\Z")),
 )
 _CEILING_LINE = re.compile(r"repair: ceiling allowance used for (\S+) run=([0-9a-f]{12})\Z")
@@ -1360,14 +1360,21 @@ def _parse_prose(line: str) -> dict | None:
         m = pat.match(line)
         if not m:
             continue
+        # `facts` are the fields a receipt must agree on beyond identity:
+        # the repaired red, and a terminal line's evidence (panel round 4 of
+        # the D00 T04 §41 review).
         if kind == "attempt":
             return {"episode": m.group(1), "event": m.group(3), "attempt": int(m.group(2)), "commit": m.group(4),
-                    "red": m.group(5) or "", "full": "", "ident": m.group(6, 7, 8, 9)}
+                    "red": m.group(5) or "", "full": "", "ident": m.group(6, 7, 8, 9), "facts": (m.group(5) or "",)}
         if kind == "opened":
             return {"episode": m.group(1), "event": "opened", "attempt": None, "commit": "", "red": m.group(2),
-                    "full": "", "ident": m.group(3, 4, 5, 6)}
+                    "full": "", "ident": m.group(3, 4, 5, 6), "facts": (m.group(2),)}
+        if kind == "closed":
+            return {"episode": m.group(1), "event": kind, "attempt": None, "commit": "", "red": "", "full": "",
+                    "ident": m.group(6, 7, 8, 9), "facts": m.group(2, 3, 4, 5)}
+        silent = re.search(r" for [0-9a-f]{12}\.\.([0-9a-f]{12});", line)
         return {"episode": m.group(1), "event": kind, "attempt": None, "commit": "", "red": "", "full": "",
-                "ident": m.group(2, 3, 4, 5)}
+                "ident": m.group(2, 3, 4, 5), "facts": (silent.group(1) if silent else "",)}
     return None
 
 
@@ -1389,10 +1396,17 @@ def _parse_receipt(line: str) -> dict | None:
         return None
     commit = sha[:12] if body["event"] in ("reserved", "pushed", "abandoned") else ""
     red = body.get("red") if isinstance(body.get("red"), str) else ""
+    if body["event"] == "closed":
+        facts = ((sha or "")[:12], str(body.get("run")), str(body.get("run_attempt")), str(body.get("workflow_id")))
+    elif body["event"] == "retired":
+        facts = ((sha or "")[:12],)
+    else:
+        facts = (red[:12],)
     return {"episode": ep[:12], "event": body["event"], "attempt": attempt, "commit": commit,
             "red": red[:12] if body["event"] == "opened" else red,
             "full": sha if commit and len(sha) == 40 else "", "episode_full": ep if len(ep) == 40 else "",
-            "ident": (body.get("repository"), body.get("branch"), body.get("workflow"), body.get("campaign"))}
+            "ident": (body.get("repository"), body.get("branch"), body.get("workflow"), body.get("campaign")),
+            "facts": facts}
 
 
 def _journal(root: str, run_file: str) -> tuple[dict | None, list[tuple], set[str]]:
@@ -1434,8 +1448,8 @@ def _journal(root: str, run_file: str) -> tuple[dict | None, list[tuple], set[st
             rc = _parse_receipt(nxt)
             if rc is None or rc["event"] == "ceiling":
                 raise GuardError(f"{run_file} line {i + 2} is not a well-formed receipt for line {i + 1}: escalate")
-            if (rc["episode"], rc["event"], rc["attempt"], rc["commit"], rc["ident"]) != (
-                    ev["episode"], ev["event"], ev["attempt"], ev["commit"], ev["ident"]):
+            if (rc["episode"], rc["event"], rc["attempt"], rc["commit"], rc["ident"], rc["facts"]) != (
+                    ev["episode"], ev["event"], ev["attempt"], ev["commit"], ev["ident"], ev["facts"]):
                 raise GuardError(f"{where} and its receipt disagree (an edited journal): escalate")
             events.append((i + 1, rc))
             i += 2
@@ -3881,6 +3895,16 @@ def _self_test() -> int:
               rere.returncode == 0 and "at 1 of 3 attempts" in rere.stdout
               and f"reserved, push unconfirmed: {shas[4][:12]}" in st_rere.stdout, rere.stdout + rere.stderr + st_rere.stdout)
         os.remove(EP)
+        # Panel round 4: a closing receipt whose evidence disagrees with
+        # its line refuses.
+        bad_close = (op + r1 + p1 + cl + "repair-receipt: " + json.dumps(
+            {"v": 1, "event": "closed", "episode": shas[3], "sha": shas[6], "run": 9, "run_attempt": 1,
+             "workflow_id": 42, "repository": here[0], "branch": here[1], "workflow": here[2],
+             "campaign": "aaaaaaaaaaaa"}) + "\n")
+        res_bc = _repair_cli("restore", "--workflow", "plan-gates", "--run-file", _jfile("j-badclose", text=bad_close))
+        check("repair-strict-replay-refuses: a closing receipt whose evidence disagrees",
+              res_bc.returncode == 1 and "and its receipt disagree" in res_bc.stderr,
+              res_bc.stdout + res_bc.stderr)
         # A quoted copy is a record, never a journal line: it neither
         # restores an episode nor double-counts one.
         quoted = _repair_cli("restore", "--workflow", "plan-gates", "--run-file",

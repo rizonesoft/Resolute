@@ -2021,11 +2021,29 @@ _ANY_SECRET_KEY = re.compile(
 _HEREDOC = re.compile(r"<<(-?)~?[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
 
 
-def _open_quote(value: str, q: str) -> bool:
-    """Whether `value` leaves a `q` quote open (a doubled `''` and an
-    escaped `\\"` count as characters, not quotes)."""
-    v = value.replace("''", "") if q == "'" else re.sub(r'\\.', "", value)
-    return v.count(q) % 2 == 1
+def _quote_state(text: str, quote: str = "") -> str:
+    """The quote still open after `text`, scanned left to right from
+    `quote`: the enclosing quote decides, so a `"` inside `'...'` is data
+    (panel round 4 of the D00 T04 §41 review). A double-quoted `\\x` and a
+    single-quoted `''` are characters."""
+    i = 0
+    while i < len(text):
+        c = text[i]
+        if quote == '"':
+            if c == "\\":
+                i += 1
+            elif c == '"':
+                quote = ""
+        elif quote == "'":
+            if c == "'":
+                if text[i + 1:i + 2] == "'":
+                    i += 1
+                else:
+                    quote = ""
+        elif c in "'\"":
+            quote = c
+        i += 1
+    return quote
 
 
 def _bracket_depth(text: str) -> int:
@@ -2059,9 +2077,9 @@ def _multiline_opener(value: str) -> tuple[str, object] | None:
     v = value.rstrip()
     if v.endswith(('@"', "@'")):
         return "herestring", v[-1] + "@"
-    for q in ('"', "'"):
-        if _open_quote(value, q):
-            return "quote", q
+    q = _quote_state(value)
+    if q:
+        return "quote", q
     depth = _bracket_depth(value)
     if depth > 0:
         return "bracket", depth
@@ -2101,6 +2119,7 @@ def _redact_blocks(text: str) -> str:
             out[-1] = cols + head[:key.end()] + " ***"
             kind, end = opener
             depth = end if kind == "bracket" else 0
+            qstate = end if kind == "quote" else ""
             while i < len(lines):
                 nxt = lines[i]
                 ncols = _LOG_COLS.match(nxt).group(0)
@@ -2116,8 +2135,10 @@ def _redact_blocks(text: str) -> str:
                 indent = body[:len(body) - len(body.lstrip(" \t"))]
                 out.append(ncols + indent + "***")
                 i += 1
-                if kind == "quote" and _open_quote(body, end):
-                    break
+                if kind == "quote":
+                    qstate = _quote_state(body, qstate)
+                    if not qstate:
+                        break
                 if kind == "bracket":
                     depth += _bracket_depth(body)
                     if depth <= 0:
@@ -7750,6 +7771,9 @@ def _self_test() -> int:
                     ("a single-quoted here-string", "$secret = @'\ns3cr3tline\n'@\ndone", "s3cr3tline", "done"),
                     ("a quoted bracket inside a bracket", "token: [" + chr(10) + '  "]",' + chr(10)
                      + '  "s3cr3tline"' + chr(10) + "]" + chr(10) + "mode: fast", "s3cr3tline", "mode: fast"),
+                    ("a double quote inside a single-quoted value", "API_TOKEN='first \"" + chr(10)
+                     + 'second "' + chr(10) + "s3cr3tline" + chr(10) + "last'" + chr(10) + "echo done",
+                     "s3cr3tline", "echo done"),
                     ("an indented here-string close", "$env:API_TOKEN = @\"\n  \"@\ns3cr3tline\n\"@\ndone",
                      "s3cr3tline", "done"),
                     ("a quoted multiline value", "password: \"abc\ns3cr3tline\nend\"\nmode: fast", "s3cr3tline",
