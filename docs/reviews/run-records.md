@@ -532,3 +532,19 @@ round: 5 model: gpt-6-astra effort: high outcome: findings candidate: 694e91a6 p
 round: 6 model: gpt-6-astra effort: high outcome: independent candidate: 9a9550ef provider: openai version: gpt-6-astra cost: unresolved latency: 167s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S37-F1, D00-T04-S37-F2, D00-T04-S37-F3
 empty: 0
 refuted: 0
+
+run: D00-T04-S38
+date: 2026-09-26
+runner: panel
+rounds: 6
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 3349d4c2 provider: openai version: gpt-6-astra cost: 64216tokens latency: 42s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S38-F5, D00-T04-S38-F6, D00-T04-S38-F7, D00-T04-S38-F8
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: 4ff640f4 provider: openai version: gpt-6-astra cost: 61219tokens latency: 40s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S38-F9, D00-T04-S38-F10, D00-T04-S38-F11
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: dcfccf64 provider: openai version: gpt-6-astra cost: 73876tokens latency: 61s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S38-F12, D00-T04-S38-F13
+# round 3 is the Full sign-off: F13 was blocking (an obsolete heartbeat could keep writing after a handover), so rounds 4 and 5 ran on depth.
+round: 4 model: gpt-6-astra effort: high outcome: findings candidate: 8136e4b1 provider: openai version: gpt-6-astra cost: 70316tokens latency: 61s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S38-F14, D00-T04-S38-F15
+round: 5 model: gpt-6-astra effort: high outcome: findings candidate: f3a6d485 provider: openai version: gpt-6-astra cost: 72260tokens latency: 85s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S38-F16
+# round 5 is the hard cap: F16 filed in D00 T04 §40. Latencies are measured by the session around each invocation.
+# round 6 is the independent pass (`panel_slots.py exec independent --commit 7c0e4f3d`, ran before panel round 1); the runner printed no token figure.
+round: 6 model: gpt-6-astra effort: high outcome: independent candidate: 7c0e4f3d provider: openai version: gpt-6-astra cost: unresolved latency: 314s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S38-F1, D00-T04-S38-F2, D00-T04-S38-F3, D00-T04-S38-F4
+empty: 0
+refuted: 0

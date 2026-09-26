@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**400 findings across 48 sections.**
+**416 findings across 49 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 118 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 84 | fails under hostile or unexpected input |
-| `correctness` | 69 | the code does the wrong thing |
+| `record` | 119 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 92 | fails under hostile or unexpected input |
+| `correctness` | 72 | the code does the wrong thing |
+| `integration` | 61 | a consumer, caller, or downstream artifact no longer holds |
 | `consistency` | 58 | disagrees with the rest of the suite, its naming, or its layout |
-| `integration` | 57 | a consumer, caller, or downstream artifact no longer holds |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 182 | wrong behavior in code, plan, or record |
-| `minor` | 212 | polish or wording, or no surviving defect |
+| `major` | 189 | wrong behavior in code, plan, or record |
+| `minor` | 221 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -379,6 +379,22 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §37` | F18 | minor | `record` | cleared | independent | the checkpoint's suite counts are not quoted |
 | `D00 T04 §37` | F19 | major | `adversarial` | filed | independent | a bare credential value stops at a comma or brace |
 | `D00 T04 §37` | F20 | minor | `integration` | filed | independent | restore still rebinds identity |
+| `D00 T04 §38` | F1 | major | `adversarial` | fixed | independent | attempt lines print credentials from the remote URL |
+| `D00 T04 §38` | F2 | minor | `correctness` | fixed | independent | repeated report lines reset the stall breaker |
+| `D00 T04 §38` | F3 | minor | `correctness` | fixed | independent | the heartbeat keeps a stale job id after a re-point |
+| `D00 T04 §38` | F4 | minor | `correctness` | fixed | independent | a backtick becomes part of the journal's workflow |
+| `D00 T04 §38` | F5 | major | `adversarial` | fixed | independent | whoami hands the job id to a duplicate carrier |
+| `D00 T04 §38` | F6 | minor | `adversarial` | fixed | independent | a mixed journal collapses before its identities are checked |
+| `D00 T04 §38` | F7 | major | `integration` | fixed | independent | the stall step deletes the job when end refuses |
+| `D00 T04 §38` | F8 | minor | `record` | fixed | independent | the post-CronCreate recovery ends with no heartbeat |
+| `D00 T04 §38` | F9 | major | `adversarial` | fixed | independent | an empty listing releases the job id |
+| `D00 T04 §38` | F10 | minor | `adversarial` | fixed | independent | a fenced ack passes without a guard |
+| `D00 T04 §38` | F11 | major | `integration` | fixed | independent | plan-done deletes the job when end refuses |
+| `D00 T04 §38` | F12 | minor | `adversarial` | fixed | independent | a pre-run-id state is deleted at the first re-point |
+| `D00 T04 §38` | F13 | major | `integration` | fixed | independent | a stall-step refusal resumes the campaign after a handover |
+| `D00 T04 §38` | F14 | minor | `adversarial` | fixed | independent | a legacy guard's state is lost at a same-run acquisition |
+| `D00 T04 §38` | F15 | major | `integration` | fixed | independent | an incomplete end lets a stopped campaign resume |
+| `D00 T04 §38` | F16 | minor | `adversarial` | filed | independent | a crash inside acquire leaves a legacy state the hook adopts |
 | `D00 T04 §4` | F1 | major | `correctness` | fixed | independent | the chain was wrong, in the way that matters most |
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
