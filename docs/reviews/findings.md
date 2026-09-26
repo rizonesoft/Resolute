@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**435 findings across 50 sections.**
+**453 findings across 51 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 120 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 101 | fails under hostile or unexpected input |
-| `correctness` | 75 | the code does the wrong thing |
-| `integration` | 67 | a consumer, caller, or downstream artifact no longer holds |
-| `consistency` | 58 | disagrees with the rest of the suite, its naming, or its layout |
+| `record` | 122 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 109 | fails under hostile or unexpected input |
+| `correctness` | 77 | the code does the wrong thing |
+| `integration` | 71 | a consumer, caller, or downstream artifact no longer holds |
+| `consistency` | 60 | disagrees with the rest of the suite, its naming, or its layout |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 197 | wrong behavior in code, plan, or record |
-| `minor` | 232 | polish or wording, or no surviving defect |
+| `major` | 203 | wrong behavior in code, plan, or record |
+| `minor` | 244 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -418,6 +418,24 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §4` | F2 | major | `correctness` | fixed | independent | a documented reference form matched nothing |
 | `D00 T04 §4` | F3 | major | `correctness` | fixed | independent | unreadable evidence was reported as absent evidence |
 | `D00 T04 §4` | F4 | minor | `record` | fixed | self | the headline number counted work that cannot be delayed |
+| `D00 T04 §40` | F1 | major | `adversarial` | fixed | independent | a delayed rotation can resurrect an ended campaign |
+| `D00 T04 §40` | F2 | minor | `correctness` | fixed | independent | in-place migration discards the same run's state |
+| `D00 T04 §40` | F3 | minor | `correctness` | fixed | independent | two quarantines in one second overwrite each other |
+| `D00 T04 §40` | F4 | major | `adversarial` | fixed | independent | a job cleared by delete-check can be made current before its deletion |
+| `D00 T04 §40` | F5 | minor | `adversarial` | fixed | independent | whoami without a listing releases the job |
+| `D00 T04 §40` | F6 | minor | `consistency` | fixed | independent | phase advance deletes the old job before re-pointing |
+| `D00 T04 §40` | F7 | minor | `integration` | refuted | independent | the header is 51 characters, not 52 |
+| `D00 T04 §40` | F8 | minor | `record` | fixed | independent | the upgrade drive never migrated a guard's identity |
+| `D00 T04 §40` | F9 | major | `adversarial` | fixed | independent | recover can restore a cleared job |
+| `D00 T04 §40` | F10 | minor | `adversarial` | fixed | independent | clearances expire after 200 later checks |
+| `D00 T04 §40` | F11 | minor | `integration` | fixed | independent | an unreadable listing still names pending jobs for deletion |
+| `D00 T04 §40` | F12 | minor | `record` | fixed | independent | the run record lacks the suite counts |
+| `D00 T04 §40` | F13 | minor | `adversarial` | fixed | independent | an unreadable clearance ledger reads as empty |
+| `D00 T04 §40` | F14 | minor | `consistency` | fixed | independent | the power-loss default overstates consistency |
+| `D00 T04 §40` | F15 | major | `integration` | fixed | independent | startup adopts a survivor of the lost job's generation |
+| `D00 T04 §40` | F16 | major | `adversarial` | fixed | independent | quarantining the ledger lifts every prohibition |
+| `D00 T04 §40` | F17 | major | `integration` | fixed | independent | startup deletes a same-generation twin |
+| `D00 T04 §40` | F18 | minor | `adversarial` | filed | independent | quarantine moves the ledger before publishing its replacement |
 | `D00 T04 §5` | F1 | minor | `record` | corrected | self | the section's own premise was wrong, and the advisory was mostly right |
 | `D00 T04 §5` | F2 | minor | `source-defect` | corrected | self | the compound `document` rule was accused and is correct |
 | `D00 T04 §5` | F3 | major | `correctness` | fixed | self | one message covered three defects and asserted what it had not tested |

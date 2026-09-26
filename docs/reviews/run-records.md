@@ -564,3 +564,19 @@ round: 5 model: gpt-6-astra effort: high outcome: findings candidate: 897d6426 p
 round: 6 model: gpt-6-astra effort: high outcome: independent candidate: 34bc5ecb provider: openai version: gpt-6-astra cost: unresolved latency: 293s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S39-F1, D00-T04-S39-F2, D00-T04-S39-F3, D00-T04-S39-F4, D00-T04-S39-F5, D00-T04-S39-F6
 empty: 0
 refuted: 0
+
+run: D00-T04-S40
+date: 2026-09-26
+runner: panel
+rounds: 6
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 807f7840 provider: openai version: gpt-6-astra cost: 49906tokens latency: 40s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S40-F4, D00-T04-S40-F5, D00-T04-S40-F6, D00-T04-S40-F7, D00-T04-S40-F8
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: 6f3caafc provider: openai version: gpt-6-astra cost: 58124tokens latency: 37s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S40-F9, D00-T04-S40-F10, D00-T04-S40-F11, D00-T04-S40-F12
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: a6feb28a provider: openai version: gpt-6-astra cost: 61272tokens latency: 71s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T04-S40-F13, D00-T04-S40-F14, D00-T04-S40-F15
+# round 3 is the Full sign-off: F15 was blocking (an in-flight firing could share an adopted identity), so rounds 4 and 5 ran on depth.
+round: 4 model: gpt-6-astra effort: high outcome: findings candidate: 3d39ffe0 provider: openai version: gpt-6-astra cost: 62850tokens latency: 53s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S40-F16, D00-T04-S40-F17
+round: 5 model: gpt-6-astra effort: high outcome: findings candidate: 06209c98 provider: openai version: gpt-6-astra cost: 77457tokens latency: 47s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T04-S40-F18
+# round 5 is the hard cap: F18 filed in D00 T04 §42. F7 (round 1) was refuted. Latencies are measured by the session around each invocation.
+# round 6 is the independent pass (`panel_slots.py exec independent --commit 39ed6d3d`, ran before panel round 1); the runner printed no token figure.
+round: 6 model: gpt-6-astra effort: high outcome: independent candidate: 39ed6d3d provider: openai version: gpt-6-astra cost: unresolved latency: 213s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S40-F1, D00-T04-S40-F2, D00-T04-S40-F3
+empty: 0
+refuted: 1
