@@ -1,46 +1,79 @@
 # Icon manifest. D00 T02 §8.
 #
-# Every Lucide icon name the code references, with each referrer as
-# path:line (a path relative to the repository root). icon_manifest_test.cpp
-# asserts that each name resolves to SVG and to a bitmap, and that each
-# referrer line still quotes the name, so a typo, a removed icon, or a moved
-# reference fails the gate by name.
+# Every Lucide icon name the code references, with each file that references
+# it (a path relative to the repository root). icon_manifest_test.cpp asserts
+# that each name resolves to SVG and to a bitmap, and that each listed file
+# still quotes the name, so a typo, a removed icon, or a reference that left
+# its file fails the gate by name. Files, not lines: an unrelated edit that
+# moves a line never breaks the audit.
 #
 # Scope, enumerated 2026-09-26 by searching every quoted kebab-case literal:
 #   the shared controls   shared/resolute-ui/ (headers and sources)
 #   the launcher          src/main.cpp names no icon itself; it reaches icons
 #                         only through the shared controls listed here
 #   the tool descriptors  extensions/RegStudio draws no Lucide icon
-# Excluded: shared/resolute-ui/include/resolute/render.h:46 ("settings" in a
-# doc comment's example, not a reference).
+# The case scans those same sources both ways: every quoted kebab-case
+# literal in shared/resolute-ui/include, shared/resolute-ui/src, src, and
+# extensions/*/src must be listed for its file, either as an icon referrer
+# here or as a declared non-icon line starting with `!` below.
+# An unlisted literal fails by name, so a new or misspelled icon reference
+# cannot pass unseen (panel round 1 of the D00 T02 §8 review).
 #
 # A name no referrer uses any more is kept with the referrer `dead`, so it
 # still has to resolve until it is removed from the set.
 #
 # name	referrer [referrer ...]   (fields separated by tabs)
-view-list	shared/resolute-ui/include/resolute/controls/sidebar.h:27	shared/resolute-ui/include/resolute/controls/toolbar.h:79	shared/resolute-ui/include/resolute/controls/toolbar.h:84
-system	shared/resolute-ui/include/resolute/controls/sidebar.h:28
-network	shared/resolute-ui/include/resolute/controls/sidebar.h:29
-security	shared/resolute-ui/include/resolute/controls/sidebar.h:30
-display	shared/resolute-ui/include/resolute/controls/sidebar.h:31
-programs	shared/resolute-ui/include/resolute/controls/sidebar.h:32
-view-large-icons	shared/resolute-ui/include/resolute/controls/toolbar.h:77
-view-small-icons	shared/resolute-ui/include/resolute/controls/toolbar.h:78
-view-details	shared/resolute-ui/include/resolute/controls/toolbar.h:80
-refresh	shared/resolute-ui/include/resolute/controls/toolbar.h:86
-settings	shared/resolute-ui/include/resolute/controls/toolbar.h:88
-theme-dark	shared/resolute-ui/include/resolute/controls/toolbar.h:89	shared/resolute-ui/src/controls/toolbar.cpp:31	shared/resolute-ui/src/controls/toolbar.cpp:34
-theme-light	shared/resolute-ui/src/controls/toolbar.cpp:30
-theme-system	shared/resolute-ui/src/controls/toolbar.cpp:32
-chevron-down	shared/resolute-ui/src/controls/toolbar.cpp:497
-ellipsis	shared/resolute-ui/src/controls/toolbar.cpp:561
-folder-open	shared/resolute-ui/include/resolute/controls/contentview.h:35
-inbox	shared/resolute-ui/src/controls/contentview.cpp:60
-alert-triangle	shared/resolute-ui/src/controls/contentview.cpp:303	shared/resolute-ui/src/controls/statusbar.cpp:520
-check-circle	shared/resolute-ui/src/controls/contentview.cpp:363
-chevron-up	shared/resolute-ui/src/controls/listview.cpp:553
-chevron-left	shared/resolute-ui/src/controls/sidebar.cpp:345
-chevron-right	shared/resolute-ui/src/controls/sidebar.cpp:349
-circle	shared/resolute-ui/src/controls/statusbar.cpp:508
-loader-2	shared/resolute-ui/src/controls/statusbar.cpp:512
-check	shared/resolute-ui/src/controls/statusbar.cpp:516
+view-list	shared/resolute-ui/include/resolute/controls/sidebar.h	shared/resolute-ui/include/resolute/controls/toolbar.h
+system	shared/resolute-ui/include/resolute/controls/sidebar.h
+network	shared/resolute-ui/include/resolute/controls/sidebar.h
+security	shared/resolute-ui/include/resolute/controls/sidebar.h
+display	shared/resolute-ui/include/resolute/controls/sidebar.h
+programs	shared/resolute-ui/include/resolute/controls/sidebar.h
+view-large-icons	shared/resolute-ui/include/resolute/controls/toolbar.h
+view-small-icons	shared/resolute-ui/include/resolute/controls/toolbar.h
+view-details	shared/resolute-ui/include/resolute/controls/toolbar.h
+refresh	shared/resolute-ui/include/resolute/controls/toolbar.h
+settings	shared/resolute-ui/include/resolute/controls/toolbar.h
+theme-dark	shared/resolute-ui/include/resolute/controls/toolbar.h	shared/resolute-ui/src/controls/toolbar.cpp
+theme-light	shared/resolute-ui/src/controls/toolbar.cpp
+theme-system	shared/resolute-ui/src/controls/toolbar.cpp
+chevron-down	shared/resolute-ui/src/controls/toolbar.cpp
+ellipsis	shared/resolute-ui/src/controls/toolbar.cpp
+folder-open	shared/resolute-ui/include/resolute/controls/contentview.h
+inbox	shared/resolute-ui/src/controls/contentview.cpp
+alert-triangle	shared/resolute-ui/src/controls/contentview.cpp	shared/resolute-ui/src/controls/statusbar.cpp
+check-circle	shared/resolute-ui/src/controls/contentview.cpp
+chevron-up	shared/resolute-ui/src/controls/listview.cpp
+chevron-left	shared/resolute-ui/src/controls/sidebar.cpp
+chevron-right	shared/resolute-ui/src/controls/sidebar.cpp
+circle	shared/resolute-ui/src/controls/statusbar.cpp
+loader-2	shared/resolute-ui/src/controls/statusbar.cpp
+check	shared/resolute-ui/src/controls/statusbar.cpp
+#
+# Declared non-icon literals: !literal<TAB>file [file ...]
+# category: a JSON key the launcher reads
+!category	src/main.cpp
+# description: a JSON key
+!description	src/main.cpp
+# from: a word in a comment
+!from	shared/resolute-ui/src/theme.cpp
+# height: an SVG attribute
+!height	shared/resolute-ui/src/render.cpp
+# key: a JSON key
+!key	src/main.cpp
+# name: a JSON key
+!name	src/main.cpp
+# otf: a font file extension
+!otf	shared/resolute-ui/src/typography.cpp
+# s: a plural suffix
+!s	extensions/RegStudio/src/main.cpp
+# settings: a doc comment's example
+!settings	shared/resolute-ui/include/resolute/render.h
+# ttf: a font file extension
+!ttf	shared/resolute-ui/src/typography.cpp
+# value: a JSON key
+!value	src/main.cpp
+# version: a JSON key
+!version	src/main.cpp
+# width: an SVG attribute
+!width	shared/resolute-ui/src/render.cpp
