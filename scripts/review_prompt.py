@@ -1159,20 +1159,81 @@ def _glob_regex(glob: str) -> re.Pattern:
 def _flow_list(value: str, child: list[str]) -> list[str]:
     """A YAML list given inline (`[a, 'b']`, or a single scalar) or as
     `- item` lines, as plain strings."""
-    strip_c = lambda v: re.sub(r"(?:\A|\s+)#.*\Z", "", v).strip()
-    value = strip_c(value)
-    if value.startswith("["):
-        # Items split at commas outside quotes, so `['feature/foo,bar']` is
-        # one pattern (panel round 1 of the D00 T04 §39 review).
-        items = re.findall(r"\s*('(?:''|[^'])*'|\"(?:\\.|[^\"\\])*\"|[^,\]]+)\s*(?:,|\]|\Z)", value[1:])
-        out = []
-        for it in items:
-            it = it.strip()
-            out.append(_list_scalar(it))
-        return [x for x in out if x]
-    if value:
-        return [_list_scalar(value)]
-    return [_list_scalar(strip_c(ln.strip()[2:])) for ln in child if ln.strip().startswith("- ")]
+    # A scanner, not a pattern: quotes are honored before anything else, so
+    # a comma, a bracket, or a `#` inside a quoted item is part of it, and
+    # a comment starts only at a `#` outside quotes after whitespace
+    # (panel rounds 1 to 3 of the D00 T04 §39 review, rethought after the
+    # third). A shape it cannot scan raises ScalarRefused.
+    value = value.strip()
+    if value and not value.startswith("#"):
+        items, rest = _scan_flow(value)
+        if rest.strip() and not rest.strip().startswith("#"):
+            raise ScalarRefused(f"text after the list: {rest.strip()[:40]}")
+        return [x for x in items if x]
+    out = []
+    for ln in child:
+        if ln.strip().startswith("- "):
+            items, rest = _scan_flow(ln.strip()[2:].strip(), single=True)
+            if rest.strip() and not rest.strip().startswith("#"):
+                raise ScalarRefused(f"text after a list item: {rest.strip()[:40]}")
+            out += items
+    return [x for x in out if x]
+
+
+def _scan_one(text: str, i: int, stops: str) -> tuple[str, int]:
+    """One scalar from `text[i:]`: quoted (its closing quote honored, a
+    doubled single quote or a backslash escape kept inside) or plain (up to
+    a character in `stops` or a ` #` comment). Returns the decoded item
+    and the index after it."""
+    n = len(text)
+    if i < n and text[i] in "'\"":
+        q, j = text[i], i + 1
+        while j < n:
+            if q == "'" and text[j] == "'":
+                if j + 1 < n and text[j + 1] == "'":
+                    j += 2
+                    continue
+                break
+            if q == '"' and text[j] == "\\":
+                j += 2
+                continue
+            if q == '"' and text[j] == '"':
+                break
+            j += 1
+        if j >= n:
+            raise ScalarRefused("an unterminated quoted item")
+        return _list_scalar(text[i:j + 1]), j + 1
+    j = i
+    while j < n and text[j] not in stops and not (text[j] == "#" and j > i and text[j - 1] in " \t"):
+        j += 1
+    return text[i:j].strip(), j
+
+
+def _scan_flow(value: str, single: bool = False) -> tuple[list[str], str]:
+    """(items, the text after them) for a flow sequence `[a, 'b']` or one
+    scalar."""
+    if single or not value.startswith("["):
+        item, j = _scan_one(value, 0, "")
+        return [item], value[j:]
+    items: list[str] = []
+    i, n = 1, len(value)
+    while True:
+        while i < n and value[i] in " \t":
+            i += 1
+        if i >= n:
+            raise ScalarRefused("an unterminated flow list")
+        if value[i] == "]":
+            return items, value[i + 1:]
+        item, i = _scan_one(value, i, ",]")
+        items.append(item)
+        while i < n and value[i] in " \t":
+            i += 1
+        if i < n and value[i] == ",":
+            i += 1
+        elif i < n and value[i] == "]":
+            continue
+        else:
+            raise ScalarRefused("a flow list item followed by something other than , or ]")
 
 
 def _list_scalar(item: str) -> str:
@@ -1864,7 +1925,43 @@ _SECRET_RES = (
 _SECRET_NAME = re.compile(r"(?i)(secret|token|passw|credential|private|api[_-]?key|auth)")
 
 
+_LOG_COLS = re.compile(r"\A(?:[^\t\n]*\t[^\t\n]*\t\S*[ \t])?")
+_BLOCK_SECRET_KEY = re.compile(
+    r"(?i)\A([ \t]*)(?:-[ \t]+)?[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|"
+    r"private[_-]?key)[A-Za-z0-9_]*[\"']?[ \t]*:[ \t]*[|>][+-]?[0-9]?[+-]?[ \t]*(?:#.*)?\Z")
+
+
+def _redact_blocks(text: str) -> str:
+    """A credential key given as a YAML block scalar (`password: |`) masks
+    every body line: the lines after it indented deeper than the key, and
+    the blank lines among them, a log's job, step, and timestamp columns
+    kept (panel round 3 of the D00 T04 §39 review)."""
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        i += 1
+        cols = _LOG_COLS.match(line).group(0)
+        m = _BLOCK_SECRET_KEY.match(line[len(cols):])
+        if not m:
+            continue
+        key_indent = len(m.group(1).expandtabs())
+        while i < len(lines):
+            nxt = lines[i]
+            ncols = _LOG_COLS.match(nxt).group(0)
+            body = nxt[len(ncols):]
+            if body.strip() and len(body) - len(body.lstrip(" \t")) <= key_indent:
+                break
+            indent = body[:len(body) - len(body.lstrip(" \t"))]
+            out.append(ncols + (indent + "***" if body.strip() else body))
+            i += 1
+    return "\n".join(out)
+
+
 def redact(text: str) -> str:
+    text = _redact_blocks(text)
     for pat, repl in _SECRET_RES:
         text = pat.sub(repl, text)
     return text
@@ -6896,7 +6993,10 @@ def _self_test() -> int:
                     ("an escaped branch", "on:\n  push:\n    branches: [\"\\u006daster\"]\njobs: {}\n", "master",
                      ["a"], False),
                     ("an escape the decoder refuses", "on:\n  push:\n    branches: [\"\\q\"]\njobs: {}\n", "master",
-                     ["a"], False)):
+                     ["a"], False),
+                    # Panel round 3: a `#` inside quotes is part of the item.
+                    ("a hash inside a quoted path", "on:\n  push:\n    paths: ['foo #bar/**']\njobs: {}\n", "master",
+                     ["foo #bar/test.txt"], False)):
                 got_ex = push_excluded(push_trigger_filter(wf_t), branch, changed_t)[0]
                 check(f"push-exclusion: {label}", got_ex == want, f"{got_ex} {push_trigger_filter(wf_t)}")
             got_nt7 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
@@ -6962,6 +7062,11 @@ def _self_test() -> int:
                     ("a bare value past a comma", "API_TOKEN=abc,defghi", "defghi", "API_TOKEN="),
                     ("a bare value past a brace", "password: abc}defghi", "defghi", "password: "),
                     ("a YAML plain scalar with a space", "  password: abc defghi # note", "defghi", "# note"),
+                    # Panel round 3: a block scalar's body lines are the value.
+                    ("a YAML block scalar", "creds:\n  password: |\n    abc\n    defghi\n  mode: fast", "defghi",
+                     "  mode: fast"),
+                    ("a folded block in a log", "j\ts\tT1 token: >-\nj\ts\tT2   s3cr3tline\nj\ts\tT3 next: 1",
+                     "s3cr3tline", "next: 1"),
                     ("a shell value with an escaped space", "API_TOKEN=abc\\ defghi rest", "defghi", " rest"),
                     ("a JSON value with a comma and brace", '{"token": "a,b}c", "mode": "x"}', "a,b}c", '"mode": "x"'),
                     ("an escaped-newline key", "key=-----BEGIN PRIVATE KEY-----\\nMIIEv\\n-----END PRIVATE KEY----- tail",

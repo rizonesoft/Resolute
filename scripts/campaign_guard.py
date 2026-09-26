@@ -1088,6 +1088,11 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
         if action in ("attempt", "pushed", "abandon", "close", "retire", "restore") and not campaign:
             raise GuardError(f"repair {action} needs a live campaign guard with a run id: the episode is bound to "
                              f"its campaign")
+        # A persisted episode of another campaign is refused before its
+        # journal is read or anything returns (panel round 3).
+        if state and state.get("run") and campaign and state["run"] != campaign:
+            raise GuardError(f"the open episode belongs to campaign run {state['run']}, not {campaign}; "
+                             f"a journal from another campaign is not this one's")
         jep, idents = _journal(root, run_file)
         note = ""
         if state:
@@ -2634,6 +2639,12 @@ def _self_test() -> int:
         bound = _repair_cli("attempt", "--red", shas[6], "--commit", shas[7], *W)
         _campaign("bbbbbbbbbbbb")
         foreign = _repair_cli("attempt", "--red", shas[6], "--commit", shas[8], *W)
+        # Panel round 3: restore with the foreign episode file present
+        # refuses too, before any early return.
+        foreign_present = _repair_cli("restore", *W)
+        check("repair-restore-refuses-a-present-foreign-episode",
+              foreign_present.returncode == 1 and "belongs to campaign run aaaaaaaaaaaa" in foreign_present.stderr,
+              foreign_present.stdout + foreign_present.stderr)
         os.remove(EP)
         foreign_restore = _repair_cli("restore", *W)
         check("repair-binds-the-episode-to-its-campaign",
