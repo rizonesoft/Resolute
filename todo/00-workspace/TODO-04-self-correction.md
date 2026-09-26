@@ -97,6 +97,7 @@ track: W1
 |  37   |   §37   | CI read-back hardening                         | §35 |  [x]   |
 |  38   |   §38   | Campaign guard identity and recovery           | §36 |  [ ]   |
 |  39   |   §39   | CI read-back and repair completeness           | §37 |  [ ]   |
+|  40   |   §40   | Campaign guard fence completeness              | §38 |  [ ]   |
 
 ---
 
@@ -1566,6 +1567,7 @@ The D00 T04 §36 review files what its contract does not own. Its sign-off round
 
 -> XREF: D00 T04 §36 -- the guard lifecycle this section hardens, and the review findings it files
 -> XREF: D00 T04 §37 -- the repair-episode restore whose identity one item binds
+-> XREF: D00 T04 §40 -- the review findings on the guard fences, filed after the hard cap
 -> SOURCE: panel-D00-T04-s36-2026-09-25-F11 D00-T04-S36-F11
 -> SOURCE: panel-D00-T04-s37-2026-09-25-F17 D00-T04-S37-F17
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR17 D00-T04-S37-PR17
@@ -1619,6 +1621,41 @@ The D00 T04 §37 review files what its contract does not own. Its hard-cap round
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR14 D00-T04-S37-PR14
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR15 D00-T04-S37-PR15
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR16 D00-T04-S37-PR16
+
+## 40. Campaign Guard Fence Completeness
+
+The D00 T04 §38 review files what its contract does not own. Its hard-cap round (panel round 5, F16) found that a crash inside `acquire`, between publishing the new guard and resetting a state written before states carried a run id, leaves that legacy state for the hook to adopt into the new run, so inherited trips could end a fresh campaign as stalled. The D00 T04 §38 plan review (run 20260926-D00-T04-S38-astra) adds thirteen accepted findings, grouped below by the unit they harden; two more (episode ids and a crash-safe episode journal) are D00 T04 §39's.
+
+- [ ] Tag a legacy state before an acquisition can orphan it: `acquire` publishes the new guard before it resets a state with no run id, and the hook adopts such a state whole (panel round 5 of the D00 T04 §38 review, F16; needs §38 shipped). Done when: a state without a run id is stamped with the outgoing guard's run id (or deleted) before the new guard publishes, the hook reads an untagged state as foreign once the guard carries a run id, and a crash fixture at each acquisition step with a legacy two-trip state reads a fresh breaker, quoted.
+- [ ] Require the whole identity on every owner mutation: `--run` is optional, so a caller can drop it and weaken the fence (plan review PR1; needs §38 shipped). Done when: `end`, an owner's `reset-state`, and `hook-error --ack` require `--run` beside `--generation` and `--cron-id`, the skills pass it, and a fixture pins a stale run refused, quoted.
+- [ ] Rotate the generation when duplicates resolve, and fence the scheduler deletion: a firing of a duplicate already running when its entry was deleted can borrow the survivor's identity, and `CronDelete` sits outside every fence (plan review PR2 and PR3; needs §38 shipped). Done when: resolving a duplicate mints a new generation and re-points (so an in-flight obsolete firing reads `NOT THE CURRENT JOB`), every `CronDelete` the heartbeat or runner issues follows a fresh `whoami` or `pending-cancel` naming that job, and fixtures for overlapping firings and a handover between listing and deletion refuse, quoted.
+- [ ] Bound the prompt identity and refuse an unreadable listing: the header must fit the `CronList` cut, a workspace basename can collide across checkouts, and an empty listing reads the same as a failed or truncated one (plan review PR4 and PR5; needs §38 shipped). Done when: the header carries a bounded digest of the canonical workspace path and run file (with a stated length contract), long-path and same-basename fixtures scope correctly, and `reconcile` and `whoami` take an explicit listing status so an unparseable or missing listing answers `UNKNOWN` and names nothing to delete, quoted.
+- [ ] Give terminal pending cancellations and orphan errors an owner: after the last heartbeat and the guard are gone nothing drains a failed cancellation, and an error raised with no owner or after termination can be acknowledged by nobody (plan review PR6 and PR7; needs §38 shipped). Done when: the next `process-plan` startup (reconcile) drains or reports every pending record and every orphan error with a stated retry trigger, orphan errors acknowledge under the startup's own identity with their origin kept, and fixtures pin both after a terminated campaign, quoted.
+- [ ] Drive the upgrade end to end: legacy guards gain run ids and generations while legacy prompts are left alone by reconcile (plan review PR8; needs §38 shipped). Done when: a recorded drive starts from a pre-§38 guard, state, heartbeat prompt, and run record, and ends at one recognised carrier and a consistent record, quoted.
+- [ ] Repair malformed guard files to a bounded end: the malformed-guard branch only reports (plan review PR9; needs §38 shipped). Done when: a malformed guard, state, or pending record is quarantined under `build/` with its bytes kept, the operator's recovery command restores ownership from the run record, reading it back, and fixtures pin each file's corruption, quoted.
+- [ ] Prove failed writes, not only interrupted ones: the crash fixtures kill a change between steps, but a failing write, replace, or delete is untested and power-loss durability is unstated (plan review PR10; needs §38 shipped). Done when: injected failures of each write, replace, and delete leave a consistent lifecycle, and `process-plan` states whether files are fsynced (a recorded default, with its cost of changing), quoted.
+- [ ] Strip every credential shape from the repository identity: userinfo is dropped, but query parameters and fragments can carry tokens too (plan review PR13; needs §38 shipped). Done when: the identity drops userinfo, query, and fragment before serialization and comparison, and fixtures with a token in each place print none, quoted.
+- [ ] Drive the in-section health interval: the 60-minute check is stated, not proven, during blocking work (plan review PR14; needs §38 shipped). Done when: a recorded long section or recovery wait shows the check running inside it (a shortened interval, stated) and a job deleted mid-wait replaced before the wait ends, quoted.
+- [ ] Write §38's final acceptance contract: its Done notes carry six rounds of superseding corrections (plan review PR15; needs §38 shipped). Done when: D00 T04 §38 carries a dated acceptance paragraph stating its commands, refusal outcomes, and recovery transitions in one place, its stamp and history untouched, quoted.
+- [ ] Commit: `"workspace: campaign guard fence completeness"`
+
+**Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the legacy-state-crash, whole-identity, generation-rotation, fenced-delete, bounded-header, unknown-listing, terminal-drain, orphan-error, quarantine, injected-failure, and credential-shape legs, quoted with the suite count. Driven run with evidence: the upgrade drive and the in-section health drive, each in a run file, quoted.
+
+-> XREF: D00 T04 §38 -- the guard identity and recovery this section completes, and the review findings it files
+-> SOURCE: panel-D00-T04-s38-2026-09-26-F16 D00-T04-S38-F16
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR1 D00-T04-S38-PR1
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR2 D00-T04-S38-PR2
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR3 D00-T04-S38-PR3
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR4 D00-T04-S38-PR4
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR5 D00-T04-S38-PR5
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR6 D00-T04-S38-PR6
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR7 D00-T04-S38-PR7
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR8 D00-T04-S38-PR8
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR9 D00-T04-S38-PR9
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR10 D00-T04-S38-PR10
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR13 D00-T04-S38-PR13
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR14 D00-T04-S38-PR14
+-> SOURCE: plan-D00-T04-s38-2026-09-26-PR15 D00-T04-S38-PR15
 
 ## Verification
 
