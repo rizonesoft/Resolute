@@ -34,6 +34,7 @@ Every test carries at least one tag naming what it belongs to, because the suite
 | `[framework]` | `src/framework/`, consumed by every tool |
 | `[repair]` | the repair contract |
 | `[<tool>]` | that tool specifically, lowercase: `[ownership]`, `[regstudio]` |
+| `[driven]` | pumps a real message loop against real, hidden windows (the UI library's animation endpoints and window-backed input, D00 T02 §7); slower than the headless cases, and never shown on the desktop |
 
 A second tag narrows: `"[ui][dpi]"`. Run one group with `ctest --preset debug -R` or `catch2 "[dpi]"`.
 

@@ -90,6 +90,7 @@ struct RESUI_API Animation {
     EaseFn   easing   = ease::OutCubic;
     bool     finished = false;
     bool     started  = false;   // delay elapsed
+    const void* owner = nullptr; // the control it animates, for CancelOwner
 
     // Callback with (currentValue, animation)
     std::function<void(float, const Animation&)> onUpdate;
@@ -149,11 +150,29 @@ public:
     void AnimateStaggered(int count, float from, float to,
                           float durationMs, float staggerMs,
                           EaseFn easing,
-                          std::function<void(int index, float value)> onUpdate,
-                          std::function<void()> onAllComplete = nullptr);
+                          const std::function<void(int index, float value)>& onUpdate,
+                          const std::function<void()>& onAllComplete = nullptr);
+
+    // The same, tagged with the object the callbacks reach through, so
+    // the object's teardown cancels them before they can run against
+    // freed memory (D00 T02 §7). Every control passes itself.
+    uint32_t AnimateFor(const void* owner, float from, float to, float durationMs,
+                        EaseFn easing,
+                        std::function<void(float, const Animation&)> onUpdate,
+                        std::function<void()> onComplete = nullptr,
+                        float delayMs = 0.0f);
+    void AnimateStaggeredFor(const void* owner, int count, float from, float to,
+                             float durationMs, float staggerMs,
+                             EaseFn easing,
+                             const std::function<void(int index, float value)>& onUpdate,
+                             const std::function<void()>& onAllComplete = nullptr);
 
     // Cancel an animation by ID
     void Cancel(uint32_t id);
+
+    // Cancel every animation tagged with `owner`; safe from inside a
+    // callback, where the cancelled ones never run again this frame
+    void CancelOwner(const void* owner);
 
     // Cancel all animations
     void CancelAll();
@@ -168,6 +187,7 @@ private:
     AnimationManager() = default;
 
     void OnTick();
+    bool Dropped(const Animation& a) const;
 
     static void CALLBACK TimerCallback(HWND hwnd, UINT msg, UINT_PTR id, DWORD time);
 
@@ -177,6 +197,15 @@ private:
     uint32_t   m_nextId     = 1;
     DWORD      m_lastTick   = 0;
     bool       m_running    = false;
+
+    // A tick runs over a moved-out copy, so a callback that adds or
+    // cancels an animation never reshapes the vector being iterated;
+    // cancellations made during the tick are recorded here and honored
+    // before any later callback runs (D00 T02 §7).
+    bool                     m_ticking    = false;
+    bool                     m_cancelAll  = false;
+    std::vector<uint32_t>    m_cancelledIds;
+    std::vector<const void*> m_deadOwners;
 
     static constexpr UINT kFrameInterval = 16; // ~60fps
 };

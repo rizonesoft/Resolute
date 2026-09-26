@@ -7,6 +7,8 @@
 
 namespace rui {
 
+Toolbar::~Toolbar() { AnimationManager::Instance().CancelOwner(this); }
+
 // ── Accessors ───────────────────────────────────────────────
 int  Toolbar::ScaledHeight() const { return Dpi::Scale(BASE_HEIGHT, m_dpi); }
 HWND Toolbar::Handle() const { return m_hwnd; }
@@ -191,7 +193,7 @@ void Toolbar::AnimateHover(int idx, bool entering) {
 
     float from = m_hoverAlpha[idx];
     float to   = entering ? 1.0f : 0.0f;
-    m_hoverAnimId[idx] = mgr.Animate(
+    m_hoverAnimId[idx] = mgr.AnimateFor(this, 
         from, to, entering ? 150.0f : 250.0f,
         entering ? ease::OutQuart : ease::InQuad,
         [this, idx](float v, const Animation&) {
@@ -211,7 +213,7 @@ void Toolbar::AnimateIndicator(int btnIdx, float totalWidth) {
     float fromX = m_indicatorX;
     float fromW = m_indicatorW;
 
-    m_indicatorAnimId = mgr.Animate(
+    m_indicatorAnimId = mgr.AnimateFor(this, 
         0.0f, 1.0f, 300.0f,
         ease::OutQuart,
         [this, fromX, fromW, targetX, targetW](float t, const Animation&) {
@@ -227,7 +229,7 @@ void Toolbar::AnimateRefreshSpin() {
     if (m_refreshAnimId) mgr.Cancel(m_refreshAnimId);
 
     m_refreshAngle = 0.0f;
-    m_refreshAnimId = mgr.Animate(
+    m_refreshAnimId = mgr.AnimateFor(this, 
         0.0f, -360.0f, 600.0f,
         ease::InOutCubic,
         [this](float v, const Animation&) {
@@ -663,7 +665,7 @@ LRESULT CALLBACK Toolbar::ToolbarProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
             }
             // Spring back
             auto& mgr = AnimationManager::Instance();
-            mgr.Animate(0.96f, 1.0f, 200.0f, ease::Spring,
+            mgr.AnimateFor(self, 0.96f, 1.0f, 200.0f, ease::Spring,
                 [self, pressedIdx](float v, const Animation&) {
                     self->m_pressScale[pressedIdx] = v;
                     self->Repaint();

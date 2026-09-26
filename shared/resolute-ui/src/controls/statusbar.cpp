@@ -6,6 +6,8 @@
 
 namespace rui {
 
+StatusBar::~StatusBar() { AnimationManager::Instance().CancelOwner(this); }
+
 // ── Accessors ───────────────────────────────────────────────
 int  StatusBar::ScaledHeight() const { return Dpi::Scale(BASE_HEIGHT, m_dpi); }
 HWND StatusBar::Handle() const { return m_hwnd; }
@@ -145,7 +147,7 @@ void StatusBar::AnimateSegmentText(int idx) {
     s.fadeOut = 1.0f;
     s.fadeIn  = 0.0f;
 
-    s.fadeAnim = mgr.Animate(0.0f, 1.0f, 200.0f, ease::OutQuad,
+    s.fadeAnim = mgr.AnimateFor(this, 0.0f, 1.0f, 200.0f, ease::OutQuad,
         [this, idx](float t, const Animation&) {
             m_segments[idx].fadeOut = 1.0f - t;
             m_segments[idx].fadeIn  = t;
@@ -167,7 +169,7 @@ void StatusBar::AnimateSegmentHover(int idx, bool entering) {
 
     float from = s.hoverAlpha;
     float to   = entering ? 1.0f : 0.0f;
-    s.hoverAnim = mgr.Animate(from, to, entering ? 120.0f : 200.0f,
+    s.hoverAnim = mgr.AnimateFor(this, from, to, entering ? 120.0f : 200.0f,
         entering ? ease::OutQuart : ease::InQuad,
         [this, idx](float v, const Animation&) {
             m_segments[idx].hoverAlpha = v;
@@ -219,7 +221,7 @@ void StatusBar::StopProgress()  { HideProgress(); }
 void StatusBar::StartIndeterminateLoop() {
     struct LoopHelper {
         static void Start(StatusBar* sb) {
-            sb->m_progressAnimId = AnimationManager::Instance().Animate(
+            sb->m_progressAnimId = AnimationManager::Instance().AnimateFor(sb, 
                 0.0f, 1.0f, 1200.0f, ease::InOutCubic,
                 [sb](float v, const Animation&) {
                     sb->m_progressPhase = v;
@@ -253,7 +255,7 @@ void StatusBar::AddNotifyIcon(int id, NotifyIconKind kind) {
                 // Find the icon by id
                 for (auto& icon : sb->m_notifyIcons) {
                     if (icon.id == iconId) {
-                        icon.spinAnim = AnimationManager::Instance().Animate(
+                        icon.spinAnim = AnimationManager::Instance().AnimateFor(sb, 
                             0.0f, 360.0f, 1000.0f, ease::Linear,
                             [sb, iconId](float v, const Animation&) {
                                 for (auto& ic : sb->m_notifyIcons) {
@@ -332,7 +334,7 @@ void StatusBar::ShowNotification(const wchar_t* text, COLORREF color, float dura
     m_notifyOffset = 200.0f;
     m_notifyAlpha  = 1.0f;
 
-    m_notifySlideId = mgr.Animate(200.0f, 0.0f, 250.0f, ease::OutCubic,
+    m_notifySlideId = mgr.AnimateFor(this, 200.0f, 0.0f, 250.0f, ease::OutCubic,
         [this](float v, const Animation&) {
             m_notifyOffset = v;
             Repaint();
@@ -689,7 +691,7 @@ LRESULT CALLBACK StatusBar::StatusProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp
             auto& mgr = AnimationManager::Instance();
             if (self->m_notifyFadeId) mgr.Cancel(self->m_notifyFadeId);
 
-            self->m_notifyFadeId = mgr.Animate(1.0f, 0.0f, 300.0f, ease::OutQuad,
+            self->m_notifyFadeId = mgr.AnimateFor(self, 1.0f, 0.0f, 300.0f, ease::OutQuad,
                 [self](float v, const Animation&) {
                     self->m_notifyAlpha = v;
                     self->Repaint();
@@ -713,7 +715,7 @@ LRESULT CALLBACK StatusBar::StatusProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp
 
                 // Fade out then remove
                 auto& mgr = AnimationManager::Instance();
-                it->fadeAnim = mgr.Animate(1.0f, 0.0f, 300.0f, ease::OutQuad,
+                it->fadeAnim = mgr.AnimateFor(self, 1.0f, 0.0f, 300.0f, ease::OutQuad,
                     [self, iconId](float v, const Animation&) {
                         for (auto& ni : self->m_notifyIcons) {
                             if (ni.id == iconId) {

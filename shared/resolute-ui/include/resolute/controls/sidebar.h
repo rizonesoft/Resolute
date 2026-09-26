@@ -35,6 +35,9 @@ inline constexpr int kCategoryCount = _countof(kCategories);
 
 class RESUI_API Sidebar {
 public:
+    // Cancels every animation whose callbacks reach this control, so
+    // none runs against it after teardown (D00 T02 §7).
+    ~Sidebar();
     static constexpr int BASE_WIDTH       = 200;
     static constexpr int BASE_ITEM_HEIGHT = 40;
     static constexpr int BASE_PADDING_X   = 16;

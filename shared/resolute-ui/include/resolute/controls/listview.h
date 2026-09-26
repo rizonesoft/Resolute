@@ -54,6 +54,9 @@ using ItemProvider = std::function<const ListItem&(int index)>;
 // ═══════════════════════════════════════════════════════════
 class RESUI_API ListView {
 public:
+    // Cancels every animation whose callbacks reach this control, so
+    // none runs against it after teardown (D00 T02 §7).
+    ~ListView();
     // ── Layout Constants (unscaled) ─────────────────────────
     static constexpr int BASE_ROW_HEIGHT       = 28;
     static constexpr int BASE_HEADER_HEIGHT    = 32;

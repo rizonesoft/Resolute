@@ -38,6 +38,9 @@ struct DropdownChoice {
 
 class RESUI_API Toolbar {
 public:
+    // Cancels every animation whose callbacks reach this control, so
+    // none runs against it after teardown (D00 T02 §7).
+    ~Toolbar();
     static constexpr int BASE_HEIGHT    = 40;
     static constexpr int BASE_FONT_SIZE = 13;
     static constexpr int BASE_ICON_SIZE = 16;

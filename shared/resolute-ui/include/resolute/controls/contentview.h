@@ -20,6 +20,9 @@ namespace rui {
 
 class RESUI_API ContentView {
 public:
+    // Cancels every animation whose callbacks reach this control, so
+    // none runs against it after teardown (D00 T02 §7).
+    ~ContentView();
     void Create(HWND parent, HINSTANCE hInst, int id);
     HWND Handle() const;
     void Resize(int x, int y, int w, int h);

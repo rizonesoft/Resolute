@@ -32,6 +32,9 @@ inline constexpr int IDC_SB_RIGHT  = 2003;
 
 class RESUI_API StatusBar {
 public:
+    // Cancels every animation whose callbacks reach this control, so
+    // none runs against it after teardown (D00 T02 §7).
+    ~StatusBar();
     static constexpr int BASE_HEIGHT    = 26;
     static constexpr int BASE_FONT_SIZE = 12;
     static constexpr int BASE_PADDING_X = 10;

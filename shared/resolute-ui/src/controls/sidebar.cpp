@@ -8,6 +8,8 @@
 
 namespace rui {
 
+Sidebar::~Sidebar() { AnimationManager::Instance().CancelOwner(this); }
+
 // ── Accessors ───────────────────────────────────────────────
 int Sidebar::ScaledWidth() const {
     int full = Dpi::Scale(BASE_WIDTH, m_dpi);
@@ -201,7 +203,7 @@ void Sidebar::AnimateSelection(int newIdx) {
     float toY   = ItemYCenter(newIdx);
     m_selectionTargetY = toY;
 
-    m_selAnimId = mgr.Animate(fromY, toY, 250.0f, ease::OutCubic,
+    m_selAnimId = mgr.AnimateFor(this, fromY, toY, 250.0f, ease::OutCubic,
         [this](float v, const Animation&) {
             m_selectionY = v;
             Repaint();
@@ -218,7 +220,7 @@ void Sidebar::AnimateHover(int idx, bool entering) {
     float from = m_hoverAlpha[idx];
     float to   = entering ? 1.0f : 0.0f;
 
-    m_hoverAnimId[idx] = mgr.Animate(from, to, 120.0f, ease::OutQuad,
+    m_hoverAnimId[idx] = mgr.AnimateFor(this, from, to, 120.0f, ease::OutQuad,
         [this, idx](float v, const Animation&) {
             m_hoverAlpha[idx] = v;
             Repaint();
@@ -233,13 +235,13 @@ void Sidebar::AnimateIconPulse(int idx) {
 
     // Opacity pulse: briefly brighten then settle back
     // (no scaling — scaling a bitmap always blurs)
-    mgr.Animate(1.0f, 1.3f, 100.0f, ease::OutQuad,
+    mgr.AnimateFor(this, 1.0f, 1.3f, 100.0f, ease::OutQuad,
         [this, idx](float v, const Animation&) {
             m_iconScale[idx] = v;  // repurposed as brightness
             Repaint();
         },
         [this, idx]() {
-            AnimationManager::Instance().Animate(
+            AnimationManager::Instance().AnimateFor(this, 
                 m_iconScale[idx], 1.0f, 200.0f, ease::OutQuad,
                 [this, idx](float v, const Animation&) {
                     m_iconScale[idx] = v;
@@ -254,7 +256,7 @@ void Sidebar::AnimateEnter() {
     m_entered = true;
 
     auto& mgr = AnimationManager::Instance();
-    mgr.AnimateStaggered(kCategoryCount, 0.0f, 1.0f, 250.0f, 30.0f,
+    mgr.AnimateStaggeredFor(this, kCategoryCount, 0.0f, 1.0f, 250.0f, 30.0f,
         ease::OutQuart,
         [this](int i, float v) {
             m_enterAlpha[i] = v;
@@ -275,7 +277,7 @@ void Sidebar::AnimateCollapse(bool collapse) {
                         / static_cast<float>(Dpi::Scale(BASE_WIDTH, m_dpi));
     float to = collapse ? iconOnlyRatio : 1.0f;
 
-    m_collapseAnimId = mgr.Animate(from, to, 250.0f, ease::OutCubic,
+    m_collapseAnimId = mgr.AnimateFor(this, from, to, 250.0f, ease::OutCubic,
         [this](float v, const Animation&) {
             m_widthFactor = v;
             SendMessageW(m_parent, WM_SIZE, 0, 0);

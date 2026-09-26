@@ -4,6 +4,8 @@
 
 namespace rui {
 
+ContentView::~ContentView() { AnimationManager::Instance().CancelOwner(this); }
+
 // ── Accessors ───────────────────────────────────────────────
 HWND ContentView::Handle() const { return m_hwnd; }
 bool ContentView::IsEmpty() const { return m_emptyVisible; }
@@ -65,7 +67,7 @@ void ContentView::ShowEmpty(const wchar_t* title, const wchar_t* subtitle,
     auto& mgr = AnimationManager::Instance();
     if (m_emptyAnimId) mgr.Cancel(m_emptyAnimId);
 
-    m_emptyAnimId = mgr.Animate(m_emptyAlpha, 1.0f, 300.0f, ease::OutQuad,
+    m_emptyAnimId = mgr.AnimateFor(this, m_emptyAlpha, 1.0f, 300.0f, ease::OutQuad,
         [this](float v, const Animation&) {
             m_emptyAlpha = v;
             Repaint();
@@ -80,7 +82,7 @@ void ContentView::HideEmpty() {
     auto& mgr = AnimationManager::Instance();
     if (m_emptyAnimId) mgr.Cancel(m_emptyAnimId);
 
-    m_emptyAnimId = mgr.Animate(m_emptyAlpha, 0.0f, 200.0f, ease::OutQuad,
+    m_emptyAnimId = mgr.AnimateFor(this, m_emptyAlpha, 0.0f, 200.0f, ease::OutQuad,
         [this](float v, const Animation&) {
             m_emptyAlpha = v;
             Repaint();
@@ -112,7 +114,7 @@ void ContentView::ShowError(const wchar_t* message, float durationSec) {
         GetWindowLongPtrW(m_hwnd, GWL_EXSTYLE) & ~WS_EX_TRANSPARENT);
 
     // Slide down from top
-    m_errorAnimId = mgr.Animate(-1.0f, 0.0f, 300.0f, ease::OutCubic,
+    m_errorAnimId = mgr.AnimateFor(this, -1.0f, 0.0f, 300.0f, ease::OutCubic,
         [this](float v, const Animation&) {
             m_errorSlideY = v;
             Repaint();
@@ -132,7 +134,7 @@ void ContentView::DismissError() {
     auto& mgr = AnimationManager::Instance();
     if (m_errorAnimId) mgr.Cancel(m_errorAnimId);
 
-    m_errorAnimId = mgr.Animate(1.0f, 0.0f, 250.0f, ease::OutQuad,
+    m_errorAnimId = mgr.AnimateFor(this, 1.0f, 0.0f, 250.0f, ease::OutQuad,
         [this](float v, const Animation&) {
             m_errorAlpha = v;
             Repaint();
@@ -164,7 +166,7 @@ void ContentView::ShowSuccess(const wchar_t* message, float durationSec) {
         GetWindowLongPtrW(m_hwnd, GWL_EXSTYLE) & ~WS_EX_TRANSPARENT);
 
     // Phase 1: Fade in (150ms)
-    m_successAnimId = mgr.Animate(0.0f, 1.0f, 150.0f, ease::OutQuad,
+    m_successAnimId = mgr.AnimateFor(this, 0.0f, 1.0f, 150.0f, ease::OutQuad,
         [this](float v, const Animation&) {
             m_successAlpha = v;
             Repaint();
@@ -438,7 +440,7 @@ LRESULT CALLBACK ContentView::ContentProc(HWND hwnd, UINT msg,
             auto& mgr = AnimationManager::Instance();
             if (self->m_successAnimId) mgr.Cancel(self->m_successAnimId);
 
-            self->m_successAnimId = mgr.Animate(
+            self->m_successAnimId = mgr.AnimateFor(self, 
                 self->m_successAlpha, 0.0f, 300.0f, ease::OutQuad,
                 [self](float v, const Animation&) {
                     self->m_successAlpha = v;

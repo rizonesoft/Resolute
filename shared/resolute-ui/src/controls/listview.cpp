@@ -8,6 +8,8 @@
 
 namespace rui {
 
+ListView::~ListView() { AnimationManager::Instance().CancelOwner(this); }
+
 // ── Accessors ───────────────────────────────────────────────
 HWND ListView::Handle() const { return m_hwnd; }
 int  ListView::ItemCount() const { return m_itemCount; }
@@ -244,7 +246,7 @@ void ListView::AnimateSelection(int newIdx) {
     if (oldIdx < 0) {
         m_selHighlightY = newY;
         if (m_selFadeId) mgr.Cancel(m_selFadeId);
-        m_selFadeId = mgr.Animate(0.0f, 1.0f, 150.0f, ease::OutQuad,
+        m_selFadeId = mgr.AnimateFor(this, 0.0f, 1.0f, 150.0f, ease::OutQuad,
             [this](float v, const Animation&) { m_selAlpha = v; Repaint(); },
             [this]() { m_selFadeId = 0; });
         return;
@@ -252,7 +254,7 @@ void ListView::AnimateSelection(int newIdx) {
 
     if (m_selAnimId) mgr.Cancel(m_selAnimId);
     float fromY = m_selHighlightY;
-    m_selAnimId = mgr.Animate(fromY, newY, 180.0f, ease::OutQuart,
+    m_selAnimId = mgr.AnimateFor(this, fromY, newY, 180.0f, ease::OutQuart,
         [this](float v, const Animation&) { m_selHighlightY = v; Repaint(); },
         [this]() { m_selAnimId = 0; });
     m_selAlpha = 1.0f;
@@ -265,11 +267,11 @@ void ListView::AnimateHover(int newIdx) {
     if (m_hoverAnimId) mgr.Cancel(m_hoverAnimId);
 
     if (newIdx >= 0) {
-        m_hoverAnimId = mgr.Animate(m_hoverAlpha, 1.0f, 100.0f, ease::OutQuad,
+        m_hoverAnimId = mgr.AnimateFor(this, m_hoverAlpha, 1.0f, 100.0f, ease::OutQuad,
             [this](float v, const Animation&) { m_hoverAlpha = v; Repaint(); },
             [this]() { m_hoverAnimId = 0; });
     } else {
-        m_hoverAnimId = mgr.Animate(m_hoverAlpha, 0.0f, 150.0f, ease::InQuad,
+        m_hoverAnimId = mgr.AnimateFor(this, m_hoverAlpha, 0.0f, 150.0f, ease::InQuad,
             [this](float v, const Animation&) { m_hoverAlpha = v; Repaint(); },
             [this]() { m_hoverAnimId = 0; });
     }
@@ -287,7 +289,7 @@ void ListView::SetSortColumn(int colIdx, bool ascending) {
     float fromAngle = m_sortChevronAngle;
     if (!sameCol) fromAngle = targetAngle; // no rotation on new column
 
-    m_sortAnimId = mgr.Animate(fromAngle, targetAngle, 200.0f, ease::OutCubic,
+    m_sortAnimId = mgr.AnimateFor(this, fromAngle, targetAngle, 200.0f, ease::OutCubic,
         [this](float v, const Animation&) { m_sortChevronAngle = v; Repaint(); },
         [this]() { m_sortAnimId = 0; });
 
@@ -302,7 +304,7 @@ void ListView::AnimateScrollTo(float targetY) {
     auto& mgr = AnimationManager::Instance();
     if (m_scrollAnimId) mgr.Cancel(m_scrollAnimId);
 
-    m_scrollAnimId = mgr.Animate(m_scrollY, targetY, 250.0f, ease::OutQuart,
+    m_scrollAnimId = mgr.AnimateFor(this, m_scrollY, targetY, 250.0f, ease::OutQuart,
         [this](float v, const Animation&) { m_scrollY = v; Repaint(); },
         [this]() { m_scrollAnimId = 0; });
 
@@ -442,7 +444,7 @@ void ListView::BeginEdit(int itemIdx, int colIdx) {
 
     struct BlinkLoop {
         static void Start(ListView* lv) {
-            lv->m_cursorAnimId = AnimationManager::Instance().Animate(
+            lv->m_cursorAnimId = AnimationManager::Instance().AnimateFor(lv, 
                 0.0f, 1.0f, 1000.0f, ease::Linear,
                 [lv](float v, const Animation&) { lv->m_cursorBlinkPhase = v; lv->Repaint(); },
                 [lv]() { lv->m_cursorAnimId = 0; BlinkLoop::Start(lv); });
@@ -932,7 +934,7 @@ LRESULT CALLBACK ListView::ListViewProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM l
                 auto& mgr = AnimationManager::Instance();
                 if (self->m_headerHoverAnimId) mgr.Cancel(self->m_headerHoverAnimId);
                 float target = (col >= 0) ? 1.0f : 0.0f;
-                self->m_headerHoverAnimId = mgr.Animate(self->m_headerHoverAlpha, target, 100.0f, ease::OutQuad,
+                self->m_headerHoverAnimId = mgr.AnimateFor(self, self->m_headerHoverAlpha, target, 100.0f, ease::OutQuad,
                     [self](float v, const Animation&) { self->m_headerHoverAlpha = v; self->Repaint(); },
                     [self]() { self->m_headerHoverAnimId = 0; });
             }
@@ -1127,7 +1129,7 @@ LRESULT CALLBACK ListView::ListViewProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM l
             self->m_scrollbarTimer = 0;
             auto& mgr = AnimationManager::Instance();
             if (self->m_scrollbarFadeId) mgr.Cancel(self->m_scrollbarFadeId);
-            self->m_scrollbarFadeId = mgr.Animate(self->m_scrollbarAlpha, 0.0f, 400.0f, ease::OutQuad,
+            self->m_scrollbarFadeId = mgr.AnimateFor(self, self->m_scrollbarAlpha, 0.0f, 400.0f, ease::OutQuad,
                 [self](float v, const Animation&) { self->m_scrollbarAlpha = v; self->Repaint(); },
                 [self]() { self->m_scrollbarFadeId = 0; });
         }
