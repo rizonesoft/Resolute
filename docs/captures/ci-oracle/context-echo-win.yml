@@ -1,0 +1,47 @@
+name: context-echo-win
+
+# Disposable: the D00 T04 §39 Windows shell drill. Each step prints its
+# directory, its shell's error preference or edition, and its env as a
+# child process sees it, so the local re-run of pwsh, powershell, and cmd
+# is judged against what GitHub ran. Lives only on the drill branch.
+on:
+  push:
+    branches: ['drill/**']
+
+jobs:
+  context-echo-win:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: default shell
+        run: |
+          (Get-Item -LiteralPath .).Name
+          "$ErrorActionPreference"
+          $PSVersionTable.PSEdition
+      - name: explicit powershell
+        shell: powershell
+        run: |
+          (Get-Item -LiteralPath .).Name
+          "$ErrorActionPreference"
+          $PSVersionTable.PSEdition
+      - name: pwsh env and directory
+        shell: pwsh
+        working-directory: drill/sub dir
+        env:
+          MODE: "two words"
+          QUOTE: it's
+        run: |
+          (Get-Item -LiteralPath .).Name
+          $env:MODE
+          $env:QUOTE
+          pwsh -NoProfile -Command 'Write-Output "child: $env:MODE"'
+      - name: cmd env and directory
+        shell: cmd
+        working-directory: drill/sub dir
+        env:
+          MODE: "two words"
+        run: |
+          @echo off
+          for %%I in (.) do echo %%~nxI
+          echo %MODE%
+          cmd /c echo child: %MODE%

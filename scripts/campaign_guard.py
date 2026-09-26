@@ -18,7 +18,9 @@ deleted only through this module (D00 T04 §34):
     python scripts/campaign_guard.py expiry --session S [--now ISO]
     python scripts/campaign_guard.py repair attempt --red SHA --commit SHA --workflow W --run-file F
     python scripts/campaign_guard.py repair close --green SHA --workflow W --run-file F --evidence LINE
-    python scripts/campaign_guard.py repair status|restore --run-file F [--workflow W] | ceiling --run-id ID
+    python scripts/campaign_guard.py repair pushed --commit SHA --run-file F | abandon --commit SHA --reason TEXT --run-file F
+    python scripts/campaign_guard.py repair retire --workflow W --run-file F --evidence "<the NOT GREEN line>"
+    python scripts/campaign_guard.py repair status|restore --run-file F [--workflow W] | ceiling --run-id ID [--attempt N] --run-file F
     python scripts/campaign_guard.py --self-test
 
 `acquire` creates the guard exclusively; the owning session may re-point
@@ -888,6 +890,10 @@ def _repair_path(root: str) -> str:
     return os.path.join(root, "build", "claude-campaign-repair.json")
 
 
+def _ceiling_path(root: str) -> str:
+    return os.path.join(root, "build", "claude-campaign-ceiling.json")
+
+
 def _git(root: str, *args: str) -> tuple[int, str]:
     proc = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8",
                           errors="replace")
@@ -905,17 +911,31 @@ def _repo_identity(root: str) -> dict:
     return {"repo": re.sub(r"^([A-Za-z][A-Za-z0-9+.-]*://)[^/@]*@", r"\1", url), "branch": branch}
 
 
-_ATTEMPT_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) attempt (\d+) of \d+ \(([0-9a-f]{12}) repairs ([0-9a-f]{12})\)"
-                           # A field never swallows the Markdown backtick a
-                           # run file wraps the line in (independent review).
-                           r"(?: repo=([^\s`]+) branch=([^\s`]+) workflow=([^\s`]+))?")
+def _repo_slug(url: str) -> str:
+    """`owner/name` of a GitHub remote, https or ssh, without `.git`."""
+    m = re.search(r"github\.com[:/]+([^/\s]+/[^/\s]+?)(?:\.git)?/?$", url or "")
+    return m.group(1) if m else ""
+
+
+# The journal is the run file's own record, written by these commands
+# before the state file (write-ahead: D00 T04 §39), and every line carries
+# the episode's identity. Legacy lines (before D00 T04 §39) lack the state
+# word and the campaign run; D00 T04 §37 lines lack the identity too.
+_IDENT = r"(?: repo=([^\s`]+) branch=([^\s`]+) workflow=([^\s`]+))?(?: run=([0-9a-f]{6,}))?"
+_OPENED_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) opened on red ([0-9a-f]{12})" + _IDENT)
+_ATTEMPT_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) attempt (\d+) of \d+ (?:(reserved|pushed|abandoned) )?"
+                           r"\(([0-9a-f]{12})(?: repairs ([0-9a-f]{12}))?\)" + _IDENT)
+_CLOSED_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) (?:closed green|retired)")
+_CEILING_LINE = re.compile(r"repair: ceiling allowance used for (\S+)")
 
 
 def _ident_suffix(ep: dict) -> str:
-    """The identity every attempt line carries, so a restore recovers it
-    from the journal rather than from the caller (D00 T04 §38)."""
-    return f" repo={ep.get('repo') or '-'} branch={ep.get('branch') or '-'} workflow={ep.get('workflow') or '-'}"
-_CLOSED_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) closed green")
+    """The identity every journal line carries, so a restore recovers it
+    from the journal rather than from the caller (D00 T04 §38), with the
+    campaign run it belongs to (D00 T04 §39)."""
+    tail = f" run={ep['run']}" if ep.get("run") else ""
+    return (f" repo={ep.get('repo') or '-'} branch={ep.get('branch') or '-'} "
+            f"workflow={ep.get('workflow') or '-'}{tail}")
 
 
 def _canon(root: str, rev: str) -> str:
@@ -926,187 +946,355 @@ def _canon(root: str, rev: str) -> str:
     return out if rc == 0 and out else rev
 
 
-def _episode_from_run_file(root: str, run_file: str) -> list[tuple]:
-    """(episode, commit, red, repo, branch, workflow) for every distinct
-    attempt the run file records after its last closed episode: what a
-    lost episode file held. An `already counted` line repeats an attempt
-    and is not a new one. A legacy line carries no identity (None)."""
+def _journal_text(root: str, run_file: str) -> str:
     try:
         with open(os.path.join(root, run_file), encoding="utf-8", errors="replace") as fh:
-            text = fh.read()
+            return fh.read()
     except OSError:
-        return []
+        return ""
+
+
+def _journal(root: str, run_file: str) -> tuple[dict | None, list[tuple]]:
+    """(the open episode the journal records, every identity its lines
+    carry) after the last closed or retired episode: a closed episode is
+    never resurrected (D00 T04 §39). Attempts carry their state
+    (reserved, pushed, abandoned); a legacy line without one reads as
+    pushed, since it was recorded after its push."""
+    text = _journal_text(root, run_file)
     last_close = max((m.end() for m in _CLOSED_LINE.finditer(text)), default=0)
-    out: list[tuple[str, str, str]] = []
-    seen: set[str] = set()
-    for m in _ATTEMPT_LINE.finditer(text, last_close):
-        if m.group(3) in seen:
+    ep: dict | None = None
+    idents: list[tuple] = []
+    events = sorted([(m.start(), "open", m) for m in _OPENED_LINE.finditer(text, last_close)]
+                    + [(m.start(), "attempt", m) for m in _ATTEMPT_LINE.finditer(text, last_close)],
+                    key=lambda e: e[0])
+    for _pos, kind, m in events:
+        if kind == "open":
+            ident = (m.group(3), m.group(4), m.group(5), m.group(6))
+            idents.append(ident)
+            ep = {"episode": m.group(2), "attempts": [], "ident": ident, "opened": True}
             continue
-        seen.add(m.group(3))
-        out.append((m.group(1), m.group(3), m.group(4), m.group(5), m.group(6), m.group(7)))
-    return out
+        state, commit, red = m.group(3), m.group(4), m.group(5)
+        ident = (m.group(6), m.group(7), m.group(8), m.group(9))
+        if state in (None, "reserved"):
+            idents.append(ident)
+        if ep is None:
+            ep = {"episode": m.group(1), "attempts": [], "ident": ident, "opened": False}
+        hit = [a for a in ep["attempts"] if a["commit"] == commit]
+        if state in (None, "reserved"):
+            if not hit:
+                ep["attempts"].append({"commit": commit, "red": red or "", "state": state or "pushed"})
+        elif hit:
+            hit[0]["state"] = state
+    return ep, idents
 
 
-def _journal_identities(root: str, run_file: str) -> list[tuple]:
-    """(repo, branch, workflow) of EVERY attempt line after the last closed
-    episode, repeats included: a restore validates them all before any
-    de-duplication, so two lines for one commit under different
-    identities are a mixed journal, never collapsed into one (panel round
-    1 of the D00 T04 §38 review)."""
+def _journal_append(root: str, run_file: str, line: str) -> None:
+    path = os.path.join(root, run_file)
+    text = _journal_text(root, run_file)
+    with open(path, "a", encoding="utf-8", newline="\n") as fh:
+        fh.write(("" if not text or text.endswith("\n") else "\n") + line + "\n")
+
+
+def _active(ep: dict) -> list[dict]:
+    """The attempts that count against the bound: every one not
+    abandoned. A reservation whose push is unknown counts, conservatively,
+    until it is marked pushed or abandoned (D00 T04 §39)."""
+    return [a for a in ep["attempts"] if a.get("state") != "abandoned"]
+
+
+def _gh_argv() -> list[str]:
+    """The GitHub CLI: `GH` when set (a `.py` path runs under this
+    interpreter, which is how the self-test fakes it), else `gh`."""
+    env = os.environ.get("GH")
+    if env:
+        return [sys.executable, env] if env.endswith(".py") else [env]
+    return [shutil.which("gh") or "gh"]
+
+
+def _green_run(root: str, green: str, workflow: str) -> tuple[dict | None, str]:
+    """GitHub's own record of `workflow`'s latest run on `green`, re-read
+    rather than trusted from a pasted line (D00 T04 §39)."""
     try:
-        with open(os.path.join(root, run_file), encoding="utf-8", errors="replace") as fh:
-            text = fh.read()
-    except OSError:
-        return []
-    last_close = max((m.end() for m in _CLOSED_LINE.finditer(text)), default=0)
-    return [(m.group(5), m.group(6), m.group(7)) for m in _ATTEMPT_LINE.finditer(text, last_close)]
+        proc = subprocess.run([*_gh_argv(), "run", "list", "--commit", green, "--workflow", workflow, "--json",
+                               "databaseId,headSha,headBranch,conclusion,status,url,attempt,workflowName"],
+                              cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                              timeout=120)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return None, f"gh unavailable: {exc}"
+    if proc.returncode != 0:
+        return None, f"gh exited {proc.returncode}: {' '.join(proc.stderr.split())[:160]}"
+    try:
+        runs = json.loads(proc.stdout or "[]")
+    except ValueError:
+        return None, "gh output is not JSON"
+    runs = [r for r in runs if isinstance(r, dict)] if isinstance(runs, list) else []
+    if not runs:
+        return None, f"GitHub lists no {workflow} run on {green[:12]}"
+    return max(runs, key=lambda r: r.get("databaseId") or 0), ""
 
 
 def repair(root: str, action: str, red: str = "", commit: str = "", green: str = "",
-           workflow: str = "", run_file: str = "", evidence: str = "", run_id: str = "") -> tuple[int, str]:
-    """The CI repair episode, persisted beside the guard state so a
-    resumed or restarted runner cannot recount from zero (D00 T04 §35).
-    An episode opens at its first red and closes at the next green; at
-    most REPAIR_BOUND repair attempts ride one episode, across however
-    many reds it sees. D00 T04 §37 binds it: the episode records its
-    repository, branch, workflow, and run file and refuses a mismatched
-    call; an attempt is keyed to its repair commit, so a repeat after a
-    crash or a failed push counts once; `close` needs a green read-back
-    line for that workflow on a descendant of the last attempt; a lost
-    episode file is detected from the run file's attempt lines and
-    restored; and `ceiling` allows one re-run per GitHub run that stayed
-    pending past the ceiling. Returns (exit, line); exit 1 is the
-    escalation."""
+           workflow: str = "", run_file: str = "", evidence: str = "", run_id: str = "",
+           reason: str = "", attempt_no: str = "") -> tuple[int, str]:
+    """The CI repair episode (D00 T04 §35, §37, §39). An episode opens at
+    its first red and ends green (closed) or by an authorized retirement
+    (retired); at most REPAIR_BOUND attempts count against it. The run
+    file's journal is the source of truth: every command writes its line
+    there first and the state file after, so a crash between the two is
+    recovered from the journal, and a journal line the state lacks is
+    adopted, never lost (write-ahead). An attempt is reserved before its
+    push and then marked pushed or abandoned, so a failed push is never
+    ambiguous; an abandoned attempt frees its place. The episode carries
+    the repository, branch, workflow, and the campaign's run id, and
+    refuses a caller or journal from elsewhere. `close` re-reads the green
+    run from GitHub. `ceiling` allows one re-run per GitHub run attempt,
+    keyed by repository, run id, and attempt, journalled beside the
+    episode. Returns (exit, line); exit 1 is the escalation."""
     path = _repair_path(root)
     with _Lock(root):
-        exists = True
+        if action == "ceiling":
+            return _ceiling(root, run_id, attempt_no or "1", run_file)
         try:
             with open(path, encoding="utf-8") as fh:
-                ep = json.load(fh)
+                state = json.load(fh)
+            exists = True
         except FileNotFoundError:
-            ep, exists = None, False
+            state, exists = None, False
         except (OSError, ValueError) as exc:
             # An unreadable episode must never reset the bound (panel round 1).
             raise GuardError(f"the repair episode {path} is unreadable ({exc}); the bound cannot be "
                              f"counted, so escalate rather than repair")
-        if action == "ceiling":
-            cpath = os.path.join(root, "build", "claude-campaign-ceiling.json")
-            try:
-                with open(cpath, encoding="utf-8") as fh:
-                    seen = json.load(fh)
-            except FileNotFoundError:
-                seen = {}
-            except (OSError, ValueError):
-                raise GuardError("the ceiling record is unreadable; escalate rather than wait again")
-            if not run_id:
-                raise GuardError("repair ceiling needs --run-id <GitHub run id>")
-            if seen.get(run_id, 0) >= 1:
-                return 1, (f"repair: run {run_id} already had its one re-run past the ceiling: escalate "
-                           f"(a queue that never drains is outside the tree)")
-            seen[run_id] = seen.get(run_id, 0) + 1
-            with open(cpath + ".tmp", "w", encoding="utf-8") as fh:
-                json.dump(seen, fh)
-            os.replace(cpath + ".tmp", cpath)
-            return 0, f"repair: run {run_id} may re-run ci-wait once more past the ceiling"
         # Only a missing file means no episode: a file holding anything but
         # a well-formed episode (a JSON null included) refuses (panel round 2).
-        if exists and not (isinstance(ep, dict) and isinstance(ep.get("episode"), str)
-                           and isinstance(ep.get("attempts"), list)):
+        if exists and not (isinstance(state, dict) and isinstance(state.get("episode"), str)
+                           and isinstance(state.get("attempts"), list)):
             raise GuardError(f"the repair episode {path} is malformed; the bound cannot be counted, "
                              f"so escalate rather than repair")
+        if not run_file:
+            raise GuardError(f"repair {action} needs --run-file: the run file's journal is the episode's record")
+        try:
+            guard = read_guard(root)
+        except GuardError:
+            guard = None
+        campaign = str((guard or {}).get("run_id") or "")
+        jep, idents = _journal(root, run_file)
+        note = ""
+        if state and jep is None:
+            # The journal closed (or never opened) what the state holds: a
+            # crash after the closing line, before the state delete.
+            os.unlink(path)
+            state, note = None, " (a stale episode file the journal had closed was dropped)"
+        elif state and jep and jep["episode"] == state["episode"][:12]:
+            want = [(a["commit"], a.get("state", "pushed")) for a in jep["attempts"]]
+            have = [(a["commit"][:12], a.get("state", "pushed")) for a in state["attempts"]]
+            if want != have:
+                # The journal is written first, so it can only be ahead. A
+                # state attempt the journal lacks means the journal was
+                # edited: the bound cannot be trusted.
+                if {c for c, _s in have} - {c for c, _s in want}:
+                    raise GuardError("the episode file records an attempt the journal does not: the journal was "
+                                     "edited, so the bound cannot be counted; escalate")
+                # Write-ahead recovery: the journal wins (D00 T04 §39).
+                by_short = {a["commit"][:12]: a for a in state["attempts"]}
+                state["attempts"] = [dict(by_short.get(c, {"commit": _canon(root, c), "red": ""}), state=s)
+                                     for c, s in want]
+                _publish(path, json.dumps(state, indent=1).encode("utf-8"))
+                note = " (recovered from the journal)"
         if action == "restore":
-            if ep:
-                return 0, f"repair: episode {ep['episode'][:12]} is present; nothing to restore"
-            if not workflow or not run_file:
+            if state:
+                return 0, f"repair: episode {state['episode'][:12]} is present; nothing to restore{note}"
+            if not workflow:
                 raise GuardError("repair restore needs --workflow and --run-file: the restored episode is bound to both")
-            found = _episode_from_run_file(root, run_file)
-            if not found:
+            if jep is None or not jep["attempts"]:
                 return 0, "repair: the run file shows no open episode; nothing to restore"
-            # D00 T04 §38: the journal carries the episode's identity, and a
-            # restore recovers it from there, refusing a caller elsewhere.
-            every = _journal_identities(root, run_file)
-            if any(f[0] is None for f in every):
+            if any(i[0] is None for i in idents):
                 raise GuardError(f"{run_file} records attempts without their repository, branch, and workflow "
                                  f"(a legacy journal): the identity cannot be recovered, so restore refuses; "
                                  f"escalate rather than rebind the episode")
-            idents = set(every)
-            if len(idents) > 1:
-                raise GuardError(f"{run_file} mixes attempts from {len(idents)} identities (a mixed journal): "
+            if len({i[:3] for i in idents}) > 1 or len({i[3] for i in idents if i[3]}) > 1:
+                raise GuardError(f"{run_file} mixes attempts from {len(set(idents))} identities (a mixed journal): "
                                  f"restore refuses; escalate")
-            repo, branch, wf = next(iter(idents))
+            repo, branch, wf, run = idents[0][0], idents[0][1], idents[0][2], next((i[3] for i in idents if i[3]), None)
             here = _repo_identity(root)
             for key, was, now in (("repository", repo, here["repo"] or "-"),
                                   ("branch", branch, here["branch"] or "-"), ("workflow", wf, workflow)):
                 if was != now:
                     raise GuardError(f"the journal's episode belongs to {key} {was!r}, not {now!r}: "
                                      f"restore refuses to rebind it")
-            ep = {"episode": _canon(root, found[0][2]),
-                  "attempts": [{"red": _canon(root, f[2]), "commit": _canon(root, f[1])} for f in found],
-                  "repo": here["repo"], "branch": here["branch"], "workflow": workflow, "run_file": run_file,
-                  "restored": True}
-            with open(path + ".tmp", "w", encoding="utf-8") as fh:
-                json.dump(ep, fh, indent=1)
-            os.replace(path + ".tmp", path)
-            return 0, (f"repair: episode {ep['episode'][:12]} restored from {run_file} at "
-                       f"{len(ep['attempts'])} of {REPAIR_BOUND} attempts")
+            if run and campaign and run != campaign:
+                raise GuardError(f"the journal's episode belongs to campaign run {run}, not {campaign}: "
+                                 f"restore refuses a journal from another campaign")
+            state = {"episode": _canon(root, jep["episode"]),
+                     "attempts": [{"red": _canon(root, a["red"]) if a["red"] else "", "commit": _canon(root, a["commit"]),
+                                   "state": a["state"]} for a in jep["attempts"]],
+                     "repo": here["repo"], "branch": here["branch"], "workflow": workflow, "run_file": run_file,
+                     "run": run or campaign or None, "restored": True}
+            _publish(path, json.dumps(state, indent=1).encode("utf-8"))
+            return 0, (f"repair: episode {state['episode'][:12]} restored from {run_file} at "
+                       f"{len(_active(state))} of {REPAIR_BOUND} attempts")
         if action == "status":
-            if not ep:
-                lost = _episode_from_run_file(root, run_file) if run_file else []
-                if lost:
-                    return 1, (f"repair: the episode file is lost but {run_file} shows episode {lost[0][0]} at "
-                               f"{len(lost)} of {REPAIR_BOUND} attempts: run repair restore before any repair")
-                return 0, "repair: no open episode"
-            return 0, (f"repair: episode {ep['episode'][:12]} open, {len(ep['attempts'])} of "
-                       f"{REPAIR_BOUND} attempts used")
+            if not state:
+                if jep and jep["attempts"]:
+                    return 1, (f"repair: the episode file is lost but {run_file} shows episode {jep['episode']} at "
+                               f"{len(_active(jep))} of {REPAIR_BOUND} attempts: run repair restore before any repair")
+                return 0, f"repair: no open episode{note}"
+            pending = [a["commit"][:12] for a in state["attempts"] if a.get("state") == "reserved"]
+            return 0, (f"repair: episode {state['episode'][:12]} open, {len(_active(state))} of {REPAIR_BOUND} "
+                       f"attempts used" + (f"; reserved, push unconfirmed: {', '.join(pending)}" if pending else "")
+                       + note)
         identity = {**_repo_identity(root), "workflow": workflow, "run_file": run_file}
-        if ep and action in ("attempt", "close"):
+        if state and action in ("attempt", "pushed", "abandon", "close", "retire"):
             for key in ("repo", "branch", "workflow", "run_file"):
-                if ep.get(key, identity[key]) != identity[key]:
-                    raise GuardError(f"the open episode belongs to {key} {ep.get(key)!r}, not {identity[key]!r}; "
-                                     f"refusing to mix episodes")
+                if workflow or key != "workflow":
+                    if state.get(key, identity[key]) != identity[key]:
+                        raise GuardError(f"the open episode belongs to {key} {state.get(key)!r}, not {identity[key]!r}; "
+                                         f"refusing to mix episodes")
+            if state.get("run") and campaign and state["run"] != campaign:
+                raise GuardError(f"the open episode belongs to campaign run {state['run']}, not {campaign}; "
+                                 f"a journal from another campaign is not this one's")
+        if action == "attempt":
+            if not red or not commit or not workflow:
+                raise GuardError("repair attempt needs --red, --commit, --workflow, and --run-file")
+            if not state and jep and jep["attempts"]:
+                raise GuardError(f"the run file shows open episode {jep['episode']} but its file is lost: "
+                                 f"run repair restore first")
+            red, commit = _canon(root, red), _canon(root, commit)
+            opening = state is None
+            state = state or {"episode": red, "attempts": [], **identity, "run": campaign or None}
+            done = [a for a in state["attempts"] if _canon(root, a.get("commit", "")) == commit]
+            if done:
+                n = state["attempts"].index(done[0]) + 1
+                return 0, (f"repair: episode {state['episode'][:12]} attempt {n} of {REPAIR_BOUND} reserved "
+                           f"({commit[:12]} repairs {done[0]['red'][:12]}){_ident_suffix(state)} already counted{note}")
+            if len(_active(state)) >= REPAIR_BOUND:
+                return 1, (f"repair: episode {state['episode'][:12]} has used all {REPAIR_BOUND} attempts: "
+                           f"the bound is exhausted, escalate (PARKED ... escalation:, then end --reason escalation)")
+            state["attempts"].append({"red": red, "commit": commit, "state": "reserved"})
+            n = len(state["attempts"])
+            line = (f"repair: episode {state['episode'][:12]} attempt {n} of {REPAIR_BOUND} reserved "
+                    f"({commit[:12]} repairs {red[:12]}){_ident_suffix(state)}")
+            if opening:
+                _journal_append(root, run_file, f"repair: episode {state['episode'][:12]} opened on red "
+                                                f"{red[:12]}{_ident_suffix(state)}")
+            _journal_append(root, run_file, line)
+            _crash("repair:journal-written")
+            _publish(path, json.dumps(state, indent=1).encode("utf-8"))
+            return 0, line + " (then push it, and mark it pushed or abandoned)"
+        if action in ("pushed", "abandon"):
+            if not commit:
+                raise GuardError(f"repair {action} needs --commit and --run-file")
+            if not state:
+                raise GuardError("there is no open episode to mark")
+            commit = _canon(root, commit)
+            hit = [a for a in state["attempts"] if _canon(root, a.get("commit", "")) == commit]
+            if not hit:
+                raise GuardError(f"no reserved attempt names {commit[:12]}")
+            if hit[0].get("state") != "reserved":
+                return 0, f"repair: attempt {commit[:12]} is already {hit[0].get('state')}{note}"
+            n = state["attempts"].index(hit[0]) + 1
+            new = "pushed" if action == "pushed" else "abandoned"
+            if new == "abandoned" and not reason:
+                raise GuardError("repair abandon needs --reason (why the push did not land)")
+            line = (f"repair: episode {state['episode'][:12]} attempt {n} of {REPAIR_BOUND} {new} ({commit[:12]})"
+                    + (f": {reason}" if new == "abandoned" else ""))
+            _journal_append(root, run_file, line)
+            _crash("repair:journal-written")
+            hit[0]["state"] = new
+            _publish(path, json.dumps(state, indent=1).encode("utf-8"))
+            return 0, line
         if action == "close":
             if not green:
                 raise GuardError("repair close needs --green <sha>")
-            if not ep:
-                return 0, "repair: no open episode to close"
-            want = re.compile(rf"\Aci-wait: {re.escape(green[:12])}[0-9a-f]* {re.escape(workflow or ep.get('workflow', ''))} success\b")
+            if not state:
+                return 0, f"repair: no open episode to close{note}"
+            wf = workflow or state.get("workflow", "")
+            want = re.compile(rf"\Aci-wait: {re.escape(green[:12])}[0-9a-f]* {re.escape(wf)} success\b")
             if not want.match(evidence or ""):
                 raise GuardError("repair close needs --evidence with the green ci-wait line for this sha and "
                                  "workflow (an authorized no-run is not green)")
-            last = ep["attempts"][-1]["commit"] if ep["attempts"] else ep["episode"]
+            if any(a.get("state") == "reserved" for a in state["attempts"]):
+                raise GuardError("an attempt is still reserved with its push unconfirmed: mark it pushed or "
+                                 "abandoned before closing")
+            last = next((a["commit"] for a in reversed(state["attempts"]) if a.get("state") == "pushed"),
+                        state["episode"])
             rc, _ = _git(root, "merge-base", "--is-ancestor", last, green)
             if rc != 0:
                 raise GuardError(f"the green {green[:12]} does not descend from the last attempt {last[:12]}; "
                                  f"it cannot close this episode")
+            # D00 T04 §39: GitHub's record, not the pasted line, proves green.
+            run, why = _green_run(root, _canon(root, green), wf)
+            if run is None:
+                raise GuardError(f"repair close could not re-read the green run: {why}")
+            checks = (("head sha", run.get("headSha") == _canon(root, green)),
+                      ("conclusion", run.get("status") == "completed" and run.get("conclusion") == "success"),
+                      ("workflow", run.get("workflowName") in (wf, None)),
+                      ("branch", run.get("headBranch") == state.get("branch")),
+                      ("repository", bool(_repo_slug(state.get("repo", "")))
+                       and f"/{_repo_slug(state.get('repo', ''))}/actions/" in str(run.get("url", ""))),
+                      ("run id", re.search(rf"/runs/{run.get('databaseId')}\b", evidence or "") is not None))
+            bad = [name for name, ok in checks if not ok]
+            if bad:
+                raise GuardError(f"GitHub's record of run {run.get('databaseId')} disagrees on {', '.join(bad)}: "
+                                 f"it cannot close this episode")
+            line = (f"repair: episode {state['episode'][:12]} closed green at {green[:12]} (run "
+                    f"{run.get('databaseId')} attempt {run.get('attempt') or 1}) after {len(_active(state))} attempt(s)")
+            _journal_append(root, run_file, line)
+            _crash("repair:journal-written")
             os.unlink(path)
-            return 0, (f"repair: episode {ep['episode'][:12]} closed green at {green[:12]} after "
-                       f"{len(ep['attempts'])} attempt(s)")
-        if action == "attempt":
-            if not red or not commit or not workflow or not run_file:
-                raise GuardError("repair attempt needs --red, --commit, --workflow, and --run-file")
-            if not ep:
-                lost = _episode_from_run_file(root, run_file)
-                if lost:
-                    raise GuardError(f"the run file shows open episode {lost[0][0]} but its file is lost: "
-                                     f"run repair restore first")
-            red, commit = _canon(root, red), _canon(root, commit)
-            ep = ep or {"episode": red, "attempts": [], **identity}
-            done = [a for a in ep["attempts"] if _canon(root, a.get("commit", "")) == commit]
-            if done:
-                n = ep["attempts"].index(done[0]) + 1
-                return 0, (f"repair: episode {ep['episode'][:12]} attempt {n} of {REPAIR_BOUND} "
-                           f"({commit[:12]} repairs {done[0]['red'][:12]}){_ident_suffix(ep)} already counted")
-            if len(ep["attempts"]) >= REPAIR_BOUND:
-                return 1, (f"repair: episode {ep['episode'][:12]} has used all {REPAIR_BOUND} attempts: "
-                           f"the bound is exhausted, escalate (PARKED ... escalation:, then end --reason escalation)")
-            ep["attempts"].append({"red": red, "commit": commit})
-            tmp = path + ".tmp"
-            with open(tmp, "w", encoding="utf-8") as fh:
-                json.dump(ep, fh, indent=1)
-            os.replace(tmp, path)
-            return 0, (f"repair: episode {ep['episode'][:12]} attempt {len(ep['attempts'])} of "
-                       f"{REPAIR_BOUND} ({commit[:12]} repairs {red[:12]}){_ident_suffix(ep)}")
-        raise GuardError(f"repair action {action!r} is not attempt, close, status, restore, or ceiling")
+            return 0, line
+        if action == "retire":
+            if not state:
+                return 0, f"repair: no open episode to retire{note}"
+            wf = workflow or state.get("workflow", "")
+            if not re.match(rf"\Aci-wait: [0-9a-f]{{7,}} {re.escape(wf)} NOT GREEN: no run within \d+s, as authorized "
+                            rf"by \S", evidence or ""):
+                raise GuardError("repair retire needs --evidence with the authorized NOT GREEN line for this "
+                                 "episode's workflow: only an authorized retirement ends an episode without green")
+            line = (f"repair: episode {state['episode'][:12]} retired: {wf} no longer runs this push "
+                    f"({evidence.split(' as authorized by ', 1)[-1][:120]})")
+            _journal_append(root, run_file, line)
+            _crash("repair:journal-written")
+            os.unlink(path)
+            return 0, line
+        raise GuardError(f"repair action {action!r} is not attempt, pushed, abandon, close, retire, status, "
+                         f"restore, or ceiling")
+
+
+def _ceiling(root: str, run_id: str, attempt: str, run_file: str) -> tuple[int, str]:
+    """One re-run of `ci-wait` past its ceiling per GitHub run attempt,
+    keyed by repository, run id, and attempt, journalled in the run file
+    (D00 T04 §39). The file under build/ is a cache the journal rebuilds;
+    a corrupt cache escalates."""
+    if not run_id:
+        raise GuardError("repair ceiling needs --run-id <GitHub run id>")
+    if not run_file:
+        raise GuardError("repair ceiling needs --run-file: the allowance is journalled beside the episode")
+    key = f"{_repo_slug(_repo_identity(root)['repo']) or 'unknown-repo'}#{run_id}@{attempt}"
+    cpath = _ceiling_path(root)
+    try:
+        with open(cpath, encoding="utf-8") as fh:
+            seen = json.load(fh)
+        if not isinstance(seen, dict):
+            raise ValueError("not an object")
+        note = ""
+    except FileNotFoundError:
+        seen, note = {}, ""
+    except (OSError, ValueError):
+        raise GuardError("the ceiling record is unreadable; escalate rather than wait again")
+    journalled = {m.group(1) for m in _CEILING_LINE.finditer(_journal_text(root, run_file))}
+    lost = sorted(k for k in journalled if k not in seen)
+    if lost:
+        seen.update({k: 1 for k in lost})
+        _publish(cpath, json.dumps(seen).encode("utf-8"))
+        note = f" (restored {len(lost)} lost allowance record(s) from the journal)"
+    if seen.get(key, 0) >= 1:
+        return 1, (f"repair: run {key} already had its one re-run past the ceiling: escalate "
+                   f"(a queue that never drains is outside the tree){note}")
+    _journal_append(root, run_file, f"repair: ceiling allowance used for {key}")
+    _crash("repair:journal-written")
+    seen[key] = 1
+    _publish(cpath, json.dumps(seen).encode("utf-8"))
+    return 0, f"repair: run {key} may re-run ci-wait once more past the ceiling{note}"
 
 
 def _powershell() -> str | None:
@@ -2193,19 +2381,21 @@ def _self_test() -> int:
         check("a-new-run-starts-a-clean-breaker", _state(iroot) == {} and read_guard(iroot)["run_id"] != rid,
               str(_state(iroot)))
 
-    # D00 T04 §35, §37: the repair episode survives a restart, refuses a
-    # fourth attempt, binds its identity, counts a repeat once, closes only
-    # on proven green, and is restored from the run file when lost.
+    # D00 T04 §35, §37, §39: the repair episode survives a restart, refuses
+    # a fourth attempt, binds its identity and campaign, counts a repeat
+    # once, journals before it writes state, closes only on a green GitHub
+    # re-reads, and is restored only from the journal's open episode.
     with tempfile.TemporaryDirectory(prefix="campaign-repair-") as rtmp:
         os.makedirs(os.path.join(rtmp, "build"))
         os.makedirs(os.path.join(rtmp, "docs"))
-        for args in (["init", "-q"], ["config", "user.email", "t@t"], ["config", "user.name", "t"],
-                     ["config", "commit.gpgsign", "false"]):
+        for args in (["init", "-q", "-b", "master"], ["config", "user.email", "t@t"], ["config", "user.name", "t"],
+                     ["config", "commit.gpgsign", "false"],
+                     ["remote", "add", "origin", "https://github.com/example/here.git"]):
             subprocess.run(["git", *args], cwd=rtmp, capture_output=True, check=True)
         with open(os.path.join(rtmp, ".gitignore"), "w", encoding="utf-8") as fh:
             fh.write("build/\n")
         shas = []
-        for n in range(6):
+        for n in range(9):
             with open(os.path.join(rtmp, "f.txt"), "w", encoding="utf-8") as fh:
                 fh.write(f"{n}\n")
             subprocess.run(["git", "add", "-A"], cwd=rtmp, capture_output=True, check=True)
@@ -2215,78 +2405,153 @@ def _self_test() -> int:
         runf = "docs/run.md"
         with open(os.path.join(rtmp, runf), "w", encoding="utf-8") as fh:
             fh.write("# run\n")
+        # A fake gh answers `run list` from a JSON file the legs write.
+        gh_json = os.path.join(rtmp, "gh-run.json")
+        fake_gh = os.path.join(rtmp, "fake_gh.py")
+        with open(fake_gh, "w", encoding="utf-8") as fh:
+            fh.write("import sys\nprint(open(sys.argv[0][:-len('fake_gh.py')] + 'gh-run.json').read())\n")
+        EP = os.path.join(rtmp, "build", "claude-campaign-repair.json")
 
-        def _repair_cli(*args: str) -> subprocess.CompletedProcess:
+        def _repair_cli(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, os.path.join(HERE, "campaign_guard.py"), "repair", *args,
-                                   "--root", rtmp], capture_output=True, text=True, encoding="utf-8")
+                                   "--root", rtmp], capture_output=True, text=True, encoding="utf-8",
+                                  env=dict(os.environ, GH=fake_gh, PYTHONIOENCODING="utf-8", **(env or {})))
         W = ("--workflow", "plan-gates", "--run-file", runf)
-        outs = [_repair_cli("attempt", "--red", shas[n - 1], "--commit", shas[n], *W) for n in (1, 2, 3)]
+        R = ("--run-file", runf)
+
+        def _reserve_push(red: str, fix: str) -> subprocess.CompletedProcess:
+            got = _repair_cli("attempt", "--red", red, "--commit", fix, *W)
+            _repair_cli("pushed", "--commit", fix, *R)
+            return got
+        outs = [_reserve_push(shas[n - 1], shas[n]) for n in (1, 2, 3)]
         check("repair-attempts-count-across-processes",
-              [o.returncode for o in outs] == [0, 0, 0] and "attempt 3 of 3" in outs[2].stdout
+              [o.returncode for o in outs] == [0, 0, 0] and "attempt 3 of 3 reserved" in outs[2].stdout
               and f"episode {shas[0][:12]}" in outs[2].stdout, str([o.stdout + o.stderr for o in outs]))
+        journal = open(os.path.join(rtmp, runf), encoding="utf-8").read()
+        check("repair-journals-each-transition-itself",
+              f"repair: episode {shas[0][:12]} opened on red {shas[0][:12]}" in journal
+              and journal.count(" reserved (") == 3 and journal.count(" pushed (") == 3, journal[-600:])
         again = _repair_cli("attempt", "--red", shas[1], "--commit", shas[2], *W)
         check("repair-counts-a-repeated-attempt-once",
               again.returncode == 0 and "already counted" in again.stdout, again.stdout + again.stderr)
-        st = _repair_cli("status", "--run-file", runf)
+        st = _repair_cli("status", *R)
         check("repair-status-reads-the-persisted-episode", "3 of 3 attempts used" in st.stdout, st.stdout)
         fourth = _repair_cli("attempt", "--red", shas[3], "--commit", shas[4], *W)
         check("repair-refuses-a-fourth-attempt-after-a-restart",
               fourth.returncode == 1 and "bound is exhausted, escalate" in fourth.stderr, fourth.stderr)
-        other = _repair_cli("attempt", "--red", shas[3], "--commit", shas[4], "--workflow", "release",
-                            "--run-file", runf)
+        other = _repair_cli("attempt", "--red", shas[3], "--commit", shas[4], "--workflow", "release", *R)
         check("repair-refuses-a-mismatched-episode",
               other.returncode == 1 and "belongs to workflow 'plan-gates'" in other.stderr, other.stderr)
-        with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), encoding="utf-8") as fh:
+        with open(EP, encoding="utf-8") as fh:
             saved = fh.read()
         for label, body in (("corrupt", "{not json"), ("malformed", '{"episode": 3}'), ("null", "null")):
-            with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), "w", encoding="utf-8") as fh:
+            with open(EP, "w", encoding="utf-8") as fh:
                 fh.write(body)
             bad = _repair_cli("attempt", "--red", shas[3], "--commit", shas[5], *W)
             check(f"repair-refuses-{label}-state-rather-than-resetting",
                   bad.returncode == 1 and "escalate rather than repair" in bad.stderr, bad.stderr)
-        with open(os.path.join(rtmp, "build", "claude-campaign-repair.json"), "w", encoding="utf-8") as fh:
+        with open(EP, "w", encoding="utf-8") as fh:
             fh.write(saved)
+        # Close proves green on GitHub's own record (D00 T04 §39).
+        good = {"databaseId": 555, "headSha": shas[5], "headBranch": "master", "conclusion": "success",
+                "status": "completed", "url": "https://github.com/example/here/actions/runs/555", "attempt": 1,
+                "workflowName": "plan-gates"}
+        ev = f"ci-wait: {shas[5][:12]} plan-gates success https://github.com/example/here/actions/runs/555"
         no_ev = _repair_cli("close", "--green", shas[5], *W, "--evidence", f"ci-wait: {shas[5][:12]} plan-gates started no run")
         check("repair-close-refuses-without-green-evidence",
               no_ev.returncode == 1 and "needs --evidence with the green ci-wait line" in no_ev.stderr, no_ev.stderr)
         not_desc = _repair_cli("close", "--green", shas[1], *W, "--evidence", f"ci-wait: {shas[1][:12]} plan-gates success x")
         check("repair-close-refuses-a-green-that-is-not-a-descendant",
               not_desc.returncode == 1 and "does not descend from the last attempt" in not_desc.stderr, not_desc.stderr)
-        closed = _repair_cli("close", "--green", shas[5], *W, "--evidence", f"ci-wait: {shas[5][:12]} plan-gates success https://x")
-        again2 = _repair_cli("attempt", "--red", shas[4], "--commit", shas[5], *W)
-        check("repair-close-opens-a-fresh-episode",
-              "closed green" in closed.stdout and again2.returncode == 0 and "attempt 1 of 3" in again2.stdout,
-              f"{closed.stdout}{closed.stderr} {again2.stdout}{again2.stderr}")
-        # A lost episode file is detected from the run file and restored.
-        with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
-            fh.write(again2.stdout)
-        os.remove(os.path.join(rtmp, "build", "claude-campaign-repair.json"))
-        lost = _repair_cli("status", "--run-file", runf)
+        for label, patch, evid in (("head sha", {"headSha": shas[6]}, ev),
+                                   ("conclusion", {"conclusion": "failure"}, ev),
+                                   ("branch", {"headBranch": "release/9"}, ev),
+                                   ("repository", {"url": "https://github.com/other/fork/actions/runs/555"}, ev),
+                                   ("run id", {}, ev.replace("/runs/555", "/runs/554"))):
+            with open(gh_json, "w", encoding="utf-8") as fh:
+                json.dump([dict(good, **patch)], fh)
+            got_c = _repair_cli("close", "--green", shas[5], *W, "--evidence", evid)
+            check(f"repair-close-refuses-when-github-disagrees-on-{label.replace(' ', '-')}",
+                  got_c.returncode == 1 and f"disagrees on {label}" in got_c.stderr and os.path.exists(EP),
+                  got_c.stderr)
+        with open(gh_json, "w", encoding="utf-8") as fh:
+            json.dump([good], fh)
+        closed = _repair_cli("close", "--green", shas[5], *W, "--evidence", ev)
+        check("repair-close-proves-green-on-githubs-record",
+              closed.returncode == 0 and "closed green at" in closed.stdout and "(run 555 attempt 1)" in closed.stdout
+              and not os.path.exists(EP), closed.stdout + closed.stderr)
+        resurrect = _repair_cli("restore", *W)
+        check("repair-restore-never-resurrects-a-closed-episode",
+              resurrect.returncode == 0 and "no open episode" in resurrect.stdout, resurrect.stdout + resurrect.stderr)
+        # A reservation counts until it is marked; an abandoned one frees
+        # its place, and close waits for no reservation (D00 T04 §39).
+        a1 = _repair_cli("attempt", "--red", shas[5], "--commit", shas[6], *W)
+        blocked_close = _repair_cli("close", "--green", shas[6], *W, "--evidence",
+                                    f"ci-wait: {shas[6][:12]} plan-gates success https://github.com/example/here/actions/runs/556")
+        ab = _repair_cli("abandon", "--commit", shas[6], "--reason", "the push was rejected", *R)
+        st2 = _repair_cli("status", *R)
+        check("repair-an-abandoned-attempt-frees-its-place",
+              a1.returncode == 0 and blocked_close.returncode == 1 and "still reserved" in blocked_close.stderr
+              and "abandoned" in ab.stdout and "0 of 3 attempts used" in st2.stdout, st2.stdout + ab.stderr)
+        # Write-ahead: a crash after the journal line, before the state,
+        # loses nothing; the next call adopts the journal.
+        crash = _repair_cli("attempt", "--red", shas[5], "--commit", shas[7], *W,
+                            env={"CAMPAIGN_CRASH_AT": "repair:journal-written"})
+        st3 = _repair_cli("status", *R)
+        check("repair-a-crash-after-the-journal-recovers-the-attempt",
+              crash.returncode == 97 and "1 of 3 attempts used" in st3.stdout and "recovered from the journal" in st3.stdout
+              and "reserved, push unconfirmed" in st3.stdout, st3.stdout + st3.stderr)
+        _repair_cli("pushed", "--commit", shas[7], *R)
+        # A lost episode file is detected from the journal and restored.
+        os.remove(EP)
+        lost = _repair_cli("status", *R)
         check("repair-status-detects-a-lost-episode-file",
               lost.returncode == 1 and "the episode file is lost" in lost.stderr, lost.stdout + lost.stderr)
-        blocked = _repair_cli("attempt", "--red", shas[5], "--commit", shas[3], *W)
+        blocked = _repair_cli("attempt", "--red", shas[7], "--commit", shas[8], *W)
         check("repair-attempt-refuses-until-restored",
               blocked.returncode == 1 and "run repair restore first" in blocked.stderr, blocked.stderr)
-        no_wf = _repair_cli("restore", "--run-file", runf)
+        no_wf = _repair_cli("restore", *R)
         check("repair-restore-refuses-without-a-workflow",
               no_wf.returncode == 1 and "needs --workflow and --run-file" in no_wf.stderr, no_wf.stderr)
-        # An `already counted` line in the run file is not a second attempt.
-        with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
-            fh.write(again2.stdout.strip() + " already counted\n")
         restored = _repair_cli("restore", *W)
         check("repair-restore-rebuilds-from-the-run-file",
               restored.returncode == 0 and "restored from docs/run.md at 1 of 3 attempts" in restored.stdout,
               restored.stdout + restored.stderr)
-        full_retry = _repair_cli("attempt", "--red", shas[4], "--commit", shas[5], *W)
+        full_retry = _repair_cli("attempt", "--red", shas[5], "--commit", shas[7], *W)
         check("repair-restored-attempts-compare-by-full-sha",
               full_retry.returncode == 0 and "already counted" in full_retry.stdout,
               full_retry.stdout + full_retry.stderr)
+        check("repair-attempt-lines-carry-the-identity",
+              " repo=https://github.com/example/here.git branch=master workflow=plan-gates" in full_retry.stdout,
+              full_retry.stdout)
+        # An authorized retirement ends the episode without green.
+        wrong = _repair_cli("retire", *W, "--evidence", ev)
+        retired = _repair_cli("retire", *W, "--evidence",
+                              f"ci-wait: {shas[8][:12]} plan-gates NOT GREEN: no run within 900s, as authorized by "
+                              f"operator at 2026-09-26T03:00Z for x..y (retired; the workflow no longer triggers on push)")
+        check("repair-retire-ends-an-episode-only-on-an-authorized-no-run",
+              wrong.returncode == 1 and "authorized NOT GREEN line" in wrong.stderr
+              and retired.returncode == 0 and " retired: plan-gates no longer runs this push" in retired.stdout
+              and not os.path.exists(EP), wrong.stderr + retired.stdout + retired.stderr)
+        # The episode binds the campaign's run id (D00 T04 §39).
+        with open(os.path.join(rtmp, "build", "claude-campaign-guard.json"), "w", encoding="utf-8") as fh:
+            json.dump({"session_id": SESSION, "run_file": runf, "cron_id": "j", "generation": "g", "run_id": "aaaaaaaaaaaa"}, fh)
+        bound = _repair_cli("attempt", "--red", shas[6], "--commit", shas[7], *W)
+        with open(os.path.join(rtmp, "build", "claude-campaign-guard.json"), "w", encoding="utf-8") as fh:
+            json.dump({"session_id": SESSION, "run_file": runf, "cron_id": "j", "generation": "g", "run_id": "bbbbbbbbbbbb"}, fh)
+        foreign = _repair_cli("attempt", "--red", shas[6], "--commit", shas[8], *W)
+        os.remove(EP)
+        foreign_restore = _repair_cli("restore", *W)
+        check("repair-binds-the-episode-to-its-campaign",
+              bound.returncode == 0 and " run=aaaaaaaaaaaa" in bound.stdout
+              and foreign.returncode == 1 and "belongs to campaign run aaaaaaaaaaaa, not bbbbbbbbbbbb" in foreign.stderr
+              and foreign_restore.returncode == 1 and "a journal from another campaign" in foreign_restore.stderr,
+              bound.stdout + foreign.stderr + foreign_restore.stderr)
+        os.remove(os.path.join(rtmp, "build", "claude-campaign-guard.json"))
         # D00 T04 §38: the journal carries the episode's identity, and a
         # restore refuses any caller or journal that would rebind it.
-        check("repair-attempt-lines-carry-the-identity",
-              f" repo=- branch={_repo_identity(rtmp)['branch']} workflow=plan-gates" in again2.stdout, again2.stdout)
         here_branch = _repo_identity(rtmp)["branch"]
-        subprocess.run(["git", "remote", "add", "origin", "https://example.invalid/here.git"], cwd=rtmp,
+        subprocess.run(["git", "remote", "set-url", "origin", "https://example.invalid/here.git"], cwd=rtmp,
                        capture_output=True, check=True)
 
         def _journal(name: str, *idents: tuple | None) -> str:
@@ -2298,7 +2563,6 @@ def _self_test() -> int:
                              f"{shas[3 + n][:12]}){tail}\n")
             return rel
         here = ("https://example.invalid/here.git", here_branch, "plan-gates")
-        os.remove(os.path.join(rtmp, "build", "claude-campaign-repair.json"))
         for label, rel, wf, want in (
                 ("cross-repository", _journal("j-repo", ("https://example.invalid/other.git", here_branch,
                                                           "plan-gates")), "plan-gates", "belongs to repository"),
@@ -2310,9 +2574,7 @@ def _self_test() -> int:
                 ("legacy", _journal("j-legacy", None), "plan-gates", "(a legacy journal)")):
             res = _repair_cli("restore", "--workflow", wf, "--run-file", rel)
             check(f"repair-restore-refuses-a-{label}-journal",
-                  res.returncode == 1 and want in res.stderr
-                  and not os.path.exists(os.path.join(rtmp, "build", "claude-campaign-repair.json")),
-                  res.stdout + res.stderr)
+                  res.returncode == 1 and want in res.stderr and not os.path.exists(EP), res.stdout + res.stderr)
         with open(os.path.join(rtmp, "docs", "j-samecommit.md"), "w", encoding="utf-8") as fh:
             for ident in (here, ("https://example.invalid/here.git", "release/9", "plan-gates")):
                 fh.write(f"repair: episode {shas[3][:12]} attempt 1 of 3 ({shas[4][:12]} repairs {shas[3][:12]}) "
@@ -2327,23 +2589,39 @@ def _self_test() -> int:
         # attempt line, and the credential-free form still matches.
         subprocess.run(["git", "remote", "set-url", "origin", "https://ci-bot:s3cr3t-t0ken@example.invalid/here.git"],
                        cwd=rtmp, capture_output=True, check=True)
-        cred = _repair_cli("attempt", "--red", shas[4], "--commit", shas[5], *W[:2], "--run-file", "docs/j-ok.md")
+        cred = _repair_cli("attempt", "--red", shas[4], "--commit", shas[5], "--workflow", "plan-gates",
+                           "--run-file", "docs/j-ok.md")
         check("repair-attempt-lines-carry-no-credentials",
               cred.returncode == 0 and "s3cr3t" not in cred.stdout + cred.stderr
               and " repo=https://example.invalid/here.git " in cred.stdout, cred.stdout + cred.stderr)
         # A run file wraps the line in backticks; the identity stops there.
-        os.remove(os.path.join(rtmp, "build", "claude-campaign-repair.json"))
+        os.remove(EP)
         with open(os.path.join(rtmp, "docs", "j-tick.md"), "w", encoding="utf-8") as fh:
-            fh.write(f"- attempt 1: `{cred.stdout.strip()}`\n")
+            fh.write(f"- attempt 1: `{cred.stdout.strip().split(' already counted')[0]}`\n")
         ticked = _repair_cli("restore", "--workflow", "plan-gates", "--run-file", "docs/j-tick.md")
         check("repair-restore-reads-a-backtick-wrapped-journal",
               ticked.returncode == 0 and "restored from docs/j-tick.md at 1 of 3 attempts" in ticked.stdout,
               ticked.stdout + ticked.stderr)
-        c1 = _repair_cli("ceiling", "--run-id", "777")
-        c2 = _repair_cli("ceiling", "--run-id", "777")
-        check("repair-ceiling-allows-one-re-run-per-run",
-              c1.returncode == 0 and c2.returncode == 1 and "already had its one re-run" in c2.stderr,
-              c1.stdout + c2.stderr)
+        # The ceiling allowance: one per repository, run, and attempt,
+        # journalled, its cache rebuilt when lost and refused when corrupt.
+        subprocess.run(["git", "remote", "set-url", "origin", "https://github.com/example/here.git"], cwd=rtmp,
+                       capture_output=True, check=True)
+        c1 = _repair_cli("ceiling", "--run-id", "777", *R)
+        c2 = _repair_cli("ceiling", "--run-id", "777", *R)
+        c3 = _repair_cli("ceiling", "--run-id", "777", "--attempt", "2", *R)
+        check("repair-ceiling-allows-one-re-run-per-run-attempt",
+              c1.returncode == 0 and "example/here#777@1" in c1.stdout and c2.returncode == 1
+              and "already had its one re-run" in c2.stderr and c3.returncode == 0 and "#777@2" in c3.stdout,
+              c1.stdout + c2.stderr + c3.stdout + c3.stderr)
+        os.remove(os.path.join(rtmp, "build", "claude-campaign-ceiling.json"))
+        c4 = _repair_cli("ceiling", "--run-id", "777", *R)
+        check("repair-ceiling-rebuilds-a-lost-record-from-the-journal",
+              c4.returncode == 1 and "restored 2 lost allowance record(s) from the journal" in c4.stderr, c4.stderr)
+        with open(os.path.join(rtmp, "build", "claude-campaign-ceiling.json"), "w", encoding="utf-8") as fh:
+            fh.write("{broken")
+        c5 = _repair_cli("ceiling", "--run-id", "778", *R)
+        check("repair-ceiling-escalates-a-corrupt-record",
+              c5.returncode == 1 and "ceiling record is unreadable; escalate" in c5.stderr, c5.stderr)
 
     # D00 T04 §34: the runner's contract routes through these commands.
     plan_skill = os.path.normpath(os.path.join(HERE, "..", ".claude", "skills", "process-plan", "SKILL.md"))
@@ -2452,7 +2730,8 @@ def main(argv: list[str]) -> int:
             rroot = ropts.pop("root", REPO)
             code, line = repair(rroot, argv[1], ropts.get("red", ""), ropts.get("commit", ""),
                                 ropts.get("green", ""), ropts.get("workflow", ""), ropts.get("run_file", ""),
-                                ropts.get("evidence", ""), ropts.get("run_id", ""))
+                                ropts.get("evidence", ""), ropts.get("run_id", ""), ropts.get("reason", ""),
+                                ropts.get("attempt", ""))
             print(line, file=sys.stdout if code == 0 else sys.stderr)
             return code
         opts = _opts(argv[1:])

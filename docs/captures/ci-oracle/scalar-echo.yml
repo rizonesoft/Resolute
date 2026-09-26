@@ -1,0 +1,66 @@
+name: scalar-echo
+
+# Disposable: the D00 T04 §35 scalar drill. Every step prints the script
+# file GitHub writes from its `run:` value (a custom shell `cat {0}`), so
+# the decoder's expected outputs come from GitHub, not from its author.
+# Lives only on the drill/d00-t04-s35 branch.
+on:
+  push:
+    branches: ['drill/**']
+
+jobs:
+  scalar-echo:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: plain
+        shell: cat {0}
+        run: python3 scripts/check.py --flag value
+      - name: plain with a comment
+        shell: cat {0}
+        run: make test # the comment is not part of the command
+      - name: single quoted
+        shell: cat {0}
+        run: 'echo ''it''''s'' && echo "#not a comment"'
+      - name: double quoted
+        shell: cat {0}
+        run: "printf '%s\\n' \"a\\tb\" café \\\\path \x41"
+      - name: literal clip
+        shell: cat {0}
+        run: |
+          first line
+            indented line
+          last line
+      - name: literal strip
+        shell: cat {0}
+        run: |-
+          alpha
+          beta
+      - name: literal keep
+        shell: cat {0}
+        run: |+
+          kept
+
+      - name: literal indentation indicator
+        shell: cat {0}
+        run: |2
+             three extra spaces
+            two extra spaces
+      - name: folded clip
+        shell: cat {0}
+        run: >
+          python3 scripts/long.py
+          --one --two
+
+          --after-a-blank
+      - name: folded more indented
+        shell: cat {0}
+        run: >-
+          folded start
+          continues here
+            kept as is
+            also kept
+          folds again
+          and joins
+      - run: |
+          echo unnamed step
+        shell: cat {0}

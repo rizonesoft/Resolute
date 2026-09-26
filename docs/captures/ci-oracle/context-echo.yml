@@ -1,0 +1,36 @@
+name: context-echo
+
+# Disposable: the D00 T04 §37 execution-context drill. Each step prints
+# its directory, its shell's errexit and pipefail, and its env as a child
+# process sees it, so the re-run printout is proven against GitHub.
+# Lives only on drill/d00-t04-s37.
+on:
+  push:
+    branches: ['drill/**']
+
+jobs:
+  context-echo:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: default shell
+        run: |
+          basename "$PWD"
+          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac
+          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi
+      - name: explicit bash
+        shell: bash
+        run: |
+          basename "$PWD"
+          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac
+          if shopt -qo pipefail; then echo pipefail; else echo nopipefail; fi
+      - name: env and directory
+        working-directory: drill/sub dir
+        env:
+          MODE: "two words"
+          QUOTE: it's
+        run: |
+          basename "$PWD"
+          echo "$MODE"
+          echo "$QUOTE"
+          bash -c 'echo "child: $MODE"'

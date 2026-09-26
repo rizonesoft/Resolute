@@ -1,0 +1,23 @@
+name: context-echo-sh
+
+# Disposable: the D00 T04 §37 sh-template drill. Lives only on
+# drill/d00-t04-s37-sh.
+on:
+  push:
+    branches: ['drill/**']
+
+jobs:
+  context-echo-sh:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: explicit sh
+        shell: sh
+        working-directory: drill/sub dir
+        env:
+          MODE: "two words"
+        run: |
+          basename "$PWD"
+          case $- in *e*) echo errexit ;; *) echo noerrexit ;; esac
+          echo "$MODE"
+          sh -c 'echo "child: $MODE"'

@@ -1,0 +1,120 @@
+scalar-echo	Set up job	﻿2026-09-25T18:45:36.4005175Z Current runner version: '2.337.0'
+scalar-echo	Set up job	2026-09-25T18:45:36.4033489Z ##[group]Runner Image Provisioner
+scalar-echo	Set up job	2026-09-25T18:45:36.4034495Z Hosted Compute Agent
+scalar-echo	Set up job	2026-09-25T18:45:36.4035160Z Version: 20260828.587
+scalar-echo	Set up job	2026-09-25T18:45:36.4035932Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+scalar-echo	Set up job	2026-09-25T18:45:36.4036698Z Build Date: 2026-08-28T16:44:25Z
+scalar-echo	Set up job	2026-09-25T18:45:36.4037835Z Worker ID: {ee574e89-c62e-4cb9-8ef0-ca0212236f99}
+scalar-echo	Set up job	2026-09-25T18:45:36.4038661Z Azure Region: westus3
+scalar-echo	Set up job	2026-09-25T18:45:36.4039324Z ##[endgroup]
+scalar-echo	Set up job	2026-09-25T18:45:36.4041070Z ##[group]Operating System
+scalar-echo	Set up job	2026-09-25T18:45:36.4041792Z Ubuntu
+scalar-echo	Set up job	2026-09-25T18:45:36.4042319Z 24.04.5
+scalar-echo	Set up job	2026-09-25T18:45:36.4042978Z LTS
+scalar-echo	Set up job	2026-09-25T18:45:36.4043515Z ##[endgroup]
+scalar-echo	Set up job	2026-09-25T18:45:36.4044177Z ##[group]Runner Image
+scalar-echo	Set up job	2026-09-25T18:45:36.4044829Z Image: ubuntu-24.04
+scalar-echo	Set up job	2026-09-25T18:45:36.4045394Z Version: 20260920.314.1
+scalar-echo	Set up job	2026-09-25T18:45:36.4046574Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+scalar-echo	Set up job	2026-09-25T18:45:36.4048845Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+scalar-echo	Set up job	2026-09-25T18:45:36.4049884Z ##[endgroup]
+scalar-echo	Set up job	2026-09-25T18:45:36.4053385Z ##[group]GITHUB_TOKEN Permissions
+scalar-echo	Set up job	2026-09-25T18:45:36.4055990Z Actions: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4056693Z ArtifactMetadata: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4057823Z Attestations: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4058476Z Checks: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4059150Z CodeQuality: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4059776Z Contents: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4060343Z CopilotRequests: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4061020Z Deployments: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4061593Z Discussions: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4062230Z Drives: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4062848Z Issues: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4063392Z Metadata: read
+scalar-echo	Set up job	2026-09-25T18:45:36.4064132Z Models: read
+scalar-echo	Set up job	2026-09-25T18:45:36.4064699Z Packages: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4065330Z Pages: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4065933Z PullRequests: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4066554Z RepositoryProjects: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4067427Z SecurityEvents: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4068045Z Statuses: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4068634Z VulnerabilityAlerts: read
+scalar-echo	Set up job	2026-09-25T18:45:36.4069332Z ##[endgroup]
+scalar-echo	Set up job	2026-09-25T18:45:36.4071484Z Secret source: Actions
+scalar-echo	Set up job	2026-09-25T18:45:36.4072560Z Cache mode: write
+scalar-echo	Set up job	2026-09-25T18:45:36.4073302Z Prepare workflow directory
+scalar-echo	Set up job	2026-09-25T18:45:36.4425291Z Prepare all required actions
+scalar-echo	Set up job	2026-09-25T18:45:36.4553742Z Complete job name: scalar-echo
+scalar-echo	plain	﻿2026-09-25T18:45:36.5399385Z ##[group]Run python3 scripts/check.py --flag value
+scalar-echo	plain	2026-09-25T18:45:36.5400583Z ^[[36;1mpython3 scripts/check.py --flag value^[[0m
+scalar-echo	plain	2026-09-25T18:45:36.5754842Z shell: /usr/bin/cat {0}
+scalar-echo	plain	2026-09-25T18:45:36.5756604Z ##[endgroup]
+scalar-echo	plain	2026-09-25T18:45:36.6165296Z python3 scripts/check.py --flag value
+scalar-echo	plain with a comment	﻿2026-09-25T18:45:36.6339624Z ##[group]Run make test
+scalar-echo	plain with a comment	2026-09-25T18:45:36.6340503Z ^[[36;1mmake test^[[0m
+scalar-echo	plain with a comment	2026-09-25T18:45:36.6373907Z shell: /usr/bin/cat {0}
+scalar-echo	plain with a comment	2026-09-25T18:45:36.6374757Z ##[endgroup]
+scalar-echo	plain with a comment	2026-09-25T18:45:36.6437325Z make test
+scalar-echo	single quoted	﻿2026-09-25T18:45:36.6500335Z ##[group]Run echo 'it''s' && echo "#not a comment"
+scalar-echo	single quoted	2026-09-25T18:45:36.6501519Z ^[[36;1mecho 'it''s' && echo "#not a comment"^[[0m
+scalar-echo	single quoted	2026-09-25T18:45:36.6533986Z shell: /usr/bin/cat {0}
+scalar-echo	single quoted	2026-09-25T18:45:36.6534806Z ##[endgroup]
+scalar-echo	single quoted	2026-09-25T18:45:36.6591344Z echo 'it''s' && echo "#not a comment"
+scalar-echo	double quoted	﻿2026-09-25T18:45:36.6651787Z ##[group]Run printf '%s\n' "a\tb" café \\path A
+scalar-echo	double quoted	2026-09-25T18:45:36.6652968Z ^[[36;1mprintf '%s\n' "a\tb" café \\path A^[[0m
+scalar-echo	double quoted	2026-09-25T18:45:36.6684749Z shell: /usr/bin/cat {0}
+scalar-echo	double quoted	2026-09-25T18:45:36.6685584Z ##[endgroup]
+scalar-echo	double quoted	2026-09-25T18:45:36.6860914Z printf '%s\n' "a\tb" café \\path A
+scalar-echo	literal clip	﻿2026-09-25T18:45:36.6901302Z ##[group]Run first line
+scalar-echo	literal clip	2026-09-25T18:45:36.6901872Z ^[[36;1mfirst line^[[0m
+scalar-echo	literal clip	2026-09-25T18:45:36.6902351Z ^[[36;1m  indented line^[[0m
+scalar-echo	literal clip	2026-09-25T18:45:36.6902845Z ^[[36;1mlast line^[[0m
+scalar-echo	literal clip	2026-09-25T18:45:36.6925350Z shell: /usr/bin/cat {0}
+scalar-echo	literal clip	2026-09-25T18:45:36.6925860Z ##[endgroup]
+scalar-echo	literal clip	2026-09-25T18:45:36.6967528Z first line
+scalar-echo	literal clip	2026-09-25T18:45:36.6968324Z   indented line
+scalar-echo	literal clip	2026-09-25T18:45:36.6969311Z last line
+scalar-echo	literal strip	﻿2026-09-25T18:45:36.7008566Z ##[group]Run alpha
+scalar-echo	literal strip	2026-09-25T18:45:36.7009100Z ^[[36;1malpha^[[0m
+scalar-echo	literal strip	2026-09-25T18:45:36.7009553Z ^[[36;1mbeta^[[0m
+scalar-echo	literal strip	2026-09-25T18:45:36.7031248Z shell: /usr/bin/cat {0}
+scalar-echo	literal strip	2026-09-25T18:45:36.7031758Z ##[endgroup]
+scalar-echo	literal strip	2026-09-25T18:45:36.7071620Z alpha
+scalar-echo	literal strip	2026-09-25T18:45:36.7072371Z beta
+scalar-echo	literal keep	﻿2026-09-25T18:45:36.7110303Z ##[group]Run kept
+scalar-echo	literal keep	2026-09-25T18:45:36.7110808Z ^[[36;1mkept^[[0m
+scalar-echo	literal keep	2026-09-25T18:45:36.7132595Z shell: /usr/bin/cat {0}
+scalar-echo	literal keep	2026-09-25T18:45:36.7133092Z ##[endgroup]
+scalar-echo	literal keep	2026-09-25T18:45:36.7172805Z kept
+scalar-echo	literal keep	2026-09-25T18:45:36.7173219Z 
+scalar-echo	literal indentation indicator	﻿2026-09-25T18:45:36.7212091Z ##[group]Run three extra spaces
+scalar-echo	literal indentation indicator	2026-09-25T18:45:36.7212687Z ^[[36;1m   three extra spaces^[[0m
+scalar-echo	literal indentation indicator	2026-09-25T18:45:36.7213202Z ^[[36;1m  two extra spaces^[[0m
+scalar-echo	literal indentation indicator	2026-09-25T18:45:36.7235152Z shell: /usr/bin/cat {0}
+scalar-echo	literal indentation indicator	2026-09-25T18:45:36.7235649Z ##[endgroup]
+scalar-echo	literal indentation indicator	2026-09-25T18:45:36.7275821Z    three extra spaces
+scalar-echo	literal indentation indicator	2026-09-25T18:45:36.7276720Z   two extra spaces
+scalar-echo	folded clip	﻿2026-09-25T18:45:36.7316105Z ##[group]Run python3 scripts/long.py --one --two
+scalar-echo	folded clip	2026-09-25T18:45:36.7316882Z ^[[36;1mpython3 scripts/long.py --one --two^[[0m
+scalar-echo	folded clip	2026-09-25T18:45:36.7317852Z ^[[36;1m--after-a-blank^[[0m
+scalar-echo	folded clip	2026-09-25T18:45:36.7339410Z shell: /usr/bin/cat {0}
+scalar-echo	folded clip	2026-09-25T18:45:36.7339915Z ##[endgroup]
+scalar-echo	folded clip	2026-09-25T18:45:36.7379963Z python3 scripts/long.py --one --two
+scalar-echo	folded clip	2026-09-25T18:45:36.7381124Z --after-a-blank
+scalar-echo	folded more indented	﻿2026-09-25T18:45:36.7420567Z ##[group]Run folded start continues here
+scalar-echo	folded more indented	2026-09-25T18:45:36.7421241Z ^[[36;1mfolded start continues here^[[0m
+scalar-echo	folded more indented	2026-09-25T18:45:36.7421801Z ^[[36;1m  kept as is^[[0m
+scalar-echo	folded more indented	2026-09-25T18:45:36.7422279Z ^[[36;1m  also kept^[[0m
+scalar-echo	folded more indented	2026-09-25T18:45:36.7422774Z ^[[36;1mfolds again and joins^[[0m
+scalar-echo	folded more indented	2026-09-25T18:45:36.7444497Z shell: /usr/bin/cat {0}
+scalar-echo	folded more indented	2026-09-25T18:45:36.7445002Z ##[endgroup]
+scalar-echo	folded more indented	2026-09-25T18:45:36.7484591Z folded start continues here
+scalar-echo	folded more indented	2026-09-25T18:45:36.7485655Z   kept as is
+scalar-echo	folded more indented	2026-09-25T18:45:36.7486406Z   also kept
+scalar-echo	folded more indented	2026-09-25T18:45:36.7487333Z folds again and joins
+scalar-echo	Run echo unnamed step	﻿2026-09-25T18:45:36.7575396Z ##[group]Run echo unnamed step
+scalar-echo	Run echo unnamed step	2026-09-25T18:45:36.7576008Z ^[[36;1mecho unnamed step^[[0m
+scalar-echo	Run echo unnamed step	2026-09-25T18:45:36.7598814Z shell: /usr/bin/cat {0}
+scalar-echo	Run echo unnamed step	2026-09-25T18:45:36.7599339Z ##[endgroup]
+scalar-echo	Run echo unnamed step	2026-09-25T18:45:36.7639656Z echo unnamed step
+scalar-echo	Complete job	﻿2026-09-25T18:45:36.7728197Z Cleaning up orphan processes

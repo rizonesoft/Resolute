@@ -1,0 +1,278 @@
+context-echo-win	Set up job	﻿2026-09-26T02:20:05.3454954Z Current runner version: '2.337.0'
+context-echo-win	Set up job	2026-09-26T02:20:05.5952528Z ##[group]Runner Image Provisioner
+context-echo-win	Set up job	2026-09-26T02:20:05.5953490Z Hosted Compute Agent
+context-echo-win	Set up job	2026-09-26T02:20:05.5954178Z Version: 20260828.587
+context-echo-win	Set up job	2026-09-26T02:20:05.5954872Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+context-echo-win	Set up job	2026-09-26T02:20:05.5955638Z Build Date: 2026-08-28T16:44:25Z
+context-echo-win	Set up job	2026-09-26T02:20:05.5956428Z Worker ID: {5d498cf8-0a62-4175-8ff0-992fa19b335e}
+context-echo-win	Set up job	2026-09-26T02:20:05.5957184Z Azure Region: eastus
+context-echo-win	Set up job	2026-09-26T02:20:05.5958289Z ##[endgroup]
+context-echo-win	Set up job	2026-09-26T02:20:05.5959921Z ##[group]Operating System
+context-echo-win	Set up job	2026-09-26T02:20:05.5960644Z Microsoft Windows Server 2025
+context-echo-win	Set up job	2026-09-26T02:20:05.5961351Z 10.0.26100
+context-echo-win	Set up job	2026-09-26T02:20:05.5961964Z Datacenter
+context-echo-win	Set up job	2026-09-26T02:20:05.5962535Z ##[endgroup]
+context-echo-win	Set up job	2026-09-26T02:20:05.5963131Z ##[group]Runner Image
+context-echo-win	Set up job	2026-09-26T02:20:05.5963764Z Image: windows-2025-vs2026
+context-echo-win	Set up job	2026-09-26T02:20:05.5964453Z Version: 20260922.246.2
+context-echo-win	Set up job	2026-09-26T02:20:05.5965651Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260922.246/images/windows/Windows2025-VS2026-Readme.md
+context-echo-win	Set up job	2026-09-26T02:20:05.5967692Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260922.246
+context-echo-win	Set up job	2026-09-26T02:20:05.5968748Z ##[endgroup]
+context-echo-win	Set up job	2026-09-26T02:20:05.5972014Z ##[group]GITHUB_TOKEN Permissions
+context-echo-win	Set up job	2026-09-26T02:20:05.5974425Z Actions: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5975165Z ArtifactMetadata: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5975824Z Attestations: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5976428Z Checks: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5977055Z CodeQuality: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5977633Z Contents: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5978731Z CopilotRequests: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5979397Z Deployments: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5980003Z Discussions: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5980610Z Drives: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5981181Z Issues: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5981764Z Metadata: read
+context-echo-win	Set up job	2026-09-26T02:20:05.5982396Z Models: read
+context-echo-win	Set up job	2026-09-26T02:20:05.5982998Z Packages: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5983585Z Pages: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5984191Z PullRequests: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5984815Z RepositoryProjects: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5985464Z SecurityEvents: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5986057Z Statuses: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5986666Z VulnerabilityAlerts: read
+context-echo-win	Set up job	2026-09-26T02:20:05.5987323Z ##[endgroup]
+context-echo-win	Set up job	2026-09-26T02:20:05.5989542Z Secret source: Actions
+context-echo-win	Set up job	2026-09-26T02:20:05.5990600Z Cache mode: write
+context-echo-win	Set up job	2026-09-26T02:20:05.5991494Z Prepare workflow directory
+context-echo-win	Set up job	2026-09-26T02:20:05.6324095Z Prepare all required actions
+context-echo-win	Set up job	2026-09-26T02:20:05.6371937Z Getting action download info
+context-echo-win	Set up job	2026-09-26T02:20:05.7707310Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+context-echo-win	Set up job	2026-09-26T02:20:07.5407662Z Complete job name: context-echo-win
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-26T02:20:10.2014100Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2014967Z with:
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2015182Z   repository: rizonesoft/Resolute
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2017577Z   token: ***
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2017798Z   ssh-strict: true
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2018001Z   ssh-user: git
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2018215Z   persist-credentials: true
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2018444Z   clean: true
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2018658Z   sparse-checkout-cone-mode: true
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2018902Z   fetch-depth: 1
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2019096Z   fetch-tags: false
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2019295Z   show-progress: true
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2019499Z   lfs: false
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2019675Z   submodules: false
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2019889Z   set-safe-directory: true
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2020126Z   allow-unsafe-pr-checkout: false
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.2020558Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.8193237Z Syncing repository: rizonesoft/Resolute
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.8194563Z ##[group]Getting Git version info
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.8194978Z Working directory is 'D:\a\Resolute\Resolute'
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:10.9058354Z [command]"C:\Program Files\Git\bin\git.exe" version
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9314951Z git version 2.55.0.windows.5
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9366136Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9383398Z Temporarily overriding HOME='D:\a\_temp\9559fba8-85e9-4878-b7e9-13f8723a57fb' before making global git config changes
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9384174Z Adding repository directory to the temporary git global config as a safe directory
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9393578Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Resolute\Resolute
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9688236Z Deleting the contents of 'D:\a\Resolute\Resolute'
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9693167Z ##[group]Determining repository object format
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9695388Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9695857Z ##[group]Initializing the repository
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:13.9703800Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\Resolute\Resolute
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.0480901Z Initialized empty Git repository in D:/a/Resolute/Resolute/.git/
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.0536030Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/rizonesoft/Resolute
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.0853067Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.0853795Z ##[group]Disabling automatic garbage collection
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.0861674Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.1162474Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.1163175Z ##[group]Setting up auth
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.1163724Z Removing SSH command configuration
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.1175162Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:14.1466004Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:15.6019933Z Removing HTTP extra header
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:15.6030149Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:15.6331185Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.1536093Z Removing includeIf entries pointing to credentials config files
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.1546849Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.1839069Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.7330551Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.7634071Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Resolute/Resolute/.git.path D:\a\_temp\git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.7925894Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path D:\a\_temp\git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.8238355Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.8535566Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.8828204Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.8828637Z ##[group]Fetching the repository
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:16.8841432Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +cda21b8df09d2a3e8f630b83877e807eb3fc948a:refs/remotes/origin/drill/d00-t04-s39-win
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5186696Z From https://github.com/rizonesoft/Resolute
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5187675Z  * [new ref]         cda21b8df09d2a3e8f630b83877e807eb3fc948a -> origin/drill/d00-t04-s39-win
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5241878Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/drill/d00-t04-s39-win
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5545478Z   origin/drill/d00-t04-s39-win
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5589557Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/drill/d00-t04-s39-win
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5875575Z cda21b8df09d2a3e8f630b83877e807eb3fc948a
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5906482Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5907169Z ##[group]Determining the checkout info
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5908992Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.5919521Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.6287995Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.6607045Z ##[group]Checking out the ref
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:20.6623975Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B drill/d00-t04-s39-win refs/remotes/origin/drill/d00-t04-s39-win
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:21.7514105Z Updating files:  27% (2290/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:21.7789372Z Updating files:  28% (2314/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.2607195Z Updating files:  29% (2396/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.2906400Z Updating files:  30% (2479/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.3152442Z Updating files:  31% (2562/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.3385844Z Updating files:  32% (2644/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.3740985Z Updating files:  33% (2727/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.5923167Z Updating files:  34% (2810/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.6148672Z Updating files:  35% (2892/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:22.9202693Z Updating files:  36% (2975/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.0211919Z Updating files:  36% (3021/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.0412936Z Updating files:  37% (3057/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.0628108Z Updating files:  38% (3140/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.0887600Z Updating files:  39% (3223/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.1268622Z Updating files:  40% (3305/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.1543551Z Updating files:  41% (3388/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.1777259Z Updating files:  42% (3471/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.2161454Z Updating files:  43% (3553/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.2770692Z Updating files:  44% (3636/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.2946580Z Updating files:  45% (3718/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.3111472Z Updating files:  46% (3801/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.3272718Z Updating files:  47% (3884/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.3436835Z Updating files:  48% (3966/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.4033318Z Updating files:  49% (4049/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.4346383Z Updating files:  50% (4131/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.4534986Z Updating files:  51% (4214/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.4700395Z Updating files:  52% (4297/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.4864578Z Updating files:  53% (4379/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.5025200Z Updating files:  54% (4462/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.5378342Z Updating files:  55% (4545/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.6182155Z Updating files:  56% (4627/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.6357424Z Updating files:  57% (4710/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.6524517Z Updating files:  58% (4792/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.6702652Z Updating files:  59% (4875/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.6888150Z Updating files:  60% (4958/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.7174972Z Updating files:  61% (5040/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.7182948Z Updating files:  61% (5121/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.7611656Z Updating files:  62% (5123/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.7992566Z Updating files:  63% (5206/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.8946505Z Updating files:  64% (5288/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.9260433Z Updating files:  65% (5371/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.9488115Z Updating files:  66% (5453/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.9718116Z Updating files:  67% (5536/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:23.9915116Z Updating files:  68% (5619/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.0312016Z Updating files:  69% (5701/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.0501452Z Updating files:  70% (5784/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.0775951Z Updating files:  71% (5867/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.0944098Z Updating files:  72% (5949/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.1167607Z Updating files:  73% (6032/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.1366668Z Updating files:  74% (6114/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.1565152Z Updating files:  75% (6197/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.1779935Z Updating files:  76% (6280/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.4011243Z Updating files:  77% (6362/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.4260743Z Updating files:  78% (6445/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.7842972Z Updating files:  79% (6527/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.9430204Z Updating files:  79% (6591/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.9656731Z Updating files:  80% (6610/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:24.9878836Z Updating files:  81% (6693/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.0092190Z Updating files:  82% (6775/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.0407970Z Updating files:  83% (6858/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.2784126Z Updating files:  84% (6941/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.3006410Z Updating files:  85% (7023/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.7489077Z Updating files:  86% (7106/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.8178706Z Updating files:  86% (7157/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.8402178Z Updating files:  87% (7188/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.8637119Z Updating files:  88% (7271/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.8866635Z Updating files:  89% (7354/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:25.9196123Z Updating files:  90% (7436/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.1964813Z Updating files:  91% (7519/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.2165460Z Updating files:  92% (7602/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.2410244Z Updating files:  93% (7684/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.2771682Z Updating files:  94% (7767/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.2977004Z Updating files:  95% (7849/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.3143288Z Updating files:  96% (7932/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.3375463Z Updating files:  97% (8015/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.3662505Z Updating files:  98% (8097/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.3949979Z Updating files:  99% (8180/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.3950546Z Updating files: 100% (8262/8262)
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.3951052Z Updating files: 100% (8262/8262), done.
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.4235835Z Switched to a new branch 'drill/d00-t04-s39-win'
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.4262556Z branch 'drill/d00-t04-s39-win' set up to track 'origin/drill/d00-t04-s39-win'.
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.4498380Z ##[endgroup]
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.4897348Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+context-echo-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:26.5197620Z cda21b8df09d2a3e8f630b83877e807eb3fc948a
+context-echo-win	default shell	﻿2026-09-26T02:20:26.5647753Z ##[group]Run (Get-Item -LiteralPath .).Name
+context-echo-win	default shell	2026-09-26T02:20:26.5648427Z ^[[36;1m(Get-Item -LiteralPath .).Name^[[0m
+context-echo-win	default shell	2026-09-26T02:20:26.5648804Z ^[[36;1m"$ErrorActionPreference"^[[0m
+context-echo-win	default shell	2026-09-26T02:20:26.5649140Z ^[[36;1m$PSVersionTable.PSEdition^[[0m
+context-echo-win	default shell	2026-09-26T02:20:26.5769737Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+context-echo-win	default shell	2026-09-26T02:20:26.5770176Z ##[endgroup]
+context-echo-win	default shell	2026-09-26T02:20:27.0554623Z Resolute
+context-echo-win	default shell	2026-09-26T02:20:27.0564138Z Stop
+context-echo-win	default shell	2026-09-26T02:20:27.0653183Z Core
+context-echo-win	explicit powershell	﻿2026-09-26T02:20:27.1329580Z ##[group]Run (Get-Item -LiteralPath .).Name
+context-echo-win	explicit powershell	2026-09-26T02:20:27.1330061Z ^[[36;1m(Get-Item -LiteralPath .).Name^[[0m
+context-echo-win	explicit powershell	2026-09-26T02:20:27.1330355Z ^[[36;1m"$ErrorActionPreference"^[[0m
+context-echo-win	explicit powershell	2026-09-26T02:20:27.1330630Z ^[[36;1m$PSVersionTable.PSEdition^[[0m
+context-echo-win	explicit powershell	2026-09-26T02:20:27.1457719Z shell: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.EXE -command ". '{0}'"
+context-echo-win	explicit powershell	2026-09-26T02:20:27.1458489Z ##[endgroup]
+context-echo-win	explicit powershell	2026-09-26T02:20:29.4278123Z Resolute
+context-echo-win	explicit powershell	2026-09-26T02:20:29.4289358Z Stop
+context-echo-win	explicit powershell	2026-09-26T02:20:29.4403438Z Desktop
+context-echo-win	pwsh env and directory	﻿2026-09-26T02:20:29.4973117Z ##[group]Run (Get-Item -LiteralPath .).Name
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.4973561Z ^[[36;1m(Get-Item -LiteralPath .).Name^[[0m
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.4973844Z ^[[36;1m$env:MODE^[[0m
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.4974042Z ^[[36;1m$env:QUOTE^[[0m
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.4974492Z ^[[36;1mpwsh -NoProfile -Command 'Write-Output "child: $env:MODE"'^[[0m
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.5042315Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.5042674Z env:
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.5043038Z   MODE: two words
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.5043232Z   QUOTE: it's
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.5043415Z ##[endgroup]
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.8697837Z sub dir
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.8703755Z two words
+context-echo-win	pwsh env and directory	2026-09-26T02:20:29.8709534Z it's
+context-echo-win	pwsh env and directory	2026-09-26T02:20:30.2368292Z child: two words
+context-echo-win	cmd env and directory	﻿2026-09-26T02:20:30.3602552Z ##[group]Run @echo off
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3603367Z ^[[36;1m@echo off^[[0m
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3603758Z ^[[36;1mfor %%I in (.) do echo %%~nxI^[[0m
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3604188Z ^[[36;1mecho %MODE%^[[0m
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3604540Z ^[[36;1mcmd /c echo child: %MODE%^[[0m
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3647364Z shell: C:\Windows\system32\cmd.EXE /D /E:ON /V:OFF /S /C "CALL "{0}""
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3647973Z env:
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3648247Z   MODE: two words
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3648564Z ##[endgroup]
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3831739Z sub dir
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3835015Z two words
+context-echo-win	cmd env and directory	2026-09-26T02:20:30.3905009Z child: two words
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-26T02:20:30.4177458Z Post job cleanup.
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.6894666Z [command]"C:\Program Files\Git\bin\git.exe" version
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.7297561Z git version 2.55.0.windows.5
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.7361877Z Temporarily overriding HOME='D:\a\_temp\3470c636-f94c-4760-8c1d-0ef3f1e67a43' before making global git config changes
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.7364499Z Adding repository directory to the temporary git global config as a safe directory
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.7376227Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Resolute\Resolute
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.7737947Z Removing SSH command configuration
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.7751642Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:30.8219821Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:31.4866726Z Removing HTTP extra header
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:31.4880036Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:31.5293383Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.1879620Z Removing includeIf entries pointing to credentials config files
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.1892089Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.2241506Z includeif.gitdir:D:/a/Resolute/Resolute/.git.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.2242463Z includeif.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.2243360Z includeif.gitdir:/github/workspace/.git.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.2244265Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.2293819Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Resolute/Resolute/.git.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.2600806Z D:\a\_temp\git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.2665393Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Resolute/Resolute/.git.path D\:\\a\\_temp\\git\-credentials\-e9e1d936\-8a86\-4e52\-91bc\-9c9741680738\.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.3085051Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.3445698Z D:\a\_temp\git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.3497148Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-e9e1d936\-8a86\-4e52\-91bc\-9c9741680738\.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.3901029Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.4166300Z /github/runner_temp/git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.4213735Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-e9e1d936\-8a86\-4e52\-91bc\-9c9741680738\.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.4540084Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.4987608Z /github/runner_temp/git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.5083055Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-e9e1d936\-8a86\-4e52\-91bc\-9c9741680738\.config
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:32.5401605Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+context-echo-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T02:20:33.1657792Z Removing credentials config 'D:\a\_temp\git-credentials-e9e1d936-8a86-4e52-91bc-9c9741680738.config'
+context-echo-win	Complete job	﻿2026-09-26T02:20:33.1891338Z Cleaning up orphan processes

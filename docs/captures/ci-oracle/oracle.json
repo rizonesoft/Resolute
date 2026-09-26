@@ -1,0 +1,28 @@
+{
+ "drills": [
+  {
+   "kind": "scalar",
+   "workflow": "scalar-echo.yml",
+   "run": 36175449390,
+   "section": "D00 T04 \u00a735"
+  },
+  {
+   "kind": "context",
+   "workflow": "context-echo.yml",
+   "run": 36191008012,
+   "section": "D00 T04 \u00a737"
+  },
+  {
+   "kind": "context",
+   "workflow": "context-echo-sh.yml",
+   "run": 36194988672,
+   "section": "D00 T04 \u00a737"
+  },
+  {
+   "kind": "context",
+   "workflow": "context-echo-win.yml",
+   "run": 36211341983,
+   "section": "D00 T04 \u00a739"
+  }
+ ]
+}

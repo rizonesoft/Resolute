@@ -1,0 +1,235 @@
+context-echo-sh	Set up job	﻿2026-09-25T22:05:46.9834675Z Current runner version: '2.337.0'
+context-echo-sh	Set up job	2026-09-25T22:05:46.9875320Z ##[group]Runner Image Provisioner
+context-echo-sh	Set up job	2026-09-25T22:05:46.9876814Z Hosted Compute Agent
+context-echo-sh	Set up job	2026-09-25T22:05:46.9877852Z Version: 20260828.587
+context-echo-sh	Set up job	2026-09-25T22:05:46.9879135Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+context-echo-sh	Set up job	2026-09-25T22:05:46.9880503Z Build Date: 2026-08-28T16:44:25Z
+context-echo-sh	Set up job	2026-09-25T22:05:46.9881791Z Worker ID: {8c5525e0-50a9-466a-9c87-18cefc3cbeeb}
+context-echo-sh	Set up job	2026-09-25T22:05:46.9883469Z Azure Region: eastus2
+context-echo-sh	Set up job	2026-09-25T22:05:46.9884645Z ##[endgroup]
+context-echo-sh	Set up job	2026-09-25T22:05:46.9887620Z ##[group]Operating System
+context-echo-sh	Set up job	2026-09-25T22:05:46.9888703Z Ubuntu
+context-echo-sh	Set up job	2026-09-25T22:05:46.9889688Z 24.04.5
+context-echo-sh	Set up job	2026-09-25T22:05:46.9891070Z LTS
+context-echo-sh	Set up job	2026-09-25T22:05:46.9892158Z ##[endgroup]
+context-echo-sh	Set up job	2026-09-25T22:05:46.9893395Z ##[group]Runner Image
+context-echo-sh	Set up job	2026-09-25T22:05:46.9894636Z Image: ubuntu-24.04
+context-echo-sh	Set up job	2026-09-25T22:05:46.9895606Z Version: 20260920.314.1
+context-echo-sh	Set up job	2026-09-25T22:05:46.9897633Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+context-echo-sh	Set up job	2026-09-25T22:05:46.9900742Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+context-echo-sh	Set up job	2026-09-25T22:05:46.9902633Z ##[endgroup]
+context-echo-sh	Set up job	2026-09-25T22:05:46.9908647Z ##[group]GITHUB_TOKEN Permissions
+context-echo-sh	Set up job	2026-09-25T22:05:46.9912204Z Actions: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9913736Z ArtifactMetadata: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9914908Z Attestations: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9915948Z Checks: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9917078Z CodeQuality: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9918157Z Contents: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9919416Z CopilotRequests: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9920467Z Deployments: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9921416Z Discussions: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9922482Z Drives: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9923666Z Issues: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9924758Z Metadata: read
+context-echo-sh	Set up job	2026-09-25T22:05:46.9925854Z Models: read
+context-echo-sh	Set up job	2026-09-25T22:05:46.9926737Z Packages: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9927846Z Pages: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9928745Z PullRequests: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9929973Z RepositoryProjects: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9931070Z SecurityEvents: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9932206Z Statuses: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9933395Z VulnerabilityAlerts: read
+context-echo-sh	Set up job	2026-09-25T22:05:46.9934537Z ##[endgroup]
+context-echo-sh	Set up job	2026-09-25T22:05:46.9937881Z Secret source: Actions
+context-echo-sh	Set up job	2026-09-25T22:05:46.9939643Z Cache mode: write
+context-echo-sh	Set up job	2026-09-25T22:05:46.9941270Z Prepare workflow directory
+context-echo-sh	Set up job	2026-09-25T22:05:47.0439414Z Prepare all required actions
+context-echo-sh	Set up job	2026-09-25T22:05:47.0515704Z Getting action download info
+context-echo-sh	Set up job	2026-09-25T22:05:47.2164477Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+context-echo-sh	Set up job	2026-09-25T22:05:47.4066447Z Complete job name: context-echo-sh
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-25T22:05:47.5018013Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5019123Z with:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5019586Z   repository: rizonesoft/Resolute
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5023832Z   token: ***
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5024287Z   ssh-strict: true
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5024725Z   ssh-user: git
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5025199Z   persist-credentials: true
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5025686Z   clean: true
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5026125Z   sparse-checkout-cone-mode: true
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5026647Z   fetch-depth: 1
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5027216Z   fetch-tags: false
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5027907Z   show-progress: true
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5028590Z   lfs: false
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5029191Z   submodules: false
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5029653Z   set-safe-directory: true
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5030163Z   allow-unsafe-pr-checkout: false
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5031099Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6054490Z Syncing repository: rizonesoft/Resolute
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6056638Z ##[group]Getting Git version info
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6057492Z Working directory is '/home/runner/work/Resolute/Resolute'
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6058565Z [command]/usr/bin/git version
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6171939Z git version 2.55.0
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6200991Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6209520Z Temporarily overriding HOME='/home/runner/work/_temp/9ece41ca-8c76-42c8-8b85-f9a8a8123894' before making global git config changes
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6212494Z Adding repository directory to the temporary git global config as a safe directory
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6214982Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Resolute/Resolute
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6269061Z Deleting the contents of '/home/runner/work/Resolute/Resolute'
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6272418Z ##[group]Determining repository object format
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6274137Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6275572Z ##[group]Initializing the repository
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6278344Z [command]/usr/bin/git init /home/runner/work/Resolute/Resolute
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6439910Z hint: Using 'master' as the name for the initial branch. This default branch name
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6442268Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6444369Z hint: to use in all of your new repositories, which will suppress this warning,
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6445928Z hint: call:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6447043Z hint:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6448107Z hint: 	git config --global init.defaultBranch <name>
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6449334Z hint:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6450679Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6453036Z hint: 'development'. The just-created branch can be renamed via this command:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6455373Z hint:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6456852Z hint: 	git branch -m <name>
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6458295Z hint:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6459996Z hint: Disable this message with "git config set advice.defaultBranchName false"
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6463983Z Initialized empty Git repository in /home/runner/work/Resolute/Resolute/.git/
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6468680Z [command]/usr/bin/git remote add origin https://github.com/rizonesoft/Resolute
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6521102Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6522425Z ##[group]Disabling automatic garbage collection
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6526239Z [command]/usr/bin/git config --local gc.auto 0
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6565112Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6566359Z ##[group]Setting up auth
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6567380Z Removing SSH command configuration
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6572836Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.6612385Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7027510Z Removing HTTP extra header
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7033694Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7071238Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7335495Z Removing includeIf entries pointing to credentials config files
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7337189Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7347997Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7617352Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7660324Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Resolute/Resolute/.git.path /home/runner/work/_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7696942Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Resolute/Resolute/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7736413Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7772182Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7803862Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7805281Z ##[group]Fetching the repository
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.7811516Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +dceea66a0888b25cae02ff0ec6cb57b3cd2938d9:refs/remotes/origin/drill/d00-t04-s37-sh
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7163962Z From https://github.com/rizonesoft/Resolute
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7165703Z  * [new ref]         dceea66a0888b25cae02ff0ec6cb57b3cd2938d9 -> origin/drill/d00-t04-s37-sh
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7167609Z [command]/usr/bin/git branch --list --remote origin/drill/d00-t04-s37-sh
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7198650Z   origin/drill/d00-t04-s37-sh
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7206947Z [command]/usr/bin/git rev-parse refs/remotes/origin/drill/d00-t04-s37-sh
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7234274Z dceea66a0888b25cae02ff0ec6cb57b3cd2938d9
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7238845Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7239413Z ##[group]Determining the checkout info
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7240203Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7244455Z [command]/usr/bin/git sparse-checkout disable
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7301084Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7345487Z ##[group]Checking out the ref
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:50.7349915Z [command]/usr/bin/git checkout --progress --force -B drill/d00-t04-s37-sh refs/remotes/origin/drill/d00-t04-s37-sh
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.7590669Z Updating files:  49% (4071/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.7692497Z Updating files:  50% (4129/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.7722088Z Updating files:  51% (4212/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.7752482Z Updating files:  52% (4295/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.7784075Z Updating files:  53% (4377/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.7812694Z Updating files:  54% (4460/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.7924565Z Updating files:  55% (4542/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8102819Z Updating files:  56% (4625/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8129676Z Updating files:  57% (4708/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8159552Z Updating files:  58% (4790/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8188638Z Updating files:  59% (4873/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8218107Z Updating files:  60% (4955/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8274624Z Updating files:  61% (5038/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8387508Z Updating files:  62% (5120/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8487576Z Updating files:  63% (5203/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8688458Z Updating files:  64% (5286/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8759313Z Updating files:  65% (5368/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8793408Z Updating files:  66% (5451/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8830528Z Updating files:  67% (5533/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.8860459Z Updating files:  68% (5616/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9007737Z Updating files:  69% (5699/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9063866Z Updating files:  70% (5781/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9119149Z Updating files:  71% (5864/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9147209Z Updating files:  72% (5946/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9189122Z Updating files:  73% (6029/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9228853Z Updating files:  74% (6111/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9269897Z Updating files:  75% (6194/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:51.9312922Z Updating files:  76% (6277/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.0193768Z Updating files:  77% (6359/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.0277242Z Updating files:  78% (6442/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.2914153Z Updating files:  79% (6524/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.2967035Z Updating files:  80% (6607/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.3011133Z Updating files:  81% (6689/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.3054337Z Updating files:  82% (6772/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.3153879Z Updating files:  83% (6855/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.4021312Z Updating files:  84% (6937/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.4064584Z Updating files:  85% (7020/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.6685539Z Updating files:  86% (7102/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.6734167Z Updating files:  87% (7185/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.6775562Z Updating files:  88% (7268/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.6823896Z Updating files:  89% (7350/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.6925025Z Updating files:  90% (7433/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8189457Z Updating files:  91% (7515/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8356235Z Updating files:  91% (7572/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8398510Z Updating files:  92% (7598/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8465387Z Updating files:  93% (7680/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8572741Z Updating files:  94% (7763/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8605909Z Updating files:  95% (7846/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8633602Z Updating files:  96% (7928/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8678228Z Updating files:  97% (8011/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8778494Z Updating files:  98% (8093/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8865801Z Updating files:  99% (8176/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8866505Z Updating files: 100% (8258/8258)
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8866961Z Updating files: 100% (8258/8258), done.
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8963692Z Switched to a new branch 'drill/d00-t04-s37-sh'
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.8970260Z branch 'drill/d00-t04-s37-sh' set up to track 'origin/drill/d00-t04-s37-sh'.
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.9006862Z ##[endgroup]
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.9054640Z [command]/usr/bin/git log -1 --format=%H
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:52.9082687Z dceea66a0888b25cae02ff0ec6cb57b3cd2938d9
+context-echo-sh	explicit sh	﻿2026-09-25T22:05:52.9307410Z ##[group]Run basename "$PWD"
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9307761Z ^[[36;1mbasename "$PWD"^[[0m
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9308100Z ^[[36;1mcase $- in *e*) echo errexit ;; *) echo noerrexit ;; esac^[[0m
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9308449Z ^[[36;1mecho "$MODE"^[[0m
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9308685Z ^[[36;1msh -c 'echo "child: $MODE"'^[[0m
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9339109Z shell: /usr/bin/sh -e {0}
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9339372Z env:
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9339560Z   MODE: two words
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9339761Z ##[endgroup]
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9406014Z sub dir
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9407854Z errexit
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9408211Z two words
+context-echo-sh	explicit sh	2026-09-25T22:05:52.9414044Z child: two words
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-25T22:05:52.9538958Z Post job cleanup.
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0456694Z [command]/usr/bin/git version
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0502564Z git version 2.55.0
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0550428Z Temporarily overriding HOME='/home/runner/work/_temp/42ba139f-9cd1-4e28-8388-9533d91c5a03' before making global git config changes
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0551839Z Adding repository directory to the temporary git global config as a safe directory
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0557029Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Resolute/Resolute
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0592907Z Removing SSH command configuration
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0600930Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0640866Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0910979Z Removing HTTP extra header
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0918622Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.0960159Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1222735Z Removing includeIf entries pointing to credentials config files
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1231212Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1265085Z includeif.gitdir:/home/runner/work/Resolute/Resolute/.git.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1266108Z includeif.gitdir:/home/runner/work/Resolute/Resolute/.git/worktrees/*.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1267080Z includeif.gitdir:/github/workspace/.git.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1267896Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1273958Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Resolute/Resolute/.git.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1325085Z /home/runner/work/_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1331288Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Resolute/Resolute/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-0162b808\-928c\-4090\-87e7\-e0b75980dd11\.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1379025Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Resolute/Resolute/.git/worktrees/*.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1411600Z /home/runner/work/_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1421937Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Resolute/Resolute/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-0162b808\-928c\-4090\-87e7\-e0b75980dd11\.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1474359Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1500600Z /github/runner_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1509222Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-0162b808\-928c\-4090\-87e7\-e0b75980dd11\.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1554474Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1573313Z /github/runner_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1581433Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-0162b808\-928c\-4090\-87e7\-e0b75980dd11\.config
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1621302Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+context-echo-sh	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:53.1854564Z Removing credentials config '/home/runner/work/_temp/git-credentials-0162b808-928c-4090-87e7-e0b75980dd11.config'
+context-echo-sh	Complete job	﻿2026-09-25T22:05:53.2001916Z Cleaning up orphan processes
