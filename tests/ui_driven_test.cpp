@@ -263,6 +263,35 @@ TEST_CASE("A control torn down mid-animation leaves no callback behind", "[ui][d
     }
     CHECK(probeRuns == 0);
 
+    // An animation that ticked earlier in the frame is still dropped when a
+    // later callback cancels its owner: it never runs on a later frame.
+    int earlyRuns = 0;
+    int earlyOwner = 0;
+    mgr.AnimateFor(&earlyOwner, 0.0f, 1.0f, 2000.0f, rui::ease::Linear,
+                   [&](float, const rui::Animation&) { ++earlyRuns; });
+    mgr.Animate(0.0f, 1.0f, 10.0f, rui::ease::Linear,
+                [&](float, const rui::Animation&) { mgr.CancelOwner(&earlyOwner); });
+    {
+        INFO("transition: an earlier owner cancelled later in the frame");
+        REQUIRE(PumpUntil(Settled));
+    }
+    CHECK(earlyRuns == 1);
+
+    // An owner torn down by its animation's own final update never sees
+    // that animation's completion.
+    int completeRuns = 0;
+    int selfOwner = 0;
+    mgr.AnimateFor(&selfOwner, 0.0f, 1.0f, 10.0f, rui::ease::Linear,
+                   [&](float v, const rui::Animation&) {
+                       if (v >= 1.0f) mgr.CancelOwner(&selfOwner);
+                   },
+                   [&] { ++completeRuns; });
+    {
+        INFO("transition: an owner cancelled by its own final update");
+        REQUIRE(PumpUntil(Settled));
+    }
+    CHECK(completeRuns == 0);
+
     // A callback that starts a new animation mid-frame is safe, and the new
     // one runs to completion after the frame.
     bool followUpDone = false;

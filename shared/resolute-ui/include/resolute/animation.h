@@ -96,13 +96,16 @@ struct RESUI_API Animation {
     std::function<void(float, const Animation&)> onUpdate;
     std::function<void()> onComplete;
 
-    // Advance by dt milliseconds, returns true if still active
-    bool Tick(float dt) {
+    // Advance the clock by dt milliseconds without running a callback;
+    // true once the delay has elapsed and `current` holds a new value.
+    // The manager runs the callbacks itself, checking for cancellation
+    // between the update and the completion (D00 T02 §7).
+    bool Step(float dt) {
         if (finished) return false;
         elapsed += dt;
 
         // Handle delay
-        if (elapsed < delay) return true;
+        if (elapsed < delay) return false;
         started = true;
 
         float t = (elapsed - delay) / duration;
@@ -114,6 +117,13 @@ struct RESUI_API Animation {
         progress = t;
         float easedT = easing(t);
         current = from + (to - from) * easedT;
+        return true;
+    }
+
+    // Advance by dt milliseconds, returns true if still active
+    bool Tick(float dt) {
+        if (finished) return false;
+        if (!Step(dt)) return true;
 
         if (onUpdate) onUpdate(current, *this);
         if (finished && onComplete) onComplete();

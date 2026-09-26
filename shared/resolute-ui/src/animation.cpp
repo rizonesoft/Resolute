@@ -53,10 +53,26 @@ void AnimationManager::OnTick() {
     kept.reserve(ticking.size());
     for (auto& anim : ticking) {
         if (Dropped(anim)) continue;
-        if (anim.Tick(dt) && !Dropped(anim)) kept.push_back(std::move(anim));
+        if (anim.Step(dt)) {
+            if (anim.onUpdate) anim.onUpdate(anim.current, anim);
+            // The update may have torn its own owner down: its completion
+            // must not run against it (independent review of D00 T02 §7).
+            if (Dropped(anim)) continue;
+            if (anim.finished) {
+                if (anim.onComplete) anim.onComplete();
+                continue;
+            }
+        }
+        kept.push_back(std::move(anim));
     }
     m_ticking = false;
 
+    // A callback later in the frame may have cancelled an animation that
+    // already ticked and was kept: filter against the frame's final
+    // cancellations before they are cleared (independent review).
+    kept.erase(std::remove_if(kept.begin(), kept.end(),
+                              [this](const Animation& a) { return Dropped(a); }),
+               kept.end());
     for (auto& added : m_animations) kept.push_back(std::move(added));
     m_animations.swap(kept);
     m_cancelledIds.clear();
