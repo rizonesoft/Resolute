@@ -100,7 +100,7 @@ TEST_CASE("Every referenced icon name resolves to SVG and to a bitmap", "[ui][ic
 
 TEST_CASE("Every icon-shaped literal in the sources is in the manifest", "[ui][icons]") {
     // The other direction (panel round 1 of the D00 T02 §8 review): every
-    // quoted kebab-case literal in the scoped sources is listed for its file,
+    // single-token literal in the scoped sources is listed for its file,
     // either as an icon referrer or as a declared non-icon, so a new or
     // misspelled icon reference fails here by name.
     std::map<std::string, std::set<std::string>> listed;  // literal -> files
@@ -113,7 +113,12 @@ TEST_CASE("Every icon-shaped literal in the sources is in the manifest", "[ui][i
     for (const auto& ext : fs::directory_iterator(root / "extensions"))
         if (fs::is_directory(ext.path() / "src")) dirs.push_back(ext.path() / "src");
 
-    const std::regex literal(R"re("([a-z][a-z0-9]*(?:-[a-z0-9]+)*)")re");
+    // Any single-token narrow literal, whatever its case or separator, so a
+    // malformed name ("chevron-Up", "chevron_up") is caught as well as a
+    // misspelled one (panel round 2 of the D00 T02 §8 review). The character
+    // before the quote must not be part of an identifier, which skips the
+    // wide and UTF prefixes (L"", u"", U"", u8"") icon names never use.
+    const std::regex literal(R"re((?:^|[^A-Za-z0-9_])"([A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*)")re");
     int scanned = 0;
     for (const auto& dir : dirs) {
         for (const auto& f : fs::recursive_directory_iterator(dir)) {

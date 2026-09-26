@@ -12,8 +12,9 @@
 #   the launcher          src/main.cpp names no icon itself; it reaches icons
 #                         only through the shared controls listed here
 #   the tool descriptors  extensions/RegStudio draws no Lucide icon
-# The case scans those same sources both ways: every quoted kebab-case
-# literal in shared/resolute-ui/include, shared/resolute-ui/src, src, and
+# The case scans those same sources both ways: every single-token narrow
+# literal (letters, digits, `-`, `_`, any case) in shared/resolute-ui/include,
+# shared/resolute-ui/src, src, and
 # extensions/*/src must be listed for its file, either as an icon referrer
 # here or as a declared non-icon line starting with `!` below.
 # An unlisted literal fails by name, so a new or misspelled icon reference
@@ -77,3 +78,17 @@ check	shared/resolute-ui/src/controls/statusbar.cpp
 !version	src/main.cpp
 # width: an SVG attribute
 !width	shared/resolute-ui/src/render.cpp
+# LucideCreateHBitmap: an entry point GetProcAddress resolves
+!LucideCreateHBitmap	shared/resolute-ui/src/icons.cpp
+# LucideFree: an entry point GetProcAddress resolves
+!LucideFree	shared/resolute-ui/src/icons.cpp
+# LucideGetIconCount: an entry point GetProcAddress resolves
+!LucideGetIconCount	shared/resolute-ui/src/icons.cpp
+# LucideGetIconName: an entry point GetProcAddress resolves
+!LucideGetIconName	shared/resolute-ui/src/icons.cpp
+# LucideGetSvgData: an entry point GetProcAddress resolves
+!LucideGetSvgData	shared/resolute-ui/src/icons.cpp
+# LucideRenderIcon: an entry point GetProcAddress resolves
+!LucideRenderIcon	shared/resolute-ui/src/icons.cpp
+# currentColor: the SVG colour keyword the renderer replaces
+!currentColor	shared/resolute-ui/src/render.cpp
