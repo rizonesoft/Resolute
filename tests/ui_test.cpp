@@ -310,14 +310,24 @@ TEST_CASE("A catalog icon renders and exposes its SVG", "[ui][icons]") {
         DeleteObject(bmp);
 }
 
-TEST_CASE("Unknown icon names resolve to null, never crash", "[ui][icons]") {
+TEST_CASE("Unknown icon names draw the fallback, never crash", "[ui][icons]") {
+    // Corrected by D00 T02 §9: the draw calls resolve an unknown or null name
+    // to the fallback glyph instead of returning null, and the SVG lookup
+    // stays strict.
     REQUIRE(rui::LucideIcons::Load());
     CHECK(rui::LucideIcons::GetSvgData("no-such-icon-xyz") == nullptr);
     CHECK(rui::LucideIcons::GetSvgData(nullptr) == nullptr);
-    CHECK(rui::LucideIcons::Render("no-such-icon-xyz", 16, 0xFFFFFFu) == nullptr);
-    CHECK(rui::LucideIcons::Render(nullptr, 16, 0xFFFFFFu) == nullptr);
+    for (const char* name : {"no-such-icon-xyz", static_cast<const char*>(nullptr)}) {
+        uint8_t* px = rui::LucideIcons::Render(name, 16, 0xFFFFFFu);
+        CHECK(px != nullptr);
+        rui::LucideIcons::Free(px);
+    }
     CHECK(rui::LucideIcons::Render(rui::LucideIcons::GetName(0), 0, 0xFFFFFFu) == nullptr);
-    CHECK(rui::LucideIcons::CreateBitmap("no-such-icon-xyz", 16, 0xFFFFFFu) == nullptr);
+    HBITMAP bmp = rui::LucideIcons::CreateBitmap("no-such-icon-xyz", 16, 0xFFFFFFu);
+    CHECK(bmp != nullptr);
+    if (bmp)
+        DeleteObject(bmp);
+    rui::LucideIcons::ClearUnknownNames();
 }
 
 // ── Controls: ListView ────────────────────────────────────────────────

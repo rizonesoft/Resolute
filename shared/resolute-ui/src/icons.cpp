@@ -66,28 +66,27 @@ std::set<std::string>& UnknownSet() {
 void NoteUnknown(const char* name) {
     const std::string shown = name ? name : "(null)";
     if (UnknownSet().insert(shown).second) {
-        const std::string line = "ResoluteUI: unknown icon \"" + shown + "\"; drawing the fallback glyph\n";
+        const std::string line = "ResoluteUI: unknown icon \"" + shown + "\"\n";
         OutputDebugStringA(line.c_str());
     }
 }
 }  // namespace
 
-// Each public entry point records a name that does not resolve, so a
-// computed or malformed name passed straight to it is logged and reported
-// by UnknownNames like one passed through Resolve; the entry points still
-// return null for it (D00 T02 §9, panel round 1 of its review).
+// The two draw calls resolve their name, so a computed or malformed name
+// passed straight to them draws the fallback glyph and is reported like one
+// passed through Resolve. GetSvgData stays a strict lookup: it returns null
+// for an unknown name, which the icon manifest relies on, and reports it
+// (D00 T02 §9, panel rounds 1 and 2 of its review).
 uint8_t* LucideIcons::Render(const char* name, int size, uint32_t color) {
-    uint8_t* px = s_render ? s_render(name, size, color) : nullptr;
-    if (!px && name && size > 0 && !(s_getSvg && s_getSvg(name))) NoteUnknown(name);
-    return px;
+    if (!s_render || size <= 0) return nullptr;
+    return s_render(Resolve(name), size, color);
 }
 
 void LucideIcons::Free(void* ptr) { if (s_free) s_free(ptr); }
 
 HBITMAP LucideIcons::CreateBitmap(const char* name, int size, uint32_t color) {
-    HBITMAP bmp = s_createBmp ? static_cast<HBITMAP>(s_createBmp(name, size, color)) : nullptr;
-    if (!bmp && name && !(s_getSvg && s_getSvg(name))) NoteUnknown(name);
-    return bmp;
+    if (!s_createBmp || size <= 0) return nullptr;
+    return static_cast<HBITMAP>(s_createBmp(Resolve(name), size, color));
 }
 
 const char* LucideIcons::GetSvgData(const char* name) {

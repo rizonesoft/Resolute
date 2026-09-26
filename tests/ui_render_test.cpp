@@ -35,6 +35,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -491,14 +492,24 @@ TEST_CASE("An overflowed toolbar offers every hidden command", "[ui][render]") {
 }
 
 TEST_CASE("A name passed straight to the icon API is reported too", "[ui][render]") {
-    // The public entry points still return null for an unknown name, and
-    // now also record it, so no path around Resolve is silent (panel round 1
-    // of the D00 T02 §9 review).
+    // The draw calls draw the fallback glyph for an unknown name, pixel for
+    // pixel, and the strict SVG lookup returns null; all three record the
+    // name, so no path around Resolve is silent or blank (panel rounds 1 and
+    // 2 of the D00 T02 §9 review).
     REQUIRE(rui::LucideIcons::Load());
     rui::LucideIcons::ClearUnknownNames();
     CHECK(rui::LucideIcons::GetSvgData("chevron up") == nullptr);
-    CHECK(rui::LucideIcons::Render("chevron__up", 16, 0xFFFFFFu) == nullptr);
-    CHECK(rui::LucideIcons::CreateBitmap("Chevron-Up", 16, 0xFFFFFFu) == nullptr);
+    uint8_t* bad = rui::LucideIcons::Render("chevron__up", 16, 0xFFFFFFu);
+    uint8_t* fallback = rui::LucideIcons::Render(rui::LucideIcons::kFallbackIcon, 16, 0xFFFFFFu);
+    REQUIRE(bad != nullptr);
+    REQUIRE(fallback != nullptr);
+    CHECK(std::memcmp(bad, fallback, 16 * 16 * 4) == 0);
+    rui::LucideIcons::Free(bad);
+    rui::LucideIcons::Free(fallback);
+    HBITMAP bmp = rui::LucideIcons::CreateBitmap("Chevron-Up", 16, 0xFFFFFFu);
+    CHECK(bmp != nullptr);
+    if (bmp)
+        DeleteObject(bmp);
     CHECK(rui::LucideIcons::UnknownNames() == std::vector<std::string>{"Chevron-Up", "chevron up", "chevron__up"});
     rui::LucideIcons::ClearUnknownNames();
 }

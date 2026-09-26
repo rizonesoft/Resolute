@@ -14,6 +14,10 @@ public:
     static bool Load();
     static int GetCount();
     static const char* GetName(int idx);
+    // Render and CreateBitmap draw Resolve(name), so an unknown name draws
+    // the fallback glyph; null only when the size is not positive or the
+    // library is not loaded. GetSvgData is a strict lookup and returns null
+    // for an unknown name. All three report an unknown name (D00 T02 §9).
     static uint8_t* Render(const char* name, int size, uint32_t color);
     static void Free(void* ptr);
     static HBITMAP CreateBitmap(const char* name, int size, uint32_t color);
