@@ -2013,7 +2013,7 @@ _ANY_SECRET_KEY = re.compile(
 # normalized first (`\r\n` and a lone `\r` read as `\n`), so a malformed
 # input never hides a line break from the rules. GitHub's own `***` masks
 # pass through untouched.
-_HEREDOC = re.compile(r"<<-?~?[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+_HEREDOC = re.compile(r"<<(-?)~?[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
 
 
 def _open_quote(value: str, q: str) -> bool:
@@ -2027,7 +2027,9 @@ def _multiline_opener(value: str) -> tuple[str, object] | None:
     """(kind, end) of the multiline value `value` opens (rule 4), or None."""
     m = _HEREDOC.search(value)
     if m:
-        return "heredoc", m.group(2)
+        # `<<WORD` ends only at a line that is exactly WORD; `<<-WORD` also
+        # allows leading tabs (panel round 1 of the D00 T04 §41 review).
+        return "heredoc", (m.group(3), m.group(1) == "-")
     v = value.rstrip()
     if v.endswith(('@"', "@'")):
         return "herestring", v[-1] + "@"
@@ -2079,7 +2081,7 @@ def _redact_blocks(text: str) -> str:
                 if block is not None and "\t".join(nxt.split("\t", 2)[:2]) != block:
                     break
                 body = nxt[len(ncols):]
-                if kind == "heredoc" and body.strip() == end:
+                if kind == "heredoc" and (body.lstrip("\t") if end[1] else body).rstrip("\r") == end[0]:
                     break
                 if kind == "herestring" and body.lstrip().startswith(end):
                     break
@@ -7232,10 +7234,20 @@ def _self_test() -> int:
                         same_exit = str(got_f.returncode) == _gh_fail[1]
                     else:
                         same_exit = got_f.returncode != 0 and not loc_out and not gh_lines
-                    message = next((m for m in ("drill boom", "drill soft") if any(m in e for e in loc_err)), None)
+                    # GitHub's lines past the local stdout are the error
+                    # record: each drill message there must be in the local
+                    # error, an error record must carry one, and a step with
+                    # none fails locally with no error either (panel round 1
+                    # of the D00 T04 §41 review).
+                    gh_extra = gh_lines[len(loc_out):]
+                    messages = [m for m in ("drill boom", "drill soft") if any(m in g for g in gh_extra)]
+                    if _gh_fail and _gh_fail[0] == "exit":
+                        same_error = (all(any(m in e for e in loc_err) for m in messages)
+                                      and (bool(messages) == bool(gh_extra)) and (bool(gh_extra) == bool(loc_err)))
+                    else:
+                        same_error = bool(loc_err)
                     check(f"failure-drill-fails-the-same-way-locally: {step['name']}",
-                          same_exit and gh_lines[:len(loc_out)] == loc_out
-                          and (message is None or any(message in g for g in gh_lines[len(loc_out):])),
+                          same_exit and same_error and gh_lines[:len(loc_out)] == loc_out,
                           f"exit {got_f.returncode} vs {_gh_fail}; out {loc_out} vs {gh_lines[:6]}; err {loc_err[:2]}")
             win = "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        shell: python\n        run: make\n"
             check("rerun-refuses-an-unproven-shell-template",
@@ -7705,6 +7717,8 @@ def _self_test() -> int:
                     ("an open bracket", "token: [abc,\n s3cr3tline,\n]\nmode: fast", "s3cr3tline", "mode: fast"),
                     ("an unterminated here-document", "API_TOKEN=$(cat <<EOF\ns3cr3tline\nmore\nand more",
                      "and more", "API_TOKEN="),
+                    ("a space-indented heredoc terminator", "API_TOKEN=$(cat <<EOF" + chr(10) + " EOF" + chr(10)
+                     + "s3cr3tline" + chr(10) + "EOF" + chr(10) + ")" + chr(10) + "next", "s3cr3tline", "next"),
                     ("an unterminated quote in a log stops at its step",
                      "j\ts\tT1 password: \"abc\nj\ts\tT2 s3cr3tline\nj\tt\tT3 next step", "s3cr3tline", "next step"),
                     ("carriage-return line ends", "password: |\r  s3cr3tline\r\nmode: fast", "s3cr3tline", "mode: fast"),

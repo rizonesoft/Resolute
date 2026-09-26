@@ -1920,6 +1920,16 @@ def _repair(root: str, action: str, red: str, commit: str, green: str, workflow:
             if _git(root, "merge-base", "--is-ancestor", last, silent)[0] != 0:
                 raise GuardError(f"the silent push {silent[:12]} does not descend from the last attempt {last[:12]}; "
                                  f"it cannot retire this episode")
+            # Panel round 1 of the D00 T04 §41 review: the path must name
+            # the episode's workflow, proven at the range's base (where it
+            # still ran), so a made-up path never reads as "no workflow".
+            shown_base = subprocess.run(["git", "show", f"{base}:{wf_path}"], cwd=root, capture_output=True)
+            base_text = shown_base.stdout.decode("utf-8", errors="replace") if shown_base.returncode == 0 else ""
+            base_name = re.search(r"(?m)^name:[ \t]*['\"]?([^'\"#\n]+?)['\"]?[ \t]*(?:#.*)?$", base_text)
+            stem = os.path.splitext(os.path.basename(wf_path))[0]
+            if not base_text or not ((base_name and base_name.group(1).strip() == wf) or stem == wf):
+                raise GuardError(f"{wf_path} at {base[:12]} is not the episode's workflow {wf}: the NOT GREEN line "
+                                 f"cannot retire the episode")
             # D00 T04 §41: the line is not trusted for exclusion; the
             # committed workflow at the silent push is re-read with the same
             # reader ci-wait uses.
@@ -1970,13 +1980,46 @@ def _ceiling(root: str, run_id: str, attempt: str, run_file: str, campaign: str)
         seen, note = {}, ""
     except (OSError, ValueError):
         raise GuardError("the ceiling record is unreadable; escalate rather than wait again")
+    # Panel round 1 of the D00 T04 §41 review: ceiling lines replay as
+    # strictly as the episode's. A prose line and the receipt written with
+    # it must agree, a key is used once, every use belongs to this campaign,
+    # and a cached campaign must be the journal's.
     journalled: dict[str, str] = {}
-    for ln in _journal_lines(_journal_text(root, run_file)):
+    rows = _journal_lines(_journal_text(root, run_file))
+    k = 0
+    while k < len(rows):
+        ln = rows[k]
+        use = None
         if ln.startswith("repair: ceiling "):
             m = _CEILING_LINE.match(ln)
             if not m:
                 raise GuardError(f"{run_file} holds a ceiling line that does not parse ({ln[:80]!r}): escalate")
-            journalled[m.group(1)] = m.group(2)
+            use = (m.group(1), m.group(2))
+            if k + 1 < len(rows) and rows[k + 1].startswith("repair-receipt: "):
+                rc = _parse_receipt(rows[k + 1])
+                if rc is not None and rc["event"] == "ceiling":
+                    if (rc["key"], rc["campaign"]) != use:
+                        raise GuardError(f"{run_file}: a ceiling line and its receipt disagree (an edited journal): "
+                                         f"escalate")
+                    k += 1
+        elif ln.startswith("repair-receipt: "):
+            rc = _parse_receipt(ln)
+            if rc is not None and rc["event"] == "ceiling":
+                use = (rc["key"], rc["campaign"])
+        k += 1
+        if use is None:
+            continue
+        if use[0] in journalled:
+            raise GuardError(f"{run_file} records the ceiling allowance for {use[0]} twice (a duplicate line): "
+                             f"escalate")
+        if use[1] != campaign:
+            raise GuardError(f"{run_file} records a ceiling allowance under campaign run {use[1]}, not {campaign}: "
+                             f"a journal from another campaign; escalate")
+        journalled[use[0]] = use[1]
+    for key_s, v in seen.items():
+        if isinstance(v, dict) and key_s in journalled and v.get("campaign") != journalled[key_s]:
+            raise GuardError(f"the ceiling record binds {key_s} to campaign run {v.get('campaign')}, but the journal "
+                             f"to {journalled[key_s]}: escalate")
     gone = sorted(k for k, v in seen.items() if isinstance(v, dict) and v.get("run_file") == run_file
                   and k not in journalled)
     if gone:
@@ -3451,7 +3494,7 @@ def _self_test() -> int:
             fh.write("build/\n")
         wf_file = os.path.join(rtmp, ".github", "workflows", "plan.yml")
         with open(wf_file, "w", encoding="utf-8") as fh:
-            fh.write("on: push\njobs: {}\n")
+            fh.write("name: plan-gates\non: push\njobs: {}\n")
         shas = []
         for n in range(10):
             with open(os.path.join(rtmp, "f.txt"), "w", encoding="utf-8") as fh:
@@ -3459,7 +3502,7 @@ def _self_test() -> int:
             if n == 9:
                 # The retirement commit: the workflow stops triggering on push.
                 with open(wf_file, "w", encoding="utf-8") as fh:
-                    fh.write("on: [workflow_dispatch]\njobs: {}\n")
+                    fh.write("name: plan-gates\non: [workflow_dispatch]\njobs: {}\n")
             subprocess.run(["git", "add", "-A"], cwd=rtmp, capture_output=True, check=True)
             subprocess.run(["git", "commit", "-qm", f"c{n}"], cwd=rtmp, capture_output=True, check=True)
             shas.append(subprocess.run(["git", "rev-parse", "HEAD"], cwd=rtmp, capture_output=True,
@@ -3694,9 +3737,12 @@ def _self_test() -> int:
               and off_branch.returncode == 1 and "names branch release/9" in off_branch.stderr
               and os.path.exists(EP), unrelated.stderr + off_range.stderr + off_branch.stderr)
         fabricated = _repair_cli("retire", *W, "--evidence", _nogreen(shas[8], shas[7], shas[8]))
+        made_up = _repair_cli("retire", *W, "--evidence", _nogreen(shas[9], shas[7], shas[9]).replace(
+            "workflow-path=.github/workflows/plan.yml", "workflow-path=.github/workflows/nowhere.yml"))
         check("repair-retire-re-derives-the-exclusion",
-              fabricated.returncode == 1 and "does not exclude this push" in fabricated.stderr and os.path.exists(EP),
-              fabricated.stderr)
+              fabricated.returncode == 1 and "does not exclude this push" in fabricated.stderr
+              and made_up.returncode == 1 and "is not the episode's workflow plan-gates" in made_up.stderr
+              and os.path.exists(EP), fabricated.stderr + made_up.stderr)
         wrong = _repair_cli("retire", *W, "--evidence", ev)
         retired = _repair_cli("retire", *W, "--evidence", _nogreen(shas[9], shas[7], shas[9]))
         check("repair-retire-ends-an-episode-only-on-an-authorized-no-run",
@@ -3883,6 +3929,22 @@ def _self_test() -> int:
             fh.write(with_ceiling)
         check("repair-ceiling-refuses-a-truncated-journal",
               c_trunc.returncode == 1 and "a changed or truncated journal" in c_trunc.stderr, c_trunc.stderr)
+        # Panel round 1: ceiling lines replay strictly.
+        for label, extra, want in (
+                ("a duplicate use", "repair: ceiling allowance used for example/here#777@1 run=aaaaaaaaaaaa\n",
+                 "twice (a duplicate line)"),
+                ("another campaign's use", "repair: ceiling allowance used for example/here#780@1 run=cccccccccccc\n",
+                 "a journal from another campaign"),
+                ("a receipt that disagrees", "repair: ceiling allowance used for example/here#781@1 run=aaaaaaaaaaaa\n"
+                 'repair-receipt: {"v":1,"event":"ceiling","campaign":"aaaaaaaaaaaa","key":"example/here#782@1"}\n',
+                 "its receipt disagree")):
+            with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
+                fh.write(extra)
+            c_bad = _repair_cli("ceiling", "--run-id", "799", *R)
+            with open(os.path.join(rtmp, runf), "w", encoding="utf-8") as fh:
+                fh.write(with_ceiling)
+            check(f"repair-ceiling-replays-strictly: {label}", c_bad.returncode == 1 and want in c_bad.stderr,
+                  c_bad.stderr)
         _campaign("")
         c_nocamp = _repair_cli("ceiling", "--run-id", "779", *R)
         _campaign("aaaaaaaaaaaa")
