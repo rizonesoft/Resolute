@@ -1,0 +1,77 @@
+{
+ "databaseId": 36227133366,
+ "headSha": "c0e423e630a75c7e068ebbc5f48a491decb16468",
+ "headBranch": "drill/d00-t04-s41-win",
+ "event": "push",
+ "conclusion": "success",
+ "attempt": 1,
+ "workflowName": "failure-win",
+ "jobs": [
+  {
+   "name": "failure-win",
+   "conclusion": "success",
+   "steps": [
+    {
+     "number": 1,
+     "name": "Set up job",
+     "conclusion": "success"
+    },
+    {
+     "number": 2,
+     "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+     "conclusion": "success"
+    },
+    {
+     "number": 3,
+     "name": "native failure then output",
+     "conclusion": "success"
+    },
+    {
+     "number": 4,
+     "name": "native failure last",
+     "conclusion": "success"
+    },
+    {
+     "number": 5,
+     "name": "pwsh exception",
+     "conclusion": "success"
+    },
+    {
+     "number": 6,
+     "name": "pwsh non-terminating error",
+     "conclusion": "success"
+    },
+    {
+     "number": 7,
+     "name": "powershell exception",
+     "conclusion": "success"
+    },
+    {
+     "number": 8,
+     "name": "cmd expansion characters",
+     "conclusion": "success"
+    },
+    {
+     "number": 9,
+     "name": "cmd failure mid-script",
+     "conclusion": "success"
+    },
+    {
+     "number": 10,
+     "name": "missing working directory",
+     "conclusion": "success"
+    },
+    {
+     "number": 20,
+     "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+     "conclusion": "success"
+    },
+    {
+     "number": 21,
+     "name": "Complete job",
+     "conclusion": "success"
+    }
+   ]
+  }
+ ]
+}

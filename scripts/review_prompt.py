@@ -1240,8 +1240,11 @@ def _list_scalar(item: str) -> str:
     """One list item decoded as YAML does: a single-quoted item with its
     doubled quote, a double-quoted one with every escape the step decoder
     knows (panel round 2 of the D00 T04 §39 review), else the plain text.
-    An escape the decoder refuses raises ScalarRefused."""
+    An escape the decoder refuses, or a block scalar item, raises
+    ScalarRefused (D00 T04 §41)."""
     item = item.strip()
+    if item.startswith(("|", ">")):
+        raise ScalarRefused("a block scalar list item")
     if len(item) >= 2 and item[0] == item[-1] == "'":
         return item[1:-1].replace("''", "'")
     if len(item) >= 2 and item[0] == item[-1] == '"':
@@ -1266,7 +1269,8 @@ def _push_trigger_filter(text: str | None) -> dict | None:
     if not text:
         return None
     nocomment = lambda v: re.sub(r"(?:\A|\s+)#.*\Z", "", v).strip()
-    plain = {"branches": None, "branches-ignore": None, "paths": None, "paths-ignore": None}
+    plain = {"branches": None, "branches-ignore": None, "paths": None, "paths-ignore": None, "tags": None,
+             "tags-ignore": None}
     lines = text.splitlines()
     top = _entries(lines, _first_col(lines) or 0)
     on = next((e for e in top if e[0] in ("on", "true")), None)
@@ -1295,27 +1299,79 @@ def _push_trigger_filter(text: str | None) -> dict | None:
     for k, v, c, _i in (_entries(pc, pcol) if pcol is not None else []):
         if k in filt:
             filt[k] = _flow_list(v, c)
+        elif k not in ("types",):
+            # A push key this reader does not model refuses rather than
+            # being ignored (D00 T04 §41).
+            return {"unknown": f"a push key the reader does not model ({k})"}
     return filt
+
+
+def _filter_admits(patterns: list[str], value: str) -> bool:
+    """GitHub's filter order (D00 T04 §41): patterns are read top to
+    bottom, a plain pattern includes and a `!` pattern excludes, and the
+    last pattern that matches decides; a value no pattern matches is not
+    admitted."""
+    admitted = False
+    for pat in patterns:
+        neg = pat.startswith("!")
+        if _glob_regex(pat[1:] if neg else pat).match(value):
+            admitted = not neg
+    return admitted
 
 
 def push_excluded(filt: dict | None, branch: str, changed: list[str]) -> tuple[bool, str]:
     """(excluded, why) for a push of `changed` paths to `branch` under a
-    workflow's push filter: GitHub runs the workflow only when every
-    present filter admits the push."""
+    workflow's push filter: GitHub runs the workflow only when the branch
+    filter and the path filter both admit the push (D00 T04 §39, §41)."""
     if filt is None:
         return True, "the workflow no longer triggers on push"
     if "unknown" in filt:
         return False, f"the new triggers use a shape the reader does not decode ({filt['unknown']}), so exclusion is unproven"
-    if filt["branches"] is not None and not any(_glob_regex(g).match(branch) for g in filt["branches"]):
+    if any(isinstance(v, list) and any(x.startswith(("|", ">")) for x in v) for v in filt.values()):
+        return False, "a filter holds a block scalar the reader does not decode, so exclusion is unproven"
+    # The matcher models `*`, `**`, and a leading `!`; GitHub's `?`, `+`,
+    # and character classes, or a `!` elsewhere, refuse (D00 T04 §41).
+    odd = [x for v in filt.values() if isinstance(v, list) for x in v if re.search(r"[?+\[\]]|.!", x)]
+    if odd:
+        return False, f"a filter pattern uses syntax the matcher does not model ({odd[0]}), so exclusion is unproven"
+    if (filt["tags"] is not None or filt["tags-ignore"] is not None) and filt["branches"] is None \
+            and filt["branches-ignore"] is None:
+        return True, "its push trigger filters tags only, so a branch push never runs it"
+    if filt["branches"] is not None and not _filter_admits(filt["branches"], branch):
         return True, f"its branches filter excludes {branch}"
-    if filt["branches-ignore"] is not None and any(_glob_regex(g).match(branch) for g in filt["branches-ignore"]):
+    if filt["branches-ignore"] is not None and _filter_admits(filt["branches-ignore"], branch):
         return True, f"its branches-ignore filter excludes {branch}"
-    if filt["paths"] is not None and not push_triggers_workflow(changed, filt["paths"]):
+    if filt["paths"] is not None and not any(_filter_admits(filt["paths"], p) for p in changed):
         return True, "its paths filter matches none of the pushed paths"
-    if filt["paths-ignore"] is not None and all(any(_glob_regex(g).match(p) for g in filt["paths-ignore"])
-                                                for p in changed):
+    if filt["paths-ignore"] is not None and all(_filter_admits(filt["paths-ignore"], p) for p in changed):
         return True, "its paths-ignore filter covers every pushed path"
     return False, f"its push trigger still admits a push to {branch} with these paths"
+
+
+# GitHub evaluates a path filter over the first 300 changed files of a
+# push; past that the outcome is not derivable here (D00 T04 §41).
+PATH_FILTER_FILE_LIMIT = 300
+
+
+def changed_paths_for_push(before: str | None, after: str, cwd=None) -> tuple[list[str] | None, str]:
+    """(paths, why) GitHub's path filter sees for a push from `before` to
+    `after`, or (None, why) when they cannot be derived: a new branch (no
+    before), a force push (before not an ancestor), or more files than
+    GitHub evaluates."""
+    if not after or set(after) == {"0"}:
+        return None, "a branch deletion: there is no pushed commit to run against"
+    if not before or set(before) == {"0"}:
+        return None, "a new branch: GitHub compares against the default branch, which this reader does not derive"
+    ok, _detail = git_is_ancestor(before, after, cwd=cwd)
+    if ok is not True:
+        return None, "a force push (the before commit is not an ancestor): the compared range cannot be derived"
+    rc, diff = _git_out(["diff", "--name-only", before, after], cwd=cwd)
+    if rc != 0:
+        return None, "git could not list the changed paths"
+    paths = [ln for ln in diff.splitlines() if ln.strip()]
+    if len(paths) > PATH_FILTER_FILE_LIMIT:
+        return None, f"{len(paths)} changed files, past the {PATH_FILTER_FILE_LIMIT} GitHub's path filter evaluates"
+    return paths, ""
 
 
 def push_triggers_workflow(changed: list[str], globs: list[str] | None) -> bool:
@@ -1932,15 +1988,69 @@ _ANY_SECRET_KEY = re.compile(
     r"private[_-]?key)[A-Za-z0-9_]*[\"']?[ \t]*[=:]")
 
 
+# D00 T04 §41: the redaction grammar. ci-wait masks, in everything it
+# prints and every capture it writes, these forms and no others:
+#
+# 1. Token shapes: `gh[pousr]_`, `github_pat_`, `AKIA...`, `xox[abprs]-`,
+#    a PEM private-key block, and a `Bearer` value.
+# 2. A credential-named key (password, passwd, secret, token, api key,
+#    credential, private key) followed by `=` or `:`, its value every
+#    adjacent quoted or bare segment; after `key:` at a mapping line's
+#    start, the whole YAML plain scalar.
+# 3. The value's continuation: every following line indented deeper than
+#    the key's line, and every line after a trailing backslash.
+# 4. A multiline value the key's line opens: a here-document (`<<WORD`,
+#    `<<-WORD`, quoted or not) through its terminator line, a PowerShell
+#    here-string (`@"` or `@'`) through its closing `"@` or `'@`, a quote
+#    left open through the line that closes it, and an open bracket through
+#    the line that balances it.
+# 5. A base64 run of sixty or more characters alone at a line's end (a key
+#    body seen without its BEGIN line).
+#
+# The fallback is conservative: a multiline form (rule 4) whose end never
+# comes masks the rest of its block, which in a log is the rest of that
+# job and step and elsewhere the rest of the text. Line ends are
+# normalized first (`\r\n` and a lone `\r` read as `\n`), so a malformed
+# input never hides a line break from the rules. GitHub's own `***` masks
+# pass through untouched.
+_HEREDOC = re.compile(r"<<-?~?[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+
+
+def _open_quote(value: str, q: str) -> bool:
+    """Whether `value` leaves a `q` quote open (a doubled `''` and an
+    escaped `\\"` count as characters, not quotes)."""
+    v = value.replace("''", "") if q == "'" else re.sub(r'\\.', "", value)
+    return v.count(q) % 2 == 1
+
+
+def _multiline_opener(value: str) -> tuple[str, object] | None:
+    """(kind, end) of the multiline value `value` opens (rule 4), or None."""
+    m = _HEREDOC.search(value)
+    if m:
+        return "heredoc", m.group(2)
+    v = value.rstrip()
+    if v.endswith(('@"', "@'")):
+        return "herestring", v[-1] + "@"
+    for q in ('"', "'"):
+        if _open_quote(value, q):
+            return "quote", q
+    depth = sum(value.count(c) for c in "([{") - sum(value.count(c) for c in ")]}")
+    if depth > 0:
+        return "bracket", depth
+    return None
+
+
 def _redact_blocks(text: str) -> str:
-    """A credential's value spans its continuation lines, and those lines
-    are masked whole (panel rounds 2 to 4 of the D00 T04 §39 review,
-    rethought after the third patch into one rule): after a line carrying
-    a credential key, every following line indented deeper than that line
-    (a YAML block scalar's body, a plain scalar continued, a nested value)
-    and every line that follows a trailing backslash (a shell
-    continuation) is part of the value. Blank lines inside a deeper run
-    are kept as they are; a log's job, step, and timestamp columns stay."""
+    """Rules 3 and 4 of the grammar above: a credential's value spans its
+    continuation lines, and those lines are masked whole (panel rounds 2
+    to 4 of the D00 T04 §39 review, rethought after the third patch into
+    one rule; the multiline openers and their fallback from D00 T04 §41).
+    After a line carrying a credential key, a multiline value it opens is
+    masked through its end, or through the end of its block when the end
+    never comes; otherwise every following line indented deeper than the
+    key's line and every line after a trailing backslash is part of the
+    value. Blank lines inside a deeper run are kept as they are; a log's
+    job, step, and timestamp columns stay."""
     lines = text.split("\n")
     out: list[str] = []
     i = 0
@@ -1950,7 +2060,33 @@ def _redact_blocks(text: str) -> str:
         i += 1
         cols = _LOG_COLS.match(line).group(0)
         head = line[len(cols):]
-        if not _ANY_SECRET_KEY.search(head):
+        key = _ANY_SECRET_KEY.search(head)
+        if not key:
+            continue
+        block = "\t".join(line.split("\t", 2)[:2]) if cols else None
+        opener = _multiline_opener(head[key.end():])
+        if opener:
+            kind, end = opener
+            depth = end if kind == "bracket" else 0
+            while i < len(lines):
+                nxt = lines[i]
+                ncols = _LOG_COLS.match(nxt).group(0)
+                if block is not None and "\t".join(nxt.split("\t", 2)[:2]) != block:
+                    break
+                body = nxt[len(ncols):]
+                if kind == "heredoc" and body.strip() == end:
+                    break
+                if kind == "herestring" and body.lstrip().startswith(end):
+                    break
+                indent = body[:len(body) - len(body.lstrip(" \t"))]
+                out.append(ncols + indent + "***")
+                i += 1
+                if kind == "quote" and _open_quote(body, end):
+                    break
+                if kind == "bracket":
+                    depth += sum(body.count(c) for c in "([{") - sum(body.count(c) for c in ")]}")
+                    if depth <= 0:
+                        break
             continue
         key_indent = len(head.expandtabs()) - len(head.expandtabs().lstrip(" "))
         continued = head.rstrip().endswith("\\")
@@ -1978,10 +2114,29 @@ def _redact_blocks(text: str) -> str:
 
 
 def redact(text: str) -> str:
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = _redact_blocks(text)
     for pat, repl in _SECRET_RES:
         text = pat.sub(repl, text)
     return text
+
+
+_SCAN_NAMES = ("a GitHub token", "a fine-grained GitHub token", "an AWS access key", "a Slack token",
+               "a private key", "a bearer token", "a credential key's YAML value", "a credential key's value",
+               "a base64 key body")
+
+
+def secret_scan(text: str) -> list[str]:
+    """The grammar's forms still present in `text` (D00 T04 §41): a text
+    passes when redaction would change nothing in it. Names the form,
+    never the value."""
+    found = []
+    if _redact_blocks(text.replace("\r\n", "\n").replace("\r", "\n")) != text.replace("\r\n", "\n").replace("\r", "\n"):
+        found.append("a credential's multiline value")
+    for name, (pat, repl) in zip(_SCAN_NAMES, _SECRET_RES):
+        if pat.sub(repl, text) != text:
+            found.append(name)
+    return found
 
 
 def lines_by_step(text: str) -> dict[str, list[str]]:
@@ -2036,9 +2191,109 @@ def classify_red(steps: list[str], lines: list[str], by_step: dict[str, list[str
             f"fix it forward and push the repair")
 
 
-AGGREGATION_RULE = ("ci-wait: aggregation: each failing step is classified alone; any repairable step makes the "
-                    "red repairable (fix those first); platform only when every signalled step is platform; a "
-                    "platform signal in one step and a repository error in another reads unknown")
+AGGREGATION_RULE = ("ci-wait: aggregation: each failing step is classified alone, then the decision table's first "
+                    "matching row decides the red (D00 T04 §41): a platform signal in one step and a repository "
+                    "error in another reads unknown before any repairable step counts")
+
+# D00 T04 §41: the ordered decision table. Rows are tried top to bottom and
+# the first that matches decides; every row names its outcome and one
+# bounded next action. Inputs: whether the run started a job and GitHub
+# named a workflow-file issue, each job's conclusion and failing steps, and
+# each failing step's own verdict (repairable, platform fault, no signal,
+# unavailable when its log cannot be read, ambiguous when its name repeats
+# inside its job).
+DECISION_TABLE = (
+    ("D1", "the run started no job and GitHub names a workflow-file issue", "repairable",
+     "check the workflow file's syntax locally at the pushed commit, fix it forward, and push the repair"),
+    ("D2", "the run started no job and GitHub names no workflow-file issue", "unknown",
+     "read the run page (gh run view <id>); if it names no cause, escalate a cause the tree cannot establish"),
+    ("D3", "a job was cancelled and no step failed", "unknown",
+     "read the run page: a run superseded by a newer push is read back on that push's head; any other "
+     "cancellation escalates"),
+    ("D4", "a job timed out", "unknown",
+     "re-run the timed-out job's commands locally at the pushed commit: a local hang or failure is repairable, a "
+     "local pass escalates as a platform fault"),
+    ("D5", "a platform signal ends one step and a repository error another", "unknown",
+     "gather the evidence the skills name (run page, full log, one local re-run) before repairing or escalating"),
+    ("D6", "every signalled step ends on a platform signal", "platform fault",
+     "escalate (PARKED ... escalation:, then end --reason escalation)"),
+    ("D7", "a step ends on a repository error", "repairable", "fix it forward and push the repair"),
+    ("D8", "a job failed with no failing step (a job-level or startup failure)", "unknown",
+     "read the run page's annotations: a runner or quota message escalates as a platform fault, one naming the "
+     "repository is repairable"),
+    ("D9", "a failing step's log is unavailable or its name is ambiguous, and no step carries a signal", "unknown",
+     "re-run the printed step command locally at the pushed commit: a local failure is repairable, a local pass "
+     "escalates"),
+    ("D10", "failing steps carry no signal", "unknown",
+     "re-run the printed step commands locally at the pushed commit before escalating"),
+    ("D11", "no step, job, or log evidence", "unknown", "re-run the workflow's commands locally before escalating"),
+)
+_ROWS = {r[0]: r for r in DECISION_TABLE}
+
+
+def decide(verdicts: dict[str, str], jobs: list[dict] | None = None, no_job: bool = False,
+           wf_issue: bool = False) -> tuple[str, str, str, str]:
+    """The first DECISION_TABLE row the evidence matches (D00 T04 §41)."""
+    if no_job:
+        return _ROWS["D1" if wf_issue else "D2"]
+    jobs = jobs or []
+    any_failed = bool(verdicts) or any(j.get("failed") for j in jobs)
+    if any(j.get("conclusion") == "cancelled" for j in jobs) and not any_failed:
+        return _ROWS["D3"]
+    if any(j.get("conclusion") == "timed_out" for j in jobs):
+        return _ROWS["D4"]
+    kinds = set(verdicts.values())
+    if {"platform fault", "repairable"} <= kinds:
+        return _ROWS["D5"]
+    if "platform fault" in kinds:
+        return _ROWS["D6"]
+    if "repairable" in kinds:
+        return _ROWS["D7"]
+    if any(j.get("conclusion") in ("failure", "startup_failure") and not j.get("failed") for j in jobs):
+        return _ROWS["D8"]
+    if kinds & {"unavailable", "ambiguous"}:
+        return _ROWS["D9"]
+    if kinds:
+        return _ROWS["D10"]
+    return _ROWS["D11"]
+
+
+def decision_lines(row: tuple[str, str, str, str], verdicts: dict[str, str], lines: list[str]) -> list[str]:
+    """The decision and the one `cause:` line derived from it."""
+    rid, cond, outcome, action = row
+    out = [f"ci-wait: decision: {rid}: {cond} -> {outcome}; next: {action}"]
+    name = lambda k: k or "the log"  # noqa: E731
+    if outcome == "repairable":
+        where = "; ".join(name(k) for k, v in verdicts.items() if v == "repairable") or "the workflow file"
+        out.append(f"ci-wait: cause: repairable (repository-controlled: {where}); fix it forward and push the repair")
+    elif outcome == "platform fault":
+        hit = next((ln for ln in reversed(lines) if _PLATFORM_RE.search(ln)), "a platform signal")
+        out.append(f"ci-wait: cause: platform fault, escalate ({hit[:160]})")
+    elif rid == "D5":
+        plat = "; ".join(name(k) for k, v in verdicts.items() if v == "platform fault")
+        repo = "; ".join(name(k) for k, v in verdicts.items() if v == "repairable")
+        out.append(f"ci-wait: cause: unknown (a platform signal in {plat} and a repository error in {repo}); "
+                   f"gather the evidence the skills name before repairing or escalating")
+    else:
+        out.append(f"ci-wait: cause: unknown ({cond}); {action}")
+    return out
+
+
+def run_jobs(run_id: str) -> list[dict] | None:
+    """Each job's conclusion and failing steps from `gh run view --json
+    jobs` (D00 T04 §41), None when gh cannot say."""
+    import json as _json
+    ok, out = _gh_text(["run", "view", run_id, "--json", "jobs"])
+    if not ok:
+        return None
+    try:
+        jobs = _json.loads(out or "{}").get("jobs") or []
+    except (ValueError, AttributeError):
+        return None
+    return [{"name": j.get("name", "?"), "conclusion": j.get("conclusion"),
+             "failed": [st.get("name", "?") for st in (j.get("steps") or [])
+                        if isinstance(st, dict) and st.get("conclusion") == "failure"]}
+            for j in jobs if isinstance(j, dict)]
 
 
 def step_cause(lines: list[str]) -> str:
@@ -2174,6 +2429,7 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         rows += [f"ci-wait: | {ln}" for ln in lines]
         by_step = lines_by_step(out)
         per_step = cause_lines(by_step, idents)
+        verdicts = {k: step_cause(v) for k, v in by_step.items()}
         named = [(i["job"], i["step"]) for i in (idents or [])]
         if idents and len(set(named)) < len(named):
             # Display names collide (a matrix with one explicit name, or a
@@ -2181,7 +2437,7 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
             # apart, so each job's log is fetched by its id and each step
             # classified from its own job (panel round 1 of the D00 T04 §39
             # review). A step name repeated inside one job stays ambiguous.
-            by_step, per_step = {}, []
+            by_step, per_step, verdicts = {}, [], {}
             for jid in dict.fromkeys(i["job_id"] for i in idents):
                 ok_j, log_j = _gh_text(["run", "view", run_id, "--job", str(jid), "--log-failed"])
                 job_lines = lines_by_step(redact(log_j)) if ok_j else {}
@@ -2191,13 +2447,16 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
                     key = _ident_text(i)
                     if not ok_j:
                         per_step.append(f"ci-wait: cause in {key}: unknown (its job log is unavailable)")
+                        verdicts[key] = "unavailable"
                         continue
                     if len(twins) > 1:
                         per_step.append(f"ci-wait: cause in {key}: ambiguous (step name repeats in its job)")
+                        verdicts[key] = "ambiguous"
                         continue
                     lines_i = job_lines.get(f"{i['job']} / {i['step']}", [])
                     by_step[key] = lines_i
                     verdict = step_cause(lines_i)
+                    verdicts[key] = verdict
                     if verdict != "no signal":
                         per_step.append(f"ci-wait: cause in {key}: {verdict}")
         if len(per_step) > 1:
@@ -2205,7 +2464,7 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
             # aggregate, under a rule the output states (D00 T04 §39).
             rows += per_step
             rows.append(AGGREGATION_RULE)
-        rows.append(classify_red(steps, normalized_log_lines(out), by_step))
+        rows += decision_lines(decide(verdicts, run_jobs(run_id)), verdicts, normalized_log_lines(out))
         return "\n".join(rows)
     rows = [f"ci-wait: failed-step log unavailable ({out}); the run is still red"]
     failing = failed_job_steps(run_id)
@@ -2227,7 +2486,11 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         rows.append(f"ci-wait: full log read instead; {scope}: "
                     f"{'; '.join(steps) if steps else 'not named by the log'}")
         rows += [f"ci-wait: | {ln}" for ln in lines]
-        rows.append(classify_red(steps, normalized_log_lines("\n".join(kept)), lines_by_step("\n".join(kept))))
+        kept_steps = lines_by_step("\n".join(kept))
+        verdicts = {k: step_cause(v) for k, v in kept_steps.items()}
+        for name in steps:
+            verdicts.setdefault(name, "no signal")
+        rows += decision_lines(decide(verdicts, run_jobs(run_id)), verdicts, normalized_log_lines("\n".join(kept)))
         return "\n".join(rows)
     rows.append(f"ci-wait: full log unavailable too ({full if not ok_full else 'it carries no lines'})")
     if failing == [NO_JOB]:
@@ -2236,11 +2499,10 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         if workflow_file_issue(run_id, conclusion):
             rows.append("ci-wait: the run started no job: GitHub could not load the workflow file "
                         "at the pushed commit; check its syntax locally")
-            rows.append(classify_red(failing, []))
+            rows += decision_lines(decide({}, no_job=True, wf_issue=True), {NO_JOB: "repairable"}, [])
         else:
             rows.append("ci-wait: the run started no job and GitHub names no workflow-file issue")
-            rows.append("ci-wait: cause: unknown (no step, log, or workflow-file evidence); "
-                        "read the run page before repairing or escalating")
+            rows += decision_lines(decide({}, no_job=True), {}, [])
         return "\n".join(rows)
     steps = workflow_steps(workflow_text)
     names = [s.split(" / ", 1)[-1] for s in (failing or [])]
@@ -2255,7 +2517,10 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         rows += rerun_lines(step, at)
     if not picked:
         rows.append("ci-wait: the pushed commit's workflow names no run step to re-run")
-    rows.append(classify_red(failing or [], []))
+    # No log at all: each failing step is unavailable, never repairable on
+    # its name alone (D00 T04 §41, decision D9).
+    no_log = {name: "unavailable" for name in (failing or [])}
+    rows += decision_lines(decide(no_log, run_jobs(run_id)), no_log, [])
     return "\n".join(rows)
 
 
@@ -2286,7 +2551,7 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float,
         try:
             proc = subprocess.run(
                 [*_gh_argv(), "run", "list", "--commit", sha, "--workflow", workflow,
-                 "--json", "status,conclusion,url,databaseId,headSha"],
+                 "--json", "status,conclusion,url,databaseId,headSha,attempt,workflowDatabaseId"],
                 capture_output=True, text=True, timeout=120)
         except (OSError, subprocess.TimeoutExpired) as exc:
             return 2, f"ci-wait: gh unavailable: {exc}"
@@ -2301,7 +2566,10 @@ def ci_conclusion(sha: str, workflow: str, timeout: float, interval: float,
             run = max(runs, key=lambda r: r.get("databaseId") or 0)
             if run.get("status") == "completed":
                 verdict = run.get("conclusion") or "unknown"
-                line = f"ci-wait: {sha[:12]} {workflow} {verdict} {run.get('url', '')}".rstrip()
+                # D00 T04 §41: the line names the attempt it read and the
+                # workflow's immutable id, which `repair close` re-checks.
+                line = (f"ci-wait: {sha[:12]} {workflow} {verdict} {run.get('url', '')}".rstrip()
+                        + f" attempt={run.get('attempt') or 1} workflow-id={run.get('workflowDatabaseId') or 0}")
                 if verdict != "success" and run.get("databaseId"):
                     line += "\n" + failed_log_report(str(run["databaseId"]), sha=sha,
                                                      workflow_text=workflow_text, conclusion=verdict)
@@ -3980,6 +4248,106 @@ def oracle_log(run_id: str | int) -> tuple[dict[str, list[str]], dict[str, str],
         if not line.startswith("##["):
             outputs[step].append(line)
     return outputs, shells, facts
+
+
+def _write_atomic(path: str, text: str) -> None:
+    tmp = f"{path}.tmp-{os.getpid()}"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
+
+
+def capture_run(run_id: str, workflow_file: str, kind: str, section: str, out_dir: str | None = None,
+                repo_slug: str | None = None) -> tuple[int, str]:
+    """Capture one drill run as oracle evidence (D00 T04 §41): the
+    workflow file at the run's head commit, the run record with each job's
+    and step's conclusion, and the full log, fetched from GitHub by run id.
+    Every file passes the redaction and a clean `secret_scan` before
+    anything is written; any finding writes nothing. The oracle entry keeps
+    the provenance: when and how it was fetched, the head commit, and each
+    written file's sha256."""
+    import datetime as _dt
+    import hashlib as _hl
+    import json as _json
+    out_dir = out_dir or ORACLE_DIR
+    ok, rec = _gh_text(["run", "view", str(run_id), "--json",
+                        "databaseId,headSha,headBranch,event,conclusion,attempt,jobs,workflowName"])
+    if not ok:
+        return 2, f"capture-run: gh could not read run {run_id} ({rec})"
+    try:
+        record = _json.loads(rec)
+    except ValueError:
+        return 2, f"capture-run: gh's record of run {run_id} is not JSON"
+    sha = str(record.get("headSha") or "")
+    if not re.fullmatch(r"[0-9a-f]{40}", sha) or str(record.get("databaseId")) != str(run_id):
+        return 2, f"capture-run: gh's record does not name run {run_id} and a full head sha"
+    kept = {k: record.get(k) for k in ("databaseId", "headSha", "headBranch", "event", "conclusion", "attempt",
+                                       "workflowName")}
+    kept["jobs"] = [{"name": j.get("name"), "conclusion": j.get("conclusion"),
+                     "steps": [{"number": st.get("number"), "name": st.get("name"), "conclusion": st.get("conclusion")}
+                               for st in (j.get("steps") or []) if isinstance(st, dict)]}
+                    for j in (record.get("jobs") or []) if isinstance(j, dict)]
+    ok, log = _gh_text(["run", "view", str(run_id), "--log"])
+    if not ok:
+        return 2, f"capture-run: gh could not read run {run_id}'s log ({log})"
+    if not repo_slug:
+        rc, url = _git_out(["remote", "get-url", "origin"])
+        m = re.search(r"github\.com[:/]+([^/\s]+/[^/\s]+?)(?:\.git)?/?$", url.strip()) if rc == 0 else None
+        repo_slug = m.group(1) if m else ""
+    if not repo_slug:
+        return 2, "capture-run: the origin remote names no GitHub repository"
+    ok, wf = _gh_text(["api", "-H", "Accept: application/vnd.github.raw+json",
+                       f"repos/{repo_slug}/contents/.github/workflows/{workflow_file}?ref={sha}"])
+    if not ok:
+        return 2, f"capture-run: gh could not read {workflow_file} at {sha[:12]} ({wf})"
+    files = {workflow_file: redact(wf), f"run-{run_id}.json": redact(_json.dumps(kept, indent=1) + "\n"),
+             f"log-{run_id}.txt": redact(log)}
+    for name, text in files.items():
+        found = secret_scan(text)
+        if found:
+            return 2, f"capture-run: {name} still carries {', '.join(found)} after redaction: nothing written"
+    index = os.path.join(out_dir, "oracle.json")
+    try:
+        with open(index, encoding="utf-8") as fh:
+            oracle = _json.load(fh)
+    except FileNotFoundError:
+        oracle = {"drills": []}
+    except (OSError, ValueError) as exc:
+        return 2, f"capture-run: {index} is unreadable ({exc}): nothing written"
+    if any(str(d.get("run")) == str(run_id) for d in oracle.get("drills", [])):
+        return 2, f"capture-run: run {run_id} is already captured: nothing written"
+    os.makedirs(out_dir, exist_ok=True)
+    for name, text in files.items():
+        _write_atomic(os.path.join(out_dir, name), text)
+    oracle.setdefault("drills", []).append({
+        "kind": kind, "workflow": workflow_file, "run": int(run_id), "section": section,
+        "provenance": {"captured_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                       "source": "gh run view --json and --log, gh api contents at the head commit",
+                       "head_sha": sha, "sanitized": "redact(), then secret_scan() clean",
+                       "sha256": {n: _hl.sha256(t.encode("utf-8")).hexdigest() for n, t in files.items()}}})
+    _write_atomic(index, _json.dumps(oracle, indent=1, ensure_ascii=True) + "\n")
+    return 0, f"capture-run: run {run_id} captured into {out_dir} ({', '.join(files)}), scan clean"
+
+
+def oracle_failures(run_id: str | int) -> dict[str, tuple[str, str]]:
+    """Each step's failure as GitHub recorded it in a drill's captured log
+    (D00 T04 §41): ("exit", "<code>") from `Process completed with exit
+    code N`, or ("start", "<message>") when the runner could not start the
+    step's process. A step with no `##[error]` line is absent."""
+    found: dict[str, tuple[str, str]] = {}
+    with open(os.path.join(ORACLE_DIR, f"log-{run_id}.txt"), encoding="utf-8-sig") as fh:
+        for raw in fh.read().splitlines():
+            parts = raw.split("\t", 2)
+            if len(parts) != 3:
+                continue
+            line = _ORACLE_TS.sub("", parts[2]).rstrip()
+            if not line.startswith("##[error]") or parts[1] in found:
+                continue
+            m = re.match(r"##\[error\]Process completed with exit code (-?\d+)\.", line)
+            found[parts[1]] = ("exit", m.group(1)) if m else ("start", line[len("##[error]"):])
+    return found
 
 
 def normalize_template(template: str) -> list[str]:
@@ -6450,12 +6818,12 @@ def _self_test() -> int:
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
-                "else: runs = [{'status': 'completed', 'conclusion': mode, 'databaseId': 9, 'headSha': sha, 'url': 'https://x/9'}]\n"
+                "else: runs = [{'status': 'completed', 'conclusion': mode, 'databaseId': 9, 'headSha': sha, 'url': 'https://x/9', 'attempt': 2, 'workflowDatabaseId': 77}]\n"
                 "print(json.dumps(runs))\n")
         old_gh = os.environ.get("GH")
         os.environ["GH"] = fake
         try:
-            for mode, want, needle in (("success", 0, "plan-gates success https://x/9"),
+            for mode, want, needle in (("success", 0, "plan-gates success https://x/9 attempt=2 workflow-id=77"),
                                        ("failure", 1, "plan-gates failure"),
                                        ("pending", 3, "still in_progress past the 0s ceiling (run 7)"),
                                        ("none", 2, "no run listed yet")):
@@ -6504,6 +6872,67 @@ def _self_test() -> int:
                       and re.fullmatch(r"[0-9a-f]{40}", _rec.get("headSha", "")) is not None
                       and bool(_facts.get("Image")) and bool(_facts.get("Image version"))
                       and bool(_facts.get("Current runner version")), f"{_rec} {_facts}")
+            # D00 T04 §41: every committed capture is sanitized, and its
+            # digest (line ends normalized, as a checkout may convert them)
+            # is the one its provenance recorded.
+            for _cap in sorted(os.listdir(ORACLE_DIR)):
+                _ct = open(os.path.join(ORACLE_DIR, _cap), encoding="utf-8-sig").read()
+                check(f"capture-scans-clean: {_cap}", secret_scan(_ct) == [], str(secret_scan(_ct)))
+            import hashlib as _hl
+            for _od in oracle_drills():
+                _dig = (_od.get("provenance") or {}).get("sha256") or {}
+                _got_d = {n: _hl.sha256(open(os.path.join(ORACLE_DIR, n), encoding="utf-8-sig").read()
+                                        .replace("\r\n", "\n").encode("utf-8")).hexdigest() for n in _dig}
+                check(f"capture-provenance-holds: {_od['workflow']}",
+                      set(_dig) == {_od["workflow"], f"run-{_od['run']}.json", f"log-{_od['run']}.txt"}
+                      and _got_d == _dig and re.fullmatch(r"[0-9a-f]{40}", _od["provenance"].get("head_sha", "")),
+                      f"{_dig} {_got_d}")
+            _capd = os.path.join(tmpd, "capture")
+            os.makedirs(_capd)
+            _cap_gh = os.path.join(tmpd, "cap_gh.py")
+            with open(_cap_gh, "w", encoding="utf-8") as fh:
+                fh.write("import json, sys\n"
+                         "a = sys.argv[1:]\n"
+                         "if a[:2] == ['run', 'view'] and '--log' in a:\n"
+                         "    print('j\\tstep\\t2026-01-01T00:00:00Z token=ghp_abcdefghijklmnopqrstuvwxyz0123456789')\n"
+                         "    print('j\\tstep\\t2026-01-01T00:00:01Z hello')\n"
+                         "elif a[:2] == ['run', 'view']:\n"
+                         "    print(json.dumps({'databaseId': int(a[2]), 'headSha': 'ab' * 20, 'headBranch': 'drill/x',\n"
+                         "                      'event': 'push', 'conclusion': 'success', 'attempt': 1,\n"
+                         "                      'workflowName': 'x', 'jobs': [{'name': 'j', 'conclusion': 'success',\n"
+                         "                      'steps': [{'number': 2, 'name': 'step', 'conclusion': 'failure'}]}]}))\n"
+                         "elif a[0] == 'api':\n"
+                         "    print('on: push\\njobs: {}')\n"
+                         "else:\n"
+                         "    sys.exit(1)\n")
+            _old_gh_c = os.environ.get("GH")
+            os.environ["GH"] = _cap_gh
+            try:
+                _c_ok = capture_run("4242", "x.yml", "failure", "D90 T01 §1", _capd, "o/r")
+                _c_log = open(os.path.join(_capd, "log-4242.txt"), encoding="utf-8").read()
+                _c_idx = json.load(open(os.path.join(_capd, "oracle.json"), encoding="utf-8"))
+                _c_run = json.load(open(os.path.join(_capd, "run-4242.json"), encoding="utf-8"))
+                check("capture-run-sanitizes-and-keeps-provenance",
+                      _c_ok[0] == 0 and "ghp_" not in _c_log and "token=***" in _c_log and "hello" in _c_log
+                      and _c_idx["drills"][0]["provenance"]["head_sha"] == "ab" * 20
+                      and set(_c_idx["drills"][0]["provenance"]["sha256"]) == {"x.yml", "run-4242.json", "log-4242.txt"}
+                      and _c_run["jobs"][0]["steps"][0]["conclusion"] == "failure", f"{_c_ok} {_c_log}")
+                _c_dup = capture_run("4242", "x.yml", "failure", "D90 T01 §1", _capd, "o/r")
+                _real_redact = globals()["redact"]
+                globals()["redact"] = lambda t: t
+                try:
+                    _c_leak = capture_run("4243", "x.yml", "failure", "D90 T01 §1", os.path.join(tmpd, "capture2"), "o/r")
+                finally:
+                    globals()["redact"] = _real_redact
+                check("capture-run-refuses-a-duplicate-or-a-dirty-scan",
+                      _c_dup[0] == 2 and "already captured" in _c_dup[1] and _c_leak[0] == 2
+                      and "still carries a GitHub token" in _c_leak[1] and "ghp_" not in _c_leak[1]
+                      and not os.path.exists(os.path.join(tmpd, "capture2")), f"{_c_dup} {_c_leak}")
+            finally:
+                if _old_gh_c is None:
+                    os.environ.pop("GH", None)
+                else:
+                    os.environ["GH"] = _old_gh_c
             _sd = next(d for d in oracle_drills() if d["kind"] == "scalar")
             _souts, _sshells, _sfacts = oracle_log(_sd["run"])
             decoded = {s["name"]: s for s in workflow_steps(oracle_workflow(_sd["workflow"]))}
@@ -6696,6 +7125,64 @@ def _self_test() -> int:
                     check(f"rerun-reproduces-githubs-context: {step['name']}",
                           _gh_out is not None and got_ctx.stdout.splitlines() == _gh_out,
                           f"{got_ctx.stdout.splitlines()} vs {_gh_out} ({template}) {got_ctx.stderr[:200]}")
+            # D00 T04 §41: Windows failure semantics. The drill fails every
+            # step on purpose (a native failure before and as the last line,
+            # a pwsh throw, a non-terminating error under GitHub's `stop`, a
+            # Windows PowerShell throw, cmd expansion characters, a cmd
+            # failure mid-script, a missing working directory); each
+            # printed re-run, executed locally under GitHub's template,
+            # fails the same way: the same exit code (a start failure reads
+            # as any non-zero exit with no output), stdout equal to GitHub's
+            # output up to its error record, and the error's message in
+            # GitHub's log.
+            _ansi = re.compile(r"\x1b\[[0-9;]*m")
+            for _fd in (d for d in oracle_drills() if d["kind"] == "failure"):
+                _fouts, _fshells, _ffacts = oracle_log(_fd["run"])
+                _fails = oracle_failures(_fd["run"])
+                for step in workflow_steps(oracle_workflow(_fd["workflow"])):
+                    if step["kind"] != "run":
+                        continue
+                    _gh_fail = _fails.get(step["name"])
+                    check(f"failure-drill-captured: {step['name']}", _gh_fail is not None
+                          and step["name"] in _fshells, f"{_gh_fail} {_fshells.get(step['name'])}")
+                    rows = rerun_lines(step, "abc")
+                    shell_row = next(r for r in rows if r.startswith("ci-wait: |   (shell: "))
+                    template = shell_row[len("ci-wait: |   (shell: "):].split(";", 1)[0]
+                    check(f"failure-drill-template-is-githubs: {step['name']}",
+                          normalize_template(template) == normalize_template(_fshells.get(step["name"], "")),
+                          f"{template} vs {_fshells.get(step['name'])}")
+                    program = normalize_template(template)[0]
+                    if os.name != "nt":
+                        check(f"windows-reproduction-needs-a-windows-host: {step['name']}", True)
+                        continue
+                    body = [r[len("ci-wait: |   "):] for r in rows if r.startswith("ci-wait: |   ")
+                            and not r.startswith("ci-wait: |   (shell: ")]
+                    fdir = os.path.join(tmpd, "faildrill", "Resolute")
+                    os.makedirs(fdir, exist_ok=True)
+                    ext = ".cmd" if program == "cmd" else ".ps1"
+                    script = os.path.join(tmpd, "faildrill", "step" + ext)
+                    with open(script, "w", encoding="utf-8", newline="\r\n" if ext == ".cmd" else "\n") as fh:
+                        fh.write("\n".join(body) + "\n")
+                    win_exe = _sh.which(program)
+                    check(f"failure-drill-has-{program}", bool(win_exe),
+                          f"the Windows failure drill needs {program} on PATH: it never skips silently")
+                    if not win_exe:
+                        continue
+                    argv = ([win_exe, "-command", f". '{script}'"] if program != "cmd"
+                            else template.replace("{0}", script).replace(program, f'"{win_exe}"', 1))
+                    got_f = subprocess.run(argv, cwd=fdir, capture_output=True, text=True)
+                    gh_lines = [_ansi.sub("", x) for x in _fouts.get(step["name"], [])]
+                    loc_out = got_f.stdout.splitlines()
+                    loc_err = [_ansi.sub("", x).strip() for x in got_f.stderr.splitlines() if x.strip()]
+                    if _gh_fail and _gh_fail[0] == "exit":
+                        same_exit = str(got_f.returncode) == _gh_fail[1]
+                    else:
+                        same_exit = got_f.returncode != 0 and not loc_out and not gh_lines
+                    message = next((m for m in ("drill boom", "drill soft") if any(m in e for e in loc_err)), None)
+                    check(f"failure-drill-fails-the-same-way-locally: {step['name']}",
+                          same_exit and gh_lines[:len(loc_out)] == loc_out
+                          and (message is None or any(message in g for g in gh_lines[len(loc_out):])),
+                          f"exit {got_f.returncode} vs {_gh_fail}; out {loc_out} vs {gh_lines[:6]}; err {loc_err[:2]}")
             win = "jobs:\n  j:\n    runs-on: windows-2025\n    steps:\n      - name: a\n        shell: python\n        run: make\n"
             check("rerun-refuses-an-unproven-shell-template",
                   "cannot reproduce locally: the python template is not proven against GitHub"
@@ -6914,7 +7401,8 @@ def _self_test() -> int:
                                       "--expect-no-run", "trigger retired by the operator", *auth],
                                      cwd=tmpd, capture_output=True, text=True, env=dict(os.environ))
             check("ci-wait-expect-no-run-is-a-distinct-not-green-outcome",
-                  got_enr.returncode == 4 and "NOT GREEN: no run within 0s, as authorized by operator at 2026-09-25T22:00Z" in got_enr.stdout,
+                  got_enr.returncode == 4 and "NOT GREEN: no run within 0s, as authorized by operator at 2026-09-25T22:00Z" in got_enr.stdout
+                  and " branch=master workflow-path=.github/workflows/plan.yml (" in got_enr.stdout,
                   f"exit={got_enr.returncode} out={got_enr.stdout!r} err={got_enr.stderr!r}")
             for label, extra, needle in (
                     ("no authorization", [], "needs --authorized-by"),
@@ -7013,9 +7501,59 @@ def _self_test() -> int:
                      ["a"], False),
                     # Panel round 3: a `#` inside quotes is part of the item.
                     ("a hash inside a quoted path", "on:\n  push:\n    paths: ['foo #bar/**']\njobs: {}\n", "master",
-                     ["foo #bar/test.txt"], False)):
+                     ["foo #bar/test.txt"], False),
+                    # D00 T04 §41: GitHub's order, negation, and the last
+                    # match wins; tags-only filters; block scalars refuse.
+                    ("a negated branch after an include", "on:\n  push:\n    branches: ['*', '!master']\njobs: {}\n",
+                     "master", ["a"], True),
+                    ("a re-include after a negation",
+                     "on:\n  push:\n    branches: ['*', '!master', 'master']\njobs: {}\n", "master", ["a"], False),
+                    ("a negated path leaves nothing", "on:\n  push:\n    paths: ['src/**', '!src/gen/**']\njobs: {}\n",
+                     "master", ["src/gen/x.cpp"], True),
+                    ("a negated path leaves one", "on:\n  push:\n    paths: ['src/**', '!src/gen/**']\njobs: {}\n",
+                     "master", ["src/gen/x.cpp", "src/a.cpp"], False),
+                    ("a negated paths-ignore keeps a path",
+                     "on:\n  push:\n    paths-ignore: ['docs/**', '!docs/keep.md']\njobs: {}\n", "master",
+                     ["docs/keep.md"], False),
+                    ("a tags-only push filter", "on:\n  push:\n    tags: ['v*']\njobs: {}\n", "master", ["a"], True),
+                    ("tags beside branches", "on:\n  push:\n    tags: ['v*']\n    branches: [master]\njobs: {}\n",
+                     "master", ["a"], False),
+                    ("a block scalar item", "on:\n  push:\n    branches:\n      - >-\n        release\njobs: {}\n",
+                     "release", ["a"], False),
+                    ("a star stays inside one segment", "on:\n  push:\n    branches: ['feature/*']\njobs: {}\n",
+                     "feature/a/b", ["a"], True),
+                    ("a double star crosses segments", "on:\n  push:\n    branches: ['feature/**']\njobs: {}\n",
+                     "feature/a/b", ["a"], False),
+                    ("a question mark refuses", "on:\n  push:\n    branches: ['releas?']\njobs: {}\n", "master",
+                     ["a"], False),
+                    ("a character class refuses", "on:\n  push:\n    paths: ['src/[ab]/**']\njobs: {}\n", "master",
+                     ["todo/x.md"], False),
+                    ("a push key the reader does not model",
+                     "on:\n  push:\n    branches: [release]\n    bogus: [x]\njobs: {}\n", "master", ["a"], False)):
                 got_ex = push_excluded(push_trigger_filter(wf_t), branch, changed_t)[0]
                 check(f"push-exclusion: {label}", got_ex == want, f"{got_ex} {push_trigger_filter(wf_t)}")
+            # D00 T04 §41: the pushed paths come only from a derivable
+            # before-and-after pair.
+            p_ok, _w = changed_paths_for_push(c6, c7, cwd=tmpd)
+            check("push-paths: a fast-forward range lists its paths", p_ok == [".github/workflows/plan.yml"], str(p_ok))
+            for label, before, after, frag in (
+                    ("a new branch", "0" * 40, c7, "a new branch"),
+                    ("a missing before", None, c7, "a new branch"),
+                    ("a force push", c7, c6, "a force push"),
+                    ("a branch deletion", c6, "0" * 40, "a branch deletion")):
+                p_no, why_no = changed_paths_for_push(before, after, cwd=tmpd)
+                check(f"push-paths-refuse: {label}", p_no is None and frag in why_no, f"{p_no} {why_no}")
+            big = os.path.join(tmpd, "big")
+            os.makedirs(big, exist_ok=True)
+            for i in range(PATH_FILTER_FILE_LIMIT + 1):
+                with open(os.path.join(big, f"f{i}.txt"), "w", encoding="utf-8") as fh:
+                    fh.write("x\n")
+            _g("add", "big")
+            _g("commit", "-qm", "c-big")
+            c_big = _g("rev-parse", "HEAD").stdout.strip()
+            p_big, why_big = changed_paths_for_push(c7, c_big, cwd=tmpd)
+            check("push-paths-refuse: past GitHub's 300-file limit", p_big is None and "past the 300" in why_big,
+                  f"{p_big and len(p_big)} {why_big}")
             got_nt7 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
                                       "--expect-no-run", "x", "--authorized-by", "operator",
                                       "--approved-range", f"{c2w}..{c3}"],
@@ -7094,9 +7632,37 @@ def _self_test() -> int:
                     ("a truncated key block", "x\n-----BEGIN RSA PRIVATE KEY-----\nMIIEtruncatedbody", "truncatedbody", "x"),
                     ("a lone key-body line", "j\ts\t2026-01-01T00:00:00Z " + B64, B64[:20], "j\ts\t"),
                     ("a multiline key block", "a\n-----BEGIN EC PRIVATE KEY-----\nAAAA\nBBBB\n-----END EC PRIVATE KEY-----\nb",
-                     "BBBB", "b")):
+                     "BBBB", "b"),
+                    # D00 T04 §41: the multiline openers, each through its
+                    # end, and the fallback when the end never comes.
+                    ("a here-document", "API_TOKEN=$(cat <<EOF\ns3cr3tline\nEOF\n)\necho done", "s3cr3tline",
+                     "EOF\n)\necho done"),
+                    ("a quoted here-document terminator", "password=$(cat <<-'END'\n\ts3cr3tline\n\tEND\n)\nnext",
+                     "s3cr3tline", "next"),
+                    ("a PowerShell here-string", "$env:API_TOKEN = @\"\ns3cr3tline\n\"@\nWrite-Output done",
+                     "s3cr3tline", "Write-Output done"),
+                    ("a single-quoted here-string", "$secret = @'\ns3cr3tline\n'@\ndone", "s3cr3tline", "done"),
+                    ("a quoted multiline value", "password: \"abc\ns3cr3tline\nend\"\nmode: fast", "s3cr3tline",
+                     "mode: fast"),
+                    ("an open bracket", "token: [abc,\n s3cr3tline,\n]\nmode: fast", "s3cr3tline", "mode: fast"),
+                    ("an unterminated here-document", "API_TOKEN=$(cat <<EOF\ns3cr3tline\nmore\nand more",
+                     "and more", "API_TOKEN="),
+                    ("an unterminated quote in a log stops at its step",
+                     "j\ts\tT1 password: \"abc\nj\ts\tT2 s3cr3tline\nj\tt\tT3 next step", "s3cr3tline", "next step"),
+                    ("carriage-return line ends", "password: |\r  s3cr3tline\r\nmode: fast", "s3cr3tline", "mode: fast"),
+                    ("a lone carriage return", "export API_TOKEN=abc\\\rs3cr3tline\recho done", "s3cr3tline",
+                     "echo done")):
                 got_r = redact(text)
                 check(f"redact-to-the-true-end: {label}", gone not in got_r and kept in got_r, got_r)
+            # D00 T04 §41: the scan names the form still present, never the
+            # value, and a redacted text scans clean.
+            leaky = "token=ghp_abcdefghijklmnopqrstuvwxyz0123456789\nAPI_TOKEN=$(cat <<EOF\nabc\nEOF\n)"
+            check("secret-scan-names-each-form",
+                  set(secret_scan(leaky)) >= {"a GitHub token", "a credential's multiline value"}
+                  and not any("ghp_" in f for f in secret_scan(leaky)) and secret_scan(redact(leaky)) == [],
+                  f"{secret_scan(leaky)} {secret_scan(redact(leaky))}")
+            check("secret-scan-passes-plain-text", secret_scan("MODE=fast\nrun: make\n*** kept") == [],
+                  str(secret_scan("MODE=fast\nrun: make\n*** kept")))
             # D00 T04 §39: several failures, each classified alone and
             # identified by GitHub's ids, under a stated aggregation rule.
             with open(state, "w", encoding="utf-8") as fh:
@@ -7127,6 +7693,46 @@ def _self_test() -> int:
                 fh.write("failure")
             one = failed_log_report("9")
             check("a-single-failure-prints-no-aggregation", AGGREGATION_RULE not in one, one)
+            # D00 T04 §41: the ordered decision table, one leg per row, and
+            # the overlaps its order resolves.
+            _cx = {"conclusion": "cancelled", "failed": []}
+            _tx = {"conclusion": "timed_out", "failed": []}
+            _fx = {"conclusion": "failure", "failed": []}
+            for want_row, args in (
+                    ("D1", ({}, None, True, True)),
+                    ("D2", ({}, None, True, False)),
+                    ("D3", ({}, [_cx])),
+                    ("D4", ({"j / a": "repairable"}, [_tx])),
+                    ("D5", ({"j / a": "platform fault", "j / b": "repairable"}, None)),
+                    ("D6", ({"j / a": "platform fault", "j / b": "no signal"}, None)),
+                    ("D7", ({"j / a": "repairable", "j / b": "unavailable"}, None)),
+                    ("D8", ({}, [_fx])),
+                    ("D9", ({"j / a": "unavailable", "j / b": "no signal"}, None)),
+                    ("D10", ({"j / a": "no signal"}, None)),
+                    ("D11", ({}, None))):
+                got_row = decide(*args)
+                cause = decision_lines(got_row, args[0], [])
+                check(f"decision-table-row: {want_row}", got_row[0] == want_row and cause[0].startswith(
+                    f"ci-wait: decision: {want_row}: ") and cause[1].startswith("ci-wait: cause: ")
+                      and f"; next: {got_row[3]}" in cause[0], f"{got_row} {cause}")
+            check("decision-table-order: a cancelled job with a failed step reads its steps",
+                  decide({"j / a": "repairable"}, [_cx, {"conclusion": "failure", "failed": ["a"]}])[0] == "D7",
+                  str(decide({"j / a": "repairable"}, [_cx])))
+            check("decision-table-order: a job-level failure beside a repairable step repairs the step first",
+                  decide({"j / a": "repairable"}, [_fx])[0] == "D7", str(decide({"j / a": "repairable"}, [_fx])))
+            check("decision-table-covers-every-row-once",
+                  [r[0] for r in DECISION_TABLE] == [f"D{n}" for n in range(1, 12)]
+                  and all(r[2] in ("repairable", "platform fault", "unknown") and r[3] for r in DECISION_TABLE),
+                  str([r[0] for r in DECISION_TABLE]))
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("nolog")
+            nolog = failed_log_report("9", sha=c1, workflow_text=plan_text)
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("nologall")
+            nolog_all = failed_log_report("9", sha=c1, workflow_text=plan_text)
+            check("decision-table-no-log-reads-unknown-not-repairable",
+                  "cause: repairable" not in nolog + nolog_all and "ci-wait: cause: unknown (" in nolog
+                  and "ci-wait: decision: D11: " in nolog_all, nolog + " ---- " + nolog_all)
             cred_step = workflow_steps("jobs:\n  j:\n    runs-on: ubuntu-24.04\n    steps:\n      - name: c\n"
                                        "        run: curl -H token=abc123def https://x\n")[0]
             cred_rows = rerun_lines(cred_step, "abc")
@@ -7188,7 +7794,16 @@ def _self_test() -> int:
             ("skill-ci-retire-ends-an-episode", "repair retire --workflow <workflow> --run-file <run file> --evidence \"<the NOT GREEN line>\""),
             ("skill-ci-reserve-then-mark", "repair pushed --commit <repair sha> --run-file <run file>"),
             ("skill-ci-abandon-frees-a-place", "repair abandon --commit <repair sha> --reason <why> --run-file <run file>"),
-            ("skill-ci-close-re-reads-github", "re-reads the run from GitHub (head sha, conclusion, workflow, branch, repository, and run id must all agree"),
+            ("skill-ci-close-re-reads-github", "re-reads the run from GitHub (head sha, conclusion, workflow, branch, repository, run id, and the latest attempt and workflow id the line names as `attempt=N workflow-id=W` must all agree"),
+            # D00 T04 §41: the repair evidence, receipts, strict replay, the
+            # decision table, the severity rule, and sanitized captures.
+            ("skill-ci-abandon-asks-the-remote", "abandon first asks the remote (`--remote <name>`, default `origin`), marks a commit that landed pushed instead"),
+            ("skill-ci-repair-receipt", "every repair command ends its output with a versioned `repair-receipt: {json}` line"),
+            ("skill-ci-strict-replay", "a truncated, duplicate, out-of-order, edited, or foreign journal line, or a journal cut below its committed lines, refuses"),
+            ("skill-ci-retire-re-derives", "re-derives the exclusion from the committed workflow at the silent push"),
+            ("skill-ci-decision-table", "prints a red's `decision:` line, the first matching row of its ordered decision table"),
+            ("skill-ci-severity", "GitHub masks only registered secrets, so a credential that reaches a log unregistered"),
+            ("skill-ci-capture-run", "python scripts/review_prompt.py capture-run <run id> --workflow-file <file> --kind <kind> --section <ref>"),
             ("skill-ci-ceiling-keyed-and-journalled", "repair ceiling --run-id <GitHub run id> --attempt <run attempt> --run-file <run file>"),
             ("skill-ci-quotes-redacted", "a record quotes `ci-wait` only as printed, its secret shapes already masked"),
             ("skill-ci-unknown-cause", "An unknown cause owes bounded evidence gathering"),
@@ -8178,7 +8793,12 @@ if __name__ == "__main__":
             # D00 T04 §39: a changed trigger is not enough; the new triggers
             # must exclude this very push (its event, branch, and paths).
             rc_n, wf_new = _git_out(["show", f"{ident[0]}:{wf_path}"])
-            excluded, why = push_excluded(push_trigger_filter(wf_new if rc_n == 0 else None), push_branch, changed)
+            push_paths, why_paths = changed_paths_for_push(base, ident[0])
+            if push_paths is None:
+                print(f"ci-wait: --expect-no-run refused: the pushed paths cannot be derived ({why_paths}), so "
+                      f"exclusion is unproven", file=sys.stderr)
+                sys.exit(2)
+            excluded, why = push_excluded(push_trigger_filter(wf_new if rc_n == 0 else None), push_branch, push_paths)
             if not excluded:
                 print(f"ci-wait: --expect-no-run refused: {why}, so silence would not be explained by the "
                       f"authorized change", file=sys.stderr)
@@ -8195,7 +8815,8 @@ if __name__ == "__main__":
             # A distinct outcome: an authorized silence is never green, and
             # repair close refuses it as evidence (D00 T04 §37).
             print(f"ci-wait: {ident[0][:12]} {workflow} NOT GREEN: no run within {int(timeout)}s, as authorized "
-                  f"by {authorized_by} at {authorized_at} for {approved_range} ({expect_no_run}; {why})")
+                  f"by {authorized_by} at {authorized_at} for {approved_range} branch={push_branch} "
+                  f"workflow-path={wf_path} ({expect_no_run}; {why})")
             sys.exit(4)
         if not touches_workflow and not push_triggers_workflow(changed, filters):
             print(f"ci-wait: {ident[0][:12]} {workflow} not triggered "
@@ -8215,6 +8836,21 @@ if __name__ == "__main__":
         # Exit 3 (pending past the ceiling) is not retried here: the skills
         # say to re-run ci-wait once and then escalate (D00 T04 §35).
         print(redact(line), file=sys.stdout if code == 0 else sys.stderr)
+        sys.exit(code)
+    if len(sys.argv) >= 3 and sys.argv[1] == "capture-run":
+        # capture-run <run id> --workflow-file F --kind K --section "D00 T04 §N" [--dir D] (D00 T04 §41)
+        cap = {"--workflow-file": None, "--kind": None, "--section": None, "--dir": None}
+        rest_c = sys.argv[3:]
+        if len(rest_c) % 2 or any(k not in cap for k in rest_c[0::2]):
+            print("capture-run: usage: capture-run <run id> --workflow-file F --kind K --section S [--dir D]",
+                  file=sys.stderr)
+            sys.exit(2)
+        cap.update(dict(zip(rest_c[0::2], rest_c[1::2])))
+        if not (sys.argv[2].isdigit() and cap["--workflow-file"] and cap["--kind"] and cap["--section"]):
+            print("capture-run: needs a numeric run id, --workflow-file, --kind, and --section", file=sys.stderr)
+            sys.exit(2)
+        code, line = capture_run(sys.argv[2], cap["--workflow-file"], cap["--kind"], cap["--section"], cap["--dir"])
+        print(line, file=sys.stdout if code == 0 else sys.stderr)
         sys.exit(code)
     if len(sys.argv) == 4 and sys.argv[1] == "check-parents":
         # check-parents <commit> <expected-parent>: the stamp lands on

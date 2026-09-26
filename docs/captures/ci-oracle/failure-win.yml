@@ -1,0 +1,66 @@
+name: failure-win
+
+# Disposable: the D00 T04 §41 Windows failure drill. Each step fails on
+# purpose (continue-on-error keeps the job going), so the exit code and
+# output GitHub records can be compared with the printed re-run executed
+# locally. Lives only on the drill branch.
+on:
+  push:
+    branches: ['drill/**']
+
+jobs:
+  failure-win:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: native failure then output
+        continue-on-error: true
+        run: |
+          cmd /c exit 3
+          Write-Output "after native"
+      - name: native failure last
+        continue-on-error: true
+        run: |
+          Write-Output "before native"
+          cmd /c exit 4
+      - name: pwsh exception
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Write-Output "before throw"
+          throw "drill boom"
+          Write-Output "after throw"
+      - name: pwsh non-terminating error
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Write-Error "drill soft"
+          Write-Output "after soft"
+      - name: powershell exception
+        continue-on-error: true
+        shell: powershell
+        run: |
+          Write-Output "before throw"
+          throw "drill boom"
+      - name: cmd expansion characters
+        continue-on-error: true
+        shell: cmd
+        run: |
+          @echo off
+          echo 100%% done
+          echo caret^^ and bang!
+          set V=one
+          echo !V! %V%
+          exit /b 5
+      - name: cmd failure mid-script
+        continue-on-error: true
+        shell: cmd
+        run: |
+          @echo off
+          cmd /c exit 2
+          echo after failure
+      - name: missing working directory
+        continue-on-error: true
+        shell: pwsh
+        working-directory: drill/absent
+        run: Write-Output "never"

@@ -53,7 +53,7 @@ context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	20
 context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5023832Z   token: ***
 context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5024287Z   ssh-strict: true
 context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5024725Z   ssh-user: git
-context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5025199Z   persist-credentials: true
+context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5025199Z   persist-credentials: ***
 context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5025686Z   clean: true
 context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5026125Z   sparse-checkout-cone-mode: true
 context-echo-sh	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-25T22:05:47.5026647Z   fetch-depth: 1

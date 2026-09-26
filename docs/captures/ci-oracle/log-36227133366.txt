@@ -1,0 +1,309 @@
+failure-win	Set up job	﻿2026-09-26T07:33:26.8391638Z Current runner version: '2.337.0'
+failure-win	Set up job	2026-09-26T07:33:26.8662692Z ##[group]Runner Image Provisioner
+failure-win	Set up job	2026-09-26T07:33:26.8663559Z Hosted Compute Agent
+failure-win	Set up job	2026-09-26T07:33:26.8664106Z Version: 20260828.587
+failure-win	Set up job	2026-09-26T07:33:26.8664695Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+failure-win	Set up job	2026-09-26T07:33:26.8665436Z Build Date: 2026-08-28T16:44:25Z
+failure-win	Set up job	2026-09-26T07:33:26.8666108Z Worker ID: {02cf01a8-00cf-4400-adcc-951c244201df}
+failure-win	Set up job	2026-09-26T07:33:26.8666812Z Azure Region: centralus
+failure-win	Set up job	2026-09-26T07:33:26.8667353Z ##[endgroup]
+failure-win	Set up job	2026-09-26T07:33:26.8668716Z ##[group]Operating System
+failure-win	Set up job	2026-09-26T07:33:26.8669368Z Microsoft Windows Server 2025
+failure-win	Set up job	2026-09-26T07:33:26.8669974Z 10.0.26100
+failure-win	Set up job	2026-09-26T07:33:26.8670427Z Datacenter
+failure-win	Set up job	2026-09-26T07:33:26.8670935Z ##[endgroup]
+failure-win	Set up job	2026-09-26T07:33:26.8671894Z ##[group]Runner Image
+failure-win	Set up job	2026-09-26T07:33:26.8672493Z Image: windows-2025-vs2026
+failure-win	Set up job	2026-09-26T07:33:26.8673047Z Version: 20260922.246.2
+failure-win	Set up job	2026-09-26T07:33:26.8674135Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260922.246/images/windows/Windows2025-VS2026-Readme.md
+failure-win	Set up job	2026-09-26T07:33:26.8676044Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260922.246
+failure-win	Set up job	2026-09-26T07:33:26.8676989Z ##[endgroup]
+failure-win	Set up job	2026-09-26T07:33:26.8680007Z ##[group]GITHUB_TOKEN Permissions
+failure-win	Set up job	2026-09-26T07:33:26.8682094Z Actions: write
+failure-win	Set up job	2026-09-26T07:33:26.8682710Z ArtifactMetadata: write
+failure-win	Set up job	2026-09-26T07:33:26.8683278Z Attestations: write
+failure-win	Set up job	2026-09-26T07:33:26.8683885Z Checks: write
+failure-win	Set up job	2026-09-26T07:33:26.8684374Z CodeQuality: write
+failure-win	Set up job	2026-09-26T07:33:26.8684928Z Contents: write
+failure-win	Set up job	2026-09-26T07:33:26.8685449Z CopilotRequests: write
+failure-win	Set up job	2026-09-26T07:33:26.8685977Z Deployments: write
+failure-win	Set up job	2026-09-26T07:33:26.8686493Z Discussions: write
+failure-win	Set up job	2026-09-26T07:33:26.8686986Z Drives: write
+failure-win	Set up job	2026-09-26T07:33:26.8687458Z Issues: write
+failure-win	Set up job	2026-09-26T07:33:26.8687979Z Metadata: read
+failure-win	Set up job	2026-09-26T07:33:26.8688563Z Models: read
+failure-win	Set up job	2026-09-26T07:33:26.8689123Z Packages: write
+failure-win	Set up job	2026-09-26T07:33:26.8689611Z Pages: write
+failure-win	Set up job	2026-09-26T07:33:26.8690111Z PullRequests: write
+failure-win	Set up job	2026-09-26T07:33:26.8690648Z RepositoryProjects: write
+failure-win	Set up job	2026-09-26T07:33:26.8691201Z SecurityEvents: write
+failure-win	Set up job	2026-09-26T07:33:26.8692187Z Statuses: write
+failure-win	Set up job	2026-09-26T07:33:26.8692719Z VulnerabilityAlerts: read
+failure-win	Set up job	2026-09-26T07:33:26.8693243Z ##[endgroup]
+failure-win	Set up job	2026-09-26T07:33:26.8695297Z Secret source: Actions
+failure-win	Set up job	2026-09-26T07:33:26.8696146Z Cache mode: write
+failure-win	Set up job	2026-09-26T07:33:26.8696849Z Prepare workflow directory
+failure-win	Set up job	2026-09-26T07:33:26.9731010Z Prepare all required actions
+failure-win	Set up job	2026-09-26T07:33:26.9779415Z Getting action download info
+failure-win	Set up job	2026-09-26T07:33:27.1952777Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+failure-win	Set up job	2026-09-26T07:33:27.5842935Z Complete job name: failure-win
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-26T07:33:28.2591428Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2592660Z with:
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2593087Z   repository: rizonesoft/Resolute
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2596954Z   token: ***
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2597387Z   ssh-strict: true
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2597791Z   ssh-user: git
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2598199Z   persist-credentials: ***
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2598654Z   clean: true
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2599068Z   sparse-checkout-cone-mode: true
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2599554Z   fetch-depth: 1
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2599955Z   fetch-tags: false
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2600362Z   show-progress: true
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2600782Z   lfs: false
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2601575Z   submodules: false
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2602011Z   set-safe-directory: true
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2602484Z   allow-unsafe-pr-checkout: false
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.2603235Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.4547572Z Syncing repository: rizonesoft/Resolute
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.4549732Z ##[group]Getting Git version info
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.4550665Z Working directory is 'D:\a\Resolute\Resolute'
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:28.6061926Z [command]"C:\Program Files\Git\bin\git.exe" version
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.0388909Z git version 2.55.0.windows.5
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.0487729Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.0747386Z Temporarily overriding HOME='D:\a\_temp\6bb24759-2b5b-43ff-9bb1-8805c928e85b' before making global git config changes
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.0749741Z Adding repository directory to the temporary git global config as a safe directory
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.0752081Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Resolute\Resolute
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.1435844Z Deleting the contents of 'D:\a\Resolute\Resolute'
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.1440868Z ##[group]Determining repository object format
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.1443581Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.1444875Z ##[group]Initializing the repository
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.1465791Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\Resolute\Resolute
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.2560860Z Initialized empty Git repository in D:/a/Resolute/Resolute/.git/
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.2629657Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/rizonesoft/Resolute
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.3475835Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.3477742Z ##[group]Disabling automatic garbage collection
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.3488224Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.3963661Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.3966031Z ##[group]Setting up auth
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.3967432Z Removing SSH command configuration
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.3980645Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:29.4614001Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:31.9021906Z Removing HTTP extra header
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:31.9029990Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:32.0735300Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:33.8251975Z Removing includeIf entries pointing to credentials config files
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:33.8263424Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:34.0211703Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.2199097Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.2941250Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Resolute/Resolute/.git.path D:\a\_temp\git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.4169585Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path D:\a\_temp\git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.5300121Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.6042067Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.7299100Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.7314508Z ##[group]Fetching the repository
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:35.7316952Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c0e423e630a75c7e068ebbc5f48a491decb16468:refs/remotes/origin/drill/d00-t04-s41-win
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.3961475Z From https://github.com/rizonesoft/Resolute
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.3965124Z  * [new ref]         c0e423e630a75c7e068ebbc5f48a491decb16468 -> origin/drill/d00-t04-s41-win
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.4059800Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/drill/d00-t04-s41-win
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.5684024Z   origin/drill/d00-t04-s41-win
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.5761513Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/drill/d00-t04-s41-win
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.7051867Z c0e423e630a75c7e068ebbc5f48a491decb16468
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.7111624Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.7112542Z ##[group]Determining the checkout info
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.7113654Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.7126453Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:40.9176597Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:41.1217585Z ##[group]Checking out the ref
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:41.1234300Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B drill/d00-t04-s41-win refs/remotes/origin/drill/d00-t04-s41-win
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:42.4242483Z Updating files:  27% (2293/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:42.4922330Z Updating files:  28% (2319/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:43.4033128Z Updating files:  29% (2401/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:43.6495853Z Updating files:  29% (2477/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:43.6818480Z Updating files:  30% (2484/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:43.7114310Z Updating files:  31% (2567/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:43.7393477Z Updating files:  32% (2650/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:43.7674347Z Updating files:  33% (2733/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.0529557Z Updating files:  34% (2815/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.0774826Z Updating files:  35% (2898/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.3815080Z Updating files:  36% (2981/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.4914056Z Updating files:  36% (3038/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.5257098Z Updating files:  37% (3064/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.5577192Z Updating files:  38% (3147/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.5823763Z Updating files:  39% (3229/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.6271363Z Updating files:  40% (3312/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.6532221Z Updating files:  41% (3395/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.6827155Z Updating files:  42% (3478/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.7287716Z Updating files:  43% (3560/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.7930179Z Updating files:  44% (3643/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.8159257Z Updating files:  45% (3726/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.8443939Z Updating files:  46% (3809/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.8716910Z Updating files:  47% (3892/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.8989248Z Updating files:  48% (3974/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:44.9859187Z Updating files:  49% (4057/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.0336199Z Updating files:  50% (4140/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.0629654Z Updating files:  51% (4223/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.0896581Z Updating files:  52% (4306/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.1156305Z Updating files:  53% (4388/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.1421461Z Updating files:  54% (4471/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.1935240Z Updating files:  55% (4554/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.2646984Z Updating files:  56% (4637/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.2926619Z Updating files:  57% (4720/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.3200376Z Updating files:  58% (4802/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.3355016Z Updating files:  59% (4885/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.3455755Z Updating files:  59% (4935/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.3872577Z Updating files:  60% (4968/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.5088922Z Updating files:  61% (5051/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.5566812Z Updating files:  62% (5133/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.5931200Z Updating files:  63% (5216/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.6679408Z Updating files:  64% (5299/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.7157069Z Updating files:  65% (5382/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.7350051Z Updating files:  66% (5465/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.7547038Z Updating files:  67% (5547/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.7731432Z Updating files:  68% (5630/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.8118338Z Updating files:  69% (5713/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.8299833Z Updating files:  70% (5796/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.8559061Z Updating files:  71% (5879/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.8716161Z Updating files:  72% (5961/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.8928975Z Updating files:  73% (6044/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.9118442Z Updating files:  74% (6127/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.9316918Z Updating files:  75% (6210/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:45.9512012Z Updating files:  76% (6293/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.1730150Z Updating files:  77% (6375/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.1989822Z Updating files:  78% (6458/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.5486491Z Updating files:  79% (6541/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.7120628Z Updating files:  79% (6608/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.7347505Z Updating files:  80% (6624/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.7616675Z Updating files:  81% (6706/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.7821025Z Updating files:  82% (6789/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:46.8045346Z Updating files:  83% (6872/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.0287294Z Updating files:  84% (6955/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.0510647Z Updating files:  85% (7038/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.3999273Z Updating files:  86% (7120/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.5574973Z Updating files:  86% (7173/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.5804588Z Updating files:  87% (7203/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.6028572Z Updating files:  88% (7286/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.6254830Z Updating files:  89% (7369/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.6569115Z Updating files:  90% (7452/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.9298992Z Updating files:  91% (7534/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.9523337Z Updating files:  92% (7617/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:47.9766947Z Updating files:  93% (7700/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.0126225Z Updating files:  94% (7783/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.0316419Z Updating files:  95% (7866/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.0477063Z Updating files:  96% (7948/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.0708814Z Updating files:  97% (8031/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.0988306Z Updating files:  98% (8114/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.1414444Z Updating files:  99% (8197/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.1414877Z Updating files: 100% (8279/8279)
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.1415139Z Updating files: 100% (8279/8279), done.
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.1924738Z Switched to a new branch 'drill/d00-t04-s41-win'
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.1986581Z branch 'drill/d00-t04-s41-win' set up to track 'origin/drill/d00-t04-s41-win'.
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.2213760Z ##[endgroup]
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.2629195Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+failure-win	Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:48.3048131Z c0e423e630a75c7e068ebbc5f48a491decb16468
+failure-win	native failure then output	﻿2026-09-26T07:33:48.3502183Z ##[group]Run cmd /c exit 3
+failure-win	native failure then output	2026-09-26T07:33:48.3502605Z ^[[36;1mcmd /c exit 3^[[0m
+failure-win	native failure then output	2026-09-26T07:33:48.3502841Z ^[[36;1mWrite-Output "after native"^[[0m
+failure-win	native failure then output	2026-09-26T07:33:48.4143147Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+failure-win	native failure then output	2026-09-26T07:33:48.4143577Z ##[endgroup]
+failure-win	native failure then output	2026-09-26T07:33:48.8450098Z after native
+failure-win	native failure then output	2026-09-26T07:33:48.9236975Z ##[error]Process completed with exit code 1.
+failure-win	native failure last	﻿2026-09-26T07:33:48.9471819Z ##[group]Run Write-Output "before native"
+failure-win	native failure last	2026-09-26T07:33:48.9472257Z ^[[36;1mWrite-Output "before native"^[[0m
+failure-win	native failure last	2026-09-26T07:33:48.9472525Z ^[[36;1mcmd /c exit 4^[[0m
+failure-win	native failure last	2026-09-26T07:33:48.9546635Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+failure-win	native failure last	2026-09-26T07:33:48.9546995Z ##[endgroup]
+failure-win	native failure last	2026-09-26T07:33:49.2849938Z before native
+failure-win	native failure last	2026-09-26T07:33:49.3588894Z ##[error]Process completed with exit code 1.
+failure-win	pwsh exception	﻿2026-09-26T07:33:49.3746072Z ##[group]Run Write-Output "before throw"
+failure-win	pwsh exception	2026-09-26T07:33:49.3746480Z ^[[36;1mWrite-Output "before throw"^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:49.3746738Z ^[[36;1mthrow "drill boom"^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:49.3746967Z ^[[36;1mWrite-Output "after throw"^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:49.3823866Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+failure-win	pwsh exception	2026-09-26T07:33:49.3824230Z ##[endgroup]
+failure-win	pwsh exception	2026-09-26T07:33:49.7476961Z before throw
+failure-win	pwsh exception	2026-09-26T07:33:49.9518441Z ^[[31;1mException: ^[[0mD:\a\_temp\77348954-5831-4fca-abc5-1efc97878916.ps1:3^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:49.9519531Z ^[[31;1m^[[0m^[[36;1mLine |^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:49.9520783Z ^[[31;1m^[[0m^[[36;1m^[[36;1m   3 | ^[[0m ^[[36;1mthrow "drill boom"^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:49.9521646Z ^[[31;1m^[[0m^[[36;1m^[[36;1m^[[0m^[[36;1m^[[0m^[[36;1m     | ^[[31;1m ~~~~~~~~~~~~~~~~~~^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:49.9522655Z ^[[31;1m^[[0m^[[36;1m^[[36;1m^[[0m^[[36;1m^[[0m^[[36;1m^[[31;1m^[[31;1m^[[36;1m     | ^[[31;1mdrill boom^[[0m
+failure-win	pwsh exception	2026-09-26T07:33:50.0219929Z ##[error]Process completed with exit code 1.
+failure-win	pwsh non-terminating error	﻿2026-09-26T07:33:50.0375221Z ##[group]Run Write-Error "drill soft"
+failure-win	pwsh non-terminating error	2026-09-26T07:33:50.0375592Z ^[[36;1mWrite-Error "drill soft"^[[0m
+failure-win	pwsh non-terminating error	2026-09-26T07:33:50.0375854Z ^[[36;1mWrite-Output "after soft"^[[0m
+failure-win	pwsh non-terminating error	2026-09-26T07:33:50.0444849Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+failure-win	pwsh non-terminating error	2026-09-26T07:33:50.0445203Z ##[endgroup]
+failure-win	pwsh non-terminating error	2026-09-26T07:33:50.6697212Z ^[[31;1mWrite-Error: ^[[31;1mdrill soft^[[0m
+failure-win	pwsh non-terminating error	2026-09-26T07:33:50.7209473Z ##[error]Process completed with exit code 1.
+failure-win	powershell exception	﻿2026-09-26T07:33:50.7358809Z ##[group]Run Write-Output "before throw"
+failure-win	powershell exception	2026-09-26T07:33:50.7359245Z ^[[36;1mWrite-Output "before throw"^[[0m
+failure-win	powershell exception	2026-09-26T07:33:50.7359523Z ^[[36;1mthrow "drill boom"^[[0m
+failure-win	powershell exception	2026-09-26T07:33:50.7424903Z shell: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.EXE -command ". '{0}'"
+failure-win	powershell exception	2026-09-26T07:33:50.7425335Z ##[endgroup]
+failure-win	powershell exception	2026-09-26T07:33:53.2253028Z before throw
+failure-win	powershell exception	2026-09-26T07:33:53.4506711Z drill boom
+failure-win	powershell exception	2026-09-26T07:33:53.4507572Z At D:\a\_temp\9057013f-3575-4b3e-be0f-d6692e679e8d.ps1:3 char:1
+failure-win	powershell exception	2026-09-26T07:33:53.4508324Z + throw "drill boom"
+failure-win	powershell exception	2026-09-26T07:33:53.4508660Z + ~~~~~~~~~~~~~~~~~~
+failure-win	powershell exception	2026-09-26T07:33:53.4509521Z     + CategoryInfo          : OperationStopped: (drill boom:String) [], RuntimeException
+failure-win	powershell exception	2026-09-26T07:33:53.4510153Z     + FullyQualifiedErrorId : drill boom
+failure-win	powershell exception	2026-09-26T07:33:53.4511190Z  
+failure-win	powershell exception	2026-09-26T07:33:53.4944143Z ##[error]Process completed with exit code 1.
+failure-win	cmd expansion characters	﻿2026-09-26T07:33:53.5109895Z ##[group]Run @echo off
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5110235Z ^[[36;1m@echo off^[[0m
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5110431Z ^[[36;1mecho 100%% done^[[0m
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5110647Z ^[[36;1mecho caret^^ and bang!^[[0m
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5110882Z ^[[36;1mset V=one^[[0m
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5111069Z ^[[36;1mecho !V! %V%^[[0m
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5111252Z ^[[36;1mexit /b 5^[[0m
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5141520Z shell: C:\Windows\system32\cmd.EXE /D /E:ON /V:OFF /S /C "CALL "{0}""
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5141899Z ##[endgroup]
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5279345Z 100% done
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5282104Z caret^ and bang!
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5288378Z !V! one
+failure-win	cmd expansion characters	2026-09-26T07:33:53.5312290Z ##[error]Process completed with exit code 5.
+failure-win	cmd failure mid-script	﻿2026-09-26T07:33:53.5464618Z ##[group]Run @echo off
+failure-win	cmd failure mid-script	2026-09-26T07:33:53.5465057Z ^[[36;1m@echo off^[[0m
+failure-win	cmd failure mid-script	2026-09-26T07:33:53.5465390Z ^[[36;1mcmd /c exit 2^[[0m
+failure-win	cmd failure mid-script	2026-09-26T07:33:53.5465738Z ^[[36;1mecho after failure^[[0m
+failure-win	cmd failure mid-script	2026-09-26T07:33:53.5498486Z shell: C:\Windows\system32\cmd.EXE /D /E:ON /V:OFF /S /C "CALL "{0}""
+failure-win	cmd failure mid-script	2026-09-26T07:33:53.5498836Z ##[endgroup]
+failure-win	cmd failure mid-script	2026-09-26T07:33:53.5706325Z after failure
+failure-win	cmd failure mid-script	2026-09-26T07:33:53.5727390Z ##[error]Process completed with exit code 2.
+failure-win	missing working directory	﻿2026-09-26T07:33:53.5895241Z ##[group]Run Write-Output "never"
+failure-win	missing working directory	2026-09-26T07:33:53.5895779Z ^[[36;1mWrite-Output "never"^[[0m
+failure-win	missing working directory	2026-09-26T07:33:53.5985254Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+failure-win	missing working directory	2026-09-26T07:33:53.5985608Z ##[endgroup]
+failure-win	missing working directory	2026-09-26T07:33:53.6142159Z ##[error]An error occurred trying to start process 'C:\Program Files\PowerShell\7\pwsh.EXE' with working directory 'D:\a\Resolute\Resolute\drill/absent'. The directory name is invalid.
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	﻿2026-09-26T07:33:53.6363453Z Post job cleanup.
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.8512558Z [command]"C:\Program Files\Git\bin\git.exe" version
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.8853257Z git version 2.55.0.windows.5
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.8926132Z Temporarily overriding HOME='D:\a\_temp\54a641c8-b9f7-428c-bcc5-b0699297cd1d' before making global git config changes
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.8927398Z Adding repository directory to the temporary git global config as a safe directory
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.8941641Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Resolute\Resolute
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.9269736Z Removing SSH command configuration
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.9281184Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:53.9582466Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:54.5217445Z Removing HTTP extra header
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:54.5228019Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:54.5631360Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1046439Z Removing includeIf entries pointing to credentials config files
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1057695Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1314746Z includeif.gitdir:D:/a/Resolute/Resolute/.git.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1315470Z includeif.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1316109Z includeif.gitdir:/github/workspace/.git.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1316708Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1355931Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Resolute/Resolute/.git.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1609432Z D:\a\_temp\git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1653045Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Resolute/Resolute/.git.path D\:\\a\\_temp\\git\-credentials\-363c2d56\-de14\-48a8\-b237\-8533837c4906\.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.1950078Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.2200718Z D:\a\_temp\git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.2241666Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/Resolute/Resolute/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-363c2d56\-de14\-48a8\-b237\-8533837c4906\.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.2532544Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.2778781Z /github/runner_temp/git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.2818370Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-363c2d56\-de14\-48a8\-b237\-8533837c4906\.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.3107774Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.3351708Z /github/runner_temp/git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.3428834Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-363c2d56\-de14\-48a8\-b237\-8533837c4906\.config
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.3729134Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+failure-win	Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1	2026-09-26T07:33:55.8981547Z Removing credentials config 'D:\a\_temp\git-credentials-363c2d56-de14-48a8-b237-8533837c4906.config'
+failure-win	Complete job	﻿2026-09-26T07:33:55.9175795Z Cleaning up orphan processes

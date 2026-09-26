@@ -10,6 +10,7 @@ Each drill ran once on a disposable `drill/**` branch that was then deleted, so 
 | D00 T04 §37 context drill | `context-echo.yml` | 36191008012 | ubuntu-24.04, image 20260920.314.1, runner 2.337.0 | bash default and explicit templates, env, and working directory |
 | D00 T04 §37 sh drill | `context-echo-sh.yml` | 36194988672 | ubuntu-24.04, image 20260920.314.1, runner 2.337.0 | the explicit `sh` template |
 | D00 T04 §39 Windows drill | `context-echo-win.yml` | 36211341983 | windows-2025-vs2026, image 20260922.246.2, runner 2.337.0 | the `pwsh`, `powershell`, and `cmd` templates, and the `Stop` error preference GitHub sets |
+| D00 T04 §41 Windows failure drill | `failure-win.yml` | 36227133366 | windows-2025-vs2026, image 20260922.246.2, runner 2.337.0 | the exit code and output of native failures, PowerShell exceptions, cmd expansion, and a missing working directory, each reproduced by the printed re-run locally |
 
 Files per drill:
 
@@ -17,4 +18,4 @@ Files per drill:
 - `run-<run id>.json`: the run's record (`gh run view --json`): id, head sha, branch, event, conclusion, attempt.
 - `log-<run id>.txt`: the run's full log (`gh run view --log`). Each step's output follows its `##[endgroup]`; its `shell:` line is the template GitHub ran.
 
-`oracle.json` lists the drills. A new drill adds its three files and one entry there.
+`oracle.json` lists the drills. A new drill is captured only through `python scripts/review_prompt.py capture-run <run id> --workflow-file <file> --kind <kind> --section <ref>` (D00 T04 §41), which writes its three files and one entry only when every file passes the redaction and a clean secret scan. Each entry's `provenance` keeps how and when it was fetched, the head commit, and each file's sha256 (over LF line ends, since a checkout may convert them). The three drills captured before D00 T04 §41 were re-sanitized then: the checkout step's `persist-credentials` input reads `***`, and no oracle leg reads it.

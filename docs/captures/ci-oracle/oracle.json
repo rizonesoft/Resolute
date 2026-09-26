@@ -4,25 +4,86 @@
    "kind": "scalar",
    "workflow": "scalar-echo.yml",
    "run": 36175449390,
-   "section": "D00 T04 \u00a735"
+   "section": "D00 T04 \u00a735",
+   "provenance": {
+    "captured": "under D00 T04 \u00a735, recorded in docs/phase-runs/2026-09-25-phase-0.md",
+    "source": "gh run view --json and --log, the workflow file at the head commit",
+    "head_sha": "18dba4c6aa812d434c2ad797e0eb5cb337268c4f",
+    "sanitized": "re-sanitized 2026-09-26 under D00 T04 \u00a741: redact(), then secret_scan() clean",
+    "sha256": {
+     "scalar-echo.yml": "965dc47cfa85be394d252aa7e1498707de878c339b804376f99587ab9d85cae5",
+     "run-36175449390.json": "3658af705cbdf37abe7cb479ba2ef5406b14be6822cda88d36f1369e175d0a60",
+     "log-36175449390.txt": "93298b851be9d2a29321074ac24ce941918a3cf84bbf2a28a230d416329d066f"
+    }
+   }
   },
   {
    "kind": "context",
    "workflow": "context-echo.yml",
    "run": 36191008012,
-   "section": "D00 T04 \u00a737"
+   "section": "D00 T04 \u00a737",
+   "provenance": {
+    "captured": "under D00 T04 \u00a737, recorded in docs/phase-runs/2026-09-25-phase-0.md",
+    "source": "gh run view --json and --log, the workflow file at the head commit",
+    "head_sha": "e23a44964b00280f1ce3eff309c4cb0c84a82b09",
+    "sanitized": "re-sanitized 2026-09-26 under D00 T04 \u00a741: redact(), then secret_scan() clean",
+    "sha256": {
+     "context-echo.yml": "2c0a6c723c1fd42115efe47c32fb47e6bc16b776c6925c3ea55e97fd980d4199",
+     "run-36191008012.json": "ba98c4736219b87a84fa7c53de70bf338a4f1029c0209b2686b878ec133ca008",
+     "log-36191008012.txt": "91f13bb1c5f05085930a002fb25723a97d99f7a6f9b725050bd94a1ba13eee05"
+    }
+   }
   },
   {
    "kind": "context",
    "workflow": "context-echo-sh.yml",
    "run": 36194988672,
-   "section": "D00 T04 \u00a737"
+   "section": "D00 T04 \u00a737",
+   "provenance": {
+    "captured": "under D00 T04 \u00a737, recorded in docs/phase-runs/2026-09-25-phase-0.md",
+    "source": "gh run view --json and --log, the workflow file at the head commit",
+    "head_sha": "dceea66a0888b25cae02ff0ec6cb57b3cd2938d9",
+    "sanitized": "re-sanitized 2026-09-26 under D00 T04 \u00a741: redact(), then secret_scan() clean",
+    "sha256": {
+     "context-echo-sh.yml": "7304305f003aa37775017634b542898903c07f082abb6c3e66ca2704926918cc",
+     "run-36194988672.json": "82335ace7844c049ada99ba421c0824af035882ea616ccc658a16041cdf2c66f",
+     "log-36194988672.txt": "f09fc87620a3a318e6879732efdeef6ad963e8b22bbba900caa83275985bfb36"
+    }
+   }
   },
   {
    "kind": "context",
    "workflow": "context-echo-win.yml",
    "run": 36211341983,
-   "section": "D00 T04 \u00a739"
+   "section": "D00 T04 \u00a739",
+   "provenance": {
+    "captured": "under D00 T04 \u00a739, recorded in docs/phase-runs/2026-09-25-phase-0.md",
+    "source": "gh run view --json and --log, the workflow file at the head commit",
+    "head_sha": "cda21b8df09d2a3e8f630b83877e807eb3fc948a",
+    "sanitized": "re-sanitized 2026-09-26 under D00 T04 \u00a741: redact(), then secret_scan() clean",
+    "sha256": {
+     "context-echo-win.yml": "4849c7747ac8f3ab25bb6b7ccab2808b3a2ef494fcd72e39c0253dc001e12e2e",
+     "run-36211341983.json": "537137f461464ce9de8581b7d7cf996e49d2f5cee8d393d7f64e96ab63836c1c",
+     "log-36211341983.txt": "08bac81b8c56ec32013faa69696b5b944c12fcd02c9297c2d4098020794590d5"
+    }
+   }
+  },
+  {
+   "kind": "failure",
+   "workflow": "failure-win.yml",
+   "run": 36227133366,
+   "section": "D00 T04 \u00a741",
+   "provenance": {
+    "captured_at": "2026-09-26T07:35:47Z",
+    "source": "gh run view --json and --log, gh api contents at the head commit",
+    "head_sha": "c0e423e630a75c7e068ebbc5f48a491decb16468",
+    "sanitized": "redact(), then secret_scan() clean",
+    "sha256": {
+     "failure-win.yml": "97b82d439a5e725e012d50879512c4068cfb0f67c9ffa99c836a19e7afb01ea7",
+     "run-36227133366.json": "0186f0a63da478e3cde5273e3a103402ba2cc639d24a0b671fec75f2c8ab46c2",
+     "log-36227133366.txt": "a2c2113f5f1cab7638bde9d0389be2ab1e7df4c4209f5af1a5b11d307b96e03f"
+    }
+   }
   }
  ]
 }
