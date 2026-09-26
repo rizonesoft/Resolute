@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**472 findings across 52 sections.**
+**476 findings across 53 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 124 | the plan or the evidence misdescribes what happened |
+| `record` | 127 | the plan or the evidence misdescribes what happened |
 | `adversarial` | 116 | fails under hostile or unexpected input |
 | `correctness` | 80 | the code does the wrong thing |
-| `integration` | 78 | a consumer, caller, or downstream artifact no longer holds |
+| `integration` | 79 | a consumer, caller, or downstream artifact no longer holds |
 | `consistency` | 60 | disagrees with the rest of the suite, its naming, or its layout |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -27,7 +27,7 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
 | `major` | 213 | wrong behavior in code, plan, or record |
-| `minor` | 253 | polish or wording, or no surviving defect |
+| `minor` | 257 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -71,6 +71,10 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T01 §6` | F4 | minor | `record` | corrected | self | the size baseline named a figure its own source superseded |
 | `D00 T01 §6` | F5 | minor | `adversarial` | corrected | self | a network check was being wired into a gate that must work offline |
 | `D00 T01 §6` | F6 | minor | `source-defect` | cleared | self | clang-tidy 21 had a false positive that 23 retired |
+| `D00 T01 §9` | F1 | minor | `integration` | fixed | independent | job-level run defaults drop every step's re-run printout |
+| `D00 T01 §9` | F2 | minor | `record` | fixed | independent | the inventory and removal results are summarized, not quoted |
+| `D00 T01 §9` | F3 | minor | `record` | fixed | independent | the broader inventory output is still not committed whole |
+| `D00 T01 §9` | F4 | minor | `record` | fixed | independent | the capture truncates each matching line |
 | `D00 T02 §1` | F1 | major | `correctness` | fixed | independent | a defect `§5` already fixed, reintroduced here |
 | `D00 T02 §1` | F2 | major | `integration` | fixed | self | adding our own tests put 37 dependency findings into the baseline |
 | `D00 T02 §1` | F3 | major | `source-defect` | fixed | self | the link failed because UNICODE propagates publicly |

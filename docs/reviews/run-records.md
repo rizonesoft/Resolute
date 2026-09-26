@@ -608,3 +608,17 @@ round: 3 model: gpt-6-astra effort: high outcome: empty candidate: b71d71a6 prov
 round: 4 model: gpt-6-astra effort: high outcome: independent candidate: b71d71a6 provider: openai version: gpt-6-astra cost: unresolved latency: 52s opportunity: full-scope purpose: section-review provenance: recorded findings:
 empty: 3
 refuted: 0
+
+run: D00-T01-S9
+date: 2026-09-26
+runner: panel
+rounds: 5
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 5cb4e802 provider: openai version: gpt-6-astra cost: 33883tokens latency: 28s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T01-S9-F2
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: 0ec273d4 provider: openai version: gpt-6-astra cost: 34738tokens latency: 25s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T01-S9-F3
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: 27d2f1fb provider: openai version: gpt-6-astra cost: 31795tokens latency: 66s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T01-S9-F4
+# round 3 is the Full sign-off: F4 was stamp-invalidating (the stamp would quote a false "committed whole"), so round 4 ran on depth.
+round: 4 model: gpt-6-astra effort: high outcome: empty candidate: bdb01ffa provider: openai version: gpt-6-astra cost: 44539tokens latency: 22s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+# round 5 is the independent pass (`panel_slots.py exec independent --commit 072661e3`, ran before panel round 1); the runner printed no token figure.
+round: 5 model: gpt-6-astra effort: high outcome: independent candidate: 072661e3 provider: openai version: gpt-6-astra cost: unresolved latency: 81s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T01-S9-F1
+empty: 1
+refuted: 0
