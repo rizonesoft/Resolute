@@ -497,7 +497,10 @@ void ListView::OnPaint() {
 
     HRESULT hr = m_rt->EndDraw();
     m_paintHr = hr;
-    if (hr == D2DERR_RECREATE_TARGET) {
+    // Only the window's own target is recreated here: an offscreen target
+    // RenderTo lent is the caller's, and the window target stays intact
+    // (panel round 4 of the D00 T02 §9 review).
+    if (hr == D2DERR_RECREATE_TARGET && m_rt.Get() == static_cast<ID2D1RenderTarget*>(m_hwndRt.Get())) {
         m_rt.Reset();
         m_hwndRt.Reset();
     }

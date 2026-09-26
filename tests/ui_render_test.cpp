@@ -150,7 +150,8 @@ Image RenderGdi(UINT w, UINT h, const std::function<void(HDC)>& paint) {
 }
 
 // Pixels where any channel differs by more than the tolerance, over the
-// union of both sizes: a pixel only one image has always differs, so a size
+// union of both sizes: a pixel exactly one image has always differs (one in
+// neither is skipped), so a size
 // change fails with a count and a diff like any other change, and no pixel
 // is read out of bounds. `diff`, when given, receives the differing pixels
 // in red over a dimmed actual (black where the actual has no pixel).
@@ -162,6 +163,7 @@ int DiffCount(const Image& actual, const Image& want, Image* diff = nullptr) {
     for (UINT y = 0; y < h; ++y) {
         for (UINT x = 0; x < w; ++x) {
             const bool inA = x < actual.w && y < actual.h, inB = x < want.w && y < want.h;
+            if (!inA && !inB) continue;  // in neither image: nothing to compare
             // Blue, green, red: the bytes of a BGRA pixel, alpha (always opaque) aside.
             const auto* a = inA ? reinterpret_cast<const uint8_t*>(&actual.px[size_t{y} * actual.w + x]) : nullptr;
             const auto* b = inB ? reinterpret_cast<const uint8_t*>(&want.px[size_t{y} * want.w + x]) : nullptr;
@@ -558,6 +560,11 @@ TEST_CASE("A golden of another size fails with a count and a diff", "[ui][render
     CHECK(diff.w == 2);
     CHECK(diff.h == 3);
     CHECK(DiffCount(a, a) == 0);
+    // Crossed sizes: 2x3 against 3x2 share four pixels, and each has two the
+    // other lacks; the corner neither has is not a difference (panel round 4).
+    const Image tall{2, 3, std::vector<uint32_t>(6, 0xFFFFFFFFu)};
+    const Image wide{3, 2, std::vector<uint32_t>(6, 0xFFFFFFFFu)};
+    CHECK(DiffCount(tall, wide) == 4);
     const Image torn{2, 2, std::vector<uint32_t>(3, 0xFFFFFFFFu)};
     CHECK(DiffCount(torn, a) == -1);
 }
