@@ -99,6 +99,7 @@ track: W1
 |  39   |   §39   | CI read-back and repair completeness           | §37 |  [x]   |
 |  40   |   §40   | Campaign guard fence completeness              | §38 |  [ ]   |
 |  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [ ]   |
+|  42   |   §42   | Campaign guard recovery completeness           | §40 |  [ ]   |
 
 ---
 
@@ -1667,6 +1668,7 @@ The D00 T04 §38 review files what its contract does not own. Its hard-cap round
 **Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the legacy-state-crash, whole-identity, generation-rotation, fenced-delete, bounded-header, unknown-listing, terminal-drain, orphan-error, quarantine, injected-failure, and credential-shape legs, quoted with the suite count. Driven run with evidence: the upgrade drive and the in-section health drive, each in a run file, quoted.
 
 -> XREF: D00 T04 §38 -- the guard identity and recovery this section completes, and the review findings it files
+-> XREF: D00 T04 §42 -- the review findings on recovery, filed after the hard cap
 -> SOURCE: panel-D00-T04-s38-2026-09-26-F16 D00-T04-S38-F16
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR1 D00-T04-S38-PR1
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR2 D00-T04-S38-PR2
@@ -1718,6 +1720,42 @@ The D00 T04 §39 review files what its contract does not own. Its hard-cap round
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR14 D00-T04-S39-PR14
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR15 D00-T04-S39-PR15
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR18 D00-T04-S39-PR18
+
+## 42. Campaign Guard Recovery Completeness
+
+The D00 T04 §40 review files what its contract does not own. Its hard-cap round (panel round 5, F18) found that `quarantine` moves the clearance ledger before publishing the salvaged replacement, so a crash or a failed write between the two leaves no ledger, which reads as empty and lifts every outstanding prohibition; round 5 is the cap, so it files here. The D00 T04 §40 plan review (run 20260926-D00-T04-S40-astra) adds sixteen accepted findings, grouped below by the unit they harden.
+
+- [ ] Keep every deletion prohibition through any recovery: the ledger is moved before its replacement publishes, salvage keeps only the ids its bytes still carry, and the ledger has no identity scope, reuse policy, or compaction contract (panel round 5 of the D00 T04 §40 review, F18, and plan review PR3 and PR6; needs §40 shipped). Done when: the replacement publishes before the corrupt file moves (or a missing ledger after a quarantine reads as "all jobs cleared" until the next `CronList` proves the live set), a partial loss refuses every job not proven created after the loss, clearances carry the workspace digest and session, and a compaction rule keeps them bounded without lifting a live one, with crash and failure fixtures at each step, quoted.
+- [ ] Never resume a campaign an operator ended: `recover` rebuilds from the last `acquire:` line without checking for a later stop, park, or closeout, a rotation does not refuse a guard whose `end` is incomplete, and a power loss can drop the pending record that carried the stop (plan review PR1, PR2, and PR12; needs §40 shipped). Done when: `recover` refuses when the run file records a terminal marker or an end after that line, the rotation's compare-and-swap refuses while an `end incomplete` record exists, the stop intent is written into the run file before the guard is deleted so a lost pending record still reads as stopped, and fixtures pin each, quoted.
+- [ ] Reconstruct pending obligations and retire foreign ones: a quarantined pending record leaves its jobs unowned, and another session's pending jobs are reported at every start forever (plan review PR4 and PR14; needs §40 shipped). Done when: a quarantined pending record is rebuilt from the run file's `end:` lines, a foreign-session record escalates once with a deduplicated incident line and retires when the operator confirms that session gone, and fixtures pin both, quoted.
+- [ ] Authorize deletion on positive evidence and detect an incomplete listing: `delete-check` refuses only the current job and never proves a job belongs to this workspace, run, and scheduler session, and a syntactically valid listing can omit a duplicate (plan review PR5 and PR7; needs §40 shipped). Done when: `delete-check` takes the `CronList` text and approves only a job whose prompt carries this workspace's digest (or a recorded job of this session), a listing's completeness is cross-checked (its count against a second listing, or the tool's own total where it prints one), and fixtures pin a foreign job refused and an omitted duplicate caught, quoted.
+- [ ] Specify the workspace identity: canonicalization is `realpath` plus `normcase` and the run file's separators, with no stated treatment of junctions, drive letters, relative run files, or a digest collision (plan review PR8 and PR9; needs §40 shipped). Done when: the canonical form is written down (Windows long paths, junctions resolved, drive letter case, run file relative to the workspace with forward slashes), the twelve-hex digest's collision assumption is stated with an ambiguity refusal (two workspaces in one listing sharing a digest refuse), and fixtures pin each spelling, quoted.
+- [ ] Bound in-place migration: `migrated_at` lets the hook accept an untagged state with no expiry, and no crash fixture proves migration's two publications (plan review PR10; needs §40 shipped). Done when: the hook accepts an untagged state beside a migrated guard only until the state is tagged or the guard is re-pointed, crash fixtures kill migration between its guard and state publications, and a later foreign untagged state is refused, quoted.
+- [ ] Prove every failure path: the injected failures cover the pending record, the guard, and the state, not migration, clearance publication, quarantine, recovery, or error acknowledgement (plan review PR11; needs §40 shipped). Done when: `CAMPAIGN_FAIL_AT` fails each remaining write, replace, link, and delete, and each leaves a lifecycle every reader handles, quoted.
+- [ ] Make the in-section health check executable during blocking work: the rule is wall time, but a blocking command stops the session from running it (plan review PR13; needs §40 shipped). Done when: long waits run in the background (or `ci-wait` checks health itself between polls), the skills name that mechanism, and a recorded genuine CI wait (not a stand-in) shows the check running inside it, quoted.
+- [ ] Publish §40's current transition contract and structured outcomes: §40's behavior is spread over superseding corrections, and command outcomes are prose the skills parse (plan review PR15 and PR16; needs §40 shipped). Done when: D00 T04 §40 carries a dated acceptance paragraph with a command matrix (identity each command requires, its refusals, the partial states it leaves, and their recovery), and each guard command can print a versioned JSON outcome with a stable code beside its prose, pinned by a fixture, quoted.
+- [ ] Commit: `"workspace: campaign guard recovery completeness"`
+
+**Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the prohibition-through-recovery, terminal-respect, pending-reconstruction, positive-deletion-evidence, incomplete-listing, workspace-identity, bounded-migration, every-failure-path, and structured-outcome legs, quoted with the suite count. Driven run with evidence: a genuine CI wait with the health check running inside it, in a run file, quoted.
+
+-> XREF: D00 T04 §40 -- the guard fences this section completes, and the review findings it files
+-> SOURCE: panel-D00-T04-s40-2026-09-26-F18 D00-T04-S40-F18
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR1 D00-T04-S40-PR1
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR2 D00-T04-S40-PR2
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR3 D00-T04-S40-PR3
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR4 D00-T04-S40-PR4
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR5 D00-T04-S40-PR5
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR6 D00-T04-S40-PR6
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR7 D00-T04-S40-PR7
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR8 D00-T04-S40-PR8
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR9 D00-T04-S40-PR9
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR10 D00-T04-S40-PR10
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR11 D00-T04-S40-PR11
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR12 D00-T04-S40-PR12
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR13 D00-T04-S40-PR13
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR14 D00-T04-S40-PR14
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR15 D00-T04-S40-PR15
+-> SOURCE: plan-D00-T04-s40-2026-09-26-PR16 D00-T04-S40-PR16
 
 ## Verification
 
