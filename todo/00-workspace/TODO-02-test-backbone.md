@@ -52,7 +52,7 @@ track: W1
 |   7   |   §7    | Driven UI completion tests                 | §5             |  [x]   |
 |   8   |   §8    | Icon manifest audit                        | §5             |  [x]   |
 |   9   |   §9    | Rendered-output regression tests           | §5             |  [x]   |
-|  10   |   §10   | Focus-free UI suite conversion             | §7             |  [ ]   |
+|  10   |   §10   | Focus-free UI suite conversion             | §7             |  [x]   |
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [ ]   |
 |  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [ ]   |
 
@@ -632,6 +632,13 @@ Why this section exists: the suite cannot run while the operator works. `D00 T02
 -> SOURCE: plan-D00-T02-s7-2026-09-26-PR11 D00-T02-S7-PR11
 -> SOURCE: plan-D00-T02-s7-2026-09-26-PR12 D00-T02-S7-PR12
 -> SOURCE: plan-D00-T02-s7-2026-09-26-PR13 D00-T02-S7-PR13
+
+> **Verified:** 2026-09-27 | §10 | the default run passes while nothing takes the operator's desktop: `ctest --preset debug` `100% tests passed out of 99`, every case's `CENSUS` line `violations=0` under a focus guard that watches in context and fails the run on any show, foreground, held capture, or window left behind (its first run caught the hidden driven host taking the foreground through a list view's `SetFocus`); the fenced tier, excluded from the default presets, passed as the operator's visible run at `ff19d583` (`100% tests passed out of 8`, every window on its declared monitor and DPI) and skips by day with machine-readable lines (`fence-debt: 8 fenced case(s): 0 green, 8 night-owed, 0 unaccounted`); Night-owed: none; eleven default-tier drills failed by name, and of five headful drills two failed by name and three stood down on operator input as designed, each reverted (docs/phase-runs/2026-09-25-phase-0.md); the launcher's four captures are under `docs/captures/runs/`; `scripts/check-all.ps1` `check-all: 21 gate(s) ok`
+> **Review:** round 4 GPT depth, candidates `9986704c`(round 1) `17fe7678`(round 2) `00f3e931`(round 3) `a3edd383`(round 4) -- `adversarial` needs-attention at round 4, filed: F14 in D00 T02 §11 (below the blocking bar: an adopted window's placement is measured at delivery; closing it needs an in-context hook DLL), closed earlier: 7 fixed (F1, F2, F3, F5, F6, F9, F13) · `consistency` approves at round 4, closed: 1 fixed (F10) · `integration` approves at round 4, closed: 3 fixed (F4, F7, F11) · `record` approves at round 4, closed: 2 fixed (F8, F12) · `source-defect` owed and done (WinEvent hooks, the DWM frame, thread DPI awareness, `STARTF_USEPOSITION`, `GetLastInputInfo`, each confirmed by a run) · `design` owed and done (the four captures looked at before publishing; the launcher's DPI-unscaled first size folded into D01 T02 §2) · debt completeness: `fence-debt: 8 fenced case(s): 8 green, 0 night-owed, 0 unaccounted` on the operator's visible pass at the round 3 answer. Independent pass on the implementation commit f4c884b9 (`independent` slot, gpt-6-astra high): 4 findings, fixed in 9986704c. Raw findings: docs/reviews/00-workspace/D00-T02-s10.md Attestation: docs/reviews/00-workspace/D00-T02-s10.attest.json
+> **Plan review:** astra (run 20260926-D00-T02-S10-astra) -- filed: D00 T02 §11 (PR1, PR2, PR3, PR4, PR6, as one item), D00 T02 §12 (PR10, PR11, PR12, as one item), D01 T02 §2 (PR8), D01 T02 §5 (PR7); 3 rejected and 1 duplicate with reasons in the ledger
+> **CRUD:** not applicable (a test harness, test presets, a capture script, and shared UI fixes; no user data)
+> **Duration:** 2026-09-26T17:02:59Z to 2026-09-26T22:32:56Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 11. Nightly Full-Suite Regression Run
 
