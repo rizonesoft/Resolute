@@ -309,7 +309,9 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
     guard, state_path = _paths(root)
     os.makedirs(os.path.dirname(guard), exist_ok=True)
     try:
-        previous = read_guard(root) or {}
+        # A legacy guard is migrated first, so a same-run acquisition keeps
+        # its run id and its legacy state migrates with it (panel round 4).
+        previous = _migrate_locked(root, read_guard(root)) or {}
     except GuardError:
         previous = {}
     # Leftovers of a publish a crash interrupted (D00 T04 §38).
@@ -533,8 +535,9 @@ def pending_cancel(root: str, session: str | None = None) -> str:
         cron, gen = str(j.get("cron_id")), j.get("generation") or "none"
         if guard is not None and cron == str(guard.get("cron_id")) \
                 and gen == (guard.get("generation") or "none"):
-            out.append(f"pending-cancel: end incomplete for job {cron}: the guard still names it; "
-                       f"re-run end, do not CronDelete a live run's heartbeat")
+            out.append(f"pending-cancel: end incomplete for job {cron} (reason {j.get('reason')}): the guard "
+                       f"still names it; finish it with end --reason {j.get('reason')} before anything else, and "
+                       f"do not CronDelete a live run's heartbeat")
         elif session and j.get("session") and j.get("session") != session:
             out.append(f"pending-cancel: report job {cron} generation={gen}: session {j.get('session')} "
                        f"scheduled it and only that session's scheduler can cancel it; do not cancel it here")
@@ -2086,7 +2089,8 @@ def _self_test() -> int:
             refused = "the end did not finish" in str(exc)
         check("crash-after-the-pending-record-reads-as-an-unfinished-end",
               r.returncode == 97 and read_guard(iroot) is not None and refused
-              and pend.startswith("pending-cancel: end incomplete for job job-k")
+              and pend.startswith("pending-cancel: end incomplete for job job-k (reason park)")
+              and "finish it with end --reason park before anything else" in pend
               and "pending-cancel: CronDelete" not in pend, pend)
         r = _crashed("end:guard-deleted", *end_args)
         code, out, _ = run_hook(iroot, SESSION)
@@ -2175,6 +2179,16 @@ def _self_test() -> int:
         check("a-handover-migrates-a-legacy-state",
               st.get("run_id") == rid and st.get("trips") == 1 and st.get("hook_error") == "legacy boom"
               and "legacy boom" in hook_error(iroot, SESSION), str(st))
+        # Panel round 4: a legacy guard (no run id) re-pointed by its owner on
+        # the same run file keeps its legacy state, migrated with it.
+        _guard(iroot, run_file=RUN_FILE)
+        with open(_paths(iroot)[1], "w", encoding="utf-8") as fh:
+            json.dump({"fingerprint": "f", "blocks": 1, "trips": 1, "stalled": False}, fh)
+        acquire(iroot, SESSION, 0, RUN_FILE, "job-1", generation=mint_generation())
+        st = _state(iroot)
+        check("a-legacy-guard-re-point-keeps-its-legacy-state",
+              st.get("trips") == 1 and st.get("run_id") == read_guard(iroot)["run_id"] and bool(st.get("run_id")),
+              f"{st} {read_guard(iroot)}")
         acquire(iroot, OTHER, 1, other_run, "job-n", handover="drill new run", generation=mint_generation())
         check("a-new-run-starts-a-clean-breaker", _state(iroot) == {} and read_guard(iroot)["run_id"] != rid,
               str(_state(iroot)))
@@ -2357,6 +2371,8 @@ def _self_test() -> int:
                          "carries `run_id` equal to the run id step 2 printed and trips of 2 or more"),
                         ("skill-heartbeat-deletes-only-after-end-succeeds",
                          "Only after `end` succeeds (a refusal follows the rule above: step 2 runs again"),
+                        ("skill-heartbeat-finishes-an-incomplete-end",
+                         "Never resume under step 6 while such a line prints"),
                         ("skill-heartbeat-one-refusal-rule",
                          "a refusal means the guard moved since step 2 read it, so run nothing else this firing has "
                          "planned, append the refusal as a `- bookkeeping:` line, and start again at step 2"),
