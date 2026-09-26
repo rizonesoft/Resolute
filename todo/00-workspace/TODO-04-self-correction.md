@@ -95,7 +95,7 @@ track: W1
 |  35   |   §35   | CI read-back follow-ups                        | §33 |  [x]   |
 |  36   |   §36   | Campaign guard lifecycle follow-ups            | §34 |  [x]   |
 |  37   |   §37   | CI read-back hardening                         | §35 |  [x]   |
-|  38   |   §38   | Campaign guard identity and recovery           | §36 |  [ ]   |
+|  38   |   §38   | Campaign guard identity and recovery           | §36 |  [x]   |
 |  39   |   §39   | CI read-back and repair completeness           | §37 |  [ ]   |
 |  40   |   §40   | Campaign guard fence completeness              | §38 |  [ ]   |
 
@@ -1585,6 +1585,13 @@ The D00 T04 §36 review files what its contract does not own. Its sign-off round
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR12 D00-T04-S36-PR12
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR13 D00-T04-S36-PR13
 -> SOURCE: plan-D00-T04-s36-2026-09-25-PR14 D00-T04-S36-PR14
+
+> **Verified:** 2026-09-26 | §38 | `campaign_guard.py --self-test` `campaign_guard self-test: 189 cases, 0 failed`, carrying the identity fences (an obsolete generation or job refused at `end`, `reset-state`, and `hook-error --ack`; the CLI refusing without them), one live carrier before any fenced step (`whoami` over the `CronList` text withholding `job=` for a duplicate, a stale id, or no carrier), scheduler-scoped cancellations, scoped `reconcile` with the three startup interruptions, crash points at every publication step, legacy guard and state migration, identified hook errors, what a handover keeps, the coverage summary, and restore refusing cross-repository, cross-branch, cross-workflow, mixed, legacy, and credential-bearing journals; the drives in docs/phase-runs/2026-09-25-phase-0.md (three startup interruptions against real jobs on a fixture workspace, each ending at one heartbeat and a consistent record, and the live heartbeat deleted, reported missing by `health`, and replaced by `db8458fb`); `review_prompt.py --self-test` `review-prompt self-test: 460 cases, 0 failed`; `scripts/check-all.ps1` `19 gate(s) ok`
+> **Review:** round 5 GPT depth, candidates `3349d4c2`(round 1) `4ff640f4`(round 2) `dcfccf64`(round 3) `8136e4b1`(round 4) `f3a6d485`(round 5) -- `adversarial` needs-attention at round 5, filed: F16 in D00 T04 §40 (the hard cap; a legacy state orphaned by a crash inside `acquire`, whose worst effect is a reported breaker trip), closed earlier: 7 fixed · `consistency` approves at round 5, closed: none raised · `integration` approves at round 5, closed: 4 fixed (the heartbeat's refusal handling rethought into one rule after three rounds) · `record` approves at round 5, closed: 1 fixed · `source-defect` not owed · `design` not owed. Independent pass on the implementation commit 7c0e4f3d (`independent` slot, gpt-6-astra high): one P1 and three P2s, all right, fixed in 3349d4c2 before round 1. Raw findings: docs/reviews/00-workspace/D00-T04-s38.md Attestation: docs/reviews/00-workspace/D00-T04-s38.attest.json
+> **Plan review:** astra (run 20260926-D00-T04-S38-astra) -- filed: D00 T04 §40 (PR1, PR2, PR3, PR4, PR5, PR6, PR7, PR8, PR9, PR10, PR13, PR14, PR15), duplicates of D00 T04 §39 (PR11, PR12)
+> **CRUD:** not applicable (harness wiring, the Stop hook, review tooling, and skill text; writes only gitignored run state under `build/`)
+> **Duration:** 2026-09-25T23:55:24Z to 2026-09-26T01:37:35Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 39. CI Read-Back and Repair Completeness
 
