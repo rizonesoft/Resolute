@@ -96,7 +96,7 @@ track: W1
 |  36   |   §36   | Campaign guard lifecycle follow-ups            | §34 |  [x]   |
 |  37   |   §37   | CI read-back hardening                         | §35 |  [x]   |
 |  38   |   §38   | Campaign guard identity and recovery           | §36 |  [x]   |
-|  39   |   §39   | CI read-back and repair completeness           | §37 |  [ ]   |
+|  39   |   §39   | CI read-back and repair completeness           | §37 |  [x]   |
 |  40   |   §40   | Campaign guard fence completeness              | §38 |  [ ]   |
 |  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [ ]   |
 
@@ -1635,6 +1635,13 @@ The D00 T04 §37 review files what its contract does not own. Its hard-cap round
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR14 D00-T04-S37-PR14
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR15 D00-T04-S37-PR15
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR16 D00-T04-S37-PR16
+
+> **Verified:** 2026-09-26 | §39 | `review_prompt.py --self-test` `review-prompt self-test: 524 cases, 0 failed`, carrying redaction to the true end (bare values, plain and block scalars, continuations, key bodies, the whole log before any excerpt) and the incomplete label for masked inputs, per-step causes by GitHub id under the stated aggregation rule, the push-exclusion check over fifteen trigger shapes (a scanner for flow lists, refusing what it cannot decode), and the durable oracle: four drills under `docs/captures/ci-oracle/` whose logs supply every expectation and whose `shell:` lines match every printed template, with the Windows re-runs executed locally under pwsh, powershell, and cmd; `campaign_guard.py --self-test` `campaign_guard self-test: 209 cases, 0 failed`, carrying the write-ahead journal (reserved, pushed, abandoned, closed, retired; crash recovery; no resurrection; foreign identities refused), close re-reading GitHub, campaign binding failing closed, retirement bound to the episode head, and the keyed, journalled ceiling; the Windows drill (run 36211341983) in docs/phase-runs/2026-09-25-phase-0.md; `scripts/check-all.ps1` `19 gate(s) ok`
+> **Review:** round 5 GPT depth, candidates `f122556e`(round 1) `f5c4bc06`(round 2) `96221264`(round 3) `2d337c78`(round 4) `897d6426`(round 5) -- `adversarial` needs-attention at round 5, filed: F18 in D00 T04 §41 (the hard cap; a block scalar as a trigger-list pattern), closed earlier: 8 fixed (redaction and the flow-list reader each rethought after three rounds) · `consistency` approves at round 5, closed: none raised · `integration` needs-attention at round 5, filed: F19 in D00 T04 §41 as major (a hand-written foreign transition in the campaign's own run file), closed earlier: 5 fixed · `record` approves at round 5, closed: 1 fixed · `source-defect` approves in-session (GitHub's semantics read from its own drill logs) · `design` not owed. Independent pass on the implementation commit 34bc5ecb (`independent` slot, gpt-6-astra high): one P1 and five P2s, all right, fixed in f122556e before round 1; the WSL-only failure it surfaced predates the section, filed in D00 T01 §9. Raw findings: docs/reviews/00-workspace/D00-T04-s39.md Attestation: docs/reviews/00-workspace/D00-T04-s39.attest.json
+> **Plan review:** astra (run 20260926-D00-T04-S39-astra) -- filed: D00 T04 §41 (PR1, PR2, PR3, PR4, PR5, PR6, PR7, PR8, PR9, PR10, PR11, PR12, PR13, PR14, PR15, PR18), D00 T01 §9 (PR16, PR17)
+> **CRUD:** not applicable (review tooling, the campaign guard's repair records, skill text, and captured drill evidence; writes only gitignored run state under `build/` and journal lines in the run file)
+> **Duration:** 2026-09-26T02:10:30Z to 2026-09-26T04:00:30Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 40. Campaign Guard Fence Completeness
 
