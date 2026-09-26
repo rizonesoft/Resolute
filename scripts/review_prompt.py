@@ -2004,17 +2004,20 @@ _ANY_SECRET_KEY = re.compile(
 #    start, the whole YAML plain scalar.
 # 3. The value's continuation: every following line indented deeper than
 #    the key's line, and every line after a trailing backslash.
-# 4. A multiline value the key's line opens: a here-document (`<<WORD`,
-#    `<<-WORD`, quoted or not) through its terminator line, a PowerShell
-#    here-string (`@"` or `@'`) through its closing `"@` or `'@`, a quote
-#    left open through the line that closes it, and an open bracket through
-#    the line that balances it.
+# 4. A multiline value the key's line opens (a here-document `<<WORD` or
+#    `<<-WORD`, a PowerShell here-string `@"` or `@'`, a quote left open,
+#    or an open bracket): the key line's value and every following line of
+#    its block.
 # 5. A base64 run of sixty or more characters alone at a line's end (a key
 #    body seen without its BEGIN line).
 #
-# The fallback is conservative: a multiline form (rule 4) whose end never
-# comes masks the rest of its block, which in a log is the rest of that
-# job and step and elsewhere the rest of the text. Line ends are
+# Rule 4 never looks for the form's end. Four review rounds of the D00
+# T04 §41 review each found a terminator the matcher accepted too early (a
+# space-indented heredoc end, an indented here-string close, a quoted
+# bracket, a quote of the other kind), so the unit was rethought: a block
+# is the rest of that job and step in a log and the rest of the text
+# elsewhere, and masking it whole cannot stop early. The cost is masked
+# lines after the value's true end, which is the conservative side. Line ends are
 # normalized first (`\r\n` and a lone `\r` read as `\n`), so a malformed
 # input never hides a line break from the rules. GitHub's own `***` masks
 # pass through untouched.
@@ -2068,7 +2071,8 @@ def _bracket_depth(text: str) -> int:
 
 
 def _multiline_opener(value: str) -> tuple[str, object] | None:
-    """(kind, end) of the multiline value `value` opens (rule 4), or None."""
+    """(kind, detail) of the multiline value `value` opens (rule 4), or
+    None. Detection only: the masking never looks for the form's end."""
     m = _HEREDOC.search(value)
     if m:
         # `<<WORD` ends only at a line that is exactly WORD; `<<-WORD` also
@@ -2110,39 +2114,20 @@ def _redact_blocks(text: str) -> str:
         if not key:
             continue
         block = "\t".join(line.split("\t", 2)[:2]) if cols else None
-        opener = _multiline_opener(head[key.end():])
-        if opener:
-            # The key line's own value opens the multiline form: it is masked
-            # with the lines that continue it, since the single-line rules
-            # cannot match a value whose closing lies on a later line
-            # (independent review of D00 T04 §41, P1).
+        if _multiline_opener(head[key.end():]):
+            # The key line's own value opens the form: it is masked with the
+            # rest of its block (independent review of D00 T04 §41, P1; the
+            # block rule rethought after panel round 4).
             out[-1] = cols + head[:key.end()] + " ***"
-            kind, end = opener
-            depth = end if kind == "bracket" else 0
-            qstate = end if kind == "quote" else ""
             while i < len(lines):
                 nxt = lines[i]
                 ncols = _LOG_COLS.match(nxt).group(0)
                 if block is not None and "\t".join(nxt.split("\t", 2)[:2]) != block:
                     break
                 body = nxt[len(ncols):]
-                if kind == "heredoc" and (body.lstrip("\t") if end[1] else body).rstrip("\r") == end[0]:
-                    break
-                # PowerShell closes a here-string only at column 0 (panel
-                # round 2 of the D00 T04 §41 review).
-                if kind == "herestring" and body.startswith(end):
-                    break
                 indent = body[:len(body) - len(body.lstrip(" \t"))]
-                out.append(ncols + indent + "***")
+                out.append(ncols + indent + ("***" if body.strip() else ""))
                 i += 1
-                if kind == "quote":
-                    qstate = _quote_state(body, qstate)
-                    if not qstate:
-                        break
-                if kind == "bracket":
-                    depth += _bracket_depth(body)
-                    if depth <= 0:
-                        break
             continue
         key_indent = len(head.expandtabs()) - len(head.expandtabs().lstrip(" "))
         continued = head.rstrip().endswith("\\")
@@ -7760,35 +7745,38 @@ def _self_test() -> int:
                     ("a lone key-body line", "j\ts\t2026-01-01T00:00:00Z " + B64, B64[:20], "j\ts\t"),
                     ("a multiline key block", "a\n-----BEGIN EC PRIVATE KEY-----\nAAAA\nBBBB\n-----END EC PRIVATE KEY-----\nb",
                      "BBBB", "b"),
-                    # D00 T04 §41: the multiline openers, each through its
-                    # end, and the fallback when the end never comes.
-                    ("a here-document", "API_TOKEN=$(cat <<EOF\ns3cr3tline\nEOF\n)\necho done", "s3cr3tline",
-                     "EOF\n)\necho done"),
+                    # D00 T04 §41: each multiline opener masks its value and
+                    # the rest of its block, whatever looks like its end
+                    # (the unit rethought after panel round 4): in plain
+                    # text the rest of the text, in a log the rest of its
+                    # step, the next step staying visible.
+                    ("a here-document", "x=1\nAPI_TOKEN=$(cat <<EOF\ns3cr3tline\nEOF\n)\necho done", "echo done", "x=1"),
                     ("a quoted here-document terminator", "password=$(cat <<-'END'\n\ts3cr3tline\n\tEND\n)\nnext",
-                     "s3cr3tline", "next"),
+                     "s3cr3tline", "password="),
                     ("a PowerShell here-string", "$env:API_TOKEN = @\"\ns3cr3tline\n\"@\nWrite-Output done",
-                     "s3cr3tline", "Write-Output done"),
-                    ("a single-quoted here-string", "$secret = @'\ns3cr3tline\n'@\ndone", "s3cr3tline", "done"),
+                     "Write-Output done", "$env:API_TOKEN ="),
+                    ("a single-quoted here-string", "$secret = @'\ns3cr3tline\n'@\ndone", "s3cr3tline", "$secret ="),
                     ("a quoted bracket inside a bracket", "token: [" + chr(10) + '  "]",' + chr(10)
-                     + '  "s3cr3tline"' + chr(10) + "]" + chr(10) + "mode: fast", "s3cr3tline", "mode: fast"),
+                     + '  "s3cr3tline"' + chr(10) + "]" + chr(10) + "mode: fast", "s3cr3tline", "token:"),
                     ("a double quote inside a single-quoted value", "API_TOKEN='first \"" + chr(10)
                      + 'second "' + chr(10) + "s3cr3tline" + chr(10) + "last'" + chr(10) + "echo done",
-                     "s3cr3tline", "echo done"),
+                     "s3cr3tline", "API_TOKEN="),
                     ("an indented here-string close", "$env:API_TOKEN = @\"\n  \"@\ns3cr3tline\n\"@\ndone",
-                     "s3cr3tline", "done"),
-                    ("a quoted multiline value", "password: \"abc\ns3cr3tline\nend\"\nmode: fast", "s3cr3tline",
-                     "mode: fast"),
+                     "s3cr3tline", "$env:API_TOKEN ="),
+                    ("a quoted multiline value", "password: \"abc\ns3cr3tline\nend\"\nmode: fast", "mode: fast",
+                     "password:"),
                     # Independent review of D00 T04 §41, P1: the opening line's
                     # own value is masked with its continuation.
                     ("a quoted multiline value's first line", 'password: "TOPSECRET' + chr(10) + 'rest' + chr(10) + 'end"'
-                     + chr(10) + "mode: fast", "TOPSECRET", "mode: fast"),
-                    ("an open bracket", "token: [abc,\n s3cr3tline,\n]\nmode: fast", "s3cr3tline", "mode: fast"),
+                     + chr(10) + "mode: fast", "TOPSECRET", "password:"),
+                    ("an open bracket", "token: [abc,\n s3cr3tline,\n]\nmode: fast", "s3cr3tline", "token:"),
                     ("an unterminated here-document", "API_TOKEN=$(cat <<EOF\ns3cr3tline\nmore\nand more",
                      "and more", "API_TOKEN="),
                     ("a space-indented heredoc terminator", "API_TOKEN=$(cat <<EOF" + chr(10) + " EOF" + chr(10)
-                     + "s3cr3tline" + chr(10) + "EOF" + chr(10) + ")" + chr(10) + "next", "s3cr3tline", "next"),
-                    ("an unterminated quote in a log stops at its step",
-                     "j\ts\tT1 password: \"abc\nj\ts\tT2 s3cr3tline\nj\tt\tT3 next step", "s3cr3tline", "next step"),
+                     + "s3cr3tline" + chr(10) + "EOF" + chr(10) + ")" + chr(10) + "next", "s3cr3tline", "API_TOKEN="),
+                    ("an opener in a log stops at its step, never before",
+                     "j\ts\tT1 password: \"abc\nj\ts\tT2 end\"\nj\ts\tT3 s3cr3tline\nj\tt\tT4 next step",
+                     "s3cr3tline", "next step"),
                     ("carriage-return line ends", "password: |\r  s3cr3tline\r\nmode: fast", "s3cr3tline", "mode: fast"),
                     ("a lone carriage return", "export API_TOKEN=abc\\\rs3cr3tline\recho done", "s3cr3tline",
                      "echo done")):
