@@ -2083,7 +2083,9 @@ def _redact_blocks(text: str) -> str:
                 body = nxt[len(ncols):]
                 if kind == "heredoc" and (body.lstrip("\t") if end[1] else body).rstrip("\r") == end[0]:
                     break
-                if kind == "herestring" and body.lstrip().startswith(end):
+                # PowerShell closes a here-string only at column 0 (panel
+                # round 2 of the D00 T04 §41 review).
+                if kind == "herestring" and body.startswith(end):
                     break
                 indent = body[:len(body) - len(body.lstrip(" \t"))]
                 out.append(ncols + indent + "***")
@@ -7708,6 +7710,8 @@ def _self_test() -> int:
                     ("a PowerShell here-string", "$env:API_TOKEN = @\"\ns3cr3tline\n\"@\nWrite-Output done",
                      "s3cr3tline", "Write-Output done"),
                     ("a single-quoted here-string", "$secret = @'\ns3cr3tline\n'@\ndone", "s3cr3tline", "done"),
+                    ("an indented here-string close", "$env:API_TOKEN = @\"\n  \"@\ns3cr3tline\n\"@\ndone",
+                     "s3cr3tline", "done"),
                     ("a quoted multiline value", "password: \"abc\ns3cr3tline\nend\"\nmode: fast", "s3cr3tline",
                      "mode: fast"),
                     # Independent review of D00 T04 §41, P1: the opening line's

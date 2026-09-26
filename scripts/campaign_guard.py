@@ -1984,8 +1984,14 @@ def _ceiling(root: str, run_id: str, attempt: str, run_file: str, campaign: str)
     # strictly as the episode's. A prose line and the receipt written with
     # it must agree, a key is used once, every use belongs to this campaign,
     # and a cached campaign must be the journal's.
+    # Panel round 2: the whole journal replays strictly first (a malformed
+    # receipt anywhere refuses), and a final journal line cut short refuses.
+    _journal(root, run_file)
+    whole = _journal_text(root, run_file)
+    if whole and not whole.endswith("\n") and whole.rsplit("\n", 1)[-1].startswith(("repair: ", "repair-receipt: ")):
+        raise GuardError(f"{run_file} ends in a journal line without its newline (a write cut short): escalate")
     journalled: dict[str, str] = {}
-    rows = _journal_lines(_journal_text(root, run_file))
+    rows = _journal_lines(whole)
     k = 0
     while k < len(rows):
         ln = rows[k]
@@ -1997,7 +2003,9 @@ def _ceiling(root: str, run_id: str, attempt: str, run_file: str, campaign: str)
             use = (m.group(1), m.group(2))
             if k + 1 < len(rows) and rows[k + 1].startswith("repair-receipt: "):
                 rc = _parse_receipt(rows[k + 1])
-                if rc is not None and rc["event"] == "ceiling":
+                if rc is None:
+                    raise GuardError(f"{run_file}: the receipt after a ceiling line is malformed: escalate")
+                if rc["event"] == "ceiling":
                     if (rc["key"], rc["campaign"]) != use:
                         raise GuardError(f"{run_file}: a ceiling line and its receipt disagree (an edited journal): "
                                          f"escalate")
@@ -3937,7 +3945,11 @@ def _self_test() -> int:
                  "a journal from another campaign"),
                 ("a receipt that disagrees", "repair: ceiling allowance used for example/here#781@1 run=aaaaaaaaaaaa\n"
                  'repair-receipt: {"v":1,"event":"ceiling","campaign":"aaaaaaaaaaaa","key":"example/here#782@1"}\n',
-                 "its receipt disagree")):
+                 "its receipt disagree"),
+                ("a truncated receipt", "repair: ceiling allowance used for example/here#783@1 run=aaaaaaaaaaaa\n"
+                 'repair-receipt: {"v":1,"event":"ceil\n', "not a well-formed repair receipt"),
+                ("a final line cut short", "repair: ceiling allowance used for example/here#784@1 run=aaaa",
+                 "without its newline")):
             with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
                 fh.write(extra)
             c_bad = _repair_cli("ceiling", "--run-id", "799", *R)
