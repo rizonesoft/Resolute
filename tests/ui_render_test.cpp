@@ -33,6 +33,7 @@
 #include <wincodec.h>
 #include <wrl/client.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -148,25 +149,32 @@ Image RenderGdi(UINT w, UINT h, const std::function<void(HDC)>& paint) {
     return img;
 }
 
-// Pixels where any channel differs by more than the tolerance; `diff`,
-// when given, receives the differing pixels in red over a dimmed actual.
+// Pixels where any channel differs by more than the tolerance, over the
+// union of both sizes: a pixel only one image has always differs, so a size
+// change fails with a count and a diff like any other change, and no pixel
+// is read out of bounds. `diff`, when given, receives the differing pixels
+// in red over a dimmed actual (black where the actual has no pixel).
 int DiffCount(const Image& actual, const Image& want, Image* diff = nullptr) {
-    // Callers compare sizes first; a mismatch here is refused, never read.
-    if (actual.w != want.w || actual.h != want.h || actual.px.size() != want.px.size()) return -1;
-    if (diff) *diff = actual;
+    const UINT w = std::max(actual.w, want.w), h = std::max(actual.h, want.h);
+    if (actual.px.size() != size_t{actual.w} * actual.h || want.px.size() != size_t{want.w} * want.h) return -1;
+    if (diff) *diff = Image{w, h, std::vector<uint32_t>(size_t{w} * h, 0xFF000000u)};
     int differing = 0;
-    for (size_t i = 0; i < actual.px.size(); ++i) {
-        // Blue, green, red: the bytes of a BGRA pixel, alpha (always opaque) aside.
-        const auto* a = reinterpret_cast<const uint8_t*>(&actual.px[i]);
-        const auto* b = reinterpret_cast<const uint8_t*>(&want.px[i]);
-        bool differs = false;
-        for (int ch = 0; ch < 3; ++ch)
-            if (std::abs(static_cast<int>(a[ch]) - static_cast<int>(b[ch])) > kChannelTolerance) differs = true;
-        if (differs) ++differing;
-        if (diff) {
-            auto* d = reinterpret_cast<uint8_t*>(&diff->px[i]);
-            for (int ch = 0; ch < 3; ++ch) d[ch] = differs ? (ch == 2 ? 255 : 0) : static_cast<uint8_t>(a[ch] / 2);
-            d[3] = 255;
+    for (UINT y = 0; y < h; ++y) {
+        for (UINT x = 0; x < w; ++x) {
+            const bool inA = x < actual.w && y < actual.h, inB = x < want.w && y < want.h;
+            // Blue, green, red: the bytes of a BGRA pixel, alpha (always opaque) aside.
+            const auto* a = inA ? reinterpret_cast<const uint8_t*>(&actual.px[size_t{y} * actual.w + x]) : nullptr;
+            const auto* b = inB ? reinterpret_cast<const uint8_t*>(&want.px[size_t{y} * want.w + x]) : nullptr;
+            bool differs = !(a && b);
+            for (int ch = 0; a && b && ch < 3; ++ch)
+                if (std::abs(static_cast<int>(a[ch]) - static_cast<int>(b[ch])) > kChannelTolerance) differs = true;
+            if (differs) ++differing;
+            if (diff) {
+                auto* d = reinterpret_cast<uint8_t*>(&diff->px[size_t{y} * w + x]);
+                for (int ch = 0; ch < 3; ++ch)
+                    d[ch] = differs ? (ch == 2 ? 255 : 0) : static_cast<uint8_t>(a[ch] / 2);
+                d[3] = 255;
+            }
         }
     }
     return differing;
@@ -190,8 +198,11 @@ void CheckGolden(const std::string& name, const Image& actual) {
     Image want;
     INFO("golden missing or unreadable: " << golden.string());
     REQUIRE(LoadPng(golden, want));
-    REQUIRE(want.w == actual.w);
-    REQUIRE(want.h == actual.h);
+    // A size change is a failure with its artifacts, never an abort without
+    // them (panel round 3 of the D00 T02 §9 review).
+    INFO("size: actual " << actual.w << "x" << actual.h << ", golden " << want.w << "x" << want.h);
+    CHECK(want.w == actual.w);
+    CHECK(want.h == actual.h);
     Image diff;
     const int differing = DiffCount(actual, want, &diff);
     if (differing) {
@@ -515,10 +526,11 @@ TEST_CASE("A name passed straight to the icon API is reported too", "[ui][render
 }
 
 TEST_CASE("RenderTo reports the drawing's own result", "[ui][render]") {
-    // A target whose drawing fails makes RenderTo false, whatever pointer it
-    // leaves behind: a 1x1 target cannot fail, so a control painted into a
-    // target that was never begun is the failure (panel round 1 of the D00
-    // T02 §9 review). Success is asserted on a real target.
+    // A target whose drawing fails makes RenderTo false although the paint
+    // ran to EndDraw: a DC render target never bound to a DC fails its
+    // EndDraw, which the old pointer-based result reported as drawn (panel
+    // rounds 1 and 3 of the D00 T02 §9 review). Success is asserted on a
+    // real target, and a null target is refused.
     Host host;
     rui::Sidebar bar;
     bar.Create(host.hwnd, GetModuleHandleW(nullptr), 208);
@@ -526,6 +538,26 @@ TEST_CASE("RenderTo reports the drawing's own result", "[ui][render]") {
     rui::AnimationManager::Instance().Flush();
     const Image ok = Render(bar, bar.ScaledWidth(), S(320, 96));
     CHECK(ok.w > 0);
+    const D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
+        D2D1_RENDER_TARGET_TYPE_SOFTWARE, D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED));
+    Microsoft::WRL::ComPtr<ID2D1DCRenderTarget> unbound;
+    REQUIRE(SUCCEEDED(rui::RenderContext::D2D()->CreateDCRenderTarget(&props, &unbound)));
+    CHECK_FALSE(bar.RenderTo(unbound.Get()));
     CHECK_FALSE(bar.RenderTo(nullptr));
     DestroyWindow(bar.Handle());
+}
+
+TEST_CASE("A golden of another size fails with a count and a diff", "[ui][render]") {
+    // A size change is compared over the union of both sizes, so it fails
+    // like any other change, with the pixels only one image has counted and
+    // a diff to save (panel round 3 of the D00 T02 §9 review).
+    const Image a{2, 2, std::vector<uint32_t>(4, 0xFFFFFFFFu)};
+    const Image b{2, 3, std::vector<uint32_t>(6, 0xFFFFFFFFu)};
+    Image diff;
+    CHECK(DiffCount(a, b, &diff) == 2);
+    CHECK(diff.w == 2);
+    CHECK(diff.h == 3);
+    CHECK(DiffCount(a, a) == 0);
+    const Image torn{2, 2, std::vector<uint32_t>(3, 0xFFFFFFFFu)};
+    CHECK(DiffCount(torn, a) == -1);
 }
