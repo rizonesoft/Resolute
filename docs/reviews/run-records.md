@@ -596,3 +596,15 @@ round: 5 model: gpt-6-astra effort: high outcome: findings candidate: 1fc1cc0a p
 round: 6 model: gpt-6-astra effort: high outcome: independent candidate: 83700a9e provider: openai version: gpt-6-astra cost: unresolved latency: 368s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T04-S41-F1, D00-T04-S41-F2, D00-T04-S41-F3, D00-T04-S41-F4
 empty: 0
 refuted: 0
+
+run: D00-T01-S8
+date: 2026-09-26
+runner: panel
+rounds: 4
+round: 1 model: gpt-6-astra effort: medium outcome: empty candidate: b71d71a6 provider: openai version: gpt-6-astra cost: 13120tokens latency: 17s opportunity: full-scope purpose: section-review provenance: recorded findings:
+round: 2 model: gpt-6-astra effort: medium outcome: empty candidate: b71d71a6 provider: openai version: gpt-6-astra cost: 13224tokens latency: 18s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings:
+round: 3 model: gpt-6-astra effort: high outcome: empty candidate: b71d71a6 provider: openai version: gpt-6-astra cost: 13270tokens latency: 18s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings:
+# round 4 is the independent pass (`panel_slots.py exec independent --commit b71d71a6`, ran before panel round 1); the runner printed no token figure.
+round: 4 model: gpt-6-astra effort: high outcome: independent candidate: b71d71a6 provider: openai version: gpt-6-astra cost: unresolved latency: 52s opportunity: full-scope purpose: section-review provenance: recorded findings:
+empty: 3
+refuted: 0

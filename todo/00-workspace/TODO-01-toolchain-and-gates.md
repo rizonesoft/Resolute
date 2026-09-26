@@ -846,6 +846,9 @@ Five gates that must each be remembered are five gates that get skipped under ti
 **Test checkpoint:** `check-all` reports both presets green, quoted; a deliberately release-only failure fails the gate, quoted.
 
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR17 D00-T02-S5-PR17
+-> SOURCE: plan-D00-T01-s8-2026-09-26-PR4 D00-T01-S8-PR4
+
+<!-- claim: count "--preset release" scripts/check-all.ps1 = 1 -->
 
 ## 9. Remove the Linux Execution Surface
 
