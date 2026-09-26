@@ -49,7 +49,7 @@ track: W1
 |   5   |   §5    | One command runs every gate                  | §3, §4     |  [x]   |
 |   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [x]   |
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
-|   8   |   §8    | Run the unit suite under release             | §5         |  [ ]   |
+|   8   |   §8    | Run the unit suite under release             | §5         |  [x]   |
 |   9   |   §9    | Remove the Linux execution surface         | §5         |  [ ]   |
 
 ---
@@ -849,6 +849,13 @@ Five gates that must each be remembered are five gates that get skipped under ti
 -> SOURCE: plan-D00-T01-s8-2026-09-26-PR4 D00-T01-S8-PR4
 
 <!-- claim: count "--preset release" scripts/check-all.ps1 = 1 -->
+
+> **Verified:** 2026-09-26 | §8 | `scripts/check-all.ps1` `check-all: 20 gate(s) ok`, `tests debug` and `tests release` each its own gate (`100% tests passed out of 69` under both presets); falsified in docs/phase-runs/2026-09-25-phase-0.md: a temporary `NDEBUG`-only failing test left `tests debug` ok and failed `tests release` (`1 tests failed out of 70`), `check-all: 1 of 20 gate(s) FAILED`, then reverted; the claim `count "--preset release" scripts/check-all.ps1 = 1` holds
+> **Review:** round 3 GPT signoff, candidate `b71d71a6` -- `adversarial` approves at every round · `consistency` approves at every round · `integration` approves at every round · `record` approves at every round · `source-defect` not owed · `design` not owed. Independent pass on the implementation commit b71d71a6 (`independent` slot, gpt-6-astra high): no findings. Raw findings: docs/reviews/00-workspace/D00-T01-s8.md Attestation: docs/reviews/00-workspace/D00-T01-s8.attest.json
+> **Plan review:** astra (run 20260926-D00-T01-S8-astra) -- filed: D00 T01 §8 (PR4, a claim); 4 rejected with reasons in the ledger
+> **CRUD:** not applicable (a gate in `scripts/check-all.ps1`; writes only build logs under `build/`)
+> **Duration:** 2026-09-26T09:27:01Z to 2026-09-26T10:11:29Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 9. Remove the Linux Execution Surface
 
