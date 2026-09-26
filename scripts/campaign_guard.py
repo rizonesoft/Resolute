@@ -278,16 +278,23 @@ def acquire(root: str, session: str, phase: int, run_file: str, cron_id: str,
         return _acquire_locked(root, session, phase, run_file, cron_id, handover, generation)
 
 
-def _clear_state_if_new_run(root: str, run_id: str) -> None:
+def _clear_state_if_new_run(root: str, run_id: str, previous_run_id: str | None = None) -> None:
     """The breaker state belongs to one run: a handover or a re-point that
     keeps the run id keeps its blocks, stall trips, and coverage, and a new
     run starts clean (D00 T04 §38). The hook ignores a state carrying
-    another run id, so a crash before this delete is harmless."""
+    another run id, so a crash before this delete is harmless. A state
+    written before states carried a run id belongs to the guard that was
+    live: when the run id is unchanged it is migrated (stamped with the run
+    id), never deleted, so its trips and a legacy `hook_error` survive the
+    first re-point after the upgrade (panel round 3)."""
     _, state_path = _paths(root)
     try:
         with open(state_path, encoding="utf-8-sig") as fh:
             old = json.load(fh)
         if isinstance(old, dict) and old.get("run_id") == run_id:
+            return
+        if isinstance(old, dict) and not old.get("run_id") and previous_run_id and previous_run_id == run_id:
+            _publish(state_path, json.dumps(dict(old, run_id=run_id)).encode("utf-8"))
             return
     except (OSError, ValueError):
         pass
@@ -352,7 +359,7 @@ def _acquire_locked(root: str, session: str, phase: int, run_file: str, cron_id:
         os.replace(tmp, guard)
         _crash("acquire:repoint-published")
         what = "handed over" if owner != session else "re-pointed"
-        _clear_state_if_new_run(root, doc["run_id"])
+        _clear_state_if_new_run(root, doc["run_id"], current.get("run_id"))
         return (f"acquire: guard {what} for session {session} (phase {phase}, {run_file}, job {cron_id}, "
                 f"generation {doc['generation']}, run {doc['run_id']})")
     tmp = guard + f".{os.getpid()}.tmp"
@@ -2158,7 +2165,17 @@ def _self_test() -> int:
         check("a-post-handover-delivery-reads-as-the-old-sessions",
               f"session={OTHER}" not in delivered and hook_error(iroot, OTHER, "e00000000002", g_h, "job-h")
               .startswith("hook-error: acknowledged and cleared"), delivered)
-        acquire(iroot, OTHER, 1, other_run, "job-n", generation=mint_generation())
+        # Panel round 3: a state written before states carried a run id is
+        # migrated at a same-run handover, never deleted.
+        with open(_paths(iroot)[1], "w", encoding="utf-8") as fh:
+            json.dump({"fingerprint": "f", "blocks": 1, "trips": 1, "stalled": False,
+                       "hook_error": "legacy boom", "hook_error_at": "2099-01-01T00:00:00Z"}, fh)
+        acquire(iroot, SESSION, 0, RUN_FILE, "job-h2", handover="drill back", generation=mint_generation())
+        st = _state(iroot)
+        check("a-handover-migrates-a-legacy-state",
+              st.get("run_id") == rid and st.get("trips") == 1 and st.get("hook_error") == "legacy boom"
+              and "legacy boom" in hook_error(iroot, SESSION), str(st))
+        acquire(iroot, OTHER, 1, other_run, "job-n", handover="drill new run", generation=mint_generation())
         check("a-new-run-starts-a-clean-breaker", _state(iroot) == {} and read_guard(iroot)["run_id"] != rid,
               str(_state(iroot)))
 
@@ -2327,7 +2344,7 @@ def _self_test() -> int:
                         ("skill-refused-acquire-cancels-its-job", "A refused `acquire` means another session owns the run"),
                         ("skill-heartbeat-checks-ownership", "NOT THE OWNER or NOT THE CURRENT JOB"),
                         ("skill-heartbeat-ends-through-end",
-                         "--reason plan-done --generation G --cron-id <job id>`. If `end` refuses"),
+                         "--reason plan-done --generation G --cron-id <job id>`. Only after `end` succeeds for plan-done"),
                         # D00 T04 §38: the heartbeat drains its own pending
                         # cancellations first, then asks who it is with the
                         # CronList text, and fences every later mutation.
@@ -2338,9 +2355,13 @@ def _self_test() -> int:
                          "--cronlist -`"),
                         ("skill-heartbeat-stalls-only-its-own-run",
                          "carries `run_id` equal to the run id step 2 printed and trips of 2 or more"),
-                        ("skill-heartbeat-deletes-only-after-end-succeeds", "Only after `end` succeeds, CronDelete this job"),
+                        ("skill-heartbeat-deletes-only-after-end-succeeds",
+                         "Only after `end` succeeds (a refusal follows the rule above: step 2 runs again"),
+                        ("skill-heartbeat-one-refusal-rule",
+                         "a refusal means the guard moved since step 2 read it, so run nothing else this firing has "
+                         "planned, append the refusal as a `- bookkeeping:` line, and start again at step 2"),
                         ("skill-heartbeat-plan-done-only-after-end-succeeds",
-                         "Only after `end` succeeds for plan-done, CronDelete this job"),
+                         "Only after `end` succeeds for plan-done (a refusal follows the rule above), CronDelete this job"),
                         ("skill-heartbeat-no-live-carrier-runs-no-fenced-step",
                          "If it prints NO LIVE CARRIER, or still withholds the job, run no fenced step this firing"),
                         ("skill-heartbeat-reports-are-bookkeeping",
