@@ -6525,7 +6525,9 @@ def _self_test() -> int:
             ("skill-ci-no-run-authorized", "--authorized-by <who> --authorized-at <UTC time> --approved-range <base>..<head>`, which exits 4 `NOT GREEN`"),
             ("skill-ci-quotes-redacted", "a record quotes `ci-wait` only as printed, its secret shapes already masked"),
             ("skill-ci-unknown-cause", "An unknown cause owes bounded evidence gathering"),
-            ("skill-ci-escalation-ends-run", "--reason escalation` and `CronDelete` of the heartbeat it names"),
+            ("skill-ci-escalation-ends-run",
+             "--reason escalation --generation <generation> --cron-id <job id>` (the fenced identity, D00 T04 §38) "
+             "and `CronDelete` of the heartbeat it names"),
             ("skill-ci-escalation", "escalates to the operator only for a cause the tree cannot fix"),
             ("skill-ci-continue", "On green, with any reopened section re-stamped, it continues with the next section in the same turn"),
             ("skill-ci-reopen-restamp", "A reopened section is repaired, re-reviewed, and re-stamped through this skill before anything continues"),

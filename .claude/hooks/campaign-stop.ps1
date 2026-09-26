@@ -10,9 +10,15 @@
 #     { runner, workspace, phase, run_file, session_id, cron_id }
 #     Deleting it is how an operator stop sticks.
 #   claude-campaign-state.json  owned by this hook: progress
-#     fingerprint, blocks without progress, stall trips, and the last
-#     thrown error (hook_error), which the heartbeat reports (D00 T04
-#     section 34).
+#     fingerprint, blocks without progress, stall trips, the run it
+#     belongs to (run_id, session, generation), and the fingerprint's
+#     coverage. A state carrying another run's id is read as a fresh
+#     breaker (D00 T04 section 38).
+#   claude-campaign-hook-errors/  one JSON file per thrown error, each
+#     with a unique id and the session, run id, and generation it was
+#     raised under (empty when the hook failed before reading them),
+#     published by atomic rename; the heartbeat reports and acknowledges
+#     each by its id (D00 T04 section 38).
 $ErrorActionPreference = "Stop"
 $MaxBlocksWithoutProgress = 3
 # Untracked content is hashed file by file, bounded so a huge scratch
@@ -138,13 +144,17 @@ try {
         $small = @()
         $large = @()
         $index = 0
+        # How each untracked path counted, so the degraded coverage is
+        # visible when it bites (D00 T04 section 38).
+        $named = 0
+        $statted = 0
         foreach ($path in $paths) {
             $index++
-            if ($index -gt $MaxHashedFiles + $MaxStatFiles) { $large += $path; continue }
+            if ($index -gt $MaxHashedFiles + $MaxStatFiles) { $large += $path; $named++; continue }
             $item = Get-Item -LiteralPath (Join-Path $root $path) -ErrorAction SilentlyContinue
             if ($item -and $index -le $MaxHashedFiles -and $item.Length -le $MaxHashedBytes) { $small += $path }
-            elseif ($item) { $large += "$path $($item.Length) $($item.LastWriteTimeUtc.Ticks)" }
-            else { $large += "$path missing" }
+            elseif ($item) { $large += "$path $($item.Length) $($item.LastWriteTimeUtc.Ticks)"; $statted++ }
+            else { $large += "$path missing"; $named++ }
         }
         $hashes = @()
         # Paths ride the argument list, in chunks, never a pipe: a pipe into
@@ -190,12 +200,28 @@ try {
         [Console]::Error.WriteLine("campaign-stop: the guard changed while this hook waited; nothing written")
         Allow
     }
-    $state = [ordered]@{ fingerprint = ""; blocks = 0; trips = 0; stalled = $false }
+    $generation = ""
+    if ($guard.PSObject.Properties.Name -contains 'generation') { $generation = [string]$guard.generation }
+    $coverage = [ordered]@{ hashed = $small.Count; statted = $statted; named = $named }
+    $state = [ordered]@{ fingerprint = ""; blocks = 0; trips = 0; stalled = $false;
+                         run_id = $runId; session = $owner; generation = $generation; coverage = $coverage }
     if (Test-Path -LiteralPath $statePath) {
         $old = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
-        $state.fingerprint = [string]$old.fingerprint
-        $state.blocks = [int]$old.blocks
-        $state.trips = [int]$old.trips
+        # Another run's state is not this run's breaker: a crash between
+        # acquire's guard publish and its state reset leaves one behind,
+        # and it reads as a fresh start (D00 T04 section 38). A handover
+        # keeps the run id, so its blocks and trips carry over.
+        $oldRun = ""
+        if ($old.PSObject.Properties.Name -contains 'run_id') { $oldRun = [string]$old.run_id }
+        if (-not $oldRun -or $oldRun -eq $runId) {
+            $state.fingerprint = [string]$old.fingerprint
+            $state.blocks = [int]$old.blocks
+            $state.trips = [int]$old.trips
+            if ($old.PSObject.Properties.Name -contains 'hook_error') {
+                $state.hook_error = [string]$old.hook_error
+                $state.hook_error_at = [string]$old.hook_error_at
+            }
+        }
     }
 
     if ($state.fingerprint -ne $fingerprint) {
@@ -227,7 +253,8 @@ try {
 
     $message = "Campaign run is still open ($relative). Do not end the turn. Finish the open section's checklist, run the review panel and stamp it, then the next section, then the next phase. A commit, a green suite, a red CI (repair it: D00 T04 section 31), or a status report is not a stop."
     if ($next) { $message += " Next ready row: $($next.Trim())." }
-    $message += " Finished means a '## Closeout run=$runId' heading or a column-0 'PARKED <UTC> run=$runId <reason>' line in the run file. Escalating to the operator (an exhausted repair bound, an unverifiable CI, a cause the tree cannot fix) ends the run first: write a column-0 'PARKED <UTC> run=$runId escalation: <cause>' line, run 'python scripts/campaign_guard.py end --session $owner --reason escalation', CronDelete the heartbeat it names, then report. The breaker allows the stop after $MaxBlocksWithoutProgress pushes with no tree change (this is push $($state.blocks))."
+    $message += " Fingerprint coverage: $($coverage.hashed) untracked path(s) hashed, $($coverage.statted) by size and write time, $($coverage.named) by name only."
+    $message += " Finished means a '## Closeout run=$runId' heading or a column-0 'PARKED <UTC> run=$runId <reason>' line in the run file. Escalating to the operator (an exhausted repair bound, an unverifiable CI, a cause the tree cannot fix) ends the run first: write a column-0 'PARKED <UTC> run=$runId escalation: <cause>' line, run 'python scripts/campaign_guard.py end --session $owner --reason escalation --generation $generation --cron-id $([string]$guard.cron_id)', CronDelete the heartbeat it names, then report. The breaker allows the stop after $MaxBlocksWithoutProgress pushes with no tree change (this is push $($state.blocks))."
     $payload = @{ decision = "block"; reason = $message } | ConvertTo-Json -Compress
     [Console]::Out.WriteLine($payload)
     exit 0
@@ -235,54 +262,30 @@ try {
 catch {
     $reason = $_.Exception.Message
     [Console]::Error.WriteLine("campaign-stop: $reason")
-    # Still fail open, but never silently: record the error where the
-    # heartbeat reads it (D00 T04 section 34), in the state file under the
-    # guard lock when it can be had, else in an append-only error log that
-    # needs no lock (D00 T04 section 36). Best effort only.
+    # Still fail open, but never silently: every error lands in a file of
+    # its own under build/claude-campaign-hook-errors/, never in the state
+    # (D00 T04 section 38). It needs no lock, because no writer shares a
+    # file, and it is published by atomic rename, so a reader never meets
+    # half a record. It carries a unique id and the identity the hook had
+    # captured when it failed: an error raised before the owner was read
+    # carries none, and so can never be written into a run's state.
     try {
         if ($root) {
             $at = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
-            $lock2 = $null
-            try { $lock2 = Enter-GuardLock $root 1000 } catch { $lock2 = $null }
-            # The error path re-checks the guard under the lock too: a run
-            # handed over or ended while this hook waited gets the error in
-            # a file of its own, never a write into its state (D00 T04
-            # section 36 panel round 2).
-            if ($lock2 -and $guardPath -and $owner) {
-                $still2 = $null
-                if (Test-Path -LiteralPath $guardPath) {
-                    try { $still2 = Get-Content -LiteralPath $guardPath -Raw -Encoding UTF8 | ConvertFrom-Json } catch { $still2 = $null }
-                }
-                $same2 = $still2 -and ([string]$still2.session_id -eq $owner)
-                if ($same2 -and $guard -and ($guard.PSObject.Properties.Name -contains 'run_id')) {
-                    $same2 = ([string]$still2.run_id -eq [string]$guard.run_id)
-                }
-                if (-not $same2) { Exit-GuardLock $lock2; $lock2 = $null }
+            $id = [guid]::NewGuid().ToString("N").Substring(0, 12)
+            $errSession = ""; $errRun = ""; $errGen = ""
+            if ($owner) {
+                $errSession = [string]$owner
+                try { $errRun = [string]$guard.run_id; $errGen = [string]$guard.generation } catch { }
             }
-            if ($lock2) {
-                try {
-                    $statePath = Join-Path $root "build\claude-campaign-state.json"
-                    $state = [ordered]@{ fingerprint = ""; blocks = 0; trips = 0; stalled = $false }
-                    if (Test-Path -LiteralPath $statePath) {
-                        try {
-                            $old = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
-                            $state.fingerprint = [string]$old.fingerprint
-                            $state.blocks = [int]$old.blocks
-                            $state.trips = [int]$old.trips
-                        } catch { }
-                    }
-                    $state.hook_error = $reason
-                    $state.hook_error_at = $at
-                    Write-State $statePath $state
-                } finally { Exit-GuardLock $lock2 }
-            } else {
-                # One file per error, never an append: a drain can never
-                # race a writer (D00 T04 section 36 panel round 1).
-                $dir = Join-Path $root "build\claude-campaign-hook-errors"
-                [void][System.IO.Directory]::CreateDirectory($dir)
-                $name = "{0:D20}-{1}.txt" -f [DateTime]::UtcNow.Ticks, $PID
-                [System.IO.File]::WriteAllText((Join-Path $dir $name), "$at $reason")
-            }
+            $dir = Join-Path $root "build\claude-campaign-hook-errors"
+            [void][System.IO.Directory]::CreateDirectory($dir)
+            $name = "{0:D20}-{1}-{2}" -f [DateTime]::UtcNow.Ticks, $PID, $id
+            $doc = [ordered]@{ id = $id; at = $at; reason = $reason; session = $errSession;
+                               run_id = $errRun; generation = $errGen } | ConvertTo-Json -Compress
+            $tmp = Join-Path $dir "$name.tmp"
+            [System.IO.File]::WriteAllText($tmp, $doc)
+            [System.IO.File]::Move($tmp, (Join-Path $dir "$name.json"))
         }
     } catch { }
     exit 0
