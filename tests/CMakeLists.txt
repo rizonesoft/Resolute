@@ -39,6 +39,10 @@ target_compile_definitions(resolute_tests PRIVATE
     # The house-style contract the test asserts against the constants.
     # Supplied by CMake so no absolute path enters a tracked build file.
     RESOLUTE_CONTRACT_PATH="${CMAKE_SOURCE_DIR}/docs/captures/house-style/contract.md"
+    # The icon manifest and the root its referrers are relative to.
+    # D00 T02 §8.
+    RESOLUTE_ICON_MANIFEST="${CMAKE_CURRENT_SOURCE_DIR}/icon_manifest.txt"
+    RESOLUTE_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
 )
 target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

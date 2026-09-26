@@ -538,13 +538,15 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 
 ## 8. Icon Manifest Audit
 
+> **Started:** 2026-09-26T13:28:03Z
+
 Icons are referenced by string name and an unknown name resolves to null, which renders as a silently missing control. §5 pins one glyph and the null path; nothing checks that every name the suite references actually resolves. This section enumerates every icon name referenced by the launcher, the shared controls, and the tool descriptors and asserts each one resolves, so a typo fails the gate instead of shipping an invisible control.
 
 **Needs:** Windows host (build/test)
 
-- [ ] Enumerate the referenced icon names from the launcher, the shared controls, and the tool descriptors into one manifest. Done when: the manifest is committed and a name referenced nowhere else still resolves or is named as dead.
-- [ ] Assert every manifest entry resolves to SVG and to a bitmap. Done when: all resolve, and a deliberately removed icon fails by name, quoted.
-- [ ] Commit: `"test: icon manifest audit"`
+- [x] Enumerate the referenced icon names from the launcher, the shared controls, and the tool descriptors into one manifest. Done when: the manifest is committed and a name referenced nowhere else still resolves or is named as dead. **Done 2026-09-26:** `tests/icon_manifest.txt` lists 26 names, each with every referrer as `path:line`, found by searching every quoted kebab-case literal in the shared controls' headers and sources, the launcher, and the tool code: the launcher (`src/main.cpp`) names no icon itself and reaches icons only through the shared controls, and `extensions/RegStudio` draws none; `render.h:46`'s `"settings"` is a doc-comment example and is excluded by name. A name no referrer uses keeps the referrer `dead` and must still resolve; none is dead today.
+- [x] Assert every manifest entry resolves to SVG and to a bitmap. Done when: all resolve, and a deliberately removed icon fails by name, quoted. **Done 2026-09-26:** `tests/icon_manifest_test.cpp` asserts each name resolves through `GetSvgData` (starting `<svg`) and `CreateBitmap`, and that each referrer line still quotes the name; `All tests passed (137 assertions in 1 test case)`. The audit found seven referenced names the set never carried (`inbox`, `alert-triangle`, `check-circle`, `circle`, `loader-2`, `check`, `ellipsis`), each drawing nothing: the content view's empty and error states, the status bar's notification icons, and the toolbar's overflow. They are added from Lucide 1.48.0 under the names the controls use, with their sources in `shared/lucide/icons/SOURCES.md`. With those seven files moved aside, the case failed 14 assertions, two per name, each naming its icon (exit 42), recorded in the run file and restored. **Corrected 2026-09-26:** the item reads as an audit only; making the referenced names resolve is in scope because the item's Done-when is that all resolve.
+- [x] Commit: `"test: icon manifest audit"`
 
 **Test checkpoint:** The manifest lists every referenced icon name with its referrer; all resolve to SVG and bitmap. A deliberately removed icon fails naming the icon. Counts are quoted.
 

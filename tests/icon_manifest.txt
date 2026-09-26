@@ -1,0 +1,46 @@
+# Icon manifest. D00 T02 §8.
+#
+# Every Lucide icon name the code references, with each referrer as
+# path:line (a path relative to the repository root). icon_manifest_test.cpp
+# asserts that each name resolves to SVG and to a bitmap, and that each
+# referrer line still quotes the name, so a typo, a removed icon, or a moved
+# reference fails the gate by name.
+#
+# Scope, enumerated 2026-09-26 by searching every quoted kebab-case literal:
+#   the shared controls   shared/resolute-ui/ (headers and sources)
+#   the launcher          src/main.cpp names no icon itself; it reaches icons
+#                         only through the shared controls listed here
+#   the tool descriptors  extensions/RegStudio draws no Lucide icon
+# Excluded: shared/resolute-ui/include/resolute/render.h:46 ("settings" in a
+# doc comment's example, not a reference).
+#
+# A name no referrer uses any more is kept with the referrer `dead`, so it
+# still has to resolve until it is removed from the set.
+#
+# name	referrer [referrer ...]   (fields separated by tabs)
+view-list	shared/resolute-ui/include/resolute/controls/sidebar.h:27	shared/resolute-ui/include/resolute/controls/toolbar.h:79	shared/resolute-ui/include/resolute/controls/toolbar.h:84
+system	shared/resolute-ui/include/resolute/controls/sidebar.h:28
+network	shared/resolute-ui/include/resolute/controls/sidebar.h:29
+security	shared/resolute-ui/include/resolute/controls/sidebar.h:30
+display	shared/resolute-ui/include/resolute/controls/sidebar.h:31
+programs	shared/resolute-ui/include/resolute/controls/sidebar.h:32
+view-large-icons	shared/resolute-ui/include/resolute/controls/toolbar.h:77
+view-small-icons	shared/resolute-ui/include/resolute/controls/toolbar.h:78
+view-details	shared/resolute-ui/include/resolute/controls/toolbar.h:80
+refresh	shared/resolute-ui/include/resolute/controls/toolbar.h:86
+settings	shared/resolute-ui/include/resolute/controls/toolbar.h:88
+theme-dark	shared/resolute-ui/include/resolute/controls/toolbar.h:89	shared/resolute-ui/src/controls/toolbar.cpp:31	shared/resolute-ui/src/controls/toolbar.cpp:34
+theme-light	shared/resolute-ui/src/controls/toolbar.cpp:30
+theme-system	shared/resolute-ui/src/controls/toolbar.cpp:32
+chevron-down	shared/resolute-ui/src/controls/toolbar.cpp:497
+ellipsis	shared/resolute-ui/src/controls/toolbar.cpp:561
+folder-open	shared/resolute-ui/include/resolute/controls/contentview.h:35
+inbox	shared/resolute-ui/src/controls/contentview.cpp:60
+alert-triangle	shared/resolute-ui/src/controls/contentview.cpp:303	shared/resolute-ui/src/controls/statusbar.cpp:520
+check-circle	shared/resolute-ui/src/controls/contentview.cpp:363
+chevron-up	shared/resolute-ui/src/controls/listview.cpp:553
+chevron-left	shared/resolute-ui/src/controls/sidebar.cpp:345
+chevron-right	shared/resolute-ui/src/controls/sidebar.cpp:349
+circle	shared/resolute-ui/src/controls/statusbar.cpp:508
+loader-2	shared/resolute-ui/src/controls/statusbar.cpp:512
+check	shared/resolute-ui/src/controls/statusbar.cpp:516
