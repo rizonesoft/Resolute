@@ -1755,12 +1755,14 @@ The D00 T04 §40 review files what its contract does not own, and so does the D0
 - [ ] Make the repair journal durable against torn and concurrent writes: a torn append is refused with no recovery procedure, uncommitted journal lines plus a lost episode file can erase a consumed budget, and serial writes are asserted without a concurrency checkpoint (plan review PR1, PR2, and PR13 of the D00 T04 §41 review; needs §41 shipped). Done when: a documented `repair` recovery quarantines a torn final line and rebuilds from the rest, the budget survives the loss of both the uncommitted lines and the episode file (or the loss refuses), and a two-process fixture races reservations and terminal transitions without losing or doubling budget, quoted.
 - [ ] Bind delivery and exclusion evidence to the push that happened: absence from the remote now cannot prove a commit was never delivered (a force push can remove it after CI ran), the before and after commits a retirement uses are not bound to the delivered push, and `**` in a filter never matches zero directories (`src/**/x` misses `src/x`), which can prove a false exclusion (plan review PR3, PR5, and PR6 [major, owner Claude Code, due 2026-10-03] of the D00 T04 §41 review; needs §41 shipped). Done when: abandon also refuses when GitHub lists a run for the commit, retirement checks the range against the recorded push (its `ci-wait --since` head and the delivered head), `**` matches zero or more whole segments as GitHub documents, and legs pin each, quoted.
 - [ ] Publish captures and receipts as whole, versioned contracts: a capture's workflow, record, log, and index are written one by one, and receipts have no schema, unknown-version policy, or check of derived fields such as `remaining` (plan review PR11 and PR12 of the D00 T04 §41 review; needs §41 shipped). Done when: `capture-run` stages the set and publishes it in one rename (or rolls back), with an interrupted-capture fixture that retries cleanly, and a receipt schema names every field, refuses an unknown version, and replay re-derives `remaining`, quoted.
+- [ ] Prove `plan-gates` fails and reproduces under the Windows runner's Git Bash: D00 T01 §9 moved `plan-gates` to `windows-2025` with `shell: bash`, proven by green runs and by the printed template matching the logged `shell:` line, but no drill shows a failing Python step failing the job there, or the printed re-run reproducing it locally under Git Bash (plan review PR4 and PR5 of the D00 T01 §9 review; needs D00 T01 §9 shipped). Done when: a disposable drill on `windows-2025` fails a `shell: bash` step with a known exit code, captured through `capture-run`, and the printed re-run executed locally under Git Bash fails with the same code and output, quoted.
 - [ ] Commit: `"workspace: campaign guard recovery completeness"`
 
 **Test checkpoint:** Unit test: `python scripts/campaign_guard.py --self-test` carries the prohibition-through-recovery, terminal-respect, pending-reconstruction, positive-deletion-evidence, incomplete-listing, workspace-identity, bounded-migration, every-failure-path, and structured-outcome legs, and `python scripts/campaign_guard.py --self-test` plus `python scripts/review_prompt.py --self-test` carry the D00 T04 §41 fold's backtick, transition-order, capture-gate, torn-write, concurrency, delivery, range-binding, zero-segment, capture-set, and receipt-schema legs, quoted with the suite counts. Driven run with evidence: a genuine CI wait with the health check running inside it, in a run file, quoted.
 
 -> XREF: D00 T04 §40 -- the guard fences this section completes, and the review findings it files
 -> XREF: D00 T04 §41 -- the CI read-back hardening whose hard-cap and plan-review findings fold here
+-> XREF: D00 T01 §9 -- the Windows Git Bash runner whose failure drill folds here
 -> SOURCE: panel-D00-T04-s40-2026-09-26-F18 D00-T04-S40-F18
 -> SOURCE: plan-D00-T04-s40-2026-09-26-PR1 D00-T04-S40-PR1
 -> SOURCE: plan-D00-T04-s40-2026-09-26-PR2 D00-T04-S40-PR2
@@ -1790,6 +1792,8 @@ The D00 T04 §40 review files what its contract does not own, and so does the D0
 -> SOURCE: plan-D00-T04-s41-2026-09-26-PR12 D00-T04-S41-PR12
 -> SOURCE: plan-D00-T04-s41-2026-09-26-PR13 D00-T04-S41-PR13
 -> SOURCE: plan-D00-T04-s41-2026-09-26-PR14 D00-T04-S41-PR14
+-> SOURCE: plan-D00-T01-s9-2026-09-26-PR4 D00-T01-S9-PR4
+-> SOURCE: plan-D00-T01-s9-2026-09-26-PR5 D00-T01-S9-PR5
 
 ## Verification
 

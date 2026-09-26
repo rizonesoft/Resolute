@@ -880,6 +880,12 @@ Resolute is a Windows-only suite, per the operator's 2026-09-20 decision, but th
 -> XREF: D00 T04 §39 -- the WSL self-test failure its independent review found, filed as an item here
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR16 D00-T04-S39-PR16
 -> SOURCE: plan-D00-T04-s39-2026-09-26-PR17 D00-T04-S39-PR17
+-> SOURCE: plan-D00-T01-s9-2026-09-26-PR7 D00-T01-S9-PR7
+-> XREF: D00 T04 §42 -- the Windows Git Bash oracle drill this section's plan review folded there
+
+<!-- claim: absent scripts/wsl.sh -->
+<!-- claim: count "ubuntu" .github/workflows/plan.yml = 0 -->
+<!-- claim: count "runs-on: windows-2025" .github/workflows/plan.yml = 1 -->
 
 ## Verification
 
