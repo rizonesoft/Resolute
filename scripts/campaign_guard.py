@@ -604,8 +604,14 @@ def whoami(root: str, session: str, generation: str | None = None, cronlist: str
         # exists, the answer withholds `job=`, and no fenced step can run
         # until the extras are gone and `whoami` is asked again (panel
         # round 1 of the D00 T04 §38 review).
+        if not carriers:
+            # No verified live carrier: an empty or unparsed listing never
+            # releases an identity (panel round 2).
+            return (f"OWNER run={guard.get('run_id')} (job withheld: no live CronList job carries generation "
+                    f"{generation})\nNO LIVE CARRIER: the guard's job {job} is not in the CronList text given: "
+                    f"CronCreate a heartbeat and re-point with acquire --cron-id, then run whoami again")
         keep = job
-        repoint = job not in carriers and bool(carriers)
+        repoint = job not in carriers
         if repoint:
             keep = carriers[0]
         extras = [c for c in carriers if c != keep]
@@ -845,8 +851,10 @@ def _hook_error_locked(root: str, session: str | None, ack: str | None = None,
         if unreadable:
             raise GuardError("the guard is unreadable, so the acknowledgement cannot be fenced: repair the "
                              "guard, then acknowledge")
-        if guard is not None:
-            _fence(guard, session, generation, cron_id)
+        # No guard means no owner to fence against: a fenced ack refuses
+        # rather than trusting identity values that may be obsolete (panel
+        # round 2 of the D00 T04 §38 review).
+        _fence(guard, session, generation, cron_id)
     hit = [e for e in errors if str(e.get("id")) == ack]
     if not hit:
         raise GuardError(f"no recorded error has id {ack}; nothing cleared")
@@ -1939,6 +1947,25 @@ def _self_test() -> int:
         out = whoami(iroot, SESSION, g, _cl(("job-1", tag), ("job-9", "an unrelated reminder")))
         check("whoami-releases-the-job-once-one-carrier-lives",
               out == f"OWNER run={read_guard(iroot)['run_id']} job=job-1", out)
+        # Panel round 2: no carrier at all releases nothing either.
+        out = whoami(iroot, SESSION, g, _cl(("job-9", "an unrelated reminder")))
+        check("whoami-withholds-the-job-without-a-live-carrier",
+              "job=" not in out and "NO LIVE CARRIER: the guard's job job-1 is not in the CronList text" in out, out)
+        _eg = read_guard(iroot)
+        os.makedirs(_errors_dir(iroot), exist_ok=True)
+        with open(os.path.join(_errors_dir(iroot), "00000000000000000009-1-e00000000009.json"), "w",
+                  encoding="utf-8") as fh:
+            json.dump({"id": "e00000000009", "at": "2099-01-01T00:00:00Z", "reason": "r"}, fh)
+        os.remove(_paths(iroot)[0])
+        try:
+            hook_error(iroot, SESSION, "e00000000009", _eg["generation"], "job-1")
+            check("hook-error-refuses-a-fenced-ack-without-a-guard", False)
+        except GuardError as exc:
+            check("hook-error-refuses-a-fenced-ack-without-a-guard",
+                  "no guard file" in str(exc) and len(_hook_errors(iroot)) == 1, str(exc))
+        shutil.rmtree(_errors_dir(iroot))
+        with open(_paths(iroot)[0], "w", encoding="utf-8") as fh:
+            json.dump(_eg, fh)
         out = whoami(iroot, SESSION, g, _cl(("job-2", tag), ("job-3", tag)))
         check("whoami-re-points-to-a-live-duplicate",
               "the guard's job job-1 is not live and job-2 carries its generation: re-point first" in out
@@ -2300,7 +2327,7 @@ def _self_test() -> int:
                         ("skill-refused-acquire-cancels-its-job", "A refused `acquire` means another session owns the run"),
                         ("skill-heartbeat-checks-ownership", "NOT THE OWNER or NOT THE CURRENT JOB"),
                         ("skill-heartbeat-ends-through-end",
-                         "--reason plan-done --generation G --cron-id <job id>`, CronDelete this job"),
+                         "--reason plan-done --generation G --cron-id <job id>`. If `end` refuses"),
                         # D00 T04 §38: the heartbeat drains its own pending
                         # cancellations first, then asks who it is with the
                         # CronList text, and fences every later mutation.
@@ -2312,6 +2339,10 @@ def _self_test() -> int:
                         ("skill-heartbeat-stalls-only-its-own-run",
                          "carries `run_id` equal to the run id step 2 printed and trips of 2 or more"),
                         ("skill-heartbeat-deletes-only-after-end-succeeds", "Only after `end` succeeds, CronDelete this job"),
+                        ("skill-heartbeat-plan-done-only-after-end-succeeds",
+                         "Only after `end` succeeds for plan-done, CronDelete this job"),
+                        ("skill-heartbeat-no-live-carrier-runs-no-fenced-step",
+                         "If it prints NO LIVE CARRIER, or still withholds the job, run no fenced step this firing"),
                         ("skill-heartbeat-reports-are-bookkeeping",
                          "Critical events as a `- bookkeeping: ` line (it repeats on every firing"),
                         ("skill-heartbeat-re-reads-its-job-after-a-re-point",
