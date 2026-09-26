@@ -98,6 +98,7 @@ track: W1
 |  38   |   §38   | Campaign guard identity and recovery           | §36 |  [x]   |
 |  39   |   §39   | CI read-back and repair completeness           | §37 |  [ ]   |
 |  40   |   §40   | Campaign guard fence completeness              | §38 |  [ ]   |
+|  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [ ]   |
 
 ---
 
@@ -1616,6 +1617,7 @@ The D00 T04 §37 review files what its contract does not own. Its hard-cap round
 
 -> XREF: D00 T04 §37 -- the read-back and repair episode this section completes, and the review findings it files
 -> XREF: D00 T01 §9 -- the WSL-only self-test failure this section's independent review found, filed there
+-> XREF: D00 T04 §41 -- the review findings on replay, evidence, and redaction, filed after the hard cap
 -> SOURCE: panel-D00-T04-s37-2026-09-25-F19 D00-T04-S37-F19
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR1 D00-T04-S37-PR1
 -> SOURCE: plan-D00-T04-s37-2026-09-25-PR2 D00-T04-S37-PR2
@@ -1668,6 +1670,43 @@ The D00 T04 §38 review files what its contract does not own. Its hard-cap round
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR13 D00-T04-S38-PR13
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR14 D00-T04-S38-PR14
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR15 D00-T04-S38-PR15
+
+## 41. CI Read-Back Evidence and Replay Hardening
+
+The D00 T04 §39 review files what its contract does not own. Its hard-cap round (panel round 5, F18 and F19) found a block scalar inside a trigger list read as its indicator, which could prove a false exclusion, and `pushed` and `abandoned` journal lines applied without an identity of their own, so a foreign transition could free a current episode's budget; round 5 is the cap, so both file here. The D00 T04 §39 plan review (run 20260926-D00-T04-S39-astra) adds sixteen accepted findings here, grouped by the unit they harden; two more (PR16 and PR17) scope D00 T01 §9's purge.
+
+- [ ] Replay the journal strictly: `pushed` and `abandoned` lines carry no identity, the replay has no stated transition order, and a truncated line, a duplicate event, or a concurrent write is not defined (panel round 5 of the D00 T04 §39 review, F19, and plan review PR7 and PR8; needs §39 shipped). Done when: every journal line carries the episode's identity and campaign run and replay checks each one, replay follows a stated state machine (open, reserved, pushed or abandoned, re-reserved, closed or retired) refusing an impossible history, a truncated or duplicate line fails closed, a re-reserved commit replays as the latest transition, and fixtures pin each, quoted.
+- [ ] Refuse a trigger shape the reader cannot decode, and state the pattern semantics: a block scalar inside a trigger list reads as its indicator, and the matcher has no stated contract for ordered negation, branch and path conjunction, slash matching, tag pushes, or the changed-path set of a multi-commit push, a new branch, a deletion, or a force push (panel round 5, F18, and plan review PR3 and PR4; needs §39 shipped). Done when: any block scalar or unsupported pattern in a filter refuses as unproven, negation and conjunction follow GitHub's documented order, the changed paths come from the event's own before and after with a conservative refusal for the shapes the reader cannot derive, and fixtures pin each, quoted.
+- [ ] Bind terminal evidence as strongly as green: close does not compare the run attempt, and retirement trusts a supplied NOT GREEN line for its authorization and exclusion (plan review PR1 and PR2; needs §39 shipped). Done when: close requires the latest completed attempt of the run and its immutable workflow identity, retirement re-derives the trigger exclusion from the committed workflow and records the authorization it verified, and fixtures pin a stale attempt and a fabricated NOT GREEN line refused, quoted.
+- [ ] Reconcile a push's outcome before abandoning it: abandonment frees a place without proving the commit never reached the remote (plan review PR5; needs §39 shipped). Done when: `repair abandon` checks the remote branch for the commit (`git ls-remote`, or `branch --contains` after a fetch), refuses to abandon a delivered commit and marks it pushed instead, and fixtures pin a push that landed before its client failed, quoted.
+- [ ] Prove every transition's interruption and bind the ceiling journal to the campaign: the crash fixture covers only a reservation, and the ceiling survives a missing, truncated, or substituted journal (plan review PR6 and PR9; needs §39 shipped). Done when: interruption fixtures kill `open`, `pushed`, `abandoned`, `closed`, `retired`, and a ceiling use between journal and state and each recovers without budget loss or resurrection, the ceiling key carries the campaign run, and a changed or truncated journal refuses rather than renewing an allowance, quoted.
+- [ ] Classify every failed job and step deterministically: the aggregation rule overlaps (any repairable against mixed unknown) and job-level startup failures, cancellations, timeouts, and unavailable logs have no stated outcome (plan review PR10 and PR11; needs §39 shipped). Done when: an ordered decision table covers each combination, including failed steps with no signal and job-level outcomes, each with a bounded next action, and fixtures pin every row, quoted.
+- [ ] Give redaction a stated grammar and sanitize captures: redaction is a growing set of heuristics, the oracle captures are persisted without a sanitization gate, and the severity rule leans on GitHub masking registered secrets only (plan review PR12, PR13, and PR14; needs §39 shipped). Done when: the supported credential forms are written down with a conservative fallback (an unsupported multiline form masks the rest of its block) and adversarial fixtures (quoted multiline values, here-documents, here-strings, malformed input), every capture passes the redaction and a secret scan before it is written, with its provenance kept, and a severity rule treats unregistered and derived credentials as exposed, quoted.
+- [ ] Prove Windows failure semantics: the drill proves output and templates, not native-command failures, PowerShell exceptions, cmd expansion characters, or a missing working directory (plan review PR15; needs §39 shipped). Done when: a Windows drill fails each of those deliberately, its captured exit codes and output live under `docs/captures/ci-oracle/`, and each printed re-run fails the same way locally, quoted.
+- [ ] Emit a structured repair receipt: repair outcomes are parsed from human-readable lines (plan review PR18; needs §39 shipped). Done when: every repair command also prints a versioned JSON receipt (campaign, repository, workflow, sha, run, attempt, outcome, remaining budget), the journal carries it, restore reads it in preference to the prose, and a fixture round-trips it, quoted.
+- [ ] Commit: `"workspace: CI read-back evidence and replay hardening"`
+
+**Test checkpoint:** Unit test: `python scripts/review_prompt.py --self-test` and `python scripts/campaign_guard.py --self-test` carry the strict-replay, trigger-shape, terminal-evidence, push-outcome, interruption, decision-table, redaction-grammar, capture-sanitization, and receipt legs, quoted with the suite counts. Driven run with evidence: the Windows failure drill under `docs/captures/ci-oracle/`, quoted.
+
+-> XREF: D00 T04 §39 -- the read-back and repair completeness this section hardens, and the review findings it files
+-> SOURCE: panel-D00-T04-s39-2026-09-26-F18 D00-T04-S39-F18
+-> SOURCE: panel-D00-T04-s39-2026-09-26-F19 D00-T04-S39-F19
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR1 D00-T04-S39-PR1
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR2 D00-T04-S39-PR2
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR3 D00-T04-S39-PR3
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR4 D00-T04-S39-PR4
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR5 D00-T04-S39-PR5
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR6 D00-T04-S39-PR6
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR7 D00-T04-S39-PR7
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR8 D00-T04-S39-PR8
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR9 D00-T04-S39-PR9
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR10 D00-T04-S39-PR10
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR11 D00-T04-S39-PR11
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR12 D00-T04-S39-PR12
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR13 D00-T04-S39-PR13
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR14 D00-T04-S39-PR14
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR15 D00-T04-S39-PR15
+-> SOURCE: plan-D00-T04-s39-2026-09-26-PR18 D00-T04-S39-PR18
 
 ## Verification
 
