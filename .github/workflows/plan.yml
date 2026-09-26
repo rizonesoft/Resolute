@@ -14,11 +14,9 @@ jobs:
   plan-gates:
     # Windows-only suite (operator decision 2026-09-20, D00 T01 §9): the
     # gates run on the same host family they are developed on, through
-    # the runner's Git Bash, with the runner's `python`.
+    # the runner's Git Bash (`shell: bash` on each step, not job defaults,
+    # which ci-wait's re-run printout does not read), with `python`.
     runs-on: windows-2025
-    defaults:
-      run:
-        shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -26,14 +24,18 @@ jobs:
           # fix-commit proofs, ancestry) cannot resolve on a shallow checkout.
           fetch-depth: 0
       - name: Self-test the TODO graph tool
+        shell: bash
         run: python scripts/todo-graph.py self-test
       - name: Validate the TODO tree
+        shell: bash
         run: python scripts/todo-graph.py validate
       - name: Check plan projection is current
+        shell: bash
         run: |
           python scripts/todo-graph.py plan --sync
           test -z "$(git status --porcelain)" || { echo "stale plan projection:"; git status --porcelain; git diff --stat; exit 1; }
       - name: Assert commit hook is intact
+        shell: bash
         run: |
           test "$(git ls-files -s tools/githooks/pre-commit | cut -d' ' -f1)" = "100755" || { echo "hook index mode is not 100755"; exit 1; }
           git show HEAD:tools/githooks/pre-commit > /tmp/hook-blob || exit 1
