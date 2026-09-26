@@ -1162,7 +1162,19 @@ def _flow_list(value: str, child: list[str]) -> list[str]:
     strip_c = lambda v: re.sub(r"(?:\A|\s+)#.*\Z", "", v).strip()
     value = strip_c(value)
     if value.startswith("["):
-        return [x.strip().strip("'\"") for x in value.strip("[]").split(",") if x.strip()]
+        # Items split at commas outside quotes, so `['feature/foo,bar']` is
+        # one pattern (panel round 1 of the D00 T04 §39 review).
+        items = re.findall(r"\s*('(?:''|[^'])*'|\"(?:\\.|[^\"\\])*\"|[^,\]]+)\s*(?:,|\]|\Z)", value[1:])
+        out = []
+        for it in items:
+            it = it.strip()
+            if it.startswith("'"):
+                out.append(it[1:-1].replace("''", "'"))
+            elif it.startswith('"'):
+                out.append(it[1:-1].replace('\\"', '"'))
+            elif it:
+                out.append(it)
+        return out
     if value:
         return [value.strip("'\"")]
     return [strip_c(ln.strip()[2:]).strip("'\"") for ln in child if ln.strip().startswith("- ")]
@@ -2024,6 +2036,32 @@ def failed_log_report(run_id: str, limit: int = 20, sha: str | None = None,
         rows += [f"ci-wait: | {ln}" for ln in lines]
         by_step = lines_by_step(out)
         per_step = cause_lines(by_step, idents)
+        named = [(i["job"], i["step"]) for i in (idents or [])]
+        if idents and len(set(named)) < len(named):
+            # Display names collide (a matrix with one explicit name, or a
+            # repeated step name): the combined log cannot tell the jobs
+            # apart, so each job's log is fetched by its id and each step
+            # classified from its own job (panel round 1 of the D00 T04 §39
+            # review). A step name repeated inside one job stays ambiguous.
+            by_step, per_step = {}, []
+            for jid in dict.fromkeys(i["job_id"] for i in idents):
+                ok_j, log_j = _gh_text(["run", "view", run_id, "--job", str(jid), "--log-failed"])
+                job_lines = lines_by_step(redact(log_j)) if ok_j else {}
+                mine = [i for i in idents if i["job_id"] == jid]
+                for i in mine:
+                    twins = [m for m in mine if m["step"] == i["step"]]
+                    key = _ident_text(i)
+                    if not ok_j:
+                        per_step.append(f"ci-wait: cause in {key}: unknown (its job log is unavailable)")
+                        continue
+                    if len(twins) > 1:
+                        per_step.append(f"ci-wait: cause in {key}: ambiguous (step name repeats in its job)")
+                        continue
+                    lines_i = job_lines.get(f"{i['job']} / {i['step']}", [])
+                    by_step[key] = lines_i
+                    verdict = step_cause(lines_i)
+                    if verdict != "no signal":
+                        per_step.append(f"ci-wait: cause in {key}: {verdict}")
         if len(per_step) > 1:
             # Several failing steps: each is classified alone before the
             # aggregate, under a rule the output states (D00 T04 §39).
@@ -6168,6 +6206,11 @@ def _self_test() -> int:
                 "                {'name': 'build (x64)', 'databaseId': 101, 'steps': [{'name': 'Compile', 'number': 3, 'conclusion': 'failure'}]},\n"
                 "                {'name': 'build (arm64)', 'databaseId': 102, 'steps': [{'name': 'Compile', 'number': 3, 'conclusion': 'failure'}]}]}))\n"
                 "            sys.exit(0)\n"
+                "        if mode == 'samename':\n"
+                "            print(json.dumps({'jobs': [\n"
+                "                {'name': 'build', 'databaseId': 301, 'steps': [{'name': 'Compile', 'number': 3, 'conclusion': 'failure'}]},\n"
+                "                {'name': 'build', 'databaseId': 302, 'steps': [{'name': 'Compile', 'number': 3, 'conclusion': 'failure'}]}]}))\n"
+                "            sys.exit(0)\n"
                 "        if mode == 'twocause':\n"
                 "            print(json.dumps({'jobs': [{'name': 'plan-gates', 'databaseId': 201, 'steps': [\n"
                 "                {'name': 'Self-test', 'number': 2, 'conclusion': 'failure'},\n"
@@ -6203,6 +6246,11 @@ def _self_test() -> int:
                 "    if mode == 'matrixlog':\n"
                 "        print('build (x64)\\tCompile\\t2026-09-23T21:37:50.1Z error: x64 link failed')\n"
                 "        print('build (arm64)\\tCompile\\t2026-09-23T21:37:50.2Z The runner has received a shutdown signal.')\n"
+                "        sys.exit(0)\n"
+                "    if mode == 'samename':\n"
+                "        job = sys.argv[sys.argv.index('--job') + 1] if '--job' in sys.argv else None\n"
+                "        if job in (None, '301'): print('build\\tCompile\\t2026-09-23T21:37:50.1Z error: link failed')\n"
+                "        if job in (None, '302'): print('build\\tCompile\\t2026-09-23T21:37:50.2Z The runner has received a shutdown signal.')\n"
                 "        sys.exit(0)\n"
                 "    if mode == 'twocause':\n"
                 "        print('plan-gates\\tSelf-test\\t2026-09-23T21:37:50.1Z FAIL the review-prompt suite')\n"
@@ -6260,7 +6308,7 @@ def _self_test() -> int:
                 "if mode == 'gherror':\n"
                 "    sys.stderr.write('HTTP 503: service unavailable\\n')\n"
                 "    sys.exit(1)\n"
-                "if mode in ('nolog', 'nologall', 'nojobs', 'nojobsbare', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep', 'emptylog', 'mixedrepo', 'mixedplatform', 'nometa', 'crossstep', 'secretlog', 'keylog', 'matrixlog', 'twocause'): mode = 'failure'\n"
+                "if mode in ('nolog', 'nologall', 'nojobs', 'nojobsbare', 'fulllog', 'badpin', 'lostrunner', 'shutdowncancel', 'unknownstep', 'emptylog', 'mixedrepo', 'mixedplatform', 'nometa', 'crossstep', 'secretlog', 'keylog', 'matrixlog', 'twocause', 'samename'): mode = 'failure'\n"
                 "sha = sys.argv[sys.argv.index('--commit') + 1]\n"
                 "if mode == 'pending': runs = [{'status': 'in_progress', 'conclusion': '', 'databaseId': 7, 'headSha': sha}]\n"
                 "elif mode == 'none': runs = []\n"
@@ -6815,7 +6863,10 @@ def _self_test() -> int:
                      ["todo/x.md"], False),
                     ("an on flow mapping", "on: {push: null}\njobs: {}\n", "master", ["a"], False),
                     ("a commented branch item", "on:\n  push:\n    branches:\n      - master # main line\njobs: {}\n",
-                     "master", ["a"], False)):
+                     "master", ["a"], False),
+                    # Panel round 1: a quoted comma is part of the pattern.
+                    ("a quoted comma in a branch", "on:\n  push:\n    branches: ['feature/foo,bar']\njobs: {}\n",
+                     "feature/foo,bar", ["a"], False)):
                 got_ex = push_excluded(push_trigger_filter(wf_t), branch, changed_t)[0]
                 check(f"push-exclusion: {label}", got_ex == want, f"{got_ex} {push_trigger_filter(wf_t)}")
             got_nt7 = subprocess.run([sys.executable, me, "ci-wait", c3, "--timeout", "0", "--interval", "0",
@@ -6898,6 +6949,15 @@ def _self_test() -> int:
                   "ci-wait: cause in build (x64) (job id 101) / step 3 Compile: repairable" in mx
                   and "ci-wait: cause in build (arm64) (job id 102) / step 3 Compile: platform fault" in mx
                   and AGGREGATION_RULE in mx and "ci-wait: cause: unknown" in mx, mx)
+            # Panel round 1: two matrix jobs under one explicit display name
+            # are told apart by job id, each classified from its own log.
+            with open(state, "w", encoding="utf-8") as fh:
+                fh.write("samename")
+            sn = failed_log_report("9")
+            check("jobs-sharing-a-name-are-classified-by-id",
+                  "ci-wait: cause in build (job id 301) / step 3 Compile: repairable" in sn
+                  and "ci-wait: cause in build (job id 302) / step 3 Compile: platform fault" in sn
+                  and "ci-wait: cause: unknown" in sn, sn)
             with open(state, "w", encoding="utf-8") as fh:
                 fh.write("twocause")
             tc = failed_log_report("9")
