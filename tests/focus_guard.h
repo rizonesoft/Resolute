@@ -3,11 +3,9 @@
 // WinEvent hooks for foreground changes and window shows see a transient
 // activation when it happens rather than missing it between polls: in
 // context for this process, so a window is judged as it was when shown, and
-// on a dedicated thread for the processes a case adopts, where every show is
-// kept and measured at delivery; the adopted processes' threads are
-// snapshotted every 100 ms, so a show whose raising thread has exited by
-// delivery still resolves. The one limit: a thread born and gone inside one
-// 100 ms gap, having shown a window, cannot be attributed. At the end of every case the
+// on a dedicated thread, through hooks scoped to each process a case adopts
+// (started suspended, adopted, then resumed), where every show is that
+// process's and is kept and measured at delivery. At the end of every case the
 // guard takes a census of the windows the suite owns (this process and any
 // process a case adopts, such as the launcher it starts) and checks it:
 //
@@ -49,7 +47,9 @@ struct Event {
 void Start();
 void Stop();
 
-// Windows of `pid` count as the suite's from now until the case ends.
+// Windows of `pid` count as the suite's from now until the case ends. Its
+// hooks are installed before this returns, so start the process suspended,
+// adopt it, and then resume it.
 void AdoptProcess(DWORD pid);
 
 // The events observed since the last drain, after the observer has caught up.

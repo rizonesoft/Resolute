@@ -9,7 +9,6 @@
 #include <catch2/reporters/catch_reporter_registrars.hpp>
 
 #include <shellscalingapi.h>
-#include <tlhelp32.h>
 
 #include <algorithm>
 #include <cctype>
@@ -45,7 +44,6 @@ bool SystemClass(const std::wstring& cls) {
 
 HWINEVENTHOOK g_ownForeground = nullptr;
 HWINEVENTHOOK g_ownShow       = nullptr;
-bool          g_adoptedHooks  = false;  // the observer thread's hooks installed
 
 bool Owned(HWND hwnd) {
     DWORD pid = 0;
@@ -72,93 +70,61 @@ void CALLBACK OnOwnEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, L
     Record(event, Describe(hwnd));
 }
 
-// The adopted processes' threads, as last seen: a thread that raised a show
-// and exited before the show was delivered still resolves to its process.
-std::map<DWORD, DWORD> g_threadOwner;
+// An adopted process's windows (the launcher a case starts), out of context
+// through hooks scoped to that process: the system delivers only its events,
+// so each one is that process's however short-lived the thread or window
+// that raised it (panel round 3 of the D00 T02 §10 review). Every show is
+// kept whatever the window's visibility by delivery, since it still went on
+// the desktop; one gone altogether is kept as unmeasured.
+std::map<HWINEVENTHOOK, DWORD> g_adopted;  // hook -> the process it watches (observer thread only)
 
-// Records every thread of every adopted process. Taken when a process is
-// adopted, at every drain, and every 100 ms on the observer thread while any
-// process is adopted, so only a thread born and gone inside one such gap,
-// having shown a window, escapes attribution.
-void SnapshotThreads() {
-    std::set<DWORD> pids;
-    {
-        std::lock_guard<std::mutex> hold(g_lock);
-        pids = g_pids;
-    }
-    pids.erase(GetCurrentProcessId());
-    if (pids.empty()) return;
-    HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-    if (snap == INVALID_HANDLE_VALUE) return;
-    THREADENTRY32 te{};
-    te.dwSize = sizeof(te);
-    for (BOOL ok = Thread32First(snap, &te); ok; ok = Thread32Next(snap, &te)) {
-        if (pids.count(te.th32OwnerProcessID) == 0) continue;
-        std::lock_guard<std::mutex> hold(g_lock);
-        g_threadOwner[te.th32ThreadID] = te.th32OwnerProcessID;
-    }
-    CloseHandle(snap);
-}
-
-DWORD PidOfThread(DWORD threadId) {
-    HANDLE thread = OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, threadId);
-    if (thread) {
-        const DWORD pid = GetProcessIdOfThread(thread);
-        CloseHandle(thread);
-        if (pid) return pid;
-    }
-    std::lock_guard<std::mutex> hold(g_lock);
-    const auto it = g_threadOwner.find(threadId);
-    return it == g_threadOwner.end() ? 0 : it->second;
-}
-
-// An adopted process's windows (the launcher a case starts), out of
-// context: ownership comes from the thread that raised the event, which
-// outlives its windows, and a window gone before delivery is still
-// recorded, as shown somewhere nobody measured.
-void CALLBACK OnAdoptedEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD threadId,
-                             DWORD) {
+void CALLBACK OnAdoptedEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD, DWORD) {
     if (!hwnd || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
-    const DWORD pid = PidOfThread(threadId);
-    if (pid == 0 || pid == GetCurrentProcessId()) return;  // the in-context hook has this process
-    {
-        std::lock_guard<std::mutex> hold(g_lock);
-        if (g_pids.count(pid) == 0) return;
-    }
-    // Every show is kept, whatever the window's visibility by delivery: a
-    // window shown and hidden again still went on the desktop, and its
-    // rectangle still says where. One gone altogether cannot be measured,
-    // and is kept as that.
+    const auto it = g_adopted.find(hook);
+    if (it == g_adopted.end()) return;
     WindowRecord w;
     if (IsWindow(hwnd)) {
         w = Describe(hwnd);
     } else {
         w.hwnd = hwnd;
-        w.pid  = pid;
+        w.pid  = it->second;
         w.cls  = L"(gone before it was measured)";
     }
     w.visible = true;
     Record(event, std::move(w));
 }
 
+constexpr UINT kAdopt   = WM_APP + 2;  // wParam: the process to watch
+constexpr UINT kRelease = WM_APP + 3;  // stop watching every adopted process
+HANDLE g_adoptDone = nullptr;           // set by the observer after each adopt
+bool   g_adoptOk   = false;             // whether that adopt installed its hooks
+
 DWORD WINAPI Observe(LPVOID) {
     MSG msg;
     PeekMessageW(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);  // make the queue
-    HWINEVENTHOOK fg   = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr, OnAdoptedEvent, 0,
-                                         0, WINEVENT_OUTOFCONTEXT);
-    HWINEVENTHOOK show = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr, OnAdoptedEvent, 0, 0,
-                                         WINEVENT_OUTOFCONTEXT);
-    g_adoptedHooks = fg != nullptr && show != nullptr;
-    const UINT_PTR snapshots = SetTimer(nullptr, 0, 100, nullptr);
     SetEvent(g_ready);
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (msg.message == kFlush) SetEvent(g_flushed);
-        if (msg.message == WM_TIMER && msg.wParam == snapshots) SnapshotThreads();
+        if (msg.message == kAdopt) {
+            const auto pid = static_cast<DWORD>(msg.wParam);
+            HWINEVENTHOOK fg = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr,
+                                               OnAdoptedEvent, pid, 0, WINEVENT_OUTOFCONTEXT);
+            HWINEVENTHOOK show =
+                SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr, OnAdoptedEvent, pid, 0, WINEVENT_OUTOFCONTEXT);
+            if (fg) g_adopted[fg] = pid;
+            if (show) g_adopted[show] = pid;
+            g_adoptOk = fg != nullptr && show != nullptr;
+            SetEvent(g_adoptDone);
+        }
+        if (msg.message == kRelease) {
+            for (const auto& [hook, pid] : g_adopted) UnhookWinEvent(hook);
+            g_adopted.clear();
+            SetEvent(g_adoptDone);
+        }
         DispatchMessageW(&msg);
     }
-    KillTimer(nullptr, snapshots);
-    if (fg) UnhookWinEvent(fg);
-    if (show) UnhookWinEvent(show);
+    for (const auto& [hook, pid] : g_adopted) UnhookWinEvent(hook);
+    g_adopted.clear();
     return 0;
 }
 
@@ -247,6 +213,7 @@ void Start() {
     }
     g_ready   = CreateEventW(nullptr, TRUE, FALSE, nullptr);
     g_flushed = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    g_adoptDone = CreateEventW(nullptr, FALSE, FALSE, nullptr);
     g_thread = CreateThread(nullptr, 0, Observe, nullptr, 0, &g_threadId);
     WaitForSingleObject(g_ready, 5000);
     const DWORD self = GetCurrentProcessId();
@@ -259,7 +226,7 @@ void Start() {
     // A guard without its hooks sees nothing and would pass every case: that
     // fails the run instead (the first in-context attempt, without a module,
     // installed nothing and said nothing).
-    if (!g_ownForeground || !g_ownShow || !g_adoptedHooks) {
+    if (!g_ownForeground || !g_ownShow) {
         std::printf("FOCUS-VIOLATION the focus guard could not install its hooks (error %lu)\n", GetLastError());
         std::fflush(stdout);
         ++g_violations;
@@ -276,6 +243,7 @@ void Stop() {
     CloseHandle(g_thread);
     CloseHandle(g_ready);
     CloseHandle(g_flushed);
+    CloseHandle(g_adoptDone);
     g_thread = nullptr;
 }
 
@@ -284,11 +252,18 @@ void AdoptProcess(DWORD pid) {
         std::lock_guard<std::mutex> hold(g_lock);
         g_pids.insert(pid);
     }
-    SnapshotThreads();
+    // The hooks are in place before this returns: a case starts the process
+    // suspended, adopts it, and only then lets it run.
+    g_adoptOk = false;
+    if (!g_thread || !PostThreadMessageW(g_threadId, kAdopt, pid, 0) ||
+        WaitForSingleObject(g_adoptDone, 5000) != WAIT_OBJECT_0 || !g_adoptOk) {
+        std::printf("FOCUS-VIOLATION the focus guard could not watch process %lu\n", pid);
+        std::fflush(stdout);
+        ++g_violations;
+    }
 }
 
 std::vector<Event> Drain() {
-    SnapshotThreads();
     if (g_thread) {
         // Out-of-context events reach the observer's queue asynchronously:
         // give them a moment, then post a marker behind them and wait for it.
@@ -370,8 +345,8 @@ public:
         std::lock_guard<std::mutex> hold(g_lock);
         g_pids.clear();
         g_pids.insert(GetCurrentProcessId());
-        g_threadOwner.clear();
         }
+        if (g_thread && PostThreadMessageW(g_threadId, kRelease, 0, 0)) WaitForSingleObject(g_adoptDone, 5000);
         int visible = 0, foreground = 0;
         for (const Event& e : events) (e.kind == Event::Kind::Foreground ? foreground : visible)++;
         const std::filesystem::path dir(RESOLUTE_CENSUS_DIR);

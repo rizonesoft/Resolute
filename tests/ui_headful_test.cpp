@@ -342,8 +342,10 @@ void CaptureLauncher(const char* mode, UINT dpi) {
     Launched launched;
     PROCESS_INFORMATION& pi = launched.pi;
     std::wstring cmd = L"\"" + std::filesystem::path(RESOLUTE_LAUNCHER).wstring() + L"\"";
-    REQUIRE(CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi));
+    // Suspended until the guard watches it, so nothing it shows goes unseen.
+    REQUIRE(CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, CREATE_SUSPENDED, nullptr, nullptr, &si, &pi));
     focusguard::AdoptProcess(pi.dwProcessId);
+    ResumeThread(pi.hThread);
     HWND main = nullptr;
     const bool appeared = WaitOrStandDown([&] { return (main = MainWindowOf(pi.dwProcessId)) != nullptr; }, 10000);
     RESOLUTE_HEADFUL_CHECK_INPUT();
