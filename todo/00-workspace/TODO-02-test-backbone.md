@@ -50,7 +50,7 @@ track: W1
 |   5   |   §5    | Cover the inherited UI library             | §1, D00 T03 §3 |  [x]   |
 |   6   |   §6    | Remove the tautological width check        | §5             |  [x]   |
 |   7   |   §7    | Driven UI completion tests                 | §5             |  [x]   |
-|   8   |   §8    | Icon manifest audit                        | §5             |  [ ]   |
+|   8   |   §8    | Icon manifest audit                        | §5             |  [x]   |
 |   9   |   §9    | Rendered-output regression tests           | §5             |  [ ]   |
 |  10   |   §10   | Focus-free UI suite conversion             | §7             |  [ ]   |
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [ ]   |
@@ -551,6 +551,13 @@ Icons are referenced by string name and an unknown name resolves to null, which 
 **Test checkpoint:** The manifest lists every referenced icon name with its referrer; all resolve to SVG and bitmap. A deliberately removed icon fails naming the icon. Counts are quoted.
 
 -> SOURCE: plan-D00-T02-s5-2026-09-19-PR13 D00-T02-S5-PR13
+
+> **Verified:** 2026-09-26 | §8 | `tests/icon_manifest.txt` lists 26 referenced names with their files and 20 declared non-icon literals; `tests/icon_manifest_test.cpp` asserts every name resolves to SVG and to a bitmap and that every single-token literal in the scoped sources is listed for its file, `[icons]` `All tests passed (205 assertions in 5 test cases)`; the audit found seven referenced names the set never carried, now added from Lucide 1.48.0 (`shared/lucide/icons/SOURCES.md`), and with them moved aside the case failed 14 assertions naming each (docs/phase-runs/2026-09-25-phase-0.md); `scripts/check-all.ps1` `check-all: 20 gate(s) ok` with both presets `100% tests passed out of 76`
+> **Review:** round 3 GPT signoff, candidates `a6aaa693`(round 1) `f4479e69`(round 2) `b1738177`(round 3) -- `adversarial` needs-attention at round 3, filed: F3 in D00 T02 §9 (below the blocking bar; the third spelling variant, so the fix is rethought as call-site validation), closed earlier: 2 fixed · `consistency` approves at every round · `integration` approves at every round · `record` approves at every round · `source-defect` owed and done (Lucide 1.48.0's own files) · `design` not owed (D00 T02 §9 owes the rendered check). Independent pass on the implementation commit a6aaa693 (`independent` slot, gpt-6-astra high): no findings. Raw findings: docs/reviews/00-workspace/D00-T02-s8.md Attestation: docs/reviews/00-workspace/D00-T02-s8.attest.json
+> **Plan review:** astra (run 20260926-D00-T02-S8-astra) -- filed: D00 T02 §9 (PR1, PR2, PR4, PR6); 4 rejected with reasons in the ledger
+> **CRUD:** not applicable (a test manifest, tests, and embedded icon assets; no user data)
+> **Duration:** 2026-09-26T13:28:03Z to 2026-09-26T14:24:01Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 9. Rendered-Output Regression Tests
 
