@@ -215,8 +215,10 @@ try {
         if ($old.PSObject.Properties.Name -contains 'run_id') { $oldRun = [string]$old.run_id }
         # An untagged state is foreign once the guard carries a run id:
         # acquire tags a legacy state with its own run before a new guard
-        # publishes (D00 T04 section 40).
-        if ($oldRun -eq $runId -or (-not $oldRun -and -not $runId)) {
+        # publishes (D00 T04 section 40). A guard migrated in place
+        # (migrated_at) is the same run, whose state it tags just after.
+        $migrated = $guard.PSObject.Properties.Name -contains 'migrated_at'
+        if ($oldRun -eq $runId -or (-not $oldRun -and (-not $runId -or $migrated))) {
             $state.fingerprint = [string]$old.fingerprint
             $state.blocks = [int]$old.blocks
             $state.trips = [int]$old.trips

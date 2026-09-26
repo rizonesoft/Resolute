@@ -216,6 +216,18 @@ def _migrate_locked(root: str, guard: dict | None) -> dict | None:
     guard = dict(guard, run_id=guard.get("run_id") or mint_generation(),
                  generation=guard.get("generation") or mint_generation(), migrated_at=_utc_now())
     _publish(_paths(root)[0], json.dumps(guard, indent=2).encode("utf-8"))
+    # The same run's state is tagged after the guard publishes; until then
+    # the hook honors an untagged state beside a guard migrated in place
+    # (`migrated_at`), so no step loses the run's breaker or its legacy
+    # error (D00 T04 §40 independent review).
+    state_path = _paths(root)[1]
+    try:
+        with open(state_path, encoding="utf-8-sig") as fh:
+            old = json.load(fh)
+        if isinstance(old, dict) and not old.get("run_id"):
+            _publish(state_path, json.dumps(dict(old, run_id=guard["run_id"])).encode("utf-8"))
+    except (OSError, ValueError):
+        pass
     return guard
 
 
@@ -326,7 +338,8 @@ def _run_length(root: str, run_file: str) -> int:
 
 
 def acquire(root: str, session: str, phase: int, run_file: str, cron_id: str,
-            handover: str | None = None, generation: str | None = None) -> str:
+            handover: str | None = None, generation: str | None = None,
+            expect_generation: str | None = None, expect_run: str | None = None) -> str:
     """Write the guard for `session`. A new guard is created exclusively
     (O_EXCL), so two sessions racing to start a run cannot both win; the
     owner re-points its own guard by compare-and-swap on `session_id`; a
@@ -337,6 +350,21 @@ def acquire(root: str, session: str, phase: int, run_file: str, cron_id: str,
     if os.path.isabs(run_file) or ".." in run_file.replace("\\", "/").split("/"):
         raise GuardError(f"run file {run_file!r} must be a repo-relative path inside the workspace")
     with _Lock(root):
+        if expect_generation or expect_run:
+            # A rotation re-points only the guard it was named for: an end, a
+            # handover, or a phase move since then refuses, and the caller
+            # deletes the job it just made (D00 T04 §40 independent review).
+            try:
+                live = read_guard(root)
+            except GuardError:
+                live = None
+            if (live is None or str(live.get("session_id", "")) != session
+                    or (expect_generation and str(live.get("generation", "")) != expect_generation)
+                    or (expect_run and str(live.get("run_id", "")) != expect_run)
+                    or str(live.get("run_file", "")) != run_file):
+                raise GuardError("the guard is no longer the one this rotation was named for (it ended, moved, or "
+                                 "changed hands): nothing changed; delete the job just created, after delete-check, "
+                                 "and stop")
         return _acquire_locked(root, session, phase, run_file, cron_id, handover, generation)
 
 
@@ -732,8 +760,10 @@ def whoami(root: str, session: str, generation: str | None = None, cronlist: str
                 + (f" and the guard's job {job} is not live" if repoint else "")
                 + f": rotate it: python scripts/campaign_guard.py mint-generation, CronCreate a heartbeat from the "
                   f"canonical prompt with the new generation, acquire --session {session} --phase {guard.get('phase')} "
-                  f"--run-file {guard.get('run_file')} --cron-id <new job> --generation <new generation>, then "
-                  f"CronDelete {stale}, each after delete-check; this firing then stops")
+                  f"--run-file {guard.get('run_file')} --cron-id <new job> --generation <new generation> "
+                  f"--expect-generation {generation} --expect-run {guard.get('run_id')} (if it refuses, delete the "
+                  f"new job after delete-check and stop), then CronDelete {stale}, each after delete-check; this "
+                  f"firing then stops")
 
 
 def reset_state(root: str, session: str | None = None, expect_no_guard: bool = False,
@@ -888,7 +918,14 @@ def quarantine(root: str, session: str) -> list[str]:
                 pass
             folder = os.path.join(root, "build", _QUARANTINE)
             os.makedirs(folder, exist_ok=True)
-            dest = os.path.join(folder, f"{_utc_now().replace(':', '')}-{session[:8]}-{os.path.basename(path)}")
+            import uuid
+            while True:
+                dest = os.path.join(folder, f"{_utc_now().replace(':', '')}-{session[:8]}-{uuid.uuid4().hex[:8]}-"
+                                            f"{os.path.basename(path)}")
+                if not os.path.exists(dest):
+                    break
+            # Held under the guard lock, so no second quarantine races this
+            # name; the unique suffix keeps two in one second apart.
             os.replace(path, dest)
             out.append(f"quarantine: {os.path.basename(path)} did not parse; moved, bytes kept, to "
                        f"build/{_QUARANTINE}/{os.path.basename(dest)}")
@@ -2866,6 +2903,54 @@ def _self_test() -> int:
         check("an-injected-failure-at-the-guard-publish-leaves-no-guard",
               r_a.returncode == 1 and read_guard(froot) is None
               and not [n for n in os.listdir(os.path.join(froot, "build")) if n.endswith(".tmp")], r_a.stderr)
+        # Independent review (P1): a rotation re-points only the guard it was
+        # named for; an ended run or a moved phase refuses.
+        _fresh_f()
+        g_rot = mint_generation()
+        acquire(froot, SESSION, 0, RUN_FILE, "job-r1", generation=g_rot)
+        rid_rot = read_guard(froot)["run_id"]
+        ok_rot = acquire(froot, SESSION, 0, RUN_FILE, "job-r2", generation=mint_generation(),
+                         expect_generation=g_rot, expect_run=rid_rot)
+        refusals = []
+        for label, setup in (("an obsolete generation", lambda: None),
+                             ("a moved phase", lambda: acquire(froot, SESSION, 1, "docs/phase-runs/2099-06-06-phase-1.md",
+                                                               "job-p", generation=mint_generation())),
+                             ("an ended run", lambda: os.remove(_paths(froot)[0]))):
+            setup()
+            try:
+                acquire(froot, SESSION, 0, RUN_FILE, "job-late", generation=mint_generation(),
+                        expect_generation=g_rot, expect_run=rid_rot)
+                refusals.append(f"{label}: accepted")
+            except GuardError as exc:
+                if "no longer the one this rotation was named for" not in str(exc):
+                    refusals.append(f"{label}: {exc}")
+        check("a-rotation-re-points-only-the-guard-it-was-named-for",
+              ok_rot.startswith("acquire: guard re-pointed") and not refusals and read_guard(froot) is None, str(refusals))
+        # Independent review (P2): migrating a legacy guard in place keeps its
+        # state, trips and legacy error included.
+        _fresh_f()
+        _guard(froot)
+        with open(_paths(froot)[1], "w", encoding="utf-8") as fh:
+            json.dump({"fingerprint": "f", "blocks": 1, "trips": 2, "stalled": False,
+                       "hook_error": "legacy boom", "hook_error_at": "2099-01-01T00:00:00Z"}, fh)
+        whoami(froot, SESSION)
+        tagged_m = _state(froot)
+        run_hook(froot, SESSION)
+        after_m = _state(froot)
+        check("migrating-a-legacy-guard-keeps-its-state",
+              tagged_m.get("run_id") == read_guard(froot)["run_id"] and tagged_m.get("trips") == 2
+              and after_m.get("run_id") == read_guard(froot)["run_id"] and after_m.get("hook_error") == "legacy boom",
+              f"{tagged_m} {after_m}")
+        # Independent review (P2): two quarantines in one second keep both.
+        _fresh_f()
+        for _n in range(2):
+            with open(_paths(froot)[1], "w", encoding="utf-8") as fh:
+                fh.write("{broken state " + str(_n))
+            quarantine(froot, SESSION)
+        qfiles = sorted(os.listdir(os.path.join(froot, "build", _QUARANTINE)))
+        qbodies = sorted(open(os.path.join(froot, "build", _QUARANTINE, n), encoding="utf-8").read() for n in qfiles)
+        check("two-quarantines-keep-both-records",
+              qbodies == ["{broken state 0", "{broken state 1"], str(qfiles))
         # Item 9: every place a credential can ride leaves the identity.
         for label, url in (("userinfo", "https://bot:s3cr3t@github.com/o/r.git"),
                            ("query", "https://github.com/o/r.git?access_token=s3cr3t"),
@@ -3237,6 +3322,8 @@ def _self_test() -> int:
                          "Critical events as a `- bookkeeping: ` line (it repeats on every firing"),
                         ("skill-heartbeat-rotates-a-duplicate-generation",
                          "rotate the generation as that line says (a new job from this prompt with a fresh generation"),
+                        ("skill-rotation-is-a-compare-and-swap",
+                         "re-pointed to it with `--expect-generation` and `--expect-run` (a compare-and-swap"),
                         ("skill-every-crondelete-follows-delete-check",
                          "every CronDelete of any job follows `python scripts/campaign_guard.py delete-check --session S"),
                         ("skill-states-the-fsync-default", "Files are not fsynced: a power loss can lose the last change"),
@@ -3319,7 +3406,7 @@ def main(argv: list[str]) -> int:
         if argv[0] == "acquire":
             print(acquire(root, opts.get("session", ""), int(opts.get("phase", "0")),
                           opts.get("run_file", ""), opts.get("cron_id", ""), opts.get("handover"),
-                          opts.get("generation")))
+                          opts.get("generation"), opts.get("expect_generation"), opts.get("expect_run")))
             return 0
         def need(*keys: str) -> None:
             missing = [k for k in keys if not opts.get(k)]
