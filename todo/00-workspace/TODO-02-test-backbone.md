@@ -51,7 +51,7 @@ track: W1
 |   6   |   §6    | Remove the tautological width check        | §5             |  [x]   |
 |   7   |   §7    | Driven UI completion tests                 | §5             |  [x]   |
 |   8   |   §8    | Icon manifest audit                        | §5             |  [x]   |
-|   9   |   §9    | Rendered-output regression tests           | §5             |  [ ]   |
+|   9   |   §9    | Rendered-output regression tests           | §5             |  [x]   |
 |  10   |   §10   | Focus-free UI suite conversion             | §7             |  [ ]   |
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [ ]   |
 |  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [ ]   |
@@ -585,6 +585,13 @@ Icons are referenced by string name and an unknown name resolves to null, which 
 - -> XREF: D00 T02 §10 -- the focus fence that runs the headful tests; these goldens carry the default tier's rendering proof
 - -> XREF: D00 T02 §12 -- the capture pairs that extend this matrix with the implementation axis, region-diffed
 
+> **Verified:** 2026-09-26 | §9 | `tests/ui_render_test.cpp` renders every shared control offscreen through its own paint path (`RenderTo` on the five D2D controls, `PopupMenu::RenderTo(HDC)`) against 48 goldens under `tests/golden/`, light and dark at 96 and 144, `100% tests passed out of 13` for `ctest --preset debug -L render` and `[render]` `All tests passed (519 assertions in 13 test cases)`; a one-pixel list view drill failed all four list view goldens by name (13461 to 29111 differing pixels) and a misspelled sidebar icon failed by name and by pixels (docs/phase-runs/2026-09-25-phase-0.md); unknown icon names draw the `square-dashed` fallback and are reported; the matrix convention is in `docs/captures/runs/README.md`, the launcher's four captures owed by D00 T02 §10; `scripts/check-all.ps1` `check-all: 20 gate(s) ok`
+> **Review:** round 5 GPT depth, candidates `4d81a3ec`(round 1) `d51e60ae`(round 2) `bd0feecf`(round 3) `714571af`(round 4) `8e1788a5`(round 5) -- `adversarial` approves at round 5, closed: 5 fixed (F3, F4, F5, F10, F13) · `consistency` approves at every round · `integration` approves at round 5, closed: 4 fixed (F1, F6, F8, F12) · `record` approves at round 5, closed: 4 fixed (F2, F7, F9, F11) · `source-defect` owed and done (`EndDraw` and the unbound DC target per Microsoft's documentation, confirmed by the drill) · `design` owed and done (every golden looked at, both appearances and both scales). Independent pass on the implementation commit bba2c4ad (`independent` slot, gpt-6-astra high): 4 findings, fixed in 4d81a3ec. Raw findings: docs/reviews/00-workspace/D00-T02-s9.md Attestation: docs/reviews/00-workspace/D00-T02-s9.attest.json
+> **Plan review:** astra (run 20260926-D00-T02-S9-astra) -- filed: D00 T02 §12 (PR1, PR8, PR9, PR10, PR11, as one item); 8 rejected with reasons in the ledger
+> **CRUD:** not applicable (a test harness, goldens, and shared UI rendering; no user data)
+> **Duration:** 2026-09-26T14:30:03Z to 2026-09-26T16:51:15Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
+
 ## 10. Focus-Free UI Suite Conversion
 
 Why this section exists: the suite cannot run while the operator works. `D00 T02 §7` needs real windows and a pumping message loop, and §3's `scripts/capture-window.ps1` refuses (exit 3) unless its target owns the foreground, so a full daytime run steals focus repeatedly and a mistimed capture files the wrong window as evidence. ScratchPad measured the same shape on 2026-09-17 (112 focus-dependent input calls) and its `D00 T02 §8` is the proven split this section ports: a background-safe default tier that runs any time without interrupting, and a fenced headful tier that runs only visibly or in the night window `D00 T02 §11` owns. **Corrected 2026-09-19:** the first filing funneled every suite window to the secondary monitor and gated on zero primary-monitor windows. That repeats the ScratchPad mistake the operator rejects: DPI awareness must be proven on both DPIs and positioning tests must target their declared monitor, so the fence carries per-test placement intent (which monitor, which DPI, why) and the census verifies actual placement against it instead of asserting absence. **Corrected 2026-09-19 (completion-first):** no section waits for the window to test, review, stamp, and flip: outside the window the fenced tier self-skips and the skip list becomes a `Night-owed:` line on the stamp (flip on DAY-green, debt recorded); `D00 T02 §11` collects the debt at night and a red night result reopens through audit stance. Operator defaults 2026-09-19: no frozen-tool carve-out, one retry before reopen, and no decision wait: collection widens to idle-unlocked daytime automatically, hardware-absent debt re-probes nightly and auto-collects on appearance, and age is report information, never an escalation.
@@ -668,6 +675,11 @@ Why this section exists: `D00 T02 §4` compares what two implementations DID, fi
 **Test checkpoint:** The launcher's AutoIt-vs-C++ capture pair exists with sidecars; a renamed label and a removed control each fail naming what diverged; a theme-only difference passes with the exemption quoted. Cheaper substitute that fails: a pixel diff across implementations presented as comparison, which `todo/README.md` refuses.
 
 -> SOURCE: operator-2026-09-19-visual-timers-s12
+-> SOURCE: plan-D00-T02-s9-2026-09-26-PR1 D00-T02-S9-PR1
+-> SOURCE: plan-D00-T02-s9-2026-09-26-PR8 D00-T02-S9-PR8
+-> SOURCE: plan-D00-T02-s9-2026-09-26-PR9 D00-T02-S9-PR9
+-> SOURCE: plan-D00-T02-s9-2026-09-26-PR10 D00-T02-S9-PR10
+-> SOURCE: plan-D00-T02-s9-2026-09-26-PR11 D00-T02-S9-PR11
 
 ## Verification
 
