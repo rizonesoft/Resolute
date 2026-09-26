@@ -1095,6 +1095,18 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
                              f"a journal from another campaign is not this one's")
         jep, idents = _journal(root, run_file)
         note = ""
+        # The journal is trusted only when every identity its lines carry is
+        # the persisted episode's: a foreign journal never rewrites this
+        # episode's attempts (panel round 4 of the D00 T04 §39 review).
+        if state and jep and jep["episode"] == state["episode"][:12]:
+            for repo_i, branch_i, wf_i, run_i in idents:
+                if repo_i is not None and (repo_i, branch_i, wf_i) != (state.get("repo") or "-", state.get("branch") or "-",
+                                                                       state.get("workflow") or "-"):
+                    raise GuardError(f"{run_file} records the episode under repository {repo_i}, branch {branch_i}, "
+                                     f"workflow {wf_i}, not the episode file's: escalate rather than reconcile")
+                if run_i and state.get("run") and run_i != state["run"]:
+                    raise GuardError(f"{run_file} records the episode under campaign run {run_i}, not "
+                                     f"{state['run']}: escalate rather than reconcile")
         if state:
             # Episode files from before D00 T04 §39 carry no attempt state:
             # they were recorded after their push.
@@ -2579,6 +2591,19 @@ def _self_test() -> int:
               crash.returncode == 97 and "1 of 3 attempts used" in st3.stdout and "recovered from the journal" in st3.stdout
               and "reserved, push unconfirmed" in st3.stdout, st3.stdout + st3.stderr)
         _repair_cli("pushed", "--commit", shas[7], *R)
+        # Panel round 4: a journal line naming the episode under another
+        # identity is never reconciled into it.
+        ep_now = json.load(open(EP, encoding="utf-8"))["episode"][:12]
+        with open(os.path.join(rtmp, runf), encoding="utf-8") as fh:
+            before_foreign = fh.read()
+        with open(os.path.join(rtmp, runf), "a", encoding="utf-8") as fh:
+            fh.write(f"repair: episode {ep_now} attempt 1 of 3 reserved ({shas[7][:12]} repairs {shas[5][:12]}) "
+                     f"repo=https://github.com/other/fork.git branch=master workflow=plan-gates run=aaaaaaaaaaaa\n")
+        mixed_j = _repair_cli("status", *R)
+        with open(os.path.join(rtmp, runf), "w", encoding="utf-8") as fh:
+            fh.write(before_foreign)
+        check("repair-never-reconciles-a-foreign-journal-line",
+              mixed_j.returncode == 1 and "escalate rather than reconcile" in mixed_j.stderr, mixed_j.stdout + mixed_j.stderr)
         # Another run file, or a journal silent about the episode, never
         # resets the bound (independent review, P1).
         other_rf = _repair_cli("status", "--run-file", "docs/other.md")

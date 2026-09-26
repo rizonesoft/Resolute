@@ -1926,16 +1926,21 @@ _SECRET_NAME = re.compile(r"(?i)(secret|token|passw|credential|private|api[_-]?k
 
 
 _LOG_COLS = re.compile(r"\A(?:[^\t\n]*\t[^\t\n]*\t\S*[ \t])?")
-_BLOCK_SECRET_KEY = re.compile(
-    r"(?i)\A([ \t]*)(?:-[ \t]+)?[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|"
-    r"private[_-]?key)[A-Za-z0-9_]*[\"']?[ \t]*:[ \t]*[|>][+-]?[0-9]?[+-]?[ \t]*(?:#.*)?\Z")
+# A credential key anywhere on a line, with `=` or `:`.
+_ANY_SECRET_KEY = re.compile(
+    r"(?i)(?<![A-Za-z0-9_])[\"']?[A-Za-z0-9_]*(?:password|passwd|secret|token|api[_-]?key|credential|"
+    r"private[_-]?key)[A-Za-z0-9_]*[\"']?[ \t]*[=:]")
 
 
 def _redact_blocks(text: str) -> str:
-    """A credential key given as a YAML block scalar (`password: |`) masks
-    every body line: the lines after it indented deeper than the key, and
-    the blank lines among them, a log's job, step, and timestamp columns
-    kept (panel round 3 of the D00 T04 §39 review)."""
+    """A credential's value spans its continuation lines, and those lines
+    are masked whole (panel rounds 2 to 4 of the D00 T04 §39 review,
+    rethought after the third patch into one rule): after a line carrying
+    a credential key, every following line indented deeper than that line
+    (a YAML block scalar's body, a plain scalar continued, a nested value)
+    and every line that follows a trailing backslash (a shell
+    continuation) is part of the value. Blank lines inside a deeper run
+    are kept as they are; a log's job, step, and timestamp columns stay."""
     lines = text.split("\n")
     out: list[str] = []
     i = 0
@@ -1944,18 +1949,30 @@ def _redact_blocks(text: str) -> str:
         out.append(line)
         i += 1
         cols = _LOG_COLS.match(line).group(0)
-        m = _BLOCK_SECRET_KEY.match(line[len(cols):])
-        if not m:
+        head = line[len(cols):]
+        if not _ANY_SECRET_KEY.search(head):
             continue
-        key_indent = len(m.group(1).expandtabs())
+        key_indent = len(head.expandtabs()) - len(head.expandtabs().lstrip(" "))
+        continued = head.rstrip().endswith("\\")
         while i < len(lines):
             nxt = lines[i]
             ncols = _LOG_COLS.match(nxt).group(0)
             body = nxt[len(ncols):]
-            if body.strip() and len(body) - len(body.lstrip(" \t")) <= key_indent:
+            depth = len(body.expandtabs()) - len(body.expandtabs().lstrip(" "))
+            deeper = bool(body.strip()) and depth > key_indent
+            if not (continued or deeper or (not body.strip() and i + 1 < len(lines))):
                 break
+            if not body.strip():
+                # A blank line continues only a run of deeper lines.
+                look = lines[i + 1][len(_LOG_COLS.match(lines[i + 1]).group(0)):] if i + 1 < len(lines) else ""
+                if not (look.strip() and len(look.expandtabs()) - len(look.expandtabs().lstrip(" ")) > key_indent):
+                    break
+                out.append(nxt)
+                i += 1
+                continue
             indent = body[:len(body) - len(body.lstrip(" \t"))]
-            out.append(ncols + (indent + "***" if body.strip() else body))
+            out.append(ncols + indent + "***")
+            continued = body.rstrip().endswith("\\")
             i += 1
     return "\n".join(out)
 
@@ -7067,6 +7084,9 @@ def _self_test() -> int:
                      "  mode: fast"),
                     ("a folded block in a log", "j\ts\tT1 token: >-\nj\ts\tT2   s3cr3tline\nj\ts\tT3 next: 1",
                      "s3cr3tline", "next: 1"),
+                    # Panel round 4: a value's continuation lines are the value.
+                    ("a plain scalar continued", "password: abc\n  defghi\nmode: fast", "defghi", "mode: fast"),
+                    ("a shell continuation", "export API_TOKEN=abc\\\ndefghi\necho done", "defghi", "echo done"),
                     ("a shell value with an escaped space", "API_TOKEN=abc\\ defghi rest", "defghi", " rest"),
                     ("a JSON value with a comma and brace", '{"token": "a,b}c", "mode": "x"}', "a,b}c", '"mode": "x"'),
                     ("an escaped-newline key", "key=-----BEGIN PRIVATE KEY-----\\nMIIEv\\n-----END PRIVATE KEY----- tail",
