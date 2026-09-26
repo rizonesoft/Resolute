@@ -834,12 +834,14 @@ Five gates that must each be remembered are five gates that get skipped under ti
 
 ## 8. Run the Unit Suite Under Release
 
+> **Started:** 2026-09-26T09:27:01Z
+
 `testPresets` exist for both configurations (`D00 T02 §1`) but `check-all` runs `ctest --preset debug` only, so everything the suite pins is proven under debug: asserts live, optimization off. What release changes, asserts compiled out and optimization on, is exactly the class of difference a second run would catch, and today nothing runs it.
 
 **Needs:** Windows host (build/test)
 
-- [ ] Run the unit suite under the release preset in `check-all`. Done when: `ctest --preset release` runs green beside debug and a debug-only pass cannot gate the tree.
-- [ ] Commit: `"gates: run the unit suite under release"`
+- [x] Run the unit suite under the release preset in `check-all`. Done when: `ctest --preset release` runs green beside debug and a debug-only pass cannot gate the tree. **Done 2026-09-26:** `scripts/check-all.ps1` now runs the suite as two gates, `tests debug` (`ctest --preset debug`) and `tests release` (`ctest --preset release`), each failing alone, so one green preset never covers the other; the check reads `check-all: 20 gate(s) ok` with `100% tests passed out of 69` under both. Driven falsification: a temporary test that fails only under `NDEBUG`, appended to `tests/dpi_test.cpp` and reverted, left `tests debug ok` (69 tests) and failed `tests release` (`1 tests failed out of 70`, `d00-t01-s8 release-only drill`), `check-all: 1 of 20 gate(s) FAILED`, recorded in docs/phase-runs/2026-09-25-phase-0.md.
+- [x] Commit: `"gates: run the unit suite under release"`
 
 **Test checkpoint:** `check-all` reports both presets green, quoted; a deliberately release-only failure fails the gate, quoted.
 

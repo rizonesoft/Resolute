@@ -269,8 +269,14 @@ if (-not $SkipBuild) {
 
 # The not-present tolerance D00 T01 §5 left here is GONE, removed by
 # D00 T02 §1 which landed the harness. A failing test now fails the gate.
-Invoke-Gate -Name 'tests' -LogName 'gate-tests' -Command {
+Invoke-Gate -Name 'tests debug' -LogName 'gate-tests-debug' -Command {
     & $Ctest --preset debug --output-on-failure
+}
+# D00 T01 §8: the same suite under release, where asserts compile out and
+# the optimizer runs, so a debug-only pass cannot gate the tree. Each preset
+# is its own gate: one green run never covers the other.
+Invoke-Gate -Name 'tests release' -LogName 'gate-tests-release' -Command {
+    & $Ctest --preset release --output-on-failure
 }
 
 # ── validate, and the plan projection ────────────────────────
