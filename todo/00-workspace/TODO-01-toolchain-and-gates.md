@@ -50,7 +50,7 @@ track: W1
 |   6   |   §6    | Keep the toolchain current                   | §1, §5     |  [x]   |
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
 |   8   |   §8    | Run the unit suite under release             | §5         |  [x]   |
-|   9   |   §9    | Remove the Linux execution surface         | §5         |  [ ]   |
+|   9   |   §9    | Remove the Linux execution surface         | §5         |  [x]   |
 
 ---
 
@@ -886,6 +886,13 @@ Resolute is a Windows-only suite, per the operator's 2026-09-20 decision, but th
 <!-- claim: absent scripts/wsl.sh -->
 <!-- claim: count "ubuntu" .github/workflows/plan.yml = 0 -->
 <!-- claim: count "runs-on: windows-2025" .github/workflows/plan.yml = 1 -->
+
+> **Verified:** 2026-09-26 | §9 | `scripts/wsl.sh` and the README's WSL flow deleted; `plan-gates` on `windows-2025` through Git Bash, green twice (`ci-wait: 072661e357b9 plan-gates success .../runs/36236461973`, then `797b907e0355 ... success .../runs/36236604697` after the per-step shell fix), every step's logged `shell:` line `C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}` matching the printed template; the inventory before and after committed whole in `docs/captures/runs/2026-09-26-d00-t01-s9-linux-inventory.txt` (`wsl.sh`: git grep exit 1, no match); a Git Bash fence round `cross-check: 8 file(s) agree`; the TODO tooling declared Windows-only in `AGENTS.md`; `scripts/check-all.ps1` `check-all: 20 gate(s) ok`
+> **Review:** round 4 GPT depth, candidates `5cb4e802`(round 1) `0ec273d4`(round 2) `27d2f1fb`(round 3) `bdb01ffa`(round 4) -- `adversarial` approves at every round · `consistency` approves at every round · `integration` approves at every round · `record` approves at round 4, closed: 3 fixed (the inventory quoted, committed, then untruncated) · `source-defect` owed and done (GitHub's own Windows log is the source for the bash template) · `design` not owed. Independent pass on the implementation commit 072661e3 (`independent` slot, gpt-6-astra high): one P2 (job-level run defaults drop the re-run printout), already fixed by self-review in 797b907e. Raw findings: docs/reviews/00-workspace/D00-T01-s9.md Attestation: docs/reviews/00-workspace/D00-T01-s9.attest.json
+> **Plan review:** astra (run 20260926-D00-T01-S9-astra) -- filed: D00 T01 §9 (PR7, three claims), D00 T04 §42 (PR4, PR5); PR6 a duplicate of PR9 and 5 rejected with reasons in the ledger
+> **CRUD:** not applicable (workspace tooling, CI configuration, and docs; no user data)
+> **Duration:** 2026-09-26T10:19:14Z to 2026-09-26T11:06:51Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## Verification
 
