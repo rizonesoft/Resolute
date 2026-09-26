@@ -1580,8 +1580,20 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
     """The CI repair episode (D00 T04 §35, §37, §39, §41), with its
     structured receipt: every command's output ends with one
     `repair-receipt: {json}` line (D00 T04 §41)."""
-    code, line = _repair(root, action, red, commit, green, workflow, run_file, evidence, run_id, reason,
-                         attempt_no, remote)
+    try:
+        code, line = _repair(root, action, red, commit, green, workflow, run_file, evidence, run_id, reason,
+                             attempt_no, remote)
+    except GuardError as exc:
+        # A refusal carries its receipt too, so a reader never falls back to
+        # the prose on an escalation path (independent review of D00 T04 §41).
+        code, line = 1, f"campaign_guard: {exc}"
+        try:
+            with open(_repair_path(root), encoding="utf-8") as fh:
+                st = json.load(fh)
+            st = st if isinstance(st, dict) and isinstance(st.get("attempts"), list) else None
+        except (OSError, ValueError):
+            st = None
+        return code, line + "\n" + _receipt(action, st, outcome="refused", reason=str(exc)[:300])
     if "\nrepair-receipt: " not in "\n" + line:
         try:
             with open(_repair_path(root), encoding="utf-8") as fh:
@@ -3941,6 +3953,8 @@ def _self_test() -> int:
         check("repair-refuses-a-journal-cut-below-its-commit",
               cut_ceil.returncode == 1 and "lost or changed journal lines committed at HEAD" in cut_ceil.stderr
               and cut_status.returncode == 1 and "committed at HEAD" in cut_status.stderr
+              and _receipt_of(cut_status.stderr).get("outcome") == "refused"
+              and "committed at HEAD" in _receipt_of(cut_status.stderr).get("reason", "")
               and grown.returncode == 0, cut_ceil.stderr + cut_status.stderr + grown.stdout + grown.stderr)
 
     # D00 T04 §34: the runner's contract routes through these commands.

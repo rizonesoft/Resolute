@@ -2066,6 +2066,11 @@ def _redact_blocks(text: str) -> str:
         block = "\t".join(line.split("\t", 2)[:2]) if cols else None
         opener = _multiline_opener(head[key.end():])
         if opener:
+            # The key line's own value opens the multiline form: it is masked
+            # with the lines that continue it, since the single-line rules
+            # cannot match a value whose closing lies on a later line
+            # (independent review of D00 T04 §41, P1).
+            out[-1] = cols + head[:key.end()] + " ***"
             kind, end = opener
             depth = end if kind == "bracket" else 0
             while i < len(lines):
@@ -4302,12 +4307,50 @@ def capture_run(run_id: str, workflow_file: str, kind: str, section: str, out_di
                        f"repos/{repo_slug}/contents/.github/workflows/{workflow_file}?ref={sha}"])
     if not ok:
         return 2, f"capture-run: gh could not read {workflow_file} at {sha[:12]} ({wf})"
-    files = {workflow_file: redact(wf), f"run-{run_id}.json": redact(_json.dumps(kept, indent=1) + "\n"),
-             f"log-{run_id}.txt": redact(log)}
+    def _clean(value):
+        # String values are redacted one by one, never the serialized text,
+        # whose own quotes the grammar would read as an opener (independent
+        # review of D00 T04 §41, P2).
+        if isinstance(value, str):
+            return redact(value)
+        if isinstance(value, list):
+            return [_clean(v) for v in value]
+        if isinstance(value, dict):
+            return {k: _clean(v) for k, v in value.items()}
+        return value
+
+    def _strings(value):
+        if isinstance(value, str):
+            yield value
+        elif isinstance(value, list):
+            for v in value:
+                yield from _strings(v)
+        elif isinstance(value, dict):
+            for k, v in value.items():
+                yield k
+                yield from _strings(v)
+    kept = _clean(kept)
+    record_text = _json.dumps(kept, indent=1) + "\n"
+    try:
+        _json.loads(record_text)
+    except ValueError:
+        return 2, f"capture-run: run-{run_id}.json would not parse: nothing written"
+    files = {workflow_file: redact(wf), f"run-{run_id}.json": record_text, f"log-{run_id}.txt": redact(log)}
     for name, text in files.items():
-        found = secret_scan(text)
+        found = (sorted({f for v in _strings(kept) for f in secret_scan(v)}) if name.endswith(".json")
+                 else secret_scan(text))
         if found:
             return 2, f"capture-run: {name} still carries {', '.join(found)} after redaction: nothing written"
+    # A workflow snapshot another drill already recorded is never replaced:
+    # its digest and head commit are that drill's evidence (independent
+    # review of D00 T04 §41, P2).
+    wf_path = os.path.join(out_dir, workflow_file)
+    if os.path.exists(wf_path):
+        with open(wf_path, encoding="utf-8-sig") as fh:
+            prior = fh.read().replace("\r\n", "\n")
+        if prior != files[workflow_file].replace("\r\n", "\n"):
+            return 2, (f"capture-run: {workflow_file} already holds another drill's snapshot with different "
+                       f"content: name this drill's workflow file differently; nothing written")
     index = os.path.join(out_dir, "oracle.json")
     try:
         with open(index, encoding="utf-8") as fh:
@@ -6900,7 +6943,7 @@ def _self_test() -> int:
                          "    print(json.dumps({'databaseId': int(a[2]), 'headSha': 'ab' * 20, 'headBranch': 'drill/x',\n"
                          "                      'event': 'push', 'conclusion': 'success', 'attempt': 1,\n"
                          "                      'workflowName': 'x', 'jobs': [{'name': 'j', 'conclusion': 'success',\n"
-                         "                      'steps': [{'number': 2, 'name': 'step', 'conclusion': 'failure'}]}]}))\n"
+                         "                      'steps': [{'number': 2, 'name': 'verify token=placeholder', 'conclusion': 'failure'}]}]}))\n"
                          "elif a[0] == 'api':\n"
                          "    print('on: push\\njobs: {}')\n"
                          "else:\n"
@@ -6918,6 +6961,17 @@ def _self_test() -> int:
                       and set(_c_idx["drills"][0]["provenance"]["sha256"]) == {"x.yml", "run-4242.json", "log-4242.txt"}
                       and _c_run["jobs"][0]["steps"][0]["conclusion"] == "failure", f"{_c_ok} {_c_log}")
                 _c_dup = capture_run("4242", "x.yml", "failure", "D90 T01 §1", _capd, "o/r")
+                # Independent review of D00 T04 §41: a record value is
+                # redacted as a value and the JSON parses, and another
+                # drill's workflow snapshot is never overwritten.
+                _c_rec_text = open(os.path.join(_capd, "run-4242.json"), encoding="utf-8").read()
+                with open(os.path.join(_capd, "x.yml"), "a", encoding="utf-8") as fh:
+                    fh.write("# an earlier drill's snapshot" + chr(10))
+                _c_conflict = capture_run("4244", "x.yml", "failure", "D90 T01 §1", _capd, "o/r")
+                check("capture-run-keeps-json-and-earlier-snapshots",
+                      "placeholder" not in _c_rec_text and "verify token=***" in _c_rec_text
+                      and _c_conflict[0] == 2 and "another drill's snapshot" in _c_conflict[1]
+                      and not os.path.exists(os.path.join(_capd, "log-4244.txt")), f"{_c_rec_text[:300]} {_c_conflict}")
                 _real_redact = globals()["redact"]
                 globals()["redact"] = lambda t: t
                 try:
@@ -6926,7 +6980,7 @@ def _self_test() -> int:
                     globals()["redact"] = _real_redact
                 check("capture-run-refuses-a-duplicate-or-a-dirty-scan",
                       _c_dup[0] == 2 and "already captured" in _c_dup[1] and _c_leak[0] == 2
-                      and "still carries a GitHub token" in _c_leak[1] and "ghp_" not in _c_leak[1]
+                      and "still carries" in _c_leak[1] and "ghp_" not in _c_leak[1] and "placeholder" not in _c_leak[1]
                       and not os.path.exists(os.path.join(tmpd, "capture2")), f"{_c_dup} {_c_leak}")
             finally:
                 if _old_gh_c is None:
@@ -7644,6 +7698,10 @@ def _self_test() -> int:
                     ("a single-quoted here-string", "$secret = @'\ns3cr3tline\n'@\ndone", "s3cr3tline", "done"),
                     ("a quoted multiline value", "password: \"abc\ns3cr3tline\nend\"\nmode: fast", "s3cr3tline",
                      "mode: fast"),
+                    # Independent review of D00 T04 §41, P1: the opening line's
+                    # own value is masked with its continuation.
+                    ("a quoted multiline value's first line", 'password: "TOPSECRET' + chr(10) + 'rest' + chr(10) + 'end"'
+                     + chr(10) + "mode: fast", "TOPSECRET", "mode: fast"),
                     ("an open bracket", "token: [abc,\n s3cr3tline,\n]\nmode: fast", "s3cr3tline", "mode: fast"),
                     ("an unterminated here-document", "API_TOKEN=$(cat <<EOF\ns3cr3tline\nmore\nand more",
                      "and more", "API_TOKEN="),
