@@ -598,17 +598,28 @@ def whoami(root: str, session: str, generation: str | None = None, cronlist: str
         stem = run_stem(str(guard.get("run_file", "")))
         carriers = [jid for jid, prompt in parse_cronlist(cronlist)
                     if classify_job(root, prompt) == (generation, repo_name(root), stem)]
+        # A firing cannot learn its own job id (CronList shows none, and two
+        # jobs from one prompt are byte-identical), so the fence instead
+        # guarantees one live carrier: while a duplicate or a stale job id
+        # exists, the answer withholds `job=`, and no fenced step can run
+        # until the extras are gone and `whoami` is asked again (panel
+        # round 1 of the D00 T04 §38 review).
         keep = job
-        if job not in carriers and carriers:
+        repoint = job not in carriers and bool(carriers)
+        if repoint:
             keep = carriers[0]
+        extras = [c for c in carriers if c != keep]
+        if not repoint and not extras:
+            return line
+        line = f"OWNER run={guard.get('run_id')} (job withheld until the duplicates below are resolved)"
+        if repoint:
             line += (f"\nDUPLICATE GENERATION: the guard's job {job} is not live and {keep} carries its "
                      f"generation: re-point first with acquire --session {session} --phase {guard.get('phase')} "
                      f"--run-file {guard.get('run_file')} --cron-id {keep} --generation {generation}")
-        extras = [c for c in carriers if c != keep]
         if extras:
             line += (f"\nDUPLICATE GENERATION: CronDelete {', '.join(extras)} (they carry generation "
                      f"{generation}; the job to keep is {keep})")
-        return line
+        return line + "\nThen run whoami again: its job id is the only one the fenced steps accept."
 
 
 def reset_state(root: str, session: str | None = None, expect_no_guard: bool = False,
@@ -918,6 +929,21 @@ def _episode_from_run_file(root: str, run_file: str) -> list[tuple]:
     return out
 
 
+def _journal_identities(root: str, run_file: str) -> list[tuple]:
+    """(repo, branch, workflow) of EVERY attempt line after the last closed
+    episode, repeats included: a restore validates them all before any
+    de-duplication, so two lines for one commit under different
+    identities are a mixed journal, never collapsed into one (panel round
+    1 of the D00 T04 §38 review)."""
+    try:
+        with open(os.path.join(root, run_file), encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError:
+        return []
+    last_close = max((m.end() for m in _CLOSED_LINE.finditer(text)), default=0)
+    return [(m.group(5), m.group(6), m.group(7)) for m in _ATTEMPT_LINE.finditer(text, last_close)]
+
+
 def repair(root: str, action: str, red: str = "", commit: str = "", green: str = "",
            workflow: str = "", run_file: str = "", evidence: str = "", run_id: str = "") -> tuple[int, str]:
     """The CI repair episode, persisted beside the guard state so a
@@ -980,11 +1006,12 @@ def repair(root: str, action: str, red: str = "", commit: str = "", green: str =
                 return 0, "repair: the run file shows no open episode; nothing to restore"
             # D00 T04 §38: the journal carries the episode's identity, and a
             # restore recovers it from there, refusing a caller elsewhere.
-            if any(f[3] is None for f in found):
+            every = _journal_identities(root, run_file)
+            if any(f[0] is None for f in every):
                 raise GuardError(f"{run_file} records attempts without their repository, branch, and workflow "
                                  f"(a legacy journal): the identity cannot be recovered, so restore refuses; "
                                  f"escalate rather than rebind the episode")
-            idents = {(f[3], f[4], f[5]) for f in found}
+            idents = set(every)
             if len(idents) > 1:
                 raise GuardError(f"{run_file} mixes attempts from {len(idents)} identities (a mixed journal): "
                                  f"restore refuses; escalate")
@@ -1903,8 +1930,15 @@ def _self_test() -> int:
         tag = heartbeat_tag(iroot, g, RUN_FILE)
         out = whoami(iroot, SESSION, g, _cl(("job-1", tag), ("job-2", tag), ("job-9", "an unrelated reminder")))
         check("whoami-names-a-duplicate-generation",
-              out.splitlines()[0] == f"OWNER run={read_guard(iroot)['run_id']} job=job-1"
-              and "DUPLICATE GENERATION: CronDelete job-2 (they carry generation" in out and "job-9" not in out, out)
+              out.splitlines()[0] == f"OWNER run={read_guard(iroot)['run_id']} (job withheld until the duplicates "
+                                     f"below are resolved)"
+              and "DUPLICATE GENERATION: CronDelete job-2 (they carry generation" in out and "job-9" not in out
+              and "job=" not in out and out.endswith("run whoami again: its job id is the only one the fenced "
+                                                     "steps accept."), out)
+        # Panel round 1: the job id is released only once one carrier lives.
+        out = whoami(iroot, SESSION, g, _cl(("job-1", tag), ("job-9", "an unrelated reminder")))
+        check("whoami-releases-the-job-once-one-carrier-lives",
+              out == f"OWNER run={read_guard(iroot)['run_id']} job=job-1", out)
         out = whoami(iroot, SESSION, g, _cl(("job-2", tag), ("job-3", tag)))
         check("whoami-re-points-to-a-live-duplicate",
               "the guard's job job-1 is not live and job-2 carries its generation: re-point first" in out
@@ -1938,9 +1972,20 @@ def _self_test() -> int:
         rc = reconcile(iroot, SESSION, _cl(*live), RUN_FILE)
         live = []  # the runner deletes it
         rc2 = reconcile(iroot, SESSION, _cl(*live), RUN_FILE)
+        # ...and the start then completes (panel round 1: recovery ends at
+        # one current heartbeat and a consistent record, not at none).
+        g1b = mint_generation()
+        live = [("job-c1b", heartbeat_tag(iroot, g1b, RUN_FILE) + ": ...")]
+        acquire(iroot, SESSION, 0, RUN_FILE, "job-c1b", generation=g1b)
+        with open(irun, "a", encoding="utf-8") as fh:
+            fh.write(f"\n- run guard: heartbeat job-c1b generation {g1b}\n")
+        rc3 = reconcile(iroot, SESSION, _cl(*live))
         check("interrupted-after-croncreate-recovers",
               rc == ["reconcile: orphan job job-c1 has no guard: CronDelete it"]
-              and rc2 == ["reconcile: consistent (no guard, no job)"], f"{rc} {rc2}")
+              and rc2 == ["reconcile: consistent (no guard, no job)"]
+              and rc3 == ["reconcile: consistent (guard and job job-c1b)"], f"{rc} {rc2} {rc3}")
+        end(iroot, SESSION, "operator-stop", g1b, "job-c1b")
+        cancel_confirmed(iroot, "job-c1b", SESSION, g1b)
         # (2) acquire landed, the run file never recorded it.
         g2 = mint_generation()
         live = [("job-c2", heartbeat_tag(iroot, g2, RUN_FILE) + ": ...")]
@@ -2210,6 +2255,13 @@ def _self_test() -> int:
                   res.returncode == 1 and want in res.stderr
                   and not os.path.exists(os.path.join(rtmp, "build", "claude-campaign-repair.json")),
                   res.stdout + res.stderr)
+        with open(os.path.join(rtmp, "docs", "j-samecommit.md"), "w", encoding="utf-8") as fh:
+            for ident in (here, ("https://example.invalid/here.git", "release/9", "plan-gates")):
+                fh.write(f"repair: episode {shas[3][:12]} attempt 1 of 3 ({shas[4][:12]} repairs {shas[3][:12]}) "
+                         f"repo={ident[0]} branch={ident[1]} workflow={ident[2]}\n")
+        same = _repair_cli("restore", "--workflow", "plan-gates", "--run-file", "docs/j-samecommit.md")
+        check("repair-restore-refuses-a-mixed-journal-on-one-commit",
+              same.returncode == 1 and "(a mixed journal)" in same.stderr, same.stdout + same.stderr)
         ok = _repair_cli("restore", "--workflow", "plan-gates", "--run-file", _journal("j-ok", here, here))
         check("repair-restore-recovers-a-matching-journal",
               ok.returncode == 0 and "at 2 of 3 attempts" in ok.stdout, ok.stdout + ok.stderr)
@@ -2257,6 +2309,9 @@ def _self_test() -> int:
                         ("skill-heartbeat-owner-first",
                          "2. Run CronList, then `python scripts/campaign_guard.py whoami --session S --generation G "
                          "--cronlist -`"),
+                        ("skill-heartbeat-stalls-only-its-own-run",
+                         "carries `run_id` equal to the run id step 2 printed and trips of 2 or more"),
+                        ("skill-heartbeat-deletes-only-after-end-succeeds", "Only after `end` succeeds, CronDelete this job"),
                         ("skill-heartbeat-reports-are-bookkeeping",
                          "Critical events as a `- bookkeeping: ` line (it repeats on every firing"),
                         ("skill-heartbeat-re-reads-its-job-after-a-re-point",
