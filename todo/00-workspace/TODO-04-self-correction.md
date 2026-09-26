@@ -97,7 +97,7 @@ track: W1
 |  37   |   §37   | CI read-back hardening                         | §35 |  [x]   |
 |  38   |   §38   | Campaign guard identity and recovery           | §36 |  [x]   |
 |  39   |   §39   | CI read-back and repair completeness           | §37 |  [x]   |
-|  40   |   §40   | Campaign guard fence completeness              | §38 |  [ ]   |
+|  40   |   §40   | Campaign guard fence completeness              | §38 |  [x]   |
 |  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [ ]   |
 |  42   |   §42   | Campaign guard recovery completeness           | §40 |  [ ]   |
 
@@ -1683,6 +1683,13 @@ The D00 T04 §38 review files what its contract does not own. Its hard-cap round
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR13 D00-T04-S38-PR13
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR14 D00-T04-S38-PR14
 -> SOURCE: plan-D00-T04-s38-2026-09-26-PR15 D00-T04-S38-PR15
+
+> **Verified:** 2026-09-26 | §40 | `campaign_guard.py --self-test` `campaign_guard self-test: 258 cases, 0 failed`, carrying legacy-state tagging through each acquisition crash point and in-place migration, `--run` on every owner mutation, generation rotation with its compare-and-swap and `delete-check` with its never-truncated clearance ledger (refused when unreadable, salvaged when quarantined), the fixed-length workspace-digest header and the three listing states, startup draining with the startup acknowledgement, quarantine and recover, injected failures at the pending record, the guard, and the state, and a credential-free identity; two upgrade drives (one from a guard with no identity) and the in-section health drive in docs/phase-runs/2026-09-25-phase-0.md; `review_prompt.py --self-test` `review-prompt self-test: 524 cases, 0 failed`; `scripts/check-all.ps1` `19 gate(s) ok`
+> **Review:** round 5 GPT depth, candidates `807f7840`(round 1) `6f3caafc`(round 2) `a6feb28a`(round 3) `3d39ffe0`(round 4) `06209c98`(round 5) -- `adversarial` needs-attention at round 5, filed: F18 in D00 T04 §42 (the hard cap; a failure inside quarantine between a clearance and its deletion), closed earlier: 7 fixed (the clearance unit rethought after four rounds) · `consistency` approves at round 5, closed: 2 fixed · `integration` approves at round 5, closed: 3 fixed, 1 refuted (the header is 52 characters) · `record` approves at round 5, closed: 2 fixed · `source-defect` not owed · `design` not owed. Independent pass on the implementation commit 39ed6d3d (`independent` slot, gpt-6-astra high): one P1 and two P2s, all right, fixed in 807f7840 before round 1. Raw findings: docs/reviews/00-workspace/D00-T04-s40.md Attestation: docs/reviews/00-workspace/D00-T04-s40.attest.json
+> **Plan review:** astra (run 20260926-D00-T04-S40-astra) -- filed: D00 T04 §42 (PR1, PR2, PR3, PR4, PR5, PR6, PR7, PR8, PR9, PR10, PR11, PR12, PR13, PR14, PR15, PR16)
+> **CRUD:** not applicable (harness wiring, the Stop hook, review tooling, and skill text; writes only gitignored run state under `build/`)
+> **Duration:** 2026-09-26T04:23:22Z to 2026-09-26T06:02:27Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 41. CI Read-Back Evidence and Replay Hardening
 
