@@ -866,14 +866,20 @@ def _git(root: str, *args: str) -> tuple[int, str]:
 
 
 def _repo_identity(root: str) -> dict:
-    """The repository and branch an episode belongs to, read from git."""
+    """The repository and branch an episode belongs to, read from git. The
+    URL loses any userinfo (`https://user:token@host/...`), because attempt
+    lines carrying it land in tracked run files, and serialization and
+    comparison use the same credential-free form (D00 T04 §38 independent
+    review; AGENTS.md: credentials never enter tracked files)."""
     _rc, url = _git(root, "remote", "get-url", "origin")
     _rc, branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
-    return {"repo": url, "branch": branch}
+    return {"repo": re.sub(r"^([A-Za-z][A-Za-z0-9+.-]*://)[^/@]*@", r"\1", url), "branch": branch}
 
 
 _ATTEMPT_LINE = re.compile(r"repair: episode ([0-9a-f]{12}) attempt (\d+) of \d+ \(([0-9a-f]{12}) repairs ([0-9a-f]{12})\)"
-                           r"(?: repo=(\S+) branch=(\S+) workflow=(\S+))?")
+                           # A field never swallows the Markdown backtick a
+                           # run file wraps the line in (independent review).
+                           r"(?: repo=([^\s`]+) branch=([^\s`]+) workflow=([^\s`]+))?")
 
 
 def _ident_suffix(ep: dict) -> str:
@@ -2207,6 +2213,22 @@ def _self_test() -> int:
         ok = _repair_cli("restore", "--workflow", "plan-gates", "--run-file", _journal("j-ok", here, here))
         check("repair-restore-recovers-a-matching-journal",
               ok.returncode == 0 and "at 2 of 3 attempts" in ok.stdout, ok.stdout + ok.stderr)
+        # Independent review: credentials in the remote URL never reach an
+        # attempt line, and the credential-free form still matches.
+        subprocess.run(["git", "remote", "set-url", "origin", "https://ci-bot:s3cr3t-t0ken@example.invalid/here.git"],
+                       cwd=rtmp, capture_output=True, check=True)
+        cred = _repair_cli("attempt", "--red", shas[4], "--commit", shas[5], *W[:2], "--run-file", "docs/j-ok.md")
+        check("repair-attempt-lines-carry-no-credentials",
+              cred.returncode == 0 and "s3cr3t" not in cred.stdout + cred.stderr
+              and " repo=https://example.invalid/here.git " in cred.stdout, cred.stdout + cred.stderr)
+        # A run file wraps the line in backticks; the identity stops there.
+        os.remove(os.path.join(rtmp, "build", "claude-campaign-repair.json"))
+        with open(os.path.join(rtmp, "docs", "j-tick.md"), "w", encoding="utf-8") as fh:
+            fh.write(f"- attempt 1: `{cred.stdout.strip()}`\n")
+        ticked = _repair_cli("restore", "--workflow", "plan-gates", "--run-file", "docs/j-tick.md")
+        check("repair-restore-reads-a-backtick-wrapped-journal",
+              ticked.returncode == 0 and "restored from docs/j-tick.md at 1 of 3 attempts" in ticked.stdout,
+              ticked.stdout + ticked.stderr)
         c1 = _repair_cli("ceiling", "--run-id", "777")
         c2 = _repair_cli("ceiling", "--run-id", "777")
         check("repair-ceiling-allows-one-re-run-per-run",
@@ -2235,6 +2257,10 @@ def _self_test() -> int:
                         ("skill-heartbeat-owner-first",
                          "2. Run CronList, then `python scripts/campaign_guard.py whoami --session S --generation G "
                          "--cronlist -`"),
+                        ("skill-heartbeat-reports-are-bookkeeping",
+                         "Critical events as a `- bookkeeping: ` line (it repeats on every firing"),
+                        ("skill-heartbeat-re-reads-its-job-after-a-re-point",
+                         "then run this step's `whoami` again and keep the job id it prints now"),
                         ("skill-heartbeat-acks-by-id-fenced",
                          "hook-error --session S --generation G --cron-id <job id> --ack <the id inside"),
                         ("skill-heartbeat-prompt-leads-with-its-identity",
