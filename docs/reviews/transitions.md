@@ -193,3 +193,11 @@ to: duplicate
 why: "Round-5 R1: item 12's `three observed largest` rationale postdates the 6-commit candidate."
 evidence: "Answered at F18, whose fix replaces the count cap and its rationale; the F9 sentence stands as dated history (true at the 3-commit round 2), corrected by the F18 note beside it", recorded as duplicate of F18; see the F18 ledger row (fixed in `e0d43fc9`).
 as-of: decb549b
+
+transition: D00-T04-S40-F7
+date: 2026-09-26
+from: raised
+to: refuted
+why: "The header is `Claude run-guard heartbeat ` (27 characters), a 12-hex generation, one space, and a 12-hex digest: 27 + 12 + 1 + 12 = 52, which `HEARTBEAT_TAG_LENGTH` states."
+evidence: "`heartbeat-tag-has-a-fixed-length-and-no-collision` measures the tag for three workspaces and passes at 52", quoted from the D00 T04 §40 record.
+as-of: fbef1e00
