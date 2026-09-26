@@ -561,11 +561,17 @@ Icons are referenced by string name and an unknown name resolves to null, which 
 - [ ] Render every shared control offscreen (D2D bitmap target through WIC, no window) in light and dark at 100 and 150 percent, and commit the outputs as golden images under `tests/golden/`, named by control, appearance, and DPI. Done when: every control in `shared/resolute-ui/src/controls/` has four goldens, and a deliberately shifted layout fails the diff naming the control.
 - [ ] Pixel-diff the renders against the goldens under ctest with a stated per-pixel tolerance, saving the diff image and the differing-pixel count beside the run on failure. Done when: a green run quotes zero differences, a one-pixel shift fails naming the control with its count quoted, and the tolerance value is recorded in the test with its reason.
 - [ ] Extend the runs/ capture convention with the matrix: every section that ships a user-visible surface owes light-by-dark by 100-by-150 captures under `docs/captures/runs/`, named `<date>-<section>-<surface>-<mode>-<dpi>.png`, reusing the §3 sidecar with appearance added, and each shipped surface extends the goldens with its own renders. Done when: the matrix naming is written in `docs/captures/runs/README.md` beside the existing convention and the launcher's four captures plus sidecars are committed as the first instance.
+- [ ] Make a missing glyph impossible to miss: D00 T02 §8's audit finds icon references by the spelling of a literal, so a malformed name the scan does not match (`"chevron--up"`, `"chevron up"`), a computed name, or an icon use hidden behind a file-level non-icon exemption still resolves to null and draws nothing, and the resolver stays silent when it does (the D00 T02 §8 sign-off leftover, F8, and plan review PR1, PR2, PR4, and PR6 of the D00 T02 §8 review; needs D00 T02 §8 shipped). Done when: every icon name is validated where it is used (the arguments of `LucideIcons::Render`, `CreateBitmap`, `GetSvgData`, and the icon drawing call, and the icon tables of the controls) whatever its spelling, the resolver logs an unknown name once and draws a visible fallback glyph, the goldens show each of the seven glyphs D00 T02 §8 restored at its real size in both appearances, and a malformed name fails by name, quoted.
 - [ ] Commit: `"test: rendered-output regression tests"`
 
 **Test checkpoint:** `ctest --preset debug -L render` exits 0 with zero differences quoted; a one-pixel shift of one control fails naming the control with its differing-pixel count quoted; `docs/captures/runs/` holds the launcher matrix (four PNG with sidecars) and the convention README. The goldens prove composition, the matrix proves a human looked, and the UIA tree keeps the wiring half.
 
 -> SOURCE: operator-2026-09-19-visual-testing
+-> SOURCE: plan-D00-T02-s8-2026-09-26-PR1 D00-T02-S8-PR1
+-> SOURCE: plan-D00-T02-s8-2026-09-26-PR2 D00-T02-S8-PR2
+-> SOURCE: plan-D00-T02-s8-2026-09-26-PR4 D00-T02-S8-PR4
+-> SOURCE: plan-D00-T02-s8-2026-09-26-PR6 D00-T02-S8-PR6
+-> SOURCE: panel-D00-T02-s8-2026-09-26-F8 D00-T02-S8-F8
 
 - -> XREF: D00 T02 §10 -- the focus fence that runs the headful tests; these goldens carry the default tier's rendering proof
 - -> XREF: D00 T02 §12 -- the capture pairs that extend this matrix with the implementation axis, region-diffed
