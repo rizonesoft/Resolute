@@ -4,16 +4,16 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**453 findings across 51 sections.**
+**472 findings across 52 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `record` | 122 | the plan or the evidence misdescribes what happened |
-| `adversarial` | 109 | fails under hostile or unexpected input |
-| `correctness` | 77 | the code does the wrong thing |
-| `integration` | 71 | a consumer, caller, or downstream artifact no longer holds |
+| `record` | 124 | the plan or the evidence misdescribes what happened |
+| `adversarial` | 116 | fails under hostile or unexpected input |
+| `correctness` | 80 | the code does the wrong thing |
+| `integration` | 78 | a consumer, caller, or downstream artifact no longer holds |
 | `consistency` | 60 | disagrees with the rest of the suite, its naming, or its layout |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 203 | wrong behavior in code, plan, or record |
-| `minor` | 244 | polish or wording, or no surviving defect |
+| `major` | 213 | wrong behavior in code, plan, or record |
+| `minor` | 253 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -436,6 +436,25 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T04 §40` | F16 | major | `adversarial` | fixed | independent | quarantining the ledger lifts every prohibition |
 | `D00 T04 §40` | F17 | major | `integration` | fixed | independent | startup deletes a same-generation twin |
 | `D00 T04 §40` | F18 | minor | `adversarial` | filed | independent | quarantine moves the ledger before publishing its replacement |
+| `D00 T04 §41` | F1 | major | `adversarial` | fixed | independent | a quoted multiline credential's first line stays unmasked |
+| `D00 T04 §41` | F2 | minor | `correctness` | fixed | independent | capture-run redacts serialized JSON and can break it |
+| `D00 T04 §41` | F3 | minor | `correctness` | fixed | independent | a second capture overwrites another drill's workflow snapshot |
+| `D00 T04 §41` | F4 | minor | `integration` | fixed | independent | repair refusals print no receipt |
+| `D00 T04 §41` | F5 | major | `adversarial` | fixed | independent | retirement trusts a made-up workflow path |
+| `D00 T04 §41` | F6 | major | `adversarial` | fixed | independent | a space-indented heredoc terminator ends masking |
+| `D00 T04 §41` | F7 | minor | `integration` | fixed | independent | ceiling lines bypass strict replay |
+| `D00 T04 §41` | F8 | minor | `record` | fixed | independent | the drill comparison checks only a stdout prefix |
+| `D00 T04 §41` | F9 | major | `adversarial` | fixed | independent | an indented here-string close ends masking |
+| `D00 T04 §41` | F10 | minor | `integration` | fixed | independent | a malformed ceiling receipt or a cut final line is accepted |
+| `D00 T04 §41` | F11 | minor | `record` | fixed | independent | the candidate's suite counts are not recorded |
+| `D00 T04 §41` | F12 | major | `adversarial` | fixed | independent | a quoted bracket ends bracket masking |
+| `D00 T04 §41` | F13 | major | `correctness` | fixed | independent | `git diff --name-only` quotes non-ASCII paths, proving a false exclusion |
+| `D00 T04 §41` | F14 | minor | `integration` | fixed | independent | only `ceiling` validates ceiling lines |
+| `D00 T04 §41` | F15 | major | `adversarial` | fixed | independent | a double quote inside a single-quoted value ends masking |
+| `D00 T04 §41` | F16 | major | `integration` | fixed | independent | receipt agreement omits the red and terminal evidence |
+| `D00 T04 §41` | F17 | major | `adversarial` | filed | independent | a PowerShell backtick escape reads as a closing quote |
+| `D00 T04 §41` | F18 | major | `integration` | filed | independent | a re-reserved commit keeps its old order, so close can take an older push |
+| `D00 T04 §41` | F19 | minor | `integration` | filed | independent | the capture gate scans serialized JSON while capture-run scans values |
 | `D00 T04 §5` | F1 | minor | `record` | corrected | self | the section's own premise was wrong, and the advisory was mostly right |
 | `D00 T04 §5` | F2 | minor | `source-defect` | corrected | self | the compound `document` rule was accused and is correct |
 | `D00 T04 §5` | F3 | major | `correctness` | fixed | self | one message covered three defects and asserted what it had not tested |
