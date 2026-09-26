@@ -49,7 +49,7 @@ track: W1
 |   4   |   §4    | Parity driver for a built tool             | §1, §2         |  [x]   |
 |   5   |   §5    | Cover the inherited UI library             | §1, D00 T03 §3 |  [x]   |
 |   6   |   §6    | Remove the tautological width check        | §5             |  [x]   |
-|   7   |   §7    | Driven UI completion tests                 | §5             |  [ ]   |
+|   7   |   §7    | Driven UI completion tests                 | §5             |  [x]   |
 |   8   |   §8    | Icon manifest audit                        | §5             |  [ ]   |
 |   9   |   §9    | Rendered-output regression tests           | §5             |  [ ]   |
 |  10   |   §10   | Focus-free UI suite conversion             | §7             |  [ ]   |
@@ -528,6 +528,13 @@ Round 5 of the §5 panel caught one vacuous assertion and the hard cap left it f
 <!-- claim: count "\.AnimateStaggered\(" shared/resolute-ui/src/controls/*.cpp = 0 -->
 
 - -> XREF: D00 T02 §10 -- the focus fence this host runs under; the driven completions ship headful, the gate proves the default run never is
+
+> **Verified:** 2026-09-26 | §7 | `tests/ui_driven_test.cpp` `All tests passed (50 assertions in 5 test cases)`: the theme crossfade ends on an independently read target palette, the content view's hide and error restore `WS_EX_TRANSPARENT` (read back), the sidebar settles at 50 and 200, and the list view hit-tests, scrolls three rows, and moves a column edge under real mouse messages; teardown now cancels a control's animations (`AnimateFor`, `CancelOwner`, a destructor per animated control, a tick over a moved-out copy that honors mid-frame cancellation and skips nested ticks), each regression leg failing against the code it guards and a stuck crossfade failing by name (docs/phase-runs/2026-09-25-phase-0.md); `scripts/check-all.ps1` `check-all: 20 gate(s) ok` with both presets `100% tests passed out of 74` and `tidy` 166 under its baseline of 169
+> **Review:** round 3 GPT signoff, candidates `af27a44f`(round 1) `18111005`(round 2) `18111005`(round 3) -- `adversarial` approves at round 3, closed: 1 fixed (nested ticks) · `consistency` approves at every round · `integration` approves at every round · `record` approves at round 3, closed: 1 fixed (the teardown leg pumped past the animation) · `source-defect` not owed · `design` not owed. Independent pass on the implementation commit c8a31bd3 (`independent` slot, gpt-6-astra high): two P1s in the cancellation, both right, fixed in af27a44f before round 1. Raw findings: docs/reviews/00-workspace/D00-T02-s7.md Attestation: docs/reviews/00-workspace/D00-T02-s7.attest.json
+> **Plan review:** astra (run 20260926-D00-T02-S7-astra) -- filed: D00 T02 §7 (PR5, two claims), D00 T02 §10 (PR1, PR2, PR3, PR4, PR6, PR7, PR10, PR11, PR12, PR13); 2 rejected with reasons in the ledger
+> **CRUD:** not applicable (tests and the UI library's animation lifetime; no user data)
+> **Duration:** 2026-09-26T11:51:09Z to 2026-09-26T13:19:53Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 8. Icon Manifest Audit
 
