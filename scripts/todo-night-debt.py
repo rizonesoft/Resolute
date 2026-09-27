@@ -32,7 +32,10 @@ AUDIT = ROOT / "tests" / "focus-audit.md"
 HEADING = re.compile(r"^## (\d+)\. ")
 TODO_NAME = re.compile(r"TODO-(\d+)-")
 VERIFIED_DATE = re.compile(r"^> \*\*Verified:\*\* (\d{4}-\d{2}-\d{2})")
-OWED = re.compile(r"^> \*\*Night-owed:\*\* (.*)$")
+# The markers alone, then the body validated: a bare or mis-spaced marker is
+# malformed, never silently no debt (panel round 4 of the D00 T02 §11 review).
+OWED = re.compile(r"^> \*\*Night-owed:\*\*(.*)$")
+VERIFIED_MARK = re.compile(r"^> \*\*Night-verified:\*\*")
 CLEARED = re.compile(r"^> \*\*Night-verified:\*\* (\d{4}-\d{2}-\d{2}) \| candidate ([0-9a-f]{40}) \| run (\S+) \| (.*)$")
 # The full commit id: the collector builds that commit, and an abbreviation can
 # stop naming one commit as the history grows (panel round 2 of the D00 T02 §11 review).
@@ -132,6 +135,8 @@ def debts_in(text, ref, today, place, malformed=None):
             elif body != "none" and malformed is not None:
                 malformed.append(f"{ref(current)}: {line.strip()}")
         c = CLEARED.match(line)
+        if not c and VERIFIED_MARK.match(line) and malformed is not None:
+            malformed.append(f"{ref(current)}: {line.strip()}")
         if c:
             entries = parse_entries(c.group(4))
             if entries is None and malformed is not None:
@@ -206,6 +211,11 @@ def self_test():
     debts_in('## 7. Z\n> **Verified:** 2026-09-20 | §7 | x\n> **Night-owed:** candidate abcdef1 | "A" (r)\n',
              lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, short)
     checks.append(("an abbreviated candidate is malformed", len(short) == 1))
+    bare = []
+    debts_in('## 8. W\n> **Verified:** 2026-09-20 | §8 | x\n> **Night-owed:**\n> **Night-owed:**none-ish\n'
+             '> **Night-verified:** 2026-09-21 | run x\n',
+             lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, bare)
+    checks.append(("a bare marker, a mis-spaced body, and a short verification are each malformed", len(bare) == 3))
     checks.append(("a reason holding parentheses and a semicolon stays whole",
                    parsed is not None and len(parsed) == 2 and parsed[0][1].endswith("runs it on demand")
                    and parsed[1] == ("Launcher capture, dark at 150 percent", "hardware absent")))

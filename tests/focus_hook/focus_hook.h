@@ -10,6 +10,12 @@ inline constexpr const wchar_t* kFocusHookSinkClass = L"ResoluteFocusGuardSink";
 // adopting guard's sink window: the hook reads its own process's entry, so
 // two test processes running at once never receive each other's records.
 inline constexpr const wchar_t* kFocusHookSinkMapping = L"Local\\ResoluteFocusGuardSink-";
+// The mapping's layout: the sink window, then how many records the hook
+// could not deliver, which the guard reads when it releases the process.
+struct FocusHookSinkBlock {
+    ULONG_PTR     sink;
+    volatile LONG lost;
+};
 // WM_COPYDATA's dwData, so the sink accepts nothing else.
 inline constexpr ULONG_PTR kFocusHookMagic = 0x52465347;  // "RFSG"
 

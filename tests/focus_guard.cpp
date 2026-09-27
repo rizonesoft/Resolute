@@ -80,6 +80,7 @@ void CALLBACK OnOwnEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, L
 // window where it was at delivery, not where it was shown).
 std::vector<HWINEVENTHOOK> g_adopted;  // observer thread only
 std::vector<HANDLE>        g_sinkMaps;  // each adopted process's pointer to this guard's sink
+LONG                       g_lost = 0;  // records adopted processes could not deliver, at release
 HMODULE g_hookDll  = nullptr;
 WINEVENTPROC g_hookProc = nullptr;
 
@@ -146,13 +147,15 @@ DWORD WINAPI Observe(LPVOID) {
             // the hook in that process looks for it.
             const std::wstring name = std::wstring(kFocusHookSinkMapping) + std::to_wstring(pid);
             HANDLE map = sink ? CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
-                                                   sizeof(ULONG_PTR), name.c_str())
+                                                   sizeof(FocusHookSinkBlock), name.c_str())
                               : nullptr;
             bool published = false;
             if (map) {
-                if (void* view = MapViewOfFile(map, FILE_MAP_WRITE, 0, 0, sizeof(ULONG_PTR))) {
-                    *static_cast<ULONG_PTR*>(view) = reinterpret_cast<ULONG_PTR>(sink);
-                    UnmapViewOfFile(view);
+                if (auto* block = static_cast<FocusHookSinkBlock*>(
+                        MapViewOfFile(map, FILE_MAP_WRITE, 0, 0, sizeof(FocusHookSinkBlock)))) {
+                    block->sink = reinterpret_cast<ULONG_PTR>(sink);
+                    block->lost = 0;
+                    UnmapViewOfFile(block);
                     published = true;
                 }
                 g_sinkMaps.push_back(map);
@@ -171,7 +174,14 @@ DWORD WINAPI Observe(LPVOID) {
         if (msg.message == kRelease) {
             for (HWINEVENTHOOK hook : g_adopted) UnhookWinEvent(hook);
             g_adopted.clear();
-            for (HANDLE map : g_sinkMaps) CloseHandle(map);
+            for (HANDLE map : g_sinkMaps) {
+                if (auto* block = static_cast<FocusHookSinkBlock*>(
+                        MapViewOfFile(map, FILE_MAP_READ, 0, 0, sizeof(FocusHookSinkBlock)))) {
+                    g_lost += block->lost;
+                    UnmapViewOfFile(block);
+                }
+                CloseHandle(map);
+            }
             g_sinkMaps.clear();
             SetEvent(g_adoptDone);
         }
@@ -401,7 +411,16 @@ public:
         g_pids.clear();
         g_pids.insert(GetCurrentProcessId());
         }
+        g_lost = 0;
         if (g_thread && PostThreadMessageW(g_threadId, kRelease, 0, 0)) WaitForSingleObject(g_adoptDone, 5000);
+        if (g_lost > 0) {
+            // An adopted window the guard never heard of cannot be judged:
+            // the case's proof is void (panel round 4 of the D00 T02 §11 review).
+            std::printf("FOCUS-VIOLATION %s: %ld record(s) from an adopted process were never delivered\n", name.c_str(),
+                        static_cast<long>(g_lost));
+            std::fflush(stdout);
+            ++g_violations;
+        }
         int visible = 0, foreground = 0;
         for (const Event& e : events) (e.kind == Event::Kind::Foreground ? foreground : visible)++;
         const std::filesystem::path dir(RESOLUTE_CENSUS_DIR);
