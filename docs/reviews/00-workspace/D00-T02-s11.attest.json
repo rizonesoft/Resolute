@@ -1,0 +1,16 @@
+{
+  "candidate_base": "74dba449a66b730e51ffa19b34c527356b57d2fa",
+  "candidate_head": "e2d324c9a4c1137992d65a1989d021ea507ade5b",
+  "checker": "PASS four lenses, one verdict each :: 66b735196dfb3f7212013e00ca96b73b2e63ea131a4872175cc499c0ade0458d",
+  "findings_path": "docs/reviews/00-workspace/D00-T02-s11.md",
+  "findings_sha256": "69c592d44038f44ef02a507139142cf34575d3695797e6e9931ace7bdd788c7a",
+  "manifest_sha": "4355304cb1131d4c6e700e4dcaecf153662516adbd46e2526c751cef1d47d2a5",
+  "model": "gpt-6-astra",
+  "model_provenance": "derived",
+  "reviewer": "codex-panel",
+  "runner_sha256": "9c83f6a94467c4b7a4248c1343a6307c42c77f37cdabdb842fadaec172cfbe3d",
+  "schema": 2,
+  "timestamp": "2026-09-27T02:46:52Z",
+  "tree": "2d504b7e73601bf4c7236497c7b4d979f58e0275",
+  "verdict": "needs-attention"
+}

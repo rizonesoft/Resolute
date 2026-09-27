@@ -1183,6 +1183,7 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 -> SOURCE: plan-D00-T04-s30-2026-09-23-PR3 D00-T04-S30-PR3
 -> SOURCE: plan-D00-T04-s30-2026-09-23-PR4 D00-T04-S30-PR4
 -> SOURCE: plan-D00-T04-s30-2026-09-23-PR5 D00-T04-S30-PR5
+-> XREF: D00 T02 §11 -- the nightly collector whose morning results the item above takes into the review flow
 -> SOURCE: plan-D00-T02-s11-2026-09-27-PR3 D00-T02-S11-PR3
 -> SOURCE: plan-D00-T02-s11-2026-09-27-PR4 D00-T02-S11-PR4
 -> SOURCE: plan-D00-T02-s11-2026-09-27-PR8 D00-T02-S11-PR8

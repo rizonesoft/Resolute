@@ -53,7 +53,7 @@ track: W1
 |   8   |   §8    | Icon manifest audit                        | §5             |  [x]   |
 |   9   |   §9    | Rendered-output regression tests           | §5             |  [x]   |
 |  10   |   §10   | Focus-free UI suite conversion             | §7             |  [x]   |
-|  11   |   §11   | Nightly full-suite regression run          | §10            |  [ ]   |
+|  11   |   §11   | Nightly full-suite regression run          | §10            |  [x]   |
 |  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [ ]   |
 
 ---
@@ -670,6 +670,14 @@ Why this section exists: the fenced headful set has no owner, no schedule, and n
 -> SOURCE: plan-D00-T02-s10-2026-09-26-PR3 D00-T02-S10-PR3
 -> SOURCE: plan-D00-T02-s10-2026-09-26-PR4 D00-T02-S10-PR4
 -> SOURCE: plan-D00-T02-s10-2026-09-26-PR6 D00-T02-S10-PR6
+
+> **Verified:** 2026-09-27 | §11 | `tools/nightly.ps1` is registered as `\Resolute\Nightly` (daily 02:05 and on idle, with the operator's approval) and runs the procedure `docs/testing.md` states: its first scheduled run `20260927-020508` ran the default half (99 passed) and stood the fenced half down on the active operator, and the task fired inside the window at `20260927-044936` ran both halves in full (`default half: passed 99`, `fenced half: passed 9, failed 0, skipped-with-reason 0`); `query night-debt` derives open debt from the stamps (`night-debt: 0 open` today); every collector rule has its drill in `docs/testing.md` (retry, second red, incomplete attempt, candidate binding, hardware absent, one writer, no orphans after a timeout kill); the focus guard now places an adopted window where it was shown (the flasher case); `ctest --preset debug` `100% tests passed out of 99`; `scripts/check-all.ps1` `check-all: 21 gate(s) ok`
+> **Night-owed:** none
+> **Review:** round 5 GPT depth, candidates `5a80fa26`(round 1) `bc78a9dc`(round 2) `bd89f5c0`(round 3) `e7674fbf`(round 4) `e2d324c9`(round 5) -- `adversarial` needs-attention at round 5, filed: F20 in D00 T02 §12 (below the blocking bar: the hook drops a record uncounted when it cannot open or map the guard's mapping), closed earlier: 7 fixed (F2, F4, F5, F7, F11, F15, F18) · `consistency` approves at round 5, closed: 4 fixed (F6, F8, F12, F19) · `integration` approves at round 5, closed: 5 fixed (F1, F3, F9, F13, F16) · `record` approves at round 5, closed: 3 fixed (F10, F14, F17) · `source-defect` owed and done (Task Scheduler, in-context WinEvent hooks with a DLL, named mappings, job objects, `OpenInputDesktop`, each confirmed by a run) · `design` not owed (no user surface). Independent pass on the implementation commit 2ff3bf4d (`independent` slot, gpt-6-astra high): 6 findings, fixed in 5a80fa26. Raw findings: docs/reviews/00-workspace/D00-T02-s11.md Attestation: docs/reviews/00-workspace/D00-T02-s11.attest.json
+> **Plan review:** astra (run 20260927-D00-T02-S11-astra) -- filed: D00 T04 §26 (PR3, PR4, PR8, PR15, as one item), D00 T02 §12 (PR10); 9 rejected and 1 duplicate with reasons in the ledger
+> **CRUD:** not applicable (a test runner, a scheduled task, and plan tooling; no user data)
+> **Duration:** 2026-09-26T23:43:09Z to 2026-09-27T03:06:24Z
+> **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 12. Port-vs-Port Visual Comparison
 
