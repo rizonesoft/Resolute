@@ -26,6 +26,14 @@ DWORD LastInput() {
     return GetLastInputInfo(&li) ? li.dwTime : 0;
 }
 
+// A locked workstation, or any desktop but the user's, cannot take input.
+bool Locked() {
+    HDESK desk = OpenInputDesktop(0, FALSE, DESKTOP_SWITCHDESKTOP);
+    if (!desk) return true;
+    CloseDesktop(desk);
+    return false;
+}
+
 std::string Clock(int minuteOfDay) {
     char buf[8];
     std::snprintf(buf, sizeof(buf), "%02d:%02d", minuteOfDay / 60, minuteOfDay % 60);
@@ -37,12 +45,13 @@ std::string Clock(int minuteOfDay) {
 bool InQuietHours(int minuteOfDay) { return minuteOfDay >= kQuietStart && minuteOfDay < kQuietEnd; }
 
 Verdict Decide(const std::string& headfulEnv, const std::string& idleCollectEnv, int minuteOfDay,
-               unsigned long idleMs) {
+               unsigned long idleMs, bool locked) {
     if (headfulEnv == "visible") return {Mode::Visible, "visible run requested (RESOLUTE_HEADFUL=visible)"};
     const bool collecting = idleCollectEnv == "1" || InQuietHours(minuteOfDay);
     if (!collecting)
         return {Mode::Skip, "headful: outside the quiet-hours window 02:00-06:50 local (now " + Clock(minuteOfDay) +
                                 "); RESOLUTE_HEADFUL=visible runs it on demand"};
+    if (locked) return {Mode::Skip, "headful: the session is locked, so no window can be shown; re-queued"};
     if (idleMs < kCollectIdleMs)
         return {Mode::Skip, "headful: the operator is active (last input " + std::to_string(idleMs / 1000) +
                                 " s ago, under the " + std::to_string(kCollectIdleMs / 1000) +
@@ -55,7 +64,7 @@ Verdict Now() {
     SYSTEMTIME st{};
     GetLocalTime(&st);
     const unsigned long idle = GetTickCount() - LastInput();
-    return Decide(Env("RESOLUTE_HEADFUL"), Env("RESOLUTE_IDLE_COLLECT"), st.wHour * 60 + st.wMinute, idle);
+    return Decide(Env("RESOLUTE_HEADFUL"), Env("RESOLUTE_IDLE_COLLECT"), st.wHour * 60 + st.wMinute, idle, Locked());
 }
 
 void Open(Mode mode) {
@@ -71,6 +80,6 @@ void Close() {
 
 bool Headful() { return g_open; }
 
-bool InputResumed() { return g_open && g_mode == Mode::Collect && LastInput() != g_baseline; }
+bool InputResumed() { return g_open && g_mode == Mode::Collect && (LastInput() != g_baseline || Locked()); }
 
 }  // namespace fence

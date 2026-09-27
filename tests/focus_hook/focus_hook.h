@@ -6,6 +6,10 @@
 
 // The guard's message-only window that receives the records.
 inline constexpr const wchar_t* kFocusHookSinkClass = L"ResoluteFocusGuardSink";
+// The named mapping, suffixed with the adopted process's id, that holds the
+// adopting guard's sink window: the hook reads its own process's entry, so
+// two test processes running at once never receive each other's records.
+inline constexpr const wchar_t* kFocusHookSinkMapping = L"Local\\ResoluteFocusGuardSink-";
 // WM_COPYDATA's dwData, so the sink accepts nothing else.
 inline constexpr ULONG_PTR kFocusHookMagic = 0x52465347;  // "RFSG"
 

@@ -8,7 +8,7 @@ unaccounted control: it ran and failed, or it never ran at all.
 
     ctest --preset headful -V > build/headful.log
     python scripts/fence-debt.py --log build/headful.log            # the check
-    python scripts/fence-debt.py --log build/headful.log --stamp    # the Night-owed: line
+    python scripts/fence-debt.py --log build/headful.log --stamp --candidate <sha>   # the Night-owed: stamp line
     python scripts/fence-debt.py --self-test
 
 --cases narrows the check to one named case, and repeats for more, for a
@@ -86,9 +86,13 @@ def judge(cases, log_text):
     return out
 
 
-def stamp_line(verdicts):
-    owed = [f"{c} ({d})" for c, v, d in verdicts if v == "owed"]
-    return "Night-owed: " + ("; ".join(owed) if owed else "none")
+def stamp_line(verdicts, candidate):
+    """The stamp line scripts/todo-night-debt.py reads: bound to the reviewed
+    candidate, each case quoted whole, or `none`."""
+    owed = [f'"{c}" ({d})' for c, v, d in verdicts if v == "owed"]
+    if not owed:
+        return "> **Night-owed:** none"
+    return f"> **Night-owed:** candidate {candidate} | " + "; ".join(owed)
 
 
 def self_test():
@@ -125,9 +129,15 @@ def self_test():
                    judge(["Beta case"], log.replace('2: SKIP "Beta case"', "2: nothing")) ==
                    [("Beta case", "unaccounted", "absent from the run")]))
     checks.append(("the stamp line lists the debt",
-                   stamp_line(judge(["Alpha case", "Beta case"], log)) ==
-                   "Night-owed: Beta case (headful: outside the quiet-hours window)"))
-    checks.append(("no debt says none", stamp_line(judge(["Alpha case"], log)) == "Night-owed: none"))
+                   stamp_line(judge(["Alpha case", "Beta case"], log), "abc1234") ==
+                   '> **Night-owed:** candidate abc1234 | "Beta case" (headful: outside the quiet-hours window)'))
+    checks.append(("no debt says none", stamp_line(judge(["Alpha case"], log), "abc1234") == "> **Night-owed:** none"))
+    nd = _night_debt()
+    produced = stamp_line(judge(["Alpha case", "Beta case"], log), "abcdef1234")
+    read = nd.debts_in("## 1. S\n> **Verified:** 2026-09-27 | §1 | x\n" + produced + "\n", lambda n: "D00 T02 §1",
+                       __import__("datetime").date(2026, 9, 27), {})
+    checks.append(("the night-debt reader reads what --stamp writes",
+                   [(e["case"], e["candidate"]) for e in read] == [("Beta case", "abcdef1234")]))
     launcher = "Launcher capture, dark at 100 percent"
     audit2 = audit + "\n| d | `" + launcher + "` | fence | fenced | [place:dpi96] |"
     log2 = (log + '\n5: SKIP "' + launcher + '" hardware absent' +
@@ -142,13 +152,22 @@ def self_test():
     return 1 if bad else 0
 
 
+def _night_debt():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("todo_night_debt", Path(__file__).with_name("todo-night-debt.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def parser():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--log", help="a fenced run's output (ctest --preset headful -V)")
     ap.add_argument("--audit", default=str(AUDIT))
     ap.add_argument("--cases", action="append", default=[],
                     help="a case name to check instead of every fenced row; repeat for more")
-    ap.add_argument("--stamp", action="store_true", help="print the Night-owed: line")
+    ap.add_argument("--stamp", action="store_true", help="print the Night-owed: stamp line")
+    ap.add_argument("--candidate", help="--stamp: the reviewed candidate the debt binds to (full sha)")
     ap.add_argument("--self-test", action="store_true")
     return ap
 
@@ -174,7 +193,11 @@ def main(argv):
         cases = wanted
     verdicts = judge(cases, Path(args.log).read_text(encoding="utf-8", errors="replace"))
     if args.stamp:
-        print(stamp_line(verdicts))
+        owed = any(v == "owed" for _, v, _ in verdicts)
+        if owed and not args.candidate:
+            print("fence-debt: --stamp needs --candidate when anything is owed: debt binds to its reviewed candidate")
+            return 1
+        print(stamp_line(verdicts, args.candidate))
     for case, verdict, detail in verdicts:
         print(f"  {verdict:<11} {case}" + (f"  ({detail})" if detail else ""))
     unaccounted = [c for c, v, _ in verdicts if v == "unaccounted"]

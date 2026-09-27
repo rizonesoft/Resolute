@@ -166,10 +166,10 @@ Every control, menu item, dialog, and state on the Fidelity counterpart is worki
 
 ```bash
 ctest --preset headful -V > build/headful.log
-python scripts/fence-debt.py --log build/headful.log --cases "<a fenced case>" --cases "<another>" --stamp
+python scripts/fence-debt.py --log build/headful.log --cases "<a fenced case>" --cases "<another>" --stamp --candidate <sha>
 ```
 
-Quote its `Night-owed:` line and its summary in the findings file, and carry the `Night-owed:` line onto the stamp. A section that changes the fence itself owes one explicit headful pass (`ctest --preset headful-visible`, or a collecting run) and cannot stamp its own fence on skips (`docs/testing.md`).
+Quote its `Night-owed:` line and its summary in the findings file, and carry the `Night-owed:` line onto the stamp as its own stamp line, exactly as printed: `query night-debt` reads that form, and fails on a `Night-owed:` line in any other. A section that changes the fence itself owes one explicit headful pass (`ctest --preset headful-visible`, or a collecting run) and cannot stamp its own fence on skips (`docs/testing.md`).
 
 ### 7. Frozen check (frozen TODOs)
 

@@ -49,17 +49,19 @@ struct Verdict {
 };
 
 // The decision from its inputs, so boundary fixtures can pin it: the two
-// override variables' values (empty when unset), the local minute, and how
-// long ago the operator's last input was.
+// override variables' values (empty when unset), the local minute, how long
+// ago the operator's last input was, and whether the desktop is locked (a
+// locked desktop cannot show windows, so a collecting case stands down).
 Verdict Decide(const std::string& headfulEnv, const std::string& idleCollectEnv, int minuteOfDay,
-               unsigned long idleMs);
+               unsigned long idleMs, bool locked);
 
 // The decision for this process now.
 Verdict Now();
 
-// Whether operator input arrived since the gate opened a collecting case
-// (Mode::Collect): such a case stops and is re-queued. Always false for a
-// visible run the operator asked for, and outside a headful case.
+// Whether operator input arrived, or the desktop locked, since the gate
+// opened a collecting case (Mode::Collect): such a case stops and is
+// re-queued. Always false for a visible run the operator asked for, and
+// outside a headful case.
 bool InputResumed();
 
 // Called by the gate: records the case's mode and the input baseline.

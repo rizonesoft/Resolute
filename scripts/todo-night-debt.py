@@ -58,8 +58,9 @@ def section_ref(path, num):
     return f"D{domain} T{m.group(1) if m else '??'} §{num}"
 
 
-def debts_in(text, ref, today, place):
-    """Open debt entries in one TODO file's text."""
+def debts_in(text, ref, today, place, malformed=None):
+    """Open debt entries in one TODO file's text; a Night-owed line in neither
+    form is appended to `malformed`, never silently read as no debt."""
     open_entries = []
     current, stamp_date, owed, cleared = None, None, [], set()
 
@@ -87,9 +88,12 @@ def debts_in(text, ref, today, place):
         if o:
             body = o.group(1).strip()
             m = OWED_BODY.match(body)
-            if m:
-                for case, reason in ENTRY.findall(m.group(2)):
+            entries = ENTRY.findall(m.group(2)) if m else []
+            if m and entries:
+                for case, reason in entries:
                     owed.append((m.group(1), case, reason))
+            elif body != "none" and malformed is not None:
+                malformed.append(f"{ref(current)}: {line.strip()}")
         c = CLEARED.match(line)
         if c:
             for case, _ in ENTRY.findall(c.group(4)):
@@ -99,12 +103,12 @@ def debts_in(text, ref, today, place):
     return open_entries
 
 
-def collect(root=ROOT, today=None):
+def collect(root=ROOT, today=None, malformed=None):
     today = today or datetime.date.today()
     place = placements(AUDIT.read_text(encoding="utf-8")) if AUDIT.exists() else {}
     out = []
     for path in sorted((root / "todo").glob("*/TODO-*.md")):
-        out += debts_in(path.read_text(encoding="utf-8"), lambda n, p=path: section_ref(p, n), today, place)
+        out += debts_in(path.read_text(encoding="utf-8"), lambda n, p=path: section_ref(p, n), today, place, malformed)
     return out
 
 
@@ -147,6 +151,10 @@ def self_test():
         ("none owes nothing", all(e["section"] != "D00 T02 §4" for e in got)),
         ("the table names the entry", "D00 T02 §3" in render(got) and "age 4 night(s)" in render(got)),
     ]
+    bad_lines = []
+    debts_in("## 5. X\n> **Verified:** 2026-09-20 | §5 | x\n> **Night-owed:** Popup case (outside the window)\n",
+             lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, bad_lines)
+    checks.append(("a Night-owed line in neither form is reported malformed", len(bad_lines) == 1 and "D00 T02 §5" in bad_lines[0]))
     bad = [n for n, ok in checks if not ok]
     for n in bad:
         print(f"night-debt self-test FAIL: {n}")
@@ -157,12 +165,15 @@ def self_test():
 def cli(argv):
     if "--self-test" in argv:
         return self_test()
-    entries = collect()
+    malformed = []
+    entries = collect(malformed=malformed)
     if "--json" in argv:
         print(json.dumps(entries, indent=1))
     else:
         print(render(entries))
-    return 0
+    for m in malformed:
+        print(f"night-debt: MALFORMED Night-owed line, read as nothing: {m}", file=sys.stderr)
+    return 1 if malformed else 0
 
 
 if __name__ == "__main__":

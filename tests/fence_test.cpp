@@ -47,28 +47,34 @@ TEST_CASE("The fence decides from its overrides and the clock", "[fence]") {
     constexpr unsigned long away = 600000;  // the operator gone ten minutes
     // Outside the window with no override: skip, naming the window and the
     // way to run it on demand.
-    const fence::Verdict day = fence::Decide("", "", 19 * 60 + 5, away);
+    const fence::Verdict day = fence::Decide("", "", 19 * 60 + 5, away, false);
     CHECK(day.mode == fence::Mode::Skip);
     CHECK(day.reason.find("02:00-06:50") != std::string::npos);
     CHECK(day.reason.find("now 19:05") != std::string::npos);
     CHECK(day.reason.find("RESOLUTE_HEADFUL=visible") != std::string::npos);
     // Inside the window: collect, stopping on input.
-    CHECK(fence::Decide("", "", 3 * 60, away).mode == fence::Mode::Collect);
+    CHECK(fence::Decide("", "", 3 * 60, away, false).mode == fence::Mode::Collect);
     // The night runner's idle signal: collect by day.
-    CHECK(fence::Decide("", "1", 14 * 60, away).mode == fence::Mode::Collect);
-    CHECK(fence::Decide("", "yes", 14 * 60, away).mode == fence::Mode::Skip);
+    CHECK(fence::Decide("", "1", 14 * 60, away, false).mode == fence::Mode::Collect);
+    CHECK(fence::Decide("", "yes", 14 * 60, away, false).mode == fence::Mode::Skip);
     // The operator's visible run wins over everything, and only "visible" asks.
-    CHECK(fence::Decide("visible", "1", 3 * 60, 0).mode == fence::Mode::Visible);
-    CHECK(fence::Decide("1", "", 14 * 60, away).mode == fence::Mode::Skip);
+    CHECK(fence::Decide("visible", "1", 3 * 60, 0, false).mode == fence::Mode::Visible);
+    CHECK(fence::Decide("1", "", 14 * 60, away, false).mode == fence::Mode::Skip);
     // A collecting case needs the operator away at its own start, so a
     // return mid-run stands every later case down (panel round 1 of the
     // D00 T02 §10 review): 119 s is too soon, 120 s is enough.
-    const fence::Verdict back = fence::Decide("", "1", 14 * 60, 119999);
+    const fence::Verdict back = fence::Decide("", "1", 14 * 60, 119999, false);
     CHECK(back.mode == fence::Mode::Skip);
     CHECK(back.reason.find("the operator is active (last input 119 s ago") != std::string::npos);
     CHECK(back.reason.find("re-queued") != std::string::npos);
-    CHECK(fence::Decide("", "1", 14 * 60, 120000).mode == fence::Mode::Collect);
-    CHECK(fence::Decide("", "", 3 * 60, 5000).mode == fence::Mode::Skip);
+    CHECK(fence::Decide("", "1", 14 * 60, 120000, false).mode == fence::Mode::Collect);
+    CHECK(fence::Decide("", "", 3 * 60, 5000, false).mode == fence::Mode::Skip);
+    // A locked desktop cannot show a window: collecting stands down, and the
+    // operator's visible run is theirs to judge (D00 T02 §11).
+    const fence::Verdict locked = fence::Decide("", "1", 3 * 60, away, true);
+    CHECK(locked.mode == fence::Mode::Skip);
+    CHECK(locked.reason.find("the session is locked") != std::string::npos);
+    CHECK(fence::Decide("visible", "", 14 * 60, 0, true).mode == fence::Mode::Visible);
 }
 
 TEST_CASE("A visible run never stops on input and a skipped case never counts as headful", "[fence]") {

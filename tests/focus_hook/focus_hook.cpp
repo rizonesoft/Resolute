@@ -36,7 +36,19 @@ extern "C" __declspec(dllexport) void CALLBACK ResoluteFocusHook(HWINEVENTHOOK, 
     UINT x = 0, y = 0;
     if (SUCCEEDED(GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &x, &y))) rec.dpi = x;
 
-    HWND sink = FindWindowExW(HWND_MESSAGE, nullptr, kFocusHookSinkClass, nullptr);
+    // The sink of the guard that adopted this process, from the mapping it
+    // published under this process's id.
+    wchar_t name[96];
+    wsprintfW(name, L"%s%lu", kFocusHookSinkMapping, GetCurrentProcessId());
+    HANDLE mapping = OpenFileMappingW(FILE_MAP_READ, FALSE, name);
+    if (!mapping) return;
+    HWND sink = nullptr;
+    if (const void* view = MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, sizeof(ULONG_PTR))) {
+        ULONG_PTR raw = *static_cast<const ULONG_PTR*>(view);
+        sink = reinterpret_cast<HWND>(raw);  // NOLINT(performance-no-int-to-ptr): a handle published as data
+        UnmapViewOfFile(view);
+    }
+    CloseHandle(mapping);
     if (!sink) return;
     COPYDATASTRUCT cds{};
     cds.dwData = kFocusHookMagic;

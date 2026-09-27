@@ -39,6 +39,9 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $Root = Split-Path -Parent $PSScriptRoot
+# Python and this script agree on UTF-8, or a section mark reads back garbled.
+$env:PYTHONIOENCODING = 'utf-8'
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $NightDir = Join-Path $Root 'build\nightly'
 $TaskPath = '\Resolute\'
 $TaskName = 'Nightly'
@@ -191,16 +194,24 @@ try {
         } else {
             Push-Location $wt
             & ctest --preset debug -V *> (Join-Path $RunDir 'default.log')
+            $ctestExit = $LASTEXITCODE
             $d = Read-Results (Join-Path $RunDir 'default.log')
             Note "default half: $(Count-Line $d (Join-Path $RunDir 'default.log'))"
+            # A half with no results never ran: ctest failed before any test
+            # (a bad preset, an empty inventory), which is a failure, not a pass.
+            if ($d.Count -eq 0) { $failures.Add("default: no results (ctest exit $ctestExit)") }
             foreach ($k in $d.Keys) { if ($d[$k] -notin 'Passed', 'Skipped') { $failures.Add("default: $k ($($d[$k]))") } }
+            # The lock state now, not as it was before the build.
+            $unlocked = [NightProbe]::Unlocked()
             if (-not $unlocked) {
                 Note 'fenced half: skipped, the session is locked (a locked desktop cannot show windows); the debt stays owed'
             } else {
                 if ($Mode -eq 'Collect') { $env:RESOLUTE_IDLE_COLLECT = '1' }
                 & ctest --preset headful -V *> (Join-Path $RunDir 'full.log')
+                $ctestExit = $LASTEXITCODE
                 Remove-Item Env:RESOLUTE_IDLE_COLLECT -ErrorAction SilentlyContinue
                 $f = Read-Results (Join-Path $RunDir 'full.log')
+                if ($f.Count -eq 0) { $failures.Add("fenced: no results (ctest exit $ctestExit)") }
                 Note "fenced half: $(Count-Line $f (Join-Path $RunDir 'full.log'))"
                 foreach ($line in Select-String -Path (Join-Path $RunDir 'full.log') -Pattern '^\d+: SKIP "' ) { Note "  $($line.Line -replace '^\d+: ', '')" }
                 foreach ($k in $f.Keys) { if ($f[$k] -notin 'Passed', 'Skipped') { $failures.Add("fenced: $k ($($f[$k]))") } }
@@ -211,7 +222,11 @@ try {
     }
 
     # Night debt: each owed case run at the candidate it was reviewed at.
-    $debt = @(& $Python (Join-Path $Root 'scripts\todo-graph.py') query night-debt --json | ConvertFrom-Json)
+    $debtJson = & $Python (Join-Path $Root 'scripts\todo-graph.py') query night-debt --json 2> (Join-Path $RunDir 'night-debt.err')
+    if ($LASTEXITCODE -ne 0) {
+        $failures.Add("query night-debt failed (exit $LASTEXITCODE): $((Get-Content (Join-Path $RunDir 'night-debt.err')) -join ' ')")
+    }
+    $debt = @($debtJson | ConvertFrom-Json)
     Note "## Night debt: $($debt.Count) open before this run"
     $verified = [System.Collections.Generic.List[string]]::new()
     if ($debt.Count -gt 0 -and -not $unlocked) {
@@ -226,11 +241,15 @@ try {
                 continue
             }
             $cases = @($group.Group | ForEach-Object { $_.case } | Select-Object -Unique)
-            $regex = '^(' + (($cases | ForEach-Object { [regex]::Escape($_) -replace '\\ ', ' ' }) -join '|') + ')$'
             $results = @{}
+            $run = $cases   # attempt 1 runs every owed case
             foreach ($attempt in 1, 2) {
-                $pending = @($cases | Where-Object { $results[$_] -ne 'Passed' })
-                if ($pending.Count -eq 0) { break }
+                if ($run.Count -eq 0) { break }
+                if (-not [NightProbe]::Unlocked()) {
+                    Note "candidate $($sha.Substring(0, 8)) attempt ${attempt}: not run, the session locked; the debt stays owed"
+                    break
+                }
+                $regex = '^(' + (($run | ForEach-Object { [regex]::Escape($_) -replace '\\ ', ' ' }) -join '|') + ')$'
                 $log = Join-Path $RunDir "debt-$($sha.Substring(0, 8))-a$attempt.log"
                 Push-Location $wt
                 if ($Mode -eq 'Collect') { $env:RESOLUTE_IDLE_COLLECT = '1' }
@@ -238,11 +257,13 @@ try {
                 Remove-Item Env:RESOLUTE_IDLE_COLLECT -ErrorAction SilentlyContinue
                 Pop-Location
                 $r = Read-Results $log
-                foreach ($c in $pending) { $results[$c] = if ($r.Contains($c)) { $r[$c] } else { 'Not Run' } }
-                $summary = @($pending | ForEach-Object { '"' + $_ + '" ' + $results[$_] }) -join '; '
+                # Every case this attempt ran takes its result, a pass included.
+                foreach ($c in $run) { $results[$c] = if ($r.Contains($c)) { $r[$c] } else { 'Not Run' } }
+                $summary = @($run | ForEach-Object { '"' + $_ + '" ' + $results[$_] }) -join '; '
                 Note "candidate $($sha.Substring(0, 8)) attempt ${attempt}: $summary"
-                # A skip (the gate, input, lock, hardware absent) is not red: it stays owed without a retry.
-                if (@($pending | Where-Object { $results[$_] -notin 'Passed', 'Skipped' }).Count -eq 0) { break }
+                # Only red retries: a pass is done, and a skip (the gate, input,
+                # a lock, hardware absent) stays owed without a retry.
+                $run = @($run | Where-Object { $results[$_] -notin 'Passed', 'Skipped' })
             }
             foreach ($section in ($group.Group | Group-Object section)) {
                 $green = @($section.Group | Where-Object { $results[$_.case] -eq 'Passed' } | ForEach-Object { "`"$($_.case)`"" })

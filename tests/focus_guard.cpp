@@ -79,6 +79,7 @@ void CALLBACK OnOwnEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, L
 // round 4 of the D00 T02 §10 review filed: an out-of-process hook measured a
 // window where it was at delivery, not where it was shown).
 std::vector<HWINEVENTHOOK> g_adopted;  // observer thread only
+std::vector<HANDLE>        g_sinkMaps;  // each adopted process's pointer to this guard's sink
 HMODULE g_hookDll  = nullptr;
 WINEVENTPROC g_hookProc = nullptr;
 
@@ -141,7 +142,22 @@ DWORD WINAPI Observe(LPVOID) {
         if (msg.message == kAdopt) {
             const auto pid = static_cast<DWORD>(msg.wParam);
             HWINEVENTHOOK fg = nullptr, show = nullptr;
-            if (sink && LoadHookDll()) {
+            // Publish this guard's sink under the adopted process's id, where
+            // the hook in that process looks for it.
+            const std::wstring name = std::wstring(kFocusHookSinkMapping) + std::to_wstring(pid);
+            HANDLE map = sink ? CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
+                                                   sizeof(ULONG_PTR), name.c_str())
+                              : nullptr;
+            bool published = false;
+            if (map) {
+                if (void* view = MapViewOfFile(map, FILE_MAP_WRITE, 0, 0, sizeof(ULONG_PTR))) {
+                    *static_cast<ULONG_PTR*>(view) = reinterpret_cast<ULONG_PTR>(sink);
+                    UnmapViewOfFile(view);
+                    published = true;
+                }
+                g_sinkMaps.push_back(map);
+            }
+            if (published && LoadHookDll()) {
                 fg   = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, g_hookDll, g_hookProc, pid, 0,
                                        WINEVENT_INCONTEXT);
                 show = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, g_hookDll, g_hookProc, pid, 0,
@@ -155,6 +171,8 @@ DWORD WINAPI Observe(LPVOID) {
         if (msg.message == kRelease) {
             for (HWINEVENTHOOK hook : g_adopted) UnhookWinEvent(hook);
             g_adopted.clear();
+            for (HANDLE map : g_sinkMaps) CloseHandle(map);
+            g_sinkMaps.clear();
             SetEvent(g_adoptDone);
         }
         DispatchMessageW(&msg);
