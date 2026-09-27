@@ -4,17 +4,17 @@
 
 Derived from the per-section findings files under `docs/reviews/`, which stay authoritative. This file is a view, not a record: editing it changes nothing and is overwritten on the next run. `D00 T04 §2` owns it.
 
-**510 findings across 57 sections.**
+**530 findings across 58 sections.**
 
 ## By category
 
 | Category | Count | What it means |
 | --- | ---: | --- |
-| `adversarial` | 135 | fails under hostile or unexpected input |
-| `record` | 134 | the plan or the evidence misdescribes what happened |
-| `integration` | 86 | a consumer, caller, or downstream artifact no longer holds |
+| `adversarial` | 143 | fails under hostile or unexpected input |
+| `record` | 137 | the plan or the evidence misdescribes what happened |
+| `integration` | 91 | a consumer, caller, or downstream artifact no longer holds |
 | `correctness` | 80 | the code does the wrong thing |
-| `consistency` | 61 | disagrees with the rest of the suite, its naming, or its layout |
+| `consistency` | 65 | disagrees with the rest of the suite, its naming, or its layout |
 | `design` | 4 | the rendered surface disagrees with the design contract |
 | `test-coverage` | 4 | correct, and nothing exercises it, so a regression would be silent |
 | `source-defect` | 3 | a Win32 contract, registry layout, or other source read wrongly |
@@ -26,8 +26,8 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | Severity | Count | What it means |
 | --- | ---: | --- |
 | `critical` | 6 | invalidates safety, data integrity, or the stamp |
-| `major` | 224 | wrong behavior in code, plan, or record |
-| `minor` | 280 | polish or wording, or no surviving defect |
+| `major` | 225 | wrong behavior in code, plan, or record |
+| `minor` | 299 | polish or wording, or no surviving defect |
 
 ## Every finding
 
@@ -95,6 +95,26 @@ Derived from the per-section findings files under `docs/reviews/`, which stay au
 | `D00 T02 §10` | F12 | major | `record` | fixed | independent | the headful pass at the final candidate is still owed |
 | `D00 T02 §10` | F13 | major | `adversarial` | fixed | independent | a thread born and gone between snapshots escapes attribution |
 | `D00 T02 §10` | F14 | minor | `adversarial` | filed | independent | an adopted window's placement is measured at delivery, not when shown |
+| `D00 T02 §11` | F1 | major | `integration` | fixed | independent | the debt producer and reader disagree, so real debt reads as none |
+| `D00 T02 §11` | F2 | minor | `adversarial` | fixed | independent | a retry re-runs passed and skipped cases and ignores their new results |
+| `D00 T02 §11` | F3 | minor | `integration` | fixed | independent | a half with no results reads as clean |
+| `D00 T02 §11` | F4 | minor | `adversarial` | fixed | independent | the lock state is sampled once before the build |
+| `D00 T02 §11` | F5 | minor | `adversarial` | fixed | independent | the hook finds its guard by a global class name |
+| `D00 T02 §11` | F6 | minor | `consistency` | fixed | independent | the flasher case is missing from the audit inventory |
+| `D00 T02 §11` | F7 | minor | `adversarial` | fixed | independent | a lock-interrupted retry is reported as red twice |
+| `D00 T02 §11` | F8 | minor | `consistency` | fixed | independent | a partly malformed debt list is partly accepted |
+| `D00 T02 §11` | F9 | minor | `integration` | fixed | independent | a nonzero ctest exit is ignored once any result parses |
+| `D00 T02 §11` | F10 | minor | `record` | fixed | independent | the flasher case never proves a misplaced show is rejected by name |
+| `D00 T02 §11` | F11 | minor | `adversarial` | fixed | independent | the job's kill-on-close could fail silently |
+| `D00 T02 §11` | F12 | minor | `consistency` | fixed | independent | an abbreviated candidate breaks the worktree path |
+| `D00 T02 §11` | F13 | minor | `integration` | fixed | independent | debt attempts skip the completeness check |
+| `D00 T02 §11` | F14 | minor | `record` | fixed | independent | the flasher's rejection goes unproven without a second DPI |
+| `D00 T02 §11` | F15 | minor | `adversarial` | fixed | independent | second-resolution run ids could reuse a directory |
+| `D00 T02 §11` | F16 | minor | `integration` | fixed | independent | the report keeps the owed reason, not the latest skip reason |
+| `D00 T02 §11` | F17 | minor | `record` | fixed | independent | the rules' drills are not in docs/testing.md |
+| `D00 T02 §11` | F18 | minor | `adversarial` | fixed | independent | the hook drops a record it cannot deliver |
+| `D00 T02 §11` | F19 | minor | `consistency` | fixed | independent | a bare or mis-spaced marker reads as no debt |
+| `D00 T02 §11` | F20 | minor | `adversarial` | filed | independent | the hook drops a record uncounted when it cannot open or map the mapping |
 | `D00 T02 §2` | F1 | major | `adversarial` | fixed | independent | the boundary guard was not applied to the fixture's own root |
 | `D00 T02 §2` | F2 | major | `correctness` | fixed | independent | the sweep reported success while leaving residue |
 | `D00 T02 §2` | F3 | major | `correctness` | fixed | independent | a fixture that could not read back what it wrote |

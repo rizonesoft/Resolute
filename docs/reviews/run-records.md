@@ -687,3 +687,18 @@ round: 4 model: gpt-6-astra effort: high outcome: findings candidate: a3edd383 p
 round: 5 model: gpt-6-astra effort: high outcome: independent candidate: f4c884b9 provider: openai version: gpt-6-astra cost: unresolved latency: 223s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S10-F1, D00-T02-S10-F2, D00-T02-S10-F3, D00-T02-S10-F4
 empty: 0
 refuted: 0
+
+run: D00-T02-S11
+date: 2026-09-27
+runner: panel
+rounds: 6
+round: 1 model: gpt-6-astra effort: medium outcome: findings candidate: 5a80fa26 provider: openai version: gpt-6-astra cost: 42200tokens latency: 57s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S11-F7, D00-T02-S11-F8, D00-T02-S11-F9, D00-T02-S11-F10
+round: 2 model: gpt-6-astra effort: medium outcome: findings candidate: bc78a9dc provider: openai version: gpt-6-astra cost: 43757tokens latency: 42s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S11-F11, D00-T02-S11-F12, D00-T02-S11-F13, D00-T02-S11-F14
+round: 3 model: gpt-6-astra effort: high outcome: findings candidate: bd89f5c0 provider: openai version: gpt-6-astra cost: 49474tokens latency: 178s opportunity: delta-plus-regressions purpose: sign-off provenance: recorded findings: D00-T02-S11-F15, D00-T02-S11-F16, D00-T02-S11-F17
+# round 3 is the Full sign-off; its findings were cheap and answered, and rounds 4 and 5 ran the depth slot to confirm; round 5 is the hard cap and its one finding sits below the blocking bar, filed in D00 T02 §12.
+round: 4 model: gpt-6-astra effort: high outcome: findings candidate: e7674fbf provider: openai version: gpt-6-astra cost: 48335tokens latency: 111s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S11-F18, D00-T02-S11-F19
+round: 5 model: gpt-6-astra effort: high outcome: findings candidate: e2d324c9 provider: openai version: gpt-6-astra cost: 46729tokens latency: 33s opportunity: delta-plus-regressions purpose: fix-loop provenance: recorded findings: D00-T02-S11-F20
+# round 6 is the independent pass (`panel_slots.py exec independent --commit 2ff3bf4d`, ran before panel round 1); the runner printed no token figure.
+round: 6 model: gpt-6-astra effort: high outcome: independent candidate: 2ff3bf4d provider: openai version: gpt-6-astra cost: unresolved latency: 156s opportunity: full-scope purpose: section-review provenance: recorded findings: D00-T02-S11-F1, D00-T02-S11-F2, D00-T02-S11-F3, D00-T02-S11-F4, D00-T02-S11-F5, D00-T02-S11-F6
+empty: 0
+refuted: 0
