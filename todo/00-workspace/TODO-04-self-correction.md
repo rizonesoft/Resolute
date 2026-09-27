@@ -1158,6 +1158,7 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 - [ ] Match the CI read-back to the exact push: `ci-wait` filters by commit and workflow but not by branch, event, or run attempt, so a re-run or an unrelated green run on the same sha could stand in (plan review of the D00 T04 §30 candidate, PR3; needs §30 shipped: it hardens §30's read-back). Done when: the read-back requires the `push` event on `master` and reads the latest attempt, and fixture legs refuse a wrong-branch and a superseded-attempt run, quoted.
 - [ ] Confirm "not triggered" against GitHub before trusting it: the local path-filter calculation can misread a workflow shape it does not model (`paths-ignore`, several `on:` triggers), and a wrong `not triggered` hides a missing CI run (plan review of the D00 T04 §30 candidate, PR4; needs §30 shipped: it hardens §30's read-back). Done when: a `not triggered` verdict is confirmed by a grace-period `gh run list` that finds no run (a run that appears is waited on), unmodelled workflow keys make the calculation fail closed to waiting, and fixture legs pin both, quoted.
 - [ ] Carry the provenance tags in the portable bundle: the bundle can verify while a cited staged tree is unreachable from a fresh clone (plan review of the D00 T04 §30 candidate, PR5; needs §30 shipped: it records §30's tags). Done when: the bundle records each provenance tag name and target, `bundle-verify --recheck-remote` confirms each tag on the remote, and a removed tag fails the recheck by name, quoted.
+- [ ] Take the nightly collector's results into the review flow (D00 T02 §11 plan review): a morning report's `REOPEN` and failure lines hold the next section boundary until Claude Code files them, so a twice-red candidate never keeps its effective approval while the report waits; reports with unrecorded results are retained until recorded, never pruned or overwritten by a later run; a section re-shipped after a reopen supersedes its old candidate's debt explicitly, so an immutable failing candidate does not stay in the collection queue; and a case green only on retry is recorded per test, so recurring retry-green instability is filed rather than hidden. Done when: each is enforced by the process-plan boundary check or the query, with a drill quoted.
 - [ ] Commit: `"workspace: review-flow follow-ups"`
 
 **Test checkpoint:** The undeclared-neither fails quoted; the trusted sign-off refuses quoted; the OID-mismatched tag fails quoted; the conflicting attestation fails quoted; the undated escape closes-or-proves quoted; the bundle name reads unsigned quoted; the separate-machine replay greens quoted; the chain verifies quoted; the exception reads quoted; the mega-assembly paths quoted; the POSIX grandchild is gone after exit 124 quoted.
@@ -1182,6 +1183,10 @@ The §24 plan review files nine findings plus one panel advisory the §24 contra
 -> SOURCE: plan-D00-T04-s30-2026-09-23-PR3 D00-T04-S30-PR3
 -> SOURCE: plan-D00-T04-s30-2026-09-23-PR4 D00-T04-S30-PR4
 -> SOURCE: plan-D00-T04-s30-2026-09-23-PR5 D00-T04-S30-PR5
+-> SOURCE: plan-D00-T02-s11-2026-09-27-PR3 D00-T02-S11-PR3
+-> SOURCE: plan-D00-T02-s11-2026-09-27-PR4 D00-T02-S11-PR4
+-> SOURCE: plan-D00-T02-s11-2026-09-27-PR8 D00-T02-S11-PR8
+-> SOURCE: plan-D00-T02-s11-2026-09-27-PR15 D00-T02-S11-PR15
 
 ## 27. One Writer, a GPT-Governed Panel, Slot-Bound Pins
 

@@ -137,7 +137,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   5   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
-| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  16   |
+| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  17   |
 | [x] | `D00 T04 §27` | One writer, a GPT-governed panel, slot-bound pins |   6   |
 | [ ] | `D00 T04 §28` | Slot-table review follow-ups                      |   6   |
 | [x] | `D00 T04 §29` | Grok fallbacks on the newest Grok model           |   6   |
@@ -167,7 +167,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §9`  | Rendered-output regression tests                  |   5   |
 | [x] | `D00 T02 §10` | Focus-free UI suite conversion                    |  11   |
 | [ ] | `D00 T02 §11` | Nightly full-suite regression run                 |   9   |
-| [ ] | `D00 T02 §12` | Port-vs-port visual comparison                    |   7   |
+| [ ] | `D00 T02 §12` | Port-vs-port visual comparison                    |   8   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |   5   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |  18   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
