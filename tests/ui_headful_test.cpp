@@ -298,7 +298,13 @@ HANDLE CaseJob() {
         HANDLE j = CreateJobObjectW(nullptr, nullptr);
         JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
         limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-        if (j) SetInformationJobObject(j, JobObjectExtendedLimitInformation, &limits, sizeof(limits));
+        // A job without kill-on-close would let a child outlive the case:
+        // no job at all, and every start in it fails (panel round 2 of the
+        // D00 T02 §11 review).
+        if (j && !SetInformationJobObject(j, JobObjectExtendedLimitInformation, &limits, sizeof(limits))) {
+            CloseHandle(j);
+            j = nullptr;
+        }
         return j;
     }();
     return job;
@@ -503,7 +509,16 @@ TEST_CASE("An adopted window is placed where it was shown, not where it moved", 
     // check by name: the show on the primary is where it was shown.
     const UINT primaryDpi = focusguard::MonitorDpi(MonitorFromPoint(POINT{0, 0}, MONITOR_DEFAULTTOPRIMARY));
     const HMONITOR other  = focusguard::MonitorWithDpi(primaryDpi == 96 ? 144 : 96);
-    if (other) {
+    if (!other) {
+        // The rejection needs a monitor at another DPI to declare: without
+        // one it is owed, never passed unproven (panel round 2 of the D00 T02
+        // §11 review).
+        std::printf("SKIP \"%s\" hardware absent: no monitor at a second DPI to declare; re-probed each night\n",
+                    Catch::getResultCapture().getCurrentTestName().c_str());
+        std::fflush(stdout);
+        SKIP("hardware absent: no monitor at a second DPI");
+    }
+    {
         const std::string place = "place:dpi" + std::to_string(focusguard::MonitorDpi(other));
         const std::string name  = Catch::getResultCapture().getCurrentTestName();
         const auto lines = focusguard::Check(name, true, place, {}, events, {}, nullptr);

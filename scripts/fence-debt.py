@@ -129,15 +129,15 @@ def self_test():
                    judge(["Beta case"], log.replace('2: SKIP "Beta case"', "2: nothing")) ==
                    [("Beta case", "unaccounted", "absent from the run")]))
     checks.append(("the stamp line lists the debt",
-                   stamp_line(judge(["Alpha case", "Beta case"], log), "abc1234") ==
-                   '> **Night-owed:** candidate abc1234 | "Beta case" (headful: outside the quiet-hours window)'))
-    checks.append(("no debt says none", stamp_line(judge(["Alpha case"], log), "abc1234") == "> **Night-owed:** none"))
+                   stamp_line(judge(["Alpha case", "Beta case"], log), "abc1234000000000000000000000000000000000") ==
+                   '> **Night-owed:** candidate abc1234000000000000000000000000000000000 | "Beta case" (headful: outside the quiet-hours window)'))
+    checks.append(("no debt says none", stamp_line(judge(["Alpha case"], log), "abc1234000000000000000000000000000000000") == "> **Night-owed:** none"))
     nd = _night_debt()
-    produced = stamp_line(judge(["Alpha case", "Beta case"], log), "abcdef1234")
+    produced = stamp_line(judge(["Alpha case", "Beta case"], log), "abcdef1234000000000000000000000000000000")
     read = nd.debts_in("## 1. S\n> **Verified:** 2026-09-27 | §1 | x\n" + produced + "\n", lambda n: "D00 T02 §1",
                        __import__("datetime").date(2026, 9, 27), {})
     checks.append(("the night-debt reader reads what --stamp writes",
-                   [(e["case"], e["candidate"]) for e in read] == [("Beta case", "abcdef1234")]))
+                   [(e["case"], e["candidate"]) for e in read] == [("Beta case", "abcdef1234000000000000000000000000000000")]))
     launcher = "Launcher capture, dark at 100 percent"
     audit2 = audit + "\n| d | `" + launcher + "` | fence | fenced | [place:dpi96] |"
     log2 = (log + '\n5: SKIP "' + launcher + '" hardware absent' +
@@ -194,8 +194,8 @@ def main(argv):
     verdicts = judge(cases, Path(args.log).read_text(encoding="utf-8", errors="replace"))
     if args.stamp:
         owed = any(v == "owed" for _, v, _ in verdicts)
-        if owed and not args.candidate:
-            print("fence-debt: --stamp needs --candidate when anything is owed: debt binds to its reviewed candidate")
+        if owed and not re.fullmatch(r"[0-9a-f]{40}", args.candidate or ""):
+            print("fence-debt: --stamp needs --candidate <full 40-character sha> when anything is owed: debt binds to its reviewed candidate")
             return 1
         print(stamp_line(verdicts, args.candidate))
     for case, verdict, detail in verdicts:

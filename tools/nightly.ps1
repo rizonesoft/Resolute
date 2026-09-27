@@ -273,9 +273,20 @@ try {
                 Push-Location $wt
                 if ($Mode -eq 'Collect') { $env:RESOLUTE_IDLE_COLLECT = '1' }
                 & ctest --preset headful -R $regex -V *> $log
+                $attemptExit = $LASTEXITCODE
                 Remove-Item Env:RESOLUTE_IDLE_COLLECT -ErrorAction SilentlyContinue
                 Pop-Location
                 $r = Read-Results $log
+                # An attempt ctest did not finish proves nothing either way:
+                # its cases stay owed, verified by nothing and reopened by nothing.
+                $total = Read-Total $log
+                $named = @($r.Values | Where-Object { $_ -notin 'Passed', 'Skipped' }).Count
+                if ($r.Count -eq 0 -or $total -lt 0 -or $r.Count -ne $total -or ($attemptExit -ne 0 -and $named -eq 0)) {
+                    foreach ($c in $run) { $results[$c] = 'Incomplete' }
+                    $failures.Add("candidate $($sha.Substring(0, 8)) attempt ${attempt}: incomplete ($($r.Count) results of $total, ctest exit $attemptExit); its debt stays owed")
+                    Note "candidate $($sha.Substring(0, 8)) attempt ${attempt}: incomplete, ctest exit $attemptExit; the debt stays owed"
+                    break
+                }
                 # Every case this attempt ran takes its result, a pass included.
                 foreach ($c in $run) {
                     $results[$c] = if ($r.Contains($c)) { $r[$c] } else { 'Not Run' }
@@ -285,7 +296,7 @@ try {
                 Note "candidate $($sha.Substring(0, 8)) attempt ${attempt}: $summary"
                 # Only red retries: a pass is done, and a skip (the gate, input,
                 # a lock, hardware absent) stays owed without a retry.
-                $run = @($run | Where-Object { $results[$_] -notin 'Passed', 'Skipped' })
+                $run = @($run | Where-Object { $results[$_] -notin 'Passed', 'Skipped', 'Incomplete' })
             }
             foreach ($section in ($group.Group | Group-Object section)) {
                 $green = @($section.Group | Where-Object { $results[$_.case] -eq 'Passed' } | ForEach-Object { "`"$($_.case)`"" })

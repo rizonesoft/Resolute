@@ -33,8 +33,10 @@ HEADING = re.compile(r"^## (\d+)\. ")
 TODO_NAME = re.compile(r"TODO-(\d+)-")
 VERIFIED_DATE = re.compile(r"^> \*\*Verified:\*\* (\d{4}-\d{2}-\d{2})")
 OWED = re.compile(r"^> \*\*Night-owed:\*\* (.*)$")
-CLEARED = re.compile(r"^> \*\*Night-verified:\*\* (\d{4}-\d{2}-\d{2}) \| candidate ([0-9a-f]{7,40}) \| run (\S+) \| (.*)$")
-OWED_BODY = re.compile(r"^candidate ([0-9a-f]{7,40}) \| (.*)$")
+CLEARED = re.compile(r"^> \*\*Night-verified:\*\* (\d{4}-\d{2}-\d{2}) \| candidate ([0-9a-f]{40}) \| run (\S+) \| (.*)$")
+# The full commit id: the collector builds that commit, and an abbreviation can
+# stop naming one commit as the history grows (panel round 2 of the D00 T02 §11 review).
+OWED_BODY = re.compile(r"^candidate ([0-9a-f]{40}) \| (.*)$")
 def parse_entries(body):
     """`"case" (reason); "case" (reason)` as [(case, reason)], or None when any
     part of the list is not in that form. A reason may hold its own
@@ -170,9 +172,9 @@ def self_test():
     todo = "\n".join([
         "## 3. A Section",
         "> **Verified:** 2026-09-20 | §3 | shipped by day",
-        '> **Night-owed:** candidate abcdef1234 | "Launcher capture, dark at 150 percent" (outside the window); "Popup case" (outside the window)',
-        '> **Night-verified:** 2026-09-22 | candidate abcdef1234 | run 20260922-020500 | "Popup case"',
-        '> **Night-verified:** 2026-09-23 | candidate 9999999999 | run 20260923-020500 | "Launcher capture, dark at 150 percent"',
+        '> **Night-owed:** candidate abcdef1234000000000000000000000000000000 | "Launcher capture, dark at 150 percent" (outside the window); "Popup case" (outside the window)',
+        '> **Night-verified:** 2026-09-22 | candidate abcdef1234000000000000000000000000000000 | run 20260922-020500 | "Popup case"',
+        '> **Night-verified:** 2026-09-23 | candidate 9999999999000000000000000000000000000000 | run 20260923-020500 | "Launcher capture, dark at 150 percent"',
         "## 4. Another",
         "> **Verified:** 2026-09-21 | §4 | Night-owed: none",
         "> **Night-owed:** none",
@@ -181,7 +183,7 @@ def self_test():
     checks = [
         ("one case still owed", len(got) == 1),
         ("a verification of another candidate clears nothing",
-         got and got[0]["case"] == "Launcher capture, dark at 150 percent" and got[0]["candidate"] == "abcdef1234"),
+         got and got[0]["case"] == "Launcher capture, dark at 150 percent" and got[0]["candidate"] == "abcdef1234000000000000000000000000000000"),
         ("its placement comes from the audit table", got and got[0]["place"] == "[place:dpi144]"),
         ("its age counts nights since the stamp", got and got[0]["age_nights"] == 4),
         ("a comma inside a case name stays in it", got and "," in got[0]["case"]),
@@ -194,12 +196,16 @@ def self_test():
              lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, bad_lines)
     checks.append(("a Night-owed line in neither form is reported malformed", len(bad_lines) == 1 and "D00 T02 §5" in bad_lines[0]))
     partial = []
-    debts_in('## 6. Y\n> **Verified:** 2026-09-20 | §6 | x\n> **Night-owed:** candidate abcdef1234 | "A" (r); B (r)\n',
+    debts_in('## 6. Y\n> **Verified:** 2026-09-20 | §6 | x\n> **Night-owed:** candidate abcdef1234000000000000000000000000000000 | "A" (r); B (r)\n',
              lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, partial)
     checks.append(("a list malformed after its first entry is malformed as a whole", len(partial) == 1))
     real = ('"Popup case" (headful: outside the quiet-hours window 02:00-06:50 local (now 19:53); '
             'RESOLUTE_HEADFUL=visible runs it on demand); "Launcher capture, dark at 150 percent" (hardware absent)')
     parsed = parse_entries(real)
+    short = []
+    debts_in('## 7. Z\n> **Verified:** 2026-09-20 | §7 | x\n> **Night-owed:** candidate abcdef1 | "A" (r)\n',
+             lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, short)
+    checks.append(("an abbreviated candidate is malformed", len(short) == 1))
     checks.append(("a reason holding parentheses and a semicolon stays whole",
                    parsed is not None and len(parsed) == 2 and parsed[0][1].endswith("runs it on demand")
                    and parsed[1] == ("Launcher capture, dark at 150 percent", "hardware absent")))
