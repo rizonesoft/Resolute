@@ -288,6 +288,33 @@ struct Child {
     }
 };
 
+// A job every process a case starts joins, killed with this process: the
+// only handle to it closes when the test process ends, even when ctest kills
+// it at its timeout, so no launcher or capture outlives the case that
+// started it (D00 T02 §11, from the D00 T02 §10 plan review).
+HANDLE CaseJob() {
+    static HANDLE job = [] {
+        HANDLE j = CreateJobObjectW(nullptr, nullptr);
+        JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
+        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+        if (j) SetInformationJobObject(j, JobObjectExtendedLimitInformation, &limits, sizeof(limits));
+        return j;
+    }();
+    return job;
+}
+
+// Starts `cmd` suspended and in the case job; the caller resumes it.
+bool StartInJob(std::wstring cmd, const STARTUPINFOW& si, PROCESS_INFORMATION& pi) {
+    STARTUPINFOW copy = si;
+    if (!CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, CREATE_SUSPENDED, nullptr, nullptr, &copy, &pi))
+        return false;
+    if (!CaseJob() || !AssignProcessToJobObject(CaseJob(), pi.hProcess)) {
+        TerminateProcess(pi.hProcess, 1);
+        return false;
+    }
+    return true;
+}
+
 // The launcher a case started: closed when the case ends, however it ends,
 // so a failed assertion never leaves a window on the operator's desktop.
 struct Launched {
@@ -307,7 +334,7 @@ struct Launched {
 // Brings `hwnd` to the foreground from a background process: a thread whose
 // input is attached to the current foreground thread may pass it on.
 bool TakeForeground(HWND hwnd) {
-    const HWND  current = GetForegroundWindow();
+    HWND        current = GetForegroundWindow();
     const DWORD theirs  = current ? GetWindowThreadProcessId(current, nullptr) : 0;
     const DWORD mine    = GetCurrentThreadId();
     const bool  attach  = theirs && theirs != mine && AttachThreadInput(mine, theirs, TRUE);
@@ -343,7 +370,7 @@ void CaptureLauncher(const char* mode, UINT dpi) {
     PROCESS_INFORMATION& pi = launched.pi;
     std::wstring cmd = L"\"" + std::filesystem::path(RESOLUTE_LAUNCHER).wstring() + L"\"";
     // Suspended until the guard watches it, so nothing it shows goes unseen.
-    REQUIRE(CreateProcessW(nullptr, cmd.data(), nullptr, nullptr, FALSE, CREATE_SUSPENDED, nullptr, nullptr, &si, &pi));
+    REQUIRE(StartInJob(cmd, si, pi));
     focusguard::AdoptProcess(pi.dwProcessId);
     ResumeThread(pi.hThread);
     HWND main = nullptr;
@@ -391,7 +418,8 @@ void CaptureLauncher(const char* mode, UINT dpi) {
     STARTUPINFOW psi{};
     psi.cb = sizeof(psi);
     Child capture;
-    REQUIRE(CreateProcessW(nullptr, ps.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &psi, &capture.pi));
+    REQUIRE(StartInJob(ps, psi, capture.pi));
+    ResumeThread(capture.pi.hThread);
     const bool finished =
         WaitOrStandDown([&] { return WaitForSingleObject(capture.pi.hProcess, 0) == WAIT_OBJECT_0; }, 60000);
     if (!finished && fence::InputResumed()) {
@@ -431,4 +459,43 @@ TEST_CASE("Launcher capture, light at 150 percent", "[ui][headful][place:dpi144]
 TEST_CASE("Launcher capture, dark at 150 percent", "[ui][headful][place:dpi144]") {
     RESOLUTE_HEADFUL_GATE();
     CaptureLauncher("dark", 144);
+}
+
+TEST_CASE("An adopted window is placed where it was shown, not where it moved", "[ui][headful][place:primary]") {
+    // The flasher shows a window on the primary monitor and moves it to the
+    // other one at once. The guard's in-context hook in the adopted process
+    // must record the primary, where it was shown; an out-of-process hook
+    // measured it after the move (panel round 4 of the D00 T02 §10 review,
+    // closed in D00 T02 §11). The case drains its own events, so the show it
+    // arranged on purpose is judged here rather than by its placement tag.
+    RESOLUTE_HEADFUL_GATE();
+    focusguard::Drain();
+    STARTUPINFOW si{};
+    si.cb = sizeof(si);
+    Child flasher;
+    std::wstring cmd = L"\"" + std::filesystem::path(RESOLUTE_FLASHER).wstring() + L"\"";
+    REQUIRE(StartInJob(cmd, si, flasher.pi));
+    focusguard::AdoptProcess(flasher.pi.dwProcessId);
+    ResumeThread(flasher.pi.hThread);
+    const bool done =
+        WaitOrStandDown([&] { return WaitForSingleObject(flasher.pi.hProcess, 0) == WAIT_OBJECT_0; }, 10000);
+    RESOLUTE_HEADFUL_CHECK_INPUT();
+    REQUIRE(done);
+    DWORD rc = 1;
+    GetExitCodeProcess(flasher.pi.hProcess, &rc);
+    if (rc == 2) {
+        std::printf("SKIP \"%s\" hardware absent: one monitor, nowhere to move to; re-probed each night\n",
+                    Catch::getResultCapture().getCurrentTestName().c_str());
+        std::fflush(stdout);
+        SKIP("hardware absent: one monitor");
+    }
+    MONITORINFOEXW primary{};
+    primary.cbSize = sizeof(primary);
+    GetMonitorInfoW(MonitorFromPoint(POINT{0, 0}, MONITOR_DEFAULTTOPRIMARY), &primary);
+    const auto events = focusguard::Drain();
+    bool shownOnPrimary = false;
+    for (const auto& e : events)
+        if (e.kind == focusguard::Event::Kind::Shown && e.window.cls == L"ResoluteFlasher")
+            shownOnPrimary = shownOnPrimary || e.window.monitor == primary.szDevice;
+    CHECK(shownOnPrimary);
 }

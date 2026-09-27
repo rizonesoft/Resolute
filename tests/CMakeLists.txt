@@ -59,6 +59,7 @@ target_compile_definitions(resolute_tests PRIVATE
     # docs/captures/runs/: publishing one there is a deliberate copy.
     RESOLUTE_CAPTURE_DIR="${CMAKE_BINARY_DIR}/captures"
     RESOLUTE_LAUNCHER="$<TARGET_FILE:Resolute>"
+    RESOLUTE_FLASHER="$<TARGET_FILE:resolute_flasher>"
 )
 target_include_directories(resolute_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -80,6 +81,22 @@ target_link_libraries(resolute_tests PRIVATE
 )
 # The headful captures start the launcher, so a test build carries it.
 add_dependencies(resolute_tests Resolute)
+
+# The focus guard's in-context hook for adopted processes, and the helper
+# that shows a window on one monitor and moves it at once (D00 T02 §11). The
+# DLL is loaded into another program, so it links only the system.
+add_library(resolute_focus_hook SHARED focus_hook/focus_hook.cpp)
+target_include_directories(resolute_focus_hook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(resolute_focus_hook PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
+target_link_libraries(resolute_focus_hook PRIVATE shcore user32)
+target_link_options(resolute_focus_hook PRIVATE -static)
+set_target_properties(resolute_focus_hook PROPERTIES PREFIX "")  # the name the guard loads
+resolute_set_warnings(resolute_focus_hook)
+add_executable(resolute_flasher WIN32 helpers/flasher.cpp)
+target_compile_definitions(resolute_flasher PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
+target_link_options(resolute_flasher PRIVATE -municode -static)
+resolute_set_warnings(resolute_flasher)
+add_dependencies(resolute_tests resolute_focus_hook resolute_flasher)
 
 # -municode, and NOT -mwindows.
 #

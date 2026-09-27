@@ -2012,6 +2012,17 @@ def cmd_query(args) -> int:
         return 2
     if args.what == "adjacency":
         return adjacency_module().cli(sys.modules[__name__], args)
+    if args.what == "night-debt":
+        # Open Night-owed debt, derived from the stamps (D00 T02 §11).
+        spec = importlib.util.spec_from_file_location("todo_night_debt", Path(__file__).with_name("todo-night-debt.py"))
+        module = importlib.util.module_from_spec(spec)
+        previous_bytecode = sys.dont_write_bytecode
+        try:
+            sys.dont_write_bytecode = True
+            spec.loader.exec_module(module)
+        finally:
+            sys.dont_write_bytecode = previous_bytecode
+        return module.cli(["--json"] if getattr(args, "json", False) else [])
     todos = load_todos()
     by_id, by_key, done = _section_state(todos)
     what = args.what
@@ -8869,13 +8880,13 @@ def main() -> int:
     q = sub.add_parser("query", help="ask the graph a question")
     q.add_argument(
         "what",
-        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency", "calibration", "sequence", "plan-health", "summary", "run"],
+        choices=["ready", "blocked", "stats", "deferred", "frozen", "findings", "surfaces", "adjacency", "calibration", "sequence", "plan-health", "summary", "run", "night-debt"],
     )
     q.add_argument("target", nargs="?", help="run: run ID to inspect")
     q.add_argument("--all", action="store_true", help="findings: include ones already done")
     q.add_argument("--file", help="adjacency: exact repository-relative TODO path")
     q.add_argument("--at", help="adjacency: inspect an isolated historical commit")
-    q.add_argument("--json", action="store_true", help="adjacency, plan-health: machine-readable report")
+    q.add_argument("--json", action="store_true", help="adjacency, plan-health, night-debt: machine-readable report")
     q.add_argument("--check", action="store_true", help="plan-health: exit 1 on actionable entries (covered escalations and bare partials pass; --fail-on gates presence)")
     q.add_argument("--fail-on", metavar="DIMS", help="plan-health: comma-separated dimensions whose non-emptiness exits 1")
     q.add_argument("--require-owned", action="store_true", help="adjacency: refuse incomplete file ownership at closeout")
@@ -8925,7 +8936,8 @@ def main() -> int:
     )
     pr.set_defaults(fn=cmd_progress)
     args = p.parse_args()
-    if args.cmd == "query" and args.what != "adjacency" and any(getattr(args, key, None) for key in ("file", "at", "json", "require_owned", "require_conformance")):
+    adjacency_only = ("file", "at", "require_owned", "require_conformance") if args.cmd == "query" and args.what == "night-debt" else ("file", "at", "json", "require_owned", "require_conformance")
+    if args.cmd == "query" and args.what != "adjacency" and any(getattr(args, key, None) for key in adjacency_only):
         p.error("--file/--at/--json/--require-owned/--require-conformance apply only to query adjacency")
     return args.fn(args)
 

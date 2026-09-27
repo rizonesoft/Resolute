@@ -3,6 +3,7 @@
 #include "focus_guard.h"
 
 #include "fence.h"
+#include "focus_hook/focus_hook.h"
 
 #include <catch2/catch_test_case_info.hpp>
 #include <catch2/reporters/catch_reporter_event_listener.hpp>
@@ -13,6 +14,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <map>
@@ -70,28 +72,52 @@ void CALLBACK OnOwnEvent(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject, L
     Record(event, Describe(hwnd));
 }
 
-// An adopted process's windows (the launcher a case starts), out of context
-// through hooks scoped to that process: the system delivers only its events,
-// so each one is that process's however short-lived the thread or window
-// that raised it (panel round 3 of the D00 T02 §10 review). Every show is
-// kept whatever the window's visibility by delivery, since it still went on
-// the desktop; one gone altogether is kept as unmeasured.
-std::map<HWINEVENTHOOK, DWORD> g_adopted;  // hook -> the process it watches (observer thread only)
+// An adopted process's windows (the launcher a case starts), described in
+// that process when each event is raised: the guard injects
+// resolute_focus_hook.dll as an in-context hook scoped to the process, and
+// the DLL sends each record to this sink (D00 T02 §11, closing the gap panel
+// round 4 of the D00 T02 §10 review filed: an out-of-process hook measured a
+// window where it was at delivery, not where it was shown).
+std::vector<HWINEVENTHOOK> g_adopted;  // observer thread only
+HMODULE g_hookDll  = nullptr;
+WINEVENTPROC g_hookProc = nullptr;
 
-void CALLBACK OnAdoptedEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD, DWORD) {
-    if (!hwnd || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
-    const auto it = g_adopted.find(hook);
-    if (it == g_adopted.end()) return;
-    WindowRecord w;
-    if (IsWindow(hwnd)) {
-        w = Describe(hwnd);
-    } else {
-        w.hwnd = hwnd;
-        w.pid  = it->second;
-        w.cls  = L"(gone before it was measured)";
+LRESULT CALLBACK SinkProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+    if (msg == WM_COPYDATA) {
+        // WM_COPYDATA's lParam is a pointer carried as an integer, by contract.
+        // NOLINTNEXTLINE(performance-no-int-to-ptr)
+        const auto* cds = reinterpret_cast<const COPYDATASTRUCT*>(lp);
+        if (cds && cds->dwData == kFocusHookMagic && cds->cbData == sizeof(FocusHookRecord)) {
+            const auto* rec = static_cast<const FocusHookRecord*>(cds->lpData);
+            WindowRecord w;
+            w.hwnd = reinterpret_cast<HWND>(rec->hwnd);  // NOLINT(performance-no-int-to-ptr): a handle carried as data
+            w.pid     = rec->pid;
+            w.cls     = std::wstring(rec->cls, wcsnlen(rec->cls, 64));
+            w.visible = rec->visible != FALSE;
+            w.iconic  = rec->iconic != FALSE;
+            w.rect    = rec->rect;
+            w.monitor = std::wstring(rec->monitor, wcsnlen(rec->monitor, 32));
+            w.dpi     = rec->dpi;
+            Record(rec->kind, std::move(w));
+        }
+        return TRUE;
     }
-    w.visible = true;
-    Record(event, std::move(w));
+    return DefWindowProcW(hwnd, msg, wp, lp);
+}
+
+// Loads the hook DLL from beside this executable, once.
+bool LoadHookDll() {
+    if (g_hookProc) return true;
+    wchar_t exe[MAX_PATH] = {};
+    GetModuleFileNameW(nullptr, exe, MAX_PATH);
+    std::filesystem::path dll = std::filesystem::path(exe).parent_path() / L"resolute_focus_hook.dll";
+    g_hookDll = LoadLibraryW(dll.c_str());
+    if (!g_hookDll) return false;
+    // GetProcAddress returns every export as FARPROC; this one is the
+    // WINEVENTPROC the DLL defines, so the cast restores its real type.
+    // NOLINTNEXTLINE
+    g_hookProc = reinterpret_cast<WINEVENTPROC>(GetProcAddress(g_hookDll, "ResoluteFocusHook"));
+    return g_hookProc != nullptr;
 }
 
 constexpr UINT kAdopt   = WM_APP + 2;  // wParam: the process to watch
@@ -102,29 +128,40 @@ bool   g_adoptOk   = false;             // whether that adopt installed its hook
 DWORD WINAPI Observe(LPVOID) {
     MSG msg;
     PeekMessageW(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);  // make the queue
+    WNDCLASSW wc{};
+    wc.lpfnWndProc   = SinkProc;
+    wc.hInstance     = GetModuleHandleW(nullptr);
+    wc.lpszClassName = kFocusHookSinkClass;
+    RegisterClassW(&wc);
+    HWND sink = CreateWindowExW(0, kFocusHookSinkClass, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, wc.hInstance,
+                                nullptr);
     SetEvent(g_ready);
     while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (msg.message == kFlush) SetEvent(g_flushed);
         if (msg.message == kAdopt) {
             const auto pid = static_cast<DWORD>(msg.wParam);
-            HWINEVENTHOOK fg = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr,
-                                               OnAdoptedEvent, pid, 0, WINEVENT_OUTOFCONTEXT);
-            HWINEVENTHOOK show =
-                SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr, OnAdoptedEvent, pid, 0, WINEVENT_OUTOFCONTEXT);
-            if (fg) g_adopted[fg] = pid;
-            if (show) g_adopted[show] = pid;
+            HWINEVENTHOOK fg = nullptr, show = nullptr;
+            if (sink && LoadHookDll()) {
+                fg   = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, g_hookDll, g_hookProc, pid, 0,
+                                       WINEVENT_INCONTEXT);
+                show = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, g_hookDll, g_hookProc, pid, 0,
+                                       WINEVENT_INCONTEXT);
+            }
+            if (fg) g_adopted.push_back(fg);
+            if (show) g_adopted.push_back(show);
             g_adoptOk = fg != nullptr && show != nullptr;
             SetEvent(g_adoptDone);
         }
         if (msg.message == kRelease) {
-            for (const auto& [hook, pid] : g_adopted) UnhookWinEvent(hook);
+            for (HWINEVENTHOOK hook : g_adopted) UnhookWinEvent(hook);
             g_adopted.clear();
             SetEvent(g_adoptDone);
         }
         DispatchMessageW(&msg);
     }
-    for (const auto& [hook, pid] : g_adopted) UnhookWinEvent(hook);
+    for (HWINEVENTHOOK hook : g_adopted) UnhookWinEvent(hook);
     g_adopted.clear();
+    if (sink) DestroyWindow(sink);
     return 0;
 }
 

@@ -3,9 +3,10 @@
 // WinEvent hooks for foreground changes and window shows see a transient
 // activation when it happens rather than missing it between polls: in
 // context for this process, so a window is judged as it was when shown, and
-// on a dedicated thread, through hooks scoped to each process a case adopts
-// (started suspended, adopted, then resumed), where every show is that
-// process's and is kept and measured at delivery. At the end of every case the
+// for each process a case adopts (started suspended, adopted, then resumed),
+// through resolute_focus_hook.dll injected as an in-context hook scoped to
+// that process, which describes each window there when it is shown and
+// sends the record to the guard. At the end of every case the
 // guard takes a census of the windows the suite owns (this process and any
 // process a case adopts, such as the launcher it starts) and checks it:
 //
