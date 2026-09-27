@@ -109,6 +109,19 @@ The DAY tier is the default half; a section flips its row on a DAY-green run at 
 - **One writer.** The run owns only its worktrees and `build/nightly/`; it never builds over the writer's work and never commits.
 - **No orphans.** Every process a fenced case starts (the launcher, a capture, the flasher) runs in a job object killed with the test process, so a case ctest kills at its timeout leaves nothing running.
 
+Each rule's drill, from D00 T02 §11's runs (build/nightly/<id>/ is ignored scratch; the quotes are the record):
+
+| Rule | Drill | Result |
+| --- | --- | --- |
+| Candidate binding | a `Night-verified:` line for another candidate beside an owed case | `night-debt: 1 open`: it cleared nothing |
+| Retry | run `20260927-031026`: one case that cannot run, one real case | attempt 1 `"Drill no such fenced case" Not Run; "The popup menu returns the command the keyboard chooses" Passed`; attempt 2 ran only the first |
+| Second red | run `20260927-024103`: a case red in both executed attempts | `REOPEN D00 T02 §10 through audit stance: "Drill no such fenced case" red twice at candidate 2ff3bf4d...` |
+| Incomplete attempt | run `20260927-035629`: an attempt ctest could not finish | `candidate 2ff3bf4d attempt 1: incomplete, ctest exit 8; the debt stays owed`, and no reopen |
+| Interruption | D00 T02 §10's stand-down drills, and the scheduled run `20260927-020508` | `SKIP "..." the operator is active (last input 0 s ago, under the 120 s a collecting case needs); re-queued` for every fenced case |
+| Hardware absent | a launcher case declared at 192 DPI | `SKIP "Launcher capture, dark at 150 percent" hardware absent: no monitor at 192 DPI; re-probed each night`, no window opened |
+| One writer | a second run started beside a first | it exited at once; one run directory made |
+| No orphans | `ctest --preset headful-visible -R "Launcher capture, dark at 150 percent" --timeout 3` | `***Timeout 3.09 sec`, then no launcher and no capture process running |
+
 ### Logs and the report
 
 Each run has a unique id, `YYYYMMDD-HHMMSS`, and its own directory: `build/nightly/<id>/run.log`, `default.log`, `full.log`, `debt-<sha>-a<attempt>.log`, and the build logs. The report is `build/nightly/<id>/report.md`, copied to the fixed path `build/nightly/morning-report.md`, which is the file to read first; `build/nightly/latest.txt` names the latest run. A worked example:

@@ -123,9 +123,13 @@ try {
     exit 0   # another run holds the lock: one run at a time
 }
 
+# A new directory per run: a second run in the same second takes the next
+# suffix rather than writing into the first one's evidence.
 $Id = $now.ToString('yyyyMMdd-HHmmss')
+$suffix = 1
+while (Test-Path (Join-Path $NightDir $Id)) { $suffix++; $Id = "$($now.ToString('yyyyMMdd-HHmmss'))-$suffix" }
 $RunDir = Join-Path $NightDir $Id
-New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
+New-Item -ItemType Directory -Path $RunDir | Out-Null
 $Report = [System.Collections.Generic.List[string]]::new()
 function Note([string]$line) { $Report.Add($line); Add-Content -Path (Join-Path $RunDir 'run.log') -Value $line }
 
@@ -294,6 +298,9 @@ try {
                 }
                 $summary = @($run | ForEach-Object { '"' + $_ + '" ' + $results[$_] }) -join '; '
                 Note "candidate $($sha.Substring(0, 8)) attempt ${attempt}: $summary"
+                # Each skip's reason as it is now (input, a lock, hardware
+                # absent), not the reason the debt was first owed for.
+                foreach ($line in Select-String -Path $log -Pattern '^\d+: SKIP "') { Note "  $($line.Line -replace '^\d+: ', '')" }
                 # Only red retries: a pass is done, and a skip (the gate, input,
                 # a lock, hardware absent) stays owed without a retry.
                 $run = @($run | Where-Object { $results[$_] -notin 'Passed', 'Skipped', 'Incomplete' })
