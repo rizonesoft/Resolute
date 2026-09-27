@@ -16,6 +16,7 @@
 #include "focus_guard.h"
 #include "ui_host.h"
 
+#include <algorithm>
 #include <atomic>
 #include <cstdio>
 #include <filesystem>
@@ -498,4 +499,18 @@ TEST_CASE("An adopted window is placed where it was shown, not where it moved", 
         if (e.kind == focusguard::Event::Kind::Shown && e.window.cls == L"ResoluteFlasher")
             shownOnPrimary = shownOnPrimary || e.window.monitor == primary.szDevice;
     CHECK(shownOnPrimary);
+    // Declared at the monitor it moved to, the same events fail the placement
+    // check by name: the show on the primary is where it was shown.
+    const UINT primaryDpi = focusguard::MonitorDpi(MonitorFromPoint(POINT{0, 0}, MONITOR_DEFAULTTOPRIMARY));
+    const HMONITOR other  = focusguard::MonitorWithDpi(primaryDpi == 96 ? 144 : 96);
+    if (other) {
+        const std::string place = "place:dpi" + std::to_string(focusguard::MonitorDpi(other));
+        const std::string name  = Catch::getResultCapture().getCurrentTestName();
+        const auto lines = focusguard::Check(name, true, place, {}, events, {}, nullptr);
+        CAPTURE(place);
+        CHECK(std::any_of(lines.begin(), lines.end(), [&](const std::string& l) {
+            return l.find("FOCUS-VIOLATION " + name + ": a window is not where [" + place + "] declares") == 0 &&
+                   l.find("class=ResoluteFlasher") != std::string::npos;
+        }));
+    }
 }

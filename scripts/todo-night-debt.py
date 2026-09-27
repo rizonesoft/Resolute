@@ -35,7 +35,42 @@ VERIFIED_DATE = re.compile(r"^> \*\*Verified:\*\* (\d{4}-\d{2}-\d{2})")
 OWED = re.compile(r"^> \*\*Night-owed:\*\* (.*)$")
 CLEARED = re.compile(r"^> \*\*Night-verified:\*\* (\d{4}-\d{2}-\d{2}) \| candidate ([0-9a-f]{7,40}) \| run (\S+) \| (.*)$")
 OWED_BODY = re.compile(r"^candidate ([0-9a-f]{7,40}) \| (.*)$")
-ENTRY = re.compile(r'"([^"]+)"(?:\s*\(([^)]*)\))?')
+def parse_entries(body):
+    """`"case" (reason); "case" (reason)` as [(case, reason)], or None when any
+    part of the list is not in that form. A reason may hold its own
+    parentheses and semicolons (the fence's SKIP reasons do), so it is read to
+    its balanced closing parenthesis rather than to the first one."""
+    out, i, n = [], 0, len(body)
+    while True:
+        while i < n and body[i] == " ":
+            i += 1
+        if i >= n or body[i] != '"':
+            return None
+        end = body.find('"', i + 1)
+        if end < 0 or end == i + 1:
+            return None
+        case, i, reason = body[i + 1:end], end + 1, ""
+        while i < n and body[i] == " ":
+            i += 1
+        if i < n and body[i] == "(":
+            depth, start = 0, i
+            while i < n:
+                depth += body[i] == "("
+                depth -= body[i] == ")"
+                i += 1
+                if depth == 0:
+                    break
+            if depth != 0:
+                return None
+            reason = body[start + 1:i - 1]
+        out.append((case, reason))
+        while i < n and body[i] == " ":
+            i += 1
+        if i >= n:
+            return out
+        if body[i] != ";":
+            return None
+        i += 1
 PLACE = re.compile(r"\[place:[^\]]+\]")
 
 
@@ -88,15 +123,18 @@ def debts_in(text, ref, today, place, malformed=None):
         if o:
             body = o.group(1).strip()
             m = OWED_BODY.match(body)
-            entries = ENTRY.findall(m.group(2)) if m else []
-            if m and entries:
+            entries = parse_entries(m.group(2)) if m else None
+            if entries:
                 for case, reason in entries:
                     owed.append((m.group(1), case, reason))
             elif body != "none" and malformed is not None:
                 malformed.append(f"{ref(current)}: {line.strip()}")
         c = CLEARED.match(line)
         if c:
-            for case, _ in ENTRY.findall(c.group(4)):
+            entries = parse_entries(c.group(4))
+            if entries is None and malformed is not None:
+                malformed.append(f"{ref(current)}: {line.strip()}")
+            for case, _ in entries or []:
                 cleared.add((c.group(2), case))
     if current is not None:
         flush()
@@ -155,6 +193,16 @@ def self_test():
     debts_in("## 5. X\n> **Verified:** 2026-09-20 | §5 | x\n> **Night-owed:** Popup case (outside the window)\n",
              lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, bad_lines)
     checks.append(("a Night-owed line in neither form is reported malformed", len(bad_lines) == 1 and "D00 T02 §5" in bad_lines[0]))
+    partial = []
+    debts_in('## 6. Y\n> **Verified:** 2026-09-20 | §6 | x\n> **Night-owed:** candidate abcdef1234 | "A" (r); B (r)\n',
+             lambda n: f"D00 T02 §{n}", datetime.date(2026, 9, 24), place, partial)
+    checks.append(("a list malformed after its first entry is malformed as a whole", len(partial) == 1))
+    real = ('"Popup case" (headful: outside the quiet-hours window 02:00-06:50 local (now 19:53); '
+            'RESOLUTE_HEADFUL=visible runs it on demand); "Launcher capture, dark at 150 percent" (hardware absent)')
+    parsed = parse_entries(real)
+    checks.append(("a reason holding parentheses and a semicolon stays whole",
+                   parsed is not None and len(parsed) == 2 and parsed[0][1].endswith("runs it on demand")
+                   and parsed[1] == ("Launcher capture, dark at 150 percent", "hardware absent")))
     bad = [n for n, ok in checks if not ok]
     for n in bad:
         print(f"night-debt self-test FAIL: {n}")

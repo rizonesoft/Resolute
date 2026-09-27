@@ -158,6 +158,24 @@ function Build-At([string]$wt, [string]$log) {
     } finally { Pop-Location }
 }
 
+# How many tests ctest says it ran ("... out of N"), or -1 when it never said.
+function Read-Total([string]$log) {
+    $m = Select-String -Path $log -Pattern 'tests passed.* out of (\d+)' | Select-Object -Last 1
+    if ($m) { return [int]$m.Matches[0].Groups[1].Value }
+    return -1
+}
+
+# A half is complete when ctest finished, named as many results as it ran,
+# and exited 0 or named a failing test for its nonzero exit.
+function Check-Half([string]$half, [System.Collections.IDictionary]$r, [string]$log, [int]$exit) {
+    $total = Read-Total $log
+    if ($r.Count -eq 0 -or $total -lt 0 -or $r.Count -ne $total) {
+        $failures.Add("${half}: incomplete ($($r.Count) results of $total, ctest exit $exit)")
+    } elseif ($exit -ne 0 -and @($r.Values | Where-Object { $_ -notin 'Passed', 'Skipped' }).Count -eq 0) {
+        $failures.Add("${half}: ctest exit $exit with no failing test named")
+    }
+}
+
 # ctest's per-test results: name -> Passed, Skipped, Failed, Timeout, Exception, Not Run.
 function Read-Results([string]$log) {
     $r = [ordered]@{}
@@ -199,7 +217,7 @@ try {
             Note "default half: $(Count-Line $d (Join-Path $RunDir 'default.log'))"
             # A half with no results never ran: ctest failed before any test
             # (a bad preset, an empty inventory), which is a failure, not a pass.
-            if ($d.Count -eq 0) { $failures.Add("default: no results (ctest exit $ctestExit)") }
+            Check-Half 'default' $d (Join-Path $RunDir 'default.log') $ctestExit
             foreach ($k in $d.Keys) { if ($d[$k] -notin 'Passed', 'Skipped') { $failures.Add("default: $k ($($d[$k]))") } }
             # The lock state now, not as it was before the build.
             $unlocked = [NightProbe]::Unlocked()
@@ -211,7 +229,7 @@ try {
                 $ctestExit = $LASTEXITCODE
                 Remove-Item Env:RESOLUTE_IDLE_COLLECT -ErrorAction SilentlyContinue
                 $f = Read-Results (Join-Path $RunDir 'full.log')
-                if ($f.Count -eq 0) { $failures.Add("fenced: no results (ctest exit $ctestExit)") }
+                Check-Half 'fenced' $f (Join-Path $RunDir 'full.log') $ctestExit
                 Note "fenced half: $(Count-Line $f (Join-Path $RunDir 'full.log'))"
                 foreach ($line in Select-String -Path (Join-Path $RunDir 'full.log') -Pattern '^\d+: SKIP "' ) { Note "  $($line.Line -replace '^\d+: ', '')" }
                 foreach ($k in $f.Keys) { if ($f[$k] -notin 'Passed', 'Skipped') { $failures.Add("fenced: $k ($($f[$k]))") } }
@@ -242,6 +260,7 @@ try {
             }
             $cases = @($group.Group | ForEach-Object { $_.case } | Select-Object -Unique)
             $results = @{}
+            $reds = @{}     # how many executed attempts each case was red in
             $run = $cases   # attempt 1 runs every owed case
             foreach ($attempt in 1, 2) {
                 if ($run.Count -eq 0) { break }
@@ -258,7 +277,10 @@ try {
                 Pop-Location
                 $r = Read-Results $log
                 # Every case this attempt ran takes its result, a pass included.
-                foreach ($c in $run) { $results[$c] = if ($r.Contains($c)) { $r[$c] } else { 'Not Run' } }
+                foreach ($c in $run) {
+                    $results[$c] = if ($r.Contains($c)) { $r[$c] } else { 'Not Run' }
+                    if ($results[$c] -notin 'Passed', 'Skipped') { $reds[$c] = 1 + [int]$reds[$c] }
+                }
                 $summary = @($run | ForEach-Object { '"' + $_ + '" ' + $results[$_] }) -join '; '
                 Note "candidate $($sha.Substring(0, 8)) attempt ${attempt}: $summary"
                 # Only red retries: a pass is done, and a skip (the gate, input,
@@ -272,8 +294,12 @@ try {
                 }
                 foreach ($e in $section.Group) {
                     $state = $results[$e.case]
-                    if ($state -notin 'Passed', 'Skipped') {
+                    # Only red in two executed attempts reopens; an attempt a
+                    # lock or input prevented leaves the debt owed.
+                    if ([int]$reds[$e.case] -ge 2) {
                         $failures.Add("REOPEN $($section.Name) through audit stance: `"$($e.case)`" red twice at candidate $sha ($state)")
+                    } elseif ([int]$reds[$e.case] -eq 1) {
+                        Note "  `"$($e.case)`" red once, its retry not run: stays owed"
                     }
                 }
             }
