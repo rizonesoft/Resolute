@@ -762,9 +762,12 @@ def _option_values(arg: str) -> list[str]:
         return [arg]
     values = [part for sep in "=:" for part in [arg.partition(sep)[2]] if part]
     if not arg.startswith("--"):
-        # A value can follow any letter of a short cluster (`-rt.claude`,
-        # `-cftodo/a.tar`), so every suffix past the first letter is judged.
-        values.extend(arg[k:] for k in range(2, len(arg)))
+        # A value can start after any letter of a short cluster (`-rt.claude`,
+        # `-cftodo/a.tar`), so every suffix that starts inside the leading run
+        # of letters is judged; once the value has begun (`-rtbuild/todo`),
+        # it is judged whole, never from a later directory component.
+        run = len(arg) - len(arg[1:].lstrip("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
+        values.extend(arg[k:] for k in range(2, min(run, len(arg) - 1) + 1))
     return values
 
 
@@ -1576,6 +1579,10 @@ def _self_test() -> int:
         reason = bash(command, who)
         check(f"{who} refuses every-operand {command!r}", reason is not None
               and (rule or "into todo") in reason, str(reason))
+    for command in ("tar -cfbuild/todo/archive.tar build/x", "cp -rtbuild/todo build/x",
+                    "cp -rtbuild/.claude build/x", "tar -xfbuild/p.tar -Cbuild/todo"):
+        check(f"delegate-build allows scratch cluster {command!r}",
+              bash(command, "delegate-build") is None, str(bash(command, "delegate-build")))
     for label, name, who, key, path in (
             ("Edit .claude/settings.json", "Edit", "delegate-build", "file_path", ".claude/settings.json"),
             ("Write todo/x.md", "Write", "delegate-build", "file_path", "todo/x.md"),
