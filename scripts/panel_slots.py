@@ -756,12 +756,15 @@ def _protected_root(token: str, repo_root: str) -> str | None:
 def _option_values(arg: str) -> list[str]:
     """The path candidates one argument carries: itself, and for an option
     the value glued to it (`--target-directory=DIR`, `-Destination:DIR`,
-    `-dDIR`), so an attached value is judged like a separate operand."""
+    `-dDIR`, and any suffix of a short cluster such as `-rtDIR`), so an
+    attached value is judged like a separate operand."""
     if not arg.startswith("-"):
         return [arg]
     values = [part for sep in "=:" for part in [arg.partition(sep)[2]] if part]
-    if not arg.startswith("--") and len(arg) > 2:
-        values.append(arg[2:])
+    if not arg.startswith("--"):
+        # A value can follow any letter of a short cluster (`-rt.claude`,
+        # `-cftodo/a.tar`), so every suffix past the first letter is judged.
+        values.extend(arg[k:] for k in range(2, len(arg)))
     return values
 
 
@@ -1566,7 +1569,10 @@ def _self_test() -> int:
             ("delegate-build", "tar -xf build/backup.tar todo/README.md", "tar into todo"),
             ("delegate-build", "unzip build/backup.zip todo/README.md", "unzip into todo"),
             ("delegate-build", "install build/x todo/x -m 644", "install into todo"),
-            ("delegate-build", "cp build/x todo/x --suffix .bak", "cp into todo")]:
+            ("delegate-build", "cp build/x todo/x --suffix .bak", "cp into todo"),
+            ("delegate-build", "cp -rt.claude build/x", "cp into .claude"),
+            ("delegate-build", "tar -cftodo/archive.tar build/x", "tar into todo"),
+            ("delegate-build", "unzip -od.conclave build/p.zip", "unzip into .conclave")]:
         reason = bash(command, who)
         check(f"{who} refuses every-operand {command!r}", reason is not None
               and (rule or "into todo") in reason, str(reason))
