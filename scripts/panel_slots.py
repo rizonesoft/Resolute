@@ -576,17 +576,21 @@ GIT_DENIED = ("add", "am", "apply", "branch", "checkout", "cherry-pick", "clean"
 
 _ARG = r"""(?:"[^"]*"|'[^']*'|[^\s;&|()`"']+)"""
 _PATHISH = r"""[^\s;&|()`"']*[\\/]"""
+# Horizontal whitespace, or a backslash-newline continuation: argument scans
+# never cross a bare newline, which ends the command.
+_HS = r"(?:[ \t]|\\\r?\n)"
 # A command position: the start, or after `;`, `&`, `|`, `(`, a backtick, or a
 # newline, then optional spaces and `NAME=value` assignments. `$(` ends in `(`.
 _CMD_POS = r"""(?:^|[;&|(`\n])\s*(?:[A-Za-z_]\w*=(?:"[^"]*"|'[^']*'|[^\s;&|()`"']*)\s+)*"""
 _GIT_RE = re.compile(
     _CMD_POS + r"(?:" + _PATHISH + r")?git(?:\.exe)?"
-    r"(?:\s+(?:-[Cc]\s+" + _ARG + r"|--(?:git-dir|work-tree|namespace|config-env|exec-path)"
-    r"(?:=" + _ARG + r"|\s+" + _ARG + r")|--?[A-Za-z][\w-]*(?:=" + _ARG + r")?))*"
-    r"\s+(?P<sub>" + "|".join(GIT_DENIED) + r")(?![\w-])")
+    r"(?:" + _HS + r"+(?:-[Cc]" + _HS + r"+" + _ARG + r"|--(?:git-dir|work-tree|namespace|config-env|exec-path)"
+    r"(?:=" + _ARG + r"|" + _HS + r"+" + _ARG + r")|--?[A-Za-z][\w-]*(?:=" + _ARG + r")?))*"
+    + _HS + r"+(?P<sub>" + "|".join(GIT_DENIED) + r")(?![\w-])")
 _PANEL_RE = re.compile(
-    _CMD_POS + r"(?:(?:" + _PATHISH + r")?(?:python3?|py)(?:\.exe)?(?:\s+-[^\s;&|()`]+)*\s+)?"
-    r"""["']?[^\s;&|()`"']*panel_slots\.py["']?\s+(?P<sub>exec|delegate-probe)(?![\w-])""")
+    _CMD_POS + r"(?:(?:" + _PATHISH + r")?(?:python3?|py)(?:\.exe)?(?:" + _HS + r"+-[^\s;&|()`]+)*"
+    + _HS + r"+)?"
+    r"""["']?[^\s;&|()`"']*panel_slots\.py["']?""" + _HS + r"+(?P<sub>exec|delegate-probe)(?![\w-])")
 _CODEX_RE = re.compile(
     _CMD_POS + r"(?:" + _PATHISH + r")?codex(?:\.cmd|\.exe|\.ps1)?(?![\w.-])")
 
@@ -601,8 +605,8 @@ _CMDLET_RE = re.compile(
     _CMD_POS + r"(?:" + _PATHISH + r")?(?P<name>" + "|".join(_CMDLETS) + r")(?![\w.-])", re.IGNORECASE)
 # `sed` and `perl` mutate only with an in-place option (`-i`, `-pi`, `-i.bak`, `--in-place`).
 _INPLACE_RE = re.compile(
-    _CMD_POS + r"(?:" + _PATHISH + r")?(?P<name>sed|perl)(?:\.exe)?(?:\s+" + _ARG + r")*?"
-    r"\s+(?:-[A-Za-z]*i[^\s;&|()`]*|--in-place[^\s;&|()`]*)(?![\w-])")
+    _CMD_POS + r"(?:" + _PATHISH + r")?(?P<name>sed|perl)(?:\.exe)?(?:" + _HS + r"+" + _ARG + r")*?"
+    + _HS + r"+(?:-[A-Za-z]*i[^\s;&|()`]*|--in-place[^\s;&|()`]*)(?![\w-])")
 _ARG_RE = re.compile(_ARG)
 _HARMLESS_SINKS = ("/dev/null", "nul", "$null")
 
@@ -621,10 +625,14 @@ def _mutators(command: str) -> list[tuple[str, int]]:
     return sorted(found, key=lambda item: item[1])
 
 
+_REDIRECT_TOKEN_RE = re.compile(r"^\d*(?:>>?|<)[|&]?(?P<rest>.*)$")
+
+
 def _segment_args(command: str, start: int) -> list[str]:
     """The quote-stripped arguments of the command whose name ends at `start`,
-    up to the next unquoted separator (a `&` that belongs to `2>&1` or `&>` is
-    not one)."""
+    up to the next unquoted separator (a newline, `;`, `|`, `(`, `)`, a
+    backtick, or a `&` that does not belong to `2>&1` or `&>`). Redirection
+    tokens (`2>/dev/null`, `> out`) are dropped: `_redirect_targets` judges them."""
     quote = None
     end = start
     while end < len(command):
@@ -639,7 +647,205 @@ def _segment_args(command: str, start: int) -> list[str]:
         elif char == "&" and command[end - 1:end] != ">" and command[end + 1:end + 2] != ">":
             break
         end += 1
-    return [_unquoted(token) for token in _ARG_RE.findall(command[start:end])]
+    args = []
+    skip = False
+    for token in _ARG_RE.findall(command[start:end]):
+        if skip:
+            skip = False
+            continue
+        redirect = None if token[:1] in "\"'" else _REDIRECT_TOKEN_RE.match(token)
+        if redirect:
+            skip = not redirect.group("rest")  # `> out`: the target is the next token
+            continue
+        args.append(_unquoted(token))
+    return args
+
+
+def _target_option(args: list[str], i: int, rest: str) -> tuple[str | None, int]:
+    """The value of a short option whose letter was just read: the rest of its
+    cluster when there is one, else the next argument. Returns (value, next index)."""
+    if rest:
+        return rest, i
+    if i < len(args):
+        return args[i], i + 1
+    return None, i
+
+
+def _copy_destinations(name: str, args: list[str]) -> list[str]:
+    """The operand `cp`, `install`, or `ln` writes: the value of `-t DIR` or
+    `--target-directory=DIR`, else the last non-option operand. `install -d`
+    creates every operand, so all of them count."""
+    operands: list[str] = []
+    target = None
+    makes_dirs = False
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        i += 1
+        if arg == "--":
+            operands.extend(args[i:])
+            break
+        if arg.startswith("--"):
+            flag, eq, value = arg.partition("=")
+            if flag == "--target-directory":
+                target, i = (value, i) if eq else _target_option(args, i, "")
+            elif flag == "--directory":
+                makes_dirs = True
+        elif arg.startswith("-") and len(arg) > 1:
+            cluster = arg[1:]
+            pos = cluster.find("t")
+            if pos != -1:
+                target, i = _target_option(args, i, cluster[pos + 1:])
+            makes_dirs = makes_dirs or "d" in cluster[:pos if pos != -1 else len(cluster)]
+        else:
+            operands.append(arg)
+    if target is not None:
+        return [target]
+    if name == "install" and makes_dirs:
+        return operands
+    return operands[-1:]
+
+
+# Copy-Item parameters that take a value (matched by an unambiguous prefix of at
+# least three letters, case-insensitively, as PowerShell does).
+_PS_VALUE_PARAMS = ("path", "literalpath", "destination", "filter", "include", "exclude",
+                    "credential", "tosession", "fromsession")
+
+
+def _copy_item_destinations(args: list[str]) -> list[str]:
+    """The operand `Copy-Item` writes: `-Destination X`, else the second
+    positional operand (the first when `-Path` was named)."""
+    positional: list[str] = []
+    destination = None
+    path_named = False
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        i += 1
+        if len(arg) > 1 and arg[0] == "-" and arg[1].isalpha():
+            name, colon, value = arg[1:].partition(":")
+            name = name.lower()
+            full = next((p for p in _PS_VALUE_PARAMS if len(name) >= 3 and p.startswith(name)), None)
+            if full is None:
+                continue  # a switch, or a parameter that names no path
+            if not value and i < len(args):
+                value = args[i]
+                i += 1
+            if full == "destination":
+                destination = value
+            elif full in ("path", "literalpath"):
+                path_named = True
+        else:
+            positional.append(arg)
+    if destination is not None:
+        return [destination]
+    index = 0 if path_named else 1
+    return positional[index:index + 1]
+
+
+_TAR_LONG_MODES = {"--create": "c", "--extract": "x", "--get": "x", "--append": "r",
+                   "--update": "u", "--delete": "delete", "--concatenate": "A",
+                   "--catenate": "A"}
+# Short options that take a value, so the rest of their cluster is not a mode.
+_TAR_VALUE_LETTERS = "fCTXIbLNVgKH"
+
+
+def _tar_scan(args: list[str]) -> tuple[set[str], str | None, str | None]:
+    """(modes, archive file, directory) of a `tar` command. A mode is `c`, `x`,
+    `r`, `u`, `A`, or `delete`; `-t` and `--list` add none, so an empty set is
+    list mode. The first argument may be a bundled cluster with no dash (`xzf`)."""
+    modes: set[str] = set()
+    archive = directory = None
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        first = i == 0
+        i += 1
+        if arg.startswith("--"):
+            flag, eq, value = arg.partition("=")
+            if flag in _TAR_LONG_MODES:
+                modes.add(_TAR_LONG_MODES[flag])
+            elif flag in ("--file", "--directory"):
+                if not eq:
+                    value, i = _target_option(args, i, "")
+                if flag == "--file":
+                    archive = value
+                else:
+                    directory = value
+            continue
+        if not first and not (arg.startswith("-") and len(arg) > 1):
+            continue
+        cluster = arg[1:] if arg.startswith("-") else arg
+        for pos, letter in enumerate(cluster):
+            if letter in "cxruA":
+                modes.add(letter)
+            elif letter in _TAR_VALUE_LETTERS:
+                value, i = _target_option(args, i, cluster[pos + 1:])
+                if letter == "f":
+                    archive = value
+                elif letter == "C":
+                    directory = value
+                break
+    return modes, archive, directory
+
+
+def _tar_targets(args: list[str]) -> list[str]:
+    """What `tar` writes: `-C DIR` when it extracts, and the archive file
+    when it creates, appends to, updates, or deletes from one."""
+    modes, archive, directory = _tar_scan(args)
+    targets = []
+    if "x" in modes and directory:
+        targets.append(directory)
+    if modes & {"c", "r", "u", "A", "delete"} and archive:
+        targets.append(archive)
+    return targets
+
+
+def _unzip_scan(args: list[str]) -> tuple[bool, str | None]:
+    """(read-only, `-d` directory) of an `unzip` command. `-l`, `-v`, `-t`,
+    `-z`, and `-Z` list, test, or print without extracting."""
+    read_only = False
+    directory = None
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        i += 1
+        if arg.startswith("--") or not arg.startswith("-") or len(arg) == 1:
+            continue
+        cluster = arg[1:]
+        for pos, letter in enumerate(cluster):
+            if letter in "lvtzZ":
+                read_only = True
+            elif letter in "dP":
+                value, i = _target_option(args, i, cluster[pos + 1:])
+                if letter == "d":
+                    directory = value
+                break
+    return read_only, directory
+
+
+def _archive_mutates(name: str, args: list[str]) -> bool:
+    """False for list or test mode (`tar -t`, `unzip -l`), which only reads."""
+    if name == "tar":
+        return bool(_tar_scan(args)[0])
+    return not _unzip_scan(args)[0]
+
+
+def _write_operands(name: str, args: list[str]) -> list[str]:
+    """The operands of a mutator that it writes. A copy writes its destination
+    only, so a protected source is fine; a move modifies both ends, and every
+    other mutator is judged by all of its operands."""
+    key = name.lower()
+    if key in ("cp", "install", "ln"):
+        return _copy_destinations(key, args)
+    if key == "copy-item":
+        return _copy_item_destinations(args)
+    if key == "tar":
+        return _tar_targets(args)
+    if key == "unzip":
+        directory = _unzip_scan(args)[1]
+        return [directory] if directory else []
+    return args
 
 
 def _redirect_targets(command: str) -> list[str]:
@@ -708,9 +914,12 @@ def _mutation_rule(command: str, read_only: bool, repo_root: str) -> str | None:
     that is not a harmless sink); every other delegate may not mutate a
     protected root."""
     for name, end in _mutators(command):
+        args = _segment_args(command, end)
+        if name in ("tar", "unzip") and not _archive_mutates(name, args):
+            continue
         if read_only:
             return f"read-only: {name}"
-        for token in _segment_args(command, end):
+        for token in _write_operands(name, args):
             root = _protected_root(token, repo_root)
             if root is not None:
                 return f"{name} into {root}"
@@ -751,7 +960,10 @@ def pre_tool_decision(payload: dict, repo_root: str) -> str | None:
     may run no mutator (`rm`, `cp`, `tee`, `sed -i`, `Remove-Item`, and the
     rest of `_MUTATORS` and `_CMDLETS`) and no output redirection except the
     harmless sinks (`2>&1`, `>&2`, `/dev/null`, `nul`, `$null`), and any other
-    delegate may not aim a mutator or a redirection at a protected root. This is
+    delegate may not aim a mutator or a redirection at a protected root. A
+    command ends at a newline or separator; `cp`, `install`, `ln`, and
+    `Copy-Item` are judged by their destination only (a move by both ends); and
+    `tar -t` and `unzip -l` (list or test) are not mutations. This is
     a guard against accidents, not a sandbox: it reads the command text with a
     regex, so a determined `bash -c`, a quoted separator, a PowerShell alias
     such as `del`, an interpreter that writes the file itself, or a script that
@@ -1400,7 +1612,41 @@ def _self_test() -> int:
             ("delegate-build", 'mv a "todo/b c"', "mv into todo"),
             ("delegate-build", "touch x/../todo", "touch into todo"),
             ("delegate-build", f'echo x | tee "{abs_git}"', "tee into .git"),
-            ("delegate-build", f"echo x > {os.path.join(root, 'todo', 'a')}", "redirection into todo")):
+            ("delegate-build", f"echo x > {os.path.join(root, 'todo', 'a')}", "redirection into todo"),
+            # a command ends at its newline, so a later line is judged on its own
+            ("delegate-check", "grep -n x a.py\nsed -i s/a/b/ c.txt", "read-only: sed -i"),
+            ("delegate-build", "ls\nrm todo/x", "rm into todo"),
+            ("delegate-build", "sed -n p a.py\nsed -i s/a/b/ todo/c.md", "sed -i into todo"),
+            # a copy writes its destination; a move touches both ends
+            ("delegate-build", "cp -t todo build/x", "cp into todo"),
+            ("delegate-build", "cp build/x --target-directory=.claude", "cp into .claude"),
+            ("delegate-build", "cp build/x --target-directory .claude", "cp into .claude"),
+            ("delegate-build", "cp build/a todo/b", "cp into todo"),
+            ("delegate-build", "cp -r build/a todo/b 2>/dev/null", "cp into todo"),
+            ("delegate-build", "install -d build/x todo/y", "install into todo"),
+            ("delegate-build", "ln -s build/a todo/b", "ln into todo"),
+            ("delegate-build", "Copy-Item build/a.md -Destination todo/a.md", "Copy-Item into todo"),
+            ("delegate-build", "copy-item build/a.md -destination:todo/a.md", "copy-item into todo"),
+            ("delegate-build", "Copy-Item -Path build/a.md -Force todo/a.md", "Copy-Item into todo"),
+            ("delegate-build", "Copy-Item build/a.md todo/a.md", "Copy-Item into todo"),
+            ("delegate-build", "mv todo/a.md build/a.md", "mv into todo"),
+            ("delegate-build", "mv build/a.md todo/a.md", "mv into todo"),
+            ("delegate-build", "Move-Item todo/a.md build/a.md", "Move-Item into todo"),
+            ("delegate-build", "Rename-Item todo/a.md b.md", "Rename-Item into todo"),
+            # archives: only a create, extract, append, update, or delete mutates
+            ("delegate-check", "tar -xf build/p.tar", "read-only: tar"),
+            ("delegate-check", "tar xzf build/p.tgz", "read-only: tar"),
+            ("delegate-check", "tar -czf build/p.tgz src", "read-only: tar"),
+            ("delegate-check", "tar --extract --file=build/p.tar", "read-only: tar"),
+            ("delegate-check", "tar --delete -f build/p.tar x", "read-only: tar"),
+            ("delegate-check", "unzip build/p.zip", "read-only: unzip"),
+            ("delegate-check", "unzip -o build/p.zip", "read-only: unzip"),
+            ("delegate-build", "tar -xf build/p.tar -C todo", "tar into todo"),
+            ("delegate-build", "tar xzf build/p.tgz -C .claude", "tar into .claude"),
+            ("delegate-build", "tar -xzC todo -f build/p.tgz", "tar into todo"),
+            ("delegate-build", "tar -cf todo/p.tar build/x", "tar into todo"),
+            ("delegate-build", "unzip build/p.zip -d todo", "unzip into todo"),
+            ("delegate-build", "unzip -o build/p.zip -dtodo/out", "unzip into todo")):
         reason = bash(command, who) or ""
         check(f"{who} denies {command!r}", f"`{rule}`" in reason and "protected roots" in reason, reason)
     for who, command in (
@@ -1419,6 +1665,35 @@ def _self_test() -> int:
             ("delegate-build", f"touch {os.path.join(tmpd, 'scratch.txt')}"),
             ("delegate-build", "rm a; ls todo"),
             ("delegate-build", "cat todo/x.md > build/copy.md"),
+            ("delegate-check", "sed -n '1,20p' scripts/panel_slots.py\ngrep -i delegate AGENTS.md"),
+            ("delegate-check", "sed -n p a.py\r\ngrep -i x b.txt"),
+            ("delegate-research", "perl -ne print a.pl\ngrep -pi x b.txt"),
+            ("delegate-check", "git log -3\ngit status"),
+            ("delegate-build", "cp todo/README.md build/plan-fixture.md"),
+            ("delegate-build", "cp -r todo/a .claude/b build/"),
+            ("delegate-build", "cp todo/a build/b 2>/dev/null"),
+            ("delegate-build", "cp -t build todo/a .claude/b"),
+            ("delegate-build", "cp --target-directory=build todo/a"),
+            ("delegate-build", "install -m 755 todo/a build/b"),
+            ("delegate-build", "ln -s todo/a build/link"),
+            ("delegate-build", "Copy-Item todo/a.md -Destination build/a.md"),
+            ("delegate-build", "Copy-Item todo/a.md build/a.md"),
+            ("delegate-build", "Copy-Item -Path todo/a.md -Recurse -Destination:build/a.md"),
+            ("delegate-build", "Copy-Item todo/a.md"),
+            ("delegate-build", "tar -czf build/p.tgz todo/"),
+            ("delegate-build", "tar -xf build/p.tar"),
+            ("delegate-build", "tar -xf build/p.tar -C build/out"),
+            ("delegate-check", "tar -tf build/package.tar"),
+            ("delegate-check", "tar tzf build/p.tgz"),
+            ("delegate-check", "tar -tvf build/p.tar -C todo"),
+            ("delegate-check", "tar --list --file=build/p.tar"),
+            ("delegate-research", "tar -tf build/p.tar | head"),
+            ("delegate-check", "unzip -l build/package.zip"),
+            ("delegate-check", "unzip -Z1 build/package.zip"),
+            ("delegate-check", "unzip -t build/package.zip"),
+            ("delegate-check", "unzip -qv build/package.zip"),
+            ("delegate-build", "unzip build/p.zip -d build/out"),
+            ("delegate-build", "unzip build/p.zip"),
             ("general-purpose", "rm todo/x"),
             (None, "echo x > todo/x")):
         check(f"{who} allows {command!r}", bash(command, who) is None, str(bash(command, who)))
