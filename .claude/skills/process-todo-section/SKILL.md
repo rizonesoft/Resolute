@@ -69,7 +69,11 @@ Use the `skill arg` line it prints as the canonical form for the rest of the run
 
 ## The session does every step
 
-One session validates, builds, gates, commits, obtains an independent review, and hands to stamping. It dispatches nobody to implement, gate, or keep records, and the one reviewer it invokes is external and advisory. Output discipline is load-bearing: bound every command (build output filtered to the touched target, `tail`/`head` on logs, field extraction on `.ini` readbacks), because an unbounded dump lands in the one context that must carry it for the rest of the run.
+One session validates, builds, gates, commits, obtains an independent review, and hands to stamping. That session is the lead, and it stays accountable for every step.
+
+**Corrected 2026-10-01** (operator decision, D00 T04 §43): this paragraph said the session "dispatches nobody to implement, gate, or keep records". The lead now hands bounded work to the delegates in `.claude/agents/` under the rule in `AGENTS.md`: `delegate-research` for fact-finding and claim checks in steps 1-2, `delegate-build` for checklist items whose design the lead has already decided in step 3, and `delegate-check` for a routine pass over the diff before step 6. Independent work runs in parallel with disjoint write sets. The lead keeps the plan validation verdicts, every design, security, data-integrity, frozen-behavior, elevation, and restore decision, the integration, the gates of record, the commit, and the review hand-off, and reviews each delegate diff before it lands. Every delegation is recorded: the commit body carries a `Delegated:` line per subagent naming its type, its task in a few words, and the model and effort its ledger line records (`python scripts/panel_slots.py ledger`), or `Delegated: none`.
+
+Output discipline is load-bearing: bound every command (build output filtered to the touched target, `tail`/`head` on logs, field extraction on `.ini` readbacks), because an unbounded dump lands in the one context that must carry it for the rest of the run.
 
 ## Workflow
 
@@ -197,6 +201,7 @@ Commit as one section commit with the evidence in the body:
 
 <checkpoint output, quoted>
 <plan corrections, if any>
+Delegated: <agent-type> -- <task> -- <model> effort <effort>   (one per subagent, or `Delegated: none`)
 ```
 
 Quote every suite count in the body from the commit being created: re-run the suites at this commit and quote those figures, never figures measured mid-item. Live-green quotes ride the same commit-time discipline: two non-simultaneous measurements never jointly satisfy one checkpoint.

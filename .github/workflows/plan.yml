@@ -5,6 +5,9 @@ on:
     branches: [master]
     paths:
       - 'scripts/**'
+      - '.conclave/**'
+      - '.claude/**'
+      - 'AGENTS.md'
       - 'todo/**'
       - 'tools/githooks/**'
       - '.gitattributes'
@@ -29,6 +32,11 @@ jobs:
       - name: Validate the TODO tree
         shell: bash
         run: python scripts/todo-graph.py validate
+      - name: Validate the review slots and the delegate roster
+        shell: bash
+        run: |
+          python scripts/panel_slots.py --self-test
+          python scripts/panel_slots.py validate
       - name: Check plan projection is current
         shell: bash
         run: |

@@ -49,6 +49,8 @@ Then fix the **candidate**: the commit (or commit range) under review, recorded 
 
 Work the three questions across the diff and its blast radius. Fix what you find, then re-ask them: a fix changes the answers. Self-review runs before the lenses, and it costs no round.
 
+A `delegate-check` pass (D00 T04 §43) may sweep the diff first, so the lead's self-review starts from its findings. Its output is self-review input only: the lead verifies each finding before acting on it, it never supplies a lens verdict or fills a panel slot, and anything it flags `ESCALATE` is judged by the lead.
+
 Look specifically for the failure modes this codebase is prone to:
 
 - A trusted value decided in the UI with nothing verifying it.

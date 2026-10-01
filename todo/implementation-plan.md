@@ -134,7 +134,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §40` | Campaign guard fence completeness                 |  12   |
 | [x] | `D00 T04 §41` | CI read-back evidence and replay hardening        |  10   |
 | [ ] | `D00 T04 §42` | Campaign guard recovery completeness              |  15   |
-| [ ] | `D00 T04 §43` | Sonnet delegates under one lead                   |   8   |
+| [ ] | `D00 T04 §43` | Sonnet delegates under one lead                   |   9   |
 | [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   5   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
 | [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |

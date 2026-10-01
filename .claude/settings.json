@@ -10,6 +10,39 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"import os,runpy,sys; p=os.path.join(os.environ['CLAUDE_PROJECT_DIR'],'scripts','panel_slots.py'); sys.argv=[p,'hook','pre-agent']; runpy.run_path(p,run_name='__main__')\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"import os,runpy,sys; p=os.path.join(os.environ['CLAUDE_PROJECT_DIR'],'scripts','panel_slots.py'); sys.argv=[p,'hook','pre-tool']; runpy.run_path(p,run_name='__main__')\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"import os,runpy,sys; p=os.path.join(os.environ['CLAUDE_PROJECT_DIR'],'scripts','panel_slots.py'); sys.argv=[p,'hook','subagent-stop']; runpy.run_path(p,run_name='__main__')\"",
+            "timeout": 30
+          }
+        ]
+      }
     ]
   }
 }

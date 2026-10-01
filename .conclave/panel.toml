@@ -51,6 +51,12 @@ retired = "2026-09-23"
 family = "claude"
 probed = "2026-09-23"
 
+# The delegate model (D00 T04 §43): what the `sonnet` alias resolved to
+# at the probe date, by `panel_slots.py delegate-probe`.
+[model."claude-sonnet-5-5"]
+family = "claude"
+probed = "2026-10-01"
+
 [model."gpt-5.6-sol"]
 family = "codex"
 retired = "2026-09-23"
@@ -101,3 +107,16 @@ timeout = 900
 model = "gpt-6-astra"
 effort = "high"
 timeout = 600
+
+# Operator decision 2026-10-01 (D00 T04 §43): the writer is the lead and
+# hands bounded research, implementation, tests, documentation, and
+# routine review to Claude Code subagents defined in `.claude/agents/`.
+# Every definition declares this alias and effort in its frontmatter
+# (`panel_slots.py validate` refuses one that does not), and `model` is
+# what the alias resolved to at the probe: `delegate-probe` refuses when
+# the alias has moved, so a newer Sonnet is a re-pin, never a drift.
+# Delegates are the writer's family: they never fill a review slot.
+[delegate]
+alias = "sonnet"
+model = "claude-sonnet-5-5"
+effort = "high"

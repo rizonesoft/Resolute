@@ -35,7 +35,40 @@ Governance, not convenience:
     python scripts/panel_slots.py family <model>
     python scripts/panel_slots.py models <codex|claude|grok> [--all]
     python scripts/panel_slots.py exec <slot> [extra...] < prompt > out 2> err
+    python scripts/panel_slots.py delegate-probe
+    python scripts/panel_slots.py hook pre-agent|subagent-stop|pre-tool < payload.json
+    python scripts/panel_slots.py ledger [N]
     python scripts/panel_slots.py --self-test
+
+The delegate pin (operator decision 2026-10-01, D00 T04 §43): `[delegate]`
+names the alias, the model it resolved to at the probe, and the effort
+that Claude Code subagents in `.claude/agents/delegate-*.md` run on. The
+table requires it, the model must be registered, live, and the writer's
+family (delegates are subagents of the writer harness, never a review
+slot), and `validate` refuses any agent definition whose `model` or
+`effort` frontmatter differs. `delegate-probe` refuses when the alias
+resolves to another model, so a newer Sonnet is a re-pin, never a drift.
+The `hook` events fail open (a bad payload prints one stderr line and
+allows): `pre-agent` denies an `Agent` call that would run unpinned, and
+`subagent-stop` appends what each finished subagent ran on to
+`build/agent-delegations.jsonl`, which `ledger` prints. `pre-agent` allows
+a per-call `model` only as `opus`, `fable`, or the writer's own model id, so
+an older id such as `claude-opus-3` is denied. Both agent-name hooks read
+`roster_names()`, the `delegate-*.md` stems under `.claude/agents/`, so one
+malformed agent file never turns the guard off (validity is `validate`'s
+job). `subagent-stop` records nothing for an empty `agent_type` (a
+harness-internal side agent, not a delegation), and when the pin is
+`mismatch` or `unread` it also prints a `SubagentStop` `additionalContext`
+JSON object on stdout so the lead sees it; `match` stays silent.
+
+`pre-tool` (PreToolUse on Bash, Edit, Write, NotebookEdit) constrains only
+an `agent_type` starting with `delegate-`; the lead and other agents never
+are. `delegate-research` and `delegate-check` are read-only. Every delegate
+is denied mutating git (`add`, `commit`, `push`, `reset`, `stash`,
+`checkout`, and the rest of `GIT_DENIED`), `panel_slots.py exec`,
+`panel_slots.py delegate-probe`, `codex`, and any write under `.git`,
+`.claude`, `.conclave`, `todo`, or `resolute_au3`. Read-only git passes. It
+is a guard against accidents, not a sandbox.
 
 `exec` runs the slot's producer with the prompt on stdin, enforces the
 slot timeout, and exits 124 on expiry (the `timeout` convention the
@@ -47,6 +80,9 @@ reads no prompt.
 
 from __future__ import annotations
 
+import datetime
+import io
+import json
 import os
 import re
 import shutil
@@ -69,6 +105,12 @@ PANEL_SLOTS = (
     "independent",
     "arch-primary",
 )
+# The aliases Claude Code documents for `--model`; the delegate names one.
+DELEGATE_ALIASES = ("sonnet", "opus", "haiku", "fable")
+DELEGATE_EFFORTS = ("high", "xhigh")
+DELEGATE_PREFIX = "delegate-"
+PROBE_PROMPT = "Reply with exactly: PROBE-OK"
+PROBE_TIMEOUT = 180
 TIMEOUT_EXIT = 124
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -80,6 +122,19 @@ class PanelSlotsError(ValueError):
 def toml_path() -> str:
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.normpath(os.path.join(here, "..", ".conclave", "panel.toml"))
+
+
+def agents_dir() -> str:
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.normpath(os.path.join(here, "..", ".claude", "agents"))
+
+
+def ledger_path() -> str:
+    override = os.environ.get("PANEL_DELEGATION_LEDGER")
+    if override:
+        return override
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.normpath(os.path.join(here, "..", "build", "agent-delegations.jsonl"))
 
 
 def _read(path: str | None) -> dict:
@@ -188,7 +243,37 @@ def load(path: str | None = None) -> dict:
         slots[name] = {"model": model, "effort": effort, "timeout": timeout, "family": family}
     if slots["independent"]["family"] != "codex":
         raise PanelSlotsError("panel slot 'independent' runs `codex review` and needs a codex model")
-    return {"writer": {"model": wmodel, "family": wfamily}, "models": models, "slots": slots}
+    delegate = _delegate(doc, models, wfamily)
+    return {"writer": {"model": wmodel, "family": wfamily}, "models": models, "slots": slots,
+            "delegate": delegate}
+
+
+def _delegate(doc: dict, models: dict[str, dict], wfamily: str) -> dict:
+    entry = doc.get("delegate")
+    if not isinstance(entry, dict):
+        raise PanelSlotsError("panel slots file carries no [delegate] table")
+    for key in ("alias", "model", "effort"):
+        if not isinstance(entry.get(key), str):
+            raise PanelSlotsError(f"delegate {key} {entry.get(key)!r} is not a string")
+    alias = entry.get("alias")
+    if alias not in DELEGATE_ALIASES:
+        raise PanelSlotsError(
+            f"delegate alias {alias!r} is outside {', '.join(DELEGATE_ALIASES)}")
+    model = entry.get("model")
+    if model not in models:
+        raise PanelSlotsError(f"delegate model {model!r} is not registered")
+    if models[model]["retired"]:
+        raise PanelSlotsError(f"delegate model {model!r} retired {models[model]['retired']}")
+    family = models[model]["family"]
+    if family != wfamily:
+        raise PanelSlotsError(
+            f"delegate model {model!r} runs family {family!r}, not the writer's {wfamily!r}: "
+            f"delegates are subagents of the writer harness")
+    effort = entry.get("effort")
+    if effort not in DELEGATE_EFFORTS:
+        raise PanelSlotsError(
+            f"delegate effort {effort!r} is outside {', '.join(DELEGATE_EFFORTS)}")
+    return {"alias": alias, "model": model, "effort": effort, "family": family}
 
 
 def load_slots(path: str | None = None) -> dict[str, dict]:
@@ -279,6 +364,383 @@ def exec_slot(slot: str, extra: list[str], stdin, stdout, stderr, table: dict | 
         return TIMEOUT_EXIT
 
 
+# --- delegates ---------------------------------------------------------------
+
+
+def agent_frontmatter(path: str) -> dict[str, str]:
+    """Scalar `key: value` frontmatter of an agent definition. Raises
+    PanelSlotsError naming the file when it has none, never closes, or
+    carries a line that is not a scalar."""
+    try:
+        with open(path, encoding="utf-8-sig") as fh:
+            lines = fh.read().splitlines()
+    except OSError as exc:
+        raise PanelSlotsError(f"agent file {path} is unreadable: {exc}")
+    if not lines or lines[0].strip() != "---":
+        raise PanelSlotsError(f"agent file {path} has no frontmatter (it must open with ---)")
+    fields: dict[str, str] = {}
+    for number, line in enumerate(lines[1:], start=2):
+        if line.strip() == "---":
+            return fields
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        key, sep, value = line.partition(":")
+        if not sep or not key.strip() or key != key.strip():
+            raise PanelSlotsError(f"agent file {path} line {number} is not a `key: value` scalar")
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        fields[key.strip()] = value
+    raise PanelSlotsError(f"agent file {path} frontmatter has no closing ---")
+
+
+def check_agents(table: dict, directory: str | None = None) -> list[str]:
+    """Refuse an empty roster or any agent definition that contradicts the
+    delegate pin; return the agent names, sorted."""
+    directory = directory or agents_dir()
+    delegate = table["delegate"]
+    try:
+        files = sorted(name for name in os.listdir(directory) if name.endswith(".md"))
+    except OSError:
+        raise PanelSlotsError(f"agent roster directory {directory} does not exist")
+    if not files:
+        raise PanelSlotsError(f"agent roster directory {directory} holds no *.md agent files")
+    names: list[str] = []
+    for filename in files:
+        path = os.path.join(directory, filename)
+        fields = agent_frontmatter(path)
+        stem = filename[:-len(".md")]
+        name = fields.get("name")
+        if name != stem:
+            raise PanelSlotsError(f"agent file {path} field name {name!r} is not the file stem {stem!r}")
+        if not name.startswith(DELEGATE_PREFIX):
+            raise PanelSlotsError(
+                f"agent file {path} field name {name!r} lacks the {DELEGATE_PREFIX!r} prefix")
+        for key, want in (("model", delegate["alias"]), ("effort", delegate["effort"])):
+            got = fields.get(key)
+            if got is None:
+                raise PanelSlotsError(f"agent file {path} omits field {key} (the pin is {want!r})")
+            if got != want:
+                raise PanelSlotsError(f"agent file {path} field {key} {got!r} is not the pin {want!r}")
+        names.append(name)
+    return names
+
+
+def roster_names(directory: str | None = None) -> list[str]:
+    """Sorted stems of the `delegate-*.md` files in the roster directory, []
+    when it is absent. It reads names only, so one malformed agent file never
+    turns a hook off; whether the files are valid is `check_agents`'s job."""
+    directory = directory or agents_dir()
+    try:
+        files = os.listdir(directory)
+    except OSError:
+        return []
+    return sorted(name[:-len(".md")] for name in files
+                  if name.endswith(".md") and name.startswith(DELEGATE_PREFIX))
+
+
+def probe_verdict(json_text: str, table: dict) -> str:
+    """The model a `delegate-probe` run resolved to, when it is the pin.
+    Raises PanelSlotsError naming why the run does not prove the pin."""
+    delegate = table["delegate"]
+    try:
+        obj = json.loads(json_text)
+    except (ValueError, TypeError):
+        raise PanelSlotsError("delegate-probe output is not JSON")
+    if not isinstance(obj, dict):
+        raise PanelSlotsError("delegate-probe output is not a JSON object")
+    if obj.get("is_error"):
+        raise PanelSlotsError("delegate-probe run reported is_error")
+    result = obj.get("result")
+    if not isinstance(result, str) or "PROBE-OK" not in result:
+        raise PanelSlotsError("delegate-probe reply lacks PROBE-OK")
+    usage = obj.get("modelUsage")
+    if not isinstance(usage, dict) or not usage:
+        raise PanelSlotsError("delegate-probe output carries no modelUsage")
+    if set(usage) != {delegate["model"]}:
+        raise PanelSlotsError(
+            f"alias {delegate['alias']!r} resolved to {', '.join(sorted(map(str, usage)))}, but the "
+            f"pin is {delegate['model']}: the alias has moved; re-pin [delegate] model in "
+            f".conclave/panel.toml after review, with a fresh probe date")
+    return delegate["model"]
+
+
+def delegate_probe(table: dict, stdout, stderr) -> int:
+    """Run the live probe; 0 when the alias resolves to the pin, 1 on any
+    refusal, 124 on timeout."""
+    delegate = table["delegate"]
+    argv = [_exe("claude"), "-p", "--model", delegate["alias"], "--effort", delegate["effort"],
+            "--output-format", "json", PROBE_PROMPT]
+    proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    try:
+        out, err = proc.communicate(timeout=PROBE_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        _kill_tree(proc)
+        proc.communicate()
+        print(f"delegate-probe: timed out after {PROBE_TIMEOUT}s", file=stderr, flush=True)
+        return TIMEOUT_EXIT
+    try:
+        model = probe_verdict(out.decode("utf-8", errors="replace"), table)
+    except PanelSlotsError as exc:
+        note = f" (claude exited {proc.returncode})" if proc.returncode else ""
+        print(f"delegate-probe: {exc}{note}", file=stderr, flush=True)
+        return 1
+    print(f"delegate-probe: alias {delegate['alias']} effort {delegate['effort']} resolved "
+          f"{model} (pinned {delegate['model']}): ok", file=stdout, flush=True)
+    return 0
+
+
+def _stronger_than_delegate(model: str, table: dict) -> bool:
+    """Only the aliases Claude Code resolves to the newest `opus` or `fable`,
+    or the writer's own model id, are stronger than the delegate. A dated or
+    older id (`claude-opus-3`) is not, so it is never waved through."""
+    return str(model).lower() in ("opus", "fable") or str(model) == table["writer"]["model"]
+
+
+def pre_agent_decision(tool_input: dict, table: dict, agent_names) -> str | None:
+    """A deny reason for an `Agent` call that would run unpinned, or None."""
+    delegate = table["delegate"]
+    kind = tool_input.get("subagent_type") or ""
+    model = tool_input.get("model") or ""
+    roster = ", ".join(sorted(agent_names))
+    pin = f"{delegate['alias']} at effort {delegate['effort']}"
+    tail = (f"Use a delegate agent ({roster}); consequential work stays with the lead or the "
+            f"GPT panel.")
+    if kind == "fork":
+        return None
+    if kind in agent_names:
+        if model:
+            return (f"{kind} runs the pin in its definition ({pin}); omit `model` "
+                    f"(got {model!r}).")
+        return None
+    if model and _stronger_than_delegate(model, table):
+        return None
+    if not model:
+        return (f"This call (subagent_type {kind or 'unset'!r}) would run on an inherited or "
+                f"built-in model at an unpinned effort. {tail}")
+    return (f"A per-call model {model!r} runs at that model's default effort, not the pinned "
+            f"{delegate['effort']}. {tail}")
+
+
+def ledger_entry(payload: dict, table: dict, agent_names, transcript_lines, now_iso: str) -> dict:
+    """One delegation-ledger record. Model and effort come from the last
+    assistant line of the transcript, whose format is internal to Claude
+    Code, so anything unreadable is recorded as `unread`, never guessed."""
+    model = effort = "unread"
+    for line in reversed(list(transcript_lines)):
+        try:
+            obj = json.loads(line)
+        except (ValueError, TypeError):
+            continue
+        if not isinstance(obj, dict) or obj.get("type") != "assistant":
+            continue
+        message = obj.get("message")
+        got_model = message.get("model") if isinstance(message, dict) else None
+        got_effort = obj.get("effort")
+        model = got_model if isinstance(got_model, str) and got_model else "unread"
+        effort = got_effort if isinstance(got_effort, str) and got_effort else "unread"
+        break
+    agent_type = payload.get("agent_type")
+    delegate = table["delegate"]
+    if agent_type not in agent_names:
+        pin = "n/a"
+    elif "unread" in (model, effort):
+        pin = "unread"
+    elif model == delegate["model"] and effort == delegate["effort"]:
+        pin = "match"
+    else:
+        pin = "mismatch"
+    return {"at": now_iso, "session": payload.get("session_id"), "agent_type": agent_type,
+            "agent_id": payload.get("agent_id"), "model": model, "effort": effort,
+            "payload_effort": payload.get("effort"), "pin": pin}
+
+
+# What a delegate may never touch. The lead owns git state, the review panel,
+# and these roots (`.git`, the agent and panel configuration, the plan, and the
+# frozen AutoIt specification).
+PROTECTED_ROOTS = (".git", ".claude", ".conclave", "todo", "resolute_au3")
+READ_ONLY_DELEGATES = ("delegate-research", "delegate-check")
+WRITE_TOOLS = ("Edit", "Write", "NotebookEdit")
+GUARDED_TOOLS = ("Bash",) + WRITE_TOOLS
+GIT_DENIED = ("add", "am", "apply", "branch", "checkout", "cherry-pick", "clean", "commit",
+              "config", "gc", "merge", "mv", "notes", "pull", "push", "rebase", "reset",
+              "restore", "revert", "rm", "stash", "submodule", "switch", "tag", "update-index",
+              "update-ref", "worktree")
+
+_ARG = r"""(?:"[^"]*"|'[^']*'|[^\s;&|()`"']+)"""
+_PATHISH = r"""[^\s;&|()`"']*[\\/]"""
+# A command position: the start, or after `;`, `&`, `|`, `(`, a backtick, or a
+# newline, then optional spaces and `NAME=value` assignments. `$(` ends in `(`.
+_CMD_POS = r"""(?:^|[;&|(`\n])\s*(?:[A-Za-z_]\w*=(?:"[^"]*"|'[^']*'|[^\s;&|()`"']*)\s+)*"""
+_GIT_RE = re.compile(
+    _CMD_POS + r"(?:" + _PATHISH + r")?git(?:\.exe)?"
+    r"(?:\s+(?:-[Cc]\s+" + _ARG + r"|--(?:git-dir|work-tree|namespace|config-env|exec-path)"
+    r"(?:=" + _ARG + r"|\s+" + _ARG + r")|--?[A-Za-z][\w-]*(?:=" + _ARG + r")?))*"
+    r"\s+(?P<sub>" + "|".join(GIT_DENIED) + r")(?![\w-])")
+_PANEL_RE = re.compile(
+    _CMD_POS + r"(?:(?:" + _PATHISH + r")?(?:python3?|py)(?:\.exe)?(?:\s+-[^\s;&|()`]+)*\s+)?"
+    r"""["']?[^\s;&|()`"']*panel_slots\.py["']?\s+(?P<sub>exec|delegate-probe)(?![\w-])""")
+_CODEX_RE = re.compile(
+    _CMD_POS + r"(?:" + _PATHISH + r")?codex(?:\.cmd|\.exe|\.ps1)?(?![\w.-])")
+
+
+def _bash_rule(command: str) -> str | None:
+    """The name of the rule a delegate's Bash command breaks, or None."""
+    found = _GIT_RE.search(command)
+    if found:
+        return f"git {found.group('sub')}"
+    found = _PANEL_RE.search(command)
+    if found:
+        return f"panel_slots.py {found.group('sub')}"
+    if _CODEX_RE.search(command):
+        return "codex"
+    return None
+
+
+def _resolved(path: str) -> str:
+    return os.path.normcase(os.path.realpath(os.path.normpath(path)))
+
+
+def pre_tool_decision(payload: dict, repo_root: str) -> str | None:
+    """A deny reason for a delegate's Bash, Edit, Write, or NotebookEdit call,
+    or None. Only an `agent_type` starting with `delegate-` is constrained: the
+    lead and every other agent are never. `delegate-research` and
+    `delegate-check` are read-only. Every delegate is kept out of mutating git,
+    the review panel (`panel_slots.py exec`, `delegate-probe`, `codex`), and the
+    protected roots under `repo_root`; paths outside the repository (scratch)
+    are free. This is a guard against accidents, not a sandbox: it reads the
+    command text with a regex, so a determined `bash -c`, a quoted separator, or
+    a script that does the same thing gets past it, and it is not a security
+    boundary."""
+    kind = payload.get("agent_type")
+    if not isinstance(kind, str) or not kind.startswith(DELEGATE_PREFIX):
+        return None
+    tool = payload.get("tool_name")
+    tool_input = payload.get("tool_input")
+    if tool not in GUARDED_TOOLS or not isinstance(tool_input, dict):
+        return None
+    owns = (f"The lead owns git state, the review panel, and the protected roots "
+            f"({', '.join(PROTECTED_ROOTS)}); report what you need instead of doing it.")
+    if tool == "Bash":
+        command = tool_input.get("command")
+        rule = _bash_rule(command) if isinstance(command, str) else None
+        if rule is None:
+            return None
+        return f"{kind} may not run `{rule}`. {owns}"
+    if kind in READ_ONLY_DELEGATES:
+        return f"{kind} is read-only, so {tool} is denied. {owns}"
+    path = tool_input.get("file_path") or tool_input.get("notebook_path")
+    if not isinstance(path, str) or not path:
+        return None
+    full = _resolved(path if os.path.isabs(path) else os.path.join(repo_root, path))
+    for name in PROTECTED_ROOTS:
+        root = _resolved(os.path.join(repo_root, name))
+        if full == root or full.startswith(root + os.sep):
+            return f"{kind} may not write under `{name}` ({path}). {owns}"
+    return None
+
+
+def _read_json_payload(stdin, stderr, event: str) -> dict | None:
+    try:
+        payload = json.loads(stdin.read())
+    except (ValueError, OSError):
+        print(f"panel_slots: hook {event}: payload is not JSON; allowing", file=stderr, flush=True)
+        return None
+    if not isinstance(payload, dict):
+        print(f"panel_slots: hook {event}: payload is not an object; allowing", file=stderr, flush=True)
+        return None
+    return payload
+
+
+def _deny(reason: str, stdout) -> None:
+    print(json.dumps({"hookSpecificOutput": {
+        "hookEventName": "PreToolUse", "permissionDecision": "deny",
+        "permissionDecisionReason": reason}}), file=stdout, flush=True)
+
+
+def run_hook(event: str, stdin, stdout, stderr, table: dict | None = None,
+             agent_names: list[str] | None = None, ledger: str | None = None,
+             agents: str | None = None, repo_root: str | None = None) -> int:
+    """Handle one hook event. Always exits 0: a hook that cannot decide
+    allows, with one stderr line saying why. Agent names come from
+    `agent_names`, else from the `agents` roster directory (default
+    `.claude/agents`)."""
+    payload = _read_json_payload(stdin, stderr, event)
+    if payload is None:
+        return 0
+    try:
+        if event == "pre-tool":
+            if payload.get("tool_name") not in GUARDED_TOOLS:
+                return 0
+            here = os.path.dirname(os.path.abspath(__file__))
+            reason = pre_tool_decision(payload, repo_root or os.path.join(here, ".."))
+            if reason is not None:
+                _deny(reason, stdout)
+            return 0
+        if event == "subagent-stop":
+            kind = payload.get("agent_type")
+            if not isinstance(kind, str) or not kind:
+                return 0  # a harness-internal side agent, not a delegation
+        table = table or load()
+        if event == "pre-agent":
+            if payload.get("tool_name") != "Agent":
+                return 0
+            tool_input = payload.get("tool_input")
+            if not isinstance(tool_input, dict):
+                print("panel_slots: hook pre-agent: no tool_input; allowing", file=stderr, flush=True)
+                return 0
+            reason = pre_agent_decision(tool_input, table,
+                                        agent_names if agent_names is not None else roster_names(agents))
+            if reason is not None:
+                _deny(reason, stdout)
+            return 0
+        lines: list[str] = []
+        transcript = payload.get("agent_transcript_path")
+        if isinstance(transcript, str) and transcript:
+            try:
+                with open(transcript, encoding="utf-8", errors="replace") as fh:
+                    lines = fh.read().splitlines()
+            except OSError:
+                lines = []
+        names = agent_names if agent_names is not None else roster_names(agents)
+        now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        entry = ledger_entry(payload, table, names, lines, now)
+        path = ledger or ledger_path()
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(entry) + "\n")
+        warning = None
+        if entry["pin"] == "mismatch":
+            warning = (f"panel_slots: delegation {entry['agent_type']} ran {entry['model']} at effort "
+                       f"{entry['effort']}, not the pin {table['delegate']['model']} at "
+                       f"{table['delegate']['effort']}")
+        elif entry["pin"] == "unread":
+            warning = (f"panel_slots: delegation {entry['agent_type']} left no readable model or effort "
+                       f"in its transcript; the pin is unproven for this run")
+        if warning is not None:
+            print(warning, file=stderr, flush=True)
+            print(json.dumps({"hookSpecificOutput": {
+                "hookEventName": "SubagentStop", "additionalContext": warning}}),
+                file=stdout, flush=True)
+    except Exception as exc:  # fail open: a hook that cannot decide never blocks
+        print(f"panel_slots: hook {event}: {type(exc).__name__}: {exc}; allowing", file=stderr, flush=True)
+    return 0
+
+
+def show_ledger(count: int, stdout, path: str | None = None) -> int:
+    path = path or ledger_path()
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            lines = fh.read().splitlines()
+    except FileNotFoundError:
+        print("no delegations recorded", file=stdout)
+        return 0
+    for line in lines[-count:] if count > 0 else []:
+        print(line, file=stdout)
+    return 0
+
+
 # --- self-test ---------------------------------------------------------------
 
 GOOD = r"""
@@ -287,6 +749,12 @@ model = "w-claude"
 [model."w-claude"]
 family = "claude"
 probed = "2026-09-23"
+[model."d-sonnet"]
+family = "claude"
+probed = "2026-10-01"
+[model."d-old"]
+family = "claude"
+retired = "2026-09-01"
 [model."g-one"]
 family = "codex"
 probed = "2026-09-23"
@@ -326,6 +794,10 @@ timeout = 900
 model = "g-one"
 effort = "high"
 timeout = 600
+[delegate]
+alias = "sonnet"
+model = "d-sonnet"
+effort = "high"
 """
 
 
@@ -458,6 +930,391 @@ def _self_test() -> int:
     finally:
         globals()["argv_for_slot"] = real_argv
 
+    # The delegate pin.
+    check("delegate pin loads", good["delegate"] == {"alias": "sonnet", "model": "d-sonnet",
+                                                     "effort": "high", "family": "claude"})
+    refuses("delegate missing", GOOD.split("[delegate]")[0], "no [delegate] table")
+    refuses("delegate alias outside the set", GOOD.replace('alias = "sonnet"', 'alias = "gpt"'),
+            "delegate alias 'gpt' is outside")
+    refuses("delegate model unregistered", GOOD.replace('model = "d-sonnet"', 'model = "d-nope"'),
+            "delegate model 'd-nope' is not registered")
+    refuses("delegate model retired", GOOD.replace('model = "d-sonnet"', 'model = "d-old"'),
+            "retired 2026-09-01")
+    refuses("delegate foreign family", GOOD.replace('model = "d-sonnet"', 'model = "g-one"'),
+            "delegates are subagents of the writer harness")
+    # The delegate block is last in GOOD, so its effort is the last one.
+    head = GOOD[:GOOD.rindex('effort = "high"')]
+    refuses("delegate effort medium", head + 'effort = "medium"\n',
+            "delegate effort 'medium' is outside high, xhigh")
+    refuses("delegate effort low", head + 'effort = "low"\n', "delegate effort 'low' is outside")
+    refuses("delegate alias not a string", GOOD.replace('alias = "sonnet"', 'alias = ["a"]'),
+            "delegate alias ['a'] is not a string")
+    refuses("delegate model not a string", GOOD.replace('model = "d-sonnet"', 'model = ["a"]'),
+            "delegate model ['a'] is not a string")
+    refuses("delegate effort not a string", head + 'effort = ["a"]\n',
+            "delegate effort ['a'] is not a string")
+    xhigh = head + 'effort = "xhigh"\n'
+    check("delegate effort xhigh accepted", load(write(xhigh))["delegate"]["effort"] == "xhigh")
+
+    # The agent roster.
+    def roster(files: dict[str, str]) -> str:
+        directory = tempfile.mkdtemp(prefix="agents-", dir=tmpd)
+        for name, text in files.items():
+            with open(os.path.join(directory, name), "w", encoding="utf-8") as fh:
+                fh.write(text)
+        return directory
+
+    def agent(name: str = "delegate-x", model: str | None = "sonnet", effort: str | None = "high") -> str:
+        lines = ["---", f"name: {name}", "description: a test agent"]
+        if model is not None:
+            lines.append(f"model: {model}")
+        if effort is not None:
+            lines.append(f"effort: {effort}")
+        return "\n".join(lines + ["tools: Read", "---", "body", ""])
+
+    def agents_refuse(name: str, files: dict[str, str], needle: str) -> None:
+        try:
+            check_agents(good, roster(files))
+        except PanelSlotsError as exc:
+            check(name, needle in str(exc), f"message {exc!s} lacks {needle!r}")
+            return
+        check(name, False, "roster accepted without refusal")
+
+    check("valid roster accepted",
+          check_agents(good, roster({"delegate-a.md": agent("delegate-a"),
+                                     "delegate-b.md": agent("delegate-b")}))
+          == ["delegate-a", "delegate-b"])
+    agents_refuse("roster empty", {}, "holds no *.md agent files")
+    try:
+        check_agents(good, os.path.join(tmpd, "no-such-dir"))
+        check("roster directory missing", False, "accepted")
+    except PanelSlotsError as exc:
+        check("roster directory missing", "does not exist" in str(exc))
+    agents_refuse("agent without frontmatter", {"delegate-x.md": "just text\n"}, "has no frontmatter")
+    agents_refuse("agent frontmatter never closes", {"delegate-x.md": "---\nname: delegate-x\n"},
+                  "no closing ---")
+    agents_refuse("agent missing effort", {"delegate-x.md": agent(effort=None)}, "omits field effort")
+    agents_refuse("agent missing model", {"delegate-x.md": agent(model=None)}, "omits field model")
+    agents_refuse("agent wrong model", {"delegate-x.md": agent(model="opus")}, "field model 'opus'")
+    agents_refuse("agent wrong effort", {"delegate-x.md": agent(effort="medium")},
+                  "field effort 'medium'")
+    agents_refuse("agent name differs from stem", {"delegate-y.md": agent("delegate-x")},
+                  "is not the file stem")
+    agents_refuse("agent name lacks the prefix", {"helper.md": agent("helper")}, "lacks the 'delegate-' prefix")
+
+    names_dir = roster({"delegate-b.md": agent("delegate-b"), "delegate-a.md": "just text\n",
+                        "helper.md": agent("helper"), "delegate-c.txt": "x"})
+    check("roster_names lists delegate stems only", roster_names(names_dir) == ["delegate-a", "delegate-b"])
+    check("roster_names of an absent directory", roster_names(os.path.join(tmpd, "no-such-dir")) == [])
+    check("roster_names of an empty directory", roster_names(roster({})) == [])
+
+    def raw_agent(data: bytes) -> str:
+        directory = tempfile.mkdtemp(prefix="agents-", dir=tmpd)
+        path = os.path.join(directory, "delegate-x.md")
+        with open(path, "wb") as fh:
+            fh.write(data)
+        return path
+
+    crlf = agent().replace("\n", "\r\n").encode("utf-8")
+    check("frontmatter reads CRLF line endings",
+          agent_frontmatter(raw_agent(crlf))["effort"] == "high")
+    check("frontmatter reads a UTF-8 BOM",
+          agent_frontmatter(raw_agent(b"\xef\xbb\xbf" + agent().encode("utf-8")))["name"] == "delegate-x")
+    colon = agent().replace("description: a test agent", "description: Use when: asked, then: stop")
+    check("frontmatter keeps a colon in a description",
+          agent_frontmatter(raw_agent(colon.encode("utf-8")))["description"] == "Use when: asked, then: stop")
+
+    # delegate-probe verdicts.
+    def probe(model_usage: dict | None = None, **over) -> str:
+        obj = {"is_error": False, "result": "PROBE-OK",
+               "modelUsage": {"d-sonnet": {}} if model_usage is None else model_usage}
+        obj.update(over)
+        return json.dumps(obj)
+
+    def probe_refuses(name: str, text: str, needle: str) -> None:
+        try:
+            probe_verdict(text, good)
+        except PanelSlotsError as exc:
+            check(name, needle in str(exc), f"message {exc!s} lacks {needle!r}")
+            return
+        check(name, False, "probe accepted without refusal")
+
+    check("probe verdict ok", probe_verdict(probe(), good) == "d-sonnet")
+    probe_refuses("probe alias moved", probe({"d-sonnet-next": {}}), "the alias has moved; re-pin")
+    probe_refuses("probe names what it resolved to", probe({"d-sonnet-next": {}}), "resolved to d-sonnet-next")
+    probe_refuses("probe extra model", probe({"d-sonnet": {}, "d-other": {}}), "the alias has moved")
+    probe_refuses("probe is_error", probe(is_error=True), "is_error")
+    probe_refuses("probe lacks PROBE-OK", probe(result="hello"), "lacks PROBE-OK")
+    probe_refuses("probe unparsable", "not json", "is not JSON")
+    probe_refuses("probe modelUsage empty", probe({}), "carries no modelUsage")
+    missing = json.loads(probe())
+    del missing["modelUsage"]
+    probe_refuses("probe modelUsage missing", json.dumps(missing), "carries no modelUsage")
+
+    # The pre-agent hook decision.
+    def decision(**tool_input) -> str | None:
+        return pre_agent_decision(tool_input, good, ["delegate-a", "delegate-b"])
+
+    check("hook allows fork", decision(subagent_type="fork") is None)
+    check("hook allows a bare delegate", decision(subagent_type="delegate-a") is None)
+    check("hook denies a delegate with a model",
+          "omit `model`" in (decision(subagent_type="delegate-a", model="sonnet") or ""))
+    for label, kwargs in (("general-purpose bare", {"subagent_type": "general-purpose"}),
+                          ("empty type bare", {}),
+                          ("Explore bare", {"subagent_type": "Explore"})):
+        reason = decision(**kwargs) or ""
+        check(f"hook denies {label}", "unpinned effort" in reason and "delegate-a, delegate-b" in reason
+              and "GPT panel" in reason, reason)
+    for model in ("sonnet", "haiku", "claude-sonnet-5-5"):
+        reason = decision(subagent_type="general-purpose", model=model) or ""
+        check(f"hook denies general-purpose with {model}",
+              "default effort, not the pinned high" in reason and "delegate-a, delegate-b" in reason, reason)
+    for model in ("opus", "fable", "w-claude"):
+        check(f"hook allows general-purpose with {model}",
+              decision(subagent_type="general-purpose", model=model) is None)
+    for model in ("claude-opus-3", "claude-opus-4-1", "claude-fable-1"):
+        reason = decision(subagent_type="general-purpose", model=model) or ""
+        check(f"hook denies the older id {model}", "default effort, not the pinned high" in reason, reason)
+    check("hook denies a delegate type with model opus",
+          "omit `model`" in (decision(subagent_type="delegate-b", model="opus") or ""))
+
+    def run(event: str, text: str, **kw) -> tuple[int, str, str]:
+        out, err = io.StringIO(), io.StringIO()
+        rc = run_hook(event, io.StringIO(text), out, err, table=good, agent_names=["delegate-a"], **kw)
+        return rc, out.getvalue(), err.getvalue()
+
+    out, err = io.StringIO(), io.StringIO()
+    rc = run_hook("pre-agent", io.StringIO(json.dumps({"tool_name": "Agent", "tool_input": {}})),
+                  out, err, table={"slots": {}}, agent_names=["delegate-a"])
+    check("hook fails open on an unexpected error", rc == 0 and out.getvalue() == ""
+          and "KeyError" in err.getvalue() and "allowing" in err.getvalue(), err.getvalue())
+
+    denied = run("pre-agent", json.dumps({"tool_name": "Agent", "tool_input": {
+        "subagent_type": "general-purpose", "model": "sonnet"}}))
+    body = json.loads(denied[1]) if denied[1].strip() else {}
+    inner = body.get("hookSpecificOutput", {})
+    check("deny stdout shape", denied[0] == 0 and list(body) == ["hookSpecificOutput"]
+          and inner.get("hookEventName") == "PreToolUse" and inner.get("permissionDecision") == "deny"
+          and "default effort" in inner.get("permissionDecisionReason", "")
+          and denied[1].count("\n") == 1, denied[1])
+    allowed = run("pre-agent", json.dumps({"tool_name": "Agent", "tool_input": {
+        "subagent_type": "delegate-a"}}))
+    check("allow is silent", allowed == (0, "", ""), repr(allowed))
+    other = run("pre-agent", json.dumps({"tool_name": "Bash", "tool_input": {"command": "ls"}}))
+    check("non-Agent tool is ignored", other == (0, "", ""), repr(other))
+    for event in ("pre-agent", "subagent-stop"):
+        for text in ("not json", "[1, 2]", ""):
+            rc, out, err = run(event, text)
+            check(f"{event} fails open on {text!r}", rc == 0 and out == "" and err.count("\n") == 1, err)
+    rc, out, err = run("pre-agent", json.dumps({"tool_name": "Agent"}))
+    check("pre-agent fails open without tool_input", rc == 0 and out == "" and "allowing" in err)
+
+    # The delegation ledger.
+    def assistant(model: str | None, effort: str | None) -> str:
+        message = {} if model is None else {"model": model}
+        obj = {"type": "assistant", "message": message}
+        if effort is not None:
+            obj["effort"] = effort
+        return json.dumps(obj)
+
+    stamp = "2026-10-01T00:00:00Z"
+    base = {"session_id": "s1", "agent_type": "delegate-a", "agent_id": "a1", "effort": "high"}
+    names = ["delegate-a"]
+    first_user = json.dumps({"type": "user"})
+    entry = ledger_entry(base, good, names, [assistant("x", "low"), first_user,
+                                             assistant("d-sonnet", "high"), "garbage", first_user], stamp)
+    check("ledger match", entry == {"at": stamp, "session": "s1", "agent_type": "delegate-a",
+                                    "agent_id": "a1", "model": "d-sonnet", "effort": "high",
+                                    "payload_effort": "high", "pin": "match"}, str(entry))
+    entry = ledger_entry(base, good, names, [assistant("d-sonnet", "medium")], stamp)
+    check("ledger mismatch on effort", entry["pin"] == "mismatch" and entry["effort"] == "medium")
+    entry = ledger_entry(base, good, names, [assistant("d-other", "high")], stamp)
+    check("ledger mismatch on model", entry["pin"] == "mismatch" and entry["model"] == "d-other")
+    entry = ledger_entry({"agent_type": "delegate-a"}, good, names, [first_user], stamp)
+    check("ledger unread without an assistant line", entry["model"] == "unread"
+          and entry["effort"] == "unread" and entry["payload_effort"] is None
+          and entry["pin"] == "unread", str(entry))
+    entry = ledger_entry(base, good, names, [assistant(None, None)], stamp)
+    check("ledger unread when fields are absent", entry["model"] == "unread" and entry["effort"] == "unread"
+          and entry["pin"] == "unread")
+    entry = ledger_entry(base, good, names, [assistant("d-sonnet", None)], stamp)
+    check("ledger unread when only effort is absent", entry["pin"] == "unread", str(entry))
+    entry = ledger_entry({"agent_type": "Explore"}, good, names, [assistant("x", "low")], stamp)
+    check("ledger n/a for a non-delegate", entry["pin"] == "n/a")
+
+    ledger = os.path.join(tmpd, "ledger-dir", "agent-delegations.jsonl")
+    transcript = os.path.join(tmpd, "transcript.jsonl")
+    with open(transcript, "w", encoding="utf-8") as fh:
+        fh.write(assistant("d-sonnet", "high") + "\n")
+    stop = json.dumps({**base, "agent_transcript_path": transcript})
+    real_env = os.environ.get("PANEL_DELEGATION_LEDGER")
+    os.environ["PANEL_DELEGATION_LEDGER"] = ledger
+    try:
+        rc, out, err = run("subagent-stop", stop)
+        check("ledger append is silent on match", (rc, out, err) == (0, "", ""), repr((rc, out, err)))
+        with open(transcript, "w", encoding="utf-8") as fh:
+            fh.write(assistant("d-sonnet", "medium") + "\n")
+        rc, out, err = run("subagent-stop", stop)
+        body = json.loads(out) if out.strip() else {}
+        check("ledger warns on mismatch", rc == 0 and "not the pin" in err, err)
+        check("ledger mismatch stdout shape", list(body) == ["hookSpecificOutput"]
+              and body["hookSpecificOutput"] == {"hookEventName": "SubagentStop",
+                                                 "additionalContext": err.strip()}
+              and out.count("\n") == 1, out)
+        rc, out, err = run("subagent-stop", json.dumps({**base, "agent_transcript_path": "no-such-file"}))
+        body = json.loads(out) if out.strip() else {}
+        check("ledger warns on unread", rc == 0 and "unproven" in err, err)
+        check("ledger unread stdout shape", body.get("hookSpecificOutput", {}).get("hookEventName")
+              == "SubagentStop" and body["hookSpecificOutput"].get("additionalContext") == err.strip(), out)
+        for label, kind in (("absent", None), ("empty", ""), ("non-string", 7)):
+            side = {k: v for k, v in base.items() if k != "agent_type"}
+            if kind is not None:
+                side["agent_type"] = kind
+            side["agent_transcript_path"] = transcript
+            check(f"ledger writes nothing for an {label} agent_type",
+                  run("subagent-stop", json.dumps(side)) == (0, "", ""))
+        with open(ledger, encoding="utf-8") as fh:
+            written = [json.loads(line) for line in fh.read().splitlines()]
+        check("ledger lines landed in the override path", len(written) == 3
+              and written[0]["pin"] == "match" and written[1]["pin"] == "mismatch"
+              and written[2]["model"] == "unread" and written[2]["pin"] == "unread", str(written))
+        shown = io.StringIO()
+        show_ledger(1, shown)
+        check("ledger shows the last N", shown.getvalue().count("\n") == 1
+              and json.loads(shown.getvalue())["pin"] == "unread")
+    finally:
+        if real_env is None:
+            del os.environ["PANEL_DELEGATION_LEDGER"]
+        else:
+            os.environ["PANEL_DELEGATION_LEDGER"] = real_env
+    shown = io.StringIO()
+    show_ledger(10, shown, os.path.join(tmpd, "absent.jsonl"))
+    check("ledger absent", shown.getvalue() == "no delegations recorded\n")
+
+    # A malformed roster file never turns the pre-agent guard off.
+    names_out, names_err = io.StringIO(), io.StringIO()
+    run_hook("pre-agent", io.StringIO(json.dumps({"tool_name": "Agent", "tool_input": {
+        "subagent_type": "general-purpose", "model": "sonnet"}})), names_out, names_err,
+        table=good, agents=names_dir)
+    check("malformed roster file still denies", "default effort" in names_out.getvalue()
+          and "delegate-a, delegate-b" in names_out.getvalue() and names_err.getvalue() == "",
+          names_out.getvalue() + names_err.getvalue())
+    names_out, names_err = io.StringIO(), io.StringIO()
+    run_hook("subagent-stop", io.StringIO(json.dumps({"agent_type": "delegate-b", "agent_id": "z"})),
+             names_out, names_err, table=good, agents=names_dir,
+             ledger=os.path.join(tmpd, "roster-ledger.jsonl"))
+    with open(os.path.join(tmpd, "roster-ledger.jsonl"), encoding="utf-8") as fh:
+        check("ledger resolves names from the roster directory", json.loads(fh.read())["pin"] == "unread")
+
+    # The pre-tool hook: delegates only, git state, the panel, protected roots.
+    root = os.path.join(tmpd, "repo")
+    os.makedirs(os.path.join(root, ".git"))
+
+    def tool(name: str, who: str | None = "delegate-build", **tool_input) -> str | None:
+        payload = {"tool_name": name, "tool_input": tool_input}
+        if who is not None:
+            payload["agent_type"] = who
+        return pre_tool_decision(payload, root)
+
+    def bash(command: str, who: str | None = "delegate-build") -> str | None:
+        return tool("Bash", who, command=command)
+
+    check("non-delegate git commit allowed", bash("git commit -m x", None) is None
+          and bash("git commit -m x", "general-purpose") is None)
+    for command, rule in (("git commit -m x", "git commit"), ("git -C sub push", "git push"),
+                          ("echo a && git reset --hard", "git reset"), ("FOO=1 git stash", "git stash"),
+                          ("(git checkout -- f)", "git checkout"), ("ls\ngit add .", "git add"),
+                          ("x=$(git config user.name)", "git config"), ("a | git apply p", "git apply"),
+                          ("git -c core.x=1 --no-pager tag v1", "git tag"),
+                          ("git --git-dir=.git worktree add w", "git worktree"),
+                          ('FOO="a b" git rm f', "git rm"), ("/usr/bin/git merge x", "git merge"),
+                          ("python scripts/panel_slots.py exec bulk", "panel_slots.py exec"),
+                          ("python scripts/panel_slots.py delegate-probe", "panel_slots.py delegate-probe"),
+                          ("cd x; ./scripts/panel_slots.py exec bulk", "panel_slots.py exec"),
+                          ("codex review", "codex"), ("echo a; codex exec x", "codex")):
+        reason = bash(command) or ""
+        check(f"delegate-build denies {command!r}", f"`{rule}`" in reason and "lead owns git state" in reason
+              and "protected roots" in reason, reason)
+    for command in ("git status", "git diff -- a", "git log -3", "git show HEAD", "git ls-files",
+                    "git rev-parse HEAD", "git blame f", "git grep commit", "git cat-file -p x",
+                    "git ls-remote origin", "git fetch", "git -C sub status",
+                    'grep -rn "git commit" docs/', "echo git push", "git commit-tree x",
+                    "python scripts/panel_slots.py --self-test", "python -m py_compile scripts/panel_slots.py",
+                    'grep -rn "panel_slots.py exec" docs/', "ls codex-notes"):
+        check(f"delegate-build allows {command!r}", bash(command) is None, str(bash(command)))
+    for who in ("delegate-research", "delegate-check"):
+        check(f"{who} Bash follows the git rule too", bash("git push", who) is not None
+              and bash("git status", who) is None)
+    for label, name, who, key, path in (
+            ("Edit .claude/settings.json", "Edit", "delegate-build", "file_path", ".claude/settings.json"),
+            ("Write todo/x.md", "Write", "delegate-build", "file_path", "todo/x.md"),
+            ("Write resolute_au3/a.au3", "Write", "delegate-build", "file_path", "resolute_au3/a.au3"),
+            ("Write .git/config absolute", "Write", "delegate-build", "file_path",
+             os.path.join(root, ".git", "config")),
+            ("Write TODO/../.conclave/panel.toml", "Write", "delegate-build", "file_path",
+             "TODO/../.conclave/panel.toml"),
+            ("Write .claude mixed separators", "Write", "delegate-build", "file_path", ".claude\\agents/x.md"),
+            ("NotebookEdit under todo", "NotebookEdit", "delegate-build", "notebook_path", "todo/n.ipynb"),
+            ("Write scripts/x.py as research", "Write", "delegate-research", "file_path", "scripts/x.py"),
+            ("Write scripts/x.py as check", "Write", "delegate-check", "file_path", "scripts/x.py"),
+            ("Edit scripts/x.py as check", "Edit", "delegate-check", "file_path", "scripts/x.py"),
+            ("NotebookEdit as research", "NotebookEdit", "delegate-research", "notebook_path", "n.ipynb")):
+        reason = tool(name, who, **{key: path}) or ""
+        check(f"pre-tool denies {label}", "lead owns git state" in reason and "protected roots" in reason, reason)
+    for label, who, path in (("scripts/x.py", "delegate-build", "scripts/x.py"),
+                             ("todox/a.md", "delegate-build", "todox/a.md"),
+                             ("outside the repo", "delegate-build", os.path.join(tmpd, "scratch.txt"))):
+        check(f"pre-tool allows Write {label}", tool("Write", who, file_path=path) is None)
+    check("pre-tool allows a non-delegate Write under todo", tool("Write", None, file_path="todo/x.md") is None)
+    check("pre-tool allows Read", tool("Read", file_path="todo/x.md") is None)
+    for label, payload in (("no tool_input", {"tool_name": "Bash", "agent_type": "delegate-build"}),
+                           ("tool_input not an object", {"tool_name": "Write", "agent_type": "delegate-build",
+                                                         "tool_input": "x"}),
+                           ("command not a string", {"tool_name": "Bash", "agent_type": "delegate-build",
+                                                     "tool_input": {"command": 7}}),
+                           ("no path", {"tool_name": "Write", "agent_type": "delegate-build",
+                                        "tool_input": {}}),
+                           ("agent_type not a string", {"tool_name": "Bash", "agent_type": 3,
+                                                        "tool_input": {"command": "git push"}})):
+        check(f"pre-tool allows a payload with {label}", pre_tool_decision(payload, root) is None)
+
+    def run_tool(payload: object) -> tuple[int, str, str]:
+        out, err = io.StringIO(), io.StringIO()
+        text = payload if isinstance(payload, str) else json.dumps(payload)
+        rc = run_hook("pre-tool", io.StringIO(text), out, err, repo_root=root)
+        return rc, out.getvalue(), err.getvalue()
+
+    rc, out, err = run_tool({"tool_name": "Bash", "agent_type": "delegate-build", "agent_id": "x",
+                             "tool_input": {"command": "git commit -m x"}})
+    body = json.loads(out) if out.strip() else {}
+    inner = body.get("hookSpecificOutput", {})
+    check("pre-tool deny stdout shape", rc == 0 and err == "" and list(body) == ["hookSpecificOutput"]
+          and inner.get("hookEventName") == "PreToolUse" and inner.get("permissionDecision") == "deny"
+          and "git commit" in inner.get("permissionDecisionReason", "") and out.count("\n") == 1, out)
+    check("pre-tool lead call is silent",
+          run_tool({"tool_name": "Bash", "tool_input": {"command": "git commit -m x"}}) == (0, "", ""))
+    check("pre-tool delegate allow is silent",
+          run_tool({"tool_name": "Bash", "agent_type": "delegate-build",
+                    "tool_input": {"command": "git status"}}) == (0, "", ""))
+    check("pre-tool ignores other tools",
+          run_tool({"tool_name": "Read", "agent_type": "delegate-build",
+                    "tool_input": {"file_path": "todo/x.md"}}) == (0, "", ""))
+    rc, out, err = run_tool({"tool_name": "Write", "agent_type": "delegate-check",
+                             "tool_input": {"file_path": "scripts/x.py"}})
+    check("pre-tool read-only deny via run_hook", rc == 0 and "is read-only" in out, out)
+    for text in ("not json", "[1, 2]", ""):
+        rc, out, err = run_tool(text)
+        check(f"pre-tool fails open on {text!r}", rc == 0 and out == "" and err.count("\n") == 1, err)
+    rc, out, err = run_tool({"tool_name": "Write", "agent_type": "delegate-build",
+                             "tool_input": {"file_path": ".claude/x.md"}})
+    check("pre-tool path deny via run_hook", rc == 0 and "may not write under `.claude`" in out, out)
+    out, err = io.StringIO(), io.StringIO()
+    rc = run_hook("pre-tool", io.StringIO(json.dumps({
+        "tool_name": "Write", "agent_type": "delegate-build", "tool_input": {"file_path": "x"}})),
+        out, err, repo_root=7)
+    check("pre-tool fails open on an unexpected error", rc == 0 and out.getvalue() == ""
+          and "allowing" in err.getvalue(), err.getvalue())
+
     # The checked-in table validates.
     try:
         live = load()
@@ -474,16 +1331,28 @@ def main(argv: list[str]) -> int:
         return _self_test()
     if not argv:
         print("usage: panel_slots.py validate | show | argv <slot> | get <slot> <field> | "
-              "writer | family <model> | models <family> [--all] | exec <slot> [extra...] | --self-test",
+              "writer | family <model> | models <family> [--all] | exec <slot> [extra...] | "
+              "delegate-probe | hook pre-agent|subagent-stop|pre-tool | ledger [N] | --self-test",
               file=sys.stderr)
         return 2
     cmd, rest = argv[0], argv[1:]
+    if cmd == "hook" and len(rest) == 1 and rest[0] in ("pre-agent", "subagent-stop", "pre-tool"):
+        stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8", errors="replace")
+        return run_hook(rest[0], stdin, sys.stdout, sys.stderr)
     try:
         if cmd == "validate" and not rest:
             table = load()
+            agents = check_agents(table)
+            delegate = table["delegate"]
             print(f"panel slots ok: writer {table['writer']['model']} ({table['writer']['family']}), "
-                  f"{len(table['slots'])} slots, {len(table['models'])} registered models")
+                  f"{len(table['slots'])} slots, {len(table['models'])} registered models; "
+                  f"delegate {delegate['alias']} -> {delegate['model']} effort {delegate['effort']}, "
+                  f"{len(agents)} agents ({', '.join(agents)})")
             return 0
+        if cmd == "delegate-probe" and not rest:
+            return delegate_probe(load(), sys.stdout, sys.stderr)
+        if cmd == "ledger" and len(rest) <= 1 and (not rest or rest[0].isdecimal()):
+            return show_ledger(int(rest[0]) if rest else 10, sys.stdout)
         if cmd == "show" and not rest:
             table = load()
             print(f"writer  {table['writer']['model']} ({table['writer']['family']})")
