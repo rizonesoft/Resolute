@@ -57,9 +57,11 @@ an older id such as `claude-opus-3` is denied. Both agent-name hooks read
 `roster_names()`, the `delegate-*.md` stems under `.claude/agents/`, so one
 malformed agent file never turns the guard off (validity is `validate`'s
 job). `subagent-stop` records nothing for an empty `agent_type` (a
-harness-internal side agent, not a delegation), and when the pin is
-`mismatch` or `unread` it also prints a `SubagentStop` `additionalContext`
-JSON object on stdout so the lead sees it; `match` stays silent.
+harness-internal side agent, not a delegation). It never prints to stdout,
+because a `SubagentStop` output may resume the finished subagent rather than
+reach the lead; when the pin is `mismatch` or `unread` it writes one stderr
+warning line, and the lead reads the ledger (`ledger`), which every
+`Delegated:` commit line cites.
 
 `pre-tool` (PreToolUse on Bash, Edit, Write, NotebookEdit) constrains only
 an `agent_type` starting with `delegate-`; the lead and other agents never
@@ -67,8 +69,12 @@ are. `delegate-research` and `delegate-check` are read-only. Every delegate
 is denied mutating git (`add`, `commit`, `push`, `reset`, `stash`,
 `checkout`, and the rest of `GIT_DENIED`), `panel_slots.py exec`,
 `panel_slots.py delegate-probe`, `codex`, and any write under `.git`,
-`.claude`, `.conclave`, `todo`, or `resolute_au3`. Read-only git passes. It
-is a guard against accidents, not a sandbox.
+`.claude`, `.conclave`, `todo`, or `resolute_au3`, including a shell mutator
+(`rm`, `mv`, `cp`, `tee`, `sed -i`, `Remove-Item`, and the like) or a `>`
+redirection aimed there. The read-only delegates may run no shell mutator and
+no redirection except to `/dev/null`, `nul`, `$null`, or a descriptor
+(`2>&1`). Read-only git passes. It is a guard against accidents, not a
+sandbox.
 
 `exec` runs the slot's producer with the prompt on stdin, enforces the
 slot timeout, and exits 124 on expiry (the `timeout` convention the
@@ -585,7 +591,139 @@ _CODEX_RE = re.compile(
     _CMD_POS + r"(?:" + _PATHISH + r")?codex(?:\.cmd|\.exe|\.ps1)?(?![\w.-])")
 
 
-def _bash_rule(command: str) -> str | None:
+_MUTATORS = ("rm", "rmdir", "mv", "cp", "touch", "mkdir", "tee", "truncate", "dd", "ln", "chmod",
+             "chown", "install", "patch", "unzip", "tar")
+_CMDLETS = ("Remove-Item", "Set-Content", "Add-Content", "Out-File", "New-Item", "Copy-Item",
+            "Move-Item", "Rename-Item", "Clear-Content")
+_MUTATOR_RE = re.compile(
+    _CMD_POS + r"(?:" + _PATHISH + r")?(?P<name>" + "|".join(_MUTATORS) + r")(?:\.exe)?(?![\w.-])")
+_CMDLET_RE = re.compile(
+    _CMD_POS + r"(?:" + _PATHISH + r")?(?P<name>" + "|".join(_CMDLETS) + r")(?![\w.-])", re.IGNORECASE)
+# `sed` and `perl` mutate only with an in-place option (`-i`, `-pi`, `-i.bak`, `--in-place`).
+_INPLACE_RE = re.compile(
+    _CMD_POS + r"(?:" + _PATHISH + r")?(?P<name>sed|perl)(?:\.exe)?(?:\s+" + _ARG + r")*?"
+    r"\s+(?:-[A-Za-z]*i[^\s;&|()`]*|--in-place[^\s;&|()`]*)(?![\w-])")
+_ARG_RE = re.compile(_ARG)
+_HARMLESS_SINKS = ("/dev/null", "nul", "$null")
+
+
+def _unquoted(token: str) -> str:
+    return token.replace('"', "").replace("'", "")
+
+
+def _mutators(command: str) -> list[tuple[str, int]]:
+    """Every mutating command in `command`: its name and where the name ends."""
+    found = []
+    for regex in (_MUTATOR_RE, _CMDLET_RE, _INPLACE_RE):
+        for match in regex.finditer(command):
+            name = match.group("name")
+            found.append((f"{name} -i" if regex is _INPLACE_RE else name, match.end("name")))
+    return sorted(found, key=lambda item: item[1])
+
+
+def _segment_args(command: str, start: int) -> list[str]:
+    """The quote-stripped arguments of the command whose name ends at `start`,
+    up to the next unquoted separator (a `&` that belongs to `2>&1` or `&>` is
+    not one)."""
+    quote = None
+    end = start
+    while end < len(command):
+        char = command[end]
+        if quote:
+            if char == quote:
+                quote = None
+        elif char in "\"'":
+            quote = char
+        elif char in ";|\n()`":
+            break
+        elif char == "&" and command[end - 1:end] != ">" and command[end + 1:end + 2] != ">":
+            break
+        end += 1
+    return [_unquoted(token) for token in _ARG_RE.findall(command[start:end])]
+
+
+def _redirect_targets(command: str) -> list[str]:
+    """The target of every unquoted `>` or `>>` (fd prefixes such as `2>` are
+    covered because only the `>` is looked for), minus the harmless sinks and
+    descriptor duplication (`2>&1`, `>&2`). A redirection with no readable
+    target is returned as an empty string."""
+    targets = []
+    quote = None
+    i = 0
+    while i < len(command):
+        char = command[i]
+        if quote:
+            if char == quote:
+                quote = None
+        elif char in "\"'":
+            quote = char
+        elif char == ">":
+            i += 1
+            if command[i:i + 1] == ">":
+                i += 1
+            if command[i:i + 1] == "|":
+                i += 1
+            if command[i:i + 1] == "&":
+                i += 1
+                if command[i:i + 1] in tuple("0123456789-"):
+                    i += 1
+                    continue
+            while command[i:i + 1] in (" ", "\t"):
+                i += 1
+            found = _ARG_RE.match(command, i)
+            target = _unquoted(found.group()) if found else ""
+            if target.lower() not in _HARMLESS_SINKS:
+                targets.append(target)
+            i = found.end() if found else i
+            continue
+        i += 1
+    return targets
+
+
+def _protected_root(token: str, repo_root: str) -> str | None:
+    """The protected root a path token names, or None. A relative token is a
+    root name or starts with one followed by a separator (`./` and `..` are
+    normalised away); an absolute token must resolve into `repo_root/<root>`."""
+    token = _unquoted(token).strip()
+    if not token or token.startswith("-"):
+        return None
+    if re.match(r"(?:[A-Za-z]:)?[\\/]", token):
+        full = _resolved(token)
+        for name in PROTECTED_ROOTS:
+            root = _resolved(os.path.join(repo_root, name))
+            if full == root or full.startswith(root + os.sep):
+                return name
+        return None
+    relative = os.path.normcase(os.path.normpath(token.replace("\\", "/"))).replace("\\", "/")
+    for name in PROTECTED_ROOTS:
+        name_cmp = os.path.normcase(name).replace("\\", "/")
+        if relative == name_cmp or relative.startswith(name_cmp + "/"):
+            return name
+    return None
+
+
+def _mutation_rule(command: str, read_only: bool, repo_root: str) -> str | None:
+    """The name of the shell-mutation rule `command` breaks, or None. A
+    read-only delegate may not mutate at all (any mutator, any redirection
+    that is not a harmless sink); every other delegate may not mutate a
+    protected root."""
+    for name, end in _mutators(command):
+        if read_only:
+            return f"read-only: {name}"
+        for token in _segment_args(command, end):
+            root = _protected_root(token, repo_root)
+            if root is not None:
+                return f"{name} into {root}"
+    for target in _redirect_targets(command):
+        if read_only:
+            return "read-only: redirection"
+        root = _protected_root(target, repo_root)
+        if root is not None:
+            return f"redirection into {root}"
+    return None
+
+
+def _bash_rule(command: str, read_only: bool = False, repo_root: str = ".") -> str | None:
     """The name of the rule a delegate's Bash command breaks, or None."""
     found = _GIT_RE.search(command)
     if found:
@@ -595,7 +733,7 @@ def _bash_rule(command: str) -> str | None:
         return f"panel_slots.py {found.group('sub')}"
     if _CODEX_RE.search(command):
         return "codex"
-    return None
+    return _mutation_rule(command, read_only, repo_root)
 
 
 def _resolved(path: str) -> str:
@@ -609,10 +747,15 @@ def pre_tool_decision(payload: dict, repo_root: str) -> str | None:
     `delegate-check` are read-only. Every delegate is kept out of mutating git,
     the review panel (`panel_slots.py exec`, `delegate-probe`, `codex`), and the
     protected roots under `repo_root`; paths outside the repository (scratch)
-    are free. This is a guard against accidents, not a sandbox: it reads the
-    command text with a regex, so a determined `bash -c`, a quoted separator, or
-    a script that does the same thing gets past it, and it is not a security
-    boundary."""
+    are free. Bash also guards ordinary shell mutations: a read-only delegate
+    may run no mutator (`rm`, `cp`, `tee`, `sed -i`, `Remove-Item`, and the
+    rest of `_MUTATORS` and `_CMDLETS`) and no output redirection except the
+    harmless sinks (`2>&1`, `>&2`, `/dev/null`, `nul`, `$null`), and any other
+    delegate may not aim a mutator or a redirection at a protected root. This is
+    a guard against accidents, not a sandbox: it reads the command text with a
+    regex, so a determined `bash -c`, a quoted separator, a PowerShell alias
+    such as `del`, an interpreter that writes the file itself, or a script that
+    does the same thing gets past it, and it is not a security boundary."""
     kind = payload.get("agent_type")
     if not isinstance(kind, str) or not kind.startswith(DELEGATE_PREFIX):
         return None
@@ -624,7 +767,8 @@ def pre_tool_decision(payload: dict, repo_root: str) -> str | None:
             f"({', '.join(PROTECTED_ROOTS)}); report what you need instead of doing it.")
     if tool == "Bash":
         command = tool_input.get("command")
-        rule = _bash_rule(command) if isinstance(command, str) else None
+        rule = (_bash_rule(command, kind in READ_ONLY_DELEGATES, repo_root)
+                if isinstance(command, str) else None)
         if rule is None:
             return None
         return f"{kind} may not run `{rule}`. {owns}"
@@ -720,9 +864,6 @@ def run_hook(event: str, stdin, stdout, stderr, table: dict | None = None,
                        f"in its transcript; the pin is unproven for this run")
         if warning is not None:
             print(warning, file=stderr, flush=True)
-            print(json.dumps({"hookSpecificOutput": {
-                "hookEventName": "SubagentStop", "additionalContext": warning}}),
-                file=stdout, flush=True)
     except Exception as exc:  # fail open: a hook that cannot decide never blocks
         print(f"panel_slots: hook {event}: {type(exc).__name__}: {exc}; allowing", file=stderr, flush=True)
     return 0
@@ -1155,17 +1296,11 @@ def _self_test() -> int:
         with open(transcript, "w", encoding="utf-8") as fh:
             fh.write(assistant("d-sonnet", "medium") + "\n")
         rc, out, err = run("subagent-stop", stop)
-        body = json.loads(out) if out.strip() else {}
-        check("ledger warns on mismatch", rc == 0 and "not the pin" in err, err)
-        check("ledger mismatch stdout shape", list(body) == ["hookSpecificOutput"]
-              and body["hookSpecificOutput"] == {"hookEventName": "SubagentStop",
-                                                 "additionalContext": err.strip()}
-              and out.count("\n") == 1, out)
+        check("ledger warns on mismatch on stderr only", rc == 0 and out == ""
+              and "not the pin" in err and err.count("\n") == 1, repr((out, err)))
         rc, out, err = run("subagent-stop", json.dumps({**base, "agent_transcript_path": "no-such-file"}))
-        body = json.loads(out) if out.strip() else {}
-        check("ledger warns on unread", rc == 0 and "unproven" in err, err)
-        check("ledger unread stdout shape", body.get("hookSpecificOutput", {}).get("hookEventName")
-              == "SubagentStop" and body["hookSpecificOutput"].get("additionalContext") == err.strip(), out)
+        check("ledger warns on unread on stderr only", rc == 0 and out == ""
+              and "unproven" in err and err.count("\n") == 1, repr((out, err)))
         for label, kind in (("absent", None), ("empty", ""), ("non-string", 7)):
             side = {k: v for k, v in base.items() if k != "agent_type"}
             if kind is not None:
@@ -1245,6 +1380,48 @@ def _self_test() -> int:
     for who in ("delegate-research", "delegate-check"):
         check(f"{who} Bash follows the git rule too", bash("git push", who) is not None
               and bash("git status", who) is None)
+    # Shell mutations: read-only delegates mutate nothing, the rest spare the protected roots.
+    abs_git = os.path.join(root, ".git", "config")
+    for who, command, rule in (
+            ("delegate-check", "rm todo/probe.md", "read-only: rm"),
+            ("delegate-research", "cd x && Set-Content a.txt hi", "read-only: Set-Content"),
+            ("delegate-check", "echo x > notes.txt", "read-only: redirection"),
+            ("delegate-check", "echo x 2>> log.txt", "read-only: redirection"),
+            ("delegate-check", "ls | tee out.txt", "read-only: tee"),
+            ("delegate-check", "sed -i s/a/b/ scripts/x.py", "read-only: sed -i"),
+            ("delegate-check", "perl -pi -e 1 scripts/x.py", "read-only: perl -i"),
+            ("delegate-check", "remove-item x", "read-only: remove-item"),
+            ("delegate-build", "cp build/probe.md .claude/settings.json", "cp into .claude"),
+            ("delegate-build", "rm -rf ./todo/x", "rm into todo"),
+            ("delegate-build", "echo x >> resolute_au3/a.au3", "redirection into resolute_au3"),
+            ("delegate-build", "echo x 2> .conclave/e", "redirection into .conclave"),
+            ("delegate-build", "sed -i s/a/b/ todo/x.md", "sed -i into todo"),
+            ("delegate-build", "Remove-Item .conclave\\panel.toml", "Remove-Item into .conclave"),
+            ("delegate-build", 'mv a "todo/b c"', "mv into todo"),
+            ("delegate-build", "touch x/../todo", "touch into todo"),
+            ("delegate-build", f'echo x | tee "{abs_git}"', "tee into .git"),
+            ("delegate-build", f"echo x > {os.path.join(root, 'todo', 'a')}", "redirection into todo")):
+        reason = bash(command, who) or ""
+        check(f"{who} denies {command!r}", f"`{rule}`" in reason and "protected roots" in reason, reason)
+    for who, command in (
+            ("delegate-check", "git log -3 2>&1 | head"),
+            ("delegate-check", "python scripts/panel_slots.py --self-test 2>/dev/null | tail -1"),
+            ("delegate-check", 'grep -rn "rm -rf" docs/'),
+            ("delegate-check", "ls > /dev/null; echo a 2>nul; echo b >$null; echo c >&2"),
+            ("delegate-check", 'grep ">" notes.txt'),
+            ("delegate-check", "ls remove-items; echo rmx"),
+            ("delegate-research", "sed -n s/a/b/p scripts/x.py"),
+            ("delegate-build", "echo x > build/out.txt"),
+            ("delegate-build", "cp a.py scripts/b.py"),
+            ("delegate-build", "mkdir -p build/tmp"),
+            ("delegate-build", "rm -rf build/todo todox"),
+            ("delegate-build", "sed -i s/a/b/ tests/x.py"),
+            ("delegate-build", f"touch {os.path.join(tmpd, 'scratch.txt')}"),
+            ("delegate-build", "rm a; ls todo"),
+            ("delegate-build", "cat todo/x.md > build/copy.md"),
+            ("general-purpose", "rm todo/x"),
+            (None, "echo x > todo/x")):
+        check(f"{who} allows {command!r}", bash(command, who) is None, str(bash(command, who)))
     for label, name, who, key, path in (
             ("Edit .claude/settings.json", "Edit", "delegate-build", "file_path", ".claude/settings.json"),
             ("Write todo/x.md", "Write", "delegate-build", "file_path", "todo/x.md"),
