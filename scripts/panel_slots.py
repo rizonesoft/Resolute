@@ -40,41 +40,43 @@ Governance, not convenience:
     python scripts/panel_slots.py ledger [N]
     python scripts/panel_slots.py --self-test
 
-The delegate pin (operator decision 2026-10-01, D00 T04 §43): `[delegate]`
-names the alias, the model it resolved to at the probe, and the effort
-that Claude Code subagents in `.claude/agents/delegate-*.md` run on. The
-table requires it, the model must be registered, live, and the writer's
-family (delegates are subagents of the writer harness, never a review
-slot), and `validate` refuses any agent definition whose `model` or
-`effort` frontmatter differs. `delegate-probe` refuses when the alias
-resolves to another model, so a newer Sonnet is a re-pin, never a drift.
-The `hook` events fail open (a bad payload prints one stderr line and
-allows): `pre-agent` denies an `Agent` call that would run unpinned, and
-`subagent-stop` appends what each finished subagent ran on to
-`build/agent-delegations.jsonl`, which `ledger` prints. `pre-agent` allows
-a per-call `model` only as `opus`, `fable`, or the writer's own model id, so
-an older id such as `claude-opus-3` is denied. Both agent-name hooks read
-`roster_names()`, the `delegate-*.md` stems under `.claude/agents/`, so one
-malformed agent file never turns the guard off (validity is `validate`'s
-job). `subagent-stop` records nothing for an empty `agent_type` (a
-harness-internal side agent, not a delegation). It never prints to stdout,
-because a `SubagentStop` output may resume the finished subagent rather than
-reach the lead; when the pin is `mismatch` or `unread` it writes one stderr
-warning line, and the lead reads the ledger (`ledger`), which every
-`Delegated:` commit line cites.
+The delegate pin (operator decision 2026-10-01, D00 T04 §43; updated
+2026-10-17): `[delegate]` names the alias, the model it resolved to at
+the probe, and the effort that Claude Code subagents in
+`.claude/agents/delegate-*.md` run on. Subagents read and run; they
+never write. The table requires `[delegate]`, the model must be
+registered, live, and the writer's family (delegates are subagents of
+the writer harness, never a review slot), and `validate` refuses any
+agent definition whose `model` or `effort` frontmatter differs or whose
+`tools` frontmatter omits an explicit list or grants any edit tool
+(`Edit`, `Write`, `MultiEdit`, `NotebookEdit`, or `*`). `delegate-probe`
+refuses when the alias resolves to another model, so a newer Sonnet is a
+re-pin, never a drift. The `hook` events fail open (a bad payload prints
+one stderr line and allows): `pre-agent` denies an `Agent` call that
+would run unpinned, and `subagent-stop` appends what each finished
+subagent ran on to `build/agent-delegations.jsonl`, which `ledger`
+prints. `pre-agent` allows a per-call `model` only as `opus`, `fable`,
+or the writer's own model id, so an older id such as `claude-opus-3` is
+denied. Both agent-name hooks read `roster_names()`, the `delegate-*.md`
+stems under `.claude/agents/`, so one malformed agent file never turns
+the guard off (validity is `validate`'s job). `subagent-stop` records
+nothing for an empty `agent_type` (a harness-internal side agent, not a
+delegation). It never prints to stdout, because a `SubagentStop` output
+may resume the finished subagent rather than reach the lead; when the
+pin is `mismatch` or `unread` it writes one stderr warning line, and the
+lead reads the ledger (`ledger`), which every `Delegated:` commit line
+cites.
 
-`pre-tool` (PreToolUse on Bash, Edit, Write, NotebookEdit) constrains only
-an `agent_type` starting with `delegate-`; the lead and other agents never
-are. `delegate-research` and `delegate-check` are read-only. Every delegate
-is denied mutating git (`add`, `commit`, `push`, `reset`, `stash`,
-`checkout`, and the rest of `GIT_DENIED`), `panel_slots.py exec`,
-`panel_slots.py delegate-probe`, `codex`, and any write under `.git`,
-`.claude`, `.conclave`, `todo`, or `resolute_au3`, including a shell mutator
-(`rm`, `mv`, `cp`, `tee`, `sed -i`, `Remove-Item`, and the like) or a `>`
-redirection aimed there. The read-only delegates may run no shell mutator and
-no redirection except to `/dev/null`, `nul`, `$null`, or a descriptor
-(`2>&1`). Read-only git passes. It is a guard against accidents, not a
-sandbox.
+`pre-tool` (PreToolUse on Bash, Edit, Write, MultiEdit, NotebookEdit)
+constrains only an `agent_type` starting with `delegate-`; the lead and
+other agents never are. Every delegate is read-only: it is denied all
+write tools (`Edit`, `Write`, `MultiEdit`, `NotebookEdit`), mutating git
+(`add`, `commit`, `push`, `reset`, `stash`, `checkout`, and the rest of
+`GIT_DENIED`), `panel_slots.py exec`, `panel_slots.py delegate-probe`,
+`codex`, and any shell mutator (`rm`, `mv`, `cp`, `tee`, `sed -i`,
+`Remove-Item`, and the like) or `>` redirection except to `/dev/null`,
+`nul`, `$null`, or a descriptor (`2>&1`). Read-only git passes. It is a
+guard against accidents, not a sandbox.
 
 `exec` runs the slot's producer with the prompt on stdin, enforces the
 slot timeout, and exits 124 on expiry (the `timeout` convention the
@@ -402,7 +404,7 @@ def agent_frontmatter(path: str) -> dict[str, str]:
 
 def check_agents(table: dict, directory: str | None = None) -> list[str]:
     """Refuse an empty roster or any agent definition that contradicts the
-    delegate pin; return the agent names, sorted."""
+    delegate pin or grants edit tools; return the agent names, sorted."""
     directory = directory or agents_dir()
     delegate = table["delegate"]
     try:
@@ -428,6 +430,15 @@ def check_agents(table: dict, directory: str | None = None) -> list[str]:
                 raise PanelSlotsError(f"agent file {path} omits field {key} (the pin is {want!r})")
             if got != want:
                 raise PanelSlotsError(f"agent file {path} field {key} {got!r} is not the pin {want!r}")
+        tools_raw = (fields.get("tools") or "").strip()
+        if not tools_raw:
+            raise PanelSlotsError(
+                f"agent file {path} omits field tools; subagents read and run, and never write")
+        tool_names = [t.partition("(")[0].strip().lower() for t in tools_raw.split(",") if t.strip()]
+        if not tool_names or any(t == "*" or t in _FORBIDDEN_AGENT_TOOLS for t in tool_names):
+            raise PanelSlotsError(
+                f"agent file {path} grants edit tools ({tools_raw!r}); "
+                f"subagents read and run, they never write")
         names.append(name)
     return names
 
@@ -567,7 +578,8 @@ def ledger_entry(payload: dict, table: dict, agent_names, transcript_lines, now_
 # frozen AutoIt specification).
 PROTECTED_ROOTS = (".git", ".claude", ".conclave", "todo", "resolute_au3")
 READ_ONLY_DELEGATES = ("delegate-research", "delegate-check")
-WRITE_TOOLS = ("Edit", "Write", "NotebookEdit")
+WRITE_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
+_FORBIDDEN_AGENT_TOOLS = tuple(t.lower() for t in WRITE_TOOLS)
 GUARDED_TOOLS = ("Bash",) + WRITE_TOOLS
 GIT_DENIED = ("add", "am", "apply", "branch", "checkout", "cherry-pick", "clean", "commit",
               "config", "gc", "merge", "mv", "notes", "pull", "push", "rebase", "reset",
@@ -800,7 +812,7 @@ def _mutation_rule(command: str, read_only: bool, repo_root: str) -> str | None:
     return None
 
 
-def _bash_rule(command: str, read_only: bool = False, repo_root: str = ".") -> str | None:
+def _bash_rule(command: str, read_only: bool = True, repo_root: str = ".") -> str | None:
     """The name of the rule a delegate's Bash command breaks, or None."""
     found = _GIT_RE.search(command)
     if found:
@@ -818,26 +830,21 @@ def _resolved(path: str) -> str:
 
 
 def pre_tool_decision(payload: dict, repo_root: str) -> str | None:
-    """A deny reason for a delegate's Bash, Edit, Write, or NotebookEdit call,
-    or None. Only an `agent_type` starting with `delegate-` is constrained: the
-    lead and every other agent are never. `delegate-research` and
-    `delegate-check` are read-only. Every delegate is kept out of mutating git,
-    the review panel (`panel_slots.py exec`, `delegate-probe`, `codex`), and the
-    protected roots under `repo_root`; paths outside the repository (scratch)
-    are free. Bash also guards ordinary shell mutations: a read-only delegate
-    may run no mutator (`rm`, `cp`, `tee`, `sed -i`, `Remove-Item`, and the
-    rest of `_MUTATORS` and `_CMDLETS`) and no output redirection except the
-    harmless sinks (`2>&1`, `>&2`, `/dev/null`, `nul`, `$null`), and any other
-    delegate may not aim a mutator or a redirection at a protected root. A
-    command ends at a newline or separator; every operand of a mutator counts,
-    sources and option-attached values included, so copying out of a protected
-    root is refused too (`cat <file> > build/...` reads it into scratch); and
-    only an unambiguous `tar -t` or `unzip -l` (list or test) is not a
-    mutation. This is
-    a guard against accidents, not a sandbox: it reads the command text with a
-    regex, so a determined `bash -c`, a quoted separator, a PowerShell alias
-    such as `del`, an interpreter that writes the file itself, or a script that
-    does the same thing gets past it, and it is not a security boundary."""
+    """A deny reason for a delegate's Bash, Edit, Write, MultiEdit, or
+    NotebookEdit call, or None. Only an `agent_type` starting with `delegate-`
+    is constrained: the lead and every other agent are never. Every delegate is
+    read-only (subagents read and run, and never write): it is denied all write
+    tools (`Edit`, `Write`, `MultiEdit`, `NotebookEdit`), mutating git, the
+    review panel (`panel_slots.py exec`, `delegate-probe`, `codex`), and shell
+    mutations (`rm`, `cp`, `tee`, `sed -i`, `Remove-Item`, and the rest of
+    `_MUTATORS` and `_CMDLETS`, plus output redirection except the harmless
+    sinks `2>&1`, `>&2`, `/dev/null`, `nul`, `$null`). A command ends at a
+    newline or separator, and only an unambiguous `tar -t` or `unzip -l` (list
+    or test) is not a mutation. This is a guard against accidents, not a
+    sandbox: it reads the command text with a regex, so a determined `bash -c`,
+    a quoted separator, a PowerShell alias such as `del`, an interpreter that
+    writes the file itself, or a script that does the same thing gets past it,
+    and it is not a security boundary."""
     kind = payload.get("agent_type")
     if not isinstance(kind, str) or not kind.startswith(DELEGATE_PREFIX):
         return None
@@ -849,22 +856,12 @@ def pre_tool_decision(payload: dict, repo_root: str) -> str | None:
             f"({', '.join(PROTECTED_ROOTS)}); report what you need instead of doing it.")
     if tool == "Bash":
         command = tool_input.get("command")
-        rule = (_bash_rule(command, kind in READ_ONLY_DELEGATES, repo_root)
+        rule = (_bash_rule(command, True, repo_root)
                 if isinstance(command, str) else None)
         if rule is None:
             return None
         return f"{kind} may not run `{rule}`. {owns}"
-    if kind in READ_ONLY_DELEGATES:
-        return f"{kind} is read-only, so {tool} is denied. {owns}"
-    path = tool_input.get("file_path") or tool_input.get("notebook_path")
-    if not isinstance(path, str) or not path:
-        return None
-    full = _resolved(path if os.path.isabs(path) else os.path.join(repo_root, path))
-    for name in PROTECTED_ROOTS:
-        root = _resolved(os.path.join(repo_root, name))
-        if full == root or full.startswith(root + os.sep):
-            return f"{kind} may not write under `{name}` ({path}). {owns}"
-    return None
+    return f"{kind} is read-only, so {tool} is denied. {owns}"
 
 
 def _read_json_payload(stdin, stderr, event: str) -> dict | None:
@@ -1187,13 +1184,16 @@ def _self_test() -> int:
                 fh.write(text)
         return directory
 
-    def agent(name: str = "delegate-x", model: str | None = "sonnet", effort: str | None = "high") -> str:
+    def agent(name: str = "delegate-x", model: str | None = "sonnet", effort: str | None = "high",
+              tools: str | None = "Read") -> str:
         lines = ["---", f"name: {name}", "description: a test agent"]
         if model is not None:
             lines.append(f"model: {model}")
         if effort is not None:
             lines.append(f"effort: {effort}")
-        return "\n".join(lines + ["tools: Read", "---", "body", ""])
+        if tools is not None:
+            lines.append(f"tools: {tools}")
+        return "\n".join(lines + ["---", "body", ""])
 
     def agents_refuse(name: str, files: dict[str, str], needle: str) -> None:
         try:
@@ -1224,6 +1224,11 @@ def _self_test() -> int:
     agents_refuse("agent name differs from stem", {"delegate-y.md": agent("delegate-x")},
                   "is not the file stem")
     agents_refuse("agent name lacks the prefix", {"helper.md": agent("helper")}, "lacks the 'delegate-' prefix")
+    agents_refuse("agent missing tools", {"delegate-x.md": agent(tools=None)}, "omits field tools")
+    agents_refuse("agent empty tools", {"delegate-x.md": agent(tools="")}, "omits field tools")
+    for bad_tools in ("Read, Edit", "Write", "Read, MultiEdit", "NotebookEdit, Read", "Read, Edit(src/**)", "*"):
+        agents_refuse(f"agent grants edit tools {bad_tools!r}",
+                      {"delegate-x.md": agent(tools=bad_tools)}, "grants edit tools")
 
     names_dir = roster({"delegate-b.md": agent("delegate-b"), "delegate-a.md": "just text\n",
                         "helper.md": agent("helper"), "delegate-c.txt": "x"})
@@ -1423,17 +1428,17 @@ def _self_test() -> int:
     with open(os.path.join(tmpd, "roster-ledger.jsonl"), encoding="utf-8") as fh:
         check("ledger resolves names from the roster directory", json.loads(fh.read())["pin"] == "unread")
 
-    # The pre-tool hook: delegates only, git state, the panel, protected roots.
+    # The pre-tool hook: delegates only, git state, the panel, protected roots, and read-only enforcement.
     root = os.path.join(tmpd, "repo")
     os.makedirs(os.path.join(root, ".git"))
 
-    def tool(name: str, who: str | None = "delegate-build", **tool_input) -> str | None:
+    def tool(name: str, who: str | None = "delegate-check", **tool_input) -> str | None:
         payload = {"tool_name": name, "tool_input": tool_input}
         if who is not None:
             payload["agent_type"] = who
         return pre_tool_decision(payload, root)
 
-    def bash(command: str, who: str | None = "delegate-build") -> str | None:
+    def bash(command: str, who: str | None = "delegate-check") -> str | None:
         return tool("Bash", who, command=command)
 
     check("non-delegate git commit allowed", bash("git commit -m x", None) is None
@@ -1450,7 +1455,7 @@ def _self_test() -> int:
                           ("cd x; ./scripts/panel_slots.py exec bulk", "panel_slots.py exec"),
                           ("codex review", "codex"), ("echo a; codex exec x", "codex")):
         reason = bash(command) or ""
-        check(f"delegate-build denies {command!r}", f"`{rule}`" in reason and "lead owns git state" in reason
+        check(f"delegate denies {command!r}", f"`{rule}`" in reason and "lead owns git state" in reason
               and "protected roots" in reason, reason)
     for command in ("git status", "git diff -- a", "git log -3", "git show HEAD", "git ls-files",
                     "git rev-parse HEAD", "git blame f", "git grep commit", "git cat-file -p x",
@@ -1458,11 +1463,12 @@ def _self_test() -> int:
                     'grep -rn "git commit" docs/', "echo git push", "git commit-tree x",
                     "python scripts/panel_slots.py --self-test", "python -m py_compile scripts/panel_slots.py",
                     'grep -rn "panel_slots.py exec" docs/', "ls codex-notes"):
-        check(f"delegate-build allows {command!r}", bash(command) is None, str(bash(command)))
+        check(f"delegate allows {command!r}", bash(command) is None, str(bash(command)))
     for who in ("delegate-research", "delegate-check"):
         check(f"{who} Bash follows the git rule too", bash("git push", who) is not None
               and bash("git status", who) is None)
-    # Shell mutations: read-only delegates mutate nothing, the rest spare the protected roots.
+    # Shell mutations: delegates are read-only and mutate nothing; _mutation_rule(read_only=False)
+    # still guards protected roots directly.
     abs_git = os.path.join(root, ".git", "config")
     for who, command, rule in (
             ("delegate-check", "rm todo/probe.md", "read-only: rm"),
@@ -1473,37 +1479,7 @@ def _self_test() -> int:
             ("delegate-check", "sed -i s/a/b/ scripts/x.py", "read-only: sed -i"),
             ("delegate-check", "perl -pi -e 1 scripts/x.py", "read-only: perl -i"),
             ("delegate-check", "remove-item x", "read-only: remove-item"),
-            ("delegate-build", "cp build/probe.md .claude/settings.json", "cp into .claude"),
-            ("delegate-build", "rm -rf ./todo/x", "rm into todo"),
-            ("delegate-build", "echo x >> resolute_au3/a.au3", "redirection into resolute_au3"),
-            ("delegate-build", "echo x 2> .conclave/e", "redirection into .conclave"),
-            ("delegate-build", "sed -i s/a/b/ todo/x.md", "sed -i into todo"),
-            ("delegate-build", "Remove-Item .conclave\\panel.toml", "Remove-Item into .conclave"),
-            ("delegate-build", 'mv a "todo/b c"', "mv into todo"),
-            ("delegate-build", "touch x/../todo", "touch into todo"),
-            ("delegate-build", f'echo x | tee "{abs_git}"', "tee into .git"),
-            ("delegate-build", f"echo x > {os.path.join(root, 'todo', 'a')}", "redirection into todo"),
-            # a command ends at its newline, so a later line is judged on its own
             ("delegate-check", "grep -n x a.py\nsed -i s/a/b/ c.txt", "read-only: sed -i"),
-            ("delegate-build", "ls\nrm todo/x", "rm into todo"),
-            ("delegate-build", "sed -n p a.py\nsed -i s/a/b/ todo/c.md", "sed -i into todo"),
-            # every operand counts, destinations and attached values included
-            ("delegate-build", "cp -t todo build/x", "cp into todo"),
-            ("delegate-build", "cp build/x --target-directory=.claude", "cp into .claude"),
-            ("delegate-build", "cp build/x --target-directory .claude", "cp into .claude"),
-            ("delegate-build", "cp build/a todo/b", "cp into todo"),
-            ("delegate-build", "cp -r build/a todo/b 2>/dev/null", "cp into todo"),
-            ("delegate-build", "install -d build/x todo/y", "install into todo"),
-            ("delegate-build", "ln -s build/a todo/b", "ln into todo"),
-            ("delegate-build", "Copy-Item build/a.md -Destination todo/a.md", "Copy-Item into todo"),
-            ("delegate-build", "copy-item build/a.md -destination:todo/a.md", "copy-item into todo"),
-            ("delegate-build", "Copy-Item -Path build/a.md -Force todo/a.md", "Copy-Item into todo"),
-            ("delegate-build", "Copy-Item build/a.md todo/a.md", "Copy-Item into todo"),
-            ("delegate-build", "mv todo/a.md build/a.md", "mv into todo"),
-            ("delegate-build", "mv build/a.md todo/a.md", "mv into todo"),
-            ("delegate-build", "Move-Item todo/a.md build/a.md", "Move-Item into todo"),
-            ("delegate-build", "Rename-Item todo/a.md b.md", "Rename-Item into todo"),
-            # archives: only a create, extract, append, update, or delete mutates
             ("delegate-check", "tar -xf build/p.tar", "read-only: tar"),
             ("delegate-check", "tar xzf build/p.tgz", "read-only: tar"),
             ("delegate-check", "tar -czf build/p.tgz src", "read-only: tar"),
@@ -1511,14 +1487,45 @@ def _self_test() -> int:
             ("delegate-check", "tar --delete -f build/p.tar x", "read-only: tar"),
             ("delegate-check", "unzip build/p.zip", "read-only: unzip"),
             ("delegate-check", "unzip -o build/p.zip", "read-only: unzip"),
-            ("delegate-build", "tar -xf build/p.tar -C todo", "tar into todo"),
-            ("delegate-build", "tar xzf build/p.tgz -C .claude", "tar into .claude"),
-            ("delegate-build", "tar -xzC todo -f build/p.tgz", "tar into todo"),
-            ("delegate-build", "tar -cf todo/p.tar build/x", "tar into todo"),
-            ("delegate-build", "unzip build/p.zip -d todo", "unzip into todo"),
-            ("delegate-build", "unzip -o build/p.zip -dtodo/out", "unzip into todo")):
+            ("delegate-check", "tar fx build/backup.tar", "read-only: tar")):
         reason = bash(command, who) or ""
         check(f"{who} denies {command!r}", f"`{rule}`" in reason and "protected roots" in reason, reason)
+    for command, rule in (
+            ("cp build/probe.md .claude/settings.json", "cp into .claude"),
+            ("rm -rf ./todo/x", "rm into todo"),
+            ("echo x >> resolute_au3/a.au3", "redirection into resolute_au3"),
+            ("echo x 2> .conclave/e", "redirection into .conclave"),
+            ("sed -i s/a/b/ todo/x.md", "sed -i into todo"),
+            ("Remove-Item .conclave\\panel.toml", "Remove-Item into .conclave"),
+            ('mv a "todo/b c"', "mv into todo"),
+            ("touch x/../todo", "touch into todo"),
+            (f'echo x | tee "{abs_git}"', "tee into .git"),
+            (f"echo x > {os.path.join(root, 'todo', 'a')}", "redirection into todo"),
+            ("ls\nrm todo/x", "rm into todo"),
+            ("sed -n p a.py\nsed -i s/a/b/ todo/c.md", "sed -i into todo"),
+            ("cp -t todo build/x", "cp into todo"),
+            ("cp build/x --target-directory=.claude", "cp into .claude"),
+            ("cp build/x --target-directory .claude", "cp into .claude"),
+            ("cp build/a todo/b", "cp into todo"),
+            ("cp -r build/a todo/b 2>/dev/null", "cp into todo"),
+            ("install -d build/x todo/y", "install into todo"),
+            ("ln -s build/a todo/b", "ln into todo"),
+            ("Copy-Item build/a.md -Destination todo/a.md", "Copy-Item into todo"),
+            ("copy-item build/a.md -destination:todo/a.md", "copy-item into todo"),
+            ("Copy-Item -Path build/a.md -Force todo/a.md", "Copy-Item into todo"),
+            ("Copy-Item build/a.md todo/a.md", "Copy-Item into todo"),
+            ("mv todo/a.md build/a.md", "mv into todo"),
+            ("mv build/a.md todo/a.md", "mv into todo"),
+            ("Move-Item todo/a.md build/a.md", "Move-Item into todo"),
+            ("Rename-Item todo/a.md b.md", "Rename-Item into todo"),
+            ("tar -xf build/p.tar -C todo", "tar into todo"),
+            ("tar xzf build/p.tgz -C .claude", "tar into .claude"),
+            ("tar -xzC todo -f build/p.tgz", "tar into todo"),
+            ("tar -cf todo/p.tar build/x", "tar into todo"),
+            ("unzip build/p.zip -d todo", "unzip into todo"),
+            ("unzip -o build/p.zip -dtodo/out", "unzip into todo")):
+        got = _mutation_rule(command, False, root) or ""
+        check(f"_mutation_rule denies {command!r}", got == rule, got)
     for who, command in (
             ("delegate-check", "git log -3 2>&1 | head"),
             ("delegate-check", "python scripts/panel_slots.py --self-test 2>/dev/null | tail -1"),
@@ -1527,20 +1534,10 @@ def _self_test() -> int:
             ("delegate-check", 'grep ">" notes.txt'),
             ("delegate-check", "ls remove-items; echo rmx"),
             ("delegate-research", "sed -n s/a/b/p scripts/x.py"),
-            ("delegate-build", "echo x > build/out.txt"),
-            ("delegate-build", "cp a.py scripts/b.py"),
-            ("delegate-build", "mkdir -p build/tmp"),
-            ("delegate-build", "rm -rf build/todo todox"),
-            ("delegate-build", "sed -i s/a/b/ tests/x.py"),
-            ("delegate-build", f"touch {os.path.join(tmpd, 'scratch.txt')}"),
-            ("delegate-build", "rm a; ls todo"),
-            ("delegate-build", "cat todo/x.md > build/copy.md"),
             ("delegate-check", "sed -n '1,20p' scripts/panel_slots.py\ngrep -i delegate AGENTS.md"),
             ("delegate-check", "sed -n p a.py\r\ngrep -i x b.txt"),
             ("delegate-research", "perl -ne print a.pl\ngrep -pi x b.txt"),
             ("delegate-check", "git log -3\ngit status"),
-            ("delegate-build", "tar -xf build/p.tar"),
-            ("delegate-build", "tar -xf build/p.tar -C build/out"),
             ("delegate-check", "tar -tf build/package.tar"),
             ("delegate-check", "tar tzf build/p.tgz"),
             ("delegate-check", "tar -tvf build/p.tar -C todo"),
@@ -1550,8 +1547,6 @@ def _self_test() -> int:
             ("delegate-check", "unzip -Z1 build/package.zip"),
             ("delegate-check", "unzip -t build/package.zip"),
             ("delegate-check", "unzip -qv build/package.zip"),
-            ("delegate-build", "unzip build/p.zip -d build/out"),
-            ("delegate-build", "unzip build/p.zip"),
             ("general-purpose", "rm todo/x"),
             (None, "echo x > todo/x")):
         check(f"{who} allows {command!r}", bash(command, who) is None, str(bash(command, who)))
@@ -1559,7 +1554,7 @@ def _self_test() -> int:
     # protected root through a copy or archive is refused, and the review's
     # bypasses (traditional tar syntax, selected members, a trailing option
     # value, a glued `-d`) stay refused.
-    for who, command, rule in [("delegate-build", c, None) for c in (
+    for command, rule in [(c, None) for c in (
             "cp todo/README.md build/plan-fixture.md", "cp -r todo/a .claude/b build/",
             "cp todo/a build/b 2>/dev/null", "cp -t build todo/a .claude/b",
             "cp --target-directory=build todo/a", "install -m 755 todo/a build/b",
@@ -1567,51 +1562,45 @@ def _self_test() -> int:
             "Copy-Item todo/a.md build/a.md",
             "Copy-Item -Path todo/a.md -Recurse -Destination:build/a.md",
             "Copy-Item todo/a.md", "tar -czf build/p.tgz todo/")] + [
-            ("delegate-check", "tar fx build/backup.tar", "read-only: tar"),
-            ("delegate-build", "tar cfz todo/archive.tgz build/x", "tar into todo"),
-            ("delegate-build", "tar -xf build/backup.tar todo/README.md", "tar into todo"),
-            ("delegate-build", "unzip build/backup.zip todo/README.md", "unzip into todo"),
-            ("delegate-build", "install build/x todo/x -m 644", "install into todo"),
-            ("delegate-build", "cp build/x todo/x --suffix .bak", "cp into todo"),
-            ("delegate-build", "cp -rt.claude build/x", "cp into .claude"),
-            ("delegate-build", "tar -cftodo/archive.tar build/x", "tar into todo"),
-            ("delegate-build", "unzip -od.conclave build/p.zip", "unzip into .conclave")]:
-        reason = bash(command, who)
-        check(f"{who} refuses every-operand {command!r}", reason is not None
-              and (rule or "into todo") in reason, str(reason))
+            ("tar cfz todo/archive.tgz build/x", "tar into todo"),
+            ("tar -xf build/backup.tar todo/README.md", "tar into todo"),
+            ("unzip build/backup.zip todo/README.md", "unzip into todo"),
+            ("install build/x todo/x -m 644", "install into todo"),
+            ("cp build/x todo/x --suffix .bak", "cp into todo"),
+            ("cp -rt.claude build/x", "cp into .claude"),
+            ("tar -cftodo/archive.tar build/x", "tar into todo"),
+            ("unzip -od.conclave build/p.zip", "unzip into .conclave")]:
+        got = _mutation_rule(command, False, root)
+        check(f"_mutation_rule refuses every-operand {command!r}", got is not None
+              and (rule or "into todo") in got, str(got))
     for command in ("tar -cfbuild/todo/archive.tar build/x", "cp -rtbuild/todo build/x",
                     "cp -rtbuild/.claude build/x", "tar -xfbuild/p.tar -Cbuild/todo"):
-        check(f"delegate-build allows scratch cluster {command!r}",
-              bash(command, "delegate-build") is None, str(bash(command, "delegate-build")))
+        check(f"_mutation_rule allows scratch cluster {command!r}",
+              _mutation_rule(command, False, root) is None, str(_mutation_rule(command, False, root)))
     for label, name, who, key, path in (
-            ("Edit .claude/settings.json", "Edit", "delegate-build", "file_path", ".claude/settings.json"),
-            ("Write todo/x.md", "Write", "delegate-build", "file_path", "todo/x.md"),
-            ("Write resolute_au3/a.au3", "Write", "delegate-build", "file_path", "resolute_au3/a.au3"),
-            ("Write .git/config absolute", "Write", "delegate-build", "file_path",
+            ("Edit .claude/settings.json", "Edit", "delegate-check", "file_path", ".claude/settings.json"),
+            ("Write todo/x.md", "Write", "delegate-check", "file_path", "todo/x.md"),
+            ("Write resolute_au3/a.au3", "Write", "delegate-check", "file_path", "resolute_au3/a.au3"),
+            ("Write .git/config absolute", "Write", "delegate-check", "file_path",
              os.path.join(root, ".git", "config")),
-            ("Write TODO/../.conclave/panel.toml", "Write", "delegate-build", "file_path",
+            ("Write TODO/../.conclave/panel.toml", "Write", "delegate-check", "file_path",
              "TODO/../.conclave/panel.toml"),
-            ("Write .claude mixed separators", "Write", "delegate-build", "file_path", ".claude\\agents/x.md"),
-            ("NotebookEdit under todo", "NotebookEdit", "delegate-build", "notebook_path", "todo/n.ipynb"),
+            ("Write .claude mixed separators", "Write", "delegate-check", "file_path", ".claude\\agents/x.md"),
+            ("NotebookEdit under todo", "NotebookEdit", "delegate-check", "notebook_path", "todo/n.ipynb"),
             ("Write scripts/x.py as research", "Write", "delegate-research", "file_path", "scripts/x.py"),
             ("Write scripts/x.py as check", "Write", "delegate-check", "file_path", "scripts/x.py"),
             ("Edit scripts/x.py as check", "Edit", "delegate-check", "file_path", "scripts/x.py"),
+            ("MultiEdit scripts/x.py as check", "MultiEdit", "delegate-check", "file_path", "scripts/x.py"),
             ("NotebookEdit as research", "NotebookEdit", "delegate-research", "notebook_path", "n.ipynb")):
         reason = tool(name, who, **{key: path}) or ""
-        check(f"pre-tool denies {label}", "lead owns git state" in reason and "protected roots" in reason, reason)
-    for label, who, path in (("scripts/x.py", "delegate-build", "scripts/x.py"),
-                             ("todox/a.md", "delegate-build", "todox/a.md"),
-                             ("outside the repo", "delegate-build", os.path.join(tmpd, "scratch.txt"))):
-        check(f"pre-tool allows Write {label}", tool("Write", who, file_path=path) is None)
+        check(f"pre-tool denies {label}", "is read-only" in reason and "lead owns git state" in reason, reason)
     check("pre-tool allows a non-delegate Write under todo", tool("Write", None, file_path="todo/x.md") is None)
     check("pre-tool allows Read", tool("Read", file_path="todo/x.md") is None)
-    for label, payload in (("no tool_input", {"tool_name": "Bash", "agent_type": "delegate-build"}),
-                           ("tool_input not an object", {"tool_name": "Write", "agent_type": "delegate-build",
+    for label, payload in (("no tool_input", {"tool_name": "Bash", "agent_type": "delegate-check"}),
+                           ("tool_input not an object", {"tool_name": "Write", "agent_type": "delegate-check",
                                                          "tool_input": "x"}),
-                           ("command not a string", {"tool_name": "Bash", "agent_type": "delegate-build",
+                           ("command not a string", {"tool_name": "Bash", "agent_type": "delegate-check",
                                                      "tool_input": {"command": 7}}),
-                           ("no path", {"tool_name": "Write", "agent_type": "delegate-build",
-                                        "tool_input": {}}),
                            ("agent_type not a string", {"tool_name": "Bash", "agent_type": 3,
                                                         "tool_input": {"command": "git push"}})):
         check(f"pre-tool allows a payload with {label}", pre_tool_decision(payload, root) is None)
@@ -1622,7 +1611,7 @@ def _self_test() -> int:
         rc = run_hook("pre-tool", io.StringIO(text), out, err, repo_root=root)
         return rc, out.getvalue(), err.getvalue()
 
-    rc, out, err = run_tool({"tool_name": "Bash", "agent_type": "delegate-build", "agent_id": "x",
+    rc, out, err = run_tool({"tool_name": "Bash", "agent_type": "delegate-check", "agent_id": "x",
                              "tool_input": {"command": "git commit -m x"}})
     body = json.loads(out) if out.strip() else {}
     inner = body.get("hookSpecificOutput", {})
@@ -1632,10 +1621,10 @@ def _self_test() -> int:
     check("pre-tool lead call is silent",
           run_tool({"tool_name": "Bash", "tool_input": {"command": "git commit -m x"}}) == (0, "", ""))
     check("pre-tool delegate allow is silent",
-          run_tool({"tool_name": "Bash", "agent_type": "delegate-build",
+          run_tool({"tool_name": "Bash", "agent_type": "delegate-check",
                     "tool_input": {"command": "git status"}}) == (0, "", ""))
     check("pre-tool ignores other tools",
-          run_tool({"tool_name": "Read", "agent_type": "delegate-build",
+          run_tool({"tool_name": "Read", "agent_type": "delegate-check",
                     "tool_input": {"file_path": "todo/x.md"}}) == (0, "", ""))
     rc, out, err = run_tool({"tool_name": "Write", "agent_type": "delegate-check",
                              "tool_input": {"file_path": "scripts/x.py"}})
@@ -1643,20 +1632,29 @@ def _self_test() -> int:
     for text in ("not json", "[1, 2]", ""):
         rc, out, err = run_tool(text)
         check(f"pre-tool fails open on {text!r}", rc == 0 and out == "" and err.count("\n") == 1, err)
-    rc, out, err = run_tool({"tool_name": "Write", "agent_type": "delegate-build",
-                             "tool_input": {"file_path": ".claude/x.md"}})
-    check("pre-tool path deny via run_hook", rc == 0 and "may not write under `.claude`" in out, out)
     out, err = io.StringIO(), io.StringIO()
+    out.close()
     rc = run_hook("pre-tool", io.StringIO(json.dumps({
-        "tool_name": "Write", "agent_type": "delegate-build", "tool_input": {"file_path": "x"}})),
-        out, err, repo_root=7)
-    check("pre-tool fails open on an unexpected error", rc == 0 and out.getvalue() == ""
+        "tool_name": "Write", "agent_type": "delegate-check", "tool_input": {"file_path": "x"}})),
+        out, err, repo_root=root)
+    check("pre-tool fails open on an unexpected error", rc == 0
           and "allowing" in err.getvalue(), err.getvalue())
 
-    # The checked-in table validates.
+    # The checked-in table and roster validate, and no slot or delegate dispatches a writer agent.
     try:
         live = load()
         check("checked-in table validates", live["writer"]["family"] == "claude")
+        live_agents = check_agents(live)
+        check("checked-in roster has only read-only delegates",
+              live_agents == ["delegate-check", "delegate-research"])
+        for slot_name, slot_entry in live["slots"].items():
+            argv = argv_for_slot(slot_name, table=live)
+            check(f"slot {slot_name} never dispatches a writer agent",
+                  slot_entry["family"] != live["writer"]["family"]
+                  and "--agent" not in argv
+                  and (slot_name == "independent" or "-s" in argv and "read-only" in argv
+                       or "--allowedTools" in argv and argv[argv.index("--allowedTools") + 1:] == ["Read"]),
+                  str(argv))
     except PanelSlotsError as exc:
         check("checked-in table validates", False, str(exc))
 
