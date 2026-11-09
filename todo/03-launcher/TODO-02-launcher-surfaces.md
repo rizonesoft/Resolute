@@ -115,6 +115,7 @@ The searchable catalog of Windows system locations per the `D03 T01 §4` directi
 
 **Fidelity:** the locations browser, against `DESIGN.md`; new surface, no AutoIt baseline beyond the cascade items it absorbs.
 **Job:** a user reaches a Windows system location without knowing its CLSID. Consumer: the browser `D03 T01 §4` builds and the launched shell location.
+**Operator decision (2026-11-09):** system locations are Resolute's own tool clones (Control Panel, a registry editor, an event viewer, disk management, and their peers are built as Resolute tools under `extensions/`), not shortcuts to the Windows applets. The browser therefore launches the installed Resolute clone for a location when one exists; a Windows-native target is only the interim entry for a location with no clone yet, and each such interim entry names the clone that will replace it. The catalog's category set follows the clone set as it lands; nothing here assumes the final tool count.
 **Treatment:** a curated catalog with localized names, each entry verified to open. Cheaper substitute that fails the checkpoint: specifying the browser without the failure presentation, which ships silent nothing-happens for every dead CLSID.
 **Chrome:** consume the framework list surface and message layer. No new dialog.
 
