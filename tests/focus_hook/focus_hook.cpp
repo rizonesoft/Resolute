@@ -25,9 +25,11 @@ bool AdoptionIntentMarked() {
     wchar_t value[2];
     if (GetEnvironmentVariableW(kFocusHookAdoptEnv, value, 2) > 0) return true;
     wchar_t path[MAX_PATH];
-    if (!GetTempPathW(MAX_PATH, path)) return false;
+    const DWORD len = GetTempPathW(MAX_PATH, path);
+    if (!len || len >= MAX_PATH) return false;
     wchar_t name[96];
     wsprintfW(name, L"%s%lu.txt", kFocusHookIntentPrefix, GetCurrentProcessId());
+    if (len + lstrlenW(name) >= MAX_PATH) return false;
     lstrcatW(path, name);
     return GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES;
 }
@@ -41,10 +43,13 @@ bool AdoptionIntentMarked() {
 HANDLE g_failMutex = nullptr;
 
 bool WriteMarkerFile(const wchar_t* dir, const wchar_t* kind) {
-    wchar_t path[MAX_PATH];
-    lstrcpynW(path, dir, MAX_PATH);
     wchar_t name[96];
     wsprintfW(name, L"%s%lu.txt", kFocusHookFailPrefix, GetCurrentProcessId());
+    // A long directory must fall through to the next destination, never
+    // past the buffer: check the complete filename fits first.
+    if (lstrlenW(dir) + lstrlenW(name) >= MAX_PATH) return false;
+    wchar_t path[MAX_PATH];
+    lstrcpynW(path, dir, MAX_PATH);
     lstrcatW(path, name);
     HANDLE file = CreateFileW(path, GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file == INVALID_HANDLE_VALUE) return false;
@@ -60,8 +65,10 @@ bool WriteMarkerFile(const wchar_t* dir, const wchar_t* kind) {
 
 void WriteFailureMarker(const wchar_t* kind) {
     wchar_t dir[MAX_PATH];
-    if (GetTempPathW(MAX_PATH, dir) && WriteMarkerFile(dir, kind)) return;
-    if (GetCurrentDirectoryW(MAX_PATH, dir)) {
+    const DWORD tempLen = GetTempPathW(MAX_PATH, dir);
+    if (tempLen && tempLen < MAX_PATH && WriteMarkerFile(dir, kind)) return;
+    const DWORD cwdLen = GetCurrentDirectoryW(MAX_PATH, dir);
+    if (cwdLen && cwdLen + 1 < MAX_PATH) {
         lstrcatW(dir, L"\\");
         if (WriteMarkerFile(dir, kind)) return;
     }
