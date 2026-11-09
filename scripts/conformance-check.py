@@ -452,9 +452,15 @@ def eval_build_clean(root: Path, tool, spec, ctx):
     # captured by the ratchet before analysis and verified by it
     # after: a change before, during, or after measurement voids
     # the evidence, with no timestamp race left to find.
-    if record.get("inputs_sha256") != ctx["ratchet"].input_manifest(root):
+    current_inputs = ctx["ratchet"].input_manifest(root)
+    if record.get("inputs_sha256") != current_inputs:
         raise Refusal(
             "C24: build inputs differ from the measured manifest; rerun the gate"
+        )
+    if record.get("build_inputs_sha256") != current_inputs:
+        raise Refusal(
+            "C24: artifacts were not built from these inputs "
+            "(build record mismatch); rebuild and rerun the gate"
         )
     target = spec["tidy_target"]
     if target not in record.get("targets", {}):
@@ -835,6 +841,7 @@ def self_test() -> int:
 
         rec = _j.loads(result.read_text())
         rec["inputs_sha256"] = load_ratchet(tmp).input_manifest(tmp)
+        rec["build_inputs_sha256"] = rec["inputs_sha256"]
         result.write_text(_j.dumps(rec))
 
 
@@ -865,6 +872,7 @@ def self_test() -> int:
             "baseline_sha256": _h.sha256((tmp / "todo" / ".tidy-baseline").read_bytes()).hexdigest(),
             "artifacts": {"Bin/Release/ToolA.exe": _h.sha256((tmp / "Bin/Release/ToolA.exe").read_bytes()).hexdigest()},
             "inputs_sha256": load_ratchet(tmp).input_manifest(tmp),
+            "build_inputs_sha256": load_ratchet(tmp).input_manifest(tmp),
             "compile_dbs": {"build/release/compile_commands.json": _h.sha256((tmp / "build/release/compile_commands.json").read_bytes()).hexdigest()},
         }))
         tools = {

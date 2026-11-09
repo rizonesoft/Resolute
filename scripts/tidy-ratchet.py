@@ -530,7 +530,10 @@ def default_base(root: Path, override):
     return "origin/master" if probe.returncode == 0 else "HEAD"
 
 
-INPUT_SUFFIXES = {".h", ".hpp", ".cpp", ".cc", ".cxx", ".inl", ".cmake", ".txt", ".in", ".rc"}
+INPUT_SUFFIXES = {
+    ".h", ".hpp", ".cpp", ".cc", ".cxx", ".inl", ".cmake", ".txt",
+    ".in", ".rc", ".manifest", ".def", ".json", ".ico", ".png",
+}
 
 
 def input_manifest(root: Path) -> str:
@@ -544,7 +547,7 @@ def input_manifest(root: Path) -> str:
     import hashlib
 
     entries = []
-    for base_name in ("src", "shared", "extensions", "cmake", "tests"):
+    for base_name in ("src", "shared", "extensions", "cmake", "tests", "resources"):
         base = root / base_name
         if not base.is_dir():
             continue
@@ -590,6 +593,27 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
     if not clang_tidy.is_file():
         raise Refusal(f"clang-tidy not found at {clang_tidy}")
     inputs_before = input_manifest(root)
+    build_inputs = None
+    if result_path is not None:
+        # Bind to the BUILD, not only to analysis: build.ps1 records
+        # the input manifest and artifact hashes of the successful
+        # build, and a source change after that build (before this
+        # analysis) must not certify old executables (review round 7).
+        import json as _json2
+
+        build_record = root / "build" / "logs" / "build-record.json"
+        if not build_record.is_file():
+            raise Refusal(
+                "no build record at build/logs/build-record.json; the analysis "
+                "cannot bind to a successful build (run scripts/build.ps1 first)"
+            )
+        record_in = _json2.loads(build_record.read_text(encoding="utf-8"))
+        build_inputs = record_in.get("inputs_sha256")
+        if build_inputs != inputs_before:
+            raise Refusal(
+                "build inputs differ from the recorded successful build; "
+                "the artifacts were not built from these sources, rebuild first"
+            )
     per_target, global_set, total_tus, log_error = run_analysis(root, clang_tidy, targets, log_path)
     if input_manifest(root) != inputs_before:
         raise Refusal(
@@ -677,6 +701,7 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
                 if f.is_file()
             } if (root / "Bin" / "Release").is_dir() else {},
             "inputs_sha256": inputs_before,
+            "build_inputs_sha256": build_inputs,
             "compile_dbs": {
                 db.relative_to(root).as_posix(): _hashlib.sha256(db.read_bytes()).hexdigest()
                 for db in targets.values()
@@ -1271,11 +1296,31 @@ def main(argv=None) -> int:
     ap.add_argument("--clang-tidy", default=None)
     ap.add_argument("--log", default=None, help="write raw clang-tidy output here")
     ap.add_argument("--result-json", default=None, help="write the measured result record here")
+    ap.add_argument("--write-build-record", default=None, help="record input manifest + artifact hashes of a successful build")
     ap.add_argument("--root", default=None)
     args = ap.parse_args(argv)
 
     if args.self_test:
         return self_test()
+
+    root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parent.parent
+    if args.write_build_record:
+        import hashlib as _hl
+        import json as _js
+
+        artifacts = {}
+        base = root / "Bin" / "Release"
+        if base.is_dir():
+            artifacts = {
+                f.relative_to(root).as_posix(): _hl.sha256(f.read_bytes()).hexdigest()
+                for f in sorted(base.rglob("*"))
+                if f.is_file()
+            }
+        record = {"inputs_sha256": input_manifest(root), "artifacts": artifacts}
+        Path(args.write_build_record).parent.mkdir(parents=True, exist_ok=True)
+        write_atomic(Path(args.write_build_record), _js.dumps(record, indent=1) + "\n")
+        print(f"tidy-ratchet: build record written ({len(artifacts)} artifact(s))")
+        return 0
 
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parent.parent
     clang_tidy = (
