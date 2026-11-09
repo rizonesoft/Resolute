@@ -44,6 +44,7 @@ track: Q1
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [x]   |
 |   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [ ]   |
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [ ]   |
+|   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
 
 ---
 
@@ -254,6 +255,23 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 
 **Test checkpoint:** `python scripts/smoke-run.py --self-test` passes with the blocked-capture case named, and the case fails when the bound is removed (quoted from a real run each way).
 
+## 7. Unattended Elevated Smoke via Scheduled Task
+
+**Filed 2026-11-10** from an operator decision in the `D07 T01 §5` run: approving a UAC prompt for every elevated smoke run does not scale to unattended runs, and an elevated terminal only helps runs launched from inside it, because elevation is a process token a child inherits from its parent, never from another window on the desktop. Nightly, watchdog, and resumed-session parents are not children of that terminal, so they still face the prompt. This section owns the consent-once path: one highest-privilege interactive scheduled task, registered with one approval, that later runs invoke without any prompt. `RunAsInvoker` and lowering the machine UAC policy were considered and rejected: the first never elevates, so it cannot prove an elevated step, and the second weakens every application on the machine to convenience one test.
+
+**Needs:** Windows host (build/test)
+
+No surface of its own: a scheduled task, two scripts, and the existing smoke report. The shared smoke driver and its report format are consumed unchanged; this section adds no second elevation mechanism to `scripts/smoke-run.py`, whose `--elevate` runas path stays the attended fallback.
+
+- [ ] Provision the task from `tools/elevated-smoke.ps1` (registration mode): creates `\Resolute\ElevatedSmoke` with `RunLevel Highest`, an interactive logon type (run only when the operator is logged on, so windows and `PrintWindow` captures live in the real session, never session 0), and one fixed action, `python scripts/smoke-run.py --visible` from the repository root, described as the consent-once elevated smoke task. Done when: `Get-ScheduledTask \Resolute\ElevatedSmoke` readback shows the principal, logon type, and action exactly, quoted; registering from a non-elevated shell prompts exactly once, at registration. Cheaper substitute that fails the checkpoint: a SYSTEM or session-0 task, whose windows no capture can prove, or a task action built from caller-supplied arguments, which turns a test task into a general elevated launcher.
+- [ ] Run it unattended from `tools/elevated-smoke.ps1` (run mode): `schtasks /Run /TN \Resolute\ElevatedSmoke` from a non-elevated shell, then wait for the task to leave the running state inside a named bound, and read the result from `build/smoke/smoke-report.md` by its write time, never a stale report. Done when: no prompt appears, the script prints the report and the task `LastTaskResult`, and it exits non-zero when the verdict is not `pass` or the report did not change. Cheaper substitute: trusting the `schtasks` exit code, which proves a task started, not that a tool was driven.
+- [ ] Prove no silent elevation bypass ships with it: the registered action and environment carry no `__COMPAT_LAYER` / `RunAsInvoker`, and `docs/testing.md` records the three routes by name (elevated terminal inheritance for manual runs, this task for unattended runs, `--elevate` runas for attended one-offs) with the token-inheritance reason an elevated terminal cannot help a nightly or resumed parent. Done when: the task readback and the `docs/testing.md` passage are quoted together.
+- [ ] Provide the reverse: `tools/elevated-smoke.ps1` (remove mode) unregisters `\Resolute\ElevatedSmoke` and a readback proves it absent. Done when: removal and its confirming `Get-ScheduledTask` failure are quoted, and the task is re-registered afterwards so the machine is left in the working state.
+- [ ] Commit: `"quality: unattended elevated smoke via scheduled task"`
+
+-> SOURCE: operator-2026-11-10-elevated-smoke-task
+
+**Test checkpoint:** From a non-elevated shell, `tools/elevated-smoke.ps1` run mode completes with no UAC prompt, the fresh `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent`, `LastTaskResult` is 0, and the registration readback shows `RunLevel Highest` with an interactive logon type and no `RunAsInvoker`. All quoted from a real run.
 ## Verification
 
 - [ ] The conformance profile states every clause in evaluable terms with an owner per clause

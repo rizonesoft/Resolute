@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **73 of 236 sections complete (31%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **73 of 237 sections complete (31%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -387,3 +387,5 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 - **It does not vendor a compiler into git.** The bootstrap downloads a pinned llvm-mingw toolchain into an ignored directory instead.
 - **It does not keep the ExoSuite name.** `D00 T03` renames the product, the UI library, and the toolchain to Resolute, because there is one product here rather than two.
 
+
+| [ ] | `D07 T01 §7`  | Unattended elevated smoke via scheduled task    |   5   |
