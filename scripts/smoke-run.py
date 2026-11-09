@@ -1591,7 +1591,7 @@ def self_test() -> int:
     def _fake_mono():
         _clock["t"] += 2.0
         return _clock["t"]
-    _drun.resumed = lambda: _clock["t"] > 1005.0
+    _drun.resumed = lambda: _clock["t"] >= 1008.0
     time.monotonic = _fake_mono
     try:
         _drun.cleanup()
@@ -1702,6 +1702,33 @@ def self_test() -> int:
           _srow is not None and "TerminateProcess failed" in _srow[3] and "ResumeThread failed" in _srow[3]
           and _xrow is not None and "CloseHandle(job) failed" in _xrow[3]
           and len(_jrun.rows) == 5 and _jrun.failed)
+
+    # Production launch and cleanup failures, combined in one main() report.
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+            _fixture_run = ToolRun("SmokeDrillBroken", Path(sys.executable),
+                                   [str(ROOT / "scripts" / "smoke_fixture.py"), "nowindow"])
+            globals()["real_tools"] = lambda only=None, flavor="Release": [_fixture_run]
+            _rr, _rc = kernel32.ResumeThread, kernel32.CloseHandle
+            kernel32.ResumeThread = lambda h: 0xFFFFFFFF
+            kernel32.CloseHandle = lambda h: 0
+            buf = io.StringIO()
+            try:
+                with redirect_stdout(buf):
+                    rc = main([])
+            finally:
+                kernel32.ResumeThread, kernel32.CloseHandle = _rr, _rc
+            out = buf.getvalue()
+            _diag = ("ResumeThread failed" in out and "CloseHandle(thread) failed" in out
+                     and ("CloseHandle(process) failed" in out or "CloseHandle(job) failed" in out))
+            check("combined launch and release diagnostics reach the report with exit 1",
+                  rc == 1 and _diag and out.count("| SmokeDrillBroken |") >= 5)
+    finally:
+        globals().update(_saved)
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
