@@ -96,7 +96,7 @@ track: W1
 |  42   |   §42   | Campaign guard recovery completeness           | §40, §41 |  [ ]   |
 |  43   |   §43   | Sonnet delegates under one lead                | §27 |  [ ]   |
 |  44   |   §44   | Review-order skills match the dispatcher       | --           |  [x]   |
-|  45   |   §45   | Skill numbering and stamp separator follow-ups | §44          |  [ ]   |
+|  45   |   §45   | Skill numbering and stamp separator follow-ups | §44          |  [x]   |
 
 ---
 
@@ -1871,6 +1871,14 @@ Operator decision 2026-10-01 (**updated 2026-10-17:** subagents read and run, th
 - [x] Commit: `"workspace: skill numbering matches execution order"`
 
 -> SOURCE: review-2026-11-09-d00-t04-s44-round3 (P3 numbering order, P3 stamp separator)
+
+> **Verified:** 2026-11-09 | §45 | the review skills read in execution order and describe the pinned schedule: rounds are step 3 and completion step 4 in review-todo-section (all three mirrors byte-identical by file hash), the stamp template carries the real separator character (no literal escape in any SKILL.md), and the lens descriptions match `.conclave/reviewers.toml` (round 1 medium adversarial alone, later rounds low rotating, escalation adversarial at low, completion medium); `python scripts/review-dispatch.py --check-pin` ok; `python -m unittest discover -s scripts/tests` OK (skipped=3); `python scripts/todo-graph.py validate` 0 fatal.
+> **Review:** round 1 astra (medium, adversarial) on repair candidate `155926c8..6fb7ab2a` clean, HIGHEST: none; first cycle round 1 on `baceecaf..155926c8` also clean. Raw findings: docs/reviews/00-workspace/D00-T04-s45.md and D00-T04-s45-repair.md.
+> **Completion:** astra (medium), candidate 6fb7ab2ac7aad8de254ba21f58b551037db6ec50 -- COMPLETION: complete · Repair records: D00-T04-s45-repair.md (final candidate 6fb7ab2a)
+> **Plan review:** astra -- PLAN: complete on the section (2026-11-09T17:52:48Z) and on the repair (2026-11-09T17:59:41Z)
+> **CRUD:** not applicable (skill documentation; no user data)
+> **Duration:** 2026-11-09T17:52:54Z to 2026-11-09T18:04:28Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 **Test checkpoint:** `grep` over the twelve skill files shows no stale step cross-reference and no literal `\\u00b7` in the stamp template (quoted), the three mirrors of each touched skill stay byte-identical, `python scripts/review-dispatch.py --check-pin` ok, and `python -m unittest discover -s scripts/tests` green.
 
