@@ -65,3 +65,79 @@ All 29 self-test checks passed. No files modified; no GUI or forced-termination 
 HIGHEST: P2
 
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T09:13:21Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: 3971a345c61babf1c4450f37ad35cbc52729d935
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 7
+- Digest: d2ed96a134b784f1
+
+## consistency: approve
+
+No additional actionable consistency findings in the two candidate commits. Static review only; no tests or GUI runs performed, and no files modified.
+
+HIGHEST: none
+
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T09:15:52Z
+- Candidate: 7c664ceb79fd377a390ed9699b5fcfc2461f4765
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: 3971a345c61babf1c4450f37ad35cbc52729d935
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 32
+- Digest: cc13373265770676
+
+The repair is **not complete** and **does not yet meet the repository’s quality bar**. I inspected all four commits and reran the 29 self-tests successfully. Windowless probes nevertheless reproduced containment, cleanup-reporting, and input-detection defects. No files changed; GUI drills were not rerun.
+
+Part 1: completeness
+
+1. **missing-in-scope: exactly five rows per tool on every path.** The five step rows are filled, but cleanup failures append sixth and potentially seventh rows (`scripts/smoke-run.py:774`, `:780`). Record cleanup failures within the five-step contract or in separate diagnostics.
+2. **missing-in-scope: stand-down inside every wait.** Capture callbacks are connected, but `tick_resumed()` misses input across tick rollover and treats input-query failure as no input (`scripts/smoke-run.py:237`, `:252`). A probe returned false for baseline `0xfffffff0`, current `20`. Cleanup also waits up to five seconds without cancellation (`:473`).
+3. **missing-in-scope: guaranteed kill-on-close containment from creation.** Atomic job-list creation exists, but `spawn_contained()` clears the job-configuration error (`scripts/smoke-run.py:523`). A failed `SetInformationJobObject` therefore still reaches `CreateProcessW`, potentially using a job without kill-on-close. The windowless probe confirmed this.
+4. **missing-in-scope: checked API calls and typed bindings.** Window-enumeration APIs still lack signatures; message posting, process termination and job closure ignore failure returns (`scripts/smoke-run.py:264`, `:330`, `:508`, `:428`). Process/thread handles and the initialized attribute list are never released (`:575-591`).
+5. **missing-in-scope: resilient reporting with failure evidence.** The outer exception handler supplies only `driver error`, without capture availability, and suppresses cleanup exceptions (`scripts/smoke-run.py:877-884`). Final report writes remain unguarded (`:850`, `:892`), so an unwritable report destination loses the structured result.
+6. **present:** unknown selections fail by name before launch (`scripts/smoke-run.py:833-838`).
+7. **missing-in-scope: nightly preserves verdict and concrete report path.** Verdict parsing is repaired, but emitted notes omit the resolved `$smokeReportPath`; the failure branch gives no report filename or directory (`tools/nightly.ps1:265-273`).
+8. **missing-in-scope: cleanup failures named.** Python exceptions are reported in normal cleanup, but a failed `CloseHandle` is ignored and its handle discarded (`scripts/smoke-run.py:426-429`). The probe confirmed this silent failure.
+
+Part 2: excellence
+
+1. **in-scope: containment must fail closed.** Target: every job-configuration failure prevents process creation; forced driver termination leaves zero owned processes. Preserve the original API name and error code.
+2. **in-scope: production regression coverage remains inadequate.** The “containment refusal” test replaces `JobBox.assign()` with a lambda and tests that lambda, although production now uses `spawn_contained()` (`scripts/smoke-run.py:971-985`). Target: tests invoke production launch, interruption, cleanup and reporting paths, and fail when those protections are removed. Include automated nightly verdict/path assertions.
+3. **in-scope: resource ownership and diagnostics need completion.** Target: close every acquired process/thread handle, delete every initialized attribute list, and report failed cleanup APIs by name. Inject failures to verify that none retain a passing outcome.
+4. **in-scope: cancellation and reporting need failure-path proof.** Target: rollover and input-query failure cannot silently continue collection; interrupted waits preserve stand-down; recoverable exceptions retain five step outcomes and capture availability; report-write failure still emits an actionable result.
+5. **out-of-scope:** the deliberately blocked capture-timeout regression remains owned by `D07 T01 §6` (`todo/07-quality/TODO-01-quality-bar.md:229-238`). Its measurable target is already specified: bounded return while capture remains blocked, with the test failing when the bound is removed.
+
+Gap list
+
+1. **missing-in-scope, P1:** preserve failed job setup and prohibit launch without verified kill-on-close configuration.
+2. **missing-in-scope, P2:** complete API checking, bindings and resource release.
+3. **missing-in-scope, P2:** repair cancellation edge cases and error-path reporting.
+4. **missing-in-scope, P2:** replace disconnected helper checks with production-path regression tests.
+5. **missing-in-scope, P2:** reconcile cleanup diagnostics with exactly five step rows.
+6. **missing-in-scope, P3:** emit the concrete smoke-report path in every nightly outcome.
+7. **missing-out-of-scope:** complete the separately filed §6 capture-timeout proof.
+
+COMPLETION: gaps
+
+- Implemented: fail-closed job configuration, five-row cleanup diagnostics, rollover/fail-closed stand-down, handle and attribute release, guarded report write, exception capture evidence in the repair2 build, reviewed on D07-T01-s4-repair2.md
+- Implemented: production-path launch tests and nightly verdict parsing in the repair2 build, reviewed on D07-T01-s4-repair2.md
+- Implemented: concrete smoke-report path in every nightly outcome in the repair2 build, reviewed on D07-T01-s4-repair2.md
+- Filed: D07 T01 S6 (blocked-capture timeout proof, already tracked)

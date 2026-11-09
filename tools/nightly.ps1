@@ -268,9 +268,9 @@ try {
                 $m = Select-String -Path $smokeReportPath -Pattern 'Suite verdict: \*\*([\w-]+)\*\*' | Select-Object -Last 1
                 if ($m) { $smokeVerdict = $m.Matches[0].Groups[1].Value }
             }
-            if ($smokeExit -eq 0) { Note "smoke: $smokeVerdict (report build/smoke/smoke-report.md in the candidate worktree)" }
-            elseif ($smokeExit -eq 2) { Note "smoke: $smokeVerdict (exit 2, reason named in the candidate smoke report at build/smoke/smoke-report.md)" }
-            else { Note "smoke: $smokeVerdict FAILED (exit $smokeExit, see smoke.log and the candidate smoke report)"; $failures.Add("smoke run failed at $head (exit $smokeExit)") }
+            if ($smokeExit -eq 0) { Note "smoke: $smokeVerdict (report $smokeReportPath)" }
+            elseif ($smokeExit -eq 2) { Note "smoke: $smokeVerdict (exit 2, reason named in the candidate smoke report at $smokeReportPath)" }
+            else { Note "smoke: $smokeVerdict FAILED (exit $smokeExit, see smoke.log and the candidate smoke report at $smokeReportPath)"; $failures.Add("smoke run failed at $head (exit $smokeExit)") }
         }
         Note ''
     }

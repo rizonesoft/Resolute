@@ -250,8 +250,18 @@ def idle_seconds() -> float:
 
 
 def tick_resumed(baseline_tick: int, current_tick: int) -> bool:
-    """Input happened when the last-input tick advanced past the baseline."""
-    return baseline_tick >= 0 and current_tick > baseline_tick
+    """Input happened when the last-input tick advanced past the baseline.
+
+    Ticks are 32-bit milliseconds and wrap: a small positive modular delta
+    is new input. A failed query stands a collecting run down (fail closed)
+    rather than silently continuing to drive windows.
+    """
+    if baseline_tick < 0:
+        return False
+    if current_tick < 0:
+        return True
+    delta = (current_tick - baseline_tick) & 0xFFFFFFFF
+    return 0 < delta < 0x80000000
 
 
 def pid_windows(pid: int):
@@ -425,7 +435,8 @@ class JobBox:
 
     def close(self):
         if self.handle:
-            kernel32.CloseHandle(self.handle)
+            if not kernel32.CloseHandle(self.handle):
+                self.error = f"CloseHandle(job) failed ({ctypes.get_last_error()})"
             self.handle = None
 
 
@@ -520,7 +531,8 @@ def spawn_contained(run: "ToolRun"):
     the child with it. The child starts suspended and is resumed only
     after creation succeeds.
     """
-    run.job.error = None
+    if run.job.error:
+        return  # configuration failed: fail closed, never create the process
     job = run.job.handle
     if not job:
         run.job.error = run.job.error or "no job handle"
@@ -563,6 +575,8 @@ def spawn_contained(run: "ToolRun"):
                                             ctypes.c_void_p, ctypes.c_void_p]
     k.ResumeThread.restype = wintypes.DWORD
     k.ResumeThread.argtypes = [wintypes.HANDLE]
+    k.DeleteProcThreadAttributeList.restype = None
+    k.DeleteProcThreadAttributeList.argtypes = [ctypes.c_void_p]
 
     cmdline = subprocess.list2cmdline([str(run.exe), *run.args])
     jobs = (wintypes.HANDLE * 1)(job)
@@ -585,10 +599,12 @@ def spawn_contained(run: "ToolRun"):
     if not created:
         run.job.error = f"CreateProcess with job list failed ({ctypes.get_last_error()})"
         return
+    k.DeleteProcThreadAttributeList(six.lpAttributeList)
     run.proc = WinProc(int(proc_info.hProcess), int(proc_info.hThread), int(proc_info.dwProcessId))
     if k.ResumeThread(wintypes.HANDLE(int(proc_info.hThread))) == 0xFFFFFFFF:
         run.job.error = "ResumeThread failed"
         run.proc.terminate()
+    kernel32.CloseHandle(wintypes.HANDLE(int(proc_info.hThread)))
 
 
 def launch_block_text() -> str:
@@ -764,20 +780,30 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
         cleanup_safely(run)
 
 
+def note_cleanup_failure(run: "ToolRun", detail: str):
+    """Cleanup failure rides the exit row: five step rows, never a pass."""
+    run.failed = True
+    for i, (tool, step, result, old) in enumerate(run.rows):
+        if step == "exit":
+            run.rows[i] = (tool, step, "fail", f"{old}; cleanup failed: {detail}")
+            return
+    run.rows.append((run.name, "exit", "fail", f"cleanup failed: {detail}"))
+
+
 def cleanup_safely(run: "ToolRun"):
-    """Cleanup failure is a named row, never a silent pass; the job closes
-    independently of whether process cleanup succeeds."""
+    """Cleanup failure is named on the exit row, never a silent pass; the
+    job closes independently of whether process cleanup succeeds."""
     try:
         run.cleanup()
     except Exception as exc:
-        run.failed = True
-        run.rows.append((run.name, "cleanup", "fail", f"cleanup failed: {exc!r}"))
+        note_cleanup_failure(run, repr(exc))
     try:
         if run.job is not None:
             run.job.close()
+            if run.job.error:
+                note_cleanup_failure(run, run.job.error)
     except Exception as exc:
-        run.failed = True
-        run.rows.append((run.name, "cleanup", "fail", f"job close failed: {exc!r}"))
+        note_cleanup_failure(run, repr(exc))
 
 
 def failure_capture(run: ToolRun, step: str, out_dir: Path, abort=None) -> str:
@@ -875,7 +901,9 @@ def main(argv=None) -> int:
             ensure_rows(run, "stood-down" if stood_down else "fail",
                         "operator input resumed; tool dismissed" if stood_down else "not reached")
         except Exception as exc:  # one tool's crash never stops the run or loses the report
-            ensure_rows(run, "fail", f"driver error: {exc!r}")
+            evidence = failure_capture(run, "error", SMOKE_DIR, abort=resumed) \
+                if run.hwnd else "capture unavailable: no window"
+            ensure_rows(run, "fail", f"driver error: {exc!r}; {evidence}")
             try:
                 run.cleanup()
                 if run.job is not None:
@@ -883,13 +911,18 @@ def main(argv=None) -> int:
             except Exception:
                 pass
         rows += run.rows
-    failed = any(r[2] == "fail" for r in rows)
+    failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
     blocked = any(r[2] == "blocked" for r in rows)
     verdict = "stood-down" if stood_down else ("fail" if failed else ("blocked" if blocked else "pass"))
     notes.append(f"Tools: {', '.join(r.name for r in runs)}.")
-    SMOKE_DIR.mkdir(parents=True, exist_ok=True)
     report = render_report(rows, verdict, notes)
-    (SMOKE_DIR / "smoke-report.md").write_text(report, encoding="utf-8")
+    try:
+        SMOKE_DIR.mkdir(parents=True, exist_ok=True)
+        (SMOKE_DIR / "smoke-report.md").write_text(report, encoding="utf-8")
+    except OSError as exc:
+        print(f"smoke: could not write build/smoke/smoke-report.md: {exc}")
+        print(report)
+        return 1
     print(report)
     if failed:
         return 1
@@ -1001,8 +1034,31 @@ def self_test() -> int:
     _sprobe.proc = _BadProc()
     _sprobe.job = JobBox()
     cleanup_safely(_sprobe)
-    check("cleanup failure surfaces instead of passing silently",
-          _sprobe.failed and any(r[1] == "cleanup" and r[2] == "fail" for r in _sprobe.rows))
+    check("cleanup failure surfaces on the exit row, never silently",
+          _sprobe.failed and any(r[1] == "exit" and r[2] == "fail" for r in _sprobe.rows))
+    check("tick rollover still detects input", tick_resumed(0xFFFFFFF0, 20)
+          and not tick_resumed(20, 0xFFFFFFF0))
+    check("failed input query stands collecting down", tick_resumed(100, -1))
+
+    # Production launch path: a job that failed configuration creates no
+    # process at all, and a good job spawns, contains, and cleans up.
+    fixture = ROOT / "scripts" / "smoke_fixture.py"
+    broken = ToolRun("SmokeDrillBroken", Path(sys.executable), [str(fixture), "nowindow"])
+    broken.job = JobBox()
+    broken.job.error = "injected configuration failure"
+    spawn_contained(broken)
+    check("failed job configuration creates no process", broken.proc is None)
+    live = ToolRun("SmokeDrillBroken", Path(sys.executable), [str(fixture), "nowindow"])
+    live.job = JobBox()
+    spawn_contained(live)
+    spawned = live.proc is not None and live.proc.poll() is None
+    if live.proc is not None:
+        live.cleanup()
+    check("contained spawn runs and cleans up", spawned and live.proc.poll() is not None)
+    check("nightly verdict words all parse", all(
+        __import__("re").match(r"Suite verdict: \*\*([\w-]+)\*\*",
+                               f"Suite verdict: **{v}**").group(1) == v
+        for v in ("pass", "fail", "blocked", "refused", "stood-down")))
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
