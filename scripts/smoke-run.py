@@ -485,17 +485,28 @@ class ToolRun:
             self.failed = True
 
     def cleanup(self):
-        """Terminate only the process this run launched, then release it."""
+        """Terminate only the process this run launched, then release it.
+
+        The handle release is attempted even when termination raises; the
+        cleanup wait also stops waiting (not cleaning up) when the operator
+        returns, because closing the job reaps the child regardless.
+        """
         if self.job is None:
             self.job = JobBox()
-        if self.proc and self.proc.poll() is None:
-            self.proc.terminate()
-            try:
-                self.proc.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                self.proc.kill()
-        if isinstance(self.proc, WinProc):
-            self.proc.close()
+        try:
+            if self.proc and self.proc.poll() is None:
+                self.proc.terminate()
+                deadline = time.monotonic() + 5
+                while self.proc.poll() is None and time.monotonic() < deadline:
+                    resumed = getattr(self, "resumed", None)
+                    if resumed is not None and resumed():
+                        break
+                    time.sleep(0.05)
+                if self.proc.poll() is None and not (getattr(self, "resumed", None) and self.resumed()):
+                    self.proc.kill()
+        finally:
+            if isinstance(self.proc, WinProc):
+                self.proc.close()
 
 
 class WinProc:
@@ -624,11 +635,13 @@ def spawn_contained(run: "ToolRun"):
         run.job.error = f"CreateProcess with job list failed ({ctypes.get_last_error()})"
         return
     run.proc = WinProc(int(proc_info.hProcess), int(proc_info.hThread), int(proc_info.dwProcessId))
-    if k.ResumeThread(wintypes.HANDLE(int(proc_info.hThread))) == 0xFFFFFFFF:
-        run.job.error = "ResumeThread failed"
-        run.proc.terminate()
-    if not kernel32.CloseHandle(wintypes.HANDLE(int(proc_info.hThread))):
-        run.job.error = f"CloseHandle(thread) failed ({ctypes.get_last_error()})"
+    try:
+        if k.ResumeThread(wintypes.HANDLE(int(proc_info.hThread))) == 0xFFFFFFFF:
+            run.job.error = "ResumeThread failed"
+            run.proc.terminate()
+    finally:
+        if not kernel32.CloseHandle(wintypes.HANDLE(int(proc_info.hThread))):
+            run.job.error = f"CloseHandle(thread) failed ({ctypes.get_last_error()})"
 
 
 def launch_block_text() -> str:
@@ -646,6 +659,7 @@ def launch_block(exc: OSError) -> str | None:
 def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                input_mark: float, resumed=None) -> bool:
     """Drive one tool through the five steps. Returns stood_down."""
+    run.resumed = resumed
     table = dict(step_table(run.name))
     run.job = JobBox()
     try:
@@ -1116,6 +1130,43 @@ def self_test() -> int:
         __import__("re").match(r"Suite verdict: \*\*([\w-]+)\*\*",
                                f"Suite verdict: **{v}**").group(1) == v
         for v in ("pass", "fail", "blocked", "refused", "stood-down")))
+
+    # main() itself: a failed baseline query refuses a collecting run, and
+    # an unwritable report directory still yields the report on stdout.
+    import io, tempfile
+    from contextlib import redirect_stdout
+    _saved = (globals()["SMOKE_DIR"], globals()["PREV_DIR"], last_input_tick)
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["last_input_tick"] = lambda: -1
+            os.environ["RESOLUTE_IDLE_COLLECT"] = "1"
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            check("main refuses a collecting run whose baseline query failed",
+                  rc == 2 and "refused" in buf.getvalue())
+            globals()["last_input_tick"] = _saved[2]
+            os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+            blocker = Path(td) / "blocker"
+            blocker.write_text("x")
+            globals()["SMOKE_DIR"] = blocker / "smoke"
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            check("unwritable refusal report falls back to stdout",
+                  rc == 2 and "Suite verdict" in buf.getvalue())
+    finally:
+        globals()["SMOKE_DIR"], globals()["PREV_DIR"], globals()["last_input_tick"] = _saved
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+    # The actual PowerShell verdict expression from tools/nightly.ps1.
+    ps = subprocess.run(
+        ["pwsh", "-NoProfile", "-Command",
+         r"$m = [regex]::Match('Suite verdict: **stood-down**', 'Suite verdict: \*\*([\w-]+)\*\*'); $m.Groups[1].Value"],
+        capture_output=True, text=True, timeout=60)
+    check("nightly PowerShell expression parses stood-down",
+          ps.returncode == 0 and ps.stdout.strip() == "stood-down")
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
