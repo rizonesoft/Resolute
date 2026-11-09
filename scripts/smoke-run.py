@@ -456,6 +456,8 @@ def collect_late_capture_diagnostics(runs, notes, join_timeout: float = 10.0, ab
             elif "error" in box:
                 notes.append(f"{run.name}: late capture failure: {box['error']!r}")
                 run.failed = True
+            if abort is not None and abort():
+                stood_down = True
     if stood_down:
         notes.append("Operator input resumed during capture drain; the run stood down.")
     return stood_down
@@ -1097,6 +1099,8 @@ def main(argv=None) -> int:
                 notes.append(f"Operator input resumed during {run.name}; the run stood down.")
         rows += run.rows
     if collect_late_capture_diagnostics(runs, notes, abort=resumed):
+        stood_down = True
+    if resumed():
         stood_down = True
     failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
     blocked = any(r[2] == "blocked" for r in rows)
@@ -1813,6 +1817,49 @@ def self_test() -> int:
     check("drain stands down on input and reports the worker unverified",
           _sd is True and any("stood down" in n for n in _notes4)
           and any("unverified" in n for n in _notes4) and _drain_run.failed)
+
+    # Input during the drain join, through main(): stood-down verdict,
+    # retained diagnostics, failure exit kept.
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["admission"] = lambda v, n, e: (True, "collecting (test)", True)
+            globals()["last_input_tick"] = lambda: 100
+            import threading as _th5
+            _rel5 = _th5.Event()
+            def _drive_pending(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                globals()["capture_window"] = lambda hwnd: (_rel5.wait(30), None)[1]
+                capture_window_bounded(99, timeout=0.5, pending=run.pending_captures)
+                globals()["capture_window"] = _real_cap5
+                for step, _e in step_table(run.name):
+                    run.record(step, "pass", "stub")
+                return False
+            _real_cap5 = globals()["capture_window"]
+            globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
+            _rd5 = globals()["drive_tool"]
+            globals()["drive_tool"] = _drive_pending
+            # resumed() in main reads ticks: baseline 100, input (200) arrives
+            # only once the drain is joining.
+            _ticks = {"n": 0}
+            def _tick():
+                _ticks["n"] += 1
+                return 100 if _ticks["n"] < 8 else 200
+            globals()["last_input_tick"] = _tick
+            buf = io.StringIO()
+            try:
+                with redirect_stdout(buf):
+                    rc = main([])
+            finally:
+                _rel5.set()
+                globals()["drive_tool"] = _rd5
+                globals()["capture_window"] = _real_cap5
+            out = buf.getvalue()
+            check("input during the drain join stands the verdict down, exit kept",
+                  rc == 1 and "Suite verdict: **stood-down**" in out and "unverified" in out)
+    finally:
+        globals().update(_saved)
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
