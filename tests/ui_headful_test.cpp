@@ -15,6 +15,7 @@
 #include "fence.h"
 #include "focus_guard.h"
 #include "ui_host.h"
+#include "visual_pair_util.h"
 
 #include <algorithm>
 #include <atomic>
@@ -354,7 +355,7 @@ bool TakeForeground(HWND hwnd) {
 // Starts the launcher, puts it on the monitor at `dpi` in the appearance
 // asked for, and captures it with scripts/capture-window.ps1 into the
 // appearance-by-DPI matrix (D00 T02 §9's convention, first instance).
-void CaptureLauncher(const char* mode, UINT dpi) {
+std::filesystem::path CaptureLauncher(const char* mode, UINT dpi, const char* stem = nullptr) {
     HMONITOR monitor = focusguard::MonitorWithDpi(dpi);
     if (!monitor) {
         const std::string why = "hardware absent: no monitor at " + std::to_string(dpi) + " DPI; re-probed each night";
@@ -410,9 +411,10 @@ void CaptureLauncher(const char* mode, UINT dpi) {
     const int pct = static_cast<int>(dpi * 100 / 96);
     // Into build scratch: a re-run never overwrites or deletes the tracked
     // evidence. docs/testing.md gives the publishing step.
-    const std::filesystem::path out = std::filesystem::path(RESOLUTE_CAPTURE_DIR) /
-                                      (std::string(date) + "-D00-T02-s10-launcher-" + mode + "-" +
-                                       std::to_string(pct) + ".png");
+    const std::filesystem::path out =
+        stem ? std::filesystem::path(RESOLUTE_CAPTURE_DIR) / (std::string(stem) + ".png")
+             : std::filesystem::path(RESOLUTE_CAPTURE_DIR) /
+                   (std::string(date) + "-D00-T02-s10-launcher-" + mode + "-" + std::to_string(pct) + ".png");
     std::error_code made;
     std::filesystem::create_directories(out.parent_path(), made);
     // The capture script, started directly rather than through a shell.
@@ -421,7 +423,7 @@ void CaptureLauncher(const char* mode, UINT dpi) {
                       std::to_wstring(pi.dwProcessId) + L" -Appearance " + std::filesystem::path(mode).wstring() +
                       L" -Out \"" + out.wstring() + L"\" -Describes \"the launcher at startup, " +
                       std::filesystem::path(mode).wstring() + L", " + std::to_wstring(pct) +
-                      L" percent (D00 T02 section 10)\"";
+                      L" percent (D00 T02 section 10)\" -Fixture \"launcher at startup, extensions scanned\"";
     STARTUPINFOW psi{};
     psi.cb = sizeof(psi);
     Child capture;
@@ -443,7 +445,7 @@ void CaptureLauncher(const char* mode, UINT dpi) {
     GetExitCodeProcess(capture.pi.hProcess, &rc);
     CHECK(rc == 0);
     CHECK(std::filesystem::exists(out));
-
+    return out;
 }
 
 }  // namespace
@@ -528,4 +530,42 @@ TEST_CASE("An adopted window is placed where it was shown, not where it moved", 
                    l.find("class=ResoluteFlasher") != std::string::npos;
         }));
     }
+}
+
+TEST_CASE("Launcher pair at 150 percent compares against the composed baseline", "[ui][headful][place:dpi144]") {
+    RESOLUTE_HEADFUL_GATE();
+    // The C++ leg of the pair (D00 T02 section 12): a fresh capture through
+    // the same suspended, adopted, positioned flow as the matrix captures,
+    // compared region by region against the section 10 baseline of record
+    // (the composed baseline: production rasterization, whole window,
+    // launcher at startup). The AutoIt half runs with the deferred pair in
+    // D03 T02 section 7, which needs an elevated session.
+    const std::filesystem::path out = CaptureLauncher("light", 144, "pair-launcher-light-150");
+    std::filesystem::path sidecar = out;
+    sidecar.replace_extension(".txt");
+    REQUIRE(std::filesystem::exists(sidecar));
+    std::ifstream sin(sidecar);
+    const std::string sidecarText((std::istreambuf_iterator<char>(sin)), std::istreambuf_iterator<char>());
+    INFO("the pair capture must be measured at 144 DPI on its declared monitor");
+    CHECK(sidecarText.find("monitor dpi   : 144") != std::string::npos);
+    CHECK(sidecarText.find("fixture") != std::string::npos);
+    CHECK(sidecarText.find("launch args") != std::string::npos);
+    CHECK(sidecarText.find("locale") != std::string::npos);
+    CHECK(sidecarText.find("exe sha256") != std::string::npos);
+    CHECK(sidecarText.find("source revision") != std::string::npos);
+
+    const visualpair::Spec spec = visualpair::LoadSpec();
+    visualpair::Image baseline;
+    REQUIRE(visualpair::LoadPng(visualpair::Baseline150(), baseline));
+    const auto baselineObserved = visualpair::MeasureAll(baseline, spec.regions);
+    REQUIRE(visualpair::Compare(spec.regions, baselineObserved, spec.equivalents, {}).empty());
+
+    visualpair::Image fresh;
+    REQUIRE(visualpair::LoadPng(out, fresh));
+    const auto failures =
+        visualpair::Compare(spec.regions, visualpair::MeasureAll(fresh, spec.regions), spec.equivalents, {"dpi"});
+    std::printf("visual pair: %zu regions, %zu divergence(s)\n", spec.regions.size(), failures.size());
+    for (const auto& f : failures) std::printf("visual pair divergence: %s\n", f.c_str());
+    std::fflush(stdout);
+    CHECK(failures.empty());
 }
