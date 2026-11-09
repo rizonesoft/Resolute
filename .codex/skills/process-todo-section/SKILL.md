@@ -99,7 +99,7 @@ Run gates while iterating, bounded to the touched area: the build for the touche
 
 ### 5. Surface and feature completeness
 
-Before the checkpoint, account for 100% of every control, menu item, dialog and state on the Fidelity surface and `DESIGN.md` section: each is working (proven on the rendered surface with real data and read-back) or deferred to a named, resolving section (`python scripts/todo-graph.py resolve '<ref>'` must not exit 1 or 2). Confirm the refusal/error/recovery path and undo/restore path required by the section hold. After the commit, `review-todo-section` runs its rounds to a clean terminal round and then step 3 has the pinned reviewer run the one-pass completion and excellence review last on the built feature; every in-scope gap it finds is built in this section as a new repair cycle on a `-repair` record with its own plan pass, rounds, and completion.
+Before the checkpoint, account for 100% of every control, menu item, dialog and state on the Fidelity surface and `DESIGN.md` section: each is working (proven on the rendered surface with real data and read-back) or deferred to a named, resolving section (`python scripts/todo-graph.py resolve '<ref>'` must not exit 1 or 2). Confirm the refusal/error/recovery path and undo/restore path required by the section hold. After the commit, `review-todo-section` runs its rounds to a clean terminal round and then step 4 has the pinned reviewer run the one-pass completion and excellence review last on the built feature; every in-scope gap it finds is built in this section as a new repair cycle on a `-repair` record with its own plan pass, rounds, and completion.
 
 ### 6. Run the Test checkpoint, for real
 

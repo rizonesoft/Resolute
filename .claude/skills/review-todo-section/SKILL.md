@@ -54,7 +54,7 @@ The dispatcher picks each round's lenses and effort (capped at `medium`) from th
 python scripts/review-dispatch.py --writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version> --prompt <scratch-review-prompt.md> --record docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md
 ```
 
-The dispatcher appends a `## Round N` section naming the reviewer, its model, effort and lenses, or `none` with the reason when the reviewer returned no review. Pass `--surface` on every round of a section that builds a user-facing surface so round 1 includes the `design` lens. Headings that start `## Round`, `## Completion review` or `## Plan review` are reserved for what `--record` writes: a writer's own note in a findings file uses another heading (for example `## Writer note: ...`), or the file stops being readable and the next review is refused with the offending line named.
+The dispatcher appends a `## Round N` section naming the reviewer, its model, effort and lenses, or `none` with the reason when the reviewer returned no review. Pass `--surface` on every round of a section that builds a user-facing surface so the `design` lens joins the later `low` rotation rounds (round 1 is `adversarial` alone, and a clean round ends the loop, so `design` is admitted but not guaranteed to run). Headings that start `## Round`, `## Completion review` or `## Plan review` are reserved for what `--record` writes: a writer's own note in a findings file uses another heading (for example `## Writer note: ...`), or the file stops being readable and the next review is refused with the offending line named.
 
 | Lens | Asks |
 | ---- | ---- |
