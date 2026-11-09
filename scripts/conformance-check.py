@@ -221,12 +221,28 @@ def shipped_set_problems(root: Path, tools: dict):
 # Compiler runtimes are refused (the suite links static), msvcrt.dll
 # excepted as a Windows system library. Anything else means the tool
 # is not standalone.
-# A real API-set contract name: api-/ext- prefix, component terms,
-# and the versioned -l<major>-<minor>-<patch> suffix. A bare prefix
-# is not a contract (review round 9).
-API_SET_RE = re.compile(
-    r"^(api|ext)-ms-win-[a-z0-9]+(-[a-z0-9]+)*-l\d+-\d+-\d+\.dll$"
-)
+# API-set trust is an explicit contract allowlist, not syntax: a
+# fabricated version-shaped name (api-ms-win-<anything>-l99-99-99)
+# satisfies every grammatical rule and still names no Windows
+# contract (repair plan review). These are the contracts the
+# shipped tools import today, enumerated from their binaries
+# 2026-11-09; a new contract fails by name until it is added here
+# with the tool that needs it, exactly like SYSTEM_DLLS below.
+API_SET_CONTRACTS = {
+    "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-environment-l1-1-0.dll",
+    "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-multibyte-l1-1-0.dll",
+    "api-ms-win-crt-private-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll",
+    "api-ms-win-crt-utility-l1-1-0.dll",
+}
 
 SYSTEM_DLLS = {
     "advapi32.dll", "bcrypt.dll", "cfgmgr32.dll", "comctl32.dll",
@@ -335,7 +351,7 @@ def pe_problems(path: Path):
                 f"{path.name} imports path-bearing DLL name '{name}'; imports name contracts, never paths"
             )
             continue
-        if API_SET_RE.match(low):
+        if low in API_SET_CONTRACTS:
             continue
         if low in SYSTEM_DLLS:
             continue
@@ -817,7 +833,7 @@ def self_test() -> int:
         raise AssertionError(f"expected refusal naming {needle!r}")
 
     def pe_cases():
-        ok = make_pe(["KERNEL32.dll", "api-ms-win-core-file-l1-1-0.dll"], ["USER32.dll"])
+        ok = make_pe(["KERNEL32.dll", "api-ms-win-crt-heap-l1-1-0.dll"], ["USER32.dll"])
         tmp = mkdtemp()
         p = tmp / "tool.exe"
         p.write_bytes(ok)
@@ -1130,7 +1146,14 @@ def self_test() -> int:
             got = pe_problems(p)
             assert got, f"{bad} was trusted"
         p.write_bytes(make_pe(["api-ms-win-core-file-l1-1-0.dll", "ext-ms-win-ntuser-window-l1-1-0.dll"]))
+        got = pe_problems(p)
+        assert got and "api-ms-win-core-file-l1-1-0.dll" in got[0], got
+        p.write_bytes(make_pe(["api-ms-win-crt-runtime-l1-1-0.dll"]))
         assert pe_problems(p) == [], pe_problems(p)
+        for bad in ("api-ms-win-resolute-private-l1-1-0.dll", "ext-ms-win-private-l99-99-99.dll"):
+            p.write_bytes(make_pe([bad]))
+            got = pe_problems(p)
+            assert got and bad in got[0], (bad, got)
 
     case("API-set impersonators refused, real contracts pass", api_set_impersonators_refuse)
 

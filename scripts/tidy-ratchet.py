@@ -643,6 +643,18 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
                 "shipped artifacts differ from the recorded successful build; "
                 "a replaced executable gains no evidence here, rebuild first"
             )
+        import hashlib as _hl3
+
+        current_dbs = {
+            db.relative_to(root).as_posix(): _hl3.sha256(db.read_bytes()).hexdigest()
+            for db in targets.values()
+            if db.is_file()
+        }
+        if current_dbs != record_in.get("compile_dbs", {}):
+            raise Refusal(
+                "compile databases differ from the recorded successful build; "
+                "analysis coverage is not the build's coverage, rebuild first"
+            )
         build_targets = record_in.get("targets", [])
     else:
         build_targets = None
@@ -654,6 +666,16 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
         )
     if result_path is not None and artifact_hashes(root) != record_in.get("artifacts", {}):
         raise Refusal("shipped artifacts changed during analysis; rerun the gate")
+    if result_path is not None:
+        import hashlib as _hl4
+
+        after_dbs = {
+            db.relative_to(root).as_posix(): _hl4.sha256(db.read_bytes()).hexdigest()
+            for db in targets.values()
+            if db.is_file()
+        }
+        if after_dbs != record_in.get("compile_dbs", {}):
+            raise Refusal("compile databases changed during analysis; rerun the gate")
     if log_error is not None:
         # A successful analysis whose diagnostics could not be saved
         # still says so: the counts are evidence, the missing log is
@@ -1362,8 +1384,17 @@ def main(argv=None) -> int:
                 "the record would bind changed sources to stale artifacts"
             )
             return 1
+        import hashlib as _hl2
+
+        dbs = {}
+        for db in [root / "build" / "release" / "compile_commands.json"] + sorted(
+            (root / "extensions").glob("*/build/Release/compile_commands.json")
+        ) if (root / "extensions").is_dir() else [root / "build" / "release" / "compile_commands.json"]:
+            if db.is_file():
+                dbs[db.relative_to(root).as_posix()] = _hl2.sha256(db.read_bytes()).hexdigest()
         record = {
             "inputs_sha256": current_inputs,
+            "compile_dbs": dbs,
             "artifacts": artifacts,
             "config": args.build_config,
             "targets": [x for x in args.build_targets.split(",") if x],
