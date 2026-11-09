@@ -45,7 +45,7 @@ track: M1
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [x]   |
 |   4   |   §4    | Distro reports compiler failure           | --           |  [x]   |
 |   5   |   §5    | Stop logging the signing password in Distro | --           |  [x]   |
-|   6   |   §6    | Per-tool update URLs from Distro          | --           |  [ ]   |
+|   6   |   §6    | Per-tool update URLs from Distro          | --           |  [x]   |
 
 ---
 
@@ -103,7 +103,7 @@ Small, known, and cheap. Each is recorded so it is not rediscovered later as a m
 > **Completion:** astra (medium), candidate 0fe682ef -- in-scope gaps closed (build command and exits recorded; Current state corrected); the one remaining item is out of scope and filed at §6 · Repair records: D09-T01-s2-repair (candidate 0fe682ef)
 > **Plan review:** astra (medium) -- five gaps folded into the section before building (record D09-T01-s2.md); repair plan pass returned one P3, corrected in the candidate
 > **CRUD:** not applicable (housekeeping deletions and URL values; no user records)
-> **Deferred:** Distro writes every tool's UpdateURL from its own global -> XREF: D09 T01 §6
+> **Resolved:** Distro writes every tool's UpdateURL from its own global -> XREF: D09 T01 §6 (shipped 2026-11-09)
 > **Duration:** 2026-11-09T12:10:08Z to 2026-11-09T12:27:51Z
 > **Implementer:** muse (muse-wonder-1.0)
 
@@ -247,6 +247,14 @@ Every tool declares its own update destination, but `Distro`'s `_CreateUpdateFil
 - [x] Commit: `"au3: write per-tool update URLs in Distro"`
 
 **Test checkpoint:** Driven run with evidence: two tools' `.ru` files carry their own declared `UpdateURL` values with descriptor-key readbacks against the scripts, the original producer shown failing the same readback, and a pre-change descriptor upgraded in place. `Au3Check.exe -q Distro.au3` exits 0. No tool's frozen behaviour changes.
+
+> **Verified:** 2026-11-09 | §6 | Driven proof retained under `docs/captures/d09-t01-s6-updateurls/`: descriptor captures before and after one candidate Distro launch in clone R:\resolute-s6check2 show `UpdateURL` appended as the 28th [Environment] key with prior order unchanged (BiosCodes per-tool path, ComIntRep suite path, matching the scripts); the shipped `_CreateUpdateFiles` run verbatim with real IniWrite writes both declared values (generated/), re-derives the identical value without the key (BiosCodes-rederived.ru), and refuses with an ERROR and no file when a tool declares none (refusal-log.txt, refusal-check.txt); the pre-change producer writes the suite URL for the same tool (base-producer/). Comment-block harness cases for the global reader all read back correctly. `Au3Check.exe -q` exits 0 for Distro.au3 and AutoIt3Script.au3. `python scripts/todo-graph.py validate`: 0 fatal. `python scripts/todo-claims.py`: 116 hold, 0 stale.
+> **Review:** rounds 1-2 on the base record (round 2 clean), repair round 1 clean, repair2 round 1 clean, astra (`gpt-6-astra` via `codex`), candidates 29ec4926 (round 2), fd6dfc66 (repair round 1), 4a596cd7 (repair2 round 1) · Raw findings: docs/reviews/09-au3-maintenance/D09-T01-s6.md, D09-T01-s6-repair.md, D09-T01-s6-repair2.md
+> **Completion:** astra (medium), candidate 29ec4926756f20227ba26fb82527e78f1bcd6f2b: COMPLETION: gaps (one missing-in-scope evidence item), closed by the repair records · Repair records: D09-T01-s6-repair (candidate fd6dfc6657cf75145a5d3479ae92ebced98f6f8, COMPLETION: gaps on two readbacks), D09-T01-s6-repair2 (candidate a8302e6b0134603b0b7f5a9b5bbb0c2122e946d1, COMPLETION: complete)
+> **Plan review:** astra (medium): three gaps folded into the section before writing (record D09-T01-s6.md); repair and repair2 plan passes clean
+> **CRUD:** not applicable (the builder writes update files from in-repo declarations; no records change hands)
+> **Duration:** 2026-11-09T14:12:18Z to 2026-11-09T14:46:37Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 ## Verification
 
