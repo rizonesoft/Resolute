@@ -1563,6 +1563,80 @@ def self_test() -> int:
           _start_row is not None and _start_row[2] == "fail"
           and "TerminateProcess failed" in _start_row[3] and "ResumeThread failed" in _start_row[3])
 
+    # The ABORTED branch itself: interruption arriving after capture begins.
+    _calls = {"n": 0}
+    def _late_abort():
+        _calls["n"] += 1
+        return _calls["n"] > 1
+    _arun = ToolRun("Resolute", Path("x"))
+    _arun.hwnd = 99
+    _atext = failure_capture(_arun, "about", SMOKE_DIR, abort=_late_abort)
+    check("interruption inside the capture wait sets the flag",
+          getattr(_arun, "interrupted", False) is True and "operator input resumed" in _atext)
+    # Cleanup deadline branch: the child never exits, input arrives at expiry.
+    _drun = ToolRun("Resolute", Path("x"))
+    class _NeverProc:
+        def poll(self): return None
+        def terminate(self): pass
+        def kill(self): raise AssertionError("kill must be suppressed by resumed input")
+    _drun.proc = _NeverProc()
+    _drun.job = JobBox()
+    _t0 = time.monotonic()
+    _drun.resumed = lambda: time.monotonic() > _t0 + 4.9
+    _drun.cleanup()
+    check("cleanup deadline observation sets the stand-down flag",
+          getattr(_drun, "stood_down_during_cleanup", False) is True)
+    # Exceptional final tool: capture interruption plus a drive failure keeps
+    # exit 1, the fail verdict, and names the stand-down in the report.
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+            globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
+            def _drive_exc2(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                run.hwnd = 99
+                _n = {"n": 0}
+                def _ab():
+                    _n["n"] += 1
+                    return _n["n"] > 1
+                failure_capture(run, "error", out_dir, abort=_ab)
+                run.record("start", "pass", "stub")
+                raise RuntimeError("stub drive failure")
+            _rd4 = globals()["drive_tool"]
+            globals()["drive_tool"] = _drive_exc2
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            globals()["drive_tool"] = _rd4
+            out = buf.getvalue()
+            check("exceptional capture interruption: stood-down verdict, failure exit kept",
+                  rc == 1 and "Suite verdict: **stood-down**" in out and "driver error" in out
+                  and out.count("| Resolute |") == 5)
+    finally:
+        globals().update(_saved)
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+    # Combined diagnostics beneath production spawn: resume and thread-close
+    # failures both survive in job.error.
+    _sp = ToolRun("SmokeDrillBroken", Path(sys.executable),
+                  [str(ROOT / "scripts" / "smoke_fixture.py"), "nowindow"])
+    _sp.job = JobBox()
+    _real_resume2, _real_close2 = kernel32.ResumeThread, kernel32.CloseHandle
+    kernel32.ResumeThread = lambda h: 0xFFFFFFFF
+    kernel32.CloseHandle = lambda h: 0
+    try:
+        spawn_contained(_sp)
+    finally:
+        kernel32.ResumeThread, kernel32.CloseHandle = _real_resume2, _real_close2
+    check("resume and thread-release failures both survive in job.error",
+          _sp.job.error is not None and "ResumeThread failed" in _sp.job.error
+          and "CloseHandle(thread) failed" in _sp.job.error)
+    if _sp.proc is not None:
+        try:
+            _sp.proc.kill()
+        except Exception:
+            pass
+
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
     check("report names tool, step, verdict", "| T | start | pass | ok |" in text and "Suite verdict: **pass**" in text)
