@@ -459,9 +459,9 @@ TEST_CASE("Truncating the Name header fails as clipped naming the control", "[vi
 
 namespace {
 
-// Renders the control's own label truncated at its right boundary: every
-// ink pixel of the control is repainted shifted right so the label's last
-// glyph is cut at the boundary, as clipped text renders.
+// Renders the control's own label truncated at its right boundary: the
+// label's last glyph is cut there, its left half painted at the boundary
+// and the rest beyond it, as clipped text renders.
 void TruncateLabelAtEdge(Image& img, const RegionSpec& region) {
     const int x0 = static_cast<int>(region.x0 * img.w), x1 = static_cast<int>(region.x1 * img.w);
     const int y0 = static_cast<int>(region.y0 * img.h), y1 = static_cast<int>(region.y1 * img.h);
@@ -473,39 +473,69 @@ void TruncateLabelAtEdge(Image& img, const RegionSpec& region) {
     for (const auto& [colour, n] : counts)
         if (n > best) { best = n; paper = colour; }
     const double paperLum = visualpair::Luminance(paper);
-    const Image src = img;
-    // Find the rightmost ink column of the label.
-    int rightmost = x0;
-    for (int y = y0; y < y1; ++y)
-        for (int x = x0; x < x1 - 6; ++x)
-            if (std::abs(visualpair::Luminance(src.px[static_cast<size_t>(y) * img.w + x]) - paperLum) > 0.05)
-                rightmost = std::max(rightmost, x);
-    const int shift = (x1 - 2) - rightmost + 3;  // push the last glyph past the boundary
-    for (int y = y0; y < y1; ++y)
-        for (int x = x0; x < x1; ++x) img.px[static_cast<size_t>(y) * img.w + x] = paper;
-    int glyphTop = y1, glyphBottom = y0;
-    uint32_t inkColour = 0xFF101010u;
-    for (int y = y0; y < y1; ++y)
-        for (int x = x0; x < x1; ++x) {
-            const uint32_t c = src.px[static_cast<size_t>(y) * img.w + x];
-            if (std::abs(visualpair::Luminance(c) - paperLum) <= 0.05) continue;
-            glyphTop = std::min(glyphTop, y);
-            glyphBottom = std::max(glyphBottom, y);
-            inkColour = c;
-            const int nx = x + shift;
-            if (nx < x1) img.px[static_cast<size_t>(y) * img.w + nx] = c;
+    const int labelZone = x0 + (x1 - x0) / 2;
+    // Find the label's last glyph component (rightmost in the label zone).
+    std::vector<std::pair<int, int>> glyph;
+    int glyphMinX = 0, glyphMaxX = -1, glyphMinY = 0;
+    std::vector<char> seen(static_cast<size_t>(x1 - x0) * (y1 - y0), 0);
+    for (int y = y0; y < y1; ++y) {
+        for (int x = x0; x < labelZone; ++x) {
+            const size_t idx = static_cast<size_t>(y - y0) * (x1 - x0) + (x - x0);
+            if (seen[idx]) continue;
+            if (std::abs(visualpair::Luminance(img.px[static_cast<size_t>(y) * img.w + x]) - paperLum) <= 0.05) continue;
+            std::vector<std::pair<int, int>> stack{{x, y}}, cells;
+            seen[idx] = 1;
+            int minX = x, maxX = x, minY = y, maxY = y;
+            while (!stack.empty()) {
+                auto [cx, cy] = stack.back();
+                stack.pop_back();
+                cells.emplace_back(cx, cy);
+                minX = std::min(minX, cx);
+                maxX = std::max(maxX, cx);
+                minY = std::min(minY, cy);
+                maxY = std::max(maxY, cy);
+                const int dx[4] = {1, -1, 0, 0}, dy[4] = {0, 0, 1, -1};
+                for (int k = 0; k < 4; ++k) {
+                    const int nx = cx + dx[k], ny = cy + dy[k];
+                    if (nx < x0 || ny < y0 || nx >= labelZone || ny >= y1) continue;
+                    const size_t ni = static_cast<size_t>(ny - y0) * (x1 - x0) + (nx - x0);
+                    if (seen[ni]) continue;
+                    if (std::abs(visualpair::Luminance(img.px[static_cast<size_t>(ny) * img.w + nx]) - paperLum) <= 0.05)
+                        continue;
+                    seen[ni] = 1;
+                    stack.emplace_back(nx, ny);
+                }
+            }
+            // A glyph, not the selected fill or a badge: bounded in both
+            // dimensions and in area.
+            if (cells.size() >= 4 && cells.size() <= 400 && maxX - minX <= 30 && maxY - minY <= 30 &&
+                maxX > glyphMaxX) {
+                glyph = cells;
+                glyphMinX = minX;
+                glyphMaxX = maxX;
+                glyphMinY = minY;
+            }
         }
-    // The cut glyph's strokes reach the sampled columns on its own rows:
-    // a glyph truncated at the boundary is ink there, not a solid strip.
-    for (int y = glyphTop; y <= glyphBottom; ++y)
-        for (int x = std::max(x0, x1 - 4); x < std::max(x0, x1 - 2); ++x)
-            img.px[static_cast<size_t>(y) * img.w + x] = inkColour;
+    }
+    if (glyph.empty()) return;
+    // Save the glyph's colours, erase it, and repaint its left half cut at
+    // the boundary.
+    std::vector<uint32_t> colours;
+    for (auto [x, y] : glyph) colours.push_back(img.px[static_cast<size_t>(y) * img.w + x]);
+    for (auto [x, y] : glyph) img.px[static_cast<size_t>(y) * img.w + x] = paper;
+    const int targetLeft = x1 - 4;
+    for (size_t i = 0; i < glyph.size(); ++i) {
+        const int nx = targetLeft + (glyph[i].first - glyphMinX);
+        if (nx >= x0 && nx < x1) img.px[static_cast<size_t>(glyph[i].second) * img.w + nx] = colours[i];
+    }
+    (void)glyphMinY;
 }
 
 void CheckTruncated(const Spec& spec, Image baseline, const char* name) {
     const RegionSpec& control = ByName(spec, name);
     TruncateLabelAtEdge(baseline, control);
     const auto observed = MeasureAll(baseline, {control});
+    std::printf("truncate %s edge %.3f max %.2f\n", name, observed[0].edgeTouch, control.maxEdge);
     CHECK(observed[0].edgeTouch > control.maxEdge);
     const auto failures = Compare({control}, observed, spec.equivalents, {"theme"});
     CHECK(AnyNames(failures, "clipped"));
@@ -516,12 +546,17 @@ void CheckTruncated(const Spec& spec, Image baseline, const char* name) {
 
 TEST_CASE("Partial-glyph truncation fails as clipped naming each control", "[visual-pair]") {
     const Spec spec = LoadSpec();
-    Image baseline;
-    REQUIRE(LoadPng(Baseline150(), baseline));
-    CheckTruncated(spec, baseline, "sidebar-all");
-    CheckTruncated(spec, baseline, "list-header-name");
-    CheckTruncated(spec, baseline, "list-header-description");
-    CheckTruncated(spec, baseline, "list-header-version");
+    Image light, dark;
+    REQUIRE(LoadPng(Baseline150(), light));
+    REQUIRE(LoadPng(std::filesystem::path(RESOLUTE_SOURCE_ROOT) / "docs" / "captures" / "runs" /
+                        "2026-11-09-D00-T02-s10-launcher-dark-150.png",
+                    dark));
+    for (const Image& baseline : {light, dark}) {
+        CheckTruncated(spec, baseline, "sidebar-all");
+        CheckTruncated(spec, baseline, "list-header-name");
+        CheckTruncated(spec, baseline, "list-header-description");
+        CheckTruncated(spec, baseline, "list-header-version");
+    }
 }
 
 TEST_CASE("The shipped spec keeps the enforcement configuration", "[visual-pair]") {

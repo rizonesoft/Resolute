@@ -227,23 +227,31 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
         out.contrast = worst;
     }
     {
-        // Painted content running into the region's right edge: on a
-        // control rectangle, text truncated by its own drawing boundary,
-        // observed in the image. (Tiled launcher regions set maxEdge 1.0;
-        // their clipping is observed from the pane rectangles.)
-        long borderPainted = 0, border = 0;
-        for (int y = y0; y < y1; ++y) {
-            // The third and fourth columns from the right: where truncated
-            // text arrives, inside the boundary divider itself.
-            for (int x = std::max(x0, x1 - 4); x < std::max(x0, x1 - 2); ++x) {
-                const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
-                const int d = std::abs(Channel(c, 16) - Channel(bg, 16)) + std::abs(Channel(c, 8) - Channel(bg, 8)) +
-                              std::abs(Channel(c, 0) - Channel(bg, 0));
-                if (d > 24) ++borderPainted;
-                ++border;
+        // Painted content reaching the sampled columns just inside the
+        // right boundary, over the region's active rows (rows that paint
+        // anything): a glyph truncated at the boundary puts its strokes
+        // there on its own rows, while an unclipped label leaves them
+        // empty. (Tiled pane regions set maxEdge 1.0; their clipping is
+        // observed from the pane rectangles.)
+        {
+            long activeRows = 0, sampledPainted = 0;
+            for (int y = y0; y < y1; ++y) {
+                bool rowActive = false, rowSampled = false;
+                for (int x = x0; x < x1; ++x) {
+                    const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
+                    const int d = std::abs(Channel(c, 16) - Channel(bg, 16)) +
+                                  std::abs(Channel(c, 8) - Channel(bg, 8)) + std::abs(Channel(c, 0) - Channel(bg, 0));
+                    if (d <= 24) continue;
+                    rowActive = true;
+                    if (x >= std::max(x0, x1 - 4) && x < std::max(x0, x1 - 2)) rowSampled = true;
+                }
+                if (rowActive) {
+                    ++activeRows;
+                    if (rowSampled) ++sampledPainted;
+                }
             }
+            out.edgeTouch = activeRows ? static_cast<double>(sampledPainted) / activeRows : 0;
         }
-        out.edgeTouch = border ? static_cast<double>(borderPainted) / border : 0;
     }
     // A region that ends exactly at the window edge on both axes while the
     // spec ends inside it is treated as clipped by the caller, which knows
