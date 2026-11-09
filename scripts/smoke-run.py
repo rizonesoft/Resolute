@@ -382,6 +382,16 @@ def input_resumed(collecting: bool, idle_now: float) -> bool:
 COLLECT_MIN_IDLE = 120.0  # docs/testing.md: no input for 120 s at a collecting start
 
 
+def collecting_gate(baseline_tick: int, idle_now: float) -> str | None:
+    """Why a collecting run must refuse, or None when it may start."""
+    if baseline_tick < 0:
+        return "refused: the last-input query failed, so a collecting run cannot prove the operator is away"
+    if idle_now < COLLECT_MIN_IDLE:
+        return (f"refused: collecting runs need {COLLECT_MIN_IDLE:.0f}s without "
+                "operator input at their start (docs/testing.md fence)")
+    return None
+
+
 class JobBox:
     """Kill-on-close job: launched tools die with the driver, even on a kill.
 
@@ -475,7 +485,7 @@ class ToolRun:
             self.failed = True
 
     def cleanup(self):
-        """Terminate only the process this run launched."""
+        """Terminate only the process this run launched, then release it."""
         if self.job is None:
             self.job = JobBox()
         if self.proc and self.proc.poll() is None:
@@ -484,6 +494,8 @@ class ToolRun:
                 self.proc.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 self.proc.kill()
+        if isinstance(self.proc, WinProc):
+            self.proc.close()
 
 
 class WinProc:
@@ -516,10 +528,19 @@ class WinProc:
             time.sleep(0.05)
 
     def terminate(self):
-        kernel32.TerminateProcess(wintypes.HANDLE(self._handle), 1)
+        if not kernel32.TerminateProcess(wintypes.HANDLE(self._handle), 1):
+            raise OSError(f"TerminateProcess failed ({ctypes.get_last_error()})")
 
     def kill(self):
         self.terminate()
+
+    def close(self):
+        """Release the process handle; called once the process is reaped."""
+        if getattr(self, "_closed", False):
+            return
+        self._closed = True
+        if not kernel32.CloseHandle(wintypes.HANDLE(self._handle)):
+            raise OSError(f"CloseHandle(process) failed ({ctypes.get_last_error()})")
 
 
 def spawn_contained(run: "ToolRun"):
@@ -588,7 +609,8 @@ def spawn_contained(run: "ToolRun"):
     six.lpAttributeList = ctypes.cast(attr_buf, ctypes.c_void_p)
     proc_info = PROCESS_INFORMATION()
     created = False
-    if k.InitializeProcThreadAttributeList(six.lpAttributeList, 1, 0, ctypes.byref(size)):
+    initialized = bool(k.InitializeProcThreadAttributeList(six.lpAttributeList, 1, 0, ctypes.byref(size)))
+    if initialized:
         # 0x2000D = PROC_THREAD_ATTRIBUTE_JOB_LIST
         if k.UpdateProcThreadAttribute(six.lpAttributeList, 0, ctypes.c_size_t(0x2000D),
                                        ctypes.cast(jobs, ctypes.c_void_p), ctypes.sizeof(jobs), None, None):
@@ -596,15 +618,17 @@ def spawn_contained(run: "ToolRun"):
                 str(run.exe), ctypes.create_unicode_buffer(cmdline), None, None, False,
                 0x00000004 | 0x00080000,  # CREATE_SUSPENDED | EXTENDED_STARTUPINFO_PRESENT
                 None, None, ctypes.byref(six), ctypes.byref(proc_info)))
+    if initialized:
+        k.DeleteProcThreadAttributeList(six.lpAttributeList)
     if not created:
         run.job.error = f"CreateProcess with job list failed ({ctypes.get_last_error()})"
         return
-    k.DeleteProcThreadAttributeList(six.lpAttributeList)
     run.proc = WinProc(int(proc_info.hProcess), int(proc_info.hThread), int(proc_info.dwProcessId))
     if k.ResumeThread(wintypes.HANDLE(int(proc_info.hThread))) == 0xFFFFFFFF:
         run.job.error = "ResumeThread failed"
         run.proc.terminate()
-    kernel32.CloseHandle(wintypes.HANDLE(int(proc_info.hThread)))
+    if not kernel32.CloseHandle(wintypes.HANDLE(int(proc_info.hThread))):
+        run.job.error = f"CloseHandle(thread) failed ({ctypes.get_last_error()})"
 
 
 def launch_block_text() -> str:
@@ -636,8 +660,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                     run.record(step, "fail" if expected else "absent",
                                f"containment could not be established: {run.job.error}"
                                if expected else "surface not shipped")
-            run.cleanup()
-            run.job.close()
+            cleanup_safely(run)
             return False
     except OSError as exc:
         blocked = launch_block(exc)
@@ -649,7 +672,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             else:
                 run.record(step, "fail" if expected else "absent",
                            f"launch failed for {run.exe}: {exc}" if expected else "surface not shipped")
-        run.job.close()
+        cleanup_safely(run)
         return False
     try:
         # start: observe the main window inside the launch bound.
@@ -750,7 +773,8 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             run.record("preferences", "absent",
                        "preferences surface not shipped (framework shell D01 T03 S2)")
 
-        # exit: WM_CLOSE, then observe the process terminated.
+        # exit: WM_CLOSE, then observe the process terminated.  (evidence
+        # for an unexpected exception is captured in the except below)
         post(run.hwnd, WM_CLOSE)
         deadline = time.monotonic() + TIMEOUTS["exit"]
         while True:
@@ -776,6 +800,10 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             detail += "; capture unavailable: the process has exited"
         run.record("exit", result, detail)
         return False
+    except Exception:
+        run._evidence = (failure_capture(run, "error", out_dir, abort=resumed)
+                         if run.hwnd else "capture unavailable: no window")
+        raise
     finally:
         cleanup_safely(run)
 
@@ -864,17 +892,22 @@ def main(argv=None) -> int:
         return 2
 
     admitted, mode, collecting = admission(args.visible, datetime.now(), os.environ)
-    if admitted and collecting and idle_seconds() < COLLECT_MIN_IDLE:
-        admitted, mode = False, (f"refused: collecting runs need {COLLECT_MIN_IDLE:.0f}s without "
-                                 "operator input at their start (docs/testing.md fence)")
+    if admitted and collecting:
+        gate = collecting_gate(last_input_tick(), idle_seconds())
+        if gate:
+            admitted, mode = False, gate
     notes = [f"Admission: {mode}."]
     if not admitted:
         SMOKE_DIR.mkdir(parents=True, exist_ok=True)
         refused_rows = [(name, step, "refused", mode)
                         for name in (only or sorted(load_tools()))
                         for step, _ in step_table(name)]
-        (SMOKE_DIR / "smoke-report.md").write_text(
-            render_report(refused_rows, "refused", notes + ["No tool was launched."]), encoding="utf-8")
+        try:
+            (SMOKE_DIR / "smoke-report.md").write_text(
+                render_report(refused_rows, "refused", notes + ["No tool was launched."]), encoding="utf-8")
+        except OSError as exc:
+            print(f"smoke: could not write the refusal report: {exc}")
+            print(render_report(refused_rows, "refused", notes + ["No tool was launched."]))
         print(f"smoke: {mode}; report at build/smoke/smoke-report.md")
         return 2
 
@@ -901,8 +934,7 @@ def main(argv=None) -> int:
             ensure_rows(run, "stood-down" if stood_down else "fail",
                         "operator input resumed; tool dismissed" if stood_down else "not reached")
         except Exception as exc:  # one tool's crash never stops the run or loses the report
-            evidence = failure_capture(run, "error", SMOKE_DIR, abort=resumed) \
-                if run.hwnd else "capture unavailable: no window"
+            evidence = getattr(run, "_evidence", "capture unavailable: no window")
             ensure_rows(run, "fail", f"driver error: {exc!r}; {evidence}")
             try:
                 run.cleanup()
@@ -1055,6 +1087,30 @@ def self_test() -> int:
     if live.proc is not None:
         live.cleanup()
     check("contained spawn runs and cleans up", spawned and live.proc.poll() is not None)
+    check("collecting gate refuses a failed baseline query",
+          collecting_gate(-1, 9999.0) is not None and collecting_gate(100, 9999.0) is None
+          and collecting_gate(100, 3.0) is not None)
+    # Kill-on-close proof on the production path: closing the job, with no
+    # terminate call, reaps the contained child.
+    live2 = ToolRun("SmokeDrillBroken", Path(sys.executable), [str(fixture), "nowindow"])
+    live2.job = JobBox()
+    spawn_contained(live2)
+    running = live2.proc is not None and live2.proc.poll() is None
+    if live2.proc is not None:
+        live2.job.close()
+        try:
+            live2.proc.wait(timeout=5)
+            reaped = live2.proc.poll() is not None
+        except Exception:
+            reaped = False
+        live2.cleanup()
+    else:
+        reaped = False
+    check("closing the job reaps the contained child", running and reaped)
+    check("process handle released by cleanup", isinstance(live2.proc, WinProc) and live2.proc._closed)
+    nightly_text = (ROOT / "tools" / "nightly.ps1").read_text(encoding="utf-8", errors="replace")
+    check("nightly parses verdicts with hyphens and names the report path",
+          "[\\w-]+" in nightly_text and nightly_text.count("$smokeReportPath") >= 4)
     check("nightly verdict words all parse", all(
         __import__("re").match(r"Suite verdict: \*\*([\w-]+)\*\*",
                                f"Suite verdict: **{v}**").group(1) == v
