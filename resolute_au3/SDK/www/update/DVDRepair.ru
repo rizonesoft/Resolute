@@ -1,3 +1,3 @@
 [Update]
 LatestBuild=2920
-UpdateURL=https://www.rizonesoft.com/downloads/resolute/update/
+UpdateURL=https://rizonesoft.com/downloads/resolute/update/
