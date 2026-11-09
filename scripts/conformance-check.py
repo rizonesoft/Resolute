@@ -221,6 +221,13 @@ def shipped_set_problems(root: Path, tools: dict):
 # Compiler runtimes are refused (the suite links static), msvcrt.dll
 # excepted as a Windows system library. Anything else means the tool
 # is not standalone.
+# A real API-set contract name: api-/ext- prefix, component terms,
+# and the versioned -l<major>-<minor>-<patch> suffix. A bare prefix
+# is not a contract (review round 9).
+API_SET_RE = re.compile(
+    r"^(api|ext)-ms-win-[a-z0-9]+(-[a-z0-9]+)*-l\d+-\d+-\d+\.dll$"
+)
+
 SYSTEM_DLLS = {
     "advapi32.dll", "bcrypt.dll", "cfgmgr32.dll", "comctl32.dll",
     "comdlg32.dll", "crypt32.dll", "d2d1.dll", "dbghelp.dll",
@@ -323,7 +330,12 @@ def pe_problems(path: Path):
     problems = []
     for name in names:
         low = name.lower()
-        if low.startswith(("api-ms-win-", "ext-ms-win-")):
+        if "/" in name or "\\" in name:
+            problems.append(
+                f"{path.name} imports path-bearing DLL name '{name}'; imports name contracts, never paths"
+            )
+            continue
+        if API_SET_RE.match(low):
             continue
         if low in SYSTEM_DLLS:
             continue
@@ -1109,6 +1121,18 @@ def self_test() -> int:
             assert "unparsed clause row" in str(exc), exc
 
     case("clause grammar matches the profile validator, no silent drops", missing_trailing_pipe_still_evaluates)
+
+    def api_set_impersonators_refuse():
+        tmp = mkdtemp()
+        p = tmp / "tool.exe"
+        for bad in ("api-ms-win-attacker.dll", "ext-ms-win-private.dll", "api-ms-win-evil/thirdparty.dll"):
+            p.write_bytes(make_pe([bad]))
+            got = pe_problems(p)
+            assert got, f"{bad} was trusted"
+        p.write_bytes(make_pe(["api-ms-win-core-file-l1-1-0.dll", "ext-ms-win-ntuser-window-l1-1-0.dll"]))
+        assert pe_problems(p) == [], pe_problems(p)
+
+    case("API-set impersonators refused, real contracts pass", api_set_impersonators_refuse)
 
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)

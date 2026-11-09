@@ -273,6 +273,9 @@ else {
     $targets = @($match)
 }
 
+# Capture the input manifest BEFORE compiling: a source changed
+# mid-build must not acquire build evidence (D07 T01 section 3).
+$inputsBefore = (& python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --print-input-manifest).Trim()
 Write-Host "building $($targets.Count) target(s), $Config, x86-64" -ForegroundColor Cyan
 
 foreach ($t in $targets) {
@@ -309,7 +312,7 @@ Write-Host "build: $($results.Count) target(s) built, $Config, output under Bin\
 # refuses to certify artifacts its sources no longer match, and the
 # conformance check's C24 consumes the chain (D07 T01 section 3).
 if ($Config -eq 'Release') {
-    & python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json') --build-config $Config --build-targets ($targets -join ',')
+    & python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json') --build-config $Config --build-targets ($targets -join ',') --expect-inputs $inputsBefore
     if ($LASTEXITCODE -ne 0) { Write-Host 'build: writing the build record failed' -ForegroundColor Red; exit 1 }
 }
 exit 0

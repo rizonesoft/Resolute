@@ -1331,6 +1331,8 @@ def main(argv=None) -> int:
     ap.add_argument("--write-build-record", default=None, help="record input manifest + artifact hashes of a successful build")
     ap.add_argument("--build-config", default=None)
     ap.add_argument("--build-targets", default="")
+    ap.add_argument("--expect-inputs", default=None, help="refuse to write the build record if inputs moved")
+    ap.add_argument("--print-input-manifest", action="store_true")
     ap.add_argument("--root", default=None)
     args = ap.parse_args(argv)
 
@@ -1338,6 +1340,9 @@ def main(argv=None) -> int:
         return self_test()
 
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parent.parent
+    if args.print_input_manifest:
+        print(input_manifest(root))
+        return 0
     if args.write_build_record:
         import hashlib as _hl
         import json as _js
@@ -1350,8 +1355,15 @@ def main(argv=None) -> int:
                 for f in sorted(base.rglob("*"))
                 if f.is_file()
             }
+        current_inputs = input_manifest(root)
+        if args.expect_inputs and current_inputs != args.expect_inputs:
+            print(
+                "tidy-ratchet: FAILED: build inputs changed during the build; "
+                "the record would bind changed sources to stale artifacts"
+            )
+            return 1
         record = {
-            "inputs_sha256": input_manifest(root),
+            "inputs_sha256": current_inputs,
             "artifacts": artifacts,
             "config": args.build_config,
             "targets": [x for x in args.build_targets.split(",") if x],
