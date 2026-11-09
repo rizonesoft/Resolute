@@ -761,8 +761,11 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             elif blocked:
                 run.record(step, "absent", "surface not shipped")
             else:
+                detail = f"launch failed for {run.exe}: {exc}"
+                if run.job is not None and run.job.error and run.job.error not in detail:
+                    detail += f"; containment: {run.job.error}"
                 run.record(step, "fail" if expected else "absent",
-                           f"launch failed for {run.exe}: {exc}" if expected else "surface not shipped")
+                           detail if expected else "surface not shipped")
         cleanup_safely(run)
         return False
     try:
@@ -940,7 +943,10 @@ def failure_capture(run: ToolRun, step: str, out_dir: Path, abort=None) -> str:
         shot = capture_window_bounded(run.hwnd, abort=abort)
     except Exception as exc:
         return f"capture unavailable: {exc!r}"
-    if shot is None or shot == ABORTED:
+    if shot == ABORTED:
+        run.interrupted = True
+        return "capture unavailable: operator input resumed during capture"
+    if shot is None:
         return "capture unavailable: PrintWindow produced nothing within its bound"
     width, height, bgra = shot
     try:
@@ -1034,6 +1040,9 @@ def main(argv=None) -> int:
                 stood_down = True
             if getattr(run, "stood_down_during_cleanup", False):
                 stood_down = True
+            if getattr(run, "interrupted", False):
+                stood_down = True
+                notes.append(f"Operator input resumed during {run.name}; the run stood down.")
             ensure_rows(run, "stood-down" if stood_down else "fail",
                         "operator input resumed; tool dismissed" if stood_down else "not reached")
         except Exception as exc:  # one tool's crash never stops the run or loses the report
@@ -1044,6 +1053,9 @@ def main(argv=None) -> int:
                 stood_down = True
                 notes.append(f"Operator input resumed during {run.name} cleanup; "
                              "the run stood down after recording its failure.")
+            if getattr(run, "interrupted", False):
+                stood_down = True
+                notes.append(f"Operator input resumed during {run.name}; the run stood down.")
         rows += run.rows
     failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
     blocked = any(r[2] == "blocked" for r in rows)
@@ -1429,6 +1441,61 @@ def self_test() -> int:
             globals()["drive_tool"] = _rd
             check("report-write failure after mkdir falls back to stdout",
                   rc == 1 and "could not write" in buf.getvalue() and "Suite verdict" in buf.getvalue())
+    finally:
+        globals().update(_saved)
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+
+    user32.GetWindowRect = _rect
+    user32.GetWindowDC = lambda h: 11
+    user32.PrintWindow = lambda h, dc, f: 0
+    user32.ReleaseDC = lambda h, dc: 0
+    gdi32.CreateCompatibleDC = lambda dc: 22
+    gdi32.CreateCompatibleBitmap = lambda dc, w, h: 33
+    gdi32.SelectObject = lambda dc, obj: 44
+    gdi32.DeleteObject = lambda obj: 0
+    gdi32.DeleteDC = lambda dc: 0
+    try:
+        capture_window(99)
+        _agg_all = False
+    except RuntimeError as exc:
+        _msg = str(exc)
+        _agg_all = all(name in _msg for name in ("DeleteObject", "DeleteDC", "ReleaseDC"))
+    finally:
+        (user32.GetWindowRect, user32.GetWindowDC, user32.PrintWindow, user32.ReleaseDC,
+         gdi32.CreateCompatibleDC, gdi32.CreateCompatibleBitmap, gdi32.SelectObject,
+         gdi32.DeleteObject, gdi32.DeleteDC) = _saved_apis
+    check("every capture release failure is named in the aggregate", _agg_all)
+    # Final-tool stand-down reaches the verdict on normal and exception paths.
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+            globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
+            def _drive_sd(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                for step, _e in step_table(run.name):
+                    run.record(step, "pass", "stub")
+                run.stood_down_during_cleanup = True
+                return False
+            _rd2 = globals()["drive_tool"]
+            globals()["drive_tool"] = _drive_sd
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            check("final-tool cleanup stand-down reaches the verdict",
+                  rc == 2 and "stood-down" in buf.getvalue())
+            def _drive_exc(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                run.record("start", "pass", "stub")
+                run.interrupted = True
+                raise RuntimeError("stub drive failure")
+            globals()["drive_tool"] = _drive_exc
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            globals()["drive_tool"] = _rd2
+            out = buf.getvalue()
+            check("final-tool exception keeps failure exit and names stand-down",
+                  rc == 1 and "stood down" in out and out.count("| Resolute |") == 5)
     finally:
         globals().update(_saved)
         os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
