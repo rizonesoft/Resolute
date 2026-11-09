@@ -95,6 +95,7 @@ track: W1
 |  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [x]   |
 |  42   |   §42   | Campaign guard recovery completeness           | §40, §41 |  [ ]   |
 |  43   |   §43   | Sonnet delegates under one lead                | §27 |  [ ]   |
+|  44   |   §44   | Review-order skills match the dispatcher       | --           |  [ ]   |
 
 ---
 
@@ -1829,6 +1830,19 @@ Operator decision 2026-10-01 (**updated 2026-10-17:** subagents read and run, th
 **Test checkpoint:** Unit test (`panel_slots.py --self-test` with the delegate, agent-file, probe-parse, and hook legs, counts quoted) plus driven run (live `delegate-probe`, the headless delegated run's `modelUsage` and ledger line, a denied per-call `model: sonnet` on `general-purpose`, `panel_slots.py validate` over the checked-in table and roster, `todo-graph.py validate` 0 fatal). The failure path is proven by the effort-below-high and moved-alias refusals and the denied per-call override.
 
 -> XREF: D00 T04 §27 -- the slot table and runner whose registry this section extends with the delegate pin
+
+## 44. Review-Order Skills Match the Dispatcher
+
+**Filed 2026-11-09** from the `D07 T01 §2` run (findings lineage in `docs/reviews/07-quality/D07-T01-s2.md` and its three repair records). The skills and the dispatcher disagree about review order, and the dispatcher wins because it refuses: `process-todo-section` step 7 and `review-todo-section` step 3 describe the completion review running **before** the regular rounds, while `scripts/review-dispatch.py` `check_sequence` enforces plan, then rounds until a clean terminal round, then completion **last**, and closes a findings record once its completion returns, so every completion gap starts a new reviewed repair cycle on a new record. A runner following the skills hits a refusal on its first completion dispatch and has to rediscover the real order from the dispatcher's source. The stamp block the skills prescribe also names the completion as preceding the rounds, which the record then contradicts.
+
+- [ ] Rewrite the ordering in `.agents/skills/review-todo-section/SKILL.md` (steps 3, 4 and 7), `.agents/skills/process-todo-section/SKILL.md` (steps 5 and 7) and their `.claude/` and `.codex/` mirrors to match `scripts/review-dispatch.py` `check_sequence`: plan, rounds to a clean terminal round, completion last, and a returned completion closes the record so its gaps open a new repair cycle on a `-repair` record. Done when: no skill text instructs a dispatch order the dispatcher refuses, and the repair-cycle record naming used by `D07 T01 §2` is the documented one. Cheaper substitute that fails the checkpoint: editing one mirror only, which leaves two agent families reading the refused order.
+- [ ] State the ordering once in `AGENTS.md` beside the reviewer-effort rule, so a cold reader meets it before the skills. Done when: the line names plan, rounds, completion-last, and the closed-record rule with the dispatcher as the enforcing source.
+- [ ] Commit: `"workspace: review skills state the dispatcher's order"`
+
+-> SOURCE: phase-run-2026-11-09-d07-t01-s2 (completion dispatched before rounds, refused: 'completion requires a clean terminal round')
+
+**Test checkpoint:** `grep` over the six skill files shows no instruction to run completion before rounds (quoted), `python scripts/review-dispatch.py --check-pin` ok, `python -m unittest discover -s scripts/tests` green, and a dry reading of one full cycle (plan, round, completion, repair) against the rewritten steps names no step the dispatcher would refuse.
+
 
 ## Verification
 
