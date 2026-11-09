@@ -219,7 +219,20 @@ def check_raise_guard(current_text: str, base_text, expected_targets) -> list:
 
 
 def rewrite_baseline(text: str, measured_count: int, measured_targets: dict) -> str:
-    """Return the baseline text with counts rewritten down to measured."""
+    """Return the baseline text with counts rewritten down to measured.
+
+    A '# Raised' line whose <new> was the value just rewritten down is
+    adjusted to the measured value: an authorized raise to 177 that
+    measurement then writes down to 173 must still authorize 173 on
+    the next unchanged run, or the rewrite produces a baseline its
+    own guard refuses (completion review gap 1). The reason text is
+    untouched; only the ceiling it recorded follows the measurement.
+    """
+    current = parse_baseline_lenient(text)
+    ceilings = {"total": (current["count"], measured_count)}
+    for name, val in current["targets"].items():
+        if name in measured_targets:
+            ceilings[name] = (val, measured_targets[name])
     out = []
     for raw in text.splitlines():
         t = raw.strip()
@@ -230,8 +243,27 @@ def rewrite_baseline(text: str, measured_count: int, measured_targets: dict) -> 
         if m:
             out.append(f"target {m.group(1)}: {measured_targets[m.group(1)]}")
             continue
+        m = RAISED_RE.match(t)
+        if m and m.group("target") in ceilings:
+            old_ceiling, measured = ceilings[m.group("target")]
+            if int(m.group("new")) == old_ceiling and measured < old_ceiling:
+                raw = raw.replace(
+                    f"{m.group('old')} -> {m.group('new')}",
+                    f"{m.group('old')} -> {measured}",
+                    1,
+                )
         out.append(raw)
     return "\n".join(out) + "\n"
+
+
+def write_atomic(path: Path, text: str) -> None:
+    """Replace a file atomically and read it back (AGENTS.md: atomic
+    writes, readback). A failed write leaves the original intact."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text)
+    os.replace(tmp, path)
+    if path.read_text() != text:
+        raise Refusal(f"readback mismatch after writing {path}; baseline not trusted")
 
 
 ID_CLASSES = ("IDI", "IDC", "IDM", "IDS", "IDD", "IDB", "IDA", "IDR")
@@ -476,20 +508,31 @@ def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
         )
     for name in names:
         if measured_targets[name] > baseline["targets"][name]:
-            findings = "\n".join(sorted(per_target[name]))
+            all_findings = sorted(per_target[name])
+            shown = all_findings[:20]
+            findings = "\n".join(shown)
+            if len(all_findings) > len(shown):
+                findings += f"\n... and {len(all_findings) - len(shown)} more (full log: {log_path})"
             regressed.append(
                 f"target '{name}' {measured_targets[name]} is above its baseline "
                 f"{baseline['targets'][name]}; its findings:\n{findings}"
             )
     if regressed:
-        raise Refusal("; ".join(regressed))
+        # The one-line summary repeats last: check-all.ps1 shows only the
+        # tail of a failing gate, and a findings list must not push the
+        # target and counts out of it (completion review gap 4).
+        summary = "; ".join(
+            r.split("; its findings:")[0] if "; its findings:" in r else r.split("\n")[0]
+            for r in regressed
+        )
+        raise Refusal("; ".join(regressed) + f"\nsummary: {summary}")
 
     dropped = measured_count < baseline["count"] or any(
         measured_targets[n] < baseline["targets"][n] for n in names
     )
     if dropped:
         new_text = rewrite_baseline(current_text, measured_count, measured_targets)
-        baseline_path.write_text(new_text)
+        write_atomic(baseline_path, new_text)
         print(
             f"tidy-ratchet: REWRITTEN DOWN total {baseline['count']} -> {measured_count}, "
             + ", ".join(
@@ -771,6 +814,81 @@ def self_test() -> int:
         assert log.is_file() and log.read_text().strip(), "failing run left no diagnostics log"
 
     case("failed analysis persists its diagnostics log", failed_analysis_keeps_its_log)
+
+    def run_end_to_end():
+        # The complete operation over a real git repository, with the
+        # analyzer stubbed at run_analysis's function boundary (the
+        # subprocess path itself is covered by the drills in the
+        # section record and the failed-log case above).
+        tmp = mkdtemp()
+        (tmp / "todo").mkdir()
+        (tmp / "src").mkdir()
+        (tmp / "src" / "a.rc").write_text('1 ICON "i.ico"\n')
+        (tmp / "extensions" / "Ext").mkdir(parents=True)
+        baseline = tmp / "todo" / ".tidy-baseline"
+        baseline.write_text("count: 5\ntarget Ext: 2\ntarget root: 3\n")
+        env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1")
+        for args in (
+            ["git", "init", "-q", "-b", "master"],
+            ["git", "config", "user.email", "t@example.invalid"],
+            ["git", "config", "user.name", "t"],
+            ["git", "add", "."],
+            ["git", "commit", "-qm", "base"],
+            ["git", "update-ref", "refs/remotes/origin/master", "HEAD"],
+        ):
+            subprocess.run(args, cwd=tmp, check=True, capture_output=True, env=env)
+
+        measured = {"root": {"a|1|1|x", "a|2|1|x", "a|3|1|x"}, "Ext": {"b|1|1|x", "b|2|1|x"}}
+        real_analysis = run_analysis
+
+        def fake_analysis(root, clang_tidy, targets, log_path):
+            glob = set().union(*measured.values())
+            return {k: set(v) for k, v in measured.items()}, glob, 2
+
+        globals()["run_analysis"] = fake_analysis
+        try:
+            tidy = Path(sys.executable)
+            before = baseline.read_bytes()
+            assert run(tmp, tidy, None, tmp / "log.txt") == 0
+            assert baseline.read_bytes() == before, "equal run rewrote the baseline"
+
+            measured["root"].add("a|4|1|x")
+            measured["Ext"].discard("b|2|1|x")
+            try:
+                run(tmp, tidy, None, tmp / "log.txt")
+                raise AssertionError("offset regression passed")
+            except Refusal as exc:
+                last = str(exc).strip().splitlines()[-1]
+                assert last.startswith("summary:") and "'root' 4 is above its baseline 3" in last, last
+            assert baseline.read_bytes() == before, "refused run rewrote the baseline"
+
+            baseline.write_text(
+                "# Raised total 5 -> 7 on 2026-11-09: wider coverage\n"
+                "# Raised root 3 -> 5 on 2026-11-09: wider coverage\n"
+                "count: 7\ntarget Ext: 2\ntarget root: 5\n"
+            )
+            measured["Ext"] = {"b|1|1|x", "b|2|1|x"}
+            assert run(tmp, tidy, None, tmp / "log.txt") == 0
+            text = baseline.read_text()
+            assert "count: 6" in text and "target root: 4" in text, text
+            assert "# Raised total 5 -> 6" in text and "# Raised root 3 -> 4" in text, text
+            assert run(tmp, tidy, None, tmp / "log.txt") == 0, "unchanged rerun after rewrite refused"
+
+            def failing_analysis(root, clang_tidy, targets, log_path):
+                raise Refusal("analysis did not complete (stub)")
+
+            globals()["run_analysis"] = failing_analysis
+            before = baseline.read_bytes()
+            try:
+                run(tmp, tidy, None, tmp / "log.txt")
+                raise AssertionError("incomplete analysis passed")
+            except Refusal:
+                pass
+            assert baseline.read_bytes() == before, "incomplete run rewrote the baseline"
+        finally:
+            globals()["run_analysis"] = real_analysis
+
+    case("run() end to end: equal, offset refusal, rewrite then rerun, incomplete", run_end_to_end)
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
