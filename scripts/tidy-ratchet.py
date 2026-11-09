@@ -530,6 +530,40 @@ def default_base(root: Path, override):
     return "origin/master" if probe.returncode == 0 else "HEAD"
 
 
+INPUT_SUFFIXES = {".h", ".hpp", ".cpp", ".cc", ".cxx", ".inl", ".cmake", ".txt", ".in", ".rc"}
+
+
+def input_manifest(root: Path) -> str:
+    """SHA-256 over every build input's path and bytes: sources and
+    headers under src/, shared/, extensions/, cmake/, tests/, plus
+    root build configuration. Captured before analysis and verified
+    after it (and again by the conformance check's C24), so a change
+    before, during, or after measurement voids the evidence. This
+    replaced timestamp freshness after three review rounds showed
+    every time-based binding has a race (D07 T01 \u00a73)."""
+    import hashlib
+
+    entries = []
+    for base_name in ("src", "shared", "extensions", "cmake", "tests"):
+        base = root / base_name
+        if not base.is_dir():
+            continue
+        for f in sorted(p for p in base.rglob("*") if p.is_file()):
+            if "build" in f.parts:
+                continue
+            if f.suffix.lower() in INPUT_SUFFIXES or f.name in (".clang-tidy", "CMakeLists.txt", "CMakePresets.json"):
+                entries.append(f)
+    for extra in (root / "CMakeLists.txt", root / ".clang-tidy", root / "CMakePresets.json"):
+        if extra.is_file():
+            entries.append(extra)
+    h = hashlib.sha256()
+    for f in sorted(set(entries)):
+        h.update(f.relative_to(root).as_posix().encode())
+        h.update(b"\0")
+        h.update(hashlib.sha256(f.read_bytes()).digest())
+    return h.hexdigest()
+
+
 def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None) -> int:
     baseline_path = root / "todo" / ".tidy-baseline"
     targets = expected_targets(root)
@@ -555,7 +589,13 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
 
     if not clang_tidy.is_file():
         raise Refusal(f"clang-tidy not found at {clang_tidy}")
+    inputs_before = input_manifest(root)
     per_target, global_set, total_tus, log_error = run_analysis(root, clang_tidy, targets, log_path)
+    if input_manifest(root) != inputs_before:
+        raise Refusal(
+            "build inputs changed during analysis; the count does not "
+            "describe the current tree, rerun the gate"
+        )
     if log_error is not None:
         # A successful analysis whose diagnostics could not be saved
         # still says so: the counts are evidence, the missing log is
@@ -636,6 +676,7 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
                 for f in sorted((root / "Bin" / "Release").rglob("*"))
                 if f.is_file()
             } if (root / "Bin" / "Release").is_dir() else {},
+            "inputs_sha256": inputs_before,
             "compile_dbs": {
                 db.relative_to(root).as_posix(): _hashlib.sha256(db.read_bytes()).hexdigest()
                 for db in targets.values()

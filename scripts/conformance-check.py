@@ -71,11 +71,12 @@ SELF_SECTION = "D07 T01 \u00a73"
 
 ADD_EXECUTABLE_RE = re.compile(r"add_executable\s*\(\s*([A-Za-z0-9_.-]+)")
 CLAUSE_RE = re.compile(
-    r"^\|\s*(C\d+)\s*\|\s*(universal|repair)\s*\|\s*([a-z]+)\s*\|([^|]*)\|([^|]*)\|\s*(D\d\d T\d\d \u00a7\d+)\s*\|"
+    r"^\|\s*(C\d+)\s*\|\s*(universal|repair)\s*\|\s*([a-z]+)\s*\|([^|]*)\|([^|]*)\|\s*(D\d\d T\d\d \u00a7\d+)\s*\|?"
 )
 EXCEPTION_RE = re.compile(
-    r"^\|\s*([A-Za-z0-9_.-]+)\s*\|\s*(C\d+)\s*\|\s*(\d{4}-\d{2}-\d{2})\s*\|([^|]+)\|\s*(D\d\d T\d\d \u00a7\d+)\s*\|"
+    r"^\|\s*([A-Za-z0-9_.-]+)\s*\|\s*(C\d+)\s*\|\s*(\d{4}-\d{2}-\d{2})\s*\|([^|]+)\|\s*(D\d\d T\d\d \u00a7\d+)\s*\|?"
 )
+CLAUSE_SHAPED_RE = re.compile(r"^\|\s*C\d+\s*\|")
 
 
 def parse_profile(text: str):
@@ -103,7 +104,12 @@ def parse_profile(text: str):
                 }
             )
             continue
+        if CLAUSE_SHAPED_RE.match(line):
+            raise Refusal(f"unparsed clause row in profile: {line.strip()!r}")
         if in_exceptions:
+            if line.startswith("|") and "---" not in line and "Tool" not in line.split("|")[1]:
+                if not EXCEPTION_RE.match(line):
+                    raise Refusal(f"unparsed exception row in profile: {line.strip()!r}")
             m = EXCEPTION_RE.match(line)
             if m:
                 exceptions.append(
@@ -442,31 +448,14 @@ def eval_build_clean(root: Path, tool, spec, ctx):
         db_path = root / rel_db
         if not db_path.is_file() or hashlib.sha256(db_path.read_bytes()).hexdigest() != digest:
             raise Refusal(f"C24: compile database {rel_db} changed since measurement; rerun the gate")
-    record_mtime = Path(result_path).stat().st_mtime
-    # Every build input, not only the tool's own tree: the launcher
-    # statically links shared/resolute-ui and shared/lucide, and a
-    # change there leaves the old executable certifying itself
-    # (review round 5). CMake and tidy configuration are inputs too.
-    input_suffixes = SOURCE_SUFFIXES | {".cmake", ".txt", ".in", ".rc"}
-    for base_name in ("src", "shared", "extensions", "cmake", "tests"):
-        base = root / base_name
-        if not base.is_dir():
-            continue
-        for f in base.rglob("*"):
-            if not f.is_file() or "build" in f.parts:
-                continue
-            if f.suffix.lower() in input_suffixes or f.name in (".clang-tidy", "CMakeLists.txt", "CMakePresets.json"):
-                if f.stat().st_mtime > record_mtime:
-                    raise Refusal(
-                        f"C24: build input {f.relative_to(root).as_posix()} is newer than "
-                        "the measurement; rerun the gate"
-                    )
-    for extra in (root / "CMakeLists.txt", root / ".clang-tidy"):
-        if extra.is_file() and extra.stat().st_mtime > record_mtime:
-            raise Refusal(
-                f"C24: build input {extra.relative_to(root).as_posix()} is newer than "
-                "the measurement; rerun the gate"
-            )
+    # The record binds to the exact build inputs by content hash,
+    # captured by the ratchet before analysis and verified by it
+    # after: a change before, during, or after measurement voids
+    # the evidence, with no timestamp race left to find.
+    if record.get("inputs_sha256") != ctx["ratchet"].input_manifest(root):
+        raise Refusal(
+            "C24: build inputs differ from the measured manifest; rerun the gate"
+        )
     target = spec["tidy_target"]
     if target not in record.get("targets", {}):
         raise Refusal(f"C24: result record carries no count for target '{target}'")
@@ -840,6 +829,15 @@ def self_test() -> int:
 | --- | --- | --- | --- | --- |
 """
 
+    def refresh_result(tmp, result):
+        import hashlib as _h
+        import json as _j
+
+        rec = _j.loads(result.read_text())
+        rec["inputs_sha256"] = load_ratchet(tmp).input_manifest(tmp)
+        result.write_text(_j.dumps(rec))
+
+
     def fixture(profile=PROFILE, status_map=None):
         tmp = mkdtemp()
         (tmp / "docs").mkdir()
@@ -866,6 +864,7 @@ def self_test() -> int:
             "log_sha256": _h.sha256(log.read_bytes()).hexdigest(),
             "baseline_sha256": _h.sha256((tmp / "todo" / ".tidy-baseline").read_bytes()).hexdigest(),
             "artifacts": {"Bin/Release/ToolA.exe": _h.sha256((tmp / "Bin/Release/ToolA.exe").read_bytes()).hexdigest()},
+            "inputs_sha256": load_ratchet(tmp).input_manifest(tmp),
             "compile_dbs": {"build/release/compile_commands.json": _h.sha256((tmp / "build/release/compile_commands.json").read_bytes()).hexdigest()},
         }))
         tools = {
@@ -908,11 +907,7 @@ def self_test() -> int:
         d.mkdir(parents=True)
         planted = d / "Settings.cpp"
         planted.write_text("// private settings\n")
-        import os as _os
-        import time as _time
-
-        past = _time.time() - 3600
-        _os.utime(planted, (past, past))
+        refresh_result(tmp, result)
         refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "shared-layer name")
 
     case("layout violation fails by name", layout_violation)
@@ -929,6 +924,7 @@ def self_test() -> int:
         (tmp / "src" / "CMakeLists.txt").write_text(
             "add_executable(ToolA WIN32 main.cpp)\nadd_executable(Sneak WIN32 main.cpp)\n"
         )
+        refresh_result(tmp, result)
         refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "'Sneak'")
 
     case("unregistered executable target fails by name", unregistered_target)
@@ -951,7 +947,7 @@ def self_test() -> int:
             d.mkdir(parents=True)
             f = d / "r.cpp"
             f.write_text('RepairItem{ "hosts-file" };\n')
-            _os.utime(f, (past, past))
+        refresh_result(tmp, result)
         refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "repair subject 'hosts-file'")
 
     case("duplicate repair subject fails by name", dup_repair)
@@ -1053,9 +1049,8 @@ def self_test() -> int:
         import time as _time
 
         tmp, tools, log, status, result = fixture()
-        future = _time.time() + 60
-        _os.utime(tmp / "src" / "main.cpp", (future, future))
-        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "is newer than")
+        (tmp / "src" / "main.cpp").write_text("int main(){ return 1; }\n")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "differ from the measured manifest")
         tmp, tools, log, status, result = fixture()
         (tmp / "Bin/Release/ToolA.exe").write_bytes(make_pe(["USER32.dll"]))
         refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "differs from the artifact")
@@ -1085,11 +1080,22 @@ def self_test() -> int:
         shared.mkdir(parents=True)
         f = shared / "ui.cpp"
         f.write_text("int x;\n")
-        future = _time.time() + 60
-        _os.utime(f, (future, future))
-        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "shared/lib/ui.cpp")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "differ from the measured manifest")
 
     case("shared source change voids C24 evidence", shared_source_voids_evidence)
+
+    def missing_trailing_pipe_still_evaluates():
+        prof = PROFILE.replace("| D00 T01 \u00a73 |", "| D00 T01 \u00a73")
+        clauses, _ = parse_profile(prof)
+        assert any(c["id"] == "C24" for c in clauses), clauses
+        bad = PROFILE.replace("| C24 | universal |", "| C24 | someday |")
+        try:
+            parse_profile(bad)
+            raise AssertionError("unparsed clause row passed")
+        except Refusal as exc:
+            assert "unparsed clause row" in str(exc), exc
+
+    case("clause grammar matches the profile validator, no silent drops", missing_trailing_pipe_still_evaluates)
 
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)
