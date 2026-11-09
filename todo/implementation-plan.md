@@ -154,6 +154,8 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D07 T01 §4`  | Standing smoke run over the suite                 |  13   |
 | [ ] | `D07 T01 §5`  | Elevated smoke pass for RegStudio                 |   3   |
 | [ ] | `D07 T01 §6`  | Smoke capture-timeout test                        |   3   |
+| [ ] | `D07 T01 §7`  | Unattended elevated smoke via scheduled task      |   5   |
+| [ ] | `D07 T01 §8`  | Smoke forwarding-test assertion                   |   2   |
 | [x] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   6   |
 | [x] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
 | [x] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
@@ -387,7 +389,3 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 - **It does not vendor a compiler into git.** The bootstrap downloads a pinned llvm-mingw toolchain into an ignored directory instead.
 - **It does not keep the ExoSuite name.** `D00 T03` renames the product, the UI library, and the toolchain to Resolute, because there is one product here rather than two.
 
-
-| [ ] | `D07 T01 §7`  | Unattended elevated smoke via scheduled task    |   5   |
-
-| [ ] | `D07 T01 §8`  | Smoke forwarding-test assertion                 |   2   |
