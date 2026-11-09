@@ -2285,6 +2285,8 @@ def self_test() -> int:
                 return True
             advapi32.GetTokenInformation = _get_one
             check("elevated token at the API boundary returns True", is_elevated() is True)
+            check("the elevated synthetic token also closes exactly once",
+                  _closed_tokens == [99, 99, 99])
             shell32.ShellExecuteExW = lambda info_ptr: 0
             ctypes.get_last_error = lambda: 1223
             try:
