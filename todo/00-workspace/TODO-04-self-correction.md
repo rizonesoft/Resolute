@@ -97,6 +97,7 @@ track: W1
 |  43   |   §43   | Sonnet delegates under one lead                | §27 |  [ ]   |
 |  44   |   §44   | Review-order skills match the dispatcher       | --           |  [x]   |
 |  45   |   §45   | Skill numbering and stamp separator follow-ups | §44          |  [x]   |
+|  46   |   §46   | Plan rows outside phase tables refused       | --           |  [ ]   |
 
 ---
 
@@ -1881,6 +1882,20 @@ Operator decision 2026-10-01 (**updated 2026-10-17:** subagents read and run, th
 > **Implementer:** muse (muse-wonder-1.0)
 
 **Test checkpoint:** `grep` over the twelve skill files shows no stale step cross-reference and no literal `\\u00b7` in the stamp template (quoted), the three mirrors of each touched skill stay byte-identical, `python scripts/review-dispatch.py --check-pin` ok, and `python -m unittest discover -s scripts/tests` green.
+
+## 46. Plan Rows Outside Phase Tables Refused
+
+**Filed 2026-11-10** from a defect the operator caught in this run: the `D07 T01 §7` and `§8` filing commits appended both plan rows after the closing prose of `todo/implementation-plan.md`, and `plan --check` still passed, because the plan parser counts a section row anywhere in the file. A row outside every phase table is not in a phase, no runner will ever reach it in table order, and a parity check that accepts it proves less than it claims. This section makes placement mechanical rather than a diff-reading duty.
+
+No surface of its own: the plan parser in `scripts/todo-graph.py` and its self-test, consumed by every phase run.
+
+- [ ] Refuse stray rows in `scripts/todo-graph.py`: the plan parser records the phase table each row belongs to (from its `### Phase` heading to the next heading of the same or higher level), and a section-row-shaped line outside every phase table is refused by `plan --check` and `plan --sync`, naming the section reference and its line number. Done when: a fixture plan carrying a valid row after its closing prose fails by name, and the real plan, with every row inside a phase table, passes unchanged. Cheaper substitute that fails the checkpoint: warning instead of refusing, which is how the defect survived a green gate.
+- [ ] Cover it in `python scripts/todo-graph.py self-test`: one case with a stray row after closing prose (refused, named) and one control with the same row inside its phase table (accepted). Done when: removing the table-boundary check makes the refusal case fail.
+- [ ] Commit: `"workspace: refuse plan rows outside phase tables"`
+
+-> SOURCE: operator-2026-11-10-plan-row-placement
+
+**Test checkpoint:** `python scripts/todo-graph.py self-test` passes with the stray-row case named, and `python scripts/todo-graph.py plan --check` on the real tree passes with every row inside a phase table. All quoted.
 
 ## Verification
 
