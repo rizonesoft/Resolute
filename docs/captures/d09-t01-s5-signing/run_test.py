@@ -108,7 +108,11 @@ FileWrite("RESULT_PATH", $g_sLog)
 
 FAKE_SIGNTOOL = """
 #AutoIt3Wrapper_Change2CUI=y
-FileWrite("ARGV_PATH", $CmdLineRaw)
+Local $sArgs = $CmdLine[0] & @CRLF
+For $iArg = 1 To $CmdLine[0]
+    $sArgs &= $CmdLine[$iArg] & @CRLF
+Next
+FileWrite("ARGV_PATH", $sArgs)
 """
 
 
@@ -208,7 +212,8 @@ def main() -> int:
         cand_meta_log, cand_argv = run_meta(args.candidate, fake, tmp, "candidate")
         if META in cand_meta_log or "SECRETTAIL" in cand_meta_log:
             failures.append("metachar password leaked into the log through the shell layer")
-        if META not in cand_argv:
+        cand_args = cand_argv.splitlines()[1:] if cand_argv else []
+        if "/p" not in cand_args or cand_args[cand_args.index("/p") + 1] != META:
             failures.append(f"fake signtool did not receive the metachar password as one argument: {cand_argv!r}")
         if args.base:
             base_meta_log, _ = run_meta(args.base, fake, tmp, "base")
