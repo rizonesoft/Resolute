@@ -1,7 +1,7 @@
 capture       : 2026-11-09-D00-T02-s10-launcher-dark-100.png
 describes     : the launcher at startup, dark, 100 percent (D00 T02 section 10)
 window title  : Resolute
-target process: 50404 D:\GitHub\Resolute\Bin\Debug\Resolute.exe
+target process: 51372 D:\GitHub\Resolute\Bin\Debug\Resolute.exe
 attached      : attached to a process the caller started and owns
 source binary : D:\GitHub\Resolute\Bin\Debug\Resolute.exe
 file version  : 0.1.0.0
@@ -12,13 +12,13 @@ dpi aware     : True
 appearance    : dark  (stated by the caller)
 fixture       : launcher at startup; System/*.exe beside the launcher scanned for RESEXT resources; appearance dark set by 1 theme-command press(es) from System
 launch context: D:/GitHub/Resolute/Bin/Debug/Resolute.exe (no arguments), working directory D:\GitHub\Resolute
-fixture files : a.exe; RegStudio.exe
+fixture files : RegStudio.exe; a.exe
 launch args   : attached to a running process
 working dir   : (default)
 locale        : en-ZA / UI en-US
 geometry      : -5713,40 1086x713
-exe sha256    : 8EE275E707809A24EAECAD365DD13A5D56EB73B95DBA5A0D22264F9BE74E77D3
-source revision: 9cc85f7f1e9d0b3cc464c2c807d3e3a834a498a6
+exe sha256    : 1FC70910BA7F6CF9F9E9775E1DA752C7BC3FCCE6F5461F2C25B3C9BE47CCAB99
+source revision: 5b62a825d6f713565f0b23d3007df2b1a4183d6e
 windows build : 10.0.26300.0
 captured      : 2026-11-09
 

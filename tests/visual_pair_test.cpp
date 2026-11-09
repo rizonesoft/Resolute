@@ -64,7 +64,7 @@ bool AnyNames(const std::vector<std::string>& failures, const std::string& needl
 TEST_CASE("Visual pair spec enumerates the launcher regions", "[visual-pair]") {
     const Spec spec = LoadSpec();
     CHECK(spec.errors.empty());
-    CHECK(spec.regions.size() == 18);
+    CHECK(spec.regions.size() == 21);
     CHECK(AnyNames([&] {
               std::vector<std::string> names;
               for (const auto& r : spec.regions) names.push_back(r.name);

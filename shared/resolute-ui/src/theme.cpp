@@ -101,7 +101,7 @@ ColorPalette LightPalette {
     RGB(249, 249, 249),  // toolbar
     RGB(25,  25,  25),   // text
     RGB(100, 100, 100),  // textSecondary
-    RGB(140, 140, 140),  // border (darkened 2026-11-09: at 210 the pair measured under the DESIGN.md 3:1 border floor on the D00 T02 section 12 captures)
+    RGB(128, 128, 128),  // border (darkened 2026-11-09: at 210 the pair measured under the DESIGN.md 3:1 border floor on the D00 T02 section 12 captures)
     RGB(0,   120, 212),  // accent
     RGB(230, 230, 230),  // statusBar
     RGB(90,  90,  90),   // statusBarText (darkened 2026-11-09: at 100 the pair measured 4.47:1 against the DESIGN.md 4.5:1 text floor on the D00 T02 section 12 captures)

@@ -141,7 +141,7 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
                 // few percent of the paper is background, not ink, and
                 // would otherwise swallow the glyphs sitting on it.
                 ink[static_cast<size_t>(y) * rw + x] =
-                    std::abs(Luminance(img.px[static_cast<size_t>(y0 + y) * img.w + (x0 + x)]) - paper) > 0.25;
+                    std::abs(Luminance(img.px[static_cast<size_t>(y0 + y) * img.w + (x0 + x)]) - paper) > 0.12;
         double worst = 0;
         std::vector<int> stack;
         for (int start = 0; start < rw * rh; ++start) {
@@ -208,7 +208,10 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
                 // local paper. A thick touching band is a surface, not a
                 // border, and carries no border relationship.
                 const bool isLong = (maxX - minX) >= rw / 4 || (maxY - minY) >= rh / 4;
-                const bool isThinLine = std::min(maxX - minX, maxY - minY) <= 3;
+                // Average thickness, not bounding-box height: a border
+                // line joined to a frame or a glyph still averages thin.
+                const bool isThinLine =
+                    static_cast<double>(area) / std::max(1, std::max(maxX - minX, maxY - minY)) <= 3.0;
                 if (isLong && isThinLine && (out.borderContrast == 0 || ratio < out.borderContrast))
                     out.borderContrast = ratio;
                 continue;
@@ -285,9 +288,13 @@ inline std::vector<std::string> Compare(const std::vector<RegionSpec>& spec,
         if (want.minDetail > 0 && got->detail < want.minDetail)
             failures.push_back("region '" + want.name + "' detail " + std::to_string(got->detail) +
                                " is below " + std::to_string(want.minDetail) + " (blurred or unpainted)");
-        if (want.borderCheck && enforceContrast && got->borderContrast > 0 && got->borderContrast < 3.0)
-            failures.push_back("region '" + want.name + "' border contrast " + std::to_string(got->borderContrast) +
-                               " is below the DESIGN.md floor 3:1");
+        if (want.borderCheck && enforceContrast) {
+            if (got->borderContrast <= 0)
+                failures.push_back("region '" + want.name + "' border contrast is unmeasured");
+            else if (got->borderContrast < 3.0)
+                failures.push_back("region '" + want.name + "' border contrast " + std::to_string(got->borderContrast) +
+                                   " is below the DESIGN.md floor 3:1");
+        }
         if (want.checkContrast && enforceContrast) {
             // Text-sized glyphs answer to 4.5:1 in a text region; every
             // glyph, icons included, answers to the 3:1 element floor.

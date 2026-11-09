@@ -34,11 +34,11 @@
 # (the section 10 capture of record: production renderer, ClearType,
 # light, 150 percent). Crop: the whole window. State: launcher at
 # startup, extensions scanned from System/*.exe beside the executable.
-region|window-title|Resolute||0.00|0.00|1.00|0.063|0.001|0.5|text|1.0|0.15|both
-region|toolbar|||0.00|0.063|1.00|0.146|0.005|0.5|element|1.0|0.02|both
-region|sidebar|||0.00|0.148|0.278|0.945|0.010|0.5|text|1.0|0.02|both
-region|tool-list|||0.278|0.148|1.00|0.945|0.005|0.3|text|1.0|0.02|both
-region|status-bar|||0.00|0.945|1.00|1.00|0.001|0.3|text|1.0|0.15|both
+region|window-title|Resolute||0.00|0.00|1.00|0.063|0.001|0.5|text|1.0|0.15|check
+region|toolbar|||0.00|0.063|1.00|0.146|0.005|0.5|element|1.0|0.02|check
+region|sidebar|||0.00|0.148|0.278|0.945|0.010|0.5|text|1.0|0.02|check
+region|tool-list|||0.278|0.148|1.00|0.945|0.005|0.3|text|1.0|0.02|check
+region|status-bar|||0.00|0.945|1.00|1.00|0.001|0.3|text|1.0|0.15|check
 region|toolbar-view|View||0.008|0.066|0.135|0.143|0.01|0|text|0.25|0.004|skip
 region|toolbar-refresh|||0.145|0.066|0.205|0.143|0.01|0|element|0.25|0.004|skip
 region|toolbar-settings|||0.838|0.066|0.898|0.143|0.01|0|element|0.50|0.004|skip
@@ -52,6 +52,9 @@ region|sidebar-programs|Programs||0.002|0.665|0.278|0.750|0.01|0|text|0.25|0.004
 region|list-header-name|Name||0.279|0.148|0.529|0.207|0.01|0|text|1.0|0.004|skip
 region|list-header-description|Description||0.529|0.148|0.917|0.207|0.01|0|text|1.0|0.004|skip
 region|list-header-version|Version||0.917|0.148|0.998|0.207|0.01|0|text|1.0|0.004|skip
+region|border-toolbar-bottom|||0.00|0.142|1.00|0.152|0|0|element|1.0|0.02|border
+region|border-sidebar-right|||0.273|0.148|0.283|0.945|0|0|element|1.0|0.02|border
+region|border-status-top|||0.00|0.938|1.00|0.952|0|0|element|1.0|0.02|border
 # Intended redesigns, recorded so the comparison keeps function without
 # freezing the AutoIt layout: an observed label in the left column counts
 # as the region named in the right column.
