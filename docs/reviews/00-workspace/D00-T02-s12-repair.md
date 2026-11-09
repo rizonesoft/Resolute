@@ -33,3 +33,31 @@ PLAN: gaps
 OVERALL: needs-attention
 
 - Planned: all seven repair-plan gaps folded into the revised repair plan below (writer, 2026-11-09). (1) Label/value observation on the C++ leg is per-slot pixel comparison against the baseline (section 9 DiffCount-style tolerance per slot), so a renamed label or changed row value changes its slot's pixels and fails naming the slot; the spec record remains the AutoIt half's extraction, deferred to D03 T02 section 7. (2) Contrast relationships are measured in 12-pixel blocks (ink/paper extremes per block, region floor is the minimum qualifying block), with mixed-block and unmeasurable-relationship failures drilled and real light and dark passes. (3) The hook's failure channel gains a third, filesystem-independent destination: a named mutex the guard probes at case end; short writes count as failures and move to the next destination; drills block both file destinations. (4) Clipping is also observed inside panes: painted content touching a slot's inner edge beyond a stated margin fails under the theme exemption through the production measurement; pane extraction failure refuses the case. (5) Relative tolerances are numeric (painted ratio and detail fraction, with zero-baseline handling), and the mutation drill reduces a slot's painting above its absolute floor so only the relative comparison can fail it. (6) Sidecars record the actual launch context (target process and path, fixture contents naming the scan root and theme presses), the pair case rejects placeholder values, and the restaked sidecars are the reproduction record. (7) Spec validation is semantic: finite numbers, ordered bounds inside [0,1], known kinds, unique names, non-negative floors, each with file/line diagnostics and drills.
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T15:46:06Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: c15d54d93e7e4fc53bdf21c6e90a10e6e4dd234d
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 10
+- Digest: e39ded287c72bd84
+
+## adversarial: needs-attention
+
+1. **P1: The third failure channel vanishes before inspection.** `tests/focus_hook/focus_hook.cpp:70` keeps the failure mutex only in the adopted child. `CaptureLauncher` terminates that child before returning (`tests/ui_headful_test.cpp:331`), while `HookFailures` probes the mutex afterward, at case end (`tests/focus_guard.cpp:483`). Windows destroys the mutex when its last handle closes. **Reproduction:** exercise an adopted child’s mapping failure with both marker creations denied, then let the child exit before calling `HookFailures`. This models unavailable filesystem destinations during resource or access failures. The failure evidence disappears, allowing the guard to accept incomplete observations. The added drill checks a still-running process, so it misses this lifecycle. The parent must retain an independently observable failure state through child teardown.
+
+2. **P3: Malformed tolerances silently disable checks.** `tests/visual_pair_util.h:131-132` parses `maxEdge` and `maxMoved` without checking finiteness, complete consumption, or bounds. **Reproduction:** pass `region|a|||0|0|1|1|0|0|text|nan|nan|check` to `ParseSpec`. It reports no errors; subsequent comparisons against those NaNs always return false, disabling edge and pixel-difference rejection. Values such as `0.02junk` also pass. Apply the validation already used for the other numeric fields. Severity is P3 because exploitation requires malformed repository-controlled spec content.
+
+These findings are based on candidate source inspection; failure drills were not executed.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Implemented: repair round 1 findings in 3ee6090b: the failure channel's third destination is now a named event the guard creates at adoption and holds through case end (the mutex died with the child), and ParseSpec validates maxEdge/maxMoved for finiteness, full consumption, and sign, with drills. Default suite 119/119.
