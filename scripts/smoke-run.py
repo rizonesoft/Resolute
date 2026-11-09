@@ -1034,6 +1034,10 @@ def main(argv=None) -> int:
             evidence = getattr(run, "_evidence", "capture unavailable: no window")
             ensure_rows(run, "fail", f"driver error: {exc!r}; {evidence}")
             cleanup_safely(run)
+            if getattr(run, "stood_down_during_cleanup", False):
+                stood_down = True
+                notes.append(f"Operator input resumed during {run.name} cleanup; "
+                             "the run stood down after recording its failure.")
         rows += run.rows
     failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
     blocked = any(r[2] == "blocked" for r in rows)
@@ -1323,7 +1327,7 @@ def self_test() -> int:
     block = "\n".join(block_lines)
     nightly_ok = bool(block_lines)
     if nightly_ok:
-        for exit_code, verdict in ((0, "pass"), (2, "blocked"), (1, "fail")):
+        for exit_code, verdict in ((0, "pass"), (2, "blocked"), (2, "refused"), (2, "stood-down"), (1, "fail"), (-1, "fail")):
             with tempfile.TemporaryDirectory() as td:
                 wt = Path(td) / "wt"
                 (wt / "build" / "smoke").mkdir(parents=True)
@@ -1335,9 +1339,93 @@ def self_test() -> int:
                     "; $script:notes -join '|'; 'FAILURES=' + $failures.Count")
                 ps = subprocess.run(["pwsh", "-NoProfile", "-Command", snippet],
                                     capture_output=True, text=True, timeout=60)
-                want_fail = "FAILURES=1" if exit_code == 1 else "FAILURES=0"
-                nightly_ok = nightly_ok and ps.returncode == 0 and verdict in ps.stdout and want_fail in ps.stdout
+                want_fail = "FAILURES=1" if exit_code in (1, -1) else "FAILURES=0"
+                nightly_ok = nightly_ok and ps.returncode == 0 and verdict in ps.stdout and want_fail in ps.stdout and str(wt) in ps.stdout.replace("/", "\\")
     check("nightly reporting block names verdict, path, and failures per exit class", nightly_ok)
+
+    # Capture release failures aggregate even when there is no image.
+    _u, _g = user32, gdi32
+    class _FakeUser:
+        def __getattr__(self, name): return getattr(_u, name)
+    try:
+        def _rect(hwnd, rect_ptr):
+            rect = ctypes.cast(rect_ptr, ctypes.POINTER(wintypes.RECT)).contents
+            rect.left, rect.top, rect.right, rect.bottom = 0, 0, 8, 8
+            return True
+        _saved_apis = (user32.GetWindowRect, user32.GetWindowDC, user32.PrintWindow,
+                       user32.ReleaseDC, gdi32.CreateCompatibleDC, gdi32.CreateCompatibleBitmap,
+                       gdi32.SelectObject, gdi32.DeleteObject, gdi32.DeleteDC)
+        user32.GetWindowRect = _rect
+        user32.GetWindowDC = lambda h: 11
+        user32.PrintWindow = lambda h, dc, f: 0
+        user32.ReleaseDC = lambda h, dc: 0
+        gdi32.CreateCompatibleDC = lambda dc: 22
+        gdi32.CreateCompatibleBitmap = lambda dc, w, h: 33
+        gdi32.SelectObject = lambda dc, obj: 44
+        gdi32.DeleteObject = lambda obj: 0
+        gdi32.DeleteDC = lambda dc: 0
+        try:
+            capture_window(99)
+            _agg = False
+        except RuntimeError as exc:
+            _agg = "release failed" in str(exc)
+        check("no-image capture still aggregates release failures", _agg)
+    finally:
+        (user32.GetWindowRect, user32.GetWindowDC, user32.PrintWindow, user32.ReleaseDC,
+         gdi32.CreateCompatibleDC, gdi32.CreateCompatibleBitmap, gdi32.SelectObject,
+         gdi32.DeleteObject, gdi32.DeleteDC) = _saved_apis
+    # Cleanup-time interruption sets the stand-down flag on the production path.
+    _iproc = ToolRun("Resolute", Path("x"))
+    class _SlowProc:
+        def __init__(self): self.calls = 0
+        def poll(self):
+            self.calls += 1
+            return None if self.calls < 3 else 0
+        def terminate(self): pass
+        def kill(self): pass
+    _iproc.proc = _SlowProc()
+    _iproc.job = JobBox()
+    _iproc.resumed = lambda: True
+    _iproc.cleanup()
+    check("cleanup interruption sets the stand-down flag",
+          getattr(_iproc, "stood_down_during_cleanup", False) is True)
+    # Resume failure is named and the suspended child is terminated.
+    _rproc = ToolRun("SmokeDrillBroken", Path(sys.executable),
+                     [str(ROOT / "scripts" / "smoke_fixture.py"), "nowindow"])
+    _rproc.job = JobBox()
+    _real_resume = kernel32.ResumeThread
+    kernel32.ResumeThread = lambda h: 0xFFFFFFFF
+    try:
+        spawn_contained(_rproc)
+    finally:
+        kernel32.ResumeThread = _real_resume
+    check("resume failure names itself and terminates the child",
+          _rproc.job.error == "ResumeThread failed" and _rproc.proc.poll() is not None)
+    _rproc.cleanup()
+    # Report-write failure after the directory exists: report still on stdout.
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            _dir = Path(td) / "smoke"
+            (_dir / "smoke-report.md").mkdir(parents=True)
+            globals()["SMOKE_DIR"] = _dir
+            globals()["PREV_DIR"] = _dir / "prev"
+            globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+            globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
+            def _fake_drive2(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                for step, _e in step_table(run.name):
+                    run.record(step, "pass", "stub")
+                return False
+            _rd = globals()["drive_tool"]
+            globals()["drive_tool"] = _fake_drive2
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            globals()["drive_tool"] = _rd
+            check("report-write failure after mkdir falls back to stdout",
+                  rc == 1 and "could not write" in buf.getvalue() and "Suite verdict" in buf.getvalue())
+    finally:
+        globals().update(_saved)
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
