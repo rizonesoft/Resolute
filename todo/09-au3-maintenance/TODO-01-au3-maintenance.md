@@ -85,10 +85,10 @@ A shipping product that cannot be built from its own repository cannot be fixed.
 
 Small, known, and cheap. Each is recorded so it is not rediscovered later as a mystery.
 
-- [ ] Remove `resolute_au3/SDK/Concrete/Rescue/`, which holds only build output for a tool that no longer has source. Done when: the directory is gone and the removal names the commit that removed the tool.
+- [ ] Remove `resolute_au3/SDK/Concrete/Rescue/`, which holds only build output for a tool that no longer has source. Done when: the directory is gone and the removal is recorded here. **Corrected 2026-11-09:** the directory is untracked, ignored build output (`.gitignore` covers `**/SDK/Concrete/*/Distribution/`), so its removal is a recorded working-tree deletion, not a commit; no commit in this repository removed the tool, and the leftover arrived with the suite import (earliest touch `02152772`).
 - [ ] Remove `resolute_au3/SDK/Concrete/BiosCodes/Includes/Localization.au3.backup`. Done when: it is gone.
 - [ ] Clear `ReBar`'s product page URL, since it is internal tooling rather than a product. Done when: it no longer advertises a download page.
-- [ ] Decide whether `resolute_au3/samples/Resources/` should be tracked; it is 180 files and has never been. Done when: the decision is recorded and acted on.
+- [ ] Decide whether `resolute_au3/samples/Resources/` should be tracked. Done when: the decision is recorded here and acted on. **Corrected 2026-11-09:** it is already tracked (180 files, tracked since the suite move `71caa37b`), so the open decision is whether to keep it tracked, not whether to start.
 - [ ] Commit: `"au3: clear the known housekeeping defects"`
 
 **Test checkpoint:** `Rescue/` and the stray `.backup` file are absent. `ReBar` advertises no download page. The `samples/Resources/` decision is recorded and acted on. The tree builds unchanged afterwards.
