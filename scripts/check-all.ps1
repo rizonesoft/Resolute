@@ -172,7 +172,7 @@ if (-not $SkipBuild) {
 
 if (-not $SkipBuild) {
     Invoke-Gate -Name 'tidy ratchet' -LogName 'gate-tidy-ratchet' -DetailPattern '^tidy-ratchet: ' -Command {
-        & $Python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --log (Join-Path $LogDir 'gate-tidy.log')
+        & $Python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --log (Join-Path $LogDir 'gate-tidy.log') --result-json (Join-Path $LogDir 'gate-tidy-result.json')
     }
 }
 Invoke-Gate -Name 'ratchet self-test' -LogName 'gate-ratchet-selftest' -Command {
@@ -189,7 +189,7 @@ Invoke-Gate -Name 'ratchet self-test' -LogName 'gate-ratchet-selftest' -Command 
 
 if (-not $SkipBuild) {
     Invoke-Gate -Name 'conformance check' -LogName 'gate-conformance' -DetailPattern '^conformance: \d+ clause' -Command {
-        & $Python (Join-Path $RepoRoot 'scripts\conformance-check.py') --tidy-log (Join-Path $LogDir 'gate-tidy.log')
+        & $Python (Join-Path $RepoRoot 'scripts\conformance-check.py') --tidy-log (Join-Path $LogDir 'gate-tidy.log') --tidy-result (Join-Path $LogDir 'gate-tidy-result.json')
     }
 }
 Invoke-Gate -Name 'conformance self-test' -LogName 'gate-conformance-selftest' -Command {

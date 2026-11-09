@@ -530,7 +530,7 @@ def default_base(root: Path, override):
     return "origin/master" if probe.returncode == 0 else "HEAD"
 
 
-def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
+def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None) -> int:
     baseline_path = root / "todo" / ".tidy-baseline"
     targets = expected_targets(root)
     names = sorted(targets)
@@ -607,6 +607,28 @@ def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
             + "; commit todo/.tidy-baseline with the change that earned it"
         )
         baseline = {"count": measured_count, "targets": dict(measured_targets)}
+    if result_path is not None:
+        # The conformance check (C24) consumes this record instead of
+        # trusting a log it cannot tie to this run: hashes bind it to
+        # the exact log and baseline bytes measured here:
+        # review round 1 of D07 T01 \u00a73.
+        import hashlib as _hashlib
+        import json as _json
+
+        record = {
+            "count": measured_count,
+            "targets": dict(measured_targets),
+            "baseline_count": baseline["count"],
+            "baseline_targets": dict(baseline["targets"]),
+            "tus": total_tus,
+            "log_sha256": _hashlib.sha256(Path(log_path).read_bytes()).hexdigest()
+            if log_path and Path(log_path).is_file()
+            else None,
+            "baseline_sha256": _hashlib.sha256(
+                (root / "todo" / ".tidy-baseline").read_bytes()
+            ).hexdigest(),
+        }
+        write_atomic(Path(result_path), _json.dumps(record, indent=1) + "\n")
     print(
         f"tidy-ratchet: {measured_count} finding(s), baseline {baseline['count']}, "
         + ", ".join(f"{n} {measured_targets[n]}/{baseline['targets'][n]}" for n in names)
@@ -1194,6 +1216,7 @@ def main(argv=None) -> int:
     ap.add_argument("--base", default=None, help="comparison revision for the raise guard")
     ap.add_argument("--clang-tidy", default=None)
     ap.add_argument("--log", default=None, help="write raw clang-tidy output here")
+    ap.add_argument("--result-json", default=None, help="write the measured result record here")
     ap.add_argument("--root", default=None)
     args = ap.parse_args(argv)
 
@@ -1207,7 +1230,7 @@ def main(argv=None) -> int:
         else root / "reskit" / "llvm-mingw" / "bin" / "clang-tidy.exe"
     )
     try:
-        return run(root, clang_tidy, args.base, args.log)
+        return run(root, clang_tidy, args.base, args.log, args.result_json)
     except Refusal as exc:
         print(f"tidy-ratchet: FAILED: {exc}")
         return 1

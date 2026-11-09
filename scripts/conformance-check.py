@@ -231,7 +231,13 @@ def pe_imports(data: bytes):
         opt_size = struct.unpack_from("<H", data, pe_off + 20)[0]
         opt = pe_off + 24
         magic = struct.unpack_from("<H", data, opt)[0]
+        if magic not in (0x10B, 0x20B):
+            raise ValueError(f"unknown optional-header magic {magic:#x}")
+        if num_sections == 0:
+            raise ValueError("no sections")
         dd_base = opt + (112 if magic == 0x20B else 96)
+        if dd_base + 14 * 8 > opt + opt_size or dd_base + 14 * 8 > len(data):
+            raise ValueError("data directories truncated")
 
         def directory(index):
             return struct.unpack_from("<II", data, dd_base + index * 8)
@@ -371,51 +377,50 @@ def eval_generated_values(root: Path, tool, spec, ctx):
 
 
 def eval_build_clean(root: Path, tool, spec, ctx):
-    """C24: current gate evidence only. The build gates prove the
-    warning-clean build by having run before this check in
-    check-all.ps1; the analysis count is recounted here from the
-    ratchet's raw log with the baseline's counting rule, per target.
-    Missing evidence is a checker error, never a stale pass."""
+    """C24: current gate evidence, bound to this run. The ratchet's
+    result record (counts plus SHA-256 of the exact log and baseline
+    bytes it measured) is the evidence; the log is recounted as a
+    cross-check. A missing record, a hash mismatch, or a recount
+    that disagrees is a checker error: an empty, interrupted, stale,
+    or unrelated log certifies nothing (review round 1)."""
+    import hashlib
+    import json
+
+    result_path = ctx.get("tidy_result")
     log = ctx.get("tidy_log")
-    if not log or not Path(log).is_file():
+    if not result_path or not Path(result_path).is_file():
         raise Refusal(
-            "C24 has no current analysis evidence (no tidy log); "
-            "run through check-all.ps1 or pass --tidy-log"
+            "C24 has no ratchet result record; run through check-all.ps1 "
+            "or pass --tidy-result from the same ratchet run"
         )
-    ratchet = ctx["ratchet"]
-    db = ctx["compile_db"](spec)
-    if not db.is_file():
-        raise Refusal(f"C24: compile database missing for {tool} at {db}")
-    measured = set()
-    lines = Path(log).read_text(errors="replace").splitlines()
-    # The ratchet log holds every target's output; findings are
-    # attributed by source path under the tool's tree (root target:
-    # everything not under extensions/<other tool>).
-    all_findings = ratchet.collect_findings(lines, root)
-    prefix = (root / spec["source_dir"]).as_posix().lower()
-    others = [
-        (root / s["source_dir"]).as_posix().lower()
-        for n, s in ctx["tools"].items()
-        if n != tool and s["source_dir"] != "src"
-    ]
-    for key in all_findings:
-        f = key.split("|", 1)[0]
-        if tool == "Resolute":
-            if any(f.startswith(o + "/") for o in others):
-                continue
-            measured.add(key)
-        elif f.startswith(prefix + "/"):
-            measured.add(key)
-    baseline = ctx["baseline"]
-    ceiling = baseline["targets"][spec["tidy_target"]]
-    # The log recount is a lower bound for the target (header
-    # findings outside the tool tree belong to the target too); the
-    # ratchet gate itself already enforced the exact count. A recount
-    # above the ceiling is a certain regression; at or below it, the
-    # gate's own pass stands as the measurement.
-    if len(measured) > ceiling:
-        return "FAIL", f"recounted {len(measured)} in-tree findings above baseline {ceiling}"
-    return "PASS", f"build artifacts present; in-tree recount {len(measured)} <= baseline {ceiling}"
+    if not log or not Path(log).is_file():
+        raise Refusal("C24 has no tidy log beside its result record")
+    try:
+        record = json.loads(Path(result_path).read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        raise Refusal(f"C24 result record unreadable: {exc}") from exc
+    log_bytes = Path(log).read_bytes()
+    if record.get("log_sha256") != hashlib.sha256(log_bytes).hexdigest():
+        raise Refusal("C24: tidy log does not match the result record (stale or unrelated log)")
+    baseline_bytes = (root / "todo" / ".tidy-baseline").read_bytes()
+    if record.get("baseline_sha256") != hashlib.sha256(baseline_bytes).hexdigest():
+        raise Refusal("C24: baseline changed since the ratchet measured it; rerun the gate")
+    target = spec["tidy_target"]
+    if target not in record.get("targets", {}):
+        raise Refusal(f"C24: result record carries no count for target '{target}'")
+    measured = record["targets"][target]
+    ceiling = ctx["baseline"]["targets"][target]
+    recount = len(ctx["ratchet"].collect_findings(log_bytes.decode("utf-8", "replace").splitlines(), root))
+    if recount != record.get("count"):
+        raise Refusal(
+            f"C24: log recount {recount} disagrees with recorded count {record.get('count')}"
+        )
+    exe = root / spec["exe"]
+    if not exe.is_file():
+        return "FAIL", f"declared artifact {spec['exe']} missing"
+    if measured > ceiling:
+        return "FAIL", f"recorded {measured} findings above baseline {ceiling}"
+    return "PASS", f"recorded {measured} finding(s) <= baseline {ceiling}, log and baseline hashes bound"
 
 
 EVALUATORS = {
@@ -479,7 +484,7 @@ def compile_db_for(root: Path, spec):
     )
 
 
-def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None) -> int:
+def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tidy_result=None) -> int:
     tools = tools if tools is not None else TOOLS
     profile_path = root / "docs" / "conformance-profile.md"
     text = profile_text if profile_text is not None else profile_path.read_text(encoding="utf-8")
@@ -507,10 +512,10 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None) -> 
     for exc in exceptions:
         key = (exc["tool"], exc["clause"])
         closing = status(exc["closing"])
-        if closing == "shipped":
+        if closing in ("shipped", "moved"):
             problems.append(
                 f"exception {exc['tool']} {exc['clause']}: closing section {exc['closing']} "
-                "has shipped, so the exception is spent; remove it or re-date it"
+                f"is {closing}, so the exception is spent; remove it or re-date it"
             )
         exc_map[key] = exc
 
@@ -522,6 +527,7 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None) -> 
     )
     ctx = {
         "tidy_log": tidy_log,
+        "tidy_result": tidy_result,
         "ratchet": ratchet,
         "baseline": baseline,
         "tools": tools,
@@ -648,8 +654,17 @@ def repro_check(root: Path) -> int:
     exes = [root / spec["exe"] for spec in TOOLS.values()]
 
     def build_and_hash():
+        # A clean build, not a relink: build trees and deployed
+        # executables go, so compilation itself is re-proven
+        # deterministic (review round 1).
         for exe in exes:
             exe.unlink(missing_ok=True)
+        for tree in (root / "build" / "release", root / "build" / "debug"):
+            shutil.rmtree(tree, ignore_errors=True)
+        ext = root / "extensions"
+        if ext.is_dir():
+            for tool_dir in ext.iterdir():
+                shutil.rmtree(tool_dir / "build", ignore_errors=True)
         proc = subprocess.run(
             ["pwsh", "-NoProfile", "-File", str(root / "scripts" / "build.ps1"),
              "-All", "-Config", "Release"],
@@ -747,6 +762,16 @@ def self_test() -> int:
         (tmp / "build" / "release" / "compile_commands.json").write_text("[]")
         log = tmp / "tidy.log"
         log.write_text("")
+        import hashlib as _h
+        import json as _j
+
+        result = tmp / "tidy-result.json"
+        result.write_text(_j.dumps({
+            "count": 0, "targets": {"root": 0},
+            "baseline_count": 0, "baseline_targets": {"root": 0}, "tus": 1,
+            "log_sha256": _h.sha256(log.read_bytes()).hexdigest(),
+            "baseline_sha256": _h.sha256((tmp / "todo" / ".tidy-baseline").read_bytes()).hexdigest(),
+        }))
         tools = {
             "ToolA": {
                 "target": "ToolA", "source_dir": "src",
@@ -766,79 +791,114 @@ def self_test() -> int:
                 return statuses[ref]
             raise Refusal(f"owner {ref} does not resolve")
 
-        return tmp, tools, log, status
+        return tmp, tools, log, status, result
 
     def matrix_ok():
-        tmp, tools, log, status = fixture()
-        assert run(tmp, log, tools, PROFILE, status) == 0
+        tmp, tools, log, status, result = fixture()
+        assert run(tmp, log, tools, PROFILE, status, result) == 0
 
     case("matrix passes with shipped C23/C24 and open C99", matrix_ok)
 
     def shipped_without_evaluator():
-        tmp, tools, log, status = fixture(status_map={"D01 T01 \u00a71": "shipped"})
-        refuses(lambda: run(tmp, log, tools, PROFILE, status), "no evaluator is registered")
+        tmp, tools, log, status, result = fixture(status_map={"D01 T01 \u00a71": "shipped"})
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "no evaluator is registered")
 
     case("shipped owner without evaluator is a checker error", shipped_without_evaluator)
 
     def layout_violation():
-        tmp, tools, log, status = fixture()
+        tmp, tools, log, status, result = fixture()
         tools["ToolA"]["source_dir"] = "extensions/ToolA"
         d = tmp / "extensions" / "ToolA"
         d.mkdir(parents=True)
         (d / "Settings.cpp").write_text("// private settings\n")
-        refuses(lambda: run(tmp, log, tools, PROFILE, status), "shared-layer name")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "shared-layer name")
 
     case("layout violation fails by name", layout_violation)
 
     def stray_file():
-        tmp, tools, log, status = fixture()
+        tmp, tools, log, status, result = fixture()
         (tmp / "Bin" / "Release" / "a.exe").write_bytes(b"x")
-        refuses(lambda: run(tmp, log, tools, PROFILE, status), "undeclared file in the shipped set: Bin/Release/a.exe")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "undeclared file in the shipped set: Bin/Release/a.exe")
 
     case("stray shipped file fails by name", stray_file)
 
     def unregistered_target():
-        tmp, tools, log, status = fixture()
+        tmp, tools, log, status, result = fixture()
         (tmp / "src" / "CMakeLists.txt").write_text(
             "add_executable(ToolA WIN32 main.cpp)\nadd_executable(Sneak WIN32 main.cpp)\n"
         )
-        refuses(lambda: run(tmp, log, tools, PROFILE, status), "'Sneak'")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "'Sneak'")
 
     case("unregistered executable target fails by name", unregistered_target)
 
     def over_budget():
-        tmp, tools, log, status = fixture()
+        tmp, tools, log, status, result = fixture()
         tools["ToolA"]["budget"] = 10
-        refuses(lambda: run(tmp, log, tools, PROFILE, status), "above its budget")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "above its budget")
 
     case("over-budget tool fails by name", over_budget)
 
     def dup_repair():
-        tmp, tools, log, status = fixture()
+        tmp, tools, log, status, result = fixture()
         for tool in ("ToolA", "ToolB"):
             d = tmp / "extensions" / tool
             d.mkdir(parents=True)
             (d / "r.cpp").write_text('RepairItem{ "hosts-file" };\n')
-        refuses(lambda: run(tmp, log, tools, PROFILE, status), "repair subject 'hosts-file'")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "repair subject 'hosts-file'")
 
     case("duplicate repair subject fails by name", dup_repair)
 
     def exceptions():
         prof = PROFILE + "| ToolA | C99 | 2026-11-09 | not yet | D01 T01 \u00a71 |\n"
-        tmp, tools, log, status = fixture(profile=prof)
-        assert run(tmp, log, tools, prof, status) == 0
-        tmp, tools, log, status = fixture(
+        tmp, tools, log, status, result = fixture(profile=prof)
+        assert run(tmp, log, tools, prof, status, result) == 0
+        tmp, tools, log, status, result = fixture(
             profile=prof, status_map={"D01 T01 \u00a71": "shipped"}
         )
-        refuses(lambda: run(tmp, log, tools, prof, status), "exception is spent")
+        refuses(lambda: run(tmp, log, tools, prof, status, result), "exception is spent")
 
     case("exception holds while closing open, fails once shipped", exceptions)
 
     def missing_evidence():
-        tmp, tools, log, status = fixture()
-        refuses(lambda: run(tmp, tmp / "no.log", tools, PROFILE, status), "no current analysis evidence")
+        tmp, tools, log, status, result = fixture()
+        refuses(lambda: run(tmp, tmp / "no.log", tools, PROFILE, status, result), "no tidy log beside its result record")
 
     case("C24 without current evidence is a checker error", missing_evidence)
+
+    def unrelated_log_refused():
+        tmp, tools, log, status, result = fixture()
+        refuses(
+            lambda: run(tmp, tmp / "todo" / ".tidy-baseline", tools, PROFILE, status, result),
+            "does not match the result record",
+        )
+
+    case("unrelated or stale log cannot certify C24", unrelated_log_refused)
+
+    def moved_exception_fails():
+        prof = PROFILE + "| ToolA | C23 | 2026-11-09 | x | D01 T01 \u00a71 |\n"
+        tmp, tools, log, status, result = fixture(
+            profile=prof, status_map={"D01 T01 \u00a71": "moved"}
+        )
+        refuses(lambda: run(tmp, log, tools, prof, status, result), "exception is spent")
+
+    case("moved closing section spends its exception", moved_exception_fails)
+
+    def bad_magic():
+        data = bytearray(make_pe(["KERNEL32.dll"]))
+        pe_off = struct.unpack_from("<I", bytes(data), 0x3C)[0]
+        struct.pack_into("<H", data, pe_off + 24, 0xFFFF)
+        try:
+            pe_imports(bytes(data))
+            raise AssertionError("bad magic passed")
+        except Refusal as exc:
+            assert "magic" in str(exc), exc
+        try:
+            pe_imports(b"MZ" + b"\0" * 510)
+            raise AssertionError("zero headers passed")
+        except Refusal:
+            pass
+
+    case("unknown PE magic and empty headers refuse", bad_magic)
 
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)
@@ -855,6 +915,7 @@ def main(argv=None) -> int:
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--repro-check", action="store_true")
     ap.add_argument("--tidy-log", default=None)
+    ap.add_argument("--tidy-result", default=None)
     ap.add_argument("--root", default=None)
     args = ap.parse_args(argv)
     if args.self_test:
@@ -863,7 +924,7 @@ def main(argv=None) -> int:
     try:
         if args.repro_check:
             return repro_check(root)
-        return run(root, args.tidy_log)
+        return run(root, args.tidy_log, tidy_result=args.tidy_result)
     except Refusal as exc:
         print(f"conformance: FAILED: {exc}")
         return 1
