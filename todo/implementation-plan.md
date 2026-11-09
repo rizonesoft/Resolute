@@ -247,7 +247,7 @@ Every existing tool moves onto the shared layers, proven 1:1 against its AutoIt 
 | [ ] | `D03 T01 §5` | Suite log viewer                             |   5   |
 | [ ] | `D03 T02 §6` | Symptom search surface                       |   5   |
 | [ ] | `D03 T01 §6` | Symptom routing                              |   8   |
-| [ ] | `D03 T02 §7` | Launcher chrome and notices                  |   6   |
+| [ ] | `D03 T02 §7` | Launcher chrome and notices                  |   7   |
 | [ ] | `D03 T01 §3` | Launch, failure reporting, and elevation     |   5   |
 | [ ] | `D04 T02 §1` | Ownership inventory, shared-layer map        |   6   |
 | [ ] | `D04 T03 §1` | ComIntRep repair inventory, reversibility    |   6   |
