@@ -45,6 +45,7 @@ track: Q1
 |   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [ ]   |
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [ ]   |
 |   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
+|   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [ ]   |
 
 ---
 
@@ -272,6 +273,18 @@ No surface of its own: a scheduled task, two scripts, and the existing smoke rep
 -> SOURCE: operator-2026-11-10-elevated-smoke-task
 
 **Test checkpoint:** From a non-elevated shell, `tools/elevated-smoke.ps1` run mode completes with no UAC prompt, the fresh `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent`, `LastTaskResult` is 0, and the registration readback shows `RunLevel Highest` with an interactive logon type and no `RunAsInvoker`. All quoted from a real run.
+## 8. Smoke Forwarding-Test Assertion
+
+**Filed 2026-11-10** from the `D07 T01 §5` review (round 3, `P3`, in `docs/reviews/07-quality/D07-T01-s5.md`): the child exit-code forwarding case in `scripts/smoke-run.py --self-test` can pass when forwarding is broken, because the loop breaks on the first mismatched code while the final assertion accepts the last one. A test that cannot fail on the behaviour it names is the defect this domain exists to catch.
+
+No surface of its own: a windowless self-test case in the existing driver, consumed unchanged by every other smoke section.
+
+- [ ] Make the forwarding case assert every code: in the `main()` branch cases of `scripts/smoke-run.py --self-test`, accumulate an explicit success flag over child codes 0, 1, and 2 (each forwarded unchanged and each preserving the child report byte-for-byte) instead of breaking to a final assertion the last code can satisfy alone. Done when: stubbing `main()` to always return 2 makes the case fail, quoted, and the unbroken case passes.
+- [ ] Commit: `"quality: assert every forwarded smoke exit code"`
+
+-> SOURCE: review-2026-11-10-d07-t01-s5-round3 (P3 forwarding test can pass broken)
+
+**Test checkpoint:** `python scripts/smoke-run.py --self-test` passes with the strengthened case, and the case fails when forwarding is stubbed to a constant 2 (quoted from a real run each way).
 ## Verification
 
 - [ ] The conformance profile states every clause in evaluable terms with an owner per clause
