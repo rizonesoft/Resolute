@@ -359,7 +359,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 | [ ] | `D06 T01 §13` | Stamped-Surface Agreement Test                 |   5   |
 | [ ] | `D06 T01 §14` | Help Content Pipeline: Guide to Offline HTML   |   5   |
 | [ ] | `D06 T01 §18` | F1 Context Help Through the Surface Map        |   5   |
-| [ ] | `D06 T01 §3`  | Installers: Per Tool and Whole Suite           |  13   |
+| [ ] | `D06 T01 §3`  | Installers: Per Tool and Whole Suite           |  14   |
 | [ ] | `D06 T01 §9`  | The Bare-Machine Proof                         |   7   |
 | [ ] | `D06 T01 §4`  | Migration From the AutoIt Suite                |   7   |
 | [ ] | `D06 T01 §15` | Web Publishing and Link Switch                 |   4   |
