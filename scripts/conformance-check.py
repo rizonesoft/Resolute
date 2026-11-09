@@ -507,10 +507,34 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tid
                     f"tool '{name}' ships {total} bytes, above its budget {spec['budget']}"
                 )
 
-    # Exceptions are validated before cells are decided.
+    # Exceptions are validated before cells are decided. An
+    # exception is a dated record naming its reason; a row that
+    # cannot be one (impossible date, blank reason, unknown tool or
+    # clause, a duplicate) refuses rather than waiving a clause
+    # (review round 2).
+    import datetime as _dt
+
+    clause_ids = {c["id"] for c in clauses}
     exc_map = {}
     for exc in exceptions:
         key = (exc["tool"], exc["clause"])
+        if exc["tool"] not in tools:
+            raise Refusal(f"exception names unknown tool '{exc['tool']}'")
+        if exc["clause"] not in clause_ids:
+            raise Refusal(f"exception names unknown clause '{exc['clause']}'")
+        if key in exc_map:
+            raise Refusal(f"duplicate exception for {exc['tool']} {exc['clause']}")
+        try:
+            _dt.date.fromisoformat(exc["date"])
+        except ValueError:
+            raise Refusal(
+                f"exception {exc['tool']} {exc['clause']}: '{exc['date']}' is not a calendar date"
+            ) from None
+        if not exc["reason"]:
+            raise Refusal(
+                f"exception {exc['tool']} {exc['clause']}: no reason recorded; "
+                "an unnamed reason is a silent skip"
+            )
         closing = status(exc["closing"])
         if closing in ("shipped", "moved"):
             problems.append(
@@ -899,6 +923,22 @@ def self_test() -> int:
             pass
 
     case("unknown PE magic and empty headers refuse", bad_magic)
+
+    def invalid_exceptions_refuse():
+        for row, needle in (
+            ("| ToolA | C24 | 2026-99-99 | because | D01 T01 \u00a71 |\n", "not a calendar date"),
+            ("| ToolA | C24 | 2026-11-09 |   | D01 T01 \u00a71 |\n", "no reason recorded"),
+            ("| Nope | C24 | 2026-11-09 | because | D01 T01 \u00a71 |\n", "unknown tool"),
+            ("| ToolA | C77 | 2026-11-09 | because | D01 T01 \u00a71 |\n", "unknown clause"),
+        ):
+            prof = PROFILE + row
+            tmp, tools, log, status, result = fixture(profile=prof)
+            refuses(lambda: run(tmp, log, tools, prof, status, result), needle)
+        prof = PROFILE + "| ToolA | C99 | 2026-11-09 | a | D01 T01 \u00a71 |\n| ToolA | C99 | 2026-11-09 | b | D01 T01 \u00a71 |\n"
+        tmp, tools, log, status, result = fixture(profile=prof)
+        refuses(lambda: run(tmp, log, tools, prof, status, result), "duplicate exception")
+
+    case("invalid exception rows refuse instead of waiving", invalid_exceptions_refuse)
 
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)
