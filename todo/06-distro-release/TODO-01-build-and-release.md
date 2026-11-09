@@ -22,6 +22,7 @@ track: R1
 - -> XREF: [`08-docs-localization/TODO-01 §1`](../08-docs-localization/TODO-01-docs-and-localization.md) -- the documentation set every release includes
 - -> XREF: [`05-new-tools/TODO-05 §1`](../05-new-tools/TODO-05-recovery-and-imaging.md) -- the two GPL v3 ports whose attribution obligations §7 records
 - -> XREF: [`00-workspace/TODO-01 §7`](../00-workspace/TODO-01-toolchain-and-gates.md) -- where §9 was written before it moved here, and the narrower toolchain claim that stayed there
+- -> XREF: D09 T01 §3 -- the maintenance scope whose retirement procedure names this file's announcement and descriptor sections as its owners
 
 ## Outcome
 

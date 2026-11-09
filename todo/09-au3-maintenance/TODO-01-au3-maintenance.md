@@ -42,7 +42,7 @@ track: M1
 | :---: | :-----: | ------------------------------------------ | ------------ | :----: |
 |   1   |   §1    | Make the AutoIt suite buildable again      | --           |  [x]   |
 |   2   |   §2    | Clear the housekeeping defects             | --           |  [x]   |
-|   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [ ]   |
+|   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [x]   |
 |   4   |   §4    | Distro reports compiler failure           | --           |  [ ]   |
 |   5   |   §5    | Stop logging the signing password in Distro | --           |  [ ]   |
 |   6   |   §6    | Per-tool update URLs from Distro          | --           |  [ ]   |
@@ -156,6 +156,14 @@ What `Distro` contributed survives it: the per-tool `.sni` descriptor whose modu
 A defect found in the AutoIt tree that also affects the C++ port is fixed in AutoIt first when users of the shipping suite are affected, because that is the tree they run. The port-side correction is filed the same day to the section that owns the behaviour in C++, with the AutoIt fix named as its source, and it is verified by the parity proof that port owes (D07). If the only correct fix would change a frozen tool's system effect, the AutoIt side does not change: the effect is the specification. The request is recorded here with the reason, the port implements the decided behaviour, and the operator is named as the only authority who can move a frozen effect.
 
 **Test checkpoint:** The scope states what is in and out with a reason. `AGENTS.md` and this section agree that `resolute_au3/` is otherwise read-only. The retirement procedure covers update file, download page, and source, naming its owner. The shared-defect policy is dated.
+
+> **Verified:** 2026-11-09 | §3 | The scope, retirement procedure, and shared-defect policy are written in this section (scope text, Retirement procedure, policy dated 2026-11-09) and read back against their checkpoints: scope in/out with reasons including buildability and release-security; AGENTS.md line 137 and the section state the same read-only rule; procedure dispositions cover update file (.ru/.ruz, terminal feed retained), download page, and source, each with performer and verifier and D06 T01 §5 as announcement owner; Distro contribution reconciled with D06 T01 §1. `python scripts/todo-graph.py validate`: 0 fatal. `python scripts/todo-claims.py`: 116 hold, 0 stale.
+> **Review:** rounds 1-3 on the base record (round 3 clean), repair round 1 clean, astra (`gpt-6-astra` via `codex`), candidates cb1539e5(round 3) and 853d9042(repair round 1) · Raw findings: docs/reviews/09-au3-maintenance/D09-T01-s3.md, D09-T01-s3-repair.md
+> **Completion:** astra (medium), candidate 853d90428d31ed5a666d21367e0eeb1d6066cf4c -- COMPLETION: complete · Repair records: D09-T01-s3-repair (candidate 853d9042)
+> **Plan review:** astra (medium) -- four gaps folded into the section before writing (record D09-T01-s3.md); repair plan pass clean
+> **CRUD:** not applicable (the section writes policy prose; no records change hands)
+> **Duration:** 2026-11-09T12:30:23Z to 2026-11-09T12:38:54Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 
 ## 4. Distro Reports Compiler Failure
