@@ -1896,7 +1896,7 @@ def self_test() -> int:
     _real_cap2 = globals()["capture_window"]
     import threading as _th
     _release = _th.Event()
-    globals()["capture_window"] = lambda hwnd: (_release.wait(30), None)[1]
+    globals()["capture_window"] = lambda hwnd: (_release.wait(), None)[1]
     try:
         _atext = failure_capture(_arun, "about", SMOKE_DIR, abort=_late_abort)
     finally:
@@ -1920,7 +1920,7 @@ def self_test() -> int:
     if _bpending:
         _bpending[0]["thread"].join(5)
     check("blocked capture returns None inside its bound while still blocked",
-          _bres is None and _bstill and 0.4 <= _belapsed < 5.0)
+          _bres is None and _bstill and 0.4 <= _belapsed < 0.9)
     # Scheduling-independent abort (D07 T01 S6): the worker waits for
     # explicit release with no timeout, and the loop observes the abort
     # before a controlled clock can expire the deadline.
@@ -1972,7 +1972,7 @@ def self_test() -> int:
             _real_cap = globals()["capture_window"]
             import threading as _th2
             _release2 = _th2.Event()
-            globals()["capture_window"] = lambda hwnd: (_release2.wait(30), None)[1]
+            globals()["capture_window"] = lambda hwnd: (_release2.wait(), None)[1]
             def _drive_exc2(run, out_dir, prev_dir, collecting, mark, resumed=None):
                 run.hwnd = 99
                 _n = {"n": 0}
