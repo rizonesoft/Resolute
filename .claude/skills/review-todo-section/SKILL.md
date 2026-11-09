@@ -46,7 +46,7 @@ Work the three questions across the diff and its blast radius. You may also run 
 
 ### 3. Completion and excellence review (one pass)
 
-Before the regular rounds, once per section, the pinned reviewer reviews the built feature as a user meets it and against `resolute_au3/` and `DESIGN.md`. Write the prompt to a scratch file from `docs/completion-review-prompt.md` (the candidate SHA, the section contract, the TODO file's Goal and Outcome, the `DESIGN.md` sections and `resolute_au3/` counterpart, the delivered diff), then run it (with `run_in_background` as enforced by `scripts/dispatch_hook.py`):
+Last, once per section and only after a clean terminal round (step 4), the pinned reviewer reviews the built feature as a user meets it and against `resolute_au3/` and `DESIGN.md`. The dispatcher refuses this pass any earlier (`completion requires a clean terminal round`), and refuses rounds after a clean terminal round, so this pass is always the final dispatch on its record. Write the prompt to a scratch file from `docs/completion-review-prompt.md` (the candidate SHA, the section contract, the TODO file's Goal and Outcome, the `DESIGN.md` sections and `resolute_au3/` counterpart, the delivered diff), then run it (with `run_in_background` as enforced by `scripts/dispatch_hook.py`):
 
 ```bash
 python scripts/review-dispatch.py --kind completion --candidate <full candidate SHA> --writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version> --prompt <scratch-completion-prompt.md> --record docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md
@@ -54,9 +54,11 @@ python scripts/review-dispatch.py --kind completion --candidate <full candidate 
 
 The dispatcher appends a `## Completion review` section (reviewer, model, candidate SHA), not a round: it is not counted against the cap, and a findings file takes one returned completion review. The review ends `COMPLETION: complete` or `COMPLETION: gaps`.
 
-Then, before any regular round, implement every `missing-in-scope` gap and every `in-scope` excellence item in this section (new commits appended to the candidate, the section's checklist and gates covering them), and file every `missing-out-of-scope` gap and `out-of-scope` item through `add-todo` as a new section. Under the completion review in the findings file, add one line per gap: `- Implemented: <gap> in <commit>`, or `- Filed: DNN TNN §N (<gap>)` for each section filed, and add a `> **Deferred:** <what> -- > XREF: DNN TNN §N` line to the section when its surface shows the filed item. When the dispatcher exits 1 (the reviewer returned no completion review), run the pass again; the regular rounds wait for it.
+Then implement every `missing-in-scope` gap and every `in-scope` excellence item in this section (new commits appended to the candidate, the section's checklist and gates covering them), and file every `missing-out-of-scope` gap and `out-of-scope` item through `add-todo` as a new section. Under the completion review in the findings file, add one line per gap (an implemented gap names the repair record that reviewed it): `- Implemented: <gap> in <commit>`, or `- Filed: DNN TNN §N (<gap>)` for each section filed, and add a `> **Deferred:** <what> -- > XREF: DNN TNN §N` line to the section when its surface shows the filed item. When the dispatcher exits 1 (the reviewer returned no completion review), run the pass again. A returned completion closes the record: the dispatcher refuses every later pass on it, so gaps from a returned completion are implemented and reviewed as a new repair cycle on a `-repair` record (`docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>-repair.md`, then `-repair2` and so on), which takes its own plan pass, rounds to a clean terminal round, and completion last, exactly as the first record did.
 
 ### 4. Independent review rounds (the pinned reviewer)
+
+The order on every record is fixed by `scripts/review-dispatch.py` `check_sequence`: one plan pass, then rounds until a clean terminal round, then the completion pass (step 3) last. No other order dispatches.
 
 The dispatcher picks each round's lenses and effort (capped at `medium`) from the pin's schedule, at least one round by the pinned independent reviewer. Write the prompt to a scratch file from `docs/review-round-prompt.md` (candidate SHA, section contract, governing documents, lenses), then run it, naming your own agent as the writer (with `run_in_background` when in Claude Code):
 
@@ -79,11 +81,11 @@ The dispatcher appends a `## Round N` section naming the reviewer, its model, ef
 | `optimization` | Is there avoidable work, allocation, latency or step count on a hot path? |
 | `record` | Does evidence match what ran, with owned deferrals and earned flip? |
 
-The loop is bounded: at most 33 rounds (a round that returns no review does not count), and it ends early on severity: the first round whose findings are all `P3` or advisory (one with no `P1` or `P2`, `HIGHEST: P3` or `HIGHEST: none`) stops the loop, and its `P3` findings are filed through `add-todo`. Findings are fixed in new commits appended to the candidate, gates re-run, and the next round runs against the new tip. A unit patched three rounds running is stopped and re-thought instead of patched again. When the dispatcher exits 1 (the reviewer returned no review), record the outage in the findings file and re-run or stop without a stamp: a session-only pass is not a substitute.
+The loop is bounded: at most `1 + max_low_rounds` rounds (nine under the current pin: one `medium` round plus up to eight `low` rounds; a round that returns no review does not count). Exhausting that budget with findings open is operator recovery, never approval: the dispatcher refuses the next round and no stamp follows from exhaustion. and it ends early on severity: the first round whose findings are all `P3` or advisory (one with no `P1` or `P2`, `HIGHEST: P3` or `HIGHEST: none`) stops the loop, and its `P3` findings are filed through `add-todo`. Findings are fixed in new commits appended to the candidate, gates re-run, and the next round runs against the new tip. A unit patched three rounds running is stopped and re-thought instead of patched again. When the dispatcher exits 1 (the reviewer returned no review), record the outage in the findings file and re-run or stop without a stamp: a session-only pass is not a substitute.
 
 ### 5. Re-run the gates
 
-After the last fix, re-run the section's Test checkpoint and its owed gates (`pwsh scripts/check-all.ps1` or the affected test suites, build warnings clean, `python scripts/todo-graph.py validate`, `python scripts/todo-claims.py`, and the Freeze check in frozen files). Quote the outputs in the findings file. A fix verified by reasoning is not verified. A red gate reopens the candidate: fix, re-run to green, and re-run the review round, because earlier verdicts rested on the broken candidate.
+After the last fix, re-run the section's Test checkpoint and its owed gates (`pwsh scripts/check-all.ps1` or the affected test suites, build warnings clean, `python scripts/todo-graph.py validate`, `python scripts/todo-claims.py`, and the Freeze check in frozen files). Quote the outputs in the findings file. A fix verified by reasoning is not verified. A red gate reopens the candidate: fix, re-run to green, and re-review, because earlier verdicts rested on the broken candidate. The re-review follows the dispatcher's order, never a bare round rerun: while no clean terminal round exists, run the next round; once a clean terminal round exists, the next pass is completion (a further round is refused); once a completion has returned, open a new `-repair` record and run its plan pass, rounds, and completion there.
 
 ### 6. Surface, feature, and frozen checks
 
@@ -102,6 +104,7 @@ python scripts/todo-graph.py plan --check
 The stamp block records:
 - `> **Verified:** <YYYY-MM-DD> | §<N> | <quoted checkpoint and gate outputs>`
 - `> **Review:** round <N> Astra (<effort>), candidates <sha>(round 1) ... -- <lens verdicts> · Raw findings: docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md`
+- `> **Completion:** astra (medium), candidate <sha> -- COMPLETION: complete \u00b7 Repair records: <none, or each -repair record with its final candidate>`
 - `> **Plan review:** astra -- <outcome>`
 - `> **CRUD:** <applicable or not applicable (...)>`
 - `> **Duration:** <start UTC> to <end UTC>`
@@ -111,7 +114,7 @@ Commit the stamp, findings file, and regenerated plan together as `todo: stamp <
 
 ### 8. Audit stance
 
-On an already-`[x]` section: run steps 1, 2 and 4 to 6 against the section's own candidate, recording the audit's rounds in `docs/reviews/<NN-domain>/audit-d<NN>-t<NN>-s<N>.md` (`--record` that path). Confirm the stamp's evidence still holds (re-run the checkpoint) or find the regression. If a regression is found, reopen the section by replacing its `> **Verified:**` line with `> **Reopened:** <YYYY-MM-DD> -- <reason>; prior stamp <date> superseded`, unticking the affected checklist items and the Implementation Order row, and running `python scripts/todo-graph.py plan --sync`. A re-confirmed row keeps its stamp; say so in one line.
+On an already-`[x]` section: run steps 1, 2 and 4 to 6 against the section's own candidate, recording the audit in `docs/reviews/<NN-domain>/audit-d<NN>-t<NN>-s<N>.md` (`--record` that path). That fresh record takes its own plan pass first (step 3a's dispatch with `--kind plan` on the audit candidate), then its rounds, then completion last: the dispatcher refuses a round on a record with no returned plan review. Confirm the stamp's evidence still holds (re-run the checkpoint) or find the regression. If a regression is found, reopen the section by replacing its `> **Verified:**` line with `> **Reopened:** <YYYY-MM-DD> -- <reason>; prior stamp <date> superseded`, unticking the affected checklist items and the Implementation Order row, and running `python scripts/todo-graph.py plan --sync`. A re-confirmed row keeps its stamp; say so in one line.
 
 ## Guardrails
 

@@ -99,7 +99,7 @@ Run gates while iterating, bounded to the touched area: the build for the touche
 
 ### 5. Surface and feature completeness
 
-Before the checkpoint, account for 100% of every control, menu item, dialog and state on the Fidelity surface and `DESIGN.md` section: each is working (proven on the rendered surface with real data and read-back) or deferred to a named, resolving section (`python scripts/todo-graph.py resolve '<ref>'` must not exit 1 or 2). Confirm the refusal/error/recovery path and undo/restore path required by the section hold. After the commit, `review-todo-section` step 3 has the pinned reviewer run the one-pass completion and excellence review on the built feature, and every in-scope gap it finds is built in this section before the regular rounds.
+Before the checkpoint, account for 100% of every control, menu item, dialog and state on the Fidelity surface and `DESIGN.md` section: each is working (proven on the rendered surface with real data and read-back) or deferred to a named, resolving section (`python scripts/todo-graph.py resolve '<ref>'` must not exit 1 or 2). Confirm the refusal/error/recovery path and undo/restore path required by the section hold. After the commit, `review-todo-section` runs its rounds to a clean terminal round and then step 3 has the pinned reviewer run the one-pass completion and excellence review last on the built feature; every in-scope gap it finds is built in this section as a new repair cycle on a `-repair` record with its own plan pass, rounds, and completion.
 
 ### 6. Run the Test checkpoint, for real
 
@@ -116,7 +116,7 @@ Commit the section work (in one or more commits as steps complete), recording th
 <plan corrections, if any>
 ```
 
-Then invoke `review-todo-section` on the same ref. It runs the one-pass completion and excellence review first (`scripts/review-dispatch.py --kind completion`): implement every in-scope gap and excellence item it lists in this section, file the rest through `add-todo`, then the regular rounds run. Review writes the `Verified:` and `Review:` stamp lines, flips the row, and syncs the plan. Commit the stamp and the regenerated plan as the stamp commit (`todo: stamp <ref>`).
+Then invoke `review-todo-section` on the same ref. It runs the dispatcher's order: rounds to a clean terminal round first, then the one-pass completion and excellence review last (`scripts/review-dispatch.py --kind completion`): implement every in-scope gap and excellence item it lists in this section as a new repair cycle on a `-repair` record, and file the rest through `add-todo`. Review writes the `Verified:` and `Review:` stamp lines, flips the row, and syncs the plan. Commit the stamp and the regenerated plan as the stamp commit (`todo: stamp <ref>`).
 
 ### 8. Report
 

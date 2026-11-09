@@ -20,14 +20,14 @@ The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a r
 
 1. Review your own change first and fix what you find.
 2. Write the review prompt to a scratch file, not the repository, from `docs/review-round-prompt.md`: name the candidate commit or range, the governing documents (`AGENTS.md`, `DESIGN.md`, `resolute_au3/`), and the lenses that apply.
-3. Run the round:
+3. Run the passes in the dispatcher's order on the one findings record: a section record takes its plan pass first (`--kind plan`, once, before any round), then rounds, then its completion pass (`--kind completion`) after a clean terminal round. The dispatcher refuses a round on a record with no returned plan review, refuses rounds after a clean terminal round, and refuses every pass after a returned completion (its gaps open a new `-repair` record). For a non-section topic record with no plan pass, say so in the prompt. Run the round:
 
    ```bash
    python scripts/review-dispatch.py --writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version> --prompt <scratch>/review-prompt.md --record docs/reviews/<topic>.md
    ```
 
 4. Read the review. Verify every finding against the code before acting: fix what is real, and record why anything else is not.
-5. Commit fixes as new commits and run another round on the new tip, up to `max_low_rounds` low rounds after round 1; the first round with no `P1` or `P2` finding (all `P3` or advisory) ends the loop and its findings are filed as follow-up work through `add-todo`. A unit that needs patching three rounds running gets re-thought, not patched again.
+5. Commit fixes as new commits and run another round on the new tip, up to `max_low_rounds` low rounds after round 1; the first round with no `P1` or `P2` finding (all `P3` or advisory) is the clean terminal round, its findings are filed as follow-up work through `add-todo`, and on a section record the completion pass follows it last. Budget exhaustion (`1 + max_low_rounds` rounds) with findings open is operator recovery, never approval. A unit that needs patching three rounds running gets re-thought, not patched again.
 
 ## Rules
 
