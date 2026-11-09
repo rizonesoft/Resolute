@@ -113,13 +113,47 @@ Small, known, and cheap. Each is recorded so it is not rediscovered later as a m
 
 Without a written scope, every request to fix something in the AutoIt tree is argued from scratch, and the rewrite quietly becomes two projects.
 
-- [ ] Write the scope: what will be fixed here, what will not, and why. Done when: it states that only defects affecting users of the shipping suite are in scope, and that the conformance campaign is not.
-- [ ] State explicitly that `resolute_au3/` is otherwise read-only, because it is the specification the ports are measured against. Done when: the statement is here and `AGENTS.md` agrees with it.
-- [ ] Write the retirement procedure: what happens to an AutoIt tool the day its C++ port ships. Done when: the procedure covers the update file, the download page, and the source, and names `D06 T01 §5` as the owner of the announcement.
-- [ ] Cover the tools that retire with **no successor**, which is a different case. Done when: `Distro` and `ReBar` are both named. `Distro` is the AutoIt `.sni` builder and is replaced by CMake, Ninja, and the release scripts rather than ported, so it ends when the last AutoIt tool does. `ReBar` does not retire so much as become the C++ framework. Neither gets a consolidation announcement, because neither had users to announce to.
-- [ ] Record what `Distro` contributed before it goes. Done when: this section notes that its `.sni` module model, meaning the Portable, Installation, and UpdateFile flags, is what `D06 T01 §1` reproduces as declarative release descriptors, so the concepts survive even though the tool does not.
-- [ ] Decide and record how a defect found in the AutoIt tree that also affects the port is handled. Done when: the answer is dated, and says which tree gets fixed first.
-- [ ] Commit: `"au3: maintenance scope and the retirement procedure"`
+- [x] Write the scope: what will be fixed here, what will not, and why. Done when: it states that only defects affecting users of the shipping suite are in scope, and that the conformance campaign is not. Buildability of the suite (§1) and release-security defects in the builder (§5) are named in scope as well, and enhancements are routed to the tool's C++ port or, for a capability no port has, through `add-todo` to the domain that will own it in C++, never built in AutoIt.
+- [x] State explicitly that `resolute_au3/` is otherwise read-only, because it is the specification the ports are measured against. Done when: the statement is here and `AGENTS.md` agrees with it.
+- [x] Write the retirement procedure: what happens to an AutoIt tool the day its C++ port ships. Done when: the procedure gives a concrete disposition for the update file, the download page, and the source, names who performs and who verifies each, names `D06 T01 §5` as the owner of the announcement, and distinguishes a same-name replacement (the C++ successor keeps the tool's name) from a consolidation (the tool folds into another product).
+- [x] Cover the tools that retire with **no successor**, which is a different case. Done when: `Distro` and `ReBar` are both named. `Distro` is the AutoIt `.sni` builder and is replaced by CMake, Ninja, and the release scripts rather than ported, so it ends when the last AutoIt tool does. `ReBar` does not retire so much as become the C++ framework, and AutoIt ReBar changes end when the C++ framework ships its first tool port; its source stays as specification afterwards. Neither gets a consolidation announcement, because neither had users to announce to.
+- [x] Record what `Distro` contributed before it goes. Done when: this section notes that its `.sni` module model, meaning the Portable, Installation, and UpdateFile flags, is what `D06 T01 §1` reproduces as declarative release descriptors, so the concepts survive even though the tool does not. The claim is reconciled with `D06 T01 §1` as written: its Outcome carries the portable edition and the generated update file; reproducing the flag model is the recorded intent this section states, not a contract `D06 T01 §1`'s checklist spells out flag for flag.
+- [x] Decide and record how a defect found in the AutoIt tree that also affects the port is handled. Done when: the answer is dated, says which tree gets fixed first, states that a correction may never change a frozen tool's system effect and how a request that would do so is resolved, and assigns the port-side correction and its parity verification to an owner.
+- [x] Commit: `"au3: maintenance scope and the retirement procedure"`
+
+
+### The scope, written 2026-11-09
+
+In scope for this domain, and nothing else:
+
+- A defect that affects users of the shipping AutoIt suite: wrong behaviour, a crash, a broken download or update path. The fix lands in the AutoIt tree, because that is what users run today.
+- The suite's buildability: descriptors, the builder, and anything that stops a clean checkout compiling (§1).
+- Release-security defects in the builder: credentials, signing, and update metadata (§5 is the standing example).
+- Housekeeping that keeps the tree honest: orphan output, stray files, wrong metadata (§2).
+
+Out of scope:
+
+- The conformance campaign. Comparing the trees belongs to D07; this domain does not run it.
+- Enhancements. A request to make an AutoIt tool do something new goes to the tool's C++ port. For a capability no port has yet, it is filed through `add-todo` to the domain that will own it in C++, and it is never built in AutoIt. Building it here is how the rewrite quietly becomes two projects.
+- The frozen behaviours. What `Ownership`, `ComIntRep`, `USBRepair`, `DVDRepair`, `PixRepair` and `BiosCodes` compute and write does not change here, for any reason short of the operator deciding otherwise in writing.
+
+`resolute_au3/` is otherwise read-only, because it is the specification the ports are measured against; changing it changes what the port is measured against. `AGENTS.md` says the same, and the two must not drift: this section is the long form, `AGENTS.md` is the standing rule.
+
+### Retirement procedure
+
+The day a tool's C++ port ships, its AutoIt counterpart retires. Three things have a disposition, each with a performer and a verifier:
+
+- **Update file.** For a same-name replacement, the tool's `.ru` (and `.rus`) on the update server is replaced by the C++ release's update file in the same step as the release, so an AutoIt user is offered the successor, not silence. For a consolidation, the retired tool's update file carries one final announcement release pointing at the consolidating product, and is removed after that release cycle. `D06 T01 §5` owns update files and the announcement; this domain hands it the retirement date and verifies the file that lands by reading it back.
+- **Download page.** For a same-name replacement, the page stays and now serves the C++ build. For a consolidation, the page is replaced by the announcement and a pointer to the consolidating product; it is not left advertising a download that no longer exists. The release work under D06 performs the change; this domain verifies the page no longer offers the AutoIt download.
+- **Source.** The AutoIt source stays in `resolute_au3/` as specification. It is marked retired in its tool's TODO file, it is not deleted, and it receives no further changes except through this domain for a defect that still affects users who have not upgraded. Parity keeps measuring against it, which is why it stays.
+
+A tool with no successor is a different case. `Distro` ends when the last AutoIt tool retires: it is replaced by CMake, Ninja and the release scripts, it is never ported, and nobody announces it because nobody outside this project runs it. `ReBar` becomes the C++ framework in `src/framework/`; AutoIt ReBar changes end when the framework ships its first tool port, and its source stays as specification afterwards. Neither gets a consolidation announcement, because neither had users to announce to.
+
+What `Distro` contributed survives it: the per-tool `.sni` descriptor whose module switches (`Distribute`, `Portable`, `Installation`, `UpdateFile`) declare what a release contains. `D06 T01 §1` is where the C++ release descriptors reproduce those ideas declaratively (portable by construction, generated update files), so the concepts carry over even though the tool does not.
+
+### Shared-defect policy, decided 2026-11-09
+
+A defect found in the AutoIt tree that also affects the C++ port is fixed in AutoIt first when users of the shipping suite are affected, because that is the tree they run. The port-side correction is filed the same day to the section that owns the behaviour in C++, with the AutoIt fix named as its source, and it is verified by the parity proof that port owes (D07). If the only correct fix would change a frozen tool's system effect, the AutoIt side does not change: the effect is the specification. The request is recorded here with the reason, the port implements the decided behaviour, and the operator is named as the only authority who can move a frozen effect.
 
 **Test checkpoint:** The scope states what is in and out with a reason. `AGENTS.md` and this section agree that `resolute_au3/` is otherwise read-only. The retirement procedure covers update file, download page, and source, naming its owner. The shared-defect policy is dated.
 
