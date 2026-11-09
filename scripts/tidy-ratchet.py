@@ -247,11 +247,12 @@ def rewrite_baseline(text: str, measured_count: int, measured_targets: dict) -> 
         if m and m.group("target") in ceilings:
             old_ceiling, measured = ceilings[m.group("target")]
             if int(m.group("new")) == old_ceiling and measured < old_ceiling:
-                raw = raw.replace(
-                    f"{m.group('old')} -> {m.group('new')}",
-                    f"{m.group('old')} -> {measured}",
-                    1,
-                )
+                # Replace the matched numeric span itself: the grammar
+                # accepts any spacing around '->', so a literal spaced
+                # substring would miss '5->9' (repair plan review).
+                indent = len(raw) - len(raw.lstrip())
+                start, end = m.span("new")
+                raw = raw[: indent + start] + str(measured) + raw[indent + end :]
         out.append(raw)
     return "\n".join(out) + "\n"
 
@@ -260,8 +261,15 @@ def write_atomic(path: Path, text: str) -> None:
     """Replace a file atomically and read it back (AGENTS.md: atomic
     writes, readback). A failed write leaves the original intact."""
     tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(text)
-    os.replace(tmp, path)
+    try:
+        tmp.write_text(text)
+        os.replace(tmp, path)
+    except OSError as exc:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+        raise Refusal(f"could not persist {path}: {exc}") from exc
     if path.read_text() != text:
         raise Refusal(f"readback mismatch after writing {path}; baseline not trusted")
 
@@ -889,6 +897,44 @@ def self_test() -> int:
             globals()["run_analysis"] = real_analysis
 
     case("run() end to end: equal, offset refusal, rewrite then rerun, incomplete", run_end_to_end)
+
+    def ceiling_spacing_variants():
+        for arrow in ("5 -> 9", "5->9", "5  ->  9"):
+            text = (
+                f"# Raised total {arrow} on 2026-11-09: wider coverage\n"
+                f"# Raised root {arrow} on 2026-11-09: wider coverage\n"
+                "count: 9\ntarget root: 9\n"
+            )
+            out = rewrite_baseline(text, 7, {"root": 7})
+            assert "9 on 2026" not in out, (arrow, out)
+            named = check_raise_guard(out, "count: 5\ntarget root: 5\n", ["root"])
+            assert len(named) == 2, (arrow, out, named)
+
+    case("rewrite adjusts Raised ceilings at any accepted spacing", ceiling_spacing_variants)
+
+    def persistence_failures():
+        from unittest import mock
+
+        tmp = mkdtemp()
+        dest = tmp / ".tidy-baseline"
+        dest.write_text("original\n")
+
+        (tmp / ".tidy-baseline.tmp").mkdir()
+        refuses(lambda: write_atomic(dest, "new\n"), "could not persist")
+        assert dest.read_text() == "original\n"
+        (tmp / ".tidy-baseline.tmp").rmdir()
+
+        with mock.patch("os.replace", side_effect=OSError("simulated replace failure")):
+            refuses(lambda: write_atomic(dest, "new\n"), "could not persist")
+        assert dest.read_text() == "original\n"
+
+        def wrong_replace(src, dst):
+            Path(dst).write_text("corrupted\n")
+
+        with mock.patch("os.replace", wrong_replace):
+            refuses(lambda: write_atomic(dest, "new\n"), "readback mismatch")
+
+    case("persistence failures refuse and leave the original intact", persistence_failures)
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
