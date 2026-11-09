@@ -456,3 +456,83 @@ TEST_CASE("Truncating the Name header fails as clipped naming the control", "[vi
     CHECK(AnyNames(failures, "clipped"));
     CHECK(AnyNames(failures, "list-header-name"));
 }
+
+namespace {
+
+// Renders the control's own label truncated at its right boundary: every
+// ink pixel of the control is repainted shifted right so the label's last
+// glyph is cut at the boundary, as clipped text renders.
+void TruncateLabelAtEdge(Image& img, const RegionSpec& region) {
+    const int x0 = static_cast<int>(region.x0 * img.w), x1 = static_cast<int>(region.x1 * img.w);
+    const int y0 = static_cast<int>(region.y0 * img.h), y1 = static_cast<int>(region.y1 * img.h);
+    std::map<uint32_t, long> counts;
+    for (int y = y0; y < y1; ++y)
+        for (int x = x0; x < x1; ++x) ++counts[img.px[static_cast<size_t>(y) * img.w + x]];
+    uint32_t paper = 0;
+    long best = -1;
+    for (const auto& [colour, n] : counts)
+        if (n > best) { best = n; paper = colour; }
+    const double paperLum = visualpair::Luminance(paper);
+    const Image src = img;
+    // Find the rightmost ink column of the label.
+    int rightmost = x0;
+    for (int y = y0; y < y1; ++y)
+        for (int x = x0; x < x1 - 6; ++x)
+            if (std::abs(visualpair::Luminance(src.px[static_cast<size_t>(y) * img.w + x]) - paperLum) > 0.05)
+                rightmost = std::max(rightmost, x);
+    const int shift = (x1 - 2) - rightmost + 3;  // push the last glyph past the boundary
+    for (int y = y0; y < y1; ++y)
+        for (int x = x0; x < x1; ++x) img.px[static_cast<size_t>(y) * img.w + x] = paper;
+    int glyphTop = y1, glyphBottom = y0;
+    uint32_t inkColour = 0xFF101010u;
+    for (int y = y0; y < y1; ++y)
+        for (int x = x0; x < x1; ++x) {
+            const uint32_t c = src.px[static_cast<size_t>(y) * img.w + x];
+            if (std::abs(visualpair::Luminance(c) - paperLum) <= 0.05) continue;
+            glyphTop = std::min(glyphTop, y);
+            glyphBottom = std::max(glyphBottom, y);
+            inkColour = c;
+            const int nx = x + shift;
+            if (nx < x1) img.px[static_cast<size_t>(y) * img.w + nx] = c;
+        }
+    // The cut glyph's strokes reach the sampled columns on its own rows:
+    // a glyph truncated at the boundary is ink there, not a solid strip.
+    for (int y = glyphTop; y <= glyphBottom; ++y)
+        for (int x = std::max(x0, x1 - 4); x < std::max(x0, x1 - 2); ++x)
+            img.px[static_cast<size_t>(y) * img.w + x] = inkColour;
+}
+
+void CheckTruncated(const Spec& spec, Image baseline, const char* name) {
+    const RegionSpec& control = ByName(spec, name);
+    TruncateLabelAtEdge(baseline, control);
+    const auto observed = MeasureAll(baseline, {control});
+    CHECK(observed[0].edgeTouch > control.maxEdge);
+    const auto failures = Compare({control}, observed, spec.equivalents, {"theme"});
+    CHECK(AnyNames(failures, "clipped"));
+    CHECK(AnyNames(failures, name));
+}
+
+}  // namespace
+
+TEST_CASE("Partial-glyph truncation fails as clipped naming each control", "[visual-pair]") {
+    const Spec spec = LoadSpec();
+    Image baseline;
+    REQUIRE(LoadPng(Baseline150(), baseline));
+    CheckTruncated(spec, baseline, "sidebar-all");
+    CheckTruncated(spec, baseline, "list-header-name");
+    CheckTruncated(spec, baseline, "list-header-description");
+    CheckTruncated(spec, baseline, "list-header-version");
+}
+
+TEST_CASE("The shipped spec keeps the enforcement configuration", "[visual-pair]") {
+    const Spec spec = LoadSpec();
+    REQUIRE(spec.errors.empty());
+    const RegionSpec& view = ByName(spec, "toolbar-view");
+    CHECK(view.text);
+    CHECK(view.checkContrast);
+    for (const char* name : {"sidebar-all", "list-header-name", "list-header-description", "list-header-version"})
+        CHECK(ByName(spec, name).maxEdge < 1.0);
+    for (const RegionSpec& r : spec.regions)
+        if (r.name == "toolbar" || r.name == "sidebar" || r.name == "tool-list" || r.name == "status-bar")
+            CHECK(r.checkContrast);
+}
