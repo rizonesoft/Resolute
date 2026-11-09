@@ -24,3 +24,10 @@ OVERALL: needs-attention
 
 - Planned: step 5 clean definition aligned to line 17 in the repair build (gap 1)
 - Planned: repair verification readback of all four completion-gap targets, malformed-declaration walkthroughs, and a worked Codex/Argon stamp recorded as a writer note in this record (gap 2)
+
+## Writer note: repair verification (2026-11-09)
+
+- Readback (R:\scratch\verify_repair.py, all PASS): mirrors byte-identical 4 skills x 3 dirs; process-phase names plan first; independent-review requires completion on every record and states the exact clean definition in both places; review-todo-section states clean uniqueness and stamp placeholders for round, plan, completion reviewers and implementer; no 33-round cap and no completion-before-rounds text remains.
+- Malformed-declaration walkthroughs against the real dispatcher clean(): single HIGHEST P3 True, single HIGHEST none True, missing False, duplicate False, contradictory P1+P3 False, P1 only False, P2 only False.
+- Worked Codex stamp from the template placeholders: Review round 1 Argon (medium); Plan review Argon; Completion Argon (medium) COMPLETION complete, repair records named; Implementer codex with its exact model. No Astra or Claude Opus identity is hardcoded.
+- Gates: python scripts/review-dispatch.py --check-pin ok (run this cycle); unit suite green at the S44 build (130 OK, 3 skipped), re-run at stamp.
