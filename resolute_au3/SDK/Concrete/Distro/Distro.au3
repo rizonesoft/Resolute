@@ -2392,7 +2392,9 @@ Func _RunSignCommand($sOutputFile, $sCertPath, $sDescription, $sWebsite, $sPassw
 	Local $sSignCommand = "signtool.exe sign /f " & Chr(34) & $sCertPath & Chr(34) & " /p " & $sPassword & _
 			" /t " & $sCertTimeServer & Chr(32) & Chr(34) & $sOutputFile & Chr(34)
 
-	_Logging_EditWrite("Command: " & $sSignCommand)
+	Local $sSignCommandLogged = "signtool.exe sign /f " & Chr(34) & $sCertPath & Chr(34) & " /p " & $sPassMsk & _
+			" /t " & $sCertTimeServer & Chr(32) & Chr(34) & $sOutputFile & Chr(34)
+	_Logging_EditWrite("Command: " & $sSignCommandLogged)
 	_ProcessEx_RunCommand($sSignCommand, $sSignWorkingDir)
 
 EndFunc   ;==>_RunSignCommand
