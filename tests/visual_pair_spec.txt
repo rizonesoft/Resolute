@@ -25,8 +25,9 @@
 # kind is text (DESIGN.md contrast floor 4.5:1) or element (3:1).
 # contrast is both (glyph floor plus long-border components at 3:1),
 # check (glyph only), or skip (the parent region checks). maxEdge is the
-# painted fraction of the control's right two columns that reads as
-# clipped. maxMoved is per region because the title and status carry
+# fraction of the region's active rows (rows painting anything) that
+# carry ink in the two sampled columns just inside the right boundary;
+# a region with no active rows measures zero. maxMoved is per region because the title and status carry
 # live text. No exemption waives a missing region, a clipped control, or
 # a contrast below floor.
 #

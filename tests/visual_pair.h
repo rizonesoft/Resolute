@@ -51,7 +51,7 @@ struct Observed {
     double      x0 = 0, y0 = 0, x1 = 0, y1 = 0;
     double      painted = 0;    // painted fraction inside the region rect
     double      detail = 0;     // mean absolute horizontal neighbour difference
-    double      edgeTouch = 0;  // painted fraction just inside the right boundary
+    double      edgeTouch = 0;  // active-row fraction with ink in the sampled columns inside the right boundary
     double      borderContrast = 0;  // worst long border component vs its local paper
     double      contrastElement = 0; // worst glyph of any size (element floor 3:1)
     double      contrast = 0;   // (L95 + .05) / (L5 + .05) inside the rect

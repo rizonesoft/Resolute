@@ -472,21 +472,38 @@ std::pair<long, long> TruncateLabelAtEdge(Image& img, const RegionSpec& region, 
     long best = -1;
     for (const auto& [colour, n] : counts)
         if (n > best) { best = n; paper = colour; }
-    const double paperLum = visualpair::Luminance(paper);
     const int labelZone = x0 + static_cast<int>((x1 - x0) * zoneFrac);
-    // Shift the zone's whole ink mask right until it straddles the
+    // Ink is what the edge measure itself counts: a channel-sum
+    // difference over 24 from the paper. Rows whose ink spans nearly
+    // the whole zone are gradient or border rows, not label ink; they
+    // carry no glyph and must not set the shift, or the label never
+    // reaches the boundary on a selected row.
+    auto isInk = [&](uint32_t c) {
+        return std::abs(visualpair::Channel(c, 16) - visualpair::Channel(paper, 16)) +
+                   std::abs(visualpair::Channel(c, 8) - visualpair::Channel(paper, 8)) +
+                   std::abs(visualpair::Channel(c, 0) - visualpair::Channel(paper, 0)) >
+               24;
+    };
+    std::map<int, long> rowInk;
+    for (int y = y0; y < y1; ++y)
+        for (int x = x0; x < labelZone; ++x)
+            if (isInk(img.px[static_cast<size_t>(y) * img.w + x])) ++rowInk[y];
+    const long lineRow = static_cast<long>((labelZone - x0) * 0.8);
+    // Shift the zone's label ink mask right until it straddles the
     // boundary: the rightmost ink lands just beyond x1, so part is
     // retained inside and part cropped, as clipped content renders.
     struct Ink { int x, y; uint32_t c; };
     std::vector<Ink> ink;
     int inkRight = -1;
-    for (int y = y0; y < y1; ++y)
+    for (int y = y0; y < y1; ++y) {
+        if (rowInk[y] > lineRow) continue;
         for (int x = x0; x < labelZone; ++x) {
             const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
-            if (std::abs(visualpair::Luminance(c) - paperLum) <= 0.05) continue;
+            if (!isInk(c)) continue;
             ink.push_back({x, y, c});
             inkRight = std::max(inkRight, x);
         }
+    }
     if (ink.empty()) return {0, 0};
     const int delta = (x1 + 2) - inkRight;
     for (const Ink& px : ink) img.px[static_cast<size_t>(px.y) * img.w + px.x] = paper;
@@ -527,6 +544,7 @@ TEST_CASE("Partial-glyph truncation fails as clipped naming each control", "[vis
                         "2026-11-09-D00-T02-s10-launcher-dark-150.png",
                     dark));
     for (const Image& baseline : {light, dark}) {
+        CheckTruncated(spec, baseline, "sidebar-all");
         CheckTruncated(spec, baseline, "sidebar-system");
         CheckTruncated(spec, baseline, "list-header-name");
         CheckTruncated(spec, baseline, "list-header-description");
