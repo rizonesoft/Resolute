@@ -817,8 +817,17 @@ def repro_check(root: Path) -> int:
         ext = root / "extensions"
         if ext.is_dir():
             trees += [d / "build" for d in ext.iterdir() if d.is_dir()]
+        import time
+
         for tree in trees:
-            shutil.rmtree(tree, ignore_errors=True)
+            # Windows can hold a just-built tree briefly (compiler
+            # handles draining, AV scan): retry the removal, but the
+            # refusal below still fires if anything remains.
+            for _attempt in range(20):
+                shutil.rmtree(tree, ignore_errors=True)
+                if not tree.exists():
+                    break
+                time.sleep(0.5)
             if tree.exists():
                 # A cleanup that silently failed would let both
                 # builds reuse the same products and still report
