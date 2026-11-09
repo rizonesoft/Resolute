@@ -820,15 +820,24 @@ def repro_check(root: Path) -> int:
         import stat as _stat
         import time
 
-        def _clear_readonly(func, path, exc):
+        def _clear_readonly(func, path, _exc):
             # FetchContent clones carry read-only git pack files;
             # Windows refuses to delete those until the flag clears
-            # (the standard shutil onexc pattern).
+            # (the standard shutil pattern).
             try:
                 Path(path).chmod(_stat.S_IWRITE)
                 func(path)
             except OSError:
                 pass
+
+        def _remove_tree(tree):
+            # onexc exists only on Python 3.12+; the tree's tools
+            # run on any stdlib Python 3 (AGENTS.md), so select the
+            # callback spelling the running interpreter supports.
+            if sys.version_info >= (3, 12):
+                shutil.rmtree(tree, onexc=_clear_readonly)
+            else:
+                shutil.rmtree(tree, onerror=lambda f, pth, ei: _clear_readonly(f, pth, ei[1]))
 
         for tree in trees:
             # Windows can also hold a just-built tree briefly
@@ -836,7 +845,7 @@ def repro_check(root: Path) -> int:
             # removal, but the refusal below still fires if
             # anything remains.
             for _attempt in range(20):
-                shutil.rmtree(tree, onexc=_clear_readonly)
+                _remove_tree(tree)
                 if not tree.exists():
                     break
                 time.sleep(0.5)

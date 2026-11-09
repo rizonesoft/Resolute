@@ -28,3 +28,27 @@ Verification: all three pattern tests passed. HEAD differs from the candidate on
 
 PLAN: gaps
 OVERALL: needs-attention
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T06:29:24Z
+- Effort: medium
+- Writer model: muse-wonder-full-1.0
+- Policy: 8bf10da4fea2b765de0fbb1388d6f0a7bcd19e00
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 8
+- Digest: 47f2702ab909a482
+
+**adversarial: needs-attention**
+
+- **P2: Repro check crashes on Python 3.11 after deleting deployed executables.** [scripts/conformance-check.py:839](D:/GitHub/Resolute/scripts/conformance-check.py:839) introduces `shutil.rmtree(..., onexc=...)`, unsupported by Python 3.11. Executable deletion occurs first at line 815. Reproduction: invoke `repro_check(Path.cwd())` under installed CPython 3.11.15, intercepting `Path.unlink` to prevent changes. It attempts both executable deletions, then raises `TypeError: rmtree() got an unexpected keyword argument 'onexc'`. Use the compatible `onerror` callback, or validate the required interpreter version before deleting anything.
+
+Read-only probes only; no files modified. Full builds were not rerun.
+
+HIGHEST: P2
+OVERALL: needs-attention
