@@ -357,7 +357,8 @@ std::vector<std::string> HookFailures(const std::vector<DWORD>& pids) {
         std::wstring path = TempPathFor(kFocusHookFailPrefix, pid);
         if (GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES) {
             wchar_t cwd[MAX_PATH];
-            if (GetCurrentDirectoryW(MAX_PATH, cwd))
+            const DWORD cwdLen = GetCurrentDirectoryW(MAX_PATH, cwd);
+            if (cwdLen && cwdLen < MAX_PATH)
                 path = std::wstring(cwd) + L"\\" + kFocusHookFailPrefix + std::to_wstring(pid) + L".txt";
         }
         HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
@@ -511,7 +512,8 @@ public:
             }
             DeleteFileW(TempPathFor(kFocusHookFailPrefix, pid).c_str());
             wchar_t cwd[MAX_PATH];
-            if (GetCurrentDirectoryW(MAX_PATH, cwd))
+            const DWORD cwdLen = GetCurrentDirectoryW(MAX_PATH, cwd);
+            if (cwdLen && cwdLen < MAX_PATH)
                 DeleteFileW((std::wstring(cwd) + L"\\" + kFocusHookFailPrefix + std::to_wstring(pid) + L".txt").c_str());
             if (pid != GetCurrentProcessId()) DeleteFileW(TempPathFor(kFocusHookIntentPrefix, pid).c_str());
         }
