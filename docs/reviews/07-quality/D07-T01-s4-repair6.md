@@ -27,3 +27,30 @@ PLAN: gaps
 OVERALL: needs-attention
 
 - Planned: controlled-clock deadline branch, deterministic ABORTED capture, real-driver exception evidence, combined five-diagnostic rows (repair6 plan gaps 1-4)
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T10:00:09Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: a896bb2f70a95d835ada0cfc5fcea58d39a165ea
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 11
+- Digest: 0ccc9afe5ff1e62e
+
+## adversarial: needs-attention
+
+1. **P2: The windowless self-test now opens an unfenced desktop window.** [scripts/smoke-run.py:1672](D:/GitHub/Resolute/scripts/smoke-run.py:1672) drives the real `deaf` fixture, which creates a Tk window. `--self-test` returns before admission checks, and this call uses synthetic elapsed time instead of operator input. **Reproduction:** run `python scripts/smoke-run.py --self-test` during active daytime use without `--visible`. It launches the fixture despite the desktop fence. Move this case behind explicit headful admission or exercise the production exception handler with windowless dependencies.
+
+2. **P2: Slow startup makes the new exception regression fail without reaching its exception.** [scripts/smoke-run.py:1661](D:/GitHub/Resolute/scripts/smoke-run.py:1661) starts a 1.5-second interruption timer before launching Python/Tk, while the main capture deliberately sleeps one second. Startup taking roughly half a second can therefore interrupt the main capture; startup exceeding 1.5 seconds interrupts the launch wait. Both paths return normally, setting `_evidence_ok = False`. **Reproduction:** inject a 1.6-second delay around `spawn_contained` in memory before running this case. The unchanged production handler fails its regression check. Trigger interruption from the exception-capture phase using controlled synchronization instead of launch-relative wall time.
+
+Static review only; reproduction procedures above were not executed. No files modified.
+
+HIGHEST: P2
+
+OVERALL: needs-attention

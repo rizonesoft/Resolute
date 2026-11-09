@@ -1653,30 +1653,33 @@ def self_test() -> int:
         except Exception:
             pass
 
-    # Real drive_tool: About raises, the driver's own exception handler
-    # captures failure evidence with the interruption, then re-raises.
+    # Real drive_tool, windowless: window enumeration and capture are
+    # injected fakes, the fixture process shows no window, and interruption
+    # is triggered by phase, never by wall time. About raises; the driver's
+    # own exception handler captures the interruption, then re-raises.
     _fixture = ROOT / "scripts" / "smoke_fixture.py"
-    _erun = ToolRun("SmokeDrillDeaf", Path(sys.executable), [str(_fixture), "deaf"])
-    _real_post = globals()["post"]
-    _t_start = time.monotonic()
-    def _resumed_toggle():
-        return time.monotonic() > _t_start + 1.5
-    def _post_raise(hwnd, msg, wparam=0):
+    _erun = ToolRun("SmokeDrillDeaf", Path(sys.executable), [str(_fixture), "nowindow"],
+                    start_timeout=15.0)
+    _phase = {"capture": False}
+    _saved_drive_apis = {k: globals()[k] for k in ("post", "pid_windows", "capture_window")}
+    def _fake_windows(pid):
+        return [(4242, "TkTopLevel", "fixture")] if _erun.proc and pid == _erun.proc.pid else []
+    def _fake_post(hwnd, msg, wparam=0):
         if msg == WM_COMMAND and wparam == ABOUT_IDM:
+            _phase["capture"] = True
             raise RuntimeError("about post failed")
-        return _real_post(hwnd, msg, wparam)
-    globals()["post"] = _post_raise
-    _real_cap3 = globals()["capture_window"]
-    globals()["capture_window"] = lambda hwnd: (time.sleep(1), _real_cap3(hwnd))[1]
+    globals()["pid_windows"] = _fake_windows
+    globals()["post"] = _fake_post
+    globals()["capture_window"] = lambda hwnd: (64, 64, bytes([7, 9, 11, 255]) * 4096)
     try:
-        drive_tool(_erun, SMOKE_DIR, PREV_DIR, True, 0.0, resumed=_resumed_toggle)
+        drive_tool(_erun, SMOKE_DIR, PREV_DIR, True, 0.0,
+                   resumed=lambda: _phase["capture"])
         _evidence_ok = False
     except RuntimeError:
         _evidence_ok = (getattr(_erun, "interrupted", False) is True
                         and "operator input resumed" in getattr(_erun, "_evidence", ""))
     finally:
-        globals()["post"] = _real_post
-        globals()["capture_window"] = _real_cap3
+        globals().update(_saved_drive_apis)
     check("real driver exception handler captures the interruption as evidence", _evidence_ok)
     # Combined diagnostics in the report rows: termination, resume, thread
     # and job-close failures all survive production drive and cleanup.
