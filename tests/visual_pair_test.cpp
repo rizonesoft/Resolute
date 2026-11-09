@@ -371,7 +371,7 @@ TEST_CASE("Extending a real label to its control edge fails as clipped naming th
     const int y0 = static_cast<int>(control.y0 * changed.h), y1 = static_cast<int>(control.y1 * changed.h);
     // Label text running into the control's right edge, as truncation paints it.
     for (int y = y0 + 4; y < y1 - 4; ++y)
-        for (int x = x1 - 2; x < x1; ++x) changed.px[static_cast<size_t>(y) * changed.w + x] = 0xFF101010u;
+        for (int x = x1 - 6; x < x1; ++x) changed.px[static_cast<size_t>(y) * changed.w + x] = 0xFF101010u;
     (void)x0;
     const auto failures = Compare({control}, MeasureAll(changed, {control}), spec.equivalents, {"theme"});
     CHECK(AnyNames(failures, "clipped"));
@@ -387,4 +387,72 @@ TEST_CASE("The baseline compared with itself passes the pair comparison", "[visu
         visualpair::ComparePair(spec.regions, baseline, baseline, observed, observed, spec.equivalents);
     for (const auto& f : failures) std::printf("visual-pair failure: %s\n", f.c_str());
     CHECK(failures.empty());
+}
+
+TEST_CASE("View text between the element and text floors fails naming the floor", "[visual-pair]") {
+    auto render = [](bool dark) {
+        Image img;
+        img.w = 160;
+        img.h = 60;
+        const uint32_t paper = dark ? 0xFF282828u : 0xFFFFFFFFu;
+        const uint32_t ink = dark ? 0xFF848484u : 0xFF828282u;  // between 3:1 and 4.5:1 on its paper
+        img.px.assign(160 * 60, paper);
+        for (int y = 20; y < 36; ++y)
+            for (int x = 20; x < 60; ++x)
+                if ((x % 12) < 7) img.px[static_cast<size_t>(y) * 160 + x] = ink;
+        return img;
+    };
+    RegionSpec view;
+    view.name = "toolbar-view";
+    view.label = "View";
+    view.x0 = 0.0;
+    view.y0 = 0.0;
+    view.x1 = 1.0;
+    view.y1 = 1.0;
+    view.text = true;
+    view.checkContrast = true;
+    for (bool dark : {false, true}) {
+        Observed got;
+        MeasureRegion(render(dark), view, got);
+        INFO("measured contrast must sit between the floors, got " << got.contrast);
+        CHECK(got.contrast > 3.0);
+        CHECK(got.contrast < 4.5);
+        const auto failures = Compare({view}, {got}, {}, {"theme"});
+        CHECK(AnyNames(failures, "toolbar-view"));
+        CHECK(AnyNames(failures, "4.5:1"));
+    }
+}
+
+TEST_CASE("Truncating the selected All label fails as clipped naming the control", "[visual-pair]") {
+    const Spec spec = LoadSpec();
+    Image baseline;
+    REQUIRE(LoadPng(Baseline150(), baseline));
+    Image changed = baseline;
+    const RegionSpec& control = ByName(spec, "sidebar-all");
+    const int x1 = static_cast<int>(control.x1 * changed.w);
+    const int y0 = static_cast<int>(control.y0 * changed.h), y1 = static_cast<int>(control.y1 * changed.h);
+    for (int y = y0 + 4; y < y1 - 4; ++y)
+        for (int x = x1 - 6; x < x1; ++x) changed.px[static_cast<size_t>(y) * changed.w + x] = 0xFF101010u;
+    const auto observed = MeasureAll(changed, {control});
+    CHECK(observed[0].edgeTouch > control.maxEdge);
+    const auto failures = Compare({control}, observed, spec.equivalents, {"theme"});
+    CHECK(AnyNames(failures, "clipped"));
+    CHECK(AnyNames(failures, "sidebar-all"));
+}
+
+TEST_CASE("Truncating the Name header fails as clipped naming the control", "[visual-pair]") {
+    const Spec spec = LoadSpec();
+    Image baseline;
+    REQUIRE(LoadPng(Baseline150(), baseline));
+    Image changed = baseline;
+    const RegionSpec& control = ByName(spec, "list-header-name");
+    const int x1 = static_cast<int>(control.x1 * changed.w);
+    const int y0 = static_cast<int>(control.y0 * changed.h), y1 = static_cast<int>(control.y1 * changed.h);
+    for (int y = y0 + 4; y < y1 - 4; ++y)
+        for (int x = x1 - 6; x < x1; ++x) changed.px[static_cast<size_t>(y) * changed.w + x] = 0xFF101010u;
+    const auto observed = MeasureAll(changed, {control});
+    CHECK(observed[0].edgeTouch > control.maxEdge);
+    const auto failures = Compare({control}, observed, spec.equivalents, {"theme"});
+    CHECK(AnyNames(failures, "clipped"));
+    CHECK(AnyNames(failures, "list-header-name"));
 }

@@ -51,7 +51,7 @@ struct Observed {
     double      x0 = 0, y0 = 0, x1 = 0, y1 = 0;
     double      painted = 0;    // painted fraction inside the region rect
     double      detail = 0;     // mean absolute horizontal neighbour difference
-    double      edgeTouch = 0;  // painted fraction of the region's right edge columns
+    double      edgeTouch = 0;  // painted fraction just inside the right boundary
     double      borderContrast = 0;  // worst long border component vs its local paper
     double      contrastElement = 0; // worst glyph of any size (element floor 3:1)
     double      contrast = 0;   // (L95 + .05) / (L5 + .05) inside the rect
@@ -233,7 +233,9 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
         // their clipping is observed from the pane rectangles.)
         long borderPainted = 0, border = 0;
         for (int y = y0; y < y1; ++y) {
-            for (int x = std::max(x0, x1 - 2); x < x1; ++x) {
+            // The third and fourth columns from the right: where truncated
+            // text arrives, inside the boundary divider itself.
+            for (int x = std::max(x0, x1 - 4); x < std::max(x0, x1 - 2); ++x) {
                 const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
                 const int d = std::abs(Channel(c, 16) - Channel(bg, 16)) + std::abs(Channel(c, 8) - Channel(bg, 8)) +
                               std::abs(Channel(c, 0) - Channel(bg, 0));
