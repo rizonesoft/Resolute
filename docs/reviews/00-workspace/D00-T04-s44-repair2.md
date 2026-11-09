@@ -37,3 +37,62 @@ OVERALL: needs-attention
 - clean() distinction proven against the real dispatcher: unresolved P2 text with HIGHEST none returns True (dispatcher checks declarations only), unresolved P2 with HIGHEST P2 returns False. The skills now state both halves.
 - Readback: exact clean wording present in independent-review (both statements) and review-todo-section, byte-identical across .agents, .claude, .codex mirrors (hash check at build).
 - Worked stamps: the concrete Muse/Astra stamp in this record's first writer note is populated from D00-T04-s44.md pass headers (candidates 1f8abfe0, 4bc5dfc2, 3d8bbe03, a484bf50; writer muse-wonder-1.0). The Codex instance substitutes Argon and gemini-4-argon-medium from .conclave/reviewers.toml, the same candidate, and the writer model from its own record header when a Codex session writes one.
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T08:33:02Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: e712feb4ff96f23a464ea6e05da8c29b520d2e3a
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 6
+- Digest: d38184a31eebd761
+
+### adversarial: approve
+
+No actionable adversarial findings in this candidate. Read-only checks confirmed the documented declaration-only behavior, including acceptance of a false-clean declaration. The revised wording explicitly assigns truthful severity reporting to the reviewer.
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T08:34:53Z
+- Candidate: 72495a9f8c19ad72c4640cb183e02075dc052f63
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: e712feb4ff96f23a464ea6e05da8c29b520d2e3a
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 21
+- Digest: 1baa6e51d8e6bb0c
+
+Part 1: completeness
+
+References below use candidate `72495a9`; skill paths are under `.agents/skills/`, with identical line references in both mirrors.
+
+1. **present:** Declaration-only enforcement and truthful-severity duty are distinguished in `independent-review/SKILL.md:17,30` and `review-todo-section/SKILL.md:84`. Executing the candidate’s `clean()` confirmed the documented distinction.
+2. **present:** Concrete Muse/Astra worked example at `docs/reviews/00-workspace/D00-T04-s44-repair2.md:5`, with verification at `:39`. The Codex-specific example remains schematic, but this is explicitly settled at `:32`; the stated absence of Codex-written records was independently confirmed. No new evidence reopens it.
+3. **present:** All four skills are byte-identical across `.agents`, `.claude`, and `.codex`, verified using candidate Git blob identities.
+4. **present:** No refused dispatch order remains: `independent-review/SKILL.md:23,30`, `process-phase/SKILL.md:52`, `process-todo-section/SKILL.md:82,102,119`, and `review-todo-section/SKILL.md:57,61,88,117`.
+
+Part 2: excellence
+
+1. **out-of-scope:** Lens descriptions still overpromise coverage in `review-todo-section/SKILL.md:10,69` and misdescribe later rounds in `independent-review/SKILL.md:8`. **Target:** describe round one as adversarial only, subsequent rounds as rotating lenses, and escalation as adversarial, matching `scripts/review-dispatch.py:339-350` and `.conclave/reviewers.toml:32-42`. Already tracked in D00 T04 §45.
+2. **out-of-scope:** Workflow numbering places completion before rounds despite correct execution instructions (`review-todo-section/SKILL.md:47,59`). **Target:** numbered steps and every cross-reference follow actual execution order. Already tracked in §45.
+3. **out-of-scope:** The completion template renders literal `\u00b7` (`review-todo-section/SKILL.md:107`). **Target:** copied stamps contain the intended separator and zero literal escapes. Already tracked in §45.
+
+Gap list
+
+1. **in-scope:** No unresolved gap found. The repair is complete for its scoped user need and meets the repository’s quality bar within that scope.
+2. **out-of-scope:** The three documented §45 wording defects remain; they do not reopen this repair.
+
+COMPLETION: complete
