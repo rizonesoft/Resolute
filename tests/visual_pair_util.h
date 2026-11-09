@@ -127,12 +127,23 @@ inline Spec ParseSpec(std::istream& in, const std::string& source) {
             continue;
         }
         r.text = f[10] == "text";
-        try {
-            r.maxEdge = std::stod(f[11]);
-            r.maxMoved = std::stod(f[12]);
-        } catch (...) {
-            fail(lineno, "region '" + r.name + "' has an unparsable tolerance");
-            continue;
+        {
+            bool badTolerance = false;
+            for (int i = 0; i < 2 && !badTolerance; ++i) {
+                try {
+                    size_t used = 0;
+                    const double v = std::stod(f[11 + i], &used);
+                    if (used != f[11 + i].size() || !std::isfinite(v) || v < 0) badTolerance = true;
+                    else if (i == 0) r.maxEdge = v;
+                    else r.maxMoved = v;
+                } catch (...) {
+                    badTolerance = true;
+                }
+            }
+            if (badTolerance) {
+                fail(lineno, "region '" + r.name + "' has an unparsable, non-finite, or negative tolerance");
+                continue;
+            }
         }
         if (f[13] != "check" && f[13] != "skip") {
             fail(lineno, "region '" + r.name + "' contrast must be check or skip");

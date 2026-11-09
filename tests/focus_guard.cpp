@@ -329,16 +329,30 @@ void WriteIntentFile(DWORD pid) {
 
 }  // namespace
 
+namespace {
+std::map<DWORD, HANDLE> g_failEvents;
+}
+
 std::vector<std::string> HookFailures(const std::vector<DWORD>& pids) {
     std::vector<std::string> out;
     for (DWORD pid : pids) {
-        const std::wstring mutexName = std::wstring(kFocusHookFailMutex) + std::to_wstring(pid);
-        if (HANDLE mutex = OpenMutexW(SYNCHRONIZE, FALSE, mutexName.c_str())) {
-            CloseHandle(mutex);
-            out.push_back("the focus hook in process " + std::to_string(pid) +
-                          " could not write its failure marker to either file destination (mutex failure): its records "
-                          "cannot be judged");
-            continue;
+        HANDLE event = nullptr;
+        auto held = g_failEvents.find(pid);
+        if (held != g_failEvents.end()) {
+            event = held->second;
+        } else {
+            const std::wstring eventName = std::wstring(kFocusHookFailEvent) + std::to_wstring(pid);
+            event = OpenEventW(SYNCHRONIZE, FALSE, eventName.c_str());
+        }
+        if (event) {
+            const bool signalled = WaitForSingleObject(event, 0) == WAIT_OBJECT_0;
+            if (held == g_failEvents.end()) CloseHandle(event);
+            if (signalled) {
+                out.push_back("the focus hook in process " + std::to_string(pid) +
+                              " could not write its failure marker to either file destination (event failure): its "
+                              "records cannot be judged");
+                continue;
+            }
         }
         std::wstring path = TempPathFor(kFocusHookFailPrefix, pid);
         if (GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES) {
@@ -379,6 +393,10 @@ void AdoptProcess(DWORD pid) {
     // process, created before adoption). D00 T02 section 12.
     SetEnvironmentVariableW(kFocusHookAdoptEnv, L"1");
     WriteIntentFile(pid);
+    {
+        const std::wstring eventName = std::wstring(kFocusHookFailEvent) + std::to_wstring(pid);
+        if (!g_failEvents.count(pid)) g_failEvents[pid] = CreateEventW(nullptr, TRUE, FALSE, eventName.c_str());
+    }
     // The hooks are in place before this returns: a case starts the process
     // suspended, adopts it, and only then lets it run.
     g_adoptOk = false;
@@ -486,6 +504,11 @@ public:
             ++g_violations;
         }
         for (DWORD pid : adoptedSnapshot) {
+            auto heldEvent = g_failEvents.find(pid);
+            if (heldEvent != g_failEvents.end()) {
+                CloseHandle(heldEvent->second);
+                g_failEvents.erase(heldEvent);
+            }
             DeleteFileW(TempPathFor(kFocusHookFailPrefix, pid).c_str());
             wchar_t cwd[MAX_PATH];
             if (GetCurrentDirectoryW(MAX_PATH, cwd))

@@ -115,7 +115,7 @@ TEST_CASE("A dropped event among delivered ones still marks the failure", "[focu
     CHECK(failures.size() == 1);
 }
 
-TEST_CASE("When both marker files are blocked the mutex carries the failure", "[focus-hook]") {
+TEST_CASE("When both marker files are blocked the event carries the failure", "[focus-hook]") {
     HookProc hook = LoadHook();
     REQUIRE(hook != nullptr);
     using ReleaseProc = void (*)();
@@ -147,5 +147,5 @@ TEST_CASE("When both marker files are blocked the mutex carries the failure", "[
     std::filesystem::remove(cwdBlock);
     SetEnvironmentVariableW(kFocusHookAdoptEnv, nullptr);
     REQUIRE(failures.size() == 1);
-    CHECK(failures[0].find("mutex") != std::string::npos);
+    CHECK(failures[0].find("event") != std::string::npos);
 }

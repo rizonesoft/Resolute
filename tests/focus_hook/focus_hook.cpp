@@ -65,14 +65,20 @@ void WriteFailureMarker(const wchar_t* kind) {
         lstrcatW(dir, L"\\");
         if (WriteMarkerFile(dir, kind)) return;
     }
+    // Third destination: the named event the guard created at adoption
+    // (or creates here when it did not), signalled and held so the guard
+    // can probe it at case end even after this process has exited: the
+    // guard's own handle keeps the event alive through child teardown.
     wchar_t name[96];
-    wsprintfW(name, L"%s%lu", kFocusHookFailMutex, GetCurrentProcessId());
-    g_failMutex = CreateMutexW(nullptr, TRUE, name);
+    wsprintfW(name, L"%s%lu", kFocusHookFailEvent, GetCurrentProcessId());
+    g_failMutex = OpenEventW(EVENT_MODIFY_STATE, FALSE, name);
+    if (!g_failMutex) g_failMutex = CreateEventW(nullptr, TRUE, FALSE, name);
+    if (g_failMutex) SetEvent(g_failMutex);
 }
 
 }  // namespace
 
-// Test support: releases the failure mutex so a drill that forced the
+// Test support: releases the failure event so a drill that forced the
 // third destination can clean up inside its own case.
 extern "C" __declspec(dllexport) void ResoluteFocusHookReleaseFailureMutex() {
     if (g_failMutex) {

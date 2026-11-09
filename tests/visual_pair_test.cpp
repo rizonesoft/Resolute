@@ -190,6 +190,8 @@ TEST_CASE("Malformed region specifications fail with file and line", "[visual-pa
     CHECK(!parse("region|a|||0|0|1|1|0|0|gadget|1|0.02|check\n").errors.empty());
     CHECK(!parse("region|a|||0|0|1|1|0|0|text|1|0.02|check\nregion|a|||0|0|1|1|0|0|text|1|0.02|check\n").errors.empty());
     CHECK(!parse("region|a|||0|0|1|1|-1|0|text|1|0.02|check\n").errors.empty());
+    CHECK(!parse("region|a|||0|0|1|1|0|0|text|nan|nan|check\n").errors.empty());
+    CHECK(!parse("region|a|||0|0|1|1|0|0|text|1|0.02junk|check\n").errors.empty());
     const auto missing = visualpair::LoadSpecFrom("no-such-spec-file.txt");
     REQUIRE(!missing.errors.empty());
     CHECK(missing.errors[0].find("unreadable") != std::string::npos);
