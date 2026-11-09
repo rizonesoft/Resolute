@@ -1133,26 +1133,20 @@ def self_test() -> int:
                     msg = str(exc)
                     assert "could not be saved" in msg, msg
                     assert "BoomKey" in msg, msg
-        # Earlier warnings must not displace the failing diagnostic.
-        failing = subprocess.CompletedProcess(
-            args=[],
-            returncode=1,
-            stdout="a.cpp:1:1: warning: w [bugprone-foo]\n" * 40,
-            stderr="b.cpp:2:1: fatal error: later.hpp file not found\n",
-        )
-        globals()["write_atomic"] = lambda *a, **k: (_ for _ in ()).throw(
-            Refusal("could not persist (stub)")
-        )
-        try:
+                    assert "diagnostics in " not in msg, msg
+            # Earlier warnings must not displace the failing diagnostic.
+            failing = subprocess.CompletedProcess(
+                args=[],
+                returncode=1,
+                stdout="a.cpp:1:1: warning: w [bugprone-foo]\n" * 40,
+                stderr="b.cpp:2:1: fatal error: later.hpp file not found\n",
+            )
             with _mock.patch("subprocess.run", return_value=failing):
                 try:
                     run_analysis(tmp, Path(sys.executable), {"root": db}, tmp / "logs" / "g.log")
                     raise AssertionError("failing analyzer passed")
                 except Refusal as exc:
                     assert "later.hpp" in str(exc), str(exc)
-        finally:
-            globals()["write_atomic"] = real_atomic
-                    assert "diagnostics in " not in msg, msg
         finally:
             globals()["write_atomic"] = real_atomic
 
