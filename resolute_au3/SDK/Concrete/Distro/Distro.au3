@@ -2569,7 +2569,10 @@ Func _DescriptorRelativePath($sBase, $sFull)
 	; no root with $sBase are returned unchanged.
 	Local $aBase = StringSplit(StringRegExpReplace($sBase, "\\+$", ""), "\")
 	Local $aFull = StringSplit(StringRegExpReplace($sFull, "\\+$", ""), "\")
-	If $aBase[0] = 0 Or $aFull[0] = 0 Or $aBase[1] <> $aFull[1] Then Return $sFull
+	If $aBase[0] = 0 Or $aFull[0] = 0 Or $aBase[1] <> $aFull[1] Then
+		ConsoleWrite("Distro: no descriptor-relative form for " & $sFull & " (different root); absolute path kept." & @CRLF)
+		Return $sFull
+	EndIf
 	Local $iCommon = 1
 	While $iCommon < $aBase[0] And $iCommon < $aFull[0] And $aBase[$iCommon + 1] = $aFull[$iCommon + 1]
 		$iCommon += 1
@@ -2587,7 +2590,7 @@ EndFunc   ;==>_DescriptorRelativePath
 
 Func _ResolveDescriptorPath($sBase, $sValue)
 	; Descriptor-relative values resolve against the descriptor directory.
-	If $sValue = "" Or $sValue = "0" Or StringRegExp($sValue, "^[A-Za-z]:") Then Return $sValue
+	If $sValue = "" Or $sValue = "0" Or StringRegExp($sValue, "^[A-Za-z]:") Or StringLeft($sValue, 1) = "\" Then Return $sValue
 	Return _PathFull($sBase & $sValue)
 EndFunc   ;==>_ResolveDescriptorPath
 
