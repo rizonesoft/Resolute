@@ -1486,14 +1486,14 @@ Func _PopulateSolutions()
 
 				; Local $sSolCompany = StringRegExpReplace($sSolCompTemp, "([&copy;|\(c\)|Copyright][\s][0-9]{4}[\s])", "")
 
-				IniWrite($sSolIniPath, "Environment", "ScriptPath", $sAu3ScriptIn)
+				IniWrite($sSolIniPath, "Environment", "ScriptPath", _DescriptorRelativePath($sSolutionBase, $sAu3ScriptIn))
 				IniWrite($sSolIniPath, "Environment", "Company", $sSolCompany)
 				IniWrite($sSolIniPath, "Environment", "CompanyURL", $sSolCompURL)
 				IniWrite($sSolIniPath, "Environment", "Name", $sSolName)
 				IniWrite($sSolIniPath, "Environment", "ShortName", $sSolShortName)
 				IniWrite($sSolIniPath, "Environment", "Description", $sSolProgDesc)
 				IniWrite($sSolIniPath, "Environment", "Type", $sSolType)
-				IniWrite($sSolIniPath, "Environment", "Icon", $sSolIcon)
+				IniWrite($sSolIniPath, "Environment", "Icon", _DescriptorRelativePath($sSolutionBase, $sSolIcon))
 				IniWrite($sSolIniPath, "Environment", "Version", $sSolVersion)
 				IniWrite($sSolIniPath, "Environment", "VersionMajor", $iSolMajor)
 				IniWrite($sSolIniPath, "Environment", "VersionMaintenance", $iSolMaintenance)
@@ -1503,16 +1503,16 @@ Func _PopulateSolutions()
 				IniWrite($sSolIniPath, "Environment", "CompileBoth", $sCompileBoth)
 				IniWrite($sSolIniPath, "Environment", "OutFile", StringReplace($sOutFile, "..\..\..\Resolute\", ""))
 				IniWrite($sSolIniPath, "Environment", "OutFileX64", StringReplace($sOutFileX64, "..\..\..\Resolute\", ""))
-				IniWrite($sSolIniPath, "Environment", "OutFilePath", $sOutFilePath)
-				IniWrite($sSolIniPath, "Environment", "OutFileX64Path", $sOutFileX64Path)
+				IniWrite($sSolIniPath, "Environment", "OutFilePath", _DescriptorRelativePath($sSolutionBase, $sOutFilePath))
+				IniWrite($sSolIniPath, "Environment", "OutFileX64Path", _DescriptorRelativePath($sSolutionBase, $sOutFileX64Path))
 				IniWrite($sSolIniPath, "Environment", "InstallScriptPath", 0)
 				IniWrite($sSolIniPath, "Environment", "InstallOutputPath", 0)
 				IniWrite($sSolIniPath, "Environment", "InstallSize", 0)
-				IniWrite($sSolIniPath, "Environment", "DistributionPath", $sDistributionPath)
+				IniWrite($sSolIniPath, "Environment", "DistributionPath", _DescriptorRelativePath($sSolutionBase, $sDistributionPath))
 				IniWrite($sSolIniPath, "Environment", "DistributionName", $sDistributionName)
-				IniWrite($sSolIniPath, "Environment", "FullDistributionPath", $sFullDistributionPath)
+				IniWrite($sSolIniPath, "Environment", "FullDistributionPath", _DescriptorRelativePath($sSolutionBase, $sFullDistributionPath))
 				IniWrite($sSolIniPath, "Environment", "DistroSourceName", $sDistroSourceName)
-				IniWrite($sSolIniPath, "Environment", "DistroSourceFullPath", $sDistroSourceFullPath)
+				IniWrite($sSolIniPath, "Environment", "DistroSourceFullPath", _DescriptorRelativePath($sSolutionBase, $sDistroSourceFullPath))
 
 			WEnd
 
@@ -1847,6 +1847,14 @@ Func _ProcessSelectedSolution($iAction)
 			Local $sSolutionIniPath = $sRangeSplit[2]
 
 			$g_aEnvironment = IniReadSection($sSolutionIniPath, "Environment")
+
+			Local $sDescriptorBase = _FileEx_PathSplit($sSolutionIniPath, 2)
+			For $iEnv = 1 To $g_aEnvironment[0][0]
+				Switch $g_aEnvironment[$iEnv][0]
+					Case "ScriptPath", "Icon", "OutFilePath", "OutFileX64Path", "DistributionPath", "FullDistributionPath", "DistroSourceFullPath"
+						$g_aEnvironment[$iEnv][1] = _ResolveDescriptorPath($sDescriptorBase, $g_aEnvironment[$iEnv][1])
+				EndSwitch
+			Next
 
 			If Not @error Then
 
@@ -2550,6 +2558,35 @@ Func _ReplacePathVariables($sInputPath, $sPath)
 	Return $sReturnPath
 
 EndFunc
+
+
+Func _DescriptorRelativePath($sBase, $sFull)
+	; The path of $sFull relative to the descriptor directory $sBase,
+	; with .. segments for anything outside it. Absolute paths that share
+	; no root with $sBase are returned unchanged.
+	Local $aBase = StringSplit(StringRegExpReplace($sBase, "\\+$", ""), "\")
+	Local $aFull = StringSplit(StringRegExpReplace($sFull, "\\+$", ""), "\")
+	If $aBase[0] = 0 Or $aFull[0] = 0 Or $aBase[1] <> $aFull[1] Then Return $sFull
+	Local $iCommon = 1
+	While $iCommon < $aBase[0] And $iCommon < $aFull[0] And $aBase[$iCommon + 1] = $aFull[$iCommon + 1]
+		$iCommon += 1
+	WEnd
+	Local $sRelative = ""
+	For $i = $iCommon + 1 To $aBase[0]
+		$sRelative &= "..\"
+	Next
+	For $i = $iCommon + 1 To $aFull[0]
+		$sRelative &= $aFull[$i] & "\"
+	Next
+	Return StringRegExpReplace($sRelative, "\\+$", "")
+EndFunc   ;==>_DescriptorRelativePath
+
+
+Func _ResolveDescriptorPath($sBase, $sValue)
+	; Descriptor-relative values resolve against the descriptor directory.
+	If $sValue = "" Or $sValue = "0" Or StringRegExp($sValue, "^[A-Za-z]:") Then Return $sValue
+	Return _PathFull($sBase & $sValue)
+EndFunc   ;==>_ResolveDescriptorPath
 
 
 Func _CleanDestinationPath($sPath)

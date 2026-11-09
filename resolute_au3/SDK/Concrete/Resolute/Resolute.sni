@@ -28,14 +28,14 @@ File=%RootDir%\Language\Resolute\en.lng
 [Sources]
 
 [Environment]
-ScriptPath=R:\Workspace\Resolute\SDK\Concrete\Resolute\Resolute.au3
+ScriptPath=Resolute.au3
 Company=Rizonesoft
 CompanyURL=https://rizonesoft.com
 Name=Resolute Power Tools
 ShortName=Resolute
 Description=Resolute Power Tools
 Type=N
-Icon=R:\Workspace\Resolute\SDK\Resources\Icons\Resolute.ico
+Icon=..\..\Resources\Icons\Resolute.ico
 Version=23.2.0.857
 VersionMajor=23
 VersionMaintenance=0
@@ -45,13 +45,13 @@ UseX64=Y
 CompileBoth=Y
 OutFile=..\..\..\Resolute.exe
 OutFileX64=..\..\..\Resolute_X64.exe
-OutFilePath=R:\Workspace\Resolute\Resolute.exe
-OutFileX64Path=R:\Workspace\Resolute\Resolute_X64.exe
+OutFilePath=..\..\..\Resolute.exe
+OutFileX64Path=..\..\..\Resolute_X64.exe
 InstallScriptPath=0
 InstallOutputPath=0
 InstallSize=0
-DistributionPath=R:\Workspace\Resolute\SDK\Concrete\Resolute\Distribution\857
+DistributionPath=Distribution\857
 DistributionName=Resolute_857
-FullDistributionPath=R:\Workspace\Resolute\SDK\Concrete\Resolute\Distribution\857\Resolute_857
+FullDistributionPath=Distribution\857\Resolute_857
 DistroSourceName=Resolute_857_Source
-DistroSourceFullPath=R:\Workspace\Resolute\SDK\Concrete\Resolute\Distribution\857\Resolute_857_Source
+DistroSourceFullPath=Distribution\857\Resolute_857_Source
