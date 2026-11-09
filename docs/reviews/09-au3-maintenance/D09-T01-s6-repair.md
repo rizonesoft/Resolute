@@ -54,3 +54,4 @@ OVERALL: approve
 1. **missing-in-scope:** `docs/captures/d09-t01-s6-updateurls/results.txt:16` claims a successful run with the descriptor key absent, but no separately identified output or run record substantiates that case. Line 22 also claims no `.ru` was written, while `refusal-log.txt` shows only the diagnostic, without an output-existence check. Retain those readbacks or narrow the claims. The two generated URLs, original-producer failure, and preserved descriptor key order are substantiated.
 
 COMPLETION: gaps
+- Implemented: the repair-completion readback gap in 4a596cd7, reviewed on D09-T01-s6-repair2 (COMPLETION: complete).
