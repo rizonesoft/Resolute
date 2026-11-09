@@ -81,7 +81,12 @@ EXCEPTION_RE = re.compile(
 def parse_profile(text: str):
     clauses, exceptions = [], []
     in_exceptions = False
-    for line in text.splitlines():
+    for raw_line in text.splitlines():
+        # The governing validator (profile-check.py) strips cells, so
+        # an indented row is a clause there; dropping it here would
+        # silently un-evaluate it (review round 3). Parse the same
+        # grammar: leading whitespace is not an opt-out.
+        line = raw_line.lstrip()
         if line.startswith("## "):
             in_exceptions = line.strip().lower() == "## exceptions"
             continue
@@ -112,6 +117,10 @@ def parse_profile(text: str):
                 )
     if not clauses:
         raise Refusal("profile carries no clause rows this parser recognizes")
+    ids = [c["id"] for c in clauses]
+    dupes = sorted({i for i in ids if ids.count(i) > 1})
+    if dupes:
+        raise Refusal(f"profile carries duplicate clause rows: {', '.join(dupes)}")
     return clauses, exceptions
 
 
@@ -244,10 +253,16 @@ def pe_imports(data: bytes):
 
         sections = []
         sec_off = opt + opt_size
+        if sec_off + num_sections * 40 > len(data):
+            raise ValueError("section table truncated")
         for i in range(num_sections):
             vsize, vaddr, rsize, rptr = struct.unpack_from(
                 "<IIII", data, sec_off + i * 40 + 8
             )
+            if rsize and rptr + rsize > len(data):
+                raise ValueError(
+                    f"section {i} raw data [{rptr:#x}, {rptr + rsize:#x}) beyond EOF"
+                )
             sections.append((vaddr, max(vsize, rsize), rptr))
 
         def rva_to_off(rva):
@@ -683,12 +698,20 @@ def repro_check(root: Path) -> int:
         # deterministic (review round 1).
         for exe in exes:
             exe.unlink(missing_ok=True)
-        for tree in (root / "build" / "release", root / "build" / "debug"):
-            shutil.rmtree(tree, ignore_errors=True)
+        trees = [root / "build" / "release", root / "build" / "debug"]
         ext = root / "extensions"
         if ext.is_dir():
-            for tool_dir in ext.iterdir():
-                shutil.rmtree(tool_dir / "build", ignore_errors=True)
+            trees += [d / "build" for d in ext.iterdir() if d.is_dir()]
+        for tree in trees:
+            shutil.rmtree(tree, ignore_errors=True)
+            if tree.exists():
+                # A cleanup that silently failed would let both
+                # builds reuse the same products and still report
+                # clean-build reproducibility (review round 3).
+                raise Refusal(
+                    f"repro check could not remove build tree {tree}; "
+                    "a reused product must not certify a clean build"
+                )
         proc = subprocess.run(
             ["pwsh", "-NoProfile", "-File", str(root / "scripts" / "build.ps1"),
              "-All", "-Config", "Release"],
@@ -939,6 +962,30 @@ def self_test() -> int:
         refuses(lambda: run(tmp, log, tools, prof, status, result), "duplicate exception")
 
     case("invalid exception rows refuse instead of waiving", invalid_exceptions_refuse)
+
+    def indented_clause_still_evaluates():
+        prof = PROFILE.replace("| C24 |", "  | C24 |")
+        tmp, tools, log, status, result = fixture(profile=prof)
+        refuses(
+            lambda: run(tmp, tmp / "none.log", tools, prof, status, result),
+            "no tidy log beside its result record",
+        )
+
+    case("indented clause row cannot opt out of evaluation", indented_clause_still_evaluates)
+
+    def section_beyond_eof():
+        data = bytearray(make_pe(["KERNEL32.dll"]))
+        pe_off = struct.unpack_from("<I", bytes(data), 0x3C)[0]
+        opt_size = struct.unpack_from("<H", bytes(data), pe_off + 20)[0]
+        sec = pe_off + 24 + opt_size
+        struct.pack_into("<I", data, sec + 20, len(data) + 0x1000)
+        try:
+            pe_imports(bytes(data))
+            raise AssertionError("section beyond EOF passed")
+        except Refusal as exc:
+            assert "beyond EOF" in str(exc), exc
+
+    case("section raw data beyond EOF refuses", section_beyond_eof)
 
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)
