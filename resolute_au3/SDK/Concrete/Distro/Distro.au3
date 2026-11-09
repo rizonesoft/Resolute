@@ -1994,9 +1994,11 @@ Func _BuildSelected($sSolutionIniPath, $iRow, $iCol)
 
 			EndIf
 
-		Else
+		ElseIf Not FileExists($g_aAutoIt3[9]) Then
 			_Logging_EditWrite(_Logging_SetLevel(StringFormat($g_aLangMessages2[8], $g_aAutoIt3[9]), "ERROR"))
 			_Logging_EditWrite($g_aLangMessages2[9])
+		Else
+			_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s': the AutoIt3Wrapper script was not found at '%s'.", $sReleaseName, $g_cAutoItWrapper), "ERROR"))
 		EndIf
 
 	Else
