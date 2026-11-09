@@ -419,14 +419,27 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
         # by hand to see the error that just failed them (round 2).
         # Written atomically like the baseline: a direct write would
         # follow a planted link at the log path and truncate its
-        # target (repair2 round 1). Best-effort: a flush failure never
-        # masks the refusal that follows it.
-        if log_path is not None:
-            try:
-                Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-                write_atomic(Path(log_path), "".join(log_lines))
-            except (OSError, Refusal):
-                pass
+        # target (repair2 round 1). Returns None on success, else a
+        # one-line reason the refusal can quote: pointing at a log
+        # that was never saved is a refusal that lies (repair2
+        # completion gap 2).
+        if log_path is None:
+            return "no log path set"
+        try:
+            Path(log_path).parent.mkdir(parents=True, exist_ok=True)
+            write_atomic(Path(log_path), "".join(log_lines))
+            return None
+        except (OSError, Refusal) as exc:
+            return str(exc)
+
+    def diagnostics_where(flush_error):
+        if flush_error is None:
+            return f"diagnostics in {log_path}"
+        excerpt = " ".join("".join(log_lines).split())[:240]
+        return (
+            f"diagnostics could not be saved to {log_path} ({flush_error}); "
+            f"first output: {excerpt}"
+        )
 
     # Every expected database is checked before any analysis runs: a
     # missing extension database must refuse in seconds, not after the
@@ -462,15 +475,14 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             )
             out = (proc.stdout or "") + (proc.stderr or "")
             log_lines.append(out)
-            where = f"diagnostics in {log_path}" if log_path is not None else "diagnostics discarded (no log path set)"
             if proc.returncode != 0:
-                flush_log()
+                where = diagnostics_where(flush_log())
                 raise Refusal(
                     f"target '{name}': clang-tidy exited {proc.returncode} on {tu}; "
                     f"the finding count is not evidence until analysis completes; {where}"
                 )
             if ERROR_RE.search(out):
-                flush_log()
+                where = diagnostics_where(flush_log())
                 raise Refusal(
                     f"target '{name}': error diagnostic while analysing {tu}; "
                     f"the finding count is not evidence until analysis completes; {where}"
@@ -1085,6 +1097,35 @@ def self_test() -> int:
         assert log.read_text().strip(), "diagnostics not written"
 
     case("log flush cannot truncate a linked baseline", log_flush_cannot_truncate_baseline)
+
+    def log_failure_is_reported_not_promised():
+        from unittest import mock as _mock
+
+        tmp = mkdtemp()
+        db = tmp / "build" / "release" / "compile_commands.json"
+        db.parent.mkdir(parents=True)
+        db.write_text(json.dumps([{"file": "a.cpp", "directory": str(tmp), "command": "cc a.cpp"}]))
+        fake = subprocess.CompletedProcess(
+            args=[], returncode=1, stdout="", stderr="clang-tidy: unknown key BoomKey\n"
+        )
+        real_atomic = write_atomic
+        globals()["write_atomic"] = lambda *a, **k: (_ for _ in ()).throw(
+            Refusal("could not persist (stub)")
+        )
+        try:
+            with _mock.patch("subprocess.run", return_value=fake):
+                try:
+                    run_analysis(tmp, Path(sys.executable), {"root": db}, tmp / "logs" / "g.log")
+                    raise AssertionError("failing analyzer passed")
+                except Refusal as exc:
+                    msg = str(exc)
+                    assert "could not be saved" in msg, msg
+                    assert "BoomKey" in msg, msg
+                    assert "diagnostics in " not in msg, msg
+        finally:
+            globals()["write_atomic"] = real_atomic
+
+    case("log persistence failure is reported, never promised", log_failure_is_reported_not_promised)
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)

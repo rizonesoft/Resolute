@@ -95,7 +95,8 @@ function Invoke-Gate {
         [scriptblock]$Command,
         [string]$LogName,
         [switch]$Tolerate,       # report and do not fail the run
-        [string]$TolerateWhen    # the condition that makes it tolerable
+        [string]$TolerateWhen,   # the condition that makes it tolerable
+        [string]$DetailPattern   # log lines matching this become the gate's Detail
     )
 
     $log = Join-Path $LogDir "$LogName.log"
@@ -125,10 +126,20 @@ function Invoke-Gate {
     }
     $clock.Stop()
 
+    $detail = ''
+    if ($DetailPattern) {
+        # A passing gate that changed something (a rewritten baseline)
+        # must say so where the developer is looking, not only in its
+        # log: an invisible baseline rewrite is a change nobody commits
+        # on purpose (D07 T01 section 2, repair2 completion gap 1).
+        $detail = @((Get-Content $log -ErrorAction SilentlyContinue) |
+            Where-Object { $_ -match $DetailPattern } |
+            ForEach-Object { ($_ -replace '^tidy-ratchet: ', '').Trim() }) -join ' | '
+    }
     [void]$results.Add([pscustomobject]@{
         Name = $Name; Status = if ($code -eq 0) { 'ok' } else { 'FAILED' }
         Seconds = [math]::Round($clock.Elapsed.TotalSeconds, 1)
-        Log = $log; Detail = ''; Failed = ($code -ne 0)
+        Log = $log; Detail = $detail; Failed = ($code -ne 0)
     })
 }
 
@@ -160,7 +171,7 @@ if (-not $SkipBuild) {
 # lesson from D00 T01 section 3).
 
 if (-not $SkipBuild) {
-    Invoke-Gate -Name 'tidy ratchet' -LogName 'gate-tidy-ratchet' -Command {
+    Invoke-Gate -Name 'tidy ratchet' -LogName 'gate-tidy-ratchet' -DetailPattern '^tidy-ratchet: ' -Command {
         & $Python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --log (Join-Path $LogDir 'gate-tidy.log')
     }
 }
