@@ -28,6 +28,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -509,6 +510,14 @@ def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
 def self_test() -> int:
     failures = []
     cases = 0
+    scratch_dirs = []
+
+    def mkdtemp() -> Path:
+        # Tracked so every fixture tree is removed when the suite ends,
+        # pass or fail: check-all runs this suite on every invocation.
+        d = Path(tempfile.mkdtemp())
+        scratch_dirs.append(d)
+        return d
 
     def case(name, fn):
         nonlocal cases
@@ -619,7 +628,7 @@ def self_test() -> int:
     case("rewrite down produces a valid baseline", rewrite)
 
     def resource_tree(files):
-        tmp = Path(tempfile.mkdtemp())
+        tmp = mkdtemp()
         for rel, content in files.items():
             p = tmp / rel
             p.parent.mkdir(parents=True, exist_ok=True)
@@ -662,7 +671,7 @@ def self_test() -> int:
     case("legal reuse passes (class, manifest, other executable)", legal_reuse)
 
     def git_base():
-        tmp = Path(tempfile.mkdtemp())
+        tmp = mkdtemp()
         (tmp / "todo").mkdir()
         base_file = tmp / "todo" / ".tidy-baseline"
         base_file.write_text(good)
@@ -695,7 +704,7 @@ def self_test() -> int:
     case("unreasoned raise refused uncommitted and committed-ahead", git_base)
 
     def upfront_databases():
-        tmp = Path(tempfile.mkdtemp())
+        tmp = mkdtemp()
         db = tmp / "build" / "release" / "compile_commands.json"
         db.parent.mkdir(parents=True)
         db.write_text(json.dumps([{"file": "a.cpp", "directory": str(tmp), "command": "cc a.cpp"}]))
@@ -748,7 +757,7 @@ def self_test() -> int:
     )
 
     def failed_analysis_keeps_its_log():
-        tmp = Path(tempfile.mkdtemp())
+        tmp = mkdtemp()
         db = tmp / "build" / "release" / "compile_commands.json"
         db.parent.mkdir(parents=True)
         db.write_text(json.dumps([{"file": "a.cpp", "directory": str(tmp), "command": "cc a.cpp"}]))
@@ -763,6 +772,8 @@ def self_test() -> int:
 
     case("failed analysis persists its diagnostics log", failed_analysis_keeps_its_log)
 
+    for d in scratch_dirs:
+        shutil.rmtree(d, ignore_errors=True)
     if failures:
         for f in failures:
             print(f"tidy-ratchet self-test FAIL: {f}")
