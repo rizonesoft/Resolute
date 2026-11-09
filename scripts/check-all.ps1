@@ -188,7 +188,7 @@ Invoke-Gate -Name 'ratchet self-test' -LogName 'gate-ratchet-selftest' -Command 
 # not-yet-evaluable in the matrix, never a silent pass.
 
 if (-not $SkipBuild) {
-    Invoke-Gate -Name 'conformance check' -LogName 'gate-conformance' -DetailPattern '^conformance: \d+ clause' -Command {
+    Invoke-Gate -Name 'conformance check' -LogName 'gate-conformance' -DetailPattern '^conformance: \d+ clause|^conformance detail: .*\(advisory FAIL' -Command {
         & $Python (Join-Path $RepoRoot 'scripts\conformance-check.py') --tidy-log (Join-Path $LogDir 'gate-tidy.log') --tidy-result (Join-Path $LogDir 'gate-tidy-result.json')
     }
 }

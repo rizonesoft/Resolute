@@ -152,3 +152,5 @@ The candidate has **in-scope gaps in reporting and regression coverage**. HEAD m
 3. **Out of scope, nonblocking:** avoid repeated common-evidence validation.
 
 COMPLETION: gaps
+
+Settled 2026-11-09: completion gaps fixed (advisory failures named in the conformance summary line check-all retains, gate DetailPattern also surfaces advisory FAIL details, wrapper pinned by scripts/tests/test_check_all_patterns.py; moved-owner destination now tested through real resolver-to-matrix rendering). Out-of-scope repeated-validation optimization declined again as reviewer-marked nonblocking. This record closed; continuation on D07-T01-s3-repair3.md.

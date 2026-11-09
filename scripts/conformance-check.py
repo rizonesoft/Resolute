@@ -653,6 +653,7 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tid
     names = sorted(tools)
     cells = {}
     details = []
+    advisory_fails = []
     owner_state_cache = {}
     moved_destinations = {}
     if status_fn is None:
@@ -688,6 +689,8 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tid
                         details.append(
                             f"{clause['id']} {name}: NYE (advisory {a_state}: {a_evidence})"
                         )
+                        if a_state == "FAIL":
+                            advisory_fails.append(f"{clause['id']} {name}")
                     except Refusal:
                         pass
                 continue
@@ -737,10 +740,20 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tid
         raise Refusal("; ".join(problems))
     fails = sum(1 for v in cells.values() if v == "FAIL")
     nyes = sum(1 for v in cells.values() if v == "NYE")
-    print(
+    summary = (
         f"conformance: {len(clauses)} clause(s) x {len(names)} tool(s), "
         f"{fails} failing, {nyes} not yet evaluable"
     )
+    if advisory_fails:
+        # Advisory failures never fail the gate while their owner is
+        # open, but they must reach the developer: check-all.ps1
+        # retains this summary line as the gate detail, so the
+        # failing advisories are named here (repair2 completion).
+        summary += (
+            f", {len(advisory_fails)} advisory failing (owner open): "
+            + ", ".join(advisory_fails)
+        )
+    print(summary)
     return 0
 
 
@@ -1212,6 +1225,7 @@ def self_test() -> int:
         rc, out = _capture(lambda: run(tmp, log, tools, PROFILE_C22, status, result))
         assert rc == 0, f"advisory FAIL failed the gate: {out}"
         assert "C22 ToolA: NYE (advisory FAIL" in out, out
+        assert "1 advisory failing (owner open): C22 ToolA" in out, out
 
     case("open-owner advisory reports PASS/FAIL while the cell stays NYE", advisory_open_owner_reports_but_stays_nye)
 
@@ -1229,6 +1243,29 @@ def self_test() -> int:
         assert "ELSEWHERE.md" in cache["D01 T01 \u00a71|moved"], cache
 
     case("moved owner destination parsed from resolver output", moved_destination_parsed)
+
+    def moved_destination_rendered_in_matrix():
+        # Through the real resolver path: a stub todo-graph in the
+        # fixture root answers resolve with the graph's exit codes,
+        # and run() with no status override must render the moved
+        # destination in the matrix owner column.
+        tmp, tools, log, status, result = fixture(profile=PROFILE_C22)
+        (tmp / "scripts" / "todo-graph.py").write_text(
+            "import sys\n"
+            "ref = sys.argv[-1]\n"
+            "if ref.startswith('D01'):\n"
+            "    print('moved      2026-11-09 to ELSEWHERE.md -- note'); sys.exit(5)\n"
+            "if ref.startswith('D00'):\n"
+            "    sys.exit(3)\n"
+            "sys.exit(0)\n"
+        )
+        rc, out = _capture(lambda: run(tmp, log, tools, PROFILE_C22, None, result))
+        assert rc == 0, out
+        row = next(ln for ln in out.splitlines() if ln.startswith("| C22 |"))
+        assert "ELSEWHERE.md" in row, row
+        assert "| NYE |" in row, row
+
+    case("moved owner destination reaches the rendered matrix", moved_destination_rendered_in_matrix)
 
     def owner_resolution_uses_running_interpreter():
         seen = {}
