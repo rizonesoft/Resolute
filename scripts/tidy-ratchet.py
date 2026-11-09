@@ -218,16 +218,23 @@ def check_raise_guard(current_text: str, base_text, expected_targets) -> list:
     return named
 
 
-def rewrite_baseline(text: str, measured_count: int, measured_targets: dict) -> str:
+def rewrite_baseline(text: str, measured_count: int, measured_targets: dict, base_text=None) -> str:
     """Return the baseline text with counts rewritten down to measured.
 
     A '# Raised' line whose <new> was the value just rewritten down is
     adjusted to the measured value: an authorized raise to 177 that
     measurement then writes down to 173 must still authorize 173 on
     the next unchanged run, or the rewrite produces a baseline its
-    own guard refuses (completion review gap 1). The reason text is
-    untouched; only the ceiling it recorded follows the measurement.
+    own guard refuses (completion review gap 1). Only lines that are
+    NEW against the base revision are adjusted: a historical line
+    already committed at base is an audit record of a past decision
+    and stays byte-identical, date and reason included (repair
+    completion gap 1). Without a base, no line is adjusted.
     """
+    base_lines = (
+        {line for _, _, _, line in raised_lines(base_text)} if base_text else set()
+    )
+    no_base = base_text is None
     current = parse_baseline_lenient(text)
     ceilings = {"total": (current["count"], measured_count)}
     for name, val in current["targets"].items():
@@ -244,7 +251,7 @@ def rewrite_baseline(text: str, measured_count: int, measured_targets: dict) -> 
             out.append(f"target {m.group(1)}: {measured_targets[m.group(1)]}")
             continue
         m = RAISED_RE.match(t)
-        if m and m.group("target") in ceilings:
+        if m and m.group("target") in ceilings and t not in base_lines and not no_base:
             old_ceiling, measured = ceilings[m.group("target")]
             if int(m.group("new")) == old_ceiling and measured < old_ceiling:
                 # Replace the matched numeric span itself: the grammar
@@ -508,10 +515,15 @@ def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
     current_text = baseline_path.read_text()
     baseline = parse_baseline(current_text, names)
 
+    if log_path is None:
+        # Standalone invocation keeps its diagnostics too: without a
+        # log, an analyzer failure's actual error text is discarded
+        # and only the generic refusal survives (repair completion
+        # gap 2). Same path the combined gate passes explicitly.
+        log_path = root / "build" / "logs" / "gate-tidy.log"
     base_rev = default_base(root, base_override)
-    named_raises = check_raise_guard(
-        current_text, baseline_at_revision(root, base_rev), names
-    )
+    base_text = baseline_at_revision(root, base_rev)
+    named_raises = check_raise_guard(current_text, base_text, names)
     for line in named_raises:
         print(f"tidy-ratchet: authorized raise vs {base_rev}: {line}")
 
@@ -553,7 +565,7 @@ def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
         measured_targets[n] < baseline["targets"][n] for n in names
     )
     if dropped:
-        new_text = rewrite_baseline(current_text, measured_count, measured_targets)
+        new_text = rewrite_baseline(current_text, measured_count, measured_targets, base_text)
         write_atomic(baseline_path, new_text)
         print(
             f"tidy-ratchet: REWRITTEN DOWN total {baseline['count']} -> {measured_count}, "
@@ -931,7 +943,7 @@ def self_test() -> int:
                 f"# Raised root {arrow} on 2026-11-09: wider coverage\n"
                 "count: 9\ntarget root: 9\n"
             )
-            out = rewrite_baseline(text, 7, {"root": 7})
+            out = rewrite_baseline(text, 7, {"root": 7}, "count: 5\ntarget root: 5\n")
             assert "9 on 2026" not in out, (arrow, out)
             named = check_raise_guard(out, "count: 5\ntarget root: 5\n", ["root"])
             assert len(named) == 2, (arrow, out, named)
@@ -972,6 +984,59 @@ def self_test() -> int:
             refuses(lambda: write_atomic(dest, "new\n"), "readback mismatch")
 
     case("persistence failures refuse and leave the original intact", persistence_failures)
+
+    def historical_raise_lines_survive():
+        base = (
+            "# Raised total 103 -> 169 on 2026-09-17: clang 23 new and widened checks\n"
+            "# Raised root 59 -> 122 on 2026-09-17: clang 23 new and widened checks\n"
+            "count: 169\ntarget Ext: 47\ntarget root: 122\n"
+        )
+        out = rewrite_baseline(base, 168, {"Ext": 47, "root": 121}, base)
+        assert "# Raised total 103 -> 169 on 2026-09-17" in out, out
+        assert "# Raised root 59 -> 122 on 2026-09-17" in out, out
+        assert "count: 168" in out and "target root: 121" in out, out
+
+        fresh = (
+            "# Raised total 169 -> 177 on 2026-11-09: wider coverage\n"
+            "# Raised root 122 -> 130 on 2026-11-09: wider coverage\n"
+            "count: 177\ntarget Ext: 47\ntarget root: 130\n"
+        )
+        out = rewrite_baseline(fresh, 173, {"Ext": 47, "root": 126}, base)
+        assert "# Raised total 169 -> 173" in out, out
+        assert "# Raised root 122 -> 126" in out, out
+
+    case("historical Raised lines stay byte-identical on rewrite", historical_raise_lines_survive)
+
+    def standalone_failure_keeps_diagnostics():
+        tmp = mkdtemp()
+        (tmp / "todo").mkdir()
+        (tmp / "src").mkdir()
+        (tmp / "src" / "a.rc").write_text('1 ICON "i.ico"\n')
+        for rel in ("build/release", "extensions/Ext/build/Release"):
+            d = tmp / rel
+            d.mkdir(parents=True)
+            (d / "compile_commands.json").write_text(
+                json.dumps([{"file": "a.cpp", "directory": str(tmp), "command": "cc a.cpp"}])
+            )
+        baseline = tmp / "todo" / ".tidy-baseline"
+        baseline.write_text("count: 0\ntarget Ext: 0\ntarget root: 0\n")
+        env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1")
+        for args in (
+            ["git", "init", "-q", "-b", "master"],
+            ["git", "config", "user.email", "t@example.invalid"],
+            ["git", "config", "user.name", "t"],
+            ["git", "add", "."],
+            ["git", "commit", "-qm", "base"],
+            ["git", "update-ref", "refs/remotes/origin/master", "HEAD"],
+        ):
+            subprocess.run(args, cwd=tmp, check=True, capture_output=True, env=env)
+        refuses(
+            lambda: run(tmp, Path(sys.executable), None, None), "clang-tidy exited"
+        )
+        log = tmp / "build" / "logs" / "gate-tidy.log"
+        assert log.is_file() and log.read_text().strip(), "standalone run discarded diagnostics"
+
+    case("standalone analyzer failure keeps its diagnostics log", standalone_failure_keeps_diagnostics)
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
