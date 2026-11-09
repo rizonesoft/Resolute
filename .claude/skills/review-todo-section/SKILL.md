@@ -35,7 +35,7 @@ Name the candidate: the implementation commit, or the commit range (`<BASE_SHA>.
 
 ### 2. Self-review
 
-Work the three questions across the diff and its blast radius. You may also run the read-only `delegate-check` subagent as self-review input (never as a lens verdict). Fix what you find, then re-ask them. Look specifically for the failure modes this codebase invites:
+Work the three questions across the diff and its blast radius. You may also run the read-only `delegate-check` subagent as self-review input (never as a lens verdict). Fix what you find, then re-ask them. Route the fetching, never the judging: stale-claim and count checks are true mechanical work, so run `scripts/todo-claims.py` and `scripts/todo-graph.py` directly and give them to no model; dummy work around them (locating callers, extracting a quoted value, batched small lookups) goes in one batched brief to the `spark` workflow (`.agents/workflows/spark.js`, `muse-spark-1.3` at medium effort) in Muse sessions, or to a Haiku delegate under the allowance in `scripts/verify-agent-tiers.py` in Claude Code sessions. Spark and Haiku output is self-review input only, never a lens verdict. On a partial or failed run, do not relaunch from scratch: resume the Spark run so completed briefs replay, pass the prior result references into one follow-up brief covering only the unresolved items, and in Claude Code re-brief only those unresolved items. Look specifically for the failure modes this codebase invites:
 
 - The failure modes `AGENTS.md` and `DESIGN.md` call out for the area you touched: list them in the findings file and check each one.
 - Reimplementing shared framework (`src/framework/`) or repair contract (`src/repair/`) behavior privately in a tool.

@@ -5,7 +5,12 @@ The rule is in AGENTS.md: mechanical subtasks delegate to subagents on the
 Sonnet tier; an elevated tier is reserved for work whose verdict quality
 demands it; Haiku is allowed only for near-mechanical work (at least 90%
 mechanical) whose output a script or the main loop verifies; and no subagent
-writes: subagents read and run, and the main loop makes every change.
+writes: subagents read and run, and the main loop makes every change. True
+mechanical work is run as a script by the lead and given to no model; the
+Muse Spark workflow (`.agents/workflows/spark.js`) takes the dummy work
+around those scripts on `muse-spark-1.3` at medium effort, and this check
+also holds that workflow to its model pin, its effort pin, its read-only
+contract, and the replay that qualifies it.
 
 A rule stated in prose is protected by discipline. This makes it protected by
 a check: an agent with no `model:` line, an agent that could edit files, or a
@@ -17,9 +22,10 @@ agent silently inherits the caller's model: mechanical work then runs on the
 expensive tier with no signal at all, which is the exact regression this
 exists to catch.
 
-No dependencies and no repository-specific paths, so a bootstrapped project
-can run it from day one. With no agents defined yet it passes with nothing
-checked, and starts enforcing the moment the first definition appears.
+No dependencies, so a bootstrapped project can run it from day one. With no
+agents defined yet it passes with nothing checked, and starts enforcing the
+moment the first definition appears. The Spark check follows the same rule:
+it starts enforcing the moment the workflow or its AGENTS.md route appears.
 
 This is a line-for-line port of the former verify-agent-tiers.mjs (retired
 2026-11-09 so the repository's gates need no Node installation at all; the
@@ -68,6 +74,19 @@ HAIKU_JUDGMENT_TERMS = re.compile(
 
 # Where an elevated pin must record why it is elevated.
 ELEVATION_RATIONALE_FIELD = "model_rationale"
+
+# The Muse Spark workflow: dummy work on muse-spark-1.3 at medium effort.
+#
+# AGENTS.md routes dummy work to this saved workflow, so the route is part
+# of the tier invariant: a workflow that drifts back to low effort, loses
+# its read-only contract, or loses the replay that qualifies it fails here
+# rather than silently spending or misrouting. A tree with neither the
+# workflow nor the AGENTS.md route has not adopted Spark and passes, the
+# same bootstrap rule as having no agent definitions yet.
+SPARK_WORKFLOW = Path(".agents") / "workflows" / "spark.js"
+SPARK_REPLAY = Path("docs") / "replays" / "2026-11-09-spark-replay.md"
+SPARK_MODEL_PIN = "muse-spark-1.3"
+SPARK_EFFORT_PIN = "medium"
 
 # Tools no subagent on any tier is given. A `*` grant includes them, and so
 # does a missing `tools:` list, because the agent then inherits every tool.
@@ -310,6 +329,62 @@ def haiku_problems(repo_root, fields, model):
     return problems
 
 
+def spark_problems(repo_root):
+    """Every way the Spark route in AGENTS.md and spark.js disagree."""
+    repo_root = Path(repo_root)
+    workflow_path = repo_root / SPARK_WORKFLOW
+    agents_path = repo_root / "AGENTS.md"
+    route_declared = (
+        agents_path.is_file()
+        and ".agents/workflows/spark.js" in agents_path.read_text(encoding="utf-8")
+    )
+    if not workflow_path.is_file():
+        if route_declared:
+            return [
+                f"{SPARK_WORKFLOW} is routed to by AGENTS.md but does not exist"
+            ]
+        return []
+
+    problems = []
+    text = workflow_path.read_text(encoding="utf-8")
+    if not re.search(
+        rf'SPARK_MODEL\s*=\s*"{re.escape(SPARK_MODEL_PIN)}"', text
+    ):
+        problems.append(
+            f'{SPARK_WORKFLOW} must pin SPARK_MODEL = "{SPARK_MODEL_PIN}"'
+        )
+    if not re.search(
+        rf'SPARK_EFFORT\s*=\s*"{SPARK_EFFORT_PIN}"', text
+    ) or not re.search(r"effort:\s*SPARK_EFFORT", text):
+        problems.append(
+            f"{SPARK_WORKFLOW} must run at medium effort through "
+            "SPARK_EFFORT; dummy work on Spark is a medium-effort route, "
+            "not low"
+        )
+    if re.search(r'effort:\s*"low"', text):
+        problems.append(
+            f'{SPARK_WORKFLOW} still carries an effort: "low" call; Spark '
+            "runs at medium"
+        )
+    if "never edit" not in text.lower():
+        problems.append(
+            f"{SPARK_WORKFLOW} lost its read-only contract (never edit, "
+            "create, move, or delete a file)"
+        )
+    replay_path = repo_root / SPARK_REPLAY
+    if not replay_path.is_file():
+        problems.append(
+            f"Spark needs {SPARK_REPLAY} recording a known-answer replay "
+            "at medium effort showing no loss"
+        )
+    elif SPARK_EFFORT_PIN not in replay_path.read_text(encoding="utf-8").lower():
+        problems.append(
+            f"{SPARK_REPLAY} does not record a medium-effort replay; the "
+            "qualifying replay must match the pinned effort"
+        )
+    return problems
+
+
 def verify_agent_tiers(repo_root=None, relative_root=None):
     if repo_root is None:
         repo_root = Path.cwd()
@@ -320,7 +395,15 @@ def verify_agent_tiers(repo_root=None, relative_root=None):
     errors = []
     absolute_root = repo_root / relative_root
     if not absolute_root.exists():
-        return {"checked": 0, "elevated": 0, "haiku": 0, "errors": errors}
+        spark_errors = spark_problems(repo_root)
+        errors.extend(spark_errors)
+        return {
+            "checked": 0,
+            "elevated": 0,
+            "haiku": 0,
+            "spark": 1 if (repo_root / SPARK_WORKFLOW).is_file() and not spark_errors else 0,
+            "errors": errors,
+        }
 
     files = sorted(
         entry.name
@@ -389,10 +472,13 @@ def verify_agent_tiers(repo_root=None, relative_root=None):
                     "default that drifted"
                 )
 
+    spark_errors = spark_problems(repo_root)
+    errors.extend(spark_errors)
     return {
         "checked": len(files),
         "elevated": elevated,
         "haiku": haiku,
+        "spark": 1 if (repo_root / SPARK_WORKFLOW).is_file() and not spark_errors else 0,
         "errors": errors,
     }
 
@@ -447,6 +533,26 @@ def self_test():
          {"a.md": _agent("a", 'model: "sonnet # haiku"')}, 1)
     case("no agents passes empty", {}, 0)
 
+    spark_good = (
+        'const SPARK_MODEL = "muse-spark-1.3";\n'
+        'const SPARK_EFFORT = "medium";\n'
+        "effort: SPARK_EFFORT,\n"
+        "// Read and run only: never edit, create, move, or delete a file.\n"
+    )
+    spark_cases = []
+
+    def spark_case(label, workflow_text, expect_errors, route=False, replay=None):
+        spark_cases.append((label, workflow_text, expect_errors, route, replay))
+
+    spark_case("spark medium passes", spark_good, 0,
+               replay="medium effort replay, no loss\n")
+    spark_case("spark low refused",
+               spark_good.replace('"medium"', '"low"'), 1,
+               replay="medium effort replay, no loss\n")
+    spark_case("spark missing replay refused", spark_good, 1)
+    spark_case("spark route without workflow refused", None, 1, route=True)
+    spark_case("spark not adopted passes", None, 0)
+
     failures = []
     for label, files, expect_errors, replay_file in cases:
         with tempfile.TemporaryDirectory() as tmp:
@@ -466,6 +572,28 @@ def self_test():
                     f"{label}: expected {'errors' if expect_errors else 'clean'}, "
                     f"got {got}: {result['errors']}"
                 )
+    total_cases = len(cases) + len(spark_cases)
+    for label, workflow_text, expect_errors, route, replay in spark_cases:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            if workflow_text is not None:
+                workflow = root / SPARK_WORKFLOW
+                workflow.parent.mkdir(parents=True)
+                workflow.write_text(workflow_text, encoding="utf-8")
+            if route:
+                (root / "AGENTS.md").write_text(
+                    "route: .agents/workflows/spark.js\n", encoding="utf-8"
+                )
+            if replay is not None:
+                replay_file = root / SPARK_REPLAY
+                replay_file.parent.mkdir(parents=True)
+                replay_file.write_text(replay, encoding="utf-8")
+            got_errors = spark_problems(root)
+            if (expect_errors == 0) != (len(got_errors) == 0):
+                failures.append(
+                    f"{label}: expected {'errors' if expect_errors else 'clean'}, "
+                    f"got {len(got_errors)}: {got_errors}"
+                )
     if failures:
         sys.stderr.write(
             "verify-agent-tiers self-test FAILED:\n"
@@ -473,7 +601,7 @@ def self_test():
         )
         return 1
     sys.stdout.write(
-        f"verify-agent-tiers self-test: {len(cases)} cases, 0 failed\n"
+        f"verify-agent-tiers self-test: {total_cases} cases, 0 failed\n"
     )
     return 0
 
@@ -494,7 +622,8 @@ def main(argv):
     sys.stdout.write(
         f"Agent tiers valid: {result['checked']} definition(s) checked, "
         f"{result['elevated']} elevated with a recorded rationale, "
-        f"{result['haiku']} on Haiku under the mechanical-work allowance.\n"
+        f"{result['haiku']} on Haiku under the mechanical-work allowance, "
+        f"{result['spark']} Spark workflow(s) at medium effort.\n"
     )
     return 0
 

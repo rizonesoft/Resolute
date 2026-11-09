@@ -71,6 +71,8 @@ Eight questions, each answered against the repository and the governing document
 
 Ground each answer: `python scripts/todo-graph.py validate`, `python scripts/todo-claims.py`, searches over `src/`, `shared/`, `extensions/`, and `tests/` for the named symbols, `git log --oneline -5 -- <touched paths>`. Check deferrals in both directions with `python scripts/todo-graph.py query deferred`: deferrals this section owns are part of its scope; deferrals this section wrote get re-read against today's tree.
 
+Route the fetching, never the judging: counts, claim re-measurement, and plan stats are true mechanical work, so run the scripts above directly and give them to no model. Dummy work around them (locating a named symbol or file, extracting a quoted value, running a named read-only command, batched small lookups) goes in one batched brief to the `spark` workflow (`.agents/workflows/spark.js`, `muse-spark-1.3` at medium effort) in Muse sessions, or to a Haiku delegate under the allowance in `scripts/verify-agent-tiers.py` in Claude Code sessions. The lead verifies every returned fact before acting on it. On a partial or failed run, do not relaunch from scratch: resume the Spark run so completed briefs replay, pass the prior result references into one follow-up brief covering only the unresolved items, and in Claude Code re-brief only those unresolved items.
+
 Anything unclear becomes a question answered from the source (`resolute_au3/`, `DESIGN.md`, Win32 or wxWidgets documentation). Where the source is silent, take a justified default, record that it is a default with the cost of changing it, and carry on.
 
 ### 3. Correct the section when validation fails

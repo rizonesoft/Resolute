@@ -35,6 +35,8 @@ Run `python scripts/todo-graph.py validate` after every structural edit. Cycles 
 
 Walk every open section's concrete claims against today's repository: scripts, functions, includes, paths, counts, versions, ini keys. Correct drift in place with dated notes, exactly as `process-todo-section` steps 2-3 do, but tree-wide and without building anything.
 
+Route the fetching, never the judging: counts and claim re-measurement are true mechanical work, so run `scripts/todo-claims.py` and `scripts/todo-graph.py` directly and give them to no model. Dummy work around them (locating a moved path, extracting a quoted version or key, batched small lookups across sections) goes in one batched brief per area to the `spark` workflow (`.agents/workflows/spark.js`, `muse-spark-1.3` at medium effort) in Muse sessions, or to a Haiku delegate under the allowance in `scripts/verify-agent-tiers.py` in Claude Code sessions. The lead verifies every returned fact before correcting a claim with it. On a partial or failed run, do not relaunch from scratch: resume the Spark run so completed briefs replay, pass the prior result references into one follow-up brief covering only the unresolved items, and in Claude Code re-brief only those unresolved items.
+
 Pay special attention to:
 
 - "Nothing exists yet" claims that are no longer true.
