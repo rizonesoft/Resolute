@@ -1344,12 +1344,24 @@ def self_test() -> int:
             "build a.obj: CXX_COMPILER__x a.cpp\nbuild b.obj: CXX_COMPILER__x b.cpp\n"
         )
         (tmp / "Bin" / "Release").mkdir(parents=True)
-        rc = main([
-            "--root", str(tmp),
-            "--write-build-record", str(tmp / "build" / "logs" / "build-record.json"),
-            "--build-config", "Release", "--build-targets", "Resolute",
-        ])
+        import contextlib
+        import hashlib as _h
+        import io
+
+        expect = (
+            f"build/release/compile_commands.json={_h.sha256(db.read_bytes()).hexdigest()};"
+            f"build/release/build.ninja={_h.sha256((db.parent / 'build.ninja').read_bytes()).hexdigest()}"
+        )
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = main([
+                "--root", str(tmp),
+                "--write-build-record", str(tmp / "build" / "logs" / "build-record.json"),
+                "--build-config", "Release", "--build-targets", "Resolute",
+                "--expect-dbs", expect,
+            ])
         assert rc == 1, f"swapped database was recorded (rc={rc})"
+        assert "does not describe the build" in buf.getvalue(), buf.getvalue()
         assert not (tmp / "build" / "logs" / "build-record.json").exists()
 
     case("build record refuses a database the build never used", build_record_rejects_swapped_db)
@@ -1363,6 +1375,23 @@ def self_test() -> int:
         db.write_text(json.dumps(entries(rel)))
         (rel / "build.ninja").write_text(ninja_lines)
         return tmp, db
+
+    def _run_capture(args):
+        import contextlib
+        import io
+
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = main(args)
+        return rc, buf.getvalue()
+
+    def _both_hashes(db):
+        import hashlib as _h
+
+        return (
+            f"build/release/compile_commands.json={_h.sha256(db.read_bytes()).hexdigest()};"
+            f"build/release/build.ninja={_h.sha256((db.parent / 'build.ninja').read_bytes()).hexdigest()}"
+        )
 
     def _record_args(tmp, extra=()):
         return ["--root", str(tmp), "--write-build-record", str(tmp / "build" / "logs" / "build-record.json"),
@@ -1386,17 +1415,22 @@ def self_test() -> int:
             "build a.obj: CXX_COMPILER__x a.cpp\n")
         import hashlib as _h
         configured = json.dumps([{"file": "a.cpp", "directory": str(db.parent), "command": "cc a.cpp"}])
-        expect = _h.sha256(configured.encode()).hexdigest()
-        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={expect}"]))
+        expect = (
+            f"build/release/compile_commands.json={_h.sha256(configured.encode()).hexdigest()};"
+            f"build/release/build.ninja={_h.sha256((db.parent / 'build.ninja').read_bytes()).hexdigest()}"
+        )
+        rc, out = _run_capture(_record_args(tmp, ["--expect-dbs", expect]))
         assert rc == 1, f"command-changed database recorded (rc={rc})"
+        assert "changed after its configure; it does not describe the compilation" in out, out
         assert not (tmp / "build" / "logs" / "build-record.json").exists()
 
     def build_record_rejects_same_basename():
         tmp, db = _record_fixture(
             lambda rel: [{"file": "other/a.cpp", "directory": str(rel), "command": "cc other/a.cpp"}],
             "build a.obj: CXX_COMPILER__x a.cpp\n")
-        rc = main(_record_args(tmp))
+        rc, out = _run_capture(_record_args(tmp, ["--expect-dbs", _both_hashes(db)]))
         assert rc == 1, f"same-basename different-path database recorded (rc={rc})"
+        assert "does not describe the build" in out, out
         assert not (tmp / "build" / "logs" / "build-record.json").exists()
 
     case("build record accepts the unchanged configured database", build_record_positive_control)
@@ -1461,8 +1495,9 @@ def self_test() -> int:
             f"build/release/compile_commands.json={_h.sha256(db.read_bytes()).hexdigest()};"
             f"build/release/build.ninja={configured}"
         )
-        rc = main(_record_args(tmp, ["--expect-dbs", expect]))
+        rc, out = _run_capture(_record_args(tmp, ["--expect-dbs", expect]))
         assert rc == 1, f"ninja graph changed after configure was recorded (rc={rc})"
+        assert "build graph" in out and "changed after its configure" in out, out
         assert not (tmp / "build" / "logs" / "build-record.json").exists()
 
     case("single-target build record binds only its own database", build_record_single_target_ignores_other_db)

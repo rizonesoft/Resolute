@@ -84,3 +84,27 @@ Probes intercepted publication and directory creation. No files modified; builds
 
 HIGHEST: P2  
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T05:52:57Z
+- Effort: low
+- Writer model: muse-wonder-full-1.0
+- Policy: ea21439b7f1f676fd5ea7dfd65500ceec62d1d67
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 8
+- Digest: cab14923562a032d
+
+**consistency: needs-attention**
+
+- **P3: Regression fixtures no longer satisfy the publication contract.** [scripts/tidy-ratchet.py:1390](D:/GitHub/Resolute/scripts/tidy-ratchet.py:1390) supplies only the database hash; [line 1399](D:/GitHub/Resolute/scripts/tidy-ratchet.py:1399) supplies no hashes. Both therefore return at the mandatory Ninja-hash check before exercising command-change or same-basename detection. Reproduction: a read-only invocation using each fixture’s argument pattern returned `1` with `no configure-time hash for build/release/build.ninja`. Their assertions accept this unrelated refusal, so either intended check could break without failing these tests. Supply both configure-time hashes, introduce the intended discrepancy, and assert its specific diagnostic.
+
+No files modified. Full self-tests were not rerun.
+
+HIGHEST: P3
+OVERALL: needs-attention
