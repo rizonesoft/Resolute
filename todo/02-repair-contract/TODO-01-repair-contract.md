@@ -80,6 +80,7 @@ The contract's whole value is that a tool declares items and the loop does the r
 - [ ] Add assertions for the loop over a fixture item set, including the mixed case where some items apply and some do not. Done when: three assertions run.
 - [ ] Commit: `"repair: the repair item and the run loop"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C25`, `C33` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C25`, `C33` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A fixture tool with four declared items produces four outcomes through the shared loop with no tool-side loop code. An item lacking a reversibility answer is rejected. An unelevated run refuses per item and the fixture is unchanged. All quoted.
 
 ## 2. Diagnose Before Repair
@@ -102,6 +103,7 @@ Presenting a user with a checklist and letting them guess is the current behavio
 - [ ] Add assertions for the applicable subset, the read-only guarantee, the unknown state, and both pre-flight checks. Done when: five assertions run.
 - [ ] Commit: `"repair: diagnose before offering a repair"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C26`, `C28` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C26`, `C28` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A fixture where two of four items apply offers exactly two. A diagnose pass leaves the fixture byte-identical, asserted. The unknown state renders distinctly. An override is recorded in both result and log. A skewed-clock fixture and an expired-root-certificate fixture each produce a named pre-flight warning connecting the fault to the user's symptom, and proceeding past one is logged. All quoted.
 
 ## 3. Per-Item Result and the Surface
@@ -155,6 +157,7 @@ The part users actually need and the part nobody builds. A repair with no revers
 
 **Freeze check:** The contract changes no tool's repair effect. What changes is that the prior state is recorded first. Evidence is a fixture run before and after the change producing byte-identical effects. Fixture source: `tests/fixtures/`.
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C27`, `C29` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C27`, `C29` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A fixture run followed by undo restores every value and type, asserted. A corrupted record is refused with the fixture byte-identical afterwards. An irreversible item states so on the surface. The record list is captured. All quoted.
 
 ## 5. Transcript the User Can Carry
@@ -173,6 +176,7 @@ A repair result is the one thing in this suite a user genuinely wants to keep: t
 - [ ] Carry the restore record's identity so a reader can tell which undo belongs to which run. Done when: the transcript names its record and the link is asserted.
 - [ ] Commit: `"repair: a transcript the user can carry away"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C32` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C32` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A fixture run exports a transcript whose content matches the rendered result list. An export to a read-only target reports failure. The file opens readably in a plain text editor, captured. The transcript names its restore record.
 
 ## 6. One Log Line Per Action and Per Refusal
@@ -188,6 +192,7 @@ The audit trail. The AutoIt suite has six tools that write nothing at all, so th
 - [ ] Prove no action can bypass the log. Done when: this section names the enforcement and an assertion covers it.
 - [ ] Commit: `"repair: one log line per action and per refusal"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C30` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C30` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A mixed fixture run produces exactly one line per item, each naming item and target. Lines and rendered rows are compared and agree. Undo lines are distinguishable from repair lines. All quoted.
 
 ## Verification

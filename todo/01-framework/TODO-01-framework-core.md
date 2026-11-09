@@ -90,6 +90,7 @@ Everything else in this file hangs off the shell. It decides what a tool is stru
 - [ ] Apply the saved process priority and the memory-trim behaviour at startup (groom 2026-09-23 gap scan) : `D01 T03 §2` specifies the priority combo and the reduce-memory checkbox and `§2` persists them, but nothing applies either, so both are settings with no consumer, and `AGENTS.md` names process priority as framework-owned. Done when: a saved priority reads back as the process's priority class after startup, the save-above-high guard refuses silently raising past High, and the reduce-memory setting drives one trim path, each quoted from a drive.
 - [ ] Commit: `"framework: application shell and lifecycle"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C01` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C01` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A minimal tool built on the shell starts and exits cleanly for both architectures. The documented startup order matches the asserted order. A forced close persists configuration, proven by readback. All three quoted.
 
 ## 2. Settings: One Writer, One Path
@@ -110,6 +111,7 @@ This section exists because the AutoIt suite typed its settings path fourteen ti
 - [ ] Record why settings stay INI rather than moving to JSON, TOML, the registry, or a packaged store, with the cost of changing. Done when: this section names the AutoIt readback parity, portable file-beside-exe, dependency-free, and human-editable reasons, states that structured per-tool data lives in a data file rather than settings, and states the migration a future format would owe.
 - [ ] Commit: `"framework: one settings writer and one settings path"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C02`, `C03` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C02`, `C03` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** `ctest` runs eight settings assertions green. An `.ini` written by the shipped AutoIt tool reads back identically. Mode detection is asserted per rule with the startup line quoted; portable in a read-only directory fails naming the directory. A write to a read-only target reports failure with the original intact. A fixture `.lng` migrates with its log line. All quoted.
 
 ## 3. Logging and the Log Surface
@@ -130,6 +132,7 @@ Six of fourteen AutoIt tools write no log at all, including every browser optimi
 - [ ] Resolve the log directory per mode, mirroring `§2`'s settings path (groom 2026-09-23 gap scan) : the crash report (`§10`), the restore record (`D02 T01 §4`), the launcher's suite log viewer (`D03 T01 §5`), and Repair History (`D05 T04 §2`) all need the log location, and no item provides one while the Verification forbids tool-side paths. Done when: one resolver returns the portable and installed log directories, every consumer calls it, and a fixture proves both modes, quoted.
 - [ ] Commit: `"framework: one log format, one log writer"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C04`, `C05` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C04`, `C05` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Three logging assertions run green. A line from the new writer matches the AutoIt shape on a fixture. Disabling produces no writes; a small cap rotates. An action followed by forced termination still leaves its line. All quoted.
 
 ## 4. Localization and the Pack Loader
@@ -147,6 +150,7 @@ Six of fourteen AutoIt tools write no log at all, including every browser optimi
 - [ ] Add assertions for resolution order, missing-key reporting, and the three malformed cases. Done when: five assertions run.
 - [ ] Commit: `"framework: localization and the pack loader"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C06`, `C07` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C06`, `C07` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** All 35 Firemin packs load with key counts reported. Resolution order is asserted. An incomplete pack produces a missing-key list. Three malformed packs each produce a named message and a log line. All quoted.
 
 ## 5. Update Check and Consolidation Announcement
@@ -189,6 +193,7 @@ Every AutoIt tool requests elevation at startup and then assumes it holds for th
 - [ ] Decide the manifest execution level and add the elevated relaunch (groom 2026-09-23 gap scan) : this section only refuses, `D01 T03 §6` requires the refusal to offer a next step, and `D03 T01` assumes tools prompt for UAC at launch, but no item decides `asInvoker` against `requireAdministrator`; with the latter the guard never fires in the window and its checkpoint is unreachable. Done when: the decision is dated with its reason, the refusal offers "restart as administrator" that relaunches with the same command line and writes one log line, and both the unelevated refusal and the elevated relaunch are driven, quoted.
 - [ ] Commit: `"framework: gate privileged actions at the call site"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C31` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C31` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Three elevation assertions run green in an unelevated session, each proving the action was refused by name, nothing changed, and exactly one log line was written. The refusal message is quoted.
 
 ## 7. Adopt the UI Library and Its Surfaces
@@ -214,6 +219,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 - [ ] Wire every Help and File menu target to a real destination (groom 2026-09-23 gap scan) : `D01 T03 §1` specifies update check, publisher home, downloads, support, and issue creation, but only the About and F1 entries have build items. Done when: each target opens the destination the tool descriptor names (re-pointed at the `D06 T01 §10` registry when it ships), driven per entry with the launcher seam mocked, quoted.
 - [ ] Commit: `"framework: standard window, about, and preferences"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C11`, `C12`, `C13` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C11`, `C12`, `C13` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Two different tools render correct About dialogs with no tool-side code. Every preferences control persists and survives a restart, proven by readback. The three rendered surfaces are compared against their captures with differences listed. Captures committed under `docs/captures/runs/`.
 
 -> XREF: D06 T01 §17 -- the About dialog specified in full, rendered from the registry (moved from this file's §12 on 2026-09-23)
@@ -257,6 +263,7 @@ Every tool is distributed on its own. This section proves the framework did not 
 - [ ] Add the standalone check to the harness so a later change cannot silently break it. Done when: the assertion runs and fails if a framework surface reaches outside the tool folder.
 - [ ] Commit: `"framework: prove a tool runs standalone in an empty folder"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C14`, `C15` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C14`, `C15` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A built tool alone in an empty directory starts, localizes, shows About, opens preferences, and checks for updates, all captured. A file-system trace shows no write outside its own folder. The machine has no `Resolute/` directory during the run. The harness assertion fails when a surface reaches outside. All quoted.
 
 ## 10. Crash Handling and Single Instance
@@ -279,6 +286,7 @@ Two lifecycle guarantees the plan assumed and never assigned. Both matter more h
 - [ ] Build the crash notice's restart offer (groom 2026-09-23 gap scan) : `D01 T03 §6` specifies the restart offer and its buttons, and this section writes the report without it. Done when: after a seeded crash the notice offers restart, restart relaunches the tool with its command line, and dismiss exits with one log line, driven, quoted.
 - [ ] Commit: `"framework: crash handling and single instance"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C19` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C19` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A deliberately faulted fixture tool produces a report, not the Windows crash dialog, and no tool installs its own handler, proven by search. A tool faulted mid-repair leaves a usable restore record, proven by undoing it from `Repair History`. The notice names the tool and whether the machine changed, captured. A second launch focuses the first. Two copies cannot repair the same target simultaneously, asserted.
 
 ## 11. Command Line and Exit Codes
@@ -301,6 +309,7 @@ Every tool in this suite is something an IT administrator would want to run acro
 - [ ] Add a shared "open item" verb to the command-line grammar (groom 2026-09-23 gap scan) : `D03 T02` requires that launching from a symptom opens the named repair item, not just the tool (`TODO-02-launcher-surfaces.md:161`), and the grammar has no verb for it. Done when: `--open <item-id>` (or the grammar's chosen spelling) selects the named item or surface on start, an unknown id refuses by name with the documented exit code, and `D03 T01 §6` consumes it, quoted.
 - [ ] Commit: `"framework: one command-line grammar and one set of exit codes"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C20` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C20` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A fixture repair runs unattended from a script with no window, writes its transcript, and returns. Each of the five exit codes is produced by a fixture run and matches its documented value. An unattended destructive run without the authorising flag refuses with the refusal code. `--help` and `--version` work on two tools with no tool-side code. An unelevated unattended run refuses by name and changes nothing.
 
 ## 12. About Dialog, From the Registry

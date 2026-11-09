@@ -76,6 +76,7 @@ The templates already exist at `resolute_au3/SDK/Concrete/ReBar/Templates/`, so 
 - [ ] State the same-commit guide rule. Done when: every new user-facing surface ships its guide page in the same commit as the surface, so pages are written in fresh context and reviewed against behavior; `D01 T01 §12` is the first instance and `D01 T01 §13` the second.
 - [ ] Commit: `"docs: the documentation contract, with metadata generated"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C09` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C09` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Every shipped tool has a complete set, proven by the conformance check. No documentation file contains a typed version, date, requirement list, or disk figure, proven by search. The full GPL v3 text ships with every tool. One copyright form appears across the suite. The user guide covers every shipped tool's main surface, each naming its version.
 
 -> XREF: D06 T01 §14 -- the pipeline that renders this contract's guide to offline HTML
@@ -103,6 +104,7 @@ The change that turns an impossible translation job into a tractable one. Most s
 - [ ] Extract each tool's key set from source and check every pack against it (groom 2026-09-23 gap scan) : clause C07 forbids literal strings (`docs/conformance-profile.md:40`), but completeness is checked only by a driven run, which misses undriven surfaces and never finds orphaned keys. Done when: a build step extracts every key each tool references, every composed pack is checked for missing and orphaned keys, and a seeded missing key and a seeded orphan each fail the release by name, quoted.
 - [ ] Commit: `"localization: coverage matrix and pack hygiene"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C08` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C08` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Every pack follows one naming rule, checked. A malformed pack fails the release, proven with three malformed fixtures. The coverage matrix renders every tool by every language. Every shipped tool is driven with every pack and missing keys are reported.
 
 ## 4. Rewrite the Shipped Documentation

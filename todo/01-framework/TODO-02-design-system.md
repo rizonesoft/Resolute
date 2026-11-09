@@ -63,6 +63,7 @@ A style rule that relies on everyone remembering it is a style rule that decays.
 - [ ] Record any token pair that fails today. Done when: each is either corrected in the palette or listed here with a dated exception and its reason.
 - [ ] Commit: `"design: make the token set the only path to a colour or a size"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C17` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C17` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** A deliberate colour literal and a deliberate size literal each fail the check by name, both diagnostics quoted. The contrast assertion runs over every token pair in use, in both themes, and a deliberately failing pair is named. Any real failing pair is corrected or carries a dated exception.
 
 ## 2. Spacing Grid, Density, and Responsive Layout
@@ -169,6 +170,7 @@ Every custom-drawn control in this suite reports nothing to a screen reader toda
 - [ ] Add UI scaling independent of system DPI, on the standard zoom shortcuts. Done when: zoom in, out, and reset are driven and the layout stays correct.
 - [ ] Commit: `"design: meet the accessibility floor"`
 
+- [ ] Extend `scripts/conformance-check.py` with evaluators for `C18` when this section ships (or record there why a clause needs none): a shipped-owner clause without an evaluator is a checker error by design (`D07 T01 §3`), so the gate goes red until the evaluator lands. Done when: the matrix cells for `C18` evaluate to pass or fail from this section's evidence, quoted in the checkpoint.
 **Test checkpoint:** Narrator announces name, role, value, and state for every shared control, quoted per control. The UI Automation tree walk from `docs/captures/ui-automation-spike.md` is re-run and the descendant count rises from 4 to cover the surface, with before and after quoted, and a control is found by automation id in two languages. A completed repair raises an announcement, quoted. Every surface is driven mouse-free and the path recorded. The focus ring is captured in both appearances. With reduced motion set, no animation occurs and state still changes. Every hit target is measured against the floor.
 -> SOURCE: plan-D00-T02-s10-2026-09-26-PR7 D00-T02-S10-PR7
 
