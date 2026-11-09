@@ -43,7 +43,12 @@ param(
     # Desktop interaction is explicit: without -Visible the driver
     # refuses, and even with it, it stands down while the operator is
     # active (docs/testing.md's stand-down rule).
-    [switch]$Visible
+    [switch]$Visible,
+    # The established collection threshold (docs/testing.md): the
+    # operator must be idle this long before the driver takes the
+    # desktop, and input resuming mid-shot stands the run down.
+    [int]$IdleSeconds = 120,
+    [int]$IdleWaitSeconds = 600
 )
 
 $ErrorActionPreference = 'Stop'
@@ -84,14 +89,35 @@ public class Idle {
 }
 '@
 
-# Wait until the operator has been idle for at least 3 seconds (up to
-# 60), so a capture never pulls focus out of active work.
+# Wait until the operator has been idle past the collection
+# threshold, so a capture never pulls focus out of active work.
 function Wait-OperatorIdle([string]$What) {
-    foreach ($i in 1..120) {
-        if ([Idle]::IdleSeconds() -ge 3) { return }
+    $tries = $IdleWaitSeconds * 2
+    foreach ($i in 1..$tries) {
+        if ([Idle]::IdleSeconds() -ge $IdleSeconds) { return }
         Start-Sleep -Milliseconds 500
     }
     throw "operator is active; stood down before $What (docs/testing.md stand-down rule)"
+}
+
+# The last-input tick when interaction began. Any later input is the
+# operator resuming, and the run stands down: owned processes are
+# dismissed, the interrupted capture is discarded, and no further
+# shot is attempted.
+$script:InputTickAtStart = 0
+function Test-InputResumed {
+    $info = New-Object Idle+LASTINPUTINFO
+    $info.cbSize = [System.Runtime.InteropServices.Marshal]::SizeOf($info)
+    if (-not [Idle]::GetLastInputInfo([ref]$info)) { return $false }
+    return $script:InputTickAtStart -ne 0 -and $info.dwTime -ne $script:InputTickAtStart
+}
+
+function Wait-Checked([int]$Milliseconds, [string]$What) {
+    $steps = [Math]::Max(1, [int]($Milliseconds / 200))
+    foreach ($i in 1..$steps) {
+        if (Test-InputResumed) { throw "operator input resumed during $What; stood down (docs/testing.md stand-down rule)" }
+        Start-Sleep -Milliseconds 200
+    }
 }
 
 $Exe = (Resolve-Path $Exe).Path
@@ -112,16 +138,19 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         }
         if ($hwnd -eq [IntPtr]::Zero) { throw "no main window for $name" }
         [Shot]::SetWindowPos($hwnd, [IntPtr]::Zero, 40, 40, 1600, 1000, 0x0040) | Out-Null
-        Start-Sleep -Milliseconds 500
+        Wait-Checked 500 'positioning'
         # The launcher starts in System appearance; its theme command
         # cycles System, Dark, Light, so one press is dark, two light.
         foreach ($i in 1..$Presses) {
             [Shot]::SendMessageW($hwnd, 0x0111, [IntPtr]1030, [IntPtr]::Zero) | Out-Null
-            Start-Sleep -Milliseconds 900
+            Wait-Checked 900 'the theme change'
         }
         [Shot]::SendMessageW($hwnd, 0x0111, [IntPtr]$ViewCmd, [IntPtr]::Zero) | Out-Null
-        Start-Sleep -Milliseconds 700
+        Wait-Checked 700 'the view change'
         Wait-OperatorIdle "taking the foreground for $name"
+        $tick = New-Object Idle+LASTINPUTINFO
+        $tick.cbSize = [System.Runtime.InteropServices.Marshal]::SizeOf($tick)
+        if ([Idle]::GetLastInputInfo([ref]$tick)) { $script:InputTickAtStart = $tick.dwTime }
         $fg = [Shot]::GetForegroundWindow()
         $pidOut = 0
         $theirs = [Shot]::GetWindowThreadProcessId($fg, [ref]$pidOut)
@@ -130,12 +159,21 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         if ($theirs -ne 0 -and $theirs -ne $mine) { $attach = [Shot]::AttachThreadInput($mine, $theirs, $true) }
         [Shot]::SetForegroundWindow($hwnd) | Out-Null
         if ($attach) { [Shot]::AttachThreadInput($mine, $theirs, $false) | Out-Null }
-        Start-Sleep -Milliseconds 600
+        Wait-Checked 600 'foreground settling'
         $describes = "the launcher $State view, $Mode, at 1600 px wide: visual proof for the README (D00 T05 section 1)"
         $fixture = "launcher built from a clean checkout (Bin/Release/Resolute.exe); host $HostName; appearance $Mode set by $Presses theme-command press(es) from System; view set by WM_COMMAND $ViewCmd"
-        $context = "pwsh scripts/capture-launcher-readme.ps1 -Exe $Exe -CaptureScript $CaptureScript -OutDir $OutDir (this shot: theme x$Presses, view $ViewCmd, then capture-window.ps1 -ProcessId <pid> -Out $out)"
-        & pwsh -NoProfile -File $CaptureScript -ProcessId $proc.Id -Appearance $Mode -Out $out -Describes $describes -Fixture $fixture -LaunchContext $context -FixtureFiles 'none beside Bin/Release (launcher only build)'
-        if ($LASTEXITCODE -ne 0) { throw "capture-window failed for $name with $LASTEXITCODE" }
+        $driverPath = Join-Path $PSScriptRoot 'capture-launcher-readme.ps1'
+        $context = "pwsh -NoProfile -File `"$driverPath`" -Visible -Exe `"$Exe`" -CaptureScript `"$CaptureScript`" -OutDir `"$OutDir`" -Date $Date"
+        $cap = Start-Process pwsh -ArgumentList @('-NoProfile', '-File', $CaptureScript, '-ProcessId', $proc.Id, '-Appearance', $Mode, '-Out', $out, '-Describes', $describes, '-Fixture', $fixture, '-LaunchContext', $context, '-FixtureFiles', 'none beside Bin/Release (launcher only build)') -PassThru -NoNewWindow
+        while (-not $cap.WaitForExit(200)) {
+            if (Test-InputResumed) {
+                Stop-Process -Id $cap.Id -Force -ErrorAction SilentlyContinue
+                Remove-Item $out -Force -ErrorAction SilentlyContinue
+                Remove-Item ([System.IO.Path]::ChangeExtension($out, '.txt')) -Force -ErrorAction SilentlyContinue
+                throw "operator input resumed during the capture of $name; stood down and discarded it (docs/testing.md stand-down rule)"
+            }
+        }
+        if ($cap.ExitCode -ne 0) { throw "capture-window failed for $name with $($cap.ExitCode)" }
         Write-Output "SHOT $name ok"
     } finally {
         if (-not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
