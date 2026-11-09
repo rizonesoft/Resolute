@@ -41,7 +41,7 @@ track: Q1
 |   1   |   §1    | The conformance profile                | --           |  [x]   |
 |   2   |   §2    | Warning and analysis ratchet           | D00 T01 §3   |  [x]   |
 |   3   |   §3    | Conformance check and its report       | §1           |  [x]   |
-|   4   |   §4    | Standing smoke run over the suite      | §3           |  [ ]   |
+|   4   |   §4    | Standing smoke run over the suite      | §3           |  [x]   |
 |   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [ ]   |
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [ ]   |
 
@@ -213,6 +213,15 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 - [x] Commit: `"quality: a standing smoke run over the whole suite"`
 
 **Test checkpoint:** A full smoke run covers every shipped tool through the five steps as that tool exposes them (absent surfaces named, not passed; an elevation-required launch `blocked` by name), produces one report quoting every tool and step, and captures every main surface it can launch. A deliberately broken tool is reported without stopping the run, naming tool, step, and captured state, and the run exits non-zero. All quoted from a real `scripts/smoke-run.py` run and its `--self-test`.
+
+> **Verified:** 2026-11-09 | §4 | real `scripts/smoke-run.py --visible`: Resolute start/main/exit pass (capture 733x480, changed vs previous on repeats), About and preferences absent named; RegStudio blocked naming elevation (WinError 740) on every expected step, verdict blocked exit 2, elevated pass owned by §5; `--drill`: SmokeDrillBroken fail at start, SmokeDrillHung fail at exit with failure capture, SmokeDrillDeaf fail at about with failure capture, real tools complete, exit 1; fence refusal exit 2, nothing launched, five refused rows per tool; `--self-test` all pass (over 55 checks incl. production-path containment, stand-down, diagnostics, and nightly-block cases); nightly Manual at 4a0a75ee names smoke blocked with its report path and turns red with RESOLUTE_SMOKE_DRILL=1; `python scripts/todo-graph.py validate` 0 fatal; `python scripts/todo-claims.py` 116 hold; `--check-pin` ok; `python -m unittest discover -s scripts/tests` 130 OK (3 skipped)
+> **Review:** D07-T01-s4.md rounds 1-3 (P2s fixed, P3 filed in §6, clean terminal round 3); repair cycles repair through repair9 each plan-reviewed (or settled with evidence), rounded to a clean terminal round, and completed, final completion COMPLETION: complete on cd3f9da1 in D07-T01-s4-repair9.md · Raw findings: docs/reviews/07-quality/D07-T01-s4.md and D07-T01-s4-repair.md through D07-T01-s4-repair9.md
+> **Plan review:** astra (medium) on 1f8abfe0, 5 gaps folded into the section in 758ea592; each repair cycle's plan gaps likewise fixed or settled with evidence in its record
+> **Completion:** astra (medium), candidate 4f6069fc COMPLETION gaps (8 in-scope implemented across repair cycles, blocked-capture remainder filed in §6); final repair9 completion on cd3f9da1 COMPLETION: complete · Repair records: D07-T01-s4-repair.md through D07-T01-s4-repair9.md
+> **CRUD:** not applicable (developer gate tooling; writes only build/smoke/ artifacts, launches the shipped tools read-only by window messages, terminates only processes it launched)
+> **Deferred:** RegStudio elevated five-step pass -> XREF: D07 T01 §5; blocked-capture timeout and scheduling-independent interruption proofs -> XREF: D07 T01 §6
+> **Duration:** 2026-11-09T08:41:18Z to 2026-11-09T10:29:11Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 ## 5. Elevated Smoke Pass for RegStudio
 
