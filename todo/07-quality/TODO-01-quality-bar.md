@@ -42,7 +42,7 @@ track: Q1
 |   2   |   §2    | Warning and analysis ratchet           | D00 T01 §3   |  [x]   |
 |   3   |   §3    | Conformance check and its report       | §1           |  [x]   |
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [x]   |
-|   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [ ]   |
+|   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [x]   |
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [ ]   |
 |   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
 |   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [ ]   |
@@ -221,7 +221,8 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 > **Plan review:** astra (medium) on 1f8abfe0, 5 gaps folded into the section in 758ea592; each repair cycle's plan gaps likewise fixed or settled with evidence in its record
 > **Completion:** astra (medium), candidate 4f6069fc COMPLETION gaps (8 in-scope implemented across repair cycles, blocked-capture remainder filed in §6); final repair9 completion on cd3f9da1 COMPLETION: complete · Repair records: D07-T01-s4-repair.md through D07-T01-s4-repair9.md
 > **CRUD:** not applicable (developer gate tooling; writes only build/smoke/ artifacts, launches the shipped tools read-only by window messages, terminates only processes it launched)
-> **Deferred:** RegStudio elevated five-step pass -> XREF: D07 T01 §5; blocked-capture timeout and scheduling-independent interruption proofs -> XREF: D07 T01 §6
+> **Resolved:** 2026-11-10 | RegStudio elevated five-step pass -> XREF: D07 T01 §5 | closed by `6be8a109` (the §5 stamp quotes the elevated report)
+> **Deferred:** blocked-capture timeout and scheduling-independent interruption proofs -> XREF: D07 T01 §6
 > **Duration:** 2026-11-09T08:41:18Z to 2026-11-09T10:29:11Z
 > **Implementer:** muse (muse-wonder-1.0)
 
@@ -243,6 +244,15 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 3. `scripts/smoke-run.py` `main()`: `--elevate` when not elevated relaunches and exits with the child's code (the child writes the shared `build/smoke/smoke-report.md`; the parent writes nothing over it); when declined it writes the blocked report (five `blocked` rows per selected tool, all registered tools when `--tools` is absent, naming the decline) and exits 2; `--elevated-child` without elevation refuses by name, writes the same refused rows, and exits 2 rather than looping. Every new report write that fails names the failure and falls back to printing the report, as the existing driver does. `--self-test` drives each branch through `main()` with stubbed admission, elevation, and relaunch: child-not-elevated refusal launches and relaunches nothing, child success (0), failure (1), and blocked (2) codes are forwarded unchanged, the child's report is preserved byte-for-byte, and an already-elevated invocation runs the normal driver path to completion. Done when: the documented command is `python scripts/smoke-run.py --elevate --visible --tools RegStudio`, named in the module docstring Usage and `--help`.
 4. Driven proof: the approved elevated run and the paired non-elevated `--visible --tools RegStudio` run, both quoted. Done when: the elevated report shows start, main, About, exit `pass` and preferences `absent`, and the non-elevated report shows `blocked` naming WinError 740.
 **Test checkpoint:** The elevated run's `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent` named, quoted in the stamp; the paired non-elevated run shows `blocked` naming the elevation requirement.
+
+> **Verified:** 2026-11-10 | §5 | elevated `python scripts/smoke-run.py --elevate --visible --tools RegStudio` exit 0 at the final candidate: RegStudio start `pass`, main `pass` (capture `build/smoke/RegStudio-main.png` 683x512, unchanged vs previous), About `pass` (observed and dismissed), preferences `absent` (framework shell `D01 T03 §2`), exit `pass`; paired non-elevated `--visible --tools RegStudio` exit 2 with every expected step `blocked` naming the elevation requirement (WinError 740) · `--self-test` all pass, including argument mapping, token and shell errors at the Win32 API boundary, verified termination, child exit-code forwarding with report preservation, and unelevated-child refusal · `todo-graph validate` 0 fatal, `todo-claims` 116 hold
+> **Review:** D07-T01-s5.md candidates `9475ae33`(round 1) `1973447c`(round 3) -- astra medium/low: round 1 adversarial 2 P2 and 1 P3 (unverified termination, post-launch false no-launch note, interrupt outside the wait), all fixed in `97e5278`; round 2 reviewed the pre-fix candidate named in its prompt, its P3 fixed in `1973447c`; round 3 quality 1 P3 filed in `D07 T01 §8`, clean terminal round (HIGHEST P3) · Raw findings: docs/reviews/07-quality/D07-T01-s5.md
+> **Completion:** astra (medium), candidate `1973447c` COMPLETION gaps (5 in-scope, implemented in `aae9f55` on D07-T01-s5-repair.md: repair plan P2 taken, round 1 HIGHEST none, completion gaps again on the superseded candidate named in its prompt); repair2 `cb55fcb`/`6be8a109` closed both repeated gaps in fact; repair3 on D07-T01-s5-repair3.md, plan complete with no findings, round 1 HIGHEST none, candidate `6be8a109` COMPLETION: complete · Repair records: docs/reviews/07-quality/D07-T01-s5-repair.md, D07-T01-s5-repair2.md, D07-T01-s5-repair3.md
+> **Plan review:** astra (medium) on `578b2c08`, 4 P2 gaps folded into the section build order before building (`25701516`); repair-cycle plans likewise returned gaps folded in before their rounds
+> **CRUD:** not applicable (developer gate tooling; writes only `build/smoke/` artifacts, launches the shipped tool read-only by window messages, terminates only processes it launched, and a declined consent launches nothing)
+> **Deferred:** unattended elevated smoke without a prompt per run -> XREF: D07 T01 §7; forwarding-test assertion strength -> XREF: D07 T01 §8
+> **Duration:** 2026-11-09T21:57:01Z to 2026-11-09T22:41:11Z
+> **Implementer:** Muse Code (muse-wonder-1.0)
 
 ## 6. Smoke Capture-Timeout Test
 
