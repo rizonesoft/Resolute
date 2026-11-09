@@ -239,6 +239,14 @@ try {
                 foreach ($k in $f.Keys) { if ($f[$k] -notin 'Passed', 'Skipped') { $failures.Add("fenced: $k ($($f[$k]))") } }
             }
             Pop-Location
+            # Standing smoke run at the same candidate (D07 T01 section 4).
+            $env:RESOLUTE_IDLE_COLLECT = '1'
+            & $Python (Join-Path $wt 'scripts\smoke-run.py') *> (Join-Path $RunDir 'smoke.log')
+            $smokeExit = $LASTEXITCODE
+            Remove-Item Env:RESOLUTE_IDLE_COLLECT -ErrorAction SilentlyContinue
+            if ($smokeExit -eq 0) { Note 'smoke: pass (report build/smoke/smoke-report.md in the candidate worktree)' }
+            elseif ($smokeExit -eq 2) { Note 'smoke: blocked (exit 2, named refusal in the candidate smoke report); the elevated pass is owned by D07 T01 section 5' }
+            else { Note "smoke: FAILED (exit $smokeExit, see smoke.log and the candidate smoke report)"; $failures.Add("smoke run failed at $head (exit $smokeExit)") }
         }
         Note ''
     }
