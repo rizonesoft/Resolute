@@ -54,3 +54,32 @@ Static review only; reproduction procedures above were not executed. No files mo
 HIGHEST: P2
 
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T10:02:07Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: a896bb2f70a95d835ada0cfc5fcea58d39a165ea
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 9
+- Digest: e802a2803245ab98
+
+## consistency: needs-attention
+
+1. **P2:** `scripts/smoke-run.py:1672` at candidate `a3dc5650` violates the documented “windowless logic tests” contract. It launches the `deaf` fixture, which creates a visible Tk window, while `--self-test` bypasses admission. Reproduction: run `python scripts/smoke-run.py --self-test` during active daytime use without `--visible`. This conflicts with `docs/testing.md` desktop fencing rules.
+
+The working-tree HEAD is newer (`493b887b`) and replaces this case with windowless dependencies. The finding applies to the explicitly requested candidate. Static inspection only; reproduction not executed.
+
+HIGHEST: P2
+
+OVERALL: needs-attention
+
+## Writer note: settled (repair6 round 2)
+
+- Settled: the round-2 finding names candidate a3dc5650; the reviewer itself records that HEAD 493b887b replaces the case with windowless dependencies (injected window enumeration, capture, and post; phase-triggered interruption; no Tk window). The round prompt's candidate list predated that fix commit. Round 3 is dispatched against the current tip.
