@@ -1,0 +1,26 @@
+capture       : 2026-11-09-D00-T05-s1-launcher-details-light.png
+describes     : the launcher details view, light, at 1600 px wide: visual proof for the README (D00 T05 section 1)
+window title  : Resolute
+target process: 50448 R:\resolute-clean-check\Bin\Release\Resolute.exe
+attached      : attached to a process the caller started and owns
+source binary : R:\resolute-clean-check\Bin\Release\Resolute.exe
+file version  : 0.1.0.0
+size          : 1582 x 991 px
+monitor dpi   : 144  (150% scaling) -- what the image was rendered at
+window dpi    : 144  (logical dpi the process sees)
+dpi aware     : True
+appearance    : light  (stated by the caller)
+fixture       : launcher from the clean checkout at c4f6fcde (Bin/Release/Resolute.exe); host VENOM-PC; appearance light set by 2 theme-command press(es) from System
+launch context: pwsh R:\scratch\capture-readme.ps1 (launch R:\resolute-clean-check\Bin\Release\Resolute.exe, resize 1600x1000, theme x2, view 1004, then capture-window.ps1 -ProcessId <pid>)
+fixture files : none beside Bin/Release (launcher only build)
+launch args   : attached to a running process
+working dir   : (default)
+locale        : en-ZA / UI en-US
+geometry      : 49,40 1582x991
+exe sha256    : 2CD7AD0780FEB494AE5C2A6D524143434103A0BAD64F56B50664301E6EE99B4A
+source revision: c4f6fcde31af213ebf3b6e9309ffd3a5360f206d
+windows build : 10.0.26300.0
+captured      : 2026-11-09
+
+Reproduce with scripts/capture-window.ps1. Where this capture and
+DESIGN.md disagree, the contract wins and this capture is restaked.

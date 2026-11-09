@@ -57,11 +57,11 @@ The README shows real pixels from the shipped app, never mockups: the suite buil
 
 **Needs:** Windows host (build/test)
 
-- [ ] Build the app from a clean checkout. Done when: `scripts/build.ps1` completes on a checkout with no prior `build/` output, quoted.
-- [ ] Capture both themes for every README shot (**Groomed 2026-09-23** for the premium README): each shot has a light and a dark capture of the same surface and state, so the README's `<picture>` pairs follow the reader's GitHub theme. Done when: each pair exists at the same size with matching sidecars naming the theme.
-- [ ] Capture two README shots at no less than 1280 px. Done when: both shots come from the built app, both meet the width floor, and both are committed under `docs/captures/`. Cheaper substitute that fails the checkpoint: cropping a window capture up past the floor, which ships blur as proof.
-- [ ] Record provenance for each shot. Done when: each shot carries a sidecar with date, host, commit, and the command that produced it, per the §3 convention.
-- [ ] Commit: `"docs: README screenshots with provenance"`
+- [x] Build the app from a clean checkout. Done when: `scripts/build.ps1` completes on a checkout with no prior `build/` output, quoted.
+- [x] Capture both themes for every README shot (**Groomed 2026-09-23** for the premium README): each shot has a light and a dark capture of the same surface and state, so the README's `<picture>` pairs follow the reader's GitHub theme. Done when: each pair exists at the same size with matching sidecars naming the theme.
+- [x] Capture two README shots at no less than 1280 px. Done when: both shots come from the built app, both meet the width floor, and both are committed under `docs/captures/`. Cheaper substitute that fails the checkpoint: cropping a window capture up past the floor, which ships blur as proof.
+- [x] Record provenance for each shot. Done when: each shot carries a sidecar with date, host, commit, and the command that produced it, per the §3 convention.
+- [x] Commit: `"docs: README screenshots with provenance"`
 
 **Test checkpoint:** A clean checkout builds by one command; two shots at or above 1280 px exist with complete sidecars; every sidecar field names a real value. Cheaper substitute that fails the checkpoint: mockups or undated captures, which prove the layout was imagined rather than shipped.
 
