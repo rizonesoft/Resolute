@@ -323,7 +323,7 @@ Global $g_sUrlGitHubIssues		= "https://github.com/rizonesoft/Resolute/issues|Git
 Global $g_sUrlRSS				= "https://rizonesoft.com/feed|www.rizonesoft.com/feed"												; https://rizonesoft.com/feed
 Global $g_sUrlPayPal			= "https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE|PayPal.com/donate"						; https://www.paypal.com/donate/?hosted_button_id=7UGGCSDUZJPFE
 Global $g_sUrlSA				= "https://en.wikipedia.org/wiki/South_Africa|Wikipedia.org/wiki/South_Africa"							; https://en.wikipedia.org/wiki/South_Africa
-Global $g_sUrlProgPage			= "https://rizonesoft.com/downloads/resolute/|www.rizonesoft.com/downloads/resolute/"
+Global $g_sUrlProgPage			= "https://rizonesoft.com|www.rizonesoft.com"
 Global $g_sUrlUpdate			= "https://rizonesoft.com/downloads/resolute/update/"
 Global $g_sUrlUpdateServer		= "https://cdn2.rizonesoft.com/update/"
 
