@@ -142,6 +142,7 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
             if (!ink[static_cast<size_t>(start)] || seen[static_cast<size_t>(start)]) continue;
             long area = 0;
             bool touches = false;
+            int minX = rw, minY = rh, maxX = -1, maxY = -1;
             std::vector<double> lums;
             stack.clear();
             stack.push_back(start);
@@ -151,6 +152,10 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
                 stack.pop_back();
                 const int cx = cur % rw, cy = cur / rw;
                 ++area;
+                minX = std::min(minX, cx);
+                minY = std::min(minY, cy);
+                maxX = std::max(maxX, cx);
+                maxY = std::max(maxY, cy);
                 if (cx == 0 || cy == 0 || cx == rw - 1 || cy == rh - 1) touches = true;
                 lums.push_back(Luminance(img.px[static_cast<size_t>(y0 + cy) * img.w + (x0 + cx)]));
                 const int dx[4] = {1, -1, 0, 0}, dy[4] = {0, 0, 1, -1};
@@ -164,7 +169,12 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
                     }
                 }
             }
-            if (touches || area < 4 || area * 50 > static_cast<long>(rw) * rh || lums.empty()) continue;
+            // A component thinner than 3 pixels in either dimension is a
+            // separator, grip, or rule, not a glyph: it carries no text
+            // relationship for the floor to judge.
+            if (touches || area < 4 || area * 50 > static_cast<long>(rw) * rh || lums.empty() ||
+                maxX - minX < 2 || maxY - minY < 2)
+                continue;
             std::sort(lums.begin(), lums.end());
             // The glyph's core, not its anti-aliased median: the far-end
             // decile of its own pixels.
@@ -285,13 +295,11 @@ inline std::vector<std::string> ComparePair(const std::vector<RegionSpec>& spec,
                                             const Image& fresh, const std::vector<Observed>& baselineObs,
                                             const std::vector<Observed>& freshObs,
                                             const EquivalenceMap& equivalents) {
-    // Structural rules absolute; contrast relative to the baseline: the
-    // baseline of record is the current launcher, whose palette defects
-    // are the design system's to fix (DESIGN.md: a failing token pair is
-    // a palette defect), so the pair refuses a regression below the
-    // baseline's measured contrast, while Compare's absolute floor stays
-    // the rule drills and new surfaces answer to.
-    std::vector<std::string> failures = Compare(spec, freshObs, equivalents, {}, false);
+    // Every rule absolute, contrast included: the DESIGN.md floor is not
+    // waived for the baseline, whose palette was corrected at its owning
+    // layer (the theme tokens) until the captures of record pass it. The
+    // relative contrast rule below additionally refuses a regression.
+    std::vector<std::string> failures = Compare(spec, freshObs, equivalents, {});
     auto find = [&](const std::vector<Observed>& v, const std::string& name) -> const Observed* {
         for (const auto& o : v)
             if (o.name == name) return &o;

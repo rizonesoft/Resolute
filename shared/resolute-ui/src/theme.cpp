@@ -104,7 +104,7 @@ ColorPalette LightPalette {
     RGB(210, 210, 210),  // border
     RGB(0,   120, 212),  // accent
     RGB(230, 230, 230),  // statusBar
-    RGB(100, 100, 100),  // statusBarText
+    RGB(90,  90,  90),   // statusBarText (darkened 2026-11-09: at 100 the pair measured 4.47:1 against the DESIGN.md 4.5:1 text floor on the D00 T02 section 12 captures)
 
     RGB(30,  140, 230),  // accentHover
     RGB(0,   90,  170),  // accentPressed
