@@ -5,9 +5,11 @@ readback = (ev / "descriptor-readback.txt").read_text(encoding="utf-8", errors="
 warnings = (ev / "distro-warnings.txt").read_text(encoding="utf-8", errors="replace")
 
 tools = re.findall(r"^=== (\w+)\\", readback, re.M)
+EXPECTED = ["BiosCodes", "Chromin", "ComIntRep", "DVDRepair", "Edgemin", "Firemin",
+            "MemBoost", "Ownership", "PixRepair", "ReBar", "Resolute", "USBRepair", "Watermin"]
 fail = 0
-if len(tools) != 13:
-    print(f"expected 13 descriptor readbacks, found {len(tools)}")
+if sorted(tools) != EXPECTED:
+    print(f"expected exactly the 13 tools {EXPECTED}, found {tools}")
     fail += 1
 for tool in tools:
     m = re.search(rf"^Icon=(.+)$", readback.split(f"=== {tool}\\")[1].split("===")[0], re.M)

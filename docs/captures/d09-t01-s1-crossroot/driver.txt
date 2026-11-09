@@ -1,0 +1,12 @@
+dialog title=[] text=[OK
+
+
+]
+dialog dismissed
+dialog title=[Oops! Something went wrong!] text=[OK
+
+SDK root is not writable, so we moved the Concrete directory to: C:\Users\DerickPayne\AppData\Roaming\Rizonesoft\Distro\Concrete
+]
+dialog dismissed
+main window=0x0000000001731886
+discovery wait done
