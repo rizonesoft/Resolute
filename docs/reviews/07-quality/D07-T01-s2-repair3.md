@@ -23,3 +23,5 @@ No files modified. Supplied gate and self-test results were not rerun.
 HIGHEST: P2
 PLAN: gaps
 OVERALL: needs-attention
+
+- Planned: gap 1 (log-save outcome propagated; success reports it, regression stops advertising an unsaved log) in 9f38143f8174fce3565e8f55f5c325dce59fc319
