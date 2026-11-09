@@ -1449,6 +1449,7 @@ Func _PopulateSolutions()
 				Local $sUseBeta = _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_Version")
 				Local $sUseX64 = _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_UseX64")
 				Local $sCompileBoth = _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_Compile_both")
+			Local $sToolUpdateURL = _AutoIt3Script_GetGlobalValue($sAu3ScriptIn, "$g_sUrlUpdate")
 				Local $sOutFile = _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_OutFile")
 				Local $sOutFileX64 = _AutoIt3Script_GetDirectiveValue($sAu3ScriptIn, "#AutoIt3Wrapper_OutFile_X64")
 
@@ -1513,6 +1514,7 @@ Func _PopulateSolutions()
 				IniWrite($sSolIniPath, "Environment", "FullDistributionPath", _DescriptorRelativePath($sSolutionBase, $sFullDistributionPath))
 				IniWrite($sSolIniPath, "Environment", "DistroSourceName", $sDistroSourceName)
 				IniWrite($sSolIniPath, "Environment", "DistroSourceFullPath", _DescriptorRelativePath($sSolutionBase, $sDistroSourceFullPath))
+				IniWrite($sSolIniPath, "Environment", "UpdateURL", $sToolUpdateURL)
 
 			WEnd
 
@@ -3440,9 +3442,19 @@ Func _CreateUpdateFiles($sSolutionIniPath, $iRow, $iCol)
 	_Logging_Start("Creating update files.")
 	_StartSoloProcess($iRow, $iCol)
 
+	Local $sUpdateURL = ""
+	For $iEnv = 1 To $g_aEnvironment[0][0]
+		If $g_aEnvironment[$iEnv][0] = "UpdateURL" Then $sUpdateURL = $g_aEnvironment[$iEnv][1]
+	Next
+	If $sUpdateURL = "" Then $sUpdateURL = _AutoIt3Script_GetGlobalValue($g_aEnvironment[1][1], "$g_sUrlUpdate")
+	If $sUpdateURL = "" Then
+		_Logging_EditWrite(_Logging_SetLevel(StringFormat("Update files were not created for '%s': the tool declares no update destination ($g_sUrlUpdate).", $sProgShortName), "ERROR"))
+		Return False
+	EndIf
+
 	$iIniError = IniWrite($sUpdateFile, "Update", "LatestBuild", $sProgBuild)
 	_UpdateSoloProcess($iRow, $iCol, 30)
-	$iIniError = IniWrite($sUpdateFile, "Update", "UpdateURL", $g_sUrlUpdate)
+	$iIniError = IniWrite($sUpdateFile, "Update", "UpdateURL", $sUpdateURL)
 	_UpdateSoloProcess($iRow, $iCol, 60)
 
 	If $iIniError = 0 Then

@@ -138,6 +138,24 @@ Func _AutoIt3Script_GetDirectiveValue($sAu3Script_In, $sParam, $sResField = "")
 EndFunc   ;==>_AutoIt3Script_GetDirectiveValue
 
 
+Func _AutoIt3Script_GetGlobalValue($sAu3Script_In, $sGlobalName)
+
+	; The literal string a script assigns to a Global, or "" when the script
+	; does not declare it. $sGlobalName includes the leading $.
+	Local $hFileOpen = FileOpen($sAu3Script_In, $FO_FULLFILE_DETECT)
+	If $hFileOpen = -1 Then Return SetError(1, 0, "")
+	Local $sFileRead = FileRead($hFileOpen)
+	FileClose($hFileOpen)
+
+	Local $sPattern = '(?m)^\s*Global\s+' & StringReplace($sGlobalName, "$", "\$") & '\s*=\s*"([^"]*)"'
+	Local $aMatch = StringRegExp($sFileRead, $sPattern, 1)
+	If @error Then Return ""
+
+	Return $aMatch[0]
+
+EndFunc   ;==>_AutoIt3Script_GetGlobalValue
+
+
 Func _AutoIt3Script_GetFilename($sScriptFullPath)
 
 	Local $sDrive = "", $sDir = "", $sFileName = "", $sExtension = ""
