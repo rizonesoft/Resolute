@@ -4,7 +4,8 @@
 
 .DESCRIPTION
     Reads toolchain.json, which is the only place a version, URL or hash is
-    written, and populates reskit/ with llvm-mingw, CMake and Ninja.
+    written, and populates reskit/ with llvm-mingw, CMake, Ninja, the pinned
+    CPython the repository's scripts run under, and sccache.
 
     Three properties this script owes, each one a D00 T01 §1 item:
 

@@ -72,15 +72,23 @@ New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 $Cmake = Join-Path $RepoRoot 'reskit\cmake\bin\cmake.exe'
 $Ctest = Join-Path $RepoRoot 'reskit\cmake\bin\ctest.exe'
 
-# The TODO scripts are stdlib-only and run under any Python 3, but the name
-# on PATH differs by install: `python` usually, `python3` on some, `py`
-# as the Windows launcher fallback. Resolve once so a
-# bare `python` that is missing (or shadowed by the Store stub) fails here
-# with a name, not eight gates down with a confusing error.
-$Python = @('python', 'python3', 'py') | ForEach-Object {
-    Get-Command $_ -ErrorAction SilentlyContinue
-} | Select-Object -First 1 -ExpandProperty Source
-if (-not $Python) { throw 'check-all: no Python 3 on PATH (looked for python, python3, py)' }
+# The TODO scripts are stdlib-only. They run under the pinned CPython in
+# reskit/python (toolchain.json, installed by scripts/bootstrap.ps1), so
+# every machine and every gate uses the same interpreter and no machine
+# argues with its system Python again. Resolve once, here.
+$PinnedPython = Join-Path $RepoRoot 'reskit\python\python.exe'
+if (Test-Path $PinnedPython) {
+    $Python = $PinnedPython
+} else {
+    # Not bootstrapped: fall back to PATH so the documentation-only gates
+    # still run, and say which interpreter that was. The pinned interpreter
+    # is the guarantee; a PATH one is a convenience with a name attached.
+    $Python = @('python', 'python3', 'py') | ForEach-Object {
+        Get-Command $_ -ErrorAction SilentlyContinue
+    } | Select-Object -First 1 -ExpandProperty Source
+    if (-not $Python) { throw 'check-all: no Python found (looked in reskit\python, then python, python3, py on PATH); fix: pwsh scripts/bootstrap.ps1' }
+    Write-Host "check-all: reskit\python not present, using $Python from PATH (run pwsh scripts/bootstrap.ps1 for the pinned interpreter)" -ForegroundColor Yellow
+}
 
 $results = [System.Collections.ArrayList]::new()
 
@@ -262,7 +270,10 @@ Invoke-Gate -Name 'scripts unit tests' -LogName 'gate-scripts-unittests' -Comman
     & $Python -m unittest discover -s (Join-Path $RepoRoot 'scripts\tests')
 }
 Invoke-Gate -Name 'agent tiers' -LogName 'gate-agent-tiers' -Command {
-    & node (Join-Path $RepoRoot 'scripts\verify-agent-tiers.mjs')
+    & $Python (Join-Path $RepoRoot 'scripts\verify-agent-tiers.py')
+}
+Invoke-Gate -Name 'agent tiers self-test' -LogName 'gate-agent-tiers-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\verify-agent-tiers.py') --self-test
 }
 
 # The conformance profile is a contract other domains are measured against, so

@@ -69,18 +69,30 @@ endfunction()
 # and naming it. Inheritance can be defeated by a target that sets its own
 # options; an audit of what actually got applied cannot.
 #
-# Anything under `_deps` is skipped, which is the same by-construction
-# exemption stated once more: a dependency is not ours, so it is neither
-# policed nor audited.
+# Anything under the FetchContent base directory is skipped, which is the
+# same by-construction exemption stated once more: a dependency is not ours,
+# so it is neither policed nor audited. The base used to be recognisable by
+# its default name, `_deps` under each binary directory. Since the base is
+# one shared directory (build/deps), the exemption has to read the variable
+# that names it rather than pattern-match a directory name that no longer
+# identifies anything.
 
 function(_resolute_collect_targets dir out_var)
     get_property(_subs DIRECTORY "${dir}" PROPERTY SUBDIRECTORIES)
     get_property(_here DIRECTORY "${dir}" PROPERTY BUILDSYSTEM_TARGETS)
     set(_acc ${_here})
     foreach(_sub IN LISTS _subs)
-        # A FetchContent dependency is materialised under the build tree and is
-        # not ours to police.
-        if(NOT _sub MATCHES "/_deps/")
+        # A FetchContent dependency is materialised under the FetchContent
+        # base directory and is not ours to police.
+        set(_is_dep FALSE)
+        if(DEFINED FETCHCONTENT_BASE_DIR AND NOT "${FETCHCONTENT_BASE_DIR}" STREQUAL "")
+            file(TO_CMAKE_PATH "${FETCHCONTENT_BASE_DIR}" _fc_base)
+            file(TO_CMAKE_PATH "${_sub}" _fc_sub)
+            if(_fc_sub STREQUAL _fc_base OR _fc_sub MATCHES "^${_fc_base}/")
+                set(_is_dep TRUE)
+            endif()
+        endif()
+        if(NOT _is_dep AND NOT _sub MATCHES "/_deps/")
             _resolute_collect_targets("${_sub}" _sub_targets)
             list(APPEND _acc ${_sub_targets})
         endif()

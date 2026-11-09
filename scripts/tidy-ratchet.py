@@ -61,8 +61,15 @@ def normalise_file(raw: str, root: Path) -> str:
     return str(p).lower()
 
 
-def collect_findings(lines, root: Path) -> set:
-    """Unique (file,line,col,check) keys from clang-tidy output lines."""
+def collect_findings(lines, root: Path, deps_prefixes=()) -> set:
+    """Unique (file,line,col,check) keys from clang-tidy output lines.
+
+    Findings in a dependency's headers are the dependency's, not ours,
+    even when our translation unit is the one that included the header.
+    They are excluded by the same FetchContent base the TU selection
+    uses, read from the build's CMake cache, plus the legacy `_deps`
+    directory name that base used to have.
+    """
     seen = set()
     for text in lines:
         m = FINDING_RE.match(text.rstrip("\n"))
@@ -70,6 +77,8 @@ def collect_findings(lines, root: Path) -> set:
             continue
         f = normalise_file(m.group("file"), root)
         if "/_deps/" in f:
+            continue
+        if any(f.startswith(prefix) for prefix in deps_prefixes):
             continue
         seen.add(f"{f}|{m.group('line')}|{m.group('col')}|{m.group('check')}")
     return seen
@@ -405,6 +414,33 @@ def expected_targets(root: Path) -> dict:
     return targets
 
 
+def fetchcontent_prefixes(db_parent):
+    """Normalised path prefixes of the FetchContent base for a build tree.
+
+    A FetchContent dependency is not ours to analyse or to bind. It used
+    to be recognisable by the `_deps` directory in its path; since the
+    FetchContent base became one shared directory, the base has to be
+    read from the build's own CMake cache, which is where CMake recorded
+    the value it actually used.
+    """
+    prefixes = []
+    cache = Path(db_parent) / "CMakeCache.txt"
+    if cache.is_file():
+        for line in cache.read_text(errors="replace").splitlines():
+            if line.startswith("FETCHCONTENT_BASE_DIR"):
+                value = line.split("=", 1)[-1].strip()
+                if value:
+                    prefixes.append(str(Path(value)).replace("\\", "/").lower())
+    return prefixes
+
+
+def is_project_source(file_name, deps_prefixes):
+    normalised = file_name.replace("\\", "/").lower()
+    if "_deps" in normalised:
+        return False
+    return not any(normalised.startswith(prefix) for prefix in deps_prefixes)
+
+
 def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
     """Run clang-tidy per target. Returns (per-target finding sets,
     global set, per-target sorted finding lines). Refuses when the
@@ -461,10 +497,12 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
     total_tus = 0
     for name, db in targets.items():
         entries = json.loads(db.read_text())
+        deps_prefixes = fetchcontent_prefixes(db.parent)
         tus = [
             e["file"]
             for e in entries
-            if "_deps" not in e["file"] and not e["file"].endswith(".rc")
+            if is_project_source(e["file"], deps_prefixes)
+            and not e["file"].endswith(".rc")
         ]
         if not tus:
             flush_log()
@@ -492,7 +530,7 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
                     f"target '{name}': error diagnostic while analysing {tu}; "
                     f"the finding count is not evidence until analysis completes; {where}"
                 )
-            found |= collect_findings(out.splitlines(), root)
+            found |= collect_findings(out.splitlines(), root, deps_prefixes)
         per_target[name] = found
         global_set |= found
     return per_target, global_set, total_tus, flush_log()
@@ -815,6 +853,33 @@ def self_test() -> int:
         assert len(got) == 2, f"expected 2 unique findings, got {sorted(got)}"
 
     case("counting deduplicates, normalises, keeps analyzer names", count_cases)
+
+    def shared_deps_excluded():
+        tmp = mkdtemp()
+        (tmp / "CMakeCache.txt").write_text(
+            "FETCHCONTENT_BASE_DIR:PATH=" + str(tmp / "deps").replace("\\", "/") + "\n"
+        )
+        prefixes = fetchcontent_prefixes(tmp)
+        assert len(prefixes) == 1, f"expected one deps prefix, got {prefixes}"
+        dep = str(tmp / "deps" / "catch2-src" / "catch.cpp")
+        own = str(tmp / "src" / "a.cpp")
+        assert not is_project_source(dep, prefixes), "shared deps source analysed as ours"
+        assert is_project_source(own, prefixes), "project source excluded as a dependency"
+        assert not is_project_source("C:/repo/build/release/_deps/x/y.cpp", prefixes)
+
+    case("shared FetchContent base excluded by its cache value", shared_deps_excluded)
+
+    def deps_header_findings_excluded():
+        lines = [
+            "D:/GitHub/Resolute/build/deps/release/catch2-src/src/catch2/catch.hpp:1:2: warning: x [bugprone-foo]",
+            "C:/repo/src/a.cpp:1:2: warning: x [bugprone-foo]",
+        ]
+        got = collect_findings(
+            lines, root, ["d:/github/resolute/build/deps/release"]
+        )
+        assert len(got) == 1, f"expected only the project finding, got {sorted(got)}"
+
+    case("dependency header findings under the shared base excluded", deps_header_findings_excluded)
 
     good = "count: 5\ntarget RegStudio: 2\ntarget root: 4\n"
 
@@ -1600,10 +1665,12 @@ def main(argv=None) -> int:
                     pth = Path(base_dir) / pth
                 return pth.resolve(strict=False).as_posix().lower()
 
+            _deps_prefixes = fetchcontent_prefixes(db.parent)
             db_sources = {
                 _resolved(e.get("directory") or db.parent, e["file"])
                 for e in _js2.loads(db.read_text(encoding="utf-8"))
-                if "_deps" not in e["file"] and not e["file"].endswith(".rc")
+                if is_project_source(e["file"], _deps_prefixes)
+                and not e["file"].endswith(".rc")
             }
             ninja = db.parent / "build.ninja"
             if not ninja.is_file():
@@ -1646,7 +1713,7 @@ def main(argv=None) -> int:
             for line in ninja.read_text(errors="replace").splitlines():
                 if line.startswith("build ") and ": CXX_COMPILER__" in line:
                     for token in _ninja_tokens(line.split(": CXX_COMPILER__", 1)[1]):
-                        if token.lower().endswith((".cpp", ".cc", ".cxx")) and "_deps" not in token:
+                        if token.lower().endswith((".cpp", ".cc", ".cxx")) and is_project_source(token, _deps_prefixes):
                             ninja_sources.add(_resolved(db.parent, token))
             if db_sources != ninja_sources:
                 print(

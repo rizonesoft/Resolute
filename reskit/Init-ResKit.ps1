@@ -3,8 +3,9 @@
     Initialize ResKit portable toolchain for Resolute builds.
 
 .DESCRIPTION
-    Sets PATH to use ResKit tools (LLVM-MinGW, CMake, Ninja) instead of
-    system-installed versions. Run this before any build scripts.
+    Sets PATH to use ResKit tools (LLVM-MinGW, CMake, Ninja, Python,
+    sccache) instead of system-installed versions. Run this before any
+    build scripts.
     
     Only modifies environment if the tools are actually present.
 
@@ -23,6 +24,8 @@ $ResKitRoot = $PSScriptRoot
 $LlvmBin = Join-Path $ResKitRoot "llvm-mingw\bin"
 $CmakeBin = Join-Path $ResKitRoot "cmake\bin"
 $NinjaBin = Join-Path $ResKitRoot "ninja"
+$PythonBin = Join-Path $ResKitRoot "python"
+$SccacheBin = Join-Path $ResKitRoot "sccache"
 
 # Build list of existing tool paths
 $ToolPaths = @()
@@ -37,6 +40,14 @@ if (Test-Path (Join-Path $CmakeBin "cmake.exe")) {
 
 if (Test-Path (Join-Path $NinjaBin "ninja.exe")) {
     $ToolPaths += $NinjaBin
+}
+
+if (Test-Path (Join-Path $PythonBin "python.exe")) {
+    $ToolPaths += $PythonBin
+}
+
+if (Test-Path (Join-Path $SccacheBin "sccache.exe")) {
+    $ToolPaths += $SccacheBin
 }
 
 # Prepend ResKit paths to PATH

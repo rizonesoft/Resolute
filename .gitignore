@@ -54,6 +54,8 @@ test_font.obj
 /reskit/llvm-mingw/
 /reskit/cmake/
 /reskit/ninja/
+/reskit/python/
+/reskit/sccache/
 
 # TODO graph derived cache (always reproducible from todo/*.md)
 build/

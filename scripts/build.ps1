@@ -75,6 +75,15 @@ $RepoRootFwd = $RepoRoot -replace '\\', '/'
 
 $Cmake = Join-Path $RepoRoot 'reskit\cmake\bin\cmake.exe'
 $Ninja = Join-Path $RepoRoot 'reskit\ninja\ninja.exe'
+$Python = Join-Path $RepoRoot 'reskit\python\python.exe'
+$Sccache = Join-Path $RepoRoot 'reskit\sccache\sccache.exe'
+
+# The compile cache lives under build/, capped, never in the user profile:
+# a cache in the profile is machine state two checkouts would silently
+# share, which is the system-wide coupling this toolchain exists to end.
+# The CMake presets set the same variables for direct configure runs.
+$env:SCCACHE_DIR = Join-Path $RepoRoot 'build\sccache'
+$env:SCCACHE_CACHE_SIZE = '10G'
 
 # ── The toolchain has to be there before anything is built ───
 #
@@ -85,6 +94,8 @@ function Assert-Toolchain {
     $missing = @()
     if (-not (Test-Path $Cmake)) { $missing += 'reskit\cmake\bin\cmake.exe' }
     if (-not (Test-Path $Ninja)) { $missing += 'reskit\ninja\ninja.exe' }
+    if (-not (Test-Path $Python)) { $missing += 'reskit\python\python.exe' }
+    if (-not (Test-Path $Sccache)) { $missing += 'reskit\sccache\sccache.exe' }
     $clang = Join-Path $RepoRoot 'reskit\llvm-mingw\bin\clang++.exe'
     if (-not (Test-Path $clang)) { $missing += 'reskit\llvm-mingw\bin\clang++.exe' }
 
@@ -205,7 +216,11 @@ function Build-Extension {
                 "-DCMAKE_C_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang.exe" `
                 "-DCMAKE_CXX_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/clang++.exe" `
                 "-DCMAKE_RC_COMPILER=$RepoRootFwd/reskit/llvm-mingw/bin/llvm-windres.exe" `
-                "-DCMAKE_MAKE_PROGRAM=$RepoRootFwd/reskit/ninja/ninja.exe"
+                "-DCMAKE_MAKE_PROGRAM=$RepoRootFwd/reskit/ninja/ninja.exe" `
+                "-DCMAKE_C_COMPILER_LAUNCHER=$RepoRootFwd/reskit/sccache/sccache.exe" `
+                "-DCMAKE_CXX_COMPILER_LAUNCHER=$RepoRootFwd/reskit/sccache/sccache.exe" `
+                "-DFETCHCONTENT_BASE_DIR=$RepoRootFwd/build/deps/$Configuration" `
+                "-DFETCHCONTENT_UPDATES_DISCONNECTED=ON"
         }
         if ($code -ne 0) {
             Write-Host "build: configure failed for $ExtName" -ForegroundColor Red
@@ -290,7 +305,7 @@ function Capture-Db([string]$Path) {
 
 # Capture the input manifest BEFORE compiling: a source changed
 # mid-build must not acquire build evidence (D07 T01 section 3).
-$inputsBefore = (& python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --print-input-manifest).Trim()
+$inputsBefore = (& $Python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --print-input-manifest).Trim()
 Write-Host "building $($targets.Count) target(s), $Config, x86-64" -ForegroundColor Cyan
 
 foreach ($t in $targets) {
@@ -327,7 +342,7 @@ Write-Host "build: $($results.Count) target(s) built, $Config, output under Bin\
 # refuses to certify artifacts its sources no longer match, and the
 # conformance check's C24 consumes the chain (D07 T01 section 3).
 if ($Config -eq 'Release') {
-    & python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json') --build-config $Config --build-targets ($targets -join ',') --expect-inputs $inputsBefore --expect-dbs (($script:DbExpect.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ';')
+    & $Python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json') --build-config $Config --build-targets ($targets -join ',') --expect-inputs $inputsBefore --expect-dbs (($script:DbExpect.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ';')
     if ($LASTEXITCODE -ne 0) { Write-Host 'build: writing the build record failed' -ForegroundColor Red; exit 1 }
 }
 exit 0

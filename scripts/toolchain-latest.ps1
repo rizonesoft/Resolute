@@ -51,6 +51,7 @@ $Upstream = @{
     'llvm-mingw' = @{ Repo = 'mstorsjo/llvm-mingw'; Strip = $false }
     'cmake'      = @{ Repo = 'Kitware/CMake';       Strip = $true  }
     'ninja'      = @{ Repo = 'ninja-build/ninja';   Strip = $true  }
+    'sccache'    = @{ Repo = 'mozilla/sccache';     Strip = $true  }
 }
 
 if (-not (Test-Path $ManifestPath)) {

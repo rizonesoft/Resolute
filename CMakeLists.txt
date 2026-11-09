@@ -51,6 +51,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Bin/Debug")
 # this makes the prescription match what was already true rather than changing
 # the output.
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteLinkPolicy.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/ResoluteJobPools.cmake")
 
 # The warning policy is applied per target rather than here, because a
 # FetchContent dependency is a subdirectory of this build and would inherit

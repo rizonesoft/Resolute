@@ -502,7 +502,16 @@ def eval_build_clean(root: Path, tool, spec, ctx):
         raise Refusal(f"C24: result record carries no count for target '{target}'")
     measured = record["targets"][target]
     ceiling = ctx["baseline"]["targets"][target]
-    recount = len(ctx["ratchet"].collect_findings(log_bytes.decode("utf-8", "replace").splitlines(), root))
+    # The recount must exclude dependency findings exactly as the ratchet
+    # did, or it counts a dependency's headers against the project: the
+    # FetchContent bases of every database the record binds, read from
+    # those builds' own CMake caches through the ratchet's one reader.
+    deps_prefixes = sorted({
+        prefix
+        for rel_db in record.get("compile_dbs", {})
+        for prefix in ctx["ratchet"].fetchcontent_prefixes((root / rel_db).parent)
+    })
+    recount = len(ctx["ratchet"].collect_findings(log_bytes.decode("utf-8", "replace").splitlines(), root, deps_prefixes))
     if recount != record.get("count"):
         raise Refusal(
             f"C24: log recount {recount} disagrees with recorded count {record.get('count')}"
@@ -1007,6 +1016,28 @@ def self_test() -> int:
         assert run(tmp, log, tools, PROFILE, status, result) == 0
 
     case("matrix passes with shipped C23/C24 and open C99", matrix_ok)
+
+    def c24_recount_excludes_shared_deps():
+        # A finding in a dependency header under the shared FetchContent
+        # base must recount to the recorded count, not against it: the
+        # ratchet excluded it when measuring, so the cross-check must too.
+        tmp, tools, log, status, result = fixture()
+        import hashlib as _h
+        import json as _j
+        deps = tmp / "build" / "deps" / "release"
+        (tmp / "build" / "release" / "CMakeCache.txt").write_text(
+            "FETCHCONTENT_BASE_DIR:PATH=" + str(deps).replace("\\", "/") + "\n"
+        )
+        log.write_text(
+            str(deps / "catch2-src" / "catch.hpp").replace("\\", "/")
+            + ":1:2: warning: x [bugprone-foo]\n"
+        )
+        record = _j.loads(result.read_text())
+        record["log_sha256"] = _h.sha256(log.read_bytes()).hexdigest()
+        result.write_text(_j.dumps(record))
+        assert run(tmp, log, tools, PROFILE, status, result) == 0
+
+    case("C24 recount excludes findings under the shared FetchContent base", c24_recount_excludes_shared_deps)
 
     def shipped_without_evaluator():
         tmp, tools, log, status, result = fixture(status_map={"D01 T01 \u00a71": "shipped"})

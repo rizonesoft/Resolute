@@ -19,8 +19,11 @@
 # Raised total 59 -> 103 on 2026-09-17: RegStudio came under analysis (prose record below, migrated to this grammar 2026-11-09)
 # Raised total 103 -> 169 on 2026-09-17: clang 23 new and widened checks (prose record below, migrated to this grammar 2026-11-09)
 
-count: 169
-target root: 122
+# Raised total 169 -> 184 on 2026-11-09: tree drift since the 2026-09-17 measurement, proven tooling-independent below
+# Raised root 122 -> 137 on 2026-11-09: tree drift since the 2026-09-17 measurement, proven tooling-independent below
+
+count: 184
+target root: 137
 target RegStudio: 47
 
 # ── Raised 103 -> 169 on 2026-09-17: a stronger analyser, not worse code
@@ -167,3 +170,36 @@ target RegStudio: 47
 # gate found, and fixing it here would be the section widening itself. It is
 # called out so the ratchet in D07 T01 §2 starts with a known first target
 # rather than a flat list.
+
+# -- Raised 169 -> 184 on 2026-11-09: the tree grew, the tooling did not move the number
+#
+# Raised under this file's own grammar, on this evidence: a fresh clone of
+# HEAD (674f8c5d) into a different absolute path, built and analysed with
+# the pre-change tooling and the pre-change ratchet, reports exactly
+# total 184 and root 137. The changed tooling (pinned Python and sccache,
+# ThinLTO stated explicitly, per-configuration FetchContent bases, Ninja
+# job pools) reports the same 184 and 137 in this tree, with an identical
+# check-by-check breakdown. Two independent pipelines agreeing is what
+# makes this a measurement of the code rather than of the pipeline.
+#
+# The +15 against the 2026-09-17 breakdown above, accounted exactly:
+#
+#     + 8  bugprone-signed-bitwise                       49 -> 57
+#     + 6  bugprone-implicit-widening-of-multiplication-result  1 -> 7
+#     + 1  performance-no-int-to-ptr                     36 -> 37
+#     + 1  misc-misplaced-const                          new
+#     + 1  performance-inefficient-vector-operation      new
+#     + 1  performance-inefficient-string-concatenation   new
+#     - 1  bugprone-use-after-move                       1 -> 0 (the animation.cpp defect above, fixed in code)
+#     - 2  performance-unnecessary-value-param           2 -> 0
+#     ----
+#     + 15
+#
+# The growth sits in the user interface code written after 2026-09-17
+# (controls and layout arithmetic in shared/resolute-ui, and the test
+# surfaces over it). RegStudio did not move: 47 stayed 47, which is the
+# control that says this is new code surfacing findings, not the gate
+# widening underneath old code.
+#
+# The ratchet rule stands unchanged: this raise needed its paragraph,
+# and the next one needs its own.

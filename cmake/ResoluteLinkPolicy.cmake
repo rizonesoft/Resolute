@@ -28,6 +28,19 @@ set(RESOLUTE_LINK_POLICY_APPLIED TRUE)
 # may not depend at runtime on a suite-wide file.
 add_link_options(-static -static-libgcc -static-libstdc++)
 
+# ThinLTO for Release, stated explicitly rather than inherited from
+# CMAKE_INTERPROCEDURAL_OPTIMIZATION. CMake translates that switch to
+# -flto=thin for Clang today, which the 2026-11-09 compile databases
+# confirm, but the translation is CMake's choice, not this project's:
+# a CMake change could silently move a release build to full LTO, whose
+# monolithic link is the largest memory consumer in the build. ThinLTO
+# parallelises the link backends and keeps the peak down. MSVC is left
+# alone: it has no -flto, and its /GL is a separate decision.
+if(NOT MSVC)
+    add_compile_options($<$<CONFIG:Release>:-flto=thin>)
+    add_link_options($<$<CONFIG:Release>:-flto=thin>)
+endif()
+
 # Reproducible binaries (D07 T01 §3, decided 2026-11-09): the same
 # source must produce the same bytes, so a signed release can be
 # independently confirmed against its tag. The PE timestamp is the

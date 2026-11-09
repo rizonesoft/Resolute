@@ -9,6 +9,7 @@ project(RegStudio LANGUAGES CXX RC)
 # independent review of 6062ecb.
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteLinkPolicy.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteWarnings.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ResoluteJobPools.cmake")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

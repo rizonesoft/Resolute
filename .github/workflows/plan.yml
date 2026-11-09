@@ -43,7 +43,8 @@ jobs:
           python scripts/todo-night-debt.py --self-test
           python scripts/profile-check.py
           python scripts/profile-check.py --self-test
-          node scripts/verify-agent-tiers.mjs
+          python scripts/verify-agent-tiers.py
+          python scripts/verify-agent-tiers.py --self-test
       - name: Check plan projection is current
         shell: bash
         run: |

@@ -6,9 +6,11 @@
     "",
     "Every sha256 was taken from a real download on 2026-09-17 and independently",
     "cross-checked against the digest GitHub records for the same asset. A pin",
-    "without a hash is reproducible only until a release is re-cut in place."
+    "without a hash is reproducible only until a release is re-cut in place.",
+    "The python and sccache pins followed the same rule on 2026-11-09: sccache",
+    "against the .sha256 Mozilla publishes, python against the python.org file."
   ],
-  "pinned": "2026-09-17",
+  "pinned": "2026-11-09",
   "components": [
     {
       "name": "llvm-mingw",
@@ -52,6 +54,36 @@
       ],
       "versionMatch": "^([0-9.]+)",
       "reportsOwnVersion": true
+    },
+    {
+      "name": "python",
+      "version": "3.14.10",
+      "url": "https://www.python.org/ftp/python/3.14.10/python-3.14.10-embed-amd64.zip",
+      "sha256": "90905e64a840557d8c1bc4f5b74db3d7ee85e3ffb217611cac1c7813acea4159",
+      "bytes": 12619664,
+      "dir": "python",
+      "probe": "python.exe",
+      "versionArgs": [
+        "--version"
+      ],
+      "versionMatch": "Python ([0-9.]+)",
+      "reportsOwnVersion": true,
+      "note": "The official embeddable distribution: a full CPython with its standard library and no pip. That is exactly the shape the repository's tooling needs, because every scripts/*.py file is stdlib-only (verified 2026-11-09: the only non-stdlib import is the repository's own scripts/lib). No pip means no per-machine package state to drift."
+    },
+    {
+      "name": "sccache",
+      "version": "0.19.0",
+      "url": "https://github.com/mozilla/sccache/releases/download/v0.19.0/sccache-v0.19.0-x86_64-pc-windows-msvc.zip",
+      "sha256": "28be8c61f6b2c89b9eb2869f6af7f78e6f992e78a8abae0ce855fcc129cbeac1",
+      "bytes": 9830245,
+      "dir": "sccache",
+      "probe": "sccache.exe",
+      "versionArgs": [
+        "--version"
+      ],
+      "versionMatch": "sccache ([0-9.]+)",
+      "reportsOwnVersion": true,
+      "note": "Compile cache, wired in by scripts/build.ps1 as the CMake compiler launcher with its cache under build/sccache capped at 10 GB. The sha256 above was cross-checked against the .sha256 asset Mozilla publishes beside the zip, the same standard the 2026-09-17 pins were held to."
     }
   ]
 }
