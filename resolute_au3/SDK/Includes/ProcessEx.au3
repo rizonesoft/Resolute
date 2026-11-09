@@ -98,6 +98,78 @@ Func _ProcessEx_RunCommand($sCommand, $sWorkingDir = "")
 EndFunc   ;==>_ProcessEx_RunCommand
 
 
+Func _ProcessEx_RunCommandDirect($sCommand, $sWorkingDir = "")
+
+	; Like _ProcessEx_RunCommand, but no shell ever parses the command: the
+	; caller builds one CreateProcess command line (quote each argument with
+	; _ProcessEx_QuoteArgument), so shell metacharacters and %VAR% expansion
+	; in an argument stay inert. Use it whenever an argument is a secret.
+	Local $iCMD = Run($sCommand, $sWorkingDir, @SW_HIDE, $STDERR_MERGED)
+	Local $iRunError = @error
+	If $iCMD = 0 Then
+		; Never log the command here: it may carry a secret argument.
+		_Logging_EditWrite(_Logging_SetLevel(StringFormat("Could not start the command (launch error %s).", $iRunError), "ERROR"))
+		Return False
+	EndIf
+
+	Local $sOutput, $sSuccess = ""
+
+	While 1
+		$sOutput = StdoutRead($iCMD)
+		If @error Then
+			ExitLoop
+		EndIf
+
+		Local $aOutput = StringSplit($sOutput, @CRLF)
+		For $x = 1 To $aOutput[0]
+			If __HasOutput($aOutput[$x]) Then
+				_Logging_EditWrite(StringStripWS(__FormatRunOutput($aOutput[$x]), $STR_STRIPLEADING + $STR_STRIPTRAILING))
+				Sleep(50)
+			EndIf
+		Next
+
+	WEnd
+
+	Return True
+
+EndFunc   ;==>_ProcessEx_RunCommandDirect
+
+
+Func _ProcessEx_QuoteArgument($sArg)
+
+	; One argument, quoted for a CreateProcess command line: backslashes are
+	; doubled before a quote and at the end, and a quote is backslash-escaped,
+	; so the receiving program parses back exactly $sArg.
+	Local $sQuoted = Chr(34)
+	Local $iBackslashes = 0
+	For $i = 1 To StringLen($sArg)
+		Local $cChar = StringMid($sArg, $i, 1)
+		If $cChar = "\" Then
+			$iBackslashes += 1
+		ElseIf $cChar = Chr(34) Then
+			For $b = 1 To $iBackslashes * 2 + 1
+				$sQuoted &= "\"
+			Next
+			$sQuoted &= Chr(34)
+			$iBackslashes = 0
+		Else
+			For $b = 1 To $iBackslashes
+				$sQuoted &= "\"
+			Next
+			$sQuoted &= $cChar
+			$iBackslashes = 0
+		EndIf
+	Next
+	For $b = 1 To $iBackslashes * 2
+		$sQuoted &= "\"
+	Next
+	$sQuoted &= Chr(34)
+
+	Return $sQuoted
+
+EndFunc   ;==>_ProcessEx_QuoteArgument
+
+
 Func __HasOutput($sOutput)
 
 	$sOutput = StringStripWS($sOutput, $STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES)
