@@ -260,17 +260,31 @@ def rewrite_baseline(text: str, measured_count: int, measured_targets: dict) -> 
 def write_atomic(path: Path, text: str) -> None:
     """Replace a file atomically and read it back (AGENTS.md: atomic
     writes, readback). A failed write leaves the original intact."""
-    tmp = path.with_name(path.name + ".tmp")
+    # An exclusively created temp in the destination directory: a
+    # predictable name would follow a planted link and truncate its
+    # target before the replace (repair round 1).
+    tmp = None
     try:
-        tmp.write_text(text)
+        fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+        tmp = Path(tmp_name)
+        with os.fdopen(fd, "w") as fh:
+            fh.write(text)
         os.replace(tmp, path)
     except OSError as exc:
-        try:
-            tmp.unlink()
-        except OSError:
-            pass
+        if tmp is not None:
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
         raise Refusal(f"could not persist {path}: {exc}") from exc
-    if path.read_text() != text:
+    try:
+        readback = path.read_text()
+    except OSError as exc:
+        raise Refusal(
+            f"could not read back {path} after replacing it: {exc}; "
+            "the replacement already occurred, verify the file by hand"
+        ) from exc
+    if readback != text:
         raise Refusal(f"readback mismatch after writing {path}; baseline not trusted")
 
 
@@ -893,6 +907,18 @@ def self_test() -> int:
             except Refusal:
                 pass
             assert baseline.read_bytes() == before, "incomplete run rewrote the baseline"
+
+            globals()["run_analysis"] = fake_analysis
+            measured["root"].discard("a|4|1|x")
+            from unittest import mock as _mock
+
+            with _mock.patch("os.replace", side_effect=OSError("simulated replace failure")):
+                try:
+                    run(tmp, tidy, None, tmp / "log.txt")
+                    raise AssertionError("persistence failure passed")
+                except Refusal as exc:
+                    assert "could not persist" in str(exc), exc
+            assert baseline.read_bytes() == before, "failed persistence rewrote the baseline"
         finally:
             globals()["run_analysis"] = real_analysis
 
@@ -919,10 +945,21 @@ def self_test() -> int:
         dest = tmp / ".tidy-baseline"
         dest.write_text("original\n")
 
-        (tmp / ".tidy-baseline.tmp").mkdir()
-        refuses(lambda: write_atomic(dest, "new\n"), "could not persist")
+        with mock.patch("tempfile.mkstemp", side_effect=OSError("simulated temp failure")):
+            refuses(lambda: write_atomic(dest, "new\n"), "could not persist")
         assert dest.read_text() == "original\n"
-        (tmp / ".tidy-baseline.tmp").rmdir()
+
+        real_read = Path.read_text
+
+        def flaky_read(self, *a, **k):
+            if self == dest:
+                raise PermissionError("simulated readback failure")
+            return real_read(self, *a, **k)
+
+        with mock.patch.object(Path, "read_text", flaky_read):
+            refuses(lambda: write_atomic(dest, "new\n"), "replacement already occurred")
+        assert dest.read_text() == "new\n"
+        dest.write_text("original\n")
 
         with mock.patch("os.replace", side_effect=OSError("simulated replace failure")):
             refuses(lambda: write_atomic(dest, "new\n"), "could not persist")
