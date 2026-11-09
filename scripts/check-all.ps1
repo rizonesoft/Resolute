@@ -242,6 +242,17 @@ Invoke-Gate -Name 'fence-debt self-test' -LogName 'gate-fence-debt-selftest' -Co
 Invoke-Gate -Name 'night-debt self-test' -LogName 'gate-night-debt-selftest' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\todo-night-debt.py') --self-test
 }
+# The fenced inventory reconciles both ways: every discovered [headful]
+# test has a focus-audit row, and every fenced row names a discovered test
+# (D00 T02 section 12).
+Invoke-Gate -Name 'fence-inventory self-test' -LogName 'gate-fence-inventory-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\fence-inventory.py') --self-test
+}
+Invoke-Gate -Name 'fence inventory' -LogName 'gate-fence-inventory' -Command {
+    $list = Join-Path $LogDir 'headful-list.txt'
+    & $Ctest --test-dir (Join-Path $RepoRoot 'build\debug') -N -L headful | Out-File -FilePath $list -Encoding utf8
+    & $Python (Join-Path $RepoRoot 'scripts\fence-inventory.py') --list $list
+}
 # The review wiring (.conclave/reviewers.toml, max medium effort) and
 # unit tests for review-dispatch.py, dispatch_hook.py, and run-guard.py.
 Invoke-Gate -Name 'reviewers pin' -LogName 'gate-reviewers-pin' -Command {

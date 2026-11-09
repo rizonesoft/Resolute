@@ -65,6 +65,13 @@ WindowRecord Describe(HWND hwnd);
 HMONITOR MonitorWithDpi(UINT dpi);
 UINT     MonitorDpi(HMONITOR monitor);
 
+// The hook failure markers for `pids` (D00 T02 section 12): one line per
+// marker, naming the process and which step failed ("open" or "map"). The
+// listener calls this at case end for every adopted process; any marker
+// voids the case's proof. Reading does not delete: the listener deletes
+// after reporting, so a drill can read its own marker first.
+std::vector<std::string> HookFailures(const std::vector<DWORD>& pids);
+
 // Violations recorded so far in this process.
 int Violations();
 

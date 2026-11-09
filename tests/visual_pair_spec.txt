@@ -1,0 +1,30 @@
+# Launcher region spec. D00 T02 section 12.
+#
+# One line per region:
+#   region | name | label | value | x0 | y0 | x1 | y1 | minPainted | minDetail | kind
+# Coordinates are fractions of the captured window image. Labels and values
+# come from this spec (the surface's own record of what it must show), not
+# from pixels: the C++ window exposes four unnamed Direct2D panes to
+# automation (docs/captures/ui-automation-spike.md), so presence and painted
+# extent are measured in the image inside each region, and the AutoIt half
+# (deferred to D03 T02 section 7, elevated session) enumerates child
+# controls against the same names.
+#
+# kind is text (DESIGN.md contrast floor 4.5:1) or element (3:1). No
+# theme-only or DPI-only exemption may waive a missing region, a clipped
+# control, or a region below its contrast floor.
+#
+# Baseline: docs/captures/runs/2026-11-09-D00-T02-s10-launcher-light-150.png
+# (the section 10 capture of record: production renderer, ClearType, light,
+# 150 percent, 1082x711). Crop: the whole window. State: launcher at
+# startup, extensions scanned. Rasterization: production, not the section 9
+# offscreen grayscale renderer.
+region|window-title|Resolute||0.00|0.00|1.00|0.05|0.001|0.5|text
+region|toolbar|||0.00|0.04|1.00|0.13|0.005|0.5|element
+region|sidebar|||0.00|0.12|0.24|0.97|0.010|0.5|text
+region|tool-list|||0.23|0.12|1.00|0.97|0.005|0.3|text
+region|status-bar|||0.00|0.96|1.00|1.00|0.001|0.3|text
+# Intended redesigns, recorded so the comparison keeps function without
+# freezing the AutoIt layout: an observed label in the left column counts
+# as the region named in the right column.
+equiv|Resolute|window-title

@@ -2,6 +2,8 @@
 
 #include "focus_guard.h"
 
+#include "focus_hook/focus_hook.h"
+
 #include "fence.h"
 #include "focus_hook/focus_hook.h"
 
@@ -312,11 +314,55 @@ void Stop() {
     g_thread = nullptr;
 }
 
+namespace {
+
+std::wstring TempPathFor(const wchar_t* prefix, DWORD pid) {
+    wchar_t dir[MAX_PATH];
+    if (!GetTempPathW(MAX_PATH, dir)) return {};
+    return std::wstring(dir) + prefix + std::to_wstring(pid) + L".txt";
+}
+
+void WriteIntentFile(DWORD pid) {
+    const std::wstring path = TempPathFor(kFocusHookIntentPrefix, pid);
+    HANDLE file = CreateFileW(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS,
+                              FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file != INVALID_HANDLE_VALUE) CloseHandle(file);
+}
+
+}  // namespace
+
+std::vector<std::string> HookFailures(const std::vector<DWORD>& pids) {
+    std::vector<std::string> out;
+    for (DWORD pid : pids) {
+        const std::wstring path = TempPathFor(kFocusHookFailPrefix, pid);
+        HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
+                                  FILE_ATTRIBUTE_NORMAL, nullptr);
+        if (file == INVALID_HANDLE_VALUE) continue;
+        char buf[32] = {};
+        DWORD read = 0;
+        ReadFile(file, buf, sizeof(buf) - 1, &read, nullptr);
+        CloseHandle(file);
+        std::string kind(buf, read);
+        while (!kind.empty() && (kind.back() == '\n' || kind.back() == '\r' || kind.back() == ' ')) kind.pop_back();
+        if (kind.empty()) kind = "unknown";
+        out.push_back("the focus hook in process " + std::to_string(pid) + " could not " +
+                      (kind == "open" ? std::string("open") : kind == "map" ? std::string("map") : kind) +
+                      " the guard's mapping (" + kind + " failure): its records cannot be judged");
+    }
+    return out;
+}
+
 void AdoptProcess(DWORD pid) {
     {
         std::lock_guard<std::mutex> hold(g_lock);
         g_pids.insert(pid);
     }
+    // Mark adoption intent where the hook can find it even when the mapping
+    // itself is the thing that fails: the environment (inherited by any
+    // child started from now on) and a per-process intent file (covers this
+    // process, created before adoption). D00 T02 section 12.
+    SetEnvironmentVariableW(kFocusHookAdoptEnv, L"1");
+    WriteIntentFile(pid);
     // The hooks are in place before this returns: a case starts the process
     // suspended, adopts it, and only then lets it run.
     g_adoptOk = false;
@@ -400,6 +446,11 @@ public:
 
     void testCaseEnded(const Catch::TestCaseStats& stats) override {
         const std::string name = stats.testInfo->name;
+        std::vector<DWORD> adoptedSnapshot;
+        {
+            std::lock_guard<std::mutex> hold(g_lock);
+            adoptedSnapshot.assign(g_pids.begin(), g_pids.end());
+        }
         const bool headful = fence::Headful();
         const std::vector<Event> events = Drain();
         const std::vector<WindowRecord> census = Census();
@@ -413,6 +464,15 @@ public:
         }
         g_lost = 0;
         if (g_thread && PostThreadMessageW(g_threadId, kRelease, 0, 0)) WaitForSingleObject(g_adoptDone, 5000);
+        for (const std::string& failure : HookFailures(adoptedSnapshot)) {
+            std::printf("FOCUS-VIOLATION %s: %s\n", name.c_str(), failure.c_str());
+            std::fflush(stdout);
+            ++g_violations;
+        }
+        for (DWORD pid : adoptedSnapshot) {
+            DeleteFileW(TempPathFor(kFocusHookFailPrefix, pid).c_str());
+            if (pid != GetCurrentProcessId()) DeleteFileW(TempPathFor(kFocusHookIntentPrefix, pid).c_str());
+        }
         if (g_lost > 0) {
             // An adopted window the guard never heard of cannot be judged:
             // the case's proof is void (panel round 4 of the D00 T02 §11 review).

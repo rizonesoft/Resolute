@@ -16,6 +16,43 @@
 
 #include <shellscalingapi.h>
 
+namespace {
+
+// Whether the guard marked adoption intent for this process: the inherited
+// environment variable, or the intent file the guard wrote for a child it
+// adopted after creation.
+bool AdoptionIntentMarked() {
+    wchar_t value[2];
+    if (GetEnvironmentVariableW(kFocusHookAdoptEnv, value, 2) > 0) return true;
+    wchar_t path[MAX_PATH];
+    if (!GetTempPathW(MAX_PATH, path)) return false;
+    wchar_t name[96];
+    wsprintfW(name, L"%s%lu.txt", kFocusHookIntentPrefix, GetCurrentProcessId());
+    lstrcatW(path, name);
+    return GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES;
+}
+
+// The failure marker: a small file in the temp directory naming which step
+// failed, so the guard can void the case's proof by name at its end.
+void WriteFailureMarker(const wchar_t* kind) {
+    wchar_t path[MAX_PATH];
+    if (!GetTempPathW(MAX_PATH, path)) return;
+    wchar_t name[96];
+    wsprintfW(name, L"%s%lu.txt", kFocusHookFailPrefix, GetCurrentProcessId());
+    lstrcatW(path, name);
+    HANDLE file = CreateFileW(path, GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file == INVALID_HANDLE_VALUE) return;
+    char buf[16];
+    int n = 0;
+    for (const wchar_t* c = kind; *c; ++c) buf[n++] = static_cast<char>(*c);
+    buf[n++] = '\n';
+    DWORD written = 0;
+    WriteFile(file, buf, static_cast<DWORD>(n), &written, nullptr);
+    CloseHandle(file);
+}
+
+}  // namespace
+
 extern "C" __declspec(dllexport) void CALLBACK ResoluteFocusHook(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject,
                                                                  LONG idChild, DWORD, DWORD) {
     if (!hwnd || idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
@@ -43,9 +80,15 @@ extern "C" __declspec(dllexport) void CALLBACK ResoluteFocusHook(HWINEVENTHOOK, 
     // The guard publishes this before the process runs, so a missing mapping
     // means no guard adopted it and there is nobody to tell.
     HANDLE mapping = OpenFileMappingW(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, name);
-    if (!mapping) return;
+    if (!mapping) {
+        // Nobody to tell through the mapping; the marker is the channel
+        // that does not depend on it.
+        if (AdoptionIntentMarked()) WriteFailureMarker(L"open");
+        return;
+    }
     auto* block = static_cast<FocusHookSinkBlock*>(
         MapViewOfFile(mapping, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, sizeof(FocusHookSinkBlock)));
+    if (!block && AdoptionIntentMarked()) WriteFailureMarker(L"map");
     if (block) {
         HWND sink = reinterpret_cast<HWND>(block->sink);  // NOLINT(performance-no-int-to-ptr): a handle published as data
         COPYDATASTRUCT cds{};

@@ -77,7 +77,13 @@ param(
     [ValidateSet('', 'light', 'dark')]
     [string]$Appearance = '',
     [int]$WaitSeconds = 5,
-    [switch]$KeepOpen
+    [switch]$KeepOpen,
+
+    # The fixture and launch arguments the sidecar must record so a second
+    # operator can recreate the comparison from the sidecar alone
+    # (D00 T02 section 12, item 5 schema).
+    [string]$Fixture = '',
+    [string]$LaunchArgs = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -142,6 +148,7 @@ if ($Path) {
 
     $startArgs = @{ FilePath = $Path; PassThru = $true }
     if ($WorkingDirectory) { $startArgs['WorkingDirectory'] = $WorkingDirectory }
+    if ($LaunchArgs) { $startArgs['ArgumentList'] = $LaunchArgs }
     $launched = Start-Process @startArgs
     Start-Sleep -Seconds $WaitSeconds
 
@@ -261,6 +268,13 @@ $appearanceLine = if ($Appearance) {
     "window dpi    : $windowDpi  (logical dpi the process sees)"
     "dpi aware     : $dpiAware$(if (-not $dpiAware) { '  -- Windows bitmap-scales this window' })"
     "appearance    : $appearanceLine"
+    "fixture       : $(if ($Fixture) { $Fixture } else { 'none stated' })"
+    "launch args   : $(if ($LaunchArgs) { $LaunchArgs } elseif ($Path) { '(none)' } else { 'attached to a running process' })"
+    "working dir   : $(if ($WorkingDirectory) { $WorkingDirectory } else { '(default)' })"
+    "locale        : $((Get-Culture).Name) / UI $((Get-UICulture).Name)"
+    "geometry      : $($rect.Left),$($rect.Top) ${width}x${height}"
+    "exe sha256    : $(if ($sourcePath -and (Test-Path $sourcePath)) { (Get-FileHash $sourcePath -Algorithm SHA256).Hash } else { 'unknown' })"
+    "source revision: $(try { (git -C (Split-Path $PSScriptRoot -Parent) rev-parse HEAD 2>$null) } catch { 'unknown' })"
     "windows build : $([System.Environment]::OSVersion.Version.ToString())"
     "captured      : $(Get-Date -Format 'yyyy-MM-dd')"
     ""
