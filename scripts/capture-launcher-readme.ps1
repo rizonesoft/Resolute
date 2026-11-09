@@ -14,7 +14,7 @@
 
       pwsh scripts/bootstrap.ps1
       pwsh scripts/build.ps1 Resolute
-      pwsh scripts/capture-launcher-readme.ps1 `
+      pwsh scripts/capture-launcher-readme.ps1 -Visible `
           -Exe <checkout>\Bin\Release\Resolute.exe `
           -CaptureScript <checkout>\scripts\capture-window.ps1 `
           -OutDir docs\captures
@@ -39,7 +39,11 @@ param(
     [string]$Exe = (Join-Path $PSScriptRoot '..\Bin\Release\Resolute.exe'),
     [string]$CaptureScript = (Join-Path $PSScriptRoot 'capture-window.ps1'),
     [string]$OutDir = (Join-Path $PSScriptRoot '..\docs\captures'),
-    [string]$Date = (Get-Date -Format 'yyyy-MM-dd')
+    [string]$Date = (Get-Date -Format 'yyyy-MM-dd'),
+    # Desktop interaction is explicit: without -Visible the driver
+    # refuses, and even with it, it stands down while the operator is
+    # active (docs/testing.md's stand-down rule).
+    [switch]$Visible
 )
 
 $ErrorActionPreference = 'Stop'
@@ -58,6 +62,37 @@ public class Shot {
 }
 '@
 [Shot]::SetThreadDpiAwarenessContext([IntPtr](-4)) | Out-Null
+
+if (-not $Visible) {
+    Write-Host 'capture-launcher-readme: refusing to run without -Visible.' -ForegroundColor Red
+    Write-Host '  This driver takes the foreground to capture; run it visibly, when the desktop is free.' -ForegroundColor DarkGray
+    exit 2
+}
+
+Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public class Idle {
+    [StructLayout(LayoutKind.Sequential)] public struct LASTINPUTINFO { public uint cbSize; public uint dwTime; }
+    [DllImport("user32.dll")] public static extern bool GetLastInputInfo(ref LASTINPUTINFO info);
+    [DllImport("kernel32.dll")] public static extern uint GetTickCount();
+    public static double IdleSeconds() {
+        var info = new LASTINPUTINFO(); info.cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(info);
+        if (!GetLastInputInfo(ref info)) return 0;
+        return (GetTickCount() - info.dwTime) / 1000.0;
+    }
+}
+'@
+
+# Wait until the operator has been idle for at least 3 seconds (up to
+# 60), so a capture never pulls focus out of active work.
+function Wait-OperatorIdle([string]$What) {
+    foreach ($i in 1..120) {
+        if ([Idle]::IdleSeconds() -ge 3) { return }
+        Start-Sleep -Milliseconds 500
+    }
+    throw "operator is active; stood down before $What (docs/testing.md stand-down rule)"
+}
 
 $Exe = (Resolve-Path $Exe).Path
 $CaptureScript = (Resolve-Path $CaptureScript).Path
@@ -86,6 +121,7 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         }
         [Shot]::SendMessageW($hwnd, 0x0111, [IntPtr]$ViewCmd, [IntPtr]::Zero) | Out-Null
         Start-Sleep -Milliseconds 700
+        Wait-OperatorIdle "taking the foreground for $name"
         $fg = [Shot]::GetForegroundWindow()
         $pidOut = 0
         $theirs = [Shot]::GetWindowThreadProcessId($fg, [ref]$pidOut)

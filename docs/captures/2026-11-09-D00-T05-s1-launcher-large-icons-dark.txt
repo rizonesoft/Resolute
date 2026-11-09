@@ -1,7 +1,7 @@
 capture       : 2026-11-09-D00-T05-s1-launcher-large-icons-dark.png
 describes     : the launcher large-icons view, dark, at 1600 px wide: visual proof for the README (D00 T05 section 1)
 window title  : Resolute
-target process: 34944 R:\resolute-clean-check\Bin\Release\Resolute.exe
+target process: 53672 R:\resolute-clean-check\Bin\Release\Resolute.exe
 attached      : attached to a process the caller started and owns
 source binary : R:\resolute-clean-check\Bin\Release\Resolute.exe
 file version  : 0.1.0.0
