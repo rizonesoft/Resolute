@@ -2259,7 +2259,9 @@ def self_test() -> int:
         # Win32 boundary: production is_elevated and _shell_execute_runas
         # with only the API functions and last-error source stubbed.
         _api_saved = (advapi32.OpenProcessToken, advapi32.GetTokenInformation,
-                      shell32.ShellExecuteExW, ctypes.get_last_error)
+                      shell32.ShellExecuteExW, ctypes.get_last_error, kernel32.CloseHandle)
+        _closed_tokens = []
+        kernel32.CloseHandle = lambda h: _closed_tokens.append(int(h.value) if hasattr(h, "value") else h) or True
         try:
             advapi32.OpenProcessToken = lambda proc, access, tok: False
             check("token open failure at the API boundary returns None", is_elevated() is None)
@@ -2276,6 +2278,8 @@ def self_test() -> int:
                 return True
             advapi32.GetTokenInformation = _get_zero
             check("unelevated token at the API boundary returns False", is_elevated() is False)
+            check("each acquired synthetic token is closed exactly once, never via the real API",
+                  _closed_tokens == [99, 99])
             def _get_one(tok, cls, buf, size, out):
                 buf._obj.value = 1
                 return True
@@ -2307,7 +2311,7 @@ def self_test() -> int:
                   _elev_saved["_shell_execute_runas"](["--visible"]) == 777)
         finally:
             (advapi32.OpenProcessToken, advapi32.GetTokenInformation,
-             shell32.ShellExecuteExW, ctypes.get_last_error) = _api_saved
+             shell32.ShellExecuteExW, ctypes.get_last_error, kernel32.CloseHandle) = _api_saved
         # Termination confirmation has distinct asserted outcomes.
         for _seq, _want, _label in (
                 ([WAIT_FAILED, WAIT_OBJECT_0], "terminated and confirmed exited", "confirmed"),
@@ -2399,6 +2403,7 @@ def self_test() -> int:
             report = sentinel.read_text(encoding="utf-8")
             check("a missing handle through main reports launch unverified, exit 2",
                   rc == 2 and "could not be verified" in report
+                  and "launch and termination" in report and "unverified" in report
                   and "No tool was launched" not in report)
             # Declined with no selection reports every registered tool.
             globals()["relaunch_elevated"] = _decline
