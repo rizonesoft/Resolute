@@ -1287,7 +1287,7 @@ def main(argv=None) -> int:
             try:
                 return relaunch_elevated(call_argv)
             except ElevationDeclined as exc:
-                detail = f"blocked: {exc}; RegStudio's steps were not observed"
+                detail = f"blocked: {exc}; the selected tool steps were not observed"
                 emit_report(elevation_rows(only, "blocked", detail), "blocked",
                             [f"Admission: {detail}.", "No tool was launched."])
                 print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
