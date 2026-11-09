@@ -432,13 +432,18 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
         except (OSError, Refusal) as exc:
             return str(exc)
 
-    def diagnostics_where(flush_error):
+    def diagnostics_where(flush_error, failing_output=""):
         if flush_error is None:
             return f"diagnostics in {log_path}"
-        excerpt = " ".join("".join(log_lines).split())[:240]
+        # The excerpt comes from the failing invocation, error lines
+        # first: an aggregate prefix lets earlier warnings displace
+        # the diagnostic that actually failed (repair3 round 1).
+        lines = [ln.strip() for ln in failing_output.splitlines() if ln.strip()]
+        errors = [ln for ln in lines if ERROR_RE.search(ln)]
+        excerpt = " ".join((errors or lines))[:240]
         return (
             f"diagnostics could not be saved to {log_path} ({flush_error}); "
-            f"first output: {excerpt}"
+            f"failing output: {excerpt}"
         )
 
     # Every expected database is checked before any analysis runs: a
@@ -476,13 +481,13 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             out = (proc.stdout or "") + (proc.stderr or "")
             log_lines.append(out)
             if proc.returncode != 0:
-                where = diagnostics_where(flush_log())
+                where = diagnostics_where(flush_log(), out)
                 raise Refusal(
                     f"target '{name}': clang-tidy exited {proc.returncode} on {tu}; "
                     f"the finding count is not evidence until analysis completes; {where}"
                 )
             if ERROR_RE.search(out):
-                where = diagnostics_where(flush_log())
+                where = diagnostics_where(flush_log(), out)
                 raise Refusal(
                     f"target '{name}': error diagnostic while analysing {tu}; "
                     f"the finding count is not evidence until analysis completes; {where}"
@@ -1128,6 +1133,25 @@ def self_test() -> int:
                     msg = str(exc)
                     assert "could not be saved" in msg, msg
                     assert "BoomKey" in msg, msg
+        # Earlier warnings must not displace the failing diagnostic.
+        failing = subprocess.CompletedProcess(
+            args=[],
+            returncode=1,
+            stdout="a.cpp:1:1: warning: w [bugprone-foo]\n" * 40,
+            stderr="b.cpp:2:1: fatal error: later.hpp file not found\n",
+        )
+        globals()["write_atomic"] = lambda *a, **k: (_ for _ in ()).throw(
+            Refusal("could not persist (stub)")
+        )
+        try:
+            with _mock.patch("subprocess.run", return_value=failing):
+                try:
+                    run_analysis(tmp, Path(sys.executable), {"root": db}, tmp / "logs" / "g.log")
+                    raise AssertionError("failing analyzer passed")
+                except Refusal as exc:
+                    assert "later.hpp" in str(exc), str(exc)
+        finally:
+            globals()["write_atomic"] = real_atomic
                     assert "diagnostics in " not in msg, msg
         finally:
             globals()["write_atomic"] = real_atomic
