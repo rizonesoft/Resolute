@@ -316,6 +316,8 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
         return None
     mem = bmp = old = None
     failures = []
+    primary = None
+    result = None
     try:
         mem = gdi32.CreateCompatibleDC(hdc)
         if not mem:
@@ -342,7 +344,9 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
         buf = ctypes.create_string_buffer(width * height * 4)
         if not gdi32.GetDIBits(mem, bmp, 0, height, buf, ctypes.byref(info), 0):
             return None
-        return width, height, buf.raw
+        result = (width, height, buf.raw)
+    except BaseException as exc:
+        primary = exc
     finally:
         if mem and old:
             try:
@@ -362,11 +366,18 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
             except Exception as exc:
                 failures.append(exc)
         try:
-            user32.ReleaseDC(hwnd, hdc)
+            if not user32.ReleaseDC(hwnd, hdc):
+                failures.append(OSError("ReleaseDC failed"))
         except Exception as exc:
             failures.append(exc)
+    if primary is not None:
         if failures:
-            raise RuntimeError("; ".join(repr(f) for f in failures))
+            raise RuntimeError(f"{primary!r}; also release failed: "
+                               + "; ".join(repr(f) for f in failures)) from primary
+        raise primary
+    if failures:
+        raise RuntimeError("; ".join(repr(f) for f in failures))
+    return result
 
 
 def post(hwnd, msg, wparam=0):
@@ -397,6 +408,8 @@ def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None):
         worker.join(0.05)
     if worker.is_alive():
         return None
+    if "error" in box:
+        raise box["error"]
     return box.get("shot")
 
 
@@ -763,13 +776,19 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             return True
 
         # main: capture the surface; a blank capture fails by name.
-        shot = capture_window_bounded(run.hwnd, abort=resumed)
-        if shot == ABORTED:
+        try:
+            shot = capture_window_bounded(run.hwnd, abort=resumed)
+        except Exception as exc:
+            run.record("main", "fail", f"capture failed: {exc!r}")
+            shot = "handled"
+        if shot == "handled":
+            pass  # the failure row is recorded; the remaining steps still run
+        elif shot == ABORTED:
             post(run.hwnd, WM_CLOSE)
             run.record("main", "stood-down", "operator input resumed; tool dismissed")
             ensure_rows(run, "stood-down", "operator input resumed; tool dismissed")
             return True
-        if shot is None:
+        elif shot is None:
             run.record("main", "fail", "PrintWindow produced no capture")
         else:
             width, height, bgra = shot
@@ -897,7 +916,10 @@ def failure_capture(run: ToolRun, step: str, out_dir: Path, abort=None) -> str:
     """Capture the surface at failure, or say why none exists."""
     if run.hwnd is None:
         return "capture unavailable: no window"
-    shot = capture_window_bounded(run.hwnd, abort=abort)
+    try:
+        shot = capture_window_bounded(run.hwnd, abort=abort)
+    except Exception as exc:
+        return f"capture unavailable: {exc!r}"
     if shot is None or shot == ABORTED:
         return "capture unavailable: PrintWindow produced nothing within its bound"
     width, height, bgra = shot

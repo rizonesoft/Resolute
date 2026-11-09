@@ -32,3 +32,30 @@ OVERALL: needs-attention
 - Planned: termination and release failures both preserved; WinProc release exercised by injected failures (gap 2)
 - Planned: deterministic main() tests with stubbed admission, input, and tool list (gap 3)
 - Planned: nightly's production verdict line extracted and executed for every verdict (gap 4)
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T09:30:48Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: 96c50dde7a5d24475c1fbeb401d3b719cb00d474
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 11
+- Digest: 2623d58f1ec7952b
+
+## adversarial: needs-attention
+
+1. **P2: Failed DC release can still produce a passing capture.** `scripts/smoke-run.py:365` ignores `ReleaseDC`’s return value. **Reproduction:** an in-memory probe supplied a valid, nonblank capture and made `ReleaseDC` return `0`. `capture_window_bounded()` returned the image successfully, allowing the main step to pass despite failed cleanup. Check the release result and propagate failure.
+
+2. **P3: Capture failures lose the diagnostic evidence this repair promises to preserve.** `scripts/smoke-run.py:369` replaces the original exception with cleanup errors, and `:388-400` stores that exception but never returns or raises it. **Reproduction:** injecting a `PrintWindow` exception alongside failed bitmap deletion produced only `RuntimeError("OSError('DeleteObject(bitmap) failed')")`; the production bounded wrapper returned `None`, losing both named failures from the report. Preserve the primary and cleanup failures and propagate them through the wrapper.
+
+Verified with windowless, in-memory probes. No files modified; GUI evidence was not rerun.
+
+HIGHEST: P2
+
+OVERALL: needs-attention
