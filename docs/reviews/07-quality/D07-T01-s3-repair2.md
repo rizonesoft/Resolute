@@ -58,3 +58,29 @@ This was a read-only source and review-record inspection. No files were modified
 
 PLAN: gaps
 OVERALL: needs-attention
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T05:45:08Z
+- Effort: medium
+- Writer model: muse-wonder-full-1.0
+- Policy: ea21439b7f1f676fd5ea7dfd65500ceec62d1d67
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 10
+- Digest: 8171a3389171eeeb
+
+**adversarial: needs-attention**
+
+- **P2: Single-target Release builds now fail publication.** [scripts/tidy-ratchet.py:1497](D:/GitHub/Resolute/scripts/tidy-ratchet.py:1497) enumerates every existing compile database, while `build.ps1` captures hashes only for selected targets. Reproduction: after an all-target build, run `build.ps1 -Name Resolute -Config Release`. Compilation succeeds, but publication refuses the uncaptured RegStudio database. A read-only probe using the actual databases and launcher-only expectation returned `1` with that exact refusal. Standalone extension builds likewise require an unrelated launcher database. Derive required databases from `--build-targets`; retain full-target enforcement when analysis consumes the record.
+
+- **P3: Ninja compiler flags can diverge from the certified database undetected.** [scripts/tidy-ratchet.py:1544](D:/GitHub/Resolute/scripts/tidy-ratchet.py:1544) compares source paths only; configure-time capture binds the database but not Ninja’s compilation instructions. Reproduction: after configuration, change Ninja `FLAGS` to add a preprocessor definition, leave `compile_commands.json` unchanged, then compile and publish. Analysis uses the original definition set. An in-memory probe changed all 166 actual Ninja `FLAGS` lines while supplying both correct database hashes, the current input manifest and both targets. Publication returned `0`. This is distinct from the previously settled database-replacement case: the database remains unchanged while the build instructions change. Bind the generated compilation instructions through the build as well. Rated P3 because this requires deliberate intervention in generated files.
+
+Probes intercepted publication and directory creation. No files modified; builds and file-writing self-tests were not rerun.
+
+HIGHEST: P2  
+OVERALL: needs-attention
