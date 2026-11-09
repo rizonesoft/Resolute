@@ -231,6 +231,7 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 **Filed 2026-11-09** from the `D07 T01 §4` review (round 3, `P3`, in `docs/reviews/07-quality/D07-T01-s4.md`): the hung fixture keeps pumping messages, so it never exercises the blocked `PrintWindow` path or the capture worker's timeout in `scripts/smoke-run.py`.
 
 - [ ] Add a windowless `--self-test` case that feeds `capture_window_bounded` a deliberately blocked capture function and asserts it returns `None` inside its bound while the blocked call is still running. Done when: replacing the bounded call with a direct capture makes the new case fail, and the case opens no window.
+- [ ] Make the capture-interruption regressions scheduling-independent: the blocked capture worker waits for explicit release without a timeout, and the bounded capture loop observes the abort before its deadline can expire under a controlled clock. Done when: removing the abort observation fails the cases even when the test thread is descheduled past the capture deadline.
 - [ ] Commit: `"quality: test the smoke capture timeout"`
 
 -> SOURCE: review-2026-11-09-d07-t01-s4-round3 (P3 capture timeout untested)

@@ -153,7 +153,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D07 T01 §3`  | Conformance check and its report                  |  19   |
 | [ ] | `D07 T01 §4`  | Standing smoke run over the suite                 |  13   |
 | [ ] | `D07 T01 §5`  | Elevated smoke pass for RegStudio                 |   3   |
-| [ ] | `D07 T01 §6`  | Smoke capture-timeout test                        |   2   |
+| [ ] | `D07 T01 §6`  | Smoke capture-timeout test                        |   3   |
 | [ ] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   5   |
 | [ ] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
 | [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
