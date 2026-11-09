@@ -147,8 +147,12 @@ Func _AutoIt3Script_GetGlobalValue($sAu3Script_In, $sGlobalName)
 	Local $sFileRead = FileRead($hFileOpen)
 	FileClose($hFileOpen)
 
+	; Never match a declaration inside a comment block.
+	Local $sSource = StringRegExpReplace($sFileRead, '(?is)#cs.*?#ce', '')
+	$sSource = StringRegExpReplace($sSource, '(?is)#comments-start.*?#comments-end', '')
+
 	Local $sPattern = '(?m)^\s*Global\s+' & StringReplace($sGlobalName, "$", "\$") & '\s*=\s*"([^"]*)"'
-	Local $aMatch = StringRegExp($sFileRead, $sPattern, 1)
+	Local $aMatch = StringRegExp($sSource, $sPattern, 1)
 	If @error Then Return ""
 
 	Return $aMatch[0]
