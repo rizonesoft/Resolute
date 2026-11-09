@@ -455,17 +455,18 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             )
             out = (proc.stdout or "") + (proc.stderr or "")
             log_lines.append(out)
+            where = f"diagnostics in {log_path}" if log_path is not None else "diagnostics discarded (no log path set)"
             if proc.returncode != 0:
                 flush_log()
                 raise Refusal(
                     f"target '{name}': clang-tidy exited {proc.returncode} on {tu}; "
-                    "the finding count is not evidence until analysis completes"
+                    f"the finding count is not evidence until analysis completes; {where}"
                 )
             if ERROR_RE.search(out):
                 flush_log()
                 raise Refusal(
                     f"target '{name}': error diagnostic while analysing {tu}; "
-                    "the finding count is not evidence until analysis completes"
+                    f"the finding count is not evidence until analysis completes; {where}"
                 )
             found |= collect_findings(out.splitlines(), root)
         per_target[name] = found
@@ -1030,11 +1031,34 @@ def self_test() -> int:
             ["git", "update-ref", "refs/remotes/origin/master", "HEAD"],
         ):
             subprocess.run(args, cwd=tmp, check=True, capture_output=True, env=env)
+        before = baseline.read_bytes()
         refuses(
-            lambda: run(tmp, Path(sys.executable), None, None), "clang-tidy exited"
+            lambda: run(tmp, Path(sys.executable), None, None),
+            "diagnostics in " + str(tmp / "build" / "logs" / "gate-tidy.log"),
         )
         log = tmp / "build" / "logs" / "gate-tidy.log"
         assert log.is_file() and log.read_text().strip(), "standalone run discarded diagnostics"
+        assert baseline.read_bytes() == before, "failed standalone run rewrote the baseline"
+
+        from unittest import mock as _mock
+
+        fake = subprocess.CompletedProcess(
+            args=[], returncode=0, stdout="a.cpp:1:1: error: boom [clang-diagnostic-error]\n", stderr=""
+        )
+        real_run = subprocess.run
+
+        def fake_run(args, **kwargs):
+            if "--quiet" in args:
+                return fake
+            return real_run(args, **kwargs)
+
+        with _mock.patch("subprocess.run", fake_run):
+            refuses(
+                lambda: run(tmp, Path(sys.executable), None, None),
+                "error diagnostic while analysing",
+            )
+        assert "boom" in log.read_text(), "error diagnostic text not retained"
+        assert baseline.read_bytes() == before, "error-diagnostic run rewrote the baseline"
 
     case("standalone analyzer failure keeps its diagnostics log", standalone_failure_keeps_diagnostics)
 
