@@ -1,0 +1,22 @@
+D09 T01 S6 driven proof, retained 2026-11-09
+Candidate: 29ec4926756f20227ba26fb82527e78f1bcd6f2b
+Method (operator decision 2026-11-09: skip the Distro GUI, prove manually):
+the shipped _CreateUpdateFiles function is extracted verbatim from the
+candidate source and run in a harness with its real IniWrite writing into
+a scratch directory; descriptor discovery is proven by launching the
+rebuilt Distro once (no GUI driving) in clone R:\resolute-s6check2.
+
+Descriptor upgrade (Distro's own discovery on launch, no hand edit):
+- descriptors-before.txt: BiosCodes.sni and ComIntRep.sni [Environment] as cloned: 27 keys, no UpdateURL.
+- descriptors-after.txt: after launching the rebuilt Distro_X64.exe: UpdateURL appended as the 28th key in both, prior key order unchanged.
+  BiosCodes UpdateURL=https://rizonesoft.com/downloads/bios-beep-codes-viewer/ (matches SDK/Concrete/BiosCodes/BiosCodes.au3 $g_sUrlUpdate)
+  ComIntRep UpdateURL=https://rizonesoft.com/downloads/resolute/update/ (matches SDK/Concrete/ComIntRep/ComIntRep.au3)
+
+Generated update files (shipped _CreateUpdateFiles, extracted verbatim, real IniWrite):
+- generated/BiosCodes.ru: UpdateURL=https://rizonesoft.com/downloads/bios-beep-codes-viewer/ (descriptor key present; the run without the key re-derives the identical value from the script)
+- generated/ComIntRep.ru: UpdateURL=https://rizonesoft.com/downloads/resolute/update/ (its declared suite path, served from its descriptor, proven distinct from the other tool's value)
+
+Original producer, same readback (extracted pre-change _CreateUpdateFiles from 1e371afe):
+- base-producer/BiosCodes.ru: UpdateURL=https://rizonesoft.com/downloads/resolute/update/ (the suite URL for a per-tool-declaring tool: the defect)
+
+A script with no $g_sUrlUpdate declaration produces refusal-log.txt: the ERROR names the tool and no .ru is written.
