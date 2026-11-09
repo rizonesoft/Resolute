@@ -43,6 +43,7 @@ track: M1
 |   1   |   §1    | Make the AutoIt suite buildable again      | --           |  [ ]   |
 |   2   |   §2    | Clear the housekeeping defects             | --           |  [ ]   |
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [ ]   |
+|   4   |   §4    | Distro reports compiler failure           | --           |  [ ]   |
 
 ---
 
@@ -94,6 +95,22 @@ Without a written scope, every request to fix something in the AutoIt tree is ar
 - [ ] Commit: `"au3: maintenance scope and the retirement procedure"`
 
 **Test checkpoint:** The scope states what is in and out with a reason. `AGENTS.md` and this section agree that `resolute_au3/` is otherwise read-only. The retirement procedure covers update file, download page, and source, naming its owner. The shared-defect policy is dated.
+
+
+## 4. Distro Reports Compiler Failure
+
+`D09 T01 §1` proved the suite builds, but `Distro` itself cannot currently say so: `_BuildSelected` drains the compiler's output without checking its result, then emits its final message and sets progress to 100, and batch processing continues into downstream operations. A failed compile therefore looks like success to the person shipping a fix. This is builder behaviour, not a tool's frozen behaviour, so it is in scope for this domain.
+
+-> SOURCE: D09 T01 §1 completion review on `504f9c80`, gap 4 (missing-out-of-scope)
+-> XREF: D09 T01 §1 -- the clean-checkout build this makes trustworthy from inside Distro
+
+- [ ] Make `_BuildSelected` (`resolute_au3/SDK/Concrete/Distro/Distro.au3`) check the compiler result for each architecture it invokes. Done when: a nonzero compiler exit is recorded as a failure for that solution and architecture, naming the tool, instead of being drained and discarded.
+- [ ] Stop the success path on failure. Done when: after a failed compile, Distro does not emit its final success message, does not set progress to 100 for that solution, and does not continue into compress, sign, or distribute operations for it.
+- [ ] Report the failure where the operator looks. Done when: the failure appears in Distro's status list and log with the compiler's exit value, in the existing logging format, and a successful build's messages and progress are unchanged.
+- [ ] Prove both directions. Done when: a seeded broken script (syntax error) driven through Distro is reported as failed with no success message, and an unmodified tool still builds and reports success.
+- [ ] Commit: `"au3: report compiler failure in Distro"`
+
+**Test checkpoint:** Driven run with evidence: a seeded syntax-error script is reported failed by Distro (status and log quoted) and a clean tool still reports success. `Au3Check.exe -q Distro.au3` exits 0. No tool's frozen behaviour changes.
 
 ## Verification
 
