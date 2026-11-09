@@ -601,6 +601,55 @@ def post(hwnd, msg, wparam=0):
     user32.PostMessageW(hwnd, msg, wparam, 0)
 
 
+BM_CLICK = 0x00F5
+
+
+def dialog_ok_button(dialog):
+    """The dialog's OK button (control ID IDOK), or None."""
+    found = []
+
+    @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+    def cb(hwnd, _):
+        cls = ctypes.create_unicode_buffer(64)
+        user32.GetClassNameW(hwnd, cls, 64)
+        if cls.value == "Button" and user32.GetDlgCtrlID(hwnd) == IDOK:
+            found.append(hwnd)
+        return True
+
+    user32.EnumChildWindows(dialog, cb, 0)
+    return found[0] if found else None
+
+
+def dismiss_dialog(dialog, pid, timeout, resumed=None):
+    """Dismiss a dialog, escalating until it is gone or the bound expires.
+
+    A posted IDOK command is not honoured by every dialog in every
+    launch context (a Task Scheduler parent proved that), so dismissal
+    escalates: IDOK command, then a click on the OK button itself, then
+    WM_CLOSE. Returns "gone", "stood-down", or "present".
+    """
+    post(dialog, WM_COMMAND, IDOK)
+    deadline = time.monotonic() + timeout
+    stage = 0
+    while time.monotonic() < deadline:
+        if resumed is not None and resumed():
+            post(dialog, WM_COMMAND, IDOK)
+            return "stood-down"
+        if not any(h == dialog for h, _, _ in pid_windows(pid)):
+            return "gone"
+        remaining = deadline - time.monotonic()
+        if stage == 0 and remaining < timeout * 2 / 3:
+            stage = 1
+            button = dialog_ok_button(dialog)
+            if button:
+                post(button, BM_CLICK)
+        elif stage == 1 and remaining < timeout / 3:
+            stage = 2
+            post(dialog, WM_CLOSE)
+        time.sleep(0.1)
+    return "gone" if not any(h == dialog for h, _, _ in pid_windows(pid)) else "present"
+
+
 def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None, pending=None):
     """PrintWindow on a worker thread: a hung UI thread must not hang the run.
 
@@ -1093,21 +1142,14 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                            "About dialog did not appear (command ignored or no dialog); "
                            + failure_capture(run, "about", out_dir, abort=resumed))
             else:
-                post(dialog, WM_COMMAND, IDOK)
-                deadline = time.monotonic() + TIMEOUTS["message"]
-                gone = False
-                while time.monotonic() < deadline:
-                    if resumed is not None and resumed():
-                        post(dialog, WM_COMMAND, IDOK)
-                        post(run.hwnd, WM_CLOSE)
-                        run.record("about", "stood-down", "operator input resumed; tool dismissed")
-                        run.record("preferences", "stood-down", "operator input resumed; tool dismissed")
-                        run.record("exit", "stood-down", "operator input resumed; tool dismissed")
-                        return True
-                    if not any(h == dialog for h, _, _ in pid_windows(run.proc.pid)):
-                        gone = True
-                        break
-                    time.sleep(0.1)
+                outcome = dismiss_dialog(dialog, run.proc.pid, TIMEOUTS["message"], resumed=resumed)
+                if outcome == "stood-down":
+                    post(run.hwnd, WM_CLOSE)
+                    run.record("about", "stood-down", "operator input resumed; tool dismissed")
+                    run.record("preferences", "stood-down", "operator input resumed; tool dismissed")
+                    run.record("exit", "stood-down", "operator input resumed; tool dismissed")
+                    return True
+                gone = outcome == "gone"
                 run.record("about", "pass" if gone else "fail",
                            "About dialog observed and dismissed" if gone
                            else "About dialog did not dismiss; " + failure_capture(run, "about", out_dir, abort=resumed))
@@ -1940,6 +1982,40 @@ def self_test() -> int:
         globals()["capture_window"] = _real_cap2
     check("abort is observed before the deadline under a controlled clock",
           _cres == ABORTED)
+    # Dialog dismissal escalation: IDOK ignored, button click dismisses.
+    _dstate = {"gone": False, "posts": []}
+    _real_post = globals()["post"]
+    _real_pidwin = globals()["pid_windows"]
+    _real_okbtn = globals()["dialog_ok_button"]
+    def _fake_post(hwnd, msg, wparam=0):
+        _dstate["posts"].append((hwnd, msg))
+        if msg == BM_CLICK and hwnd == 77:
+            _dstate["gone"] = True
+    globals()["post"] = _fake_post
+    globals()["pid_windows"] = lambda pid: [] if _dstate["gone"] else [(55, "#32770", "About")]
+    globals()["dialog_ok_button"] = lambda dialog: 77
+    try:
+        _dout = dismiss_dialog(55, 1, 0.6)
+    finally:
+        globals()["post"] = _real_post
+        globals()["pid_windows"] = _real_pidwin
+        globals()["dialog_ok_button"] = _real_okbtn
+    check("dialog dismissal escalates to the OK button click",
+          _dout == "gone" and (77, BM_CLICK) in _dstate["posts"])
+    _dstate2 = {"posts": []}
+    globals()["post"] = lambda hwnd, msg, wparam=0: _dstate2["posts"].append((hwnd, msg))
+    globals()["pid_windows"] = lambda pid: [(55, "#32770", "About")]
+    globals()["dialog_ok_button"] = lambda dialog: None
+    try:
+        _dout2 = dismiss_dialog(55, 1, 0.45)
+    finally:
+        globals()["post"] = _real_post
+        globals()["pid_windows"] = _real_pidwin
+        globals()["dialog_ok_button"] = _real_okbtn
+    check("an undismissable dialog ends present after WM_CLOSE",
+          _dout2 == "present" and (55, WM_CLOSE) in _dstate2["posts"])
+    check("dialog dismissal stands down on resumed input",
+          dismiss_dialog(55, 1, 0.5, resumed=lambda: True) == "stood-down")
     # Cleanup deadline branch: the child never exits, input arrives at expiry.
     _drun = ToolRun("Resolute", Path("x"))
     class _NeverProc:

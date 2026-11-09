@@ -41,6 +41,16 @@ A collecting case also needs the operator away at its own start (no input for 12
 
 Placement tags: `[place:primary]` puts the case's windows on the primary monitor; `[place:dpi96]` and `[place:dpi144]` put them on the monitor at that DPI, because the case proves rendering at that scale. A case whose monitor is not attached skips with `hardware absent`, and the night runner re-probes it. `tests/focus-audit.md` gives each fenced case's reason.
 
+## Elevated smoke: three routes, one consent model
+
+Elevation is a process token a child inherits from its parent, never from another window on the desktop. That one fact decides which route an elevated smoke run takes:
+
+- **Manual runs** start from an elevated terminal. Children of that terminal inherit its token, `scripts/smoke-run.py` sees it is already elevated, and no prompt ever appears.
+- **Unattended runs** use the `\Resolute\ElevatedSmoke` scheduled task (`tools/elevated-smoke.ps1`). A nightly, watchdog, or resumed-session parent is not a child of the operator's terminal, so an elevated terminal left open cannot help it; the task is registered once (`-Register`, one consent prompt, highest privilege, interactive logon) and later runs start it with `-Run` and no prompt. The task runs the driver collecting (`RESOLUTE_IDLE_COLLECT=1`), never with `--visible`, so the fence and its stand-down on operator input still apply.
+- **Attended one-offs** use `python scripts/smoke-run.py --elevate`, which relaunches through the shell consent prompt each time (D07 T01 §5).
+
+The task's trust boundary is pinned bytes, not a trusted path: registration records the SHA-256 of `scripts/smoke-run.py` and `scripts/conformance-check.py` in `C:\ProgramData\Resolute\ElevatedSmoke\trusted-hashes.txt` (write: Administrators and SYSTEM only), and both the task wrapper and `-Run` verify those hashes before anything launches. Editing either file after registration buys a named refusal and a re-registration prompt, never silent elevated execution of new code, because this checkout's files grant Modify to Authenticated Users and a fixed argument list cannot bound what changed code would do. `RunAsInvoker` is never used: it does not elevate, so it cannot prove an elevated step.
+
 ## Skips are debt
 
 Every skip prints one machine-readable line:
