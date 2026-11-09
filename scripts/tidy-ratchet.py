@@ -490,8 +490,7 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             found |= collect_findings(out.splitlines(), root)
         per_target[name] = found
         global_set |= found
-    flush_log()
-    return per_target, global_set, total_tus
+    return per_target, global_set, total_tus, flush_log()
 
 
 def baseline_at_revision(root: Path, rev: str):
@@ -551,7 +550,12 @@ def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
 
     if not clang_tidy.is_file():
         raise Refusal(f"clang-tidy not found at {clang_tidy}")
-    per_target, global_set, total_tus = run_analysis(root, clang_tidy, targets, log_path)
+    per_target, global_set, total_tus, log_error = run_analysis(root, clang_tidy, targets, log_path)
+    if log_error is not None:
+        # A successful analysis whose diagnostics could not be saved
+        # still says so: the counts are evidence, the missing log is
+        # not, and nothing below may point at it (repair3 plan gap).
+        print(f"tidy-ratchet: diagnostics could not be saved to {log_path} ({log_error})")
     measured_targets = {n: len(s) for n, s in per_target.items()}
     measured_count = len(global_set)
 
@@ -566,7 +570,10 @@ def run(root: Path, clang_tidy: Path, base_override, log_path) -> int:
             shown = all_findings[:20]
             findings = "\n".join(shown)
             if len(all_findings) > len(shown):
-                findings += f"\n... and {len(all_findings) - len(shown)} more (full log: {log_path})"
+                if log_error is None:
+                    findings += f"\n... and {len(all_findings) - len(shown)} more (full log: {log_path})"
+                else:
+                    findings += f"\n... and {len(all_findings) - len(shown)} more (diagnostics log could not be saved: {log_error})"
             regressed.append(
                 f"target '{name}' {measured_targets[name]} is above its baseline "
                 f"{baseline['targets'][name]}; its findings:\n{findings}"
@@ -897,7 +904,7 @@ def self_test() -> int:
 
         def fake_analysis(root, clang_tidy, targets, log_path):
             glob = set().union(*measured.values())
-            return {k: set(v) for k, v in measured.items()}, glob, 2
+            return {k: set(v) for k, v in measured.items()}, glob, 2, None
 
         globals()["run_analysis"] = fake_analysis
         try:
@@ -1126,6 +1133,32 @@ def self_test() -> int:
             globals()["write_atomic"] = real_atomic
 
     case("log persistence failure is reported, never promised", log_failure_is_reported_not_promised)
+
+    def successful_analysis_log_failure_surfaces():
+        from unittest import mock as _mock
+
+        tmp = mkdtemp()
+        db = tmp / "build" / "release" / "compile_commands.json"
+        db.parent.mkdir(parents=True)
+        db.write_text(json.dumps([{"file": "a.cpp", "directory": str(tmp), "command": "cc a.cpp"}]))
+        fake = subprocess.CompletedProcess(
+            args=[], returncode=0, stdout="a.cpp:1:1: warning: w [bugprone-foo]\n", stderr=""
+        )
+        real_atomic = write_atomic
+        globals()["write_atomic"] = lambda *a, **k: (_ for _ in ()).throw(
+            Refusal("could not persist (stub)")
+        )
+        try:
+            with _mock.patch("subprocess.run", return_value=fake):
+                per, glob, tus, log_error = run_analysis(
+                    tmp, Path(sys.executable), {"root": db}, tmp / "logs" / "g.log"
+                )
+            assert log_error is not None and "persist" in log_error, log_error
+            assert len(glob) == 1, glob
+        finally:
+            globals()["write_atomic"] = real_atomic
+
+    case("successful analysis propagates its log-save failure", successful_analysis_log_failure_surfaces)
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
