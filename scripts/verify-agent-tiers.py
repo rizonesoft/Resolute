@@ -89,6 +89,16 @@ SPARK_REPLAY = Path("docs") / "replays" / "2026-11-09-spark-replay.md"
 SPARK_MODEL_PIN = "muse-spark-1.3"
 SPARK_EFFORT_PIN = "medium"
 
+# The Ember tier inside the same workflow: muse-ember-1.0 at medium
+# effort, for the narrow classes only (a single named command, or
+# extraction from a single named file). It earned that scope in a
+# head-to-head replay against Spark, and it keeps it only while the
+# workflow keeps its narrow-class guard and its auto-escalation to
+# Spark when an Ember attempt comes back incomplete.
+EMBER_REPLAY = Path("docs") / "replays" / "2026-11-09-ember-replay.md"
+EMBER_MODEL_PIN = "muse-ember-1.0"
+EMBER_EFFORT_PIN = "medium"
+
 # Tools no subagent on any tier is given. A `*` grant includes them, and so
 # does a missing `tools:` list, because the agent then inherits every tool.
 EDIT_TOOLS = ["edit", "write", "multiedit", "notebookedit"]
@@ -384,6 +394,43 @@ def spark_problems(repo_root):
             "evidence without a file:line or command: source must be "
             "dropped before it reaches the lead"
         )
+    if not re.search(
+        rf'EMBER_MODEL\s*=\s*"{re.escape(EMBER_MODEL_PIN)}"', text
+    ) or not re.search(
+        rf'EMBER_EFFORT\s*=\s*"{EMBER_EFFORT_PIN}"', text
+    ):
+        problems.append(
+            f"{SPARK_WORKFLOW} must pin EMBER_MODEL = "
+            f'"{EMBER_MODEL_PIN}" at EMBER_EFFORT = "{EMBER_EFFORT_PIN}" '
+            "for the narrow Ember tier"
+        )
+    if not re.search(r"\bisNarrowEmberTask\b", text):
+        problems.append(
+            f"{SPARK_WORKFLOW} lost its narrow-class guard "
+            "(isNarrowEmberTask): Ember takes only a single named "
+            "command or single-file extraction, never batched or "
+            "multi-file briefs"
+        )
+    if not re.search(r"\bescalatedFrom\b", text):
+        problems.append(
+            f"{SPARK_WORKFLOW} lost its auto-escalation (escalatedFrom): "
+            "an incomplete Ember attempt must be retried once on Spark "
+            "instead of returning subpar evidence"
+        )
+    ember_replay_path = repo_root / EMBER_REPLAY
+    if not ember_replay_path.is_file():
+        problems.append(
+            f"Ember needs {EMBER_REPLAY} recording its head-to-head "
+            "replay against Spark at medium effort"
+        )
+    else:
+        ember_text = ember_replay_path.read_text(encoding="utf-8").lower()
+        if EMBER_EFFORT_PIN not in ember_text or "head-to-head" not in ember_text:
+            problems.append(
+                f"{EMBER_REPLAY} does not record a medium-effort "
+                "head-to-head replay against Spark; the qualifying "
+                "replay must match the pinned effort and comparison"
+            )
     replay_path = repo_root / SPARK_REPLAY
     if not replay_path.is_file():
         problems.append(
@@ -553,11 +600,18 @@ def self_test():
         "// Read and run only: never edit, create, move, or delete a file.\n"
         "function isJudgmentBrief(input) { return false; }\n"
         "function isCitedSource(source) { return true; }\n"
+        'const EMBER_MODEL = "muse-ember-1.0";\n'
+        'const EMBER_EFFORT = "medium";\n'
+        "function isNarrowEmberTask(task) { return true; }\n"
+        "escalatedFrom: null,\n"
     )
     spark_cases = []
 
-    def spark_case(label, workflow_text, expect_errors, route=False, replay=None):
-        spark_cases.append((label, workflow_text, expect_errors, route, replay))
+    def spark_case(label, workflow_text, expect_errors, route=False, replay=None,
+                   ember_replay="medium head-to-head ember replay\n"):
+        spark_cases.append(
+            (label, workflow_text, expect_errors, route, replay, ember_replay)
+        )
 
     spark_case("spark medium passes", spark_good, 0,
                replay="medium effort replay, no loss\n")
@@ -571,6 +625,17 @@ def self_test():
     spark_case("spark without cited-source check refused",
                spark_good.replace("isCitedSource", "isChecked"), 1,
                replay="medium effort replay, no loss\n")
+    spark_case("ember pin missing refused",
+               spark_good.replace("muse-ember-1.0", "muse-ember-9.9"), 1,
+               replay="medium effort replay, no loss\n")
+    spark_case("ember without narrow guard refused",
+               spark_good.replace("isNarrowEmberTask", "isWideTask"), 1,
+               replay="medium effort replay, no loss\n")
+    spark_case("ember without escalation refused",
+               spark_good.replace("escalatedFrom", "upgradedFrom"), 1,
+               replay="medium effort replay, no loss\n")
+    spark_case("ember missing replay refused", spark_good, 1,
+               replay="medium effort replay, no loss\n", ember_replay=None)
     spark_case("spark route without workflow refused", None, 1, route=True)
     spark_case("spark not adopted passes", None, 0)
 
@@ -594,7 +659,7 @@ def self_test():
                     f"got {got}: {result['errors']}"
                 )
     total_cases = len(cases) + len(spark_cases)
-    for label, workflow_text, expect_errors, route, replay in spark_cases:
+    for label, workflow_text, expect_errors, route, replay, ember_replay in spark_cases:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             if workflow_text is not None:
@@ -607,8 +672,12 @@ def self_test():
                 )
             if replay is not None:
                 replay_file = root / SPARK_REPLAY
-                replay_file.parent.mkdir(parents=True)
+                replay_file.parent.mkdir(parents=True, exist_ok=True)
                 replay_file.write_text(replay, encoding="utf-8")
+            if ember_replay is not None:
+                ember_file = root / EMBER_REPLAY
+                ember_file.parent.mkdir(parents=True, exist_ok=True)
+                ember_file.write_text(ember_replay, encoding="utf-8")
             got_errors = spark_problems(root)
             if (expect_errors == 0) != (len(got_errors) == 0):
                 failures.append(
