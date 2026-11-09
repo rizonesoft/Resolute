@@ -1847,7 +1847,9 @@ Func _ProcessSelectedSolution($iAction)
 			Local $sSolutionIniPath = $sRangeSplit[2]
 
 			$g_aEnvironment = IniReadSection($sSolutionIniPath, "Environment")
+			Local $iEnvReadError = @error
 
+			If IsArray($g_aEnvironment) Then
 			Local $sDescriptorBase = _FileEx_PathSplit($sSolutionIniPath, 2)
 			For $iEnv = 1 To $g_aEnvironment[0][0]
 				Switch $g_aEnvironment[$iEnv][0]
@@ -1855,8 +1857,9 @@ Func _ProcessSelectedSolution($iAction)
 						$g_aEnvironment[$iEnv][1] = _ResolveDescriptorPath($sDescriptorBase, $g_aEnvironment[$iEnv][1])
 				EndSwitch
 			Next
+			EndIf
 
-			If Not @error Then
+			If Not $iEnvReadError Then
 
 				If $g_aEnvironment[0][0] >= $g_iMagicNumber Then
 
