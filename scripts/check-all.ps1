@@ -320,6 +320,8 @@ foreach ($r in $results) {
     $secs = $r.Seconds.ToString('0.0', [System.Globalization.CultureInfo]::InvariantCulture)
     $line = '  {0,-18} {1,-12} {2,6}s' -f $r.Name, $r.Status, $secs
     if ($r.Detail) { $line += "  $($r.Detail)" }
+    # An advisory finding on a passing gate names its full report, or the developer is told something is wrong with nowhere to read it (D07 T01 section 3, repair3 plan).
+    if ($r.Detail -match 'advisory') { $line += "  (full report: $($r.Log))" }
     Write-Host $line -ForegroundColor $colour
 }
 

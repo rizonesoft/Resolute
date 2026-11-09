@@ -47,5 +47,14 @@ class ConformanceGateDetail(unittest.TestCase):
         self.assertNotRegex(line, pat)
 
 
+class AdvisoryReportPath(unittest.TestCase):
+    def test_successful_advisory_gate_names_its_log(self):
+        text = (ROOT / "scripts" / "check-all.ps1").read_text(encoding="utf-8")
+        self.assertRegex(
+            text,
+            r"\$r\.Detail -match 'advisory'.*full report: \$\(\$r\.Log\)",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
