@@ -443,15 +443,30 @@ def eval_build_clean(root: Path, tool, spec, ctx):
         if not db_path.is_file() or hashlib.sha256(db_path.read_bytes()).hexdigest() != digest:
             raise Refusal(f"C24: compile database {rel_db} changed since measurement; rerun the gate")
     record_mtime = Path(result_path).stat().st_mtime
-    source_root = root / spec["source_dir"]
-    if source_root.is_dir():
-        for f in source_root.rglob("*"):
-            if f.is_file() and "build" not in f.parts and f.suffix.lower() in SOURCE_SUFFIXES:
+    # Every build input, not only the tool's own tree: the launcher
+    # statically links shared/resolute-ui and shared/lucide, and a
+    # change there leaves the old executable certifying itself
+    # (review round 5). CMake and tidy configuration are inputs too.
+    input_suffixes = SOURCE_SUFFIXES | {".cmake", ".txt", ".in", ".rc"}
+    for base_name in ("src", "shared", "extensions", "cmake", "tests"):
+        base = root / base_name
+        if not base.is_dir():
+            continue
+        for f in base.rglob("*"):
+            if not f.is_file() or "build" in f.parts:
+                continue
+            if f.suffix.lower() in input_suffixes or f.name in (".clang-tidy", "CMakeLists.txt", "CMakePresets.json"):
                 if f.stat().st_mtime > record_mtime:
                     raise Refusal(
-                        f"C24: source {f.relative_to(root).as_posix()} is newer than the "
-                        "measurement; rerun the gate"
+                        f"C24: build input {f.relative_to(root).as_posix()} is newer than "
+                        "the measurement; rerun the gate"
                     )
+    for extra in (root / "CMakeLists.txt", root / ".clang-tidy"):
+        if extra.is_file() and extra.stat().st_mtime > record_mtime:
+            raise Refusal(
+                f"C24: build input {extra.relative_to(root).as_posix()} is newer than "
+                "the measurement; rerun the gate"
+            )
     target = spec["tidy_target"]
     if target not in record.get("targets", {}):
         raise Refusal(f"C24: result record carries no count for target '{target}'")
@@ -927,10 +942,16 @@ def self_test() -> int:
 
     def dup_repair():
         tmp, tools, log, status, result = fixture()
+        import os as _os
+        import time as _time
+
+        past = _time.time() - 3600
         for tool in ("ToolA", "ToolB"):
             d = tmp / "extensions" / tool
             d.mkdir(parents=True)
-            (d / "r.cpp").write_text('RepairItem{ "hosts-file" };\n')
+            f = d / "r.cpp"
+            f.write_text('RepairItem{ "hosts-file" };\n')
+            _os.utime(f, (past, past))
         refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "repair subject 'hosts-file'")
 
     case("duplicate repair subject fails by name", dup_repair)
@@ -1034,7 +1055,7 @@ def self_test() -> int:
         tmp, tools, log, status, result = fixture()
         future = _time.time() + 60
         _os.utime(tmp / "src" / "main.cpp", (future, future))
-        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "is newer than the measurement")
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "is newer than")
         tmp, tools, log, status, result = fixture()
         (tmp / "Bin/Release/ToolA.exe").write_bytes(make_pe(["USER32.dll"]))
         refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "differs from the artifact")
@@ -1054,6 +1075,21 @@ def self_test() -> int:
         assert got and "malformed" in got[0], got
 
     case("imports outside raw section data refuse", zero_raw_section)
+
+    def shared_source_voids_evidence():
+        import os as _os
+        import time as _time
+
+        tmp, tools, log, status, result = fixture()
+        shared = tmp / "shared" / "lib"
+        shared.mkdir(parents=True)
+        f = shared / "ui.cpp"
+        f.write_text("int x;\n")
+        future = _time.time() + 60
+        _os.utime(f, (future, future))
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "shared/lib/ui.cpp")
+
+    case("shared source change voids C24 evidence", shared_source_voids_evidence)
 
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)
