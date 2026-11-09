@@ -1374,7 +1374,8 @@ def self_test() -> int:
             "build a.obj: CXX_COMPILER__x a.cpp\n")
         import hashlib as _h
         digest = _h.sha256(db.read_bytes()).hexdigest()
-        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={digest}"]))
+        ndigest = _h.sha256((db.parent / "build.ninja").read_bytes()).hexdigest()
+        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={digest};build/release/build.ninja={ndigest}"]))
         assert rc == 0, f"unchanged database refused (rc={rc})"
         rec = json.loads((tmp / "build" / "logs" / "build-record.json").read_text())
         assert rec["compile_dbs"]["build/release/compile_commands.json"] == digest
@@ -1423,11 +1424,49 @@ def self_test() -> int:
             "build b.obj: CXX_COMPILER__x cost$$/b.cpp\n")
         import hashlib as _h
         digest = _h.sha256(db.read_bytes()).hexdigest()
-        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={digest}"]))
+        ndigest = _h.sha256((db.parent / "build.ninja").read_bytes()).hexdigest()
+        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={digest};build/release/build.ninja={ndigest}"]))
         assert rc == 0, f"escaped-space/dollar ninja paths refused (rc={rc})"
 
     case("build record requires a configure-time hash per database", build_record_requires_configure_hash)
     case("build record accepts ninja-escaped spaces and dollars", build_record_accepts_escaped_ninja_paths)
+
+    def _expect_both(db):
+        import hashlib as _h
+        return (
+            f"build/release/compile_commands.json={_h.sha256(db.read_bytes()).hexdigest()};"
+            f"build/release/build.ninja={_h.sha256((db.parent / 'build.ninja').read_bytes()).hexdigest()}"
+        )
+
+    def build_record_single_target_ignores_other_db():
+        tmp, db = _record_fixture(
+            lambda rel: [{"file": "a.cpp", "directory": str(rel), "command": "cc a.cpp"}],
+            "build a.obj: CXX_COMPILER__x a.cpp\n")
+        other = tmp / "extensions" / "Other" / "build" / "Release"
+        other.mkdir(parents=True)
+        (other / "compile_commands.json").write_text("[]")
+        (other / "build.ninja").write_text("")
+        rc = main(_record_args(tmp, ["--expect-dbs", _expect_both(db)]))
+        assert rc == 0, f"single-target record refused over an unrelated database (rc={rc})"
+        rec = json.loads((tmp / "build" / "logs" / "build-record.json").read_text())
+        assert list(rec["compile_dbs"]) == ["build/release/compile_commands.json"], rec
+
+    def build_record_rejects_ninja_change():
+        tmp, db = _record_fixture(
+            lambda rel: [{"file": "a.cpp", "directory": str(rel), "command": "cc a.cpp"}],
+            "build a.obj: CXX_COMPILER__x a.cpp\n")
+        import hashlib as _h
+        configured = _h.sha256(b"build a.obj: CXX_COMPILER__x a.cpp\n  FLAGS = -DORIGINAL=1\n").hexdigest()
+        expect = (
+            f"build/release/compile_commands.json={_h.sha256(db.read_bytes()).hexdigest()};"
+            f"build/release/build.ninja={configured}"
+        )
+        rc = main(_record_args(tmp, ["--expect-dbs", expect]))
+        assert rc == 1, f"ninja graph changed after configure was recorded (rc={rc})"
+        assert not (tmp / "build" / "logs" / "build-record.json").exists()
+
+    case("single-target build record binds only its own database", build_record_single_target_ignores_other_db)
+    case("build record refuses a ninja graph changed after configure", build_record_rejects_ninja_change)
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
@@ -1493,16 +1532,25 @@ def main(argv=None) -> int:
             return 1
         import hashlib as _hl2
 
+        # Required databases derive from the targets this build ran:
+        # a single-target Release build binds only its own database,
+        # never an unrelated one left on disk (repair2 round 1 P2).
+        targets = [x for x in args.build_targets.split(",") if x]
+        if not targets:
+            print("tidy-ratchet: FAILED: --write-build-record names no build targets")
+            return 1
+        db_files = [
+            root / "build" / "release" / "compile_commands.json"
+            if name == "Resolute"
+            else root / "extensions" / name / "build" / "Release" / "compile_commands.json"
+            for name in targets
+        ]
         dbs = {}
-        db_files = [root / "build" / "release" / "compile_commands.json"]
-        if (root / "extensions").is_dir():
-            db_files += sorted((root / "extensions").glob("*/build/Release/compile_commands.json"))
+        consumed_expect = set()
         for db in db_files:
             if not db.is_file():
-                if db == db_files[0]:
-                    print(f"tidy-ratchet: FAILED: compile database {db} missing; nothing to bind")
-                    return 1
-                continue
+                print(f"tidy-ratchet: FAILED: compile database {db} missing; nothing to bind")
+                return 1
             # The database must describe the build that just ran:
             # its translation units are exactly the C++ sources the
             # sibling build.ninja compiled. A database swapped in
@@ -1525,6 +1573,24 @@ def main(argv=None) -> int:
             ninja = db.parent / "build.ninja"
             if not ninja.is_file():
                 print(f"tidy-ratchet: FAILED: no build.ninja beside {db}; cannot bind the database")
+                return 1
+            # The ninja graph carries the actual compile flags; bind
+            # its bytes from configure through publication too, or
+            # flags can diverge from the certified database
+            # (repair2 round 1 P3).
+            ninja_rel = ninja.relative_to(root).as_posix()
+            if ninja_rel not in expect_dbs:
+                print(
+                    f"tidy-ratchet: FAILED: no configure-time hash for {ninja_rel}; "
+                    "publish through scripts/build.ps1"
+                )
+                return 1
+            consumed_expect.add(ninja_rel)
+            if expect_dbs[ninja_rel] != _hl2.sha256(ninja.read_bytes()).hexdigest():
+                print(
+                    f"tidy-ratchet: FAILED: build graph {ninja_rel} changed after "
+                    "its configure; its flags no longer match the database"
+                )
                 return 1
             def _ninja_tokens(text):
                 toks, cur, i = [], [], 0
@@ -1558,6 +1624,7 @@ def main(argv=None) -> int:
                 return 1
             digest = _hl2.sha256(db.read_bytes()).hexdigest()
             rel = db.relative_to(root).as_posix()
+            consumed_expect.add(rel)
             if rel not in expect_dbs:
                 print(
                     f"tidy-ratchet: FAILED: no configure-time hash for {rel}; "
@@ -1575,16 +1642,16 @@ def main(argv=None) -> int:
         if not dbs:
             print("tidy-ratchet: FAILED: no compile database bound; refusing an empty build record")
             return 1
-        stale = sorted(set(expect_dbs) - set(dbs))
+        stale = sorted(set(expect_dbs) - consumed_expect)
         if stale:
-            print(f"tidy-ratchet: FAILED: configure-time hash names no recorded database: {stale[:3]}")
+            print(f"tidy-ratchet: FAILED: configure-time hash names nothing this build recorded: {stale[:3]}")
             return 1
         record = {
             "inputs_sha256": current_inputs,
             "compile_dbs": dbs,
             "artifacts": artifacts,
             "config": args.build_config,
-            "targets": [x for x in args.build_targets.split(",") if x],
+            "targets": targets,
         }
         Path(args.write_build_record).parent.mkdir(parents=True, exist_ok=True)
         write_atomic(Path(args.write_build_record), _js.dumps(record, indent=1) + "\n")

@@ -277,12 +277,14 @@ else {
 
 $script:DbExpect = @{}
 function Capture-Db([string]$Path) {
-    # Hash a compile database the moment its configure produced it;
+    # Hash a compile database and its build.ninja the moment the configure produced them;
     # the build-record writer refuses if it changed through
     # compilation or publication (D07 T01 section 3).
-    if (Test-Path $Path) {
-        $rel = [IO.Path]::GetRelativePath($RepoRoot, $Path) -replace '\\', '/'
-        $script:DbExpect[$rel] = (Get-FileHash $Path).Hash.ToLowerInvariant()
+    foreach ($f in @($Path, (Join-Path (Split-Path $Path) 'build.ninja'))) {
+        if (Test-Path $f) {
+            $rel = [IO.Path]::GetRelativePath($RepoRoot, $f) -replace '\\', '/'
+            $script:DbExpect[$rel] = (Get-FileHash $f).Hash.ToLowerInvariant()
+        }
     }
 }
 
