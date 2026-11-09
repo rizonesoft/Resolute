@@ -4,10 +4,24 @@
 # makes it one-way: a count above this fails, equal passes, below rewrites this
 # file down in the same commit.
 #
-# Format: the first line that is not blank and does not start with '#' is
-# `count: <integer>`. Everything else here is for the person reading it.
+# Format (validated by scripts/tidy-ratchet.py, D07 T01 section 2): comment
+# lines start with '#'. Exactly one `count: <integer>` (the globally
+# deduplicated total) and exactly one `target <name>: <integer>` per target,
+# where a target is one compile database: `root` for build/release and one
+# per extensions/<Tool>/ directory. Per-target counts deduplicate within
+# their database, so a shared-header finding counts once per surfacing
+# target and once in `count`, and `count` never exceeds the target sum.
+# A raise needs a new `# Raised <target> <old> -> <new> on <YYYY-MM-DD>:
+# <reason>` line per raised target (`total` for the count), absent from the
+# base revision's copy of this file. Everything else here is for the person
+# reading it.
+#
+# Raised total 59 -> 103 on 2026-09-17: RegStudio came under analysis (prose record below, migrated to this grammar 2026-11-09)
+# Raised total 103 -> 169 on 2026-09-17: clang 23 new and widened checks (prose record below, migrated to this grammar 2026-11-09)
 
 count: 169
+target root: 122
+target RegStudio: 47
 
 # ── Raised 103 -> 169 on 2026-09-17: a stronger analyser, not worse code
 #

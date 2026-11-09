@@ -147,7 +147,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §3`  | House-Style Contract, Checked Against Source      |   6   |
 | [x] | `D00 T02 §4`  | Parity driver for a built tool                    |   7   |
 | [x] | `D07 T01 §1`  | The conformance profile                           |   7   |
-| [ ] | `D07 T01 §2`  | Warning and analysis ratchet                      |   6   |
+| [ ] | `D07 T01 §2`  | Warning and analysis ratchet                      |  11   |
 | [ ] | `D07 T01 §3`  | Conformance check and its report                  |  12   |
 | [ ] | `D07 T01 §4`  | Standing smoke run over the suite                 |   5   |
 | [ ] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   5   |
