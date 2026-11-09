@@ -27,19 +27,46 @@
 // brief instead of one task per question: the spawn cost is per task.
 //
 // Every brief inherits this contract, appended to the caller's input:
-// read and run only, never write, compact evidence with file:line
-// references, and name every unresolved item rather than guess.
+// read and run only, never write, compact evidence where every fact
+// carries a cited source (a file:line or the exact command that
+// produced it), and name every unresolved item rather than guess.
+//
+// Two guards run in this file, before and after the spawn, so neither
+// depends on the lead remembering a rule:
+// 1. A brief that carries judgment (deciding what is relevant,
+//    assessing, recommending, explaining why) is refused before any
+//    agent spawns. The screen is deliberately fail-closed: a refused
+//    brief goes back to the lead, and rewording it past the screen is
+//    itself a routing failure.
+// 2. Evidence without a cited source is dropped and the task is
+//    reported incomplete, so uncited prose can never reach the lead
+//    as a fact to act on. The lead still opens the cited line or
+//    re-runs the quoted command before using any returned fact.
 
 const SPARK_MODEL = "muse-spark-1.3";
 const SPARK_EFFORT = "medium";
 
+const JUDGMENT_TERMS =
+  /\b(review|audit|assess|assessing|evaluate|evaluating|judge|judgment|decide|decision|recommend|relevant|relevance|appropriate|best|should|why|explain|diagnose|diagnosis|choose|choosing)\b/i;
+
+function isJudgmentBrief(input) {
+  return JUDGMENT_TERMS.test(String(input ?? ""));
+}
+
+function isCitedSource(source) {
+  if (typeof source !== "string") return false;
+  const trimmed = source.trim();
+  return /^.+:\d+$/.test(trimmed) || /^command:\s*\S/.test(trimmed);
+}
+
 const CONTRACT = [
   "You are a spark agent doing dummy work: fetching, locating, extracting, and running named read-only commands.",
   "Read and run only: never edit, create, move, or delete a file, and never change git state.",
-  "Answer exactly the brief, nothing else. Cite file:line for every fact taken from a file.",
-  "Never compute a count, total, or version yourself when a command can produce it: run the command and quote it verbatim in the evidence string for that fact.",
+  "Answer exactly the brief, nothing else. Every evidence item is one fact with its source: source is exactly a file:line reference (path:123) for a fact taken from a file, or command: followed by the exact command whose output produced the fact.",
+  "Never compute a count, total, or version yourself when a command can produce it: run the command and cite it as command: in the source for that fact.",
+  "If any part of the brief requires deciding what is relevant, assessing, recommending, choosing, or explaining why, do not answer that part: name it under unresolved as judgment for the lead.",
   "If the brief asks for something a repository script already produces exactly, name that script under unresolved and do not estimate the answer.",
-  "Keep evidence compact: one short string per fact, no prose summaries.",
+  "Keep evidence compact: one fact per evidence item, no prose summaries.",
   "Name every part you could not complete under unresolved instead of guessing.",
 ].join("\n");
 
@@ -48,7 +75,17 @@ const evidenceSchema = {
   required: ["complete", "evidence", "unresolved"],
   properties: {
     complete: { type: "boolean" },
-    evidence: { type: "array", items: { type: "string" } },
+    evidence: {
+      type: "array",
+      items: {
+        type: "object",
+        required: ["fact", "source"],
+        properties: {
+          fact: { type: "string" },
+          source: { type: "string" },
+        },
+      },
+    },
     unresolved: { type: "array", items: { type: "string" } },
   },
 };
@@ -76,8 +113,16 @@ export default async function workflow(host) {
   }
 
   phase("spark");
-  const results = await host.parallel(
-    tasks.map((task) => ({
+  const allowed = [];
+  const allowedIndex = [];
+  tasks.forEach((task, index) => {
+    if (!isJudgmentBrief(task.input)) {
+      allowed.push(task);
+      allowedIndex.push(index);
+    }
+  });
+  const spawned = await host.parallel(
+    allowed.map((task) => ({
       input: `${task.input}\n\n${CONTRACT}`,
       label: task.label ?? "spark",
       model: SPARK_MODEL,
@@ -85,19 +130,47 @@ export default async function workflow(host) {
       schema: evidenceSchema,
     })),
   );
+  const byIndex = new Map(allowedIndex.map((taskIndex, i) => [taskIndex, spawned[i]]));
 
-  const compact = results.map((result, index) => {
-    const failed = result === null || result.error_kind;
+  const compact = tasks.map((task, index) => {
+    if (isJudgmentBrief(task.input)) {
+      return {
+        label: task.label ?? `task-${index}`,
+        ref: null,
+        complete: false,
+        evidence: [],
+        notes: null,
+        unresolved: [
+          "judgment-bearing brief refused before spawn: route it to the lead, and do not reword it past this screen",
+        ],
+      };
+    }
+    const result = byIndex.get(index);
+    const failed = result === null || result === undefined || result.error_kind;
     const data = !failed && result.data && typeof result.data === "object" ? result.data : null;
+    const rawEvidence = Array.isArray(data?.evidence) ? data.evidence : [];
+    const evidence = [];
+    const dropped = [];
+    for (const item of rawEvidence) {
+      const fact = typeof item?.fact === "string" ? item.fact.trim() : "";
+      const source = typeof item?.source === "string" ? item.source.trim() : "";
+      if (fact && isCitedSource(source)) {
+        evidence.push({ fact, source });
+      } else {
+        dropped.push(`dropped evidence without a cited source, do not act on it: ${fact || "(empty fact)"}`);
+      }
+    }
+    const declared = Array.isArray(data?.unresolved) ? data.unresolved : null;
     return {
-      label: tasks[index].label ?? `task-${index}`,
+      label: task.label ?? `task-${index}`,
       ref: result?.ref ?? null,
-      complete: data?.complete === true && Array.isArray(data?.evidence) && data.evidence.length > 0,
-      evidence: Array.isArray(data?.evidence) ? data.evidence : [],
+      complete:
+        data?.complete === true && evidence.length > 0 && dropped.length === 0,
+      evidence,
       notes: typeof result?.notes === "string" && result.notes.trim() ? result.notes : null,
       unresolved: failed
         ? [`spark task failed: ${result?.error_kind ?? "not admitted"}`]
-        : (Array.isArray(data?.unresolved) ? data.unresolved : ["spark task returned no structured result"]),
+        : [...(declared ?? ["spark task returned no structured result"]), ...dropped],
     };
   });
 

@@ -47,6 +47,20 @@ Expected: line 142, and `2c9f761b tooling: pin the interpreters, cap the build, 
 
 Spark returned both exactly, and the workflow report itself recorded `"effort": "medium"`.
 
+## Routing hardening re-run, 2026-11-09
+
+Two routing failures were then closed in `spark.js` itself, rather than left as prose: a judgment screen (`isJudgmentBrief`) refuses a judgment-bearing brief before any agent spawns, and a cited-source check (`isCitedSource`) drops evidence whose source is not a `file:line` or a `command:` citation and reports the task incomplete.
+A test run at medium effort carried two dummy briefs and one judgment probe in a single call.
+
+Dummy briefs: extract `SPARK_MODEL_PIN` and `SPARK_EFFORT_PIN` from `scripts/verify-agent-tiers.py`, and run `git log --oneline -1`.
+
+Spark returned `SPARK_MODEL_PIN = "muse-spark-1.3"` at line 89, `SPARK_EFFORT_PIN = "medium"` at line 90, and `9727a8fd workspace: route dummy work to Spark at medium effort` with source `command: git log --oneline -1`.
+The lead verified each by opening the cited lines and re-running the quoted command, as the routing gate requires. All exact.
+
+Judgment probe: find the relevant code for settings loading and assess whether it is correct.
+
+No agent spawned for it (two agents ran, not three). The workflow returned it with `ref: null`, no evidence, and the unresolved item `judgment-bearing brief refused before spawn`, and reported the whole run `partial` rather than complete.
+
 ## Verdict
 
 Three briefs at low effort, seven facts, no errors; then three fresh briefs at medium effort, six facts, no errors, no unresolved items, and no prose beyond the evidence strings.

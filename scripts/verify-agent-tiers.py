@@ -10,7 +10,8 @@ mechanical work is run as a script by the lead and given to no model; the
 Muse Spark workflow (`.agents/workflows/spark.js`) takes the dummy work
 around those scripts on `muse-spark-1.3` at medium effort, and this check
 also holds that workflow to its model pin, its effort pin, its read-only
-contract, and the replay that qualifies it.
+contract, its judgment screen, its cited-source evidence check, and the
+replay that qualifies it.
 
 A rule stated in prose is protected by discipline. This makes it protected by
 a check: an agent with no `model:` line, an agent that could edit files, or a
@@ -371,6 +372,18 @@ def spark_problems(repo_root):
             f"{SPARK_WORKFLOW} lost its read-only contract (never edit, "
             "create, move, or delete a file)"
         )
+    if not re.search(r"\bisJudgmentBrief\b", text):
+        problems.append(
+            f"{SPARK_WORKFLOW} lost its judgment screen (isJudgmentBrief): "
+            "a brief that needs choosing, assessing, or deciding what is "
+            "relevant must be refused before any agent spawns"
+        )
+    if not re.search(r"\bisCitedSource\b", text):
+        problems.append(
+            f"{SPARK_WORKFLOW} lost its cited-source check (isCitedSource): "
+            "evidence without a file:line or command: source must be "
+            "dropped before it reaches the lead"
+        )
     replay_path = repo_root / SPARK_REPLAY
     if not replay_path.is_file():
         problems.append(
@@ -538,6 +551,8 @@ def self_test():
         'const SPARK_EFFORT = "medium";\n'
         "effort: SPARK_EFFORT,\n"
         "// Read and run only: never edit, create, move, or delete a file.\n"
+        "function isJudgmentBrief(input) { return false; }\n"
+        "function isCitedSource(source) { return true; }\n"
     )
     spark_cases = []
 
@@ -550,6 +565,12 @@ def self_test():
                spark_good.replace('"medium"', '"low"'), 1,
                replay="medium effort replay, no loss\n")
     spark_case("spark missing replay refused", spark_good, 1)
+    spark_case("spark without judgment screen refused",
+               spark_good.replace("isJudgmentBrief", "isScreened"), 1,
+               replay="medium effort replay, no loss\n")
+    spark_case("spark without cited-source check refused",
+               spark_good.replace("isCitedSource", "isChecked"), 1,
+               replay="medium effort replay, no loss\n")
     spark_case("spark route without workflow refused", None, 1, route=True)
     spark_case("spark not adopted passes", None, 0)
 
