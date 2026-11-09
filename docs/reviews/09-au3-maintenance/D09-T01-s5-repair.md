@@ -26,3 +26,42 @@ OVERALL: needs-attention
 
 
 - Planned: all three plan gaps folded into the repair before writing (2026-11-09). Gap 1: the shell-free runner reports a failed Run() immediately with an ERROR line naming only the launch error (never the secret-bearing command), and the regression test covers a missing executable. Gap 2: the test adds passwords with a trailing backslash and with a backslash immediately before an embedded quote (exact /p argument readback, clean log), and the fake signtool is built into a path containing spaces. Gap 3: D09 T01 section 5's item and checkpoint wording are reconciled to the shell-free runner in the repair commit, with fresh evidence recorded for the repaired candidate.
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T14:08:05Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: c75c32b4bae61ef08130fd4863699a4fab71f3e5
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 2
+- Digest: 74fda24de43ffaf6
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T14:08:57Z
+- Candidate: 9771b6355364613720185beb5d732ae35e3a6599
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: c75c32b4bae61ef08130fd4863699a4fab71f3e5
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 5
+- Digest: ec9f1b2bbcf5473d
+
+No gaps found. The candidate closes both repair gaps: shell-free execution preserves password arguments, launch failures omit the command, and §5 records the search inventory and dispositions. The original runner and its other callers remain unchanged.
+
+Assessment used source inspection and recorded regression evidence; tests were not rerun because the harness writes files.
+
+COMPLETION: complete

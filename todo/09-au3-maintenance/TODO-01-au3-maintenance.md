@@ -44,7 +44,7 @@ track: M1
 |   2   |   §2    | Clear the housekeeping defects             | --           |  [x]   |
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [x]   |
 |   4   |   §4    | Distro reports compiler failure           | --           |  [x]   |
-|   5   |   §5    | Stop logging the signing password in Distro | --           |  [ ]   |
+|   5   |   §5    | Stop logging the signing password in Distro | --           |  [x]   |
 |   6   |   §6    | Per-tool update URLs from Distro          | --           |  [ ]   |
 
 ---
@@ -78,7 +78,7 @@ A shipping product that cannot be built from its own repository cannot be fixed.
 > **Plan review:** astra (medium) -- six gaps folded into the section before building (record D09-T01-s1.md); repair, repair2, repair3 and repair4 plan passes each returned gaps that were dispositioned and closed in their cycles
 > **CRUD:** not applicable (no records are created, read, updated or deleted for a user; the change is build descriptors and their one loader)
 > **Resolved:** Distro compiler-failure propagation -> XREF: D09 T01 §4 (shipped 2026-11-09)
-> **Deferred:** Signing password written to the Distro log -> XREF: D09 T01 §5
+> **Resolved:** Signing password written to the Distro log -> XREF: D09 T01 §5 (shipped 2026-11-09)
 > **Duration:** 2026-11-09T10:33:21Z to 2026-11-09T12:04:46Z
 > **Implementer:** muse (muse-wonder-1.0)
 
@@ -221,6 +221,15 @@ A defect found in the AutoIt tree that also affects the C++ port is fixed in Aut
 - No other hit writes a password or certificate secret to a log, console line, or command-line echo.
 
 **Test checkpoint:** Driven run with evidence: the Distro log from a signing run with a dummy password contains `******` and does not contain the dummy password, the complete masked `Command:` line is quoted, and the executed command (full signtool path, the password as one escaped argument, no shell) and working directory are proven by the retained regression test under `docs/captures/d09-t01-s5-signing/`, including shell-metacharacter, quote-breakout, `%VAR%`, trailing-backslash, and backslash-before-quote passwords driven through the real `_ProcessEx_RunCommandDirect` with a fake signtool (fails on the pre-change source, passes on the candidate), plus a missing-executable launch that logs only the launch error. The signtool invocation that executes is unchanged apart from how its password argument is carried. `Au3Check.exe -q Distro.au3` and `ProcessEx.au3` exit 0.
+
+> **Verified:** 2026-11-09 | §5 | The retained regression test at `docs/captures/d09-t01-s5-signing/run_test.py` passes on the candidate and fails on the pre-change source: the candidate log shows the complete masked `Command:` line (`/p ******`), never the dummy password, exactly one shell-free runner invocation with the expected command and unchanged working directory; five password shapes (metachar, quote-breakout, `%VAR%`, trailing backslash, backslash-before-quote) driven through the real `_ProcessEx_RunCommandDirect` with a native fake signtool arrive as exactly the `/p` argument with a clean log, while the pre-change source leaks `SECRETTAIL`; a missing executable logs only the launch error. `Au3Check.exe -q` exits 0 for Distro.au3 and ProcessEx.au3. `python scripts/todo-graph.py validate`: 0 fatal. `python scripts/todo-claims.py`: 116 hold, 0 stale.
+> **Review:** rounds 1-3 on the base record (round 3 clean-terminal, its P3 fixed in c75c32b4), repair round 1 clean, astra (`gpt-6-astra` via `codex`), candidates bdc4f5d1 (round 2), 67c8bde3 (round 3), 9771b635 (repair round 1) · Raw findings: docs/reviews/09-au3-maintenance/D09-T01-s5.md, D09-T01-s5-repair.md
+> **Completion:** astra (medium), candidate c75c32b4bae61ef08130fd4863699a4fab71f3e5: COMPLETION: gaps (two missing-in-scope items), closed by the repair record · Repair records: D09-T01-s5-repair (candidate 9771b6355364613720185beb5d732ae35e3a6599, COMPLETION: complete)
+> **Plan review:** astra (medium): two gaps folded into the section before writing (record D09-T01-s5.md); repair plan pass returned three P2s, all folded in before writing
+> **CRUD:** not applicable (the builder's log output changes; no records change hands)
+> **Deferred:** Signing.ini operational password removal and rotation -> XREF: D06 T01 §3
+> **Duration:** 2026-11-09T13:21:12Z to 2026-11-09T14:08:57Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 
 ## 6. Per-Tool Update URLs from Distro
