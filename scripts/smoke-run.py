@@ -563,8 +563,14 @@ class ToolRun:
                         self.stood_down_during_cleanup = True
                         break
                     time.sleep(0.05)
-                if self.proc.poll() is None and not (getattr(self, "resumed", None) and self.resumed()):
-                    self.proc.kill()
+                # Any resumed observation in cleanup sets the flag, including
+                # the one that suppresses the kill at the deadline.
+                resumed = getattr(self, "resumed", None)
+                if self.proc.poll() is None:
+                    if resumed is not None and resumed():
+                        self.stood_down_during_cleanup = True
+                    else:
+                        self.proc.kill()
         except BaseException as exc:
             primary = exc
         finally:
