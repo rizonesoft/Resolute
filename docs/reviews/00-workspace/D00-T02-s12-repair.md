@@ -139,3 +139,70 @@ HIGHEST: P1
 OVERALL: needs-attention
 
 - Implemented: repair round 4 (adversarial P1) in 093f4a9d: both GetCurrentDirectoryW consumers in the guard check the returned length before using the buffer. Hook drills 4/4.
+
+## Round 5: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T16:00:12Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: c15d54d93e7e4fc53bdf21c6e90a10e6e4dd234d
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 6
+- Digest: 832ec741d40aa089
+
+### adversarial: approve
+
+No actionable adversarial findings established in `c15d54d9..093f4a9d`. Reviewed the requested tip directly; failure-path drills were not executed during this read-only review.
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T16:02:38Z
+- Candidate: 093f4a9d452944d527e0e5494a29844c2ab3727f
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: c15d54d93e7e4fc53bdf21c6e90a10e6e4dd234d
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 29
+- Digest: a648dcb26e2ee771
+
+The candidate still has in-scope gaps. Review was read-only; the fence-inventory self-test passed 5/5. C++ and headful tests were not rerun.
+
+**Part 1: completeness**
+
+- **missing-in-scope: Reliable individual-control and label/value detection.** [visual_pair_spec.txt:37](D:/GitHub/Resolute/tests/visual_pair_spec.txt:37) divides the surface into broad slots and bands, with empty labels/values and 2% pixel tolerances. [visual_pair_util.h:189](D:/GitHub/Resolute/tests/visual_pair_util.h:189) still copies the expected label into the observation. The new regression [visual_pair_test.cpp:304](D:/GitHub/Resolute/tests/visual_pair_test.cpp:304) replaces an entire slot with a checkerboard; it does not establish that a real label edit or value change fails. Required: production-path mutations of individual controls, naming the affected control.
+
+- **missing-in-scope: Internal clipping detection in the delivered specification.** Every region sets `maxEdge=1.0`, so the edge-touch fraction cannot exceed it. The live check only detects panes extending outside the client area ([ui_headful_test.cpp:425](D:/GitHub/Resolute/tests/ui_headful_test.cpp:425)). The clipping drill uses a different threshold, `0.05` ([visual_pair_test.cpp:203](D:/GitHub/Resolute/tests/visual_pair_test.cpp:203)). Required: a clipped label inside an otherwise valid pane must fail using the shipped specification, including under a theme exemption.
+
+- **missing-in-scope: Complete contrast coverage.** [visual_pair_spec.txt:35](D:/GitHub/Resolute/tests/visual_pair_spec.txt:35) skips the whole list despite the capture containing “Name”, “Description” and “Version” headers. The toolbar is classified as `element`, applying 3:1 to its visible “View” text instead of 4.5:1. The glyph measurement also excludes boundary-touching components, so it does not establish the required border contrast ([visual_pair.h:175](D:/GitHub/Resolute/tests/visual_pair.h:175)). Required: separate text and element/border relationships, with deficient examples failing in both themes.
+
+- **missing-in-scope: Discoverable hook failures when child working directories differ.** The hook returns after successfully writing its fallback marker into the **child’s** current directory ([focus_hook.cpp:65](D:/GitHub/Resolute/tests/focus_hook/focus_hook.cpp:65)); the guard searches its **own** current directory ([focus_guard.cpp:358](D:/GitHub/Resolute/tests/focus_guard.cpp:358)). If temporary-file creation fails and those directories differ, the marker can be missed and the event remains unsignalled. Required: a shared destination or independently signalled failure, tested with distinct working directories and an unavailable temporary destination.
+
+- **missing-in-scope: Reproduction from the sidecar alone.** The restaked [light-150 sidecar:14](D:/GitHub/Resolute/docs/captures/runs/2026-11-09-D00-T02-s10-launcher-light-150.txt:14) still records “attached to a running process” and “(default)” for arguments and working directory. `System/*.exe` describes a scan rule, not its actual inputs. [ui_headful_test.cpp:589](D:/GitHub/Resolute/tests/ui_headful_test.cpp:589) checks descriptive strings and field presence without resolving these omissions. Required: actual launch context and an explicit fixture inventory, including an empty inventory when appropriate.
+
+- **present: Specification validation, baseline comparison, fenced execution and cleanup infrastructure.** Evidence: malformed-input drills at [visual_pair_test.cpp:180](D:/GitHub/Resolute/tests/visual_pair_test.cpp:180), live comparison at [ui_headful_test.cpp:598](D:/GitHub/Resolute/tests/ui_headful_test.cpp:598), and fence-inventory self-test 5/5. This developer harness introduces no application dialogs, shortcuts, settings or system-repair undo surface requiring additional checklist items.
+
+**Part 2: excellence**
+
+- **in-scope: Regression sensitivity remains weaker than the promised control preservation.** Target: changing one displayed label/value, removing one control or clipping its content fails through the shipped extraction and comparison path, naming that control. Whole-slot corruption does not prove this target.
+
+- **in-scope: DESIGN.md compliance is incompletely measured.** Target: every visible text relationship meets 4.5:1 and every interactive element/border relationship meets 3:1 in both themes. Headers, toolbar text and borders need explicit coverage.
+
+- **in-scope: Failure evidence can still disappear.** Target: a dropped adopted-process event always invalidates proof, including when temporary storage fails and the child uses another working directory.
+
+- **in-scope: Evidence is not yet independently reproducible.** Target: another operator recreates the fixture and launch state from the sidecar without consulting the original workspace.
+
+- **out-of-scope, already assigned: Live AutoIt behavioral parity.** This section has no AutoIt counterpart and cannot establish 1:1 effects parity. The agreed elevated pair remains owned by `D03 T02 §7`; this review does not reopen that deferral.
+
+COMPLETION: gaps
