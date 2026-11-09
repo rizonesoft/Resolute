@@ -111,3 +111,31 @@ HIGHEST: P1
 OVERALL: needs-attention
 
 - Implemented: repair round 3 (adversarial P1) in 3eb8496b: every marker path build in the hook checks the complete filename fits MAX_PATH and falls through to the next destination instead of appending past the buffer. Hook drills 4/4.
+
+## Round 4: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T15:58:00Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: c15d54d93e7e4fc53bdf21c6e90a10e6e4dd234d
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 10
+- Digest: 214351969cceaf36
+
+### adversarial: needs-attention
+
+1. **P1: Long working directories still cause undefined behaviour in the guard.** `tests/focus_guard.cpp:360-361` and `:514-515` treat any nonzero `GetCurrentDirectoryW` return as success, then construct `std::wstring(cwd)` from an uninitialized stack buffer. When the directory exceeds the buffer, Windows returns the required size, not a populated string. [Microsoft API contract](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory).
+
+   **Reproduction:** Run the test executable by absolute path from an existing directory longer than 260 characters on a long-path-enabled Windows host. Ordinary case teardown reaches the new cleanup code; absent failure markers also reach the reader. Both can read beyond the buffer, causing undefined behaviour or a crash. No mapping failure or disk exhaustion is required. Check the returned length before consuming the buffer, or allocate the required size.
+
+   Source-confirmed at `3eb8496b`; not executed during this read-only review.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Implemented: repair round 4 (adversarial P1) in 093f4a9d: both GetCurrentDirectoryW consumers in the guard check the returned length before using the buffer. Hook drills 4/4.
