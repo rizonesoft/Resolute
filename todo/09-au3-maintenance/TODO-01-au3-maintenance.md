@@ -41,7 +41,7 @@ track: M1
 | Order | Section | Deliverable                                | Depends On   | Status |
 | :---: | :-----: | ------------------------------------------ | ------------ | :----: |
 |   1   |   §1    | Make the AutoIt suite buildable again      | --           |  [x]   |
-|   2   |   §2    | Clear the housekeeping defects             | --           |  [ ]   |
+|   2   |   §2    | Clear the housekeeping defects             | --           |  [x]   |
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [ ]   |
 |   4   |   §4    | Distro reports compiler failure           | --           |  [ ]   |
 |   5   |   §5    | Stop logging the signing password in Distro | --           |  [ ]   |
@@ -97,6 +97,15 @@ Small, known, and cheap. Each is recorded so it is not rediscovered later as a m
 **Build record 2026-11-09:** fresh clone `R:\resolute-housecheck` at `4e1ce4b2`, AutoIt3Wrapper per tool, both architectures: BiosCodes, Chromin, ComIntRep, DVDRepair, Edgemin, Firemin, MemBoost, Ownership, PixRepair, ReBar, USBRepair, Watermin each created x86 and x64 outputs with no failed lines; Distro created `resolute_au3\SDK\Distro.exe` and `Distro_X64.exe`; Resolute created `resolute_au3\Resolute.exe` and `Resolute_X64.exe`. Same coverage and success as §1. `Rescue/` and `Localization.au3.backup` are absent from the clone, as they are from this tree. Exit-code record 2026-11-09 (repair): the run was repeated in fresh clone `R:\resolute-housecheck2` at `2721e559` (the implementation candidate `4e1ce4b2` plus only TODO and review-record changes: `git diff 4e1ce4b2..2721e559` touches `todo/09-au3-maintenance/TODO-01-au3-maintenance.md` and `docs/reviews/09-au3-maintenance/D09-T01-s2.md`, so the built sources are identical) with the command `AutoIt3.exe AutoIt3Wrapper.au3 /in <Tool>.au3` per tool from its descriptor directory; every wrapper process exited 0 and created both architecture outputs (14 tools including Distro, 28 programs): BiosCodes 0, Chromin 0, ComIntRep 0, Distro 0, DVDRepair 0, Edgemin 0, Firemin 0, MemBoost 0, Ownership 0, PixRepair 0, ReBar 0, Resolute 0, USBRepair 0, Watermin 0.
 
 **Test checkpoint:** `Rescue/` and the stray `.backup` file are absent. `ReBar` and `Distro` advertise no product download page, in their About and update destinations alike (verified by readback of both call sites). The `samples/Resources/` decision is recorded and acted on. After the changes, a fresh clone at the final candidate builds all thirteen tools to both architectures (the §1 coverage), with candidate, command and exit results recorded here; 'unchanged' means the same coverage succeeding, and AutoIt3Wrapper's version-directive increments during compilation are expected, as §1 recorded.
+
+> **Verified:** 2026-11-09 | §2 | `Rescue/` and `Localization.au3.backup` absent from this tree and from the proof clones (Test-Path). `ReBar` and `Distro` advertise no product download page in About or update destinations (readback of `About.au3` and `Update.au3:98` call sites; `ReBar.ru` now `https://rizonesoft.com/`). Post-change build: fresh clone `R:\resolute-housecheck2` at `2721e559` (implementation `4e1ce4b2` plus document-only changes), wrapper command per tool recorded, all 14 wrapper processes exit 0, 28 programs created. `python scripts/todo-claims.py`: 116 hold, 0 stale. `python scripts/todo-graph.py validate`: 0 fatal.
+> **Review:** round 1 clean on the base record, repair round 1 clean, astra (`gpt-6-astra` via `codex`), candidates 2721e559(round 1) and 0fe682ef(repair round 1) · Raw findings: docs/reviews/09-au3-maintenance/D09-T01-s2.md, D09-T01-s2-repair.md
+> **Completion:** astra (medium), candidate 0fe682ef -- in-scope gaps closed (build command and exits recorded; Current state corrected); the one remaining item is out of scope and filed at §6 · Repair records: D09-T01-s2-repair (candidate 0fe682ef)
+> **Plan review:** astra (medium) -- five gaps folded into the section before building (record D09-T01-s2.md); repair plan pass returned one P3, corrected in the candidate
+> **CRUD:** not applicable (housekeeping deletions and URL values; no user records)
+> **Deferred:** Distro writes every tool's UpdateURL from its own global -> XREF: D09 T01 §6
+> **Duration:** 2026-11-09T12:10:08Z to 2026-11-09T12:27:51Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 ## 3. Maintenance Scope and Retirement Procedure
 
