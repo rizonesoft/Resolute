@@ -109,6 +109,8 @@ Small, known, and cheap. Each is recorded so it is not rediscovered later as a m
 
 ## 3. Maintenance Scope and Retirement Procedure
 
+> **Started:** 2026-11-09T12:30:23Z
+
 Without a written scope, every request to fix something in the AutoIt tree is argued from scratch, and the rewrite quietly becomes two projects.
 
 - [ ] Write the scope: what will be fixed here, what will not, and why. Done when: it states that only defects affecting users of the shipping suite are in scope, and that the conformance campaign is not.
