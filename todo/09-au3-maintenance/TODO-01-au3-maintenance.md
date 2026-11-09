@@ -43,7 +43,7 @@ track: M1
 |   1   |   §1    | Make the AutoIt suite buildable again      | --           |  [x]   |
 |   2   |   §2    | Clear the housekeeping defects             | --           |  [x]   |
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [x]   |
-|   4   |   §4    | Distro reports compiler failure           | --           |  [ ]   |
+|   4   |   §4    | Distro reports compiler failure           | --           |  [x]   |
 |   5   |   §5    | Stop logging the signing password in Distro | --           |  [ ]   |
 |   6   |   §6    | Per-tool update URLs from Distro          | --           |  [ ]   |
 
@@ -77,7 +77,7 @@ A shipping product that cannot be built from its own repository cannot be fixed.
 > **Completion:** astra (medium), candidate b79505535d575bec31cf1e13cca8767689fb94fb -- COMPLETION: complete · Repair records: D09-T01-s1-repair (candidate 1b4aecfa), D09-T01-s1-repair2 (candidate c918af7b), D09-T01-s1-repair3 (candidate 611d3e85), D09-T01-s1-repair4 (candidate b7950553)
 > **Plan review:** astra (medium) -- six gaps folded into the section before building (record D09-T01-s1.md); repair, repair2, repair3 and repair4 plan passes each returned gaps that were dispositioned and closed in their cycles
 > **CRUD:** not applicable (no records are created, read, updated or deleted for a user; the change is build descriptors and their one loader)
-> **Deferred:** Distro compiler-failure propagation -> XREF: D09 T01 §4
+> **Resolved:** Distro compiler-failure propagation -> XREF: D09 T01 §4 (shipped 2026-11-09)
 > **Deferred:** Signing password written to the Distro log -> XREF: D09 T01 §5
 > **Duration:** 2026-11-09T10:33:21Z to 2026-11-09T12:04:46Z
 > **Implementer:** muse (muse-wonder-1.0)
@@ -184,6 +184,14 @@ A defect found in the AutoIt tree that also affects the C++ port is fixed in Aut
 - [x] Commit: `"au3: report compiler failure in Distro"`
 
 **Test checkpoint:** Driven run with evidence: in a clone, a seeded syntax-error script driven through Distro's Process action with downstream actions checked is reported failed (status and log quoted, per architecture), never reaches progress 100, and its downstream artifacts read back unchanged; a one-architecture failure against retained old binaries is reported for that architecture; a clean tool still reports success with both outputs verified fresh from that invocation. `Au3Check.exe -q Distro.au3` exits 0. No tool's frozen behaviour changes.
+
+> **Verified:** 2026-11-09 | §4 | In clone R:\resolute-s4check (Distro rebuilt from the candidate, driven through its GUI Process action on BiosCodes with Build, Compress and Create Update File checked): clean run logs "Finished: Finished building Beep Codes Viewer." with both outputs created fresh and downstream sections running; seeded syntax error with retained outputs logs one "Build failed for 'Beep Codes Viewer' (<arch>): no compiler result was reported for this architecture." per architecture and "Finished with (17) errors!", no downstream sections, and BiosCodes.exe, BiosCodes_X64.exe and SDK\www\update\BiosCodes.ru hashes and mtimes identical before and after; x64 output path replaced by a directory logs only "(x64): the expected output was not created" with downstream gated. The missing-wrapper repair was proven by a harness executing the shipped branch segment verbatim (both present selects the run path, AutoIt missing the AutoIt message, wrapper missing the wrapper-path message); the rename-the-installed-wrapper run was denied by the Program Files ACL in this non-elevated session. `Au3Check.exe -q Distro.au3` exits 0. `python scripts/todo-graph.py validate`: 0 fatal. `python scripts/todo-claims.py`: 116 hold, 0 stale.
+> **Review:** rounds 4-5 on the base record (rounds 1-3 returned no valid verdict and do not count; round at position 1 found one P2, fixed in b4b529d6; round at position 2 clean), repair round 1 clean, astra (`gpt-6-astra` via `codex`), candidates b4b529d6 (position 2) and 50e8a90e (repair round 1) · Raw findings: docs/reviews/09-au3-maintenance/D09-T01-s4.md, D09-T01-s4-repair.md
+> **Completion:** astra (medium), candidate b4b529d6d00e8e416708d34604216cc3a0ae06cb: COMPLETION: gaps (one missing-in-scope item), closed by the repair record · Repair records: D09-T01-s4-repair (candidate 50e8a90e0f9790a6d1c02c9beccb155e546223e0, COMPLETION: complete)
+> **Plan review:** astra (medium): five gaps folded into the section before writing (record D09-T01-s4.md); repair plan pass clean
+> **CRUD:** not applicable (the builder reports build results; no records change hands)
+> **Duration:** 2026-11-09T12:45:33Z to 2026-11-09T13:15:47Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 
 ## 5. Stop Logging the Signing Password in Distro
