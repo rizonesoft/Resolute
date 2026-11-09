@@ -54,7 +54,7 @@ track: W1
 |   9   |   §9    | Rendered-output regression tests           | §5             |  [x]   |
 |  10   |   §10   | Focus-free UI suite conversion             | §7             |  [x]   |
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [x]   |
-|  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [ ]   |
+|  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [x]   |
 
 ---
 
@@ -716,6 +716,15 @@ Why this section exists: `D00 T02 §4` compares what two implementations DID, fi
 -> SOURCE: plan-D00-T02-s10-2026-09-26-PR11 D00-T02-S10-PR11
 -> SOURCE: plan-D00-T02-s10-2026-09-26-PR12 D00-T02-S10-PR12
 -> SOURCE: plan-D00-T02-s11-2026-09-27-PR10 D00-T02-S11-PR10
+
+> **Verified:** 2026-11-09 | §12 | the region/equivalence comparison engine and its drills pass at the final candidate: `resolute_tests.exe "[visual-pair],[focus-hook]"` all tests passed (174 assertions in 26 test cases, including renamed-label, removed-control, clipped-under-theme-exemption, low-contrast, blurred-150, and real-ink truncation drills for sidebar, headers, and toolbar controls on both light and dark captures); `ctest --preset debug` 100% tests passed out of 125; the fenced pair case under `RESOLUTE_HEADFUL=visible` passes (26 assertions, 0 divergences against the composed §10 baseline); `python scripts/fence-inventory.py --list build/logs/headful-list.txt` 10 discovered, 10 fenced, 0 undeclared, 0 stale; `python scripts/todo-graph.py validate` 0 fatal; `python scripts/todo-claims.py` 116 hold, 0 stale.
+> **Review:** round 1 astra (medium, adversarial) on repair6 candidate `819df0ab..dd28b4ee` clean, HIGHEST: none; the main record and repair records D00-T02-s12-repair.md through D00-T02-s12-repair5.md each reached a clean terminal round before their completion passes. Raw findings: docs/reviews/00-workspace/D00-T02-s12.md and the six repair records beside it.
+> **Completion:** astra (medium), candidate a70c7f12e5bec51fc3bb38e5cd6123e18230037f -- COMPLETION: complete · Repair records: D00-T02-s12-repair.md, D00-T02-s12-repair2.md, D00-T02-s12-repair3.md, D00-T02-s12-repair4.md, D00-T02-s12-repair5.md, D00-T02-s12-repair6.md (final candidate a70c7f12)
+> **Plan review:** astra -- gaps folded before building on the main record (2026-11-09); repair6 plan approved, PLAN: complete (2026-11-09T17:46:07Z)
+> **CRUD:** not applicable (test infrastructure and captures; no user data)
+> **Deferred:** the live AutoIt half of the launcher pair (elevated session, surfaces not yet equivalent) -> XREF: D03 T02 §7
+> **Duration:** 2026-11-09T14:53:59Z to 2026-11-09T17:49:33Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 ## Verification
 

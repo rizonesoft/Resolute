@@ -186,6 +186,7 @@ Everything the launcher owns around its content: its Preferences page in the fra
 **Test checkpoint:** Every prefs control names key and default; first-run names text or deliberate silence; all three failure texts name message, title, key, and log line; both confirmations name keys and buttons; both elevation states are named. The `D03 T01 §3` checklist can be built from this section with no invented string. Cheaper substitute that fails the checkpoint: failure texts without log lines, which tell the user and hide it from support.
 
 -> XREF: D03 T01 §3 -- the build that consumes this chrome spec
+-> XREF: D00 T02 §12 -- the region comparison harness the deferred pair runs on
 
 ## Verification
 
