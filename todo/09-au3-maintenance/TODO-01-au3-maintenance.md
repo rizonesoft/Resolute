@@ -196,6 +196,8 @@ A defect found in the AutoIt tree that also affects the C++ port is fixed in Aut
 
 ## 5. Stop Logging the Signing Password in Distro
 
+> **Started:** 2026-11-09T13:21:12Z
+
 `_RunSignCommand` (`resolute_au3/SDK/Concrete/Distro/Distro.au3`) masks the certificate password on one line (`Password: ******`) and then writes the full signing command, which contains `/p <password>` in plain text, to Distro's log on the next. The log is the file a maintainer attaches to a bug report, so the password reaches wherever the log goes. This predates `D09 T01 §1`; that section's repair completion review found it. No credential value was read while filing this.
 
 -> SOURCE: D09 T01 §1 repair completion review on `1b4aecfa`, Part 2 item 1 (out-of-scope)

@@ -158,7 +158,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
 | [x] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
 | [x] | `D09 T01 §4`  | Distro reports compiler failure                   |   7   |
-| [ ] | `D09 T01 §5`  | Stop logging the signing password in Distro       |   4   |
+| [ ] | `D09 T01 §5`  | Stop logging the signing password in Distro       |   5   |
 | [ ] | `D09 T01 §6`  | Per-tool update URLs from Distro                  |   4   |
 | [x] | `D00 T02 §5`  | Cover the inherited UI library                    |   7   |
 | [x] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
