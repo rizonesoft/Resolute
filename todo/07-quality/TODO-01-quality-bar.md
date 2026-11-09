@@ -185,6 +185,8 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 
 ## 4. Standing Smoke Run Over the Suite
 
+> **Started:** 2026-11-09T08:41:18Z
+
 > [!IMPORTANT]
 > **Validated 2026-11-09 before implementation. The five steps are per tool as the tool exists today, and the drive mechanism is messages, never synthetic input.**
 >
