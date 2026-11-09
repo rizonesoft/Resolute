@@ -15,7 +15,7 @@ Search the tree for a home the work already has:
 
 ```bash
 grep -rn "<keywords>" todo/ --include='TODO-*.md' | head -30
-python scripts/todo-graph.py query findings | head -20
+grep -rn "<keywords>" docs/reviews/ --include='*.md' | head -20
 ```
 
 Read the candidates. A home exists when a section's scope already covers the work, even if its checklist does not name it yet.

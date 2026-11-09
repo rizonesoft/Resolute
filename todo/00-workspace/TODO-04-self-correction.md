@@ -15,26 +15,20 @@ track: W1
 > [!IMPORTANT]
 > **Current state (verified 2026-09-16):** What exists is real but partial. `validate` proves the tree is **internally consistent**: every section has a row, every reference resolves, every stamp covers what it claims, and a stale deferral is FATAL. `plan --check` keeps the projection honest. `self-test` guards the tooling; the suite reports its own case count and this block deliberately does not repeat it. A warning ratchet is planned in `D07 T01 §2`. `scripts/todo-claims.py` exists and re-measures the factual claims TODOs make. **Corrected 2026-09-17:** this block said "11 claims live"; there are **30** today. No number is written here any more, because `--coverage` reports it and a figure duplicated in prose is a second source of truth that drifts. This block having gone stale while describing staleness detection is the argument for this section, not an embarrassment to hide.
 >
-> What does **not** exist: nothing notices that a `Current state` block has gone stale when it carries no claim; nothing records what a section actually cost against what it was estimated to; nothing categorises what reviews find, so the same class of defect can be found five times without ever becoming a check; and nothing re-sequences the plan when evidence says the order was wrong. **Groomed 2026-09-23:** that list describes 2026-09-16; `§1`-`§4` have since shipped all four properties (`todo-claims.py --coverage`, `scripts/todo-findings.py`, calibration through `_calibration_rows`, and `query sequence` through `_longest_chain`).
+> What does **not** exist: nothing notices that a `Current state` block has gone stale when it carries no claim; nothing records what a section actually cost against what it was estimated to; nothing categorises what reviews find, so the same class of defect can be found five times without ever becoming a check; and nothing re-sequences the plan when evidence says the order was wrong. **Groomed 2026-09-23:** that list describes 2026-09-16; `§1`-`§4` have since shipped all four properties (`todo-claims.py --coverage`, `scripts/todo-findings.py`, calibration through `_calibration_rows`, and `query sequence` through `_longest_chain`). **Realigned 2026-11-07:** the review and run-guard tooling was aligned to `Recto` (`scripts/review-dispatch.py`, `scripts/dispatch_hook.py`, `.conclave/reviewers.toml` with a `medium` effort ceiling) and `Steward` (`scripts/run-guard.py`, `scripts/lib/run_guard.py`), and `scripts/todo-graph.py` was simplified to the core graph validator and plan projection.
 >
 > The evidence this is needed: on 2026-09-16 the tree carried a section describing registry backup behaviour `ReBar` has never had, a submodule recorded as vendored source, one repair declared in two tools, and four skills instructing an executor to run `Au3Check` over C++. **Every one was caught by a human reading the tree.** That is not a process.
 
 <!-- claim: count "COVERAGE_FLOOR = 3" scripts/todo-claims.py = 1 -->
 <!-- claim: count "re.MULTILINE" scripts/todo-claims.py = 2 -->
 <!-- claim: count "def collect_unterminated" scripts/todo-claims.py = 1 -->
-<!-- claim: count "def _sync_items_cell" scripts/todo-graph.py = 1 -->
-<!-- claim: count "def _plan_items" scripts/todo-graph.py = 1 -->
-<!-- claim: exists scripts/todo-findings.py -->
-<!-- claim: count "def render_ledger" scripts/todo-findings.py = 1 -->
 <!-- claim: count "def _ignored" scripts/todo-claims.py = 1 -->
-<!-- claim: count "def _calibration_rows" scripts/todo-graph.py = 1 -->
-<!-- claim: count "CALIBRATION_MIN_SAMPLE = 30" scripts/todo-graph.py = 1 -->
-<!-- claim: count "def _longest_chain" scripts/todo-graph.py = 1 -->
-<!-- claim: count "def _filing_couplings" scripts/todo-graph.py = 1 -->
-<!-- claim: count "FILED_TO_RE" scripts/todo-findings.py = 2 -->
-<!-- claim: count "panel_slots.py exec independent" .claude/skills/process-todo-section/SKILL.md = 1 -->
-<!-- claim: count "model_reasoning_effort" .claude/skills/process-todo-section/SKILL.md = 0 -->
-<!-- claim: exists .conclave/panel.toml -->
+<!-- claim: exists scripts/review-dispatch.py -->
+<!-- claim: exists scripts/dispatch_hook.py -->
+<!-- claim: exists scripts/run-guard.py -->
+<!-- claim: exists scripts/lib/run_guard.py -->
+<!-- claim: exists .conclave/reviewers.toml -->
+<!-- claim: absent .conclave/panel.toml -->
 
 ## Inputs
 
@@ -1012,6 +1006,8 @@ The §16 plan review found the checkers speak human text only: every refusal is 
 
 ## 23. Single-Reviewer Panel Revisit
 
+> **Moved:** 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+
 **Re-scoped 2026-09-23** (operator instruction, answering the D00 T04 §27 plan review's PR10): this section was the third Sol-versus-Opus keep-or-cut revisit. The one-writer decision answered that question, since Opus 5.5 writes every section and so never reviews one (D00 T04 §27), and the fallbacks moved to the newest Grok model (D00 T04 §29). The question that still needs evidence is whether one GPT reviewer is enough, or whether Grok should take a live rung rather than wait for an outage. The §18 machinery answers it unchanged in shape: blinded severity, a controlled crossover, the zero and overlap legs, value per cost. The five §18-shape items are retired and their substance carries into the items below; the §18 plan-review findings they held (independent rating, pinned controls, deterministic candidate selection, blinded matching) ride items 3 and 4. Partial work from the old scope is parked unmerged on branch `wip/d00-t04-s23-revisit` (commit `189a3d01`), and item 1 disposes of it.
 
 **Corrected 2026-09-25** (operator decision, commit `0c8ffa5a`): every panel slot now runs `gpt-6-astra` and Grok left the panel with every fallback slot, so the live-rung question is gone. The Sol-versus-Grok crossover with its calibration round, and the Grok-rung decision, are retired. The question left is whether one GPT reviewer with no fallback is enough: the rating item runs one rater family, and the decision item decides from the export whether a second non-writer family should return.
@@ -1108,6 +1104,8 @@ The §20 sign-off and plan review accept eight follow-ups the §20 contract does
 
 ## 25. Checker Diagnostic Follow-Ups
 
+> **Moved:** 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+
 The §22 plan review files nine findings the §22 contract does not own: the registry covers two checkers only (PR1), code stability is unenforced (PR2), no retirement lifecycle exists (PR3), the refusal schema is unversioned (PR4), multi-refusal order is unpinned (PR6), two deliberate behaviors lack legs (PR10), no worked consumer exists (PR12, premium win), no operator index exists (PR13, premium win), and crashes collide with problem reports (PR14). All nine extend §22's registry, schema, or exit map rather than revisiting its decisions. (Depends On §22 carries the relation; opened beside §24 at filing so neither section breaches the sizing cap, per PR15.) The §24 plan review adds two more to the same surface: format-governed usage refusals (PR21) and one JSON document for report mode (PR22). The D00 T04 §24 stamp adds a twelfth: plan-ledger `duplicate` rows cannot name a panel finding as canonical (PR11 reword).
 
 - [ ] Extend the diagnostic registry beyond the two review checkers: `todo-graph.py`, `todo-claims.py`, and `review_prompt.py` emit refusals with no codes, so consumers still string-match prose for most of the tooling surface (plan review of the §22 candidate, PR1; needs §22 shipped: it extends §22's registry). Done when: each tool's refusal families carry registry codes quoted from drives, the code list stays in the single registry (no second list), the self-tests pin each new family's code plus exit, and `validate` stays green. Cheaper substitute that fails the checkpoint: codes on one more tool, which repeats the two-checker partial coverage.
@@ -1141,6 +1139,8 @@ The §22 plan review files nine findings the §22 contract does not own: the reg
 -> SOURCE: self-2026-09-21-duplicate-canonical
 
 ## 26. Review-Flow Follow-Ups
+
+> **Moved:** 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
 
 The §24 plan review files nine findings plus one panel advisory the §24 contract does not own, and the D00 T04 §27 panel adds an eleventh (a POSIX producer-tree timeout): span exclusions lack an independent list (PR1), trusted pins are unenforced on approvals (PR4), recorded rounds lack candidate OIDs (PR5), multiple attestations mask by first-wins (PR7), undated stamps escape binding (PR8), the bundle name overclaims signing (PR10), the second-machine proof shares its host (PR12), the bundle carries no chain (PR13, premium win), and the fix-commit exception reads nowhere (PR16); the round-4 advisory adds the mega-assembly path (F17). All ten extend §24's review machinery rather than revisiting its decisions. (Depends On §24 carries the relation.)
 
@@ -1221,6 +1221,8 @@ Operator decision 2026-09-23: Claude Code on Opus 5.5 is the only writer, Muse l
 > **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
 
 ## 28. Slot-Table Review Follow-Ups
+
+> **Moved:** 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
 
 The §27 plan review files five findings the §27 contract does not own: a `GPT outage` note alone authorizes the writer-family cross-fill (PR2; **Groomed 2026-09-23:** D00 T04 §29 replaced the cross-fill with the Grok fallback, which the item now binds), the governing heading is a word rather than a derived identity (PR3), a re-pin can change how an older round reads (PR4), `exec` extra arguments are not barred from overriding the pin (PR5), and derived provenance binds the sign-off only (PR6). All five harden §27's table, runner, or rule 16.
 
@@ -1748,6 +1750,8 @@ The D00 T04 §39 review files what its contract does not own. Its hard-cap round
 
 ## 42. Campaign Guard Recovery Completeness
 
+> **Moved:** 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+
 The D00 T04 §40 review files what its contract does not own, and so does the D00 T04 §41 review, folded here rather than into a new section (operator direction 2026-09-26: the plan must not grow unconditionally). The D00 T04 §40 hard-cap round (panel round 5, F18) found that `quarantine` moves the clearance ledger before publishing the salvaged replacement, so a crash or a failed write between the two leaves no ledger, which reads as empty and lifts every outstanding prohibition; round 5 is the cap, so it files here. The D00 T04 §40 plan review (run 20260926-D00-T04-S40-astra) adds sixteen accepted findings, grouped below by the unit they harden. The D00 T04 §41 hard-cap round (panel round 5, F17 to F19) and nine accepted findings of its plan review (run 20260926-D00-T04-S41-astra) close the list; the plan review's other seven were rejected with reasons in docs/reviews/00-workspace/D00-T04-s41.md.
 
 - [ ] Keep every deletion prohibition through any recovery: the ledger is moved before its replacement publishes, salvage keeps only the ids its bytes still carry, and the ledger has no identity scope, reuse policy, or compaction contract (panel round 5 of the D00 T04 §40 review, F18, and plan review PR3 and PR6; needs §40 shipped). Done when: the replacement publishes before the corrupt file moves (or a missing ledger after a quarantine reads as "all jobs cleared" until the next `CronList` proves the live set), a partial loss refuses every job not proven created after the loss, clearances carry the workspace digest and session, and a compaction rule keeps them bounded without lifting a live one, with crash and failure fixtures at each step, quoted.
@@ -1804,6 +1808,8 @@ The D00 T04 §40 review files what its contract does not own, and so does the D0
 -> SOURCE: plan-D00-T01-s9-2026-09-26-PR5 D00-T01-S9-PR5
 
 ## 43. Sonnet Delegates Under One Lead
+
+> **Moved:** 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
 
 > **Started:** 2026-10-01T21:42:13Z
 

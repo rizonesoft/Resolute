@@ -1,48 +1,34 @@
 {
   "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"& ([System.IO.Path]::Combine([Environment]::GetEnvironmentVariable('CLAUDE_PROJECT_DIR'), '.claude', 'hooks', 'campaign-stop.ps1'))\"",
-            "timeout": 30
-          }
-        ]
-      }
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/scripts/run-guard.py\" hook", "timeout": 40 } ] }
+    ],
+    "StopFailure": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/scripts/run-guard.py\" hook", "timeout": 10 } ] }
+    ],
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/scripts/run-guard.py\" hook", "timeout": 10 } ] }
+    ],
+    "SessionEnd": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/scripts/run-guard.py\" hook", "timeout": 10 } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "CronCreate", "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/scripts/run-guard.py\" hook", "timeout": 10 } ] }
     ],
     "PreToolUse": [
       {
-        "matcher": "Agent",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
-            "command": "python -c \"import os,runpy,sys; p=os.path.join(os.environ['CLAUDE_PROJECT_DIR'],'scripts','panel_slots.py'); sys.argv=[p,'hook','pre-agent']; runpy.run_path(p,run_name='__main__')\"",
-            "timeout": 30
-          }
-        ]
-      },
-      {
-        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python -c \"import os,runpy,sys; p=os.path.join(os.environ['CLAUDE_PROJECT_DIR'],'scripts','panel_slots.py'); sys.argv=[p,'hook','pre-tool']; runpy.run_path(p,run_name='__main__')\"",
+            "command": "python -c \"import os, runpy, sys; sys.argv = ['dispatch_hook.py']; runpy.run_path(os.path.join(os.environ.get('CLAUDE_PROJECT_DIR') or os.getcwd(), 'scripts', 'dispatch_hook.py'), run_name='__main__')\"",
             "timeout": 30
           }
         ]
       }
     ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python -c \"import os,runpy,sys; p=os.path.join(os.environ['CLAUDE_PROJECT_DIR'],'scripts','panel_slots.py'); sys.argv=[p,'hook','subagent-stop']; runpy.run_path(p,run_name='__main__')\"",
-            "timeout": 30
-          }
-        ]
-      }
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/scripts/run-guard.py\" hook", "timeout": 90 } ] }
     ]
   }
 }

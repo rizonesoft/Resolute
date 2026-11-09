@@ -32,11 +32,18 @@ jobs:
       - name: Validate the TODO tree
         shell: bash
         run: python scripts/todo-graph.py validate
-      - name: Validate the review slots and the delegate roster
+      - name: Validate the review pin, run-guard, and delegate roster
         shell: bash
         run: |
-          python scripts/panel_slots.py --self-test
-          python scripts/panel_slots.py validate
+          python scripts/review-dispatch.py --check-pin
+          python -m unittest discover -s scripts/tests
+          python scripts/todo-claims.py
+          python scripts/todo-claims.py --self-test
+          python scripts/fence-debt.py --self-test
+          python scripts/todo-night-debt.py --self-test
+          python scripts/profile-check.py
+          python scripts/profile-check.py --self-test
+          node scripts/verify-agent-tiers.mjs
       - name: Check plan projection is current
         shell: bash
         run: |

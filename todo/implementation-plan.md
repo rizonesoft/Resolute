@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **61 of 234 sections complete (26%).** Derived from the Implementation Order tables by `python scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **61 of 228 sections complete (27%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -133,14 +133,8 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §39` | CI read-back and repair completeness              |  10   |
 | [x] | `D00 T04 §40` | Campaign guard fence completeness                 |  12   |
 | [x] | `D00 T04 §41` | CI read-back evidence and replay hardening        |  10   |
-| [ ] | `D00 T04 §42` | Campaign guard recovery completeness              |  15   |
-| [ ] | `D00 T04 §43` | Sonnet delegates under one lead                   |  10   |
-| [ ] | `D00 T04 §23` | Single-reviewer panel revisit                     |   5   |
 | [x] | `D00 T04 §24` | Review-tooling follow-ups                         |  24   |
-| [ ] | `D00 T04 §25` | Checker diagnostic follow-ups                     |  13   |
-| [ ] | `D00 T04 §26` | Review-flow follow-ups                            |  17   |
 | [x] | `D00 T04 §27` | One writer, a GPT-governed panel, slot-bound pins |   6   |
-| [ ] | `D00 T04 §28` | Slot-table review follow-ups                      |   6   |
 | [x] | `D00 T04 §29` | Grok fallbacks on the newest Grok model           |   6   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                      |  14   |
 | [x] | `D00 T01 §2`  | CMake structure and dependencies                  |  11   |
@@ -181,6 +175,13 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D10 T01 §2`  | Branch Protection, Real Check Names               |   4   |
 | [ ] | `D10 T01 §3`  | Cold-Reader Taste Pass                            |   3   |
 | [ ] | `D10 T01 §4`  | Demo Clip Recorded and Embedded                   |   5   |
+
+> **Moved:** `D00 T04 §42` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+> **Moved:** `D00 T04 §43` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+> **Moved:** `D00 T04 §23` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+> **Moved:** `D00 T04 §25` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+> **Moved:** `D00 T04 §26` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
+> **Moved:** `D00 T04 §28` -- 2026-11-07 to AGENTS.md -- superseded by the Recto review-dispatch and Steward run-guard alignment
 
 
 ### Phase 1 -- The two shared layers

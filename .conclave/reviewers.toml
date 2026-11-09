@@ -1,0 +1,45 @@
+# One writer and one reviewer per section. Historical receipts replay their original pin.
+# Steward operator 2026-11-06 (published JMR policy parity): plan medium, adversarial medium, up to eight low rounds,
+# completion medium last. Codex is reviewed by Argon; other writers by Astra. Claude is never a reviewer.
+schema_version = 1
+
+[reviewers.astra]
+cli = "codex"
+model = "gpt-6-astra"
+effort = "medium"
+
+[reviewers.argon]
+cli = "agy"
+model = "gemini-4-argon-medium"
+models_by_effort = { low = "gemini-4-argon-low", medium = "gemini-4-argon-medium" }
+
+[routes]
+claude = ["astra"]
+codex = ["argon"]
+gemini = ["astra"]
+muse = ["astra"]
+meta = ["astra"]
+
+[schedule]
+completion_order = "last"
+max_low_rounds = 8
+severity_stop_after = 0
+
+[schedule.plan]
+effort = "medium"
+lenses = ["plan"]
+
+[[schedule.rounds]]
+effort = "medium"
+lenses = ["adversarial"]
+
+[schedule.rotation]
+effort = "low"
+lenses = ["consistency", "quality", "integration", "source-defect", "design", "optimization", "record", "plan-delivery"]
+
+[schedule.escalation]
+effort = "low"
+lenses = ["adversarial"]
+
+[schedule.completion]
+effort = "medium"

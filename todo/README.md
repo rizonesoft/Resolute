@@ -386,19 +386,22 @@ Reviewers refuse stamps on partial scope. The mechanical check (a `[x]` row with
 ## Tooling
 
 ```bash
-python scripts/todo-graph.py build      # parse todo/ -> build/todo-cache.json
-python scripts/todo-graph.py validate   # structural + graph integrity checks
-python scripts/todo-graph.py self-test  # the script's own suite; must stay green
+python scripts/todo-graph.py build              # parse todo/ -> build/todo-cache.json
+python scripts/todo-graph.py validate           # structural + graph integrity checks
+python scripts/todo-graph.py self-test          # the script's own suite; must stay green
 python scripts/todo-graph.py query ready        # sections with all deps met, split into runnable-now versus runnable-elsewhere by the runner's context
+python scripts/todo-graph.py query ready --json # machine-readable ready list consumed by scripts/run-guard.py
 python scripts/todo-graph.py query blocked      # sections waiting on something
+python scripts/todo-graph.py query deferred     # open and resolved deferrals
 python scripts/todo-graph.py query stats        # tree health
-python scripts/todo-graph.py query plan-health  # review-loop governance: --json emits schema plan-health/4 (total sort keys, exits 0); --check/--fail-on gate automation
-python scripts/todo-graph.py query summary      # operator digest: incomplete runs, blocked clearances, overdue owners, next action, gate verdict (text-only; exits 1 when the gate fails)
-python scripts/todo-graph.py query run <id>     # one run ID resolves to candidate, scope, findings, lineage, outage, artifacts
+python scripts/todo-graph.py query adjacency    # feature adjacency obligations
+python scripts/todo-graph.py query night-debt   # open night-owed test debt
 python scripts/todo-graph.py render             # mermaid dependency graph
 python scripts/todo-graph.py plan --sync        # re-derive the checkboxes AND re-align every table
 python scripts/todo-graph.py plan --check       # fail if the boxes are stale
 python scripts/todo-graph.py resolve 'D03 T01 §3'   # ref -> file, section, deps, status
+python scripts/review-dispatch.py --check-pin   # validate .conclave/reviewers.toml (max medium effort)
+python scripts/run-guard.py status              # inspect the process-plan run guard, heartbeat, and watchdog
 ```
 
 The scripts are stdlib-only by design: no install step stands between a fresh clone and validating the plan. Use `python3` instead of `python` where that is what your shell has.
@@ -415,66 +418,7 @@ is a complete instruction: nobody has to translate domain `00` and TODO `01` int
 
 [`implementation-plan.md`](./implementation-plan.md) is the second derived artefact, and the only one that is committed: it is prose a person reads, so it cannot live in `build/`. Its boxes are a projection of the Implementation Order tables and **are never ticked by hand**; `plan --check` runs in CI so a stale projection fails the build instead of quietly misinforming whoever reads it next. Run `plan --sync` after any row flips.
 
-**CI enforces exactly this contract and nothing more.** The todo workflow runs `validate` on every push touching `todo/`, `scripts/todo-graph.py`, or the workflow itself, so a FATAL (or a NEW warning) fails the build like any other defect.
-
-### FATAL blocks; WARN is ratcheted
-
-`validate` reports two severities under a **two-layer contract**: a FATAL always exits `1` and is never ackable; a WARN is ratchet-managed, so one already in `todo/.warning-baseline` or the ack ledger exits `0`, while a NEW one prints as `WARN*` and exits `1` until it is fixed or deliberately accepted with `warnings --accept`. "Advisory" therefore describes only warnings that are already baselined or acked, never a new one.
-
-| Severity | Exit code | Meaning |
-| -------- | :-------: | ------- |
-| `FATAL`  |    `1`    | The graph or the format is broken: a `Depends On` that does not resolve, a section without its Implementation Order row, a row without its section, a one-sided XREF, a deferral with no owner, a `superseded` TODO with no successor, and every other structural class in the per-class table below. Fix it before doing anything else. |
-| `WARN`   | see below | Ratchet-managed: a warning already in `todo/.warning-baseline` or the ack ledger exits `0`; a NEW one prints as `WARN*` and exits `1` until fixed or deliberately accepted with `warnings --accept`. |
-
-**The per-class map, mirrored from `SEVERITY_MAP` in `scripts/todo-graph.py`: the self-test compares this table to the map row-for-row, so editing one without the other fails `self-test`.** The rule is push-time actionability: FATAL where the fix is mechanical and the defect is a structural-integrity break; WARN where the fix is a judgement call a red build cannot resolve.
-
-| Class | Severity | Why |
-| ----- | -------- | --- |
-| `over-section-cap` | FATAL | A TODO file may hold at most **55** sections. Past that the next work opens a NEW file in the same domain, split by subject. Section numbers are permanent addresses, so a file can never be renumbered or made smaller. |
-| `duplicate-source-key` | FATAL | Two sections claim the same `-> SOURCE: <key>`. An automated filer stamps what it filed FROM, so a scanner that runs twice a day cannot open a second row for one build failure. |
-| `evidence-citation-short-form` | FATAL | New evidence cites full `DNN TNN §N` refs on stamps, findings files, and attestations; pre-cutoff records stand as history. |
-| `review-citation-role-less` | FATAL | A multi-commit Review line tags every candidate with its round; round-to-commit mapping must be mechanical. |
-| `review-citation-role-mismatch` | FATAL | A round tag matching no recorded panel round, or two candidates sharing one round; the mapping must correspond, not merely exist. |
-| `superseded-no-successor` | FATAL | A superseded TODO must name where its work went; mechanical. |
-| `filter-overclaim-open` | FATAL | An open checkpoint that cannot detect its promised regression; naming the tests or scripts is a two-minute fix. |
-| `filter-overclaim-stamped` | WARN | The stamp must not be reopened; the fix-forward channel owns it. |
-| `no-commit-item` | FATAL | One section = one commit is the format's core contract. |
-| `partial-flip-shipped` | FATAL | An unticked micro-step outside the exemptions inside a `[x]` section breaks the shipped claim itself. |
-| `commit-history-unreadable` | WARN | History the `Commit:` binding cannot read is unverified, not broken; a bare-tree export must still validate. |
-| `fidelity-missing-lines-open` | FATAL | A Fidelity surface with no Job/Treatment/Chrome is unimplementable in house style. |
-| `fidelity-missing-lines-stamped` | WARN | Fix-forward: the gap is real, the stamp stays. |
-| `no-checklist-items` | FATAL | An empty section is unimplementable (co-emits `no-commit-item`). |
-| `over-30-items` | WARN | Sizing is a judgement call; a red build cannot split a section. |
-| `frozen-no-freeze-check` | FATAL | A frozen TODO without its check is a safety-marker mismatch; mechanical either way. |
-| `freeze-check-not-frozen` | FATAL | A Freeze check in a TODO whose frontmatter does not say `frozen: true` is the same safety-marker mismatch in the other direction; mechanical fix. |
-| `bare-todo-ref` | WARN | Prose legitimately mentions a TODO file without a section. |
-| `one-sided-xref` | FATAL | This spec calls it broken; the validator agrees. |
-| `deferral-no-owner` | FATAL | A deferral with no owner is an abandonment. |
-| `resolved-owner-unshipped` | WARN | Recording early resolution is evidence, not a defect. |
-| `missing-from-index` | FATAL | Two-line mechanical fix; discoverability is structural. |
-| `malformed-stamp` | FATAL | A `Verified:` line the parser refused. It reads as evidence while verifying nothing, so it is worse than a missing stamp; the fix is to write the line correctly. |
-| `needs-unknown` | FATAL | A `**Needs:**` value outside the closed list in `todo-graph.py` (`NEEDS_ALLOWED`). The list is closed so a misspelt host cannot silently unmark a section that cannot run without it. |
-| `moved-target-missing` | FATAL | A `> **Moved:**` marker that names no file, or a file that does not exist. The marker takes the section out of `query ready`, the plan and the progress totals on the strength of that pointer, so a dead pointer would hide work. |
-| `pending-control-contract` | FATAL | Reserved: the coming-soon inspector is not ported yet, so this class cannot fire until it lands. |
-| `stamp-no-opus-panel` | FATAL | A stamp dated after the Opus-panel rule landed whose findings carry no panel verdicts. It reads as reviewed evidence while verifying nothing. From 2026-09-23 (D00 T04 §27, §29) the governing record is the last `GPT panel` section; a last `Grok panel` section is the fallback and must carry a `GPT outage` line; a last `Claude panel` (or legacy `Opus panel`) section fails, because the writer never reviews. Earlier stamps keep the Opus-governed rule, where a last `GPT panel` section needs an `Opus outage` line. |
-| `requires-unknown` | FATAL | A `**Requires:**` value outside the closed list in `todo-graph.py` (`REQUIRES_ALLOWED`). The list is closed so a misspelt capability cannot silently unmark a section. |
-| `requires-no-reason` | FATAL | A `**Requires:**` mark without its `-- reason`. The citation is what makes the mark auditable instead of vibes. |
-| `stamp-no-plan-review` | FATAL | A stamp dated after the plan-review rule landed that carries no `Plan review:` completion marker. The second-family round is required procedure. |
-| `plan-review-malformed` | FATAL | A post-cutoff plan-review record the query cannot parse: a `Plan review` section without its Manifest line or its Ledger block, a non-row line inside the block, or a content-illegal row. |
-| `filed-target-no-backlink` | FATAL | A filed ledger row whose target file carries no back-link. The filing is untraceable from the target side, so remediation cannot be attributed to the finding. |
-| `stamp-reopened` | FATAL | A `> **Reopened:**` line outside its shape, on a still-checked row, or with a still-stamped dependent. A reopen that does not void proof downstream lets work continue on invalid evidence. |
-| `plan-review-duplicate-id` | FATAL | A finding ID appearing twice in one ledger. Multi-target findings ride one row with every target, never split rows. |
-| `plan-review-no-lineage` | FATAL | A `Plan review:` marker without run lineage: no run ID, a reused run ID, a rerun marker naming no superseded run, or a run the manifest does not carry. |
-| `ledger-history-violation` | FATAL | A ledger row whose disposition moved the forbidden way against the committed record, or a row that vanished. Later evidence amends via a new row, never by rewriting the old one. |
-| `provenance-malformed` | FATAL | A post-cutoff findings file without a well-formed `Provenance:` line, or a provenance line outside the field shape, without a shaped run ID, with an unresolving candidate, a missing path, or a run no marker of its section carries. |
-| `ledger-supersession-broken` | FATAL | A ledger row whose `supersedes` link names no row of its block, crosses review namespaces, or closes a cycle. |
-| `risk-acceptance-malformed` | FATAL | A `Risk accepted:` line outside the record shape, with an uncoverable target, expiring before it is recorded, or reviewed outside its record-expiry window. |
-| `risk-acceptance-silent-edit` | FATAL | A risk acceptance whose owning record changed after the evidence commit without a superseding record. |
-| `risk-acceptance-chain-broken` | FATAL | A `supersedes <date>` link that names no earlier record on its target, points forward, branches, or cycles. |
-| `skill-citation-unresolved` | FATAL | A skill citing a full section ref (`D00 T04 §6`) that resolves to no live section. |
-| `skill-citation-short-form` | FATAL | A skill citing a short section form (bare `§6`, `T04 §6`, or `file.md §6`) instead of a full `DNN TNN §N` ref. |
-
-Treat a warning as a decision to make rather than noise to clear. The tree starts at zero FATAL and zero non-baselined warnings, and it is worth keeping there.
+`validate` checks: frontmatter fields, unique ids, rows and sections one to one, a test checkpoint and checklist per section, `[x]` only under a covering `Verified:` stamp, no unticked work left in a shipped section, dependencies that resolve without cycles, bidirectional XREFs, the `Needs`/`Requires`/`Manual` vocabularies, Moved targets, the deferral rules, INDEX listings, and the 55-section cap.
 
 ## Skills
 
@@ -483,11 +427,12 @@ Treat a warning as a decision to make rather than noise to clear. The tree start
 | `add-todo`              | **Front door.** Route new work to the right domain, file, and section            |
 | `create-todo`           | Author a whole new TODO file, wire XREFs, update indexes                         |
 | `groom-plan`            | Harden the tree for a weaker executor: sequence, drift, gaps, complete features  |
+| `independent-review`    | Dispatch an independent review round through `scripts/review-dispatch.py`        |
 | `process-todo-section`  | **Fact-check the plan, correct what has drifted, then ship exactly one section** |
 | `review-todo-section`   | Quality gate after implementation; writes the stamp                              |
 | `process-todo-file`     | Loose-end sweep and closure when every section is `[x]`                          |
 | `process-phase`         | Attended phase runner: repair + gap-audit the phase, then ship it to 100%        |
-| `process-plan`          | Front door for `implementation-plan.md`; chains ready phases                     |
+| `process-plan`          | Front door for `implementation-plan.md`; chains ready phases under `run-guard`   |
 
 When something needs doing, start at `add-todo`: it decides whether the work belongs in an existing section, needs a new one, warrants a whole new file (delegating to `create-todo`), or is already covered. Reaching for `create-todo` directly tends to produce a second TODO over an existing one.
 

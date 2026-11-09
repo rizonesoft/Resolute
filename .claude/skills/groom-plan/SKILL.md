@@ -8,7 +8,7 @@ description: Harden the todo tree for a weaker executor -- sequence check, drift
 ## Evidence before reordering
 
 ```bash
-python scripts/todo-graph.py query sequence
+python scripts/todo-graph.py query blocked
 ```
 
 It prints the longest dependency chain, which is where delay costs most, and every coupling the review findings recorded: a section that filed a finding to another section ran into work that section owns, which the dependency graph does not carry.

@@ -291,7 +291,7 @@ Invoke-Gate -Name 'plan --check' -LogName 'gate-plan' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\todo-graph.py') plan --check
 }
 
-# ── claims, and the findings ledger ──────────────────────────
+# ── claims, review-dispatch, and run-guard ───────────────────
 #
 # todo-claims.py exits non-zero on a stale claim AND on a fallen coverage
 # floor, and both must fail here rather than print and be ignored. Registered
@@ -303,34 +303,24 @@ Invoke-Gate -Name 'claims' -LogName 'gate-claims' -Command {
 Invoke-Gate -Name 'claims self-test' -LogName 'gate-claims-selftest' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\todo-claims.py') --self-test
 }
-Invoke-Gate -Name 'findings ledger' -LogName 'gate-findings' -Command {
-    & $Python (Join-Path $RepoRoot 'scripts\todo-findings.py') --check
-}
-Invoke-Gate -Name 'review-prompt self-test' -LogName 'gate-reviewprompt-selftest' -Command {
-    & $Python (Join-Path $RepoRoot 'scripts\review_prompt.py') --self-test
-}
-Invoke-Gate -Name 'findings self-test' -LogName 'gate-findings-selftest' -Command {
-    & $Python (Join-Path $RepoRoot 'scripts\todo-findings.py') --self-test
-}
-Invoke-Gate -Name 'runs self-test' -LogName 'gate-runs-selftest' -Command {
-    & $Python (Join-Path $RepoRoot 'scripts\todo-runs.py') --self-test
-}
 # The fence's debt check: every fenced case ends green or night-owed
 # (D00 T02 §10).
 Invoke-Gate -Name 'fence-debt self-test' -LogName 'gate-fence-debt-selftest' -Command {
     & $Python (Join-Path $RepoRoot 'scripts\fence-debt.py') --self-test
 }
-# The review wiring: one table names the writer and pins every review slot,
-# and a governing slot never shares the writer's family. D00 T04 §27.
-Invoke-Gate -Name 'panel slots' -LogName 'gate-panel-slots' -Command {
-    & $Python (Join-Path $RepoRoot 'scripts\panel_slots.py') validate
+Invoke-Gate -Name 'night-debt self-test' -LogName 'gate-night-debt-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\todo-night-debt.py') --self-test
 }
-Invoke-Gate -Name 'panel slots self-test' -LogName 'gate-panel-slots-selftest' -Command {
-    & $Python (Join-Path $RepoRoot 'scripts\panel_slots.py') --self-test
+# The review wiring (.conclave/reviewers.toml, max medium effort) and
+# unit tests for review-dispatch.py, dispatch_hook.py, and run-guard.py.
+Invoke-Gate -Name 'reviewers pin' -LogName 'gate-reviewers-pin' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\review-dispatch.py') --check-pin
 }
-# The campaign Stop hook, driven against a throwaway workspace. D00 T04 §32.
-Invoke-Gate -Name 'campaign guard self-test' -LogName 'gate-campaign-guard' -Command {
-    & $Python (Join-Path $RepoRoot 'scripts\campaign_guard.py') --self-test
+Invoke-Gate -Name 'scripts unit tests' -LogName 'gate-scripts-unittests' -Command {
+    & $Python -m unittest discover -s (Join-Path $RepoRoot 'scripts\tests')
+}
+Invoke-Gate -Name 'agent tiers' -LogName 'gate-agent-tiers' -Command {
+    & node (Join-Path $RepoRoot 'scripts\verify-agent-tiers.mjs')
 }
 
 # The conformance profile is a contract other domains are measured against, so
