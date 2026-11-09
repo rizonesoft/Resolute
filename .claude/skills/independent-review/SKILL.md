@@ -20,7 +20,7 @@ The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a r
 
 1. Review your own change first and fix what you find.
 2. Write the review prompt to a scratch file, not the repository, from `docs/review-round-prompt.md`: name the candidate commit or range, the governing documents (`AGENTS.md`, `DESIGN.md`, `resolute_au3/`), and the lenses that apply.
-3. Run the passes in the dispatcher's order on the one findings record: a section record takes its plan pass first (`--kind plan`, once, before any round), then rounds, then its completion pass (`--kind completion`) after a clean terminal round. The dispatcher refuses a round on a record with no returned plan review, refuses rounds after a clean terminal round, and refuses every pass after a returned completion (its gaps open a new `-repair` record). For a non-section topic record with no plan pass, say so in the prompt. Run the round:
+3. Run the passes in the dispatcher's order on the one findings record: a section record takes its plan pass first (`--kind plan`, once, before any round), then rounds, then its completion pass (`--kind completion`) after a clean terminal round. The dispatcher refuses a round on a record with no returned plan review, refuses rounds after a clean terminal round, and refuses every pass after a returned completion (its gaps open a new `-repair` record). Every record takes that plan pass first, section or topic alike: the dispatcher refuses a round on any record with no returned plan review. Run the round:
 
    ```bash
    python scripts/review-dispatch.py --writer <claude|codex|gemini|muse|meta> --writer-model <exact-model-version> --prompt <scratch>/review-prompt.md --record docs/reviews/<topic>.md

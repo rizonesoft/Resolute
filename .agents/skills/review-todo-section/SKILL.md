@@ -104,7 +104,7 @@ python scripts/todo-graph.py plan --check
 The stamp block records:
 - `> **Verified:** <YYYY-MM-DD> | §<N> | <quoted checkpoint and gate outputs>`
 - `> **Review:** round <N> Astra (<effort>), candidates <sha>(round 1) ... -- <lens verdicts> · Raw findings: docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md`
-- `> **Completion:** astra (medium), candidate <sha> -- COMPLETION: complete \u00b7 Repair records: <none, or each -repair record with its final candidate>`
+- `> **Completion:** <reviewer from the completion record> (medium), candidate <sha> -- COMPLETION: complete \u00b7 Repair records: <none, or each -repair record with its final candidate>`
 - `> **Plan review:** astra -- <outcome>`
 - `> **CRUD:** <applicable or not applicable (...)>`
 - `> **Duration:** <start UTC> to <end UTC>`
