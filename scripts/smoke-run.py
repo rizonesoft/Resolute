@@ -180,6 +180,7 @@ def admission(visible: bool, now: datetime, env) -> tuple[bool, str, bool]:
 # ---------------------------------------------------------------- elevation
 
 ELEVATE_WAIT_TIMEOUT = 3600.0
+TERMINATE_CONFIRM_MS = 5000  # bound for confirming a terminated child exited
 ERROR_CANCELLED = 1223  # consent declined at the runas prompt
 TOKEN_QUERY_ACCESS = 0x0008
 TOKEN_ELEVATION_CLASS = 20
@@ -195,7 +196,15 @@ class ElevationDeclined(Exception):
 
 
 class ElevationFailed(Exception):
-    """The elevated relaunch failed by name (shell, handle, wait, exit)."""
+    """The elevated relaunch failed by name (shell, handle, wait, exit).
+
+    `launched` is True when the elevated child was launched before the
+    failure, so the caller never reports that nothing was launched.
+    """
+
+    def __init__(self, message, launched=False):
+        super().__init__(message)
+        self.launched = launched
 
 
 def is_elevated():
@@ -284,7 +293,25 @@ def _close_handle(handle):
 
 def _terminate_process(handle):
     if handle:
-        kernel32.TerminateProcess(handle, 2)
+        return bool(kernel32.TerminateProcess(handle, 2))
+    return False
+
+
+def _terminate_and_confirm(handle):
+    """Terminate the owned child and confirm it exited; return a note.
+
+    Termination is asynchronous, so the note says plainly when exit
+    could not be confirmed rather than claiming the child is gone.
+    """
+    if not _terminate_process(handle):
+        return "TerminateProcess failed; child termination not confirmed"
+    try:
+        waited = _wait_process(handle, TERMINATE_CONFIRM_MS)
+    except KeyboardInterrupt:
+        return "interrupted again while confirming; child termination not confirmed"
+    if waited != WAIT_OBJECT_0:
+        return f"child termination not confirmed (wait 0x{waited & 0xFFFFFFFF:08x})"
+    return "terminated and confirmed exited"
 
 
 def relaunch_elevated(argv, timeout=ELEVATE_WAIT_TIMEOUT):
@@ -302,25 +329,29 @@ def relaunch_elevated(argv, timeout=ELEVATE_WAIT_TIMEOUT):
         while True:
             remaining = deadline - time.monotonic()
             if remaining <= 0:
-                _terminate_process(handle)
+                note = _terminate_and_confirm(handle)
                 raise ElevationFailed(
-                    f"elevated child did not finish within {timeout:.0f}s; terminated")
-            try:
-                waited = _wait_process(handle, min(100, int(remaining * 1000)))
-            except KeyboardInterrupt:
-                _terminate_process(handle)
-                raise ElevationFailed(
-                    "interrupted while waiting for the elevated child; terminated")
+                    f"elevated child did not finish within {timeout:.0f}s; {note}",
+                    launched=True)
+            waited = _wait_process(handle, min(100, int(remaining * 1000)))
             if waited == WAIT_OBJECT_0:
                 break
             if waited == WAIT_TIMEOUT:
                 continue
-            _terminate_process(handle)
-            raise ElevationFailed(f"WaitForSingleObject failed (0x{waited & 0xFFFFFFFF:08x})")
+            note = _terminate_and_confirm(handle)
+            raise ElevationFailed(
+                f"WaitForSingleObject failed (0x{waited & 0xFFFFFFFF:08x}); {note}",
+                launched=True)
         code = _process_exit_code(handle)
         if code is None:
-            raise ElevationFailed("GetExitCodeProcess failed for the elevated child")
+            raise ElevationFailed("GetExitCodeProcess failed for the elevated child",
+                                  launched=True)
         return code
+    except KeyboardInterrupt:
+        note = _terminate_and_confirm(handle)
+        raise ElevationFailed(
+            f"interrupted while the elevated child was owned; {note}",
+            launched=True)
     finally:
         _close_handle(handle)
 
@@ -1262,9 +1293,16 @@ def main(argv=None) -> int:
                 print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
                 return 2
             except ElevationFailed as exc:
-                detail = f"blocked: elevated relaunch failed: {exc}"
-                emit_report(elevation_rows(only, "blocked", detail), "blocked",
-                            [f"Admission: {detail}.", "No tool was launched."])
+                if exc.launched:
+                    detail = (f"blocked: elevated child was launched, then failed: {exc}; "
+                              "steps in this run were not reliably observed")
+                    notes = [f"Admission: {detail}.",
+                             "The elevated child was launched. Captures it produced "
+                             "under build/smoke/ are retained."]
+                else:
+                    detail = f"blocked: elevated relaunch failed: {exc}"
+                    notes = [f"Admission: {detail}.", "No tool was launched."]
+                emit_report(elevation_rows(only, "blocked", detail), "blocked", notes)
                 print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
                 return 2
 
@@ -2111,7 +2149,7 @@ def self_test() -> int:
             globals()["_wait_process"] = wait
             globals()["_process_exit_code"] = code
             globals()["_close_handle"] = lambda h: _closed.append(h)
-            globals()["_terminate_process"] = lambda h: _terminated.append(h)
+            globals()["_terminate_process"] = lambda h: (_terminated.append(h), True)[1]
             try:
                 return ("rc", relaunch_elevated(["--elevate", "--visible"]))
             except (ElevationDeclined, ElevationFailed) as exc:
@@ -2142,7 +2180,7 @@ def self_test() -> int:
         globals()["_wait_process"] = lambda h, ms: WAIT_TIMEOUT
         globals()["_process_exit_code"] = lambda h: 0
         globals()["_close_handle"] = lambda h: _closed.append(h)
-        globals()["_terminate_process"] = lambda h: _terminated.append(h)
+        globals()["_terminate_process"] = lambda h: (_terminated.append(h), True)[1]
         # timeout=0 expires the bound before any wait, so the stubbed WAIT_TIMEOUT loop cannot spin for the real bound.
         try:
             kind, val = ("rc", relaunch_elevated(["--visible"], timeout=0.0))
@@ -2158,7 +2196,7 @@ def self_test() -> int:
         globals()["_shell_execute_runas"] = lambda a: 44
         globals()["_wait_process"] = _interrupt
         globals()["_close_handle"] = lambda h: _closed.append(h)
-        globals()["_terminate_process"] = lambda h: _terminated.append(h)
+        globals()["_terminate_process"] = lambda h: (_terminated.append(h), True)[1]
         try:
             relaunch_elevated(["--visible"])
             kind = "rc"
@@ -2169,6 +2207,42 @@ def self_test() -> int:
         kind, val = _relaunch_case(lambda a: 45, lambda h, ms: WAIT_OBJECT_0, lambda h: None)
         check("an exit-code failure fails by name",
               kind == "ElevationFailed" and "GetExitCodeProcess" in val)
+        # Termination that the API refuses is reported unconfirmed, never as done.
+        _closed.clear(); _terminated.clear()
+        globals()["_shell_execute_runas"] = lambda a: 46
+        globals()["_wait_process"] = lambda h, ms: WAIT_OBJECT_0
+        globals()["_process_exit_code"] = lambda h: 0
+        globals()["_close_handle"] = lambda h: _closed.append(h)
+        globals()["_terminate_process"] = lambda h: False
+        try:
+            relaunch_elevated(["--visible"], timeout=0.0)
+            kind, val = "rc", ""
+        except ElevationFailed as exc:
+            kind, val = ("ElevationFailed", str(exc))
+        check("a refused termination is named unconfirmed and the handle closes",
+              kind == "ElevationFailed" and "not confirmed" in val and _closed == [46])
+        # An interrupt anywhere in the owned lifetime, not only inside the wait.
+        _closed.clear(); _terminated.clear()
+        globals()["_shell_execute_runas"] = lambda a: 47
+        globals()["_wait_process"] = lambda h, ms: WAIT_OBJECT_0
+        globals()["_terminate_process"] = lambda h: (_terminated.append(h), True)[1]
+        _real_monotonic = time.monotonic
+        _mono_calls = []
+        def _flaky_monotonic():
+            _mono_calls.append(1)
+            if len(_mono_calls) > 1:
+                raise KeyboardInterrupt
+            return 0.0
+        time.monotonic = _flaky_monotonic
+        try:
+            relaunch_elevated(["--visible"])
+            kind = "rc"
+        except ElevationFailed:
+            kind = "ElevationFailed"
+        finally:
+            time.monotonic = _real_monotonic
+        check("an interrupt outside the wait still terminates, closes, and names blocked",
+              kind == "ElevationFailed" and _terminated == [47] and _closed == [47])
 
         # main() branches through the production entry point.
         import io as _io
@@ -2218,6 +2292,18 @@ def self_test() -> int:
             report = sentinel.read_text(encoding="utf-8")
             check("declined consent records blocked naming the decline, exit 2",
                   rc == 2 and "consent declined" in report and "| RegStudio | start | blocked |" in report)
+            # A failure after launch never claims nothing was launched.
+            def _launched_fail(argv):
+                raise ElevationFailed("interrupted while the elevated child was owned; "
+                                      "terminated and confirmed exited", launched=True)
+            globals()["relaunch_elevated"] = _launched_fail
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+            report = sentinel.read_text(encoding="utf-8")
+            check("a post-launch failure records the launch, never a false no-launch",
+                  rc == 2 and "child was launched" in report
+                  and "No tool was launched" not in report)
             # Already elevated: no relaunch, the normal driver path completes.
             globals()["is_elevated"] = lambda: True
             globals()["relaunch_elevated"] = lambda argv: 99
