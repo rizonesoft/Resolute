@@ -827,8 +827,9 @@ def cleanup_safely(run: "ToolRun"):
         note_cleanup_failure(run, repr(exc))
     try:
         if run.job is not None:
+            before = run.job.error
             run.job.close()
-            if run.job.error:
+            if run.job.error and run.job.error != before:
                 note_cleanup_failure(run, run.job.error)
     except Exception as exc:
         note_cleanup_failure(run, repr(exc))
