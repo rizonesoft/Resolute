@@ -61,3 +61,29 @@ HIGHEST: P1
 OVERALL: needs-attention
 
 - Implemented: repair round 1 findings in 3ee6090b: the failure channel's third destination is now a named event the guard creates at adoption and holds through case end (the mutex died with the child), and ParseSpec validates maxEdge/maxMoved for finiteness, full consumption, and sign, with drills. Default suite 119/119.
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T15:49:05Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: c15d54d93e7e4fc53bdf21c6e90a10e6e4dd234d
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 8
+- Digest: 47b3ba48ffa0934e
+
+### consistency: needs-attention
+
+1. **P1, `tests/visual_pair.h:294`: The real pair comparison bypasses the shared contrast rule.** `ComparePair` calls `Compare(..., false)`, disabling both absolute contrast floors and unmeasured-contrast rejection, then accepts contrast within 90% of the baseline. This contradicts `DESIGN.md:72-74`, the region spec, and §12’s requirement that every control remain above the floor. Recording palette defects elsewhere does not authorize weakening this check.
+
+   **Reproduction:** Use the committed light-150 capture in “The baseline compared with itself passes the pair comparison.” Its status-bar contrast is recorded as 2.78:1 in `todo/01-framework/TODO-02-design-system.md`, below the required 4.5:1, yet self-comparison passes. The headful launcher case uses this same bypass. This is a check accepting what its contract requires it to refuse. Keep the absolute checks enabled and correct the palette at its owning layer.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Implemented: repair round 2 (consistency P1) in 4c39c361 and 9a595635: ComparePair again enforces the absolute DESIGN.md floor (no bypass); components thinner than 3px in either dimension (separators, grips, rules) are not glyphs; the one real failure, light status text at 4.47:1, is corrected at its owning layer (LightPalette statusBarText RGB(100) to RGB(90)), the section 9 light status goldens are restaked (131 differing pixels, all the darkened text), and the captures of record are restaked. Default suite 119/119; pair 0 divergences.
