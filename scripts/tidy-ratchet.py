@@ -417,9 +417,16 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
         # failing invocation's own output: a gate whose log holds an
         # earlier run (or nothing) sends the reader to re-run clang-tidy
         # by hand to see the error that just failed them (round 2).
+        # Written atomically like the baseline: a direct write would
+        # follow a planted link at the log path and truncate its
+        # target (repair2 round 1). Best-effort: a flush failure never
+        # masks the refusal that follows it.
         if log_path is not None:
-            Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-            Path(log_path).write_text("".join(log_lines))
+            try:
+                Path(log_path).parent.mkdir(parents=True, exist_ok=True)
+                write_atomic(Path(log_path), "".join(log_lines))
+            except (OSError, Refusal):
+                pass
 
     # Every expected database is checked before any analysis runs: a
     # missing extension database must refuse in seconds, not after the
@@ -1061,6 +1068,23 @@ def self_test() -> int:
         assert baseline.read_bytes() == before, "error-diagnostic run rewrote the baseline"
 
     case("standalone analyzer failure keeps its diagnostics log", standalone_failure_keeps_diagnostics)
+
+    def log_flush_cannot_truncate_baseline():
+        tmp = mkdtemp()
+        db = tmp / "build" / "release" / "compile_commands.json"
+        db.parent.mkdir(parents=True)
+        db.write_text(json.dumps([{"file": "a.cpp", "directory": str(tmp), "command": "cc a.cpp"}]))
+        baseline = tmp / "todo" / ".tidy-baseline"
+        baseline.parent.mkdir(parents=True)
+        baseline.write_text("count: 0\n")
+        log = tmp / "logs" / "gate-tidy.log"
+        log.parent.mkdir(parents=True)
+        os.link(baseline, log)
+        refuses(lambda: run_analysis(tmp, Path(sys.executable), {"root": db}, log), "clang-tidy exited")
+        assert baseline.read_text() == "count: 0\n", "log flush truncated the baseline through the link"
+        assert log.read_text().strip(), "diagnostics not written"
+
+    case("log flush cannot truncate a linked baseline", log_flush_cannot_truncate_baseline)
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
