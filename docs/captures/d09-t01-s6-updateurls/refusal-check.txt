@@ -1,0 +1,3 @@
+Refusal run output check (captured at run time, re-read 2026-11-09):
+BiosCodes.ru exists in the refusal output directory: False
+Files in the refusal output directory: harness.au3, log.txt, nodecl.au3

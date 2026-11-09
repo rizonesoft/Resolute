@@ -13,10 +13,11 @@ Descriptor upgrade (Distro's own discovery on launch, no hand edit):
   ComIntRep UpdateURL=https://rizonesoft.com/downloads/resolute/update/ (matches SDK/Concrete/ComIntRep/ComIntRep.au3)
 
 Generated update files (shipped _CreateUpdateFiles, extracted verbatim, real IniWrite):
-- generated/BiosCodes.ru: UpdateURL=https://rizonesoft.com/downloads/bios-beep-codes-viewer/ (descriptor key present; the run without the key re-derives the identical value from the script)
+- generated/BiosCodes.ru: UpdateURL=https://rizonesoft.com/downloads/bios-beep-codes-viewer/ (descriptor key present)
+- generated/BiosCodes-rederived.ru: the same tool with no UpdateURL key in the descriptor environment: the candidate re-derives the identical declared value from the script
 - generated/ComIntRep.ru: UpdateURL=https://rizonesoft.com/downloads/resolute/update/ (its declared suite path, served from its descriptor, proven distinct from the other tool's value)
 
 Original producer, same readback (extracted pre-change _CreateUpdateFiles from 1e371afe):
 - base-producer/BiosCodes.ru: UpdateURL=https://rizonesoft.com/downloads/resolute/update/ (the suite URL for a per-tool-declaring tool: the defect)
 
-A script with no $g_sUrlUpdate declaration produces refusal-log.txt: the ERROR names the tool and no .ru is written.
+A script with no $g_sUrlUpdate declaration produces refusal-log.txt (the ERROR names the tool) and refusal-check.txt (the existence readback: no .ru in the output directory).
