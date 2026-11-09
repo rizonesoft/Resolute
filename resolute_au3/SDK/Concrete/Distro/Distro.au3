@@ -1889,7 +1889,9 @@ Func _ProcessSelectedSolution($iAction)
 							; ConsoleWrite(_ProcessCheckedCount() & @CRLF)
 							If _ProcessCheckedCount() > 0 Then
 
-								If GUICtrlRead($g_aBuild[0][0][1]) = $GUI_CHECKED Then _BuildSelected($sSolutionIniPath, 0, 0)
+								Local $bBuildOk = True
+								If GUICtrlRead($g_aBuild[0][0][1]) = $GUI_CHECKED Then $bBuildOk = _BuildSelected($sSolutionIniPath, 0, 0)
+								If $bBuildOk Then
 								If GUICtrlRead($g_aBuild[1][0][1]) = $GUI_CHECKED Then _CompressExecutables($sSolutionIniPath, 1, 0)
 								If GUICtrlRead($g_aBuild[2][0][1]) = $GUI_CHECKED Then _SignExecutables($sSolutionIniPath, 2, 0)
 								If GUICtrlRead($g_aBuild[3][0][1]) = $GUI_CHECKED Then _GenerateDocumentation($sSolutionIniPath, 3, 0)
@@ -1898,6 +1900,7 @@ Func _ProcessSelectedSolution($iAction)
 								If GUICtrlRead($g_aBuild[3][1][1]) = $GUI_CHECKED Then _CreateInstall($sSolutionIniPath, 3, 1)
 								If GUICtrlRead($g_aBuild[4][1][1]) = $GUI_CHECKED Then _SignExecutables($sSolutionIniPath, 4, 1, True)
 								If GUICtrlRead($g_aBuild[5][1][1]) = $GUI_CHECKED Then _CreateUpdateFiles($sSolutionIniPath, 5, 1)
+								EndIf
 
 								; Reset Build Icons
 								For $iBr = 0 To $CNT_BUILD - 1
@@ -1944,13 +1947,30 @@ Func _BuildSelected($sSolutionIniPath, $iRow, $iCol)
 	_StartSoloProcess($iRow, $iCol)
 
 	Local $sAu3ScriptIn = $g_aEnvironment[1][1]
+	Local $bBuildOk = False
 
 	If FileExists($sAu3ScriptIn) Then
 
 		If FileExists($g_aAutoIt3[9]) And FileExists($g_cAutoItWrapper) Then
 
+			Local $sBuildStart = StringFormat("%04d%02d%02d%02d%02d%02d", @YEAR, @MON, @MDAY, @HOUR, @MIN, @SEC)
 			Local $iWrapPID = Run(Chr(34) & $g_aAutoIt3[9] & Chr(34) & Chr(32) & Chr(34) & $g_cAutoItWrapper & Chr(34) & " /NoStatus /prod /in " & _
 				Chr(34) & $sAu3ScriptIn & Chr(34), _FileEx_RemoveFileName($sAu3ScriptIn), @SW_SHOW, $STDOUT_CHILD)
+			Local $iRunError = @error
+
+			If $iWrapPID = 0 Then
+
+				_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s': the compiler wrapper could not be started (launch error %s).", $sReleaseName, $iRunError), "ERROR"))
+
+			Else
+
+				; Open the process handle while the wrapper is alive: once the process is
+				; reaped, its exit code can no longer be read back from the PID.
+				Local $hWrapProcess = 0
+				Local $aOpenProcess = DllCall("kernel32.dll", "handle", "OpenProcess", "dword", 0x0400, "bool", False, "dword", $iWrapPID)
+				If Not @error And $aOpenProcess[0] Then $hWrapProcess = $aOpenProcess[0]
+
+				Local $sAllWrapOutput = ""
 
 			While 1
 
@@ -1960,11 +1980,19 @@ Func _BuildSelected($sSolutionIniPath, $iRow, $iCol)
 				EndIf
 
 				If StringLen($sWrapOutput) > 0 Then
+					$sAllWrapOutput &= $sWrapOutput
 					_AutoIt3Script_WrapperOutPut($sWrapOutput)
 					_UpdateSoloProcess($iRow, $iCol, _AutoIt3Script_GetBuildProgress($sWrapOutput))
 				EndIf
 
 			WEnd
+
+				Local $iWrapExit = _ProcessExitCode($hWrapProcess)
+				If $hWrapProcess Then DllCall("kernel32.dll", "bool", "CloseHandle", "handle", $hWrapProcess)
+
+				$bBuildOk = _BuildVerdict($sReleaseName, $sAllWrapOutput, $iWrapExit, $sBuildStart)
+
+			EndIf
 
 		Else
 			_Logging_EditWrite(_Logging_SetLevel(StringFormat($g_aLangMessages2[8], $g_aAutoIt3[9]), "ERROR"))
@@ -1980,9 +2008,111 @@ Func _BuildSelected($sSolutionIniPath, $iRow, $iCol)
 	_PopulateSolutions()
 
 	_Logging_FinalMessage(StringFormat($g_aLangMessages2[7], $sReleaseName))
-	_UpdateSoloProcess($iRow, $iCol, 100)
+	If $bBuildOk Then
+		_UpdateSoloProcess($iRow, $iCol, 100)
+	Else
+		_FailSoloProcess($iRow, $iCol)
+	EndIf
+
+	Return $bBuildOk
 
 EndFunc   ;==>_BuildSelection
+
+
+Func _ProcessExitCode($hProcess)
+
+	; Returns the process exit code, or -1 when it cannot be read.
+	If $hProcess = 0 Then Return -1
+
+	Local $iCode = 259 ; STILL_ACTIVE
+	Local $iWait = 0
+	While $iCode = 259 And $iWait < 600
+		Local $aExit = DllCall("kernel32.dll", "bool", "GetExitCodeProcess", "handle", $hProcess, "dword*", 0)
+		If @error Or Not $aExit[0] Then Return -1
+		$iCode = $aExit[2]
+		If $iCode = 259 Then
+			Sleep(50)
+			$iWait += 1
+		EndIf
+	WEnd
+
+	If $iCode = 259 Then Return -1
+	Return $iCode
+
+EndFunc   ;==>_ProcessExitCode
+
+
+Func _BuildVerdict($sReleaseName, $sAllWrapOutput, $iWrapExit, $sBuildStart)
+
+	; Expected outputs, in the order the wrapper compiles them.
+	Local $aArchName[2] = ["x86", "x64"]
+	Local $aArchOut[2] = [$g_aEnvironment[18][1], $g_aEnvironment[19][1]]
+	Local $iFirstArch = 0
+	Local $iArchCount = 1
+	If StringUpper($g_aEnvironment[15][1]) = "Y" Then
+		$iArchCount = 2
+	ElseIf StringUpper($g_aEnvironment[14][1]) = "Y" Then
+		$iFirstArch = 1
+	EndIf
+
+	Local $aRc = StringRegExp($sAllWrapOutput, "rc:[ ]*(-?[0-9]+)", 3)
+	If @error Then Local $aRc[0]
+	Local $aCreated = StringRegExp($sAllWrapOutput, "Created program:[ ]*([^\r\n]+)", 3)
+	If @error Then Local $aCreated[0]
+
+	Local $bOk = True
+
+	For $iA = 0 To $iArchCount - 1
+
+		Local $iArch = $iFirstArch + $iA
+		Local $sExpected = $aArchOut[$iArch]
+		Local $bArchOk = True
+		Local $sExitText = ""
+
+		If $iA < UBound($aRc) Then
+			$sExitText = $aRc[$iA]
+			If Number($aRc[$iA]) <> 0 Then $bArchOk = False
+		Else
+			$bArchOk = False
+			If $iWrapExit > 0 Then $sExitText = $iWrapExit
+		EndIf
+
+		If $bArchOk Then
+			If $iA >= UBound($aCreated) Then
+				$bArchOk = False
+			ElseIf StringLower(_PathFull(StringStripWS($aCreated[$iA], 3))) <> StringLower(_PathFull($sExpected)) Then
+				$bArchOk = False
+			ElseIf Not FileExists($sExpected) Then
+				$bArchOk = False
+			ElseIf FileGetTime($sExpected, 0, 1) < $sBuildStart Then
+				; A retained output from an earlier build cannot pass for this one.
+				$bArchOk = False
+			EndIf
+		EndIf
+
+		If Not $bArchOk Then
+			$bOk = False
+			If $sExitText = "" Then
+				_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s' (%s): no compiler result was reported for this architecture.", $sReleaseName, $aArchName[$iArch]), "ERROR"))
+			Else
+				_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s' (%s): compiler exit %s.", $sReleaseName, $aArchName[$iArch], $sExitText), "ERROR"))
+			EndIf
+		EndIf
+
+	Next
+
+	If $bOk And $iWrapExit <> 0 Then
+		$bOk = False
+		If $iWrapExit < 0 Then
+			_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s': the compiler wrapper exit code could not be read.", $sReleaseName), "ERROR"))
+		Else
+			_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s': compiler wrapper exit %s.", $sReleaseName, $iWrapExit), "ERROR"))
+		EndIf
+	EndIf
+
+	Return $bOk
+
+EndFunc   ;==>_BuildVerdict
 
 
 Func _AutoIt3Script_WrapperOutPut($sOutPut)
@@ -3380,6 +3510,31 @@ Func _UpdateSoloProcess($iRow, $iCol, $iPerc)
 	EndIf
 
 EndFunc   ;==>_UpdateSoloProcess
+
+
+Func _FailSoloProcess($iRow, $iCol)
+
+	; Terminal failure state: the error icon, red cell and cleanup the 100 branch
+	; performs, without drawing the progress bar to 100.
+	If $g_SoloProcess = False Then
+		GUICtrlSetState($g_aBuild[$iRow][$iCol][1], $GUI_UNCHECKED)
+	EndIf
+
+	GUICtrlSetBkColor($g_aBuild[$iRow][$iCol][6], 0xC80B0B)
+	GUICtrlSetImage($g_aBuild[$iRow][$iCol][0], $g_aCommIcons[5], $g_iComIconStart + 5)
+
+	Sleep(1000)
+
+	If $g_SoloProcess = True Then
+
+		Local $iXz = ($iRow + 11) + ($iCol * 4)
+
+		_ResetProgress($iRow, $iCol)
+		GUICtrlSetImage($g_aBuild[$iRow][$iCol][0], $g_aCommIcons[$iXz], $g_iComIconStart + $iXz)
+
+	EndIf
+
+EndFunc   ;==>_FailSoloProcess
 
 
 Func _ResetProgress($iRow, $iCol)
