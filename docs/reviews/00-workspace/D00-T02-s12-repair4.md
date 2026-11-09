@@ -83,3 +83,5 @@ This is a test-author workflow, so new application controls, tooltips, keyboard 
 - **in-scope: Theme coverage is incomplete for that guarantee.** Run those four mutations against both recorded light and dark captures. Target: eight named clipping failures and passing unchanged baselines, without relaxing the [DESIGN.md contrast floors](D:/GitHub/Resolute/DESIGN.md:72).
 
 COMPLETION: gaps
+
+- Implemented: the two Part 2 items are built in the repair5 cycle (record D00-T02-s12-repair5.md): the artificial ink overlay is gone, drills shift real ink until it straddles each control boundary with retained and cropped ink both asserted, on both light and dark captures. The sidebar drill row is System rather than All, because All's count badge occupies the sampled edge rows; see the repair5 record for the measurement evidence.

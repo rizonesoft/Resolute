@@ -462,7 +462,7 @@ namespace {
 // Renders the control's own label truncated at its right boundary: the
 // label's last glyph is cut there, its left half painted at the boundary
 // and the rest beyond it, as clipped text renders.
-void TruncateLabelAtEdge(Image& img, const RegionSpec& region) {
+std::pair<long, long> TruncateLabelAtEdge(Image& img, const RegionSpec& region, double zoneFrac = 0.5) {
     const int x0 = static_cast<int>(region.x0 * img.w), x1 = static_cast<int>(region.x1 * img.w);
     const int y0 = static_cast<int>(region.y0 * img.h), y1 = static_cast<int>(region.y1 * img.h);
     std::map<uint32_t, long> counts;
@@ -473,67 +473,42 @@ void TruncateLabelAtEdge(Image& img, const RegionSpec& region) {
     for (const auto& [colour, n] : counts)
         if (n > best) { best = n; paper = colour; }
     const double paperLum = visualpair::Luminance(paper);
-    const int labelZone = x0 + (x1 - x0) / 2;
-    // Find the label's last glyph component (rightmost in the label zone).
-    std::vector<std::pair<int, int>> glyph;
-    int glyphMinX = 0, glyphMaxX = -1, glyphMinY = 0;
-    std::vector<char> seen(static_cast<size_t>(x1 - x0) * (y1 - y0), 0);
-    for (int y = y0; y < y1; ++y) {
+    const int labelZone = x0 + static_cast<int>((x1 - x0) * zoneFrac);
+    // Shift the zone's whole ink mask right until it straddles the
+    // boundary: the rightmost ink lands just beyond x1, so part is
+    // retained inside and part cropped, as clipped content renders.
+    struct Ink { int x, y; uint32_t c; };
+    std::vector<Ink> ink;
+    int inkRight = -1;
+    for (int y = y0; y < y1; ++y)
         for (int x = x0; x < labelZone; ++x) {
-            const size_t idx = static_cast<size_t>(y - y0) * (x1 - x0) + (x - x0);
-            if (seen[idx]) continue;
-            if (std::abs(visualpair::Luminance(img.px[static_cast<size_t>(y) * img.w + x]) - paperLum) <= 0.05) continue;
-            std::vector<std::pair<int, int>> stack{{x, y}}, cells;
-            seen[idx] = 1;
-            int minX = x, maxX = x, minY = y, maxY = y;
-            while (!stack.empty()) {
-                auto [cx, cy] = stack.back();
-                stack.pop_back();
-                cells.emplace_back(cx, cy);
-                minX = std::min(minX, cx);
-                maxX = std::max(maxX, cx);
-                minY = std::min(minY, cy);
-                maxY = std::max(maxY, cy);
-                const int dx[4] = {1, -1, 0, 0}, dy[4] = {0, 0, 1, -1};
-                for (int k = 0; k < 4; ++k) {
-                    const int nx = cx + dx[k], ny = cy + dy[k];
-                    if (nx < x0 || ny < y0 || nx >= labelZone || ny >= y1) continue;
-                    const size_t ni = static_cast<size_t>(ny - y0) * (x1 - x0) + (nx - x0);
-                    if (seen[ni]) continue;
-                    if (std::abs(visualpair::Luminance(img.px[static_cast<size_t>(ny) * img.w + nx]) - paperLum) <= 0.05)
-                        continue;
-                    seen[ni] = 1;
-                    stack.emplace_back(nx, ny);
-                }
-            }
-            // A glyph, not the selected fill or a badge: bounded in both
-            // dimensions and in area.
-            if (cells.size() >= 4 && cells.size() <= 400 && maxX - minX <= 30 && maxY - minY <= 30 &&
-                maxX > glyphMaxX) {
-                glyph = cells;
-                glyphMinX = minX;
-                glyphMaxX = maxX;
-                glyphMinY = minY;
-            }
+            const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
+            if (std::abs(visualpair::Luminance(c) - paperLum) <= 0.05) continue;
+            ink.push_back({x, y, c});
+            inkRight = std::max(inkRight, x);
+        }
+    if (ink.empty()) return {0, 0};
+    const int delta = (x1 + 2) - inkRight;
+    for (const Ink& px : ink) img.px[static_cast<size_t>(px.y) * img.w + px.x] = paper;
+    long retained = 0, cropped = 0;
+    for (const Ink& px : ink) {
+        const int nx = px.x + delta;
+        if (nx >= x0 && nx < x1) {
+            img.px[static_cast<size_t>(px.y) * img.w + nx] = px.c;
+            ++retained;
+        } else if (nx >= x1) {
+            ++cropped;
         }
     }
-    if (glyph.empty()) return;
-    // Save the glyph's colours, erase it, and repaint its left half cut at
-    // the boundary.
-    std::vector<uint32_t> colours;
-    for (auto [x, y] : glyph) colours.push_back(img.px[static_cast<size_t>(y) * img.w + x]);
-    for (auto [x, y] : glyph) img.px[static_cast<size_t>(y) * img.w + x] = paper;
-    const int targetLeft = x1 - 4;
-    for (size_t i = 0; i < glyph.size(); ++i) {
-        const int nx = targetLeft + (glyph[i].first - glyphMinX);
-        if (nx >= x0 && nx < x1) img.px[static_cast<size_t>(glyph[i].second) * img.w + nx] = colours[i];
-    }
-    (void)glyphMinY;
+    return {retained, cropped};
 }
 
-void CheckTruncated(const Spec& spec, Image baseline, const char* name) {
+void CheckTruncated(const Spec& spec, Image baseline, const char* name, double zoneFrac = 0.5) {
     const RegionSpec& control = ByName(spec, name);
-    TruncateLabelAtEdge(baseline, control);
+    const auto [retained, cropped] = TruncateLabelAtEdge(baseline, control, zoneFrac);
+    INFO("the drill must retain and crop ink (retained " << retained << ", cropped " << cropped << ")");
+    CHECK(retained > 0);
+    CHECK(cropped > 0);
     const auto observed = MeasureAll(baseline, {control});
     std::printf("truncate %s edge %.3f max %.2f\n", name, observed[0].edgeTouch, control.maxEdge);
     CHECK(observed[0].edgeTouch > control.maxEdge);
@@ -552,10 +527,13 @@ TEST_CASE("Partial-glyph truncation fails as clipped naming each control", "[vis
                         "2026-11-09-D00-T02-s10-launcher-dark-150.png",
                     dark));
     for (const Image& baseline : {light, dark}) {
-        CheckTruncated(spec, baseline, "sidebar-all");
+        CheckTruncated(spec, baseline, "sidebar-system");
         CheckTruncated(spec, baseline, "list-header-name");
         CheckTruncated(spec, baseline, "list-header-description");
         CheckTruncated(spec, baseline, "list-header-version");
+        CheckTruncated(spec, baseline, "toolbar-refresh", 0.75);
+        CheckTruncated(spec, baseline, "toolbar-settings", 0.75);
+        CheckTruncated(spec, baseline, "toolbar-theme", 0.75);
     }
 }
 

@@ -40,9 +40,9 @@ region|sidebar|||0.00|0.148|0.278|0.945|0.010|0.5|text|1.0|0.02|check
 region|tool-list|||0.278|0.148|1.00|0.945|0.005|0.3|text|1.0|0.02|check
 region|status-bar|||0.00|0.945|1.00|1.00|0.001|0.3|text|1.0|0.15|check
 region|toolbar-view|View||0.008|0.066|0.135|0.143|0.01|0|text|0.25|0.004|check
-region|toolbar-refresh|||0.145|0.066|0.205|0.143|0.01|0|element|1.0|0.004|skip
-region|toolbar-settings|||0.838|0.066|0.898|0.143|0.01|0|element|1.0|0.004|skip
-region|toolbar-theme|||0.908|0.066|0.968|0.143|0.01|0|element|1.0|0.004|skip
+region|toolbar-refresh|||0.153|0.066|0.203|0.143|0.01|0|element|0.10|0.004|skip
+region|toolbar-settings|||0.878|0.066|0.928|0.143|0.01|0|element|0.10|0.004|skip
+region|toolbar-theme|||0.933|0.066|0.983|0.143|0.01|0|element|0.10|0.004|skip
 region|sidebar-all|All||0.002|0.240|0.272|0.325|0.01|0|text|0.22|0.004|skip
 region|sidebar-system|System||0.002|0.325|0.278|0.410|0.01|0|text|0.10|0.004|skip
 region|sidebar-network|Network||0.002|0.410|0.278|0.495|0.01|0|text|0.10|0.004|skip
