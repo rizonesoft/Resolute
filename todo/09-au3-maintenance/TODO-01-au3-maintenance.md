@@ -168,6 +168,8 @@ A defect found in the AutoIt tree that also affects the C++ port is fixed in Aut
 
 ## 4. Distro Reports Compiler Failure
 
+> **Started:** 2026-11-09T12:45:33Z
+
 `D09 T01 §1` proved the suite builds, but `Distro` itself cannot currently say so: `_BuildSelected` drains the compiler's output without checking its result, then emits its final message and sets progress to 100, and batch processing continues into downstream operations. A failed compile therefore looks like success to the person shipping a fix. This is builder behaviour, not a tool's frozen behaviour, so it is in scope for this domain.
 
 -> SOURCE: D09 T01 §1 completion review on `504f9c80`, gap 4 (missing-out-of-scope)
