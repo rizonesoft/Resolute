@@ -14,7 +14,7 @@ Your own review is not enough for a nontrivial change: a different model reviews
 | Codex (`codex`) | `--writer codex` | Gemini 4 Argon (`agy`) | none |
 | Muse / Meta | `--writer muse` / `--writer meta` | GPT-6 Astra (`codex`) | none |
 
-The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a reviewer named twice or more than four, and a reviewer of the writer's own model family. A loop ends on the first clean round: exactly one standalone `HIGHEST: P3` or `HIGHEST: none` declaration and no `P1` or `P2` (a missing, duplicate, or contradictory declaration is not clean, whatever the findings say); an outage is no review, so run the round again.
+The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a reviewer named twice or more than four, and a reviewer of the writer's own model family. A loop ends on the first clean round. The dispatcher judges cleanliness from declarations alone: exactly one standalone `HIGHEST: P3` or `HIGHEST: none` line (a missing, duplicate, or contradictory declaration is not clean). Declaring P3 or none while a `P1` or `P2` finding stands is a false declaration, not a clean round: the reviewer's duty is to report severity truthfully, and the dispatcher does not scan findings to check; an outage is no review, so run the round again.
 
 ## Steps
 
@@ -27,7 +27,7 @@ The pin refuses an unknown writer or reviewer CLI, an effort above `medium`, a r
    ```
 
 4. Read the review. Verify every finding against the code before acting: fix what is real, and record why anything else is not.
-5. Commit fixes as new commits and run another round on the new tip, up to `max_low_rounds` low rounds after round 1; the first clean round (exactly one standalone `HIGHEST: P3` or `HIGHEST: none` declaration and no `P1` or `P2` finding) is the clean terminal round, its findings are filed as follow-up work through `add-todo`, and on every record the completion pass follows it last. Budget exhaustion (`1 + max_low_rounds` rounds) with findings open is operator recovery, never approval. A unit that needs patching three rounds running gets re-thought, not patched again.
+5. Commit fixes as new commits and run another round on the new tip, up to `max_low_rounds` low rounds after round 1; the first clean round (exactly one standalone `HIGHEST: P3` or `HIGHEST: none` declaration, truthfully reporting no standing `P1` or `P2` finding) is the clean terminal round, its findings are filed as follow-up work through `add-todo`, and on every record the completion pass follows it last. Budget exhaustion (`1 + max_low_rounds` rounds) with findings open is operator recovery, never approval. A unit that needs patching three rounds running gets re-thought, not patched again.
 
 ## Rules
 
