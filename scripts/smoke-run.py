@@ -620,11 +620,13 @@ def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None, pending=None
     box["thread"] = worker
     worker.start()
     deadline = time.monotonic() + timeout
-    while worker.is_alive() and time.monotonic() < deadline:
+    while worker.is_alive():
         if abort is not None and abort():
             if pending is not None:
                 pending.append(box)  # late diagnostics are collected, not lost
             return ABORTED
+        if time.monotonic() >= deadline:
+            break
         worker.join(0.05)
     if worker.is_alive():
         if pending is not None:
@@ -1902,6 +1904,42 @@ def self_test() -> int:
         globals()["capture_window"] = _real_cap2
     check("interruption inside the capture wait sets the flag",
           getattr(_arun, "interrupted", False) is True and "operator input resumed" in _atext)
+    # Blocked capture bound (D07 T01 S6): a capture that never returns
+    # yields None inside its bound while the call is still blocked.
+    _brel = _th.Event()
+    _bpending = []
+    globals()["capture_window"] = lambda hwnd: (_brel.wait(), None)[1]
+    _bt0 = time.monotonic()
+    try:
+        _bres = capture_window_bounded(99, timeout=0.5, pending=_bpending)
+        _belapsed = time.monotonic() - _bt0
+        _bstill = bool(_bpending) and _bpending[0]["thread"].is_alive()
+    finally:
+        _brel.set()
+        globals()["capture_window"] = _real_cap2
+    if _bpending:
+        _bpending[0]["thread"].join(5)
+    check("blocked capture returns None inside its bound while still blocked",
+          _bres is None and _bstill and 0.4 <= _belapsed < 5.0)
+    # Scheduling-independent abort (D07 T01 S6): the worker waits for
+    # explicit release with no timeout, and the loop observes the abort
+    # before a controlled clock can expire the deadline.
+    _crel = _th.Event()
+    globals()["capture_window"] = lambda hwnd: (_crel.wait(), None)[1]
+    _real_mono6 = time.monotonic
+    _ct6 = {"t": 1000.0}
+    def _fast_mono6():
+        _ct6["t"] += 100.0
+        return _ct6["t"]
+    time.monotonic = _fast_mono6
+    try:
+        _cres = capture_window_bounded(99, timeout=10.0, abort=lambda: True)
+    finally:
+        time.monotonic = _real_mono6
+        _crel.set()
+        globals()["capture_window"] = _real_cap2
+    check("abort is observed before the deadline under a controlled clock",
+          _cres == ABORTED)
     # Cleanup deadline branch: the child never exits, input arrives at expiry.
     _drun = ToolRun("Resolute", Path("x"))
     class _NeverProc:
