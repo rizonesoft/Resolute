@@ -161,6 +161,7 @@ function Build-Launcher {
         Write-Host 'build: configure failed for Resolute' -ForegroundColor Red
         return $false
     }
+    Capture-Db (Join-Path $RepoRoot "build\$preset\compile_commands.json")
 
     Write-Host "  compiling Resolute ($Configuration)..." -ForegroundColor DarkGray
     $code = Invoke-Logged "Resolute-$Configuration-build" { & $Cmake --build (Join-Path $RepoRoot "build\$preset") }
@@ -210,6 +211,7 @@ function Build-Extension {
             Write-Host "build: configure failed for $ExtName" -ForegroundColor Red
             return $false
         }
+        Capture-Db (Join-Path $buildDir 'compile_commands.json')
 
         Write-Host "  compiling $ExtName ($Configuration)..." -ForegroundColor DarkGray
         $code = Invoke-Logged "$ExtName-$Configuration-build" { & $Cmake --build . }
@@ -273,6 +275,17 @@ else {
     $targets = @($match)
 }
 
+$script:DbExpect = @{}
+function Capture-Db([string]$Path) {
+    # Hash a compile database the moment its configure produced it;
+    # the build-record writer refuses if it changed through
+    # compilation or publication (D07 T01 section 3).
+    if (Test-Path $Path) {
+        $rel = [IO.Path]::GetRelativePath($RepoRoot, $Path) -replace '\\', '/'
+        $script:DbExpect[$rel] = (Get-FileHash $Path).Hash.ToLowerInvariant()
+    }
+}
+
 # Capture the input manifest BEFORE compiling: a source changed
 # mid-build must not acquire build evidence (D07 T01 section 3).
 $inputsBefore = (& python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --print-input-manifest).Trim()
@@ -312,7 +325,7 @@ Write-Host "build: $($results.Count) target(s) built, $Config, output under Bin\
 # refuses to certify artifacts its sources no longer match, and the
 # conformance check's C24 consumes the chain (D07 T01 section 3).
 if ($Config -eq 'Release') {
-    & python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json') --build-config $Config --build-targets ($targets -join ',') --expect-inputs $inputsBefore
+    & python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json') --build-config $Config --build-targets ($targets -join ',') --expect-inputs $inputsBefore --expect-dbs (($script:DbExpect.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ';')
     if ($LASTEXITCODE -ne 0) { Write-Host 'build: writing the build record failed' -ForegroundColor Red; exit 1 }
 }
 exit 0

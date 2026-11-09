@@ -1333,8 +1333,6 @@ def self_test() -> int:
 
     case("successful analysis propagates its log-save failure", successful_analysis_log_failure_surfaces)
 
-    for d in scratch_dirs:
-        shutil.rmtree(d, ignore_errors=True)
     def build_record_rejects_swapped_db():
         tmp = Path(tempfile.mkdtemp())
         scratch_dirs.append(tmp)
@@ -1356,6 +1354,57 @@ def self_test() -> int:
 
     case("build record refuses a database the build never used", build_record_rejects_swapped_db)
 
+    def _record_fixture(entries, ninja_lines):
+        tmp = Path(tempfile.mkdtemp()); scratch_dirs.append(tmp)
+        rel = tmp / "build" / "release"; rel.mkdir(parents=True)
+        (tmp / "build" / "logs").mkdir(parents=True)
+        (tmp / "Bin" / "Release").mkdir(parents=True)
+        db = rel / "compile_commands.json"
+        db.write_text(json.dumps(entries(rel)))
+        (rel / "build.ninja").write_text(ninja_lines)
+        return tmp, db
+
+    def _record_args(tmp, extra=()):
+        return ["--root", str(tmp), "--write-build-record", str(tmp / "build" / "logs" / "build-record.json"),
+                "--build-config", "Release", "--build-targets", "Resolute", *extra]
+
+    def build_record_positive_control():
+        tmp, db = _record_fixture(
+            lambda rel: [{"file": "a.cpp", "directory": str(rel), "command": "cc a.cpp"}],
+            "build a.obj: CXX_COMPILER__x a.cpp\n")
+        import hashlib as _h
+        digest = _h.sha256(db.read_bytes()).hexdigest()
+        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={digest}"]))
+        assert rc == 0, f"unchanged database refused (rc={rc})"
+        rec = json.loads((tmp / "build" / "logs" / "build-record.json").read_text())
+        assert rec["compile_dbs"]["build/release/compile_commands.json"] == digest
+
+    def build_record_rejects_command_change():
+        tmp, db = _record_fixture(
+            lambda rel: [{"file": "a.cpp", "directory": str(rel), "command": "cc -DCHANGED=1 a.cpp"}],
+            "build a.obj: CXX_COMPILER__x a.cpp\n")
+        import hashlib as _h
+        configured = json.dumps([{"file": "a.cpp", "directory": str(db.parent), "command": "cc a.cpp"}])
+        expect = _h.sha256(configured.encode()).hexdigest()
+        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={expect}"]))
+        assert rc == 1, f"command-changed database recorded (rc={rc})"
+        assert not (tmp / "build" / "logs" / "build-record.json").exists()
+
+    def build_record_rejects_same_basename():
+        tmp, db = _record_fixture(
+            lambda rel: [{"file": "other/a.cpp", "directory": str(rel), "command": "cc other/a.cpp"}],
+            "build a.obj: CXX_COMPILER__x a.cpp\n")
+        rc = main(_record_args(tmp))
+        assert rc == 1, f"same-basename different-path database recorded (rc={rc})"
+        assert not (tmp / "build" / "logs" / "build-record.json").exists()
+
+    case("build record accepts the unchanged configured database", build_record_positive_control)
+    case("build record refuses a command changed after configure", build_record_rejects_command_change)
+    case("build record refuses a same-basename different-path source", build_record_rejects_same_basename)
+
+    for d in scratch_dirs:
+        shutil.rmtree(d, ignore_errors=True)
+
     if failures:
         for f in failures:
             print(f"tidy-ratchet self-test FAIL: {f}")
@@ -1375,6 +1424,7 @@ def main(argv=None) -> int:
     ap.add_argument("--build-config", default=None)
     ap.add_argument("--build-targets", default="")
     ap.add_argument("--expect-inputs", default=None, help="refuse to write the build record if inputs moved")
+    ap.add_argument("--expect-dbs", default="", help="relpath=sha256;... captured at configure time")
     ap.add_argument("--print-input-manifest", action="store_true")
     ap.add_argument("--root", default=None)
     args = ap.parse_args(argv)
@@ -1398,6 +1448,11 @@ def main(argv=None) -> int:
                 for f in sorted(base.rglob("*"))
                 if f.is_file()
             }
+        expect_dbs = {}
+        for pair in (args.expect_dbs or "").split(";"):
+            if "=" in pair:
+                k, v = pair.split("=", 1)
+                expect_dbs[k] = v
         current_inputs = input_manifest(root)
         if args.expect_inputs and current_inputs != args.expect_inputs:
             print(
@@ -1422,8 +1477,14 @@ def main(argv=None) -> int:
             # moment both are at hand (repair round 1).
             import json as _js2
 
+            def _resolved(base_dir, raw):
+                pth = Path(str(raw).replace("\\", "/"))
+                if not pth.is_absolute():
+                    pth = Path(base_dir) / pth
+                return pth.resolve(strict=False).as_posix().lower()
+
             db_sources = {
-                Path(e["file"]).name.lower()
+                _resolved(e.get("directory") or db.parent, e["file"])
                 for e in _js2.loads(db.read_text(encoding="utf-8"))
                 if "_deps" not in e["file"] and not e["file"].endswith(".rc")
             }
@@ -1436,7 +1497,7 @@ def main(argv=None) -> int:
                 if line.startswith("build ") and ": CXX_COMPILER__" in line:
                     for token in line.split(": CXX_COMPILER__", 1)[1].split():
                         if token.lower().endswith((".cpp", ".cc", ".cxx")) and "_deps" not in token:
-                            ninja_sources.add(Path(token.replace("\\", "/")).name.lower())
+                            ninja_sources.add(_resolved(db.parent, token.replace("$:", ":").replace("$$", "$")))
             if db_sources != ninja_sources:
                 print(
                     "tidy-ratchet: FAILED: compile database "
@@ -1446,7 +1507,15 @@ def main(argv=None) -> int:
                     f"only-ninja {sorted(ninja_sources - db_sources)[:3]})"
                 )
                 return 1
-            dbs[db.relative_to(root).as_posix()] = _hl2.sha256(db.read_bytes()).hexdigest()
+            digest = _hl2.sha256(db.read_bytes()).hexdigest()
+            rel = db.relative_to(root).as_posix()
+            if expect_dbs.get(rel, digest) != digest:
+                print(
+                    f"tidy-ratchet: FAILED: compile database {rel} changed after "
+                    "its configure; it does not describe the compilation"
+                )
+                return 1
+            dbs[rel] = digest
         record = {
             "inputs_sha256": current_inputs,
             "compile_dbs": dbs,

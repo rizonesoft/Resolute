@@ -140,13 +140,18 @@ def owner_status(root: Path, cache: dict):
             return "shipped"
         if ref not in cache:
             proc = subprocess.run(
-                ["python", "scripts/todo-graph.py", "resolve", ref],
+                [sys.executable, "scripts/todo-graph.py", "resolve", ref],
                 cwd=root,
                 capture_output=True,
                 text=True,
                 errors="replace",
             )
             cache[ref] = proc.returncode
+            cache[ref + "|moved"] = next(
+                (ln.split("moved", 1)[1].strip() for ln in proc.stdout.splitlines()
+                 if ln.strip().startswith("moved")),
+                "",
+            )
         code = cache[ref]
         if code == 3:
             return "shipped"
@@ -648,8 +653,20 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tid
     names = sorted(tools)
     cells = {}
     details = []
+    owner_state_cache = {}
+    moved_destinations = {}
+    if status_fn is None:
+        probe_cache = {}
+        probe = owner_status(root, probe_cache)
+        for clause in clauses:
+            owner_state_cache[clause["owner"]] = probe(clause["owner"])
+            moved_destinations[clause["owner"]] = probe_cache.get(
+                clause["owner"] + "|moved", ""
+            )
+        status = lambda ref: owner_state_cache[ref]  # noqa: E731
     for clause in clauses:
         owner_state = status(clause["owner"])
+        owner_state_cache.setdefault(clause["owner"], owner_state)
         for name in names:
             spec = tools[name]
             if clause["kind"] == "repair" and spec["kind"] != "repair":
@@ -664,6 +681,15 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tid
                 continue
             if owner_state in ("open", "moved"):
                 cells[(clause["id"], name)] = "NYE"
+                advisory = EVALUATORS.get(clause["id"])
+                if advisory is not None:
+                    try:
+                        a_state, a_evidence = advisory(root, name, spec, ctx)
+                        details.append(
+                            f"{clause['id']} {name}: NYE (advisory {a_state}: {a_evidence})"
+                        )
+                    except Refusal:
+                        pass
                 continue
             evaluator = EVALUATORS.get(clause["id"])
             if evaluator is None:
@@ -686,7 +712,11 @@ def run(root: Path, tidy_log, tools=None, profile_text=None, status_fn=None, tid
     print("| --- | --- | " + " | ".join("---" for _ in names) + " |")
     for clause in clauses:
         row = [cells.get((clause["id"], n), "NYE") for n in names]
-        print(f"| {clause['id']} | {clause['owner']} | " + " | ".join(row) + " |")
+        owner_label = clause["owner"]
+        if owner_state_cache.get(clause["owner"]) == "moved":
+            dest = moved_destinations.get(clause["owner"], "")
+            owner_label = f"{owner_label} (moved {dest})" if dest else f"{owner_label} (moved)"
+        print(f"| {clause['id']} | {owner_label} | " + " | ".join(row) + " |")
     for d in details:
         print(f"conformance detail: {d}")
 
