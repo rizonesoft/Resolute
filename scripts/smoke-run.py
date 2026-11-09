@@ -397,7 +397,7 @@ def post(hwnd, msg, wparam=0):
     user32.PostMessageW(hwnd, msg, wparam, 0)
 
 
-def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None):
+def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None, pending=None):
     """PrintWindow on a worker thread: a hung UI thread must not hang the run.
 
     The worker is a daemon: if it outlives its bound it dies with the driver,
@@ -413,17 +413,40 @@ def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None):
             box["error"] = exc
 
     worker = threading.Thread(target=work, daemon=True)
+    box["thread"] = worker
     worker.start()
     deadline = time.monotonic() + timeout
     while worker.is_alive() and time.monotonic() < deadline:
         if abort is not None and abort():
+            if pending is not None:
+                pending.append(box)  # late diagnostics are collected, not lost
             return ABORTED
         worker.join(0.05)
     if worker.is_alive():
+        if pending is not None:
+            pending.append(box)
         return None
     if "error" in box:
         raise box["error"]
     return box.get("shot")
+
+
+def collect_late_capture_diagnostics(runs, notes, join_timeout: float = 10.0):
+    """Drain abandoned capture workers into the report before the verdict.
+
+    A worker that finished with a failure names it; a worker still blocked
+    is reported as unverified. Either way the run fails: silent loss of a
+    release diagnostic is exactly what this prevents.
+    """
+    for run in runs:
+        for box in getattr(run, "pending_captures", []):
+            box["thread"].join(timeout=join_timeout)
+            if box["thread"].is_alive():
+                notes.append(f"{run.name}: capture cleanup unverified (worker still blocked)")
+                run.failed = True
+            elif "error" in box:
+                notes.append(f"{run.name}: late capture failure: {box['error']!r}")
+                run.failed = True
 
 
 def exit_result(returncode) -> tuple[str, str]:
@@ -533,6 +556,7 @@ class ToolRun:
         self.args = list(args)
         self.start_timeout = start_timeout or TIMEOUTS["launch"]
         self.proc = None
+        self.pending_captures = []
         self.job = None
         self.hwnd = None
         self.rows = []
@@ -800,7 +824,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
 
         # main: capture the surface; a blank capture fails by name.
         try:
-            shot = capture_window_bounded(run.hwnd, abort=resumed)
+            shot = capture_window_bounded(run.hwnd, abort=resumed, pending=run.pending_captures)
         except Exception as exc:
             run.record("main", "fail", f"capture failed: {exc!r}")
             shot = "handled"
@@ -943,7 +967,7 @@ def failure_capture(run: ToolRun, step: str, out_dir: Path, abort=None) -> str:
         run.interrupted = True
         return "capture unavailable: operator input resumed during capture"
     try:
-        shot = capture_window_bounded(run.hwnd, abort=abort)
+        shot = capture_window_bounded(run.hwnd, abort=abort, pending=run.pending_captures)
     except Exception as exc:
         return f"capture unavailable: {exc!r}"
     if shot == ABORTED:
@@ -1060,6 +1084,7 @@ def main(argv=None) -> int:
                 stood_down = True
                 notes.append(f"Operator input resumed during {run.name}; the run stood down.")
         rows += run.rows
+    collect_late_capture_diagnostics(runs, notes)
     failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
     blocked = any(r[2] == "blocked" for r in rows)
     verdict = "stood-down" if stood_down else ("fail" if failed else ("blocked" if blocked else "pass"))
@@ -1737,6 +1762,26 @@ def self_test() -> int:
     finally:
         globals().update(_saved)
         os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+
+    # Late capture diagnostics: a worker abandoned at its bound finishes
+    # afterwards, and its release failure is collected, not discarded.
+    import threading as _th3
+    _rel3 = _th3.Event()
+    _lrun2 = ToolRun("Resolute", Path("x"))
+    _real_cap4 = globals()["capture_window"]
+    def _late_fail(hwnd):
+        _rel3.wait(30)
+        raise RuntimeError("ReleaseDC failed")
+    globals()["capture_window"] = _late_fail
+    try:
+        _shot = capture_window_bounded(99, timeout=0.5, pending=_lrun2.pending_captures)
+    finally:
+        _rel3.set()
+        globals()["capture_window"] = _real_cap4
+    _notes3 = []
+    collect_late_capture_diagnostics([_lrun2], _notes3)
+    check("late capture release failure reaches the report and fails the run",
+          _shot is None and _lrun2.failed and any("ReleaseDC failed" in n for n in _notes3))
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
