@@ -1,7 +1,7 @@
 capture       : 2026-11-09-D00-T05-s1-launcher-details-dark.png
 describes     : the launcher details view, dark, at 1600 px wide: visual proof for the README (D00 T05 section 1)
 window title  : Resolute
-target process: 14168 R:\resolute-clean-check\Bin\Release\Resolute.exe
+target process: 3700 R:\resolute-clean-check\Bin\Release\Resolute.exe
 attached      : attached to a process the caller started and owns
 source binary : R:\resolute-clean-check\Bin\Release\Resolute.exe
 file version  : 0.1.0.0
@@ -10,8 +10,8 @@ monitor dpi   : 144  (150% scaling) -- what the image was rendered at
 window dpi    : 144  (logical dpi the process sees)
 dpi aware     : True
 appearance    : dark  (stated by the caller)
-fixture       : launcher from the clean checkout at c4f6fcde (Bin/Release/Resolute.exe); host VENOM-PC; appearance dark set by 1 theme-command press(es) from System
-launch context: pwsh R:\scratch\capture-readme.ps1 (launch R:\resolute-clean-check\Bin\Release\Resolute.exe, resize 1600x1000, theme x1, view 1004, then capture-window.ps1 -ProcessId <pid>)
+fixture       : launcher built from a clean checkout (Bin/Release/Resolute.exe); host VENOM-PC; appearance dark set by 1 theme-command press(es) from System; view set by WM_COMMAND 1004
+launch context: pwsh scripts/capture-launcher-readme.ps1 -Exe R:\resolute-clean-check\Bin\Release\Resolute.exe -CaptureScript R:\resolute-clean-check\scripts\capture-window.ps1 -OutDir D:\GitHub\Resolute\docs\captures (this shot: theme x1, view 1004, then capture-window.ps1 -ProcessId <pid> -Out D:\GitHub\Resolute\docs\captures\2026-11-09-D00-T05-s1-launcher-details-dark.png)
 fixture files : none beside Bin/Release (launcher only build)
 launch args   : attached to a running process
 working dir   : (default)
