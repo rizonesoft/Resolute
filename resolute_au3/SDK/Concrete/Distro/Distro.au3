@@ -2055,7 +2055,7 @@ Func _BuildVerdict($sReleaseName, $sAllWrapOutput, $iWrapExit, $sBuildStart)
 		$iFirstArch = 1
 	EndIf
 
-	Local $aRc = StringRegExp($sAllWrapOutput, "rc:[ ]*(-?[0-9]+)", 3)
+	Local $aRc = StringRegExp($sAllWrapOutput, "Aut2exe\.exe ended\.[^\r\n]*rc:[ ]*(-?[0-9]+)", 3)
 	If @error Then Local $aRc[0]
 	Local $aCreated = StringRegExp($sAllWrapOutput, "Created program:[ ]*([^\r\n]+)", 3)
 	If @error Then Local $aCreated[0]
