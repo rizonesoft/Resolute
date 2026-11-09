@@ -348,18 +348,29 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
     global set, per-target sorted finding lines). Refuses when the
     analysis is incomplete: a missing database, an empty target, a
     failed invocation, or an error diagnostic."""
+    log_lines = []
+
+    def flush_log():
+        # Diagnostics are persisted before every refusal, including the
+        # failing invocation's own output: a gate whose log holds an
+        # earlier run (or nothing) sends the reader to re-run clang-tidy
+        # by hand to see the error that just failed them (round 2).
+        if log_path is not None:
+            Path(log_path).parent.mkdir(parents=True, exist_ok=True)
+            Path(log_path).write_text("".join(log_lines))
+
     # Every expected database is checked before any analysis runs: a
     # missing extension database must refuse in seconds, not after the
     # root target has been analysed in full.
     for name, db in targets.items():
         if not db.is_file():
+            flush_log()
             raise Refusal(
                 f"target '{name}': compile database missing at {db.relative_to(root).as_posix()}; "
                 "the release build must run first"
             )
     per_target = {}
     global_set = set()
-    log_lines = []
     total_tus = 0
     for name, db in targets.items():
         entries = json.loads(db.read_text())
@@ -369,6 +380,7 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             if "_deps" not in e["file"] and not e["file"].endswith(".rc")
         ]
         if not tus:
+            flush_log()
             raise Refusal(f"target '{name}': compile database has no translation units")
         found = set()
         for tu in tus:
@@ -382,11 +394,13 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             out = (proc.stdout or "") + (proc.stderr or "")
             log_lines.append(out)
             if proc.returncode != 0:
+                flush_log()
                 raise Refusal(
                     f"target '{name}': clang-tidy exited {proc.returncode} on {tu}; "
                     "the finding count is not evidence until analysis completes"
                 )
             if ERROR_RE.search(out):
+                flush_log()
                 raise Refusal(
                     f"target '{name}': error diagnostic while analysing {tu}; "
                     "the finding count is not evidence until analysis completes"
@@ -394,9 +408,7 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             found |= collect_findings(out.splitlines(), root)
         per_target[name] = found
         global_set |= found
-    if log_path is not None:
-        Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-        Path(log_path).write_text("".join(log_lines))
+    flush_log()
     return per_target, global_set, total_tus
 
 
@@ -734,6 +746,22 @@ def self_test() -> int:
         "missing base baseline fails closed",
         lambda: refuses(lambda: check_raise_guard(good, None, targets), "fails closed"),
     )
+
+    def failed_analysis_keeps_its_log():
+        tmp = Path(tempfile.mkdtemp())
+        db = tmp / "build" / "release" / "compile_commands.json"
+        db.parent.mkdir(parents=True)
+        db.write_text(json.dumps([{"file": "a.cpp", "directory": str(tmp), "command": "cc a.cpp"}]))
+        log = tmp / "logs" / "gate-tidy.log"
+        # sys.executable stands in for a clang-tidy that fails: it exits
+        # non-zero on tidy arguments and prints to stderr.
+        refuses(
+            lambda: run_analysis(tmp, Path(sys.executable), {"root": db}, log),
+            "clang-tidy exited",
+        )
+        assert log.is_file() and log.read_text().strip(), "failing run left no diagnostics log"
+
+    case("failed analysis persists its diagnostics log", failed_analysis_keeps_its_log)
 
     if failures:
         for f in failures:
