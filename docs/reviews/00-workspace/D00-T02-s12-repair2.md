@@ -55,3 +55,59 @@ HIGHEST: P1
 OVERALL: needs-attention
 
 - Implemented: repair2 round 1 (adversarial P1) in 835016cf: border lines are measured in dedicated strip regions, Compare refuses an unmeasured border, thinness is average thickness, the dark border clears the ink threshold, and the light border token darkens 140 to 128 (2.82:1 measured at 140). Suite 120/120; pair 0 divergences.
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T16:30:10Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: 9cc85f7f1e9d0b3cc464c2c807d3e3a834a498a6
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: d94c8bd637614fb5
+
+### consistency: approve
+
+No actionable consistency findings in `9cc85f7f..835016cf`. Review was read-only; tests were not rerun.
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T16:32:00Z
+- Candidate: 835016cf3eee4f4047d21594fdbe534864fb5a32
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: 9cc85f7f1e9d0b3cc464c2c807d3e3a834a498a6
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 18
+- Digest: 91d7067a9197f734
+
+Read-only review of `9cc85f7f..835016cf`. No files changed; C++ and headful tests were not rerun.
+
+**Part 1: completeness**
+
+- **missing-in-scope: Enforce 4.5:1 for toolbar text.** [visual_pair_spec.txt:38](D:/GitHub/Resolute/tests/visual_pair_spec.txt:38) classifies the toolbar as `element`, while its `toolbar-view` text region skips contrast checking at line 42. Consequently, [visual_pair.h:298](D:/GitHub/Resolute/tests/visual_pair.h:298) applies only 3:1 to “View”. The border repair does not close this text-coverage gap. Add a rendered “View” regression between 3:1 and 4.5:1 that fails in both themes, including under the theme exemption.
+- **missing-in-scope: Detect clipping for every declared control.** `sidebar-all` and all three list headers still have `maxEdge=1.0` in [visual_pair_spec.txt:46](D:/GitHub/Resolute/tests/visual_pair_spec.txt:46) and [line 52](D:/GitHub/Resolute/tests/visual_pair_spec.txt:52). Their measured edge fraction cannot exceed that threshold, so the clipping condition at [visual_pair.h:273](D:/GitHub/Resolute/tests/visual_pair.h:273) cannot detect internal truncation. The new `sidebar-system` drill proves that control only. Add actual header and selected-item truncation drills that fail specifically as clipped, including under the theme exemption.
+- **present: Region comparison, malformed-input refusal and regression diagnostics.** Evidence: [visual_pair_test.cpp:77](D:/GitHub/Resolute/tests/visual_pair_test.cpp:77), [line 180](D:/GitHub/Resolute/tests/visual_pair_test.cpp:180), and glyph mutation drills at [line 341](D:/GitHub/Resolute/tests/visual_pair_test.cpp:341).
+- **present: Fenced execution, cancellation cleanup and capture readback.** Evidence: child cleanup at [ui_headful_test.cpp:283](D:/GitHub/Resolute/tests/ui_headful_test.cpp:283), interruption handling at [line 488](D:/GitHub/Resolute/tests/ui_headful_test.cpp:488), and pair comparison at [line 643](D:/GitHub/Resolute/tests/ui_headful_test.cpp:643).
+- **present: Independent hook-failure reporting and storage-failure fallback.** Open/map/drop drills and blocked-file fallback are covered by [focus_hook_test.cpp:50](D:/GitHub/Resolute/tests/focus_hook_test.cpp:50) through its named event-fallback test at line 118.
+- **missing-out-of-scope, already assigned: Live AutoIt comparison.** Owned by `D03 T02 §7` under the agreed elevated-session requirement. This is not a new completion blocker. The harness introduces no application dialogs, settings, keyboard controls or system-repair undo surface requiring additional implementation here.
+
+**Part 2: excellence**
+
+- **in-scope: Contrast certification remains weaker than DESIGN.md.** Target: every text region rejects measured contrast below 4.5:1; interactive elements and borders reject below 3:1. “View” currently lacks the required text-floor enforcement.
+- **in-scope: Clipping certification remains incomplete.** Target: truncating any declared control’s content produces a diagnostic naming that control as clipped, independently of pixel-difference failures and despite theme exemptions. Selected “All” and the list headers currently have inert clipping thresholds.
+- **out-of-scope, already assigned: Behavioral parity proof.** This infrastructure has no AutoIt counterpart, and its C++ baseline checks do not establish 1:1 system-effects parity. The deferred live pair remains with `D03 T02 §7`.
+
+COMPLETION: gaps
