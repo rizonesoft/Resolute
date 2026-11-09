@@ -87,3 +87,27 @@ HIGHEST: P1
 OVERALL: needs-attention
 
 - Implemented: repair round 2 (consistency P1) in 4c39c361 and 9a595635: ComparePair again enforces the absolute DESIGN.md floor (no bypass); components thinner than 3px in either dimension (separators, grips, rules) are not glyphs; the one real failure, light status text at 4.47:1, is corrected at its owning layer (LightPalette statusBarText RGB(100) to RGB(90)), the section 9 light status goldens are restaked (131 differing pixels, all the darkened text), and the captures of record are restaked. Default suite 119/119; pair 0 divergences.
+
+## Round 3: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T15:55:58Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: c15d54d93e7e4fc53bdf21c6e90a10e6e4dd234d
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 6
+- Digest: ec1c146010d3a6ac
+
+### adversarial: needs-attention
+
+1. **P1**: `tests/focus_hook/focus_hook.cpp:48` appends the marker filename to a `MAX_PATH` stack buffer without checking remaining capacity. The new current-directory fallback reaches this with an ordinary long working directory. **Reproduction:** run the existing “A hook that cannot open the mapping marks the failure” case from a 240-character directory with TEMP on a volume whose quota is exhausted. The failed temp write falls through to the working directory; appending `ResoluteFocusHookFail-<pid>.txt` exceeds 260 characters, causing stack memory corruption before the event fallback can report failure. This is source-confirmed, not executed during this read-only review. Check directory API return lengths and the complete filename length, falling through to the event when the path cannot fit.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Implemented: repair round 3 (adversarial P1) in 3eb8496b: every marker path build in the hook checks the complete filename fits MAX_PATH and falls through to the next destination instead of appending past the buffer. Hook drills 4/4.
