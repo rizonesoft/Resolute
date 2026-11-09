@@ -48,6 +48,8 @@ track: M1
 
 ## 1. Make the AutoIt Suite Buildable Again
 
+> **Started:** 2026-11-09T10:33:21Z
+
 A shipping product that cannot be built from its own repository cannot be fixed. This is first because everything else in this domain assumes a build exists.
 
 **Needs:** Windows host (build/test)
