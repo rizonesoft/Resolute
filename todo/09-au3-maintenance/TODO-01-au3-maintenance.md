@@ -44,6 +44,7 @@ track: M1
 |   2   |   §2    | Clear the housekeeping defects             | --           |  [ ]   |
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [ ]   |
 |   4   |   §4    | Distro reports compiler failure           | --           |  [ ]   |
+|   5   |   §5    | Stop logging the signing password in Distro | --           |  [ ]   |
 
 ---
 
@@ -111,6 +112,21 @@ Without a written scope, every request to fix something in the AutoIt tree is ar
 - [ ] Commit: `"au3: report compiler failure in Distro"`
 
 **Test checkpoint:** Driven run with evidence: a seeded syntax-error script is reported failed by Distro (status and log quoted) and a clean tool still reports success. `Au3Check.exe -q Distro.au3` exits 0. No tool's frozen behaviour changes.
+
+
+## 5. Stop Logging the Signing Password in Distro
+
+`_RunSignCommand` (`resolute_au3/SDK/Concrete/Distro/Distro.au3`) masks the certificate password on one line (`Password: ******`) and then writes the full signing command, which contains `/p <password>` in plain text, to Distro's log on the next. The log is the file a maintainer attaches to a bug report, so the password reaches wherever the log goes. This predates `D09 T01 §1`; that section's repair completion review found it. No credential value was read while filing this.
+
+-> SOURCE: D09 T01 §1 repair completion review on `1b4aecfa`, Part 2 item 1 (out-of-scope)
+-> XREF: D09 T01 §1 -- the section whose review found this
+
+- [ ] Remove the password from the logged command. Done when: the log line for the signing command shows the command shape with the password masked (the same mask as the `Password:` line), and the real command passed to `_ProcessEx_RunCommand` is unchanged.
+- [ ] Search Distro and its includes for any other place a password or certificate secret reaches a log, a console line, or a command-line echo. Done when: every hit is listed here and either fixed the same way or named as not a secret with its reason.
+- [ ] Prove it. Done when: a driven `_RunSignCommand` with a dummy password writes a log containing the mask and not the dummy password, quoted from the log.
+- [ ] Commit: `"au3: stop logging the signing password in Distro"`
+
+**Test checkpoint:** Driven run with evidence: the Distro log from a signing run with a dummy password contains `******` and does not contain the dummy password. The signing command that executes is unchanged. `Au3Check.exe -q Distro.au3` exits 0.
 
 ## Verification
 
