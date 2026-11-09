@@ -299,7 +299,12 @@ def wait_window(pid: int, timeout: float, want_dialog: bool = False, abort=None)
 
 
 def capture_window(hwnd) -> tuple[int, int, bytes] | None:
-    """PrintWindow into a DIB; returns (width, height, BGRA top-down)."""
+    """PrintWindow into a DIB; returns (width, height, BGRA top-down).
+
+    Every acquired GDI object is released independently, the original
+    bitmap is restored before deletion, and a failed release raises so the
+    step fails by name instead of leaking silently.
+    """
     rect = wintypes.RECT()
     if not user32.GetWindowRect(hwnd, ctypes.byref(rect)):
         return None
@@ -307,10 +312,18 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
     if width <= 0 or height <= 0:
         return None
     hdc = user32.GetWindowDC(hwnd)
-    mem = gdi32.CreateCompatibleDC(hdc)
-    bmp = gdi32.CreateCompatibleBitmap(hdc, width, height)
-    gdi32.SelectObject(mem, bmp)
+    if not hdc:
+        return None
+    mem = bmp = old = None
+    failures = []
     try:
+        mem = gdi32.CreateCompatibleDC(hdc)
+        if not mem:
+            return None
+        bmp = gdi32.CreateCompatibleBitmap(hdc, width, height)
+        if not bmp:
+            return None
+        old = gdi32.SelectObject(mem, bmp)
         if not user32.PrintWindow(hwnd, mem, PW_RENDERFULLCONTENT):
             return None
 
@@ -331,9 +344,29 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
             return None
         return width, height, buf.raw
     finally:
-        gdi32.DeleteObject(bmp)
-        gdi32.DeleteDC(mem)
-        user32.ReleaseDC(hwnd, hdc)
+        if mem and old:
+            try:
+                gdi32.SelectObject(mem, old)
+            except Exception as exc:
+                failures.append(exc)
+        if bmp:
+            try:
+                if not gdi32.DeleteObject(bmp):
+                    failures.append(OSError("DeleteObject(bitmap) failed"))
+            except Exception as exc:
+                failures.append(exc)
+        if mem:
+            try:
+                if not gdi32.DeleteDC(mem):
+                    failures.append(OSError("DeleteDC failed"))
+            except Exception as exc:
+                failures.append(exc)
+        try:
+            user32.ReleaseDC(hwnd, hdc)
+        except Exception as exc:
+            failures.append(exc)
+        if failures:
+            raise RuntimeError("; ".join(repr(f) for f in failures))
 
 
 def post(hwnd, msg, wparam=0):
@@ -493,6 +526,7 @@ class ToolRun:
         """
         if self.job is None:
             self.job = JobBox()
+        primary = None
         try:
             if self.proc and self.proc.poll() is None:
                 self.proc.terminate()
@@ -504,9 +538,18 @@ class ToolRun:
                     time.sleep(0.05)
                 if self.proc.poll() is None and not (getattr(self, "resumed", None) and self.resumed()):
                     self.proc.kill()
+        except BaseException as exc:
+            primary = exc
         finally:
             if isinstance(self.proc, WinProc):
-                self.proc.close()
+                try:
+                    self.proc.close()
+                except Exception as close_exc:
+                    if primary is not None:
+                        raise RuntimeError(f"{primary!r}; also release failed: {close_exc!r}") from primary
+                    raise
+            if primary is not None:
+                raise primary
 
 
 class WinProc:
@@ -641,7 +684,8 @@ def spawn_contained(run: "ToolRun"):
             run.proc.terminate()
     finally:
         if not kernel32.CloseHandle(wintypes.HANDLE(int(proc_info.hThread))):
-            run.job.error = f"CloseHandle(thread) failed ({ctypes.get_last_error()})"
+            note = f"CloseHandle(thread) failed ({ctypes.get_last_error()})"
+            run.job.error = f"{run.job.error}; {note}" if run.job.error else note
 
 
 def launch_block_text() -> str:
@@ -1131,42 +1175,63 @@ def self_test() -> int:
                                f"Suite verdict: **{v}**").group(1) == v
         for v in ("pass", "fail", "blocked", "refused", "stood-down")))
 
-    # main() itself: a failed baseline query refuses a collecting run, and
-    # an unwritable report directory still yields the report on stdout.
+    # main() itself, deterministically: stub admission, the input query and
+    # the tool list, so no real tool can launch in any of these cases.
     import io, tempfile
     from contextlib import redirect_stdout
-    _saved = (globals()["SMOKE_DIR"], globals()["PREV_DIR"], last_input_tick)
+    _saved = {k: globals()[k] for k in ("SMOKE_DIR", "PREV_DIR", "last_input_tick", "admission", "real_tools")}
     try:
         with tempfile.TemporaryDirectory() as td:
             globals()["SMOKE_DIR"] = Path(td) / "smoke"
             globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["real_tools"] = lambda only=None, flavor="Release": []
             globals()["last_input_tick"] = lambda: -1
+            globals()["admission"] = lambda v, n, e: (True, "collecting (test)", True)
             os.environ["RESOLUTE_IDLE_COLLECT"] = "1"
             buf = io.StringIO()
             with redirect_stdout(buf):
                 rc = main([])
             check("main refuses a collecting run whose baseline query failed",
                   rc == 2 and "refused" in buf.getvalue())
-            globals()["last_input_tick"] = _saved[2]
-            os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+            # Refusal with an unwritable report directory: five rows on stdout.
+            globals()["last_input_tick"] = lambda: 100
+            globals()["admission"] = lambda v, n, e: (False, "refused: test fence", False)
             blocker = Path(td) / "blocker"
             blocker.write_text("x")
             globals()["SMOKE_DIR"] = blocker / "smoke"
             buf = io.StringIO()
             with redirect_stdout(buf):
                 rc = main([])
-            check("unwritable refusal report falls back to stdout",
-                  rc == 2 and "Suite verdict" in buf.getvalue())
+            check("unwritable refusal report falls back to stdout with rows",
+                  rc == 2 and "Suite verdict" in buf.getvalue() and "| Resolute |" in buf.getvalue())
+            # Admitted run whose report cannot be written: report on stdout.
+            globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            check("unwritable run report falls back to stdout",
+                  rc == 1 and "Suite verdict" in buf.getvalue())
     finally:
-        globals()["SMOKE_DIR"], globals()["PREV_DIR"], globals()["last_input_tick"] = _saved
+        globals().update(_saved)
         os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
-    # The actual PowerShell verdict expression from tools/nightly.ps1.
-    ps = subprocess.run(
-        ["pwsh", "-NoProfile", "-Command",
-         r"$m = [regex]::Match('Suite verdict: **stood-down**', 'Suite verdict: \*\*([\w-]+)\*\*'); $m.Groups[1].Value"],
-        capture_output=True, text=True, timeout=60)
-    check("nightly PowerShell expression parses stood-down",
-          ps.returncode == 0 and ps.stdout.strip() == "stood-down")
+    # Nightly's own verdict line, extracted from tools/nightly.ps1 and run
+    # by PowerShell against a fabricated report for every verdict.
+    nightly_src = (ROOT / "tools" / "nightly.ps1").read_text(encoding="utf-8", errors="replace")
+    ps_line = next((l.strip() for l in nightly_src.splitlines() if "Select-String -Path $smokeReportPath" in l), "")
+    import tempfile as _tf
+    verdicts_ok = bool(ps_line)
+    if verdicts_ok:
+        for verdict in ("pass", "fail", "blocked", "refused", "stood-down"):
+            with _tf.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as fh:
+                fh.write(f"Suite verdict: **{verdict}**\n")
+                report_file = fh.name
+            snippet = (f"$smokeReportPath = '{report_file}'; " + ps_line +
+                       "; if ($m) { $m.Matches[0].Groups[1].Value }")
+            ps = subprocess.run(["pwsh", "-NoProfile", "-Command", snippet],
+                                capture_output=True, text=True, timeout=60)
+            verdicts_ok = verdicts_ok and ps.returncode == 0 and ps.stdout.strip() == verdict
+            Path(report_file).unlink(missing_ok=True)
+    check("nightly's production verdict line parses every verdict", verdicts_ok)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
