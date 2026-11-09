@@ -2569,7 +2569,18 @@ Func _DescriptorRelativePath($sBase, $sFull)
 	; no root with $sBase are returned unchanged.
 	Local $aBase = StringSplit(StringRegExpReplace($sBase, "\\+$", ""), "\")
 	Local $aFull = StringSplit(StringRegExpReplace($sFull, "\\+$", ""), "\")
-	If $aBase[0] = 0 Or $aFull[0] = 0 Or $aBase[1] <> $aFull[1] Then
+	; The root is the drive, or \\server\share for a UNC path: both UNC
+	; paths split to empty first components, so compare server and share.
+	Local $bRootDiffers = False
+	If $aBase[0] = 0 Or $aFull[0] = 0 Then $bRootDiffers = True
+	If Not $bRootDiffers And StringLeft($sBase, 2) = "\\" And StringLeft($sFull, 2) = "\\" Then
+		If $aBase[0] < 4 Or $aFull[0] < 4 Or $aBase[3] <> $aFull[3] Or $aBase[4] <> $aFull[4] Then $bRootDiffers = True
+	ElseIf Not $bRootDiffers And (StringLeft($sBase, 2) = "\\") <> (StringLeft($sFull, 2) = "\\") Then
+		$bRootDiffers = True
+	ElseIf Not $bRootDiffers And $aBase[1] <> $aFull[1] Then
+		$bRootDiffers = True
+	EndIf
+	If $bRootDiffers Then
 		ConsoleWrite("Distro: no descriptor-relative form for " & $sFull & " (different root); absolute path kept." & @CRLF)
 		_Logging_EditWrite(_Logging_SetLevel("No descriptor-relative form for " & $sFull & " (different root); absolute path kept.", "WARNING"))
 		Return $sFull
