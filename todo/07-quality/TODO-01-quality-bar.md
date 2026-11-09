@@ -233,6 +233,10 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 
 -> SOURCE: run-2026-11-09-d07-t01-s4 (RegStudio launch WinError 740 under a non-elevated driver)
 
+**Build order:**
+1. `scripts/smoke-run.py` elevation admission: `is_elevated()` (TokenElevation via `ctypes`), `elevated_child_args(argv)` (drops `--elevate`, adds internal `--elevated-child`, keeps every other argument identical), and `relaunch_elevated(argv)` through `ShellExecuteExW` with the `runas` verb on `sys.executable`, waiting on the returned process handle and returning its exit code. Done when: `--self-test` proves the argument mapping, that an already-elevated process never relaunches, and that error 1223 (consent declined) maps to a named `blocked` outcome with no process launched. Cheaper substitute that fails the checkpoint: a second elevated-only copy of the driver, or `Start-Process -Verb RunAs` from a wrapper script the checkpoint never exercises.
+2. `scripts/smoke-run.py` `main()`: `--elevate` when not elevated relaunches and exits with the child's code (the child writes the shared `build/smoke/smoke-report.md`; the parent writes nothing over it); when declined it writes the blocked report (five RegStudio rows `blocked` naming the decline when `--tools RegStudio` is selected) and exits 2; `--elevated-child` without elevation refuses by name rather than looping. Done when: the documented command is `python scripts/smoke-run.py --elevate --visible --tools RegStudio`, named in the module docstring Usage and `--help`.
+3. Driven proof: the approved elevated run and the paired non-elevated `--visible --tools RegStudio` run, both quoted. Done when: the elevated report shows start, main, About, exit `pass` and preferences `absent`, and the non-elevated report shows `blocked` naming WinError 740.
 **Test checkpoint:** The elevated run's `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent` named, quoted in the stamp; the paired non-elevated run shows `blocked` naming the elevation requirement.
 
 ## 6. Smoke Capture-Timeout Test
