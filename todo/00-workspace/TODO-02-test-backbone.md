@@ -681,6 +681,8 @@ Why this section exists: the fenced headful set has no owner, no schedule, and n
 
 ## 12. Port-vs-Port Visual Comparison
 
+> **Started:** 2026-11-09T14:53:59Z
+
 Why this section exists: `D00 T02 §4` compares what two implementations DID, field by field, and `D00 T02 §9` proves the C++ controls render stably, but nothing compares what the user SEES across the AutoIt tool and its C++ port at the same fixture state: a port that writes the right registry values while dropping a control, renaming a label, or leaving a region unpainted passes every gate it has. This section builds that comparison as capture pairs plus region diffs, explicitly NOT as pixel parity: `todo/README.md` refuses pixel comparisons across implementations ("Comparing them pixel to pixel would freeze the defects the rewrite exists to fix") and §4 repeats the exclusion with the reason, so DPI and theme differences are out of scope by rule and the harness compares structure (same controls, same labels and values, same painted regions), never raw pixels. **Corrected 2026-09-19:** pairs are captured per attached DPI (150% main and 100% secondary today, per the §10 placement plan), and DPI awareness itself is proven same-implementation: the C++ capture at 150 must match the §9 150 golden, while the AutoIt 150 capture is expected bitmap-stretched (DPI-unaware by construction) and asserts structure only. The launcher is the first pair: the C++ launcher renders today (§5) and `resolute_au3/SDK/Concrete/Resolute/Resolute.au3` is its counterpart, so the harness is provable now and each ported tool extends it with its own pair.
 
 **Needs:** Windows host (build/test)
