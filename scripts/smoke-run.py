@@ -1570,7 +1570,12 @@ def self_test() -> int:
         return _calls["n"] > 1
     _arun = ToolRun("Resolute", Path("x"))
     _arun.hwnd = 99
-    _atext = failure_capture(_arun, "about", SMOKE_DIR, abort=_late_abort)
+    _real_cap2 = globals()["capture_window"]
+    globals()["capture_window"] = lambda hwnd: (time.sleep(2), None)[1]
+    try:
+        _atext = failure_capture(_arun, "about", SMOKE_DIR, abort=_late_abort)
+    finally:
+        globals()["capture_window"] = _real_cap2
     check("interruption inside the capture wait sets the flag",
           getattr(_arun, "interrupted", False) is True and "operator input resumed" in _atext)
     # Cleanup deadline branch: the child never exits, input arrives at expiry.
@@ -1581,9 +1586,17 @@ def self_test() -> int:
         def kill(self): raise AssertionError("kill must be suppressed by resumed input")
     _drun.proc = _NeverProc()
     _drun.job = JobBox()
-    _t0 = time.monotonic()
-    _drun.resumed = lambda: time.monotonic() > _t0 + 4.9
-    _drun.cleanup()
+    _clock = {"t": 1000.0, "calls": 0}
+    _real_mono = time.monotonic
+    def _fake_mono():
+        _clock["t"] += 2.0
+        return _clock["t"]
+    _drun.resumed = lambda: _clock["t"] > 1005.0
+    time.monotonic = _fake_mono
+    try:
+        _drun.cleanup()
+    finally:
+        time.monotonic = _real_mono
     check("cleanup deadline observation sets the stand-down flag",
           getattr(_drun, "stood_down_during_cleanup", False) is True)
     # Exceptional final tool: capture interruption plus a drive failure keeps
@@ -1639,6 +1652,53 @@ def self_test() -> int:
             _sp.proc.kill()
         except Exception:
             pass
+
+    # Real drive_tool: About raises, the driver's own exception handler
+    # captures failure evidence with the interruption, then re-raises.
+    _fixture = ROOT / "scripts" / "smoke_fixture.py"
+    _erun = ToolRun("SmokeDrillDeaf", Path(sys.executable), [str(_fixture), "deaf"])
+    _real_post = globals()["post"]
+    _t_start = time.monotonic()
+    def _resumed_toggle():
+        return time.monotonic() > _t_start + 1.5
+    def _post_raise(hwnd, msg, wparam=0):
+        if msg == WM_COMMAND and wparam == ABOUT_IDM:
+            raise RuntimeError("about post failed")
+        return _real_post(hwnd, msg, wparam)
+    globals()["post"] = _post_raise
+    _real_cap3 = globals()["capture_window"]
+    globals()["capture_window"] = lambda hwnd: (time.sleep(1), _real_cap3(hwnd))[1]
+    try:
+        drive_tool(_erun, SMOKE_DIR, PREV_DIR, True, 0.0, resumed=_resumed_toggle)
+        _evidence_ok = False
+    except RuntimeError:
+        _evidence_ok = (getattr(_erun, "interrupted", False) is True
+                        and "operator input resumed" in getattr(_erun, "_evidence", ""))
+    finally:
+        globals()["post"] = _real_post
+        globals()["capture_window"] = _real_cap3
+    check("real driver exception handler captures the interruption as evidence", _evidence_ok)
+    # Combined diagnostics in the report rows: termination, resume, thread
+    # and job-close failures all survive production drive and cleanup.
+    _jrun = ToolRun("Resolute", Path("x"))
+    _real_spawn2 = globals()["spawn_contained"]
+    _real_close3 = kernel32.CloseHandle
+    def _bad_spawn2(run):
+        run.job.error = "ResumeThread failed; CloseHandle(thread) failed (5)"
+        raise OSError("TerminateProcess failed (5)")
+    globals()["spawn_contained"] = _bad_spawn2
+    kernel32.CloseHandle = lambda h: 0
+    try:
+        drive_tool(_jrun, SMOKE_DIR, PREV_DIR, False, 0.0)
+    finally:
+        globals()["spawn_contained"] = _real_spawn2
+        kernel32.CloseHandle = _real_close3
+    _srow = next((r for r in _jrun.rows if r[1] == "start"), None)
+    _xrow = next((r for r in _jrun.rows if r[1] == "exit"), None)
+    check("combined diagnostics survive into start and exit rows",
+          _srow is not None and "TerminateProcess failed" in _srow[3] and "ResumeThread failed" in _srow[3]
+          and _xrow is not None and "CloseHandle(job) failed" in _xrow[3]
+          and len(_jrun.rows) == 5 and _jrun.failed)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
