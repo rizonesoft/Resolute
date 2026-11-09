@@ -18,7 +18,13 @@ A collecting run stands down when operator input resumes.
 
 Usage:
   python scripts/smoke-run.py [--visible] [--drill] [--tools A,B]
+  python scripts/smoke-run.py --elevate --visible --tools RegStudio
   python scripts/smoke-run.py --self-test
+
+`--elevate` relaunches this driver through the shell's `runas` consent
+prompt when it is not already elevated, then exits with the child's code.
+A declined prompt records `blocked` naming the decline and exits 2; the
+consent prompt is never bypassed or suppressed.
 
 Exit codes: 0 clean, 1 a tool or step failed, 2 refused or stood down.
 Stdlib only, like every TODO tool.
@@ -171,9 +177,159 @@ def admission(visible: bool, now: datetime, env) -> tuple[bool, str, bool]:
     return False, "refused: desktop fence (not visible, not collecting, outside 02:00-06:50)", False
 
 
+# ---------------------------------------------------------------- elevation
+
+ELEVATE_WAIT_TIMEOUT = 3600.0
+ERROR_CANCELLED = 1223  # consent declined at the runas prompt
+TOKEN_QUERY_ACCESS = 0x0008
+TOKEN_ELEVATION_CLASS = 20
+SEE_MASK_NOCLOSEPROCESS = 0x00000040
+SW_SHOWNORMAL = 1
+WAIT_OBJECT_0 = 0
+WAIT_TIMEOUT = 0x00000102
+WAIT_FAILED = 0xFFFFFFFF
+
+
+class ElevationDeclined(Exception):
+    """The operator declined the shell's elevation consent prompt."""
+
+
+class ElevationFailed(Exception):
+    """The elevated relaunch failed by name (shell, handle, wait, exit)."""
+
+
+def is_elevated():
+    """True when this process holds an elevated token, False when not.
+
+    None when the token query itself fails: the caller refuses by name
+    rather than guessing at the privilege it holds.
+    """
+    token = wintypes.HANDLE()
+    if not advapi32.OpenProcessToken(kernel32.GetCurrentProcess(),
+                                     TOKEN_QUERY_ACCESS, ctypes.byref(token)):
+        return None
+    try:
+        elevation = wintypes.DWORD()
+        size = wintypes.DWORD()
+        if not advapi32.GetTokenInformation(token, TOKEN_ELEVATION_CLASS,
+                                            ctypes.byref(elevation),
+                                            ctypes.sizeof(elevation),
+                                            ctypes.byref(size)):
+            return None
+        return elevation.value != 0
+    finally:
+        kernel32.CloseHandle(token)
+
+
+def elevated_child_args(argv):
+    """The same driver invocation, marked as the elevated child.
+
+    Drops --elevate (the child is already elevated, or refuses) and adds
+    --elevated-child so a child that arrives unelevated refuses by name
+    instead of prompting again. Every other argument is kept identical.
+    """
+    child = [a for a in argv if a != "--elevate"]
+    if "--elevated-child" not in child:
+        child.append("--elevated-child")
+    return child
+
+
+class _ShellExecuteInfoW(ctypes.Structure):
+    _fields_ = [("cbSize", wintypes.DWORD), ("fMask", wintypes.ULONG),
+                ("hwnd", wintypes.HWND), ("lpVerb", wintypes.LPCWSTR),
+                ("lpFile", wintypes.LPCWSTR), ("lpParameters", wintypes.LPCWSTR),
+                ("lpDirectory", wintypes.LPCWSTR), ("nShow", ctypes.c_int),
+                ("hInstApp", wintypes.HINSTANCE), ("lpIDList", ctypes.c_void_p),
+                ("lpClass", wintypes.LPCWSTR), ("hkeyClass", wintypes.HKEY),
+                ("dwHotKey", wintypes.DWORD), ("hIcon", wintypes.HANDLE),
+                ("hProcess", wintypes.HANDLE)]
+
+
+def _shell_execute_runas(child_argv):
+    """Launch sys.executable elevated via the runas verb; return its handle."""
+    info = _ShellExecuteInfoW()
+    info.cbSize = ctypes.sizeof(info)
+    info.fMask = SEE_MASK_NOCLOSEPROCESS
+    info.lpVerb = "runas"
+    info.lpFile = sys.executable
+    info.lpParameters = subprocess.list2cmdline(
+        [str(Path(__file__).resolve())] + list(child_argv))
+    info.lpDirectory = str(ROOT)
+    info.nShow = SW_SHOWNORMAL
+    if not shell32.ShellExecuteExW(ctypes.byref(info)):
+        err = ctypes.get_last_error()
+        if err == ERROR_CANCELLED:
+            raise ElevationDeclined(
+                "elevation consent declined at the runas prompt")
+        raise ElevationFailed(f"ShellExecuteExW failed (Win32 error {err})")
+    return info.hProcess
+
+
+def _wait_process(handle, timeout_ms):
+    """WAIT_OBJECT_0, WAIT_TIMEOUT or WAIT_FAILED for the handle."""
+    return kernel32.WaitForSingleObject(handle, timeout_ms)
+
+
+def _process_exit_code(handle):
+    code = wintypes.DWORD()
+    if not kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+        return None
+    return int(code.value)
+
+
+def _close_handle(handle):
+    if handle:
+        kernel32.CloseHandle(handle)
+
+
+def _terminate_process(handle):
+    if handle:
+        kernel32.TerminateProcess(handle, 2)
+
+
+def relaunch_elevated(argv, timeout=ELEVATE_WAIT_TIMEOUT):
+    """Relaunch this driver elevated and return the child's exit code.
+
+    Bounded and interruptible: a timeout or keyboard interrupt terminates
+    the child and raises ElevationFailed, so an elevated run is never
+    abandoned silently. The process handle is freed on every path.
+    """
+    handle = _shell_execute_runas(elevated_child_args(list(argv)))
+    if not handle:
+        raise ElevationFailed("ShellExecuteExW returned no process handle")
+    try:
+        deadline = time.monotonic() + timeout
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                _terminate_process(handle)
+                raise ElevationFailed(
+                    f"elevated child did not finish within {timeout:.0f}s; terminated")
+            try:
+                waited = _wait_process(handle, min(100, int(remaining * 1000)))
+            except KeyboardInterrupt:
+                _terminate_process(handle)
+                raise ElevationFailed(
+                    "interrupted while waiting for the elevated child; terminated")
+            if waited == WAIT_OBJECT_0:
+                break
+            if waited == WAIT_TIMEOUT:
+                continue
+            _terminate_process(handle)
+            raise ElevationFailed(f"WaitForSingleObject failed (0x{waited & 0xFFFFFFFF:08x})")
+        code = _process_exit_code(handle)
+        if code is None:
+            raise ElevationFailed("GetExitCodeProcess failed for the elevated child")
+        return code
+    finally:
+        _close_handle(handle)
+
+
 # ---------------------------------------------------------------- win32
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
+shell32 = ctypes.WinDLL("shell32", use_last_error=True)
+advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)
 gdi32 = ctypes.WinDLL("gdi32", use_last_error=True)
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
@@ -226,6 +382,20 @@ def _bind():
     k.CloseHandle.restype = wintypes.BOOL
     k.CloseHandle.argtypes = [wintypes.HANDLE]
     k.GetTickCount.restype = wintypes.DWORD
+    k.GetCurrentProcess.restype = wintypes.HANDLE
+    advapi32.OpenProcessToken.restype = wintypes.BOOL
+    advapi32.OpenProcessToken.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.POINTER(wintypes.HANDLE)]
+    advapi32.GetTokenInformation.restype = wintypes.BOOL
+    advapi32.GetTokenInformation.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p,
+                                      wintypes.DWORD, ctypes.POINTER(wintypes.DWORD)]
+    k.WaitForSingleObject.restype = wintypes.DWORD
+    k.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+    k.GetExitCodeProcess.restype = wintypes.BOOL
+    k.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+    k.TerminateProcess.restype = wintypes.BOOL
+    k.TerminateProcess.argtypes = [wintypes.HANDLE, wintypes.UINT]
+    shell32.ShellExecuteExW.restype = wintypes.BOOL
+    shell32.ShellExecuteExW.argtypes = [ctypes.c_void_p]
     ntdll = ctypes.windll.ntdll
     ntdll.NtResumeProcess.restype = ctypes.c_long
     ntdll.NtResumeProcess.argtypes = [wintypes.HANDLE]
@@ -1020,6 +1190,30 @@ def real_tools(only=None, flavor="Release"):
     return runs
 
 
+
+def emit_report(rows, verdict, notes) -> bool:
+    """Write build/smoke/smoke-report.md; on failure print it instead."""
+    report = render_report(rows, verdict, notes)
+    try:
+        SMOKE_DIR.mkdir(parents=True, exist_ok=True)
+        (SMOKE_DIR / "smoke-report.md").write_text(report, encoding="utf-8")
+        return True
+    except OSError as exc:
+        print(f"smoke: could not write build/smoke/smoke-report.md: {exc}")
+        print(report)
+        return False
+
+
+def elevation_rows(only, result, detail):
+    """One row per step per selected tool for an elevation outcome."""
+    names = sorted(only) if only else sorted(load_tools())
+    rows = []
+    for name in names:
+        for step, expected in step_table(name):
+            rows.append((name, step, result if expected else "absent", detail))
+    return rows
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--visible", action="store_true", help="operator asked: run visibly now")
@@ -1028,6 +1222,9 @@ def main(argv=None) -> int:
     ap.add_argument("--flavor", default="Release", choices=("Release", "Debug"),
                     help="build flavor whose Bin/<flavor> executables to drive (nightly builds Debug)")
     ap.add_argument("--self-test", action="store_true", help="windowless logic tests")
+    ap.add_argument("--elevate", action="store_true",
+                    help="relaunch elevated through the runas consent prompt when not elevated")
+    ap.add_argument("--elevated-child", action="store_true", help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     if args.self_test:
         return self_test()
@@ -1038,6 +1235,38 @@ def main(argv=None) -> int:
         print(f"smoke: unknown tool selection(s): {', '.join(unknown)} "
               f"(registered: {', '.join(sorted(load_tools()))}); nothing launched")
         return 2
+
+    if args.elevated_child or args.elevate:
+        elevated = is_elevated()
+        call_argv = list(argv) if argv is not None else sys.argv[1:]
+        if elevated is None:
+            detail = "elevation could not be verified (token query failed); nothing launched"
+            emit_report(elevation_rows(only, "refused", detail), "refused",
+                        [f"Admission: {detail}.", "No tool was launched."])
+            print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
+            return 2
+        if args.elevated_child and not elevated:
+            detail = ("elevated child launched without elevation; "
+                      "refusing to relaunch, nothing launched")
+            emit_report(elevation_rows(only, "refused", detail), "refused",
+                        [f"Admission: {detail}.", "No tool was launched."])
+            print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
+            return 2
+        if args.elevate and not elevated:
+            try:
+                return relaunch_elevated(call_argv)
+            except ElevationDeclined as exc:
+                detail = f"blocked: {exc}; RegStudio's steps were not observed"
+                emit_report(elevation_rows(only, "blocked", detail), "blocked",
+                            [f"Admission: {detail}.", "No tool was launched."])
+                print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
+                return 2
+            except ElevationFailed as exc:
+                detail = f"blocked: elevated relaunch failed: {exc}"
+                emit_report(elevation_rows(only, "blocked", detail), "blocked",
+                            [f"Admission: {detail}.", "No tool was launched."])
+                print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
+                return 2
 
     admitted, mode, collecting = admission(args.visible, datetime.now(), os.environ)
     baseline_tick = last_input_tick()
@@ -1860,6 +2089,145 @@ def self_test() -> int:
     finally:
         globals().update(_saved)
         os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+
+    # Elevation admission (D07 T01 S5): argument mapping, failure outcomes
+    # at the parent-child boundary, and main() branch behaviour, all with
+    # the shell and wait APIs stubbed so no prompt and no window appears.
+    check("elevated child args drop --elevate and mark the child",
+          elevated_child_args(["--elevate", "--visible", "--tools", "RegStudio"])
+          == ["--visible", "--tools", "RegStudio", "--elevated-child"])
+    check("elevated child args keep an existing marker",
+          elevated_child_args(["--elevated-child"]) == ["--elevated-child"])
+    _elev_saved = {k: globals()[k] for k in
+                   ("_shell_execute_runas", "_wait_process", "_process_exit_code",
+                    "_close_handle", "_terminate_process", "is_elevated",
+                    "relaunch_elevated", "SMOKE_DIR", "PREV_DIR",
+                    "last_input_tick", "admission", "real_tools")}
+    try:
+        _closed, _terminated = [], []
+
+        def _relaunch_case(shell, wait, code):
+            globals()["_shell_execute_runas"] = shell
+            globals()["_wait_process"] = wait
+            globals()["_process_exit_code"] = code
+            globals()["_close_handle"] = lambda h: _closed.append(h)
+            globals()["_terminate_process"] = lambda h: _terminated.append(h)
+            try:
+                return ("rc", relaunch_elevated(["--elevate", "--visible"]))
+            except (ElevationDeclined, ElevationFailed) as exc:
+                return (type(exc).__name__, str(exc))
+
+        _closed.clear(); _terminated.clear()
+        kind, val = _relaunch_case(lambda a: 777, lambda h, ms: WAIT_OBJECT_0, lambda h: 3)
+        check("elevated relaunch returns the child exit code and closes the handle",
+              kind == "rc" and val == 3 and _closed == [777] and not _terminated)
+        kind, val = _relaunch_case(
+            lambda a: (_ for _ in ()).throw(ElevationDeclined("declined")), None, None)
+        check("declined consent is a named ElevationDeclined", kind == "ElevationDeclined")
+        kind, val = _relaunch_case(
+            lambda a: (_ for _ in ()).throw(ElevationFailed("ShellExecuteExW failed (Win32 error 5)")),
+            None, None)
+        check("other shell errors are named ElevationFailed",
+              kind == "ElevationFailed" and "Win32 error 5" in val)
+        _closed.clear()
+        kind, val = _relaunch_case(lambda a: None, lambda h, ms: WAIT_OBJECT_0, lambda h: 0)
+        check("a missing process handle fails by name",
+              kind == "ElevationFailed" and "no process handle" in val and _closed == [])
+        _closed.clear(); _terminated.clear()
+        kind, val = _relaunch_case(lambda a: 42, lambda h, ms: WAIT_FAILED, lambda h: 0)
+        check("a wait failure terminates, closes, and fails by name",
+              kind == "ElevationFailed" and _terminated == [42] and _closed == [42])
+        _closed.clear(); _terminated.clear()
+        globals()["_shell_execute_runas"] = lambda a: 43
+        globals()["_wait_process"] = lambda h, ms: WAIT_TIMEOUT
+        globals()["_process_exit_code"] = lambda h: 0
+        globals()["_close_handle"] = lambda h: _closed.append(h)
+        globals()["_terminate_process"] = lambda h: _terminated.append(h)
+        # timeout=0 expires the bound before any wait, so the stubbed WAIT_TIMEOUT loop cannot spin for the real bound.
+        try:
+            kind, val = ("rc", relaunch_elevated(["--visible"], timeout=0.0))
+        except ElevationFailed as exc:
+            kind, val = ("ElevationFailed", str(exc))
+        check("an expired wait terminates, closes, and fails by name",
+              kind == "ElevationFailed" and "did not finish" in val
+              and _terminated == [43] and _closed == [43])
+
+        def _interrupt(h, ms):
+            raise KeyboardInterrupt
+        _closed.clear(); _terminated.clear()
+        globals()["_shell_execute_runas"] = lambda a: 44
+        globals()["_wait_process"] = _interrupt
+        globals()["_close_handle"] = lambda h: _closed.append(h)
+        globals()["_terminate_process"] = lambda h: _terminated.append(h)
+        try:
+            relaunch_elevated(["--visible"])
+            kind = "rc"
+        except ElevationFailed:
+            kind = "ElevationFailed"
+        check("an interrupted wait terminates, closes, and fails by name",
+              kind == "ElevationFailed" and _terminated == [44] and _closed == [44])
+        kind, val = _relaunch_case(lambda a: 45, lambda h, ms: WAIT_OBJECT_0, lambda h: None)
+        check("an exit-code failure fails by name",
+              kind == "ElevationFailed" and "GetExitCodeProcess" in val)
+
+        # main() branches through the production entry point.
+        import io as _io
+        from contextlib import redirect_stdout as _redir
+        globals()["last_input_tick"] = lambda: 100
+        globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            launched = []
+            globals()["real_tools"] = lambda only=None, flavor="Release": launched.append(1) or []
+            globals()["is_elevated"] = lambda: False
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevated-child", "--tools", "RegStudio"])
+            report = (Path(td) / "smoke" / "smoke-report.md").read_text(encoding="utf-8")
+            check("unelevated child refuses by name, launches nothing, exits 2",
+                  rc == 2 and not launched and "without elevation" in report
+                  and report.count("| RegStudio |") == 5)
+            globals()["is_elevated"] = lambda: None
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevate", "--tools", "RegStudio"])
+            check("an unverifiable token refuses by name and exits 2",
+                  rc == 2 and "could not be verified" in buf.getvalue())
+            # Exit-code forwarding preserves the child's report byte-for-byte.
+            globals()["is_elevated"] = lambda: False
+            sentinel = Path(td) / "smoke" / "smoke-report.md"
+            sentinel.parent.mkdir(parents=True, exist_ok=True)
+            sentinel.write_text("child report sentinel", encoding="utf-8")
+            for want in (0, 1, 2):
+                globals()["relaunch_elevated"] = (lambda w: lambda argv: w)(want)
+                buf = _io.StringIO()
+                with _redir(buf):
+                    rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+                if not (rc == want and sentinel.read_text(encoding="utf-8") == "child report sentinel"):
+                    break
+            check("child exit codes 0, 1, 2 forward and preserve its report",
+                  rc == 2 and sentinel.read_text(encoding="utf-8") == "child report sentinel")
+            # Declined consent through main(): blocked rows, exit 2.
+            def _decline(argv):
+                raise ElevationDeclined("elevation consent declined at the runas prompt")
+            globals()["relaunch_elevated"] = _decline
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+            report = sentinel.read_text(encoding="utf-8")
+            check("declined consent records blocked naming the decline, exit 2",
+                  rc == 2 and "consent declined" in report and "| RegStudio | start | blocked |" in report)
+            # Already elevated: no relaunch, the normal driver path completes.
+            globals()["is_elevated"] = lambda: True
+            globals()["relaunch_elevated"] = lambda argv: 99
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+            check("already-elevated runs the driver inline without relaunching",
+                  rc == 0 and "Suite verdict" in (Path(td) / "smoke" / "smoke-report.md").read_text(encoding="utf-8"))
+    finally:
+        globals().update(_elev_saved)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
