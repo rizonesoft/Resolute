@@ -108,3 +108,47 @@ No files modified. Full self-tests were not rerun.
 
 HIGHEST: P3
 OVERALL: needs-attention
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T05:55:32Z
+- Candidate: d887fe141638839f534433c894d69157c08338fe
+- Effort: medium
+- Writer model: muse-wonder-full-1.0
+- Policy: ea21439b7f1f676fd5ea7dfd65500ceec62d1d67
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 28
+- Digest: 31d7c5ae0eabc274
+
+The candidate has **in-scope gaps in reporting and regression coverage**. HEAD matches `d887fe14`; the worktree is clean. Review was read-only, including a PowerShell filtering probe. Builds and file-writing self-tests were not rerun.
+
+**Part 1: completeness per need**
+
+| Developer need | Assessment |
+| --- | --- |
+| Run conformance through the combined gate | **Present:** [check-all.ps1:190](D:/GitHub/Resolute/scripts/check-all.ps1:190). |
+| Inspect the matrix, owners, sizes and budgets | **Present in the log:** [conformance-check.py:708](D:/GitHub/Resolute/scripts/conformance-check.py:708). Discoverability gap below. |
+| Enforce inventory, layout, dependencies and duplicate subjects | **Present within the validated scope:** [conformance-check.py:586](D:/GitHub/Resolute/scripts/conformance-check.py:586). |
+| Bind analysis to the built candidate | **Present:** [tidy-ratchet.py:610](D:/GitHub/Resolute/scripts/tidy-ratchet.py:610), [conformance-check.py:438](D:/GitHub/Resolute/scripts/conformance-check.py:438). |
+| Receive advisory findings when running the combined gate | **Missing-in-scope:** its detail filter retains only the aggregate summary. C22 advisory FAIL disappears from terminal output, and passing gates provide no report link. [check-all.ps1:191](D:/GitHub/Resolute/scripts/check-all.ps1:191). |
+| Prove remaining runtime clauses | **Missing-out-of-scope:** explicitly deferred to their owners by the [Validated block](D:/GitHub/Resolute/todo/07-quality/TODO-01-quality-bar.md:150). |
+| Check two-clean-build reproducibility | **Present:** [conformance-check.py:789](D:/GitHub/Resolute/scripts/conformance-check.py:789). Cross-machine reproducibility remains outside this checkpoint. |
+
+**Part 2: excellence against the profile-check predecessor**
+
+- **Failure quality, in scope:** advisory failure reporting stops at the Python process boundary. A read-only probe of the actual PowerShell filter retained “0 failing, 44 not yet evaluable” and discarded C22’s advisory FAIL. Surface advisory failures without changing their nonblocking status, and print the full-report path.
+- **Test quality, in scope:** [the advisory test](D:/GitHub/Resolute/scripts/conformance-check.py:1204) captures Python output only, missing that wrapper defect. Also, [the moved-owner test](D:/GitHub/Resolute/scripts/conformance-check.py:1218) checks the resolver cache but never renders the matrix. Repair2’s plan explicitly required resolver-to-renderer coverage; removing destination rendering would leave this test green.
+- **Speed, out of scope:** C24 still rehashes common inputs and recounts the same log per tool ([line 488](D:/GitHub/Resolute/scripts/conformance-check.py:488)). This previously declined optimization remains nonblocking; no measured slowdown is claimed.
+- **Evidence binding:** no additional shortfall established. The difference from `0e4f5966` is confined to ratchet fixtures and the review record, so it does not itself invalidate the supplied build evidence.
+
+**Consolidated gap list**
+
+1. **In scope:** expose advisory failures and the report location in successful combined-gate output; cover that wrapper behavior.
+2. **In scope:** extend the moved-owner regression test through actual matrix rendering.
+3. **Out of scope, nonblocking:** avoid repeated common-evidence validation.
+
+COMPLETION: gaps
