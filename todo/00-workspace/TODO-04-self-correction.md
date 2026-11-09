@@ -96,6 +96,7 @@ track: W1
 |  42   |   §42   | Campaign guard recovery completeness           | §40, §41 |  [ ]   |
 |  43   |   §43   | Sonnet delegates under one lead                | §27 |  [ ]   |
 |  44   |   §44   | Review-order skills match the dispatcher       | --           |  [ ]   |
+|  45   |   §45   | Skill numbering and stamp separator follow-ups | §44          |  [ ]   |
 
 ---
 
@@ -1849,6 +1850,18 @@ Operator decision 2026-10-01 (**updated 2026-10-17:** subagents read and run, th
 
 **Test checkpoint:** `grep` over the twelve skill files (four skills in three directories) shows no instruction to run completion before rounds, and a positive readback of every corrected passage, the `AGENTS.md` statement, and the stamp template completion line is quoted, `python scripts/review-dispatch.py --check-pin` ok, `python -m unittest discover -s scripts/tests` green, and a dry reading of one full cycle (plan, round, completion, repair) against the rewritten steps names no step the dispatcher would refuse.
 
+
+## 45. Skill Numbering and Stamp Separator Follow-Ups
+
+**Filed 2026-11-09** from the `D00 T04 §44` review (round 3, both findings `P3`, in `docs/reviews/00-workspace/D00-T04-s44.md`). Two wording defects survive §44 because fixing them after its clean terminal round would change its candidate: the review skill's numbered workflow places completion at step 3 and rounds at step 4 while execution runs rounds first and completion last, and the stamp template §44 added carries a literal `\\u00b7` escape that Markdown renders as text instead of a separator.
+
+- [ ] Renumber or reorder `.agents/skills/review-todo-section/SKILL.md` steps 3 and 4 and their `.claude/` and `.codex/` mirrors so the numbering matches execution (rounds, then completion), updating every cross-reference to those step numbers in all four review skills and their mirrors. Done when: a sequential reading of the workflow dispatches in the order it reads, and no cross-reference names the old step for the wrong pass. Cheaper substitute that fails the checkpoint: renaming one mirror only, which leaves two agent families reading crossed references.
+- [ ] Replace the literal `\\u00b7` in the stamp template's completion line in `.agents/skills/review-todo-section/SKILL.md` and its mirrors with the intended separator character. Done when: the rendered template shows the separator, and a worked stamp copied from the template carries no escape text. Cheaper substitute that fails the checkpoint: leaving the escape, which every later stamp copies verbatim.
+- [ ] Commit: `"workspace: skill numbering matches execution order"`
+
+-> SOURCE: review-2026-11-09-d00-t04-s44-round3 (P3 numbering order, P3 stamp separator)
+
+**Test checkpoint:** `grep` over the twelve skill files shows no stale step cross-reference and no literal `\\u00b7` in the stamp template (quoted), the three mirrors of each touched skill stay byte-identical, `python scripts/review-dispatch.py --check-pin` ok, and `python -m unittest discover -s scripts/tests` green.
 
 ## Verification
 
