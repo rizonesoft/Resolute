@@ -1152,7 +1152,7 @@ class RepositoryPin(unittest.TestCase):
                                        "gemini": ["astra"], "muse": ["astra"], "meta": ["astra"]})
         schedule = pin["schedule"]
         self.assertEqual(schedule["completion_order"], "last")
-        self.assertEqual(schedule["max_low_rounds"], 8)
+        self.assertEqual(schedule["max_low_rounds"], 32)
         self.assertEqual(schedule["plan"], {"effort": "medium", "lenses": ["plan"]})
         self.assertEqual(schedule["completion"], {"effort": "medium"})
         self.assertEqual(schedule["rounds"], [{"effort": "medium", "lenses": ["adversarial"]}])

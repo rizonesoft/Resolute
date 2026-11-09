@@ -1,5 +1,6 @@
 # One writer and one reviewer per section. Historical receipts replay their original pin.
 # Steward operator 2026-11-06 (published JMR policy parity): plan medium, adversarial medium, up to eight low rounds,
+# raised to thirty-two low rounds (cap 33) by operator decision 2026-11-09 for continuity with the other repositories.
 # completion medium last. Codex is reviewed by Argon; other writers by Astra. Claude is never a reviewer.
 schema_version = 1
 
@@ -22,7 +23,7 @@ meta = ["astra"]
 
 [schedule]
 completion_order = "last"
-max_low_rounds = 8
+max_low_rounds = 32
 severity_stop_after = 0
 
 [schedule.plan]
