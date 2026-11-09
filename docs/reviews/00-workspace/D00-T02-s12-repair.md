@@ -206,3 +206,5 @@ The candidate still has in-scope gaps. Review was read-only; the fence-inventory
 - **out-of-scope, already assigned: Live AutoIt behavioral parity.** This section has no AutoIt counterpart and cannot establish 1:1 effects parity. The agreed elevated pair remains owned by `D03 T02 §7`; this review does not reopen that deferral.
 
 COMPLETION: gaps
+
+- Implemented: the repair completion gaps in the second repair cycle `docs/reviews/00-workspace/D00-T02-s12-repair2.md`, implementation a8aa85fd (control-level rectangles with real glyph drills, local-paper glyph and border contrast with palette corrections, DLL-directory hook fallback, exact sidecar launch context and inventory). Default suite 120/120; pair 18 regions, 0 divergences.
