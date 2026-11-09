@@ -33,25 +33,53 @@ bool AdoptionIntentMarked() {
 }
 
 // The failure marker: a small file in the temp directory naming which step
-// failed, so the guard can void the case's proof by name at its end.
-void WriteFailureMarker(const wchar_t* kind) {
+// failed, so the guard can void the case's proof by name at its end. When
+// the temp file cannot be written, a current-directory file is tried, and
+// when that fails too, a named mutex the guard probes: three destinations,
+// so no single filesystem failure silences the channel. Every write checks
+// its byte count; a short write moves to the next destination.
+HANDLE g_failMutex = nullptr;
+
+bool WriteMarkerFile(const wchar_t* dir, const wchar_t* kind) {
     wchar_t path[MAX_PATH];
-    if (!GetTempPathW(MAX_PATH, path)) return;
+    lstrcpynW(path, dir, MAX_PATH);
     wchar_t name[96];
     wsprintfW(name, L"%s%lu.txt", kFocusHookFailPrefix, GetCurrentProcessId());
     lstrcatW(path, name);
     HANDLE file = CreateFileW(path, GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-    if (file == INVALID_HANDLE_VALUE) return;
+    if (file == INVALID_HANDLE_VALUE) return false;
     char buf[16];
     int n = 0;
     for (const wchar_t* c = kind; *c; ++c) buf[n++] = static_cast<char>(*c);
     buf[n++] = '\n';
     DWORD written = 0;
-    WriteFile(file, buf, static_cast<DWORD>(n), &written, nullptr);
+    const bool ok = WriteFile(file, buf, static_cast<DWORD>(n), &written, nullptr) && written == static_cast<DWORD>(n);
     CloseHandle(file);
+    return ok;
+}
+
+void WriteFailureMarker(const wchar_t* kind) {
+    wchar_t dir[MAX_PATH];
+    if (GetTempPathW(MAX_PATH, dir) && WriteMarkerFile(dir, kind)) return;
+    if (GetCurrentDirectoryW(MAX_PATH, dir)) {
+        lstrcatW(dir, L"\\");
+        if (WriteMarkerFile(dir, kind)) return;
+    }
+    wchar_t name[96];
+    wsprintfW(name, L"%s%lu", kFocusHookFailMutex, GetCurrentProcessId());
+    g_failMutex = CreateMutexW(nullptr, TRUE, name);
 }
 
 }  // namespace
+
+// Test support: releases the failure mutex so a drill that forced the
+// third destination can clean up inside its own case.
+extern "C" __declspec(dllexport) void ResoluteFocusHookReleaseFailureMutex() {
+    if (g_failMutex) {
+        CloseHandle(g_failMutex);
+        g_failMutex = nullptr;
+    }
+}
 
 extern "C" __declspec(dllexport) void CALLBACK ResoluteFocusHook(HWINEVENTHOOK, DWORD event, HWND hwnd, LONG idObject,
                                                                  LONG idChild, DWORD, DWORD) {

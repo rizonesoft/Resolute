@@ -332,10 +332,28 @@ void WriteIntentFile(DWORD pid) {
 std::vector<std::string> HookFailures(const std::vector<DWORD>& pids) {
     std::vector<std::string> out;
     for (DWORD pid : pids) {
-        const std::wstring path = TempPathFor(kFocusHookFailPrefix, pid);
+        const std::wstring mutexName = std::wstring(kFocusHookFailMutex) + std::to_wstring(pid);
+        if (HANDLE mutex = OpenMutexW(SYNCHRONIZE, FALSE, mutexName.c_str())) {
+            CloseHandle(mutex);
+            out.push_back("the focus hook in process " + std::to_string(pid) +
+                          " could not write its failure marker to either file destination (mutex failure): its records "
+                          "cannot be judged");
+            continue;
+        }
+        std::wstring path = TempPathFor(kFocusHookFailPrefix, pid);
+        if (GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES) {
+            wchar_t cwd[MAX_PATH];
+            if (GetCurrentDirectoryW(MAX_PATH, cwd))
+                path = std::wstring(cwd) + L"\\" + kFocusHookFailPrefix + std::to_wstring(pid) + L".txt";
+        }
         HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
                                   FILE_ATTRIBUTE_NORMAL, nullptr);
-        if (file == INVALID_HANDLE_VALUE) continue;
+        if (file == INVALID_HANDLE_VALUE) {
+            if (GetFileAttributesW(path.c_str()) != INVALID_FILE_ATTRIBUTES)
+                out.push_back("the focus hook failure marker for process " + std::to_string(pid) +
+                              " exists but is unreadable: its records cannot be judged");
+            continue;
+        }
         char buf[32] = {};
         DWORD read = 0;
         ReadFile(file, buf, sizeof(buf) - 1, &read, nullptr);
@@ -469,6 +487,9 @@ public:
         }
         for (DWORD pid : adoptedSnapshot) {
             DeleteFileW(TempPathFor(kFocusHookFailPrefix, pid).c_str());
+            wchar_t cwd[MAX_PATH];
+            if (GetCurrentDirectoryW(MAX_PATH, cwd))
+                DeleteFileW((std::wstring(cwd) + L"\\" + kFocusHookFailPrefix + std::to_wstring(pid) + L".txt").c_str());
             if (pid != GetCurrentProcessId()) DeleteFileW(TempPathFor(kFocusHookIntentPrefix, pid).c_str());
         }
         if (g_lost > 0) {

@@ -114,3 +114,38 @@ TEST_CASE("A dropped event among delivered ones still marks the failure", "[focu
     REQUIRE(marked);
     CHECK(failures.size() == 1);
 }
+
+TEST_CASE("When both marker files are blocked the mutex carries the failure", "[focus-hook]") {
+    HookProc hook = LoadHook();
+    REQUIRE(hook != nullptr);
+    using ReleaseProc = void (*)();
+    ReleaseProc release = nullptr;
+    {
+        wchar_t exe[MAX_PATH];
+        GetModuleFileNameW(nullptr, exe, MAX_PATH);
+        const std::filesystem::path dll = std::filesystem::path(exe).parent_path() / "resolute_focus_hook.dll";
+        release = reinterpret_cast<ReleaseProc>(GetProcAddress(LoadLibraryW(dll.c_str()), "ResoluteFocusHookReleaseFailureMutex"));
+    }
+    REQUIRE(release != nullptr);
+    SetEnvironmentVariableW(kFocusHookAdoptEnv, L"1");
+    ClearMarker();
+    // Block the temp destination and the current-directory destination with
+    // directories of the marker's name: neither file can be created.
+    const std::filesystem::path tempBlock = MarkerPath();
+    wchar_t cwd[MAX_PATH];
+    GetCurrentDirectoryW(MAX_PATH, cwd);
+    const std::filesystem::path cwdBlock =
+        std::filesystem::path(cwd) / (std::wstring(kFocusHookFailPrefix) + std::to_wstring(GetCurrentProcessId()) + L".txt");
+    std::filesystem::create_directory(tempBlock);
+    std::filesystem::create_directory(cwdBlock);
+    uitest::HiddenHost host(L"FocusHookDrill");
+    REQUIRE(host.hwnd != nullptr);
+    hook(nullptr, EVENT_SYSTEM_FOREGROUND, host.hwnd, OBJID_WINDOW, CHILDID_SELF, 0, 0);
+    const auto failures = focusguard::HookFailures({GetCurrentProcessId()});
+    release();
+    std::filesystem::remove(tempBlock);
+    std::filesystem::remove(cwdBlock);
+    SetEnvironmentVariableW(kFocusHookAdoptEnv, nullptr);
+    REQUIRE(failures.size() == 1);
+    CHECK(failures[0].find("mutex") != std::string::npos);
+}

@@ -261,6 +261,8 @@ $appearanceLine = if ($Appearance) {
     "capture       : $(Split-Path $Out -Leaf)"
     "describes     : $Describes"
     "window title  : $($target.MainWindowTitle)"
+    "target process: $($target.Id) $(if ($target.Path) { $target.Path } else { '(path unavailable)' })"
+    "attached      : $(if ($ours) { 'started by this invocation' } else { 'attached to a process the caller started and owns' })"
     "source binary : $sourcePath"
     "file version  : $(if ($sourcePath -and (Test-Path $sourcePath)) { (Get-Item $sourcePath).VersionInfo.FileVersion } else { 'unknown' })"
     "size          : $width x $height px"

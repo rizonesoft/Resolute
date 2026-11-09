@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -48,36 +49,125 @@ inline bool LoadPng(const std::filesystem::path& path, Image& img) {
 struct Spec {
     std::vector<RegionSpec> regions;
     EquivalenceMap equivalents;
+    std::vector<std::string> errors;  // file:line diagnostics; empty only when usable
 };
 
-inline Spec LoadSpec() {
+// Parses one spec stream, validating semantically: field counts, finite
+// numbers, bounds inside [0,1] and ordered, known kinds, unique names,
+// non-negative floors. Every rejection names the source and line, so an
+// authoring error fails loudly instead of silently dropping a check.
+inline Spec ParseSpec(std::istream& in, const std::string& source) {
     Spec out;
-    std::ifstream in(std::filesystem::path(RESOLUTE_SOURCE_ROOT) / "tests" / "visual_pair_spec.txt");
+    auto fail = [&](int line, const std::string& what) {
+        out.errors.push_back(source + ":" + std::to_string(line) + ": " + what);
+    };
     std::string line;
+    int lineno = 0;
     while (std::getline(in, line)) {
+        ++lineno;
         if (line.empty() || line[0] == '#') continue;
         std::vector<std::string> f;
         std::stringstream ss(line);
         std::string cell;
         while (std::getline(ss, cell, '|')) f.push_back(cell);
-        if (f.size() >= 2 && f[0] == "equiv") {
-            out.equivalents[f[1]] = f[2];
-        } else if (f.size() >= 11 && f[0] == "region") {
-            RegionSpec r;
-            r.name = f[1];
-            r.label = f[2];
-            r.value = f[3];
-            r.x0 = std::stod(f[4]);
-            r.y0 = std::stod(f[5]);
-            r.x1 = std::stod(f[6]);
-            r.y1 = std::stod(f[7]);
-            r.minPainted = std::stod(f[8]);
-            r.minDetail = std::stod(f[9]);
-            r.text = f[10] == "text";
-            out.regions.push_back(r);
+        if (f.empty()) continue;
+        if (f[0] == "equiv") {
+            if (f.size() != 3) {
+                fail(lineno, "equiv needs exactly 3 fields");
+            } else if (f[1].empty() || f[2].empty()) {
+                fail(lineno, "equiv label and region must not be empty");
+            } else {
+                out.equivalents[f[1]] = f[2];
+            }
+            continue;
         }
+        if (f[0] != "region") {
+            fail(lineno, "unknown line kind '" + f[0] + "'");
+            continue;
+        }
+        if (f.size() != 14) {
+            fail(lineno, "region needs exactly 14 fields, found " + std::to_string(f.size()));
+            continue;
+        }
+        RegionSpec r;
+        r.name = f[1];
+        r.label = f[2];
+        r.value = f[3];
+        double nums[6] = {};
+        bool badNumber = false;
+        for (int i = 0; i < 6; ++i) {
+            try {
+                size_t used = 0;
+                nums[i] = std::stod(f[4 + i], &used);
+                if (used != f[4 + i].size() || !std::isfinite(nums[i])) badNumber = true;
+            } catch (...) {
+                badNumber = true;
+            }
+        }
+        if (badNumber) {
+            fail(lineno, "region '" + r.name + "' has an unparsable or non-finite number");
+            continue;
+        }
+        r.x0 = nums[0];
+        r.y0 = nums[1];
+        r.x1 = nums[2];
+        r.y1 = nums[3];
+        r.minPainted = nums[4];
+        r.minDetail = nums[5];
+        if (r.x0 < 0 || r.y0 < 0 || r.x1 > 1 || r.y1 > 1 || r.x0 >= r.x1 || r.y0 >= r.y1) {
+            fail(lineno, "region '" + r.name + "' bounds are outside [0,1] or reversed");
+            continue;
+        }
+        if (r.minPainted < 0 || r.minDetail < 0) {
+            fail(lineno, "region '" + r.name + "' has a negative floor");
+            continue;
+        }
+        if (f[10] != "text" && f[10] != "element") {
+            fail(lineno, "region '" + r.name + "' kind must be text or element");
+            continue;
+        }
+        r.text = f[10] == "text";
+        try {
+            r.maxEdge = std::stod(f[11]);
+            r.maxMoved = std::stod(f[12]);
+        } catch (...) {
+            fail(lineno, "region '" + r.name + "' has an unparsable tolerance");
+            continue;
+        }
+        if (f[13] != "check" && f[13] != "skip") {
+            fail(lineno, "region '" + r.name + "' contrast must be check or skip");
+            continue;
+        }
+        r.checkContrast = f[13] == "check";
+        if (r.name.empty()) {
+            fail(lineno, "region name must not be empty");
+            continue;
+        }
+        bool duplicate = false;
+        for (const RegionSpec& other : out.regions)
+            if (other.name == r.name) duplicate = true;
+        if (duplicate) {
+            fail(lineno, "duplicate region '" + r.name + "'");
+            continue;
+        }
+        out.regions.push_back(r);
     }
+    if (out.regions.empty() && out.errors.empty()) fail(0, "spec has no regions");
     return out;
+}
+
+inline Spec LoadSpecFrom(const std::filesystem::path& path) {
+    std::ifstream in(path);
+    if (!in) {
+        Spec out;
+        out.errors.push_back(path.string() + ":0: spec file is unreadable");
+        return out;
+    }
+    return ParseSpec(in, path.string());
+}
+
+inline Spec LoadSpec() {
+    return LoadSpecFrom(std::filesystem::path(RESOLUTE_SOURCE_ROOT) / "tests" / "visual_pair_spec.txt");
 }
 
 inline std::vector<Observed> MeasureAll(const Image& img, const std::vector<RegionSpec>& regions) {

@@ -1,6 +1,8 @@
 capture       : 2026-11-09-D00-T02-s10-launcher-dark-150.png
 describes     : the launcher at startup, dark, 150 percent (D00 T02 section 10)
 window title  : Resolute
+target process: 13800 D:\GitHub\Resolute\Bin\Debug\Resolute.exe
+attached      : attached to a process the caller started and owns
 source binary : D:\GitHub\Resolute\Bin\Debug\Resolute.exe
 file version  : 0.1.0.0
 size          : 1082 x 711 px
@@ -8,13 +10,13 @@ monitor dpi   : 144  (150% scaling) -- what the image was rendered at
 window dpi    : 144  (logical dpi the process sees)
 dpi aware     : True
 appearance    : dark  (stated by the caller)
-fixture       : none stated
+fixture       : launcher at startup; System/*.exe beside the launcher scanned for RESEXT resources; appearance dark set by 1 theme-command press(es) from System
 launch args   : attached to a running process
 working dir   : (default)
 locale        : en-ZA / UI en-US
 geometry      : 49,40 1082x711
 exe sha256    : 8627407B2D59197020B78C22A37C645EEB9C784D2EE02B8A1D199FA33B2B62C8
-source revision: 68f807e4d7282b38d8395befd30b3d120a65a7b1
+source revision: 1ae04ea636b139c01d04d1cb8f1b727626b2c9c0
 windows build : 10.0.26300.0
 captured      : 2026-11-09
 

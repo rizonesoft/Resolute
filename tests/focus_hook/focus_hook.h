@@ -28,6 +28,7 @@ struct FocusHookSinkBlock {
 inline constexpr const wchar_t* kFocusHookAdoptEnv = L"RESOLUTE_FOCUS_HOOK_ADOPTED";
 inline constexpr const wchar_t* kFocusHookIntentPrefix = L"ResoluteFocusHookIntent-";
 inline constexpr const wchar_t* kFocusHookFailPrefix = L"ResoluteFocusHookFail-";
+inline constexpr const wchar_t* kFocusHookFailMutex = L"Local\\ResoluteFocusHookFail-";
 
 // WM_COPYDATA's dwData, so the sink accepts nothing else.
 inline constexpr ULONG_PTR kFocusHookMagic = 0x52465347;  // "RFSG"

@@ -21,6 +21,7 @@
 #include <atomic>
 #include <cstdio>
 #include <filesystem>
+#include <map>
 #include <string>
 #include <thread>
 #include <vector>
@@ -355,7 +356,8 @@ bool TakeForeground(HWND hwnd) {
 // Starts the launcher, puts it on the monitor at `dpi` in the appearance
 // asked for, and captures it with scripts/capture-window.ps1 into the
 // appearance-by-DPI matrix (D00 T02 §9's convention, first instance).
-std::filesystem::path CaptureLauncher(const char* mode, UINT dpi, const char* stem = nullptr) {
+std::filesystem::path CaptureLauncher(const char* mode, UINT dpi, const char* stem = nullptr,
+                                      std::map<std::string, bool>* clippedByRegion = nullptr) {
     HMONITOR monitor = focusguard::MonitorWithDpi(dpi);
     if (!monitor) {
         const std::string why = "hardware absent: no monitor at " + std::to_string(dpi) + " DPI; re-probed each night";
@@ -397,6 +399,36 @@ std::filesystem::path CaptureLauncher(const char* mode, UINT dpi, const char* st
     // Checked again before the foreground is taken: never take it from an
     // operator who is back.
     RESOLUTE_HEADFUL_CHECK_INPUT();
+    if (clippedByRegion) {
+        // The four panes by control id (src/main.cpp): a pane extending
+        // beyond the client area clips its region in the capture.
+        RECT client{};
+        GetClientRect(main, &client);
+        struct PaneProbe {
+            HWND main;
+            LONG right, bottom;
+            std::map<std::string, bool>* out;
+        } probe{main, client.right, client.bottom, clippedByRegion};
+        EnumChildWindows(
+            main,
+            [](HWND child, LPARAM lp) -> BOOL {
+                auto* probe = reinterpret_cast<PaneProbe*>(lp);
+                const int id = GetDlgCtrlID(child);
+                const char* region = id == 100 ? "toolbar" : id == 101 ? "sidebar" : id == 102 ? "tool-list"
+                                     : id == 103 ? "status-bar"
+                                                 : nullptr;
+                if (!region) return TRUE;
+                RECT pane{};
+                GetWindowRect(child, &pane);
+                POINT origin{0, 0};
+                ClientToScreen(probe->main, &origin);
+                const bool clipped = pane.left < origin.x || pane.top < origin.y ||
+                                     pane.right > origin.x + probe->right || pane.bottom > origin.y + probe->bottom;
+                (*probe->out)[region] = clipped;
+                return TRUE;
+            },
+            reinterpret_cast<LPARAM>(&probe));
+    }
     const bool foreground = TakeForeground(main);
     WaitOrStandDown([] { return false; }, 500);
     RESOLUTE_HEADFUL_CHECK_INPUT();
@@ -419,11 +451,14 @@ std::filesystem::path CaptureLauncher(const char* mode, UINT dpi, const char* st
     std::filesystem::create_directories(out.parent_path(), made);
     // The capture script, started directly rather than through a shell.
     const std::filesystem::path script = std::filesystem::path(RESOLUTE_SOURCE_ROOT) / "scripts" / "capture-window.ps1";
+    const std::wstring fixture = L"launcher at startup; System/*.exe beside the launcher scanned for RESEXT resources; appearance " +
+                                 std::filesystem::path(mode).wstring() + L" set by " + std::to_wstring(presses) +
+                                 L" theme-command press(es) from System";
     std::wstring ps = L"pwsh -NoProfile -File \"" + script.wstring() + L"\" -ProcessId " +
                       std::to_wstring(pi.dwProcessId) + L" -Appearance " + std::filesystem::path(mode).wstring() +
                       L" -Out \"" + out.wstring() + L"\" -Describes \"the launcher at startup, " +
                       std::filesystem::path(mode).wstring() + L", " + std::to_wstring(pct) +
-                      L" percent (D00 T02 section 10)\" -Fixture \"launcher at startup, extensions scanned\"";
+                      L" percent (D00 T02 section 10)\" -Fixture \"" + fixture + L"\"";
     STARTUPINFOW psi{};
     psi.cb = sizeof(psi);
     Child capture;
@@ -540,7 +575,10 @@ TEST_CASE("Launcher pair at 150 percent compares against the composed baseline",
     // (the composed baseline: production rasterization, whole window,
     // launcher at startup). The AutoIt half runs with the deferred pair in
     // D03 T02 section 7, which needs an elevated session.
-    const std::filesystem::path out = CaptureLauncher("light", 144, "pair-launcher-light-150");
+    std::map<std::string, bool> clippedByRegion;
+    const std::filesystem::path out = CaptureLauncher("light", 144, "pair-launcher-light-150", &clippedByRegion);
+    INFO("the four panes must be extractable from the running launcher");
+    REQUIRE(clippedByRegion.size() == 4);
     std::filesystem::path sidecar = out;
     sidecar.replace_extension(".txt");
     REQUIRE(std::filesystem::exists(sidecar));
@@ -548,6 +586,10 @@ TEST_CASE("Launcher pair at 150 percent compares against the composed baseline",
     const std::string sidecarText((std::istreambuf_iterator<char>(sin)), std::istreambuf_iterator<char>());
     INFO("the pair capture must be measured at 144 DPI on its declared monitor");
     CHECK(sidecarText.find("monitor dpi   : 144") != std::string::npos);
+    INFO("the sidecar fixture must state contents, not placeholders");
+    CHECK(sidecarText.find("System/*.exe") != std::string::npos);
+    CHECK(sidecarText.find("theme-command") != std::string::npos);
+    CHECK(sidecarText.find("none stated") == std::string::npos);
     CHECK(sidecarText.find("fixture") != std::string::npos);
     CHECK(sidecarText.find("launch args") != std::string::npos);
     CHECK(sidecarText.find("locale") != std::string::npos);
@@ -555,15 +597,23 @@ TEST_CASE("Launcher pair at 150 percent compares against the composed baseline",
     CHECK(sidecarText.find("source revision") != std::string::npos);
 
     const visualpair::Spec spec = visualpair::LoadSpec();
+    REQUIRE(spec.errors.empty());
     visualpair::Image baseline;
     REQUIRE(visualpair::LoadPng(visualpair::Baseline150(), baseline));
     const auto baselineObserved = visualpair::MeasureAll(baseline, spec.regions);
-    REQUIRE(visualpair::Compare(spec.regions, baselineObserved, spec.equivalents, {}).empty());
+    REQUIRE(visualpair::ComparePair(spec.regions, baseline, baseline, baselineObserved, baselineObserved,
+                                    spec.equivalents)
+                .empty());
 
     visualpair::Image fresh;
     REQUIRE(visualpair::LoadPng(out, fresh));
+    auto freshObserved = visualpair::MeasureAll(fresh, spec.regions);
+    for (auto& o : freshObserved) {
+        auto it = clippedByRegion.find(o.name);
+        if (it != clippedByRegion.end() && it->second) o.clipped = true;
+    }
     const auto failures =
-        visualpair::Compare(spec.regions, visualpair::MeasureAll(fresh, spec.regions), spec.equivalents, {"dpi"});
+        visualpair::ComparePair(spec.regions, baseline, fresh, baselineObserved, freshObserved, spec.equivalents);
     std::printf("visual pair: %zu regions, %zu divergence(s)\n", spec.regions.size(), failures.size());
     for (const auto& f : failures) std::printf("visual pair divergence: %s\n", f.c_str());
     std::fflush(stdout);
