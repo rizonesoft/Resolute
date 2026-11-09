@@ -1335,6 +1335,27 @@ def self_test() -> int:
 
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
+    def build_record_rejects_swapped_db():
+        tmp = Path(tempfile.mkdtemp())
+        scratch_dirs.append(tmp)
+        (tmp / "build" / "release").mkdir(parents=True)
+        (tmp / "build" / "logs").mkdir(parents=True)
+        db = tmp / "build" / "release" / "compile_commands.json"
+        db.write_text(json.dumps([{"file": "only.cpp", "directory": str(tmp), "command": "cc only.cpp"}]))
+        (tmp / "build" / "release" / "build.ninja").write_text(
+            "build a.obj: CXX_COMPILER__x a.cpp\nbuild b.obj: CXX_COMPILER__x b.cpp\n"
+        )
+        (tmp / "Bin" / "Release").mkdir(parents=True)
+        rc = main([
+            "--root", str(tmp),
+            "--write-build-record", str(tmp / "build" / "logs" / "build-record.json"),
+            "--build-config", "Release", "--build-targets", "Resolute",
+        ])
+        assert rc == 1, f"swapped database was recorded (rc={rc})"
+        assert not (tmp / "build" / "logs" / "build-record.json").exists()
+
+    case("build record refuses a database the build never used", build_record_rejects_swapped_db)
+
     if failures:
         for f in failures:
             print(f"tidy-ratchet self-test FAIL: {f}")
@@ -1387,11 +1408,45 @@ def main(argv=None) -> int:
         import hashlib as _hl2
 
         dbs = {}
-        for db in [root / "build" / "release" / "compile_commands.json"] + sorted(
-            (root / "extensions").glob("*/build/Release/compile_commands.json")
-        ) if (root / "extensions").is_dir() else [root / "build" / "release" / "compile_commands.json"]:
-            if db.is_file():
-                dbs[db.relative_to(root).as_posix()] = _hl2.sha256(db.read_bytes()).hexdigest()
+        db_files = [root / "build" / "release" / "compile_commands.json"]
+        if (root / "extensions").is_dir():
+            db_files += sorted((root / "extensions").glob("*/build/Release/compile_commands.json"))
+        for db in db_files:
+            if not db.is_file():
+                continue
+            # The database must describe the build that just ran:
+            # its translation units are exactly the C++ sources the
+            # sibling build.ninja compiled. A database swapped in
+            # after compilation (reduced or fabricated) disagrees
+            # with the ninja graph and is refused here, at the only
+            # moment both are at hand (repair round 1).
+            import json as _js2
+
+            db_sources = {
+                Path(e["file"]).name.lower()
+                for e in _js2.loads(db.read_text(encoding="utf-8"))
+                if "_deps" not in e["file"] and not e["file"].endswith(".rc")
+            }
+            ninja = db.parent / "build.ninja"
+            if not ninja.is_file():
+                print(f"tidy-ratchet: FAILED: no build.ninja beside {db}; cannot bind the database")
+                return 1
+            ninja_sources = set()
+            for line in ninja.read_text(errors="replace").splitlines():
+                if line.startswith("build ") and ": CXX_COMPILER__" in line:
+                    for token in line.split(": CXX_COMPILER__", 1)[1].split():
+                        if token.lower().endswith((".cpp", ".cc", ".cxx")) and "_deps" not in token:
+                            ninja_sources.add(Path(token.replace("\\", "/")).name.lower())
+            if db_sources != ninja_sources:
+                print(
+                    "tidy-ratchet: FAILED: compile database "
+                    f"{db.relative_to(root).as_posix()} does not describe the build "
+                    f"(db {len(db_sources)} sources, ninja {len(ninja_sources)}; "
+                    f"only-db {sorted(db_sources - ninja_sources)[:3]}, "
+                    f"only-ninja {sorted(ninja_sources - db_sources)[:3]})"
+                )
+                return 1
+            dbs[db.relative_to(root).as_posix()] = _hl2.sha256(db.read_bytes()).hexdigest()
         record = {
             "inputs_sha256": current_inputs,
             "compile_dbs": dbs,
