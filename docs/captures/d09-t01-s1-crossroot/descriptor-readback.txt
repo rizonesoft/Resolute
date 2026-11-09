@@ -1,0 +1,104 @@
+=== BiosCodes\\BiosCodes.sni
+ScriptPath=BiosCodes.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\BiosCodes.ico
+OutFilePath=..\..\..\Resolute\BiosCodes.exe
+OutFileX64Path=..\..\..\Resolute\BiosCodes_X64.exe
+DistributionPath=Distribution\1994
+FullDistributionPath=Distribution\1994\BiosCodes_1994
+DistroSourceFullPath=Distribution\1994\BiosCodes_1994_Source
+=== Chromin\\Chromin.sni
+ScriptPath=Chromin.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Chromin.ico
+OutFilePath=..\..\..\Resolute\Chromin.exe
+OutFileX64Path=..\..\..\Resolute\Chromin_X64.exe
+DistributionPath=Distribution\8534
+FullDistributionPath=Distribution\8534\Chromin_8534
+DistroSourceFullPath=Distribution\8534\Chromin_8534_Source
+=== ComIntRep\\ComIntRep.sni
+ScriptPath=ComIntRep.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\ComIntRep.ico
+OutFilePath=..\..\..\Resolute\ComIntRep.exe
+OutFileX64Path=..\..\..\Resolute\ComIntRep_X64.exe
+DistributionPath=Distribution\6508
+FullDistributionPath=Distribution\6508\ComIntRep_6508
+DistroSourceFullPath=Distribution\6508\ComIntRep_6508_Source
+=== DVDRepair\\DVDRepair.sni
+ScriptPath=DVDRepair.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\DVDRepair.ico
+OutFilePath=..\..\..\Resolute\DVDRepair.exe
+OutFileX64Path=..\..\..\Resolute\DVDRepair_X64.exe
+DistributionPath=Distribution\2921
+FullDistributionPath=Distribution\2921\DVDRepair_2921
+DistroSourceFullPath=Distribution\2921\DVDRepair_2921_Source
+=== Edgemin\\Edgemin.sni
+ScriptPath=Edgemin.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Edgemin.ico
+OutFilePath=..\..\..\Resolute\Edgemin.exe
+OutFileX64Path=..\..\..\Resolute\Edgemin_X64.exe
+DistributionPath=Distribution\8534
+FullDistributionPath=Distribution\8534\Edgemin_8534
+DistroSourceFullPath=Distribution\8534\Edgemin_8534_Source
+=== Firemin\\Firemin.sni
+ScriptPath=Firemin.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Firemin.ico
+OutFilePath=..\..\..\Resolute\Firemin.exe
+OutFileX64Path=..\..\..\Resolute\Firemin_X64.exe
+DistributionPath=Distribution\9558
+FullDistributionPath=Distribution\9558\Firemin_9558
+DistroSourceFullPath=Distribution\9558\Firemin_9558_Source
+=== MemBoost\\MemBoost.sni
+ScriptPath=MemBoost.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\MemBoost.ico
+OutFilePath=..\..\..\Resolute\MemBoost.exe
+OutFileX64Path=..\..\..\Resolute\MemBoost_X64.exe
+DistributionPath=Distribution\2429
+FullDistributionPath=Distribution\2429\MemBoost_2429
+DistroSourceFullPath=Distribution\2429\MemBoost_2429_Source
+=== Ownership\\Ownership.sni
+ScriptPath=Ownership.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Ownership.ico
+OutFilePath=..\..\..\Resolute\Ownership.exe
+OutFileX64Path=..\..\..\Resolute\Ownership_X64.exe
+DistributionPath=Distribution\869
+FullDistributionPath=Distribution\869\Ownership_869
+DistroSourceFullPath=Distribution\869\Ownership_869_Source
+=== PixRepair\\PixRepair.sni
+ScriptPath=PixRepair.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\PixRepair.ico
+OutFilePath=..\..\..\Resolute\PixRepair.exe
+OutFileX64Path=..\..\..\Resolute\PixRepair_X64.exe
+DistributionPath=Distribution\1011
+FullDistributionPath=Distribution\1011\PixRepair_1011
+DistroSourceFullPath=Distribution\1011\PixRepair_1011_Source
+=== ReBar\\ReBar.sni
+ScriptPath=ReBar.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\ReBar.ico
+OutFilePath=..\..\..\Resolute\ReBar.exe
+OutFileX64Path=..\..\..\Resolute\ReBar_X64.exe
+DistributionPath=Distribution\5588
+FullDistributionPath=Distribution\5588\ReBar_5588
+DistroSourceFullPath=Distribution\5588\ReBar_5588_Source
+=== Resolute\\Resolute.sni
+ScriptPath=Resolute.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Resolute.ico
+OutFilePath=..\..\..\Resolute.exe
+OutFileX64Path=..\..\..\Resolute_X64.exe
+DistributionPath=Distribution\857
+FullDistributionPath=Distribution\857\Resolute_857
+DistroSourceFullPath=Distribution\857\Resolute_857_Source
+=== USBRepair\\USBRepair.sni
+ScriptPath=USBRepair.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\USBRepair.ico
+OutFilePath=..\..\..\Resolute\USBRepair.exe
+OutFileX64Path=..\..\..\Resolute\USBRepair_X64.exe
+DistributionPath=Distribution\2380
+FullDistributionPath=Distribution\2380\USBRepair_2380
+DistroSourceFullPath=Distribution\2380\USBRepair_2380_Source
+=== Watermin\\Watermin.sni
+ScriptPath=Watermin.au3
+Icon=R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Watermin.ico
+OutFilePath=..\..\..\Resolute\Watermin.exe
+OutFileX64Path=..\..\..\Resolute\Watermin_X64.exe
+DistributionPath=Distribution\8534
+FullDistributionPath=Distribution\8534\Watermin_8534
+DistroSourceFullPath=Distribution\8534\Watermin_8534_Source

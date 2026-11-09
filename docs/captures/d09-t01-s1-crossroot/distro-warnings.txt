@@ -1,0 +1,13 @@
+[ 2026/11/09 14:00:38 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\BiosCodes.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:39 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Chromin.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:39 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\ComIntRep.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:39 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\DVDRepair.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:39 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Edgemin.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:39 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Firemin.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:40 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\MemBoost.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:40 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Ownership.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:40 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\PixRepair.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:40 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\ReBar.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:40 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Resolute.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:40 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\USBRepair.ico (different root); absolute path kept.
+[ 2026/11/09 14:00:40 ] Warning: No descriptor-relative form for R:\resolute-repair2\resolute_au3\SDK\Resources\Icons\Watermin.ico (different root); absolute path kept.
