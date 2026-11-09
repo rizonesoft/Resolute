@@ -2,8 +2,6 @@
 
 #include "focus_guard.h"
 
-#include "focus_hook/focus_hook.h"
-
 #include "fence.h"
 #include "focus_hook/focus_hook.h"
 

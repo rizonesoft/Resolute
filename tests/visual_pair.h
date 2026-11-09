@@ -55,10 +55,12 @@ struct Observed {
 // of the spec label for the named region.
 using EquivalenceMap = std::map<std::string, std::string>;
 
+inline int Channel(uint32_t c, int shift) { return static_cast<int>((c >> shift) & 0xFFu); }
+
 inline double Luminance(uint32_t c) {
-    const double r = ((c >> 16) & 0xFF) / 255.0;
-    const double g = ((c >> 8) & 0xFF) / 255.0;
-    const double b = (c & 0xFF) / 255.0;
+    const double r = Channel(c, 16) / 255.0;
+    const double g = Channel(c, 8) / 255.0;
+    const double b = Channel(c, 0) / 255.0;
     auto lin = [](double v) { return v <= 0.03928 ? v / 12.92 : std::pow((v + 0.055) / 1.055, 2.4); };
     return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 }
@@ -81,9 +83,9 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
         for (int x = x0; x < x1; ++x) {
             const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
             ++total;
-            const int dr = std::abs(static_cast<int>((c >> 16) & 0xFF) - static_cast<int>((bg >> 16) & 0xFF));
-            const int dg = std::abs(static_cast<int>((c >> 8) & 0xFF) - static_cast<int>((bg >> 8) & 0xFF));
-            const int db = std::abs(static_cast<int>(c & 0xFF) - static_cast<int>(bg & 0xFF));
+            const int dr = std::abs(Channel(c, 16) - Channel(bg, 16));
+            const int dg = std::abs(Channel(c, 8) - Channel(bg, 8));
+            const int db = std::abs(Channel(c, 0) - Channel(bg, 0));
             if (dr + dg + db > 24) ++painted;
             lum.push_back(Luminance(c));
         }
@@ -97,9 +99,8 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
             for (int x = x0 + 1; x < x1; ++x) {
                 const uint32_t a = img.px[static_cast<size_t>(y) * img.w + x - 1];
                 const uint32_t b = img.px[static_cast<size_t>(y) * img.w + x];
-                acc += std::abs(static_cast<int>((b >> 16) & 0xFF) - static_cast<int>((a >> 16) & 0xFF)) +
-                       std::abs(static_cast<int>((b >> 8) & 0xFF) - static_cast<int>((a >> 8) & 0xFF)) +
-                       std::abs(static_cast<int>(b & 0xFF) - static_cast<int>(a & 0xFF));
+                acc += std::abs(Channel(b, 16) - Channel(a, 16)) + std::abs(Channel(b, 8) - Channel(a, 8)) +
+                       std::abs(Channel(b, 0) - Channel(a, 0));
                 ++n;
             }
         }
