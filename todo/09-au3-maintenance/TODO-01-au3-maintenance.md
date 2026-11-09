@@ -45,6 +45,7 @@ track: M1
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [ ]   |
 |   4   |   §4    | Distro reports compiler failure           | --           |  [ ]   |
 |   5   |   §5    | Stop logging the signing password in Distro | --           |  [ ]   |
+|   6   |   §6    | Per-tool update URLs from Distro          | --           |  [ ]   |
 
 ---
 
@@ -83,15 +84,17 @@ A shipping product that cannot be built from its own repository cannot be fixed.
 
 ## 2. Clear the Housekeeping Defects
 
+> **Started:** 2026-11-09T12:10:08Z
+
 Small, known, and cheap. Each is recorded so it is not rediscovered later as a mystery.
 
-- [ ] Remove `resolute_au3/SDK/Concrete/Rescue/`, which holds only build output for a tool that no longer has source. Done when: the directory is gone and the removal is recorded here. **Corrected 2026-11-09:** the directory is untracked, ignored build output (`.gitignore` covers `**/SDK/Concrete/*/Distribution/`), so its removal is a recorded working-tree deletion, not a commit; no commit in this repository removed the tool, and the leftover arrived with the suite import (earliest touch `02152772`).
-- [ ] Remove `resolute_au3/SDK/Concrete/BiosCodes/Includes/Localization.au3.backup`. Done when: it is gone.
-- [ ] Clear `ReBar`'s product page URL, since it is internal tooling rather than a product. Done when: it no longer advertises a download page.
-- [ ] Decide whether `resolute_au3/samples/Resources/` should be tracked. Done when: the decision is recorded here and acted on. **Corrected 2026-11-09:** it is already tracked (180 files, tracked since the suite move `71caa37b`), so the open decision is whether to keep it tracked, not whether to start.
+- [ ] Remove `resolute_au3/SDK/Concrete/Rescue/`, which holds only build output for a tool that no longer has source. Done when: the directory is gone and the removal is recorded here. **Corrected 2026-11-09:** the directory is untracked, ignored build output (`.gitignore` covers `**/SDK/Concrete/*/Distribution/`), so its removal is a recorded working-tree deletion, not a commit. **Corrected 2026-11-09 (plan review):** the commit that removed the tool does exist under the pre-move path: `e9b62590` (Remove Rescue application and Bin directory) deletes `SDK/Concrete/Rescue/Rescue.au3`, its descriptor and includes; today's cleanup removes only the ignored output that commit left behind.
+- [ ] Remove `resolute_au3/SDK/Concrete/BiosCodes/Includes/Localization.au3.backup`. Done when: it is gone, the measured claim in the Current state block flips from `exists` to `absent` in the same commit, and `python scripts/todo-claims.py` holds.
+- [ ] Clear the internal tools' product page URLs, since they are internal tooling rather than products. Done when: neither `ReBar.au3` nor `Distro.au3` advertises the Resolute product download page: both `$g_sUrlProgPage` values take the company home page form their own `HomePage` fields use, `ReBar`'s `$g_sUrlUpdate` fallback and the tracked `resolute_au3/SDK/www/update/ReBar.ru` `UpdateURL` take the same form, and the About destination (`SDK/Includes/About.au3` ShellExecute on `$g_sUrlProgPage`) and the update destination (`SDK/Includes/Update.au3:98`, the `.ru` `UpdateURL` overriding the fallback) are both verified by readback. The one producer that would rewrite `ReBar.ru` on a future Distro run (`Distro.au3:3305` writes every tool's `UpdateURL` from Distro's own global) is filed separately, not fixed here. -> XREF: D09 T01 §6
+- [ ] Decide whether `resolute_au3/samples/Resources/` should be tracked. Done when: the decision is recorded here and acted on. **Corrected 2026-11-09:** it is already tracked (180 files, tracked since the suite move `71caa37b`), so the open decision is whether to keep it tracked, not whether to start. Decision recorded 2026-11-09: keep it tracked, because the sample tools are source examples whose icon and resource references must resolve from a clean checkout; untracking would break the samples to save repository size this project has not asked to save.
 - [ ] Commit: `"au3: clear the known housekeeping defects"`
 
-**Test checkpoint:** `Rescue/` and the stray `.backup` file are absent. `ReBar` advertises no download page. The `samples/Resources/` decision is recorded and acted on. The tree builds unchanged afterwards.
+**Test checkpoint:** `Rescue/` and the stray `.backup` file are absent. `ReBar` and `Distro` advertise no product download page, in their About and update destinations alike (verified by readback of both call sites). The `samples/Resources/` decision is recorded and acted on. After the changes, a fresh clone at the final candidate builds all thirteen tools to both architectures (the §1 coverage), with candidate, command and exit results recorded here; 'unchanged' means the same coverage succeeding, and AutoIt3Wrapper's version-directive increments during compilation are expected, as §1 recorded.
 
 ## 3. Maintenance Scope and Retirement Procedure
 
@@ -137,6 +140,21 @@ Without a written scope, every request to fix something in the AutoIt tree is ar
 - [ ] Commit: `"au3: stop logging the signing password in Distro"`
 
 **Test checkpoint:** Driven run with evidence: the Distro log from a signing run with a dummy password contains `******` and does not contain the dummy password. The signing command that executes is unchanged. `Au3Check.exe -q Distro.au3` exits 0.
+
+
+## 6. Per-Tool Update URLs from Distro
+
+Every tool declares its own update destination, but `Distro`'s `_CreateUpdateFiles` (`resolute_au3/SDK/Concrete/Distro/Distro.au3:3305`) writes every tool's `UpdateURL` from Distro's own `$g_sUrlUpdate` global, so all tools' `.ru` files name the one suite update directory regardless of what the tool declares. For the product tools that happens to be near enough to go unnoticed; for an internal tool it re-advertises the product update page that `D09 T01 §2` cleared from the tracked metadata. The producer should write the producing tool's declared update destination, the way the rest of the update file is per-tool data.
+
+-> SOURCE: D09 T01 §2 plan review on `c4dd27db`, gap 2 (producing configuration)
+-> XREF: D09 T01 §2 -- the housekeeping section that cleared the tracked metadata this producer would rewrite
+
+- [ ] Make `_CreateUpdateFiles` take the update destination from the producing tool's own declaration (its script globals as discovery reads them, or a descriptor value discovery persists), not from Distro's global. Done when: the written `UpdateURL` differs per tool exactly as the tools declare, and Distro's own global is no longer the source.
+- [ ] Regenerate or correct the tracked `resolute_au3/SDK/www/update/*.ru` files from the corrected producer. Done when: each `.ru` `UpdateURL` matches its tool's declaration, verified per tool.
+- [ ] Prove it. Done when: a driven update-file creation for two tools with different declared update destinations writes two different, correct `UpdateURL` values, quoted from the files.
+- [ ] Commit: `"au3: write per-tool update URLs in Distro"`
+
+**Test checkpoint:** Driven run with evidence: two tools' `.ru` files carry their own declared `UpdateURL` values. `Au3Check.exe -q Distro.au3` exits 0. No tool's frozen behaviour changes.
 
 ## Verification
 

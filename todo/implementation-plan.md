@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **66 of 234 sections complete (28%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **66 of 235 sections complete (28%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -159,6 +159,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |
 | [ ] | `D09 T01 §4`  | Distro reports compiler failure                   |   5   |
 | [ ] | `D09 T01 §5`  | Stop logging the signing password in Distro       |   4   |
+| [ ] | `D09 T01 §6`  | Per-tool update URLs from Distro                  |   4   |
 | [x] | `D00 T02 §5`  | Cover the inherited UI library                    |   7   |
 | [x] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
 | [x] | `D00 T01 §9`  | Remove the Linux execution surface                |   7   |
