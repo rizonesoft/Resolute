@@ -122,3 +122,8 @@ That is deliberate and it has a cost. The shipped suite puts `Language/<Tool>/`,
 A tool that cannot meet a clause does not quietly fail it. It carries a dated exception naming the clause, the reason, and the section that will close it.
 
 An exception with no closing section is not an exception, it is a defect with better manners.
+
+| Tool | Clause | Date | Reason | Closing |
+| --- | --- | --- | --- | --- |
+
+The table is machine-read by scripts/conformance-check.py (D07 T01 §3): an exception makes its cell read EXC, never a pass, and one whose closing section has shipped fails the check by name.

@@ -179,6 +179,23 @@ Invoke-Gate -Name 'ratchet self-test' -LogName 'gate-ratchet-selftest' -Command 
     & $Python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --self-test
 }
 
+# -- conformance: the profile against every shipped tool (D07 T01 section 3) --
+#
+# Runs after build and ratchet because C24 consumes their current
+# evidence (the ratchet's raw log, recounted per target). Skipped
+# with the build; its self-test always runs. A clause fails here
+# only when its owner section has shipped; open owners report
+# not-yet-evaluable in the matrix, never a silent pass.
+
+if (-not $SkipBuild) {
+    Invoke-Gate -Name 'conformance check' -LogName 'gate-conformance' -DetailPattern '^conformance: \d+ clause' -Command {
+        & $Python (Join-Path $RepoRoot 'scripts\conformance-check.py') --tidy-log (Join-Path $LogDir 'gate-tidy.log')
+    }
+}
+Invoke-Gate -Name 'conformance self-test' -LogName 'gate-conformance-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\conformance-check.py') --self-test
+}
+
 # ── tests ────────────────────────────────────────────────────
 
 # The not-present tolerance D00 T01 §5 left here is GONE, removed by

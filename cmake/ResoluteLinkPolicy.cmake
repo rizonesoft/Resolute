@@ -27,3 +27,15 @@ set(RESOLUTE_LINK_POLICY_APPLIED TRUE)
 # runtime DLL ships beside anything. Every tool is distributed on its own and
 # may not depend at runtime on a suite-wide file.
 add_link_options(-static -static-libgcc -static-libstdc++)
+
+# Reproducible binaries (D07 T01 §3, decided 2026-11-09): the same
+# source must produce the same bytes, so a signed release can be
+# independently confirmed against its tag. The PE timestamp is the
+# linker-inserted wall clock; embedded absolute source paths are the
+# other half. Measured: without these, Resolute.exe differed across
+# two consecutive clean relinks at identical size; with them, the
+# hashes match. scripts/conformance-check.py --repro-check proves it
+# by building twice and comparing.
+add_link_options(-Wl,--no-insert-timestamp)
+get_filename_component(_resolute_repo_root "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+add_compile_options(-ffile-prefix-map=${_resolute_repo_root}=.)
