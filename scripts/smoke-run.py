@@ -320,7 +320,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                 run.record(step, "absent", "surface not shipped")
             else:
                 run.record(step, "fail" if expected else "absent",
-                           f"launch failed: {exc}" if expected else "surface not shipped")
+                           f"launch failed for {run.exe}: {exc}" if expected else "surface not shipped")
         return False
     try:
         # start: observe the main window inside the launch bound.
@@ -409,12 +409,15 @@ def drill_tools():
     ]
 
 
-def real_tools(only=None):
+def real_tools(only=None, flavor="Release"):
     runs = []
     for name, spec in load_tools().items():
         if only and name not in only:
             continue
-        runs.append(ToolRun(name, ROOT / spec["exe"]))
+        exe = spec["exe"]
+        if flavor != "Release":
+            exe = exe.replace("Bin/Release", f"Bin/{flavor}", 1)
+        runs.append(ToolRun(name, ROOT / exe))
     return runs
 
 
@@ -423,6 +426,8 @@ def main(argv=None) -> int:
     ap.add_argument("--visible", action="store_true", help="operator asked: run visibly now")
     ap.add_argument("--drill", action="store_true", help="add the broken-tool fixture entries")
     ap.add_argument("--tools", default="", help="comma-separated subset of registered tools")
+    ap.add_argument("--flavor", default="Release", choices=("Release", "Debug"),
+                    help="build flavor whose Bin/<flavor> executables to drive (nightly builds Debug)")
     ap.add_argument("--self-test", action="store_true", help="windowless logic tests")
     args = ap.parse_args(argv)
     if args.self_test:
@@ -438,7 +443,7 @@ def main(argv=None) -> int:
         return 2
 
     only = {t.strip() for t in args.tools.split(",") if t.strip()} or None
-    runs = real_tools(only)
+    runs = real_tools(only, args.flavor)
     if args.drill:
         runs += drill_tools()
     rows = []
