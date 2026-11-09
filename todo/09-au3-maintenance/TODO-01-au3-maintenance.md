@@ -234,6 +234,8 @@ A defect found in the AutoIt tree that also affects the C++ port is fixed in Aut
 
 ## 6. Per-Tool Update URLs from Distro
 
+> **Started:** 2026-11-09T14:12:18Z
+
 Every tool declares its own update destination, but `Distro`'s `_CreateUpdateFiles` (`resolute_au3/SDK/Concrete/Distro/Distro.au3:3305`) writes every tool's `UpdateURL` from Distro's own `$g_sUrlUpdate` global, so all tools' `.ru` files name the one suite update directory regardless of what the tool declares. For the product tools that happens to be near enough to go unnoticed; for an internal tool it re-advertises the product update page that `D09 T01 §2` cleared from the tracked metadata. The producer should write the producing tool's declared update destination, the way the rest of the update file is per-tool data.
 
 -> SOURCE: D09 T01 §2 plan review on `c4dd27db`, gap 2 (producing configuration)
