@@ -46,6 +46,7 @@ track: Q1
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [ ]   |
 |   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
 |   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [ ]   |
+|   9   |   §9    | Smoke fixture release in finally              | §6            |  [ ]   |
 
 ---
 
@@ -297,6 +298,19 @@ No surface of its own: a windowless self-test case in the existing driver, consu
 -> SOURCE: review-2026-11-10-d07-t01-s5-round3 (P3 forwarding test can pass broken)
 
 **Test checkpoint:** `python scripts/smoke-run.py --self-test` passes with the strengthened case, and the case fails when forwarding is stubbed to a constant 2 (quoted from a real run each way).
+## 9. Smoke Fixture Release in Finally
+
+**Filed 2026-11-10** from the `D07 T01 §6` repair review (round 1, `P3`, in `docs/reviews/07-quality/D07-T01-s6-repair.md`): one capture-interruption regression waits for explicit release with no timeout, but its release runs only after `main([])` returns normally, so an exception or cancellation in that fixture leaves the daemon worker blocked until process exit. A fixture that can leak a worker on its own failure path is the kind of test debt that later reads as a hang.
+
+No surface of its own: a windowless self-test fixture in the existing driver.
+
+- [ ] Release in `finally` in `scripts/smoke-run.py --self-test`: the exceptional-capture fixture (`_release2`) is set in a `finally` covering the whole driven case, not only after `main([])` returns. Done when: forcing the driven case to raise still releases the worker, proven by joining it inside its bound in the case itself.
+- [ ] Commit: `"quality: release the smoke fixture worker in finally"`
+
+-> SOURCE: review-2026-11-10-d07-t01-s6-repair-round1 (P3 release not in finally)
+
+**Test checkpoint:** `python scripts/smoke-run.py --self-test` passes, and the fixture case proves the worker is released and joined when the driven case raises (quoted from a real run).
+
 ## Verification
 
 - [ ] The conformance profile states every clause in evaluable terms with an owner per clause
