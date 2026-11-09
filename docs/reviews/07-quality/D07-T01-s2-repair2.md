@@ -99,3 +99,7 @@ Gap list
 4. **in-scope:** Provide diagnostic fallback on log-write failure and test that refusal path.
 
 COMPLETION: gaps
+
+- Implemented: completion gap 1 (gate Detail surfaces counts, raises, rewrites) in 4bea5b47
+- Implemented: completion gap 2 (log persistence failure reported with excerpt) in 4bea5b47
+- Settled: third repair cycle runs on docs/reviews/07-quality/D07-T01-s2-repair3.md
