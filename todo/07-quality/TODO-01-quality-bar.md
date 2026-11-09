@@ -43,7 +43,7 @@ track: Q1
 |   3   |   §3    | Conformance check and its report       | §1           |  [x]   |
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [x]   |
 |   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [x]   |
-|   6   |   §6    | Smoke capture-timeout test                    | §4            |  [ ]   |
+|   6   |   §6    | Smoke capture-timeout test                    | §4            |  [x]   |
 |   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
 |   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [ ]   |
 |   9   |   §9    | Smoke fixture release in finally              | §6            |  [ ]   |
@@ -223,7 +223,7 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 > **Completion:** astra (medium), candidate 4f6069fc COMPLETION gaps (8 in-scope implemented across repair cycles, blocked-capture remainder filed in §6); final repair9 completion on cd3f9da1 COMPLETION: complete · Repair records: D07-T01-s4-repair.md through D07-T01-s4-repair9.md
 > **CRUD:** not applicable (developer gate tooling; writes only build/smoke/ artifacts, launches the shipped tools read-only by window messages, terminates only processes it launched)
 > **Resolved:** 2026-11-10 | RegStudio elevated five-step pass -> XREF: D07 T01 §5 | closed by `6be8a109` (the §5 stamp quotes the elevated report)
-> **Deferred:** blocked-capture timeout and scheduling-independent interruption proofs -> XREF: D07 T01 §6
+> **Resolved:** 2026-11-10 | blocked-capture timeout and scheduling-independent interruption proofs -> XREF: D07 T01 §6 | closed by `8ef54ca` (the §6 stamp quotes both cases)
 > **Duration:** 2026-11-09T08:41:18Z to 2026-11-09T10:29:11Z
 > **Implementer:** muse (muse-wonder-1.0)
 
@@ -268,6 +268,15 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 -> SOURCE: review-2026-11-09-d07-t01-s4-round3 (P3 capture timeout untested)
 
 **Test checkpoint:** `python scripts/smoke-run.py --self-test` passes with the blocked-capture case named, and the case fails when the bound is removed (quoted from a real run each way).
+
+> **Verified:** 2026-11-10 | §6 | `python scripts/smoke-run.py --self-test` all pass at the final candidate, including `blocked capture returns None inside its bound while still blocked` (0.5s bound, worker still blocked, released explicitly) and `abort is observed before the deadline under a controlled clock` (monotonic advancing 100s per call, capture waiting on explicit release with no timeout) · mutations quoted from `R:/scratch/s6_mutations.py`: a direct unbounded capture stayed blocked past 2s, and the previous time-first loop returned `None` instead of `ABORTED` under the same fast clock · `todo-graph validate` 0 fatal at stamp
+> **Review:** D07-T01-s6.md candidate `2f1432ea`(round 1) -- astra medium adversarial approve, HIGHEST none · repair record D07-T01-s6-repair.md candidate `8ef54ca`(round 1) -- astra medium adversarial 1 P3 (fixture release not in finally), clean terminal round (HIGHEST P3), filed in `D07 T01 §9` · Raw findings: docs/reviews/07-quality/D07-T01-s6.md, docs/reviews/07-quality/D07-T01-s6-repair.md
+> **Completion:** astra (medium), candidate `2f1432ea` COMPLETION gaps (2 in-scope: bound assertion too loose, interruption regression still on a 30s wait; implemented in `8ef54ca` on D07-T01-s6-repair.md, plan complete with no findings); repair completion on candidate `8ef54ca` COMPLETION gaps with the sole gap out-of-scope, the §9 fixture release already filed · Repair records: docs/reviews/07-quality/D07-T01-s6-repair.md
+> **Plan review:** astra (medium) on `7446095e`, no findings, PLAN complete
+> **CRUD:** not applicable (developer gate tooling; windowless self-test cases only, no user system or data)
+> **Deferred:** fixture release in finally -> XREF: D07 T01 §9
+> **Duration:** 2026-11-09T22:43:46Z to 2026-11-09T22:51:38Z
+> **Implementer:** Muse Code (muse-wonder-1.0)
 
 ## 7. Unattended Elevated Smoke via Scheduled Task
 
