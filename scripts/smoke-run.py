@@ -939,6 +939,9 @@ def failure_capture(run: ToolRun, step: str, out_dir: Path, abort=None) -> str:
     """Capture the surface at failure, or say why none exists."""
     if run.hwnd is None:
         return "capture unavailable: no window"
+    if abort is not None and abort():
+        run.interrupted = True
+        return "capture unavailable: operator input resumed during capture"
     try:
         shot = capture_window_bounded(run.hwnd, abort=abort)
     except Exception as exc:
@@ -1499,6 +1502,66 @@ def self_test() -> int:
     finally:
         globals().update(_saved)
         os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+
+    # Production capture interruption: failure_capture itself sets the flag,
+    # and a final-tool main() run turns it into the stood-down verdict.
+    _crun = ToolRun("Resolute", Path("x"))
+    _crun.hwnd = 99
+    _ctext = failure_capture(_crun, "about", SMOKE_DIR, abort=lambda: True)
+    check("failure_capture interruption sets the flag and names itself",
+          getattr(_crun, "interrupted", False) is True and "operator input resumed" in _ctext)
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+            globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
+            def _drive_cap(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                run.hwnd = 99
+                failure_capture(run, "about", out_dir, abort=lambda: True)
+                for step, _e in step_table(run.name):
+                    run.record(step, "pass", "stub")
+                return False
+            _rd3 = globals()["drive_tool"]
+            globals()["drive_tool"] = _drive_cap
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            check("capture interruption on the final tool yields stood-down",
+                  rc == 2 and "Suite verdict: **stood-down**" in buf.getvalue())
+            def _drive_clean_sd(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                run.proc = _SlowProc()
+                run.job = JobBox()
+                run.resumed = lambda: True
+                cleanup_safely(run)
+                for step, _e in step_table(run.name):
+                    run.record(step, "pass", "stub")
+                return False
+            globals()["drive_tool"] = _drive_clean_sd
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            globals()["drive_tool"] = _rd3
+            check("cleanup stand-down on the final tool yields stood-down",
+                  rc == 2 and "Suite verdict: **stood-down**" in buf.getvalue())
+    finally:
+        globals().update(_saved)
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+    # Combined launch diagnostics through the production drive path.
+    _lrun = ToolRun("Resolute", Path("x"))
+    _real_spawn = globals()["spawn_contained"]
+    def _bad_spawn(run):
+        run.job.error = "ResumeThread failed; CloseHandle(thread) failed (5)"
+        raise OSError("TerminateProcess failed (5)")
+    globals()["spawn_contained"] = _bad_spawn
+    try:
+        drive_tool(_lrun, SMOKE_DIR, PREV_DIR, False, 0.0)
+    finally:
+        globals()["spawn_contained"] = _real_spawn
+    _start_row = next((r for r in _lrun.rows if r[1] == "start"), None)
+    check("combined launch diagnostics survive into the start row",
+          _start_row is not None and _start_row[2] == "fail"
+          and "TerminateProcess failed" in _start_row[3] and "ResumeThread failed" in _start_row[3])
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
