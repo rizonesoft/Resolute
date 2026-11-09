@@ -173,9 +173,9 @@ def admission(visible: bool, now: datetime, env) -> tuple[bool, str, bool]:
 
 # ---------------------------------------------------------------- win32
 
-user32 = ctypes.windll.user32
-gdi32 = ctypes.windll.gdi32
-kernel32 = ctypes.windll.kernel32
+user32 = ctypes.WinDLL("user32", use_last_error=True)
+gdi32 = ctypes.WinDLL("gdi32", use_last_error=True)
+kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
 WM_CLOSE = 0x0010
 WM_COMMAND = 0x0111
@@ -591,11 +591,15 @@ def spawn_contained(run: "ToolRun"):
         run.proc.terminate()
 
 
+def launch_block_text() -> str:
+    return ("launching this tool requires elevation "
+            "(run the smoke driver elevated; elevated pass owned by D07 T01 S5)")
+
+
 def launch_block(exc: OSError) -> str | None:
     """A named refusal at launch, or None when the launch simply failed."""
     if getattr(exc, "winerror", None) == 740:  # ERROR_ELEVATION_REQUIRED
-        return ("launching this tool requires elevation "
-                "(run the smoke driver elevated; elevated pass owned by D07 T01 S5)")
+        return launch_block_text()
     return None
 
 
@@ -607,10 +611,15 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
     try:
         spawn_contained(run)
         if run.job.error:
-            for step, expected in step_table(run.name):
-                run.record(step, "fail" if expected else "absent",
-                           f"containment could not be established: {run.job.error}"
-                           if expected else "surface not shipped")
+            if "(740)" in run.job.error:  # elevation refusal at CreateProcess
+                for step, expected in step_table(run.name):
+                    run.record(step, "blocked" if expected else "absent",
+                               launch_block_text() if expected else "surface not shipped")
+            else:
+                for step, expected in step_table(run.name):
+                    run.record(step, "fail" if expected else "absent",
+                               f"containment could not be established: {run.job.error}"
+                               if expected else "surface not shipped")
             run.cleanup()
             run.job.close()
             return False
