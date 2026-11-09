@@ -40,7 +40,7 @@ track: Q1
 | :---: | :-----: | -------------------------------------- | ------------ | :----: |
 |   1   |   §1    | The conformance profile                | --           |  [x]   |
 |   2   |   §2    | Warning and analysis ratchet           | D00 T01 §3   |  [x]   |
-|   3   |   §3    | Conformance check and its report       | §1           |  [ ]   |
+|   3   |   §3    | Conformance check and its report       | §1           |  [x]   |
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [ ]   |
 
 ---
@@ -175,6 +175,13 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 - [x] Commit: `"quality: the conformance check"`
 
 **Test checkpoint:** The check produces a tool-by-clause matrix, quoted, with every cell one of pass, fail, or not-yet-evaluable with its owner named. A tool failing a shipped-owner clause is named with its clause and owner section, and fails `scripts/check-all.ps1`; a clause whose owner is open never fails the gate and never reads as a pass. A stray undeclared file in the shipped set and a fixture PE import of a non-system DLL each fail by name. The reproducibility decision is dated and quoted from two consecutive clean builds compared by hash. Per-tool sizes and the suite total are printed against their recorded budgets. A duplicate repair subject in a fixture fails by name. All quoted, from `scripts/conformance-check.py --self-test`, driven drills, and `pwsh scripts/check-all.ps1`.
+
+> **Verified:** 2026-11-09 | §3 | `scripts/conformance-check.py` evaluates the 33-clause profile against the two shipped tools (Resolute, RegStudio): full `pwsh scripts/check-all.ps1` exit 0 at `787d23ce`, every gate ok, conformance line `33 clause(s) x 2 tool(s), 0 failing, 44 not yet evaluable, 1 advisory failing (owner open): C22 RegStudio` with its full report path printed · C24 evidence is hash-bound end to end (inputs captured before compilation, compile databases and build.ninja graphs captured at configure and verified at publication and analysis, per-target databases derived from `--build-targets`) · API-set imports pass only against the explicit observed-contract allowlist · exceptions are machine-readable and never read as pass · self-tests `tidy-ratchet 40`, `conformance 25`, scripts unit tests `130 OK (skipped=3)` at `ef0f8357` · `--repro-check` identical across two clean builds under Python 3.14 and CPython 3.11.15 (Resolute `7571b314...`, RegStudio `48625aeb...`) · `todo-graph validate` 0 fatal at stamp
+> **Review:** lineage across four records (the dispatcher closes a record at each completion): D07-T01-s3.md rounds 1-9 exhausted, then repair (round 1 P3, completion 5 gaps), repair2 (plan gaps, round 1 P2/P3, round 2 P3 severity-stop, completion 2 gaps), repair3 (plan 1 gap, round 1 P2, round 2 clean, completion 1 test-quality gap), repair4 candidate `ef0f8357` plan approve, round 1 HIGHEST none, final `COMPLETION: complete`. Raw findings: docs/reviews/07-quality/D07-T01-s3.md, D07-T01-s3-repair.md, D07-T01-s3-repair2.md, D07-T01-s3-repair3.md, D07-T01-s3-repair4.md
+> **Plan review:** astra medium, per record; every gap folded into the section or its repair cycle before the round that verified it
+> **CRUD:** not applicable (developer gate tooling over the repository; it writes only build artifacts and gate logs under `build/`, no user system or user data)
+> **Duration:** 2026-11-09T02:47:16Z to 2026-11-09T07:10:09Z
+> **Implementer:** Muse Code (muse-wonder-full-1.0)
 
 ## 4. Standing Smoke Run Over the Suite
 
