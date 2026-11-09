@@ -95,7 +95,7 @@ track: W1
 |  41   |   §41   | CI read-back evidence and replay hardening     | §39 |  [x]   |
 |  42   |   §42   | Campaign guard recovery completeness           | §40, §41 |  [ ]   |
 |  43   |   §43   | Sonnet delegates under one lead                | §27 |  [ ]   |
-|  44   |   §44   | Review-order skills match the dispatcher       | --           |  [ ]   |
+|  44   |   §44   | Review-order skills match the dispatcher       | --           |  [x]   |
 |  45   |   §45   | Skill numbering and stamp separator follow-ups | §44          |  [ ]   |
 
 ---
@@ -1850,6 +1850,14 @@ Operator decision 2026-10-01 (**updated 2026-10-17:** subagents read and run, th
 
 **Test checkpoint:** `grep` over the twelve skill files (four skills in three directories) shows no instruction to run completion before rounds, and a positive readback of every corrected passage, the `AGENTS.md` statement, and the stamp template completion line is quoted, `python scripts/review-dispatch.py --check-pin` ok, `python -m unittest discover -s scripts/tests` green, and a dry reading of one full cycle (plan, round, completion, repair) against the rewritten steps names no step the dispatcher would refuse.
 
+
+> **Verified:** 2026-11-09 | §44 | grep over the twelve skill files (four skills in three directories) shows no instruction to run completion before rounds and no 33-round cap; positive readback of every corrected passage, the AGENTS.md Review order line, and the stamp template completion line quoted in `docs/reviews/00-workspace/D00-T04-s44-repair.md` and `D00-T04-s44-repair2.md`; `python scripts/review-dispatch.py --check-pin` ok; `python -m unittest discover -s scripts/tests` 130 OK (3 skipped); `python scripts/todo-graph.py validate` 0 fatal; `python scripts/todo-claims.py` 116 hold, 0 stale; dry cycle plan, rounds, completion, repair names no refused step, and clean() walkthroughs (missing, duplicate, contradictory declarations all False; false-clean declaration distinguished) quoted in the repair2 record
+> **Review:** D00-T04-s44.md round 1 P2 (post-terminal candidate change), round 2 P2+P3 (topic-record plan pass, stamp reviewer), round 3 P3 clean terminal (both P3s filed in §45); repair record round 1 HIGHEST none; repair2 record round 1 HIGHEST none · Raw findings: docs/reviews/00-workspace/D00-T04-s44.md, D00-T04-s44-repair.md, D00-T04-s44-repair2.md
+> **Plan review:** astra (medium) on 1f8abfe0, 5 gaps all folded into the section in 18b77a4c; repair plan gaps and repair2 plan gaps closed or settled with evidence in their records
+> **Completion:** astra (medium), candidate a484bf50 COMPLETION gaps (4 in-scope, all implemented in d321297f); repair completion on 3ec81cb1 gaps (2 in-scope implemented in 72495a9f, 3 out-of-scope filed in §45); repair2 completion on 72495a9f COMPLETION: complete · Repair records: D00-T04-s44-repair.md, D00-T04-s44-repair2.md
+> **CRUD:** not applicable (skills and plan documentation; no user data or system state)
+> **Duration:** 2026-11-09T08:13:04Z to 2026-11-09T08:37:59Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 ## 45. Skill Numbering and Stamp Separator Follow-Ups
 
