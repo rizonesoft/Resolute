@@ -567,6 +567,19 @@ def input_manifest(root: Path) -> str:
     return h.hexdigest()
 
 
+def artifact_hashes(root: Path) -> dict:
+    import hashlib
+
+    base = root / "Bin" / "Release"
+    if not base.is_dir():
+        return {}
+    return {
+        f.relative_to(root).as_posix(): hashlib.sha256(f.read_bytes()).hexdigest()
+        for f in sorted(base.rglob("*"))
+        if f.is_file()
+    }
+
+
 def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None) -> int:
     baseline_path = root / "todo" / ".tidy-baseline"
     targets = expected_targets(root)
@@ -614,12 +627,33 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
                 "build inputs differ from the recorded successful build; "
                 "the artifacts were not built from these sources, rebuild first"
             )
+        # The record must describe a full Release build of exactly
+        # the targets under analysis, and the artifacts on disk must
+        # still be the ones it recorded: a swapped executable or a
+        # partial/Debug build record certifies nothing (round 8).
+        expected_build_targets = {"Resolute"} | {k for k in targets if k != "root"}
+        if record_in.get("config") != "Release" or set(record_in.get("targets", [])) != expected_build_targets:
+            raise Refusal(
+                "build record is not a full Release build of the analysed targets "
+                f"(config={record_in.get('config')!r}, targets={record_in.get('targets')!r}); "
+                "run a full Release build first"
+            )
+        if artifact_hashes(root) != record_in.get("artifacts", {}):
+            raise Refusal(
+                "shipped artifacts differ from the recorded successful build; "
+                "a replaced executable gains no evidence here, rebuild first"
+            )
+        build_targets = record_in.get("targets", [])
+    else:
+        build_targets = None
     per_target, global_set, total_tus, log_error = run_analysis(root, clang_tidy, targets, log_path)
     if input_manifest(root) != inputs_before:
         raise Refusal(
             "build inputs changed during analysis; the count does not "
             "describe the current tree, rerun the gate"
         )
+    if result_path is not None and artifact_hashes(root) != record_in.get("artifacts", {}):
+        raise Refusal("shipped artifacts changed during analysis; rerun the gate")
     if log_error is not None:
         # A successful analysis whose diagnostics could not be saved
         # still says so: the counts are evidence, the missing log is
@@ -695,13 +729,11 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
             # shipped artifacts and compile databases as they stood.
             # Changed sources with an old executable must not certify
             # (D07 T01 \u00a73 review round 4).
-            "artifacts": {
-                f.relative_to(root).as_posix(): _hashlib.sha256(f.read_bytes()).hexdigest()
-                for f in sorted((root / "Bin" / "Release").rglob("*"))
-                if f.is_file()
-            } if (root / "Bin" / "Release").is_dir() else {},
+            "artifacts": artifact_hashes(root),
             "inputs_sha256": inputs_before,
             "build_inputs_sha256": build_inputs,
+            "build_config": "Release" if result_path is not None else None,
+            "build_targets": build_targets,
             "compile_dbs": {
                 db.relative_to(root).as_posix(): _hashlib.sha256(db.read_bytes()).hexdigest()
                 for db in targets.values()
@@ -1297,6 +1329,8 @@ def main(argv=None) -> int:
     ap.add_argument("--log", default=None, help="write raw clang-tidy output here")
     ap.add_argument("--result-json", default=None, help="write the measured result record here")
     ap.add_argument("--write-build-record", default=None, help="record input manifest + artifact hashes of a successful build")
+    ap.add_argument("--build-config", default=None)
+    ap.add_argument("--build-targets", default="")
     ap.add_argument("--root", default=None)
     args = ap.parse_args(argv)
 
@@ -1316,7 +1350,12 @@ def main(argv=None) -> int:
                 for f in sorted(base.rglob("*"))
                 if f.is_file()
             }
-        record = {"inputs_sha256": input_manifest(root), "artifacts": artifacts}
+        record = {
+            "inputs_sha256": input_manifest(root),
+            "artifacts": artifacts,
+            "config": args.build_config,
+            "targets": [x for x in args.build_targets.split(",") if x],
+        }
         Path(args.write_build_record).parent.mkdir(parents=True, exist_ok=True)
         write_atomic(Path(args.write_build_record), _js.dumps(record, indent=1) + "\n")
         print(f"tidy-ratchet: build record written ({len(artifacts)} artifact(s))")

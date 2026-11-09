@@ -308,6 +308,8 @@ Write-Host "build: $($results.Count) target(s) built, $Config, output under Bin\
 # Bind this successful build to its inputs and outputs: the ratchet
 # refuses to certify artifacts its sources no longer match, and the
 # conformance check's C24 consumes the chain (D07 T01 section 3).
-& python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json')
-if ($LASTEXITCODE -ne 0) { Write-Host 'build: writing the build record failed' -ForegroundColor Red; exit 1 }
+if ($Config -eq 'Release') {
+    & python (Join-Path $RepoRoot 'scripts\tidy-ratchet.py') --write-build-record (Join-Path $LogDir 'build-record.json') --build-config $Config --build-targets ($targets -join ',')
+    if ($LASTEXITCODE -ne 0) { Write-Host 'build: writing the build record failed' -ForegroundColor Red; exit 1 }
+}
 exit 0

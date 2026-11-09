@@ -457,6 +457,8 @@ def eval_build_clean(root: Path, tool, spec, ctx):
         raise Refusal(
             "C24: build inputs differ from the measured manifest; rerun the gate"
         )
+    if record.get("build_config") != "Release" or not record.get("build_targets"):
+        raise Refusal("C24: result record carries no full Release build binding; rerun the gate")
     if record.get("build_inputs_sha256") != current_inputs:
         raise Refusal(
             "C24: artifacts were not built from these inputs "
@@ -842,6 +844,8 @@ def self_test() -> int:
         rec = _j.loads(result.read_text())
         rec["inputs_sha256"] = load_ratchet(tmp).input_manifest(tmp)
         rec["build_inputs_sha256"] = rec["inputs_sha256"]
+        rec.setdefault("build_config", "Release")
+        rec.setdefault("build_targets", ["ToolA"])
         result.write_text(_j.dumps(rec))
 
 
@@ -873,6 +877,7 @@ def self_test() -> int:
             "artifacts": {"Bin/Release/ToolA.exe": _h.sha256((tmp / "Bin/Release/ToolA.exe").read_bytes()).hexdigest()},
             "inputs_sha256": load_ratchet(tmp).input_manifest(tmp),
             "build_inputs_sha256": load_ratchet(tmp).input_manifest(tmp),
+            "build_config": "Release", "build_targets": ["ToolA"],
             "compile_dbs": {"build/release/compile_commands.json": _h.sha256((tmp / "build/release/compile_commands.json").read_bytes()).hexdigest()},
         }))
         tools = {
