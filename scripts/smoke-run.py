@@ -431,22 +431,34 @@ def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None, pending=None
     return box.get("shot")
 
 
-def collect_late_capture_diagnostics(runs, notes, join_timeout: float = 10.0):
+def collect_late_capture_diagnostics(runs, notes, join_timeout: float = 10.0, abort=None) -> bool:
     """Drain abandoned capture workers into the report before the verdict.
 
     A worker that finished with a failure names it; a worker still blocked
     is reported as unverified. Either way the run fails: silent loss of a
-    release diagnostic is exactly what this prevents.
+    release diagnostic is exactly what this prevents. The drain itself
+    stands down when operator input resumes: it stops joining, reports the
+    worker unverified, and returns True so the verdict can stand down while
+    collected failures keep exit 1.
     """
+    stood_down = False
     for run in runs:
         for box in getattr(run, "pending_captures", []):
-            box["thread"].join(timeout=join_timeout)
+            deadline = time.monotonic() + join_timeout
+            while box["thread"].is_alive() and time.monotonic() < deadline:
+                if abort is not None and abort():
+                    stood_down = True
+                    break
+                box["thread"].join(timeout=0.05)
             if box["thread"].is_alive():
                 notes.append(f"{run.name}: capture cleanup unverified (worker still blocked)")
                 run.failed = True
             elif "error" in box:
                 notes.append(f"{run.name}: late capture failure: {box['error']!r}")
                 run.failed = True
+    if stood_down:
+        notes.append("Operator input resumed during capture drain; the run stood down.")
+    return stood_down
 
 
 def exit_result(returncode) -> tuple[str, str]:
@@ -1084,7 +1096,8 @@ def main(argv=None) -> int:
                 stood_down = True
                 notes.append(f"Operator input resumed during {run.name}; the run stood down.")
         rows += run.rows
-    collect_late_capture_diagnostics(runs, notes)
+    if collect_late_capture_diagnostics(runs, notes, abort=resumed):
+        stood_down = True
     failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
     blocked = any(r[2] == "blocked" for r in rows)
     verdict = "stood-down" if stood_down else ("fail" if failed else ("blocked" if blocked else "pass"))
@@ -1782,6 +1795,24 @@ def self_test() -> int:
     collect_late_capture_diagnostics([_lrun2], _notes3)
     check("late capture release failure reaches the report and fails the run",
           _shot is None and _lrun2.failed and any("ReleaseDC failed" in n for n in _notes3))
+
+    # The drain stands down on input while its worker is still blocked.
+    import threading as _th4
+    _rel4 = _th4.Event()
+    _drain_run = ToolRun("Resolute", Path("x"))
+    _real_cap5 = globals()["capture_window"]
+    globals()["capture_window"] = lambda hwnd: (_rel4.wait(30), None)[1]
+    try:
+        capture_window_bounded(99, timeout=0.5, pending=_drain_run.pending_captures)
+        _notes4 = []
+        _sd = collect_late_capture_diagnostics([_drain_run], _notes4, join_timeout=5.0,
+                                               abort=lambda: True)
+    finally:
+        _rel4.set()
+        globals()["capture_window"] = _real_cap5
+    check("drain stands down on input and reports the worker unverified",
+          _sd is True and any("stood down" in n for n in _notes4)
+          and any("unverified" in n for n in _notes4) and _drain_run.failed)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
