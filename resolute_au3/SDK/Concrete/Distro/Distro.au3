@@ -2077,22 +2077,29 @@ Func _BuildVerdict($sReleaseName, $sAllWrapOutput, $iWrapExit, $sBuildStart)
 			If $iWrapExit > 0 Then $sExitText = $iWrapExit
 		EndIf
 
+		Local $sFailReason = ""
 		If $bArchOk Then
 			If $iA >= UBound($aCreated) Then
 				$bArchOk = False
+				$sFailReason = "the compiler did not report creating the expected output"
 			ElseIf StringLower(_PathFull(StringStripWS($aCreated[$iA], 3))) <> StringLower(_PathFull($sExpected)) Then
 				$bArchOk = False
-			ElseIf Not FileExists($sExpected) Then
+				$sFailReason = "the compiler did not report creating the expected output"
+			ElseIf Not FileExists($sExpected) Or StringInStr(FileGetAttrib($sExpected), "D") Then
 				$bArchOk = False
+				$sFailReason = "the expected output was not created"
 			ElseIf FileGetTime($sExpected, 0, 1) < $sBuildStart Then
 				; A retained output from an earlier build cannot pass for this one.
 				$bArchOk = False
+				$sFailReason = "the expected output was not produced by this build"
 			EndIf
 		EndIf
 
 		If Not $bArchOk Then
 			$bOk = False
-			If $sExitText = "" Then
+			If $sFailReason <> "" Then
+				_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s' (%s): %s.", $sReleaseName, $aArchName[$iArch], $sFailReason), "ERROR"))
+			ElseIf $sExitText = "" Then
 				_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s' (%s): no compiler result was reported for this architecture.", $sReleaseName, $aArchName[$iArch]), "ERROR"))
 			Else
 				_Logging_EditWrite(_Logging_SetLevel(StringFormat("Build failed for '%s' (%s): compiler exit %s.", $sReleaseName, $aArchName[$iArch], $sExitText), "ERROR"))
