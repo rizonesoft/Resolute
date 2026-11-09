@@ -114,7 +114,7 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 > [!IMPORTANT]
 > **Read `todo/.tidy-baseline` before writing the counter.** It records the exact reproduction procedure, and two traps that produce a plausible wrong number rather than an error. The second one already cost `D00 T01 §3` a round: `clang-analyzer` checks are spelled `clang-analyzer-security.ArrayBound`, with uppercase letters and dots, so a check-name character class of `[a-z0-9.-]+` silently drops every analyzer finding. That is how the baseline was first recorded as 52 instead of 59.
 
-- [ ] Record the per-target baseline for compiler warnings and static-analysis findings. Done when: the baseline file exists and the combined gate compares against it. **The analysis baseline already exists** at `todo/.tidy-baseline`, written by `D00 T01 §3` at 59; this item adds the per-target split and the comparison.
+- [ ] Record the per-target baseline for compiler warnings and static-analysis findings. Done when: the baseline file exists and the combined gate compares against it. **The analysis baseline already exists** at `todo/.tidy-baseline`, written by `D00 T01 §3` at 59 and since raised with recorded reasons to 169 (the file is the authority); this item adds the per-target split and the comparison. **Corrected 2026-11-09:** the target split is per compile database (the root `build/release` database is one target, each `extensions/<Tool>/build/Release` database is one target), because that is the boundary `check-all.ps1` already enumerates and the boundary a regression is attributable at. The ratchet lives in `scripts/tidy-ratchet.py` (stdlib, `--self-test`, following `scripts/profile-check.py`), wired into the `check-all.ps1` tidy gate, which keeps the compiler-warning side at its existing zero (`-Werror`, nothing baselined).
 - [ ] Make the ratchet one-way. Done when: a count above the baseline fails, a count equal passes, and a count below rewrites the baseline down in the same commit.
 - [ ] Report which target regressed, not just that something did. Done when: a deliberate regression names the target and the finding.
 - [ ] Prevent a silent baseline raise. Done when: raising a baseline requires an explicit recorded reason and the check names it.
@@ -124,7 +124,7 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 
 -> SOURCE: plan-D00-T04-s6-2026-09-19-PR14 D00-T04-S6-PR14
 
-**Test checkpoint:** A count above the baseline fails and names the target and finding. A count equal passes. A count below rewrites the baseline down. A raise without a recorded reason is refused. All four quoted.
+**Test checkpoint:** A count above the baseline fails and names the target and its findings. A count equal passes. A count below rewrites the baseline down. A raise without a recorded reason is refused, and a raise with one is named in the gate output. A duplicate resource id (the `D00 T03 §2` twice-defined `IDI_APPFALLBACK` shape, and two symbols sharing one numeric value) fails the gate by name. All quoted, from `scripts/tidy-ratchet.py --self-test`, from driven drills against the real tree, and from `pwsh scripts/check-all.ps1`. **Corrected 2026-11-09:** the raise guard compares the working-tree baseline against `git show HEAD:todo/.tidy-baseline`; a higher count passes only when the baseline carries a `# Raised <old> -> <new> on <YYYY-MM-DD>: <reason>` line whose `<new>` equals the current total, which is the form the two recorded raises already use.
 
 ## 3. Conformance Check and Its Report
 
