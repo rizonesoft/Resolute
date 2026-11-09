@@ -91,6 +91,7 @@ The 450x500 Preferences dialog (`ReBar.au3:1005-`, dialog title from `[Preferenc
 **Test checkpoint:** The shell names tabs, buttons, notices, and the dirty rule; all three groups name every control with key and behavior; the priority values map to Win32 classes; the dead Cache key is cut with reason. The `D01 T01 §7` checklist can be built from this section with no invented control. Cheaper substitute that fails the checkpoint: groups without setting keys, which ships a dialog that displays settings it cannot store.
 
 -> XREF: D01 T01 §7 -- the build that consumes this preferences spec
+-> XREF: D07 T01 §4 -- the smoke run whose preferences step activates per tool when this shell ships
 
 ## 3. Preferences Language Page and Tool-Page Contract
 

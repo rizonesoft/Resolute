@@ -150,7 +150,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D07 T01 §1`  | The conformance profile                           |   7   |
 | [x] | `D07 T01 §2`  | Warning and analysis ratchet                      |  11   |
 | [x] | `D07 T01 §3`  | Conformance check and its report                  |  19   |
-| [ ] | `D07 T01 §4`  | Standing smoke run over the suite                 |   5   |
+| [ ] | `D07 T01 §4`  | Standing smoke run over the suite                 |   7   |
 | [ ] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   5   |
 | [ ] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
 | [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |

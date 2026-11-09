@@ -185,13 +185,24 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 
 ## 4. Standing Smoke Run Over the Suite
 
-- [ ] Drive every shipped tool through start, main surface, About, preferences, and exit. Done when: every tool is covered and a crash in any one is reported without stopping the run.
-- [ ] Capture each tool's main surface on every run. Done when: the capture set is produced and compared against the previous run.
-- [ ] Report the run as one artifact. Done when: a full run produces a single report naming every tool and its result, quoted.
-- [ ] Make a smoke failure actionable. Done when: a failure names the tool, the step, and the captured state at failure.
+> [!IMPORTANT]
+> **Validated 2026-11-09 before implementation. The five steps are per tool as the tool exists today, and the drive mechanism is messages, never synthetic input.**
+>
+> The shipped inventory is the conformance registry's two tools (launcher `Resolute`, `RegStudio`), consumed from `scripts/conformance-check.py` so the suite has one tool list, not two. Neither tool has a preferences surface yet (the framework preferences shell is `D01 T03 §2`, open), and the launcher has no menu: RegStudio has Help > About (a `MessageBox`) and File > Exit, the launcher exits by closing its window. So the five steps are start, main surface, About, preferences, exit, and a step a tool does not expose is reported `absent` by name in the report, never silently passed and never a failure: the step activates for that tool when its surface ships. `capture-window.ps1` (D00 T02 §3) removed synthetic input because `SetForegroundWindow` fails from a background process and keystrokes land on the operator's foreground app, so this run drives by Win32 messages to the tool's own window (`WM_COMMAND` for menu items, `WM_CLOSE` to exit) and captures with `PrintWindow` (`PW_RENDERFULLCONTENT`), which needs no foreground and takes nothing from the operator. It is therefore not wired into `check-all.ps1`: `docs/testing.md` fences desktop windows out of the default gate, and a run that opens real windows belongs on demand and in the nightly run, named here rather than smuggled into the gate.
+>
+> **Corrected 2026-11-09:** the original checkpoint's "five steps each" read as if every tool already had all five surfaces. It does not, per above; the checkpoint below is corrected to the per-tool step table the report prints.
+>
+> **Deferred:** the preferences step per tool, active when the framework preferences surface ships --> XREF: D01 T03 §2
+
+- [ ] Build the driver `scripts/smoke-run.py` (stdlib only, like every TODO tool): the tool inventory is imported from `scripts/conformance-check.py`'s registry, never re-listed. Done when: `--self-test` passes and a run enumerates exactly the shipped tools the conformance check names.
+- [ ] Drive every shipped tool through start, main surface, About, preferences, and exit, by window messages only (no `SendKeys`, no foreground requirement). Done when: every tool is covered, each step records `pass`, `absent` (surface not shipped, named), or `fail`, and a crash in any one tool is reported without stopping the run.
+- [ ] Capture each tool's main surface on every run with `PrintWindow` to `build/smoke/<tool>-main.png`, and compare against the previous run's capture. Done when: the capture set is produced, a blank capture (no pixel variance) fails that tool's surface step by name, and the report names each surface `changed` or `unchanged` versus the previous run where one exists.
+- [ ] Report the run as one artifact. Done when: a full run produces a single report at `build/smoke/smoke-report.md` naming every tool, every step result, its captures, and the suite verdict, quoted in the stamp.
+- [ ] Make a smoke failure actionable. Done when: a failure names the tool, the step, and the captured state at failure (the surface capture taken at that step, or the reason none exists), the run continues with the remaining tools, and the exit code is non-zero.
+- [ ] Prove the failure path with a deliberately broken tool: a fixture inventory entry whose executable shows no window. Done when: the drill reports that tool failed at `start` by name, the real tools still complete, and the run exits non-zero; and `--self-test` covers the report and step-table logic without opening a window.
 - [ ] Commit: `"quality: a standing smoke run over the whole suite"`
 
-**Test checkpoint:** A full smoke run covers every shipped tool through five steps each and produces one report, quoted. A deliberately broken tool is reported without stopping the run, naming tool, step, and captured state.
+**Test checkpoint:** A full smoke run covers every shipped tool through the five steps as that tool exposes them (absent surfaces named, not passed), produces one report quoting every tool and step, and captures every main surface. A deliberately broken tool is reported without stopping the run, naming tool, step, and captured state, and the run exits non-zero. All quoted from a real `scripts/smoke-run.py` run and its `--self-test`.
 
 ## Verification
 
