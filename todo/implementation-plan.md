@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **73 of 235 sections complete (31%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **73 of 236 sections complete (31%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -173,6 +173,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |   5   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |  18   |
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
+| [ ] | `D00 T05 §4`  | Sidecar Reproduction Command Carries -Visible     |   3   |
 | [ ] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow                  |   5   |
 | [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                     |   7   |
 | [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs                 |   5   |

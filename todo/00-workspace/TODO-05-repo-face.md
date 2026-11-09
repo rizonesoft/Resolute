@@ -46,6 +46,7 @@ track: N0
 |   1   |   §1    | Visual proof capture with provenance | D00 T01 §4, D00 T02 §3 |  [ ]   |
 |   2   |   §2    | README rewrite plus repo-face files | §1 |  [ ]   |
 |   3   |   §3    | Setup-path CI plus reproducibility record | §2 |  [ ]   |
+|   4   |   §4    | Sidecar reproduction command carries -Visible | §1 |  [ ]   |
 
 ---
 
@@ -66,6 +67,7 @@ The README shows real pixels from the shipped app, never mockups: the suite buil
 **Test checkpoint:** A clean checkout builds by one command; two shots at or above 1280 px exist with complete sidecars; every sidecar field names a real value. Cheaper substitute that fails the checkpoint: mockups or undated captures, which prove the layout was imagined rather than shipped.
 
 -> XREF: D00 T05 §2 -- the README these captures illustrate
+-> XREF: D00 T05 §4 -- the filed fix for the sidecar reproduction command
 
 ## 2. README Rewrite Plus Repo-Face Files
 
@@ -114,6 +116,19 @@ A CI lane runs the README quick start verbatim on every push, per build lane, so
 
 -> XREF: D00 T05 §2 -- the quick start this lane executes
 -> XREF: D10 T01 §2 -- the rule that guards this workflow
+
+## 4. Sidecar Reproduction Command Carries -Visible
+
+**Filed 2026-11-09** from the `D00 T05 §1` repair review (round 3, `P3`, in `docs/reviews/00-workspace/D00-T05-s1-repair.md`): the four sidecars committed by §1 record a reproduction command that omits the capture driver's mandatory `-Visible` switch, so the command as written exits 2 and captures nothing.
+
+- [ ] Add `-Visible` to the reproduction command `scripts/capture-launcher-readme.ps1` writes into each sidecar's launch context. Done when: the generated command, run as written, captures instead of refusing.
+- [ ] Restake the four §1 sidecars by re-running the driver. Done when: each sidecar's launch context carries `-Visible`, and the recorded revision, exe hash, dimensions, and theme still verify against the built exe.
+- [ ] Commit: `"docs: sidecar reproduction command carries -Visible"`
+
+**Test checkpoint:** the exact command in one restaked sidecar reproduces its shot (quoted), and `grep` over the four sidecars shows `-Visible` in every launch context.
+
+-> XREF: D00 T05 §1 -- the captures whose sidecars are corrected
+-> SOURCE: review-2026-11-09-d00-t05-s1-repair-round3 (P3 sidecar command)
 
 ## Verification
 
