@@ -515,6 +515,13 @@ def self_test() -> int:
     check("night admits collecting", admission(False, night, {}) == (True, "collecting (night window 02:00-06:50)", True))
     check("plain daytime refused", admission(False, day, {})[0] is False)
 
+    # Flavor maps the registry's release paths onto the built flavor.
+    debug_exes = {r.name: str(r.exe) for r in real_tools(flavor="Debug")}
+    check("debug flavor drives Bin/Debug", debug_exes["Resolute"].endswith("Bin\\Debug\\Resolute.exe")
+          and debug_exes["RegStudio"].endswith("Bin\\Debug\\System\\RegStudio.exe"))
+    check("release flavor drives Bin/Release",
+          str(real_tools()[0].exe).endswith("Bin\\Release\\Resolute.exe"))
+
     # Elevation refusal is a named block, not a failure.
     exc = OSError("requires elevation")
     exc.winerror = 740
