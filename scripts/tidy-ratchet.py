@@ -627,6 +627,19 @@ def run(root: Path, clang_tidy: Path, base_override, log_path, result_path=None)
             "baseline_sha256": _hashlib.sha256(
                 (root / "todo" / ".tidy-baseline").read_bytes()
             ).hexdigest(),
+            # Bind the record to the candidate it measured: the
+            # shipped artifacts and compile databases as they stood.
+            # Changed sources with an old executable must not certify
+            # (D07 T01 \u00a73 review round 4).
+            "artifacts": {
+                f.relative_to(root).as_posix(): _hashlib.sha256(f.read_bytes()).hexdigest()
+                for f in sorted((root / "Bin" / "Release").rglob("*"))
+                if f.is_file()
+            } if (root / "Bin" / "Release").is_dir() else {},
+            "compile_dbs": {
+                db.relative_to(root).as_posix(): _hashlib.sha256(db.read_bytes()).hexdigest()
+                for db in targets.values()
+            },
         }
         write_atomic(Path(result_path), _json.dumps(record, indent=1) + "\n")
     print(

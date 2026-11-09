@@ -263,38 +263,43 @@ def pe_imports(data: bytes):
                 raise ValueError(
                     f"section {i} raw data [{rptr:#x}, {rptr + rsize:#x}) beyond EOF"
                 )
-            sections.append((vaddr, max(vsize, rsize), rptr))
+            sections.append((vaddr, rsize, rptr))
 
-        def rva_to_off(rva):
-            for vaddr, span, rptr in sections:
-                if vaddr <= rva < vaddr + span:
+        def rva_to_off(rva, size=1):
+            # File-backed bytes only: an RVA in the virtual-only tail
+            # of a section (or a zero-raw section) has no bytes in
+            # the file, and reading through it accepts import data
+            # that does not exist (review round 4).
+            for vaddr, raw_span, rptr in sections:
+                if vaddr <= rva and rva + size <= vaddr + raw_span:
                     return rptr + (rva - vaddr)
-            raise ValueError(f"RVA {rva:#x} outside sections")
+            raise ValueError(f"RVA {rva:#x} (+{size}) outside raw section data")
 
         def cstring(rva):
             off = rva_to_off(rva)
             end = data.index(b"\0", off)
+            rva_to_off(rva, end - off + 1)
             return data[off:end].decode("ascii", "strict")
 
         names = []
         imp_rva, _ = directory(1)
         if imp_rva:
-            off = rva_to_off(imp_rva)
+            desc = imp_rva
             while True:
-                fields = struct.unpack_from("<IIIII", data, off)
+                fields = struct.unpack_from("<IIIII", data, rva_to_off(desc, 20))
                 if not any(fields):
                     break
                 names.append(cstring(fields[3]))
-                off += 20
+                desc += 20
         delay_rva, _ = directory(13)
         if delay_rva:
-            off = rva_to_off(delay_rva)
+            desc = delay_rva
             while True:
-                fields = struct.unpack_from("<IIIIIIII", data, off)
+                fields = struct.unpack_from("<IIIIIIII", data, rva_to_off(desc, 32))
                 if not any(fields):
                     break
                 names.append(cstring(fields[1]))
-                off += 32
+                desc += 32
         return names
     except (ValueError, struct.error, IndexError, UnicodeDecodeError) as exc:
         raise Refusal(f"malformed or unreadable PE: {exc}") from exc
@@ -420,6 +425,33 @@ def eval_build_clean(root: Path, tool, spec, ctx):
     baseline_bytes = (root / "todo" / ".tidy-baseline").read_bytes()
     if record.get("baseline_sha256") != hashlib.sha256(baseline_bytes).hexdigest():
         raise Refusal("C24: baseline changed since the ratchet measured it; rerun the gate")
+    # The record binds to the candidate it measured: the shipped
+    # artifacts and compile databases by hash, and no source file
+    # newer than the record itself. Changed sources beside an old
+    # executable certify nothing (review round 4).
+    exe_rel = spec["exe"]
+    recorded_artifacts = record.get("artifacts", {})
+    exe_path = root / exe_rel
+    if exe_path.is_file():
+        digest = hashlib.sha256(exe_path.read_bytes()).hexdigest()
+        if recorded_artifacts.get(exe_rel) != digest:
+            raise Refusal(
+                f"C24: {exe_rel} differs from the artifact the ratchet measured; rerun the gate"
+            )
+    for rel_db, digest in record.get("compile_dbs", {}).items():
+        db_path = root / rel_db
+        if not db_path.is_file() or hashlib.sha256(db_path.read_bytes()).hexdigest() != digest:
+            raise Refusal(f"C24: compile database {rel_db} changed since measurement; rerun the gate")
+    record_mtime = Path(result_path).stat().st_mtime
+    source_root = root / spec["source_dir"]
+    if source_root.is_dir():
+        for f in source_root.rglob("*"):
+            if f.is_file() and "build" not in f.parts and f.suffix.lower() in SOURCE_SUFFIXES:
+                if f.stat().st_mtime > record_mtime:
+                    raise Refusal(
+                        f"C24: source {f.relative_to(root).as_posix()} is newer than the "
+                        "measurement; rerun the gate"
+                    )
     target = spec["tidy_target"]
     if target not in record.get("targets", {}):
         raise Refusal(f"C24: result record carries no count for target '{target}'")
@@ -818,6 +850,8 @@ def self_test() -> int:
             "baseline_count": 0, "baseline_targets": {"root": 0}, "tus": 1,
             "log_sha256": _h.sha256(log.read_bytes()).hexdigest(),
             "baseline_sha256": _h.sha256((tmp / "todo" / ".tidy-baseline").read_bytes()).hexdigest(),
+            "artifacts": {"Bin/Release/ToolA.exe": _h.sha256((tmp / "Bin/Release/ToolA.exe").read_bytes()).hexdigest()},
+            "compile_dbs": {"build/release/compile_commands.json": _h.sha256((tmp / "build/release/compile_commands.json").read_bytes()).hexdigest()},
         }))
         tools = {
             "ToolA": {
@@ -857,7 +891,13 @@ def self_test() -> int:
         tools["ToolA"]["source_dir"] = "extensions/ToolA"
         d = tmp / "extensions" / "ToolA"
         d.mkdir(parents=True)
-        (d / "Settings.cpp").write_text("// private settings\n")
+        planted = d / "Settings.cpp"
+        planted.write_text("// private settings\n")
+        import os as _os
+        import time as _time
+
+        past = _time.time() - 3600
+        _os.utime(planted, (past, past))
         refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "shared-layer name")
 
     case("layout violation fails by name", layout_violation)
@@ -986,6 +1026,34 @@ def self_test() -> int:
             assert "beyond EOF" in str(exc), exc
 
     case("section raw data beyond EOF refuses", section_beyond_eof)
+
+    def stale_candidate_refused():
+        import os as _os
+        import time as _time
+
+        tmp, tools, log, status, result = fixture()
+        future = _time.time() + 60
+        _os.utime(tmp / "src" / "main.cpp", (future, future))
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "is newer than the measurement")
+        tmp, tools, log, status, result = fixture()
+        (tmp / "Bin/Release/ToolA.exe").write_bytes(make_pe(["USER32.dll"]))
+        refuses(lambda: run(tmp, log, tools, PROFILE, status, result), "differs from the artifact")
+
+    case("changed source or artifact voids C24 evidence", stale_candidate_refused)
+
+    def zero_raw_section():
+        data = bytearray(make_pe(["KERNEL32.dll"]))
+        pe_off = struct.unpack_from("<I", bytes(data), 0x3C)[0]
+        opt_size = struct.unpack_from("<H", bytes(data), pe_off + 20)[0]
+        sec = pe_off + 24 + opt_size
+        struct.pack_into("<I", data, sec + 16, 0)
+        tmp = mkdtemp()
+        p = tmp / "tool.exe"
+        p.write_bytes(bytes(data))
+        got = pe_problems(p)
+        assert got and "malformed" in got[0], got
+
+    case("imports outside raw section data refuse", zero_raw_section)
 
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)
