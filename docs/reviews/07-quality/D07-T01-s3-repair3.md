@@ -74,3 +74,49 @@ Reviewed the candidate diff and prior records. All four wrapper tests passed. No
 
 HIGHEST: none
 OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T07:02:07Z
+- Candidate: 787d23ceb2ebf3f2b453277cb76435a6f65cee4f
+- Effort: medium
+- Writer model: muse-wonder-full-1.0
+- Policy: 8bf10da4fea2b765de0fbb1388d6f0a7bcd19e00
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 28
+- Digest: a2a2986ae6e050ac
+
+The candidate has one remaining **in-scope test-quality gap**. The supplied run demonstrates the developer-facing behavior, but the new regression test does not protect it.
+
+HEAD matches `787d23ce`; the worktree is clean. Review was read-only. All four wrapper tests passed; builds and file-writing self-tests were not rerun.
+
+**Part 1: completeness per need**
+
+| Developer need | Assessment |
+| --- | --- |
+| Run conformance through the combined gate | Present: [check-all.ps1:191](D:/GitHub/Resolute/scripts/check-all.ps1:191). |
+| Inspect clauses, owners, budgets and totals | Present: [conformance-check.py:711](D:/GitHub/Resolute/scripts/conformance-check.py:711). |
+| Distinguish enforced failures from open-owner advisories | Present: [conformance-check.py:683](D:/GitHub/Resolute/scripts/conformance-check.py:683). |
+| See advisory failures and find their full report | Present: [check-all.ps1:324](D:/GitHub/Resolute/scripts/check-all.ps1:324), supported by the supplied candidate run. |
+| Trust current build and analysis evidence | Present: [conformance-check.py:438](D:/GitHub/Resolute/scripts/conformance-check.py:438). |
+| Prevent recurrence of the report-discoverability defect | **Missing-in-scope:** [test_check_all_patterns.py:51](D:/GitHub/Resolute/scripts/tests/test_check_all_patterns.py:51) checks source text, not reporting behavior. |
+| Prove remaining runtime clauses | **Missing-out-of-scope:** assigned to their owners in the [Validated block](D:/GitHub/Resolute/todo/07-quality/TODO-01-quality-bar.md:148). |
+
+**Part 2: excellence against the predecessor pattern**
+
+- **Test quality, in scope:** the report-path test accepts a commented-out implementation. In an in-memory mutation, I commented out the entire path-appending statement at `check-all.ps1:324`; all four tests still passed. This is new evidence that the repair3 plan’s required behavior coverage remains incomplete. Exercise the actual PowerShell reporting code with a successful advisory result and assert the emitted tool, clause and full report path. Disabling the statement must fail that test.
+- **Speed, out of scope:** repeated common-evidence validation remains the previously declined optimization. No new performance evidence warrants reopening it.
+- **Failure quality and evidence binding:** no additional shortfall established within the validated scope.
+
+**Consolidated gap list**
+
+1. **In scope:** replace the source-presence assertion with a behavioral regression test for successful advisory reporting.
+2. **Out of scope, nonblocking:** remaining runtime evaluators belong to their open owners; repeated-validation optimization remains declined.
+
+COMPLETION: gaps
+
+Settled 2026-11-09: completion test-quality gap fixed (report-path test now executes check-all.ps1's own report block under pwsh and asserts the emitted advisory line and report path; commenting the statement out is detected, verified by mutation probe). This record closed; continuation on D07-T01-s3-repair4.md.
