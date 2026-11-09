@@ -81,7 +81,7 @@ The dispatcher appends a `## Round N` section naming the reviewer, its model, ef
 | `optimization` | Is there avoidable work, allocation, latency or step count on a hot path? |
 | `record` | Does evidence match what ran, with owned deferrals and earned flip? |
 
-The loop is bounded: at most `1 + max_low_rounds` rounds (nine under the current pin: one `medium` round plus up to eight `low` rounds; a round that returns no review does not count). Exhausting that budget with findings open is operator recovery, never approval: the dispatcher refuses the next round and no stamp follows from exhaustion. and it ends early on severity: the first round whose findings are all `P3` or advisory (one with no `P1` or `P2`, `HIGHEST: P3` or `HIGHEST: none`) stops the loop, and its `P3` findings are filed through `add-todo`. Findings are fixed in new commits appended to the candidate, gates re-run, and the next round runs against the new tip. A unit patched three rounds running is stopped and re-thought instead of patched again. When the dispatcher exits 1 (the reviewer returned no review), record the outage in the findings file and re-run or stop without a stamp: a session-only pass is not a substitute.
+The loop is bounded: at most `1 + max_low_rounds` rounds (nine under the current pin: one `medium` round plus up to eight `low` rounds; a round that returns no review does not count). Exhausting that budget with findings open is operator recovery, never approval: the dispatcher refuses the next round and no stamp follows from exhaustion. and it ends early on severity: the first clean round stops the loop: a round is clean only when it carries exactly one standalone `HIGHEST: P3` or `HIGHEST: none` declaration and no `P1` or `P2` finding (a missing, duplicate, or contradictory declaration is never clean), and its `P3` findings are filed through `add-todo`. Findings are fixed in new commits appended to the candidate, gates re-run, and the next round runs against the new tip. A unit patched three rounds running is stopped and re-thought instead of patched again. When the dispatcher exits 1 (the reviewer returned no review), record the outage in the findings file and re-run or stop without a stamp: a session-only pass is not a substitute.
 
 ### 5. Re-run the gates
 
@@ -103,12 +103,12 @@ python scripts/todo-graph.py plan --check
 
 The stamp block records:
 - `> **Verified:** <YYYY-MM-DD> | §<N> | <quoted checkpoint and gate outputs>`
-- `> **Review:** round <N> Astra (<effort>), candidates <sha>(round 1) ... -- <lens verdicts> · Raw findings: docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md`
+- `> **Review:** round <N> <reviewer from the round record> (<effort>), candidates <sha>(round 1) ... -- <lens verdicts> · Raw findings: docs/reviews/<NN-domain>/D<NN>-T<NN>-s<N>.md`
 - `> **Completion:** <reviewer from the completion record> (medium), candidate <sha> -- COMPLETION: complete \u00b7 Repair records: <none, or each -repair record with its final candidate>`
-- `> **Plan review:** astra -- <outcome>`
+- `> **Plan review:** <reviewer from the plan record> -- <outcome>`
 - `> **CRUD:** <applicable or not applicable (...)>`
 - `> **Duration:** <start UTC> to <end UTC>`
-- `> **Implementer:** Claude Opus 5.5`
+- `> **Implementer:** <writer and exact writer model from the records>`
 
 Commit the stamp, findings file, and regenerated plan together as `todo: stamp <ref>`.
 
