@@ -817,14 +817,26 @@ def repro_check(root: Path) -> int:
         ext = root / "extensions"
         if ext.is_dir():
             trees += [d / "build" for d in ext.iterdir() if d.is_dir()]
+        import stat as _stat
         import time
 
+        def _clear_readonly(func, path, exc):
+            # FetchContent clones carry read-only git pack files;
+            # Windows refuses to delete those until the flag clears
+            # (the standard shutil onexc pattern).
+            try:
+                Path(path).chmod(_stat.S_IWRITE)
+                func(path)
+            except OSError:
+                pass
+
         for tree in trees:
-            # Windows can hold a just-built tree briefly (compiler
-            # handles draining, AV scan): retry the removal, but the
-            # refusal below still fires if anything remains.
+            # Windows can also hold a just-built tree briefly
+            # (compiler handles draining, AV scan): retry the
+            # removal, but the refusal below still fires if
+            # anything remains.
             for _attempt in range(20):
-                shutil.rmtree(tree, ignore_errors=True)
+                shutil.rmtree(tree, onexc=_clear_readonly)
                 if not tree.exists():
                     break
                 time.sleep(0.5)
