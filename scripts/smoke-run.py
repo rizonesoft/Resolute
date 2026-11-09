@@ -45,12 +45,17 @@ from ctypes import wintypes
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+# RESOLUTE_SMOKE_ROOT is set only by the elevated-smoke task wrapper,
+# which executes a hash-verified snapshot of this file from a protected
+# directory (D07 T01 S7): the tree under test stays ROOT, the code that
+# runs elevated is the snapshot, and no repository path joins sys.path.
+ROOT = Path(os.environ["RESOLUTE_SMOKE_ROOT"]) if os.environ.get("RESOLUTE_SMOKE_ROOT") else Path(__file__).resolve().parent.parent
 SMOKE_DIR = ROOT / "build" / "smoke"
 PREV_DIR = SMOKE_DIR / "prev"
 
-sys.path.insert(0, str(ROOT / "tests"))
-sys.path.insert(0, str(ROOT / "scripts"))
+if not os.environ.get("RESOLUTE_SMOKE_ROOT"):
+    sys.path.insert(0, str(ROOT / "tests"))
+    sys.path.insert(0, str(ROOT / "scripts"))
 
 # Per-tool expected surfaces beyond start/main/exit, as shipped today.
 # Preferences ships for neither tool yet (D01 T03 S2 owns the shell); About
@@ -70,7 +75,7 @@ TIMEOUTS = {"launch": 20.0, "window": 15.0, "message": 10.0, "dialog": 10.0, "ex
 
 def load_tools():
     """The shipped-tool inventory, consumed from the conformance registry."""
-    path = ROOT / "scripts" / "conformance-check.py"
+    path = Path(__file__).resolve().parent / "conformance-check.py"
     spec = importlib.util.spec_from_file_location("conformance_check", path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)

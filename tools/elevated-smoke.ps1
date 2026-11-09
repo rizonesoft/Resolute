@@ -29,6 +29,7 @@ $TaskPath = '\Resolute\'
 $TaskName = 'ElevatedSmoke'
 $HashDir = 'C:\ProgramData\Resolute\ElevatedSmoke'
 $HashFile = Join-Path $HashDir 'trusted-hashes.txt'
+$SnapshotDir = Join-Path $HashDir 'run\scripts'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
 $AckTimeoutSec = 60
 $RunTimeoutSec = 900
@@ -116,7 +117,9 @@ function Get-ExpectedAction([string]$Base) {
         "if (`$v -ne 'clean') { exit 2 }; " +
         "`$pinned = @{}; foreach (`$line in Get-Content '$HashFile') { if (`$line -match '^([0-9A-Fa-f]{64})  (.+)$') { `$pinned[`$Matches[2]] = `$Matches[1].ToUpper() } }; " +
         "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$h = (Get-FileHash -Algorithm SHA256 -Path (Join-Path '$Base' `$rel)).Hash; if (`$pinned[`$rel] -ne `$h) { Set-Content -Path '$envFile' -Value 'refused: driver changed since registration'; exit 2 } }; " +
-        "`$env:RESOLUTE_IDLE_COLLECT = '1'; & '$python' '$driver'; exit `$LASTEXITCODE"
+        "`$snap = '$SnapshotDir'; New-Item -ItemType Directory -Force -Path `$snap | Out-Null; " +
+        "foreach (`$rel in @('scripts\\smoke-run.py','scripts\\conformance-check.py')) { `$leaf = Split-Path `$rel -Leaf; Copy-Item -Path (Join-Path '$Base' `$rel) -Destination (Join-Path `$snap `$leaf) -Force; `$h2 = (Get-FileHash -Algorithm SHA256 -Path (Join-Path `$snap `$leaf)).Hash; if (`$pinned[`$rel] -ne `$h2) { Set-Content -Path '$envFile' -Value 'refused: snapshot hash mismatch'; exit 2 } }; " +
+        "`$env:RESOLUTE_SMOKE_ROOT = '$Base'; `$env:RESOLUTE_IDLE_COLLECT = '1'; & '$python' -I (Join-Path `$snap 'smoke-run.py'); exit `$LASTEXITCODE"
     return @{
         Execute = 'powershell.exe'
         Argument = "-NoProfile -NonInteractive -Command ""& { $inner }"""
@@ -147,16 +150,37 @@ function Wait-TaskStopped([scriptblock]$GetState, [int]$TimeoutSec) {
     return ((& $GetState) -ne 'Running')
 }
 
+function Test-DriverProcessesGone($Procs, [bool]$InventoryOk, [string]$DriverPath) {
+    # Gone is proven only by a readable inventory in which no python
+    # process carries the driver (snapshot or checkout path) and none is
+    # unreadable. A failed query proves nothing and returns $false.
+    if (-not $InventoryOk) { return $false }
+    foreach ($proc in @($Procs)) {
+        if (-not $proc.CommandLine) { return $false }
+        if ($proc.CommandLine.Contains($DriverPath) -or $proc.CommandLine.Contains('smoke-run.py')) { return $false }
+    }
+    return $true
+}
+
 function Stop-OwnedTask {
-    # Stops the task and confirms it, and this checkout's driver processes,
-    # are gone. Returns $true only when both are confirmed.
+    # Stops the task (running or queued) and confirms it, and this
+    # checkout's driver processes, are gone. Returns $true only when
+    # both are confirmed; an unreadable inventory is not confirmation.
     Stop-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -ErrorAction SilentlyContinue
-    $stopped = Wait-TaskStopped { (Get-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName).State } $StopTimeoutSec
+    $stopped = Wait-TaskStopped {
+        $s = (Get-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName).State
+        if ($s -eq 'Running' -or $s -eq 'Queued') { 'Running' } else { 'Ready' }
+    } $StopTimeoutSec
     if (-not $stopped) { return $false }
     $driver = Join-Path $Root 'scripts\smoke-run.py'
-    $procs = Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandLine -and $_.CommandLine.Contains($driver) }
-    return (-not $procs)
+    $inventoryOk = $true
+    try {
+        $procs = @(Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" -ErrorAction Stop)
+    } catch {
+        $procs = @()
+        $inventoryOk = $false
+    }
+    return (Test-DriverProcessesGone $procs $inventoryOk $driver)
 }
 
 function Invoke-SelfTest {
@@ -213,6 +237,13 @@ function Invoke-SelfTest {
         Add-Content -Path (Join-Path $hashBase 'scripts\smoke-run.py') -Value 'x' -NoNewline
         Check 'one-byte change refused by name' ((Test-PinnedHashes $hashBase $pinnedFile) -match 'driver changed.*smoke-run').Count -ge 1
 
+        # Process-inventory verdicts: absence must be proven, never assumed.
+        $fakeDriver = 'R:\\x\\scripts\\smoke-run.py'
+        Check 'unreadable inventory proves nothing' (-not (Test-DriverProcessesGone @() $false $fakeDriver))
+        Check 'unrelated readable process is gone' (Test-DriverProcessesGone @([pscustomobject]@{ CommandLine = 'python other.py' }) $true $fakeDriver)
+        Check 'driver process present is not gone' (-not (Test-DriverProcessesGone @([pscustomobject]@{ CommandLine = "python $fakeDriver" }) $true $fakeDriver))
+        Check 'unreadable process is not gone' (-not (Test-DriverProcessesGone @([pscustomobject]@{ CommandLine = $null }) $true $fakeDriver))
+
         # Unconfirmed stop: a getter that never leaves Running fails the wait.
         Check 'unconfirmed stop fails inside its bound' (-not (Wait-TaskStopped { 'Running' } 1))
         Check 'confirmed stop passes' (Wait-TaskStopped { 'Ready' } 1)
@@ -233,11 +264,14 @@ function Invoke-RegisterElevated {
     if (-not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
     $trustRefusals = Test-PinnedHashes $Root $HashFile  # informational before first registration
     Remove-Variable trustRefusals -ErrorAction SilentlyContinue
+    $priorXml = $null
+    $prior = Get-TaskOrNull
+    if ($prior) { $priorXml = Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName }
+    $priorHash = if (Test-Path $HashFile) { Get-Content $HashFile -Raw } else { $null }
+    try {
     $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
     $expected = Get-ExpectedAction $Root
     $action = New-ScheduledTaskAction -Execute $expected.Execute -Argument $expected.Argument -WorkingDirectory $expected.WorkingDirectory
-    Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
-        -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
     New-Item -ItemType Directory -Force -Path $HashDir | Out-Null
     $lines = foreach ($rel in $DriverFiles) {
         '{0}  {1}' -f (Get-FileHash -Algorithm SHA256 -Path (Join-Path $Root $rel)).Hash, $rel
@@ -254,6 +288,29 @@ function Invoke-RegisterElevated {
     }
     $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($users, 'ReadAndExecute', 'Allow')))
     Set-Acl -Path $HashFile -AclObject $acl
+    # Protect the snapshot directory the same way: only Administrators and
+    # SYSTEM write where elevated code is staged.
+    New-Item -ItemType Directory -Force -Path $SnapshotDir | Out-Null
+    $dacl = New-Object Security.AccessControl.DirectorySecurity
+    $dacl.SetAccessRuleProtection($true, $false)
+    foreach ($sid in $admins, $system) {
+        $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($sid, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+    }
+    $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($users, 'ReadAndExecute', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+    Set-Acl -Path (Split-Path $SnapshotDir -Parent) -AclObject $dacl
+    Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
+        -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
+    } catch {
+        # Roll back: a failed registration leaves neither a half-registered
+        # task nor new pinned hashes behind.
+        if ($priorXml) {
+            Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -XmlText $priorXml -Force | Out-Null
+        } else {
+            Unregister-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+        }
+        if ($priorHash) { Set-Content -Path $HashFile -Value $priorHash } else { Remove-Item $HashFile -ErrorAction SilentlyContinue }
+        throw
+    }
     return 0
 }
 
@@ -347,7 +404,7 @@ function Invoke-Run {
     } finally {
         if (-not $completed) {
             $t = Get-TaskOrNull
-            if ($t -and $t.State -eq 'Running') {
+            if ($t -and ($t.State -eq 'Running' -or $t.State -eq 'Queued')) {
                 if (Stop-OwnedTask) {
                     Write-Host 'cleanup: task stopped and confirmed'
                 } else {
