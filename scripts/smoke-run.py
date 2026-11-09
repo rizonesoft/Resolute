@@ -181,6 +181,7 @@ WM_CLOSE = 0x0010
 WM_COMMAND = 0x0111
 IDOK = 1
 PW_RENDERFULLCONTENT = 0x00000002
+ABORTED = "aborted"  # wait_window result when the stand-down abort fires
 
 
 class LASTINPUTINFO(ctypes.Structure):
@@ -277,7 +278,7 @@ def wait_window(pid: int, timeout: float, want_dialog: bool = False, abort=None)
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         if abort is not None and abort():
-            return None
+            return ABORTED
         for hwnd, cls, title in pid_windows(pid):
             if want_dialog and cls == "#32770":
                 return hwnd
@@ -329,7 +330,7 @@ def post(hwnd, msg, wparam=0):
     user32.PostMessageW(hwnd, msg, wparam, 0)
 
 
-def capture_window_bounded(hwnd, timeout: float = 10.0):
+def capture_window_bounded(hwnd, timeout: float = 10.0, abort=None):
     """PrintWindow on a worker thread: a hung UI thread must not hang the run.
 
     The worker is a daemon: if it outlives its bound it dies with the driver,
@@ -346,7 +347,11 @@ def capture_window_bounded(hwnd, timeout: float = 10.0):
 
     worker = threading.Thread(target=work, daemon=True)
     worker.start()
-    worker.join(timeout)
+    deadline = time.monotonic() + timeout
+    while worker.is_alive() and time.monotonic() < deadline:
+        if abort is not None and abort():
+            return ABORTED
+        worker.join(0.05)
     if worker.is_alive():
         return None
     return box.get("shot")
@@ -470,6 +475,22 @@ class ToolRun:
                 self.proc.kill()
 
 
+def spawn_contained(run: "ToolRun"):
+    """Create the child suspended, contain it, and only then resume it.
+
+    A child whose containment fails is terminated still suspended: it never
+    executes a single instruction outside the job.
+    """
+    run.proc = subprocess.Popen([str(run.exe), *run.args],
+                                creationflags=0x00000004)  # CREATE_SUSPENDED
+    if not run.job.assign(run.proc):
+        run.proc.terminate()
+        return
+    if ctypes.windll.ntdll.NtResumeProcess(wintypes.HANDLE(int(run.proc._handle))) != 0:
+        run.job.error = "NtResumeProcess failed"
+        run.proc.terminate()
+
+
 def launch_block(exc: OSError) -> str | None:
     """A named refusal at launch, or None when the launch simply failed."""
     if getattr(exc, "winerror", None) == 740:  # ERROR_ELEVATION_REQUIRED
@@ -484,13 +505,8 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
     table = dict(step_table(run.name))
     run.job = JobBox()
     try:
-        # Suspended at creation, assigned to the job, then resumed: there is
-        # no window in which the child runs uncontained.
-        run.proc = subprocess.Popen([str(run.exe), *run.args],
-                                    creationflags=0x00000004)  # CREATE_SUSPENDED
-        contained = run.job.assign(run.proc)
-        ctypes.windll.ntdll.NtResumeProcess(wintypes.HANDLE(int(run.proc._handle)))
-        if not contained:
+        spawn_contained(run)
+        if run.job.error:
             for step, expected in step_table(run.name):
                 run.record(step, "fail" if expected else "absent",
                            f"containment could not be established: {run.job.error}"
@@ -508,10 +524,15 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             else:
                 run.record(step, "fail" if expected else "absent",
                            f"launch failed for {run.exe}: {exc}" if expected else "surface not shipped")
+        run.job.close()
         return False
     try:
         # start: observe the main window inside the launch bound.
         run.hwnd = wait_window(run.proc.pid, run.start_timeout, abort=resumed)
+        if run.hwnd == ABORTED:
+            run.record("start", "stood-down", "operator input resumed during launch wait")
+            ensure_rows(run, "stood-down", "operator input resumed; tool dismissed")
+            return True
         if run.hwnd is None:
             run.record("start", "fail",
                        f"no window within {run.start_timeout:.0f}s (capture: none, no window)")
@@ -536,7 +557,12 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             return True
 
         # main: capture the surface; a blank capture fails by name.
-        shot = capture_window_bounded(run.hwnd)
+        shot = capture_window_bounded(run.hwnd, abort=resumed)
+        if shot == ABORTED:
+            post(run.hwnd, WM_CLOSE)
+            run.record("main", "stood-down", "operator input resumed; tool dismissed")
+            ensure_rows(run, "stood-down", "operator input resumed; tool dismissed")
+            return True
         if shot is None:
             run.record("main", "fail", "PrintWindow produced no capture")
         else:
@@ -565,6 +591,11 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
         else:
             post(run.hwnd, WM_COMMAND, ABOUT_IDM)
             dialog = wait_window(run.proc.pid, TIMEOUTS["dialog"], want_dialog=True, abort=resumed)
+            if dialog == ABORTED:
+                post(run.hwnd, WM_CLOSE)
+                run.record("about", "stood-down", "operator input resumed; tool dismissed")
+                ensure_rows(run, "stood-down", "operator input resumed; tool dismissed")
+                return True
             if dialog is None:
                 run.record("about", "fail",
                            "About dialog did not appear (command ignored or no dialog); "
@@ -596,18 +627,43 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
 
         # exit: WM_CLOSE, then observe the process terminated.
         post(run.hwnd, WM_CLOSE)
-        try:
-            run.proc.wait(timeout=TIMEOUTS["exit"])
-            result, detail = exit_result(run.proc.returncode)
-            run.record("exit", result, detail)
-        except subprocess.TimeoutExpired:
-            run.record("exit", "fail",
-                       f"process still running {TIMEOUTS['exit']:.0f}s after WM_CLOSE; "
-                       + failure_capture(run, "exit", out_dir) + "; cleaned up")
+        deadline = time.monotonic() + TIMEOUTS["exit"]
+        while True:
+            if resumed is not None and resumed():
+                run.record("exit", "stood-down", "operator input resumed; tool dismissed")
+                return True
+            try:
+                run.proc.wait(timeout=0.1)
+                break
+            except subprocess.TimeoutExpired:
+                if time.monotonic() >= deadline:
+                    run.record("exit", "fail",
+                               f"process still running {TIMEOUTS['exit']:.0f}s after WM_CLOSE; "
+                               + failure_capture(run, "exit", out_dir) + "; cleaned up")
+                    return False
+        result, detail = exit_result(run.proc.returncode)
+        if result == "fail":
+            detail += "; capture unavailable: the process has exited"
+        run.record("exit", result, detail)
         return False
     finally:
+        cleanup_safely(run)
+
+
+def cleanup_safely(run: "ToolRun"):
+    """Cleanup failure is a named row, never a silent pass; the job closes
+    independently of whether process cleanup succeeds."""
+    try:
         run.cleanup()
-        run.job.close()
+    except Exception as exc:
+        run.failed = True
+        run.rows.append((run.name, "cleanup", "fail", f"cleanup failed: {exc!r}"))
+    try:
+        if run.job is not None:
+            run.job.close()
+    except Exception as exc:
+        run.failed = True
+        run.rows.append((run.name, "cleanup", "fail", f"job close failed: {exc!r}"))
 
 
 def failure_capture(run: ToolRun, step: str, out_dir: Path) -> str:
@@ -615,7 +671,7 @@ def failure_capture(run: ToolRun, step: str, out_dir: Path) -> str:
     if run.hwnd is None:
         return "capture unavailable: no window"
     shot = capture_window_bounded(run.hwnd)
-    if shot is None:
+    if shot is None or shot == ABORTED:
         return "capture unavailable: PrintWindow produced nothing within its bound"
     width, height, bgra = shot
     try:
@@ -674,8 +730,11 @@ def main(argv=None) -> int:
     notes = [f"Admission: {mode}."]
     if not admitted:
         SMOKE_DIR.mkdir(parents=True, exist_ok=True)
+        refused_rows = [(name, step, "refused", mode)
+                        for name in (only or sorted(load_tools()))
+                        for step, _ in step_table(name)]
         (SMOKE_DIR / "smoke-report.md").write_text(
-            render_report([], "refused", notes + ["No tool was launched."]), encoding="utf-8")
+            render_report(refused_rows, "refused", notes + ["No tool was launched."]), encoding="utf-8")
         print(f"smoke: {mode}; report at build/smoke/smoke-report.md")
         return 2
 
@@ -794,6 +853,42 @@ def self_test() -> int:
     check("ensure_rows completes five rows", [r[1] for r in probe.rows] == list(STEPS)
           and all(r[2] == "stood-down" for r in probe.rows))
     check("ensure_rows keeps recorded rows", (ensure_rows(probe, "fail", "y") or len(probe.rows)) == 5)
+
+    # Failure injection: containment refusal never resumes the child.
+    class _FakeProc:
+        _handle = 0
+        def __init__(self): self.terminated = False
+        def terminate(self): self.terminated = True
+    _probe = ToolRun("Resolute", Path("x"))
+    _probe.job = JobBox()
+    _real_assign = JobBox.assign
+    JobBox.assign = lambda self, proc: False
+    try:
+        _fake = _FakeProc()
+        _contained_ok = _probe.job.assign(_fake)
+    finally:
+        JobBox.assign = _real_assign
+    check("containment refusal is named", _contained_ok is False)
+    check("interrupted wait reports abort", wait_window(0, 5.0, abort=lambda: True) == ABORTED)
+    _cprobe = ToolRun("Resolute", Path("x"))
+    class _BadProc:
+        def poll(self): return None
+        def terminate(self): raise RuntimeError("boom")
+        def wait(self, timeout=None): return None
+        def kill(self): pass
+    _cprobe.proc = _BadProc()
+    _cprobe.job = JobBox()
+    try:
+        _cprobe.cleanup()
+        _cleanup_recorded = True
+    except RuntimeError:
+        _cleanup_recorded = False
+    _sprobe = ToolRun("Resolute", Path("x"))
+    _sprobe.proc = _BadProc()
+    _sprobe.job = JobBox()
+    cleanup_safely(_sprobe)
+    check("cleanup failure surfaces instead of passing silently",
+          _sprobe.failed and any(r[1] == "cleanup" and r[2] == "fail" for r in _sprobe.rows))
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])

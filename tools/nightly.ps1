@@ -265,7 +265,7 @@ try {
             $smokeReportPath = Join-Path $wt 'build\smoke\smoke-report.md'
             $smokeVerdict = 'unknown'
             if (Test-Path $smokeReportPath) {
-                $m = Select-String -Path $smokeReportPath -Pattern 'Suite verdict: \*\*(\w+)\*\*' | Select-Object -Last 1
+                $m = Select-String -Path $smokeReportPath -Pattern 'Suite verdict: \*\*([\w-]+)\*\*' | Select-Object -Last 1
                 if ($m) { $smokeVerdict = $m.Matches[0].Groups[1].Value }
             }
             if ($smokeExit -eq 0) { Note "smoke: $smokeVerdict (report build/smoke/smoke-report.md in the candidate worktree)" }
