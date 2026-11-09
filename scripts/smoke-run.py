@@ -269,6 +269,83 @@ def post(hwnd, msg, wparam=0):
     user32.PostMessageW(hwnd, msg, wparam, 0)
 
 
+def capture_window_bounded(hwnd, timeout: float = 10.0):
+    """PrintWindow on a worker thread: a hung UI thread must not hang the run.
+
+    The worker is a daemon: if it outlives its bound it dies with the driver,
+    and the tool it was capturing is terminated by cleanup either way.
+    """
+    import threading
+    box = {}
+
+    def work():
+        try:
+            box["shot"] = capture_window(hwnd)
+        except Exception as exc:  # a capture failure is a step failure, not a crash
+            box["error"] = exc
+
+    worker = threading.Thread(target=work, daemon=True)
+    worker.start()
+    worker.join(timeout)
+    if worker.is_alive():
+        return None
+    return box.get("shot")
+
+
+def exit_result(returncode) -> tuple[str, str]:
+    """Only a clean self-exit passes; a crash status fails by name."""
+    if returncode == 0:
+        return "pass", "process exited (0)"
+    return "fail", f"process exited with crash status 0x{returncode & 0xFFFFFFFF:08x}"
+
+
+def input_resumed(collecting: bool, idle_now: float) -> bool:
+    """Collecting runs stand down the moment operator input resumes."""
+    return bool(collecting and idle_now < 2.0)
+
+
+COLLECT_MIN_IDLE = 120.0  # docs/testing.md: no input for 120 s at a collecting start
+
+
+class JobBox:
+    """Kill-on-close job: launched tools die with the driver, even on a kill."""
+
+    def __init__(self):
+        self.handle = kernel32.CreateJobObjectW(None, None)
+        if self.handle:
+            class LIMITS(ctypes.Structure):
+                _fields_ = [("PerProcessUserTimeLimit", ctypes.c_int64),
+                            ("PerJobUserTimeLimit", ctypes.c_int64),
+                            ("LimitFlags", wintypes.DWORD),
+                            ("MinimumWorkingSetSize", ctypes.c_size_t),
+                            ("MaximumWorkingSetSize", ctypes.c_size_t),
+                            ("ActiveProcessLimit", wintypes.DWORD),
+                            ("Affinity", ctypes.c_size_t),
+                            ("PriorityClass", wintypes.DWORD),
+                            ("SchedulingClass", wintypes.DWORD)]
+
+            class EXTENDED(ctypes.Structure):
+                _fields_ = [("BasicLimitInformation", LIMITS),
+                            ("IoInfo", ctypes.c_void_p * 6),
+                            ("ProcessMemoryLimit", ctypes.c_size_t),
+                            ("JobMemoryLimit", ctypes.c_size_t),
+                            ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                            ("PeakJobMemoryUsed", ctypes.c_size_t)]
+
+            info = EXTENDED()
+            info.BasicLimitInformation.LimitFlags = 0x00002000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+            kernel32.SetInformationJobObject(self.handle, 9, ctypes.byref(info), ctypes.sizeof(info))
+
+    def assign(self, proc):
+        if self.handle and proc is not None:
+            kernel32.AssignProcessToJobObject(self.handle, int(proc._handle))
+
+    def close(self):
+        if self.handle:
+            kernel32.CloseHandle(self.handle)
+            self.handle = None
+
+
 # ---------------------------------------------------------------- driver
 
 class ToolRun:
@@ -278,6 +355,7 @@ class ToolRun:
         self.args = list(args)
         self.start_timeout = start_timeout or TIMEOUTS["launch"]
         self.proc = None
+        self.job = None
         self.hwnd = None
         self.rows = []
         self.failed = False
@@ -289,6 +367,8 @@ class ToolRun:
 
     def cleanup(self):
         """Terminate only the process this run launched."""
+        if self.job is None:
+            self.job = JobBox()
         if self.proc and self.proc.poll() is None:
             self.proc.terminate()
             try:
@@ -309,8 +389,10 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                input_mark: float) -> bool:
     """Drive one tool through the five steps. Returns stood_down."""
     table = dict(step_table(run.name))
+    run.job = JobBox()
     try:
         run.proc = subprocess.Popen([str(run.exe), *run.args])
+        run.job.assign(run.proc)
     except OSError as exc:
         blocked = launch_block(exc)
         for step, expected in step_table(run.name):
@@ -337,8 +419,19 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             return False
         run.record("start", "pass", f"window 0x{run.hwnd:x} pid {run.proc.pid}")
 
+        def stood_down_here(next_steps) -> bool:
+            if not (collecting and input_resumed(collecting, idle_seconds())):
+                return False
+            post(run.hwnd, WM_CLOSE)
+            for step in next_steps:
+                run.record(step, "stood-down", "operator input resumed; tool dismissed")
+            return True
+
+        if stood_down_here(("main", "about", "preferences", "exit")):
+            return True
+
         # main: capture the surface; a blank capture fails by name.
-        shot = capture_window(run.hwnd)
+        shot = capture_window_bounded(run.hwnd)
         if shot is None:
             run.record("main", "fail", "PrintWindow produced no capture")
         else:
@@ -374,6 +467,12 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                 deadline = time.monotonic() + TIMEOUTS["message"]
                 gone = False
                 while time.monotonic() < deadline:
+                    if collecting and input_resumed(collecting, idle_seconds()):
+                        post(dialog, WM_COMMAND, IDOK)
+                        post(run.hwnd, WM_CLOSE)
+                        run.record("preferences", "stood-down", "operator input resumed; tool dismissed")
+                        run.record("exit", "stood-down", "operator input resumed; tool dismissed")
+                        return True
                     if not any(h == dialog for h, _, _ in pid_windows(run.proc.pid)):
                         gone = True
                         break
@@ -390,13 +489,15 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
         post(run.hwnd, WM_CLOSE)
         try:
             run.proc.wait(timeout=TIMEOUTS["exit"])
-            run.record("exit", "pass", f"process exited ({run.proc.returncode})")
+            result, detail = exit_result(run.proc.returncode)
+            run.record("exit", result, detail)
         except subprocess.TimeoutExpired:
             run.record("exit", "fail",
                        f"process still running {TIMEOUTS['exit']:.0f}s after WM_CLOSE; cleaned up")
         return False
     finally:
         run.cleanup()
+        run.job.close()
 
 
 def drill_tools():
@@ -434,6 +535,9 @@ def main(argv=None) -> int:
         return self_test()
 
     admitted, mode, collecting = admission(args.visible, datetime.now(), os.environ)
+    if admitted and collecting and idle_seconds() < COLLECT_MIN_IDLE:
+        admitted, mode = False, (f"refused: collecting runs need {COLLECT_MIN_IDLE:.0f}s without "
+                                 "operator input at their start (docs/testing.md fence)")
     notes = [f"Admission: {mode}."]
     if not admitted:
         SMOKE_DIR.mkdir(parents=True, exist_ok=True)
@@ -450,14 +554,15 @@ def main(argv=None) -> int:
     stood_down = False
     base_idle = idle_seconds()
     for run in runs:
-        if collecting and idle_seconds() < base_idle - 1.0:
-            rows.append((run.name, "start", "stood-down", "operator input resumed; not launched"))
+        if collecting and input_resumed(collecting, idle_seconds()):
+            rows.append((run.name, "start", "stood-down", "operator input resumed; dismissed and not launched"))
             stood_down = True
             continue
         if stood_down:
             rows.append((run.name, "start", "stood-down", "operator input resumed; not launched"))
             continue
-        drive_tool(run, SMOKE_DIR, PREV_DIR, collecting, base_idle)
+        if drive_tool(run, SMOKE_DIR, PREV_DIR, collecting, base_idle):
+            stood_down = True
         rows += run.rows
     failed = any(r[2] == "fail" for r in rows)
     blocked = any(r[2] == "blocked" for r in rows)
@@ -527,6 +632,12 @@ def self_test() -> int:
     exc.winerror = 740
     check("740 launch refusal is blocked", launch_block(exc) is not None and "elevation" in launch_block(exc))
     check("other launch errors are not blocked", launch_block(OSError("missing exe")) is None)
+
+    check("crash status fails exit", exit_result(-1073741819)[0] == "fail"
+          and "0xc0000005" in exit_result(-1073741819)[1])
+    check("clean exit passes", exit_result(0) == ("pass", "process exited (0)"))
+    check("input resumes only when collecting", input_resumed(True, 0.5) and not input_resumed(False, 0.5)
+          and not input_resumed(True, 30.0))
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])

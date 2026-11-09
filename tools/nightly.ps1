@@ -250,8 +250,17 @@ try {
             $env:RESOLUTE_IDLE_COLLECT = '1'
             $smokeArgs = @((Join-Path $wt 'scripts\smoke-run.py'), '--flavor', 'Debug')
             if ($env:RESOLUTE_SMOKE_DRILL -eq '1') { $smokeArgs += '--drill' }
-            & $Python $smokeArgs *> (Join-Path $RunDir 'smoke.log')
-            $smokeExit = $LASTEXITCODE
+            # Bounded: a hung smoke run must not hold the nightly run open.
+            $smokeProc = Start-Process -FilePath $Python -ArgumentList $smokeArgs -WorkingDirectory $wt `
+                -RedirectStandardOutput (Join-Path $RunDir 'smoke.log') -RedirectStandardError (Join-Path $RunDir 'smoke.err') `
+                -NoNewWindow -PassThru
+            if ($smokeProc.WaitForExit(20 * 60 * 1000)) {
+                $smokeExit = $smokeProc.ExitCode
+            } else {
+                $smokeProc.Kill($true)
+                $smokeExit = -1
+                $failures.Add('smoke run exceeded its 20-minute bound and was killed')
+            }
             Remove-Item Env:RESOLUTE_IDLE_COLLECT -ErrorAction SilentlyContinue
             if ($smokeExit -eq 0) { Note 'smoke: pass (report build/smoke/smoke-report.md in the candidate worktree)' }
             elseif ($smokeExit -eq 2) { Note 'smoke: blocked (exit 2, named refusal in the candidate smoke report); the elevated pass is owned by D07 T01 section 5' }
