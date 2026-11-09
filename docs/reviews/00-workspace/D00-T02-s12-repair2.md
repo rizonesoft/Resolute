@@ -27,3 +27,31 @@ PLAN: gaps
 OVERALL: needs-attention
 
 - Planned: the four plan gaps folded (writer, 2026-11-09). (1) Border contrast is measured in the raster: long border-touching components against their local paper at the 3:1 floor for the main regions, with deficient-border drills in synthetic light and dark, and the palette border tokens corrected at their owning layer (light RGB(210) toward 140, dark RGB(60) toward 108, exact values set by the measure) with goldens and captures restaked. (2) The spec's grid slots become named control rectangles from the library layout (toolbar View/Refresh/Settings/Theme from kItems, sidebar All/System/Network/Security/Display/Programs from kCategories, list headers Name/Description/Version from the launcher's AddColumn calls), each carrying its label from the same table and a 0.005 moved-pixel tolerance, so one erased or repainted glyph fails naming the control; glyph erasure and repaint drills run on the real baseline. (3) Edge-touch becomes the painted fraction of the control's right two columns (the truncation side), calibrated per control from the baseline plus 0.25, and the clipping drill extends a real sidebar label to its control's right edge and asserts the clipped line itself under the theme exemption. (4) The pair case asserts the sidecar's launch context exactly (the command line it built and its working directory) and compares the recorded fixture inventory against the System/*.exe files it enumerates itself, empty inventory included.
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T16:22:07Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: 9cc85f7f1e9d0b3cc464c2c807d3e3a834a498a6
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 10
+- Digest: c28ae4b06689c52e
+
+### adversarial: needs-attention
+
+1. **P1: The border check accepts an existing below-floor border.** `tests/visual_pair.h:288` accepts `borderContrast == 0`, although the detector can discard real borders through its luminance threshold (`:144`) and component-shape restriction (`:211`).
+
+   **Reproduction:** Read the committed `docs/captures/runs/2026-11-09-D00-T02-s10-launcher-light-150.png`. Pixel `(200,670)` is the RGB(140) status-bar border, between RGB(235) at `(200,669)` and RGB(230) at `(200,671)`. Its contrast is **2.82:1 and 2.69:1**, below the required 3:1. A read-only reproduction of the candidate’s calculation returns `borderContrast = 0` for both sidebar and status-bar regions, which `Compare` accepts. The dark capture likewise yields zero border measurements across all five main regions.
+
+   This is a check passing what it must refuse on the repository’s actual captured surface. Measure borders independently of glyph eligibility, reject missing required measurements, and correct the deficient palette relationship.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Implemented: repair2 round 1 (adversarial P1) in 835016cf: border lines are measured in dedicated strip regions, Compare refuses an unmeasured border, thinness is average thickness, the dark border clears the ink threshold, and the light border token darkens 140 to 128 (2.82:1 measured at 140). Suite 120/120; pair 0 divergences.
