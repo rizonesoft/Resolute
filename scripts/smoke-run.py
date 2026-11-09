@@ -298,6 +298,10 @@ def wait_window(pid: int, timeout: float, want_dialog: bool = False, abort=None)
     return None
 
 
+class _CaptureNoImage(Exception):
+    """PrintWindow produced no image; release failures still aggregate."""
+
+
 def capture_window(hwnd) -> tuple[int, int, bytes] | None:
     """PrintWindow into a DIB; returns (width, height, BGRA top-down).
 
@@ -321,13 +325,16 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
     try:
         mem = gdi32.CreateCompatibleDC(hdc)
         if not mem:
-            return None
+            raise RuntimeError("CreateCompatibleDC failed")
         bmp = gdi32.CreateCompatibleBitmap(hdc, width, height)
         if not bmp:
-            return None
+            raise RuntimeError("CreateCompatibleBitmap failed")
         old = gdi32.SelectObject(mem, bmp)
+        if not old:
+            raise RuntimeError("SelectObject failed")
         if not user32.PrintWindow(hwnd, mem, PW_RENDERFULLCONTENT):
-            return None
+            result = None
+            raise _CaptureNoImage(result)
 
         class BITMAPINFOHEADER(ctypes.Structure):
             _fields_ = [("biSize", wintypes.DWORD), ("biWidth", wintypes.LONG),
@@ -343,14 +350,15 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
         info.biPlanes, info.biBitCount = 1, 32
         buf = ctypes.create_string_buffer(width * height * 4)
         if not gdi32.GetDIBits(mem, bmp, 0, height, buf, ctypes.byref(info), 0):
-            return None
+            raise _CaptureNoImage()
         result = (width, height, buf.raw)
     except BaseException as exc:
         primary = exc
     finally:
         if mem and old:
             try:
-                gdi32.SelectObject(mem, old)
+                if not gdi32.SelectObject(mem, old):
+                    failures.append(OSError("SelectObject(restore) failed"))
             except Exception as exc:
                 failures.append(exc)
         if bmp:
@@ -370,6 +378,11 @@ def capture_window(hwnd) -> tuple[int, int, bytes] | None:
                 failures.append(OSError("ReleaseDC failed"))
         except Exception as exc:
             failures.append(exc)
+    if isinstance(primary, _CaptureNoImage):
+        if failures:
+            raise RuntimeError("capture produced no image; also release failed: "
+                               + "; ".join(repr(f) for f in failures)) from primary
+        return None
     if primary is not None:
         if failures:
             raise RuntimeError(f"{primary!r}; also release failed: "
@@ -547,6 +560,7 @@ class ToolRun:
                 while self.proc.poll() is None and time.monotonic() < deadline:
                     resumed = getattr(self, "resumed", None)
                     if resumed is not None and resumed():
+                        self.stood_down_during_cleanup = True
                         break
                     time.sleep(0.05)
                 if self.proc.poll() is None and not (getattr(self, "resumed", None) and self.resumed()):
@@ -1012,17 +1026,14 @@ def main(argv=None) -> int:
         try:
             if drive_tool(run, SMOKE_DIR, PREV_DIR, collecting, base_idle, resumed=resumed):
                 stood_down = True
+            if getattr(run, "stood_down_during_cleanup", False):
+                stood_down = True
             ensure_rows(run, "stood-down" if stood_down else "fail",
                         "operator input resumed; tool dismissed" if stood_down else "not reached")
         except Exception as exc:  # one tool's crash never stops the run or loses the report
             evidence = getattr(run, "_evidence", "capture unavailable: no window")
             ensure_rows(run, "fail", f"driver error: {exc!r}; {evidence}")
-            try:
-                run.cleanup()
-                if run.job is not None:
-                    run.job.close()
-            except Exception:
-                pass
+            cleanup_safely(run)
         rows += run.rows
     failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
     blocked = any(r[2] == "blocked" for r in rows)
@@ -1254,6 +1265,79 @@ def self_test() -> int:
             verdicts_ok = verdicts_ok and ps.returncode == 0 and ps.stdout.strip() == verdict
             Path(report_file).unlink(missing_ok=True)
     check("nightly's production verdict line parses every verdict", verdicts_ok)
+
+    # Exceptional release: termination and process-handle release are both
+    # attempted, and both failures survive in one named error.
+    _calls = []
+    _real_term, _real_close = kernel32.TerminateProcess, kernel32.CloseHandle
+    try:
+        kernel32.TerminateProcess = lambda h, code: (_calls.append("terminate"), 0)[1]
+        kernel32.CloseHandle = lambda h: (_calls.append(f"close-{h}"), 0)[1]
+        _wp = WinProc(111, 222, 333)
+        _wrun = ToolRun("Resolute", Path("x"))
+        _wrun.proc = _wp
+        _wrun.job = JobBox()
+        try:
+            _wrun.cleanup()
+            _both = False
+        except RuntimeError as exc:
+            _both = "also release failed" in str(exc)
+        check("termination failure preserves the release failure too",
+              _both and any(str(c).startswith("close-") for c in _calls))
+    finally:
+        kernel32.TerminateProcess, kernel32.CloseHandle = _real_term, _real_close
+    # main() fallback with a real (stub-driven) tool: five rows on stdout.
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            globals()["SMOKE_DIR"] = Path(td) / "blocker" / "smoke"
+            (Path(td) / "blocker").write_text("x")
+            globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
+            globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
+            globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
+            def _fake_drive(run, out_dir, prev_dir, collecting, mark, resumed=None):
+                for step, _e in step_table(run.name):
+                    run.record(step, "pass", "stub")
+                return False
+            _real_drive = globals()["drive_tool"]
+            globals()["drive_tool"] = _fake_drive
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                rc = main([])
+            globals()["drive_tool"] = _real_drive
+            out = buf.getvalue()
+            check("admitted report-write failure prints five rows on stdout",
+                  rc == 1 and out.count("| Resolute |") == 5 and "Suite verdict" in out)
+    finally:
+        globals().update(_saved)
+        os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
+    # Nightly's production reporting block, executed for every exit class.
+    block_lines = []
+    in_block = False
+    for line in nightly_src.splitlines():
+        if "$smokeReportPath = " in line:
+            in_block = True
+        if in_block:
+            block_lines.append(line)
+        if in_block and "smoke run failed at $head" in line:
+            break
+    block = "\n".join(block_lines)
+    nightly_ok = bool(block_lines)
+    if nightly_ok:
+        for exit_code, verdict in ((0, "pass"), (2, "blocked"), (1, "fail")):
+            with tempfile.TemporaryDirectory() as td:
+                wt = Path(td) / "wt"
+                (wt / "build" / "smoke").mkdir(parents=True)
+                (wt / "build" / "smoke" / "smoke-report.md").write_text(f"Suite verdict: **{verdict}**\n")
+                snippet = (
+                    "function Note([string]$l) { $script:notes += $l }; $script:notes = @(); "
+                    "$failures = [System.Collections.Generic.List[string]]::new(); "
+                    f"$wt = '{wt}'; $smokeExit = {exit_code}; $head = 'abc123'; " + block +
+                    "; $script:notes -join '|'; 'FAILURES=' + $failures.Count")
+                ps = subprocess.run(["pwsh", "-NoProfile", "-Command", snippet],
+                                    capture_output=True, text=True, timeout=60)
+                want_fail = "FAILURES=1" if exit_code == 1 else "FAILURES=0"
+                nightly_ok = nightly_ok and ps.returncode == 0 and verdict in ps.stdout and want_fail in ps.stdout
+    check("nightly reporting block names verdict, path, and failures per exit class", nightly_ok)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])

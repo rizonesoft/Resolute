@@ -59,3 +59,76 @@ Verified with windowless, in-memory probes. No files modified; GUI evidence was 
 HIGHEST: P2
 
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T09:32:46Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: 96c50dde7a5d24475c1fbeb401d3b719cb00d474
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 7
+- Digest: 1192671ccdbc891d
+
+## consistency: approve
+
+No new actionable consistency findings in either commit. Static review only; supplied driven evidence was not rerun. No files modified.
+
+HIGHEST: none
+
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T09:34:51Z
+- Candidate: 2747092f4a1d98a23034e597efeb1b9424070078
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: 96c50dde7a5d24475c1fbeb401d3b719cb00d474
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 30
+- Digest: 82e00a8c3387a4c7
+
+The repair is not complete and does not yet meet the quality bar. A windowless, in-memory probe reproduced lost cleanup failures. No files were modified; supplied GUI runs were not rerun.
+
+**Part 1: completeness**
+
+1. **present:** Fail-closed containment through atomic job-list process creation, with configuration failure preventing launch. `scripts/smoke-run.py:613`.
+2. **present:** Five step rows for selected tools, including refusal, interruption and exception paths. `scripts/smoke-run.py:499`, `:983`, `:1015`.
+3. **missing-in-scope:** Cleanup detects resumed input but only breaks its wait. It does not propagate stand-down to the caller. On the final tool, the report can therefore omit the interruption. `scripts/smoke-run.py:547`, `:879`, `:1013`.
+4. **missing-in-scope:** Checked, exception-safe release with every failure preserved is incomplete. Early `return None` statements bypass the error aggregation after `finally`; bitmap selection and restoration results remain unchecked. The outer exception recovery also suppresses cleanup exceptions. `scripts/smoke-run.py:322`, `:329`, `:350`, `:373`, `:1020`.
+5. **present:** Report creation and writing have guarded stdout fallbacks. `scripts/smoke-run.py:986`, `:1032`.
+6. **present:** About/exit failures and unexpected drive exceptions collect evidence before teardown. `scripts/smoke-run.py:825`, `:866`, `:880`.
+7. **missing-in-scope:** Production-path and `main()` tests exist, but the promised exceptional-release and interruption regressions remain absent. `_BadProc` never exercises `WinProc.close()`; the admitted `main()` fixture has zero tools. `scripts/smoke-run.py:1134`, `:1209`.
+8. **present:** Nightly reports the verdict and concrete candidate report path. Integration proof remains weaker than required, as detailed below. `tools/nightly.ps1:265`.
+
+**Part 2: excellence**
+
+1. **in-scope:** Resource-failure diagnostics fall below the tooling bar. Target: every acquisition/capture failure combined with any release failure preserves all named failures through the bounded wrapper and report.
+2. **in-scope:** Interruption handling lacks an observable final-tool outcome. Target: input arriving during cleanup stops further driving and produces `stood-down`, while retaining any cleanup failures and the appropriate nonzero exit.
+3. **in-scope:** Regression coverage does not substantiate the repair record’s promises. Target: injected termination, resume, process/thread/job/GDI release failures assert actual release calls and retained diagnostics; `main()` tests assert exactly five rows per tool for directory-creation and report-write failures, and zero launches on refusal.
+4. **in-scope:** The PowerShell test executes only the extracted parser line. Target: exercise the production reporting block for all verdicts and exit classes, asserting the concrete path and failure-list propagation. `scripts/smoke-run.py:1242`; `tools/nightly.ps1:271`.
+5. **out-of-scope:** Elevated RegStudio evidence remains owned by §5. Target: paired elevated success and non-elevated blocked reports. `todo/07-quality/TODO-01-quality-bar.md:217`.
+6. **out-of-scope:** Blocked-capture timeout regression remains owned by §6. Target: the bounded wrapper returns while capture remains blocked, and the test fails when the bound is removed. `todo/07-quality/TODO-01-quality-bar.md:229`.
+
+**Gap list**
+
+1. **missing-in-scope, P2:** Preserve cleanup failures on early capture returns. My probe made `PrintWindow` return zero and all three releases fail; `capture_window()` returned `None` without reporting any release failure. Failed DC creation likewise swallowed failed `ReleaseDC`. Check selection/restoration results and remove the outer cleanup exception suppression.
+2. **missing-in-scope, P2:** Propagate cleanup-time stand-down into the final suite result, including when it occurs on the last tool.
+3. **missing-in-scope, P2:** Add the missing exceptional-release, final-cleanup interruption, nonempty `main()` fallback and nightly reporting regressions. Passing current self-tests does not close these previously identified obligations.
+4. **missing-out-of-scope:** Elevated RegStudio proof and blocked-capture timeout testing remain explicitly assigned to §5 and §6.
+
+COMPLETION: gaps
+
+- Implemented: capture early returns aggregate release failures, cleanup stand-down propagates to the suite verdict, outer cleanup unsuppressed in the repair4 build, reviewed on D07-T01-s4-repair4.md
+- Implemented: exceptional-release injection, nonempty main() fallback, and nightly reporting-block execution tests in the repair4 build, reviewed on D07-T01-s4-repair4.md
+- Filed: D07 T01 S6 (blocked-capture timeout proof, already tracked)
