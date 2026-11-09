@@ -128,32 +128,60 @@ def raised_lines(text: str) -> list:
     return out
 
 
+def parse_baseline_lenient(text: str) -> dict:
+    """Parse a base-revision baseline in its own era's grammar.
+
+    The base predates today's target set whenever a tool was added, so
+    it is parsed for the count and target lines it actually carries
+    instead of being validated against today's expected targets:
+    discarding its per-target counts on a validation failure would
+    silently drop raise protection for every existing target exactly
+    when a new target arrives (review round 1). Duplicate or
+    unrecognised lines still refuse, naming the base as malformed.
+    """
+    count = None
+    targets = {}
+    for lineno, raw in enumerate(text.splitlines(), 1):
+        t = raw.strip()
+        if not t or t.startswith("#"):
+            continue
+        m = COUNT_RE.match(t)
+        if m:
+            if count is not None:
+                raise Refusal(f"base baseline line {lineno}: duplicate 'count:' line")
+            count = int(m.group(1))
+            continue
+        m = TARGET_RE.match(t)
+        if m:
+            if m.group(1) in targets:
+                raise Refusal(f"base baseline line {lineno}: duplicate target '{m.group(1)}'")
+            targets[m.group(1)] = int(m.group(2))
+            continue
+        raise Refusal(f"base baseline line {lineno}: unrecognised line {t!r}")
+    if count is None:
+        raise Refusal("base baseline has no 'count: <n>' line; the raise guard cannot run")
+    return {"count": count, "targets": targets}
+
+
 def check_raise_guard(current_text: str, base_text, expected_targets) -> list:
     """Refuse a baseline raise that no new recorded reason authorizes.
 
     Compares the current baseline against the base revision's. Every
     target (and the total, as target 'total') whose count rose needs a
     '# Raised <target> <old> -> <new> on <date>: <reason>' line present
-    now and absent at base, matching the exact transition. Returns the
-    authorizing lines so the gate can name them.
+    now and absent at base, matching the exact transition. A target
+    the base does not carry (a newly added tool, in a base that has
+    per-target lines at all) compares against 0, so new coverage is
+    authorized the same way as a raise. A scalar-era base (no target
+    lines) compares only the total. Returns the authorizing lines so
+    the gate can name them.
     """
     if base_text is None:
-        return []
-    try:
-        base = parse_baseline(base_text, expected_targets)
-    except Refusal:
-        # A base in the pre-migration scalar form: only its count can
-        # be compared, as 'total'.
-        base = None
-        m = None
-        for raw in base_text.splitlines():
-            mm = COUNT_RE.match(raw.strip())
-            if mm:
-                m = int(mm.group(1))
-                break
-        if m is None:
-            return []
-        base = {"count": m, "targets": {}}
+        raise Refusal(
+            "no base baseline to compare against; the raise guard fails closed "
+            "(pass --base <rev> naming a revision that carries todo/.tidy-baseline)"
+        )
+    base = parse_baseline_lenient(base_text)
     current = parse_baseline(current_text, expected_targets)
     base_lines = {line for _, _, _, line in raised_lines(base_text)}
     new_lines = [r for r in raised_lines(current_text) if r[3] not in base_lines]
@@ -175,6 +203,8 @@ def check_raise_guard(current_text: str, base_text, expected_targets) -> list:
         named.append(line)
     for name in expected_targets:
         old = base["targets"].get(name)
+        if old is None and base["targets"]:
+            old = 0
         new = current["targets"][name]
         if old is not None and new > old:
             line = authorized(name, old, new)
@@ -371,6 +401,9 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
 
 
 def baseline_at_revision(root: Path, rev: str):
+    """The baseline at a revision, or a Refusal: an unresolvable
+    comparison revision must fail closed, never disable the guard
+    (review round 1)."""
     proc = subprocess.run(
         ["git", "show", f"{rev}:todo/.tidy-baseline"],
         cwd=root,
@@ -379,7 +412,11 @@ def baseline_at_revision(root: Path, rev: str):
         errors="replace",
     )
     if proc.returncode != 0:
-        return None
+        raise Refusal(
+            f"comparison revision '{rev}' has no readable todo/.tidy-baseline "
+            f"(git show exited {proc.returncode}); the raise guard fails closed, "
+            "pass --base <rev> naming a revision that carries it"
+        )
     return proc.stdout
 
 
@@ -662,6 +699,41 @@ def self_test() -> int:
         )
 
     case("missing database refused before any analysis runs", upfront_databases)
+
+    three = ["Ownership", "RegStudio", "root"]
+    case(
+        "adding a target keeps raise protection for existing targets",
+        lambda: refuses(
+            lambda: check_raise_guard(
+                "count: 5\ntarget Ownership: 0\ntarget RegStudio: 1\ntarget root: 5\n",
+                good,
+                three,
+            ),
+            "target 'root' raised 4 -> 5",
+        ),
+    )
+
+    def new_target_authorized():
+        text = (
+            "# Raised Ownership 0 -> 3 on 2026-11-09: Ownership came under analysis\n"
+            "# Raised total 5 -> 8 on 2026-11-09: Ownership came under analysis\n"
+            "count: 8\ntarget Ownership: 3\ntarget RegStudio: 2\ntarget root: 4\n"
+        )
+        named = check_raise_guard(text, good, three)
+        assert len(named) == 2, named
+
+    case("new target authorized by its 0 -> N line", new_target_authorized)
+    case(
+        "unresolvable comparison revision fails closed",
+        lambda: refuses(
+            lambda: baseline_at_revision(Path.cwd(), "refs/heads/review-missing-base"),
+            "fails closed",
+        ),
+    )
+    case(
+        "missing base baseline fails closed",
+        lambda: refuses(lambda: check_raise_guard(good, None, targets), "fails closed"),
+    )
 
     if failures:
         for f in failures:
