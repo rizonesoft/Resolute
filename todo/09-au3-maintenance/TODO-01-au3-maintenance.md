@@ -40,7 +40,7 @@ track: M1
 
 | Order | Section | Deliverable                                | Depends On   | Status |
 | :---: | :-----: | ------------------------------------------ | ------------ | :----: |
-|   1   |   §1    | Make the AutoIt suite buildable again      | --           |  [ ]   |
+|   1   |   §1    | Make the AutoIt suite buildable again      | --           |  [x]   |
 |   2   |   §2    | Clear the housekeeping defects             | --           |  [ ]   |
 |   3   |   §3    | Maintenance scope and retirement procedure | §1           |  [ ]   |
 |   4   |   §4    | Distro reports compiler failure           | --           |  [ ]   |
@@ -70,6 +70,16 @@ A shipping product that cannot be built from its own repository cannot be fixed.
 - [x] Commit: `"au3: make the autoit suite build from a clean checkout"`
 
 **Test checkpoint:** No descriptor under `resolute_au3/SDK/Concrete/*/*.sni` contains an absolute path and all 91 values resolve from their descriptor directories, proven by check (the six descriptors under `resolute_au3/samples/` are out of scope and named as such). A fresh clone into a different absolute path builds all thirteen tools to both architectures with no file edited, and that path is quoted. The per-tool, per-architecture build result is recorded for all thirteen. The measured claim in the Current state block is updated in the same commit and `python scripts/todo-claims.py` holds.
+
+> **Verified:** 2026-11-09 | §1 | No descriptor under `resolute_au3/SDK/Concrete/*/*.sni` contains an absolute path and all 91 values resolve from their descriptor directories (checker: checked=91, failures=0; exact destinations 91/91 in two trees). Fresh clone `R:\resolute-cleancheck` at `702b8a7b` built all thirteen tools to both architectures with no preparatory edit; per-tool record in this section. Distro discovery proven end to end (seeded absolute values rewritten relative by the shipped program; sentinels in a second clone all replaced, destinations matching a pre-build Fileversion snapshot 91/91). Failed-read path and cross-root warning executed (harness exits 0; retained readbacks and warnings under `docs/captures/d09-t01-s1-crossroot/`, checker tools=13 failures=0). `python scripts/todo-claims.py`: 116 hold, 0 stale. `python scripts/todo-graph.py validate`: 0 fatal.
+> **Review:** rounds 1-3 on the base record (round 3 clean), repair rounds 1-2 (round 2 clean), repair2 rounds 1-2 (round 2 clean), repair3 rounds 1-2 (round 2 clean), repair4 round 1 clean, astra (`gpt-6-astra` via `codex`), candidates 319dca04(round 1) to b7950553(repair4 round 1) · Raw findings: docs/reviews/09-au3-maintenance/D09-T01-s1.md, D09-T01-s1-repair.md, D09-T01-s1-repair2.md, D09-T01-s1-repair3.md, D09-T01-s1-repair4.md
+> **Completion:** astra (medium), candidate b79505535d575bec31cf1e13cca8767689fb94fb -- COMPLETION: complete · Repair records: D09-T01-s1-repair (candidate 1b4aecfa), D09-T01-s1-repair2 (candidate c918af7b), D09-T01-s1-repair3 (candidate 611d3e85), D09-T01-s1-repair4 (candidate b7950553)
+> **Plan review:** astra (medium) -- six gaps folded into the section before building (record D09-T01-s1.md); repair, repair2, repair3 and repair4 plan passes each returned gaps that were dispositioned and closed in their cycles
+> **CRUD:** not applicable (no records are created, read, updated or deleted for a user; the change is build descriptors and their one loader)
+> **Deferred:** Distro compiler-failure propagation -> XREF: D09 T01 §4
+> **Deferred:** Signing password written to the Distro log -> XREF: D09 T01 §5
+> **Duration:** 2026-11-09T10:33:21Z to 2026-11-09T12:04:46Z
+> **Implementer:** muse (muse-wonder-1.0)
 
 ## 2. Clear the Housekeeping Defects
 
