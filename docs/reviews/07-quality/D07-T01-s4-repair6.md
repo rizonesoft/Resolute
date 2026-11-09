@@ -110,3 +110,73 @@ No files modified. Full self-test and GUI evidence were not rerun.
 HIGHEST: P2
 
 OVERALL: needs-attention
+
+## Round 4: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T10:05:36Z
+- Effort: low
+- Writer model: muse-wonder-1.0
+- Policy: a896bb2f70a95d835ada0cfc5fcea58d39a165ea
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: integration
+- Lines: 9
+- Digest: aa23a778214b0925
+
+## integration: approve
+
+No actionable integration findings in the three specified commits. Static inspection found no broken nightly, conformance-consumer, or check-all fence contract.
+
+No files modified. Self-tests and driven evidence were not rerun.
+
+HIGHEST: none
+
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T10:07:34Z
+- Candidate: e4fe34d14835015e8319f64746ef9d1f4ed1e0d2
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: a896bb2f70a95d835ada0cfc5fcea58d39a165ea
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 26
+- Digest: aae29f04f255096d
+
+The repair is **not complete against its regression requirements**, so it does **not yet meet the quality bar**. Inspected all five commits. No files modified; supplied driven results were not rerun.
+
+**Part 1: completeness**
+
+1. **present**: Fail-closed containment, `scripts/smoke-run.py:633`.
+2. **present**: Five step rows across normal, refusal and exceptional paths, `scripts/smoke-run.py:512`, `:1012`, `:1053`.
+3. **present**: Capture and cleanup stand-down propagate to the suite verdict, `scripts/smoke-run.py:571`, `:949`, `:1044`, `:1059`.
+4. **present**: Checked synchronous handle releases and diagnostic aggregation, `scripts/smoke-run.py:357`, `:624`, `:719`, `:764`, `:921`. Complete combined-failure regression proof remains missing.
+5. **present**: Guarded reports with stdout fallback, `scripts/smoke-run.py:1015`, `:1068`.
+6. **present**: Exceptional failure evidence before teardown, `scripts/smoke-run.py:903`.
+7. **missing-in-scope**: Deterministic production-path proof remains weaker than claimed: the combined assertion permits missing diagnostics and extra rows; capture interruption still relies on a two-second sleep.
+8. **present**: Nightly verdict, report path and propagation into its failures list, `tools/nightly.ps1:265`.
+
+**Part 2: excellence**
+
+1. **in-scope**: Combined-failure assertions must reject loss of any required diagnostic. Target: inject resume, termination, thread-close, process-close and job-close failures beneath production functions; require all five messages, exactly five step rows and exit `1`.
+2. **in-scope**: Capture interruption must be independent of scheduling speed. Target: keep the capture worker blocked through explicit synchronization until interruption is observed, then release it.
+3. **out-of-scope**: Elevated RegStudio proof remains owed under §5. Target: elevated start/main/About/exit pass, preferences absent, paired with non-elevated blocked evidence (`todo/07-quality/TODO-01-quality-bar.md:222`).
+4. **out-of-scope**: Blocked-capture timeout proof remains owed under §6. Target: bounded return while capture remains blocked, with the test failing when the bound is removed (`todo/07-quality/TODO-01-quality-bar.md:233`).
+
+**Gap list**
+
+1. **missing-in-scope, P2**: [scripts/smoke-run.py:1715](D:/GitHub/Resolute/scripts/smoke-run.py:1715) does not inject termination failure. Its assertion uses process-close **or** job-close and accepts `>= 5` rows. An executed, read-only evaluation of the actual assertion accepted missing termination and process-release diagnostics plus **six rows**. This leaves the recorded five-diagnostic requirement unresolved.
+2. **missing-in-scope, P3**: [scripts/smoke-run.py:1574](D:/GitHub/Resolute/scripts/smoke-run.py:1574), also `:1611`, uses `sleep(2)` to keep capture alive. If the caller is descheduled until that sleep finishes, it misses the intended ABORTED branch. This is timing-dependent rather than deterministic.
+
+COMPLETION: gaps
+
+- Implemented: all five launch and release diagnostics asserted exactly (five rows, exit 1) and event-blocked deterministic captures in the repair7 build, reviewed on D07-T01-s4-repair7.md
+- Filed: D07 T01 S6 (blocked-capture timeout proof, already tracked)

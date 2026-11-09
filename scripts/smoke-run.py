@@ -1571,10 +1571,13 @@ def self_test() -> int:
     _arun = ToolRun("Resolute", Path("x"))
     _arun.hwnd = 99
     _real_cap2 = globals()["capture_window"]
-    globals()["capture_window"] = lambda hwnd: (time.sleep(2), None)[1]
+    import threading as _th
+    _release = _th.Event()
+    globals()["capture_window"] = lambda hwnd: (_release.wait(30), None)[1]
     try:
         _atext = failure_capture(_arun, "about", SMOKE_DIR, abort=_late_abort)
     finally:
+        _release.set()
         globals()["capture_window"] = _real_cap2
     check("interruption inside the capture wait sets the flag",
           getattr(_arun, "interrupted", False) is True and "operator input resumed" in _atext)
@@ -1608,7 +1611,9 @@ def self_test() -> int:
             globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
             globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
             _real_cap = globals()["capture_window"]
-            globals()["capture_window"] = lambda hwnd: (time.sleep(2), None)[1]
+            import threading as _th2
+            _release2 = _th2.Event()
+            globals()["capture_window"] = lambda hwnd: (_release2.wait(30), None)[1]
             def _drive_exc2(run, out_dir, prev_dir, collecting, mark, resumed=None):
                 run.hwnd = 99
                 _n = {"n": 0}
@@ -1624,6 +1629,7 @@ def self_test() -> int:
             with redirect_stdout(buf):
                 rc = main([])
             globals()["drive_tool"] = _rd4
+            _release2.set()
             globals()["capture_window"] = _real_cap
             out = buf.getvalue()
             check("exceptional capture interruption: stood-down verdict, failure exit kept",
@@ -1712,20 +1718,22 @@ def self_test() -> int:
             _fixture_run = ToolRun("SmokeDrillBroken", Path(sys.executable),
                                    [str(ROOT / "scripts" / "smoke_fixture.py"), "nowindow"])
             globals()["real_tools"] = lambda only=None, flavor="Release": [_fixture_run]
-            _rr, _rc = kernel32.ResumeThread, kernel32.CloseHandle
+            _rr, _rc, _rt = kernel32.ResumeThread, kernel32.CloseHandle, kernel32.TerminateProcess
             kernel32.ResumeThread = lambda h: 0xFFFFFFFF
             kernel32.CloseHandle = lambda h: 0
+            kernel32.TerminateProcess = lambda h, code: 0
             buf = io.StringIO()
             try:
                 with redirect_stdout(buf):
                     rc = main([])
             finally:
-                kernel32.ResumeThread, kernel32.CloseHandle = _rr, _rc
+                kernel32.ResumeThread, kernel32.CloseHandle, kernel32.TerminateProcess = _rr, _rc, _rt
             out = buf.getvalue()
-            _diag = ("ResumeThread failed" in out and "CloseHandle(thread) failed" in out
-                     and ("CloseHandle(process) failed" in out or "CloseHandle(job) failed" in out))
+            _need = ("ResumeThread failed", "TerminateProcess failed", "CloseHandle(thread) failed",
+                     "CloseHandle(process) failed", "CloseHandle(job) failed")
             check("combined launch and release diagnostics reach the report with exit 1",
-                  rc == 1 and _diag and out.count("| SmokeDrillBroken |") >= 5)
+                  rc == 1 and all(n in out for n in _need)
+                  and out.count("| SmokeDrillBroken |") == 5)
     finally:
         globals().update(_saved)
         os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
