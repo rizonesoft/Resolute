@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **64 of 230 sections complete (28%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **64 of 231 sections complete (28%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -151,7 +151,8 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D07 T01 §1`  | The conformance profile                           |   7   |
 | [x] | `D07 T01 §2`  | Warning and analysis ratchet                      |  11   |
 | [x] | `D07 T01 §3`  | Conformance check and its report                  |  19   |
-| [ ] | `D07 T01 §4`  | Standing smoke run over the suite                 |  12   |
+| [ ] | `D07 T01 §4`  | Standing smoke run over the suite                 |  13   |
+| [ ] | `D07 T01 §5`  | Elevated smoke pass for RegStudio                 |   3   |
 | [ ] | `D09 T01 §1`  | Make the AutoIt suite buildable again             |   5   |
 | [ ] | `D09 T01 §2`  | Clear the housekeeping defects                    |   5   |
 | [ ] | `D09 T01 §3`  | Maintenance scope and retirement procedure        |   7   |

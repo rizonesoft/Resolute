@@ -42,6 +42,7 @@ track: Q1
 |   2   |   §2    | Warning and analysis ratchet           | D00 T01 §3   |  [x]   |
 |   3   |   §3    | Conformance check and its report       | §1           |  [x]   |
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [ ]   |
+|   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [ ]   |
 
 ---
 
@@ -197,7 +198,8 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 > **Deferred:** the preferences step per tool, active when the framework preferences surface ships --> XREF: D01 T03 §2
 
 - [ ] Build the driver `scripts/smoke-run.py` (stdlib only, like every TODO tool): the tool inventory is imported from `scripts/conformance-check.py`'s registry, never re-listed. Done when: `--self-test` passes and a run enumerates exactly the shipped tools the conformance check names.
-- [ ] Drive every shipped tool through start, main surface, About, preferences, and exit, by window messages only (no `SendKeys`, no foreground requirement). Done when: every tool is covered, each step records `pass`, `absent` (surface not shipped, named), or `fail`, and a crash in any one tool is reported without stopping the run.
+- [ ] Drive every shipped tool through start, main surface, About, preferences, and exit, by window messages only (no `SendKeys`, no foreground requirement). Done when: every tool is covered, each step records `pass`, `absent` (surface not shipped, named), `blocked` (named refusal, below), or `fail`, and a crash in any one tool is reported without stopping the run.
+- [ ] Name an elevation refusal instead of failing it: `RegStudio` ships `requireAdministrator`, so a non-elevated driver cannot launch it at all (`WinError 740`), and the nightly task runs `Limited`. Done when: that launch refusal records every expected step `blocked` naming the elevation requirement and the remedy (run the driver elevated), the suite verdict is `blocked` (exit 2) when nothing failed, and the elevated full pass is owned by `D07 T01 §5`. **Corrected 2026-11-09:** the original item had only pass, absent, and fail, which made a manifest refusal indistinguishable from a broken tool.
 - [ ] Capture each tool's main surface on every run with `PrintWindow` to `build/smoke/<tool>-main.png`, and compare against the previous run's capture. Done when: the capture set is produced, a blank capture (no pixel variance) fails that tool's surface step by name, and the report names each surface `changed` or `unchanged` versus the previous run where one exists.
 - [ ] Report the run as one artifact. Done when: a full run produces a single report at `build/smoke/smoke-report.md` naming every tool, every step result, its captures, and the suite verdict, quoted in the stamp.
 - [ ] Make a smoke failure actionable. Done when: a failure names the tool, the step, and the captured state at failure (the surface capture taken at that step, or the reason none exists), the run continues with the remaining tools, and the exit code is non-zero.
@@ -209,7 +211,19 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 - [ ] Wire the run into `tools/nightly.ps1`: after the halves at the built candidate, the nightly run executes `scripts/smoke-run.py` in the candidate worktree with `RESOLUTE_IDLE_COLLECT=1`, notes its verdict and report path in the morning report, and adds a smoke failure to its failures list. Done when: a driven nightly-mode run with a broken fixture entry turns the nightly verdict red and names the smoke report, and a clean run names the smoke report as passed.
 - [ ] Commit: `"quality: a standing smoke run over the whole suite"`
 
-**Test checkpoint:** A full smoke run covers every shipped tool through the five steps as that tool exposes them (absent surfaces named, not passed), produces one report quoting every tool and step, and captures every main surface. A deliberately broken tool is reported without stopping the run, naming tool, step, and captured state, and the run exits non-zero. All quoted from a real `scripts/smoke-run.py` run and its `--self-test`.
+**Test checkpoint:** A full smoke run covers every shipped tool through the five steps as that tool exposes them (absent surfaces named, not passed; an elevation-required launch `blocked` by name), produces one report quoting every tool and step, and captures every main surface it can launch. A deliberately broken tool is reported without stopping the run, naming tool, step, and captured state, and the run exits non-zero. All quoted from a real `scripts/smoke-run.py` run and its `--self-test`.
+
+## 5. Elevated Smoke Pass for RegStudio
+
+**Filed 2026-11-09** from `D07 T01 §4`: `RegStudio` ships a `requireAdministrator` manifest (`extensions/RegStudio/resources/app.manifest`), so the standing smoke run launched non-elevated, and the `Limited` nightly task, can never observe its five steps. §4 records that launch refusal `blocked` by name; this section owns the elevated pass that turns it into evidence.
+
+- [ ] Provide an elevated admission for the smoke driver: a documented way to run `scripts/smoke-run.py` elevated (its own manifest-free relaunch through the shell's elevation prompt, refusing cleanly when consent is declined) that never bypasses or suppresses the consent prompt. Done when: a declined prompt records `blocked` naming the decline, and an approved prompt runs the same driver with no code path difference besides elevation.
+- [ ] Prove RegStudio's five steps elevated: start, main surface with capture, About observed and dismissed, preferences `absent` (named, until `D01 T03 §2` ships the shell), exit observed. Done when: an elevated run's report shows those results quoted, and the non-elevated run still shows `blocked` for the same tool.
+- [ ] Commit: `"quality: RegStudio smoke steps pass elevated"`
+
+-> SOURCE: run-2026-11-09-d07-t01-s4 (RegStudio launch WinError 740 under a non-elevated driver)
+
+**Test checkpoint:** The elevated run's `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent` named, quoted in the stamp; the paired non-elevated run shows `blocked` naming the elevation requirement.
 
 ## Verification
 
