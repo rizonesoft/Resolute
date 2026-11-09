@@ -2,56 +2,56 @@
 #
 # One line per region:
 #   region | name | label | value | x0 | y0 | x1 | y1 | minPainted | minDetail | kind | maxEdge | maxMoved | contrast
-# Coordinates are fractions of the captured window image. Labels and values
-# come from this spec (the surface's own record of what it must show), not
-# from pixels: the C++ window exposes four unnamed Direct2D panes to
-# automation (docs/captures/ui-automation-spike.md), so presence and painted
-# extent are measured in the image inside each region, and the AutoIt half
-# (deferred to D03 T02 section 7, elevated session) enumerates child
-# controls against the same names. On the C++ leg, each slot and row band
-# is also compared pixel by pixel against the baseline (maxMoved), so a
-# renamed label or changed value inside a slot fails naming the slot.
+# Coordinates are fractions of the captured window image (1082x711 at
+# 150%). The main regions are the four panes and the title. The control
+# rectangles come from the library layout: toolbar items from kItems in
+# shared/resolute-ui/include/resolute/controls/toolbar.h (View dropdown,
+# Refresh, Settings, Theme), sidebar categories from kCategories in
+# sidebar.h (All, System, Network, Security, Display, Programs; item
+# height 40 and YStart 44 at 96 DPI, scaled), and list columns from the
+# launcher's AddColumn calls in src/main.cpp (Name 180, Description 280,
+# Version 80 at 96 DPI, scaled). Icon-only controls carry their tooltip
+# as the label record in the AutoIt half's contract; here they are
+# observed by painted extent and pixel comparison.
 #
-# kind is text (DESIGN.md contrast floor 4.5:1) or element (3:1). No
-# theme-only or DPI-only exemption may waive a missing region, a clipped
-# control, or a region below its contrast floor. contrast is check or
-# skip; slots skip because their parent region checks the floor per block.
-# maxEdge is the painted edge-touch ceiling that reads as clipped on
-# a margined slot; the launcher regions tile the window, so theirs is 1.0
-# and their clipping is observed from the pane rectangles in the case.
-# The tool-list skips the contrast floor: at this fixture its rows are
-# fixture-dependent and may be empty, so it carries no text relationship
-# to measure; its row bands are pixel-compared against the baseline.
-# maxMoved is per region because the title and status carry live text.
+# On the C++ leg each control is compared pixel by pixel against the
+# baseline (maxMoved 0.01), so one erased or repainted glyph fails naming
+# the control. Labels and values come from this spec (the surface's own
+# record), because the C++ window exposes four unnamed Direct2D panes to
+# automation (docs/captures/ui-automation-spike.md); the AutoIt half
+# (deferred to D03 T02 section 7, elevated session) enumerates child
+# controls against the same names and labels.
+#
+# kind is text (DESIGN.md contrast floor 4.5:1) or element (3:1).
+# contrast is both (glyph floor plus long-border components at 3:1),
+# check (glyph only), or skip (the parent region checks). maxEdge is the
+# painted fraction of the control's right two columns that reads as
+# clipped. maxMoved is per region because the title and status carry
+# live text. No exemption waives a missing region, a clipped control, or
+# a contrast below floor.
 #
 # Baseline: docs/captures/runs/2026-11-09-D00-T02-s10-launcher-light-150.png
-# (the section 10 capture of record: production renderer, ClearType, light,
-# 150 percent, 1082x711). Crop: the whole window. State: launcher at
-# startup, extensions scanned. Rasterization: production, not the section 9
-# offscreen grayscale renderer.
-region|window-title|Resolute||0.00|0.00|1.00|0.05|0.001|0.5|text|1.0|0.15|check
-region|toolbar|||0.00|0.04|1.00|0.13|0.005|0.5|element|1.0|0.02|check
-region|sidebar|||0.00|0.12|0.24|0.97|0.010|0.5|text|1.0|0.02|check
-region|tool-list|||0.23|0.12|1.00|0.97|0.005|0.3|text|1.0|0.02|skip
-region|status-bar|||0.00|0.96|1.00|1.00|0.001|0.3|text|1.0|0.15|check
-region|toolbar-slot-1|||0.00|0.04|0.17|0.13|0|0|element|1.0|0.02|skip
-region|toolbar-slot-2|||0.17|0.04|0.33|0.13|0|0|element|1.0|0.02|skip
-region|toolbar-slot-3|||0.33|0.04|0.50|0.13|0|0|element|1.0|0.02|skip
-region|toolbar-slot-4|||0.50|0.04|0.67|0.13|0|0|element|1.0|0.02|skip
-region|toolbar-slot-5|||0.67|0.04|0.83|0.13|0|0|element|1.0|0.02|skip
-region|toolbar-slot-6|||0.83|0.04|1.00|0.13|0|0|element|1.0|0.02|skip
-region|sidebar-band-1|||0.00|0.12|0.24|0.26|0|0|text|1.0|0.02|skip
-region|sidebar-band-2|||0.00|0.26|0.24|0.40|0|0|text|1.0|0.02|skip
-region|sidebar-band-3|||0.00|0.40|0.24|0.55|0|0|text|1.0|0.02|skip
-region|sidebar-band-4|||0.00|0.55|0.24|0.69|0|0|text|1.0|0.02|skip
-region|sidebar-band-5|||0.00|0.69|0.24|0.83|0|0|text|1.0|0.02|skip
-region|sidebar-band-6|||0.00|0.83|0.24|0.97|0|0|text|1.0|0.02|skip
-region|list-row-1|||0.23|0.12|1.00|0.26|0|0|text|1.0|0.02|skip
-region|list-row-2|||0.23|0.26|1.00|0.40|0|0|text|1.0|0.02|skip
-region|list-row-3|||0.23|0.40|1.00|0.55|0|0|text|1.0|0.02|skip
-region|list-row-4|||0.23|0.55|1.00|0.69|0|0|text|1.0|0.02|skip
-region|list-row-5|||0.23|0.69|1.00|0.83|0|0|text|1.0|0.02|skip
-region|list-row-6|||0.23|0.83|1.00|0.97|0|0|text|1.0|0.02|skip
+# (the section 10 capture of record: production renderer, ClearType,
+# light, 150 percent). Crop: the whole window. State: launcher at
+# startup, extensions scanned from System/*.exe beside the executable.
+region|window-title|Resolute||0.00|0.00|1.00|0.063|0.001|0.5|text|1.0|0.15|both
+region|toolbar|||0.00|0.063|1.00|0.146|0.005|0.5|element|1.0|0.02|both
+region|sidebar|||0.00|0.148|0.278|0.945|0.010|0.5|text|1.0|0.02|both
+region|tool-list|||0.278|0.148|1.00|0.945|0.005|0.3|text|1.0|0.02|both
+region|status-bar|||0.00|0.945|1.00|1.00|0.001|0.3|text|1.0|0.15|both
+region|toolbar-view|View||0.008|0.066|0.135|0.143|0.01|0|text|0.25|0.004|skip
+region|toolbar-refresh|||0.145|0.066|0.205|0.143|0.01|0|element|0.25|0.004|skip
+region|toolbar-settings|||0.838|0.066|0.898|0.143|0.01|0|element|0.50|0.004|skip
+region|toolbar-theme|||0.908|0.066|0.968|0.143|0.01|0|element|0.25|0.004|skip
+region|sidebar-all|All||0.002|0.240|0.278|0.325|0.01|0|text|1.0|0.004|skip
+region|sidebar-system|System||0.002|0.325|0.278|0.410|0.01|0|text|0.25|0.004|skip
+region|sidebar-network|Network||0.002|0.410|0.278|0.495|0.01|0|text|0.25|0.004|skip
+region|sidebar-security|Security||0.002|0.495|0.278|0.580|0.01|0|text|0.25|0.004|skip
+region|sidebar-display|Display||0.002|0.580|0.278|0.665|0.01|0|text|0.25|0.004|skip
+region|sidebar-programs|Programs||0.002|0.665|0.278|0.750|0.01|0|text|0.25|0.004|skip
+region|list-header-name|Name||0.279|0.148|0.529|0.207|0.01|0|text|1.0|0.004|skip
+region|list-header-description|Description||0.529|0.148|0.917|0.207|0.01|0|text|1.0|0.004|skip
+region|list-header-version|Version||0.917|0.148|0.998|0.207|0.01|0|text|1.0|0.004|skip
 # Intended redesigns, recorded so the comparison keeps function without
 # freezing the AutoIt layout: an observed label in the left column counts
 # as the region named in the right column.

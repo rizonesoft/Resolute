@@ -365,8 +365,10 @@ void Sidebar::OnPaint() {
         }
 
         D2D1_RECT_F chevIconRc = D2D1::RectF(chevX, chevY, chevX + iconSzF, chevY + iconSzF);
-        uint32_t chevColor = Theme::IsDark() ? 0x999999 : 0x666666;
-        RenderContext::DrawSvgIcon(m_rt.Get(), chevIcon, chevIconRc, chevColor, m_chevronHovered ? 1.0f : 0.7f);
+        // The theme's icon colour at full strength: the hardcoded grey at
+        // 0.7 alpha measured 2.75:1 against the DESIGN.md floor on the
+        // D00 T02 section 12 captures (2026-11-09).
+        RenderContext::DrawSvgIcon(m_rt.Get(), chevIcon, chevIconRc, Theme::IconColor(), 1.0f);
     }
 
     // Reusable brushes

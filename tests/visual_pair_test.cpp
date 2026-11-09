@@ -64,7 +64,7 @@ bool AnyNames(const std::vector<std::string>& failures, const std::string& needl
 TEST_CASE("Visual pair spec enumerates the launcher regions", "[visual-pair]") {
     const Spec spec = LoadSpec();
     CHECK(spec.errors.empty());
-    CHECK(spec.regions.size() == 23);
+    CHECK(spec.regions.size() == 18);
     CHECK(AnyNames([&] {
               std::vector<std::string> names;
               for (const auto& r : spec.regions) names.push_back(r.name);
@@ -279,42 +279,103 @@ TEST_CASE("The dark 150 baseline passes with the theme exemption quoted", "[visu
     CHECK(failures.empty());
 }
 
-TEST_CASE("A thinned slot fails the relative comparison naming the slot", "[visual-pair]") {
-    const Spec spec = LoadSpec();
-    Image baseline;
-    REQUIRE(LoadPng(Baseline150(), baseline));
-    Image thinned = baseline;
-    // Erase most painted pixels inside toolbar-slot-1 only: its absolute
-    // floors are zero, so only the relative rules can refuse it.
-    const RegionSpec& slot = spec.regions[5];
-    const int x0 = static_cast<int>(slot.x0 * thinned.w), x1 = static_cast<int>(slot.x1 * thinned.w);
-    const int y0 = static_cast<int>(slot.y0 * thinned.h), y1 = static_cast<int>(slot.y1 * thinned.h);
-    const uint32_t bg = thinned.px[static_cast<size_t>(y0) * thinned.w + x0];
-    int erased = 0;
+namespace {
+
+// Erases the first glyph component inside `region` (flood-filled and
+// painted over with the region's paper): a one-letter label edit.
+void EraseFirstGlyph(Image& img, const RegionSpec& region) {
+    const int x0 = static_cast<int>(region.x0 * img.w), x1 = static_cast<int>(region.x1 * img.w);
+    const int y0 = static_cast<int>(region.y0 * img.h), y1 = static_cast<int>(region.y1 * img.h);
+    std::map<uint32_t, long> counts;
     for (int y = y0; y < y1; ++y)
+        for (int x = x0; x < x1; ++x) ++counts[img.px[static_cast<size_t>(y) * img.w + x]];
+    uint32_t paper = 0;
+    long best = -1;
+    for (const auto& [colour, n] : counts)
+        if (n > best) { best = n; paper = colour; }
+    const double paperLum = visualpair::Luminance(paper);
+    for (int y = y0; y < y1; ++y) {
         for (int x = x0; x < x1; ++x) {
-            uint32_t& c = thinned.px[static_cast<size_t>(y) * thinned.w + x];
-            if (c != bg && (erased++ % 5) != 0) c = bg;
+            if (std::abs(visualpair::Luminance(img.px[static_cast<size_t>(y) * img.w + x]) - paperLum) <= 0.05) continue;
+            // Flood this component and paint its bounding box with paper.
+            std::vector<std::pair<int, int>> stack{{x, y}}, cells;
+            img.px[static_cast<size_t>(y) * img.w + x] = paper;
+            cells.emplace_back(x, y);
+            int minX = x, maxX = x, minY = y, maxY = y;
+            while (!stack.empty()) {
+                auto [cx, cy] = stack.back();
+                stack.pop_back();
+                minX = std::min(minX, cx);
+                maxX = std::max(maxX, cx);
+                minY = std::min(minY, cy);
+                maxY = std::max(maxY, cy);
+                const int dx[4] = {1, -1, 0, 0}, dy[4] = {0, 0, 1, -1};
+                for (int k = 0; k < 4; ++k) {
+                    const int nx = cx + dx[k], ny = cy + dy[k];
+                    if (nx < x0 || ny < y0 || nx >= x1 || ny >= y1) continue;
+                    uint32_t& c = img.px[static_cast<size_t>(ny) * img.w + nx];
+                    if (std::abs(visualpair::Luminance(c) - paperLum) <= 0.05) continue;
+                    c = paper;
+                    cells.emplace_back(nx, ny);
+                    stack.emplace_back(nx, ny);
+                }
+            }
+            // A hairline (a column divider) is not the glyph: keep looking.
+            if (cells.size() >= 4 && maxX - minX >= 2 && maxY - minY >= 2) {
+                for (int yy = minY; yy <= maxY; ++yy)
+                    for (int xx = minX; xx <= maxX; ++xx) img.px[static_cast<size_t>(yy) * img.w + xx] = paper;
+                return;
+            }
         }
-    const auto failures = visualpair::ComparePair(spec.regions, baseline, thinned, MeasureAll(baseline, spec.regions),
-                                                  MeasureAll(thinned, spec.regions), spec.equivalents);
-    CHECK(AnyNames(failures, "toolbar-slot-1"));
+    }
 }
 
-TEST_CASE("A repainted slot fails the pixel comparison naming the slot", "[visual-pair]") {
+const RegionSpec& ByName(const Spec& spec, const char* name) {
+    for (const RegionSpec& r : spec.regions)
+        if (r.name == name) return r;
+    return spec.regions[0];
+}
+
+}  // namespace
+
+TEST_CASE("Erasing one glyph of a real label fails naming the control", "[visual-pair]") {
     const Spec spec = LoadSpec();
     Image baseline;
     REQUIRE(LoadPng(Baseline150(), baseline));
     Image changed = baseline;
-    const RegionSpec& slot = spec.regions[6];  // toolbar-slot-2
-    const int x0 = static_cast<int>(slot.x0 * changed.w), x1 = static_cast<int>(slot.x1 * changed.w);
-    const int y0 = static_cast<int>(slot.y0 * changed.h), y1 = static_cast<int>(slot.y1 * changed.h);
-    for (int y = y0; y < y1; ++y)
-        for (int x = x0; x < x1; ++x)
-            changed.px[static_cast<size_t>(y) * changed.w + x] = ((x + y) % 2) ? 0xFF202020u : 0xFFE0E0E0u;
+    EraseFirstGlyph(changed, ByName(spec, "sidebar-system"));
     const auto failures = visualpair::ComparePair(spec.regions, baseline, changed, MeasureAll(baseline, spec.regions),
                                                   MeasureAll(changed, spec.regions), spec.equivalents);
-    CHECK(AnyNames(failures, "toolbar-slot-2"));
+    CHECK(AnyNames(failures, "sidebar-system"));
+}
+
+TEST_CASE("Repainting one glyph of a real header fails naming the control", "[visual-pair]") {
+    const Spec spec = LoadSpec();
+    Image baseline;
+    REQUIRE(LoadPng(Baseline150(), baseline));
+    Image changed = baseline;
+    EraseFirstGlyph(changed, ByName(spec, "list-header-name"));
+    const auto failures = visualpair::ComparePair(spec.regions, baseline, changed, MeasureAll(baseline, spec.regions),
+                                                  MeasureAll(changed, spec.regions), spec.equivalents);
+    for (const auto& f : failures) std::printf("glyph drill failure: %s\n", f.c_str());
+    CHECK(AnyNames(failures, "list-header-name"));
+}
+
+TEST_CASE("Extending a real label to its control edge fails as clipped naming the control", "[visual-pair]") {
+    const Spec spec = LoadSpec();
+    Image baseline;
+    REQUIRE(LoadPng(Baseline150(), baseline));
+    Image changed = baseline;
+    const RegionSpec& control = ByName(spec, "sidebar-system");
+    const int x0 = static_cast<int>(control.x0 * changed.w), x1 = static_cast<int>(control.x1 * changed.w);
+    const int y0 = static_cast<int>(control.y0 * changed.h), y1 = static_cast<int>(control.y1 * changed.h);
+    // Label text running into the control's right edge, as truncation paints it.
+    for (int y = y0 + 4; y < y1 - 4; ++y)
+        for (int x = x1 - 2; x < x1; ++x) changed.px[static_cast<size_t>(y) * changed.w + x] = 0xFF101010u;
+    (void)x0;
+    const auto failures = Compare({control}, MeasureAll(changed, {control}), spec.equivalents, {"theme"});
+    CHECK(AnyNames(failures, "clipped"));
+    CHECK(AnyNames(failures, "sidebar-system"));
 }
 
 TEST_CASE("The baseline compared with itself passes the pair comparison", "[visual-pair]") {

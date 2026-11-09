@@ -83,7 +83,13 @@ param(
     # operator can recreate the comparison from the sidecar alone
     # (D00 T02 section 12, item 5 schema).
     [string]$Fixture = '',
-    [string]$LaunchArgs = ''
+    [string]$LaunchArgs = '',
+
+    # The exact launch context and fixture inventory, recorded verbatim so
+    # a second operator can recreate the capture from the sidecar alone
+    # (D00 T02 section 12).
+    [string]$LaunchContext = '',
+    [string]$FixtureFiles = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -271,6 +277,8 @@ $appearanceLine = if ($Appearance) {
     "dpi aware     : $dpiAware$(if (-not $dpiAware) { '  -- Windows bitmap-scales this window' })"
     "appearance    : $appearanceLine"
     "fixture       : $(if ($Fixture) { $Fixture } else { 'none stated' })"
+    "launch context: $(if ($LaunchContext) { $LaunchContext } else { '(not stated)' })"
+    "fixture files : $(if ($FixtureFiles) { $FixtureFiles } else { '(not stated)' })"
     "launch args   : $(if ($LaunchArgs) { $LaunchArgs } elseif ($Path) { '(none)' } else { 'attached to a running process' })"
     "working dir   : $(if ($WorkingDirectory) { $WorkingDirectory } else { '(default)' })"
     "locale        : $((Get-Culture).Name) / UI $((Get-UICulture).Name)"

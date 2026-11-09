@@ -1,7 +1,7 @@
 capture       : 2026-11-09-D00-T02-s10-launcher-light-100.png
 describes     : the launcher at startup, light, 100 percent (D00 T02 section 10)
 window title  : Resolute
-target process: 51060 D:\GitHub\Resolute\Bin\Debug\Resolute.exe
+target process: 7044 D:\GitHub\Resolute\Bin\Debug\Resolute.exe
 attached      : attached to a process the caller started and owns
 source binary : D:\GitHub\Resolute\Bin\Debug\Resolute.exe
 file version  : 0.1.0.0
@@ -11,12 +11,14 @@ window dpi    : 96  (logical dpi the process sees)
 dpi aware     : True
 appearance    : light  (stated by the caller)
 fixture       : launcher at startup; System/*.exe beside the launcher scanned for RESEXT resources; appearance light set by 2 theme-command press(es) from System
+launch context: D:/GitHub/Resolute/Bin/Debug/Resolute.exe (no arguments), working directory D:\GitHub\Resolute
+fixture files : a.exe; RegStudio.exe
 launch args   : attached to a running process
 working dir   : (default)
 locale        : en-ZA / UI en-US
 geometry      : -5713,40 1086x713
-exe sha256    : D7B1E086EE75FA54999B5023AF742656C2F374D7AE6075D83CD6286224784269
-source revision: e22cbb20a1fbe38941a1da42301f53af3df76184
+exe sha256    : 1216725F43299DFE8EBC0D7EC9B6AE9A490320D6D3AEA56265B94D93208FF525
+source revision: 9cc85f7f1e9d0b3cc464c2c807d3e3a834a498a6
 windows build : 10.0.26300.0
 captured      : 2026-11-09
 

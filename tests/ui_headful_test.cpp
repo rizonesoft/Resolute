@@ -451,6 +451,24 @@ std::filesystem::path CaptureLauncher(const char* mode, UINT dpi, const char* st
     std::filesystem::create_directories(out.parent_path(), made);
     // The capture script, started directly rather than through a shell.
     const std::filesystem::path script = std::filesystem::path(RESOLUTE_SOURCE_ROOT) / "scripts" / "capture-window.ps1";
+    std::wstring fixtureFiles;
+    {
+        const std::filesystem::path systemDir = std::filesystem::path(RESOLUTE_LAUNCHER).parent_path() / "System";
+        std::error_code ec;
+        std::vector<std::wstring> names;
+        for (const auto& entry : std::filesystem::directory_iterator(systemDir, ec))
+            if (entry.path().extension() == ".exe") names.push_back(entry.path().filename().wstring());
+        std::sort(names.begin(), names.end());
+        for (const auto& name : names) {
+            if (!fixtureFiles.empty()) fixtureFiles += L"; ";
+            fixtureFiles += name;
+        }
+        if (fixtureFiles.empty()) fixtureFiles = L"none";
+    }
+    wchar_t cwdBuf[MAX_PATH];
+    const std::wstring launchContext = std::filesystem::path(RESOLUTE_LAUNCHER).wstring() +
+                                       L" (no arguments), working directory " +
+                                       (GetCurrentDirectoryW(MAX_PATH, cwdBuf) ? std::wstring(cwdBuf) : L"(unknown)");
     const std::wstring fixture = L"launcher at startup; System/*.exe beside the launcher scanned for RESEXT resources; appearance " +
                                  std::filesystem::path(mode).wstring() + L" set by " + std::to_wstring(presses) +
                                  L" theme-command press(es) from System";
@@ -458,7 +476,8 @@ std::filesystem::path CaptureLauncher(const char* mode, UINT dpi, const char* st
                       std::to_wstring(pi.dwProcessId) + L" -Appearance " + std::filesystem::path(mode).wstring() +
                       L" -Out \"" + out.wstring() + L"\" -Describes \"the launcher at startup, " +
                       std::filesystem::path(mode).wstring() + L", " + std::to_wstring(pct) +
-                      L" percent (D00 T02 section 10)\" -Fixture \"" + fixture + L"\"";
+                      L" percent (D00 T02 section 10)\" -Fixture \"" + fixture + L"\" -LaunchContext \"" + launchContext +
+                      L"\" -FixtureFiles \"" + fixtureFiles + L"\"";
     STARTUPINFOW psi{};
     psi.cb = sizeof(psi);
     Child capture;
@@ -591,6 +610,28 @@ TEST_CASE("Launcher pair at 150 percent compares against the composed baseline",
     CHECK(sidecarText.find("theme-command") != std::string::npos);
     CHECK(sidecarText.find("none stated") == std::string::npos);
     CHECK(sidecarText.find("fixture") != std::string::npos);
+    {
+        // The sidecar must record the launch exactly as built, and the
+        // fixture inventory the case enumerates itself: a second operator
+        // recreates the capture from these lines alone.
+        const std::filesystem::path systemDir = std::filesystem::path(RESOLUTE_LAUNCHER).parent_path() / "System";
+        std::wstring expectedFiles;
+        std::error_code ec;
+        std::vector<std::wstring> names;
+        for (const auto& entry : std::filesystem::directory_iterator(systemDir, ec))
+            if (entry.path().extension() == ".exe") names.push_back(entry.path().filename().wstring());
+        std::sort(names.begin(), names.end());
+        for (const auto& name : names) {
+            if (!expectedFiles.empty()) expectedFiles += L"; ";
+            expectedFiles += name;
+        }
+        if (expectedFiles.empty()) expectedFiles = L"none";
+        const std::string expectedUtf8(expectedFiles.begin(), expectedFiles.end());
+        INFO("fixture inventory in the sidecar must match the enumerated System/*.exe set");
+        CHECK(sidecarText.find("fixture files : " + expectedUtf8) != std::string::npos);
+        CHECK(sidecarText.find("launch context: " + std::filesystem::path(RESOLUTE_LAUNCHER).string() +
+                               " (no arguments), working directory ") != std::string::npos);
+    }
     CHECK(sidecarText.find("launch args") != std::string::npos);
     CHECK(sidecarText.find("locale") != std::string::npos);
     CHECK(sidecarText.find("exe sha256") != std::string::npos);

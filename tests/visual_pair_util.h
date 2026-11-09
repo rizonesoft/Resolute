@@ -145,11 +145,12 @@ inline Spec ParseSpec(std::istream& in, const std::string& source) {
                 continue;
             }
         }
-        if (f[13] != "check" && f[13] != "skip") {
-            fail(lineno, "region '" + r.name + "' contrast must be check or skip");
+        if (f[13] != "check" && f[13] != "skip" && f[13] != "both" && f[13] != "border") {
+            fail(lineno, "region '" + r.name + "' contrast must be check, border, both, or skip");
             continue;
         }
-        r.checkContrast = f[13] == "check";
+        r.checkContrast = f[13] == "check" || f[13] == "both";
+        r.borderCheck = f[13] == "border" || f[13] == "both";
         if (r.name.empty()) {
             fail(lineno, "region name must not be empty");
             continue;

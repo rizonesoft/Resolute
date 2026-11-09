@@ -39,7 +39,8 @@ struct RegionSpec {
     double      maxEdge = 1.0;                   // maximum painted edge-touch (clipping)
     double      maxMoved = 0.02;                 // maximum pixel fraction moved from baseline
     bool        text = true;                     // text (4.5:1) vs element (3:1)
-    bool        checkContrast = true;            // slots defer to their parent region
+    bool        checkContrast = true;            // glyph floor for this region
+    bool        borderCheck = false;             // long border components at 3:1
 };
 
 struct Observed {
@@ -50,7 +51,9 @@ struct Observed {
     double      x0 = 0, y0 = 0, x1 = 0, y1 = 0;
     double      painted = 0;    // painted fraction inside the region rect
     double      detail = 0;     // mean absolute horizontal neighbour difference
-    double      edgeTouch = 0;  // painted fraction of the region's inner border
+    double      edgeTouch = 0;  // painted fraction of the region's right edge columns
+    double      borderContrast = 0;  // worst long border component vs its local paper
+    double      contrastElement = 0; // worst glyph of any size (element floor 3:1)
     double      contrast = 0;   // (L95 + .05) / (L5 + .05) inside the rect
     bool        clipped = false;
 };
@@ -134,8 +137,11 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
         std::vector<char> ink(static_cast<size_t>(rw) * rh, 0), seen(static_cast<size_t>(rw) * rh, 0);
         for (int y = 0; y < rh; ++y)
             for (int x = 0; x < rw; ++x)
+                // Strong ink only: a header bar or surface step within a
+                // few percent of the paper is background, not ink, and
+                // would otherwise swallow the glyphs sitting on it.
                 ink[static_cast<size_t>(y) * rw + x] =
-                    std::abs(Luminance(img.px[static_cast<size_t>(y0 + y) * img.w + (x0 + x)]) - paper) > 0.05;
+                    std::abs(Luminance(img.px[static_cast<size_t>(y0 + y) * img.w + (x0 + x)]) - paper) > 0.25;
         double worst = 0;
         std::vector<int> stack;
         for (int start = 0; start < rw * rh; ++start) {
@@ -169,39 +175,69 @@ inline void MeasureRegion(const Image& img, const RegionSpec& spec, Observed& ou
                     }
                 }
             }
-            // A component thinner than 3 pixels in either dimension is a
-            // separator, grip, or rule, not a glyph: it carries no text
-            // relationship for the floor to judge.
-            if (touches || area < 4 || area * 50 > static_cast<long>(rw) * rh || lums.empty() ||
-                maxX - minX < 2 || maxY - minY < 2)
-                continue;
+            if (area < 4 || lums.empty()) continue;
+            if (!touches && area * 50 > static_cast<long>(rw) * rh) continue;
+            // The component's own paper: the modal colour of the ring
+            // around its bounding box, so text on a header bar or a
+            // selected row is judged against the background it sits on.
+            double localPaper = paper;
+            {
+                std::map<uint32_t, long> ring;
+                const int rx0 = std::max(0, minX - 3), ry0 = std::max(0, minY - 3);
+                const int rx1 = std::min(rw, maxX + 4), ry1 = std::min(rh, maxY + 4);
+                for (int y = ry0; y < ry1; ++y)
+                    for (int x = rx0; x < rx1; ++x)
+                        if (!ink[static_cast<size_t>(y) * rw + x])
+                            ++ring[img.px[static_cast<size_t>(y0 + y) * img.w + (x0 + x)]];
+                long best = -1;
+                for (const auto& [colour, n] : ring)
+                    if (n > best) { best = n; localPaper = Luminance(colour); }
+            }
             std::sort(lums.begin(), lums.end());
             // The glyph's core, not its anti-aliased median: the far-end
             // decile of its own pixels.
-            const double glyph = paper >= lums[lums.size() / 2]
+            const double glyph = localPaper >= lums[lums.size() / 2]
                                      ? lums[static_cast<size_t>(lums.size() * 0.10)]
                                      : lums[std::min(lums.size() - 1, static_cast<size_t>(lums.size() * 0.90))];
-            const double hi = std::max(paper, glyph), lo = std::min(paper, glyph);
+            const double hi = std::max(localPaper, glyph), lo = std::min(localPaper, glyph);
             const double ratio = (hi + 0.05) / (lo + 0.05);
+            const bool thin = maxX - minX < 2 || maxY - minY < 2;
+            if (touches) {
+                // A long thin border component: a panel border or
+                // separator line, judged at the element floor against its
+                // local paper. A thick touching band is a surface, not a
+                // border, and carries no border relationship.
+                const bool isLong = (maxX - minX) >= rw / 4 || (maxY - minY) >= rh / 4;
+                const bool isThinLine = std::min(maxX - minX, maxY - minY) <= 3;
+                if (isLong && isThinLine && (out.borderContrast == 0 || ratio < out.borderContrast))
+                    out.borderContrast = ratio;
+                continue;
+            }
+            if (thin) continue;
+            if (out.contrastElement == 0 || ratio < out.contrastElement) out.contrastElement = ratio;
+            // Small components are iconography (an element, 3:1 in
+            // Compare); text-sized glyphs (a cap height of strokes, not a
+            // filled marker like the sort chevron) answer to the text floor.
+            if (area < 24 || maxY - minY < 8) continue;
             if (worst == 0 || ratio < worst) worst = ratio;
         }
         out.contrast = worst;
     }
     {
-        // Painted content running into the region's inner border: on a
-        // margined slot, a control clipped by its own drawing rectangle,
+        // Painted content running into the region's right edge: on a
+        // control rectangle, text truncated by its own drawing boundary,
         // observed in the image. (Tiled launcher regions set maxEdge 1.0;
         // their clipping is observed from the pane rectangles.)
         long borderPainted = 0, border = 0;
-        auto visit = [&](int x, int y) {
-            const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
-            const int d = std::abs(Channel(c, 16) - Channel(bg, 16)) + std::abs(Channel(c, 8) - Channel(bg, 8)) +
-                          std::abs(Channel(c, 0) - Channel(bg, 0));
-            if (d > 24) ++borderPainted;
-            ++border;
-        };
-        for (int x = x0; x < x1; ++x) { visit(x, y0); if (y1 - 1 != y0) visit(x, y1 - 1); }
-        for (int y = y0 + 1; y < y1 - 1; ++y) { visit(x0, y); if (x1 - 1 != x0) visit(x1 - 1, y); }
+        for (int y = y0; y < y1; ++y) {
+            for (int x = std::max(x0, x1 - 2); x < x1; ++x) {
+                const uint32_t c = img.px[static_cast<size_t>(y) * img.w + x];
+                const int d = std::abs(Channel(c, 16) - Channel(bg, 16)) + std::abs(Channel(c, 8) - Channel(bg, 8)) +
+                              std::abs(Channel(c, 0) - Channel(bg, 0));
+                if (d > 24) ++borderPainted;
+                ++border;
+            }
+        }
         out.edgeTouch = border ? static_cast<double>(borderPainted) / border : 0;
     }
     // A region that ends exactly at the window edge on both axes while the
@@ -249,13 +285,24 @@ inline std::vector<std::string> Compare(const std::vector<RegionSpec>& spec,
         if (want.minDetail > 0 && got->detail < want.minDetail)
             failures.push_back("region '" + want.name + "' detail " + std::to_string(got->detail) +
                                " is below " + std::to_string(want.minDetail) + " (blurred or unpainted)");
+        if (want.borderCheck && enforceContrast && got->borderContrast > 0 && got->borderContrast < 3.0)
+            failures.push_back("region '" + want.name + "' border contrast " + std::to_string(got->borderContrast) +
+                               " is below the DESIGN.md floor 3:1");
         if (want.checkContrast && enforceContrast) {
-            const double floor = want.text ? 4.5 : 3.0;
-            if (got->contrast <= 0)
+            // Text-sized glyphs answer to 4.5:1 in a text region; every
+            // glyph, icons included, answers to the 3:1 element floor.
+            if (want.text) {
+                if (got->contrast <= 0 && got->contrastElement <= 0)
+                    failures.push_back("region '" + want.name + "' contrast is unmeasured");
+                else if (got->contrast > 0 && got->contrast < 4.5)
+                    failures.push_back("region '" + want.name + "' contrast " + std::to_string(got->contrast) +
+                                       " is below the DESIGN.md floor 4.5:1");
+            }
+            if (got->contrastElement > 0 && got->contrastElement < 3.0)
+                failures.push_back("region '" + want.name + "' element contrast " +
+                                   std::to_string(got->contrastElement) + " is below the DESIGN.md floor 3:1");
+            if (!want.text && got->contrastElement <= 0)
                 failures.push_back("region '" + want.name + "' contrast is unmeasured");
-            else if (got->contrast < floor)
-                failures.push_back("region '" + want.name + "' contrast " + std::to_string(got->contrast) +
-                                   " is below the DESIGN.md floor " + (want.text ? "4.5:1" : "3:1"));
         }
     }
     return failures;

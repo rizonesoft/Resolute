@@ -47,9 +47,10 @@ bool WriteMarkerFile(const wchar_t* dir, const wchar_t* kind) {
     wsprintfW(name, L"%s%lu.txt", kFocusHookFailPrefix, GetCurrentProcessId());
     // A long directory must fall through to the next destination, never
     // past the buffer: check the complete filename fits first.
-    if (lstrlenW(dir) + lstrlenW(name) >= MAX_PATH) return false;
+    if (lstrlenW(dir) + 1 + lstrlenW(name) >= MAX_PATH) return false;
     wchar_t path[MAX_PATH];
     lstrcpynW(path, dir, MAX_PATH);
+    lstrcatW(path, L"\\");
     lstrcatW(path, name);
     HANDLE file = CreateFileW(path, GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file == INVALID_HANDLE_VALUE) return false;
@@ -67,10 +68,21 @@ void WriteFailureMarker(const wchar_t* kind) {
     wchar_t dir[MAX_PATH];
     const DWORD tempLen = GetTempPathW(MAX_PATH, dir);
     if (tempLen && tempLen < MAX_PATH && WriteMarkerFile(dir, kind)) return;
-    const DWORD cwdLen = GetCurrentDirectoryW(MAX_PATH, dir);
-    if (cwdLen && cwdLen + 1 < MAX_PATH) {
-        lstrcatW(dir, L"\\");
-        if (WriteMarkerFile(dir, kind)) return;
+    // Second destination: this DLL's own directory, which the guard
+    // derives the same way (the DLL sits beside the test executable), so
+    // the two processes' working directories cannot diverge.
+    {
+        HMODULE self = nullptr;
+        wchar_t dllPath[MAX_PATH];
+        if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               reinterpret_cast<LPCWSTR>(&WriteFailureMarker), &self) &&
+            GetModuleFileNameW(self, dllPath, MAX_PATH)) {
+            wchar_t* slash = dllPath;
+            for (wchar_t* c = dllPath; *c; ++c)
+                if (*c == L'\\') slash = c;
+            *slash = L'\0';
+            if (WriteMarkerFile(dllPath, kind)) return;
+        }
     }
     // Third destination: the named event the guard created at adoption
     // (or creates here when it did not), signalled and held so the guard

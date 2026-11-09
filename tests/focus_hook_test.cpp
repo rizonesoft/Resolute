@@ -132,19 +132,32 @@ TEST_CASE("When both marker files are blocked the event carries the failure", "[
     // Block the temp destination and the current-directory destination with
     // directories of the marker's name: neither file can be created.
     const std::filesystem::path tempBlock = MarkerPath();
+    std::filesystem::create_directory(tempBlock);
+    // Run from a different working directory: the fallback destination is
+    // the hook DLL's directory, shared with the guard, so this cannot hide
+    // the marker from it.
     wchar_t cwd[MAX_PATH];
     GetCurrentDirectoryW(MAX_PATH, cwd);
-    const std::filesystem::path cwdBlock =
-        std::filesystem::path(cwd) / (std::wstring(kFocusHookFailPrefix) + std::to_wstring(GetCurrentProcessId()) + L".txt");
-    std::filesystem::create_directory(tempBlock);
-    std::filesystem::create_directory(cwdBlock);
+    const std::filesystem::path otherDir = std::filesystem::temp_directory_path() / "resolute-hook-drill-cwd";
+    std::filesystem::create_directory(otherDir);
+    SetCurrentDirectoryW(otherDir.c_str());
+    // Block the shared DLL-directory destination too, so only the event
+    // remains: the drill proves the third destination, not the second.
+    wchar_t exePath[MAX_PATH];
+    GetModuleFileNameW(nullptr, exePath, MAX_PATH);
+    const std::filesystem::path dllBlock = std::filesystem::path(exePath).parent_path() /
+                                           (std::wstring(kFocusHookFailPrefix) +
+                                            std::to_wstring(GetCurrentProcessId()) + L".txt");
+    std::filesystem::create_directory(dllBlock);
     uitest::HiddenHost host(L"FocusHookDrill");
     REQUIRE(host.hwnd != nullptr);
     hook(nullptr, EVENT_SYSTEM_FOREGROUND, host.hwnd, OBJID_WINDOW, CHILDID_SELF, 0, 0);
     const auto failures = focusguard::HookFailures({GetCurrentProcessId()});
     release();
+    SetCurrentDirectoryW(cwd);
+    std::filesystem::remove(otherDir);
     std::filesystem::remove(tempBlock);
-    std::filesystem::remove(cwdBlock);
+    std::filesystem::remove(dllBlock);
     SetEnvironmentVariableW(kFocusHookAdoptEnv, nullptr);
     REQUIRE(failures.size() == 1);
     CHECK(failures[0].find("event") != std::string::npos);
