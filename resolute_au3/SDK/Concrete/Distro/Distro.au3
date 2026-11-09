@@ -2571,6 +2571,7 @@ Func _DescriptorRelativePath($sBase, $sFull)
 	Local $aFull = StringSplit(StringRegExpReplace($sFull, "\\+$", ""), "\")
 	If $aBase[0] = 0 Or $aFull[0] = 0 Or $aBase[1] <> $aFull[1] Then
 		ConsoleWrite("Distro: no descriptor-relative form for " & $sFull & " (different root); absolute path kept." & @CRLF)
+		_Logging_EditWrite(_Logging_SetLevel("No descriptor-relative form for " & $sFull & " (different root); absolute path kept.", "WARNING"))
 		Return $sFull
 	EndIf
 	Local $iCommon = 1
