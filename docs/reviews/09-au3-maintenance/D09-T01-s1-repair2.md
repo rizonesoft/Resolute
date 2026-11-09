@@ -55,4 +55,5 @@ Static harness inspection; the mutation was not executed. The independent destin
 
 HIGHEST: P2
 OVERALL: needs-attention
+
 - Settled: repair2 round 1 P2 (harness predicate passes without processing) fixed by strengthening the harness: the Exit predicate now requires the read to have been attempted (sentinel global replaced by the failed read's scalar), no build stub tripped, and the shipped disabled-to-enabled transition; removing the _ProcessSelectedSolution(0) call makes it fail (read attempted=False). Also corrected: a failed read produces no dialog in the shipped code; the nearby MsgBox belongs to the not-enough-values branch.
