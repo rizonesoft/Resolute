@@ -187,12 +187,70 @@ class LASTINPUTINFO(ctypes.Structure):
     _fields_ = [("cbSize", wintypes.UINT), ("dwTime", wintypes.DWORD)]
 
 
-def idle_seconds() -> float:
+def _bind():
+    """Pointer-safe signatures: handles must not truncate on 64-bit Python."""
+    u, g, k = user32, gdi32, kernel32
+    u.GetWindowDC.restype = wintypes.HDC
+    u.GetWindowDC.argtypes = [wintypes.HWND]
+    u.ReleaseDC.restype = ctypes.c_int
+    u.ReleaseDC.argtypes = [wintypes.HWND, wintypes.HDC]
+    u.PrintWindow.restype = wintypes.BOOL
+    u.PrintWindow.argtypes = [wintypes.HWND, wintypes.HDC, wintypes.UINT]
+    u.EnumWindows.restype = wintypes.BOOL
+    u.GetWindowRect.restype = wintypes.BOOL
+    u.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
+    u.PostMessageW.restype = wintypes.BOOL
+    u.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+    u.GetLastInputInfo.restype = wintypes.BOOL
+    u.GetLastInputInfo.argtypes = [ctypes.POINTER(LASTINPUTINFO)]
+    g.CreateCompatibleDC.restype = wintypes.HDC
+    g.CreateCompatibleDC.argtypes = [wintypes.HDC]
+    g.CreateCompatibleBitmap.restype = wintypes.HBITMAP
+    g.CreateCompatibleBitmap.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
+    g.SelectObject.restype = wintypes.HGDIOBJ
+    g.SelectObject.argtypes = [wintypes.HDC, wintypes.HGDIOBJ]
+    g.DeleteObject.restype = wintypes.BOOL
+    g.DeleteObject.argtypes = [wintypes.HGDIOBJ]
+    g.DeleteDC.restype = wintypes.BOOL
+    g.DeleteDC.argtypes = [wintypes.HDC]
+    g.GetDIBits.restype = ctypes.c_int
+    g.GetDIBits.argtypes = [wintypes.HDC, wintypes.HBITMAP, wintypes.UINT, wintypes.UINT,
+                            ctypes.c_void_p, ctypes.c_void_p, wintypes.UINT]
+    k.CreateJobObjectW.restype = wintypes.HANDLE
+    k.CreateJobObjectW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
+    k.SetInformationJobObject.restype = wintypes.BOOL
+    k.SetInformationJobObject.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+    k.AssignProcessToJobObject.restype = wintypes.BOOL
+    k.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
+    k.CloseHandle.restype = wintypes.BOOL
+    k.CloseHandle.argtypes = [wintypes.HANDLE]
+    k.GetTickCount.restype = wintypes.DWORD
+    ntdll = ctypes.windll.ntdll
+    ntdll.NtResumeProcess.restype = ctypes.c_long
+    ntdll.NtResumeProcess.argtypes = [wintypes.HANDLE]
+
+
+_bind()
+
+
+def last_input_tick() -> int:
     info = LASTINPUTINFO()
     info.cbSize = ctypes.sizeof(info)
     if not user32.GetLastInputInfo(ctypes.byref(info)):
+        return -1
+    return int(info.dwTime)
+
+
+def idle_seconds() -> float:
+    tick = last_input_tick()
+    if tick < 0:
         return 0.0
-    return (kernel32.GetTickCount() - info.dwTime) / 1000.0
+    return (kernel32.GetTickCount() - tick) / 1000.0
+
+
+def tick_resumed(baseline_tick: int, current_tick: int) -> bool:
+    """Input happened when the last-input tick advanced past the baseline."""
+    return baseline_tick >= 0 and current_tick > baseline_tick
 
 
 def pid_windows(pid: int):
@@ -215,9 +273,11 @@ def pid_windows(pid: int):
     return found
 
 
-def wait_window(pid: int, timeout: float, want_dialog: bool = False):
+def wait_window(pid: int, timeout: float, want_dialog: bool = False, abort=None):
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
+        if abort is not None and abort():
+            return None
         for hwnd, cls, title in pid_windows(pid):
             if want_dialog and cls == "#32770":
                 return hwnd
@@ -308,42 +368,75 @@ COLLECT_MIN_IDLE = 120.0  # docs/testing.md: no input for 120 s at a collecting 
 
 
 class JobBox:
-    """Kill-on-close job: launched tools die with the driver, even on a kill."""
+    """Kill-on-close job: launched tools die with the driver, even on a kill.
+
+    Every API result is checked: containment that could not be established
+    is a named failure, never a silent hope.
+    """
 
     def __init__(self):
         self.handle = kernel32.CreateJobObjectW(None, None)
-        if self.handle:
-            class LIMITS(ctypes.Structure):
-                _fields_ = [("PerProcessUserTimeLimit", ctypes.c_int64),
-                            ("PerJobUserTimeLimit", ctypes.c_int64),
-                            ("LimitFlags", wintypes.DWORD),
-                            ("MinimumWorkingSetSize", ctypes.c_size_t),
-                            ("MaximumWorkingSetSize", ctypes.c_size_t),
-                            ("ActiveProcessLimit", wintypes.DWORD),
-                            ("Affinity", ctypes.c_size_t),
-                            ("PriorityClass", wintypes.DWORD),
-                            ("SchedulingClass", wintypes.DWORD)]
+        self.error = None
+        if not self.handle:
+            self.error = f"CreateJobObject failed ({ctypes.get_last_error()})"
+            return
 
-            class EXTENDED(ctypes.Structure):
-                _fields_ = [("BasicLimitInformation", LIMITS),
-                            ("IoInfo", ctypes.c_void_p * 6),
-                            ("ProcessMemoryLimit", ctypes.c_size_t),
-                            ("JobMemoryLimit", ctypes.c_size_t),
-                            ("PeakProcessMemoryUsed", ctypes.c_size_t),
-                            ("PeakJobMemoryUsed", ctypes.c_size_t)]
+        class LIMITS(ctypes.Structure):
+            _fields_ = [("PerProcessUserTimeLimit", ctypes.c_int64),
+                        ("PerJobUserTimeLimit", ctypes.c_int64),
+                        ("LimitFlags", wintypes.DWORD),
+                        ("MinimumWorkingSetSize", ctypes.c_size_t),
+                        ("MaximumWorkingSetSize", ctypes.c_size_t),
+                        ("ActiveProcessLimit", wintypes.DWORD),
+                        ("Affinity", ctypes.c_size_t),
+                        ("PriorityClass", wintypes.DWORD),
+                        ("SchedulingClass", wintypes.DWORD)]
 
-            info = EXTENDED()
-            info.BasicLimitInformation.LimitFlags = 0x00002000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
-            kernel32.SetInformationJobObject(self.handle, 9, ctypes.byref(info), ctypes.sizeof(info))
+        class IO_COUNTERS(ctypes.Structure):
+            _fields_ = [(name, ctypes.c_uint64) for name in (
+                "ReadOperationCount", "WriteOperationCount", "OtherOperationCount",
+                "ReadTransferCount", "WriteTransferCount", "OtherTransferCount")]
 
-    def assign(self, proc):
-        if self.handle and proc is not None:
-            kernel32.AssignProcessToJobObject(self.handle, int(proc._handle))
+        class EXTENDED(ctypes.Structure):
+            _fields_ = [("BasicLimitInformation", LIMITS),
+                        ("IoInfo", IO_COUNTERS),
+                        ("ProcessMemoryLimit", ctypes.c_size_t),
+                        ("JobMemoryLimit", ctypes.c_size_t),
+                        ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                        ("PeakJobMemoryUsed", ctypes.c_size_t)]
+
+        info = EXTENDED()
+        info.BasicLimitInformation.LimitFlags = 0x00002000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+        if not kernel32.SetInformationJobObject(self.handle, 9, ctypes.byref(info), ctypes.sizeof(info)):
+            self.error = f"SetInformationJobObject failed ({ctypes.get_last_error()})"
+
+    def assign(self, proc) -> bool:
+        if not self.handle or self.error:
+            return False
+        if not kernel32.AssignProcessToJobObject(self.handle, wintypes.HANDLE(int(proc._handle))):
+            self.error = f"AssignProcessToJobObject failed ({ctypes.get_last_error()})"
+            return False
+        return True
 
     def close(self):
         if self.handle:
             kernel32.CloseHandle(self.handle)
             self.handle = None
+
+
+def ensure_rows(run: "ToolRun", result: str, detail: str):
+    """Every selected tool ends with exactly the five step rows."""
+    have = {row[1] for row in run.rows}
+    for step, _expected in step_table(run.name):
+        if step not in have:
+            run.record(step, result, detail)
+
+
+def validate_tools(only, known):
+    """Unknown selections fail by name; they never pass as an empty suite."""
+    if not only:
+        return []
+    return sorted(name for name in only if name not in known)
 
 
 # ---------------------------------------------------------------- driver
@@ -386,13 +479,25 @@ def launch_block(exc: OSError) -> str | None:
 
 
 def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
-               input_mark: float) -> bool:
+               input_mark: float, resumed=None) -> bool:
     """Drive one tool through the five steps. Returns stood_down."""
     table = dict(step_table(run.name))
     run.job = JobBox()
     try:
-        run.proc = subprocess.Popen([str(run.exe), *run.args])
-        run.job.assign(run.proc)
+        # Suspended at creation, assigned to the job, then resumed: there is
+        # no window in which the child runs uncontained.
+        run.proc = subprocess.Popen([str(run.exe), *run.args],
+                                    creationflags=0x00000004)  # CREATE_SUSPENDED
+        contained = run.job.assign(run.proc)
+        ctypes.windll.ntdll.NtResumeProcess(wintypes.HANDLE(int(run.proc._handle)))
+        if not contained:
+            for step, expected in step_table(run.name):
+                run.record(step, "fail" if expected else "absent",
+                           f"containment could not be established: {run.job.error}"
+                           if expected else "surface not shipped")
+            run.cleanup()
+            run.job.close()
+            return False
     except OSError as exc:
         blocked = launch_block(exc)
         for step, expected in step_table(run.name):
@@ -406,7 +511,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
         return False
     try:
         # start: observe the main window inside the launch bound.
-        run.hwnd = wait_window(run.proc.pid, run.start_timeout)
+        run.hwnd = wait_window(run.proc.pid, run.start_timeout, abort=resumed)
         if run.hwnd is None:
             run.record("start", "fail",
                        f"no window within {run.start_timeout:.0f}s (capture: none, no window)")
@@ -420,7 +525,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
         run.record("start", "pass", f"window 0x{run.hwnd:x} pid {run.proc.pid}")
 
         def stood_down_here(next_steps) -> bool:
-            if not (collecting and input_resumed(collecting, idle_seconds())):
+            if resumed is None or not resumed():
                 return False
             post(run.hwnd, WM_CLOSE)
             for step in next_steps:
@@ -459,17 +564,20 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             run.record("about", "absent", "no About surface shipped for this tool")
         else:
             post(run.hwnd, WM_COMMAND, ABOUT_IDM)
-            dialog = wait_window(run.proc.pid, TIMEOUTS["dialog"], want_dialog=True)
+            dialog = wait_window(run.proc.pid, TIMEOUTS["dialog"], want_dialog=True, abort=resumed)
             if dialog is None:
-                run.record("about", "fail", "About dialog did not appear (command ignored or no dialog)")
+                run.record("about", "fail",
+                           "About dialog did not appear (command ignored or no dialog); "
+                           + failure_capture(run, "about", out_dir))
             else:
                 post(dialog, WM_COMMAND, IDOK)
                 deadline = time.monotonic() + TIMEOUTS["message"]
                 gone = False
                 while time.monotonic() < deadline:
-                    if collecting and input_resumed(collecting, idle_seconds()):
+                    if resumed is not None and resumed():
                         post(dialog, WM_COMMAND, IDOK)
                         post(run.hwnd, WM_CLOSE)
+                        run.record("about", "stood-down", "operator input resumed; tool dismissed")
                         run.record("preferences", "stood-down", "operator input resumed; tool dismissed")
                         run.record("exit", "stood-down", "operator input resumed; tool dismissed")
                         return True
@@ -478,7 +586,8 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                         break
                     time.sleep(0.1)
                 run.record("about", "pass" if gone else "fail",
-                           "About dialog observed and dismissed" if gone else "About dialog did not dismiss")
+                           "About dialog observed and dismissed" if gone
+                           else "About dialog did not dismiss; " + failure_capture(run, "about", out_dir))
 
         # preferences: absent until the framework shell ships (D01 T03 S2).
         if not table["preferences"]:
@@ -493,11 +602,28 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             run.record("exit", result, detail)
         except subprocess.TimeoutExpired:
             run.record("exit", "fail",
-                       f"process still running {TIMEOUTS['exit']:.0f}s after WM_CLOSE; cleaned up")
+                       f"process still running {TIMEOUTS['exit']:.0f}s after WM_CLOSE; "
+                       + failure_capture(run, "exit", out_dir) + "; cleaned up")
         return False
     finally:
         run.cleanup()
         run.job.close()
+
+
+def failure_capture(run: ToolRun, step: str, out_dir: Path) -> str:
+    """Capture the surface at failure, or say why none exists."""
+    if run.hwnd is None:
+        return "capture unavailable: no window"
+    shot = capture_window_bounded(run.hwnd)
+    if shot is None:
+        return "capture unavailable: PrintWindow produced nothing within its bound"
+    width, height, bgra = shot
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / f"{run.name}-{step}.png").write_bytes(png_encode(width, height, bgra))
+        return f"capture build/smoke/{run.name}-{step}.png"
+    except OSError as exc:
+        return f"capture unavailable: {exc}"
 
 
 def drill_tools():
@@ -534,6 +660,13 @@ def main(argv=None) -> int:
     if args.self_test:
         return self_test()
 
+    only = {t.strip() for t in args.tools.split(",") if t.strip()} or None
+    unknown = validate_tools(only, load_tools())
+    if unknown:
+        print(f"smoke: unknown tool selection(s): {', '.join(unknown)} "
+              f"(registered: {', '.join(sorted(load_tools()))}); nothing launched")
+        return 2
+
     admitted, mode, collecting = admission(args.visible, datetime.now(), os.environ)
     if admitted and collecting and idle_seconds() < COLLECT_MIN_IDLE:
         admitted, mode = False, (f"refused: collecting runs need {COLLECT_MIN_IDLE:.0f}s without "
@@ -546,23 +679,36 @@ def main(argv=None) -> int:
         print(f"smoke: {mode}; report at build/smoke/smoke-report.md")
         return 2
 
-    only = {t.strip() for t in args.tools.split(",") if t.strip()} or None
     runs = real_tools(only, args.flavor)
     if args.drill:
         runs += drill_tools()
     rows = []
     stood_down = False
     base_idle = idle_seconds()
+    baseline_tick = last_input_tick()
+
+    def resumed() -> bool:
+        return collecting and tick_resumed(baseline_tick, last_input_tick())
+
     for run in runs:
-        if collecting and input_resumed(collecting, idle_seconds()):
-            rows.append((run.name, "start", "stood-down", "operator input resumed; dismissed and not launched"))
+        if stood_down or resumed():
             stood_down = True
+            ensure_rows(run, "stood-down", "operator input resumed; not launched")
+            rows += run.rows
             continue
-        if stood_down:
-            rows.append((run.name, "start", "stood-down", "operator input resumed; not launched"))
-            continue
-        if drive_tool(run, SMOKE_DIR, PREV_DIR, collecting, base_idle):
-            stood_down = True
+        try:
+            if drive_tool(run, SMOKE_DIR, PREV_DIR, collecting, base_idle, resumed=resumed):
+                stood_down = True
+            ensure_rows(run, "stood-down" if stood_down else "fail",
+                        "operator input resumed; tool dismissed" if stood_down else "not reached")
+        except Exception as exc:  # one tool's crash never stops the run or loses the report
+            ensure_rows(run, "fail", f"driver error: {exc!r}")
+            try:
+                run.cleanup()
+                if run.job is not None:
+                    run.job.close()
+            except Exception:
+                pass
         rows += run.rows
     failed = any(r[2] == "fail" for r in rows)
     blocked = any(r[2] == "blocked" for r in rows)
@@ -638,6 +784,16 @@ def self_test() -> int:
     check("clean exit passes", exit_result(0) == ("pass", "process exited (0)"))
     check("input resumes only when collecting", input_resumed(True, 0.5) and not input_resumed(False, 0.5)
           and not input_resumed(True, 30.0))
+
+    check("last-input tick advance means resumed", tick_resumed(100, 101) and not tick_resumed(100, 100)
+          and not tick_resumed(-1, 500))
+    check("unknown selections named", validate_tools({"Typo", "Resolute"}, load_tools()) == ["Typo"]
+          and validate_tools({"Resolute"}, load_tools()) == [] and validate_tools(None, load_tools()) == [])
+    probe = ToolRun("Resolute", Path("x"))
+    ensure_rows(probe, "stood-down", "test")
+    check("ensure_rows completes five rows", [r[1] for r in probe.rows] == list(STEPS)
+          and all(r[2] == "stood-down" for r in probe.rows))
+    check("ensure_rows keeps recorded rows", (ensure_rows(probe, "fail", "y") or len(probe.rows)) == 5)
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])

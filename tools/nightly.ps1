@@ -262,9 +262,15 @@ try {
                 $failures.Add('smoke run exceeded its 20-minute bound and was killed')
             }
             Remove-Item Env:RESOLUTE_IDLE_COLLECT -ErrorAction SilentlyContinue
-            if ($smokeExit -eq 0) { Note 'smoke: pass (report build/smoke/smoke-report.md in the candidate worktree)' }
-            elseif ($smokeExit -eq 2) { Note 'smoke: blocked (exit 2, named refusal in the candidate smoke report); the elevated pass is owned by D07 T01 section 5' }
-            else { Note "smoke: FAILED (exit $smokeExit, see smoke.log and the candidate smoke report)"; $failures.Add("smoke run failed at $head (exit $smokeExit)") }
+            $smokeReportPath = Join-Path $wt 'build\smoke\smoke-report.md'
+            $smokeVerdict = 'unknown'
+            if (Test-Path $smokeReportPath) {
+                $m = Select-String -Path $smokeReportPath -Pattern 'Suite verdict: \*\*(\w+)\*\*' | Select-Object -Last 1
+                if ($m) { $smokeVerdict = $m.Matches[0].Groups[1].Value }
+            }
+            if ($smokeExit -eq 0) { Note "smoke: $smokeVerdict (report build/smoke/smoke-report.md in the candidate worktree)" }
+            elseif ($smokeExit -eq 2) { Note "smoke: $smokeVerdict (exit 2, reason named in the candidate smoke report at build/smoke/smoke-report.md)" }
+            else { Note "smoke: $smokeVerdict FAILED (exit $smokeExit, see smoke.log and the candidate smoke report)"; $failures.Add("smoke run failed at $head (exit $smokeExit)") }
         }
         Note ''
     }
