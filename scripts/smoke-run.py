@@ -1594,6 +1594,8 @@ def self_test() -> int:
             globals()["PREV_DIR"] = Path(td) / "smoke" / "prev"
             globals()["admission"] = lambda v, n, e: (True, "visible (test)", False)
             globals()["real_tools"] = lambda only=None, flavor="Release": [ToolRun("Resolute", Path("x"))]
+            _real_cap = globals()["capture_window"]
+            globals()["capture_window"] = lambda hwnd: (time.sleep(2), None)[1]
             def _drive_exc2(run, out_dir, prev_dir, collecting, mark, resumed=None):
                 run.hwnd = 99
                 _n = {"n": 0}
@@ -1609,6 +1611,7 @@ def self_test() -> int:
             with redirect_stdout(buf):
                 rc = main([])
             globals()["drive_tool"] = _rd4
+            globals()["capture_window"] = _real_cap
             out = buf.getvalue()
             check("exceptional capture interruption: stood-down verdict, failure exit kept",
                   rc == 1 and "Suite verdict: **stood-down**" in out and "driver error" in out
