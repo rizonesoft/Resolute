@@ -204,6 +204,9 @@ class ElevationFailed(Exception):
 
     def __init__(self, message, launched=False):
         super().__init__(message)
+        # False: no child launched. True: child launched. None: the
+        # shell call succeeded but returned no handle, so whether a
+        # child launched cannot be verified.
         self.launched = launched
 
 
@@ -323,7 +326,7 @@ def relaunch_elevated(argv, timeout=ELEVATE_WAIT_TIMEOUT):
     """
     handle = _shell_execute_runas(elevated_child_args(list(argv)))
     if not handle:
-        raise ElevationFailed("ShellExecuteExW returned no process handle")
+        raise ElevationFailed("ShellExecuteExW returned no process handle", launched=None)
     try:
         deadline = time.monotonic() + timeout
         while True:
@@ -1246,7 +1249,10 @@ def elevation_rows(only, result, detail):
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0],
+                                 formatter_class=argparse.RawDescriptionHelpFormatter,
+                                 epilog="Elevated RegStudio pass:\n"
+                                        "  python scripts/smoke-run.py --elevate --visible --tools RegStudio")
     ap.add_argument("--visible", action="store_true", help="operator asked: run visibly now")
     ap.add_argument("--drill", action="store_true", help="add the broken-tool fixture entries")
     ap.add_argument("--tools", default="", help="comma-separated subset of registered tools")
@@ -1293,7 +1299,13 @@ def main(argv=None) -> int:
                 print(f"smoke: {detail}; report at build/smoke/smoke-report.md")
                 return 2
             except ElevationFailed as exc:
-                if exc.launched:
+                if exc.launched is None:
+                    detail = (f"blocked: elevated launch could not be verified: {exc}; "
+                              "whether a tool launched is unknown")
+                    notes = [f"Admission: {detail}.",
+                             "No process handle was returned, so launch and termination "
+                             "are unverified."]
+                elif exc.launched:
                     detail = (f"blocked: elevated child was launched, then failed: {exc}; "
                               "steps in this run were not reliably observed")
                     notes = [f"Admission: {detail}.",
@@ -2244,6 +2256,78 @@ def self_test() -> int:
         check("an interrupt outside the wait still terminates, closes, and names blocked",
               kind == "ElevationFailed" and _terminated == [47] and _closed == [47])
 
+        # Win32 boundary: production is_elevated and _shell_execute_runas
+        # with only the API functions and last-error source stubbed.
+        _api_saved = (advapi32.OpenProcessToken, advapi32.GetTokenInformation,
+                      shell32.ShellExecuteExW, ctypes.get_last_error)
+        try:
+            advapi32.OpenProcessToken = lambda proc, access, tok: False
+            check("token open failure at the API boundary returns None", is_elevated() is None)
+            def _open_ok(proc, access, tok_ptr):
+                tok_ptr._obj.value = 99
+                return True
+            def _get_fail(tok, cls, buf, size, out):
+                return False
+            advapi32.OpenProcessToken = _open_ok
+            advapi32.GetTokenInformation = _get_fail
+            check("token info failure at the API boundary returns None", is_elevated() is None)
+            def _get_zero(tok, cls, buf, size, out):
+                buf._obj.value = 0
+                return True
+            advapi32.GetTokenInformation = _get_zero
+            check("unelevated token at the API boundary returns False", is_elevated() is False)
+            def _get_one(tok, cls, buf, size, out):
+                buf._obj.value = 1
+                return True
+            advapi32.GetTokenInformation = _get_one
+            check("elevated token at the API boundary returns True", is_elevated() is True)
+            shell32.ShellExecuteExW = lambda info_ptr: 0
+            ctypes.get_last_error = lambda: 1223
+            try:
+                _elev_saved["_shell_execute_runas"](["--visible"])
+                _shell_kind = "rc"
+            except ElevationDeclined:
+                _shell_kind = "declined"
+            except ElevationFailed:
+                _shell_kind = "failed"
+            check("shell error 1223 at the API boundary maps to declined", _shell_kind == "declined")
+            ctypes.get_last_error = lambda: 5
+            try:
+                _elev_saved["_shell_execute_runas"](["--visible"])
+                _shell_kind, _shell_msg = "rc", ""
+            except ElevationFailed as exc:
+                _shell_kind, _shell_msg = "failed", str(exc)
+            check("shell error 5 at the API boundary names its Win32 error",
+                  _shell_kind == "failed" and "Win32 error 5" in _shell_msg)
+            def _shell_ok(info_ptr):
+                ctypes.cast(info_ptr, ctypes.POINTER(_ShellExecuteInfoW)).contents.hProcess = 777
+                return 1
+            shell32.ShellExecuteExW = _shell_ok
+            check("shell success at the API boundary returns the process handle",
+                  _elev_saved["_shell_execute_runas"](["--visible"]) == 777)
+        finally:
+            (advapi32.OpenProcessToken, advapi32.GetTokenInformation,
+             shell32.ShellExecuteExW, ctypes.get_last_error) = _api_saved
+        # Termination confirmation has distinct asserted outcomes.
+        for _seq, _want, _label in (
+                ([WAIT_FAILED, WAIT_OBJECT_0], "terminated and confirmed exited", "confirmed"),
+                ([WAIT_FAILED, WAIT_TIMEOUT], "not confirmed", "unconfirmed")):
+            _closed.clear(); _terminated.clear()
+            _waits = iter(_seq)
+            globals()["_shell_execute_runas"] = lambda a: 48
+            globals()["_wait_process"] = lambda h, ms: next(_waits)
+            globals()["_process_exit_code"] = lambda h: 0
+            globals()["_close_handle"] = lambda h: _closed.append(h)
+            globals()["_terminate_process"] = lambda h: (_terminated.append(h), True)[1]
+            try:
+                relaunch_elevated(["--visible"])
+                _kind, _val = "rc", ""
+            except ElevationFailed as exc:
+                _kind, _val = "ElevationFailed", str(exc)
+            check(f"termination {_label} outcome is asserted by name",
+                  _kind == "ElevationFailed" and _want in _val
+                  and _terminated == [48] and _closed == [48])
+
         # main() branches through the production entry point.
         import io as _io
         from contextlib import redirect_stdout as _redir
@@ -2304,6 +2388,39 @@ def self_test() -> int:
             check("a post-launch failure records the launch, never a false no-launch",
                   rc == 2 and "child was launched" in report
                   and "No tool was launched" not in report)
+            # Missing handle through production relaunch_elevated and main:
+            # launch state is unverified, never a false no-launch claim.
+            globals()["relaunch_elevated"] = _elev_saved["relaunch_elevated"]
+            globals()["_shell_execute_runas"] = lambda a: None
+            globals()["is_elevated"] = lambda: False
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+            report = sentinel.read_text(encoding="utf-8")
+            check("a missing handle through main reports launch unverified, exit 2",
+                  rc == 2 and "could not be verified" in report
+                  and "No tool was launched" not in report)
+            # Declined with no selection reports every registered tool.
+            globals()["relaunch_elevated"] = _decline
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevate", "--visible"])
+            report = sentinel.read_text(encoding="utf-8")
+            check("declined with default selection reports all registered tools",
+                  rc == 2 and report.count("| RegStudio |") == 5
+                  and report.count("| Resolute |") == 5)
+            # Report-write failure on the elevation path prints the report.
+            _blocker = Path(td) / "blocker"
+            _blocker.write_text("x", encoding="utf-8")
+            globals()["SMOKE_DIR"] = _blocker / "smoke"
+            buf = _io.StringIO()
+            with _redir(buf):
+                rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
+            _out = buf.getvalue()
+            globals()["SMOKE_DIR"] = Path(td) / "smoke"
+            check("elevation report-write failure prints diagnostic and report",
+                  rc == 2 and "could not write" in _out
+                  and "| RegStudio | start | blocked |" in _out)
             # Already elevated: no relaunch, the normal driver path completes.
             globals()["is_elevated"] = lambda: True
             globals()["relaunch_elevated"] = lambda argv: 99
@@ -2314,6 +2431,19 @@ def self_test() -> int:
                   rc == 0 and "Suite verdict" in (Path(td) / "smoke" / "smoke-report.md").read_text(encoding="utf-8"))
     finally:
         globals().update(_elev_saved)
+
+    # --help names the documented elevated command (D07 T01 S5 build order).
+    import io as _help_io
+    from contextlib import redirect_stdout as _help_redir
+    _help_buf = _help_io.StringIO()
+    _help_code = None
+    try:
+        with _help_redir(_help_buf):
+            main(["--help"])
+    except SystemExit as _help_exc:
+        _help_code = _help_exc.code
+    check("--help names the elevated RegStudio command",
+          _help_code == 0 and "python scripts/smoke-run.py --elevate --visible --tools RegStudio" in _help_buf.getvalue())
 
     # Report renders every row and the verdict.
     text = render_report([("T", "start", "pass", "ok")], "pass", ["Admission: visible."])
