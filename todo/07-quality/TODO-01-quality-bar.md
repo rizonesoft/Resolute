@@ -280,6 +280,8 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 
 ## 7. Unattended Elevated Smoke via Scheduled Task
 
+> **Started:** 2026-11-09T22:56:17Z
+
 **Filed 2026-11-10** from an operator decision in the `D07 T01 §5` run: approving a UAC prompt for every elevated smoke run does not scale to unattended runs, and an elevated terminal only helps runs launched from inside it, because elevation is a process token a child inherits from its parent, never from another window on the desktop. Nightly, watchdog, and resumed-session parents are not children of that terminal, so they still face the prompt. This section owns the consent-once path: one highest-privilege interactive scheduled task, registered with one approval, that later runs invoke without any prompt. `RunAsInvoker` and lowering the machine UAC policy were considered and rejected: the first never elevates, so it cannot prove an elevated step, and the second weakens every application on the machine to convenience one test.
 
 **Corrected 2026-11-10 (plan review, astra, all gaps folded in before building):** the filed draft trusted a fixed argument list, ran `--visible` through the fence, and waited for a task to stop being `Running`. Six gaps corrected below: fixed arguments do not bound what user-writable code does elevated (P1); `--visible` defeats the collecting fence and its stand-down (P2); a not-`Running` wait and a report timestamp do not correlate a run (P2); timeout, interruption, and removal had no cleanup contract (P2); registration and removal named no refusals (P2); and a task readback cannot prove the executed environment carried no `__COMPAT_LAYER` (P2). The items below are the corrected contract.
