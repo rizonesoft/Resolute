@@ -893,17 +893,18 @@ def main(argv=None) -> int:
         return 2
 
     admitted, mode, collecting = admission(args.visible, datetime.now(), os.environ)
+    baseline_tick = last_input_tick()
     if admitted and collecting:
-        gate = collecting_gate(last_input_tick(), idle_seconds())
+        gate = collecting_gate(baseline_tick, idle_seconds())
         if gate:
             admitted, mode = False, gate
     notes = [f"Admission: {mode}."]
     if not admitted:
-        SMOKE_DIR.mkdir(parents=True, exist_ok=True)
         refused_rows = [(name, step, "refused", mode)
                         for name in (only or sorted(load_tools()))
                         for step, _ in step_table(name)]
         try:
+            SMOKE_DIR.mkdir(parents=True, exist_ok=True)
             (SMOKE_DIR / "smoke-report.md").write_text(
                 render_report(refused_rows, "refused", notes + ["No tool was launched."]), encoding="utf-8")
         except OSError as exc:
@@ -918,7 +919,6 @@ def main(argv=None) -> int:
     rows = []
     stood_down = False
     base_idle = idle_seconds()
-    baseline_tick = last_input_tick()
 
     def resumed() -> bool:
         return collecting and tick_resumed(baseline_tick, last_input_tick())

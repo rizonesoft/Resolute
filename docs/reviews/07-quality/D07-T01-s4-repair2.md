@@ -33,3 +33,30 @@ OVERALL: needs-attention
 - Planned: every exit through cleanup_safely, checked TerminateProcess (gap 3)
 - Planned: guarded refusal report, evidence captured before teardown (gap 4)
 - Planned: production containment proof (job close reaps child), handle-release and nightly contract tests (gap 5)
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T09:22:21Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: 9f5a90156e343e6fa6d739409e5da7158b838610
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 11
+- Digest: 9b95c45f5def40cf
+
+## adversarial: needs-attention
+
+1. **P2: Collecting admission still permits an unchecked cancellation baseline.** `scripts/smoke-run.py:921` replaces the sample validated at `:897`. If this later query fails, `tick_resumed(-1, ...)` always returns false, disabling stand-down. Input arriving between admission and this replacement baseline is also forgotten. **Reproduction:** windowless probes through `main()` supplied gate/baseline/subsequent ticks of `100/-1/200` and `100/200/200`. Both invoked the driver, reported `resumed=False`, and returned exit 0. Preserve the validated baseline through execution and reject failed samples.
+
+2. **P2: Refusal reporting still crashes when directory creation fails.** `scripts/smoke-run.py:902` calls `mkdir()` outside the report-write guard. An inaccessible report directory therefore prevents both the structured stdout fallback and the intended refusal exit. **Reproduction:** invoke the refusal branch through `main()` with `SMOKE_DIR.mkdir()` raising `PermissionError`. The exception escapes and stdout contains no report. Include directory creation inside the guarded reporting operation.
+
+Probes used in-memory substitutions; no files modified or GUI runs performed.
+
+HIGHEST: P2
+
+OVERALL: needs-attention
