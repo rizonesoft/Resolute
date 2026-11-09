@@ -51,6 +51,8 @@ track: N0
 
 ## 1. Visual Proof Capture
 
+> **Started:** 2026-11-09T18:07:34Z
+
 The README shows real pixels from the shipped app, never mockups: the suite builds from a clean checkout through the shipped `D00 T01 §4` one-command build, and two screenshots at no less than 1280 px are captured with the `D00 T02 §3` provenance convention (what it proves, what produced it, the machine, the date). The surfaces captured are the ones that exist at build time.
 
 **Needs:** Windows host (build/test)
