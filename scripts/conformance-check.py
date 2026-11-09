@@ -1187,6 +1187,71 @@ def self_test() -> int:
 
     case("API-set impersonators refused, real contracts pass", api_set_impersonators_refuse)
 
+    PROFILE_C22 = PROFILE.replace(
+        "## Exceptions",
+        "| C22 | universal | run | generated values | source search | D01 T01 \u00a71 |\n\n## Exceptions",
+    )
+
+    def _capture(fn):
+        import contextlib
+        import io
+
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = fn()
+        return rc, buf.getvalue()
+
+    def advisory_open_owner_reports_but_stays_nye():
+        tmp, tools, log, status, result = fixture(profile=PROFILE_C22)
+        rc, out = _capture(lambda: run(tmp, log, tools, PROFILE_C22, status, result))
+        assert rc == 0, out
+        assert "C22 ToolA: NYE (advisory PASS" in out, out
+        assert "| C22 |" in out and "| NYE |" in out, out
+        (tmp / "src" / "main.cpp").write_text("/* Copyright (c) 2026 X */\nint main(){}\n")
+        refresh_result(tmp, result)
+        rc, out = _capture(lambda: run(tmp, log, tools, PROFILE_C22, status, result))
+        assert rc == 0, f"advisory FAIL failed the gate: {out}"
+        assert "C22 ToolA: NYE (advisory FAIL" in out, out
+
+    case("open-owner advisory reports PASS/FAIL while the cell stays NYE", advisory_open_owner_reports_but_stays_nye)
+
+    def moved_destination_parsed():
+        tmp = mkdtemp()
+        (tmp / "scripts").mkdir()
+        (tmp / "scripts" / "todo-graph.py").write_text(
+            "import sys\n"
+            "print('moved      2026-11-09 to ELSEWHERE.md -- note')\n"
+            "sys.exit(5)\n"
+        )
+        cache = {}
+        status = owner_status(tmp, cache)
+        assert status("D01 T01 \u00a71") == "moved"
+        assert "ELSEWHERE.md" in cache["D01 T01 \u00a71|moved"], cache
+
+    case("moved owner destination parsed from resolver output", moved_destination_parsed)
+
+    def owner_resolution_uses_running_interpreter():
+        seen = {}
+        real_run = subprocess.run
+
+        class _Proc:
+            returncode = 0
+            stdout = ""
+
+        def fake_run(argv, **kw):
+            seen["argv"] = argv
+            return _Proc()
+
+        subprocess.run = fake_run
+        try:
+            status = owner_status(mkdtemp(), {})
+            assert status("D01 T01 \u00a71") == "open"
+        finally:
+            subprocess.run = real_run
+        assert seen["argv"][0] == sys.executable, seen
+
+    case("owner resolution invokes sys.executable, not literal python", owner_resolution_uses_running_interpreter)
+
     for d in scratch:
         shutil.rmtree(d, ignore_errors=True)
     if failures:

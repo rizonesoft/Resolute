@@ -1402,6 +1402,33 @@ def self_test() -> int:
     case("build record refuses a command changed after configure", build_record_rejects_command_change)
     case("build record refuses a same-basename different-path source", build_record_rejects_same_basename)
 
+    def build_record_requires_configure_hash():
+        tmp, db = _record_fixture(
+            lambda rel: [{"file": "a.cpp", "directory": str(rel), "command": "cc a.cpp"}],
+            "build a.obj: CXX_COMPILER__x a.cpp\n")
+        rc = main(_record_args(tmp))
+        assert rc == 1, f"database without configure-time hash recorded (rc={rc})"
+        assert not (tmp / "build" / "logs" / "build-record.json").exists()
+        rc = main(_record_args(tmp, ["--expect-dbs", "not-a-pair"]))
+        assert rc == 1, f"malformed --expect-dbs accepted (rc={rc})"
+        assert not (tmp / "build" / "logs" / "build-record.json").exists()
+
+    def build_record_accepts_escaped_ninja_paths():
+        tmp, db = _record_fixture(
+            lambda rel: [
+                {"file": "my dir/a.cpp", "directory": str(rel), "command": "cc x"},
+                {"file": "cost$/b.cpp", "directory": str(rel), "command": "cc y"},
+            ],
+            "build a.obj: CXX_COMPILER__x my$ dir/a.cpp\n"
+            "build b.obj: CXX_COMPILER__x cost$$/b.cpp\n")
+        import hashlib as _h
+        digest = _h.sha256(db.read_bytes()).hexdigest()
+        rc = main(_record_args(tmp, ["--expect-dbs", f"build/release/compile_commands.json={digest}"]))
+        assert rc == 0, f"escaped-space/dollar ninja paths refused (rc={rc})"
+
+    case("build record requires a configure-time hash per database", build_record_requires_configure_hash)
+    case("build record accepts ninja-escaped spaces and dollars", build_record_accepts_escaped_ninja_paths)
+
     for d in scratch_dirs:
         shutil.rmtree(d, ignore_errors=True)
 
@@ -1450,9 +1477,13 @@ def main(argv=None) -> int:
             }
         expect_dbs = {}
         for pair in (args.expect_dbs or "").split(";"):
-            if "=" in pair:
-                k, v = pair.split("=", 1)
-                expect_dbs[k] = v
+            if not pair:
+                continue
+            if "=" not in pair or not pair.split("=", 1)[0] or not pair.split("=", 1)[1]:
+                print(f"tidy-ratchet: FAILED: malformed --expect-dbs entry {pair!r}")
+                return 1
+            k, v = pair.split("=", 1)
+            expect_dbs[k] = v
         current_inputs = input_manifest(root)
         if args.expect_inputs and current_inputs != args.expect_inputs:
             print(
@@ -1468,6 +1499,9 @@ def main(argv=None) -> int:
             db_files += sorted((root / "extensions").glob("*/build/Release/compile_commands.json"))
         for db in db_files:
             if not db.is_file():
+                if db == db_files[0]:
+                    print(f"tidy-ratchet: FAILED: compile database {db} missing; nothing to bind")
+                    return 1
                 continue
             # The database must describe the build that just ran:
             # its translation units are exactly the C++ sources the
@@ -1492,12 +1526,27 @@ def main(argv=None) -> int:
             if not ninja.is_file():
                 print(f"tidy-ratchet: FAILED: no build.ninja beside {db}; cannot bind the database")
                 return 1
+            def _ninja_tokens(text):
+                toks, cur, i = [], [], 0
+                while i < len(text):
+                    ch = text[i]
+                    if ch == "$" and i + 1 < len(text) and text[i + 1] in " $:":
+                        cur.append(text[i + 1]); i += 2; continue
+                    if ch in " \t":
+                        if cur:
+                            toks.append("".join(cur)); cur = []
+                        i += 1; continue
+                    cur.append(ch); i += 1
+                if cur:
+                    toks.append("".join(cur))
+                return toks
+
             ninja_sources = set()
             for line in ninja.read_text(errors="replace").splitlines():
                 if line.startswith("build ") and ": CXX_COMPILER__" in line:
-                    for token in line.split(": CXX_COMPILER__", 1)[1].split():
+                    for token in _ninja_tokens(line.split(": CXX_COMPILER__", 1)[1]):
                         if token.lower().endswith((".cpp", ".cc", ".cxx")) and "_deps" not in token:
-                            ninja_sources.add(_resolved(db.parent, token.replace("$:", ":").replace("$$", "$")))
+                            ninja_sources.add(_resolved(db.parent, token))
             if db_sources != ninja_sources:
                 print(
                     "tidy-ratchet: FAILED: compile database "
@@ -1509,13 +1558,27 @@ def main(argv=None) -> int:
                 return 1
             digest = _hl2.sha256(db.read_bytes()).hexdigest()
             rel = db.relative_to(root).as_posix()
-            if expect_dbs.get(rel, digest) != digest:
+            if rel not in expect_dbs:
+                print(
+                    f"tidy-ratchet: FAILED: no configure-time hash for {rel}; "
+                    "publish through scripts/build.ps1, which captures each "
+                    "database at its configure"
+                )
+                return 1
+            if expect_dbs[rel] != digest:
                 print(
                     f"tidy-ratchet: FAILED: compile database {rel} changed after "
                     "its configure; it does not describe the compilation"
                 )
                 return 1
             dbs[rel] = digest
+        if not dbs:
+            print("tidy-ratchet: FAILED: no compile database bound; refusing an empty build record")
+            return 1
+        stale = sorted(set(expect_dbs) - set(dbs))
+        if stale:
+            print(f"tidy-ratchet: FAILED: configure-time hash names no recorded database: {stale[:3]}")
+            return 1
         record = {
             "inputs_sha256": current_inputs,
             "compile_dbs": dbs,
