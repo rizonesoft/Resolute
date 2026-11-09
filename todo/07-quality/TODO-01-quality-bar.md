@@ -43,6 +43,7 @@ track: Q1
 |   3   |   §3    | Conformance check and its report       | §1           |  [x]   |
 |   4   |   §4    | Standing smoke run over the suite      | §3           |  [ ]   |
 |   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [ ]   |
+|   6   |   §6    | Smoke capture-timeout test                    | §4            |  [ ]   |
 
 ---
 
@@ -224,6 +225,17 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 -> SOURCE: run-2026-11-09-d07-t01-s4 (RegStudio launch WinError 740 under a non-elevated driver)
 
 **Test checkpoint:** The elevated run's `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent` named, quoted in the stamp; the paired non-elevated run shows `blocked` naming the elevation requirement.
+
+## 6. Smoke Capture-Timeout Test
+
+**Filed 2026-11-09** from the `D07 T01 §4` review (round 3, `P3`, in `docs/reviews/07-quality/D07-T01-s4.md`): the hung fixture keeps pumping messages, so it never exercises the blocked `PrintWindow` path or the capture worker's timeout in `scripts/smoke-run.py`.
+
+- [ ] Add a windowless `--self-test` case that feeds `capture_window_bounded` a deliberately blocked capture function and asserts it returns `None` inside its bound while the blocked call is still running. Done when: replacing the bounded call with a direct capture makes the new case fail, and the case opens no window.
+- [ ] Commit: `"quality: test the smoke capture timeout"`
+
+-> SOURCE: review-2026-11-09-d07-t01-s4-round3 (P3 capture timeout untested)
+
+**Test checkpoint:** `python scripts/smoke-run.py --self-test` passes with the blocked-capture case named, and the case fails when the bound is removed (quoted from a real run each way).
 
 ## Verification
 
