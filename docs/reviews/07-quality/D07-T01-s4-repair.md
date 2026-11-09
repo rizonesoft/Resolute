@@ -38,3 +38,30 @@ OVERALL: needs-attention
 - Planned: cleanup failure records a named row, job closes independently (gap 4)
 - Planned: crash exit and driver exceptions name capture availability, refusal renders five rows per tool (gap 5)
 - Planned: windowless failure-injection tests for containment, interrupted waits, cleanup (gap 6)
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: muse
+- Run: 2026-11-09T09:10:01Z
+- Effort: medium
+- Writer model: muse-wonder-1.0
+- Policy: 3971a345c61babf1c4450f37ad35cbc52729d935
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 11
+- Digest: ded634564f588f59
+
+## adversarial: needs-attention
+
+1. **P2: Forced cancellation can still orphan a suspended child.** `scripts/smoke-run.py:484-486` creates the process before assigning it to the kill-on-close job. Terminating the driver between these operations leaves the child alive, permanently suspended and outside containment. Suspension prevents execution but does not guarantee cleanup. **Reproduction:** pause immediately before `run.job.assign(run.proc)`, terminate the driver, and inspect the child PID. This is source-derived, not a driven reproduction.
+
+2. **P2: Failure captures bypass operator stand-down.** `scripts/smoke-run.py:673` calls `capture_window_bounded` without the abort callback. A blocked failure capture therefore retains the tool for another ten seconds after input resumes. On the exit-timeout path (`:640-643`), the function then returns `False` without checking input again, so interruption during the final tool can also lose the stand-down verdict. **Reproduction:** make the exit failure capture block, then resume input during capture. A windowless spy confirmed that this call receives no abort callback. This is a production cancellation defect, distinct from the filed timeout-test coverage item.
+
+All 29 self-test checks passed. No files modified; no GUI or forced-termination reproduction performed.
+
+HIGHEST: P2
+
+OVERALL: needs-attention

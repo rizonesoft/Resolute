@@ -475,19 +475,119 @@ class ToolRun:
                 self.proc.kill()
 
 
-def spawn_contained(run: "ToolRun"):
-    """Create the child suspended, contain it, and only then resume it.
+class WinProc:
+    """A process created inside its job, with the Popen surface we use."""
 
-    A child whose containment fails is terminated still suspended: it never
-    executes a single instruction outside the job.
+    def __init__(self, handle, thread, pid):
+        self._handle = handle
+        self._thread = thread
+        self.pid = pid
+        self.returncode = None
+
+    def poll(self):
+        if self.returncode is not None:
+            return self.returncode
+        code = wintypes.DWORD()
+        if kernel32.GetExitCodeProcess(wintypes.HANDLE(self._handle), ctypes.byref(code)):
+            if code.value != 259:  # STILL_ACTIVE
+                self.returncode = ctypes.c_long(code.value).value
+                return self.returncode
+        return None
+
+    def wait(self, timeout=None):
+        deadline = None if timeout is None else time.monotonic() + timeout
+        while True:
+            rc = self.poll()
+            if rc is not None:
+                return rc
+            if deadline is not None and time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired("tool", timeout)
+            time.sleep(0.05)
+
+    def terminate(self):
+        kernel32.TerminateProcess(wintypes.HANDLE(self._handle), 1)
+
+    def kill(self):
+        self.terminate()
+
+
+def spawn_contained(run: "ToolRun"):
+    """Create the child already inside the kill-on-close job, then resume it.
+
+    The job rides the PROC_THREAD_ATTRIBUTE_JOB_LIST startup attribute, so
+    containment is atomic with creation: there is no instant in which the
+    child exists outside the job, and a driver killed at any point takes
+    the child with it. The child starts suspended and is resumed only
+    after creation succeeds.
     """
-    run.proc = subprocess.Popen([str(run.exe), *run.args],
-                                creationflags=0x00000004)  # CREATE_SUSPENDED
-    if not run.job.assign(run.proc):
-        run.proc.terminate()
+    run.job.error = None
+    job = run.job.handle
+    if not job:
+        run.job.error = run.job.error or "no job handle"
         return
-    if ctypes.windll.ntdll.NtResumeProcess(wintypes.HANDLE(int(run.proc._handle))) != 0:
-        run.job.error = "NtResumeProcess failed"
+
+    class STARTUPINFO(ctypes.Structure):
+        _fields_ = [("cb", wintypes.DWORD), ("lpReserved", wintypes.LPWSTR),
+                    ("lpDesktop", wintypes.LPWSTR), ("lpTitle", wintypes.LPWSTR),
+                    ("dwX", wintypes.DWORD), ("dwY", wintypes.DWORD),
+                    ("dwXSize", wintypes.DWORD), ("dwYSize", wintypes.DWORD),
+                    ("dwXCountChars", wintypes.DWORD), ("dwYCountChars", wintypes.DWORD),
+                    ("dwFillAttribute", wintypes.DWORD), ("dwFlags", wintypes.DWORD),
+                    ("wShowWindow", wintypes.WORD), ("cbReserved2", wintypes.WORD),
+                    ("lpReserved2", ctypes.c_void_p), ("hStdInput", wintypes.HANDLE),
+                    ("hStdOutput", wintypes.HANDLE), ("hStdError", wintypes.HANDLE)]
+
+    class STARTUPINFOEX(ctypes.Structure):
+        _fields_ = [("StartupInfo", STARTUPINFO), ("lpAttributeList", ctypes.c_void_p)]
+
+    class PROCESS_INFORMATION(ctypes.Structure):
+        _fields_ = [("hProcess", wintypes.HANDLE), ("hThread", wintypes.HANDLE),
+                    ("dwProcessId", wintypes.DWORD), ("dwThreadId", wintypes.DWORD)]
+
+    k = kernel32
+    k.CreateProcessW.restype = wintypes.BOOL
+    k.CreateProcessW.argtypes = [wintypes.LPCWSTR, wintypes.LPWSTR, ctypes.c_void_p,
+                                 ctypes.c_void_p, wintypes.BOOL, wintypes.DWORD,
+                                 ctypes.c_void_p, wintypes.LPCWSTR, ctypes.c_void_p,
+                                 ctypes.c_void_p]
+    k.GetExitCodeProcess.restype = wintypes.BOOL
+    k.GetExitCodeProcess.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+    k.TerminateProcess.restype = wintypes.BOOL
+    k.TerminateProcess.argtypes = [wintypes.HANDLE, wintypes.UINT]
+    k.InitializeProcThreadAttributeList.restype = wintypes.BOOL
+    k.InitializeProcThreadAttributeList.argtypes = [ctypes.c_void_p, wintypes.DWORD,
+                                                    wintypes.DWORD, ctypes.POINTER(ctypes.c_size_t)]
+    k.UpdateProcThreadAttribute.restype = wintypes.BOOL
+    k.UpdateProcThreadAttribute.argtypes = [ctypes.c_void_p, wintypes.DWORD, ctypes.c_size_t,
+                                            ctypes.c_void_p, ctypes.c_size_t,
+                                            ctypes.c_void_p, ctypes.c_void_p]
+    k.ResumeThread.restype = wintypes.DWORD
+    k.ResumeThread.argtypes = [wintypes.HANDLE]
+
+    cmdline = subprocess.list2cmdline([str(run.exe), *run.args])
+    jobs = (wintypes.HANDLE * 1)(job)
+    size = ctypes.c_size_t(0)
+    k.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(size))
+    attr_buf = ctypes.create_string_buffer(size.value)
+    six = STARTUPINFOEX()
+    six.StartupInfo.cb = ctypes.sizeof(six)
+    six.lpAttributeList = ctypes.cast(attr_buf, ctypes.c_void_p)
+    proc_info = PROCESS_INFORMATION()
+    created = False
+    if k.InitializeProcThreadAttributeList(six.lpAttributeList, 1, 0, ctypes.byref(size)):
+        # 0x2000D = PROC_THREAD_ATTRIBUTE_JOB_LIST
+        if k.UpdateProcThreadAttribute(six.lpAttributeList, 0, ctypes.c_size_t(0x2000D),
+                                       ctypes.cast(jobs, ctypes.c_void_p), ctypes.sizeof(jobs), None, None):
+            created = bool(k.CreateProcessW(
+                str(run.exe), ctypes.create_unicode_buffer(cmdline), None, None, False,
+                0x00000004 | 0x00080000,  # CREATE_SUSPENDED | EXTENDED_STARTUPINFO_PRESENT
+                None, None, ctypes.byref(six), ctypes.byref(proc_info)))
+    if not created:
+        run.job.error = f"CreateProcess with job list failed ({ctypes.get_last_error()})"
+        return
+    run.proc = WinProc(int(proc_info.hProcess), int(proc_info.hThread), int(proc_info.dwProcessId))
+    if k.ResumeThread(wintypes.HANDLE(int(proc_info.hThread))) == 0xFFFFFFFF:
+        run.job.error = "ResumeThread failed"
         run.proc.terminate()
 
 
@@ -599,7 +699,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
             if dialog is None:
                 run.record("about", "fail",
                            "About dialog did not appear (command ignored or no dialog); "
-                           + failure_capture(run, "about", out_dir))
+                           + failure_capture(run, "about", out_dir, abort=resumed))
             else:
                 post(dialog, WM_COMMAND, IDOK)
                 deadline = time.monotonic() + TIMEOUTS["message"]
@@ -618,7 +718,7 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                     time.sleep(0.1)
                 run.record("about", "pass" if gone else "fail",
                            "About dialog observed and dismissed" if gone
-                           else "About dialog did not dismiss; " + failure_capture(run, "about", out_dir))
+                           else "About dialog did not dismiss; " + failure_capture(run, "about", out_dir, abort=resumed))
 
         # preferences: absent until the framework shell ships (D01 T03 S2).
         if not table["preferences"]:
@@ -637,9 +737,14 @@ def drive_tool(run: ToolRun, out_dir: Path, prev_dir: Path, collecting: bool,
                 break
             except subprocess.TimeoutExpired:
                 if time.monotonic() >= deadline:
+                    evidence = failure_capture(run, "exit", out_dir, abort=resumed)
+                    if resumed is not None and resumed():
+                        run.record("exit", "stood-down",
+                                   "operator input resumed; tool dismissed (" + evidence + ")")
+                        return True
                     run.record("exit", "fail",
                                f"process still running {TIMEOUTS['exit']:.0f}s after WM_CLOSE; "
-                               + failure_capture(run, "exit", out_dir) + "; cleaned up")
+                               + evidence + "; cleaned up")
                     return False
         result, detail = exit_result(run.proc.returncode)
         if result == "fail":
@@ -666,11 +771,11 @@ def cleanup_safely(run: "ToolRun"):
         run.rows.append((run.name, "cleanup", "fail", f"job close failed: {exc!r}"))
 
 
-def failure_capture(run: ToolRun, step: str, out_dir: Path) -> str:
+def failure_capture(run: ToolRun, step: str, out_dir: Path, abort=None) -> str:
     """Capture the surface at failure, or say why none exists."""
     if run.hwnd is None:
         return "capture unavailable: no window"
-    shot = capture_window_bounded(run.hwnd)
+    shot = capture_window_bounded(run.hwnd, abort=abort)
     if shot is None or shot == ABORTED:
         return "capture unavailable: PrintWindow produced nothing within its bound"
     width, height, bgra = shot
