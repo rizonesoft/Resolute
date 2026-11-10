@@ -130,3 +130,29 @@ HIGHEST: P2
 OVERALL: needs-attention
 
 - Settled: round 2 P2 1, the launcher treats any failure to read the token cache as no cache and goes on to the stored login, as the watchdog does; driven with the cache held open exclusively
+
+## Round 3: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-10T15:06:48Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: 2a7345735f5d66b6f6c22c6b3c3053b456c1b8fe
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: quality
+- Lines: 8
+- Digest: b0be84d5b1d5c352
+
+## quality: needs-attention
+
+1. **P3: The live-marker tests can pass without testing lock contention.** `scripts/tests/test_run_guard.py:633` checks the marker immediately after creation, so `review_running()` normally returns through its five-second grace period (`scripts/lib/run_guard.py:649`) without probing the lock. The test ages the marker only after killing its holder. The same-process test at line 576 also uses a fresh marker. Reproduction: make the lock probe always report unlocked; these tests can still pass. Age the marker while the separate holder remains alive, assert it still counts as running, then kill the holder and assert removal.
+
+Source inspection only; the suites were not run because they create files.
+
+HIGHEST: P3
+OVERALL: needs-attention
+
+- Settled: round 3 P3 1, the killed-dispatcher test ages the marker while its holder is alive and requires it to still count, so the lock probe itself is exercised (a probe changed to always report unlocked now fails it)
