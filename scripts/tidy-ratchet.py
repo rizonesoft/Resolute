@@ -32,6 +32,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 FINDING_RE = re.compile(
@@ -441,6 +442,18 @@ def is_project_source(file_name, deps_prefixes):
     return not any(normalised.startswith(prefix) for prefix in deps_prefixes)
 
 
+def tidy_jobs() -> int:
+    """How many translation units clang-tidy analyses at once: 4, or
+    fewer on a machine with fewer cores. Four keeps the analyzer's
+    memory near what one compile pool job is budgeted on a machine
+    shared with other builds. RESOLUTE_TIDY_JOBS overrides it, because
+    the right number on a CI runner is a fact about that runner."""
+    override = os.environ.get("RESOLUTE_TIDY_JOBS", "").strip()
+    if override.isdigit() and int(override) >= 1:
+        return int(override)
+    return max(1, min(4, os.cpu_count() or 1))
+
+
 def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
     """Run clang-tidy per target. Returns (per-target finding sets,
     global set, per-target sorted finding lines). Refuses when the
@@ -508,29 +521,42 @@ def run_analysis(root: Path, clang_tidy: Path, targets: dict, log_path):
             flush_log()
             raise Refusal(f"target '{name}': compile database has no translation units")
         found = set()
-        for tu in tus:
-            total_tus += 1
-            proc = subprocess.run(
+
+        def analyse(tu, db=db):
+            return subprocess.run(
                 [str(clang_tidy), "-p", str(db.parent), "--quiet", tu],
                 capture_output=True,
                 text=True,
                 errors="replace",
             )
-            out = (proc.stdout or "") + (proc.stderr or "")
-            log_lines.append(out)
-            if proc.returncode != 0:
-                where = diagnostics_where(flush_log(), out)
-                raise Refusal(
-                    f"target '{name}': clang-tidy exited {proc.returncode} on {tu}; "
-                    f"the finding count is not evidence until analysis completes; {where}"
-                )
-            if ERROR_RE.search(out):
-                where = diagnostics_where(flush_log(), out)
-                raise Refusal(
-                    f"target '{name}': error diagnostic while analysing {tu}; "
-                    f"the finding count is not evidence until analysis completes; {where}"
-                )
-            found |= collect_findings(out.splitlines(), root, deps_prefixes)
+
+        # The translation units are independent, so they are analysed a
+        # few at a time: one at a time took 328 seconds over 35 units on
+        # 2026-11-10, most of a full gate run. The results are still
+        # read in the database's order, so the log, the findings and
+        # the unit a refusal names are what the serial loop produced; a
+        # refusal stops the units not yet started.
+        pool = ThreadPoolExecutor(max_workers=tidy_jobs())
+        try:
+            for tu, proc in zip(tus, pool.map(analyse, tus)):
+                total_tus += 1
+                out = (proc.stdout or "") + (proc.stderr or "")
+                log_lines.append(out)
+                if proc.returncode != 0:
+                    where = diagnostics_where(flush_log(), out)
+                    raise Refusal(
+                        f"target '{name}': clang-tidy exited {proc.returncode} on {tu}; "
+                        f"the finding count is not evidence until analysis completes; {where}"
+                    )
+                if ERROR_RE.search(out):
+                    where = diagnostics_where(flush_log(), out)
+                    raise Refusal(
+                        f"target '{name}': error diagnostic while analysing {tu}; "
+                        f"the finding count is not evidence until analysis completes; {where}"
+                    )
+                found |= collect_findings(out.splitlines(), root, deps_prefixes)
+        finally:
+            pool.shutdown(wait=True, cancel_futures=True)
         per_target[name] = found
         global_set |= found
     return per_target, global_set, total_tus, flush_log()
@@ -560,12 +586,12 @@ def default_base(root: Path, override):
     if override:
         return override
     probe = subprocess.run(
-        ["git", "rev-parse", "--verify", "origin/master"],
+        ["git", "rev-parse", "--verify", "origin/main"],
         cwd=root,
         capture_output=True,
         text=True,
     )
-    return "origin/master" if probe.returncode == 0 else "HEAD"
+    return "origin/main" if probe.returncode == 0 else "HEAD"
 
 
 INPUT_SUFFIXES = {
@@ -1006,12 +1032,12 @@ def self_test() -> int:
         base_file.write_text(good)
         env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1")
         for args in (
-            ["git", "init", "-q", "-b", "master"],
+            ["git", "init", "-q", "-b", "main"],
             ["git", "config", "user.email", "t@example.invalid"],
             ["git", "config", "user.name", "t"],
             ["git", "add", "."],
             ["git", "commit", "-qm", "base"],
-            ["git", "update-ref", "refs/remotes/origin/master", "HEAD"],
+            ["git", "update-ref", "refs/remotes/origin/main", "HEAD"],
         ):
             subprocess.run(args, cwd=tmp, check=True, capture_output=True, env=env)
         raised = "count: 6\ntarget RegStudio: 2\ntarget root: 4\n"
@@ -1022,7 +1048,7 @@ def self_test() -> int:
         base_file.write_text(raised)
         subprocess.run(["git", "add", "."], cwd=tmp, check=True, capture_output=True, env=env)
         subprocess.run(["git", "commit", "-qm", "raise"], cwd=tmp, check=True, capture_output=True, env=env)
-        assert default_base(tmp, None) == "origin/master"
+        assert default_base(tmp, None) == "origin/main"
         refuses(
             lambda: check_raise_guard(
                 raised, baseline_at_revision(tmp, default_base(tmp, None)), targets
@@ -1115,12 +1141,12 @@ def self_test() -> int:
         baseline.write_text("count: 5\ntarget Ext: 2\ntarget root: 3\n")
         env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1")
         for args in (
-            ["git", "init", "-q", "-b", "master"],
+            ["git", "init", "-q", "-b", "main"],
             ["git", "config", "user.email", "t@example.invalid"],
             ["git", "config", "user.name", "t"],
             ["git", "add", "."],
             ["git", "commit", "-qm", "base"],
-            ["git", "update-ref", "refs/remotes/origin/master", "HEAD"],
+            ["git", "update-ref", "refs/remotes/origin/main", "HEAD"],
         ):
             subprocess.run(args, cwd=tmp, check=True, capture_output=True, env=env)
 
@@ -1274,12 +1300,12 @@ def self_test() -> int:
         baseline.write_text("count: 0\ntarget Ext: 0\ntarget root: 0\n")
         env = dict(os.environ, GIT_CONFIG_NOSYSTEM="1")
         for args in (
-            ["git", "init", "-q", "-b", "master"],
+            ["git", "init", "-q", "-b", "main"],
             ["git", "config", "user.email", "t@example.invalid"],
             ["git", "config", "user.name", "t"],
             ["git", "add", "."],
             ["git", "commit", "-qm", "base"],
-            ["git", "update-ref", "refs/remotes/origin/master", "HEAD"],
+            ["git", "update-ref", "refs/remotes/origin/main", "HEAD"],
         ):
             subprocess.run(args, cwd=tmp, check=True, capture_output=True, env=env)
         before = baseline.read_bytes()

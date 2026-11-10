@@ -149,6 +149,61 @@ function Invoke-Logged {
     return $code
 }
 
+# ── A build tree made by a clone that has since moved ────────
+#
+# CMake writes the source directory into CMakeCache.txt and refuses to
+# configure a tree whose cache names another one ("does not match the source
+# ... used to generate cache"). A clone that is moved or renamed therefore
+# cannot build until its build trees are deleted by hand, which an unattended
+# run cannot know to do: on 2026-11-10 this clone had moved from
+# D:\GitHub\Resolute and every configure failed on that line. Build trees are
+# derived output, so those that belong to another location are removed here
+# and rebuilt. A move makes every tree stale at once, and the fetched
+# dependencies under build\deps carry the same absolute paths in their
+# sub-builds and are shared by the trees, so all of it goes in one pass before
+# anything is built: removing them one target at a time would pull the
+# dependencies out from under a tree this run had just rebuilt.
+function Get-MovedBuildTrees {
+    $trees = @()
+    foreach ($preset in 'debug', 'release') {
+        $trees += [pscustomobject]@{ Dir = (Join-Path $RepoRoot "build\$preset"); Source = $RepoRoot }
+    }
+    foreach ($ext in Get-Extensions) {
+        $extBuild = Join-Path $ext.FullName 'build'
+        if (Test-Path $extBuild) {
+            foreach ($d in Get-ChildItem -Path $extBuild -Directory) {
+                $trees += [pscustomobject]@{ Dir = $d.FullName; Source = $ext.FullName }
+            }
+        }
+    }
+    $moved = @()
+    foreach ($t in $trees) {
+        $cache = Join-Path $t.Dir 'CMakeCache.txt'
+        if (-not (Test-Path $cache)) { continue }
+        $line = Select-String -Path $cache -Pattern '^CMAKE_HOME_DIRECTORY:INTERNAL=(.*)$' | Select-Object -First 1
+        if (-not $line) { continue }
+        $made = ($line.Matches[0].Groups[1].Value.Trim() -replace '/', '\').TrimEnd('\')
+        if ($made -ine $t.Source.TrimEnd('\')) {
+            $moved += [pscustomobject]@{ Dir = $t.Dir; MadeFor = $made }
+        }
+    }
+    return $moved
+}
+
+function Reset-MovedBuildTrees {
+    $moved = @(Get-MovedBuildTrees)
+    if ($moved.Count -eq 0) { return }
+    foreach ($m in $moved) {
+        Write-Host "build: $($m.Dir) was made for $($m.MadeFor); this clone has moved, so the tree is removed and rebuilt" -ForegroundColor Yellow
+        Remove-Item -LiteralPath $m.Dir -Recurse -Force
+    }
+    $deps = Join-Path $RepoRoot 'build\deps'
+    if (Test-Path $deps) {
+        Write-Host "build: $deps is removed with them and fetched again" -ForegroundColor Yellow
+        Remove-Item -LiteralPath $deps -Recurse -Force
+    }
+}
+
 # ── The launcher ─────────────────────────────────────────────
 
 function Build-Launcher {
@@ -271,6 +326,7 @@ function Build-Extension {
 # ── Dispatch ─────────────────────────────────────────────────
 
 Assert-Toolchain
+Reset-MovedBuildTrees
 
 $extensions = Get-Extensions
 $results = [ordered]@{}
