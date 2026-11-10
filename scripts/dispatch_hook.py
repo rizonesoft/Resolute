@@ -7,6 +7,9 @@ pin and recorded rounds are never modified on the way to a review or a stamp.
 2. Any command that runs `review-dispatch.py` or `todo-graph.py stamp` while `.conclave/reviewers.toml` or anything
    under `docs/reviews/` is modified or staged in the working tree is refused (`stamp` reads both from `HEAD` anyway,
    and refusing here stops a hand-edited pin or round before a reviewer runs).
+3. A `review-dispatch.py` call that runs a reviewer must use the shell tool's `run_in_background` option. A review
+   takes up to half an hour and the shell tool stops a foreground command at ten minutes, and only a background
+   command tells the session when it has finished, so the session can end its turn and be woken by the result.
 """
 import json
 from pathlib import Path
@@ -48,9 +51,26 @@ def deny(reason):
     return 0
 
 
-def check_command(command, repo=ROOT):
+# The dispatcher run as a command (an interpreter at the start of a command, then the script), not its name inside a
+# file being written or a message: a here-string that mentions it is not a review. The two read-only inspections
+# start no reviewer.
+RUNS_A_REVIEW = re.compile(
+    r"(?:^|[;&|()\n`]|&&|\|\|)\s*(?:&\s*)?"
+    r"[\"']?(?:[^\s\"']*[/\\])?(?:python[\d.]*|py)(?:\.exe)?[\"']?\s+(?:-\S+\s+)*"
+    r"[\"']?[^\s\"']*review-dispatch\.py\b(?![^\n;|&]*--(?:check-pin|list-rounds)\b)",
+    re.IGNORECASE,
+)
+
+
+def check_command(command, repo=ROOT, background=True):
     """Return a refusal reason if `command` violates the dispatch rules, or None."""
     first = FIRST_WORD.match(command or "")
+    if not background and (first.group(1).lower() if first else "") != "git" and RUNS_A_REVIEW.search(command or ""):
+        return (
+            "Run `review-dispatch.py` with the shell tool's `run_in_background` option: a review can take half an hour, "
+            "a foreground command is stopped at ten minutes, and only a background command wakes this session when "
+            "the review returns. Start it in the background, end the turn, and read the record when notified."
+        )
     first_word = first.group(1).lower() if first else ""
     if first_word != "git" and DIRECT_CODEX.search(command or ""):
         return (
@@ -77,8 +97,9 @@ def main():
         payload = json.load(sys.stdin)
     except Exception:
         return 0
-    command = (payload.get("tool_input") or {}).get("command") or ""
-    reason = check_command(command)
+    tool_input = payload.get("tool_input") or {}
+    command = tool_input.get("command") or ""
+    reason = check_command(command, background=tool_input.get("run_in_background") is True)
     if reason:
         return deny(reason)
     return 0

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
 import sys
@@ -17,8 +18,8 @@ import run_guard as guard  # noqa: E402
 class World:
     """Stands in for the machine: rows, the tree, sessions and what gets spawned."""
 
-    def __init__(self, rows=("D01 T02 §4",), signature="one", alive=(), live=(), child=False):
-        self.rows, self.sig, self.live, self.child = rows, signature, list(live), child
+    def __init__(self, rows=("D01 T02 §4",), signature="one", alive=(), live=(), child=False, reviewing=False):
+        self.rows, self.sig, self.live, self.child, self.reviewing = rows, signature, list(live), child, reviewing
         self.alive = set(alive)
         self.spawned = []
 
@@ -30,6 +31,7 @@ class World:
             live_here=lambda: self.live,
             child_alive=lambda c: self.child,
             spawn=lambda s: self.spawned.append(dict(s)) or {"pid": 1, "started": 2},
+            reviewing=lambda: self.reviewing,
         )
 
 
@@ -185,6 +187,26 @@ class SessionEvents(unittest.TestCase):
         guard.start(state, "other", "acceptEdits", World().env())
         self.assertEqual((state["session_id"], state["permission_mode"]), ("other", "acceptEdits"))
 
+    def test_start_will_not_take_a_run_the_watchdog_resumed(self):
+        state = active(child={"pid": 1, "started": 2})
+        with self.assertRaises(ValueError):
+            guard.start(state, "other", None, World(child=True).env())
+        self.assertEqual(state["session_id"], "me")
+
+    def test_start_keeps_the_launcher_and_a_start_without_one_forgets_it(self):
+        state = {}
+        guard.start(state, "me", "bypassPermissions", World().env(), {"pid": 7, "started": 8})
+        self.assertEqual(state["launcher"], {"pid": 7, "started": 8})
+        guard.start(state, "me", "bypassPermissions", World().env())
+        self.assertNotIn("launcher", state)
+
+    def test_a_review_in_flight_lets_the_turn_end_and_is_not_an_idle_attempt(self):
+        state = active(signature="one", idle=guard.MAX_IDLE_BLOCKS - 1, yields=guard.MAX_YIELDS - 1)
+        before = dict(state)
+        self.assertIsNone(guard.on_stop(state, {"session_id": "me"}, World(reviewing=True).env()))
+        self.assertEqual(state, before)
+        self.assertIn("Do not stop", guard.on_stop(active(), {"session_id": "me"}, World().env()))
+
     def test_the_heartbeat_is_recorded_and_its_absence_is_said(self):
         state = active()
         self.assertIn("not armed", guard.on_stop(state, {"session_id": "me"}, World().env()))
@@ -209,6 +231,20 @@ class Watch(unittest.TestCase):
         world = World(child=True)
         guard.watch(active(child={"pid": 1, "started": 2}), world.env())
         self.assertEqual(world.spawned, [])
+
+    def test_never_while_the_launcher_that_restarts_the_session_is_alive(self):
+        world = World(child=True)
+        state = active(launcher={"pid": 7, "started": 8})
+        self.assertIn("launcher", guard.watch(state, world.env()))
+        self.assertEqual(world.spawned, [])
+        world.child = False
+        self.assertIn("attempt 1", guard.watch(state, world.env()))
+
+    def test_never_while_a_review_is_in_flight(self):
+        world = World(reviewing=True)
+        state = active()
+        self.assertEqual(guard.watch(state, world.env()), "review in flight")
+        self.assertEqual((world.spawned, state.get("restarts", 0)), ([], 0))
 
     def test_a_dead_session_resumes_once_a_tick(self):
         world, state = World(), active()
@@ -276,6 +312,96 @@ class Watch(unittest.TestCase):
         self.assertEqual(command, ["claude", "-p", "process plan", "--resume", "me", "--permission-mode", "acceptEdits"])
         self.assertNotIn("--permission-mode", guard.resume_command(active(), "claude"))
         self.assertNotIn("--dangerously-skip-permissions", " ".join(command))
+
+    def test_a_resume_that_changed_nothing_is_followed_by_a_fresh_session(self):
+        again = guard.resume_command(active(permission_mode="bypassPermissions", restarts=1), "claude")
+        self.assertEqual(again, ["claude", "-p", "process plan", "--permission-mode", "bypassPermissions"])
+        world, state = World(), active()
+        guard.watch(state, world.env())
+        guard.watch(state, world.env())
+        self.assertIn("--resume", guard.resume_command(world.spawned[0], "claude"))
+        self.assertNotIn("--resume", guard.resume_command(world.spawned[1], "claude"))
+
+
+class SignIn(unittest.TestCase):
+    TOKEN = "sk-ant-oat01-" + "a" * 60
+
+    def test_the_resumed_session_gets_the_token_when_the_vault_gives_it(self):
+        env, how = guard.sign_in({"PATH": "x"}, lambda: self.TOKEN, lambda: None)
+        self.assertEqual(env, {"PATH": "x", "CLAUDE_CODE_OAUTH_TOKEN": self.TOKEN})
+        self.assertIn("1Password", how)
+        self.assertNotIn(self.TOKEN, how)
+
+    def test_a_locked_vault_falls_back_to_the_cache_and_the_vault_wins_when_both_answer(self):
+        other = "sk-ant-oat01-" + "b" * 60
+        env, how = guard.sign_in({}, lambda: None, lambda: self.TOKEN)
+        self.assertEqual(env["CLAUDE_CODE_OAUTH_TOKEN"], self.TOKEN)
+        self.assertIn("cache", how)
+        self.assertEqual(guard.sign_in({}, lambda: other, lambda: self.TOKEN)[0]["CLAUDE_CODE_OAUTH_TOKEN"], other)
+
+    def test_no_token_or_a_value_of_the_wrong_shape_leaves_the_stored_login(self):
+        for value in (None, "", "ERROR: not signed in", self.TOKEN + " trailing words"):
+            env, how = guard.sign_in({"PATH": "x"}, lambda: value, lambda: value)
+            self.assertEqual(env, {"PATH": "x"}, value)
+            self.assertIn("stored login", how)
+
+    @unittest.skipUnless(sys.platform == "win32", "DPAPI is a Windows facility")
+    def test_the_cache_round_trips_and_never_holds_the_token_in_the_clear(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "nested" / "token.dpapi"
+            self.assertIsNone(guard.cached_token(path))
+            guard.cache_token(self.TOKEN + "\n", path)
+            self.assertNotIn(self.TOKEN.encode(), path.read_bytes())
+            self.assertEqual(guard.cached_token(path), self.TOKEN)
+            with self.assertRaises(ValueError):
+                guard.cache_token("not a token", path)
+            self.assertEqual(guard.cached_token(path), self.TOKEN)
+            path.write_bytes(b"not something DPAPI wrote")
+            self.assertIsNone(guard.cached_token(path))
+
+
+class InFlight(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.folder = Path(self.temp.name) / "review-in-flight"
+        spec = importlib.util.spec_from_file_location("review_dispatch", Path(__file__).resolve().parents[1] / "review-dispatch.py")
+        self.dispatch = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.dispatch)
+
+    def test_the_dispatcher_and_the_guard_agree_where_the_lock_and_the_markers_are(self):
+        self.assertEqual(self.dispatch.LOCK_AT, guard.REVIEW_LOCK_AT)
+        self.assertEqual(self.dispatch.IN_FLIGHT, guard.IN_FLIGHT)
+
+    def test_a_marker_stands_exactly_while_the_review_runs(self):
+        self.assertEqual(guard.reviews_in_flight(self.folder), [])
+        with self.dispatch.in_flight("docs/reviews/x.md", "round", self.folder):
+            (marker,) = guard.reviews_in_flight(self.folder)
+            self.assertEqual(json.loads((self.folder / marker).read_text(encoding="utf-8"))["record"], "docs/reviews/x.md")
+        self.assertEqual(guard.reviews_in_flight(self.folder), [])
+        with self.assertRaises(RuntimeError):
+            with self.dispatch.in_flight(None, "plan", self.folder):
+                raise RuntimeError("the reviewer failed")
+        self.assertEqual(list(self.folder.iterdir()), [])
+
+    def test_a_marker_left_by_a_killed_dispatcher_is_not_a_review_and_is_removed(self):
+        # A real dispatcher process holds the marker, is killed without a chance to clean up, and its lock goes with it.
+        code = (
+            "import importlib.util, sys, time; from pathlib import Path\n"
+            "spec = importlib.util.spec_from_file_location('d', sys.argv[1]); d = importlib.util.module_from_spec(spec); spec.loader.exec_module(d)\n"
+            "with d.in_flight('x.md', 'round', Path(sys.argv[2])):\n    print('held', flush=True); time.sleep(60)\n"
+        )
+        child = subprocess.Popen([sys.executable, "-c", code, self.dispatch.__file__, str(self.folder)], stdout=subprocess.PIPE)
+        try:
+            self.assertEqual(child.stdout.readline().strip(), b"held")
+            self.assertEqual(len(guard.reviews_in_flight(self.folder)), 1)
+        finally:
+            child.kill()
+            child.wait()
+            child.stdout.close()
+        self.assertEqual(len(list(self.folder.iterdir())), 1)
+        self.assertEqual(guard.reviews_in_flight(self.folder), [])
+        self.assertEqual(list(self.folder.iterdir()), [])
 
 
 class Rows(unittest.TestCase):

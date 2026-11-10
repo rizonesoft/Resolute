@@ -8,6 +8,7 @@ Historical cycles retain their initiating committed policy and sealed findings.
 exit 2 means refusal; exit 0 means a returned review, not necessarily approval.
 """
 import argparse
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -25,6 +26,10 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 PIN = ROOT / ".conclave" / "reviewers.toml"
+# One marker per running review. The unattended run (scripts/lib/run_guard.py) reads this folder and waits for a
+# review instead of working beside it. LOCK_AT is past any marker's content, so the lock never blocks reading it.
+IN_FLIGHT = ROOT / "build" / "review-in-flight"
+LOCK_AT = 1 << 30
 WRITERS = ("claude", "codex", "gemini", "muse", "meta")
 CLIS = ("codex", "agy", "claude")
 # Operator rule 2026-11-06: Claude writes and never reviews. Past pins naming it stay readable so their receipts replay,
@@ -51,6 +56,33 @@ CLEANUP_SECONDS = 10
 
 class Refused(Exception):
     """The pin or the arguments are wrong; nothing ran."""
+
+
+@contextmanager
+def in_flight(record, kind, folder=None):
+    """Holds a marker for exactly as long as a reviewer runs. This process keeps a lock on it, which the operating
+    system drops when the process ends however it ends, so a marker left by a killed dispatcher is told from a live
+    one by trying the lock (run_guard.reviews_in_flight), with no process id to be reused."""
+    folder = IN_FLIGHT if folder is None else folder
+    folder.mkdir(parents=True, exist_ok=True)
+    marker = folder / f"{os.getpid()}.json"
+    with marker.open("w+b") as handle:
+        handle.seek(LOCK_AT)
+        if os.name == "nt":
+            import msvcrt
+            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        handle.seek(0)
+        handle.write(json.dumps({"pid": os.getpid(), "record": record, "kind": kind,
+                                 "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}).encode("utf-8"))
+        handle.flush()
+        try:
+            yield
+        finally:
+            handle.close()  # the lock goes with the handle, and Windows removes no file that is still open
+            marker.unlink(missing_ok=True)
 
 
 def load_pin(path=PIN, data=None):
@@ -981,7 +1013,8 @@ def main(argv=None):
         if args.writer_model:
             if not MODEL.fullmatch(args.writer_model):
                 raise Refused("invalid exact writer model")
-        result = review(pin, args.writer, args.prompt, args.timeout, plan)
+        with in_flight(args.record, args.kind):
+            result = review(pin, args.writer, args.prompt, args.timeout, plan)
         if args.writer_model:
             result["writer_model"] = args.writer_model
         if policy_sha:

@@ -4,9 +4,10 @@
   hook                       one Claude Code hook event on stdin (.claude/settings.json)
   watch                      one scheduled tick: resume a dead run, never beside a live session
   status                     prints "active" or why not, then the detail
-  start --session <id>       switch the run on for a session already running
+  start --session <id>       switch the run on for a session (--launcher-pid names the process that restarts it)
   halt --ground G --reason R record a halt (data-loss, credentials, shared-infrastructure, wrong-calculation, operator)
   install | uninstall        add or remove the Windows scheduled task for `watch`
+  cache-token                keep the sign-in token read from stdin, encrypted for this Windows account, for a resume
 """
 
 from __future__ import annotations
@@ -61,11 +62,12 @@ def watch() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    for name in ("hook", "watch", "status", "install", "uninstall"):
+    for name in ("hook", "watch", "status", "install", "uninstall", "cache-token"):
         commands.add_parser(name)
     start = commands.add_parser("start")
     start.add_argument("--session", required=True)
     start.add_argument("--permission-mode")
+    start.add_argument("--launcher-pid", type=int, help="the process that restarts this session when it dies, so `watch` leaves the run to it")
     stop = commands.add_parser("halt")
     stop.add_argument("--ground", required=True, choices=guard.GROUNDS)
     stop.add_argument("--reason", required=True)
@@ -80,6 +82,15 @@ def main() -> int:
             return 0
         if output:
             say(output)
+        return 0
+    if args.command == "cache-token":
+        # The token arrives on stdin, never as an argument, and is not echoed: only the outcome is said.
+        try:
+            guard.cache_token(sys.stdin.read())
+        except (ValueError, OSError) as error:
+            say(f"not cached: {error}")
+            return 1
+        say("cached")
         return 0
     if args.command == "install":
         return install()
@@ -98,7 +109,12 @@ def main() -> int:
         state = guard.load()
         if args.command == "start":
             try:
-                guard.start(state, args.session, args.permission_mode, guard.REAL)
+                launcher = None
+                if args.launcher_pid:
+                    launcher = {"pid": args.launcher_pid, "started": guard.process_started(args.launcher_pid)}
+                    if launcher["started"] is None:
+                        raise ValueError(f"launcher process {args.launcher_pid} is not running")
+                guard.start(state, args.session, args.permission_mode, guard.REAL, launcher)
             except ValueError as error:
                 say(str(error))
                 return 1
