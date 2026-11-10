@@ -59,20 +59,31 @@ QUOTED_BLOCK = re.compile(
     r"@'.*?^'@|@\".*?^\"@|<<-?\s*(['\"]?)(\w+)\1.*?^\s*\2\s*$",
     re.DOTALL | re.MULTILINE,
 )
-# An opening quote is a command position too: a shell wrapper such as `pwsh -Command "..."` or `bash -c '...'` runs
-# what it quotes.
 RUNS_A_REVIEW = re.compile(
-    r"(?:^|[;&|()\n`\"']|&&|\|\|)\s*(?:&\s*)?"
+    r"(?:^|[;&|()\n`]|&&|\|\|)\s*(?:&\s*)?"
     r"[\"']?(?:[^\s\"']*[/\\])?(?:python[\d.]*|py)(?:\.exe)?[\"']?\s+(?:-\S+\s+)*"
     r"[\"']?[^\s\"']*review-dispatch\.py\b(?![^\n;|&]*--(?:check-pin|list-rounds)\b)",
     re.IGNORECASE,
 )
+# A shell that is handed a command as a quoted string runs what the string says: `pwsh -Command "..."`,
+# `bash -c '...'`, `cmd /c "..."`. The quoted string is read as commands in its own right. Only after such a flag:
+# `echo "python scripts/review-dispatch.py ..."` prints its string and runs nothing.
+WRAPPED = re.compile(
+    r"\b(?:pwsh|powershell|bash|sh|zsh|cmd)(?:\.exe)?\b[^\n;|&]*?\s(?:-Command|-c|/c)\s+([\"'])(.*?)\1",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def runs_a_review(command):
+    """Whether the command line starts a reviewer, directly or through a shell it hands a quoted command to."""
+    text = QUOTED_BLOCK.sub(" ", command or "")
+    return bool(RUNS_A_REVIEW.search(text)) or any(RUNS_A_REVIEW.search(inner.group(2)) for inner in WRAPPED.finditer(text))
 
 
 def check_command(command, repo=ROOT, background=True):
     """Return a refusal reason if `command` violates the dispatch rules, or None."""
     first = FIRST_WORD.match(command or "")
-    if not background and RUNS_A_REVIEW.search(QUOTED_BLOCK.sub(" ", command or "")):
+    if not background and runs_a_review(command):
         return (
             "Run `review-dispatch.py` with the shell tool's `run_in_background` option: a review can take half an hour, "
             "a foreground command is stopped at ten minutes, and only a background command wakes this session when "

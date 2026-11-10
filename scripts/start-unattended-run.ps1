@@ -33,7 +33,8 @@
     Write the Desktop shortcut for this clone. Run it again after moving the clone.
 
 .PARAMETER Stop
-    End the active run from outside the session (an operator halt), so nothing resumes it.
+    End the active run from outside the session: an operator halt, so nothing resumes it, and the session's process
+    is ended. Work the session had not committed stays in the tree for the next run's audit.
 
 .EXAMPLE
     pwsh scripts/start-unattended-run.ps1
@@ -78,7 +79,9 @@ if ($InstallShortcut) {
 }
 
 if ($Stop) {
-    python scripts/run-guard.py halt --ground operator --reason 'stopped from the launcher (-Stop)'
+    # A stop from outside the session: the guard is halted so nothing restarts or resumes the run, and the session's
+    # process is ended, because a session with a goal set would otherwise carry on working.
+    python scripts/run-guard.py halt --ground operator --reason 'stopped from the launcher (-Stop)' --end-session
     exit $LASTEXITCODE
 }
 
@@ -144,13 +147,13 @@ if (-not (Test-Path -LiteralPath (Join-Path $root 'reskit\llvm-mingw\bin\clang++
 # path, and only an operator at the keyboard can consent to registering it, so this is the moment to ask.
 $smokeScript = Join-Path $root 'tools\elevated-smoke.ps1'
 if (Test-Path -LiteralPath $smokeScript) {
-    $smokeTask = Get-ScheduledTask -TaskPath '\Resolute\' -TaskName 'ElevatedSmoke' -ErrorAction SilentlyContinue
-    $smokeHere = $smokeTask -and "$($smokeTask.Actions[0].Arguments)".Contains("'$root'")
-    if ($smokeHere) {
-        Write-Host 'Elevated tests: the ElevatedSmoke task is registered for this clone (no UAC prompt during the run).'
+    # The script's own answer to "would -Run be refused": the task's definition for this clone AND the pinned
+    # driver hashes, so a driver that changed since the last consent is caught here and not three hours in.
+    $smokeSaid = (& pwsh -NoProfile -File $smokeScript -Check | Out-String).Trim()
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host 'Elevated tests: ready (the ElevatedSmoke task matches this clone and its pinned drivers; no UAC prompt during the run).'
     } else {
-        $why = if ($smokeTask) { 'is registered for another clone path' } else { 'is not registered' }
-        Write-Warning "Elevated tests: the ElevatedSmoke task $why, so tests that need administrator rights cannot run unattended and their sections will be left for you."
+        Write-Warning "Elevated tests: $smokeSaid. Tests that need administrator rights cannot run unattended until it is registered again, and their sections will be left for you."
         if (-not $PrintOnly) {
             $answer = Read-Host 'Press Enter to register it now (one UAC prompt), or type s to skip'
             if ($answer.Trim() -ne 's') {

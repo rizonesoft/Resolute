@@ -24,6 +24,7 @@ class World:
         self.rows, self.sig, self.live, self.child, self.reviewing = rows, signature, list(live), child, reviewing
         self.alive = set(alive)
         self.spawned = []
+        self.quiet, self.ended = None, []  # minutes since the session last wrote, and the processes ended
 
     def env(self):
         return guard.Env(
@@ -34,6 +35,8 @@ class World:
             child_alive=lambda c: self.child,
             spawn=lambda s: self.spawned.append(dict(s)) or {"pid": 1, "started": 2},
             reviewing=lambda: self.reviewing,
+            quiet=lambda state, now: self.quiet,
+            end=self.ended.append,
         )
 
 
@@ -282,11 +285,34 @@ class Watch(unittest.TestCase):
         world, state = World(signature="two"), active(restart_signature="one", changed_at=1000.0)
         self.assertIn("attempt 1", guard.watch(state, world.env(), now=1000.0 + guard.MAX_QUIET_HOURS * 3600))
 
-    def test_a_hung_resumed_session_is_reported_and_left_alone(self):
+    def test_a_resumed_session_that_works_for_hours_and_changes_nothing_ends_with_its_run(self):
+        # It was once left running under a run called stalled: a writer nobody held and nobody would stop.
         world, state = World(child=True), active(child={"pid": 7, "started": 2}, restart_signature="one", changed_at=1000.0)
+        world.quiet = 1  # still writing to its transcript, so it is not the silent case below
         self.assertEqual(guard.watch(state, world.env(), now=1000.0 + guard.CHILD_HANG_HOURS * 3600), "stalled")
-        self.assertIn("left running", state["why"])
-        self.assertEqual(world.spawned, [])
+        self.assertIn("was ended", state["why"])
+        self.assertEqual((world.ended, world.spawned), ([7], []))
+
+    def test_a_silent_resumed_session_is_ended_and_the_next_tick_starts_another(self):
+        world, state = World(child=True), active(child={"pid": 7, "started": 2}, restart_signature="one", restarts=1, launched_at=1000.0, changed_at=1000.0)
+        world.quiet = guard.QUIET_LIMIT - 1
+        self.assertEqual(guard.watch(state, world.env(), now=2000.0), "resumed session still running")
+        world.quiet = guard.QUIET_LIMIT
+        self.assertIn("was ended", guard.watch(state, world.env(), now=2000.0))
+        self.assertEqual((world.ended, "child" in state, state["active"]), ([7], False, True))
+        world.child = False  # it has gone
+        self.assertIn("attempt 2", guard.watch(state, world.env(), now=2600.0))
+
+    def test_a_resumed_session_waiting_on_a_review_is_not_silent(self):
+        world, state = World(child=True, reviewing=True), active(child={"pid": 7, "started": 2}, restart_signature="one", launched_at=1000.0, changed_at=1000.0)
+        world.quiet = 500
+        self.assertEqual(guard.watch(state, world.env(), now=2000.0), "resumed session still running")
+        self.assertEqual(world.ended, [])
+
+    def test_a_resumed_session_with_no_transcript_is_measured_from_its_start(self):
+        world, state = World(child=True), active(child={"pid": 7, "started": 2}, restart_signature="one", launched_at=1000.0, changed_at=1000.0)
+        self.assertEqual(guard.watch(state, world.env(), now=1000.0 + (guard.QUIET_LIMIT - 1) * 60), "resumed session still running")
+        self.assertIn("was ended", guard.watch(state, world.env(), now=1000.0 + guard.QUIET_LIMIT * 60))
 
     def test_a_quiet_session_that_crashed_does_not_condemn_its_replacement(self):
         world, state = World(), active(restart_signature="one", changed_at=1000.0)
@@ -471,6 +497,22 @@ class SlowSignIn(unittest.TestCase):
             self.path.write_text(json.dumps(active()), encoding="utf-8")
             guard.watch_tick(self.env(world, lambda: asked.append(1)), self.path)
         self.assertEqual(asked, [])
+
+
+class OutsideStop(unittest.TestCase):
+    """A stop given from outside the session ends the session: a halted guard alone leaves a goal-driven one working."""
+
+    def test_the_owner_and_a_session_the_watchdog_resumed_are_both_ended(self):
+        world = World(child=True)
+        state = active(child={"pid": 7, "started": 2})
+        guard.halt(state, "operator", "stopped from the launcher (-Stop)")
+        self.assertEqual(guard.end_sessions(state, world.env(), process=lambda session: 41 if session == "me" else None), [41, 7])
+        self.assertEqual(world.ended, [41, 7])
+
+    def test_nothing_is_ended_when_nothing_of_this_run_is_running(self):
+        world = World()
+        self.assertEqual(guard.end_sessions(active(child={"pid": 7, "started": 2}), world.env(), process=lambda session: None), [])
+        self.assertEqual(world.ended, [])
 
 
 class Stuck(unittest.TestCase):

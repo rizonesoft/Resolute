@@ -84,6 +84,8 @@ class Env:
     task_installed: Callable[[], bool] = lambda: True
     reviewing: Callable[[], bool] = lambda: False
     prepare: Callable[[], object] | None = None  # the slow part of a spawn (the sign-in), done before the lock
+    quiet: Callable[[dict, float], float | None] = lambda state, now: None  # minutes since the session last wrote
+    end: Callable[[int], None] = lambda pid: None  # end a session's process tree
 
 
 def stamp(now: float | None = None) -> str:
@@ -337,9 +339,21 @@ def watch(state: dict, env: Env, now: float | None = None) -> str:
         state.update(restart_signature=signature, restarts=0, changed_at=now)
     quiet = (now - state.get("changed_at", now)) / 3600
     if state.get("child") and env.child_alive(state["child"]):
+        pid = int(state["child"].get("pid", 0))
         if (now - max(state.get("changed_at", now), state.get("launched_at", 0))) / 3600 >= CHILD_HANG_HOURS:
-            end_run(state, "stalled", f"resumed session {state['child'].get('pid')} changed nothing for {CHILD_HANG_HOURS} hours; it was left running")
+            # It kept writing and changed nothing for hours. A run called stalled has no writer: the session is ended.
+            env.end(pid)
+            end_run(state, "stalled", f"resumed session {pid} changed nothing for {CHILD_HANG_HOURS} hours and was ended")
             return "stalled"
+        quiet = env.quiet(state, now)
+        if quiet is None:
+            quiet = (now - state.get("launched_at", now)) / 60  # no transcript at all: quiet since it was started
+        if owner_stuck(state, env, quiet):
+            # The same rule the launcher applies to a session it started: silent this long with no review in flight,
+            # it will not wake itself. It is ended here and the next tick starts another, on the same bounded count.
+            env.end(pid)
+            state.pop("child", None)
+            return f"resumed session {pid} wrote nothing for {round(quiet)} minutes and was ended; the next tick starts another"
         return "resumed session still running"
     live = env.live_here()
     if live:
@@ -363,6 +377,19 @@ def watch(state: dict, env: Env, now: float | None = None) -> str:
         state["session_id"] = child["session_id"]
     state.update(child=child, restarts=state.get("restarts", 0) + 1, launched_at=now, last_restart=stamp())
     return f"resumed, attempt {state['restarts']}"
+
+
+def end_sessions(state: dict, env: Env, process: Callable[[str | None], int | None] | None = None) -> list[int]:
+    """End every session writing for this run: the owner's process and a session the watchdog resumed. For a stop
+    given from outside the session, which has no other way to reach it: a halted guard stops sending the session
+    back, but a session with a goal set goes on working by itself. Returns the processes ended."""
+    ended = []
+    child = state.get("child")
+    for pid in ((process or owner_process)(state.get("session_id")), int(child.get("pid", 0)) if child and env.child_alive(child) else None):
+        if pid and pid not in ended:
+            env.end(pid)
+            ended.append(pid)
+    return ended
 
 
 def halt(state: dict, ground: str, reason: str) -> None:
@@ -747,7 +774,7 @@ def real_reviewing() -> bool:
     return bool(reviews_in_flight())
 
 
-REAL = Env(real_rows, real_signature, real_alive, real_live_here, real_child_alive, real_spawn, real_task_installed, real_reviewing, real_prepare)
+REAL = Env(real_rows, real_signature, real_alive, real_live_here, real_child_alive, real_spawn, real_task_installed, real_reviewing, real_prepare, owner_quiet_minutes, end_tree)
 
 
 def record_tick(result: str, ok: bool, path: Path = STATE) -> None:

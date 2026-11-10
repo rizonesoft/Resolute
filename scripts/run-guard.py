@@ -79,6 +79,7 @@ def main() -> int:
     stop = commands.add_parser("halt")
     stop.add_argument("--ground", required=True, choices=guard.GROUNDS)
     stop.add_argument("--reason", required=True)
+    stop.add_argument("--end-session", action="store_true", help="also end the session's process, for a stop given from outside it")
     args = parser.parse_args()
 
     if args.command == "hook":
@@ -146,9 +147,16 @@ def main() -> int:
             guard.halt(state, args.ground, args.reason)
         guard.save(state)
     say(state.get("status", ""))
-    child = state.get("child")
-    if args.command == "halt" and child and guard.real_child_alive(child):
-        say(f"Resumed session {child['pid']} is still working and will stop at the end of its turn. To end it now: taskkill /PID {child['pid']}")
+    if args.command == "halt":
+        # Said as it is: the guard no longer holds the run open, and whether the session itself has stopped.
+        if args.end_session:
+            ended = guard.end_sessions(state, guard.REAL)
+            say(f"The session was ended (process {', '.join(map(str, ended))})." if ended else "No session of this run was found running.")
+        else:
+            child = state.get("child")
+            working = [str(pid) for pid in (guard.owner_process(state.get("session_id")), child["pid"] if child and guard.real_child_alive(child) else None) if pid]
+            if working:
+                say(f"The guard no longer holds the run open, but its session (process {', '.join(working)}) is still running and a session with a goal set keeps working. To end it: `run-guard.py halt --ground operator --reason <why> --end-session`.")
     return 0
 
 

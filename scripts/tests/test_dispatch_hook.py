@@ -36,6 +36,9 @@ class Background(unittest.TestCase):
             f"@\"\n{REVIEW}\n\"@ | Set-Content notes.txt",
             f"cat > notes.txt <<'EOF'\n{REVIEW}\nEOF",
             "Select-String -Path scripts/review-dispatch.py -Pattern astra",
+            f'echo "{REVIEW}"',
+            f"Write-Host '{REVIEW}'",
+            f'git commit -m "{REVIEW}"',
         ):
             self.assertIsNone(hook.check_command(command, background=False), command)
 

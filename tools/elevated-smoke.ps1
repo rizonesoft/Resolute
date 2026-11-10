@@ -5,6 +5,7 @@
 #   pwsh tools/elevated-smoke.ps1 -Run                  start it, wait, and validate the fresh report (no prompt)
 #   pwsh tools/elevated-smoke.ps1 -Remove               stop if running, unregister, prove absence
 #   pwsh tools/elevated-smoke.ps1 -SelfTest             windowless contract tests; registers nothing
+#   pwsh tools/elevated-smoke.ps1 -Check                would -Run be refused? starts nothing, changes nothing
 #
 # Trust boundary: registration pins the SHA-256 of scripts/smoke-run.py and
 # scripts/conformance-check.py in C:\ProgramData\Resolute\ElevatedSmoke\
@@ -20,6 +21,7 @@ param(
     [switch]$Run,
     [switch]$Remove,
     [switch]$SelfTest,
+    [switch]$Check,
     [switch]$RegisterElevated,   # internal: elevated copy of this script, run by -Register
     [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )
@@ -351,6 +353,18 @@ function Invoke-Register {
     return 0
 }
 
+function Invoke-Check {
+    # The refusals -Run would give before it starts anything, so a launcher can ask for a new registration while
+    # the operator is still at the keyboard to consent (scripts/start-unattended-run.ps1). Read-only.
+    $refusals = @(Test-PinnedHashes $Root $HashFile)
+    $task = Get-TaskOrNull
+    if (-not $task) { $refusals += 'task not registered' }
+    else { $refusals += @(Test-DefinitionMatch $task $Root) }
+    if ($refusals) { Write-Host ("not ready: " + ($refusals -join '; ')); return 2 }
+    Write-Host 'ready: the task is registered for this checkout and the pinned driver hashes match'
+    return 0
+}
+
 function Invoke-Run {
     $hashRefusals = Test-PinnedHashes $Root $HashFile
     if ($hashRefusals) {
@@ -445,12 +459,13 @@ function Invoke-Remove {
     return 0
 }
 
-$modes = @($Register, $Run, $Remove, $SelfTest, $RegisterElevated) | Where-Object { $_ }
+$modes = @($Register, $Run, $Remove, $SelfTest, $Check, $RegisterElevated) | Where-Object { $_ }
 if ($modes.Count -ne 1) {
-    Write-Host 'usage: elevated-smoke.ps1 -Register [-Replace] | -Run | -Remove | -SelfTest'
+    Write-Host 'usage: elevated-smoke.ps1 -Register [-Replace] | -Run | -Remove | -SelfTest | -Check'
     exit 2
 }
 if ($SelfTest) { $modeCode = Invoke-SelfTest; exit $modeCode }
+if ($Check) { $modeCode = Invoke-Check; exit $modeCode }
 if ($RegisterElevated) { $modeCode = Invoke-RegisterElevated; exit $modeCode }
 if ($Register) { $modeCode = Invoke-Register; exit $modeCode }
 if ($Run) { $modeCode = Invoke-Run; exit $modeCode }
