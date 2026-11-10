@@ -83,6 +83,7 @@ class Env:
     spawn: Callable[[dict], dict]
     task_installed: Callable[[], bool] = lambda: True
     reviewing: Callable[[], bool] = lambda: False
+    prepare: Callable[[], object] | None = None  # the slow part of a spawn (the sign-in), done before the lock
 
 
 def stamp(now: float | None = None) -> str:
@@ -189,8 +190,12 @@ def on_prompt(state: dict, data: dict, env: Env) -> str | None:
                 "something else, carry on."
             )
         return None
-    if state.get("active") and state.get("session_id") not in (None, session) and env.alive(state["session_id"]):
-        return f"Another session ({state['session_id']}) owns the active run. Never run two writers on one tree: stop and say so."
+    # The same admission a launcher's session passes (`start`), so a prompt typed in another session cannot take a
+    # run a launcher has reserved, the watchdog has resumed, or a review is reading. The operator typed this in an
+    # open session, so other open sessions are theirs to judge.
+    refused = admission_refusal(state, session, env, launcher=None, open_ok=True, own_ok=True)
+    if refused:
+        return f"The run was not taken: {refused}. Stop and say so."
     if not state.get("active"):
         state.clear()
         state.update(active=True, status="active", started=stamp(), changed_at=time.time())
@@ -271,19 +276,19 @@ def start(state: dict, session: str, mode: str | None, env: Env, launcher: dict 
     the watchdog starts gets the same."""
     if restart and not state.get("active"):
         raise ValueError(f"the run is no longer active ({state.get('status') or 'inactive'}: {state.get('why') or 'no reason kept'}), so it was not restarted")
-    owner = state.get("session_id")
-    if state.get("active") and owner not in (None, session) and env.alive(owner):
-        raise ValueError(f"session {owner} owns the active run and is alive; never run two writers on one tree")
-    if state.get("active") and state.get("child") and env.child_alive(state["child"]):
-        raise ValueError(f"the watchdog's resumed session {state['child'].get('pid')} is working on this run; never run two writers on one tree")
-    held = state.get("launcher")
-    if state.get("active") and held and held != launcher and env.child_alive(held):
-        raise ValueError(f"another launcher (process {held.get('pid')}) holds this run; never run two writers on one tree")
-    if env.reviewing():
-        raise ValueError("a review is in flight and a review runs alone; start again when it has returned")
-    others = [s for s in env.live_here() if s != session]
-    if others and not open_ok:
-        raise ValueError(f"Claude Code session(s) already open in this clone: {', '.join(others)}; never run two writers on one tree")
+    refused = admission_refusal(state, session, env, launcher, open_ok)
+    if refused:
+        raise ValueError(refused)
+    if restart:
+        # A restart is an attempt like the watchdog's, on the same count: sessions that keep dying or being replaced
+        # with nothing changed (an expired sign-in, an API that stays down) end the run instead of going on for ever.
+        signature = env.signature()
+        if signature != state.get("restart_signature"):
+            state.update(restart_signature=signature, restarts=0, changed_at=time.time())
+        if state.get("restarts", 0) >= MAX_RESTARTS:
+            end_run(state, "stalled", f"{MAX_RESTARTS} restarts changed nothing")
+            raise ValueError(f"{MAX_RESTARTS} restarts in a row changed nothing in the tree, so the run was ended as stalled; read the last session before starting again")
+        state.update(restarts=state.get("restarts", 0) + 1, last_restart=stamp())
     if not state.get("active"):
         state.clear()
         state.update(active=True, status="active", started=stamp(), changed_at=time.time())
@@ -294,6 +299,27 @@ def start(state: dict, session: str, mode: str | None, env: Env, launcher: dict 
         state["launcher"] = launcher
     else:
         state.pop("launcher", None)
+
+
+def admission_refusal(state: dict, session: str | None, env: Env, launcher: dict | None, open_ok: bool, own_ok: bool = False) -> str | None:
+    """Why `session` may not take the run, or None. The one statement of who may write, used by `start` (a launcher's
+    session) and by the `process plan` prompt. `own_ok` lets the run's own session say `process plan` again."""
+    owner = state.get("session_id")
+    if own_ok and state.get("active") and owner == session:
+        return None
+    if state.get("active") and owner not in (None, session) and env.alive(owner):
+        return f"session {owner} owns the active run and is alive; never run two writers on one tree"
+    if state.get("active") and state.get("child") and env.child_alive(state["child"]):
+        return f"the watchdog's resumed session {state['child'].get('pid')} is working on this run; never run two writers on one tree"
+    held = state.get("launcher")
+    if state.get("active") and held and held != launcher and env.child_alive(held):
+        return f"a launcher (process {held.get('pid')}) holds this run for session {owner}; never run two writers on one tree"
+    if env.reviewing():
+        return "a review is in flight and a review runs alone; start again when it has returned"
+    others = [s for s in env.live_here() if s != session]
+    if others and not open_ok:
+        return f"Claude Code session(s) already open in this clone: {', '.join(others)}; never run two writers on one tree"
+    return None
 
 
 def on_session_end(state: dict, data: dict) -> None:
@@ -584,13 +610,17 @@ def sign_in(environ: dict, read: Callable[[], str | None] = read_token, cached: 
     return dict(environ), "the stored login (neither 1Password nor the cache gave the token)"
 
 
-def real_spawn(state: dict) -> dict:
+def real_prepare() -> tuple[dict, str]:
+    return sign_in(dict(os.environ))
+
+
+def real_spawn(state: dict, prepared: tuple[dict, str] | None = None) -> dict:
     claude = shutil.which("claude")
     if not claude:
         raise OSError("claude is not on PATH")
     output = STATE.with_name("resumed-session.log")
     flags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
-    env, how = sign_in(dict(os.environ))
+    env, how = prepared or real_prepare()
     fresh = str(uuid.uuid4()) if wants_fresh(state) else None
     with output.open("ab") as out:
         child = subprocess.Popen(resume_command(state, claude, fresh), cwd=ROOT, env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=out, creationflags=flags)
@@ -717,7 +747,7 @@ def real_reviewing() -> bool:
     return bool(reviews_in_flight())
 
 
-REAL = Env(real_rows, real_signature, real_alive, real_live_here, real_child_alive, real_spawn, real_task_installed, real_reviewing)
+REAL = Env(real_rows, real_signature, real_alive, real_live_here, real_child_alive, real_spawn, real_task_installed, real_reviewing, real_prepare)
 
 
 def record_tick(result: str, ok: bool, path: Path = STATE) -> None:
@@ -748,11 +778,33 @@ def health(state: dict, path: Path = STATE, env: Env = REAL, now: float | None =
     }
 
 
+class _WouldSpawn(Exception):
+    pass
+
+
+def would_spawn(state: dict, env: Env, now: float | None) -> bool:
+    """Whether this tick is about to start a session, worked out on a copy so nothing is changed or started."""
+    def stop(_state: dict) -> dict:
+        raise _WouldSpawn
+
+    try:
+        watch(json.loads(json.dumps(state)), replace(env, spawn=stop), now)
+    except _WouldSpawn:
+        return True
+    return False
+
+
 def watch_tick(env: Env = REAL, path: Path = STATE, now: float | None = None) -> str:
     """One scheduled tick, with its result kept: slow reads first, then the lock, then the state as it now stands."""
-    if not load(path).get("active"):
+    peek = load(path)
+    if not peek.get("active"):
         return "inactive"
     env = snapshot(env)
+    if env.prepare is not None and would_spawn(peek, env, now):
+        # 1Password may take a minute to answer, or not answer: asked here, before the lock, so a stop is never
+        # kept waiting behind it. The decision to spawn is taken again under the lock, from the state as it then is.
+        prepared, spawn = env.prepare(), env.spawn
+        env = replace(env, spawn=lambda state: spawn(state, prepared))
     with locked(path):
         state = load(path)
         try:

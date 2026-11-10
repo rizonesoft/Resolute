@@ -119,9 +119,12 @@ def main() -> int:
             guard.log(f"launcher: {result}")
         say(result)
         return 0
+    # The tree's signature is a slow read, taken before the lock like every other: only a restart needs it.
+    env = guard.snapshot(guard.REAL) if args.command == "start" and args.restart else guard.REAL
     with guard.locked():
         state = guard.load()
         if args.command == "start":
+            before = json.dumps(state, sort_keys=True)
             try:
                 launcher = None
                 if args.launcher_pid:
@@ -132,8 +135,11 @@ def main() -> int:
                 if args.model or args.disallowed or args.goal_file:
                     launch = {"model": args.model, "disallowed": [t for t in (args.disallowed or "").split(",") if t],
                               "goal": Path(args.goal_file).read_text(encoding="utf-8").strip() if args.goal_file else None}
-                guard.start(state, args.session, args.permission_mode, guard.REAL, launcher, restart=args.restart, open_ok=args.open_ok, launch=launch)
+                guard.start(state, args.session, args.permission_mode, env, launcher, restart=args.restart, open_ok=args.open_ok, launch=launch)
             except (ValueError, OSError) as error:
+                if json.dumps(state, sort_keys=True) != before:  # a refusal can itself end the run (stalled): keep that
+                    guard.save(state)
+                    guard.log(f"start refused: {state.get('status')} {state.get('why', '')}".rstrip())
                 say(str(error))
                 return 1
         else:

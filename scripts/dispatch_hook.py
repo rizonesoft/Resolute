@@ -59,8 +59,10 @@ QUOTED_BLOCK = re.compile(
     r"@'.*?^'@|@\".*?^\"@|<<-?\s*(['\"]?)(\w+)\1.*?^\s*\2\s*$",
     re.DOTALL | re.MULTILINE,
 )
+# An opening quote is a command position too: a shell wrapper such as `pwsh -Command "..."` or `bash -c '...'` runs
+# what it quotes.
 RUNS_A_REVIEW = re.compile(
-    r"(?:^|[;&|()\n`]|&&|\|\|)\s*(?:&\s*)?"
+    r"(?:^|[;&|()\n`\"']|&&|\|\|)\s*(?:&\s*)?"
     r"[\"']?(?:[^\s\"']*[/\\])?(?:python[\d.]*|py)(?:\.exe)?[\"']?\s+(?:-\S+\s+)*"
     r"[\"']?[^\s\"']*review-dispatch\.py\b(?![^\n;|&]*--(?:check-pin|list-rounds)\b)",
     re.IGNORECASE,

@@ -139,6 +139,29 @@ if (-not (Test-Path -LiteralPath (Join-Path $root 'reskit\llvm-mingw\bin\clang++
     }
 }
 
+# Elevated tests (RegStudio's manifest is requireAdministrator) run through the one consented task of D07 T01 S7,
+# \Resolute\ElevatedSmoke, because nobody is there to answer a UAC prompt during the run. The task holds this clone's
+# path, and only an operator at the keyboard can consent to registering it, so this is the moment to ask.
+$smokeScript = Join-Path $root 'tools\elevated-smoke.ps1'
+if (Test-Path -LiteralPath $smokeScript) {
+    $smokeTask = Get-ScheduledTask -TaskPath '\Resolute\' -TaskName 'ElevatedSmoke' -ErrorAction SilentlyContinue
+    $smokeHere = $smokeTask -and "$($smokeTask.Actions[0].Arguments)".Contains("'$root'")
+    if ($smokeHere) {
+        Write-Host 'Elevated tests: the ElevatedSmoke task is registered for this clone (no UAC prompt during the run).'
+    } else {
+        $why = if ($smokeTask) { 'is registered for another clone path' } else { 'is not registered' }
+        Write-Warning "Elevated tests: the ElevatedSmoke task $why, so tests that need administrator rights cannot run unattended and their sections will be left for you."
+        if (-not $PrintOnly) {
+            $answer = Read-Host 'Press Enter to register it now (one UAC prompt), or type s to skip'
+            if ($answer.Trim() -ne 's') {
+                & pwsh -NoProfile -File $smokeScript -Register -Replace
+                if ($LASTEXITCODE -eq 0) { Write-Host 'Elevated tests: registered for this clone.' }
+                else { Write-Warning 'Elevated tests: the registration did not complete (declined or refused); the run starts without it.' }
+            }
+        }
+    }
+}
+
 $status = @(python scripts/run-guard.py status)
 Write-Host "Run guard: $($status[0])"
 $detail = if ($status.Count -gt 1) { $status[1] | ConvertFrom-Json } else { $null }

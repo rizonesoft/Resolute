@@ -352,16 +352,16 @@ class Admission(unittest.TestCase):
         self.assertTrue(state["active"])
 
     def test_a_restart_continues_a_run_that_is_still_active(self):
-        state = active(restarts=2, launcher={"pid": 7, "started": 8})
+        state = active(restarts=1, restart_signature="one", launcher={"pid": 7, "started": 8})
         guard.start(state, "next", "bypassPermissions", World(child=True).env(), {"pid": 7, "started": 8}, restart=True)
-        self.assertEqual((state["session_id"], state["restarts"]), ("next", 2))
+        self.assertEqual((state["session_id"], state["restarts"]), ("next", 2))  # counted as an attempt, like the watchdog's
 
     def test_a_second_launcher_is_refused_while_the_first_is_alive(self):
         state = {}
         guard.start(state, "one", None, World().env(), {"pid": 7, "started": 8})
         with self.assertRaises(ValueError) as refused:
             guard.start(state, "two", None, World(child=True).env(), {"pid": 9, "started": 10})
-        self.assertIn("another launcher", str(refused.exception))
+        self.assertIn("a launcher (process 7) holds this run", str(refused.exception))
         self.assertEqual(state["session_id"], "one")
         guard.start(state, "two", None, World().env(), {"pid": 9, "started": 10})  # the first launcher has gone
         self.assertEqual(state["launcher"], {"pid": 9, "started": 10})
@@ -383,11 +383,94 @@ class Admission(unittest.TestCase):
             guard.start(state, "next", None, World(live=["other"]).env(), restart=True)
         guard.start(state, "me", None, World(live=["me"]).env())  # the session itself is not another session
 
+    def test_a_prompt_in_another_session_cannot_take_a_run_a_launcher_has_reserved(self):
+        # The launcher has been admitted and its Claude process has not registered yet, so the owner is not "alive".
+        state = {}
+        guard.start(state, "reserved", "bypassPermissions", World().env(), {"pid": 7, "started": 8})
+        world = World(child=True)  # the launcher is alive
+        note = guard.on_prompt(state, {"prompt": "process plan", "session_id": "intruder"}, world.env())
+        self.assertIn("launcher", note)
+        self.assertEqual(state["session_id"], "reserved")
+        self.assertIn("Unattended run guard is active", guard.on_prompt(state, {"prompt": "process plan", "session_id": "reserved"}, world.env()))
+
+    def test_a_prompt_cannot_take_a_run_while_a_review_is_in_flight_or_the_watchdogs_session_works(self):
+        for world, state, word in ((World(reviewing=True), active(), "review"), (World(child=True), active(child={"pid": 1, "started": 2}), "watchdog")):
+            note = guard.on_prompt(state, {"prompt": "process plan", "session_id": "intruder"}, world.env())
+            self.assertIn(word, note)
+            self.assertEqual(state["session_id"], "me")
+        fresh = {}
+        self.assertIn("review", guard.on_prompt(fresh, {"prompt": "process plan", "session_id": "me"}, World(reviewing=True).env()))
+        self.assertEqual(fresh, {})
+
+    def test_restarts_that_change_nothing_end_the_run_however_far_apart_they_are(self):
+        state = {}
+        launcher = {"pid": 7, "started": 8}
+        guard.start(state, "s0", None, World().env(), launcher)
+        for attempt in range(1, guard.MAX_RESTARTS + 1):
+            guard.start(state, f"s{attempt}", None, World(child=True).env(), launcher, restart=True)
+            self.assertEqual(state["restarts"], attempt)
+        with self.assertRaises(ValueError) as refused:
+            guard.start(state, "one-too-many", None, World(child=True).env(), launcher, restart=True)
+        self.assertIn("stalled", str(refused.exception))
+        self.assertEqual((state["active"], state["status"]), (False, "stalled"))
+
+    def test_a_restart_after_progress_starts_the_count_again(self):
+        state = {}
+        launcher = {"pid": 7, "started": 8}
+        guard.start(state, "s0", None, World().env(), launcher)
+        for _ in range(guard.MAX_RESTARTS):
+            guard.start(state, "again", None, World(child=True).env(), launcher, restart=True)
+        guard.start(state, "after-work", None, World(child=True, signature="a commit landed").env(), launcher, restart=True)
+        self.assertEqual((state["active"], state["restarts"]), (True, 1))
+
     def test_what_the_session_was_started_with_is_kept(self):
         state = {}
         guard.start(state, "me", None, World().env(), launch={"model": "m", "disallowed": ["AskUserQuestion"], "goal": "g"})
         guard.start(state, "next", None, World().env(), restart=True)
         self.assertEqual(state["launch"], {"model": "m", "disallowed": ["AskUserQuestion"], "goal": "g"})
+
+
+class SlowSignIn(unittest.TestCase):
+    """The sign-in can take a minute. It is fetched before the lock, so a stop never waits behind it."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.path = Path(self.temp.name) / "state.json"
+        self.path.write_text(json.dumps(active()), encoding="utf-8")
+
+    def env(self, world, prepare):
+        env = world.env()
+        env.spawn = lambda state, prepared=None: world.spawned.append(prepared) or {"pid": 1, "started": 2}
+        env.prepare = prepare
+        return env
+
+    def test_a_stop_gets_in_while_the_sign_in_is_fetched_and_then_nothing_is_started(self):
+        world = World()
+
+        def prepare():
+            with guard.locked(self.path, wait=1):  # the lock is free while this runs
+                state = guard.load(self.path)
+                guard.halt(state, "operator", "stopped while 1Password was asked")
+                guard.save(state, self.path)
+            return ({"CLAUDE_CODE_OAUTH_TOKEN": "x"}, "the one-year token from 1Password")
+
+        self.assertEqual(guard.watch_tick(self.env(world, prepare), self.path), "inactive")
+        self.assertEqual(world.spawned, [])
+        self.assertEqual(guard.load(self.path)["status"], "halted")
+
+    def test_the_session_is_started_with_what_was_fetched(self):
+        world = World()
+        fetched = ({"CLAUDE_CODE_OAUTH_TOKEN": "x"}, "the one-year token from 1Password")
+        self.assertIn("resumed", guard.watch_tick(self.env(world, lambda: fetched), self.path))
+        self.assertEqual(world.spawned, [fetched])
+
+    def test_the_vault_is_not_asked_on_a_tick_that_starts_nothing(self):
+        asked = []
+        for world in (World(live=["someone"]), World(reviewing=True), World(rows=())):
+            self.path.write_text(json.dumps(active()), encoding="utf-8")
+            guard.watch_tick(self.env(world, lambda: asked.append(1)), self.path)
+        self.assertEqual(asked, [])
 
 
 class Stuck(unittest.TestCase):

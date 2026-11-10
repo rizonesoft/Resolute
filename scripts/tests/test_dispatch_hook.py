@@ -23,6 +23,11 @@ class Background(unittest.TestCase):
         for command in (f"git status; {REVIEW}", f"git status && {REVIEW}", f"git log -1\n{REVIEW}"):
             self.assertIn("run_in_background", hook.check_command(command, background=False), command)
 
+    def test_a_review_wrapped_in_another_shell_is_still_a_review(self):
+        for command in (f'pwsh -NoProfile -Command "{REVIEW}"', f"bash -c '{REVIEW}'", f'pwsh -c "cd D:/Resolute; {REVIEW}"'):
+            self.assertIn("run_in_background", hook.check_command(command, background=False), command)
+            self.assertIsNone(hook.check_command(command, background=True), command)
+
     def test_naming_the_dispatcher_in_a_message_or_a_file_being_written_is_not_a_review(self):
         for command in (
             'git commit -m "run review-dispatch.py in the background"',
