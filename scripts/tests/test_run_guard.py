@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -314,13 +316,111 @@ class Watch(unittest.TestCase):
         self.assertNotIn("--dangerously-skip-permissions", " ".join(command))
 
     def test_a_resume_that_changed_nothing_is_followed_by_a_fresh_session(self):
-        again = guard.resume_command(active(permission_mode="bypassPermissions", restarts=1), "claude")
-        self.assertEqual(again, ["claude", "-p", "process plan", "--permission-mode", "bypassPermissions"])
-        world, state = World(), active()
-        guard.watch(state, world.env())
-        guard.watch(state, world.env())
-        self.assertIn("--resume", guard.resume_command(world.spawned[0], "claude"))
-        self.assertNotIn("--resume", guard.resume_command(world.spawned[1], "claude"))
+        self.assertFalse(guard.wants_fresh(active()))
+        self.assertTrue(guard.wants_fresh(active(restarts=1)))
+        self.assertTrue(guard.wants_fresh({"active": True}))
+        fresh = guard.resume_command(active(permission_mode="bypassPermissions", restarts=1), "claude", "new-id")
+        self.assertEqual(fresh, ["claude", "-p", "process plan", "--session-id", "new-id", "--permission-mode", "bypassPermissions"])
+
+    def test_a_fresh_session_owns_the_run_under_the_id_it_was_started_with(self):
+        world, state = World(), active(restarts=1)
+        env = world.env()
+        env.spawn = lambda s: {"pid": 1, "started": 2, "session_id": "new-id"}
+        guard.watch(state, env)
+        self.assertEqual(state["session_id"], "new-id")
+        self.assertIn("Do not stop", guard.on_stop(state, {"session_id": "new-id"}, world.env()))
+
+    def test_a_resumed_or_fresh_session_keeps_what_the_launcher_started_the_run_with(self):
+        launch = {"model": "claude-fable-5-2", "disallowed": ["AskUserQuestion"], "goal": "/goal finish the plan"}
+        state = active(permission_mode="bypassPermissions", launch=launch)
+        tail = ["--permission-mode", "bypassPermissions", "--model", "claude-fable-5-2", "--disallowedTools", "AskUserQuestion"]
+        self.assertEqual(guard.resume_command(state, "claude"), ["claude", "-p", "process plan", "--resume", "me", *tail])
+        self.assertEqual(guard.resume_command(state, "claude", "new-id"), ["claude", "-p", "/goal finish the plan", "--session-id", "new-id", *tail])
+
+
+class Admission(unittest.TestCase):
+    """`start` is the one way a launcher's session gets to write."""
+
+    def test_a_stop_given_while_the_launcher_waited_is_not_undone_by_its_restart(self):
+        state = active()
+        guard.halt(state, "operator", "stopped from the launcher (-Stop)")
+        with self.assertRaises(ValueError) as refused:
+            guard.start(state, "next", "bypassPermissions", World().env(), {"pid": 7, "started": 8}, restart=True)
+        self.assertIn("no longer active", str(refused.exception))
+        self.assertEqual((state["status"], state["session_id"]), ("halted", "me"))
+        guard.start(state, "next", "bypassPermissions", World().env(), {"pid": 7, "started": 8})  # the operator starting again
+        self.assertTrue(state["active"])
+
+    def test_a_restart_continues_a_run_that_is_still_active(self):
+        state = active(restarts=2, launcher={"pid": 7, "started": 8})
+        guard.start(state, "next", "bypassPermissions", World(child=True).env(), {"pid": 7, "started": 8}, restart=True)
+        self.assertEqual((state["session_id"], state["restarts"]), ("next", 2))
+
+    def test_a_second_launcher_is_refused_while_the_first_is_alive(self):
+        state = {}
+        guard.start(state, "one", None, World().env(), {"pid": 7, "started": 8})
+        with self.assertRaises(ValueError) as refused:
+            guard.start(state, "two", None, World(child=True).env(), {"pid": 9, "started": 10})
+        self.assertIn("another launcher", str(refused.exception))
+        self.assertEqual(state["session_id"], "one")
+        guard.start(state, "two", None, World().env(), {"pid": 9, "started": 10})  # the first launcher has gone
+        self.assertEqual(state["launcher"], {"pid": 9, "started": 10})
+
+    def test_a_review_in_flight_refuses_a_start(self):
+        with self.assertRaises(ValueError) as refused:
+            guard.start({}, "me", None, World(reviewing=True).env())
+        self.assertIn("review is in flight", str(refused.exception))
+
+    def test_another_open_session_refuses_a_start_unless_the_operator_accepted_it(self):
+        state = {}
+        with self.assertRaises(ValueError) as refused:
+            guard.start(state, "me", None, World(live=["other"]).env())
+        self.assertIn("other", str(refused.exception))
+        self.assertEqual(state, {})
+        guard.start(state, "me", None, World(live=["other"]).env(), open_ok=True)
+        self.assertTrue(state["active"])
+        with self.assertRaises(ValueError):  # a restart is nobody at the keyboard, so it never carries the acceptance
+            guard.start(state, "next", None, World(live=["other"]).env(), restart=True)
+        guard.start(state, "me", None, World(live=["me"]).env())  # the session itself is not another session
+
+    def test_what_the_session_was_started_with_is_kept(self):
+        state = {}
+        guard.start(state, "me", None, World().env(), launch={"model": "m", "disallowed": ["AskUserQuestion"], "goal": "g"})
+        guard.start(state, "next", None, World().env(), restart=True)
+        self.assertEqual(state["launch"], {"model": "m", "disallowed": ["AskUserQuestion"], "goal": "g"})
+
+
+class Stuck(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.projects = Path(self.temp.name)
+        (self.projects / "D--Resolute").mkdir()
+
+    def test_quiet_is_measured_from_the_sessions_transcript(self):
+        self.assertIsNone(guard.owner_quiet_minutes(active(), projects=self.projects))
+        transcript = self.projects / "D--Resolute" / "me.jsonl"
+        transcript.write_text("{}\n", encoding="utf-8")
+        self.assertEqual(guard.owner_quiet_minutes(active(), now=transcript.stat().st_mtime + 600, projects=self.projects), 10.0)
+
+    def test_only_a_silent_session_of_an_active_run_with_no_review_is_stuck(self):
+        env = World().env()
+        self.assertTrue(guard.owner_stuck(active(), env, guard.QUIET_LIMIT))
+        self.assertFalse(guard.owner_stuck(active(), env, guard.QUIET_LIMIT - 1))
+        self.assertFalse(guard.owner_stuck(active(), env, None))
+        self.assertFalse(guard.owner_stuck(active(), World(reviewing=True).env(), 500))
+        self.assertFalse(guard.owner_stuck({"active": False, "session_id": "me"}, env, 500))
+
+    def test_a_stuck_session_is_ended_and_a_working_one_is_left_alone(self):
+        ended = []
+        long_ago = time.time() - (guard.QUIET_LIMIT + 5) * 60
+        said = guard.replace_stuck(active(session_id="never-wrote"), World().env(), long_ago, kill=ended.append, process=lambda s: 4242)
+        self.assertEqual(ended, [4242])
+        self.assertIn("replaced", said)
+        said = guard.replace_stuck(active(session_id="never-wrote"), World().env(), time.time(), kill=ended.append, process=lambda s: 4242)
+        self.assertEqual((ended, said.startswith("working")), ([4242], True))
+        said = guard.replace_stuck(active(session_id="never-wrote"), World(reviewing=True).env(), long_ago, kill=ended.append, process=lambda s: 4242)
+        self.assertEqual(ended, [4242])
 
 
 class SignIn(unittest.TestCase):
@@ -359,6 +459,20 @@ class SignIn(unittest.TestCase):
             path.write_bytes(b"not something DPAPI wrote")
             self.assertIsNone(guard.cached_token(path))
 
+    @unittest.skipUnless(sys.platform == "win32" and shutil.which("pwsh"), "the launcher is PowerShell on Windows")
+    def test_the_launcher_can_read_the_cache_the_guard_wrote(self):
+        # start-unattended-run.ps1 falls back to this cache when 1Password is locked, through .NET's ProtectedData:
+        # the two must agree on the format, or that fallback is silently empty.
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "token.dpapi"
+            guard.cache_token(self.TOKEN, path)
+            read = subprocess.run(
+                ["pwsh", "-NoProfile", "-Command",
+                 "[Text.Encoding]::UTF8.GetString([System.Security.Cryptography.ProtectedData]::Unprotect("
+                 f"[IO.File]::ReadAllBytes('{path}'), $null, 'CurrentUser'))"],
+                capture_output=True, text=True, timeout=60)
+            self.assertEqual(read.stdout.strip(), self.TOKEN, read.stderr)
+
 
 class InFlight(unittest.TestCase):
     def setUp(self):
@@ -384,6 +498,45 @@ class InFlight(unittest.TestCase):
                 raise RuntimeError("the reviewer failed")
         self.assertEqual(list(self.folder.iterdir()), [])
 
+    def test_a_marker_just_made_or_one_that_cannot_be_opened_counts_as_a_review(self):
+        self.folder.mkdir()
+        fresh = self.folder / "1.json"
+        fresh.write_text("{}", encoding="utf-8")  # its dispatcher is between creating it and locking it
+        self.assertTrue(guard.review_running(fresh))
+        self.assertEqual(guard.reviews_in_flight(self.folder), ["1.json"])
+        old = time.time() - guard.REVIEW_SETTLE - 1
+        os.utime(fresh, (old, old))
+        self.assertFalse(guard.review_running(fresh))  # nobody holds its lock
+        blocked = self.folder / "2.json"
+        blocked.mkdir()  # a marker that exists and cannot be opened as a file
+        os.utime(blocked, (old, old))
+        self.assertTrue(guard.review_running(blocked))
+
+    def test_a_killed_dispatcher_takes_its_reviewer_with_it(self):
+        # The dispatcher joins a kill-on-close job before it starts a reviewer, so killing it ends the reviewer too:
+        # otherwise the marker would go while a reviewer still read the tree.
+        if os.name != "nt":
+            self.skipTest("the job object is the Windows half; elsewhere the reviewer's process group is ended")
+        code = (
+            "import subprocess, sys, time\n"
+            f"sys.path.insert(0, {str(Path(__file__).resolve().parents[1] / 'lib')!r})\n"
+            "import win_job\nwin_job.end_children_with_this_process()\n"
+            "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'])\n"
+            "print(child.pid, flush=True); time.sleep(120)\n"
+        )
+        parent = subprocess.Popen([sys.executable, "-c", code], stdout=subprocess.PIPE)
+        try:
+            reviewer = int(parent.stdout.readline())
+            self.assertIsNotNone(guard.process_started(reviewer))
+        finally:
+            parent.kill()
+            parent.wait()
+            parent.stdout.close()
+        deadline = time.monotonic() + 10
+        while guard.process_started(reviewer) is not None and time.monotonic() < deadline:
+            time.sleep(0.1)
+        self.assertIsNone(guard.process_started(reviewer))
+
     def test_a_marker_left_by_a_killed_dispatcher_is_not_a_review_and_is_removed(self):
         # A real dispatcher process holds the marker, is killed without a chance to clean up, and its lock goes with it.
         code = (
@@ -399,7 +552,9 @@ class InFlight(unittest.TestCase):
             child.kill()
             child.wait()
             child.stdout.close()
-        self.assertEqual(len(list(self.folder.iterdir())), 1)
+        (marker,) = self.folder.iterdir()
+        old = time.time() - guard.REVIEW_SETTLE - 1
+        os.utime(marker, (old, old))
         self.assertEqual(guard.reviews_in_flight(self.folder), [])
         self.assertEqual(list(self.folder.iterdir()), [])
 

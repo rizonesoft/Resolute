@@ -19,10 +19,17 @@ class Background(unittest.TestCase):
         for flag in ("--check-pin", "--list-rounds --json"):
             self.assertIsNone(hook.check_command(f"python scripts/review-dispatch.py {flag}", background=False), flag)
 
+    def test_a_review_after_another_command_is_still_a_review(self):
+        for command in (f"git status; {REVIEW}", f"git status && {REVIEW}", f"git log -1\n{REVIEW}"):
+            self.assertIn("run_in_background", hook.check_command(command, background=False), command)
+
     def test_naming_the_dispatcher_in_a_message_or_a_file_being_written_is_not_a_review(self):
         for command in (
             'git commit -m "run review-dispatch.py in the background"',
             f"@'\nREVIEW = \"{REVIEW}\"\n'@ | Set-Content scripts/tests/x.py",
+            f"@'\n{REVIEW}\n'@ | Set-Content notes.txt",
+            f"@\"\n{REVIEW}\n\"@ | Set-Content notes.txt",
+            f"cat > notes.txt <<'EOF'\n{REVIEW}\nEOF",
             "Select-String -Path scripts/review-dispatch.py -Pattern astra",
         ):
             self.assertIsNone(hook.check_command(command, background=False), command)

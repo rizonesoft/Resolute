@@ -28,6 +28,7 @@ import shutil
 import subprocess
 import sys
 import time
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -258,17 +259,37 @@ def on_stop_failure(state: dict, data: dict) -> None:
         state["last_api_failure"] = f"{stamp()} {data.get('error') or 'unknown'}"
 
 
-def start(state: dict, session: str, mode: str | None, env: Env, launcher: dict | None = None) -> None:
-    """Switch the run on for `session`. `launcher` is the process that will restart it, as {"pid", "started"}."""
+def start(state: dict, session: str, mode: str | None, env: Env, launcher: dict | None = None, *,
+          restart: bool = False, open_ok: bool = False, launch: dict | None = None) -> None:
+    """Switch the run on for `session`, or refuse with the reason. This is the one admission for a session that is
+    about to write, taken under the state lock, so two starts cannot both pass it.
+
+    `launcher` is the process that will restart the session, as {"pid", "started"}. `restart` is the launcher
+    replacing a session that died: it only continues a run that is still active, so a stop given while it waited
+    stands. `open_ok` is the operator, at the keyboard, accepting the other sessions open in this clone; a restart
+    never has it. `launch` is what the session was started with (model, tools switched off, goal), kept so a session
+    the watchdog starts gets the same."""
+    if restart and not state.get("active"):
+        raise ValueError(f"the run is no longer active ({state.get('status') or 'inactive'}: {state.get('why') or 'no reason kept'}), so it was not restarted")
     owner = state.get("session_id")
     if state.get("active") and owner not in (None, session) and env.alive(owner):
         raise ValueError(f"session {owner} owns the active run and is alive; never run two writers on one tree")
     if state.get("active") and state.get("child") and env.child_alive(state["child"]):
         raise ValueError(f"the watchdog's resumed session {state['child'].get('pid')} is working on this run; never run two writers on one tree")
+    held = state.get("launcher")
+    if state.get("active") and held and held != launcher and env.child_alive(held):
+        raise ValueError(f"another launcher (process {held.get('pid')}) holds this run; never run two writers on one tree")
+    if env.reviewing():
+        raise ValueError("a review is in flight and a review runs alone; start again when it has returned")
+    others = [s for s in env.live_here() if s != session]
+    if others and not open_ok:
+        raise ValueError(f"Claude Code session(s) already open in this clone: {', '.join(others)}; never run two writers on one tree")
     if not state.get("active"):
         state.clear()
         state.update(active=True, status="active", started=stamp(), changed_at=time.time())
     state.update(session_id=session, permission_mode=mode)
+    if launch is not None:
+        state["launch"] = launch
     if launcher:
         state["launcher"] = launcher
     else:
@@ -312,6 +333,8 @@ def watch(state: dict, env: Env, now: float | None = None) -> str:
         end_run(state, "stalled", f"{MAX_RESTARTS} resumes changed nothing")
         return "stalled"
     child = env.spawn(state)  # a launch that fails raises and uses no attempt: nothing ran, so nothing was tried
+    if child.get("session_id"):  # a fresh session, started under an id of the guard's choosing: it owns the run now
+        state["session_id"] = child["session_id"]
     state.update(child=child, restarts=state.get("restarts", 0) + 1, launched_at=now, last_restart=stamp())
     return f"resumed, attempt {state['restarts']}"
 
@@ -450,17 +473,31 @@ def real_child_alive(child: dict) -> bool:
     return started is not None and started == child.get("started")
 
 
-def resume_command(state: dict, claude: str) -> list[str]:
+def wants_fresh(state: dict) -> bool:
     """The first attempt resumes the dead session with its context. An attempt after one that changed nothing starts
-    a fresh session instead, which the `process plan` prompt hands the run to: a session that cannot be resumed (no
-    transcript, or one another tool wrote) would otherwise fail the same way until the run stalled, as the run of
-    2026-11-09 did on a session id Claude Code had never seen."""
-    command = [claude, "-p", "process plan"]
-    if state.get("session_id") and not state.get("restarts"):
+    a fresh session instead: a session that cannot be resumed (no transcript, or one another tool wrote) would
+    otherwise fail the same way until the run stalled, as the run of 2026-11-09 did on a session id Claude Code had
+    never seen."""
+    return bool(state.get("restarts")) or not state.get("session_id")
+
+
+def resume_command(state: dict, claude: str, fresh: str | None = None) -> list[str]:
+    """The command for one resume. `fresh` is the id of a new session to start instead of resuming the old one. Either
+    way the session keeps what the launcher started the run with: its model, the tools switched off, and for a fresh
+    session the goal as its first prompt."""
+    launch = state.get("launch") or {}
+    command = [claude, "-p", (launch.get("goal") if fresh else None) or "process plan"]
+    if fresh:
+        command += ["--session-id", fresh]
+    elif state.get("session_id"):
         command += ["--resume", state["session_id"]]
     # The operator's own mode for this run and no wider, or a headless run has no one to answer its prompts.
     if state.get("permission_mode"):
         command += ["--permission-mode", state["permission_mode"]]
+    if launch.get("model"):
+        command += ["--model", launch["model"]]
+    if launch.get("disallowed"):
+        command += ["--disallowedTools", *launch["disallowed"]]  # a list option: it stays last
     return command
 
 
@@ -554,9 +591,10 @@ def real_spawn(state: dict) -> dict:
     output = STATE.with_name("resumed-session.log")
     flags = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
     env, how = sign_in(dict(os.environ))
+    fresh = str(uuid.uuid4()) if wants_fresh(state) else None
     with output.open("ab") as out:
-        child = subprocess.Popen(resume_command(state, claude), cwd=ROOT, env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=out, creationflags=flags)
-    return {"pid": child.pid, "started": process_started(child.pid), "sign_in": how}
+        child = subprocess.Popen(resume_command(state, claude, fresh), cwd=ROOT, env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=out, creationflags=flags)
+    return {"pid": child.pid, "started": process_started(child.pid), "sign_in": how, **({"session_id": fresh} if fresh else {})}
 
 
 def real_task_installed() -> bool:
@@ -568,9 +606,22 @@ def real_task_installed() -> bool:
 REVIEW_LOCK_AT = 1 << 30  # where a running dispatcher holds its lock: review-dispatch.py LOCK_AT, past the content
 
 
+REVIEW_SETTLE = 5  # seconds a new marker is taken as running unprobed, while its dispatcher takes its lock
+
+
 def review_running(marker: Path) -> bool:
     """A running dispatcher holds a lock on its marker and the operating system drops it when that process ends, so
-    a lock this can take means nobody is running that review. A marker that has gone is a review that ended."""
+    a lock this can take means nobody is running that review. A marker that has gone is a review that ended. One
+    just made is not probed: its dispatcher is between creating it and locking it, and a probe there would take the
+    lock from under it. One that cannot be opened is taken as running: waiting on a review that is not there costs a
+    tick, working beside one that is there costs the review."""
+    try:
+        if time.time() - marker.stat().st_mtime < REVIEW_SETTLE:
+            return True
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return True
     try:
         with marker.open("r+b") as handle:
             handle.seek(REVIEW_LOCK_AT)
@@ -589,6 +640,8 @@ def review_running(marker: Path) -> bool:
                 return True  # held: this is the answer, not an error
     except FileNotFoundError:
         return False
+    except OSError:
+        return True  # it exists and cannot be opened: see above
     return False
 
 
@@ -604,6 +657,60 @@ def reviews_in_flight(folder: Path = IN_FLIGHT) -> list[str]:
             except OSError:
                 continue  # a dispatcher opened it between the two lines above: the next look sees its lock
     return found
+
+
+def owner_quiet_minutes(state: dict, now: float | None = None, projects: Path | None = None) -> float | None:
+    """Minutes since the run's session last wrote to its transcript, which Claude Code appends to on every message and
+    tool call. A live session that has written nothing for a long time, with no review in flight, is not working: an
+    API failure before its heartbeat existed leaves exactly that, and only the process that started it can replace
+    it. None when the session has no transcript yet."""
+    if not state.get("session_id"):
+        return None
+    projects = projects or Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home() / ".claude") / "projects"
+    written = [p.stat().st_mtime for p in projects.glob(f"*/{state['session_id']}.jsonl")]
+    if not written:
+        return None
+    return round(((time.time() if now is None else now) - max(written)) / 60, 1)
+
+
+QUIET_LIMIT = 45  # minutes: a foreground tool call ends at ten, and the heartbeat writes every fifteen
+
+
+def owner_stuck(state: dict, env: Env, quiet: float | None, limit: float = QUIET_LIMIT) -> bool:
+    """A live session of an active run that is not working and is not waiting on a review. It is replaced, not
+    waited for: nothing inside it will wake it."""
+    return bool(state.get("active")) and quiet is not None and quiet >= limit and not env.reviewing()
+
+
+def owner_process(session: str | None) -> int | None:
+    for record in session_records():
+        if session and record.get("sessionId") == session:
+            return int(record["pid"])
+    return None
+
+
+def replace_stuck(state: dict, env: Env, started: float, now: float | None = None, kill: Callable[[int], None] | None = None,
+                  process: Callable[[str | None], int | None] = owner_process) -> str:
+    """One look by the launcher at the session it started at `started`. Ends the session's process tree when it is
+    stuck, so the launcher's own restart starts a new one; says what it found either way."""
+    now = time.time() if now is None else now
+    quiet = owner_quiet_minutes(state, now)
+    if quiet is None:
+        quiet = round((now - started) / 60, 1)  # no transcript at all: quiet since the launcher started it
+    if not owner_stuck(state, env, quiet):
+        return f"working (quiet {quiet} min)"
+    pid = process(state.get("session_id"))
+    if pid is None:
+        return f"quiet {quiet} min, and its process has already gone"
+    (kill or end_tree)(pid)
+    return f"replaced: session {state.get('session_id')} wrote nothing for {quiet} minutes, so process {pid} was ended"
+
+
+def end_tree(pid: int) -> None:
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/T", "/F", "/PID", str(pid)], capture_output=True, **hidden())
+    else:
+        os.kill(pid, 9)
 
 
 def real_reviewing() -> bool:
@@ -636,6 +743,7 @@ def health(state: dict, path: Path = STATE, env: Env = REAL, now: float | None =
         "heartbeat_current": heartbeat_current(state, now),
         "review_in_flight": env.reviewing(),
         "live_here": env.live_here(),  # every Claude Code session open in this clone, so a launcher can say who is writing
+        "owner_quiet_minutes": owner_quiet_minutes(state, now),
         "launcher_alive": bool(state.get("launcher")) and env.child_alive(state["launcher"]),
     }
 

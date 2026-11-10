@@ -7,6 +7,7 @@
   start --session <id>       switch the run on for a session (--launcher-pid names the process that restarts it)
   halt --ground G --reason R record a halt (data-loss, credentials, shared-infrastructure, wrong-calculation, operator)
   install | uninstall        add or remove the Windows scheduled task for `watch`
+  replace-stuck --started T  the launcher's look at its session: end one that has written nothing for 45 minutes
   cache-token                keep the sign-in token read from stdin, encrypted for this Windows account, for a resume
 """
 
@@ -68,6 +69,13 @@ def main() -> int:
     start.add_argument("--session", required=True)
     start.add_argument("--permission-mode")
     start.add_argument("--launcher-pid", type=int, help="the process that restarts this session when it dies, so `watch` leaves the run to it")
+    start.add_argument("--restart", action="store_true", help="replace a session that died: refused unless the run is still active")
+    start.add_argument("--open-ok", action="store_true", help="the operator accepted the other sessions open in this clone")
+    start.add_argument("--model", help="the session's model, kept for a session the watchdog starts")
+    start.add_argument("--disallowed", help="tools switched off for the session, comma-separated, kept the same way")
+    start.add_argument("--goal-file", help="a file holding the session's first prompt, kept the same way")
+    stuck = commands.add_parser("replace-stuck")
+    stuck.add_argument("--started", type=float, required=True, help="when the launcher started the session, as epoch seconds")
     stop = commands.add_parser("halt")
     stop.add_argument("--ground", required=True, choices=guard.GROUNDS)
     stop.add_argument("--reason", required=True)
@@ -105,6 +113,12 @@ def main() -> int:
         return 0
     if args.command == "watch":
         return watch()
+    if args.command == "replace-stuck":
+        result = guard.replace_stuck(guard.load(), guard.REAL, args.started)
+        if result.startswith("replaced"):
+            guard.log(f"launcher: {result}")
+        say(result)
+        return 0
     with guard.locked():
         state = guard.load()
         if args.command == "start":
@@ -114,8 +128,12 @@ def main() -> int:
                     launcher = {"pid": args.launcher_pid, "started": guard.process_started(args.launcher_pid)}
                     if launcher["started"] is None:
                         raise ValueError(f"launcher process {args.launcher_pid} is not running")
-                guard.start(state, args.session, args.permission_mode, guard.REAL, launcher)
-            except ValueError as error:
+                launch = None
+                if args.model or args.disallowed or args.goal_file:
+                    launch = {"model": args.model, "disallowed": [t for t in (args.disallowed or "").split(",") if t],
+                              "goal": Path(args.goal_file).read_text(encoding="utf-8").strip() if args.goal_file else None}
+                guard.start(state, args.session, args.permission_mode, guard.REAL, launcher, restart=args.restart, open_ok=args.open_ok, launch=launch)
+            except (ValueError, OSError) as error:
                 say(str(error))
                 return 1
         else:

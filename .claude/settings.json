@@ -3,7 +3,9 @@
     "resolute-tools": { "source": { "source": "directory", "path": "./tools/claude-plugins" } }
   },
   "enabledPlugins": {
-    "resolute-lsp@resolute-tools": true
+    "resolute-lsp@resolute-tools": true,
+    "pyright-lsp@claude-plugins-official": false,
+    "clangd-lsp@claude-plugins-official": false
   },
   "hooks": {
     "UserPromptSubmit": [

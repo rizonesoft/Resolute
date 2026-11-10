@@ -110,6 +110,8 @@ class Harness(unittest.TestCase):
         (self.repo / "scripts").mkdir(parents=True)
         (self.repo / ".conclave").mkdir()
         shutil.copy(SCRIPTS / "review-dispatch.py", self.repo / "scripts/review-dispatch.py")
+        (self.repo / "scripts/lib").mkdir(exist_ok=True)
+        shutil.copy(SCRIPTS / "lib" / "win_job.py", self.repo / "scripts/lib/win_job.py")
         (self.repo / ".conclave/reviewers.toml").write_text(FIXTURE_PIN, encoding="utf-8")
         self.bin = Path(self._tmp.name) / "bin"
         self.bin.mkdir()

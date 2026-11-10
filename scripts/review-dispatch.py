@@ -70,7 +70,9 @@ def in_flight(record, kind, folder=None):
         handle.seek(LOCK_AT)
         if os.name == "nt":
             import msvcrt
-            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            # LK_LOCK waits and retries for about ten seconds: the guard may be probing this very lock, for an
+            # instant, to learn whether the marker is live.
+            msvcrt.locking(handle.fileno(), msvcrt.LK_LOCK, 1)
         else:
             import fcntl
             fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -1013,6 +1015,11 @@ def main(argv=None):
         if args.writer_model:
             if not MODEL.fullmatch(args.writer_model):
                 raise Refused("invalid exact writer model")
+        # The reviewer and everything it starts end with this process, however it ends, so the marker below is true
+        # for the whole review: a dispatcher killed mid-review leaves no reviewer reading a tree the run then writes.
+        sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+        import win_job
+        win_job.end_children_with_this_process()
         with in_flight(args.record, args.kind):
             result = review(pin, args.writer, args.prompt, args.timeout, plan)
         if args.writer_model:

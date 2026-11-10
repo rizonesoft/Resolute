@@ -13,7 +13,7 @@ one on PATH because the tree targets MinGW-w64 with llvm-mingw's own headers: an
 ones. Both servers are bounded for a machine that runs several sessions: clangd indexes on 4 threads and keeps
 preambles on disk, and pyrightconfig.json limits pyright to the tracked script folders.
 
-On Windows this process puts itself in a kill-on-close job object before it starts the server, so the server and
+On Windows this process puts itself in a kill-on-close job object (scripts/lib/win_job.py) before it starts the server, so the server and
 anything it starts end when this process ends, however that happens. It also watches the process that started it
 (Claude Code) and ends itself when that one goes, because Windows does not end a child with its parent. So neither
 a killed launcher nor a killed session leaves a language server behind. Stdlib only.
@@ -29,9 +29,6 @@ import sys
 REPO = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 COMPILE_DB = os.path.join(REPO, "build", "debug")
 CLANGD = os.path.join(REPO, "reskit", "llvm-mingw", "bin", "clangd.exe")
-
-_JOB = None  # kept for the life of the process: closing this handle is what ends the server
-
 
 class LaunchError(Exception):
     """Why the server cannot start; printed to stderr, where Claude Code's plugin errors show it."""
@@ -53,39 +50,6 @@ def pyright() -> list[str]:
     if not server:
         raise LaunchError("pyright-langserver is not on PATH; install it with: npm install -g pyright")
     return [server, "--stdio"]
-
-
-def end_children_with_this_process() -> None:
-    """Join a kill-on-close job object. Every process started afterwards is born inside it, and Windows ends them all
-    when this process ends. Raises OSError when Windows refuses, so nothing is started outside a job."""
-    global _JOB
-    import ctypes
-    from ctypes import wintypes
-
-    class Basic(ctypes.Structure):
-        _fields_ = [("PerProcessUserTimeLimit", ctypes.c_longlong), ("PerJobUserTimeLimit", ctypes.c_longlong),
-                    ("LimitFlags", wintypes.DWORD), ("MinimumWorkingSetSize", ctypes.c_size_t),
-                    ("MaximumWorkingSetSize", ctypes.c_size_t), ("ActiveProcessLimit", wintypes.DWORD),
-                    ("Affinity", ctypes.c_size_t), ("PriorityClass", wintypes.DWORD), ("SchedulingClass", wintypes.DWORD)]
-
-    class Extended(ctypes.Structure):
-        _fields_ = [("Basic", Basic), ("IoInfo", ctypes.c_ulonglong * 6), ("ProcessMemoryLimit", ctypes.c_size_t),
-                    ("JobMemoryLimit", ctypes.c_size_t), ("PeakProcessMemoryUsed", ctypes.c_size_t),
-                    ("PeakJobMemoryUsed", ctypes.c_size_t)]
-
-    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
-    kernel.CreateJobObjectW.restype = wintypes.HANDLE
-    kernel.CreateJobObjectW.argtypes = (ctypes.c_void_p, wintypes.LPCWSTR)
-    kernel.SetInformationJobObject.argtypes = (wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD)
-    kernel.AssignProcessToJobObject.argtypes = (wintypes.HANDLE, wintypes.HANDLE)
-    kernel.GetCurrentProcess.restype = wintypes.HANDLE
-    info = Extended()
-    info.Basic.LimitFlags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
-    job = kernel.CreateJobObjectW(None, None)
-    if (not job or not kernel.SetInformationJobObject(job, 9, ctypes.byref(info), ctypes.sizeof(info))
-            or not kernel.AssignProcessToJobObject(job, kernel.GetCurrentProcess())):
-        raise OSError(f"could not join a kill-on-close job object (error {ctypes.get_last_error()})")
-    _JOB = job
 
 
 def end_with_parent() -> None:
@@ -133,7 +97,10 @@ def main(argv: list[str]) -> int:
     try:
         if os.name == "nt":
             end_with_parent()
-            end_children_with_this_process()
+            sys.path.insert(0, os.path.join(REPO, "scripts", "lib"))
+            import win_job
+
+            win_job.end_children_with_this_process()
         child = subprocess.Popen(servers[argv[0]](), cwd=REPO)
     except (LaunchError, OSError) as error:
         print(f"lsp-launch: {error}", file=sys.stderr)

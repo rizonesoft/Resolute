@@ -52,8 +52,13 @@ def deny(reason):
 
 
 # The dispatcher run as a command (an interpreter at the start of a command, then the script), not its name inside a
-# file being written or a message: a here-string that mentions it is not a review. The two read-only inspections
-# start no reviewer.
+# file being written: quoted blocks (a PowerShell here-string, a shell here-document) are taken out before the
+# command is read, so text that mentions a review is not one. Every command on the line is read, whatever the first
+# one is: a review that follows `git status;` is still a review. The two read-only inspections start no reviewer.
+QUOTED_BLOCK = re.compile(
+    r"@'.*?^'@|@\".*?^\"@|<<-?\s*(['\"]?)(\w+)\1.*?^\s*\2\s*$",
+    re.DOTALL | re.MULTILINE,
+)
 RUNS_A_REVIEW = re.compile(
     r"(?:^|[;&|()\n`]|&&|\|\|)\s*(?:&\s*)?"
     r"[\"']?(?:[^\s\"']*[/\\])?(?:python[\d.]*|py)(?:\.exe)?[\"']?\s+(?:-\S+\s+)*"
@@ -65,7 +70,7 @@ RUNS_A_REVIEW = re.compile(
 def check_command(command, repo=ROOT, background=True):
     """Return a refusal reason if `command` violates the dispatch rules, or None."""
     first = FIRST_WORD.match(command or "")
-    if not background and (first.group(1).lower() if first else "") != "git" and RUNS_A_REVIEW.search(command or ""):
+    if not background and RUNS_A_REVIEW.search(QUOTED_BLOCK.sub(" ", command or "")):
         return (
             "Run `review-dispatch.py` with the shell tool's `run_in_background` option: a review can take half an hour, "
             "a foreground command is stopped at ten minutes, and only a background command wakes this session when "

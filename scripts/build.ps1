@@ -42,6 +42,9 @@
 .PARAMETER All
     Build the launcher and every extension.
 
+.PARAMETER ResetMovedTrees
+    Remove the build trees a clone at another path made, and build nothing.
+
 .PARAMETER Config
     Debug or Release. Defaults to Release.
 
@@ -58,6 +61,9 @@ param(
 
     [Parameter(ParameterSetName = 'All', Mandatory = $true)]
     [switch]$All,
+
+    [Parameter(ParameterSetName = 'Reset', Mandatory = $true)]
+    [switch]$ResetMovedTrees,
 
     [ValidateSet('Debug', 'Release')]
     [string]$Config = 'Release'
@@ -324,6 +330,12 @@ function Build-Extension {
 }
 
 # ── Dispatch ─────────────────────────────────────────────────
+
+if ($ResetMovedTrees) {
+    # Only the cleanup, without the toolchain or a build: what a clone that has just moved runs to see what goes.
+    Reset-MovedBuildTrees
+    exit 0
+}
 
 Assert-Toolchain
 Reset-MovedBuildTrees

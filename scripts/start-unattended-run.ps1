@@ -151,6 +151,7 @@ if ($open.Count -gt 0) {
     Write-Host 'If one of them is still working here, close THIS window: two writers on one tree corrupt each other''s work.'
     if (-not $PrintOnly) { Read-Host 'Press Enter to start the run anyway' | Out-Null }
 }
+$openAccepted = $open.Count -gt 0
 
 # ── Sign-in ──────────────────────────────────────────────────
 # The token goes from 1Password into claude.exe's environment and nowhere else. 1Password may ask the operator to
@@ -185,11 +186,31 @@ function Read-ClaudeToken {
     }
 }
 
+# The copy an earlier start left for the watchdog (scripts/lib/run_guard.py TOKEN_CACHE), encrypted by Windows for
+# this account. It is the fallback here too: with 1Password locked and the stored login expired, it is the only way in.
+function Read-CachedToken {
+    $cache = Join-Path $env:LOCALAPPDATA 'Resolute\claude-token.dpapi'
+    if (-not (Test-Path -LiteralPath $cache)) { return $null }
+    try {
+        $plain = [System.Security.Cryptography.ProtectedData]::Unprotect([IO.File]::ReadAllBytes($cache), $null, 'CurrentUser')
+        $value = [Text.Encoding]::UTF8.GetString($plain).Trim()
+    } catch [System.Security.Cryptography.CryptographicException] {
+        Write-Warning 'The cached token could not be decrypted by this account; it is ignored.'
+        return $null
+    }
+    if ($value -cmatch '^sk-ant-oat[0-9]{2}-[A-Za-z0-9_-]{40,}$') { return $value }
+    return $null
+}
+
+$fromVault = $true
 $token = Read-ClaudeToken
-if ($token) {
+if (-not $token) { $fromVault = $false; $token = Read-CachedToken }
+if ($token -and $fromVault) {
     Write-Host 'Sign-in: the one-year token from 1Password.'
+} elseif ($token) {
+    Write-Warning "Sign-in: 1Password did not give the token, so the copy cached for this account is used. If the token was replaced in 1Password since, unlock 1Password and start again."
 } else {
-    Write-Warning "Sign-in: 1Password did not give the token ($tokenItem, vault $tokenVault); starting on the stored Claude Code login."
+    Write-Warning "Sign-in: neither 1Password ($tokenItem, vault $tokenVault) nor the cache gave the token; starting on the stored Claude Code login."
 }
 Write-Host "Model: $model, permission prompts off, questions off, goal of $($goal.Length) characters."
 
@@ -202,7 +223,7 @@ if ($PrintOnly) {
 
 # A copy for the watchdog, which resumes the run after a reboot when 1Password is locked and nobody is there to
 # unlock it: encrypted by Windows for this account (DPAPI), passed on stdin so it is never an argument.
-if ($token) {
+if ($token -and $fromVault) {
     $cached = $token | python scripts/run-guard.py cache-token
     if ($LASTEXITCODE -ne 0) { Write-Warning "The token was not cached for the watchdog ($cached): a run resumed after a reboot uses the stored login." }
 }
@@ -215,32 +236,70 @@ if ($LASTEXITCODE -ne 0) { Write-Warning 'The watchdog task could not be registe
 # ── The run, and its restarts ────────────────────────────────
 Write-Host ''
 Write-Host 'To stop: type stop in the session, or leave Claude Code with /exit. Closing this window counts as a crash and the watchdog resumes the run.' -ForegroundColor DarkGray
+# What the session is started with, kept by the guard so a session the watchdog starts gets the same.
+$goalFile = Join-Path $root '.git\run-guard\goal.txt'
+New-Item -ItemType Directory -Force -Path (Split-Path $goalFile) | Out-Null
+[IO.File]::WriteAllText($goalFile, $goal)
+
 $before = $env:CLAUDE_CODE_OAUTH_TOKEN
 $started = [System.Collections.Generic.List[datetime]]::new()
 $code = 0
+$watch = $null
 try {
     if ($token) { $env:CLAUDE_CODE_OAUTH_TOKEN = $token }
     $token = $null
     while ($true) {
+        $restart = $started.Count -gt 0
+        if ($restart) {
+            # The session that died may have left a review running, and a review runs alone.
+            $said = $false
+            while ((python scripts/run-guard.py status | Select-Object -Last 1 | ConvertFrom-Json).review_in_flight) {
+                if (-not $said) { Write-Host 'A review is still in flight; the new session starts when it has returned.' -ForegroundColor Yellow; $said = $true }
+                Start-Sleep -Seconds 30
+            }
+        }
         # A new session each time, named to the guard before it starts, so the Stop hook holds it from its first
-        # turn. The guard refuses when another live session owns the run: one tree takes one writer.
+        # turn. This is the one admission: the guard refuses when another session, another launcher or a review
+        # holds the tree, and it refuses a restart of a run that was stopped while this launcher waited.
         $session = [guid]::NewGuid().ToString()
-        $refusal = python scripts/run-guard.py start --session $session --permission-mode bypassPermissions --launcher-pid $PID
+        $admit = @('scripts/run-guard.py', 'start', '--session', $session, '--permission-mode', 'bypassPermissions',
+            '--launcher-pid', $PID, '--model', $model, '--disallowed', 'AskUserQuestion', '--goal-file', $goalFile)
+        if ($restart) { $admit += '--restart' } elseif ($openAccepted) { $admit += '--open-ok' }
+        $refusal = python @admit
         if ($LASTEXITCODE -ne 0) {
             Write-Host "Not started: $refusal" -ForegroundColor Red
             $code = 1
             break
         }
         $started.Add((Get-Date))
-        # --disallowedTools takes a list, so options follow it and the goal stays the last, positional argument.
-        & $claude --dangerously-skip-permissions --disallowedTools AskUserQuestion --session-id $session --model $model $goal
-        $code = $LASTEXITCODE
+        # A session that is alive but has written nothing for 45 minutes, with no review in flight, will not wake
+        # itself (an API failure before its heartbeat existed leaves exactly that). The guard ends it, and the loop
+        # below starts a new one.
+        $since = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+        $watch = Start-ThreadJob -ArgumentList $root, $since -ScriptBlock {
+            param($root, $since)
+            Set-Location -LiteralPath $root
+            while ($true) {
+                Start-Sleep -Seconds 300
+                python scripts/run-guard.py replace-stuck --started $since | Out-Null
+            }
+        }
+        try {
+            # --disallowedTools takes a list, so options follow it and the goal stays the last, positional argument.
+            & $claude --dangerously-skip-permissions --disallowedTools AskUserQuestion --session-id $session --model $model $goal
+            $code = $LASTEXITCODE
+        } finally {
+            Stop-Job $watch
+            Remove-Job $watch -Force
+            $watch = $null
+        }
 
         $status = @(python scripts/run-guard.py status)
         if ($status[0] -ne 'active') {
             Write-Host ''
             Write-Host "The run ended: $($status[0])." -ForegroundColor Cyan
-            if ($status.Count -gt 1) { Write-Host "  $($status[1])" -ForegroundColor DarkGray }
+            $why = if ($status.Count -gt 1) { ($status[1] | ConvertFrom-Json).why } else { $null }
+            if ($why) { Write-Host "  $why" -ForegroundColor DarkGray }
             Write-Host 'Run this shortcut to start it again.'
             break
         }
