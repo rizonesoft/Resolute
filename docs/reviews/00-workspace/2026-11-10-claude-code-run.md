@@ -102,3 +102,31 @@ OVERALL: needs-attention
 - Settled: round 1 P1 2, a launcher restart counts with the watchdog's resumes, and three in a row that change nothing end the run as stalled, however far apart they are
 - Settled: round 1 P2 3, the sign-in is fetched before the state lock and the decision to spawn is taken again under it, so a stop is never kept waiting behind 1Password
 - Settled: round 1 P2 4, an opening quote counts as a command position, so a review wrapped in `pwsh -Command "..."` or `bash -c '...'` needs the background option too
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-10T15:04:59Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: 2a7345735f5d66b6f6c22c6b3c3053b456c1b8fe
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 10
+- Digest: 3cfd78413fd2abe2
+
+## consistency: needs-attention
+
+1. **P2: Launcher cache errors bypass the credential fallback used by the watchdog.** `scripts/start-unattended-run.ps1:218-220` catches only `CryptographicException`. An unreadable cache raises `IOException` or `UnauthorizedAccessException` and terminates the launcher because `$ErrorActionPreference` is `Stop`. The sibling implementation at `scripts/lib/run_guard.py:593-598` handles these failures and continues with stored login.
+
+   Reproduce with 1Password unavailable and `%LOCALAPPDATA%\Resolute\claude-token.dpapi` temporarily held open with exclusive sharing, as can occur during backup or security scanning. Start the Desktop launcher: it exits before session admission despite a usable stored login. Handle cache read failures consistently with the watchdog, without exposing the contents.
+
+Source inspection only; tests were not run because they write files.
+
+HIGHEST: P2
+OVERALL: needs-attention
+
+- Settled: round 2 P2 1, the launcher treats any failure to read the token cache as no cache and goes on to the stored login, as the watchdog does; driven with the cache held open exclusively
