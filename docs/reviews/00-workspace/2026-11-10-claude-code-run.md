@@ -67,3 +67,38 @@ OVERALL: needs-attention
 - Settled: P2 8, the dispatcher's lock waits instead of failing when the guard is probing, a marker younger than five seconds is taken as running unprobed, and one that cannot be opened is taken as running instead of raising out of the hook
 - Settled: P2 9, the hook reads every command on the line whatever the first word is, and takes quoted blocks (here-strings, here-documents) out first (`test_a_review_after_another_command_is_still_a_review`)
 - Settled: P2 10, `scripts/tests/test_tooling.py`: the moved-clone cleanup keeps everything that is not a stale build tree or the fetched dependencies, four-at-a-time analysis gives the serial findings, log and refusal with units finishing out of order, and a killed session leaves no launcher or language server
+
+## Round 1: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-10T14:58:34Z
+- Effort: medium
+- Writer model: claude-fable-5-2
+- Policy: 2a7345735f5d66b6f6c22c6b3c3053b456c1b8fe
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 14
+- Digest: 150a38b0f9f34752
+
+## adversarial: needs-attention
+
+1. **P1: Prompt admission bypasses the launcher reservation.** `scripts/lib/run_guard.py:279` protects `start()`, but `on_prompt()` at line 192 still checks only whether the recorded session is alive. Reproduce by submitting `process plan` in another session after launcher admission but before its Claude process registers. The prompt hook replaces the reserved owner, then the launcher starts its already-admitted session: two writers are admitted. A read-only probe also confirmed that this route accepts ownership while `reviewing()` is true. Route prompt admission through the same ownership checks.
+
+2. **P1: Persistent startup failures cause unlimited restarts.** `scripts/start-unattended-run.ps1:306` limits only starts within the preceding hour. With an authentication or API failure that leaves each interactive session idle, `replace-stuck` kills it after 45 minutes and the launcher starts another. This cadence never reaches five starts per hour. The watchdog also returns early while the launcher lives, before enforcing its inactivity limit. Reproduce with an expired credential or sustained API failure before heartbeat creation and leave the shortcut running. The failure loop continues indefinitely. Bound consecutive restarts without progress across these longer intervals.
+
+3. **P2: Credential lookup holds the state lock longer than a stop can wait.** `scripts/lib/run_guard.py:756` holds the lock through `watch()` and `real_spawn()`, including the new 1Password lookup, which permits 60 seconds. Lock acquisition times out after five seconds. Reproduce after reboot with 1Password locked: while the watchdog waits for authorization, run `pwsh scripts/start-unattended-run.ps1 -Stop`. The halt can time out without recording the stop, and the watchdog subsequently launches Claude. Fetch credentials outside the lock, then reacquire it and revalidate admission before spawning.
+
+4. **P2: Shell-wrapped foreground reviews evade detection.** `scripts/dispatch_hook.py:63` recognizes a directly invoked Python interpreter but misses the ordinary Windows invocation `pwsh -NoProfile -Command "python scripts/review-dispatch.py ..."` submitted through Bash without `run_in_background`. A read-only regex probe confirmed that the direct invocation matches and the wrapped invocation does not. Consequently, a long review can run foreground and be terminated by the shell timeout. Inspect supported shell wrappers or enforce this requirement at a boundary that receives the actual dispatcher invocation.
+
+Verification used source inspection and read-only probes. The full test suites were not run because they create files.
+
+HIGHEST: P1
+OVERALL: needs-attention
+
+- Settled: round 1 P1 1, the `process plan` prompt goes through the same admission as `start` (`admission_refusal`): it cannot take a run a live launcher reserved, the watchdog resumed, or a review is reading
+- Settled: round 1 P1 2, a launcher restart counts with the watchdog's resumes, and three in a row that change nothing end the run as stalled, however far apart they are
+- Settled: round 1 P2 3, the sign-in is fetched before the state lock and the decision to spawn is taken again under it, so a stop is never kept waiting behind 1Password
+- Settled: round 1 P2 4, an opening quote counts as a command position, so a review wrapped in `pwsh -Command "..."` or `bash -c '...'` needs the background option too
