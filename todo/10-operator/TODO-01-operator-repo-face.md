@@ -13,7 +13,7 @@ track: N0
 > **Goal:** The repository's GitHub face is complete and human-verified: the About bar, topics, and social preview are set, branch protection guards the real checks, a cold reader has run the quick start verbatim, and a demo clip shows the app moving. Every click leaves proof in the repo.
 
 > [!IMPORTANT]
-> **Current state:** The repo lives at `https://github.com/rizonesoft/Resolute` on the `master` branch. The agent half of the face lands in `D00 T05`: screenshots, the full-structure README, and the setup-path CI lane. Nothing in this file can start until its `D00 T05` dependency ships, and nothing in it runs under an agent runner. Proof screenshots land under `docs/captures/setup-proof/`, the repo's standing capture directory.
+> **Current state:** The repo lives at `https://github.com/rizonesoft/Resolute` on the `main` branch (renamed from `master` on 2026-11-10). The agent half of the face lands in `D00 T05`: screenshots, the full-structure README, and the setup-path CI lane. Nothing in this file can start until its `D00 T05` dependency ships, and nothing in it runs under an agent runner. Proof screenshots land under `docs/captures/setup-proof/`, the repo's standing capture directory.
 
 <!-- claim: exists .github/workflows/plan.yml -->
 
@@ -65,14 +65,14 @@ The repo face quotes the README: the description is the `D00 T05 §2` one-liner,
 
 > **OPERATOR-ONLY:** no agent runner takes this row; the operator works it from this file with the click paths below, starting from `https://github.com/rizonesoft/Resolute`.
 
-The `master` branch requires the real checks before merge, with force-push blocked. Check names are collected from a live Actions run, never guessed, because a guessed name guards nothing. Proof is the rule screenshot since rules are not public.
+The `main` branch requires the real checks before merge, with force-push blocked. Check names are collected from a live Actions run, never guessed, because a guessed name guards nothing. Proof is the rule screenshot since rules are not public.
 
 - [ ] Collect the check names from a live run. Done when: from Actions, the latest setup-path run's check names are recorded exactly as shown, and the plan-gates names beside them.
-- [ ] Set the rule requiring pull requests plus the checks. Done when: from Settings, Branches, Add rule for `master`, require-a-pull-request is on and every collected check name is required, with no guessed name in the list. Cheaper substitute that fails the checkpoint: typing check names from memory, which silently guards a check that never runs.
+- [ ] Set the rule requiring pull requests plus the checks. Done when: from Settings, Branches, Add rule for `main`, require-a-pull-request is on and every collected check name is required, with no guessed name in the list. Cheaper substitute that fails the checkpoint: typing check names from memory, which silently guards a check that never runs.
 - [ ] Block force-push and prove the rule. Done when: force-push is blocked on the rule, and a screenshot of the finished rule lands under `docs/captures/setup-proof/`.
 - [ ] Commit: `"docs: branch protection rule proof"`
 
-**Test checkpoint:** The rule screenshot shows `master`, the required checks matching the live-run names exactly, and force-push blocked. Cheaper substitute that fails the checkpoint: a rule whose names were guessed, which passes review and protects nothing.
+**Test checkpoint:** The rule screenshot shows `main`, the required checks matching the live-run names exactly, and force-push blocked. Cheaper substitute that fails the checkpoint: a rule whose names were guessed, which passes review and protects nothing.
 
 -> XREF: D00 T05 §3 -- the workflow this rule guards
 

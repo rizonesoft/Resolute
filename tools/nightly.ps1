@@ -31,7 +31,7 @@ param(
     [int]$IdleMinutes = 10,
     [switch]$Register,
     [switch]$Unregister,
-    # Test hook: run the halves against this commit instead of master's head.
+    # Test hook: run the halves against this commit instead of main's head.
     [string]$Commit = ''
 )
 
@@ -197,10 +197,10 @@ function Count-Line([System.Collections.IDictionary]$r, [string]$log) {
     return "passed $passed, failed $failed, skipped-with-reason $skipped, focus violations $violations"
 }
 
-$head = if ($Commit) { $Commit } else { (& git -C $Root rev-parse master).Trim() }
+$head = if ($Commit) { $Commit } else { (& git -C $Root rev-parse main).Trim() }
 Note "# Nightly report $Id"
 Note ''
-Note "mode $Mode; master $head; started $($now.ToString('yyyy-MM-dd HH:mm:ss')); idle ${idle}s; session $(if ($unlocked) { 'unlocked' } else { 'LOCKED' })"
+Note "mode $Mode; main $head; started $($now.ToString('yyyy-MM-dd HH:mm:ss')); idle ${idle}s; session $(if ($unlocked) { 'unlocked' } else { 'LOCKED' })"
 Note "probe: $([NightProbe]::Monitors())"
 Note ''
 $failures = [System.Collections.Generic.List[string]]::new()

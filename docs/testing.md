@@ -80,7 +80,7 @@ D00 T02 §11. `tools/nightly.ps1` is the one governed run of the whole suite: th
 
 | When | Mode | Runs |
 | --- | --- | --- |
-| 02:00 to 06:50 local | Night | both halves at master's head, then the debt |
+| 02:00 to 06:50 local | Night | both halves at main's head, then the debt |
 | otherwise, unlocked and idle 10 minutes | Collect | the debt only, each fenced case standing down on input |
 | otherwise | none | nothing; it exits |
 
@@ -91,8 +91,8 @@ D00 T02 §11. `tools/nightly.ps1` is the one governed run of the whole suite: th
 1. Takes `build/nightly/.lock` exclusively; a second run exits at once.
 2. Probes the session: lock state, idle time, and every monitor's size and DPI, read per-monitor aware (unaware, every DPI reads 96).
 3. Builds each commit it tests in its own git worktree under `build/nightly/wt/<sha>/`, with the toolchain linked in. It never builds in, or writes to, the working tree the writer uses; everything it writes is ignored scratch under `build/nightly/`.
-4. Default half: `ctest --preset debug -V` at master's head. Green means every test passed and every census is clean.
-5. Fenced half: `ctest --preset headful -V` at master's head, skipped as a whole when the session is locked (a locked desktop cannot show windows; the skip is logged and the run goes on). Green means every case passed on its declared monitor and DPI, or skipped with a reason: outside the window, operator input, or `hardware absent` when a declared DPI has no monitor.
+4. Default half: `ctest --preset debug -V` at main's head. Green means every test passed and every census is clean.
+5. Fenced half: `ctest --preset headful -V` at main's head, skipped as a whole when the session is locked (a locked desktop cannot show windows; the skip is logged and the run goes on). Green means every case passed on its declared monitor and DPI, or skipped with a reason: outside the window, operator input, or `hardware absent` when a declared DPI has no monitor.
 6. Debt: `python scripts/todo-graph.py query night-debt --json`, then each owed case run at the candidate it was reviewed at, in that candidate's worktree.
 7. Writes the report.
 
@@ -139,7 +139,7 @@ Each run has a unique id, `YYYYMMDD-HHMMSS`, and its own directory: `build/night
 ```
 # Nightly report 20260927-020500
 
-mode Night; master 74dba449...; started 2026-09-27 02:05:00; idle 13200s; session unlocked
+mode Night; main 74dba449...; started 2026-09-27 02:05:00; idle 13200s; session unlocked
 probe: monitor \.\DISPLAY1 2560x1440 dpi 144 primary; monitor \.\DISPLAY2 1920x1080 dpi 96
 
 ## Halves at 74dba4493a2b
