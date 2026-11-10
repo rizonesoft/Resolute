@@ -1,0 +1,7 @@
+{
+  "include": ["scripts"],
+  "exclude": ["**/__pycache__", "build", "reskit", "resolute_au3", "samples"],
+  "extraPaths": ["scripts", "scripts/lib"],
+  "pythonPlatform": "Windows",
+  "typeCheckingMode": "standard"
+}

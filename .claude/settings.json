@@ -1,4 +1,10 @@
 {
+  "extraKnownMarketplaces": {
+    "resolute-tools": { "source": { "source": "directory", "path": "./tools/claude-plugins" } }
+  },
+  "enabledPlugins": {
+    "resolute-lsp@resolute-tools": true
+  },
   "hooks": {
     "UserPromptSubmit": [
       { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/scripts/run-guard.py\" hook", "timeout": 40 } ] }

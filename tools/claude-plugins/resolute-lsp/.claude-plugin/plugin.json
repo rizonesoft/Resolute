@@ -1,0 +1,6 @@
+{
+  "name": "resolute-lsp",
+  "version": "1.0.0",
+  "description": "Language servers for the Resolute tree: the pinned clangd for C++, pyright for the Python tooling.",
+  "author": { "name": "Rizonesoft" }
+}

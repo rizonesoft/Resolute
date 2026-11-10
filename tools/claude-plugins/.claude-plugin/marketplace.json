@@ -1,0 +1,12 @@
+{
+  "name": "resolute-tools",
+  "owner": { "name": "Rizonesoft" },
+  "description": "Claude Code plugins this repository ships for its own sessions.",
+  "plugins": [
+    {
+      "name": "resolute-lsp",
+      "source": "./resolute-lsp",
+      "description": "Language servers for the Resolute tree: the pinned clangd for C++, pyright for the Python tooling."
+    }
+  ]
+}
