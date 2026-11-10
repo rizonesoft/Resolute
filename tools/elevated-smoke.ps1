@@ -118,7 +118,7 @@ function Get-ExpectedAction([string]$Base) {
         "`$pinned = @{}; foreach (`$line in Get-Content '$HashFile') { if (`$line -match '^([0-9A-Fa-f]{64})  (.+)$') { `$pinned[`$Matches[2]] = `$Matches[1].ToUpper() } }; " +
         "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$h = (Get-FileHash -Algorithm SHA256 -Path (Join-Path '$Base' `$rel)).Hash; if (`$pinned[`$rel] -ne `$h) { Set-Content -Path '$envFile' -Value 'refused: driver changed since registration'; exit 2 } }; " +
         "`$snap = '$SnapshotDir'; New-Item -ItemType Directory -Force -Path `$snap | Out-Null; " +
-        "foreach (`$rel in @('scripts\\smoke-run.py','scripts\\conformance-check.py')) { `$leaf = Split-Path `$rel -Leaf; Copy-Item -Path (Join-Path '$Base' `$rel) -Destination (Join-Path `$snap `$leaf) -Force; `$h2 = (Get-FileHash -Algorithm SHA256 -Path (Join-Path `$snap `$leaf)).Hash; if (`$pinned[`$rel] -ne `$h2) { Set-Content -Path '$envFile' -Value 'refused: snapshot hash mismatch'; exit 2 } }; " +
+        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$leaf = Split-Path `$rel -Leaf; Copy-Item -Path (Join-Path '$Base' `$rel) -Destination (Join-Path `$snap `$leaf) -Force; `$h2 = (Get-FileHash -Algorithm SHA256 -Path (Join-Path `$snap `$leaf)).Hash; if (`$pinned[`$rel] -ne `$h2) { Set-Content -Path '$envFile' -Value 'refused: snapshot hash mismatch'; exit 2 } }; " +
         "`$env:RESOLUTE_SMOKE_ROOT = '$Base'; `$env:RESOLUTE_IDLE_COLLECT = '1'; & '$python' -I (Join-Path `$snap 'smoke-run.py'); exit `$LASTEXITCODE"
     return @{
         Execute = 'powershell.exe'
