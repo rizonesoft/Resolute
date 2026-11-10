@@ -156,3 +156,77 @@ HIGHEST: P3
 OVERALL: needs-attention
 
 - Settled: round 3 P3 1, the killed-dispatcher test ages the marker while its holder is alive and requires it to still count, so the lock probe itself is exercised (a probe changed to always report unlocked now fails it)
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-10T15:10:04Z
+- Candidate: c46d87de9e286fc592617560e6b9384edca4d2e0
+- Effort: medium
+- Writer model: claude-fable-5-2
+- Policy: 2a7345735f5d66b6f6c22c6b3c3053b456c1b8fe
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 53
+- Digest: 53902afba9599171
+
+Not complete for the operator: stopping, recovery after watchdog takeover, and elevated-test readiness still have gaps.
+
+Read-only review of the specified range, which contains 12 commits. No files changed. I ran in-memory probes; I did not run the supplied suites because they create files. The accepted signed-in-session requirement is not reopened.
+
+**Part 1: completeness**
+
+1. **present: Desktop shortcut and launcher.** Installation, clone-relative paths and launch instructions exist at `scripts/start-unattended-run.ps1:63`; operator documentation is at `AGENTS.md:160`.
+
+2. **present: Sign-in and encrypted fallback.** Vault lookup and cache fallback are at `scripts/start-unattended-run.ps1:182` and `:214`; watchdog credential selection and atomic encrypted-cache replacement are at `scripts/lib/run_guard.py:582` and `:601`. Documented at `AGENTS.md:166`.
+
+3. **present: One-writer admission.** Launcher admission runs under the state lock at `scripts/run-guard.py:124`; shared admission checks are at `scripts/lib/run_guard.py:302`. The admission tests cover competing launchers, watchdog ownership, reviews and restart conflicts. Documented at `AGENTS.md:162`.
+
+4. **present: Review waiting and reviewer lifetime.** Locked markers are implemented at `scripts/review-dispatch.py:62`; guard interpretation is at `scripts/lib/run_guard.py:642`. Stop-hook waiting is at `:223`. The killed-dispatcher test covers child termination and aged-marker lock contention. The process-plan skill documents waiting for notification.
+
+5. **present: Launcher restart and idle-session replacement.** The monitoring job invokes `replace-stuck` at `scripts/start-unattended-run.ps1:305`; restart accounting and stopped-run refusal are at `scripts/lib/run_guard.py:267`. Documented at `AGENTS.md:161` and `:165`.
+
+6. **present: Watchdog installation and dead-session resume.** Task installation is at `scripts/run-guard.py:34`; resume/fresh-session command construction is at `scripts/lib/run_guard.py:508`. Its accepted Windows sign-in boundary is documented at `AGENTS.md:163`.
+
+7. **missing-in-scope: Recovery of a hung watchdog-owned session.** `scripts/lib/run_guard.py:339` marks it stalled after three hours and explicitly leaves it running. Unlike launcher-owned sessions, it receives no replacement. An in-memory probe confirmed this terminal state. The test `test_a_hung_resumed_session_is_reported_and_left_alone` codifies the limitation. The earlier fix for launcher-owned hangs does not cover this path.
+
+8. **present: Stop intent prevents subsequent restarts.** `scripts/start-unattended-run.ps1:81` records the external halt; `scripts/lib/run_guard.py:277` refuses automatic restart of an inactive run. Normal exit and typed stop are handled at `:325` and `:179`.
+
+9. **missing-in-scope: External stop reaches the active writer.** `halt()` only changes state at `scripts/lib/run_guard.py:368`. It neither signals the writer nor supplies it a stop instruction. `scripts/run-guard.py:151` promises a resumed session “will stop at the end of its turn”, but the inactive Stop hook merely stops enforcing continuation. A running goal can continue working before that boundary. The operator needs an acknowledged stop, not just disabled recovery.
+
+10. **missing-in-scope: Elevated-test readiness before walking away.** `scripts/start-unattended-run.ps1:148` checks only whether task arguments contain the clone path. A task registered before a driver change passes this check and prints readiness, although `tools/elevated-smoke.ps1:355` subsequently refuses its stale hashes. Check the definition and pinned hashes while the operator can still consent. This concerns changes already present at launch, not the accepted limitation on driver changes during the run.
+
+11. **present: Language servers and setup documentation.** Configuration is in `tools/claude-plugins/resolute-lsp/.lsp.json:1`; startup and lifetime control are at `scripts/lsp-launch.py:37` and `:55`. Prerequisites and diagnostic limitations are documented in `tools/claude-plugins/README.md:17`. Lifecycle tests exist at `scripts/tests/test_tooling.py:182`.
+
+12. **present: Fetching delegate and operating contract.** `.claude/agents/delegate-facts.md:1` defines its model, tools and evidence contract; `docs/replays/2026-11-10-delegate-facts-replay.md:7` records the replay. Routing is documented at `AGENTS.md:152`.
+
+13. **present: Build recovery and parallel analysis.** Moved-tree cleanup is implemented at `scripts/build.ps1:171`, with preservation tests at `scripts/tests/test_tooling.py:61`. Serial/parallel findings, logs and refusal ordering are compared by tests at `:141` and `:151`.
+
+**Part 2: excellence**
+
+1. **in-scope: Recovery becomes slower and less capable after watchdog takeover.** The operator goes from 45-minute idle replacement to a three-hour wait followed by abandonment of a live child. **Target:** apply equivalent idle detection and bounded replacement after takeover, within 55 minutes, while preserving review waiting and one-writer ownership.
+
+2. **in-scope: External stopping gives an unsupported assurance.** The command can report halted while the writer remains active. **Target:** one stop command delivers cancellation, reports acknowledgement or explicitly reports pending stop, and prevents further work after the next safe boundary.
+
+3. **in-scope: Elevated-test startup output overstates readiness.** A matching path is presented as sufficient preparation. **Target:** detect stale hashes or mismatched task definition before printing readiness, with renewal offered during that same attended launch.
+
+4. **in-scope: Harmless quoted commands are mistaken for foreground reviews.** An in-memory probe showed `echo "python scripts/review-dispatch.py --writer claude --prompt p.md"` matches `RUNS_A_REVIEW` at `scripts/dispatch_hook.py:64`. The shell-wrapper fix treats every opening quote as executable context. **Target:** allow ordinary quoted output while continuing to reject actual foreground dispatcher invocations, including supported shell wrappers.
+
+**Gap list**
+
+1. **missing-in-scope:** Replace hung watchdog-owned sessions instead of marking them stalled and leaving them running.
+2. **missing-in-scope:** Deliver and acknowledge external stop to the active writer.
+3. **missing-in-scope:** Verify elevated-task definition and pinned hashes before declaring launch readiness.
+4. **in-scope:** Match launcher recovery timing and bounded replacement after watchdog takeover.
+5. **in-scope:** Make stop output accurately distinguish requested, pending and acknowledged cessation.
+6. **in-scope:** Surface elevated-test repair while the operator is still present.
+7. **in-scope:** Distinguish quoted command text from executable review commands.
+
+COMPLETION: gaps
+
+- Settled: completion gaps 1 and 4, a session the watchdog resumed is held to the launcher's rule: silent for 45 minutes with no review in flight it is ended and the next tick starts another, on the same bounded count; one that works for three hours and changes nothing is ended with its run instead of left running
+- Settled: completion gaps 2 and 5, `-Stop` (`halt --end-session`) ends the session's process as well as halting the guard and says which; a plain `halt` says when the session is still running; driven against a real working session
+- Settled: completion gaps 3 and 6, `tools/elevated-smoke.ps1 -Check` answers whether `-Run` would be refused (task definition and pinned hashes), and the launcher asks it at start and offers the registration then
+- Settled: completion gap 7, a quoted string counts as commands only after a shell's command flag (`-Command`, `-c`, `/c`); `echo "..."` and a commit message are text
