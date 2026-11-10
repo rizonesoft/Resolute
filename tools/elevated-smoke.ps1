@@ -203,6 +203,7 @@ function Invoke-SelfTest {
             Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive' }
         }
         Check 'definition mismatch refused by name' ((Test-DefinitionMatch $bad $Root) -match 'arguments differ').Count -ge 1
+        Check 'action path keys match the pinned relative paths' ($expected.Argument.Contains("@('scripts\smoke-run.py','scripts\conformance-check.py')") -and -not $expected.Argument.Contains('scripts\\smoke-run.py'))
 
         # Report validation: fresh pass accepted; stale, non-pass, nonzero refused.
         $report = Join-Path $td 'smoke-report.md'
