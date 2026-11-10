@@ -630,7 +630,14 @@ class InFlight(unittest.TestCase):
         child = subprocess.Popen([sys.executable, "-c", code, self.dispatch.__file__, str(self.folder)], stdout=subprocess.PIPE)
         try:
             self.assertEqual(child.stdout.readline().strip(), b"held")
-            self.assertEqual(len(guard.reviews_in_flight(self.folder)), 1)
+            # Aged past its settling time while its holder lives, so what keeps it counted is the lock itself: with
+            # a probe that always found the lock free, this would read as no review and the marker would be removed.
+            (held,) = self.folder.iterdir()
+            old = time.time() - guard.REVIEW_SETTLE - 1
+            os.utime(held, (old, old))
+            self.assertTrue(guard.review_running(held))
+            self.assertEqual(guard.reviews_in_flight(self.folder), [held.name])
+            self.assertTrue(held.is_file())
         finally:
             child.kill()
             child.wait()
