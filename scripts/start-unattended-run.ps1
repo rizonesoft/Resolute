@@ -217,8 +217,11 @@ function Read-CachedToken {
     try {
         $plain = [System.Security.Cryptography.ProtectedData]::Unprotect([IO.File]::ReadAllBytes($cache), $null, 'CurrentUser')
         $value = [Text.Encoding]::UTF8.GetString($plain).Trim()
-    } catch [System.Security.Cryptography.CryptographicException] {
-        Write-Warning 'The cached token could not be decrypted by this account; it is ignored.'
+    } catch {
+        # Whatever the reason (held open by a backup or a scanner, no access, not this account's): a cache that
+        # cannot be read is the same as no cache, as it is for the watchdog (run_guard.cached_token), and the start
+        # goes on to the stored login. Only the kind of failure is said, never anything read.
+        Write-Warning "The cached token could not be read ($($_.Exception.GetType().Name)); it is ignored."
         return $null
     }
     if ($value -cmatch '^sk-ant-oat[0-9]{2}-[A-Za-z0-9_-]{40,}$') { return $value }
