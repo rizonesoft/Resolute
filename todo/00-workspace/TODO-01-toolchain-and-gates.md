@@ -51,7 +51,7 @@ track: W1
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
 |   8   |   §8    | Run the unit suite under release             | §5         |  [x]   |
 |   9   |   §9    | Remove the Linux execution surface         | §5         |  [x]   |
-|  10   |   §10   | CI runs the full gate set on every push      | §5         |  [ ]   |
+|  10   |   §10   | CI runs the full gate set on every push      | §5         |  [x]   |
 |  11   |   §11   | CI reader tests go through the real helpers  | §10        |  [ ]   |
 
 ---
@@ -935,6 +935,15 @@ No surface of its own: a workflow file, a reader script, and the working rules. 
 -> SOURCE: operator-2026-11-12-ci-does-the-heavy-lifting
 
 **Test checkpoint:** A push to `main` produces a green `gates` run whose log shows `check-all` exiting 0 with its gate summary quoted as printed (URL and wall time quoted, cache miss and cache hit); a `prove_red=true` dispatch ends failed at the tests gate with the gate's lines in the job summary and the logs artifact attached (URL quoted); `python scripts/ci-status.py --self-test` passes, a real `python scripts/ci-status.py` on the pushed commit prints its owed workflows green, and the same command on the commit that carries the red proof run still exits 0; `python scripts/todo-claims.py` holds with the claims above updated to the built state. All from real runs.
+
+> **Verified:** 2026-11-13 | §10 | `D00 T01 §10` at `82cd7898`: `gates` run 43316942527 on `fe8f4974` green with caches empty in 12 min 4 s and run 43319176589 on `e1c59621` green with caches hit in 7 min 41 s, each ending `check-all: 24 gate(s) ok`; red proof runs 43320546348 and 43323673228 (`gates (red proof)`) failed at "Run every gate" with `tests debug FAILED` and `tests release FAILED` on "CI red proof: this case fails on purpose", the summary step and the logs artifact both successful; `scripts/ci-gate-summary.ps1` on the first proof's kept output and logs printed the gate table and two labelled 80-line excerpts, and names a missing log; `python scripts/ci-status.py --self-test` 37 cases, 0 failed; real reads: `0f55ef53` green exit 0, `e3a5ac7b` (a commit that carried a parse error) `plan-gates: failure` with its log tail exit 1, the mid-push `cca26f23` "GitHub lists no push ending at ..." exit 3, `nosuchref` "is not a commit here" exit 3, and `e1c59621`, which also carries a red proof run, exit 0; `python scripts/ci-status.py --wait 900` on the final candidate `82cd7898`: `gates: success` (run 43326746586) and `plan-gates: success` (run 43326746341), exit 0; `validate` 0 fatal; `todo-claims.py` 119 hold; the three skill mirrors byte-identical and `verify-agent-tiers.py` valid
+> **Review:** round 2 astra (low), candidates `4f711a30`(round 1) `6c4cdc73`(round 2) -- `adversarial` needs-attention (1, P2, fixed in `6c4cdc73`) then `consistency` approve; repair record round 2 astra (low), candidates `32ade4dd`(round 1) `0f55ef53`(round 2) -- `adversarial` needs-attention (1, P2, fixed in `e3a5ac7b` and `0f55ef53`) then `consistency` approve; repair2 record round 3 astra (low), candidates `685d52a7`(round 1) `22c46652`(round 2) `98de93ee`(round 3) -- `adversarial` needs-attention (1, P2, fixed in `22c46652`), `consistency` needs-attention (1, P2, fixed in `98de93ee`), `quality` P3 (filed as `D00 T01 §11`); repair3 record round 1 astra (medium), candidate `82cd7898`(round 1) -- `adversarial` approve. Raw findings: docs/reviews/00-workspace/D00-T01-s10.md, D00-T01-s10-repair.md, D00-T01-s10-repair2.md, D00-T01-s10-repair3.md
+> **Completion:** astra (medium), candidate `6c4cdc73` -- COMPLETION: gaps (2 in-scope, implemented in `32ade4dd`). Repair records: D00-T01-s10-repair.md final candidate `0f55ef53`, gaps (2 in-scope, implemented in `685d52a7`); D00-T01-s10-repair2.md final candidate `98de93ee`, gaps (1 in-scope, implemented in `82cd7898`); D00-T01-s10-repair3.md final candidate `82cd7898`, COMPLETION: complete
+> **Plan review:** astra (medium) on `1608231a`, 4 gaps planned in `f58e2369`; repair on `f93d89c4`, 2 gaps planned in `cca26f23`; repair2 on `9bf730ea`, 1 gap planned in `6a2ded61`; repair3 on `54e9bd47`, no findings
+> **Deferred:** the failed-listing test substitutes a function that already raises, so it does not exercise `changed_paths()` itself -> XREF: §11 (item: "Exercise `changed_paths()` itself")
+> **CRUD:** not applicable (a workflow, a read-only reader and working rules; the reader writes nothing, and the runner's caches and artifacts are disposable)
+> **Duration:** 2026-11-12T22:06:00Z to 2026-11-12T23:18:39Z
+> **Implementer:** Claude Fable 5.2 (claude-fable-5-2)
 
 ## 11. CI Reader Tests Go Through the Real Helpers
 

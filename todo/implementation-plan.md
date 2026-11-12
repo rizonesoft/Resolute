@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **79 of 244 sections complete (32%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **80 of 244 sections complete (33%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -169,7 +169,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §5`  | Cover the inherited UI library                    |   7   |
 | [x] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
 | [x] | `D00 T01 §9`  | Remove the Linux execution surface                |   7   |
-| [ ] | `D00 T01 §10` | CI runs the full gate set on every push           |  11   |
+| [x] | `D00 T01 §10` | CI runs the full gate set on every push           |  11   |
 | [ ] | `D00 T01 §11` | CI reader tests go through the real helpers       |   2   |
 | [x] | `D00 T02 §6`  | Remove the tautological width check               |   3   |
 | [x] | `D00 T02 §7`  | Driven UI completion tests                        |   4   |
