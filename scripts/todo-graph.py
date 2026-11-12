@@ -897,16 +897,20 @@ def _discard(temp: Path | None) -> str:
     held after that is named, because a file left beside the plan that nobody was told about is a second defect."""
     if temp is None:
         return ""
-    for attempt in range(CLEANUP_TRIES):
-        try:
-            os.unlink(temp)
-            return ""
-        except FileNotFoundError:
-            return ""
-        except OSError as e:
-            error = e
-            if attempt + 1 < CLEANUP_TRIES:
-                time.sleep(CLEANUP_WAIT)
+    error: object = "the removal was interrupted"
+    try:
+        for attempt in range(CLEANUP_TRIES):
+            try:
+                os.unlink(temp)
+                return ""
+            except FileNotFoundError:
+                return ""
+            except OSError as e:
+                error = e
+                if attempt + 1 < CLEANUP_TRIES:
+                    time.sleep(CLEANUP_WAIT)
+    except KeyboardInterrupt:
+        pass  # Ctrl+C during the wait ends the tries, and the file is still named below
     return f"; the temporary file {temp} could not be removed ({error}) and is left behind: delete it"
 
 
@@ -1503,6 +1507,15 @@ def cmd_self_test(_args) -> int:
                       [True] if left else [False])
                 for f in leftovers:
                     f.unlink()
+            # Ctrl+C during the cleanup's wait still names the file it leaves.
+            before = stale_plan()
+            with mock.patch.object(os, "replace", refuse), mock.patch.object(os, "unlink", refuse), mock.patch.object(time, "sleep", interrupt):
+                code, said = sync_said()
+            leftovers = [f for f in root.iterdir() if f.is_file() and f.name != "implementation-plan.md"]
+            check("a cleanup interrupted in its wait still refuses, names the leftover and keeps the plan",
+                  (code, [f"the temporary file {f} could not be removed" in said for f in leftovers], PLAN.read_bytes() == before), (1, [True], True))
+            for f in leftovers:
+                f.unlink()
             # Ctrl+C is a refusal with its own exit code, and it says which side of the replace it landed on.
             real_replace = os.replace
 
