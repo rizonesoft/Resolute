@@ -163,6 +163,8 @@ def read(commit: str, gh, paths: list[str], filtered: dict[str, list[str]], say)
                     say("    " + line)
                 if not tail:
                     say("    (the failed log is empty: open the run)")
+            except BudgetSpent:
+                say("    the failed log was not read (the wait interval is over): open the run")  # the failure stands
             except CannotAsk as e:
                 say(f"    the failed log could not be read ({e}): open the run")
     return 1 if red else 2 if pending else 0
@@ -343,6 +345,21 @@ def self_test() -> int:
     box = [0.0]
     code = status("c0ffee", 0, gh=slow(box), paths=["src/a.cpp"], filtered=filtered, say=lambda line: None, clock=lambda: box[0])
     check("the same stall with no wait is gh failing to answer", code, 3)
+
+    # A failure already read stands when the wait runs out while its log is being fetched.
+    box = [0.0]
+
+    def list_then_stall(args, timeout):
+        if args[:2] == ["run", "view"]:
+            box[0] += timeout
+            raise TimedOut("gh run view did not answer")
+        return json.dumps([run(conclusion="failure")])
+
+    said_lines = []
+    code = status("c0ffee", 10, gh=list_then_stall, paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
+                  clock=lambda: box[0], sleep=lambda seconds: None)
+    check("a known failure is still red when the wait ends during its log", (code, "gates: failure" in "
+".join(said_lines)), (1, True))
 
     # What a commit owes comes from the workflow file in that commit, not from the working tree.
     then = "on:\n  push:\n    paths:\n      - 'scripts/**'\njobs:\n"
