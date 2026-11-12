@@ -401,7 +401,7 @@ python scripts/todo-graph.py plan --sync        # re-derive the checkboxes AND r
 python scripts/todo-graph.py plan --check       # fail if the boxes are stale
 python scripts/todo-graph.py resolve 'D03 T01 §3'   # ref -> file, section, deps, status
 python scripts/review-dispatch.py --check-pin   # validate .conclave/reviewers.toml (max medium effort)
-python scripts/run-guard.py status              # inspect the process-plan run guard, heartbeat, and watchdog
+python scripts/run-guard.py status              # inspect the process-plan run guard and its heartbeat
 ```
 
 The scripts are stdlib-only by design: no install step stands between a fresh clone and validating the plan. Use `python3` instead of `python` where that is what your shell has.

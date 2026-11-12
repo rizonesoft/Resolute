@@ -2,21 +2,20 @@
 """Keeps an unattended `process plan` run going; see scripts/lib/run_guard.py for the rules.
 
   hook                       one Claude Code hook event on stdin (.claude/settings.json)
-  watch                      one scheduled tick: resume a dead run, never beside a live session
-  status                     prints "active" or why not, then the detail
-  start --session <id>       switch the run on for a session (--launcher-pid names the process that restarts it)
+  status                     prints "active" or why not, then the detail; a run whose session is gone is recorded as ended
+  start --session <id>       switch the run on for a session (--launcher-pid names the launcher that is starting it)
+  session -- <command...>    run the session's CLI in this console, inside a job object that ends its whole tree with it
+  ended --session <id>       the launcher's word that its session ended: an active run is recorded as ended
   halt --ground G --reason R record a halt (data-loss, credentials, shared-infrastructure, wrong-calculation, operator)
-  install | uninstall        add or remove the Windows scheduled task for `watch`
-  replace-stuck --started T  the launcher's look at its session: end one that has written nothing for 45 minutes
-  cache-token                keep the sign-in token read from stdin, encrypted for this Windows account, for a resume
+  cache-token                keep the sign-in token read from stdin, encrypted for this Windows account, for a later start
+
+Nothing here starts or resumes a session that is dead: a run starts only when the operator starts it.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -27,55 +26,32 @@ import run_guard as guard  # noqa: E402
 
 
 def say(text: str) -> None:
-    if sys.stdout is not None:  # pythonw, as the scheduled task runs it, has no stdout
-        print(text)
-
-
-def install() -> int:
-    python = Path(sys.executable)
-    windowless = python.with_name("pythonw.exe")
-    runner = windowless if windowless.exists() else python
-    action = f'"{runner}" "{Path(__file__).resolve()}" watch'
-    done = subprocess.run(["schtasks", "/Create", "/F", "/TN", guard.TASK_NAME, "/SC", "MINUTE", "/MO", str(guard.WATCH_MINUTES), "/IT", "/TR", action], capture_output=True, text=True)
-    say((done.stdout or done.stderr).strip())
-    return done.returncode
-
-
-def uninstall() -> int:
-    done = subprocess.run(["schtasks", "/Delete", "/F", "/TN", guard.TASK_NAME], capture_output=True, text=True)
-    say((done.stdout or done.stderr).strip())
-    return done.returncode
-
-
-def watch() -> int:
-    try:
-        result = guard.watch_tick()
-    except Exception as error:
-        guard.log(f"watch failed: {error!r}")
-        guard.record_tick(repr(error), False)
-        return 1
-    guard.log(f"watch: {result}")
-    guard.record_tick(result, True)
-    say(result)
-    return 0
+    print(text)
 
 
 def main() -> int:
+    if sys.argv[1:2] == ["session"]:
+        # Everything after `session` is the session's own command line, passed on untouched.
+        command = sys.argv[3:] if sys.argv[2:3] == ["--"] else sys.argv[2:]
+        if not command:
+            say("session needs the command to run")
+            return 2
+        try:
+            return guard.run_session(command)
+        except OSError as error:
+            say(f"The session was not started: {error}")
+            return 1
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    for name in ("hook", "watch", "status", "install", "uninstall", "cache-token"):
+    for name in ("hook", "status", "cache-token"):
         commands.add_parser(name)
     start = commands.add_parser("start")
     start.add_argument("--session", required=True)
-    start.add_argument("--permission-mode")
-    start.add_argument("--launcher-pid", type=int, help="the process that restarts this session when it dies, so `watch` leaves the run to it")
-    start.add_argument("--restart", action="store_true", help="replace a session that died: refused unless the run is still active")
+    start.add_argument("--launcher-pid", type=int, help="the launcher that is starting this session and holds the run until it exists")
     start.add_argument("--open-ok", action="store_true", help="the operator accepted the other sessions open in this clone")
-    start.add_argument("--model", help="the session's model, kept for a session the watchdog starts")
-    start.add_argument("--disallowed", help="tools switched off for the session, comma-separated, kept the same way")
-    start.add_argument("--goal-file", help="a file holding the session's first prompt, kept the same way")
-    stuck = commands.add_parser("replace-stuck")
-    stuck.add_argument("--started", type=float, required=True, help="when the launcher started the session, as epoch seconds")
+    ended = commands.add_parser("ended")
+    ended.add_argument("--session", required=True)
+    ended.add_argument("--reason", required=True, help="how the session ended, in the launcher's words")
     stop = commands.add_parser("halt")
     stop.add_argument("--ground", required=True, choices=guard.GROUNDS)
     stop.add_argument("--reason", required=True)
@@ -101,48 +77,28 @@ def main() -> int:
             return 1
         say("cached")
         return 0
-    if args.command == "install":
-        return install()
-    if args.command == "uninstall":
-        return uninstall()
-
     if args.command == "status":
-        state = guard.load()
+        state = guard.look()
         say("active" if state.get("active") else (state.get("status") or "inactive"))
-        detail = {k: state.get(k) for k in ("session_id", "why", "started", "ended", "restarts", "yields", "last_restart", "last_error", "heartbeat_at", "last_api_failure") if state.get(k) is not None}
+        detail = {k: state.get(k) for k in ("session_id", "why", "started", "ended", "yields", "heartbeat_at", "last_api_failure") if state.get(k) is not None}
         say(json.dumps({**detail, **guard.health(state)}))
         return 0
-    if args.command == "watch":
-        return watch()
-    if args.command == "replace-stuck":
-        result = guard.replace_stuck(guard.load(), guard.REAL, args.started)
-        if result.startswith("replaced"):
-            guard.log(f"launcher: {result}")
-        say(result)
-        return 0
-    # The tree's signature is a slow read, taken before the lock like every other: only a restart needs it.
-    env = guard.snapshot(guard.REAL) if args.command == "start" and args.restart else guard.REAL
+
     with guard.locked():
         state = guard.load()
         if args.command == "start":
-            before = json.dumps(state, sort_keys=True)
             try:
                 launcher = None
                 if args.launcher_pid:
                     launcher = {"pid": args.launcher_pid, "started": guard.process_started(args.launcher_pid)}
                     if launcher["started"] is None:
                         raise ValueError(f"launcher process {args.launcher_pid} is not running")
-                launch = None
-                if args.model or args.disallowed or args.goal_file:
-                    launch = {"model": args.model, "disallowed": [t for t in (args.disallowed or "").split(",") if t],
-                              "goal": Path(args.goal_file).read_text(encoding="utf-8").strip() if args.goal_file else None}
-                guard.start(state, args.session, args.permission_mode, env, launcher, restart=args.restart, open_ok=args.open_ok, launch=launch)
+                guard.start(state, args.session, guard.REAL, launcher, open_ok=args.open_ok)
             except (ValueError, OSError) as error:
-                if json.dumps(state, sort_keys=True) != before:  # a refusal can itself end the run (stalled): keep that
-                    guard.save(state)
-                    guard.log(f"start refused: {state.get('status')} {state.get('why', '')}".rstrip())
                 say(str(error))
                 return 1
+        elif args.command == "ended":
+            guard.session_ended(state, args.session, args.reason)
         else:
             guard.halt(state, args.ground, args.reason)
         guard.save(state)
@@ -153,10 +109,9 @@ def main() -> int:
             ended = guard.end_sessions(state, guard.REAL)
             say(f"The session was ended (process {', '.join(map(str, ended))})." if ended else "No session of this run was found running.")
         else:
-            child = state.get("child")
-            working = [str(pid) for pid in (guard.owner_process(state.get("session_id")), child["pid"] if child and guard.real_child_alive(child) else None) if pid]
+            working = guard.owner_process(state.get("session_id"))
             if working:
-                say(f"The guard no longer holds the run open, but its session (process {', '.join(working)}) is still running and a session with a goal set keeps working. To end it: `run-guard.py halt --ground operator --reason <why> --end-session`.")
+                say(f"The guard no longer holds the run open, but its session (process {working}) is still running and a session with a goal set keeps working. To end it: `run-guard.py halt --ground operator --reason <why> --end-session`.")
     return 0
 
 

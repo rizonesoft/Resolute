@@ -11,6 +11,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
 
@@ -18,13 +19,12 @@ import run_guard as guard  # noqa: E402
 
 
 class World:
-    """Stands in for the machine: rows, the tree, sessions and what gets spawned."""
+    """Stands in for the machine: rows, the tree, sessions, the launcher and the processes ended."""
 
-    def __init__(self, rows=("D01 T02 §4",), signature="one", alive=(), live=(), child=False, reviewing=False):
-        self.rows, self.sig, self.live, self.child, self.reviewing = rows, signature, list(live), child, reviewing
+    def __init__(self, rows=("D01 T02 §4",), signature="one", alive=(), live=(), launcher=False, reviewing=False):
+        self.rows, self.sig, self.live, self.launcher, self.reviewing = rows, signature, list(live), launcher, reviewing
         self.alive = set(alive)
-        self.spawned = []
-        self.quiet, self.ended = None, []  # minutes since the session last wrote, and the processes ended
+        self.ended = []
 
     def env(self):
         return guard.Env(
@@ -32,12 +32,15 @@ class World:
             signature=lambda: self.sig,
             alive=lambda s: s in self.alive,
             live_here=lambda: self.live,
-            child_alive=lambda c: self.child,
-            spawn=lambda s: self.spawned.append(dict(s)) or {"pid": 1, "started": 2},
+            process_alive=lambda record: self.launcher,
             reviewing=lambda: self.reviewing,
-            quiet=lambda state, now: self.quiet,
             end=self.ended.append,
         )
+
+
+def no_window() -> int:
+    """The creation flag for a process a launcher test starts: no console window on Windows, nothing elsewhere."""
+    return subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
 
 
 def active(**extra):
@@ -50,18 +53,13 @@ class Prompts(unittest.TestCase):
             state = {}
             note = guard.on_prompt(state, {"prompt": prompt, "session_id": "me", "permission_mode": "acceptEdits"}, World().env())
             self.assertTrue(state.get("active"), prompt)
-            self.assertEqual(state["permission_mode"], "acceptEdits")
+            self.assertEqual(state["session_id"], "me")
             self.assertIn("CronCreate", note)
 
     def test_please_also_starts_it(self):
         state = {}
         guard.on_prompt(state, {"prompt": "please process the plan", "session_id": "me"}, World().env())
         self.assertTrue(state["active"])
-
-    def test_a_missing_watchdog_is_said_when_the_run_starts(self):
-        env = World().env()
-        env.task_installed = lambda: False
-        self.assertIn("run-guard.py install", guard.on_prompt({}, {"prompt": "process plan", "session_id": "me"}, env))
 
     def test_an_audit_a_named_phase_or_talk_about_the_plan_does_not(self):
         for prompt in ("process plan --audit", "process-plan 2", "why did process plan stop", "I see we stopped"):
@@ -100,10 +98,10 @@ class Prompts(unittest.TestCase):
         self.assertEqual(state["session_id"], "me")
 
     def test_a_session_can_take_a_run_whose_owner_died_and_keeps_its_counters(self):
-        state = active(restarts=2)
+        state = active(yields=2)
         guard.on_prompt(state, {"prompt": "process plan", "session_id": "new"}, World().env())
         self.assertEqual(state["session_id"], "new")
-        self.assertEqual(state["restarts"], 2)
+        self.assertEqual(state["yields"], 2)
 
 
 class Stops(unittest.TestCase):
@@ -187,22 +185,16 @@ class SessionEvents(unittest.TestCase):
     def test_start_will_not_take_a_live_run(self):
         state = active()
         with self.assertRaises(ValueError):
-            guard.start(state, "other", None, World(alive=["me"]).env())
+            guard.start(state, "other", World(alive=["me"]).env())
         self.assertEqual(state["session_id"], "me")
-        guard.start(state, "other", "acceptEdits", World().env())
-        self.assertEqual((state["session_id"], state["permission_mode"]), ("other", "acceptEdits"))
-
-    def test_start_will_not_take_a_run_the_watchdog_resumed(self):
-        state = active(child={"pid": 1, "started": 2})
-        with self.assertRaises(ValueError):
-            guard.start(state, "other", None, World(child=True).env())
-        self.assertEqual(state["session_id"], "me")
+        guard.start(state, "other", World().env())
+        self.assertEqual(state["session_id"], "other")
 
     def test_start_keeps_the_launcher_and_a_start_without_one_forgets_it(self):
         state = {}
-        guard.start(state, "me", "bypassPermissions", World().env(), {"pid": 7, "started": 8})
+        guard.start(state, "me", World().env(), {"pid": 7, "started": 8})
         self.assertEqual(state["launcher"], {"pid": 7, "started": 8})
-        guard.start(state, "me", "bypassPermissions", World().env())
+        guard.start(state, "me", World().env())
         self.assertNotIn("launcher", state)
 
     def test_a_review_in_flight_lets_the_turn_end_and_is_not_an_idle_attempt(self):
@@ -221,301 +213,180 @@ class SessionEvents(unittest.TestCase):
         self.assertNotIn("not armed", guard.on_stop(state, {"session_id": "me"}, World(signature="two").env()))
 
 
-class Watch(unittest.TestCase):
-    def test_nothing_starts_without_an_active_run(self):
-        world = World()
-        self.assertEqual(guard.watch({}, world.env()), "inactive")
-        self.assertEqual(world.spawned, [])
-
-    def test_never_beside_a_live_session_even_an_unrelated_one(self):
-        world = World(live=["someone"])
-        self.assertIn("someone", guard.watch(active(), world.env()))
-        self.assertEqual(world.spawned, [])
-
-    def test_never_beside_the_session_it_already_resumed(self):
-        world = World(child=True)
-        guard.watch(active(child={"pid": 1, "started": 2}), world.env())
-        self.assertEqual(world.spawned, [])
-
-    def test_never_while_the_launcher_that_restarts_the_session_is_alive(self):
-        world = World(child=True)
-        state = active(launcher={"pid": 7, "started": 8})
-        self.assertIn("launcher", guard.watch(state, world.env()))
-        self.assertEqual(world.spawned, [])
-        world.child = False
-        self.assertIn("attempt 1", guard.watch(state, world.env()))
-
-    def test_never_while_a_review_is_in_flight(self):
-        world = World(reviewing=True)
-        state = active()
-        self.assertEqual(guard.watch(state, world.env()), "review in flight")
-        self.assertEqual((world.spawned, state.get("restarts", 0)), ([], 0))
-
-    def test_a_dead_session_resumes_once_a_tick(self):
-        world, state = World(), active()
-        self.assertIn("attempt 1", guard.watch(state, world.env()))
-        self.assertEqual(len(world.spawned), 1)
-        self.assertEqual(state["child"], {"pid": 1, "started": 2})
-
-    def test_resumes_that_change_nothing_stall_and_progress_resets_them(self):
-        world, state = World(), active()
-        for _ in range(guard.MAX_RESTARTS):
-            guard.watch(state, world.env())
-        self.assertEqual(guard.watch(state, world.env()), "stalled")
-        self.assertEqual(len(world.spawned), guard.MAX_RESTARTS)
-        self.assertFalse(state["active"])
-        world, state = World(), active()
-        for turn in range(guard.MAX_RESTARTS * 3):
-            world.sig = str(turn)
-            guard.watch(state, world.env())
-        self.assertTrue(state["active"])
-
-    def test_a_plan_with_nothing_left_finishes_instead_of_resuming(self):
-        world, state = World(rows=()), active()
-        self.assertEqual(guard.watch(state, world.env()), "drained")
-        self.assertEqual(world.spawned, [])
-
-    def test_a_run_walked_away_from_expires_instead_of_resuming(self):
-        world, state = World(), active(restart_signature="one", changed_at=1000.0)
-        self.assertEqual(guard.watch(state, world.env(), now=1000.0 + guard.MAX_QUIET_HOURS * 3600), "expired")
-        self.assertEqual(world.spawned, [])
-        self.assertFalse(state["active"])
-
-    def test_a_change_keeps_a_run_from_expiring(self):
-        world, state = World(signature="two"), active(restart_signature="one", changed_at=1000.0)
-        self.assertIn("attempt 1", guard.watch(state, world.env(), now=1000.0 + guard.MAX_QUIET_HOURS * 3600))
-
-    def test_a_resumed_session_that_works_for_hours_and_changes_nothing_ends_with_its_run(self):
-        # It was once left running under a run called stalled: a writer nobody held and nobody would stop.
-        world, state = World(child=True), active(child={"pid": 7, "started": 2}, restart_signature="one", changed_at=1000.0)
-        world.quiet = 1  # still writing to its transcript, so it is not the silent case below
-        self.assertEqual(guard.watch(state, world.env(), now=1000.0 + guard.CHILD_HANG_HOURS * 3600), "stalled")
-        self.assertIn("was ended", state["why"])
-        self.assertEqual((world.ended, world.spawned), ([7], []))
-
-    def test_a_silent_resumed_session_is_ended_and_the_next_tick_starts_another(self):
-        world, state = World(child=True), active(child={"pid": 7, "started": 2}, restart_signature="one", restarts=1, launched_at=1000.0, changed_at=1000.0)
-        world.quiet = guard.QUIET_LIMIT - 1
-        self.assertEqual(guard.watch(state, world.env(), now=2000.0), "resumed session still running")
-        world.quiet = guard.QUIET_LIMIT
-        self.assertIn("was ended", guard.watch(state, world.env(), now=2000.0))
-        self.assertEqual((world.ended, "child" in state, state["active"]), ([7], False, True))
-        world.child = False  # it has gone
-        self.assertIn("attempt 2", guard.watch(state, world.env(), now=2600.0))
-
-    def test_a_resumed_session_waiting_on_a_review_is_not_silent(self):
-        world, state = World(child=True, reviewing=True), active(child={"pid": 7, "started": 2}, restart_signature="one", launched_at=1000.0, changed_at=1000.0)
-        world.quiet = 500
-        self.assertEqual(guard.watch(state, world.env(), now=2000.0), "resumed session still running")
-        self.assertEqual(world.ended, [])
-
-    def test_a_resumed_session_with_no_transcript_is_measured_from_its_start(self):
-        world, state = World(child=True), active(child={"pid": 7, "started": 2}, restart_signature="one", launched_at=1000.0, changed_at=1000.0)
-        self.assertEqual(guard.watch(state, world.env(), now=1000.0 + (guard.QUIET_LIMIT - 1) * 60), "resumed session still running")
-        self.assertIn("was ended", guard.watch(state, world.env(), now=1000.0 + guard.QUIET_LIMIT * 60))
-
-    def test_a_quiet_session_that_crashed_does_not_condemn_its_replacement(self):
-        world, state = World(), active(restart_signature="one", changed_at=1000.0)
-        launched = 1000.0 + guard.CHILD_HANG_HOURS * 3600 + 60
-        self.assertIn("attempt 1", guard.watch(state, world.env(), now=launched))
-        world.child = True
-        self.assertEqual(guard.watch(state, world.env(), now=launched + 600), "resumed session still running")
-        self.assertTrue(state["active"])
-        self.assertEqual(guard.watch(state, world.env(), now=launched + guard.CHILD_HANG_HOURS * 3600), "stalled")
-
-    def test_not_knowing_who_is_alive_starts_nothing(self):
-        world, state = World(), active()
-        env = world.env()
-
-        def unknown():
-            raise OSError("cannot tell")
-
-        env.live_here = unknown
-        with self.assertRaises(OSError):
-            guard.watch(state, env)
-        self.assertEqual(world.spawned, [])
-
-    def test_the_resume_uses_the_operators_own_mode_and_no_wider(self):
-        command = guard.resume_command(active(permission_mode="acceptEdits"), "claude")
-        self.assertEqual(command, ["claude", "-p", "process plan", "--resume", "me", "--permission-mode", "acceptEdits"])
-        self.assertNotIn("--permission-mode", guard.resume_command(active(), "claude"))
-        self.assertNotIn("--dangerously-skip-permissions", " ".join(command))
-
-    def test_a_resume_that_changed_nothing_is_followed_by_a_fresh_session(self):
-        self.assertFalse(guard.wants_fresh(active()))
-        self.assertTrue(guard.wants_fresh(active(restarts=1)))
-        self.assertTrue(guard.wants_fresh({"active": True}))
-        fresh = guard.resume_command(active(permission_mode="bypassPermissions", restarts=1), "claude", "new-id")
-        self.assertEqual(fresh, ["claude", "-p", "process plan", "--session-id", "new-id", "--permission-mode", "bypassPermissions"])
-
-    def test_a_fresh_session_owns_the_run_under_the_id_it_was_started_with(self):
-        world, state = World(), active(restarts=1)
-        env = world.env()
-        env.spawn = lambda s: {"pid": 1, "started": 2, "session_id": "new-id"}
-        guard.watch(state, env)
-        self.assertEqual(state["session_id"], "new-id")
-        self.assertIn("Do not stop", guard.on_stop(state, {"session_id": "new-id"}, world.env()))
-
-    def test_a_resumed_or_fresh_session_keeps_what_the_launcher_started_the_run_with(self):
-        launch = {"model": "claude-fable-5-2", "disallowed": ["AskUserQuestion"], "goal": "/goal finish the plan"}
-        state = active(permission_mode="bypassPermissions", launch=launch)
-        tail = ["--permission-mode", "bypassPermissions", "--model", "claude-fable-5-2", "--disallowedTools", "AskUserQuestion"]
-        self.assertEqual(guard.resume_command(state, "claude"), ["claude", "-p", "process plan", "--resume", "me", *tail])
-        self.assertEqual(guard.resume_command(state, "claude", "new-id"), ["claude", "-p", "/goal finish the plan", "--session-id", "new-id", *tail])
-
-
 class Admission(unittest.TestCase):
     """`start` is the one way a launcher's session gets to write."""
 
-    def test_a_stop_given_while_the_launcher_waited_is_not_undone_by_its_restart(self):
-        state = active()
-        guard.halt(state, "operator", "stopped from the launcher (-Stop)")
-        with self.assertRaises(ValueError) as refused:
-            guard.start(state, "next", "bypassPermissions", World().env(), {"pid": 7, "started": 8}, restart=True)
-        self.assertIn("no longer active", str(refused.exception))
-        self.assertEqual((state["status"], state["session_id"]), ("halted", "me"))
-        guard.start(state, "next", "bypassPermissions", World().env(), {"pid": 7, "started": 8})  # the operator starting again
-        self.assertTrue(state["active"])
-
-    def test_a_restart_continues_a_run_that_is_still_active(self):
-        state = active(restarts=1, restart_signature="one", launcher={"pid": 7, "started": 8})
-        guard.start(state, "next", "bypassPermissions", World(child=True).env(), {"pid": 7, "started": 8}, restart=True)
-        self.assertEqual((state["session_id"], state["restarts"]), ("next", 2))  # counted as an attempt, like the watchdog's
-
     def test_a_second_launcher_is_refused_while_the_first_is_alive(self):
         state = {}
-        guard.start(state, "one", None, World().env(), {"pid": 7, "started": 8})
+        guard.start(state, "one", World().env(), {"pid": 7, "started": 8})
         with self.assertRaises(ValueError) as refused:
-            guard.start(state, "two", None, World(child=True).env(), {"pid": 9, "started": 10})
+            guard.start(state, "two", World(launcher=True).env(), {"pid": 9, "started": 10})
         self.assertIn("a launcher (process 7) holds this run", str(refused.exception))
         self.assertEqual(state["session_id"], "one")
-        guard.start(state, "two", None, World().env(), {"pid": 9, "started": 10})  # the first launcher has gone
+        guard.start(state, "two", World().env(), {"pid": 9, "started": 10})  # the first launcher has gone
         self.assertEqual(state["launcher"], {"pid": 9, "started": 10})
 
     def test_a_review_in_flight_refuses_a_start(self):
         with self.assertRaises(ValueError) as refused:
-            guard.start({}, "me", None, World(reviewing=True).env())
+            guard.start({}, "me", World(reviewing=True).env())
         self.assertIn("review is in flight", str(refused.exception))
 
     def test_another_open_session_refuses_a_start_unless_the_operator_accepted_it(self):
         state = {}
         with self.assertRaises(ValueError) as refused:
-            guard.start(state, "me", None, World(live=["other"]).env())
+            guard.start(state, "me", World(live=["other"]).env())
         self.assertIn("other", str(refused.exception))
         self.assertEqual(state, {})
-        guard.start(state, "me", None, World(live=["other"]).env(), open_ok=True)
+        guard.start(state, "me", World(live=["other"]).env(), open_ok=True)
         self.assertTrue(state["active"])
-        with self.assertRaises(ValueError):  # a restart is nobody at the keyboard, so it never carries the acceptance
-            guard.start(state, "next", None, World(live=["other"]).env(), restart=True)
-        guard.start(state, "me", None, World(live=["me"]).env())  # the session itself is not another session
+        guard.start(state, "me", World(live=["me"]).env())  # the session itself is not another session
 
     def test_a_prompt_in_another_session_cannot_take_a_run_a_launcher_has_reserved(self):
         # The launcher has been admitted and its Claude process has not registered yet, so the owner is not "alive".
         state = {}
-        guard.start(state, "reserved", "bypassPermissions", World().env(), {"pid": 7, "started": 8})
-        world = World(child=True)  # the launcher is alive
+        guard.start(state, "reserved", World().env(), {"pid": 7, "started": 8})
+        world = World(launcher=True)  # the launcher is alive
         note = guard.on_prompt(state, {"prompt": "process plan", "session_id": "intruder"}, world.env())
         self.assertIn("launcher", note)
         self.assertEqual(state["session_id"], "reserved")
         self.assertIn("Unattended run guard is active", guard.on_prompt(state, {"prompt": "process plan", "session_id": "reserved"}, world.env()))
 
-    def test_a_prompt_cannot_take_a_run_while_a_review_is_in_flight_or_the_watchdogs_session_works(self):
-        for world, state, word in ((World(reviewing=True), active(), "review"), (World(child=True), active(child={"pid": 1, "started": 2}), "watchdog")):
-            note = guard.on_prompt(state, {"prompt": "process plan", "session_id": "intruder"}, world.env())
-            self.assertIn(word, note)
-            self.assertEqual(state["session_id"], "me")
+    def test_a_prompt_cannot_take_a_run_while_a_review_is_in_flight(self):
+        state = active()
+        note = guard.on_prompt(state, {"prompt": "process plan", "session_id": "intruder"}, World(reviewing=True).env())
+        self.assertIn("review", note)
+        self.assertEqual(state["session_id"], "me")
         fresh = {}
         self.assertIn("review", guard.on_prompt(fresh, {"prompt": "process plan", "session_id": "me"}, World(reviewing=True).env()))
         self.assertEqual(fresh, {})
 
-    def test_restarts_that_change_nothing_end_the_run_however_far_apart_they_are(self):
+
+class Gone(unittest.TestCase):
+    """A run starts only when the operator starts it: a session that dies ends its run, and nothing resumes it."""
+
+    def test_a_dead_session_is_recorded_as_ended_and_is_not_resumed(self):
+        world, state = World(), active(launcher={"pid": 7, "started": 8})  # the session and its launcher are both gone
+        self.assertTrue(guard.record_gone(state, world.env()))
+        self.assertEqual((state["active"], state["status"]), (False, "ended"))
+        self.assertIn("nothing resumes it", state["why"])
+        # Nothing is left that could carry the run on: the dead session coming back is not told to continue, its
+        # turns are not sent back, and the guard has no way to start a process of its own.
+        self.assertIsNone(guard.on_session_start(state, {"session_id": "me"}))
+        self.assertIsNone(guard.on_stop(state, {"session_id": "me"}, world.env()))
+        self.assertEqual(world.ended, [])
+        for name in ("watch", "watch_tick", "real_spawn", "resume_command", "replace_stuck"):
+            self.assertFalse(hasattr(guard, name), name)
+        self.assertNotIn("spawn", guard.Env.__dataclass_fields__)
+
+    def test_a_live_session_is_never_ended_however_quiet_it_is(self):
+        # A usage limit, a review or a long tool call all look like silence: only the session's death ends a run.
+        state = active(heartbeat_epoch=1.0, changed_at=1.0)
+        self.assertFalse(guard.record_gone(state, World(alive=["me"]).env()))
+        self.assertTrue(state["active"])
+
+    def test_a_run_its_launcher_still_holds_is_left_to_the_launcher(self):
+        # Between the admission and the session appearing in Claude Code's records the owner is not "alive" yet.
         state = {}
-        launcher = {"pid": 7, "started": 8}
-        guard.start(state, "s0", None, World().env(), launcher)
-        for attempt in range(1, guard.MAX_RESTARTS + 1):
-            guard.start(state, f"s{attempt}", None, World(child=True).env(), launcher, restart=True)
-            self.assertEqual(state["restarts"], attempt)
-        with self.assertRaises(ValueError) as refused:
-            guard.start(state, "one-too-many", None, World(child=True).env(), launcher, restart=True)
-        self.assertIn("stalled", str(refused.exception))
-        self.assertEqual((state["active"], state["status"]), (False, "stalled"))
+        guard.start(state, "reserved", World().env(), {"pid": 7, "started": 8})
+        self.assertFalse(guard.record_gone(state, World(launcher=True).env()))
+        self.assertTrue(state["active"])
 
-    def test_a_restart_after_progress_starts_the_count_again(self):
-        state = {}
-        launcher = {"pid": 7, "started": 8}
-        guard.start(state, "s0", None, World().env(), launcher)
-        for _ in range(guard.MAX_RESTARTS):
-            guard.start(state, "again", None, World(child=True).env(), launcher, restart=True)
-        guard.start(state, "after-work", None, World(child=True, signature="a commit landed").env(), launcher, restart=True)
-        self.assertEqual((state["active"], state["restarts"]), (True, 1))
+    def test_not_knowing_who_is_alive_ends_nothing(self):
+        env = World().env()
 
-    def test_what_the_session_was_started_with_is_kept(self):
-        state = {}
-        guard.start(state, "me", None, World().env(), launch={"model": "m", "disallowed": ["AskUserQuestion"], "goal": "g"})
-        guard.start(state, "next", None, World().env(), restart=True)
-        self.assertEqual(state["launch"], {"model": "m", "disallowed": ["AskUserQuestion"], "goal": "g"})
+        def unknown(_session):
+            raise OSError("cannot tell")
+
+        env.alive = unknown
+        state = active()
+        with self.assertRaises(OSError):
+            guard.record_gone(state, env)
+        self.assertTrue(state["active"])
+
+    def test_the_launcher_says_when_its_session_ended_and_an_earlier_ending_stands(self):
+        state = active()
+        guard.session_ended(state, "another", "its session ended (exit 1)")
+        self.assertTrue(state["active"])
+        guard.session_ended(state, "me", "its session ended (exit 1)")
+        self.assertEqual((state["active"], state["status"], state["why"]), (False, "ended", "its session ended (exit 1)"))
+        stopped = active()
+        guard.halt(stopped, "operator", "stopped from the launcher (-Stop)")
+        guard.session_ended(stopped, "me", "its session ended (exit 0)")
+        self.assertEqual(stopped["status"], "halted")
 
 
-class SlowSignIn(unittest.TestCase):
-    """The sign-in can take a minute. It is fetched before the lock, so a stop never waits behind it."""
+class CommandLine(unittest.TestCase):
+    """scripts/run-guard.py as the launcher and the heartbeat run it, against a state file of the test's own."""
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / "state.json"
-        self.path.write_text(json.dumps(active()), encoding="utf-8")
 
-    def env(self, world, prepare):
-        env = world.env()
-        env.spawn = lambda state, prepared=None: world.spawned.append(prepared) or {"pid": 1, "started": 2}
-        env.prepare = prepare
-        return env
+    def guard(self, *args):
+        script = Path(__file__).resolve().parents[1] / "run-guard.py"
+        return subprocess.run([sys.executable, str(script), *args], capture_output=True, text=True, timeout=120,
+                              env={**os.environ, "RUN_GUARD_STATE": str(self.path)}, creationflags=no_window())
 
-    def test_a_stop_gets_in_while_the_sign_in_is_fetched_and_then_nothing_is_started(self):
-        world = World()
+    def test_status_records_a_run_whose_session_is_gone_as_ended_and_says_so(self):
+        self.path.write_text(json.dumps(active(session_id="a-session-that-never-ran")), encoding="utf-8")
+        said = self.guard("status").stdout.splitlines()
+        self.assertEqual(said[0], "ended")
+        self.assertIn("nothing resumes it", json.loads(said[1])["why"])
+        state = guard.load(self.path)
+        self.assertEqual((state["active"], state["status"]), (False, "ended"))
+        self.assertEqual(self.guard("status").stdout.splitlines()[0], "ended")  # and it stays ended
 
-        def prepare():
-            with guard.locked(self.path, wait=1):  # the lock is free while this runs
-                state = guard.load(self.path)
-                guard.halt(state, "operator", "stopped while 1Password was asked")
-                guard.save(state, self.path)
-            return ({"CLAUDE_CODE_OAUTH_TOKEN": "x"}, "the one-year token from 1Password")
+    def test_there_is_no_command_that_resumes_a_run_or_schedules_one(self):
+        self.path.write_text(json.dumps(active(session_id="a-session-that-never-ran")), encoding="utf-8")
+        before = self.path.read_text(encoding="utf-8")
+        for command in ("watch", "install", "uninstall", "replace-stuck"):
+            self.assertEqual(self.guard(command).returncode, 2, command)
+        self.assertEqual(self.path.read_text(encoding="utf-8"), before)
 
-        self.assertEqual(guard.watch_tick(self.env(world, prepare), self.path), "inactive")
-        self.assertEqual(world.spawned, [])
-        self.assertEqual(guard.load(self.path)["status"], "halted")
-
-    def test_the_session_is_started_with_what_was_fetched(self):
-        world = World()
-        fetched = ({"CLAUDE_CODE_OAUTH_TOKEN": "x"}, "the one-year token from 1Password")
-        self.assertIn("resumed", guard.watch_tick(self.env(world, lambda: fetched), self.path))
-        self.assertEqual(world.spawned, [fetched])
-
-    def test_the_vault_is_not_asked_on_a_tick_that_starts_nothing(self):
-        asked = []
-        for world in (World(live=["someone"]), World(reviewing=True), World(rows=())):
-            self.path.write_text(json.dumps(active()), encoding="utf-8")
-            guard.watch_tick(self.env(world, lambda: asked.append(1)), self.path)
-        self.assertEqual(asked, [])
+    @unittest.skipUnless(sys.platform == "win32", "the job object is the Windows half")
+    def test_a_session_that_ends_takes_everything_it_started_with_it(self):
+        # What the launcher runs: `session -- <the runner's command>`. The stand-in session starts a process that
+        # would outlive it, says which, and ends. Closing the window ends the wrapper the same way, so this is the
+        # proof for both: nothing a run started keeps running.
+        code = (
+            "import subprocess, sys\n"
+            "left = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'])\n"
+            "print(left.pid, flush=True); sys.exit(7)\n"
+        )
+        ran = self.guard("session", "--", sys.executable, "-c", code)
+        self.assertEqual(ran.returncode, 7, ran.stderr)
+        left = int(ran.stdout.strip())
+        deadline = time.monotonic() + 10
+        while guard.process_started(left) is not None and time.monotonic() < deadline:
+            time.sleep(0.1)
+        self.assertIsNone(guard.process_started(left))
 
 
 class OutsideStop(unittest.TestCase):
     """A stop given from outside the session ends the session: a halted guard alone leaves a goal-driven one working."""
 
-    def test_the_owner_and_a_session_the_watchdog_resumed_are_both_ended(self):
-        world = World(child=True)
-        state = active(child={"pid": 7, "started": 2})
+    def test_the_sessions_process_is_ended(self):
+        world = World(launcher=True)
+        state = active(launcher={"pid": 7, "started": 8})
         guard.halt(state, "operator", "stopped from the launcher (-Stop)")
-        self.assertEqual(guard.end_sessions(state, world.env(), process=lambda session: 41 if session == "me" else None), [41, 7])
-        self.assertEqual(world.ended, [41, 7])
+        self.assertEqual(guard.end_sessions(state, world.env(), process=lambda session: 41 if session == "me" else None), [41])
+        self.assertEqual(world.ended, [41])
+
+    def test_a_session_claude_code_has_no_record_of_is_ended_through_its_launcher(self):
+        # Another runner's session (Antigravity) is held under the launcher's own name for it.
+        world = World(launcher=True)
+        state = active(session_id="agy-1", launcher={"pid": 7, "started": 8})
+        self.assertEqual(guard.end_sessions(state, world.env(), process=lambda session: None), [7])
+        self.assertEqual(world.ended, [7])
 
     def test_nothing_is_ended_when_nothing_of_this_run_is_running(self):
         world = World()
-        self.assertEqual(guard.end_sessions(active(child={"pid": 7, "started": 2}), world.env(), process=lambda session: None), [])
+        self.assertEqual(guard.end_sessions(active(launcher={"pid": 7, "started": 8}), world.env(), process=lambda session: None), [])
         self.assertEqual(world.ended, [])
 
 
-class Stuck(unittest.TestCase):
+class Quiet(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -528,47 +399,9 @@ class Stuck(unittest.TestCase):
         transcript.write_text("{}\n", encoding="utf-8")
         self.assertEqual(guard.owner_quiet_minutes(active(), now=transcript.stat().st_mtime + 600, projects=self.projects), 10.0)
 
-    def test_only_a_silent_session_of_an_active_run_with_no_review_is_stuck(self):
-        env = World().env()
-        self.assertTrue(guard.owner_stuck(active(), env, guard.QUIET_LIMIT))
-        self.assertFalse(guard.owner_stuck(active(), env, guard.QUIET_LIMIT - 1))
-        self.assertFalse(guard.owner_stuck(active(), env, None))
-        self.assertFalse(guard.owner_stuck(active(), World(reviewing=True).env(), 500))
-        self.assertFalse(guard.owner_stuck({"active": False, "session_id": "me"}, env, 500))
-
-    def test_a_stuck_session_is_ended_and_a_working_one_is_left_alone(self):
-        ended = []
-        long_ago = time.time() - (guard.QUIET_LIMIT + 5) * 60
-        said = guard.replace_stuck(active(session_id="never-wrote"), World().env(), long_ago, kill=ended.append, process=lambda s: 4242)
-        self.assertEqual(ended, [4242])
-        self.assertIn("replaced", said)
-        said = guard.replace_stuck(active(session_id="never-wrote"), World().env(), time.time(), kill=ended.append, process=lambda s: 4242)
-        self.assertEqual((ended, said.startswith("working")), ([4242], True))
-        said = guard.replace_stuck(active(session_id="never-wrote"), World(reviewing=True).env(), long_ago, kill=ended.append, process=lambda s: 4242)
-        self.assertEqual(ended, [4242])
-
 
 class SignIn(unittest.TestCase):
     TOKEN = "sk-ant-oat01-" + "a" * 60
-
-    def test_the_resumed_session_gets_the_token_when_the_vault_gives_it(self):
-        env, how = guard.sign_in({"PATH": "x"}, lambda: self.TOKEN, lambda: None)
-        self.assertEqual(env, {"PATH": "x", "CLAUDE_CODE_OAUTH_TOKEN": self.TOKEN})
-        self.assertIn("1Password", how)
-        self.assertNotIn(self.TOKEN, how)
-
-    def test_a_locked_vault_falls_back_to_the_cache_and_the_vault_wins_when_both_answer(self):
-        other = "sk-ant-oat01-" + "b" * 60
-        env, how = guard.sign_in({}, lambda: None, lambda: self.TOKEN)
-        self.assertEqual(env["CLAUDE_CODE_OAUTH_TOKEN"], self.TOKEN)
-        self.assertIn("cache", how)
-        self.assertEqual(guard.sign_in({}, lambda: other, lambda: self.TOKEN)[0]["CLAUDE_CODE_OAUTH_TOKEN"], other)
-
-    def test_no_token_or_a_value_of_the_wrong_shape_leaves_the_stored_login(self):
-        for value in (None, "", "ERROR: not signed in", self.TOKEN + " trailing words"):
-            env, how = guard.sign_in({"PATH": "x"}, lambda: value, lambda: value)
-            self.assertEqual(env, {"PATH": "x"}, value)
-            self.assertIn("stored login", how)
 
     @unittest.skipUnless(sys.platform == "win32", "DPAPI is a Windows facility")
     def test_the_cache_round_trips_and_never_holds_the_token_in_the_clear(self):
@@ -591,12 +424,18 @@ class SignIn(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "token.dpapi"
             guard.cache_token(self.TOKEN, path)
-            read = subprocess.run(
-                ["pwsh", "-NoProfile", "-Command",
-                 "[Text.Encoding]::UTF8.GetString([System.Security.Cryptography.ProtectedData]::Unprotect("
-                 f"[IO.File]::ReadAllBytes('{path}'), $null, 'CurrentUser'))"],
-                capture_output=True, text=True, timeout=60)
+            with mock.patch.object(subprocess, "run", wraps=subprocess.run) as started:
+                read = subprocess.run(
+                    ["pwsh", "-NoProfile", "-Command",
+                     "[Text.Encoding]::UTF8.GetString([System.Security.Cryptography.ProtectedData]::Unprotect("
+                     f"[IO.File]::ReadAllBytes('{path}'), $null, 'CurrentUser'))"],
+                    capture_output=True, text=True, timeout=60, creationflags=no_window())
             self.assertEqual(read.stdout.strip(), self.TOKEN, read.stderr)
+            # A launcher test never opens a console window over the operator's work: every process it starts
+            # carries the flag.
+            self.assertTrue(started.call_args_list)
+            for call in started.call_args_list:
+                self.assertEqual(call.kwargs.get("creationflags"), no_window(), call.args[0][0])
 
 
 class InFlight(unittest.TestCase):
@@ -791,64 +630,10 @@ class HookEntry(unittest.TestCase):
         with guard.locked(self.path, wait=5):
             pass
 
-    def test_status_says_when_a_tick_failed_or_has_gone_quiet(self):
-        env = World().env()
-        unseen = guard.health(active(), self.path, env, now=1000.0)
-        self.assertTrue(unseen["last_tick_stale"])
-        guard.record_tick("OSError('no')", False, self.path)
-        failed = guard.health(active(), self.path, env)
-        self.assertFalse(failed["last_tick"]["ok"])
-        self.assertTrue(failed["last_tick_stale"])
-        guard.record_tick("inactive", True, self.path)
-        self.assertFalse(guard.health(active(), self.path, env)["last_tick_stale"])
-        self.assertTrue(guard.health(active(), self.path, env, now=time.time() + guard.WATCH_MINUTES * 60 * 4)["last_tick_stale"])
-
     def test_the_cron_tool_records_the_heartbeat(self):
         self.path.write_text(json.dumps(active()), encoding="utf-8")
         self.event(hook_event_name="PostToolUse", tool_name="CronCreate", session_id="me")
         self.assertIn("heartbeat_at", guard.load(self.path))
-
-    def test_a_stop_gets_in_while_a_tick_does_its_slow_reads(self):
-        self.path.write_text(json.dumps(active()), encoding="utf-8")
-        reading, release = threading.Event(), threading.Event()
-        world = World()
-        env = world.env()
-
-        def slow_rows():
-            reading.set()
-            release.wait(10)
-            return ["D01 T02 §4"]
-
-        env.rows = slow_rows
-        results = []
-        tick = threading.Thread(target=lambda: results.append(guard.watch_tick(env, self.path)))
-        tick.start()
-        self.assertTrue(reading.wait(5))
-        self.event(hook_event_name="UserPromptSubmit", prompt="stop", session_id="me")
-        release.set()
-        tick.join(10)
-        self.assertEqual(results, ["inactive"])
-        self.assertEqual(world.spawned, [])
-        self.assertEqual(guard.load(self.path)["status"], "stopped")
-
-    def test_a_failed_launch_uses_no_attempt_and_its_error_stays_until_one_works(self):
-        self.path.write_text(json.dumps(active()), encoding="utf-8")
-        world = World()
-        env = world.env()
-
-        def fails(_state):
-            raise OSError("claude is not on PATH")
-
-        broken = guard.replace(env, spawn=fails)
-        for _ in range(guard.MAX_RESTARTS + 2):
-            with self.assertRaises(OSError):
-                guard.watch_tick(broken, self.path)
-        state = guard.load(self.path)
-        self.assertTrue(state["active"])
-        self.assertEqual(state.get("restarts", 0), 0)
-        self.assertIn("not on PATH", state["last_error"])
-        self.assertIn("attempt 1", guard.watch_tick(env, self.path))
-        self.assertNotIn("last_error", guard.load(self.path))
 
 
 class Signature(unittest.TestCase):
