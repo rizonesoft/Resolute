@@ -13,9 +13,11 @@ Exit codes
     3  the question could not be asked: no gh, not signed in, an API error, or a call that timed out
 
 What a commit owes (D00 T01 section 10). `gates` has no path filter, so every pushed head owes it. `plan-gates`
-is filtered by the `paths` list in .github/workflows/plan.yml, so a commit owes it only when it touches one of
-those paths; any other workflow that did run for the commit is read as well. GitHub attaches runs to the head
-of a push, so ask about a commit that was pushed as a head.
+is filtered by the `paths` list in .github/workflows/plan.yml as the commit has it, and GitHub applies that
+filter to the whole push, base to head: so the reader asks GitHub which push ended at the commit and lists what
+that push changed. Any other workflow that did run for the commit is read as well. GitHub attaches runs to the
+head of a push, so ask about a commit that was pushed as a head; for any other commit the reader says it cannot
+establish what is owed (exit 3).
 
 Which run speaks. A run whose name ends " (red proof)" is the deliberate failure that proves the workflow can
 go red: it never counts, red or green. Among the rest, the newest run of a workflow for the commit decides, at
@@ -75,26 +77,68 @@ def run_gh(args: list[str], timeout: float) -> str:
     return done.stdout
 
 
-def committed_text(commit: str, rel: str) -> str | None:
+def run_git(args: list[str], timeout: float) -> subprocess.CompletedProcess:
+    """One git read, bounded. A git that cannot run or does not answer is said, never read as empty output."""
+    try:
+        return subprocess.run(["git", *args], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                              cwd=ROOT, timeout=timeout)
+    except FileNotFoundError:
+        raise CannotAsk("git is not installed or not on PATH") from None
+    except subprocess.TimeoutExpired:
+        raise TimedOut(f"git {args[0]} did not answer within {timeout:.0f}s") from None
+    except OSError as e:
+        raise CannotAsk(f"git {args[0]} could not run ({e})") from None
+
+
+def first_line(text: str) -> str:
+    return (text.strip().splitlines() or ["no message"])[0]
+
+
+def resolve_commit(name: str, timeout: float = CALL_TIMEOUT) -> str:
+    done = run_git(["rev-parse", "--verify", name + "^{commit}"], timeout)
+    if done.returncode != 0:
+        raise CannotAsk(f"{name} is not a commit here")
+    return done.stdout.strip()
+
+
+def committed_text(commit: str, rel: str, timeout: float = CALL_TIMEOUT) -> str | None:
     """A file as the commit has it, or None when the commit has no such file.
 
     What a commit owes is decided by the workflow file in that commit: the working tree may have moved on, and a
     later edit to a path filter must not change the verdict on an earlier candidate."""
-    try:
-        done = subprocess.run(["git", "show", f"{commit}:{rel}"], capture_output=True, text=True, encoding="utf-8",
-                              errors="replace", cwd=ROOT, timeout=CALL_TIMEOUT)
-    except (OSError, subprocess.TimeoutExpired) as e:
-        raise CannotAsk(f"git could not read {rel} at {commit[:12]} ({e})") from None
+    done = run_git(["show", f"{commit}:{rel}"], timeout)
     if done.returncode == 0:
         return done.stdout
     if re.search(r"does not exist|exists on disk, but not in", done.stderr):
         return None
-    raise CannotAsk(f"git could not read {rel} at {commit[:12]} ({(done.stderr.strip().splitlines() or ['no message'])[0]})")
+    raise CannotAsk(f"git could not read {rel} at {commit[:12]} ({first_line(done.stderr)})")
 
 
-def changed_paths(commit: str) -> list[str]:
-    done = subprocess.run(["git", "diff-tree", "--no-commit-id", "--name-only", "-r", "-m", "--root", commit],
-                          capture_output=True, text=True, encoding="utf-8", cwd=ROOT, timeout=CALL_TIMEOUT)
+def push_base(commit: str, gh, timeout: float = CALL_TIMEOUT) -> str:
+    """The commit `main` pointed at before the push that ended at `commit`.
+
+    GitHub applies a workflow's path filter to the whole push, base to head, not to the head commit alone: a push
+    of a TODO edit followed by a C++ commit owes `plan-gates`, and a change reverted inside one push does not. So
+    what a commit owes is read from the push GitHub recorded, and when GitHub records none ending at this commit
+    the answer is that it cannot be established, never a guess."""
+    out = gh(["api", "repos/{owner}/{repo}/activity?activity_type=push&per_page=100",
+              "--jq", f'.[] | select(.after == "{commit}") | .before'], timeout)
+    found = out.split()
+    if not found:
+        raise CannotAsk(f"GitHub lists no push ending at {commit[:12]} among the last 100: it was not pushed as a head, "
+                        "so what it owes cannot be established (ask about the head of the push that carried it)")
+    return found[0]
+
+
+def changed_paths(commit: str, base: str, timeout: float = CALL_TIMEOUT) -> list[str]:
+    """The paths the push changed, base to head. A failed listing is an error: an empty list would say the push
+    owes no path-filtered workflow, and a green verdict must never rest on that."""
+    if set(base) == {"0"}:  # the push created the branch: everything the commit holds is new
+        done = run_git(["diff-tree", "--no-commit-id", "--name-only", "-r", "-m", "--root", commit], timeout)
+    else:
+        done = run_git(["diff", "--name-only", base, commit], timeout)
+    if done.returncode != 0:
+        raise CannotAsk(f"git could not list what the push {base[:12]}..{commit[:12]} changed ({first_line(done.stderr)})")
     return sorted({line for line in done.stdout.splitlines() if line})
 
 
@@ -170,44 +214,52 @@ def read(commit: str, gh, paths: list[str], filtered: dict[str, list[str]], say)
     return 1 if red else 2 if pending else 0
 
 
-def status(commit: str, wait: float, gh=run_gh, paths=None, filtered=None, say=print, clock=time.monotonic, sleep=time.sleep,
-           committed=committed_text) -> int:
+def status(name: str, wait: float, gh=run_gh, paths=None, filtered=None, say=print, clock=time.monotonic, sleep=time.sleep,
+           committed=committed_text, changed=changed_paths, resolve=resolve_commit, pushed=None) -> int:
     """One read, or with `wait` a poll that ends when the runs finish or the interval is over.
 
-    The interval is one budget for everything: sleeping, and every gh call, which is given no more time than is
-    left. Nothing is asked once it is spent, so the command returns inside the interval it was given."""
+    The interval is one budget for everything: resolving the commit, reading what it changed and what it owes,
+    every gh call, and the sleeping between reads. No read is given more time than is left, and nothing is asked
+    once it is spent, so the command returns inside the interval it was given."""
     start = clock()
     deadline = start + wait
 
-    def bounded(args: list[str], timeout: float) -> str:
+    def within(call, *args):
         if not wait:
-            return gh(args, timeout)
+            return call(*args, CALL_TIMEOUT)
         left = deadline - clock()
         if left <= 0:
             raise BudgetSpent
         try:
-            return gh(args, min(timeout, left))
+            return call(*args, min(CALL_TIMEOUT, left))
         except TimedOut:
             if clock() >= deadline:
-                raise BudgetSpent from None  # the interval ran out during the call: that is the wait ending, not gh failing
+                raise BudgetSpent from None  # the interval ran out during the read: that is the wait ending
             raise
 
-    try:
-        if paths is None:
-            paths = changed_paths(commit)
-        if filtered is None:
-            filtered = {}
-            for name, rel in FILTERED.items():
-                text = committed(commit, rel)
-                if text is not None:
-                    filtered[name] = workflow_paths(text)
-    except CannotAsk as e:
-        say(f"ci-status: {e}")
-        return 3
+    def bounded(args: list[str], timeout: float) -> str:
+        return within(gh, args)
 
     def expired() -> int:
         say(f"ci-status: still not finished after {clock() - start:.0f}s")
         return 2
+
+    try:
+        commit = within(resolve, name)
+        if paths is None:
+            base = within(pushed or (lambda sha, timeout: push_base(sha, gh, timeout)), commit)
+            paths = within(changed, commit, base)
+        if filtered is None:
+            filtered = {}
+            for workflow, rel in FILTERED.items():
+                text = within(committed, commit, rel)
+                if text is not None:
+                    filtered[workflow] = workflow_paths(text)
+    except BudgetSpent:
+        return expired()
+    except CannotAsk as e:
+        say(f"ci-status: {e}")
+        return 3
 
     while True:
         try:
@@ -231,6 +283,12 @@ def status(commit: str, wait: float, gh=run_gh, paths=None, filtered=None, say=p
 def self_test() -> int:
     failures: list[str] = []
     cases = 0
+
+    def named(*args, **kwargs) -> int:
+        """status() on a fixture commit: nothing is resolved through git."""
+        kwargs.setdefault("resolve", lambda name, timeout: name)
+        kwargs.setdefault("pushed", lambda commit, timeout: "ba5e")
+        return status(*args, **kwargs)
 
     def check(name: str, got, want) -> None:
         nonlocal cases
@@ -265,7 +323,7 @@ def self_test() -> int:
             if ticks is not None:
                 ticks.append(seconds)
 
-        code = status("c0ffee", wait, gh=gh or fake, paths=list(paths), filtered=filtered, say=said.append, clock=lambda: now[0], sleep=sleep)
+        code = named("c0ffee", wait, gh=gh or fake, paths=list(paths), filtered=filtered, say=said.append, clock=lambda: now[0], sleep=sleep)
         return code, "\n".join(said)
 
     code, said = ask([run()])
@@ -339,11 +397,11 @@ def self_test() -> int:
 
     box = [0.0]
     said_lines: list[str] = []
-    code = status("c0ffee", 12, gh=slow(box), paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
+    code = named("c0ffee", 12, gh=slow(box), paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
                   clock=lambda: box[0], sleep=lambda seconds: box.__setitem__(0, box[0] + seconds))
     check("a call that uses up the wait ends it inside the interval", (code, box[0], "still not finished after 12s" in "\n".join(said_lines)), (2, 12.0, True))
     box = [0.0]
-    code = status("c0ffee", 0, gh=slow(box), paths=["src/a.cpp"], filtered=filtered, say=lambda line: None, clock=lambda: box[0])
+    code = named("c0ffee", 0, gh=slow(box), paths=["src/a.cpp"], filtered=filtered, say=lambda line: None, clock=lambda: box[0])
     check("the same stall with no wait is gh failing to answer", code, 3)
 
     # A failure already read stands when the wait runs out while its log is being fetched.
@@ -356,7 +414,7 @@ def self_test() -> int:
         return json.dumps([run(conclusion="failure")])
 
     said_lines = []
-    code = status("c0ffee", 10, gh=list_then_stall, paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
+    code = named("c0ffee", 10, gh=list_then_stall, paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
                   clock=lambda: box[0], sleep=lambda seconds: None)
     check("a known failure is still red when the wait ends during its log", (code, "gates: failure" in " ".join(said_lines)), (1, True))
 
@@ -364,24 +422,73 @@ def self_test() -> int:
     then = "on:\n  push:\n    paths:\n      - 'scripts/**'\njobs:\n"
     seen: list = []
 
-    def at_commit(commit, rel):
+    def at_commit(commit, rel, timeout):
         seen.append((commit, rel))
         return then
 
     said_lines = []
-    code = status("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=said_lines.append, committed=at_commit)
+    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=said_lines.append, committed=at_commit)
     check("the path filter is read from the queried commit", (code, seen, "plan-gates: no run yet" in "\n".join(said_lines)),
           (2, [("c0ffee", PLAN_WORKFLOW)], True))
-    code = status("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=lambda line: None,
-                  committed=lambda commit, rel: None)
+    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=lambda line: None,
+                  committed=lambda commit, rel, timeout: None)
     check("a commit with no plan workflow owes only gates", code, 0)
 
-    def unreadable(commit, rel):
+    def unreadable(commit, rel, timeout):
         raise CannotAsk("git could not read .github/workflows/plan.yml at c0ffee (fatal: bad object)")
 
     said_lines = []
-    code = status("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=said_lines.append, committed=unreadable)
+    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=said_lines.append, committed=unreadable)
     check("a workflow file git cannot read is said, never guessed", (code, "git could not read" in "\n".join(said_lines)), (3, True))
+
+    # What is owed follows the whole push, base to head, as GitHub's path filter does.
+    spans: list = []
+
+    def push_changed(touched):
+        def listing(commit, base, timeout):
+            spans.append((base, commit))
+            return touched
+        return listing
+
+    said_lines = []
+    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), filtered=filtered, say=said_lines.append,
+                 changed=push_changed(["src/a.cpp", "scripts/x.py"]))
+    check("a push whose earlier commit touched the filter owes plan-gates, though its head did not",
+          (code, spans, "plan-gates: no run yet" in " ".join(said_lines)), (2, [("ba5e", "c0ffee")], True))
+    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), filtered=filtered, say=lambda line: None,
+                 changed=push_changed(["src/a.cpp"]))
+    check("a push that changed nothing under the filter owes only gates", code, 0)
+
+    def no_push(commit, timeout):
+        raise CannotAsk(f"GitHub lists no push ending at {commit} among the last 100")
+
+    said_lines = []
+    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), filtered=filtered, say=said_lines.append, pushed=no_push)
+    check("a commit GitHub records no push for is exit 3, never green", (code, "lists no push ending at" in " ".join(said_lines)), (3, True))
+    check("the push base is read from GitHub's record of the push",
+          push_base("c0ffee", lambda args, timeout: "0123abcd\n", 5), "0123abcd")
+
+    # Local git is inside the same rules: a failed read is exit 3 and never an empty answer, and a slow one
+    # spends the wait like any other read.
+    def cannot_list(commit, base, timeout):
+        raise CannotAsk("git could not list what c0ffee changed (fatal: bad object)")
+
+    said_lines = []
+    code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), filtered=filtered, say=said_lines.append, changed=cannot_list)
+    check("a failed listing of the commit's paths is exit 3, never green", (code, "git could not list" in " ".join(said_lines)), (3, True))
+    code = status("nope", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
+                  resolve=lambda name, timeout: (_ for _ in ()).throw(CannotAsk(f"{name} is not a commit here")))
+    check("a name that is not a commit is exit 3", (code, "nope is not a commit here" in " ".join(said_lines)), (3, True))
+    box = [0.0]
+
+    def slow_git(name, timeout):
+        box[0] += timeout
+        raise TimedOut(f"git rev-parse did not answer within {timeout:.0f}s")
+
+    asked: list = []
+    code = status("c0ffee", 1, gh=lambda args, timeout: asked.append(args) or "[]", paths=["src/a.cpp"], filtered=filtered,
+                  say=lambda line: None, clock=lambda: box[0], resolve=slow_git)
+    check("slow local git spends the wait: exit 2 at the interval, and nothing more is asked", (code, box[0], asked), (2, 1.0, []))
 
     for failure in failures:
         print("FAIL " + failure)
@@ -397,11 +504,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.self_test:
         return self_test()
-    done = subprocess.run(["git", "rev-parse", "--verify", args.commit + "^{commit}"], capture_output=True, text=True, cwd=ROOT)
-    if done.returncode != 0:
-        print(f"ci-status: {args.commit} is not a commit here")
-        return 3
-    return status(done.stdout.strip(), args.wait)
+    return status(args.commit, args.wait)
 
 
 if __name__ == "__main__":
