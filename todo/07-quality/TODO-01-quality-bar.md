@@ -46,7 +46,7 @@ track: Q1
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [x]   |
 |   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
 |   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [x]   |
-|   9   |   §9    | Smoke fixture release in finally              | §6            |  [ ]   |
+|   9   |   §9    | Smoke fixture release in finally              | §6            |  [x]   |
 |  10   |   §10   | Elevated smoke ends with the run that started it | §7          |  [ ]   |
 
 ---
@@ -275,7 +275,7 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 > **Completion:** astra (medium), candidate `2f1432ea` COMPLETION gaps (2 in-scope: bound assertion too loose, interruption regression still on a 30s wait; implemented in `8ef54ca` on D07-T01-s6-repair.md, plan complete with no findings); repair completion on candidate `8ef54ca` COMPLETION gaps with the sole gap out-of-scope, the §9 fixture release already filed · Repair records: docs/reviews/07-quality/D07-T01-s6-repair.md
 > **Plan review:** astra (medium) on `7446095e`, no findings, PLAN complete
 > **CRUD:** not applicable (developer gate tooling; windowless self-test cases only, no user system or data)
-> **Deferred:** fixture release in finally -> XREF: D07 T01 §9
+> **Resolved:** 2026-11-13 | fixture release in finally -> XREF: D07 T01 §9 | closed by `c5275cc0`
 > **Duration:** 2026-11-09T22:43:46Z to 2026-11-09T22:51:38Z
 > **Implementer:** Muse Code (muse-wonder-1.0)
 
@@ -346,6 +346,14 @@ No surface of its own: a windowless self-test fixture in the existing driver.
 -> SOURCE: review-2026-11-10-d07-t01-s6-repair-round1 (P3 release not in finally)
 
 **Test checkpoint:** `python scripts/smoke-run.py --self-test` passes, and the fixture case proves the worker is released and joined when the driven case raises (quoted from a real run).
+
+> **Verified:** 2026-11-13 | §9 | `D07 T01 §9` at `c5275cc0`: `python scripts/smoke-run.py --self-test` prints "PASS the blocked capture worker is released and joined after the driven case" and "PASS a driven case that raises still releases and joins its capture worker" and ends "self-test: all pass", exit 0; with the release moved out of the `finally` it prints "FAIL a driven case that raises still releases and joins its capture worker"; `python scripts/ci-status.py` on `e1c59621`, which contains the candidate: `gates` success (run 43319176589, all 24 gates) and `plan-gates` success (run 43319176583); `validate` 0 fatal
+> **Review:** round 1 astra (medium), candidate `c5275cc0`(round 1) -- `adversarial` approve. Raw findings: docs/reviews/07-quality/D07-T01-s9.md
+> **Completion:** astra (medium), candidate `c5275cc0` -- COMPLETION: complete. Repair records: none
+> **Plan review:** astra (medium) on `e10c93bc`, no findings
+> **CRUD:** not applicable (a self-test fixture; nothing is written)
+> **Duration:** 2026-11-12T22:20:02Z to 2026-11-12T22:30:14Z
+> **Implementer:** Claude Fable 5.2 (claude-fable-5-2)
 
 ## 10. Elevated Smoke Ends With the Run That Started It
 
