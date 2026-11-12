@@ -104,11 +104,17 @@ class Prompts(unittest.TestCase):
         self.assertIn("two writers", note)
         self.assertEqual(state["session_id"], "me")
 
-    def test_a_session_can_take_a_run_whose_owner_died_and_keeps_its_counters(self):
-        state = active(yields=2)
+    def test_a_session_that_takes_a_run_whose_owner_died_starts_a_new_run(self):
+        # The dead run was one idle turn short of a stall: its successor must not stall on its first turn.
+        state = active(signature="one", idle=guard.MAX_IDLE_BLOCKS - 1, yields=guard.MAX_YIELDS - 1, contained="me")
         guard.on_prompt(state, {"prompt": "process plan", "session_id": "new"}, World().env())
         self.assertEqual(state["session_id"], "new")
-        self.assertEqual(state["yields"], 2)
+        self.assertEqual((state.get("idle", 0), state.get("yields", 0)), (0, 0))
+        self.assertIn("Do not stop", guard.on_stop(state, {"session_id": "new"}, World().env()))
+        self.assertTrue(state["active"])
+        again = active(yields=2)  # the run's own session saying it again keeps the run it has
+        guard.on_prompt(again, {"prompt": "process plan", "session_id": "me"}, World().env())
+        self.assertEqual(again["yields"], 2)
 
 
 class Stops(unittest.TestCase):
@@ -447,6 +453,25 @@ class OutsideStop(unittest.TestCase):
         state = active(session_id="agy-1", launcher={"pid": 7, "started": 8})
         self.assertEqual(guard.end_sessions(state, world.env(), process=lambda session: None), [7])
         self.assertEqual(world.ended, [7])
+
+    def test_a_process_that_would_not_end_is_named_and_one_that_went_is_not(self):
+        alive = {41: 1, 42: 1}
+        self.assertEqual(guard.still_running([41, 42, 43], wait=0, started=alive.get), [41, 42])
+        alive.pop(41)
+        self.assertEqual(guard.still_running([41, 42], wait=0, started=alive.get), [42])
+        self.assertEqual(guard.still_running([], wait=0, started=alive.get), [])
+
+    def test_the_operators_stop_tells_the_session_to_stop_working(self):
+        note = guard.on_prompt(active(), {"prompt": "stop", "session_id": "me"}, World().env())
+        self.assertIn("Stop working now", note)
+        self.assertIn("goal counts as met", note)
+
+    def test_status_says_whether_closing_the_window_ends_what_the_run_started(self):
+        env = World().env()
+        self.assertTrue(guard.health(active(contained="me"), env)["window_bound"])
+        self.assertTrue(guard.health(active(launcher={"pid": 7, "started": 8}), env)["window_bound"])
+        self.assertFalse(guard.health(active(), env)["window_bound"])
+        self.assertFalse(guard.health(active(contained="an earlier session"), env)["window_bound"])
 
     def test_nothing_is_ended_when_nothing_of_this_run_is_running(self):
         world = World()

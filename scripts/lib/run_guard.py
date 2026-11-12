@@ -171,7 +171,9 @@ def on_prompt(state: dict, data: dict, env: Env) -> str | None:
     session = data.get("session_id")
     if state.get("active") and is_stop(prompt):
         end_run(state, "stopped", f"operator: {prompt.strip()}")
-        return "The run guard stopped holding this run because the operator said to stop. `process plan` starts it again."
+        return ("The operator stopped the run, and the run guard no longer holds it. Stop working now: end any build, test "
+                "or review you started in the background, start nothing new, and say in a few lines where the work stands. "
+                "The session's goal counts as met by this stop. `process plan` starts a run again.")
     if not START.match(prompt):
         # Background-task notifications and the heartbeat arrive as prompts too; neither is the operator speaking.
         machine = "<task-notification>" in prompt or prompt.startswith("Run heartbeat:")
@@ -189,10 +191,7 @@ def on_prompt(state: dict, data: dict, env: Env) -> str | None:
     refused = admission_refusal(state, session, env, launcher=None, open_ok=True, own_ok=True)
     if refused:
         return f"The run was not taken: {refused}. Stop and say so."
-    if not state.get("active"):
-        state.clear()
-        state.update(active=True, status="active", started=stamp(), changed_at=time.time())
-    state["session_id"] = session
+    begin(state, session)
     note = heartbeat_note()
     # Closing a run's window ends everything the run started. A launcher's session is already inside the launcher's
     # job object (run_session); a session the operator typed this into is put in one of its own here, once.
@@ -275,14 +274,21 @@ def start(state: dict, session: str, env: Env, launcher: dict | None = None, *, 
     refused = admission_refusal(state, session, env, launcher, open_ok)
     if refused:
         raise ValueError(refused)
-    if not state.get("active"):
-        state.clear()
-        state.update(active=True, status="active", started=stamp(), changed_at=time.time())
-    state["session_id"] = session
+    begin(state, session)
     if launcher:
         state["launcher"] = launcher
     else:
         state.pop("launcher", None)
+
+
+def begin(state: dict, session: str | None) -> None:
+    """The run is `session`'s from here. A run another session left active is over (admission has just shown that
+    session is dead): the operator starting again starts a new run, with none of the old one's counters, so a run
+    that died one idle turn short of a stall does not stall its successor on its first turn."""
+    if not state.get("active") or state.get("session_id") not in (None, session):
+        state.clear()
+        state.update(active=True, status="active", started=stamp(), changed_at=time.time())
+    state["session_id"] = session
 
 
 def admission_refusal(state: dict, session: str | None, env: Env, launcher: dict | None, open_ok: bool, own_ok: bool = False) -> str | None:
@@ -345,6 +351,19 @@ def end_sessions(state: dict, env: Env, process: Callable[[str | None], int | No
         return []
     env.end(pid)
     return [pid]
+
+
+def still_running(pids: list[int], wait: float = 10, started: Callable[[int], int | None] | None = None) -> list[int]:
+    """The processes of `pids` that are still there after `wait` seconds: ending a process is asked for, and only
+    its absence says it happened (Windows refuses to end a process of higher integrity, and says so only in an
+    exit code)."""
+    started = started or process_started
+    deadline = time.monotonic() + wait
+    left = [pid for pid in pids if started(pid) is not None]
+    while left and time.monotonic() < deadline:
+        time.sleep(0.2)
+        left = [pid for pid in left if started(pid) is not None]
+    return left
 
 
 def halt(state: dict, ground: str, reason: str) -> None:
@@ -661,6 +680,9 @@ def health(state: dict, env: Env = REAL, now: float | None = None) -> dict:
         "live_here": env.live_here(),  # every Claude Code session open in this clone, so a launcher can say who is writing
         "owner_quiet_minutes": owner_quiet_minutes(state, now),
         "launcher_alive": bool(state.get("launcher")) and env.process_alive(state["launcher"]),
+        # Whether closing the run's window ends what the run started: a launcher's session is inside the launcher's
+        # job object, and a session that took the run by the prompt is put in one of its own (on_prompt).
+        "window_bound": bool(state.get("launcher")) or (bool(state.get("session_id")) and state.get("contained") == state.get("session_id")),
     }
 
 

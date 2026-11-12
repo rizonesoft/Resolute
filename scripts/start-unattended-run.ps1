@@ -32,7 +32,10 @@
     Claude Code login. Antigravity signs in with its own account on this PC and is never handed Claude's token.
 
     STOPPING. Type `stop` in the session, leave it normally (/exit), or close this window: each ends the run, and
-    nothing starts it again. `-Stop` ends it from another window.
+    nothing starts it again. `-Stop` ends it from another window, and says so when Windows would not end the session.
+    Closing the window is what ends every process the session started, at once. One exception stands until
+    D07 T01 S10 is built: an elevated smoke test already running through the \Resolute\ElevatedSmoke task belongs to
+    Task Scheduler, and finishes by itself.
 
 .PARAMETER Runner
     The session's runner: Claude Code (`claude`, the project's writer and the default) or Google Antigravity on
@@ -133,7 +136,7 @@ if ($Stop) {
 
 # One line, no double quotes: it is passed to the runner as a single argument. /goal allows 4,000 characters.
 $goal = @'
-/goal Resolute's implementation plan (todo/implementation-plan.md in {ROOT}) is 100 percent complete: `python scripts/todo-graph.py query stats` shows every section done, each one built, proven by its checkpoint from a real run, reviewed by the pinned reviewer (GPT-6 Astra, through scripts/review-dispatch.py) and stamped through the review-todo-section skill, with no partial ships and `pwsh scripts/check-all.ps1` green. The goal is also met when the run has ended the way the process-plan skill allows while rows are still open: `python scripts/run-guard.py status` no longer prints active, every remaining row is blocked here (an unmet dependency, a waiting Need, a host this session cannot reach, or a section its last completion review left with gaps), and the last message lists each leftover row with what blocks it and what the owner must do to release it. Nothing else counts as done: not an audit, not a status report, not a finished phase while another phase has a ready row. The work: process the plan through the process-plan skill, starting now, unattended, on main and nowhere else. Follow AGENTS.md, DESIGN.md and the skills exactly. Never ask the operator a question: where the answer can be worked out, work it out; otherwise take the industry-standard option, record it with its cost of reversing, and carry on. Act with full autonomy, as the owner would and better: improve the plan, the skills, the agents, the tools and the methods whenever they could be better, repair the run's own failures at their cause, and keep going. Aim for excellence in every section. Resolute must end as the best Windows system utility suite in its class, the one users choose over Sysinternals, PowerToys, CCleaner and every other rival: before building a surface or a feature, look at how the best competitor does it and make Resolute faster, with fewer steps, smarter defaults, better recovery from errors and better accessibility, proven with measurements. Nothing is impossible here: never plan less because something is hard or because no competitor has done it, and never call a row blocked that effort can unblock. No shortcuts, no workarounds, no weakened tests. Frozen behavior stays frozen and proven by parity. Hand fetching and routine checking to {DELEGATES}, and keep every decision and every write. This machine is shared with other work: run full builds and full test suites through `bosun run --`, one heavy job at a time.
+/goal Resolute's implementation plan (todo/implementation-plan.md in {ROOT}) is 100 percent complete: `python scripts/todo-graph.py query stats` shows every section done, each one built, proven by its checkpoint from a real run, reviewed by the pinned reviewer (GPT-6 Astra, through scripts/review-dispatch.py) and stamped through the review-todo-section skill, with no partial ships and `pwsh scripts/check-all.ps1` green. The goal is also met when the run has ended the way the process-plan skill allows while rows are still open: `python scripts/run-guard.py status` no longer prints active, every remaining row is blocked here (an unmet dependency, a waiting Need, a host this session cannot reach, or a section its last completion review left with gaps), and the last message lists each leftover row with what blocks it and what the owner must do to release it. The goal is met at once when the operator stops the run (the same command prints stopped or halted): end what you started in the background and do nothing more. Nothing else counts as done: not an audit, not a status report, not a finished phase while another phase has a ready row. The work: process the plan through the process-plan skill, starting now, unattended, on main and nowhere else. Follow AGENTS.md, DESIGN.md and the skills exactly. Never ask the operator a question: where the answer can be worked out, work it out; otherwise take the industry-standard option, record it with its cost of reversing, and carry on. Act with full autonomy, as the owner would and better: improve the plan, the skills, the agents, the tools and the methods whenever they could be better, repair the run's own failures at their cause, and keep going. Aim for excellence in every section. Resolute must end as the best Windows system utility suite in its class, the one users choose over Sysinternals, PowerToys, CCleaner and every other rival: before building a surface or a feature, look at how the best competitor does it and make Resolute faster, with fewer steps, smarter defaults, better recovery from errors and better accessibility, proven with measurements. Nothing is impossible here: never plan less because something is hard or because no competitor has done it, and never call a row blocked that effort can unblock. No shortcuts, no workarounds, no weakened tests. Frozen behavior stays frozen and proven by parity. Hand fetching and routine checking to {DELEGATES}, and keep every decision and every write. This machine is shared with other work: run full builds and full test suites through `bosun run --`, one heavy job at a time.
 '@
 $delegates = @{ claude = 'the Sonnet delegates as AGENTS.md says'; agy = 'read-only subagents under the rules AGENTS.md sets for them' }[$Runner]
 $goal = $goal.Trim().Replace('{ROOT}', $root).Replace('{DELEGATES}', $delegates)
@@ -150,6 +153,33 @@ if ($missing) {
     exit 2
 }
 $cli = (Get-Command $Runner).Source
+
+# ── Who holds the tree, said before anything else is done ────
+# The guard's admission further down is what decides, under its lock. What is already known is said here, before
+# the toolchain, the elevated task and 1Password are asked for anything.
+$status = @(python scripts/run-guard.py status)
+Write-Host "Run guard: $($status[0])"
+$detail = if ($status.Count -gt 1) { $status[1] | ConvertFrom-Json } else { $null }
+if ($detail -and -not $PrintOnly) {
+    if ($status[0] -eq 'active') {
+        Write-Host "Not started: a run is already active here (session $($detail.session_id)). End it first: pwsh scripts/start-unattended-run.ps1 -Stop" -ForegroundColor Red
+        exit 1
+    }
+    if ($detail.review_in_flight) {
+        Write-Host 'Not started: a review is in flight, and a review runs alone. Start again when it has returned.' -ForegroundColor Red
+        exit 1
+    }
+}
+if ($detail -and $detail.why) { Write-Host "  last run: $($detail.why)" -ForegroundColor DarkGray }
+# One tree takes one writer. A Claude Code session already open in this clone may be writing, so the operator, who
+# is at the keyboard when this starts, says whether to go on.
+$open = @(if ($detail) { $detail.live_here })
+if ($open.Count -gt 0) {
+    Write-Warning "$($open.Count) Claude Code session(s) already open in this clone: $($open -join ', ')."
+    Write-Host 'If one of them is still working here, close THIS window: two writers on one tree corrupt each other''s work.'
+    if (-not $PrintOnly) { Read-Host 'Press Enter to start the run anyway' | Out-Null }
+}
+$openAccepted = $open.Count -gt 0
 
 # ── The machine and the tree, printed and not refused ────────
 $freeMb = [int](Get-Counter '\Memory\Available MBytes').CounterSamples[0].CookedValue
@@ -211,21 +241,6 @@ if (Test-Path -LiteralPath $smokeScript) {
         }
     }
 }
-
-$status = @(python scripts/run-guard.py status)
-Write-Host "Run guard: $($status[0])"
-$detail = if ($status.Count -gt 1) { $status[1] | ConvertFrom-Json } else { $null }
-if ($detail -and $detail.why) { Write-Host "  last run: $($detail.why)" -ForegroundColor DarkGray }
-# One tree takes one writer. A Claude Code session already open in this clone may be writing, so the operator, who
-# is at the keyboard when this starts, says whether to go on.
-$open = @(if ($detail) { $detail.live_here })
-if ($open.Count -gt 0) {
-    Write-Warning "$($open.Count) Claude Code session(s) already open in this clone: $($open -join ', ')."
-    Write-Host 'If one of them is still working here, close THIS window: two writers on one tree corrupt each other''s work.'
-    if (-not $PrintOnly) { Read-Host 'Press Enter to start the run anyway' | Out-Null }
-}
-$openAccepted = $open.Count -gt 0
-
 
 # ── Sign-in ──────────────────────────────────────────────────
 # The token goes from 1Password into claude.exe's environment and nowhere else. 1Password may ask the operator to
@@ -326,7 +341,8 @@ if ($token -and $fromVault) {
 
 # ── The run: one session, started here and never again ───────
 Write-Host ''
-Write-Host 'To stop: type stop in the session, leave it with /exit, or close this window. Each ends the run and everything it started, and nothing starts it again.' -ForegroundColor DarkGray
+Write-Host 'To stop: type stop in the session, leave it with /exit, or close this window. Each ends the run, and nothing starts it again. Closing the window is the one that ends every process the session started, at once.' -ForegroundColor DarkGray
+Write-Host 'One exception until D07 T01 S10 is built: an elevated smoke test already running through the ElevatedSmoke task finishes by itself.' -ForegroundColor DarkGray
 
 $before = $env:CLAUDE_CODE_OAUTH_TOKEN
 $code = 0

@@ -107,6 +107,10 @@ def main() -> int:
         # Said as it is: the guard no longer holds the run open, and whether the session itself has stopped.
         if args.end_session:
             ended = guard.end_sessions(state, guard.REAL)
+            left = guard.still_running(ended)
+            if left:
+                say(f"NOT ended: process {', '.join(map(str, left))} is still running (Windows refused, as it does for an elevated process). The guard no longer holds the run, but its session may still be working: close its window.")
+                return 1
             say(f"The session was ended (process {', '.join(map(str, ended))})." if ended else "No session of this run was found running.")
         else:
             working = guard.owner_process(state.get("session_id"))
