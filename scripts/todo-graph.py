@@ -843,18 +843,21 @@ def align_tables(text: str) -> str:
     return "\n".join(out)
 
 
-def _items_table_next(line: str, current: bool) -> bool:
-    """Whether the lines after `line` sit in a table whose header has an Items column.
+def _items_table_next(line: str, current: str) -> str:
+    """Where the lines after `line` sit: "" (no table), "header:N" (an N-cell Items header awaiting its delimiter
+    row) or "table".
 
-    A blank line ends a Markdown table, so it ends membership too: a row after it is in no table."""
-    if line.startswith("|"):
-        if PLAN_ROW_RE.match(line):
-            return current
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if "Items" in cells:
-            return True
-        return current if cells and all(SEP_CELL_RE.match(c) for c in cells) else False
-    return False
+    A table is a header row with an Items column and the delimiter row directly under it, with as many cells; a header
+    without that delimiter is paragraph text and so are the rows under it. A blank line ends a Markdown table, so it
+    ends membership too: a row after it is in no table."""
+    if not line.startswith("|"):
+        return ""
+    if PLAN_ROW_RE.match(line):
+        return current if current == "table" else ""
+    cells = [c.strip() for c in line.strip().strip("|").split("|")]
+    if current.startswith("header:"):
+        return "table" if all(SEP_CELL_RE.match(c) for c in cells) and len(cells) == int(current[7:]) else ""
+    return f"header:{len(cells)}" if "Items" in cells else ""
 
 
 def _in_phase_next(line: str, current: bool) -> bool:
@@ -887,7 +890,7 @@ def cmd_plan(args) -> int:
     stray: list[str] = []  # rows in no phase table: no runner reaches them in table order
     noted: set[str] = set()
     pending_notes: list[str] = []  # Moved lines, written where the table that held the row ends
-    items_table = False
+    items_table = ""
     in_phase = False
 
     def flush_notes(next_line: str | None) -> None:
@@ -919,7 +922,7 @@ def cmd_plan(args) -> int:
             out.append(line)
             continue
         ref = re.sub(r"\s+", " ", m.group("ref"))
-        if not (in_phase and items_table):
+        if not (in_phase and items_table == "table"):
             where = "sits in no table with an Items header" if in_phase else "sits under no `### Phase` heading"
             stray.append(f"{PLAN.name} line {lineno}: the row for {ref} is outside every phase table ({where})")
         if ref in moved:
@@ -937,7 +940,7 @@ def cmd_plan(args) -> int:
         if want != m.group("box"):
             stale.append(f"{ref}: plan says [{m.group('box')}], graph says [{want}]")
         line = line[: m.start("box")] + want + line[m.end("box"):]
-        if items_table:
+        if items_table == "table":
             tail = PLAN_ITEM_TAIL_RE.search(line)
             if tail is None:
                 stale.append(f"{ref}: plan row has no Items count, graph says {item_counts[ref]}")
@@ -1252,6 +1255,8 @@ def cmd_self_test(_args) -> int:
                  "under no `### Phase` heading"),
                 ("below a paragraph under the phase heading",
                  without.replace(table_end, "A paragraph.\n" + beta_row + "\n" + table_end), "in no table with an Items header"),
+                ("under an Items header that lost its delimiter row",
+                 "\n".join(ln for ln in synced.split("\n") if not ln.startswith("| :-:")), "in no table with an Items header"),
                 ("after the blank line that ends the phase table",
                  without.replace(table_end, beta_row + "\n" + table_end), "in no table with an Items header"),
             ):
