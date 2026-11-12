@@ -51,6 +51,7 @@ track: W1
 |   7   |   §7    | The bare-machine proof                       | §1         |  [ ]   |
 |   8   |   §8    | Run the unit suite under release             | §5         |  [x]   |
 |   9   |   §9    | Remove the Linux execution surface         | §5         |  [x]   |
+|  10   |   §10   | CI runs the full gate set on every push      | §5         |  [ ]   |
 
 ---
 
@@ -893,6 +894,29 @@ Resolute is a Windows-only suite, per the operator's 2026-09-20 decision, but th
 > **CRUD:** not applicable (workspace tooling, CI configuration, and docs; no user data)
 > **Duration:** 2026-09-26T10:19:14Z to 2026-09-26T11:06:51Z
 > **Implementer:** Claude Opus 5.5 (claude-opus-5-5)
+
+## 10. CI Runs the Full Gate Set on Every Push
+
+**Filed 2026-11-13** from two operator decisions in the 2026-11-12 process-plan run: testing must keep a cadence with implementation and not become most of a run, and "we should let CI do the heavy lifting. We have the resources in GitHub, so why not use it to take the load off the local development environment", with gating kept where it belongs. Today the only workflow is `.github/workflows/plan.yml` (`plan-gates`), which runs the Python gates: nothing on GitHub builds the C++ tree, runs the Catch2 suite or the clang-tidy ratchet, so every full build and full suite runs on the one shared development machine, through `bosun`, one at a time. This section moves that load: `scripts/check-all.ps1`, unchanged, runs on a GitHub-hosted runner on every push, and the local cadence in `AGENTS.md` shrinks to what covers the touched code. -> XREF: §5
+
+<!-- claim: absent .github/workflows/gates.yml -->
+<!-- claim: count "check-all.ps1" .github/workflows/plan.yml = 0 -->
+
+**Default taken, with its cost of reversing:** a GitHub-hosted `windows-2025` runner, the same image `plan-gates` uses, on every push to `main` and on manual dispatch. The alternative, a self-hosted runner on the development machine, would put the load back where it is being taken from. Reversing costs one deleted workflow file and the `AGENTS.md` cadence paragraph; no product code depends on it.
+
+No surface of its own: a workflow file, a reader script, and the working rules.
+
+- [ ] Add `.github/workflows/gates.yml`, workflow name `gates`, one job on `windows-2025`: check out with full history, restore the toolchain cache (`actions/cache`, path `reskit/` minus its tracked helpers, key from the SHA-256 of `toolchain.json`), run `pwsh scripts/bootstrap.ps1` (a no-op on a cache hit, the download on a miss), restore and save the compile cache at `build/sccache` (key prefix per week so it cannot grow without bound), then `pwsh scripts/check-all.ps1` exactly as a developer runs it. Triggers: `push` to `main` and `workflow_dispatch`. Every third-party action is pinned to a commit SHA, as `plan.yml` does. Done when: a push produces a run whose `check-all` step prints its gate summary with every gate `ok`, the run URL is quoted, and its wall time on a cache hit and on a cache miss are both recorded here. Cheaper substitute that fails the checkpoint: a workflow that builds one configuration and skips the tests, which moves no load that matters.
+- [ ] Keep the logs: on failure the job uploads `build/logs/` (the per-gate logs `check-all` already writes) as an artifact kept 14 days, and prints the failing gate's last 80 lines into the job summary. Done when: the red proof run below shows the failing gate's lines in its summary and the artifact in its run.
+- [ ] Prove it can go red without a red commit on `main`: a `workflow_dispatch` input `prove_red` (default `false`) that, when `true`, writes one failing Catch2 case into the runner's working copy before the gates and so fails the `tests` gate in that run only. Done when: a dispatched run with `prove_red=true` ends failed at the tests gate, quoted with its URL, and a dispatched run without it is green. Cheaper substitute that fails the checkpoint: `exit 1` in a workflow step, which proves the runner can fail and nothing about the gates.
+- [ ] Name what the hosted runner cannot run: any gate or test that needs what the runner lacks (a display session for driven runs, the elevated smoke task, attached devices) is listed in `docs/testing.md` under a "What CI runs, and what stays local" heading with the reason, and `check-all` on the runner reports each as it does locally (`not present`, counted apart from `ok`), never as a silent pass. Done when: the list is quoted beside the green run's gate summary and the two agree gate for gate.
+- [ ] Read CI from one command: `scripts/ci-status.py` (stdlib, calling `gh run list` and `gh run view`) prints, for a commit (default `HEAD`), each workflow's run with its status, conclusion and URL, exits 0 when every completed run is green and none is missing, 1 when any is red (printing `gh run view <id> --log-failed` tail for it), and 2 when a run is still in progress or has not started. `--wait <seconds>` polls until the runs complete or the bound passes. Done when: its `--self-test` covers green, red, in-progress and no-run-yet from canned `gh` JSON without calling the network, and a real call on a pushed commit is quoted.
+- [ ] Set the cadence in `AGENTS.md` (the "Test cadence" and "CI is watched" rules), `docs/testing.md` and the three mirrors of `process-todo-section` and `review-todo-section`: locally, a section runs the touched targets' build, the tests that cover the change and its own checkpoint, plus what only this machine can run (driven runs, elevated smoke, parity, devices); CI runs the whole gate set on every push; a stamp on a section that changed code records `python scripts/ci-status.py` green for its final candidate, and work on the next row goes on while that run is in flight; a red run is the next piece of work; a full local `check-all` is for phase closeout, a release, and reproducing a red CI run. Done when: the four documents say the same thing, `python scripts/verify-agent-tiers.py` passes, and the mirrors are byte-identical.
+- [ ] Commit: `"workspace: CI runs the full gate set on every push"`
+
+-> SOURCE: operator-2026-11-12-ci-does-the-heavy-lifting
+
+**Test checkpoint:** A push to `main` produces a green `gates` run whose log shows `check-all` with every gate `ok` (URL and wall time quoted, cache miss and cache hit); a `prove_red=true` dispatch ends failed at the tests gate with the gate's lines in the job summary and the logs artifact attached (URL quoted); `python scripts/ci-status.py --self-test` passes and a real `python scripts/ci-status.py` on the pushed commit prints both workflows green; `python scripts/todo-claims.py` holds with the claims above updated to the built state. All from real runs.
 
 ## Verification
 
