@@ -116,22 +116,22 @@ def deciding(runs: list[dict]) -> dict[str, dict]:
 def read(commit: str, gh, paths: list[str], filtered: dict[str, list[str]], say) -> int:
     runs = json.loads(gh(["run", "list", "--commit", commit, "--limit", "50", "--json", FIELDS], CALL_TIMEOUT) or "[]")
     speaks = deciding(runs)
-    verdict = 0
+    red = pending = False  # a known failure outranks a run still to come: red is fixed first
     for name in sorted(set(owed(paths, filtered)) | set(speaks)):
         run = speaks.get(name)
         if run is None:
             say(f"{name}: no run yet for {commit[:12]}")
-            verdict = max(verdict, 2)
+            pending = True
             continue
         where = f"attempt {run.get('attempt', 1)}, {run['url']}"
         if run["status"] != "completed":
             say(f"{name}: {run['status']} ({where})")
-            verdict = max(verdict, 2)
+            pending = True
         elif run["conclusion"] == "success":
             say(f"{name}: success ({where})")
         else:
             say(f"{name}: {run['conclusion'] or 'no conclusion'} ({where})")
-            verdict = 1 if verdict in (0, 1, 2) else verdict
+            red = True
             try:
                 tail = gh(["run", "view", str(run["databaseId"]), "--log-failed"], CALL_TIMEOUT).splitlines()[-LOG_TAIL:]
                 for line in tail:
@@ -140,7 +140,7 @@ def read(commit: str, gh, paths: list[str], filtered: dict[str, list[str]], say)
                     say("    (the failed log is empty: open the run)")
             except CannotAsk as e:
                 say(f"    the failed log could not be read ({e}): open the run")
-    return verdict
+    return 1 if red else 2 if pending else 0
 
 
 def status(commit: str, wait: float, gh=run_gh, paths=None, filtered=None, say=print, clock=time.monotonic, sleep=time.sleep) -> int:
@@ -212,6 +212,8 @@ def self_test() -> int:
     code, said = ask([run(conclusion="failure")], log=None)
     check("red, the log unreadable", (code, "could not be read" in said), (1, True))
     check("cancelled is red", ask([run(conclusion="cancelled")])[0], 1)
+    check("a failure outranks another workflow still running",
+          ask([run(conclusion="failure"), run(name="plan-gates", status_="in_progress", conclusion="", rid=4)], paths=("scripts/x.py",))[0], 1)
     code, said = ask([run(status_="in_progress", conclusion="")])
     check("in progress", (code, "gates: in_progress" in said), (2, True))
     code, said = ask([])
