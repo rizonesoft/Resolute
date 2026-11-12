@@ -98,7 +98,7 @@ track: W1
 |  44   |   §44   | Review-order skills match the dispatcher       | --           |  [x]   |
 |  45   |   §45   | Skill numbering and stamp separator follow-ups | §44          |  [x]   |
 |  46   |   §46   | Plan rows outside phase tables refused       | --           |  [x]   |
-|  47   |   §47   | Plan sync publishes atomically, with readback | --           |  [ ]   |
+|  47   |   §47   | Plan sync publishes atomically, with readback | --           |  [x]   |
 
 ---
 
@@ -1934,6 +1934,14 @@ No surface of its own: the plan writer in `scripts/todo-graph.py` and its self-t
 -> SOURCE: review-2026-11-12-D00-T04-s46-repair-gap-1
 
 **Test checkpoint:** `python scripts/todo-graph.py self-test` passes with the successful-publication byte case, the seven before-replace fault cases, the two held-temporary-file cases, the two after-replace cases and the five interrupt cases named, each asserting its exit code, its message, the plan's bytes on disk and no leftover temporary file (the one exception being the temporary file held for good, which asserts exactly one leftover at the full path the refusal names, removed by the test afterwards); the same self-test fails on the failed-replace case with the old in-place `write_text` restored; and `python scripts/todo-graph.py plan --sync` followed by `plan --check` on the real tree both exit 0 with `git diff --stat todo/implementation-plan.md` empty. All quoted.
+
+> **Verified:** 2026-11-12 | §47 | `D00 T04 §47` at `32a5dc02`: `python scripts/todo-graph.py self-test` 296 cases, 0 failed, covering the published bytes (UTF-8, LF, read with `read_bytes`), seven faults before the replace (temporary file not created, full disk at the write, at the flush and at fsync, readback other bytes, readback refused, replace refused) each with the plan byte for byte as it was, a temporary file held for good (5 tries, the leftover named) and let go after two tries, an interrupt during the cleanup wait, five Ctrl+C cases exiting 130, and two failures after the replace reported as published but unverified; the in-place `write_text` restored fails 26 of them, among them "a sync refuses when the replace is refused: got 0, want 1"; the interrupt classification removed fails "a sync interrupted in the replace, after it happened says published and unverified"; `python scripts/todo-graph.py plan --sync` "synced 242 row(s) -- 76 complete (31%), 0 box(es) changed" exit 0, then `plan --check` "implementation plan is current -- 76/242 sections complete (31%)" exit 0, `git diff --stat todo/implementation-plan.md` empty; `python -m unittest discover -s scripts/tests` OK (skipped=3) on the final candidate; `validate` 0 fatal; `todo-claims.py` 116 hold; CI `plan-gates` success on `32a5dc02`
+> **Review:** round 2 astra (low), candidates `fa2a20da`(round 1) `77fd5e12`(round 2) -- `adversarial` needs-attention (1, P2, fixed in `77fd5e12`) then `consistency` approve; repair record round 2 astra (low), candidates `b990a9ab`(round 1) `32a5dc02`(round 2) -- `adversarial` needs-attention (1, P2, fixed in `32a5dc02`) then `consistency` approve. Raw findings: docs/reviews/00-workspace/D00-T04-s47.md, docs/reviews/00-workspace/D00-T04-s47-repair.md
+> **Completion:** astra (medium), candidate `77fd5e12` -- COMPLETION: gaps (2 in-scope, both implemented in `b990a9ab`). Repair records: docs/reviews/00-workspace/D00-T04-s47-repair.md, final candidate `32a5dc02`, COMPLETION: complete
+> **Plan review:** astra (medium) on `5ca3ac6e`, 3 gaps planned in `34e09fa8`; repair plan review on `f7b3aea0`, 2 gaps planned in `65c652bb`
+> **CRUD:** applicable | the plan file's write path driven end to end in the self-test and on the real tree: published, read back as bytes, and on every injected failure before the replace read back unchanged
+> **Duration:** 2026-11-12T21:32:48Z to 2026-11-12T21:58:40Z
+> **Implementer:** Claude Fable 5.2 (claude-fable-5-2)
 
 ## Verification
 
