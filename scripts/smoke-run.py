@@ -2482,15 +2482,16 @@ def self_test() -> int:
             sentinel = Path(td) / "smoke" / "smoke-report.md"
             sentinel.parent.mkdir(parents=True, exist_ok=True)
             sentinel.write_text("child report sentinel", encoding="utf-8")
+            # Every code is asserted: a final check on the last code alone would pass a main() that returns a
+            # constant 2 (D07 T01 section 8).
+            forwarded = True
             for want in (0, 1, 2):
                 globals()["relaunch_elevated"] = (lambda w: lambda argv: w)(want)
                 buf = _io.StringIO()
                 with _redir(buf):
                     rc = main(["--elevate", "--visible", "--tools", "RegStudio"])
-                if not (rc == want and sentinel.read_text(encoding="utf-8") == "child report sentinel"):
-                    break
-            check("child exit codes 0, 1, 2 forward and preserve its report",
-                  rc == 2 and sentinel.read_text(encoding="utf-8") == "child report sentinel")
+                forwarded = forwarded and rc == want and sentinel.read_text(encoding="utf-8") == "child report sentinel"
+            check("child exit codes 0, 1, 2 forward and preserve its report", forwarded)
             # Declined consent through main(): blocked rows, exit 2.
             def _decline(argv):
                 raise ElevationDeclined("elevation consent declined at the runas prompt")

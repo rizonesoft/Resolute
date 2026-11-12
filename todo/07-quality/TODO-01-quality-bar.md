@@ -311,12 +311,14 @@ No surface of its own: a scheduled task, one script, and the existing smoke repo
 **Test checkpoint:** From a non-elevated shell after 120s without input, `tools/elevated-smoke.ps1 -Run` completes with no UAC prompt, the fresh `build/smoke/smoke-report.md` shows RegStudio start, main, About, and exit `pass` with preferences `absent`, the environment verdict reads clean, `LastTaskResult` is 0, and the registration readback shows `RunLevel Highest` with an interactive logon type. `tools/elevated-smoke.ps1 -SelfTest` passes, and its failure paths are quoted. All from real runs.
 ## 8. Smoke Forwarding-Test Assertion
 
+> **Started:** 2026-11-12T22:14:18Z
+
 **Filed 2026-11-10** from the `D07 T01 §5` review (round 3, `P3`, in `docs/reviews/07-quality/D07-T01-s5.md`): the child exit-code forwarding case in `scripts/smoke-run.py --self-test` can pass when forwarding is broken, because the loop breaks on the first mismatched code while the final assertion accepts the last one. A test that cannot fail on the behaviour it names is the defect this domain exists to catch.
 
 No surface of its own: a windowless self-test case in the existing driver, consumed unchanged by every other smoke section.
 
-- [ ] Make the forwarding case assert every code: in the `main()` branch cases of `scripts/smoke-run.py --self-test`, accumulate an explicit success flag over child codes 0, 1, and 2 (each forwarded unchanged and each preserving the child report byte-for-byte) instead of breaking to a final assertion the last code can satisfy alone. Done when: stubbing `main()` to always return 2 makes the case fail, quoted, and the unbroken case passes.
-- [ ] Commit: `"quality: assert every forwarded smoke exit code"`
+- [x] Make the forwarding case assert every code: in the `main()` branch cases of `scripts/smoke-run.py --self-test`, accumulate an explicit success flag over child codes 0, 1, and 2 (each forwarded unchanged and each preserving the child report byte-for-byte) instead of breaking to a final assertion the last code can satisfy alone. Done when: stubbing `main()` to always return 2 makes the case fail, quoted, and the unbroken case passes.
+- [x] Commit: `"quality: assert every forwarded smoke exit code"`
 
 -> SOURCE: review-2026-11-10-d07-t01-s5-round3 (P3 forwarding test can pass broken)
 
