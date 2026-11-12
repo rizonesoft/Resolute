@@ -68,6 +68,8 @@ def run_gh(args: list[str], timeout: float) -> str:
         raise CannotAsk("gh is not installed or not on PATH: install the GitHub CLI (https://cli.github.com)") from None
     except subprocess.TimeoutExpired:
         raise TimedOut(f"gh {args[0]} {args[1]} did not answer within {timeout:.0f}s: check the network and run this again") from None
+    except OSError as e:
+        raise CannotAsk(f"gh could not be started ({e}): check that this account is allowed to run it") from None
     if done.returncode != 0:
         said = (done.stderr or done.stdout).strip().splitlines()
         first = said[0] if said else f"exit {done.returncode}"
@@ -284,6 +286,18 @@ def status(name: str, wait: float, gh=run_gh, paths=None, filtered=None, say=pri
             return expired()
 
 
+def answer(name: str, wait: float, say=print, **readers) -> int:
+    """status(), with the one promise its exit code makes kept: 1 means a red run and nothing else.
+
+    An error the reader did not foresee would otherwise leave as a traceback, which exits 1, and a consumer reads 1
+    as red CI. It is said as what it is, a reader that could not read, and that is exit 3."""
+    try:
+        return status(name, wait, say=say, **readers)
+    except Exception as e:  # the door for whatever is not handled by name above
+        say(f"ci-status: CI could not be read ({type(e).__name__}: {e}); this is not a CI result")
+        return 3
+
+
 def self_test() -> int:
     failures: list[str] = []
     cases = 0
@@ -368,6 +382,14 @@ def self_test() -> int:
             check("gh unauthenticated", "no refusal", "refused")
         except CannotAsk as e:
             check("gh unauthenticated", "gh auth login" in str(e), True)
+
+        def refused_launch(*a, **k):
+            raise PermissionError(13, "Access is denied")
+
+        subprocess.run = refused_launch
+        said_lines = []
+        code = named("c0ffee", 0, paths=["src/a.cpp"], filtered=filtered, say=said_lines.append)
+        check("a gh that Windows refuses to start is exit 3, named", (code, "gh could not be started" in " ".join(said_lines)), (3, True))
 
         def stalled(*a, **k):
             raise subprocess.TimeoutExpired(a, k.get("timeout", 0.0))
@@ -507,6 +529,12 @@ def self_test() -> int:
                   say=lambda line: None, clock=lambda: box[0], resolve=slow_git)
     check("slow local git spends the wait: exit 2 at the interval, and nothing more is asked", (code, box[0], asked), (2, 1.0, []))
 
+    said_lines = []
+    code = answer("c0ffee", 0, say=said_lines.append, gh=lambda args, timeout: "not json", paths=["src/a.cpp"], filtered=filtered,
+                  resolve=lambda name, timeout: name)
+    check("an error the reader did not foresee is exit 3 and said, never a traceback",
+          (code, "CI could not be read" in " ".join(said_lines), "this is not a CI result" in " ".join(said_lines)), (3, True, True))
+
     for failure in failures:
         print("FAIL " + failure)
     print(f"{cases} cases, {len(failures)} failed")
@@ -521,7 +549,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.self_test:
         return self_test()
-    return status(args.commit, args.wait)
+    return answer(args.commit, args.wait)
 
 
 if __name__ == "__main__":
