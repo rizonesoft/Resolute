@@ -169,7 +169,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §5`  | Cover the inherited UI library                    |   7   |
 | [x] | `D00 T01 §8`  | Run the unit suite under release                  |   2   |
 | [x] | `D00 T01 §9`  | Remove the Linux execution surface                |   7   |
-| [ ] | `D00 T01 §10` | CI runs the full gate set on every push           |   9   |
+| [ ] | `D00 T01 §10` | CI runs the full gate set on every push           |  10   |
 | [x] | `D00 T02 §6`  | Remove the tautological width check               |   3   |
 | [x] | `D00 T02 §7`  | Driven UI completion tests                        |   4   |
 | [x] | `D00 T02 §8`  | Icon manifest audit                               |   3   |
