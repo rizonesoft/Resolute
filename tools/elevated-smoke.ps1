@@ -585,6 +585,22 @@ function Invoke-SelfTest {
         [void][System.Management.Automation.Language.Parser]::ParseInput($source, [ref]$null, [ref]$parseErrors)
         Check 'a checkout path with an apostrophe gives an action that parses' ($parseErrors.Count -eq 0 -and $source.Contains("'D:\Derick''s Projects\Resolute'"))
 
+        # -Check and -Run refuse on the same list: a reason any check gives stops a run.
+        $ready = Get-RunRefusals $good @({ @() }, { $null })
+        $held = Get-RunRefusals $good @({ @() }, { 'the task can be changed by another principal: S-1-5-11' })
+        Check 'a run is refused on any reason the shared list gives, and only then' ($ready.Count -eq 0 -and $held.Count -eq 1 -and $held[0] -match 'another principal')
+        $runSource = (Get-Command Invoke-Run).ScriptBlock.ToString()
+        $checkSource = (Get-Command Invoke-Check).ScriptBlock.ToString()
+        Check 'the launch path and the readiness answer both read the shared list' ($runSource.Contains('Get-RunRefusals') -and $checkSource.Contains('Get-RunRefusals'))
+        $defaults = (Get-Command Get-RunRefusals).ScriptBlock.ToString()
+        Check 'the shared list holds the task security, directory, definition and pin checks' (
+            @('Get-TaskSecurityRefusals', 'Get-DirectoryRefusals', 'Test-DefinitionMatch', 'Test-PinnedHashes' | Where-Object { -not $defaults.Contains($_) }).Count -eq 0)
+
+        # Both ways into an elevated registration go through the same entry, which holds the rollback proof.
+        $entry = (Get-Command Invoke-ElevatedRegistration).ScriptBlock.ToString()
+        Check 'an elevated shell and the consented copy register through the one entry that carries the rollback proof' (
+            $entry.Contains('Invoke-ProveRollback') -and (Get-Command Invoke-Register).ScriptBlock.ToString().Contains('return Invoke-ElevatedRegistration'))
+
         # A rollback is judged by reading the state back, field by field.
         $was = [pscustomobject]@{ Task = 'xml'; Hashes = 'h'; Python = 'p'; DirectorySddl = 'd' }
         $now = [pscustomobject]@{ Task = 'xml'; Hashes = 'other'; Python = 'p'; DirectorySddl = 'd' }
@@ -678,6 +694,23 @@ function Invoke-ProveRollback {
     if ($differs.Count) { Write-Registration ("rollback proof: REFUSED, not restored: " + ($differs -join ', ')); return 2 }
     Write-Registration 'rollback proof: the previous task, pinned hashes, runtime and directory permissions were read back unchanged'
     return 0
+}
+
+function Invoke-ElevatedRegistration {
+    # The elevated registration as both entries reach it: the copy -Register
+    # starts through the consent prompt, and -Register run from a shell that
+    # is elevated already. The rollback proof, when asked for, comes first
+    # on both, and a registration is not attempted when the proof refuses.
+    if ($ProveRollback) {
+        $proofCode = Invoke-ProveRollback
+        if ($proofCode -ne 0) { return $proofCode }
+    }
+    try {
+        return (Invoke-RegisterElevated)
+    } catch {
+        Write-Registration "registration failed: $($_.Exception.Message)"
+        return 2
+    }
 }
 
 function Invoke-RegisterElevated {
@@ -847,7 +880,7 @@ function Invoke-Register {
     $drift = @(Get-DriftRefusals $Root)
     if ($drift) { Write-Host ("refused: " + ($drift -join '; ')); return 2 }
     if (Test-IsElevated) {
-        return Invoke-RegisterElevated
+        return Invoke-ElevatedRegistration
     }
     Write-Host 'registration needs one consent prompt; approving it registers the task and pins the driver hashes'
     $args = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -RegisterElevated -OperatorSid $(Get-CurrentSid) -Root `"$Root`""
@@ -877,34 +910,39 @@ function Invoke-Register {
     return 0
 }
 
+function Get-RunRefusals($Task, [scriptblock[]]$Checks = $null) {
+    # Every reason the task may not be started, in one place. -Check reports
+    # this list and -Run refuses on it, so the launch path cannot be missing
+    # a check the readiness answer has.
+    if (-not $Checks) {
+        $Checks = @(
+            { Test-PinnedHashes $Root $HashFile },
+            { if (-not $Task) { 'task not registered (run tools/elevated-smoke.ps1 -Register first)' } },
+            { if ($Task) { Test-DefinitionMatch $Task $Root } },
+            { if (-not (Test-Path (Join-Path $PythonDir 'python.exe'))) { "the task's Python is missing from $PythonDir (register again)" } },
+            { Get-DirectoryRefusals },
+            { if ($Task) { Get-TaskSecurityRefusals } }
+        )
+    }
+    $refusals = @()
+    foreach ($check in $Checks) { $refusals += @(& $check) }
+    return ,@($refusals | Where-Object { $_ })
+}
+
 function Invoke-Check {
     # The refusals -Run would give before it starts anything, so a launcher can ask for a new registration while
     # the operator is still at the keyboard to consent (scripts/start-unattended-run.ps1). Read-only.
-    $refusals = @(Test-PinnedHashes $Root $HashFile)
-    $task = Get-TaskOrNull
-    if (-not $task) { $refusals += 'task not registered' }
-    else { $refusals += @(Test-DefinitionMatch $task $Root) }
-    if (-not (Test-Path (Join-Path $PythonDir 'python.exe'))) { $refusals += "the task's Python is missing from $PythonDir (register again)" }
-    $refusals += @(Get-DirectoryRefusals)
-    if ($task) { $refusals += @(Get-TaskSecurityRefusals) }
+    $refusals = Get-RunRefusals (Get-TaskOrNull)
     if ($refusals) { Write-Host ("not ready: " + ($refusals -join '; ')); return 2 }
     Write-Host 'ready: the task is registered for this checkout and the pinned driver hashes match'
     return 0
 }
 
 function Invoke-Run {
-    $hashRefusals = Test-PinnedHashes $Root $HashFile
-    if ($hashRefusals) {
-        Write-Host ("refused: " + ($hashRefusals -join '; '))
-        return 2
-    }
     $task = Get-TaskOrNull
-    if (-not $task) { Write-Host 'refused: task not registered (run tools/elevated-smoke.ps1 -Register first)'; return 2 }
+    $refusals = Get-RunRefusals $task
+    if ($refusals) { Write-Host ("refused: " + ($refusals -join '; ')); return 2 }
     if (Test-TaskNeedsStop $task.State) { Write-Host "refused: the elevated smoke task is already $($task.State)"; return 2 }
-    $untrusted = @(Get-DirectoryRefusals)
-    if ($untrusted) { Write-Host ("refused: " + ($untrusted -join '; ')); return 2 }
-    $diffs = Test-DefinitionMatch $task $Root
-    if ($diffs) { Write-Host ("refused: registered task differs from this registration: " + ($diffs -join '; ')); return 2 }
 
     # The run manifest: what this run may launch elevated, recorded by the
     # operator's own account in the operator's own hive. The elevated driver
@@ -1017,11 +1055,7 @@ if ($modes.Count -ne 1) {
 if ($SelfTest) { $modeCode = Invoke-SelfTest; exit $modeCode }
 if ($Check) { $modeCode = Invoke-Check; exit $modeCode }
 if ($Readback) { $modeCode = Invoke-Readback; exit $modeCode }
-if ($RegisterElevated) {
-    if ($ProveRollback) { $proofCode = Invoke-ProveRollback; if ($proofCode -ne 0) { exit $proofCode } }
-    try { $modeCode = Invoke-RegisterElevated } catch { Write-Registration "registration failed: $($_.Exception.Message)"; exit 2 }
-    exit $modeCode
-}
+if ($RegisterElevated) { $modeCode = Invoke-ElevatedRegistration; exit $modeCode }
 if ($Register) { $modeCode = Invoke-Register; exit $modeCode }
 if ($Run) { $modeCode = Invoke-Run; exit $modeCode }
 if ($Remove) { $modeCode = Invoke-Remove; exit $modeCode }
