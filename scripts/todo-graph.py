@@ -877,6 +877,10 @@ def _in_phase_next(line: str, current: bool) -> bool:
 class PlanPublishError(Exception):
     """The synced plan could not be published, or was published and could not be verified."""
 
+    def __init__(self, message: str, interrupted: bool = False):
+        super().__init__(message)
+        self.interrupted = interrupted  # Ctrl+C: the caller exits 130, the conventional status for an interrupt
+
 
 def _read_back(path: Path) -> bytes:
     return path.read_bytes()
@@ -906,12 +910,19 @@ def _discard(temp: Path | None) -> str:
     return f"; the temporary file {temp} could not be removed ({error}) and is left behind: delete it"
 
 
+PUBLISHED_THEN_INTERRUPTED = "{path}: the plan was published, but the run was interrupted before it could be verified"
+
+
 def publish_plan(path: Path, text: str) -> None:
     """Replace the plan with `text`, atomically, and read it back.
 
     The bytes are UTF-8 with the text's own LF endings (.gitattributes pins *.md to LF), never translated. They go to
     a temporary file beside the plan, are flushed to disk and read back, and only then replace the plan, so every
-    failure before the replace leaves the old plan as it was. A failure after it is said as what it is."""
+    failure before the replace leaves the old plan as it was. A failure after it is said as what it is.
+
+    Ctrl+C is a refusal like the others, never a way past the cleanup: before the replace the temporary file is
+    removed and the plan is unchanged, after it the plan is published and unverified. An interrupt that lands in the
+    replace itself is told apart by whether the temporary file is still there."""
     data = text.encode("utf-8")
     temp: Path | None = None
     failure = ""
@@ -934,10 +945,16 @@ def publish_plan(path: Path, text: str) -> None:
             temp = None
     except OSError as e:
         failure = f"{step} failed ({e})"
+    except KeyboardInterrupt:
+        if temp is not None and not os.path.exists(temp):  # the rename happened: the interrupt landed after it
+            raise PlanPublishError(PUBLISHED_THEN_INTERRUPTED.format(path=path), interrupted=True) from None
+        raise PlanPublishError(f"{path}: interrupted while {step}; the plan is unchanged{_discard(temp)}", interrupted=True) from None
     if failure:
         raise PlanPublishError(f"{path}: {failure}; the plan is unchanged{_discard(temp)}")
     try:
         published = _read_back(path)
+    except KeyboardInterrupt:
+        raise PlanPublishError(PUBLISHED_THEN_INTERRUPTED.format(path=path), interrupted=True) from None
     except OSError as e:
         raise PlanPublishError(f"{path}: the plan was published, but it could not be read back to verify it ({e})") from e
     if published != data:
@@ -1073,7 +1090,7 @@ def cmd_plan(args) -> int:
         publish_plan(PLAN, align_tables(text))
     except PlanPublishError as e:
         print(f"::error::{e}")
-        return 1
+        return 130 if e.interrupted else 1
     print(f"synced {total} row(s) -- {done} complete ({pct}%), {len(stale)} box(es) changed")
     for r in dupes:
         print(f"  WARNING: {r} appears in more than one phase")
@@ -1397,6 +1414,32 @@ def cmd_self_test(_args) -> int:
 
                 write = full
 
+            real_fdopen = os.fdopen
+
+            class FlushFails:
+                """The temporary file, whose buffered bytes meet a full disk at the flush."""
+
+                def __init__(self, fd, *a, **k):
+                    self.real = real_fdopen(fd, *a, **k)
+
+                def __enter__(self):
+                    return self
+
+                def __exit__(self, *exc):
+                    self.real.close()
+                    return False
+
+                def write(self, data):
+                    return len(data)
+
+                flush = full
+
+            def interrupt(*a, **k):
+                raise KeyboardInterrupt
+
+            class InterruptedWrite(FullDisk):
+                write = interrupt
+
             real_read = _read_back
             replaced: list = []
 
@@ -1414,8 +1457,10 @@ def cmd_self_test(_args) -> int:
             for name, target, attr, fake, step, never_replaces in (
                 ("the temporary file cannot be created", tempfile, "mkstemp", refuse, "creating the temporary file failed", True),
                 ("the disk is full at the write", os, "fdopen", FullDisk, "writing the temporary file failed", True),
+                ("the disk is full at the flush", os, "fdopen", FlushFails, "writing the temporary file failed", True),
                 ("the disk is full at fsync", os, "fsync", full, "flushing the temporary file to disk failed", True),
                 ("the temporary file reads back as other bytes", None, "_read_back", lambda path: b"other", "reading the temporary file back gave other bytes", True),
+                ("the temporary file cannot be read back", None, "_read_back", refuse, "reading the temporary file back failed", True),
                 ("the replace is refused", os, "replace", refuse, "replacing the plan failed", False),
             ):
                 before = stale_plan()
@@ -1458,6 +1503,34 @@ def cmd_self_test(_args) -> int:
                       [True] if left else [False])
                 for f in leftovers:
                     f.unlink()
+            # Ctrl+C is a refusal with its own exit code, and it says which side of the replace it landed on.
+            real_replace = os.replace
+
+            def replace_then_interrupt(src, dst):
+                real_replace(src, dst)
+                raise KeyboardInterrupt
+
+            for name, target, attr, fake, published, step in (
+                ("at the write", os, "fdopen", InterruptedWrite, False, "interrupted while writing the temporary file"),
+                ("at the temporary file's readback", None, "_read_back", interrupt, False, "interrupted while reading the temporary file back"),
+                ("in the replace, before it happens", os, "replace", interrupt, False, "interrupted while replacing the plan"),
+                ("in the replace, after it happened", os, "replace", replace_then_interrupt, True, ""),
+                ("at the published plan's readback", None, "_read_back", lambda path: real_read(path) if path != PLAN else interrupt(), True, ""),
+            ):
+                before = stale_plan()
+                with mock.patch.object(target, attr, fake) if target else mock.patch.dict(globals(), {attr: fake}):
+                    code, said = sync_said()
+                label = f"a sync interrupted {name}"
+                check(f"{label} exits 130", code, 130)
+                if published:
+                    check(f"{label} says published and unverified",
+                          (f"{PLAN}: the plan was published, but the run was interrupted before it could be verified" in said, "unchanged" in said), (True, False))
+                    check(f"{label} leaves the new plan on disk", (PLAN.read_bytes() == synced.encode("utf-8"), PLAN.read_bytes() != before), (True, True))
+                else:
+                    check(f"{label} says so, and that the plan is unchanged", (f"{PLAN}: {step}; the plan is unchanged" in said, "published" in said), (True, False))
+                    check(f"{label} leaves the plan byte for byte as it was", PLAN.read_bytes(), before)
+                check(f"{label} does not say synced", "synced" in said, False)
+                check(f"{label} leaves no temporary file", sorted(f.name for f in root.iterdir() if f.is_file()), ["implementation-plan.md"])
             for name, fake, want in (
                 ("returns other bytes", lambda path: real_read(path) if path != PLAN else b"other", "could not be verified"),
                 ("is refused", lambda path: real_read(path) if path != PLAN else refuse(), "could not be read back to verify it"),
