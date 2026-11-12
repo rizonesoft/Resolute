@@ -133,20 +133,59 @@ function Get-ExpectedAction([string]$Base) {
     # by its full path, the staged drivers, and the pinned Python copied in
     # at registration. The checkout appears only as data: the files to stage
     # and verify, and the root of the tree under test.
-    $python = Join-Path $PythonDir 'python.exe'
+    # The action is PowerShell source, and every path in it sits inside single
+    # quotes: an apostrophe in a path (D:\Derick's Projects\Resolute) is
+    # doubled, or it would end the string and the action would not parse.
+    $q = { param([string]$text) $text.Replace("'", "''") }
+    $python = & $q (Join-Path $PythonDir 'python.exe')
+    $base = & $q $Base
+    $envFile = & $q $EnvFile
+    $hashFile = & $q $HashFile
+    $snapshotDir = & $q $SnapshotDir
+    $manifestName = & $q $ManifestName
     $inner = "`$v = if (`$env:__COMPAT_LAYER -or [Environment]::GetEnvironmentVariable('__COMPAT_LAYER','User') -or [Environment]::GetEnvironmentVariable('__COMPAT_LAYER','Machine')) { 'contaminated: __COMPAT_LAYER present' } else { 'clean' }; " +
-        "Set-Content -Path '$EnvFile' -Value `$v; " +
+        "Set-Content -Path '$envFile' -Value `$v; " +
         "if (`$v -ne 'clean') { exit 2 }; " +
-        "`$pinned = @{}; foreach (`$line in Get-Content '$HashFile') { if (`$line -match '^([0-9A-Fa-f]{64})  (.+)$') { `$pinned[`$Matches[2]] = `$Matches[1].ToUpper() } }; " +
-        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$h = (Get-FileHash -Algorithm SHA256 -Path (Join-Path '$Base' `$rel)).Hash; if (`$pinned[`$rel] -ne `$h) { Set-Content -Path '$EnvFile' -Value 'refused: driver changed since registration'; exit 2 } }; " +
-        "`$snap = '$SnapshotDir'; New-Item -ItemType Directory -Force -Path `$snap | Out-Null; " +
-        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$leaf = Split-Path `$rel -Leaf; Copy-Item -Path (Join-Path '$Base' `$rel) -Destination (Join-Path `$snap `$leaf) -Force; `$h2 = (Get-FileHash -Algorithm SHA256 -Path (Join-Path `$snap `$leaf)).Hash; if (`$pinned[`$rel] -ne `$h2) { Set-Content -Path '$EnvFile' -Value 'refused: snapshot hash mismatch'; exit 2 } }; " +
-        "`$env:RESOLUTE_SMOKE_ROOT = '$Base'; `$env:RESOLUTE_SMOKE_MANIFEST = '$ManifestName'; `$env:RESOLUTE_IDLE_COLLECT = '1'; & '$python' -I (Join-Path `$snap 'smoke-run.py'); exit `$LASTEXITCODE"
+        "`$pinned = @{}; foreach (`$line in Get-Content '$hashFile') { if (`$line -match '^([0-9A-Fa-f]{64})  (.+)$') { `$pinned[`$Matches[2]] = `$Matches[1].ToUpper() } }; " +
+        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$h = (Get-FileHash -Algorithm SHA256 -Path (Join-Path '$base' `$rel)).Hash; if (`$pinned[`$rel] -ne `$h) { Set-Content -Path '$envFile' -Value 'refused: driver changed since registration'; exit 2 } }; " +
+        "`$snap = '$snapshotDir'; New-Item -ItemType Directory -Force -Path `$snap | Out-Null; " +
+        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$leaf = Split-Path `$rel -Leaf; Copy-Item -Path (Join-Path '$base' `$rel) -Destination (Join-Path `$snap `$leaf) -Force; `$h2 = (Get-FileHash -Algorithm SHA256 -Path (Join-Path `$snap `$leaf)).Hash; if (`$pinned[`$rel] -ne `$h2) { Set-Content -Path '$envFile' -Value 'refused: snapshot hash mismatch'; exit 2 } }; " +
+        "`$env:RESOLUTE_SMOKE_ROOT = '$base'; `$env:RESOLUTE_SMOKE_MANIFEST = '$manifestName'; `$env:RESOLUTE_IDLE_COLLECT = '1'; & '$python' -I (Join-Path `$snap 'smoke-run.py'); exit `$LASTEXITCODE"
     return @{
         Execute = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
         Argument = "-NoProfile -NonInteractive -Command ""& { $inner }"""
         WorkingDirectory = $HashDir
     }
+}
+
+function Test-TrustedOwner([string]$OwnerSid) {
+    # An owner can always rewrite an object's ACL, so a protected ACL means
+    # nothing while an ordinary account owns the directory.
+    return ($OwnerSid -eq $AdminsSid -or $OwnerSid -eq $SystemSid)
+}
+
+function Get-DirectoryRefusals {
+    # Why the task's directory, or the folder that holds it, cannot be
+    # trusted; empty when both can. The directory: a trusted owner and no
+    # writer beyond Administrators and SYSTEM. Its parent: a trusted owner
+    # and nobody else able to delete or re-permission what is inside it,
+    # because whoever can replace the directory owns everything in it.
+    $refusals = @()
+    $parent = Split-Path $HashDir -Parent
+    $checks = @(
+        @{ Path = $HashDir; Mask = [Security.AccessControl.FileSystemRights]'Write, Delete, DeleteSubdirectoriesAndFiles, ChangePermissions, TakeOwnership'; What = 'written' },
+        @{ Path = $parent; Mask = [Security.AccessControl.FileSystemRights]'DeleteSubdirectoriesAndFiles, ChangePermissions, TakeOwnership'; What = 'replaced' }
+    )
+    foreach ($check in $checks) {
+        if (-not (Test-Path -LiteralPath $check.Path)) { $refusals += "$($check.Path) is missing (register again)"; continue }
+        $acl = Get-Acl -LiteralPath $check.Path
+        $owner = $acl.GetOwner([Security.Principal.SecurityIdentifier]).Value
+        if (-not (Test-TrustedOwner $owner)) { $refusals += "$($check.Path) is owned by $($acl.Owner), who can rewrite its permissions (register again)" }
+        $mask = $check.Mask
+        $extra = Get-ExtraWriters @(ConvertTo-WriteRules $acl.Access { param($ace) ($ace.FileSystemRights -band $mask) -ne 0 }) @($AdminsSid, $SystemSid)
+        if ($extra.Count) { $refusals += "$($check.Path) can be $($check.What) by $($extra -join ', ')" }
+    }
+    return $refusals
 }
 
 function Get-ExtraWriters($Rules, [string[]]$AllowedSids) {
@@ -472,6 +511,16 @@ function Invoke-SelfTest {
         Switch-Runtime $new $live
         Check 'a runtime swap that succeeds leaves the new runtime and no old copy' ((Get-Content (Join-Path $live 'python.exe')) -eq 'new' -and -not (Test-Path "$live.old") -and -not (Test-Path $new))
 
+        # Ownership is part of the boundary: only Administrators or SYSTEM may own the directory.
+        Check 'Administrators and SYSTEM are trusted owners, an ordinary account is not' (
+            (Test-TrustedOwner $AdminsSid) -and (Test-TrustedOwner $SystemSid) -and -not (Test-TrustedOwner 'S-1-5-21-1-2-3-1001'))
+        # A checkout path with an apostrophe still gives an action that parses.
+        $quoted = Get-ExpectedAction "D:\Derick's Projects\Resolute"
+        $source = $quoted.Argument.Substring($quoted.Argument.IndexOf('"') + 1).TrimEnd('"')
+        $parseErrors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseInput($source, [ref]$null, [ref]$parseErrors)
+        Check 'a checkout path with an apostrophe gives an action that parses' ($parseErrors.Count -eq 0 -and $source.Contains("'D:\Derick''s Projects\Resolute'"))
+
         # Who may write: a principal beyond the allowed ones is named.
         $rules = @(
             [pscustomobject]@{ Sid = $AdminsSid; Name = 'BUILTIN\Administrators'; Writes = $true },
@@ -550,7 +599,17 @@ function Invoke-RegisterElevated {
         }
         $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
             (New-Object Security.Principal.SecurityIdentifier('S-1-5-32-545')), 'ReadAndExecute', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+        # Administrators own it and everything in it: an ordinary account that
+        # created this folder first would otherwise keep the right to rewrite
+        # the ACL just set. The folder that holds it gets the same owner.
+        $dacl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
         Set-Acl -Path $HashDir -AclObject $dacl
+        $parentDir = Split-Path $HashDir -Parent
+        $parentAcl = Get-Acl -LiteralPath $parentDir
+        $parentAcl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
+        Set-Acl -LiteralPath $parentDir -AclObject $parentAcl
+        & icacls.exe $HashDir /setowner "*$AdminsSid" /T /C /Q | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "icacls could not give Administrators ownership of everything under $HashDir (exit $LASTEXITCODE)" }
         # Whatever is here that registration did not put here was put by
         # someone else while the folder was open to them: it goes.
         foreach ($entry in Get-ChildItem -LiteralPath $HashDir -Force) {
@@ -575,6 +634,8 @@ function Invoke-RegisterElevated {
         Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
             -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
         Switch-Runtime $newPython $PythonDir
+        $untrusted = @(Get-DirectoryRefusals)
+        if ($untrusted) { throw ("the directory is not protected after registration: " + ($untrusted -join '; ')) }
         Write-Host "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
         foreach ($line in $lines) { Write-Host "pinned: $line" }
     } catch {
@@ -656,6 +717,7 @@ function Invoke-Check {
     if (-not $task) { $refusals += 'task not registered' }
     else { $refusals += @(Test-DefinitionMatch $task $Root) }
     if (-not (Test-Path (Join-Path $PythonDir 'python.exe'))) { $refusals += "the task's Python is missing from $PythonDir (register again)" }
+    $refusals += @(Get-DirectoryRefusals)
     if ($refusals) { Write-Host ("not ready: " + ($refusals -join '; ')); return 2 }
     Write-Host 'ready: the task is registered for this checkout and the pinned driver hashes match'
     return 0
@@ -670,6 +732,8 @@ function Invoke-Run {
     $task = Get-TaskOrNull
     if (-not $task) { Write-Host 'refused: task not registered (run tools/elevated-smoke.ps1 -Register first)'; return 2 }
     if (Test-TaskNeedsStop $task.State) { Write-Host "refused: the elevated smoke task is already $($task.State)"; return 2 }
+    $untrusted = @(Get-DirectoryRefusals)
+    if ($untrusted) { Write-Host ("refused: " + ($untrusted -join '; ')); return 2 }
     $diffs = Test-DefinitionMatch $task $Root
     if ($diffs) { Write-Host ("refused: registered task differs from this registration: " + ($diffs -join '; ')); return 2 }
 
