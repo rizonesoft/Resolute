@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import errno
 import importlib.util
 import io
 import json
@@ -30,6 +31,7 @@ import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
+from unittest import mock
 
 REPO = Path(__file__).resolve().parent.parent
 # Rebound by the self-test to a fixture tree.
@@ -871,6 +873,52 @@ def _in_phase_next(line: str, current: bool) -> bool:
     return bool(PLAN_PHASE_RE.match(line))
 
 
+class PlanPublishError(Exception):
+    """The synced plan could not be published, or was published and could not be verified."""
+
+
+def _read_back(path: Path) -> bytes:
+    return path.read_bytes()
+
+
+def publish_plan(path: Path, text: str) -> None:
+    """Replace the plan with `text`, atomically, and read it back.
+
+    The bytes are UTF-8 with the text's own LF endings (.gitattributes pins *.md to LF), never translated. They go to
+    a temporary file beside the plan, are flushed to disk and read back, and only then replace the plan, so every
+    failure before the replace leaves the old plan as it was. A failure after it is said as what it is."""
+    data = text.encode("utf-8")
+    temp: Path | None = None
+    step = "creating the temporary file"
+    try:
+        fd, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
+        temp = Path(name)
+        with os.fdopen(fd, "wb") as fh:
+            step = "writing the temporary file"
+            fh.write(data)
+            fh.flush()
+            step = "flushing the temporary file to disk"
+            os.fsync(fh.fileno())
+        step = "reading the temporary file back"
+        if _read_back(temp) != data:
+            raise PlanPublishError(f"{path}: {step} gave other bytes than were written; the plan is unchanged")
+        step = "replacing the plan"
+        os.replace(temp, path)
+        temp = None
+    except OSError as e:
+        raise PlanPublishError(f"{path}: {step} failed ({e}); the plan is unchanged") from e
+    finally:
+        if temp is not None:
+            with contextlib.suppress(OSError):
+                temp.unlink()
+    try:
+        published = _read_back(path)
+    except OSError as e:
+        raise PlanPublishError(f"{path}: the plan was published, but it could not be read back to verify it ({e})") from e
+    if published != data:
+        raise PlanPublishError(f"{path}: the plan was published, but could not be verified: what is on disk is not what was written")
+
+
 def cmd_plan(args) -> int:
     """Sync (default) or check implementation-plan.md's boxes and Items counts against the graph."""
     if not PLAN.exists():
@@ -996,7 +1044,11 @@ def cmd_plan(args) -> int:
         print(f"implementation plan is current -- {done}/{total} sections complete ({pct}%)")
         return 0
 
-    PLAN.write_text(align_tables(text), encoding="utf-8", newline="\n")  # LF: .gitattributes pins *.md
+    try:
+        publish_plan(PLAN, align_tables(text))
+    except PlanPublishError as e:
+        print(f"::error::{e}")
+        return 1
     print(f"synced {total} row(s) -- {done} complete ({pct}%), {len(stale)} box(es) changed")
     for r in dupes:
         print(f"  WARNING: {r} appears in more than one phase")
@@ -1287,6 +1339,87 @@ def cmd_self_test(_args) -> int:
             write(plan=synced)
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 check("the same row inside its phase table is accepted", cmd_plan(argparse.Namespace(check=True)), 0)
+
+            # plan --sync publishes atomically: UTF-8 and LF as written, read back, and a failure before the replace
+            # leaves the old plan and no temporary file.
+            def stale_plan() -> bytes:
+                write()
+                return PLAN.read_bytes()
+
+            def sync_said() -> tuple[int, str]:
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(io.StringIO()):
+                    return cmd_plan(argparse.Namespace(check=False)), said.getvalue()
+
+            def refuse(*a, **k):
+                raise PermissionError(13, "Access is denied")
+
+            def full(*a, **k):
+                raise OSError(errno.ENOSPC, "No space left on device")
+
+            class FullDisk:
+                """The temporary file, whose write finds the disk full."""
+
+                def __init__(self, fd, *a, **k):
+                    self.fd = fd
+
+                def __enter__(self):
+                    return self
+
+                def __exit__(self, *exc):
+                    os.close(self.fd)
+                    return False
+
+                write = full
+
+            real_read = _read_back
+            replaced: list = []
+
+            def counting_replace(src, dst, _real=os.replace):
+                replaced.append(dst)
+                return _real(src, dst)
+
+            stale_plan()
+            code, said = sync_said()
+            check("publication exits 0 and says synced", (code, "synced 4 row(s)" in said), (0, True))
+            check("publication writes UTF-8 with LF and nothing else", PLAN.read_bytes(), synced.encode("utf-8"))
+            check("the published bytes carry no CR and a UTF-8 section mark",
+                  (b"\r" in PLAN.read_bytes(), "`D00 T01 §1`".encode("utf-8") in PLAN.read_bytes()), (False, True))
+            check("publication leaves no temporary file", sorted(f.name for f in root.iterdir() if f.is_file()), ["implementation-plan.md"])
+            for name, target, attr, fake, step, never_replaces in (
+                ("the temporary file cannot be created", tempfile, "mkstemp", refuse, "creating the temporary file failed", True),
+                ("the disk is full at the write", os, "fdopen", FullDisk, "writing the temporary file failed", True),
+                ("the disk is full at fsync", os, "fsync", full, "flushing the temporary file to disk failed", True),
+                ("the temporary file reads back as other bytes", None, "_read_back", lambda path: b"other", "reading the temporary file back gave other bytes", True),
+                ("the replace is refused", os, "replace", refuse, "replacing the plan failed", False),
+            ):
+                before = stale_plan()
+                del replaced[:]
+                with contextlib.ExitStack() as stack:
+                    if never_replaces:
+                        stack.enter_context(mock.patch.object(os, "replace", counting_replace))
+                    stack.enter_context(mock.patch.object(target, attr, fake) if target else mock.patch.dict(globals(), {attr: fake}))
+                    code, said = sync_said()
+                label = f"a sync refuses when {name}"
+                check(label, code, 1)
+                check(f"{label}, naming the plan and the step", (str(PLAN) in said, step in said, "the plan is unchanged" in said), (True, True, True))
+                check(f"{label}, without saying synced", "synced" in said, False)
+                check(f"{label}, the plan byte for byte as it was", PLAN.read_bytes(), before)
+                check(f"{label}, no temporary file left", sorted(f.name for f in root.iterdir() if f.is_file()), ["implementation-plan.md"])
+                if never_replaces:
+                    check(f"{label}, the replace never runs", replaced, [])
+            for name, fake, want in (
+                ("returns other bytes", lambda path: real_read(path) if path != PLAN else b"other", "could not be verified"),
+                ("is refused", lambda path: real_read(path) if path != PLAN else refuse(), "could not be read back to verify it"),
+            ):
+                before = stale_plan()
+                with mock.patch.dict(globals(), {"_read_back": fake}):
+                    code, said = sync_said()
+                label = f"a sync whose readback of the published plan {name}"
+                check(f"{label} exits 1", code, 1)
+                check(f"{label} says published and unverified", (str(PLAN) in said, "the plan was published" in said, want in said, "unchanged" in said), (True, True, True, False))
+                check(f"{label} does not say synced", "synced" in said, False)
+                check(f"{label} leaves the new plan on disk", (PLAN.read_bytes() == synced.encode("utf-8"), PLAN.read_bytes() != before), (True, True))
             write(plan=FIXTURE_PLAN.replace("| [ ] | `D01 T01 §1` | Beta one | 1 |\n", ""))
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 cmd_plan(ns)
