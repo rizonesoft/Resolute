@@ -61,3 +61,25 @@ OVERALL: needs-attention
 
 - Fixed: finding 1 (P1, the directory's owner was never set, and an owner can rewrite the ACL). Registration gives Administrators ownership of the directory, everything in it and its parent, and `-Run`, `-Check` and registration refuse an untrusted owner, an extra writer on the directory, or anyone else able to delete or re-permission inside the parent. Read back after a real registration: every entry owned by `BUILTIN\Administrators`, `-Check` ready.
 - Fixed: finding 2 (P2, an apostrophe in the checkout path broke the action). Every embedded path is escaped for single-quoted PowerShell; the self-test parses the action built for `D:\Derick's Projects\Resolute` with no errors. `tools/elevated-smoke.ps1 -SelfTest`: 31 PASS, all pass.
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-12T23:33:04Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: f1a2479e7ba25df7398bb77727be2d3cc16c7dd6
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: 18a79feed50135a3
+
+## consistency: approve
+
+No actionable consistency findings in the scoped candidate. Static review only; no files modified or elevated tasks run.
+
+HIGHEST: none
+OVERALL: approve
