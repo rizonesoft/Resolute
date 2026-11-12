@@ -97,7 +97,7 @@ Then write `Started:`: add `> **Started:** <current UTC instant>` directly under
 
 Work the micro-step checklist top to bottom. Tick each micro-step item as its `Done when:` becomes true, in the file, as you go; never tick a partially finished item (`partial-flip-shipped` is fatal). Write the failing test first where the section names one. Build the cheaper substitute's failure into the checkpoint so the wrong thing cannot pass. UI sections consume the shared controls from `shared/resolute-ui` and `src/framework/ui/` as specified in `DESIGN.md`.
 
-Run gates while iterating, bounded to the touched area: the build for the touched targets, the affected test cases, and `clang-tidy` on the touched translation units. Warnings are errors at the configured level.
+Run gates while iterating, bounded to the touched area: the build for the touched targets, the affected test cases, and `clang-tidy` on the touched translation units. Warnings are errors at the configured level. Keep to the test cadence in `AGENTS.md`: no full suite while iterating, and one test case per behaviour that can really fail, not a matrix.
 
 ### 5. Surface and feature completeness
 
