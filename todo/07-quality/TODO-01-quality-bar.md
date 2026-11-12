@@ -47,6 +47,7 @@ track: Q1
 |   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
 |   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [ ]   |
 |   9   |   §9    | Smoke fixture release in finally              | §6            |  [ ]   |
+|  10   |   §10   | Elevated smoke ends with the run that started it | §7          |  [ ]   |
 
 ---
 
@@ -332,6 +333,28 @@ No surface of its own: a windowless self-test fixture in the existing driver.
 -> SOURCE: review-2026-11-10-d07-t01-s6-repair-round1 (P3 release not in finally)
 
 **Test checkpoint:** `python scripts/smoke-run.py --self-test` passes, and the fixture case proves the worker is released and joined when the driven case raises (quoted from a real run).
+
+## 10. Elevated Smoke Ends With the Run That Started It
+
+**Filed 2026-11-12** from the plan review of the operator-started-runs change (finding 2, `P1`, in `docs/reviews/00-workspace/2026-11-12-operator-started-runs.md`). The operator's rule of 2026-11-12 is that closing an unattended run's window stops everything the run started. The session runs inside a job object that ends with the window (`scripts/run-guard.py session`), but an elevated smoke run it started through `tools/elevated-smoke.ps1 -Run` is outside that job: its process belongs to Task Scheduler and runs elevated. The caller's own cleanup (`Stop-ScheduledTask` on timeout or interruption, `D07 T01 §7`) never runs when the caller is ended with the window, so a smoke run in progress carries on to its own end, inside the caller's 900 second bound at most, driving windows on the desktop after the operator closed the run.
+
+No surface of its own: the scheduled task's fixed action and the script that registers it.
+
+**Needs:** Windows host (build/test)
+
+**Requires:** operator -- convicted by `tools/elevated-smoke.ps1 -Register` needing one UAC consent prompt for a changed task action (`D07 T01 §7`)
+
+The fixed action is consent-pinned (`D07 T01 §7`): changing it changes the registered definition, so the operator registers the task again with one UAC prompt, and this section cannot prove its checkpoint in an unattended run.
+
+- [ ] Couple the task to its caller in `tools/elevated-smoke.ps1`: `-Run` records the caller's process id and start time in a file under `build/smoke/` before it starts the task, and the fixed action's wrapper watches that process while the driver runs. When the recorded process is gone before the driver has finished, the wrapper ends the driver's whole process tree and records `stood down: the run that started this smoke has ended` in the environment verdict file. A missing or unreadable caller record refuses the launch by name. Done when: the wrapper's watch is in the registered action and the definition readback matches.
+- [ ] Keep the trust boundary: the caller record carries a process id and a start time only, is validated as two integers before use, and can only make the elevated run end sooner, never start, extend or redirect it. Done when: `-SelfTest` refuses a malformed record by name and proves a record naming a process that never existed stands the run down.
+- [ ] Prove it windowlessly in `tools/elevated-smoke.ps1 -SelfTest`: a stand-in driver that starts a child and sleeps is ended, child included, inside 30 seconds of its recorded caller ending, and a caller that outlives the driver changes nothing. Done when: both cases pass and each fails when the watch is removed, quoted.
+- [ ] Update `docs/testing.md` (the unattended route) and the "Elevated tests run through one consented task" bullet of `AGENTS.md` to say the elevated run ends with the run that started it. Done when: both passages are quoted beside the task readback.
+- [ ] Commit: `"quality: an elevated smoke run ends with the run that started it"`
+
+-> SOURCE: review-2026-11-12-operator-started-runs-plan (P1 elevated smoke task outside the run's job)
+
+**Test checkpoint:** After the operator registers the task again (`tools/elevated-smoke.ps1 -Register -Replace`, one consent prompt), a driven run with evidence: `tools/elevated-smoke.ps1 -Run` is started from a window that is then closed while the task is `Running`; inside 30 seconds the task has left `Running`, no process command line carries the snapshot driver, and `build/smoke/elevated-smoke-env.txt` records the stand-down (task state, process listing and the verdict line quoted). `tools/elevated-smoke.ps1 -SelfTest` passes with the two new cases.
 
 ## Verification
 
