@@ -767,6 +767,7 @@ PLAN_ITEM_TAIL_RE = re.compile(r"\|\s*(?P<n>\d+)\s*\|\s*$")
 SEP_CELL_RE = re.compile(r"^:?-+:?$")
 PLAN_HEADING_RE = re.compile(r"^(?P<marks>#{1,6})\s")
 PLAN_PHASE_RE = re.compile(r"^### Phase\b")
+STRAY_ADVICE = "Move each row into its phase's table, then run `python3 scripts/todo-graph.py plan --sync`."
 
 
 def _width(s: str) -> int:
@@ -912,6 +913,7 @@ def cmd_plan(args) -> int:
                 out.append(f"> **Moved:** `{ref}` -- {moved[ref]}")
             else:
                 stale_notes.append(ref)
+            items_table = ""  # a note is not a table line: it ends the table above it, so a row under it is in none
             continue
         m = PLAN_ROW_RE.match(line)
         if not m:
@@ -969,7 +971,7 @@ def cmd_plan(args) -> int:
         # Refused, and nothing written: a sync that rewrote the file around a stray row would bless where it sits.
         for e in stray:
             print(f"::error::{e}")
-        print("Move each row into its phase's table, then run `python3 scripts/todo-graph.py plan --sync`.", file=sys.stderr)
+        print(STRAY_ADVICE, file=sys.stderr)
         return 1
 
     if args.check:
@@ -988,7 +990,8 @@ def cmd_plan(args) -> int:
         for e in errors:
             print(f"::error::{e}")
         if errors or unknown:
-            print("Run `python3 scripts/todo-graph.py plan --sync`.", file=sys.stderr)
+            # A sync would be refused for the same stray rows, so with one present it is not the remedy.
+            print(STRAY_ADVICE if stray else "Run `python3 scripts/todo-graph.py plan --sync`.", file=sys.stderr)
             return 1
         print(f"implementation plan is current -- {done}/{total} sections complete ({pct}%)")
         return 0
@@ -1248,6 +1251,10 @@ def cmd_self_test(_args) -> int:
             without = synced.replace(beta_row, "")
             check("the fixture row is there to move", without != synced, True)
             table_end = "> **Moved:** `D01 T01 §2`"
+            note_line = next(row for row in synced.split("\n") if row.startswith(table_end))
+            after_note = [row for row in synced.split("\n") if row != note_line]
+            after_note.insert(next(n for n, row in enumerate(after_note) if row.startswith("| :-:")) + 1, note_line)
+            after_note = "\n".join(after_note)
             for name, broken, where in (
                 ("after closing prose", without + "\n## What this plan does not do\n\nClosing prose.\n" + beta_row, "under no `### Phase` heading"),
                 ("in a whole table after a later heading",
@@ -1259,18 +1266,24 @@ def cmd_self_test(_args) -> int:
                  "\n".join(ln for ln in synced.split("\n") if not ln.startswith("| :-:")), "in no table with an Items header"),
                 ("after the blank line that ends the phase table",
                  without.replace(table_end, beta_row + "\n" + table_end), "in no table with an Items header"),
+                ("after a Moved note that follows the table's delimiter row", after_note, "in no table with an Items header"),
             ):
                 line_no = broken.splitlines().index(beta_row.rstrip("\n")) + 1
-                for mode in (True, False):
-                    write(plan=broken)
-                    said = io.StringIO()
-                    with contextlib.redirect_stdout(said), contextlib.redirect_stderr(io.StringIO()):
+                # Both line endings, compared as bytes: a refused sync that rewrote CRLF as LF would have written.
+                for mode, ending in ((True, "\n"), (False, "\n"), (True, "\r\n"), (False, "\r\n")):
+                    write()
+                    on_disk = broken.replace("\n", ending).encode("utf-8")
+                    PLAN.write_bytes(on_disk)
+                    said, advice = io.StringIO(), io.StringIO()
+                    with contextlib.redirect_stdout(said), contextlib.redirect_stderr(advice):
                         code = cmd_plan(argparse.Namespace(check=mode))
-                    label = f"plan {'check' if mode else 'sync'} refuses a row {name}"
+                    label = f"plan {'check' if mode else 'sync'} refuses a row {name} ({'CRLF' if ending == chr(13) + chr(10) else 'LF'})"
                     check(label, code, 1)
                     check(f"{label}, named",
                           f"line {line_no}: the row for D01 T01 §1 is outside every phase table (sits {where})" in said.getvalue(), True)
-                    check(f"{label}, file unchanged", PLAN.read_text(encoding="utf-8"), broken)
+                    check(f"{label}, file unchanged byte for byte", PLAN.read_bytes(), on_disk)
+                    check(f"{label}, says to move the row first", "Move each row into its phase's table, then run" in advice.getvalue(), True)
+                    check(f"{label}, never says only to sync", "\nRun `python3 scripts/todo-graph.py plan --sync`." in "\n" + advice.getvalue(), False)
             write(plan=synced)
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 check("the same row inside its phase table is accepted", cmd_plan(argparse.Namespace(check=True)), 0)
