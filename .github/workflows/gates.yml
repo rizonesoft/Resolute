@@ -93,16 +93,9 @@ jobs:
         if: ${{ failure() }}
         shell: pwsh
         run: |
-          $out = 'build/logs/check-all-output.txt'
-          if (-not (Test-Path $out)) {
-            'The run failed before check-all wrote anything: see the step that failed above.' >> $env:GITHUB_STEP_SUMMARY
-            exit 0
-          }
-          '### check-all: the gate table and each failed gate' >> $env:GITHUB_STEP_SUMMARY
-          '' >> $env:GITHUB_STEP_SUMMARY
-          '```' >> $env:GITHUB_STEP_SUMMARY
-          Get-Content $out -Tail 80 >> $env:GITHUB_STEP_SUMMARY
-          '```' >> $env:GITHUB_STEP_SUMMARY
+          # The gate table, then each failed gate under its own heading with
+          # the last 80 lines of its own log (scripts/ci-gate-summary.ps1).
+          pwsh scripts/ci-gate-summary.ps1 -Output build/logs/check-all-output.txt -LogDir build/logs >> $env:GITHUB_STEP_SUMMARY
 
       - name: Keep the gate logs
         if: ${{ failure() }}

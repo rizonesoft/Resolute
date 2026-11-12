@@ -36,7 +36,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN_WORKFLOW = ROOT / ".github" / "workflows" / "plan.yml"
+PLAN_WORKFLOW = ".github/workflows/plan.yml"
 ALWAYS_OWED = ("gates",)
 FILTERED = {"plan-gates": PLAN_WORKFLOW}
 PROOF_SUFFIX = " (red proof)"
@@ -50,6 +50,14 @@ class CannotAsk(Exception):
     """gh could not answer; the message names why and what to do."""
 
 
+class TimedOut(CannotAsk):
+    """One gh call ran out of the time it was given."""
+
+
+class BudgetSpent(Exception):
+    """The --wait interval is over: nothing more is asked."""
+
+
 def run_gh(args: list[str], timeout: float) -> str:
     try:
         done = subprocess.run(["gh", *args], capture_output=True, text=True, encoding="utf-8", errors="replace",
@@ -57,7 +65,7 @@ def run_gh(args: list[str], timeout: float) -> str:
     except FileNotFoundError:
         raise CannotAsk("gh is not installed or not on PATH: install the GitHub CLI (https://cli.github.com)") from None
     except subprocess.TimeoutExpired:
-        raise CannotAsk(f"gh {args[0]} {args[1]} did not answer within {timeout:.0f}s: check the network and run this again") from None
+        raise TimedOut(f"gh {args[0]} {args[1]} did not answer within {timeout:.0f}s: check the network and run this again") from None
     if done.returncode != 0:
         said = (done.stderr or done.stdout).strip().splitlines()
         first = said[0] if said else f"exit {done.returncode}"
@@ -65,6 +73,23 @@ def run_gh(args: list[str], timeout: float) -> str:
             raise CannotAsk(f"gh is not signed in ({first}): run `gh auth login`")
         raise CannotAsk(f"gh {args[0]} {args[1]} failed ({first})")
     return done.stdout
+
+
+def committed_text(commit: str, rel: str) -> str | None:
+    """A file as the commit has it, or None when the commit has no such file.
+
+    What a commit owes is decided by the workflow file in that commit: the working tree may have moved on, and a
+    later edit to a path filter must not change the verdict on an earlier candidate."""
+    try:
+        done = subprocess.run(["git", "show", f"{commit}:{rel}"], capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", cwd=ROOT, timeout=CALL_TIMEOUT)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        raise CannotAsk(f"git could not read {rel} at {commit[:12]} ({e})") from None
+    if done.returncode == 0:
+        return done.stdout
+    if re.search(r"does not exist|exists on disk, but not in", done.stderr):
+        return None
+    raise CannotAsk(f"git could not read {rel} at {commit[:12]} ({(done.stderr.strip().splitlines() or ['no message'])[0]})")
 
 
 def changed_paths(commit: str) -> list[str]:
@@ -143,29 +168,62 @@ def read(commit: str, gh, paths: list[str], filtered: dict[str, list[str]], say)
     return 1 if red else 2 if pending else 0
 
 
-def status(commit: str, wait: float, gh=run_gh, paths=None, filtered=None, say=print, clock=time.monotonic, sleep=time.sleep) -> int:
-    if paths is None:
-        paths = changed_paths(commit)
-    if filtered is None:
-        filtered = {name: workflow_paths(path.read_text(encoding="utf-8")) for name, path in FILTERED.items() if path.exists()}
-    deadline = clock() + wait
+def status(commit: str, wait: float, gh=run_gh, paths=None, filtered=None, say=print, clock=time.monotonic, sleep=time.sleep,
+           committed=committed_text) -> int:
+    """One read, or with `wait` a poll that ends when the runs finish or the interval is over.
+
+    The interval is one budget for everything: sleeping, and every gh call, which is given no more time than is
+    left. Nothing is asked once it is spent, so the command returns inside the interval it was given."""
+    start = clock()
+    deadline = start + wait
 
     def bounded(args: list[str], timeout: float) -> str:
+        if not wait:
+            return gh(args, timeout)
         left = deadline - clock()
-        return gh(args, max(1.0, min(timeout, left)) if wait else timeout)
+        if left <= 0:
+            raise BudgetSpent
+        try:
+            return gh(args, min(timeout, left))
+        except TimedOut:
+            if clock() >= deadline:
+                raise BudgetSpent from None  # the interval ran out during the call: that is the wait ending, not gh failing
+            raise
+
+    try:
+        if paths is None:
+            paths = changed_paths(commit)
+        if filtered is None:
+            filtered = {}
+            for name, rel in FILTERED.items():
+                text = committed(commit, rel)
+                if text is not None:
+                    filtered[name] = workflow_paths(text)
+    except CannotAsk as e:
+        say(f"ci-status: {e}")
+        return 3
+
+    def expired() -> int:
+        say(f"ci-status: still not finished after {clock() - start:.0f}s")
+        return 2
 
     while True:
         try:
             verdict = read(commit, bounded, paths, filtered, say)
+        except BudgetSpent:
+            return expired()
         except CannotAsk as e:
             say(f"ci-status: {e}")
             return 3
-        if verdict != 2 or clock() + POLL > deadline:
-            if verdict == 2 and wait:
-                say(f"ci-status: still not finished after {wait:.0f}s")
+        if verdict != 2 or not wait:
             return verdict
-        say(f"ci-status: waiting ({max(0, deadline - clock()):.0f}s left)")
-        sleep(POLL)
+        left = deadline - clock()
+        if left <= 0:
+            return expired()
+        say(f"ci-status: waiting ({left:.0f}s left)")
+        sleep(min(POLL, left))
+        if clock() >= deadline:
+            return expired()
 
 
 def self_test() -> int:
@@ -182,14 +240,17 @@ def self_test() -> int:
         return {"databaseId": rid, "workflowName": name, "status": status_, "conclusion": conclusion, "event": "push",
                 "displayTitle": title, "attempt": attempt, "url": f"https://example.invalid/runs/{rid}", "createdAt": created}
 
+    given: list[float] = []
     filtered = {"plan-gates": workflow_paths("on:\n  push:\n    paths:\n      - 'scripts/**'\n      - 'AGENTS.md'\njobs:\n")}
     check("the paths list is read", filtered["plan-gates"], ["scripts/**", "AGENTS.md"])
 
     def ask(runs, paths=("src/a.cpp",), log="line one\nthe failing line\n", wait=0.0, gh=None, ticks=None):
         said: list[str] = []
         now = [0.0]
+        given.clear()
 
         def fake(args, timeout):
+            given.append(timeout)
             if args[:2] == ["run", "view"]:
                 if log is None:
                     raise CannotAsk("gh run view failed (HTTP 410)")
@@ -256,11 +317,55 @@ def self_test() -> int:
     finally:
         subprocess.run = real_run
     ticks: list = []
-    code, said = ask([[run(status_="in_progress", conclusion="")], [run()]], wait=300, ticks=ticks)
-    check("--wait ends when the run completes", (code, ticks), (0, [POLL]))
+    code, said = ask([[run(status_="in_progress", conclusion="")], [run()]], wait=30, ticks=ticks)
+    check("--wait reads again after one polling interval and ends when the run completes", (code, ticks), (0, [POLL]))
     ticks = []
     code, said = ask([run(status_="queued", conclusion="")], wait=50, ticks=ticks)
-    check("--wait expires inside its bound", (code, sum(ticks) <= 50, "still not finished after 50s" in said), (2, True, True))
+    check("--wait sleeps through its whole interval before it expires", (code, sum(ticks), "still not finished after 50s" in said), (2, 50, True))
+    ticks = []
+    code, said = ask([run(status_="queued", conclusion="")], wait=10, ticks=ticks)
+    check("a wait shorter than the polling interval sleeps exactly that long, and says so",
+          (code, ticks, "still not finished after 10s" in said, len(given)), (2, [10], True, 1))
+
+    # The interval covers the calls too: a call that uses it up ends the wait (2), where the same stall with no
+    # wait is gh failing to answer (3).
+    def slow(clock_box):
+        def call(args, timeout):
+            clock_box[0] += timeout
+            raise TimedOut(f"gh run list did not answer within {timeout:.0f}s")
+        return call
+
+    box = [0.0]
+    said_lines: list[str] = []
+    code = status("c0ffee", 12, gh=slow(box), paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
+                  clock=lambda: box[0], sleep=lambda seconds: box.__setitem__(0, box[0] + seconds))
+    check("a call that uses up the wait ends it inside the interval", (code, box[0], "still not finished after 12s" in "\n".join(said_lines)), (2, 12.0, True))
+    box = [0.0]
+    code = status("c0ffee", 0, gh=slow(box), paths=["src/a.cpp"], filtered=filtered, say=lambda line: None, clock=lambda: box[0])
+    check("the same stall with no wait is gh failing to answer", code, 3)
+
+    # What a commit owes comes from the workflow file in that commit, not from the working tree.
+    then = "on:\n  push:\n    paths:\n      - 'scripts/**'\njobs:\n"
+    seen: list = []
+
+    def at_commit(commit, rel):
+        seen.append((commit, rel))
+        return then
+
+    said_lines = []
+    code = status("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=said_lines.append, committed=at_commit)
+    check("the path filter is read from the queried commit", (code, seen, "plan-gates: no run yet" in "\n".join(said_lines)),
+          (2, [("c0ffee", PLAN_WORKFLOW)], True))
+    code = status("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=lambda line: None,
+                  committed=lambda commit, rel: None)
+    check("a commit with no plan workflow owes only gates", code, 0)
+
+    def unreadable(commit, rel):
+        raise CannotAsk("git could not read .github/workflows/plan.yml at c0ffee (fatal: bad object)")
+
+    said_lines = []
+    code = status("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=said_lines.append, committed=unreadable)
+    check("a workflow file git cannot read is said, never guessed", (code, "git could not read" in "\n".join(said_lines)), (3, True))
 
     for failure in failures:
         print("FAIL " + failure)
