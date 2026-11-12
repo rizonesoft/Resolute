@@ -1,0 +1,114 @@
+name: gates
+
+# The whole gate set, on GitHub's machine and not the development one
+# (operator decision 2026-11-12, D00 T01 §10). `scripts/check-all.ps1` runs
+# here exactly as a developer runs it: Debug and Release builds, the
+# clang-tidy ratchet, the Catch2 suite and the plan gates.
+#
+# What stays local is listed in docs/testing.md under "What CI runs, and what
+# stays local": the headful CTest preset, the elevated smoke, parity runs and
+# device tests need the development machine and are not gates of check-all.
+
+run-name: ${{ inputs.prove_red && 'gates (red proof)' || '' }}
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      prove_red:
+        description: 'Proof that this workflow can fail: add one failing Catch2 case to the working copy for this run only'
+        type: boolean
+        default: false
+
+concurrency:
+  # One run per commit and kind: a newer push does not cancel an older
+  # commit's run, because a stamp records the result for its own candidate.
+  group: gates-${{ github.sha }}-${{ inputs.prove_red && 'proof' || 'gates' }}
+  cancel-in-progress: false
+
+jobs:
+  gates:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # Full history: the validator's git legs and the tidy ratchet's base
+          # revision cannot resolve on a shallow checkout.
+          fetch-depth: 0
+
+      - name: Restore the pinned toolchain
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            reskit/llvm-mingw
+            reskit/cmake
+            reskit/ninja
+            reskit/python
+            reskit/sccache
+          key: toolchain-${{ runner.os }}-${{ hashFiles('toolchain.json') }}
+
+      - name: Bootstrap the toolchain
+        # Detects before it downloads: nothing to do on a cache hit, the
+        # pinned download with its hash check on a miss.
+        shell: pwsh
+        run: pwsh scripts/bootstrap.ps1
+
+      - name: Name this week's compile cache
+        id: week
+        shell: pwsh
+        run: |
+          "week=$(Get-Date -UFormat '%G-%V')" >> $env:GITHUB_OUTPUT
+
+      - name: Restore the compile cache
+        # Keyed by week, so it is rebuilt from an empty cache once a week and
+        # cannot grow without bound; the newest cache of the week is restored.
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build/sccache
+          key: sccache-${{ runner.os }}-${{ steps.week.outputs.week }}-${{ github.sha }}
+          restore-keys: |
+            sccache-${{ runner.os }}-${{ steps.week.outputs.week }}-
+
+      - name: Add the failing case (red proof only)
+        if: ${{ inputs.prove_red }}
+        shell: pwsh
+        run: |
+          # In the runner's working copy only, never committed: one Catch2
+          # case that cannot pass, so the tests gate must turn this run red.
+          Add-Content -Path tests/fixtures_test.cpp -Value "`nTEST_CASE(`"CI red proof: this case fails on purpose`", `"[ci-red-proof]`") { REQUIRE(1 == 2); }"
+
+      - name: Run every gate
+        shell: pwsh
+        run: |
+          # The output is kept as well as shown: check-all ends with its gate
+          # table and the last lines of every failed gate's log, which is what
+          # the summary step below puts on the run page.
+          New-Item -ItemType Directory -Force -Path build/logs | Out-Null
+          pwsh scripts/check-all.ps1 *>&1 | Tee-Object -FilePath build/logs/check-all-output.txt
+          exit $LASTEXITCODE
+
+      - name: Show the failing gates
+        if: ${{ failure() }}
+        shell: pwsh
+        run: |
+          $out = 'build/logs/check-all-output.txt'
+          if (-not (Test-Path $out)) {
+            'The run failed before check-all wrote anything: see the step that failed above.' >> $env:GITHUB_STEP_SUMMARY
+            exit 0
+          }
+          '### check-all: the gate table and each failed gate' >> $env:GITHUB_STEP_SUMMARY
+          '' >> $env:GITHUB_STEP_SUMMARY
+          '```' >> $env:GITHUB_STEP_SUMMARY
+          Get-Content $out -Tail 80 >> $env:GITHUB_STEP_SUMMARY
+          '```' >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Keep the gate logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: gate-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/logs/
+          retention-days: 14
+          if-no-files-found: warn
