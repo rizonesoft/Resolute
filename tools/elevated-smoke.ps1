@@ -35,6 +35,8 @@ param(
     [switch]$SelfTest,
     [switch]$Check,
     [switch]$RegisterElevated,   # internal: elevated copy of this script, run by -Register
+    [string]$OperatorSid = '',   # internal: the account that asked for the registration
+    [int]$RunTimeoutSec = 900,   # how long -Run waits for the task before it stops it and cleans up
     [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )
 
@@ -48,12 +50,11 @@ $PythonDir = Join-Path $HashDir 'python'
 $EnvFile = Join-Path $HashDir 'run\elevated-smoke-env.txt'
 $ManifestKey = 'HKCU:\Software\Resolute\ElevatedSmoke\Manifest'
 $ManifestName = 'HKCU\Software\Resolute\ElevatedSmoke\Manifest'   # as the driver's winreg reads it
-$KnownEntries = @('trusted-hashes.txt', 'python', 'python.new', 'run')
+$KnownEntries = @('trusted-hashes.txt', 'python', 'python.new', 'python.old', 'run')
 $AdminsSid = 'S-1-5-32-544'
 $SystemSid = 'S-1-5-18'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
 $AckTimeoutSec = 60
-$RunTimeoutSec = 900
 $StopTimeoutSec = 30
 
 function Test-IsElevated {
@@ -214,6 +215,21 @@ function Get-DriftRefusals([string]$Base) {
     return $refusals
 }
 
+function Get-CurrentSid {
+    return [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+}
+
+function Resolve-PrincipalSid([string]$UserId) {
+    # A task principal as its SID, or $null when Windows cannot say whose it is.
+    if (-not $UserId) { return $null }
+    try {
+        if ($UserId -match '^S-1-') { return (New-Object Security.Principal.SecurityIdentifier($UserId)).Value }
+        return (New-Object Security.Principal.NTAccount($UserId)).Translate([Security.Principal.SecurityIdentifier]).Value
+    } catch {
+        return $null
+    }
+}
+
 function Test-DefinitionMatch($Task, [string]$Base) {
     # Refusals when an existing task differs from the expected definition.
     $refusals = @()
@@ -224,7 +240,33 @@ function Test-DefinitionMatch($Task, [string]$Base) {
     if ($action.WorkingDirectory -ne $expected.WorkingDirectory) { $refusals += "working directory differs: $($action.WorkingDirectory)" }
     if ($Task.Principal.RunLevel -ne 'Highest') { $refusals += "run level is $($Task.Principal.RunLevel), not Highest" }
     if ($Task.Principal.LogonType -ne 'Interactive') { $refusals += "logon type is $($Task.Principal.LogonType), not Interactive" }
+    # The task runs as its principal and reads that account's HKCU for the
+    # run manifest, so it must be the account that runs -Run and writes it.
+    # A consent given with another administrator's credentials registers
+    # that administrator, whose hive this account never writes.
+    if ((Resolve-PrincipalSid $Task.Principal.UserId) -ne (Get-CurrentSid)) {
+        $refusals += "task principal is $($Task.Principal.UserId), not this account"
+    }
     return $refusals
+}
+
+function Switch-Runtime([string]$New, [string]$Live, [scriptblock]$Move = { param($from, $to) Move-Item -LiteralPath $from -Destination $to }) {
+    # Puts the new runtime in place of the live one and keeps the old one
+    # until the new one is there and has its python.exe: a failure on the
+    # way puts the old one back, so the task is never left without a runtime.
+    $old = "$Live.old"
+    if (Test-Path -LiteralPath $old) { Remove-Item -LiteralPath $old -Recurse -Force }
+    $hadLive = Test-Path -LiteralPath $Live
+    if ($hadLive) { & $Move $Live $old }
+    try {
+        & $Move $New $Live
+        if (-not (Test-Path -LiteralPath (Join-Path $Live 'python.exe'))) { throw "the runtime at $Live has no python.exe after the swap" }
+    } catch {
+        if (Test-Path -LiteralPath $Live) { Remove-Item -LiteralPath $Live -Recurse -Force }
+        if ($hadLive) { & $Move $old $Live }
+        throw
+    }
+    if ($hadLive) { Remove-Item -LiteralPath $old -Recurse -Force }
 }
 
 function Wait-TaskStopped([scriptblock]$GetState, [int]$TimeoutSec) {
@@ -237,12 +279,23 @@ function Wait-TaskStopped([scriptblock]$GetState, [int]$TimeoutSec) {
     return ((& $GetState) -ne 'Running')
 }
 
-function Test-DriverProcessesGone($Procs, [bool]$InventoryOk, [string]$DriverPath) {
-    # Gone is proven only by a readable inventory in which no python
-    # process carries the driver (snapshot or checkout path) and none is
-    # unreadable. A failed query proves nothing and returns $false.
+function Test-DriverProcessesGone($Procs, [bool]$InventoryOk, [string]$DriverPath, [string[]]$ToolNames = @(), [string]$StageRoot = '') {
+    # Gone is proven only by a readable inventory in which nothing of the
+    # run is left: no python process carrying the driver, and no process of
+    # a tool the run staged. A tool process counts as the run's when it runs
+    # from the staging directory, and also when its path cannot be read,
+    # because an elevated process hides its path from this unelevated
+    # caller and the run's tools are elevated. The same tool started by the
+    # operator from Bin\ has a readable path elsewhere and is left alone.
+    # A failed query proves nothing and returns $false.
     if (-not $InventoryOk) { return $false }
     foreach ($proc in @($Procs)) {
+        $name = "$($proc.Name)"
+        if ($ToolNames -contains $name) {
+            if (-not $proc.ExecutablePath) { return $false }
+            if ($StageRoot -and $proc.ExecutablePath.StartsWith($StageRoot, [StringComparison]::OrdinalIgnoreCase)) { return $false }
+            continue
+        }
         if (-not $proc.CommandLine) { return $false }
         if ($proc.CommandLine.Contains($DriverPath) -or $proc.CommandLine.Contains('smoke-run.py')) { return $false }
     }
@@ -270,21 +323,47 @@ function Stop-OwnedTask {
     # Stops the task (running or queued) and confirms it, and this
     # checkout's driver processes, are gone. Returns $true only when
     # both are confirmed; an unreadable inventory is not confirmation.
+    $stageRoot = Join-Path $HashDir 'run\bin'
+    $toolNames = @()
+    if (Test-Path -LiteralPath $stageRoot) {
+        $toolNames = @(Get-ChildItem -LiteralPath $stageRoot -Recurse -File -Filter '*.exe' | ForEach-Object Name | Select-Object -Unique)
+    }
+    # What is alive before the stop is said, so "confirmed gone" afterwards
+    # is a statement about processes that were there.
+    $aliveNow = try {
+        $alive = @(Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object {
+            ($toolNames -contains $_.Name) -and (-not $_.ExecutablePath -or $_.ExecutablePath.StartsWith($stageRoot, [StringComparison]::OrdinalIgnoreCase)) })
+        if ($alive) { ($alive | ForEach-Object { "$($_.Name) (pid $($_.ProcessId))" }) -join ', ' } else { 'none' }
+    } catch {
+        "could not be listed ($($_.Exception.Message))"
+    }
+    Write-Host "cleanup: stopping the task; tool processes of the run alive now: $aliveNow"
+    # A stop that finds nothing to stop is not a failure here: what counts is
+    # the confirmation below that the task and its processes are gone.
     Stop-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -ErrorAction SilentlyContinue
     $stopped = Wait-TaskStopped {
         $s = (Get-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName).State
         if ($s -eq 'Running' -or $s -eq 'Queued') { 'Running' } else { 'Ready' }
     } $StopTimeoutSec
     if (-not $stopped) { return $false }
+    # Stopping the task ends its process tree: the wrapper, the driver, and
+    # through the driver's kill-on-close job the tools it launched. That is
+    # checked, not assumed: the driver and every staged tool must be gone.
     $driver = Join-Path $Root 'scripts\smoke-run.py'
-    $inventoryOk = $true
-    try {
-        $procs = @(Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" -ErrorAction Stop)
-    } catch {
-        $procs = @()
-        $inventoryOk = $false
-    }
-    return (Test-DriverProcessesGone $procs $inventoryOk $driver)
+    $wanted = @('python.exe') + $toolNames
+    $deadline = [DateTime]::UtcNow.AddSeconds($StopTimeoutSec)
+    do {
+        $inventoryOk = $true
+        try {
+            $procs = @(Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object { $wanted -contains $_.Name })
+        } catch {
+            $procs = @()
+            $inventoryOk = $false
+        }
+        if (Test-DriverProcessesGone $procs $inventoryOk $driver $toolNames $stageRoot) { return $true }
+        Start-Sleep -Milliseconds 500
+    } while ([DateTime]::UtcNow -lt $deadline)
+    return $false
 }
 
 function Invoke-SelfTest {
@@ -299,12 +378,12 @@ function Invoke-SelfTest {
         $expected = Get-ExpectedAction $Root
         $good = [pscustomobject]@{
             Actions = @([pscustomobject]@{ Execute = $expected.Execute; Arguments = $expected.Argument; WorkingDirectory = $expected.WorkingDirectory })
-            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive' }
+            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive'; UserId = (Get-CurrentSid) }
         }
         Check 'definition match accepted' ((Test-DefinitionMatch $good $Root).Count -eq 0)
         $bad = [pscustomobject]@{
             Actions = @([pscustomobject]@{ Execute = $expected.Execute; Arguments = '-visible'; WorkingDirectory = $expected.WorkingDirectory })
-            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive' }
+            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive'; UserId = (Get-CurrentSid) }
         }
         Check 'definition mismatch refused by name' ((Test-DefinitionMatch $bad $Root) -match 'arguments differ').Count -ge 1
         Check 'action path keys match the pinned relative paths' ($expected.Argument.Contains("@('scripts\smoke-run.py','scripts\conformance-check.py')") -and -not $expected.Argument.Contains('scripts\\smoke-run.py'))
@@ -359,10 +438,39 @@ function Invoke-SelfTest {
             $expected.WorkingDirectory -eq $HashDir -and $expected.Argument.Contains("& '$PythonDir\python.exe' -I"))
         $bare = [pscustomobject]@{
             Actions = @([pscustomobject]@{ Execute = 'powershell.exe'; Arguments = $expected.Argument; WorkingDirectory = $Root })
-            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive' }
+            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive'; UserId = (Get-CurrentSid) }
         }
         Check 'the earlier bare powershell.exe definition is refused by name' (
             ((Test-DefinitionMatch $bare $Root) -join '; ') -match 'action execute differs: powershell\.exe.*working directory differs')
+
+        # The task must be this account's: its HKCU holds the run manifest.
+        $other = [pscustomobject]@{
+            Actions = @([pscustomobject]@{ Execute = $expected.Execute; Arguments = $expected.Argument; WorkingDirectory = $expected.WorkingDirectory })
+            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive'; UserId = 'S-1-5-18' }
+        }
+        Check 'a task registered as another account is refused by name' (((Test-DefinitionMatch $other $Root) -join '; ') -match 'task principal is S-1-5-18, not this account')
+
+        # Cleanup counts the tools the run staged, not only the driver.
+        $stage = 'C:\ProgramData\Resolute\ElevatedSmoke\run\bin'
+        $staged = [pscustomobject]@{ Name = 'RegStudio.exe'; CommandLine = $null; ExecutablePath = "$stage\RegStudio\RegStudio.exe" }
+        $hidden = [pscustomobject]@{ Name = 'RegStudio.exe'; CommandLine = $null; ExecutablePath = $null }
+        $mine = [pscustomobject]@{ Name = 'RegStudio.exe'; CommandLine = 'RegStudio.exe'; ExecutablePath = 'D:\Resolute\Bin\Release\System\RegStudio.exe' }
+        Check 'a staged tool still running, or one whose path is hidden, is not gone; the operator''s own copy is left alone' (
+            -not (Test-DriverProcessesGone @($staged) $true $fakeDriver @('RegStudio.exe') $stage) -and
+            -not (Test-DriverProcessesGone @($hidden) $true $fakeDriver @('RegStudio.exe') $stage) -and
+            (Test-DriverProcessesGone @($mine) $true $fakeDriver @('RegStudio.exe') $stage))
+
+        # The runtime swap keeps the old runtime until the new one is in place.
+        $live = Join-Path $td 'python'; $new = Join-Path $td 'python.new'
+        New-Item -ItemType Directory -Path $live, $new | Out-Null
+        Set-Content (Join-Path $live 'python.exe') 'old'; Set-Content (Join-Path $new 'python.exe') 'new'
+        $threw = $false
+        try {
+            Switch-Runtime $new $live { param($from, $to) if ($from -eq $new) { throw 'the disk refused the rename' }; Move-Item -LiteralPath $from -Destination $to }
+        } catch { $threw = $true }
+        Check 'a failed runtime swap puts the old runtime back' ($threw -and (Get-Content (Join-Path $live 'python.exe')) -eq 'old' -and -not (Test-Path "$live.old"))
+        Switch-Runtime $new $live
+        Check 'a runtime swap that succeeds leaves the new runtime and no old copy' ((Get-Content (Join-Path $live 'python.exe')) -eq 'new' -and -not (Test-Path "$live.old") -and -not (Test-Path $new))
 
         # Who may write: a principal beyond the allowed ones is named.
         $rules = @(
@@ -404,6 +512,13 @@ function Invoke-RegisterElevated {
     # directory, copies the pinned Python in, writes the pinned hashes and
     # registers the task. Exit code says the outcome.
     if (-not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
+    if ($OperatorSid -and $OperatorSid -ne (Get-CurrentSid)) {
+        # Consent given with another administrator's credentials: this copy
+        # runs as that administrator, so the task and the HKCU it reads would
+        # be theirs, and the operator's -Run could never feed it.
+        Write-Host "refused: the consent was given as another account ($([Security.Principal.WindowsIdentity]::GetCurrent().Name)); the task must run as the account that asked for it. Sign in as an administrator, or give this account administrator rights, and register again"
+        return 2
+    }
     $pinnedPython = Join-Path $Root 'reskit\python'
     if (-not (Test-Path (Join-Path $pinnedPython 'python.exe'))) {
         Write-Host "refused: the pinned Python is not installed at $pinnedPython (run pwsh scripts/bootstrap.ps1)"
@@ -459,8 +574,7 @@ function Invoke-RegisterElevated {
         Set-Content -Path $HashFile -Value $lines
         Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
             -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
-        if (Test-Path $PythonDir) { Remove-Item -LiteralPath $PythonDir -Recurse -Force }
-        Rename-Item -LiteralPath $newPython -NewName (Split-Path $PythonDir -Leaf)
+        Switch-Runtime $newPython $PythonDir
         Write-Host "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
         foreach ($line in $lines) { Write-Host "pinned: $line" }
     } catch {
@@ -515,7 +629,7 @@ function Invoke-Register {
         return Invoke-RegisterElevated
     }
     Write-Host 'registration needs one consent prompt; approving it registers the task and pins the driver hashes'
-    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -RegisterElevated -Root `"$Root`""
+    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -RegisterElevated -OperatorSid $(Get-CurrentSid) -Root `"$Root`""
     try {
         $proc = Start-Process powershell.exe -Verb RunAs -ArgumentList $args -Wait -PassThru -ErrorAction Stop
     } catch {
