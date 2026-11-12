@@ -97,7 +97,8 @@ track: W1
 |  43   |   §43   | Sonnet delegates under one lead                | §27 |  [ ]   |
 |  44   |   §44   | Review-order skills match the dispatcher       | --           |  [x]   |
 |  45   |   §45   | Skill numbering and stamp separator follow-ups | §44          |  [x]   |
-|  46   |   §46   | Plan rows outside phase tables refused       | --           |  [ ]   |
+|  46   |   §46   | Plan rows outside phase tables refused       | --           |  [x]   |
+|  47   |   §47   | Plan sync publishes atomically, with readback | --           |  [ ]   |
 
 ---
 
@@ -1902,6 +1903,31 @@ No surface of its own: the plan parser in `scripts/todo-graph.py` and its self-t
 -> SOURCE: operator-2026-11-10-plan-row-placement
 
 **Test checkpoint:** `python scripts/todo-graph.py self-test` passes with every stray-row case named (closing prose, a whole table outside a phase, below a paragraph, a header without its delimiter, after a blank line, after a `Moved` note), the same self-test fails on the table-outside-a-phase case with the phase tracking removed and on the paragraph and blank-line cases with the table tracking removed, and `python scripts/todo-graph.py plan --check` on the real tree passes with every row inside a phase table. All quoted.
+
+> **Verified:** 2026-11-12 | §46 | `D00 T04 §46` at `13a402ca`: `python scripts/todo-graph.py self-test` 209 cases, 0 failed, with six stray-row cases (closing prose, a whole table outside a phase, below a paragraph, a header without its delimiter, after a blank line, after a `Moved` note) refused by `--check` and `--sync` under LF and CRLF, named by reference and line, file bytes unchanged; phase tracking removed fails the table-outside-a-phase case, table tracking removed fails the paragraph and blank-line cases, the delimiter requirement removed fails the bare-header case, the note reset removed fails the `Moved` note case, the check advice reverted fails 24 assertions; `python scripts/todo-graph.py plan --check` on the real plan: implementation plan is current -- 75/241 sections complete (31%); `python -m unittest discover -s scripts/tests` OK (skipped=3); `validate` 0 fatal; `todo-claims.py` 116 hold
+> **Review:** round 2 astra (low), candidates `bd9a9a24`(round 1) `47bf0d37`(round 2) -- `adversarial` needs-attention (1, P1, fixed in `47bf0d37`) then `consistency` approve; repair record round 1 astra (medium), candidate `13a402ca`(round 1) -- `adversarial` approve. Raw findings: docs/reviews/00-workspace/D00-T04-s46.md, docs/reviews/00-workspace/D00-T04-s46-repair.md
+> **Completion:** astra (medium), candidate `47bf0d37` -- COMPLETION: gaps (2 in-scope, both implemented in `13a402ca`). Repair records: docs/reviews/00-workspace/D00-T04-s46-repair.md, final candidate `13a402ca`, COMPLETION: gaps (0 in-scope, 1 out-of-scope filed as `D00 T04 §47`)
+> **Plan review:** astra (medium) on `ef9d758e`, 2 gaps planned in `8c00eeaa`; repair plan review on `275fcec6`, 1 gap planned in `b725930c`
+> **Deferred:** a successful `plan --sync` writes the plan in place, without atomic replacement or readback -> XREF: §47 (item: "Publish the synced plan atomically")
+> **CRUD:** not applicable (a refusal path that writes nothing; the byte-for-byte preservation of the plan file on refusal is asserted under LF and CRLF)
+> **Duration:** 2026-11-12T21:08:15Z to 2026-11-12T21:30:23Z
+> **Implementer:** Claude Fable 5.2 (claude-fable-5-2)
+
+## 47. Plan Sync Publishes Atomically, With Readback
+
+**Filed 2026-11-12** from the completion review of the `D00 T04 §46` repair (`docs/reviews/00-workspace/D00-T04-s46-repair.md`, gap 1, out of scope there). A successful `plan --sync` ends in `PLAN.write_text(...)` in `cmd_plan` of `scripts/todo-graph.py`, which truncates `todo/implementation-plan.md` and writes it in place: a full disk, a locked file or an interrupted run leaves the committed projection truncated or half written, and nothing reads the result back. AGENTS.md's "User systems first" rule asks for atomic writes with readback, and the plan is the file every run starts from. -> XREF: §46
+
+No surface of its own: the plan writer in `scripts/todo-graph.py` and its self-test.
+
+- [ ] Publish the synced plan atomically in `cmd_plan` of `scripts/todo-graph.py`: write the new text to a temporary file in the plan's own directory, flush and `os.fsync` it, then `os.replace` it over `todo/implementation-plan.md`. Done when: a sync whose replace step fails (the self-test makes `os.replace` raise `PermissionError`, which is what a destination held open by another process gives on Windows) exits 1 naming the plan path and the error, leaves the plan byte for byte as it was, and leaves no temporary file behind in `todo/`. Cheaper substitute that fails the checkpoint: catching the error around the existing `write_text`, which has already truncated the file by the time it fails.
+- [ ] Read the published plan back in `cmd_plan`: after the replace, `read_bytes` the plan and compare it with the bytes written; a mismatch exits 1 naming the plan path. Done when: the self-test, with the readback made to return other bytes, sees exit 1 and that message, and a normal sync still prints its `synced N row(s)` line and exits 0.
+- [ ] A failed write of the temporary file leaves the plan alone: Done when: the self-test makes the temporary file's write raise `OSError(errno.ENOSPC)`, and the sync exits 1 naming the error, with the plan unchanged byte for byte and no temporary file left.
+- [ ] Say so in `todo/README.md` under Tooling: one sentence beside the `plan --sync` paragraph that the sync replaces the plan atomically and reads it back. Done when: the sentence is there and `python scripts/todo-claims.py` stays green.
+- [ ] Commit: `"workspace: plan sync publishes atomically, with readback"`
+
+-> SOURCE: review-2026-11-12-D00-T04-s46-repair-gap-1
+
+**Test checkpoint:** `python scripts/todo-graph.py self-test` passes with the failed-replace, failed-write and failed-readback cases named, each asserting exit 1, the unchanged plan bytes and no leftover temporary file; the same self-test fails on the failed-replace case with the old in-place `write_text` restored; and `python scripts/todo-graph.py plan --sync` followed by `plan --check` on the real tree both exit 0. All quoted.
 
 ## Verification
 
