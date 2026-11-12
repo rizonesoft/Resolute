@@ -36,6 +36,8 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
+import shutil
 import struct
 import subprocess
 import sys
@@ -835,6 +837,7 @@ class ToolRun:
         self.hwnd = None
         self.rows = []
         self.failed = False
+        self.refusal = None  # set by the elevated task when the executable may not be launched
 
     def record(self, step, result, detail=""):
         self.rows.append((self.name, step, result, detail))
@@ -1261,15 +1264,106 @@ def drill_tools():
     ]
 
 
-def real_tools(only=None, flavor="Release"):
-    runs = []
+# The elevated task never launches an executable from the checkout: other accounts can write there, so an
+# executable could be replaced after it was checked, or a DLL dropped beside it for the loader to find first
+# (D07 T01 section 7). `tools/elevated-smoke.ps1 -Run`, as the operator, records each executable's SHA-256 in a
+# manifest under the operator's own profile; the task stages each executable into a directory only
+# Administrators and SYSTEM can write, verifies the staged copy against that manifest, and launches the copy.
+STAGE_DIR = Path(os.environ.get("ProgramData", r"C:\ProgramData")) / "Resolute" / "ElevatedSmoke" / "run" / "bin"
+
+
+def tool_paths(only=None, flavor="Release"):
+    """(name, executable) for each selected tool, as the tree under test has them."""
+    out = []
     for name, spec in load_tools().items():
         if only and name not in only:
             continue
         exe = spec["exe"]
         if flavor != "Release":
             exe = exe.replace("Bin/Release", f"Bin/{flavor}", 1)
-        runs.append(ToolRun(name, ROOT / exe))
+        out.append((name, ROOT / exe))
+    return out
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest().upper()
+
+
+def read_manifest(path):
+    """{tool name: SHA-256} from the operator's run manifest, or None when there is none to read."""
+    if not path:
+        return None
+    if str(path).upper().startswith("HKCU\\"):
+        # The operator's own hive: other accounts cannot write it, and the elevated task runs as the operator.
+        import winreg
+        out = {}
+        try:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, str(path)[5:]) as key:
+                index = 0
+                while True:
+                    try:
+                        name, value, _kind = winreg.EnumValue(key, index)
+                    except OSError:
+                        break
+                    if re.fullmatch(r"[0-9A-Fa-f]{64}", str(value)):
+                        out[name] = str(value).upper()
+                    index += 1
+        except OSError:
+            return None
+        return out
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+    except OSError:
+        return None
+    out = {}
+    for line in text.splitlines():
+        m = re.match(r"^([0-9A-Fa-f]{64})  (\S+)$", line.strip())
+        if m:
+            out[m.group(2)] = m.group(1).upper()
+    return out
+
+
+def stage_tool(name: str, exe: Path, manifest, stage_dir: Path):
+    """(staged executable, "") when the staged copy is the one the operator recorded, else (None, why)."""
+    if manifest is None:
+        return None, "refused: no run manifest (start the elevated smoke through tools/elevated-smoke.ps1 -Run)"
+    want = manifest.get(name)
+    if want is None:
+        return None, f"refused: {name} is not in the run manifest"
+    staged = stage_dir / name / exe.name
+    try:
+        staged.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(exe, staged)
+        got = file_sha256(staged)
+    except OSError as exc:
+        return None, f"refused: {exe.name} could not be staged ({exc})"
+    if got != want:
+        try:
+            staged.unlink()
+        except OSError:
+            pass  # the copy is never launched either way; it is overwritten by the next run
+        return None, f"refused: {exe.name} changed after the run manifest recorded it"
+    return staged, ""
+
+
+def real_tools(only=None, flavor="Release"):
+    in_task = bool(os.environ.get("RESOLUTE_SMOKE_ROOT"))
+    manifest = read_manifest(os.environ.get("RESOLUTE_SMOKE_MANIFEST")) if in_task else None
+    runs = []
+    for name, exe in tool_paths(only, flavor):
+        if not in_task:
+            runs.append(ToolRun(name, exe))
+            continue
+        staged, why = stage_tool(name, exe, manifest, STAGE_DIR)
+        run = ToolRun(name, staged or exe)
+        run.refusal = why or None
+        if staged:
+            print(f"smoke: staged {name} {file_sha256(staged)} {staged}")
+        runs.append(run)
     return runs
 
 
@@ -1308,6 +1402,8 @@ def main(argv=None) -> int:
     ap.add_argument("--flavor", default="Release", choices=("Release", "Debug"),
                     help="build flavor whose Bin/<flavor> executables to drive (nightly builds Debug)")
     ap.add_argument("--self-test", action="store_true", help="windowless logic tests")
+    ap.add_argument("--list-tools", action="store_true",
+                    help="print each selected tool's name and executable, tab-separated, and launch nothing")
     ap.add_argument("--elevate", action="store_true",
                     help="relaunch elevated through the runas consent prompt when not elevated")
     ap.add_argument("--elevated-child", action="store_true", help=argparse.SUPPRESS)
@@ -1321,6 +1417,11 @@ def main(argv=None) -> int:
         print(f"smoke: unknown tool selection(s): {', '.join(unknown)} "
               f"(registered: {', '.join(sorted(load_tools()))}); nothing launched")
         return 2
+    if args.list_tools:
+        # What a run would test, for tools/elevated-smoke.ps1 -Run to record in its manifest.
+        for name, exe in tool_paths(only, args.flavor):
+            print(f"{name}\t{exe}")
+        return 0
 
     if args.elevated_child or args.elevate:
         elevated = is_elevated()
@@ -1399,6 +1500,10 @@ def main(argv=None) -> int:
         return collecting and tick_resumed(baseline_tick, last_input_tick())
 
     for run in runs:
+        if run.refusal:
+            ensure_rows(run, "refused", run.refusal)
+            rows += run.rows
+            continue
         if stood_down or resumed():
             stood_down = True
             ensure_rows(run, "stood-down", "operator input resumed; not launched")
@@ -1431,7 +1536,7 @@ def main(argv=None) -> int:
     if resumed():
         stood_down = True
     failed = any(r[2] == "fail" for r in rows) or any(r.failed for r in runs)
-    blocked = any(r[2] == "blocked" for r in rows)
+    blocked = any(r[2] in ("blocked", "refused") for r in rows)  # a tool that was not launched is never a pass
     verdict = "stood-down" if stood_down else ("fail" if failed else ("blocked" if blocked else "pass"))
     notes.append(f"Tools: {', '.join(r.name for r in runs)}.")
     report = render_report(rows, verdict, notes)
@@ -1467,6 +1572,28 @@ def self_test() -> int:
         ("start", True), ("main", True), ("about", False), ("preferences", False), ("exit", True)])
     check("RegStudio expects About", dict(step_table("RegStudio"))["about"] is True)
     check("unknown tool defaults absent", dict(step_table("Nope"))["about"] is False)
+
+    # The elevated task launches only a staged copy that matches the operator's run manifest (D07 T01 section 7).
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        exe = Path(td) / "Bin" / "Tool.exe"
+        exe.parent.mkdir()
+        exe.write_bytes(b"MZ built bytes")
+        stage = Path(td) / "stage"
+        good = Path(td) / "manifest.txt"
+        good.write_text(f"{file_sha256(exe)}  Tool\n", encoding="utf-8")
+        staged, why = stage_tool("Tool", exe, read_manifest(good), stage)
+        check("a recorded executable is staged, and the staged copy is what runs",
+              why == "" and staged == stage / "Tool" / "Tool.exe" and staged.read_bytes() == exe.read_bytes())
+        exe.write_bytes(b"MZ other bytes")
+        staged, why = stage_tool("Tool", exe, read_manifest(good), stage)
+        check("an executable changed after the manifest is refused by name, and no copy is left to launch",
+              staged is None and "Tool.exe changed after the run manifest recorded it" in why
+              and not (stage / "Tool" / "Tool.exe").exists())
+        staged, why = stage_tool("Other", exe, read_manifest(good), stage)
+        check("a tool missing from the manifest is refused by name", staged is None and "Other is not in the run manifest" in why)
+        staged, why = stage_tool("Tool", exe, read_manifest(Path(td) / "absent.txt"), stage)
+        check("a missing manifest refuses", staged is None and "no run manifest" in why)
 
     # Pixel logic, no window needed.
     uniform = bytes([10, 20, 30, 255]) * 64

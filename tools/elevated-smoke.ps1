@@ -7,11 +7,23 @@
 #   pwsh tools/elevated-smoke.ps1 -SelfTest             windowless contract tests; registers nothing
 #   pwsh tools/elevated-smoke.ps1 -Check                would -Run be refused? starts nothing, changes nothing
 #
-# Trust boundary: registration pins the SHA-256 of scripts/smoke-run.py and
-# scripts/conformance-check.py in C:\ProgramData\Resolute\ElevatedSmoke\
-# trusted-hashes.txt (write: Administrators and SYSTEM only). The task
-# wrapper and -Run verify both hashes before anything launches elevated, so
-# editing a driver file after registration buys a named refusal and a
+# Trust boundary: nothing the task runs elevated is read from a place another
+# account can write.
+#   * The whole of C:\ProgramData\Resolute\ElevatedSmoke is written only by
+#     Administrators and SYSTEM. Registration sets that on the directory
+#     itself, because ProgramData lets ordinary users create files in a new
+#     folder, and removes anything it did not put there.
+#   * The drivers (scripts/smoke-run.py, scripts/conformance-check.py) are
+#     pinned by SHA-256 at registration, staged into that directory before
+#     each run, verified there, and run from there.
+#   * Python is the repository's pinned runtime (reskit/python), copied into
+#     that directory at registration. The machine's own python may sit in a
+#     folder any signed-in account can modify, so it is never used.
+#   * The tool executables change with every build, so -Run, as the operator,
+#     records their SHA-256 under HKCU (the operator's own hive), and the
+#     elevated driver stages each one into that directory, verifies the copy
+#     and launches the copy.
+# Editing a driver after registration buys a named refusal and a
 # re-registration prompt, never silent elevated execution of new code.
 # The task action is fixed at registration and takes no caller arguments.
 
@@ -32,6 +44,13 @@ $TaskName = 'ElevatedSmoke'
 $HashDir = 'C:\ProgramData\Resolute\ElevatedSmoke'
 $HashFile = Join-Path $HashDir 'trusted-hashes.txt'
 $SnapshotDir = Join-Path $HashDir 'run\scripts'
+$PythonDir = Join-Path $HashDir 'python'
+$EnvFile = Join-Path $HashDir 'run\elevated-smoke-env.txt'
+$ManifestKey = 'HKCU:\Software\Resolute\ElevatedSmoke\Manifest'
+$ManifestName = 'HKCU\Software\Resolute\ElevatedSmoke\Manifest'   # as the driver's winreg reads it
+$KnownEntries = @('trusted-hashes.txt', 'python', 'python.new', 'run')
+$AdminsSid = 'S-1-5-32-544'
+$SystemSid = 'S-1-5-18'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
 $AckTimeoutSec = 60
 $RunTimeoutSec = 900
@@ -109,24 +128,90 @@ function Get-TaskOrNull {
 }
 
 function Get-ExpectedAction([string]$Base) {
-    $python = (Get-Command python -ErrorAction Stop).Source
-    $driver = Join-Path $Base 'scripts\smoke-run.py'
-    $envFile = Join-Path $Base 'build\smoke\elevated-smoke-env.txt'
-    $smokeDir = Join-Path $Base 'build\smoke'
+    # Everything the action executes lives under $HashDir: Windows PowerShell
+    # by its full path, the staged drivers, and the pinned Python copied in
+    # at registration. The checkout appears only as data: the files to stage
+    # and verify, and the root of the tree under test.
+    $python = Join-Path $PythonDir 'python.exe'
     $inner = "`$v = if (`$env:__COMPAT_LAYER -or [Environment]::GetEnvironmentVariable('__COMPAT_LAYER','User') -or [Environment]::GetEnvironmentVariable('__COMPAT_LAYER','Machine')) { 'contaminated: __COMPAT_LAYER present' } else { 'clean' }; " +
-        "New-Item -ItemType Directory -Force -Path '$smokeDir' | Out-Null; " +
-        "Set-Content -Path '$envFile' -Value `$v; " +
+        "Set-Content -Path '$EnvFile' -Value `$v; " +
         "if (`$v -ne 'clean') { exit 2 }; " +
         "`$pinned = @{}; foreach (`$line in Get-Content '$HashFile') { if (`$line -match '^([0-9A-Fa-f]{64})  (.+)$') { `$pinned[`$Matches[2]] = `$Matches[1].ToUpper() } }; " +
-        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$h = (Get-FileHash -Algorithm SHA256 -Path (Join-Path '$Base' `$rel)).Hash; if (`$pinned[`$rel] -ne `$h) { Set-Content -Path '$envFile' -Value 'refused: driver changed since registration'; exit 2 } }; " +
+        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$h = (Get-FileHash -Algorithm SHA256 -Path (Join-Path '$Base' `$rel)).Hash; if (`$pinned[`$rel] -ne `$h) { Set-Content -Path '$EnvFile' -Value 'refused: driver changed since registration'; exit 2 } }; " +
         "`$snap = '$SnapshotDir'; New-Item -ItemType Directory -Force -Path `$snap | Out-Null; " +
-        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$leaf = Split-Path `$rel -Leaf; Copy-Item -Path (Join-Path '$Base' `$rel) -Destination (Join-Path `$snap `$leaf) -Force; `$h2 = (Get-FileHash -Algorithm SHA256 -Path (Join-Path `$snap `$leaf)).Hash; if (`$pinned[`$rel] -ne `$h2) { Set-Content -Path '$envFile' -Value 'refused: snapshot hash mismatch'; exit 2 } }; " +
-        "`$env:RESOLUTE_SMOKE_ROOT = '$Base'; `$env:RESOLUTE_IDLE_COLLECT = '1'; & '$python' -I (Join-Path `$snap 'smoke-run.py'); exit `$LASTEXITCODE"
+        "foreach (`$rel in @('scripts\smoke-run.py','scripts\conformance-check.py')) { `$leaf = Split-Path `$rel -Leaf; Copy-Item -Path (Join-Path '$Base' `$rel) -Destination (Join-Path `$snap `$leaf) -Force; `$h2 = (Get-FileHash -Algorithm SHA256 -Path (Join-Path `$snap `$leaf)).Hash; if (`$pinned[`$rel] -ne `$h2) { Set-Content -Path '$EnvFile' -Value 'refused: snapshot hash mismatch'; exit 2 } }; " +
+        "`$env:RESOLUTE_SMOKE_ROOT = '$Base'; `$env:RESOLUTE_SMOKE_MANIFEST = '$ManifestName'; `$env:RESOLUTE_IDLE_COLLECT = '1'; & '$python' -I (Join-Path `$snap 'smoke-run.py'); exit `$LASTEXITCODE"
     return @{
-        Execute = 'powershell.exe'
+        Execute = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
         Argument = "-NoProfile -NonInteractive -Command ""& { $inner }"""
-        WorkingDirectory = $Base
+        WorkingDirectory = $HashDir
     }
+}
+
+function Get-ExtraWriters($Rules, [string[]]$AllowedSids) {
+    # The principals that can write and are not among the allowed ones.
+    # $Rules is a list of { Sid; Name; Writes } so the rule is testable
+    # without a real descriptor; Get-FileWriteRules and Get-KeyWriteRules
+    # build it from one.
+    $extra = @()
+    foreach ($rule in @($Rules)) {
+        if ($rule.Writes -and ($AllowedSids -notcontains $rule.Sid)) { $extra += "$($rule.Name) ($($rule.Sid))" }
+    }
+    return ,@($extra | Select-Object -Unique)
+}
+
+function ConvertTo-WriteRules($Access, [scriptblock]$Writes) {
+    foreach ($ace in @($Access)) {
+        if ($ace.AccessControlType -ne 'Allow') { continue }
+        $sid = try { $ace.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value } catch { "$($ace.IdentityReference)" }
+        [pscustomobject]@{ Sid = $sid; Name = "$($ace.IdentityReference)"; Writes = [bool](& $Writes $ace) }
+    }
+}
+
+function Get-KeyWriteRules([string]$KeyPath) {
+    $mask = [Security.AccessControl.RegistryRights]'SetValue, CreateSubKey, Delete, ChangePermissions, TakeOwnership'
+    return @(ConvertTo-WriteRules (Get-Acl -Path $KeyPath).Access { param($ace) ($ace.RegistryRights -band $mask) -ne 0 })
+}
+
+function Test-LineEndingDrift([byte[]]$Disk, [byte[]]$Blob) {
+    # True when the file on disk is the committed blob with CRLF where the
+    # blob has LF: bytes git would never write for an eol=lf path, so a pin
+    # taken over them breaks the next time git rewrites the file.
+    if ($null -eq $Blob -or $Disk.Length -eq $Blob.Length) { return $false }
+    $text = [Text.Encoding]::GetEncoding(28591)
+    return ($text.GetString($Disk).Replace("`r`n", "`n") -ceq $text.GetString($Blob))
+}
+
+function Get-HeadBlob([string]$Base, [string]$Rel) {
+    # The committed bytes of a path, or $null when git cannot say.
+    $info = [Diagnostics.ProcessStartInfo]::new('git')
+    foreach ($a in @('-C', $Base, 'cat-file', 'blob', ('HEAD:' + $Rel.Replace('\', '/')))) { $info.ArgumentList.Add($a) }
+    $info.UseShellExecute = $false
+    $info.RedirectStandardOutput = $true
+    $info.RedirectStandardError = $true
+    $info.CreateNoWindow = $true
+    try { $git = [Diagnostics.Process]::Start($info) } catch { return $null }
+    try {
+        $null = $git.StandardError.ReadToEndAsync()
+        $buffer = [IO.MemoryStream]::new()
+        $git.StandardOutput.BaseStream.CopyTo($buffer)
+        $git.WaitForExit()
+        if ($git.ExitCode -ne 0) { return $null }
+        return ,$buffer.ToArray()
+    } finally {
+        $git.Dispose()
+    }
+}
+
+function Get-DriftRefusals([string]$Base) {
+    $refusals = @()
+    foreach ($rel in $DriverFiles) {
+        $disk = [IO.File]::ReadAllBytes((Join-Path $Base $rel))
+        if (Test-LineEndingDrift $disk (Get-HeadBlob $Base $rel)) {
+            $refusals += "$rel is on disk with CRLF line endings, which git does not write for it: restore it (git checkout -- $($rel.Replace('\','/'))) and register again"
+        }
+    }
+    return $refusals
 }
 
 function Test-DefinitionMatch($Task, [string]$Base) {
@@ -268,6 +353,34 @@ function Invoke-SelfTest {
         Check 'unconfirmed stop fails inside its bound' (-not (Wait-TaskStopped { 'Running' } 1))
         Check 'confirmed stop passes' (Wait-TaskStopped { 'Ready' } 1)
 
+        # The action runs nothing by a bare name and nothing from the checkout.
+        Check 'the action runs Windows PowerShell by its full path from the protected directory' (
+            $expected.Execute -eq (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -and
+            $expected.WorkingDirectory -eq $HashDir -and $expected.Argument.Contains("& '$PythonDir\python.exe' -I"))
+        $bare = [pscustomobject]@{
+            Actions = @([pscustomobject]@{ Execute = 'powershell.exe'; Arguments = $expected.Argument; WorkingDirectory = $Root })
+            Principal = [pscustomobject]@{ RunLevel = 'Highest'; LogonType = 'Interactive' }
+        }
+        Check 'the earlier bare powershell.exe definition is refused by name' (
+            ((Test-DefinitionMatch $bare $Root) -join '; ') -match 'action execute differs: powershell\.exe.*working directory differs')
+
+        # Who may write: a principal beyond the allowed ones is named.
+        $rules = @(
+            [pscustomobject]@{ Sid = $AdminsSid; Name = 'BUILTIN\Administrators'; Writes = $true },
+            [pscustomobject]@{ Sid = 'S-1-5-11'; Name = 'NT AUTHORITY\Authenticated Users'; Writes = $true },
+            [pscustomobject]@{ Sid = 'S-1-5-32-545'; Name = 'BUILTIN\Users'; Writes = $false }
+        )
+        $extra = Get-ExtraWriters $rules @($AdminsSid, $SystemSid)
+        Check 'a writer beyond the allowed principals is named, a reader is not' ($extra.Count -eq 1 -and $extra[0] -match 'Authenticated Users \(S-1-5-11\)')
+        Check 'allowed writers alone pass' ((Get-ExtraWriters $rules[0, 2] @($AdminsSid, $SystemSid)).Count -eq 0)
+
+        # Line endings: a CRLF copy of the committed bytes is drift, the bytes themselves are not.
+        $blob = [Text.Encoding]::ASCII.GetBytes("one`ntwo`n")
+        Check 'a CRLF copy of the committed driver is refused, the committed bytes are accepted' (
+            (Test-LineEndingDrift ([Text.Encoding]::ASCII.GetBytes("one`r`ntwo`r`n")) $blob) -and
+            -not (Test-LineEndingDrift $blob $blob) -and
+            -not (Test-LineEndingDrift ([Text.Encoding]::ASCII.GetBytes("one`nthree`n")) $blob))
+
         # A queued instance is stopped like a running one; a ready task is left.
         Check 'running and queued need a stop, ready does not' ((Test-TaskNeedsStop 'Running') -and (Test-TaskNeedsStop 'Queued') -and -not (Test-TaskNeedsStop 'Ready'))
 
@@ -287,54 +400,74 @@ function Invoke-SelfTest {
 }
 
 function Invoke-RegisterElevated {
-    # Runs elevated (one consent prompt from -Register). Registers the task
-    # and writes the protected pinned-hashes file. Exit code says the outcome.
+    # Runs elevated (one consent prompt from -Register). Protects the
+    # directory, copies the pinned Python in, writes the pinned hashes and
+    # registers the task. Exit code says the outcome.
     if (-not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
-    $trustRefusals = Test-PinnedHashes $Root $HashFile  # informational before first registration
-    Remove-Variable trustRefusals -ErrorAction SilentlyContinue
-    $priorXml = $null
+    $pinnedPython = Join-Path $Root 'reskit\python'
+    if (-not (Test-Path (Join-Path $pinnedPython 'python.exe'))) {
+        Write-Host "refused: the pinned Python is not installed at $pinnedPython (run pwsh scripts/bootstrap.ps1)"
+        return 2
+    }
     $prior = Get-TaskOrNull
+    if ($prior -and (Test-TaskNeedsStop $prior.State)) {
+        Write-Host 'refused: the elevated smoke task is running or queued; let it finish or run -Remove first'
+        return 2
+    }
+    $priorXml = $null
     if ($prior) { $priorXml = Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName }
     $priorHash = if (Test-Path $HashFile) { Get-Content $HashFile -Raw } else { $null }
     $hadHashDir = Test-Path $HashDir
-    $hadSnapshotRoot = Test-Path (Split-Path $SnapshotDir -Parent)
+    $newPython = Join-Path $HashDir 'python.new'
     try {
-    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
-    $expected = Get-ExpectedAction $Root
-    $action = New-ScheduledTaskAction -Execute $expected.Execute -Argument $expected.Argument -WorkingDirectory $expected.WorkingDirectory
-    New-Item -ItemType Directory -Force -Path $HashDir | Out-Null
-    $lines = foreach ($rel in $DriverFiles) {
-        '{0}  {1}' -f (Get-FileHash -Algorithm SHA256 -Path (Join-Path $Root $rel)).Hash, $rel
-    }
-    Set-Content -Path $HashFile -Value $lines
-    # Hashes file: write for Administrators and SYSTEM only, read for Users.
-    $acl = New-Object Security.AccessControl.FileSecurity
-    $acl.SetAccessRuleProtection($true, $false)
-    $admins = New-Object Security.Principal.SecurityIdentifier('S-1-5-32-544')
-    $system = New-Object Security.Principal.SecurityIdentifier('S-1-5-18')
-    $users = New-Object Security.Principal.SecurityIdentifier('S-1-5-32-545')
-    foreach ($sid in $admins, $system) {
-        $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($sid, 'FullControl', 'Allow')))
-    }
-    $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($users, 'ReadAndExecute', 'Allow')))
-    Set-Acl -Path $HashFile -AclObject $acl
-    # Protect the snapshot directory the same way: only Administrators and
-    # SYSTEM write where elevated code is staged.
-    New-Item -ItemType Directory -Force -Path $SnapshotDir | Out-Null
-    $dacl = New-Object Security.AccessControl.DirectorySecurity
-    $dacl.SetAccessRuleProtection($true, $false)
-    foreach ($sid in $admins, $system) {
-        $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($sid, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
-    }
-    $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($users, 'ReadAndExecute', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
-    Set-Acl -Path (Split-Path $SnapshotDir -Parent) -AclObject $dacl
-    Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
-        -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
+        $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
+        $expected = Get-ExpectedAction $Root
+        $action = New-ScheduledTaskAction -Execute $expected.Execute -Argument $expected.Argument -WorkingDirectory $expected.WorkingDirectory
+        New-Item -ItemType Directory -Force -Path $HashDir | Out-Null
+        # The directory itself: Administrators and SYSTEM write, Users read,
+        # inherited by everything under it and nothing inherited from
+        # ProgramData, which lets ordinary users create files in a new folder.
+        $dacl = New-Object Security.AccessControl.DirectorySecurity
+        $dacl.SetAccessRuleProtection($true, $false)
+        foreach ($sid in $AdminsSid, $SystemSid) {
+            $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
+                (New-Object Security.Principal.SecurityIdentifier($sid)), 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+        }
+        $dacl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule(
+            (New-Object Security.Principal.SecurityIdentifier('S-1-5-32-545')), 'ReadAndExecute', 'ContainerInherit, ObjectInherit', 'None', 'Allow')))
+        Set-Acl -Path $HashDir -AclObject $dacl
+        # Whatever is here that registration did not put here was put by
+        # someone else while the folder was open to them: it goes.
+        foreach ($entry in Get-ChildItem -LiteralPath $HashDir -Force) {
+            if ($KnownEntries -notcontains $entry.Name) {
+                Write-Host "removed an unexpected entry from ${HashDir}: $($entry.Name)"
+                Remove-Item -LiteralPath $entry.FullName -Recurse -Force
+            }
+        }
+        # The run directory is rebuilt, so nothing staged before the folder
+        # was protected is still there, and it takes the inherited ACL.
+        $runDir = Split-Path $SnapshotDir -Parent
+        if (Test-Path $runDir) { Remove-Item -LiteralPath $runDir -Recurse -Force }
+        New-Item -ItemType Directory -Force -Path $SnapshotDir | Out-Null
+        # The pinned Python, copied beside the old copy and swapped in last.
+        if (Test-Path $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force }
+        Copy-Item -LiteralPath $pinnedPython -Destination $newPython -Recurse
+        $lines = foreach ($rel in $DriverFiles) {
+            '{0}  {1}' -f (Get-FileHash -Algorithm SHA256 -Path (Join-Path $Root $rel)).Hash, $rel
+        }
+        if (Test-Path $HashFile) { Remove-Item -LiteralPath $HashFile -Force }  # a new file takes the inherited ACL
+        Set-Content -Path $HashFile -Value $lines
+        Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
+            -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
+        if (Test-Path $PythonDir) { Remove-Item -LiteralPath $PythonDir -Recurse -Force }
+        Rename-Item -LiteralPath $newPython -NewName (Split-Path $PythonDir -Leaf)
+        Write-Host "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
+        foreach ($line in $lines) { Write-Host "pinned: $line" }
     } catch {
         # Roll back: a failed registration leaves neither a half-registered
-        # task nor new pinned hashes behind.
-        # Every step runs whatever the others do, what this run created is
-        # removed, and a step that fails is said beside the original error.
+        # task nor new pinned hashes behind. Every step runs whatever the
+        # others do, what this run created is removed, and a step that
+        # fails is said beside the original error.
         $cause = $_
         $notRestored = Invoke-RollbackSteps @(
             {
@@ -349,8 +482,7 @@ function Invoke-RegisterElevated {
                 elseif (Test-Path $HashFile) { Remove-Item $HashFile -ErrorAction Stop }
             },
             {
-                $snapshotRoot = Split-Path $SnapshotDir -Parent
-                if (-not $hadSnapshotRoot -and (Test-Path $snapshotRoot)) { Remove-Item $snapshotRoot -Recurse -Force -ErrorAction Stop }
+                if (Test-Path $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force -ErrorAction Stop }
                 if (-not $hadHashDir -and (Test-Path $HashDir)) { Remove-Item $HashDir -Recurse -Force -ErrorAction Stop }
             }
         )
@@ -375,6 +507,10 @@ function Invoke-Register {
         Write-Host 're-run with -Register -Replace to consent to overwriting it'
         return 2
     }
+    # Before any prompt: a pin taken over bytes git would not write breaks
+    # by itself later, so it is refused here, by name.
+    $drift = @(Get-DriftRefusals $Root)
+    if ($drift) { Write-Host ("refused: " + ($drift -join '; ')); return 2 }
     if (Test-IsElevated) {
         return Invoke-RegisterElevated
     }
@@ -405,6 +541,7 @@ function Invoke-Check {
     $task = Get-TaskOrNull
     if (-not $task) { $refusals += 'task not registered' }
     else { $refusals += @(Test-DefinitionMatch $task $Root) }
+    if (-not (Test-Path (Join-Path $PythonDir 'python.exe'))) { $refusals += "the task's Python is missing from $PythonDir (register again)" }
     if ($refusals) { Write-Host ("not ready: " + ($refusals -join '; ')); return 2 }
     Write-Host 'ready: the task is registered for this checkout and the pinned driver hashes match'
     return 0
@@ -418,12 +555,33 @@ function Invoke-Run {
     }
     $task = Get-TaskOrNull
     if (-not $task) { Write-Host 'refused: task not registered (run tools/elevated-smoke.ps1 -Register first)'; return 2 }
-    if ($task.State -eq 'Running') { Write-Host 'refused: the elevated smoke task is already Running'; return 2 }
+    if (Test-TaskNeedsStop $task.State) { Write-Host "refused: the elevated smoke task is already $($task.State)"; return 2 }
     $diffs = Test-DefinitionMatch $task $Root
     if ($diffs) { Write-Host ("refused: registered task differs from this registration: " + ($diffs -join '; ')); return 2 }
 
+    # The run manifest: what this run may launch elevated, recorded by the
+    # operator's own account in the operator's own hive. The elevated driver
+    # stages each executable, verifies the copy against this, and runs the copy.
+    $listed = @(& python (Join-Path $Root 'scripts\smoke-run.py') --list-tools)
+    if ($LASTEXITCODE -ne 0 -or -not $listed) { Write-Host 'refused: the smoke driver could not list its tools'; return 2 }
+    New-Item -Path $ManifestKey -Force | Out-Null
+    $writers = Get-ExtraWriters (Get-KeyWriteRules $ManifestKey) @(
+        [Security.Principal.WindowsIdentity]::GetCurrent().User.Value, $AdminsSid, $SystemSid)
+    if ($writers.Count) {
+        Write-Host ("refused: the run manifest key can be written by another principal: " + ($writers -join ', '))
+        return 2
+    }
+    foreach ($name in @((Get-Item $ManifestKey).GetValueNames())) { Remove-ItemProperty -Path $ManifestKey -Name $name }
+    foreach ($line in $listed) {
+        $name, $exe = $line -split "`t", 2
+        if (-not (Test-Path -LiteralPath $exe)) { Write-Host "refused: $name is not built ($exe)"; return 2 }
+        $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $exe).Hash
+        Set-ItemProperty -Path $ManifestKey -Name $name -Value $hash
+        Write-Host "manifest: $hash  $name"
+    }
+
     $reportPath = Join-Path $Root 'build\smoke\smoke-report.md'
-    $envPath = Join-Path $Root 'build\smoke\elevated-smoke-env.txt'
+    $envPath = $EnvFile
     $started = Get-Date
     $completed = $false
     try {
