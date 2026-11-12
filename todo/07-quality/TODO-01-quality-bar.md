@@ -45,7 +45,7 @@ track: Q1
 |   5   |   §5    | Elevated smoke pass for RegStudio             | §4            |  [x]   |
 |   6   |   §6    | Smoke capture-timeout test                    | §4            |  [x]   |
 |   7   |   §7    | Unattended elevated smoke via scheduled task  | §5            |  [ ]   |
-|   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [ ]   |
+|   8   |   §8    | Smoke forwarding-test assertion               | §5            |  [x]   |
 |   9   |   §9    | Smoke fixture release in finally              | §6            |  [ ]   |
 |  10   |   §10   | Elevated smoke ends with the run that started it | §7          |  [ ]   |
 
@@ -323,6 +323,15 @@ No surface of its own: a windowless self-test case in the existing driver, consu
 -> SOURCE: review-2026-11-10-d07-t01-s5-round3 (P3 forwarding test can pass broken)
 
 **Test checkpoint:** `python scripts/smoke-run.py --self-test` passes with the strengthened case, and the case fails when forwarding is stubbed to a constant 2 (quoted from a real run each way).
+
+> **Verified:** 2026-11-13 | §8 | `D07 T01 §8` at `5a9a3c23`: `python scripts/smoke-run.py --self-test` ends "self-test: all pass", exit 0; the same self-test with the forwarding call stubbed to a constant 2 ends "FAIL child exit codes 0, 1, 2 forward and preserve its report" and "self-test: FAIL child exit codes 0, 1, 2 forward and preserve its report"; `validate` 0 fatal
+> **Review:** round 1 astra (medium), candidate `5a9a3c23`(round 1) -- `adversarial` approve. Raw findings: docs/reviews/07-quality/D07-T01-s8.md
+> **Completion:** astra (medium), candidate `5a9a3c23` -- COMPLETION: gaps (1, the quoted real-run evidence, which is this stamp and the candidate's commit body; no code gap). Repair records: none
+> **Plan review:** astra (medium) on `8ab3658a`, no findings
+> **CRUD:** not applicable (a self-test assertion; nothing is written)
+> **Duration:** 2026-11-12T22:14:18Z to 2026-11-12T22:18:19Z
+> **Implementer:** Claude Fable 5.2 (claude-fable-5-2)
+
 ## 9. Smoke Fixture Release in Finally
 
 **Filed 2026-11-10** from the `D07 T01 §6` repair review (round 1, `P3`, in `docs/reviews/07-quality/D07-T01-s6-repair.md`): one capture-interruption regression waits for explicit release with no timeout, but its release runs only after `main([])` returns normally, so an exception or cancellation in that fixture leaves the daemon worker blocked until process exit. A fixture that can leak a worker on its own failure path is the kind of test debt that later reads as a hang.

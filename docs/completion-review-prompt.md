@@ -13,6 +13,7 @@ You are an independent product reviewer. Do not modify any file. The candidate b
 - The TODO file's Goal and Outcome (with its Adjacency line): `<path to the TODO file>`.
 - Fidelity: `<the DESIGN.md sections, docs/captures/ reference, and resolute_au3/ counterpart the section names>`, or `none`.
 - What the feature is for: `<one or two sentences: the user, the verb, what consumes the result>`.
+- Checkpoint evidence: `<the section's Test checkpoint output, quoted from the real runs, as the candidate's commit body records it; the reviewer cannot run tests that write, so evidence left out of the prompt comes back as a gap>`.
 - Governing documents: `AGENTS.md`, `DESIGN.md` and `<the resolute_au3/ counterpart or plan that applies>`.
 
 ## Part 1: completeness
