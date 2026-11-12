@@ -121,11 +121,13 @@ def push_base(commit: str, gh, timeout: float = CALL_TIMEOUT) -> str:
     of a TODO edit followed by a C++ commit owes `plan-gates`, and a change reverted inside one push does not. So
     what a commit owes is read from the push GitHub recorded, and when GitHub records none ending at this commit
     the answer is that it cannot be established, never a guess."""
-    out = gh(["api", "repos/{owner}/{repo}/activity?activity_type=push&per_page=100",
-              "--jq", f'.[] | select(.after == "{commit}") | .before'], timeout)
-    found = out.split()
+    query = ["api", "repos/{owner}/{repo}/activity?activity_type=push&per_page=100",
+             "--jq", f'.[] | select(.after == "{commit}") | .before']
+    # The newest hundred pushes answer almost every question in one request; an older head is looked for through
+    # every page GitHub has. A search that is cut short raises (exit 3); only a finished one may say "none".
+    found = gh(query, timeout).split() or gh([*query, "--paginate"], timeout).split()
     if not found:
-        raise CannotAsk(f"GitHub lists no push ending at {commit[:12]} among the last 100: it was not pushed as a head, "
+        raise CannotAsk(f"GitHub lists no push ending at {commit[:12]}: it was not pushed as a head, "
                         "so what it owes cannot be established (ask about the head of the push that carried it)")
     return found[0]
 
@@ -467,6 +469,8 @@ def self_test() -> int:
     check("a commit GitHub records no push for is exit 3, never green", (code, "lists no push ending at" in " ".join(said_lines)), (3, True))
     check("the push base is read from GitHub's record of the push",
           push_base("c0ffee", lambda args, timeout: "0123abcd\n", 5), "0123abcd")
+    check("a head older than the newest hundred pushes is found on a later page",
+          push_base("c0ffee", lambda args, timeout: "0ldba5e\n" if "--paginate" in args else "", 5), "0ldba5e")
 
     # Local git is inside the same rules: a failed read is exit 3 and never an empty answer, and a slow one
     # spends the wait like any other read.
