@@ -82,6 +82,8 @@ The task's trust boundary is that nothing it runs elevated is read from a place 
 
 The action itself runs Windows PowerShell by its full path with the protected directory as its working directory. Editing either driver after registration buys a named refusal and a re-registration prompt, never silent elevated execution of new code. `RunAsInvoker` is never used: it does not elevate, so it cannot prove an elevated step.
 
+`tools/elevated-smoke.ps1 -Readback` prints what the boundary rests on as it is now: the task's principal, action and security descriptor, who can write each pinned driver, and who owns the directory and its parent. A registration that fails puts back the previous task, pinned hashes and Python; what it leaves is only what takes access away (Administrators' ownership of the directory and its parent, the tightened permissions, an empty run directory), and `tools/elevated-smoke.ps1 -Remove` followed by deleting `C:\ProgramData\Resolute\ElevatedSmoke` from an elevated shell removes all of it.
+
 One exposure remains and is accepted: the driver writes its report and captures under `build/smoke` in the checkout, as every smoke run does, so an account that can write the checkout could redirect those files (a report and PNG captures, never code) to another folder. Reversing that would mean a second report location for elevated runs and a copy back, which nothing has needed yet.
 
 ## Skips are debt
