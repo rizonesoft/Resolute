@@ -18,7 +18,7 @@ The full gate set runs on GitHub on every push, so the development machine runs 
 
 | Workflow | Runs | When |
 | --- | --- | --- |
-| `gates` (`.github/workflows/gates.yml`) | `pwsh scripts/check-all.ps1`, unchanged: build Debug, build Release, tidy ratchet, ratchet self-test, conformance check, conformance self-test, tests debug, tests release, graph validate, graph self-test, plan --check, claims, claims self-test, fence-debt self-test, night-debt self-test, fence-inventory self-test, fence inventory, reviewers pin, scripts unit tests, agent tiers, agent tiers self-test, conformance profile, profile self-test | every push to `main`, and by hand (`gh workflow run gates`) |
+| `gates` (`.github/workflows/gates.yml`) | `pwsh scripts/check-all.ps1`, unchanged, 24 gates: toolchain (advisory: it reports `current`, `behind` or `unknown` against the latest releases and does not fail the run), build Debug, build Release, tidy ratchet, ratchet self-test, conformance check, conformance self-test, tests debug, tests release, graph validate, graph self-test, plan --check, claims, claims self-test, fence-debt self-test, night-debt self-test, fence-inventory self-test, fence inventory, reviewers pin, scripts unit tests, agent tiers, agent tiers self-test, conformance profile, profile self-test | every push to `main`, and by hand (`gh workflow run gates`) |
 | `plan-gates` (`.github/workflows/plan.yml`) | the Python gates and the plan projection check | a push that touches `scripts/`, `.conclave/`, `.claude/`, `AGENTS.md`, `todo/`, `tools/githooks/`, `.gitattributes` or the workflow itself |
 
 These are not gates of `check-all` and have no line in its summary, on the runner or here. Each needs this machine, and each is run locally by the section that owes it:
