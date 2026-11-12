@@ -6,6 +6,7 @@
 #   pwsh tools/elevated-smoke.ps1 -Remove               stop if running, unregister, prove absence
 #   pwsh tools/elevated-smoke.ps1 -SelfTest             windowless contract tests; registers nothing
 #   pwsh tools/elevated-smoke.ps1 -Check                would -Run be refused? starts nothing, changes nothing
+#   pwsh tools/elevated-smoke.ps1 -Readback             print what the trust boundary rests on, as it is now
 #
 # Trust boundary: nothing the task runs elevated is read from a place another
 # account can write.
@@ -34,8 +35,11 @@ param(
     [switch]$Remove,
     [switch]$SelfTest,
     [switch]$Check,
+    [switch]$Readback,
     [switch]$RegisterElevated,   # internal: elevated copy of this script, run by -Register
     [string]$OperatorSid = '',   # internal: the account that asked for the registration
+    [switch]$ProveRollback,      # with -Register: first fail a registration on purpose and read the previous state back
+    [string]$FailAfterStep = '', # internal: the step after which the elevated copy fails on purpose (it can only make a registration fail)
     [int]$RunTimeoutSec = 900,   # how long -Run waits for the task before it stops it and cleans up
     [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )
@@ -50,7 +54,8 @@ $PythonDir = Join-Path $HashDir 'python'
 $EnvFile = Join-Path $HashDir 'run\elevated-smoke-env.txt'
 $ManifestKey = 'HKCU:\Software\Resolute\ElevatedSmoke\Manifest'
 $ManifestName = 'HKCU\Software\Resolute\ElevatedSmoke\Manifest'   # as the driver's winreg reads it
-$KnownEntries = @('trusted-hashes.txt', 'python', 'python.new', 'python.old', 'run')
+$KnownEntries = @('trusted-hashes.txt', 'python', 'python.new', 'python.old', 'run', 'register-log.txt')
+$RegisterLog = Join-Path $HashDir 'register-log.txt'
 $AdminsSid = 'S-1-5-32-544'
 $SystemSid = 'S-1-5-18'
 $DriverFiles = @('scripts\smoke-run.py', 'scripts\conformance-check.py')
@@ -186,6 +191,62 @@ function Get-DirectoryRefusals {
         if ($extra.Count) { $refusals += "$($check.Path) can be $($check.What) by $($extra -join ', ')" }
     }
     return $refusals
+}
+
+function Get-SddlExtraWriters([string]$Sddl, [string[]]$AllowedSids) {
+    # The principals a security descriptor lets change the object, beyond
+    # the allowed ones. Used on the scheduled task: whoever can rewrite the
+    # task can point it at anything.
+    $write = 0x10000000 -bor 0x40000000 -bor 0x00010000 -bor 0x00040000 -bor 0x00080000 -bor 0x2 -bor 0x4 -bor 0x10 -bor 0x100
+    $descriptor = New-Object Security.AccessControl.RawSecurityDescriptor($Sddl)
+    $extra = @()
+    foreach ($ace in $descriptor.DiscretionaryAcl) {
+        if ($ace.AceType -ne 'AccessAllowed') { continue }
+        if (($ace.AccessMask -band $write) -eq 0) { continue }
+        $sid = $ace.SecurityIdentifier.Value
+        if ($AllowedSids -notcontains $sid) { $extra += $sid }
+    }
+    return ,@($extra | Select-Object -Unique)
+}
+
+function Get-TaskSddl {
+    $service = New-Object -ComObject Schedule.Service
+    $service.Connect()
+    return $service.GetFolder($TaskPath.TrimEnd('\')).GetTask($TaskName).GetSecurityDescriptor(0x7)  # owner, group, DACL
+}
+
+function Get-TaskSecurityRefusals {
+    try { $sddl = Get-TaskSddl } catch { return @("the task's security descriptor could not be read ($($_.Exception.Message))") }
+    $extra = Get-SddlExtraWriters $sddl @((Get-CurrentSid), $AdminsSid, $SystemSid)
+    if ($extra.Count) { return @("the task can be changed by another principal: " + ($extra -join ', ')) }
+    return @()
+}
+
+function Get-DriverWriters([string]$Base) {
+    # Who can write each pinned driver file in the checkout. They can break
+    # the pin (a refusal, and a new consent), never run code through it.
+    $mask = [Security.AccessControl.FileSystemRights]'Write, Delete, ChangePermissions, TakeOwnership'
+    foreach ($rel in $DriverFiles) {
+        $rules = @(ConvertTo-WriteRules (Get-Acl -LiteralPath (Join-Path $Base $rel)).Access { param($ace) ($ace.FileSystemRights -band $mask) -ne 0 })
+        "$rel can be written by: " + ((@($rules | Where-Object Writes | ForEach-Object Name) | Select-Object -Unique) -join ', ')
+    }
+}
+
+function Invoke-Readback {
+    # Read-only: what the trust boundary rests on, as it is now.
+    $task = Get-TaskOrNull
+    if (-not $task) { Write-Host 'no ElevatedSmoke task is registered'; return 2 }
+    Write-Host "task principal: $($task.Principal.UserId), $($task.Principal.RunLevel), $($task.Principal.LogonType)"
+    Write-Host "task action: $(@($task.Actions)[0].Execute) in $(@($task.Actions)[0].WorkingDirectory)"
+    try { Write-Host "task security descriptor: $(Get-TaskSddl)" } catch { Write-Host "task security descriptor: could not be read ($($_.Exception.Message))" }
+    foreach ($line in Get-DriverWriters $Root) { Write-Host "driver: $line" }
+    foreach ($dir in (Split-Path $HashDir -Parent), $HashDir) {
+        if (Test-Path -LiteralPath $dir) { Write-Host "directory: $dir owner $((Get-Acl -LiteralPath $dir).Owner)" }
+    }
+    $refusals = @(Get-TaskSecurityRefusals) + @(Get-DirectoryRefusals) + @(Test-DefinitionMatch $task $Root) + @(Test-PinnedHashes $Root $HashFile)
+    if ($refusals) { Write-Host ("not trusted: " + ($refusals -join '; ')); return 2 }
+    Write-Host 'trusted: the task, its directory and its pinned drivers are as registered'
+    return 0
 }
 
 function Get-ExtraWriters($Rules, [string[]]$AllowedSids) {
@@ -406,7 +467,10 @@ function Stop-OwnedTask {
 }
 
 function Invoke-SelfTest {
-    $failures = @()
+    # One list, in script scope, for the nested Check to add to and for the
+    # verdict below to read. A function-local list here would stay empty
+    # whatever failed, and the command would say "all pass" over FAIL lines.
+    $script:failures = @()
     function Check([string]$Name, [bool]$Ok) {
         if ($Ok) { Write-Host "PASS $Name" } else { Write-Host "FAIL $Name"; $script:failures += $Name }
     }
@@ -521,6 +585,17 @@ function Invoke-SelfTest {
         [void][System.Management.Automation.Language.Parser]::ParseInput($source, [ref]$null, [ref]$parseErrors)
         Check 'a checkout path with an apostrophe gives an action that parses' ($parseErrors.Count -eq 0 -and $source.Contains("'D:\Derick''s Projects\Resolute'"))
 
+        # A rollback is judged by reading the state back, field by field.
+        $was = [pscustomobject]@{ Task = 'xml'; Hashes = 'h'; Python = 'p'; DirectorySddl = 'd' }
+        $now = [pscustomobject]@{ Task = 'xml'; Hashes = 'other'; Python = 'p'; DirectorySddl = 'd' }
+        Check 'a rollback that left the pinned hashes changed is named, an exact restoration is not' (
+            ((Compare-RegistrationState $was $now) -join ',') -eq 'Hashes' -and (Compare-RegistrationState $was $was).Count -eq 0)
+
+        # Who may change the task: a descriptor that lets another principal write is refused, a reader is not.
+        Check 'a task descriptor that lets Authenticated Users write names them, one that lets them read does not' (
+            ((Get-SddlExtraWriters 'D:(A;;FA;;;BA)(A;;FA;;;SY)(A;;FA;;;AU)' @($AdminsSid, $SystemSid)) -join ',') -eq 'S-1-5-11' -and
+            (Get-SddlExtraWriters 'D:(A;;FA;;;BA)(A;;FA;;;SY)(A;;FR;;;AU)' @($AdminsSid, $SystemSid)).Count -eq 0)
+
         # Who may write: a principal beyond the allowed ones is named.
         $rules = @(
             [pscustomobject]@{ Sid = $AdminsSid; Name = 'BUILTIN\Administrators'; Writes = $true },
@@ -548,11 +623,60 @@ function Invoke-SelfTest {
     } finally {
         Remove-Item $td -Recurse -Force -ErrorAction SilentlyContinue
     }
-    if ($failures.Count) {
-        Write-Host ("self-test: FAIL " + ($failures -join ', '))
+    if ($script:failures.Count) {
+        Write-Host ("self-test: FAIL " + ($script:failures -join ', '))
         return 1
     }
     Write-Host 'self-test: all pass'
+    return 0
+}
+
+function Write-Registration([string]$Line) {
+    # The elevated copy runs in a window of its own, so what it says is
+    # also kept in the protected directory for -Register to print.
+    Write-Host $Line
+    if (Test-Path -LiteralPath $HashDir) { Add-Content -LiteralPath $RegisterLog -Value $Line }
+}
+
+function Get-RegistrationState {
+    # What a rollback must put back, in a form two readings can compare.
+    $task = Get-TaskOrNull
+    return [pscustomobject]@{
+        Task = if ($task) { (Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName) -replace '\s+', ' ' } else { '' }
+        Hashes = if (Test-Path -LiteralPath $HashFile) { (Get-Content -LiteralPath $HashFile -Raw).Trim() } else { '' }
+        Python = if (Test-Path -LiteralPath (Join-Path $PythonDir 'python.exe')) { (Get-FileHash -LiteralPath (Join-Path $PythonDir 'python.exe')).Hash } else { '' }
+        DirectorySddl = if (Test-Path -LiteralPath $HashDir) { (Get-Acl -LiteralPath $HashDir).Sddl } else { '' }
+    }
+}
+
+function Compare-RegistrationState($Before, $After) {
+    # The names of what differs; empty when a rollback restored everything.
+    $differs = @()
+    foreach ($name in 'Task', 'Hashes', 'Python', 'DirectorySddl') {
+        if ($Before.$name -ne $After.$name) { $differs += $name }
+    }
+    return ,$differs
+}
+
+function Invoke-ProveRollback {
+    # Elevated. Fails a registration on purpose after it has changed the
+    # directory, the hashes and the task, and reads back that the previous
+    # task, hashes, runtime and directory permissions are what they were.
+    $before = Get-RegistrationState
+    $failed = $false
+    try {
+        $script:FailAfterStep = 'task'
+        [void](Invoke-RegisterElevated)
+    } catch {
+        $failed = $true
+        Write-Registration "rollback proof: the registration failed as injected ($($_.Exception.Message))"
+    } finally {
+        $script:FailAfterStep = ''
+    }
+    if (-not $failed) { Write-Registration 'rollback proof: REFUSED, the injected failure did not fail the registration'; return 2 }
+    $differs = Compare-RegistrationState $before (Get-RegistrationState)
+    if ($differs.Count) { Write-Registration ("rollback proof: REFUSED, not restored: " + ($differs -join ', ')); return 2 }
+    Write-Registration 'rollback proof: the previous task, pinned hashes, runtime and directory permissions were read back unchanged'
     return 0
 }
 
@@ -561,6 +685,10 @@ function Invoke-RegisterElevated {
     # directory, copies the pinned Python in, writes the pinned hashes and
     # registers the task. Exit code says the outcome.
     if (-not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
+    function Step([string]$Name) {
+        # Only ever makes a registration fail: the rollback proof's fault.
+        if ($script:FailAfterStep -eq $Name) { throw "injected failure after step '$Name'" }
+    }
     if ($OperatorSid -and $OperatorSid -ne (Get-CurrentSid)) {
         # Consent given with another administrator's credentials: this copy
         # runs as that administrator, so the task and the HKCU it reads would
@@ -582,6 +710,10 @@ function Invoke-RegisterElevated {
     if ($prior) { $priorXml = Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName }
     $priorHash = if (Test-Path $HashFile) { Get-Content $HashFile -Raw } else { $null }
     $hadHashDir = Test-Path $HashDir
+    $priorDirSddl = if ($hadHashDir) { (Get-Acl -LiteralPath $HashDir).Sddl } else { $null }
+    $parentDir = Split-Path $HashDir -Parent
+    $priorParentOwner = if (Test-Path -LiteralPath $parentDir) { (Get-Acl -LiteralPath $parentDir).GetOwner([Security.Principal.SecurityIdentifier]).Value } else { $null }
+    $removedEntries = @()
     $newPython = Join-Path $HashDir 'python.new'
     try {
         $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
@@ -604,17 +736,19 @@ function Invoke-RegisterElevated {
         # the ACL just set. The folder that holds it gets the same owner.
         $dacl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
         Set-Acl -Path $HashDir -AclObject $dacl
-        $parentDir = Split-Path $HashDir -Parent
-        $parentAcl = Get-Acl -LiteralPath $parentDir
-        $parentAcl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
-        Set-Acl -LiteralPath $parentDir -AclObject $parentAcl
+        if (-not (Test-TrustedOwner (Get-Acl -LiteralPath $parentDir).GetOwner([Security.Principal.SecurityIdentifier]).Value)) {
+            $parentAcl = Get-Acl -LiteralPath $parentDir
+            $parentAcl.SetOwner((New-Object Security.Principal.SecurityIdentifier($AdminsSid)))
+            Set-Acl -LiteralPath $parentDir -AclObject $parentAcl
+        }
         & icacls.exe $HashDir /setowner "*$AdminsSid" /T /C /Q | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "icacls could not give Administrators ownership of everything under $HashDir (exit $LASTEXITCODE)" }
         # Whatever is here that registration did not put here was put by
         # someone else while the folder was open to them: it goes.
         foreach ($entry in Get-ChildItem -LiteralPath $HashDir -Force) {
             if ($KnownEntries -notcontains $entry.Name) {
-                Write-Host "removed an unexpected entry from ${HashDir}: $($entry.Name)"
+                Write-Registration "removed an unexpected entry from ${HashDir}: $($entry.Name)"
+                $removedEntries += $entry.Name
                 Remove-Item -LiteralPath $entry.FullName -Recurse -Force
             }
         }
@@ -623,6 +757,7 @@ function Invoke-RegisterElevated {
         $runDir = Split-Path $SnapshotDir -Parent
         if (Test-Path $runDir) { Remove-Item -LiteralPath $runDir -Recurse -Force }
         New-Item -ItemType Directory -Force -Path $SnapshotDir | Out-Null
+        Step 'directory'
         # The pinned Python, copied beside the old copy and swapped in last.
         if (Test-Path $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force }
         Copy-Item -LiteralPath $pinnedPython -Destination $newPython -Recurse
@@ -631,13 +766,17 @@ function Invoke-RegisterElevated {
         }
         if (Test-Path $HashFile) { Remove-Item -LiteralPath $HashFile -Force }  # a new file takes the inherited ACL
         Set-Content -Path $HashFile -Value $lines
+        Step 'hashes'
         Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Action $action -Principal $principal `
             -Description 'Resolute unattended elevated smoke (D07 T01 S7). Fixed action, hash-pinned driver; remove with tools/elevated-smoke.ps1 -Remove.' -Force | Out-Null
-        Switch-Runtime $newPython $PythonDir
+        Step 'task'
         $untrusted = @(Get-DirectoryRefusals)
         if ($untrusted) { throw ("the directory is not protected after registration: " + ($untrusted -join '; ')) }
-        Write-Host "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
-        foreach ($line in $lines) { Write-Host "pinned: $line" }
+        # Last, because it is the one step that discards something: until
+        # here a failure restores the previous task, hashes and runtime.
+        Switch-Runtime $newPython $PythonDir
+        Write-Registration "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
+        foreach ($line in $lines) { Write-Registration "pinned: $line" }
     } catch {
         # Roll back: a failed registration leaves neither a half-registered
         # task nor new pinned hashes behind. Every step runs whatever the
@@ -659,10 +798,31 @@ function Invoke-RegisterElevated {
             {
                 if (Test-Path $newPython) { Remove-Item -LiteralPath $newPython -Recurse -Force -ErrorAction Stop }
                 if (-not $hadHashDir -and (Test-Path $HashDir)) { Remove-Item $HashDir -Recurse -Force -ErrorAction Stop }
+            },
+            {
+                # The directory's owner and permissions as they were, and the
+                # owner of the folder that holds it when this run changed it.
+                if ($priorDirSddl -and (Test-Path -LiteralPath $HashDir)) {
+                    $was = Get-Acl -LiteralPath $HashDir
+                    $was.SetSecurityDescriptorSddlForm($priorDirSddl)
+                    Set-Acl -LiteralPath $HashDir -AclObject $was -ErrorAction Stop
+                }
+                if ($priorParentOwner -and (Test-Path -LiteralPath $parentDir) -and
+                    (Get-Acl -LiteralPath $parentDir).GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $priorParentOwner) {
+                    $was = Get-Acl -LiteralPath $parentDir
+                    $was.SetOwner((New-Object Security.Principal.SecurityIdentifier($priorParentOwner)))
+                    Set-Acl -LiteralPath $parentDir -AclObject $was -ErrorAction Stop
+                }
             }
         )
         if ($notRestored.Count) {
             Write-Host ("rollback incomplete, restore by hand: " + ($notRestored -join '; '))
+        }
+        # What a rollback does not undo, said so nobody has to find it.
+        if ($hadHashDir) {
+            $kept = "not restored by the rollback: the run directory's staged copies (the next run stages them again), and Administrators' ownership of the files inside $HashDir"
+            if ($removedEntries) { $kept += "; and the entries removed as unexpected, which are gone: " + ($removedEntries -join ', ') }
+            Write-Registration $kept
         }
         throw $cause
     }
@@ -691,12 +851,16 @@ function Invoke-Register {
     }
     Write-Host 'registration needs one consent prompt; approving it registers the task and pins the driver hashes'
     $args = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -RegisterElevated -OperatorSid $(Get-CurrentSid) -Root `"$Root`""
+    if ($ProveRollback) { $args += ' -ProveRollback' }
+    $logFrom = if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog).Count } else { 0 }
     try {
         $proc = Start-Process powershell.exe -Verb RunAs -ArgumentList $args -Wait -PassThru -ErrorAction Stop
     } catch {
         Write-Host "blocked: elevation consent declined or the elevated registration could not start: $($_.Exception.Message)"
         return 2
     }
+    # What the elevated copy said, from the log it keeps in the protected directory.
+    if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog) | Select-Object -Skip $logFrom | ForEach-Object { Write-Host "elevated: $_" } }
     if ($proc.ExitCode -ne 0) {
         Write-Host "refused: elevated registration failed with exit code $($proc.ExitCode); nothing is registered by this run"
         return 2
@@ -705,6 +869,10 @@ function Invoke-Register {
     if (-not $task) { Write-Host 'refused: registration reported success but the task readback finds nothing'; return 2 }
     $diffs = Test-DefinitionMatch $task $Root
     if ($diffs) { Write-Host ("refused: registered task readback differs: " + ($diffs -join '; ')); return 2 }
+    $security = @(Get-TaskSecurityRefusals)
+    if ($security) { Write-Host ("refused: " + ($security -join '; ')); return 2 }
+    foreach ($line in Get-DriverWriters $Root) { Write-Host "driver: $line" }
+    Write-Host "task security descriptor: $(Get-TaskSddl)"
     Write-Host 'registered: definition readback matches; pinned hashes recorded'
     return 0
 }
@@ -718,6 +886,7 @@ function Invoke-Check {
     else { $refusals += @(Test-DefinitionMatch $task $Root) }
     if (-not (Test-Path (Join-Path $PythonDir 'python.exe'))) { $refusals += "the task's Python is missing from $PythonDir (register again)" }
     $refusals += @(Get-DirectoryRefusals)
+    if ($task) { $refusals += @(Get-TaskSecurityRefusals) }
     if ($refusals) { Write-Host ("not ready: " + ($refusals -join '; ')); return 2 }
     Write-Host 'ready: the task is registered for this checkout and the pinned driver hashes match'
     return 0
@@ -840,14 +1009,19 @@ function Invoke-Remove {
     return 0
 }
 
-$modes = @($Register, $Run, $Remove, $SelfTest, $Check, $RegisterElevated) | Where-Object { $_ }
+$modes = @($Register, $Run, $Remove, $SelfTest, $Check, $Readback, $RegisterElevated) | Where-Object { $_ }
 if ($modes.Count -ne 1) {
-    Write-Host 'usage: elevated-smoke.ps1 -Register [-Replace] | -Run | -Remove | -SelfTest | -Check'
+    Write-Host 'usage: elevated-smoke.ps1 -Register [-Replace] | -Run | -Remove | -SelfTest | -Check | -Readback'
     exit 2
 }
 if ($SelfTest) { $modeCode = Invoke-SelfTest; exit $modeCode }
 if ($Check) { $modeCode = Invoke-Check; exit $modeCode }
-if ($RegisterElevated) { $modeCode = Invoke-RegisterElevated; exit $modeCode }
+if ($Readback) { $modeCode = Invoke-Readback; exit $modeCode }
+if ($RegisterElevated) {
+    if ($ProveRollback) { $proofCode = Invoke-ProveRollback; if ($proofCode -ne 0) { exit $proofCode } }
+    try { $modeCode = Invoke-RegisterElevated } catch { Write-Registration "registration failed: $($_.Exception.Message)"; exit 2 }
+    exit $modeCode
+}
 if ($Register) { $modeCode = Invoke-Register; exit $modeCode }
 if ($Run) { $modeCode = Invoke-Run; exit $modeCode }
 if ($Remove) { $modeCode = Invoke-Remove; exit $modeCode }
