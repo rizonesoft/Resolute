@@ -139,7 +139,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T04 §44` | Review-order skills match the dispatcher          |   7   |
 | [x] | `D00 T04 §45` | Skill numbering and stamp separator follow-ups    |   4   |
 | [x] | `D00 T04 §46` | Plan rows outside phase tables refused            |   5   |
-| [ ] | `D00 T04 §47` | Plan sync publishes atomically, with readback     |   5   |
+| [ ] | `D00 T04 §47` | Plan sync publishes atomically, with readback     |   7   |
 | [x] | `D00 T01 §1`  | Portable toolchain bootstrap                      |  14   |
 | [x] | `D00 T01 §2`  | CMake structure and dependencies                  |  11   |
 | [x] | `D00 T01 §3`  | Warnings as errors at one level                   |   6   |
