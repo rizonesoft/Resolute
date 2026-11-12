@@ -249,7 +249,9 @@ def status(name: str, wait: float, gh=run_gh, paths=None, filtered=None, say=pri
     try:
         commit = within(resolve, name)
         if paths is None:
-            base = within(pushed or (lambda sha, timeout: push_base(sha, gh, timeout)), commit)
+            # Each request of the lookup draws on what is left of the interval when it starts, not on one
+            # allowance taken at the beginning.
+            base = within(pushed, commit) if pushed else push_base(commit, bounded)
             paths = within(changed, commit, base)
         if filtered is None:
             filtered = {}
@@ -469,6 +471,17 @@ def self_test() -> int:
     check("a commit GitHub records no push for is exit 3, never green", (code, "lists no push ending at" in " ".join(said_lines)), (3, True))
     check("the push base is read from GitHub's record of the push",
           push_base("c0ffee", lambda args, timeout: "0123abcd\n", 5), "0123abcd")
+    box = [0.0]
+    budgets: list = []
+
+    def two_slow_pages(args, timeout):
+        budgets.append(timeout)
+        box[0] += 9
+        return "[]" if args[:2] == ["run", "list"] else ("0ldba5e\n" if "--paginate" in args else "")
+
+    status("c0ffee", 10, gh=two_slow_pages, filtered=filtered, say=lambda line: None, clock=lambda: box[0], sleep=lambda seconds: None,
+           resolve=lambda name, timeout: name, changed=lambda commit, base, timeout: ["src/a.cpp"])
+    check("the second page of the push lookup gets only what is left of the wait", budgets[:2], [10, 1])
     check("a head older than the newest hundred pushes is found on a later page",
           push_base("c0ffee", lambda args, timeout: "0ldba5e\n" if "--paginate" in args else "", 5), "0ldba5e")
 
