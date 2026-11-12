@@ -76,6 +76,7 @@ class Env:
     process_alive: Callable[[dict], bool]  # a recorded {"pid", "started"} is still that process
     reviewing: Callable[[], bool] = lambda: False
     end: Callable[[int], None] = lambda pid: None  # end a session's process tree
+    contain: Callable[[str], str | None] = lambda session: None  # tie what a session starts to its life; why not, or None
 
 
 def stamp(now: float | None = None) -> str:
@@ -192,7 +193,17 @@ def on_prompt(state: dict, data: dict, env: Env) -> str | None:
         state.clear()
         state.update(active=True, status="active", started=stamp(), changed_at=time.time())
     state["session_id"] = session
-    return heartbeat_note()
+    note = heartbeat_note()
+    # Closing a run's window ends everything the run started. A launcher's session is already inside the launcher's
+    # job object (run_session); a session the operator typed this into is put in one of its own here, once.
+    held = state.get("launcher")
+    if session and state.get("contained") != session and not (held and env.process_alive(held)):
+        failed = env.contain(session)
+        if failed:
+            note += f" Say this to the operator once: what this session starts could not be tied to its window ({failed}), so closing the window may leave a build or a review running."
+        else:
+            state["contained"] = session
+    return note
 
 
 def heartbeat_current(state: dict, now: float | None = None) -> bool:
@@ -605,6 +616,21 @@ def end_tree(pid: int) -> None:
         os.kill(pid, 9)
 
 
+def real_contain(session: str) -> str | None:
+    """Put the session's process in a job object that ends what it starts with it (scripts/lib/win_job.py). Returns
+    why that could not be done, or None."""
+    import win_job
+
+    try:
+        pid = owner_process(session)
+        if pid is None:
+            return "its process is not in Claude Code's records"
+        win_job.end_children_with(pid)
+    except (OSError, ValueError, KeyError) as error:
+        return str(error)
+    return None
+
+
 def real_reviewing() -> bool:
     return bool(reviews_in_flight())
 
@@ -623,7 +649,7 @@ def run_session(command: list[str]) -> int:
     return subprocess.call(command)
 
 
-REAL = Env(real_rows, real_signature, real_alive, real_live_here, real_process_alive, real_reviewing, end_tree)
+REAL = Env(real_rows, real_signature, real_alive, real_live_here, real_process_alive, real_reviewing, end_tree, real_contain)
 
 
 def health(state: dict, env: Env = REAL, now: float | None = None) -> dict:

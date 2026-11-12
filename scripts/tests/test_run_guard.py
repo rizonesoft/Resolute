@@ -25,6 +25,12 @@ class World:
         self.rows, self.sig, self.live, self.launcher, self.reviewing = rows, signature, list(live), launcher, reviewing
         self.alive = set(alive)
         self.ended = []
+        self.contained, self.uncontainable = [], None  # sessions tied to their window, and why one could not be
+
+    def contain(self, session):
+        if self.uncontainable is None:
+            self.contained.append(session)
+        return self.uncontainable
 
     def env(self):
         return guard.Env(
@@ -35,6 +41,7 @@ class World:
             process_alive=lambda record: self.launcher,
             reviewing=lambda: self.reviewing,
             end=self.ended.append,
+            contain=self.contain,
         )
 
 
@@ -363,6 +370,67 @@ class CommandLine(unittest.TestCase):
         self.assertIsNone(guard.process_started(left))
 
 
+class Contained(unittest.TestCase):
+    """Closing a run's window ends what the run started, for a run started by the prompt as for a launcher's."""
+
+    def test_a_session_that_takes_the_run_by_the_prompt_is_tied_to_its_window_once(self):
+        world, state = World(), {}
+        guard.on_prompt(state, {"prompt": "process plan", "session_id": "me"}, world.env())
+        guard.on_prompt(state, {"prompt": "process plan", "session_id": "me"}, world.env())
+        self.assertEqual(world.contained, ["me"])
+        guard.on_prompt(state, {"prompt": "process plan", "session_id": "new"}, world.env())  # the first has died
+        self.assertEqual(world.contained, ["me", "new"])
+
+    def test_a_launchers_session_is_left_to_the_launchers_own_job(self):
+        world, state = World(launcher=True), {}
+        guard.start(state, "me", World().env(), {"pid": 7, "started": 8})
+        guard.on_prompt(state, {"prompt": "process plan", "session_id": "me"}, world.env())
+        self.assertEqual(world.contained, [])
+
+    def test_a_session_that_could_not_be_tied_is_said_and_tried_again(self):
+        world, state = World(), {}
+        world.uncontainable = "could not open process 41 (error 5)"
+        note = guard.on_prompt(state, {"prompt": "process plan", "session_id": "me"}, world.env())
+        self.assertIn("could not open process 41", note)
+        self.assertTrue(state["active"])  # the guard fails open: the run is held all the same
+        world.uncontainable = None
+        guard.on_prompt(state, {"prompt": "process plan", "session_id": "me"}, world.env())
+        self.assertEqual(world.contained, ["me"])
+
+    @unittest.skipUnless(sys.platform == "win32", "the job object is the Windows half")
+    def test_what_a_running_process_starts_afterwards_ends_with_it(self):
+        # The stand-in session is already running when it is tied, as a Claude Code session is when `process plan`
+        # is typed into it. It then starts a process, and is killed as a closed window kills it.
+        import win_job
+
+        code = (
+            "import subprocess, sys, time\n"
+            "sys.stdin.readline()\n"
+            "left = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(120)'])\n"
+            "print(left.pid, flush=True); time.sleep(120)\n"
+        )
+        session = subprocess.Popen([sys.executable, "-c", code], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                   text=True, creationflags=no_window())
+        left = None
+        try:
+            win_job.end_children_with(session.pid)
+            session.stdin.write("\n")
+            session.stdin.flush()
+            left = int(session.stdout.readline())
+            self.assertIsNotNone(guard.process_started(left))
+        finally:
+            session.kill()
+            session.wait()
+            session.stdin.close()
+            session.stdout.close()
+            deadline = time.monotonic() + 10
+            while left and guard.process_started(left) is not None and time.monotonic() < deadline:
+                time.sleep(0.1)
+            if left and guard.process_started(left) is not None:
+                guard.end_tree(left)  # never left behind by a failing test
+                self.fail("the process the session started outlived it")
+
+
 class OutsideStop(unittest.TestCase):
     """A stop given from outside the session ends the session: a halted guard alone leaves a goal-driven one working."""
 
@@ -435,7 +503,7 @@ class SignIn(unittest.TestCase):
             # carries the flag.
             self.assertTrue(started.call_args_list)
             for call in started.call_args_list:
-                self.assertEqual(call.kwargs.get("creationflags"), no_window(), call.args[0][0])
+                self.assertEqual(call.kwargs.get("creationflags"), subprocess.CREATE_NO_WINDOW, call.args[0][0])
 
 
 class InFlight(unittest.TestCase):
