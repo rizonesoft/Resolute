@@ -213,5 +213,20 @@ class LanguageServerLifetime(unittest.TestCase):
         self.assertIn("pyright-langserver is not on PATH", done.stderr)
 
 
+class LauncherWriterModel(unittest.TestCase):
+    """The Claude campaign starts on the latest Opus at medium effort (operator decision 2026-11-12), and says so."""
+
+    def setUp(self):
+        self.text = (SCRIPTS / "start-unattended-run.ps1").read_text(encoding="utf-8")
+
+    def test_the_pin_is_opus_at_medium(self):
+        self.assertIn("$model = 'claude-opus-5-5'", self.text)
+        self.assertIn("$effort = 'medium'", self.text)
+
+    def test_the_session_is_started_with_both(self):
+        line = next(l for l in self.text.splitlines() if "'--session-id', $session" in l)
+        self.assertIn("'--model', $model, '--effort', $effort, $goal)", line)
+
+
 if __name__ == "__main__":
     unittest.main()

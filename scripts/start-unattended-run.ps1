@@ -73,8 +73,10 @@ $root = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $root
 
 # The writer models. scripts/review-dispatch.py records the writer's on every review (--writer-model), so each is an
-# exact id. Antigravity's model name carries its effort.
-$model = 'claude-fable-5-2'
+# exact id. Claude Code runs on the latest Opus at medium effort (operator decision 2026-11-12); a newer Opus is a
+# change to this line. Antigravity's model name carries its effort.
+$model = 'claude-opus-5-5'
+$effort = 'medium'
 $carbon = 'gemini-4-carbon-medium'
 $tokenVault = 'Conclave'
 $tokenItem = 'Claude Code OAuth token (1 year, setup-token)'
@@ -307,7 +309,7 @@ if ($Runner -eq 'claude') {
     } else {
         Write-Warning "Sign-in: neither 1Password ($tokenItem, vault $tokenVault) nor the cache gave the token; starting on the stored Claude Code login."
     }
-    Write-Host "Model: $model, permission prompts off, questions off, goal of $($goal.Length) characters."
+    Write-Host "Model: $model at $effort effort, permission prompts off, questions off, goal of $($goal.Length) characters."
 } else {
     Write-Host "Sign-in: $runnerName's own account on this PC."
     Write-Host "Model: $carbon, permission prompts off, goal of $($goal.Length) characters."
@@ -320,7 +322,7 @@ $session = if ($Runner -eq 'claude') { [guid]::NewGuid().ToString() } else { "ag
 # --disallowedTools takes a list, so options follow it and the goal stays the last, positional argument. -i runs
 # the opening prompt and keeps the conversation open, as Claude Code does with its prompt argument.
 $command = if ($Runner -eq 'claude') {
-    @($cli, '--dangerously-skip-permissions', '--disallowedTools', 'AskUserQuestion', '--session-id', $session, '--model', $model, $goal)
+    @($cli, '--dangerously-skip-permissions', '--disallowedTools', 'AskUserQuestion', '--session-id', $session, '--model', $model, '--effort', $effort, $goal)
 } else {
     @($cli, '--model', $carbon, '--dangerously-skip-permissions', '-i', $goal)
 }
