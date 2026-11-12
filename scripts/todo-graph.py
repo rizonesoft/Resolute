@@ -27,6 +27,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
@@ -881,6 +882,30 @@ def _read_back(path: Path) -> bytes:
     return path.read_bytes()
 
 
+CLEANUP_TRIES = 5
+CLEANUP_WAIT = 0.2  # seconds between tries: a scanner or an indexer lets go of a new file within a moment
+
+
+def _discard(temp: Path | None) -> str:
+    """Remove the temporary file, and say so when it cannot be removed.
+
+    A sharing violation on Windows is usually brief, so the removal is tried a bounded number of times. What is still
+    held after that is named, because a file left beside the plan that nobody was told about is a second defect."""
+    if temp is None:
+        return ""
+    for attempt in range(CLEANUP_TRIES):
+        try:
+            os.unlink(temp)
+            return ""
+        except FileNotFoundError:
+            return ""
+        except OSError as e:
+            error = e
+            if attempt + 1 < CLEANUP_TRIES:
+                time.sleep(CLEANUP_WAIT)
+    return f"; the temporary file {temp} could not be removed ({error}) and is left behind: delete it"
+
+
 def publish_plan(path: Path, text: str) -> None:
     """Replace the plan with `text`, atomically, and read it back.
 
@@ -889,6 +914,7 @@ def publish_plan(path: Path, text: str) -> None:
     failure before the replace leaves the old plan as it was. A failure after it is said as what it is."""
     data = text.encode("utf-8")
     temp: Path | None = None
+    failure = ""
     step = "creating the temporary file"
     try:
         fd, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
@@ -901,16 +927,15 @@ def publish_plan(path: Path, text: str) -> None:
             os.fsync(fh.fileno())
         step = "reading the temporary file back"
         if _read_back(temp) != data:
-            raise PlanPublishError(f"{path}: {step} gave other bytes than were written; the plan is unchanged")
-        step = "replacing the plan"
-        os.replace(temp, path)
-        temp = None
+            failure = f"{step} gave other bytes than were written"
+        else:
+            step = "replacing the plan"
+            os.replace(temp, path)
+            temp = None
     except OSError as e:
-        raise PlanPublishError(f"{path}: {step} failed ({e}); the plan is unchanged") from e
-    finally:
-        if temp is not None:
-            with contextlib.suppress(OSError):
-                temp.unlink()
+        failure = f"{step} failed ({e})"
+    if failure:
+        raise PlanPublishError(f"{path}: {failure}; the plan is unchanged{_discard(temp)}")
     try:
         published = _read_back(path)
     except OSError as e:
@@ -1408,6 +1433,31 @@ def cmd_self_test(_args) -> int:
                 check(f"{label}, no temporary file left", sorted(f.name for f in root.iterdir() if f.is_file()), ["implementation-plan.md"])
                 if never_replaces:
                     check(f"{label}, the replace never runs", replaced, [])
+            # A temporary file that cannot be removed is tried a bounded number of times, then named.
+            real_unlink = os.unlink
+            for name, held_for, left in (("is held for good", CLEANUP_TRIES, True), ("is let go after two tries", 2, False)):
+                before = stale_plan()
+                tries: list = []
+
+                def held(target, *a, _failures=held_for, **k):
+                    tries.append(target)
+                    if len(tries) <= _failures:
+                        raise PermissionError(13, "The process cannot access the file because it is being used by another process")
+                    return real_unlink(target, *a, **k)
+
+                with mock.patch.object(os, "replace", refuse), mock.patch.object(os, "unlink", held), \
+                        mock.patch.dict(globals(), {"CLEANUP_WAIT": 0}):
+                    code, said = sync_said()
+                leftovers = sorted(f for f in root.iterdir() if f.is_file() and f.name != "implementation-plan.md")
+                label = f"a refused sync whose temporary file {name}"
+                check(f"{label} exits 1 with the plan unchanged", (code, PLAN.read_bytes() == before, "the plan is unchanged" in said), (1, True, True))
+                check(f"{label} tries the removal {min(held_for + 1, CLEANUP_TRIES)} time(s)", len(tries), min(held_for + 1, CLEANUP_TRIES))
+                check(f"{label} leaves {'it' if left else 'nothing'} behind", len(leftovers), 1 if left else 0)
+                check(f"{label} {'names' if left else 'does not mention'} a leftover",
+                      [f"the temporary file {f} could not be removed" in said and "is left behind: delete it" in said for f in leftovers] or ["left behind" in said],
+                      [True] if left else [False])
+                for f in leftovers:
+                    f.unlink()
             for name, fake, want in (
                 ("returns other bytes", lambda path: real_read(path) if path != PLAN else b"other", "could not be verified"),
                 ("is refused", lambda path: real_read(path) if path != PLAN else refuse(), "could not be read back to verify it"),
