@@ -12,6 +12,30 @@ D00 T02 §10. The suite runs while the operator works. Anything that needs the d
 
 The default presets exclude the `headful` label, and the fenced presets include only it. Every test has a 120 second timeout, so a case that never returns (a modal loop nobody dismisses, a dispatch that blocks) fails by name instead of hanging the run.
 
+## What CI runs, and what stays local
+
+The full gate set runs on GitHub on every push, so the development machine runs only what covers the change in hand (operator decision 2026-11-12, `D00 T01 §10`). `python scripts/ci-status.py` reads the result for a commit.
+
+| Workflow | Runs | When |
+| --- | --- | --- |
+| `gates` (`.github/workflows/gates.yml`) | `pwsh scripts/check-all.ps1`, unchanged: build Debug, build Release, tidy ratchet, ratchet self-test, conformance check, conformance self-test, tests debug, tests release, graph validate, graph self-test, plan --check, claims, claims self-test, fence-debt self-test, night-debt self-test, fence-inventory self-test, fence inventory, reviewers pin, scripts unit tests, agent tiers, agent tiers self-test, conformance profile, profile self-test | every push to `main`, and by hand (`gh workflow run gates`) |
+| `plan-gates` (`.github/workflows/plan.yml`) | the Python gates and the plan projection check | a push that touches `scripts/`, `.conclave/`, `.claude/`, `AGENTS.md`, `todo/`, `tools/githooks/`, `.gitattributes` or the workflow itself |
+
+These are not gates of `check-all` and have no line in its summary, on the runner or here. Each needs this machine, and each is run locally by the section that owes it:
+
+| Check | Why it stays local | Command |
+| --- | --- | --- |
+| Fenced tests | the `headful` label needs an interactive display session with the monitor and DPI a case declares, and the fence's idle signal | `ctest --preset headful` (or `headful-visible`) |
+| Smoke run | launches the built tools and drives their windows in the operator's session | `python scripts/smoke-run.py` |
+| Elevated smoke | runs through the one consented scheduled task, which exists on this machine only | `pwsh tools/elevated-smoke.ps1 -Run` |
+| Parity against the AutoIt suite | needs the shipped AutoIt tool and its runtime beside the C++ one, and changes real system state inside a fixture | the parity cases a ported tool's section names (`tests/parity/`) |
+| Device tests | need the USB device or optical drive a section's `Needs:` line names | the command that section's checkpoint gives |
+| The nightly run | collects night-owed debt on this machine's idle signal | see "The nightly run" below |
+
+Proof that the `gates` workflow can fail is a manual dispatch with `prove_red` set, which adds one failing Catch2 case to the runner's working copy for that run only. Such a run is named `gates (red proof)` and `ci-status.py` never counts it.
+
+A full local `pwsh scripts/check-all.ps1` (through `bosun run --`) is for phase closeout, a release, and reproducing a red CI run.
+
 ## The focus guard
 
 `tests/main.cpp` runs every Catch2 session inside the focus guard (`tests/focus_guard.cpp`). A dedicated thread holds WinEvent hooks for foreground changes and window shows, so even a transient activation is seen when it happens. At the end of every case the guard takes a census of the windows the suite owns (the test process, plus any process a case starts and adopts, such as the launcher) and checks it against the case's tier.

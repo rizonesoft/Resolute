@@ -45,6 +45,7 @@ jobs:
           python scripts/profile-check.py --self-test
           python scripts/verify-agent-tiers.py
           python scripts/verify-agent-tiers.py --self-test
+          python scripts/ci-status.py --self-test
       - name: Check plan projection is current
         shell: bash
         run: |

@@ -62,7 +62,7 @@ Skip rows whose `resolve` is not exit 0 here, and rows whose Needs name a host o
 
 ## Step 4: closeout
 
-When the phase table is all `[x]`: `process-todo-file` on any file the phase exhausted, re-run `pwsh scripts/check-all.ps1`, confirm `query stats` and the regenerated plan show the phase complete, write the closeout under a `## Closeout` heading in the run file (what shipped, what was repaired, what was learned), commit, and report. A phase is complete when its table says so and the closeout is written: not before.
+When the phase table is all `[x]`: `process-todo-file` on any file the phase exhausted, re-run `pwsh scripts/check-all.ps1` locally (through `bosun run --`; this is one of the three moments the full local gate set runs) and read `python scripts/ci-status.py` green for the tip, confirm `query stats` and the regenerated plan show the phase complete, write the closeout under a `## Closeout` heading in the run file (what shipped, what was repaired, what was learned), commit, and report. A phase is complete when its table says so and the closeout is written: not before.
 
 ## Guardrails
 
