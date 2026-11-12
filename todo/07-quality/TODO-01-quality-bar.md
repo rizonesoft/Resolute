@@ -334,12 +334,14 @@ No surface of its own: a windowless self-test case in the existing driver, consu
 
 ## 9. Smoke Fixture Release in Finally
 
+> **Started:** 2026-11-12T22:20:02Z
+
 **Filed 2026-11-10** from the `D07 T01 §6` repair review (round 1, `P3`, in `docs/reviews/07-quality/D07-T01-s6-repair.md`): one capture-interruption regression waits for explicit release with no timeout, but its release runs only after `main([])` returns normally, so an exception or cancellation in that fixture leaves the daemon worker blocked until process exit. A fixture that can leak a worker on its own failure path is the kind of test debt that later reads as a hang.
 
 No surface of its own: a windowless self-test fixture in the existing driver.
 
-- [ ] Release in `finally` in `scripts/smoke-run.py --self-test`: the exceptional-capture fixture (`_release2`) is set in a `finally` covering the whole driven case, not only after `main([])` returns. Done when: forcing the driven case to raise still releases the worker, proven by joining it inside its bound in the case itself.
-- [ ] Commit: `"quality: release the smoke fixture worker in finally"`
+- [x] Release in `finally` in `scripts/smoke-run.py --self-test`: the exceptional-capture fixture (`_release2`) is set in a `finally` covering the whole driven case, not only after `main([])` returns. Done when: forcing the driven case to raise still releases the worker, proven by joining it inside its bound in the case itself.
+- [x] Commit: `"quality: release the smoke fixture worker in finally"`
 
 -> SOURCE: review-2026-11-10-d07-t01-s6-repair-round1 (P3 release not in finally)
 

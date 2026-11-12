@@ -2053,7 +2053,6 @@ def self_test() -> int:
             _real_cap = globals()["capture_window"]
             import threading as _th2
             _release2 = _th2.Event()
-            globals()["capture_window"] = lambda hwnd: (_release2.wait(), None)[1]
             def _drive_exc2(run, out_dir, prev_dir, collecting, mark, resumed=None):
                 run.hwnd = 99
                 _n = {"n": 0}
@@ -2064,17 +2063,54 @@ def self_test() -> int:
                 run.record("start", "pass", "stub")
                 raise RuntimeError("stub drive failure")
             _rd4 = globals()["drive_tool"]
-            globals()["drive_tool"] = _drive_exc2
+
+            def _released(body):
+                """Run a driven case whose capture blocks until released. The release is in `finally`, so a case
+                that raises frees its worker too, and the workers it started are joined inside a bound
+                (D07 T01 section 9). Returns the body's result and the workers still alive."""
+                before = set(_th2.enumerate())
+                _release2.clear()
+                globals()["capture_window"] = lambda hwnd: (_release2.wait(), None)[1]
+                globals()["drive_tool"] = _drive_exc2
+                result = None
+                try:
+                    result = body()
+                finally:
+                    globals()["drive_tool"] = _rd4
+                    _release2.set()
+                    globals()["capture_window"] = _real_cap
+                    started = [t for t in _th2.enumerate() if t not in before]
+                    for t in started:
+                        t.join(5.0)
+                    _left[:] = [t for t in started if t.is_alive()]
+                return result
+
+            _left: list = []
             buf = io.StringIO()
-            with redirect_stdout(buf):
-                rc = main([])
-            globals()["drive_tool"] = _rd4
-            _release2.set()
-            globals()["capture_window"] = _real_cap
+
+            def _through_main():
+                with redirect_stdout(buf):
+                    return main([])
+
+            rc = _released(_through_main)
             out = buf.getvalue()
             check("exceptional capture interruption: stood-down verdict, failure exit kept",
                   rc == 1 and "Suite verdict: **stood-down**" in out and "driver error" in out
                   and out.count("| Resolute |") == 5)
+            check("the blocked capture worker is released and joined after the driven case", _left == [])
+
+            # The same fixture when the driven case itself raises: the worker is still released and joined.
+            def _raises():
+                capture_window_bounded(99, abort=lambda: True, pending=[])  # leaves its worker blocked on the event
+                raise RuntimeError("stub: the driven case raised")
+
+            _blocked = []
+            try:
+                _released(_raises)
+            except RuntimeError as exc:
+                _blocked.append(str(exc))
+            check("a driven case that raises still releases and joins its capture worker",
+                  _blocked == ["stub: the driven case raised"] and _left == [])
     finally:
         globals().update(_saved)
         os.environ.pop("RESOLUTE_IDLE_COLLECT", None)
