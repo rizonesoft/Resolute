@@ -4,7 +4,7 @@
 #   pwsh tools/elevated-smoke.ps1 -Register [-Replace]  register \Resolute\ElevatedSmoke (one UAC prompt)
 #   pwsh tools/elevated-smoke.ps1 -Run                  start it, wait, and validate the fresh report (no prompt)
 #   pwsh tools/elevated-smoke.ps1 -Remove               stop if running, unregister, prove absence
-#   pwsh tools/elevated-smoke.ps1 -SelfTest             windowless contract tests; registers nothing
+#   pwsh tools/elevated-smoke.ps1 -SelfTest             windowless contract tests; touches no task but a throwaway of its own
 #   pwsh tools/elevated-smoke.ps1 -Check                would -Run be refused? starts nothing, changes nothing
 #   pwsh tools/elevated-smoke.ps1 -Readback             print what the trust boundary rests on, as it is now
 #
@@ -350,10 +350,23 @@ function Test-DefinitionMatch($Task, [string]$Base) {
     return $refusals
 }
 
-function Switch-Runtime([string]$New, [string]$Live, [scriptblock]$Move = { param($from, $to) Move-Item -LiteralPath $from -Destination $to }) {
+function Restore-Task([string]$Path, [string]$Name, [string]$Xml) {
+    # Puts a task back from its exported definition. The parameter is -Xml:
+    # the rollback used -XmlText until 2026-11-13, which the cmdlet does not
+    # have, so every restoration failed at parameter binding. The self-test
+    # runs this on a throwaway task for that reason.
+    Register-ScheduledTask -TaskPath $Path -TaskName $Name -Xml $Xml -Force -ErrorAction Stop | Out-Null
+}
+
+function Switch-Runtime([string]$New, [string]$Live, [scriptblock]$Move = { param($from, $to) Move-Item -LiteralPath $from -Destination $to },
+                        [scriptblock]$Discard = { param($path) Remove-Item -LiteralPath $path -Recurse -Force }) {
     # Puts the new runtime in place of the live one and keeps the old one
     # until the new one is there and has its python.exe: a failure on the
     # way puts the old one back, so the task is never left without a runtime.
+    # Once the new one is in place the swap has happened, and nothing after
+    # that point throws: an old copy that cannot be removed is returned as a
+    # note (the next registration removes it), never as a failure that would
+    # roll the task and hashes back under a runtime that is already new.
     $old = "$Live.old"
     if (Test-Path -LiteralPath $old) { Remove-Item -LiteralPath $old -Recurse -Force }
     $hadLive = Test-Path -LiteralPath $Live
@@ -366,7 +379,10 @@ function Switch-Runtime([string]$New, [string]$Live, [scriptblock]$Move = { para
         if ($hadLive) { & $Move $old $Live }
         throw
     }
-    if ($hadLive) { Remove-Item -LiteralPath $old -Recurse -Force }
+    if ($hadLive) {
+        try { & $Discard $old } catch { return "the previous runtime could not be removed from $old ($($_.Exception.Message)); the next registration removes it" }
+    }
+    return ''
 }
 
 function Wait-TaskStopped([scriptblock]$GetState, [int]$TimeoutSec) {
@@ -569,10 +585,10 @@ function Invoke-SelfTest {
         Set-Content (Join-Path $live 'python.exe') 'old'; Set-Content (Join-Path $new 'python.exe') 'new'
         $threw = $false
         try {
-            Switch-Runtime $new $live { param($from, $to) if ($from -eq $new) { throw 'the disk refused the rename' }; Move-Item -LiteralPath $from -Destination $to }
+            $null = Switch-Runtime $new $live { param($from, $to) if ($from -eq $new) { throw 'the disk refused the rename' }; Move-Item -LiteralPath $from -Destination $to }
         } catch { $threw = $true }
         Check 'a failed runtime swap puts the old runtime back' ($threw -and (Get-Content (Join-Path $live 'python.exe')) -eq 'old' -and -not (Test-Path "$live.old"))
-        Switch-Runtime $new $live
+        $null = Switch-Runtime $new $live
         Check 'a runtime swap that succeeds leaves the new runtime and no old copy' ((Get-Content (Join-Path $live 'python.exe')) -eq 'new' -and -not (Test-Path "$live.old") -and -not (Test-Path $new))
 
         # Ownership is part of the boundary: only Administrators or SYSTEM may own the directory.
@@ -599,7 +615,44 @@ function Invoke-SelfTest {
         # Both ways into an elevated registration go through the same entry, which holds the rollback proof.
         $entry = (Get-Command Invoke-ElevatedRegistration).ScriptBlock.ToString()
         Check 'an elevated shell and the consented copy register through the one entry that carries the rollback proof' (
-            $entry.Contains('Invoke-ProveRollback') -and (Get-Command Invoke-Register).ScriptBlock.ToString().Contains('return Invoke-ElevatedRegistration'))
+            $entry.Contains('Invoke-ProveRollback') -and (Get-Command Invoke-Register).ScriptBlock.ToString().Contains('$code = Invoke-ElevatedRegistration'))
+
+        # Every path through -Register ends in the readiness list: a reason on it is not a registration.
+        Check 'a registration with a reason left on the readiness list is refused, one with none is not judged here' (
+            (Confirm-Registration @('the task can be changed by another principal: S-1-5-11') 6>$null) -eq 2)
+        $registerSource = (Get-Command Invoke-Register).ScriptBlock.ToString()
+        Check 'every success of -Register goes through the readiness list' (
+            ([regex]::Matches($registerSource, 'return 0')).Count -eq 0 -and ([regex]::Matches($registerSource, 'Confirm-Registration')).Count -eq 2)
+
+        # The swap has happened once the new runtime is in place: a previous copy that cannot be removed is a note.
+        $live2 = Join-Path $td 'rt'; $new2 = Join-Path $td 'rt.new'
+        New-Item -ItemType Directory -Path $live2, $new2 | Out-Null
+        Set-Content (Join-Path $live2 'python.exe') 'old'; Set-Content (Join-Path $new2 'python.exe') 'new'
+        $note = Switch-Runtime $new2 $live2 -Discard { param($path) throw 'the old copy is held open' }
+        Check 'an old runtime that cannot be removed is a note after the swap, not a failure' (
+            $note -match 'could not be removed' -and (Get-Content (Join-Path $live2 'python.exe')) -eq 'new')
+
+        # The task restoration the rollback relies on, run for real on a throwaway task of this account
+        # (limited privilege, an action that only exits, no trigger), which is removed before the case ends.
+        $scratchName = 'ResoluteSelfTest-' + [Guid]::NewGuid().ToString('N')
+        $restored = $false
+        try {
+            $one = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\cmd.exe') -Argument '/c exit 0'
+            $two = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\cmd.exe') -Argument '/c exit 1'
+            Register-ScheduledTask -TaskPath '\' -TaskName $scratchName -Action $one -RunLevel Limited -ErrorAction Stop | Out-Null
+            $priorScratch = Export-ScheduledTask -TaskPath '\' -TaskName $scratchName
+            Register-ScheduledTask -TaskPath '\' -TaskName $scratchName -Action $two -RunLevel Limited -Force -ErrorAction Stop | Out-Null
+            $changed = @((Get-ScheduledTask -TaskPath '\' -TaskName $scratchName).Actions)[0].Arguments
+            Restore-Task '\' $scratchName $priorScratch
+            $back = @((Get-ScheduledTask -TaskPath '\' -TaskName $scratchName).Actions)[0].Arguments
+            $restored = ($changed -eq '/c exit 1' -and $back -eq '/c exit 0')
+        } catch {
+            Write-Host "the throwaway task could not be used: $($_.Exception.Message)"
+        } finally {
+            Unregister-ScheduledTask -TaskPath '\' -TaskName $scratchName -Confirm:$false -ErrorAction SilentlyContinue
+        }
+        Check 'a replaced task is put back from its exported definition, on a real throwaway task' $restored
+        Check 'the throwaway task is gone' (-not (Get-ScheduledTask -TaskName $scratchName -ErrorAction SilentlyContinue))
 
         # A rollback is judged by reading the state back, field by field.
         $was = [pscustomobject]@{ Task = 'xml'; Hashes = 'h'; Python = 'p'; DirectorySddl = 'd' }
@@ -805,11 +858,16 @@ function Invoke-RegisterElevated {
         Step 'task'
         $untrusted = @(Get-DirectoryRefusals)
         if ($untrusted) { throw ("the directory is not protected after registration: " + ($untrusted -join '; ')) }
-        # Last, because it is the one step that discards something: until
-        # here a failure restores the previous task, hashes and runtime.
-        Switch-Runtime $newPython $PythonDir
-        Write-Registration "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $PythonDir 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
+        # Everything that can fail is done before the swap, the report too:
+        # a full disk or a held log after it would roll the task and hashes
+        # back under a runtime that is already the new one.
+        Write-Registration "python: $((Get-FileHash -Algorithm SHA256 -Path (Join-Path $newPython 'python.exe')).Hash) $(Join-Path $PythonDir 'python.exe')"
         foreach ($line in $lines) { Write-Registration "pinned: $line" }
+        Step 'report'
+        # Last, because it is the one step that discards something: until
+        # here a failure restores the previous task, hashes and runtime, and
+        # after it nothing throws.
+        $swapNote = Switch-Runtime $newPython $PythonDir
     } catch {
         # Roll back: a failed registration leaves neither a half-registered
         # task nor new pinned hashes behind. Every step runs whatever the
@@ -819,7 +877,7 @@ function Invoke-RegisterElevated {
         $notRestored = Invoke-RollbackSteps @(
             {
                 if ($priorXml) {
-                    Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -XmlText $priorXml -Force -ErrorAction Stop | Out-Null
+                    Restore-Task $TaskPath $TaskName $priorXml
                 } elseif (Get-TaskOrNull) {
                     Unregister-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Confirm:$false -ErrorAction Stop
                 }
@@ -859,19 +917,30 @@ function Invoke-RegisterElevated {
         }
         throw $cause
     }
+    if ($swapNote) {
+        # Said after the transaction, where a failure to say it changes nothing.
+        try { Write-Registration $swapNote } catch { Write-Host $swapNote }
+    }
+    return 0
+}
+
+function Confirm-Registration([string[]]$Refusals) {
+    # The one way a registration is reported as done: the same list of
+    # reasons a run would be refused on must be empty. Every path through
+    # -Register ends here, so none can report success on less.
+    if ($Refusals) { Write-Host ("refused: the registration does not pass its own readiness checks: " + ($Refusals -join '; ')); return 2 }
+    foreach ($line in Get-DriverWriters $Root) { Write-Host "driver: $line" }
+    Write-Host "task security descriptor: $(Get-TaskSddl)"
+    Write-Host 'registered: the task, its directory, its security and its pinned hashes pass the readiness checks'
     return 0
 }
 
 function Invoke-Register {
     $existing = Get-TaskOrNull
     if ($existing -and -not $Replace) {
-        $diffs = Test-DefinitionMatch $existing $Root
-        $hashRefusals = Test-PinnedHashes $Root $HashFile
-        if (-not $diffs -and -not $hashRefusals) {
-            Write-Host 'already registered: definition and pinned hashes match'
-            return 0
-        }
-        Write-Host ("refused: an existing task differs and is preserved: " + (($diffs + $hashRefusals) -join '; '))
+        $refusals = Get-RunRefusals $existing
+        if (-not $refusals) { return (Confirm-Registration @()) }
+        Write-Host ("refused: an existing task differs and is preserved: " + ($refusals -join '; '))
         Write-Host 're-run with -Register -Replace to consent to overwriting it'
         return 2
     }
@@ -880,34 +949,27 @@ function Invoke-Register {
     $drift = @(Get-DriftRefusals $Root)
     if ($drift) { Write-Host ("refused: " + ($drift -join '; ')); return 2 }
     if (Test-IsElevated) {
-        return Invoke-ElevatedRegistration
+        $code = Invoke-ElevatedRegistration
+        if ($code -ne 0) { return $code }
+    } else {
+        Write-Host 'registration needs one consent prompt; approving it registers the task and pins the driver hashes'
+        $args = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -RegisterElevated -OperatorSid $(Get-CurrentSid) -Root `"$Root`""
+        if ($ProveRollback) { $args += ' -ProveRollback' }
+        $logFrom = if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog).Count } else { 0 }
+        try {
+            $proc = Start-Process powershell.exe -Verb RunAs -ArgumentList $args -Wait -PassThru -ErrorAction Stop
+        } catch {
+            Write-Host "blocked: elevation consent declined or the elevated registration could not start: $($_.Exception.Message)"
+            return 2
+        }
+        # What the elevated copy said, from the log it keeps in the protected directory.
+        if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog) | Select-Object -Skip $logFrom | ForEach-Object { Write-Host "elevated: $_" } }
+        if ($proc.ExitCode -ne 0) {
+            Write-Host "refused: elevated registration failed with exit code $($proc.ExitCode); nothing is registered by this run"
+            return 2
+        }
     }
-    Write-Host 'registration needs one consent prompt; approving it registers the task and pins the driver hashes'
-    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -RegisterElevated -OperatorSid $(Get-CurrentSid) -Root `"$Root`""
-    if ($ProveRollback) { $args += ' -ProveRollback' }
-    $logFrom = if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog).Count } else { 0 }
-    try {
-        $proc = Start-Process powershell.exe -Verb RunAs -ArgumentList $args -Wait -PassThru -ErrorAction Stop
-    } catch {
-        Write-Host "blocked: elevation consent declined or the elevated registration could not start: $($_.Exception.Message)"
-        return 2
-    }
-    # What the elevated copy said, from the log it keeps in the protected directory.
-    if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog) | Select-Object -Skip $logFrom | ForEach-Object { Write-Host "elevated: $_" } }
-    if ($proc.ExitCode -ne 0) {
-        Write-Host "refused: elevated registration failed with exit code $($proc.ExitCode); nothing is registered by this run"
-        return 2
-    }
-    $task = Get-TaskOrNull
-    if (-not $task) { Write-Host 'refused: registration reported success but the task readback finds nothing'; return 2 }
-    $diffs = Test-DefinitionMatch $task $Root
-    if ($diffs) { Write-Host ("refused: registered task readback differs: " + ($diffs -join '; ')); return 2 }
-    $security = @(Get-TaskSecurityRefusals)
-    if ($security) { Write-Host ("refused: " + ($security -join '; ')); return 2 }
-    foreach ($line in Get-DriverWriters $Root) { Write-Host "driver: $line" }
-    Write-Host "task security descriptor: $(Get-TaskSddl)"
-    Write-Host 'registered: definition readback matches; pinned hashes recorded'
-    return 0
+    return (Confirm-Registration (Get-RunRefusals (Get-TaskOrNull)))
 }
 
 function Get-RunRefusals($Task, [scriptblock[]]$Checks = $null) {
@@ -1052,11 +1114,20 @@ if ($modes.Count -ne 1) {
     Write-Host 'usage: elevated-smoke.ps1 -Register [-Replace] | -Run | -Remove | -SelfTest | -Check | -Readback'
     exit 2
 }
-if ($SelfTest) { $modeCode = Invoke-SelfTest; exit $modeCode }
-if ($Check) { $modeCode = Invoke-Check; exit $modeCode }
-if ($Readback) { $modeCode = Invoke-Readback; exit $modeCode }
-if ($RegisterElevated) { $modeCode = Invoke-ElevatedRegistration; exit $modeCode }
-if ($Register) { $modeCode = Invoke-Register; exit $modeCode }
-if ($Run) { $modeCode = Invoke-Run; exit $modeCode }
-if ($Remove) { $modeCode = Invoke-Remove; exit $modeCode }
+function Exit-WithCode($Result) {
+    # A mode answers with one integer. Anything else a function let fall
+    # into its output must not decide the exit code: `exit` on an array
+    # exits 0, which is how a failed self-test once reported success. With
+    # no integer at all the answer is unknown, and that is exit 2.
+    $codes = @(@($Result) | Where-Object { $_ -is [int] })
+    if ($codes.Count -ne 1) { exit 2 }
+    exit $codes[0]
+}
 
+if ($SelfTest) { Exit-WithCode (Invoke-SelfTest) }
+if ($Check) { Exit-WithCode (Invoke-Check) }
+if ($Readback) { Exit-WithCode (Invoke-Readback) }
+if ($RegisterElevated) { Exit-WithCode (Invoke-ElevatedRegistration) }
+if ($Register) { Exit-WithCode (Invoke-Register) }
+if ($Run) { Exit-WithCode (Invoke-Run) }
+if ($Remove) { Exit-WithCode (Invoke-Remove) }
