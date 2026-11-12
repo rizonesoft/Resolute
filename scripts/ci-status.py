@@ -358,8 +358,7 @@ def self_test() -> int:
     said_lines = []
     code = status("c0ffee", 10, gh=list_then_stall, paths=["src/a.cpp"], filtered=filtered, say=said_lines.append,
                   clock=lambda: box[0], sleep=lambda seconds: None)
-    check("a known failure is still red when the wait ends during its log", (code, "gates: failure" in "
-".join(said_lines)), (1, True))
+    check("a known failure is still red when the wait ends during its log", (code, "gates: failure" in " ".join(said_lines)), (1, True))
 
     # What a commit owes comes from the workflow file in that commit, not from the working tree.
     then = "on:\n  push:\n    paths:\n      - 'scripts/**'\njobs:\n"
