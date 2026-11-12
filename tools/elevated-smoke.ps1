@@ -164,6 +164,23 @@ function Test-DriverProcessesGone($Procs, [bool]$InventoryOk, [string]$DriverPat
     return $true
 }
 
+function Test-TaskNeedsStop([string]$State) {
+    # A queued instance has been asked to start and will, so it is stopped
+    # like a running one: by -Run's cleanup and by -Remove alike.
+    return ($State -eq 'Running' -or $State -eq 'Queued')
+}
+
+function Invoke-RollbackSteps([scriptblock[]]$Steps) {
+    # Runs every restore step even when an earlier one throws, and returns
+    # what failed, so one failed restore never hides the rest or the error
+    # that started the rollback.
+    $failed = @()
+    foreach ($step in $Steps) {
+        try { & $step } catch { $failed += $_.Exception.Message }
+    }
+    return ,$failed
+}
+
 function Stop-OwnedTask {
     # Stops the task (running or queued) and confirms it, and this
     # checkout's driver processes, are gone. Returns $true only when
@@ -250,6 +267,14 @@ function Invoke-SelfTest {
         # Unconfirmed stop: a getter that never leaves Running fails the wait.
         Check 'unconfirmed stop fails inside its bound' (-not (Wait-TaskStopped { 'Running' } 1))
         Check 'confirmed stop passes' (Wait-TaskStopped { 'Ready' } 1)
+
+        # A queued instance is stopped like a running one; a ready task is left.
+        Check 'running and queued need a stop, ready does not' ((Test-TaskNeedsStop 'Running') -and (Test-TaskNeedsStop 'Queued') -and -not (Test-TaskNeedsStop 'Ready'))
+
+        # Rollback: a step that throws does not stop the next, and is named.
+        $ran = @()
+        $notRestored = Invoke-RollbackSteps @({ throw 'task restore failed' }, { $script:ran += 'hashes' })
+        Check 'rollback runs every step and names the one that failed' (($script:ran -join ',') -eq 'hashes' -and $notRestored.Count -eq 1 -and $notRestored[0] -match 'task restore failed')
     } finally {
         Remove-Item $td -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -271,6 +296,8 @@ function Invoke-RegisterElevated {
     $prior = Get-TaskOrNull
     if ($prior) { $priorXml = Export-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName }
     $priorHash = if (Test-Path $HashFile) { Get-Content $HashFile -Raw } else { $null }
+    $hadHashDir = Test-Path $HashDir
+    $hadSnapshotRoot = Test-Path (Split-Path $SnapshotDir -Parent)
     try {
     $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
     $expected = Get-ExpectedAction $Root
@@ -306,13 +333,31 @@ function Invoke-RegisterElevated {
     } catch {
         # Roll back: a failed registration leaves neither a half-registered
         # task nor new pinned hashes behind.
-        if ($priorXml) {
-            Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -XmlText $priorXml -Force | Out-Null
-        } else {
-            Unregister-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+        # Every step runs whatever the others do, what this run created is
+        # removed, and a step that fails is said beside the original error.
+        $cause = $_
+        $notRestored = Invoke-RollbackSteps @(
+            {
+                if ($priorXml) {
+                    Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -XmlText $priorXml -Force -ErrorAction Stop | Out-Null
+                } elseif (Get-TaskOrNull) {
+                    Unregister-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Confirm:$false -ErrorAction Stop
+                }
+            },
+            {
+                if ($priorHash) { Set-Content -Path $HashFile -Value $priorHash -ErrorAction Stop }
+                elseif (Test-Path $HashFile) { Remove-Item $HashFile -ErrorAction Stop }
+            },
+            {
+                $snapshotRoot = Split-Path $SnapshotDir -Parent
+                if (-not $hadSnapshotRoot -and (Test-Path $snapshotRoot)) { Remove-Item $snapshotRoot -Recurse -Force -ErrorAction Stop }
+                if (-not $hadHashDir -and (Test-Path $HashDir)) { Remove-Item $HashDir -Recurse -Force -ErrorAction Stop }
+            }
+        )
+        if ($notRestored.Count) {
+            Write-Host ("rollback incomplete, restore by hand: " + ($notRestored -join '; '))
         }
-        if ($priorHash) { Set-Content -Path $HashFile -Value $priorHash } else { Remove-Item $HashFile -ErrorAction SilentlyContinue }
-        throw
+        throw $cause
     }
     return 0
 }
@@ -419,7 +464,7 @@ function Invoke-Run {
     } finally {
         if (-not $completed) {
             $t = Get-TaskOrNull
-            if ($t -and ($t.State -eq 'Running' -or $t.State -eq 'Queued')) {
+            if ($t -and (Test-TaskNeedsStop $t.State)) {
                 if (Stop-OwnedTask) {
                     Write-Host 'cleanup: task stopped and confirmed'
                 } else {
@@ -446,12 +491,12 @@ function Invoke-Remove {
         Write-Host "refused: scheduler readback failed: $($_.Exception.Message)"
         return 2
     }
-    if ($task.State -eq 'Running') {
+    if (Test-TaskNeedsStop $task.State) {
         if (-not (Stop-OwnedTask)) {
-            Write-Host 'refused: cleanup unconfirmed; the running task was not removed'
+            Write-Host 'refused: cleanup unconfirmed; the running or queued task was not removed'
             return 2
         }
-        Write-Host 'stopped: running task confirmed stopped before removal'
+        Write-Host 'stopped: running or queued task confirmed stopped before removal'
     }
     Unregister-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -Confirm:$false
     if (Get-TaskOrNull) { Write-Host 'refused: task still present after removal'; return 2 }
