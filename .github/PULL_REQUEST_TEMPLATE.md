@@ -18,6 +18,6 @@ paste the output here
 
 ## What did you check?
 
-- [ ] `pwsh scripts/check-all.ps1` is green, and its verdict line is quoted above
+- [ ] The checks that cover this change ran locally, and their output is quoted above. The `gates` workflow runs every gate on this pull request; a full local `pwsh scripts/check-all.ps1` is welcome and not required
 - [ ] A frozen tool's effect is unchanged, or this pull request touches none
 - [ ] No em dashes, one line per paragraph

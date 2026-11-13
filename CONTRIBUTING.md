@@ -10,10 +10,23 @@ Thank you for wanting to help. This page says how a change gets in and what it h
 
 ## How does a change get in?
 
-- **Trunk only.** Work lands on `main`. Keep your branch rebased on it; history on `main` is never rewritten.
-- **No force-push** to `main`, and no `--no-verify`: a hook that fails is telling you something.
+There are two ways, and they differ.
+
+**Routine work, by the maintainers:**
+
+- **Straight on `main`.** Work is committed to `main` directly: no feature branch and no pull request ([`AGENTS.md`](AGENTS.md), "The unattended run").
 - **One section, one commit**, with a message in the imperative that names the section, for example `docs: README rewrite plus repo-face files (D00 T05 §2)`.
-- **Run the gates** before you ask for review: `pwsh scripts/check-all.ps1`. The `gates` workflow runs the same command on every push and a red run blocks the merge.
+- **Test what you touched, locally.** Build the targets you changed and run the tests and the section's own checkpoint that cover the change, plus anything only this machine can run ([`docs/testing.md`](docs/testing.md#what-ci-runs-and-what-stays-local)). The full gate set is not run locally for every change.
+- **CI runs every gate, and is read.** On each push the `gates` workflow runs `pwsh scripts/check-all.ps1` whole, and `plan-gates` runs the plan's checks. After a push, read the result with `python scripts/ci-status.py` (0 green, 1 red, 2 still running). A red run is the next piece of work, ahead of anything else.
+- **A full local `check-all`** is for three moments: closing a phase, a release, and reproducing a red CI run.
+
+**An outside contribution:**
+
+- **A pull request from a fork**, against `main`, rebased on it. This is the one place a branch and a pull request are used.
+- **Say what you ran.** Run what covers your change and quote it. You do not need the whole gate set locally: the `gates` workflow runs it on the pull request, and a red run blocks the merge.
+- The contributor licence position below applies first.
+
+**For everyone:** no force-push to `main`, history on `main` is never rewritten, and no `--no-verify`: a hook that fails is telling you something.
 
 ## What proof does a change owe?
 

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import struct
 import subprocess
@@ -111,19 +112,39 @@ def tree_tools(repo: Path) -> set[str]:
     return autoit | cpp
 
 
-def plan_state(repo: Path, plan: dict) -> tuple[str, int, int]:
+def resolve_section(repo: Path, ref: str) -> tuple[str, int, bool]:
+    """Where a section reference lives: its TODO file, its section number, and whether its row is done."""
+    proc = subprocess.run([sys.executable, str(repo / "scripts" / "todo-graph.py"), "resolve", ref],
+                          capture_output=True, encoding="utf-8", cwd=str(repo), check=False)
+    path = re.search(r"^path\s+(\S+)", proc.stdout, re.MULTILINE)
+    section = re.search(r"^section\s+§(\d+)", proc.stdout, re.MULTILINE)
+    status = re.search(r"^status\s+\[(x| )\]", proc.stdout, re.MULTILINE)
+    if proc.returncode in (1, 2) or not path or not section:
+        raise Stale(f"the plan section {ref} does not resolve")
+    return path.group(1), int(section.group(1)), bool(status and status.group(1) == "x")
+
+
+def section_started(text: str, number: int) -> bool:
+    """Whether section `number` of a TODO file carries a Started line. `resolve` prints a section's status and never
+    its Started line, so the section's own text is read: its heading to the next one."""
+    found = re.search(rf"^## {number}\. .*$", text, re.MULTILINE)
+    if not found:
+        return False
+    rest = text[found.end():]
+    following = re.search(r"^## ", rest, re.MULTILINE)
+    return "> **Started:**" in (rest[:following.start()] if following else rest)
+
+
+def plan_state(repo: Path, plan: dict, resolver=resolve_section) -> tuple[str, int, int]:
     """'planned', 'in progress' or 'shipped', with the sections done and the sections owed."""
     if "file" in plan:
         text = (repo / plan["file"]).read_text(encoding="utf-8")
         rows = re.findall(r"^\|\s*\d+\s*\|\s*§\d+\s*\|.*\|\s*\[(x| )\]\s*\|\s*$", text, re.MULTILINE)
         done, total, started = rows.count("x"), len(rows), "> **Started:**" in text
     else:
-        proc = subprocess.run([sys.executable, str(repo / "scripts" / "todo-graph.py"), "resolve", plan["ref"]],
-                              capture_output=True, encoding="utf-8", cwd=str(repo), check=False)
-        if proc.returncode in (1, 2):
-            raise Stale(f"the plan section {plan['ref']} does not resolve")
-        status = re.search(r"^status\s+\[(x| )\]", proc.stdout, re.MULTILINE)
-        done, total, started = (1 if status and status.group(1) == "x" else 0), 1, "> **Started:**" in proc.stdout
+        path, number, is_done = resolver(repo, plan["ref"])
+        done, total = (1 if is_done else 0), 1
+        started = section_started((repo / path).read_text(encoding="utf-8"), number)
     if total and done == total:
         return "shipped", done, total
     return ("in progress" if done or started else "planned"), done, total
@@ -237,15 +258,31 @@ def stale_parts(repo: Path, ready: list[dict] | None = None) -> list[str]:
     return stale
 
 
-def write(repo: Path, ready: list[dict] | None = None) -> None:
+def write(repo: Path, ready: list[dict] | None = None, replace=os.replace) -> None:
+    """Publish the blocks and icons so that a failure never leaves a file half written. Every file is first written
+    whole beside its target and read back; only then is each moved into place, the README (the one file here that holds
+    hand-written text) last; and an icon no row names is removed only after everything else succeeded. A failure at
+    any step removes the staged copies and leaves each target either as it was or whole and new."""
     readme, icons = build(repo, ready)
     (repo / "docs" / "readme" / "icons").mkdir(parents=True, exist_ok=True)
+    targets = [(repo / rel, data) for rel, data in icons.items()] + [(repo / "README.md", readme.encode("utf-8"))]
+    staged: list[tuple[Path, Path]] = []
+    try:
+        for path, data in targets:
+            temp = path.with_name(path.name + ".tmp")
+            staged.append((temp, path))
+            temp.write_bytes(data)
+            if temp.read_bytes() != data:
+                raise OSError(f"{temp} did not read back as written")
+        for temp, path in staged:
+            replace(str(temp), str(path))
+    finally:
+        for temp, _ in staged:
+            if temp.exists():
+                temp.unlink()
     for path in (repo / "docs" / "readme" / "icons").glob("*.png"):
         if f"docs/readme/icons/{path.name}" not in icons:
             path.unlink()
-    for rel, data in icons.items():
-        (repo / rel).write_bytes(data)
-    (repo / "README.md").write_bytes(readme.encode("utf-8"))
 
 
 # ----- self-test --------------------------------------------------------------------------------------------------
@@ -333,6 +370,41 @@ def self_test() -> int:
         (root / "README.md").write_text(text, encoding="utf-8")
         stale = stale_parts(root, ready)
         check("a hand edit inside the gallery is named stale", stale == ["the tool-gallery block in README.md"], repr(stale))
+
+        # A tool mapped to one section of a plan file (six of the real rows are): its state is that section's.
+        sectioned = root / "plans" / "TODO-02-sections.md"
+        sectioned.write_text("## 1. First\n\n- [ ] one\n\n## 2. Second\n\n> **Started:** 2026-01-01T00:00:00Z\n\n- [ ] two\n\n## 3. Third\n\n- [ ] three\n",
+                             encoding="utf-8")
+
+        def resolver(_repo: Path, ref: str) -> tuple[str, int, bool]:
+            return "plans/TODO-02-sections.md", int(ref[-1]), False
+
+        check("a tool mapped to a section that has been started is in progress",
+              plan_state(root, {"ref": "D09 T02 §2"}, resolver)[0] == "in progress", repr(plan_state(root, {"ref": "D09 T02 §2"}, resolver)))
+        check("a tool mapped to a section nobody has started is planned, whatever its neighbours hold",
+              plan_state(root, {"ref": "D09 T02 §1"}, resolver)[0] == "planned" and plan_state(root, {"ref": "D09 T02 §3"}, resolver)[0] == "planned")
+
+        # A write that fails part way leaves the README as it was, and no half-written file behind.
+        write(root, ready)
+        kept = (root / "README.md").read_bytes()
+        (root / "extensions" / "Beta").rmdir()   # so the next build differs: Beta's row must go
+        tools_map["tools"] = tools_map["tools"][:1]
+        (root / "docs" / "readme" / "tools.json").write_text(json.dumps(tools_map), encoding="utf-8")
+
+        def failing_replace(src: str, dst: str) -> None:
+            if Path(dst).name == "README.md":
+                raise OSError("seeded: the README cannot be replaced")
+            os.replace(src, dst)
+
+        try:
+            write(root, ready, failing_replace)
+            raised = False
+        except OSError:
+            raised = True
+        leftovers = [p.name for p in root.rglob("*.tmp")]
+        check("a failed write leaves the README as it was and nothing half-written",
+              raised and (root / "README.md").read_bytes() == kept and leftovers == []
+              and (root / "docs" / "readme" / "icons" / "Beta.png").is_file(), f"raised={raised} leftovers={leftovers}")
     if failed:
         print(f"self-test: {len(failed)} failed: " + "; ".join(failed))
         return 1

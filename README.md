@@ -76,6 +76,7 @@ Every setting is a script parameter; there is no configuration file to write.
 | `build.ps1 <Name>` | none | Builds one target: `Resolute` (the launcher) or any folder under `extensions/` |
 | `build.ps1 -All` | none | Builds the launcher and every tool |
 | `build.ps1 -Config` | `Release` | `Debug` or `Release` |
+| `build.ps1 -ResetMovedTrees` | off | Removes build trees that a clone at another path made, and builds nothing. An ordinary build does the same cleanup first, so this is only for seeing what would go: `pwsh scripts/build.ps1 -ResetMovedTrees` |
 | `check-all.ps1 -SkipBuild` | off | Skips the build and tidy gates, for a change to documents only |
 
 The pinned versions and their hashes live in [`toolchain.json`](toolchain.json); a download whose hash differs is refused.
