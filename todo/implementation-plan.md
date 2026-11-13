@@ -217,7 +217,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T03 §3`  | Language page and tool-page contract         |   5   |
 | [ ] | `D01 T01 §7`  | Standard window, About, and preferences      |  12   |
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme               |   7   |
-| [ ] | `D01 T03 §4`  | Per-tool log surface                         |   5   |
+| [ ] | `D01 T03 §4`  | Per-tool log surface                         |   6   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                  |   8   |
 | [ ] | `D01 T03 §5`  | Update dialog and announcement               |   5   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement  |   9   |
@@ -239,7 +239,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T02 §5`  | The accessibility floor                      |  11   |
 | [ ] | `D01 T02 §6`  | Performance floor                            |   8   |
 | [ ] | `D01 T02 §7`  | Text presentation and machine values         |   5   |
-| [ ] | `D01 T02 §8`  | Menu bar and the complete popup menu         |   5   |
+| [ ] | `D01 T02 §8`  | Menu bar and the complete popup menu         |   6   |
 | [ ] | `D01 T03 §7`  | Splash, donate, string audit                 |   4   |
 
 
