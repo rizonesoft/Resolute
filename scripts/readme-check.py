@@ -112,6 +112,24 @@ def check_file(path: Path, repo: Path) -> list[str]:
     return problems
 
 
+def miscased(base: Path, relative: str) -> str | None:
+    """The real name of the first path component whose letter case differs from the link's, or None. Windows opens
+    `design.md` for `DESIGN.md`, so a link that only differs in case exists here and on CI's Windows runner and is
+    broken on GitHub, whose paths are case-sensitive. Each component is compared with its folder's own listing."""
+    current = base
+    for part in Path(relative.replace("\\", "/")).parts:
+        if part in (".", "/"):
+            continue
+        if part == "..":
+            current = current.parent
+            continue
+        names = {entry.name for entry in current.iterdir()} if current.is_dir() else set()
+        if part not in names:
+            return next((name for name in names if name.lower() == part.lower()), None)
+        current = current / part
+    return None
+
+
 def check_target(target: str, source: Path, repo: Path, where: str) -> list[str]:
     target = target.split()[0]   # a srcset entry may carry a descriptor
     if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.IGNORECASE) or target.startswith("//"):
@@ -120,6 +138,10 @@ def check_target(target: str, source: Path, repo: Path, where: str) -> list[str]
     destination = source if not file_part else (source.parent / file_part).resolve()
     if file_part and not destination.exists():
         return [f"{where}: links to {file_part}, which does not exist"]
+    if file_part:
+        wrong = miscased(source.parent, file_part)
+        if wrong:
+            return [f"{where}: links to {file_part}, but the file is named {wrong}: GitHub's paths are case-sensitive"]
     if anchor and destination.is_file() and destination.suffix.lower() == ".md" and anchor not in anchors(destination):
         return [f"{where}: links to #{anchor} in {destination.relative_to(repo).as_posix() if destination.is_relative_to(repo) else destination}, which has no such heading"]
     return []
@@ -179,6 +201,8 @@ def self_test() -> int:
             "a broken relative link": (clean.replace("docs/guide.md#", "docs/missing.md#"), "links to docs/missing.md, which does not exist"),
             "a broken anchor": (clean.replace("#how-do-i-start", "#how-do-i-stop"), "which has no such heading"),
             "a missing image": (clean.replace("image.png", "absent.png"), "links to absent.png, which does not exist"),
+            "a link whose letter case differs from the file's": (clean.replace("docs/guide.md#", "docs/Guide.md#"), "the file is named guide.md"),
+            "a link whose folder's letter case differs": (clean.replace("docs/guide.md#", "Docs/guide.md#"), "the file is named docs"),
             "an em dash": (clean.replace("One line per paragraph,", "One line per paragraph —"), "an em dash"),
             "a skipped heading level": (clean.replace("## Usage", "#### Usage"), "skips from level 1 to 4"),
             "a wrapped paragraph": (clean.replace("A range of 1–5 is fine.", "A range of 1–5\nis fine."), "keep each paragraph on one line"),

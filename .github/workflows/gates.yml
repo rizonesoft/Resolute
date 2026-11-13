@@ -14,6 +14,13 @@ run-name: ${{ inputs.prove_red && 'gates (red proof)' || '' }}
 on:
   push:
     branches: [main]
+  # An outside contribution arrives as a pull request from a fork, and
+  # CONTRIBUTING.md promises it the whole gate set before a merge. Routine
+  # work lands on main directly and is covered by the push trigger above.
+  # `pull_request` (never `pull_request_target`): the run gets the fork's
+  # code with a read-only token and no secrets, which is all the gates need.
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       prove_red:
