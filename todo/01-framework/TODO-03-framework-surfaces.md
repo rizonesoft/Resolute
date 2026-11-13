@@ -233,6 +233,8 @@ The status list every tool window carries (`ReBar.au3:579-594`, single column, s
 
 **Plan review 2026-11-13 (`docs/reviews/01-framework/D01-T03-s4.md`, three P2, all folded into the items below):** the surface had no state for logging that is on but cannot write, so a readable file would look current after recording stopped; "up to 100 MB" ignored the larger limits an AutoIt settings file may keep; and the window's remembered place had no persistence proof.
 
+**Repair round 2 (one P2, fixed 2026-11-13):** Esc closed the surface from inside the new More menu and its submenu; it now acts on the innermost thing open, one step a press, menus first.
+
 **Repair round 1 (one P2, fixed 2026-11-13):** the minimum height counted the toolbar, three rows and the footer but not a banner, so a cannot-write warning appearing at the smallest size had no room; banners now count, and the window grows for one that appears.
 
 **Corrected 2026-11-13 (completion review, `docs/reviews/01-framework/D01-T03-s4.md`, two gaps in scope):** a search still running when the user typed more could finish late and replace the newer search's rows, since results were discarded only when the file changed; and the one-row footer could not hold the count, path, size, Clear log and its cannot-be-undone line at 480 wide and 200 percent text, with only the path allowed to shorten and no overflow menu for the toolbar (`DESIGN.md` §5). The two Repair items below close them, reviewed on `docs/reviews/01-framework/D01-T03-s4-repair.md`. The writer (`D01 T01 §3`), the build and its proof (`D01 T01 §7`) and the string audit (`D01 T03 §7`) are owned.

@@ -39,3 +39,25 @@ OVERALL: approve
 
 HIGHEST: P2
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T15:51:17Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: 57d065bb33c6c6f1edaff85cb11b89cabab8c952
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: bb2a9d176ed55ed7
+
+### consistency: needs-attention
+
+1. **P2**: `docs/framework/log-surface.md:206` says Esc closes the surface whenever focus is outside the find box, including the newly added More menu and its filter submenu. This conflicts with the menu dismissal order in `docs/framework/standard-window.md`. Reproduce at 480 wide: open More, enter the level-filter submenu, then press Esc. The specified action closes the log window instead of dismissing the submenu. Give open menus precedence over the surface’s Esc handling, including the closing rule at line 43.
+
+HIGHEST: P2
+OVERALL: needs-attention
