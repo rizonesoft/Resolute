@@ -61,6 +61,16 @@ class Refused(Exception):
     """A refusal by name: the workflow's, the connection's, or the tool's."""
 
 
+class RestoreLeftovers(Refused):
+    """A restore that created its database and then could not clean up everything. loaded says whether the backup's rows
+    were loaded into it, so a caller knows the database is this restore's own and in what state, and never has to
+    guess that from whether a database of that name exists, which another author's work can also make true."""
+
+    def __init__(self, message: str, loaded: bool):
+        super().__init__(message)
+        self.loaded = loaded
+
+
 SENT = [0]   # client sessions started, so the self-test can show a refusal sent nothing
 
 
@@ -627,7 +637,7 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_overrid
                 left.append(f"the half-made database '{s.database}' could not be confirmed removed ({refusal}); drop it with: DROP DATABASE IF EXISTS `{s.database}`;")
         if left:
             ended = f"refused: the backup was restored into '{s.database}', but " if restored else f"{failure or 'refused: the restore failed'}; and "
-            raise Refused(ended + "; ".join(left)) from None
+            raise RestoreLeftovers(ended + "; ".join(left), loaded=restored) from None
     print(f"restored {dump} into '{s.database}'")
     return 0
 
@@ -657,20 +667,13 @@ def upgrade_difference(old: Session, new: Session) -> str | None:
     return None
 
 
-def _exists_quietly(s: Session) -> bool:
-    """Whether a database exists, read without letting a failed read hide the refusal being reported."""
-    try:
-        return s.exists()
-    except Refused:
-        return True   # unknown: reported as possibly there, which is the safe side for an author deciding what to drop
-
-
 def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, restricted_override: dict | None = None,
-                before_cleanup=None) -> int:
+                before_cleanup=None, before_restore=None) -> int:
     """Copies a database at an older schema revision into a new one at this revision: a backup of the old, restored into
     the new name from the current schema, then every version's text and every changelog row read back from both and
-    compared. The old database is never changed; a difference drops the new one. after_restore is the self-test's
-    stand-in for a restore that lost something."""
+    compared. The old database is never changed; a difference drops the new one. after_restore, before_cleanup and
+    before_restore are the self-test's hooks: a restore that lost something, a cleanup that cannot remove its file, and
+    another author's work taking the new name between the check and the restore."""
     if not s.exists():
         raise Refused(f"refused: the database '{s.database}' does not exist")
     revision = schema_revision(s)
@@ -684,11 +687,14 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
         dump = Path(tmp) / "upgrade.sql"
         with contextlib.redirect_stdout(io.StringIO()):
             cmd_backup(s, str(dump))
+            if before_restore:
+                before_restore()
             try:
                 cmd_restore(new, str(dump), schema, restricted_override, before_cleanup)
-            except Refused as refusal:
-                # A restore that loaded and then could not clean up leaves the copy behind, never compared.
-                if not _exists_quietly(new):
+            except RestoreLeftovers as refusal:
+                # Only a restore that says it loaded its own copy leaves one behind, never compared; any other refusal
+                # (a name another author took meanwhile among them) names no database of this upgrade's to drop.
+                if not refusal.loaded:
                     raise
                 raise Refused(f"{refusal}; the upgrade stopped before comparing, so '{to}' is loaded but unverified: do not use it. "
                               f"{keep_old}, and drop the copy with: DROP DATABASE IF EXISTS `{to}`;") from None
@@ -814,9 +820,8 @@ class SelfTestRun:
 
 
 def _phase_workflow(t: SelfTestRun) -> None:
-    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
-    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
-        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    checks, session, base = t.checks, t.session, t.base
+    proposal, refused, digest_of, review = t.proposal, t.refused, t.digest_of, t.review
     # Version 1: proposed, refused review by its author, reviewed, stamped.
     v1 = str(FIXTURES / "fixture-v1.json")
     code, out = call(["propose", v1] + base)
@@ -934,8 +939,6 @@ def _phase_workflow(t: SelfTestRun) -> None:
 
 def _phase_restores(t: SelfTestRun) -> None:
     checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
-    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
-        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
     # A backup round trip: the rows come back in a database of their own, with the schema's rules.
     dump_file = Path(tmp) / "roundtrip.sql"
     code, out = call(["backup", str(dump_file)] + base)
@@ -999,9 +1002,8 @@ def _phase_restores(t: SelfTestRun) -> None:
 
 
 def _phase_review_and_history(t: SelfTestRun) -> None:
-    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
-    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
-        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    checks, session, options, database, base = t.checks, t.session, t.options, t.database, t.base
+    proposal, safe_call, digest_of, review = t.proposal, t.safe_call, t.digest_of, t.review
     # ---- Repair 1: an approval covers exactly what was inspected, and every edit stays in the history.
     call(["stamp", "fixture", "4", "--as", "author-one", "--reason", "release the fourth version"] + base)
     call(["propose", proposal("v5", {"dataset": "fixture", "author": "author-one", "reason": "a fifth version", "changes": [
@@ -1088,9 +1090,8 @@ def _phase_review_and_history(t: SelfTestRun) -> None:
 
 
 def _phase_file_errors_and_cleanup(t: SelfTestRun) -> None:
-    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
-    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
-        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    checks, options, database, base, tmp = t.checks, t.options, t.database, t.base, str(t.tmp)
+    safe_call, held, server, kernel32 = t.safe_call, t.held, t.server, t.kernel32
     dump_file = t.dump_file
     hostile = t.hostile
     # File errors in backup and restore are refused naming the action and the path; earlier files are kept.
@@ -1184,9 +1185,8 @@ def _phase_file_errors_and_cleanup(t: SelfTestRun) -> None:
 
 
 def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
-    checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
-    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
-        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    checks, options, database, tmp = t.checks, t.options, t.database, str(t.tmp)
+    held, server, kernel32 = t.held, t.server, t.kernel32
     expected_v1 = t.expected_v1
     expected_v2 = t.expected_v2
     # A database at schema revision 1 is upgraded with nothing lost; until then, commands on it are refused.
@@ -1237,6 +1237,20 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
                      and f"DROP DATABASE IF EXISTS `{unverified}`;" in unverified_said
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(unverified_said))
         run_sql(f"DROP DATABASE IF EXISTS `{unverified}`;", options=options)
+
+        # Another author's upgrade takes the new name after this one's check and before its restore: this one is
+        # refused, and never tells anybody to drop the database the other author made.
+        taken = f"{database}_taken"
+        raced_said = None
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_upgrade(old, taken, before_restore=lambda: run_sql(f"CREATE DATABASE `{taken}`;", options=options))
+        except Refused as refusal:
+            raced_said = str(refusal)
+        checks.check("an upgrade whose new name another author took meanwhile is refused without advising a drop, that database left alone",
+                     raced_said is not None and "already exists" in raced_said and "DROP DATABASE" not in raced_said
+                     and Session(options, taken).exists(), repr(raced_said))
+        run_sql(f"DROP DATABASE IF EXISTS `{taken}`;", options=options)
 
         # A comparison that fails keeps its reason; on one outage the drop fails too, and the copy is named.
         def comparison_fails(new: Session) -> None:
@@ -1376,8 +1390,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
 
 def _phase_force_list_and_timeout(t: SelfTestRun) -> None:
     checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
-    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
-        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
+    proposal = t.proposal
     # An option file that tells the client to go on past errors cannot make a refused proposal commit.
     forcing = Path(tmp) / "forcing.cnf"
     forcing.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[mysql]\r\nforce\r\n")
@@ -1429,8 +1442,6 @@ def _phase_force_list_and_timeout(t: SelfTestRun) -> None:
 
 def _phase_inspection_connection_restart(t: SelfTestRun) -> None:
     checks, session, options, database, base, tmp = t.checks, t.session, t.options, t.database, t.base, str(t.tmp)
-    proposal, refused, safe_call, digest_of, review, held, server, kernel32 = (
-        t.proposal, t.refused, t.safe_call, t.digest_of, t.review, t.held, t.server, t.kernel32)
     v1 = t.v1
     read_back = t.read_back
     # The inspection commands read the persisted records.
