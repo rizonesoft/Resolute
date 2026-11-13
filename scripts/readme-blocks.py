@@ -34,12 +34,23 @@ class Stale(Exception):
 
 # ----- icons ------------------------------------------------------------------------------------------------------
 
+def _stored_zlib(data: bytes) -> bytes:
+    """A zlib stream of stored (uncompressed) blocks, written by hand. A compressor's output differs between zlib
+    builds, so a compressed icon regenerated on another machine has other bytes and --check calls the tree stale
+    there (CI did, 2026-11-13); stored blocks have exactly one encoding, and these icons are a few kilobytes."""
+    out = bytearray(b"\x78\x01")
+    blocks = [data[i:i + 65535] for i in range(0, len(data), 65535)] or [b""]
+    for n, block in enumerate(blocks):
+        out += struct.pack("<BHH", 1 if n == len(blocks) - 1 else 0, len(block), len(block) ^ 0xFFFF) + block
+    return bytes(out) + struct.pack(">I", zlib.adler32(data) & 0xFFFFFFFF)
+
+
 def _png(width: int, height: int, rgba: bytes) -> bytes:
     def chunk(kind: bytes, data: bytes) -> bytes:
         return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
     rows = b"".join(b"\x00" + rgba[y * width * 4:(y + 1) * width * 4] for y in range(height))
     return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
-            + chunk(b"IDAT", zlib.compress(rows, 9)) + chunk(b"IEND", b""))
+            + chunk(b"IDAT", _stored_zlib(rows)) + chunk(b"IEND", b""))
 
 
 def _dib_to_rgba(dib: bytes) -> tuple[int, int, bytes]:
@@ -286,6 +297,11 @@ def self_test() -> int:
         check("a row per mapped tool, with its icon, frozen marker and state",
               "**Alpha** (frozen)" in readme and "| does alpha | AutoIt, shipping | planned" in readme and "new, C++ only" in readme
               and set(icons) == {"docs/readme/icons/Alpha.png", "docs/readme/icons/Beta.png"}, readme)
+        idat = icons["docs/readme/icons/Alpha.png"][41:]   # after the signature, IHDR, and IDAT's length and name
+        rows = 48 * (1 + 48 * 4)
+        check("an icon's PNG is written the same on every machine: stored blocks, no compressor",
+              idat[:2] == b"\x78\x01" and idat[2] == 1 and struct.unpack("<HH", idat[3:7]) == (rows, rows ^ 0xFFFF)
+              and zlib.decompress(idat[:2 + 5 + rows + 4]) == b"".join(b"\x00" + bytes((255, 0, 0, 255)) * 48 for _ in range(48)))
         check("an icon's bitmap frame becomes a PNG of its size",
               icons["docs/readme/icons/Alpha.png"][:8] == b"\x89PNG\r\n\x1a\n" and struct.unpack(">II", icons["docs/readme/icons/Alpha.png"][16:24]) == (48, 48))
         plan_file.write_text(plan_file.read_text(encoding="utf-8").replace("|   1   |   §1    | One | -- |  [ ]   |", "|   1   |   §1    | One | -- |  [x]   |"), encoding="utf-8")
