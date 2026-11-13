@@ -370,7 +370,9 @@ class Graph:
 
     def section(self, ref: str, origin: Todo) -> tuple[Todo, Section] | None:
         r = self.resolve_ref(ref, origin)
-        target = self.by_id.get(r[0]) if r else None
+        if r is None:
+            return None
+        target = self.by_id.get(r[0])
         if target is None or r[1] not in target.sections:
             return None
         return target, target.sections[r[1]]
@@ -386,7 +388,7 @@ class Graph:
         for raw in t.sections[num].depends_on:
             r = self.resolve_ref(raw, t)
             src = self.by_id.get(r[0]) if r else None
-            if src is None or r[1] not in src.sections:
+            if r is None or src is None or r[1] not in src.sections:
                 label = f"{r[0]} §{r[1]}" if r else raw
                 unmet.append((label, label))
             elif src.sections[r[1]].status != "x" and not src.sections[r[1]].moved:
@@ -609,6 +611,8 @@ def cmd_validate(_args) -> int:
 def _load_sibling(filename: str, modname: str):
     path = Path(__file__).with_name(filename)
     spec = importlib.util.spec_from_file_location(modname, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load {path}")
     mod = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = mod
     spec.loader.exec_module(mod)
@@ -818,9 +822,10 @@ def align_tables(text: str) -> str:
             j += 1
         block = lines[i:j]
         i = j
-        rows = [_split_row(b) for b in block]
+        split = [_split_row(b) for b in block]
+        rows = [r for r in split if r is not None]
         sep_at = next((k for k, r in enumerate(rows) if r and all(SEP_CELL_RE.match(c) for c in r)), None)
-        if sep_at is None or any(r is None for r in rows) or any(len(r) != len(rows[sep_at]) for r in rows):
+        if sep_at is None or len(rows) != len(split) or any(len(r) != len(rows[sep_at]) for r in rows):
             out.extend(block)
             continue
         ncol = len(rows[sep_at])
@@ -1096,6 +1101,15 @@ def cmd_plan(args) -> int:
         print(f"::error::{e}")
         return 130 if e.interrupted else 1
     print(f"synced {total} row(s) -- {done} complete ({pct}%), {len(stale)} box(es) changed")
+    # The README's progress block and tool gallery are a second view of this plan (D00 T05 §2), so a sync of the
+    # repository's own plan refreshes them too; `readme-blocks.py --check` in check-all fails them when stale.
+    readme_blocks = REPO / "scripts" / "readme-blocks.py"
+    if PLAN.resolve() == (REPO / "todo" / "implementation-plan.md").resolve() and readme_blocks.is_file():
+        refreshed = subprocess.run([sys.executable, str(readme_blocks)], capture_output=True, text=True, cwd=str(REPO), check=False)
+        said = (refreshed.stdout + refreshed.stderr).strip().splitlines()
+        print(f"  {said[-1] if said else 'readme-blocks.py printed nothing'}")
+        if refreshed.returncode != 0:
+            return 1
     for r in dupes:
         print(f"  WARNING: {r} appears in more than one phase")
     for r in moved_rows:
@@ -1629,9 +1643,9 @@ def cmd_self_test(_args) -> int:
 def main() -> int:
     # TODO text is UTF-8; a Windows console code page cannot encode all of it.
     for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, "reconfigure"):
+        if isinstance(stream, io.TextIOWrapper):
             stream.reconfigure(encoding="utf-8", errors="replace")
-    p = argparse.ArgumentParser(prog="todo-graph", description=__doc__.split("\n")[0])
+    p = argparse.ArgumentParser(prog="todo-graph", description=(__doc__ or "todo-graph").split("\n")[0])
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("validate", help="integrity checks; exit 1 on any problem").set_defaults(fn=cmd_validate)
     sub.add_parser("self-test", help="prove this script against fixtures").set_defaults(fn=cmd_self_test)
