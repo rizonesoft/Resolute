@@ -345,6 +345,8 @@ Every framework notice that is not the update dialog: elevation refusal (`D01 T0
 
 **Plan review 2026-11-13 (`docs/reviews/01-framework/D01-T03-s6.md`, two P1 and one P2, all folded):** a recorded change is not always one that can be undone, so the crash notice gains a fourth case for irreversible items; a restart after a crash would have repeated a repair started from the command line, so it drops one-time action arguments as the Language page's restart does, and `D01 T01 §10`'s item is corrected; and the shutdown notice had no Cancel, so Esc could only have meant discard.
 
+**Repair round 1 (one P2, one P3, fixed 2026-11-13):** the fallback pointed to the log even when logging was off or not writing, and a list of more than ten irreversible items pointed to a report that might not have been written; a place is now named only when something is known to be there. The matrix holds 34 rows.
+
 **Corrected 2026-11-13 (completion review, `docs/reviews/01-framework/D01-T03-s6.md`, three gaps in scope):** an unanswered restart as administrator had no text of its own; a crash whose record could not be written pointed to the report even when the report could not be written either; and a crash notice shown at the next start told a user whose tool was already running to restart it. The three Repair items below close them, reviewed on `docs/reviews/01-framework/D01-T03-s6-repair.md`.
 
 **Round 2 (two P3, fixed 2026-11-13):** a failed restart after a crash borrowed the Language page's body, which speaks of a saved language, and a report folder that cannot be opened borrowed the message for a web page; each has its own text now.
