@@ -46,6 +46,7 @@ track: F1
 |   5   |   §5    | The accessibility floor                    | §2             |  [ ]   |
 |   6   |   §6    | Performance floor                          | §3             |  [ ]   |
 |   7   |   §7    | Text presentation and machine values       | §1             |  [ ]   |
+|   8   |   §8    | Menu bar and the complete popup menu       | --             |  [ ]   |
 
 ---
 
@@ -210,6 +211,27 @@ Small rules, and the ones a user notices when they are wrong: a path they cannot
 - [ ] Commit: `"design: text truncation, monospace values, and copyable text"`
 
 **Test checkpoint:** A long value truncates with an ellipsis, captured. A truncated value shows a tooltip and an untruncated one does not, both driven. Machine values render monospace and prose proportional, captured. A value is selected and copied from two surfaces, both driven.
+
+## 8. Menu Bar and the Complete Popup Menu
+
+**Filed 2026-11-13** from `D01 T03 §1`, whose standard window needs a menu bar with File and Help, separators, a Logging submenu, disabled items that say why, and accelerators drawn by the framework. The shared `PopupMenu` (`shared/resolute-ui/include/resolute/controls/popupmenu.h`) takes only `DropdownChoice` entries of an id, a label and an optional Lucide icon (`toolbar.h:33-37`): no separator, no disabled state, no accelerator text, no submenu, and no keyboard navigation beyond what its window procedure happens to handle, and there is no menu bar control at all. No section owned them.
+
+**Fidelity:** the menu bar and its menus, against `DESIGN.md` sections 8 and 9 and `docs/framework/standard-window.md`. No AutoIt baseline survives: the AutoIt menus are the system's, through `GUICtrlCreateMenu`.
+**Job:** a user opens File or Help with the mouse or the keyboard, reads which items act and why the others do not, and reaches every item without a mouse. Consumer: the standard window `D01 T01 §7` builds, and every tool through it.
+**Treatment:** one menu bar control and one popup menu in the UI library, drawn in the theme, with the menu roles UI Automation expects. Cheaper substitute that fails the checkpoint: the system menu bar beside a Direct2D caption, which ignores the theme and the DPI scale.
+**Chrome:** extend `shared/resolute-ui`; no tool draws a menu.
+**Needs:** Windows host (build/test)
+
+- [ ] Give the popup menu what a menu needs: separators, disabled items with the reason as their tooltip, a right-aligned accelerator text supplied by the caller (never parsed out of a label), access keys from an `&` in the label (underlined, Alt-less inside an open menu), and one submenu level. Done when: a menu holding each is rendered through `PopupMenu::RenderTo` at 100 and 150 percent in both appearances and compared with a captured baseline, and a disabled item cannot be chosen by click, Enter or its access key, each driven.
+- [ ] Add the menu bar control: text buttons left-aligned in the theme, each opening its popup menu below it. Done when: it renders at 100 and 150 percent in both appearances, captured, and clicking a title opens its menu, driven.
+- [ ] Make both keyboard-complete: Alt or F10 focuses the bar, Left and Right move between titles and open the neighbour's menu while one is open, Up and Down move between enabled items, Home and End jump, Right opens and Left closes a submenu, Enter chooses, Esc closes one level, and a second Esc leaves the bar. Done when: each key is driven against a headless menu and the focused item read back.
+- [ ] Expose the roles: the bar as `MenuBar`, each title and item as `MenuItem` with its name, access key, accelerator and enabled state, and a submenu's expanded state. Done when: a UI Automation walk of an open menu reads every item's name, state and accelerator.
+- [ ] Commit: `"ui: menu bar and the complete popup menu"`
+
+**Test checkpoint:** A menu with a separator, a disabled item, an accelerator, an access key and a submenu renders against its baseline at 100 and 150 percent in both appearances; the keyboard path opens, moves, opens the submenu, chooses and closes with every key named, driven; a disabled item cannot be chosen; and a UI Automation walk reads every item. Cheaper substitute that fails the checkpoint: a popup that renders separators but cannot be driven from the keyboard.
+
+-> XREF: D01 T03 §1 -- the standard window whose menus this builds
+-> XREF: D01 T01 §7 -- the window build that consumes it
 
 ## Verification
 

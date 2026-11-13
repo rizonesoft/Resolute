@@ -77,6 +77,7 @@ The window every tool opens: the Direct2D caption and status bar per `D01 T02 §
 **Test checkpoint:** `docs/framework/standard-window.md` exists; its matrix has a row, a failure presentation and a named `D01 T01 §7` check for every interactive element; the AutoIt inventory gives every part a verdict; both menus name every item with key, states, target and failure, with F1 left to `D06 T01 §18`; the message layer names titles, buttons, focus, keys and modality with the dead calls cut; the status bar names every region's states, triggers and clearing rules; and `D01 T01 §7` carries the item that builds the matrix's checks. The `D01 T01 §7` checklist can be built from this section with no invented control. Cheaper substitute that fails the checkpoint: menus without the no-tool-items rule, which specifies today and drifts tomorrow.
 
 -> XREF: D01 T01 §7 -- the build that consumes this window spec
+-> XREF: D01 T02 §8 -- the menu bar and popup menu this spec's menus need
 
 ## 2. Preferences Shell, General, and Performance
 

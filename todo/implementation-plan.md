@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **87 of 247 sections complete (35%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **87 of 248 sections complete (35%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -239,6 +239,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [ ] | `D01 T02 §5`  | The accessibility floor                      |  11   |
 | [ ] | `D01 T02 §6`  | Performance floor                            |   8   |
 | [ ] | `D01 T02 §7`  | Text presentation and machine values         |   5   |
+| [ ] | `D01 T02 §8`  | Menu bar and the complete popup menu         |   5   |
 | [ ] | `D01 T03 §7`  | Splash, donate, string audit                 |   4   |
 
 

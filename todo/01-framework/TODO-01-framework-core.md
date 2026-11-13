@@ -63,7 +63,7 @@ track: F1
 |   4   |   §4    | Localization and the pack loader                | §2                     |  [ ]   |
 |   5   |   §5    | Update check and consolidation announcement     | §2, §4, D01 T03 §5     |  [ ]   |
 |   6   |   §6    | Elevation and its refusal path                  | §3, §4, D01 T03 §6     |  [ ]   |
-|   7   |   §7    | Adopt the UI library and its surfaces           | §4, D00 T03 §3, D01 T03 §1, D01 T03 §2, D01 T03 §3 |  [ ]   |
+|   7   |   §7    | Adopt the UI library and its surfaces           | §4, D00 T03 §3, D01 T03 §1, D01 T03 §2, D01 T03 §3, D01 T02 §8 |  [ ]   |
 |   8   |   §8    | Extend the UI library for the tools             | §7                     |  [ ]   |
 |   9   |   §9    | Standalone proof in an empty folder             | §2, §4, §5, §7         |  [ ]   |
 |  10   |   §10   | Crash handling and single instance              | §1, §3, D01 T03 §6     |  [ ]   |
@@ -225,6 +225,7 @@ This section connects the two, and it is adoption rather than construction. DPI 
 
 -> XREF: D06 T01 §17 -- the About dialog specified in full, rendered from the registry (moved from this file's §12 on 2026-09-23)
 
+-> XREF: D01 T02 §8 -- the menu bar and popup menu the standard window's menus are built with
 ## 8. Extend the UI Library for the Tools
 
 The library has six controls, built for a launcher that browses and launches things. The repair tools need surfaces it does not have: a per-item result list that reconciles, a progress surface, and the standard message and confirmation dialogs every destructive action goes through.
