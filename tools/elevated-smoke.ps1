@@ -949,8 +949,10 @@ function Invoke-SelfTest {
             $running = $holder.BeginInvoke()
             try {
                 $null = $ready.Wait(10000)
+                $logFrom = @(Read-RegistrationLog 0).Count
                 $null = Register-InSandbox -AbandonAfter 'task'
-                $journalBefore = Get-Content -LiteralPath $script:JournalFile -Raw -ErrorAction SilentlyContinue
+                $journalBefore = if (Test-Path -LiteralPath $script:JournalFile) { Get-Content -LiteralPath $script:JournalFile -Raw } else { $null }
+                $parentRead = @(Read-RegistrationLog $logFrom)
             } finally {
                 $release.Set()
                 $null = $holder.EndInvoke($running)
@@ -958,6 +960,8 @@ function Invoke-SelfTest {
             }
             Check 'a registration started while another holds the lock is refused before it touches anything' (
                 $journalBefore -eq $null -and (Compare-RegistrationState $registered (Get-RegistrationState)).Count -eq 0)
+            Check 'the busy refusal of a registration reaches -Register through the log it reads' (
+                $parentRead -contains (Get-BusyRefusal 'registering the elevated smoke task'))
             # The same lock keeps a run out while a registration holds it, and a run is refused before it starts anything.
             $holder = [powershell]::Create()
             $ready = New-Object Threading.ManualResetEventSlim($false)
@@ -982,7 +986,7 @@ function Invoke-SelfTest {
                 $holder.Dispose()
             }
             Check 'a run started while a registration holds the lock is refused, naming it, and starts nothing' (
-                $runSaid -match 'a registration of the elevated smoke task is running' -and $notStarted)
+                $runSaid.Contains((Get-BusyRefusal 'running the elevated smoke')) -and $notStarted)
             # Inside an admitted run the lock is held; when the run has returned it is free again.
             $seen = @{}
             $peek = {
@@ -1025,7 +1029,11 @@ function Invoke-SelfTest {
                 $holder.Dispose()
             }
             Check '-Remove with the lock held elsewhere refuses by name and leaves the task in place' (
-                $removeSaid -match 'a registration or a run of the elevated smoke task is under way' -and $stillThere)
+                $removeSaid.Contains((Get-BusyRefusal 'removing the elevated smoke task')) -and $stillThere)
+
+            Check 'the busy refusal names the action refused and says another operation holds the lock' (
+                (@('registering the elevated smoke task', 'running the elevated smoke', 'removing the elevated smoke task' | Where-Object {
+                    -not ((Get-BusyRefusal $_) -match "^refused: $([regex]::Escape($_)) is not possible now: another elevated smoke operation \(a registration, a recovery, a run or a removal\) holds the lock; try again when it has finished$") })).Count -eq 0)
 
             Check 'a lock this process may not open counts as held' (
                 $null -eq (Enter-RegistrationLock $script:RegistrationLockName { param($n) throw [UnauthorizedAccessException]::new('Access to the path is denied.') }))
@@ -1129,6 +1137,13 @@ function Invoke-SelfTest {
     return 0
 }
 
+function Read-RegistrationLog([int]$From) {
+    # What the elevated copy said since line $From, for -Register to print:
+    # that copy runs in a console of its own, which closes when it exits.
+    if (-not (Test-Path -LiteralPath $RegisterLog)) { return @() }
+    return @(@(Get-Content -LiteralPath $RegisterLog) | Select-Object -Skip $From)
+}
+
 function Write-Registration([string]$Line) {
     # The elevated copy runs in a window of its own, so what it says is
     # also kept in the protected directory for -Register to print.
@@ -1196,6 +1211,13 @@ function Invoke-ElevatedRegistration {
     }
 }
 
+function Get-BusyRefusal([string]$Action) {
+    # The one refusal every holder of the lock gives: it says what was refused
+    # and what holds the lock, which is one of four operations and is not
+    # worth a subsystem to name exactly.
+    return "refused: $Action is not possible now: another elevated smoke operation (a registration, a recovery, a run or a removal) holds the lock; try again when it has finished"
+}
+
 function Enter-RegistrationLock([string]$Name, [scriptblock]$Open = { param($n) New-Object Threading.Mutex($false, $n) }) {
     # The lock, taken at once or not at all. A mutex whose holder died is
     # taken too: that is the abandoned registration a journal records. One
@@ -1223,7 +1245,7 @@ function Invoke-RegisterElevated {
     # second registration started meanwhile is refused instead of taking
     # the first one's journal for an abandoned one and undoing it.
     $lock = Enter-RegistrationLock $script:RegistrationLockName
-    if (-not $lock) { Write-Host 'refused: another registration of the elevated smoke task is running; wait for it to finish'; return 2 }
+    if (-not $lock) { Write-Registration (Get-BusyRefusal 'registering the elevated smoke task'); return 2 }
     try {
         return (Invoke-RegistrationTransaction)
     } finally {
@@ -1241,23 +1263,23 @@ function Invoke-RegistrationTransaction {
     # included, puts back the previous task, hashes, runtime and directory
     # permissions. Exit code says the outcome.
     $mode = $script:Registration
-    if ($mode.RequireElevation -and -not (Test-IsElevated)) { Write-Host 'refused: the registration copy is not elevated'; return 2 }
+    if ($mode.RequireElevation -and -not (Test-IsElevated)) { Write-Registration 'refused: the registration copy is not elevated'; return 2 }
     function Step([string]$Name) { Invoke-StepPoint $Name }
     if ($OperatorSid -and $OperatorSid -ne (Get-CurrentSid)) {
         # Consent given with another administrator's credentials: this copy
         # runs as that administrator, so the task and the HKCU it reads would
         # be theirs, and the operator's -Run could never feed it.
-        Write-Host "refused: the consent was given as another account ($([Security.Principal.WindowsIdentity]::GetCurrent().Name)); the task must run as the account that asked for it. Sign in as an administrator, or give this account administrator rights, and register again"
+        Write-Registration "refused: the consent was given as another account ($([Security.Principal.WindowsIdentity]::GetCurrent().Name)); the task must run as the account that asked for it. Sign in as an administrator, or give this account administrator rights, and register again"
         return 2
     }
     $pinnedPython = & $mode.Source
     if (-not (Test-Path (Join-Path $pinnedPython 'python.exe'))) {
-        Write-Host "refused: the pinned Python is not installed at $pinnedPython (run pwsh scripts/bootstrap.ps1)"
+        Write-Registration "refused: the pinned Python is not installed at $pinnedPython (run pwsh scripts/bootstrap.ps1)"
         return 2
     }
     $prior = Get-TaskOrNull
     if ($prior -and (Test-TaskNeedsStop $prior.State)) {
-        Write-Host 'refused: the elevated smoke task is running or queued; let it finish or run -Remove first'
+        Write-Registration 'refused: the elevated smoke task is running or queued; let it finish or run -Remove first'
         return 2
     }
     # An earlier registration that never reached its commit comes first.
@@ -1485,7 +1507,7 @@ function Invoke-Register {
             return 2
         }
         # What the elevated copy said, from the log it keeps in the protected directory.
-        if (Test-Path -LiteralPath $RegisterLog) { @(Get-Content -LiteralPath $RegisterLog) | Select-Object -Skip $logFrom | ForEach-Object { Write-Host "elevated: $_" } }
+        Read-RegistrationLog $logFrom | ForEach-Object { Write-Host "elevated: $_" }
         if ($proc.ExitCode -ne 0) {
             Write-Host "refused: elevated registration failed with exit code $($proc.ExitCode); nothing is registered by this run"
             return 2
@@ -1535,7 +1557,7 @@ function Invoke-Run {
     # The whole run, from its readiness check to its end, under the lock a
     # registration takes: neither can begin while the other is under way.
     $lock = Enter-RegistrationLock $script:RegistrationLockName
-    if (-not $lock) { Write-Host 'refused: a registration of the elevated smoke task is running; run again when it has finished'; return 2 }
+    if (-not $lock) { Write-Host (Get-BusyRefusal 'running the elevated smoke'); return 2 }
     try {
         return (Invoke-RunUnderLock)
     } finally {
@@ -1630,7 +1652,7 @@ function Invoke-Remove {
     # Under the same lock: a removal between a registration's readiness check
     # and its commit would leave that registration reporting a task that is gone.
     $lock = Enter-RegistrationLock $script:RegistrationLockName
-    if (-not $lock) { Write-Host 'refused: a registration or a run of the elevated smoke task is under way; remove it when that has finished'; return 2 }
+    if (-not $lock) { Write-Host (Get-BusyRefusal 'removing the elevated smoke task'); return 2 }
     try {
         return (Invoke-RemoveUnderLock)
     } finally {
