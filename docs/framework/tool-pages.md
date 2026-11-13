@@ -96,11 +96,26 @@ It runs something the tool offers beside its settings: "Clear the cache now", "T
 | --- | --- |
 | When it runs | At once, when pressed. It is one of the actions that are not saves: the dirty rule does not see it, and Cancel and Discard do not undo it. |
 | What it sees | The saved settings, never the edits on screen. A button whose result depends on a setting on the same page says so in its hint. |
-| Confirmation | A declaration may give a confirmation: a summary key, a body key and the action's own button label. The host then asks first through the message layer, with Cancel as the default, as [`standard-window.md`](standard-window.md) rules for an action that changes the system. An action that changes anything outside the dialog must declare one, and its body must say what cannot be undone. |
-| While it runs | The button is disabled and reads `Label_Action_Running` ("Working..."); the dialog stays responsive and can be closed, which does not stop the action. One press starts one run. |
+| Confirmation | A declaration may give a confirmation: a summary key, a body key, the action's own button label, and an impact function ([below](#what-does-a-confirmation-say)). The host then asks first through the message layer, with Cancel as the default, as [`standard-window.md`](standard-window.md) rules for an action that changes the system. An action that changes anything outside the dialog must declare one, and its body must say what cannot be undone. |
+| Who owns the run | The tool, through the framework's status layer, not the dialog. An action runs as a task ([`standard-window.md`](standard-window.md#how-does-each-segment-change)), named by the button's label: the status bar's task segment shows it, the taskbar button shows it, and it is announced as every task is. |
+| While it runs | The button is disabled and reads `Label_Action_Running` ("Working..."). The state comes from the task, so it is the same however the page is reached: closing Preferences does not stop the action, and reopening while it runs shows the button disabled and reading `Label_Action_Running` until the task ends. One press starts one run, and there is no way to start a second while the first runs. The dialog stays responsive throughout. |
 | Elevation | Checked at the action, by the tool, through the framework's guard (`D01 T01 §6`). An action that needs rights the tool does not have fails with that reason; a page never raises a consent prompt by being opened. |
-| Success | A note beside the button with the tool's own result text (a string key and arguments), selectable and copyable, announced. It stays until the page is left or the button is pressed again. |
-| Failure | The same note in its error form: `Label_Action_Failed` ("%1 did not finish: %2"), %1 the button's label without its access key and %2 the tool's reason. The button is enabled again. The failure is logged. |
+| Success | The task's result line goes to the status bar's state segment and to the log, with the task's announcement, whether or not Preferences is open. When the page is showing, the same text also appears in a note beside the button (a string key and arguments from the tool), selectable and copyable; it stays until the page is left or the button is pressed again. |
+| Failure | The same, in the failed form: `Label_Action_Failed` ("%1 did not finish: %2"), %1 the button's label without its access key and %2 the tool's reason, in the state segment and the log always, and in the note beside the button when the page is showing. The button is enabled again. |
+
+### What does a confirmation say?
+
+What the action will affect, in numbers, before it asks (`DESIGN.md` §11). The tool's sentence alone ("Cached pages are deleted") is not a confirmation, so a confirmation always comes with an impact function, and the host builds the message from what it returns:
+
+| Step | Rule |
+| --- | --- |
+| Working it out | Pressing the button calls the tool's impact function off the UI thread; the button is disabled and reads `Label_Action_Running` meanwhile. The function returns the places affected (paths, registry keys or names), how many items, and their total size where size has a meaning. It changes nothing. |
+| The message | Warning. Summary: the tool's summary key. Body: `Confirm_Impact` ("This affects %1 items (%2) in:"), or `Confirm_Impact_Count` ("This affects %1 items in:") when there is no size, then the places, one per line in monospace, at most ten with `Confirm_Impact_More` ("and %1 more"), then the tool's own body sentence, which says what cannot be undone. Buttons: the action's own label, and Cancel, the default. Counts and sizes are formatted for the user's locale. |
+| Cancel | Nothing has changed, the button is enabled again, and nothing is logged as done. |
+| Nothing to affect | An impact of no items asks nothing and runs nothing: the note beside the button reads `Label_Action_Nothing` ("There is nothing to do."). |
+| An impact that cannot be worked out | The function reports a reason (a folder that cannot be read, a profile that has gone). No confirmation is shown for an impact nobody could state, and the action does not run: the note reads `Label_Action_Failed` with that reason, and the button is enabled again. |
+| Closing Preferences while it is worked out | Cancels the preparation. Nothing runs, no confirmation is left waiting, and reopening shows the button enabled. An action only ever runs after its confirmation's own button is pressed. Once the message is showing, it is modal, so the dialog cannot be closed from under it. |
+| What ran | The action is given the impact the user confirmed, and acts on those places only. |
 
 ## What if a declaration is wrong?
 
@@ -113,7 +128,7 @@ A declaration is checked once, when the tool hands it over. One that fails is re
 | A string key with no built-in English text | `Page_Refused_String` ("the text %1 is missing") |
 | Two controls on the page with the same access key, or one that takes the shell's (Save's) | `Page_Refused_Access_Key` ("two controls share the access key %1") |
 | A default the control's own limits do not allow, or an "enabled when" that names a control not on the page | `Page_Refused_Value` ("the control %1 is declared with a value it does not allow") |
-| A control that takes effect at Save without both of its functions, or an action button without its function | `Page_Refused_Function` ("the control %1 has nothing to run") |
+| A control that takes effect at Save without both of its functions, an action button without its function, or a confirmation without its impact function | `Page_Refused_Function` ("the control %1 has nothing to run") |
 | A page id that is empty, not ASCII letters and digits, or used twice | `Page_Refused_Id` ("its name is not usable") |
 
 A refused page is not dropped. It is listed in the page list, under its title when that resolves and under its id when it does not, and it shows `Page_Refused_Title` ("This page cannot be shown") with `Page_Refused_Body` ("%1 declared it wrongly: %2. Its settings are unchanged."), %1 the tool's name and %2 the reason, selectable and copyable. The refusal is logged with the page id and the reason. The tool's stored settings are not touched, and the tool reads them as it always does. So a tool's settings never vanish silently, and the fault is found the first time anyone opens Preferences.
@@ -154,7 +169,8 @@ PreferencesPage{
             ActionButton{.label = {"Button_Clear_Now", "Clear the cache &now"},
                          .confirm = {{"Confirm_Clear_Title", "Clear the cache?"},
                                      {"Confirm_Clear_Body", "Cached pages are deleted and cannot be restored."},
-                                     {"Button_Clear", "Clear the cache"}},
+                                     {"Button_Clear", "Clear the cache"},
+                                     &CacheImpact},   // returns the cache folders, the file count and their size
                          .run = &ClearCacheNow},
             Note{.text = {"Note_Profiles", "Profiles are read when the browser starts."}},
         },
@@ -165,7 +181,7 @@ PreferencesPage{
 }
 ```
 
-Each `{"Key", "English"}` pair is a string key with its built-in English text. The page stores four keys in the tool's settings section, is validated and saved by the shell, and draws nothing itself.
+Each `{"Key", "English"}` pair is a string key with its built-in English text. Pressing "Clear the cache now" first shows, from `CacheImpact`: "This affects 1,204 items (86.3 MB) in:", the profile's cache folder in monospace, then "Cached pages are deleted and cannot be restored.", with Cancel as the default. The page stores four keys in the tool's settings section, is validated and saved by the shell, and draws nothing itself.
 
 ## Which strings does the host add?
 
@@ -181,6 +197,10 @@ All in `[Preferences]` unless marked. A tool's own strings are in its `[Preferen
 | `Label_Apply_Failed` | Saved, but %{Program.Name} could not apply it: %1 | New |
 | `Label_Action_Running` | Working... | New |
 | `Label_Action_Failed` | %1 did not finish: %2 | New |
+| `Label_Action_Nothing` | There is nothing to do. | New |
+| `Confirm_Impact`, in `[Messages]` | This affects %1 items (%2) in: | New |
+| `Confirm_Impact_Count`, in `[Messages]` | This affects %1 items in: | New |
+| `Confirm_Impact_More`, in `[Messages]` | and %1 more | New |
 | `Page_Check_Failed`, in `[Messages]` | %1 could not check its settings: %2. Nothing was saved. | New |
 | `Page_Refused_Title` | This page cannot be shown | New |
 | `Page_Refused_Body` | %1 declared it wrongly: %2. Its settings are unchanged. | New |
@@ -206,9 +226,13 @@ Every row is one behavioural check in `D01 T01 §7`. Two fixture tools exist for
 | An unedited stored value | Open with a number out of range and a combo value no choice has in the file; touch nothing and take the way out; reopen, change another setting and Save; then retype the number's shown default and Save | | Each shows its default with `Label_Stored_Invalid` naming the stored text; the tool is given the default; untouched, Save is disabled and the dialog closes without asking; after the unrelated save both keys read back unchanged; after the retyped default the page is dirty, the number reads back as the default and its note is gone | None can occur: an unedited control is never dirty and writes nothing | `toolpage: a stored value that is not allowed is kept and reported` |
 | Takes effect at Save | Change the setting; Save; then change only another setting and Save | Apply succeeding | The tool's apply runs once for the first save and not for the second; the effective value reported matches | Apply failing (seeded): `Label_Apply_Failed` with the tool's reason beneath the control, the saved notice still shown, and apply tried again at the next save | `toolpage: apply runs only where effective differs` |
 | Takes effect after a restart | Change the setting; Save; reopen | | `Label_Effect_Restart` beneath the control while the stored value differs from the one the tool started with; gone after a restart | Save's failures | `toolpage: a restart setting says so` |
-| Action button | Click; Space; its access key | Idle; running | The action runs once at once; the button is disabled and reads `Label_Action_Running`; the tool's result note appears, announced; the dirty state is unchanged and Cancel does not undo it | The action failing (seeded): `Label_Action_Failed` with the tool's reason, the button enabled again, logged | `toolpage: an action runs at once and reports` |
-| Action confirmation | Press an action that declares one; Enter; then press it again and choose its button | | The message shows the summary and body with Cancel as the default; Enter does nothing to the system; the action's button runs it | The action's own failure, as the row above | `toolpage: a confirmed action defaults to cancel` |
-| A refused page | Start the second fixture tool, one page per refusal; open Preferences | Each of the seven refusals | Each page is listed, shows `Page_Refused_Title` and its reason, builds no control, and leaves the tool's settings file byte for byte; the refusal is in the log | The stated results are the failure presentations | `toolpage: a wrong declaration is shown, not dropped` |
+| Action button | Click; Space; its access key | Idle; running | The action runs once at once as a task; the status bar's task segment names it; the button is disabled and reads `Label_Action_Running`; the tool's result appears in the note and in the state segment, announced; the dirty state is unchanged and Cancel does not undo it | The action failing (seeded): `Label_Action_Failed` with the tool's reason in the note and the state segment, the button enabled again, logged | `toolpage: an action runs at once and reports` |
+| An action that outlives the dialog | Start the fixture's slow action; close Preferences; reopen it while the action runs; press the button's access key; close again and let the action end | Running, dialog closed; reopened | One run only: on reopening the button is disabled and reads `Label_Action_Running`, and the key starts nothing; with Preferences closed the result line is in the state segment and the log, and the task's announcement is raised | The action failing with Preferences closed (seeded): the failed line is in the state segment and the log | `toolpage: an action survives closing the dialog` |
+| Action confirmation | Press an action that declares one; Enter; then press it again and choose its button | | The message names the fixture's own places, count and size above the tool's sentence, with Cancel as the default; Enter changes nothing on the system and the button is enabled again; the action's button runs it on exactly those places | The action's own failure, as the action row above | `toolpage: a confirmation names what it affects and defaults to cancel` |
+| An impact that cannot be worked out | Make the fixture's target folder unreadable; press the button | | No confirmation is shown and the action does not run; the note gives `Label_Action_Failed` with the reason; the button is enabled again | The stated result is the failure presentation | `toolpage: no confirmation without a stated impact` |
+| Nothing to affect | Empty the fixture's target; press the button | | No message; the note reads `Label_Action_Nothing`; nothing runs | None can occur: an empty impact asks nothing | `toolpage: an empty impact does nothing` |
+| Closing while the impact is worked out | Delay the fixture's impact function; press the button; close Preferences; reopen | Preparing | The preparation is cancelled; nothing is deleted; no message appears then or on reopening; the button is enabled and one press starts one new preparation | None can occur: an action runs only from its confirmation | `toolpage: closing cancels an unconfirmed action` |
+| A refused page | Start the second fixture tool, one page per refusal; open Preferences | Each of the seven refusals, a confirmation without an impact function among them | Each page is listed, shows `Page_Refused_Title` and its reason, builds no control, and leaves the tool's settings file byte for byte; the refusal is in the log | The stated results are the failure presentations | `toolpage: a wrong declaration is shown, not dropped` |
 | The declaration check | Run the host's check function on every fixture declaration, with no window | Valid; each refusal | Valid: no refusals. Each wrong one: its refusal, the same as the page shows. A test built on it fails on a refused page | None can occur: the function is the one the host uses | `toolpage: a tool's tests catch a refused page` |
 | Strings | Show the fixture page with a pack that translates some keys, and with none | | Translated keys show from the pack; the rest show their declared English; nothing is blank and no key name shows | None can occur: every key has built-in English, or the page is refused | `toolpage: every string resolves or shows english` |
 | Keyboard and announcements | Tab through the fixture page; raise an error, an apply note and an action result | | Tab order is the declared order with each note after its control; every control is operated by keyboard; each note is announced once and read through UI Automation | None can occur: the controls are the framework's | `toolpage: a tool page is reachable and announced` |
