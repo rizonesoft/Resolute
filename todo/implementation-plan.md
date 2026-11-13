@@ -186,7 +186,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
 | [ ] | `D00 T05 §4`  | Sidecar Reproduction Command Carries -Visible     |   3   |
 | [x] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow                  |  26   |
-| [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                     |  10   |
+| [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                     |  11   |
 | [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs                 |   5   |
 | [ ] | `D00 T06 §4`  | Data Extension: Vendors, Blink, POST              |   5   |
 | [ ] | `D00 T06 §5`  | Consumer Contract for Tools                       |   4   |
