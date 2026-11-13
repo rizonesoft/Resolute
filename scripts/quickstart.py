@@ -24,6 +24,7 @@ Windows only, stdlib only. The lane is .github/workflows/quick-start.yml.
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import re
@@ -31,6 +32,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -141,10 +143,24 @@ def run(readme: Path, work: Path, expect: str = "", timeout: float = DEFAULT_TIM
     script.write_text(session_script(commands, expect, state, after_clone), encoding="utf-8-sig")
     job = win_job.OwnedJob()   # refuses before anything is started
     child = None
+    heard = None
     code = EXIT_TIMEOUT
     stuck = False
     try:
-        child = subprocess.Popen([pwsh, "-NoLogo", "-NoProfile", "-NonInteractive", "-File", str(script)], cwd=work, creationflags=NO_WINDOW)
+        # The session's output is read here and said by the runner, line by line as it comes. Left to inherit the
+        # runner's own output it did not reach a CI log at all, and a failed command would have been unreadable.
+        child = subprocess.Popen([pwsh, "-NoLogo", "-NoProfile", "-NonInteractive", "-File", str(script)], cwd=work, creationflags=NO_WINDOW,
+                                 stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        output = child.stdout
+        assert output is not None   # stdout=PIPE above
+
+        def relay() -> None:
+            for raw in iter(output.readline, b""):
+                say(raw.decode("utf-8", "replace").rstrip("\r\n"))
+
+        heard = threading.Thread(target=relay, daemon=True)
+        heard.start()
         if before_owned:
             before_owned()   # the self-test's pause between starting the session and owning it
         try:
@@ -161,6 +177,8 @@ def run(readme: Path, work: Path, expect: str = "", timeout: float = DEFAULT_TIM
             code = EXIT_TIMEOUT
     finally:
         left = job.end()   # the session and everything it started, on every way out of here
+        if heard is not None:
+            heard.join(10)     # the pipe closes once every process that held it is gone
         if child is not None:
             try:
                 child.wait(10)
@@ -357,6 +375,11 @@ def self_test() -> int:
             (root / f"{name}.md").write_text(readme(*commands), encoding="utf-8")
             return run(root / f"{name}.md", work, say=said.append, **{"check_lanes": False, **options})
 
+        code = attempt("heard", ("Write-Output 'said by the session'", "cmd /c \"echo said on stderr 1>&2\""))
+        check("what the session prints is relayed by the runner, each command named before it runs",
+              code == 0 and "quickstart> Write-Output 'said by the session'" in said and "said by the session" in said
+              and any("said on stderr" in line for line in said), f"{code} {said}")
+
         # A child the session starts and does not wait for: `Start-Sleep 300` in its own process, its id written down.
         stray = "(Start-Process pwsh -NoNewWindow -PassThru -ArgumentList '-NoProfile','-Command','Start-Sleep 300').Id | Set-Content child.pid"
 
@@ -473,6 +496,9 @@ def self_test() -> int:
 
 
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):   # a CI log is read while the run is going: say each line when it is said
+        if isinstance(stream, io.TextIOWrapper):
+            stream.reconfigure(line_buffering=True, errors="replace")
     parser = argparse.ArgumentParser(description="Run the README's quick start as written, and check the facts about a first run.")
     parser.add_argument("--self-test", action="store_true")
     commands = parser.add_subparsers(dest="command")
