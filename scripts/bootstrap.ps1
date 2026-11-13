@@ -202,7 +202,7 @@ foreach ($c in $Pins.components) {
     $actual = (Get-FileHash $tempZip -Algorithm SHA256).Hash.ToLower()
     if ($actual -ne $c.sha256.ToLower()) {
         Remove-Item $tempZip -Force
-        Write-Host "  [ABORT] $($c.name) hash mismatch. Nothing was installed." -ForegroundColor Red
+        Write-Host "  [ABORT] $($c.name) hash mismatch. $($c.name) was not installed; $installed component(s) installed before it in this run stay installed." -ForegroundColor Red
         Write-Host "          expected: $($c.sha256)" -ForegroundColor Red
         Write-Host "          actual:   $actual" -ForegroundColor Red
         Write-Host "          The archive at that URL is not the archive this" -ForegroundColor DarkGray

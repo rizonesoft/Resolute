@@ -137,12 +137,12 @@ The plan is the contract: every section is built, proven by a check from a real 
 Every tool consumes the framework, and the repair tools also consume the repair contract. The one rule between the layers is that a tool never reimplements what a layer below it provides.
 
 ```mermaid
-flowchart TB
-    tools["Tools: extensions/&lt;Tool&gt;/<br/>each a standalone executable"]
-    launcher["Launcher: src/<br/>finds tools and starts them"]
-    repair["Repair contract: src/repair/<br/>diagnose, result list, restore record, undo<br/>(D02 T01)"]
-    framework["Framework: src/framework/<br/>startup, settings, logging, language, update, About<br/>(D01 T01)"]
-    ui["UI library: shared/resolute-ui/<br/>every control, theming, DPI, typography"]
+flowchart LR
+    tools["Tools:<br/>extensions/ToolName/<br/>each a standalone<br/>executable"]
+    launcher["Launcher: src/<br/>finds tools and<br/>starts them"]
+    repair["Repair contract:<br/>src/repair/<br/>diagnose, result list,<br/>restore record, undo<br/>(D02 T01)"]
+    framework["Framework:<br/>src/framework/<br/>startup, settings, logging,<br/>language, update, About<br/>(D01 T01)"]
+    ui["UI library:<br/>shared/resolute-ui/<br/>every control, theming,<br/>DPI, typography"]
     tools -- repair tools only --> repair
     tools --> framework
     launcher --> framework
@@ -183,7 +183,7 @@ The repair contract is for the repair tools only. The framework and the repair c
 | What you see | Why, and what to do |
 | --- | --- |
 | `pwsh` is not recognised | The scripts need PowerShell 7. Install it from Microsoft and run them from `pwsh`, not Windows PowerShell 5. |
-| bootstrap refuses a download because its hash differs | The file is not the one pinned in `toolchain.json`. Nothing was installed; retry, and if it persists the mirror changed and the pin needs review. |
+| bootstrap refuses a download because its hash differs | The file is not the one pinned in `toolchain.json`, so that component was not installed. Components bootstrap had already installed before it stay installed. Run bootstrap again: it skips what is present at its pinned version and retries the rest. If the refusal persists, the mirror changed and the pin needs review. |
 | CMake complains that the build tree was made at another path | `build.ps1` removes and rebuilds a tree another clone made; run it again rather than `cmake` by hand. |
 | the launcher's list is empty | Expected today: no tool declares itself to the launcher yet (`D05 T02 §1`). Start a tool directly from `Bin\<Config>\System\`. |
 | a gate fails in `check-all` | Its log is under `build\logs\`, named after the gate; the last lines name the failure. |
