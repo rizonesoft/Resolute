@@ -97,7 +97,7 @@ A message has:
 | --- | --- |
 | Window title | The tool's display name, so a user with several tools open knows which one is speaking. |
 | Severity | Information, Warning or Error, shown by a themed Lucide icon (`info`, `triangle-alert`, `circle-x`) and named for screen readers by `Info_Title`, `Warning_Title` or `Error_Title`. Colour is never the only carrier: the icon shape differs. |
-| Summary | One line in Subtitle (16 px, SemiBold): what happened, in the message's own key. |
+| Summary | In Subtitle (16 px, SemiBold): what happened, in the message's own key. Written to fit one line; a summary that does not fit the message's width (a long name in it, a longer language) wraps and is never cut. |
 | Body | Body text (13 px), selectable and copyable; machine values (paths, codes, registry keys) in monospace (`DESIGN.md` §4). Long bodies scroll inside a maximum height of 320; width 480, both base. |
 | Buttons | Right-aligned, `SpacingSM` apart. A button names its action ("Open download page", "Restart now"), and Cancel or Close is the way out. Sets: Close; one action or two, plus the way out, which is Cancel where declining stops something the user started and Close where the message asks nothing and declining changes nothing (the update notices, [`update-notices.md`](update-notices.md)). |
 | Button labels | The ways out are the framework's, in `[Messages]`: `Button_Close` ("Close"), `Button_Cancel` ("Cancel"), and `Button_OK` ("OK") for an Information message that asks nothing. An action button's label is the calling notice's own key, specified with the notice in `D01 T03 §5` or `§6`. The AutoIt `Button_Ok` ("Ok", `[About]`, `en.lng:42`) is replaced by `Button_OK` here. |
