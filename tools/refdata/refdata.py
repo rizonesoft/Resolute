@@ -678,11 +678,13 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, 
         raise Refused(f"refused: the database '{s.database}' does not exist")
     revision = schema_revision(s)
     if revision >= SCHEMA_REVISION:
-        raise Refused(f"refused: the database '{s.database}' is already at schema revision {revision}; there is nothing to upgrade")
+        raise Refused(f"refused: the database '{s.database}' is already at schema revision {revision}; there is nothing to upgrade: work in it")
     new = Session(s.options, to)
     if new.exists():
         raise Refused(f"refused: the database '{to}' already exists; upgrade into a new name; nothing was changed")
-    keep_old = f"'{s.database}' is unchanged: keep working in it"
+    # Every command refuses the old database, so the next step is the upgrade again, once the cause is fixed.
+    keep_old = (f"'{s.database}' is unchanged and keeps every version; fix the cause named here and run "
+                f"refdata.py upgrade --database {s.database} --to <a new name> again")
     with tempfile.TemporaryDirectory(prefix="refdata-upgrade-") as tmp:
         dump = Path(tmp) / "upgrade.sql"
         with contextlib.redirect_stdout(io.StringIO()):
@@ -1229,8 +1231,19 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         except Refused as refusal:
             lossy_said = str(refusal)
         checks.check("an upgrade whose copy lost a changelog row is refused naming it, the copy dropped and the old database unchanged",
-                     lossy_said is not None and "changelog has" in lossy_said and not Session(options, lossy).exists()
+                     lossy_said is not None and "changelog has" in lossy_said and f"refdata.py upgrade --database {old.database} --to" in lossy_said and not Session(options, lossy).exists()
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(lossy_said))
+
+        # A database already at this revision is told there is nothing to upgrade and to work in it, never to retry.
+        current_said = None
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_upgrade(Session(options, database), f"{database}_again")
+        except Refused as refusal:
+            current_said = str(refusal)
+        checks.check("an upgrade of a database already at this revision says to work in it, with no retry advice",
+                     current_said is not None and "there is nothing to upgrade: work in it" in current_said and "upgrade --database" not in current_said
+                     and not Session(options, f"{database}_again").exists(), repr(current_said))
 
         # An upgrade whose restore could not clean up says its copy is loaded but unverified.
         unverified, handles = f"{database}_unverified", []
@@ -1246,7 +1259,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
             kernel32.CloseHandle(handle)
             path.unlink(missing_ok=True)
         checks.check("an upgrade whose restore could not clean up names its copy as unverified, with how to drop it, the old database unchanged",
-                     unverified_said is not None and f"'{unverified}' is loaded but unverified" in unverified_said
+                     unverified_said is not None and f"'{unverified}' is loaded but unverified" in unverified_said and f"refdata.py upgrade --database {old.database} --to" in unverified_said
                      and f"DROP DATABASE IF EXISTS `{unverified}`;" in unverified_said
                      and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state, repr(unverified_said))
         run_sql(f"DROP DATABASE IF EXISTS `{unverified}`;", options=options)
@@ -1291,7 +1304,7 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         if outage_up_said and command in outage_up_said:
             run_sql(command, options=options)   # the command the refusal gave, run as given
         checks.check("an upgrade's rollback keeps the comparison's reason, and on an outage names the copy it could not remove with the command that removes it",
-                     failed_said is not None and "the drill's comparison read failed" in failed_said and "was dropped" in failed_said
+                     failed_said is not None and "the drill's comparison read failed" in failed_said and "was dropped" in failed_said and f"refdata.py upgrade --database {old.database} --to" in failed_said
                      and not Session(options, f"{database}_cmpfail").exists()
                      and outage_up_said is not None and "could not be compared" in outage_up_said and "could not be confirmed removed" in outage_up_said
                      and command in outage_up_said and started.startswith("exit 0") and left_after_outage and not Session(options, outage_copy).exists(),
