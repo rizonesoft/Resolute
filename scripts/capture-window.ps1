@@ -722,7 +722,9 @@ function Start-Cover {
     foreach ($a in '-NoProfile', '-Command', $code) { $info.ArgumentList.Add($a) }
     $info.UseShellExecute = $false
     $info.CreateNoWindow = $true
-    $proc = [System.Diagnostics.Process]::Start($info)
+    # Owned the moment it starts, so a stop during the wait below still ends it.
+    $script:cover = [System.Diagnostics.Process]::Start($info)
+    $proc = $script:cover
     # [NullString]::Value, not $null: PowerShell hands $null to a string parameter as "", a class name no window has.
     $clock = [System.Diagnostics.Stopwatch]::StartNew()
     $deadline = (Get-Date).AddSeconds(20)
@@ -730,14 +732,13 @@ function Start-Cover {
     $found = [ZOrder]::FindWindowW([NullString]::Value, 'Resolute capture drill cover') -ne [IntPtr]::Zero
     Start-Sleep -Milliseconds 300
     Write-Host "drill: a covering window of process $($proc.Id) is over the target ($DrillCoverAt), $(if ($found) { "found after $($clock.ElapsedMilliseconds) ms" } else { 'not found within 20 s' })"
-    return $proc
 }
 function Stop-Cover { if ($script:cover -and -not $script:cover.HasExited) { & taskkill.exe /T /F /PID $script:cover.Id 2>&1 | Out-Null; $null = $script:cover.WaitForExit(10000) } }
-if ($DrillCoverAt -eq 'before') { $script:cover = Start-Cover }
 try {
+    if ($DrillCoverAt -eq 'before') { Start-Cover }
     $refusal = Assert-Uncovered $hwnd $targetFrame $targetPid 'before'
     if ($refusal) { Write-Host $refusal -ForegroundColor Red; Stop-Ours; Exit-Capture 3 }
-    if ($DrillCoverAt -eq 'between') { $script:cover = Start-Cover }
+    if ($DrillCoverAt -eq 'between') { Start-Cover }
     if ($DrillCoverAt -eq 'hide') { [void][Win32Capture]::ShowWindow($hwnd, 0); $script:hidden = $true; Start-Sleep -Milliseconds 700; Write-Host 'drill: the target was hidden between the checks' }
     $bitmap = New-Object System.Drawing.Bitmap $width, $height
     $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
