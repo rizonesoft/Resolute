@@ -49,3 +49,78 @@ OVERALL: needs-attention
 
 HIGHEST: P2
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T15:25:38Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: fa84f0bb6cfa365f72ba43e748d4fe41d383caa2
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: 00d6206cb399aec5
+
+## consistency: approve
+
+No findings in the three Repair items covered by this candidate.
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T15:28:11Z
+- Candidate: 288351e209e66c076997b80824e57fb955a33ec6
+- Effort: medium
+- Writer model: claude-fable-5-2
+- Policy: fa84f0bb6cfa365f72ba43e748d4fe41d383caa2
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 33
+- Digest: 81004a7844f2c81b
+
+The three repair items are complete as specification changes. I found no remaining in-scope product gap in this diff. User-level completeness and executed parity remain pending in the already assigned implementation work.
+
+Part 1: completeness
+
+1. **present:** Retained AutoIt behavior and deliberate deviations are accounted for in `docs/framework/language-page.md:13`. Selection persists through `Language`, matching `ReBar.au3:1303`. The settled default, flags and prompt changes are recorded decisions, not parity defects.
+2. **present:** Language discovery, English recovery and faulty-pack handling are specified at `language-page.md:51` and `:138`. Named checks at `:271` cover damaged English, missing translations, missing packs and preservation of stored choices.
+3. **present:** Slow discovery has a responsive pending state, announcements and protection against overwriting a user's choice (`language-page.md:56`). Checks at `:253` and `:254` exercise delayed reads, clean opening and saving a choice made during scanning.
+4. **present:** Preview, persistence and read-back are distinguished (`language-page.md:81`; `docs/framework/preferences.md:51`). Failed or unconfirmed saves retain unsaved state (`preferences.md:57`); Cancel and Discard undo preview without claiming to reverse an already written file.
+5. **present:** Restart covers unsaved edits, running-task refusal, launch failure, timeout and cancellation (`language-page.md:106`, `:110`, `:118`). The new waiting contract disables edits and actions across every page while preserving navigation and copying (`:124`). Named checks at `:264` cover timeout and cancellation.
+6. **present:** Tool-page controls, validation, declaration refusal and saved-versus-applied outcomes are specified (`docs/framework/tool-pages.md:25`, `:54`, `:68`, `:79`, `:124`). The matrix includes invalid stored values, failed application and refused declarations.
+7. **present:** Action ownership survives Preferences closure. Running state prevents duplicate invocation after reopening; results reach the status surface and log even with Preferences closed (`tool-pages.md:100`). The named lifecycle check is at `:230`.
+8. **present:** Confirmation obtains concrete impact before execution, defaults to Cancel, handles empty or unreadable targets, and cancels preparation when Preferences closes (`tool-pages.md:107`). Checks at `:231` cover these paths; missing impact functions are declaration refusals.
+9. **present:** Keyboard access, announcements, copyable diagnostics and scaling have specified checks (`language-page.md:175`, `:189`, `:203`; `tool-pages.md:240`). I independently confirmed 30 language rows and 22 tool-page rows, no empty failure entries, and clean document lint.
+10. **missing-out-of-scope:** Working implementation and executed behavioral proof. These documents specify tests; they do not demonstrate passing persistence, restart, refusal, accessibility or retained AutoIt parity. Owner: D01 T01 §§4, 7, 10 and D01 T02 §§7, 9. The matrix execution remains unchecked at `todo/01-framework/TODO-01-framework-core.md:227` and `:228`.
+11. **missing-out-of-scope:** Final language-pack string audit, including removal of obsolete closing-message keys under both spellings (`language-page.md:243`). Owner: D01 T03 §7.
+12. **missing-out-of-scope:** Mirrored layout for right-to-left languages remains an explicitly accepted limitation (`language-page.md:207`). Owner: D01 T02 §7.
+
+Part 2: excellence
+
+Counterpart: AutoIt `_ShowPreferencesDlg` and its handlers, with `DESIGN.md` as the modern quality standard.
+
+1. **out-of-scope:** Responsiveness and recovery are specified but unmeasured in a working dialog. **Target:** execute all 52 matrix checks, including responsive five-second discovery, the ten-second restart timeout, cancellation leaving exactly one instance, and action completion after Preferences closes. Owners: D01 T01 and D01 T02.
+2. **out-of-scope:** Arabic, Persian and Hebrew retain left-side navigation and unchanged column order (`language-page.md:207`). **Target:** deliver mirrored layout with correct keyboard order, readable mixed-direction paths and no clipping at minimum width and 200 percent text scaling. Owner: D01 T02 §7; this does not reopen the accepted current-version limit.
+
+Gap list
+
+1. **missing-out-of-scope:** Implement and execute persistence, recovery, accessibility and retained AutoIt parity checks; D01 T01 §§4, 7, 10 and D01 T02 §§7, 9.
+2. **missing-out-of-scope:** Complete the pack string audit; D01 T03 §7.
+3. **missing-out-of-scope:** Deliver RTL layout mirroring, the accepted deferred limit; D01 T02 §7.
+4. **out-of-scope:** Demonstrate the specified responsiveness and recovery targets through all 52 matrix checks; D01 T01 and D01 T02.
+5. **out-of-scope:** Verify mirrored RTL navigation, mixed-direction text and scaling; D01 T02 §7.
+
+COMPLETION: gaps
+
+## Writer note: completion gaps
+
+- Filed: D01 T01 §4, §7 and §10 and D01 T02 §7 and §9 (gap 1, the build and its executed proof), D01 T03 §7 (gap 2, the string audit) and D01 T02 §7 (gap 3, layout mirroring), already in the plan with those owners.
