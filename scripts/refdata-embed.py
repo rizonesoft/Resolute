@@ -122,22 +122,46 @@ def unpack_bytes(blob_bytes: bytes, what: str) -> tuple[fmt.Blob, fmt.Export, by
 
 
 def cmd_pack(source: Path, target: Path) -> int:
+    """Packs one export into its embedded form at target. The blob is written whole beside the target and read back
+    before it is moved into place, so an earlier packed file is never left half replaced. Every step that can fail
+    (reading the export, creating the folder, writing, reading back, moving, removing the staging file) ends in a
+    refusal by name that keeps the first failure's reason; a staging file that could not be removed is named."""
     try:
         data = source.read_bytes()
     except OSError as error:
         raise EmbedError(f"{source}: could not be read ({error.strerror or error}); nothing was embedded") from None
     blob = pack_bytes(data, source.name)
-    target.parent.mkdir(parents=True, exist_ok=True)
+    kept = "the earlier packed file is as it was" if target.exists() else "no packed file was written"
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        raise EmbedError(f"{target.parent}: the folder could not be created ({error.strerror or error}); nothing was embedded; "
+                         "check the build folder is writable and build again") from None
     partial = target.with_name(target.name + ".partial")
+
+    def refuse(step: str, error: OSError) -> EmbedError:
+        # The first failure is the one reported. Removing the staging file is tried, and its own failure is added
+        # to the refusal, never put in the first one's place.
+        left = ""
+        try:
+            if partial.is_file():
+                partial.unlink()
+            elif partial.exists():
+                left = f"; the staging path {partial} is in the way and could not be removed: remove it by hand"
+        except OSError as cleanup:
+            left = f"; the staging file {partial} could not be removed ({cleanup.strerror or cleanup}): remove it by hand"
+        return EmbedError(f"{target}: could not be {step} ({error.strerror or error}); {kept}, nothing was embedded{left}; build again once the cause is fixed")
+
     try:
         partial.write_bytes(blob)
         if partial.read_bytes() != blob:
             raise OSError("it did not read back as written")
+    except OSError as error:
+        raise refuse("written", error) from None
+    try:
         os.replace(partial, target)
     except OSError as error:
-        if partial.exists():
-            partial.unlink()
-        raise EmbedError(f"{target}: could not be written ({error.strerror or error}); nothing was embedded") from None
+        raise refuse("replaced", error) from None
     print(f"refdata-embed: packed {source.name}: {len(data)} bytes to {len(blob)} embedded")
     return 0
 
@@ -262,6 +286,46 @@ def self_test() -> int:
         check("pack writes the blob whole and leaves no staging file",
               (root / "out" / "sample.rdz").read_bytes() == blob and not list((root / "out").glob("*.partial")))
         check("a missing export is refused by name", "could not be read" in refusal(lambda: cmd_pack(root / "absent.refdata", root / "out" / "x.rdz")))
+        # The packer's own writes: every failure is a refusal by name that keeps the first reason.
+        target = root / "out" / "sample.rdz"
+        earlier = target.read_bytes()
+
+        def outcome(action) -> str:
+            # A failure the packer does not turn into a refusal is reported as what it is, not raised.
+            try:
+                action()
+                return "no refusal"
+            except EmbedError as error:
+                return str(error)
+            except OSError as error:
+                return f"UNHANDLED {type(error).__name__}: {error}"
+
+        (root / "afile").write_bytes(b"a file where a folder is needed")
+        said = outcome(lambda: cmd_pack(root / "sample.refdata", root / "afile" / "out" / "sample.rdz"))
+        check("a destination folder that cannot be created is refused by name",
+              "UNHANDLED" not in said and "could not be created" in said and "nothing was embedded" in said, said)
+        partial = target.with_name(target.name + ".partial")
+        partial.mkdir()   # the staging path is taken by a folder: the write fails, and so does removing it as a file
+        said = outcome(lambda: cmd_pack(root / "sample.refdata", target))
+        check("a staging file that cannot be written or removed is refused with the first reason kept and the staging path named",
+              "UNHANDLED" not in said and "could not be written" in said and "could not be removed" in said and str(partial) in said
+              and target.read_bytes() == earlier, said)
+        partial.rmdir()
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.CreateFileW.restype = ctypes.c_void_p
+        kernel32.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p]
+        kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+        held = kernel32.CreateFileW(str(target), 0x80000000, 1, None, 3, 0x80, None)   # readable; it cannot be replaced while held
+        try:
+            (root / "sample.refdata").write_bytes(fmt.emit(fmt.Export("sample", 5, fmt.digest_of("sample", 5, entries), entries)))
+            said = outcome(lambda: cmd_pack(root / "sample.refdata", target))
+        finally:
+            kernel32.CloseHandle(held)
+        check("a packed file that cannot be replaced is refused by name, left as it was, with no staging file behind",
+              "UNHANDLED" not in said and "could not be replaced" in said and "is as it was" in said
+              and target.read_bytes() == earlier and not partial.exists(), said)
+        said = outcome(lambda: cmd_pack(root / "sample.refdata", target))
+        check("the pack completes once nothing is in its way", said == "no refusal" and target.read_bytes() != earlier, said)
         check("a file that is not a binary is refused by name", "could not open it as a binary" in refusal(lambda: embedded(root / "sample.refdata")))
     if failed:
         print(f"self-test: {len(failed)} failed: " + "; ".join(failed))

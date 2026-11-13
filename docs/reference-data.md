@@ -184,6 +184,7 @@ Reference text compresses well: the 244-entry fixture `bulk` is 38,204 bytes exp
 | `refdata-verify: ... not in canonical form` or `lines must end in LF` | The file's bytes were changed by a tool (an editor, a line-end conversion) | The same |
 | `export: X version N: X.refdata differs from the database` | The database has a newer stamped version than the committed file | Run `export`, review the diff, commit |
 | `resolute_embed_refdata(T): the dataset 'X' has no export` | A target names a dataset that was never exported, or its name is misspelled | Export it and commit the file, or correct the name |
+| `refdata-embed: refused: <file>: could not be written` or `could not be replaced`, or `the folder could not be created` | The build folder cannot be written, or the packed file is held open by another program | Fix the cause the line gives and build again; the earlier packed file is as it was. If the line names a staging file it could not remove, remove that file by hand |
 | `refdata-embed: refused: ...: Windows could not create a compressor` | The Compression API is not available on the build machine | The build needs Windows 8 or later; nothing was embedded |
 
 ## How do I move a database to a newer schema?
