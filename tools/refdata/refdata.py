@@ -35,6 +35,7 @@ import json
 import os
 import re
 import secrets
+import ssl
 import subprocess
 import sys
 import tempfile
@@ -127,6 +128,14 @@ def unmark(field: str | None) -> str | None:
     if field is None or field[:1] not in ("N", "V") or (field[:1] == "N" and field != "N"):
         raise Refused(f"refused: a marked value read back as {field!r}, which is neither NULL nor a value")
     return None if field == "N" else field[1:]
+
+
+def unmark_text(field: str | None) -> str:
+    """A marked value from a column that is never NULL (a key, a name): NULL there means the read went wrong."""
+    value = unmark(field)
+    if value is None:
+        raise Refused("refused: a column that is never NULL read back as NULL")
+    return value
 
 
 def _end_tree(proc: subprocess.Popen) -> None:
@@ -310,9 +319,9 @@ def cmd_step(s: Session, step: str, dataset: str, number: int, actor: str | None
 def cmd_list(s: Session) -> int:
     require_current(s)
     rows = s.sql(
-        f"SELECT d.name, v.number, v.status, v.author, {marked('v.reviewer')} FROM datasets d LEFT JOIN versions v ON v.dataset_id = d.id ORDER BY d.name, v.number;"
+        f"SELECT {marked('d.name')}, v.number, v.status, {marked('v.author')}, {marked('v.reviewer')} FROM datasets d LEFT JOIN versions v ON v.dataset_id = d.id ORDER BY d.name, v.number;"
     )
-    rows = [[name, number, status, author, None if reviewer is None else unmark(reviewer)] for name, number, status, author, reviewer in rows]
+    rows = [[unmark(name), number, status, unmark(author), unmark(reviewer)] for name, number, status, author, reviewer in rows]
     if not rows:
         print("no datasets")
     for name, number, status, author, reviewer in rows:
@@ -371,8 +380,8 @@ def changes_between(s: Session, dataset: str, number: int) -> tuple[int | None, 
     if not any(r[0] == "status" for r in rows):
         raise Refused(f"refused: {dataset} has no version {number}")
     base = next(int(r[1]) for r in rows if r[0] == "base") or None
-    before = {unmark(r[1]): (unmark(r[2]), unmark(r[3])) for r in rows if r[0] == "before"}
-    after = {unmark(r[1]): (unmark(r[2]), unmark(r[3])) for r in rows if r[0] == "after"}
+    before = {unmark_text(r[1]): (unmark(r[2]), unmark(r[3])) for r in rows if r[0] == "before"}
+    after = {unmark_text(r[1]): (unmark(r[2]), unmark(r[3])) for r in rows if r[0] == "after"}
     digest = next(r[1] for r in rows if r[0] == "digest")
     out = []
     for key in sorted(after):
@@ -423,7 +432,7 @@ def cmd_history(s: Session, dataset: str) -> int:
     return 0
 
 
-def cmd_backup(s: Session, path: str) -> int:
+def cmd_backup(s: Session, path: str, timeout: int = TIMEOUT_SECONDS) -> int:
     if not s.exists():
         raise Refused(f"refused: the database '{s.database}' does not exist")
     target = Path(path)
@@ -446,12 +455,21 @@ def cmd_backup(s: Session, path: str) -> int:
              # schema_info is the schema's own row, which a restore's schema.sql writes; a backup carries data alone.
              "--skip-dump-date", f"--ignore-table={s.database}.schema_info", s.database],
             stdout=out, stderr=subprocess.PIPE, cwd=str(s.options.parent))
+        timed_out, err = False, b""
         try:
-            _, err = proc.communicate(timeout=TIMEOUT_SECONDS)
+            _, err = proc.communicate(timeout=timeout)
         except subprocess.TimeoutExpired:
             _end_tree(proc)
+            timed_out = True
+    # The partial dump is removed only after this process's own handle to it is closed: Windows refuses to delete a
+    # file that is still open.
+    if timed_out:
+        try:
             partial.unlink()
-            raise Refused(f"refused: the dump did not finish within {TIMEOUT_SECONDS}s and was ended; nothing was written") from None
+            left = "the partial dump was removed"
+        except OSError as exc:
+            left = f"the partial dump is left at {partial} ({exc.strerror or exc})"
+        raise Refused(f"refused: the dump did not finish within {timeout}s and was ended; nothing was written, {kept}, and {left}") from None
     if proc.returncode != 0:
         partial.unlink()
         raise Refused(_classify(err.decode("utf-8", "replace"), s.database) + "; nothing was written")
@@ -487,14 +505,24 @@ def grant_pattern(database: str) -> str:
     return database.replace("\\", "\\\\").replace("_", "\\_").replace("%", "\\%")
 
 
-def option_value(options: Path, key: str) -> str | None:
-    for line in options.read_text(encoding="ascii", errors="replace").splitlines():
-        if line.strip().startswith(f"{key}="):
-            return line.split("=", 1)[1].strip()
-    return None
+CREDENTIAL_LINE = re.compile(rb"^\s*(user|password)\s*=", re.IGNORECASE)
 
 
-def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
+def restricted_option_bytes(author: Path, user: str, password: str, override: dict | None = None) -> bytes:
+    """The restore user's option file: the author's own, every setting kept (host, port, TLS mode, CA, certificate,
+    key and any other), with only the user and password replaced, so the restore connects as the author's own
+    connections do. Kept as bytes, in whatever code page the author's file is in. override is the self-test's hook
+    for changing a setting the copy carries, in the restricted file alone; it adds nothing the author's file lacks."""
+    kept = [line for line in author.read_bytes().splitlines() if not CREDENTIAL_LINE.match(line)]
+    for key, value in (override or {}).items():
+        setting = re.compile(rb"^\s*" + re.escape(key.encode("ascii")) + rb"\s*=")
+        kept = [key.encode("ascii") + b"=" + value.encode("ascii") if setting.match(line) else line for line in kept]
+    extra = [f"user={user}", f"password={password}"]
+    # A [client] group last, so its user and password are the ones read, whatever groups the author's file has.
+    return b"\r\n".join(kept + [b"", b"[client]"] + [line.encode("ascii") for line in extra]) + b"\r\n"
+
+
+def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_override: dict | None = None) -> int:
     """Loads a backup into a new database, and nowhere else. The schema comes from the repository's own schema.sql;
     the backup's rows are then run as a MySQL user created for this restore alone, whose only privileges are SELECT,
     INSERT and LOCK TABLES on the new database, so a statement that reaches any other database is refused by the
@@ -529,15 +557,15 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA) -> int:
             run_sql(schema.read_text(encoding="utf-8"), options=s.options, database=s.database)
             run_sql(f"CREATE USER '{user}'@{sql_str(account_host)} IDENTIFIED BY {sql_str(password)};\n"
                     f"GRANT SELECT, INSERT, LOCK TABLES ON `{grant_pattern(s.database)}`.* TO '{user}'@{sql_str(account_host)};", options=s.options)
-            restricted.write_text(f"[client]\nuser={user}\npassword={password}\nhost={option_value(s.options, 'host') or '127.0.0.1'}\n"
-                                  f"port={option_value(s.options, 'port') or '3306'}\n", encoding="ascii")
+            restricted.write_bytes(restricted_option_bytes(s.options, user, password, restricted_override))
             try:
                 # The backup is untrusted text, and the client has commands of its own that no database privilege
                 # governs (\! runs a shell command as this Windows user): --binary-mode turns them off for the input,
                 # and --skip-system-command turns off \! itself.
                 run_sql(text, options=restricted, database=s.database, extra=("--binary-mode", "--skip-system-command"))
             except Refused as refusal:
-                raise Refused(f"refused: the backup could not be loaded as rows into '{s.database}' alone ({refusal}); nothing outside it was changed") from None
+                raise Refused(f"refused: the backup could not be loaded as rows into '{s.database}' alone through the restore user's connection, "
+                              f"which uses your option file's settings ({refusal}); nothing outside it was changed") from None
             restored = True
         finally:
             run_sql(f"DROP USER IF EXISTS '{user}'@{sql_str(account_host)};", options=s.options)
@@ -572,7 +600,7 @@ def upgrade_difference(old: Session, new: Session) -> str | None:
     return None
 
 
-def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None) -> int:
+def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, restricted_override: dict | None = None) -> int:
     """Copies a database at an older schema revision into a new one at this revision: a backup of the old, restored into
     the new name from the current schema, then every version's text and every changelog row read back from both and
     compared. The old database is never changed; a difference drops the new one. after_restore is the self-test's
@@ -589,7 +617,7 @@ def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None) 
         dump = Path(tmp) / "upgrade.sql"
         with contextlib.redirect_stdout(io.StringIO()):
             cmd_backup(s, str(dump))
-            cmd_restore(new, str(dump), schema)
+            cmd_restore(new, str(dump), schema, restricted_override)
     try:
         if after_restore:
             after_restore(new)
@@ -654,7 +682,7 @@ def self_test(schema: Path) -> int:
     base = ["--options", str(options), "--database", database]
     created = False
     with tempfile.TemporaryDirectory(prefix="refdata-selftest-") as tmp:
-        def proposal(name: str, body: dict) -> str:
+        def proposal(name: str, body: object) -> str:
             path = Path(tmp) / f"{name}.json"
             path.write_text(json.dumps(body), encoding="utf-8")
             return str(path)
@@ -896,6 +924,7 @@ def self_test(schema: Path) -> int:
             seen = digest_of(6)
             hold = subprocess.Popen([str(client_path()), f"--defaults-extra-file={options.name}", "--batch", database],
                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
+            assert hold.stdin is not None   # stdin=PIPE above
             hold.stdin.write(b"SET autocommit = 0;\nSTART TRANSACTION;\n"
                              b"CALL rd_reword('fixture', 6, 'beep-f', 'F, changed while under review', NULL, 'a concurrent edit', 'author-two');\n"
                              b"DO SLEEP(4);\nCOMMIT;\n")
@@ -989,6 +1018,7 @@ def self_test(schema: Path) -> int:
                                                  check=True, encoding="utf-8").stdout, encoding="utf-8")
             old = Session(options, f"{database}_r1")
             upgraded, lossy = f"{database}_r2", f"{database}_r2lossy"
+            tls_restored, tls_upgraded, tls_refused, tls_refused_up = (f"{database}_tls", f"{database}_tlsup", f"{database}_tlsno", f"{database}_tlsupno")
             try:
                 with contextlib.redirect_stdout(io.StringIO()):
                     cmd_init(old, old_schema)
@@ -1021,9 +1051,86 @@ def self_test(schema: Path) -> int:
                              and code2 == 0 and "v1 add beep-1-long by author-one: first entry  (contents not recorded" in said
                              and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
                              f"old refused {refused_old}; upgrade exit {code} {out.strip()!r}; history {said.strip()[:400]!r}")
+
+                # A restore and an upgrade connect as the author's own connections do: an option file that verifies the
+                # server's certificate is obeyed by the restricted connection too. The private server's own CA verifies;
+                # a CA that did not sign its certificate, put into the restricted file alone, is refused there.
+                ca = HOME / "server" / "data" / "ca.pem"
+                secure = Path(tmp) / "secure.cnf"
+                secure.write_bytes(options.read_bytes().rstrip(b"\r\n") + f"\r\nssl-mode=VERIFY_CA\r\nssl-ca={ca.as_posix()}\r\n".encode("ascii"))
+                roots = ssl.create_default_context().get_ca_certs(binary_form=True)
+                other_ca = Path(tmp) / "other-ca.pem"
+                other_ca.write_text(ssl.DER_cert_to_PEM_cert(roots[0]) if roots else "", encoding="ascii")
+                cipher = run_sql("SHOW SESSION STATUS LIKE 'Ssl_cipher';", options=secure) if ca.is_file() else []
+                tls_dump = Path(tmp) / "tls.sql"
+                with contextlib.redirect_stdout(io.StringIO()):
+                    cmd_backup(Session(secure, database), str(tls_dump))
+                code, out = call(["restore", str(tls_dump), "--options", str(secure), "--database", tls_restored])
+                code2, out2 = call(["upgrade", "--options", str(secure), "--database", old.database, "--to", tls_upgraded])
+                checks.check("a restore and an upgrade through an option file that verifies the server's CA succeed, over TLS",
+                             bool(roots) and ca.is_file() and bool(cipher) and bool(cipher[0][1]) and code == 0 and code2 == 0
+                             and Session(options, tls_restored).exists() and Session(options, tls_upgraded).exists(),
+                             f"CA {ca.is_file()}, roots {len(roots)}, cipher {cipher!r}; restore {code} {out.strip()!r}; upgrade {code2} {out2.strip()!r}")
+
+                wrong = {"ssl-ca": other_ca.as_posix()}
+                said_restore = said_upgrade = None
+                for target_name, action in ((tls_refused, lambda: cmd_restore(Session(secure, tls_refused), str(tls_dump), restricted_override=wrong)),
+                                            (tls_refused_up, lambda: cmd_upgrade(Session(secure, old.database), tls_refused_up, restricted_override=wrong))):
+                    try:
+                        with contextlib.redirect_stdout(io.StringIO()):
+                            action()
+                    except Refused as refusal:
+                        if target_name == tls_refused:
+                            said_restore = str(refusal)
+                        else:
+                            said_upgrade = str(refusal)
+                users = run_sql("SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'refdata_restore_%';", options=options)[0][0]
+                checks.check("a restore and an upgrade whose restricted connection is given a CA that did not sign the server's certificate are refused "
+                             "naming that connection, no database or restore user left and the source unchanged",
+                             said_restore is not None and "restore user's connection" in said_restore and said_upgrade is not None
+                             and "restore user's connection" in said_upgrade and not Session(options, tls_refused).exists()
+                             and not Session(options, tls_refused_up).exists() and users == "0"
+                             and {name: old.sql(query) for name, query in UPGRADE_READBACK.items()} == old_state,
+                             f"restore said {said_restore!r}; upgrade said {said_upgrade!r}; restore users left {users}")
             finally:
-                for name in (old.database, upgraded, lossy):
+                for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up):
                     run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)
+
+            # A dataset and an author named NULL list as that text.
+            call(["propose", proposal("named-null", {"dataset": "NULL", "create": "a dataset named NULL", "author": "NULL",
+                                                     "reason": "a dataset and author named NULL", "changes": [{"add": "k", "text": "t", "reason": "r"}]})] + base)
+            code, out = call(["list"] + base)
+            checks.check("list prints a dataset and an author named NULL as that text", code == 0 and "NULL v1: proposed, author NULL" in out, out.strip()[-300:])
+
+            # A backup whose dump outlasts its time is ended and refused by name, with nothing left behind.
+            slow = Path(tmp) / "slow.sql"
+            slow.write_bytes(b"-- an earlier backup\n")
+            locker = subprocess.Popen([str(client_path()), f"--defaults-extra-file={options.name}", "--batch", database],
+                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(options.parent))
+            assert locker.stdin is not None   # stdin=PIPE above
+            locker.stdin.write(b"LOCK TABLES changelog WRITE;\nDO SLEEP(8);\nUNLOCK TABLES;\n")
+            locker.stdin.close()
+            locked, deadline = False, time.monotonic() + 15
+            while time.monotonic() < deadline and locker.poll() is None:
+                if run_sql("SELECT COUNT(*) FROM information_schema.processlist WHERE info LIKE 'DO SLEEP(8)%';", options=options)[0][0] != "0":
+                    locked = True
+                    break
+                time.sleep(0.1)
+            try:
+                cmd_backup(session, str(slow), timeout=2)
+                said = "the backup finished"
+            except Refused as refusal:
+                said = str(refusal)
+            except Exception as exc:  # noqa: BLE001 -- an unhandled error is the failure this case exists to catch
+                said = f"unhandled {type(exc).__name__}: {exc}"
+            try:
+                locker.communicate(timeout=60)
+            except subprocess.TimeoutExpired:
+                _end_tree(locker)
+            checks.check("a backup whose dump outlasts its time is ended and refused by name, no partial dump left and the earlier backup kept",
+                         locked and "did not finish within 2s" in said and "the partial dump was removed" in said
+                         and not slow.with_name("slow.sql.partial").exists() and slow.read_bytes() == b"-- an earlier backup\n",
+                         f"lock held {locked}; said {said!r}")
 
             # The inspection commands read the persisted records.
             for argv, want in ((["list"], "fixture v3: stamped"), (["show", "fixture", "2"], "beep-1-long: One long beep: no memory detected in any slot"),
