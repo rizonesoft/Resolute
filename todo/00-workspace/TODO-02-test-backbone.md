@@ -56,7 +56,7 @@ track: W1
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [x]   |
 |  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [x]   |
 |  13   |   §13   | Capture pairs are replaced atomically       | §3             |  [x]   |
-|  14   |   §14   | A capture refuses a covered window          | §3             |  [ ]   |
+|  14   |   §14   | A capture refuses a covered window          | §3             |  [x]   |
 
 ---
 
@@ -787,6 +787,14 @@ No surface of its own: the capture writer `scripts/capture-window.ps1` and its s
 -> SOURCE: review-2026-11-13-d00-t05-s1-repair6-completion (one gap, capture helper)
 
 **Test checkpoint:** the overlap rule's self-test cases pass and fail with the rule removed, quoted; a driven capture under an always-on-top window refuses naming it and writes nothing, and the same capture beside it writes its pair. All from real runs.
+
+> **Verified:** 2026-11-13 | §14 | a capture refuses a window covered by another application's always-on-top window, and a target that is gone, hidden, moved or unreadable, naming the window and the step: `pwsh scripts/capture-window.ps1 -SelfTest` 27 PASS, `self-test: all pass` at 20eaae0f, each repair's case failing by name with its check removed (Repair 4's with `if (true || Exists(h))`: `FAIL a window that closes while it is read is gone ...`). Driven on the final candidate after the operator had been idle 542 s, launcher `Bin/Debug/Resolute.exe`: a foreign always-on-top window of another process (`process 62416, at 514,374 300x200, always on top: True`) over the launcher, `capture-window: refused before the copy: the target is covered by 'Resolute drill foreign window' (pwsh, pid 62416)`, exit 3, `pair unchanged: True`, the window `unchanged: True`; the same window moved beside it (`1254,374 300x200`), `captured cover.png  1082x711`, exit 0, `-Verify` `... are one capture` exit 0, the window `unchanged: True, still open: True`. `python scripts/ci-status.py` green for 1c8fae9a (`gates: success`, `plan-gates: success`). `todo-graph.py validate` `30 todos, 256 sections -- 0 fatal`.
+> **Review:** astra (gpt-6-astra via codex). `docs/reviews/00-workspace/D00-T02-s14.md`: plan (3 findings, folded), rounds 1 to 4 (P1, P1, P2 fixed, round 4 `HIGHEST: none`), completion `gaps` (3, Repair 1). `-repair.md`: plan approve, round 1 P2 fixed, round 2 `HIGHEST: none`, completion `gaps` (1, Repair 2). `-repair2.md`: plan approve, round 1 `HIGHEST: none`, completion `gaps` (1, Repair 3). `-repair3.md`: plan approve, round 1 `HIGHEST: none`, completion `gaps` (1, Repair 4). `-repair4.md`: plan approve, round 1 (medium, adversarial) `HIGHEST: none` · Raw findings: docs/reviews/00-workspace/D00-T02-s14*.md
+> **Completion:** astra (medium), candidate 20eaae0f32057a4d46b689fac31d7b65cf96eda6 -- COMPLETION: complete · Repair records: -repair (951e0ad2), -repair2 (c9266928), -repair3 (76fe7fb3), -repair4 (20eaae0f)
+> **Plan review:** astra -- gaps (3, folded before Started), then approve on each repair record
+> **CRUD:** not applicable (developer tooling: it reads windows and writes only its own capture pair, whose replacement is §13's)
+> **Duration:** 2026-11-13T04:21:01Z to 2026-11-13T09:50:00Z
+> **Implementer:** claude (claude-opus-5-5)
 
 ## Verification
 
