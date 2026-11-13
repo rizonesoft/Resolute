@@ -41,3 +41,65 @@ OVERALL: approve
 
 HIGHEST: P2
 OVERALL: needs-attention
+
+## Round 2: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T16:37:00Z
+- Effort: low
+- Writer model: claude-fable-5-2
+- Policy: e9fce9e1f0fa7068c76bbf75295a176ff0cb9d51
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: consistency
+- Lines: 6
+- Digest: c8f90b670efd4edd
+
+## consistency: approve
+
+No findings in the three Repair items. The candidate matches the shared restart wording, message-layer rules, and conditional recovery text.
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T16:38:35Z
+- Candidate: 98e5fdae9ee54606c1598402e4b54fc8e14504dc
+- Effort: medium
+- Writer model: claude-fable-5-2
+- Policy: e9fce9e1f0fa7068c76bbf75295a176ff0cb9d51
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 24
+- Digest: d3abfc387b2b70e7
+
+Part 1: completeness
+
+Reviewed the three-item Repair contract. This is a notice specification, not a delivered Preferences dialog. It closes the three prior findings; runtime parity and rendered conformance remain the named build sections’ proof obligations.
+
+1. **present**: Elevation timeout has its own localized reason, distinct from Windows refusing startup. The unanswered instance is ended, the original stays usable, and timing excludes the permission prompt. Evidence: `docs/framework/notices.md:49`; named failure check at `:263`.
+2. **present**: Failed restore-record writing selects recovery instructions according to whether a report, log, or neither exists. Evidence: `docs/framework/notices.md:75`, `:104`; named checks at `:268`, `:269`, `:270`.
+3. **present**: When the restore record exists but the report does not, overflow instructions point to the record. Evidence: `docs/framework/notices.md:74`; eleven-item failure check at `:271`.
+4. **present**: Deferred notification supplies localized recovery wording for both fully and partly undoable changes, requiring no additional restart. Evidence: `docs/framework/notices.md:77`; the next-start check at `:275` requires the correct record and successful Undo.
+5. **present**: Deferred-notice acknowledgement includes persistence read-back, suppression on the following start, and repeat notification when saving acknowledgement fails. Evidence: `docs/framework/notices.md:108`, `:275`.
+6. **present**: Settings remain protected by the existing atomic Save/read-back contract and restart cancellation rules. Evidence: `docs/framework/preferences.md:52`, `:57`; `docs/framework/notices.md:155`, `:157`, `:264`. The repair introduces no competing persistence behavior.
+7. **present**: Added strings have language-pack keys and inherit shared keyboard, announcement, copying and sizing behavior. Evidence: `docs/framework/notices.md:220`, `:239`; `docs/framework/standard-window.md:100`.
+8. **present**: Failure-sensitive checks are assigned to build owners. Independently verified **34 matrix rows, zero missing failure/check entries**, and lint result **`[]`**. These establish specification coverage, not executed behavioral proof.
+
+Part 2: excellence
+
+Counterpart: AutoIt ReBar behavior, with the new refusal and crash recovery surfaces assessed against `DESIGN.md` §§9–11. The Preferences references do not make this notices-only repair a Preferences implementation.
+
+No concrete remaining shortfall found within the repair scope. The specified outcomes address the prior wording, recovery and unnecessary-restart defects without changing the frozen tools’ effects.
+
+Gap list
+
+Empty.
+
+COMPLETION: complete

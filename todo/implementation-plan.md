@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **92 of 249 sections complete (37%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **93 of 249 sections complete (37%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -222,7 +222,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [x] | `D01 T03 §5`  | Update dialog and announcement                |  17   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement   |  10   |
 | [ ] | `D01 T01 §9`  | Standalone proof in an empty folder           |   7   |
-| [ ] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |  14   |
+| [x] | `D01 T03 §6`  | Refusal, crash, singleton, shutdown           |  14   |
 | [ ] | `D01 T01 §6`  | Elevation and its refusal path                |   9   |
 | [ ] | `D01 T01 §10` | Crash Handling and Single Instance            |  12   |
 | [ ] | `D01 T01 §11` | Command Line and Exit Codes                   |  11   |
