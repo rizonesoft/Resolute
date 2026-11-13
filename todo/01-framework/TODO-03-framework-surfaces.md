@@ -42,7 +42,7 @@ track: F1
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | Standard window, menus, and message layer | -- |  [x]   |
-|   2   |   §2    | Preferences shell, General, and Performance | -- |  [ ]   |
+|   2   |   §2    | Preferences shell, General, and Performance | -- |  [x]   |
 |   3   |   §3    | Preferences Language page and tool-page contract | -- |  [ ]   |
 |   4   |   §4    | Per-tool log surface | -- |  [ ]   |
 |   5   |   §5    | Update dialog and announcement | -- |  [ ]   |
@@ -150,6 +150,14 @@ The 450x500 Preferences dialog (`ReBar.au3:1005-`, dialog title from `[Preferenc
 - [x] Commit: `"framework-spec: preferences shell, general, and performance"` (775ff1fc)
 
 **Test checkpoint:** `docs/framework/preferences.md` exists; its matrix has a row, a failure entry and a named `D01 T01 §7` check for every control and button; the AutoIt inventory gives every part and every named defect a verdict; the shell names its pages, buttons, notices, save and the dirty rule for every way out; every group names every control with its setting key, default and behavior; the priority values map to Win32 classes with the Realtime rule exact; the dead Cache key is cut with reason; every string has a key. The `D01 T01 §7` checklist can be built from this section with no invented control. Cheaper substitute that fails the checkpoint: groups without setting keys, which ships a dialog that displays settings it cannot store.
+
+> **Verified:** 2026-11-13 | §2 | the Preferences dialog is specified with no control left to invent: `docs/framework/preferences.md` exists; its matrix "What must the build prove, row by row?" holds 37 rows, each with a trigger, states, result, a failure entry (none empty, counted by script: `37 0`) and a named `D01 T01 §7` check, which `D01 T01 §7` carries as an item; the AutoIt inventory gives every part of `_ShowPreferencesDlg` and each named defect a verdict, every cited line printed from the source (`ReBar.au3:989-1362`, `Localization.au3:97-120`, `en.lng` `[Preferences]`); the shell names its pages, Save's three steps, the one reconcile rule, the outcome table and the way out; every group names each control with its setting key, default and when it takes effect; the six priority values map to Win32 classes with the Realtime rule and a refusal's states; `Tab_Cache` is cut as a dead key; every string has a key and a verdict. The page lints clean under `scripts/readme-check.py`'s rules (`[]`). `todo-graph.py validate` `30 todos, 258 sections -- 0 fatal`. A specification: no code changed, so no CI run is owed to it.
+> **Review:** astra (gpt-6-astra via codex). `docs/reviews/01-framework/D01-T03-s2.md` (writer model claude-opus-5-5): plan gaps (6, folded), round 1 (three P2, fixed), then stopped at the writer model change, without a completion. `-repair.md` (writer model claude-fable-5-2, the whole page): plan gaps (4 P2, folded), round 1 (two P2, fixed), round 2 (P2 and P3, the apply rule re-thought as one reconcile rule), round 3 `HIGHEST: none`, completion gaps (8 in scope, Repair 2). `-repair2.md`: plan gaps (3 P2, folded), round 1 (P2, fixed), round 2 `HIGHEST: P3` (two, carried into Repair 3), completion gaps (2 in scope plus the two P3, Repair 3). `-repair3.md`: plan approve, round 1 (medium, adversarial) `HIGHEST: none` · Raw findings: docs/reviews/01-framework/D01-T03-s2*.md
+> **Completion:** astra (medium), candidate b03f4557 -- COMPLETION: gaps (0 in scope; 3 out of scope, the build and its proof owned by `D01 T01 §7` and `D01 T02 §9`, the Language page by `D01 T03 §3`, the update dialog and string audit by `D01 T03 §5` and `§7`) · Repair records: -repair (a86246da), -repair2 (2eecae95), -repair3 (b03f4557)
+> **Plan review:** astra -- gaps on the first record (6, folded), then each later record's own plan pass
+> **CRUD:** applicable to the settings the dialog edits: read at open, update at Save through the one settings writer with read-back (`D01 T01 §2`), no create or delete of settings by the user; Clear log deletes log files, stated as irreversible before it is pressed
+> **Duration:** 2026-11-13T14:09:48Z to 2026-11-13T14:42:54Z
+> **Implementer:** claude (claude-opus-5-5 to round 1 of the first record, then claude-fable-5-2)
 
 -> XREF: D01 T01 §7 -- the build that consumes this preferences spec
 -> XREF: D01 T02 §9 -- the form controls this dialog's pages are made of

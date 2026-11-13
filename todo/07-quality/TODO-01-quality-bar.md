@@ -201,7 +201,9 @@ The compiler side of this is already at zero: `D00 T01 §3` fixed all 13 warning
 >
 > **Corrected 2026-11-09:** the original checkpoint's "five steps each" read as if every tool already had all five surfaces. It does not, per above; the checkpoint below is corrected to the per-tool step table the report prints.
 >
-> **Deferred:** the preferences step per tool, active when the framework preferences surface ships --> XREF: D01 T03 §2
+> **Corrected 2026-11-13:** this deferral named `D01 T03 §2`, which specifies the preferences surface and shipped on 2026-11-13 as a specification (`docs/framework/preferences.md`); the surface itself is built by `D01 T01 §7`, so the step waits on that section, which now carries the item.
+>
+> **Deferred:** the preferences step per tool, active when the framework preferences surface ships --> XREF: D01 T01 §7 (item: "Activate the smoke run's preferences step per tool")
 
 - [x] Build the driver `scripts/smoke-run.py` (stdlib only, like every TODO tool): the tool inventory is imported from `scripts/conformance-check.py`'s registry, never re-listed. Done when: `--self-test` passes and a run enumerates exactly the shipped tools the conformance check names.
 - [x] Drive every shipped tool through start, main surface, About, preferences, and exit, by window messages only (no `SendKeys`, no foreground requirement). Done when: every tool is covered, each step records `pass`, `absent` (surface not shipped, named), `blocked` (named refusal, below), or `fail`, and a crash in any one tool is reported without stopping the run.
