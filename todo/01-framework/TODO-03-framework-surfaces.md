@@ -233,6 +233,8 @@ The status list every tool window carries (`ReBar.au3:579-594`, single column, s
 
 **Plan review 2026-11-13 (`docs/reviews/01-framework/D01-T03-s4.md`, three P2, all folded into the items below):** the surface had no state for logging that is on but cannot write, so a readable file would look current after recording stopped; "up to 100 MB" ignored the larger limits an AutoIt settings file may keep; and the window's remembered place had no persistence proof.
 
+**Round 3 (two P3, fixed 2026-11-13):** Esc's rule was stated two ways (it closes from anywhere but a find box holding text), and the cleared-from-Preferences check expected an empty list in every case where the page says the list matches the disk.
+
 **Round 2 (one P2, fixed 2026-11-13):** the footer's result text (a partly-cleared clear's file name and reason) was outside the Tab order and the copy rule, so every text in the surface that carries a path, a name, a reason or a count is now a stop and copies whole.
 
 **Round 1 (two P2, fixed 2026-11-13):** Clear log emptied the list even when the current file could not be deleted, hiding lines still on disk, so the list now shows what is on disk after a clear; and a read or search still running when the writer rotated or the log was cleared could deliver the old file's rows into the new view, so each belongs to one file and is discarded when that file stops showing. The matrix holds 32 rows.
