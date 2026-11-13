@@ -72,7 +72,7 @@ Exactly these items, in this order, built the same way.
 | Item | Pack key (`[Menus]`) | Accelerator | Enabled | Target |
 | --- | --- | --- | --- | --- |
 | Help for this window | reserved for `D06 T01 §18` | F1, reserved | Owned by `D06 T01 §18` | The first item, reserved: `D06 T01 §18` owns F1 and context help, and adds this item with its key when it ships. Until then the item is absent and F1 does nothing; no other item takes F1. |
-| Check for updates | `Help_Update` (`Check for &updates`) | | Except while a check runs, then disabled with the tooltip `Help_Update_Running` ("Checking for updates...") | Runs the update check, `D01 T01 §5`; the result, or its failure, is the update dialog, `D01 T03 §5`. |
+| Check for updates | `Help_Update` (`Check for &updates`); while a check runs, `Help_Update_Cancel` (`Cancel &update check`) | | Always. While a check runs the item is the way to stop it, whoever started it and whatever else is running | Runs the update check, `D01 T01 §5`; the result, or its failure, is one of the update notices, `D01 T03 §5` ([`update-notices.md`](update-notices.md)). While a check runs, cancels it: no notice, one log line. A second check cannot be started, because the item that would start it is the one that cancels. |
 | (separator) | | | | |
 | Rizonesoft Home | `Help_Home` (`%{Company.Name} &Home`) | | Always | `https://rizonesoft.com` in the default browser (`ReBar.au3:281`). |
 | More Downloads | `Help_Downloads` (`More &Downloads`) | | Always | `https://rizonesoft.com/downloads/` (`ReBar.au3:284`). |
@@ -176,7 +176,7 @@ Every string this page introduces, with its pack section and English text; nothi
 | `File_Minimize` | `[Menus]` | `Mi&nimize` | File, Minimize |
 | `File_Logging_Unavailable` | `[Menus]` | There is no log file yet, or it was moved or deleted. | Open log file's disabled reason |
 | `File_Logging_Folder_Unavailable` | `[Menus]` | The log folder does not exist. | Open log folder's disabled reason |
-| `Help_Update_Running` | `[Menus]` | Checking for updates... | Check for updates, disabled while it runs |
+| `Help_Update_Cancel` | `[Menus]` | `Cancel &update check` | Check for updates, while a check runs |
 | `Heading_About` | `[Menus]` | About %{Program.Name} | The heading icon's accessible name and tooltip |
 | `Status_Ready` | `[Status]`, new section | Ready | The state segment when idle |
 | `Status_Cancelled` | `[Status]` | Cancelled: %1 | The state segment after a cancel; %1 is the task's name |
@@ -207,7 +207,7 @@ Every row is one behavioural check in `D01 T01 §7`, named in the last column, d
 | The log items' availability | Open File, Logging on a first run, after the log is deleted with its folder kept, and with the folder removed | The three states | First run: both disabled with their own reasons. Log deleted: Open log file disabled with `File_Logging_Unavailable`, Open log folder enabled. Folder removed: both disabled with their own reasons. On a first run and after the folder is deleted, Open log folder's reason reads "The log folder does not exist." as its tooltip on keyboard focus and as its UI Automation help text | None can occur: availability is read when the menu opens | `window: the log items follow the file and the folder` |
 | File, Minimize | Click; Alt+F, N; Esc with nothing open | Always | The window minimizes | None can occur: minimizing a window the process owns does not fail | `window: minimize, and Esc closes a menu first` |
 | File, Close | Click; Alt+F, C; Alt+F4; caption close | Always | Shutdown runs and the window closes | A failed settings write is shutdown's message, then the close | `window: close persists settings` |
-| Help, Check for updates | Click; Alt+H, U | Disabled while a check runs, with its reason | The check runs; its result is the update dialog | The update dialog's failure state | `window: update check is single-flight` |
+| Help, Check for updates | Click; Alt+H, U; the same again while the check runs | Idle; a check running | Idle: the check runs, and its result is one of the update notices. Running: the item reads `Help_Update_Cancel` and cancels the check, with no notice; a second check is never started | The update notices' failure presentations (`D01 T03 §5`) | `window: update check is single-flight` |
 | Help, Home, Downloads, Support, Report a problem | Click; Alt+H and the access key | Always | The default browser opens the item's framework constant URL | Error `Link_Open_Failed`, URL selectable, "Copy link" | `window: help links open, and refuse without a browser` |
 | Help, About | Click; Alt+H, A | Always | The About dialog for this tool's descriptor | None can occur: the descriptor is compiled into the tool; an About already open is brought forward | `window: about shows this tool's descriptor` |
 | Heading icon | Click; Enter or Space when focused | Always | The About dialog; its accessible name and tooltip are `Heading_About` | As Help, About | `window: heading icon opens about` |
