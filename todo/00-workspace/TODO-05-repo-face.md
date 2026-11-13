@@ -48,7 +48,7 @@ track: N0
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
 |   1   |   §1    | Visual proof capture with provenance | D00 T01 §4, D00 T02 §3 |  [x]   |
-|   2   |   §2    | README rewrite plus repo-face files | §1 |  [ ]   |
+|   2   |   §2    | README rewrite plus repo-face files | §1 |  [x]   |
 |   3   |   §3    | Setup-path CI plus reproducibility record | §2 |  [ ]   |
 |   4   |   §4    | Sidecar reproduction command carries -Visible | §1 |  [ ]   |
 
@@ -156,6 +156,14 @@ The README follows the full shape: purpose, badges, screenshot, audience, quick 
 - [x] Commit: `"docs: full-structure README plus contributor files"` **Done 2026-11-13:** `28d971b6`, then `70c7b0db` (the icon encoding made the same on every machine, after CI's `plan-gates` went red on it) and `3812f99b` (the six captures of GitHub's rendering).
 
 **Test checkpoint:** The four stale claims read true, quoted; the hero, screenshots, and diagram render in both GitHub themes, captured; the gallery and progress blocks regenerate clean under `--check` and a hand edit fails the gate by name; the link and lint gate fails a broken link by name; `SECURITY.md` exists and is linked; every one of the ten README sections is present; every badge renders and the toolchain badge matches the pin file; `CONTRIBUTING.md` and the pull-request template exist; the quick start runs check-all with the gate verdict quoted. Cheaper substitute that fails the checkpoint: a README that reads well but whose quick start was never executed, which §3 catches.
+
+> **Verified:** 2026-11-13 | §2 | the repository's face is rebuilt and checked on every push: `README.md` with its hero, screenshots, quick start, settings table, generated tool gallery and progress block, architecture diagram and troubleshooting; `CONTRIBUTING.md`, `SECURITY.md` and the pull-request template, which tell routine trunk work from an outside contribution. `python scripts/readme-check.py`: `readme-check: 6 files clean`; `python scripts/readme-blocks.py --check`: `readme-blocks: README.md's generated blocks and icons are current`; both self-tests `self-test: all pass`, their new cases (a failed write leaving the README whole, a section-mapped tool reading in progress, a link differing only in letter case) each shown failing before its fix. GitHub's rendering is captured at `e76440c9` in both themes with sidecars (`docs/captures/runs/2026-11-13-D00-T05-s2-readme-*.png`): the logo legible, both CI badges passing, the theme-matched launcher capture, and the diagram with all five nodes, `extensions/ToolName/` and the edge labelled "repair tools only". The cold quick start from a fresh clone ended `check-all: 28 gate(s) ok`. CI for the final candidate `cef30930`: `python scripts/ci-status.py cef30930` reports `gates: success` and `plan-gates: success`.
+> **Review:** astra (gpt-6-astra via codex). `docs/reviews/00-workspace/D00-T05-s2.md` (writer model claude-opus-5-5): plan gaps (4, folded), then stopped at the writer model change. `-repair.md` (claude-fable-5-2, the whole section): plan gaps (4 P2, fixed), round 1 (one P1, one P2, fixed), round 2 (consistency) `HIGHEST: P3` (two, fixed), completion gaps (2 in scope, the Repair). `-repair2.md`: plan approve, round 1 (medium, adversarial) `HIGHEST: P3` (one, fixed in the candidate) · Raw findings: docs/reviews/00-workspace/D00-T05-s2*.md
+> **Completion:** astra (medium), candidate cef30930 -- COMPLETION: gaps (0 in scope; 2 out of scope, the quick start run verbatim on CI owned by `D00 T05 §3`, and the Preferences dialog, no part of this section, owned by `D01 T01 §2` and `§7`) · Repair records: -repair (ded1ad7e), -repair2 (cef30930)
+> **Plan review:** astra -- gaps on each of the first two records (4 and 4, folded or fixed), then approve on the Repair's record
+> **CRUD:** applicable to the generated parts of the README: the gallery and progress blocks and the gallery's icons are created and updated by `scripts/readme-blocks.py`, each file staged, read back and moved into place, an icon no row names removed last; nothing outside the marked blocks is written
+> **Duration:** 2026-11-13T13:03:36Z to 2026-11-13T17:55:13Z
+> **Implementer:** claude (claude-opus-5-5 for the build to `28d971b6`, then claude-fable-5-2)
 
 -> XREF: D00 T05 §1 -- the captures this README embeds
 -> XREF: D00 T05 §3 -- the CI that runs this quick start verbatim
