@@ -308,7 +308,7 @@ Seven programs from `samples/` become products and eleven new utilities join, al
 | [ ] | `D05 T01 §3` | QuickErase and WinClean                           |  14   |
 | [ ] | `D05 T01 §4` | Indicators and SaveDesk                           |   6   |
 | [ ] | `D05 T01 §5` | The four new utilities                            |  11   |
-| [ ] | `D05 T02 §1` | RegStudio on the shared framework                 |   7   |
+| [ ] | `D05 T02 §1` | RegStudio on the shared framework                 |   8   |
 | [ ] | `D05 T02 §2` | The registry engine                               |   7   |
 | [ ] | `D05 T02 §3` | Browse, display, and virtualize                   |   6   |
 | [ ] | `D05 T02 §4` | Editing, with a reverse                           |   8   |

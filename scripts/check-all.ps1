@@ -288,6 +288,23 @@ Invoke-Gate -Name 'profile self-test' -LogName 'gate-profile-selftest' -Command 
     & $Python (Join-Path $RepoRoot 'scripts\profile-check.py') --self-test
 }
 
+# The repository's face (D00 T05 §2): the README's generated tool gallery and
+# progress block are current (a hand edit inside either fails by name), and the
+# README, contributor and security files carry no broken link or anchor, no em
+# dash and no wrapped paragraph, and a toolchain badge that matches the pin.
+Invoke-Gate -Name 'readme blocks' -LogName 'gate-readme-blocks' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\readme-blocks.py') --check
+}
+Invoke-Gate -Name 'readme blocks self-test' -LogName 'gate-readme-blocks-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\readme-blocks.py') --self-test
+}
+Invoke-Gate -Name 'readme check' -LogName 'gate-readme-check' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\readme-check.py')
+}
+Invoke-Gate -Name 'readme check self-test' -LogName 'gate-readme-check-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\readme-check.py') --self-test
+}
+
 # ── toolchain currency, ADVISORY ─────────────────────────────
 #
 # A pin that has fallen behind is information, not a failure. The build is

@@ -1,0 +1,18 @@
+{
+  "about": "The README's tool gallery is generated from this map by scripts/readme-blocks.py (D00 T05 §2). Each row names its icon and the plan that owns its C++ build; the generator refuses a tool the tree has that this map lacks. A folded tool names what it folds into, from the product decisions in docs/brainstorm/2026-09-16-completion-brainstorm.md (decision 6). Re-pointed at D06 T01 §10's registry once that ships.",
+  "decision": "docs/brainstorm/2026-09-16-completion-brainstorm.md#product-count-after-decisions-6-and-11",
+  "tools": [
+    {"name": "Ownership", "job": "Take ownership of files, folders and registry keys from the context menu.", "icon": "resolute_au3/SDK/Resources/Icons/Ownership.ico", "plan": {"file": "todo/04-tools-port/TODO-02-ownership-complete.md"}, "frozen": true},
+    {"name": "ComIntRep", "job": "Repair Windows internet and network connectivity in one pass: Winsock, IP, proxy and more.", "icon": "resolute_au3/SDK/Resources/Icons/ComIntRep.ico", "plan": {"file": "todo/04-tools-port/TODO-03-comintrep-complete.md"}, "frozen": true},
+    {"name": "PixRepair", "job": "Exercise stuck LCD pixels with rapidly changing colour patterns.", "icon": "resolute_au3/SDK/Resources/Icons/PixRepair.ico", "plan": {"file": "todo/04-tools-port/TODO-04-pixrepair-complete.md"}, "frozen": true},
+    {"name": "BiosCodes", "job": "Look up what a BIOS beep code means, by manufacturer.", "icon": "resolute_au3/SDK/Resources/Icons/BiosCodes.ico", "plan": {"file": "todo/04-tools-port/TODO-05-bioscodes-complete.md"}, "frozen": true},
+    {"name": "USBRepair", "job": "Repair USB devices and drives that Windows no longer recognises.", "icon": "resolute_au3/SDK/Resources/Icons/USBRepair.ico", "plan": {"ref": "D04 T01 §4"}, "frozen": true, "folds_into": "Drive Repair"},
+    {"name": "DVDRepair", "job": "Repair CD and DVD drives that Windows no longer shows.", "icon": "resolute_au3/SDK/Resources/Icons/DVDRepair.ico", "plan": {"ref": "D04 T01 §4"}, "frozen": true, "folds_into": "Drive Repair"},
+    {"name": "MemBoost", "job": "Free physical memory by trimming the working sets of running processes.", "icon": "resolute_au3/SDK/Resources/Icons/MemBoost.ico", "plan": {"file": "todo/04-tools-port/TODO-06-memboost-complete.md"}, "frozen": false},
+    {"name": "Firemin", "job": "Keep Firefox's memory use in check while it runs.", "icon": "resolute_au3/SDK/Resources/Icons/Firemin.ico", "plan": {"ref": "D04 T01 §3"}, "frozen": false, "folds_into": "the browser optimizer"},
+    {"name": "Chromin", "job": "Keep Chrome's memory use in check while it runs.", "icon": "resolute_au3/SDK/Resources/Icons/Chromin.ico", "plan": {"ref": "D04 T01 §3"}, "frozen": false, "folds_into": "the browser optimizer"},
+    {"name": "Edgemin", "job": "Keep Microsoft Edge's memory use in check while it runs.", "icon": "resolute_au3/SDK/Resources/Icons/Edgemin.ico", "plan": {"ref": "D04 T01 §3"}, "frozen": false, "folds_into": "the browser optimizer"},
+    {"name": "Watermin", "job": "Keep Waterfox's memory use in check while it runs.", "icon": "resolute_au3/SDK/Resources/Icons/Watermin.ico", "plan": {"ref": "D04 T01 §3"}, "frozen": false, "folds_into": "the browser optimizer"},
+    {"name": "RegStudio", "job": "Browse, search and edit the Windows registry, with every change reversible.", "icon": "extensions/RegStudio/resources/icon.ico", "plan": {"file": "todo/05-new-tools/TODO-02-regstudio.md"}, "frozen": false, "new": true}
+  ]
+}

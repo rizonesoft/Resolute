@@ -25,7 +25,7 @@ If applicable, add screenshots.
 
 ## Environment
 - **OS**: Windows 10/11 (build number)
-- **Resolute Version**: 
+- **Resolute Version**: (the version the tool reports)
 - **Running as Admin**: Yes/No
 
 ## Additional Context
