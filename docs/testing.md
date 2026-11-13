@@ -36,6 +36,29 @@ Proof that the `gates` workflow can fail is a manual dispatch with `prove_red` s
 
 A full local `pwsh scripts/check-all.ps1` (through `bosun run --`) is for phase closeout, a release, and reproducing a red CI run.
 
+## The quick-start lane
+
+The `quick-start` workflow (`.github/workflows/quick-start.yml`, `D00 T05 §3`) runs the README's quick start on every push to `main`, as a cold reader would: from an empty folder on a fresh runner, with no toolchain cache and no compile cache.
+
+- **No command is typed into the workflow.** `python scripts/quickstart.py run` reads the first `powershell` block under "## Quick start" in `README.md` and runs its lines word for word, in order, in one PowerShell 7 session. A README whose heading or block is gone fails the lane by name, and a command that no longer works fails it at that command, naming it.
+- **The clone is the pushed commit.** The README's `git clone` line takes the head of `main`, which is a newer commit when a second push lands first. The workflow points git, for that one address, at a bare copy whose `main` is the pushed commit, so the line runs as written and gets that commit; the runner compares the two and refuses before bootstrap if they differ.
+- **Every preset is built.** When the last command has passed, the runner reads `CMakePresets.json` in the clone and fails naming any configure preset whose build tree holds no build.
+- **The pins are checked on every run.** With nothing cached, `scripts/bootstrap.ps1` downloads each component `toolchain.json` pins and refuses one whose SHA-256 differs, naming it.
+- **Nothing it starts is left running.** The session runs in a job object the runner owns (`scripts/lib/win_job.py`), ended when the run returns: finished, failed or timed out.
+
+`python scripts/ci-status.py` owes this lane for every commit that carries its workflow file, so a commit is green only when `gates` and `quick-start` both are. It takes far longer than `gates`, because nothing is cached; work on the next row goes on while it runs.
+
+Proof that a wrong pin fails the lane is a manual dispatch with `prove_wrong_pin` set, which changes one pinned hash in the clone for that run only. Such a run is named `quick-start (red proof)`, and `ci-status` never counts it.
+
+### What a first run needs
+
+Two facts about a first run are worked out from the tree by `python scripts/quickstart.py facts`, printed into the lane's summary, and fail the lane when either stops being true:
+
+- **`.env` does not apply.** No `.env` file is tracked, and no script or build file names one or loads one. Every setting is a script parameter, listed in the README's Configuration section.
+- **A first run takes from outside the clone only what is pinned:** the components `toolchain.json` pins by SHA-256, downloaded by `scripts/bootstrap.ps1`, and two sources CMake fetches at a pinned commit, Catch2 (`tests/CMakeLists.txt`) and Lucide (`shared/lucide/CMakeLists.txt`). Nothing else seeds it: no data, account, service or earlier build.
+
+Every tracked file that reaches the network is recorded in `FETCHERS` in `scripts/quickstart.py` with what it is to a first run. A new one fails the check until it is recorded there, and so does a `FetchContent_Declare` pinned to a tag and not a full commit hash.
+
 ## The focus guard
 
 `tests/main.cpp` runs every Catch2 session inside the focus guard (`tests/focus_guard.cpp`). A dedicated thread holds WinEvent hooks for foreground changes and window shows, so even a transient activation is seen when it happens. At the end of every case the guard takes a census of the windows the suite owns (the test process, plus any process a case starts and adopts, such as the launcher) and checks it against the case's tier.

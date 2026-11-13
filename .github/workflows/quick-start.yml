@@ -1,0 +1,101 @@
+name: quick-start
+
+# The README's quick start, run as a cold reader runs it (D00 T05 §3).
+#
+# No command is typed here. `scripts/quickstart.py run` reads the block under
+# "## Quick start" in README.md and runs its lines word for word, in order,
+# in one PowerShell 7 session started in an empty folder: clone, bootstrap,
+# build, check-all. So the README and what this lane proves cannot drift
+# apart: a command that no longer works turns the lane red at that command.
+#
+# Nothing is restored from a cache. Bootstrap downloads every component
+# toolchain.json pins and checks each against its SHA-256 on every run, and
+# the build starts from an empty tree, which is what a first run is.
+#
+# Not on pull requests: the README's clone takes `main`, never a fork's
+# branch, so such a run would prove nothing about the change it names. The
+# `gates` workflow covers pull requests.
+
+run-name: ${{ inputs.prove_wrong_pin && 'quick-start (red proof)' || '' }}
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      prove_wrong_pin:
+        description: 'Proof that a wrong pin fails this lane: change one pinned hash in the clone, for this run only, before bootstrap'
+        type: boolean
+        default: false
+
+concurrency:
+  # One run per commit and kind, never cancelled: a stamp records the result
+  # for its own candidate (scripts/ci-status.py).
+  group: quick-start-${{ github.sha }}-${{ inputs.prove_wrong_pin && 'proof' || 'lane' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  quick-start:
+    runs-on: windows-2025
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+          # Full history: the clone below is made from it, and check-all's
+          # git legs cannot resolve on a shallow one.
+          fetch-depth: 0
+
+      - name: Make the README's clone address serve this commit
+        # `git clone https://github.com/rizonesoft/Resolute.git` takes the head
+        # of main, which is a newer commit when a second push lands first, and
+        # a green run would then be for code this run never saw. So git is
+        # pointed, for that one address, at a bare copy whose main is exactly
+        # the pushed commit. The README's line still runs as written, and the
+        # runner refuses before bootstrap if the clone is any other commit.
+        shell: pwsh
+        run: |
+          $mirror = Join-Path $env:RUNNER_TEMP 'resolute-mirror.git'
+          git clone --quiet --bare source $mirror
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          git -C $mirror update-ref refs/heads/main $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          git -C $mirror symbolic-ref HEAD refs/heads/main
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          $address = 'file:///' + ($mirror -replace '\\', '/')
+          git config --global "url.$address.insteadOf" 'https://github.com/rizonesoft/Resolute.git'
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          "The clone address serves $env:GITHUB_SHA"
+
+      - name: Check the .env and first-run facts
+        # Worked out from the tree, and red when either stops being true
+        # (docs/testing.md, "What a first run needs").
+        shell: pwsh
+        run: |
+          python source/scripts/quickstart.py facts | Tee-Object -FilePath (Join-Path $env:RUNNER_TEMP 'facts.txt')
+          $code = $LASTEXITCODE
+          "### First-run facts`n" >> $env:GITHUB_STEP_SUMMARY
+          Get-Content (Join-Path $env:RUNNER_TEMP 'facts.txt') | ForEach-Object { "- $_" } >> $env:GITHUB_STEP_SUMMARY
+          exit $code
+
+      - name: Run the README quick start, word for word
+        shell: pwsh
+        run: |
+          $work = Join-Path $env:RUNNER_TEMP 'quick-start'
+          New-Item -ItemType Directory -Path $work | Out-Null
+          $proof = @()
+          if ('${{ inputs.prove_wrong_pin }}' -eq 'true') { $proof = @('--prove-wrong-pin') }
+          python source/scripts/quickstart.py run --work $work --expect-commit $env:GITHUB_SHA --timeout 6600 @proof
+          exit $LASTEXITCODE
+
+      - name: Keep the gate logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: quick-start-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quick-start/Resolute/build/logs/
+          retention-days: 14
+          if-no-files-found: ignore

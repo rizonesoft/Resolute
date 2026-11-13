@@ -105,3 +105,62 @@ def end_children_with(pid: int) -> None:
         if job:
             kernel.CloseHandle(job)
         kernel.CloseHandle(process)
+
+
+class OwnedJob:
+    """A kill-on-close job object for one child this process starts and wants to end, with everything the child
+    starts, at a moment it chooses and not only at its own exit.
+
+        job = OwnedJob()                 # raises OSError when Windows refuses, so the caller starts nothing
+        child = subprocess.Popen(...)
+        job.take(child)                  # the child and everything it starts from now on are in the job
+        ...
+        left = job.end()                 # ends every process still in the job; returns how many there were
+
+    Used by scripts/quickstart.py: a build, a compile cache or a test the session started is gone when the run
+    returns, whether the session finished, failed or timed out. Windows only."""
+
+    def __init__(self) -> None:
+        import ctypes
+
+        self._kernel = _kernel()
+        self._job = _kill_on_close_job(self._kernel)
+        if not self._job:
+            raise OSError(f"could not create a kill-on-close job object (error {ctypes.get_last_error()})")
+
+    def take(self, child) -> None:
+        import ctypes
+        from ctypes import wintypes
+
+        if not self._kernel.AssignProcessToJobObject(self._job, wintypes.HANDLE(int(child._handle))):
+            raise OSError(f"could not put process {child.pid} in the job object (error {ctypes.get_last_error()})")
+
+    def members(self) -> int:
+        """How many processes are in the job now."""
+        import ctypes
+        from ctypes import wintypes
+
+        class Accounting(ctypes.Structure):
+            _fields_ = [("TotalUserTime", ctypes.c_longlong), ("TotalKernelTime", ctypes.c_longlong),
+                        ("ThisPeriodTotalUserTime", ctypes.c_longlong), ("ThisPeriodTotalKernelTime", ctypes.c_longlong),
+                        ("TotalPageFaultCount", wintypes.DWORD), ("TotalProcesses", wintypes.DWORD),
+                        ("ActiveProcesses", wintypes.DWORD), ("TotalTerminatedProcesses", wintypes.DWORD)]
+
+        info = Accounting()
+        self._kernel.QueryInformationJobObject.argtypes = (wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD, ctypes.c_void_p)
+        if not self._kernel.QueryInformationJobObject(self._job, 1, ctypes.byref(info), ctypes.sizeof(info), None):
+            raise OSError(f"could not read the job object (error {ctypes.get_last_error()})")
+        return int(info.ActiveProcesses)
+
+    def end(self) -> int:
+        """Ends every process still in the job and closes it. Returns how many were still running. Safe to call twice."""
+        from ctypes import wintypes
+
+        if not self._job:
+            return 0
+        left = self.members()
+        self._kernel.TerminateJobObject.argtypes = (wintypes.HANDLE, wintypes.UINT)
+        self._kernel.TerminateJobObject(self._job, 1)
+        self._kernel.CloseHandle(self._job)
+        self._job = None
+        return left

@@ -12,7 +12,9 @@ Exit codes
     2  an owed run is queued, in progress, or has not appeared
     3  the question could not be asked: no gh, not signed in, an API error, or a call that timed out
 
-What a commit owes (D00 T01 section 10). `gates` has no path filter, so every pushed head owes it. `plan-gates`
+What a commit owes (D00 T01 section 10). `gates` has no path filter, so every pushed head owes it. So does
+`quick-start` (D00 T05 section 3, the README's quick start run as written), from the commit that first carries
+.github/workflows/quick-start.yml. `plan-gates`
 is filtered by the `paths` list in .github/workflows/plan.yml as the commit has it, and GitHub applies that
 filter to the whole push, base to head: so the reader asks GitHub which push ended at the commit and lists what
 that push changed. Any other workflow that did run for the commit is read as well. GitHub attaches runs to the
@@ -40,7 +42,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_WORKFLOW = ".github/workflows/plan.yml"
 ALWAYS_OWED = ("gates",)
-FILTERED = {"plan-gates": PLAN_WORKFLOW}
+QUICK_START_WORKFLOW = ".github/workflows/quick-start.yml"
+# Workflows a commit owes when the commit carries their file: by its `paths` list when it has one, and for every
+# push when it has none. A commit made before a workflow existed does not owe it.
+FILTERED = {"plan-gates": PLAN_WORKFLOW, "quick-start": QUICK_START_WORKFLOW}
 PROOF_SUFFIX = " (red proof)"
 CALL_TIMEOUT = 30  # seconds for one gh call
 POLL = 20  # seconds between reads under --wait
@@ -171,7 +176,8 @@ def touches(paths: list[str], patterns: list[str]) -> bool:
 
 
 def owed(paths: list[str], filtered: dict[str, list[str]]) -> list[str]:
-    return list(ALWAYS_OWED) + [name for name, patterns in filtered.items() if touches(paths, patterns)]
+    """`gates`, and each workflow the commit carries: one with no path filter (an empty list) is owed by every push."""
+    return list(ALWAYS_OWED) + [name for name, patterns in filtered.items() if not patterns or touches(paths, patterns)]
 
 
 def deciding(runs: list[dict]) -> dict[str, dict]:
@@ -335,7 +341,7 @@ def self_test() -> int:
     filtered = {"plan-gates": workflow_paths("on:\n  push:\n    paths:\n      - 'scripts/**'\n      - 'AGENTS.md'\njobs:\n")}
     check("the paths list is read", filtered["plan-gates"], ["scripts/**", "AGENTS.md"])
 
-    def ask(runs, paths=("src/a.cpp",), log="line one\nthe failing line\n", wait=0.0, gh=None, ticks=None):
+    def ask(runs, paths=("src/a.cpp",), log: str | None = "line one\nthe failing line\n", wait=0.0, gh=None, ticks=None):
         said: list[str] = []
         now = [0.0]
         given.clear()
@@ -468,7 +474,28 @@ def self_test() -> int:
     said_lines = []
     code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=said_lines.append, committed=at_commit)
     check("the path filter is read from the queried commit", (code, seen, "plan-gates: no run yet" in "\n".join(said_lines)),
-          (2, [("c0ffee", PLAN_WORKFLOW)], True))
+          (2, [("c0ffee", PLAN_WORKFLOW), ("c0ffee", QUICK_START_WORKFLOW)], True))
+
+    # The quick-start lane has no path filter: a commit that carries its workflow file owes it on every push.
+    def carries_quick_start(commit, rel, timeout):
+        return "on:\n  push:\n    branches: [main]\njobs:\n" if rel == QUICK_START_WORKFLOW else None
+
+    def lane(runs):
+        lines: list[str] = []
+        got = named("c0ffee", 0, gh=lambda args, timeout: "the lane's failing line\n" if args[:2] == ["run", "view"] else json.dumps(runs),
+                    paths=["src/a.cpp"], say=lines.append, committed=carries_quick_start)
+        return got, "\n".join(lines)
+
+    code, said = lane([run()])
+    check("a commit that carries the quick-start lane and has no run of it is still running", (code, "quick-start: no run yet" in said), (2, True))
+    code, said = lane([run(), run(name="quick-start", rid=7)])
+    check("gates and the quick-start lane green is green", code, 0)
+    code, said = lane([run(), run(name="quick-start", conclusion="failure", rid=7)])
+    check("a failed quick-start lane is red", (code, "quick-start: failure" in said), (1, True))
+    code, said = lane([run(), run(name="quick-start", rid=7), run(name="quick-start", conclusion="failure", title="quick-start (red proof)", created="2026-11-13T01:00:00Z", rid=8)])
+    check("the wrong-pin proof run is not the commit's result", code, 0)
+    code, said = lane([run(), run(name="quick-start", conclusion="failure", title="quick-start (red proof)", rid=8)])
+    check("a proof run alone does not stand in for the lane", (code, "quick-start: no run yet" in said), (2, True))
     code = named("c0ffee", 0, gh=lambda args, timeout: json.dumps([run()]), paths=["scripts/x.py"], say=lambda line: None,
                   committed=lambda commit, rel, timeout: None)
     check("a commit with no plan workflow owes only gates", code, 0)

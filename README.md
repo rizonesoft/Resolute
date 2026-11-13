@@ -9,7 +9,7 @@
 
 **Windows repair and system tools that fix the problem, show what they changed, and can put it back.**
 
-[![gates](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml) [![plan-gates](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml) ![license: not yet declared](https://img.shields.io/badge/license-not%20yet%20declared-lightgrey) ![llvm-mingw 20260908](https://img.shields.io/badge/llvm--mingw-20260908-blue) ![platform: Windows](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20x64-0078D4)
+[![gates](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/gates.yml) [![plan-gates](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/plan.yml) [![quick-start](https://github.com/rizonesoft/Resolute/actions/workflows/quick-start.yml/badge.svg)](https://github.com/rizonesoft/Resolute/actions/workflows/quick-start.yml) ![license: not yet declared](https://img.shields.io/badge/license-not%20yet%20declared-lightgrey) ![llvm-mingw 20260908](https://img.shields.io/badge/llvm--mingw-20260908-blue) ![platform: Windows](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20x64-0078D4)
 
 </div>
 
@@ -63,7 +63,7 @@ pwsh scripts/build.ps1 -All    # builds the launcher and every C++ tool, Release
 pwsh scripts/check-all.ps1     # runs every gate: build, clang-tidy, tests, plan and document checks
 ```
 
-Nothing is installed system-wide and no Visual Studio is needed: llvm-mingw carries its own headers and import libraries. `check-all` prints one line per gate and ends with its verdict, `check-all: <n> gate(s) ok` when every gate passed.
+Nothing is installed system-wide and no Visual Studio is needed: llvm-mingw carries its own headers and import libraries. `check-all` prints one line per gate and ends with its verdict, `check-all: <n> gate(s) ok` when every gate passed. These five lines are run exactly as written, from an empty folder with nothing cached, on every push: the `quick-start` badge above is that run.
 
 ## Configuration
 

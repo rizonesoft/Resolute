@@ -305,6 +305,17 @@ Invoke-Gate -Name 'readme check self-test' -LogName 'gate-readme-check-selftest'
     & $Python (Join-Path $RepoRoot 'scripts\readme-check.py') --self-test
 }
 
+# ── the quick start (D00 T05 §3) ─────────────────────────────
+
+# The quick-start lane runs the README's commands on GitHub. What can be
+# proven here is its runner: the block is read as written, a failed command
+# and a clone at another commit stop it by name, the processes a session
+# leaves are ended on every way out, and the .env and first-run facts hold
+# on this tree and fail on a tree where they do not.
+Invoke-Gate -Name 'quickstart self-test' -LogName 'gate-quickstart-selftest' -Command {
+    & $Python (Join-Path $RepoRoot 'scripts\quickstart.py') --self-test
+}
+
 # ── reference data (D00 T06 §2) ──────────────────────────────
 
 # The database stays on authoring machines, so this is what a build and CI can
