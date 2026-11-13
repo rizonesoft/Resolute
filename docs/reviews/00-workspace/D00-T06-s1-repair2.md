@@ -91,3 +91,25 @@ OVERALL: needs-attention
 
 HIGHEST: P1
 OVERALL: needs-attention
+
+## Round 4: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T11:00:28Z
+- Effort: low
+- Writer model: claude-opus-5-5
+- Policy: f2b50b8b7eb98c36012fef72c7708d340606ae06
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 6
+- Digest: 813b212452c439ab
+
+## adversarial: needs-attention
+
+1. **P2, `tools/refdata/refdata.py:514`: The connection allowlist drops `bind-address`.** On a Windows authoring machine with multiple interfaces, restore can use a different source address from the author connection. The temporary account is created for the author's source address, so the restricted connection can fail authentication or a server firewall check. Reproduce through `refdata.py restore backup.sql --database restored --options client.cnf`, with `bind-address` selecting a nondefault local interface permitted by the shared server. Upgrade uses the same failing path. The installed client's help confirms this option exists; a read-only probe confirmed `client_settings` discards it. The network failure was not exercised.
+
+HIGHEST: P2
+OVERALL: needs-attention

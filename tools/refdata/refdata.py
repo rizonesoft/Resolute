@@ -509,24 +509,13 @@ def grant_pattern(database: str) -> str:
     return database.replace("\\", "\\\\").replace("_", "\\_").replace("%", "\\%")
 
 
-# What decides how and to where the client connects, which a restore's connection must share with the author's.
-# Anything else an option file can say (force, execute, init-command, a database) is not carried.
-CONNECTION_SETTINGS = {
-    "host", "port", "socket", "protocol", "connect-timeout", "ssl-mode", "ssl-ca", "ssl-capath", "ssl-cert", "ssl-key",
-    "ssl-cipher", "ssl-crl", "ssl-crlpath", "ssl-fips-mode", "tls-version", "tls-ciphersuites", "get-server-public-key",
-    "server-public-key-path", "compression-algorithms", "zstd-compression-level",
-}
-# Settings naming a file, which the client resolves against its working directory, the option file's own folder.
-PATH_SETTINGS = {"ssl-ca", "ssl-capath", "ssl-cert", "ssl-key", "ssl-crl", "ssl-crlpath", "server-public-key-path"}
-
-
 OPTION_CODE_PAGE = "mbcs"   # option files are read in the system's ANSI code page (tools/refdata/server.ps1, Write-OptionFile)
 
 
-def client_settings(author: Path) -> dict[str, str]:
-    """The connection settings the mysql client reads from the author's option file, as MySQL's own reader gives them
-    (my_print_defaults over the [client] and [mysql] groups): comments, quoting, escapes and included files are read
-    the way the client reads them, because nothing else here parses an option file."""
+def client_settings(author: Path) -> list[str]:
+    """Every option the mysql client reads from the author's option file, in order, as MySQL's own reader gives them
+    (my_print_defaults over the [client] and [mysql] groups, `name=value` without the leading dashes, any password
+    masked): nothing here parses an option file itself."""
     exe = client_path("my_print_defaults")
     if not exe.is_file():
         raise Refused(f"refused: no my_print_defaults at {exe} (run tools/refdata/server.ps1 -Install, or set RESOLUTE_REFDATA_CLIENT)")
@@ -536,48 +525,26 @@ def client_settings(author: Path) -> dict[str, str]:
     if proc.returncode != 0:
         said = proc.stderr.decode(OPTION_CODE_PAGE, "replace").strip().splitlines()
         raise Refused(f"refused: the option file {author} could not be read ({said[0] if said else f'my_print_defaults exit {proc.returncode}'}); nothing was restored")
-    settings = {}
+    settings = []
     for line in proc.stdout.decode(OPTION_CODE_PAGE, "replace").splitlines():
         if not line.startswith("--"):
             continue
-        key, equals, value = line[2:].partition("=")
-        key = key.strip().lower().replace("_", "-")
-        # The client's option modifiers, read as the client reads them: loose- changes nothing but the error on an
-        # unknown name, enable- sets a boolean, and disable- and skip- clear one. Later lines still win.
-        if key.startswith("loose-"):
-            key = key[len("loose-"):]
-        if key.startswith("enable-"):
-            key, value = key[len("enable-"):], value if equals else "1"
-        elif key.startswith(("disable-", "skip-")):
-            key, value = key.split("-", 1)[1], "0"
-        if key in CONNECTION_SETTINGS:
-            if key in PATH_SETTINGS and value and not Path(value).is_absolute():
-                value = str((author.parent / value).resolve())
-            settings[key] = value
+        settings.append(line[2:])
     return settings
 
 
 def restricted_option_bytes(author: Path, user: str, password: str, override: dict | None = None) -> bytes:
-    """The restore user's option file: the connection settings the author's file gives the mysql client
-    (client_settings: host, port, TLS mode, CA, certificate, key and the rest of CONNECTION_SETTINGS), a file path made
-    absolute against the author's folder so it names the same file from another folder, then the restore user's own
-    user and password. override is the self-test's hook for changing a setting the copy carries, in the restricted
-    file alone; it adds nothing the author's file lacks."""
-    settings = client_settings(author)
-    for key, value in (override or {}).items():
-        if key in settings:
-            settings[key] = value
-
-    def quoted(value: str) -> str:
-        # Double-quoted, so a # or a space in a value stays in it; a backslash is the option file's escape character.
-        # An option file has no escape for a double quote inside a quoted value, so such a value is refused, not guessed.
-        if '"' in value:
-            raise Refused(f"refused: a connection setting in {author} holds a double quote, which the restore's own option file cannot carry; nothing was restored")
-        return '"' + value.replace("\\", "\\\\") + '"'
-
-    lines = ["[client]"] + [key if value == "" else f"{key}={quoted(value.replace(chr(92), '/') if key in PATH_SETTINGS else value)}"
-                            for key, value in settings.items()]
-    lines += [f"user={user}", f"password={quoted(password)}"]
+    """The restore user's option file, written beside the author's: it includes the author's file, so the client
+    reads every setting exactly as the author's own connections read it (host, port, bind address, TLS, comments,
+    option modifiers, relative paths, included files and whatever else MySQL adds), and then names the restore user
+    and password last, in each group the client reads, so those two alone are replaced. override is the self-test's
+    hook for changing a setting the author's file gives, in the restricted file alone; it adds nothing the author's
+    file lacks."""
+    given = {option.partition("=")[0].lower().replace("_", "-") for option in client_settings(author)}
+    changed = [f"{key}={value}" for key, value in (override or {}).items() if key in given]
+    lines = [f"!include {author.name}"]
+    for group in ("client", "mysql"):
+        lines += [f"[{group}]"] + changed + [f"user={user}", f"password={password}"]
     return ("\r\n".join(lines) + "\r\n").encode(OPTION_CODE_PAGE)
 
 
@@ -610,26 +577,32 @@ def cmd_restore(s: Session, path: str, schema: Path = SCHEMA, restricted_overrid
     account_host = run_sql("SELECT SUBSTRING_INDEX(USER(), '@', -1);", options=s.options)[0][0]
     run_sql(f"CREATE DATABASE `{s.database}` CHARACTER SET utf8mb4;", options=s.options)
     restored = False
-    with tempfile.TemporaryDirectory(prefix="refdata-restore-") as tmp:
-        restricted = Path(tmp) / "restore.cnf"
+    # Beside the author's option file, which it includes, so the client runs from the same folder and reads every
+    # setting as the author's own connections do; it holds the restore user's password and is removed however the
+    # restore ends.
+    restricted = s.options.with_name(f"refdata-restore-{secrets.token_hex(4)}.cnf")
+    try:
+        run_sql(schema.read_text(encoding="utf-8"), options=s.options, database=s.database)
+        run_sql(f"CREATE USER '{user}'@{sql_str(account_host)} IDENTIFIED BY {sql_str(password)};\n"
+                f"GRANT SELECT, INSERT, LOCK TABLES ON `{grant_pattern(s.database)}`.* TO '{user}'@{sql_str(account_host)};", options=s.options)
         try:
-            run_sql(schema.read_text(encoding="utf-8"), options=s.options, database=s.database)
-            run_sql(f"CREATE USER '{user}'@{sql_str(account_host)} IDENTIFIED BY {sql_str(password)};\n"
-                    f"GRANT SELECT, INSERT, LOCK TABLES ON `{grant_pattern(s.database)}`.* TO '{user}'@{sql_str(account_host)};", options=s.options)
             restricted.write_bytes(restricted_option_bytes(s.options, user, password, restricted_override))
-            try:
-                # The backup is untrusted text, and the client has commands of its own that no database privilege
-                # governs (\! runs a shell command as this Windows user): --binary-mode turns them off for the input,
-                # and --skip-system-command turns off \! itself.
-                run_sql(text, options=restricted, database=s.database, extra=("--binary-mode", "--skip-system-command"))
-            except Refused as refusal:
-                raise Refused(f"refused: the backup could not be loaded as rows into '{s.database}' alone through the restore user's connection, "
-                              f"which uses your option file's settings ({refusal}); nothing outside it was changed") from None
-            restored = True
-        finally:
-            run_sql(f"DROP USER IF EXISTS '{user}'@{sql_str(account_host)};", options=s.options)
-            if not restored:
-                run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
+        except OSError as exc:
+            raise Refused(f"refused: the restore user's option file could not be written beside {s.options} ({exc.strerror or exc}); nothing was restored") from None
+        try:
+            # The backup is untrusted text, and the client has commands of its own that no database privilege
+            # governs (\! runs a shell command as this Windows user): --binary-mode turns them off for the input,
+            # and --skip-system-command turns off \! itself.
+            run_sql(text, options=restricted, database=s.database, extra=("--binary-mode", "--skip-system-command"))
+        except Refused as refusal:
+            raise Refused(f"refused: the backup could not be loaded as rows into '{s.database}' alone through the restore user's connection, "
+                          f"which uses your option file's settings ({refusal}); nothing outside it was changed") from None
+        restored = True
+    finally:
+        restricted.unlink(missing_ok=True)
+        run_sql(f"DROP USER IF EXISTS '{user}'@{sql_str(account_host)};", options=s.options)
+        if not restored:
+            run_sql(f"DROP DATABASE IF EXISTS `{s.database}`;", options=s.options)
     print(f"restored {dump} into '{s.database}'")
     return 0
 
@@ -1187,15 +1160,19 @@ def self_test(schema: Path) -> int:
                 checks.check("TLS settings under a group header with a comment, or in an included file, are carried to the restore's connection",
                              all("restore user's connection" in said for said in carried.values()), repr(carried))
 
-                # Option modifiers are read as the client reads them: a loose- setting is carried, and a later
-                # skip- or enable- of a boolean wins over an earlier one.
+                # The restore's option file reads, through MySQL's own reader, as every option of the author's file in
+                # its order (modifiers, a bind address, settings in other groups) and then the restore user's own.
                 modified = Path(tmp) / "modified.cnf"
-                modified.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[client]\r\nloose-ssl-mode=VERIFY_IDENTITY\r\nloose_ssl_ca=server-ca.pem\r\n"
-                                     b"get-server-public-key\r\nskip-get-server-public-key\r\nloose-compression-algorithms=zlib\r\n")
-                written = restricted_option_bytes(modified, "u", "p").decode(OPTION_CODE_PAGE)
-                checks.check("settings written with loose-, skip- or enable- are carried as the client reads them, the later one winning",
-                             'ssl-mode="VERIFY_IDENTITY"' in written and f'ssl-ca="{(Path(tmp) / "server-ca.pem").resolve().as_posix()}"' in written
-                             and 'get-server-public-key="0"' in written and 'compression-algorithms="zlib"' in written, written.replace("\r\n", " | "))
+                modified.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[client] # a shared server\r\nloose-ssl-mode=VERIFY_IDENTITY\r\nloose_ssl_ca=server-ca.pem\r\n"
+                                     b"bind-address=127.0.0.1\r\nget-server-public-key\r\nskip-get-server-public-key\r\n[mysql]\r\nloose-compression-algorithms=zlib\r\n")
+                beside_it = modified.with_name("restore-check.cnf")
+                beside_it.write_bytes(restricted_option_bytes(modified, "restore-user", "restore-secret"))
+                author_reads, restore_reads = client_settings(modified), client_settings(beside_it)
+                checks.check("the restore's option file reads as every option of the author's, in order, then the restore user's alone",
+                             restore_reads[:len(author_reads)] == author_reads and "bind-address=127.0.0.1" in author_reads
+                             and [o.partition("=")[0] for o in restore_reads[len(author_reads):]] == ["user", "password", "user", "password"]
+                             and restore_reads[len(author_reads)] == "user=restore-user",
+                             f"author {author_reads!r}; restore {restore_reads!r}")
             finally:
                 for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up, rel_restored, rel_upgraded, f"{database}_carry"):
                     run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)
