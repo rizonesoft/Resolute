@@ -55,7 +55,7 @@ track: W1
 |  10   |   §10   | Focus-free UI suite conversion             | §7             |  [x]   |
 |  11   |   §11   | Nightly full-suite regression run          | §10            |  [x]   |
 |  12   |   §12   | Port-vs-port visual comparison             | §9, §10        |  [x]   |
-|  13   |   §13   | Capture pairs are replaced atomically       | §3             |  [ ]   |
+|  13   |   §13   | Capture pairs are replaced atomically       | §3             |  [x]   |
 |  14   |   §14   | A capture refuses a covered window          | §3             |  [ ]   |
 
 ---
@@ -748,6 +748,10 @@ No surface of its own: the capture writer `scripts/capture-window.ps1` and its s
 - [x] Commit: `"workspace: capture pairs are replaced atomically"`
 
 -> SOURCE: review-2026-11-09-d00-t05-s1-repair-completion (gap 4, out of scope)
+
+> **Verified:** 2026-11-13 | §13 | the capture writer switches a pair in whole, recovers one cut short, serializes writers, and binds each pair by content: `pwsh scripts/capture-window.ps1 -SelfTest` 17 PASS at aec14786 (a refused write, a sidecar that reads back differently, a writer stopped between its switches over a pair and over none, an undo cut short, two writers to one pair, a pair that verifies, a mixed pair refused naming both hashes, a pre-binding sidecar refused as unverifiable, `-Out shot.txt` refused through the entry point with nothing touched, and a replacing write); each guard removed in turn fails its own cases by name (readback, recovery, lock wait, hash comparison, guard order); a real capture of the four README shots through it writes four pairs that `-Verify` accepts, exit 0 each; `python scripts/ci-status.py` green at cb086b1f (gates and plan-gates).
+> **Review:** `docs/reviews/00-workspace/D00-T02-s13.md`: plan (2 findings, folded), round 1 (P1 concurrent writers, P3 restartable undo, fixed in 63ec7175), round 2 clean, completion `gaps` (reader-visible mixed pair, an output that is its own sidecar); `docs/reviews/00-workspace/D00-T02-s13-repair.md`: plan (3 findings, folded), round 1 clean, HIGHEST: none.
+> **Completion:** astra (medium), candidate 29d8d89a6e5d484ed857580616c535a0848d462d -- COMPLETION: complete, gap list empty. The reader guarantee is content binding, a recorded default: two files cannot be replaced at once on Windows.
 
 **Test checkpoint:** the self-test's cases pass, quoted: the staged sidecar that reads back differently refused, failing with the readback removed; the recovery cases, failing with the recovery removed; the two-writer case, failing with the lock removed; and Repair 1's binding and clash cases, each failing with its check removed. One real capture through `scripts/capture-window.ps1` writes a matching pair that `-Verify` accepts. All from real runs.
 

@@ -2,7 +2,7 @@
 
 The order to run every section in, from today to a signed release of the C++ suite.
 
-> **Progress:** **83 of 247 sections complete (34%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
+> **Progress:** **84 of 247 sections complete (34%).** Derived from the Implementation Order tables by `python3 scripts/todo-graph.py plan --sync` -- never edited by hand.
 >
 > **Plan/graph parity.** Every numbered TODO section, open or shipped, appears in exactly one phase table row. `plan --check` enforces missing, unknown, duplicate, and status parity. Read live totals from the generated Progress line above and `python scripts/todo-graph.py query stats`; never repeat a fixed denominator in prose.
 
@@ -179,7 +179,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [x] | `D00 T02 §10` | Focus-free UI suite conversion                    |  11   |
 | [x] | `D00 T02 §11` | Nightly full-suite regression run                 |   9   |
 | [x] | `D00 T02 §12` | Port-vs-port visual comparison                    |   8   |
-| [ ] | `D00 T02 §13` | Capture pairs are replaced atomically             |   4   |
+| [x] | `D00 T02 §13` | Capture pairs are replaced atomically             |   4   |
 | [ ] | `D00 T02 §14` | A capture refuses a covered window                |   2   |
 | [ ] | `D00 T05 §1`  | Visual Proof Capture With Provenance              |  15   |
 | [ ] | `D00 T05 §2`  | README Rewrite Plus Repo-Face Files               |  18   |
