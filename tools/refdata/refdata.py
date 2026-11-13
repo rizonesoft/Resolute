@@ -668,8 +668,11 @@ def upgrade_difference(old: Session, new: Session) -> str | None:
 
 
 def powershell_literal(text: str) -> str:
-    """A PowerShell single-quoted string: nothing inside is expanded, and a single quote is written twice."""
-    return "'" + text.replace("'", "''") + "'"
+    """A PowerShell single-quoted string: nothing inside is expanded, and each character PowerShell takes for a single
+    quote (the ASCII apostrophe and the curly U+2018 to U+201B) is written twice."""
+    for quote in ("'", "‘", "’", "‚", "‛"):
+        text = text.replace(quote, quote * 2)
+    return "'" + text + "'"
 
 
 def cmd_upgrade(s: Session, to: str, schema: Path = SCHEMA, after_restore=None, restricted_override: dict | None = None,
@@ -1240,7 +1243,8 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         refused_old = code == 1 and f"upgrade --database {old.database}" in out
 
         # Through an option file of the author's own choosing, which the advised retry must carry.
-        chosen = Path(tmp) / "chosen $folder `tick" / "my-server.cnf"   # a $ and a backtick, which PowerShell expands in double quotes
+        # A $ and a backtick, which PowerShell expands in double quotes, and a curly apostrophe, which it takes for a quote.
+        chosen = Path(tmp) / "chosen $folder `tick D’Arcy" / "my-server.cnf"
         chosen.parent.mkdir()
         chosen.write_bytes(options.read_bytes())
         lossy_said = None
@@ -1349,9 +1353,15 @@ def _phase_upgrade_and_tls(t: SelfTestRun) -> None:
         # The upgrade that follows is the one the lossy refusal advised: its PowerShell line, a name put in, run unedited.
         advised = re.search(r"run, in PowerShell: (python '(?:[^']|'')*' upgrade --database \S+ --options '(?:[^']|'')*' --to <a new name>)", lossy_said or "")
         if advised:
-            proc = subprocess.run(["pwsh", "-NoProfile", "-Command", advised.group(1).replace("<a new name>", upgraded)],
-                                  capture_output=True, encoding="utf-8", errors="replace", timeout=600, check=False)
-            code, out = proc.returncode, proc.stdout + proc.stderr
+            proc = subprocess.Popen(["pwsh", "-NoProfile", "-Command", advised.group(1).replace("<a new name>", upgraded)],
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            try:
+                said_bytes, _ = proc.communicate(timeout=600)
+            except subprocess.TimeoutExpired:
+                # The whole tree (pwsh, its python and the clients it runs), so nothing writes while cleanup drops.
+                _end_tree(proc)
+                said_bytes = b"the retry did not finish within 600s and was ended with its children"
+            code, out = proc.returncode, said_bytes.decode("utf-8", "replace")
         else:
             code, out = None, f"no runnable PowerShell retry in the refusal: {lossy_said!r}"
         new = Session(options, upgraded)
