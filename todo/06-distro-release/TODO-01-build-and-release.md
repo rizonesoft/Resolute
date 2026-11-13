@@ -91,9 +91,11 @@ Thirteen descriptors pointing at a directory that no longer exists is the cleare
 - [ ] Refuse to produce a release when the gates are not green. Done when: a deliberate warning makes the release command refuse with a named message, and the refusal names which gate failed.
 - [ ] Report the set legibly: one line per tool with its version, architectures, and artifact sizes. Done when: a full run's report is quoted.
 - [ ] Make the run reproducible. Done when: two runs from the same commit produce identical artifacts, or this section records exactly which bytes differ and why.
+- [ ] Run the reference-data check and embedding inside the release build (`D00 T06 §2`): `scripts/release.ps1` runs `scripts/refdata-verify.py` before it builds and refuses to produce a release when a committed export fails it; the datasets each tool names are embedded by the same CMake build, with no separate step. Done when: a release run shows the verify step, and a seeded edit to a committed export stops the run naming the dataset. **Filed 2026-11-13** from `D00 T06 §2`.
 - [ ] Commit: `"release: one command builds the whole release set"`
 
 **Test checkpoint:** One invocation produces the whole set for both architectures with a per-tool report, quoted. A deliberate warning makes it refuse and name the failing gate. Two runs from one commit are compared and any difference is explained.
+-> XREF: D00 T06 §2 -- the reference-data check and embedding this build runs
 
 ## 3. Installers: Per Tool and Whole Suite
 

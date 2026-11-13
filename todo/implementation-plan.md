@@ -186,7 +186,7 @@ Nothing in this plan can be proven until this phase is done. It opens by taking 
 | [ ] | `D00 T05 §3`  | Setup-Path CI Plus Reproducibility                |   5   |
 | [ ] | `D00 T05 §4`  | Sidecar Reproduction Command Carries -Visible     |   3   |
 | [x] | `D00 T06 §1`  | MySQL Schema, Authoring Workflow                  |  26   |
-| [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                     |   7   |
+| [ ] | `D00 T06 §2`  | Export, Embedding, Versioning                     |  10   |
 | [ ] | `D00 T06 §3`  | Beep Database Migration Off Packs                 |   5   |
 | [ ] | `D00 T06 §4`  | Data Extension: Vendors, Blink, POST              |   5   |
 | [ ] | `D00 T06 §5`  | Consumer Contract for Tools                       |   4   |
@@ -360,7 +360,7 @@ The suite is correct by here. This phase makes it shippable and makes it speak e
 |  ✔  | Section       | Deliverable                                    | Items |
 | :-: | ------------- | ---------------------------------------------- | :---: |
 | [ ] | `D06 T01 §1`  | Release Descriptors, Portable by Construction  |   6   |
-| [ ] | `D06 T01 §2`  | One Command Builds the Release Set             |   5   |
+| [ ] | `D06 T01 §2`  | One Command Builds the Release Set             |   6   |
 | [ ] | `D06 T01 §6`  | Version Rule, Changelog, and Release Checklist |   6   |
 | [ ] | `D06 T01 §8`  | Licensing and Attribution                      |  12   |
 | [ ] | `D01 T01 §14` | Embedded Dataset Loader                        |   4   |
