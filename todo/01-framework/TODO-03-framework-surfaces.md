@@ -41,7 +41,7 @@ track: F1
 
 | Order | Section | Deliverable | Depends On | Status |
 | :---: | :-----: | ----------- | ---------- | :----: |
-|   1   |   §1    | Standard window, menus, and message layer | -- |  [ ]   |
+|   1   |   §1    | Standard window, menus, and message layer | -- |  [x]   |
 |   2   |   §2    | Preferences shell, General, and Performance | -- |  [ ]   |
 |   3   |   §3    | Preferences Language page and tool-page contract | -- |  [ ]   |
 |   4   |   §4    | Per-tool log surface | -- |  [ ]   |
@@ -92,8 +92,17 @@ The window every tool opens: the Direct2D caption and status bar per `D01 T02 §
 
 **Test checkpoint:** `docs/framework/standard-window.md` exists; its matrix has a row, a failure presentation and a named `D01 T01 §7` check for every interactive element; the AutoIt inventory gives every part a verdict; both menus name every item with key, states, target and failure, with F1 left to `D06 T01 §18`; the message layer names titles, buttons, focus, keys and modality with the dead calls cut; the status bar names every region's states, triggers and clearing rules; and `D01 T01 §7` carries the item that builds the matrix's checks. The `D01 T01 §7` checklist can be built from this section with no invented control. Cheaper substitute that fails the checkpoint: menus without the no-tool-items rule, which specifies today and drifts tomorrow.
 
+> **Verified:** 2026-11-13 | §1 | the standard tool window is specified with no control left to invent: `docs/framework/standard-window.md` exists; its matrix "What must the build prove, row by row?" holds 25 rows, each with a trigger, states, result, a failure entry (none empty, counted by script) and a named `D01 T01 §7` check, which `D01 T01 §7` carries as an item; the AutoIt inventory gives every part of `_StartCoreGui` a verdict, its 34 source citations each opened and matched (a read-only check quoting every line, the lead re-opening a sample and the size constants `ReBar.au3:374-375`, `:342`, `:319`); both menus name every item with key, states, target and failure, with F1 left to `D06 T01 §18`; the message layer names titles, buttons, focus, keys and modality, the 18 dead `MsgBox(0, "")` lines counted by the page's grep, all comments; the status bar names every segment's states, triggers and clearing rules, density heights and the taskbar rule; every new string has its key, section and text. The page lints clean under `scripts/readme-check.py`'s rules (`[]`). `todo-graph.py validate` `30 todos, 257 sections -- 0 fatal`. A specification: no code changed, so no CI run is owed to it.
+> **Review:** astra (gpt-6-astra via codex). `docs/reviews/01-framework/D01-T03-s1.md`: plan gaps (6, folded), round 1 (two P2, fixed), round 2 (P2 and P3, fixed), round 3 (P3, carried into Repair 1), completion gaps (9 in scope, Repair 1). `-repair.md`: plan gaps (3 P2, folded), round 1 (medium, adversarial) `HIGHEST: none`, completion gaps (4 in scope, Repair 2). `-repair2.md`: plan gaps (2 P2, folded), round 1 `HIGHEST: none`, completion gaps (1 in scope, Repair 3). `-repair3.md`: plan gaps (P2, folded), round 1 `HIGHEST: none` · Raw findings: docs/reviews/01-framework/D01-T03-s1*.md
+> **Completion:** astra (medium), candidate 5f76b4aa -- COMPLETION: gaps (0 in scope; 1 out of scope, the build and its behavioural proof, owned by `D01 T01 §7` and `D01 T02 §8`) · Repair records: -repair (a0c9c226), -repair2 (dc0d8e6a), -repair3 (5f76b4aa)
+> **Plan review:** astra -- gaps on the first record (6, folded), then each repair record's own plan pass
+> **CRUD:** not applicable (a specification; the window it specifies reads and writes through the settings writer and the log, owned by `D01 T01 §2` and `§3`)
+> **Duration:** 2026-11-13T13:30:34Z to 2026-11-13T14:03:29Z
+> **Implementer:** claude (claude-opus-5-5)
+
 -> XREF: D01 T01 §7 -- the build that consumes this window spec
 -> XREF: D01 T02 §8 -- the menu bar and popup menu this spec's menus need
+-> XREF: D06 T01 §18 -- context help, for which this window reserves F1 and the Help menu's first position
 
 ## 2. Preferences Shell, General, and Performance
 

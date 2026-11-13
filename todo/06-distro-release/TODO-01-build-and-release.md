@@ -458,6 +458,7 @@ F1 opens context help: the guide page for the focused surface through the `D06 T
 
 -> XREF: D06 T01 §14 -- the pipeline and map this behavior reads
 -> XREF: D01 T01 §13 -- where this section was written; its Moved marker points here
+-> XREF: D01 T03 §1 -- the standard window, which reserves F1 and the Help menu's first position for this section (`docs/framework/standard-window.md`)
 
 ## Verification
 
