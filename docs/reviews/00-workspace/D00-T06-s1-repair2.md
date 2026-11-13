@@ -113,3 +113,86 @@ OVERALL: needs-attention
 
 HIGHEST: P2
 OVERALL: needs-attention
+
+## Round 5: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T11:06:23Z
+- Effort: low
+- Writer model: claude-opus-5-5
+- Policy: f2b50b8b7eb98c36012fef72c7708d340606ae06
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: source-defect
+- Lines: 6
+- Digest: 1369e56976d00cfa
+
+## source-defect: approve
+
+No findings within the scheduled lens. The three Repair 2 requirements are interpreted consistently with the governing contract, and the switch to including the author's option file is documented.
+
+HIGHEST: none
+OVERALL: approve
+
+## Completion review: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T11:09:19Z
+- Candidate: 2e4aed5dd413832a0b0b8487a02096e8324f4628
+- Effort: medium
+- Writer model: claude-opus-5-5
+- Policy: f2b50b8b7eb98c36012fef72c7708d340606ae06
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lines: 40
+- Digest: 0510404e48e3fdd5
+
+The Repair 2 behavior is implemented, but restore still has a cleanup gap. Review was read-only, with one mocked-I/O probe; I did not rerun the database-mutating self-test.
+
+**Part 1: completeness**
+
+1. **present:** Authoring setup, connection configuration and persistent storage. Evidence: `docs/reference-data.md:17`, `:34`; installation and lifecycle evidence in `todo/00-workspace/TODO-06-reference-data.md:72`.
+
+2. **present:** Versioned proposals, independent review, stamping, immutable history and transactional refusal. Regression cases cover rollback, reopening, concurrent edits and retained edit contents in `tools/refdata/refdata.py:809`, `:831`, `:932`, `:978`.
+
+3. **present:** Truthful listing, including literal `NULL` names and authors. Implementation: `tools/refdata/refdata.py:321`; regression: `:1196`. The section records failure with field marking removed.
+
+4. **present:** Persisted records remain inspectable and survive restart. Readback checks: `tools/refdata/refdata.py:794`, `:796`, `:1232`, `:1258`.
+
+5. **present:** Backup publishes only a completed dump and preserves an earlier backup on failure. Implementation: `tools/refdata/refdata.py:437`; unwritable destination, locked replacement and timeout regressions: `:1019`, `:1030`, `:1223`. Timeout cleanup closes the output handle before deletion.
+
+6. **present:** Restore refuses existing destinations, unreadable backups and attempts to escape its restricted database. Implementation: `tools/refdata/refdata.py:551`; isolation, client-command and unreadable-file tests: `:883`, `:893`, `:903`, `:1043`.
+
+7. **present:** Restore and upgrade inherit connection settings through MySQL’s own option-file handling. Implementation: `tools/refdata/refdata.py:536`, `:583`; tests cover verified TLS, incorrect CA refusal, relative paths, comments, includes and option ordering at `:1103`, `:1121`, `:1137`, `:1160`, `:1171`.
+
+8. **present:** Option-file `force` cannot turn a refused proposal into a partial commit. Command-line overrides: `tools/refdata/refdata.py:175`, `:460`; persisted rollback regression: `:1188`, with a recorded failing mutation.
+
+9. **present:** Upgrade preserves the source and compares the restored contents before reporting success. Implementation: `tools/refdata/refdata.py:635`; successful migration and deliberately lossy-copy refusal tests: `:1073`, `:1080`. Recovery instructions: `docs/reference-data.md:95`.
+
+10. **missing-in-scope, G1:** Restore cleanup stops if deleting its temporary credential file fails. At `tools/refdata/refdata.py:602`, an uncaught `PermissionError` prevents the subsequent `DROP USER`; on a failed restore it also prevents destination cleanup. A mocked Windows sharing violation reproduced the exception and confirmed no account-drop attempt. This leaves credentials and a usable temporary account behind even after an otherwise successful restore. No regression covers this cleanup failure.
+
+11. **missing-out-of-scope, G2:** The platform still needs deterministic export, embedding and drift detection, BiosCodes migration and expansion, and the shared consumer loader. These are explicitly unfinished in `todo/00-workspace/TODO-06-reference-data.md:16`, with owners **D00 T06 §§2-5**, plus BiosCodes integration in **D04 T05**. They do not belong to this repair.
+
+**Part 2: excellence**
+
+Counterpart: **none in `resolute_au3/`**. Behavioral parity is not applicable to this authoring tooling. The applicable modern-quality shortfall concerns recovery and truthful refusals under `DESIGN.md:201` and `:204`.
+
+1. **in-scope, G1:** A credential-file deletion failure produces a traceback and skips database cleanup. **Target:** independently attempt credential-file removal, account removal and any required destination removal; report each remaining resource by name with recovery instructions and exit nonzero without a traceback. A regression must prove that a locked credential file cannot prevent account removal, including after successful loading.
+
+No additional concrete wording or speed shortfall was established.
+
+**Gap list**
+
+1. **missing-in-scope / in-scope, G1:** Make restore cleanup independent of credential-file deletion, report leftovers accurately, and test the failure at `tools/refdata/refdata.py:602`.
+2. **missing-out-of-scope, G2:** Complete downstream export, embedding, drift detection, consumer loading and BiosCodes work under D00 T06 §§2-5 and D04 T05.
+
+COMPLETION: gaps
+
+## Writer note: completion gaps
+
+- Planned: G1, a restore's cleanup steps stopped by a credential file that cannot be removed, as the Repair 3 item in D00 T06 §1, reviewed on `docs/reviews/00-workspace/D00-T06-s1-repair3.md`.
+- Filed: D00 T06 §2 to §5 and D04 T05 (G2, export, embedding, drift, consumer loader and BiosCodes), already in the plan with those owners.
