@@ -100,8 +100,9 @@ param(
     # A drill (D00 T02 section 14): an always-on-top window of another
     # process laid over the target before the first check, or between the
     # first check and the copy, so each check is proven as it runs.
-    # 'close' ends the target between the checks instead, as a user closing it mid-capture would.
-    [ValidateSet('', 'before', 'between', 'close')][string]$DrillCoverAt = ''
+    # 'hide' hides the target between the checks instead, as a target that closes or minimizes
+    # mid-capture would, and shows it again: this script never ends a process it did not start.
+    [ValidateSet('', 'before', 'between', 'hide')][string]$DrillCoverAt = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -669,6 +670,7 @@ if ($width -le 0 -or $height -le 0) {
 $targetFrame = @($rect.Left, $rect.Top, $rect.Right, $rect.Bottom)
 $targetPid = [uint32]$target.Id
 $cover = $null
+$script:hidden = $false
 function Start-Cover {
     # The drill's covering window: another process's always-on-top window over the target's lower right quarter.
     $l = $rect.Left + [int]($width / 2); $t = $rect.Top + [int]($height / 2)
@@ -691,7 +693,7 @@ try {
     $refusal = Assert-Uncovered $hwnd $targetFrame $targetPid 'before'
     if ($refusal) { Write-Host $refusal -ForegroundColor Red; Stop-Ours; Exit-Capture 3 }
     if ($DrillCoverAt -eq 'between') { $script:cover = Start-Cover }
-    if ($DrillCoverAt -eq 'close') { Stop-Process -Id $target.Id -Force; Start-Sleep -Milliseconds 700; Write-Host "drill: the target, process $($target.Id), was closed between the checks" }
+    if ($DrillCoverAt -eq 'hide') { [void][Win32Capture]::ShowWindow($hwnd, 0); $script:hidden = $true; Start-Sleep -Milliseconds 700; Write-Host 'drill: the target was hidden between the checks' }
     $bitmap = New-Object System.Drawing.Bitmap $width, $height
     $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
     $graphics.CopyFromScreen($rect.Left, $rect.Top, 0, 0, $bitmap.Size)
@@ -701,6 +703,7 @@ try {
     if ($refusal) { $bitmap.Dispose(); Write-Host $refusal -ForegroundColor Red; Stop-Ours; Exit-Capture 3 }
 } finally {
     Stop-Cover
+    if ($script:hidden) { [void][Win32Capture]::ShowWindow($hwnd, 5) }   # the drill's hidden target is shown again
 }
 
 $outDir = Split-Path $Out -Parent
