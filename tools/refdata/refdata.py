@@ -540,8 +540,16 @@ def client_settings(author: Path) -> dict[str, str]:
     for line in proc.stdout.decode(OPTION_CODE_PAGE, "replace").splitlines():
         if not line.startswith("--"):
             continue
-        key, _, value = line[2:].partition("=")
+        key, equals, value = line[2:].partition("=")
         key = key.strip().lower().replace("_", "-")
+        # The client's option modifiers, read as the client reads them: loose- changes nothing but the error on an
+        # unknown name, enable- sets a boolean, and disable- and skip- clear one. Later lines still win.
+        if key.startswith("loose-"):
+            key = key[len("loose-"):]
+        if key.startswith("enable-"):
+            key, value = key[len("enable-"):], value if equals else "1"
+        elif key.startswith(("disable-", "skip-")):
+            key, value = key.split("-", 1)[1], "0"
         if key in CONNECTION_SETTINGS:
             if key in PATH_SETTINGS and value and not Path(value).is_absolute():
                 value = str((author.parent / value).resolve())
@@ -1178,6 +1186,16 @@ def self_test(schema: Path) -> int:
                     run_sql(f"DROP DATABASE IF EXISTS `{target_name}`;", options=options)
                 checks.check("TLS settings under a group header with a comment, or in an included file, are carried to the restore's connection",
                              all("restore user's connection" in said for said in carried.values()), repr(carried))
+
+                # Option modifiers are read as the client reads them: a loose- setting is carried, and a later
+                # skip- or enable- of a boolean wins over an earlier one.
+                modified = Path(tmp) / "modified.cnf"
+                modified.write_bytes(options.read_bytes().rstrip(b"\r\n") + b"\r\n[client]\r\nloose-ssl-mode=VERIFY_IDENTITY\r\nloose_ssl_ca=server-ca.pem\r\n"
+                                     b"get-server-public-key\r\nskip-get-server-public-key\r\nloose-compression-algorithms=zlib\r\n")
+                written = restricted_option_bytes(modified, "u", "p").decode(OPTION_CODE_PAGE)
+                checks.check("settings written with loose-, skip- or enable- are carried as the client reads them, the later one winning",
+                             'ssl-mode="VERIFY_IDENTITY"' in written and f'ssl-ca="{(Path(tmp) / "server-ca.pem").resolve().as_posix()}"' in written
+                             and 'get-server-public-key="0"' in written and 'compression-algorithms="zlib"' in written, written.replace("\r\n", " | "))
             finally:
                 for name in (old.database, upgraded, lossy, tls_restored, tls_upgraded, tls_refused, tls_refused_up, rel_restored, rel_upgraded, f"{database}_carry"):
                     run_sql(f"DROP DATABASE IF EXISTS `{name}`;", options=options)

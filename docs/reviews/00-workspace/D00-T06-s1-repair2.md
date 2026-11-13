@@ -69,3 +69,25 @@ OVERALL: needs-attention
 
 HIGHEST: P1
 OVERALL: needs-attention
+
+## Round 3: astra (`gpt-6-astra` via `codex`)
+
+- Writer: claude
+- Run: 2026-11-13T10:54:52Z
+- Effort: low
+- Writer model: claude-opus-5-5
+- Policy: f2b50b8b7eb98c36012fef72c7708d340606ae06
+- Execution: returned
+- Attempt reviewer: astra
+- Attempt model: gpt-6-astra
+- Attempt cli: codex
+- Lenses: adversarial
+- Lines: 6
+- Digest: eed5fb70f4892157
+
+## adversarial: needs-attention
+
+1. **P1, `tools/refdata/refdata.py:545`: Valid prefixed TLS options are silently discarded.** MySQL accepts `loose-ssl-mode=VERIFY_IDENTITY`, but the allowlist recognizes only `ssl-mode`. Reproduce through the documented shared-server path: put `loose-ssl-mode=VERIFY_IDENTITY` and `ssl-ca=ca.pem` under `[client]` in the author's option file, then run restore or upgrade. The restricted connection loses the explicit identity-verification requirement. MySQL processes recognized `loose-` options normally ([documentation](https://dev.mysql.com/doc/refman/26.10/en/option-modifiers.html)). A read-only probe confirmed native client acceptance and, with simulated reader output, that `client_settings` drops this setting. Normalize supported option modifiers before filtering, preserving option precedence.
+
+HIGHEST: P1
+OVERALL: needs-attention
