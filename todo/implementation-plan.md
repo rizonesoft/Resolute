@@ -217,7 +217,7 @@ The framework every tool consumes, the repair contract the destructive half cons
 | [x] | `D01 T03 §3`  | Language page and tool-page contract          |  15   |
 | [ ] | `D01 T01 §7`  | Standard window, About, and preferences       |  17   |
 | [ ] | `D01 T01 §8`  | DPI awareness and system theme                |   7   |
-| [ ] | `D01 T03 §4`  | Per-tool log surface                          |  13   |
+| [ ] | `D01 T03 §4`  | Per-tool log surface                          |  15   |
 | [ ] | `D01 T01 §3`  | Logging and the log surface                   |   9   |
 | [ ] | `D01 T03 §5`  | Update dialog and announcement                |   6   |
 | [ ] | `D01 T01 §5`  | Update check and consolidation announcement   |   9   |
