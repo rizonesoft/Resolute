@@ -91,7 +91,11 @@ param(
     # Drills through the display checks: a work area in place of the
     # display's (left,top,right,bottom), and a placed window moved partly off it.
     [string]$DrillWorkArea = '',
-    [switch]$DrillMoveOffscreen
+    [switch]$DrillMoveOffscreen,
+    # A drill: the display shrinks to 1366 x 768 at this point of the first
+    # shot, as a resolution change during the run would, so each re-read of
+    # the work area is proven to happen there.
+    [ValidateSet('', 'launch', 'capture')][string]$DrillShrinkAt = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -290,6 +294,37 @@ function Test-FitsDisplay([int[]]$Work, [int]$Inset, [int]$Width, [int]$Height) 
     $workWidth = $Work[2] - $Work[0]; $workHeight = $Work[3] - $Work[1]
     if ($Inset + $Width -le $workWidth -and $Inset + $Height -le $workHeight) { return $null }
     return "the display's work area is $workWidth x $workHeight, too small for a $Width x $Height window at $Inset from its corner, so part of each shot would be off the screen"
+}
+
+$script:Shrunk = $false
+function Read-WorkArea([string]$Stage) {
+    # The primary monitor's work area now, left, top, right, bottom. Read
+    # fresh at every check: the display can change while the run waits.
+    if ($DrillShrinkAt -and $DrillShrinkAt -eq $Stage -and -not $script:Shrunk) { $script:Shrunk = $true; Write-Host "drill: the display shrinks at $Stage" }
+    if ($script:Shrunk) { return @(0, 0, 1366, 728) }
+    if ($DrillWorkArea) {
+        $given = @($DrillWorkArea -split ',' | ForEach-Object { [int]$_ })
+        if ($given.Count -ne 4) { throw "-DrillWorkArea takes left,top,right,bottom" }
+        return $given
+    }
+    $area = [Shot]::PrimaryWorkArea()
+    if ($null -eq $area) { throw "the display's work area could not be read" }
+    return @($area.Left, $area.Top, $area.Right, $area.Bottom)
+}
+
+function Assert-OnScreen([IntPtr]$Hwnd, [string]$What, [string]$Stage) {
+    # The display as it is now fits the window, and the window, when there
+    # is one, lies wholly inside it. Returns the work area it checked against.
+    try { $work = Read-WorkArea $Stage } catch { throw "stood down during ${What}: $($_.Exception.Message)" }
+    $tooSmall = Test-FitsDisplay $work 40 1600 1000
+    if ($tooSmall) { throw "stood down during ${What}: $tooSmall" }
+    if ($Hwnd -ne [IntPtr]::Zero) {
+        $placed = New-Object Shot+RECT
+        if (-not [Shot]::GetWindowRect($Hwnd, [ref]$placed) -or $placed.Left -lt $work[0] -or $placed.Top -lt $work[1] -or $placed.Right -gt $work[2] -or $placed.Bottom -gt $work[3]) {
+            throw "stood down during ${What}: the window is not wholly inside the display's work area"
+        }
+    }
+    return $work
 }
 
 function Set-Position([IntPtr]$Hwnd, [int]$X, [int]$Y, [int]$Width, [int]$Height, [string]$What, [int]$TimeoutMs = 5000) {
@@ -605,6 +640,7 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
     $cap = $null
     try {
         Assert-NoInput "the launch of $name"
+        $work = Assert-OnScreen ([IntPtr]::Zero) "the launch of $name" 'launch'
         $proc = Start-Process -FilePath $Exe -WorkingDirectory $WorkingDir -PassThru
         if ($DrillFailQuery) { $script:QueryFails = $true }
         $hwnd = [IntPtr]::Zero
@@ -615,17 +651,14 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         }
         if ($hwnd -eq [IntPtr]::Zero) { throw "no main window for $name" }
         Assert-NoInput 'positioning'
-        Set-Position $hwnd ($script:Work[0] + 40) ($script:Work[1] + 40) 1600 1000 'positioning'
+        Set-Position $hwnd ($work[0] + 40) ($work[1] + 40) 1600 1000 'positioning'
         if ($DrillMoveOffscreen) {
             # The drill's launcher moving itself: half its width past the work area's right edge.
-            [void][Shot]::SetWindowPos($hwnd, [IntPtr]::Zero, $script:Work[2] - 800, $script:Work[1] + 40, 1600, 1000, 0x4000)
+            [void][Shot]::SetWindowPos($hwnd, [IntPtr]::Zero, $work[2] - 800, $work[1] + 40, 1600, 1000, 0x4000)
             Start-Sleep -Milliseconds 500
             Write-Host 'drill: the window was moved partly off the work area'
         }
-        $placed = New-Object Shot+RECT
-        if (-not [Shot]::GetWindowRect($hwnd, [ref]$placed) -or $placed.Left -lt $script:Work[0] -or $placed.Top -lt $script:Work[1] -or $placed.Right -gt $script:Work[2] -or $placed.Bottom -gt $script:Work[3]) {
-            throw "stood down during positioning: the window is not wholly inside the display's work area"
-        }
+        $null = Assert-OnScreen $hwnd 'positioning' 'positioning'
         Invoke-Drill 'positioning'
         Wait-Checked 500 'positioning'
         # The launcher starts in System appearance; its theme command
@@ -652,6 +685,7 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
         foreach ($a in @('-NoProfile', '-File', $CaptureScript, '-ProcessId', "$($proc.Id)", '-Appearance', $Mode, '-Out', $out, '-Describes', $describes, '-Fixture', $fixture, '-LaunchContext', $context, '-FixtureFiles', 'none beside Bin/Release (launcher only build)')) { $info.ArgumentList.Add($a) }
         $info.UseShellExecute = $false
         Assert-NoInput "the capture of $name"
+        $null = Assert-OnScreen $hwnd "the capture of $name" 'capture'
         $cap = [System.Diagnostics.Process]::Start($info)
         Invoke-Drill 'capture'
         $deadline = [DateTime]::UtcNow.AddSeconds($CaptureTimeoutSeconds)
@@ -659,8 +693,9 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
             Assert-NoInput "the capture of $name"
             if ([DateTime]::UtcNow -gt $deadline) { throw "the capture of $name did not finish within ${CaptureTimeoutSeconds}s" }
         }
-        # Input that arrived as the capture finished counts too.
+        # Input that arrived as the capture finished counts too, and so does a display that changed under it.
         Assert-NoInput "the capture of $name"
+        $null = Assert-OnScreen $hwnd "the capture of $name" 'captured'
         if ($cap.ExitCode -ne 0) { throw "capture-window failed for $name with $($cap.ExitCode)" }
         $script:Shots += $name
         Write-Output "SHOT $name ok"
@@ -674,18 +709,17 @@ function Take-Shot([string]$State, [string]$Mode, [int]$Presses, [int]$ViewCmd) 
 
 $script:KeepStaging = $false
 
-$workArea = [Shot]::PrimaryWorkArea()
-if ($null -eq $workArea) {
-    Write-Host 'stood down before launching anything: the display''s work area could not be read' -ForegroundColor Yellow
+# The display is checked before the admission wait, so a run that can
+# never fit refuses at once, and again at every shot, because the display
+# can change while the run waits.
+if ($DrillWorkArea) { Write-Host "drill: the work area is $DrillWorkArea" }
+try {
+    $startWork = Read-WorkArea 'start'
+} catch {
+    Write-Host "stood down before launching anything: $($_.Exception.Message)" -ForegroundColor Yellow
     exit 3
 }
-$script:Work = @($workArea.Left, $workArea.Top, $workArea.Right, $workArea.Bottom)
-if ($DrillWorkArea) {
-    $script:Work = @($DrillWorkArea -split ',' | ForEach-Object { [int]$_ })
-    if ($script:Work.Count -ne 4) { Write-Host "capture-launcher-readme: -DrillWorkArea takes left,top,right,bottom" -ForegroundColor Red; exit 2 }
-    Write-Host "drill: the work area is $DrillWorkArea"
-}
-$tooSmall = Test-FitsDisplay $script:Work 40 1600 1000
+$tooSmall = Test-FitsDisplay $startWork 40 1600 1000
 if ($tooSmall) {
     Write-Host "stood down before launching anything: $tooSmall" -ForegroundColor Yellow
     exit 3
