@@ -68,7 +68,7 @@ param(
     [string]$WorkingDirectory,
     [string]$WindowTitle,
     [int]$ProcessId = 0,
-    [Parameter(Mandatory = $true)][string]$Out,
+    [string]$Out,
     [string]$Describes = '',
 
     # The appearance the captured window shows. An application can override
@@ -89,11 +89,167 @@ param(
     # a second operator can recreate the capture from the sidecar alone
     # (D00 T02 section 12).
     [string]$LaunchContext = '',
-    [string]$FixtureFiles = ''
+    [string]$FixtureFiles = '',
+
+    # Check the pair writer without a desktop (D00 T02 section 13).
+    [switch]$SelfTest
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+
+# ---- the pair writer (D00 T02 section 13) -----------------------------------
+# A capture is two files that prove each other: the image and the sidecar that
+# says what it shows. They are written beside the live pair as *.new, each read
+# back against the bytes meant, and only then switched in, the image first and
+# the sidecar second, each by File.Replace keeping the old file as *.old. If the
+# sidecar's switch fails, the image's is undone, so the live pair is either the
+# old one or the new one, never one of each. Whatever fails, the *.new and *.old
+# files this call made are removed and the failure is named.
+
+$script:AfterWrite = $null   # the self-test's way to make a write land other bytes
+$script:SwitchHook = $null   # the self-test's stand-in for the writer ending between the two switches
+
+function Restore-Pair([string]$Image, [string]$Sidecar) {
+    # A writer that ended between the switches left a state the files
+    # alone describe. Returns what it found, or $null when nothing was left.
+    $imageNew = "$Image.new"; $sidecarNew = "$Sidecar.new"; $imageOld = "$Image.old"; $sidecarOld = "$Sidecar.old"
+    $said = $null
+    if (Test-Path -LiteralPath $imageNew) {
+        # The switch never began: the live pair is untouched.
+        foreach ($f in $imageNew, $sidecarNew) { if (Test-Path -LiteralPath $f) { [System.IO.File]::Delete($f) } }
+        $said = 'a capture that never switched in was removed'
+    } elseif (Test-Path -LiteralPath $sidecarNew) {
+        # The image switched and the sidecar did not: the earlier image comes back, or the lone new one goes.
+        if (Test-Path -LiteralPath $imageOld) { [System.IO.File]::Move($imageOld, $Image, $true) } elseif (Test-Path -LiteralPath $Image) { [System.IO.File]::Delete($Image) }
+        [System.IO.File]::Delete($sidecarNew)
+        $said = 'a capture cut short between its switches was undone; the earlier pair is back'
+    }
+    foreach ($f in $imageOld, $sidecarOld) {
+        if (Test-Path -LiteralPath $f) { [System.IO.File]::Delete($f); if (-not $said) { $said = 'a finished capture''s backups were removed' } }
+    }
+    return $said
+}
+
+function Write-Verified([string]$Path, [byte[]]$Bytes, [string]$What) {
+    [System.IO.File]::WriteAllBytes($Path, $Bytes)
+    if ($script:AfterWrite) { & $script:AfterWrite $Path }
+    $back = [System.IO.File]::ReadAllBytes($Path)
+    if (-not [System.Linq.Enumerable]::SequenceEqual($back, $Bytes)) {
+        throw "the $What read back differently from what was written ($($back.Length) bytes against $($Bytes.Length))"
+    }
+}
+
+function Switch-In([string]$New, [string]$Live) {
+    # Returns the backup of the file it replaced, or $null when there was none.
+    if (Test-Path -LiteralPath $Live) {
+        $old = "$Live.old"
+        [System.IO.File]::Replace($New, $Live, $old)
+        return $old
+    }
+    [System.IO.File]::Move($New, $Live)
+    return $null
+}
+
+function Write-CapturePair([string]$Image, [byte[]]$ImageBytes, [string]$Sidecar, [byte[]]$SidecarBytes) {
+    $imageNew = "$Image.new"
+    $sidecarNew = "$Sidecar.new"
+    $made = [System.Collections.Generic.List[string]]::new()
+    $imageOld = $null
+    $imageSwitched = $false
+    try {
+        $made.Add($imageNew)
+        Write-Verified $imageNew $ImageBytes 'image'
+        $made.Add($sidecarNew)
+        Write-Verified $sidecarNew $SidecarBytes 'sidecar'
+        $imageOld = Switch-In $imageNew $Image
+        $imageSwitched = $true
+        if ($imageOld) { $made.Add($imageOld) }
+        if ($script:SwitchHook -and (& $script:SwitchHook) -eq 'stop') { return }
+        $sidecarOld = Switch-In $sidecarNew $Sidecar
+        if ($sidecarOld) { $made.Add($sidecarOld) }
+    } catch {
+        $why = $_.Exception.Message
+        try {
+            if ($imageSwitched) {
+                # The new image is live beside the old sidecar: put the old image back.
+                if ($imageOld) { [System.IO.File]::Move($imageOld, $Image, $true) } else { [System.IO.File]::Delete($Image) }
+            }
+        } catch {
+            throw "the capture pair was not written, and the previous image could not be put back ($($_.Exception.Message)); it is at ${imageOld}: $why"
+        } finally {
+            foreach ($f in $made) { if ($f -ne $imageOld -and (Test-Path -LiteralPath $f -PathType Leaf)) { Remove-Item -LiteralPath $f -Force } }
+        }
+        throw "the capture pair was not written, and the previous pair is unchanged: $why"
+    }
+    foreach ($f in $made) { if (Test-Path -LiteralPath $f -PathType Leaf) { Remove-Item -LiteralPath $f -Force } }
+}
+
+function Invoke-SelfTest {
+    $failed = [System.Collections.Generic.List[string]]::new()
+    function Check([string]$Name, [bool]$Ok) {
+        if ($Ok) { Write-Host "PASS $Name" } else { Write-Host "FAIL $Name"; $failed.Add($Name) }
+    }
+    $dir = Join-Path ([System.IO.Path]::GetTempPath()) ("capture-pair-selftest-" + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $dir | Out-Null
+    try {
+        $png = Join-Path $dir 'shot.png'
+        $txt = Join-Path $dir 'shot.txt'
+        $enc = [System.Text.UTF8Encoding]::new($false)
+        $oldPng = [byte[]](1..64); $oldTxt = $enc.GetBytes("old sidecar`n")
+        $newPng = [byte[]](65..160); $newTxt = $enc.GetBytes("new sidecar`n")
+        function Hash([string]$f) { (Get-FileHash -LiteralPath $f).Hash }
+        function Leftovers { @(Get-ChildItem -LiteralPath $dir -File | Where-Object { $_.Name -like '*.new' -or $_.Name -like '*.old' }).Count }
+
+        Write-CapturePair $png $oldPng $txt $oldTxt
+        Check 'a first write leaves a matching pair and no *.new or *.old' ((Leftovers) -eq 0 -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($png), $oldPng) -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($txt), $oldTxt))
+        $before = "$(Hash $png) $(Hash $txt)"
+
+        # A locked sidecar: another process holds the live sidecar open with no sharing.
+        $lock = [System.IO.File]::Open($txt, 'Open', 'Read', 'None')
+        $threw = $null
+        try { Write-CapturePair $png $newPng $txt $newTxt } catch { $threw = $_.Exception.Message } finally { $lock.Dispose() }
+        Check 'a refused sidecar write is named' ($threw -like '*was not written*')
+        Check 'a refused sidecar write leaves the previous pair byte for byte' ("$(Hash $png) $(Hash $txt)" -eq $before)
+        Check 'a refused sidecar write leaves no *.new or *.old' ((Leftovers) -eq 0)
+
+        # A write that lands other bytes: only the readback can see it.
+        $script:AfterWrite = { param($f) if ($f -like '*.txt.new') { [System.IO.File]::WriteAllText($f, 'damaged') } }
+        $threw = $null
+        try { Write-CapturePair $png $newPng $txt $newTxt } catch { $threw = $_.Exception.Message } finally { $script:AfterWrite = $null }
+        Check 'a sidecar that reads back differently is refused by name' ($threw -like '*sidecar read back differently*')
+        Check 'a sidecar that reads back differently leaves the previous pair byte for byte' ("$(Hash $png) $(Hash $txt)" -eq $before)
+
+        # (c) a writer stopped between the switches, over the previous pair and over none, then recovered as its next start does.
+        $script:SwitchHook = { 'stop' }
+        try { Write-CapturePair $png $newPng $txt $newTxt } finally { $script:SwitchHook = $null }
+        $mixed = "$(Hash $png) $(Hash $txt)" -ne $before
+        $found = Restore-Pair $png $txt
+        Check 'a writer stopped between the switches is recovered to the previous pair byte for byte' ($mixed -and $found -like '*undone*' -and "$(Hash $png) $(Hash $txt)" -eq $before -and (Leftovers) -eq 0)
+        $lonePng = Join-Path $dir 'first.png'; $loneTxt = Join-Path $dir 'first.txt'
+        $script:SwitchHook = { 'stop' }
+        try { Write-CapturePair $lonePng $newPng $loneTxt $newTxt } finally { $script:SwitchHook = $null }
+        $null = Restore-Pair $lonePng $loneTxt
+        Check 'a first capture stopped between the switches is recovered to no files' (-not (Test-Path -LiteralPath $lonePng) -and -not (Test-Path -LiteralPath $loneTxt) -and (Leftovers) -eq 0)
+
+        Write-CapturePair $png $newPng $txt $newTxt
+        Check 'a replacing write leaves the new pair and no *.new or *.old' ((Leftovers) -eq 0 -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($png), $newPng) -and [System.Linq.Enumerable]::SequenceEqual([System.IO.File]::ReadAllBytes($txt), $newTxt))
+    } finally {
+        Remove-Item -LiteralPath $dir -Recurse -Force
+    }
+    if ($failed.Count) { Write-Host ("self-test: FAIL " + ($failed -join '; ')); return 1 }
+    Write-Host 'self-test: all pass'
+    return 0
+}
+
+if ($SelfTest) { exit (Invoke-SelfTest) }
+
+if (-not $Out) {
+    Write-Host "capture-window: give -Out, the PNG to write." -ForegroundColor Red
+    exit 2
+}
+$recovered = Restore-Pair ([System.IO.Path]::GetFullPath($Out)) ([System.IO.Path]::ChangeExtension([System.IO.Path]::GetFullPath($Out), '.txt'))
+if ($recovered) { Write-Host "capture-window: $recovered ($Out)" -ForegroundColor Yellow }
 
 # Neither given means "enumerate every window and take the first", which can
 # foreground and save an unrelated application. Refused before anything is
@@ -235,8 +391,11 @@ $graphics.Dispose()
 
 $outDir = Split-Path $Out -Parent
 if ($outDir -and -not (Test-Path $outDir)) { New-Item -ItemType Directory -Force -Path $outDir | Out-Null }
-$bitmap.Save($Out, [System.Drawing.Imaging.ImageFormat]::Png)
+$encoded = [System.IO.MemoryStream]::new()
+$bitmap.Save($encoded, [System.Drawing.Imaging.ImageFormat]::Png)
 $bitmap.Dispose()
+$imageBytes = $encoded.ToArray()
+$encoded.Dispose()
 
 # TWO DPI FIGURES, because for a DPI-unaware window they differ and reporting
 # only the first is misleading. GetDpiForWindow returns the window's LOGICAL
@@ -263,7 +422,7 @@ $appearanceLine = if ($Appearance) {
     $system = if ($null -eq $appsLight) { 'unknown' } elseif ($appsLight -eq 0) { 'dark' } else { 'light' }
     "$system  (the system app setting; the application may override it: pass -Appearance)"
 }
-@(
+$sidecarLines = @(
     "capture       : $(Split-Path $Out -Leaf)"
     "describes     : $Describes"
     "window title  : $($target.MainWindowTitle)"
@@ -290,7 +449,16 @@ $appearanceLine = if ($Appearance) {
     ""
     "Reproduce with scripts/capture-window.ps1. Where this capture and"
     "DESIGN.md disagree, the contract wins and this capture is restaked."
-) | Set-Content -Path $sidecar -Encoding UTF8
+)
+# The same bytes Set-Content -Encoding UTF8 wrote before: UTF-8 without a BOM, CRLF line ends, one after the last line.
+$sidecarBytes = [System.Text.UTF8Encoding]::new($false).GetBytes((($sidecarLines | ForEach-Object { "$_" }) -join "`r`n") + "`r`n")
+try {
+    Write-CapturePair ([System.IO.Path]::GetFullPath($Out)) $imageBytes ([System.IO.Path]::GetFullPath($sidecar)) $sidecarBytes
+} catch {
+    Write-Host "capture-window: $($_.Exception.Message)" -ForegroundColor Red
+    Stop-Ours
+    exit 1
+}
 
 Write-Host ("captured {0}  {1}x{2}  monitor {3} dpi, window {4} dpi, aware={5}" -f `
     (Split-Path $Out -Leaf), $width, $height, $monX, $windowDpi, $dpiAware) -ForegroundColor Green
